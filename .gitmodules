@@ -1,0 +1,4 @@
+[submodule "common"]
+	path = common
+	url = git@git.local.tulingdao.com:root/common.git
+	update = merge
