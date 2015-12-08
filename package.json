@@ -26,6 +26,7 @@
     "morgan": "^1.6.1",
     "q": "^1.4.1",
     "reconnect-core": "^1.1.0",
+    "request": "^2.67.0",
     "serve-favicon": "^2.3.0",
     "shoe": "0.0.15"
   },
