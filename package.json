@@ -1,0 +1,32 @@
+{
+  "name": "qmtrip",
+  "version": "0.0.1",
+  "description": "qmtrip",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.local.tulingdao.com:root/qmtrip.git"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "app-module-path": "^1.0.5",
+    "body-parser": "^1.14.1",
+    "callsite": "^1.0.0",
+    "co": "^4.6.0",
+    "colors": "^1.1.2",
+    "connect-timeout": "^1.7.0",
+    "cookie-parser": "^1.4.0",
+    "dnode": "^1.2.2",
+    "express": "^4.13.3",
+    "moment": "^2.10.6",
+    "morgan": "^1.6.1",
+    "q": "^1.4.1",
+    "reconnect-core": "^1.1.0",
+    "serve-favicon": "^2.3.0",
+    "shoe": "0.0.15"
+  }
+}
