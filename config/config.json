@@ -1,0 +1,34 @@
+{
+  "appName": "qmtrip",
+
+  "hostname": "my.tulingdao.com",
+  "cluster": false,
+  "port": 4002,
+  "apiPort": 4102,
+  "host": "http://${{hostname}}:${{port}}",
+  "socket_file": null,
+  "pid_file": "${{ROOT_DIR}}/tmp/server.pid",
+
+  "logger": {
+    "path": "${{ROOT_DIR}}/log",
+    "prefix": "${{appName}}_",
+    "httptype": "short",
+    "mods": {
+      "sql": { "prefix": "${{appName}}_sql_", "console": true },
+      "http": { "console": false }
+    }
+  },
+  "postgres":{
+    "url": "postgres://postgres:root@localhost:5432/top_v2",
+    "debug": true
+  },
+  "hosts": {
+    "main":{"addr":"clear.tulingdao.com", "port":4001}
+  },
+  "api": [
+    {
+      "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
+      "modules": "auth"
+    }
+  ]
+}
