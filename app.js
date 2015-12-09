@@ -37,7 +37,7 @@ var start_time = new Date();
 var cluster = require('cluster');
 var VERSION = {VERSION:'dev', GITVERSION:'dev'};
 try{
-    VERSION = require(path.join(ROOT_DIR, 'VERSION.json'));
+    VERSION = require(path.join(__dirname, 'VERSION.json'));
 }catch(e){}
 app.use('/server_status', function(req, res, next){
     res.header('Access-Control-Allow-Origin', '*');

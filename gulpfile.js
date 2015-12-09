@@ -47,4 +47,4 @@ gulplib.dist(function(){
     return dist_all;
 });
 
-gulplib.final();
+gulplib.final('qmtrip');
