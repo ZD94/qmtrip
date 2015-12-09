@@ -38,7 +38,8 @@ gulplib.dist(function(){
         dist_all.push(gulp.src(fname).pipe(gulp.dest('dist')));
     }
     copy = [
-        'config'
+        'config',
+        'models'
     ];
     for(var i=0; i<copy.length; i++){
         var fname = copy[i];
