@@ -3,5 +3,5 @@ node_modules
 /tmp
 /log
 /dist
-bundle.*.js
+/public/script/libs
 controller.all.js
