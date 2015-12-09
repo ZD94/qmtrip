@@ -3,3 +3,4 @@
  */
 
 require("./client/index.test");
+require("./mail/index.test");

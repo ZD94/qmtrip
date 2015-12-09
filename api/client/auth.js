@@ -6,10 +6,12 @@ var Q = require("q");
 var L = require("../../common/language");
 var validate = require("../../common/validate");
 var md5 = require("../../common/utils").md5;
-
+var db = require("../../models").sequelize;
+var uuid = require("node-uuid");
 var authServer = require("../auth");
 var auth = {};
 var accounts = [];
+var mail = require("../mail");
 
 /**
  * 新建账号
@@ -27,12 +29,12 @@ auth.newAccount = function(data, callback) {
     }
 
     if (!data.email) {
-        defer.reject(L.ERR.EMAIL_NOT_EXIST);
+        defer.reject(L.ERR.EMAIL_EMPTY);
         return defer.promise.nodeify(callback);
     }
 
     if (!validate.isEmail(data.email)) {
-        defer.reject(L.ERR.EMAIL_NOT_EXIST);
+        defer.reject(L.ERR.EMAIL_EMPTY);
         return defer.promise.nodeify(callback);
     }
 
@@ -41,10 +43,26 @@ auth.newAccount = function(data, callback) {
         return defer.promise.nodeify(callback);
     }
 
-    var account = {id: "123400000-1234-1234-1234-123400001234", email: data.email, pwd: data.pwd, status: 0};
-    accounts.push(account);
-    defer.resolve({code: 0, msg: "ok", data: account});
-    return defer.promise.nodeify(callback)
+    var pwd = data.pwd;
+    pwd = md5(pwd);
+    var m = db.models.Account.build({id: uuid.v1(), email: data.email, pwd: pwd});
+    return m.save()
+        .then(function(account) {
+            if (account.status == 0) {
+                //发送激活邮件
+                mail.sendEmail(account.email, "ACTIVE_EMAIL", [data.email, "#"]);
+            }
+            return account;
+        })
+        .then(function(account) {
+            return {code: 0, msg: "ok", data: {
+                id: account.id,
+                email: account.email,
+                mobile: account.mobile,
+                status: account.status
+            }};
+        })
+        .nodeify(callback);
 }
 
 /**
@@ -65,7 +83,12 @@ auth.login = function(data, callback) {
     }
 
     if (!data.email && !data.mobile) {
-        defer.reject(L.ERR.EMAIL_NOT_EXIST);
+        defer.reject(L.ERR.EMAIL_EMPTY);
+        return defer.promise.nodeify(callback);
+    }
+
+    if (!validate.isEmail((data.email))) {
+        defer.reject(L.ERR.EMAIL_EMPTY);
         return defer.promise.nodeify(callback);
     }
 
@@ -74,33 +97,29 @@ auth.login = function(data, callback) {
         return defer.promise.nodeify(callback);
     }
 
-    var loginAccount;
-    for(var i= 0, ii=accounts.length; i<ii; i++) {
-        var account = accounts[i];
-        if (account.email == data.email || account.mobile == data.mobile) {
-            loginAccount = account;
-            break;
-        }
-    }
+    var pwd = md5(data.pwd);
 
-    if (!loginAccount) {
-        defer.reject(L.ERR.ACCOUNT_NOT_EXIST);
-        return defer.promise.nodeify(callback);
-    }
+    return db.models.Account.findOne({where: {email: data.email}})
+        .then(function(loginAccount) {
+            if (!loginAccount) {
+                defer.reject(L.ERR.ACCOUNT_NOT_EXIST);
+                return defer.promise.nodeify(callback);
+            }
 
-    if (loginAccount.pwd != data.pwd) {
-        defer.reject(L.ERR.PASSWORD_NOT_MATCH);
-        return defer.promise.nodeify(callback);
-    }
+            if (loginAccount.pwd != pwd) {
+                defer.reject(L.ERR.PASSWORD_NOT_MATCH);
+                return defer.promise.nodeify(callback);
+            }
 
-    if (loginAccount.status != 1) {
-        defer.reject(L.ERR.ACCOUNT_FORBIDDEN);
-        return defer.promise.nodeify(callback);
-    }
+            if (loginAccount.status != 1) {
+                defer.reject(L.ERR.ACCOUNT_FORBIDDEN);
+                return defer.promise.nodeify(callback);
+            }
 
-    return _authenticateSign(loginAccount.id)
-        .then(function(result) {
-            return {code:0, msg: "ok", data: result};
+            return _authenticateSign(loginAccount.id)
+                .then(function(result) {
+                    return {code:0, msg: "ok", data: result};
+                })
         })
         .nodeify(callback);
 }
@@ -115,8 +134,9 @@ auth.login = function(data, callback) {
  * @param {Callback} callback
  * @return {Promise} {code:0, msg: "Ok"}
  */
-auth.authenticate = function(userId, tokenId, timestamp, tokenSign, callback) {
+auth.authentication = function(userId, tokenId, timestamp, tokenSign, callback) {
     var defer = Q.defer();
+    var tokenSign = getTokenSign({})
     defer.resolve({code: 0, msg: "ok"});
 }
 
@@ -143,8 +163,7 @@ function _authenticateSign(accountId, callback) {
     var tokenId = "12341234-1234-1234-1234-123412341234";
     var token = "12341234";
     var timestamp = Date.now();
-    var originStr = accountId+tokenId+token+timestamp;
-    var tokenSign = md5(originStr);
+    var tokenSign = getTokenSign(accountId, tokenId, token, timestamp);
     defer.resolve({
         token_id: tokenId,
         user_id: accountId,
@@ -152,6 +171,11 @@ function _authenticateSign(accountId, callback) {
         timestamp: timestamp
     });
     return defer.promise.nodeify(callback);
+}
+
+function getTokenSign(accountId, tokenId, token, timestamp) {
+    var originStr = accountId+tokenId+token+timestamp;
+    return md5(originStr);;
 }
 
 module.exports = auth;
