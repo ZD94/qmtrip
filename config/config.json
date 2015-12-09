@@ -19,7 +19,7 @@
     }
   },
   "postgres":{
-    "url": "postgres://postgres:root@localhost:5432/top_v2",
+    "url": "postgres://postgres:root@localhost:5432/qmtrip",
     "debug": true
   },
   "hosts": {
