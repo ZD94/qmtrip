@@ -5,3 +5,4 @@ node_modules
 /dist
 /public/script/libs
 controller.all.js
+config/config.local.json
