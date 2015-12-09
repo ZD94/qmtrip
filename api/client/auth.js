@@ -136,8 +136,13 @@ auth.login = function(data, callback) {
  */
 auth.authentication = function(userId, tokenId, timestamp, tokenSign, callback) {
     var defer = Q.defer();
-    var tokenSign = getTokenSign({})
-    defer.resolve({code: 0, msg: "ok"});
+    var sign = getTokenSign(userId, tokenId, "12341234", timestamp);
+    if (sign == tokenSign) {
+        defer.resolve({code: 0, msg: "ok"});
+    } else {
+        defer.reject({code: -1, msg: "已经失效"});
+    }
+    return defer.promise.nodeify(callback);
 }
 
 /**
