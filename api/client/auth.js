@@ -59,4 +59,16 @@ auth.authentication = authServer.authentication;
  */
 auth.bindMobile =authServer.bindMobile;
 
+/**
+ * 激活账号
+ *
+ * @param {Object} data
+ * @param {UUID} data.accountId 账号ID
+ * @param {String} data.timestamp 时间戳
+ * @param {String} data.sign 签名
+ * @param {Callback} callback
+ * @return {Promise} {code:0 , msg: "ok"}
+ */
+auth.activeAccount = authServer.activeAccount;
+
 module.exports = auth;

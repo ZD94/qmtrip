@@ -10,8 +10,8 @@ var assert = require("assert");
 describe("api/client/auth.js", function() {
 
     var ACCOUNT = {
-        email: "wanglihui.sjz@gmail.com",
-        pwd: "time9818"
+        email: "lihui.wang@tulingdao.com",
+        pwd: "123456"
     }
 
     describe("API.auth.newAccount", function() {
@@ -43,7 +43,7 @@ describe("api/client/auth.js", function() {
         });
 
         after(function(done) {
-            authServer.remove({accountId: _account.id}, function(err, result) {
+            authServer.remove({email: ACCOUNT.email}, function(err, result) {
                 assert.equal(err, null);
                 assert.equal(result.code, 0);
                 done();
@@ -141,7 +141,7 @@ describe("api/client/auth.js", function() {
         })
 
         after(function(done) {
-            authServer.remove({accountId: _account.id}, function(err, result) {
+            authServer.remove({email: ACCOUNT.email}, function(err, result) {
                 assert.equal(err, null);
                 assert.equal(result.code, 0);
                 done();

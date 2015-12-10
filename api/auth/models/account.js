@@ -73,6 +73,10 @@ module.exports = function(Db, DataType) {
         lastLoginIp: {
             type: DataType.STRING(50),
             field: "last_login_ip"
+        },
+        activeToken: {
+            type: DataType.STRING(50),
+            field: "active_token"
         }
     }, {
         tableName: "accounts",

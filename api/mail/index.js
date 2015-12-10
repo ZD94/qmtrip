@@ -11,7 +11,7 @@ var format = require("js-format");
 var Mail = {};
 
 var TEMPLATE = {
-    "ACTIVE_EMAIL": {subject: "全麦商旅激活邮件", html: "%s感谢您注册了全麦商旅,点击此处激活您的账号%s"},
+    "ACTIVE_EMAIL": {subject: "全麦商旅激活邮件", html: "%s感谢您注册了全麦商旅,<a href=\"%s\">点击此处激活您的账号</a>"},
     "INVITE_JOIN_EMAIL": {subject: "邀请激活邮件", html: "%s你好,%s邀请您加入企业:%s,点击此处设置您的密码%s"}
 };
 

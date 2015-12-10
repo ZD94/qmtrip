@@ -4,7 +4,10 @@ var uuid = require("node-uuid");
 var L = require("../../common/language");
 var validate = require("../../common/validate");
 var md5 = require("../../common/utils").md5;
+var getRndStr = require("../../common/utils").getRndStr;
 var mail = require("../mail");
+var C = require("../../config");
+var moment = require("moment");
 
 var authServer = {};
 
@@ -34,7 +37,9 @@ authServer.active = function(data, callback) {
 //删除账号
 authServer.remove = function(data, callback) {
         var accountId = data.accountId;
-        return db.models.Account.destroy({where: {id: accountId}})
+        var email = data.email;
+
+        return db.models.Account.destroy({where: {$or: [{id: accountId}, {email: email}]}})
             .then(function(account) {
                 return {code: 0, msg: "ok"};
             })
@@ -78,8 +83,16 @@ authServer.newAccount = function(data, callback) {
     return m.save()
         .then(function(account) {
             if (account.status == 0) {
+                //生成激活码
+                var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
+                var activeToken = getRndStr(6);
+                var sign = makeActiveSign(activeToken, account.id, expireAt);
+                var url = C.host + "/auth/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
                 //发送激活邮件
-                mail.sendEmail(account.email, "ACTIVE_EMAIL", [data.email, "#"]);
+                return  mail.sendEmail(account.email, "ACTIVE_EMAIL", [data.email, url])
+                    .then(function() {
+                        return account;
+                    })
             }
             return account;
         })
@@ -165,13 +178,20 @@ authServer.login = function(data, callback) {
  */
 authServer.authentication = function(userId, tokenId, timestamp, tokenSign, callback) {
     var defer = Q.defer();
-    var sign = getTokenSign(userId, tokenId, "12341234", timestamp);
-    if (sign == tokenSign) {
-        defer.resolve({code: 0, msg: "ok"});
-    } else {
-        defer.reject({code: -1, msg: "已经失效"});
-    }
-    return defer.promise.nodeify(callback);
+    return db.models.Token.findOne({where: {id: tokenId, accountId: userId, expireAt: {$gte: utils.now()}}})
+        .then(function(m) {
+            if (!m) {
+                return {code: -1, msg: "已经失效"};
+            }
+
+            var sign = getTokenSign(userId, tokenId, m.token, timestamp);
+            if (sign == tokenSign) {
+                return {code: 0, msg: "ok"};
+            }
+
+            return {code: -1, msg: "已经失效"};
+        })
+        .nodeify(callback);
 }
 
 /**
@@ -191,25 +211,89 @@ authServer.bindMobile = function(data, callback) {
     return defer.promise.nodeify(callback);
 }
 
-//生成登录凭证
-function _authenticateSign(accountId, callback) {
+authServer.activeAccount = function(data, callback) {
     var defer = Q.defer();
-    var tokenId = "12341234-1234-1234-1234-123412341234";
-    var token = "12341234";
-    var timestamp = Date.now();
-    var tokenSign = getTokenSign(accountId, tokenId, token, timestamp);
-    defer.resolve({
-        token_id: tokenId,
-        user_id: accountId,
-        token_sign: tokenSign,
-        timestamp: timestamp
-    });
-    return defer.promise.nodeify(callback);
+
+    if (!data) {
+        defer.reject(L.ERR.DATA_NOT_EXIST);
+        return defer.promise.nodeify(callback);
+    }
+
+    if (!data.accountId || !data.timestamp || !data.sign) {
+        defer.reject({code: -1, msg: "链接已经失效或者不存在"});
+        return defer.promise.nodeify(callback);
+    }
+
+    return db.models.Account.findOne({where: {id: data.accountId}})
+        .then(function(account) {
+           if (!account) {
+               return L.ERR.ACCOUNT_NOT_EXIST;
+           }
+
+           var activeToken = account.activeToken;
+           var sign = makeActiveSign(activeToken, account.id, data.timestamp);
+           if (sign.toLowerCase() == data.sign.toLowerCase()) {
+               account.status = 1;
+               return account.save()
+                   .then(function() {
+                       return {code: 0, msg: "激活成功"};
+                   })
+           }
+
+            return {code: -1, msg: "链接不存在或者已经失效"};
+        })
+        .nodeify(callback);
+}
+
+//生成登录凭证
+function _authenticateSign(accountId, os, callback) {
+    if (typeof os == 'function') {
+        callback = os;
+        os  = 'web';
+    }
+
+    if (!os) {
+        os = 'web';
+    }
+
+    var defer = Q.defer();
+    db.models.Token.findOne({where:{accountId: accountId, os: os}})
+        .then(function(m) {
+            var refreshAt = moment().format("YYYY-MM-DD HH:mm:ss");
+            var expireAt = moment().add(2, "hours").format("YYYY-MM-DD HH:mm:ss")
+            if (m) {
+                m.refreshAt = refreshAt
+                m.expireAt = expireAt
+                return m.save();
+            } else {
+                m = db.models.Token.build({id: uuid.v1(), token: getRndStr(10), refreshAt: refreshAt, expireAt: expireAt});
+                return m.save();
+            }
+        })
+        .then(function(m) {
+            var tokenId = m.id;
+            var token = m.token;
+            var timestamp = new Date(m.expireAt).valueOf();
+            var tokenSign = getTokenSign(accountId, tokenId, token, timestamp);
+            return {
+                token_id: tokenId,
+                user_id: accountId,
+                token_sign: tokenSign,
+                timestamp: timestamp
+            }
+        })
+        .nodeify(callback);
 }
 
 function getTokenSign(accountId, tokenId, token, timestamp) {
     var originStr = accountId+tokenId+token+timestamp;
     return md5(originStr);;
+}
+
+//生成激活链接参数
+function makeActiveSign(activeToken, accountId, timestamp) {
+    var originStr = activeToken + accountId + timestamp;
+    return md5(originStr);
 }
 
 module.exports = authServer;
