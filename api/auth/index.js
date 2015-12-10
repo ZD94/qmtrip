@@ -1,5 +1,5 @@
 var Q = require("q");
-var db = require("../../models").sequelize;
+var db = require("./models").sequelize;
 var uuid = require("node-uuid");
 var L = require("../../common/language");
 var validate = require("../../common/validate");

@@ -3,7 +3,7 @@
  */
 
 var uuid = require("node-uuid");
-var now = require("../common/utils").now
+var now = require("../../../common/utils").now
 
 module.exports = function(Db, DataType) {
     return Db.define("Account", {
