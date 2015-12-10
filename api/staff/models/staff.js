@@ -1,7 +1,7 @@
 /**
  * Created by wlh on 15/12/9.
  */
-
+var now = require("../../../common/utils").now
 module.exports = function(Db, DataType) {
 
     return Db.define("Staff", {
@@ -61,9 +61,35 @@ module.exports = function(Db, DataType) {
         /**
          * 权限ID
          */
-        powerId: {
-            type: DataType.UUID,
-            field: "power_id"
+        roleId: {
+            type: DataType.INTEGER,
+            field: "role_id"
+        },
+        /**
+         * 邮箱
+         */
+        email: {
+            type: DataType.STRING(50),
+            field: "email"
+        },
+        /**
+         * 电话
+         */
+        mobile: {
+            type: DataType.STRING(20),
+            field: "mobile"
+        },
+        /**
+         * 创建时间
+         */
+        createAt: {
+            type: "timestamp",
+            defaultValue: now,
+            field: "create_at"
         }
-    })
+    },{
+        tableName: "staffs",
+        timestamps: false,
+        schema: "staff"
+    } )
 }
