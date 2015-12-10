@@ -10,6 +10,7 @@ var fs = require("fs");
 require('app-module-path').addPath(__dirname);
 
 var config = require("./config");
+global.C = config;
 
 var Logger = require('common/logger');
 Logger.init(config.logger);
