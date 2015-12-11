@@ -26,7 +26,6 @@ SET default_with_oids = false;
 
 CREATE TABLE trip_plan_order (
     id uuid primary key,
-    order_no character varying,
     account_id uuid not null,
     company_id uuid not null,
     type integer,
@@ -56,15 +55,6 @@ CREATE TABLE trip_plan_order (
 -- Name: TABLE trip_plan_order; Type: COMMENT; Schema: tripplan; Owner: -
 --
 COMMENT ON TABLE trip_plan_order IS '差旅记录表';
-
-
---
--- TOC entry 1012 (class 0 OID 0)
--- Dependencies: 101
--- Name: COLUMN trip_plan_order.order_no; Type: COMMENT; Schema: tripplan; Owner: -
---
-COMMENT ON COLUMN trip_plan_order.order_no IS '计划单号/预算单号';
-
 
 --
 -- TOC entry 1013 (class 0 OID 0)
