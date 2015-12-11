@@ -16,6 +16,14 @@ module.exports = function(Db, DataType) {
             type: DataType.STRING(50)
         },
         /**
+         * 性别
+         */
+        sex: {
+            type: DataType.INTEGER,
+            field: "sex",
+            defaultValue: 1
+        },
+        /**
          * 员工头像
          */
         avatar: {
