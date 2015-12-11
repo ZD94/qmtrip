@@ -1,23 +1,23 @@
 /**
- * Created by yumiao on 15-12-10.
+ * Created by yumiao on 15-12-11.
  */
 
 var uuid = require("node-uuid");
 var now = require("../../../common/utils").now
 
 module.exports = function(Db, DataType) {
-    return Db.define("TripPlanOrder", {
+    return Db.define("ConsumeDetails", {
         id: {
             type: DataType.UUID,
             defaultValue: uuid.v1,
             primaryKey: true
         },
         /**
-         * 计划/预算单号
+         * 计划单id
          */
-        orderNo: {
+        orderId: {
             type: DataType.STRING,
-            field: "order_no"
+            field: "order_id"
         },
         /**
          * 单据所属人
@@ -27,28 +27,21 @@ module.exports = function(Db, DataType) {
             field: "account_id"
         },
         /**
-         * 企业id
+         * 计划/预算单号
          */
-        companyId: {
-            type: DataType.UUID,
-            field: "company_id"
+        orderNo: {
+            type: DataType.STRING,
+            field: "order_no"
         },
         /**
-         * 单据类型
+         * 消费类型（交通和酒店）
          */
         type: {
             type: DataType.INTEGER,
             field: "type"
         },
         /**
-         * 预算/计划单描述
-         */
-        description: {
-            type: DataType.TEXT,
-            field: "description"
-        },
-        /**
-         * 企业状态
+         * 状态
          */
         status: {
             type: DataType.INTEGER,
@@ -56,46 +49,40 @@ module.exports = function(Db, DataType) {
             field: "status"
         },
         /**
-         * 出发地
+         * 出发地点
          */
         startPlace: {
             type: DataType.STRING,
             field: "start_place"
         },
         /**
-         * 出差目的地
+         * 目的地点
          */
-        destination: {
+        arrivalPlace: {
             type: DataType.STRING,
-            field: "destination"
+            field: "arrival_place"
+        },
+        city: {
+            type: DataType.STRING,
+            field: "city"
+        },
+        hotelName: {
+            type: DataType.STRING,
+            field: "hotel_name"
         },
         /**
-         * 出发时间
+         * 开始时间
          */
-        startAt: {
+        startTime: {
             type: "timestamp without time zone",
-            field: "start_at"
+            field: "start_time"
         },
         /**
          * 结束时间
          */
-        backAt: {
+        endTime: {
             type: "timestamp without time zone",
-            field: "back_at"
-        },
-        /**
-         * 是否需要交通服务
-         */
-        isNeedTraffic: {
-            type: DataType.BOOLEAN,
-            field: "is_need_traffic"
-        },
-        /**
-         * 是否需要酒店服务
-         */
-        isNeedHotel: {
-            type: DataType.BOOLEAN,
-            field: "is_need_hotel"
+            field: "end_time"
         },
         /**
          * 预算
@@ -105,25 +92,25 @@ module.exports = function(Db, DataType) {
             field: "budget"
         },
         /**
-         * 预定支出
+         * 支出
          */
-        bookExpend: {
+        expenditure: {
             type: DataType.NUMERIC(15, 2),
-            field: "book_expend"
+            field: "expenditure"
         },
         /**
-         * 支出详情
+         * 票据类型
          */
-        expendInfo: {
-            type: DataType.JSONB,
-            field: "expend_info"
-        },
-        /**
-         * 审核状态
-         */
-        auditStatus: {
+        invoiceType: {
             type: DataType.INTEGER,
-            field: "audit_status"
+            field: "invoice_type"
+        },
+        /**
+         * 票据
+         */
+        invoice: {
+            type: DataType.INTEGER,
+            field: "invoice"
         },
         /**
          * 审核备注
@@ -131,13 +118,6 @@ module.exports = function(Db, DataType) {
         auditRemark: {
             type: DataType.STRING,
             field: 'audit_remark'
-        },
-        /**
-         * 失效时间
-         */
-        expireAt: {
-            type: "timestamp without time zone",
-            field: "expire_at"
         },
         /**
          *创建时间
@@ -159,7 +139,7 @@ module.exports = function(Db, DataType) {
             field: "update_at"
         }
     }, {
-        tableName: "trip_plan_order",
+        tableName: "consume_details",
         timestamps: false,
         schema: "tripplan"
     })

@@ -44,6 +44,7 @@ CREATE TABLE trip_plan_order (
     remark character varying,
     audit_status integer default 0,
     audit_remark character varying,
+    score integer,
     expire_at timestamp without time zone,
     create_at timestamp without time zone default now(),
     update_at timestamp without time zone
@@ -174,6 +175,14 @@ COMMENT ON COLUMN trip_plan_order.expire_at IS '计划单/预算单失效时间'
 -- Name: COLUMN trip_plan_order.type; Type: COMMENT; Schema: tripplan; Owner: -
 --
 COMMENT ON COLUMN trip_plan_order.type IS '单据类型 1：预算单 2：计划单';
+
+
+--
+-- TOC entry 1028 (class 0 OID 0)
+-- Dependencies: 101
+-- Name: COLUMN trip_plan_order.score; Type: COMMENT; Schema: tripplan; Owner: -
+--
+COMMENT ON COLUMN trip_plan_order.score IS '获取的积分';
 
 
 --

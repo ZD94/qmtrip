@@ -5,6 +5,7 @@
 var Q = require("q");
 var Models = require("./models").sequelize.models;
 var PlanOrder = Models.TripPlanOrder;
+var ConsumeDetails = Models.ConsumeDetails
 var uuid = require("node-uuid");
 var L = require("../../common/language");
 var Logger = require('../../common/logger');
@@ -49,20 +50,27 @@ tripPlan.getTripPlanOrder = function(params, callback){
         .then(function(){
             var orderId = params.orderId;
             var userId = params.userId;
-            logger.info("orderId=>", orderId);
-            logger.info("userId=>", userId);
-            return PlanOrder.findById(orderId)
-                .then(function(ret){
-                    logger.info(ret);
-                    if(!ret){
+            return Q.all([
+                PlanOrder.findById(orderId),
+                ConsumeDetails.findAll({where: {orderId: orderId, type: -1}}),
+                ConsumeDetails.findAll({where: {orderId: orderId, type: 1}}),
+                ConsumeDetails.findAll({where: {orderId: orderId, type: 0}})
+            ])
+                .spread(function(order, outTraffic, backTraffic, hotel){
+                    logger.info(order);
+                    if(!order){
                         defer.reject(L.ERR.TRIP_PLAN_ORDER_NOT_EXIST);
                         return defer.promise;
                     }
-                    if(ret.accountId != userId){ //权限不足
+                    if(order.accountId != userId){ //权限不足
                         defer.reject(L.ERR.PERMISSION_DENY);
                         return defer.promise;
                     }
-                    return {code: 0, msg: '', tripPlaOrder: ret.dataValues};
+                    var tripPlanOrder = order.dataValues;
+                    tripPlanOrder.outTraffic = outTraffic;
+                    tripPlanOrder.backTraffic = backTraffic;
+                    tripPlanOrder.hotel = hotel;
+                    return {code: 0, msg: '', tripPlanOrder: tripPlanOrder};
                 })
         }).nodeify(callback);
 }
@@ -101,6 +109,7 @@ tripPlan.updateTripPlanOrder = function(params, callback){
         }).nodeify(callback);
 }
 
+
 /**
  * 获取差旅计划单/预算单列表
  * @param params
@@ -109,13 +118,48 @@ tripPlan.updateTripPlanOrder = function(params, callback){
  */
 tripPlan.listTripPlanOrder = function(params, callback){
     var defer = Q.defer();
-    if(!params || params.userId){
+    if(!params || !params.userId || !params.query){
         defer.reject({code: -1, msg: '参数不正确'});
         return defer.promise.nodeify(callback);
     }
-    return PlanOrder.findAll(params)
-        .then(function(ret){
-            return {code: 0, msg: '', tripPlanOrders: ret};
+    var query = params.query;
+    return PlanOrder.findAll(query)
+        .then(function(orders){
+            return Q.all(orders.map(function(order){
+                var orderId = order.id;
+                logger.info("orderId=>", orderId);
+                return Q.all([
+                    ConsumeDetails.findAll({where: {orderId: orderId, type: -1}}),
+                    ConsumeDetails.findAll({where: {orderId: orderId, type: 0}}),
+                    ConsumeDetails.findAll({where: {orderId: orderId, type: 1}})
+                ])
+                    .spread(function(outTraffic, hotel, backTraffic){
+                        order.outTraffic = outTraffic;
+                        order.backTraffic = backTraffic;
+                        order.hotel = hotel;
+                        return order;
+                    })
+            }))
+                .then(function(orders){
+                    return {code: 0, msg: '', tripPlanOrders: orders};
+                })
+        }).nodeify(callback);
+}
+
+/**
+ * 保存消费记录详情
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+tripPlan.saveConsumeRecord = function(params, callback){
+    var checkArr = ['orderId', 'accountId', 'type', 'startTime', 'endTime', 'invoiceType', 'budget'];
+    return checkParams(checkArr, params)
+        .then(function(){
+            return ConsumeDetails.create(params)
+                .then(function(ret){
+                    return {code: 0, msg: '', ConsumeDetail: ret.dataValues};
+                })
         }).nodeify(callback);
 }
 

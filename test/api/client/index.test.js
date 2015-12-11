@@ -3,4 +3,5 @@
  */
 
 require("./auth.test");
+//require("./staff.test");
 //require("./company.test");
