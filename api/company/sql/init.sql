@@ -31,7 +31,7 @@ CREATE TABLE company (
     name character varying(100),
     logo character varying,
     description text,
-    status integer,
+    status integer default 0,
     address character varying,
     website character varying,
     email character varying(50),

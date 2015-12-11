@@ -22,4 +22,54 @@ company.createCompany = function(params, callback){
     return API.company.createCompany(params, callback);
 }
 
+/**
+ * 更新企业信息
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+company.updateCompany = function(params, callback){
+    params.createUser = this.accountId;
+    return API.company.updateCompany(params, callback);
+}
+
+/**
+ * 获取企业信息
+ * @param companyId
+ * @param callback
+ * @returns {*}
+ */
+company.getCompany = function(companyId, callback){
+    var params = {
+        companyId: companyId,
+        userId: this.accountId
+    }
+    return API.company.getCompany(params, callback);
+}
+
+/**
+ * 根据查询条件获取企业列表
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+company.listCompany = function(params, callback){
+    params.userId = this.accountId;
+    return API.company.listCompany(params, callback);
+}
+
+/**
+ * 删除企业信息
+ * @param companyId
+ * @param callback
+ * @returns {*}
+ */
+company.deleteCompany = function(companyId, callback){
+    var params = {
+        companyId: companyId,
+        userId: this.accountId
+    }
+    return API.company.deleteCompany(params, callback);
+}
+
 module.exports = company;
