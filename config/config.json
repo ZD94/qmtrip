@@ -23,12 +23,12 @@
     "debug": true
   },
   "hosts": {
-    "main":{"addr":"clear.tulingdao.com", "port":4001}
+    "main":{"addr":"api.local.tulingdao.com", "port":4001}
   },
   "api": [
     {
       "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
-      "modules": "auth"
+      "modules": "*"
     }
   ]
 }
