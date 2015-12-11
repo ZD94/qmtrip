@@ -1,5 +1,4 @@
 --schema=staff
-
 create table staff.staffs (
     id uuid primary key,
     name varchar(50),
