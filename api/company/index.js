@@ -55,9 +55,7 @@ company.updateCompany = function(params, callback){
                         return defer.promise;
                     }
                     params.updateAt = utils.now();
-                    logger.info(params);
                     var cols = getColumns(params);
-                    logger.info("columns=>", cols);
                     return Company.update(params, {returning: true, where: {id: companyId}, fields: cols})
                         .then(function(ret){
                             logger.info("update fields=>", ret);

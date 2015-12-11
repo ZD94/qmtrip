@@ -10,4 +10,7 @@ staff.createStaff = staffServer.createStaff;
 staff.deleteStaff = staffServer.deleteStaff;
 staff.updateStaff = staffServer.updateStaff;
 staff.listAndPaginateStaff = staffServer.listAndPaginateStaff;
+staff.increaseStaffPoint = staffServer.increaseStaffPoint;
+staff.decreaseStaffPoint = staffServer.decreaseStaffPoint;
+staff.listAndPaginatePointChange = staffServer.listAndPaginatePointChange
 module.exports = staff;

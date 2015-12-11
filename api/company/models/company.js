@@ -102,7 +102,8 @@ module.exports = function(Db, DataType) {
          */
         createAt: {
             type: "timestamp without time zone",
-            field: "create_at"
+            field: "create_at",
+            defaultValue: now
         },
         /**
          * 备注
