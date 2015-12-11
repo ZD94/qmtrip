@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "app-module-path": "^1.0.5",
+    "bindings": "^1.2.1",
     "body-parser": "^1.14.1",
     "callsite": "^1.0.0",
     "co": "^4.6.0",
@@ -25,6 +26,7 @@
     "js-format": "^0.2.0",
     "moment": "^2.10.6",
     "morgan": "^1.6.1",
+    "nan": "^2.1.0",
     "node-uuid": "^1.4.7",
     "nodemailer": "^1.10.0",
     "pg": "^4.4.3",
@@ -35,7 +37,12 @@
     "request": "^2.67.0",
     "sequelize": "^3.14.2",
     "serve-favicon": "^2.3.0",
-    "shoe": "0.0.15"
+    "shoe": "0.0.15",
+    "weak": "^1.0.0"
+  },
+  "optionalDependency": {
+    "bufferutil": "^1.2.1",
+    "fsevents": "^1.0.5"
   },
   "devDependencies": {
     "angular": "^1.4.8",

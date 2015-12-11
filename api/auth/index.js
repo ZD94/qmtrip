@@ -79,7 +79,7 @@ authServer.newAccount = function(data, callback) {
         .then(function(account) {
             if (account.status == 0) {
                 //发送激活邮件
-                mail.sendEmail(account.email, "ACTIVE_EMAIL", [data.email, "#"]);
+//                mail.sendEmail(account.email, "ACTIVE_EMAIL", [data.email, "#"]);
             }
             return account;
         })
