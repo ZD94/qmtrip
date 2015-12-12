@@ -1,10 +1,15 @@
 # API 文档
 ---
 
-    1. API.place.queryPlace   获取匹配城市/机场信息
-    2. API.travelPolicy.getTravelPolicyBudget 获取差旅预算
-    3. API.auth.login 登录
-    4. API.auth.activeAccount 激活链接激活账号
+    >1. 认证模块
+        API.auth.login 登录
+        API.auth.activeAccount 激活链接激活账号
+        
+    >2. 差旅标准
+        API.travelPolicy.getTravelPolicyBudget 获取差旅预算
+        
+    >3. 地理信息
+        API.place.queryPlace   获取匹配城市/机场信息
 
 
 ### API.place.queryPlace(city, callback)
