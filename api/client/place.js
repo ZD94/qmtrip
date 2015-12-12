@@ -9,6 +9,13 @@ var service = {
     __public: true
 }
 
+/**
+ * 匹配城市名称
+ *
+ * @param {String} placeName 如北京
+ * @param {Function} callback
+ * @returns {Promise} [{"id": "BJSA-sky", name: "北京"}, ...]
+ */
 service.queryPlace = function(placeName, callback) {
     var defer = Q.defer();
     if (!placeName) {
