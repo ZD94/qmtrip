@@ -15,15 +15,6 @@ var auth = {
 var accounts = [];
 var mail = require("../mail");
 
-/**
- * 新建账号
- * @param {Object} data 参数
- * @param {String} data.email 邮箱
- * @param {String} data.pwd 密码
- * @param {Callback} callback 回调函数
- * @return {Promise} {code: 0, data:{accountId: 账号ID, email: "邮箱", status: "状态"}
- */
-auth.newAccount = authServer.newAccount;
 
 /**
  * 登录
@@ -37,18 +28,6 @@ auth.newAccount = authServer.newAccount;
  */
 auth.login = authServer.login;
 
-/**
- * 认证登录凭证是否有效
- *
- * @param {Object} params
- * @param {UUID} params.userId
- * @param {UUID} params.tokenId
- * @param {Number} params.timestamp
- * @param {String} params.tokenSign
- * @param {Function} callback
- * @return {Promise} {code:0, msg: "Ok"}
- */
-auth.authentication = authServer.authentication;
 /**
  * 绑定手机号
  *

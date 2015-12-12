@@ -13,25 +13,25 @@ var authServer = {};
 
 //激活账号
 authServer.active = function(data, callback) {
-        var accountId = data.accountId;
-        return db.models.Account.findOne({where: {id: accountId}})
-            .then(function(account) {
-                if (!account) {
-                    return L.ERR.ACCOUNT_NOT_EXIST;
-                }
+    var accountId = data.accountId;
+    return db.models.Account.findOne({where: {id: accountId}})
+        .then(function(account) {
+            if (!account) {
+                return L.ERR.ACCOUNT_NOT_EXIST;
+            }
 
-                account.status = 1;
-                return account.save()
-                    .then(function(account) {
-                        return {code: 0, msg: "ok", data: {
-                            id: account.id,
-                            mobile: account.mobile,
-                            email: account.email,
-                            status: account.status
-                        }}
-                    })
-            })
-            .nodeify(callback);
+            account.status = 1;
+            return account.save()
+                .then(function(account) {
+                    return {code: 0, msg: "ok", data: {
+                        id: account.id,
+                        mobile: account.mobile,
+                        email: account.email,
+                        status: account.status
+                    }}
+                })
+        })
+        .nodeify(callback);
 }
 
 //删除账号
@@ -221,6 +221,13 @@ authServer.bindMobile = function(data, callback) {
     return defer.promise.nodeify(callback);
 }
 
+/**
+ * 激活链接激活账号
+ *
+ * @param {Object} data
+ * @param {Function} callback
+ * @returns {*}
+ */
 authServer.activeAccount = function(data, callback) {
     var defer = Q.defer();
 
