@@ -155,7 +155,7 @@ staff.increaseStaffPoint = function(params, options, callback) {
                         pointChangeProxy.create(pointChange, {transaction: t})
                     ])
                     .spread(function(ret1,ret2){
-                        return ret1;
+                        return {code: 0, staff: ret1};
                     })
             })
 
@@ -201,7 +201,7 @@ staff.decreaseStaffPoint = function(params, options, callback) {
                         pointChangeProxy.create(pointChange, {transaction: t})
                     ])
                     .spread(function(ret1,ret2){
-                        return ret1;
+                        return {code: 0, staff: ret1};
                     })
             })
 

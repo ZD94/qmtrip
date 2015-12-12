@@ -25,7 +25,7 @@ describe("api/client/agencyUser.js", function() {
         })
     })*/
     //查询代理商集合
-    /*describe("API.agencyUser.listAndPaginateAgency", function() {
+    describe("API.agencyUser.listAndPaginateAgency", function() {
         it("API.agencyUser.listAndPaginateAgency", function(done) {
             agencyUser.listAndPaginateAgency({}, function(err, result) {
                 assert.equal(err, null);
@@ -34,7 +34,7 @@ describe("api/client/agencyUser.js", function() {
                 done();
             });
         })
-    })*/
+    })
     //更新代理商信息
     /*describe("API.agencyUser.updateAgency", function() {
         it("API.agencyUser.updateAgency", function(done) {
@@ -46,7 +46,7 @@ describe("api/client/agencyUser.js", function() {
         })
     })*/
     //删除代理商信息
-    describe("API.agencyUser.deleteAgency", function() {
+    /*describe("API.agencyUser.deleteAgency", function() {
         it("API.agencyUser.deleteAgency", function(done) {
             agencyUser.deleteAgency({id: "b3204120-9fe9-11e5-bfd2-414faa65c25d"}, function(err, result) {
                 assert.equal(err, null);
@@ -54,6 +54,6 @@ describe("api/client/agencyUser.js", function() {
                 done();
             });
         })
-    })
+    })*/
 
 })

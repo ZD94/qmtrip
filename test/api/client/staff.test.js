@@ -25,13 +25,13 @@ describe("api/client/staff.js", function() {
         })
     })*/
     //查询员工集合
-    /*describe("API.staff.listAndPaginateStaff", function() {
+    describe("API.staff.listAndPaginateStaff", function() {
         it("API.staff.listAndPaginateStaff", function(done) {
             staff.listAndPaginateStaff({}, function(err, result) {
                 assert.equal(err, null);
                 console.log(result);
-                console.log(result.items);//item dataValues里存放的才是记录信息
-                *//*{ page: 1,
+//                console.log(result.items);//item dataValues里存放的才是记录信息
+                /*{ page: 1,
                     perPage: 6,
                     total: 1,
                     items:
@@ -44,11 +44,11 @@ describe("api/client/staff.js", function() {
                         __eagerlyLoadedAssociations: [],
                         isNewRecord: false } ],
                         currentPageTotal: 1,
-                    pages: 1 }*//*
+                    pages: 1 }*/
                 done();
             });
         })
-    })*/
+    })
     //更新员工信息
     /*describe("API.staff.updateStaff", function() {
         it("API.staff.updateStaff", function(done) {
@@ -91,7 +91,7 @@ describe("api/client/staff.js", function() {
         })
     })*/
     //积分记录查询
-    describe("API.staff.listAndPaginatePointChange", function() {
+    /*describe("API.staff.listAndPaginatePointChange", function() {
         it("API.staff.listAndPaginatePointChange", function(done) {
             staff.listAndPaginatePointChange({staffId: "ee3eb6a0-9f22-11e5-8540-8b3d4cdf6eb6"}, function(err, result) {//查询条件此处用staffId或者staff_id均可
                 assert.equal(err, null);
@@ -100,7 +100,7 @@ describe("api/client/staff.js", function() {
                 done();
             });
         })
-    })
+    })*/
 
 
 })
