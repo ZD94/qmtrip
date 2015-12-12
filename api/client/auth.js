@@ -9,7 +9,9 @@ var md5 = require("../../common/utils").md5;
 var db = require("../../models").sequelize;
 var uuid = require("node-uuid");
 var authServer = require("../auth/index");
-var auth = {};
+var auth = {
+    __public: true
+};
 var accounts = [];
 var mail = require("../mail");
 
@@ -38,11 +40,12 @@ auth.login = authServer.login;
 /**
  * 认证登录凭证是否有效
  *
- * @param {UUID} userId
- * @param {UUID} tokenId
- * @param {Number} timestamp
- * @param {String} tokenSign
- * @param {Callback} callback
+ * @param {Object} params
+ * @param {UUID} params.userId
+ * @param {UUID} params.tokenId
+ * @param {Number} params.timestamp
+ * @param {String} params.tokenSign
+ * @param {Function} callback
  * @return {Promise} {code:0, msg: "Ok"}
  */
 auth.authentication = authServer.authentication;
