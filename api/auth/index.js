@@ -158,7 +158,7 @@ authServer.login = function(data, callback) {
                 return defer.promise.nodeify(callback);
             }
 
-            return _authenticateSign(loginAccount.id)
+            return makeAuthenticateSign(loginAccount.id)
                 .then(function(result) {
                     return {code:0, msg: "ok", data: result};
                 })
@@ -183,6 +183,10 @@ authServer.authentication = function(params, callback) {
         defer.resolve({code: -1, msg: "token expire"});
         return defer.promise.nodeify(callback);
     }
+    var userId = params.userId;
+    var tokenId = params.tokenId;
+    var timestamp = params.timestamp;
+    var tokenSign = params.tokenSign;
 
     return db.models.Token.findOne({where: {id: tokenId, accountId: userId, expireAt: {$gte: utils.now()}}})
         .then(function(m) {
@@ -252,7 +256,7 @@ authServer.activeAccount = function(data, callback) {
 }
 
 //生成登录凭证
-function _authenticateSign(accountId, os, callback) {
+function makeAuthenticateSign(accountId, os, callback) {
     if (typeof os == 'function') {
         callback = os;
         os  = 'web';
