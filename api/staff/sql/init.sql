@@ -1,5 +1,4 @@
 --schema=staff
-
 create table staff.staffs (
     id uuid primary key,
     name varchar(50),
@@ -9,7 +8,10 @@ create table staff.staffs (
     balance_points integer default 0,
     department_id uuid,
     travel_level uuid,
-    power_id uuid
+    role_id integer, -- 权限
+    mobile character varying(20), -- 手机
+    email character varying(50), -- 邮箱
+    create_at timestamp without time zone DEFAULT now() -- 创建时间
 );
 
 comment on table staff.staffs is '员工';
@@ -20,7 +22,10 @@ comment on column staff.staffs.total_points is '员工总获取的积分';
 comment on column staff.staffs.balance_points is '员工剩余积分';
 comment on column staff.staffs.department_id is '部门ID';
 comment on column staff.staffs.travel_level is '差旅标准';
-comment on column staff.staffs.power_id is '权限ID';
+COMMENT ON COLUMN staff.staffs.role_id IS '权限';
+COMMENT ON COLUMN staff.staffs.mobile IS '手机';
+COMMENT ON COLUMN staff.staffs.email IS '邮箱';
+COMMENT ON COLUMN staff.staffs.create_at IS '创建时间';
 
 create table staff.point_changes (
     id uuid primary key,

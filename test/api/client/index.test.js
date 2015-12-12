@@ -3,3 +3,6 @@
  */
 
 require("./auth.test");
+//require("./staff.test");
+//require("./agencyuser.test");
+//require("./company.test");
