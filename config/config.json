@@ -19,7 +19,7 @@
     }
   },
   "postgres":{
-    "url": "postgres://top_v2:Time9818@local.tulingdao.com:5432/pub_qmtrip",
+    "url": "postgres://postgres:root@localhost:5432/qmtrip",
     "debug": true
   },
   "hosts": {
