@@ -1,7 +1,5 @@
 delete from company.company;
 alter table company.company drop column if exists agency_id;
-alter table company.company drop column if exists staff_num;
-alter table company.company drop column if exists staff_score;
 alter table company.company add column agency_id uuid;
 COMMENT ON COLUMN company.company.agency_id IS '代理商id';
 
@@ -11,7 +9,6 @@ COMMENT ON COLUMN company.company.staff_num IS '员工数';
 alter table company.company add column staff_score integer default 0;
 COMMENT ON COLUMN company.company.staff_score IS '员工积分';
 
-drop table company.funds_accounts;
 
 CREATE TABLE company.funds_accounts
 (
