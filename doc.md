@@ -1,8 +1,8 @@
 # API 文档
 ---
 
->.API.place.queryPlace   获取匹配城市/机场信息
->.API.travelPolicy.getTravelPolicyBudget 获取差旅预算
+    1.API.place.queryPlace   获取匹配城市/机场信息
+    2.API.travelPolicy.getTravelPolicyBudget 获取差旅预算
 
 
 ### API.place.queryPlace(city, callback)
