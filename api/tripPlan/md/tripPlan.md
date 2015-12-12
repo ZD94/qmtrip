@@ -27,16 +27,15 @@
 | params.isNeedHotel              | 是否需要酒店服务           |boolean               |
 | params.expenditure             |支出               |numeric(15,2)                |
 | params.remark              | 备注           |varchar               |
-
-| params.consumeDetails[]          |消费支出详情（交通/酒店）       |Array(json)         |
+| params.consumeDetails[]          |消费支出详情（交通/酒店）       |Array(json)         |如果有该字段，下面列出的必填字段不可少
 | params.consumeDetails[N].type        |消费支出类型 -1：去程交通 0：酒店 1：回程酒店      |必填
 | params.consumeDetails[N].startPlace        |出发地，交通消费需要      |
 | params.consumeDetails[N].arrivalPlace        |目的地，交通消费需要       |
 | params.consumeDetails[N].city        |酒店所在地，酒店消费需要      |
 | params.consumeDetails[N].hotelName        |酒店名称，酒店消费需要      |
-| params.consumeDetails[N].startTime        |开始时间      |必填
-| params.consumeDetails[N].endTime        |结束时间      |必填
-| params.consumeDetails[N].budget        |该次消费预算      |必填
+| params.consumeDetails[N].startTime        |开始时间      |必填必填
+| params.consumeDetails[N].endTime        |结束时间      |必填必填
+| params.consumeDetails[N].budget        |该次消费预算      |必填必填
 | params.consumeDetails[N].expenditure        |该次消费支出      |
 | params.consumeDetails[N].invoiceType        |票据类型 1：机票 2：酒店发票      |
 | params.consumeDetails[N].invoice        |具体票据      |
