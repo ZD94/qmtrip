@@ -9,10 +9,13 @@ gulplib.bundle_lib('api', ['dnode', 'shoe', 'q', 'md5', 'moment']);
 gulplib.bundle_lib('angular', ['angular', 'angular-route', 'angular-sanitize', 'angular-touch']);
 gulplib.bundle_lib('jquery', ['jquery', 'jquery-ui']);
 gulplib.bundle_lib('bootstrap', ["bootstrap"]);
+gulplib.bundle_lib('notie', ['notie']);
+gulplib.bundle_lib('swiper', ['swiper']);
 
 gulplib.angular_app('staff', 'public/staff');
 gulplib.angular_app('corp', 'public/corp');
 gulplib.angular_app('agency', 'public/agency');
+gulplib.angular_app('demo', 'public/demo');
 
 gulplib.dist(function(){
     var gulp = require('gulp');
