@@ -6,53 +6,46 @@ var uuid = require("node-uuid");
 var now = require("../../../common/utils").now
 
 module.exports = function(Db, DataType) {
-    return Db.define("Company", {
+    return Db.define("Agency", {
         id: {
             type: DataType.UUID,
             defaultValue: uuid.v1,
             primaryKey: true
         },
-        agencyId: {
-            type: DataType.UUID,
-            field: "agency_id"
-        },
-        /**
-         * 企业编号
-         */
-        companyNo: {
+        agencyNo: {
             type: DataType.STRING(30),
-            field: "company_no"
+            field: "agency_no"
         },
         /**
-         * 企业创建人
+         * 代理商创建人
          */
         createUser: {
             type: DataType.UUID,
             field: "create_user"
         },
         /**
-         * 企业名称
+         * 代理商名称
          */
         name: {
             type: DataType.STRING(100),
             field: "name"
         },
         /**
-         * 企业logo
+         * 代理商logo
          */
         logo: {
             type: DataType.STRING,
             field: "logo"
         },
         /**
-         * 企业描述
+         * 代理商描述
          */
         description: {
             type: DataType.TEXT,
             field: "description"
         },
         /**
-         * 企业状态
+         * 代理商状态
          */
         status: {
             type: DataType.INTEGER,
@@ -60,21 +53,21 @@ module.exports = function(Db, DataType) {
             field: "status"
         },
         /**
-         * 企业地址
+         * 代理商地址
          */
         address: {
             type: DataType.STRING,
             field: "address"
         },
         /**
-         * 企业网址
+         * 代理商网址
          */
         website: {
             type: DataType.STRING,
             field: "website"
         },
         /**
-         * 企业邮箱
+         * 代理商邮箱
          */
         email: {
             type: DataType.STRING(50),
@@ -95,11 +88,11 @@ module.exports = function(Db, DataType) {
             field: "mobile"
         },
         /**
-         * 企业创建时间
+         * 代理商创建时间
          */
-        companyCreateAt: {
+        companyNum: {
             type: "timestamp without time zone",
-            field: "company_create_at"
+            field: "company_num"
         },
         /**
          *创建时间
@@ -121,8 +114,8 @@ module.exports = function(Db, DataType) {
             field: "update_at"
         }
     }, {
-        tableName: "company",
+        tableName: "agency",
         timestamps: false,
-        schema: "company"
+        schema: "agency"
     })
 }
