@@ -169,15 +169,21 @@ authServer.login = function(data, callback) {
 /**
  * 认证登录凭证是否有效
  *
- * @param {UUID} userId
- * @param {UUID} tokenId
- * @param {Number} timestamp
- * @param {String} tokenSign
- * @param {Callback} callback
+ * @param {Object} params
+ * @param {UUID} params.userId
+ * @param {UUID} params.tokenId
+ * @param {Number} params.timestamp
+ * @param {String} params.tokenSign
+ * @param {Function} callback
  * @return {Promise} {code:0, msg: "Ok"}
  */
-authServer.authentication = function(userId, tokenId, timestamp, tokenSign, callback) {
+authServer.authentication = function(params, callback) {
     var defer = Q.defer();
+    if (!params.userId || !params.tokenId || !params.timestamp || !params.tokenSign) {
+        defer.resolve({code: -1, msg: "token expire"});
+        return defer.promise.nodeify(callback);
+    }
+
     return db.models.Token.findOne({where: {id: tokenId, accountId: userId, expireAt: {$gte: utils.now()}}})
         .then(function(m) {
             if (!m) {
