@@ -6,8 +6,7 @@
 var sequelize = require("../models").sequelize;
 var staff = sequelize.models.Staff;
 var Q = require("q");
-var Paginate = require("./paginate").Paginate;
-
+var Paginate = require("../../../common/paginate").Paginate;
 /**
  * 分页查询员工列表
  * @param query
@@ -106,6 +105,7 @@ function update(id, values, options, callback) {
     }
 
     options.where = {id: id};
+    options.returning = true;
     return staff.update(values, options).nodeify(callback);
 }
 

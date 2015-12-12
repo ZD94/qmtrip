@@ -5,7 +5,7 @@
 var sequelize = require("../models").sequelize;
 var pointChange = sequelize.models.PointChange;
 var Q = require("q");
-var Paginate = require("./paginate").Paginate;
+var Paginate = require("../../../common/paginate").Paginate;
 /**
  * 分页积分变动记录列表
  *

@@ -36,7 +36,7 @@ staff.createStaff = function(data, callback){
         defer.reject({code: -3, msg: "姓名不能为空"});
         return defer.promise.nodeify(callback);
     }
-    if (!data.company_id) {
+    if (!data.companyId) {
         defer.reject({code: -4, msg: "所属企业不能为空"});
         return defer.promise.nodeify(callback);
     }
@@ -47,7 +47,7 @@ staff.createStaff = function(data, callback){
                 data.id = acc.data.id;
                 return staffProxy.create(data)
                     .then(function(obj){
-                        return {code: 0, staff: obj};
+                        return {code: 0, staff: obj.dataValues};
                     })
             }
         })
@@ -94,7 +94,26 @@ staff.updateStaff = function(id, data, callback){
     }
     return staffProxy.update(id, data)
         .then(function(obj){
-            return {code: 0, staff: obj, msg: "更新成功"}
+            return {code: 0, staff: obj[1].dataValues, msg: "更新成功"}
+        })
+        .nodeify(callback);
+}
+/**
+ * 根据id查询员工
+ * @param id
+ * @param data
+ * @param callback
+ * @returns {*}
+ */
+staff.getStaff = function(id, callback){
+    var defer = Q.defer();
+    if(!id){
+        defer.reject({code: -1, msg: "id不能为空"});
+        return defer.promise.nodeify(callback);
+    }
+    return staffProxy.getById(id)
+        .then(function(obj){
+            return {code: 0, staff: obj.dataValues}
         })
         .nodeify(callback);
 }
@@ -155,7 +174,7 @@ staff.increaseStaffPoint = function(params, options, callback) {
                         pointChangeProxy.create(pointChange, {transaction: t})
                     ])
                     .spread(function(ret1,ret2){
-                        return {code: 0, staff: ret1};
+                        return {code: 0, staff: ret1.dataValues};
                     })
             })
 
@@ -201,7 +220,7 @@ staff.decreaseStaffPoint = function(params, options, callback) {
                         pointChangeProxy.create(pointChange, {transaction: t})
                     ])
                     .spread(function(ret1,ret2){
-                        return {code: 0, staff: ret1};
+                        return {code: 0, staff: ret1.dataValues};
                     })
             })
 

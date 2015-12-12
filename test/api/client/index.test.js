@@ -3,6 +3,7 @@
  */
 
 //require("./auth.test");
-require("./staff.test");
+//require("./staff.test");
+require("./travalPolicy.test");
 //require("./agencyuser.test");
 //require("./company.test");

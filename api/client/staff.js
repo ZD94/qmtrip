@@ -24,6 +24,7 @@ staff.createStaff = function(params, callback){
 }
 staff.deleteStaff = staffServer.deleteStaff;
 staff.updateStaff = staffServer.updateStaff;
+staff.getStaff = staffServer.getStaff;
 staff.listAndPaginateStaff = staffServer.listAndPaginateStaff;
 staff.increaseStaffPoint = staffServer.increaseStaffPoint;
 staff.decreaseStaffPoint = staffServer.decreaseStaffPoint;

@@ -3,18 +3,18 @@
  */
 'use strict';
 var sequelize = require("../models").sequelize;
-var agency = sequelize.models.Agencies;
+var travalPolicy = sequelize.models.TravalPolicy;
 var Q = require("q");
 var Paginate = require("../../../common/paginate").Paginate;
 
 /**
- * 分页查询代理商列表
+ * 分页查询差旅标准列表
  * @param query
  * @param options
  * @param callback
  * @returns {*}
  */
-function agencyList(query, options, callback) {
+function travalPolicyList(query, options, callback) {
     if (typeof options == 'function') {
         callback = options;
         options = {};
@@ -41,18 +41,18 @@ function agencyList(query, options, callback) {
     options.limit = limit;
     options.offset = offset;
     options.where = query;
-    return agency.findAll(options).nodeify(callback);
+    return travalPolicy.findAll(options).nodeify(callback);
 }
 
 /**
- * 分页代理商列表
+ * 分页差旅标准列表
  *
  * @param query
  * @param options
  * @param callback
  * @returns {*}
  */
-function listAndPaginateAgency(query, options, callback) {
+function listAndPaginateTravalPolicy(query, options, callback) {
     if (typeof options == 'function') {
         callback = options;
         options = {};
@@ -79,7 +79,7 @@ function listAndPaginateAgency(query, options, callback) {
     options.limit = limit;
     options.offset = offset;
     options.where = query;
-    return agency.findAndCountAll(options)
+    return travalPolicy.findAndCountAll(options)
         .then(function(result){
             var pg = new Paginate(page, perPage, result.count, result.rows);
             return pg;
@@ -106,11 +106,11 @@ function update(id, values, options, callback) {
 
     options.where = {id: id};
     options.returning = true;
-    return agency.update(values, options).nodeify(callback);
+    return travalPolicy.update(values, options).nodeify(callback);
 }
 
 /**
- * 创建代理商
+ * 创建差旅标准
  * @param values
  * @param options
  * @param callback
@@ -124,7 +124,7 @@ function create(values, options, callback) {
     if (!options) {
         options = {};
     }
-    return agency.create(values, options).nodeify(callback);
+    return travalPolicy.create(values, options).nodeify(callback);
 }
 
 /**
@@ -134,7 +134,7 @@ function create(values, options, callback) {
  * @returns {*}
  */
 function getById(id, callback) {
-    return agency.findById(id).nodeify(callback);
+    return travalPolicy.findById(id).nodeify(callback);
 }
 
 /**
@@ -144,27 +144,27 @@ function getById(id, callback) {
  * @param callback
  * @returns {*}
  */
-function saveOrUpdate(agency, callback) {
-    if (!agency.id) {
-        agency = agency.build(agency);
+function saveOrUpdate(travalPolicy, callback) {
+    if (!travalPolicy.id) {
+        travalPolicy = travalPolicy.build(travalPolicy);
     }
-    return agency.save().nodeify(callback);
+    return travalPolicy.save().nodeify(callback);
 }
 
 /**
- * 根据id删除代理商
+ * 根据id删除差旅标准
  * @param id
  * @param callback
  * @returns {*}
  */
 function deleteById(id, callback){
-    return agency.destroy({where: {id: id}}).nodeify(callback);
+    return travalPolicy.destroy({where: {id: id}}).nodeify(callback);
 }
 
 exports.create = create;
 exports.deleteById = deleteById;
 exports.update = update;
-exports.listAndPaginateAgency = listAndPaginateAgency;
-exports.agencyList = agencyList;
+exports.listAndPaginateTravalPolicy = listAndPaginateTravalPolicy;
+exports.travalPolicyList = travalPolicyList;
 exports.getById = getById;
 exports.saveOrUpdate = saveOrUpdate;

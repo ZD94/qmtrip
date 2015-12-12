@@ -46,7 +46,7 @@ agency.createAgency = function(data, callback){
                 data.id = acc.data.id;
                 return agencyProxy.create(data)
                     .then(function(obj){
-                        return {code: 0, agency: obj};
+                        return {code: 0, agency: obj.dataValues};
                     })
             }
         })
@@ -93,7 +93,7 @@ agency.updateAgency = function(id, data, callback){
     }
     return agencyProxy.update(id, data)
         .then(function(obj){
-            return {code: 0, agency: obj, msg: "更新成功"}
+            return {code: 0, agency: obj[1].dataValues, msg: "更新成功"}
         })
         .nodeify(callback);
 }

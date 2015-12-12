@@ -20,8 +20,8 @@
 | params.sex                        | 代理商性别              |integer               |选填
 | params.mobile                        | 代理商手机              |varchar               |必填
 | params.email                          |代理商邮箱           |varchar               |必填
-| params.company_id                          |所属企业id           |uuid               |选填
-| params.role_id                          |权限           |integer               |选填
+| params.companyId                          |所属企业id           |uuid               |选填
+| params.roleId                          |权限           |integer               |选填
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |
@@ -53,8 +53,8 @@
 | params.sex                        | 代理商性别              |integer               |选填
 | params.mobile                        | 代理商手机              |varchar               |选填
 | params.email                          |代理商邮箱           |varchar               |选填
-| params.company_id                          |所属企业id           |uuid               |选填
-| params.role_id                          |权限           |integer               |选填
+| params.companyId                          |所属企业id           |uuid               |选填
+| params.roleId                          |权限           |integer               |选填
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |
@@ -72,8 +72,8 @@
 | params.sex                        | 代理商性别              |integer               |选填
 | params.mobile                        | 代理商手机              |varchar               |选填
 | params.email                          |代理商邮箱           |varchar               |选填
-| params.company_id                          |所属企业id           |uuid               |选填
-| params.role_id                          |权限           |integer               |选填
+| params.companyId                          |所属企业id           |uuid               |选填
+| params.roleId                          |权限           |integer               |选填
 | options                                | 分页参数             |json              |------
 | options.perPage                                | 每页条数             |integer              |选填默认为6
 | options.page                                | 当前页             |integer              |选填默认为1

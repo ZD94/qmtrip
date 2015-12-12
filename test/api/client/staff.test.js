@@ -70,7 +70,7 @@ describe("api/client/staff.js", function() {
         })
     })*/
     //加积分
-    /*describe("API.staff.increaseStaffPoint", function() {
+    describe("API.staff.increaseStaffPoint", function() {
         it("API.staff.increaseStaffPoint", function(done) {
             staff.increaseStaffPoint({id: "ee3eb6a0-9f22-11e5-8540-8b3d4cdf6eb6", increasePoint: 1000, remark: "差旅省钱加积分"}, function(err, result) {
                 assert.equal(err, null);
@@ -78,7 +78,7 @@ describe("api/client/staff.js", function() {
                 done();
             });
         })
-    })*/
+    })
     //减积分
     /*describe("API.staff.decreaseStaffPoint", function() {
         it("API.staff.decreaseStaffPoint", function(done) {
