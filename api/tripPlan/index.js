@@ -200,6 +200,69 @@ tripPlan.saveConsumeRecord = function(params, options, callback){
 }
 
 /**
+ * 删除差旅计划单/预算单
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+tripPlan.deleteTripPlanOrder = function(params, callback){
+    var defer = Q.defer();
+    return checkParams(['userId', 'orderId'], params)
+        .then(function(){
+            var orderId = params.orderId;
+            var userId = params.userId;
+            return PlanOrder.findById(orderId, {attributes: ['accountId']})
+                .then(function(order){
+                    if(!order){
+                        defer.reject(L.ERR.TRIP_PLAN_ORDER_NOT_EXIST);
+                        return defer.promise;
+                    }
+                    if(order.accountId != userId){ //权限不足
+                        defer.reject(L.ERR.PERMISSION_DENY);
+                        return defer.promise;
+                    }
+                    return Q.all([
+                        PlanOrder.destory({where: {id: orderId}}),
+                        ConsumeDetails.destory({where: {orderId: orderId}})
+                    ])
+                        .then(function(){
+                            return {code: 0, msg: '删除成功'};
+                        })
+                })
+        }).nodeify(callback);
+}
+
+/**
+ * 删除差旅消费明细
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+tripPlan.deleteConsumeDetail = function(params, callback){
+    var defer = Q.defer();
+    return checkParams(['userId', 'id'])
+        .then(function(){
+            var id = params.id;
+            var userId = params.userId;
+            return ConsumeDetails.findById(id, {attributes: ['accountId']})
+                .then(function(detail){
+                    if(!detail){
+                        defer.reject(L.ERR.CONSUME_DETAIL_NOT_EXIST);
+                        return defer.promise;
+                    }
+                    if(detail.accountId != userId){
+                        defer.reject(L.ERR.PERMISSION_DENY);
+                        return defer.promise;
+                    }
+                    return ConsumeDetails.destory({where: {id: id}})
+                        .then(function(){
+                            return {code: 0, msg: '删除成功'}
+                        })
+                })
+        }).nodeify(callback);
+}
+
+/**
  * 获取json params中的columns
  * @param params
  */

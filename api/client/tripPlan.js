@@ -76,4 +76,32 @@ tripPlan.listTripPlanOrderByCompany = function(query, callback){
     return API.tripPlan.listTripPlanOrder(params, callback);
 }
 
+/**
+ * 删除差旅计划单/预算单
+ * @param orderId
+ * @param callback
+ * @returns {*}
+ */
+tripPlan.deleteTripPlanOrder = function(orderId, callback){
+    var params = {
+        orderId: orderId,
+        userId: this.accountId
+    }
+    return API.tripPlan.deleteTripPlanOrder(params, callback);
+}
+
+/**
+ * 删除差旅消费明细
+ * @param orderId
+ * @param callback
+ * @returns {*}
+ */
+tripPlan.deleteConsumeDetail = function(id, callback){
+    var params = {
+        id: id,
+        userId: this.accountId
+    }
+    return API.tripPlan.deleteConsumeDetail(params, callback);
+}
+
 module.exports = tripPlan;
