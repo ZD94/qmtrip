@@ -18,3 +18,5 @@ service.queryPlace = function(placeName, callback) {
 
     return API.skyscanner.queryCity(placeName, callback);
 }
+
+module.exports = service;
