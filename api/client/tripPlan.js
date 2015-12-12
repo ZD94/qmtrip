@@ -7,7 +7,7 @@ var Logger = require('../../common/logger');
 var logger = new Logger();
 
 var tripPlan = {};
-
+//tripPlan.__public = true;
 /**
  * 生成计划单
  * @param params
