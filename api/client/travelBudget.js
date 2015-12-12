@@ -4,7 +4,7 @@
 
 var API = require("../../common/api");
 
-var service = {
+var services = {
     __public: true
 };
 
@@ -19,8 +19,8 @@ var service = {
  * @param {Callback} callback
  * @return {Promise} {"price": "合理预算值"}
  */
-service.getTravelPolicyBudget = function(params, callback) {
+services.getTravelPolicyBudget = function(params, callback) {
     return API.skyscanner.getLowestPrice(params, callback);
 }
 
-module.exports = service;
+module.exports = services;
