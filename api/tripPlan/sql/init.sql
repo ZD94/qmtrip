@@ -26,6 +26,7 @@ SET default_with_oids = false;
 
 CREATE TABLE trip_plan_order (
     id uuid primary key,
+    order_no character varying,
     account_id uuid not null,
     company_id uuid not null,
     type integer,
@@ -38,7 +39,7 @@ CREATE TABLE trip_plan_order (
     is_need_hotel boolean default false,
     description text,
     budget numeric(15,2),
-    book_expend numeric(15,2),
+    expenditure numeric(15,2),
     expend_info jsonb,
     remark character varying,
     audit_status integer default 0,
@@ -55,6 +56,14 @@ CREATE TABLE trip_plan_order (
 -- Name: TABLE trip_plan_order; Type: COMMENT; Schema: tripplan; Owner: -
 --
 COMMENT ON TABLE trip_plan_order IS '差旅记录表';
+
+
+--
+-- TOC entry 1012 (class 0 OID 0)
+-- Dependencies: 101
+-- Name: COLUMN trip_plan_order.order_no; Type: COMMENT; Schema: tripplan; Owner: -
+--
+COMMENT ON COLUMN trip_plan_order.order_no IS '计划单号/预算单号';
 
 --
 -- TOC entry 1013 (class 0 OID 0)
@@ -116,9 +125,9 @@ COMMENT ON COLUMN trip_plan_order.budget IS '预算金额';
 --
 -- TOC entry 1021 (class 0 OID 0)
 -- Dependencies: 101
--- Name: COLUMN trip_plan_order.book_expend; Type: COMMENT; Schema: tripplan; Owner: -
+-- Name: COLUMN trip_plan_order.expenditure; Type: COMMENT; Schema: tripplan; Owner: -
 --
-COMMENT ON COLUMN trip_plan_order.book_expend IS '预定支出';
+COMMENT ON COLUMN trip_plan_order.expenditure IS '预定支出';
 
 --
 -- TOC entry 1022 (class 0 OID 0)
@@ -182,7 +191,6 @@ COMMENT ON COLUMN trip_plan_order.score IS '获取的积分';
 CREATE TABLE consume_details (
     id uuid primary key,
     order_id uuid not null,
-    order_no character varying,
     account_id uuid not null,
     type integer,
     status integer default 0,
@@ -217,13 +225,6 @@ COMMENT ON TABLE consume_details IS '差旅消费明细表';
 -- Name: COLUMN consume_details.order_id; Type: COMMENT; Schema: tripplan; Owner: -
 --
 COMMENT ON COLUMN consume_details.order_id IS '计划/预算单id';
-
---
--- TOC entry 1102 (class 0 OID 0)
--- Dependencies: 110
--- Name: COLUMN consume_details.order_no; Type: COMMENT; Schema: tripplan; Owner: -
---
-COMMENT ON COLUMN consume_details.order_no IS '计划单号/预算单号';
 
 
 --

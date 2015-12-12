@@ -3,7 +3,8 @@
  */
 
 var Q = require("q");
-var Models = require("./models").sequelize.models;
+var sequelize = require("./models").sequelize;
+var Models = sequelize.models;
 var PlanOrder = Models.TripPlanOrder;
 var ConsumeDetails = Models.ConsumeDetails
 var uuid = require("node-uuid");
@@ -22,19 +23,47 @@ var tripPlan = {}
  * @returns {*}
  */
 tripPlan.savePlanOrder = function(params, callback){
-    var defer = Q.defer();
     var checkArr = ['accountId', 'companyId', 'type', 'startPlace', 'destination', 'startAt', 'backAt', 'budget'];
     return Q.all([
         seeds.getSeedNo('tripPlanOrderNo'),
         checkParams(checkArr, params)
     ])
         .spread(function(orderNo){
-            logger.info("orderNo=>\n", orderNo);
+            logger.info("orderNo=>", orderNo);
+            var orderId = uuid.v1();
+            params.id = orderId;
             params.orderNo = orderNo;
-            return PlanOrder.create(params)
-                .then(function(ret){
-                    return {code: 0, msg: '', tripPlanOrder: ret.dataValues};
-                })
+
+            return sequelize.transaction(function (t) {
+                var execArr = [PlanOrder.create(params, {transaction: t})];
+                if(params.consumeDetails){
+                    var details = params.consumeDetails;
+                    for(var i in details){
+                        var obj = details[i];
+                        obj.orderId = orderId;
+                        obj.accountId = params.accountId;
+                        execArr.push(tripPlan.saveConsumeRecord(obj, {transaction: t}));
+                    }
+                }
+                return Q.all(execArr)
+                    .then(function(arr){
+                        var order = arr[0].dataValues;
+                        order.outTraffic = new Array();
+                        order.backTraffic = new Array();
+                        order.hotel = new Array();
+                        for(var j = 1; j < arr.length; j++){
+                            var obj = arr[j];
+                            if(obj.type === -1){
+                                order.outTraffic.push(obj);
+                            }else if(obj.type === 0){
+                                order.hotel.push(obj);
+                            }else if(obj.type === 1){
+                                order.backTraffic.push(obj);
+                            }
+                        }
+                        return {code: 0, msg: '保存成功', tripPlanOrder: order};
+                    })
+            })
         }).nodeify(callback);
 }
 
@@ -152,13 +181,20 @@ tripPlan.listTripPlanOrder = function(params, callback){
  * @param callback
  * @returns {*}
  */
-tripPlan.saveConsumeRecord = function(params, callback){
+tripPlan.saveConsumeRecord = function(params, options, callback){
+    if(typeof options == 'function'){
+        callback = options;
+        options = {};
+    }
+    if(!options){
+        options = {};
+    }
     var checkArr = ['orderId', 'accountId', 'type', 'startTime', 'endTime', 'invoiceType', 'budget'];
     return checkParams(checkArr, params)
         .then(function(){
-            return ConsumeDetails.create(params)
+            return ConsumeDetails.create(params, options)
                 .then(function(ret){
-                    return {code: 0, msg: '', ConsumeDetail: ret.dataValues};
+                    return ret.dataValues;
                 })
         }).nodeify(callback);
 }

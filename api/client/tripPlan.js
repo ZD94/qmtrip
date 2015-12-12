@@ -1,0 +1,79 @@
+/**
+ * Created by yumiao on 15-12-12.
+ */
+
+var API = require('../../common/api');
+var Logger = require('../../common/logger');
+var logger = new Logger();
+
+var tripPlan = {};
+
+/**
+ * 生成计划单
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+tripPlan.savePlanOrder = function(params, callback){
+    params.accountId = this.accountId;
+    logger.info(params);
+    return API.tripPlan.savePlanOrder(params, callback);
+}
+
+/**
+ * 保存消费支出明细
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+tripPlan.saveConsumeDetail = function(params, callback){
+    params.accountId = this.accountId;
+    return API.tripPlan.saveConsumeRecord(params)
+        .then(function(consumeDetail){
+            return {code: 0, msg: '保存成功', consumeDetail: consumeDetail};
+        }).nodeify(callback);
+}
+
+/**
+ * 获取计划单详情
+ * @param orderId
+ * @param callback
+ */
+tripPlan.getTripPlanOrderById = function(orderId, callback){
+    var params = {
+        orderId: orderId,
+        userId: this.accountId
+    }
+    return API.tripPlan.getTripPlanOrder(params, callback);
+}
+
+/**
+ * 获取差旅计划单列表(员工)
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+tripPlan.listTripPlanOrder = function(query, callback){
+    var params = {
+        userId: this.accountId,
+        query: query
+    }
+    return API.tripPlan.listTripPlanOrder(params, callback);
+}
+
+/**
+ * 获取差旅计划单列表(企业)
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+tripPlan.listTripPlanOrderByCompany = function(query, callback){
+    query.companyId = this.companyId;
+    var params = {
+        userId: this.accountId,
+        query: query
+    }
+    return API.tripPlan.listTripPlanOrder(params, callback);
+}
+
+module.exports = tripPlan;
