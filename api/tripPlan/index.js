@@ -221,13 +221,15 @@ tripPlan.deleteTripPlanOrder = function(params, callback){
                         defer.reject(L.ERR.PERMISSION_DENY);
                         return defer.promise;
                     }
-                    return Q.all([
-                        PlanOrder.destory({where: {id: orderId}}),
-                        ConsumeDetails.destory({where: {orderId: orderId}})
-                    ])
-                        .then(function(){
-                            return {code: 0, msg: '删除成功'};
-                        })
+                    return sequelize.transaction(function(t){
+                        return Q.all([
+                            PlanOrder.destory({where: {id: orderId}, transaction: t}),
+                            ConsumeDetails.destory({where: {orderId: orderId}, transaction: t})
+                        ])
+                            .then(function(){
+                                return {code: 0, msg: '删除成功'};
+                            })
+                    })
                 })
         }).nodeify(callback);
 }

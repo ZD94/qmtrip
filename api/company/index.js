@@ -20,7 +20,7 @@ var company = {};
  * @returns {*}
  */
 company.createCompany = function(params, callback){
-    return checkParams(['createUser', 'name', 'logo', 'email'], params)
+    return checkParams(['createUser', 'name', 'logo', 'email', 'agencyId'], params)
         .then(function(){
             return Company.create(params)
                 .then(function(company){
