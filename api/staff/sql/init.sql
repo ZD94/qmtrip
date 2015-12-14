@@ -11,6 +11,8 @@ create table staff.staffs (
     role_id integer, -- 权限
     mobile character varying(20), -- 手机
     email character varying(50), -- 邮箱
+    sex integer DEFAULT 1, -- 性别
+    department character varying(50), -- 部门
     create_at timestamp without time zone DEFAULT now() -- 创建时间
 );
 
@@ -25,6 +27,8 @@ comment on column staff.staffs.travel_level is '差旅标准';
 COMMENT ON COLUMN staff.staffs.role_id IS '权限';
 COMMENT ON COLUMN staff.staffs.mobile IS '手机';
 COMMENT ON COLUMN staff.staffs.email IS '邮箱';
+COMMENT ON COLUMN staff.staffs.sex IS '性别';
+COMMENT ON COLUMN staff.staffs.department IS '部门';
 COMMENT ON COLUMN staff.staffs.create_at IS '创建时间';
 
 create table staff.point_changes (

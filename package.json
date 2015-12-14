@@ -28,6 +28,7 @@
     "morgan": "^1.6.1",
     "nan": "^2.1.0",
     "node-uuid": "^1.4.7",
+    "node-xlsx": "^0.6.0",
     "nodemailer": "^1.10.0",
     "pg": "^4.4.3",
     "pg-hstore": "^2.3.2",

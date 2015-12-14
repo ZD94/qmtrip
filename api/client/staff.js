@@ -30,4 +30,9 @@ staff.listAndPaginateStaff = staffServer.listAndPaginateStaff;
 staff.increaseStaffPoint = staffServer.increaseStaffPoint;
 staff.decreaseStaffPoint = staffServer.decreaseStaffPoint;
 staff.listAndPaginatePointChange = staffServer.listAndPaginatePointChange
+staff.importExcel = function(params, callback){
+//    params.accountId = this.accountId || 'ee3eb6a0-9f22-11e5-8540-8b3d4cdf6eb6';
+    params.accountId = this.accountId;
+    return staffServer.importExcel(params, callback);
+}
 module.exports = staff;

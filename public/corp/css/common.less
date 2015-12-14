@@ -1,0 +1,77 @@
+@import "../../css/common.less";
+.corp_header{
+	position: fixed;
+	width: 200px;
+	height: 100%;
+	background: #30343b;
+	.left_nav{
+		margin-top: 20px;
+		li{
+			height: 46px;
+			line-height: 46px;
+			padding-left: 70px;
+			font-size: 16px;
+			font-weight: bold;
+			margin-top: 10px;
+			a{
+				color: #B9B9B9;
+				font-size: 16px;
+			}
+			&.on{
+				color: #fff;
+				background: #484e58;
+				a{
+					color: #fff;
+				}
+			}
+		}
+	}
+}
+.corp_main{
+	margin-left: 200px;
+	background: #fff;
+	.corp_m_header{
+		position: fixed;
+		top: 0;
+		left: 200px;
+		height: 60px;
+		line-height: 60px;
+		width: 100%;
+		background: #fff;
+		border-bottom: 1px solid #d0d0d0;
+		.m_headerleft{
+			float: left;
+			margin-left: 20px;
+			width: 400px;
+			.corp_name{
+				font-size: 14px;
+				color: #4a4a4a;
+				max-width: 280px;
+				float: left;
+				margin-right: 20px;
+			}
+			.corp_help{
+				color: #9b9b9b;
+				width: 60px;
+				float: left;
+			}
+		}
+		.m_headerright{
+			float: right;
+			padding-right: 20px;
+			.getplan{
+				display: inline-block;
+				width: 100px;
+				height: 36px;
+				border-radius: 5px;
+				line-height: 36px;
+				text-align: center;
+				background: #f5a623;
+				color:#fff;
+			}
+		}
+	}
+	.corp_box{
+		padding-top: 60px;
+	}
+}

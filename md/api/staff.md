@@ -20,7 +20,7 @@
 | params.mobile                        | 员工手机              |varchar               |必填
 | params.email                          |员工邮箱           |varchar               |必填
 | params.companyId                          |所属企业id           |uuid               |必填
-| params.departmentId                          |部门 id           |uuid               |选填
+| params.department                          |部门名称           |varchar               |选填
 | params.travelLevel                          |差旅标准id           |uuid               |选填
 | params.roleId                          |权限           |integer               |选填
 | callback                              | 回调函数             |function              |支持promise
@@ -54,7 +54,7 @@
 | params.mobile                        | 员工手机              |varchar               |选填
 | params.email                          |员工邮箱           |varchar               |选填
 | params.companyId                          |所属企业id           |uuid               |选填
-| params.departmentId                          |部门 id           |uuid               |选填
+| params.department                          |部门名称           |varchar               |选填
 | params.travelLevel                          |差旅标准id           |uuid               |选填
 | params.roleId                          |权限           |integer               |选填
 | callback                              | 回调函数             |function              |支持promise
@@ -87,7 +87,7 @@
 | params.mobile                        | 员工手机              |varchar               |选填
 | params.email                          |员工邮箱           |varchar               |选填
 | params.companyId                          |所属企业id           |uuid               |选填
-| params.departmentId                          |部门 id           |uuid               |选填
+| params.department                          |部门名称           |varchar               |选填
 | params.travelLevel                          |差旅标准id           |uuid               |选填
 | params.roleId                          |权限           |integer               |选填
 | options                                | 分页参数             |json              |------
