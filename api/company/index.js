@@ -3,8 +3,11 @@
  */
 
 var Q = require('q');
-var Models = require("./models").sequelize.models;
+var sequelize = require("./models").sequelize;
+var Models = sequelize.models;
 var Company = Models.Company;
+var FundsAccounts = Models.FundsAccounts;
+var MoneyChanges = Models.MoneyChanges;
 var uuid = require("node-uuid");
 var L = require("../../common/language");
 var Logger = require('../../common/logger');
@@ -14,13 +17,13 @@ var utils = require("../../common/utils");
 var company = {};
 
 /**
- * 创建企业
+ * 创建企业,并生成企业的资金账户
  * @param params
  * @param callback
  * @returns {*}
  */
 company.createCompany = function(params, callback){
-    return checkParams(['createUser', 'name', 'logo', 'email', 'agencyId'], params)
+    return checkParams(['createUser', 'name', 'email', 'domainName'], params)
         .then(function(){
             return Company.create(params)
                 .then(function(company){
@@ -135,6 +138,42 @@ company.deleteCompany = function(params, callback){
                         })
                 })
         }).nodeify(callback);
+}
+
+/**
+ * 企业资金账户金额变动
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+company.moneyChange = function(params, callback){
+    var defer = Q.defer();
+    return checkParams(['money', 'channel', 'userId', 'type', 'companyId'], params)
+        .then(function(){
+            var money = params.money;
+            var userId = params.userId;
+            var type = params.type;
+            var id = params.companyId;
+            return FundsAccounts.findById(id)
+                .then(function(funds){
+                    if(!funds){
+                        defer.reject({code: -2, msg: '企业资金账户不存在'});
+                        return defer.promise;
+                    }
+                    var funds = funds.toJSON();
+                    logger.info(funds);
+                    return funds;
+                })
+        }).nodeify(callback);
+}
+
+company.chargeMoney = function(params, callback){
+    return checkParams(['money', 'channel', 'userId', 'companyId'])
+        .then(function(){
+            return Q.all([
+                MoneyChanges.create({})
+            ])
+        })
 }
 
 /**

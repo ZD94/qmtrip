@@ -38,11 +38,11 @@ module.exports = function(Db, DataType) {
             field: "name"
         },
         /**
-         * 企业logo
+         * 企业域名
          */
-        logo: {
+        domainName: {
             type: DataType.STRING,
-            field: "logo"
+            field: "domain_name"
         },
         /**
          * 企业描述
