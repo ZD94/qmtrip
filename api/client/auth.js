@@ -14,6 +14,7 @@ var auth = {
 };
 var accounts = [];
 var mail = require("../mail");
+var API = require("../../common/api");
 
 
 /**
@@ -52,5 +53,114 @@ auth.bindMobile =authServer.bindMobile;
  * @return {Promise} {code:0 , msg: "ok"}
  */
 auth.activeAccount = authServer.activeAccount;
+
+/**
+ * 注册企业账号
+ *
+ * @param {Object} params
+ * @param {String} params.companyName 企业名称
+ * @param {String} params.name 注册人姓名
+ * @param {String} params.email 企业邮箱
+ * @param {String} params.mobile 手机号
+ * @param {String} params.pwd 密码
+ * @param {String} params.msgCode 短信验证码
+ * @param {String} params.msgTicket 验证码凭证
+ * @param {String} params.picCode 图片验证码
+ * @param {String} params.picTicket 图片验证码凭证
+ * @param {Function} callback
+ * @return {Promise}
+ */
+auth.registryCompany = function(params, callback) {
+    var defer = Q.defer();
+    //先创建登录账号
+    if (!params) {
+        params = {};
+    }
+    var companyName = params.companyName;
+    var name = params.name;
+    var email = params.email;
+    var mobile = params.mobile;
+    var msgCode = params.msgCode;
+    var msgTicket = params.msgTicket;
+    var picCode = params.picCode;
+    var picTicket = params.picTicket;
+    var pwd = params.pwd;
+
+    if (!picCode || !picTicket) {
+        defer.reject({code: -1, msg: "验证码错误"});
+        return defer.promise.nodeify(callback);
+    }
+
+    if (!msgCode || !msgTicket) {
+        defer.reject({code: -1, msg: "短信验证码错误"});
+        return defer.promise.nodeify(callback);
+    }
+
+    if (!mobile || !validate.isMobile(mobile)) {
+        defer.reject(L.ERR.MOBILE_FORMAT_ERROR);
+        return defer.promise.nodeify(callback);
+    }
+
+    if (!name) {
+        defer.reject({code: -1, msg: "联系人姓名为空"});
+        return defer.promise.nodeify(callback);
+    }
+
+    if (!companyName) {
+        defer.reject({code: -1, msg: "公司名称为空"});
+        return defer.promise.nodeify(callback);
+    }
+
+    if (!pwd) {
+        defer.reject({code: -1, msg: "密码不能为空"});
+        return defer.promise.nodeify(callback);
+    }
+
+    pwd = md5(pwd);
+    var validatePicCheckCode = Q.denodeify(API.checkcode.validatePicCheckCode);
+    var validateMsgCheckCode = Q.denodeify(API.checkcode.validateMsgCheckCode);
+    var createCompany = Q.denodeify(API.company.createCompany);
+    var createStaff = Q.denodeify(API.staff.createStaff);
+    return validatePicCheckCode({code: picCode, ticket: picTicket})
+        .then(function(result) {
+            if (result.code) {
+                throw result;
+            }
+            return true;
+        })
+        .then(function() {
+            return validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile})
+                .then(function(result) {
+                    if (result.code) {
+                        throw result;
+                    }
+                    return true;
+                })
+        })
+        .then(function(){
+            return authServer.newAccount({email: email, pwd: pwd})
+                .then(function(result) {
+                    if (result.code) {
+                        throw result;
+                    }
+
+                    var domain = email.split(/@/)[1];
+                    var account = result.data;
+                    return createCompany({createUser: account.id, name: companyName, email: domain})
+                        .then(function(result) {
+                            if (result.code) {
+                                throw result;
+                            }
+
+                            var company = result.company;
+                            return createStaff({email: email, mobile: mobile, name: name, companyId: company.id, accountId: account.id})
+                        })
+                })
+                .then(function(result) {
+                    return {code: 0, msg: "OK"};
+                })
+        })
+        .nodeify(callback);
+}
 
 module.exports = auth;
