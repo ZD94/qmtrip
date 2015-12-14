@@ -13,8 +13,8 @@
         API.place.queryPlace   获取匹配城市/机场信息
         
     >4. 验证码
-        getMsgCheckCode 获取短信验证码
-        getPicCheckCode 获取图片验证码
+        API.checkcode.getMsgCheckCode 获取短信验证码
+        API.checkcode.getPicCheckCode 获取图片验证码
 
 
 ### API.place.queryPlace(city, callback)
