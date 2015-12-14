@@ -38,7 +38,6 @@ CREATE TABLE company (
     email character varying(50),
     telephone character varying(15),
     mobile character varying(11),
-    company_create_at timestamp without time zone,
     staff_num integer default 0,
     staff_score integer default 0,
     create_at timestamp without time zone default now(),

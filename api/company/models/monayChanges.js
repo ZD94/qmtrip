@@ -36,6 +36,10 @@ module.exports = function(Db, DataType) {
         userId: {
             type: DataType.UUID,
             field: "user_id"
+        },
+        remark: {
+            type: DataType.STRING,
+            field: "remark"
         }
     }, {
         tableName: "money_changes",

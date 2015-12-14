@@ -17,18 +17,30 @@ var utils = require("../../common/utils");
 var company = {};
 
 /**
- * 创建企业,并生成企业的资金账户
- * @param params
- * @param callback
- * @returns {*}
+ * 创建企业
+ * @param {Object} params
+ * @param {UUID} params.createUser 创建人
+ * @param {String} params.name 企业名称
+ * @param {String} params.domainName 域名,邮箱后缀
+ * @param {Function} callback
+ * @returns {Promise}
  */
 company.createCompany = function(params, callback){
-    return checkParams(['createUser', 'name', 'email', 'domainName'], params)
+    return checkParams(['createUser', 'name', 'domainName'], params)
         .then(function(){
-            return Company.create(params)
-                .then(function(company){
-                    return {code: 0, msg: '', company: company.dataValues};
-                })
+            var companyId = uuid.v1();
+            params.id = companyId;
+            var funds = { id: companyId }
+            return sequelize.transaction(function(t){
+                return Q.all([
+                    Company.create(params, {transaction: t}),
+                    FundsAccounts.create(funds, {transaction: t})
+                ])
+                    .spread(function(company){
+                        var company = company.toJSON();
+                        return {code: 0, msg: '', company: company};
+                    })
+            })
         }).nodeify(callback);
 }
 
@@ -66,7 +78,7 @@ company.updateCompany = function(params, callback){
                                 defer.reject({code: -2, msg: '更新企业信息失败'});
                                 return defer.promise;
                             }
-                            var company = ret[1][0].dataValues;
+                            var company = ret[1][0].toJSON();
                             return {code: 0, msg: '更新企业信息成功', company: company};
                         })
                 })
@@ -85,8 +97,9 @@ company.getCompany = function(params, callback){
             var companyId = params.companyId;
             var userId = params.userId;
             return Company.find({where: {id: companyId}})
-                .then(function(ret){
-                    return {code: 0, msg: '', company: ret.dataValues};
+                .then(function(company){
+                    var company = company.toJSON();
+                    return {code: 0, msg: '', company: company};
                 })
         }).nodeify(callback);
 }
@@ -148,7 +161,7 @@ company.deleteCompany = function(params, callback){
  */
 company.moneyChange = function(params, callback){
     var defer = Q.defer();
-    return checkParams(['money', 'channel', 'userId', 'type', 'companyId'], params)
+    return checkParams(['money', 'channel', 'userId', 'type', 'companyId', 'remark'], params)
         .then(function(){
             var money = params.money;
             var userId = params.userId;
@@ -161,20 +174,54 @@ company.moneyChange = function(params, callback){
                         return defer.promise;
                     }
                     var funds = funds.toJSON();
-                    logger.info(funds);
-                    return funds;
+                    var fundsUpdates = {
+                        updateAt: utils.now()
+                    };
+                    var moneyChange = {
+                        fundsAccountId: id,
+                        status: type,
+                        money: money,
+                        channel: params.channel,
+                        userId: userId,
+                        remark: params.remark
+                    }
+                    var income = funds.income;
+                    if(type == 1){
+                        fundsUpdates.income = parseFloat(income) + parseFloat(money);
+                    }else if(type == -1){
+                        var consume = funds.consume;
+                        var balance = funds.balance;
+                        logger.info("balance=>", balance);
+                        fundsUpdates.consume = parseFloat(consume) + parseFloat(money);
+                        var balance = parseFloat(balance) - parseFloat(money); //账户余额
+                        if(balance < 0){
+                            defer.reject(L.ERR.BALANCE_NOT_ENOUGH); //账户余额不足
+                            return defer.promise;
+                        }
+                    }else{
+                        defer.reject(L.ERR.MONEY_STATUS_ERROR);
+                        return defer.promise;
+                    }
+
+                    return sequelize.transaction(function(t){
+                        var cols = getColumns(fundsUpdates);
+                        return Q.all([
+                            FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: cols, transaction: t}),
+                            MoneyChanges.create(moneyChange, {transaction: t})
+                        ])
+                            .spread(function(funds){
+                                if(funds[0] != 1){
+                                    defer.reject({code: -3, msg: '充值失败'});
+                                    return defer.promise;
+                                }
+                                var funds = funds[1][0].toJSON();
+                                return {code: 0, msg: '', fundsAccount: funds};
+                            })
+                    })
                 })
         }).nodeify(callback);
 }
 
-company.chargeMoney = function(params, callback){
-    return checkParams(['money', 'channel', 'userId', 'companyId'])
-        .then(function(){
-            return Q.all([
-                MoneyChanges.create({})
-            ])
-        })
-}
 
 /**
  * 获取json params中的columns

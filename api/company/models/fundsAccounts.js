@@ -12,25 +12,40 @@ module.exports = function(Db, DataType) {
             defaultValue: uuid.v1,
             primaryKey: true
         },
+        status: {
+            type: DataType.STRING(11),
+            field: "status",
+            defaultValue: 0
+        },
         paymentPwd: {
             type: DataType.STRING(50),
             field: "payment_pwd"
         },
+        balance: {
+            type: DataType.VIRTUAL,
+            get: function(){
+                return this.income - this.consume - this.frozen;
+            }
+        },
         income: {
             type: DataType.NUMERIC(15,2),
-            field: "income"
+            field: "income",
+            defaultValue: 0
         },
         consume: {
             type: DataType.NUMERIC(15,2),
-            field: "consume"
+            field: "consume",
+            defaultValue: 0
         },
         frozen: {
             type: DataType.NUMERIC(15,2),
-            field: "frozen"
+            field: "frozen",
+            defaultValue: 0
         },
         staffReward: {
             type: DataType.NUMERIC(15,2),
-            field: "staff_reward"
+            field: "staff_reward",
+            defaultValue: 0
         },
         createAt: {
             type: "timestamp without time zone",
@@ -39,7 +54,8 @@ module.exports = function(Db, DataType) {
         },
         isSetPwd: {
             type: DataType.BOOLEAN,
-            field: "is_set_pwd"
+            field: "is_set_pwd",
+            defaultValue: false
         },
         updateAt: {
             type: "timestamp without time zone",
