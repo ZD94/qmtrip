@@ -17,8 +17,9 @@ staff.createStaff = function(params, callback){
                 params.companyId = data.dataValues.companyId;//此处可不可以用data.companyId
                 return staffServer.createStaff(params, callback);
             }else{
-                defer.reject({code: -1, msg: '无权限'});
-                return defer.promise;
+                return staffServer.createStaff(params, callback);//员工注册的时候
+//                defer.reject({code: -1, msg: '无权限'});
+//                return defer.promise;
             }
         })
 }
