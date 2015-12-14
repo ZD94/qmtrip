@@ -1,5 +1,5 @@
 
-function openL (title,content) {
+function Myalert (title,content) {
 	$(".messagebox_fixed").remove();
 	var str = "";
 	str += "<div class='messagebox_fixed'>";

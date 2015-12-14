@@ -196,7 +196,7 @@ input {
 
 
 
-/*jquery-ui datepicker*/
+/*jquery-ui日历控件样式*/
 .ui-datepicker {box-shadow: 0 0 4px #ccc;*width: 220px;}
 .ui-datepicker-header {text-align: center;line-height: 24px;border:1px #d7d7d7 solid;border-bottom:none;background-color: #fdfce1;}
 .ui-datepicker-header a {cursor: pointer;}
@@ -212,48 +212,10 @@ input {
 .ui-datepicker-calendar .ui-state-active {background-color: #fdfce1}
 
 
-
-.messagebox_fixed {
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
-  position: fixed;
-  top: 0;
-  left: 0;
-}
-.messagebox_box {
-  background: #ffffff;
-  padding: 5px;
-  border-radius: 5px;
-  box-shadow: 0 3px 26px rgba(0, 0, 0, .9);
-  position: fixed;
-  top: 50%;
-  left: 50%;
-}
-.messagebox_title {
-  height: 30px;
-  line-height: 30px;
-  padding: 0 5px;
-  position: relative;
-}
-.messagebox_close {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  -webkit-transtion:0.4s all ease;
-  -moz-transition:0.4s all ease;
-  transition:0.4s all ease;
-  position: absolute;
-  top: 0;
-  right: 5px;
-}
-.messagebox_close:hover {
-  -webkit-transform:rotate(180deg);
-  -moz-transform:rotate(180deg);
-  transform:rotate(180deg);
-}
-.messagebox_content {
-  line-height: 25px;
-  background: #f7f7f7;
-  padding: 20px 25px;
-}
+/*公用弹窗控件样式*/
+.messagebox_fixed {width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.3); position: fixed; top: 0;  left: 0;}
+.messagebox_fixed .messagebox_box {background: #ffffff; padding: 5px; border-radius: 5px; box-shadow: 0 3px 26px rgba(0, 0, 0, .9); position: fixed; top: 50%; left: 50%;}
+.messagebox_fixed .messagebox_box .messagebox_title {height: 30px; line-height: 30px; padding: 0 5px; position: relative;}
+.messagebox_fixed .messagebox_box .messagebox_close {width: 20px; height: 20px; cursor: pointer; -webkit-transtion:0.4s all ease; -moz-transition:0.4s all ease; transition:0.4s all ease; position: absolute; top: 0; right: 5px;}
+.messagebox_fixed .messagebox_box .messagebox_close:hover {-webkit-transform:rotate(180deg); -moz-transform:rotate(180deg); transform:rotate(180deg);}
+.messagebox_fixed .messagebox_box .messagebox_content { line-height: 25px; background: #f7f7f7; padding: 20px 25px;}

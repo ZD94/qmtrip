@@ -103,27 +103,27 @@ module.exports =(function(){
 
             var dateReg = /^\d{4}-\d{2}-\d{2}$/;
             if (startplace == "") {
-                openL("温馨提示","请选择出发城市");
+                Myalert("温馨提示","请选择出发城市");
                 return false;
             }
             if (endplace == "") {
-                openL("温馨提示","请选择目的地城市");
+                Myalert("温馨提示","请选择目的地城市");
                 return false;
             }
             if (!starttime || !dateReg.test(starttime)) {
-                openL("温馨提示","出发时间不存在或者格式不正确");
+                Myalert("温馨提示","出发时间不存在或者格式不正确");
                 return false;
             }
             if (!dateReg.test(endtime)) {
-                openL("温馨提示","返程时间格式不正确");
+                Myalert("温馨提示","返程时间格式不正确");
                 return false;
             }
             if (starttime>=endtime) {
-                openL("温馨提示","返程时间不能小于出发时间");
+                Myalert("温馨提示","返程时间不能小于出发时间");
                 return false;
             }
             if (startplace == endplace) {
-                openL("温馨提示","出发城市与目的地城市不能相同");
+                Myalert("温馨提示","出发城市与目的地城市不能相同");
                 return false;
             }
             $(".step1").hide();
