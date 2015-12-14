@@ -9,8 +9,8 @@ var assert = require("assert");
 describe("api/client/staff.js", function() {
 
     var obj = {
-        email: "yali13.wang@tulingdao.com",
-        name: "wyl13",
+        email: "yali166.wang@tulingdao.com",
+        name: "wyl163",
         mobile: "18301208613"
     }
 
@@ -101,6 +101,8 @@ describe("api/client/staff.js", function() {
             });
         })
     })*/
+
+    //导入员工
     describe("API.staff.importExcel", function() {
         it("API.staff.importExcel", function(done) {
             staff.importExcel({}, function(err, result) {//查询条件此处用staffId或者staff_id均可

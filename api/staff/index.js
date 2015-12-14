@@ -58,8 +58,12 @@ staff.createStaff = function(data, callback){
                 data.id = acc.data.id;
                 return staffProxy.create(data)
                     .then(function(obj){
-                        return {code: 0, staff: obj.dataValues};*/
-    Q.all([])
+                        return {code: 0, staff: obj.dataValues};
+                    })
+            }
+        })
+        .nodeify(callback);*/
+    return Q.all([])
         .then(function() {
             if (accountId) {
                 data.id = accountId;
@@ -288,7 +292,7 @@ staff.listAndPaginatePointChange = function(params, options, callback){
  */
 staff.importExcel = function(params, callback){
     var userId = params.accountId;
-    var obj = nodeXlsx.parse(config.upload.tmpDir + '/test.xlsx');
+    var obj = nodeXlsx.parse(config.upload.tmpDir + '/two.xls');
     var data = obj[0].data
     var travalPolicies = {};
     var noAddObj = [];
