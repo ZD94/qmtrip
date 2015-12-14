@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+	<meta charset="UTF-8">
+	<title ng-bind="pageTitle"></title>
+	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
+	<script type="text/javascript">
+        var jQuery = $ = require('jquery');
+    </script>
+    <script type="text/javascript" src="/script/libs/bundle.angular.js"></script>
+    <script type="text/javascript" src="/script/libs/bundle.api.js"></script>
+    <script type="text/javascript" src="/script/libs/api.js"></script>
+    <script type="text/javascript" src="/script/libs/ngapp.js"></script>
+    <script type="text/javascript" src="/corp/controller.all.js"></script>
+    <script type="text/javascript">
+    	var Q = require('q');
+    	var moment = require('moment');
+    	var TLD = TLD_angular_app('tulingdao.com', 'corp', '/users/user-main');
+    	// API.onlogin(function(){
+    	// 	window.location.href = "/";
+    	// 	return;
+    	// })
+    	//获取页面基本信息
+    	TLD.controller("MainController", ["$scope", function($scope) {
+
+    	}])
+    </script>
+</head>
+<body ng-controller="MainController">
+	<div class="corp_header"></div>
+</body>
+</html>
