@@ -11,6 +11,19 @@
   font-weight: normal;
   font-style: normal;
 }
+.web-icon-font {
+  font-family: 'fontawesome';
+  font-size: 15px;
+  font-style: normal;
+  color: #b6b6b6;
+}
+.web-icon-font2 {
+  font-family: 'icomoon';
+  font-size: 15px;
+  font-style: normal;
+  text-transform: none;
+  color: #b6b6b6;
+}
 * {
   margin: 0;
   padding: 0;
@@ -33,7 +46,7 @@ html {
   overflow-y: scroll;
 }
 body {
-  font-family: '΢���ź�';
+  font-family: '΢���ź�', 'microsoft yahei';
   font-size: 13px;
   margin: 0;
   padding: 0;
