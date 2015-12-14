@@ -26,4 +26,5 @@ travalPolicy.deleteTravalPolicy = travalPolicyServer.deleteTravalPolicy;
 travalPolicy.updateTravalPolicy = travalPolicyServer.updateTravalPolicy;
 travalPolicy.getTravalPolicy = travalPolicyServer.getTravalPolicy;
 travalPolicy.listAndPaginateTravalPolicy = travalPolicyServer.listAndPaginateTravalPolicy;
+travalPolicy.getAllTravalPolicy = travalPolicyServer.getAllTravalPolicy;
 module.exports = travalPolicy;

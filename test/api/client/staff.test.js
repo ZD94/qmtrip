@@ -25,13 +25,13 @@ describe("api/client/staff.js", function() {
         })
     })*/
     //查询员工集合
-    describe("API.staff.listAndPaginateStaff", function() {
+    /*describe("API.staff.listAndPaginateStaff", function() {
         it("API.staff.listAndPaginateStaff", function(done) {
             staff.listAndPaginateStaff({}, function(err, result) {
                 assert.equal(err, null);
                 console.log(result);
 //                console.log(result.items);//item dataValues里存放的才是记录信息
-                /*{ page: 1,
+                *//*{ page: 1,
                     perPage: 6,
                     total: 1,
                     items:
@@ -44,11 +44,11 @@ describe("api/client/staff.js", function() {
                         __eagerlyLoadedAssociations: [],
                         isNewRecord: false } ],
                         currentPageTotal: 1,
-                    pages: 1 }*/
+                    pages: 1 }*//*
                 done();
             });
         })
-    })
+    })*/
     //更新员工信息
     /*describe("API.staff.updateStaff", function() {
         it("API.staff.updateStaff", function(done) {
@@ -70,7 +70,7 @@ describe("api/client/staff.js", function() {
         })
     })*/
     //加积分
-    describe("API.staff.increaseStaffPoint", function() {
+    /*describe("API.staff.increaseStaffPoint", function() {
         it("API.staff.increaseStaffPoint", function(done) {
             staff.increaseStaffPoint({id: "ee3eb6a0-9f22-11e5-8540-8b3d4cdf6eb6", increasePoint: 1000, remark: "差旅省钱加积分"}, function(err, result) {
                 assert.equal(err, null);
@@ -78,7 +78,7 @@ describe("api/client/staff.js", function() {
                 done();
             });
         })
-    })
+    })*/
     //减积分
     /*describe("API.staff.decreaseStaffPoint", function() {
         it("API.staff.decreaseStaffPoint", function(done) {
@@ -101,6 +101,16 @@ describe("api/client/staff.js", function() {
             });
         })
     })*/
+    describe("API.staff.importExcel", function() {
+        it("API.staff.importExcel", function(done) {
+            staff.importExcel({}, function(err, result) {//查询条件此处用staffId或者staff_id均可
+                assert.equal(err, null);
+                console.log(err);
+                console.log(result);
+                done();
+            });
+        })
+    })
 
 
 })
