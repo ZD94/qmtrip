@@ -50,6 +50,7 @@ authServer.remove = function(data, callback) {
 /**
  * 新建账号
  * @param {Object} data 参数
+ * @param {String} data.mobile 手机号
  * @param {String} data.email 邮箱
  * @param {String} data.pwd 密码
  * @param {Callback} callback 回调函数
@@ -77,9 +78,20 @@ authServer.newAccount = function(data, callback) {
         return defer.promise.nodeify(callback);
     }
 
+    var mobile = data.mobile;
+    if (mobile && !validate.isMobile(mobile)) {
+        defer.reject(L.ERR.MOBILE_FORMAT_ERROR);
+        return defer.promise.nodeify(callback);
+    }
+
+    var status = 0;
+    if (mobile) {
+        status = 1;
+    }
+
     var pwd = data.pwd;
     pwd = md5(pwd);
-    var m = db.models.Account.build({id: uuid.v1(), email: data.email, pwd: pwd});
+    var m = db.models.Account.build({id: uuid.v1(), email: data.email, pwd: pwd, status: status});
     return m.save()
         .then(function(account) {
             if (account.status == 0) {

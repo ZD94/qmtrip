@@ -25,6 +25,9 @@
   "hosts": {
     "main":{"addr":"api.local.tulingdao.com", "port":4001}
   },
+  "upload":{
+    "tmpDir": "${{ROOT_DIR}}/public"
+  },
   "api": [
     {
       "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},

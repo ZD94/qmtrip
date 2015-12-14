@@ -32,9 +32,19 @@ describe("api/client/travalPolicy.js", function() {
         })
     })*/
     //查询差旅标准集合
-    describe("API.travalPolicy.listAndPaginateTravalPolicy", function() {
+   /* describe("API.travalPolicy.listAndPaginateTravalPolicy", function() {
         it("API.travalPolicy.listAndPaginateTravalPolicy", function(done) {
             travalPolicy.listAndPaginateTravalPolicy(obj, function(err, result) {
+                assert.equal(err, null);
+                console.log(result);
+//                console.log(result.items);//item dataValues里存放的才是记录信息
+                done();
+            });
+        })
+    })*/
+    describe("API.travalPolicy.getAllTravalPolicy", function() {
+        it("API.travalPolicy.getAllTravalPolicy", function(done) {
+            travalPolicy.getAllTravalPolicy({}, function(err, result) {
                 assert.equal(err, null);
                 console.log(result);
 //                console.log(result.items);//item dataValues里存放的才是记录信息

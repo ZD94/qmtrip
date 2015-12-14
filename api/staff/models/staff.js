@@ -60,6 +60,12 @@ module.exports = function(Db, DataType) {
             field: "department_id"
         },
         /**
+         * 部门
+         */
+        department: {
+            type: DataType.STRING(50)
+        },
+        /**
          * 差旅标准
          */
         travelLevel: {

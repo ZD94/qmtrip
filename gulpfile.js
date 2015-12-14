@@ -16,6 +16,7 @@ gulplib.angular_app('staff', 'public/staff');
 gulplib.angular_app('corp', 'public/corp');
 gulplib.angular_app('agency', 'public/agency');
 gulplib.angular_app('demo', 'public/demo');
+gulplib.angular_app("auth", "public/auth");
 
 gulplib.dist(function(){
     var gulp = require('gulp');
