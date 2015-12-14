@@ -15,12 +15,15 @@ var company = {};
 
 /**
  * 创建企业
- * @param params
- * @param callback
- * @returns {*}
+ * @param {Object} params
+ * @param {UUID} params.createUser 创建人
+ * @param {String} params.name 企业名称
+ * @param {String} params.email 域名,邮箱后缀
+ * @param {Function} callback
+ * @returns {Promise}
  */
 company.createCompany = function(params, callback){
-    return checkParams(['createUser', 'name', 'logo', 'email', 'agencyId'], params)
+    return checkParams(['createUser', 'name', 'email'], params)
         .then(function(){
             return Company.create(params)
                 .then(function(company){

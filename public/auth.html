@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html ng-app="tulingdao.com">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>全麦商旅</title>
+    <script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
+    <script>
+        jQuery = $ = require("jquery");
+        require("jquery-ui");
+    </script>
+    <script type="text/javascript" src="/script/libs/bundle.angular.js"></script>
+    <script type="text/javascript" src="/script/libs/bundle.api.js"></script>
+    <script type="text/javascript" src="/script/libs/api.js"></script>
+    <script type="text/javascript" src="/script/libs/bundle.notie.js"></script>
+    <script type="text/javascript" src="/script/libs/bundle.swiper.js"></script>
+    <script type="text/javascript" src="/script/libs/ngapp.js"></script>
+    <script>
+        Q = require("q");
+        angular = require("angular");
+    </script>
+    <script type="text/javascript" src="/demo/controller.all.js"></script>
+    <script type="text/javascript" src="/script/messagebox.js"></script>
+    <script>
+        var TLD = TLD_angular_app("tulingdao.com", "/corp", "/corp/login");
+    </script>
+</head>
+<body>
+<div id="angular-view" ng-view></div>
+</body>
+</html>

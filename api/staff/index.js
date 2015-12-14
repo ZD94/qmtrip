@@ -11,14 +11,15 @@ var pointChangeProxy = require("./proxy/pointChange.proxy");
 var L = require("../../common/language");
 var API = require("../../common/api");
 var config = require('../../config');
-var auth = require("../auth/index");
-var travalPolicy = require("../travalPolicy/index");
+//var auth = require("../auth/index");
+//var travalPolicy = require("../travalPolicy/index");
 var staff = {};
 
 
 /**
  * 创建员工
  * @param data
+ * @param data.accountId 已经有登录账号
  * @param callback
  * @returns {*}
  */
@@ -28,14 +29,20 @@ staff.createStaff = function(data, callback){
         defer.reject(L.ERR.DATA_NOT_EXIST);
         return defer.promise.nodeify(callback);
     }
-    if (!data.email) {
-        defer.reject({code: -1, msg: "邮箱不能为空"});
-        return defer.promise.nodeify(callback);
+
+    var accountId = data.accountId;
+    //如果账号存在,不进行创建了
+    if (!accountId) {
+        if (!data.email) {
+            defer.reject({code: -1, msg: "邮箱不能为空"});
+            return defer.promise.nodeify(callback);
+        }
+        if (!data.mobile) {
+            defer.reject({code: -2, msg: "手机号不能为空"});
+            return defer.promise.nodeify(callback);
+        }
     }
-    if (!data.mobile) {
-        defer.reject({code: -2, msg: "手机号不能为空"});
-        return defer.promise.nodeify(callback);
-    }
+
     if (!data.name) {
         defer.reject({code: -3, msg: "姓名不能为空"});
         return defer.promise.nodeify(callback);
@@ -45,15 +52,35 @@ staff.createStaff = function(data, callback){
         return defer.promise.nodeify(callback);
     }
     var accData = {email: data.email, mobile: data.mobile, pwd: "123456"};//初始密码暂定123456
-    return auth.newAccount(accData)
+    /*return auth.newAccount(accData)
         .then(function(acc){
             if(acc.code == 0){
                 data.id = acc.data.id;
                 return staffProxy.create(data)
                     .then(function(obj){
-                        return {code: 0, staff: obj.dataValues};
+                        return {code: 0, staff: obj.dataValues};*/
+    Q.all([])
+        .then(function() {
+            if (accountId) {
+                data.id = accountId;
+                return data;
+            } else {
+                return API.auth.newAccount(accData)
+                    .then(function(result){
+                        if (result.code) {
+                            throw result;
+                        }
+                        var account = result.data;
+                        data.id = account.id;
+                        return data;
                     })
             }
+        })
+        .then(function(staff) {
+            return staffProxy.create(staff)
+                .then(function(staff) {
+                    return {code: 0, staff: staff.toJSON()};
+                })
         })
         .nodeify(callback);
 }
@@ -270,7 +297,7 @@ staff.importExcel = function(params, callback){
     return staff.getStaff(userId)
         .then(function(sf){
             companyId = sf.staff.companyId;
-            return travalPolicy.getAllTravalPolicy({company_id: companyId})
+            return API.travalPolicy.getAllTravalPolicy({company_id: companyId})
                 .then(function(results){
                     results = results.travalPolicies;
                     for(var t=0;t<results.length;t++){
