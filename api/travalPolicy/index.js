@@ -4,6 +4,7 @@
 'use strict';
 var Q = require("q");
 var db = require("./models").sequelize;
+var travalPolicyModel = db.models.TravalPolicy;
 var uuid = require("node-uuid");
 var travalPolicyProxy = require("./proxy/travalPolicy.proxy");
 var L = require("../../common/language");
@@ -82,6 +83,22 @@ travalPolicy.getTravalPolicy = function(id, callback){
     return travalPolicyProxy.getById(id)
         .then(function(obj){
             return {code: 0, travalPolicy: obj.dataValues}
+        })
+        .nodeify(callback);
+}
+
+/**
+ * 得到全部差旅标准
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+travalPolicy.getAllTravalPolicy = function(params, callback){
+    var options = {};
+    options.where = params;
+    return travalPolicyModel.findAll(options)
+        .then(function(obj){
+            return {code: 0, travalPolicies: obj}
         })
         .nodeify(callback);
 }

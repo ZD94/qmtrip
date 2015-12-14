@@ -3,14 +3,18 @@
  */
 'use strict';
 var Q = require("q");
+var nodeXlsx = require("node-xlsx");
 var db = require("./models").sequelize;
 var uuid = require("node-uuid");
 var staffProxy = require("./proxy/staff.proxy");
 var pointChangeProxy = require("./proxy/pointChange.proxy");
 var L = require("../../common/language");
 var API = require("../../common/api");
+var config = require('../../config');
 //var auth = require("../auth/index");
+//var travalPolicy = require("../travalPolicy/index");
 var staff = {};
+
 
 /**
  * 创建员工
@@ -47,8 +51,19 @@ staff.createStaff = function(data, callback){
         defer.reject({code: -4, msg: "所属企业不能为空"});
         return defer.promise.nodeify(callback);
     }
-
-    Q.all([])
+    var accData = {email: data.email, mobile: data.mobile, pwd: "123456"};//初始密码暂定123456
+    /*return auth.newAccount(accData)
+        .then(function(acc){
+            if(acc.code == 0){
+                data.id = acc.data.id;
+                return staffProxy.create(data)
+                    .then(function(obj){
+                        return {code: 0, staff: obj.dataValues};
+                    })
+            }
+        })
+        .nodeify(callback);*/
+    return Q.all([])
         .then(function() {
             if (accountId) {
                 data.id = accountId;
@@ -59,7 +74,6 @@ staff.createStaff = function(data, callback){
                         if (result.code) {
                             throw result;
                         }
-
                         var account = result.data;
                         data.id = account.id;
                         return data;
@@ -269,5 +283,57 @@ staff.listAndPaginatePointChange = function(params, options, callback){
         })
         .nodeify(callback);
 }
+
+/**
+ * 导入员工
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+staff.importExcel = function(params, callback){
+    var userId = params.accountId;
+    var obj = nodeXlsx.parse(config.upload.tmpDir + '/two.xls');
+    var data = obj[0].data
+    var travalPolicies = {};
+    var noAddObj = [];
+    var addObj = [];
+    var companyId = "";
+    return staff.getStaff(userId)
+        .then(function(sf){
+            companyId = sf.staff.companyId;
+            return API.travalPolicy.getAllTravalPolicy({company_id: companyId})
+                .then(function(results){
+                    results = results.travalPolicies;
+                    for(var t=0;t<results.length;t++){
+                        var tp = results[t].dataValues;
+                        travalPolicies[tp.name] = tp.id;
+                    }
+                    return travalPolicies;
+                })
+                .then(function(travalps){
+                    return Q.all(data.map(function(item, index){
+                            if(index>0 && index<200){
+                                var s = data[index];
+                                var staffObj = {name: s[0], mobile: s[1], email: s[2], department: s[3],travelLevel: travalps[s[4]], roleId: s[5], companyId: companyId};//company_id默认为当前登录人的company_id
+                                return staff.createStaff(staffObj)
+                                    .then(function(ret){
+                                        if(ret){
+                                            item = ret.staff;
+                                            addObj.push(item);
+                                        }else{
+                                            noAddObj.push(item);
+                                        }
+                                        return item;
+                                    })
+                            }
+                        })).then(function(items){
+                            data = items;
+                            return {addObj: addObj, noAddObj: noAddObj};
+                        })
+                })
+        })
+        .nodeify(callback);
+}
+
 
 module.exports = staff;

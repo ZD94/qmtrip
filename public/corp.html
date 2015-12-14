@@ -43,13 +43,17 @@
     </script>
     <script type="text/javascript">
     $(function(){
+    	$(window).resize(function(){resize();})
     	$(".left_nav a").click(function(){
     		var $that = $(this);
     		$(".left_nav li").removeClass("on");
     		$that.addClass("on");
     	})
-    	var ww = $(window).width();
-    	$(".corp_m_header").css("width",ww-200)
+    	function resize(){
+    		var ww = $(window).width();
+    		$(".corp_m_header").css("width",ww-200);
+    	}
+    	resize();
     })
     </script>
 </head>
