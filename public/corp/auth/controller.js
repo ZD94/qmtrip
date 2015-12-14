@@ -6,7 +6,7 @@ var corp=(function(){
     var  corp = {};
 
     corp.loginController = function ($scope) {
-        
+
     }
     corp.registerController = function($scope) {
 
