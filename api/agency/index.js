@@ -1,7 +1,6 @@
 /**
  * Created by yumiao on 15-12-9.
  */
-
 var Q = require('q');
 var Models = require("common/model").sequelize.importModel("./models");
 var Agency = Models.Agency;

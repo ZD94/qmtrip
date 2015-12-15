@@ -156,18 +156,15 @@ authServer.login = function(data, callback) {
     return Models.Account.findOne({where: {email: data.email}})
         .then(function(loginAccount) {
             if (!loginAccount) {
-                defer.reject(L.ERR.ACCOUNT_NOT_EXIST);
-                return defer.promise.nodeify(callback);
+                throw L.ERR.ACCOUNT_NOT_EXIST
             }
 
             if (loginAccount.pwd != pwd) {
-                defer.reject(L.ERR.PASSWORD_NOT_MATCH);
-                return defer.promise.nodeify(callback);
+                throw L.ERR.PASSWORD_NOT_MATCH
             }
 
             if (loginAccount.status != 1) {
-                defer.reject(L.ERR.ACCOUNT_FORBIDDEN);
-                return defer.promise.nodeify(callback);
+                throw L.ERR.ACCOUNT_FORBIDDEN;
             }
 
             return makeAuthenticateSign(loginAccount.id)
@@ -191,16 +188,18 @@ authServer.login = function(data, callback) {
  */
 authServer.authentication = function(params, callback) {
     var defer = Q.defer();
-    if (!params.userId || !params.tokenId || !params.timestamp || !params.tokenSign) {
+    if ((!params.userId && !params.user_id) || (!params.tokenId && !params.token_id)
+        || !params.timestamp || (!params.tokenSign && !params.token_sign)) {
         defer.resolve({code: -1, msg: "token expire"});
         return defer.promise.nodeify(callback);
     }
-    var userId = params.userId;
-    var tokenId = params.tokenId;
-    var timestamp = params.timestamp;
-    var tokenSign = params.tokenSign;
 
-    return Models.Token.findOne({where: {id: tokenId, accountId: userId, expireAt: {$gte: utils.now()}}})
+    var userId = params.userId || params.user_id;
+    var tokenId = params.tokenId || params.token_id;
+    var timestamp = params.timestamp;
+    var tokenSign = params.tokenSign || params.token_sign;
+
+    return Models["Token"].findOne({where: {id: tokenId, accountId: userId}})
         .then(function(m) {
             if (!m) {
                 return {code: -1, msg: "已经失效"};
@@ -286,7 +285,7 @@ function makeAuthenticateSign(accountId, os, callback) {
     }
 
     var defer = Q.defer();
-    Models.Token.findOne({where:{accountId: accountId, os: os}})
+    return Models.Token.findOne({where:{accountId: accountId, os: os}})
         .then(function(m) {
             var refreshAt = moment().format("YYYY-MM-DD HH:mm:ss");
             var expireAt = moment().add(2, "hours").format("YYYY-MM-DD HH:mm:ss")
@@ -295,7 +294,7 @@ function makeAuthenticateSign(accountId, os, callback) {
                 m.expireAt = expireAt
                 return m.save();
             } else {
-                m = Models.Token.build({id: uuid.v1(), token: getRndStr(10), refreshAt: refreshAt, expireAt: expireAt});
+                m = Models.Token.build({id: uuid.v1(), accountId: accountId, token: getRndStr(10), refreshAt: refreshAt, expireAt: expireAt});
                 return m.save();
             }
         })

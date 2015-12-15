@@ -6,13 +6,10 @@ var Q = require("q");
 var L = require("../../common/language");
 var validate = require("../../common/validate");
 var md5 = require("../../common/utils").md5;
-var uuid = require("node-uuid");
 var authServer = require("../auth/index");
 var auth = {
     __public: true
 };
-var accounts = [];
-var mail = require("../mail");
 var API = require("../../common/api");
 
 
@@ -115,28 +112,27 @@ auth.registryCompany = function(params, callback) {
         return defer.promise.nodeify(callback);
     }
 
-    pwd = md5(pwd);
     var validatePicCheckCode = Q.denodeify(API.checkcode.validatePicCheckCode);
     var validateMsgCheckCode = Q.denodeify(API.checkcode.validateMsgCheckCode);
     var createCompany = Q.denodeify(API.company.createCompany);
     var createStaff = Q.denodeify(API.staff.createStaff);
-    //return validatePicCheckCode({code: picCode, ticket: picTicket})
-    //    .then(function(result) {
-    //        if (result.code) {
-    //            throw result;
-    //        }
-    //        return true;
-    //    })
-    //    .then(function() {
-    //        return validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile})
-    //            .then(function(result) {
-    //                if (result.code) {
-    //                    throw result;
-    //                }
-    //                return true;
-    //            })
-    //    })
-    //    .then(function(){
+    return validatePicCheckCode({code: picCode, ticket: picTicket})
+        .then(function(result) {
+            if (result.code) {
+                throw result;
+            }
+            return true;
+        })
+        .then(function() {
+            return validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile})
+                .then(function(result) {
+                    if (result.code) {
+                        throw result;
+                    }
+                    return true;
+                })
+        })
+        .then(function(){
             return authServer.newAccount({mobile: mobile, email: email, pwd: pwd})
                 .then(function(result) {
                     if (result.code) {
@@ -158,7 +154,7 @@ auth.registryCompany = function(params, callback) {
                 .then(function(result) {
                     return {code: 0, msg: "OK"};
                 })
-        //})
+        })
         .nodeify(callback);
 }
 

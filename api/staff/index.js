@@ -15,6 +15,7 @@ var config = require('../../config');
 //var travalPolicy = require("../travalPolicy/index");
 var staff = {};
 
+
 /**
  * 创建员工
  * @param data

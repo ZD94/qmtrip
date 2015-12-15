@@ -1,41 +1,39 @@
-@import (reference) "../../corp/css/common.less";
 /*注册*/
-.input{
+.input {
   width: 600px;
   height: 45px;
   margin: 20px auto 0;
   line-height: 45px;
   border-radius: 5px;
-  border:1px solid #000;
+  border: 1px solid #000;
   padding-left: 10px;
-  input{
-    border: none;
-    outline: medium;
-  }
 }
-.inputs{
+.input input {
+  border: none;
+  outline: medium;
+}
+.inputs {
   width: 600px;
   height: 45px;
   margin: 20px auto 0;
   line-height: 45px;
   padding-left: 10px;
-  div{
-    float: left;
-    width: 300px;
-    height: 45px;
-    line-height: 45px;
-    border-radius: 5px;
-    border:1px solid #000;
-    padding-left: 10px;
-    margin-left: -10px;
-  }
-  input{
-    border: none;
-    outline: medium;
-  }
 }
-
-.register{
+.inputs div {
+  float: left;
+  width: 300px;
+  height: 45px;
+  line-height: 45px;
+  border-radius: 5px;
+  border: 1px solid #000;
+  padding-left: 10px;
+  margin-left: -10px;
+}
+.inputs input {
+  border: none;
+  outline: medium;
+}
+.register {
   display: block;
   width: 600px;
   height: 45px;
@@ -46,8 +44,9 @@
   color: #fff;
   text-decoration: none;
 }
-#imgCode{
+#imgCode {
   width: 100px;
   height: 45px;
 }
 /*登录*/
+/*# sourceMappingURL=auth.css.map */
