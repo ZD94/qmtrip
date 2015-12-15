@@ -138,7 +138,7 @@ auth.registryCompany = function(params, callback) {
                 })
         })
         .then(function(){
-            return authServer.newAccount({email: email, pwd: pwd})
+            return authServer.newAccount({mobile: mobile, email: email, pwd: pwd})
                 .then(function(result) {
                     if (result.code) {
                         throw result;

@@ -72,4 +72,16 @@ company.deleteCompany = function(companyId, callback){
     return API.company.deleteCompany(params, callback);
 }
 
+/**
+ * 企业资金账户充值
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+company.fundsCharge = function(params, callback){
+    params.userId = this.accountId;
+    params.type =1;
+    return API.company.moneyChange(params, callback);
+}
+
 module.exports = company;

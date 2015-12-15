@@ -26,19 +26,18 @@ SET default_with_oids = false;
 
 CREATE TABLE company (
     id uuid primary key,
-    agency_id uuid NOT NULL,
+    agency_id uuid,
     company_no serial NOT NULL,
     create_user uuid NOT NULL,
     name character varying(100),
-    logo character varying,
+    domain_name character varying,
     description text,
     status integer default 0,
     address character varying,
-    website character varying,
+    connect_user_name character varying,
     email character varying(50),
     telephone character varying(15),
     mobile character varying(11),
-    company_create_at timestamp without time zone,
     staff_num integer default 0,
     staff_score integer default 0,
     create_at timestamp without time zone default now(),
@@ -81,9 +80,9 @@ COMMENT ON COLUMN company.name IS '企业名称';
 --
 -- TOC entry 1005 (class 0 OID 0)
 -- Dependencies: 100
--- Name: COLUMN company.logo; Type: COMMENT; Schema: company; Owner: -
+-- Name: COLUMN company.domain_name; Type: COMMENT; Schema: company; Owner: -
 --
-COMMENT ON COLUMN company.logo IS '企业logo';
+COMMENT ON COLUMN company.domain_name IS '企业域名';
 
 --
 -- TOC entry 1006 (class 0 OID 0)
@@ -102,9 +101,9 @@ COMMENT ON COLUMN company.address IS '企业地址';
 --
 -- TOC entry 1008 (class 0 OID 0)
 -- Dependencies: 100
--- Name: COLUMN company.website; Type: COMMENT; Schema: company; Owner: -
+-- Name: COLUMN company.connect_user_name; Type: COMMENT; Schema: company; Owner: -
 --
-COMMENT ON COLUMN company.website IS '企业网站';
+COMMENT ON COLUMN company.connect_user_name IS '联系人姓名';
 
 --
 -- TOC entry 1009 (class 0 OID 0)
@@ -173,6 +172,7 @@ ALTER sequence company.company_company_no_seq restart with 101;
 CREATE TABLE funds_accounts
 (
   id uuid primary key,
+  status integer default 0,
   payment_pwd character varying(50),
   income numeric(15,2) NOT NULL DEFAULT 0,
   consume numeric(15,2) NOT NULL DEFAULT 0,

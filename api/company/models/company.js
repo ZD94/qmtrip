@@ -38,11 +38,11 @@ module.exports = function(Db, DataType) {
             field: "name"
         },
         /**
-         * 企业logo
+         * 企业域名
          */
-        logo: {
+        domainName: {
             type: DataType.STRING,
-            field: "logo"
+            field: "domain_name"
         },
         /**
          * 企业描述
@@ -67,11 +67,11 @@ module.exports = function(Db, DataType) {
             field: "address"
         },
         /**
-         * 企业网址
+         * 联系人姓名
          */
-        website: {
+        connectUserName: {
             type: DataType.STRING,
-            field: "website"
+            field: "connect_user_name"
         },
         /**
          * 企业邮箱
@@ -94,12 +94,13 @@ module.exports = function(Db, DataType) {
             type: DataType.STRING(11),
             field: "mobile"
         },
-        /**
-         * 企业创建时间
-         */
-        companyCreateAt: {
-            type: "timestamp without time zone",
-            field: "company_create_at"
+        staffNum: {
+            type: DataType.INTEGER,
+            field: "staff_num"
+        },
+        staffScore: {
+            type: DataType.INTEGER,
+            field: "staff_score"
         },
         /**
          *创建时间
