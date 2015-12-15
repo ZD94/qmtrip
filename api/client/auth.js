@@ -116,28 +116,27 @@ auth.registryCompany = function(params, callback) {
         return defer.promise.nodeify(callback);
     }
 
-    pwd = md5(pwd);
     var validatePicCheckCode = Q.denodeify(API.checkcode.validatePicCheckCode);
     var validateMsgCheckCode = Q.denodeify(API.checkcode.validateMsgCheckCode);
     var createCompany = Q.denodeify(API.company.createCompany);
     var createStaff = Q.denodeify(API.staff.createStaff);
-    //return validatePicCheckCode({code: picCode, ticket: picTicket})
-    //    .then(function(result) {
-    //        if (result.code) {
-    //            throw result;
-    //        }
-    //        return true;
-    //    })
-    //    .then(function() {
-    //        return validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile})
-    //            .then(function(result) {
-    //                if (result.code) {
-    //                    throw result;
-    //                }
-    //                return true;
-    //            })
-    //    })
-    //    .then(function(){
+    return validatePicCheckCode({code: picCode, ticket: picTicket})
+        .then(function(result) {
+            if (result.code) {
+                throw result;
+            }
+            return true;
+        })
+        .then(function() {
+            return validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile})
+                .then(function(result) {
+                    if (result.code) {
+                        throw result;
+                    }
+                    return true;
+                })
+        })
+        .then(function(){
             return authServer.newAccount({mobile: mobile, email: email, pwd: pwd})
                 .then(function(result) {
                     if (result.code) {
@@ -159,7 +158,7 @@ auth.registryCompany = function(params, callback) {
                 .then(function(result) {
                     return {code: 0, msg: "OK"};
                 })
-        //})
+        })
         .nodeify(callback);
 }
 
