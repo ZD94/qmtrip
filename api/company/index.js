@@ -3,7 +3,7 @@
  */
 
 var Q = require('q');
-var sequelize = require("./models").sequelize;
+var sequelize = require("common/model").sequelize.importModel("./models").sequelize;
 var Models = sequelize.models;
 var Company = Models.Company;
 var FundsAccounts = Models.FundsAccounts;

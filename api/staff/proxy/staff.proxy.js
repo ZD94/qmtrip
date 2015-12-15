@@ -3,7 +3,7 @@
  */
 'use strict';
 
-var sequelize = require("../models").sequelize;
+var sequelize = require("common/model").sequelize.importModel("../models").sequelize;
 var staff = sequelize.models.Staff;
 var Q = require("q");
 var Paginate = require("../../../common/paginate").Paginate;

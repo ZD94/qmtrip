@@ -2,8 +2,8 @@
  * Created by wyl on 15-12-11.
  */
 'use strict';
-var sequelize = require("../models").sequelize;
-var agency = sequelize.models.Agencies;
+var Models = require("common/model").sequelize.importModel("../models");
+var agency = Models.Agencies;
 var Q = require("q");
 var Paginate = require("../../../common/paginate").Paginate;
 

@@ -2,7 +2,7 @@
  * Created by wyl on 15-12-11.
  */
 'use strict';
-var sequelize = require("../models").sequelize;
+var sequelize = require("common/model").sequelize.importModel("../models").sequelize;
 var travalPolicy = sequelize.models.TravalPolicy;
 var Q = require("q");
 var Paginate = require("../../../common/paginate").Paginate;

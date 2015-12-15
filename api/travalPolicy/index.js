@@ -3,7 +3,7 @@
  */
 'use strict';
 var Q = require("q");
-var db = require("./models").sequelize;
+var db = require("common/model").sequelize.importModel("./models").sequelize;
 var travalPolicyModel = db.models.TravalPolicy;
 var uuid = require("node-uuid");
 var travalPolicyProxy = require("./proxy/travalPolicy.proxy");

@@ -4,7 +4,7 @@
 'use strict';
 var Q = require("q");
 var nodeXlsx = require("node-xlsx");
-var db = require("./models").sequelize;
+var db = require("common/model").sequelize.importModel("./models").sequelize;
 var uuid = require("node-uuid");
 var staffProxy = require("./proxy/staff.proxy");
 var pointChangeProxy = require("./proxy/pointChange.proxy");

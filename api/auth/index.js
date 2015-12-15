@@ -1,5 +1,5 @@
 var Q = require("q");
-var db = require("./models").sequelize;
+var Models = require("common/model").sequelize.importModel("./models");
 var uuid = require("node-uuid");
 var L = require("../../common/language");
 var validate = require("../../common/validate");
@@ -14,7 +14,7 @@ var authServer = {};
 //激活账号
 authServer.active = function(data, callback) {
     var accountId = data.accountId;
-    return db.models.Account.findOne({where: {id: accountId}})
+    return Models.Account.findOne({where: {id: accountId}})
         .then(function(account) {
             if (!account) {
                 return L.ERR.ACCOUNT_NOT_EXIST;
@@ -39,7 +39,7 @@ authServer.remove = function(data, callback) {
         var accountId = data.accountId;
         var email = data.email;
 
-        return db.models.Account.destroy({where: {$or: [{id: accountId}, {email: email}]}})
+        return Models.Account.destroy({where: {$or: [{id: accountId}, {email: email}]}})
             .then(function(account) {
                 return {code: 0, msg: "ok"};
             })
@@ -91,7 +91,7 @@ authServer.newAccount = function(data, callback) {
 
     var pwd = data.pwd;
     pwd = md5(pwd);
-    var m = db.models.Account.build({id: uuid.v1(), email: data.email, pwd: pwd, status: status});
+    var m = Models.Account.build({id: uuid.v1(), email: data.email, pwd: pwd, status: status});
     return m.save()
         .then(function(account) {
             if (account.status == 0) {
@@ -153,7 +153,7 @@ authServer.login = function(data, callback) {
 
     var pwd = md5(data.pwd);
 
-    return db.models.Account.findOne({where: {email: data.email}})
+    return Models.Account.findOne({where: {email: data.email}})
         .then(function(loginAccount) {
             if (!loginAccount) {
                 defer.reject(L.ERR.ACCOUNT_NOT_EXIST);
@@ -200,7 +200,7 @@ authServer.authentication = function(params, callback) {
     var timestamp = params.timestamp;
     var tokenSign = params.tokenSign;
 
-    return db.models.Token.findOne({where: {id: tokenId, accountId: userId, expireAt: {$gte: utils.now()}}})
+    return Models.Token.findOne({where: {id: tokenId, accountId: userId, expireAt: {$gte: utils.now()}}})
         .then(function(m) {
             if (!m) {
                 return {code: -1, msg: "已经失效"};
@@ -253,7 +253,7 @@ authServer.activeAccount = function(data, callback) {
         return defer.promise.nodeify(callback);
     }
 
-    return db.models.Account.findOne({where: {id: data.accountId}})
+    return Models.Account.findOne({where: {id: data.accountId}})
         .then(function(account) {
            if (!account) {
                return L.ERR.ACCOUNT_NOT_EXIST;
@@ -286,7 +286,7 @@ function makeAuthenticateSign(accountId, os, callback) {
     }
 
     var defer = Q.defer();
-    db.models.Token.findOne({where:{accountId: accountId, os: os}})
+    Models.Token.findOne({where:{accountId: accountId, os: os}})
         .then(function(m) {
             var refreshAt = moment().format("YYYY-MM-DD HH:mm:ss");
             var expireAt = moment().add(2, "hours").format("YYYY-MM-DD HH:mm:ss")
@@ -295,7 +295,7 @@ function makeAuthenticateSign(accountId, os, callback) {
                 m.expireAt = expireAt
                 return m.save();
             } else {
-                m = db.models.Token.build({id: uuid.v1(), token: getRndStr(10), refreshAt: refreshAt, expireAt: expireAt});
+                m = Models.Token.build({id: uuid.v1(), token: getRndStr(10), refreshAt: refreshAt, expireAt: expireAt});
                 return m.save();
             }
         })

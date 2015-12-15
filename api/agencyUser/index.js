@@ -3,7 +3,7 @@
  */
 'use strict';
 var Q = require("q");
-var db = require("./models").sequelize;
+var Models = require("common/model").sequelize.importModel("./models");
 var uuid = require("node-uuid");
 var agencyProxy = require("./proxy/agency.proxy");
 var L = require("../../common/language");
