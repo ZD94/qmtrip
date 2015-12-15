@@ -17,21 +17,21 @@ describe("api/client/auth.js", function() {
     describe("API.auth.newAccount", function() {
         var _account = {};
         it("API.auth.newAccount should be err without email", function(done) {
-            auth.newAccount(ACCOUNT.pwd, function(err, result) {
+            authServer.newAccount(ACCOUNT.pwd, function(err, result) {
                 assert.notEqual(null, err);
                 done();
             });
         })
 
         it("API.auth.newAccount should be err without pwd", function(done) {
-            auth.newAccount({email: ACCOUNT.email}, function(err, result) {
+            authServer.newAccount({email: ACCOUNT.email}, function(err, result) {
                 assert.notEqual(err, null);
                 done();
             });
         });
 
         it("API.auth.newAccount should be ok with email and pwd", function(done) {
-            auth.newAccount({email: ACCOUNT.email, pwd: ACCOUNT.pwd}, function(err, result) {
+            authServer.newAccount({email: ACCOUNT.email, pwd: ACCOUNT.pwd}, function(err, result) {
                 assert.equal(null, err);
                 assert.equal(result.code, 0);
                 assert.notEqual(result.data, null);
@@ -55,7 +55,7 @@ describe("api/client/auth.js", function() {
         var _account;
         //登录之前激活账号
         before(function(done) {
-            auth.newAccount({email: ACCOUNT.email, pwd: ACCOUNT.pwd})
+            authServer.newAccount({email: ACCOUNT.email, pwd: ACCOUNT.pwd})
                 .then(function(result) {
                     _account = result.data;
                     return authServer.active({accountId: _account.id})
@@ -105,7 +105,7 @@ describe("api/client/auth.js", function() {
 
         before(function(done) {
             //创建账号,激活账号,登录
-            auth.newAccount({email: ACCOUNT.email, pwd: ACCOUNT.pwd})
+            authServer.newAccount({email: ACCOUNT.email, pwd: ACCOUNT.pwd})
                 .then(function(result) {
                     _account = result.data;
                     return _account;
