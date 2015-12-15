@@ -3,5 +3,6 @@
  */
 
 
-var C = require("../../../config");
-module.exports = require("../../../common/sequelize-model").sequelizeModel(C.postgres.url, __dirname);
+
+module.exports = require("common/model").sequelize.importModel(__dirname);
+

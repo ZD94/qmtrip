@@ -2,11 +2,6 @@
  * Created by yumiao on 15-12-9.
  */
 
-var Agency = require("../../models").sequelize.models.Agency;
-var uuid = require("node-uuid");
-
-
-
 var Q = require('q');
 var Models = require("./models").sequelize.models;
 var Agency = Models.Agency;

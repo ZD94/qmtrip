@@ -6,7 +6,6 @@ var Q = require("q");
 var L = require("../../common/language");
 var validate = require("../../common/validate");
 var md5 = require("../../common/utils").md5;
-var db = require("../../models").sequelize;
 var uuid = require("node-uuid");
 var authServer = require("../auth/index");
 var auth = {

@@ -30,5 +30,8 @@ server.api_path = path.join(__dirname, 'api');
 server.api_port = config.apiPort;
 server.api_config = config.api;
 
+var model = require('common/model');
+model.sequelize.init(config.postgres.url);
+
 server.start();
 
