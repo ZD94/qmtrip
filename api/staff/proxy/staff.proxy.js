@@ -134,7 +134,7 @@ function create(values, options, callback) {
  * @returns {*}
  */
 function getById(id, callback) {
-    return staff.findById(id).nodeify(callback);
+    return staff.findById(id, {fields: ["name"]}).nodeify(callback);
 }
 
 /**

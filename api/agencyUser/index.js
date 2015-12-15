@@ -99,6 +99,26 @@ agency.updateAgency = function(id, data, callback){
 }
 
 /**
+ * 根据id查询代理商
+ * @param id
+ * @param data
+ * @param callback
+ * @returns {*}
+ */
+agency.getAgency = function(id, callback){
+    var defer = Q.defer();
+    if(!id){
+        defer.reject({code: -1, msg: "id不能为空"});
+        return defer.promise.nodeify(callback);
+    }
+    return agencyProxy.getById(id)
+        .then(function(obj){
+            return {code: 0, agency: obj.toJSON()}
+        })
+        .nodeify(callback);
+}
+
+/**
  * 分页查询代理商集合
  * @param params 查询条件 params.company_id 企业id
  * @param options options.perPage 每页条数 options.page当前页

@@ -34,7 +34,6 @@ CREATE TABLE company (
     description text,
     status integer default 0,
     address character varying,
-    connect_user_name character varying,
     email character varying(50),
     telephone character varying(15),
     mobile character varying(11),
@@ -98,12 +97,6 @@ COMMENT ON COLUMN company.description IS '企业描述/简介';
 --
 COMMENT ON COLUMN company.address IS '企业地址';
 
---
--- TOC entry 1008 (class 0 OID 0)
--- Dependencies: 100
--- Name: COLUMN company.connect_user_name; Type: COMMENT; Schema: company; Owner: -
---
-COMMENT ON COLUMN company.connect_user_name IS '联系人姓名';
 
 --
 -- TOC entry 1009 (class 0 OID 0)

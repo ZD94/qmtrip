@@ -15,7 +15,6 @@ var config = require('../../config');
 //var travalPolicy = require("../travalPolicy/index");
 var staff = {};
 
-
 /**
  * 创建员工
  * @param data
@@ -148,7 +147,7 @@ staff.getStaff = function(id, callback){
     }
     return staffProxy.getById(id)
         .then(function(obj){
-            return {code: 0, staff: obj.dataValues}
+            return {code: 0, staff: obj.toJSON()}
         })
         .nodeify(callback);
 }

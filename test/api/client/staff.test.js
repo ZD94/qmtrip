@@ -9,9 +9,10 @@ var assert = require("assert");
 describe("api/client/staff.js", function() {
 
     var obj = {
-        email: "yali166.wang@tulingdao.com",
+        email: "yali188.wang@tulingdao.com",
         name: "wyl163",
-        mobile: "18301208613"
+        mobile: "18301208613",
+        companyId: '9f20e3c0-9f24-11e5-beab-31a51ecd9fc2'
     }
 
     //创建员工
@@ -20,6 +21,7 @@ describe("api/client/staff.js", function() {
             staff.createStaff(obj, function(err, result) {
                 assert.equal(err, null);
                 assert.equal(result.code, 0);
+                console.log(result);
                 done();
             });
         })
@@ -69,6 +71,16 @@ describe("api/client/staff.js", function() {
             });
         })
     })*/
+    //通过id得到员工
+    describe("API.staff.getStaff", function() {
+        it("API.staff.getStaff", function(done) {
+            staff.getStaff("ee3eb6a0-9f22-11e5-8540-8b3d4cdf6eb6", function(err, result) {
+                assert.equal(err, null);
+                console.log(result);
+                done();
+            });
+        })
+    })
     //加积分
     /*describe("API.staff.increaseStaffPoint", function() {
         it("API.staff.increaseStaffPoint", function(done) {
@@ -103,16 +115,16 @@ describe("api/client/staff.js", function() {
     })*/
 
     //导入员工
-    describe("API.staff.importExcel", function() {
-        it("API.staff.importExcel", function(done) {
-            staff.importExcel({}, function(err, result) {//查询条件此处用staffId或者staff_id均可
-                assert.equal(err, null);
-                console.log(err);
-                console.log(result);
-                done();
-            });
-        })
-    })
+    //describe("API.staff.importExcel", function() {
+    //    it("API.staff.importExcel", function(done) {
+    //        staff.importExcel({}, function(err, result) {//查询条件此处用staffId或者staff_id均可
+    //            assert.equal(err, null);
+    //            console.log(err);
+    //            console.log(result);
+    //            done();
+    //        });
+    //    })
+    //})
 
 
 })

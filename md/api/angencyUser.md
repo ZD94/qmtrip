@@ -63,6 +63,29 @@
 | msg     | 提示信息 |
 | agency   | 代理商信息|json
 
+>. 查询代理商信息 API.agencyUser.getAgency(id,callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| id                                | 代理商id             | uuid             |必填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code     | 返回代码0正确 其他错误 |
+| msg     | 提示信息 |
+| agency   | 代理商信息|json
+
+>. 查询代理商信息 API.agencyUser.getCurrentAgency(callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| agency   | 代理商信息|json
+
 >. 分页查询代理商信息 API.agencyUser.listAndPaginateAgency(params, options, callback);
 
 | 参数                                    | 含义               |类型                  | 备注

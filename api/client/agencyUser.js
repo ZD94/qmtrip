@@ -9,5 +9,9 @@ var agencyUser = {};
 agencyUser.createAgency = agencyUserServer.createAgency;
 agencyUser.deleteAgency = agencyUserServer.deleteAgency;
 agencyUser.updateAgency = agencyUserServer.updateAgency;
+agencyUser.getAgency = agencyUserServer.getAgency;
+agencyUser.getCurrentAgency = function(callback){
+    return agencyUserServer.getAgency(this.accountId, callback);
+}
 agencyUser.listAndPaginateAgency = agencyUserServer.listAndPaginateAgency;
 module.exports = agencyUser;

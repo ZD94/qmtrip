@@ -80,7 +80,21 @@ company.deleteCompany = function(companyId, callback){
  */
 company.fundsCharge = function(params, callback){
     params.userId = this.accountId;
-    params.type =1;
+    params.type = 1;
+    params.remark = params.remark | '充值';
+    return API.company.moneyChange(params, callback);
+}
+
+/**
+ * 冻结账户资金
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+company.frozenMoney = function(params, callback){
+    params.userId = this.accountId;
+    params.type = -2;
+    params.channel = '冻结';
     return API.company.moneyChange(params, callback);
 }
 
