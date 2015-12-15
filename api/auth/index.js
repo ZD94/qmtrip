@@ -188,14 +188,15 @@ authServer.login = function(data, callback) {
  */
 authServer.authentication = function(params, callback) {
     var defer = Q.defer();
-    if (!params.userId || !params.tokenId || !params.timestamp || !params.tokenSign) {
+    if ((!params.userId && !params.user_id) || (!params.tokenId && !params.token_id)
+        || !params.timestamp || (!params.tokenSign && !params.token_sign)) {
         defer.resolve({code: -1, msg: "token expire"});
         return defer.promise.nodeify(callback);
     }
-    var userId = params.userId;
-    var tokenId = params.tokenId;
+    var userId = params.userId || params.user_id;
+    var tokenId = params.tokenId || params.token_id;
     var timestamp = params.timestamp;
-    var tokenSign = params.tokenSign;
+    var tokenSign = params.tokenSign || params.token_sign;
 
     return db.models.Token.findOne({where: {id: tokenId, accountId: userId, expireAt: {$gte: utils.now()}}})
         .then(function(m) {
