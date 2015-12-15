@@ -67,13 +67,6 @@ module.exports = function(Db, DataType) {
             field: "address"
         },
         /**
-         * 联系人姓名
-         */
-        connectUserName: {
-            type: DataType.STRING,
-            field: "connect_user_name"
-        },
-        /**
          * 企业邮箱
          */
         email: {

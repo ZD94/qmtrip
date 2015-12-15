@@ -138,6 +138,29 @@ tripPlan.updateTripPlanOrder = function(params, callback){
         }).nodeify(callback);
 }
 
+/**
+ * 更新消费详情
+ * @param params
+ * @param callback
+ */
+tripPlan.updateConsumeDetail = function(params, callback){
+    return checkParams(['userId', 'id', 'updates'], params)
+        .then(function(){
+            var updates = params.updates;
+            var userId = params.userId;
+            var id = params.id;
+            return ConsumeDetails.findById(id)
+                .then(function(ret){
+                    var cols = getColumns(updates);
+                    return ConsumeDetails.update(updates, {returning: true, where: {id: id}, fields: cols})
+                        .then(function(detail){
+                            var detail = detail.toJSON();
+                            return {code: 0, msg: '更新成功', consumeDetail: detail};
+                        })
+                })
+        }).nodeify(callback);
+}
+
 
 /**
  * 获取差旅计划单/预算单列表

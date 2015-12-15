@@ -28,15 +28,15 @@
         <span>短信验证码</span>
         <input id="msgCode" class="" type="text" value="" placeholder="">
     </div>
-    <button ng-click="getmsgcode()">免费获取短信验证码</button>
+    <button ng-click="getMCode()">免费获取短信验证码</button>
 </div>
 <div class="inputs">
     <div>
         <span>图片验证码</span>
         <input id="picCode" class="" type="text" value="" placeholder="">
     </div>
-    <img src=""/>
-    <span>换一换</span>
+    <img id="imgCode" src=""/>
+    <a ng-click="changePicCode()">换一换</a>
 </div>
 <div style="width:600px;margin:10px auto;">
     <span><i id="check" class="web-icon-font" checkvalue="true">&#xf058;</i>同意<a href="">《途灵岛商旅注册协议》</a></span>

@@ -6,14 +6,10 @@ var Q = require("q");
 var L = require("../../common/language");
 var validate = require("../../common/validate");
 var md5 = require("../../common/utils").md5;
-var db = require("../../models").sequelize;
-var uuid = require("node-uuid");
 var authServer = require("../auth/index");
 var auth = {
     __public: true
 };
-var accounts = [];
-var mail = require("../mail");
 var API = require("../../common/api");
 
 
@@ -116,7 +112,6 @@ auth.registryCompany = function(params, callback) {
         return defer.promise.nodeify(callback);
     }
 
-    pwd = md5(pwd);
     var validatePicCheckCode = Q.denodeify(API.checkcode.validatePicCheckCode);
     var validateMsgCheckCode = Q.denodeify(API.checkcode.validateMsgCheckCode);
     var createCompany = Q.denodeify(API.company.createCompany);
@@ -146,7 +141,7 @@ auth.registryCompany = function(params, callback) {
 
                     var domain = email.split(/@/)[1];
                     var account = result.data;
-                    return createCompany({createUser: account.id, name: companyName, email: domain})
+                    return createCompany({createUser: account.id, name: companyName, domainName: domain})
                         .then(function(result) {
                             if (result.code) {
                                 throw result;

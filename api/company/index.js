@@ -156,6 +156,7 @@ company.deleteCompany = function(params, callback){
 /**
  * 企业资金账户金额变动
  * @param params
+ * @param params.type -2: 冻结账户资金 -1： 账户余额减少 1：账户余额增加 2：解除账户冻结金额
  * @param callback
  * @returns {*}
  */
@@ -186,14 +187,28 @@ company.moneyChange = function(params, callback){
                         remark: params.remark
                     }
                     var income = funds.income;
+                    var frozen = funds.frozen;
                     if(type == 1){
                         fundsUpdates.income = parseFloat(income) + parseFloat(money);
                     }else if(type == -1){
                         var consume = funds.consume;
                         var balance = funds.balance;
-                        logger.info("balance=>", balance);
                         fundsUpdates.consume = parseFloat(consume) + parseFloat(money);
                         var balance = parseFloat(balance) - parseFloat(money); //账户余额
+                        if(balance < 0){
+                            defer.reject(L.ERR.BALANCE_NOT_ENOUGH); //账户余额不足
+                            return defer.promise;
+                        }
+                    }else if(type == 2){
+                        if(parseFloat(frozen) < parseFloat(money)){
+                            defer.reject({code: -4, msg: '账户冻结金额不能小于解除冻结的金额'});
+                            return defer.promise;
+                        }
+                        fundsUpdates.frozen = parseFloat(frozen) - parseFloat(money);
+                    }else if(type == -2){
+                        var balance = funds.balance;
+                        fundsUpdates.frozen = parseFloat(frozen) + parseFloat(money);
+                        balance = parseFloat(balance) - parseFloat(money); //账户余额
                         if(balance < 0){
                             defer.reject(L.ERR.BALANCE_NOT_ENOUGH); //账户余额不足
                             return defer.promise;
@@ -215,7 +230,7 @@ company.moneyChange = function(params, callback){
                                     return defer.promise;
                                 }
                                 var funds = funds[1][0].toJSON();
-                                return {code: 0, msg: '', fundsAccount: funds};
+                                return {code: 0, msg: 'success', fundsAccount: funds};
                             })
                     })
                 })
