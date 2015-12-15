@@ -23,6 +23,7 @@
     "cookie-parser": "^1.4.0",
     "dnode": "^1.2.2",
     "express": "^4.13.3",
+    "formidable": "^1.0.17",
     "js-format": "^0.2.0",
     "moment": "^2.10.6",
     "morgan": "^1.6.1",
