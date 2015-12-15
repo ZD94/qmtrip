@@ -146,7 +146,7 @@ auth.registryCompany = function(params, callback) {
 
                     var domain = email.split(/@/)[1];
                     var account = result.data;
-                    return createCompany({createUser: account.id, name: companyName, email: domain})
+                    return createCompany({createUser: account.id, name: companyName, domainName: domain})
                         .then(function(result) {
                             if (result.code) {
                                 throw result;
