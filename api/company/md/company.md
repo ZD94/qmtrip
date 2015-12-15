@@ -88,7 +88,26 @@
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
 | params                                | 传入参数             |json              |****
-| params.channel                       |充值渠道             |varchar
+| params.companyId                     |企业id                   |uuid             |
+| params.channel                       |充值渠道             |varchar    |
+| params.money                           |充值金额           |numeric(15,2)         |
+| params.remark                        |充值备注                |varchar          |
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code    | 返回码 | 0.成功，其他失败 |
+| msg     | 错误消息 |
+
+
+>. 冻结企业账户资金 API.company.frozenMoney(params, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 传入参数             |json              |****
+| params.companyId                     |企业id                   |uuid             |
+| params.money                           |冻结金额           |numeric(15,2)         |
+| params.remark                        |冻结原因                |varchar          |
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |
