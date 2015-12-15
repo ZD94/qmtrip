@@ -5,6 +5,7 @@
 var API = require("../../common/api");
 
 module.exports = {
+    __public: true,
     getMsgCheckCode: function(params, callback) {
         API.checkcode.getMsgCheckCode(params, callback);
     },
