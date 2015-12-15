@@ -292,7 +292,7 @@ function makeAuthenticateSign(accountId, os, callback) {
                 m.expireAt = expireAt
                 return m.save();
             } else {
-                m = db.models.Token.build({id: uuid.v1(), token: getRndStr(10), refreshAt: refreshAt, expireAt: expireAt});
+                m = db.models.Token.build({id: uuid.v1(), accountId: accountId, token: getRndStr(10), refreshAt: refreshAt, expireAt: expireAt});
                 return m.save();
             }
         })
