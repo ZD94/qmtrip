@@ -94,12 +94,14 @@ function _getRolePowerList(role, callback) {
  * @param {Function} callback {code: 0, msg: "ok"}, {code: -1, msg: "权限不足"};
  */
 services.checkPower = function(params, callback) {
+    console.info("call checkpower...")
     var accountId = params.accountId;
     var needPowers = params.powers;
     var defer = Q.defer();
 
-    if (!needPowers) {
+    if (!needPowers || !needPowers.length) {
         defer.resolve({code: 0, msg: "YES"});
+        console.info("到这里了...")
         return defer.promise.nodeify(callback);
     }
 
@@ -108,6 +110,7 @@ services.checkPower = function(params, callback) {
     }
     return services.getPowerList({accountId: accountId})
         .then(function(result) {
+            console.info(result);
             var powers = result.data.powers;
             var result = true;
 
