@@ -81,3 +81,17 @@
 |---------|------|-----|
 | code    | 返回码 | 0.成功，其他失败 |
 | msg     | 错误消息 |
+
+
+>. 企业账户充值 API.company.fundsCharge(params, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 传入参数             |json              |****
+| params.channel                       |充值渠道             |varchar
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code    | 返回码 | 0.成功，其他失败 |
+| msg     | 错误消息 |
