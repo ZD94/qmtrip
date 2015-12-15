@@ -5,7 +5,8 @@ var auth=(function(){
     API.require('checkcode');
     var  auth = {};
 
-    auth.LoginController = function ($scope) {
+    auth.LoginController = function ($scope, $routeParams) {
+        var backUrl = $routeParams.backurl || "#/";
         $scope.checkLogin = function() {
             var name = $('#name').val();
             var pwd  = $('#pwd').val();
@@ -14,26 +15,34 @@ var auth=(function(){
                 //alert(name);
                 //alert(pwd);
                 if(!name){
-                    alert("登录名不能为空");
+                    Myalert("提示", "登录名不能为空");
                     return false;
                 }else if(!pwd){
-                    alert("登录密码不能为空");
+                    Myalert("提示", "登录密码不能为空");
                     return false;
                 }
                 API.onload(function(){
                     API.auth.login({email:name,pwd:pwd})
                         .then(function(result){
                             if (result.code) {
-                                console.info(result);
+                                alert(result.msg);
                             } else {
-                                console.info(result);
-                                console.info(result.data.user_id);
-                                console.info(result.data.token_sign);
-                                console.info(result.data.timestamp);
+                                var data = result.data;
+                                setCookie("user_id", data.user_id);
+                                setCookie("token_sign", data.token_sign);
+                                setCookie("timestamp", data.timestamp);
+                                setCookie("token_id", data.token_id);
+                                alert("登录成功");
+                                window.location.href= backUrl;
                             }
 
                         }).catch(function(err){
                             console.info(err);
+                            if (err.msg) {
+                                Myalert("提示信息", err.msg);
+                            } else {
+                                Myalert("系统错误", err);
+                            }
                         }).done();
                 })
             }
