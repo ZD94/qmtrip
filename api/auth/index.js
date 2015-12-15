@@ -156,18 +156,15 @@ authServer.login = function(data, callback) {
     return db.models.Account.findOne({where: {email: data.email}})
         .then(function(loginAccount) {
             if (!loginAccount) {
-                defer.reject(L.ERR.ACCOUNT_NOT_EXIST);
-                return defer.promise.nodeify(callback);
+                throw L.ERR.ACCOUNT_NOT_EXIST
             }
 
             if (loginAccount.pwd != pwd) {
-                defer.reject(L.ERR.PASSWORD_NOT_MATCH);
-                return defer.promise.nodeify(callback);
+                throw L.ERR.PASSWORD_NOT_MATCH
             }
 
             if (loginAccount.status != 1) {
-                defer.reject(L.ERR.ACCOUNT_FORBIDDEN);
-                return defer.promise.nodeify(callback);
+                throw L.ERR.ACCOUNT_FORBIDDEN;
             }
 
             return makeAuthenticateSign(loginAccount.id)
