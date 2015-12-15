@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title>登录</title>
-    <link rel="stylesheet" href="/corp/css/auth.css">
-</head>
-<body>
 <div style="width: 300px;margin:20px auto 0;">
-    <input id="" class="" type="text" value="" placeholder="企业邮箱"/>
+    <input id="name" class="" type="text" value="" placeholder="企业邮箱"/>
 </div>
 <div style="width: 300px;margin:20px auto 0;">
-    <input id="" class="" type="password" value="" placeholder="密码"/>
+    <input id="pwd" class="" type="password" value="" placeholder="密码"/>
 </div>
 <div style="width: 300px;margin:20px auto 0;">
     <span>
@@ -19,9 +11,7 @@
     </span>
     <span></span>
 </div>
-<input id="" class="" type="button" value="马上登录" style="display:block;width: 300px;margin:20px auto 0;"/>
+<input id="" class="" type="button" value="马上登录" ng-click="checkLogin()" style="display:block;width: 300px;margin:20px auto 0;"/>
 <div style="width: 300px;margin:20px auto 0;text-align: center;">
     <a href="#/auth/register">还没有账号,企业注册</a>
 </div>
-</body>
-</html>

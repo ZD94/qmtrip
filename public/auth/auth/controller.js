@@ -5,9 +5,40 @@ var auth=(function(){
     API.require('checkcode');
     var  auth = {};
 
-    //auth.loginController = function ($scope) {
-    //
-    //}
+    auth.LoginController = function ($scope) {
+        $scope.checkLogin = function() {
+            var name = $('#name').val();
+            var pwd  = $('#pwd').val();
+            var commit = true;
+            if(commit){
+                //alert(name);
+                //alert(pwd);
+                if(!name){
+                    alert("登录名不能为空");
+                    return false;
+                }else if(!pwd){
+                    alert("登录密码不能为空");
+                    return false;
+                }
+                API.onload(function(){
+                    API.auth.login({email:name,pwd:pwd})
+                        .then(function(result){
+                            if (result.code) {
+                                console.info(result);
+                            } else {
+                                console.info(result);
+                                console.info(result.data.user_id);
+                                console.info(result.data.token_sign);
+                                console.info(result.data.timestamp);
+                            }
+
+                        }).catch(function(err){
+                            console.info(err);
+                        }).done();
+                })
+            }
+        }
+    }
     auth.RegisterController = function($scope) {
 
         //图片验证码加载
@@ -117,12 +148,12 @@ var auth=(function(){
                 //    return false;
                 //}
                 API.onload(function(){
-                    console.info(123);
                     API.auth.registryCompany({companyName:cName,name:name,email:mail,mobile:mobile,pwd:pwd,msgCode:mCode,msgTicket:msgTicket,picCode:pCode,picTicket:picTicket})
                         .then(function(result){
-                            console.info(result);
+                            //console.info(result);
                             if(result.code == 0){
                                 alert("注册成功");
+                                window.location.href = "#/auth/login";
                             }
                         }).catch(function(err){
                             console.info(err);
