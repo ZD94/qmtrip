@@ -283,7 +283,7 @@ function makeAuthenticateSign(accountId, os, callback) {
     }
 
     var defer = Q.defer();
-    db.models.Token.findOne({where:{accountId: accountId, os: os}})
+    return db.models.Token.findOne({where:{accountId: accountId, os: os}})
         .then(function(m) {
             var refreshAt = moment().format("YYYY-MM-DD HH:mm:ss");
             var expireAt = moment().add(2, "hours").format("YYYY-MM-DD HH:mm:ss")
