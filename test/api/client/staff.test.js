@@ -115,16 +115,16 @@ describe("api/client/staff.js", function() {
     })*/
 
     //导入员工
-    /*describe("API.staff.importExcel", function() {
-        it("API.staff.importExcel", function(done) {
-            staff.importExcel({}, function(err, result) {//查询条件此处用staffId或者staff_id均可
-                assert.equal(err, null);
-                console.log(err);
-                console.log(result);
-                done();
-            });
-        })
-    })*/
+    //describe("API.staff.importExcel", function() {
+    //    it("API.staff.importExcel", function(done) {
+    //        staff.importExcel({}, function(err, result) {//查询条件此处用staffId或者staff_id均可
+    //            assert.equal(err, null);
+    //            console.log(err);
+    //            console.log(result);
+    //            done();
+    //        });
+    //    })
+    //})
 
 
 })
