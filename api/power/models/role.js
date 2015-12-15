@@ -9,7 +9,8 @@ module.exports = function(Db, DataType) {
          */
         role: {
             type: DataType.INTEGER,
-            defaultValue: 1
+            defaultValue: 1,
+            primaryKey: true
         },
         /**
          * 角色名称
@@ -28,11 +29,12 @@ module.exports = function(Db, DataType) {
          */
         type: {
             type: DataType.INTEGER,
-            defaultValue: 1
+            defaultValue: 1,
+            primaryKey: true
         }
     }, {
         tableName: "roles",
-        timestamp: false,
+        timestamps: false,
         schema: "power"
     })
 }

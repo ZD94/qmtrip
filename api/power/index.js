@@ -6,6 +6,8 @@
 
 var services = {};
 var API = require("../../common/api");
+var db = require("./models").sequelize;
+var Q = require("q");
 
 var STAFF_POWER = 1;   //员工权限 1
 var MANAGER_POWER = 2; //管理员权限 2
@@ -24,14 +26,19 @@ services.getPowerList = function(data, callback) {
     var accountId = data.accountId;
     var roles = [];
     return API.staff.getStaff(accountId)
-        .then(function(staff) {
+        .then(function(result) {
+            var staff = result.staff;
+            console.info(staff);
             return API.company.getCompany({companyId: staff.companyId, userId: accountId})
                 .then(function(result) {
                     var company = result.company;
                     if (company.createUser == accountId) {
                         roles.push(OWNER_POWER);
                     }
-                    roles.push(staff.role_id);
+                    if (!staff.roleId) {
+                        staff.roleId = STAFF_POWER;
+                    }
+                    roles.push(staff.roleId);
                     return roles;
                 })
         })
@@ -44,11 +51,12 @@ services.getPowerList = function(data, callback) {
             return Q.all(promises);
         })
         .then(function(result) {
+            console.info(result);
             //合并权限,去除重复权限
             var powerList = [];
             for(var i= 0, ii=result.length; i<ii; i++) {
                 var item = result[i];
-                for(var j= 0, jj= item.length; j <jj; j++) {
+                for(var j = 0, jj=item.length; j<jj; j++) {
                     var power = item[j];
                     if (powerList.indexOf(power) < 0) {
                         powerList.push(power);
@@ -71,9 +79,10 @@ services.getPowerList = function(data, callback) {
  * @param {Function} callback
  */
 function _getRolePowerList(role, callback) {
-    var defer = Q.defer();
-    defer.resolve([]);
-    return defer.promise.nodeify(callback);
+    return db.models["Role"].findOne({role: role, type: 1})
+        .then(function(result) {
+            return result.powers.split(/,/g);
+        }).nodeify(callback);
 }
 
 /**
@@ -98,7 +107,8 @@ services.checkPower = function(params, callback) {
         needPowers = [needPowers];
     }
     return services.getPowerList({accountId: accountId})
-        .then(function(powers) {
+        .then(function(result) {
+            var powers = result.data.powers;
             var result = true;
 
             for(var i= 0, ii=needPowers.length; i<ii; i++) {
