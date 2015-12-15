@@ -8,6 +8,8 @@ var staffServer = require("../staff/index");
 var staffProxy = require("../staff/proxy/staff.proxy");
 var API = require("../../common/api");
 var staff = {};
+
+
 staff.createStaff = function(params, callback){
     var defer = Q.defer();
     var user_id = this.accountId;
@@ -23,9 +25,13 @@ staff.createStaff = function(params, callback){
             }
         })
 }
+
 staff.deleteStaff = staffServer.deleteStaff;
 staff.updateStaff = staffServer.updateStaff;
 staff.getStaff = staffServer.getStaff;
+staff.getCurrentStaff = function(callback){
+    return staffServer.getStaff(this.accountId, callback);
+}
 staff.listAndPaginateStaff = staffServer.listAndPaginateStaff;
 staff.increaseStaffPoint = staffServer.increaseStaffPoint;
 staff.decreaseStaffPoint = staffServer.decreaseStaffPoint;
