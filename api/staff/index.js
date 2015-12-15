@@ -4,13 +4,14 @@
 'use strict';
 var Q = require("q");
 var nodeXlsx = require("node-xlsx");
-var db = require("common/model").sequelize.importModel("./models").sequelize;
 var uuid = require("node-uuid");
-var staffProxy = require("./proxy/staff.proxy");
-var pointChangeProxy = require("./proxy/pointChange.proxy");
+var sequelize = require("common/model").sequelize.importModel("./models").sequelize;
+var staffModel = sequelize.models.Staff;
+var pointChange = sequelize.models.PointChange;
 var L = require("../../common/language");
 var API = require("../../common/api");
 var config = require('../../config');
+var Paginate = require("../../common/paginate").Paginate;
 //var auth = require("../auth/index");
 //var travalPolicy = require("../travalPolicy/index");
 var staff = {};
@@ -81,7 +82,7 @@ staff.createStaff = function(data, callback){
             }
         })
         .then(function(staff) {
-            return staffProxy.create(staff)
+            return staffModel.create(staff)
                 .then(function(staff) {
                     return {code: 0, staff: staff.toJSON()};
                 })
@@ -105,7 +106,7 @@ staff.deleteStaff = function(params, callback){
     return API.auth.remove({accountId: id})
         .then(function(acc){
             if(acc.code == 0){
-                return staffProxy.deleteById(id)
+                return staffModel.destroy({where: {id: id}})
                     .then(function(obj){
                         return {code: 0, msg: "删除成功"}
                     })
@@ -127,11 +128,44 @@ staff.updateStaff = function(id, data, callback){
         defer.reject({code: -1, msg: "id不能为空"});
         return defer.promise.nodeify(callback);
     }
-    return staffProxy.update(id, data)
-        .then(function(obj){
-            return {code: 0, staff: obj[1].dataValues, msg: "更新成功"}
-        })
-        .nodeify(callback);
+    var options = {};
+    options.where = {id: id};
+    options.returning = true;
+    if(data.email){
+        return staffModel.findById(id)
+            .then(function(old){
+                if(old.toJSON().email == data.email){
+                    return staffModel.update(data, options)
+                        .then(function(obj){
+                            return {code: 0, staff: obj[1].toJSON(), msg: "更新成功"};
+                        })
+                }else{
+                    return API.auth.getAccount(id)//暂无此接口
+                        .then(function(acc){
+                            if(acc.status != 0){
+                                defer.reject({code: -2, msg: "该账号不允许修改邮箱"});
+                                return defer.promise.nodeify(callback);
+                            }else{
+                                var accData = {email: data.email};
+                                return Q.all([
+                                    API.auth.updataAccount(id, accData),//暂无此接口
+                                    staffModel.update(data, options)
+                                ])
+                                    .spread(function(ret1, ret2){
+                                        return {code: 0, staff: ret2[1].toJSON(), msg: "更新成功"};
+                                    })
+                            }
+                        })
+                }
+            })
+            .nodeify(callback);
+    }else{
+        return staffModel.update(data, options)
+            .then(function(obj){
+                return {code: 0, staff: obj[1].toJSON(), msg: "更新成功"};
+            })
+            .nodeify(callback);
+    }
 }
 /**
  * 根据id查询员工
@@ -146,7 +180,7 @@ staff.getStaff = function(id, callback){
         defer.reject({code: -1, msg: "id不能为空"});
         return defer.promise.nodeify(callback);
     }
-    return staffProxy.getById(id)
+    return staffModel.findById(id)
         .then(function(obj){
             return {code: 0, staff: obj.toJSON()}
         })
@@ -167,9 +201,30 @@ staff.listAndPaginateStaff = function(params, options, callback){
     if (!options) {
         options = {};
     }
-    return staffProxy.listAndPaginateStaff(params, options)
-        .then(function(paginate){
-             return paginate;
+
+    var page, perPage, limit, offset;
+    if (options.page && /^\d+$/.test(options.page)) {
+        page = options.page;
+    } else {
+        page = 1;
+    }
+    if (options.perPage && /^\d+$/.test(options.perPage)) {
+        perPage = options.perPage;
+    } else {
+        perPage = 6;
+    }
+    limit = perPage;
+    offset = (page - 1) * perPage;
+    if (!options.order) {
+        options.order = [["create_at", "desc"]]
+    }
+    options.limit = limit;
+    options.offset = offset;
+    options.where = params;
+    return staffModel.findAndCountAll(options)
+        .then(function(result){
+            var pg = new Paginate(page, perPage, result.count, result.rows);
+            return pg;
         })
         .nodeify(callback);
 }
@@ -200,13 +255,13 @@ staff.increaseStaffPoint = function(params, options, callback) {
         defer.reject({code: -2, msg: "increasePoint不能为空"});
         return defer.promise.nodeify(callback);
     }
-    return staffProxy.getById(id)
+    return staffModel.findById(id)
         .then(function(obj) {
             var pointChange = {staffId: id, status: 1, points: increasePoint, remark: params.remark||"增加积分"};
-            return db.transaction(function(t) {
+            return sequelize.transaction(function(t) {
                 return Q.all([
                         obj.increment(['total_points','balance_points'], {by: increasePoint, transaction: t}),
-                        pointChangeProxy.create(pointChange, {transaction: t})
+                        pointChange.create(pointChange, {transaction: t})
                     ])
                     .spread(function(ret1,ret2){
                         return {code: 0, staff: ret1.dataValues};
@@ -242,17 +297,17 @@ staff.decreaseStaffPoint = function(params, options, callback) {
         defer.reject({code: -2, msg: "decreasePoint不能为空"});
         return defer.promise.nodeify(callback);
     }
-    return staffProxy.getById(id)
+    return staffModel.findById(id)
         .then(function(obj) {
             if(obj.dataValues.balancePoints < decreasePoint){//此处从obj.dataValues用model里的属性名取才能取到
                 defer.reject({code: -3, msg: "积分不足"});
                 return defer.promise.nodeify(callback);
             }
             var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分"}//此处也应该用model里的属性名封装obj
-            return db.transaction(function(t) {
+            return sequelize.transaction(function(t) {
                 return Q.all([
                         obj.decrement('balance_points', {by: decreasePoint, transaction: t}),
-                        pointChangeProxy.create(pointChange, {transaction: t})
+                        pointChange.create(pointChange, {transaction: t})
                     ])
                     .spread(function(ret1,ret2){
                         return {code: 0, staff: ret1.dataValues};
@@ -277,9 +332,30 @@ staff.listAndPaginatePointChange = function(params, options, callback){
     if (!options) {
         options = {};
     }
-    return pointChangeProxy.listAndPaginatePointChange(params, options)
-        .then(function(paginate){
-            return paginate;
+
+    var page, perPage, limit, offset;
+    if (options.page && /^\d+$/.test(options.page)) {
+        page = options.page;
+    } else {
+        page = 1;
+    }
+    if (options.perPage && /^\d+$/.test(options.perPage)) {
+        perPage = options.perPage;
+    } else {
+        perPage = 6;
+    }
+    limit = perPage;
+    offset = (page - 1) * perPage;
+    if (!options.order) {
+        options.order = [["create_at", "desc"]]
+    }
+    options.limit = limit;
+    options.offset = offset;
+    options.where = params;
+    return pointChange.findAndCountAll(options)
+        .then(function(result){
+            var pg = new Paginate(page, perPage, result.count, result.rows);
+            return pg;
         })
         .nodeify(callback);
 }
@@ -292,7 +368,9 @@ staff.listAndPaginatePointChange = function(params, options, callback){
  */
 staff.importExcel = function(params, callback){
     var userId = params.accountId;
-    var obj = nodeXlsx.parse(config.upload.tmpDir + '/two.xls');
+    var fileUrl = params.fileUrl;
+//    var obj = nodeXlsx.parse(config.upload.tmpDir + '/two.xls');
+    var obj = nodeXlsx.parse(fileUrl);
     var data = obj[0].data
     var travalPolicies = {};
     var noAddObj = [];

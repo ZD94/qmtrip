@@ -4,8 +4,9 @@
 'use strict';
 var Q = require("q");
 var Models = require("common/model").sequelize.importModel("./models");
+var agencyModel = Models.Agencies;
+var Paginate = require("../../common/paginate").Paginate;
 var uuid = require("node-uuid");
-var agencyProxy = require("./proxy/agency.proxy");
 var L = require("../../common/language");
 var API = require("../../common/api");
 //var auth = require("../auth/index");
@@ -44,7 +45,7 @@ agency.createAgency = function(data, callback){
         .then(function(acc){
             if(acc.code == 0){
                 data.id = acc.data.id;
-                return agencyProxy.create(data)
+                return agencyModel.create(data)
                     .then(function(obj){
                         return {code: 0, agency: obj.dataValues};
                     })
@@ -69,7 +70,7 @@ agency.deleteAgency = function(params, callback){
     return API.auth.remove({accountId: id})
         .then(function(acc){
             if(acc.code == 0){
-                return agencyProxy.deleteById(id)
+                return agencyModel.destroy({where: {id: id}})
                     .then(function(obj){
                         return {code: 0, msg: "删除成功"}
                     })
@@ -91,7 +92,10 @@ agency.updateAgency = function(id, data, callback){
         defer.reject({code: -1, msg: "id不能为空"});
         return defer.promise.nodeify(callback);
     }
-    return agencyProxy.update(id, data)
+    var options = {};
+    options.where = {id: id};
+    options.returning = true;
+    return agencyModel.update(data, options)
         .then(function(obj){
             return {code: 0, agency: obj[1].dataValues, msg: "更新成功"}
         })
@@ -111,7 +115,7 @@ agency.getAgency = function(id, callback){
         defer.reject({code: -1, msg: "id不能为空"});
         return defer.promise.nodeify(callback);
     }
-    return agencyProxy.getById(id)
+    return agencyModel.findById(id)
         .then(function(obj){
             return {code: 0, agency: obj.toJSON()}
         })
@@ -132,9 +136,30 @@ agency.listAndPaginateAgency = function(params, options, callback){
     if (!options) {
         options = {};
     }
-    return agencyProxy.listAndPaginateAgency(params, options)
-        .then(function(paginate){
-            return paginate;
+
+    var page, perPage, limit, offset;
+    if (options.page && /^\d+$/.test(options.page)) {
+        page = options.page;
+    } else {
+        page = 1;
+    }
+    if (options.perPage && /^\d+$/.test(options.perPage)) {
+        perPage = options.perPage;
+    } else {
+        perPage = 6;
+    }
+    limit = perPage;
+    offset = (page - 1) * perPage;
+    if (!options.order) {
+        options.order = [["create_at", "desc"]]
+    }
+    options.limit = limit;
+    options.offset = offset;
+    options.where = query;
+    return agencyModel.findAndCountAll(options)
+        .then(function(result){
+            var pg = new Paginate(page, perPage, result.count, result.rows);
+            return pg;
         })
         .nodeify(callback);
 }
