@@ -193,12 +193,13 @@ authServer.authentication = function(params, callback) {
         defer.resolve({code: -1, msg: "token expire"});
         return defer.promise.nodeify(callback);
     }
+
     var userId = params.userId || params.user_id;
     var tokenId = params.tokenId || params.token_id;
     var timestamp = params.timestamp;
     var tokenSign = params.tokenSign || params.token_sign;
 
-    return db.models.Token.findOne({where: {id: tokenId, accountId: userId, expireAt: {$gte: utils.now()}}})
+    return db.models["Token"].findOne({where: {id: tokenId, accountId: userId}})
         .then(function(m) {
             if (!m) {
                 return {code: -1, msg: "已经失效"};

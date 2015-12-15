@@ -81,6 +81,7 @@ var auth=(function(){
             API.onload(function(){
                 API.checkcode.getMsgCheckCode({mobile:mobile})
                     .then(function(result){
+                        console.info("获取验证码", result);
                         if(result.code == 0){
                             //console.info(result.data.ticket);
                             //console.info(result.data.mobile);
@@ -96,9 +97,12 @@ var auth=(function(){
 
         //换一换图片验证码
         $scope.changePicCode = function(){
+            console.info("click me...")
             API.onload(function(){
+                console.info("here...")
                 API.checkcode.getPicCheckCode({width:imgW,height:imgH,quality:100,length:4,type:1})
                     .then(function(result){
+                        console.info("获取验证码图片", result);
                         //console.info(result);
                         //console.info(result.data.captcha);
                         //console.info(result.data.ticket);
