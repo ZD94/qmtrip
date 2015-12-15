@@ -78,6 +78,16 @@
 | msg     | 提示信息 |
 | staff   | 员工信息|json
 
+>. 查询员工信息 API.staff.getCurrentStaff(callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| staff   | 员工信息|json
+
 >. 分页查询员工信息 API.staff.listAndPaginateStaff(params, options, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
