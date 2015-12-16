@@ -3,7 +3,8 @@
  */
 'use strict';
 var Q = require("q");
-var Models = require("common/model").sequelize.importModel("./models");
+var sequelize = require("common/model").importModel("./models");
+var Models = sequelize.models;
 var agencyModel = Models.Agencies;
 var Paginate = require("../../common/paginate").Paginate;
 var uuid = require("node-uuid");

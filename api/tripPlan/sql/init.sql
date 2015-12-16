@@ -336,6 +336,58 @@ COMMENT ON COLUMN consume_details.invoice IS '票据';
 COMMENT ON COLUMN consume_details.audit_remark IS '审核备注';
 
 
+--
+-- TOC entry 120 (class 0 OID 0)
+-- Name: trip_order_logs; Type: TABLE; Schema: tripplan; Owner: -
+--
+CREATE TABLE tripplan.trip_order_logs
+(
+  id uuid primary key,
+  order_id uuid,
+  user_id uuid,
+  remark character varying,
+  create_at timestamp without time zone
+);
+
+
+--
+-- TOC entry 1201 (class 0 OID 0)
+-- Dependencies: 120
+-- Name: COLUMN tripplan.trip_order_logs; Type: COMMENT; Schema: tripplan; Owner: -
+--
+COMMENT ON TABLE tripplan.trip_order_logs IS '计划单操作记录表';
+
+
+--
+-- TOC entry 1202 (class 0 OID 0)
+-- Dependencies: 120
+-- Name: COLUMN trip_order_logs.order_id; Type: COMMENT; Schema: tripplan; Owner: -
+--
+COMMENT ON COLUMN tripplan.trip_order_logs.order_id IS '计划单id';
+
+
+--
+-- TOC entry 1203 (class 0 OID 0)
+-- Dependencies: 120
+-- Name: COLUMN trip_order_logs.user_id; Type: COMMENT; Schema: tripplan; Owner: -
+--
+COMMENT ON COLUMN tripplan.trip_order_logs.user_id IS '操作人id';
+
+
+--
+-- TOC entry 1204 (class 0 OID 0)
+-- Dependencies: 120
+-- Name: COLUMN trip_order_logs.remark; Type: COMMENT; Schema: tripplan; Owner: -
+--
+COMMENT ON COLUMN tripplan.trip_order_logs.remark IS '备注';
+
+
+--
+-- TOC entry 1205 (class 0 OID 0)
+-- Dependencies: 120
+-- Name: COLUMN trip_order_logs.create_at; Type: COMMENT; Schema: tripplan; Owner: -
+--
+COMMENT ON COLUMN tripplan.trip_order_logs.create_at IS '记录时间';
 
 -- Completed on 2015-12-09 11:37:14 CST
 

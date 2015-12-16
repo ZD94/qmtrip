@@ -51,6 +51,16 @@ auth.bindMobile =authServer.bindMobile;
 auth.activeAccount = authServer.activeAccount;
 
 /**
+ * 是否黑名单
+ *
+ * @param {Object} params
+ * @param {String} params.domain 域名
+ * @param {Function} callback
+ * @return {Promise} {code: 0}, {code: -1, msg: "域名已占用或者不合法"}
+ */
+auth.isBlackDomain = require("../company").isBlackDomain;
+
+/**
  * 注册企业账号
  *
  * @param {Object} params
@@ -133,29 +143,61 @@ auth.registryCompany = function(params, callback) {
                 })
         })
         .then(function(){
-            return authServer.newAccount({mobile: mobile, email: email, pwd: pwd})
+            var domain = email.split(/@/)[1];
+            return API.company.isBlackDomain({domain: domain})
                 .then(function(result) {
                     if (result.code) {
                         throw result;
+                    } else {
+                        return true;
                     }
-
-                    var domain = email.split(/@/)[1];
-                    var account = result.data;
-                    return createCompany({createUser: account.id, name: companyName, domainName: domain})
+                })
+                .then(function() {
+                    return authServer.newAccount({mobile: mobile, email: email, pwd: pwd})
                         .then(function(result) {
                             if (result.code) {
                                 throw result;
                             }
 
-                            var company = result.company;
-                            return createStaff({email: email, mobile: mobile, name: name, companyId: company.id, accountId: account.id})
+                            var account = result.data;
+                            return createCompany({createUser: account.id, name: companyName, domainName: domain})
+                                .then(function(result) {
+                                    if (result.code) {
+                                        throw result;
+                                    }
+
+                                    var company = result.company;
+                                    return createStaff({email: email, mobile: mobile, name: name, companyId: company.id, accountId: account.id})
+                                })
                         })
-                })
-                .then(function(result) {
-                    return {code: 0, msg: "OK"};
+                        .then(function(result) {
+                            return {code: 0, msg: "OK"};
+                        })
                 })
         })
         .nodeify(callback);
 }
 
+/**
+ * 权限控制
+ * @param fn
+ * @param needPowers
+ * @returns {Function}
+ */
+function needPowersMiddleware(fn, needPowers) {
+    return function(params, callback) {
+        var self = this;
+        var accountId = self.accountId;
+        return API.power.checkPower({accountId: accountId, powers: needPowers})
+            .then(function(result) {
+                if (result.code) {
+                    throw result;
+                }
+                return fn.apply(self, params);
+            })
+            .nodeify(callback);
+    }
+}
+
 module.exports = auth;
+module.exports.needPowersMiddleware = needPowersMiddleware;

@@ -7,7 +7,7 @@ var Logger = require('../../common/logger');
 var logger = new Logger();
 
 var tripPlan = {};
-//tripPlan.__public = true;
+
 /**
  * 生成计划单
  * @param params
@@ -16,7 +16,7 @@ var tripPlan = {};
  */
 tripPlan.savePlanOrder = function(params, callback){
     params.accountId = this.accountId;
-    logger.info(params);
+    params.type = 2;
     return API.tripPlan.savePlanOrder(params, callback);
 }
 

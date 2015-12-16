@@ -3,7 +3,7 @@
  */
 
 var Q = require('q');
-var sequelize = require("common/model").sequelize.importModel("./models").sequelize;
+var sequelize = require("common/model").importModel("./models");
 var Models = sequelize.models;
 var Company = Models.Company;
 var FundsAccounts = Models.FundsAccounts;
@@ -44,6 +44,31 @@ company.createCompany = function(params, callback){
         }).nodeify(callback);
 }
 
+/**
+ * 是否在域名黑名单中
+ *
+ * @param {Object} params 参数
+ * @param {String} params.domain 域名
+ * @param {Function} callback 可选回调函数
+ * @return {Promise}
+ */
+company.isBlackDomain = function(params, callback) {
+    var domain = params.domain;
+    var defer = Q.defer();
+    if (!domain) {
+        defer.reject({code: -1, msg: "域名不存在或不合法"});
+        return defer.promise.nodeify(callback);
+    }
+
+    return Models.BlackDomain.findOne({where: {domain: domain}})
+        .then(function(result) {
+            if (result) {
+                return {code: -1, msg: "域名不能使用"}
+            }
+            return {code: 0, msg: "ok"};
+        })
+        .nodeify(callback);
+}
 
 /**
  * 更新企业信息
@@ -53,27 +78,20 @@ company.createCompany = function(params, callback){
  */
 company.updateCompany = function(params, callback){
     var defer = Q.defer();
-    return checkParams(['companyId', 'userId'], params)
+    return checkParams(['companyId'], params)
         .then(function(){
             var companyId = params.companyId;
-            var userId = params.userId;
             delete params.companyId;
-            delete params.userId;
             return Company.findById(companyId, {attributes: ['createUser']}) // (['createUser'], {where: {id: companyId}})
                 .then(function(company){
                     if(!company){
                         defer.reject(L.ERR.COMPANY_NOT_EXIST);
                         return defer.promise;
                     }
-                    if(company.createUser != userId){
-                        defer.reject(L.ERR.PERMISSION_DENY);
-                        return defer.promise;
-                    }
                     params.updateAt = utils.now();
                     var cols = getColumns(params);
                     return Company.update(params, {returning: true, where: {id: companyId}, fields: cols})
                         .then(function(ret){
-                            logger.info("update fields=>", ret);
                             if(!ret[0] || ret[0] == "NaN"){
                                 defer.reject({code: -2, msg: '更新企业信息失败'});
                                 return defer.promise;
@@ -92,10 +110,9 @@ company.updateCompany = function(params, callback){
  * @returns {*}
  */
 company.getCompany = function(params, callback){
-    return checkParams(['companyId', 'userId'], params)
+    return checkParams(['companyId'], params)
         .then(function(){
             var companyId = params.companyId;
-            var userId = params.userId;
             return Company.find({where: {id: companyId}})
                 .then(function(company){
                     var company = company.toJSON();
@@ -111,11 +128,8 @@ company.getCompany = function(params, callback){
  * @returns {*}
  */
 company.listCompany = function(params, callback){
-    return checkParams(['userId'], params)
+    return checkParams(['agencyId'], params)
         .then(function(){
-            var companyId = params.companyId;
-            var userId = params.userId;
-            delete params.userId;
             return Company.findAll({where: params})
                 .then(function(ret){
                     return {code: 0, msg: '', company: ret};

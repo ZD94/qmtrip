@@ -4,11 +4,11 @@
 
 var API = require('../../common/api');
 var Logger = require('../../common/logger');
+var needPowersMiddleware = require('./auth').needPowersMiddleware;
 var logger = new Logger();
 
 var company = {}
 
-//company.__public = true;
 
 /**
  * 创建企业
@@ -20,7 +20,7 @@ company.createCompany = function(params, callback){
     logger.info("createCompany=>\n", params);
     params.createUser = this.accountId;
     return API.company.createCompany(params, callback);
-}
+};
 
 /**
  * 更新企业信息
@@ -28,10 +28,10 @@ company.createCompany = function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.updateCompany = function(params, callback){
+company.updateCompany = needPowersMiddleware(function(params, callback){
     params.createUser = this.accountId;
     return API.company.updateCompany(params, callback);
-}
+}, ["company.edit"]);
 
 /**
  * 获取企业信息
@@ -39,13 +39,13 @@ company.updateCompany = function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.getCompany = function(companyId, callback){
+company.getCompany = needPowersMiddleware(function(companyId, callback){
     var params = {
         companyId: companyId,
         userId: this.accountId
     }
     return API.company.getCompany(params, callback);
-}
+}, ["company.query"]);
 
 /**
  * 根据查询条件获取企业列表
@@ -53,10 +53,10 @@ company.getCompany = function(companyId, callback){
  * @param callback
  * @returns {*}
  */
-company.listCompany = function(params, callback){
+company.listCompany = needPowersMiddleware(function(params, callback){
     params.userId = this.accountId;
     return API.company.listCompany(params, callback);
-}
+}, ["company.query"])
 
 /**
  * 删除企业信息
@@ -64,13 +64,13 @@ company.listCompany = function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.deleteCompany = function(companyId, callback){
+company.deleteCompany = needPowersMiddleware(function(companyId, callback){
     var params = {
         companyId: companyId,
         userId: this.accountId
-    }
+    };
     return API.company.deleteCompany(params, callback);
-}
+}, ["company.delete"]);
 
 /**
  * 企业资金账户充值
@@ -96,6 +96,19 @@ company.frozenMoney = function(params, callback){
     params.type = -2;
     params.channel = '冻结';
     return API.company.moneyChange(params, callback);
+}
+
+/**
+ * 消费企业账户余额
+ * @param params
+ * @param callback
+ * @returns {boolean|*|{options, src}|{src}|{files, tasks}}
+ */
+company.consumeMoney = function(params, callback){
+    params.userId = this.accountId;
+    params.type = -1;
+    params.channel = '消费';
+    return API.moneyChange.test(params, callback);
 }
 
 module.exports = company;

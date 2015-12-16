@@ -28,7 +28,7 @@ comment on column power.roles.name is '角色名称,如管理员,财务,普通�
 comment on column power.roles.powers is '权限集合;user.add, user.delete, company.add, company.delete';
 comment on column power.roles.type is '权限归属 1.企业 2.代理商';
 
-INSERT INTO power.roles (role, name, powers, type) VALUES(2, '管理员', 'user.add,user.delete,user.edit,user.query,company.edit,user.role,point.add,point.edit,point.delete', 1);
+INSERT INTO power.roles (role, name, powers, type) VALUES(2, '管理员', 'user.add,user.delete,user.edit,user.query,company.query,company.edit,user.role,point.add,point.edit,point.delete', 1);
 INSERT INTO power.roles(role, name, powers, type) VALUES(1, '普通员工', 'user.query', 1);
 INSERT INTO power.roles(role, name, powers, type) VALUES(3, '财务人员', 'user.query,point.query,point.add,point.delete,point.edit', 1);
 INSERT INTO power.roles(role, name, powers, type) VALUES(0, '创建人', 'user.add,user.delete,user.edit,user.query,company.edit,user.role,point.add,point.edit,point.delete', 1);

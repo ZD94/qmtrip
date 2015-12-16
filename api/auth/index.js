@@ -1,5 +1,6 @@
 var Q = require("q");
-var Models = require("common/model").sequelize.importModel("./models");
+var sequelize = require("common/model").importModel("./models");
+var Models = sequelize.models;
 var uuid = require("node-uuid");
 var L = require("../../common/language");
 var validate = require("../../common/validate");
@@ -193,13 +194,12 @@ authServer.authentication = function(params, callback) {
         defer.resolve({code: -1, msg: "token expire"});
         return defer.promise.nodeify(callback);
     }
-
     var userId = params.userId || params.user_id;
     var tokenId = params.tokenId || params.token_id;
     var timestamp = params.timestamp;
     var tokenSign = params.tokenSign || params.token_sign;
 
-    return Models["Token"].findOne({where: {id: tokenId, accountId: userId}})
+    return Models.Token.findOne({where: {id: tokenId, accountId: userId}})
         .then(function(m) {
             if (!m) {
                 return {code: -1, msg: "已经失效"};
