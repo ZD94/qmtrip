@@ -8,6 +8,7 @@ create table travalpolicy.traval_policy (
 	hotel_tevel varchar(50),
 	hotel_price numeric(15,2),
 	is_change_level boolean default false,
+	create_at timestamp default now(),
 	company_id uuid
 );
 
