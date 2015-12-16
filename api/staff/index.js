@@ -368,45 +368,53 @@ staff.listAndPaginatePointChange = function(params, options, callback){
  */
 staff.importExcel = function(params, callback){
     var userId = params.accountId;
-    var fileUrl = params.fileUrl;
-//    var obj = nodeXlsx.parse(config.upload.tmpDir + '/two.xls');
-    var obj = nodeXlsx.parse(fileUrl);
-    var data = obj[0].data
+    var md5key = params.md5key;
+//    var obj = nodeXlsx.parse(fileUrl);
     var travalPolicies = {};
     var noAddObj = [];
     var addObj = [];
     var companyId = "";
-    return staff.getStaff(userId)
-        .then(function(sf){
-            companyId = sf.staff.companyId;
-            return API.travalPolicy.getAllTravalPolicy({company_id: companyId})
-                .then(function(results){
-                    results = results.travalPolicies;
-                    for(var t=0;t<results.length;t++){
-                        var tp = results[t].toJSON();
-                        travalPolicies[tp.name] = tp.id;
-                    }
-                    return travalPolicies;
-                })
-                .then(function(travalps){
-                    return Q.all(data.map(function(item, index){
-                            if(index>0 && index<200){
-                                var s = data[index];
-                                var staffObj = {name: s[0], mobile: s[1], email: s[2], department: s[3],travelLevel: travalps[s[4]], roleId: s[5], companyId: companyId};//company_id默认为当前登录人的company_id
-                                return staff.createStaff(staffObj)
-                                    .then(function(ret){
-                                        if(ret){
-                                            item = ret.staff;
-                                            addObj.push(item);
-                                        }else{
-                                            noAddObj.push(item);
-                                        }
-                                        return item;
-                                    })
+    return API.attachment.getAttachment({md5key: md5key, userId: userId})
+        .then(function(att){
+            att = att.attachment;
+            var obj = nodeXlsx.parse(att.content);
+            var data = obj[0].data
+            return staff.getStaff(userId)
+                .then(function(sf){
+                    companyId = sf.staff.companyId;
+                    return API.travalPolicy.getAllTravalPolicy({company_id: companyId})
+                        .then(function(results){
+                            results = results.travalPolicies;
+                            for(var t=0;t<results.length;t++){
+                                var tp = results[t].toJSON();
+                                travalPolicies[tp.name] = tp.id;
                             }
-                        })).then(function(items){
-                            data = items;
-                            return {addObj: addObj, noAddObj: noAddObj};
+                            return travalPolicies;
+                        })
+                        .then(function(travalps){
+                            return Q.all(data.map(function(item, index){
+                                    if(index>0 && index<200){
+                                        var s = data[index];
+                                        var staffObj = {name: s[0], mobile: s[1], email: s[2], department: s[3],travelLevel: travalps[s[4]], roleId: s[5], companyId: companyId};//company_id默认为当前登录人的company_id
+                                        return staff.createStaff(staffObj)
+                                            .then(function(ret){
+                                                if(ret){
+                                                    item = ret.staff;
+                                                    addObj.push(item);
+                                                }else{
+                                                    noAddObj.push(staffObj);
+                                                }
+                                                return item;
+                                            })
+                                            .catch(function(err){
+                                                noAddObj.push(staffObj);
+                                                console.log(err);
+                                            })
+                                    }
+                                })).then(function(items){
+                                    data = items;
+                                    return {addObj: JSON.stringify(addObj), noAddObj: JSON.stringify(noAddObj)};
+                                })
                         })
                 })
         })
