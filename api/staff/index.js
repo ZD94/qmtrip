@@ -59,7 +59,7 @@ staff.createStaff = function(data, callback){
                 data.id = acc.data.id;
                 return staffProxy.create(data)
                     .then(function(obj){
-                        return {code: 0, staff: obj.dataValues};
+                        return {code: 0, staff: obj.toJSON()};
                     })
             }
         })
@@ -264,7 +264,7 @@ staff.increaseStaffPoint = function(params, options, callback) {
                         pointChange.create(pointChange, {transaction: t})
                     ])
                     .spread(function(ret1,ret2){
-                        return {code: 0, staff: ret1.dataValues};
+                        return {code: 0, staff: ret1.toJSON()};
                     })
             })
 
@@ -299,7 +299,7 @@ staff.decreaseStaffPoint = function(params, options, callback) {
     }
     return staffModel.findById(id)
         .then(function(obj) {
-            if(obj.dataValues.balancePoints < decreasePoint){//此处从obj.dataValues用model里的属性名取才能取到
+            if(obj.toJSON().balancePoints < decreasePoint){//此处从obj.toJSON()用model里的属性名取才能取到
                 defer.reject({code: -3, msg: "积分不足"});
                 return defer.promise.nodeify(callback);
             }
@@ -310,7 +310,7 @@ staff.decreaseStaffPoint = function(params, options, callback) {
                         pointChange.create(pointChange, {transaction: t})
                     ])
                     .spread(function(ret1,ret2){
-                        return {code: 0, staff: ret1.dataValues};
+                        return {code: 0, staff: ret1.toJSON()};
                     })
             })
 
@@ -383,7 +383,7 @@ staff.importExcel = function(params, callback){
                 .then(function(results){
                     results = results.travalPolicies;
                     for(var t=0;t<results.length;t++){
-                        var tp = results[t].dataValues;
+                        var tp = results[t].toJSON();
                         travalPolicies[tp.name] = tp.id;
                     }
                     return travalPolicies;
