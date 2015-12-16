@@ -51,6 +51,16 @@ auth.bindMobile =authServer.bindMobile;
 auth.activeAccount = authServer.activeAccount;
 
 /**
+ * 是否黑名单
+ *
+ * @param {Object} params
+ * @param {String} params.domain 域名
+ * @param {Function} callback
+ * @return {Promise} {code: 0}, {code: -1, msg: "域名已占用或者不合法"}
+ */
+auth.isBlackDomain = require("../company").isBlackDomain;
+
+/**
  * 注册企业账号
  *
  * @param {Object} params

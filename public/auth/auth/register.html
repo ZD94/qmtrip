@@ -35,14 +35,14 @@
         <span>图片验证码</span>
         <input id="picCode" class="" type="text" value="" placeholder="">
     </div>
-    <img id="imgCode" src=""/>
-    <a ng-click="changePicCode()">换一换</a>
+    <img id="imgCode" ng-click="changePicCode()" alt="换一张"/>
+    <a ng-click="changePicCode()">看不清,换一张</a>
 </div>
 <div style="width:600px;margin:10px auto;">
     <span id="check1"><i id="check" class="web-icon-font" checkvalue="true">&#xf058;</i>同意<a href="">《途灵岛商旅注册协议》</a></span>
     <span id="check2" style="display: none;"><i id="check" class="web-icon-font" checkvalue="false">&#xf057;</i>同意<a href="">《途灵岛商旅注册协议》</a></span>
 </div>
-<a href="#" class="register" ng-click="register()">立即注册</a>
+<a class="register" ng-click="register()">立即注册</a>
 <div style="width: 600px;margin: 10px auto;text-align: center;"><a href="#/auth/login">已有账号?登录</a></div>
 
 <script>
