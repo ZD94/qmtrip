@@ -78,27 +78,20 @@ company.isBlackDomain = function(params, callback) {
  */
 company.updateCompany = function(params, callback){
     var defer = Q.defer();
-    return checkParams(['companyId', 'userId'], params)
+    return checkParams(['companyId'], params)
         .then(function(){
             var companyId = params.companyId;
-            var userId = params.userId;
             delete params.companyId;
-            delete params.userId;
             return Company.findById(companyId, {attributes: ['createUser']}) // (['createUser'], {where: {id: companyId}})
                 .then(function(company){
                     if(!company){
                         defer.reject(L.ERR.COMPANY_NOT_EXIST);
                         return defer.promise;
                     }
-                    if(company.createUser != userId){
-                        defer.reject(L.ERR.PERMISSION_DENY);
-                        return defer.promise;
-                    }
                     params.updateAt = utils.now();
                     var cols = getColumns(params);
                     return Company.update(params, {returning: true, where: {id: companyId}, fields: cols})
                         .then(function(ret){
-                            logger.info("update fields=>", ret);
                             if(!ret[0] || ret[0] == "NaN"){
                                 defer.reject({code: -2, msg: '更新企业信息失败'});
                                 return defer.promise;
@@ -117,10 +110,9 @@ company.updateCompany = function(params, callback){
  * @returns {*}
  */
 company.getCompany = function(params, callback){
-    return checkParams(['companyId', 'userId'], params)
+    return checkParams(['companyId'], params)
         .then(function(){
             var companyId = params.companyId;
-            var userId = params.userId;
             return Company.find({where: {id: companyId}})
                 .then(function(company){
                     var company = company.toJSON();
@@ -136,10 +128,8 @@ company.getCompany = function(params, callback){
  * @returns {*}
  */
 company.listCompany = function(params, callback){
-    return checkParams(['userId', 'agencyId'], params)
+    return checkParams(['agencyId'], params)
         .then(function(){
-            var userId = params.userId;
-            delete params.userId;
             return Company.findAll({where: params})
                 .then(function(ret){
                     return {code: 0, msg: '', company: ret};
