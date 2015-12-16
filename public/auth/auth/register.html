@@ -1,61 +1,78 @@
 <div class="head">
-    全麦旅行
-</div>
-
-<div class="input">
-    <span>企业名称</span>
-    <input id="corpName" class="" type="text" value="" placeholder="暂不支持个人注册">
-</div>
-<div class="input">
-    <span>注册人姓名</span>
-    <input id="corpRegistryName" class="" type="text" value="">
-</div>
-<div class="input">
-    <span>企业邮箱</span>
-    <input id="corpMail" class="" type="text" value="" placeholder="请使用企业邮箱作为登录账号使用">
-</div>
-<div style="width:600px;margin:10px auto;">暂不支持公共邮箱，若为<span>公共邮箱</span>，请联系客服<span>010-4657892</span></div>
-<div class="input">
-    <span>联系人电话</span>
-    <input id="corpMobile" class="" type="text" value="" placeholder="">
-</div>
-<div class="input">
-    <span>请设置登录密码</span>
-    <input id="corpPwd" class="" type="password" value="" placeholder="">
-</div>
-<div class="inputs">
-    <div>
-        <span>短信验证码</span>
-        <input id="msgCode" class="" type="text" value="" placeholder="">
+    <div class="logo">
+        <img src="../../corp/images/logo-white.png"/>
     </div>
-    <button ng-click="getMCode()">免费获取短信验证码</button>
+    <div class="to_login">
+        已有账号？
+        <span ng-click="toLogin()">登录</span>
+    </div>
+</div>
+<div class="title">
+    注册
+</div>
+<div class="input">
+    <input id="corpName" class="" type="text" value="" placeholder="企业名称 (暂不支持个人注册)">
+    <!--<span class="err_msg"><i class="web-icon-font">&#xf06a;</i>企业名称不能为空</span>-->
+    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg}}</span>
+</div>
+<div class="input">
+    <input id="corpRegistryName" class="" type="text" value="" placeholder="联系人姓名">
+    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_name}}</span>
+</div>
+<div class="input">
+    <input id="corpMail" class="" type="text" value="" placeholder="联系人邮箱（请使用企业邮箱,作为登录账号使用)">
+    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_mail}}</span>
+</div>
+<!--<div style="width:600px;margin:10px auto;">暂不支持公共邮箱，若为<span>公共邮箱</span>，请联系客服<span>010-4657892</span></div>-->
+<div class="input">
+    <input id="corpMobile" class="" type="text" value="" placeholder="联系人电话">
+    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg}}</span>
+</div>
+<div class="input">
+    <input id="corpPwd" class="" type="password" value="" placeholder="设置登录密码">
+    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg}}</span>
 </div>
 <div class="inputs">
     <div>
-        <span>图片验证码</span>
-        <input id="picCode" class="" type="text" value="" placeholder="">
+        <input id="msgCode" class="" type="text" value="" placeholder="短信验证码">
+    </div>
+    <button class="getCode" ng-click="getMCode()">免费获取短信验证码</button>
+</div>
+<div class="inputs">
+    <div>
+        <input id="picCode" class="" type="text" value="" placeholder="图片验证码">
     </div>
     <img id="imgCode" src=""/>
-    <a ng-click="changePicCode()">换一换</a>
+    <span class="change" ng-click="changePicCode()">换一换</span>
 </div>
-<div style="width:600px;margin:10px auto;">
-    <span id="check1"><i id="check" class="web-icon-font" checkvalue="true">&#xf058;</i>同意<a href="">《途灵岛商旅注册协议》</a></span>
-    <span id="check2" style="display: none;"><i id="check" class="web-icon-font" checkvalue="false">&#xf057;</i>同意<a href="">《途灵岛商旅注册协议》</a></span>
+<div class="agree">
+    <span id="check1"><i class="web-icon-font2" checkvalue="true">&#xea2e;</i>同意<a href="">《途灵岛商旅注册协议》</a></span>
+    <span id="check2" style="display: none;"><i class="web-icon-font2" checkvalue="false">&#xea2f;</i>同意<a href="">《途灵岛商旅注册协议》</a></span>
 </div>
 <a href="#" class="register" ng-click="register()">立即注册</a>
-<div style="width: 600px;margin: 10px auto;text-align: center;"><a href="#/auth/login">已有账号?登录</a></div>
-
+<!--<div style="width: 600px;margin: 10px auto;text-align: center;"><a href="#/auth/login">已有账号?登录</a></div>-->
+<div class="footer">
+    <p>由途灵岛信息股份有限公司提供技术支持</p>
+    <p>联系电话：010-57371105</p>
+</div>
 <script>
     $(function(){
         $("#check1").click(function(){
             $(this).hide();
+            $(this).removeClass("check");
             $("#check2").show();
-            console.log(123);
+            $("#check2").addClass("check");
         })
         $("#check2").click(function(){
             $(this).hide();
+            $(this).removeClass("check");
             $("#check1").show();
-            console.log(456);
+            $("#check1").addClass("check");
+        })
+        $("input").focus(function(){
+            $(this).parent().addClass("blue-border");
+            $(this).parents("div").siblings().removeClass("blue-border");
+            $(this).parents("div").siblings().children().removeClass("blue-border");
         })
     })
 </script>

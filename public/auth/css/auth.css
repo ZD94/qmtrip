@@ -1,52 +1,173 @@
 /*注册*/
+.head {
+  width: 100%;
+  height: 80px;
+  background-color: #118FD6;
+}
+.head .logo {
+  float: left;
+  margin-left: 150px;
+  margin-top: 20px;
+}
+.head .to_login {
+  float: right;
+  margin-right: 150px;
+  font-size: 14px;
+  color: #ffffff;
+  line-height: 80px;
+}
+.head .to_login span {
+  display: block;
+  float: right;
+  width: 60px;
+  height: 30px;
+  text-align: center;
+  line-height: 30px;
+  border-radius: 2px;
+  margin-left: 10px;
+  margin-top: 25px;
+  background: #58b0e2;
+  cursor: pointer;
+}
+.title {
+  width: 100%;
+  text-align: center;
+  font-size: 30px;
+  color: #4a4a4a;
+  margin-top: 30px;
+  margin-bottom: 50px;
+}
+.footer {
+  width: 100%;
+  height: 60px;
+  position: absolute;
+  bottom: 0;
+  background-color: #292b2b;
+  text-align: center;
+  color: #ffffff;
+  font-size: 12px;
+}
+.footer p {
+  line-height: 22px;
+}
+.footer p:first-child {
+  padding-top: 10px;
+}
+.blue-border {
+  border: 1px solid #118FD6 !important;
+}
+.right {
+  color: #5cca2e !important;
+}
+.err_msg {
+  float: right;
+  position: absolute;
+  left: 440px;
+  width: 200px;
+  top: 0px;
+  display: none;
+}
+.err_msg i {
+  color: #de492a;
+  margin-right: 10px;
+}
 .input {
-  width: 600px;
-  height: 45px;
-  margin: 20px auto 0;
-  line-height: 45px;
-  border-radius: 5px;
-  border: 1px solid #000;
-  padding-left: 10px;
+  width: 430px;
+  height: 40px;
+  margin: 0 auto 20px;
+  line-height: 40px;
+  border-radius: 2px;
+  border: 1px solid #d9d9d9;
+  font-size: 14px;
+  position: relative;
 }
 .input input {
+  width: 90%;
   border: none;
   outline: medium;
+  padding-left: 10px;
 }
 .inputs {
-  width: 600px;
-  height: 45px;
-  margin: 20px auto 0;
-  line-height: 45px;
-  padding-left: 10px;
+  width: 430px;
+  height: 42px;
+  margin: 0 auto 20px;
+  line-height: 42px;
+  font-size: 14px;
+  position: relative;
 }
 .inputs div {
   float: left;
-  width: 300px;
-  height: 45px;
-  line-height: 45px;
-  border-radius: 5px;
-  border: 1px solid #000;
-  padding-left: 10px;
-  margin-left: -10px;
+  width: 240px;
+  height: 40px;
+  line-height: 40px;
+  border-radius: 2px;
+  border: 1px solid #d9d9d9;
+  overflow: hidden;
 }
 .inputs input {
+  width: 90%;
   border: none;
   outline: medium;
+  padding-left: 10px;
 }
-.register {
-  display: block;
-  width: 600px;
-  height: 45px;
-  line-height: 45px;
-  text-align: center;
-  background-color: #41a8f3;
-  margin: 10px auto;
-  color: #fff;
-  text-decoration: none;
+.inputs .getCode {
+  width: 180px;
+  height: 42px;
+  float: right;
+  background: #ffffff;
+  color: #4a4a4a;
+  line-height: 42px;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+}
+.inputs .change {
+  width: auto;
+  height: 42px;
+  float: right;
+  margin-right: 10px;
+  color: #118FD6;
+  line-height: 42px;
+  cursor: pointer;
 }
 #imgCode {
   width: 100px;
-  height: 45px;
+  height: 42px;
+  margin-left: 10px;
+}
+.agree {
+  width: 430px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 14px;
+  margin: 20px auto;
+  color: #4a4a4a;
+}
+.agree #check1 i {
+  color: #118FD6;
+  margin-right: 10px;
+  cursor: default;
+}
+.agree #check2 i {
+  color: #d9d9d9;
+  margin-right: 10px;
+  cursor: default;
+}
+.agree a {
+  color: #118FD6;
+}
+.register {
+  display: block;
+  width: 430px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  background-color: #118FD6;
+  margin: 0px auto 20px;
+  color: #fff;
+  text-decoration: none;
+}
+.register:hover {
+  text-decoration: none;
 }
 /*登录*/
 /*# sourceMappingURL=auth.css.map */

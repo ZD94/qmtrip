@@ -47,7 +47,80 @@ var auth=(function(){
         }
     }
     auth.RegisterController = function($scope) {
+        var mobile = $('#corpMobile').val();
+        var pwd    = $('#corpPwd').val();
+        var mCode = $('#msgCode').val();
+        var pCode = $('#picCode').val();
 
+        //对企业名称进行判断
+        $("#corpName").blur(function(){
+            var cName  = $('#corpName').val();
+            if(!cName){
+                $scope.err_msg = "企业名称不能为空";
+                $("#corpName").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#corpName").siblings(".err_msg").children("i").removeClass("right");
+                $("#corpName").siblings(".err_msg").show();
+                $("#corpName").focus();
+                $scope.$apply();
+                return false;
+            }else{
+                $scope.err_msg = "";
+                $("#corpName").siblings(".err_msg").children("i").html("&#xf058;");
+                $("#corpName").siblings(".err_msg").children("i").addClass("right");
+                $("#corpName").siblings(".err_msg").show();
+                $scope.$apply();
+            }
+        })
+        //对联系人姓名进行判断
+        $("#corpRegistryName").blur(function(){
+            var name   = $('#corpRegistryName').val();
+            if(!name){
+                $scope.err_msg_name = "联系人姓名不能为空";
+                $("#corpRegistryName").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#corpRegistryName").siblings(".err_msg").children("i").removeClass("right");
+                $("#corpRegistryName").siblings(".err_msg").show();
+                $("#corpRegistryName").focus();
+                $scope.$apply();
+                return false;
+            }else{
+                $scope.err_msg_name = "";
+                $("#corpRegistryName").siblings(".err_msg").children("i").html("&#xf058;");
+                $("#corpRegistryName").siblings(".err_msg").children("i").addClass("right");
+                $("#corpRegistryName").siblings(".err_msg").show();
+                $scope.$apply();
+            }
+        })
+        //对联系人邮箱进行判断
+        $("#corpMail").blur(function(){
+            var mail   = $('#corpMail').val();
+            var reg = /^\w+[\w\-\.]+\w@\w[\w\-\.]+\w$/;
+            if(!mail){
+                $scope.err_msg_mail = "联系人邮箱不能为空";
+                console.info(123);
+                $("#corpMail").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
+                $("#corpMail").siblings(".err_msg").show();
+                $("#corpMail").focus();
+                $scope.$apply();
+                return false;
+            }else if(!reg.test(mail)){
+                $scope.err_msg_mail = "邮箱格式不正确";
+                console.info(456);
+                $("#corpMail").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
+                $("#corpMail").siblings(".err_msg").show();
+                $("#corpMail").focus();
+                $scope.$apply();
+                return false;
+            }else{
+                $scope.err_msg_mail = "";
+                console.info(789);
+                $("#corpMail").siblings(".err_msg").children("i").html("&#xf058;");
+                $("#corpMail").siblings(".err_msg").children("i").addClass("right");
+                $("#corpMail").siblings(".err_msg").show();
+                $scope.$apply();
+            }
+        })
         //图片验证码加载
         var imgW = $('#imgCode').attr("width");
         var imgH = $('#imgCode').attr("height");
@@ -92,7 +165,7 @@ var auth=(function(){
             console.info("click me...")
             API.onload(function(){
                 console.info("here...")
-                API.checkcode.getPicCheckCode({width:imgW,height:imgH,quality:100,length:4,type:1})
+                API.checkcode.getPicCheckCode({width:imgW,height:imgH,quality:100,length:4,type:0})
                     .then(function(result){
                         console.info("获取验证码图片", result);
                         $("#imgCode").attr("src",result.data.captcha);
@@ -112,12 +185,14 @@ var auth=(function(){
             var pwd    = $('#corpPwd').val();
             var mCode = $('#msgCode').val();
             var pCode = $('#picCode').val();
-            var agree = $('#check').attr('checkvalue');
+            var agree = $('.check').children("i").attr('checkvalue');
             var commit = true;
             var reg = /^\w+[\w\-\.]+\w@\w[\w\-\.]+\w$/;
             if(commit){
                 if(!cName){
-                    alert("企业名称不能为空!");
+                    //alert("企业名称不能为空!");
+                    $scope.err_msg = "企业名称不能为空";
+                    $("#corpName").sibling().show;
                     return false;
                 }else if(!name){
                     alert("注册人姓名不能为空!");
@@ -144,7 +219,8 @@ var auth=(function(){
                 }else if(!pCode){
                     alert("图片验证码不能为空!");
                     return false;
-                }else if(!agree){
+                }else if(agree != "true"){
+                    alert("请同意");
                     return false;
                 }
                 API.onload(function(){
@@ -161,6 +237,11 @@ var auth=(function(){
                 })
             }
         }
+
+        $scope.toLogin = function(){
+            window.location.href = "#/auth/login";
+        }
+
     }
     return auth;
 })();
