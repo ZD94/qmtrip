@@ -142,7 +142,10 @@ travalPolicy.listAndPaginateTravalPolicy = function(params, options, callback){
     options.where = params;
     return travalPolicyModel.findAndCountAll(options)
         .then(function(result){
-            var pg = new Paginate(page, perPage, result.count, result.rows);
+            var items = result.rows.map(function(item) {
+                return item.toJSON();
+            })
+            var pg = new Paginate(page, perPage, result.count, items);
             return pg;
         })
         .nodeify(callback);

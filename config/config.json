@@ -28,10 +28,13 @@
   "upload":{
     "tmpDir": "${{ROOT_DIR}}/public/temp"
   },
-  "api": [
-    {
-      "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
-      "modules": "*"
-    }
-  ]
+  "api": {
+    "postgres": "${{postgres.url}}",
+    "remotes": [
+      {
+        "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
+        "modules": "*"
+      }
+    ]
+  }
 }
