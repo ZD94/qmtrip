@@ -12,8 +12,6 @@ var auth=(function(){
             var pwd  = $('#pwd').val();
             var commit = true;
             if(commit){
-                //alert(name);
-                //alert(pwd);
                 if(!name){
                     Myalert("提示", "登录名不能为空");
                     return false;
@@ -58,9 +56,6 @@ var auth=(function(){
         API.onload(function(){
             API.checkcode.getPicCheckCode({width:imgW,height:imgH,quality:100,length:4,type:1})
                 .then(function(result){
-                    //console.info(result);
-                    //console.info(result.data.captcha);
-                    //console.info(result.data.ticket);
                     $("#imgCode").attr("src",result.data.captcha);
                     picTicket = result.data.ticket;
                 }).catch(function(err){
@@ -82,10 +77,7 @@ var auth=(function(){
                 API.checkcode.getMsgCheckCode({mobile:mobile})
                     .then(function(result){
                         if(result.code == 0){
-                            //console.info(result.data.ticket);
-                            //console.info(result.data.mobile);
                             msgTicket = result.data.ticket;
-                            //return result.data.ticket;
                         }
                     }).catch(function(err){
                         console.info(err);
@@ -99,18 +91,15 @@ var auth=(function(){
             API.onload(function(){
                 API.checkcode.getPicCheckCode({width:imgW,height:imgH,quality:100,length:4,type:1})
                     .then(function(result){
-                        //console.info(result);
-                        //console.info(result.data.captcha);
-                        //console.info(result.data.ticket);
                         $("#imgCode").attr("src",result.data.captcha);
                         picTicket = result.data.ticket;
-                        //return result.data.ticket;
                     }).catch(function(err){
                         console.info(err);
                     }).done();
             })
         }
 
+        //提交注册检验
         $scope.register = function() {
             var cName  = $('#corpName').val();
             var name   = $('#corpRegistryName').val();
@@ -121,7 +110,7 @@ var auth=(function(){
             var pCode = $('#picCode').val();
             var agree = $('#check').attr('checkvalue');
             var commit = true;
-            var myreg = /^([\.a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/;
+            var reg = /^\w+[\w\-\.]+\w@\w[\w\-\.]+\w$/;
             if(commit){
                 if(!cName){
                     alert("企业名称不能为空!");
@@ -132,11 +121,10 @@ var auth=(function(){
                 }else if(!mail){
                     alert("企业邮箱不能为空!");
                     return false;
+                }else if(!reg.test(mail)){
+                    alert("邮箱格式不正确!");
+                    return false;
                 }
-                //else if(!myreg.test(mail.value)){
-                //    alert("邮箱格式不正确!");
-                //    return false;
-                //}
                 else if(!mobile){
                     alert("联系人电话不能为空!");
                     return false;
@@ -152,10 +140,9 @@ var auth=(function(){
                 }else if(!pCode){
                     alert("图片验证码不能为空!");
                     return false;
+                }else if(!agree){
+                    return false;
                 }
-                //else if(!agree){
-                //    return false;
-                //}
                 API.onload(function(){
                     API.auth.registryCompany({companyName:cName,name:name,email:mail,mobile:mobile,pwd:pwd,msgCode:mCode,msgTicket:msgTicket,picCode:pCode,picTicket:picTicket})
                         .then(function(result){

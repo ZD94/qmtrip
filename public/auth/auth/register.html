@@ -39,24 +39,23 @@
     <span ng-click="changePicCode()">换一换</span>
 </div>
 <div style="width:600px;margin:10px auto;">
-    <span><i id="check" class="web-icon-font" checkvalue="true">&#xf058;</i>同意<a href="">《途灵岛商旅注册协议》</a></span>
+    <span id="check1"><i id="check" class="web-icon-font" checkvalue="true">&#xf058;</i>同意<a href="">《途灵岛商旅注册协议》</a></span>
+    <span id="check2" style="display: none;"><i id="check" class="web-icon-font" checkvalue="false">&#xf057;</i>同意<a href="">《途灵岛商旅注册协议》</a></span>
 </div>
 <a href="#" class="register" ng-click="register()">立即注册</a>
-<div style="width: 600px;margin: 10px auto;text-align: center;">已有账号?登录</div>
+<div style="width: 600px;margin: 10px auto;text-align: center;"><a href="#/auth/login">已有账号?登录</a></div>
 
-<!--<script>-->
-    <!--$(function(){-->
-        <!--$("#check").click(function(){-->
-            <!--$(this).attr("id","check2");-->
-            <!--$(this).attr("checkvalue","false");-->
-            <!--$(this).html("&#xf057;");-->
-            <!--console.log(123);-->
-        <!--})-->
-        <!--$("#check2").click(function(){-->
-            <!--$(this).attr("id","check");-->
-            <!--$(this).attr("checkvalue","ture");-->
-            <!--$(this).html("&#xf058;");-->
-            <!--console.log(456);-->
-        <!--})-->
-    <!--})-->
-<!--</script>-->
+<script>
+    $(function(){
+        $("#check1").click(function(){
+            $(this).hide();
+            $("#check2").show();
+            console.log(123);
+        })
+        $("#check2").click(function(){
+            $(this).hide();
+            $("#check1").show();
+            console.log(456);
+        })
+    })
+</script>
