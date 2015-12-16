@@ -19,7 +19,7 @@ var agency = {};
  * @returns {*}
  */
 agency.createAgency = function(params, callback){
-    return checkParams(['createUser', 'name', 'logo', 'email'], params)
+    return checkParams(['createUser', 'name', 'email'], params)
         .then(function(){
             return agency.create(params)
                 .then(function(agency){

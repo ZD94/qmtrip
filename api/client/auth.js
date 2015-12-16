@@ -168,4 +168,26 @@ auth.registryCompany = function(params, callback) {
         .nodeify(callback);
 }
 
+/**
+ * 权限控制
+ * @param fn
+ * @param needPowers
+ * @returns {Function}
+ */
+function needPowersMiddleware(fn, needPowers) {
+    return function(params, callback) {
+        var self = this;
+        var accountId = self.accountId;
+        return API.power.checkPower({accountId: accountId, powers: needPowers})
+            .then(function(result) {
+                if (result.code) {
+                    throw result;
+                }
+                return fn.apply(self, params);
+            })
+            .nodeify(callback);
+    }
+}
+
 module.exports = auth;
+module.exports.needPowersMiddleware = needPowersMiddleware;

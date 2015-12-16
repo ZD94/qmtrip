@@ -16,7 +16,7 @@ var tripPlan = {};
  */
 tripPlan.savePlanOrder = function(params, callback){
     params.accountId = this.accountId;
-    logger.info(params);
+    params.type = 2;
     return API.tripPlan.savePlanOrder(params, callback);
 }
 
