@@ -329,6 +329,10 @@ COMMENT ON COLUMN company.money_changes.remark IS '变动原因';
 
 
 
+CREATE TABLE company.black_domains (
+    domain varchar(255) primary key
+);
+
 -- Completed on 2015-12-09 11:37:14 CST
 
 --

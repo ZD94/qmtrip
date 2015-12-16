@@ -133,26 +133,36 @@ auth.registryCompany = function(params, callback) {
                 })
         })
         .then(function(){
-            return authServer.newAccount({mobile: mobile, email: email, pwd: pwd})
+            var domain = email.split(/@/)[1];
+            return API.company.isBlackDomain({domain: domain})
                 .then(function(result) {
                     if (result.code) {
                         throw result;
+                    } else {
+                        return true;
                     }
-
-                    var domain = email.split(/@/)[1];
-                    var account = result.data;
-                    return createCompany({createUser: account.id, name: companyName, domainName: domain})
+                })
+                .then(function() {
+                    return authServer.newAccount({mobile: mobile, email: email, pwd: pwd})
                         .then(function(result) {
                             if (result.code) {
                                 throw result;
                             }
 
-                            var company = result.company;
-                            return createStaff({email: email, mobile: mobile, name: name, companyId: company.id, accountId: account.id})
+                            var account = result.data;
+                            return createCompany({createUser: account.id, name: companyName, domainName: domain})
+                                .then(function(result) {
+                                    if (result.code) {
+                                        throw result;
+                                    }
+
+                                    var company = result.company;
+                                    return createStaff({email: email, mobile: mobile, name: name, companyId: company.id, accountId: account.id})
+                                })
                         })
-                })
-                .then(function(result) {
-                    return {code: 0, msg: "OK"};
+                        .then(function(result) {
+                            return {code: 0, msg: "OK"};
+                        })
                 })
         })
         .nodeify(callback);

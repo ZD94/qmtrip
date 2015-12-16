@@ -44,6 +44,31 @@ company.createCompany = function(params, callback){
         }).nodeify(callback);
 }
 
+/**
+ * 是否在域名黑名单中
+ *
+ * @param {Object} params 参数
+ * @param {String} params.domain 域名
+ * @param {Function} callback 可选回调函数
+ * @return {Promise}
+ */
+company.isBlackDomain = function(params, callback) {
+    var domain = params.domain;
+    var defer = Q.defer();
+    if (!domain) {
+        defer.reject({code: -1, msg: "域名不存在或不合法"});
+        return defer.promise.nodeify(callback);
+    }
+
+    return Models.BlackDomain.findOne({where: {domain: domain}})
+        .then(function(result) {
+            if (result) {
+                return {code: -1, msg: "域名不能使用"}
+            }
+            return {code: 0, msg: "ok"};
+        })
+        .nodeify(callback);
+}
 
 /**
  * 更新企业信息
