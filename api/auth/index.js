@@ -1,5 +1,6 @@
 var Q = require("q");
-var Models = require("common/model").importModel("./models");
+var db = require("common/model").importModel("./models");
+var Models = db.models;
 var uuid = require("node-uuid");
 var L = require("../../common/language");
 var validate = require("../../common/validate");
@@ -190,16 +191,16 @@ authServer.authentication = function(params, callback) {
     var defer = Q.defer();
     if ((!params.userId && !params.user_id) || (!params.tokenId && !params.token_id)
         || !params.timestamp || (!params.tokenSign && !params.token_sign)) {
+        console.info("11111?")
         defer.resolve({code: -1, msg: "token expire"});
         return defer.promise.nodeify(callback);
     }
-
     var userId = params.userId || params.user_id;
     var tokenId = params.tokenId || params.token_id;
     var timestamp = params.timestamp;
     var tokenSign = params.tokenSign || params.token_sign;
 
-    return Models["Token"].findOne({where: {id: tokenId, accountId: userId}})
+    return Models.Token.findOne({where: {id: tokenId, accountId: userId}})
         .then(function(m) {
             if (!m) {
                 return {code: -1, msg: "已经失效"};
@@ -211,6 +212,15 @@ authServer.authentication = function(params, callback) {
             }
 
             return {code: -1, msg: "已经失效"};
+        })
+        .then(function(result) {
+            console.info("执行完了", result);
+            return result;
+        })
+        .catch(function(err) {
+            console.info("有啥错误了呢?");
+            console.info(err)
+            throw err;
         })
         .nodeify(callback);
 }
