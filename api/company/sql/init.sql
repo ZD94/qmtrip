@@ -119,12 +119,6 @@ COMMENT ON COLUMN company.telephone IS '企业电话';
 --
 COMMENT ON COLUMN company.mobile IS '联系手机';
 
---
--- TOC entry 1012 (class 0 OID 0)
--- Dependencies: 100
--- Name: COLUMN company.company_create_at; Type: COMMENT; Schema: company; Owner: -
---
-COMMENT ON COLUMN company.company_create_at IS '公司创建时间';
 
 --
 -- TOC entry 1013 (class 0 OID 0)
@@ -249,7 +243,7 @@ COMMENT ON COLUMN funds_accounts.is_set_pwd IS '是否设置过支付密码';
 
 --
 -- TOC entry 120 (class 0 OID 0)
--- Name: funds_accounts; Type: TABLE; Schema: company; Owner: -
+-- Name: money_changes; Type: TABLE; Schema: company; Owner: -
 --
 CREATE TABLE company.money_changes
 (
@@ -267,7 +261,7 @@ CREATE TABLE company.money_changes
 --
 -- TOC entry 1201 (class 0 OID 0)
 -- Dependencies: 120
--- Name: TABLE funds_accounts.is_set_pwd; Type: COMMENT; Schema: company; Owner: -
+-- Name: TABLE company.money_changes; Type: COMMENT; Schema: company; Owner: -
 --
 COMMENT ON TABLE company.money_changes IS '企业资金账户变动记录';
 
@@ -275,7 +269,7 @@ COMMENT ON TABLE company.money_changes IS '企业资金账户变动记录';
 --
 -- TOC entry 1202 (class 0 OID 0)
 -- Dependencies: 120
--- Name: TABLE funds_accounts.is_set_pwd; Type: COMMENT; Schema: company; Owner: -
+-- Name: TABLE money_changes.funds_account_id; Type: COMMENT; Schema: company; Owner: -
 --
 COMMENT ON COLUMN company.money_changes.funds_account_id IS '账户ID';
 
@@ -283,7 +277,7 @@ COMMENT ON COLUMN company.money_changes.funds_account_id IS '账户ID';
 --
 -- TOC entry 1203 (class 0 OID 0)
 -- Dependencies: 120
--- Name: TABLE funds_accounts.is_set_pwd; Type: COMMENT; Schema: company; Owner: -
+-- Name: TABLE money_changes.status; Type: COMMENT; Schema: company; Owner: -
 --
 COMMENT ON COLUMN company.money_changes.status IS '1.收入 -1.消费';
 
@@ -291,7 +285,7 @@ COMMENT ON COLUMN company.money_changes.status IS '1.收入 -1.消费';
 --
 -- TOC entry 1204 (class 0 OID 0)
 -- Dependencies: 120
--- Name: TABLE funds_accounts.is_set_pwd; Type: COMMENT; Schema: company; Owner: -
+-- Name: TABLE money_changes.money; Type: COMMENT; Schema: company; Owner: -
 --
 COMMENT ON COLUMN company.money_changes.money IS '变动金额';
 
@@ -299,7 +293,7 @@ COMMENT ON COLUMN company.money_changes.money IS '变动金额';
 --
 -- TOC entry 1205 (class 0 OID 0)
 -- Dependencies: 120
--- Name: TABLE funds_accounts.is_set_pwd; Type: COMMENT; Schema: company; Owner: -
+-- Name: TABLE money_changes.channel; Type: COMMENT; Schema: company; Owner: -
 --
 COMMENT ON COLUMN company.money_changes.channel IS '变动渠道(支付渠道)';
 
@@ -307,7 +301,7 @@ COMMENT ON COLUMN company.money_changes.channel IS '变动渠道(支付渠道)';
 --
 -- TOC entry 1206 (class 0 OID 0)
 -- Dependencies: 120
--- Name: TABLE funds_accounts.is_set_pwd; Type: COMMENT; Schema: company; Owner: -
+-- Name: TABLE money_changes.create_at; Type: COMMENT; Schema: company; Owner: -
 --
 COMMENT ON COLUMN company.money_changes.create_at IS '创建时间';
 
@@ -315,7 +309,7 @@ COMMENT ON COLUMN company.money_changes.create_at IS '创建时间';
 --
 -- TOC entry 1207 (class 0 OID 0)
 -- Dependencies: 120
--- Name: TABLE funds_accounts.is_set_pwd; Type: COMMENT; Schema: company; Owner: -
+-- Name: TABLE money_changes.user_id; Type: COMMENT; Schema: company; Owner: -
 --
 COMMENT ON COLUMN company.money_changes.user_id IS '操作人 0000..默认是系统';
 
@@ -323,7 +317,7 @@ COMMENT ON COLUMN company.money_changes.user_id IS '操作人 0000..默认是系
 --
 -- TOC entry 1208 (class 0 OID 0)
 -- Dependencies: 120
--- Name: TABLE funds_accounts.is_set_pwd; Type: COMMENT; Schema: company; Owner: -
+-- Name: TABLE money_changes.remark; Type: COMMENT; Schema: company; Owner: -
 --
 COMMENT ON COLUMN company.money_changes.remark IS '变动原因';
 
