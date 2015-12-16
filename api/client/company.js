@@ -4,7 +4,8 @@
 
 var API = require('../../common/api');
 var Logger = require('../../common/logger');
-var needPowersMiddleware = require('./auth').needPowersMiddleware;
+var auth = require('./auth');
+var needPowersMiddleware = auth.needPowersMiddleware;
 var logger = new Logger();
 
 var company = {}
