@@ -5,7 +5,7 @@
 var Q = require("q");
 var nodeXlsx = require("node-xlsx");
 var uuid = require("node-uuid");
-var sequelize = require("common/model").sequelize.importModel("./models").sequelize;
+var sequelize = require("common/model").importModel("./models");
 var staffModel = sequelize.models.Staff;
 var pointChange = sequelize.models.PointChange;
 var L = require("../../common/language");
@@ -411,6 +411,29 @@ staff.importExcel = function(params, callback){
                 })
         })
         .nodeify(callback);
+}
+
+/**
+ * 判断员工是否在企业中
+ * @param staffId
+ * @param companyId
+ * @param callback
+ * @returns {*}
+ */
+staff.isStaffInCompany = function(staffId, companyId, callback){
+    var defer = Q.defer();
+    return staffModel.findById(staffId, {attributes: ['companyId']})
+        .then(function(staff){
+            if(!staff){
+                defer.reject({code: 1, msg: '没有找到该员工'});
+                return defer.promise;
+            }
+            if(staff.companyId != companyId){
+                defer.reject({code: 2, msg: '员工不在该企业'});
+                return defer.promise;
+            }
+            return {code: 0, msg: true};
+        }).nodeify(callback);
 }
 
 

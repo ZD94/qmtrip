@@ -5,7 +5,7 @@
 
 var moment = require("moment");
 var Q = require("q");
-var Seeds = require("common/model").sequelize.importModel("./models").sequelize.models.Seeds;
+var Seeds = require("common/model").importModel("./models").models.Seeds;
 var Logger = require('../../common/logger');
 var logger = new Logger("seeds");
 

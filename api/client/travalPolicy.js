@@ -5,13 +5,12 @@
 
 var Q = require("q");
 var travalPolicyServer = require("../travalPolicy/index");
-var travalPolicyProxy = require("../travalPolicy/proxy/travalPolicy.proxy");
 var API = require("../../common/api");
 var travalPolicy = {};
 travalPolicy.createTravalPolicy = function(params, callback){
     var defer = Q.defer();
     var user_id = this.accountId;
-    travalPolicyProxy.getById(user_id)
+    travalPolicyServer.getTravalPolicy(user_id)
         .then(function(data){
             if(data){
                 params.companyId = data.dataValues.companyId;//此处可不可以用data.companyId

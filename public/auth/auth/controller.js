@@ -224,14 +224,31 @@ var auth=(function(){
                     return false;
                 }
                 API.onload(function(){
-                    API.auth.registryCompany({companyName:cName,name:name,email:mail,mobile:mobile,pwd:pwd,msgCode:mCode,msgTicket:msgTicket,picCode:pCode,picTicket:picTicket})
-                        .then(function(result){
-                            //console.info(result);
-                            if(result.code == 0){
-                                alert("注册成功");
-                                window.location.href = "#/auth/login";
+                    var domain = mail.split(/@/);
+                    if (domain && domain.length > 1) {
+                        domain = domain[1];
+                    } else {
+                        alert("邮箱不合法");
+                        return false;
+                    }
+
+                    API.auth.isBlackDomain({domain: domain})
+                        .then(function(result) {
+                            if (result.code) {
+                                alert("邮箱后缀不合法或者已被使用");
+                                return;
                             }
-                        }).catch(function(err){
+                            return API.auth.registryCompany({companyName:cName,name:name,email:mail,mobile:mobile,pwd:pwd,msgCode:mCode,msgTicket:msgTicket,picCode:pCode,picTicket:picTicket})
+                                .then(function(result){
+                                    //console.info(result);
+                                    if(result.code == 0){
+                                        alert("注册成功");
+                                        window.location.href = "#/auth/login";
+                                    }
+                                })
+
+                        })
+                        .catch(function(err){
                             console.info(err);
                         }).done();
                 })

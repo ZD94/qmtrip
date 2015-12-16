@@ -5,7 +5,6 @@
 
 var Q = require("q");
 var staffServer = require("../staff/index");
-var staffProxy = require("../staff/proxy/staff.proxy");
 var API = require("../../common/api");
 var staff = {};
 
@@ -26,10 +25,10 @@ function needPowersMiddleware(fn, needPowers) {
 
 staff.createStaff = needPowersMiddleware(function(params, callback) {
     var user_id = this.accountId;
-    return staffProxy.getById(user_id)
+    return staffServer.getStaff(user_id)
         .then(function(data){
             if(data){
-                params.companyId = data.dataValues.companyId;//此处可不可以用data.companyId
+                params.companyId = data.toJSON().companyId;
                 return staffServer.createStaff(params, callback);
             }else{
                 return staffServer.createStaff(params, callback);//员工注册的时候
