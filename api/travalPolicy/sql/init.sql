@@ -8,7 +8,8 @@ create table travalpolicy.traval_policy (
 	hotel_tevel varchar(50),
 	hotel_price numeric(15,2),
 	is_change_level boolean default false,
-	company_id uuid
+	company_id uuid,
+    create_at timestamp without time zone DEFAULT now() -- 创建时间
 );
 
 COMMENT ON TABLE travalpolicy.traval_policy
