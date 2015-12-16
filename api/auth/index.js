@@ -1,5 +1,5 @@
 var Q = require("q");
-var Models = require("common/model").sequelize.importModel("./models");
+var Models = require("common/model").importModel("./models");
 var uuid = require("node-uuid");
 var L = require("../../common/language");
 var validate = require("../../common/validate");

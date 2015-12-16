@@ -2,8 +2,8 @@
  * Created by yumiao on 15-12-9.
  */
 var Q = require('q');
-var Models = require("common/model").sequelize.importModel("./models");
-var Agency = Models.Agency;
+var sequelize = require("common/model").importModel("./models");
+var Agency = sequelize.models.Agency;
 var uuid = require("node-uuid");
 var L = require("../../common/language");
 var Logger = require('../../common/logger');
@@ -21,7 +21,7 @@ var agency = {};
 agency.createAgency = function(params, callback){
     return checkParams(['createUser', 'name', 'email'], params)
         .then(function(){
-            return agency.create(params)
+            return Agency.create(params)
                 .then(function(agency){
                     return {code: 0, msg: '', agency: agency.dataValues};
                 })
@@ -43,7 +43,7 @@ agency.updateAgency = function(params, callback){
             var userId = params.userId;
             delete params.agencyId;
             delete params.userId;
-            return agency.findById(agencyId, {attributes: ['createUser']})
+            return Agency.findById(agencyId, {attributes: ['createUser']})
                 .then(function(agency){
                     if(!agency){
                         defer.reject(L.ERR.AGENCY_NOT_EXIST);
@@ -55,7 +55,7 @@ agency.updateAgency = function(params, callback){
                     }
                     params.updateAt = utils.now();
                     var cols = getColumns(params);
-                    return agency.update(params, {returning: true, where: {id: agencyId}, fields: cols})
+                    return Agency.update(params, {returning: true, where: {id: agencyId}, fields: cols})
                         .then(function(ret){
                             logger.info("update fields=>", ret);
                             if(!ret[0] || ret[0] == "NaN"){
@@ -80,7 +80,7 @@ agency.getAgency = function(params, callback){
         .then(function(){
             var agencyId = params.agencyId;
             var userId = params.userId;
-            return agency.find({where: {id: agencyId}})
+            return Agency.find({where: {id: agencyId}})
                 .then(function(ret){
                     return {code: 0, msg: '', agency: ret.dataValues};
                 })
@@ -99,7 +99,7 @@ agency.listAgency = function(params, callback){
             //var agencyId = params.agencyId;
             var userId = params.userId;
             delete params.userId;
-            return agency.findAll({where: params})
+            return Agency.findAll({where: params})
                 .then(function(ret){
                     return {code: 0, msg: '', agencys: ret};
                 })
@@ -118,7 +118,7 @@ agency.deleteAgency = function(params, callback){
         .then(function(){
             var agencyId = params.agencyId;
             var userId = params.userId;
-            return agency.findById(agencyId, {attributes: ['createUser']})
+            return Agency.findById(agencyId, {attributes: ['createUser']})
                 .then(function(agency){
                     if(!agency){
                         defer.reject(L.ERR.AGENCY_NOT_EXIST);
@@ -128,7 +128,7 @@ agency.deleteAgency = function(params, callback){
                         defer.reject(L.ERR.PERMISSION_DENY);
                         return defer.promise;
                     }
-                    return agency.destroy({where: {id: agencyId}})
+                    return Agency.destroy({where: {id: agencyId}})
                         .then(function(){
                             return {code: 0, msg: '删除成功'};
                         })

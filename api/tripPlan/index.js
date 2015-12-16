@@ -3,7 +3,7 @@
  */
 
 var Q = require("q");
-var sequelize = require("common/model").sequelize.importModel("./models").sequelize;
+var sequelize = require("common/model").importModel("./models");
 var Models = sequelize.models;
 var PlanOrder = Models.TripPlanOrder;
 var ConsumeDetails = Models.ConsumeDetails
