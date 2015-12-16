@@ -2,8 +2,8 @@
  * Created by wlh on 15/12/9.
  */
 
-var auth = require("../../../api/client/auth");
-var authServer = require("../../../api/auth");
+var auth = require("api/client/auth");
+var authServer = require("api/auth");
 
 var assert = require("assert");
 
