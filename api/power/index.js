@@ -6,7 +6,7 @@
 
 var services = {};
 var API = require("../../common/api");
-var db = require("./models").sequelize;
+var db = require("common/model").sequelize.importModel("./models").sequelize;
 var Q = require("q");
 
 var STAFF_POWER = 1;   //员工权限 1

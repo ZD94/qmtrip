@@ -33,6 +33,8 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/', require('./routes/index'));
+
 var start_time = new Date();
 var cluster = require('cluster');
 var VERSION = {VERSION:'dev', GITVERSION:'dev'};

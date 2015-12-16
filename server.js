@@ -15,6 +15,9 @@ var Logger = require('common/logger');
 Logger.init(config.logger);
 var logger = new Logger('main');
 
+var model = require('common/model');
+model.sequelize.init(config.postgres.url);
+
 var Server = require('common/server');
 var server = new Server(config.appName, config.pid_file);
 

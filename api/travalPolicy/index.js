@@ -3,10 +3,10 @@
  */
 'use strict';
 var Q = require("q");
-var db = require("./models").sequelize;
+var db = require("common/model").sequelize.importModel("./models").sequelize;
 var travalPolicyModel = db.models.TravalPolicy;
+var Paginate = require("../../common/paginate").Paginate;
 var uuid = require("node-uuid");
-var travalPolicyProxy = require("./proxy/travalPolicy.proxy");
 var L = require("../../common/language");
 var API = require("../../common/api");
 var travalPolicy = {};
@@ -20,7 +20,7 @@ var travalPolicy = {};
 travalPolicy.createTravalPolicy = function(data, callback){
     return checkParams(["name","planeLevel","planeDiscount","trainLevel","hotelTevel","hotelPrice","companyTd"], data)
         .then(function(){
-            return travalPolicyProxy.create(data)
+            return travalPolicyModel.create(data)
                 .then(function(obj){
                     return {code: 0, travalPolicy: obj.dataValues};
                 })
@@ -41,7 +41,7 @@ travalPolicy.deleteTravalPolicy = function(params, callback){
         defer.reject({code: -1, msg: "id不能为空"});
         return defer.promise.nodeify(callback);
     }
-    return travalPolicyProxy.deleteById(id)
+    return travalPolicyModel.destroy({where: {id: id}})
         .then(function(obj){
             return {code: 0, msg: "删除成功"}
         })
@@ -61,7 +61,10 @@ travalPolicy.updateTravalPolicy = function(id, data, callback){
         defer.reject({code: -1, msg: "id不能为空"});
         return defer.promise.nodeify(callback);
     }
-    return travalPolicyProxy.update(id, data)
+    var options = {};
+    options.where = {id: id};
+    options.returning = true;
+    return travalPolicyModel.update(data, options)
         .then(function(obj){
             return {code: 0, travalPolicy: obj[1].dataValues, msg: "更新成功"}
         })
@@ -80,7 +83,7 @@ travalPolicy.getTravalPolicy = function(id, callback){
         defer.reject({code: -1, msg: "id不能为空"});
         return defer.promise.nodeify(callback);
     }
-    return travalPolicyProxy.getById(id)
+    return travalPolicyModel.findById(id)
         .then(function(obj){
             return {code: 0, travalPolicy: obj.dataValues}
         })
@@ -117,9 +120,30 @@ travalPolicy.listAndPaginateTravalPolicy = function(params, options, callback){
     if (!options) {
         options = {};
     }
-    return travalPolicyProxy.listAndPaginateTravalPolicy(params, options)
-        .then(function(paginate){
-            return paginate;
+
+    var page, perPage, limit, offset;
+    if (options.page && /^\d+$/.test(options.page)) {
+        page = options.page;
+    } else {
+        page = 1;
+    }
+    if (options.perPage && /^\d+$/.test(options.perPage)) {
+        perPage = options.perPage;
+    } else {
+        perPage = 6;
+    }
+    limit = perPage;
+    offset = (page - 1) * perPage;
+    if (!options.order) {
+        options.order = [["create_at", "desc"]]
+    }
+    options.limit = limit;
+    options.offset = offset;
+    options.where = query;
+    return travalPolicyModel.findAndCountAll(options)
+        .then(function(result){
+            var pg = new Paginate(page, perPage, result.count, result.rows);
+            return pg;
         })
         .nodeify(callback);
 }
