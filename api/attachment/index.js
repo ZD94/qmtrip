@@ -3,8 +3,8 @@
  */
 'use strict';
 var Q = require("q");
-var Models = require("common/model").sequelize.importModel("./models");
-var attachmentModel = Models.Attachment;
+var sequelize = require("common/model").importModel("./models");
+var attachmentModel = sequelize.models.Attachment;
 var Paginate = require("../../common/paginate").Paginate;
 var L = require("../../common/language");
 var API = require("../../common/api");
