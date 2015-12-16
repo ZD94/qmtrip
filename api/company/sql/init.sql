@@ -119,12 +119,6 @@ COMMENT ON COLUMN company.telephone IS '企业电话';
 --
 COMMENT ON COLUMN company.mobile IS '联系手机';
 
---
--- TOC entry 1012 (class 0 OID 0)
--- Dependencies: 100
--- Name: COLUMN company.company_create_at; Type: COMMENT; Schema: company; Owner: -
---
-COMMENT ON COLUMN company.company_create_at IS '公司创建时间';
 
 --
 -- TOC entry 1013 (class 0 OID 0)
