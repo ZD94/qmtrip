@@ -10,17 +10,17 @@ var travalPolicy = {};
 travalPolicy.createTravalPolicy = function(params, callback){
     var defer = Q.defer();
     var user_id = this.accountId;
-    travalPolicyServer.getTravalPolicy(user_id)
+    return API.staff.getStaff(user_id)
         .then(function(data){
             if(data){
-                params.companyId = data.dataValues.companyId;//此处可不可以用data.companyId
+                params.companyId = data.companyId;//此处可不可以用data.companyId
                 return travalPolicyServer.createTravalPolicy(params, callback);
             }else{
                 defer.reject({code: -1, msg: '无权限'});
                 return defer.promise;
             }
         })
-}
+};
 travalPolicy.deleteTravalPolicy = travalPolicyServer.deleteTravalPolicy;
 travalPolicy.updateTravalPolicy = travalPolicyServer.updateTravalPolicy;
 travalPolicy.getTravalPolicy = travalPolicyServer.getTravalPolicy;

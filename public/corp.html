@@ -6,6 +6,7 @@
 	<title ng-bind="pageTitle"></title>
 	<link rel="stylesheet" type="text/css" href="/corp/css/common.css">
 	<link rel="stylesheet" type="text/css" href="/corp/css/public.css">
+	<link rel="stylesheet" type="text/css" href="/corp/css/criterionlist.css">
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
 	<script type="text/javascript">
         var jQuery = $ = require('jquery');
@@ -15,6 +16,7 @@
     <script type="text/javascript" src="/script/libs/api.js"></script>
     <script type="text/javascript" src="/script/libs/ngapp.js"></script>
     <script type="text/javascript" src="/script/messagebox.js"></script>
+    <script type="text/javascript" src="/script/selectbox.js"></script>
     <script type="text/javascript" src="/corp/controller.all.js"></script>
     <script type="text/javascript">
     	var Q = require('q');
@@ -28,6 +30,7 @@
     	TLD.controller("MainController", ["$scope", function($scope) {
     		API.require("company");
     		API.onload(function(){
+				console.info ("-------------------");
     			API.company.getCompany("d674f130-a236-11e5-8246-c3a1e3bc94c3")
     				.then(function(ret){
     					console.info(ret);
