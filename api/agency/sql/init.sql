@@ -168,7 +168,7 @@ create table agency.agency_user (
 -- Dependencies: 110
 -- Name: COLUMN agency.name; Type: COMMENT; Schema: agency; Owner: -
 --
-COMMENT ON COLUMN agency.name IS '姓名';
+COMMENT ON COLUMN agency.agency_user.name IS '姓名';
 
 
 --
@@ -176,7 +176,7 @@ COMMENT ON COLUMN agency.name IS '姓名';
 -- Dependencies: 110
 -- Name: COLUMN agency.sex; Type: COMMENT; Schema: agency; Owner: -
 --
-COMMENT ON COLUMN agency.sex IS '性别';
+COMMENT ON COLUMN agency.agency_user.sex IS '性别';
 
 
 --
@@ -184,7 +184,7 @@ COMMENT ON COLUMN agency.sex IS '性别';
 -- Dependencies: 110
 -- Name: COLUMN agency.mobile; Type: COMMENT; Schema: agency; Owner: -
 --
-COMMENT ON COLUMN agency.mobile IS '手机';
+COMMENT ON COLUMN agency.agency_user.mobile IS '手机';
 
 
 --
@@ -192,7 +192,7 @@ COMMENT ON COLUMN agency.mobile IS '手机';
 -- Dependencies: 110
 -- Name: COLUMN agency.email; Type: COMMENT; Schema: agency; Owner: -
 --
-COMMENT ON COLUMN agency.email IS '邮箱';
+COMMENT ON COLUMN agency.agency_user.email IS '邮箱';
 
 
 -- Completed on 2015-12-09 11:37:14 CST
