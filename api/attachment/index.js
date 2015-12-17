@@ -161,4 +161,7 @@ function checkParams(checkArray, params, callback){
     defer.resolve({code: 0});
     return defer.promise.nodeify(callback);
 }
+
+attachment.__initHttpApp = require('./upload');
+
 module.exports = attachment;
