@@ -16,11 +16,8 @@
     <script type="text/javascript" src="/script/libs/api.js"></script>
     <script type="text/javascript" src="/script/libs/ngapp.js"></script>
     <script type="text/javascript" src="/script/messagebox.js"></script>
-<<<<<<< HEAD
     <script type="text/javascript" src="/script/selectbox.js"></script>
-=======
     <script type="text/javascript" src="/script/header.js"></script>
->>>>>>> 6dffc56e642577f4a92f012fc5997fff8895b9da
     <script type="text/javascript" src="/corp/controller.all.js"></script>
     <script type="text/javascript">
     	var Q = require('q');
@@ -35,12 +32,7 @@
     		API.require("company");
     		API.require("staff");
     		API.onload(function(){
-<<<<<<< HEAD
-				console.info ("-------------------");
-    			API.company.getCompany("d674f130-a236-11e5-8246-c3a1e3bc94c3")
-=======
     			API.staff.getCurrentStaff()
->>>>>>> 6dffc56e642577f4a92f012fc5997fff8895b9da
     				.then(function(ret){
     					$scope.staff = ret.staff;
     					var company_id = ret.staff.companyId;
@@ -59,7 +51,6 @@
     				.catch(function(err){
     					console.info(err)
     				})
-    			.done
     		})
     	}])
     </script>
