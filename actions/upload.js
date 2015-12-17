@@ -82,7 +82,7 @@ function uploadActionFile(req, res, next) {
                 })*/
         }
     });
-};
+}
 
 function getImg(req, res, next) {
     var md5key = req.params.md5key;
@@ -104,7 +104,9 @@ function getImg(req, res, next) {
             }
         })
         .catch(next).done();
+}
+
+module.exports = function(app){
+    app.post('/upload/ajax-upload-file', uploadActionFile);
 };
 
-exports.uploadActionFile = uploadActionFile;
-exports.getImg = getImg;
