@@ -1,14 +1,54 @@
-@import "../../css/common.less";
+@import "common.less";
 .staff_header{
 	position: fixed;
 	top: 0;
 	width: 100%;
 	min-width: 1080px;
 	background: #fff;
-	height: 79px;
+	height: 80px;
 	line-height: 80px;
 	border-bottom: 1px solid #e5e5e5;
 	.s_header_main{
-		
+		margin: 0 auto;
+		width: 1000px;
+		.staff_logo{
+			float: left;
+			margin-right: 33px;
+			img{
+				vertical-align: middle;
+				width: 134px;
+			}
+			
+		}
+		.staff_menu_t{
+			height: 80px;
+			line-height: 80px;
+			a{
+				font-size: 16px;
+				color: #4a4a4a;
+				li{
+					float: left;
+					text-align: center;
+					width: 120px;
+					&.on{
+						color: #01bdff;
+						border-top: 4px solid #118fd6;
+						height: 76px;
+						line-height: 72px;
+						background: #f9f9f9;
+					}
+				}
+				&.tobusiness{
+					display: inline-block;
+					height: 36px;
+					line-height: 36px;
+					width: 100px;
+					border-radius: 4px;
+					background: #118fd6;
+					color: #fff;
+					text-align: center;
+				}
+			}
+		}
 	}
 }

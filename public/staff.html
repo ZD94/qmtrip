@@ -40,9 +40,9 @@
     </script>
     <script type="text/javascript">
     $(function(){
-    	$(".left_nav a").click(function(){
+    	$(".staff_menu_t a").click(function(){
     		var $that = $(this);
-    		$(".left_nav li").removeClass("on");
+    		$(".staff_menu_t li").removeClass("on");
     		$that.addClass("on");
     	})
     })
@@ -50,7 +50,27 @@
 </head>
 <body ng-controller="MainController">
 	<div class="staff_header">
-		<div class="s_header_main"></div>
+		<div class="s_header_main">
+			<div class="staff_logo">
+				<a href="/">
+					<img src="staff/images/qmtrip.png">
+				</a>
+			</div>
+			<div class="staff_menu_t">
+				<ul>
+					<a href=""><li class="on">首页</li></a>
+					<a href=""><li>出差记录</li></a>
+					<a href=""><li>积分兑换</li></a>
+					<a href="" class="tobusiness">我要出差</a>
+				</ul>
+			</div>
+			<div class="staff_header_r">
+				
+			</div>
+		</div>
+	</div>
+	<div class="staff_content">
+		
 	</div>
 </body>
 </html>

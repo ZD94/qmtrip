@@ -39,13 +39,13 @@ company.updateCompany = needPowersMiddleware(function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.getCompany = needPowersMiddleware(function(companyId, callback){
+company.getCompany = function(companyId, callback){
     var params = {
         companyId: companyId,
         userId: this.accountId
     }
     return API.company.getCompany(params, callback);
-}, ["company.query"]);
+};
 
 /**
  * 根据查询条件获取企业列表
