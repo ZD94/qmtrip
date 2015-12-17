@@ -146,6 +146,55 @@ COMMENT ON COLUMN agency.remark IS '备注';
 ALTER sequence agency.agency_agency_no_seq restart with 101;
 
 
+--
+-- TOC entry 110 (class 0 OID 0)
+-- Name: agency; Type: TABLE; Schema: agency; Owner: -
+--
+create table agency.agency_user (
+    id uuid primary key,
+    name varchar(50),
+    sex integer DEFAULT 1,
+    mobile character varying(20), -- 手机
+    email character varying(50), -- 邮箱
+    avatar text,
+    company_id uuid,
+    role_id integer, -- 权限
+    create_at timestamp without time zone DEFAULT now() -- 创建时间
+);
+
+
+--
+-- TOC entry 1101 (class 0 OID 0)
+-- Dependencies: 110
+-- Name: COLUMN agency.name; Type: COMMENT; Schema: agency; Owner: -
+--
+COMMENT ON COLUMN agency.name IS '姓名';
+
+
+--
+-- TOC entry 1102 (class 0 OID 0)
+-- Dependencies: 110
+-- Name: COLUMN agency.sex; Type: COMMENT; Schema: agency; Owner: -
+--
+COMMENT ON COLUMN agency.sex IS '性别';
+
+
+--
+-- TOC entry 1103 (class 0 OID 0)
+-- Dependencies: 110
+-- Name: COLUMN agency.mobile; Type: COMMENT; Schema: agency; Owner: -
+--
+COMMENT ON COLUMN agency.mobile IS '手机';
+
+
+--
+-- TOC entry 1104 (class 0 OID 0)
+-- Dependencies: 110
+-- Name: COLUMN agency.email; Type: COMMENT; Schema: agency; Owner: -
+--
+COMMENT ON COLUMN agency.email IS '邮箱';
+
+
 -- Completed on 2015-12-09 11:37:14 CST
 
 --

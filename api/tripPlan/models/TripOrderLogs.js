@@ -11,7 +11,7 @@ module.exports = function (Db, DataType) {
         orderId     : {type: DataType.UUID,             field: "order_id"}, //计划单id
         userId      : {type: DataType.UUID,             field: "user_id"}, //操作人id
         remark      : {type: DataType.STRING,           field: "remark"}, //操作备注
-        createAt    : {type: "timestamp without time zone", field: "create_at", defaultValue: now}, //创建时间
+        createAt    : {type: "timestamp without time zone", field: "create_at", defaultValue: now} //创建时间
     }, {
         tableName : "trip_order_logs",
         timestamps: false,
