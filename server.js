@@ -32,7 +32,6 @@ if(config.socket_file){
 server.api_path = path.join(__dirname, 'api');
 server.api_port = config.apiPort;
 server.api_config = config.api;
-server.dbUrl = config.postgres.url;
 
 server.start();
 
