@@ -130,3 +130,51 @@
 | code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
 | agency   | 代理商信息|json
+
+
+>. 更新代理商 API.agency.updateAgency(agency, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| agency                                | 代理商             |json              |------
+| agency.agencyId                      |代理商id               |uuid             |必填
+| agency.name                        | 代理商名称              |varchar               |选填
+| agency.description                        | 描述              |varchar               |选填
+| agency.mobile                        | 代理商手机              |varchar               |选填
+| agency.email                          |代理商邮箱           |varchar               |选填
+| agency.telephone                          |固话           |varchar               |选填
+| agency.remark                          |备注           |varchar               |选填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code     | 返回代码0正确 其他错误 |
+| msg     | 提示信息 |
+| agency   | 代理商信息|json
+
+
+>. 获取代理商信息 API.agency.getAgencyById(agency, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| agencyId                      |代理商id               |uuid             |必填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code     | 返回代码0正确 其他错误 |
+| msg     | 提示信息 |
+| agency   | 代理商信息|json
+
+
+>. 删除代理商 API.agency.deleteAgency(agency, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| agencyId                      |代理商id               |uuid             |必填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code     | 返回代码0正确 其他错误 |
+| msg     | 提示信息 |
