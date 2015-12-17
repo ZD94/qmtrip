@@ -4,7 +4,7 @@
   "description": "qmtrip",
   "main": "server.js",
   "scripts": {
-    "test": "mocha --harmony test",
+    "test": "mocha --delay test",
     "start": "node --harmony server.js dev"
   },
   "repository": {

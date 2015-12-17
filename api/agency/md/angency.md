@@ -5,13 +5,13 @@
 ---
 
 ```
-   在controller里引用 API.require('angencyUser');
+   在controller里引用 API.require('angency');
 ```
 
 ### Client API列表
 ---
 
->. 创建代理商 API.agencyUser.createAgency(params, callback);
+>. 创建代理商 API.agency.createAgency(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -30,7 +30,7 @@
 | msg     | 提示信息 |
 | agency   | 代理商信息|json
 
->. 删除代理商 API.agencyUser.deleteAgency(params, callback);
+>. 删除代理商 API.agency.deleteAgency(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -43,7 +43,7 @@
 | code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
 
->. 修改代理商信息 API.agencyUser.updateAgency(id, params, callback);
+>. 修改代理商信息 API.agency.updateAgency(id, params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -63,7 +63,7 @@
 | msg     | 提示信息 |
 | agency   | 代理商信息|json
 
->. 查询代理商信息 API.agencyUser.getAgency(id,callback);
+>. 查询代理商信息 API.agency.getAgency(id,callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -76,7 +76,7 @@
 | msg     | 提示信息 |
 | agency   | 代理商信息|json
 
->. 查询代理商信息 API.agencyUser.getCurrentAgency(callback);
+>. 查询代理商信息 API.agency.getCurrentAgency(callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -86,7 +86,7 @@
 |---------|------|-----|
 | agency   | 代理商信息|json
 
->. 分页查询代理商信息 API.agencyUser.listAndPaginateAgency(params, options, callback);
+>. 分页查询代理商信息 API.agency.listAndPaginateAgency(params, options, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
