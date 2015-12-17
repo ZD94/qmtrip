@@ -3,6 +3,6 @@
  */
 
 //require("./tripPlan/index.test");
-//require("./client/index.test");
-//require("./mail/index.test");
-require("./company/index.test");
+require("./client/index.test");
+require("./mail/index.test");
+//require("./company/index.test");

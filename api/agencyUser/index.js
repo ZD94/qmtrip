@@ -48,7 +48,7 @@ agency.createAgency = function(data, callback){
                 data.id = acc.data.id;
                 return agencyModel.create(data)
                     .then(function(obj){
-                        return {code: 0, agency: obj.dataValues};
+                        return {code: 0, agency: obj.toJSON()};
                     })
             }
         })
@@ -98,7 +98,7 @@ agency.updateAgency = function(id, data, callback){
     options.returning = true;
     return agencyModel.update(data, options)
         .then(function(obj){
-            return {code: 0, agency: obj[1].dataValues, msg: "更新成功"}
+            return {code: 0, agency: obj[1].toJSON(), msg: "更新成功"}
         })
         .nodeify(callback);
 }
@@ -156,7 +156,7 @@ agency.listAndPaginateAgency = function(params, options, callback){
     }
     options.limit = limit;
     options.offset = offset;
-    options.where = query;
+    options.where = params;
     return agencyModel.findAndCountAll(options)
         .then(function(result){
             var pg = new Paginate(page, perPage, result.count, result.rows);
