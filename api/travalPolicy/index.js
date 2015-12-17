@@ -41,7 +41,7 @@ travalPolicy.deleteTravalPolicy = function(params, callback){
         defer.reject({code: -1, msg: "id不能为空"});
         return defer.promise.nodeify(callback);
     }
-    return travalPolicyModel.destroy({where: {id: id}})
+    return travalPolicyModel.destroy({where: params})
         .then(function(obj){
             return {code: 0, msg: "删除成功"}
         })
