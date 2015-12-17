@@ -15,6 +15,7 @@
     <script type="text/javascript" src="/script/libs/api.js"></script>
     <script type="text/javascript" src="/script/libs/ngapp.js"></script>
     <script type="text/javascript" src="/script/messagebox.js"></script>
+    <script type="text/javascript" src="/script/header.js"></script>
     <script type="text/javascript" src="/corp/controller.all.js"></script>
     <script type="text/javascript">
     	var Q = require('q');
@@ -29,7 +30,6 @@
     		API.require("company");
     		API.require("staff");
     		API.onload(function(){
-    		console.info("222222222222")
     			API.staff.getCurrentStaff()
     				.then(function(ret){
     					$scope.staff = ret.staff;

@@ -14,3 +14,5 @@ public/agency/*.css
 public/agency/*.css.map
 public/staff/css/*.css
 public/staff/css/*.css.map
+public/business/css/*.css
+public/business/css/*.css.map

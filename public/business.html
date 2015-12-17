@@ -4,7 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title ng-bind="pageTitle"></title>
-	<link rel="stylesheet" type="text/css" href="/staff/css/public.css">
+	<link rel="stylesheet" type="text/css" href="/business/css/public.css">
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
 	<script type="text/javascript">
         var jQuery = $ = require('jquery');
@@ -15,7 +15,7 @@
     <script type="text/javascript" src="/script/libs/ngapp.js"></script>
     <script type="text/javascript" src="/script/messagebox.js"></script>
     <script type="text/javascript" src="/script/header.js"></script>
-    <script type="text/javascript" src="/staff/controller.all.js"></script>
+    <script type="text/javascript" src="/business/controller.all.js"></script>
     <script type="text/javascript">
     	var Q = require('q');
     	var moment = require('moment');
@@ -59,10 +59,10 @@
 			</div>
 			<div class="staff_menu_t">
 				<ul>
-					<a href=""><li class="on">首页</li></a>
+					<a href=""><li>首页</li></a>
 					<a href=""><li>出差记录</li></a>
 					<a href=""><li>积分兑换</li></a>
-					<a href="" class="tobusiness">我要出差</a>
+                    <a href=""><li class="on">我要出差</li></a>
 				</ul>
 			</div>
 			<div class="staff_header_r">
@@ -76,8 +76,8 @@
 			</div>
 		</div>
 	</div>
-	<div class="staff_content">
-		
+	<div class="business_content">
+		<div id="angular-view" ng-view></div>
 	</div>
 </body>
 </html>
