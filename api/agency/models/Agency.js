@@ -11,7 +11,6 @@ module.exports = function(Db, DataType) {
         agencyNo   : {type: DataType.STRING(30),    field: "agency_no"},
         createUser : {type: DataType.UUID,          field: "create_user"}, //代理商创建人
         name       : {type: DataType.STRING(100) }, //代理商名称
-        logo       : {type: DataType.STRING }, //代理商logo
         description: {type: DataType.TEXT }, //代理商描述
         status     : {type: DataType.INTEGER,       defaultValue: 0 }, //代理商状态
         address    : {type: DataType.STRING }, //代理商地址

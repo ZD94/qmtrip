@@ -6,6 +6,7 @@
 	<title ng-bind="pageTitle"></title>
 	<link rel="stylesheet" type="text/css" href="/corp/css/common.css">
 	<link rel="stylesheet" type="text/css" href="/corp/css/public.css">
+	<link rel="stylesheet" type="text/css" href="/corp/css/criterionlist.css">
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
 	<script type="text/javascript">
         var jQuery = $ = require('jquery');
@@ -15,6 +16,7 @@
     <script type="text/javascript" src="/script/libs/api.js"></script>
     <script type="text/javascript" src="/script/libs/ngapp.js"></script>
     <script type="text/javascript" src="/script/messagebox.js"></script>
+    <script type="text/javascript" src="/script/selectbox.js"></script>
     <script type="text/javascript" src="/script/header.js"></script>
     <script type="text/javascript" src="/corp/controller.all.js"></script>
     <script type="text/javascript">
@@ -49,7 +51,6 @@
     				.catch(function(err){
     					console.info(err)
     				})
-    			.done
     		})
     	}])
     </script>

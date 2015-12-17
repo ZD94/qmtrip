@@ -22,11 +22,12 @@ var agency = {};
  * @returns {*}
  */
 agency.createAgency = function(params, callback){
-    return checkParams(['createUser', 'name', 'email'], params)
+    return checkParams(['createUser', 'name'], params)
         .then(function(){
             return Agency.create(params)
                 .then(function(agency){
-                    return {code: 0, msg: '', agency: agency.dataValues};
+                    var agency = agency.toJSON();
+                    return {code: 0, msg: '', agency: agency};
                 })
         }).nodeify(callback);
 }
@@ -60,12 +61,11 @@ agency.updateAgency = function(params, callback){
                     var cols = getColumns(params);
                     return Agency.update(params, {returning: true, where: {id: agencyId}, fields: cols})
                         .then(function(ret){
-                            logger.info("update fields=>", ret);
                             if(!ret[0] || ret[0] == "NaN"){
                                 defer.reject({code: -2, msg: '更新代理商信息失败'});
                                 return defer.promise;
                             }
-                            var agency = ret[1][0].dataValues;
+                            var agency = ret[1][0].toJSON();
                             return {code: 0, msg: '更新代理商信息成功', agency: agency};
                         })
                 })

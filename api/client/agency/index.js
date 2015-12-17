@@ -11,7 +11,7 @@ var agency = {}
 //agency.__public = true;
 
 /**
- * 创建企业
+ * 创建代理商
  * @param params
  * @param callback
  * @returns {*}
@@ -22,7 +22,7 @@ agency.createAgency = function(params, callback){
 }
 
 /**
- * 更新企业信息
+ * 更新代理商信息
  * @param params
  * @param callback
  * @returns {*}
@@ -33,12 +33,12 @@ agency.updateAgency = function(params, callback){
 }
 
 /**
- * 获取企业信息
+ * 获取代理商信息
  * @param agencyId
  * @param callback
  * @returns {*}
  */
-agency.getAgency = function(agencyId, callback){
+agency.getAgencyById = function(agencyId, callback){
     var params = {
         agencyId: agencyId,
         userId: this.accountId
@@ -47,7 +47,7 @@ agency.getAgency = function(agencyId, callback){
 }
 
 /**
- * 根据查询条件获取企业列表
+ * 根据查询条件获取代理商列表
  * @param params
  * @param callback
  * @returns {*}
@@ -58,7 +58,7 @@ agency.listAgency = function(params, callback){
 }
 
 /**
- * 删除企业信息
+ * 删除代理商信息
  * @param agencyId
  * @param callback
  * @returns {*}
