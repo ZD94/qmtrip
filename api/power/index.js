@@ -28,7 +28,6 @@ services.getPowerList = function(data, callback) {
     return API.staff.getStaff(accountId)
         .then(function(result) {
             var staff = result.staff;
-            console.info(staff);
             return API.company.getCompany({companyId: staff.companyId, userId: accountId})
                 .then(function(result) {
                     var company = result.company;
@@ -91,28 +90,34 @@ function _getRolePowerList(role, callback) {
  * @param {Object} params
  * @param {UUID} params.accountId 账号ID
  * @param {String} params.powers 要检查的权限
+ * @param {String} params.type 权限所属 1.企业 2.代理商 默认 1.企业
  * @param {Function} callback {code: 0, msg: "ok"}, {code: -1, msg: "权限不足"};
  */
 services.checkPower = function(params, callback) {
-    console.info("call checkpower...")
     var accountId = params.accountId;
     var needPowers = params.powers;
     var defer = Q.defer();
 
     if (!needPowers || !needPowers.length) {
-        defer.resolve({code: 0, msg: "YES"});
-        console.info("到这里了...")
+        defer.resolve({code: 0, msg: "OK"});
         return defer.promise.nodeify(callback);
     }
 
     if (typeof needPowers == 'string') {
         needPowers = [needPowers];
     }
+    var type = params.type || 1;
+    //如果要验证代理商权限,直接返回True
+    //todo 实现代理商权限认证
+    if (type == 2) {
+        defer.resolve({code: 0, msg: "OK"});
+        return defer.promise.nodeify(callback);
+    }
+
     return services.getPowerList({accountId: accountId})
         .then(function(result) {
-            console.info(result);
             var powers = result.data.powers;
-            var result = true;
+            result = true;
 
             for(var i= 0, ii=needPowers.length; i<ii; i++) {
                 var needPower = needPowers[i];
