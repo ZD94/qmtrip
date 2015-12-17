@@ -1,9 +1,7 @@
 /**
  * Created by wlh on 15/12/9.
  */
-
-var auth = require("api/client/auth");
-var authServer = require("api/auth");
+var API = require('common/api');
 
 var assert = require("assert");
 
@@ -17,21 +15,21 @@ describe("api/client/auth.js", function() {
     describe("API.auth.newAccount", function() {
         var _account = {};
         it("API.auth.newAccount should be err without email", function(done) {
-            authServer.newAccount(ACCOUNT.pwd, function(err, result) {
+            API.auth.newAccount(ACCOUNT.pwd, function(err, result) {
                 assert.notEqual(null, err);
                 done();
             });
         })
 
         it("API.auth.newAccount should be err without pwd", function(done) {
-            authServer.newAccount({email: ACCOUNT.email}, function(err, result) {
+            API.auth.newAccount({email: ACCOUNT.email}, function(err, result) {
                 assert.notEqual(err, null);
                 done();
             });
         });
 
         it("API.auth.newAccount should be ok with email and pwd", function(done) {
-            authServer.newAccount({email: ACCOUNT.email, pwd: ACCOUNT.pwd}, function(err, result) {
+            API.auth.newAccount({email: ACCOUNT.email, pwd: ACCOUNT.pwd}, function(err, result) {
                 assert.equal(null, err);
                 assert.equal(result.code, 0);
                 assert.notEqual(result.data, null);
@@ -43,7 +41,7 @@ describe("api/client/auth.js", function() {
         });
 
         after(function(done) {
-            authServer.remove({email: ACCOUNT.email}, function(err, result) {
+            API.auth.remove({email: ACCOUNT.email}, function(err, result) {
                 assert.equal(err, null);
                 assert.equal(result.code, 0);
                 done();
@@ -55,10 +53,10 @@ describe("api/client/auth.js", function() {
         var _account;
         //登录之前激活账号
         before(function(done) {
-            authServer.newAccount({email: ACCOUNT.email, pwd: ACCOUNT.pwd})
+            API.auth.newAccount({email: ACCOUNT.email, pwd: ACCOUNT.pwd})
                 .then(function(result) {
                     _account = result.data;
-                    return authServer.active({accountId: _account.id})
+                    return API.auth.active({accountId: _account.id})
                         .then(function(result) {
                             assert.equal(result.code, 0);
                             done();
@@ -70,14 +68,14 @@ describe("api/client/auth.js", function() {
         });
 
         it("should be err with uncorrect email", function(done) {
-            auth.login({email: "shalabaji#qq.com", pwd: ACCOUNT.pwd}, function(err, result) {
+            API.client.auth.login({email: "shalabaji#qq.com", pwd: ACCOUNT.pwd}, function(err, result) {
                 assert.notEqual(err, null);
                 done();
             });
         })
 
         it("should be ok with correct email and pwd", function(done) {
-            auth.login({email:ACCOUNT.email, pwd: ACCOUNT.pwd}, function(err, result) {
+            API.client.auth.login({email:ACCOUNT.email, pwd: ACCOUNT.pwd}, function(err, result) {
                 var hasErr = false;
                 if (err) {
                     hasErr = true;
@@ -90,7 +88,7 @@ describe("api/client/auth.js", function() {
         })
 
         after(function(done) {
-            authServer.remove({accountId: _account.id}, function(err, result) {
+            API.auth.remove({accountId: _account.id}, function(err, result) {
                 assert.equal(err, null);
                 assert.equal(result.code, 0);
                 done();
@@ -105,16 +103,16 @@ describe("api/client/auth.js", function() {
 
         before(function(done) {
             //创建账号,激活账号,登录
-            authServer.newAccount({email: ACCOUNT.email, pwd: ACCOUNT.pwd})
+            API.auth.newAccount({email: ACCOUNT.email, pwd: ACCOUNT.pwd})
                 .then(function(result) {
                     _account = result.data;
                     return _account;
                 })
                 .then(function(account) {
-                    return authServer.active({accountId: account.id})
+                    return API.auth.active({accountId: account.id})
                 })
                 .then(function() {
-                    return auth.login({email: ACCOUNT.email, pwd: ACCOUNT.pwd})
+                    return API.client.auth.login({email: ACCOUNT.email, pwd: ACCOUNT.pwd})
                         .then(function(result) {
                             _tokens = result.data;
                             done();
@@ -126,14 +124,14 @@ describe("api/client/auth.js", function() {
         });
 
         it("should be unlogin response with uncorrect data", function(done) {
-            auth.authentication("", "", "", "", function(err, result) {
+            API.client.auth.authentication("", "", "", "", function(err, result) {
                 assert.notEqual(null, err);
                 done();
             });
         })
 
         it("should be ok with correct token data", function(done) {
-            auth.authentication(_tokens.user_id, _tokens.token_id, _tokens.timestamp, _tokens.token_sign, function(err, result) {
+            API.client.auth.authentication(_tokens.user_id, _tokens.token_id, _tokens.timestamp, _tokens.token_sign, function(err, result) {
                 assert.equal(err, null);
                 assert.equal(result.code, 0);
                 done();
@@ -141,7 +139,7 @@ describe("api/client/auth.js", function() {
         })
 
         after(function(done) {
-            authServer.remove({email: ACCOUNT.email}, function(err, result) {
+            API.auth.remove({email: ACCOUNT.email}, function(err, result) {
                 assert.equal(err, null);
                 assert.equal(result.code, 0);
                 done();
