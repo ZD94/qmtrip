@@ -23,11 +23,6 @@ var API = require('common/api');
 var model = require('common/model');
 model.init(config.postgres.url);
 
-console.__log = console.log;
-console.log = function(){
-    console.__log.apply(this, arguments);
-};
-
 API.init(path.join(__dirname, '../api'), config.api)
     .then(function(){
         API.test();
@@ -35,6 +30,7 @@ API.init(path.join(__dirname, '../api'), config.api)
     })
     .catch(function(e){
         logger.error(e.stack?e.stack:e);
+        console.error(e.stack?e.stack:e);
         process.exit();
     });
 
