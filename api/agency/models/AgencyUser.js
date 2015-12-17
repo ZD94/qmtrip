@@ -4,7 +4,7 @@
 var now = require("common/utils").now;
 
 module.exports = function(Db, DataType) {
-    return Db.define("Agencies", {
+    return Db.define("AgencyUser", {
         id:         { type: DataType.UUID,      primaryKey: true },
         name:       { type: DataType.STRING(50) }, //代理商姓名
         sex:        { type: DataType.INTEGER,   defaultValue: 1 }, //性别
@@ -15,9 +15,9 @@ module.exports = function(Db, DataType) {
         roleId:     { type: DataType.INTEGER,   field: "role_id" }, //权限ID
         createAt:   { type: DataType.NOW,       field: "create_at", defaultValue: now } //创建时间
     },{
-        tableName: "agencies",
+        tableName: "agency_user",
         timestamps: false,
-        schema: "agencyuser"
+        schema: "agency"
     } )
 };
 

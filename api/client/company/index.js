@@ -2,9 +2,9 @@
  * Created by yumiao on 15-12-9.
  */
 
-var API = require('../../common/api');
-var Logger = require('../../common/logger');
-var needPowersMiddleware = require('./auth').needPowersMiddleware;
+var API = require('common/api');
+var Logger = require('common/logger');
+var needPowersMiddleware = require('../auth').needPowersMiddleware;
 var logger = new Logger();
 
 var company = {}
@@ -17,7 +17,6 @@ var company = {}
  * @returns {*}
  */
 company.createCompany = function(params, callback){
-    logger.info("createCompany=>\n", params);
     params.createUser = this.accountId;
     return API.company.createCompany(params, callback);
 };
@@ -39,13 +38,13 @@ company.updateCompany = needPowersMiddleware(function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.getCompany = needPowersMiddleware(function(companyId, callback){
+company.getCompany = function(companyId, callback){
     var params = {
         companyId: companyId,
         userId: this.accountId
     }
     return API.company.getCompany(params, callback);
-}, ["company.query"]);
+};
 
 /**
  * 根据查询条件获取企业列表

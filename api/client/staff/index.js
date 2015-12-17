@@ -4,8 +4,7 @@
 'use strict';
 
 var Q = require("q");
-var staffServer = require("../staff/index");
-var API = require("../../common/api");
+var API = require("common/api");
 var staff = {};
 
 function needPowersMiddleware(fn, needPowers) {
@@ -25,30 +24,30 @@ function needPowersMiddleware(fn, needPowers) {
 
 staff.createStaff = needPowersMiddleware(function(params, callback) {
     var user_id = this.accountId;
-    return staffServer.getStaff(user_id)
+    return API.staff.getStaff(user_id)
         .then(function(data){
             if(data){
                 params.companyId = data.toJSON().companyId;
-                return staffServer.createStaff(params, callback);
+                return API.staff.createStaff(params, callback);
             }else{
-                return staffServer.createStaff(params, callback);//员工注册的时候
+                return API.staff.createStaff(params, callback);//员工注册的时候
             }
         })
         .nodeify(callback);
 }, ["user.add"]);
 
-staff.deleteStaff = staffServer.deleteStaff;
-staff.updateStaff = staffServer.updateStaff;
-staff.getStaff = staffServer.getStaff;
+staff.deleteStaff = API.staff.deleteStaff;
+staff.updateStaff = API.staff.updateStaff;
+staff.getStaff = API.staff.getStaff;
 staff.getCurrentStaff = function(callback){
-    return staffServer.getStaff(this.accountId, callback);
+    return API.staff.getStaff(this.accountId, callback);
 }
-staff.listAndPaginateStaff = staffServer.listAndPaginateStaff;
-staff.increaseStaffPoint = staffServer.increaseStaffPoint;
-staff.decreaseStaffPoint = staffServer.decreaseStaffPoint;
-staff.listAndPaginatePointChange = staffServer.listAndPaginatePointChange
+staff.listAndPaginateStaff = API.staff.listAndPaginateStaff;
+staff.increaseStaffPoint = API.staff.increaseStaffPoint;
+staff.decreaseStaffPoint = API.staff.decreaseStaffPoint;
+staff.listAndPaginatePointChange = API.staff.listAndPaginatePointChange
 staff.importExcel = function(params, callback){
     params.accountId = this.accountId;
-    return staffServer.importExcel(params, callback);
+    return API.staff.importExcel(params, callback);
 }
 module.exports = staff;

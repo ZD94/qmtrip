@@ -1,0 +1,12 @@
+$(function(){
+	$("#account").hover(function(){
+		$("#account_menu").show();
+	},function(){
+		$("#account_menu").hide();
+	})
+	$("#account_menu").hover(function(){
+		$("#account_menu").show();
+	},function(){
+		$("#account_menu").hide();
+	})
+})

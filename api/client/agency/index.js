@@ -2,8 +2,8 @@
  * Created by yumiao on 15-12-9.
  */
 
-var API = require('../../common/api');
-var Logger = require('../../common/logger');
+var API = require('../../../common/api');
+var Logger = require('../../../common/logger');
 var logger = new Logger();
 
 var agency = {}
@@ -70,5 +70,16 @@ agency.deleteAgency = function(agencyId, callback){
     }
     return API.agency.deleteAgency(params, callback);
 }
+
+/**************** 代理商用户相关 ****************/
+
+agency.createAgencyUser = API.agency.createAgencyUser;
+agency.deleteAgencyUser = API.agency.deleteAgencyUser;
+agency.updateAgencyUser = API.agency.updateAgencyUser;
+agency.getAgencyUser = API.agency.getAgencyUser;
+agency.getCurrentAgency = function(callback){
+    return agencyServer.getAgency(this.accountId, callback);
+}
+agency.listAndPaginateAgencyUser = API.agency.listAndPaginateAgencyUser;
 
 module.exports = agency;
