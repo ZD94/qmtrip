@@ -3,14 +3,13 @@
  */
 
 var Q = require("q");
-var L = require("../../common/language");
-var validate = require("../../common/validate");
-var md5 = require("../../common/utils").md5;
-var authServer = require("../auth/index");
+var L = require("common/language");
+var validate = require("common/validate");
+var md5 = require("common/utils").md5;
 var auth = {
     __public: true
 };
-var API = require("../../common/api");
+var API = require("common/api");
 
 
 /**
@@ -23,7 +22,7 @@ var API = require("../../common/api");
  * @param {Callback} callback 可选回调函数
  * @return {Promise} {code:0, msg: "ok", data: {user_id: "账号ID", token_sign: "签名", token_id: "TOKEN_ID", timestamp:"时间戳"}
  */
-auth.login = authServer.login;
+auth.login = API.auth.login;
 
 /**
  * 绑定手机号
@@ -36,7 +35,7 @@ auth.login = authServer.login;
  * @param {Callback} callback
  * @return {Promise} {code: 0, msg: "ok};
  */
-auth.bindMobile =authServer.bindMobile;
+auth.bindMobile =API.auth.bindMobile;
 
 /**
  * 激活账号
@@ -48,7 +47,7 @@ auth.bindMobile =authServer.bindMobile;
  * @param {Callback} callback
  * @return {Promise} {code:0 , msg: "ok"}
  */
-auth.activeAccount = authServer.activeAccount;
+auth.activeAccount = API.auth.activeAccount;
 
 /**
  * 是否黑名单
@@ -58,7 +57,7 @@ auth.activeAccount = authServer.activeAccount;
  * @param {Function} callback
  * @return {Promise} {code: 0}, {code: -1, msg: "域名已占用或者不合法"}
  */
-auth.isBlackDomain = require("../company").isBlackDomain;
+auth.isBlackDomain = API.company.isBlackDomain;
 
 /**
  * 注册企业账号
@@ -153,7 +152,7 @@ auth.registryCompany = function(params, callback) {
                     }
                 })
                 .then(function() {
-                    return authServer.newAccount({mobile: mobile, email: email, pwd: pwd})
+                    return API.auth.newAccount({mobile: mobile, email: email, pwd: pwd})
                         .then(function(result) {
                             if (result.code) {
                                 throw result;
@@ -184,7 +183,7 @@ auth.registryCompany = function(params, callback) {
  * @param needPowers
  * @returns {Function}
  */
-function needPowersMiddleware(fn, needPowers) {
+auth.needPowersMiddleware = function needPowersMiddleware(fn, needPowers) {
     return function(params, callback) {
         var self = this;
         var accountId = self.accountId;
@@ -200,4 +199,3 @@ function needPowersMiddleware(fn, needPowers) {
 }
 
 module.exports = auth;
-module.exports.needPowersMiddleware = needPowersMiddleware;

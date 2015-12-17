@@ -1,0 +1,96 @@
+@import (reference) "common.less";
+.travel-criterion {
+  .criterion_title {
+    width: 938px;
+    height: 58px;
+    line-height: 58px;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: right;
+    background: @background-color-second;
+    border: 1px @border-color solid;
+    padding: 0 30px;
+    margin: 20px auto 0 auto;
+    a {
+      color: @color-theme1;
+    }
+  }
+  .criterion_page {
+    width: 1000px;
+    height: auto;
+    margin: 0 auto;
+    position: relative;
+    li {
+      width: 453px;
+      height: 208px;
+      background: @background-color-second;
+      border: 1px @border-color solid;
+      padding: 0 20px;
+      margin: 10px 10px 0 0;
+      float: left;
+      position: relative;
+      .criterion_t {
+        width: 439px;
+        height: 20px;
+        line-height: 20px;
+        font-weight: bold;
+        text-align: right;
+        border-left: 4px @color-theme2 solid;
+        padding-left: 10px;
+        margin: 10px 0 5px 0;
+        a {
+          color: @color-theme1;
+        }
+      }
+    }
+    :nth-child(even) {
+      margin-right: 0;
+    }
+    .create_criterion {
+      width: 453px;
+      height: auto;
+      box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+      background: @background-color-second;
+      padding: 0 20px 20px 20px;
+      z-index: 1;
+      .criterion_t {
+        width: 439px;
+        height: 20px;
+        line-height: 20px;
+        font-weight: bold;
+        text-align: left;
+        border-left: 4px @color-theme2 solid;
+        padding-left: 10px;
+        margin: 10px 0 5px 0;
+        a {
+          color: @color-theme1;
+        }
+      }
+    }
+    .update_criterion {
+      width: 453px;
+      height: auto;
+      box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+      background: @background-color-second;
+      padding: 0 20px 20px 20px;
+      position: absolute;
+      top: 10px;
+      left: 0;
+      z-index: 1;
+      .criterion_t {
+        width: 439px;
+        height: 20px;
+        line-height: 20px;
+        font-weight: bold;
+        text-align: left;
+        border-left: 4px @color-theme2 solid;
+        padding-left: 10px;
+        margin: 10px 0 5px 0;
+        a {
+          color: @color-theme1;
+        }
+      }
+    }
+
+  }
+}

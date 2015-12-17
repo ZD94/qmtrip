@@ -22,7 +22,7 @@ travalPolicy.createTravalPolicy = function(data, callback){
         .then(function(){
             return travalPolicyModel.create(data)
                 .then(function(obj){
-                    return {code: 0, travalPolicy: obj.dataValues};
+                    return {code: 0, travalPolicy: obj.toJSON()};
                 })
         })
         .nodeify(callback);
@@ -66,7 +66,7 @@ travalPolicy.updateTravalPolicy = function(id, data, callback){
     options.returning = true;
     return travalPolicyModel.update(data, options)
         .then(function(obj){
-            return {code: 0, travalPolicy: obj[1].dataValues, msg: "更新成功"}
+            return {code: 0, travalPolicy: obj[1].toJSON(), msg: "更新成功"}
         })
         .nodeify(callback);
 }
@@ -85,7 +85,7 @@ travalPolicy.getTravalPolicy = function(id, callback){
     }
     return travalPolicyModel.findById(id)
         .then(function(obj){
-            return {code: 0, travalPolicy: obj.dataValues}
+            return {code: 0, travalPolicy: obj.toJSON()}
         })
         .nodeify(callback);
 }
@@ -139,10 +139,13 @@ travalPolicy.listAndPaginateTravalPolicy = function(params, options, callback){
     }
     options.limit = limit;
     options.offset = offset;
-    options.where = query;
+    options.where = params;
     return travalPolicyModel.findAndCountAll(options)
         .then(function(result){
-            var pg = new Paginate(page, perPage, result.count, result.rows);
+            var items = result.rows.map(function(item) {
+                return item.toJSON();
+            })
+            var pg = new Paginate(page, perPage, result.count, items);
             return pg;
         })
         .nodeify(callback);

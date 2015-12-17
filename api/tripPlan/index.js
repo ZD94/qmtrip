@@ -6,7 +6,8 @@ var Q = require("q");
 var sequelize = require("common/model").importModel("./models");
 var Models = sequelize.models;
 var PlanOrder = Models.TripPlanOrder;
-var ConsumeDetails = Models.ConsumeDetails
+var ConsumeDetails = Models.ConsumeDetails;
+var TripOrderLogs = Models.TripOrderLogs;
 var uuid = require("node-uuid");
 var L = require("../../common/language");
 var Logger = require('../../common/logger');
@@ -33,10 +34,10 @@ tripPlan.savePlanOrder = function(params, callback){
             var orderId = uuid.v1();
             params.id = orderId;
             params.orderNo = orderNo;
-
+            var userId = params.accountId;
             return sequelize.transaction(function (t) {
-                var execArr = [PlanOrder.create(params, {transaction: t})];
-                if(params.consumeDetails){
+                var execArr = [PlanOrder.create(params, {transaction: t})]; //保存计划单
+                if(params.consumeDetails){ //保存计划单预算和消费详情
                     var details = params.consumeDetails;
                     for(var i in details){
                         var obj = details[i];
@@ -45,6 +46,13 @@ tripPlan.savePlanOrder = function(params, callback){
                         execArr.push(tripPlan.saveConsumeRecord(obj, {transaction: t}));
                     }
                 }
+                var logs = {
+                    orderId: orderId,
+                    userId: userId,
+                    remark: '新增计划单 ' + orderNo,
+                    createAt: utils.now
+                }
+                execArr.push(TripOrderLogs.create(logs), {transaction: t}); //记录计划单操作日志
                 return Q.all(execArr)
                     .then(function(arr){
                         var order = arr[0].dataValues;
@@ -118,7 +126,7 @@ tripPlan.updateTripPlanOrder = function(params, callback){
             var userId = params.userId;
             var optLog = params.optLog;
             var updates = params.updates;
-            return PlanOrder.findById(orderId, {attributes: ['accountId', 'companyId']})
+            return PlanOrder.findById(orderId, {attributes: ['id', 'accountId', 'companyId']})
                 .then(function(order){
                     if(!order){
                         defer.reject(L.ERR.TRIP_PLAN_ORDER_NOT_EXIST);
@@ -128,12 +136,23 @@ tripPlan.updateTripPlanOrder = function(params, callback){
                         defer.reject(L.ERR.PERMISSION_DENY);
                         return defer.promise;
                     }
+                    var logs = {
+                        orderId: order.id,
+                        userId: userId,
+                        remark: optLog,
+                        createAt: utils.now
+                    }
                     var cols = getColumns(updates);
-                    return PlanOrder.update(updates, {returning: true, where: {id: orderId}, fields: cols})
-                        .then(function(ret){
-                            var entity = ret[1][0].dataValues;
-                            return {code: 0, msg: optLog + '成功', tripPlanOrder: entity};
-                        })
+                    return sequelize.transaction(function(t){
+                        return Q.all([
+                            PlanOrder.update(updates, {returning: true, where: {id: orderId}, fields: cols, transaction: t}),
+                            TripOrderLogs.create(logs, {transaction: t})
+                        ])
+                            .spread(function(ret){
+                                var entity = ret[1][0].toJSON();
+                                return {code: 0, msg: optLog + '成功', tripPlanOrder: entity};
+                            })
+                    })
                 })
         }).nodeify(callback);
 }

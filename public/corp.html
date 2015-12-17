@@ -6,6 +6,7 @@
 	<title ng-bind="pageTitle"></title>
 	<link rel="stylesheet" type="text/css" href="/corp/css/common.css">
 	<link rel="stylesheet" type="text/css" href="/corp/css/public.css">
+	<link rel="stylesheet" type="text/css" href="/corp/css/criterionlist.css">
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
 	<script type="text/javascript">
         var jQuery = $ = require('jquery');
@@ -15,6 +16,11 @@
     <script type="text/javascript" src="/script/libs/api.js"></script>
     <script type="text/javascript" src="/script/libs/ngapp.js"></script>
     <script type="text/javascript" src="/script/messagebox.js"></script>
+<<<<<<< HEAD
+    <script type="text/javascript" src="/script/selectbox.js"></script>
+=======
+    <script type="text/javascript" src="/script/header.js"></script>
+>>>>>>> 6dffc56e642577f4a92f012fc5997fff8895b9da
     <script type="text/javascript" src="/corp/controller.all.js"></script>
     <script type="text/javascript">
     	var Q = require('q');
@@ -27,15 +33,33 @@
     	//获取页面基本信息
     	TLD.controller("MainController", ["$scope", function($scope) {
     		API.require("company");
+    		API.require("staff");
     		API.onload(function(){
+<<<<<<< HEAD
+				console.info ("-------------------");
     			API.company.getCompany("d674f130-a236-11e5-8246-c3a1e3bc94c3")
+=======
+    			API.staff.getCurrentStaff()
+>>>>>>> 6dffc56e642577f4a92f012fc5997fff8895b9da
     				.then(function(ret){
+    					$scope.staff = ret.staff;
+    					var company_id = ret.staff.companyId;
     					console.info(ret);
+    					API.company.getCompany(company_id)
+		    				.then(function(company){
+		    					$scope.company = company.company;
+		    					console.info(company);
+		    					$scope.$apply();
+		    				})
+		    				.catch(function(err){
+		    					console.info(err)
+		    				})
     					$scope.$apply();
     				})
     				.catch(function(err){
     					console.info(err)
-    				}).done
+    				})
+    			.done
     		})
     	}])
     </script>
@@ -52,6 +76,7 @@
     		$(".corp_m_header").css("width",ww-200);
     	}
     	resize();
+    	$()
     })
     </script>
 </head>
@@ -79,17 +104,25 @@
 	<div class="corp_main">
 		<div class="corp_m_header">
 			<div class="m_headerleft">
-				<div class="corp_name">阿拉斯加拉布拉多哈士奇</div>
+				<div class="corp_name">{{company.name}}</div>
 				<div class="corp_help">帮助</div>
 			</div>
 			<div class="m_headerright">
-				<span>您好，<a href="">seven</a></span>
-				<span>退出</span>
+				<span class="header_account" id="account">您好，<a href="">{{staff.name}}</a><em class="web-icon-font">&#xf0d7;</em></span>
+				<div id="account_menu" class="account_menu">
+					<ul>
+						<li><a href="">修改密码</a></li>
+						<li><a href="">退出</a></li>
+					</ul>
+				</div>
 				<a href="" class="getplan">出差计划</a>
 			</div>
 		</div>
 		<div class="corp_box">
 			<div id="angular-view" ng-view></div>
+		</div>
+		<div class="corp_m_footer">
+			
 		</div>
 	</div>
 </body>
