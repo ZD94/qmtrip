@@ -10,19 +10,31 @@ require('app-module-path').addPath(path.normalize(path.join(__dirname, '..')));
 
 var config = require("../config");
 
+var Logger = require('common/logger');
+Logger.init({
+    path: path.join(__dirname, "../log"),
+    prefix: "mocha_",
+    console: false,
+});
+var logger = new Logger('test');
+
 var API = require('common/api');
 
+var model = require('common/model');
+model.init(config.postgres.url);
 
-console.log('API init start.');
-
-setInterval(function(){
-    console.log('interval');
-}, 10000);
+console.__log = console.log;
+console.log = function(){
+    console.__log.apply(this, arguments);
+};
 
 API.init(path.join(__dirname, '../api'), config.api)
     .then(function(){
-        console.log('API init end.');
         API.test();
         run();
+    })
+    .catch(function(e){
+        logger.error(e.stack?e.stack:e);
+        process.exit();
     });
 

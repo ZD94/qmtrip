@@ -1,8 +1,7 @@
 /**
  * Created by wyl on 15-12-11.
  */
-var agencyUser = require("../../../api/client/agencyUser");
-//var staffServer = require("../../../api/staff");
+var API = require('common/api');
 
 var assert = require("assert");
 
@@ -17,7 +16,7 @@ describe("api/client/agencyUser.js", function() {
     //创建代理商
     /*describe("API.agencyUser.createAgency", function() {
         it("API.agencyUser.createAgency", function(done) {
-            agencyUser.createAgency(obj, function(err, result) {
+            API.client.agencyUser.createAgency(obj, function(err, result) {
                 assert.equal(err, null);
                 assert.equal(result.code, 0);
                 done();
@@ -27,9 +26,9 @@ describe("api/client/agencyUser.js", function() {
     //查询代理商集合
     describe("API.agencyUser.listAndPaginateAgency", function() {
         it("API.agencyUser.listAndPaginateAgency", function(done) {
-            agencyUser.listAndPaginateAgency({}, function(err, result) {
+            API.client.agencyUser.listAndPaginateAgency({}, function(err, result) {
                 assert.equal(err, null);
-                console.log(result);
+                //console.log(result);
 //                console.log(result.items);//item dataValues里存放的才是记录信息
                 done();
             });
@@ -38,7 +37,7 @@ describe("api/client/agencyUser.js", function() {
     //更新代理商信息
     /*describe("API.agencyUser.updateAgency", function() {
         it("API.agencyUser.updateAgency", function(done) {
-            agencyUser.updateAgency("b3204120-9fe9-11e5-bfd2-414faa65c25d", obj, function(err, result) {
+            API.client.agencyUser.updateAgency("b3204120-9fe9-11e5-bfd2-414faa65c25d", obj, function(err, result) {
                 assert.equal(err, null);
                 console.log(result);
                 done();
@@ -48,7 +47,7 @@ describe("api/client/agencyUser.js", function() {
     //删除代理商信息
     /*describe("API.agencyUser.deleteAgency", function() {
         it("API.agencyUser.deleteAgency", function(done) {
-            agencyUser.deleteAgency({id: "b3204120-9fe9-11e5-bfd2-414faa65c25d"}, function(err, result) {
+            API.client.agencyUser.deleteAgency({id: "b3204120-9fe9-11e5-bfd2-414faa65c25d"}, function(err, result) {
                 assert.equal(err, null);
                 console.log(result);
                 done();

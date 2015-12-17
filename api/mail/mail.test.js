@@ -2,7 +2,7 @@
  * Created by wlh on 15/12/9.
  */
 var assert = require("assert");
-var mail = require("../../../api/mail");
+var mail = require("api/mail");
 
 describe("api/mail", function() {
 
