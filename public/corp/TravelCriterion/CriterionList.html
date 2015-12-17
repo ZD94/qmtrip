@@ -1,1 +1,192 @@
-<div class="travel-criterion">11</div>
+<div class="travel-criterion">
+    <div class="criterion_title">
+        <span style="float: left;">共设置了{{CriterionTotal}}级差旅标准</span>
+        <input type="button" value="增加标准" class="common_btn1" ng-click="createCriterionShow()" style="float: right; margin-top: 11px;">
+    </div>
+    <ul class="criterion_page">
+        <li ng-repeat="item in CriterionList">
+            <div class="criterion_t"><span style="float: left;">差旅标准{{$index+1}}</span><a href="javascript:void(0);" ng-click="updateCriterionShow(item.id,$index)">修改</a><span style="font-size: 13px;">&nbsp;|&nbsp;</span><a href="javascript:void(0);" ng-click="deleteCriterion(item.id,item.name)">删除</a></div>
+            <table width="100%">
+                <tr>
+                    <td width="70" height="34" align="right">等级名称：</td>
+                    <td height="34">{{item.name}}</td>
+                </tr>
+                <tr>
+                    <td width="70" height="34" align="right">飞机：</td>
+                    <td height="34">{{item.planeLevel}}</td>
+                </tr>
+                <tr ng-if="item.isChangeLevel==true">
+                    <td width="70" height="20" align="right"></td>
+                    <td height="20" style="color: #9B9BAF;">当高级仓位低于上述标准时，可选择高级仓位</td>
+                </tr>
+                <tr>
+                    <td width="70" height="34" align="right">火车：</td>
+                    <td height="34">{{item.trainLevel}}</td>
+                </tr>
+                <tr>
+                    <td width="70" height="34" align="right">住宿：</td>
+                    <td height="34">{{item.hotelTevel}}</td>
+                </tr>
+            </table>
+        </li>
+        <li class="create_criterion" style="display: none;">
+            <div class="criterion_t">增加差旅标准</div>
+            <table width="100%">
+                <tr>
+                    <td width="70" height="56" align="right">等级名称：</td>
+                    <td><input class="common_text w350 Cname"></td>
+                </tr>
+                <tr>
+                    <td width="70" height="56" align="right">飞机：</td>
+                    <td>
+                        <dl class="selectbox w180">
+                            <dt class="common_select CplaneLevel" ng-click="Myalert()">不限</dt>
+                            <dd class="common_option">
+                                <div>不限</div>
+                                <div>经济舱</div>
+                                <div>高端经济舱</div>
+                                <div>商务舱</div>
+                                <div>头等舱</div>
+                            </dd>
+                        </dl>
+                        <dl class="selectbox w180" style="margin-left: 12px;">
+                            <dt class="common_select CplaneDiscount" ng-click="Myalert()" selectValue="0">不限</dt>
+                            <dd class="common_option">
+                                <div selectValue="0">不限</div>
+                                <div selectValue="8">8折及以下</div>
+                                <div selectValue="7">7折及以下</div>
+                                <div selectValue="6">6折及以下</div>
+                                <div selectValue="5">5折及以下</div>
+                                <div selectValue="4">4折及以下</div>
+                            </dd>
+                        </dl>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="70" height="36" align="right"></td>
+                    <td><input type="checkbox" class="Ccheckbox" style="width: 14px; height: 14px; margin-top: 2px; float: left;"><label style="padding-left: 5px; float: left;">当高级仓位低于上述标准时，可选择高级仓位</label></td>
+                </tr>
+                <tr>
+                    <td width="70" height="56" align="right">火车：</td>
+                    <td>
+                        <dl class="selectbox w180">
+                            <dt class="common_select CtrainLevel" ng-click="Myalert()">不限</dt>
+                            <dd class="common_option">
+                                <div>不限</div>
+                                <div>商务座/高级软卧</div>
+                                <div>一等座/软卧</div>
+                                <div>二等座/软卧</div>
+                                <div>软卧</div>
+                                <div>硬卧</div>
+                            </dd>
+                        </dl>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="70" height="56" align="right">住宿：</td>
+                    <td>
+                        <dl class="selectbox w180">
+                            <dt class="common_select ChotelTevel" ng-click="Myalert()">不限</dt>
+                            <dd class="common_option">
+                                <div>不限</div>
+                                <div>五星级/豪华型</div>
+                                <div>四星级/高档型</div>
+                                <div>三星级/舒适型</div>
+                                <div>二星级/经济型</div>
+                            </dd>
+                        </dl>
+                        <input class="common_text w160 ChotelPrice" maxlength="5" style="background: url('/corp/images/night.jpg') no-repeat right; margin-left: 10px;">
+                    </td>
+                </tr>
+                <tr>
+                    <td width="70" height="56" align="right"></td>
+                    <td>
+                        <input type="button" value="保存设置" class="common_btn1" ng-click="createCriterion()">
+                        <input type="button" value="重置" class="common_btn2" ng-click="resetting()" style="margin-left: 20px;">
+                    </td>
+                </tr>
+            </table>
+        </li>
+
+        <div class="update_criterion" style="display: none;">
+            <div class="criterion_t">修改差旅标准</div>
+            <table width="100%">
+                <tr>
+                    <td width="70" height="56" align="right">等级名称：</td>
+                    <td><input class="common_text w350 Cname"></td>
+                </tr>
+                <tr>
+                    <td width="70" height="56" align="right">飞机：</td>
+                    <td>
+                        <dl class="selectbox w180">
+                            <dt class="common_select CplaneLevel" ng-click="Myalert()">不限</dt>
+                            <dd class="common_option">
+                                <div>不限</div>
+                                <div>经济舱</div>
+                                <div>高端经济舱</div>
+                                <div>商务舱</div>
+                                <div>头等舱</div>
+                            </dd>
+                        </dl>
+                        <dl class="selectbox w180" style="margin-left: 12px;">
+                            <dt class="common_select CplaneDiscount" ng-click="Myalert()" selectValue="0">不限</dt>
+                            <dd class="common_option">
+                                <div selectValue="0">不限</div>
+                                <div selectValue="8">8折及以下</div>
+                                <div selectValue="7">7折及以下</div>
+                                <div selectValue="6">6折及以下</div>
+                                <div selectValue="5">5折及以下</div>
+                                <div selectValue="4">4折及以下</div>
+                            </dd>
+                        </dl>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="70" height="36" align="right"></td>
+                    <td><input type="checkbox" class="Ccheckbox" style="width: 14px; height: 14px; margin-top: 2px; float: left;"><label style="padding-left: 5px; float: left;">当高级仓位低于上述标准时，可选择高级仓位</label></td>
+                </tr>
+                <tr>
+                    <td width="70" height="56" align="right">火车：</td>
+                    <td>
+                        <dl class="selectbox w180">
+                            <dt class="common_select CtrainLevel" ng-click="Myalert()">不限</dt>
+                            <dd class="common_option">
+                                <div>不限</div>
+                                <div>商务座/高级软卧</div>
+                                <div>一等座/软卧</div>
+                                <div>二等座/软卧</div>
+                                <div>软卧</div>
+                                <div>硬卧</div>
+                            </dd>
+                        </dl>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="70" height="56" align="right">住宿：</td>
+                    <td>
+                        <dl class="selectbox w180">
+                            <dt class="common_select ChotelTevel" ng-click="Myalert()">不限</dt>
+                            <dd class="common_option">
+                                <div>不限</div>
+                                <div>五星级/豪华型</div>
+                                <div>四星级/高档型</div>
+                                <div>三星级/舒适型</div>
+                                <div>二星级/经济型</div>
+                            </dd>
+                        </dl>
+                        <input class="common_text w160 ChotelPrice" maxlength="5" style="background: url('/corp/images/night.jpg') no-repeat right; margin-left: 10px;">
+                    </td>
+                </tr>
+                <tr>
+                    <td width="70" height="56" align="right"></td>
+                    <td>
+                        <input type="button" value="保存设置" class="common_btn1" ng-click="updateCriterion()">
+                        <input type="button" value="重置" class="common_btn2" ng-click="resetting()" style="margin-left: 20px;">
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+
+    </ul>
+</div>

@@ -13,7 +13,16 @@ describe("api/client/agency.js", function() {
         mobile: "13121534026"
     }
 
-    //创建代理商
+    describe("API.agency.createAgency", function() {
+        it("API.agency.createAgency", function(done) {
+            API.client.agency.createAgency({}, function(err, result) {
+                assert.equal(err, null);
+                done();
+            });
+        })
+    })
+
+    //创建代理商用户
     /*describe("API.agency.createAgencyUser", function() {
      it("API.agency.createAgencyUser", function(done) {
      API.client.agency.createAgencyUser(obj, function(err, result) {

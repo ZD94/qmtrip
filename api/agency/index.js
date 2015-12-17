@@ -22,11 +22,12 @@ var agency = {};
  * @returns {*}
  */
 agency.createAgency = function(params, callback){
-    return checkParams(['createUser', 'name', 'email'], params)
+    return checkParams(['createUser', 'name'], params)
         .then(function(){
             return Agency.create(params)
                 .then(function(agency){
-                    return {code: 0, msg: '', agency: agency.dataValues};
+                    var agency = agency.toJSON();
+                    return {code: 0, msg: '', agency: agency};
                 })
         }).nodeify(callback);
 }

@@ -29,7 +29,6 @@ CREATE TABLE agency (
     agency_no serial NOT NULL,
     create_user uuid NOT NULL,
     name character varying(100),
-    logo character varying,
     description text,
     status integer default 0,
     address character varying,
@@ -75,12 +74,6 @@ COMMENT ON COLUMN agency.create_user IS '创建人';
 --
 COMMENT ON COLUMN agency.name IS '代理商名称';
 
---
--- TOC entry 1005 (class 0 OID 0)
--- Dependencies: 100
--- Name: COLUMN agency.logo; Type: COMMENT; Schema: agency; Owner: -
---
-COMMENT ON COLUMN agency.logo IS '代理商logo';
 
 --
 -- TOC entry 1006 (class 0 OID 0)
