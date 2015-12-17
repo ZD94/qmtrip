@@ -47,9 +47,6 @@ var auth=(function(){
         }
     }
     auth.RegisterController = function($scope) {
-        var mobile = $('#corpMobile').val();
-        var pwd    = $('#corpPwd').val();
-        var mCode = $('#msgCode').val();
         var pCode = $('#picCode').val();
 
         //对企业名称进行判断
@@ -96,31 +93,62 @@ var auth=(function(){
             var reg = /^\w+[\w\-\.]+\w@\w[\w\-\.]+\w$/;
             if(!mail){
                 $scope.err_msg_mail = "联系人邮箱不能为空";
-                console.info(123);
+                //console.info(123);
                 $("#corpMail").siblings(".err_msg").children("i").html("&#xf06a;");
                 $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
                 $("#corpMail").siblings(".err_msg").show();
                 $("#corpMail").focus();
+                $(".tip_div").hide();
                 $scope.$apply();
                 return false;
             }else if(!reg.test(mail)){
                 $scope.err_msg_mail = "邮箱格式不正确";
-                console.info(456);
-                $("#corpMail").siblings(".err_msg").children("i").html("&#xf06a;");
+                //console.info(456);
+                $("#corpMail").siblings(".err_msg").children("i").html("&#xf057;");
                 $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
                 $("#corpMail").siblings(".err_msg").show();
                 $("#corpMail").focus();
+                $(".tip_div").hide();
                 $scope.$apply();
                 return false;
             }else{
                 $scope.err_msg_mail = "";
-                console.info(789);
                 $("#corpMail").siblings(".err_msg").children("i").html("&#xf058;");
                 $("#corpMail").siblings(".err_msg").children("i").addClass("right");
+                $(".tip_div").hide();
                 $("#corpMail").siblings(".err_msg").show();
                 $scope.$apply();
             }
         })
+        //对联系人电话进行判断
+        $("#corpMobile").blur(function(){
+            var mobile = $('#corpMobile').val();
+            if(!mobile){
+                $scope.err_msg_phone = "联系人电话不能为空";
+                //console.info(99993333);
+                $("#corpMobile").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#corpMobile").siblings(".err_msg").children("i").removeClass("right");
+                $("#corpMobile").siblings(".err_msg").show();
+                $("#corpMobile").focus();
+                $scope.$apply();
+                return false;
+            }else if(!mobile.match(/^[1][0-9]{10}$/)){
+                $scope.err_msg_phone = "手机格式不正确";
+                $("#corpMobile").siblings(".err_msg").children("i").html("&#xf057;");
+                $("#corpMobile").siblings(".err_msg").children("i").removeClass("right");
+                $("#corpMobile").siblings(".err_msg").show();
+                $("#corpMobile").focus();
+                $scope.$apply();
+                return false;
+            }else{
+                $scope.err_msg_phone = "";
+                $("#corpMobile").siblings(".err_msg").children("i").html("&#xf058;");
+                $("#corpMobile").siblings(".err_msg").children("i").addClass("right");
+                $("#corpMobile").siblings(".err_msg").show();
+                $scope.$apply();
+            }
+        })
+        //对密码强弱进行判断
         //图片验证码加载
         var imgW = $('#imgCode').attr("width");
         var imgH = $('#imgCode').attr("height");
@@ -140,10 +168,12 @@ var auth=(function(){
         $scope.getMCode = function() {
             var mobile = $('#corpMobile').val();
             if(!mobile){
-                alert("手机号不能为空");
-                return false;
-            }else if(!mobile.match(/^[1][0-9]{10}$/)){
-                alert("手机号格式不正确");
+                $scope.err_msg_phone = "联系人电话不能为空";
+                //console.info(123333);
+                $("#corpMobile").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#corpMobile").siblings(".err_msg").children("i").removeClass("right");
+                $("#corpMobile").siblings(".err_msg").show();
+                $("#corpMobile").focus();
                 return false;
             }
             API.onload(function(){
@@ -152,6 +182,28 @@ var auth=(function(){
                         console.info("获取验证码", result);
                         if(result.code == 0){
                             msgTicket = result.data.ticket;
+                            $scope.$apply();
+
+                            var $seconds = $("#seconds");
+                            var $timer = $("#timer");
+                            var $btn = $(".v_code");
+                            //显示倒计时
+                            $btn.hide();
+                            $timer.show();
+
+                            var timer = setInterval(function() {
+                                var begin = $seconds.text();
+                                begin = parseInt(begin);
+                                if (begin <=0 ) {
+                                    clearInterval(timer);
+                                    $btn.show();
+                                    $timer.hide();
+                                    $seconds.text(90);
+                                } else {
+                                    begin = begin - 1;
+                                    $seconds.text(begin);
+                                }
+                            }, 1000);
                         }
                     }).catch(function(err){
                         console.info(err);
@@ -159,7 +211,52 @@ var auth=(function(){
             })
 
         }
-
+        $("#msgCode").focus(function(){
+            $scope.err_msg_msg = "请输入您手机短信中的验证码";
+            $("#msgCode").parent("div").siblings(".err_msg").children("i").html("");
+            $("#msgCode").parent("div").siblings(".err_msg").show();
+            $scope.$apply();
+        }).blur(function(){
+            alert(44444);
+            //var mCode = $('#msgCode').val();
+            //if(!mCode){
+            //    $scope.err_msg_msg = "手机验证码不能为空";
+            //    $("#msgCode").parent("div").siblings(".err_msg").children("i").html("&#xf06a;");
+            //    $("#msgCode").parent("div").siblings(".err_msg").children("i").removeClass("right");
+            //    $("#msgCode").parent("div").siblings(".err_msg").show();
+            //    $("#msgCode").focus();
+            //    $scope.$apply();
+            //    return false;
+            //}
+        })
+            //.blur(function(){
+            //alert(22222);
+            //var mCode = $('#msgCode').val();
+            //if(!mCode){
+            //    $scope.err_msg_msg = "手机验证码不能为空";
+            //    $("#msgCode").parent("div").siblings(".err_msg").children("i").html("&#xf06a;");
+            //    $("#msgCode").parent("div").siblings(".err_msg").children("i").removeClass("right");
+            //    $("#msgCode").parent("div").siblings(".err_msg").show();
+            //    $("#msgCode").focus();
+            //    $scope.$apply();
+            //    return false;
+            //}
+            //else if(){
+            //    $scope.err_msg_msg = "手机格式不正确";
+            //    $("#msgCode").parent().siblings(".err_msg").children("i").html("&#xf057;");
+            //    $("#msgCode").parent().siblings(".err_msg").children("i").removeClass("right");
+            //    $("#msgCode").parent().siblings(".err_msg").show();
+            //    $("#msgCode").focus();
+            //    $scope.$apply();
+            //    return false;
+            //}else{
+            //    $scope.err_msg_phone = "";
+            //    $("#corpMobile").siblings(".err_msg").children("i").html("&#xf058;");
+            //    $("#corpMobile").siblings(".err_msg").children("i").addClass("right");
+            //    $("#corpMobile").siblings(".err_msg").show();
+            //    $scope.$apply();
+            //}
+        })
         //换一换图片验证码
         $scope.changePicCode = function(){
             console.info("click me...")
@@ -167,7 +264,7 @@ var auth=(function(){
                 console.info("here...")
                 API.checkcode.getPicCheckCode({width:imgW,height:imgH,quality:100,length:4,type:0})
                     .then(function(result){
-                        console.info("获取验证码图片", result);
+                        //console.info("获取验证码图片", result);
                         $("#imgCode").attr("src",result.data.captcha);
                         picTicket = result.data.ticket;
                     }).catch(function(err){
@@ -190,9 +287,7 @@ var auth=(function(){
             var reg = /^\w+[\w\-\.]+\w@\w[\w\-\.]+\w$/;
             if(commit){
                 if(!cName){
-                    //alert("企业名称不能为空!");
-                    $scope.err_msg = "企业名称不能为空";
-                    $("#corpName").sibling().show;
+                    alert("企业名称不能为空!");
                     return false;
                 }else if(!name){
                     alert("注册人姓名不能为空!");

@@ -22,21 +22,44 @@
 <div class="input">
     <input id="corpMail" class="" type="text" value="" placeholder="联系人邮箱（请使用企业邮箱,作为登录账号使用)">
     <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_mail}}</span>
+    <div class="tip_div">
+        <img src="../../images/sanjiao.jpg"/>
+        <span>
+            暂不支持公共邮箱，查看<a style="color: #118FD6;">公共邮箱</a></br>
+            后缀为 126.com  / 163.com / gmail.com / </br>
+            qq.com / sina.com
+        </span>
+    </div>
 </div>
 <!--<div style="width:600px;margin:10px auto;">暂不支持公共邮箱，若为<span>公共邮箱</span>，请联系客服<span>010-4657892</span></div>-->
 <div class="input">
-    <input id="corpMobile" class="" type="text" value="" placeholder="联系人电话">
-    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg}}</span>
+    <input id="corpMobile" class="" type="text" value="" placeholder="联系人电话" maxlength="13">
+    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_phone}}</span>
 </div>
 <div class="input">
-    <input id="corpPwd" class="" type="password" value="" placeholder="设置登录密码">
-    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg}}</span>
+    <input id="corpPwd" class="" type="password" value="" onkeyup="checkPwd()" maxlength="20" placeholder="设置登录密码">
+    <span class="err_msg"><i class="web-icon-font"></i></span>
+    <div class="pwdStrength">
+        <ul>
+            <li class="on">弱</li>
+            <li>中</li>
+            <li>强</li>
+        </ul>
+    </div>
+    <div class="tip_div2">
+        <img src="../../images/sanjiao.jpg"/>
+        <span>
+            需6~20个字符,有数字或字母组成，字母区分大小写
+        </span>
+    </div>
 </div>
 <div class="inputs">
     <div>
         <input id="msgCode" class="" type="text" value="" placeholder="短信验证码">
     </div>
-    <button class="getCode" ng-click="getMCode()">免费获取短信验证码</button>
+    <span class="getCode v_code" ng-click="getMCode()">免费获取短信验证码</span>
+    <span id="timer" class="getCode" style="display:none;background-color: #ededed;">(<span id="seconds">90</span>)s后重新发送</span>
+    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_msg}}</span>
 </div>
 <div class="inputs">
     <div>
@@ -49,13 +72,39 @@
     <span id="check1"><i class="web-icon-font2" checkvalue="true">&#xea2e;</i>同意<a href="">《途灵岛商旅注册协议》</a></span>
     <span id="check2" style="display: none;"><i class="web-icon-font2" checkvalue="false">&#xea2f;</i>同意<a href="">《途灵岛商旅注册协议》</a></span>
 </div>
-<a href="#" class="register" ng-click="register()">立即注册</a>
+<a class="register" ng-click="register()">立即注册</a>
 <!--<div style="width: 600px;margin: 10px auto;text-align: center;"><a href="#/auth/login">已有账号?登录</a></div>-->
 <div class="footer">
     <p>由途灵岛信息股份有限公司提供技术支持</p>
     <p>联系电话：010-57371105</p>
 </div>
 <script>
+    //判断密码强度
+    var weak = 6;
+    var strong = 10;
+    function checkPwd(){
+        var pwd = $('#corpPwd').val();
+        if(pwd.length > 5){
+            $("#corpPwd").siblings(".err_msg").children("i").html("&#xf058;");
+            $("#corpPwd").siblings(".err_msg").children("i").addClass("right");
+            $("#corpPwd").siblings(".err_msg").show();
+            $(".pwdStrength").show();
+            $(".tip_div2").hide();
+            if((/^\d+/.test(pwd) || /^[a-zA-Z]+$/.test(pwd)) && pwd.length <= weak) {
+                $(".pwdStrength>ul>li:first-child").addClass("on").siblings().removeClass("on");
+            } else if(/^\w+$/.test(pwd) && !/^\d+$/.test(pwd) && !/^[a-zA-Z]+$/.test(pwd) && pwd.length >= strong) {
+                $(".pwdStrength>ul>li:last-child").addClass("on").siblings().removeClass("on");
+            } else {
+                $(".pwdStrength>ul>li:nth-child(2)").addClass("on").siblings().removeClass("on");
+            }
+        }else{
+            $("#corpPwd").siblings(".err_msg").children("i").html("&#xf057;");
+            $("#corpPwd").siblings(".err_msg").children("i").removeClass("right");
+            $("#corpPwd").siblings(".err_msg").show();
+            $(".pwdStrength").hide();
+            $(".tip_div2").hide();
+        }
+    }
     $(function(){
         $("#check1").click(function(){
             $(this).hide();
@@ -74,5 +123,12 @@
             $(this).parents("div").siblings().removeClass("blue-border");
             $(this).parents("div").siblings().children().removeClass("blue-border");
         })
+        $("#corpMail").focus(function(){
+            $(".tip_div").show();
+        })
+        $("#corpPwd").focus(function(){
+            $(".tip_div2").show();
+        })
+
     })
 </script>

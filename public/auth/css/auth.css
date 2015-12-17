@@ -66,10 +66,94 @@
   width: 200px;
   top: 0px;
   display: none;
+  z-index: -2;
 }
 .err_msg i {
   color: #de492a;
   margin-right: 10px;
+}
+.tip_div {
+  float: right;
+  position: absolute;
+  left: 440px;
+  width: 360px;
+  top: 0px;
+  display: none;
+}
+.tip_div img {
+  float: left;
+  margin-top: 10px;
+}
+.tip_div span {
+  display: block;
+  float: left;
+  background-color: #ededed;
+  border: 1px solid #d9d9d9;
+  font-size: 14px;
+  line-height: 22px;
+  position: relative;
+  z-index: -1;
+  margin-top: -20px;
+  margin-left: -1px;
+  padding: 5px 10px;
+  border-radius: 2px;
+}
+.tip_div2 {
+  float: right;
+  position: absolute;
+  left: 440px;
+  width: 360px;
+  top: 0px;
+  display: none;
+}
+.tip_div2 img {
+  float: left;
+  margin-top: 10px;
+}
+.tip_div2 span {
+  display: block;
+  float: left;
+  background-color: #ededed;
+  border: 1px solid #d9d9d9;
+  font-size: 14px;
+  line-height: 30px;
+  position: relative;
+  z-index: -1;
+  /* margin-top: 2px; */
+  margin-left: -1px;
+  padding: 5px 10px;
+  border-radius: 2px;
+}
+.pwdStrength {
+  float: right;
+  position: absolute;
+  left: 470px;
+  top: 4px;
+  font-size: 14px;
+  color: #b6b6b6;
+  display: none;
+  z-index: -1;
+}
+.pwdStrength ul {
+  width: 300px;
+  border-radius: 2px;
+}
+.pwdStrength ul li {
+  display: block;
+  float: left;
+  width: 60px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  border: 1px solid #d9d9d9;
+}
+.pwdStrength ul li:nth-child(2) {
+  border-left: none;
+  border-right: none;
+}
+.pwdStrength ul li.on {
+  color: #4a4a4a;
+  background-color: #ededed;
 }
 .input {
   width: 430px;
@@ -112,13 +196,15 @@
 }
 .inputs .getCode {
   width: 180px;
-  height: 42px;
+  height: 40px;
   float: right;
+  text-align: center;
   background: #ffffff;
   color: #4a4a4a;
-  line-height: 42px;
+  line-height: 40px;
   border: 1px solid #d9d9d9;
   border-radius: 2px;
+  cursor: pointer;
 }
 .inputs .change {
   width: auto;

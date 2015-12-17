@@ -67,9 +67,97 @@
   width: 200px;
   top: 0px;
   display: none;
+  z-index: -2;
   i{
     color: @color-alert-wrong;
     margin-right: 10px;
+  }
+}
+.tip_div{
+  float: right;
+  position: absolute;
+  left: 440px;
+  width: 360px;
+  top: 0px;
+  display: none;
+  img{
+    float: left;
+    margin-top: 10px;
+  }
+  span{
+    display: block;
+    float: left;
+    background-color: @color-gray;
+    border: 1px solid #d9d9d9;
+    font-size: @h14;
+    line-height: 22px;
+    position: relative;
+    z-index: -1;
+    margin-top: -20px;
+    margin-left: -1px;
+    padding:5px 10px;
+    border-radius: @border-radius-2;
+  }
+}
+.tip_div2{
+  float: right;
+  position: absolute;
+  left: 440px;
+  width: 360px;
+  top: 0px;
+  display: none;
+  img{
+    float: left;
+    margin-top: 10px;
+  }
+  span{
+    display: block;
+    float: left;
+    background-color: @color-gray;
+    border: 1px solid #d9d9d9;
+    font-size: @h14;
+    line-height: 30px;
+    position: relative;
+    z-index: -1;
+    /* margin-top: 2px; */
+    margin-left: -1px;
+    padding: 5px 10px;
+    border-radius: @border-radius-2;
+  }
+}
+.pwdStrength{
+  float: right;
+  position: absolute;
+  left: 470px;
+  top: 4px;
+  font-size: @h14;
+  color: #b6b6b6;
+  display: none;
+  z-index: -1;
+  ul{
+    width: 300px;
+    border-radius: @border-radius-2;
+    li{
+      display: block;
+      float: left;
+      width: 60px;
+      height: 30px;
+      line-height: 30px;
+      text-align: center;
+      border: 1px solid @color-border;
+      //&:first-child{
+      //  color: @color-text;
+      //  background-color: @color-gray;
+      //}
+      &:nth-child(2){
+        border-left: none;
+        border-right: none;
+      }
+      &.on{
+        color: @color-text;
+        background-color: @color-gray;
+      }
+    }
   }
 }
 .input{
@@ -112,13 +200,15 @@
   }
   .getCode{
     width: 180px;
-    height: 42px;
+    height: 40px;
     float: right;
+    text-align: center;
     background: @color-white;
     color: @color-text;
-    line-height: 42px;
+    line-height: 40px;
     border:1px solid @color-border;
     border-radius: @border-radius-2;
+    cursor: pointer;
   }
   .change{
     width: auto;
