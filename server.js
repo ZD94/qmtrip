@@ -30,7 +30,7 @@ if(config.socket_file){
 }
 server.http_root = path.join(__dirname, 'public');
 server.http_favicon = path.join(server.http_root, 'favicon.ico');
-server.on('init.http_handler', require('./app'));
+//server.on('init.http_handler', require('./app'));
 
 server.api_path = path.join(__dirname, 'api');
 server.api_port = config.apiPort;

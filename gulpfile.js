@@ -35,8 +35,7 @@ gulplib.dist(function(){
     copy = [
         'README.md',
         'package.json',
-        'server.js',
-        'app.js'
+        'server.js'
     ];
     for(var i=0; i<copy.length; i++){
         var fname = copy[i];
@@ -44,7 +43,7 @@ gulplib.dist(function(){
     }
     copy = [
         'config',
-        'models'
+        'public'
     ];
     for(var i=0; i<copy.length; i++){
         var fname = copy[i];
