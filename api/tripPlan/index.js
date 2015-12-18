@@ -198,7 +198,6 @@ tripPlan.listTripPlanOrder = function(params, callback){
         .then(function(orders){
             return Q.all(orders.map(function(order){
                 var orderId = order.id;
-                logger.info("orderId=>", orderId);
                 return Q.all([
                     ConsumeDetails.findAll({where: {orderId: orderId, type: -1}}),
                     ConsumeDetails.findAll({where: {orderId: orderId, type: 0}}),
@@ -242,7 +241,7 @@ tripPlan.saveConsumeRecord = function(params, options, callback){
 }
 
 /**
- * 删除差旅计划单/预算单
+ * 删除差旅计划单/预算单;用户自己可以删除自己的计划单
  * @param params
  * @param callback
  * @returns {*}

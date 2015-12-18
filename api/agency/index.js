@@ -2,16 +2,16 @@
  * Created by yumiao on 15-12-9.
  */
 var Q = require('q');
-var sequelize = require("common/model").importModel("./models");
-var Agency = sequelize.models.Agency;
-var AgencyUser = sequelize.models.AgencyUser;
+var models = require("common/model").importModel("./models");
+var Agency = models.Agency;
+var AgencyUser = models.AgencyUser;
 var uuid = require("node-uuid");
-var L = require("../../common/language");
-var Logger = require('../../common/logger');
+var L = require("common/language");
+var Logger = require('common/logger');
 var logger = new Logger("agency");
-var utils = require("../../common/utils");
-var API = require("../../common/api");
-var Paginate = require("../../common/paginate").Paginate;
+var utils = require("common/utils");
+var API = require("common/api");
+var Paginate = require("common/paginate").Paginate;
 
 var agency = {};
 

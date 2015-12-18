@@ -110,4 +110,21 @@ company.consumeMoney = function(params, callback){
     return API.moneyChange.test(params, callback);
 }
 
+/**
+ * 获取企业资金账户信息
+ * @param companyId
+ * @param callback
+ * @returns {*}
+ */
+company.getCompanyFundsAccount = function(companyId, callback){
+    var params = {
+        userId: this.accountId,
+        companyId: companyId
+    };
+    return API.company.getCompanyFundsAccount(params)
+        .then(function(funds){
+            return {code: 0, msg: '', fundsAccount: funds};
+        })
+}
+
 module.exports = company;
