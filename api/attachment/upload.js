@@ -3,11 +3,11 @@
  */
 'use strict';
 var formidable = require('formidable');
-var config = require('../config');
+var config = require('config');
 var fs = require('fs');
 var path = require('path');
 var crypto = require("crypto");
-var attachmentServer = require("../api/attachment/index");
+var API = require("common/api");
 //var ImgProxy = BaseProxy.instance('attachment.attachment');
 
 function uploadActionFile(req, res, next) {
@@ -52,9 +52,9 @@ function uploadActionFile(req, res, next) {
                     var has_id = [];
                     has_id.push(user_id);
                     var imgObj = {md5key: md5key,content: data, userId: user_id, hasId: JSON.stringify(has_id),fileType:file_type};
-                    attachmentServer.deleteAttachment({md5key: md5key,userId: user_id})
+                    API.attachment.deleteAttachment({md5key: md5key,userId: user_id})
                         .then(function(){
-                            return attachmentServer.createAttachment(imgObj)
+                            return API.attachment.createAttachment(imgObj)
                                 .then(function(result){
                                     fs.exists(filePath, function (exists) {
                                         if(exists){
@@ -82,12 +82,12 @@ function uploadActionFile(req, res, next) {
                 })*/
         }
     });
-};
+}
 
 function getImg(req, res, next) {
     var md5key = req.params.md5key;
     var userId = req.cookies.user_id;
-    attachmentServer.getAttachment({md5key: md5key, userId: userId})
+    API.attachment.getAttachment({md5key: md5key, userId: userId})
         .then(function(result){
             result = result.toJSON();
             if(result.isPublic){
@@ -104,7 +104,9 @@ function getImg(req, res, next) {
             }
         })
         .catch(next).done();
+}
+
+module.exports = function(app){
+    app.post('/upload/ajax-upload-file', uploadActionFile);
 };
 
-exports.uploadActionFile = uploadActionFile;
-exports.getImg = getImg;

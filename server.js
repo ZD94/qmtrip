@@ -23,11 +23,14 @@ var server = new Server(config.appName, config.pid_file);
 
 server.enable_cluster = config.cluster;
 
-server.http_handler = require('./app');
+server.http_logtype = config.logger.httptype;
 server.http_port = config.port;
 if(config.socket_file){
     server.http_port = config.socket_file;
 }
+server.http_root = path.join(__dirname, 'public');
+server.http_favicon = path.join(server.http_root, 'favicon.ico');
+//server.on('init.http_handler', require('./app'));
 
 server.api_path = path.join(__dirname, 'api');
 server.api_port = config.apiPort;

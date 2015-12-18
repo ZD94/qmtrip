@@ -2,16 +2,16 @@
  * Created by yumiao on 15-12-9.
  */
 var Q = require('q');
-var sequelize = require("common/model").importModel("./models");
-var Agency = sequelize.models.Agency;
-var AgencyUser = sequelize.models.AgencyUser;
+var models = require("common/model").importModel("./models");
+var Agency = models.Agency;
+var AgencyUser = models.AgencyUser;
 var uuid = require("node-uuid");
-var L = require("../../common/language");
-var Logger = require('../../common/logger');
+var L = require("common/language");
+var Logger = require('common/logger');
 var logger = new Logger("agency");
-var utils = require("../../common/utils");
-var API = require("../../common/api");
-var Paginate = require("../../common/paginate").Paginate;
+var utils = require("common/utils");
+var API = require("common/api");
+var Paginate = require("common/paginate").Paginate;
 
 var agency = {};
 
@@ -61,12 +61,11 @@ agency.updateAgency = function(params, callback){
                     var cols = getColumns(params);
                     return Agency.update(params, {returning: true, where: {id: agencyId}, fields: cols})
                         .then(function(ret){
-                            logger.info("update fields=>", ret);
                             if(!ret[0] || ret[0] == "NaN"){
                                 defer.reject({code: -2, msg: '更新代理商信息失败'});
                                 return defer.promise;
                             }
-                            var agency = ret[1][0].dataValues;
+                            var agency = ret[1][0].toJSON();
                             return {code: 0, msg: '更新代理商信息成功', agency: agency};
                         })
                 })

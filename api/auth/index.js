@@ -6,10 +6,9 @@ var L = require("../../common/language");
 var validate = require("../../common/validate");
 var md5 = require("../../common/utils").md5;
 var getRndStr = require("../../common/utils").getRndStr;
-var mail = require("../mail");
 var C = require("../../config");
 var moment = require("moment");
-
+var API = require("../../common/api");
 var authServer = {};
 
 //激活账号
@@ -101,9 +100,13 @@ authServer.newAccount = function(data, callback) {
                 var activeToken = getRndStr(6);
                 var sign = makeActiveSign(activeToken, account.id, expireAt);
                 var url = C.host + "/auth/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
+
                 //发送激活邮件
-                return  mail.sendEmail(account.email, "ACTIVE_EMAIL", [data.email, url])
-                    .then(function() {
+                var sendEmailRequest = Q.denodeify(API.mail.sendMailRequest);
+                return  sendEmailRequest({toEmails: account.email, templateName: "qm_active_email", values: [data.email, url]})
+                    .then(function(result) {
+                        console.info("发送激活邮件...")
+                        console.info(result);
                         return account;
                     })
             }
