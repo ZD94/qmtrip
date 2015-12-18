@@ -38,7 +38,7 @@
 </div>
 <div class="input">
     <input id="corpPwd" class="" type="password" value="" onkeyup="checkPwd()" maxlength="20" placeholder="设置登录密码">
-    <span class="err_msg"><i class="web-icon-font"></i></span>
+    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_pwd}}</span>
     <div class="pwdStrength">
         <ul>
             <li class="on">弱</li>
@@ -128,7 +128,20 @@
         })
         $("#corpPwd").focus(function(){
             $(".tip_div2").show();
+//            $("#corpPwd").siblings(".err_msg").hide();
         })
-
+//        $("#msgCode").blur(function(){
+//            console.info(44444);
+//            //var mCode = $('#msgCode').val();
+//            //if(!mCode){
+//            //    $scope.err_msg_msg = "手机验证码不能为空";
+//            //    $("#msgCode").parent("div").siblings(".err_msg").children("i").html("&#xf06a;");
+//            //    $("#msgCode").parent("div").siblings(".err_msg").children("i").removeClass("right");
+//            //    $("#msgCode").parent("div").siblings(".err_msg").show();
+//            //    $("#msgCode").focus();
+//            //    $scope.$apply();
+//            //    return false;
+//            //}
+//        })
     })
 </script>

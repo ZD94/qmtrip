@@ -155,6 +155,21 @@
   color: #4a4a4a;
   background-color: #ededed;
 }
+.btn {
+  display: block;
+  width: 430px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  background-color: #118FD6;
+  margin: 0px auto 20px;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn:hover {
+  text-decoration: none;
+}
 .input {
   width: 430px;
   height: 40px;
@@ -251,9 +266,34 @@
   margin: 0px auto 20px;
   color: #fff;
   text-decoration: none;
+  cursor: pointer;
 }
 .register:hover {
   text-decoration: none;
 }
 /*登录*/
+.remember {
+  width: 430px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 14px;
+  margin: 20px auto;
+  color: #4a4a4a;
+}
+.remember .web-icon-font2 {
+  margin-left: 10px;
+  margin-right: 10px;
+  color: #e5e5e5;
+  font-size: 14px;
+}
+.remember .forget {
+  float: right;
+}
+.remember #remember1 i {
+  cursor: default;
+}
+.remember #remember2 i {
+  color: #118FD6;
+  cursor: default;
+}
 /*# sourceMappingURL=auth.css.map */
