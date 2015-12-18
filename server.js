@@ -2,12 +2,16 @@
  * Created by YCXJ on 2014/5/6.
  */
 'use strict';
+//可以直接require服务器根目录下的模块
+require('app-module-path').addPath(__dirname);
+
+//服务器启动性能日志
+//var perf = require('common/perf');
+//perf.init('init');
+
 var path = require('path');
 var Q = require('q');
 var fs = require("fs");
-
-//可以直接require服务器根目录下的模块
-require('app-module-path').addPath(__dirname);
 
 var config = require("./config");
 
