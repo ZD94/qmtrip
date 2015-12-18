@@ -174,13 +174,13 @@ company.deleteCompany = function(params, callback){
  * @returns {*}
  */
 company.getCompanyFundsAccount = function(params, callback){
-    return checkParams(['companyId', 'userId'])
+    return checkParams(['companyId', 'userId'], params)
         .then(function(){
             var companyId = params.companyId;
             var userId = params.userId;
             return FundsAccounts.findById(companyId)
                 .then(function(funds){
-                    return funds.toJson();
+                    return funds.toJSON();
                 })
         }).nodeify(callback);
 }
