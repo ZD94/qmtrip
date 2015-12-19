@@ -25,7 +25,7 @@ model.init(config.postgres.url);
 var Server = require('common/server');
 var server = new Server(config.appName, config.pid_file);
 
-server.enable_cluster = config.cluster;
+server.cluster = config.cluster;
 
 server.http_logtype = config.logger.httptype;
 server.http_port = config.port;
