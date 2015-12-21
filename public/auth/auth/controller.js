@@ -9,6 +9,9 @@ var auth=(function(){
         $scope.toRegister = function(){
             window.location.href = "#/auth/register";
         }
+        $scope.toForget = function(){
+            window.location.href = "#/auth/forgetpwd";
+        }
         var backUrl = $routeParams.backurl || "#/";
         $scope.checkLogin = function() {
             var name = $('#name').val();
@@ -364,6 +367,41 @@ var auth=(function(){
         }
 
     }
+
+    auth.ForgetpwdController = function($scope){
+        $scope.toRegister = function(){
+            window.location.href = "#/auth/register";
+        }
+        //图片验证码加载
+        var imgW = $('#imgCode').attr("width");
+        var imgH = $('#imgCode').attr("height");
+        var picTicket = "";//图片验证码凭证
+        API.onload(function(){
+            API.checkcode.getPicCheckCode({width:imgW,height:imgH,quality:100,length:4,type:1})
+                .then(function(result){
+                    $("#imgCode").attr("src",result.data.captcha);
+                    picTicket = result.data.ticket;
+                }).catch(function(err){
+                    console.info(err);
+                }).done();
+        })
+        //换一换图片验证码
+        $scope.changePicCode = function(){
+            console.info("click me...")
+            API.onload(function(){
+                console.info("here...")
+                API.checkcode.getPicCheckCode({width:imgW,height:imgH,quality:100,length:4})
+                    .then(function(result){
+                        //console.info("获取验证码图片", result);
+                        $("#imgCode").attr("src",result.data.captcha);
+                        picTicket = result.data.ticket;
+                    }).catch(function(err){
+                        console.info(err);
+                    }).done();
+            })
+        }
+    }
+
     return auth;
 })();
 

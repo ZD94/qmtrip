@@ -288,6 +288,7 @@
 }
 .remember .forget {
   float: right;
+  cursor: pointer;
 }
 .remember #remember1 i {
   cursor: default;
@@ -295,5 +296,32 @@
 .remember #remember2 i {
   color: #118FD6;
   cursor: default;
+}
+/*忘记密码*/
+.step {
+  width: 430px;
+  height: 30px;
+  margin: 0 auto 50px;
+  line-height: 30px;
+  border: 1px solid #d9d9d9;
+}
+.step ul {
+  width: 100%;
+  font-size: 14px;
+  color: #4a4a4a;
+}
+.step ul li {
+  display: block;
+  float: left;
+  width: 33%;
+  line-height: 30px;
+  text-align: center;
+}
+.step ul li:nth-child(2) {
+  border-left: 1px solid #d9d9d9;
+  border-right: 1px solid #d9d9d9;
+}
+.step ul li.on {
+  background-color: #ededed;
 }
 /*# sourceMappingURL=auth.css.map */
