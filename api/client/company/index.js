@@ -2,16 +2,26 @@
  * Created by yumiao on 15-12-9.
  */
 
+/**
+ * @module API
+ */
+
 var API = require('common/api');
 var Logger = require('common/logger');
 var needPowersMiddleware = require('../auth').needPowersMiddleware;
 var logger = new Logger();
 
+/**
+ * @class company 公司信息
+ */
 var company = {}
 
 
 /**
+ * @method createCompany
+ *
  * 创建企业
+ *
  * @param params
  * @param callback
  * @returns {*}

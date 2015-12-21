@@ -53,9 +53,11 @@ var auth=(function(){
                         }).catch(function(err){
                             console.info(err);
                             if (err.msg) {
-                                Myalert("提示信息", err.msg);
+                                alert(err.msg);
+                                //Myalert("提示信息", err.msg);
                             } else {
-                                Myalert("系统错误", err);
+                                //Myalert("系统错误", err);
+                                alert(err);
                             }
                         }).done();
                 })
@@ -221,6 +223,9 @@ var auth=(function(){
                             }, 1000);
                         }
                     }).catch(function(err){
+                        if(err.msg) {
+                            alert(err.msg);
+                        }
                         console.info(err);
                     }).done();
             })
@@ -349,6 +354,9 @@ var auth=(function(){
 
                         })
                         .catch(function(err){
+                            if (err.msg) {
+                                alert(err.msg);
+                            }
                             console.info(err);
                         }).done();
                 })
