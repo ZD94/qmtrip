@@ -50,7 +50,7 @@ tripPlan.savePlanOrder = function(params, callback){
                     orderId: orderId,
                     userId: userId,
                     remark: '新增计划单 ' + orderNo,
-                    createAt: utils.now
+                    createAt: utils.now()
                 }
                 execArr.push(TripOrderLogs.create(logs, {transaction: t})); //记录计划单操作日志
                 return Q.all(execArr)
@@ -72,6 +72,9 @@ tripPlan.savePlanOrder = function(params, callback){
                         return {code: 0, msg: '保存成功', tripPlanOrder: order};
                     })
             })
+                .then(function(ret){
+                    return ret;
+                })
         }).nodeify(callback);
 }
 
