@@ -189,4 +189,15 @@ staff.importExcel = function(params, callback){
     params.accountId = this.accountId;
     return API.staff.importExcel(params, callback);
 }
+
+/**
+ * 统计企业内员工数据
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+staff.statisticStaffs = function(params, callback){
+    return API.staff.statisticStaffs(params, callback);
+}
+
 module.exports = staff;

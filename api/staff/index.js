@@ -5,13 +5,17 @@
 var Q = require("q");
 var nodeXlsx = require("node-xlsx");
 var uuid = require("node-uuid");
+var utils = require("common/utils");
 var sequelize = require("common/model").importModel("./models");
+var Logger = require("common/logger");
 var staffModel = sequelize.models.Staff;
 var pointChange = sequelize.models.PointChange;
 var L = require("../../common/language");
 var API = require("../../common/api");
 var config = require('../../config');
 var Paginate = require("../../common/paginate").Paginate;
+var logger = new Logger("staff");
+var moment = require("moment");
 //var auth = require("../auth/index");
 //var travalPolicy = require("../travalPolicy/index");
 var staff = {};
@@ -441,6 +445,45 @@ staff.isStaffInCompany = function(staffId, companyId, callback){
                 return defer.promise;
             }
             return {code: 0, msg: true};
+        }).nodeify(callback);
+}
+
+/**
+ * 统计企业内的员工数据
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+staff.statisticStaffs = function(params, callback){
+    logger.info(params);
+    var defer = Q.defer();
+    if(!params.companyId){
+        defer.reject({code: -1, msg: '企业Id不能为空'});
+        return defer.promise;
+    }
+    var companyId = params.companyId;
+    var start = params.startTime;
+    var end = params.endTime;
+    if(!start || !end){
+        start = moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
+        end = moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
+    }
+    return Q.all([
+        staffModel.count({where: {companyId: companyId}}),
+        staffModel.count({where: {companyId: companyId, createAt: {$gte: start, $lte: end}, status: 1}}),
+        staffModel.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: -1 }})
+    ])
+        .spread(function(all, inNum, outNum){
+            logger.info("all=>", all);
+            var sta = {
+                all: all || 1,
+                inNum: inNum || 0,
+                outNum: outNum || 0
+            }
+            return API.company.updateCompany({companyId: companyId, staffNum: all, updateAt: utils.now()})
+                .then(function(){
+                    return {code: 0, msg: 'success', sta: sta};
+                })
         }).nodeify(callback);
 }
 
