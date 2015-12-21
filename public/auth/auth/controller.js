@@ -172,7 +172,7 @@ var auth=(function(){
         var msgTicket = "";//短信验证码凭证
         var picTicket = "";//图片验证码凭证
         API.onload(function(){
-            API.checkcode.getPicCheckCode({width:imgW,height:imgH,quality:100,length:4,type:1})
+            API.checkcode.getPicCheckCode({width:imgW,height:imgH,quality:100,length:4})
                 .then(function(result){
                     $("#imgCode").attr("src",result.data.captcha);
                     picTicket = result.data.ticket;
