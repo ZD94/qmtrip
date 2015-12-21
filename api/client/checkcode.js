@@ -42,7 +42,7 @@ var checkcode = {
      */
     getMsgCheckCode: function(params, callback) {
         var type = 1;
-        params.type = 1;
+        params.type = type;
         API.checkcode.getMsgCheckCode(params, callback);
     },
     /**
@@ -67,7 +67,7 @@ var checkcode = {
      */
     getPicCheckCode: function(params, callback) {
         var type = 1;
-        params.type = 0;
+        params.type = type;
         API.checkcode.getPicCheckCode(params, callback);
     },
 }
