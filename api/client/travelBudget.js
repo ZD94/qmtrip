@@ -39,4 +39,4 @@ travelBudget.getTravelPolicyBudget = function(params, callback) {
     return API.skyscanner.getLowestPrice(params, callback);
 }
 
-module.exports = services;
+module.exports = travelBudget;
