@@ -1,5 +1,5 @@
 /**
- * @module API.auth
+ * @module API
  */
 
 var Q = require("q");
@@ -7,7 +7,7 @@ var L = require("common/language");
 var validate = require("common/validate");
 var md5 = require("common/utils").md5;
 /**
- * @class auth
+ * @class auth 用户认证
  */
 var auth = {
     /**
