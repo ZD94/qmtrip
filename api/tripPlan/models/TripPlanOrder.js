@@ -21,7 +21,7 @@ module.exports = function (Db, DataType) {
         isNeedTraffic: {type: DataType.BOOLEAN,         field: "is_need_traffic"}, //是否需要交通服务
         isNeedHotel  : {type: DataType.BOOLEAN,         field: "is_need_hotel"}, //是否需要酒店服务
         budget       : {type: DataType.NUMERIC(15, 2) }, //预算
-        bookExpend   : {type: DataType.NUMERIC(15, 2),  field: "book_expend"}, //预定支出
+        expenditure   : {type: DataType.NUMERIC(15, 2),  field: "expenditure"}, //预定支出
         expendInfo   : {type: DataType.JSONB,           field: "expend_info"}, //支出详情
         auditStatus  : {type: DataType.INTEGER,         field: "audit_status"}, //审核状态
         auditRemark  : {type: DataType.STRING,          field: 'audit_remark'}, //审核备注

@@ -277,7 +277,7 @@ company.moneyChange = function(params, callback){
 function getColumns(params){
     var cols = new Array();
     for(var s in params){
-        cols.push(s)
+        cols.push(s);
     }
     return cols;
 }

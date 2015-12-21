@@ -127,4 +127,8 @@ company.getCompanyFundsAccount = function(companyId, callback){
         }).nodeify(callback);
 }
 
+company.setPayPassword = function(params, callback){
+    logger.info("设置支付密码");
+}
+
 module.exports = company;
