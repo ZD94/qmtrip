@@ -2,19 +2,28 @@
  * Created by yumiao on 15-12-9.
  */
 
+/**
+ * @module API
+ */
 var API = require('../../../common/api');
 var Logger = require('../../../common/logger');
 var logger = new Logger();
 
+/**
+ * @class agency 代理商
+ */
 var agency = {}
 
-//agency.__public = true;
 
 /**
+ * @method createAgency
+ *
  * 创建代理商
- * @param params
- * @param callback
- * @returns {*}
+ *
+ * @param {Object} params 参数
+ * @param {UUID} params.accountId 账号ID
+ * @param {Function} [callback]
+ * @returns {Promise}
  */
 agency.createAgency = function(params, callback){
     params.createUser = this.accountId;

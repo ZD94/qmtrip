@@ -9,6 +9,9 @@ var auth=(function(){
         $scope.toRegister = function(){
             window.location.href = "#/auth/register";
         }
+        $scope.toForget = function(){
+            window.location.href = "#/auth/forgetpwd";
+        }
         var backUrl = $routeParams.backurl || "#/";
         $scope.checkLogin = function() {
             var name = $('#name').val();
@@ -50,9 +53,11 @@ var auth=(function(){
                         }).catch(function(err){
                             console.info(err);
                             if (err.msg) {
-                                Myalert("提示信息", err.msg);
+                                alert(err.msg);
+                                //Myalert("提示信息", err.msg);
                             } else {
-                                Myalert("系统错误", err);
+                                //Myalert("系统错误", err);
+                                alert(err);
                             }
                         }).done();
                 })
@@ -167,7 +172,7 @@ var auth=(function(){
         var msgTicket = "";//短信验证码凭证
         var picTicket = "";//图片验证码凭证
         API.onload(function(){
-            API.checkcode.getPicCheckCode({width:imgW,height:imgH,quality:100,length:4,type:1})
+            API.checkcode.getPicCheckCode({width:imgW,height:imgH,quality:100,length:4})
                 .then(function(result){
                     $("#imgCode").attr("src",result.data.captcha);
                     picTicket = result.data.ticket;
@@ -218,6 +223,9 @@ var auth=(function(){
                             }, 1000);
                         }
                     }).catch(function(err){
+                        if(err.msg) {
+                            alert(err.msg);
+                        }
                         console.info(err);
                     }).done();
             })
@@ -267,47 +275,37 @@ var auth=(function(){
             var pCode = $('#picCode').val();
             var agree = $('.check').children("i").attr('checkvalue');
             var commit = true;
-            var reg = /^\w+[\w\-\.]+\w@\w[\w\-\.]+\w$/;
+            //var reg = /^\w+[\w\-\.]+\w@\w[\w\-\.]+\w$/;
             if(commit){
                 if(!cName){
                     $scope.err_msg = "企业名称不能为空";
                     $("#corpName").siblings(".err_msg").children("i").html("&#xf06a;");
                     $("#corpName").siblings(".err_msg").children("i").removeClass("right");
                     $("#corpName").siblings(".err_msg").show();
-                    //$("#corpName").focus();
                     return false;
                 }else if(!name){
                     $scope.err_msg_name = "联系人姓名不能为空";
                     $("#corpRegistryName").siblings(".err_msg").children("i").html("&#xf06a;");
                     $("#corpRegistryName").siblings(".err_msg").children("i").removeClass("right");
                     $("#corpRegistryName").siblings(".err_msg").show();
-                    //$("#corpRegistryName").focus();
                     return false;
                 }else if(!mail){
                     $scope.err_msg_mail = "联系人邮箱不能为空";
                     $("#corpMail").siblings(".err_msg").children("i").html("&#xf06a;");
                     $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
                     $("#corpMail").siblings(".err_msg").show();
-                    //$("#corpMail").focus();
                     $(".tip_div").hide();
                     return false;
                 }
-                //else if(!reg.test(mail)){
-                //    //alert("邮箱格式不正确!");
-                //    return false;
-                //}
                 else if(!mobile){
                     $scope.err_msg_phone = "联系人电话不能为空";
-                    //console.info(123333);
                     $("#corpMobile").siblings(".err_msg").children("i").html("&#xf06a;");
                     $("#corpMobile").siblings(".err_msg").children("i").removeClass("right");
                     $("#corpMobile").siblings(".err_msg").show();
-                    //$("#corpMobile").focus();
                     return false;
                 }
                 else if(!pwd){
                     $scope.err_msg_pwd = "密码不能为空";
-                    //console.info(123333);
                     $("#corpPwd").siblings(".err_msg").children("i").html("&#xf06a;");
                     $("#corpPwd").siblings(".err_msg").children("i").removeClass("right");
                     $("#corpPwd").siblings(".err_msg").show();
@@ -321,7 +319,10 @@ var auth=(function(){
                     $("#msgCode").parent("div").siblings(".err_msg").show();
                     return false;
                 }else if(!pCode){
-                    alert("图片验证码不能为空!");
+                    $scope.err_msg_pic = "图片验证码不能为空";
+                    $("#imgCode").parent("div").siblings(".err_msg").children("i").html("&#xf06a;");
+                    $("#imgCode").parent("div").siblings(".err_msg").children("i").removeClass("right");
+                    $("#imgCode").parent("div").siblings(".err_msg").show();
                     return false;
                 }else if(agree != "true"){
                     alert("请同意");
@@ -353,6 +354,9 @@ var auth=(function(){
 
                         })
                         .catch(function(err){
+                            if (err.msg) {
+                                alert(err.msg);
+                            }
                             console.info(err);
                         }).done();
                 })
@@ -365,6 +369,39 @@ var auth=(function(){
 
     }
 
+    auth.ForgetpwdController = function($scope) {
+        $scope.toRegister = function () {
+            window.location.href = "#/auth/register";
+        }
+        //图片验证码加载
+        var imgW = $('#imgCode').attr("width");
+        var imgH = $('#imgCode').attr("height");
+        var picTicket = "";//图片验证码凭证
+        API.onload(function () {
+            API.checkcode.getPicCheckCode({width: imgW, height: imgH, quality: 100, length: 4, type: 1})
+                .then(function (result) {
+                    $("#imgCode").attr("src", result.data.captcha);
+                    picTicket = result.data.ticket;
+                }).catch(function (err) {
+                    console.info(err);
+                }).done();
+        })
+        //换一换图片验证码
+        $scope.changePicCode = function () {
+            console.info("click me...")
+            API.onload(function () {
+                console.info("here...")
+                API.checkcode.getPicCheckCode({width: imgW, height: imgH, quality: 100, length: 4})
+                    .then(function (result) {
+                        //console.info("获取验证码图片", result);
+                        $("#imgCode").attr("src", result.data.captcha);
+                        picTicket = result.data.ticket;
+                    }).catch(function (err) {
+                        console.info(err);
+                    }).done();
+            })
+        }
+    }
     auth.ActiveController = function($scope, $routeParams) {
         var sign = $routeParams.sign;
         var accountId = $routeParams.accountId;
@@ -394,7 +431,6 @@ var auth=(function(){
 
         $scope.activeResult = "恭喜您账号成功激活,关闭页面";
     }
-
     return auth;
 })();
 

@@ -1,3 +1,6 @@
+/**
+ * @module auth
+ */
 var Q = require("q");
 var sequelize = require("common/model").importModel("./models");
 var Models = sequelize.models;
@@ -9,9 +12,16 @@ var getRndStr = require("../../common/utils").getRndStr;
 var C = require("../../config");
 var moment = require("moment");
 var API = require("../../common/api");
+
+/**
+ * @class API.auth 认证类
+ * @constructor
+ */
 var authServer = {};
 
 /**
+ * @method activeByEmail 通过邮箱激活账号
+ *
  * 通过邮箱激活账号
  *
  * @param {Object} data
@@ -58,7 +68,16 @@ authServer.activeByEmail = function(data, callback) {
         .nodeify(callback);
 }
 
-//激活账号
+/**
+ * @method active 激活账号
+ *
+ * 激活账号
+ *
+ * @param {Object} data
+ * @param {UUID} data.accountId 账号ID
+ * @param {Function} callback
+ * @return {Promise}
+ */
 authServer.active = function(data, callback) {
     var accountId = data.accountId;
     return Models.Account.findOne({where: {id: accountId}})
@@ -81,7 +100,15 @@ authServer.active = function(data, callback) {
         .nodeify(callback);
 }
 
-//删除账号
+/**
+ * @method remove 删除账号
+ *
+ * @param {Object} data
+ * @param {UUID} data.accountId 账号ID
+ * @param {Function} callback
+ * @return {Promise}
+ * @public
+ */
 authServer.remove = function(data, callback) {
         var accountId = data.accountId;
         var email = data.email;
@@ -95,13 +122,17 @@ authServer.remove = function(data, callback) {
 
 
 /**
+ * @method newAccount
+ *
  * 新建账号
+ *
  * @param {Object} data 参数
  * @param {String} data.mobile 手机号
  * @param {String} data.email 邮箱
  * @param {String} data.pwd 密码
  * @param {Callback} callback 回调函数
  * @return {Promise} {code: 0, data:{accountId: 账号ID, email: "邮箱", status: "状态"}
+ * @public
  */
 authServer.newAccount = function(data, callback) {
     var defer = Q.defer();
@@ -131,29 +162,45 @@ authServer.newAccount = function(data, callback) {
         return defer.promise.nodeify(callback);
     }
 
-    var status = 0;
-    var pwd = data.pwd;
-    pwd = md5(pwd);
-    var m = Models.Account.build({id: uuid.v1(), mobile:mobile, email: data.email, pwd: pwd, status: status});
-    return m.save()
-        .then(function(account) {
-            if (account.status == 0) {
-                _sendActiveEmail(account.id);
-            }
-            return account;
-        })
-        .then(function(account) {
-            return {code: 0, msg: "ok", data: {
-                id: account.id,
-                email: account.email,
-                mobile: account.mobile,
-                status: account.status
-            }};
-        })
-        .nodeify(callback);
+    //查询邮箱是否已经注册
+    return Q.all([
+        Models.Account.findOne({where: {email: data.email}}),
+        Models.Account.findOne({where: {mobile: mobile}})
+    ]).spread(function(account1, account2) {
+        if (account1) {
+            throw L.ERR.EMAIL_HAS_REGISTRY;
+        }
+
+        if (account2) {
+            throw L.ERR.MOBILE_HAS_REGISTRY;
+        }
+        return true;
+    }).then(function() {
+        var status = 0;
+        var pwd = data.pwd;
+        pwd = md5(pwd);
+        var m = Models.Account.build({id: uuid.v1(), mobile:mobile, email: data.email, pwd: pwd, status: status});
+        return m.save()
+            .then(function(account) {
+                if (account.status == 0) {
+                    _sendActiveEmail(account.id);
+                }
+                return account;
+            })
+            .then(function(account) {
+                return {code: 0, msg: "ok", data: {
+                    id: account.id,
+                    email: account.email,
+                    mobile: account.mobile,
+                    status: account.status
+                }};
+            })
+    }).nodeify(callback);
 }
 
 /**
+ * @method login
+ *
  * 登录
  *
  * @param {Object} data 参数
@@ -162,6 +209,7 @@ authServer.newAccount = function(data, callback) {
  * @param {String} data.mobile 手机号(可选,如果email提供则优先使用email)
  * @param {Callback} callback 可选回调函数
  * @return {Promise} {code:0, msg: "ok", data: {user_id: "账号ID", token_sign: "签名", token_id: "TOKEN_ID", timestamp:"时间戳"}
+ * @public
  */
 authServer.login = function(data, callback) {
     var defer = Q.defer();
@@ -210,6 +258,8 @@ authServer.login = function(data, callback) {
 }
 
 /**
+ * @method authenticate
+ *
  * 认证登录凭证是否有效
  *
  * @param {Object} params
@@ -249,6 +299,8 @@ authServer.authentication = function(params, callback) {
 }
 
 /**
+ * @method bindMobile
+ *
  * 绑定手机号
  *
  * @param {Object} data
@@ -264,6 +316,7 @@ authServer.bindMobile = function(data, callback) {
     defer.resolve({code: 0, msg: "ok"});
     return defer.promise.nodeify(callback);
 }
+
 
 //生成登录凭证
 function makeAuthenticateSign(accountId, os, callback) {

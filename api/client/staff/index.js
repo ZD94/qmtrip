@@ -3,8 +3,15 @@
  */
 'use strict';
 
+/**
+ * @module API
+ */
+
 var Q = require("q");
 var API = require("common/api");
+/**
+ * @class staff 员工信息
+ */
 var staff = {};
 
 function needPowersMiddleware(fn, needPowers) {
@@ -23,7 +30,10 @@ function needPowersMiddleware(fn, needPowers) {
 }
 
 /**
+ * @method createStaff
+ *
  * 管理员添加员工
+ *
  * @type {*}
  */
 staff.createStaff = needPowersMiddleware(function(params, callback) {

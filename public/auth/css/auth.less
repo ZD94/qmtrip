@@ -35,14 +35,17 @@
   text-align: center;
   font-size: @h30;
   color: @color-text;
-  margin-top: 30px;
+  padding-top: 30px;
   margin-bottom: 50px;
+}
+.auth_content{
+  width: 100%;
+  height: auto;
+  padding-bottom: 50px;
 }
 .footer{//页面底部
   width: 100%;
   height: 60px;
-  position: absolute;
-  bottom: 0;
   background-color: @color-footer;
   text-align: center;
   color: @color-white;
@@ -297,6 +300,7 @@
   }
   .forget{
     float: right;
+    cursor: pointer;
   }
   #remember1{
     i{
@@ -307,6 +311,34 @@
     i{
       color: @color-theme1;
       cursor: default;
+    }
+  }
+}
+
+/*忘记密码*/
+.step{
+  width: 430px;
+  height: 30px;
+  margin: 0 auto 50px;
+  line-height: 30px;
+  border: 1px solid @color-border;
+  ul{
+    width: 100%;
+    font-size: @h14;
+    color: @color-text;
+    li{
+      display: block;
+      float: left;
+      width: 33%;
+      line-height: 30px;
+      text-align: center;
+      &:nth-child(2){
+        border-left: 1px solid @color-border;
+        border-right: 1px solid @color-border;
+      }
+      &.on{
+        background-color: @color-gray;
+      }
     }
   }
 }

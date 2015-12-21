@@ -4,6 +4,7 @@ node_modules
 /log
 /dist
 /public/script/libs
+/doc
 controller.all.js
 config/config.local.json
 public/auth/css/*.css
