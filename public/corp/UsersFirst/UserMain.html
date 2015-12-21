@@ -1,5 +1,47 @@
 <div class="corphome">
 	<div class="account_detail">
 		<h3>账户信息</h3>
+		<table width="100%">
+			<tr>
+				<td>联系人：<span>{{staff.name}}</span></td>
+				<td>密码：<span>**********</span><a href="">修改</a></td>
+				<td>员工专项奖励金额：<span>￥{{balance}}</span><a href="">充值</a></td>
+			</tr>
+			<tr>
+				<td>电子邮箱：<span>{{staff.email}}</span></td>
+				<td>联系电话：<span>{{staff.mobile}}</span></td>
+				<td>公司ID：<span>{{company.companyNo}}</span></td>
+			</tr>
+		</table>
+	</div>
+	<div class="corp_chart">
+		<h3>{{}}结算信息</h3>
+	</div>
+	<div class="corp_staff">
+		<h3>员工信息管理<a href="">查看详细>></a></h3>
+		<div class="staff_left">
+			<div class="staff_num">共<span>{{company.staffNum}}</span>名</div>
+			<ul>
+				<li>本月新增<span>{{}}0</span></li>
+				<li>本月离开<span>{{}}0</span></li>
+			</ul>
+		</div>
+		<div class="staff_right">
+			<a href="" class="web-icon-font">&#xf067;&nbsp;添加员工</a>
+		</div>
+	</div>
+	<div class="corp_business">
+		<h3>差旅标准<a href="">查看详细>></a></h3>
+		<div class="business_left">
+			<div class="business_standard">
+				<span class="b_name">我是流氓我怕谁{{}}</span>
+				<ul>
+					<li><img src="corp/images/Air.png"><p>商务舱</p></li>
+					<li><img src="corp/images/Hotel.png"><p>500元/晚</p></li>
+					<li><img src="corp/images/Subway.png"><p>特等座</p></li>
+				</ul>
+			</div>
+		</div>
+		<div class="business_right"></div>
 	</div>
 </div>

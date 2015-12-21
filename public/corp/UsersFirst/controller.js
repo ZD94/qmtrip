@@ -13,10 +13,9 @@ var UsersFirst = (function(){
 				API.staff.getCurrentStaff()
 					.then(function(ret){
 						var company_id = ret.staff.companyId;
-						console.info(company_id)
 						API.company.getCompanyFundsAccount(company_id)
 							.then(function(resutlt){
-								console.info(resutlt);
+								$scope.balance = resutlt.fundsAccount.balance;
 								$scope.$apply();
 							})
 							.catch(function(err){
