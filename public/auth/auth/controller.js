@@ -400,6 +400,34 @@ var auth=(function(){
                     }).done();
             })
         }
+    auth.ActiveController = function($scope, $routeParams) {
+        var sign = $routeParams.sign;
+        var accountId = $routeParams.accountId;
+        var timestamp = $routeParams.timestamp;
+
+        API.onload(function() {
+            API.auth.activeByEmail({sign: sign, accountId: accountId, timestamp: timestamp})
+                .then(function(result) {
+                    if (result.code) {
+                        $scope.activeResult = "链接不存在或者已经失效";
+                    } else {
+                        $scope.activeResult = "恭喜您,账号激活成功!"
+                    }
+
+                    $scope.$apply();
+                })
+                .catch(function(err) {
+                    console.info(err);
+                    if (err.code) {
+                        $scope.activeResult = err.msg;
+                    } else {
+                        $scope.activeResult = '系统错误,请稍后重试';
+                    }
+                    $scope.$apply();
+                })
+        })
+
+        $scope.activeResult = "恭喜您账号成功激活,关闭页面";
     }
 
     return auth;

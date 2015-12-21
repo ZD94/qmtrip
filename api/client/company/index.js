@@ -123,7 +123,7 @@ company.getCompanyFundsAccount = function(companyId, callback){
     };
     return API.company.getCompanyFundsAccount(params)
         .then(function(funds){
-            return {code: 0, msg: '', fundsAccount: funds};
+            return {code: 0, msg: 'success', fundsAccount: funds};
         }).nodeify(callback);
 }
 

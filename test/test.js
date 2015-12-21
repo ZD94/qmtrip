@@ -24,10 +24,8 @@ var model = require('common/model');
 model.init(config.postgres.url);
 
 API.init(path.join(__dirname, '../api'), config.api)
-    .then(function(){
-        API.test();
-        run();
-    })
+    .then(API.test)
+    .then(run)
     .catch(function(e){
         logger.error(e.stack?e.stack:e);
         console.error(e.stack?e.stack:e);

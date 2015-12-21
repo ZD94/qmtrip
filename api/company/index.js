@@ -178,7 +178,7 @@ company.getCompanyFundsAccount = function(params, callback){
         .then(function(){
             var companyId = params.companyId;
             var userId = params.userId;
-            return FundsAccounts.findById(companyId)
+            return FundsAccounts.findById(companyId, {attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd', 'staffReward', 'status', 'createAt', 'updateAt']})
                 .then(function(funds){
                     return funds.toJSON();
                 })

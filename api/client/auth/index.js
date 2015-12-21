@@ -11,6 +11,18 @@ var auth = {
 };
 var API = require("common/api");
 
+/**
+ * 通过邮件激活账号
+ *
+ * @param {object} data
+ * @param {String} data.sign
+ * @param {String} data.accountId
+ * @param {String} data.timestamp
+ * @param {Function} callback
+ * @return {promise}
+ * @public
+ */
+auth.activeByEmail = API.auth.activeByEmail;
 
 /**
  * 登录
@@ -37,17 +49,6 @@ auth.login = API.auth.login;
  */
 auth.bindMobile =API.auth.bindMobile;
 
-/**
- * 激活账号
- *
- * @param {Object} data
- * @param {UUID} data.accountId 账号ID
- * @param {String} data.timestamp 时间戳
- * @param {String} data.sign 签名
- * @param {Callback} callback
- * @return {Promise} {code:0 , msg: "ok"}
- */
-auth.activeAccount = API.auth.activeAccount;
 
 /**
  * 是否黑名单
