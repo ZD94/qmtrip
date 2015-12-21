@@ -270,47 +270,37 @@ var auth=(function(){
             var pCode = $('#picCode').val();
             var agree = $('.check').children("i").attr('checkvalue');
             var commit = true;
-            var reg = /^\w+[\w\-\.]+\w@\w[\w\-\.]+\w$/;
+            //var reg = /^\w+[\w\-\.]+\w@\w[\w\-\.]+\w$/;
             if(commit){
                 if(!cName){
                     $scope.err_msg = "企业名称不能为空";
                     $("#corpName").siblings(".err_msg").children("i").html("&#xf06a;");
                     $("#corpName").siblings(".err_msg").children("i").removeClass("right");
                     $("#corpName").siblings(".err_msg").show();
-                    //$("#corpName").focus();
                     return false;
                 }else if(!name){
                     $scope.err_msg_name = "联系人姓名不能为空";
                     $("#corpRegistryName").siblings(".err_msg").children("i").html("&#xf06a;");
                     $("#corpRegistryName").siblings(".err_msg").children("i").removeClass("right");
                     $("#corpRegistryName").siblings(".err_msg").show();
-                    //$("#corpRegistryName").focus();
                     return false;
                 }else if(!mail){
                     $scope.err_msg_mail = "联系人邮箱不能为空";
                     $("#corpMail").siblings(".err_msg").children("i").html("&#xf06a;");
                     $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
                     $("#corpMail").siblings(".err_msg").show();
-                    //$("#corpMail").focus();
                     $(".tip_div").hide();
                     return false;
                 }
-                //else if(!reg.test(mail)){
-                //    //alert("邮箱格式不正确!");
-                //    return false;
-                //}
                 else if(!mobile){
                     $scope.err_msg_phone = "联系人电话不能为空";
-                    //console.info(123333);
                     $("#corpMobile").siblings(".err_msg").children("i").html("&#xf06a;");
                     $("#corpMobile").siblings(".err_msg").children("i").removeClass("right");
                     $("#corpMobile").siblings(".err_msg").show();
-                    //$("#corpMobile").focus();
                     return false;
                 }
                 else if(!pwd){
                     $scope.err_msg_pwd = "密码不能为空";
-                    //console.info(123333);
                     $("#corpPwd").siblings(".err_msg").children("i").html("&#xf06a;");
                     $("#corpPwd").siblings(".err_msg").children("i").removeClass("right");
                     $("#corpPwd").siblings(".err_msg").show();
@@ -324,7 +314,10 @@ var auth=(function(){
                     $("#msgCode").parent("div").siblings(".err_msg").show();
                     return false;
                 }else if(!pCode){
-                    alert("图片验证码不能为空!");
+                    $scope.err_msg_pic = "图片验证码不能为空";
+                    $("#imgCode").parent("div").siblings(".err_msg").children("i").html("&#xf06a;");
+                    $("#imgCode").parent("div").siblings(".err_msg").children("i").removeClass("right");
+                    $("#imgCode").parent("div").siblings(".err_msg").show();
                     return false;
                 }else if(agree != "true"){
                     alert("请同意");
