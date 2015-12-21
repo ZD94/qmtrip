@@ -8,76 +8,73 @@
     </div>
 </div>
 <div class="auth_content">
-<div class="title">
-    注册
-</div>
-<div class="input">
-    <input id="corpName" class="" type="text" value="" placeholder="企业名称 (暂不支持个人注册)">
-    <!--<span class="err_msg"><i class="web-icon-font">&#xf06a;</i>企业名称不能为空</span>-->
-    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg}}</span>
-</div>
-<div class="input">
-    <input id="corpRegistryName" class="" type="text" value="" placeholder="联系人姓名">
-    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_name}}</span>
-</div>
-<div class="input">
-    <input id="corpMail" class="" type="text" value="" placeholder="联系人邮箱（请使用企业邮箱,作为登录账号使用)">
-    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_mail}}</span>
-    <div class="tip_div">
-        <img src="../../images/sanjiao.jpg"/>
-        <span>
-            暂不支持公共邮箱，查看<a style="color: #118FD6;">公共邮箱</a></br>
-            后缀为 126.com  / 163.com / gmail.com / </br>
-            qq.com / sina.com
-        </span>
+    <div class="title">
+        注册
     </div>
-</div>
-<!--<div style="width:600px;margin:10px auto;">暂不支持公共邮箱，若为<span>公共邮箱</span>，请联系客服<span>010-4657892</span></div>-->
-<div class="input">
-    <input id="corpMobile" class="" type="text" value="" placeholder="联系人电话" maxlength="13">
-    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_phone}}</span>
-</div>
-<div class="input">
-    <input id="corpPwd" class="" type="password" value="" onkeyup="checkPwd()" maxlength="20" placeholder="设置登录密码">
-    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_pwd}}</span>
-    <div class="pwdStrength">
-        <ul>
-            <li class="on">弱</li>
-            <li>中</li>
-            <li>强</li>
-        </ul>
+    <div class="input">
+        <input id="corpName" class="" type="text" value="" placeholder="企业名称 (暂不支持个人注册)">
+        <span class="err_msg"><i class="web-icon-font"></i>{{err_msg}}</span>
     </div>
-    <div class="tip_div2">
-        <img src="../../images/sanjiao.jpg"/>
-        <span>
-            需6~20个字符,有数字或字母组成，字母区分大小写
-        </span>
+    <div class="input">
+        <input id="corpRegistryName" class="" type="text" value="" placeholder="联系人姓名">
+        <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_name}}</span>
     </div>
-</div>
-<div class="inputs">
-    <div>
-        <input id="msgCode" class="" type="text" value="" placeholder="短信验证码">
+    <div class="input">
+        <input id="corpMail" class="" type="text" value="" placeholder="联系人邮箱（请使用企业邮箱,作为登录账号使用)">
+        <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_mail}}</span>
+        <div class="tip_div">
+            <img src="../../images/sanjiao.jpg"/>
+            <span>
+                暂不支持公共邮箱，查看<a style="color: #118FD6;">公共邮箱</a></br>
+                后缀为 126.com  / 163.com / gmail.com / </br>
+                qq.com / sina.com
+            </span>
+        </div>
     </div>
-    <span class="getCode v_code" ng-click="getMCode()">免费获取短信验证码</span>
-    <span id="timer" class="getCode" style="display:none;background-color: #ededed;">(<span id="seconds">90</span>)s后重新发送</span>
-    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_msg}}</span>
-</div>
-<div class="inputs">
-    <div>
-        <input id="picCode" class="" type="text" value="" placeholder="图片验证码">
+    <div class="input">
+        <input id="corpMobile" class="" type="text" value="" placeholder="联系人电话" maxlength="13">
+        <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_phone}}</span>
     </div>
-    <img id="imgCode" src=""/>
-    <span class="change" ng-click="changePicCode()">换一换</span>
-    <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_pic}}</span>
-</div>
-<div class="agree">
-    <span id="check1"><i class="web-icon-font2" checkvalue="true">&#xea2e;</i>同意<a href="">《途灵岛商旅注册协议》</a></span>
-    <span id="check2" style="display: none;"><i class="web-icon-font2" checkvalue="false">&#xea2f;</i>同意<a href="">《途灵岛商旅注册协议》</a></span>
-</div>
-<a class="register" ng-click="register()">立即注册</a>
+    <div class="input">
+        <input id="corpPwd" class="" type="password" value="" onkeyup="checkPwd()" maxlength="20" placeholder="设置登录密码">
+        <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_pwd}}</span>
+        <div class="pwdStrength">
+            <ul>
+                <li class="on">弱</li>
+                <li>中</li>
+                <li>强</li>
+            </ul>
+        </div>
+        <div class="tip_div2">
+            <img src="../../images/sanjiao.jpg"/>
+            <span>
+                需6~20个字符,有数字或字母组成，字母区分大小写
+            </span>
+        </div>
+    </div>
+    <div class="inputs">
+        <div>
+            <input id="msgCode" class="" type="text" value="" placeholder="短信验证码">
+        </div>
+        <span class="getCode v_code" ng-click="getMCode()">免费获取短信验证码</span>
+        <span id="timer" class="getCode" style="display:none;background-color: #ededed;">(<span id="seconds">90</span>)s后重新发送</span>
+        <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_msg}}</span>
+    </div>
+    <div class="inputs">
+        <div>
+            <input id="picCode" class="" type="text" value="" placeholder="图片验证码">
+        </div>
+        <img id="imgCode" src=""/>
+        <span class="change" ng-click="changePicCode()">换一换</span>
+        <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_pic}}</span>
+    </div>
+    <div class="agree">
+        <span id="check1"><i class="web-icon-font2" checkvalue="true">&#xea2e;</i>同意<a href="">《途灵岛商旅注册协议》</a></span>
+        <span id="check2" style="display: none;"><i class="web-icon-font2" checkvalue="false">&#xea2f;</i>同意<a href="">《途灵岛商旅注册协议》</a></span>
+    </div>
+    <a class="register" ng-click="register()">立即注册</a>
 
 </div>
-<!--<div style="width: 600px;margin: 10px auto;text-align: center;"><a href="#/auth/login">已有账号?登录</a></div>-->
 <div class="footer">
     <p>由途灵岛信息股份有限公司提供技术支持</p>
     <p>联系电话：010-57371105</p>
@@ -134,18 +131,12 @@
             $(".tip_div2").show();
 //            $("#corpPwd").siblings(".err_msg").hide();
         })
-//        $("#msgCode").blur(function(){
-//            console.info(44444);
-//            //var mCode = $('#msgCode').val();
-//            //if(!mCode){
-//            //    $scope.err_msg_msg = "手机验证码不能为空";
-//            //    $("#msgCode").parent("div").siblings(".err_msg").children("i").html("&#xf06a;");
-//            //    $("#msgCode").parent("div").siblings(".err_msg").children("i").removeClass("right");
-//            //    $("#msgCode").parent("div").siblings(".err_msg").show();
-//            //    $("#msgCode").focus();
-//            //    $scope.$apply();
-//            //    return false;
-//            //}
-//        })
+    })
+</script>
+
+<script>
+    $(function(){
+        var wh = $(window).height();
+        $(".auth_content").css("min-height", wh-80-60-50);
     })
 </script>

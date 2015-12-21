@@ -34,11 +34,12 @@
   text-align: center;
   font-size: 30px;
   color: #4a4a4a;
-  margin-top: 30px;
+  padding-top: 30px;
   margin-bottom: 50px;
 }
 .auth_content {
   width: 100%;
+  height: auto;
   padding-bottom: 50px;
 }
 .footer {
