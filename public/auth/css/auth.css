@@ -59,6 +59,9 @@
 .blue-border {
   border: 1px solid #118FD6 !important;
 }
+.blue {
+  color: #118FD6;
+}
 .right {
   color: #5cca2e !important;
 }
@@ -299,6 +302,47 @@
 .remember #remember2 i {
   color: #118FD6;
   cursor: default;
+}
+/*企业激活邮件页面*/
+.tip_title {
+  width: 100%;
+  text-align: center;
+  margin: 100px auto 50px;
+  font-size: 20px;
+  color: #4a4a4a;
+}
+.tip_title i {
+  color: #118FD6;
+  font-size: 20px;
+}
+.tip_content {
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  color: #bababa;
+}
+.tip_foot {
+  width: 800px;
+  margin: 30px auto;
+  border-top: 1px solid #d9d9d9;
+  padding-top: 30px;
+  font-size: 14px;
+  text-align: center;
+  color: #4a4a4a;
+}
+.tip_foot p i {
+  color: #9b9b9b;
+  margin-right: 10px;
+}
+.tip_foot div {
+  width: 280px;
+  margin: 20px auto;
+  text-align: left;
+  line-height: 40px;
+}
+.tip_foot div i {
+  font-size: 10px;
+  line-height: 40px;
 }
 /*忘记密码*/
 .step {
