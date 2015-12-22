@@ -98,7 +98,6 @@ tripPlan.getTripPlanOrder = function(params, callback){
                 ConsumeDetails.findAll({where: {orderId: orderId, type: 0}})
             ])
                 .spread(function(order, outTraffic, backTraffic, hotel){
-                    logger.info(order);
                     if(!order){
                         defer.reject(L.ERR.TRIP_PLAN_ORDER_NOT_EXIST);
                         return defer.promise;
