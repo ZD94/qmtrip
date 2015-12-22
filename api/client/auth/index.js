@@ -6,6 +6,8 @@ var Q = require("q");
 var L = require("common/language");
 var validate = require("common/validate");
 var md5 = require("common/utils").md5;
+var errorHandle = require("common/errorHandle");
+
 /**
  * @class auth 用户认证
  */
@@ -193,6 +195,7 @@ auth.registryCompany = function(params, callback) {
                         })
                 })
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -245,6 +248,7 @@ auth.needPowersMiddleware = function(fn, needPowers) {
                 }
                 return fn.apply(self, params);
             })
+            .catch(errorHandle)
             .nodeify(callback);
     }
 }

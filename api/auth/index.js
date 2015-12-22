@@ -12,6 +12,7 @@ var getRndStr = require("../../common/utils").getRndStr;
 var C = require("../../config");
 var moment = require("moment");
 var API = require("../../common/api");
+var errorHandle = require("common/errorHandle");
 
 /**
  * @class API.auth 认证类
@@ -65,6 +66,7 @@ authServer.activeByEmail = function(data, callback) {
                     return {code: 0, msg: "OK"};
                 })
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -97,6 +99,7 @@ authServer.active = function(data, callback) {
                     }}
                 })
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -117,6 +120,7 @@ authServer.remove = function(data, callback) {
             .then(function() {
                 return {code: 0, msg: "ok"};
             })
+            .catch(errorHandle)
             .nodeify(callback);
 }
 
@@ -195,7 +199,9 @@ authServer.newAccount = function(data, callback) {
                     status: account.status
                 }};
             })
-    }).nodeify(callback);
+    })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -258,6 +264,7 @@ authServer.login = function(data, callback) {
                     return {code:0, msg: "ok", data: result};
                 })
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -299,6 +306,7 @@ authServer.authentication = function(params, callback) {
 
             return {code: -1, msg: "已经失效"};
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -359,6 +367,7 @@ function makeAuthenticateSign(accountId, os, callback) {
                 timestamp: timestamp
             }
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -425,6 +434,7 @@ authServer.sendActiveEmail = function(params, callback) {
     .then(function() {
         return {code: 0, msg: "ok"};
     })
+    .catch(errorHandle)
     .nodeify(callback);
 }
 
@@ -449,6 +459,7 @@ authServer.logout = function (params, callback) {
             }
             return {code: 0, msg: "ok"};
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
