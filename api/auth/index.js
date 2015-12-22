@@ -377,7 +377,6 @@ function _sendActiveEmail(accountId) {
             var activeToken = getRndStr(6);
             var sign = makeActiveSign(activeToken, account.id, expireAt);
             var url = C.host + "/auth.html#/auth/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
-
             //发送激活邮件
             var sendEmailRequest = Q.denodeify(API.mail.sendMailRequest);
             return  sendEmailRequest({toEmails: account.email, templateName: "qm_active_email", values: [account.email, url]})
@@ -386,6 +385,43 @@ function _sendActiveEmail(accountId) {
                     return account.save();
                 })
         })
+}
+
+/**
+ * @method sendActiveEmail
+ *
+ * 发送激活邮件
+ *
+ * @param {Object} params
+ * @param {String} params.email 要发送的邮件
+ * @param {Function} [callback] 可选回调函数
+ * @return {Promise} {code: 0, msg: "OK", submit: "ID"}
+ */
+authServer.sendActiveEmail = function(params, callback) {
+    var email = params.email;
+    var defer = Q.defer();
+    if (!email) {
+        defer.reject(L.ERR.EMAIL_EMPTY);
+        return defer.promise.nodeify(callback);
+    }
+
+    if (!validate.isEmail(email)) {
+        defer.reject(L.ERR.EMAIL_FORMAT_INVALID);
+        return defer.promise.nodeify(callback);
+    }
+
+    return Models.Account.findOne({where: {email: email}})
+    .then(function(account) {
+        if (!account) {
+            throw L.ERR.EMAIL_NOT_REGISTRY;
+        }
+
+        return _sendActiveEmail(account.id);
+    })
+    .then(function() {
+        return {code: 0, msg: "ok"};
+    })
+    .nodeify(callback);
 }
 
 module.exports = authServer;

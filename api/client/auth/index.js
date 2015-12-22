@@ -197,6 +197,20 @@ auth.registryCompany = function(params, callback) {
 }
 
 /**
+ * @method sendActiveEmail
+ *
+ * 发送激活邮件
+ *
+ * @param {Object} params
+ * @param {String} params.email 邮件账号
+ * @param {Function} callback
+ * @return {Promise} {code: 0, msg: "OK"}
+ */
+auth.sendActiveEmail = function(params, callback) {
+    return API.auth.sendActiveEmail(params, callback);
+}
+
+/**
  * @method needPowersMiddleware
  *
  * 权限控制

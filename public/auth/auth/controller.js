@@ -250,9 +250,7 @@ var auth=(function(){
         })
         //换一换图片验证码
         $scope.changePicCode = function(){
-            console.info("click me...")
             API.onload(function(){
-                console.info("here...")
                 API.checkcode.getPicCheckCode({width:imgW,height:imgH,quality:100,length:4})
                     .then(function(result){
                         //console.info("获取验证码图片", result);
@@ -356,8 +354,11 @@ var auth=(function(){
                         .catch(function(err){
                             if (err.msg) {
                                 alert(err.msg);
+                                $scope.changePicCode();
+                                $scope.$apply();
+                                return;
                             }
-                            console.info(err);
+                            console.error(err);
                         }).done();
                 })
             }
