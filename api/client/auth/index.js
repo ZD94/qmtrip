@@ -197,7 +197,7 @@ auth.registryCompany = function(params, callback) {
 }
 
 /**
- * @method needPowersMiddleware
+ * @method needPermissionMiddleware
  *
  * 权限控制
  *
@@ -205,7 +205,7 @@ auth.registryCompany = function(params, callback) {
  * @param needPowers
  * @return {Function}
  */
-auth.needPowersMiddleware = function(fn, needPowers) {
+auth.needPermissionMiddleware = function(fn, needPowers) {
     return function(params, callback) {
         var self = this;
         var accountId = self.accountId;
