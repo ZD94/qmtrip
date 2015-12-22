@@ -245,6 +245,10 @@ authServer.login = function(data, callback) {
                 throw L.ERR.PASSWORD_NOT_MATCH
             }
 
+            if (loginAccount.status == 0) {
+                throw L.ERR.ACCOUNT_NOT_ACTIVE;
+            }
+
             if (loginAccount.status != 1) {
                 throw L.ERR.ACCOUNT_FORBIDDEN;
             }
@@ -422,6 +426,30 @@ authServer.sendActiveEmail = function(params, callback) {
         return {code: 0, msg: "ok"};
     })
     .nodeify(callback);
+}
+
+/**
+ * 退出登录
+ * @param {Object} params
+ * @param {UUID} params.accountId
+ * @param {UUID} params.tokenId
+ * @param {Function} callback
+ * @return {Promise}
+ */
+authServer.logout = function (params, callback) {
+    var accountId = params.accountId;
+    var tokenId = params.tokenId;
+    return Q.all([])
+        .then(function() {
+            if (accountId && tokenId) {
+                return Models.Token.destroy({where: {accountId: accountId, id: tokenId}})
+                    .then(function() {
+                        return {code: 0, msg: "OK"};
+                    })
+            }
+            return {code: 0, msg: "ok"};
+        })
+        .nodeify(callback);
 }
 
 module.exports = authServer;

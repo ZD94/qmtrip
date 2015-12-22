@@ -432,6 +432,19 @@ var auth=(function(){
 
         $scope.activeResult = "恭喜您账号成功激活,关闭页面";
     }
+
+    auth.LogoutController = function($scope) {
+        API.onload(function() {
+            API.auth.logout(function(err, result) {
+                if (err) {
+                    alert("系统错误");
+                } else {
+                    window.location.href="#/auth/login";
+                }
+            })
+        })
+    }
+
     return auth;
 })();
 

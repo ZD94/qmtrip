@@ -211,6 +211,21 @@ auth.sendActiveEmail = function(params, callback) {
 }
 
 /**
+ * @method logout
+ *
+ * 退出登录
+ *
+ * @param [callback] 可选回调函数
+ * @return {Promise} {code: 0}, {code: -1}
+ */
+auth.logout = function(callback) {
+    var self = this;
+    var accountId = self.accountId;
+    var tokenId = self.tokenId;
+    return API.auth.logout({accountId: accountId, tokenId: tokenId}, callback);
+}
+
+/**
  * @method needPowersMiddleware
  *
  * 权限控制
