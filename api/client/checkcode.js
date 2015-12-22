@@ -4,9 +4,10 @@
 
 /**
  * @module API
- * @type {API|exports|module.exports}
  */
+
 var API = require("../../common/api");
+var Q = require("q");
 
 /**
  * @class checkcode 验证码
@@ -70,6 +71,65 @@ var checkcode = {
         params.type = type;
         API.checkcode.getPicCheckCode(params, callback);
     },
+    /**
+     * @method isMatchPicCheckCode
+     *
+     * 判断验证码是否正确
+     *
+     * @param {Object} params
+     * @param {String} params.ticket 凭证
+     * @param {String} params.code 验证码
+     * @param {Function} [callback] 回调函数 {code: 0, msg: "Ok"}, {code: -1, msg: "验证码已失效"}
+     * @return {Promise} {code: 0, msg: "Ok"}, {code: -1, msg: "验证码已失效"}
+     * @example
+     * ```
+     *  API.checkcode.isMatchPicCheckCode({ticket: "TICKET", code: "CODE"}, function(err, result) {
+     *      if (err) {
+     *          alert(err);
+     *      } else {
+     *          if (result.code) {
+     *              alert(result.msg);  //显示错误
+     *          } else {
+     *              console.info("正确");
+     *          }
+     *      }
+     *  })
+     * ```
+     */
+    isMatchPicCheckCode: function(params, callback) {
+        var fn = Q.denodeify(API.checkcode.isMatchPicCheckCode);
+        return fn(params, callback);
+    },
+    /**
+     * @method isMatchMsgCheckCode
+     *
+     * 是否匹配短信验证码
+     *
+     * @param {Object} params   参数
+     * @param {String} params.ticket 凭证
+     * @param {String} params.code 验证码
+     * @param {Function} [callback] 可选回调函数 {code: 0, msg: "OK"}, {code: -1, msg: "已失效或者不存在"}
+     * @return {Promise} {code: 0, msg: "OK"}, {code: -1, msg: "已失效或者不存在"}
+     * @example
+     * ```
+     * API.checkcode.isMatchMsgCheckCode({ticket: "TICKET", code: "CODE"}, function(err, result) {
+     *  if (err) {
+     *      console.info(err);  //有错误,抛出错误
+     *      return;
+     *  }
+     *
+     *  if (result.code) {
+     *      console.info(result.msg);   //失效或者不存在
+     *  } else {
+     *      console.info("验证码有效");
+     *  }
+     * })
+     * ```
+     */
+    isMatchMsgCheckCode: function(params, callback) {
+        var fn = Q.denodeify(API.checkcode.isMatchMsgCheckCode);
+        return fn(params, callback);
+    }
 }
 
 module.exports = checkcode;
