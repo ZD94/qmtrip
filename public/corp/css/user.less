@@ -195,6 +195,7 @@
 		height: 212px;
 		padding: 13px 20px;
 		clear: both;
+		position: relative;
 		h3{
 			border-left: 4px solid #3bbaf5;
 			font-size: 16px;
@@ -215,6 +216,54 @@
 				p{
 					margin-top: 10px;
 					text-align: center;
+				}
+			}
+		}
+		.corp_count{
+			position: absolute;
+			right: 0;
+			top: 0;
+			border-left:1px solid #e5e5e5;
+			background: #fff;
+			width: 284px;
+			height: 238px;
+			div{
+				&.corp_funds{
+					text-align: center;
+					height: 118px;
+					border-bottom: 1px solid #e5e5e5;
+					span{
+						font-size: 20px;
+						color: #4a4a4a;
+						display: inline-block;
+						margin-top: 30px;
+						line-height: 2;
+					}
+					p{
+						font-size: 14px;
+						color: #9b9b9b;
+					}
+				}
+				&:nth-child(2){
+					.ranking{
+						float: left;
+						border:7px solid #01bdff;
+						height: 88px;
+						width: 88px;
+						border-radius: 50px;
+						margin-top: 12px;
+						margin-left: 19px;
+						text-align: center;
+						span{
+							display: inline-block;
+							margin-top: 15px;
+							line-height: 2;
+						}
+					}
+					.fund_all{
+						margin-left: 140px;
+						width: 150px;padding-top: 40px;
+					}
 				}
 			}
 		}

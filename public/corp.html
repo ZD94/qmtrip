@@ -59,9 +59,10 @@
     $(function(){
     	$(window).resize(function(){resize();})
     	$(".left_nav a").click(function(){
-    		var $that = $(this);
+    		var $that = $(this).closest("li");
     		$(".left_nav li").removeClass("on");
     		$that.addClass("on");
+    		console.info($that)
     	})
     	function resize(){
     		var ww = $(window).width();
@@ -78,8 +79,8 @@
 			<img src="/corp/images/logo.png">
 		</div>
 		<ul class="left_nav">
-			<li class="on">
-				<a href="">差旅管理首页</a>
+			<li>
+				<a href="#/UsersFirst/UserMain">差旅管理首页</a>
 			</li>
 			<li>
 				<a href="">出差统计</a>
@@ -88,7 +89,7 @@
 				<a href="">员工信息管理</a>
 			</li>
 			<li>
-				<a href="">差旅标准设置</a>
+				<a href="#/TravelCriterion/CriterionList">差旅标准设置</a>
 			</li>
 			<li>
 				<a href="">员工奖励计划</a>

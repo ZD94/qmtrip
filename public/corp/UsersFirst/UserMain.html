@@ -5,7 +5,7 @@
 			<tr>
 				<td>联系人：<span>{{staff.name}}</span></td>
 				<td>密码：<span>**********</span><a href="">修改</a></td>
-				<td>员工专项奖励金额：<span>￥{{balance}}</span><a href="">充值</a></td>
+				<td>员工专项奖励金额：<span>￥{{funds.balance}}</span><a href="">充值</a></td>
 			</tr>
 			<tr>
 				<td>电子邮箱：<span>{{staff.email}}</span></td>
@@ -63,12 +63,18 @@
 				<p>JD ￥200 e卡</p>
 			</li>
 		</ul>
-		<div class="corp_funds">
-			<div>
-				<span></span>
-				<p></p>
+		<div class="corp_count">
+			<div class="corp_funds">
+				<span>￥{{funds.balance}}</span>
+				<p>增收节支专项奖励账户余额</p>
 			</div>
-			<div></div>
+			<div>
+				<div class="ranking">
+					<span>1</span>
+					<p>行业排名</p>
+				</div>
+				<div class="fund_all">公司累计投入专项奖金共：￥{{funds.income}}</div>
+			</div>
 		</div>
 	</div>
 </div>
