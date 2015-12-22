@@ -4,6 +4,7 @@
 var UsersFirst = (function(){
 	API.require("company");
 	API.require("staff");
+	API.require("staff");
 	var UsersFirst ={};
 	UsersFirst.UserMainController = function($scope){
 		$("title").html("全麦企业管理");
@@ -13,9 +14,13 @@ var UsersFirst = (function(){
 				API.staff.getCurrentStaff()
 					.then(function(ret){
 						var company_id = ret.staff.companyId;
-						API.company.getCompanyFundsAccount(company_id)
-							.then(function(resutlt){
+						Q.all([
+							API.company.getCompanyFundsAccount(company_id),
+							API.staff.statisticStaffs({companyId:company_id})
+						])
+							.spread(function(resutlt,num){
 								$scope.balance = resutlt.fundsAccount.balance;
+								$scope.num = num.sta;
 								$scope.$apply();
 							})
 							.catch(function(err){
