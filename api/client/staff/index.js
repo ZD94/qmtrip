@@ -146,7 +146,9 @@ staff.getStaff = needPowersMiddleware(function(id, params, callback) {
  * @returns {*}
  */
 staff.getCurrentStaff = function(callback){
-    return API.staff.getStaff(this.accountId, callback);
+    var self = this;
+    console.info(self.accountId);
+    return API.staff.getStaff(self.accountId, callback);
 }
 
 /**

@@ -4,8 +4,11 @@
 
 var Q = require("q");
 var L = require("common/language");
+var Logger = require("common/logger");
 var validate = require("common/validate");
 var md5 = require("common/utils").md5;
+var uuid = require('node-uuid');
+var logger = new Logger("auth");
 /**
  * @class auth 用户认证
  */
@@ -178,22 +181,59 @@ auth.registryCompany = function(params, callback) {
                             }
 
                             var account = result.data;
-                            return createCompany({createUser: account.id, name: companyName, domainName: domain})
-                                .then(function(result) {
-                                    if (result.code) {
-                                        throw result;
-                                    }
-
-                                    var company = result.company;
-                                    return createStaff({email: email, mobile: mobile, name: name, companyId: company.id, accountId: account.id})
+                            var companyId = uuid.v1();
+                            var staffId = account.id;
+                            return Q.all([
+                                createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain}),
+                                createStaff({email: email, mobile: mobile, name: name, companyId: companyId, accountId: account.id})
+                            ])
+                                .then(function(ret){
+                                    return {code: 0, msg: 'ok'};
+                                })
+                                .catch(function(err){
+                                    logger.info("*****************************************");
+                                    logger.info(err);
+                                    API.company.deleteCompany({companyId: companyId, userId: account.id});
+                                    API.staff.deleteStaff({id: staffId});
+                                    defer.reject(L.ERR.SYSTEM_ERROR);
+                                    return defer.promise;
                                 })
                         })
                         .then(function(result) {
-                            return {code: 0, msg: "OK"};
+                            return result;
                         })
                 })
         })
         .nodeify(callback);
+}
+
+/**
+ * @method sendActiveEmail
+ *
+ * 发送激活邮件
+ *
+ * @param {Object} params
+ * @param {String} params.email 邮件账号
+ * @param {Function} callback
+ * @return {Promise} {code: 0, msg: "OK"}
+ */
+auth.sendActiveEmail = function(params, callback) {
+    return API.auth.sendActiveEmail(params, callback);
+}
+
+/**
+ * @method logout
+ *
+ * 退出登录
+ *
+ * @param [callback] 可选回调函数
+ * @return {Promise} {code: 0}, {code: -1}
+ */
+auth.logout = function(callback) {
+    var self = this;
+    var accountId = self.accountId;
+    var tokenId = self.tokenId;
+    return API.auth.logout({accountId: accountId, tokenId: tokenId}, callback);
 }
 
 /**
