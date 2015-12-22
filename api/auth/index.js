@@ -12,6 +12,7 @@ var getRndStr = require("../../common/utils").getRndStr;
 var C = require("../../config");
 var moment = require("moment");
 var API = require("../../common/api");
+var errorHandle = require("common/errorHandle");
 
 /**
  * @class API.auth 认证类
@@ -65,6 +66,7 @@ authServer.activeByEmail = function(data, callback) {
                     return {code: 0, msg: "OK"};
                 })
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -97,6 +99,7 @@ authServer.active = function(data, callback) {
                     }}
                 })
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -117,6 +120,7 @@ authServer.remove = function(data, callback) {
             .then(function() {
                 return {code: 0, msg: "ok"};
             })
+            .catch(errorHandle)
             .nodeify(callback);
 }
 
@@ -195,7 +199,9 @@ authServer.newAccount = function(data, callback) {
                     status: account.status
                 }};
             })
-    }).nodeify(callback);
+    })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -245,6 +251,10 @@ authServer.login = function(data, callback) {
                 throw L.ERR.PASSWORD_NOT_MATCH
             }
 
+            if (loginAccount.status == 0) {
+                throw L.ERR.ACCOUNT_NOT_ACTIVE;
+            }
+
             if (loginAccount.status != 1) {
                 throw L.ERR.ACCOUNT_FORBIDDEN;
             }
@@ -254,6 +264,7 @@ authServer.login = function(data, callback) {
                     return {code:0, msg: "ok", data: result};
                 })
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -295,6 +306,7 @@ authServer.authentication = function(params, callback) {
 
             return {code: -1, msg: "已经失效"};
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -355,6 +367,7 @@ function makeAuthenticateSign(accountId, os, callback) {
                 timestamp: timestamp
             }
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -377,7 +390,6 @@ function _sendActiveEmail(accountId) {
             var activeToken = getRndStr(6);
             var sign = makeActiveSign(activeToken, account.id, expireAt);
             var url = C.host + "/auth.html#/auth/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
-
             //发送激活邮件
             var sendEmailRequest = Q.denodeify(API.mail.sendMailRequest);
             return  sendEmailRequest({toEmails: account.email, templateName: "qm_active_email", values: [account.email, url]})
@@ -386,6 +398,69 @@ function _sendActiveEmail(accountId) {
                     return account.save();
                 })
         })
+}
+
+/**
+ * @method sendActiveEmail
+ *
+ * 发送激活邮件
+ *
+ * @param {Object} params
+ * @param {String} params.email 要发送的邮件
+ * @param {Function} [callback] 可选回调函数
+ * @return {Promise} {code: 0, msg: "OK", submit: "ID"}
+ */
+authServer.sendActiveEmail = function(params, callback) {
+    var email = params.email;
+    var defer = Q.defer();
+    if (!email) {
+        defer.reject(L.ERR.EMAIL_EMPTY);
+        return defer.promise.nodeify(callback);
+    }
+
+    if (!validate.isEmail(email)) {
+        defer.reject(L.ERR.EMAIL_FORMAT_INVALID);
+        return defer.promise.nodeify(callback);
+    }
+
+    return Models.Account.findOne({where: {email: email}})
+    .then(function(account) {
+        if (!account) {
+            throw L.ERR.EMAIL_NOT_REGISTRY;
+        }
+
+        return _sendActiveEmail(account.id);
+    })
+    .then(function() {
+        return {code: 0, msg: "ok"};
+    })
+    .catch(errorHandle)
+    .nodeify(callback);
+}
+
+/**
+ * 退出登录
+ * @param {Object} params
+ * @param {UUID} params.accountId
+ * @param {UUID} params.tokenId
+ * @param {Function} callback
+ * @return {Promise}
+ */
+authServer.logout = function (params, callback) {
+    var accountId = params.accountId;
+    var tokenId = params.tokenId;
+    return Q.all([])
+        .then(function() {
+            if (accountId && tokenId) {
+                return Models.Token.destroy({where: {accountId: accountId, id: tokenId}})
+                    .then(function() {
+                        return {code: 0, msg: "OK"};
+                    })
+            }
+            return {code: 0, msg: "ok"};
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 module.exports = authServer;
