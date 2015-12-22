@@ -9,6 +9,7 @@ var validate = require("common/validate");
 var md5 = require("common/utils").md5;
 var uuid = require('node-uuid');
 var logger = new Logger("auth");
+var errorHandle = require("common/errorHandle");
 /**
  * @class auth 用户认证
  */
@@ -191,7 +192,6 @@ auth.registryCompany = function(params, callback) {
                                     return {code: 0, msg: 'ok'};
                                 })
                                 .catch(function(err){
-                                    logger.info("*****************************************");
                                     logger.info(err);
                                     API.company.deleteCompany({companyId: companyId, userId: account.id});
                                     API.staff.deleteStaff({id: staffId});
@@ -204,6 +204,7 @@ auth.registryCompany = function(params, callback) {
                         })
                 })
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -256,6 +257,7 @@ auth.needPermissionMiddleware = function(fn, needPowers) {
                 }
                 return fn.apply(self, params);
             })
+            .catch(errorHandle)
             .nodeify(callback);
     }
 }

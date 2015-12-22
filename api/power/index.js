@@ -8,7 +8,7 @@ var services = {};
 var API = require("../../common/api");
 var db = require("common/model").importModel("./models");
 var Q = require("q");
-
+var errorHandle = require("common/errorHandle");
 var STAFF_POWER = 1;   //员工权限 1
 var MANAGER_POWER = 2; //管理员权限 2
 var OWNER_POWER = 0;   //企业拥有者权限
@@ -67,6 +67,7 @@ services.getPowerList = function(data, callback) {
         .then(function(powers) {
             return {code: 0, data: {"accountId": accountId, powers: powers}};
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -81,7 +82,9 @@ function _getRolePowerList(role, callback) {
     return db.models["Role"].findOne({role: role, type: 1})
         .then(function(result) {
             return result.powers.split(/,/g);
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -133,6 +136,7 @@ services.checkPower = function(params, callback) {
                 return {code: -1, msg: "权限不足"};
             }
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 

@@ -13,7 +13,16 @@
                 </tr>
                 <tr>
                     <td width="70" height="34" align="right">飞机：</td>
-                    <td height="34">{{item.planeLevel}}</td>
+                    <td height="34">
+                        <span ng-if="item.planeDiscount==0">全价</span>
+                        <span ng-if="item.planeDiscount==9">最高9折</span>
+                        <span ng-if="item.planeDiscount==8">最高8折</span>
+                        <span ng-if="item.planeDiscount==7">最高7折</span>
+                        <span ng-if="item.planeDiscount==6">最高6折</span>
+                        <span ng-if="item.planeDiscount==5">最高5折</span>
+                        <span ng-if="item.planeDiscount==4">最高4折</span>
+                        ，仓位{{item.planeLevel}}
+                    </td>
                 </tr>
                 <tr ng-if="item.isChangeLevel==true">
                     <td width="70" height="20" align="right"></td>
@@ -34,13 +43,13 @@
             <table width="100%">
                 <tr>
                     <td width="70" height="56" align="right">等级名称：</td>
-                    <td><input class="common_text w350 Cname"></td>
+                    <td><input class="common_text w350 Cname" maxlength="10" placeholder="自定义差旅标准名称，限制10个汉字，例&quot;员工级&quot;"></td>
                 </tr>
                 <tr>
                     <td width="70" height="56" align="right">飞机：</td>
                     <td>
                         <dl class="selectbox w180">
-                            <dt class="common_select CplaneLevel" ng-click="Myalert()">不限</dt>
+                            <dt class="common_select CplaneLevel">请选择仓位</dt>
                             <dd class="common_option">
                                 <div>不限</div>
                                 <div>经济舱</div>
@@ -50,14 +59,15 @@
                             </dd>
                         </dl>
                         <dl class="selectbox w180" style="margin-left: 12px;">
-                            <dt class="common_select CplaneDiscount" ng-click="Myalert()" selectValue="0">不限</dt>
+                            <dt class="common_select CplaneDiscount" selectValue="0">请选择折扣</dt>
                             <dd class="common_option">
-                                <div selectValue="0">不限</div>
-                                <div selectValue="8">8折及以下</div>
-                                <div selectValue="7">7折及以下</div>
-                                <div selectValue="6">6折及以下</div>
-                                <div selectValue="5">5折及以下</div>
-                                <div selectValue="4">4折及以下</div>
+                                <div selectValue="0">全价</div>
+                                <div selectValue="9">最高9折</div>
+                                <div selectValue="8">最高8折</div>
+                                <div selectValue="7">最高7折</div>
+                                <div selectValue="6">最高6折</div>
+                                <div selectValue="5">最高5折</div>
+                                <div selectValue="4">最高4折</div>
                             </dd>
                         </dl>
                     </td>
@@ -70,7 +80,7 @@
                     <td width="70" height="56" align="right">火车：</td>
                     <td>
                         <dl class="selectbox w180">
-                            <dt class="common_select CtrainLevel" ng-click="Myalert()">不限</dt>
+                            <dt class="common_select CtrainLevel">请选择座次</dt>
                             <dd class="common_option">
                                 <div>不限</div>
                                 <div>商务座/高级软卧</div>
@@ -86,7 +96,7 @@
                     <td width="70" height="56" align="right">住宿：</td>
                     <td>
                         <dl class="selectbox w180">
-                            <dt class="common_select ChotelTevel" ng-click="Myalert()">不限</dt>
+                            <dt class="common_select ChotelTevel">星级标准</dt>
                             <dd class="common_option">
                                 <div>不限</div>
                                 <div>五星级/豪华型</div>
@@ -95,7 +105,7 @@
                                 <div>二星级/经济型</div>
                             </dd>
                         </dl>
-                        <input class="common_text w160 ChotelPrice" maxlength="5" style="background: url('/corp/images/night.jpg') no-repeat right; margin-left: 10px;">
+                        <input class="common_text w160 ChotelPrice" maxlength="5" placeholder="最高价格" style="background: url('/corp/images/night.jpg') no-repeat right; margin-left: 10px;">
                     </td>
                 </tr>
                 <tr>
@@ -119,7 +129,7 @@
                     <td width="70" height="56" align="right">飞机：</td>
                     <td>
                         <dl class="selectbox w180">
-                            <dt class="common_select CplaneLevel" ng-click="Myalert()">不限</dt>
+                            <dt class="common_select CplaneLevel">不限</dt>
                             <dd class="common_option">
                                 <div>不限</div>
                                 <div>经济舱</div>
@@ -129,14 +139,15 @@
                             </dd>
                         </dl>
                         <dl class="selectbox w180" style="margin-left: 12px;">
-                            <dt class="common_select CplaneDiscount" ng-click="Myalert()" selectValue="0">不限</dt>
+                            <dt class="common_select CplaneDiscount" selectValue="0">全价</dt>
                             <dd class="common_option">
-                                <div selectValue="0">不限</div>
-                                <div selectValue="8">8折及以下</div>
-                                <div selectValue="7">7折及以下</div>
-                                <div selectValue="6">6折及以下</div>
-                                <div selectValue="5">5折及以下</div>
-                                <div selectValue="4">4折及以下</div>
+                                <div selectValue="0">全价</div>
+                                <div selectValue="9">最高9折</div>
+                                <div selectValue="8">最高8折</div>
+                                <div selectValue="7">最高7折</div>
+                                <div selectValue="6">最高6折</div>
+                                <div selectValue="5">最高5折</div>
+                                <div selectValue="4">最高4折</div>
                             </dd>
                         </dl>
                     </td>
@@ -149,7 +160,7 @@
                     <td width="70" height="56" align="right">火车：</td>
                     <td>
                         <dl class="selectbox w180">
-                            <dt class="common_select CtrainLevel" ng-click="Myalert()">不限</dt>
+                            <dt class="common_select CtrainLevel">不限</dt>
                             <dd class="common_option">
                                 <div>不限</div>
                                 <div>商务座/高级软卧</div>
@@ -165,7 +176,7 @@
                     <td width="70" height="56" align="right">住宿：</td>
                     <td>
                         <dl class="selectbox w180">
-                            <dt class="common_select ChotelTevel" ng-click="Myalert()">不限</dt>
+                            <dt class="common_select ChotelTevel">不限</dt>
                             <dd class="common_option">
                                 <div>不限</div>
                                 <div>五星级/豪华型</div>

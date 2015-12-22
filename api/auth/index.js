@@ -12,6 +12,7 @@ var getRndStr = require("../../common/utils").getRndStr;
 var C = require("../../config");
 var moment = require("moment");
 var API = require("../../common/api");
+var errorHandle = require("common/errorHandle");
 
 /**
  * @class API.auth 认证类
@@ -65,6 +66,7 @@ authServer.activeByEmail = function(data, callback) {
                     return {code: 0, msg: "OK"};
                 })
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -97,6 +99,7 @@ authServer.active = function(data, callback) {
                     }}
                 })
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -117,6 +120,7 @@ authServer.remove = function(data, callback) {
             .then(function() {
                 return {code: 0, msg: "ok"};
             })
+            .catch(errorHandle)
             .nodeify(callback);
 }
 
@@ -195,7 +199,9 @@ authServer.newAccount = function(data, callback) {
                     status: account.status
                 }};
             })
-    }).nodeify(callback);
+    })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -258,6 +264,7 @@ authServer.login = function(data, callback) {
                     return {code:0, msg: "ok", data: result};
                 })
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -299,6 +306,7 @@ authServer.authentication = function(params, callback) {
 
             return {code: -1, msg: "已经失效"};
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -321,6 +329,67 @@ authServer.bindMobile = function(data, callback) {
     return defer.promise.nodeify(callback);
 }
 
+/**
+ * 由id查询账户信息
+ * @param id
+ * @param callback
+ * @returns {*}
+ */
+authServer.getAccount = function(id, callback){
+    var defer = Q.defer();
+    if(!id){
+        defer.reject({code: -1, msg: "id不能为空"});
+        return defer.promise.nodeify(callback);
+    }
+    return Models.Account.findById(id)
+        .then(function(obj){
+            return {code: 0, account: obj.toJSON()}
+        })
+        .nodeify(callback);
+}
+
+/**
+ * 修改账户信息
+ * @param id
+ * @param data
+ * @param callback
+ * @returns {*}
+ */
+authServer.updataAccount = function(id, data, callback){
+    var defer = Q.defer();
+    if(!id){
+        defer.reject({code: -1, msg: "id不能为空"});
+        return defer.promise.nodeify(callback);
+    }
+    var options = {};
+    options.where = {id: id};
+    options.returning = true;
+    return Models.Account.update(data, options)
+        .then(function(obj){
+            return {code: 0, account: obj[1][0].toJSON(), msg: "更新成功"}
+        })
+        .nodeify(callback);
+}
+
+/**
+ * 根据条件查询一条账户信息
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+authServer.findOneAcc = function(params, callback){
+    var options = {};
+    options.where = params;
+    return Models.Account.findOne(options)
+        .then(function(obj){
+            if(obj){
+                return {code: 0, account: obj.toJSON()}
+            }else{
+                return {code: 0, account: obj}
+            }
+        })
+        .nodeify(callback);
+}
 
 //生成登录凭证
 function makeAuthenticateSign(accountId, os, callback) {
@@ -359,6 +428,7 @@ function makeAuthenticateSign(accountId, os, callback) {
                 timestamp: timestamp
             }
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -425,6 +495,7 @@ authServer.sendActiveEmail = function(params, callback) {
     .then(function() {
         return {code: 0, msg: "ok"};
     })
+    .catch(errorHandle)
     .nodeify(callback);
 }
 
@@ -449,6 +520,7 @@ authServer.logout = function (params, callback) {
             }
             return {code: 0, msg: "ok"};
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
