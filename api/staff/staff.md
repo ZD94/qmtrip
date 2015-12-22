@@ -163,3 +163,22 @@
 | total     | 提示信息 |: 总记录数
 | items   | 积分变动记录|json
 
+
+>. 统计时间段内企业员工数量（在职 入职 离职） API.staff.statisticStaffs(params,callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 参数             | json             |-------
+| params.companyId                      | 企业Id             |uuid           |必填
+| params.startTime                     | 起始时间            | date            | 选填，默认当前月开始日期
+| params.endTime                       | 结束时间               | date            |选填，默认当前月结束时间
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code     | 返回代码0正确 其他错误 |
+| msg     | 提示信息 |
+| sta   | 员工信息|json
+| sta.all   |在职员工|integer
+| sta.inNum |入职员工|integer
+| sta.outNum  |离职员工|integer
