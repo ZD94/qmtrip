@@ -14,7 +14,7 @@ var Logger = require('common/logger');
 Logger.init({
     path: path.join(__dirname, "../log"),
     prefix: "mocha_",
-    console: false,
+    console: false
 });
 var logger = new Logger('test');
 
@@ -24,7 +24,7 @@ var model = require('common/model');
 model.init(config.postgres.url);
 
 API.init(path.join(__dirname, '../api'), config.api)
-    .then(API.test)
+    .then(API.loadTests)
     .then(run)
     .catch(function(e){
         logger.error(e.stack?e.stack:e);

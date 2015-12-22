@@ -40,5 +40,26 @@ server.api_path = path.join(__dirname, 'api');
 server.api_port = config.apiPort;
 server.api_config = config.api;
 
+server.on('init.http', function(server){
+    if(config.debug){
+        var shoe = require('shoe');
+        var sock = shoe(function (stream) {
+            var redis = require("redis");
+            var client = redis.createClient(config.redis.url);
+            client.subscribe('checkcode:msg');
+            client.on("message", function (channel, message) {
+                var message = JSON.parse(message);
+                stream.write(message.mobile + " : " + message.code + " <br>\n");
+                console.log("client channel " + channel + ": " + message);
+            });
+            stream.on('close', function(){
+                console.log('client disconnected.');
+                client.end();
+            })
+        });
+        sock.install(server, '/checkcode.sub');
+    }
+});
+
 server.start();
 

@@ -6,6 +6,8 @@ var Q = require("q");
 var L = require("common/language");
 var validate = require("common/validate");
 var md5 = require("common/utils").md5;
+var errorHandle = require("common/errorHandle");
+
 /**
  * @class auth 用户认证
  */
@@ -193,7 +195,37 @@ auth.registryCompany = function(params, callback) {
                         })
                 })
         })
+        .catch(errorHandle)
         .nodeify(callback);
+}
+
+/**
+ * @method sendActiveEmail
+ *
+ * 发送激活邮件
+ *
+ * @param {Object} params
+ * @param {String} params.email 邮件账号
+ * @param {Function} callback
+ * @return {Promise} {code: 0, msg: "OK"}
+ */
+auth.sendActiveEmail = function(params, callback) {
+    return API.auth.sendActiveEmail(params, callback);
+}
+
+/**
+ * @method logout
+ *
+ * 退出登录
+ *
+ * @param [callback] 可选回调函数
+ * @return {Promise} {code: 0}, {code: -1}
+ */
+auth.logout = function(callback) {
+    var self = this;
+    var accountId = self.accountId;
+    var tokenId = self.tokenId;
+    return API.auth.logout({accountId: accountId, tokenId: tokenId}, callback);
 }
 
 /**
@@ -216,6 +248,7 @@ auth.needPowersMiddleware = function(fn, needPowers) {
                 }
                 return fn.apply(self, params);
             })
+            .catch(errorHandle)
             .nodeify(callback);
     }
 }
