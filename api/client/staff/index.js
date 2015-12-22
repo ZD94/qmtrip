@@ -35,6 +35,7 @@ function needPowersMiddleware(fn, needPowers) {
  * 管理员添加员工
  *
  * @type {*}
+ * @return {promise}
  */
 staff.createStaff = needPowersMiddleware(function(params, callback) {
     var user_id = this.accountId;
@@ -51,8 +52,12 @@ staff.createStaff = needPowersMiddleware(function(params, callback) {
 }, ["user.add"]);
 
 /**
+ * @method deleteStaff
+ *
  * 企业删除员工
+ *
  * @type {*}
+ * @return {promise}
  */
 staff.deleteStaff = needPowersMiddleware(function(params, callback) {
     var user_id = this.accountId;
@@ -77,7 +82,10 @@ staff.deleteStaff = needPowersMiddleware(function(params, callback) {
 }, ["user.delete"]);
 
 /**
+ * @method updateStaff
+ *
  * 企业修改员工
+ *
  * @type {*}
  */
 staff.updateStaff = needPowersMiddleware(function(id, params, callback) {
@@ -103,6 +111,8 @@ staff.updateStaff = needPowersMiddleware(function(id, params, callback) {
 }, ["user.edit"]);
 
 /**
+ * @method getStaff
+ *
  * 企业根据id得到员工信息
  * @type {*}
  */
@@ -129,6 +139,8 @@ staff.getStaff = needPowersMiddleware(function(id, params, callback) {
 }, ["user.query"]);
 
 /**
+ * @method getCurrentStaff
+ *
  * 得到当前登录员工信息
  * @param callback
  * @returns {*}
@@ -138,6 +150,8 @@ staff.getCurrentStaff = function(callback){
 }
 
 /**
+ * @method listAndPaginateStaff
+ *
  * 企业分页查询员工列表
  * @type {*}
  */
@@ -152,23 +166,30 @@ staff.listAndPaginateStaff = needPowersMiddleware(function(params, options, call
 }, ["user.query"]);
 
 /**
+ * @method increaseStaffPoint
+ *
  * 增加员工积分
  * @type {*|Function}
  */
 staff.increaseStaffPoint = API.staff.increaseStaffPoint;
 
 /**
+ * @method decreaseStaffPoint
+ *
  * 减少员工积分
  * @type {*|Function}
  */
 staff.decreaseStaffPoint = API.staff.decreaseStaffPoint;
 
+
 /**
+ * @method listAndPaginatePointChange
+ *
  * 员工分页查询自己积分记录列表
- * @param params
- * @param options
- * @param callback
- * @returns {*}
+ *
+ * @param {object} params
+ * @param {Function} callback
+ * @return {promise}
  */
 staff.listAndPaginatePointChange = function(params, options, callback){
     return API.staff.getStaff(user_id)
@@ -180,10 +201,13 @@ staff.listAndPaginatePointChange = function(params, options, callback){
 }
 
 /**
+ * @method importExcel
+ *
  * 批量导入员工
- * @param params
- * @param callback
- * @returns {*}
+ *
+ * @param {object} params
+ * @param {Function} callback
+ * @return {promise}
  */
 staff.importExcel = function(params, callback){
     params.accountId = this.accountId;
@@ -191,10 +215,16 @@ staff.importExcel = function(params, callback){
 }
 
 /**
- * 统计企业内员工数据
- * @param params
- * @param callback
- * @returns {*}
+ * @method API.staff.statisticStaffs
+ *
+ * 统计时间段内企业员工数量（在职 入职 离职）
+ *
+ * @param {object} params
+ * @param {String} params.companyId
+ * @param {String} params.startTime
+ * @param {String} params.endTime
+ * @param {Function} callback
+ * @return {promise} {code: 0, msg: 'success', sta: {all: 0, inNum: 0, outNum: 0};
  */
 staff.statisticStaffs = function(params, callback){
     return API.staff.statisticStaffs(params, callback);
