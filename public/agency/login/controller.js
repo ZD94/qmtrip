@@ -1,10 +1,11 @@
 
 'use strict';
-var auth=(function(){
+var login=(function(){
     API.require('auth');
-    var  auth = {};
+    var  login = {};
 
-    auth.LoginController = function ($scope, $routeParams) {
+    console.info(API)
+    login.LoginController = function ($scope, $routeParams) {
 
         var backUrl = $routeParams.backurl || "#/";
         $scope.checkLogin = function() {
@@ -20,7 +21,7 @@ var auth=(function(){
                     return false;
                 }
                 API.onload(function(){
-                    API.auth.login({email:name,pwd:pwd})
+                    API.auth.login({email:name,pwd:pwd, type: 2})
                         .then(function(result){
                             if (result.code) {
                                 alert(result.msg);
@@ -49,7 +50,7 @@ var auth=(function(){
         }
     }
 
-    return auth;
+    return login;
 })();
 
-module.exports = auth;
+module.exports = login;
