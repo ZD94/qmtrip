@@ -249,7 +249,7 @@ agency.updateAgencyUser = function(id, data, callback){
     options.returning = true;
     return AgencyUser.update(data, options)
         .then(function(obj){
-            return {code: 0, agency: obj[1].toJSON(), msg: "更新成功"}
+            return {code: 0, agency: obj[1][0].toJSON(), msg: "更新成功"}
         })
         .nodeify(callback);
 }
