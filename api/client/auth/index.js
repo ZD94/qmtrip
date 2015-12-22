@@ -1,30 +1,56 @@
 /**
- * Created by wlh on 15/12/9.
+ * @module API
  */
 
 var Q = require("q");
 var L = require("common/language");
 var validate = require("common/validate");
 var md5 = require("common/utils").md5;
+/**
+ * @class auth 用户认证
+ */
 var auth = {
+    /**
+     * @property __public 是否公共模块
+     * @type {Boolean}
+     */
     __public: true
 };
+
 var API = require("common/api");
 
+/**
+ * @method activeByEmail
+ *
+ * 通过邮件激活账号
+ *
+ * @param {object} data
+ * @param {String} data.sign
+ * @param {String} data.accountId
+ * @param {String} data.timestamp
+ * @param {Function} callback
+ * @return {promise}
+ * @public
+ */
+auth.activeByEmail = API.auth.activeByEmail;
 
 /**
+ * @method login
+ *
  * 登录
  *
  * @param {Object} data 参数
  * @param {String} data.email 邮箱 (可选,如果email提供优先使用)
  * @param {String} data.pwd 密码
- * @param {String} data.mobile 手机号(可选,如果email提供则优先使用email)
- * @param {Callback} callback 可选回调函数
+ * @param {String} [data.mobile] 手机号(可选,如果email提供则优先使用email)
+ * @param {Callback} [callback] 可选回调函数
  * @return {Promise} {code:0, msg: "ok", data: {user_id: "账号ID", token_sign: "签名", token_id: "TOKEN_ID", timestamp:"时间戳"}
  */
 auth.login = API.auth.login;
 
 /**
+ * @method bindMobile
+ *
  * 绑定手机号
  *
  * @param {Object} data
@@ -37,19 +63,10 @@ auth.login = API.auth.login;
  */
 auth.bindMobile =API.auth.bindMobile;
 
-/**
- * 激活账号
- *
- * @param {Object} data
- * @param {UUID} data.accountId 账号ID
- * @param {String} data.timestamp 时间戳
- * @param {String} data.sign 签名
- * @param {Callback} callback
- * @return {Promise} {code:0 , msg: "ok"}
- */
-auth.activeAccount = API.auth.activeAccount;
 
 /**
+ * @method isBlackDomain
+ *
  * 是否黑名单
  *
  * @param {Object} params
@@ -60,6 +77,8 @@ auth.activeAccount = API.auth.activeAccount;
 auth.isBlackDomain = API.company.isBlackDomain;
 
 /**
+ * @method registryCompany
+ *
  * 注册企业账号
  *
  * @param {Object} params
@@ -178,12 +197,15 @@ auth.registryCompany = function(params, callback) {
 }
 
 /**
+ * @method needPowersMiddleware
+ *
  * 权限控制
+ *
  * @param fn
  * @param needPowers
- * @returns {Function}
+ * @return {Function}
  */
-auth.needPowersMiddleware = function needPowersMiddleware(fn, needPowers) {
+auth.needPowersMiddleware = function(fn, needPowers) {
     return function(params, callback) {
         var self = this;
         var accountId = self.accountId;

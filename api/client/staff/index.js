@@ -3,8 +3,15 @@
  */
 'use strict';
 
+/**
+ * @module API
+ */
+
 var Q = require("q");
 var API = require("common/api");
+/**
+ * @class staff 员工信息
+ */
 var staff = {};
 
 function needPowersMiddleware(fn, needPowers) {
@@ -23,7 +30,10 @@ function needPowersMiddleware(fn, needPowers) {
 }
 
 /**
+ * @method createStaff
+ *
  * 管理员添加员工
+ *
  * @type {*}
  */
 staff.createStaff = needPowersMiddleware(function(params, callback) {
@@ -179,4 +189,15 @@ staff.importExcel = function(params, callback){
     params.accountId = this.accountId;
     return API.staff.importExcel(params, callback);
 }
+
+/**
+ * 统计企业内员工数据
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+staff.statisticStaffs = function(params, callback){
+    return API.staff.statisticStaffs(params, callback);
+}
+
 module.exports = staff;

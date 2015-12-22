@@ -1,5 +1,6 @@
 {
   "appName": "qmtrip",
+  "debug": false,
 
   "hostname": "my.tulingdao.com",
   "cluster": false,
@@ -22,8 +23,11 @@
     "url": "postgres://postgres:root@localhost:5432/qmtrip",
     "debug": true
   },
+  "redis":{
+    "url": "redis://localhost:6379"
+  },
   "hosts": {
-    "main":{"addr":"api.local.tulingdao.com", "port":4001}
+    "main":{"addr":"api.local.tulingdao.com", "port":4101}
   },
   "upload":{
     "tmpDir": "${{ROOT_DIR}}/public/temp"

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>验证码</title>
+    <script src="/script/libs/bundle.api.js"></script>
+    <script type="text/javascript">
+        var shoe = require('shoe');
+        function connect_shoe(){
+            var stream = shoe('/checkcode.sub');
+            stream.on('data', function(data){
+                console.log(data);
+                document.body.innerHTML += data;
+            });
+            stream.on('end', function(){
+                document.body.innerHTML += '连接已断开<br>';
+                connect_shoe();
+            });
+        }
+        connect_shoe();
+    </script>
+</head>
+<body>
+
+
+</body>
+</html>

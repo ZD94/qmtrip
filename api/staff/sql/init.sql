@@ -4,6 +4,7 @@ create table staff.staffs (
     name varchar(50),
     avatar text,
     company_id uuid,
+    status integer,
     total_points integer default 0,
     balance_points integer default 0,
     department_id uuid,
@@ -13,7 +14,8 @@ create table staff.staffs (
     email character varying(50), -- 邮箱
     sex integer DEFAULT 1, -- 性别
     department character varying(50), -- 部门
-    create_at timestamp without time zone DEFAULT now() -- 创建时间
+    create_at timestamp without time zone DEFAULT now(), -- 创建时间
+    quit_time timestamp without time zone
 );
 
 comment on table staff.staffs is '员工';

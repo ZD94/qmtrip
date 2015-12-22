@@ -9,10 +9,10 @@ var PlanOrder = Models.TripPlanOrder;
 var ConsumeDetails = Models.ConsumeDetails;
 var TripOrderLogs = Models.TripOrderLogs;
 var uuid = require("node-uuid");
-var L = require("../../common/language");
-var Logger = require('../../common/logger');
-//var API = require('../../common/api');
-var seeds = require('../seeds');
+var L = require("common/language");
+var Logger = require('common/logger');
+var utils = require('common/utils');
+var API = require('../../common/api');
 var logger = new Logger("company");
 
 var tripPlan = {}
@@ -26,17 +26,17 @@ var tripPlan = {}
 tripPlan.savePlanOrder = function(params, callback){
     var checkArr = ['accountId', 'companyId', 'type', 'startPlace', 'destination', 'startAt', 'backAt', 'budget'];
     return Q.all([
-        seeds.getSeedNo('tripPlanOrderNo'),
+        API.seeds.getSeedNo('tripPlanOrderNo'),
         checkParams(checkArr, params)
     ])
         .spread(function(orderNo){
-            logger.info("orderNo=>", orderNo);
             var orderId = uuid.v1();
             params.id = orderId;
             params.orderNo = orderNo;
             var userId = params.accountId;
-            return sequelize.transaction(function (t) {
-                var execArr = [PlanOrder.create(params, {transaction: t})]; //保存计划单
+            return sequelize.transaction(function(t) {
+                var execArr = new Array();
+                execArr.push(PlanOrder.create(params, {transaction: t})); //保存计划单
                 if(params.consumeDetails){ //保存计划单预算和消费详情
                     var details = params.consumeDetails;
                     for(var i in details){
@@ -50,9 +50,9 @@ tripPlan.savePlanOrder = function(params, callback){
                     orderId: orderId,
                     userId: userId,
                     remark: '新增计划单 ' + orderNo,
-                    createAt: utils.now
+                    createAt: utils.now()
                 }
-                execArr.push(TripOrderLogs.create(logs), {transaction: t}); //记录计划单操作日志
+                execArr.push(TripOrderLogs.create(logs, {transaction: t})); //记录计划单操作日志
                 return Q.all(execArr)
                     .then(function(arr){
                         var order = arr[0].dataValues;
@@ -72,6 +72,9 @@ tripPlan.savePlanOrder = function(params, callback){
                         return {code: 0, msg: '保存成功', tripPlanOrder: order};
                     })
             })
+                .then(function(ret){
+                    return ret;
+                })
         }).nodeify(callback);
 }
 
@@ -82,6 +85,7 @@ tripPlan.savePlanOrder = function(params, callback){
  * @returns {*}
  */
 tripPlan.getTripPlanOrder = function(params, callback){
+    var defer = Q.defer();
     var checkArr = ['userId', 'orderId'];
     return checkParams(checkArr, params)
         .then(function(){
@@ -198,7 +202,6 @@ tripPlan.listTripPlanOrder = function(params, callback){
         .then(function(orders){
             return Q.all(orders.map(function(order){
                 var orderId = order.id;
-                logger.info("orderId=>", orderId);
                 return Q.all([
                     ConsumeDetails.findAll({where: {orderId: orderId, type: -1}}),
                     ConsumeDetails.findAll({where: {orderId: orderId, type: 0}}),
@@ -242,7 +245,7 @@ tripPlan.saveConsumeRecord = function(params, options, callback){
 }
 
 /**
- * 删除差旅计划单/预算单
+ * 删除差旅计划单/预算单;用户自己可以删除自己的计划单
  * @param params
  * @param callback
  * @returns {*}

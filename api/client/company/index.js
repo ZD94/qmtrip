@@ -2,16 +2,26 @@
  * Created by yumiao on 15-12-9.
  */
 
+/**
+ * @module API
+ */
+
 var API = require('common/api');
 var Logger = require('common/logger');
 var needPowersMiddleware = require('../auth').needPowersMiddleware;
 var logger = new Logger();
 
+/**
+ * @class company 公司信息
+ */
 var company = {}
 
 
 /**
+ * @method createCompany
+ *
  * 创建企业
+ *
  * @param params
  * @param callback
  * @returns {*}
@@ -108,6 +118,27 @@ company.consumeMoney = function(params, callback){
     params.type = -1;
     params.channel = '消费';
     return API.moneyChange.test(params, callback);
+}
+
+/**
+ * 获取企业资金账户信息
+ * @param companyId
+ * @param callback
+ * @returns {*}
+ */
+company.getCompanyFundsAccount = function(companyId, callback){
+    var params = {
+        userId: this.accountId,
+        companyId: companyId
+    };
+    return API.company.getCompanyFundsAccount(params)
+        .then(function(funds){
+            return {code: 0, msg: 'success', fundsAccount: funds};
+        }).nodeify(callback);
+}
+
+company.setPayPassword = function(params, callback){
+    logger.info("设置支付密码");
 }
 
 module.exports = company;

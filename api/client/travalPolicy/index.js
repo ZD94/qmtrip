@@ -3,12 +3,21 @@
  */
 'use strict';
 
+/**
+ * @module API
+ */
 var Q = require("q");
 var API = require("common/api");
+/**
+ * @class travelPolicy 出差标准
+ */
 var travalPolicy = {};
 
 /**
+ * @method createTravalPolicy
+ *
  * 企业创建差旅标准
+ *
  * @param params
  * @param callback
  * @returns {*|Promise}

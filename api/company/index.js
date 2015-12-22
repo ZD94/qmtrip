@@ -168,6 +168,24 @@ company.deleteCompany = function(params, callback){
 }
 
 /**
+ * 获取企业资金账户信息
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+company.getCompanyFundsAccount = function(params, callback){
+    return checkParams(['companyId', 'userId'], params)
+        .then(function(){
+            var companyId = params.companyId;
+            var userId = params.userId;
+            return FundsAccounts.findById(companyId, {attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd', 'staffReward', 'status', 'createAt', 'updateAt']})
+                .then(function(funds){
+                    return funds.toJSON();
+                })
+        }).nodeify(callback);
+}
+
+/**
  * 企业资金账户金额变动
  * @param params
  * @param params.type -2: 冻结账户资金 -1： 账户余额减少 1：账户余额增加 2：解除账户冻结金额
@@ -259,7 +277,7 @@ company.moneyChange = function(params, callback){
 function getColumns(params){
     var cols = new Array();
     for(var s in params){
-        cols.push(s)
+        cols.push(s);
     }
     return cols;
 }

@@ -10,6 +10,7 @@ module.exports = function (Db, DataType) {
         sex          : {type: DataType.INTEGER,     defaultValue: 1}, //性别
         avatar       : {type: DataType.TEXT}, //员工头像
         companyId    : {type: DataType.UUID,        field: "company_id"}, //公司ID
+        status       : {type: DataType.INTEGER,     field: "status"}, //员工状态-1：离职 1：在职 0：未激活
         totalPoints  : {type: DataType.INTEGER,     field: "total_points", defaultValue: 0}, //总获取积分
         balancePoints: {type: DataType.INTEGER,     field: "balance_points", defaultValue: 0}, //剩余积分
         departmentId : {type: DataType.UUID,        field: "department_id"}, //部门ID
@@ -18,7 +19,8 @@ module.exports = function (Db, DataType) {
         roleId       : {type: DataType.INTEGER,     field: "role_id"}, //权限ID
         email        : {type: DataType.STRING(50) }, //邮箱
         mobile       : {type: DataType.STRING(20) }, //电话
-        createAt     : {type: "timestamp",          field: "create_at", defaultValue: now} //创建时间
+        createAt     : {type: "timestamp",          field: "create_at", defaultValue: now}, //创建时间
+        quitTime     : {type: "timestamp without time zone",          field: "quit_time"} //离职时间
     }, {
         tableName : "staffs",
         timestamps: false,
