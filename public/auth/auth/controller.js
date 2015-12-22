@@ -349,6 +349,7 @@ var auth=(function(){
                                     if(result.code == 0){
                                         alert("注册成功");
                                         window.location.href = "#/auth/login";
+                                        //window.location.href = "#/auth/corplaststep";
                                     }
                                 })
 
@@ -429,7 +430,7 @@ var auth=(function(){
                 })
         })
 
-        $scope.activeResult = "恭喜您账号成功激活,关闭页面";
+            //$scope.activeResult = "恭喜您账号成功激活,关闭页面";
     }
     return auth;
 })();
