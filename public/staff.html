@@ -22,7 +22,7 @@
     <script type="text/javascript">
     	var Q = require('q');
     	var moment = require('moment');
-    	var TLD = TLD_angular_app('tulingdao.com', 'staff', '/users/user-main');
+    	var TLD = TLD_angular_app('tulingdao.com', 'staff', '/UsersFirst/StaffUser');
     	// API.onlogin(function(){
     	// 	window.location.href = "/";
     	// 	return;
@@ -44,7 +44,7 @@
     </script>
     <script type="text/javascript">
     $(function(){
-    	$(".staff_menu_t a").click(function(){
+    	$(".staff_menu_t a li").click(function(){
     		var $that = $(this);
     		$(".staff_menu_t li").removeClass("on");
     		$that.addClass("on");

@@ -17,7 +17,7 @@ var TravelCriterion=(function(){
         $("title").html("差旅标准");
         var companyId = "d674f130-a236-11e5-8246-c3a1e3bc94c3";
         Myselect();
-
+        $(".left_nav li").removeClass("on").eq(3).addClass("on");
 
         //获取差旅标准列表
         $scope.initCriterionList = function () {
