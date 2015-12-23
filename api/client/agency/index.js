@@ -87,13 +87,7 @@ agency.deleteAgencyUser = API.agency.deleteAgencyUser;
 agency.updateAgencyUser = API.agency.updateAgencyUser;
 agency.getAgencyUser = API.agency.getAgencyUser;
 agency.getCurrentAgency = function(callback){
-    return API.agency.getAgencyUser(this.accountId)
-        .then(function(user){
-            var agencyId = user.agencyId;
-            return API.agency.getAgency({accountId: this.accountId, agencyId: agencyId});
-        })
-        .nodeify(callback);
-
+    return API.agency.getAgencyUser(this.accountId, callback);
 }
 agency.listAndPaginateAgencyUser = API.agency.listAndPaginateAgencyUser;
 
