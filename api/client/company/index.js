@@ -8,7 +8,7 @@
 
 var API = require('common/api');
 var Logger = require('common/logger');
-var needPowersMiddleware = require('../auth').needPowersMiddleware;
+var needPermissionMiddleware = require('../auth').needPermissionMiddleware;
 var logger = new Logger();
 
 /**
@@ -37,7 +37,7 @@ company.createCompany = function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.updateCompany = needPowersMiddleware(function(params, callback){
+company.updateCompany = needPermissionMiddleware(function(params, callback){
     params.createUser = this.accountId;
     return API.company.updateCompany(params, callback);
 }, ["company.edit"]);
@@ -62,7 +62,7 @@ company.getCompany = function(companyId, callback){
  * @param callback
  * @returns {*}
  */
-company.listCompany = needPowersMiddleware(function(params, callback){
+company.listCompany = needPermissionMiddleware(function(params, callback){
     params.userId = this.accountId;
     return API.company.listCompany(params, callback);
 }, ["company.query"])
@@ -73,7 +73,7 @@ company.listCompany = needPowersMiddleware(function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.deleteCompany = needPowersMiddleware(function(companyId, callback){
+company.deleteCompany = needPermissionMiddleware(function(companyId, callback){
     var params = {
         companyId: companyId,
         userId: this.accountId

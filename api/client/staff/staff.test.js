@@ -125,5 +125,18 @@ describe("api/client/staff.js", function() {
     //    })
     //})
 
+    //导入上传结合测试
+    /*return staffServer.importExcel({accountId: user_id, md5key: md5key})
+     .then(function(result){
+     if(result){
+     fs.exists(filePath, function (exists) {
+     if(exists){
+     fs.unlinkSync(filePath);
+     console.log("删除临时文件");
+     }
+     });
+     }
+     })*/
+
 
 })

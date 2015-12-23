@@ -1,12 +1,12 @@
 /**
- * Created by chenhao on 2015/12/18.
+ * Created by chenhao on 2015/12/22.
  */
 var UsersFirst = (function(){
 	API.require("company");
 	API.require("staff");
 	var UsersFirst ={};
 	UsersFirst.UserMainController = function($scope){
-		$("title").html("差旅管理首页");
+		$("title").html("首页");
 		$(".left_nav li").removeClass("on").eq(0).addClass("on");
 		//企业管理首页信息
 		$scope.initCorpMain = function(){

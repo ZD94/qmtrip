@@ -5,6 +5,7 @@
 var Q = require("q");
 var nodeXlsx = require("node-xlsx");
 var uuid = require("node-uuid");
+var moment = require("moment");
 var utils = require("common/utils");
 var sequelize = require("common/model").importModel("./models");
 var Logger = require("common/logger");
@@ -13,6 +14,7 @@ var pointChange = sequelize.models.PointChange;
 var L = require("../../common/language");
 var API = require("../../common/api");
 var config = require('../../config');
+var fs = require('fs');
 var Paginate = require("../../common/paginate").Paginate;
 var logger = new Logger("staff");
 var moment = require("moment");
@@ -146,7 +148,7 @@ staff.updateStaff = function(id, data, callback){
                 }else{
                     return API.auth.getAccount(id)//暂无此接口
                         .then(function(acc){
-                            if(acc.status != 0){
+                            if(acc.account.status != 0){
                                 defer.reject({code: -2, msg: "该账号不允许修改邮箱"});
                                 return defer.promise.nodeify(callback);
                             }else{
@@ -156,7 +158,7 @@ staff.updateStaff = function(id, data, callback){
                                     staffModel.update(data, options)
                                 ])
                                     .spread(function(ret1, ret2){
-                                        return {code: 0, staff: ret2[1].toJSON(), msg: "更新成功"};
+                                        return {code: 0, staff: ret2[1][0].toJSON(), msg: "更新成功"};
                                     })
                             }
                         })
@@ -187,6 +189,26 @@ staff.getStaff = function(id, callback){
     return staffModel.findById(id)
         .then(function(obj){
             return {code: 0, staff: obj.toJSON()}
+        })
+        .nodeify(callback);
+}
+
+/**
+ * 根据属性查找一个员工
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+staff.findOneStaff = function(params, callback){
+    var options = {};
+    options.where = params;
+    return staffModel.findOne(options)
+        .then(function(obj){
+            if(obj){
+                return {code: 0, staff: obj.toJSON()}
+            }else{
+                return {code: 0, staff: obj}
+            }
         })
         .nodeify(callback);
 }
@@ -365,7 +387,7 @@ staff.listAndPaginatePointChange = function(params, options, callback){
 }
 
 /**
- * 导入员工
+ * 检查导入员工数据
  * @param params
  * @param callback
  * @returns {*}
@@ -375,8 +397,12 @@ staff.importExcel = function(params, callback){
     var md5key = params.md5key;
 //    var obj = nodeXlsx.parse(fileUrl);
     var travalPolicies = {};
-    var noAddObj = [];
     var addObj = [];
+    var noAddObj = [];
+    var downloadAddObj = [];
+    var downloadNoAddObj = [];
+    var emailAttr = [];
+    var mobileAttr = [];
     var companyId = "";
     return API.attachment.getAttachment({md5key: md5key, userId: userId})
         .then(function(att){
@@ -399,8 +425,69 @@ staff.importExcel = function(params, callback){
                             return Q.all(data.map(function(item, index){
                                     if(index>0 && index<200){
                                         var s = data[index];
-                                        var staffObj = {name: s[0], mobile: s[1], email: s[2], department: s[3],travelLevel: travalps[s[4]], roleId: s[5], companyId: companyId};//company_id默认为当前登录人的company_id
-                                        return staff.createStaff(staffObj)
+                                        s[1] = s[1] ? s[1]+"" : "";
+                                        var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
+                                        item = staffObj;
+                                        if(!staffObj.email || staffObj.email=="" || emailAttr.join(",").indexOf(s[2]) != -1){
+                                            staffObj.reason = "邮箱为空或与本次导入中邮箱重复";
+                                            s[6] = "邮箱为空或与本次导入中邮箱重复";
+                                            noAddObj.push(staffObj);
+                                            downloadNoAddObj.push(s);
+                                            return;
+                                        }
+                                        emailAttr.push(s[2]);
+                                        if(!staffObj.name || staffObj.name==""){
+                                            staffObj.reason = "姓名为空";
+                                            s[6] = "姓名为空";
+                                            noAddObj.push(staffObj);
+                                            downloadNoAddObj.push(s);
+                                            return;
+                                        }
+                                        if(!staffObj.mobile || staffObj.mobile=="" || mobileAttr.join(",").indexOf(s[1]) != -1){
+                                            staffObj.reason = "手机号为空或与本次导入中手机号重复";
+                                            s[6] = "手机号为空或与本次导入中手机号重复";
+                                            noAddObj.push(staffObj);
+                                            downloadNoAddObj.push(s);
+                                            return;
+                                        }
+                                        mobileAttr.push(s[1]);
+                                        if(!staffObj.department || staffObj.department==""){
+                                            staffObj.reason = "部门为空";
+                                            s[6] = "部门为空";
+                                            noAddObj.push(staffObj);
+                                            downloadNoAddObj.push(s);
+                                            return;
+                                        }
+                                        if(!staffObj.travelLevel || staffObj.travelLevel==""){
+                                            staffObj.reason = "差旅标准为空或不符合要求";
+                                            s[6] = "差旅标准为空或不符合要求";
+                                            noAddObj.push(staffObj);
+                                            downloadNoAddObj.push(s);
+                                            return;
+                                        }
+                                        return Q.all([
+                                            staff.findOneStaff({email: s[2]}),
+                                            API.auth.findOneAcc({mobile: s[1]})//acc表手机号不能重复 staff暂且不控制
+                                        ]).spread(function(ret1, ret2){
+                                                if(ret1.staff){
+                                                    staffObj.reason = "邮箱与已有用户重复";
+                                                    s[6] = "邮箱与已有用户重复";
+                                                    noAddObj.push(staffObj);
+                                                    downloadNoAddObj.push(s);
+                                                }else{
+                                                    if(ret2.account){
+                                                        staffObj.reason = "手机号与已有用户重复";
+                                                        s[6] = "手机号与已有用户重复";
+                                                        noAddObj.push(staffObj);
+                                                        downloadNoAddObj.push(s);
+                                                    }else{
+                                                        addObj.push(staffObj);
+                                                        downloadAddObj.push(s);
+                                                    }
+                                                }
+                                                return item;
+                                            })
+                                        /*return staff.createStaff(staffObj)
                                             .then(function(ret){
                                                 if(ret){
                                                     item = ret.staff;
@@ -413,16 +500,88 @@ staff.importExcel = function(params, callback){
                                             .catch(function(err){
                                                 noAddObj.push(staffObj);
                                                 console.log(err);
-                                            })
+                                            })*/
                                     }
                                 })).then(function(items){
                                     data = items;
-                                    return {addObj: JSON.stringify(addObj), noAddObj: JSON.stringify(noAddObj)};
+                                    return {addObj: JSON.stringify(addObj), downloadAddObj: JSON.stringify(downloadAddObj), noAddObj: JSON.stringify(noAddObj), downloadNoAddObj: JSON.stringify(downloadNoAddObj)};
                                 })
                         })
                 })
         })
         .nodeify(callback);
+}
+
+/**
+ * 执行导入员工数据
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+staff.importExcelAction = function(params, callback){
+    var defer = Q.defer();
+    if(!params.addObj){
+        defer.reject({code: -1, msg: "params.addObj不能为空"});
+        return defer.promise.nodeify(callback);
+    }
+    var data = JSON.parse(params.addObj);
+    console.log(data);
+    var noAddObj = [];
+    var addObj = [];
+    return Q.all(data.map(function(item, index){
+            if(index>0 && index<200){
+                var s = data[index];
+                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, roleId: s.roleId, companyId: s.companyId};//company_id默认为当前登录人的company_id
+
+                return staff.createStaff(staffObj)
+                    .then(function(ret){
+                        if(ret){
+                            item = ret.staff;
+                            addObj.push(item);
+                        }else{
+                            noAddObj.push(staffObj);
+                        }
+                        return item;
+                    })
+                    .catch(function(err){
+                        noAddObj.push(staffObj);
+                        console.log(err);
+                    })
+            }
+        })).then(function(items){
+            data = items;
+            return {addObj: JSON.stringify(addObj), noAddObj: JSON.stringify(noAddObj)};
+        })
+        .nodeify(callback);
+}
+
+/**
+ * 通过数据生成要下载的excle
+ * @param params
+ * @param params.objAttr 需要下载的数据列表
+ * @param callback
+ * @returns {*}
+ */
+staff.downloadExcle = function (params, callback){
+    if (!fs.existsSync(config.upload.tmpDir)) {
+        fs.mkdirSync(config.upload.tmpDir);
+    }
+    var data = params.objAttr;
+    var nowStr = moment().format('YYYYMMDDHHmm');
+    var defer = Q.defer();
+    if(!data){
+        defer.reject({code: -1, msg: "params.objAttr为空"});
+        return defer.promise.nodeify(callback);
+    }
+    data = JSON.parse(data);
+    if(!(data instanceof Array)){
+        defer.reject({code: -1, msg: "params.objAttr类型错误"});
+        return defer.promise.nodeify(callback);
+    }
+    var buffer = nodeXlsx.build([{name: "Sheet1", data: data}]);
+    fs.writeFileSync(config.upload.tmpDir+'/'+ nowStr +'.xlsx', buffer, 'binary');
+    defer.resolve({code: 0, url: nowStr+".xlsx"});
+    return defer.promise.nodeify(callback);
 }
 
 /**

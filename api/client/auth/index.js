@@ -4,10 +4,12 @@
 
 var Q = require("q");
 var L = require("common/language");
+var Logger = require("common/logger");
 var validate = require("common/validate");
 var md5 = require("common/utils").md5;
+var uuid = require('node-uuid');
+var logger = new Logger("auth");
 var errorHandle = require("common/errorHandle");
-
 /**
  * @class auth 用户认证
  */
@@ -180,18 +182,25 @@ auth.registryCompany = function(params, callback) {
                             }
 
                             var account = result.data;
-                            return createCompany({createUser: account.id, name: companyName, domainName: domain})
-                                .then(function(result) {
-                                    if (result.code) {
-                                        throw result;
-                                    }
-
-                                    var company = result.company;
-                                    return createStaff({email: email, mobile: mobile, name: name, companyId: company.id, accountId: account.id})
+                            var companyId = uuid.v1();
+                            var staffId = account.id;
+                            return Q.all([
+                                createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain}),
+                                createStaff({email: email, mobile: mobile, name: name, companyId: companyId, accountId: account.id})
+                            ])
+                                .then(function(ret){
+                                    return {code: 0, msg: 'ok'};
+                                })
+                                .catch(function(err){
+                                    logger.info(err);
+                                    API.company.deleteCompany({companyId: companyId, userId: account.id});
+                                    API.staff.deleteStaff({id: staffId});
+                                    defer.reject(L.ERR.SYSTEM_ERROR);
+                                    return defer.promise;
                                 })
                         })
                         .then(function(result) {
-                            return {code: 0, msg: "OK"};
+                            return result;
                         })
                 })
         })
@@ -229,7 +238,7 @@ auth.logout = function(callback) {
 }
 
 /**
- * @method needPowersMiddleware
+ * @method needPermissionMiddleware
  *
  * 权限控制
  *
@@ -237,7 +246,7 @@ auth.logout = function(callback) {
  * @param needPowers
  * @return {Function}
  */
-auth.needPowersMiddleware = function(fn, needPowers) {
+auth.needPermissionMiddleware = function(fn, needPowers) {
     return function(params, callback) {
         var self = this;
         var accountId = self.accountId;

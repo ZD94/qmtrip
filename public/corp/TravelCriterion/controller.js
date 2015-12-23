@@ -17,7 +17,7 @@ var TravelCriterion=(function(){
         $("title").html("差旅标准");
         var companyId = "d674f130-a236-11e5-8246-c3a1e3bc94c3";
         Myselect();
-
+        $(".left_nav li").removeClass("on").eq(3).addClass("on");
 
         //获取差旅标准列表
         $scope.initCriterionList = function () {
@@ -28,6 +28,9 @@ var TravelCriterion=(function(){
                         console.info (result);
                         $scope.CriterionTotal = result.total;
                         $scope.CriterionList = result.items;
+                        if ($scope.CriterionTotal==0) {
+                            $(".create_criterion").show();
+                        }
                         loading(true);
                         $scope.$apply();
                     })
@@ -47,6 +50,29 @@ var TravelCriterion=(function(){
             $(".criterion_page li").css('opacity','1');
         }
         $scope.createCriterion = function () {
+            if ($(".create_criterion .Cname").val()=="") {
+                Myalert("温馨提示","请填写等级名称");
+                return false;
+            }
+            if ($(".create_criterion .CplaneLevel").html()=="请选择仓位") {
+                Myalert("温馨提示","请选择飞机仓位");
+                return false;
+            }
+            if ($(".create_criterion .CplaneDiscount").html()=="请选择折扣") {
+                Myalert("温馨提示","请选择飞机折扣");
+                return false;
+            }
+            if ($(".create_criterion .CtrainLevel").html()=="请选择座次") {
+                Myalert("温馨提示","请选择火车座次");
+                return false;
+            }
+            if ($(".create_criterion .ChotelTevel").html()=="星级标准") {
+                Myalert("温馨提示","请选择住宿标准");
+                return false;
+            }
+
+
+
             API.onload(function(){
                 API.travalPolicy.createTravalPolicy({
                         name:$(".create_criterion .Cname").val(),
