@@ -13,6 +13,7 @@ var L = require("common/language");
 var Logger = require('common/logger');
 var logger = new Logger("company");
 var utils = require("common/utils");
+var getColsFromParams = utils.getColsFromParams;
 var errorHandle = require("common/errorHandle");
 
 var company = {};
@@ -93,7 +94,7 @@ company.updateCompany = function(params, callback){
                         return defer.promise;
                     }
                     params.updateAt = utils.now();
-                    var cols = getColumns(params);
+                    var cols = getColsFromParams(params);
                     return Company.update(params, {returning: true, where: {id: companyId}, fields: cols})
                         .then(function(ret){
                             if(!ret[0] || ret[0] == "NaN"){
@@ -265,7 +266,7 @@ company.moneyChange = function(params, callback){
                     }
 
                     return sequelize.transaction(function(t){
-                        var cols = getColumns(fundsUpdates);
+                        var cols = getColsFromParams(fundsUpdates);
                         return Q.all([
                             FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: cols, transaction: t}),
                             MoneyChanges.create(moneyChange, {transaction: t})
@@ -285,18 +286,6 @@ company.moneyChange = function(params, callback){
         .nodeify(callback);
 }
 
-
-/**
- * 获取json params中的columns
- * @param params
- */
-function getColumns(params){
-    var cols = new Array();
-    for(var s in params){
-        cols.push(s);
-    }
-    return cols;
-}
 
 function checkParams(checkArray, params, callback){
     var defer = Q.defer();

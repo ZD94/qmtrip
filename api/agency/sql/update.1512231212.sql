@@ -1,0 +1,1 @@
+alter table agency.agency_user rename column company_id to agency_id;

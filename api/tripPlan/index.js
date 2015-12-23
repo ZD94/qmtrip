@@ -12,6 +12,7 @@ var uuid = require("node-uuid");
 var L = require("common/language");
 var Logger = require('common/logger');
 var utils = require('common/utils');
+var getColsFromParams = utils.getColsFromParams;
 var API = require('common/api');
 var errorHandle = require("common/errorHandle");
 var logger = new Logger("company");
@@ -150,7 +151,7 @@ tripPlan.updateTripPlanOrder = function(params, callback){
                         remark: optLog,
                         createAt: utils.now
                     }
-                    var cols = getColumns(updates);
+                    var cols = getColsFromParams(updates);
                     return sequelize.transaction(function(t){
                         return Q.all([
                             PlanOrder.update(updates, {returning: true, where: {id: orderId}, fields: cols, transaction: t}),
@@ -180,7 +181,7 @@ tripPlan.updateConsumeDetail = function(params, callback){
             var id = params.id;
             return ConsumeDetails.findById(id)
                 .then(function(ret){
-                    var cols = getColumns(updates);
+                    var cols = getColsFromParams(updates);
                     return ConsumeDetails.update(updates, {returning: true, where: {id: id}, fields: cols})
                         .then(function(detail){
                             var detail = detail.toJSON();
@@ -325,17 +326,6 @@ tripPlan.deleteConsumeDetail = function(params, callback){
         .nodeify(callback);
 }
 
-/**
- * 获取json params中的columns
- * @param params
- */
-function getColumns(params){
-    var cols = new Array();
-    for(var s in params){
-        cols.push(s);
-    }
-    return cols;
-}
 
 function checkParams(checkArray, params, callback){
     var defer = Q.defer();

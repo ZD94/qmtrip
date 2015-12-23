@@ -2,14 +2,15 @@
  * Created by yumiao on 15-12-9.
  */
 var Q = require('q');
-var models = require("common/model").importModel("./models");
-var Agency = models.Agency;
-var AgencyUser = models.AgencyUser;
+var Models = require("common/model").importModel("./models").models;
+var Agency = Models.Agency;
+var AgencyUser = Models.AgencyUser;
 var uuid = require("node-uuid");
 var L = require("common/language");
 var Logger = require('common/logger');
 var logger = new Logger("agency");
 var utils = require("common/utils");
+var getColsFromParams = utils.getColsFromParams;
 var API = require("common/api");
 var Paginate = require("common/paginate").Paginate;
 var errorHandle = require("common/errorHandle");
@@ -61,7 +62,7 @@ agency.updateAgency = function(params, callback){
                         return defer.promise;
                     }
                     params.updateAt = utils.now();
-                    var cols = getColumns(params);
+                    var cols = getColsFromParams(params);
                     return Agency.update(params, {returning: true, where: {id: agencyId}, fields: cols})
                         .then(function(ret){
                             if(!ret[0] || ret[0] == "NaN"){
@@ -90,7 +91,11 @@ agency.getAgency = function(params, callback){
             var userId = params.userId;
             return Agency.find({where: {id: agencyId}})
                 .then(function(ret){
-                    return {code: 0, msg: '', agency: ret.dataValues};
+                    if(!ret){
+                        defer.reject({code: -2, msg: '没有代理商'});
+                        return defer.promise;
+                    }
+                    return {code: 0, msg: '', agency: ret.toJSON()};
                 })
         })
         .catch(errorHandle)
@@ -150,17 +155,6 @@ agency.deleteAgency = function(params, callback){
         .nodeify(callback);
 }
 
-/**
- * 获取json params中的columns
- * @param params
- */
-function getColumns(params){
-    var cols = new Array();
-    for(var s in params){
-        cols.push(s)
-    }
-    return cols;
-}
 
 function checkParams(checkArray, params, callback){
     var defer = Q.defer();
@@ -283,6 +277,10 @@ agency.getAgencyUser = function(id, callback){
     }
     return AgencyUser.findById(id)
         .then(function(obj){
+            if(!obj){
+                defer.reject({code: -2, msg: '用户不存在'});
+                return defer.promise;
+            }
             return {code: 0, agency: obj.toJSON()}
         })
         .catch(errorHandle)

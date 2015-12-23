@@ -11,7 +11,7 @@ module.exports = function(Db, DataType) {
         email:      { type: DataType.STRING(50) }, //邮箱
         mobile:     { type: DataType.STRING(20) }, //电话
         avatar:     { type: DataType.TEXT       }, //代理商头像
-        companyId:  { type: DataType.UUID,      field: "company_id" }, //公司ID
+        agencyId:  { type: DataType.UUID,      field: "agency_id" }, //公司ID
         roleId:     { type: DataType.INTEGER,   field: "role_id" }, //权限ID
         createAt:   { type: DataType.NOW,       field: "create_at", defaultValue: now } //创建时间
     },{
