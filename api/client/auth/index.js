@@ -255,7 +255,7 @@ auth.needPermissionMiddleware = function(fn, needPowers) {
                 if (result.code) {
                     throw result;
                 }
-                return fn.apply(self, params);
+                return fn.call(self, params);
             })
             .catch(errorHandle)
             .nodeify(callback);

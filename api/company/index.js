@@ -117,11 +117,16 @@ company.updateCompany = function(params, callback){
  * @returns {*}
  */
 company.getCompany = function(params, callback){
+    var defer = Q.defer();
     return checkParams(['companyId'], params)
         .then(function(){
             var companyId = params.companyId;
             return Company.find({where: {id: companyId}})
                 .then(function(company){
+                    if(!company){
+                        defer.reject({code: -2, msg: '企业不存在'});
+                        return defer.promise;
+                    }
                     var company = company.toJSON();
                     return {code: 0, msg: '', company: company};
                 })

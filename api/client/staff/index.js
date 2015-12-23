@@ -9,12 +9,14 @@
 
 var Q = require("q");
 var API = require("common/api");
+var Logger = require("common/logger");
+var logger = new Logger("staff");
 /**
  * @class staff 员工信息
  */
 var staff = {};
 
-function needPowersMiddleware(fn, needPowers) {
+function needPermissionMiddleware(fn, needPowers) {
     return function(params, callback) {
         var self = this;
         var accountId = self.accountId;
@@ -23,7 +25,7 @@ function needPowersMiddleware(fn, needPowers) {
                 if (result.code) {
                     throw result;
                 }
-                return fn.apply(self, params);
+                return fn.call(self, params);
             })
             .nodeify(callback);
     }
@@ -37,12 +39,13 @@ function needPowersMiddleware(fn, needPowers) {
  * @type {*}
  * @return {promise}
  */
-staff.createStaff = needPowersMiddleware(function(params, callback) {
+staff.createStaff = needPermissionMiddleware(function(params, callback) {
     var user_id = this.accountId;
     return API.staff.getStaff(user_id)
         .then(function(data){
-            if(data){
-                params.companyId = data.companyId;
+            if(!data.code){
+                var companyId = data.staff.companyId;
+                params.companyId = companyId;
                 return API.staff.createStaff(params, callback);
             }else{
                 return API.staff.createStaff(params, callback);//员工注册的时候
@@ -59,7 +62,7 @@ staff.createStaff = needPowersMiddleware(function(params, callback) {
  * @type {*}
  * @return {promise}
  */
-staff.deleteStaff = needPowersMiddleware(function(params, callback) {
+staff.deleteStaff = needPermissionMiddleware(function(params, callback) {
     var user_id = this.accountId;
     var defer = Q.defer();
     if(!params.id){
@@ -88,7 +91,7 @@ staff.deleteStaff = needPowersMiddleware(function(params, callback) {
  *
  * @type {*}
  */
-staff.updateStaff = needPowersMiddleware(function(id, params, callback) {
+staff.updateStaff = needPermissionMiddleware(function(id, params, callback) {
     var user_id = this.accountId;
     var defer = Q.defer();
     if(!id){
@@ -116,7 +119,7 @@ staff.updateStaff = needPowersMiddleware(function(id, params, callback) {
  * 企业根据id得到员工信息
  * @type {*}
  */
-staff.getStaff = needPowersMiddleware(function(id, params, callback) {
+staff.getStaff = needPermissionMiddleware(function(id, params, callback) {
     var user_id = this.accountId;
     var defer = Q.defer();
     if(!id){
@@ -157,7 +160,7 @@ staff.getCurrentStaff = function(callback){
  * 企业分页查询员工列表
  * @type {*}
  */
-staff.listAndPaginateStaff = needPowersMiddleware(function(params, options, callback) {
+staff.listAndPaginateStaff = needPermissionMiddleware(function(params, options, callback) {
     var user_id = this.accountId;
     return API.staff.getStaff(user_id)
         .then(function(data){
