@@ -105,3 +105,17 @@
 | items   | 差旅标准信息|json
 
 
+>. 获取惬意所有差旅标准 API.travelPolicy.getAllTravelPolicy(options, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| options                                | 传入参数             |json              |------
+| options.where                        | 查询条件              |json               |{}
+| options.columns                         |选择查询列      |Array            |eg:options.columns = ['id', 'name']
+| options.order                         |排序            |string   |'name' || 'name desc'
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code     | 返回代码0正确 其他错误 |
+| msg     | 提示信息 |
