@@ -12,7 +12,8 @@ var uuid = require("node-uuid");
 var L = require("common/language");
 var Logger = require('common/logger');
 var utils = require('common/utils');
-var API = require('../../common/api');
+var API = require('common/api');
+var errorHandle = require("common/errorHandle");
 var logger = new Logger("company");
 
 var tripPlan = {}
@@ -75,7 +76,9 @@ tripPlan.savePlanOrder = function(params, callback){
                 .then(function(ret){
                     return ret;
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -112,7 +115,9 @@ tripPlan.getTripPlanOrder = function(params, callback){
                     tripPlanOrder.hotel = hotel;
                     return {code: 0, msg: '', tripPlanOrder: tripPlanOrder};
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -157,7 +162,9 @@ tripPlan.updateTripPlanOrder = function(params, callback){
                             })
                     })
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -180,7 +187,9 @@ tripPlan.updateConsumeDetail = function(params, callback){
                             return {code: 0, msg: '更新成功', consumeDetail: detail};
                         })
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 
@@ -216,7 +225,9 @@ tripPlan.listTripPlanOrder = function(params, callback){
                 .then(function(orders){
                     return {code: 0, msg: '', tripPlanOrders: orders};
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -240,7 +251,9 @@ tripPlan.saveConsumeRecord = function(params, options, callback){
                 .then(function(ret){
                     return ret.dataValues;
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -275,7 +288,9 @@ tripPlan.deleteTripPlanOrder = function(params, callback){
                             })
                     })
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -305,7 +320,9 @@ tripPlan.deleteConsumeDetail = function(params, callback){
                             return {code: 0, msg: '删除成功'}
                         })
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -315,7 +332,7 @@ tripPlan.deleteConsumeDetail = function(params, callback){
 function getColumns(params){
     var cols = new Array();
     for(var s in params){
-        cols.push(s)
+        cols.push(s);
     }
     return cols;
 }

@@ -12,6 +12,7 @@ var logger = new Logger("agency");
 var utils = require("common/utils");
 var API = require("common/api");
 var Paginate = require("common/paginate").Paginate;
+var errorHandle = require("common/errorHandle");
 
 var agency = {};
 
@@ -29,7 +30,9 @@ agency.createAgency = function(params, callback){
                     var agency = agency.toJSON();
                     return {code: 0, msg: '', agency: agency};
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 
@@ -69,7 +72,9 @@ agency.updateAgency = function(params, callback){
                             return {code: 0, msg: '更新代理商信息成功', agency: agency};
                         })
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -87,7 +92,9 @@ agency.getAgency = function(params, callback){
                 .then(function(ret){
                     return {code: 0, msg: '', agency: ret.dataValues};
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -106,7 +113,9 @@ agency.listAgency = function(params, callback){
                 .then(function(ret){
                     return {code: 0, msg: '', agencys: ret};
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -136,7 +145,9 @@ agency.deleteAgency = function(params, callback){
                             return {code: 0, msg: '删除成功'};
                         })
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -203,6 +214,7 @@ agency.createAgencyUser = function(data, callback){
                     })
             }
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -228,6 +240,7 @@ agency.deleteAgencyUser = function(params, callback){
                     })
             }
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -251,6 +264,7 @@ agency.updateAgencyUser = function(id, data, callback){
         .then(function(obj){
             return {code: 0, agency: obj[1][0].toJSON(), msg: "更新成功"}
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -271,6 +285,7 @@ agency.getAgencyUser = function(id, callback){
         .then(function(obj){
             return {code: 0, agency: obj.toJSON()}
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -313,6 +328,7 @@ agency.listAndPaginateAgencyUser = function(params, options, callback){
             var pg = new Paginate(page, perPage, result.count, result.rows);
             return pg;
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
