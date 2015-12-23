@@ -4,7 +4,7 @@
 'use strict';
 var TravelCriterion=(function(){
 
-    API.require('travalPolicy');
+    API.require('travelPolicy');
 
     var  TravelCriterion = {};
 
@@ -23,7 +23,7 @@ var TravelCriterion=(function(){
         $scope.initCriterionList = function () {
             loading(false);
             API.onload(function(){
-                API.travalPolicy.listAndPaginateTravalPolicy({},{})
+                API.travelPolicy.listAndPaginateTravelPolicy({},{})
                     .then(function(result){
                         console.info (result);
                         $scope.CriterionTotal = result.total;
@@ -74,13 +74,13 @@ var TravelCriterion=(function(){
 
 
             API.onload(function(){
-                API.travalPolicy.createTravalPolicy({
+                API.travelPolicy.createTravelPolicy({
                         name:$(".create_criterion .Cname").val(),
                         planeLevel:$(".create_criterion .CplaneLevel").html(),
                         planeDiscount:$(".create_criterion .CplaneDiscount").attr('selectValue'),
                         trainLevel:$(".create_criterion .CtrainLevel").html(),
                         isChangeLevel:$(".create_criterion .Ccheckbox").is(':checked'),
-                        hotelTevel:$(".create_criterion .ChotelTevel").html(),
+                        hotelLevel:$(".create_criterion .ChotelTevel").html(),
                         hotelPrice:$(".create_criterion .ChotelPrice").val(),
                         companyTd:companyId
                     })
@@ -102,7 +102,7 @@ var TravelCriterion=(function(){
         $scope.deleteCriterion = function (id,name) {
             Myalert("温馨提示","删除成功");
             API.onload(function(){
-                API.travalPolicy.deleteTravalPolicy({id:id})
+                API.travelPolicy.deleteTravelPolicy({id:id})
                     .then(function(result){
                         Myalert("温馨提示","删除&nbsp;<span>'"+name+"'&nbsp;</span>成功");
                         $scope.initCriterionList();
@@ -143,7 +143,7 @@ var TravelCriterion=(function(){
             $(".update_criterion .CplaneDiscount").html(obj[discountTxt]).attr("selectValue",discountTxt);
             $(".update_criterion .CtrainLevel").html($scope.CriterionList[index].trainLevel);
             $(".update_criterion .Ccheckbox").attr('checked',$scope.CriterionList[index].isChangeLevel);
-            $(".update_criterion .ChotelTevel").html($scope.CriterionList[index].hotelTevel);
+            $(".update_criterion .ChotelTevel").html($scope.CriterionList[index].hotelLevel);
             $(".update_criterion .ChotelPrice").val($scope.CriterionList[index].hotelPrice);
             $(".update_criterion").show();
             $(".create_criterion").hide();
@@ -151,13 +151,13 @@ var TravelCriterion=(function(){
         }
         $scope.updateCriterion = function () {
             API.onload(function(){
-                API.travalPolicy.updateTravalPolicy($scope.updateId,{
+                API.travelPolicy.updateTravelPolicy($scope.updateId,{
                     name:$(".update_criterion .Cname").val(),
                     planeLevel:$(".update_criterion .CplaneLevel").html(),
                     planeDiscount:$(".update_criterion .CplaneDiscount").attr('selectValue'),
                     trainLevel:$(".update_criterion .CtrainLevel").html(),
                     isChangeLevel:$(".update_criterion .Ccheckbox").is(':checked'),
-                    hotelTevel:$(".update_criterion .ChotelTevel").html(),
+                    hotelLevel:$(".update_criterion .ChotelTevel").html(),
                     hotelPrice:$(".update_criterion .ChotelPrice").val(),
                     companyTd:companyId
                 })

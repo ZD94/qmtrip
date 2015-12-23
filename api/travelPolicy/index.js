@@ -4,12 +4,12 @@
 'use strict';
 var Q = require("q");
 var sequelize = require("common/model").importModel("./models");
-var travalPolicyModel = sequelize.models.TravalPolicy;
+var travalPolicyModel = sequelize.models.TravelPolicy;
 var Paginate = require("../../common/paginate").Paginate;
 var uuid = require("node-uuid");
 var L = require("../../common/language");
 var API = require("../../common/api");
-var travalPolicy = {};
+var travelPolicy = {};
 
 /**
  * 创建差旅标准
@@ -17,12 +17,12 @@ var travalPolicy = {};
  * @param callback
  * @returns {*}
  */
-travalPolicy.createTravalPolicy = function(data, callback){
-    return checkParams(["name","planeLevel","planeDiscount","trainLevel","hotelTevel","hotelPrice","companyTd"], data)
+travelPolicy.createTravelPolicy = function(data, callback){
+    return checkParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","hotelPrice","companyId"], data)
         .then(function(){
             return travalPolicyModel.create(data)
                 .then(function(obj){
-                    return {code: 0, travalPolicy: obj.toJSON()};
+                    return {code: 0, travelPolicy: obj.toJSON()};
                 })
         })
         .nodeify(callback);
@@ -34,7 +34,7 @@ travalPolicy.createTravalPolicy = function(data, callback){
  * @param callback
  * @returns {*}
  */
-travalPolicy.deleteTravalPolicy = function(params, callback){
+travelPolicy.deleteTravelPolicy = function(params, callback){
     var defer = Q.defer();
     var id = params.id;
     if (!id) {
@@ -55,7 +55,7 @@ travalPolicy.deleteTravalPolicy = function(params, callback){
  * @param callback
  * @returns {*}
  */
-travalPolicy.updateTravalPolicy = function(id, data, callback){
+travelPolicy.updateTravelPolicy = function(id, data, callback){
     var defer = Q.defer();
     if(!id){
         defer.reject({code: -1, msg: "id不能为空"});
@@ -66,7 +66,7 @@ travalPolicy.updateTravalPolicy = function(id, data, callback){
     options.returning = true;
     return travalPolicyModel.update(data, options)
         .then(function(obj){
-            return {code: 0, travalPolicy: obj[1][0].toJSON(), msg: "更新成功"}
+            return {code: 0, travelPolicy: obj[1][0].toJSON(), msg: "更新成功"}
         })
         .nodeify(callback);
 }
@@ -77,7 +77,7 @@ travalPolicy.updateTravalPolicy = function(id, data, callback){
  * @param callback
  * @returns {*}
  */
-travalPolicy.getTravalPolicy = function(id, callback){
+travelPolicy.getTravelPolicy = function(id, callback){
     var defer = Q.defer();
     if(!id){
         defer.reject({code: -1, msg: "id不能为空"});
@@ -85,7 +85,7 @@ travalPolicy.getTravalPolicy = function(id, callback){
     }
     return travalPolicyModel.findById(id)
         .then(function(obj){
-            return {code: 0, travalPolicy: obj.toJSON()}
+            return {code: 0, travelPolicy: obj.toJSON()}
         })
         .nodeify(callback);
 }
@@ -96,15 +96,17 @@ travalPolicy.getTravalPolicy = function(id, callback){
  * @param callback
  * @returns {*}
  */
-travalPolicy.getAllTravalPolicy = function(params, callback){
-    var options = {};
-    options.where = params;
+travelPolicy.getAllTravelPolicy = function(options, callback){
     return travalPolicyModel.findAll(options)
         .then(function(obj){
-            return {code: 0, travalPolicies: obj}
+            obj = obj.map(function(item){
+                return item.toJSON();
+            })
+            return {code: 0, travelPolicies: obj}
         })
         .nodeify(callback);
 }
+
 
 /**
  * 分页查询差旅标准集合
@@ -112,7 +114,7 @@ travalPolicy.getAllTravalPolicy = function(params, callback){
  * @param options options.perPage 每页条数 options.page当前页
  * @param callback
  */
-travalPolicy.listAndPaginateTravalPolicy = function(params, options, callback){
+travelPolicy.listAndPaginateTravelPolicy = function(params, options, callback){
     if (typeof options == 'function') {
         callback = options;
         options = {};
@@ -164,4 +166,4 @@ function checkParams(checkArray, params, callback){
     defer.resolve({code: 0});
     return defer.promise.nodeify(callback);
 }
-module.exports = travalPolicy;
+module.exports = travelPolicy;
