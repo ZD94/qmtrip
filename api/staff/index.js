@@ -188,6 +188,10 @@ staff.getStaff = function(id, callback){
     }
     return staffModel.findById(id)
         .then(function(obj){
+            if(!obj){
+                defer.reject({code: -2, msg: '员工不存在'});
+                return defer.promise;
+            }
             return {code: 0, staff: obj.toJSON()}
         })
         .nodeify(callback);
