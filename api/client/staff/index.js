@@ -221,6 +221,30 @@ staff.beforeImportExcel = function(params, callback){
 }
 
 /**
+ * 执行导入数据
+ * @param params
+ * @param params.addObj 导入的数据
+ * @param callback
+ * @returns {*}
+ */
+staff.importExcelAction = function(params, callback){
+    params.accountId = this.accountId;
+    return API.staff.importExcelAction(params, callback);
+}
+
+/**
+ * 下载数据
+ * @param params
+ * @param params.objAttr 需要导出的数据
+ * @param callback
+ * @returns {*}
+ */
+staff.downloadExcle = function(params, callback){
+    params.accountId = this.accountId;
+    return API.staff.downloadExcle(params, callback);
+}
+
+/**
  * @method API.staff.statisticStaffs
  *
  * 统计时间段内企业员工数量（在职 入职 离职）

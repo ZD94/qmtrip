@@ -163,6 +163,52 @@
 | total     | 提示信息 |: 总记录数
 | items   | 积分变动记录|json
 
+>. 导入前检查导入员工数据 API.staff.beforeImportExcel(params, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 查询条件参数             |json              |------
+| params.accountId                             |员工id             |uuid                |必填
+| params.md5key                                |导入文件MD5key             |string              |必填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code     | 返回代码0正确 其他错误 |
+| addObj     | 有效数据 |json string
+| noAddObj     | 无效数据 |json string
+| downloadAddObj     | 供下载的有效数据 |json string
+| downloadNoAddObj     | 供下载的无效数据 |json string
+
+>. 执行导入 API.staff.importExcelAction(params, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 查询条件参数             |json              |------
+| params.addObj                                |导入数据             |json string              |必填(即上面api得到的addObj)
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code     | 返回代码0正确 其他错误 |
+| addObj     | 成功数据 |json string
+| noAddObj     | 失败数据 |json string
+
+>. 执行导入 API.staff.importExcelAction(params, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 查询条件参数             |json              |------
+| params.accountId                             |员工id             |uuid                |必填
+| params.objAttr                                |导出的数据             |json string              |必填(即上面api得到的downloadAddObj, downloadNoAddObj)
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code     | 返回代码0正确 其他错误 |
+| msg     | 错误信息 |
+| fileName     | 文件名称 |window.location.href = '/download/excle-file/'+fileName即可下载;
+
 
 >. 统计时间段内企业员工数量（在职 入职 离职） API.staff.statisticStaffs(params,callback);
 

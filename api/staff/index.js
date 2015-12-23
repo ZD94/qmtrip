@@ -537,7 +537,6 @@ staff.importExcelAction = function(params, callback){
         return defer.promise.nodeify(callback);
     }
     var data = JSON.parse(params.addObj);
-    console.log(data);
     var noAddObj = [];
     var addObj = [];
     return Q.all(data.map(function(item, index){
@@ -598,7 +597,7 @@ staff.downloadExcle = function (params, callback){
     }
     var buffer = nodeXlsx.build([{name: "Sheet1", data: data}]);
     fs.writeFileSync(config.upload.tmpDir+'/'+ fileName +'.xlsx', buffer, 'binary');
-    defer.resolve({code: 0, url: fileName+".xlsx"});
+    defer.resolve({code: 0, fileName: fileName+".xlsx"});
     return defer.promise.nodeify(callback);
 }
 
