@@ -23,14 +23,15 @@
     	var moment = require('moment');
     	var TLD = TLD_angular_app('tulingdao.com', 'agency', '/UsersFirst/UserMain');
     	API.onlogin(function(){
-    		window.location.href = "/login/login.html";
+    		window.location.href = "agency/login.html";
     		return;
     	})
     	//获取页面基本信息
     	TLD.controller("MainController", ["$scope", function($scope) {
-    		API.require("angency");
+    		API.require("agency");
     		API.onload(function(){
-    			API.agency.getCurrentAgencyUser()
+    			console.info(API.agency)
+    			API.agency.getCurrentAgency()
     				.then(function(ret){
     					console.info(ret);
     					// API.company.getCompany(company_id)
