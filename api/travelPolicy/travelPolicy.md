@@ -5,13 +5,13 @@
 ---
 
 ```
-   在controller里引用 API.require('travalPolicy');
+   在controller里引用 API.require('travelPolicy');
 ```
 
 ### Client API列表
 ---
 
->. 创建差旅标准 API.travalPolicy.createTravalPolicy(params, callback);  "name","planeLevel","planeDiscount","trainLevel","hotelTevel","hotelPrice","companyTd"
+>. 创建差旅标准 API.travelPolicy.createTravelPolicy(params, callback);  "name","planeLevel","planeDiscount","trainLevel","hotelLevel","hotelPrice","companyTd"
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -20,7 +20,7 @@
 | params.planeLevel                        | 机票标准               |varchar               |必填
 | params.planeDiscount                          |机票折扣            |float               |必填
 | params.trainLevel                          |火车票标准           |varchar               |必填
-| params.hotelTevel                          |酒店标准           |varchar               |必填
+| params.hotelLevel                          |酒店标准           |varchar               |必填
 | params.hotelPrice                          |酒店价格           |float               |必填
 | params.companyTd                          |所属企业id           |uuid               |必填
 | callback                              | 回调函数             |function              |支持promise
@@ -29,9 +29,9 @@
 |---------|------|-----|
 | code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
-| travalPolicy   | 差旅标准信息|json
+| travelPolicy   | 差旅标准信息|json
 
->. 删除差旅标准 API.travalPolicy.deleteTravalPolicy(params, callback);
+>. 删除差旅标准 API.travelPolicy.deleteTravelPolicy(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -44,7 +44,7 @@
 | code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
 
->. 修改差旅标准信息 API.travalPolicy.updateTravalPolicy(id, params, callback);
+>. 修改差旅标准信息 API.travelPolicy.updateTravelPolicy(id, params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -54,7 +54,7 @@
 | params.planeLevel                        | 机票标准               |varchar               |选填
 | params.planeDiscount                          |机票折扣            |float               |选填
 | params.trainLevel                          |火车票标准           |varchar               |选填
-| params.hotelTevel                          |酒店标准           |varchar               |选填
+| params.hotelLevel                          |酒店标准           |varchar               |选填
 | params.hotelPrice                          |酒店价格           |float               |选填
 | params.companyTd                          |所属企业id           |uuid               |选填
 | callback                              | 回调函数             |function              |支持promise
@@ -63,9 +63,9 @@
 |---------|------|-----|
 | code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
-| travalPolicy   | 差旅标准信息|json
+| travelPolicy   | 差旅标准信息|json
 
->. 查询差旅标准信息 API.travalPolicy.getTravalPolicy(id,callback);
+>. 查询差旅标准信息 API.travelPolicy.getTravelPolicy(id,callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -76,9 +76,9 @@
 |---------|------|-----|
 | code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
-| travalPolicy   | 差旅标准信息|json
+| travelPolicy   | 差旅标准信息|json
 
->. 分页查询差旅标准信息 API.travalPolicy.listAndPaginateTravalPolicy(params, options, callback);
+>. 分页查询差旅标准信息 API.travelPolicy.listAndPaginateTravelPolicy(params, options, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -87,7 +87,7 @@
 | params.planeLevel                        | 机票标准               |varchar               |选填
 | params.planeDiscount                          |机票折扣            |float               |选填
 | params.trainLevel                          |火车票标准           |varchar               |选填
-| params.hotelTevel                          |酒店标准           |varchar               |选填
+| params.hotelLevel                          |酒店标准           |varchar               |选填
 | params.hotelPrice                          |酒店价格           |float               |选填
 | params.companyTd                          |所属企业id           |uuid               |选填
 | options                                | 分页参数             |json              |------

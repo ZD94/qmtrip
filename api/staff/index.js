@@ -20,7 +20,7 @@ var Paginate = require("../../common/paginate").Paginate;
 var logger = new Logger("staff");
 var moment = require("moment");
 //var auth = require("../auth/index");
-//var travalPolicy = require("../travalPolicy/index");
+//var travelPolicy = require("../travelPolicy/index");
 var staff = {};
 
 
@@ -417,7 +417,7 @@ staff.importExcel = function(params, callback){
             return staff.getStaff(userId)
                 .then(function(sf){
                     companyId = sf.staff.companyId;
-                    return API.travalPolicy.getAllTravalPolicy({company_id: companyId})
+                    return API.travelPolicy.getAllTravelPolicy({company_id: companyId})
                         .then(function(results){
                             results = results.travalPolicies;
                             for(var t=0;t<results.length;t++){
