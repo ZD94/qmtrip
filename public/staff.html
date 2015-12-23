@@ -20,11 +20,11 @@
     <script type="text/javascript">
     	var Q = require('q');
     	var moment = require('moment');
-    	var TLD = TLD_angular_app('tulingdao.com', 'staff', '/StaffFirst/StaffUser1');
-    	// API.onlogin(function(){
-    	// 	window.location.href = "/";
-    	// 	return;
-    	// })
+    	var TLD = TLD_angular_app('tulingdao.com', 'staff', '/StaffFirst/StaffUser');
+    	API.onlogin(function(){
+    		window.location.href = "/auth.html?backurl="+encodeURIComponent(window.location.href);
+    		return;
+    	})
     	//获取页面基本信息
     	TLD.controller("MainController", ["$scope", function($scope) {
     		API.require("staff");

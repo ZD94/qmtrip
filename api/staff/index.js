@@ -6,6 +6,7 @@ var Q = require("q");
 var nodeXlsx = require("node-xlsx");
 var uuid = require("node-uuid");
 var moment = require("moment");
+var crypto = require("crypto");
 var utils = require("common/utils");
 var sequelize = require("common/model").importModel("./models");
 var Logger = require("common/logger");
@@ -577,14 +578,20 @@ staff.downloadExcle = function (params, callback){
         defer.reject({code: -1, msg: "params.objAttr为空"});
         return defer.promise.nodeify(callback);
     }
+    if(!params.accountId){
+        defer.reject({code: -1, msg: "params.accountId为空"});
+        return defer.promise.nodeify(callback);
+    }
+    var md5 = crypto.createHash("md5");
+    var fileName = md5.update(params.accountId+nowStr).digest("hex");
     data = JSON.parse(data);
     if(!(data instanceof Array)){
         defer.reject({code: -1, msg: "params.objAttr类型错误"});
         return defer.promise.nodeify(callback);
     }
     var buffer = nodeXlsx.build([{name: "Sheet1", data: data}]);
-    fs.writeFileSync(config.upload.tmpDir+'/'+ nowStr +'.xlsx', buffer, 'binary');
-    defer.resolve({code: 0, url: nowStr+".xlsx"});
+    fs.writeFileSync(config.upload.tmpDir+'/'+ fileName +'.xlsx', buffer, 'binary');
+    defer.resolve({code: 0, url: fileName+".xlsx"});
     return defer.promise.nodeify(callback);
 }
 
