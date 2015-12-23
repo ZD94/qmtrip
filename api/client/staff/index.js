@@ -9,6 +9,7 @@
 
 var Q = require("q");
 var API = require("common/api");
+var auth = require("..//auth");
 var Logger = require("common/logger");
 var logger = new Logger("staff");
 /**
@@ -39,7 +40,7 @@ function needPermissionMiddleware(fn, needPowers) {
  * @type {*}
  * @return {promise}
  */
-staff.createStaff = needPermissionMiddleware(function(params, callback) {
+staff.createStaff = auth.needPermissionMiddleware(function(params, callback) {
     var user_id = this.accountId;
     return API.staff.getStaff(user_id)
         .then(function(data){
@@ -62,7 +63,7 @@ staff.createStaff = needPermissionMiddleware(function(params, callback) {
  * @type {*}
  * @return {promise}
  */
-staff.deleteStaff = needPermissionMiddleware(function(params, callback) {
+staff.deleteStaff = auth.needPermissionMiddleware(function(params, callback) {
     var user_id = this.accountId;
     var defer = Q.defer();
     if(!params.id){
@@ -91,7 +92,7 @@ staff.deleteStaff = needPermissionMiddleware(function(params, callback) {
  *
  * @type {*}
  */
-staff.updateStaff = needPermissionMiddleware(function(id, params, callback) {
+staff.updateStaff = auth.needPermissionMiddleware(function(id, params, callback) {
     var user_id = this.accountId;
     var defer = Q.defer();
     if(!id){
@@ -119,7 +120,7 @@ staff.updateStaff = needPermissionMiddleware(function(id, params, callback) {
  * 企业根据id得到员工信息
  * @type {*}
  */
-staff.getStaff = needPermissionMiddleware(function(id, params, callback) {
+staff.getStaff = auth.needPermissionMiddleware(function(id, params, callback) {
     var user_id = this.accountId;
     var defer = Q.defer();
     if(!id){
@@ -160,7 +161,7 @@ staff.getCurrentStaff = function(callback){
  * 企业分页查询员工列表
  * @type {*}
  */
-staff.listAndPaginateStaff = needPermissionMiddleware(function(params, options, callback) {
+staff.listAndPaginateStaff = auth.needPermissionMiddleware(function(params, options, callback) {
     var user_id = this.accountId;
     return API.staff.getStaff(user_id)
         .then(function(data){
@@ -214,9 +215,9 @@ staff.listAndPaginatePointChange = function(params, options, callback){
  * @param {Function} callback
  * @return {promise}
  */
-staff.importExcel = function(params, callback){
+staff.beforeImportExcel = function(params, callback){
     params.accountId = this.accountId;
-    return API.staff.importExcel(params, callback);
+    return API.staff.beforeImportExcel(params, callback);
 }
 
 /**
