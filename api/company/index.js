@@ -9,10 +9,11 @@ var Company = Models.Company;
 var FundsAccounts = Models.FundsAccounts;
 var MoneyChanges = Models.MoneyChanges;
 var uuid = require("node-uuid");
-var L = require("../../common/language");
-var Logger = require('../../common/logger');
+var L = require("common/language");
+var Logger = require('common/logger');
 var logger = new Logger("company");
-var utils = require("../../common/utils");
+var utils = require("common/utils");
+var errorHandle = require("common/errorHandle");
 
 var company = {};
 
@@ -41,7 +42,9 @@ company.createCompany = function(params, callback){
                         return {code: 0, msg: '', company: company};
                     })
             })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -67,6 +70,7 @@ company.isBlackDomain = function(params, callback) {
             }
             return {code: 0, msg: "ok"};
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -100,7 +104,9 @@ company.updateCompany = function(params, callback){
                             return {code: 0, msg: '更新企业信息成功', company: company};
                         })
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -118,7 +124,9 @@ company.getCompany = function(params, callback){
                     var company = company.toJSON();
                     return {code: 0, msg: '', company: company};
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -134,7 +142,9 @@ company.listCompany = function(params, callback){
                 .then(function(ret){
                     return {code: 0, msg: '', company: ret};
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -164,7 +174,9 @@ company.deleteCompany = function(params, callback){
                             return {code: 0, msg: '删除成功'};
                         })
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -182,7 +194,9 @@ company.getCompanyFundsAccount = function(params, callback){
                 .then(function(funds){
                     return funds.toJSON();
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -266,7 +280,9 @@ company.moneyChange = function(params, callback){
                             })
                     })
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 

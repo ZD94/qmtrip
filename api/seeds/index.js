@@ -8,7 +8,7 @@ var Q = require("q");
 var Seeds = require("common/model").importModel("./models").models.Seeds;
 var Logger = require('../../common/logger');
 var logger = new Logger("seeds");
-
+var errorHandle = require("common/errorHandle")
 var typeString = "^tripPlanOrderNo^";
 var seeds = {};
 
@@ -58,6 +58,7 @@ seeds.getSingleSeedCode = function(type, options, callback){
             var seeds = seeds[1][0];
             return seeds.nowNo;
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -75,7 +76,9 @@ seeds.getSeedNo = function(type, options, callback){
         .then(function(seeds){
             var now = moment().format(formatDate);
             return now + seeds;
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 module.exports = seeds;
