@@ -44,6 +44,7 @@ server.on('init.http', function(server){
     if(config.debug){
         var shoe = require('shoe');
         var sock = shoe(function (stream) {
+            stream.write('connected.<br>\n');
             var redis = require("redis");
             var client = redis.createClient(config.redis.url);
             client.subscribe('checkcode:msg');
