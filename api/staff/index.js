@@ -429,14 +429,7 @@ staff.importExcel = function(params, callback){
                                         s[1] = s[1] ? s[1]+"" : "";
                                         var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
                                         item = staffObj;
-                                        if(!staffObj.email || staffObj.email=="" || emailAttr.join(",").indexOf(s[2]) != -1){
-                                            staffObj.reason = "邮箱为空或与本次导入中邮箱重复";
-                                            s[6] = "邮箱为空或与本次导入中邮箱重复";
-                                            noAddObj.push(staffObj);
-                                            downloadNoAddObj.push(s);
-                                            return;
-                                        }
-                                        emailAttr.push(s[2]);
+
                                         if(!staffObj.name || staffObj.name==""){
                                             staffObj.reason = "姓名为空";
                                             s[6] = "姓名为空";
@@ -452,6 +445,14 @@ staff.importExcel = function(params, callback){
                                             return;
                                         }
                                         mobileAttr.push(s[1]);
+                                        if(!staffObj.email || staffObj.email=="" || emailAttr.join(",").indexOf(s[2]) != -1){
+                                            staffObj.reason = "邮箱为空或与本次导入中邮箱重复";
+                                            s[6] = "邮箱为空或与本次导入中邮箱重复";
+                                            noAddObj.push(staffObj);
+                                            downloadNoAddObj.push(s);
+                                            return;
+                                        }
+                                        emailAttr.push(s[2]);
                                         if(!staffObj.department || staffObj.department==""){
                                             staffObj.reason = "部门为空";
                                             s[6] = "部门为空";
@@ -508,6 +509,12 @@ staff.importExcel = function(params, callback){
                                     return {addObj: JSON.stringify(addObj), downloadAddObj: JSON.stringify(downloadAddObj), noAddObj: JSON.stringify(noAddObj), downloadNoAddObj: JSON.stringify(downloadNoAddObj)};
                                 })
                         })
+                })
+        })
+        .then(function(data){
+            return API.attachment.deleteAttachment({md5key: md5key, userId: userId})//
+                .then(function(result){
+                    return data;
                 })
         })
         .nodeify(callback);
