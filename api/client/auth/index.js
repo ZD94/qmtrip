@@ -186,7 +186,7 @@ auth.registryCompany = function(params, callback) {
                             var staffId = account.id;
                             return Q.all([
                                 createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain}),
-                                createStaff({email: email, mobile: mobile, name: name, companyId: companyId, accountId: account.id})
+                                createStaff({email: email, mobile: mobile, name: name, companyId: companyId, accountId: account.id, roleId: 0})
                             ])
                                 .then(function(ret){
                                     return {code: 0, msg: 'ok'};

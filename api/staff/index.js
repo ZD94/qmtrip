@@ -397,7 +397,7 @@ staff.listAndPaginatePointChange = function(params, options, callback){
  * @param callback
  * @returns {*}
  */
-staff.importExcel = function(params, callback){
+staff.beforeImportExcel = function(params, callback){
     var userId = params.accountId;
     var md5key = params.md5key;
 //    var obj = nodeXlsx.parse(fileUrl);

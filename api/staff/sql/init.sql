@@ -9,7 +9,7 @@ create table staff.staffs (
     balance_points integer default 0,
     department_id uuid,
     travel_level uuid,
-    role_id integer, -- 权限
+    role_id integer DEFAULT 1, -- 权限
     mobile character varying(20), -- 手机
     email character varying(50), -- 邮箱
     sex integer DEFAULT 1, -- 性别
