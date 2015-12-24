@@ -8,7 +8,6 @@
 	<link rel="stylesheet" type="text/css" href="/corp/css/public.css">
 	<link rel="stylesheet" type="text/css" href="/corp/css/user.css">
 	<link rel="stylesheet" type="text/css" href="/corp/css/staffmanage.css">
-	<link rel="stylesheet" type="text/css" href="/corp/css/staffawardplan.css">
 	<link rel="stylesheet" type="text/css" href="/corp/css/criterionlist.css">
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
 	<script type="text/javascript">
@@ -54,7 +53,7 @@
     					console.info(ret);
     					API.company.getCompany(company_id)
 		    				.then(function(company){
-		    					$scope.company = company.company;
+		    					$scope.company = company;
 		    					console.info(company);
 		    					$scope.$apply();
 		    				})
@@ -106,7 +105,7 @@
 				<a href="#/TravelCriterion/CriterionList">差旅标准设置</a>
 			</li>
 			<li>
-				<a href="#/StaffAwardPlan/StaffAwardPlan">员工奖励计划</a>
+				<a href="">员工奖励计划</a>
 			</li>
 		</ul>
 	</div>
