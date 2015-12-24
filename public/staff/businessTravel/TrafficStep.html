@@ -16,7 +16,7 @@
         <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
                 <td colspan="3" height="60" style="position: relative;">
-                    <input type="text" class="common_text a1" style="width: 438px;" checkval="" placeholder="出发城市" ng-model="startplacename" ng-change="startplace()">
+                    <input type="text" class="common_text traffic1" style="width: 438px;" checkval="" placeholder="出发城市" ng-model="startplacename" ng-change="startplace()">
                     <ul class="placelist1 placelist">
                         <li ng-repeat="item in startplaceitems" ng-click="chooseStartplace(item.name,item.id)">{{item.name}}</li>
                     </ul>
@@ -24,7 +24,7 @@
             </tr>
             <tr>
                 <td colspan="3" height="60" style="position: relative;">
-                    <input type="text" class="common_text a2" style="width: 438px;" checkval="" placeholder="目的地城市" ng-model="endplacename" ng-change="endplace()">
+                    <input type="text" class="common_text traffic2" style="width: 438px;" checkval="" placeholder="目的地城市" ng-model="endplacename" ng-change="endplace()">
                     <ul class="placelist2 placelist">
                         <li ng-repeat="item in endplaceitems" ng-click="chooseEndplace(item.name,item.id)">{{item.name}}</li>
                     </ul>
