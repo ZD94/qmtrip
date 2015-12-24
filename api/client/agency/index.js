@@ -87,7 +87,15 @@ agency.deleteAgency = function(agencyId, callback){
 
 /**************** 代理商用户相关 ****************/
 
-agency.createAgencyUser = API.agency.createAgencyUser;
+agency.createAgencyUser = function(params, callback){
+    return API.agency.getAgencyUser(this.accountId)
+        .then(function(ret){
+            logger.info(ret);
+            return API.agency.createAgencyUser(params)
+        })
+        .nodeify(callback);
+};
+
 agency.deleteAgencyUser = API.agency.deleteAgencyUser;
 agency.updateAgencyUser = API.agency.updateAgencyUser;
 agency.getAgencyUser = API.agency.getAgencyUser;

@@ -19,25 +19,6 @@ var md5 = require("common/utils").md5;
 
 var agency = {};
 
-/**
- * 创建代理商
- * @param params
- * @param callback
- * @returns {*}
- */
-agency.createAgency = function(params, callback){
-    return checkParams(['createUser', 'name'], params)
-        .then(function(){
-            return Agency.create(params)
-                .then(function(agency){
-                    var agency = agency.toJSON();
-                    return {code: 0, msg: '', agency: agency};
-                })
-        })
-        .catch(errorHandle)
-        .nodeify(callback);
-}
-
 
 /**
  * 注册代理商，生成代理商id
@@ -52,7 +33,6 @@ agency.registerAgency = function(params, callback){
             var agency = params;
             delete agency.userName;
             var pwd = params.pwd || md5('123456');
-            pwd = md5(pwd); //默认密码
             var mobile = params.mobile;
             var email = params.email;
             var account = {email: email, mobile: mobile, pwd: pwd};
@@ -87,8 +67,15 @@ agency.registerAgency = function(params, callback){
                                 return {code: 0, msg: '注册成功'}
                             })
                             .catch(function(err){
-                                logger.info(err);
-                                throw {code: -3, msg: '注册异常'};
+                                logger.error(err);
+                                return Agency.findOne({where: {$or: [{mobile: mobile}, {email: email}]}, attributes: ['id']})
+                                    .then(function(agency){
+                                        if(agency){
+                                            throw {code: -4, msg: '手机号或邮箱已经注册'};
+                                        }else{
+                                            throw {code: -3, msg: '注册异常'};
+                                        }
+                                    })
                             })
                     })
                 })
@@ -130,7 +117,7 @@ agency.updateAgency = function(params, callback){
                                 return defer.promise;
                             }
                             var agency = ret[1][0].toJSON();
-                            return {code: 0, msg: '更新代理商信息成功', agency: agency};
+                            return agency;
                         })
                 })
         })
@@ -155,7 +142,8 @@ agency.getAgency = function(params, callback){
                         defer.reject({code: -2, msg: '没有代理商'});
                         return defer.promise;
                     }
-                    return {code: 0, msg: '', agency: ret.toJSON()};
+                    var agency = ret.toJSON();
+                    return agency;
                 })
         })
         .catch(errorHandle)
@@ -176,7 +164,7 @@ agency.listAgency = function(params, callback){
             delete params.userId;
             return Agency.findAll({where: params})
                 .then(function(ret){
-                    return {code: 0, msg: '', agencys: ret};
+                    return ret;
                 })
         })
         .catch(errorHandle)
@@ -257,16 +245,49 @@ agency.createAgencyUser = function(data, callback){
         defer.reject({code: -3, msg: "姓名不能为空"});
         return defer.promise.nodeify(callback);
     }
-    var accData = {email: data.email, mobile: data.mobile, pwd: "123456"};//初始密码暂定123456
-    return API.auth.newAccount(accData)
-        .then(function(acc){
-            if(acc.code == 0){
-                data.id = acc.data.id;
-                return AgencyUser.create(data)
-                    .then(function(obj){
-                        return {code: 0, agency: obj.toJSON()};
+    if(!data.agencyId){
+        defer.reject({code: -4, msg: "代理商不能为空"});
+        return defer.promise.nodeify(callback);
+    }
+    var mobile = data.mobile;
+    var email = data.email;
+    var account = {email: data.email, mobile: data.mobile, pwd: "123456"};//初始密码暂定123456
+    var agencyUser = data;
+
+    return API.auth.findOneAcc({$or: [{mobile: mobile}, {email: email}]})
+        .then(function(ret){
+            if(ret.code){
+                return API.auth.newAccount(account)
+                    .then(function(acc){
+                        return acc.account;
                     })
+            }else{
+                return ret.account;
             }
+        })
+        .then(function(account){
+            var accountId = account.id;
+            agencyUser.id = accountId;
+            return sequelize.transaction(function(t){
+                return Q.all([
+                    Agency.create(agency, {transaction: t}),
+                    AgencyUser.create(agencyUser, {transaction: t})
+                ])
+                    .then(function(){
+                        return {code: 0, msg: '注册成功'}
+                    })
+                    .catch(function(err){
+                        logger.error(err);
+                        return AgencyUser.findOne({where: {$or: [{mobile: mobile}, {email: email}]}, attributes: ['id']})
+                            .then(function(agency){
+                                if(agency){
+                                    throw {code: -5, msg: '手机号或邮箱已是代理商用户'};
+                                }else{
+                                    throw {code: -6, msg: '注册异常'};
+                                }
+                            })
+                    })
+            })
         })
         .catch(errorHandle)
         .nodeify(callback);
@@ -316,7 +337,8 @@ agency.updateAgencyUser = function(id, data, callback){
     options.returning = true;
     return AgencyUser.update(data, options)
         .then(function(obj){
-            return {code: 0, agency: obj[1][0].toJSON(), msg: "更新成功"}
+            var agencuUser = obj[1][0].toJSON();
+            return agencuUser;
         })
         .catch(errorHandle)
         .nodeify(callback);
@@ -341,7 +363,8 @@ agency.getAgencyUser = function(id, callback){
                 defer.reject({code: -2, msg: '用户不存在'});
                 return defer.promise;
             }
-            return {code: 0, agency: obj.toJSON()}
+            var agencyUser = obj.toJSON()
+            return agencyUser;
         })
         .catch(errorHandle)
         .nodeify(callback);

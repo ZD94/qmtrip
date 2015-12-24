@@ -131,10 +131,7 @@ company.getCompanyFundsAccount = function(companyId, callback){
         userId: this.accountId,
         companyId: companyId
     };
-    return API.company.getCompanyFundsAccount(params)
-        .then(function(funds){
-            return {code: 0, msg: 'success', fundsAccount: funds};
-        }).nodeify(callback);
+    return API.company.getCompanyFundsAccount(params, callback);
 }
 
 company.setPayPassword = function(params, callback){

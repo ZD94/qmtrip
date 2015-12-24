@@ -192,7 +192,6 @@ auth.registryCompany = function(params, callback) {
                                     return {code: 0, msg: 'ok'};
                                 })
                                 .catch(function(err){
-                                    logger.info(err);
                                     API.company.deleteCompany({companyId: companyId, userId: account.id});
                                     API.staff.deleteStaff({id: staffId});
                                     defer.reject(L.ERR.SYSTEM_ERROR);

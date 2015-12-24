@@ -43,14 +43,10 @@ function needPermissionMiddleware(fn, needPowers) {
 staff.createStaff = auth.needPermissionMiddleware(function(params, callback) {
     var user_id = this.accountId;
     return API.staff.getStaff(user_id)
-        .then(function(data){
-            if(!data.code){
-                var companyId = data.staff.companyId;
-                params.companyId = companyId;
-                return API.staff.createStaff(params, callback);
-            }else{
-                return API.staff.createStaff(params, callback);//员工注册的时候
-            }
+        .then(function(staff){
+            var companyId = staff.companyId;
+            params.companyId = companyId;
+            return API.staff.createStaff(params, callback);
         })
         .nodeify(callback);
 }, ["user.add"]);
