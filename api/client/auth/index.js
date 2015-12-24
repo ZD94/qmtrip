@@ -192,7 +192,6 @@ auth.registryCompany = function(params, callback) {
                                     return {code: 0, msg: 'ok'};
                                 })
                                 .catch(function(err){
-                                    logger.info(err);
                                     API.company.deleteCompany({companyId: companyId, userId: account.id});
                                     API.staff.deleteStaff({id: staffId});
                                     defer.reject(L.ERR.SYSTEM_ERROR);
@@ -238,28 +237,24 @@ auth.logout = function(callback) {
 }
 
 /**
- * @method needPermissionMiddleware
+ * @method checkPermission
  *
  * 权限控制
  *
  * @param fn
- * @param needPowers
+ * @param permissions
  * @return {Function}
  */
-auth.needPermissionMiddleware = function(fn, needPowers) {
+auth.checkPermission = function(permissions, fn) {
     return function(params, callback) {
         var self = this;
         var accountId = self.accountId;
-        return API.power.checkPower({accountId: accountId, powers: needPowers})
+        return API.permit.checkPermission({accountId: accountId, permission: permissions})
             .then(function(result) {
-                if (result.code) {
-                    throw result;
-                }
                 return fn.call(self, params);
             })
-            .catch(errorHandle)
             .nodeify(callback);
     }
-}
+};
 
 module.exports = auth;

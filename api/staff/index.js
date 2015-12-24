@@ -60,17 +60,6 @@ staff.createStaff = function(data, callback){
         return defer.promise.nodeify(callback);
     }
     var accData = {email: data.email, mobile: data.mobile, pwd: "123456"};//初始密码暂定123456
-    /*return auth.newAccount(accData)
-        .then(function(acc){
-            if(acc.code == 0){
-                data.id = acc.data.id;
-                return staffProxy.create(data)
-                    .then(function(obj){
-                        return {code: 0, staff: obj.toJSON()};
-                    })
-            }
-        })
-        .nodeify(callback);*/
     return Q.all([])
         .then(function() {
             if (accountId) {
@@ -205,15 +194,16 @@ staff.getStaff = function(id, callback){
  * @returns {*}
  */
 staff.findOneStaff = function(params, callback){
+    var defer = Q.defer();
     var options = {};
     options.where = params;
     return staffModel.findOne(options)
         .then(function(obj){
-            if(obj){
-                return obj.toJSON();
-            }else{
-                return {msg: "记录不存在"};
+            if(!obj){
+                defer.reject({code: -1, msg: '员工不存在'});
+                return defer.promise;
             }
+            return obj.toJSON();
         })
         .nodeify(callback);
 }
@@ -650,7 +640,6 @@ staff.statisticStaffs = function(params, callback){
         staffModel.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: -1 }})
     ])
         .spread(function(all, inNum, outNum){
-            logger.info("all=>", all);
             var sta = {
                 all: all || 1,
                 inNum: inNum || 0,
@@ -658,7 +647,7 @@ staff.statisticStaffs = function(params, callback){
             }
             return API.company.updateCompany({companyId: companyId, staffNum: all, updateAt: utils.now()})
                 .then(function(){
-                    return {code: 0, msg: 'success', sta: sta};
+                    return sta;
                 })
         }).nodeify(callback);
 }

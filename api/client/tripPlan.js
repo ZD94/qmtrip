@@ -28,10 +28,7 @@ tripPlan.savePlanOrder = function(params, callback){
  */
 tripPlan.saveConsumeDetail = function(params, callback){
     params.accountId = this.accountId;
-    return API.tripPlan.saveConsumeRecord(params)
-        .then(function(consumeDetail){
-            return {code: 0, msg: '保存成功', consumeDetail: consumeDetail};
-        }).nodeify(callback);
+    return API.tripPlan.saveConsumeRecord(params, callback);
 }
 
 /**

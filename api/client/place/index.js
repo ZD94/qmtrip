@@ -7,7 +7,7 @@
  * @type {API|exports|module.exports}
  */
 
-var API = require("../../common/api");
+var API = require("common/api");
 var Q = require("q");
 
 /**

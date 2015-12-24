@@ -167,9 +167,8 @@ travelPolicy.getAllTravelPolicy = function(options, callback){
         delete options.columns;
     }
     return API.staff.getStaff(user_id)
-        .then(function(data){
-            if(data){
-                var staff = data.staff;
+        .then(function(staff){
+            if(staff){
                 options.where.companyId = staff.companyId;//只允许查询该企业下的差旅标准
                 return API.travelPolicy.getAllTravelPolicy(options, callback);
             }else{

@@ -32,7 +32,6 @@ CREATE TABLE agency (
     description text,
     status integer default 0,
     address character varying,
-    website character varying,
     email character varying(50),
     telephone character varying(15),
     mobile character varying(11),
