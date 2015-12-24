@@ -6,6 +6,7 @@
 "use strict";
 
 var API = require("common/api");
+var L = require("common/language");
 var Q = require("q");
 
 var permit = module.exports = {};
@@ -25,7 +26,7 @@ var roles = {
         inherit: ['staff', 'finance'],
         permission: ['user.add', 'user.delete', 'user.edit', 'company.query', 'company.edit', 'user.role']
     },
-    creator: {
+    owner: {
         name: '创建人',
         inherit: ['admin'],
         permission: []
@@ -93,27 +94,33 @@ function getRoleOfAccount(data) {
         .then(function(result) {
             var company = result.company;
             if (company.createUser == accountId) {
-                return role.creator;
+                return role.owner;
             }
             return role.staff;
         });
 }
 
-/**
- * 获取角色所拥有的权限
- *
- * @param {Object} params
- * @param {integer} params.role 角色ID
- * @param {Function} callback
- */
-function _getRolePowerList(role, callback) {
-    return db.models["Role"].findOne({role: role, type: 1})
-        .then(function(result) {
-            return result.powers.split(/,/g);
-        })
-        .catch(errorHandle)
-        .nodeify(callback);
+function getRoleList(roles){
+    Object.keys(roles)
+        .map(function(id){
+            return {id:id, name:roles[id].name};
+        });
 }
+permit.listRoles = function(params, callback) {
+    var type = params.type || 1;
+    var list;
+    switch(type){
+        case 1:
+            list = getRoleList(roles);
+            break;
+        case 2:
+            list = getRoleList(agency_roles);
+            break;
+        default:
+            return callback(L.ERR.NOT_FOUND);
+    }
+    callback(null, list);
+};
 
 /**
  * 检查用户是否拥有权限
@@ -127,7 +134,6 @@ function _getRolePowerList(role, callback) {
 permit.checkPermission = function(params, callback) {
     var accountId = params.accountId;
     var permissions = params.permission;
-    var defer = Q.defer();
 
     if (!permissions || !permissions.length) {
         return Q(true);
@@ -145,7 +151,9 @@ permit.checkPermission = function(params, callback) {
 
     return getRoleOfAccount({accountId: accountId})
         .then(function(role){
-            for(var p of needPowers){
+            if(role == undefined)
+                throw L.ERR.NOT_FOUND;
+            for(var p of permissions){
                 if(role.permission[p] != true)
                     throw L.ERR.PERMISSION_DENY;
             }
