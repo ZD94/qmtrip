@@ -21,10 +21,9 @@ var StaffFirst = (function(){
 							API.tripPlan.listTripPlanOrderByCompany({status:0||1}),
 							API.travelPolicy.getTravelPolicy(travelLevel)
 						])
-						.spread(function(tripplan,travel){
-							$scope.businesstimes = tripplan.tripPlanOrders.length;
-							$scope.travelpolicy = travel.travelPolicy;
-							console.info(travel)
+						.spread(function(tripPlanOrders,travelPolicy){
+							$scope.businesstimes = tripPlanOrders.length;
+							$scope.travelpolicy = travelPolicy;
 							$scope.$apply();
 						})
 						.catch(function(err){

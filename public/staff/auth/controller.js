@@ -351,7 +351,7 @@ var auth=(function(){
                             return API.auth.registryCompany({companyName:cName,name:name,email:mail,mobile:mobile,pwd:pwd,msgCode:mCode,msgTicket:msgTicket,picCode:pCode,picTicket:picTicket})
                                 .then(function(result){
                                     //console.info(result);
-                                    if(result.code == 0){
+                                    if(result){
                                         alert("注册成功");
                                         window.location.href = "#/auth/login";
                                         //window.location.href = "#/auth/corplaststep";

@@ -22,7 +22,8 @@ travelPolicy.createTravelPolicy = function(data, callback){
         .then(function(){
             return travalPolicyModel.create(data)
                 .then(function(obj){
-                    return {code: 0, travelPolicy: obj.toJSON()};
+                    var travelPolicy = obj.toJSON();
+                    return travelPolicy;
                 })
         })
         .nodeify(callback);
@@ -66,7 +67,8 @@ travelPolicy.updateTravelPolicy = function(id, data, callback){
     options.returning = true;
     return travalPolicyModel.update(data, options)
         .then(function(obj){
-            return {code: 0, travelPolicy: obj[1][0].toJSON(), msg: "更新成功"}
+            var travelPolicy = obj[1][0].toJSON();
+            return travelPolicy;
         })
         .nodeify(callback);
 }
@@ -85,7 +87,8 @@ travelPolicy.getTravelPolicy = function(id, callback){
     }
     return travalPolicyModel.findById(id)
         .then(function(obj){
-            return {code: 0, travelPolicy: obj.toJSON()}
+            var travelPolicy =  obj.toJSON();
+            return travelPolicy;
         })
         .nodeify(callback);
 }
@@ -102,7 +105,7 @@ travelPolicy.getAllTravelPolicy = function(options, callback){
             obj = obj.map(function(item){
                 return item.toJSON();
             })
-            return {code: 0, travelPolicies: obj}
+            return obj;
         })
         .nodeify(callback);
 }

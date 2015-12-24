@@ -37,7 +37,6 @@ agency.registerAgency = function(params, callback){
             var email = params.email;
             var account = {email: email, mobile: mobile, pwd: pwd};
             var agencyUser = {
-                id: agencyId,
                 agencyId: agencyId,
                 name: userName,
                 mobile: mobile,

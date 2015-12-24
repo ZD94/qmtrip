@@ -19,10 +19,9 @@ var UsersFirst = (function(){
 							API.company.getCompanyFundsAccount(company_id),
 							API.staff.statisticStaffs({companyId:company_id})
 						])
-							.spread(function(resutlt,num){
-								$scope.funds = resutlt.fundsAccount;
-								$scope.num = num.sta;
-								console.info(resutlt)
+							.spread(function(fundsAccount,sta){
+								$scope.funds = fundsAccount;
+								$scope.num = sta;
 								$scope.$apply();
 							})
 							.catch(function(err){
