@@ -6,6 +6,7 @@
 	<title ng-bind="pageTitle"></title>
     <link rel="stylesheet" type="text/css" href="/staff/css/public.css">
 	<link rel="stylesheet" type="text/css" href="/staff/css/users.css">
+	<link rel="stylesheet" type="text/css" href="/staff/css/auth.css"/>
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
 	<script type="text/javascript">
         var jQuery = $ = require('jquery');
@@ -24,7 +25,7 @@
 		API.onlogin(function(){
 			var backUrl = window.location.href;
 			backUrl = encodeURIComponent(backUrl);
-			window.location.href = "/staff/auth.html#/auth/login?backurl="+backUrl;
+			window.location.href = "/staff.html#/auth/login?backurl="+backUrl;
 		});
 		// function logout(){
 		// 	API.require('auth');
@@ -53,7 +54,7 @@
                 $scope.logout = function(){
                     API.auth.logout()
                         .then(function(ret){
-                            window.location.href = "/staff/auth.html#/auth/login?backurl="+encodeURIComponent(window.location.href);
+                            window.location.href = "/staff.html#/auth/login?backurl="+encodeURIComponent(window.location.href);
                         })
                         .catch(function(err){
                             console.info(err)
