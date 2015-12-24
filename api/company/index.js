@@ -30,9 +30,10 @@ var company = {};
 company.createCompany = function(params, callback){
     return checkParams(['createUser', 'name', 'domainName'], params)
         .then(function(){
-            var companyId = uuid.v1();
-            params.id = companyId;
-            var funds = { id: companyId }
+            if(!params.id){
+                params.id = uuid.v1();
+            }
+            var funds = { id: params.id };
             return sequelize.transaction(function(t){
                 return Q.all([
                     Company.create(params, {transaction: t}),
@@ -40,7 +41,7 @@ company.createCompany = function(params, callback){
                 ])
                     .spread(function(company){
                         var company = company.toJSON();
-                        return {code: 0, msg: '', company: company};
+                        return company;
                     })
             })
         })
@@ -102,7 +103,7 @@ company.updateCompany = function(params, callback){
                                 return defer.promise;
                             }
                             var company = ret[1][0].toJSON();
-                            return {code: 0, msg: '更新企业信息成功', company: company};
+                            return company;
                         })
                 })
         })
@@ -128,7 +129,7 @@ company.getCompany = function(params, callback){
                         return defer.promise;
                     }
                     var company = company.toJSON();
-                    return {code: 0, msg: '', company: company};
+                    return company;
                 })
         })
         .catch(errorHandle)
@@ -145,8 +146,8 @@ company.listCompany = function(params, callback){
     return checkParams(['agencyId'], params)
         .then(function(){
             return Company.findAll({where: params})
-                .then(function(ret){
-                    return {code: 0, msg: '', company: ret};
+                .then(function(companys){
+                    return companys;
                 })
         })
         .catch(errorHandle)

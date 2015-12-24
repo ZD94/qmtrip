@@ -71,7 +71,7 @@ tripPlan.savePlanOrder = function(params, callback){
                                 order.backTraffic.push(obj);
                             }
                         }
-                        return {code: 0, msg: '保存成功', tripPlanOrder: order};
+                        return order;
                     })
             })
                 .then(function(ret){
@@ -114,7 +114,7 @@ tripPlan.getTripPlanOrder = function(params, callback){
                     tripPlanOrder.outTraffic = outTraffic;
                     tripPlanOrder.backTraffic = backTraffic;
                     tripPlanOrder.hotel = hotel;
-                    return {code: 0, msg: '', tripPlanOrder: tripPlanOrder};
+                    return tripPlanOrder;
                 })
         })
         .catch(errorHandle)
@@ -159,7 +159,8 @@ tripPlan.updateTripPlanOrder = function(params, callback){
                         ])
                             .spread(function(ret){
                                 var entity = ret[1][0].toJSON();
-                                return {code: 0, msg: optLog + '成功', tripPlanOrder: entity};
+                                return entity;
+                                //return {code: 0, msg: optLog + '成功', tripPlanOrder: entity};
                             })
                     })
                 })
@@ -185,7 +186,7 @@ tripPlan.updateConsumeDetail = function(params, callback){
                     return ConsumeDetails.update(updates, {returning: true, where: {id: id}, fields: cols})
                         .then(function(detail){
                             var detail = detail.toJSON();
-                            return {code: 0, msg: '更新成功', consumeDetail: detail};
+                            return detail;
                         })
                 })
         })
@@ -224,7 +225,7 @@ tripPlan.listTripPlanOrder = function(params, callback){
                     })
             }))
                 .then(function(orders){
-                    return {code: 0, msg: '', tripPlanOrders: orders};
+                    return orders
                 })
         })
         .catch(errorHandle)

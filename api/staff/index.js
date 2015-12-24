@@ -60,17 +60,6 @@ staff.createStaff = function(data, callback){
         return defer.promise.nodeify(callback);
     }
     var accData = {email: data.email, mobile: data.mobile, pwd: "123456"};//初始密码暂定123456
-    /*return auth.newAccount(accData)
-        .then(function(acc){
-            if(acc.code == 0){
-                data.id = acc.data.id;
-                return staffProxy.create(data)
-                    .then(function(obj){
-                        return {code: 0, staff: obj.toJSON()};
-                    })
-            }
-        })
-        .nodeify(callback);*/
     return Q.all([])
         .then(function() {
             if (accountId) {
@@ -91,7 +80,7 @@ staff.createStaff = function(data, callback){
         .then(function(staff) {
             return staffModel.create(staff)
                 .then(function(staff) {
-                    return {code: 0, staff: staff.toJSON()};
+                    return staff.toJSON();
                 })
         })
         .nodeify(callback);
@@ -144,7 +133,7 @@ staff.updateStaff = function(id, data, callback){
                 if(old.toJSON().email == data.email){
                     return staffModel.update(data, options)
                         .then(function(obj){
-                            return {code: 0, staff: obj[1].toJSON(), msg: "更新成功"};
+                            return obj[1].toJSON();
                         })
                 }else{
                     return API.auth.getAccount(id)//暂无此接口
@@ -159,7 +148,7 @@ staff.updateStaff = function(id, data, callback){
                                     staffModel.update(data, options)
                                 ])
                                     .spread(function(ret1, ret2){
-                                        return {code: 0, staff: ret2[1][0].toJSON(), msg: "更新成功"};
+                                        return ret2[1][0].toJSON();
                                     })
                             }
                         })
@@ -169,7 +158,8 @@ staff.updateStaff = function(id, data, callback){
     }else{
         return staffModel.update(data, options)
             .then(function(obj){
-                return {code: 0, staff: obj[1].toJSON(), msg: "更新成功"};
+                var staff = obj[1].toJSON();
+                return staff;
             })
             .nodeify(callback);
     }
@@ -193,7 +183,7 @@ staff.getStaff = function(id, callback){
                 defer.reject({code: -2, msg: '员工不存在'});
                 return defer.promise;
             }
-            return {code: 0, staff: obj.toJSON()}
+            return obj.toJSON();
         })
         .nodeify(callback);
 }
@@ -209,11 +199,12 @@ staff.findOneStaff = function(params, callback){
     options.where = params;
     return staffModel.findOne(options)
         .then(function(obj){
-            if(obj){
-                return {code: 0, staff: obj.toJSON()}
-            }else{
-                return {code: 0, staff: obj}
+            if(!obj){
+                defer.reject({code: -1, msg: '员工不存在'});
+                return defer.promise;
             }
+            var staff = obj.toJSON();
+            return staff;
         })
         .nodeify(callback);
 }
@@ -650,7 +641,6 @@ staff.statisticStaffs = function(params, callback){
         staffModel.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: -1 }})
     ])
         .spread(function(all, inNum, outNum){
-            logger.info("all=>", all);
             var sta = {
                 all: all || 1,
                 inNum: inNum || 0,
@@ -658,7 +648,7 @@ staff.statisticStaffs = function(params, callback){
             }
             return API.company.updateCompany({companyId: companyId, staffNum: all, updateAt: utils.now()})
                 .then(function(){
-                    return {code: 0, msg: 'success', sta: sta};
+                    return sta;
                 })
         }).nodeify(callback);
 }
