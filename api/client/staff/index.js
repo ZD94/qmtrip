@@ -9,28 +9,13 @@
 
 var Q = require("q");
 var API = require("common/api");
-var auth = require("..//auth");
+var auth = require("../auth");
 var Logger = require("common/logger");
 var logger = new Logger("staff");
 /**
  * @class staff 员工信息
  */
 var staff = {};
-
-function needPermissionMiddleware(fn, needPermission) {
-    return function(params, callback) {
-        var self = this;
-        var accountId = self.accountId;
-        return API.permit.checkPermission({accountId: accountId, permission: needPermission})
-            .then(function(result) {
-                if (result.code) {
-                    throw result;
-                }
-                return fn.call(self, params);
-            })
-            .nodeify(callback);
-    }
-}
 
 /**
  * @method createStaff
@@ -40,16 +25,21 @@ function needPermissionMiddleware(fn, needPermission) {
  * @type {*}
  * @return {promise}
  */
-staff.createStaff = auth.needPermissionMiddleware(function(params, callback) {
-    var user_id = this.accountId;
-    return API.staff.getStaff(user_id)
-        .then(function(staff){
-            var companyId = staff.companyId;
-            params.companyId = companyId;
-            return API.staff.createStaff(params, callback);
-        })
-        .nodeify(callback);
-}, ["user.add"]);
+staff.createStaff = auth.checkPermission(["user.add"],
+    function(params, callback) {
+        var user_id = this.accountId;
+        return API.staff.getStaff(user_id)
+            .then(function(data){
+                if(!data.code){
+                    var companyId = data.staff.companyId;
+                    params.companyId = companyId;
+                    return API.staff.createStaff(params, callback);
+                }else{
+                    return API.staff.createStaff(params, callback);//员工注册的时候
+                }
+            })
+            .nodeify(callback);
+    });
 
 /**
  * @method deleteStaff
@@ -59,27 +49,28 @@ staff.createStaff = auth.needPermissionMiddleware(function(params, callback) {
  * @type {*}
  * @return {promise}
  */
-staff.deleteStaff = auth.needPermissionMiddleware(function(params, callback) {
-    var user_id = this.accountId;
-    var defer = Q.defer();
-    if(!params.id){
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
-    }
-    return API.staff.getStaff(user_id)
-        .then(function(data){
-            return API.staff.getStaff(params.id)
-                .then(function(target){
-                    if(data.companyId != target.companyId){
-                        defer.reject({code: -1, msg: "无权限"});
-                        return defer.promise.nodeify(callback);
-                    }else{
-                        return API.staff.deleteStaff(params, callback);
-                    }
-                })
-        })
-        .nodeify(callback);
-}, ["user.delete"]);
+staff.deleteStaff = auth.checkPermission(["user.delete"],
+    function(params, callback) {
+        var user_id = this.accountId;
+        var defer = Q.defer();
+        if(!params.id){
+            defer.reject({code: -1, msg: "id不能为空"});
+            return defer.promise.nodeify(callback);
+        }
+        return API.staff.getStaff(user_id)
+            .then(function(data){
+                return API.staff.getStaff(params.id)
+                    .then(function(target){
+                        if(data.companyId != target.companyId){
+                            defer.reject({code: -1, msg: "无权限"});
+                            return defer.promise.nodeify(callback);
+                        }else{
+                            return API.staff.deleteStaff(params, callback);
+                        }
+                    })
+            })
+            .nodeify(callback);
+    });
 
 /**
  * @method updateStaff
@@ -88,27 +79,28 @@ staff.deleteStaff = auth.needPermissionMiddleware(function(params, callback) {
  *
  * @type {*}
  */
-staff.updateStaff = auth.needPermissionMiddleware(function(id, params, callback) {
-    var user_id = this.accountId;
-    var defer = Q.defer();
-    if(!id){
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
-    }
-    return API.staff.getStaff(user_id)
-        .then(function(data){
-            return API.staff.getStaff(id)
-                .then(function(target){
-                    if(data.companyId != target.companyId){
-                        defer.reject({code: -1, msg: "无权限"});
-                        return defer.promise.nodeify(callback);
-                    }else{
-                        return API.staff.updateStaff(id, params, callback);
-                    }
-                })
-        })
-        .nodeify(callback);
-}, ["user.edit"]);
+staff.updateStaff = auth.checkPermission(["user.edit"],
+    function(id, params, callback) {
+        var user_id = this.accountId;
+        var defer = Q.defer();
+        if(!id){
+            defer.reject({code: -1, msg: "id不能为空"});
+            return defer.promise.nodeify(callback);
+        }
+        return API.staff.getStaff(user_id)
+            .then(function(data){
+                return API.staff.getStaff(id)
+                    .then(function(target){
+                        if(data.companyId != target.companyId){
+                            defer.reject({code: -1, msg: "无权限"});
+                            return defer.promise.nodeify(callback);
+                        }else{
+                            return API.staff.updateStaff(id, params, callback);
+                        }
+                    })
+            })
+            .nodeify(callback);
+    });
 
 /**
  * @method getStaff
@@ -116,27 +108,28 @@ staff.updateStaff = auth.needPermissionMiddleware(function(id, params, callback)
  * 企业根据id得到员工信息
  * @type {*}
  */
-staff.getStaff = auth.needPermissionMiddleware(function(id, params, callback) {
-    var user_id = this.accountId;
-    var defer = Q.defer();
-    if(!id){
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
-    }
-    return API.staff.getStaff(user_id)
-        .then(function(data){
-            return API.staff.getStaff(id)
-                .then(function(target){
-                    if(data.companyId != target.companyId){
-                        defer.reject({code: -1, msg: "无权限"});
-                        return defer.promise.nodeify(callback);
-                    }else{
-                        return {staff: target};
-                    }
-                })
-        })
-        .nodeify(callback);
-}, ["user.query"]);
+staff.getStaff = auth.checkPermission(["user.query"],
+    function(id, params, callback) {
+        var user_id = this.accountId;
+        var defer = Q.defer();
+        if(!id){
+            defer.reject({code: -1, msg: "id不能为空"});
+            return defer.promise.nodeify(callback);
+        }
+        return API.staff.getStaff(user_id)
+            .then(function(data){
+                return API.staff.getStaff(id)
+                    .then(function(target){
+                        if(data.companyId != target.companyId){
+                            defer.reject({code: -1, msg: "无权限"});
+                            return defer.promise.nodeify(callback);
+                        }else{
+                            return {staff: target};
+                        }
+                    })
+            })
+            .nodeify(callback);
+    });
 
 /**
  * @method getCurrentStaff
@@ -157,15 +150,16 @@ staff.getCurrentStaff = function(callback){
  * 企业分页查询员工列表
  * @type {*}
  */
-staff.listAndPaginateStaff = auth.needPermissionMiddleware(function(params, options, callback) {
-    var user_id = this.accountId;
-    return API.staff.getStaff(user_id)
-        .then(function(data){
-            params.companyId = data.companyId;
-            return API.staff.listAndPaginateStaff(params, options, callback);
-        })
-        .nodeify(callback);
-}, ["user.query"]);
+staff.listAndPaginateStaff = auth.checkPermission(["user.query"],
+    function(params, options, callback) {
+        var user_id = this.accountId;
+        return API.staff.getStaff(user_id)
+            .then(function(data){
+                params.companyId = data.companyId;
+                return API.staff.listAndPaginateStaff(params, options, callback);
+            })
+            .nodeify(callback);
+    });
 
 /**
  * @method increaseStaffPoint

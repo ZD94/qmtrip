@@ -89,8 +89,9 @@ agency.deleteAgency = function(agencyId, callback){
 
 agency.createAgencyUser = function(params, callback){
     return API.agency.getAgencyUser(this.accountId)
-        .then(function(ret){
-            logger.info(ret);
+        .then(function(user){
+            var agencyId = user.agencyId;
+            params.agencyId = agencyId;
             return API.agency.createAgencyUser(params)
         })
         .nodeify(callback);

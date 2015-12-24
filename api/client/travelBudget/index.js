@@ -29,10 +29,11 @@ var travelBudget = {
  * @param {Object} params 参数
  * @param {String} params.originPlace 出发地
  * @param {String} params.destinationPlace 目的地
- * @param {String} params.outboundDate 出发时间
- * @param {String} params.inboundDate 返回时间(可选)
+ * @param {String} params.outboundDate 出发时间 YYYY-MM-DD
+ * @param {String} params.inboundDate 返回时间(可选) YYYY-MM-DD
+ * @param {String} params.latestArriveTime 最晚到达时间 HH:mm
  * @param {Callback} callback
- * @return {Promise} {"price": "合理预算值"}
+ * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
  */
 travelBudget.getTravelPolicyBudget = function(params, callback) {
     return API.travelbudget.getTravelBudget(params, callback);

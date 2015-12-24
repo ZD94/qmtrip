@@ -266,28 +266,22 @@ agency.createAgencyUser = function(data, callback){
             }
         })
         .then(function(account){
-            var accountId = account.id;
-            agencyUser.id = accountId;
-            return sequelize.transaction(function(t){
-                return Q.all([
-                    Agency.create(agency, {transaction: t}),
-                    AgencyUser.create(agencyUser, {transaction: t})
-                ])
-                    .then(function(){
-                        return {code: 0, msg: '注册成功'}
-                    })
-                    .catch(function(err){
-                        logger.error(err);
-                        return AgencyUser.findOne({where: {$or: [{mobile: mobile}, {email: email}]}, attributes: ['id']})
-                            .then(function(agency){
-                                if(agency){
-                                    throw {code: -5, msg: '手机号或邮箱已是代理商用户'};
-                                }else{
-                                    throw {code: -6, msg: '注册异常'};
-                                }
-                            })
-                    })
-            })
+            agencyUser.id = account.id;
+            return AgencyUser.create(agencyUser)
+                .then(function(){
+                    return {code: 0, msg: '注册成功'}
+                })
+                .catch(function(err){
+                    logger.error(err);
+                    return AgencyUser.findOne({where: {$or: [{mobile: mobile}, {email: email}]}, attributes: ['id']})
+                        .then(function(agency){
+                            if(agency){
+                                throw {code: -5, msg: '手机号或邮箱已是代理商用户'};
+                            }else{
+                                throw {code: -6, msg: '注册异常'};
+                            }
+                        })
+                })
         })
         .catch(errorHandle)
         .nodeify(callback);

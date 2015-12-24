@@ -237,28 +237,24 @@ auth.logout = function(callback) {
 }
 
 /**
- * @method needPermissionMiddleware
+ * @method checkPermission
  *
  * 权限控制
  *
  * @param fn
- * @param needPermission
+ * @param permissions
  * @return {Function}
  */
-auth.needPermissionMiddleware = function(fn, needPermission) {
+auth.checkPermission = function(permissions, fn) {
     return function(params, callback) {
         var self = this;
         var accountId = self.accountId;
-        return API.permit.checkPermission({accountId: accountId, permission: needPermission})
+        return API.permit.checkPermission({accountId: accountId, permission: permissions})
             .then(function(result) {
-                if (result.code) {
-                    throw result;
-                }
                 return fn.call(self, params);
             })
-            .catch(errorHandle)
             .nodeify(callback);
     }
-}
+};
 
 module.exports = auth;
