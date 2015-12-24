@@ -4,10 +4,9 @@
 
 /**
  * @module API
- * @type {API|exports|module.exports}
  */
 
-var API = require("../../common/api");
+var API = require("common/api");
 
 
 /**
@@ -36,7 +35,7 @@ var travelBudget = {
  * @return {Promise} {"price": "合理预算值"}
  */
 travelBudget.getTravelPolicyBudget = function(params, callback) {
-    return API.skyscanner.getLowestPrice(params, callback);
+    return API.travelbudget.getTravelBudget(params, callback);
 }
 
 module.exports = travelBudget;

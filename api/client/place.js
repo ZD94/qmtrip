@@ -14,7 +14,7 @@ var Q = require("q");
  * @class place 地点信息
  * @type {{__public: boolean}}
  */
-var service = {
+var place = {
     __public: true
 }
 
@@ -37,14 +37,29 @@ var service = {
  * });
  * ```
  */
-service.queryPlace = function(placeName, callback) {
+place.queryPlace = function(placeName, callback) {
     var defer = Q.defer();
     if (!placeName) {
         defer.reject({code: -1, msg: "地点名称不能为空"});
         return defer.promise.nodeify(callback);
     }
 
-    return API.skyscanner.queryCity(placeName, callback);
+    return API.place.queryCity(placeName, callback);
 }
 
-module.exports = service;
+/**
+ * @method queryBusinessDistrict
+ *
+ * 查询商圈信息
+ *
+ * @param {Object} params 参数
+ * @param {String} params.keyword 关键字
+ * @param {String} params.code 城市代码
+ * @param {Function} [callback] 可选回调函数 [{"id":"ID", "name": "Name"}, {"id":"ID2", "name": "NAME2"}]
+ * @return {Promise} [{"id":"ID", "name": "Name"}, {"id":"ID2", "name": "NAME2"}]
+ */
+place.queryBusinessDistrict = function(params, callback) {
+    return API.place.queryBusinessDistrict(params, callback);
+}
+
+module.exports = place;

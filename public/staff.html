@@ -21,10 +21,22 @@
     	var Q = require('q');
     	var moment = require('moment');
     	var TLD = TLD_angular_app('tulingdao.com', 'staff', '/StaffFirst/StaffUser');
-    	API.onlogin(function(){
-    		window.location.href = "/auth.html?backurl="+encodeURIComponent(window.location.href);
-    		return;
-    	})
+		API.onlogin(function(){
+			var backUrl = window.location.href;
+			backUrl = encodeURIComponent(backUrl);
+			window.location.href = "#/auth/login?backurl="+backUrl;
+		});
+		function logout(){
+			API.require('auth');
+			API.onload(function(){
+				API.auth.logout()
+						.then(function (data) {
+							location.reload();
+						}).catch(function(error){
+					console.log(error);
+				}).done();
+			});
+		};
     	//获取页面基本信息
     	TLD.controller("MainController", ["$scope", function($scope) {
     		API.require("staff");
@@ -72,7 +84,7 @@
 				<div id="account_menu" class="account_menu">
 					<ul>
 						<li><a href="">修改密码</a></li>
-						<li><a href="">退出</a></li>
+						<li><a href="javascript: logout();">退出</a></li>
 					</ul>
 				</div>
 			</div>
