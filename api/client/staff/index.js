@@ -44,8 +44,8 @@ staff.createStaff = auth.needPermissionMiddleware(function(params, callback) {
     var user_id = this.accountId;
     return API.staff.getStaff(user_id)
         .then(function(data){
-            if(!data.code){
-                var companyId = data.staff.companyId;
+            if(data){
+                var companyId = data.companyId;
                 params.companyId = companyId;
                 return API.staff.createStaff(params, callback);
             }else{

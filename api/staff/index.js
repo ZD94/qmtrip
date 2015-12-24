@@ -91,7 +91,7 @@ staff.createStaff = function(data, callback){
         .then(function(staff) {
             return staffModel.create(staff)
                 .then(function(staff) {
-                    return {code: 0, staff: staff.toJSON()};
+                    return staff.toJSON();
                 })
         })
         .nodeify(callback);
@@ -144,7 +144,7 @@ staff.updateStaff = function(id, data, callback){
                 if(old.toJSON().email == data.email){
                     return staffModel.update(data, options)
                         .then(function(obj){
-                            return {code: 0, staff: obj[1].toJSON(), msg: "更新成功"};
+                            return obj[1].toJSON();
                         })
                 }else{
                     return API.auth.getAccount(id)//暂无此接口
@@ -159,7 +159,7 @@ staff.updateStaff = function(id, data, callback){
                                     staffModel.update(data, options)
                                 ])
                                     .spread(function(ret1, ret2){
-                                        return {code: 0, staff: ret2[1][0].toJSON(), msg: "更新成功"};
+                                        return ret2[1][0].toJSON();
                                     })
                             }
                         })
@@ -169,7 +169,7 @@ staff.updateStaff = function(id, data, callback){
     }else{
         return staffModel.update(data, options)
             .then(function(obj){
-                return {code: 0, staff: obj[1].toJSON(), msg: "更新成功"};
+                return obj[1].toJSON();
             })
             .nodeify(callback);
     }
@@ -193,7 +193,7 @@ staff.getStaff = function(id, callback){
                 defer.reject({code: -2, msg: '员工不存在'});
                 return defer.promise;
             }
-            return {code: 0, staff: obj.toJSON()}
+            return obj.toJSON();
         })
         .nodeify(callback);
 }
@@ -210,9 +210,9 @@ staff.findOneStaff = function(params, callback){
     return staffModel.findOne(options)
         .then(function(obj){
             if(obj){
-                return {code: 0, staff: obj.toJSON()}
+                return obj.toJSON();
             }else{
-                return {code: 0, staff: obj}
+                return {msg: "记录不存在"};
             }
         })
         .nodeify(callback);
@@ -295,7 +295,7 @@ staff.increaseStaffPoint = function(params, options, callback) {
                         pointChange.create(pointChange, {transaction: t})
                     ])
                     .spread(function(ret1,ret2){
-                        return {code: 0, staff: ret1.toJSON()};
+                        return ret1.toJSON();
                     })
             })
 
@@ -341,7 +341,7 @@ staff.decreaseStaffPoint = function(params, options, callback) {
                         pointChange.create(pointChange, {transaction: t})
                     ])
                     .spread(function(ret1,ret2){
-                        return {code: 0, staff: ret1.toJSON()};
+                        return ret1.toJSON();
                     })
             })
 
