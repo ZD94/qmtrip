@@ -1,6 +1,8 @@
 /**
  * @module auth
  */
+"use strict";
+
 var Q = require("q");
 var sequelize = require("common/model").importModel("./models");
 var Models = sequelize.models;
@@ -170,37 +172,33 @@ authServer.newAccount = function(data, callback) {
     return Q.all([
         Models.Account.findOne({where: {email: data.email}}),
         Models.Account.findOne({where: {mobile: mobile}})
-    ]).spread(function(account1, account2) {
-        if (account1) {
-            throw L.ERR.EMAIL_HAS_REGISTRY;
-        }
+    ])
+        .spread(function(account1, account2) {
+            if (account1) {
+                throw L.ERR.EMAIL_HAS_REGISTRY;
+            }
 
-        if (account2) {
-            throw L.ERR.MOBILE_HAS_REGISTRY;
-        }
-        return true;
-    }).then(function() {
-        var status = 0;
-        var pwd = data.pwd;
-        pwd = md5(pwd);
-        var m = Models.Account.build({id: uuid.v1(), mobile:mobile, email: data.email, pwd: pwd, status: status});
-        return m.save()
-            .then(function(account) {
-                if (account.status == 0) {
-                    _sendActiveEmail(account.id);
-                }
-                return account;
-            })
-            .then(function(account) {
-                return {code: 0, msg: "ok", data: {
-                    id: account.id,
-                    email: account.email,
-                    mobile: account.mobile,
-                    status: account.status
-                }};
-            })
-    })
-        .catch(errorHandle)
+            if (account2) {
+                throw L.ERR.MOBILE_HAS_REGISTRY;
+            }
+            return true;
+        })
+        .then(function() {
+            var status = 0;
+            var pwd = data.pwd;
+            pwd = md5(pwd);
+            var id = data.id?data.id:uuid.v1();
+            return Models.Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status});
+        })
+        .then(function(account) {
+            if (account.status == 0) {
+                return _sendActiveEmail(account.id)
+                    .then(function(){
+                        return account;
+                    })
+            }
+            return account;
+        })
         .nodeify(callback);
 }
 

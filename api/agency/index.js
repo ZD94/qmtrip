@@ -45,10 +45,7 @@ agency.registerAgency = function(params, callback){
             return API.auth.findOneAcc({$or: [{mobile: mobile}, {email: email}]})
                 .then(function(ret){
                     if(ret.code){
-                        return API.auth.newAccount(account)
-                            .then(function(acc){
-                                return acc.account;
-                            })
+                        return API.auth.newAccount(account);
                     }else{
                         return ret.account;
                     }
@@ -256,10 +253,7 @@ agency.createAgencyUser = function(data, callback){
     return API.auth.findOneAcc({$or: [{mobile: mobile}, {email: email}]})
         .then(function(ret){
             if(ret.code){
-                return API.auth.newAccount(account)
-                    .then(function(acc){
-                        return acc.account;
-                    })
+                return API.auth.newAccount(account);
             }else{
                 return ret.account;
             }
