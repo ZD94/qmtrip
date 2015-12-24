@@ -23,9 +23,6 @@ function needPermissionMiddleware(fn, needPermission) {
         var accountId = self.accountId;
         return API.permit.checkPermission({accountId: accountId, permission: needPermission})
             .then(function(result) {
-                if (result.code) {
-                    throw result;
-                }
                 return fn.call(self, params);
             })
             .nodeify(callback);
