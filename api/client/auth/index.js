@@ -243,14 +243,14 @@ auth.logout = function(callback) {
  * 权限控制
  *
  * @param fn
- * @param needPowers
+ * @param needPermission
  * @return {Function}
  */
-auth.needPermissionMiddleware = function(fn, needPowers) {
+auth.needPermissionMiddleware = function(fn, needPermission) {
     return function(params, callback) {
         var self = this;
         var accountId = self.accountId;
-        return API.power.checkPower({accountId: accountId, powers: needPowers})
+        return API.permit.checkPermission({accountId: accountId, permission: needPermission})
             .then(function(result) {
                 if (result.code) {
                     throw result;
