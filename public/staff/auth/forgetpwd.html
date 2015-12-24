@@ -1,0 +1,43 @@
+<div class="head">
+    <div class="logo">
+        <img src="../../corp/images/logo-white.png"/>
+    </div>
+    <div class="to_login">
+        没有账号？
+        <span ng-click="toRegister()">注册</span>
+    </div>
+</div>
+<div class="auth_content">
+    <div class="title">
+        忘记密码
+    </div>
+    <div class="step">
+        <ul>
+            <li class="on">1. 确认账号</li>
+            <li>2. 安全验证</li>
+            <li>3. 重新设置</li>
+        </ul>
+    </div>
+    <div class="input">
+        <input id="name" class="" type="text" value="" placeholder="请输入登录账号即注册邮箱"/>
+        <!--<span class="err_msg"><i class="web-icon-font"></i>{{err_msg_mail}}</span>-->
+    </div>
+    <div class="inputs">
+        <div>
+            <input id="picCode" class="" type="text" value="" placeholder="图片验证码">
+        </div>
+        <img id="imgCode" src=""/>
+        <span class="change" ng-click="changePicCode()">换一换</span>
+    </div>
+    <a id="" class="btn" ng-click="checkLogin()">下一步</a>
+</div>
+<div class="footer">
+    <p>由途灵岛信息股份有限公司提供技术支持</p>
+    <p>联系电话：010-57371105</p>
+</div>
+<script>
+    $(function(){
+        var wh = $(window).height();
+        $(".auth_content").css("min-height", wh-80-60-50);
+    })
+</script>

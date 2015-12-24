@@ -2,7 +2,8 @@
  * Created by yumiao on 15-12-9.
  */
 var Q = require('q');
-var Models = require("common/model").importModel("./models").models;
+var sequelize = require("common/model").importModel("./models");
+var Models = sequelize.models;
 var Agency = Models.Agency;
 var AgencyUser = Models.AgencyUser;
 var uuid = require("node-uuid");
@@ -14,6 +15,7 @@ var getColsFromParams = utils.getColsFromParams;
 var API = require("common/api");
 var Paginate = require("common/paginate").Paginate;
 var errorHandle = require("common/errorHandle");
+var md5 = require("common/utils").md5;
 
 var agency = {};
 
@@ -36,6 +38,64 @@ agency.createAgency = function(params, callback){
         .nodeify(callback);
 }
 
+
+/**
+ * 注册代理商，生成代理商id
+ * @param params
+ * @param callback
+ */
+agency.registerAgency = function(params, callback){
+    return checkParams(['name', 'email', 'mobile', 'userName'], params)
+        .then(function(){
+            var userName = params.userName;
+            var agencyId = uuid.v1();
+            var agency = params;
+            delete agency.userName;
+            var pwd = params.pwd || md5('123456');
+            pwd = md5(pwd); //默认密码
+            var mobile = params.mobile;
+            var email = params.email;
+            var account = {email: email, mobile: mobile, pwd: pwd};
+            var agencyUser = {
+                id: agencyId,
+                agencyId: agencyId,
+                name: userName,
+                mobile: mobile,
+                email: email
+            }
+            return API.auth.findOneAcc({$or: [{mobile: mobile}, {email: email}]})
+                .then(function(ret){
+                    if(ret.code){
+                        return API.auth.newAccount(account)
+                            .then(function(acc){
+                                return acc.account;
+                            })
+                    }else{
+                        return ret.account;
+                    }
+                })
+                .then(function(account){
+                    var accountId = account.id;
+                    agency.createUser = accountId;
+                    agencyUser.id = accountId;
+                    return sequelize.transaction(function(t){
+                        return Q.all([
+                            Agency.create(agency, {transaction: t}),
+                            AgencyUser.create(agencyUser, {transaction: t})
+                        ])
+                            .then(function(){
+                                return {code: 0, msg: '注册成功'}
+                            })
+                            .catch(function(err){
+                                logger.info(err);
+                                throw {code: -3, msg: '注册异常'};
+                            })
+                    })
+                })
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
+}
 
 /**
  * 更新代理商信息

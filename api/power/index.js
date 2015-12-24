@@ -121,6 +121,8 @@ services.checkPower = function(params, callback) {
         .then(function(result) {
             var powers = result.data.powers;
             result = true;
+            console.info("#########");
+            console.info(powers);
 
             for(var i= 0, ii=needPowers.length; i<ii; i++) {
                 var needPower = needPowers[i];
