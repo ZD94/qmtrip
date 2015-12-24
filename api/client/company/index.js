@@ -8,7 +8,7 @@
 
 var API = require('common/api');
 var Logger = require('common/logger');
-var needPermissionMiddleware = require('../auth').needPermissionMiddleware;
+var checkPermission = require('../auth').checkPermission;
 var logger = new Logger();
 
 /**
@@ -37,10 +37,11 @@ company.createCompany = function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.updateCompany = needPermissionMiddleware(function(params, callback){
-    params.createUser = this.accountId;
-    return API.company.updateCompany(params, callback);
-}, ["company.edit"]);
+company.updateCompany = checkPermission(["company.edit"],
+    function(params, callback){
+        params.createUser = this.accountId;
+        return API.company.updateCompany(params, callback);
+    });
 
 /**
  * 获取企业信息
@@ -62,10 +63,11 @@ company.getCompany = function(companyId, callback){
  * @param callback
  * @returns {*}
  */
-company.listCompany = needPermissionMiddleware(function(params, callback){
-    params.userId = this.accountId;
-    return API.company.listCompany(params, callback);
-}, ["company.query"])
+company.listCompany = checkPermission(["company.query"],
+    function(params, callback){
+        params.userId = this.accountId;
+        return API.company.listCompany(params, callback);
+    });
 
 /**
  * 删除企业信息
@@ -73,13 +75,14 @@ company.listCompany = needPermissionMiddleware(function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.deleteCompany = needPermissionMiddleware(function(companyId, callback){
-    var params = {
-        companyId: companyId,
-        userId: this.accountId
-    };
-    return API.company.deleteCompany(params, callback);
-}, ["company.delete"]);
+company.deleteCompany = checkPermission(["company.delete"],
+    function(companyId, callback){
+        var params = {
+            companyId: companyId,
+            userId: this.accountId
+        };
+        return API.company.deleteCompany(params, callback);
+    });
 
 /**
  * 企业资金账户充值
