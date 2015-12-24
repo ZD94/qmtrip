@@ -18,9 +18,9 @@ var staff = (function(){
             $("#add").removeClass("onCheck");
         }
         //对差旅标准进行初始化
-        $scope.selectkey = 1;//设置初始化显示
+        $scope.selectkey = "";//设置初始化显示
         $scope.selectClass = [
-            {val:1,name:"请选择对应的差旅等级",id:""}
+            {val:"",name:"请选择对应的差旅等级"}
         ]
         API.onload(function(){
             //console.info("API.onload");
@@ -58,7 +58,7 @@ var staff = (function(){
             var mail = $("#staffEmail").val();
             var tel  = $("#staffTel").val();
             var department = $("#staffDepartment").val();
-            var n = $("#staffStandard").val().length;
+            var n = $("#staffStandard").val().length;//获取差旅标准id的长度
             var standard   = $("#staffStandard").val().substr(7,n);
             var power      = $("#staffPower").val();
             var commit = true;
@@ -82,9 +82,9 @@ var staff = (function(){
                 }
                 alert(standard);
                 API.onload(function() {
-                    API.staff.createStaff({name:name,mobile:tel,email:mail,companyId:$scope.companyId,department:department,travelLevel:standard})
+                    API.staff.createStaff({name:name,mobile:tel,email:mail,companyId:$scope.companyId,department:department,travelLevel:standard,roleId:power})
                         .then(function(result){
-
+                            console.info(result);
                             $scope.$apply();
                         }).catch(function (err) {
                             console.info(err);
