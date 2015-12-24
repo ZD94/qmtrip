@@ -2,16 +2,20 @@
  * Created by yumiao on 15-12-9.
  */
 var Q = require('q');
-var models = require("common/model").importModel("./models");
-var Agency = models.Agency;
-var AgencyUser = models.AgencyUser;
+var sequelize = require("common/model").importModel("./models");
+var Models = sequelize.models;
+var Agency = Models.Agency;
+var AgencyUser = Models.AgencyUser;
 var uuid = require("node-uuid");
 var L = require("common/language");
 var Logger = require('common/logger');
 var logger = new Logger("agency");
 var utils = require("common/utils");
+var getColsFromParams = utils.getColsFromParams;
 var API = require("common/api");
 var Paginate = require("common/paginate").Paginate;
+var errorHandle = require("common/errorHandle");
+var md5 = require("common/utils").md5;
 
 var agency = {};
 
@@ -29,9 +33,69 @@ agency.createAgency = function(params, callback){
                     var agency = agency.toJSON();
                     return {code: 0, msg: '', agency: agency};
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
+
+/**
+ * 注册代理商，生成代理商id
+ * @param params
+ * @param callback
+ */
+agency.registerAgency = function(params, callback){
+    return checkParams(['name', 'email', 'mobile', 'userName'], params)
+        .then(function(){
+            var userName = params.userName;
+            var agencyId = uuid.v1();
+            var agency = params;
+            delete agency.userName;
+            var pwd = params.pwd || md5('123456');
+            pwd = md5(pwd); //默认密码
+            var mobile = params.mobile;
+            var email = params.email;
+            var account = {email: email, mobile: mobile, pwd: pwd};
+            var agencyUser = {
+                id: agencyId,
+                agencyId: agencyId,
+                name: userName,
+                mobile: mobile,
+                email: email
+            }
+            return API.auth.findOneAcc({$or: [{mobile: mobile}, {email: email}]})
+                .then(function(ret){
+                    if(ret.code){
+                        return API.auth.newAccount(account)
+                            .then(function(acc){
+                                return acc.account;
+                            })
+                    }else{
+                        return ret.account;
+                    }
+                })
+                .then(function(account){
+                    var accountId = account.id;
+                    agency.createUser = accountId;
+                    agencyUser.id = accountId;
+                    return sequelize.transaction(function(t){
+                        return Q.all([
+                            Agency.create(agency, {transaction: t}),
+                            AgencyUser.create(agencyUser, {transaction: t})
+                        ])
+                            .then(function(){
+                                return {code: 0, msg: '注册成功'}
+                            })
+                            .catch(function(err){
+                                logger.info(err);
+                                throw {code: -3, msg: '注册异常'};
+                            })
+                    })
+                })
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
+}
 
 /**
  * 更新代理商信息
@@ -58,7 +122,7 @@ agency.updateAgency = function(params, callback){
                         return defer.promise;
                     }
                     params.updateAt = utils.now();
-                    var cols = getColumns(params);
+                    var cols = getColsFromParams(params);
                     return Agency.update(params, {returning: true, where: {id: agencyId}, fields: cols})
                         .then(function(ret){
                             if(!ret[0] || ret[0] == "NaN"){
@@ -69,7 +133,9 @@ agency.updateAgency = function(params, callback){
                             return {code: 0, msg: '更新代理商信息成功', agency: agency};
                         })
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -85,9 +151,15 @@ agency.getAgency = function(params, callback){
             var userId = params.userId;
             return Agency.find({where: {id: agencyId}})
                 .then(function(ret){
-                    return {code: 0, msg: '', agency: ret.dataValues};
+                    if(!ret){
+                        defer.reject({code: -2, msg: '没有代理商'});
+                        return defer.promise;
+                    }
+                    return {code: 0, msg: '', agency: ret.toJSON()};
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -106,7 +178,9 @@ agency.listAgency = function(params, callback){
                 .then(function(ret){
                     return {code: 0, msg: '', agencys: ret};
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -136,20 +210,11 @@ agency.deleteAgency = function(params, callback){
                             return {code: 0, msg: '删除成功'};
                         })
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
-/**
- * 获取json params中的columns
- * @param params
- */
-function getColumns(params){
-    var cols = new Array();
-    for(var s in params){
-        cols.push(s)
-    }
-    return cols;
-}
 
 function checkParams(checkArray, params, callback){
     var defer = Q.defer();
@@ -203,6 +268,7 @@ agency.createAgencyUser = function(data, callback){
                     })
             }
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -228,6 +294,7 @@ agency.deleteAgencyUser = function(params, callback){
                     })
             }
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -251,6 +318,7 @@ agency.updateAgencyUser = function(id, data, callback){
         .then(function(obj){
             return {code: 0, agency: obj[1][0].toJSON(), msg: "更新成功"}
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -269,8 +337,13 @@ agency.getAgencyUser = function(id, callback){
     }
     return AgencyUser.findById(id)
         .then(function(obj){
+            if(!obj){
+                defer.reject({code: -2, msg: '用户不存在'});
+                return defer.promise;
+            }
             return {code: 0, agency: obj.toJSON()}
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -313,6 +386,7 @@ agency.listAndPaginateAgencyUser = function(params, options, callback){
             var pg = new Paginate(page, perPage, result.count, result.rows);
             return pg;
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 

@@ -9,10 +9,12 @@ var Company = Models.Company;
 var FundsAccounts = Models.FundsAccounts;
 var MoneyChanges = Models.MoneyChanges;
 var uuid = require("node-uuid");
-var L = require("../../common/language");
-var Logger = require('../../common/logger');
+var L = require("common/language");
+var Logger = require('common/logger');
 var logger = new Logger("company");
-var utils = require("../../common/utils");
+var utils = require("common/utils");
+var getColsFromParams = utils.getColsFromParams;
+var errorHandle = require("common/errorHandle");
 
 var company = {};
 
@@ -41,7 +43,9 @@ company.createCompany = function(params, callback){
                         return {code: 0, msg: '', company: company};
                     })
             })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -67,6 +71,7 @@ company.isBlackDomain = function(params, callback) {
             }
             return {code: 0, msg: "ok"};
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -89,7 +94,7 @@ company.updateCompany = function(params, callback){
                         return defer.promise;
                     }
                     params.updateAt = utils.now();
-                    var cols = getColumns(params);
+                    var cols = getColsFromParams(params);
                     return Company.update(params, {returning: true, where: {id: companyId}, fields: cols})
                         .then(function(ret){
                             if(!ret[0] || ret[0] == "NaN"){
@@ -100,7 +105,9 @@ company.updateCompany = function(params, callback){
                             return {code: 0, msg: '更新企业信息成功', company: company};
                         })
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -110,15 +117,22 @@ company.updateCompany = function(params, callback){
  * @returns {*}
  */
 company.getCompany = function(params, callback){
+    var defer = Q.defer();
     return checkParams(['companyId'], params)
         .then(function(){
             var companyId = params.companyId;
             return Company.find({where: {id: companyId}})
                 .then(function(company){
+                    if(!company){
+                        defer.reject({code: -2, msg: '企业不存在'});
+                        return defer.promise;
+                    }
                     var company = company.toJSON();
                     return {code: 0, msg: '', company: company};
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -134,7 +148,9 @@ company.listCompany = function(params, callback){
                 .then(function(ret){
                     return {code: 0, msg: '', company: ret};
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -164,7 +180,9 @@ company.deleteCompany = function(params, callback){
                             return {code: 0, msg: '删除成功'};
                         })
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -182,7 +200,9 @@ company.getCompanyFundsAccount = function(params, callback){
                 .then(function(funds){
                     return funds.toJSON();
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
 /**
@@ -251,7 +271,7 @@ company.moneyChange = function(params, callback){
                     }
 
                     return sequelize.transaction(function(t){
-                        var cols = getColumns(fundsUpdates);
+                        var cols = getColsFromParams(fundsUpdates);
                         return Q.all([
                             FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: cols, transaction: t}),
                             MoneyChanges.create(moneyChange, {transaction: t})
@@ -266,21 +286,11 @@ company.moneyChange = function(params, callback){
                             })
                     })
                 })
-        }).nodeify(callback);
+        })
+        .catch(errorHandle)
+        .nodeify(callback);
 }
 
-
-/**
- * 获取json params中的columns
- * @param params
- */
-function getColumns(params){
-    var cols = new Array();
-    for(var s in params){
-        cols.push(s);
-    }
-    return cols;
-}
 
 function checkParams(checkArray, params, callback){
     var defer = Q.defer();

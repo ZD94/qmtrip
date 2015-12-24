@@ -30,7 +30,7 @@
     "main":{"addr":"api.local.tulingdao.com", "port":4101}
   },
   "upload":{
-    "tmpDir": "${{ROOT_DIR}}/public/temp"
+    "tmpDir": "${{ROOT_DIR}}/temp"
   },
   "api": {
     "postgres": "${{postgres.url}}",

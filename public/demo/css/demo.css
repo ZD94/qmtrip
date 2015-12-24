@@ -1,0 +1,221 @@
+* {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-decoration: none;
+}
+table,tr,td,dr,th {margin: 0px;padding: 0px;}
+table{ border-collapse:collapse; border-spacing:0; }
+html {
+  overflow-y: scroll;
+}
+body {
+  font-family: '微软雅黑';
+  font-size: 13px;
+  margin: 0;
+  padding: 0;
+  background: url("/demo/images/bg.jpg") no-repeat center top;
+}
+input {
+  font-family: '微软雅黑';
+}
+.step1 {
+  width: 460px;
+  height: auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 5px;
+  box-shadow:0 5px 15px rgba(2, 37, 69, .4);
+  margin: 195px auto 0 auto;
+}
+.step1 .text {
+  height: 38px;
+  border: 1px #D9D9D9 solid;
+  border-radius: 5px;
+  padding: 0 10px;
+}
+.step1 .btn {
+  width: 310px;
+  height: 36px;
+  color: #ffffff;
+  background: #118FD6;
+  border-radius: 5px;
+  border: none;
+}
+.step1 .placelist {
+  width: 298px;
+  height: auto;
+  background: #ffffff;
+  border: 1px #D9D9D9 solid;
+  border-radius: 5px;
+  overflow: hidden;
+  position: absolute;
+  left: 0;
+  top: 60px;
+  display: none;
+  z-index: 9999;
+}
+.step1 .placelist li {
+  width: 258px;
+  height: 30px;
+  line-height: 30px;
+  text-align: left;
+  cursor: pointer;
+  z-index: 9999;
+  padding: 0 20px;
+}
+.step1 .remen1 {
+  width: 598px;
+  height: auto;
+  background: #ffffff;
+  border: 1px #D9D9D9 solid;
+  border-radius: 5px;
+  overflow: hidden;
+  position: absolute;
+  left: 0;
+  top: 60px;
+  display: none;
+  z-index: 9999;
+}
+.step1 .remen1 dt {
+  width: 578%;
+  height: 40px;
+  line-height: 40px;
+  background: #EEEEEE;
+  border-bottom: #E5E5E5;
+  padding: 0 10px;
+  z-index: 9999;
+}
+.step1 .remen1 dd {
+  width: 60px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  cursor: pointer;
+  margin: 5px 10px;
+  float: left;
+  z-index: 9999;
+}
+
+.step1 .remen2 {
+  width: 598px;
+  height: auto;
+  background: #ffffff;
+  border: 1px #D9D9D9 solid;
+  border-radius: 5px;
+  overflow: hidden;
+  position: absolute;
+  left: 0;
+  top: 60px;
+  display: none;
+  z-index: 9999;
+}
+.step1 .remen2 dt {
+  width: 578%;
+  height: 40px;
+  line-height: 40px;
+  background: #EEEEEE;
+  border-bottom: #E5E5E5;
+  padding: 0 10px;
+  z-index: 9999;
+}
+.step1 .remen2 dd {
+  width: 60px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  cursor: pointer;
+  margin: 5px 10px;
+  float: left;
+  z-index: 9999;
+}
+
+
+.step2 {
+  width: 850px;
+  height: auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 5px;
+  box-shadow:0 5px 15px rgba(2, 37, 69, .4);
+  margin: 195px auto 0 auto;
+  display: none;
+}
+.step2 .asd2 {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 30px;
+  color: #118FD6;
+  padding-top: 20px;
+}
+
+.step3 {
+  width: 850px;
+  height: auto;
+  background: #ffffff;
+  border-radius: 5px;
+  box-shadow:0 5px 15px rgba(2, 37, 69, .4);
+  margin: 195px auto 0 auto;
+  overflow: hidden;
+  display: none;
+}
+.step3 .top {
+  width: 100%;
+  height: 55px;
+  line-height: 55px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  background: #4A4A4A;
+  text-align: center;
+}
+.step3 .center {
+  background: #F5F5F5;
+}
+.step3 .bottom {
+  height: auto;
+  padding-bottom: 20px;
+  overflow: hidden;
+}
+.step3 .bottom ul {
+  width: 280px;
+  height: auto;
+  margin: 0 auto;
+}
+.step3 .bottom ul li {
+  width: 118px;
+  height: 36px;
+  line-height: 36px;
+  text-align: center;
+  border: 1px #E5E5E5 solid;
+  margin: 0 10px;
+  float: left;
+}
+
+
+
+
+
+/*jquery-ui日历控件样式*/
+.ui-datepicker {box-shadow: 0 0 4px #ccc;*width: 220px;}
+.ui-datepicker-header {text-align: center;line-height: 24px;border:1px #d7d7d7 solid;border-bottom:none;background-color: #fdfce1;}
+.ui-datepicker-header a {cursor: pointer;}
+.ui-datepicker-header .ui-datepicker-prev {float: left;margin-left: 5px}
+.ui-datepicker-header .ui-datepicker-next {float: right;margin-right: 5px}
+.ui-datepicker-calendar {border-collapse: collapse;border:1px #d7d7d7 solid;background-color: #fff;width: 220px;}
+.ui-datepicker-calendar tr th {text-align: center;}
+.ui-datepicker-calendar tr td {height: 22px;text-align: center;border:1px #d7d7d7 solid;line-height: 22px;}
+.ui-datepicker-calendar tr td.ui-datepicker-today {background-color: #4680ba;}
+.ui-datepicker-calendar tr td.ui-datepicker-today a {color: #fff;background-color: #4680ba;}
+.ui-datepicker-calendar .ui-state-highlight {margin-left: 0;}
+.ui-datepicker-calendar .ui-datepicker-unselectable {color: #ccc;}
+.ui-datepicker-calendar .ui-state-active {background-color: #fdfce1}
+
+
+/*公用弹窗控件样式*/
+.messagebox_fixed {width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.3); position: fixed; top: 0;  left: 0;}
+.messagebox_fixed .messagebox_box {background: #ffffff; padding: 5px; border-radius: 5px; box-shadow: 0 3px 26px rgba(0, 0, 0, .9); position: fixed; top: 50%; left: 50%;}
+.messagebox_fixed .messagebox_box .messagebox_title {height: 30px; line-height: 30px; padding: 0 5px; position: relative;}
+.messagebox_fixed .messagebox_box .messagebox_close {width: 20px; height: 20px; cursor: pointer; -webkit-transtion:0.4s all ease; -moz-transition:0.4s all ease; transition:0.4s all ease; position: absolute; top: 0; right: 5px;}
+.messagebox_fixed .messagebox_box .messagebox_close:hover {-webkit-transform:rotate(180deg); -moz-transform:rotate(180deg); transform:rotate(180deg);}
+.messagebox_fixed .messagebox_box .messagebox_content { line-height: 25px; background: #f7f7f7; padding: 20px 25px;}

@@ -23,16 +23,17 @@
     	var moment = require('moment');
     	var TLD = TLD_angular_app('tulingdao.com', 'agency', '/UsersFirst/UserMain');
     	API.onlogin(function(){
-    		window.location.href = "/login/login.html";
+    		window.location.href = "/agency/login.html";
     		return;
     	})
     	//获取页面基本信息
     	TLD.controller("MainController", ["$scope", function($scope) {
-    		API.require("angency");
+    		API.require("agency");
     		API.onload(function(){
-    			API.agency.getCurrentAgencyUser()
+    			API.agency.getCurrentAgency()
     				.then(function(ret){
     					console.info(ret);
+    					$scope.agency = ret.agency;
     					// API.company.getCompany(company_id)
 		    			// 	.then(function(company){
 		    			// 		$scope.company = company.company;
@@ -54,7 +55,7 @@
     $(function(){
     	$(window).resize(function(){resize();})
     	$(".left_nav a").click(function(){
-    		var $that = $(this);
+    		var $that = $(this).closest("li");
     		$(".left_nav li").removeClass("on");
     		$that.addClass("on");
     	})
@@ -94,7 +95,7 @@
 				<div class="corp_help">帮助</div>
 			</div>
 			<div class="m_headerright">
-				<span class="header_account" id="account">您好，<a href=""></a><em class="web-icon-font">&#xf0d7;</em></span>
+				<span class="header_account" id="account">您好，<a href="">{{agency.name || agency.mobile}}</a><em class="web-icon-font">&#xf0d7;</em></span>
 				<div id="account_menu" class="account_menu">
 					<ul>
 						<li><a href="">修改密码</a></li>

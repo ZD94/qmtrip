@@ -1,11 +1,11 @@
 /**
  * Created by chenhao on 2015/12/18.
  */
-var UsersFirst = (function(){
+var StaffFirst = (function(){
 	API.require("company");
 	API.require("staff");
-	var UsersFirst ={};
-	UsersFirst.UserMainController = function($scope){
+	var StaffFirst ={};
+	StaffFirst.StaffUserController = function($scope){
 		$("title").html("差旅管理首页");
 		$(".left_nav li").removeClass("on").eq(0).addClass("on");
 		//企业管理首页信息
@@ -37,6 +37,6 @@ var UsersFirst = (function(){
 		$scope.initCorpMain();
 	}
 
-	return UsersFirst;
+	return StaffFirst;
 })();
-module.exports = UsersFirst;
+module.exports = StaffFirst;

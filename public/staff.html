@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
 <html ng-app="tulingdao.com">
 <head>
 	<meta charset="UTF-8">
 	<title ng-bind="pageTitle"></title>
 	<link rel="stylesheet" type="text/css" href="/staff/css/public.css">
 	<link rel="stylesheet" type="text/css" href="/staff/css/businesstravel.css">
+	<link rel="stylesheet" type="text/css" href="/staff/css/users.css">
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
 	<script type="text/javascript">
         var jQuery = $ = require('jquery');
@@ -22,14 +22,27 @@
     <script type="text/javascript">
     	var Q = require('q');
     	var moment = require('moment');
-    	var TLD = TLD_angular_app('tulingdao.com', 'staff', '/UsersFirst/StaffUser');
-    	// API.onlogin(function(){
-    	// 	window.location.href = "/";
-    	// 	return;
-    	// })
+    	var TLD = TLD_angular_app('tulingdao.com', 'staff', '/StaffFirst/StaffUser');
+		API.onlogin(function(){
+			var backUrl = window.location.href;
+			backUrl = encodeURIComponent(backUrl);
+			window.location.href = "#/auth/login?backurl="+backUrl;
+		});
+		function logout(){
+			API.require('auth');
+			API.onload(function(){
+				API.auth.logout()
+						.then(function (data) {
+							location.reload();
+						}).catch(function(error){
+					console.log(error);
+				}).done();
+			});
+		};
     	//获取页面基本信息
     	TLD.controller("MainController", ["$scope", function($scope) {
     		API.require("staff");
+            API.require("auth");
     		API.onload(function(){
     			API.staff.getCurrentStaff()
     				.then(function(ret){
@@ -39,7 +52,17 @@
     				.catch(function(err){
     					console.info(err)
     				})
+                $scope.logout = function(){
+                    API.auth.logout()
+                        .then(function(ret){
+                            window.location.href = "/auth.html#/auth/login?backurl="+encodeURIComponent(window.location.href);
+                        })
+                        .catch(function(err){
+                            console.info(err)
+                        })
+                }
     		})
+            
     	}])
     </script>
     <script type="text/javascript">
@@ -74,7 +97,7 @@
 				<div id="account_menu" class="account_menu">
 					<ul>
 						<li><a href="">修改密码</a></li>
-						<li><a href="">退出</a></li>
+						<li><a ng-click="logout()">退出</a></li>
 					</ul>
 				</div>
 			</div>

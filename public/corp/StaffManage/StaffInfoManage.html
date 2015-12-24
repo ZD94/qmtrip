@@ -1,0 +1,95 @@
+<div class="staffManageContent">
+    <div class="staff_tab">
+        <ul>
+            <li class="check1">员工信息管理</li>
+            <li>组织架构</li>
+        </ul>
+    </div>
+    <div class="staff_tab_content">
+        <div class="organize_select">
+            <select name="select" id="" class="">
+                <option value="我的企业">我的企业</option>
+                <option value="销售部">销售部</option>
+                <option value="产品部">产品部</option>
+            </select>
+            <span>设置公司组织架构</span>
+        </div>
+        <div class="staff_function">
+            <i>目前共23名员工</i>
+            <span>待激活3名|管理员2名|普通员工18名</span>
+            <a ng-click="addStaff()" id="add">添加员工</a>
+            <a id="add_lot">批量导入</a>
+        </div>
+        <div class="add_staff">
+            <div class="little_triangle">
+
+            </div>
+            <div class="add_staff_block">
+                <div class="block_tip">
+                    {{block_tip_err}}
+                </div>
+                <div class="block_left">
+                    <ul>
+                        <li>
+                            <span style="color: #f56d23;padding-right: 5px;">*</span>姓名:
+                            <input id="staffName" type="text" placeholder="请输入员工真实姓名"/>
+                        </li>
+                        <li>
+                            <span style="color: #f56d23;padding-right: 5px;">*</span>邮箱:
+                            <input id="staffEmail" type="text" placeholder="后缀同创建人邮箱一致"/>
+                        </li>
+                        <li>
+                            手机号:
+                            <input id="staffTel" type="text" placeholder="请输入员工手机号"/>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            部门:
+                            <input id="staffDepartment" type="text" placeholder="请输入员工所属部门"/>
+                        <li>
+                            差旅标准:
+                            <select name="select" id="staffStandard" class="" ng-model="selectkey" ng-options="item.val as item.name for item in selectClass"></select>
+                        </li>
+                        <li>
+                            <span style="color: #f56d23;padding-right: 5px;">*</span>权限:
+                            <select name="select" id="staffPower" class="">
+                            <option value="请选择对应的差旅等级">请选择</option>
+                            <option value="销售部">销售部</option>
+                            <option value="产品部">产品部</option>
+                            </select>
+                            <!--<select name="select" id="staffPower" class="" ng-model="selectkey" ng-options="item.val as item.name for item in selectClass"></select>-->
+                        </li>
+                    </ul>
+                    <div style="clear: both;"></div>
+                </div>
+                <div class="block_right">
+                    <a id="save" ng-click="saveStaffInfo()">保存</a>
+                    <a id="cancel" ng-click="cancelAdd()">取消</a>
+                </div>
+                <div style="clear: both;"></div>
+            </div>
+        </div>
+        <div>
+
+        </div>
+        <table class="staff_table">
+            <tr>
+                <td>姓名</td>
+                <td>邮箱</td>
+                <td>手机号</td>
+                <td>差旅标准</td>
+                <td>权限</td>
+                <td>操作</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</div>

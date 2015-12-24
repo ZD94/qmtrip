@@ -186,7 +186,7 @@ auth.registryCompany = function(params, callback) {
                             var staffId = account.id;
                             return Q.all([
                                 createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain}),
-                                createStaff({email: email, mobile: mobile, name: name, companyId: companyId, accountId: account.id})
+                                createStaff({email: email, mobile: mobile, name: name, companyId: companyId, accountId: account.id, roleId: 0})
                             ])
                                 .then(function(ret){
                                     return {code: 0, msg: 'ok'};
@@ -243,21 +243,17 @@ auth.logout = function(callback) {
  * 权限控制
  *
  * @param fn
- * @param needPowers
+ * @param needPermission
  * @return {Function}
  */
-auth.needPermissionMiddleware = function(fn, needPowers) {
+auth.needPermissionMiddleware = function(fn, needPermission) {
     return function(params, callback) {
         var self = this;
         var accountId = self.accountId;
-        return API.power.checkPower({accountId: accountId, powers: needPowers})
+        return API.permit.checkPermission({accountId: accountId, permission: needPermission})
             .then(function(result) {
-                if (result.code) {
-                    throw result;
-                }
-                return fn.apply(self, params);
+                return fn.call(self, params);
             })
-            .catch(errorHandle)
             .nodeify(callback);
     }
 }

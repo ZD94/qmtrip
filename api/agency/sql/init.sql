@@ -150,7 +150,7 @@ create table agency.agency_user (
     mobile character varying(20), -- 手机
     email character varying(50), -- 邮箱
     avatar text,
-    company_id uuid,
+    agency_id uuid,
     role_id integer, -- 权限
     create_at timestamp without time zone DEFAULT now() -- 创建时间
 );

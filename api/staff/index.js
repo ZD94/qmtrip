@@ -6,6 +6,7 @@ var Q = require("q");
 var nodeXlsx = require("node-xlsx");
 var uuid = require("node-uuid");
 var moment = require("moment");
+var crypto = require("crypto");
 var utils = require("common/utils");
 var sequelize = require("common/model").importModel("./models");
 var Logger = require("common/logger");
@@ -19,7 +20,7 @@ var Paginate = require("../../common/paginate").Paginate;
 var logger = new Logger("staff");
 var moment = require("moment");
 //var auth = require("../auth/index");
-//var travalPolicy = require("../travalPolicy/index");
+//var travelPolicy = require("../travelPolicy/index");
 var staff = {};
 
 
@@ -188,6 +189,10 @@ staff.getStaff = function(id, callback){
     }
     return staffModel.findById(id)
         .then(function(obj){
+            if(!obj){
+                defer.reject({code: -2, msg: '员工不存在'});
+                return defer.promise;
+            }
             return {code: 0, staff: obj.toJSON()}
         })
         .nodeify(callback);
@@ -392,7 +397,7 @@ staff.listAndPaginatePointChange = function(params, options, callback){
  * @param callback
  * @returns {*}
  */
-staff.importExcel = function(params, callback){
+staff.beforeImportExcel = function(params, callback){
     var userId = params.accountId;
     var md5key = params.md5key;
 //    var obj = nodeXlsx.parse(fileUrl);
@@ -412,7 +417,7 @@ staff.importExcel = function(params, callback){
             return staff.getStaff(userId)
                 .then(function(sf){
                     companyId = sf.staff.companyId;
-                    return API.travalPolicy.getAllTravalPolicy({company_id: companyId})
+                    return API.travelPolicy.getAllTravelPolicy({company_id: companyId})
                         .then(function(results){
                             results = results.travalPolicies;
                             for(var t=0;t<results.length;t++){
@@ -428,14 +433,7 @@ staff.importExcel = function(params, callback){
                                         s[1] = s[1] ? s[1]+"" : "";
                                         var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
                                         item = staffObj;
-                                        if(!staffObj.email || staffObj.email=="" || emailAttr.join(",").indexOf(s[2]) != -1){
-                                            staffObj.reason = "邮箱为空或与本次导入中邮箱重复";
-                                            s[6] = "邮箱为空或与本次导入中邮箱重复";
-                                            noAddObj.push(staffObj);
-                                            downloadNoAddObj.push(s);
-                                            return;
-                                        }
-                                        emailAttr.push(s[2]);
+
                                         if(!staffObj.name || staffObj.name==""){
                                             staffObj.reason = "姓名为空";
                                             s[6] = "姓名为空";
@@ -451,6 +449,14 @@ staff.importExcel = function(params, callback){
                                             return;
                                         }
                                         mobileAttr.push(s[1]);
+                                        if(!staffObj.email || staffObj.email=="" || emailAttr.join(",").indexOf(s[2]) != -1){
+                                            staffObj.reason = "邮箱为空或与本次导入中邮箱重复";
+                                            s[6] = "邮箱为空或与本次导入中邮箱重复";
+                                            noAddObj.push(staffObj);
+                                            downloadNoAddObj.push(s);
+                                            return;
+                                        }
+                                        emailAttr.push(s[2]);
                                         if(!staffObj.department || staffObj.department==""){
                                             staffObj.reason = "部门为空";
                                             s[6] = "部门为空";
@@ -509,6 +515,12 @@ staff.importExcel = function(params, callback){
                         })
                 })
         })
+        .then(function(data){
+            return API.attachment.deleteAttachment({md5key: md5key, userId: userId})//
+                .then(function(result){
+                    return data;
+                })
+        })
         .nodeify(callback);
 }
 
@@ -525,7 +537,6 @@ staff.importExcelAction = function(params, callback){
         return defer.promise.nodeify(callback);
     }
     var data = JSON.parse(params.addObj);
-    console.log(data);
     var noAddObj = [];
     var addObj = [];
     return Q.all(data.map(function(item, index){
@@ -573,14 +584,20 @@ staff.downloadExcle = function (params, callback){
         defer.reject({code: -1, msg: "params.objAttr为空"});
         return defer.promise.nodeify(callback);
     }
+    if(!params.accountId){
+        defer.reject({code: -1, msg: "params.accountId为空"});
+        return defer.promise.nodeify(callback);
+    }
+    var md5 = crypto.createHash("md5");
+    var fileName = md5.update(params.accountId+nowStr).digest("hex");
     data = JSON.parse(data);
     if(!(data instanceof Array)){
         defer.reject({code: -1, msg: "params.objAttr类型错误"});
         return defer.promise.nodeify(callback);
     }
     var buffer = nodeXlsx.build([{name: "Sheet1", data: data}]);
-    fs.writeFileSync(config.upload.tmpDir+'/'+ nowStr +'.xlsx', buffer, 'binary');
-    defer.resolve({code: 0, url: nowStr+".xlsx"});
+    fs.writeFileSync(config.upload.tmpDir+'/'+ fileName +'.xlsx', buffer, 'binary');
+    defer.resolve({code: 0, fileName: fileName+".xlsx"});
     return defer.promise.nodeify(callback);
 }
 
