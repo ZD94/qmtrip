@@ -16,21 +16,26 @@ var agency = {}
 
 
 /**
- * @method createAgency
+ * @method registerAgency
  *
- * 创建代理商
+ * 注册代理商
  *
  * @param {Object} params 参数
- * @param {UUID} params.accountId 账号ID
+ * @param {string} params.name 代理商名称 必填
+ * @param {string} params.userName 用户姓名 必填
+ * @param {string} params.mobile 手机号 必填
+ * @param {string} params.email 邮箱 必填
+ * @param {string} params.pwd 密码 选填，如果手机号和邮箱在全麦注册过，则密码还是以前的密码
  * @param {Function} [callback]
- * @returns {Promise}
+ * @returns {Promise} {code: 0, msg: '注册成功||错误信息'}
  */
-agency.createAgency = function(params, callback){
-    params.createUser = this.accountId;
-    return API.agency.createAgency(params, callback);
+agency.registerAgency = function(params, callback){
+    return API.agency.registerAgency(params, callback);
 }
 
 /**
+ * @method updateAgency
+ *
  * 更新代理商信息
  * @param params
  * @param callback
