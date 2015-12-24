@@ -1,9 +1,9 @@
 <div class="staffhome">
 	<div class="staffuser">
-		<span class="nameicon"></span>
+		<span class="nameicon">{{firstname}}</span>
 		<div class="staff_role">
 			<div>{{staff.name}}
-				<span ng-if="staff.travelLevel != null">{{}}</span>
+				<span ng-if="staff.travelLevel != null">{{travelpolicy.name}}</span>
 				<span ng-if="staff.roleId == 0">创建者</span>
 				<span ng-if="staff.roleId == 1">管理员</span>
 				<a href="corp.html" ng-if="staff.roleId == 0 ||staff.roleId == 1">企业管理</a>
@@ -57,5 +57,6 @@
 	</div>
 	<div class="staff_announce">
 		<h3>小麦公告</h3>
+		<div></div>
 	</div>
 </div>
