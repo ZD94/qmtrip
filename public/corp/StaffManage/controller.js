@@ -23,20 +23,15 @@ var staff = (function(){
             {val:"",name:"请选择对应的差旅等级"}
         ]
         API.onload(function(){
-            //console.info("API.onload");
-            API.staff.getCurrentStaff()//qh获取当前登录人员的企业id
-                .then(function(result){
-                    $scope.companyId = result.staff.companyId;
-                    //console.info($scope.companyId);
-                    return $scope.companyId;
-                })
-                .catch(function(err){
-                    //console.info("error");
-                    console.info(err);
-                })
-            API.travelPolicy.getAllTravelPolicy({columns:name})//获取当前所有的差旅标准名称
-                .then(function(result){
-                    //console.info(result.travelPolicies);
+            console.info("API.onload");
+            Q.all([
+                API.staff.getCurrentStaff(),//qh获取当前登录人员的企业id
+                API.travelPolicy.getAllTravelPolicy({columns:name})//获取当前所有的差旅标准名称
+            ])
+                .spread(function(staff, result){
+                    console.info(staff);
+                    console.info(result);
+                    $scope.companyId = staff.companyId;
                     var arr = result.travelPolicies;
                     var i ;
                     for(i=0; i<arr.length; i++){
@@ -46,12 +41,13 @@ var staff = (function(){
                         $scope.selectClass.push({val:id,name:name});//放入option中
                         //console.info(id);
                     }
-
+                    $scope.$apply();
                 })
                 .catch(function(err){
-                    //console.info("error");
+                    console.info("error");
                     console.info(err);
                 })
+
         })
         $scope.saveStaffInfo = function() {
             var name = $("#staffName").val();
