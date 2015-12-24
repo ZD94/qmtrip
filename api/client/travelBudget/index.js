@@ -6,7 +6,7 @@
  * @module API
  */
 
-var API = require("../../common/api");
+var API = require("common/api");
 
 
 /**

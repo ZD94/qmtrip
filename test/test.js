@@ -32,3 +32,5 @@ API.init(path.join(__dirname, '../api'), config.api)
         process.exit();
     });
 
+
+require("../api/client/index.test");
