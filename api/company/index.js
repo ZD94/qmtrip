@@ -30,7 +30,7 @@ var company = {};
 company.createCompany = function(params, callback){
     return checkParams(['createUser', 'name', 'domainName'], params)
         .then(function(){
-            var companyId = uuid.v1();
+            var companyId = params.id || uuid.v1();
             params.id = companyId;
             var funds = { id: companyId }
             return sequelize.transaction(function(t){
