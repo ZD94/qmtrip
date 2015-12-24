@@ -21,7 +21,7 @@ attachment.createAttachment = function(data, callback){
         .then(function(){
             return attachmentModel.create(data)
                 .then(function(obj){
-                    return {code: 0, attachment: obj.toJSON()};
+                    return obj.toJSON();
                 })
         })
         .nodeify(callback);
@@ -52,7 +52,7 @@ attachment.getAllAttachment = function(params, callback){
     options.where = params;
     return attachmentModel.findAll(options)
         .then(function(obj){
-            return {code: 0, attachments: obj}
+            return obj;
         })
         .nodeify(callback);
 }
@@ -68,7 +68,7 @@ attachment.getAttachment = function(params, callback){
     options.where = params;
     return attachmentModel.findOne(options)
         .then(function(obj){
-            return {code: 0, attachment: obj.toJSON()};
+            return obj.toJSON();
         })
         .nodeify(callback);
 }

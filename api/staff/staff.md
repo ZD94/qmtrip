@@ -27,9 +27,8 @@
 
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
-| code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
-| staff   | 员工信息|json
+| json数据   | 员工信息|json
 
 >. 删除员工 API.staff.deleteStaff(params, callback);
 
@@ -61,9 +60,8 @@
 
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
-| code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
-| staff   | 员工信息|json
+| json数据   | 员工信息|json
 
 >. 查询员工信息 API.staff.getStaff(id,callback);
 
@@ -74,9 +72,8 @@
 
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
-| code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
-| staff   | 员工信息|json
+| json数据   | 员工信息|json
 
 >. 查询员工信息 API.staff.getCurrentStaff(callback);
 
@@ -86,7 +83,7 @@
 
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
-| staff   | 员工信息|json
+| json数据   | 员工信息|json
 
 >. 分页查询员工信息 API.staff.listAndPaginateStaff(params, options, callback);
 
@@ -125,8 +122,7 @@
 
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
-| code     | 返回代码0正确 其他错误 |
-| staff   | 员工信息|json
+| json数据   | 员工信息|json
 
 >. 为员工减少积分 API.staff.decreaseStaffPoint(params, callback);
 
@@ -139,8 +135,7 @@
 
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
-| code     | 返回代码0正确 其他错误 |
-| staff   | 员工信息|json
+| json数据   | 员工信息|json
 
 >. 分页查询员工积分变动记录 API.staff.listAndPaginatePointChange(params, options, callback);
 

@@ -67,8 +67,7 @@ travelPolicy.updateTravelPolicy = function(id, data, callback){
     options.returning = true;
     return travalPolicyModel.update(data, options)
         .then(function(obj){
-            var travelPolicy = obj[1][0].toJSON();
-            return travelPolicy;
+            return obj[1][0].toJSON();
         })
         .nodeify(callback);
 }
@@ -87,8 +86,7 @@ travelPolicy.getTravelPolicy = function(id, callback){
     }
     return travalPolicyModel.findById(id)
         .then(function(obj){
-            var travelPolicy =  obj.toJSON();
-            return travelPolicy;
+            return obj.toJSON();
         })
         .nodeify(callback);
 }

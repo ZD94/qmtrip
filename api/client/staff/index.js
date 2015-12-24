@@ -30,15 +30,14 @@ staff.createStaff = auth.checkPermission(["user.add"],
         var user_id = this.accountId;
         return API.staff.getStaff(user_id)
             .then(function(data){
-                if(!data.code){
-                    var companyId = data.staff.companyId;
+                if(data){
+                    var companyId = data.companyId;
                     params.companyId = companyId;
                     return API.staff.createStaff(params, callback);
                 }else{
                     return API.staff.createStaff(params, callback);//员工注册的时候
                 }
             })
-            .nodeify(callback);
     });
 
 /**
@@ -69,7 +68,6 @@ staff.deleteStaff = auth.checkPermission(["user.delete"],
                         }
                     })
             })
-            .nodeify(callback);
     });
 
 /**
@@ -99,7 +97,6 @@ staff.updateStaff = auth.checkPermission(["user.edit"],
                         }
                     })
             })
-            .nodeify(callback);
     });
 
 /**
@@ -128,7 +125,6 @@ staff.getStaff = auth.checkPermission(["user.query"],
                         }
                     })
             })
-            .nodeify(callback);
     });
 
 /**
@@ -158,7 +154,6 @@ staff.listAndPaginateStaff = auth.checkPermission(["user.query"],
                 params.companyId = data.companyId;
                 return API.staff.listAndPaginateStaff(params, options, callback);
             })
-            .nodeify(callback);
     });
 
 /**
@@ -193,7 +188,6 @@ staff.listAndPaginatePointChange = function(params, options, callback){
             params.companyId = data.companyId;
             return API.staff.listAndPaginatePointChange(params, options, callback);
         })
-        .nodeify(callback);
 }
 
 /**

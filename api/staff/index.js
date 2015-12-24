@@ -158,8 +158,7 @@ staff.updateStaff = function(id, data, callback){
     }else{
         return staffModel.update(data, options)
             .then(function(obj){
-                var staff = obj[1].toJSON();
-                return staff;
+                return obj[1].toJSON();
             })
             .nodeify(callback);
     }
@@ -195,6 +194,7 @@ staff.getStaff = function(id, callback){
  * @returns {*}
  */
 staff.findOneStaff = function(params, callback){
+    var defer = Q.defer();
     var options = {};
     options.where = params;
     return staffModel.findOne(options)
@@ -203,8 +203,7 @@ staff.findOneStaff = function(params, callback){
                 defer.reject({code: -1, msg: '员工不存在'});
                 return defer.promise;
             }
-            var staff = obj.toJSON();
-            return staff;
+            return obj.toJSON();
         })
         .nodeify(callback);
 }
@@ -286,7 +285,7 @@ staff.increaseStaffPoint = function(params, options, callback) {
                         pointChange.create(pointChange, {transaction: t})
                     ])
                     .spread(function(ret1,ret2){
-                        return {code: 0, staff: ret1.toJSON()};
+                        return ret1.toJSON();
                     })
             })
 
@@ -332,7 +331,7 @@ staff.decreaseStaffPoint = function(params, options, callback) {
                         pointChange.create(pointChange, {transaction: t})
                     ])
                     .spread(function(ret1,ret2){
-                        return {code: 0, staff: ret1.toJSON()};
+                        return ret1.toJSON();
                     })
             })
 
