@@ -25,51 +25,47 @@
 
             </div>
             <div class="add_staff_block">
+
                 <div class="block_left">
+                    <div class="block_tip">
+                        {{block_tip_err}}
+                    </div>
                     <ul>
                         <li>
                             <span style="color: #f56d23;padding-right: 5px;">*</span>姓名:
-                            <input id="" type="text" placeholder="   请输入员工真实姓名"/>
+                            <input id="staffName" type="text" placeholder="请输入员工真实姓名"/>
                         </li>
                         <li>
                             <span style="color: #f56d23;padding-right: 5px;">*</span>邮箱:
-                            <input id="" type="text" placeholder="   后缀同创建人邮箱一致"/>
+                            <input id="staffEmail" type="text" placeholder="后缀同创建人邮箱一致"/>
                         </li>
                         <li>
                             手机号:
-                            <input id="" type="text" placeholder="   请输入员工手机号"/>
+                            <input id="staffTel" type="text" placeholder="请输入员工手机号"/>
                         </li>
                     </ul>
                     <ul>
                         <li>
                             部门:
-                            <select name="select" id="" class="">
-                                <option value="请选择员工所属部门">请选择员工所属部门</option>
-                                <option value="销售部">销售部</option>
-                                <option value="产品部">产品部</option>
-                            </select>
-                        </li>
+                            <input id="staffDepartment" type="text" placeholder="请输入员工所属部门"/>
                         <li>
                             差旅标准:
-                            <select name="select" id="" class="">
-                                <option value="请选择对应的差旅等级">请选择对应的差旅等级</option>
-                                <option value="销售部">销售部</option>
-                                <option value="产品部">产品部</option>
-                            </select>
+                            <select name="select" id="staffStandard" class="" ng-model="selectkey" ng-options="item.val as item.name for item in selectClass"></select>
                         </li>
                         <li>
                             <span style="color: #f56d23;padding-right: 5px;">*</span>权限:
-                            <select name="select" id="" class="">
-                                <option value="请设置权限">请设置权限</option>
-                                <option value="销售部">销售部</option>
-                                <option value="产品部">产品部</option>
+                            <select name="select" id="staffPower" class="">
+                            <option value="请选择对应的差旅等级">请选择</option>
+                            <option value="销售部">销售部</option>
+                            <option value="产品部">产品部</option>
                             </select>
+                            <!--<select name="select" id="staffPower" class="" ng-model="selectkey" ng-options="item.val as item.name for item in selectClass"></select>-->
                         </li>
                     </ul>
                     <div style="clear: both;"></div>
                 </div>
                 <div class="block_right">
-                    <a id="save">保存</a>
+                    <a id="save" ng-click="saveStaffInfo()">保存</a>
                     <a id="cancel" ng-click="cancelAdd()">取消</a>
                 </div>
                 <div style="clear: both;"></div>
