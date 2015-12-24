@@ -40,6 +40,7 @@
     	//获取页面基本信息
     	TLD.controller("MainController", ["$scope", function($scope) {
     		API.require("staff");
+            API.require("auth");
     		API.onload(function(){
     			API.staff.getCurrentStaff()
     				.then(function(ret){
@@ -49,7 +50,17 @@
     				.catch(function(err){
     					console.info(err)
     				})
+                $scope.logout = function(){
+                    API.auth.logout()
+                        .then(function(ret){
+                            window.location.href = "/auth.html#/auth/login?backurl="+encodeURIComponent(window.location.href);
+                        })
+                        .catch(function(err){
+                            console.info(err)
+                        })
+                }
     		})
+            
     	}])
     </script>
     <script type="text/javascript">
@@ -84,7 +95,11 @@
 				<div id="account_menu" class="account_menu">
 					<ul>
 						<li><a href="">修改密码</a></li>
+<<<<<<< HEAD
+						<li><a ng-click="logout()">退出</a></li>
+=======
 						<li><a href="javascript: logout();">退出</a></li>
+>>>>>>> aa845b3cba2af032d2a7f62243205256fdb9fb34
 					</ul>
 				</div>
 			</div>

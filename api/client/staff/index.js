@@ -17,11 +17,11 @@ var logger = new Logger("staff");
  */
 var staff = {};
 
-function needPermissionMiddleware(fn, needPowers) {
+function needPermissionMiddleware(fn, needPermission) {
     return function(params, callback) {
         var self = this;
         var accountId = self.accountId;
-        return API.power.checkPower({accountId: accountId, powers: needPowers})
+        return API.permit.checkPermission({accountId: accountId, permission: needPermission})
             .then(function(result) {
                 if (result.code) {
                     throw result;

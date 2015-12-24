@@ -65,19 +65,27 @@ var staff = (function(){
 
             if(commit){
                 if(!name){
-                    alert("姓名是必填项！");
+                    //alert("姓名是必填项！");
+                    $scope.block_tip_err = "姓名是必填项！";
+                    $(".block_tip").show();
                 }else if(!mail){
-                    alert("邮箱是必填项！");
+                    $scope.block_tip_err = "邮箱是必填项！";
+                    $(".block_tip").show();
                 }else if(!tel){
-                    alert("手机号是必填项！");
+                    //alert("手机号是必填项！");
+                    $scope.block_tip_err = "手机号是必填项！";
+                    $(".block_tip").show();
                 }else if(!power){
-                    alert("权限是必选项！");
+                    //alert("权限是必选项！");
+                    $scope.block_tip_err = "权限是必选项！";
+                    $(".block_tip").show();
                 }
                 alert(standard);
                 API.onload(function() {
                     API.staff.createStaff({name:name,mobile:tel,email:mail,companyId:$scope.companyId,department:department,travelLevel:standard})
                         .then(function(result){
 
+                            $scope.$apply();
                         }).catch(function (err) {
                             console.info(err);
                         }).done();
