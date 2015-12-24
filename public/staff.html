@@ -44,7 +44,7 @@
     		API.onload(function(){
     			API.staff.getCurrentStaff()
     				.then(function(ret){
-    					$scope.staff = ret.staff;
+    					$scope.staff = ret;
     					$scope.$apply();
     				})
     				.catch(function(err){
