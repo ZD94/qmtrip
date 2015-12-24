@@ -1,5 +1,56 @@
 <div class="staffhome">
 	<div class="staffuser">
-		<div class="nameicon"></div>
+		<span class="nameicon"></span>
+		<div class="staff_role">
+			<div>{{staff.name}}
+				<span ng-if="staff.travelLevel != null">{{}}</span>
+				<span ng-if="staff.roleId == 0">创建者</span>
+				<span ng-if="staff.roleId == 1">管理员</span>
+				<a href="corp.html" ng-if="staff.roleId == 0 ||staff.roleId == 1">企业管理</a>
+				<p>电子邮箱：<em>{{staff.email}}</em></p>
+				<p>联系电话：<em>{{staff.mobile}}</em></p>
+			</div>
+		</div>
+		<div class="staff_record">
+			<ul>
+				<li>
+					<a href="">
+						<strong>{{businesstimes}}</strong>
+						<span>出差记录</span>
+					</a>
+				</li>
+				<li>
+					<a href="">
+						<strong>{{staff.totalPoints}}</strong>
+						<span>积分</span>
+					</a>
+				</li>
+				<li>
+					<a href="">
+						<strong>0</strong>
+						<span>兑换</span>
+					</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="staff_menu">
+		<ul>
+			<a href=""><li>我要出差</li></a>
+			<a href=""><li>我要上传票据</li></a>
+			<a href=""><li>我要兑换礼品</li></a>
+		</ul>
+	</div>
+	<div class="staff_standards">
+		<h3>我的差旅标准</h3>
+		<div ng-if="staff.travelLevel != null">
+			<p>等级{{travelpolicy.name}}</p>
+			<p>飞机{{travelpolicy.planeLevel}}</p>
+			<p>火车{{travelpolicy.trainLevel}}</p>
+			<p>住宿{{travelpolicy.hotelLevel}}</p>
+		</div>
+		<div ng-if="staff.travelLevel == null">
+			
+		</div>
 	</div>
 </div>

@@ -4,6 +4,8 @@
 var StaffFirst = (function(){
 	API.require("company");
 	API.require("staff");
+	API.require("tripPlan");
+	API.require("travelPolicy");
 	var StaffFirst ={};
 	StaffFirst.StaffUserController = function($scope){
 		$("title").html("首页");
@@ -14,20 +16,20 @@ var StaffFirst = (function(){
 				API.staff.getCurrentStaff()
 					.then(function(ret){
 						var company_id = ret.staff.companyId;
-						console.info(ret)
-						// Q.all([
-						// 	API.company.getCompanyFundsAccount(company_id),
-						// 	API.staff.statisticStaffs({companyId:company_id})
-						// ])
-						// 	.spread(function(resutlt,num){
-						// 		$scope.funds = resutlt.fundsAccount;
-						// 		$scope.num = num.sta;
-						// 		console.info(resutlt)
-						// 		$scope.$apply();
-						// 	})
-						// 	.catch(function(err){
-						// 		console.info(err)
-						// 	})
+						var travelLevel =ret.staff.travelLevel;
+						Q.all([
+							API.tripPlan.listTripPlanOrderByCompany({status:0||1}),
+							API.travelPolicy.getTravelPolicy(travelLevel)
+						])
+						.spread(function(tripplan,travel){
+							$scope.businesstimes = tripplan.tripPlanOrders.length;
+							$scope.travelpolicy = travel.travelPolicy;
+							console.info(travel)
+							$scope.$apply();
+						})
+						.catch(function(err){
+							console.info(err)
+						})
 						$scope.$apply();
 					})
 					.catch(function(err){
