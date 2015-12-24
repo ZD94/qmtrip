@@ -48,8 +48,8 @@
     		API.onload(function(){
     			API.staff.getCurrentStaff()
     				.then(function(ret){
-    					$scope.staff = ret.staff;
-    					var company_id = ret.staff.companyId;
+    					$scope.staff = ret;
+    					var company_id = ret.companyId;
     					console.info(ret);
     					API.company.getCompany(company_id)
 		    				.then(function(company){

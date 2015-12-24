@@ -24,19 +24,19 @@
 		API.onlogin(function(){
 			var backUrl = window.location.href;
 			backUrl = encodeURIComponent(backUrl);
-			window.location.href = "#/auth/login?backurl="+backUrl;
+			window.location.href = "/staff/auth.html#/auth/login?backurl="+backUrl;
 		});
-		function logout(){
-			API.require('auth');
-			API.onload(function(){
-				API.auth.logout()
-						.then(function (data) {
-							location.reload();
-						}).catch(function(error){
-					console.log(error);
-				}).done();
-			});
-		};
+		// function logout(){
+		// 	API.require('auth');
+		// 	API.onload(function(){
+		// 		API.auth.logout()
+		// 				.then(function (data) {
+		// 					location.reload();
+		// 				}).catch(function(error){
+		// 			console.log(error);
+		// 		}).done();
+		// 	});
+		// };
     	//获取页面基本信息
     	TLD.controller("MainController", ["$scope", function($scope) {
     		API.require("staff");
@@ -53,7 +53,7 @@
                 $scope.logout = function(){
                     API.auth.logout()
                         .then(function(ret){
-                            window.location.href = "/auth.html#/auth/login?backurl="+encodeURIComponent(window.location.href);
+                            window.location.href = "/staff/auth.html#/auth/login?backurl="+encodeURIComponent(window.location.href);
                         })
                         .catch(function(err){
                             console.info(err)
@@ -95,11 +95,8 @@
 				<div id="account_menu" class="account_menu">
 					<ul>
 						<li><a href="">修改密码</a></li>
-<<<<<<< HEAD
 						<li><a ng-click="logout()">退出</a></li>
-=======
-						<li><a href="javascript: logout();">退出</a></li>
->>>>>>> aa845b3cba2af032d2a7f62243205256fdb9fb34
+						<!-- <li><a href="javascript: logout();">退出</a></li> -->
 					</ul>
 				</div>
 			</div>

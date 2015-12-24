@@ -63,6 +63,13 @@ var auth=(function(){
                 })
             }
         }
+        API.onload(function(){
+            $('#pwd').keydown(function(e){
+                if(e.keyCode==13){
+                   $scope.checkLogin(); //处理事件
+                }
+            })
+        })
     }
     auth.RegisterController = function($scope) {
         var pCode = $('#picCode').val();
