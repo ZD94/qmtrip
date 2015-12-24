@@ -31,5 +31,3 @@ API.init(path.join(__dirname, '../api'), config.api)
         console.error(e.stack?e.stack:e);
         process.exit();
     });
-
-require("../api/index.test");
