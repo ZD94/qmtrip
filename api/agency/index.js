@@ -247,7 +247,8 @@ agency.createAgencyUser = function(data, callback){
     }
     var mobile = data.mobile;
     var email = data.email;
-    var account = {email: data.email, mobile: data.mobile, pwd: "123456"};//初始密码暂定123456
+    var pwd = md5('123456');
+    var account = {email: data.email, mobile: data.mobile, pwd: pwd};//初始密码暂定123456
     var agencyUser = data;
 
     return API.auth.findOneAcc({$or: [{mobile: mobile}, {email: email}]})

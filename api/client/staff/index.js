@@ -136,7 +136,6 @@ staff.getStaff = auth.checkPermission(["user.query"],
  */
 staff.getCurrentStaff = function(callback){
     var self = this;
-    console.info(self.accountId);
     return API.staff.getStaff(self.accountId, callback);
 }
 
