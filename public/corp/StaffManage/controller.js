@@ -9,6 +9,20 @@ var staff = (function(){
 
     staff.StaffInfoManageController = function($scope){
 
+
+        //API.onload(function(){
+        //    API.staff.listAndPaginateStaff({companyId:$scope.companyId})
+        //        .then(function(staff){
+        //            $scope.staff = staff.items;
+        //            $scope.$apply();
+        //        })
+        //        .catch(function(err){
+        //            //console.info("error");
+        //            console.info(err);
+        //        })
+        //        .done();
+        //})
+
         $scope.addStaff = function() {//添加员工信息
             $("#add").addClass("onCheck");
             $(".add_staff").show();
@@ -23,16 +37,15 @@ var staff = (function(){
             {val:"",name:"请选择对应的差旅等级"}
         ]
         API.onload(function(){
-            console.info("API.onload");
             Q.all([
                 API.staff.getCurrentStaff(),//qh获取当前登录人员的企业id
-                API.travelPolicy.getAllTravelPolicy({columns:name})//获取当前所有的差旅标准名称
+                API.travelPolicy.getAllTravelPolicy({columns:name}),//获取当前所有的差旅标准名称
+                API.staff.listAndPaginateStaff({companyId:$scope.companyId})//加载所有的员工记录
             ])
-                .spread(function(staff, result){
-                    console.info(staff);
-                    console.info(result);
+                .spread(function(staff, travelPolicies,staffinfo){
+                    console.info(staffinfo);
                     $scope.companyId = staff.companyId;
-                    var arr = result.travelPolicies;
+                    var arr = travelPolicies;
                     var i ;
                     for(i=0; i<arr.length; i++){
                         var name = arr[i].name;
@@ -40,11 +53,15 @@ var staff = (function(){
                         var id = arr[i].id;
                         $scope.selectClass.push({val:id,name:name});//放入option中
                         //console.info(id);
+
                     }
+                    $scope.staff = staffinfo.items;
+
+                    //return $scope.companyId;
                     $scope.$apply();
                 })
                 .catch(function(err){
-                    console.info("error");
+                    //console.info("error");
                     console.info(err);
                 })
 
@@ -76,11 +93,12 @@ var staff = (function(){
                     $scope.block_tip_err = "权限是必选项！";
                     $(".block_tip").show();
                 }
-                alert(standard);
+                //alert(standard);
                 API.onload(function() {
+                    //console.info($scope.companyId);
                     API.staff.createStaff({name:name,mobile:tel,email:mail,companyId:$scope.companyId,department:department,travelLevel:standard,roleId:power})
                         .then(function(result){
-                            console.info(result);
+                            //console.info(result);
                             $scope.$apply();
                         }).catch(function (err) {
                             console.info(err);
