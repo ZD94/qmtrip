@@ -50,11 +50,11 @@
     				.then(function(ret){
     					$scope.staff = ret;
     					var company_id = ret.companyId;
-    					console.info(ret);
+//    					console.info(ret);
     					API.company.getCompany(company_id)
 		    				.then(function(company){
 		    					$scope.company = company;
-		    					console.info(company);
+//		    					console.info(company);
 		    					$scope.$apply();
 		    				})
 		    				.catch(function(err){
@@ -75,7 +75,7 @@
     		var $that = $(this).closest("li");
     		$(".left_nav li").removeClass("on");
     		$that.addClass("on");
-    		console.info($that)
+//    		console.info($that)
     	})
     	function resize(){
     		var ww = $(window).width();

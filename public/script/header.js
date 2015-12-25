@@ -14,8 +14,7 @@ $(function(){
 	})
 	function minHeight(){
 		var wh = $(window).height();
-		$(".staff_content").css("min-height",wh-81-76); //减去的值为当前页面header及footer
-		$(".business_content").css("min-height",wh-81-76); //减去的值为当前页面header及footer
+		$(".staff_content").css("min-height",wh-81-60); //减去的值为当前页面header及footer
 		$(".corp_box").css("min-height",wh-61-60-20); //减去的值为当前页面header及footer  20为padding值
 	}
 })

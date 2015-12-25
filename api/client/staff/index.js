@@ -147,12 +147,16 @@ staff.getCurrentStaff = function(callback){
  */
 staff.listAndPaginateStaff = auth.checkPermission(["user.query"],
     function(params, options, callback) {
+        console.info("**************************************");
+        console.info("listAndPaginateStaff");
         var user_id = this.accountId;
         return API.staff.getStaff(user_id)
             .then(function(data){
                 params.companyId = data.companyId;
-                return API.staff.listAndPaginateStaff(params, options, callback);
+                console.info("API.staff.getStaff(user_id)");
+                return API.staff.listAndPaginateStaff(params, options);
             })
+            .nodeify(callback);
     });
 
 /**

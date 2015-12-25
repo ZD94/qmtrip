@@ -24,7 +24,7 @@ var roles = {
     admin: {
         name: '管理员',
         inherit: ['staff', 'finance'],
-        permission: ['user.add', 'user.delete', 'user.edit', 'company.query', 'company.edit', 'user.role']
+        permission: ['user.query', 'user.add', 'user.delete', 'user.edit', 'company.query', 'company.edit', 'user.role']
     },
     owner: {
         name: '创建人',
@@ -88,15 +88,14 @@ updateRole(agency_roles);
 function getRoleOfAccount(data) {
     var accountId = data.accountId;
     return API.staff.getStaff(data.accountId)
-        .then(function(result) {
-            return API.company.getCompany({companyId: result.staff.companyId});
+        .then(function(staff) {
+            return API.company.getCompany({companyId: staff.companyId});
         })
-        .then(function(result) {
-            var company = result.company;
+        .then(function(company) {
             if (company.createUser == accountId) {
-                return role.owner;
+                return roles.owner;
             }
-            return role.staff;
+            return roles.staff;
         });
 }
 

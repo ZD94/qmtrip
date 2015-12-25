@@ -238,7 +238,10 @@ staff.listAndPaginateStaff = function(params, options, callback){
     options.where = params;
     return staffModel.findAndCountAll(options)
         .then(function(result){
-            var pg = new Paginate(page, perPage, result.count, result.rows);
+            var rows = result.rows.map(function(item){
+                return item.toJSON();
+            })
+            var pg = new Paginate(page, perPage, result.count, rows);
             return pg;
         })
         .nodeify(callback);
