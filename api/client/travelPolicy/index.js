@@ -185,6 +185,6 @@ travelPolicy.getAllTravelPolicy = function(options, callback){
                 defer.reject({code: -1, msg: '无权限'});
                 return defer.promise;
             }
-        })
+        }).nodeify(callback);
 };
 module.exports = travelPolicy;
