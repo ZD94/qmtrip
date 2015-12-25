@@ -20,10 +20,11 @@ var StaffFirst = (function(){
 						var str = ret.name;
 						$scope.firstname=str.substring(0,2);
 						Q.all([
-							API.tripPlan.listTripPlanOrderByCompany({status:0||1}),
+							API.tripPlan.listTripPlanOrderByCompany({$or: [{status: 0}, {status: 1}]}),
 							API.travelPolicy.getTravelPolicy(travelLevel)
 						])
 						.spread(function(tripPlanOrders,travelPolicy){
+							console.info(travelPolicy);
 							$scope.businesstimes = tripPlanOrders.length;
 							$scope.travelpolicy = travelPolicy;
 							$scope.$apply();

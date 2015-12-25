@@ -98,12 +98,22 @@ travelPolicy.getTravelPolicy = function(id, callback){
             if(!id){
                 if(data.companyId){
                     //若该员工没有指定差旅标准 默认返回该企业最早添加的差旅标准
-                    options.where.companyId = data.companyId;//只允许查询该企业下的差旅标准
+                    var options = {
+                        where: {
+                            companyId: data.companyId //只允许查询该企业下的差旅标准
+                        }
+                    };
                     options.order = "create_at desc";//[["create_at", "desc"]]
                     return API.travelPolicy.getAllTravelPolicy(options)
                         .then(function(obj){
-                            if(obj){
-                               return obj[0].toJson();
+                            if(obj && obj.length > 0){
+                               return obj[0].toJSON();
+                            }else{
+                                //若该企业没有差旅标准默认返回系统默认差旅标准
+                                return API.travelPolicy.getTravelPolicy('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a')
+                                    .then(function(tp){
+                                        return tp;
+                                    })
                             }
                         })
                 }else{
@@ -124,7 +134,7 @@ travelPolicy.getTravelPolicy = function(id, callback){
                         }
                     })
             }
-        })
+        }).nodeify(callback);
 };
 
 /**
