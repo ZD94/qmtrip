@@ -41,16 +41,16 @@ describe("api/client/travelPolicy.js", function() {
             });
         })
     })*/
-    describe("API.travelPolicy.getAllTravelPolicy", function() {
-        it("API.travelPolicy.getAllTravelPolicy", function(done) {
-            API.client.travelPolicy.getAllTravelPolicy({}, function(err, result) {
-                assert.equal(err, null);
-                console.log(result);
-//                console.log(result.items);//item dataValues里存放的才是记录信息
-                done();
-            });
-        })
-    })
+//    describe("API.travelPolicy.getAllTravelPolicy", function() {
+//        it("API.travelPolicy.getAllTravelPolicy", function(done) {
+//            API.client.travelPolicy.getAllTravelPolicy({}, function(err, result) {
+//                assert.equal(err, null);
+//                console.log(result);
+////                console.log(result.items);//item dataValues里存放的才是记录信息
+//                done();
+//            });
+//        })
+//    })
     //更新差旅标准信息
     /*describe("API.travelPolicy.updateTravelPolicy", function() {
         it("API.travelPolicy.updateTravelPolicy", function(done) {

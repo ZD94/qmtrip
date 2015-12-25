@@ -4,11 +4,13 @@
 
 var travelBudget = require("./index");
 var assert = require("assert");
+var moment = require("moment");
 
-describe("API.travelBudget", function() {
-
+describe("api/client/travelBudget.js", function() {
+    var outboundDate = moment().add("1", "months").format("YYYY-MM-DD");
     it("#getTravelPolicyBudget should be ok", function(done) {
-        travelBudget.getTravelPolicyBudget("北京", function(err, result) {
+        this.timeout(5000);
+        travelBudget.getTravelPolicyBudget({originPlace: "CT_131", destinationPlace: "CT_289", outboundDate: outboundDate}, function(err, result) {
             if (err) {
                 throw err;
             }
@@ -23,5 +25,16 @@ describe("API.travelBudget", function() {
             assert.equal(hotel, true);
             done();
         })
+    });
+
+    it("#getTravelPolicyBudget should throw error without air information", function(done) {
+        this.timeout(5000);
+        travelBudget.getTravelPolicyBudget({originPlace: "abcd", destinationPlace: "CT_289", outboundDate: outboundDate}, function(err, result) {
+            if (err) {
+                done();
+            }  else {
+                throw new Error("not throw error");
+            }
+        });
     })
 });

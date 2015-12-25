@@ -13,14 +13,14 @@ describe("api/client/agency.js", function() {
         mobile: "13121534026"
     }
 
-    describe("API.agency.createAgency", function() {
-        it("API.agency.createAgency", function(done) {
-            API.client.agency.createAgency({}, function(err, result) {
-                assert.equal(err, null);
-                done();
-            });
-        })
-    })
+    //describe("API.agency.createAgency", function() {
+    //    it("API.agency.createAgency", function(done) {
+    //        API.client.agency.createAgency({}, function(err, result) {
+    //            assert.equal(err, null);
+    //            done();
+    //        });
+    //    })
+    //})
 
     //创建代理商用户
     /*describe("API.agency.createAgencyUser", function() {
