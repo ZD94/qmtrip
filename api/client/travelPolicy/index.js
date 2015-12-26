@@ -95,16 +95,46 @@ travelPolicy.getTravelPolicy = function(id, callback){
     var user_id = this.accountId;
     return API.staff.getStaff(user_id)
         .then(function(data){
-            return API.travelPolicy.getTravelPolicy(id)
-                .then(function(tp){
-                    if(tp.companyId == data.companyId){
-                        return {code: 0, travelPolicy: tp}
-                    }else{
-                        defer.reject({code: -1, msg: '无权限'});
-                        return defer.promise;
-                    }
-                })
-        })
+            if(!id){
+                if(data.companyId){
+                    //若该员工没有指定差旅标准 默认返回该企业最早添加的差旅标准
+                    var options = {
+                        where: {
+                            companyId: data.companyId //只允许查询该企业下的差旅标准
+                        }
+                    };
+                    options.order = "create_at desc";//[["create_at", "desc"]]
+                    return API.travelPolicy.getAllTravelPolicy(options)
+                        .then(function(obj){
+                            if(obj && obj.length > 0){
+                               return obj[0].toJSON();
+                            }else{
+                                //若该企业没有差旅标准默认返回系统默认差旅标准
+                                return API.travelPolicy.getTravelPolicy('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a')
+                                    .then(function(tp){
+                                        return tp;
+                                    })
+                            }
+                        })
+                }else{
+                    //若该企业没有差旅标准默认返回系统默认差旅标准
+                    return API.travelPolicy.getTravelPolicy('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a')
+                        .then(function(tp){
+                            return tp;
+                        })
+                }
+            }else{
+                return API.travelPolicy.getTravelPolicy(id)
+                    .then(function(tp){
+                        if(tp.companyId == data.companyId){
+                            return tp;
+                        }else{
+                            defer.reject({code: -1, msg: '无权限'});
+                            return defer.promise;
+                        }
+                    })
+            }
+        }).nodeify(callback);
 };
 
 /**
@@ -147,15 +177,14 @@ travelPolicy.getAllTravelPolicy = function(options, callback){
         delete options.columns;
     }
     return API.staff.getStaff(user_id)
-        .then(function(data){
-            if(data){
-                var staff = data.staff;
+        .then(function(staff){
+            if(staff){
                 options.where.companyId = staff.companyId;//只允许查询该企业下的差旅标准
                 return API.travelPolicy.getAllTravelPolicy(options, callback);
             }else{
                 defer.reject({code: -1, msg: '无权限'});
                 return defer.promise;
             }
-        })
+        }).nodeify(callback);
 };
 module.exports = travelPolicy;

@@ -63,6 +63,13 @@ var auth=(function(){
                 })
             }
         }
+        API.onload(function(){
+            $('#pwd').keydown(function(e){
+                if(e.keyCode==13){
+                   $scope.checkLogin(); //处理事件
+                }
+            })
+        })
     }
     auth.RegisterController = function($scope) {
         var pCode = $('#picCode').val();
@@ -335,22 +342,18 @@ var auth=(function(){
                         return false;
                     }
 
-                    API.auth.isBlackDomain({domain: domain})
+                    API.auth.checkBlackDomain({domain: domain})
+                        .catch(function(err){
+                            alert("邮箱后缀不合法或者已被使用");
+                            throw {};
+                        })
                         .then(function(result) {
-                            if (result.code) {
-                                alert("邮箱后缀不合法或者已被使用");
-                                return;
-                            }
-                            return API.auth.registryCompany({companyName:cName,name:name,email:mail,mobile:mobile,pwd:pwd,msgCode:mCode,msgTicket:msgTicket,picCode:pCode,picTicket:picTicket})
-                                .then(function(result){
-                                    //console.info(result);
-                                    if(result.code == 0){
-                                        alert("注册成功");
-                                        window.location.href = "#/auth/login";
-                                        //window.location.href = "#/auth/corplaststep";
-                                    }
-                                })
-
+                            return API.auth.registryCompany({companyName:cName,name:name,email:mail,mobile:mobile,pwd:pwd,msgCode:mCode,msgTicket:msgTicket,picCode:pCode,picTicket:picTicket});
+                        })
+                        .then(function(){
+                            alert("注册成功");
+                            window.location.href = "#/auth/login";
+                            //window.location.href = "#/auth/corplaststep";
                         })
                         .catch(function(err){
                             if (err.msg) {

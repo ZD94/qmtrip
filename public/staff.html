@@ -6,6 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="/staff/css/public.css">
 	<link rel="stylesheet" type="text/css" href="/staff/css/businesstravel.css">
 	<link rel="stylesheet" type="text/css" href="/staff/css/users.css">
+	<link rel="stylesheet" type="text/css" href="/staff/css/auth.css"/>
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
 	<script type="text/javascript">
         var jQuery = $ = require('jquery');
@@ -26,43 +27,47 @@
 		API.onlogin(function(){
 			var backUrl = window.location.href;
 			backUrl = encodeURIComponent(backUrl);
-			window.location.href = "#/auth/login?backurl="+backUrl;
+			window.location.href = "/staff.html#/auth/login?backurl="+backUrl;
 		});
-		function logout(){
-			API.require('auth');
-			API.onload(function(){
-				API.auth.logout()
-						.then(function (data) {
-							location.reload();
-						}).catch(function(error){
-					console.log(error);
-				}).done();
-			});
-		};
+		// function logout(){
+		// 	API.require('auth');
+		// 	API.onload(function(){
+		// 		API.auth.logout()
+		// 				.then(function (data) {
+		// 					location.reload();
+		// 				}).catch(function(error){
+		// 			console.log(error);
+		// 		}).done();
+		// 	});
+		// };
     	//获取页面基本信息
     	TLD.controller("MainController", ["$scope", function($scope) {
-    		API.require("staff");
             API.require("auth");
-    		API.onload(function(){
-    			API.staff.getCurrentStaff()
-    				.then(function(ret){
-    					$scope.staff = ret.staff;
-    					$scope.$apply();
-    				})
-    				.catch(function(err){
-    					console.info(err)
-    				})
-                $scope.logout = function(){
-                    API.auth.logout()
-                        .then(function(ret){
-                            window.location.href = "/auth.html#/auth/login?backurl="+encodeURIComponent(window.location.href);
-                        })
-                        .catch(function(err){
-                            console.info(err)
-                        })
-                }
-    		})
-            
+			API.require("staff", function(err, mod){ //API.require 使用回调函数时,不会导致页面跳转登录
+				if(err || !mod){
+					//console.log('load staff err:', err);
+					return;
+				}
+				API.staff.getCurrentStaff()
+						.then(function(ret){
+							$scope.staff = ret;
+							$scope.$apply();
+						})
+						.catch(function(err){
+							console.info(err)
+						});
+			});
+			$scope.logout = function(){
+				if(!API.auth)
+					return;
+				API.auth.logout()
+						.then(function(ret){
+							window.location.href = "/staff.html#/auth/login?backurl="+encodeURIComponent(window.location.href);
+						})
+						.catch(function(err){
+							console.info(err)
+						})
+			};
     	}])
     </script>
     <script type="text/javascript">
@@ -104,7 +109,7 @@
 		</div>
 	</div>
 	<div class="staff_content">
-		<div class="s_contentmain" id="angular-view" ng-view>
+		<div class="s_contentmain" id="angular-view" ui-view>
 		</div>
 	</div>
 	<div class="footer">

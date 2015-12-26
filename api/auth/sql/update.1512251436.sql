@@ -1,0 +1,1 @@
+ALTER TABLE auth.accounts ADD type integer default 1;

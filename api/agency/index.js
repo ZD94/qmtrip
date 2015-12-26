@@ -37,7 +37,6 @@ agency.registerAgency = function(params, callback){
             var email = params.email;
             var account = {email: email, mobile: mobile, pwd: pwd};
             var agencyUser = {
-                id: agencyId,
                 agencyId: agencyId,
                 name: userName,
                 mobile: mobile,
@@ -46,10 +45,7 @@ agency.registerAgency = function(params, callback){
             return API.auth.findOneAcc({$or: [{mobile: mobile}, {email: email}]})
                 .then(function(ret){
                     if(ret.code){
-                        return API.auth.newAccount(account)
-                            .then(function(acc){
-                                return acc.account;
-                            })
+                        return API.auth.newAccount(account);
                     }else{
                         return ret.account;
                     }
@@ -257,10 +253,7 @@ agency.createAgencyUser = function(data, callback){
     return API.auth.findOneAcc({$or: [{mobile: mobile}, {email: email}]})
         .then(function(ret){
             if(ret.code){
-                return API.auth.newAccount(account)
-                    .then(function(acc){
-                        return acc.account;
-                    })
+                return API.auth.newAccount(account);
             }else{
                 return ret.account;
             }

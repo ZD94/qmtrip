@@ -18,7 +18,6 @@ var config = require('../../config');
 var fs = require('fs');
 var Paginate = require("../../common/paginate").Paginate;
 var logger = new Logger("staff");
-var moment = require("moment");
 //var auth = require("../auth/index");
 //var travelPolicy = require("../travelPolicy/index");
 var staff = {};
@@ -59,29 +58,24 @@ staff.createStaff = function(data, callback){
         defer.reject({code: -4, msg: "所属企业不能为空"});
         return defer.promise.nodeify(callback);
     }
-    var accData = {email: data.email, mobile: data.mobile, pwd: "123456"};//初始密码暂定123456
-    return Q.all([])
+    return Q()
         .then(function() {
             if (accountId) {
                 data.id = accountId;
                 return data;
-            } else {
-                return API.auth.newAccount(accData)
-                    .then(function(result){
-                        if (result.code) {
-                            throw result;
-                        }
-                        var account = result.data;
-                        data.id = account.id;
-                        return data;
-                    })
             }
+            var accData = {email: data.email, mobile: data.mobile, pwd: "123456"};//初始密码暂定123456
+            return API.auth.newAccount(accData)
+                .then(function(account){
+                    data.id = account.id;
+                    return data;
+                });
         })
         .then(function(staff) {
             return staffModel.create(staff)
                 .then(function(staff) {
                     return staff.toJSON();
-                })
+                });
         })
         .nodeify(callback);
 }
@@ -158,8 +152,7 @@ staff.updateStaff = function(id, data, callback){
     }else{
         return staffModel.update(data, options)
             .then(function(obj){
-                var staff = obj[1].toJSON();
-                return staff;
+                return obj[1].toJSON();
             })
             .nodeify(callback);
     }
@@ -195,6 +188,7 @@ staff.getStaff = function(id, callback){
  * @returns {*}
  */
 staff.findOneStaff = function(params, callback){
+    var defer = Q.defer();
     var options = {};
     options.where = params;
     return staffModel.findOne(options)
@@ -203,8 +197,7 @@ staff.findOneStaff = function(params, callback){
                 defer.reject({code: -1, msg: '员工不存在'});
                 return defer.promise;
             }
-            var staff = obj.toJSON();
-            return staff;
+            return obj.toJSON();
         })
         .nodeify(callback);
 }
@@ -245,7 +238,10 @@ staff.listAndPaginateStaff = function(params, options, callback){
     options.where = params;
     return staffModel.findAndCountAll(options)
         .then(function(result){
-            var pg = new Paginate(page, perPage, result.count, result.rows);
+            var rows = result.rows.map(function(item){
+                return item.toJSON();
+            })
+            var pg = new Paginate(page, perPage, result.count, rows);
             return pg;
         })
         .nodeify(callback);
@@ -286,7 +282,7 @@ staff.increaseStaffPoint = function(params, options, callback) {
                         pointChange.create(pointChange, {transaction: t})
                     ])
                     .spread(function(ret1,ret2){
-                        return {code: 0, staff: ret1.toJSON()};
+                        return ret1.toJSON();
                     })
             })
 
@@ -332,7 +328,7 @@ staff.decreaseStaffPoint = function(params, options, callback) {
                         pointChange.create(pointChange, {transaction: t})
                     ])
                     .spread(function(ret1,ret2){
-                        return {code: 0, staff: ret1.toJSON()};
+                        return ret1.toJSON();
                     })
             })
 

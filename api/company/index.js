@@ -57,7 +57,7 @@ company.createCompany = function(params, callback){
  * @param {Function} callback 可选回调函数
  * @return {Promise}
  */
-company.isBlackDomain = function(params, callback) {
+company.checkBlackDomain = function(params, callback) {
     var domain = params.domain;
     var defer = Q.defer();
     if (!domain) {
@@ -68,11 +68,10 @@ company.isBlackDomain = function(params, callback) {
     return Models.BlackDomain.findOne({where: {domain: domain}})
         .then(function(result) {
             if (result) {
-                return {code: -1, msg: "域名不能使用"}
+                throw {code: -1, msg: "域名不能使用"}
             }
-            return {code: 0, msg: "ok"};
+            return true;
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 

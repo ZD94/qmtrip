@@ -48,13 +48,13 @@
     		API.onload(function(){
     			API.staff.getCurrentStaff()
     				.then(function(ret){
-    					$scope.staff = ret.staff;
-    					var company_id = ret.staff.companyId;
-    					console.info(ret);
+    					$scope.staff = ret;
+    					var company_id = ret.companyId;
+//    					console.info(ret);
     					API.company.getCompany(company_id)
 		    				.then(function(company){
-		    					$scope.company = company.company;
-		    					console.info(company);
+		    					$scope.company = company;
+//		    					console.info(company);
 		    					$scope.$apply();
 		    				})
 		    				.catch(function(err){
@@ -75,7 +75,7 @@
     		var $that = $(this).closest("li");
     		$(".left_nav li").removeClass("on");
     		$that.addClass("on");
-    		console.info($that)
+//    		console.info($that)
     	})
     	function resize(){
     		var ww = $(window).width();
@@ -128,7 +128,7 @@
 		</div>
 		<div class="corp_box">
 			<div class="c_boxmain">
-				<div id="angular-view" ng-view></div>
+				<div id="angular-view" ui-view></div>
 			</div>
 		</div>
 		<div class="corp_m_footer">

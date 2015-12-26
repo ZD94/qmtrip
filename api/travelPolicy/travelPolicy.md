@@ -27,9 +27,8 @@
 
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
-| code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
-| travelPolicy   | 差旅标准信息|json
+| json数据   | 差旅标准信息|
 
 >. 删除差旅标准 API.travelPolicy.deleteTravelPolicy(params, callback);
 
@@ -61,9 +60,8 @@
 
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
-| code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
-| travelPolicy   | 差旅标准信息|json
+| json数据   | 差旅标准信息|json
 
 >. 查询差旅标准信息 API.travelPolicy.getTravelPolicy(id,callback);
 
@@ -74,9 +72,8 @@
 
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
-| code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
-| travelPolicy   | 差旅标准信息|json
+| json数据   | 差旅标准信息|json
 
 >. 分页查询差旅标准信息 API.travelPolicy.listAndPaginateTravelPolicy(params, options, callback);
 

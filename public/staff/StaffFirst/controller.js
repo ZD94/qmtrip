@@ -15,16 +15,18 @@ var StaffFirst = (function(){
 			API.onload(function(){
 				API.staff.getCurrentStaff()
 					.then(function(ret){
-						var company_id = ret.staff.companyId;
-						var travelLevel =ret.staff.travelLevel;
+						var company_id = ret.companyId;
+						var travelLevel =ret.travelLevel;
+						var str = ret.name;
+						$scope.firstname=str.substring(0,2);
 						Q.all([
-							API.tripPlan.listTripPlanOrderByCompany({status:0||1}),
+							API.tripPlan.listTripPlanOrderByCompany({$or: [{status: 0}, {status: 1}]}),
 							API.travelPolicy.getTravelPolicy(travelLevel)
 						])
-						.spread(function(tripplan,travel){
-							$scope.businesstimes = tripplan.tripPlanOrders.length;
-							$scope.travelpolicy = travel.travelPolicy;
-							console.info(travel)
+						.spread(function(tripPlanOrders,travelPolicy){
+							console.info(travelPolicy);
+							$scope.businesstimes = tripPlanOrders.length;
+							$scope.travelpolicy = travelPolicy;
 							$scope.$apply();
 						})
 						.catch(function(err){

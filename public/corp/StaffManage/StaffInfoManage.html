@@ -54,11 +54,11 @@
                         <li>
                             <span style="color: #f56d23;padding-right: 5px;">*</span>权限:
                             <select name="select" id="staffPower" class="">
-                            <option value="请选择对应的差旅等级">请选择</option>
-                            <option value="销售部">销售部</option>
-                            <option value="产品部">产品部</option>
+                                <option value="">请设置权限</option>
+                                <option value="2">管理员</option>
+                                <option value="3">财务人员</option>
+                                <option value="1">普通员工</option>
                             </select>
-                            <!--<select name="select" id="staffPower" class="" ng-model="selectkey" ng-options="item.val as item.name for item in selectClass"></select>-->
                         </li>
                     </ul>
                     <div style="clear: both;"></div>
@@ -78,17 +78,19 @@
                 <td>姓名</td>
                 <td>邮箱</td>
                 <td>手机号</td>
+                <td>部门</td>
                 <td>差旅标准</td>
                 <td>权限</td>
                 <td>操作</td>
             </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+            <tr ng-repeat="item in staff">
+                <td>{{item.name}}</td>
+                <td>{{item.email}}</td>
+                <td>{{item.mobile}}</td>
+                <td>{{item.department}}</td>
+                <td>{{item.travelLevel}}</td>
+                <td>{{item.roleId}}</td>
+                <td><span>修改</span>/<span>删除</span></td>
             </tr>
         </table>
     </div>

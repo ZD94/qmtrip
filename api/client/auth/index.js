@@ -69,7 +69,7 @@ auth.bindMobile =API.auth.bindMobile;
 
 
 /**
- * @method isBlackDomain
+ * @method checkBlackDomain
  *
  * 是否黑名单
  *
@@ -78,7 +78,7 @@ auth.bindMobile =API.auth.bindMobile;
  * @param {Function} callback
  * @return {Promise} {code: 0}, {code: -1, msg: "域名已占用或者不合法"}
  */
-auth.isBlackDomain = API.company.isBlackDomain;
+auth.checkBlackDomain = API.company.checkBlackDomain;
 
 /**
  * @method registryCompany
@@ -144,66 +144,39 @@ auth.registryCompany = function(params, callback) {
         return defer.promise.nodeify(callback);
     }
 
-    var validatePicCheckCode = Q.denodeify(API.checkcode.validatePicCheckCode);
-    var validateMsgCheckCode = Q.denodeify(API.checkcode.validateMsgCheckCode);
-    var createCompany = Q.denodeify(API.company.createCompany);
-    var createStaff = Q.denodeify(API.staff.createStaff);
-    return validatePicCheckCode({code: picCode, ticket: picTicket})
-        .then(function(result) {
-            if (result.code) {
-                throw result;
-            }
-            return true;
+    return Q()
+        .then(function() {
+            return API.checkcode.validatePicCheckCode({code: picCode, ticket: picTicket});
         })
         .then(function() {
-            return validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile})
-                .then(function(result) {
-                    if (result.code) {
-                        throw result;
-                    }
-                    return true;
-                })
+            return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
         })
         .then(function(){
             var domain = email.split(/@/)[1];
-            return API.company.isBlackDomain({domain: domain})
-                .then(function(result) {
-                    if (result.code) {
-                        throw result;
-                    } else {
-                        return true;
-                    }
-                })
-                .then(function() {
-                    return API.auth.newAccount({mobile: mobile, email: email, pwd: pwd})
-                        .then(function(result) {
-                            if (result.code) {
-                                throw result;
-                            }
-
-                            var account = result.data;
-                            var companyId = uuid.v1();
-                            var staffId = account.id;
-                            return Q.all([
-                                createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain}),
-                                createStaff({email: email, mobile: mobile, name: name, companyId: companyId, accountId: account.id, roleId: 0})
-                            ])
-                                .then(function(ret){
-                                    return {code: 0, msg: 'ok'};
-                                })
-                                .catch(function(err){
-                                    API.company.deleteCompany({companyId: companyId, userId: account.id});
-                                    API.staff.deleteStaff({id: staffId});
-                                    defer.reject(L.ERR.SYSTEM_ERROR);
-                                    return defer.promise;
-                                })
-                        })
-                        .then(function(result) {
-                            return result;
-                        })
-                })
+            return API.company.checkBlackDomain({domain: domain});
         })
-        .catch(errorHandle)
+        .then(function() {
+            return API.auth.newAccount({mobile: mobile, email: email, pwd: pwd});
+        })
+        .then(function(account) {
+            var companyId = uuid.v1();
+            return Q.all([
+                    API.company.createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain}),
+                    API.staff.createStaff({accountId: account.id, companyId: companyId, email: email, mobile: mobile, name: name, roleId: 0})
+                ]);
+        })
+        .then(function(){
+            return;
+        })
+        .catch(function(err){
+            return Q.all([
+                    API.company.deleteCompany({companyId: companyId, userId: account.id}),
+                    API.staff.deleteStaff({id: account.id})
+                ])
+                .then(function(){
+                    return L.ERR.SYSTEM_ERROR;
+                });
+        })
         .nodeify(callback);
 }
 
