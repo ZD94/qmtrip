@@ -3,11 +3,13 @@
  */
 
 var Q = require("q");
+var moment = require("moment");
 var sequelize = require("common/model").importModel("./models");
 var Models = sequelize.models;
 var PlanOrder = Models.TripPlanOrder;
 var ConsumeDetails = Models.ConsumeDetails;
 var TripOrderLogs = Models.TripOrderLogs;
+var ConsumeDetailsLogs = Models.ConsumeDetailsLogs;
 var uuid = require("node-uuid");
 var L = require("common/language");
 var Logger = require('common/logger');
@@ -303,7 +305,7 @@ tripPlan.deleteTripPlanOrder = function(params, callback){
  */
 tripPlan.deleteConsumeDetail = function(params, callback){
     var defer = Q.defer();
-    return checkParams(['userId', 'id'])
+    return checkParams(['userId', 'id'], params)
         .then(function(){
             var id = params.id;
             var userId = params.userId;
@@ -327,6 +329,99 @@ tripPlan.deleteConsumeDetail = function(params, callback){
         .nodeify(callback);
 }
 
+/**
+ * 上传票据
+ * @param params
+ * @param params.userId 用户id
+ * @param params.consumeId 消费详情id
+ * @param params.picture 新上传的票据md5key
+ * @param callback
+ * @returns {*}
+ */
+tripPlan.uploadInvoice = function(params, callback){
+    var defer = Q.defer();
+    return checkParams(['userId', 'consumeId', 'picture'], params)
+        .then(function(code){
+            var account_id = params.userId;
+            var id = params.consumeId;
+            var picture = params.picture;
+            return ConsumeDetails.findOne({where: {id: id, account_id: account_id}})
+                .then(function(custome){
+                    if(custome){
+                        custome = custome.toJSON();
+                        var invoiceJson = custome.invoice;
+                        var times = invoiceJson.length ? invoiceJson.length+1 : 1;
+                        /*if(invoiceJson && invoiceJson.length > 0){
+                            invoiceJson[invoiceJson.length-1].status = custome.status;
+                            invoiceJson[invoiceJson.length-1].remark = custome.audit_remark;
+                        }*/
+                        var currentInvoice = {times:times, picture:picture, create_at:moment().format('YYYY-MM-DD HH:mm'), status:0, remark: '', approve_at: ''};
+                        invoiceJson.push(currentInvoice);
+                        var updates = {newInvoice: picture, invoice: JSON.stringify(invoiceJson), updateAt: moment().format(), status: 0, auditRemark: ""};
+                        var logs = {consumeId: id, userId: account_id, remark: "上传票据"};
+                        return sequelize.transaction(function(t){
+                            return Q.all([
+                                    ConsumeDetails.update(updates, {returning: true, where: {id: id}, transaction: t}),
+                                    ConsumeDetailsLogs.create(logs,{transaction: t})
+                                ]).spread(function(ret1, ret2){
+                                    return ret1[1][0].toJSON();
+                                })
+                        })
+                    }else{
+                        defer.reject("记录不存在");
+                        return defer.promise;
+                    }
+                })
+
+        })
+        .nodeify(callback);
+}
+
+/**
+ * 审核票据
+ * @param params
+ * @param params.status审核结果状态
+ * @param params。consumeId 审核消费单id
+ * @param params.userId 用户id
+ * @param callback
+ * @returns {*|Promise}
+ */
+tripPlan.approveInvoice = function(params, callback){
+    var defer = Q.defer();
+    return checkParams(['status', 'consumeId', 'userId'], params)
+        .then(function(){
+            var status = params.status;
+            var account_id = params.userId;
+            var id = params.consumeId;
+            var remark = params.remark;
+            return ConsumeDetails.findOne({where: {id: id, account_id: account_id}})
+                .then(function(custome){
+                    if(custome){
+                        custome = custome.toJSON();
+                        var invoiceJson = custome.invoice;
+                        if(invoiceJson && invoiceJson.length > 0){
+                             invoiceJson[invoiceJson.length-1].status = status;
+                             invoiceJson[invoiceJson.length-1].remark = remark;
+                             invoiceJson[invoiceJson.length-1].approve_at = moment().format('YYYY-MM-DD HH:mm');
+                         }
+                        var updates = {invoice: JSON.stringify(invoiceJson), updateAt: moment().format(), status: status, auditRemark: remark};
+                        var logs = {consumeId: id, userId: account_id, status: status, remark: "审核票据-"+remark};
+                        return sequelize.transaction(function(t){
+                            return Q.all([
+                                    ConsumeDetails.update(updates, {returning: true, where: {id: id}, transaction: t}),
+                                    ConsumeDetailsLogs.create(logs,{transaction: t})
+                                ]).spread(function(ret1, ret2){
+                                    return ret1[1][0].toJSON();
+                                })
+                        })
+                    }else{
+                        defer.reject("记录不存在");
+                        return defer.promise;
+                    }
+                })
+        })
+        .nodeify(callback);
+}
 
 function checkParams(checkArray, params, callback){
     var defer = Q.defer();

@@ -4,6 +4,7 @@
 		<div class="staff_role">
 			<div>{{staff.name}}
 				<span ng-if="staff.travelLevel != null">{{travelpolicy.name}}</span>
+				<span ng-if="staff.travelLevel == null">未指定</span>
 				<span ng-if="staff.roleId == 0">创建者</span>
 				<span ng-if="staff.roleId == 1">管理员</span>
 				<a href="corp.html" ng-if="staff.roleId == 0 ||staff.roleId == 1">企业管理</a>
@@ -43,17 +44,19 @@
 	</div>
 	<div class="staff_standards">
 		<h3>我的差旅标准</h3>
-		<div ng-if="staff.travelLevel != null">
-			<p>等级{{travelpolicy.name}}</p>
-			<p>飞机{{travelpolicy.planeLevel}}</p>
-			<p>火车{{travelpolicy.trainLevel}}</p>
-			<p>住宿{{travelpolicy.hotelLevel}}</p>
+		<div>
+			<p>等级：{{travelpolicy.name}}</p>
+			<p>飞机：{{travelpolicy.planeLevel}}最高{{travelpolicy.planeDiscount}}折<br/>
+				<span ng-if="travelpolicy.isChangeLevel == true">当高级舱位价格低于上述标准时，可选择高级舱位</span>
+			</p>
+			<p>火车：{{travelpolicy.trainLevel}}</p>
+			<p>住宿：{{travelpolicy.hotelLevel}}</p>
 		</div>
-		<div ng-if="staff.travelLevel == null">
+		<!-- <div ng-if="staff.travelLevel == null">
 			<div class="travelnull">
 				<span>公司未设置差旅标准</span>
 			</div>
-		</div>
+		</div> -->
 	</div>
 	<div class="staff_announce">
 		<h3>小麦公告</h3>

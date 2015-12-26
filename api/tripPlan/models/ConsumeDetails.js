@@ -22,9 +22,10 @@ module.exports = function (Db, DataType) {
         budget      : {type: DataType.NUMERIC(15, 2) }, //预算
         expenditure : {type: DataType.NUMERIC(15, 2) }, //支出
         invoiceType : {type: DataType.INTEGER,          field: "invoice_type"}, //票据类型
-        invoice     : {type: DataType.INTEGER }, //票据
-        auditRemark : {type: DataType.STRING,           field: 'audit_remark'}, //审核备注
-        createAt    : {type: "timestamp without time zone", field: "create_at", defaultValue: now,}, //创建时间
+        invoice     : {type: 'jsonb',           defaultValue: '[]'}, //历史票据json
+        newInvoice  : {type: DataType.STRING,            field: 'new_invoice'}, //新上传票据
+        auditRemark : {type: DataType.STRING,            field: 'audit_remark'}, //审核备注
+        createAt    : {type: "timestamp without time zone", field: "create_at", defaultValue: now}, //创建时间
         remark      : {type: DataType.STRING }, //备注
         updateAt    : {type: "timestamp without time zone", field: "update_at"}
     }, {
