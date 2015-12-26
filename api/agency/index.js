@@ -393,6 +393,9 @@ agency.listAndPaginateAgencyUser = function(params, options, callback){
     options.where = params;
     return AgencyUser.findAndCountAll(options)
         .then(function(result){
+            result.rows = result.rows.map(function(item){
+                return item.toJSON();
+            });
             var pg = new Paginate(page, perPage, result.count, result.rows);
             return pg;
         })
