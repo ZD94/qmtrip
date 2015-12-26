@@ -28,8 +28,7 @@ travelPolicy.createTravelPolicy = function(params, callback){
     return API.staff.getStaff(user_id)
         .then(function(data){
             if(!data.code){
-                var staff = data.staff;
-                params.companyId = staff.companyId;//只允许添加该企业下的差旅标准
+                params.companyId = data.companyId;//只允许添加该企业下的差旅标准
                 return API.travelPolicy.createTravelPolicy(params, callback);
             }else{
                 defer.reject({code: -1, msg: '无权限'});
@@ -150,8 +149,7 @@ travelPolicy.listAndPaginateTravelPolicy = function(params, options, callback){
     return API.staff.getStaff(user_id)
         .then(function(data){
             if(data){
-                var staff = data.staff;
-                params.companyId = staff.companyId;//只允许查询该企业下的差旅标准
+                params.companyId = data.companyId;//只允许查询该企业下的差旅标准
                 return API.travelPolicy.listAndPaginateTravelPolicy(params, options, callback);
             }else{
                 defer.reject({code: -1, msg: '无权限'});
