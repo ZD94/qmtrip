@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="tulingdao.com">
+<html ng-app="qmtrip.staff">
 <head>
     <meta charset="UTF-8">
     <title ng-bind="pageTitle"></title>
@@ -8,10 +8,6 @@
     <link rel="stylesheet" type="text/css" href="/staff/css/users.css">
     <link rel="stylesheet" type="text/css" href="/staff/css/auth.css"/>
     <script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
-    <script type="text/javascript">
-        var jQuery = $ = require('jquery');
-        require("jquery-ui");
-    </script>
     <script type="text/javascript" src="/script/libs/bundle.angular.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.api.js"></script>
     <script type="text/javascript" src="/script/libs/api.js"></script>
@@ -22,15 +18,14 @@
     <script type="text/javascript">
         var Q = require('q');
         var moment = require('moment');
-        var TLD = TLD_angular_app('tulingdao.com');
-        //获取页面基本信息
+        var TLD = TLD_angular_app('qmtrip.staff');
         TLD.config(function ($stateProvider) {
             $stateProvider
                     .state("auth", {
-                        url        : "/auth/:path",
-                        controller : function($route, $stateParams, $location, $scope, $sce) {
-                            $stateParams.path = 'auth/'+$stateParams.path;
-                            return TLD_angular_app_defaultController($route, $stateParams, $location, $scope, $sce);
+                        url: "/auth/:path",
+                        controllerProvider: function ($stateParams){
+                            $stateParams.path = 'auth/' + $stateParams.path;
+                            return TLD_angular_app_defaultControllerProvider($stateParams);
                         },
                         templateUrl: function (params) {
                             console.log('state auth', params);
@@ -38,17 +33,17 @@
                         }
                     })
                     .state("root", {
-                        url        : "",
+                        url: "",
                         abstract: true,
-                        controller : TLD_angular_app_defaultController,
-                        templateUrl: function(params) {
+                        controllerProvider: TLD_angular_app_defaultControllerProvider,
+                        templateUrl: function (params) {
                             console.log('state root', params);
                             return '/staff/index.html';
                         }
                     })
                     .state("root.content", {
-                        url        : "/*path",
-                        controller : TLD_angular_app_defaultController,
+                        url: "/*path",
+                        controllerProvider: TLD_angular_app_defaultControllerProvider,
                         templateUrl: function (params) {
                             console.log('state root.content', params);
                             return '/staff/' + params.path + ".html";
