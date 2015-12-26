@@ -127,7 +127,7 @@ staff.updateStaff = function(id, data, callback){
                 if(old.toJSON().email == data.email){
                     return staffModel.update(data, options)
                         .then(function(obj){
-                            return obj[1].toJSON();
+                            return obj[1][0].toJSON();
                         })
                 }else{
                     return API.auth.getAccount(id)//暂无此接口
