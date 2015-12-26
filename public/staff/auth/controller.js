@@ -12,7 +12,7 @@ var auth=(function(){
         $scope.toForget = function(){
             window.location.href = "#/auth/forgetpwd";
         }
-        var backUrl = $routeParams.backurl || "#/";
+        var backUrl = $routeParams.backurl || "#";
         $scope.checkLogin = function() {
             var name = $('#name').val();
             var pwd  = $('#pwd').val();
@@ -39,25 +39,25 @@ var auth=(function(){
                     API.auth.login({email:name,pwd:pwd})
                         .then(function(result){
                             if (result.code) {
-                                alert(result.msg);
+                                console.log(result.msg);
                             } else {
                                 var data = result.data;
                                 setCookie("user_id", data.user_id);
                                 setCookie("token_sign", data.token_sign);
                                 setCookie("timestamp", data.timestamp);
                                 setCookie("token_id", data.token_id);
-                                alert("登录成功");
+                                console.log("登录成功");
                                 window.location.href= backUrl;
                             }
 
                         }).catch(function(err){
                             console.info(err);
                             if (err.msg) {
-                                alert(err.msg);
+                                console.log(err.msg);
                                 //Myalert("提示信息", err.msg);
                             } else {
                                 //Myalert("系统错误", err);
-                                alert(err);
+                                console.log(err);
                             }
                         }).done();
                 })
