@@ -4,7 +4,7 @@ var login=(function(){
     API.require('auth');
     var  login = {};
 
-    console.info(API)
+    console.info(API);
     login.LoginController = function ($scope, $routeParams) {
 
         var backUrl = $routeParams.backurl || "#/";
