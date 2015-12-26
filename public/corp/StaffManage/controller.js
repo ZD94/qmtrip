@@ -29,45 +29,48 @@ var staff = (function(){
         //加载多个API方法
         API.onload(function(){
             //console.log(123);
-            Q.all([
-                API.staff.getCurrentStaff(),//qh获取当前登录人员的企业id
-                API.travelPolicy.getAllTravelPolicy({columns:name}),//获取当前所有的差旅标准名称
-                API.staff.listAndPaginateStaff({companyId:$scope.companyId}),//加载所有的员工记录
-            ])
-                .spread(function(staff, travelPolicies,staffinfo){
-                    //console.log(staffinfo);
-                    //console.info(staffinfo);
-                    $scope.companyId = staff.companyId;
-                    var arr = travelPolicies;
-                    var i ;
-                    for(i=0; i<arr.length; i++){
-                        var name = arr[i].name;
-                        //console.info(name);
-                        var id = arr[i].id;
-                        $scope.selectClass.push({val:id,name:name});//放入option中
-                        //console.info(id);
+            API.staff.getCurrentStaff()//qh获取当前登录人员的企业id
+                .then(function(staff){
+                    Q.all([
+                        API.travelPolicy.getAllTravelPolicy({columns:name}),//获取当前所有的差旅标准名称
+                        API.staff.listAndPaginateStaff({companyId:$scope.companyId}),//加载所有的员工记录
+                    ])
+                        .spread(function(travelPolicies,staffinfo){
+                            //console.log(staffinfo);
+                            //console.info(staffinfo);
+                            $scope.companyId = staff.companyId;
+                            var arr = travelPolicies;
+                            var i ;
+                            for(i=0; i<arr.length; i++){
+                                var name = arr[i].name;
+                                //console.info(name);
+                                var id = arr[i].id;
+                                $scope.selectClass.push({val:id,name:name});//放入option中
+                                //console.info(id);
 
-                    }
-                    $scope.staffs = staffinfo.items;
-                    //console.info($scope.staff);
-                    var tasks = $scope.staffs
-                        .map(function($staff){ //通过id拿到差旅标准的名字
-                            return API.travelPolicy.getTravelPolicy($staff.travelLevel)
-                                .then(function(travelLevel){
-                                    $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
+                            }
+                            $scope.staffs = staffinfo.items;
+                            //console.info($scope.staff);
+                            var tasks = $scope.staffs
+                                .map(function($staff){ //通过id拿到差旅标准的名字
+                                    return API.travelPolicy.getTravelPolicy($staff.travelLevel)
+                                        .then(function(travelLevel){
+                                            $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
+                                            $scope.$apply();
+                                        })
+                                });
+                            Q.all(tasks)
+                                .then(function(){
+                                    //console.log(6768);
                                     $scope.$apply();
                                 })
-                        });
-                    Q.all(tasks)
-                        .then(function(){
-                            //console.log(6768);
                             $scope.$apply();
                         })
-                    $scope.$apply();
                 })
                 .catch(function(err){
                     console.info(err);
                 })
+
 
 
         })
@@ -136,13 +139,16 @@ var staff = (function(){
             var power      = $("#staffPower"+index).val();
             var commit = true;
 
-            API.staff.updateStaff(id,{name:name,mobile:tel,email:mail,department:department,travelLevel:standard,roleId:power})
-                .then(function(newStaff){
-                    console.info(123);
-                    $scope.$apply();
-                }).catch(function(err){
-                    console.info(err);
-                }).done();
+            API.onload(function(){
+                API.staff.updateStaff(id,{name:name,mobile:tel,email:mail,department:department,travelLevel:standard,roleId:power})
+                    .then(function(newStaff){
+                        console.info(123);
+                        $(".add_staff2").hide();
+                        $scope.$apply();
+                    }).catch(function(err){
+                        console.info(err);
+                    }).done();
+            })
         }
 
         //取消对员工信息的修改
@@ -151,8 +157,18 @@ var staff = (function(){
         }
 
         //删除员工的信息
-        $scope.delStaffInfo = function() {
-
+        $scope.delStaffInfo = function(id, index) {
+            console.log(index);
+            API.onload(function(){
+                API.staff.deleteStaff({id:id})
+                    .then(function(newStaff){
+                        console.info(456);
+                        $scope.staffs.splice(index, 1);
+                        $scope.$apply();
+                    }).catch(function(err){
+                        console.info(err);
+                    }).done();
+            })
         }
 
     }
