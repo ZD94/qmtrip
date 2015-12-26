@@ -36,6 +36,7 @@ var StaffFirst = (function(){
 						])
 						.spread(function(tripPlanOrders,travelPolicy){
 							$scope.businesstimes = tripPlanOrders.length;
+							console.info(tripPlanOrders)
 							$scope.travelpolicy = travelPolicy;
 							dataloading(true);
 							$scope.$apply();
