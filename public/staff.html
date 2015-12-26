@@ -1,21 +1,23 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
 <html ng-app="tulingdao.com">
 <head>
 	<meta charset="UTF-8">
 	<title ng-bind="pageTitle"></title>
-    <link rel="stylesheet" type="text/css" href="/staff/css/public.css">
+	<link rel="stylesheet" type="text/css" href="/staff/css/public.css">
+	<link rel="stylesheet" type="text/css" href="/staff/css/businesstravel.css">
 	<link rel="stylesheet" type="text/css" href="/staff/css/users.css">
 	<link rel="stylesheet" type="text/css" href="/staff/css/auth.css"/>
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
 	<script type="text/javascript">
         var jQuery = $ = require('jquery');
+		require("jquery-ui");
     </script>
     <script type="text/javascript" src="/script/libs/bundle.angular.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.api.js"></script>
     <script type="text/javascript" src="/script/libs/api.js"></script>
     <script type="text/javascript" src="/script/libs/ngapp.js"></script>
-    <script type="text/javascript" src="/script/messagebox.js"></script>
+	<script type="text/javascript" src="/script/messagebox.js"></script>
+	<script type="text/javascript" src="/script/selectbox.js"></script>
     <script type="text/javascript" src="/script/header.js"></script>
     <script type="text/javascript" src="/staff/controller.all.js"></script>
     <script type="text/javascript">
@@ -40,28 +42,32 @@
 		// };
     	//获取页面基本信息
     	TLD.controller("MainController", ["$scope", function($scope) {
-    		API.require("staff");
             API.require("auth");
-    		API.onload(function(){
-    			API.staff.getCurrentStaff()
-    				.then(function(ret){
-    					$scope.staff = ret;
-    					$scope.$apply();
-    				})
-    				.catch(function(err){
-    					console.info(err)
-    				})
-                $scope.logout = function(){
-                    API.auth.logout()
-                        .then(function(ret){
-                            window.location.href = "/staff.html#/auth/login?backurl="+encodeURIComponent(window.location.href);
-                        })
-                        .catch(function(err){
-                            console.info(err)
-                        })
-                }
-    		})
-            
+			API.require("staff", function(err, mod){ //API.require 使用回调函数时,不会导致页面跳转登录
+				if(err || !mod){
+					//console.log('load staff err:', err);
+					return;
+				}
+				API.staff.getCurrentStaff()
+						.then(function(ret){
+							$scope.staff = ret;
+							$scope.$apply();
+						})
+						.catch(function(err){
+							console.info(err)
+						});
+			});
+			$scope.logout = function(){
+				if(!API.auth)
+					return;
+				API.auth.logout()
+						.then(function(ret){
+							window.location.href = "/staff.html#/auth/login?backurl="+encodeURIComponent(window.location.href);
+						})
+						.catch(function(err){
+							console.info(err)
+						})
+			};
     	}])
     </script>
     <script type="text/javascript">
@@ -97,14 +103,13 @@
 					<ul>
 						<li><a href="">修改密码</a></li>
 						<li><a ng-click="logout()">退出</a></li>
-						<!-- <li><a href="javascript: logout();">退出</a></li> -->
 					</ul>
 				</div>
 			</div>
 		</div>
 	</div>
 	<div class="staff_content">
-		<div class="s_contentmain" id="angular-view" ng-view>
+		<div class="s_contentmain" id="angular-view" ui-view>
 		</div>
 	</div>
 	<div class="footer">

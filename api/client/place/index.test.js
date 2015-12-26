@@ -6,7 +6,7 @@ var place = require("./index");
 var util = require("util")
 var assert = require("assert");
 
-describe("api/client/index.js", function() {
+describe("api/client/place.js", function() {
 
     it("#queryBusinessStrict should be ok", function(done) {
 
@@ -32,5 +32,5 @@ describe("api/client/index.js", function() {
             assert.equal(ret, true);
             done();
         })
-    })
+    });
 })
