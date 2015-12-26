@@ -31,6 +31,7 @@ describe("api/client/travelPlan.js", function() {
         status: 1,
         remark: '这次看清啦啦啦~'
     }
+
     //审核票据
     describe("API.tripPlan.approveInvoice", function() {
         it("API.tripPlan.approveInvoice", function(done) {
@@ -50,6 +51,7 @@ describe("api/client/travelPlan.js", function() {
             if (err) {
                 throw err;
             }
+            console.info(result);
             done();
         })
     });

@@ -210,10 +210,11 @@ tripPlan.listTripPlanOrder = function(params, callback){
         return defer.promise.nodeify(callback);
     }
     var query = params.query;
-    return PlanOrder.findAll(query)
+    return PlanOrder.findAll({where: {}})
         .then(function(orders){
             return Q.all(orders.map(function(order){
                 var orderId = order.id;
+                order = order;
                 return Q.all([
                     ConsumeDetails.findAll({where: {orderId: orderId, type: -1}}),
                     ConsumeDetails.findAll({where: {orderId: orderId, type: 0}}),
@@ -227,7 +228,7 @@ tripPlan.listTripPlanOrder = function(params, callback){
                     })
             }))
                 .then(function(orders){
-                    return orders
+                    return orders;
                 })
         })
         .catch(errorHandle)
