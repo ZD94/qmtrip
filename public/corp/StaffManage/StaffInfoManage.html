@@ -83,15 +83,75 @@
                 <td>权限</td>
                 <td>操作</td>
             </tr>
-            <tr ng-repeat="item in staff">
-                <td>{{item.name}}</td>
-                <td>{{item.email}}</td>
-                <td>{{item.mobile}}</td>
-                <td>{{item.department}}</td>
-                <td>{{item.travelLevel}}</td>
-                <td>{{item.roleId}}</td>
-                <td><span>修改</span>/<span>删除</span></td>
-            </tr>
         </table>
+        <ul class="staff_ul" ng-repeat="item in staffs" >
+            <li>{{item.name}}</li>
+            <li>{{item.email}}</li>
+            <li>{{item.mobile}}</li>
+            <li><span ng-if="item.department == null">暂未设置</span><span>{{item.department}}</span></li>
+            <li><span>{{item.travelLeverName}}</span></li>
+            <li><span ng-if="item.roleId == 1">普通员工</span><span ng-if="item.roleId == 2">管理员</span><span ng-if="item.roleId == 3">财务人员</span></li>
+            <li><span ng-click="editStaffInfo($index)" id="change">修改</span>&nbsp;|&nbsp;<span ng-click="delStaffInfo()">删除</span></li>
+            <div class="add_staff2">
+                <div class="little_triangle2">
+                </div>
+                <div class="add_staff_block2">
+                    <div class="block_tip2">
+                        {{block_tip_err}}
+                    </div>
+                    <div class="block_left2">
+                        <ul>
+                            <li>
+                                <span style="color: #f56d23;padding-right: 5px;">*</span>姓名:
+                                <input id="staffName{{$index}}" type="text" placeholder="请输入员工真实姓名" value="{{item.name}}"/>
+                            </li>
+                            <li>
+                                <span style="color: #f56d23;padding-right: 5px;">*</span>邮箱:
+                                <input id="staffEmail{{$index}}" type="text" placeholder="后缀同创建人邮箱一致" value="{{item.email}}" disabled style="background-color: #ededed;"/>
+                            </li>
+                            <li>
+                                手机号:
+                                <input id="staffTel{{$index}}" type="text" placeholder="请输入员工手机号" value="{{item.mobile}}"/>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>
+                                部门:
+                                <input id="staffDepartment{{$index}}" type="text" placeholder="请输入员工所属部门" value="{{item.department}}"/>
+                            <li>
+                                差旅标准:
+                                <select name="select" id="staffStandard{{$index}}" class="" ng-model="selectkey" ng-options="item.val as item.name for item in selectClass"></select>
+                            </li>
+                            <li>
+                                <span style="color: #f56d23;padding-right: 5px;">*</span>权限:
+                                <select name="select" id="staffPower{{$index}}" class="">
+                                    <option value="">请设置权限</option>
+                                    <option value="2" ng-selected="item.roleId == 2">管理员</option>
+                                    <option value="3" ng-selected="item.roleId == 3">财务人员</option>
+                                    <option value="1" ng-selected="item.roleId == 1">普通员工</option>
+                                </select>
+                            </li>
+                        </ul>
+                        <div style="clear: both;"></div>
+                    </div>
+                    <div class="block_right2">
+                        <a ng-click="updateStaffInfo(item.id,$index)">保存</a>
+                        <a ng-click="cancelAddStaffInfo()">取消</a>
+                    </div>
+                    <div style="clear: both;"></div>
+                </div>
+                <div style="clear: both;"></div>
+            </div>
+            <div style="clear: both;"></div>
+        </ul>
     </div>
 </div>
+
+<script>
+    $(function(){
+        $(document).on("click","#change",function(){
+            $(".add_staff2").hide();
+            $(this).closest("ul").find(".add_staff2").show();
+        })
+    })
+</script>

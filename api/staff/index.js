@@ -372,6 +372,9 @@ staff.listAndPaginatePointChange = function(params, options, callback){
     options.where = params;
     return pointChange.findAndCountAll(options)
         .then(function(result){
+            result.rows = result.rows.map(function(item){
+                return item.toJSON();
+            });
             var pg = new Paginate(page, perPage, result.count, result.rows);
             return pg;
         })
@@ -618,7 +621,6 @@ staff.isStaffInCompany = function(staffId, companyId, callback){
  * @returns {*}
  */
 staff.statisticStaffs = function(params, callback){
-    logger.info(params);
     var defer = Q.defer();
     if(!params.companyId){
         defer.reject({code: -1, msg: '企业Id不能为空'});
@@ -649,5 +651,35 @@ staff.statisticStaffs = function(params, callback){
         }).nodeify(callback);
 }
 
+/**
+ * 得到可以查看用户票据的账号id （目前暂定代理商可查看用于审核）
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+staff.getInvoiceViewer = function(params, callback){
+    var viewerId = [];
+    var defer = Q.defer();
+    var id = params.accountId;
+    if(!id){
+        defer.reject({msg: 'accountId不能为空'});
+        return defer.promise;
+    }
+    return staff.getStaff(id)
+        .then(function(obj){
+            if(obj && obj.companyId){
+                return API.company.getCompany(obj.companyId)
+                    .then(function(company){
+                        if(company && company.agencyId){
+                            viewerId.push(company.agencyId);
+                        }
+                        return viewerId;
+                    })
+            }else{
+                return viewerId;
+            }
+        })
+        .nodeify(callback);
+}
 
 module.exports = staff;

@@ -1,6 +1,15 @@
 /**
  * Created by chenhao on 2015/12/22.
  */
+ function dataloading(isDone){
+ 	if (isDone) {
+        setTimeout(function () {
+            $("#loading").hide();
+        }, 50)
+    } else {
+        $("#loading").show();
+    }
+ }
 var StaffFirst = (function(){
 	API.require("company");
 	API.require("staff");
@@ -8,10 +17,12 @@ var StaffFirst = (function(){
 	API.require("travelPolicy");
 	var StaffFirst ={};
 	StaffFirst.StaffUserController = function($scope){
+		dataloading(false);
 		$("title").html("首页");
 		$(".left_nav li").removeClass("on").eq(0).addClass("on");
 		//企业管理首页信息
 		$scope.initStaffUser = function(){
+			// loading(true)
 			API.onload(function(){
 				API.staff.getCurrentStaff()
 					.then(function(ret){
@@ -24,9 +35,9 @@ var StaffFirst = (function(){
 							API.travelPolicy.getTravelPolicy(travelLevel)
 						])
 						.spread(function(tripPlanOrders,travelPolicy){
-							console.info(travelPolicy);
 							$scope.businesstimes = tripPlanOrders.length;
 							$scope.travelpolicy = travelPolicy;
+							dataloading(true);
 							$scope.$apply();
 						})
 						.catch(function(err){
