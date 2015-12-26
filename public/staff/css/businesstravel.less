@@ -1,4 +1,4 @@
-@import (reference) "common.less";
+@import "common.less";
 .business-travel {
   width: 100%;
   height: auto;
@@ -92,7 +92,6 @@
     border-radius: 5px;
     box-shadow:0 5px 15px rgba(2, 37, 69, .4);
     margin: 117px auto 0 auto;
-    display: none;
     .placelist {
       width: 298px;
       height: auto;
@@ -127,7 +126,26 @@
     border-radius: 5px;
     box-shadow:0 5px 15px rgba(2, 37, 69, .4);
     margin: 117px auto 0 auto;
-    display: none;
+    .plan {
+      width: 100%;
+      height: auto;
+      div {
+        width: 100%;
+        height: 30px;
+        line-height: 30px;
+        font-size: 16px;
+        color: @default-text-color;
+      }
+      dt {
+        height: 25px;
+        line-height: 25px;
+      }
+      dd {
+        height: 25px;
+        line-height: 25px;
+        color: @default-text-color;
+      }
+    }
     .placelist {
       width: 298px;
       height: auto;
@@ -150,6 +168,133 @@
         padding: 0 20px;
       }
     }
+  }
 
+
+  .creating {
+    width: 1000px;
+    height: auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 5px;
+    box-shadow:0 5px 15px rgba(2, 37, 69, .4);
+    margin: 117px auto 0 auto;
+    .loadtxt {
+      font-size: 15px;
+      line-height: 36px;
+      padding-bottom: 20px;
+    }
+    .loadimg {
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 30px;
+      color: #118FD6;
+      padding-top: 20px;
+    }
+  }
+
+  .createresult {
+    width: 1000px;
+    height: auto;
+    background: #ffffff;
+    border: 1px #E5E5E5 solid;
+    border-radius: 5px;
+    box-shadow:0 5px 15px rgba(2, 37, 69, .4);
+    margin: 117px auto 0 auto;
+    overflow: hidden;
+    display: none;
+    .top {
+      width: 100%;
+      height: 40px;
+      line-height: 40px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #ffffff;
+      background: #4A4A4A;
+      text-align: center;
+      position: relative;
+    }
+    .center {
+      background: #F5F5F5;
+      .icon {
+        width: 70px;
+        height: 90px;
+        line-height: 90px;
+        text-align: center;
+        float: left;
+        span {
+          width: 30px;
+          height: 30px;
+          line-height: 30px;
+          font-weight: bold;
+          text-align: center;
+          color: @btn-text-color;
+          background: @color-theme2;
+          border-radius: 50%;
+          display: inline-block;
+        }
+      }
+      .startplace {
+        height: 90px;
+        line-height: 112px;
+        padding-right: 20px;
+        float: left;
+      }
+      .description {
+        height: 90px;
+        line-height: 70px;
+        background: url("../images/jiantou.jpg") no-repeat right 50px;
+        padding: 0 40px;
+        float: left;
+      }
+      .endplace {
+        height: 90px;
+        line-height: 112px;
+        padding-left: 20px;
+        float: left;
+      }
+    }
+    .bottom1 {
+      height: auto;
+      padding-top: 20px;
+      overflow: hidden;
+      .bottom_txt {
+        width: 100%;
+        height: 50px;
+        line-height: 50px;
+        text-align: center;
+        color: @default-text-color;
+        float: left;
+      }
+    }
+    .bottom2 {
+      height: auto;
+      padding-bottom: 20px;
+      overflow: hidden;
+      display: none;
+      .bottom_txt {
+        width: 100%;
+        height: 50px;
+        line-height: 50px;
+        text-align: center;
+        font-size: 15px;
+        color: @default-text-color;
+        float: left;
+        a {
+          color: @color-theme1;
+        }
+      }
+    }
+  }
+  .tianxun {
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    color: @default-text-color;
+    display: none;
+    a {
+      color: @color-theme1;
+    }
   }
 }
