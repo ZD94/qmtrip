@@ -4,8 +4,9 @@
 var API = require('common/api');
 
 var assert = require("assert");
+var travelPlan = require("./index");
 
-describe("api/client/travelPolicy.js", function() {
+describe("api/client/travelPlan.js", function() {
     /*var params = {
         userId: 'ee3eb6a0-9f22-11e5-8540-8b3d4cdf6eb6',
         consumeId: '31f1c2b0-a3d4-11e5-b95c-8f85c45278d4',
@@ -43,4 +44,13 @@ describe("api/client/travelPolicy.js", function() {
         })
     })*/
 
+    it("#listTripPlanOrder should be ok", function(done) {
+        var self = {accountId: "00000000-0000-0000-1234-123400001234"};
+        travelPlan.listTripPlanOrder.call(self, {}, function(err, result){
+            if (err) {
+                throw err;
+            }
+            done();
+        })
+    });
 })
