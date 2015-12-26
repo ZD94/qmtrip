@@ -19,13 +19,14 @@
         var Q = require('q');
         var moment = require('moment');
         var TLD = TLD_angular_app('qmtrip.staff');
-        TLD.config(function ($stateProvider) {
+        TLD.config(function ($stateProvider, $urlRouterProvider) {
+            $urlRouterProvider.otherwise('/StaffFirst/StaffUser');
             $stateProvider
                     .state("auth", {
                         url: "/auth/:path",
-                        controllerProvider: function ($stateParams){
+                        controllerProvider: function ($stateParams, $location){
                             $stateParams.path = 'auth/' + $stateParams.path;
-                            return TLD_angular_app_defaultControllerProvider($stateParams);
+                            return TLD_angular_app_defaultControllerProvider($stateParams, $location);
                         },
                         templateUrl: function (params) {
                             console.log('state auth', params);
