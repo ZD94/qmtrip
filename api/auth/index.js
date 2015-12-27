@@ -340,9 +340,6 @@ authServer.getAccount = function(id, callback){
         return defer.promise.nodeify(callback);
     }
     return Models.Account.findById(id)
-        .then(function(obj){
-            return {code: 0, account: obj.toJSON()}
-        })
         .nodeify(callback);
 }
 
@@ -363,8 +360,10 @@ authServer.updataAccount = function(id, data, callback){
     options.where = {id: id};
     options.returning = true;
     return Models.Account.update(data, options)
-        .then(function(obj){
-            return {code: 0, account: obj[1][0].toJSON(), msg: "更新成功"}
+        .spread(function(rownum, rows){
+            if(!rownum)
+                throw L.ERR.NOT_FOUND;
+            return rows[0];
         })
         .nodeify(callback);
 }
@@ -380,11 +379,9 @@ authServer.findOneAcc = function(params, callback){
     options.where = params;
     return Models.Account.findOne(options)
         .then(function(obj){
-            if(obj){
-                return {code: 0, account: obj.toJSON()}
-            }else{
-                return {code: 0, account: obj}
-            }
+            if(!obj)
+                throw L.ERR.NOT_FOUND;
+            return obj;
         })
         .nodeify(callback);
 }
