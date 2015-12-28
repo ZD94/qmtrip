@@ -40,7 +40,11 @@ company.createCompany = function(params, callback){
 company.updateCompany = checkPermission(["company.edit"],
     function(params, callback){
         params.createUser = this.accountId;
-        return API.company.updateCompany(params, callback);
+        return staff.getCurrentStaff()
+            .then(function(staff){
+                params.companyId = staff.companyId;
+                return API.company.updateCompany(params)
+            }).nodeify(callback);
     });
 
 /**

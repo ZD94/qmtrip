@@ -82,9 +82,9 @@ company.checkBlackDomain = function(params, callback) {
  */
 company.updateCompany = function(params, callback){
     var defer = Q.defer();
+    var companyId = params.companyId;
     return checkParams(['companyId'], params)
         .then(function(){
-            var companyId = params.companyId;
             delete params.companyId;
             return Company.findById(companyId, {attributes: ['createUser']}) // (['createUser'], {where: {id: companyId}})
         })
