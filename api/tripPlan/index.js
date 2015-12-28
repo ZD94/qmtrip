@@ -202,7 +202,7 @@ tripPlan.listTripPlanOrder = function(params, callback){
         return defer.promise.nodeify(callback);
     }
     var query = params.query;
-    return PlanOrder.findAll({where: {}})
+    return PlanOrder.findAll({where: query})
         .then(function(orders){
             return Q.all(orders.map(function(order){
                 var orderId = order.id;
