@@ -103,6 +103,7 @@ var staff = (function(){
                 API.onload(function() {//创建员工
                     API.staff.createStaff({name:name,mobile:tel,email:mail,companyId:$scope.companyId,department:department,travelLevel:standard,roleId:power})
                         .then(function(staffinfo){
+                            $(".add_staff").hide();
                             $scope.$apply();
                         }).catch(function (err) {
                             console.info(err);
@@ -118,7 +119,7 @@ var staff = (function(){
                 API.staff.listAndPaginateStaff({companyId:$scope.companyId})
                     .then(function(staffinfo){
                         $scope.travellevel = staffinfo.items[index].travelLevel;
-                        //console.info ($scope.travellevel);
+                        //console.info ($scope.travellevel); 
                         $scope.selectkey = $scope.travellevel;
                         $scope.$apply();
                     }).catch(function(err){
