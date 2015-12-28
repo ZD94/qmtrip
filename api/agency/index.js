@@ -107,13 +107,12 @@ agency.updateAgency = function(params, callback){
                     params.updateAt = utils.now();
                     var cols = getColsFromParams(params);
                     return Agency.update(params, {returning: true, where: {id: agencyId}, fields: cols})
-                        .then(function(ret){
-                            if(!ret[0] || ret[0] == "NaN"){
+                        .spread(function(rows, agencies){
+                            if(!rows || rows == "NaN"){
                                 defer.reject({code: -2, msg: '更新代理商信息失败'});
                                 return defer.promise;
                             }
-                            var agency = ret[1][0].toJSON();
-                            return agency;
+                            return agencies[0];
                         })
                 })
         })
@@ -132,13 +131,12 @@ agency.getAgency = function(params, callback){
         .then(function(){
             var agencyId = params.agencyId;
             var userId = params.userId;
-            return Agency.find({where: {id: agencyId}})
-                .then(function(ret){
-                    if(!ret){
+            return Agency.findById(agencyId)
+                .then(function(agency){
+                    if(!agency){
                         defer.reject({code: -2, msg: '没有代理商'});
                         return defer.promise;
                     }
-                    var agency = ret.toJSON();
                     return agency;
                 })
         })
@@ -323,9 +321,8 @@ agency.updateAgencyUser = function(id, data, callback){
     options.where = {id: id};
     options.returning = true;
     return AgencyUser.update(data, options)
-        .then(function(obj){
-            var agencuUser = obj[1][0].toJSON();
-            return agencuUser;
+        .spread(function(rows, users){
+            return users[0];
         })
         .catch(errorHandle)
         .nodeify(callback);
@@ -345,12 +342,11 @@ agency.getAgencyUser = function(id, callback){
         return defer.promise.nodeify(callback);
     }
     return AgencyUser.findById(id)
-        .then(function(obj){
-            if(!obj){
+        .then(function(agencyUser){
+            if(!agencyUser){
                 defer.reject({code: -2, msg: '用户不存在'});
                 return defer.promise;
             }
-            var agencyUser = obj.toJSON()
             return agencyUser;
         })
         .catch(errorHandle)
@@ -393,11 +389,7 @@ agency.listAndPaginateAgencyUser = function(params, options, callback){
     options.where = params;
     return AgencyUser.findAndCountAll(options)
         .then(function(result){
-            result.rows = result.rows.map(function(item){
-                return item.toJSON();
-            });
-            var pg = new Paginate(page, perPage, result.count, result.rows);
-            return pg;
+            return new Paginate(page, perPage, result.count, result.rows);
         })
         .catch(errorHandle)
         .nodeify(callback);

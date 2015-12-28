@@ -12,6 +12,7 @@ var API = require("common/api");
 var auth = require("../auth");
 var Logger = require("common/logger");
 var logger = new Logger("staff");
+var L = require("common/language");
 /**
  * @class staff 员工信息
  */
@@ -25,20 +26,20 @@ var staff = {};
  * @type {*}
  * @return {promise}
  */
-staff.createStaff = auth.checkPermission(["user.add"],
-    function(params, callback) {
-        var user_id = this.accountId;
-        return API.staff.getStaff(user_id)
-            .then(function(data){
-                if(data){
-                    var companyId = data.companyId;
-                    params.companyId = companyId;
-                    return API.staff.createStaff(params, callback);
-                }else{
-                    return API.staff.createStaff(params, callback);//员工注册的时候
-                }
-            })
-    });
+staff.createStaff = function(params, callback) {
+    var user_id = this.accountId;
+    return API.staff.getStaff(user_id)
+        .then(function(data){
+            if(data){
+                var companyId = data.companyId;
+                params.companyId = companyId;
+                return API.staff.createStaff(params, callback);
+            }else{
+                return API.staff.createStaff(params, callback);//员工注册的时候
+            }
+        })
+        .nodeify(callback);
+}
 
 /**
  * @method deleteStaff
@@ -51,23 +52,18 @@ staff.createStaff = auth.checkPermission(["user.add"],
 staff.deleteStaff = auth.checkPermission(["user.delete"],
     function(params, callback) {
         var user_id = this.accountId;
-        var defer = Q.defer();
-        if(!params.id){
-            defer.reject({code: -1, msg: "id不能为空"});
-            return defer.promise.nodeify(callback);
-        }
         return API.staff.getStaff(user_id)
             .then(function(data){
                 return API.staff.getStaff(params.id)
                     .then(function(target){
                         if(data.companyId != target.companyId){
-                            defer.reject({code: -1, msg: "无权限"});
-                            return defer.promise.nodeify(callback);
+                            throw L.ERR.PERMISSION_DENY;
                         }else{
                             return API.staff.deleteStaff(params, callback);
                         }
                     })
             })
+            .nodeify(callback);
     });
 
 /**
@@ -77,27 +73,50 @@ staff.deleteStaff = auth.checkPermission(["user.delete"],
  *
  * @type {*}
  */
-staff.updateStaff = auth.checkPermission(["user.edit"],
-    function(id, params, callback) {
+staff.updateStaff = auth.checkPermission(["user.edit"],//三个参数权限判断要修改
+    function(params, callback) {
         var user_id = this.accountId;
-        var defer = Q.defer();
-        if(!id){
-            defer.reject({code: -1, msg: "id不能为空"});
-            return defer.promise.nodeify(callback);
-        }
+        var id = params.id;
         return API.staff.getStaff(user_id)
             .then(function(data){
                 return API.staff.getStaff(id)
                     .then(function(target){
                         if(data.companyId != target.companyId){
-                            defer.reject({code: -1, msg: "无权限"});
-                            return defer.promise.nodeify(callback);
+                            throw L.ERR.PERMISSION_DENY;
                         }else{
-                            return API.staff.updateStaff(id, params, callback);
+                            return API.staff.updateStaff(params, callback);
                         }
                     })
             })
+            .nodeify(callback);
     });
+
+/*staff.updateStaff = function(id, params, callback) {
+    var user_id = this.accountId;
+    var defer = Q.defer();
+    if(!id){
+        defer.reject({code: -1, msg: "id不能为空"});
+        return defer.promise.nodeify(callback);
+    }
+    return API.permit.checkPermission({accountId: user_id, permission: ["user.edit123"]})
+        .then(function(result){
+            if(result){
+                return API.staff.getStaff(user_id)
+                    .then(function(data){
+                        return API.staff.getStaff(id)
+                            .then(function(target){
+                                if(data.companyId != target.companyId){
+                                    defer.reject({code: -1, msg: "无权限"});
+                                    return defer.promise.nodeify(callback);
+                                }else{
+                                    return API.staff.updateStaff(id, params, callback);
+                                }
+                            })
+                    })
+            }
+        })
+        .nodeify(callback);
+    };*/
 
 /**
  * @method getStaff
@@ -106,25 +125,20 @@ staff.updateStaff = auth.checkPermission(["user.edit"],
  * @type {*}
  */
 staff.getStaff = auth.checkPermission(["user.query"],
-    function(id, params, callback) {
+    function(params, callback) {
         var user_id = this.accountId;
-        var defer = Q.defer();
-        if(!id){
-            defer.reject({code: -1, msg: "id不能为空"});
-            return defer.promise.nodeify(callback);
-        }
-        return API.staff.getStaff(user_id)
+        return API.staff.getStaff({id: user_id})
             .then(function(data){
-                return API.staff.getStaff(id)
+                return API.staff.getStaff(params)
                     .then(function(target){
                         if(data.companyId != target.companyId){
-                            defer.reject({code: -1, msg: "无权限"});
-                            return defer.promise.nodeify(callback);
+                            throw L.ERR.PERMISSION_DENY;
                         }else{
                             return {staff: target};
                         }
                     })
             })
+            .nodeify(callback);
     });
 
 /**
@@ -137,7 +151,7 @@ staff.getStaff = auth.checkPermission(["user.query"],
 staff.getCurrentStaff = function(callback){
     var self = this;
     console.info(self.accountId);
-    return API.staff.getStaff(self.accountId, callback);
+    return API.staff.getStaff({id: self.accountId}, callback);
 }
 
 /**
@@ -147,12 +161,12 @@ staff.getCurrentStaff = function(callback){
  * @type {*}
  */
 staff.listAndPaginateStaff = auth.checkPermission(["user.query"],
-    function(params, options, callback) {
+    function(params, callback) {
         var user_id = this.accountId;
         return API.staff.getStaff(user_id)
             .then(function(data){
                 params.companyId = data.companyId;
-                return API.staff.listAndPaginateStaff(params, options);
+                return API.staff.listAndPaginateStaff(params, callback);
             })
             .nodeify(callback);
     });
@@ -183,12 +197,13 @@ staff.decreaseStaffPoint = API.staff.decreaseStaffPoint;
  * @param {Function} callback
  * @return {promise}
  */
-staff.listAndPaginatePointChange = function(params, options, callback){
+staff.listAndPaginatePointChange = function(params, callback){
     return API.staff.getStaff(user_id)
         .then(function(data){
             params.companyId = data.companyId;
-            return API.staff.listAndPaginatePointChange(params, options, callback);
+            return API.staff.listAndPaginatePointChange(params, callback);
         })
+        .nodeify(callback);
 }
 
 /**

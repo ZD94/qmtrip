@@ -39,10 +39,9 @@ company.createCompany = function(params, callback){
                     Company.create(params, {transaction: t}),
                     FundsAccounts.create(funds, {transaction: t})
                 ])
-                    .spread(function(company){
-                        var company = company.toJSON();
+                    .spread(function(company, funds){
                         return company;
-                    })
+                    });
             })
         })
         .catch(errorHandle)
@@ -88,23 +87,20 @@ company.updateCompany = function(params, callback){
             var companyId = params.companyId;
             delete params.companyId;
             return Company.findById(companyId, {attributes: ['createUser']}) // (['createUser'], {where: {id: companyId}})
-                .then(function(company){
-                    if(!company){
-                        defer.reject(L.ERR.COMPANY_NOT_EXIST);
-                        return defer.promise;
-                    }
-                    params.updateAt = utils.now();
-                    var cols = getColsFromParams(params);
-                    return Company.update(params, {returning: true, where: {id: companyId}, fields: cols})
-                        .then(function(ret){
-                            if(!ret[0] || ret[0] == "NaN"){
-                                defer.reject({code: -2, msg: '更新企业信息失败'});
-                                return defer.promise;
-                            }
-                            var company = ret[1][0].toJSON();
-                            return company;
-                        })
-                })
+        })
+        .then(function(company){
+            if(!company){
+                throw L.ERR.COMPANY_NOT_EXIST;
+            }
+            params.updateAt = utils.now();
+            var cols = getColsFromParams(params);
+            return Company.update(params, {returning: true, where: {id: companyId}, fields: cols})
+        })
+        .spread(function(rownum, rows){
+            if(!rownum || rownum == "NaN"){
+                throw {code: -2, msg: '更新企业信息失败'};
+            }
+            return rows[0];
         })
         .catch(errorHandle)
         .nodeify(callback);
@@ -121,15 +117,13 @@ company.getCompany = function(params, callback){
     return checkParams(['companyId'], params)
         .then(function(){
             var companyId = params.companyId;
-            return Company.find({where: {id: companyId}})
-                .then(function(company){
-                    if(!company){
-                        defer.reject({code: -2, msg: '企业不存在'});
-                        return defer.promise;
-                    }
-                    var company = company.toJSON();
-                    return company;
-                })
+            return Company.findById(companyId);
+        })
+        .then(function(company){
+            if(!company){
+                throw L.ERR.NOT_FOUND;
+            }
+            return company;
         })
         .catch(errorHandle)
         .nodeify(callback);
@@ -196,10 +190,9 @@ company.getCompanyFundsAccount = function(params, callback){
         .then(function(){
             var companyId = params.companyId;
             var userId = params.userId;
-            return FundsAccounts.findById(companyId, {attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd', 'staffReward', 'status', 'createAt', 'updateAt']})
-                .then(function(funds){
-                    return funds.toJSON();
-                })
+            return FundsAccounts.findById(companyId,
+                {attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd',
+                    'staffReward', 'status', 'createAt', 'updateAt']});
         })
         .catch(errorHandle)
         .nodeify(callback);
@@ -215,77 +208,72 @@ company.getCompanyFundsAccount = function(params, callback){
 company.moneyChange = function(params, callback){
     var defer = Q.defer();
     return checkParams(['money', 'channel', 'userId', 'type', 'companyId', 'remark'], params)
-        .then(function(){
+        .then(function() {
             var money = params.money;
             var userId = params.userId;
             var type = params.type;
             var id = params.companyId;
-            return FundsAccounts.findById(id)
-                .then(function(funds){
-                    if(!funds){
-                        defer.reject({code: -2, msg: '企业资金账户不存在'});
-                        return defer.promise;
-                    }
-                    var funds = funds.toJSON();
-                    var fundsUpdates = {
-                        updateAt: utils.now()
-                    };
-                    var moneyChange = {
-                        fundsAccountId: id,
-                        status: type,
-                        money: money,
-                        channel: params.channel,
-                        userId: userId,
-                        remark: params.remark
-                    }
-                    var income = funds.income;
-                    var frozen = funds.frozen;
-                    if(type == 1){
-                        fundsUpdates.income = parseFloat(income) + parseFloat(money);
-                    }else if(type == -1){
-                        var consume = funds.consume;
-                        var balance = funds.balance;
-                        fundsUpdates.consume = parseFloat(consume) + parseFloat(money);
-                        var balance = parseFloat(balance) - parseFloat(money); //账户余额
-                        if(balance < 0){
-                            defer.reject(L.ERR.BALANCE_NOT_ENOUGH); //账户余额不足
-                            return defer.promise;
-                        }
-                    }else if(type == 2){
-                        if(parseFloat(frozen) < parseFloat(money)){
-                            defer.reject({code: -4, msg: '账户冻结金额不能小于解除冻结的金额'});
-                            return defer.promise;
-                        }
-                        fundsUpdates.frozen = parseFloat(frozen) - parseFloat(money);
-                    }else if(type == -2){
-                        var balance = funds.balance;
-                        fundsUpdates.frozen = parseFloat(frozen) + parseFloat(money);
-                        balance = parseFloat(balance) - parseFloat(money); //账户余额
-                        if(balance < 0){
-                            defer.reject(L.ERR.BALANCE_NOT_ENOUGH); //账户余额不足
-                            return defer.promise;
-                        }
-                    }else{
-                        defer.reject(L.ERR.MONEY_STATUS_ERROR);
-                        return defer.promise;
-                    }
+            return FundsAccounts.findById(id);
+        })
+        .then(function(funds){
+            if(!funds){
+                throw {code: -2, msg: '企业资金账户不存在'};
+            }
+            var fundsUpdates = {
+                updateAt: utils.now()
+            };
+            var moneyChange = {
+                fundsAccountId: id,
+                status: type,
+                money: money,
+                channel: params.channel,
+                userId: userId,
+                remark: params.remark
+            }
+            var income = funds.income;
+            var frozen = funds.frozen;
+            if(type == 1){
+                fundsUpdates.income = parseFloat(income) + parseFloat(money);
+            }else if(type == -1){
+                var consume = funds.consume;
+                var balance = funds.balance;
+                fundsUpdates.consume = parseFloat(consume) + parseFloat(money);
+                var balance = parseFloat(balance) - parseFloat(money); //账户余额
+                if(balance < 0){
+                    throw L.ERR.BALANCE_NOT_ENOUGH; //账户余额不足
+                }
+            }else if(type == 2){
+                if(parseFloat(frozen) < parseFloat(money)){
+                    throw {code: -4, msg: '账户冻结金额不能小于解除冻结的金额'};
+                }
+                fundsUpdates.frozen = parseFloat(frozen) - parseFloat(money);
+            }else if(type == -2){
+                var balance = funds.balance;
+                fundsUpdates.frozen = parseFloat(frozen) + parseFloat(money);
+                balance = parseFloat(balance) - parseFloat(money); //账户余额
+                if(balance < 0){
+                    throw L.ERR.BALANCE_NOT_ENOUGH; //账户余额不足
+                }
+            }else{
+                throw L.ERR.MONEY_STATUS_ERROR;
+            }
 
-                    return sequelize.transaction(function(t){
-                        var cols = getColsFromParams(fundsUpdates);
-                        return Q.all([
-                            FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: cols, transaction: t}),
-                            MoneyChanges.create(moneyChange, {transaction: t})
-                        ])
-                            .spread(function(funds){
-                                if(funds[0] != 1){
-                                    defer.reject({code: -3, msg: '充值失败'});
-                                    return defer.promise;
-                                }
-                                var funds = funds[1][0].toJSON();
-                                return {code: 0, msg: 'success', fundsAccount: funds};
-                            })
-                    })
+            return sequelize.transaction(function(t){
+                var cols = getColsFromParams(fundsUpdates);
+                return Q.all([
+                    FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: cols, transaction: t}),
+                    MoneyChanges.create(moneyChange, {transaction: t})
+                ])
+                .spread(function(update, create){
+                    return update;
                 })
+            })
+        })
+        .spread(function(rownum, rows){
+            if(rownum != 1){
+                throw {code: -3, msg: '充值失败'};
+            }
+            return rows[0];
         })
         .catch(errorHandle)
         .nodeify(callback);
