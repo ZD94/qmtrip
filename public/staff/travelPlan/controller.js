@@ -14,6 +14,7 @@ var travelPlan=(function(){
      * @constructor
      */
     travelPlan.PlanListController = function($scope) {
+        loading(true);
         $("title").html("出差单列表");
         API.onload(function() {
             API.tripPlan.listTripPlanOrder({})
@@ -37,6 +38,7 @@ var travelPlan=(function(){
      * @constructor
      */
     travelPlan.PlanDetailController = function($scope, $routeParams) {
+        loading(true);
         $("title").html("出差单明细");
         var planId = $routeParams.planId;
         API.onload(function() {

@@ -65,8 +65,10 @@ var businessTravel=(function(){
             API.onload(function() {
                 API.place.queryPlace({keyword:$scope.startplacename})
                     .then(function(result) {
-                        $(".placelist1").show();
                         $scope.startplaceitems = result;
+                        if ($scope.startplaceitems.length) {
+                            $(".placelist1").show();
+                        }
                         console.info (result);
                         $scope.$apply();
                     })
@@ -86,8 +88,10 @@ var businessTravel=(function(){
             API.onload(function() {
                 API.place.queryPlace({keyword:$scope.endplacename})
                     .then(function(result) {
-                        $(".placelist2").show();
                         $scope.endplaceitems = result;
+                        if ($scope.endplaceitems.length) {
+                            $(".placelist2").show();
+                        }
                         console.info (result);
                         $scope.$apply();
                     })
@@ -169,8 +173,10 @@ var businessTravel=(function(){
             API.onload(function() {
                 API.place.queryPlace({keyword:$scope.endplacename})
                     .then(function(result) {
-                        $(".placelist1").show();
                         $scope.endplaceitems = result;
+                        if ($scope.endplaceitems.length) {
+                            $(".placelist1").show();
+                        }
                         console.info (result);
                         $scope.$apply();
                     })
@@ -190,8 +196,10 @@ var businessTravel=(function(){
             API.onload(function() {
                 API.place.queryBusinessDistrict({keyword:$scope.liveplacename,code:$(".live1").attr("checkval")})
                     .then(function(result) {
-                        $(".placelist2").show();
                         $scope.liveplaceitems = result;
+                        if ($scope.liveplaceitems.length) {
+                            $(".placelist2").show();
+                        }
                         console.info (result);
                         $scope.$apply();
                     })
@@ -216,10 +224,6 @@ var businessTravel=(function(){
             var dateReg = /^\d{4}-\d{2}-\d{2}$/;
             if (endplace == "") {
                 Myalert("温馨提示","请选择目的地城市");
-                return false;
-            }
-            if (liveplace == "") {
-                Myalert("温馨提示","请选择住宿位置");
                 return false;
             }
             if (!livetime || !dateReg.test(livetime)) {
@@ -260,8 +264,10 @@ var businessTravel=(function(){
             API.onload(function() {
                 API.place.queryPlace({keyword:$scope.startplacename})
                     .then(function(result) {
-                        $(".placelist1").show();
                         $scope.startplaceitems = result;
+                        if ($scope.startplaceitems.length) {
+                            $(".placelist1").show();
+                        }
                         console.info (result);
                         $scope.$apply();
                     })
@@ -281,8 +287,10 @@ var businessTravel=(function(){
             API.onload(function() {
                 API.place.queryPlace({keyword:$scope.endplacename})
                     .then(function(result) {
-                        $(".placelist2").show();
                         $scope.endplaceitems = result;
+                        if ($scope.endplaceitems.length) {
+                            $(".placelist2").show();
+                        }
                         console.info (result);
                         $scope.$apply();
                     })
@@ -301,10 +309,12 @@ var businessTravel=(function(){
         //住宿位置获取
         $scope.liveplace = function () {
             API.onload(function() {
-                API.place.queryBusinessDistrict({keyword:$scope.liveplacename,code:$(".live1").attr("checkval")})
+                API.place.queryBusinessDistrict({keyword:$scope.liveplacename,code:$scope.endplaceid})
                     .then(function(result) {
-                        $(".placelist2").show();
                         $scope.liveplaceitems = result;
+                        if ($scope.liveplaceitems.length) {
+                            $(".placelist2").show();
+                        }
                         console.info (result);
                         $scope.$apply();
                     })
@@ -328,6 +338,7 @@ var businessTravel=(function(){
                 endtime = $scope.end_time,//返回时间
                 endtimelate = $scope.end_timelate,//返回最晚到达时间
                 parameter = $("form").serialize();//表单所有数据传参
+            $scope.endplaceid = endplace;
             var dateReg = /^\d{4}-\d{2}-\d{2}$/;
             var timeReg = /^\d{2}:\d{2}$/;
             if (startplace == "") {
@@ -375,10 +386,6 @@ var businessTravel=(function(){
                 leavetime = $scope.leave_time,//离店时间
                 parameter = $("form").serialize();//表单所有数据传参
             var dateReg = /^\d{4}-\d{2}-\d{2}$/;
-            if (liveplace == "") {
-                Myalert("温馨提示","请选择住宿位置");
-                return false;
-            }
             if (!livetime || !dateReg.test(livetime)) {
                 Myalert("温馨提示","入住日期不存在或格式不正确");
                 return false;
