@@ -132,7 +132,7 @@ travelPolicy.listAndPaginateTravelPolicy = function(params, options, callback){
     options.where = params;
     return travalPolicyModel.findAndCountAll(options)
         .then(function(result){
-            return new Paginate(page, perPage, result.count, items);
+            return new Paginate(page, perPage, result.count, result.rows);
         })
         .nodeify(callback);
 }
