@@ -200,8 +200,9 @@ staff.findOneStaff = function(params, callback){
  * @param callback
  */
 staff.listAndPaginateStaff = function(params, callback){
-    var options = params.options;
+    var options = {};
     if(params.options){
+        options = params.options;
         delete params.options;
     }
     var page, perPage, limit, offset;
@@ -225,6 +226,9 @@ staff.listAndPaginateStaff = function(params, callback){
     options.where = params;
     return staffModel.findAndCountAll(options)
         .then(function(result){
+            result.rows = result.rows.map(function(item){
+                return item.toJSON();
+            })
             return new Paginate(page, perPage, result.count, result.rows);
         })
         .nodeify(callback);

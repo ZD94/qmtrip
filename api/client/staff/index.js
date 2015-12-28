@@ -28,7 +28,7 @@ var staff = {};
  */
 staff.createStaff = function(params, callback) {
     var user_id = this.accountId;
-    return API.staff.getStaff(user_id)
+    return API.staff.getStaff({id: user_id})
         .then(function(data){
             if(data){
                 var companyId = data.companyId;
@@ -52,9 +52,9 @@ staff.createStaff = function(params, callback) {
 staff.deleteStaff = auth.checkPermission(["user.delete"],
     function(params, callback) {
         var user_id = this.accountId;
-        return API.staff.getStaff(user_id)
+        return API.staff.getStaff({id: user_id})
             .then(function(data){
-                return API.staff.getStaff(params.id)
+                return API.staff.getStaff({id:params.id})
                     .then(function(target){
                         if(data.companyId != target.companyId){
                             throw L.ERR.PERMISSION_DENY;
@@ -77,9 +77,9 @@ staff.updateStaff = auth.checkPermission(["user.edit"],//三个参数权限判�
     function(params, callback) {
         var user_id = this.accountId;
         var id = params.id;
-        return API.staff.getStaff(user_id)
+        return API.staff.getStaff({id:user_id})
             .then(function(data){
-                return API.staff.getStaff(id)
+                return API.staff.getStaff({id:id})
                     .then(function(target){
                         if(data.companyId != target.companyId){
                             throw L.ERR.PERMISSION_DENY;
@@ -162,8 +162,10 @@ staff.getCurrentStaff = function(callback){
  */
 staff.listAndPaginateStaff = auth.checkPermission(["user.query"],
     function(params, callback) {
+        console.log(params);
+        console.log("=======================");
         var user_id = this.accountId;
-        return API.staff.getStaff(user_id)
+        return API.staff.getStaff({id:user_id})
             .then(function(data){
                 params.companyId = data.companyId;
                 return API.staff.listAndPaginateStaff(params, callback);
@@ -198,7 +200,8 @@ staff.decreaseStaffPoint = API.staff.decreaseStaffPoint;
  * @return {promise}
  */
 staff.listAndPaginatePointChange = function(params, callback){
-    return API.staff.getStaff(user_id)
+    var user_id = this.accountId;
+    return API.staff.getStaff({id:user_id})
         .then(function(data){
             params.companyId = data.companyId;
             return API.staff.listAndPaginatePointChange(params, callback);
