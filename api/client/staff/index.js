@@ -33,9 +33,9 @@ staff.createStaff = function(params, callback) {
             if(data){
                 var companyId = data.companyId;
                 params.companyId = companyId;
-                return API.staff.createStaff(params, callback);
+                return API.staff.createStaff(params);
             }else{
-                return API.staff.createStaff(params, callback);//员工注册的时候
+                return API.staff.createStaff(params);//员工注册的时候
             }
         })
         .nodeify(callback);
@@ -59,7 +59,7 @@ staff.deleteStaff = auth.checkPermission(["user.delete"],
                         if(data.companyId != target.companyId){
                             throw L.ERR.PERMISSION_DENY;
                         }else{
-                            return API.staff.deleteStaff(params, callback);
+                            return API.staff.deleteStaff(params);
                         }
                     })
             })
@@ -84,39 +84,12 @@ staff.updateStaff = auth.checkPermission(["user.edit"],//三个参数权限判�
                         if(data.companyId != target.companyId){
                             throw L.ERR.PERMISSION_DENY;
                         }else{
-                            return API.staff.updateStaff(params, callback);
+                            return API.staff.updateStaff(params);
                         }
                     })
             })
             .nodeify(callback);
     });
-
-/*staff.updateStaff = function(id, params, callback) {
-    var user_id = this.accountId;
-    var defer = Q.defer();
-    if(!id){
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
-    }
-    return API.permit.checkPermission({accountId: user_id, permission: ["user.edit123"]})
-        .then(function(result){
-            if(result){
-                return API.staff.getStaff(user_id)
-                    .then(function(data){
-                        return API.staff.getStaff(id)
-                            .then(function(target){
-                                if(data.companyId != target.companyId){
-                                    defer.reject({code: -1, msg: "无权限"});
-                                    return defer.promise.nodeify(callback);
-                                }else{
-                                    return API.staff.updateStaff(id, params, callback);
-                                }
-                            })
-                    })
-            }
-        })
-        .nodeify(callback);
-    };*/
 
 /**
  * @method getStaff
@@ -150,7 +123,6 @@ staff.getStaff = auth.checkPermission(["user.query"],
  */
 staff.getCurrentStaff = function(callback){
     var self = this;
-    console.info(self.accountId);
     return API.staff.getStaff({id: self.accountId}, callback);
 }
 
@@ -162,13 +134,11 @@ staff.getCurrentStaff = function(callback){
  */
 staff.listAndPaginateStaff = auth.checkPermission(["user.query"],
     function(params, callback) {
-        console.log(params);
-        console.log("=======================");
         var user_id = this.accountId;
         return API.staff.getStaff({id:user_id})
             .then(function(data){
                 params.companyId = data.companyId;
-                return API.staff.listAndPaginateStaff(params, callback);
+                return API.staff.listAndPaginateStaff(params);
             })
             .nodeify(callback);
     });
@@ -204,7 +174,7 @@ staff.listAndPaginatePointChange = function(params, callback){
     return API.staff.getStaff({id:user_id})
         .then(function(data){
             params.companyId = data.companyId;
-            return API.staff.listAndPaginatePointChange(params, callback);
+            return API.staff.listAndPaginatePointChange(params);
         })
         .nodeify(callback);
 }
