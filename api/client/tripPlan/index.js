@@ -72,11 +72,7 @@ tripPlan.listTripPlanOrderByCompany = function(query, callback){
         userId: this.accountId,
         query: query
     }
-    return API.tripPlan.listTripPlanOrder(params, function(err, ret){
-        logger.info("*******");
-        logger.info(err);
-        logger.info(ret);
-    });
+    return API.tripPlan.listTripPlanOrder(params, callback);
 }
 
 /**

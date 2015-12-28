@@ -105,7 +105,7 @@ travelPolicy.getTravelPolicy = function(id, callback){
                             companyId: data.companyId //只允许查询该企业下的差旅标准
                         }
                     };
-                    options.order = "create_at desc";//[["create_at", "desc"]]
+                    options.order = "create_at asc";//[["create_at", "desc"]]
                     return API.travelPolicy.getAllTravelPolicy(options)
                         .then(function(obj){
                             if(obj && obj.length > 0){
