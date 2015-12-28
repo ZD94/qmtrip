@@ -51,7 +51,6 @@ describe("api/client/travelPlan.js", function() {
             if (err) {
                 throw err;
             }
-            console.info(result);
             done();
         })
     });

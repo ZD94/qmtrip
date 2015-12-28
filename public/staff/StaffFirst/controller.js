@@ -18,6 +18,7 @@ var StaffFirst = (function(){
 	var StaffFirst ={};
 	StaffFirst.StaffUserController = function($scope){
 		dataloading(false);
+		loading(true);
 		$("title").html("首页");
 		$(".left_nav li").removeClass("on").eq(0).addClass("on");
 		//企业管理首页信息
@@ -30,12 +31,18 @@ var StaffFirst = (function(){
 						var travelLevel =ret.travelLevel;
 						var str = ret.name;
 						$scope.firstname=str.substring(0,2);
+								console.info("*************************");
+								API.tripPlan.listTripPlanOrderByCompany({$or: [{status: 0}, {status: 1}]}, function(err, ret){
+										console.info(err);
+										console.info(ret);
+								})
 						Q.all([
 							API.tripPlan.listTripPlanOrderByCompany({$or: [{status: 0}, {status: 1}]}),
 							API.travelPolicy.getTravelPolicy(travelLevel)
 						])
 						.spread(function(tripPlanOrders,travelPolicy){
 							$scope.businesstimes = tripPlanOrders.length;
+							console.info(tripPlanOrders)
 							$scope.travelpolicy = travelPolicy;
 							dataloading(true);
 							$scope.$apply();

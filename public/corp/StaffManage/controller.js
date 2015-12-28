@@ -154,9 +154,8 @@ var staff = (function(){
             var commit = true;
 
             API.onload(function(){
-                API.staff.updateStaff(id,{name:name,mobile:tel,email:mail,department:department,travelLevel:standard,roleId:power})
+                API.staff.updateStaff({id: id, name:name,mobile:tel,email:mail,department:department,travelLevel:standard,roleId:power})
                     .then(function(newStaff){
-                        console.info(123);
                         $(".add_staff2").hide();
                         $scope.initstafflist();
                         $scope.$apply();
