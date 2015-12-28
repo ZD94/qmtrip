@@ -18,7 +18,7 @@
             <i>目前共23名员工</i>
             <span>待激活3名|管理员2名|普通员工18名</span>
             <a ng-click="addStaff()" id="add">添加员工</a>
-            <a id="add_lot">批量导入</a>
+            <a id="add_lot" ng-click="addALotStaff()">批量导入</a>
         </div>
         <div class="add_staff">
             <div class="little_triangle">
@@ -144,6 +144,11 @@
             </div>
             <div style="clear: both;"></div>
         </ul>
+    </div>
+    <div class="staff_tab_import">
+        <div class="staff_tab_import_head">
+            <p>请选择您要批量导入的文件:</p>
+        </div>
     </div>
 </div>
 
