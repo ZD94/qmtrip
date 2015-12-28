@@ -13,14 +13,14 @@ describe("api/client/agency.js", function() {
         mobile: "13121534026"
     }
 
-    describe("API.agency.createAgency", function() {
+    /*describe("API.agency.createAgency", function() {
         it("API.agency.createAgency", function(done) {
             API.client.agency.createAgency({}, function(err, result) {
                 assert.equal(err, null);
                 done();
             });
         })
-    })
+    })*/
 
     //创建代理商用户
     /*describe("API.agency.createAgencyUser", function() {
@@ -33,7 +33,7 @@ describe("api/client/agency.js", function() {
      })
      })*/
     //查询代理商集合
-    describe("API.agency.listAndPaginateAgencyUser", function() {
+    /*describe("API.agency.listAndPaginateAgencyUser", function() {
         it("API.agency.listAndPaginateAgencyUser", function(done) {
             API.client.agency.listAndPaginateAgencyUser({}, function(err, result) {
                 assert.equal(err, null);
@@ -42,7 +42,7 @@ describe("api/client/agency.js", function() {
                 done();
             });
         })
-    })
+    })*/
     //更新代理商信息
     /*describe("API.agency.updateAgencyUser", function() {
      it("API.agency.updateAgencyUser", function(done) {

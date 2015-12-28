@@ -1,119 +1,81 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
-<html ng-app="tulingdao.com">
+<html ng-app="qmtrip.staff">
 <head>
 	<meta charset="UTF-8">
 	<title ng-bind="pageTitle"></title>
-    <link rel="stylesheet" type="text/css" href="/staff/css/public.css">
+	<link rel="stylesheet" type="text/css" href="/staff/css/public.css">
+	<link rel="stylesheet" type="text/css" href="/staff/css/businesstravel.css">
+	<link rel="stylesheet" type="text/css" href="/staff/css/travelplan.css">
 	<link rel="stylesheet" type="text/css" href="/staff/css/users.css">
 	<link rel="stylesheet" type="text/css" href="/staff/css/auth.css"/>
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
 	<script type="text/javascript">
         var jQuery = $ = require('jquery');
+		require("jquery-ui");
     </script>
     <script type="text/javascript" src="/script/libs/bundle.angular.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.api.js"></script>
     <script type="text/javascript" src="/script/libs/api.js"></script>
     <script type="text/javascript" src="/script/libs/ngapp.js"></script>
     <script type="text/javascript" src="/script/messagebox.js"></script>
-    <script type="text/javascript" src="/script/header.js"></script>
+    <script type="text/javascript" src="/script/selectbox.js"></script>
     <script type="text/javascript" src="/staff/controller.all.js"></script>
     <script type="text/javascript">
-    	var Q = require('q');
-    	var moment = require('moment');
-    	var TLD = TLD_angular_app('tulingdao.com', 'staff', '/StaffFirst/StaffUser');
-		API.onlogin(function(){
-			var backUrl = window.location.href;
-			backUrl = encodeURIComponent(backUrl);
-			window.location.href = "/staff.html#/auth/login?backurl="+backUrl;
-		});
-		// function logout(){
-		// 	API.require('auth');
-		// 	API.onload(function(){
-		// 		API.auth.logout()
-		// 				.then(function (data) {
-		// 					location.reload();
-		// 				}).catch(function(error){
-		// 			console.log(error);
-		// 		}).done();
-		// 	});
-		// };
-    	//获取页面基本信息
-    	TLD.controller("MainController", ["$scope", function($scope) {
-            API.require("auth");
-			API.require("staff", function(err, mod){ //API.require 使用回调函数时,不会导致页面跳转登录
-				if(err || !mod){
-					//console.log('load staff err:', err);
-					return;
-				}
-				API.staff.getCurrentStaff()
-						.then(function(ret){
-							$scope.staff = ret;
-							$scope.$apply();
-						})
-						.catch(function(err){
-							console.info(err)
-						});
-			});
-			$scope.logout = function(){
-				if(!API.auth)
-					return;
-				API.auth.logout()
-						.then(function(ret){
-							window.location.href = "/staff.html#/auth/login?backurl="+encodeURIComponent(window.location.href);
-						})
-						.catch(function(err){
-							console.info(err)
-						})
-			};
-    	}])
-    </script>
-    <script type="text/javascript">
-    $(function(){
-    	$(".staff_menu_t a li").click(function(){
-    		var $that = $(this);
-    		$(".staff_menu_t li").removeClass("on");
-    		$that.addClass("on");
-    	})
-    })
+        var Q = require('q');
+        var moment = require('moment');
+        var TLD = TLD_angular_app('qmtrip.staff');
+        TLD.config(function ($stateProvider, $urlRouterProvider) {
+            $urlRouterProvider.otherwise('/StaffFirst/StaffUser');
+            $stateProvider
+                    .state("auth", {
+                        url: "/auth/:path",
+                        controllerProvider: function ($injector, $stateParams){
+                            $stateParams.path = 'auth/' + $stateParams.path;
+                            return $injector.invoke(TLD_angular_app_defaultControllerProvider, this, {$stateParams:$stateParams});
+                        },
+                        templateUrl: function (params) {
+                            return '/staff/auth/' + params.path + ".html";
+                        }
+                    })
+                    .state("root", {
+                        url: "",
+                        abstract: true,
+                        controllerProvider: TLD_angular_app_defaultControllerProvider,
+                        templateUrl: function (params) {
+                            return '/staff/index.html';
+                        }
+                    })
+                    .state("root.content", {
+                        url: "/*path",
+                        controllerProvider: TLD_angular_app_defaultControllerProvider,
+                        templateUrl: function (params) {
+                            return '/staff/' + params.path + ".html";
+                        }
+                    });
+        });
+        API.onlogin(function () {
+            var backUrl = window.location.href;
+            backUrl = encodeURIComponent(backUrl);
+            window.location.href = "/staff.html#/auth/login?backurl=" + backUrl;
+        });
+        // function logout(){
+        // 	API.require('auth');
+        // 	API.onload(function(){
+        // 		API.auth.logout()
+        // 				.then(function (data) {
+        // 					location.reload();
+        // 				}).catch(function(error){
+        // 			console.log(error);
+        // 		}).done();
+        // 	});
+        // };
     </script>
 </head>
-<body ng-controller="MainController">
-	<div class="staff_header">
-		<div class="s_header_main">
-			<div class="staff_logo">
-				<a href="/">
-					<img src="staff/images/qmtrip.png">
-				</a>
-			</div>
-			<div class="staff_menu_t">
-				<ul>
-					<a href=""><li class="on">首页</li></a>
-					<a href=""><li>出差记录</li></a>
-					<a href=""><li>积分兑换</li></a>
-                    <a href=""><li>我要出差</li></a>
-					<!-- <a href="" class="tobusiness">我要出差</a> -->
-				</ul>
-			</div>
-			<div class="staff_header_r">
-				<span class="header_account" id="account">您好，<a href="">{{staff.name}}</a><em class="web-icon-font">&#xf0d7;</em></span>
-				<div id="account_menu" class="account_menu">
-					<ul>
-						<li><a href="">修改密码</a></li>
-						<li><a ng-click="logout()">退出</a></li>
-						<!-- <li><a href="javascript: logout();">退出</a></li> -->
-					</ul>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="staff_content">
-		<div class="s_contentmain" id="angular-view" ng-view>
-		</div>
-	</div>
-	<div class="footer">
-		<p>由途灵岛信息股份有限公司提供技术支持</p>
-		<p>联系电话：010-57371105</p>
-	</div>
+<body>
+<div id="angular-view" ui-view></div>
+<div class="footer">
+    <p>由途灵岛信息股份有限公司提供技术支持</p>
+    <p>联系电话：010-57371105</p>
+</div>
 </body>
 </html>

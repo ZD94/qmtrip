@@ -5,6 +5,11 @@
 var uuid = require("node-uuid");
 var now = require("../../../common/utils").now;
 
+var ACCOUNT_TYPE = {
+    COMMON_STAFF:1,
+    AGENT_STAFF: 2,
+}
+
 module.exports = function (Db, DataType) {
     return Db.define("Account", {
         id               : {type: DataType.UUID,            defaultValue: uuid.v1, primaryKey: true},
@@ -17,7 +22,8 @@ module.exports = function (Db, DataType) {
         loginFailTimes   : {type: DataType.INTEGER,         defaultValue: 0, field: "login_fail_times"}, //连续错误次数
         lastLoginAt      : {type: "timestamp",              field: "last_login_at"}, //最近登录时间
         lastLoginIp      : {type: DataType.STRING(50),      field: "last_login_ip"}, //最近登录Ip
-        activeToken      : {type: DataType.STRING(50),      field: "active_token"}
+        activeToken      : {type: DataType.STRING(50),      field: "active_token"},
+        type             : {type: DataType.INTEGER,         defaultValue: ACCOUNT_TYPE.COMMON_STAFF}
     }, {
         tableName : "accounts",
         timestamps: false,

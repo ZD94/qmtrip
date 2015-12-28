@@ -11,7 +11,8 @@ create table auth.accounts (
     login_fail_times int default 0,
     last_login_at timestamp default now(),
     last_login_ip varchar(50),
-    active_token varchar(50)
+    active_token varchar(50),
+    type integer default 1
 );
 
 

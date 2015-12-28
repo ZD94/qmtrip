@@ -71,7 +71,7 @@ describe("api/client/staff.js", function() {
         })
     })*/
     //通过id得到员工
-    describe("API.staff.getStaff", function() {
+    /*describe("API.staff.getStaff", function() {
         it("API.staff.getStaff", function(done) {
             API.client.staff.getStaff("ee3eb6a0-9f22-11e5-8540-8b3d4cdf6eb6", function(err, result) {
                 assert.equal(err, null);
@@ -79,7 +79,7 @@ describe("api/client/staff.js", function() {
                 done();
             });
         })
-    })
+    })*/
     //加积分
     /*describe("API.staff.increaseStaffPoint", function() {
         it("API.staff.increaseStaffPoint", function(done) {

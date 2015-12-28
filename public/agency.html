@@ -6,10 +6,8 @@
 	<title ng-bind="pageTitle">代理商管理</title>
 	<link rel="stylesheet" type="text/css" href="/agency/css/common.css">
 	<link rel="stylesheet" type="text/css" href="/agency/css/public.css">
+	<link rel="stylesheet" type="text/css" href="/agency/css/companylist.css">
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
-	<script type="text/javascript">
-        var jQuery = $ = require('jquery');
-    </script>
     <script type="text/javascript" src="/script/libs/bundle.angular.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.api.js"></script>
     <script type="text/javascript" src="/script/libs/api.js"></script>
@@ -106,7 +104,7 @@
 		</div>
 		<div class="corp_box">
 			<div class="c_boxmain">
-				<div id="angular-view" ng-view></div>
+				<div id="angular-view" ui-view></div>
 			</div>
 		</div>
 		<div class="corp_m_footer">

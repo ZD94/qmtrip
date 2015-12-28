@@ -1,0 +1,64 @@
+<div class="business-travel">
+    <div class="business_bg"></div>
+    <section class="creating">
+        <table width="100%">
+            <tr>
+                <td align="center" height="50" class="loadtxt" style="border-bottom: 1px #E5E5E5 solid;">
+                    您计划&nbsp;&nbsp;&nbsp;<span ng-if="starttime!=undefined">{{starttime}}&nbsp;&nbsp;&nbsp;{{startplace}}-{{endplace}}&nbsp;&nbsp;&nbsp;</span><span ng-if="starttimelate!=undefined && starttimelate!=''">最晚{{starttime}} {{starttimelate}}到达</span><br>
+                    <span ng-if="liveplace!=undefined">在{{liveplace}}附近酒店入住&nbsp;&nbsp;&nbsp;</span><span ng-if="livetime!=undefined">计划住店时间为{{livetime}}到{{leavetime}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td align="center" class="loadimg">正在生成动态预算单<br><img src="images/loading.gif"></td>
+            </tr>
+        </table>
+    </section>
+
+    <section class="createresult">
+        <div class="top">本次出差预算：¥{{price.price}}<span style="position: absolute; right: 20px;">{{purposename}}项目</span></div>
+        <div class="center">
+            <table width="100%" border="1" bordercolor="#E5E5E5">
+                <tr>
+                    <td width="80%" height="40" align="center" style="font-size: 14px;">明细</td>
+                    <td width="20%" height="40" align="center" style="font-size: 14px;">预算</td>
+                </tr>
+                <tr ng-if="startplaceval">
+                    <td height="90" style="font-size: 14px;">
+                        <div class="icon">
+                            <span>行</span>
+                        </div>
+                        <div class="startplace">{{startplace}}</div>
+                        <div class="description">{{starttime}}<span ng-if="starttimelate!=undefined && starttimelate!=''">&nbsp;&nbsp;&nbsp;最晚{{starttime}}&nbsp;{{starttimelate}}到达</span></div>
+                        <div class="endplace">{{endplace}}</div>
+                    </td>
+                    <td height="90" style="font-size: 14px;" align="center">¥{{price.traffic}}</td>
+                </tr>
+                <tr ng-if="liveplace">
+                    <td height="90" style="font-size: 14px;">
+                        <div class="icon">
+                            <span>住</span>
+                        </div>
+                        <div style="line-height: 35px; padding: 10px 0; float: left;">入住地：{{endplace}}&nbsp;{{liveplace}}附近<br>入住日期：{{livetime}}&nbsp;&nbsp;&nbsp;退房日期：{{leavetime}}</div>
+                    </td>
+                    <td height="90" style="font-size: 14px;" align="center">¥{{price.hotel}}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="bottom1">
+            <div>
+                <input type="button" value="返回上一步" class="common_btn2 w120" ng-click="prevstep()" style="margin-left: 300px;">
+                <input type="button" value="取消" class="common_btn2 w120" ng-click="cancel()" style="margin-left: 20px;">
+                <input type="button" value="生成出差记录" class="common_btn1 w120" ng-click="createRecord()" style="margin-left: 20px;">
+                <div class="bottom_txt">提示：生成出差记录同时会发送短信消息通知给企业管理人员</div>
+            </div>
+        </div>
+        <div class="bottom2">
+            <div>
+                <div class="bottom_txt">出差记录已生成，可在&nbsp;<a href="#">我的账户</a>&nbsp;>&nbsp;<a href="#">出差记录</a>&nbsp;中查找</div>
+                <input type="button" value="去预定" class="common_btn2 w120" style="margin-left: 370px;">
+                <input type="button" value="上传票据" class="common_btn2 w120" style="margin-left: 20px;">
+            </div>
+        </div>
+    </section>
+    <div class="tianxun">推荐去<a href="http://www.tianxun.com/" target="_blank">天巡网</a>进行预订</div>
+</div>
