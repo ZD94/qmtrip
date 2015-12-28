@@ -28,7 +28,7 @@ describe("api/client/place.js", function() {
             if (err) {
                 throw err;;
             }
-
+            console.info(result);
             var ret = util.isArray(result);
             assert.equal(ret, true);
             done();

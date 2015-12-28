@@ -53,8 +53,8 @@ var auth=(function(){
                             }
 
                         }).catch(function(err){
-                            console.info(err);
                             if (err.msg) {
+                                alert(err.msg);
                                 console.log(err.msg);
                                 //Myalert("提示信息", err.msg);
                             } else {
@@ -205,9 +205,10 @@ var auth=(function(){
             API.onload(function(){
                 API.checkcode.getMsgCheckCode({mobile:mobile})
                     .then(function(result){
+                        console.info("获取到的结果是:");
+                        console.info(result);
                         //console.info("获取验证码", result);
-                        if(result.code == 0){
-                            msgTicket = result.data.ticket;
+                            msgTicket = result.ticket;
                             $scope.$apply();
 
                             var $seconds = $("#seconds");
@@ -230,7 +231,6 @@ var auth=(function(){
                                     $seconds.text(begin);
                                 }
                             }, 1000);
-                        }
                     }).catch(function(err){
                         if(err.msg) {
                             alert(err.msg);
@@ -263,8 +263,8 @@ var auth=(function(){
                 API.checkcode.getPicCheckCode({width:imgW,height:imgH,quality:100,length:4})
                     .then(function(result){
                         //console.info("获取验证码图片", result);
-                        $("#imgCode").attr("src",result.data.captcha);
-                        picTicket = result.data.ticket;
+                        $("#imgCode").attr("src",result.captcha);
+                        picTicket = result.ticket;
                     }).catch(function(err){
                         console.info(err);
                     }).done();
@@ -350,9 +350,11 @@ var auth=(function(){
                             throw {};
                         })
                         .then(function(result) {
-                            return API.auth.registryCompany({companyName:cName,name:name,email:mail,mobile:mobile,pwd:pwd,msgCode:mCode,msgTicket:msgTicket,picCode:pCode,picTicket:picTicket});
+                            return API.auth.registryCompany({companyName:cName,name:name,email:mail,mobile:mobile,
+                                pwd:pwd,msgCode:mCode,msgTicket:msgTicket,picCode:pCode,picTicket:picTicket});
                         })
-                        .then(function(){
+                        .then(function(result){
+                            console.info("注册返回的结果", result);
                             alert("注册成功");
                             window.location.href = "#/auth/login";
                             //window.location.href = "#/auth/corplaststep";
@@ -387,8 +389,8 @@ var auth=(function(){
         API.onload(function () {
             API.checkcode.getPicCheckCode({width: imgW, height: imgH, quality: 100, length: 4, type: 1})
                 .then(function (result) {
-                    $("#imgCode").attr("src", result.data.captcha);
-                    picTicket = result.data.ticket;
+                    $("#imgCode").attr("src", result.captcha);
+                    picTicket = result.ticket;
                 }).catch(function (err) {
                     console.info(err);
                 }).done();
@@ -401,8 +403,8 @@ var auth=(function(){
                 API.checkcode.getPicCheckCode({width: imgW, height: imgH, quality: 100, length: 4})
                     .then(function (result) {
                         //console.info("获取验证码图片", result);
-                        $("#imgCode").attr("src", result.data.captcha);
-                        picTicket = result.data.ticket;
+                        $("#imgCode").attr("src", result.captcha);
+                        picTicket = result.ticket;
                     }).catch(function (err) {
                         console.info(err);
                     }).done();

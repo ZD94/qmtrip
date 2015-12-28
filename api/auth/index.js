@@ -16,6 +16,12 @@ var moment = require("moment");
 var API = require("../../common/api");
 var errorHandle = require("common/errorHandle");
 
+var ACCOUNT_STATUS = {
+    ACTIVE: 1,
+    NOT_ACTIVE: 0,
+    FORBIDDEN: -1
+};
+
 /**
  * @class API.auth 认证类
  * @constructor
@@ -55,17 +61,17 @@ authServer.activeByEmail = function(data, callback) {
             }
 
             if (account.status == 1) {
-                return {code: 0, msg: "OK"};
+                return true;
             }
 
             var needSign = makeActiveSign(account.activeToken, accountId, timestamp)
             if (sign.toLowerCase() != needSign.toLowerCase()) {
                 throw L.ERR.ACTIVE_URL_INVALID;
             }
-            account.status = 1;
-            return account.save()
+
+            return Models.Account.update({status: ACCOUNT_STATUS.ACTIVE, activeToken: null}, {where: {id: account.id}})
                 .then(function() {
-                    return {code: 0, msg: "OK"};
+                    return true;
                 })
         })
         .catch(errorHandle)
@@ -445,13 +451,12 @@ function _sendActiveEmail(accountId) {
             var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
             var activeToken = getRndStr(6);
             var sign = makeActiveSign(activeToken, account.id, expireAt);
-            var url = C.host + "/auth.html#/auth/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
+            var url = C.host + "/staff.html#/auth/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
             //发送激活邮件
             var sendEmailRequest = Q.denodeify(API.mail.sendMailRequest);
             return  sendEmailRequest({toEmails: account.email, templateName: "qm_active_email", values: [account.email, url]})
                 .then(function(result) {
                     account.activeToken = activeToken;
-//                    return account.save();
                     return Models.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
                 })
         })
