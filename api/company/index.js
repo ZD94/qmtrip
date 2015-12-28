@@ -81,17 +81,17 @@ company.checkBlackDomain = function(params, callback) {
  * @returns {*}
  */
 company.updateCompany = function(params, callback){
-    var defer = Q.defer();
-    var companyId = params.companyId;
     return checkParams(['companyId'], params)
         .then(function(){
-            delete params.companyId;
-            return Company.findById(companyId, {attributes: ['createUser']}) // (['createUser'], {where: {id: companyId}})
+            var companyId = params.companyId;
+            return Company.findById(companyId, {attributes: ['createUser']});
         })
         .then(function(company){
             if(!company){
                 throw L.ERR.COMPANY_NOT_EXIST;
             }
+            var companyId = params.companyId;
+            delete params.companyId;
             params.updateAt = utils.now();
             var cols = getColsFromParams(params);
             return Company.update(params, {returning: true, where: {id: companyId}, fields: cols})
@@ -113,7 +113,6 @@ company.updateCompany = function(params, callback){
  * @returns {*}
  */
 company.getCompany = function(params, callback){
-    var defer = Q.defer();
     return checkParams(['companyId'], params)
         .then(function(){
             var companyId = params.companyId;
@@ -154,7 +153,6 @@ company.listCompany = function(params, callback){
  * @returns {*}
  */
 company.deleteCompany = function(params, callback){
-    var defer = Q.defer();
     return checkParams(['companyId', 'userId'], params)
         .then(function(){
             var companyId = params.companyId;
@@ -162,12 +160,10 @@ company.deleteCompany = function(params, callback){
             return Company.findById(companyId, {attributes: ['createUser']})
                 .then(function(company){
                     if(!company){
-                        defer.reject(L.ERR.COMPANY_NOT_EXIST);
-                        return defer.promise;
+                        throw L.ERR.COMPANY_NOT_EXIST;
                     }
                     if(company.createUser != userId){
-                        defer.reject(L.ERR.PERMISSION_DENY);
-                        return defer.promise;
+                        throw L.ERR.PERMISSION_DENY;
                     }
                     return Company.destroy({where: {id: companyId}})
                         .then(function(ret){
@@ -206,12 +202,8 @@ company.getCompanyFundsAccount = function(params, callback){
  * @returns {*}
  */
 company.moneyChange = function(params, callback){
-    var defer = Q.defer();
     return checkParams(['money', 'channel', 'userId', 'type', 'companyId', 'remark'], params)
         .then(function() {
-            var money = params.money;
-            var userId = params.userId;
-            var type = params.type;
             var id = params.companyId;
             return FundsAccounts.findById(id);
         })
@@ -219,6 +211,10 @@ company.moneyChange = function(params, callback){
             if(!funds){
                 throw {code: -2, msg: '企业资金账户不存在'};
             }
+            var id = funds.id;
+            var money = params.money;
+            var userId = params.userId;
+            var type = params.type;
             var fundsUpdates = {
                 updateAt: utils.now()
             };
