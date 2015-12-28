@@ -109,7 +109,8 @@ staff.deleteStaff = function(params, callback){
  * @param callback
  * @returns {*}
  */
-staff.updateStaff = function(id, data, callback){
+staff.updateStaff = function(data, callback){
+    var id = data.id;
     var defer = Q.defer();
     if(!id){
         defer.reject({code: -1, msg: "id不能为空"});
@@ -156,7 +157,8 @@ staff.updateStaff = function(id, data, callback){
  * @param callback
  * @returns {*}
  */
-staff.getStaff = function(id, callback){
+staff.getStaff = function(params, callback){
+    var id = params.id;
     var defer = Q.defer();
     if(!id){
         defer.reject({code: -1, msg: "id不能为空"});
@@ -197,15 +199,12 @@ staff.findOneStaff = function(params, callback){
  * @param options options.perPage 每页条数 options.page当前页
  * @param callback
  */
-staff.listAndPaginateStaff = function(params, options, callback){
-    if (typeof options == 'function') {
-        callback = options;
-        options = {};
+staff.listAndPaginateStaff = function(params, callback){
+    var options = {};
+    if(params.options){
+        options = params.options;
+        delete params.options;
     }
-    if (!options) {
-        options = {};
-    }
-
     var page, perPage, limit, offset;
     if (options.page && /^\d+$/.test(options.page)) {
         page = options.page;
@@ -227,6 +226,9 @@ staff.listAndPaginateStaff = function(params, options, callback){
     options.where = params;
     return staffModel.findAndCountAll(options)
         .then(function(result){
+            result.rows = result.rows.map(function(item){
+                return item.toJSON();
+            })
             return new Paginate(page, perPage, result.count, result.rows);
         })
         .nodeify(callback);

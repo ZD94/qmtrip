@@ -87,7 +87,7 @@ updateRole(agency_roles);
  */
 function getRoleOfAccount(data) {
     var accountId = data.accountId;
-    return API.staff.getStaff(data.accountId)
+    return API.staff.getStaff({id:data.accountId})
         .then(function(staff) {
             return API.company.getCompany({companyId: staff.companyId});
         })

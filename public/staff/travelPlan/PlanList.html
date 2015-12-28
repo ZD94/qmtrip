@@ -1,0 +1,41 @@
+<style>html,body {background: #F5F5F5;}</style>
+<div class="travel-plan">
+    <div class="mainbox">
+        <ul class="mainbox_top">
+            <li class="active">待上传票据</li>
+            <li>已完成</li>
+        </ul>
+        <div class="mainbox_bottom">
+            <div class="search">
+                <input type="text" class="common_text" placeholder="输入出发时间/内容简介" style="width: 238px; margin-top: 19px;">
+                <input type="button" value="预算单搜索" class="common_btn1" style="width: 120px; margin: 19px 0 0 20px;">
+            </div>
+            <div class="content">
+                <table style="width: 100%">
+                    <tr>
+                        <th align="center">出发时间</th>
+                        <th align="center">服务</th>
+                        <th align="center">预算单内容简介</th>
+                        <th align="center">预算</th>
+                        <th align="center">上传进度</th>
+                        <th align="center">操作</th>
+                    </tr>
+                    <tr ng-repeat="item in planListitems" ng-click="enterDetail(item.id)">
+                        <td align="center">{{item.startAt | date: 'yyyy-MM-dd'}}</td>
+                        <td align="center">交通<br>住宿</td>
+                        <td align="center">
+                            {{item.startPlace}}-{{item.destination}}<br>
+                            住宿：{{item.destination}}
+                        </td>
+                        <td align="center">{{item.budget}}</td>
+                        <td align="center"></td>
+                        <td align="center">上传</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
