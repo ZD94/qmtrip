@@ -143,6 +143,7 @@ auth.registryCompany = function(params, callback) {
         defer.reject({code: -1, msg: "密码不能为空"});
         return defer.promise.nodeify(callback);
     }
+    var companyId = uuid.v1();
 
     return Q()
         .then(function() {
@@ -159,7 +160,6 @@ auth.registryCompany = function(params, callback) {
             return API.auth.newAccount({mobile: mobile, email: email, pwd: pwd});
         })
         .then(function(account) {
-            var companyId = uuid.v1();
             return Q.all([
                     API.company.createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain}),
                     API.staff.createStaff({accountId: account.id, companyId: companyId, email: email, mobile: mobile, name: name, roleId: 0})
