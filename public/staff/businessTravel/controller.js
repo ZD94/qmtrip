@@ -20,6 +20,8 @@ var businessTravel=(function(){
     businessTravel.IndexController = function($scope) {
         loading(true);
         $("title").html("我要出差");
+        $(".staff_menu_t ul li").removeClass("on");
+        $(".staff_menu_t ul a:eq(3) li").addClass("on");
         Myselect();
         //step1 获取选择状态
         $scope.trafficimg = $(".trafficimg").css("display");
