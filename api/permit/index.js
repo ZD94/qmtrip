@@ -24,7 +24,7 @@ var roles = {
     admin: {
         name: '管理员',
         inherit: ['staff', 'finance'],
-        permission: ['user.query', 'user.add', 'user.delete', 'user.edit', 'company.query', 'company.edit', 'user.role']
+        permission: ['user.query', 'user.add', 'user.delete', 'user.edit', 'company.query', 'company.edit', 'user.role', 'travelPolicy.add', 'travelPolicy.ddelete', 'travelPolicy.update', 'travelPolicy.query']
     },
     owner: {
         name: '创建人',
