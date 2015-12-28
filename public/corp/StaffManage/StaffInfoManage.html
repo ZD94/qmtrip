@@ -91,7 +91,7 @@
             <li><span ng-if="item.department == null">暂未设置</span><span>{{item.department}}</span></li>
             <li><span>{{item.travelLeverName}}</span></li>
             <li><span ng-if="item.roleId == 1">普通员工</span><span ng-if="item.roleId == 2">管理员</span><span ng-if="item.roleId == 3">财务人员</span></li>
-            <li><span ng-click="editStaffInfo($index)" id="change">修改</span>&nbsp;|&nbsp;<span ng-click="delStaffInfo()">删除</span></li>
+            <li><span ng-click="editStaffInfo($index)" id="change">修改</span>&nbsp;|&nbsp;<span ng-click="delStaffInfo(item.id, $index)">删除</span></li>
             <div class="add_staff2">
                 <div class="little_triangle2">
                 </div>

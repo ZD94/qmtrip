@@ -24,16 +24,16 @@
         var Q = require('q');
         var moment = require('moment');
         var TLD = TLD_angular_app('qmtrip.staff');
-        TLD.config(function ($stateProvider) {
+        TLD.config(function ($stateProvider, $urlRouterProvider) {
+            $urlRouterProvider.otherwise('/StaffFirst/StaffUser');
             $stateProvider
                     .state("auth", {
                         url: "/auth/:path",
-                        controllerProvider: function ($stateParams){
+                        controllerProvider: function ($injector, $stateParams){
                             $stateParams.path = 'auth/' + $stateParams.path;
-                            return TLD_angular_app_defaultControllerProvider($stateParams);
+                            return $injector.invoke(TLD_angular_app_defaultControllerProvider, this, {$stateParams:$stateParams});
                         },
                         templateUrl: function (params) {
-                            console.log('state auth', params);
                             return '/staff/auth/' + params.path + ".html";
                         }
                     })
@@ -42,7 +42,6 @@
                         abstract: true,
                         controllerProvider: TLD_angular_app_defaultControllerProvider,
                         templateUrl: function (params) {
-                            console.log('state root', params);
                             return '/staff/index.html';
                         }
                     })
@@ -50,7 +49,6 @@
                         url: "/*path",
                         controllerProvider: TLD_angular_app_defaultControllerProvider,
                         templateUrl: function (params) {
-                            console.log('state root.content', params);
                             return '/staff/' + params.path + ".html";
                         }
                     });
