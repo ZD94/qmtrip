@@ -181,8 +181,8 @@ var auth=(function(){
         API.onload(function(){
             API.checkcode.getPicCheckCode({width:imgW,height:imgH,quality:100,length:4})
                 .then(function(result){
-                    $("#imgCode").attr("src",result.data.captcha);
-                    picTicket = result.data.ticket;
+                    $("#imgCode").attr("src",result.captcha);
+                    picTicket = result.ticket;
                 }).catch(function(err){
                     console.info(err);
                 }).done();
