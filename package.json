@@ -43,6 +43,7 @@
     "sequelize": "^3.14.2",
     "serve-favicon": "^2.3.0",
     "shoe": "0.0.15",
+    "tiny-cookie": "^0.5.5",
     "weak": "^1.0.0"
   },
   "optionalDependency": {

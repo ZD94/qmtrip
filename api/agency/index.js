@@ -44,40 +44,38 @@ agency.registerAgency = function(params, callback){
             }
             return API.auth.findOneAcc({$or: [{mobile: mobile}, {email: email}]})
                 .then(function(ret){
-                    if(ret.code){
+                    if(!ret){
                         return API.auth.newAccount(account);
                     }else{
-                        return ret.account;
+                        return ret;
                     }
                 })
                 .then(function(account){
                     var accountId = account.id;
                     agency.createUser = accountId;
                     agencyUser.id = accountId;
-                    agency.myName = 'yumiao';
                     return sequelize.transaction(function(t){
                         return Q.all([
                             Agency.create(agency, {transaction: t}),
                             AgencyUser.create(agencyUser, {transaction: t})
                         ])
-                            .then(function(){
-                                return {code: 0, msg: '注册成功'}
-                            })
-                            .catch(function(err){
-                                logger.error(err);
-                                return Agency.findOne({where: {$or: [{mobile: mobile}, {email: email}]}, attributes: ['id']})
-                                    .then(function(agency){
-                                        if(agency){
-                                            throw {code: -4, msg: '手机号或邮箱已经注册'};
-                                        }else{
-                                            throw {code: -3, msg: '注册异常'};
-                                        }
-                                    })
-                            })
                     })
                 })
+                .then(function(){
+                    return {code: 0, msg: '注册成功'}
+                })
+                .catch(function(err){
+                    logger.error(err);
+                    return Agency.findOne({where: {$or: [{mobile: mobile}, {email: email}]}, attributes: ['id']})
+                        .then(function(agency){
+                            if(agency){
+                                throw {code: -4, msg: '手机号或邮箱已经注册'};
+                            }else{
+                                throw {code: -3, msg: '注册异常'};
+                            }
+                        })
+                })
         })
-        //.catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -135,8 +133,7 @@ agency.getAgency = function(params, callback){
             return Agency.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updateAt']})
                 .then(function(agency){
                     if(!agency){
-                        defer.reject({code: -2, msg: '没有代理商'});
-                        return defer.promise;
+                        throw {code: -2, msg: '没有代理商'};
                     }
                     return agency;
                 })

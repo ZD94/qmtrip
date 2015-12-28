@@ -88,7 +88,7 @@
   width: 200px;
   top: 0px;
   display: none;
-  z-index: -2;
+  z-index: 0;
   i{
     color: @color-alert-wrong;
     margin-right: 10px;
@@ -104,6 +104,8 @@
   img{
     float: left;
     margin-top: 10px;
+    position: relative;
+    z-index: 2;
   }
   span{
     display: block;
@@ -113,7 +115,7 @@
     font-size: @h14;
     line-height: 22px;
     position: relative;
-    z-index: -1;
+    z-index: 1;
     margin-top: -20px;
     margin-left: -1px;
     padding:5px 10px;
@@ -130,6 +132,8 @@
   img{
     float: left;
     margin-top: 10px;
+    position: relative;
+    z-index: 2;
   }
   span{
     display: block;
@@ -139,7 +143,7 @@
     font-size: @h14;
     line-height: 30px;
     position: relative;
-    z-index: -1;
+    z-index: 1;
     /* margin-top: 2px; */
     margin-left: -1px;
     padding: 5px 10px;
@@ -154,7 +158,7 @@
   font-size: @h14;
   color: #b6b6b6;
   display: none;
-  z-index: -1;
+  z-index: 1;
   ul{
     width: 300px;
     border-radius: @border-radius-2;

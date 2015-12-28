@@ -18,7 +18,7 @@
             <i>目前共23名员工</i>
             <span>待激活3名|管理员2名|普通员工18名</span>
             <a ng-click="addStaff()" id="add">添加员工</a>
-            <a id="add_lot">批量导入</a>
+            <a id="add_lot" ng-click="addALotStaff()">批量导入</a>
         </div>
         <div class="add_staff">
             <div class="little_triangle">
@@ -89,9 +89,9 @@
             <li>{{item.email}}</li>
             <li>{{item.mobile}}</li>
             <li><span ng-if="item.department == null">暂未设置</span><span>{{item.department}}</span></li>
-            <li><span>{{item.travelLeverName}}</span></li>
-            <li><span ng-if="item.roleId == 1">普通员工</span><span ng-if="item.roleId == 2">管理员</span><span ng-if="item.roleId == 3">财务人员</span></li>
-            <li><span ng-click="editStaffInfo($index)" id="change">修改</span>&nbsp;|&nbsp;<span ng-click="delStaffInfo(item.id, $index)">删除</span></li>
+            <li><span ng-if="item.department == null">暂未设置</span><span>{{item.travelLeverName}}</span></li>
+            <li><span ng-if="item.roleId == 0">创建者</span><span ng-if="item.roleId == 1">普通员工</span><span ng-if="item.roleId == 2">管理员</span><span ng-if="item.roleId == 3">财务人员</span></li>
+            <li><span ng-click="editStaffInfo($index)" id="change">修改</span><a ng-if="item.roleId != 0">&nbsp;|&nbsp;<span ng-click="delStaffInfo(item.id, $index)">删除</span></a></li>
             <div class="add_staff2">
                 <div class="little_triangle2">
                 </div>
@@ -129,6 +129,7 @@
                                     <option value="2" ng-selected="item.roleId == 2">管理员</option>
                                     <option value="3" ng-selected="item.roleId == 3">财务人员</option>
                                     <option value="1" ng-selected="item.roleId == 1">普通员工</option>
+                                    <option value="0" ng-if="item.roleId == 0" ng-selected="item.roleId == 0">创建者</option>
                                 </select>
                             </li>
                         </ul>
@@ -145,10 +146,29 @@
             <div style="clear: both;"></div>
         </ul>
     </div>
+    <div class="staff_tab_import">
+        <div class="staff_tab_import_head">
+            <div class="staff_import_head">
+                <span>请选择您要批量导入的文件:</span>
+                <span>返回</span>
+            </div>
+            <input type="file" class="file" value="选取文件">
+        </div>
+    </div>
 </div>
 
 <script>
     $(function(){
+        /*$(".file").AjaxFileUpload({
+            action: '/upload/ajax-upload-file?type=xls',
+            dataType: 'json',
+            data: { id: 'aaa', name: 'bbb' },
+            onComplete: function(filename, response) {
+                console.log(filename);
+                console.log(response);
+                console.log(response.result);
+            }
+        });*/
         $(document).on("click","#change",function(){
             $(".add_staff2").hide();
             $(this).closest("ul").find(".add_staff2").show();

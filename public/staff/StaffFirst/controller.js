@@ -31,18 +31,12 @@ var StaffFirst = (function(){
 						var travelLevel =ret.travelLevel;
 						var str = ret.name;
 						$scope.firstname=str.substring(0,2);
-								console.info("*************************");
-								API.tripPlan.listTripPlanOrderByCompany({$or: [{status: 0}, {status: 1}]}, function(err, ret){
-										console.info(err);
-										console.info(ret);
-								})
 						Q.all([
-							API.tripPlan.listTripPlanOrderByCompany({$or: [{status: 0}, {status: 1}]}),
+							API.tripPlan.listTripPlanOrder({$or: [{status: 0}, {status: 1}]}),
 							API.travelPolicy.getTravelPolicy(travelLevel)
 						])
 						.spread(function(tripPlanOrders,travelPolicy){
 							$scope.businesstimes = tripPlanOrders.length;
-							console.info(tripPlanOrders)
 							$scope.travelpolicy = travelPolicy;
 							dataloading(true);
 							$scope.$apply();

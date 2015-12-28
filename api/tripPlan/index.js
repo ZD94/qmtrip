@@ -202,7 +202,7 @@ tripPlan.listTripPlanOrder = function(params, callback){
         return defer.promise.nodeify(callback);
     }
     var query = params.query;
-    return PlanOrder.findAll({where: {}})
+    return PlanOrder.findAll({where: query})
         .then(function(orders){
             return Q.all(orders.map(function(order){
                 var orderId = order.id;
@@ -241,7 +241,7 @@ tripPlan.saveConsumeRecord = function(params, options, callback){
     if(!options){
         options = {};
     }
-    var checkArr = ['orderId', 'accountId', 'type', 'startTime', 'endTime', 'invoiceType', 'budget'];
+    var checkArr = ['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'];
     return checkParams(checkArr, params)
         .then(function(){
             return ConsumeDetails.create(params, options)
