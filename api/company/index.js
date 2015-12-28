@@ -186,9 +186,11 @@ company.getCompanyFundsAccount = function(params, callback){
         .then(function(){
             var companyId = params.companyId;
             var userId = params.userId;
-            return FundsAccounts.findById(companyId,
-                {attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd',
-                    'staffReward', 'status', 'createAt', 'updateAt']});
+            return FundsAccounts.findById(companyId, {attributes: ['balance']})  //{attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createAt', 'updateAt']}
+                .then(function(ret){
+                    logger.info(ret);
+                    return ret;
+                })
         })
         .catch(errorHandle)
         .nodeify(callback);
