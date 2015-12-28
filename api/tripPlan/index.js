@@ -241,7 +241,7 @@ tripPlan.saveConsumeRecord = function(params, options, callback){
     if(!options){
         options = {};
     }
-    var checkArr = ['orderId', 'accountId', 'type', 'startTime', 'endTime', 'invoiceType', 'budget'];
+    var checkArr = ['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'];
     return checkParams(checkArr, params)
         .then(function(){
             return ConsumeDetails.create(params, options)

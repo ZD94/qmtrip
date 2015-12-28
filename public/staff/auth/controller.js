@@ -4,6 +4,7 @@ var auth=(function(){
     API.require('auth');
     API.require('checkcode');
     var  auth = {};
+    var Cookie = require('tiny-cookie');
 
     auth.LoginController = function ($scope, $routeParams) {
         $scope.toRegister = function(){
@@ -42,11 +43,12 @@ var auth=(function(){
                                 console.log(result.msg);
                             } else {
                                 var data = result.data;
-                                setCookie("user_id", data.user_id);
-                                setCookie("token_sign", data.token_sign);
-                                setCookie("timestamp", data.timestamp);
-                                setCookie("token_id", data.token_id);
+                                Cookie.set("user_id", data.user_id, { expires:30 });
+                                Cookie.set("token_sign", data.token_sign, { expires:30 });
+                                Cookie.set("timestamp", data.timestamp, { expires:30 });
+                                Cookie.set("token_id", data.token_id, { expires:30 });
                                 console.log("登录成功");
+                                API.reload_all_modules();
                                 window.location.href= backUrl;
                             }
 
