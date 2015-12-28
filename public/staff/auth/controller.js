@@ -48,6 +48,7 @@ var auth=(function(){
                                 Cookie.set("timestamp", data.timestamp, { expires:30 });
                                 Cookie.set("token_id", data.token_id, { expires:30 });
                                 console.log("登录成功");
+                                API.reload_all_modules();
                                 window.location.href= backUrl;
                             }
 
