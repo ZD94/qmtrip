@@ -451,7 +451,8 @@ function _sendActiveEmail(accountId) {
             return  sendEmailRequest({toEmails: account.email, templateName: "qm_active_email", values: [account.email, url]})
                 .then(function(result) {
                     account.activeToken = activeToken;
-                    return account.save();
+//                    return account.save();
+                    return Models.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
                 })
         })
 }

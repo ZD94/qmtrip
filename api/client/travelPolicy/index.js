@@ -29,12 +29,13 @@ travelPolicy.createTravelPolicy = function(params, callback){
         .then(function(data){
             if(!data.code){
                 params.companyId = data.companyId;//只允许添加该企业下的差旅标准
-                return API.travelPolicy.createTravelPolicy(params, callback);
+                return API.travelPolicy.createTravelPolicy(params);
             }else{
                 defer.reject({code: -1, msg: '无权限'});
                 return defer.promise;
             }
         })
+        .nodeify(callback);
 };
 
 /**
@@ -50,12 +51,13 @@ travelPolicy.deleteTravelPolicy = function(params, callback){
         .then(function(data){
             if(data){
                 params.companyId = data.companyId;//只允许删除该企业下的差旅标准
-                return API.travelPolicy.deleteTravelPolicy(params, callback);
+                return API.travelPolicy.deleteTravelPolicy(params);
             }else{
                 defer.reject({code: -1, msg: '无权限'});
                 return defer.promise;
             }
         })
+        .nodeify(callback);
 };
 
 /**
@@ -74,13 +76,14 @@ travelPolicy.updateTravelPolicy = function(id, params, callback){
                 .then(function(tp){
                     if(tp.companyId == data.companyId){
                         params.companyId = data.companyId;//只允许删除该企业下的差旅标准
-                        return API.travelPolicy.updateTravelPolicy(id, params, callback);
+                        return API.travelPolicy.updateTravelPolicy(id, params);
                     }else{
                         defer.reject({code: -1, msg: '无权限'});
                         return defer.promise;
                     }
                 })
         })
+        .nodeify(callback);
 };
 
 /**
@@ -150,12 +153,13 @@ travelPolicy.listAndPaginateTravelPolicy = function(params, options, callback){
         .then(function(data){
             if(data){
                 params.companyId = data.companyId;//只允许查询该企业下的差旅标准
-                return API.travelPolicy.listAndPaginateTravelPolicy(params, options, callback);
+                return API.travelPolicy.listAndPaginateTravelPolicy(params, options);
             }else{
                 defer.reject({code: -1, msg: '无权限'});
                 return defer.promise;
             }
         })
+        .nodeify(callback);
 };
 
 /**
@@ -178,7 +182,7 @@ travelPolicy.getAllTravelPolicy = function(options, callback){
         .then(function(staff){
             if(staff){
                 options.where.companyId = staff.companyId;//只允许查询该企业下的差旅标准
-                return API.travelPolicy.getAllTravelPolicy(options, callback);
+                return API.travelPolicy.getAllTravelPolicy(options);
             }else{
                 defer.reject({code: -1, msg: '无权限'});
                 return defer.promise;
