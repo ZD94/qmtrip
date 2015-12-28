@@ -16,12 +16,12 @@ describe("api/client/travelBudget.js", function() {
     var inboundDate = moment().add("a", "months").add("2", "days").format("YYYY-MM-DD");
 
     it("#getHotelBudget should be ok", function(done) {
-        travelBudget.getHotelBudget({cityId: "CT_131"}, function(err, result) {
+        travelBudget.getHotelBudget({cityId: "CT_131", checkInDate: inboundDate, checkOutDate: outboundDate}, function(err, result) {
             console.info(result);
             var price = result.price ? true: false;
-            var hotel = result.hotel ? true: false;
+            //var hotel = result.hotel ? true: false;
             assert.equal(price, true);
-            assert.equal(hotel, true);
+            //assert.equal(hotel, true);
             done();
         })
 
@@ -29,7 +29,8 @@ describe("api/client/travelBudget.js", function() {
 
     it("#getTravelPolicyBudget should be ok", function(done) {
         //this.timeout(5000);
-        travelBudget.getTravelPolicyBudget({originPlace: "CT_131", destinationPlace: "CT_289", outboundDate: outboundDate}, function(err, result) {
+        travelBudget.getTravelPolicyBudget({originPlace: "CT_131", destinationPlace: "CT_289",
+            outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
             if (err) {
                 throw err;
             }
@@ -75,7 +76,7 @@ describe("api/client/travelBudget.js", function() {
 
     it("#getTravelPolicyBudget should throw error without air information", function(done) {
         //this.timeout(5000);
-        travelBudget.getTravelPolicyBudget({originPlace: "abcd", destinationPlace: "CT_289", outboundDate: outboundDate}, function(err, result) {
+        travelBudget.getTravelPolicyBudget({originPlace: "abcd", destinationPlace: "CT_289", outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
             if (err) {
                 done();
             }  else {
