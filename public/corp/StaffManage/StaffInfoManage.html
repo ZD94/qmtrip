@@ -91,7 +91,7 @@
             <li><span ng-if="item.department == null">暂未设置</span><span>{{item.department}}</span></li>
             <li><span>{{item.travelLeverName}}</span></li>
             <li><span ng-if="item.roleId == 0">创建者</span><span ng-if="item.roleId == 1">普通员工</span><span ng-if="item.roleId == 2">管理员</span><span ng-if="item.roleId == 3">财务人员</span></li>
-            <li><p ng-if="item.roleId != 0"><span ng-click="editStaffInfo($index)" id="change">修改</span>&nbsp;|&nbsp;<span ng-click="delStaffInfo(item.id, $index)">删除</span></p></li>
+            <li><span ng-click="editStaffInfo($index)" id="change">修改</span><a ng-if="item.roleId != 0">&nbsp;|&nbsp;<span ng-click="delStaffInfo(item.id, $index)">删除</span></a></li>
             <div class="add_staff2">
                 <div class="little_triangle2">
                 </div>
@@ -147,7 +147,11 @@
     </div>
     <div class="staff_tab_import">
         <div class="staff_tab_import_head">
-            <p>请选择您要批量导入的文件:</p>
+            <div>
+                <span>请选择您要批量导入的文件:</span>
+                <span>返回</span>
+            </div>
+
         </div>
     </div>
 </div>
