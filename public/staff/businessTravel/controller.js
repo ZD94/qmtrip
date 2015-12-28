@@ -20,8 +20,6 @@ var businessTravel=(function(){
     businessTravel.IndexController = function($scope) {
         loading(true);
         $("title").html("我要出差");
-        $(".staff_menu_t ul li").removeClass("on");
-        $(".staff_menu_t ul a:eq(3) li").addClass("on");
         Myselect();
         //step1 获取选择状态
         $scope.trafficimg = $(".trafficimg").css("display");
@@ -61,7 +59,6 @@ var businessTravel=(function(){
         $("title").html("我要出差");
         Myselect();
         var purposename = $routeParams.purposename;
-
         //出发城市获取
         $scope.startplace = function () {
             API.onload(function() {
@@ -91,7 +88,7 @@ var businessTravel=(function(){
                 API.place.queryPlace({keyword:$scope.endplacename})
                     .then(function(result) {
                         $scope.endplaceitems = result;
-                        if ($scope.endplaceitems.length) {
+                        if ($scope.startplaceitems.length) {
                             $(".placelist2").show();
                         }
                         console.info (result);
@@ -311,7 +308,7 @@ var businessTravel=(function(){
         //住宿位置获取
         $scope.liveplace = function () {
             API.onload(function() {
-                API.place.queryBusinessDistrict({keyword:$scope.liveplacename,code:$scope.endplaceid})
+                API.place.queryBusinessDistrict({keyword:$scope.liveplacename,code:$(".live1").attr("checkval")})
                     .then(function(result) {
                         $scope.liveplaceitems = result;
                         if ($scope.liveplaceitems.length) {
@@ -340,7 +337,6 @@ var businessTravel=(function(){
                 endtime = $scope.end_time,//返回时间
                 endtimelate = $scope.end_timelate,//返回最晚到达时间
                 parameter = $("form").serialize();//表单所有数据传参
-            $scope.endplaceid = endplace;
             var dateReg = /^\d{4}-\d{2}-\d{2}$/;
             var timeReg = /^\d{2}:\d{2}$/;
             if (startplace == "") {
