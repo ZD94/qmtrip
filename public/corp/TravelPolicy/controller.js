@@ -2,34 +2,34 @@
  * Created by zj on 2015/12/15.
  */
 'use strict';
-var TravelCriterion=(function(){
+var TravelPolicy=(function(){
 
     API.require('travelPolicy');
 
-    var  TravelCriterion = {};
+    var  TravelPolicy = {};
 
     /*
         差旅标准列表
      * @param $scope
      * @constructor
      */
-    TravelCriterion.CriterionListController = function($scope) {
+    TravelPolicy.PolicyListController = function($scope) {
         $("title").html("差旅标准");
         var companyId = "d674f130-a236-11e5-8246-c3a1e3bc94c3";
         Myselect();
         $(".left_nav li").removeClass("on").eq(3).addClass("on");
 
         //获取差旅标准列表
-        $scope.initCriterionList = function () {
+        $scope.initPolicyList = function () {
             loading(false);
             API.onload(function(){
                 API.travelPolicy.listAndPaginateTravelPolicy({},{})
                     .then(function(result){
                         console.info (result);
-                        $scope.CriterionTotal = result.total;
-                        $scope.CriterionList = result.items;
-                        if ($scope.CriterionTotal==0) {
-                            $(".create_criterion").show();
+                        $scope.PolicyTotal = result.total;
+                        $scope.PolicyList = result.items;
+                        if ($scope.PolicyTotal==0) {
+                            $(".create_policy").show();
                         }
                         loading(true);
                         $scope.$apply();
@@ -39,34 +39,34 @@ var TravelCriterion=(function(){
                     });
             })
         }
-        $scope.initCriterionList();
+        $scope.initPolicyList();
 
 
         //增加标准
-        $scope.createCriterionShow = function () {
+        $scope.createPolicyShow = function () {
             $scope.resetting();
-            $(".create_criterion").show();
-            $(".update_criterion").hide();
-            $(".criterion_page li").css('opacity','1');
+            $(".create_policy").show();
+            $(".update_policy").hide();
+            $(".policy_page li").css('opacity','1');
         }
-        $scope.createCriterion = function () {
-            if ($(".create_criterion .Cname").val()=="") {
+        $scope.createPolicy = function () {
+            if ($(".create_policy .Cname").val()=="") {
                 Myalert("温馨提示","请填写等级名称");
                 return false;
             }
-            if ($(".create_criterion .CplaneLevel").html()=="请选择仓位") {
+            if ($(".create_policy .CplaneLevel").html()=="请选择仓位") {
                 Myalert("温馨提示","请选择飞机仓位");
                 return false;
             }
-            if ($(".create_criterion .CplaneDiscount").html()=="请选择折扣") {
+            if ($(".create_policy .CplaneDiscount").html()=="请选择折扣") {
                 Myalert("温馨提示","请选择飞机折扣");
                 return false;
             }
-            if ($(".create_criterion .CtrainLevel").html()=="请选择座次") {
+            if ($(".create_policy .CtrainLevel").html()=="请选择座次") {
                 Myalert("温馨提示","请选择火车座次");
                 return false;
             }
-            if ($(".create_criterion .ChotelTevel").html()=="星级标准") {
+            if ($(".create_policy .ChotelTevel").html()=="星级标准") {
                 Myalert("温馨提示","请选择住宿标准");
                 return false;
             }
@@ -75,19 +75,19 @@ var TravelCriterion=(function(){
 
             API.onload(function(){
                 API.travelPolicy.createTravelPolicy({
-                        name:$(".create_criterion .Cname").val(),
-                        planeLevel:$(".create_criterion .CplaneLevel").html(),
-                        planeDiscount:$(".create_criterion .CplaneDiscount").attr('selectValue'),
-                        trainLevel:$(".create_criterion .CtrainLevel").html(),
-                        isChangeLevel:$(".create_criterion .Ccheckbox").is(':checked'),
-                        hotelLevel:$(".create_criterion .ChotelTevel").html(),
-                        hotelPrice:$(".create_criterion .ChotelPrice").val(),
+                        name:$(".create_policy .Cname").val(),
+                        planeLevel:$(".create_policy .CplaneLevel").html(),
+                        planeDiscount:$(".create_policy .CplaneDiscount").attr('selectValue'),
+                        trainLevel:$(".create_policy .CtrainLevel").html(),
+                        isChangeLevel:$(".create_policy .Ccheckbox").is(':checked'),
+                        hotelLevel:$(".create_policy .ChotelTevel").html(),
+                        hotelPrice:$(".create_policy .ChotelPrice").val(),
                         companyTd:companyId
                     })
                     .then(function(result){
                         Myalert("温馨提示","增加成功");
-                        $scope.initCriterionList();
-                        $(".create_criterion").hide();
+                        $scope.initPolicyList();
+                        $(".create_policy").hide();
                         console.info (result);
                     })
                     .catch(function(err){
@@ -99,13 +99,13 @@ var TravelCriterion=(function(){
 
 
         //删除标准
-        $scope.deleteCriterion = function (id,name) {
+        $scope.deletePolicy = function (id,name) {
             Myalert("温馨提示","删除成功");
             API.onload(function(){
                 API.travelPolicy.deleteTravelPolicy({id:id})
                     .then(function(result){
                         Myalert("温馨提示","删除&nbsp;<span>'"+name+"'&nbsp;</span>成功");
-                        $scope.initCriterionList();
+                        $scope.initPolicyList();
                         console.info (result);
                     })
                     .catch(function(err){
@@ -116,56 +116,56 @@ var TravelCriterion=(function(){
 
 
         //修改标准
-        $scope.updateCriterionShow = function (id,index) {
+        $scope.updatePolicyShow = function (id,index) {
             $scope.updateId = id;
             if (index == 0  || index == 6) {
-                $(".update_criterion").css({'top':'10px','left':'0px'});
+                $(".update_policy").css({'top':'10px','left':'0px'});
             }
             else if (index == 1  || index == 7) {
-                $(".update_criterion").css({'top':'10px','left':'505px'});
+                $(".update_policy").css({'top':'10px','left':'505px'});
             }
             else if (index == 2  || index == 8) {
-                $(".update_criterion").css({'top':'230px','left':'0px'});
+                $(".update_policy").css({'top':'230px','left':'0px'});
             }
             else if (index == 3  || index == 9) {
-                $(".update_criterion").css({'top':'230px','left':'505px'});
+                $(".update_policy").css({'top':'230px','left':'505px'});
             }
             else if (index == 4  || index == 10) {
-                $(".update_criterion").css({'top':'450px','left':'0px'});
+                $(".update_policy").css({'top':'450px','left':'0px'});
             }
             else if (index == 5  || index == 11) {
-                $(".update_criterion").css({'top':'450px','left':'505px'});
+                $(".update_policy").css({'top':'450px','left':'505px'});
             }
             var obj = {0:"不限",8:"8折及以下",7:"7折及以下",6:"6折及以下",5:"5折及以下",4:"4折及以下"};
-            var discountTxt = $scope.CriterionList[index].planeDiscount;
-            $(".update_criterion .Cname").val($scope.CriterionList[index].name);
-            $(".update_criterion .CplaneLevel").html($scope.CriterionList[index].planeLevel);
-            $(".update_criterion .CplaneDiscount").html(obj[discountTxt]).attr("selectValue",discountTxt);
-            $(".update_criterion .CtrainLevel").html($scope.CriterionList[index].trainLevel);
-            $(".update_criterion .Ccheckbox").attr('checked',$scope.CriterionList[index].isChangeLevel);
-            $(".update_criterion .ChotelTevel").html($scope.CriterionList[index].hotelLevel);
-            $(".update_criterion .ChotelPrice").val($scope.CriterionList[index].hotelPrice);
-            $(".update_criterion").show();
-            $(".create_criterion").hide();
-            $(".criterion_page li").css('opacity','0.2');
+            var discountTxt = $scope.PolicyList[index].planeDiscount;
+            $(".update_policy .Cname").val($scope.PolicyList[index].name);
+            $(".update_policy .CplaneLevel").html($scope.PolicyList[index].planeLevel);
+            $(".update_policy .CplaneDiscount").html(obj[discountTxt]).attr("selectValue",discountTxt);
+            $(".update_policy .CtrainLevel").html($scope.PolicyList[index].trainLevel);
+            $(".update_policy .Ccheckbox").attr('checked',$scope.PolicyList[index].isChangeLevel);
+            $(".update_policy .ChotelTevel").html($scope.PolicyList[index].hotelLevel);
+            $(".update_policy .ChotelPrice").val($scope.PolicyList[index].hotelPrice);
+            $(".update_policy").show();
+            $(".create_policy").hide();
+            $(".policy_page li").css('opacity','0.2');
         }
-        $scope.updateCriterion = function () {
+        $scope.updatePolicy = function () {
             API.onload(function(){
                 API.travelPolicy.updateTravelPolicy($scope.updateId,{
-                    name:$(".update_criterion .Cname").val(),
-                    planeLevel:$(".update_criterion .CplaneLevel").html(),
-                    planeDiscount:$(".update_criterion .CplaneDiscount").attr('selectValue'),
-                    trainLevel:$(".update_criterion .CtrainLevel").html(),
-                    isChangeLevel:$(".update_criterion .Ccheckbox").is(':checked'),
-                    hotelLevel:$(".update_criterion .ChotelTevel").html(),
-                    hotelPrice:$(".update_criterion .ChotelPrice").val(),
+                    name:$(".update_policy .Cname").val(),
+                    planeLevel:$(".update_policy .CplaneLevel").html(),
+                    planeDiscount:$(".update_policy .CplaneDiscount").attr('selectValue'),
+                    trainLevel:$(".update_policy .CtrainLevel").html(),
+                    isChangeLevel:$(".update_policy .Ccheckbox").is(':checked'),
+                    hotelLevel:$(".update_policy .ChotelTevel").html(),
+                    hotelPrice:$(".update_policy .ChotelPrice").val(),
                     companyTd:companyId
                 })
                     .then(function(result){
                         Myalert("温馨提示","修改成功");
-                        $scope.initCriterionList();
-                        $(".update_criterion").hide();
-                        $(".criterion_page li").css('opacity','1');
+                        $scope.initPolicyList();
+                        $(".update_policy").hide();
+                        $(".policy_page li").css('opacity','1');
                         console.info (result);
                     })
                     .catch(function(err){
@@ -188,7 +188,7 @@ var TravelCriterion=(function(){
         }
     }
 
-    return TravelCriterion;
+    return TravelPolicy;
 })();
 
-module.exports = TravelCriterion;
+module.exports = TravelPolicy;

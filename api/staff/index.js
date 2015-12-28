@@ -72,10 +72,7 @@ staff.createStaff = function(data, callback){
                 });
         })
         .then(function(staff) {
-            return staffModel.create(staff)
-                .then(function(staff) {
-                    return staff.toJSON();
-                });
+            return staffModel.create(staff);
         })
         .nodeify(callback);
 }
@@ -121,41 +118,36 @@ staff.updateStaff = function(id, data, callback){
     var options = {};
     options.where = {id: id};
     options.returning = true;
-    if(data.email){
-        return staffModel.findById(id)
-            .then(function(old){
-                if(old.toJSON().email == data.email){
-                    return staffModel.update(data, options)
-                        .then(function(obj){
-                            return obj[1][0].toJSON();
-                        })
-                }else{
-                    return API.auth.getAccount(id)//暂无此接口
-                        .then(function(acc){
-                            if(acc.account.status != 0){
-                                defer.reject({code: -2, msg: "该账号不允许修改邮箱"});
-                                return defer.promise.nodeify(callback);
-                            }else{
-                                var accData = {email: data.email};
-                                return Q.all([
-                                    API.auth.updataAccount(id, accData),//暂无此接口
-                                    staffModel.update(data, options)
-                                ])
-                                    .spread(function(ret1, ret2){
-                                        return ret2[1][0].toJSON();
-                                    })
-                            }
-                        })
-                }
-            })
-            .nodeify(callback);
-    }else{
-        return staffModel.update(data, options)
-            .then(function(obj){
-                return obj[1].toJSON();
-            })
-            .nodeify(callback);
-    }
+    return Q()
+        .then(function(){
+            if(data.email){
+                return staffModel.findById(id)
+                    .then(function(old){
+                        if(old.email != data.email){
+                            return API.auth.getAccount(id)//暂无此接口
+                                .then(function(acc){
+                                    if(acc.account.status != 0)
+                                        throw {code: -2, msg: "该账号不允许修改邮箱"};
+                                    var accData = {email: data.email};
+                                    return Q.all([
+                                        API.auth.updataAccount(id, accData),//暂无此接口
+                                        staffModel.update(data, options)
+                                    ]);
+                                })
+                                .spread(function(updateaccount, updatestaff) {
+                                    return updatestaff;
+                                });
+                        }
+                        return staffModel.update(data, options);
+                    });
+            }else{
+                return staffModel.update(data, options);
+            }
+        })
+        .spread(function(rownum, rows){
+            return rows[0];
+        })
+        .nodeify(callback);
 }
 /**
  * 根据id查询员工
@@ -171,12 +163,11 @@ staff.getStaff = function(id, callback){
         return defer.promise.nodeify(callback);
     }
     return staffModel.findById(id)
-        .then(function(obj){
-            if(!obj){
-                defer.reject({code: -2, msg: '员工不存在'});
-                return defer.promise;
+        .then(function(staff){
+            if(!staff){
+                throw {code: -2, msg: '员工不存在'};
             }
-            return obj.toJSON();
+            return staff;
         })
         .nodeify(callback);
 }
@@ -188,16 +179,14 @@ staff.getStaff = function(id, callback){
  * @returns {*}
  */
 staff.findOneStaff = function(params, callback){
-    var defer = Q.defer();
     var options = {};
     options.where = params;
     return staffModel.findOne(options)
-        .then(function(obj){
-            if(!obj){
-                defer.reject({code: -1, msg: '员工不存在'});
-                return defer.promise;
+        .then(function(staff){
+            if(!staff){
+                throw {code: -1, msg: '员工不存在'};
             }
-            return obj.toJSON();
+            return staff;
         })
         .nodeify(callback);
 }
@@ -238,11 +227,7 @@ staff.listAndPaginateStaff = function(params, options, callback){
     options.where = params;
     return staffModel.findAndCountAll(options)
         .then(function(result){
-            var rows = result.rows.map(function(item){
-                return item.toJSON();
-            })
-            var pg = new Paginate(page, perPage, result.count, rows);
-            return pg;
+            return new Paginate(page, perPage, result.count, result.rows);
         })
         .nodeify(callback);
 }
@@ -280,12 +265,11 @@ staff.increaseStaffPoint = function(params, options, callback) {
                 return Q.all([
                         obj.increment(['total_points','balance_points'], {by: increasePoint, transaction: t}),
                         pointChange.create(pointChange, {transaction: t})
-                    ])
-                    .spread(function(ret1,ret2){
-                        return ret1.toJSON();
-                    })
-            })
-
+                    ]);
+            });
+        })
+        .spread(function(increment, create){
+            return increment;
         })
         .nodeify(callback);
 }
@@ -317,21 +301,19 @@ staff.decreaseStaffPoint = function(params, options, callback) {
     }
     return staffModel.findById(id)
         .then(function(obj) {
-            if(obj.toJSON().balancePoints < decreasePoint){//此处从obj.toJSON()用model里的属性名取才能取到
-                defer.reject({code: -3, msg: "积分不足"});
-                return defer.promise.nodeify(callback);
+            if(obj.balancePoints < decreasePoint){
+                throw {code: -3, msg: "积分不足"};
             }
             var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分"}//此处也应该用model里的属性名封装obj
             return sequelize.transaction(function(t) {
                 return Q.all([
                         obj.decrement('balance_points', {by: decreasePoint, transaction: t}),
                         pointChange.create(pointChange, {transaction: t})
-                    ])
-                    .spread(function(ret1,ret2){
-                        return ret1.toJSON();
-                    })
-            })
-
+                    ]);
+            });
+        })
+        .spread(function(decrement,create){
+            return decrement;
         })
         .nodeify(callback);
 }
@@ -372,11 +354,7 @@ staff.listAndPaginatePointChange = function(params, options, callback){
     options.where = params;
     return pointChange.findAndCountAll(options)
         .then(function(result){
-            result.rows = result.rows.map(function(item){
-                return item.toJSON();
-            });
-            var pg = new Paginate(page, perPage, result.count, result.rows);
-            return pg;
+            return new Paginate(page, perPage, result.count, result.rows);
         })
         .nodeify(callback);
 }
@@ -399,111 +377,113 @@ staff.beforeImportExcel = function(params, callback){
     var emailAttr = [];
     var mobileAttr = [];
     var companyId = "";
+    var xlsxObj;
     return API.attachment.getAttachment({md5key: md5key, userId: userId})
         .then(function(att){
             att = att.attachment;
-            var obj = nodeXlsx.parse(att.content);
-            var data = obj[0].data
-            return staff.getStaff(userId)
-                .then(function(sf){
-                    companyId = sf.staff.companyId;
-                    return API.travelPolicy.getAllTravelPolicy({company_id: companyId})
-                        .then(function(results){
-                            results = results.travalPolicies;
-                            for(var t=0;t<results.length;t++){
-                                var tp = results[t].toJSON();
-                                travalPolicies[tp.name] = tp.id;
-                            }
-                            return travalPolicies;
-                        })
-                        .then(function(travalps){
-                            return Q.all(data.map(function(item, index){
-                                    if(index>0 && index<200){
-                                        var s = data[index];
-                                        s[1] = s[1] ? s[1]+"" : "";
-                                        var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
-                                        item = staffObj;
+            xlsxObj = nodeXlsx.parse(att.content);
+            return staff.getStaff(userId);
+        })
+        .then(function(sf){
+            companyId = sf.staff.companyId;
+            return API.travelPolicy.getAllTravelPolicy({company_id: companyId});
+        })
+        .then(function(results){
+            results = results.travalPolicies;
+            for(var t=0;t<results.length;t++){
+                var tp = results[t];
+                travalPolicies[tp.name] = tp.id;
+            }
+            return travalPolicies;
+        })
+        .then(function(travalps){
+            var data = xlsxObj[0].data;
+            return Q.all(data.map(function(item, index){
+                if(index>0 && index<200){
+                    var s = data[index];
+                    s[1] = s[1] ? s[1]+"" : "";
+                    var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
+                    item = staffObj;
 
-                                        if(!staffObj.name || staffObj.name==""){
-                                            staffObj.reason = "姓名为空";
-                                            s[6] = "姓名为空";
-                                            noAddObj.push(staffObj);
-                                            downloadNoAddObj.push(s);
-                                            return;
-                                        }
-                                        if(!staffObj.mobile || staffObj.mobile=="" || mobileAttr.join(",").indexOf(s[1]) != -1){
-                                            staffObj.reason = "手机号为空或与本次导入中手机号重复";
-                                            s[6] = "手机号为空或与本次导入中手机号重复";
-                                            noAddObj.push(staffObj);
-                                            downloadNoAddObj.push(s);
-                                            return;
-                                        }
-                                        mobileAttr.push(s[1]);
-                                        if(!staffObj.email || staffObj.email=="" || emailAttr.join(",").indexOf(s[2]) != -1){
-                                            staffObj.reason = "邮箱为空或与本次导入中邮箱重复";
-                                            s[6] = "邮箱为空或与本次导入中邮箱重复";
-                                            noAddObj.push(staffObj);
-                                            downloadNoAddObj.push(s);
-                                            return;
-                                        }
-                                        emailAttr.push(s[2]);
-                                        if(!staffObj.department || staffObj.department==""){
-                                            staffObj.reason = "部门为空";
-                                            s[6] = "部门为空";
-                                            noAddObj.push(staffObj);
-                                            downloadNoAddObj.push(s);
-                                            return;
-                                        }
-                                        if(!staffObj.travelLevel || staffObj.travelLevel==""){
-                                            staffObj.reason = "差旅标准为空或不符合要求";
-                                            s[6] = "差旅标准为空或不符合要求";
-                                            noAddObj.push(staffObj);
-                                            downloadNoAddObj.push(s);
-                                            return;
-                                        }
-                                        return Q.all([
-                                            staff.findOneStaff({email: s[2]}),
-                                            API.auth.findOneAcc({mobile: s[1]})//acc表手机号不能重复 staff暂且不控制
-                                        ]).spread(function(ret1, ret2){
-                                                if(ret1.staff){
-                                                    staffObj.reason = "邮箱与已有用户重复";
-                                                    s[6] = "邮箱与已有用户重复";
-                                                    noAddObj.push(staffObj);
-                                                    downloadNoAddObj.push(s);
-                                                }else{
-                                                    if(ret2.account){
-                                                        staffObj.reason = "手机号与已有用户重复";
-                                                        s[6] = "手机号与已有用户重复";
-                                                        noAddObj.push(staffObj);
-                                                        downloadNoAddObj.push(s);
-                                                    }else{
-                                                        addObj.push(staffObj);
-                                                        downloadAddObj.push(s);
-                                                    }
-                                                }
-                                                return item;
-                                            })
-                                        /*return staff.createStaff(staffObj)
-                                            .then(function(ret){
-                                                if(ret){
-                                                    item = ret.staff;
-                                                    addObj.push(item);
-                                                }else{
-                                                    noAddObj.push(staffObj);
-                                                }
-                                                return item;
-                                            })
-                                            .catch(function(err){
-                                                noAddObj.push(staffObj);
-                                                console.log(err);
-                                            })*/
-                                    }
-                                })).then(function(items){
-                                    data = items;
-                                    return {addObj: JSON.stringify(addObj), downloadAddObj: JSON.stringify(downloadAddObj), noAddObj: JSON.stringify(noAddObj), downloadNoAddObj: JSON.stringify(downloadNoAddObj)};
-                                })
-                        })
-                })
+                    if(!staffObj.name || staffObj.name==""){
+                        staffObj.reason = "姓名为空";
+                        s[6] = "姓名为空";
+                        noAddObj.push(staffObj);
+                        downloadNoAddObj.push(s);
+                        return;
+                    }
+                    if(!staffObj.mobile || staffObj.mobile=="" || mobileAttr.join(",").indexOf(s[1]) != -1){
+                        staffObj.reason = "手机号为空或与本次导入中手机号重复";
+                        s[6] = "手机号为空或与本次导入中手机号重复";
+                        noAddObj.push(staffObj);
+                        downloadNoAddObj.push(s);
+                        return;
+                    }
+                    mobileAttr.push(s[1]);
+                    if(!staffObj.email || staffObj.email=="" || emailAttr.join(",").indexOf(s[2]) != -1){
+                        staffObj.reason = "邮箱为空或与本次导入中邮箱重复";
+                        s[6] = "邮箱为空或与本次导入中邮箱重复";
+                        noAddObj.push(staffObj);
+                        downloadNoAddObj.push(s);
+                        return;
+                    }
+                    emailAttr.push(s[2]);
+                    if(!staffObj.department || staffObj.department==""){
+                        staffObj.reason = "部门为空";
+                        s[6] = "部门为空";
+                        noAddObj.push(staffObj);
+                        downloadNoAddObj.push(s);
+                        return;
+                    }
+                    if(!staffObj.travelLevel || staffObj.travelLevel==""){
+                        staffObj.reason = "差旅标准为空或不符合要求";
+                        s[6] = "差旅标准为空或不符合要求";
+                        noAddObj.push(staffObj);
+                        downloadNoAddObj.push(s);
+                        return;
+                    }
+                    return Q.all([
+                        staff.findOneStaff({email: s[2]}),
+                        API.auth.findOneAcc({mobile: s[1]})//acc表手机号不能重复 staff暂且不控制
+                    ])
+                        .spread(function(staff, account){
+                            if(staff){
+                                staffObj.reason = "邮箱与已有用户重复";
+                                s[6] = "邮箱与已有用户重复";
+                                noAddObj.push(staffObj);
+                                downloadNoAddObj.push(s);
+                            }else{
+                                if(account){
+                                    staffObj.reason = "手机号与已有用户重复";
+                                    s[6] = "手机号与已有用户重复";
+                                    noAddObj.push(staffObj);
+                                    downloadNoAddObj.push(s);
+                                }else{
+                                    addObj.push(staffObj);
+                                    downloadAddObj.push(s);
+                                }
+                            }
+                            return item;
+                        });
+                    /*return staff.createStaff(staffObj)
+                     .then(function(ret){
+                     if(ret){
+                     item = ret.staff;
+                     addObj.push(item);
+                     }else{
+                     noAddObj.push(staffObj);
+                     }
+                     return item;
+                     })
+                     .catch(function(err){
+                     noAddObj.push(staffObj);
+                     console.log(err);
+                     })*/
+                }
+            })).then(function(items){
+                data = items;
+                return {addObj: JSON.stringify(addObj), downloadAddObj: JSON.stringify(downloadAddObj), noAddObj: JSON.stringify(noAddObj), downloadNoAddObj: JSON.stringify(downloadNoAddObj)};
+            })
         })
         .then(function(data){
             return API.attachment.deleteAttachment({md5key: md5key, userId: userId})//

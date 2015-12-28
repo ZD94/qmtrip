@@ -20,11 +20,7 @@ var travelPolicy = {};
 travelPolicy.createTravelPolicy = function(data, callback){
     return checkParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","hotelPrice","companyId"], data)
         .then(function(){
-            return travalPolicyModel.create(data)
-                .then(function(obj){
-                    var travelPolicy = obj.toJSON();
-                    return travelPolicy;
-                })
+            return travalPolicyModel.create(data);
         })
         .nodeify(callback);
 }
@@ -66,8 +62,8 @@ travelPolicy.updateTravelPolicy = function(id, data, callback){
     options.where = {id: id};
     options.returning = true;
     return travalPolicyModel.update(data, options)
-        .then(function(obj){
-            return obj[1][0].toJSON();
+        .spread(function(rownum, rows){
+            return rows[0];
         })
         .nodeify(callback);
 }
@@ -85,9 +81,6 @@ travelPolicy.getTravelPolicy = function(id, callback){
         return defer.promise.nodeify(callback);
     }
     return travalPolicyModel.findById(id)
-        .then(function(obj){
-            return obj.toJSON();
-        })
         .nodeify(callback);
 }
 
@@ -99,12 +92,6 @@ travelPolicy.getTravelPolicy = function(id, callback){
  */
 travelPolicy.getAllTravelPolicy = function(options, callback){
     return travalPolicyModel.findAll(options)
-        .then(function(obj){
-            obj = obj.map(function(item){
-                return item.toJSON();
-            })
-            return obj;
-        })
         .nodeify(callback);
 }
 
@@ -145,11 +132,7 @@ travelPolicy.listAndPaginateTravelPolicy = function(params, options, callback){
     options.where = params;
     return travalPolicyModel.findAndCountAll(options)
         .then(function(result){
-            var items = result.rows.map(function(item) {
-                return item.toJSON();
-            })
-            var pg = new Paginate(page, perPage, result.count, items);
-            return pg;
+            return new Paginate(page, perPage, result.count, items);
         })
         .nodeify(callback);
 }

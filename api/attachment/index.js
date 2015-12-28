@@ -19,10 +19,7 @@ var attachment = {};
 attachment.createAttachment = function(data, callback){
     return checkParams(["md5key","content"], data)
         .then(function(){
-            return attachmentModel.create(data)
-                .then(function(obj){
-                    return obj.toJSON();
-                })
+            return attachmentModel.create(data);
         })
         .nodeify(callback);
 }
@@ -35,9 +32,6 @@ attachment.createAttachment = function(data, callback){
  */
 attachment.deleteAttachment = function(params, callback){
     return attachmentModel.destroy({where: params})
-        .then(function(obj){
-            return {code: 0, msg: "删除成功"}
-        })
         .nodeify(callback);
 }
 
@@ -51,12 +45,6 @@ attachment.getAllAttachment = function(params, callback){
     var options = {};
     options.where = params;
     return attachmentModel.findAll(options)
-        .then(function(obj){
-            obj = obj.map(function(item){
-                return item.toJSON();
-            });
-            return obj;
-        })
         .nodeify(callback);
 }
 
@@ -70,9 +58,6 @@ attachment.getAttachment = function(params, callback){
     var options = {};
     options.where = params;
     return attachmentModel.findOne(options)
-        .then(function(obj){
-            return obj.toJSON();
-        })
         .nodeify(callback);
 }
 
@@ -112,11 +97,7 @@ attachment.listAndPaginateAttachment = function(params, options, callback){
     options.where = params;
     return attachmentModel.findAndCountAll(options)
         .then(function(result){
-            result.rows = result.rows.map(function(item){
-                return item.toJSON();
-            })
-            var pg = new Paginate(page, perPage, result.count, result.rows);
-            return pg;
+            return new Paginate(page, perPage, result.count, result.rows);
         })
         .nodeify(callback);
 }
