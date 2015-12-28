@@ -2,7 +2,8 @@
 'use strict';
 var login=(function(){
     API.require('auth');
-    var  login = {};
+    var login = {};
+    var Cookie = require('tiny-cookie');
 
     console.info(API);
     login.LoginController = function ($scope, $routeParams) {
@@ -27,10 +28,10 @@ var login=(function(){
                                 alert(result.msg);
                             } else {
                                 var data = result.data;
-                                setCookie("user_id", data.user_id);
-                                setCookie("token_sign", data.token_sign);
-                                setCookie("timestamp", data.timestamp);
-                                setCookie("token_id", data.token_id);
+                                Cookie.set("user_id", data.user_id, { expires:30 });
+                                Cookie.set("token_sign", data.token_sign, { expires:30 });
+                                Cookie.set("timestamp", data.timestamp, { expires:30 });
+                                Cookie.set("token_id", data.token_id, { expires:30 });
                                 alert("登录成功");
                                 window.location.href= backUrl;
                             }
