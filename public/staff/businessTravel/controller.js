@@ -4,6 +4,7 @@
 'use strict';
 var businessTravel=(function(){
 
+    API.require("auth");
     API.require("place");
     API.require("travelPolicy");
     API.require("tripPlan");
@@ -17,6 +18,7 @@ var businessTravel=(function(){
      * @constructor
      */
     businessTravel.IndexController = function($scope) {
+        loading(true);
         $("title").html("我要出差");
         Myselect();
         //step1 获取选择状态
@@ -53,6 +55,7 @@ var businessTravel=(function(){
      * @constructor
      */
     businessTravel.TrafficStepController = function($scope, $routeParams) {
+        loading(true);
         $("title").html("我要出差");
         Myselect();
         var purposename = $routeParams.purposename;
@@ -157,6 +160,7 @@ var businessTravel=(function(){
      * @constructor
      */
     businessTravel.LiveStepController = function($scope, $routeParams) {
+        loading(true);
         $("title").html("我要出差");
         Myselect();
         var purposename = $routeParams.purposename;
@@ -246,6 +250,7 @@ var businessTravel=(function(){
      * @constructor
      */
     businessTravel.TrafficLiveController = function($scope, $routeParams) {
+        loading(true);
         $("title").html("我要出差");
         Myselect();
         var purposename = $routeParams.purposename;
@@ -404,6 +409,7 @@ var businessTravel=(function(){
      * @constructor
      */
     businessTravel.CreateResultController = function($scope, $routeParams) {
+        loading(true);
         $("title").html("我要出差");
         $scope.purposename = $routeParams.purposename;//出差目的
         $scope.startplace = $routeParams.sp;//出发城市
@@ -418,12 +424,21 @@ var businessTravel=(function(){
         $scope.livetime = $routeParams.livet;//入住时间
         $scope.leavetime = $routeParams.leavet;//离店时间
         API.onload(function() {
-            API.travelBudget.getTravelPolicyBudget({originPlace:$scope.startplaceval,destinationPlace:$scope.endplaceval,outboundDate:$scope.starttime,inboundDate:$scope.endtime})
-                .then(function(result) {
-                    $scope.price = result;
+            Q.all([
+                API.staff.getCurrentStaff(),
+                API.travelBudget.getTravelPolicyBudget({
+                    originPlace:$scope.startplaceval,
+                    destinationPlace:$scope.endplaceval,
+                    outboundDate:$scope.starttime,
+                    inboundDate:$scope.endtime
+                })
+            ])
+                .spread(function(ret1,ret2) {
+                    $scope.companyId = ret1.companyId;
+                    $scope.price = ret2;
                     $(".creating").hide();
                     $(".createresult,.tianxun").show();
-                    console.info (result);
+                    $scope.totalprice = ret2.price;
                     $scope.$apply();
                 })
                 .catch(function(err){
@@ -454,8 +469,29 @@ var businessTravel=(function(){
 
         //生成记录
         $scope.createRecord = function () {
-            $(".bottom1").hide();
-            $(".bottom2").show();
+            API.onload(function(){
+                API.tripPlan.savePlanOrder({
+                    companyId:$scope.companyId,
+                    type:1,
+                    startPlace:$scope.startplace,
+                    destination:$scope.endplace,
+                    startAt:$scope.starttime,
+                    backAt:$scope.endtime,
+                    hotelName:$scope.liveplace,
+                    startTime:$scope.livetime,
+                    endTime:$scope.leavetime,
+                    budget:$scope.totalprice
+                })
+                    .then(function(result){
+                        console.info(result);
+                        $(".bottom1").hide();
+                        $(".bottom2").show();
+                        Myalert("温馨提示","生成出差记录成功");
+                    })
+                    .catch(function(err){
+                        console.info (err);
+                    });
+            })
         }
     }
 
