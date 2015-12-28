@@ -147,17 +147,27 @@
     </div>
     <div class="staff_tab_import">
         <div class="staff_tab_import_head">
-            <div>
+            <div class="">
                 <span>请选择您要批量导入的文件:</span>
                 <span>返回</span>
             </div>
-
+            <input type="file" class="file" value="选取文件">
         </div>
     </div>
 </div>
 
 <script>
     $(function(){
+        /*$(".file").AjaxFileUpload({
+            action: '/upload/ajax-upload-file?type=xls',
+            dataType: 'json',
+            data: { id: 'aaa', name: 'bbb' },
+            onComplete: function(filename, response) {
+                console.log(filename);
+                console.log(response);
+                console.log(response.result);
+            }
+        });*/
         $(document).on("click","#change",function(){
             $(".add_staff2").hide();
             $(this).closest("ul").find(".add_staff2").show();
