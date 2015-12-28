@@ -54,6 +54,7 @@ agency.registerAgency = function(params, callback){
                     var accountId = account.id;
                     agency.createUser = accountId;
                     agencyUser.id = accountId;
+                    agency.myName = 'yumiao';
                     return sequelize.transaction(function(t){
                         return Q.all([
                             Agency.create(agency, {transaction: t}),
@@ -76,7 +77,7 @@ agency.registerAgency = function(params, callback){
                     })
                 })
         })
-        .catch(errorHandle)
+        //.catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -132,7 +133,7 @@ agency.getAgency = function(params, callback){
         .then(function(){
             var agencyId = params.agencyId;
             var userId = params.userId;
-            return Agency.find({where: {id: agencyId}})
+            return Agency.find({where: {id: agencyId}, attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updateAt']})
                 .then(function(ret){
                     if(!ret){
                         defer.reject({code: -2, msg: '没有代理商'});

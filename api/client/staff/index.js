@@ -147,8 +147,6 @@ staff.getCurrentStaff = function(callback){
  */
 staff.listAndPaginateStaff = auth.checkPermission(["user.query"],
     function(params, options, callback) {
-        console.info("**************************************");
-        console.info("listAndPaginateStaff");
         var user_id = this.accountId;
         return API.staff.getStaff(user_id)
             .then(function(data){
