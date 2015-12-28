@@ -18,6 +18,7 @@ var StaffFirst = (function(){
 	var StaffFirst ={};
 	StaffFirst.StaffUserController = function($scope){
 		dataloading(false);
+		loading(true);
 		$("title").html("首页");
 		$(".left_nav li").removeClass("on").eq(0).addClass("on");
 		//企业管理首页信息
