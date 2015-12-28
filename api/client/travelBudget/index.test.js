@@ -15,17 +15,33 @@ describe("api/client/travelBudget.js", function() {
     var outboundDate = moment().add("1", "months").format("YYYY-MM-DD");
     var inboundDate = moment().add("a", "months").add("2", "days").format("YYYY-MM-DD");
 
+    it("#getHotelBudget should be ok", function(done) {
+        travelBudget.getHotelBudget({cityId: "CT_131"}, function(err, result) {
+            console.info(result);
+            var price = result.price ? true: false;
+            var hotel = result.hotel ? true: false;
+            assert.equal(price, true);
+            assert.equal(hotel, true);
+            done();
+        })
+
+    })
+
     it("#getTravelPolicyBudget should be ok", function(done) {
-        this.timeout(5000);
+        //this.timeout(5000);
         travelBudget.getTravelPolicyBudget({originPlace: "CT_131", destinationPlace: "CT_289", outboundDate: outboundDate}, function(err, result) {
             if (err) {
                 throw err;
             }
 
             if (typeof result == 'string') {
-                result = JSON.parse(result);
+                try{
+                    result = JSON.parse(result);
+                } catch(err) {
+                    throw err;
+                }
             }
-            console.info(result);
+            //console.info(result);
             var traffic = result.traffic ? true: false;
             var hotel = result.hotel ? true : false;
 
@@ -37,21 +53,28 @@ describe("api/client/travelBudget.js", function() {
 
     it("#getTravelPlicyBudget should be ok with isRoundTrip=true", function(done) {
 
-        this.timeout(5000);
+        //this.timeout(5000);
         travelBudget.getTravelPolicyBudget({originPlace: CITY.BeiJing, destinationPlace: CITY.ShangHai,
             outboundDate: outboundDate, inboundDate: inboundDate, isRoundTrip: true}, function(err, result) {
             if (err) {
                 throw err;
             }
 
+            if (typeof result == 'string') {
+                try{
+                    result = JSON.parse(result);
+                } catch(err) {
+                    throw err;
+                }
+            }
             var ret = result.price > 0 ?true: false;
-            assert.equals(ret, true);
+            assert.equal(ret, true);
             done();
         })
     })
 
     it("#getTravelPolicyBudget should throw error without air information", function(done) {
-        this.timeout(5000);
+        //this.timeout(5000);
         travelBudget.getTravelPolicyBudget({originPlace: "abcd", destinationPlace: "CT_289", outboundDate: outboundDate}, function(err, result) {
             if (err) {
                 done();
@@ -60,4 +83,6 @@ describe("api/client/travelBudget.js", function() {
             }
         });
     })
+
+
 });

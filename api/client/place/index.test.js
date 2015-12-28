@@ -10,12 +10,13 @@ describe("api/client/place.js", function() {
 
     it("#queryBusinessStrict should be ok", function(done) {
 
-        place.queryBusinessDistrict({keyword: "北京"}, function(err, result) {
+        place.queryBusinessDistrict({keyword: "国贸", code: "CT_131"}, function(err, result) {
             if (err) {
                 throw err;
             }
 
             var ret = util.isArray(result);
+            console.info(result);
             assert.equal(ret, true);
             done();
         })

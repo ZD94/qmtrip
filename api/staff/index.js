@@ -226,9 +226,6 @@ staff.listAndPaginateStaff = function(params, callback){
     options.where = params;
     return staffModel.findAndCountAll(options)
         .then(function(result){
-            result.rows = result.rows.map(function(item){
-                return item.toJSON();
-            })
             return new Paginate(page, perPage, result.count, result.rows);
         })
         .nodeify(callback);
@@ -384,7 +381,7 @@ staff.beforeImportExcel = function(params, callback){
         .then(function(att){
             att = att.attachment;
             xlsxObj = nodeXlsx.parse(att.content);
-            return staff.getStaff(userId);
+            return staff.getStaff({id: userId});
         })
         .then(function(sf){
             companyId = sf.staff.companyId;
@@ -647,7 +644,7 @@ staff.getInvoiceViewer = function(params, callback){
         defer.reject({msg: 'accountId不能为空'});
         return defer.promise;
     }
-    return staff.getStaff(id)
+    return staff.getStaff({id: id})
         .then(function(obj){
             if(obj && obj.companyId){
                 return API.company.getCompany(obj.companyId)

@@ -25,7 +25,7 @@ var travelPolicy = {};
 travelPolicy.createTravelPolicy = function(params, callback){
     var defer = Q.defer();
     var user_id = this.accountId;
-    return API.staff.getStaff(user_id)
+    return API.staff.getStaff({id: user_id})
         .then(function(data){
             if(!data.code){
                 params.companyId = data.companyId;//只允许添加该企业下的差旅标准
@@ -46,7 +46,7 @@ travelPolicy.createTravelPolicy = function(params, callback){
 travelPolicy.deleteTravelPolicy = function(params, callback){
     var defer = Q.defer();
     var user_id = this.accountId;
-    return API.staff.getStaff(user_id)
+    return API.staff.getStaff({id: user_id})
         .then(function(data){
             if(data){
                 params.companyId = data.companyId;//只允许删除该企业下的差旅标准
@@ -68,7 +68,7 @@ travelPolicy.deleteTravelPolicy = function(params, callback){
 travelPolicy.updateTravelPolicy = function(id, params, callback){
     var defer = Q.defer();
     var user_id = this.accountId;
-    return API.staff.getStaff(user_id)
+    return API.staff.getStaff({id: user_id})
         .then(function(data){
             return API.travelPolicy.getTravelPolicy(id)
                 .then(function(tp){
@@ -92,7 +92,7 @@ travelPolicy.updateTravelPolicy = function(id, params, callback){
 travelPolicy.getTravelPolicy = function(id, callback){
     var defer = Q.defer();
     var user_id = this.accountId;
-    return API.staff.getStaff(user_id)
+    return API.staff.getStaff({id: user_id})
         .then(function(data){
             if(!id){
                 if(data.companyId){
@@ -146,7 +146,7 @@ travelPolicy.getTravelPolicy = function(id, callback){
 travelPolicy.listAndPaginateTravelPolicy = function(params, options, callback){
     var defer = Q.defer();
     var user_id = this.accountId;
-    return API.staff.getStaff(user_id)
+    return API.staff.getStaff({id: user_id})
         .then(function(data){
             if(data){
                 params.companyId = data.companyId;//只允许查询该企业下的差旅标准
@@ -174,7 +174,7 @@ travelPolicy.getAllTravelPolicy = function(options, callback){
         options.attributes = options.columns;
         delete options.columns;
     }
-    return API.staff.getStaff(user_id)
+    return API.staff.getStaff({id:user_id})
         .then(function(staff){
             if(staff){
                 options.where.companyId = staff.companyId;//只允许查询该企业下的差旅标准
