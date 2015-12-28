@@ -200,6 +200,7 @@ CREATE TABLE consume_details (
     hotel_name character varying,
     start_time timestamp without time zone,
     end_time timestamp without time zone,
+    latest_arrive_time timestamp without time zone
     budget numeric(15,2),
     expenditure numeric(15,2),
     invoice_type integer,
