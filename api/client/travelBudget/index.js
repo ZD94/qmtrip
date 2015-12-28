@@ -8,7 +8,7 @@
 
 var API = require("common/api");
 var validate = require("common/validate");
-
+var Q = require("q");
 /**
  * @class travelBudget 旅行预算
  * @type {{__public: boolean}}
@@ -45,6 +45,21 @@ travelBudget.getTravelPolicyBudget = function(params, callback) {
     }
 
     return API.travelbudget.getTravelBudget(params, callback);
+}
+
+/**
+ * @method getHotelBudget
+ *
+ * 获取酒店住宿预算
+ *
+ * @param {Object} params
+ * @param {String} params.cityId    城市ID
+ * @param {String} params.businessDistrict 商圈ID
+ * @param {Function} [callback]
+ * @return {Promise} {prize: 1000, hotel: "酒店名称"}
+ */
+travelBudget.getHotelBudget = function(params, callback) {
+    return API.travelbudget.getHotelBudget(params, callback);
 }
 
 module.exports = travelBudget;

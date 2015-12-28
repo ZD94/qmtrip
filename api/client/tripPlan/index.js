@@ -51,7 +51,6 @@ tripPlan.getTripPlanOrderById = function(orderId, callback){
  * @returns {*}
  */
 tripPlan.listTripPlanOrder = function(query, callback){
-    console.info(query, callback);
     var accountId = this.accountId;
     query.accountId = accountId;
     var params = {
