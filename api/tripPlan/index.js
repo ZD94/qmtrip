@@ -112,11 +112,10 @@ tripPlan.getTripPlanOrder = function(params, callback){
                         defer.reject(L.ERR.PERMISSION_DENY);
                         return defer.promise;
                     }
-                    var tripPlanOrder = order.dataValues;
-                    tripPlanOrder.outTraffic = outTraffic;
-                    tripPlanOrder.backTraffic = backTraffic;
-                    tripPlanOrder.hotel = hotel;
-                    return tripPlanOrder;
+                    order.outTraffic = outTraffic;
+                    order.backTraffic = backTraffic;
+                    order.hotel = hotel;
+                    return order;
                 })
         })
         .catch(errorHandle)
