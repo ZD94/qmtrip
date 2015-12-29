@@ -106,9 +106,10 @@ travelPolicy.getAllTravelPolicy = function(options, callback){
  * @param callback
  */
 travelPolicy.listAndPaginateTravelPolicy = function(params, callback){
-    var options = params.options;
-    if (!options) {
-        options = {};
+    var options = {};
+    if(params.options){
+        options = params.options;
+        delete params.options;
     }
     var page, perPage, limit, offset;
     if (options.page && /^\d+$/.test(options.page)) {

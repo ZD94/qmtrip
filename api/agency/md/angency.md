@@ -28,7 +28,7 @@
 |---------|------|-----|
 | code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
-| agencyUser   | 代理商用户|json
+| json数据   | 代理商用户|json
 
 >. 删除代理商用户 API.agency.deleteAgencyUser(params, callback);
 
@@ -43,12 +43,12 @@
 | code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
 
->. 修改代理商用户信息 API.agency.updateAgencyUser(id, params, callback);
+>. 修改代理商用户信息 API.agency.updateAgencyUser(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
-| id                                | 代理商id             | uuid             |必填
 | params                                | 更新信息             |json              |------
+| params.id                                | 代理商id             | uuid             |必填
 | params.name                        | 代理商姓名              |varchar               |选填
 | params.sex                        | 代理商性别              |integer               |选填
 | params.mobile                        | 代理商手机              |varchar               |选填
@@ -61,20 +61,21 @@
 |---------|------|-----|
 | code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
-| agency   | 代理商用户信息|json
+| json数据   | 代理商用户信息|json
 
->. 查询代理商用户信息 API.agency.getAgencyUser(id,callback);
+>. 查询代理商用户信息 API.agency.getAgencyUser(params,callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
-| id                                | 代理商id             | uuid             |必填
+| params                                | 更新信息             |json              |------
+| params.id                                | 代理商id             | uuid             |必填
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
 | code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
-| agencyUser   | 代理商用户信息|json
+| json数据   | 代理商用户信息|json
 
 >. 查询当前代理商用户 API.agency.getCurrentAgencyUser(callback);
 
@@ -84,9 +85,9 @@
 
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
-| agencyUser   | 代理商用户信息|json
+| json数据   | 代理商用户信息|json
 
->. 分页查询代理商用户信息 API.agency.listAndPaginateAgencyUser(params, options, callback);
+>. 分页查询代理商用户信息 API.agency.listAndPaginateAgencyUser(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -97,9 +98,9 @@
 | params.email                          |代理商邮箱           |varchar               |选填
 | params.companyId                          |所属企业id           |uuid               |选填
 | params.roleId                          |权限           |integer               |选填
-| options                                | 分页参数             |json              |------
-| options.perPage                                | 每页条数             |integer              |选填默认为6
-| options.page                                | 当前页             |integer              |选填默认为1
+| params.options                                | 分页参数             |json              |------
+| params.options.perPage                                | 每页条数             |integer              |选填默认为6
+| params.options.page                                | 当前页             |integer              |选填默认为1
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |

@@ -243,14 +243,7 @@ staff.listAndPaginateStaff = function(params, callback){
  * @param callback
  * @returns {*}
  */
-staff.increaseStaffPoint = function(params, options, callback) {
-    if (typeof options == 'function') {
-        callback = options;
-        options = {};
-    }
-    if (!options) {
-        options = {};
-    }
+staff.increaseStaffPoint = function(params, callback) {
     var id = params.id;
     var increasePoint = params.increasePoint;
     var defer = Q.defer();
@@ -287,14 +280,7 @@ staff.increaseStaffPoint = function(params, options, callback) {
  * @param callback
  * @returns {*}
  */
-staff.decreaseStaffPoint = function(params, options, callback) {
-    if (typeof options == 'function') {
-        callback = options;
-        options = {};
-    }
-    if (!options) {
-        options = {};
-    }
+staff.decreaseStaffPoint = function(params, callback) {
     var id = params.id;
     var decreasePoint = params.decreasePoint;
     var defer = Q.defer();
@@ -333,13 +319,11 @@ staff.decreaseStaffPoint = function(params, options, callback) {
  * @param options options.perPage 每页条数 options.page当前页
  * @param callback
  */
-staff.listAndPaginatePointChange = function(params, options, callback){
-    if (typeof options == 'function') {
-        callback = options;
-        options = {};
-    }
-    if (!options) {
-        options = {};
+staff.listAndPaginatePointChange = function(params, callback){
+    var options = {};
+    if(params.options){
+        options = params.options;
+        delete params.options;
     }
 
     var page, perPage, limit, offset;
@@ -526,7 +510,7 @@ staff.importExcelAction = function(params, callback){
                 return staff.createStaff(staffObj)
                     .then(function(ret){
                         if(ret){
-                            item = ret.staff;
+                            item = ret;
                             addObj.push(item);
                         }else{
                             noAddObj.push(staffObj);

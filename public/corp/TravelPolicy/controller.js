@@ -161,7 +161,8 @@ var TravelPolicy=(function(){
         }
         $scope.updatePolicy = function () {
             API.onload(function(){
-                API.travelPolicy.updateTravelPolicy({id:$scope.updateId},{
+                API.travelPolicy.updateTravelPolicy({
+                    id:$scope.updateId,
                     name:$(".update_policy .Cname").val(),
                     planeLevel:$(".update_policy .CplaneLevel").html(),
                     planeDiscount:$(".update_policy .CplaneDiscount").attr('selectValue'),
