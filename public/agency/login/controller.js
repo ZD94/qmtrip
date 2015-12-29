@@ -2,10 +2,10 @@
 'use strict';
 var login=(function(){
     API.require('auth');
+    API.require("checkcode");
     var login = {};
     var Cookie = require('tiny-cookie');
 
-    console.info(API);
     login.LoginController = function ($scope, $routeParams) {
 
         var backUrl = $routeParams.backurl || "#/";
@@ -21,7 +21,9 @@ var login=(function(){
                     alert("登录密码不能为空!");
                     return false;
                 }
+
                 API.onload(function(){
+                    console.info(API)
                     API.auth.login({email:name,pwd:pwd, type: 2})
                         .then(function(data){
                             Cookie.set("agent_id", data.user_id, { expires:30 });

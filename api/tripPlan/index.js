@@ -104,7 +104,7 @@ tripPlan.getTripPlanOrder = function(params, callback){
                 ConsumeDetails.findAll({where: {orderId: orderId, type: 0}})
             ])
                 .spread(function(order, outTraffic, backTraffic, hotel){
-                    if(!order){
+                    if(!order || order.status == -2){
                         defer.reject(L.ERR.TRIP_PLAN_ORDER_NOT_EXIST);
                         return defer.promise;
                     }
@@ -136,10 +136,10 @@ tripPlan.updateTripPlanOrder = function(params, callback){
             var userId = params.userId;
             var optLog = params.optLog;
             var updates = params.updates;
-            return PlanOrder.findById(orderId, {attributes: ['id', 'accountId', 'companyId']});
+            return PlanOrder.findById(orderId, {attributes: ['id', 'accountId', 'companyId', 'status']});
         })
         .then(function(order){
-            if(!order){
+            if(!order || order.status == -2){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
             }
             if(order.accountId != userId){ //权限不足
@@ -179,7 +179,10 @@ tripPlan.updateConsumeDetail = function(params, callback){
         .then(function(){
             return ConsumeDetails.findById(params.id)
         })
-        .then(function(ret){
+        .then(function(record){
+            if(!record || record.status == -2){
+                throw {code: -2, msg: '记录不存在'}
+            }
             var cols = getColsFromParams(params.updates);
             return ConsumeDetails.update(params.updates, {returning: true, where: {id: params.id}, fields: cols});
         })
@@ -201,6 +204,7 @@ tripPlan.listTripPlanOrder = function(params, callback){
         return defer.promise.nodeify(callback);
     }
     var query = params.query;
+    query.status = {$ne: -2};
     return PlanOrder.findAll({where: query})
         .then(function(orders){
             return Q.all(orders.map(function(order){
@@ -264,20 +268,18 @@ tripPlan.deleteTripPlanOrder = function(params, callback){
         .then(function(){
             var orderId = params.orderId;
             var userId = params.userId;
-            return PlanOrder.findById(orderId, {attributes: ['accountId']})
+            return PlanOrder.findById(orderId, {attributes: ['accountId', 'status']})
                 .then(function(order){
-                    if(!order){
-                        defer.reject(L.ERR.TRIP_PLAN_ORDER_NOT_EXIST);
-                        return defer.promise;
+                    if(!order || order.status == -2){
+                        throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST
                     }
                     if(order.accountId != userId){ //权限不足
-                        defer.reject(L.ERR.PERMISSION_DENY);
-                        return defer.promise;
+                        throw L.ERR.PERMISSION_DENY;
                     }
                     return sequelize.transaction(function(t){
                         return Q.all([
-                            PlanOrder.destory({where: {id: orderId}, transaction: t}),
-                            ConsumeDetails.destory({where: {orderId: orderId}, transaction: t})
+                            PlanOrder.update({status: -2}, {where: {id: orderId}, fields: ['status'], transaction: t}),
+                            ConsumeDetails.update({status: -2}, {where: {orderId: orderId}, fields: ['status'], transaction: t})
                         ])
                             .then(function(){
                                 return {code: 0, msg: '删除成功'};
