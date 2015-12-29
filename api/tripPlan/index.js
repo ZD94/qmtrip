@@ -263,11 +263,12 @@ tripPlan.saveConsumeRecord = function(params, options, callback){
  * @returns {*}
  */
 tripPlan.deleteTripPlanOrder = function(params, callback){
-    var defer = Q.defer();
     return checkParams(['userId', 'orderId'], params)
         .then(function(){
             var orderId = params.orderId;
             var userId = params.userId;
+            console.info("**********************");
+            console.info(PlanOrder.destory);
             return PlanOrder.findById(orderId, {attributes: ['accountId', 'status']})
                 .then(function(order){
                     if(!order || order.status == -2){
