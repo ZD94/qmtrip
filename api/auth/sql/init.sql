@@ -2,7 +2,7 @@
 
 create table auth.accounts (
     id uuid primary key,
-    email varchar(255) unique,
+    email varchar(255),
     pwd varchar(50),
     mobile varchar(20),
     status int default 0,

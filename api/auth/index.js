@@ -309,7 +309,7 @@ authServer.newAccount = function(data, callback) {
             var pwd = data.pwd;
             pwd = md5(pwd);
             var id = data.id?data.id:uuid.v1();
-            return Models.Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status});
+            return Models.Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status, type: type});
         })
         .then(function(account) {
             if (account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
@@ -649,6 +649,58 @@ authServer.logout = function (params, callback) {
             return {code: 0, msg: "ok"};
         })
         .catch(errorHandle)
+        .nodeify(callback);
+}
+
+
+/**
+ * @method resetPwdByOldPwd
+ *
+ * 根据旧密码重置密码
+ *
+ * @param {Object} params
+ * @param {String} params.oldPwd 旧密码
+ * @param {String} params.newPwd 新密码
+ * @param {Function} [callback] true|error
+ * @return {Promise}
+ */
+authServer.resetPwdByOldPwd = function(params, callback) {
+    var oldPwd = params.oldPwd;
+    var newPwd = params.newPwd;
+    var accountId = params.accountId;
+
+    return Q()
+        .then(function() {
+            if (!accountId) {
+                throw L.ERR.NEED_LOGIN;
+            }
+
+            if (!oldPwd || !newPwd) {
+                throw L.ERR.PWD_EMPTY;
+            }
+
+            if (oldPwd == newPwd) {
+                throw {code: -1, msg: "新旧密码不能一致"};
+            }
+
+            return Models.Account.findById(accountId)
+        })
+        .then(function(account) {
+            if (!account) {
+                throw L.ERR.ACCOUNT_NOT_EXIST;
+            }
+
+            var pwd = utils.md5(oldPwd);
+            if (account.pwd != pwd) {
+                throw L.ERR.PWD_ERROR;
+            }
+            newPwd = newPwd.replace(/\s/g, "");
+            pwd = utils.md5(newPwd);
+            return Models.Account.update({pwd: pwd}, {where: {id: account.id}});
+        })
+        .then(function() {
+            return true;
+        })
         .nodeify(callback);
 }
 

@@ -35,14 +35,14 @@ agency.registerAgency = function(params, callback){
             var pwd = params.pwd || md5('123456');
             var mobile = params.mobile;
             var email = params.email;
-            var account = {email: email, mobile: mobile, pwd: pwd};
+            var account = {email: email, mobile: mobile, pwd: pwd, type: 2};
             var agencyUser = {
                 agencyId: agencyId,
                 name: userName,
                 mobile: mobile,
                 email: email
-            }
-            return API.auth.findOneAcc({$or: [{mobile: mobile}, {email: email}]})
+            };
+            return API.auth.checkAccExist({type: 2, $or: [{mobile: mobile}, {email: email}]})
                 .then(function(ret){
                     if(!ret){
                         return API.auth.newAccount(account);
@@ -76,6 +76,7 @@ agency.registerAgency = function(params, callback){
                         })
                 })
         })
+        .catch(errorHandle)
         .nodeify(callback);
 }
 
