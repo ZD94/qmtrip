@@ -5,6 +5,7 @@
 var API = require('../../../common/api');
 var Logger = require('../../../common/logger');
 var logger = new Logger();
+var accountId = "6cee7e00-aa21-11e5-a377-2fe1a7dbc5e1";
 
 var tripPlan = {};
 
@@ -15,9 +16,15 @@ var tripPlan = {};
  * @returns {*}
  */
 tripPlan.savePlanOrder = function(params, callback){
-    params.accountId = this.accountId;
+    var self = this;
+    params.accountId = self.accountId;
     params.type = params.type | 2;
-    return API.tripPlan.savePlanOrder(params, callback);
+    return API.staff.getStaff({id: accountId, columns: ['companyId']})
+        .then(function(staff){
+            console.info(staff);
+            params.companyId = staff.companyId;
+            return API.tripPlan.savePlanOrder(params, callback);
+        })
 }
 
 /**
@@ -131,6 +138,24 @@ tripPlan.approveInvoice = function(params, callback){
 //    params.userId = this.accountId;
     params.userId = "ee3eb6a0-9f22-11e5-8540-8b3d4cdf6eb6";
     return API.tripPlan.approveInvoice(params, callback);
+};
+
+/**
+ * 根据条件统计计划单数目
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+tripPlan.countTripPlanNum = function(params, callback){
+    var self = this;
+    var accountId = self.accountId;
+    logger.info("accountId=>", accountId);
+    return API.staff.getStaff({id: accountId})
+        .then(function(staff){
+            var companyId = staff.companyId;
+            params.companyId = companyId;
+            return API.tripPlan.countTripPlanNum(params, callback);
+        });
 }
 
 

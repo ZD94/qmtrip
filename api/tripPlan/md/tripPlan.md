@@ -21,7 +21,7 @@
 | params.startPlace              | 出发地           |varchar               |必填
 | params.destination              | 目的地           |varchar               |必填
 | params.startAt              | 开始时间           |date               |必填
-| params.backAt              | 返回时间           |date               |必填
+| params.backAt              | 返回时间           |date               |
 | params.budget              | 预算           |numeric(15,2)               |必填
 | params.isNeedTraffic              | 是否需要交通服务           |boolean               |
 | params.isNeedHotel              | 是否需要酒店服务           |boolean               |
@@ -143,6 +143,19 @@
 | code    | 返回码 | 0.成功，其他失败 |
 | msg     | 错误消息 |
 
+
+>. 查询计划单数目 API.tripPlan.countTripPlanNum(params, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 参数             |json              |------
+| params.accountId                         |用户id            |uuid                 |选填
+| params.status                           |计划单状态            |integer             |选填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| json数据     | 消费单信息 |
 
 
 >. 删除计划单/预算单 API.tripPlan.deleteTripPlanOrder(orderId, callback);
