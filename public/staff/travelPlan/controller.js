@@ -28,6 +28,19 @@ var travelPlan=(function(){
         $scope.enterDetail = function (id) {
             window.location.href = "#/travelPlan/PlanDetail?planId="+id;
         }
+        $scope.deletePlan = function () {
+            API.onload(function() {
+                console.info(1111111111);
+                API.tripPlan.deleteTripPlanOrder('1ead6250-ae0f-11e5-b799-3fa6e9e1404b')
+                    .then(function(result){
+                        Myalert("温馨提示","删除成功");
+                        $scope.$apply();
+                    })
+                    .catch(function(err){
+                        console.info(err);
+                    });
+            })
+        }
     }
 
 
