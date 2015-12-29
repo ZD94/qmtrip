@@ -8,6 +8,7 @@ var tripPlan = require("./index");
 var companyId = '6cf36000-aa21-11e5-a377-2fe1a7dbc5e1';
 var accountId = "6cee7e00-aa21-11e5-a377-2fe1a7dbc5e1";
 var self = {accountId: accountId};
+var orderId = '';
 
 describe("api/client/tripPlan.js", function() {
     /*var params = {
@@ -59,16 +60,35 @@ describe("api/client/tripPlan.js", function() {
             if(err){
                 throw err;
             }
+            orderId = ret.id;
             done();
         })
     })
+
+    it("#getTripPlanOrderById should be ok", function(done) {
+        tripPlan.getTripPlanOrderById.call(self, orderId, function(err, ret){
+            if (err) {
+                throw err;
+            }
+            done();
+        })
+    });
+
+    it("#deleteTripPlanOrder should be ok", function(done) {
+        tripPlan.deleteTripPlanOrder.call(self, orderId, function(err, ret){
+            if (err) {
+                throw err;
+            }
+            done();
+        })
+    });
 
     it("#listTripPlanOrder should be ok", function(done) {
         tripPlan.listTripPlanOrder.call(self, {}, function(err, ret){
             if (err) {
                 throw err;
             }
-            //console.info("共列出计划单=>", ret.length);
+            console.info("共列出计划单=>", ret.length);
             done();
         })
     });

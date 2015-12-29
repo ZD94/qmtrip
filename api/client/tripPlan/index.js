@@ -21,7 +21,6 @@ tripPlan.savePlanOrder = function(params, callback){
     params.type = params.type | 2;
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function(staff){
-            console.info(staff);
             params.companyId = staff.companyId;
             return API.tripPlan.savePlanOrder(params, callback);
         })
@@ -89,9 +88,10 @@ tripPlan.listTripPlanOrderByCompany = function(query, callback){
  * @returns {*}
  */
 tripPlan.deleteTripPlanOrder = function(orderId, callback){
+    var self = this;
     var params = {
         orderId: orderId,
-        userId: this.accountId
+        userId: self.accountId
     }
     return API.tripPlan.deleteTripPlanOrder(params, callback);
 }
