@@ -12,6 +12,7 @@ create table auth.accounts (
     last_login_at timestamp default now(),
     last_login_ip varchar(50),
     active_token varchar(50),
+    pwd_token varchar(50),
     type integer default 1
 );
 
@@ -26,7 +27,13 @@ comment on column auth.accounts.forbidden_expire_at is '禁用失效时间';
 comment on column auth.accounts.login_fail_times is '连续登录错误次数';
 comment on column auth.accounts.last_login_at is '最后登录时间';
 comment on column auth.accounts.last_login_ip is '最后登录IP地址';
+comment on column auth.accounts.active_token is '激活账号秘钥';
+comment on column auth.accounts.pwd_token is '设置或找回密码秘钥';
+comment on column auth.accounts.type is '账号类型 1.企业员工 2.代理商员工';
 
+create index idx_auth_accounts_type on auth.accounts(type);
+create index idx_auth_accounts_email on auth.accounts(email);
+create index idx_auth_accounts_status on auth.accounts(status);
 
 create table auth.tokens(
     id uuid primary key,

@@ -22,6 +22,11 @@ var ACCOUNT_STATUS = {
     FORBIDDEN: -1
 };
 
+var ACCOUNT_TYPE = {
+    COMPANY_STAFF: 1,
+    AGENT_STAFF: 2
+}
+
 /**
  * @class API.auth 认证类
  * @constructor
@@ -60,7 +65,7 @@ authServer.activeByEmail = function(data, callback) {
                 throw L.ERR.ACTIVE_URL_INVALID;
             }
 
-            if (account.status == 1) {
+            if (account.status == ACCOUNT_STATUS.ACTIVE) {
                 return true;
             }
 
@@ -142,6 +147,8 @@ authServer.remove = function(data, callback) {
  * @param {String} data.mobile 手机号
  * @param {String} data.email 邮箱
  * @param {String} data.pwd 密码
+ * @param {Integer} data.type  账号类型 默认1.企业员工 2.代理商员工
+ * @param {INTEGER} data.status 账号状态 0未激活, 1.已激活 如果为0将发送激活邮件,如果1则不发送
  * @param {Callback} callback 回调函数
  * @return {Promise} {code: 0, data:{accountId: 账号ID, email: "邮箱", status: "状态"}
  * @public
@@ -174,10 +181,12 @@ authServer.newAccount = function(data, callback) {
         return defer.promise.nodeify(callback);
     }
 
+    var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
+
     //查询邮箱是否已经注册
     return Q.all([
-        Models.Account.findOne({where: {email: data.email}}),
-        Models.Account.findOne({where: {mobile: mobile}})
+        Models.Account.findOne({where: {email: data.email, type: type}}),
+        Models.Account.findOne({where: {mobile: mobile, type: type}})
     ])
         .spread(function(account1, account2) {
             if (account1) {
@@ -190,14 +199,14 @@ authServer.newAccount = function(data, callback) {
             return true;
         })
         .then(function() {
-            var status = 0;
+            var status = data.status? data.status: ACCOUNT_STATUS.NOT_ACTIVE;
             var pwd = data.pwd;
             pwd = md5(pwd);
             var id = data.id?data.id:uuid.v1();
             return Models.Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status});
         })
         .then(function(account) {
-            if (account.status == 0) {
+            if (account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
                 return _sendActiveEmail(account.id)
                     .then(function(){
                         return account;
@@ -216,59 +225,56 @@ authServer.newAccount = function(data, callback) {
  * @param {Object} data 参数
  * @param {String} data.email 邮箱 (可选,如果email提供优先使用)
  * @param {String} data.pwd 密码
+ * @param {Integer} data.type 1.企业员工 2.代理商员工 默认是企业员工
  * @param {String} data.mobile 手机号(可选,如果email提供则优先使用email)
  * @param {Callback} callback 可选回调函数
  * @return {Promise} {code:0, msg: "ok", data: {user_id: "账号ID", token_sign: "签名", token_id: "TOKEN_ID", timestamp:"时间戳"}
  * @public
  */
 authServer.login = function(data, callback) {
-    var defer = Q.defer();
-    if (!data) {
-        defer.reject(L.ERR.DATA_NOT_EXIST);
-        return defer.promise.nodeify(callback);
-    }
-
-    if (!data.email && !data.mobile) {
-        defer.reject(L.ERR.EMAIL_EMPTY);
-        return defer.promise.nodeify(callback);
-    }
-
-    if (!validate.isEmail((data.email))) {
-        defer.reject(L.ERR.EMAIL_EMPTY);
-        return defer.promise.nodeify(callback);
-    }
-
-    if (!data.pwd) {
-        defer.reject(L.ERR.PWD_EMPTY);
-        return defer.promise.nodeify(callback);
-    }
-
-    var pwd = md5(data.pwd);
-
-    return Models.Account.findOne({where: {email: data.email}})
-        .then(function(loginAccount) {
-            if (!loginAccount) {
-                throw L.ERR.ACCOUNT_NOT_EXIST
+    return Q()
+        .then(function() {
+            if (!data) {
+                throw L.ERR.DATA_NOT_EXIST;
             }
 
-            if (loginAccount.pwd != pwd) {
-                throw L.ERR.PASSWORD_NOT_MATCH
+            if (!data.email && !data.mobile) {
+                throw L.ERR.EMAIL_EMPTY;
             }
 
-            if (loginAccount.status == 0) {
-                throw L.ERR.ACCOUNT_NOT_ACTIVE;
+            if (!validate.isEmail((data.email))) {
+                throw L.ERR.EMAIL_EMPTY;
             }
 
-            if (loginAccount.status != 1) {
-                throw L.ERR.ACCOUNT_FORBIDDEN;
+            if (!data.pwd) {
+                throw L.ERR.PWD_EMPTY;
             }
 
-            return makeAuthenticateSign(loginAccount.id)
-                .then(function(result) {
-                    return {code:0, msg: "ok", data: result};
+            var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
+
+
+            return Models.Account.findOne({where: {email: data.email, type: type}})
+                .then(function (loginAccount) {
+                    var pwd = md5(data.pwd);
+                    if (!loginAccount) {
+                        throw L.ERR.ACCOUNT_NOT_EXIST
+                    }
+
+                    if (loginAccount.pwd != pwd) {
+                        throw L.ERR.PASSWORD_NOT_MATCH
+                    }
+
+                    if (loginAccount.status == 0) {
+                        throw L.ERR.ACCOUNT_NOT_ACTIVE;
+                    }
+
+                    if (loginAccount.status != 1) {
+                        throw L.ERR.ACCOUNT_FORBIDDEN;
+                    }
+
+                    return makeAuthenticateSign(loginAccount.id);
                 })
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -429,7 +435,6 @@ function makeAuthenticateSign(accountId, os, callback) {
                 timestamp: timestamp
             }
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 

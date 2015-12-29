@@ -112,11 +112,10 @@ tripPlan.getTripPlanOrder = function(params, callback){
                         defer.reject(L.ERR.PERMISSION_DENY);
                         return defer.promise;
                     }
-                    var tripPlanOrder = order.dataValues;
-                    tripPlanOrder.outTraffic = outTraffic;
-                    tripPlanOrder.backTraffic = backTraffic;
-                    tripPlanOrder.hotel = hotel;
-                    return tripPlanOrder;
+                    order.outTraffic = outTraffic;
+                    order.backTraffic = backTraffic;
+                    order.hotel = hotel;
+                    return order;
                 })
         })
         .catch(errorHandle)
@@ -407,6 +406,23 @@ tripPlan.approveInvoice = function(params, callback){
             return rows[0];
         })
         .nodeify(callback);
+}
+
+/**
+ * 统计计划单数量
+ *
+ * @param params
+ * @param callback
+ */
+tripPlan.countTripPlanNum = function(params, callback){
+    return checkParams(['companyId'], params)
+        .then(function(){
+            var query = {
+                companyId: params.companyId
+            }
+            logger.info(query);
+            return PlanOrder.count({where: query})
+        }).nodeify(callback);
 }
 
 function checkParams(checkArray, params, callback){

@@ -88,7 +88,7 @@ var businessTravel=(function(){
                 API.place.queryPlace({keyword:$scope.endplacename})
                     .then(function(result) {
                         $scope.endplaceitems = result;
-                        if ($scope.startplaceitems.length) {
+                        if ($scope.endplaceitems.length) {
                             $(".placelist2").show();
                         }
                         console.info (result);
@@ -308,7 +308,7 @@ var businessTravel=(function(){
         //住宿位置获取
         $scope.liveplace = function () {
             API.onload(function() {
-                API.place.queryBusinessDistrict({keyword:$scope.liveplacename,code:$(".live1").attr("checkval")})
+                API.place.queryBusinessDistrict({keyword:$scope.liveplacename,code:$(".traffic2").attr("checkval")})
                     .then(function(result) {
                         $scope.liveplaceitems = result;
                         if ($scope.liveplaceitems.length) {
@@ -441,6 +441,7 @@ var businessTravel=(function(){
                 .spread(function(ret1,ret2) {
                     $scope.companyId = ret1.companyId;
                     $scope.price = ret2;
+                    console.info (ret2);
                     $(".creating").hide();
                     $(".createresult,.tianxun").show();
                     $scope.totalprice = ret2.price;
@@ -497,6 +498,12 @@ var businessTravel=(function(){
                         console.info (err);
                     });
             })
+        }
+        $scope.bookTicket = function () {
+            window.location.href = "http://www.tianxun.com/"
+        }
+        $scope.upLoad = function () {
+            window.location.href = "#/travelPlan/PlanList"
         }
     }
 

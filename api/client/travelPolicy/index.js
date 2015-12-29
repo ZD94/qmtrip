@@ -128,12 +128,29 @@ travelPolicy.getTravelPolicy = function(id, callback){
             }else{
                 return API.travelPolicy.getTravelPolicy(id)
                     .then(function(tp){
-                        if(tp.companyId == data.companyId){
-                            return tp;
+                        if(tp){
+                            if(tp.companyId == data.companyId){
+                                return tp;
+                            }else{
+                                defer.reject({code: -1, msg: '无权限'});
+                                return defer.promise;
+                            }
                         }else{
-                            defer.reject({code: -1, msg: '无权限'});
-                            return defer.promise;
+                            //若该员工引用的差旅标准被删除使用默认标准（有待修改 被引用的差旅标准 不让删除）
+                            return API.travelPolicy.getAllTravelPolicy(options)
+                                .then(function(obj){
+                                    if(obj && obj.length > 0){
+                                        return obj[0];
+                                    }else{
+                                        //若该企业没有差旅标准默认返回系统默认差旅标准
+                                        return API.travelPolicy.getTravelPolicy('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a')
+                                            .then(function(tp){
+                                                return tp;
+                                            })
+                                    }
+                                })
                         }
+
                     })
             }
         }).nodeify(callback);
