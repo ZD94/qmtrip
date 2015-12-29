@@ -67,11 +67,20 @@ company.getCompany = function(companyId, callback){
  * @param callback
  * @returns {*}
  */
-company.listCompany = checkPermission(["company.query"],
-    function(params, callback){
-        params.userId = this.accountId;
-        return API.company.listCompany(params, callback);
-    });
+company.getCompanyListByAgency = //checkAgencyPermission(["company.query"],
+    function(callback){
+        var self = this;
+        var accountId = self.accountId;
+        var params = {
+            userId: accountId
+        }
+        return API.agency.getAgencyUser({id: accountId})
+            .then(function(user){
+                logger.info(user);
+                params.agencyId = user.agencyId;
+                return API.company.listCompany(params, callback);
+            })
+    };
 
 /**
  * 删除企业信息

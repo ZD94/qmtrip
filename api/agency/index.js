@@ -221,6 +221,7 @@ function checkParams(checkArray, params, callback){
  */
 agency.createAgencyUser = function(data, callback){
     var defer = Q.defer();
+    var accountId = data.accountId;
     if (!data) {
         defer.reject(L.ERR.DATA_NOT_EXIST);
         return defer.promise.nodeify(callback);
@@ -241,37 +242,21 @@ agency.createAgencyUser = function(data, callback){
         defer.reject({code: -4, msg: "代理商不能为空"});
         return defer.promise.nodeify(callback);
     }
-    var mobile = data.mobile;
-    var email = data.email;
-    var pwd = md5('123456');
-    var account = {email: data.email, mobile: data.mobile, pwd: pwd};//初始密码暂定123456
-    var agencyUser = data;
-
-    return API.auth.findOneAcc({$or: [{mobile: mobile}, {email: email}]})
-        .then(function(ret){
-            if(ret.code){
-                return API.auth.newAccount(account);
-            }else{
-                return ret.account;
+    return Q()
+        .then(function() {
+            if (accountId) {
+                data.id = accountId;
+                return data;
             }
+            var accData = {email: data.email, mobile: data.mobile, pwd: "123456"};//初始密码暂定123456
+            return API.auth.newAccount(accData)
+                .then(function(account){
+                    data.id = account.id;
+                    return data;
+                });
         })
-        .then(function(account){
-            agencyUser.id = account.id;
-            return AgencyUser.create(agencyUser)
-                .then(function(){
-                    return {code: 0, msg: '注册成功'}
-                })
-                .catch(function(err){
-                    logger.error(err);
-                    return AgencyUser.findOne({where: {$or: [{mobile: mobile}, {email: email}]}, attributes: ['id']})
-                        .then(function(agency){
-                            if(agency){
-                                throw {code: -5, msg: '手机号或邮箱已是代理商用户'};
-                            }else{
-                                throw {code: -6, msg: '注册异常'};
-                            }
-                        })
-                })
+        .then(function(agencyUser) {
+            return AgencyUser.create(agencyUser);
         })
         .catch(errorHandle)
         .nodeify(callback);
@@ -310,12 +295,14 @@ agency.deleteAgencyUser = function(params, callback){
  * @param callback
  * @returns {*}
  */
-agency.updateAgencyUser = function(id, data, callback){
+agency.updateAgencyUser = function(data, callback){
     var defer = Q.defer();
+    var id = data.id;
     if(!id){
         defer.reject({code: -1, msg: "id不能为空"});
         return defer.promise.nodeify(callback);
     }
+    delete data.id;
     var options = {};
     options.where = {id: id};
     options.returning = true;
@@ -334,8 +321,9 @@ agency.updateAgencyUser = function(id, data, callback){
  * @param callback
  * @returns {*}
  */
-agency.getAgencyUser = function(id, callback){
+agency.getAgencyUser = function(params, callback){
     var defer = Q.defer();
+    var id = params.id;
     if(!id){
         defer.reject({code: -1, msg: "id不能为空"});
         return defer.promise.nodeify(callback);

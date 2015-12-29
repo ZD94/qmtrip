@@ -16,7 +16,7 @@ describe("api/client/staff.js", function() {
     }
 
     var updateobj = {
-        id:"bb8b8710-a39b-11e5-ad58-6b881dd4ecc0",
+        id:"e68e5ef0-9f23-11e5-82c0-0772ae4fad14",
         email: "yali.wang@tulingdao.com",
         name: "wyll",
         mobile: "18345433986",

@@ -18,7 +18,7 @@
 		<h3>{{}}结算信息</h3>
 	</div>
 	<div class="corp_staff">
-		<h3>员工信息管理<a href="">查看详细>></a></h3>
+		<h3>员工信息管理<a href="#/StaffManage/StaffInfoManage">查看详细>></a></h3>
 		<div class="staff_left">
 			<div class="staff_num">共<span>{{num.all}}</span>名</div>
 			<ul>
@@ -27,23 +27,23 @@
 			</ul>
 		</div>
 		<div class="staff_right">
-			<a href="" class="web-icon-font">&#xf067;&nbsp;添加员工</a>
+			<a href="#/StaffManage/StaffInfoManage" class="web-icon-font">&#xf067;&nbsp;添加员工</a>
 		</div>
 	</div>
 	<div class="corp_business">
-		<h3>差旅标准<a href="">查看详细>></a></h3>
+		<h3>差旅标准<a href="#/TravelPolicy/PolicyList">查看详细>></a></h3>
 		<div class="business_left">
 			<div class="business_standard">
-				<span class="b_name">我是流氓我怕谁{{}}</span>
+				<span class="b_name">{{travelLevel.name}}</span>
 				<ul>
-					<li><img src="corp/images/Air.png"><p>商务舱</p></li>
-					<li><img src="corp/images/Hotel.png"><p>500元/晚</p></li>
-					<li><img src="corp/images/Subway.png"><p>特等座</p></li>
+					<li><img src="corp/images/Air.png"><p>{{travelLevel.planeLevel}}</p></li>
+					<li><img src="corp/images/Hotel.png"><p>{{travelLevel.hotelLevel}}</p></li>
+					<li><img src="corp/images/Subway.png"><p>{{travelLevel.trainLevel}}</p></li>
 				</ul>
 			</div>
 		</div>
 		<div class="business_right">
-			<a href="" class="web-icon-font">&#xf08e;&nbsp;进行设置</a>
+			<a href="#/TravelPolicy/PolicyList" class="web-icon-font">&#xf08e;&nbsp;进行设置</a>
 		</div>
 	</div>
 	<div class="corp_welfare">
@@ -65,7 +65,7 @@
 		</ul>
 		<div class="corp_count">
 			<div class="corp_funds">
-				<span>￥{{funds.balance}}</span>
+				<span>￥{{funds.income-funds.consume-funds.frozen}}</span>
 				<p>增收节支专项奖励账户余额</p>
 			</div>
 			<div>

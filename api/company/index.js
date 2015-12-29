@@ -137,7 +137,8 @@ company.getCompany = function(params, callback){
 company.listCompany = function(params, callback){
     return checkParams(['agencyId'], params)
         .then(function(){
-            return Company.findAll({where: params})
+            logger.info("listCompany>>>>>>>>>>>>>>>>>>");
+            return Company.findAll({where: {agencyId: params.agencyId}})
                 .then(function(companys){
                     return companys;
                 })
@@ -186,7 +187,7 @@ company.getCompanyFundsAccount = function(params, callback){
         .then(function(){
             var companyId = params.companyId;
             var userId = params.userId;
-            return FundsAccounts.findById(companyId, {attributes: ['balance']})  //{attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createAt', 'updateAt']}
+            return FundsAccounts.findById(companyId, {attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createAt', 'updateAt']})  //{attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createAt', 'updateAt']}
                 .then(function(ret){
                     logger.info(ret);
                     return ret;

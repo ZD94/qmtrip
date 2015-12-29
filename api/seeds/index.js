@@ -52,11 +52,13 @@ seeds.getSingleSeedCode = function(type, options, callback){
             } else {
                 nowNo = parseInt(seeds.nowNo) + 1;
             }
-            return Seeds.update({nowNo: nowNo}, {returning: true, where: {type: type}} );
+            return Seeds.update({nowNo: nowNo}, {returning: true, where: {type: type}})
+                .spread(function(affect, rows) {
+                    return rows[0];
+                })
         })
-        .then(function(seeds) {
-            var seeds = seeds[1][0];
-            return seeds.nowNo;
+        .then(function(seed) {
+            return seed.nowNo;
         })
         .catch(errorHandle)
         .nodeify(callback);

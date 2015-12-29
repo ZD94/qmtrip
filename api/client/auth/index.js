@@ -234,4 +234,32 @@ auth.checkPermission = function(permissions, fn) {
     }
 };
 
+/**
+ * @method sendResetPwdEmail
+ *
+ * 发送重置密码邮件
+ *
+ * @param {Object} params
+ * @param {UUID} params.accountId 账号ID
+ * @param {Boolean} params.isFirstSet true|false 是否首次设置密码
+ * @param {Function} [callback]
+ * @return {Promise} true|error
+ */
+auth.sendResetPwdEmail = API.auth.sendResetPwdEmail;
+
+/**
+ * @method resetPwdByEmail
+ *
+ * 找回密码
+ *
+ * @param {Object} params
+ * @param {UUID} params.accountId 账号ID
+ * @param {String} params.sign 签名
+ * @param {String} params.timestamp 时间戳
+ * @param {String} params.pwd 新密码
+ * @param {Function} [callback] (null, true)
+ * @return {Promise} true|error
+ */
+auth.resetPwdByEmail = API.auth.resetPwdByEmail;
+
 module.exports = auth;

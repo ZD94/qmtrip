@@ -33,7 +33,7 @@ var StaffFirst = (function(){
 						$scope.firstname=str.substring(0,2);
 						Q.all([
 							API.tripPlan.listTripPlanOrder({$or: [{status: 0}, {status: 1}]}),
-							API.travelPolicy.getTravelPolicy(travelLevel)
+							API.travelPolicy.getTravelPolicy({id: travelLevel})
 						])
 						.spread(function(tripPlanOrders,travelPolicy){
 							$scope.businesstimes = tripPlanOrders.length;
