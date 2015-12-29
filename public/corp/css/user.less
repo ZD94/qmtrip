@@ -149,28 +149,35 @@
 			height: 118px;
 			width: 305px;
 			position: relative;
-			.b_name{
-				position: absolute;
-				background: #fff;
-				padding: 0 10px;
-				top: -10px;
-				left: 20px;
-				color: #9b9b9b;
-			}
-			ul{
-				display: inline-block;
-				margin: 35px 0 0 40px;
+			.business_standard{
 				text-align: center;
-				li{
-					float: left;
-					margin-right: 36px;
-					height: 50px;
-					line-height: 50px;
-					p{
-						line-height: 1;
+				.b_name{
+					position: absolute;
+					background: #fff;
+					padding: 0 10px;
+					top: -10px;
+					left: 20px;
+					color: #9b9b9b;
+				}
+				ul{
+					display: inline-block;
+					margin-top: 35px;
+					text-align: center;
+					li{
+						float: left;
+						margin-right: 20px;
+						height: 50px;
+						line-height: 50px;
+						p{
+							line-height: 1;
+						}
+						&:last-child{
+							margin-right: 0;
+						}
 					}
 				}
 			}
+			
 		}
 		.business_right{
 			float: right;

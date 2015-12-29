@@ -67,7 +67,7 @@ company.getCompany = function(companyId, callback){
  * @param callback
  * @returns {*}
  */
-company.getCompanyListByAgency = checkPermission(["company.query"],
+company.getCompanyListByAgency = //checkAgencyPermission(["company.query"],
     function(callback){
         var self = this;
         var accountId = self.accountId;
@@ -76,10 +76,11 @@ company.getCompanyListByAgency = checkPermission(["company.query"],
         }
         return API.agency.getAgencyUser({id: accountId})
             .then(function(user){
+                logger.info(user);
                 params.agencyId = user.agencyId;
                 return API.company.listCompany(params, callback);
             })
-    });
+    };
 
 /**
  * 删除企业信息
