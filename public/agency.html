@@ -18,43 +18,69 @@
     <script type="text/javascript" src="/agency/controller.all.js"></script>
     <script type="text/javascript">
     	var Q = require('q');
+    	var Cookie = require("tiny-cookie");
     	var moment = require('moment');
 		var Cookie = require('tiny-cookie');
 		var TLD = TLD_angular_app('tulingdao.com', 'agency', '/UsersFirst/UserMain');
     	API.onlogin(function(){
-    		window.location.href = "/agency/login.html";
-    		return;
+    		var backurl = window.location.href;
+    		return gotoAgentLogin(backurl);
     	});
-		API.authenticate = function(remote, callback){
-			var user_id = Cookie.get('user_id');
-			var token_id = Cookie.get('token_id');
-			var token_sign = Cookie.get('token_sign');
-			var timestamp = Cookie.get("timestamp");
-			remote.authenticate(user_id, token_id, timestamp, token_sign, callback);
+
+    	function gotoAgentLogin(backurl) {
+    		backurl = encodeURIComponent(backurl);
+    		window.location.href = '/agency/login.html#/login/login?backurl='+backurl;
+    	}
+
+	    API.authenticate = function(remote, callback){
+
+	        var agent_id = Cookie.get('agent_id');
+	        var token_id = Cookie.get('token_id');
+	        var token_sign = Cookie.get('token_sign');
+	        var timestamp = Cookie.get("timestamp");
+
+	       	if (!(agent_id && token_id && token_sign && timestamp)) {
+	       		var backurl = window.location.href;
+	    		return gotoAgentLogin(backurl);
+	    	}
+	        remote.authenticate(agent_id, token_id, timestamp, token_sign, callback);
+	    };
+
+    	function logout(){
+			API.require('auth');
+			API.onload(function(){
+				API.auth.logout()
+					.then(function (data) {
+						console.info(data);
+						location.reload();
+					}).catch(function(error){
+						console.log(error);
+				}).done();
+			});
 		};
     	//获取页面基本信息
     	TLD.controller("MainController", ["$scope", function($scope) {
     		API.require("agency");
     		API.onload(function(){
+    			// API.authenticate()
+    			// 	.then(function(ret){
+    			// 		console.info(ret)
+    			// 		$scope.$apply;
+    			// 	})
+    			// 	.catch(function(err){
+    			// 		console.info(err)
+    			// 	})
     			API.agency.getCurrentAgency()
     				.then(function(ret){
     					console.info(ret);
     					$scope.agency = ret;
-    					// API.company.getCompany(company_id)
-		    			// 	.then(function(company){
-		    			// 		$scope.company = company.company;
-		    			// 		console.info(company);
-		    			// 		$scope.$apply();
-		    			// 	})
-		    			// 	.catch(function(err){
-		    			// 		console.info(err)
-		    			// 	})
     					$scope.$apply();
     				})
     				.catch(function(err){
     					console.info(err)
     				})
     		})
+
     	}])
     </script>
     <script type="text/javascript">
@@ -84,7 +110,7 @@
 				<a href="">待审核出差记录</a>
 			</li>
 			<li>
-				<a href="">公司管理</a>
+				<a href="#/companyList/companylist">公司管理</a>
 			</li>
 			<li>
 				<a href="">用户管理</a>
@@ -105,7 +131,7 @@
 				<div id="account_menu" class="account_menu">
 					<ul>
 						<li><a href="">修改密码</a></li>
-						<li><a href="">退出</a></li>
+						<li><a href="javascript: logout();">退出</a></li>
 					</ul>
 				</div>
 			</div>

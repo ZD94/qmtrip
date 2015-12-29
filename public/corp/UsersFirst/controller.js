@@ -4,6 +4,7 @@
 var UsersFirst = (function(){
 	API.require("company");
 	API.require("staff");
+	API.require("travelPolicy");
 	var UsersFirst ={};
 	UsersFirst.UserMainController = function($scope){
 		$("title").html("差旅管理首页");
@@ -14,14 +15,16 @@ var UsersFirst = (function(){
 				API.staff.getCurrentStaff()
 					.then(function(staff){
 						var company_id = staff.companyId;
+						var travelLevel = staff.travelLevel;
 						Q.all([
 							API.company.getCompanyFundsAccount(company_id),
-							API.staff.statisticStaffs({companyId:company_id})
+							API.staff.statisticStaffs({companyId:company_id}),
+							API.travelPolicy.getTravelPolicy({id: travelLevel})
 						])
-							.spread(function(resutlt,num){
+							.spread(function(resutlt,num,travel_level){
 								$scope.funds = resutlt;
-								console.info(resutlt)
 								$scope.num = num;
+								$scope.travelLevel = travel_level;
 								$scope.$apply();
 							})
 							.catch(function(err){
