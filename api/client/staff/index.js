@@ -26,7 +26,8 @@ var staff = {};
  * @type {*}
  * @return {promise}
  */
-staff.createStaff = function(params, callback) {
+staff.createStaff = auth.checkPermission(["user.add"],
+    function(params, callback) {
     var user_id = this.accountId;
     return API.staff.getStaff({id: user_id})
         .then(function(data){
@@ -39,7 +40,7 @@ staff.createStaff = function(params, callback) {
             }
         })
         .nodeify(callback);
-}
+});
 
 /**
  * @method deleteStaff

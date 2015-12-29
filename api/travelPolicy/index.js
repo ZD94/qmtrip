@@ -38,9 +38,16 @@ travelPolicy.deleteTravelPolicy = function(params, callback){
         defer.reject({code: -1, msg: "id不能为空"});
         return defer.promise.nodeify(callback);
     }
-    return travalPolicyModel.destroy({where: params})
-        .then(function(obj){
-            return {code: 0, msg: "删除成功"}
+    return API.staff.findOneStaff({travelLevel: id})
+        .then(function(staff){
+            if(staff){
+                throw {code: -1, msg: '差旅标准被引用不能删除'};
+            }else{
+                return travalPolicyModel.destroy({where: params})
+                    .then(function(obj){
+                        return {code: 0, msg: "删除成功"}
+                    })
+            }
         })
         .nodeify(callback);
 }

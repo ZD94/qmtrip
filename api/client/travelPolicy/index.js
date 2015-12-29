@@ -8,6 +8,7 @@
  */
 var Q = require("q");
 var API = require("common/api");
+var auth = require("../auth");
 /**
  * @class travelPolicy 出差标准
  */
@@ -22,7 +23,8 @@ var travelPolicy = {};
  * @param callback
  * @returns {*|Promise}
  */
-travelPolicy.createTravelPolicy = function(params, callback){
+travelPolicy.createTravelPolicy = auth.checkPermission(["travelPolicy.add"],
+    function(params, callback){
     var defer = Q.defer();
     var user_id = this.accountId;
     return API.staff.getStaff({id: user_id})
@@ -36,7 +38,7 @@ travelPolicy.createTravelPolicy = function(params, callback){
             }
         })
         .nodeify(callback);
-};
+});
 
 /**
  * 企业删除差旅标准
@@ -44,7 +46,8 @@ travelPolicy.createTravelPolicy = function(params, callback){
  * @param callback
  * @returns {*|Promise}
  */
-travelPolicy.deleteTravelPolicy = function(params, callback){
+travelPolicy.deleteTravelPolicy = auth.checkPermission(["travelPolicy.delete"],
+    function(params, callback){
     var defer = Q.defer();
     var user_id = this.accountId;
     return API.staff.getStaff({id: user_id})
@@ -58,7 +61,7 @@ travelPolicy.deleteTravelPolicy = function(params, callback){
             }
         })
         .nodeify(callback);
-};
+});
 
 /**
  * 企业更新差旅标准
@@ -67,7 +70,8 @@ travelPolicy.deleteTravelPolicy = function(params, callback){
  * @param callback
  * @returns {*|Promise}
  */
-travelPolicy.updateTravelPolicy = function(params, callback){
+travelPolicy.updateTravelPolicy = auth.checkPermission(["travelPolicy.update"],
+    function(params, callback){
     var defer = Q.defer();
     var user_id = this.accountId;
     return API.staff.getStaff({id: user_id})
@@ -84,7 +88,7 @@ travelPolicy.updateTravelPolicy = function(params, callback){
                 })
         })
         .nodeify(callback);
-};
+});
 
 /**
  * 企业根据id查询差旅标准
@@ -164,7 +168,8 @@ travelPolicy.getTravelPolicy = function(params, callback){
  * @param callback
  * @returns {*|Promise}
  */
-travelPolicy.listAndPaginateTravelPolicy = function(params, callback){
+travelPolicy.listAndPaginateTravelPolicy = auth.checkPermission(["travelPolicy.query"],
+    function(params, callback){
     var defer = Q.defer();
     var user_id = this.accountId;
     return API.staff.getStaff({id: user_id})
@@ -178,7 +183,7 @@ travelPolicy.listAndPaginateTravelPolicy = function(params, callback){
             }
         })
         .nodeify(callback);
-};
+});
 
 /**
  * 企业得到所有差旅标准
@@ -186,7 +191,8 @@ travelPolicy.listAndPaginateTravelPolicy = function(params, callback){
  * @param callback
  * @returns {*|Promise}
  */
-travelPolicy.getAllTravelPolicy = function(options, callback){
+travelPolicy.getAllTravelPolicy = auth.checkPermission(["travelPolicy.query"],
+    function(options, callback){
     var defer = Q.defer();
     var user_id = this.accountId;
     if(!options.where){
@@ -206,5 +212,5 @@ travelPolicy.getAllTravelPolicy = function(options, callback){
                 return defer.promise;
             }
         }).nodeify(callback);
-};
+});
 module.exports = travelPolicy;

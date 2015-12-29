@@ -190,9 +190,9 @@ staff.findOneStaff = function(params, callback){
     options.where = params;
     return staffModel.findOne(options)
         .then(function(staff){
-            if(!staff){
+            /*if(!staff){
                 throw {code: -1, msg: '员工不存在'};
-            }
+            }*/
             return staff;
         })
         .nodeify(callback);
@@ -393,7 +393,8 @@ staff.beforeImportExcel = function(params, callback){
                 if(index>0 && index<200){
                     var s = data[index];
                     s[1] = s[1] ? s[1]+"" : "";
-                    var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
+//                    var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
+                    var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
                     item = staffObj;
 
                     if(!staffObj.name || staffObj.name==""){
@@ -507,7 +508,8 @@ staff.importExcelAction = function(params, callback){
     return Q.all(data.map(function(item, index){
             if(index>0 && index<200){
                 var s = data[index];
-                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, roleId: s.roleId, companyId: s.companyId};//company_id默认为当前登录人的company_id
+//                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, roleId: s.roleId, companyId: s.companyId};//company_id默认为当前登录人的company_id
+                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, companyId: s.companyId};//company_id默认为当前登录人的company_id
 
                 return staff.createStaff(staffObj)
                     .then(function(ret){
