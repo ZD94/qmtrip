@@ -11,7 +11,7 @@ var utils = require("common/utils");
 var sequelize = require("common/model").importModel("./models");
 var Logger = require("common/logger");
 var staffModel = sequelize.models.Staff;
-var pointChange = sequelize.models.PointChange;
+var pointChangeModel = sequelize.models.PointChange;
 var L = require("../../common/language");
 var API = require("../../common/api");
 var config = require('../../config');
@@ -127,7 +127,7 @@ staff.updateStaff = function(data, callback){
                         if(old.email != data.email){
                             return API.auth.getAccount(id)//暂无此接口
                                 .then(function(acc){
-                                    if(acc.account.status != 0)
+                                    if(acc.status != 0)
                                         throw {code: -2, msg: "该账号不允许修改邮箱"};
                                     var accData = {email: data.email};
                                     return Q.all([
@@ -264,11 +264,14 @@ staff.increaseStaffPoint = function(params, options, callback) {
     }
     return staffModel.findById(id)
         .then(function(obj) {
+            var totalPoints = obj.totalPoints + increasePoint;
+            var balancePoints = obj.balancePoints + increasePoint;
             var pointChange = {staffId: id, status: 1, points: increasePoint, remark: params.remark||"增加积分"};
             return sequelize.transaction(function(t) {
                 return Q.all([
-                        obj.increment(['total_points','balance_points'], {by: increasePoint, transaction: t}),
-                        pointChange.create(pointChange, {transaction: t})
+                        staffModel.update({totalPoints: totalPoints, balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
+//                        obj.increment(['total_points','balance_points'], {by: increasePoint, transaction: t}),//此处为toJSON对象不能使用instance的方法
+                        pointChangeModel.create(pointChange, {transaction: t})
                     ]);
             });
         })
@@ -308,11 +311,13 @@ staff.decreaseStaffPoint = function(params, options, callback) {
             if(obj.balancePoints < decreasePoint){
                 throw {code: -3, msg: "积分不足"};
             }
+            var balancePoints = obj.balancePoints - decreasePoint;
             var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分"}//此处也应该用model里的属性名封装obj
             return sequelize.transaction(function(t) {
                 return Q.all([
-                        obj.decrement('balance_points', {by: decreasePoint, transaction: t}),
-                        pointChange.create(pointChange, {transaction: t})
+                        staffModel.update({balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
+//                        obj.decrement('balance_points', {by: decreasePoint, transaction: t}),
+                        pointChangeModel.create(pointChange, {transaction: t})
                     ]);
             });
         })
@@ -356,7 +361,7 @@ staff.listAndPaginatePointChange = function(params, options, callback){
     options.limit = limit;
     options.offset = offset;
     options.where = params;
-    return pointChange.findAndCountAll(options)
+    return pointChangeModel.findAndCountAll(options)
         .then(function(result){
             return new Paginate(page, perPage, result.count, result.rows);
         })
