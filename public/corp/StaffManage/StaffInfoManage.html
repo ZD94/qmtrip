@@ -150,17 +150,69 @@
         <div class="staff_tab_import_head">
             <div class="staff_import_head">
                 <span>请选择您要批量导入的文件:</span>
-                <span>返回</span>
+                <span ng-click="backToAddStaff()">返回</span>
             </div>
-            <input type="file" class="file" name="tmpFile" value='选取文件'/>
             <!--<input type="file" class="file" value="选取文件">-->
+            <a class="upload"><input type="file" class="file" name="tmpFile" value='选取文件'/></a>
+            <input type="text" class="upload_text"><span class="tip_text">未选择文件</span>
+        </div>
+        <div class="staff_tab_import_bottom">
+            <p>导入说明:</p>
+            <p class="p_title">1、请使用excel等软件创建一个CSV文件，格式如下（点击下载模板）：</p>
+            <table>
+                <tr>
+                    <td></td>
+                    <td>姓名</td>
+                    <td>邮箱</td>
+                    <td>手机号</td>
+                    <td>部门</td>
+                    <td>差旅标准</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>王鹏</td>
+                    <td>peng.wang@tulingdao.com</td>
+                    <td>13522415203</td>
+                    <td>销售部</td>
+                    <td>普通员工级</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>许倩</td>
+                    <td>qian.xu@tulingdao.com</td>
+                    <td>13522415203</td>
+                    <td>技术部</td>
+                    <td>普通员工级</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>张贵英</td>
+                    <td>guiying.zhang@tulingdao.com</td>
+                    <td>13522415203</td>
+                    <td>设计部</td>
+                    <td>普通员工级</td>
+                </tr>
+            </table>
+            <p class="p_title">
+                2、各列内容依次为：姓名、邮箱、手机、所属部门、差旅政策等级</br>
+            </p>
+            <p class="p_text">
+                姓名：员工姓名</br>
+                邮箱：员工企业邮箱，用于员工登录账号</br>
+                手机：员工手机号</br>
+                所属部门：员工所属部门名称;建议先进行公司<a>组织架构设置</a> <span>若未设置组织架构，则员工默认归属我的企业</span></br>
+                差旅政策：员工对应的差旅政策等级;建议先进行公司<a>差旅政策设置</a> <span>若未设置公司差旅标准，则员工默认无差旅标准</span>
+            </p>
+            <p class="p_title">
+                3、请使用GB系列编码保存文件
+            </p>
         </div>
     </div>
 </div>
 
 <script>
     $(function(){
-        /*$(".file").AjaxFileUpload({
+        $(".file").AjaxFileUpload({
             action: '/upload/ajax-upload-file?type=xls',
             dataType: 'json',
             data: { id: 'aaa', name: 'bbb' },
@@ -169,7 +221,7 @@
                 console.log(response);
                 console.log(response.result);
             }
-        });*/
+        });
         $(document).on("click","#change",function(){
             $(".add_staff2").hide();
             $(this).closest("ul").find(".add_staff2").show();
