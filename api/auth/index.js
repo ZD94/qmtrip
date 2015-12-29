@@ -223,30 +223,28 @@ authServer.newAccount = function(data, callback) {
  * @public
  */
 authServer.login = function(data, callback) {
-    var defer = Q.defer();
-    if (!data) {
-        defer.reject(L.ERR.DATA_NOT_EXIST);
-        return defer.promise.nodeify(callback);
-    }
+    return Q()
+        .then(function(){
+            if (!data) {
+                throw L.ERR.DATA_NOT_EXIST;
+            }
 
-    if (!data.email && !data.mobile) {
-        defer.reject(L.ERR.EMAIL_EMPTY);
-        return defer.promise.nodeify(callback);
-    }
+            if (!data.email && !data.mobile) {
+                throw L.ERR.EMAIL_EMPTY;
+            }
 
-    if (!validate.isEmail((data.email))) {
-        defer.reject(L.ERR.EMAIL_EMPTY);
-        return defer.promise.nodeify(callback);
-    }
+            if (!validate.isEmail((data.email))) {
+                throw L.ERR.EMAIL_EMPTY;
+            }
 
-    if (!data.pwd) {
-        defer.reject(L.ERR.PWD_EMPTY);
-        return defer.promise.nodeify(callback);
-    }
+            if (!data.pwd) {
+                throw L.ERR.PWD_EMPTY;
+            }
 
-    var pwd = md5(data.pwd);
+            var pwd = md5(data.pwd);
 
-    return Models.Account.findOne({where: {email: data.email}})
+            return Models.Account.findOne({where: {email: data.email}});
+        })
         .then(function(loginAccount) {
             if (!loginAccount) {
                 throw L.ERR.ACCOUNT_NOT_EXIST
@@ -264,12 +262,8 @@ authServer.login = function(data, callback) {
                 throw L.ERR.ACCOUNT_FORBIDDEN;
             }
 
-            return makeAuthenticateSign(loginAccount.id)
-                .then(function(result) {
-                    return {code:0, msg: "ok", data: result};
-                })
+            return makeAuthenticateSign(loginAccount.id);
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 
