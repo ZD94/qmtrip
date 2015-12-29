@@ -39,6 +39,7 @@ var auth=(function(){
                 API.onload(function(){
                     API.auth.login({email:name,pwd:pwd})
                         .then(function(data){
+                            console.info(data);
                             Cookie.set("user_id", data.user_id, { expires:30 });
                             Cookie.set("token_sign", data.token_sign, { expires:30 });
                             Cookie.set("timestamp", data.timestamp, { expires:30 });

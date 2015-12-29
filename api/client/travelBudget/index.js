@@ -37,6 +37,7 @@ var travelBudget = {
  * @param {String} params.outLatestArriveTime 出发最晚到达时间 HH:mm
  * @param {String} params.checkInDate 如果不传=outboundDate 入住时间
  * @param {String} params.checkOutDate 如果不传=inboundDate 离开时间
+ * @param {String} params.businessDistrict 商圈ID
  * @param {Boolean} params.isRoundTrip 是否往返 [如果为true,inboundDate必须存在]
  * @param {Callback} callback
  * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
@@ -60,7 +61,8 @@ travelBudget.getTravelPolicyBudget = function(params, callback) {
  * @param {Object} params
  * @param {String} params.cityId    城市ID
  * @param {String} params.businessDistrict 商圈ID
- * @param {String} params.
+ * @param {String} params.checkInDate 入住时间
+ * @param {String} params.checkOutDate 离开时间
  * @param {Function} [callback]
  * @return {Promise} {prize: 1000, hotel: "酒店名称"}
  */

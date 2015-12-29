@@ -435,7 +435,6 @@ function makeAuthenticateSign(accountId, os, callback) {
                 timestamp: timestamp
             }
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 
