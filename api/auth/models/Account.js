@@ -23,6 +23,7 @@ module.exports = function (Db, DataType) {
         lastLoginAt      : {type: "timestamp",              field: "last_login_at"}, //最近登录时间
         lastLoginIp      : {type: DataType.STRING(50),      field: "last_login_ip"}, //最近登录Ip
         activeToken      : {type: DataType.STRING(50),      field: "active_token"},
+        pwdToken         : {type: DataType.STRING(50),      field: "pwd_token"},
         type             : {type: DataType.INTEGER,         defaultValue: ACCOUNT_TYPE.COMMON_STAFF}
     }, {
         tableName : "accounts",

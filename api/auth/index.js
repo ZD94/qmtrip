@@ -15,6 +15,7 @@ var C = require("../../config");
 var moment = require("moment");
 var API = require("../../common/api");
 var errorHandle = require("common/errorHandle");
+var utils = require("common/utils");
 
 var ACCOUNT_STATUS = {
     ACTIVE: 1,
@@ -80,6 +81,111 @@ authServer.activeByEmail = function(data, callback) {
                 })
         })
         .catch(errorHandle)
+        .nodeify(callback);
+}
+
+/**
+ * @method sendResetPwdEmail 发送设置密码邮件
+ *
+ * @param {Object} params
+ * @param {UUID} params.accountId 账号ID
+ * @param {Boolean} params.isFirstSet true|false 是否首次设置密码
+ * @param {Function} [callback]
+ * @returns {Promise} true|error
+ */
+authServer.sendResetPwdEmail = function(params, callback) {
+    var accountId = params.accountId;
+    var isFirstSet = params.isFirstSet;
+    return Q()
+        .then(function() {
+            if (!accountId) {
+                throw L.ERR.ACCOUNT_NOT_EXIST;
+            }
+            return accountId;
+        })
+        .then(function(id) {
+            return Models.Account.findById(id)
+                .then(function(account) {
+                    if (!account) {
+                        throw L.ERR.ACCOUNT_NOT_EXIST;
+                    }
+                    return account;
+                })
+        })
+        .then(function(account) {
+            //生成设置密码token
+            var pwdToken = getRndStr(6);
+            return Models.Account.update({pwdToken: pwdToken}, {where: {id: account.id}, returning: true})
+        })
+        .spread(function(affect, rows) {
+            var account = rows[0];
+            var timeStr = utils.now();
+            var timestamp = Date.now();
+            var sign = makeActiveSign(account.pwdToken, account.id, timestamp);
+            var url = C.host + "/staff.html#/auth/reset-pwd?accountId="+account.id+"&timestamp="+timestamp+"&sign="+sign;
+            var templateName;
+            if (isFirstSet) {
+                templateName = 'qm_first_set_pwd_email';
+            } else {
+                templateName = 'qm_reset_pwd_email';
+            }
+            return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: [timeStr, url]});
+        })
+        .then(function() {
+            return true;
+        })
+        .nodeify(callback);
+}
+
+/**
+ * @method resetPwdByEmail
+ * 找回密码
+ *
+ * @param {Object} params
+ * @param {UUID} params.accountId 账号ID
+ * @param {String} params.sign 签名
+ * @param {String} params.timestamp 时间戳
+ * @param {String} params.pwd 新密码
+ * @param {Function} [callback] (null, true)
+ * @return {Promise} true|error
+ */
+authServer.resetPwdByEmail = function(params, callback) {
+    var accountId = params.accountId;
+    var sign = params.sign;
+    var timestamp = params.timestamp;
+    var pwd = params.pwd;
+
+    return Q()
+        .then(function() {
+            if (!timestamp || timestamp < Date.now()) {
+                throw L.ERR.TIMESTAMP_TIMEOUT;
+            }
+
+            if (!accountId) {
+                throw L.ERR.ACCOUNT_NOT_EXIST;
+            }
+
+            if (!sign) {
+                throw L.ERR.SIGN_ERROR;
+            }
+
+            if (!pwd) {
+                throw L.ERR.PWD_EMPTY;
+            }
+
+            return Models.Account.findById(accountId)
+        })
+        .then(function(account) {
+            var _sign = makeActiveSign(account.pwdToken, accountId, timestamp);
+            if (_sign.toLowerCase() == sign.toLowerCase()) {
+                pwd = utils.md5(pwd);
+                return Models.Account.update({pwd: pwd, pwdToken: null}, {where:{id: id}})
+            }
+            throw L.ERR.SIGN_ERROR;
+        })
+        .then(function() {
+            return true;
+        })
         .nodeify(callback);
 }
 
@@ -150,7 +256,7 @@ authServer.remove = function(data, callback) {
  * @param {Integer} data.type  账号类型 默认1.企业员工 2.代理商员工
  * @param {INTEGER} data.status 账号状态 0未激活, 1.已激活 如果为0将发送激活邮件,如果1则不发送
  * @param {Callback} callback 回调函数
- * @return {Promise} {code: 0, data:{accountId: 账号ID, email: "邮箱", status: "状态"}
+ * @return {Promise} {accountId: 账号ID, email: "邮箱", status: "状态"}
  * @public
  */
 authServer.newAccount = function(data, callback) {
