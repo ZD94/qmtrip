@@ -15,14 +15,19 @@
     </section>
 
     <section class="createresult">
-        <div class="top">本次出差预算：¥{{price.price}}<span style="position: absolute; right: 20px;">{{purposename}}项目</span></div>
+        <div class="top">本次出差预算：
+            <span ng-if="tra==1&&liv==0">¥{{onlytraffic.price}}</span>
+            <span ng-if="tra==0&&liv==1">¥{{onlylive.price}}</span>
+            <span ng-if="tra==1&&liv==1">¥{{trafficlive.price}}</span>
+            <span style="position: absolute; right: 20px;">{{purposename}}项目</span>
+        </div>
         <div class="center">
             <table width="100%" border="1" bordercolor="#E5E5E5">
                 <tr>
                     <td width="80%" height="40" align="center" style="font-size: 14px;">明细</td>
                     <td width="20%" height="40" align="center" style="font-size: 14px;">预算</td>
                 </tr>
-                <tr ng-if="startplaceval">
+                <tr ng-if="tra==1">
                     <td height="90" style="font-size: 14px;">
                         <div class="icon">
                             <span>行</span>
@@ -31,16 +36,22 @@
                         <div class="description">{{starttime}}<span ng-if="starttimelate!=undefined && starttimelate!=''">&nbsp;&nbsp;&nbsp;最晚{{starttime}}&nbsp;{{starttimelate}}到达</span></div>
                         <div class="endplace">{{endplace}}</div>
                     </td>
-                    <td height="90" style="font-size: 14px;" align="center">¥{{price.traffic}}</td>
+                    <td height="90" style="font-size: 14px;" align="center">
+                        <span ng-if="liv==0">¥{{onlytraffic.price}}</span>
+                        <span ng-if="liv==1">¥{{trafficlive.traffic}}</span>
+                    </td>
                 </tr>
-                <tr ng-if="liveplace">
+                <tr ng-if="liv==1">
                     <td height="90" style="font-size: 14px;">
                         <div class="icon">
                             <span>住</span>
                         </div>
                         <div style="line-height: 35px; padding: 10px 0; float: left;">入住地：{{endplace}}&nbsp;{{liveplace}}附近<br>入住日期：{{livetime}}&nbsp;&nbsp;&nbsp;退房日期：{{leavetime}}</div>
                     </td>
-                    <td height="90" style="font-size: 14px;" align="center">¥{{price.hotel}}</td>
+                    <td height="90" style="font-size: 14px;" align="center">
+                        <span ng-if="tra==0">¥{{onlylive.price}}</span>
+                        <span ng-if="tra==1">¥{{trafficlive.hotel}}</span>
+                    </td>
                 </tr>
             </table>
         </div>
