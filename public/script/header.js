@@ -1,7 +1,7 @@
 $(function(){
-	$(window).load(function(){ minHeight();})
-	$(window).scroll(function(){ minHeight();})
-	$(window).resize(function(){ minHeight();})
+	$(window).load(function(){ minHeight();console.info("9999999999999")});
+	$(window).scroll(function(){ minHeight();});
+	$(window).resize(function(){ minHeight();});
 	$("#account").hover(function(){
 		$("#account_menu").show();
 	},function(){
@@ -17,4 +17,5 @@ $(function(){
 		$(".staff_content").css("min-height",wh-81-60-20); //减去的值为当前页面header及footer 20为padding值
 		$(".corp_box").css("min-height",wh-61-60-20); //减去的值为当前页面header及footer  20为padding值
 	}
+	minHeight();
 })

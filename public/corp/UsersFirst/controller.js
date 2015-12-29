@@ -20,6 +20,7 @@ var UsersFirst = (function(){
 						])
 							.spread(function(resutlt,num){
 								$scope.funds = resutlt;
+								console.info(resutlt)
 								$scope.num = num;
 								$scope.$apply();
 							})
