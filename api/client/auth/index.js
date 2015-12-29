@@ -10,6 +10,7 @@ var md5 = require("common/utils").md5;
 var uuid = require('node-uuid');
 var logger = new Logger("auth");
 var errorHandle = require("common/errorHandle");
+
 /**
  * @class auth 用户认证
  */
@@ -241,11 +242,35 @@ auth.checkPermission = function(permissions, fn) {
  *
  * @param {Object} params
  * @param {UUID} params.accountId 账号ID
- * @param {Boolean} params.isFirstSet true|false 是否首次设置密码
+ * @param {String} params.code 验证码
+ * @param {String} params.ticket 验证码凭证
  * @param {Function} [callback]
  * @return {Promise} true|error
  */
-auth.sendResetPwdEmail = API.auth.sendResetPwdEmail;
+auth.sendResetPwdEmail = function(params, callback) {
+    var code = params.code;
+    var ticket = params.ticket;
+    return Q()
+        .then(function() {
+            if (!code) {
+                throw L.ERR.CODE_EMPTY;
+            }
+
+            if (!ticket) {
+                throw L.ERR.CODE_ERROR;
+            }
+
+            return API.checkcode.validatePicCheckCode({code: code, ticket: ticket});
+        })
+        .then(function(){
+            var data = {
+                accountId: params.accountId,
+                isFirstSet: false
+            };
+            return  API.auth.sendResetPwdEmail(data, callback);
+        })
+        .nodeify(callback);
+}
 
 /**
  * @method resetPwdByEmail
@@ -261,5 +286,26 @@ auth.sendResetPwdEmail = API.auth.sendResetPwdEmail;
  * @return {Promise} true|error
  */
 auth.resetPwdByEmail = API.auth.resetPwdByEmail;
+
+/**
+ * @method resetPwdByOldPwd
+ *
+ * 根据旧密码重置密码
+ *
+ * @param {Object} params
+ * @param {String} params.oldPwd 旧密码
+ * @param {String} params.newPwd 新密码
+ * @param {Function} [callback] true|error
+ * @return {Promise}
+ */
+auth.resetPwdByOldPwd = function(params, callback) {
+    var self = this;
+    var data = {};
+    var accountId = self.accountId;
+    data.oldPwd = params.oldPwd;
+    data.newPwd = params.newPwd;
+    data.accountId = params.accountId;
+    return API.auth.resetPwdByOldPwd(data, callback);
+}
 
 module.exports = auth;
