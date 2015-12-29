@@ -20,7 +20,8 @@
     	var Q = require('q');
     	var Cookie = require("tiny-cookie");
     	var moment = require('moment');
-    	var TLD = TLD_angular_app('tulingdao.com', 'agency', '/UsersFirst/UserMain');
+		var Cookie = require('tiny-cookie');
+		var TLD = TLD_angular_app('tulingdao.com', 'agency', '/UsersFirst/UserMain');
     	API.onlogin(function(){
     		var backurl = window.location.href;
     		return gotoAgentLogin(backurl);

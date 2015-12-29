@@ -38,20 +38,14 @@ var auth=(function(){
                 }
                 API.onload(function(){
                     API.auth.login({email:name,pwd:pwd})
-                        .then(function(result){
-                            if (result.code) {
-                                console.log(result.msg);
-                            } else {
-                                var data = result.data;
-                                Cookie.set("user_id", data.user_id, { expires:30 });
-                                Cookie.set("token_sign", data.token_sign, { expires:30 });
-                                Cookie.set("timestamp", data.timestamp, { expires:30 });
-                                Cookie.set("token_id", data.token_id, { expires:30 });
-                                console.log("登录成功");
-                                API.reload_all_modules();
-                                window.location.href= backUrl;
-                            }
-
+                        .then(function(data){
+                            Cookie.set("user_id", data.user_id, { expires:30 });
+                            Cookie.set("token_sign", data.token_sign, { expires:30 });
+                            Cookie.set("timestamp", data.timestamp, { expires:30 });
+                            Cookie.set("token_id", data.token_id, { expires:30 });
+                            console.log("登录成功");
+                            API.reload_all_modules();
+                            window.location.href= backUrl;
                         }).catch(function(err){
                             if (err.msg) {
                                 alert(err.msg);

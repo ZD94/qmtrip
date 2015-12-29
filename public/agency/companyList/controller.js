@@ -19,7 +19,6 @@ module.exports = (function(){
 		}
 		$scope.initCompanyList();
 	}
-
-	console.info(companyList)
+	
 	return companyList;
 })();
