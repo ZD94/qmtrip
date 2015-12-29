@@ -5,6 +5,6 @@ var API = require('common/api');
 
 var assert = require("assert");
 
-describe("api/client/auth.js", function() {
+describe("api/client/auth/index.js", function() {
 
 })

@@ -89,7 +89,7 @@
             <li>{{item.email}}</li>
             <li>{{item.mobile}}</li>
             <li><span ng-if="item.department == null">暂未设置</span><span>{{item.department}}</span></li>
-            <li><span>{{item.travelLeverName}}</span></li>
+            <li><span ng-if="item.department == null">暂未设置</span><span>{{item.travelLeverName}}</span></li>
             <li><span ng-if="item.roleId == 0">创建者</span><span ng-if="item.roleId == 1">普通员工</span><span ng-if="item.roleId == 2">管理员</span><span ng-if="item.roleId == 3">财务人员</span></li>
             <li><span ng-click="editStaffInfo($index)" id="change">修改</span><a ng-if="item.roleId != 0">&nbsp;|&nbsp;<span ng-click="delStaffInfo(item.id, $index)">删除</span></a></li>
             <div class="add_staff2">
@@ -129,6 +129,7 @@
                                     <option value="2" ng-selected="item.roleId == 2">管理员</option>
                                     <option value="3" ng-selected="item.roleId == 3">财务人员</option>
                                     <option value="1" ng-selected="item.roleId == 1">普通员工</option>
+                                    <option value="0" ng-if="item.roleId == 0" ng-selected="item.roleId == 0">创建者</option>
                                 </select>
                             </li>
                         </ul>

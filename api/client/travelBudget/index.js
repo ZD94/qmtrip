@@ -59,7 +59,16 @@ travelBudget.getTravelPolicyBudget = function(params, callback) {
  * @return {Promise} {prize: 1000, hotel: "酒店名称"}
  */
 travelBudget.getHotelBudget = function(params, callback) {
-    return API.travelbudget.getHotelBudget(params, callback);
+    return API.travelbudget.getHotelBudget(params, function(err, result) {
+        console.info("travelBudget.getHotelBudget==>")
+        if (err) {
+            console.info(err.stack);
+        } else {
+            console.info(result);
+        }
+
+        callback(err, result);
+    });
 }
 
 module.exports = travelBudget;

@@ -6,7 +6,7 @@
  * @module API
  */
 
-var API = require("../../common/api");
+var API = require("common/api");
 var Q = require("q");
 var errorHandle = require("common/errorHandle");
 /**
@@ -46,6 +46,10 @@ var checkcode = {
         params.type = type;
         var fn = Q.denodeify(API.checkcode.getMsgCheckCode);
         return fn(params)
+            .then(function(result) {
+                console.info(result);
+                return result;
+            })
             .catch(errorHandle)
             .nodeify(callback);
     },

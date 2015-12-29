@@ -144,6 +144,7 @@ auth.registryCompany = function(params, callback) {
         return defer.promise.nodeify(callback);
     }
     var companyId = uuid.v1();
+    var domain = email.split(/@/)[1];
 
     return Q()
         .then(function() {
@@ -153,7 +154,6 @@ auth.registryCompany = function(params, callback) {
             return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
         })
         .then(function(){
-            var domain = email.split(/@/)[1];
             return API.company.checkBlackDomain({domain: domain});
         })
         .then(function() {
@@ -162,20 +162,13 @@ auth.registryCompany = function(params, callback) {
         .then(function(account) {
             return Q.all([
                     API.company.createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain}),
-                    API.staff.createStaff({accountId: account.id, companyId: companyId, email: email, mobile: mobile, name: name, roleId: 0})
+                    API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
+                        mobile: mobile, name: name, roleId: 0})
                 ]);
         })
-        .then(function(){
-            return;
-        })
-        .catch(function(err){
-            return Q.all([
-                    API.company.deleteCompany({companyId: companyId, userId: account.id}),
-                    API.staff.deleteStaff({id: account.id})
-                ])
-                .then(function(){
-                    return L.ERR.SYSTEM_ERROR;
-                });
+        .then(function() {
+            console.info("注册成功了...")
+            return true;
         })
         .nodeify(callback);
 }
