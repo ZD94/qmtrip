@@ -16,6 +16,9 @@
 @h15:15px;
 @h14:14px;
 @h12:12px;
+.blue{
+  color: @color-theme1;
+}
 .staffManageContent{
   width: 1000px;
   margin: 20px auto;
@@ -416,28 +419,67 @@
     }
   }
   .upload{
+    position: relative;
+    display: block;
     width: 100px;
     height: 35px;
-    background-color: @color-theme1;
-    color: @color-white;
-    font-size: @h14;
     text-align: center;
-    line-height: 35px;
-    display: block;
+    background: @color-theme1;
+    border: 1px solid @color-border2;
     border-radius: @border-radius-2;
-    margin-top: 10px;
+    overflow: hidden;
+    color: @color-white;
+    text-decoration: none;
+    text-indent: 0;
+    line-height: 35px;
     margin-bottom: 10px;
+    cursor: pointer;
+    input {
+      width: 100px;
+      height: 35px;
+      position: absolute;
+      font-size: 100px;
+      right: 0;
+      top: 0;
+      opacity: 0;
+      &:hover {
+        background: #AADFFD;
+        border-color: #78C3F3;
+        color: #004974;
+        text-decoration: none;
+      }
+    }
   }
   .upload_text{
     width: 400px;
     height: 35px;
     line-height: 35px;
     border: 1px solid @color-border2;
+    clear: both;
+    padding-left: 10px;
+    color: #9b9b9b;
   }
   .tip_text{
     line-height: 35px;
     margin-left: 10px;
     color: #9b9b9b;
+  }
+  .makesure{
+    position: relative;
+    display: none;
+    text-align: center;
+    background: @color-theme1;
+    border: 1px solid @color-border2;
+    border-radius: 2px;
+    overflow: hidden;
+    color: @color-white;
+    text-decoration: none;
+    text-indent: 0;
+    line-height: 35px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    padding: 10px 20px;
+    margin-left: 10px;
   }
   .staff_tab_import_bottom{
     padding-top: 30px;
@@ -507,5 +549,130 @@
         color: #9b9b9b;
       }
     }
+  }
+}
+
+//µº»Î‘§¿¿
+.staff_tab_valid{
+  width: 100%;
+  height: 700px;
+  float: left;
+  clear: both;
+  background-color: @color-white;
+  border: 1px solid @color-border2;
+  margin-top: -1px;
+  z-index: -1;
+  display: none;
+  overflow-y: auto;
+  .staff_tab_valid_head{
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-bottom: 20px;
+    .staff_valid_head{
+      width: 100%;
+      height: 35px;
+      line-height: 35px;
+      margin-top: 25px;
+      font-size: @h16;
+      color: @color-text;
+      span{
+        &:first-child{
+          font-weight: bold;
+        }
+        &:nth-child(2){
+          cursor: pointer;
+          float: right;
+          display: block;
+          width: 80px;
+          height: 33px;
+          border: 1px solid @color-border2;
+          border-radius: @border-radius-2;
+          color: @color-theme1;
+          text-align: center;
+          line-height: 33px;
+          font-size: @h14;
+        }
+      }
+    }
+    p{
+      line-height: 30px;
+      span{
+        padding-left: 5px;
+      }
+    }
+  }
+  .preview_head_text{
+    margin-left: 20px;
+    margin-right: 20px;
+    font-size: @h16;
+    color: @color-text;
+    line-height: 35px;
+    height: 35px;
+    overflow: hidden;
+    .blue_block{
+      width: 5px;
+      height: 16px;
+      display: block;
+      background-color: #01dbff;
+      margin-right: 10px;
+      float: left;
+      margin-top: 11px;
+    }
+    a{
+      &:first-child{
+        color: @color-theme1;
+        font-size: @h14;
+        text-decoration: none;
+        margin-left: 20px;
+      }
+      span{
+        display: inline;
+      }
+    }
+    .tip{
+      color: #9b9b9b;
+      float: right;
+    }
+  }
+  .preview_require_head{
+    width: 100%;
+    height: 45px;
+    background-color: @color-gray;
+    line-height: 45px;
+    color: #9b9b9b;
+    font-size: @h14;
+    text-align: center;
+    border: 1px solid @color-border2;
+    border-left: none;
+    border-right: none;
+    margin-top: 10px;
+    li{
+      display: block;
+      float: left;
+      &:nth-child(1){
+        width: 100px;
+      }
+      &:nth-child(2){
+        width: 250px;
+      }
+      &:nth-child(3){
+        width: 170px;
+      }
+      &:nth-child(4){
+        width: 170px;
+      }
+      &:nth-child(5){
+        width: 150px;
+      }
+      &:nth-child(6){
+        width: 160px;
+      }
+    }
+  }
+  .staff_no_valid{
+
+  }
+  .staff_valid{
+    margin-top: 30px;
   }
 }
