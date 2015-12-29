@@ -137,7 +137,7 @@ company.getCompany = function(params, callback){
 company.listCompany = function(params, callback){
     return checkParams(['agencyId'], params)
         .then(function(){
-            return Company.findAll({where: params})
+            return Company.findAll({where: {agencyId: params.agencyId}})
                 .then(function(companys){
                     return companys;
                 })

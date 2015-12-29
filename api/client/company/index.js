@@ -74,7 +74,7 @@ company.getCompanyListByAgency = checkPermission(["company.query"],
         var params = {
             userId: accountId
         }
-        return API.agency.getAgencyUser(accountId)
+        return API.agency.getAgencyUser({id: accountId})
             .then(function(user){
                 params.agencyId = user.agencyId;
                 return API.company.listCompany(params, callback);
