@@ -136,10 +136,10 @@ tripPlan.updateTripPlanOrder = function(params, callback){
             var userId = params.userId;
             var optLog = params.optLog;
             var updates = params.updates;
-            return PlanOrder.findById(orderId, {attributes: ['id', 'accountId', 'companyId']});
+            return PlanOrder.findById(orderId, {attributes: ['id', 'accountId', 'companyId', 'status']});
         })
         .then(function(order){
-            if(!order){
+            if(!order || order.status == -2){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
             }
             if(order.accountId != userId){ //权限不足
@@ -179,7 +179,10 @@ tripPlan.updateConsumeDetail = function(params, callback){
         .then(function(){
             return ConsumeDetails.findById(params.id)
         })
-        .then(function(ret){
+        .then(function(record){
+            if(!record || record.status == -2){
+                throw {code: -2, msg: '记录不存在'}
+            }
             var cols = getColsFromParams(params.updates);
             return ConsumeDetails.update(params.updates, {returning: true, where: {id: params.id}, fields: cols});
         })
@@ -201,6 +204,7 @@ tripPlan.listTripPlanOrder = function(params, callback){
         return defer.promise.nodeify(callback);
     }
     var query = params.query;
+    query.status = {$ne: -2};
     return PlanOrder.findAll({where: query})
         .then(function(orders){
             return Q.all(orders.map(function(order){
