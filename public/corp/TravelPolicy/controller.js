@@ -23,7 +23,7 @@ var TravelPolicy=(function(){
         $scope.initPolicyList = function () {
             loading(false);
             API.onload(function(){
-                API.travelPolicy.listAndPaginateTravelPolicy({},{})
+                API.travelPolicy.listAndPaginateTravelPolicy({})
                     .then(function(result){
                         console.info (result);
                         $scope.PolicyTotal = result.total;
@@ -161,7 +161,7 @@ var TravelPolicy=(function(){
         }
         $scope.updatePolicy = function () {
             API.onload(function(){
-                API.travelPolicy.updateTravelPolicy($scope.updateId,{
+                API.travelPolicy.updateTravelPolicy({id:$scope.updateId},{
                     name:$(".update_policy .Cname").val(),
                     planeLevel:$(".update_policy .CplaneLevel").html(),
                     planeDiscount:$(".update_policy .CplaneDiscount").attr('selectValue'),
