@@ -1,5 +1,5 @@
 $(function(){
-	$(window).load(function(){ minHeight();console.info("9999999999999")});
+	$(window).load(function(){ minHeight(););
 	$(window).scroll(function(){ minHeight();});
 	$(window).resize(function(){ minHeight();});
 	$("#account").hover(function(){
