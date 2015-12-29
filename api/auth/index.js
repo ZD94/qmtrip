@@ -309,7 +309,7 @@ authServer.newAccount = function(data, callback) {
             var pwd = data.pwd;
             pwd = md5(pwd);
             var id = data.id?data.id:uuid.v1();
-            return Models.Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status});
+            return Models.Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status, type: type});
         })
         .then(function(account) {
             if (account.status == ACCOUNT_STATUS.NOT_ACTIVE) {

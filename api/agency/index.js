@@ -42,15 +42,11 @@ agency.registerAgency = function(params, callback){
                 mobile: mobile,
                 email: email
             };
-            logger.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-            return API.auth.findOneAcc({type: 2, $or: [{mobile: mobile}, {email: email}]})
+            return API.auth.checkAccExist({type: 2, $or: [{mobile: mobile}, {email: email}]})
                 .then(function(ret){
-                    logger.info("***************************************");
                     if(!ret){
-                        logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                         return API.auth.newAccount(account);
                     }else{
-                        logger.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
                         return ret;
                     }
                 })

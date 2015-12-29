@@ -61,11 +61,13 @@ describe("api/client/tripPlan.js", function() {
                 throw err;
             }
             orderId = ret.id;
+            //console.info("save orderId=>", orderId);
             done();
         })
     })
 
     it("#getTripPlanOrderById should be ok", function(done) {
+        //console.info("get orderId=>", orderId);
         tripPlan.getTripPlanOrderById.call(self, orderId, function(err, ret){
             if (err) {
                 throw err;
@@ -88,7 +90,7 @@ describe("api/client/tripPlan.js", function() {
             if (err) {
                 throw err;
             }
-            console.info("共列出计划单=>", ret.length);
+            //console.info("共列出计划单=>", ret.length);
             done();
         })
     });
@@ -101,4 +103,24 @@ describe("api/client/tripPlan.js", function() {
             done();
         })
     });
+
+
+    it("#saveConsumeDetail should be ok", function(done){
+        var tripPlanOrder = {
+            orderId: "bb9dc000-ade2-11e5-a7fa-35aeb147987c",
+            type: -1,
+            startTime: '2015-12-31 10:00:00',
+            invoiceType: 1,
+            startPlace: '北京',
+            destination: '上海',
+            budget: '1000',
+        }
+        tripPlan.saveConsumeDetail.call(self, tripPlanOrder, function(err, ret){
+            if(err){
+                throw err;
+            }
+            orderId = ret.id;
+            done();
+        })
+    })
 })
