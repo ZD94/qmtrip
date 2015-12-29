@@ -5,7 +5,6 @@
 var API = require('../../../common/api');
 var Logger = require('../../../common/logger');
 var logger = new Logger();
-var accountId = "6cee7e00-aa21-11e5-a377-2fe1a7dbc5e1";
 
 var tripPlan = {};
 
@@ -17,7 +16,8 @@ var tripPlan = {};
  */
 tripPlan.savePlanOrder = function(params, callback){
     var self = this;
-    params.accountId = self.accountId;
+    var accountId = self.accountId;
+    params.accountId = accountId;
     params.type = params.type | 2;
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function(staff){
