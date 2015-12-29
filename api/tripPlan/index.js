@@ -104,7 +104,7 @@ tripPlan.getTripPlanOrder = function(params, callback){
                 ConsumeDetails.findAll({where: {orderId: orderId, type: 0}})
             ])
                 .spread(function(order, outTraffic, backTraffic, hotel){
-                    if(!order){
+                    if(!order || order.status == -2){
                         defer.reject(L.ERR.TRIP_PLAN_ORDER_NOT_EXIST);
                         return defer.promise;
                     }
@@ -264,20 +264,18 @@ tripPlan.deleteTripPlanOrder = function(params, callback){
         .then(function(){
             var orderId = params.orderId;
             var userId = params.userId;
-            return PlanOrder.findById(orderId, {attributes: ['accountId']})
+            return PlanOrder.findById(orderId, {attributes: ['accountId', 'status']})
                 .then(function(order){
-                    if(!order){
-                        defer.reject(L.ERR.TRIP_PLAN_ORDER_NOT_EXIST);
-                        return defer.promise;
+                    if(!order || order.status == -2){
+                        throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST
                     }
                     if(order.accountId != userId){ //权限不足
-                        defer.reject(L.ERR.PERMISSION_DENY);
-                        return defer.promise;
+                        throw L.ERR.PERMISSION_DENY;
                     }
                     return sequelize.transaction(function(t){
                         return Q.all([
-                            PlanOrder.destory({where: {id: orderId}, transaction: t}),
-                            ConsumeDetails.destory({where: {orderId: orderId}, transaction: t})
+                            PlanOrder.update({status: -2}, {where: {id: orderId}, fields: ['status'], transaction: t}),
+                            ConsumeDetails.update({status: -2}, {where: {orderId: orderId}, fields: ['status'], transaction: t})
                         ])
                             .then(function(){
                                 return {code: 0, msg: '删除成功'};

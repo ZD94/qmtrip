@@ -63,6 +63,26 @@ describe("api/client/tripPlan.js", function() {
         })
     })
 
+    it("#getTripPlanOrderById should be ok", function(done) {
+        var orderId = "6d1d5080-ade2-11e5-b61e-23ad3381ce26";
+        tripPlan.getTripPlanOrderById.call(self, orderId, function(err, ret){
+            if (err) {
+                throw err;
+            }
+            done();
+        })
+    });
+
+    it("#deleteTripPlanOrder should be ok", function(done) {
+        var orderId = "6d1d5080-ade2-11e5-b61e-23ad3381ce26";
+        tripPlan.deleteTripPlanOrder.call(self, orderId, function(err, ret){
+            if (err) {
+                throw err;
+            }
+            done();
+        })
+    });
+
     it("#listTripPlanOrder should be ok", function(done) {
         tripPlan.listTripPlanOrder.call(self, {}, function(err, ret){
             if (err) {
