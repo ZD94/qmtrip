@@ -28,7 +28,7 @@ var tripPlan = {}
  * @returns {*}
  */
 tripPlan.savePlanOrder = function(params, callback){
-    var checkArr = ['accountId', 'companyId', 'type', 'startPlace', 'destination', 'startAt', 'budget'];
+    var checkArr = ['accountId', 'companyId', 'type', 'destination', 'budget'];
     return Q.all([
         API.seeds.getSeedNo('tripPlanOrderNo'),
         checkParams(checkArr, params)
