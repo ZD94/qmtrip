@@ -86,4 +86,15 @@ describe("api/client/travelBudget.js", function() {
     })
 
 
+    it("#getTraiffic should be ok", function(done) {
+        travelBudget.getTrafficBudget({originPlace: "CT_131", destinationPlace: "CT_289",
+            outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
+            if (err) {
+                throw err;
+            }
+
+            assert.equal(result.price ? true: false, true);
+            done();
+        })
+    })
 });
