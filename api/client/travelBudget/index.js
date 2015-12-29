@@ -9,6 +9,8 @@
 var API = require("common/api");
 var validate = require("common/validate");
 var Q = require("q");
+var L = require("common/language");
+
 /**
  * @class travelBudget 旅行预算
  * @type {{__public: boolean}}
@@ -59,16 +61,52 @@ travelBudget.getTravelPolicyBudget = function(params, callback) {
  * @return {Promise} {prize: 1000, hotel: "酒店名称"}
  */
 travelBudget.getHotelBudget = function(params, callback) {
-    return API.travelbudget.getHotelBudget(params, function(err, result) {
-        console.info("travelBudget.getHotelBudget==>")
-        if (err) {
-            console.info(err.stack);
-        } else {
-            console.info(result);
-        }
+    if (!params) {
+        throw L.ERR.DATA_FORMAT_ERROR;
+    }
 
-        callback(err, result);
-    });
+    if (!params.cityId) {
+        throw {code: -1, msg: "城市信息不存在"};
+    }
+
+    return API.travelbudget.getHotelBudget(params, callback);
+}
+
+/**
+ * @method getTrafficBudget
+ * 获取交通预算
+ *
+ * @param {String} params.originPlace 出发地
+ * @param {String} params.destinationPlace 目的地
+ * @param {String} params.outboundDate 出发时间 YYYY-MM-DD
+ * @param {String} params.inboundDate 返回时间(可选) YYYY-MM-DD
+ * @param {String} params.latestArriveTime 最晚到达时间 HH:mm
+ * @param {Boolean} params.isRoundTrip 是否往返 [如果为true,inboundDate必须存在]
+ * @param {Function} [callback] (err, {price: "1000"})
+ * @return {Promise} {price: "1000"}
+ */
+travelBudget.getTrafficBudget = function(params, callback) {
+    if (!params) {
+        throw L.ERR.DATA_FORMAT_ERROR;
+    }
+
+    if (!params.destinationPlace) {
+        throw {code: -1, msg: "目的地城市信息不存在"};
+    }
+
+    if (!params.originPlace) {
+        throw {code: -1, msg: "出发城市信息不存在"};
+    }
+
+    if (!params.outboundDate) {
+        throw {code: -1, msg: "出发时间不存在"};
+    }
+
+    if (params.isRoundTrip && !params.inboundDate) {
+        throw {code: -1, msg: "往返预算,返程日期不能为空"};
+    }
+
+    return API.travelbudget.getTrafficBudget(params, callback);
 }
 
 module.exports = travelBudget;
