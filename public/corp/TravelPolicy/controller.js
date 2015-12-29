@@ -49,6 +49,11 @@ var TravelPolicy=(function(){
             $(".update_policy").hide();
             $(".policy_page li").css('opacity','1');
         }
+        //增加标准取消
+        $scope.createClose = function () {
+            $(".create_policy").hide();
+            $(".policy_page li").css('opacity','1');
+        }
         $scope.createPolicy = function () {
             if ($(".create_policy .Cname").val()=="") {
                 Myalert("温馨提示","请填写等级名称");
@@ -148,6 +153,11 @@ var TravelPolicy=(function(){
             $(".update_policy").show();
             $(".create_policy").hide();
             $(".policy_page li").css('opacity','0.2');
+        }
+        //修改标准取消
+        $scope.updateClose = function () {
+            $(".update_policy").hide();
+            $(".policy_page li").css('opacity','1');
         }
         $scope.updatePolicy = function () {
             API.onload(function(){
