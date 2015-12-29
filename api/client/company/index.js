@@ -68,10 +68,12 @@ company.getCompany = function(companyId, callback){
  * @returns {*}
  */
 company.getCompanyListByAgency = checkPermission(["company.query"],
-    function(params, callback){
+    function(callback){
         var self = this;
         var accountId = self.accountId;
-        params.userId = accountId;
+        var params = {
+            userId: accountId
+        }
         return API.agency.getAgencyUser(accountId)
             .then(function(user){
                 params.agencyId = user.agencyId;
