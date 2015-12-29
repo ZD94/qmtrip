@@ -8,6 +8,7 @@ var staff = (function(){
 
     //员工管理界面
     staff.StaffInfoManageController = function($scope){
+
         $(".left_nav li").removeClass("on").eq(2).addClass("on");
         //添加员工信息
         $scope.addStaff = function() {
@@ -20,13 +21,6 @@ var staff = (function(){
             $("#add").removeClass("onCheck");
         }
 
-        //批量添加员工
-        $scope.addALotStaff = function(){
-            $(".staff_tab_content").hide();
-            $(".staff_tab_import").show();
-            //alert(123);
-        }
-
         //对差旅标准进行初始化
         $scope.selectkey = "";//设置初始化显示
         $scope.selectClass = [
@@ -36,7 +30,7 @@ var staff = (function(){
         //初始化员工记录的方法
         $scope.initStaff = function() {
             API.onload(function(){
-                API.staff.getCurrentStaff()//qh获取当前登录人员的企业id
+                API.staff.getCurrentStaff()//获取当前登录人员的企业id
                     .then(function(staff){
                         API.staff.listAndPaginateStaff({companyId:staff.companyId})
                             .then(function(staffinfo){
@@ -220,6 +214,19 @@ var staff = (function(){
                         console.info(err);
                     }).done();
             })
+        }
+
+        //批量添加员工
+        $scope.addALotStaff = function(){
+            $(".staff_tab_content").hide();
+            $(".staff_tab_import").show();
+            //alert(123);
+        }
+
+        //从批量添加返回到员工管理页面
+        $scope.backToAddStaff = function(){
+            $(".staff_tab_content").show();
+            $(".staff_tab_import").hide();
         }
 
     }
