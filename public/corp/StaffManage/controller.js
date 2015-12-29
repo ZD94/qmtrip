@@ -229,6 +229,32 @@ var staff = (function(){
             $(".staff_tab_import").hide();
         }
 
+        //上传文件进入预览页
+        $scope.uploadStaffFile = function(){
+            $(".staff_tab_valid").show();
+            $(".staff_tab_content").hide();
+            $(".staff_tab_import").hide();
+            var md5key = $("#fileMd5key").val();
+            API.onload(function(){
+                API.staff.getCurrentStaff()//获取当前登录人员的企业id
+                    .then(function(staffid){
+                        console.info(staffid);
+                        console.info(staffid.id);
+                        console.info(md5key);
+                        API.staff.beforeImportExcel({accountId:staffid.id,md5key:md5key})
+                            .then(function(allData){
+                                console.info(allData);
+                            })
+                            .catch(function(err){
+                                console.info(err);
+                            })
+                    })
+                    .catch(function(err){
+                        console.info(err);
+                    }).done();
+            })
+        }
+
     }
 
     return staff;

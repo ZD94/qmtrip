@@ -146,15 +146,17 @@
             <div style="clear: both;"></div>
         </ul>
     </div>
+
+    <!--批量导入页面-->
     <div class="staff_tab_import">
         <div class="staff_tab_import_head">
             <div class="staff_import_head">
                 <span>请选择您要批量导入的文件:</span>
                 <span ng-click="backToAddStaff()">返回</span>
             </div>
-            <!--<input type="file" class="file" value="选取文件">-->
-            <a class="upload"><input type="file" class="file" name="tmpFile" value='选取文件'/></a>
-            <input type="text" class="upload_text"><span class="tip_text">未选择文件</span>
+            <a href="javascript:;" class="upload">选择文件<input type="file" class="file" name="tmpFile" value=''/></a>
+            <input type="hidden" value="" id="fileMd5key"/>
+            <input type="text" class="upload_text"><span class="tip_text">未选择文件</span> <span class="makesure" ng-click="uploadStaffFile()">上传文件</span>
         </div>
         <div class="staff_tab_import_bottom">
             <p>导入说明:</p>
@@ -208,6 +210,66 @@
             </p>
         </div>
     </div>
+
+    <!--导入数据预览-->
+    <div class="staff_tab_valid">
+        <div class="staff_tab_valid_head">
+            <div class="staff_valid_head">
+                <span>批量导入成员:</span>
+                <span ng-click="">返回</span>
+            </div>
+            <p>
+                导入总数为：<span>200</span>,有效数为：<span>185</span>,无效数为：<span style="color: #de492a;">3</span>
+            </p>
+        </div>
+        <div class="staff_no_valid">
+            <div class="preview_head_text">
+                <span class="blue_block"></span>
+                无效成员预览
+                <a>点击下载列表</a>
+            </div>
+            <ul class="preview_require_head">
+                <li>姓名</li>
+                <li>邮箱</li>
+                <li>手机号</li>
+                <li>所属部门</li>
+                <li>差旅标准</li>
+                <li>原因</li>
+            </ul>
+            <ul class="preview_data" ng-repeat="item in invalid" >
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </div>
+        <div class="staff_valid">
+            <div class="preview_head_text">
+                <span class="blue_block"></span>
+                导入成员预览
+                <a>点击下载列表</a>
+                <a class="tip">管理员权限设置可在导入成功后，进入<span class="blue">员工信息列表</span>单独设置</a>
+            </div>
+            <ul class="preview_require_head">
+                <li>姓名</li>
+                <li>邮箱</li>
+                <li>手机号</li>
+                <li>所属部门</li>
+                <li>差旅标准</li>
+                <li>权限</li>
+            </ul>
+            <ul class="preview_data" ng-repeat="item in valid" >
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -217,9 +279,13 @@
             dataType: 'json',
             data: { id: 'aaa', name: 'bbb' },
             onComplete: function(filename, response) {
-                console.log(filename);
-                console.log(response);
-                console.log(response.result);
+//                console.log(filename);
+//                console.log(response);
+//                console.log(response.md5key);
+                $("#fileMd5key").val(response.md5key);
+                $(".upload_text").val(filename);
+                $(".tip_text").hide();
+                $(".makesure").show();
             }
         });
         $(document).on("click","#change",function(){

@@ -211,9 +211,9 @@ tripPlan.listTripPlanOrder = function(params, callback){
                 var orderId = order.id;
                 order = order;
                 return Q.all([
-                    ConsumeDetails.findAll({where: {orderId: orderId, type: -1}}),
-                    ConsumeDetails.findAll({where: {orderId: orderId, type: 0}}),
-                    ConsumeDetails.findAll({where: {orderId: orderId, type: 1}})
+                    ConsumeDetails.findAll({where: {orderId: orderId, type: -1, status: {$ne: -2}}}),
+                    ConsumeDetails.findAll({where: {orderId: orderId, type: 0, status: {$ne: -2}}}),
+                    ConsumeDetails.findAll({where: {orderId: orderId, type: 1, status: {$ne: -2}}})
                 ])
                     .spread(function(outTraffic, hotel, backTraffic){
                         order.outTraffic = outTraffic;
@@ -247,9 +247,10 @@ tripPlan.saveConsumeRecord = function(params, options, callback){
     var checkArr = ['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'];
     return checkParams(checkArr, params)
         .then(function(){
+            options.fields = getColsFromParams(params);
             return ConsumeDetails.create(params, options)
                 .then(function(ret){
-                    return ret.dataValues;
+                    return ret;
                 })
         })
         .catch(errorHandle)
@@ -263,7 +264,6 @@ tripPlan.saveConsumeRecord = function(params, options, callback){
  * @returns {*}
  */
 tripPlan.deleteTripPlanOrder = function(params, callback){
-    var defer = Q.defer();
     return checkParams(['userId', 'orderId'], params)
         .then(function(){
             var orderId = params.orderId;
