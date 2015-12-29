@@ -247,9 +247,10 @@ tripPlan.saveConsumeRecord = function(params, options, callback){
     var checkArr = ['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'];
     return checkParams(checkArr, params)
         .then(function(){
+            options.fields = getColsFromParams(params);
             return ConsumeDetails.create(params, options)
                 .then(function(ret){
-                    return ret.dataValues;
+                    return ret;
                 })
         })
         .catch(errorHandle)
@@ -267,8 +268,6 @@ tripPlan.deleteTripPlanOrder = function(params, callback){
         .then(function(){
             var orderId = params.orderId;
             var userId = params.userId;
-            console.info("**********************");
-            console.info(PlanOrder.destory);
             return PlanOrder.findById(orderId, {attributes: ['accountId', 'status']})
                 .then(function(order){
                     if(!order || order.status == -2){
