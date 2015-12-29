@@ -389,6 +389,8 @@
   .staff_tab_import_head{
     margin-left: 20px;
     margin-right: 20px;
+    border-bottom: 1px solid @color-border2;
+    padding-bottom: 20px;
     .staff_import_head{
       width: 100%;
       height: 35px;
@@ -398,6 +400,7 @@
       color: @color-text;
       span{
         &:nth-child(2){
+          cursor: pointer;
           float: right;
           display: block;
           width: 80px;
@@ -409,6 +412,99 @@
           line-height: 33px;
           font-size: @h14;
         }
+      }
+    }
+  }
+  .upload{
+    width: 100px;
+    height: 35px;
+    background-color: @color-theme1;
+    color: @color-white;
+    font-size: @h14;
+    text-align: center;
+    line-height: 35px;
+    display: block;
+    border-radius: @border-radius-2;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .upload_text{
+    width: 400px;
+    height: 35px;
+    line-height: 35px;
+    border: 1px solid @color-border2;
+  }
+  .tip_text{
+    line-height: 35px;
+    margin-left: 10px;
+    color: #9b9b9b;
+  }
+  .staff_tab_import_bottom{
+    padding-top: 30px;
+    margin-left: 20px;
+    margin-right: 20px;
+    font-size: @h14;
+    p{
+      &:first-child{
+        font-size: @h16;
+        color: @color-text;
+        margin-bottom: 20px;
+      }
+    }
+    .p_title{
+      line-height: 30px;
+      padding-left: 10px;
+    }
+    table{
+      width: 715px;
+      table-layout: fixed;
+      border-collapse:collapse;
+      border: 1px solid @color-border2;
+      margin-left: 35px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      tr{
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        &:first-child{
+          color: #9b9b9b;
+        }
+        td{
+          border: 1px solid @color-border2;
+          &:nth-child(1){
+            width: 40px;
+            color: #9b9b9b;
+          }
+          &:nth-child(2){
+            width: 80px;
+          }
+          &:nth-child(3){
+            width: 240px;
+          }
+          &:nth-child(4){
+            width: 120px;
+          }
+          &:nth-child(5){
+            width: 120px;
+          }
+          &:nth-child(6){
+            width: 120px;
+          }
+        }
+      }
+    }
+    .p_text{
+      line-height: 25px;
+      padding-left: 35px;
+      a{
+        color: @color-theme1;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      span{
+        padding-left: 10px;
+        color: #9b9b9b;
       }
     }
   }
