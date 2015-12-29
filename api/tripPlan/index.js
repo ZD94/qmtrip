@@ -409,6 +409,23 @@ tripPlan.approveInvoice = function(params, callback){
         .nodeify(callback);
 }
 
+/**
+ * 统计计划单数量
+ *
+ * @param params
+ * @param callback
+ */
+tripPlan.countTripPlanNum = function(params, callback){
+    return checkParams(['companyId'], params)
+        .then(function(){
+            var query = {
+                companyId: params.companyId
+            }
+            logger.info(query);
+            return PlanOrder.count({where: query})
+        }).nodeify(callback);
+}
+
 function checkParams(checkArray, params, callback){
     var defer = Q.defer();
     ///检查参数是否存在

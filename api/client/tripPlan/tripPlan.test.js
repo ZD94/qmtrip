@@ -1,12 +1,15 @@
 /**
  * Created by wyl on 15-12-12.
  */
-var API = require('common/api');
+//var API = require('common/api');
 
 var assert = require("assert");
-var travelPlan = require("./index");
+var tripPlan = require("./index");
+var companyId = '6cf36000-aa21-11e5-a377-2fe1a7dbc5e1';
+var accountId = "6cee7e00-aa21-11e5-a377-2fe1a7dbc5e1";
+var self = {accountId: accountId};
 
-describe("api/client/travelPlan.js", function() {
+describe("api/client/tripPlan.js", function() {
     /*var params = {
         userId: 'ee3eb6a0-9f22-11e5-8540-8b3d4cdf6eb6',
         consumeId: '31f1c2b0-a3d4-11e5-b95c-8f85c45278d4',
@@ -45,9 +48,33 @@ describe("api/client/travelPlan.js", function() {
         })
     })*/
 
+    it("#savePlanOrder should be ok", function(done){
+        var tripPlanOrder = {
+            startPlace: '北京',
+            destination: '上海',
+            startAt: '2015-12-30 11:12:12',
+            budget: '1000',
+        }
+        tripPlan.savePlanOrder.call(self, tripPlanOrder, function(err, ret){
+            if(err){
+                throw err;
+            }
+            done();
+        })
+    })
+
     it("#listTripPlanOrder should be ok", function(done) {
-        var self = {accountId: "00000000-0000-0000-1234-123400001234"};
-        travelPlan.listTripPlanOrder.call(self, {}, function(err, result){
+        tripPlan.listTripPlanOrder.call(self, {}, function(err, ret){
+            if (err) {
+                throw err;
+            }
+            //console.info("共列出计划单=>", ret.length);
+            done();
+        })
+    });
+
+    it("#countTripPlanNum should be ok", function(done) {
+        tripPlan.countTripPlanNum.call(self, {companyId: companyId}, function(err, ret){
             if (err) {
                 throw err;
             }

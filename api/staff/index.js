@@ -164,7 +164,12 @@ staff.getStaff = function(params, callback){
         defer.reject({code: -1, msg: "id不能为空"});
         return defer.promise.nodeify(callback);
     }
-    return staffModel.findById(id)
+    var cols = params.columns;
+    var options = {};
+    if(cols){
+        options.attributes = cols
+    }
+    return staffModel.findById(id, options)
         .then(function(staff){
             if(!staff){
                 throw {code: -2, msg: '员工不存在'};
