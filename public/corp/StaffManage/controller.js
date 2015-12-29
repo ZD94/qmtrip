@@ -45,7 +45,7 @@ var staff = (function(){
                                 //console.info($scope.staff);
                                 var tasks = $scope.staffs
                                     .map(function($staff){ //通过id拿到差旅标准的名字
-                                        return API.travelPolicy.getTravelPolicy($staff.travelLevel)
+                                        return API.travelPolicy.getTravelPolicy({id:$staff.travelLevel})
                                             .then(function(travelLevel){
                                                 $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
                                                 $scope.$apply();
@@ -94,7 +94,7 @@ var staff = (function(){
                                 //console.info($scope.staff);
                                 var tasks = $scope.staffs
                                     .map(function($staff){ //通过id拿到差旅标准的名字
-                                        return API.travelPolicy.getTravelPolicy($staff.travelLevel)
+                                        return API.travelPolicy.getTravelPolicy({id:$staff.travelLevel})
                                             .then(function(travelLevel){
                                                 $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
                                                 $scope.$apply();

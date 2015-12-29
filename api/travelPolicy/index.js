@@ -52,12 +52,14 @@ travelPolicy.deleteTravelPolicy = function(params, callback){
  * @param callback
  * @returns {*}
  */
-travelPolicy.updateTravelPolicy = function(id, data, callback){
+travelPolicy.updateTravelPolicy = function(data, callback){
+    var id = data.id;
     var defer = Q.defer();
     if(!id){
         defer.reject({code: -1, msg: "id不能为空"});
         return defer.promise.nodeify(callback);
     }
+    delete data.id;
     var options = {};
     options.where = {id: id};
     options.returning = true;
@@ -74,7 +76,8 @@ travelPolicy.updateTravelPolicy = function(id, data, callback){
  * @param callback
  * @returns {*}
  */
-travelPolicy.getTravelPolicy = function(id, callback){
+travelPolicy.getTravelPolicy = function(params, callback){
+    var id = params.id;
     var defer = Q.defer();
     if(!id){
         defer.reject({code: -1, msg: "id不能为空"});
@@ -102,15 +105,11 @@ travelPolicy.getAllTravelPolicy = function(options, callback){
  * @param options options.perPage 每页条数 options.page当前页
  * @param callback
  */
-travelPolicy.listAndPaginateTravelPolicy = function(params, options, callback){
-    if (typeof options == 'function') {
-        callback = options;
-        options = {};
-    }
+travelPolicy.listAndPaginateTravelPolicy = function(params, callback){
+    var options = params.options;
     if (!options) {
         options = {};
     }
-
     var page, perPage, limit, offset;
     if (options.page && /^\d+$/.test(options.page)) {
         page = options.page;
