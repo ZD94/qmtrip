@@ -23,6 +23,7 @@
     <script type="text/javascript">
         var Q = require('q');
         var moment = require('moment');
+        var Cookie = require('tiny-cookie');
         var TLD = TLD_angular_app('qmtrip.staff');
         TLD.config(function ($stateProvider, $urlRouterProvider) {
             $urlRouterProvider.otherwise('/StaffFirst/StaffUser');
@@ -58,6 +59,13 @@
             backUrl = encodeURIComponent(backUrl);
             window.location.href = "/staff.html#/auth/login?backurl=" + backUrl;
         });
+        API.authenticate = function(remote, callback){
+            var user_id = Cookie.get('user_id');
+            var token_id = Cookie.get('token_id');
+            var token_sign = Cookie.get('token_sign');
+            var timestamp = Cookie.get("timestamp");
+            remote.authenticate(user_id, token_id, timestamp, token_sign, callback);
+        };
         // function logout(){
         // 	API.require('auth');
         // 	API.onload(function(){
