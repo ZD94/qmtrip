@@ -67,10 +67,16 @@ company.getCompany = function(companyId, callback){
  * @param callback
  * @returns {*}
  */
-company.listCompany = checkPermission(["company.query"],
+company.getCompanyListByAgency = checkPermission(["company.query"],
     function(params, callback){
-        params.userId = this.accountId;
-        return API.company.listCompany(params, callback);
+        var self = this;
+        var accountId = self.accountId;
+        params.userId = accountId;
+        return API.agency.getAgencyUser(accountId)
+            .then(function(user){
+                params.agencyId = user.agencyId;
+                return API.company.listCompany(params, callback);
+            })
     });
 
 /**

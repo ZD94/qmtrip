@@ -211,9 +211,9 @@ tripPlan.listTripPlanOrder = function(params, callback){
                 var orderId = order.id;
                 order = order;
                 return Q.all([
-                    ConsumeDetails.findAll({where: {orderId: orderId, type: -1}}),
-                    ConsumeDetails.findAll({where: {orderId: orderId, type: 0}}),
-                    ConsumeDetails.findAll({where: {orderId: orderId, type: 1}})
+                    ConsumeDetails.findAll({where: {orderId: orderId, type: -1, status: {$ne: -2}}}),
+                    ConsumeDetails.findAll({where: {orderId: orderId, type: 0, status: {$ne: -2}}}),
+                    ConsumeDetails.findAll({where: {orderId: orderId, type: 1, status: {$ne: -2}}})
                 ])
                     .spread(function(outTraffic, hotel, backTraffic){
                         order.outTraffic = outTraffic;
