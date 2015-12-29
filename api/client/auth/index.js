@@ -148,16 +148,28 @@ auth.registryCompany = function(params, callback) {
 
     return Q()
         .then(function() {
+            if (process.env["NODE_ENV"] == 'test') {
+                return true;
+            }
+
             return API.checkcode.validatePicCheckCode({code: picCode, ticket: picTicket});
         })
         .then(function() {
+            if (process.env["NODE_ENV"] == 'test') {
+                return true;
+            }
+
             return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
         })
         .then(function(){
             return API.company.checkBlackDomain({domain: domain});
         })
         .then(function() {
-            return API.auth.newAccount({mobile: mobile, email: email, pwd: pwd});
+            var status = 0;
+            if (process.env["NODE_ENV"] == 'test') {
+                status = 1;
+            }
+            return API.auth.newAccount({mobile: mobile, email: email, pwd: pwd, status: status});
         })
         .then(function(account) {
             return Q.all([
@@ -167,7 +179,6 @@ auth.registryCompany = function(params, callback) {
                 ]);
         })
         .then(function() {
-            console.info("注册成功了...")
             return true;
         })
         .nodeify(callback);

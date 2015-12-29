@@ -142,6 +142,7 @@ authServer.remove = function(data, callback) {
  * @param {String} data.mobile 手机号
  * @param {String} data.email 邮箱
  * @param {String} data.pwd 密码
+ * @param {INTEGER} data.status 账号状态 0未激活, 1.已激活 如果为0将发送激活邮件,如果1则不发送
  * @param {Callback} callback 回调函数
  * @return {Promise} {code: 0, data:{accountId: 账号ID, email: "邮箱", status: "状态"}
  * @public
@@ -190,7 +191,7 @@ authServer.newAccount = function(data, callback) {
             return true;
         })
         .then(function() {
-            var status = 0;
+            var status = data.status? data.status: 0;
             var pwd = data.pwd;
             pwd = md5(pwd);
             var id = data.id?data.id:uuid.v1();
