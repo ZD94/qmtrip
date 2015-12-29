@@ -8,9 +8,9 @@ var assert = require("assert");
 describe("api/client/agency.js", function() {
 
     var obj = {
-        email: "yaya.wang@tulingdao.com",
+        email: "mingming.wang@tulingdao.com",
         name: "wlj",
-        mobile: "13121538956",
+        mobile: "13121538754",
         agencyId: "aef7f968-9fe9-11e5-a67e-ad403d808899"
     }
     var id = "";
@@ -71,7 +71,7 @@ describe("api/client/agency.js", function() {
     //删除代理商信息
     describe("API.agency.deleteAgencyUser", function() {
          it("API.agency.deleteAgencyUser", function(done) {
-             API.agency.deleteAgencyUser({id: "b3204120-9fe9-11e5-bfd2-414faa65c25d"}, function(err, result) {
+             API.agency.deleteAgencyUser({id: id}, function(err, result) {
                  assert.equal(err, null);
                  console.log(result);
                  done();

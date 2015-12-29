@@ -351,15 +351,12 @@ agency.getAgencyUser = function(params, callback){
  * @param options options.perPage 每页条数 options.page当前页
  * @param callback
  */
-agency.listAndPaginateAgencyUser = function(params, options, callback){
-    if (typeof options == 'function') {
-        callback = options;
-        options = {};
+agency.listAndPaginateAgencyUser = function(params, callback){
+    var options = {};
+    if(params.options){
+        options = params.options;
+        delete params.options;
     }
-    if (!options) {
-        options = {};
-    }
-
     var page, perPage, limit, offset;
     if (options.page && /^\d+$/.test(options.page)) {
         page = options.page;

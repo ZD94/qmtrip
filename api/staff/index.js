@@ -243,14 +243,7 @@ staff.listAndPaginateStaff = function(params, callback){
  * @param callback
  * @returns {*}
  */
-staff.increaseStaffPoint = function(params, options, callback) {
-    if (typeof options == 'function') {
-        callback = options;
-        options = {};
-    }
-    if (!options) {
-        options = {};
-    }
+staff.increaseStaffPoint = function(params, callback) {
     var id = params.id;
     var increasePoint = params.increasePoint;
     var defer = Q.defer();
@@ -287,14 +280,7 @@ staff.increaseStaffPoint = function(params, options, callback) {
  * @param callback
  * @returns {*}
  */
-staff.decreaseStaffPoint = function(params, options, callback) {
-    if (typeof options == 'function') {
-        callback = options;
-        options = {};
-    }
-    if (!options) {
-        options = {};
-    }
+staff.decreaseStaffPoint = function(params, callback) {
     var id = params.id;
     var decreasePoint = params.decreasePoint;
     var defer = Q.defer();
@@ -333,13 +319,11 @@ staff.decreaseStaffPoint = function(params, options, callback) {
  * @param options options.perPage 每页条数 options.page当前页
  * @param callback
  */
-staff.listAndPaginatePointChange = function(params, options, callback){
-    if (typeof options == 'function') {
-        callback = options;
-        options = {};
-    }
-    if (!options) {
-        options = {};
+staff.listAndPaginatePointChange = function(params, callback){
+    var options = {};
+    if(params.options){
+        options = params.options;
+        delete params.options;
     }
 
     var page, perPage, limit, offset;
@@ -389,16 +373,14 @@ staff.beforeImportExcel = function(params, callback){
     var xlsxObj;
     return API.attachment.getAttachment({md5key: md5key, userId: userId})
         .then(function(att){
-            att = att.attachment;
             xlsxObj = nodeXlsx.parse(att.content);
             return staff.getStaff({id: userId});
         })
         .then(function(sf){
-            companyId = sf.staff.companyId;
+            companyId = sf.companyId;
             return API.travelPolicy.getAllTravelPolicy({company_id: companyId});
         })
         .then(function(results){
-            results = results.travalPolicies;
             for(var t=0;t<results.length;t++){
                 var tp = results[t];
                 travalPolicies[tp.name] = tp.id;
@@ -452,8 +434,8 @@ staff.beforeImportExcel = function(params, callback){
                         return;
                     }
                     return Q.all([
-                        staff.findOneStaff({email: s[2]}),
-                        API.auth.findOneAcc({mobile: s[1]})//acc表手机号不能重复 staff暂且不控制
+                        staffModel.findOne({where: {email: s[2]}}),
+                        API.auth.checkAccExist({mobile: s[1]})//acc表手机号不能重复 staff暂且不控制
                     ])
                         .spread(function(staff, account){
                             if(staff){
@@ -473,6 +455,10 @@ staff.beforeImportExcel = function(params, callback){
                                 }
                             }
                             return item;
+                        }).catch(function(err){
+                            console.log(err);
+                            addObj.push(staffObj);
+                            downloadAddObj.push(s);
                         });
                     /*return staff.createStaff(staffObj)
                      .then(function(ret){
@@ -526,7 +512,7 @@ staff.importExcelAction = function(params, callback){
                 return staff.createStaff(staffObj)
                     .then(function(ret){
                         if(ret){
-                            item = ret.staff;
+                            item = ret;
                             addObj.push(item);
                         }else{
                             noAddObj.push(staffObj);

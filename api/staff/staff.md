@@ -43,12 +43,12 @@
 | code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
 
->. 修改员工信息 API.staff.updateStaff(id, params, callback);
+>. 修改员工信息 API.staff.updateStaff(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
-| id                                | 员工id             | uuid             |必填
 | params                                | 更新信息             |json              |------
+| params.id                                | 员工id             | uuid             |必填
 | params.name                        | 员工姓名              |varchar               |选填
 | params.mobile                        | 员工手机              |varchar               |选填
 | params.email                          |员工邮箱           |varchar               |选填
@@ -63,11 +63,12 @@
 | msg     | 提示信息 |
 | json数据   | 员工信息|json
 
->. 查询员工信息 API.staff.getStaff(id,callback);
+>. 查询员工信息 API.staff.getStaff(params,callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
-| id                                | 员工id             | uuid             |必填
+| params                                | 更新信息             |json              |------
+| params.id                                | 员工id             | uuid             |必填
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |
@@ -85,7 +86,7 @@
 |---------|------|-----|
 | json数据   | 员工信息|json
 
->. 分页查询员工信息 API.staff.listAndPaginateStaff(params, options, callback);
+>. 分页查询员工信息 API.staff.listAndPaginateStaff(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -97,9 +98,9 @@
 | params.department                          |部门名称           |varchar               |选填
 | params.travelLevel                          |差旅标准id           |uuid               |选填
 | params.roleId                          |权限           |integer               |选填
-| options                                | 分页参数             |json              |------
-| options.perPage                                | 每页条数             |integer              |选填默认为6
-| options.page                                | 当前页             |integer              |选填默认为1
+| params.options                                | 分页参数             |json              |------
+| params.options.perPage                                | 每页条数             |integer              |选填默认为6
+| params.options.page                                | 当前页             |integer              |选填默认为1
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |
@@ -137,16 +138,16 @@
 |---------|------|-----|
 | json数据   | 员工信息|json
 
->. 分页查询员工积分变动记录 API.staff.listAndPaginatePointChange(params, options, callback);
+>. 分页查询员工积分变动记录 API.staff.listAndPaginatePointChange(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
 | params                                | 查询条件参数             |json              |------
 | params.status                                | 类型             |integer              |选填（1表示增加记录-1表示减少记录）
 | params.staffId                                | 员工id             |uuid              |选填
-| options                                | 分页参数             |json              |------
-| options.perPage                                | 每页条数             |integer              |选填默认为6
-| options.page                                | 当前页             |integer              |选填默认为1
+| params.options                                | 分页参数             |json              |------
+| params.options.perPage                                | 每页条数             |integer              |选填默认为6
+| params.options.page                                | 当前页             |integer              |选填默认为1
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |

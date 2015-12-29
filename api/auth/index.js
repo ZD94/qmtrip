@@ -504,6 +504,22 @@ authServer.findOneAcc = function(params, callback){
         .nodeify(callback);
 }
 
+/**
+ * 检查账户是否存在
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+authServer.checkAccExist = function(params, callback){
+    var options = {};
+    options.where = params;
+    return Models.Account.findOne(options)
+        .then(function(obj){
+            return obj;
+        })
+        .nodeify(callback);
+}
+
 //生成登录凭证
 function makeAuthenticateSign(accountId, os, callback) {
     if (typeof os == 'function') {
