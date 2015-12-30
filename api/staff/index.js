@@ -500,7 +500,7 @@ staff.beforeImportExcel = function(params, callback){
                             addObj.push(staffObj);
                             downloadAddObj.push(s);
                         });
-                }else{
+                }else if(index != 0){
                     staffObj.reason = "文件最多两百行";
                     s[6] = "文件最多两百行";
                     noAddObj.push(staffObj);

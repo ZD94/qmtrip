@@ -258,6 +258,9 @@ var staff = (function(){
                                 $scope.valid = JSON.parse(allData.addObj);
                                 $scope.downloadInvalidData = allData.downloadNoAddObj;
                                 $scope.downloadValidData = allData.downloadAddObj;
+                                $scope.validData = JSON.parse(allData.addObj).length;
+                                $scope.invalidData = JSON.parse(allData.noAddObj).length;
+                                //$scope.totalData =
                                 //return $scope.valid;
                                 $scope.$apply();
                             })
@@ -305,12 +308,12 @@ var staff = (function(){
 
         //确定导入数据
         $scope.importData = function(){
-            console.log($scope.valid);
+            //console.log($scope.valid);
             API.onload(function(){
                 API.staff.importExcelAction({addObj:$scope.valid})
                     .then(function(data){
-                        console.info(data.addObj);
-                        console.info(data.noAddObj);
+                        //console.info(data.addObj);
+                        //console.info(data.noAddObj);
                         $(".staff_import_success").show();
                         $(".staff_tab_valid").hide();
                         $(".staff_tab_content").hide();

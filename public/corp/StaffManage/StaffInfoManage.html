@@ -82,6 +82,7 @@
                 <td>差旅标准</td>
                 <td>权限</td>
                 <td>操作</td>
+                <td></td>
             </tr>
         </table>
         <ul class="staff_ul" ng-repeat="item in staffs" >
@@ -92,6 +93,7 @@
             <li><span ng-if="item.department == null">暂未设置</span><span>{{item.travelLeverName}}</span></li>
             <li><span ng-if="item.roleId == 0">创建者</span><span ng-if="item.roleId == 1">普通员工</span><span ng-if="item.roleId == 2">管理员</span><span ng-if="item.roleId == 3">财务人员</span></li>
             <li><span ng-click="editStaffInfo($index)" id="change">修改</span><a ng-if="item.roleId != 0">&nbsp;|&nbsp;<span ng-click="delStaffInfo(item.id, $index)">删除</span></a></li>
+            <li>{{isOrNotActive}}</li>
             <div class="add_staff2">
                 <div class="little_triangle2">
                 </div>
@@ -219,7 +221,7 @@
                 <span ng-click="backToImport()">返回</span>
             </div>
             <p>
-                导入总数为：<span>200</span>,有效数为：<span>185</span>,无效数为：<span style="color: #de492a;">3</span>
+                导入总数为：<span>{{validData + invalidData}}</span>，有效数为：<span>{{validData}}</span>，无效数为：<span style="color: #de492a;">{{invalidData}}</span>
             </p>
         </div>
         <div class="staff_no_valid">
@@ -286,8 +288,8 @@
         </div>
         <div class="staff_import_success_content">
             <p>数据导入成功！</p>
-            <p>成功导入数据<span>100</span>条</p>
-            <p>无效数据<span>10</span>条未导入，<a>点击下载列表</a></p>
+            <p>成功导入数据<span>{{validData}}</span>条</p>
+            <p>无效数据<span>{{invalidData}}</span>条未导入，<a ng-click="downloadExcleData('invalid')">点击下载列表</a></p>
         </div>
     </div>
 </div>
