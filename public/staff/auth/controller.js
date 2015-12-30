@@ -6,6 +6,7 @@ var auth=(function(){
     var  auth = {};
     var Cookie = require('tiny-cookie');
 
+    //登录页面
     auth.LoginController = function ($scope, $routeParams) {
         $scope.toRegister = function(){
             window.location.href = "#/auth/register";
@@ -68,6 +69,8 @@ var auth=(function(){
             })
         })
     }
+
+    //注册页面
     auth.RegisterController = function($scope) {
         var pCode = $('#picCode').val();
 
@@ -351,8 +354,8 @@ var auth=(function(){
                         .then(function(result){
                             console.info("注册返回的结果", result);
                             alert("注册成功");
-                            window.location.href = "#/auth/login";
-                            //window.location.href = "#/auth/corplaststep";
+                            //window.location.href = "#/auth/login";
+                            window.location.href = "#/auth/corplaststep?email="+mail;
                         })
                         .catch(function(err){
                             if (err.msg) {
@@ -373,6 +376,24 @@ var auth=(function(){
 
     }
 
+    //公司注册最后一步注册完成页面
+    auth.CorplaststepController = function ($scope,$routeParams) {
+        $scope.userMail = $routeParams.email;
+
+        $scope.sendAgainActiveMail = function(){
+            API.onload(function(){
+                API.auth.sendActiveEmail({email:$scope.userMail})
+                    .then(function(){
+                        console.info("发送成功");
+                        $scope.$apply();
+                    }).catch(function(err){
+                        console.error(err);
+                    }).done();
+            })
+        }
+    }
+
+    //忘记密码页
     auth.ForgetpwdController = function($scope) {
         $scope.toRegister = function () {
             window.location.href = "#/auth/register";
@@ -406,6 +427,8 @@ var auth=(function(){
             })
         }
     }
+
+    //激活页面
     auth.ActiveController = function($scope, $routeParams) {
         var sign = $routeParams.sign;
         var accountId = $routeParams.accountId;
@@ -436,6 +459,7 @@ var auth=(function(){
             //$scope.activeResult = "恭喜您账号成功激活,关闭页面";
     }
 
+    //登出页面
     auth.LogoutController = function($scope) {
         API.onload(function() {
             API.auth.logout(function(err, result) {
