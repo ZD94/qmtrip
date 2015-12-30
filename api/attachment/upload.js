@@ -87,26 +87,6 @@ function uploadActionFile(req, res, next) {
                                         }
                                     });
                                     res.send('{"ret":0, "errMsg":"", "md5key":"'+md5key+'"}');
-                                    /*return API.staff.importExcel({accountId: user_id, md5key: md5key})
-                                        .then(function(result){
-                                            if(result){
-                                                console.log(result);
-                                                console.log("===========================================");
-                                                console.log(API.staff.importExcelAction);
-                                                return API.staff.importExcelAction({addObj: result.addObj})
-                                                    .then(function(add){
-                                                        console.log(add);
-                                                        console.log("--------------------------------------");
-                                                        fs.exists(filePath, function (exists) {
-                                                            if(exists){
-                                                                fs.unlinkSync(filePath);
-                                                                console.log("删除临时文件");
-                                                            }
-                                                        });
-                                                        res.send('{"ret":0, "errMsg":"", "md5key":"'+md5key+'"}');
-                                                    })
-                                            }
-                                        })*/
                                 })
                         })
                         .catch(next).done();
