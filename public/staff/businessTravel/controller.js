@@ -544,6 +544,7 @@ var businessTravel=(function(){
                 var order = {
                     companyId:$scope.companyId,
                     type:1,
+                    remark:$scope.purposename,
                     startPlace:$scope.startplace,
                     destination:$scope.endplace,
                     startAt:$scope.starttime,
