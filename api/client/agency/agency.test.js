@@ -28,17 +28,6 @@ describe("api/client/agency.js", function() {
 
 
     describe("registerAgency", function() {
-        //after(function(done) {
-        //    Q.all([
-        //        API.auth.remove({email: agency.email})
-        //    ])
-        //        .then(function(){
-        //            done();
-        //        })
-        //        .catch(function(err){
-        //            throw err;
-        //        })
-        //    });
 
         it("registerAgency should be ok", function(done) {
             Agency.registerAgency(agency, function(err, ret) {
@@ -136,22 +125,32 @@ describe("api/client/agency.js", function() {
     //删除代理商用户
     describe("deleteAgencyUser", function() {
         it("deleteAgencyUser should be ok", function(done) {
-            Agency.deleteAgencyUser.call(self, newUserId, function(err, ret) {
+            Agency.deleteAgencyUser.call(self, newUserId, function (err, ret) {
                 if (err) {
                     throw err;
                 }
-                done();
-            });
+            })
+            done();
         })
     })
 
     //删除代理商
     describe("deleteAgency", function() {
-        it("deleteAgency should be ok", function(done) {
-            Agency.deleteAgency.call(self, agencyId, function(err, ret) {
+        it("deleteAgency should be ok", function (done) {
+            Agency.deleteAgency.call(self, agencyId, function (err, ret) {
                 if (err) {
                     throw err;
                 }
+                done();
+            })
+        })
+    })
+
+    //查询代理商集合
+    describe("API.agency.listAndPaginateAgencyUser", function() {
+        it("API.agency.listAndPaginateAgencyUser", function(done) {
+            API.agency.listAndPaginateAgencyUser({}, function(err, result) {
+                assert.equal(err, null);
                 done();
             });
         })

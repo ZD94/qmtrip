@@ -81,7 +81,6 @@ agency.listAgency = function(params, callback){
  */
 agency.deleteAgency = function(agencyId, callback){
     var self = this;
-    console.info("client agencyId=>", agencyId);
     var params = {
         agencyId: agencyId,
         userId: self.accountId

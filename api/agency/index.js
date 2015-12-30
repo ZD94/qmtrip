@@ -295,7 +295,7 @@ agency.deleteAgencyUser = function(params, callback){
             }
             return Q.all([
                 API.auth.remove({accountId: id}),
-                AgencyUser.update({status: -2}, {where: {id: id}, field: ['status']})
+                AgencyUser.update({status: -2}, {where: {id: id}, fields: ['status']})
             ])
         })
         .then(function(){
