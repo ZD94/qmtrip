@@ -11,6 +11,25 @@ var self = {accountId: accountId};
 var orderId = '';
 
 describe("api/client/tripPlan.js", function() {
+
+    //before(function(done) {
+    //    API.auth.remove({email: testCase.email}, function(err) {
+    //        if (err) {
+    //            throw err;
+    //        }
+    //
+    //        done();
+    //    });
+    //});
+    //
+    //after(function(done) {
+    //    API.auth.remove({email: testCase.email}, function(err) {
+    //        if (err) {
+    //            throw err;
+    //        }
+    //        done();
+    //    })
+    //});
     /*var params = {
         userId: 'ee3eb6a0-9f22-11e5-8540-8b3d4cdf6eb6',
         consumeId: '31f1c2b0-a3d4-11e5-b95c-8f85c45278d4',

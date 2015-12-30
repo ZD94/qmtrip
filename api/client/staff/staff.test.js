@@ -29,8 +29,8 @@ describe("api/client/staff.js", function() {
         it("API.staff.createStaff", function(done) {
             API.staff.createStaff(obj, function(err, result) {
                 assert.equal(err, null);
-                console.log(err);
-                console.log(result);
+                //console.log(err);
+                //console.log(result);
                 id = result.id;
                 done();
             });
@@ -41,8 +41,8 @@ describe("api/client/staff.js", function() {
         it("API.staff.listAndPaginateStaff", function(done) {
             API.staff.listAndPaginateStaff({}, function(err, result) {
                 assert.equal(err, null);
-                console.log(err);
-                console.log(result);
+                //console.log(err);
+                //console.log(result);
 //                console.log(result.items);//item dataValues里存放的才是记录信息
                 done();
             });
@@ -54,8 +54,8 @@ describe("api/client/staff.js", function() {
         it("API.staff.updateStaff", function(done) {
             API.staff.updateStaff(updateobj, function(err, result) {
                 assert.equal(err, null);
-                console.log(err);
-                console.log(result);
+                //console.log(err);
+                //console.log(result);
                 done();
             });
         })
@@ -65,8 +65,8 @@ describe("api/client/staff.js", function() {
         it("API.staff.getStaff", function(done) {
             API.staff.getStaff({id:id}, function(err, result) {
                 assert.equal(err, null);
-                console.log(err);
-                console.log(result);
+                //console.log(err);
+                //console.log(result);
                 done();
             });
         })
@@ -76,8 +76,8 @@ describe("api/client/staff.js", function() {
         it("API.staff.increaseStaffPoint", function(done) {
             API.staff.increaseStaffPoint({id: id, increasePoint: 1000, remark: "差旅省钱加积分"}, function(err, result) {
                 assert.equal(err, null);
-                console.log(err);
-                console.log(result);
+                //console.log(err);
+                //console.log(result);
                 done();
             });
         })
@@ -87,8 +87,8 @@ describe("api/client/staff.js", function() {
         it("API.staff.decreaseStaffPoint", function(done) {
             API.staff.decreaseStaffPoint({id: id, decreasePoint: 1000, remark: "兑换礼品减积分"}, function(err, result) {
                 assert.equal(err, null);
-                console.log(err);
-                console.log(result);
+                //console.log(err);
+                //console.log(result);
                 done();
             });
         })
@@ -98,8 +98,8 @@ describe("api/client/staff.js", function() {
         it("API.staff.listAndPaginatePointChange", function(done) {
             API.staff.listAndPaginatePointChange({staffId: id}, function(err, result) {//查询条件此处用staffId或者staff_id均可
                 assert.equal(err, null);
-                console.log(err);
-                console.log(result);
+                //console.log(err);
+                //console.log(result);
                 done();
             });
         })
@@ -110,8 +110,8 @@ describe("api/client/staff.js", function() {
         it("API.staff.deleteStaff", function(done) {
             API.staff.deleteStaff({id: id}, function(err, result) {
                 assert.equal(err, null);
-                console.log(err);
-                console.log(result);
+                //console.log(err);
+                //console.log(result);
                 done();
             });
         })

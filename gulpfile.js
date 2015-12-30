@@ -23,7 +23,7 @@ gulplib.dist(function(){
     var filter = require('gulp-filter');
     var dist_all = [
         gulp.src(['public/**/*'])
-            .pipe(filter(['**', '!**/controller.js', '!**/*.less', '!**/*.css.map']))
+            .pipe(filter(['**', '!**/controller.js', '!**/*.less', '!**/*.map']))
             .pipe(gulp.dest('dist/public')),
         gulp.src('api/**/*')
             .pipe(gulp.dest('dist/api')),

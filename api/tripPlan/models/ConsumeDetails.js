@@ -19,6 +19,7 @@ module.exports = function (Db, DataType) {
         hotelName   : {type: DataType.STRING,           field: "hotel_name"},
         startTime   : {type: "timestamp without time zone", field: "start_time"}, //开始时间
         endTime     : {type: "timestamp without time zone", field: "end_time"}, //结束时间
+        latestArriveTime: {type: "timestamp without time zone", field: "latest_arrive_time"}, //最晚到达时间
         budget      : {type: DataType.NUMERIC(15, 2) }, //预算
         expenditure : {type: DataType.NUMERIC(15, 2) }, //支出
         invoiceType : {type: DataType.INTEGER,          field: "invoice_type"}, //票据类型
