@@ -47,8 +47,6 @@ describe("api/client/auth/index.js", function() {
                 if (err) {
                     throw err;
                 }
-
-                //console.info(result);
                 assert.equal(result, true);
                 done();
             })

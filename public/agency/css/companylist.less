@@ -45,12 +45,73 @@
 .companyinfo{
 	background: #fff;
 	margin-top: 20px;
+	a{
+		cursor: pointer;
+	}
 	.company_tab{
+		padding-top: 10px;
+		height: 30px;
+		line-height: 30px;
+		border-bottom: 1px solid #000;
 		li{
+			float: left;
+			width: 100px;
+			text-align: center;
+			margin-left: 15px;
 			&.on{
-				border:1px solid #e5e5e5;
+				border:1px solid #000;
 				border-bottom: 0;
 				border-radius: 5px;
+			}
+		}
+	}
+	.companydetail{
+		position: relative;
+		clear: both;
+		h3{
+			padding-left: 30px;
+			height: 40px;
+			line-height: 40px;
+			border-bottom: 1px solid #e5e5e5;
+		}
+		p{
+			height: 30px;
+			line-height: 30px;
+			span{
+				display: inline-block;
+				text-align: right;
+				width: 120px;
+			}
+			a{
+				color: #02bfff;
+			}
+		}
+		.charges{
+			position: absolute;
+			height: 100px;
+			width: 300px;
+			background: #fff;
+			z-index: 1;
+			top: 100px;
+			right: 300px;
+			border:1px solid #e5e5e5;
+			text-align: center;
+			display: none;
+			h2{
+				font-size: 20px;
+				padding-left: 15px;
+				font-weight: normal;
+				margin-bottom: 10px;
+				border-bottom: 1px solid #e5e5e5;
+			}
+			#Money{
+				width: 200px;
+				margin-right: 10px;
+			}
+			p{
+				a{
+					margin-right: 30px;
+				}
 			}
 		}
 	}
