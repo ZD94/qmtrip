@@ -32,6 +32,9 @@ var staff = {};
  */
 staff.createStaff = function(data, callback){
     var defer = Q.defer();
+    var type = data.type;//若type为import则为导入添加
+    if(type)
+        delete data.type;
     if (!data) {
         defer.reject(L.ERR.DATA_NOT_EXIST);
         return defer.promise.nodeify(callback);
@@ -65,6 +68,9 @@ staff.createStaff = function(data, callback){
                 return data;
             }
             var accData = {email: data.email, mobile: data.mobile, pwd: "123456"};//初始密码暂定123456
+            if(type && type == "import"){
+                accData = {email: data.email, mobile: data.mobile, status: 1}//若为导入员工置为激活状态 不设置密码
+            }
             return API.auth.newAccount(accData)
                 .then(function(account){
                     data.id = account.id;
@@ -509,7 +515,7 @@ staff.importExcelAction = function(params, callback){
             if(index>0 && index<200){
                 var s = data[index];
 //                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, roleId: s.roleId, companyId: s.companyId};//company_id默认为当前登录人的company_id
-                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, companyId: s.companyId};//company_id默认为当前登录人的company_id
+                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, companyId: s.companyId, type:"import"};//company_id默认为当前登录人的company_id
 
                 return staff.createStaff(staffObj)
                     .then(function(ret){
