@@ -17,7 +17,7 @@ describe("api/client/travelBudget.js", function() {
 
     it("#getHotelBudget should be ok", function(done) {
         travelBudget.getHotelBudget({cityId: "CT_131", checkInDate: inboundDate, checkOutDate: outboundDate}, function(err, result) {
-            console.info(result);
+            //console.info(result);
             var price = result.price ? true: false;
             //var hotel = result.hotel ? true: false;
             assert.equal(price, true);

@@ -15,13 +15,7 @@ var L = require("common/language");
  * @class travelBudget 旅行预算
  * @type {{__public: boolean}}
  */
-var travelBudget = {
-    /**
-     * @property __public 是否公共模块
-     * @type {Boolean}
-     */
-    __public: true
-};
+var travelBudget = {};
 
 /**
  * @method getTravelPolicyBudget
@@ -67,15 +61,61 @@ travelBudget.getTravelPolicyBudget = function(params, callback) {
  * @return {Promise} {prize: 1000, hotel: "酒店名称"}
  */
 travelBudget.getHotelBudget = function(params, callback) {
-    if (!params) {
-        throw L.ERR.DATA_FORMAT_ERROR;
+    if (!params || !(typeof params == 'object')) {
+        params = {};
     }
+    var self = this;
+    var cityId = params.cityId;
+    var accountId = self.accountId;
+    var businessDistrict = params.businessDistrict;
+    var checkInDate = params.checkInDate;
+    var checkOutDate = params.checkOutDate;
 
-    if (!params.cityId) {
-        throw {code: -1, msg: "城市信息不存在"};
-    }
+    return Q()
+        .then(function() {
+            if (cityId) {
+                throw L.ERR.CITY_NOT_EXIST;
+            }
 
-    return API.travelbudget.getHotelBudget(params, callback);
+            if (!checkInDate || !validate.isDate(checkInDate)) {
+                throw L.ERR.CHECK_IN_DATE_FORMAT_ERROR;
+            }
+
+            if (!checkOutDate || !validate.isDate(checkOutDate)) {
+                throw L.ERR.CHECK_OUT_DATE_FORMAT_ERROR;
+            }
+
+            //查询员工信息
+            return API.staff.getStaff({id: accountId})
+        })
+        .then(function(staff) {
+            if (!staff || !staff.travelLevel) {
+                throw L.ERR.TRAVEL_POLICY_NOT_EXIST;
+            }
+            //查询员工差旅标准
+            return API.travelPolicy.getTravelPolicy({id: staff.travelLevel})
+        })
+        .then(function(travelPolicy) {
+            if (!travelPolicy) {
+                throw L.ERR.TRAVEL_POLICY_NOT_EXIST;
+            }
+            var hotelStar = 3;
+            if (/四星级/g.test(travelPolicy.hotelLevel)) {
+                hotelStar = 4;
+            }
+            if (/五星级/g.test(travelPolicy.hotelLevel)) {
+                hotelStar = 5;
+            }
+
+            var data = {
+                maxMoney: travelPolicy.hotelPrice,
+                hotelStar: hotelStar,
+                cityId: cityId,
+                businessDistrict: businessDistrict
+            }
+            return API.travelbudget.getHotelBudget(data);
+        })
+        .nodeify(callback);
 }
 
 /**

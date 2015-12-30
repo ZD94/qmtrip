@@ -76,6 +76,8 @@
     "md5": "^2.0.0",
     "notie": "^2.1.0",
     "swiper": "^3.2.7",
+    "through2": "^2.0.0",
+    "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.6.1"
   }

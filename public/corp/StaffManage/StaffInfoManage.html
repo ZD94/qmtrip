@@ -216,7 +216,7 @@
         <div class="staff_tab_valid_head">
             <div class="staff_valid_head">
                 <span>批量导入成员:</span>
-                <span ng-click="">返回</span>
+                <span ng-click="backToImport()">返回</span>
             </div>
             <p>
                 导入总数为：<span>200</span>,有效数为：<span>185</span>,无效数为：<span style="color: #de492a;">3</span>
@@ -226,7 +226,7 @@
             <div class="preview_head_text">
                 <span class="blue_block"></span>
                 无效成员预览
-                <a>点击下载列表</a>
+                <a ng-click="downloadExcleData('invalid')">点击下载列表</a>
             </div>
             <ul class="preview_require_head">
                 <li>姓名</li>
@@ -236,20 +236,20 @@
                 <li>差旅标准</li>
                 <li>原因</li>
             </ul>
-            <ul class="preview_data" ng-repeat="item in invalid" >
-                <li></li>
-                <li></li>
-                <li></li>
-                <li></li>
-                <li></li>
-                <li></li>
+            <ul class="preview_data" ng-repeat="item in invalid track by $index" >
+                <li>{{item.name}}</li>
+                <li>{{item.email}}</li>
+                <li>{{item.mobile}}</li>
+                <li>{{item.department}}</li>
+                <li>{{item.travelLevelName}}</li>
+                <li class="special">{{item.reason}}</li>
             </ul>
         </div>
         <div class="staff_valid">
             <div class="preview_head_text">
                 <span class="blue_block"></span>
                 导入成员预览
-                <a>点击下载列表</a>
+                <a ng-click="downloadExcleData('valid')">点击下载列表</a>
                 <a class="tip">管理员权限设置可在导入成功后，进入<span class="blue">员工信息列表</span>单独设置</a>
             </div>
             <ul class="preview_require_head">
@@ -260,14 +260,34 @@
                 <li>差旅标准</li>
                 <li>权限</li>
             </ul>
-            <ul class="preview_data" ng-repeat="item in valid" >
-                <li></li>
-                <li></li>
-                <li></li>
-                <li></li>
-                <li></li>
-                <li></li>
+            <ul class="preview_data" ng-repeat="item in valid track by $index" >
+                <li>{{item.name}}</li>
+                <li>{{item.email}}</li>
+                <li>{{item.mobile}}</li>
+                <li>{{item.department}}</li>
+                <li>{{item.travelLevelName}}</li>
+                <li>普通员工</li>
             </ul>
+        </div>
+        <div class="import_btn">
+            <span ng-click="importData()">导入</span>
+            <span ng-click="backToImport()">取消</span>
+        </div>
+    </div>
+
+    <!--导入成功页面-->
+    <div class="staff_import_success">
+        <div class="staff_tab_valid_head">
+            <div class="staff_valid_head">
+                <span>批量导入成员</span>
+                <span ng-click="backToImport()">继续批量导入</span>
+                <span ng-click="backToAddStaff()">返回</span>
+            </div>
+        </div>
+        <div class="staff_import_success_content">
+            <p>数据导入成功！</p>
+            <p>成功导入数据<span>100</span>条</p>
+            <p>无效数据<span>10</span>条未导入，<a>点击下载列表</a></p>
         </div>
     </div>
 </div>
@@ -291,6 +311,10 @@
         $(document).on("click","#change",function(){
             $(".add_staff2").hide();
             $(this).closest("ul").find(".add_staff2").show();
+        })
+
+        $(".preview_data>li").hover(function(){
+
         })
     })
 </script>

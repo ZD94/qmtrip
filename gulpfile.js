@@ -12,10 +12,10 @@ gulplib.bundle_lib('bootstrap', ["bootstrap"]);
 gulplib.bundle_lib('notie', ['notie']);
 gulplib.bundle_lib('swiper', ['swiper']);
 
-gulplib.angular_app('staff', 'public/staff');
-gulplib.angular_app('corp', 'public/corp');
-gulplib.angular_app('agency', 'public/agency');
-gulplib.angular_app('demo', 'public/demo');
+gulplib.angular_app('staff');
+gulplib.angular_app('corp');
+gulplib.angular_app('agency');
+gulplib.angular_app('demo');
 
 
 gulplib.dist(function(){
@@ -23,7 +23,7 @@ gulplib.dist(function(){
     var filter = require('gulp-filter');
     var dist_all = [
         gulp.src(['public/**/*'])
-            .pipe(filter(['**', '!**/controller.js', '!**/*.less', '!**/*.css.map']))
+            .pipe(filter(['**', '!**/controller.js', '!**/*.less', '!**/*.map']))
             .pipe(gulp.dest('dist/public')),
         gulp.src('api/**/*')
             .pipe(gulp.dest('dist/api')),
