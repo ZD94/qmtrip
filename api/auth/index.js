@@ -318,6 +318,14 @@ authServer.newAccount = function(data, callback) {
                         return account;
                     })
             }
+
+            if (!account.pwd) {
+                return authServer.sendResetPwdEmail({accountId: account.id, isFirstSet: true})
+                    .then(function() {
+                        return account;
+                    })
+            }
+
             return account;
         })
         .nodeify(callback);
