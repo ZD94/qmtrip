@@ -35,6 +35,7 @@
 | params.consumeDetails[N].hotelName        |酒店名称，酒店消费需要      |varchar  |
 | params.consumeDetails[N].startTime        |开始时间         |date   |必填
 | params.consumeDetails[N].endTime        |结束时间    |date   |
+| params.consumeDetails[N].latestArriveTime  |最晚到达时间  |date |
 | params.consumeDetails[N].budget        |该次消费预算      |numeric(15,2)      |必填
 | params.consumeDetails[N].expenditure        |该次消费支出      |numeric(15,2)  |
 | params.consumeDetails[N].invoiceType        |票据类型 1：机票 2：酒店发票      |integer    |

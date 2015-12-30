@@ -31,7 +31,6 @@ CREATE TABLE agency (
     name character varying(100),
     description text,
     status integer default 0,
-    address character varying,
     email character varying(50),
     telephone character varying(15),
     mobile character varying(11),
@@ -144,6 +143,7 @@ ALTER sequence agency.agency_agency_no_seq restart with 101;
 --
 create table agency.agency_user (
     id uuid primary key,
+    status integer default 0,
     name varchar(50),
     sex integer DEFAULT 1,
     mobile character varying(20), -- 手机

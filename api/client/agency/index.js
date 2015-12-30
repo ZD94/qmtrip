@@ -42,7 +42,8 @@ agency.registerAgency = function(params, callback){
  * @returns {*}
  */
 agency.updateAgency = function(params, callback){
-    params.createUser = this.accountId;
+    var self = this;
+    params.userId = self.accountId;
     return API.agency.updateAgency(params, callback);
 }
 
@@ -53,9 +54,10 @@ agency.updateAgency = function(params, callback){
  * @returns {*}
  */
 agency.getAgencyById = function(agencyId, callback){
+    var self = this;
     var params = {
         agencyId: agencyId,
-        userId: this.accountId
+        userId: self.accountId
     }
     return API.agency.getAgency(params, callback);
 }
@@ -78,9 +80,10 @@ agency.listAgency = function(params, callback){
  * @returns {*}
  */
 agency.deleteAgency = function(agencyId, callback){
+    var self = this;
     var params = {
         agencyId: agencyId,
-        userId: this.accountId
+        userId: self.accountId
     }
     return API.agency.deleteAgency(params, callback);
 }
@@ -88,7 +91,9 @@ agency.deleteAgency = function(agencyId, callback){
 /**************** 代理商用户相关 ****************/
 
 agency.createAgencyUser = function(params, callback){
-    return API.agency.getAgencyUser(this.accountId)
+    var self = this;
+    var accountId = self.accountId;
+    return API.agency.getAgencyUser({id: accountId})
         .then(function(user){
             var agencyId = user.agencyId;
             params.agencyId = agencyId;
@@ -97,12 +102,33 @@ agency.createAgencyUser = function(params, callback){
         .nodeify(callback);
 };
 
-agency.deleteAgencyUser = API.agency.deleteAgencyUser;
-agency.updateAgencyUser = API.agency.updateAgencyUser;
-agency.getAgencyUser = API.agency.getAgencyUser;
-agency.getCurrentAgency = function(callback){
-    return API.agency.getAgencyUser({id:this.accountId}, callback);
+/**
+ * 获取当前代理商用户
+ * @param callback
+ * @returns {*}
+ */
+agency.getCurrentAgencyUser = function(callback){
+    var self = this;
+    var accountId = self.accountId;
+    return API.agency.getAgencyUser({id: accountId}, callback);
 }
+
+/**
+ * 删除代理商用户
+ * @param userId
+ * @param callback
+ * @returns {*}
+ */
+agency.deleteAgencyUser = function(userId, callback){
+    return API.agency.deleteAgencyUser({id: userId}, callback);
+}
+
+agency.updateAgencyUser = API.agency.updateAgencyUser;
+
+agency.getAgencyUser = function(userId, callback){
+    return API.agency.getAgencyUser({id: userId}, callback);
+}
+
 agency.listAndPaginateAgencyUser = API.agency.listAndPaginateAgencyUser;
 
 module.exports = agency;

@@ -13,7 +13,6 @@ module.exports = function(Db, DataType) {
         name       : {type: DataType.STRING(100) }, //代理商名称
         description: {type: DataType.TEXT }, //代理商描述
         status     : {type: DataType.INTEGER,       defaultValue: 0 }, //代理商状态
-        address    : {type: DataType.STRING }, //代理商地址
         email      : {type: DataType.STRING(50) }, //代理商邮箱
         telephone  : {type: DataType.STRING(15) }, //联系电话
         mobile     : {type: DataType.STRING(11) }, //联系手机

@@ -190,7 +190,7 @@
 | addObj     | 成功数据 |json string
 | noAddObj     | 失败数据 |json string
 
->. 执行导入 API.staff.importExcelAction(params, callback);
+>. 生成下载文件 API.staff.downloadExcle(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------

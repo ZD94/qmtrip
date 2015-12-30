@@ -544,10 +544,10 @@ var businessTravel=(function(){
                 var order = {
                     companyId:$scope.companyId,
                     type:1,
+                    remark:$scope.purposename,
                     startPlace:$scope.startplace,
                     destination:$scope.endplace,
                     startAt:$scope.starttime,
-                    backAt:$scope.endtime,
                     startTime:$scope.livetime,
                     endTime:$scope.leavetime,
                     budget:$scope.totalprice,
@@ -558,17 +558,13 @@ var businessTravel=(function(){
                 if(liv==1){
                     var consumeDetails_hotel = {
                         type:0,
-                            hotelName:$scope.liveplace,
+                        hotelName:$scope.liveplace,
                         startTime:$scope.livetime,
                         endTime:$scope.leavetime,
                         budget:$scope.liveprice,
                         invoiceType:2
                     }
                     consumeDetails.push(consumeDetails_hotel);
-                    console.info(consumeDetails_hotel);
-                    console.info('-------------------------');
-                    console.info(consumeDetails);
-                    console.info('-------------------------');
                 }
 
                 //去程
@@ -584,11 +580,10 @@ var businessTravel=(function(){
                     if($scope.endtime){
                         consumeDetails_outTraffic.endtime = $scope.endtime;
                     }
+                    if($scope.starttimelate){
+                        consumeDetails_outTraffic.latestArriveTime = $scope.starttime+' '+$scope.starttimelate;
+                    }
                     consumeDetails.push(consumeDetails_outTraffic);
-                    console.info(consumeDetails_outTraffic);
-                    console.info('-------------------------');
-                    console.info(consumeDetails);
-                    console.info('-------------------------');
                 }
 
                 //回程
@@ -602,11 +597,10 @@ var businessTravel=(function(){
                         budget:0,
                         invoiceType:1
                     }
+                    if($scope.endtimelate){
+                        consumeDetails_backTraffic.latestArriveTime = $scope.endtime+' '+$scope.endtimelate;
+                    }
                     consumeDetails.push(consumeDetails_backTraffic);
-                    console.info(consumeDetails_backTraffic);
-                    console.info('-------------------------');
-                    console.info(consumeDetails);
-                    console.info('-------------------------');
                 }
                 order.consumeDetails = consumeDetails;
 
