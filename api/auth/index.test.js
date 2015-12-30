@@ -3,6 +3,7 @@
  */
 
 var auth = require("./index");
+var assert = require("assert");
 
 describe("api/auth/index.js", function() {
 

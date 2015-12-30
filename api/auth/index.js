@@ -252,7 +252,7 @@ authServer.remove = function(data, callback) {
  * @param {Object} data 参数
  * @param {String} data.mobile 手机号
  * @param {String} data.email 邮箱
- * @param {String} data.pwd 密码
+ * @param {String} [data.pwd] 密码
  * @param {Integer} data.type  账号类型 默认1.企业员工 2.代理商员工
  * @param {INTEGER} data.status 账号状态 0未激活, 1.已激活 如果为0将发送激活邮件,如果1则不发送
  * @param {Callback} callback 回调函数
@@ -276,9 +276,11 @@ authServer.newAccount = function(data, callback) {
         return defer.promise.nodeify(callback);
     }
 
-    if (!data.pwd) {
-        defer.reject(L.ERR.PASSWORD_EMPTY);
-        return defer.promise.nodeify(callback);
+    if (data.pwd) {
+        var pwd = data.pwd;
+        pwd = md5(pwd);
+        //defer.reject(L.ERR.PASSWORD_EMPTY);
+        //return defer.promise.nodeify(callback);
     }
 
     var mobile = data.mobile;
@@ -306,8 +308,6 @@ authServer.newAccount = function(data, callback) {
         })
         .then(function() {
             var status = data.status? data.status: ACCOUNT_STATUS.NOT_ACTIVE;
-            var pwd = data.pwd;
-            pwd = md5(pwd);
             var id = data.id?data.id:uuid.v1();
             return Models.Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status, type: type});
         })
