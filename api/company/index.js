@@ -28,7 +28,7 @@ var company = {};
  * @returns {Promise}
  */
 company.createCompany = function(params, callback){
-    return checkParams(['createUser', 'name', 'domainName'], params)
+    return checkParams(['createUser', 'name', 'domainName', 'mobile', 'email'], params)
         .then(function(){
             if(!params.id){
                 params.id = uuid.v1();

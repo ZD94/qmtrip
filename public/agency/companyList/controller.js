@@ -12,7 +12,7 @@ module.exports = (function(){
 		$scope.initCompanyList = function(){
 			
 			API.onload(function(){
-				API.agency.getCurrentAgency(function(err, agency){
+				API.agency.getCurrentAgencyUser(function(err, agency){
 					// console.info(err);
 					// console.info(agency);
 				})
