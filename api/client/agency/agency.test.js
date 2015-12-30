@@ -20,7 +20,6 @@ describe("api/client/agency.js", function() {
         userName: "喵喵",
         name: '代理商喵喵',
         mobile: "15269866801",
-        id: "aef7f968-9fe9-11e5-a67e-ad403d808899"
     };
 
     var accountId = "6cee7e00-aa21-11e5-a377-2fe1a7dbc5e1";

@@ -10,6 +10,7 @@ var API = require('common/api');
 var Logger = require('common/logger');
 var checkPermission = require('../auth').checkPermission;
 var logger = new Logger();
+var uuid = require("node-uuid");
 
 /**
  * @class company 公司信息
@@ -27,8 +28,39 @@ var company = {}
  * @returns {*}
  */
 company.createCompany = function(params, callback){
-    params.createUser = this.accountId;
-    return API.company.createCompany(params, callback);
+    var self = this;
+    var accountId = self.accountId;
+    params.createUser = accountId;
+    if(!params.mobile || !params.email || !params.name || !params.domain){
+        throw {code: -1, msg: '参数不正确'};
+    }
+    var mobile = params.mobile;
+    var email = params.email;
+    var pwd = params.pwd || md5('123456');
+    var domain = params.domain;
+    var companyName = params.name;
+    return API.agency.getAgencyUser({id: accountId})
+        .then(function(agency){
+            return agency.id;
+        })
+        .then(function(agencyId){
+            params.agencyId = agencyId;
+            API.auth.newAccount({mobile: mobile, email: email, pwd: pwd, type: 1})
+        })
+        .then(function(account){
+            console.info("************************");
+            console.info(account);
+            var companyId = params.companyId || uuid.v1();
+            return Q.all([
+                API.company.createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain,
+                    mobile:mobile, email: email}),
+                API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
+                    mobile: mobile, name: name, roleId: 0})
+            ])
+        })
+        .then(function(){
+            return {code: 0, msg: '创建成功'};
+        }).nodeify(callback);
 };
 
 /**
@@ -76,7 +108,6 @@ company.getCompanyListByAgency = //checkAgencyPermission(["company.query"],
         }
         return API.agency.getAgencyUser({id: accountId})
             .then(function(user){
-                logger.info(user);
                 params.agencyId = user.agencyId;
                 return API.company.listCompany(params, callback);
             })
