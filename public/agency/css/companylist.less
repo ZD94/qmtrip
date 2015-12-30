@@ -11,4 +11,47 @@
 			line-height: 40px;
 		}
 	}
+	.companylist{
+		padding: 10px;
+		h3{
+			
+		}
+		.company{
+			width: 100%;
+			border:1px solid #e5e5e5;
+			tr{
+				border-top:1px solid #e5e5e5;
+				height: 30px;
+				line-height: 30px;
+				td{
+					&:nth-child(1){
+						padding-left: 10px;
+					}
+					a{
+						color:#01BDFF;
+					}
+				}
+				&:nth-child(1){
+					border-top:0;
+					td{
+						height: 40px;
+						line-height: 40px;
+					}
+				}
+			}
+		}
+	}
+}
+.companyinfo{
+	background: #fff;
+	margin-top: 20px;
+	.company_tab{
+		li{
+			&.on{
+				border:1px solid #e5e5e5;
+				border-bottom: 0;
+				border-radius: 5px;
+			}
+		}
+	}
 }

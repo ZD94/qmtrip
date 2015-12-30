@@ -5,6 +5,28 @@
 			<span>公司总数{{}}</span>
 			<span>今日新增公司数{{}}</span>
 		</div>
-		<div class="companylist"></div>
+	</div>
+	<div class="companylist">
+		<h3>公司列表</h3>
+		<table class="company">
+			<tr>
+				<td>企业名称</td>
+				<td>联系人姓名</td>
+				<td>联系人电话</td>
+				<td>注册时间</td>
+				<td>员工数</td>
+				<td>出差记录</td>
+				<td>账户余额</td>
+			</tr>
+			<tr ng-repeat="item in companylist">
+				<td><a href="#/companyList/CompanyList?company=">{{item.name}}</a></td>
+				<td></td>
+				<td></td>
+				<td>{{item.createAt | date:"yyyy-MM-dd HH:mm:ss"}}</td>
+				<td>{{item.staffNum}}</td>
+				<td>{{}}</td>
+				<td></td>
+			</tr>
+		</table>
 	</div>
 </div>

@@ -105,11 +105,7 @@ travelPolicy.getTravelPolicy = function(params, callback){
             if(!id){
                 if(data.companyId){
                     //若该员工没有指定差旅标准 默认返回该企业最早添加的差旅标准
-                    var options = {
-                        where: {
-                            companyId: data.companyId //只允许查询该企业下的差旅标准
-                        }
-                    };
+                    var options = {where: {companyId: data.companyId}};
                     options.order = "create_at asc";//[["create_at", "desc"]]
                     return API.travelPolicy.getAllTravelPolicy(options)
                         .then(function(obj){
@@ -124,7 +120,7 @@ travelPolicy.getTravelPolicy = function(params, callback){
                             }
                         })
                 }else{
-                    //若该企业没有差旅标准默认返回系统默认差旅标准
+                    //若该员工没有所属企业
                     return API.travelPolicy.getTravelPolicy({id:'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a'})
                         .then(function(tp){
                             return tp;
@@ -137,23 +133,10 @@ travelPolicy.getTravelPolicy = function(params, callback){
                             if(tp.companyId == data.companyId){
                                 return tp;
                             }else{
-                                defer.reject({code: -1, msg: '无权限'});
-                                return defer.promise;
+                                throw {code: -1, msg: '无权限'};
                             }
                         }else{
-                            //若该员工引用的差旅标准被删除使用默认标准（有待修改 被引用的差旅标准 不让删除）
-                            return API.travelPolicy.getAllTravelPolicy(options)
-                                .then(function(obj){
-                                    if(obj && obj.length > 0){
-                                        return obj[0];
-                                    }else{
-                                        //若该企业没有差旅标准默认返回系统默认差旅标准
-                                        return API.travelPolicy.getTravelPolicy({id:'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a'})
-                                            .then(function(tp){
-                                                return tp;
-                                            })
-                                    }
-                                })
+                            throw {code: -1, msg: '查询结果不存在'};
                         }
 
                     })

@@ -3,6 +3,7 @@
  */
 
 var auth = require("./index");
+var assert = require("assert");
 
 describe("api/auth/index.js", function() {
 
@@ -34,7 +35,7 @@ describe("api/auth/index.js", function() {
             throw new Error("not found accountId");
         }
 
-        auth.sendResetPwdEmail({accountId: accountId, isFirstSet: true}, function(err, reuslt) {
+        auth.sendResetPwdEmail({accountId: accountId, isFirstSet: true}, function(err, result) {
             if (err) {
                 throw err;
             }

@@ -34,7 +34,7 @@ var staff = (function(){
                     .then(function(staff){
                         API.staff.listAndPaginateStaff({companyId:staff.companyId})
                             .then(function(staffinfo){
-                                console.info(staffinfo);
+                                //console.info(staffinfo);
                                 $scope.staffs = staffinfo.items;
                                 //console.info($scope.staff);
                                 var tasks = $scope.staffs
@@ -148,6 +148,9 @@ var staff = (function(){
                             $scope.initStaff();
                             $scope.$apply();
                         }).catch(function (err) {
+                            $scope.block_tip_err = err.msg;
+                            $(".block_tip").show();
+                            $scope.$apply();
                             console.info(err);
                         }).done();
                 })
@@ -202,11 +205,11 @@ var staff = (function(){
 
         //删除员工的信息
         $scope.delStaffInfo = function(id, index) {
-            console.log(index);
+            //console.log(index);
             API.onload(function(){
                 API.staff.deleteStaff({id:id})
                     .then(function(newStaff){
-                        console.info(456);
+                        //console.info(456);
                         $scope.staffs.splice(index, 1);
                         //$scope.initstafflist();
                         $scope.$apply();
@@ -220,6 +223,8 @@ var staff = (function(){
         $scope.addALotStaff = function(){
             $(".staff_tab_content").hide();
             $(".staff_tab_import").show();
+            $(".staff_tab_valid").hide();
+            $(".staff_import_success").hide();
             //alert(123);
         }
 
@@ -227,6 +232,9 @@ var staff = (function(){
         $scope.backToAddStaff = function(){
             $(".staff_tab_content").show();
             $(".staff_tab_import").hide();
+            $(".staff_tab_valid").hide();
+            $(".staff_import_success").hide();
+            $scope.initStaff();
         }
 
         //上传文件进入预览页
@@ -234,16 +242,24 @@ var staff = (function(){
             $(".staff_tab_valid").show();
             $(".staff_tab_content").hide();
             $(".staff_tab_import").hide();
+            $(".staff_import_success").hide();
             var md5key = $("#fileMd5key").val();
             API.onload(function(){
-                API.staff.getCurrentStaff()//获取当前登录人员的企业id
+                API.staff.getCurrentStaff()//获取当前登录人员的id
                     .then(function(staffid){
-                        console.info(staffid);
-                        console.info(staffid.id);
-                        console.info(md5key);
+                        //console.info(staffid);
+                        //console.info(staffid.id);
+                        //console.info(md5key);
                         API.staff.beforeImportExcel({accountId:staffid.id,md5key:md5key})
                             .then(function(allData){
-                                console.info(allData);
+                                //console.info(allData);
+                                //console.info(allData.noAddObj);
+                                $scope.invalid = JSON.parse(allData.noAddObj);
+                                $scope.valid = JSON.parse(allData.addObj);
+                                $scope.downloadInvalidData = allData.downloadNoAddObj;
+                                $scope.downloadValidData = allData.downloadAddObj;
+                                //return $scope.valid;
+                                $scope.$apply();
                             })
                             .catch(function(err){
                                 console.info(err);
@@ -255,6 +271,56 @@ var staff = (function(){
             })
         }
 
+        //从预览界面返回至员工批量导入
+        $scope.backToImport = function(){
+            $(".staff_tab_valid").hide();
+            $(".staff_tab_content").hide();
+            $(".staff_import_success").hide();
+            $(".staff_tab_import").show();
+        }
+
+        //下载无效数据列表
+        $scope.downloadExcleData = function(type){
+            API.onload(function(){
+                API.staff.getCurrentStaff()//获取当前登录人员的id
+                    .then(function(staffid){
+                        var objAttr = $scope.downloadInvalidData;
+                        if(type == "valid"){
+                            objAttr = $scope.downloadValidData;
+                        }
+                        API.staff.downloadExcle({accountId:staffid.id,objAttr:objAttr})
+                            .then(function(invalidData){
+                                console.info(invalidData);
+                                var filename = invalidData.fileName;
+                                window.location.href = '/download/excle-file/'+filename;
+                                $scope.$apply();
+                            }).catch(function(err){
+                                console.info(err);
+                            })
+                    }).catch(function(err){
+                        console.info(err);
+                    }).done();
+            })
+        }
+
+        //确定导入数据
+        $scope.importData = function(){
+            console.log($scope.valid);
+            API.onload(function(){
+                API.staff.importExcelAction({addObj:$scope.valid})
+                    .then(function(data){
+                        console.info(data.addObj);
+                        console.info(data.noAddObj);
+                        $(".staff_import_success").show();
+                        $(".staff_tab_valid").hide();
+                        $(".staff_tab_content").hide();
+                        $(".staff_tab_import").hide();
+                        $scope.$apply();
+                    }).catch(function(err){
+                        console.info(err);
+                    }).done();
+            })
+        }
     }
 
     return staff;
