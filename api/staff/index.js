@@ -219,7 +219,7 @@ staff.listAndPaginateStaff = function(params, callback){
     if (options.perPage && /^\d+$/.test(options.perPage)) {
         perPage = options.perPage;
     } else {
-        perPage = 6;
+        perPage = 10;
     }
     limit = perPage;
     offset = (page - 1) * perPage;
@@ -502,11 +502,11 @@ staff.importExcelAction = function(params, callback){
         defer.reject({code: -1, msg: "params.addObj不能为空"});
         return defer.promise.nodeify(callback);
     }
-    var data = JSON.parse(params.addObj);
+    var data = params.addObj;
     var noAddObj = [];
     var addObj = [];
     return Q.all(data.map(function(item, index){
-            if(index>0 && index<200){
+            if(index>=0 && index<200){
                 var s = data[index];
 //                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, roleId: s.roleId, companyId: s.companyId};//company_id默认为当前登录人的company_id
                 var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, companyId: s.companyId};//company_id默认为当前登录人的company_id
