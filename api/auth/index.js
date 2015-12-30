@@ -312,16 +312,16 @@ authServer.newAccount = function(data, callback) {
             return Models.Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status, type: type});
         })
         .then(function(account) {
-            if (account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
-                return _sendActiveEmail(account.id)
-                    .then(function(){
+            if (!account.pwd) {
+                return authServer.sendResetPwdEmail({accountId: account.id, isFirstSet: true})
+                    .then(function() {
                         return account;
                     })
             }
 
-            if (!account.pwd) {
-                return authServer.sendResetPwdEmail({accountId: account.id, isFirstSet: true})
-                    .then(function() {
+            if (account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
+                return _sendActiveEmail(account.id)
+                    .then(function(){
                         return account;
                     })
             }
