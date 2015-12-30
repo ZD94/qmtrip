@@ -115,6 +115,25 @@ staff.getStaff = auth.checkPermission(["user.query"],
             .nodeify(callback);
     });
 
+//代理商根据id得到员工信息
+staff.getStaffByAgency = function(staffId, callback){
+    var user_id = this.accountId;
+    return API.agency.getAgencyUser({id: user_id})
+    .then(function(user){
+        var agencyId = user.agencyId;
+        return agencyId;
+    })
+    .then(function(agencyId){
+        return API.staff.getStaff({id: staffId})
+        .then(function(staff){
+            // if(agencyId != staff.companyId){
+            //     throw L.ERR.PERMISSION_DENY;
+            // }
+            return staff;
+        })
+    }).nodeify(callback);
+}
+
 /**
  * @method getCurrentStaff
  *

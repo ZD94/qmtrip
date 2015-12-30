@@ -6,7 +6,6 @@ var path = require('path');
 process.env.NODE_PATH = '.:'+process.env.NODE_PATH;
 
 require('app-module-path').addPath(path.normalize(path.join(__dirname, '..')));
-//console.log(__dirname);
 
 var config = require("../config");
 
@@ -23,6 +22,7 @@ var API = require('common/api');
 var model = require('common/model');
 model.init(config.postgres.url);
 
+
 API.init(path.join(__dirname, '../api'), config.api)
     .then(API.loadTests)
     .then(run)
@@ -30,4 +30,4 @@ API.init(path.join(__dirname, '../api'), config.api)
         logger.error(e.stack?e.stack:e);
         console.error(e.stack?e.stack:e);
         process.exit();
-    });
+    })

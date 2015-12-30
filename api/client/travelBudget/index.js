@@ -27,24 +27,111 @@ var travelBudget = {};
  * @param {String} params.destinationPlace 目的地
  * @param {String} params.outboundDate 出发时间 YYYY-MM-DD
  * @param {String} params.inboundDate 返回时间(可选) YYYY-MM-DD
- * @param {String} params.inLatestArriveTime 返程最晚时间
- * @param {String} params.outLatestArriveTime 出发最晚到达时间 HH:mm
- * @param {String} params.checkInDate 如果不传=outboundDate 入住时间
- * @param {String} params.checkOutDate 如果不传=inboundDate 离开时间
- * @param {String} params.businessDistrict 商圈ID
- * @param {Boolean} params.isRoundTrip 是否往返 [如果为true,inboundDate必须存在]
- * @param {Callback} callback
+ * @param {String} [params.inLatestArriveTime] 返程最晚时间
+ * @param {String} [params.outLatestArriveTime] 出发最晚到达时间 HH:mm
+ * @param {String} [params.checkInDate] 如果不传=outboundDate 入住时间
+ * @param {String} [params.checkOutDate] 如果不传=inboundDate 离开时间
+ * @param {String} [params.businessDistrict] 商圈ID
+ * @param {Boolean} [params.isRoundTrip] 是否往返 [如果为true,inboundDate必须存在]
+ * @param {Callback} [callback]
  * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
  */
 travelBudget.getTravelPolicyBudget = function(params, callback) {
-    var inboundDate = params.inboundDate;
-    var isRoundTrip = params.isRoundTrip || false;
+    var outboundDate = params.outboundDate; //离开时间
+    var inboundDate = params.inboundDate;   //出发时间
+    var isRoundTrip = params.isRoundTrip || false;  //是否往返
+    var originPlace = params.originPlace;
+    var destinationPlace = params.destinationPlace;
+    var checkInDate = params.checkInDate;
+    var checkOutDate = params.checkOutDate;
+    var businessDistrict = params.businessDistrict;
+    var outLatestArriveTime = params.outLatestArriveTime;
+    var inLatestArriveTime = params.inLatestArriveTime;
 
-    if (isRoundTrip && (!inboundDate || !validate.isDate(inboundDate))) {
-        throw L.ERR.DATA_FORMAT_ERROR;
-    }
+    return Q()
+        .then(function() {
+            if (!outboundDate || !validate.isDate(outboundDate)) {
+                throw L.ERR.OUTBOUND_DATE_FORMAT_ERROR;
+            }
 
-    return API.travelbudget.getTravelBudget(params, callback);
+            if (isRoundTrip && (!inboundDate || !validate.isDate(inboundDate))) {
+                throw L.ERR.INBOUND_DATE_FORMAT_ERROR;
+            }
+
+            if (!originPlace) {
+                throw L.ERR.CITY_NOT_EXIST;
+            }
+
+            if (!destinationPlace) {
+                throw L.ERR.CITY_NOT_EXIST;
+            }
+
+            if (!checkInDate) {
+                checkInDate = outboundDate;
+            }
+
+            if (!checkOutDate) {
+                checkOutDate = inboundDate;
+            }
+
+            //往返
+            if (isRoundTrip) {
+                return Q.all([
+                    travelBudget.getHotelBudget({
+                        cityId: destinationPlace,
+                        businessDistrict: businessDistrict,
+                        checkInDate: checkInDate,
+                        checkOutDate: checkOutDate
+                    }),
+                    travelBudget.getTrafficBudget({
+                        originPlace: originPlace,
+                        destinationPlace: destinationPlace,
+                        outboundDate: outboundDate,
+                        outLatestArriveTime: outLatestArriveTime
+                    }),
+                    travelBudget.getTrafficBudget({
+                        originPlace: destinationPlace,
+                        destinationPlace: originPlace,
+                        outboundDate: inboundDate,
+                        outLatestArriveTime: inLatestArriveTime
+                    })
+                ])
+                    .spread(function(hotel, goTraffic, backTraffic) {
+                        var trafficPrice = Number(goTraffic.price + backTraffic.price)
+                        return {hotel: hotel.price, traffic: trafficPrice, goTraffic: goTraffic.price, backTraffic: backTraffic.price};
+                    })
+            } else {
+                //单程
+                return Q.all([
+                    travelBudget.getHotelBudget({
+                        cityId: destinationPlace,
+                        businessDistrict: businessDistrict,
+                        checkInDate: checkInDate,
+                        checkOutDate: checkOutDate
+                    }),
+                    travelBudget.getTrafficBudget({
+                        originPlace: originPlace,
+                        destinationPlace: destinationPlace,
+                        outboundDate: outboundDate,
+                        outLatestArriveTime: outLatestArriveTime
+                    })
+                ])
+                    .spread(function(hotel, traffic) {
+                        return {hotel: hotel.price, traffic: traffic.price};
+                    })
+            }
+        })
+        .then(function(result) {
+            var price = result.traffic + result.hotel;
+            result.price = price;
+            return result;
+        })
+        .catch(function(err) {
+            console.info("发生错误了.....err")
+            console.info(err.stack);
+            throw err;
+        })
+        .nodeify(callback);
 }
 
 /**
@@ -73,7 +160,7 @@ travelBudget.getHotelBudget = function(params, callback) {
 
     return Q()
         .then(function() {
-            if (cityId) {
+            if (!cityId) {
                 throw L.ERR.CITY_NOT_EXIST;
             }
 
@@ -89,6 +176,7 @@ travelBudget.getHotelBudget = function(params, callback) {
             return API.staff.getStaff({id: accountId})
         })
         .then(function(staff) {
+            console.info("员工信息", staff)
             if (!staff || !staff.travelLevel) {
                 throw L.ERR.TRAVEL_POLICY_NOT_EXIST;
             }
@@ -96,6 +184,7 @@ travelBudget.getHotelBudget = function(params, callback) {
             return API.travelPolicy.getTravelPolicy({id: staff.travelLevel})
         })
         .then(function(travelPolicy) {
+            console.info("员工差旅标准", travelPolicy)
             if (!travelPolicy) {
                 throw L.ERR.TRAVEL_POLICY_NOT_EXIST;
             }

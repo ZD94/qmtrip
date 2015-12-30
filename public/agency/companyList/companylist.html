@@ -19,7 +19,7 @@
 				<td>账户余额</td>
 			</tr>
 			<tr ng-repeat="item in companylist">
-				<td><a href="#/companyList/CompanyList?company=">{{item.name}}</a></td>
+				<td><a href="#/companyList/CompanyDetail?company={{item.id}}">{{item.name}}</a></td>
 				<td></td>
 				<td></td>
 				<td>{{item.createAt | date:"yyyy-MM-dd HH:mm:ss"}}</td>
