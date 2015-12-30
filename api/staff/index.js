@@ -225,7 +225,7 @@ staff.listAndPaginateStaff = function(params, callback){
     if (options.perPage && /^\d+$/.test(options.perPage)) {
         perPage = options.perPage;
     } else {
-        perPage = 10;
+        perPage = 6;
     }
     limit = perPage;
     offset = (page - 1) * perPage;
@@ -500,7 +500,7 @@ staff.beforeImportExcel = function(params, callback){
                             addObj.push(staffObj);
                             downloadAddObj.push(s);
                         });
-                }else{
+                }else if(index != 0){
                     staffObj.reason = "文件最多两百行";
                     s[6] = "文件最多两百行";
                     noAddObj.push(staffObj);

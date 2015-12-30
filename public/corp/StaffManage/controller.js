@@ -292,7 +292,7 @@ var staff = (function(){
                             .then(function(invalidData){
                                 console.info(invalidData);
                                 var filename = invalidData.fileName;
-                                window.location.href = '/download/excle-file/'+filename;
+                                window.open('/download/excle-file/'+filename, "_blank");
                                 $scope.$apply();
                             }).catch(function(err){
                                 console.info(err);
