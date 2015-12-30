@@ -28,7 +28,7 @@ describe("api/client/agency.js", function() {
          it("API.agency.createAgencyUser", function(done) {
              API.agency.createAgencyUser(obj, function(err, result) {
                  assert.equal(err, null);
-                 console.log(result);
+                 //console.log(result);
                  id = result.id;
                  done();
             });
@@ -39,7 +39,7 @@ describe("api/client/agency.js", function() {
         it("API.agency.getAgencyUser", function(done) {
             API.agency.getAgencyUser({id: id}, function(err, result) {
                 assert.equal(err, null);
-                console.log(result);
+                //console.log(result);
 //                console.log(result.items);//item dataValues里存放的才是记录信息
                 done();
             });
@@ -51,7 +51,7 @@ describe("api/client/agency.js", function() {
         it("API.agency.listAndPaginateAgencyUser", function(done) {
             API.agency.listAndPaginateAgencyUser({}, function(err, result) {
                 assert.equal(err, null);
-                console.log(result);
+                //console.log(result);
 //                console.log(result.items);//item dataValues里存放的才是记录信息
                 done();
             });
@@ -63,7 +63,7 @@ describe("api/client/agency.js", function() {
              obj.id = id;
              API.agency.updateAgencyUser(obj, function(err, result) {
                  assert.equal(err, null);
-                 console.log(result);
+                 //console.log(result);
                  done();
              });
          })
@@ -73,7 +73,7 @@ describe("api/client/agency.js", function() {
          it("API.agency.deleteAgencyUser", function(done) {
              API.agency.deleteAgencyUser({id: id}, function(err, result) {
                  assert.equal(err, null);
-                 console.log(result);
+                 //console.log(result);
                  done();
              });
          })

@@ -28,7 +28,7 @@ describe("api/client/travelPolicy.js", function() {
             API.travelPolicy.createTravelPolicy(obj, function(err, result) {
                 assert.equal(err, null);
                 id = result.id;
-                console.log(result);
+                //console.log(result);
                 done();
             });
         })
@@ -38,7 +38,7 @@ describe("api/client/travelPolicy.js", function() {
         it("API.travelPolicy.getTravelPolicy", function(done) {
             API.travelPolicy.getTravelPolicy({id: id}, function(err, result) {
                 assert.equal(err, null);
-                console.log(result);
+                //console.log(result);
                 done();
             });
         })
@@ -48,7 +48,7 @@ describe("api/client/travelPolicy.js", function() {
         it("API.travelPolicy.listAndPaginateTravelPolicy", function(done) {
             API.travelPolicy.listAndPaginateTravelPolicy({companyId: companyId}, function(err, result) {
                 assert.equal(err, null);
-                console.log(result);
+                //console.log(result);
 //                console.log(result.items);//item dataValues里存放的才是记录信息
                 done();
             });
@@ -58,7 +58,7 @@ describe("api/client/travelPolicy.js", function() {
         it("API.travelPolicy.getAllTravelPolicy", function(done) {
             API.travelPolicy.getAllTravelPolicy({companyId: companyId}, function(err, result) {
                 assert.equal(err, null);
-                console.log(result);
+                //console.log(result);
 //                console.log(result.items);//item dataValues里存放的才是记录信息
                 done();
             });
@@ -70,7 +70,7 @@ describe("api/client/travelPolicy.js", function() {
             obj.id = id;
             API.travelPolicy.updateTravelPolicy(obj, function(err, result) {
                 assert.equal(err, null);
-                console.log(result);
+                //console.log(result);
                 done();
             });
         })
@@ -80,7 +80,7 @@ describe("api/client/travelPolicy.js", function() {
         it("API.travelPolicy.deleteTravelPolicy", function(done) {
             API.travelPolicy.deleteTravelPolicy({id: id}, function(err, result) {
                 assert.equal(err, null);
-                console.log(result);
+                //console.log(result);
                 done();
             });
         })
