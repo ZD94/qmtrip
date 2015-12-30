@@ -32,6 +32,9 @@ var staff = {};
  */
 staff.createStaff = function(data, callback){
     var defer = Q.defer();
+    var type = data.type;//若type为import则为导入添加
+    if(type)
+        delete data.type;
     if (!data) {
         defer.reject(L.ERR.DATA_NOT_EXIST);
         return defer.promise.nodeify(callback);
@@ -65,6 +68,9 @@ staff.createStaff = function(data, callback){
                 return data;
             }
             var accData = {email: data.email, mobile: data.mobile, pwd: "123456"};//初始密码暂定123456
+            if(type && type == "import"){
+                accData = {email: data.email, mobile: data.mobile, status: 1}//若为导入员工置为激活状态 不设置密码
+            }
             return API.auth.newAccount(accData)
                 .then(function(account){
                     data.id = account.id;
@@ -390,13 +396,12 @@ staff.beforeImportExcel = function(params, callback){
         .then(function(travalps){
             var data = xlsxObj[0].data;
             return Q.all(data.map(function(item, index){
-                if(index>0 && index<200){
-                    var s = data[index];
-                    s[1] = s[1] ? s[1]+"" : "";
+                var s = data[index];
+                s[1] = s[1] ? s[1]+"" : "";
 //                    var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
-                    var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
-                    item = staffObj;
-
+                var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
+                item = staffObj;
+                if(index>0 && index<200){//不取等于0的过滤抬头标题栏
                     if(!staffObj.name || staffObj.name==""){
                         staffObj.reason = "姓名为空";
                         s[6] = "姓名为空";
@@ -404,19 +409,53 @@ staff.beforeImportExcel = function(params, callback){
                         downloadNoAddObj.push(s);
                         return;
                     }
-                    if(!staffObj.mobile || staffObj.mobile=="" || mobileAttr.join(",").indexOf(s[1]) != -1){
-                        staffObj.reason = "手机号为空或与本次导入中手机号重复";
-                        s[6] = "手机号为空或与本次导入中手机号重复";
+                    if(!staffObj.mobile || staffObj.mobile==""){
+                        staffObj.reason = "手机号为空";
+                        s[6] = "手机号为空";
                         noAddObj.push(staffObj);
                         downloadNoAddObj.push(s);
                         return;
                     }
+                    if(mobileAttr.join(",").indexOf(s[1]) != -1){
+                        staffObj.reason = "手机号与本次导入中手机号重复";
+                        s[6] = "手机号与本次导入中手机号重复";
+                        noAddObj.push(staffObj);
+                        downloadNoAddObj.push(s)
+                        //addObj中删除重复手机号的用户
+                        for(var i=0;i<addObj.length;i++){
+                            var addStaff = addObj[i];
+                            if(addStaff.mobile == s[1]){
+                                addObj.splice(i, 1);
+                                downloadAddObj.splice(i, 1);
+                                noAddObj.push(addStaff);
+                                downloadNoAddObj.push(downloadAddObj[i]);
+                            }
+                        }
+                        return;
+                    }
                     mobileAttr.push(s[1]);
-                    if(!staffObj.email || staffObj.email=="" || emailAttr.join(",").indexOf(s[2]) != -1){
-                        staffObj.reason = "邮箱为空或与本次导入中邮箱重复";
-                        s[6] = "邮箱为空或与本次导入中邮箱重复";
+                    if(!staffObj.email || staffObj.email==""){
+                        staffObj.reason = "邮箱为空";
+                        s[6] = "邮箱为空";
                         noAddObj.push(staffObj);
                         downloadNoAddObj.push(s);
+                        return;
+                    }
+                    if(emailAttr.join(",").indexOf(s[2]) != -1){
+                        staffObj.reason = "邮箱与本次导入中邮箱重复";
+                        s[6] = "邮箱与本次导入中邮箱重复";
+                        noAddObj.push(staffObj);
+                        downloadNoAddObj.push(s);
+                        //addObj中删除重复邮箱的用户
+                        for(var i=0;i<addObj.length;i++){
+                            var addStaff = addObj[i];
+                            if(addStaff.email == s[2]){
+                                addObj.splice(i, 1);
+                                downloadAddObj.splice(i, 1);
+                                noAddObj.push(addStaff);
+                                downloadNoAddObj.push(downloadAddObj[i]);
+                            }
+                        }
                         return;
                     }
                     emailAttr.push(s[2]);
@@ -461,20 +500,12 @@ staff.beforeImportExcel = function(params, callback){
                             addObj.push(staffObj);
                             downloadAddObj.push(s);
                         });
-                    /*return staff.createStaff(staffObj)
-                     .then(function(ret){
-                     if(ret){
-                     item = ret.staff;
-                     addObj.push(item);
-                     }else{
-                     noAddObj.push(staffObj);
-                     }
-                     return item;
-                     })
-                     .catch(function(err){
-                     noAddObj.push(staffObj);
-                     console.log(err);
-                     })*/
+                }else{
+                    staffObj.reason = "文件最多两百行";
+                    s[6] = "文件最多两百行";
+                    noAddObj.push(staffObj);
+                    downloadNoAddObj.push(s);
+                    return;
                 }
             })).then(function(items){
                 data = items;
@@ -506,25 +537,29 @@ staff.importExcelAction = function(params, callback){
     var noAddObj = [];
     var addObj = [];
     return Q.all(data.map(function(item, index){
-            if(index>=0 && index<200){
-                var s = data[index];
+            var s = data[index];
 //                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, roleId: s.roleId, companyId: s.companyId};//company_id默认为当前登录人的company_id
-                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, companyId: s.companyId};//company_id默认为当前登录人的company_id
-
+            var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, companyId: s.companyId, type:"import"};//company_id默认为当前登录人的company_id
+            if(index>=0 && index<200){
                 return staff.createStaff(staffObj)
                     .then(function(ret){
                         if(ret){
                             item = ret;
                             addObj.push(item);
                         }else{
+                            staffObj.reason = "导入失败";
                             noAddObj.push(staffObj);
                         }
                         return item;
                     })
                     .catch(function(err){
+                        staffObj.reason = err.msg;
                         noAddObj.push(staffObj);
                         console.log(err);
                     })
+            }else{
+                staffObj.reason = "一次最多导入两百行";
+                noAddObj.push(staffObj);
             }
         })).then(function(items){
             data = items;

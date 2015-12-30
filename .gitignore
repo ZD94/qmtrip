@@ -6,6 +6,7 @@ node_modules
 /public/script/libs
 /doc
 controller.all.js
+controller.all.js.map
 config/config.local.json
 public/auth/css/*.css
 public/auth/css/*.css.map

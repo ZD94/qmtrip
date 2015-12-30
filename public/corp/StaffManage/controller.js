@@ -148,6 +148,9 @@ var staff = (function(){
                             $scope.initStaff();
                             $scope.$apply();
                         }).catch(function (err) {
+                            $scope.block_tip_err = err.msg;
+                            $(".block_tip").show();
+                            $scope.$apply();
                             console.info(err);
                         }).done();
                 })

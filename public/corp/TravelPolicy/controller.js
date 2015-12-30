@@ -105,7 +105,7 @@ var TravelPolicy=(function(){
 
         //删除标准
         $scope.deletePolicy = function (id,name) {
-            Myalert("温馨提示","删除成功");
+//            Myalert("温馨提示","删除成功");
             API.onload(function(){
                 API.travelPolicy.deleteTravelPolicy({id:id})
                     .then(function(result){
@@ -114,6 +114,7 @@ var TravelPolicy=(function(){
                         console.info (result);
                     })
                     .catch(function(err){
+                        Myalert("温馨提示",err.msg);
                         console.info (err);
                     });
             })
