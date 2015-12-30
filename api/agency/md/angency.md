@@ -149,11 +149,11 @@
 | agency   | 代理商信息|json
 
 
->. 删除代理商 API.agency.deleteAgency(agency, callback);
+>. 删除代理商 API.agency.deleteAgency(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
-| agencyId                      |代理商id               |uuid             |必填
+| params.id                      |删除代理商id               |uuid             |必填
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |

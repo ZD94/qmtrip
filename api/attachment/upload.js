@@ -120,35 +120,6 @@ function getImg(req, res, next) {
 }
 
 function downloadExcle(req, res, next){
-    /*var datas = '[[null,"12365489658","15fhf3gdgf@gmail.com","销售部123","一级标准",1,"姓名为空"],' +
-            '["test11","","15fhfgfhfhy3@gmail.com","销售部","一级标准",1,"手机号为空或与本次导入中手机号重复"],' +
-            '["test12","12365489658",null,"销售部","一级标准",1,"邮箱为空或与本次导入中邮箱重复"],' +
-            '["test13","12365489658","15fhhjuhf3@gmail.com",null,"一级标准",1,"手机号为空或与本次导入中手机号重复"],' +
-            '["test14","12365489658","1hhgh5fhf3@gmail.com","销售部",null,1,"手机号为空或与本次导入中手机号重复"],' +
-            '["test15","12365489658","15fhf3@gmail.com","销售部","一级标准",1,"邮箱为空或与本次导入中邮箱重复"],' +
-        '["test16","12365489658","15fheewf3@gmail.com","销售部","一级二标准",1,"手机号为空或与本次导入中手机号重复"],' +
-        '["test9","12365484658","159565687@163.com","销售部","一级标准",2,"邮箱与已有用户重复"]]';
-    return API.staff.downloadExcle({objAttr: datas, accountId: 'ee3eb6a0-9f22-11e5-8540-8b3d4cdf6eb6'})
-        .then(function(result){
-            console.log(result.url);
-            console.log("======================");
-            var filePath = config.upload.tmpDir+"/"+result.url;
-            fs.readFile(filePath, function (err, data) {
-                res.writeHead(200, {
-                    'Content-Type': "application/vnd.ms-excel",
-                    'Content-Disposition': 'attachment; filename="'+result.url+'"'
-                });
-                res.write(data);
-                res.end();
-                fs.exists(filePath, function (exists) {
-                    if(exists){
-                        fs.unlinkSync(filePath);
-                        console.log("删除临时文件");
-                    }
-                });
-            })
-        })*/
-
     var fileName = req.params.fileName;
     var filePath = config.upload.tmpDir+"/" + fileName;
     fs.exists(filePath, function (exists) {

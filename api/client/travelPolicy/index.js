@@ -98,7 +98,6 @@ travelPolicy.updateTravelPolicy = auth.checkPermission(["travelPolicy.update"],
  */
 travelPolicy.getTravelPolicy = function(params, callback){
     var id = params.id;
-    var defer = Q.defer();
     var user_id = this.accountId;
     return API.staff.getStaff({id: user_id})
         .then(function(data){

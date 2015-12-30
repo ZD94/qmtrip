@@ -225,7 +225,7 @@ staff.listAndPaginateStaff = function(params, callback){
     if (options.perPage && /^\d+$/.test(options.perPage)) {
         perPage = options.perPage;
     } else {
-        perPage = 10;
+        perPage = 6;
     }
     limit = perPage;
     offset = (page - 1) * perPage;

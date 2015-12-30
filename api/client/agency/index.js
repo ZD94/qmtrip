@@ -119,14 +119,14 @@ agency.getCurrentAgencyUser = function(callback){
  * @param callback
  * @returns {*}
  */
-agency.deleteAgencyUser = function(userId, callback){
-    return API.agency.deleteAgencyUser({id: userId}, callback);
+agency.deleteAgencyUser = function(params, callback){
+    return API.agency.deleteAgencyUser(params, callback);
 }
 
 agency.updateAgencyUser = API.agency.updateAgencyUser;
 
-agency.getAgencyUser = function(userId, callback){
-    return API.agency.getAgencyUser({id: userId}, callback);
+agency.getAgencyUser = function(params, callback){
+    return API.agency.getAgencyUser(params, callback);
 }
 
 agency.listAndPaginateAgencyUser = API.agency.listAndPaginateAgencyUser;
