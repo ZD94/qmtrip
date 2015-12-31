@@ -432,7 +432,6 @@ tripPlan.countTripPlanNum = function(params, callback){
             var query = {
                 companyId: params.companyId
             }
-            console.info(query);
             logger.info(query);
             return PlanOrder.count({where: query})
         }).nodeify(callback);

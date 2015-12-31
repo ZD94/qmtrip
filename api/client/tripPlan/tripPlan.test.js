@@ -207,26 +207,40 @@ describe("api/client/tripPlan.js", function() {
             })
     });
 
-    //describe("API.tripPlan.savePlanOrder", function() {
-    //    it("#savePlanOrder should be ok", function(done){
-    //        var tripPlanOrder = {
-    //            startPlace: '北京',
-    //            destination: '上海',
-    //            budget: 1000,
-    //            startAt: '2015-12-30 11:12:12',
-    //        }
-    //        var self = {accountId: staffId};
-    //        API.client.tripPlan.savePlanOrder.call(self, tripPlanOrder, function(err, ret){
-    //            if(err){
-    //                throw err;
-    //            }
-    //            console.info(ret);
-    //            orderId = ret.id;
-    //            //console.info("save orderId=>", orderId);
-    //            done();
-    //        })
-    //    })
-    //})
+    describe("API.tripPlan.savePlanOrder", function() {
+        it("#savePlanOrder should be ok", function(done){
+            var tripPlanOrder = {
+                startPlace: '北京',
+                destination: '上海',
+                budget: 1000,
+                startAt: '2015-12-30 11:12:12',
+            }
+            var self = {accountId: staffId};
+            API.client.tripPlan.savePlanOrder.call(self, tripPlanOrder, function(err, ret){
+                if(err){
+                    throw err;
+                }
+                orderId = ret.id;
+                //console.info("save orderId=>", orderId);
+                done();
+            })
+        })
+    })
+
+
+    describe("API.tripPlan.countTripPlanNum", function() {
+        it("#countTripPlanNum should be ok", function(done) {
+            var self = {accountId: staffId};
+            API.client.tripPlan.countTripPlanNum.call(self, {companyId: companyId}, function(err, ret){
+                if (err) {
+                    throw err;
+                }
+                //console.info("查询的计划单数目是=>", ret);
+                done();
+            })
+        });
+    })
+
 
     describe("API.tripPlan.countTripPlanNumByAgency", function() {
         it("#countTripPlanNumByAgency should be ok", function(done) {
@@ -236,7 +250,7 @@ describe("api/client/tripPlan.js", function() {
                 if (err) {
                     throw err;
                 }
-                console.info("查询的计划单数目是=>", ret);
+                //console.info("查询的计划单数目是=>", ret);
                 done();
             })
         });

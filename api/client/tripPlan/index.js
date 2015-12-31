@@ -22,8 +22,9 @@ tripPlan.savePlanOrder = function(params, callback){
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function(staff){
             params.companyId = staff.companyId;
-            return API.tripPlan.savePlanOrder(params, callback);
+            return API.tripPlan.savePlanOrder(params);
         })
+    .nodeify(callback);
 }
 
 /**
@@ -185,8 +186,9 @@ tripPlan.countTripPlanNum = function(params, callback){
         .then(function(staff){
             var companyId = staff.companyId;
             params.companyId = companyId;
-            return API.tripPlan.countTripPlanNum(params, callback);
-        });
+            return API.tripPlan.countTripPlanNum(params);
+        })
+    .nodeify(callback);
 }
 
 /**
@@ -211,9 +213,10 @@ tripPlan.countTripPlanNumByAgency = function(params, callback){
                 throw {code: -2, msg: '没有权限'};
             }
         })
-        .then(function(){
-            return API.tripPlan.countTripPlanNum(params, callback);
+        .then(function(ret){
+            return API.tripPlan.countTripPlanNum(params);
         })
+    .nodeify(callback);
 }
 
 module.exports = tripPlan;
