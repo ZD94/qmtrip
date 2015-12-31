@@ -67,7 +67,7 @@ staff.createStaff = function(data, callback){
                 data.id = accountId;
                 return data;
             }
-            var accData = {email: data.email, mobile: data.mobile, pwd: "123456"};//初始密码暂定123456
+            var accData = {email: data.email, mobile: data.mobile, status: 1};
             if(type && type == "import"){
                 accData = {email: data.email, mobile: data.mobile, status: 1}//若为导入员工置为激活状态 不设置密码
             }
