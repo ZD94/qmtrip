@@ -75,7 +75,6 @@ travelBudget.getTravelPolicyBudget = function(params, callback) {
                 checkOutDate = inboundDate;
             }
 
-
             return travelBudget.getHotelBudget.call(self, {
                 cityId: destinationPlace,
                 businessDistrict: businessDistrict,
@@ -133,8 +132,6 @@ travelBudget.getTravelPolicyBudget = function(params, callback) {
  * @return {Promise} {prize: 1000, hotel: "酒店名称"}
  */
 travelBudget.getHotelBudget = function(params, callback) {
-    console.info(this);
-
     if (!params || !(typeof params == 'object')) {
         params = {};
     }
@@ -144,8 +141,6 @@ travelBudget.getHotelBudget = function(params, callback) {
     var businessDistrict = params.businessDistrict;
     var checkInDate = params.checkInDate;
     var checkOutDate = params.checkOutDate;
-    console.info("请求酒店API:")
-    console.info(params);
     return Q()
         .then(function() {
             if (!cityId) {
@@ -163,7 +158,6 @@ travelBudget.getHotelBudget = function(params, callback) {
             return API.staff.getStaff({id: accountId})
         })
         .then(function(staff) {
-            console.info("员工信息:", staff)
             if (!staff || !staff.travelLevel) {
                 throw L.ERR.TRAVEL_POLICY_NOT_EXIST;
             }
@@ -171,7 +165,6 @@ travelBudget.getHotelBudget = function(params, callback) {
             return API.travelPolicy.getTravelPolicy({id: staff.travelLevel})
         })
         .then(function(travelPolicy) {
-            console.info("差旅标准:", travelPolicy)
             if (!travelPolicy) {
                 throw L.ERR.TRAVEL_POLICY_NOT_EXIST;
             }
@@ -187,10 +180,11 @@ travelBudget.getHotelBudget = function(params, callback) {
                 maxMoney: travelPolicy.hotelPrice,
                 hotelStar: hotelStar,
                 cityId: cityId,
-                businessDistrict: businessDistrict
+                businessDistrict: businessDistrict,
+                checkInDate: checkInDate,
+                checkOutDate: checkOutDate
             }
 
-            console.info(data);
             return API.travelbudget.getHotelBudget(data)
                 .then(function(result) {
                     //如果没有查询到结果,直接扔回最大金额
