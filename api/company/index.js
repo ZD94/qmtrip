@@ -29,7 +29,7 @@ var company = {};
  * @returns {Promise}
  */
 company.createCompany = function(params, callback){
-    var _company = checkAndGetParams(['createUser', 'name', 'domainName', 'mobile', 'email'], ['agencyId', 'description', 'telephone', 'remark'], params, true);
+    var _company = checkAndGetParams(['createUser', 'name', 'domainName', 'mobile', 'email'], ['id', 'agencyId', 'description', 'telephone', 'remark'], params, true);
     if(!_company.id){
         _company.id = uuid.v1();
     }
