@@ -437,7 +437,7 @@ var businessTravel=(function(){
         $scope.liveplace = $routeParams.lp;//住宿位置
         $scope.livetime = $routeParams.livet;//入住时间
         $scope.leavetime = $routeParams.leavet;//离店时间
-
+        $scope.businessDistrict = $routeParams.lpval;   //商圈
         //只选交通
         if (tra==1&&liv==0) {
             API.onload(function() {
@@ -454,7 +454,6 @@ var businessTravel=(function(){
                     .spread(function(ret1,ret2) {
                         $scope.companyId = ret1.companyId;
                         $scope.onlytraffic = ret2;
-                        console.info (ret2);
                         $(".creating").hide();
                         $(".createresult,.tianxun").show();
                         $scope.totalprice = ret2.price;
@@ -476,13 +475,14 @@ var businessTravel=(function(){
                     API.staff.getCurrentStaff(),
                     API.travelBudget.getHotelBudget({
                         cityId:$scope.endplaceval,
-                        businessDistrict:$scope.liveplace
+                        businessDistrict:$scope.businessDistrict,
+                        checkInDate: $scope.livetime,
+                        checkOutDate: $scope.leavetime
                     })
                 ])
                     .spread(function(ret1,ret2) {
                         $scope.companyId = ret1.companyId;
                         $scope.onlylive = ret2;
-                        console.info (ret2);
                         $(".creating").hide();
                         $(".createresult,.tianxun").show();
                         $scope.totalprice = ret2.price;
@@ -510,7 +510,7 @@ var businessTravel=(function(){
                         inboundDate:$scope.endtime,
                         outLatestArriveTime:$scope.starttimelate,
                         inLatestArriveTime:$scope.endtimelate,
-                        businessDistrict:$scope.liveplace,
+                        businessDistrict:$scope.businessDistrict,
                         checkInDate:$scope.livetime,
                         checkOutDate:$scope.leavetime
                     })
@@ -518,7 +518,6 @@ var businessTravel=(function(){
                     .spread(function(ret1,ret2) {
                         $scope.companyId = ret1.companyId;
                         $scope.trafficlive = ret2;
-                        console.info (ret2);
                         $(".creating").hide();
                         $(".createresult,.tianxun").show();
                         $scope.totalprice = ret2.price;
