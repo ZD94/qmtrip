@@ -338,14 +338,16 @@ agency.getAgencyUser = function(params, callback){
     var defer = Q.defer();
     var id = params.id;
     if(!id){
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "id不能为空"}
     }
-    return AgencyUser.findById(id)
+    var options = {};
+    if(params.columns){
+        options.attributes = params.columns;
+    }
+    return AgencyUser.findById(id, options)
         .then(function(agencyUser){
             if(!agencyUser || agencyUser.status == -2){
-                defer.reject({code: -2, msg: '用户不存在'});
-                return defer.promise;
+                throw {code: -2, msg: '用户不存在'};
             }
             return agencyUser;
         })

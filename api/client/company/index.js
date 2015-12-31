@@ -45,9 +45,9 @@ company.createCompany = function(params, callback){
     var domain = params.domain;
     var companyName = params.name;
     var userName = params.userName;
-    return API.agency.getAgencyUser({id: accountId})
-        .then(function(agency){
-            return agency.id;
+    return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
+        .then(function(user){
+            return user.agencyId;
         })
         .then(function(agencyId){
             params.agencyId = agencyId;
@@ -57,7 +57,7 @@ company.createCompany = function(params, callback){
             var companyId = params.companyId || uuid.v1();
             return Q.all([
                 API.company.createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain,
-                    mobile:mobile, email: email}),
+                    mobile:mobile, email: email, agencyId: params.agencyId, remark: params.remark}),
                 API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
                     mobile: mobile, name: userName, roleId: 0})
             ])
