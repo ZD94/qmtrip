@@ -491,12 +491,12 @@ var auth=(function(){
 
     //员工设置密码页
     auth.ResetPwdController = function($scope, $routeParams){
-        alert(456);
+        //alert(456);
         var sign = $routeParams.sign;
         var timestamp = $routeParams.timestamp;
 
         $scope.checkStaffPwd = function(){
-            alert(123);
+            //alert(123);
             var pwd = $("#firstPwd").val();
             var pwds = $("#secondPwd").val();
 
