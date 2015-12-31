@@ -46,3 +46,15 @@
         })
     })
 </script>
+<script>
+    $(function(){
+        $(window).load(function(){min_height();});
+        $(window).scroll(function(){min_height();});
+        $(window).resize(function(){min_height();});
+        function min_height(){
+            var wh = $(window).height();
+            $(".auth_content").css("min-height", wh-80-60-50);
+        }
+        min_height();
+    })
+</script>

@@ -150,6 +150,7 @@ authServer.sendResetPwdEmail = function(params, callback) {
  * @return {Promise} true|error
  */
 authServer.resetPwdByEmail = function(params, callback) {
+    console.info(params)
     var accountId = params.accountId;
     var sign = params.sign;
     var timestamp = params.timestamp;
