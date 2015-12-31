@@ -242,7 +242,6 @@ auth.checkPermission = function(permissions, fn) {
  * 发送重置密码邮件
  *
  * @param {Object} params
- * @param {UUID} params.accountId 账号ID
  * @param {String} params.code 验证码
  * @param {String} params.ticket 验证码凭证
  * @param {Function} [callback]
@@ -251,6 +250,7 @@ auth.checkPermission = function(permissions, fn) {
 auth.sendResetPwdEmail = function(params, callback) {
     var code = params.code;
     var ticket = params.ticket;
+    var accountId = this.accountId;
     return Q()
         .then(function() {
             if (!code) {
@@ -265,7 +265,7 @@ auth.sendResetPwdEmail = function(params, callback) {
         })
         .then(function(){
             var data = {
-                accountId: params.accountId,
+                accountId: accountId,
                 isFirstSet: false
             };
             return  API.auth.sendResetPwdEmail(data, callback);
@@ -305,7 +305,7 @@ auth.resetPwdByOldPwd = function(params, callback) {
     var accountId = self.accountId;
     data.oldPwd = params.oldPwd;
     data.newPwd = params.newPwd;
-    data.accountId = params.accountId;
+    data.accountId = accountId;
     return API.auth.resetPwdByOldPwd(data, callback);
 }
 

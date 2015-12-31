@@ -17,23 +17,27 @@ module.exports = (function(){
 			API.onload(function(){
 				API.company.getCompanyListByAgency()
 					.then(function(companylist){
-						console.info(companylist);
-						$scope.companylist = companylist;
-						$scope.$apply();
-						var tasks = companylist.map(function(company){
+						var promises = companylist.map(function(company){
 							// console.info(company.createUser)
 							return Q.all([
-								API.company.getCompanyFundsAccount(company.id)
-								// API.staff.getStaff({id:company.createUser})
+								API.company.getCompanyFundsAccount(company.id),
+								API.staff.getStaffByAgency(company.createUser)
 								])
-							.spread(function(funds){
-								// console.info(funds);
-								// console.info(user);
+							.spread(function(funds,staff){
+								company.funds = funds;
+								company.staff = staff;
+								return company;
 							})
+							.catch(function(err) {
+								return company;
+							});
+
 						});
-						return Q.all(tasks);
+						return Q.all(promises);
 					})
-					.then(function(){
+					.then(function(companylist){
+						console.info(companylist);
+						$scope.companylist = companylist;
 						$scope.$apply();
                         loading(true);
 					})
@@ -50,6 +54,7 @@ module.exports = (function(){
 		var companyId = $routeParams.company;
 		//企业管理详情页
 		$scope.initCompanyDetail = function(){
+			$(".left_nav li").removeClass("on").eq(1).addClass("on");
 			loading(false);
 			API.onload(function(){
 				API.company.getCompany(companyId)
@@ -61,20 +66,19 @@ module.exports = (function(){
 						
 						$scope.$apply();
                         loading(true);
-                        console.info(staffId);
-                        console.info(API.staff);
-                        API.staff.getStaffByAgency(staffId, function(err, ret){
-                        	console.info(err);
-                        	console.info(ret);
-                        })
+                        // API.tripPlan.countTripPlanNum({}, function(err, ret){
+                        // 	console.info(err);
+                        // 	console.info(ret);
+                        // })
                         Q.all([
-                        	API.staff.getStaff(staffId),
+                        	API.staff.getStaffByAgency(staffId),
                         	API.company.getCompanyFundsAccount(companyId),
                         	API.staff.statisticStaffs({companyId:companyId})
-                        	// API.tripPlan.countTripPlanNum({})
+                        	// API.tripPlan.countTripPlanNum()
                         ])
                         .spread(function(staff,funds,staffnum){
-                        	console.info(staff);
+                        	// console.info(trip);
+                        	$scope.staff = staff;
                         	$scope.funds = funds;
                         	$scope.staffnum = staffnum.all;
                         	$scope.$apply();
