@@ -111,11 +111,12 @@ company.getCompanyListByAgency = //checkAgencyPermission(["company.query"],
         var params = {
             userId: accountId
         }
+        
         return API.agency.getAgencyUser({id: accountId})
             .then(function(user){
                 params.agencyId = user.agencyId;
-                return API.company.listCompany(params, callback);
-            })
+                return API.company.listCompany(params)
+            }).nodeify(callback);
     };
 
 /**
