@@ -305,7 +305,7 @@ auth.resetPwdByOldPwd = function(params, callback) {
     var accountId = self.accountId;
     data.oldPwd = params.oldPwd;
     data.newPwd = params.newPwd;
-    data.accountId = params.accountId;
+    data.accountId = accountId;
     return API.auth.resetPwdByOldPwd(data, callback);
 }
 
