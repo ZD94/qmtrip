@@ -333,7 +333,6 @@ tripPlan.deleteConsumeDetail = function(params, callback){
  * @returns {*}
  */
 tripPlan.uploadInvoice = function(params, callback){
-    var defer = Q.defer();
     return checkParams(['userId', 'consumeId', 'picture'], params)
         .then(function(code){
             return ConsumeDetails.findOne({where: {id: params.consumeId, account_id: params.userId}});
@@ -368,6 +367,19 @@ tripPlan.uploadInvoice = function(params, callback){
         .nodeify(callback);
 }
 
+
+tripPlan.getConsumeDetail = function(params, callback){
+    return ConsumeDetails.findOne({where: {id: params.consumeId}})
+        .then(function(consumeDetail){
+            if(consumeDetail){
+                return consumeDetail;
+            }else{
+                throw {msg: "查询记录不存在"};
+            }
+        })
+        .nodeify(callback);
+}
+
 /**
  * 审核票据
  * @param params
@@ -378,10 +390,9 @@ tripPlan.uploadInvoice = function(params, callback){
  * @returns {*|Promise}
  */
 tripPlan.approveInvoice = function(params, callback){
-    var defer = Q.defer();
     return checkParams(['status', 'consumeId', 'userId'], params)
         .then(function(){
-            return ConsumeDetails.findOne({where: {id: params.consumeId, account_id: params.userId}});
+            return ConsumeDetails.findOne({where: {id: params.consumeId}});
         })
         .then(function(custome){
             if(!custome)

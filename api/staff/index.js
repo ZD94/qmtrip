@@ -251,6 +251,7 @@ staff.listAndPaginateStaff = function(params, callback){
  */
 staff.increaseStaffPoint = function(params, callback) {
     var id = params.id;
+    var operatorId = params.accountId;
     var increasePoint = params.increasePoint;
     var defer = Q.defer();
     if(!id){
@@ -265,7 +266,7 @@ staff.increaseStaffPoint = function(params, callback) {
         .then(function(obj) {
             var totalPoints = obj.totalPoints + increasePoint;
             var balancePoints = obj.balancePoints + increasePoint;
-            var pointChange = {staffId: id, status: 1, points: increasePoint, remark: params.remark||"增加积分"};
+            var pointChange = {staffId: id, status: 1, points: increasePoint, remark: params.remark||"增加积分", operatorId: operatorId};
             return sequelize.transaction(function(t) {
                 return Q.all([
                         staffModel.update({totalPoints: totalPoints, balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
@@ -289,6 +290,7 @@ staff.increaseStaffPoint = function(params, callback) {
 staff.decreaseStaffPoint = function(params, callback) {
     var id = params.id;
     var decreasePoint = params.decreasePoint;
+    var operatorId = params.accountId;
     var defer = Q.defer();
     if(!id){
         defer.reject({code: -1, msg: "id不能为空"});
@@ -304,7 +306,7 @@ staff.decreaseStaffPoint = function(params, callback) {
                 throw {code: -3, msg: "积分不足"};
             }
             var balancePoints = obj.balancePoints - decreasePoint;
-            var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分"}//此处也应该用model里的属性名封装obj
+            var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分", operatorId: operatorId}//此处也应该用model里的属性名封装obj
             return sequelize.transaction(function(t) {
                 return Q.all([
                         staffModel.update({balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),

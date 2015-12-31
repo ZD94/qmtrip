@@ -26,7 +26,7 @@ describe("api/client/agency.js", function() {
     var self = {accountId: accountId};
 
 
-    /*describe("registerAgency", function() {
+    describe("registerAgency", function() {
 
         it("registerAgency should be ok", function(done) {
             Agency.registerAgency(agency, function(err, ret) {
@@ -43,9 +43,9 @@ describe("api/client/agency.js", function() {
         });
     });
 
-    *//**
+    /**
      * 更新代理商
-     *//*
+     */
     describe("updateAgency", function() {
         it("updateAgency should be ok", function(done) {
             Agency.updateAgency.call(self, {agencyId: agencyId, description: '喵喵代理商的描述', status: '1'}, function(err, ret) {
@@ -58,9 +58,9 @@ describe("api/client/agency.js", function() {
     })
 
 
-    *//**
+    /**
      * 根据id获取代理商
-     *//*
+     */
     describe("getAgencyById", function() {
         it("getAgencyById should be ok", function(done) {
             Agency.getAgencyById.call(self, agencyId, function(err, ret) {
@@ -72,7 +72,7 @@ describe("api/client/agency.js", function() {
                 done();
             });
         })
-    });*/
+    });
 
     //代理商用户==========================================================start
     /**
@@ -129,8 +129,10 @@ describe("api/client/agency.js", function() {
     //查询代理商集合
     describe("API.agency.listAndPaginateAgencyUser", function() {
         it("API.agency.listAndPaginateAgencyUser", function(done) {
-            API.agency.listAndPaginateAgencyUser({}, function(err, result) {
-                assert.equal(err, null);
+            Agency.listAndPaginateAgencyUser.call(self, {}, function(err, ret) {
+                if (err) {
+                    throw err;
+                }
                 done();
             });
         })
@@ -139,13 +141,14 @@ describe("api/client/agency.js", function() {
     //更新代理商用户信息
     describe("API.agency.updateAgencyUser", function() {
              it("API.agency.updateAgencyUser", function(done) {
-                 var obj = {email:"test.test@test.com"};
+                     var obj = {email:"test.test@test.com"};
                      obj.id = newUserId;
-                     API.agency.updateAgencyUser(obj, function(err, result) {
-                             assert.equal(err, null);
-                             console.log(result);
-                             done();
-                         });
+                     Agency.updateAgencyUser.call(self, obj, function(err, ret) {
+                         if (err) {
+                             throw err;
+                         }
+                         done();
+                     });
                  })
          })
 
@@ -164,7 +167,7 @@ describe("api/client/agency.js", function() {
     //代理商用户==========================================================end
 
     //删除代理商
-    /*describe("deleteAgency", function() {
+    describe("deleteAgency", function() {
         it("deleteAgency should be ok", function (done) {
             Agency.deleteAgency.call(self, agencyId, function (err, ret) {
                 if (err) {
@@ -173,6 +176,6 @@ describe("api/client/agency.js", function() {
                 done();
             })
         })
-    })*/
+    })
 
 })
