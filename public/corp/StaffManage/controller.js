@@ -67,9 +67,8 @@ var staff = (function(){
 
                 API.staff.getCurrentStaff()//qh获取当前登录人员的企业id
                     .then(function(staff){
-                        //console.log(staff);
                         //console.log(Q);
-                        Q.all([
+                        return Q.all([
                             API.travelPolicy.getAllTravelPolicy({where: {companyId:staff.companyId}}),//获取当前所有的差旅标准名称
                             API.staff.listAndPaginateStaff({companyId:staff.companyId})//加载所有的员工记录
                         ])
@@ -94,7 +93,7 @@ var staff = (function(){
                                                 $scope.$apply();
                                             })
                                     });
-                                Q.all(tasks)
+                                return Q.all(tasks)
                                     .then(function(){
                                         //console.log(6768);
                                         $scope.$apply();
@@ -103,6 +102,7 @@ var staff = (function(){
                             })
                     })
                     .catch(function(err){
+                        console.log(123456);
                         console.info(err);
                     })
 

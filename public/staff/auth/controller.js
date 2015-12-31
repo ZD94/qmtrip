@@ -330,7 +330,6 @@ var auth=(function(){
                     $("#imgCode").parent("div").siblings(".err_msg").show();
                     return false;
                 }else if(agree != "true"){
-                    alert("请同意");
                     return false;
                 }
                 API.onload(function(){
@@ -353,7 +352,7 @@ var auth=(function(){
                         })
                         .then(function(result){
                             console.info("注册返回的结果", result);
-                            alert("注册成功");
+                            //alert("注册成功");
                             //window.location.href = "#/auth/login";
                             window.location.href = "#/auth/corplaststep?email="+mail;
                         })
@@ -438,8 +437,24 @@ var auth=(function(){
             API.auth.activeByEmail({sign: sign, accountId: accountId, timestamp: timestamp})
                 .then(function(result) {
                     if (result.code) {
+                        $("#success_tip").hide();
+                        $("#fail_tip").show();
                         $scope.activeResult = "链接不存在或者已经失效";
                     } else {
+                        $("#fail_tip").hide();
+                        $("#success_tip").show();
+                        var $seconds = $("#second3");
+                        var timer = setInterval(function() {
+                            var begin = $seconds.text();
+                            begin = parseInt(begin);
+                            if (begin <=0 ) {
+                                clearInterval(timer);
+                                window.location.href= '#/auth/login';
+                            } else {
+                                begin = begin - 1;
+                                $seconds.text(begin);
+                            }
+                        }, 1000);
                         $scope.activeResult = "恭喜您,账号激活成功!"
                     }
 
@@ -447,6 +462,8 @@ var auth=(function(){
                 })
                 .catch(function(err) {
                     console.info(err);
+                    $("#success_tip").hide();
+                    $("#fail_tip").show();
                     if (err.code) {
                         $scope.activeResult = err.msg;
                     } else {
@@ -472,6 +489,51 @@ var auth=(function(){
         })
     }
 
+    //员工设置密码页
+    auth.ResetPwdController = function($scope, $routeParams){
+        //alert(456);
+        var accountId = $routeParams.accountId;
+        var sign = $routeParams.sign;
+        var timestamp = $routeParams.timestamp;
+
+        $scope.checkStaffPwd = function(){
+            //alert(123);
+            var pwd = $("#firstPwd").val();
+            var pwds = $("#secondPwd").val();
+
+            if(pwd != pwds){
+                alert("两次密码输入不一致");
+                return false;
+            }
+
+            API.onload(function() {
+                API.auth.resetPwdByEmail({accountId:accountId,sign: sign, timestamp: timestamp,pwd:pwds})
+                    .then(function(){
+                        alert("设置密码成功");
+                        window.location.href="#/auth/staffPwdSuccess";
+                        $scope.$apply();
+                }).catch(function(err){
+                    console.error(err);
+                }).done();
+            })
+        }
+    }
+
+    //员工设置密码成功页面
+    auth.StaffPwdSuccessController = function($scope){
+        var $seconds = $("#second3");
+        var timer = setInterval(function() {
+            var begin = $seconds.text();
+            begin = parseInt(begin);
+            if (begin <=0 ) {
+                clearInterval(timer);
+                window.location.href= '#/auth/login';
+            } else {
+                begin = begin - 1;
+                $seconds.text(begin);
+            }
+        }, 1000);
+    }
     return auth;
 })();
 

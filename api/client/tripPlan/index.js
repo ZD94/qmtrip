@@ -2,10 +2,9 @@
  * Created by yumiao on 15-12-12.
  */
 
-var API = require('../../../common/api');
-var auth = require("../auth");
-var Logger = require('../../../common/logger');
-var logger = new Logger();
+var API = require("common/api");
+var Q = require("q");
+var Logger = require('common/logger');
 
 var tripPlan = {};
 
@@ -182,7 +181,6 @@ tripPlan.approveInvoice = function(params, callback){
 tripPlan.countTripPlanNum = function(params, callback){
     var self = this;
     var accountId = self.accountId;
-    logger.info("accountId=>", accountId);
     return API.staff.getStaff({id: accountId})
         .then(function(staff){
             var companyId = staff.companyId;
@@ -191,5 +189,31 @@ tripPlan.countTripPlanNum = function(params, callback){
         });
 }
 
+/**
+ * 代理商统计计划单数目(根据企业id和员工id,员工id为空的时候查询企业所有员工的数据)
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+tripPlan.countTripPlanNumByAgency = function(params, callback){
+    var self = this;
+    var accountId = self.accountId; //代理商用户Id
+    if(!params.companyId){
+        throw {code: -1, msg: 'companyId不能为空'};
+    }
+    var companyId = params.companyId;
+    return Q.all([
+        API.agency.getAgencyUser({id: accountId, columns: ['id', 'agencyId']}),
+        API.company.getCompany({companyId: companyId, columns: ['agencyId']})
+    ])
+        .spread(function(user, company){
+            if(user.agencyId != company.agencyId){
+                throw {code: -2, msg: '没有权限'};
+            }
+        })
+        .then(function(){
+            return API.tripPlan.countTripPlanNum(params, callback);
+        })
+}
 
 module.exports = tripPlan;
