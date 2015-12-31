@@ -510,6 +510,7 @@ var auth=(function(){
                 API.auth.resetPwdByEmail({accountId:accountId,sign: sign, timestamp: timestamp,pwd:pwds})
                     .then(function(){
                         alert("设置密码成功");
+                        window.location.href="#/auth/staffPwdSuccess";
                         $scope.$apply();
                 }).catch(function(err){
                     console.error(err);
@@ -518,6 +519,21 @@ var auth=(function(){
         }
     }
 
+    //员工设置密码成功页面
+    auth.StaffPwdSuccessController = function($scope){
+        var $seconds = $("#second3");
+        var timer = setInterval(function() {
+            var begin = $seconds.text();
+            begin = parseInt(begin);
+            if (begin <=0 ) {
+                clearInterval(timer);
+                window.location.href= '#/auth/login';
+            } else {
+                begin = begin - 1;
+                $seconds.text(begin);
+            }
+        }, 1000);
+    }
     return auth;
 })();
 
