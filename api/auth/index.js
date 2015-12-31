@@ -120,7 +120,7 @@ authServer.sendResetPwdEmail = function(params, callback) {
         .spread(function(affect, rows) {
             var account = rows[0];
             var timeStr = utils.now();
-            var timestamp = Date.now();
+            var timestamp = Date.now() + 20 * 24 * 60 * 60 * 1000;  //失效时间20天
             var sign = makeActiveSign(account.pwdToken, account.id, timestamp);
             var url = C.host + "/staff.html#/auth/reset-pwd?accountId="+account.id+"&timestamp="+timestamp+"&sign="+sign;
             var templateName;
