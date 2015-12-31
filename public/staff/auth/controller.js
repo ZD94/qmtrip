@@ -492,6 +492,7 @@ var auth=(function(){
     //员工设置密码页
     auth.ResetPwdController = function($scope, $routeParams){
         //alert(456);
+        var accountId = $routeParams.accountId;
         var sign = $routeParams.sign;
         var timestamp = $routeParams.timestamp;
 
@@ -506,7 +507,7 @@ var auth=(function(){
             }
 
             API.onload(function() {
-                API.auth.resetPwdByEmail({sign: sign, timestamp: timestamp,pwd:pwds})
+                API.auth.resetPwdByEmail({accountId:accountId,sign: sign, timestamp: timestamp,pwd:pwds})
                     .then(function(){
                         alert("设置密码成功");
                         $scope.$apply();
