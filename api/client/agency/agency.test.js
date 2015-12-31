@@ -9,11 +9,9 @@ var Q = require('q');
 
 describe("api/client/agency.js", function() {
 
-    var agencyId = "0b8c75a0-ae1c-11e5-9792-93393597ad5e";
+    var agencyId = "";
     var agencyUserId = "";
     var newUserId = "";
-
-    console.info("init agencyId=>", agencyId);
 
     var agency = {
         email: "miaomiao.yu@tulingdao.com",
@@ -22,11 +20,11 @@ describe("api/client/agency.js", function() {
         mobile: "15269866801",
     };
 
-    var accountId = "d718e5e0-ae09-11e5-90b7-8fc39eb15166";
+    var accountId = "";
     var self = {accountId: accountId};
 
 
-    /*describe("registerAgency", function() {
+    describe("registerAgency", function() {
 
         it("registerAgency should be ok", function(done) {
             Agency.registerAgency(agency, function(err, ret) {
@@ -43,9 +41,9 @@ describe("api/client/agency.js", function() {
         });
     });
 
-    *//**
+    /**
      * 更新代理商
-     *//*
+     */
     describe("updateAgency", function() {
         it("updateAgency should be ok", function(done) {
             Agency.updateAgency.call(self, {agencyId: agencyId, description: '喵喵代理商的描述', status: '1'}, function(err, ret) {
@@ -58,9 +56,9 @@ describe("api/client/agency.js", function() {
     })
 
 
-    *//**
+    /**
      * 根据id获取代理商
-     *//*
+     */
     describe("getAgencyById", function() {
         it("getAgencyById should be ok", function(done) {
             Agency.getAgencyById.call(self, agencyId, function(err, ret) {
@@ -72,7 +70,7 @@ describe("api/client/agency.js", function() {
                 done();
             });
         })
-    });*/
+    });
 
     //代理商用户==========================================================start
     /**
@@ -143,7 +141,6 @@ describe("api/client/agency.js", function() {
                      obj.id = newUserId;
                      API.agency.updateAgencyUser(obj, function(err, result) {
                              assert.equal(err, null);
-                             console.log(result);
                              done();
                          });
                  })
@@ -164,7 +161,7 @@ describe("api/client/agency.js", function() {
     //代理商用户==========================================================end
 
     //删除代理商
-    /*describe("deleteAgency", function() {
+    describe("deleteAgency", function() {
         it("deleteAgency should be ok", function (done) {
             Agency.deleteAgency.call(self, agencyId, function (err, ret) {
                 if (err) {
@@ -173,6 +170,6 @@ describe("api/client/agency.js", function() {
                 done();
             })
         })
-    })*/
+    })
 
 })

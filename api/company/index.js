@@ -29,22 +29,20 @@ var company = {};
  * @returns {Promise}
  */
 company.createCompany = function(params, callback){
-    return checkAndGetParams(['createUser', 'name', 'domainName', 'mobile', 'email'], ['agencyId', 'description', 'telephone', 'remark'], params, true)
-        .then(function(_company){
-            if(!_company.id){
-                _company.id = uuid.v1();
-            }
-            var funds = { id: _company.id };
-            return sequelize.transaction(function(t){
-                return Q.all([
-                    Company.create(_company, {transaction: t}),
-                    FundsAccounts.create(funds, {transaction: t})
-                ])
-                    .spread(function(company, funds){
-                        return company;
-                    });
-            })
-        })
+    var _company = checkAndGetParams(['createUser', 'name', 'domainName', 'mobile', 'email'], ['agencyId', 'description', 'telephone', 'remark'], params, true);
+    if(!_company.id){
+        _company.id = uuid.v1();
+    }
+    var funds = { id: _company.id };
+    return sequelize.transaction(function(t){
+        return Q.all([
+            Company.create(_company, {transaction: t}),
+            FundsAccounts.create(funds, {transaction: t})
+        ])
+            .spread(function(company, funds){
+                return company;
+            });
+    })
         .catch(errorHandle)
         .nodeify(callback);
 }

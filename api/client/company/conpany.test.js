@@ -4,25 +4,30 @@
 var assert = require("assert");
 var Company = require("./index");
 var API = require("common/api");
+var Q = require("q");
 var self = {accountId: ""};
+
 
 describe("api/client/company.js", function() {
 
-    describe("getCompanyListByAgency", function() {
+    var companyId = "";
+    var ownerUserId = "";
+    describe("company option by agency", function() {
         var agencyId = "";
 
         var company = {
-            name: '测试企业',
-            domainName: 'tulingdao.com',
+            name: '喵喵的测试企业',
+            userName: '测试企业姓名',
+            domain: 'tulingdao.com',
             email: 'miaomiao.yu@tulingdao.com',
-            mobile: '15269866801'
+            mobile: '15269866801',
         }
 
         before(function(done) {
             var agency = {
                 email: "miaomiao.yu@tulingdao.com",
                 userName: "喵喵",
-                name: '喵喵的代理商',
+                name: '创建企业测试用例代理商',
                 mobile: "12345678901",
                 remark: '测试用例企业'
             };
@@ -51,6 +56,9 @@ describe("api/client/company.js", function() {
                 if (err) {
                     throw err;
                 }
+                var company = ret.company;
+                companyId = company.id;
+                ownerUserId = company.createUser;
                 done();
             })
         });
@@ -65,5 +73,20 @@ describe("api/client/company.js", function() {
         });
 
     });
+
+    describe("delete company by test", function(){
+        it("#delete company should be ok", function(done) {
+            Q.all([
+                API.company.deleteCompany({companyId: companyId, userId: ownerUserId}),
+                API.staff.deleteStaff({id: ownerUserId})
+            ])
+                .then(function(){
+                    done();
+                })
+                .catch(function(err){
+                    throw err;
+                })
+        });
+    })
 
 })
