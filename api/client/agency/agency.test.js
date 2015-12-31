@@ -9,11 +9,9 @@ var Q = require('q');
 
 describe("api/client/agency.js", function() {
 
-    var agencyId = "0b8c75a0-ae1c-11e5-9792-93393597ad5e";
+    var agencyId = "";
     var agencyUserId = "";
     var newUserId = "";
-
-    console.info("init agencyId=>", agencyId);
 
     var agency = {
         email: "miaomiao.yu@tulingdao.com",
@@ -22,7 +20,7 @@ describe("api/client/agency.js", function() {
         mobile: "15269866801",
     };
 
-    var accountId = "d718e5e0-ae09-11e5-90b7-8fc39eb15166";
+    var accountId = "";
     var self = {accountId: accountId};
 
 

@@ -10,7 +10,7 @@ module.exports = (function(){
                 return;
             }
             API.onload(function(){
-                API.agency.getCurrentAgency()
+                API.agency.getCurrentAgencyUser()
                     .then(function(ret){
                         // console.info(ret);
                         $scope.agency = ret;
