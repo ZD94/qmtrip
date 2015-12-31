@@ -179,7 +179,7 @@ authServer.resetPwdByEmail = function(params, callback) {
             var _sign = makeActiveSign(account.pwdToken, accountId, timestamp);
             if (_sign.toLowerCase() == sign.toLowerCase()) {
                 pwd = utils.md5(pwd);
-                return Models.Account.update({pwd: pwd, pwdToken: null}, {where:{id: id}})
+                return Models.Account.update({pwd: pwd, pwdToken: null}, {where:{id: accountId}})
             }
             throw L.ERR.SIGN_ERROR;
         })
