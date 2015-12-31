@@ -20,12 +20,12 @@
 			</tr>
 			<tr ng-repeat="item in companylist">
 				<td><a href="#/companyList/CompanyDetail?company={{item.id}}">{{item.name}}</a></td>
-				<td></td>
-				<td></td>
+				<td>{{item.staff.name}}</td>
+				<td>{{item.staff.mobile}}</td>
 				<td>{{item.createAt | date:"yyyy-MM-dd HH:mm:ss"}}</td>
 				<td>{{item.staffNum}}</td>
 				<td>{{}}</td>
-				<td></td>
+				<td>{{funds.income-funds.consume-funds.frozen}}元</td>
 			</tr>
 		</table>
 	</div>

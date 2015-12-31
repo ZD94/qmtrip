@@ -41,7 +41,12 @@
                         </td>
                         <td width="150" align="center">
                             <p ng-if="item.outTraffic.length!=0">
-                                <span ng-if="item.status==0"><a href="#">上传票据</a></span>
+                                <span ng-if="item.status==0">
+                                    <!-- <a href="#">上传票据</a> -->
+                                    <input type="hidden" name="good[picture]" id="invoice_to" value="">
+                                    <input type="file" class="file" name="tmpFile" value='选择文件' id="goodFile">
+                                    <input type="button" class="c_upload" value="上传图片">
+                                </span>
                                 <span ng-if="item.status==1">
                                     <span class="shenhe" ng-if="item.auditStatus=='-1'">未通过</span>
                                     <span class="shenhe" ng-if="item.auditStatus==0">待审核</span>
@@ -49,7 +54,12 @@
                                 </span>
                             </p>
                             <p ng-if="item.hotel.length!=0">
-                                <span ng-if="item.status==0"><a href="#">上传票据</a></span>
+                                <span ng-if="item.status==0">
+                                    <!-- <a href="#">上传票据</a> -->
+                                    <input type="hidden" name="good[picture]" id="invoice_hotel" value="">
+                                    <input type="file" class="file" name="tmpFile" value='选择文件' id="goodFile">
+                                    <input type="button" class="c_upload" value="上传图片">
+                                </span>
                                 <span ng-if="item.status==1">
                                     <span class="shenhe" ng-if="item.auditStatus=='-1'">未通过</span>
                                     <span class="shenhe" ng-if="item.auditStatus==0">待审核</span>
@@ -57,7 +67,12 @@
                                 </span>
                             </p>
                             <p ng-if="item.backTraffic.length!=0">
-                                <span ng-if="item.status==0"><a href="#">上传票据</a></span>
+                                <span ng-if="item.status==0">
+                                    <!-- <a href="#">上传票据</a> -->
+                                    <input type="hidden" name="good[picture]" id="invoice_from" value="">
+                                    <input type="file" class="file" name="tmpFile" value='选择文件' id="goodFile">
+                                    <input type="button" class="c_upload" value="上传图片">
+                                </span>
                                 <span ng-if="item.status==1">
                                     <span class="shenhe" ng-if="item.auditStatus=='-1'">未通过</span>
                                     <span class="shenhe" ng-if="item.auditStatus==0">待审核</span>
