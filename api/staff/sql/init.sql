@@ -15,7 +15,8 @@ create table staff.staffs (
     sex integer DEFAULT 1, -- 性别
     department character varying(50), -- 部门
     create_at timestamp without time zone DEFAULT now(), -- 创建时间
-    quit_time timestamp without time zone
+    quit_time timestamp without time zone,
+    operator_id uuid
 );
 
 comment on table staff.staffs is '员工';
@@ -32,6 +33,7 @@ COMMENT ON COLUMN staff.staffs.email IS '邮箱';
 COMMENT ON COLUMN staff.staffs.sex IS '性别';
 COMMENT ON COLUMN staff.staffs.department IS '部门';
 COMMENT ON COLUMN staff.staffs.create_at IS '创建时间';
+COMMENT ON COLUMN staff.staffs.operator_id IS '操作人id';
 
 create table staff.point_changes (
     id uuid primary key,

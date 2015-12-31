@@ -150,7 +150,7 @@ create table agency.agency_user (
     email character varying(50), -- 邮箱
     avatar text,
     agency_id uuid,
-    role_id integer, -- 权限
+    role_id integer DEFAULT 1, -- 权限
     create_at timestamp without time zone DEFAULT now() -- 创建时间
 );
 

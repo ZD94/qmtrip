@@ -5,7 +5,6 @@
 var API = require("common/api");
 var Q = require("q");
 var Logger = require('common/logger');
-var logger = new Logger();
 
 var tripPlan = {};
 
@@ -121,8 +120,7 @@ tripPlan.deleteConsumeDetail = function(id, callback){
  * @returns {*}
  */
 tripPlan.uploadInvoice = function(params, callback){
-//    params.userId = this.accountId;
-    params.userId = "ee3eb6a0-9f22-11e5-8540-8b3d4cdf6eb6";
+    params.userId = this.accountId;
     return API.tripPlan.uploadInvoice(params, callback);
 }
 
@@ -136,9 +134,42 @@ tripPlan.uploadInvoice = function(params, callback){
  * @returns {*|*|Promise}
  */
 tripPlan.approveInvoice = function(params, callback){
-//    params.userId = this.accountId;
-    params.userId = "ee3eb6a0-9f22-11e5-8540-8b3d4cdf6eb6";
-    return API.tripPlan.approveInvoice(params, callback);
+    params.userId = this.accountId;
+    var consumeId = params.consumeId;
+    return API.tripPlan.getConsumeDetail({consumeId: consumeId})
+        .then(function(consumeDetail){
+            if(consumeDetail && consumeDetail.accountId){
+                return consumeDetail.accountId;
+            }
+        })
+        .then(function(accountId){
+            return API.staff.getStaff({id:accountId})
+                .then(function(result){
+                    if(result && result.companyId){
+                        return result.companyId;
+                    }else{
+                        throw {msg:"该员工不存在或员工所在企业不存在"};
+                    }
+                })
+        })
+        .then(function(companyId){
+            return API.company.getCompany({companyId: companyId})
+                .then(function(company){
+                    if(company && company.agencyId){
+                        return company.agencyId;
+                    }else{
+                        throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
+                    }
+                })
+        })
+        .then(function(agencyId){
+            if(agencyId == this.accountId){
+                return API.tripPlan.approveInvoice(params);
+            }else{
+                throw {msg:"无权限"};
+            }
+        })
+        .nodeify(callback);
 };
 
 /**

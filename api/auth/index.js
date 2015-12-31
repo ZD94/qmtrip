@@ -120,7 +120,7 @@ authServer.sendResetPwdEmail = function(params, callback) {
         .spread(function(affect, rows) {
             var account = rows[0];
             var timeStr = utils.now();
-            var timestamp = Date.now();
+            var timestamp = Date.now() + 20 * 24 * 60 * 60 * 1000;  //失效时间20天
             var sign = makeActiveSign(account.pwdToken, account.id, timestamp);
             var url = C.host + "/staff.html#/auth/reset-pwd?accountId="+account.id+"&timestamp="+timestamp+"&sign="+sign;
             var templateName;
@@ -179,7 +179,7 @@ authServer.resetPwdByEmail = function(params, callback) {
             var _sign = makeActiveSign(account.pwdToken, accountId, timestamp);
             if (_sign.toLowerCase() == sign.toLowerCase()) {
                 pwd = utils.md5(pwd);
-                return Models.Account.update({pwd: pwd, pwdToken: null}, {where:{id: id}})
+                return Models.Account.update({pwd: pwd, pwdToken: null}, {where:{id: accountId}})
             }
             throw L.ERR.SIGN_ERROR;
         })

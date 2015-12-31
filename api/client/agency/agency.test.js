@@ -127,8 +127,10 @@ describe("api/client/agency.js", function() {
     //查询代理商集合
     describe("API.agency.listAndPaginateAgencyUser", function() {
         it("API.agency.listAndPaginateAgencyUser", function(done) {
-            API.agency.listAndPaginateAgencyUser({}, function(err, result) {
-                assert.equal(err, null);
+            Agency.listAndPaginateAgencyUser.call(self, {}, function(err, ret) {
+                if (err) {
+                    throw err;
+                }
                 done();
             });
         })
@@ -137,12 +139,14 @@ describe("api/client/agency.js", function() {
     //更新代理商用户信息
     describe("API.agency.updateAgencyUser", function() {
              it("API.agency.updateAgencyUser", function(done) {
-                 var obj = {email:"test.test@test.com"};
+                     var obj = {email:"test.test@test.com"};
                      obj.id = newUserId;
-                     API.agency.updateAgencyUser(obj, function(err, result) {
-                             assert.equal(err, null);
-                             done();
-                         });
+                     Agency.updateAgencyUser.call(self, obj, function(err, ret) {
+                         if (err) {
+                             throw err;
+                         }
+                         done();
+                     });
                  })
          })
 

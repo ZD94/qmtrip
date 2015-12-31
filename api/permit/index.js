@@ -41,7 +41,7 @@ var agency_roles = {
     admin: {
         name: '管理员',
         inherit: ['staff'],
-        permission: ['company.add', 'company.delete', 'company.edit', 'user.add', 'user.delete', 'user.edit']
+        permission: ['company.add', 'company.delete', 'company.edit', 'user.add', 'user.delete', 'user.edit', "staff.increaseStaffPoint", "staff.decreaseStaffPoint", "tripPlan.approveInvoice"]
     }
 };
 

@@ -1,0 +1,24 @@
+<div class="head">
+    <div class="logo">
+        <img src="../../corp/images/logo-white.png"/>
+    </div>
+    <div class="to_login">
+        没有账号？
+        <span ng-click="toRegister()">注册</span>
+    </div>
+</div>
+<div class="auth_content">
+    <div class="title">
+        设置密码
+    </div>
+    <div class="input">
+        <!--<span class="tip_err"><i class="web-icon-font"></i>{{err_msg_tip}}</span>-->
+        <input id="firstPwd" class="" type="password" value="" placeholder="设置新密码"/>
+        <!--<span class="err_msg"><i class="web-icon-font"></i>{{err_msg_mail}}</span>-->
+    </div>
+    <div class="input">
+        <input id="secondPwd" class="" type="password" value="" placeholder="再次输入新密码"/>
+        <!--<span class="err_msg"><i class="web-icon-font"></i>{{err_msg_pwd}}</span>-->
+    </div>
+    <a id="" class="register" ng-click="checkStaffPwd()">确定</a>
+</div>
