@@ -63,6 +63,21 @@ ion-side-menu{
   z-index: 1003;
 }
 
+//员工管理按钮
+.staffList{
+  a{
+    text-decoration: none;
+  }
+  .staff_btn{
+    position: absolute;
+    top: 16px;
+    right:20px;
+    background: #387ef5;
+    display: inline-block;
+    text-align: center;
+  }
+}
+
 @media (max-width: 320px){
   ion-side-menu{
     .side-menu-left{
@@ -74,6 +89,14 @@ ion-side-menu{
     }
   }
   //适配iPhone5的menu高度
+
+  .button-bar{
+    &.jl_approvelist{
+      .button{
+        padding: 2px 4px 1px;
+      }
+    }
+  }
 }
 .button-bar.bar-footer{
   position: absolute;
