@@ -5,7 +5,8 @@
 
 var gulplib = require('./common/gulplib');
 
-gulplib.bundle_lib('api', ['dnode', 'shoe', 'q', 'md5', 'moment', 'tiny-cookie']);
+gulplib.bundle_lib('ws', ['ws'], {exclude:['bufferutil', 'utf-8-validate']});
+gulplib.bundle_lib('api', ['dnode', 'shoe', 'q', 'md5', 'moment', 'tiny-cookie'], {external:['ws']});
 gulplib.bundle_lib('angular', ['angular', 'angular-route', 'angular-ui-router', 'angular-sanitize', 'angular-touch']);
 gulplib.bundle_lib('jquery', ['jquery', 'jquery-ui']);
 gulplib.bundle_lib('bootstrap', ["bootstrap"]);
