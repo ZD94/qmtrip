@@ -579,7 +579,7 @@ function makeAuthenticateSign(accountId, os, callback) {
 
 function getTokenSign(accountId, tokenId, token, timestamp) {
     var originStr = accountId+tokenId+token+timestamp;
-    return md5(originStr);;
+    return md5(originStr);
 }
 
 //生成激活链接参数

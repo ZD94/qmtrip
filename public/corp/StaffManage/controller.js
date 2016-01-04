@@ -114,7 +114,6 @@ var staff = (function(){
                                         //console.log(6768);
                                         $scope.$apply();
                                     })
-                                $scope.$apply();
                             })
                     })
                     .catch(function(err){
