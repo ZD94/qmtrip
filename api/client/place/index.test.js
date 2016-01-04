@@ -26,7 +26,7 @@ describe("api/client/place.js", function() {
 
         place.queryPlace({keyword: "北京"}, function(err, result) {
             if (err) {
-                throw err;;
+                throw err;
             }
             //console.info(result);
             var ret = util.isArray(result);
