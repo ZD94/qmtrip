@@ -122,7 +122,7 @@ company.getCompany = function(params, callback){
             return Company.findById(companyId, options);
         })
         .then(function(company){
-            if(!company){
+            if(!company || company.status == -2){
                 throw L.ERR.NOT_FOUND;
             }
             return company;
@@ -141,7 +141,7 @@ company.listCompany = function(params, callback){
     return checkParams(['agencyId'], params)
         .then(function(){
             var agencyId = params.agencyId;
-            return Company.findAll({where: {agencyId: agencyId}})
+            return Company.findAll({where: {agencyId: agencyId, status: {$ne: -2}}})
                 .then(function(companys){
                     return companys;
                 })
@@ -163,16 +163,21 @@ company.deleteCompany = function(params, callback){
             var userId = params.userId;
             return Company.findById(companyId, {attributes: ['createUser']})
                 .then(function(company){
-                    if(!company){
+                    if(!company || company.status == -2){
                         throw L.ERR.COMPANY_NOT_EXIST;
                     }
                     if(company.createUser != userId){
                         throw L.ERR.PERMISSION_DENY;
                     }
-                    return Company.destroy({where: {id: companyId}})
-                        .then(function(ret){
-                            return {code: 0, msg: '删除成功'};
-                        })
+                    return sequelize.transaction(function(t){
+                        return Q.all([
+                            Company.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt']}),
+                            FundsAccounts.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt']})
+                        ])
+                    })
+                })
+                .then(function(){
+                    return {code: 0, msg: '删除成功'};
                 })
         })
         .catch(errorHandle)
@@ -191,9 +196,11 @@ company.getCompanyFundsAccount = function(params, callback){
             var companyId = params.companyId;
             var userId = params.userId;
             return FundsAccounts.findById(companyId, {attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createAt', 'updateAt']})  //{attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createAt', 'updateAt']}
-                .then(function(ret){
-                    logger.info(ret);
-                    return ret;
+                .then(function(funds){
+                    if(!funds || funds.status == -2){
+                        throw {code: -4, msg: '企业资金账户不存在'};
+                    }
+                    return funds;
                 })
         })
         .catch(errorHandle)

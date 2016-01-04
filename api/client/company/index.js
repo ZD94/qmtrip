@@ -57,7 +57,7 @@ company.createCompany = function(params, callback){
             var companyId = params.companyId || uuid.v1();
             return Q.all([
                 API.company.createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain,
-                    mobile:mobile, email: email, agencyId: params.agencyId, remark: params.remark}),
+                    mobile:mobile, email: email, agencyId: params.agencyId, remark: params.remark, description: params.description}),
                 API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
                     mobile: mobile, name: userName, roleId: 0})
             ])
@@ -76,7 +76,8 @@ company.createCompany = function(params, callback){
  */
 company.updateCompany = checkPermission(["company.edit"],
     function(params, callback){
-        params.createUser = this.accountId;
+        var self = this;
+        params.createUser = self.accountId;
         return staff.getCurrentStaff()
             .then(function(staff){
                 params.companyId = staff.companyId;
@@ -91,9 +92,10 @@ company.updateCompany = checkPermission(["company.edit"],
  * @returns {*}
  */
 company.getCompany = function(companyId, callback){
+    var self = this;
     var params = {
         companyId: companyId,
-        userId: this.accountId
+        userId: self.accountId
     }
     return API.company.getCompany(params, callback);
 };
@@ -142,9 +144,10 @@ company.deleteCompany = checkPermission(["company.delete"],
  * @returns {*}
  */
 company.fundsCharge = function(params, callback){
-    params.userId = this.accountId;
+    var self = this;
+    params.userId = self.accountId;
     params.type = 1;
-    params.remark = params.remark | '充值';
+    params.remark = params.remark || '充值';
     return API.company.moneyChange(params, callback);
 }
 
@@ -155,9 +158,11 @@ company.fundsCharge = function(params, callback){
  * @returns {*}
  */
 company.frozenMoney = function(params, callback){
-    params.userId = this.accountId;
+    var self = this;
+    params.userId = self.accountId;
     params.type = -2;
-    params.channel = '冻结';
+    params.channel = params.channel || '冻结';
+    params.remark = params.remark || '冻结账户资金';
     return API.company.moneyChange(params, callback);
 }
 
@@ -168,10 +173,12 @@ company.frozenMoney = function(params, callback){
  * @returns {boolean|*|{options, src}|{src}|{files, tasks}}
  */
 company.consumeMoney = function(params, callback){
-    params.userId = this.accountId;
+    var self = this;
+    params.userId = self.accountId;
     params.type = -1;
-    params.channel = '消费';
-    return API.moneyChange.test(params, callback);
+    params.channel = params.channel || '消费';
+    params.remark = params.remark || '账户余额消费';
+    return API.company.moneyChange(params, callback);
 }
 
 /**
@@ -181,8 +188,9 @@ company.consumeMoney = function(params, callback){
  * @returns {*}
  */
 company.getCompanyFundsAccount = function(companyId, callback){
+    var self = this;
     var params = {
-        userId: this.accountId,
+        userId: self.accountId,
         companyId: companyId
     };
     return API.company.getCompanyFundsAccount(params, callback);

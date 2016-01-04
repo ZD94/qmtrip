@@ -19,7 +19,7 @@ var travelRecord=(function(){
         //待上传票据列表
         $scope.initPlanList = function () {
             API.onload(function () {
-                API.agencyTripPlan.listTripPlanOrder({})
+                API.agencyTripPlan.listAllTripPlanOrder()
                     .then(function (result) {
                         $scope.travelListitems = result;
                         console.info(result);

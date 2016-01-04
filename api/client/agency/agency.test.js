@@ -13,9 +13,10 @@ describe("api/client/agency.js", function() {
     var newUserId = "";
 
     var agency = {
-        email: "miaomiao.yu@tulingdao.com",
+        email: "agency.test.yu@tulingdao.com",
         userName: "喵喵",
-        name: '代理商喵喵',
+        name: '喵喵的代理商',
+        description: '代理商API测试用',
         mobile: "15269866801",
     };
 
@@ -45,7 +46,7 @@ describe("api/client/agency.js", function() {
      */
     describe("updateAgency", function() {
         it("updateAgency should be ok", function(done) {
-            API.client.agency.updateAgency.call(self, {agencyId: agencyId, description: '喵喵代理商的描述', status: '1'}, function(err, ret) {
+            API.client.agency.updateAgency.call(self, {agencyId: agencyId, status: '1'}, function(err, ret) {
                 if (err) {
                     throw err;
                 }

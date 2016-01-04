@@ -194,18 +194,12 @@ tripPlan.updateConsumeDetail = function(params, callback){
  * @returns {*}
  */
 tripPlan.listTripPlanOrder = function(params, callback){
-    var defer = Q.defer();
-    if(!params || !params.userId || !params.query){
-        defer.reject({code: -1, msg: '参数不正确'});
-        return defer.promise.nodeify(callback);
-    }
-    var query = params.query;
+    var query = checkAndGetParams(['companyId'], ['accountId', 'status'], params, true);
     query.status = {$ne: -2};
     return PlanOrder.findAll({where: query})
         .then(function(orders){
             return Q.all(orders.map(function(order){
                 var orderId = order.id;
-                order = order;
                 return Q.all([
                     ConsumeDetails.findAll({where: {orderId: orderId, type: -1, status: {$ne: -2}}}),
                     ConsumeDetails.findAll({where: {orderId: orderId, type: 0, status: {$ne: -2}}}),

@@ -24,27 +24,10 @@
 | msg     | 错误消息 |
 
 
->. 代理商获取差旅计划单列表 API.agencyTripPlan.listTripPlanOrder(params, callback);
+>. 代理商获取所有管辖企业的计划单 API.agencyTripPlan.listAllTripPlanOrder(callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
-| params                                | 消费支出详情（交通/酒店）             |json              |------
-| params.type        |类型： 1：预算单 2： 计划单      |
-| params.status        |状态计划单/预算单状态 -1：失效 0：待上传状态 1：待审核状态      ||
-| params.startPlace        |出发地       |      |
-| params.destination        |目的地      |      |
-| params.startAt        |出发时间      |      |
-| params.backAt        |返回时间      |    |
-| params.isNeedTraffic        |是否需要交通服务      |        |
-| params.isNeedHotel        |是否需要酒店服务      |       |
-| params.description        |描述      |       |
-| params.budget        |预算      |         |
-| params.expenditure        |支出      |       |
-| params.auditStatus            |审核状态 -1：未通过 0：待审核 1：审核通过     |        |
-| params.score                |获取的积分      ||
-| params.remark        |备注      |         |
-| params.expireAt      |失效时间    |        |
-| params.createAt          |创建时间 |        |
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |

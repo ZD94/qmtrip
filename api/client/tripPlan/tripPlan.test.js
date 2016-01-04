@@ -80,19 +80,20 @@ describe("api/client/tripPlan.js", function() {
      */
     before(function(done) {
         var agency = {
-            email: "miaomiao.yu@tulingdao.com",
-            userName: "喵喵",
-            name: '计划单测使用代理商',
-            mobile: "12345678901",
-            remark: '计划单测使用代理商'
+            email: "trippan.test@tulingdao.com",
+            userName: "计划单测使用代理商用户",
+            name: '喵喵的代理商',
+            mobile: "15269866803",
+            description: '计划单测使用代理商'
         };
 
         var company = {
-            email: "miaomiao.yu@tulingdao.com",
+            email: "trippan.test@tulingdao.com",
             userName: "喵喵",
-            name: '计划单测试用企业',
-            mobile: "12345678901",
-            domain: 'tulingdao.com'
+            name: '喵喵的企业',
+            mobile: "15269866803",
+            domain: 'tulingdao.com',
+            description: '计划单测使用企业'
         }
 
         API.agency.registerAgency(agency, function(err, a){
@@ -103,8 +104,8 @@ describe("api/client/tripPlan.js", function() {
             agencyUserId = a.agencyUser.id;
             self.accountId = agencyUserId;
             company.agencyId = agencyId;
-            console.info("agencyId=>", agencyId);
-            console.info("agencyUserId=>", agencyUserId);
+            //console.info("agencyId=>", agencyId);
+            //console.info("agencyUserId=>", agencyUserId);
             API.client.company.createCompany.call(self, company, function(err, c){
                 if(err){
                     throw err;
