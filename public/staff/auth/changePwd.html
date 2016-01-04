@@ -1,0 +1,41 @@
+<div class="head">
+    <div class="logo">
+        <img src="../../corp/images/logo-white.png"/>
+    </div>
+    <div class="to_login">
+        没有账号？
+        <span ng-click="toRegister()">注册</span>
+    </div>
+</div>
+<div class="auth_content">
+    <div class="title">
+        修改密码
+    </div>
+    <div class="input">
+        <!--<span class="tip_err"><i class="web-icon-font"></i>{{err_msg_tip}}</span>-->
+        <input id="oldPwd" class="" type="password" value="" placeholder="原密码"/>
+        <!--<span class="err_msg"><i class="web-icon-font"></i>{{err_msg_mail}}</span>-->
+    </div>
+    <div class="input">
+        <!--<span class="tip_err"><i class="web-icon-font"></i>{{err_msg_tip}}</span>-->
+        <input id="newFirstPwd" class="" type="password" value="" placeholder="设置新密码"/>
+        <!--<span class="err_msg"><i class="web-icon-font"></i>{{err_msg_mail}}</span>-->
+    </div>
+    <div class="input">
+        <input id="newSecondPwd" class="" type="password" value="" placeholder="再次输入新密码"/>
+        <!--<span class="err_msg"><i class="web-icon-font"></i>{{err_msg_pwd}}</span>-->
+    </div>
+    <a id="" class="register" ng-click="checkChangePwd()">确定</a>
+</div>
+<script>
+    $(function(){
+        $(window).load(function(){min_height();});
+        $(window).scroll(function(){min_height();});
+        $(window).resize(function(){min_height();});
+        function min_height(){
+            var wh = $(window).height();
+            $(".auth_content").css("min-height", wh-80-60-50);
+        }
+        min_height();
+    })
+</script>

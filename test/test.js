@@ -24,7 +24,7 @@ model.init(config.postgres.url);
 
 
 API.init(path.join(__dirname, '../api'), config.api)
-    .then(API.loadTests)
+    .then(API.loadTests.bind(API))
     .then(run)
     .catch(function(e){
         logger.error(e.stack?e.stack:e);

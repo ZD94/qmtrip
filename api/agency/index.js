@@ -27,57 +27,54 @@ var agency = {};
  * @param callback
  */
 agency.registerAgency = function(params, callback){
-    return checkAndGetParams(['name', 'email', 'mobile', 'userName'], [], params, true)
-        .then(function(agency){
-            var userName = params.userName;
-            var agencyId = uuid.v1() || params.agencyId;
-            agency.id = agencyId;
-            delete agency.userName;
-            var pwd = params.pwd || md5('123456');
-            var mobile = params.mobile;
-            var email = params.email;
-            var account = {email: email, mobile: mobile, pwd: pwd, type: 2};
-            var agencyUser = {
-                agencyId: agencyId,
-                name: userName,
-                mobile: mobile,
-                email: email
-            };
-            return API.auth.checkAccExist({type: 2, $or: [{mobile: mobile}, {email: email}]})
-                .then(function(ret){
-                    if(!ret){
-                        return API.auth.newAccount(account);
+    var agency = checkAndGetParams(['name', 'email', 'mobile', 'userName'], [], params, true);
+    var userName = params.userName;
+    var agencyId = uuid.v1() || params.agencyId;
+    agency.id = agencyId;
+    delete agency.userName;
+    var pwd = params.pwd || md5('123456');
+    var mobile = params.mobile;
+    var email = params.email;
+    var account = {email: email, mobile: mobile, pwd: pwd, type: 2};
+    var agencyUser = {
+        agencyId: agencyId,
+        name: userName,
+        mobile: mobile,
+        email: email
+    };
+    return API.auth.checkAccExist({type: 2, $or: [{mobile: mobile}, {email: email}]})
+        .then(function(ret){
+            if(!ret){
+                return API.auth.newAccount(account);
+            }else{
+                return ret;
+            }
+        })
+        .then(function(account){
+            var accountId = account.id;
+            agency.createUser = accountId;
+            agencyUser.id = accountId;
+            return sequelize.transaction(function(t){
+                return Q.all([
+                    Agency.create(agency, {transaction: t}),
+                    AgencyUser.create(agencyUser, {transaction: t})
+                ])
+            })
+        })
+        .spread(function(agency, agencyUser){
+            return {code: 0, msg: '注册成功', agency: agency, agencyUser: agencyUser}
+        })
+        .catch(function(err){
+            logger.error(err);
+            return Agency.findOne({where: {$or: [{mobile: mobile}, {email: email}]}, attributes: ['id']})
+                .then(function(agency){
+                    if(agency){
+                        throw {code: -4, msg: '手机号或邮箱已经注册'};
                     }else{
-                        return ret;
+                        throw {code: -3, msg: '注册异常'};
                     }
                 })
-                .then(function(account){
-                    var accountId = account.id;
-                    agency.createUser = accountId;
-                    agencyUser.id = accountId;
-                    return sequelize.transaction(function(t){
-                        return Q.all([
-                            Agency.create(agency, {transaction: t}),
-                            AgencyUser.create(agencyUser, {transaction: t})
-                        ])
-                    })
-                })
-                .spread(function(agency, agencyUser){
-                    return {code: 0, msg: '注册成功', agency: agency, agencyUser: agencyUser}
-                })
-                .catch(function(err){
-                    logger.error(err);
-                    return Agency.findOne({where: {$or: [{mobile: mobile}, {email: email}]}, attributes: ['id']})
-                        .then(function(agency){
-                            if(agency){
-                                throw {code: -4, msg: '手机号或邮箱已经注册'};
-                            }else{
-                                throw {code: -3, msg: '注册异常'};
-                            }
-                        })
-                })
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -89,30 +86,29 @@ agency.registerAgency = function(params, callback){
  */
 agency.updateAgency = function(params, callback){
     var defer = Q.defer();
-    return checkAndGetParams(['agencyId', 'userId'], ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark'], params)
-        .then(function(_agency){
-            var agencyId = params.agencyId;
-            var userId = params.userId;
-            return Agency.findById(agencyId, {attributes: ['createUser']})
-                .then(function(agency){
-                    if(!agency || agency.status == -2){
-                        defer.reject(L.ERR.AGENCY_NOT_EXIST);
+    var _agency = checkAndGetParams(['agencyId', 'userId'],
+        ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark'], params);
+    var agencyId = params.agencyId;
+    var userId = params.userId;
+    return Agency.findById(agencyId, {attributes: ['createUser']})
+        .then(function(agency){
+            if(!agency || agency.status == -2){
+                defer.reject(L.ERR.AGENCY_NOT_EXIST);
+                return defer.promise;
+            }
+            if(agency.createUser != userId){
+                defer.reject(L.ERR.PERMISSION_DENY);
+                return defer.promise;
+            }
+            _agency.updateAt = utils.now();
+            var cols = getColsFromParams(_agency);
+            return Agency.update(_agency, {returning: true, where: {id: agencyId}, fields: cols})
+                .spread(function(rows, agencies){
+                    if(!rows || rows == "NaN"){
+                        defer.reject({code: -2, msg: '更新代理商信息失败'});
                         return defer.promise;
                     }
-                    if(agency.createUser != userId){
-                        defer.reject(L.ERR.PERMISSION_DENY);
-                        return defer.promise;
-                    }
-                    _agency.updateAt = utils.now();
-                    var cols = getColsFromParams(_agency);
-                    return Agency.update(_agency, {returning: true, where: {id: agencyId}, fields: cols})
-                        .spread(function(rows, agencies){
-                            if(!rows || rows == "NaN"){
-                                defer.reject({code: -2, msg: '更新代理商信息失败'});
-                                return defer.promise;
-                            }
-                            return agencies[0];
-                        })
+                    return agencies[0];
                 })
         })
         .catch(errorHandle)
@@ -342,14 +338,16 @@ agency.getAgencyUser = function(params, callback){
     var defer = Q.defer();
     var id = params.id;
     if(!id){
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "id不能为空"}
     }
-    return AgencyUser.findById(id)
+    var options = {};
+    if(params.columns){
+        options.attributes = params.columns;
+    }
+    return AgencyUser.findById(id, options)
         .then(function(agencyUser){
             if(!agencyUser || agencyUser.status == -2){
-                defer.reject({code: -2, msg: '用户不存在'});
-                return defer.promise;
+                throw {code: -2, msg: '用户不存在'};
             }
             return agencyUser;
         })

@@ -15,6 +15,7 @@ var L = require("common/language");
 var Logger = require('common/logger');
 var utils = require('common/utils');
 var getColsFromParams = utils.getColsFromParams;
+var checkAndGetParams = utils.checkAndGetParams;
 var API = require('common/api');
 var errorHandle = require("common/errorHandle");
 var logger = new Logger("company");
@@ -29,18 +30,16 @@ var tripPlan = {}
  */
 tripPlan.savePlanOrder = function(params, callback){
     var checkArr = ['accountId', 'companyId', 'type', 'destination', 'budget'];
-    return Q.all([
-        API.seeds.getSeedNo('tripPlanOrderNo'),
-        checkParams(checkArr, params)
-    ])
-        .spread(function(orderNo){
+    var _planOrder = checkAndGetParams(checkArr, [], params, true);
+    return API.seeds.getSeedNo('tripPlanOrderNo')
+        .then(function(orderNo){
             var orderId = uuid.v1();
-            params.id = orderId;
-            params.orderNo = orderNo;
+            _planOrder.id = orderId;
+            _planOrder.orderNo = orderNo;
             var userId = params.accountId;
             return sequelize.transaction(function(t) {
                 var execArr = new Array();
-                execArr.push(PlanOrder.create(params, {transaction: t})); //保存计划单
+                execArr.push(PlanOrder.create(_planOrder, {transaction: t})); //保存计划单
                 if(params.consumeDetails){ //保存计划单预算和消费详情
                     var details = params.consumeDetails;
                     for(var i in details){
@@ -333,7 +332,6 @@ tripPlan.deleteConsumeDetail = function(params, callback){
  * @returns {*}
  */
 tripPlan.uploadInvoice = function(params, callback){
-    var defer = Q.defer();
     return checkParams(['userId', 'consumeId', 'picture'], params)
         .then(function(code){
             return ConsumeDetails.findOne({where: {id: params.consumeId, account_id: params.userId}});
@@ -368,6 +366,19 @@ tripPlan.uploadInvoice = function(params, callback){
         .nodeify(callback);
 }
 
+
+tripPlan.getConsumeDetail = function(params, callback){
+    return ConsumeDetails.findOne({where: {id: params.consumeId}})
+        .then(function(consumeDetail){
+            if(consumeDetail){
+                return consumeDetail;
+            }else{
+                throw {msg: "查询记录不存在"};
+            }
+        })
+        .nodeify(callback);
+}
+
 /**
  * 审核票据
  * @param params
@@ -378,10 +389,9 @@ tripPlan.uploadInvoice = function(params, callback){
  * @returns {*|Promise}
  */
 tripPlan.approveInvoice = function(params, callback){
-    var defer = Q.defer();
     return checkParams(['status', 'consumeId', 'userId'], params)
         .then(function(){
-            return ConsumeDetails.findOne({where: {id: params.consumeId, account_id: params.userId}});
+            return ConsumeDetails.findOne({where: {id: params.consumeId}});
         })
         .then(function(custome){
             if(!custome)
@@ -426,6 +436,8 @@ tripPlan.countTripPlanNum = function(params, callback){
             return PlanOrder.count({where: query})
         }).nodeify(callback);
 }
+
+
 
 function checkParams(checkArray, params, callback){
     var defer = Q.defer();

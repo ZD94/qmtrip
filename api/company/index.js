@@ -14,6 +14,7 @@ var Logger = require('common/logger');
 var logger = new Logger("company");
 var utils = require("common/utils");
 var getColsFromParams = utils.getColsFromParams;
+var checkAndGetParams = utils.checkAndGetParams;
 var errorHandle = require("common/errorHandle");
 
 var company = {};
@@ -28,22 +29,20 @@ var company = {};
  * @returns {Promise}
  */
 company.createCompany = function(params, callback){
-    return checkParams(['createUser', 'name', 'domainName', 'mobile', 'email'], params)
-        .then(function(){
-            if(!params.id){
-                params.id = uuid.v1();
-            }
-            var funds = { id: params.id };
-            return sequelize.transaction(function(t){
-                return Q.all([
-                    Company.create(params, {transaction: t}),
-                    FundsAccounts.create(funds, {transaction: t})
-                ])
-                    .spread(function(company, funds){
-                        return company;
-                    });
-            })
-        })
+    var _company = checkAndGetParams(['createUser', 'name', 'domainName', 'mobile', 'email'], ['id', 'agencyId', 'description', 'telephone', 'remark'], params, true);
+    if(!_company.id){
+        _company.id = uuid.v1();
+    }
+    var funds = { id: _company.id };
+    return sequelize.transaction(function(t){
+        return Q.all([
+            Company.create(_company, {transaction: t}),
+            FundsAccounts.create(funds, {transaction: t})
+        ])
+            .spread(function(company, funds){
+                return company;
+            });
+    })
         .catch(errorHandle)
         .nodeify(callback);
 }
@@ -116,7 +115,11 @@ company.getCompany = function(params, callback){
     return checkParams(['companyId'], params)
         .then(function(){
             var companyId = params.companyId;
-            return Company.findById(companyId);
+            var options = {};
+            if(params.columns){
+                options.attributes = params.columns;
+            }
+            return Company.findById(companyId, options);
         })
         .then(function(company){
             if(!company){
@@ -137,8 +140,8 @@ company.getCompany = function(params, callback){
 company.listCompany = function(params, callback){
     return checkParams(['agencyId'], params)
         .then(function(){
-            logger.info("listCompany>>>>>>>>>>>>>>>>>>");
-            return Company.findAll({where: {agencyId: params.agencyId}})
+            var agencyId = params.agencyId;
+            return Company.findAll({where: {agencyId: agencyId}})
                 .then(function(companys){
                     return companys;
                 })
@@ -232,6 +235,9 @@ company.moneyChange = function(params, callback){
             var income = funds.income;
             var frozen = funds.frozen;
             if(type == 1){
+                if(money <= 0){
+                    throw {code: -5, msg: '充值金额不正确'};
+                }
                 fundsUpdates.income = parseFloat(income) + parseFloat(money);
             }else if(type == -1){
                 var consume = funds.consume;

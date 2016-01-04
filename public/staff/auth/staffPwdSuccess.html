@@ -3,26 +3,17 @@
         <img src="../../corp/images/logo-white.png"/>
     </div>
     <div class="to_login">
-        已有账号？
-        <span ng-click="toLogin()">登录</span>
+        没有账号？
+        <span ng-click="toRegister()">注册</span>
     </div>
 </div>
 <div class="auth_content">
-    <div class="auth_tip" id="success_tip">
+    <div class="auth_tip">
         <p>
-            <i class="web-icon-font" style="color: #5cca2e;">&#xf058;</i>
-            注册成功！
+            恭喜您，已成功激活账号！
         </p>
         <p>欢迎您加入全麦商旅！</p>
-        <p><span id="second3">3</span>秒后自动跳转到企业登录页</p>
-    </div>
-    <div class="auth_tip" id="fail_tip" style="display: none;">
-        <p>
-            <i class="web-icon-font" style="color:#de492a;">&#xf057;</i>
-            激活失败！
-        </p>
-        <p>{{activeResult}}</p>
-        <!--<p><a href="#/auth/corplaststep">返回继续激活</a></p>-->
+        <p><span id="second3">3</span>秒后自动跳转到登录页面</p>
     </div>
 </div>
 <script>

@@ -8,8 +8,11 @@
 
 var API = require('common/api');
 var Logger = require('common/logger');
+var md5 = require("common/utils").md5;
+var Q = require('q');
 var checkPermission = require('../auth').checkPermission;
 var logger = new Logger();
+var uuid = require("node-uuid");
 
 /**
  * @class company 公司信息
@@ -20,15 +23,49 @@ var company = {}
 /**
  * @method createCompany
  *
- * 创建企业
+ * 代理商创建企业
  *
  * @param params
  * @param callback
  * @returns {*}
  */
 company.createCompany = function(params, callback){
-    params.createUser = this.accountId;
-    return API.company.createCompany(params, callback);
+    var self = this;
+    var accountId = self.accountId;
+    params.createUser = accountId;
+    if(!params.mobile || !params.email || !params.name || !params.domain){
+        throw {code: -1, msg: '参数不正确'};
+    }
+    if(!params.userName){
+        throw {code: -2, msg: '联系人姓名不能为空'};
+    }
+    var mobile = params.mobile;
+    var email = params.email;
+    var pwd = params.pwd || md5('123456');
+    var domain = params.domain;
+    var companyName = params.name;
+    var userName = params.userName;
+    return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
+        .then(function(user){
+            return user.agencyId;
+        })
+        .then(function(agencyId){
+            params.agencyId = agencyId;
+            return API.auth.newAccount({mobile: mobile, email: email, pwd: pwd, type: 1})
+        })
+        .then(function(account){
+            var companyId = params.companyId || uuid.v1();
+            return Q.all([
+                API.company.createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain,
+                    mobile:mobile, email: email, agencyId: params.agencyId, remark: params.remark}),
+                API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
+                    mobile: mobile, name: userName, roleId: 0})
+            ])
+        })
+        .spread(function(company){
+            return {code: 0, msg: '创建成功', company: company};
+        })
+        .nodeify(callback);
 };
 
 /**
@@ -74,12 +111,12 @@ company.getCompanyListByAgency = //checkAgencyPermission(["company.query"],
         var params = {
             userId: accountId
         }
+        
         return API.agency.getAgencyUser({id: accountId})
             .then(function(user){
-                logger.info(user);
                 params.agencyId = user.agencyId;
-                return API.company.listCompany(params, callback);
-            })
+                return API.company.listCompany(params)
+            }).nodeify(callback);
     };
 
 /**
@@ -90,9 +127,10 @@ company.getCompanyListByAgency = //checkAgencyPermission(["company.query"],
  */
 company.deleteCompany = checkPermission(["company.delete"],
     function(companyId, callback){
+        var self = this;
         var params = {
             companyId: companyId,
-            userId: this.accountId
+            userId: self.accountId
         };
         return API.company.deleteCompany(params, callback);
     });

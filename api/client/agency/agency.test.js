@@ -1,7 +1,6 @@
 /**
  * Created by wyl on 15-12-11.
  */
-var Agency = require('./index');
 var assert = require("assert");
 var uuid = require("node-uuid");
 var API = require("common/api");
@@ -9,28 +8,25 @@ var Q = require('q');
 
 describe("api/client/agency.js", function() {
 
-    var agencyId = "0b8c75a0-ae1c-11e5-9792-93393597ad5e";
+    var agencyId = "";
     var agencyUserId = "";
     var newUserId = "";
-
-    console.info("init agencyId=>", agencyId);
 
     var agency = {
         email: "miaomiao.yu@tulingdao.com",
         userName: "喵喵",
         name: '代理商喵喵',
         mobile: "15269866801",
-        id: "aef7f968-9fe9-11e5-a67e-ad403d808899"
     };
 
-    var accountId = "d718e5e0-ae09-11e5-90b7-8fc39eb15166";
+    var accountId = "";
     var self = {accountId: accountId};
 
 
-    /*describe("registerAgency", function() {
+    describe("registerAgency", function() {
 
         it("registerAgency should be ok", function(done) {
-            Agency.registerAgency(agency, function(err, ret) {
+            API.client.agency.registerAgency(agency, function(err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -44,12 +40,12 @@ describe("api/client/agency.js", function() {
         });
     });
 
-    *//**
+    /**
      * 更新代理商
-     *//*
+     */
     describe("updateAgency", function() {
         it("updateAgency should be ok", function(done) {
-            Agency.updateAgency.call(self, {agencyId: agencyId, description: '喵喵代理商的描述', status: '1'}, function(err, ret) {
+            API.client.agency.updateAgency.call(self, {agencyId: agencyId, description: '喵喵代理商的描述', status: '1'}, function(err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -59,12 +55,12 @@ describe("api/client/agency.js", function() {
     })
 
 
-    *//**
+    /**
      * 根据id获取代理商
-     *//*
+     */
     describe("getAgencyById", function() {
         it("getAgencyById should be ok", function(done) {
-            Agency.getAgencyById.call(self, agencyId, function(err, ret) {
+            API.client.agency.getAgencyById.call(self, agencyId, function(err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -73,7 +69,7 @@ describe("api/client/agency.js", function() {
                 done();
             });
         })
-    });*/
+    });
 
     //代理商用户==========================================================start
     /**
@@ -81,7 +77,7 @@ describe("api/client/agency.js", function() {
      */
     describe("getCurrentAgencyUser", function() {
         it("getCurrentAgencyUser should be ok", function(done) {
-            Agency.getCurrentAgencyUser.call(self, function(err, ret) {
+            API.client.agency.getCurrentAgencyUser.call(self, function(err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -97,7 +93,7 @@ describe("api/client/agency.js", function() {
      */
     describe("createAgencyUser", function() {
         it("createAgencyUser should be ok", function(done) {
-            Agency.createAgencyUser.call(self, {name: '测试代理商用户', email: "test123456@tulingdao.com", mobile: '12345678777', agencyId: agencyId}, function(err, ret) {
+            API.client.agency.createAgencyUser.call(self, {name: '测试代理商用户', email: "test123456@tulingdao.com", mobile: '12345678777', agencyId: agencyId}, function(err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -112,7 +108,7 @@ describe("api/client/agency.js", function() {
      */
     describe("getAgencyUser", function() {
         it("getAgencyUser should be ok", function(done) {
-            Agency.getAgencyUser.call(self, {id:newUserId}, function(err, ret) {
+            API.client.agency.getAgencyUser.call(self, {id:newUserId}, function(err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -130,8 +126,10 @@ describe("api/client/agency.js", function() {
     //查询代理商集合
     describe("API.agency.listAndPaginateAgencyUser", function() {
         it("API.agency.listAndPaginateAgencyUser", function(done) {
-            API.agency.listAndPaginateAgencyUser({}, function(err, result) {
-                assert.equal(err, null);
+            API.client.agency.listAndPaginateAgencyUser.call(self, {}, function(err, ret) {
+                if (err) {
+                    throw err;
+                }
                 done();
             });
         })
@@ -141,19 +139,20 @@ describe("api/client/agency.js", function() {
     describe("API.agency.updateAgencyUser", function() {
              it("API.agency.updateAgencyUser", function(done) {
                  var obj = {email:"test.test@test.com"};
-                     obj.id = newUserId;
-                     API.agency.updateAgencyUser(obj, function(err, result) {
-                             assert.equal(err, null);
-                             console.log(result);
-                             done();
-                         });
-                 })
+                 obj.id = newUserId;
+                 API.client.agency.updateAgencyUser.call(self, obj, function(err, ret) {
+                     if (err) {
+                         throw err;
+                     }
+                     done();
+                 });
+             })
          })
 
     //删除代理商用户
     describe("deleteAgencyUser", function() {
         it("deleteAgencyUser should be ok", function(done) {
-            Agency.deleteAgencyUser.call(self, {id:newUserId}, function (err, ret) {
+            API.client.agency.deleteAgencyUser.call(self, {id:newUserId}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -165,15 +164,15 @@ describe("api/client/agency.js", function() {
     //代理商用户==========================================================end
 
     //删除代理商
-    /*describe("deleteAgency", function() {
+    describe("deleteAgency", function() {
         it("deleteAgency should be ok", function (done) {
-            Agency.deleteAgency.call(self, agencyId, function (err, ret) {
+            API.client.agency.deleteAgency.call(self, agencyId, function (err, ret) {
                 if (err) {
                     throw err;
                 }
                 done();
             })
         })
-    })*/
+    })
 
 })

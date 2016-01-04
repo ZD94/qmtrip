@@ -110,7 +110,11 @@ agency.createAgencyUser = function(params, callback){
 agency.getCurrentAgencyUser = function(callback){
     var self = this;
     var accountId = self.accountId;
-    return API.agency.getAgencyUser({id: accountId}, callback);
+    return API.agency.getAgencyUser({id: accountId})
+        .then(function(data){
+            return data;
+        })
+        .nodeify(callback);
 }
 
 /**
@@ -120,15 +124,62 @@ agency.getCurrentAgencyUser = function(callback){
  * @returns {*}
  */
 agency.deleteAgencyUser = function(params, callback){
-    return API.agency.deleteAgencyUser(params, callback);
+    var user_id = this.accountId;
+    return API.agency.getAgencyUser({id: user_id})
+        .then(function(data){
+            return API.agency.getAgencyUser({id:params.id})
+                .then(function(target){
+                    if(data.agencyId != target.agencyId){
+                        throw L.ERR.PERMISSION_DENY;
+                    }else{
+                        return API.agency.deleteAgencyUser(params);
+                    }
+                })
+        })
+        .nodeify(callback);
 }
 
-agency.updateAgencyUser = API.agency.updateAgencyUser;
+agency.updateAgencyUser = function(params, callback) {
+    var user_id = this.accountId;
+    var id = params.id;
+    return API.agency.getAgencyUser({id:user_id})
+        .then(function(data){
+            return API.agency.getAgencyUser({id:id})
+                .then(function(target){
+                    if(data.agencyId != target.agencyId){
+                        throw L.ERR.PERMISSION_DENY;
+                    }else{
+                        return API.agency.updateAgencyUser(params);
+                    }
+                })
+        })
+        .nodeify(callback);
+}
 
 agency.getAgencyUser = function(params, callback){
-    return API.agency.getAgencyUser(params, callback);
+    var user_id = this.accountId;
+    return API.agency.getAgencyUser({id: user_id})
+        .then(function(data){
+            return API.agency.getAgencyUser({id:params.id})
+                .then(function(target){
+                    if(data.agencyId != target.agencyId){
+                        throw L.ERR.PERMISSION_DENY;
+                    }else{
+                        return API.agency.getAgencyUser(params);
+                    }
+                })
+        })
+        .nodeify(callback);
 }
 
-agency.listAndPaginateAgencyUser = API.agency.listAndPaginateAgencyUser;
+agency.listAndPaginateAgencyUser = function(params, callback) {
+    var user_id = this.accountId;
+    return API.agency.getAgencyUser({id:user_id})
+        .then(function(data){
+            params.agencyId = data.agencyId;
+            return API.agency.listAndPaginateAgencyUser(params);
+        })
+        .nodeify(callback);
+}
 
 module.exports = agency;

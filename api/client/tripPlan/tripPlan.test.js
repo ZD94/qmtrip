@@ -4,11 +4,9 @@
 //var API = require('common/api');
 
 var assert = require("assert");
-var tripPlan = require("./index");
-var companyId = '6cf36000-aa21-11e5-a377-2fe1a7dbc5e1';
-var accountId = "6cee7e00-aa21-11e5-a377-2fe1a7dbc5e1";
-var self = {accountId: accountId};
-var orderId = '';
+var Q = require("q");
+var uuid = require("node-uuid");
+var API = require("common/api");
 
 describe("api/client/tripPlan.js", function() {
 
@@ -68,78 +66,194 @@ describe("api/client/tripPlan.js", function() {
         })
     })*/
 
-    it("#savePlanOrder should be ok", function(done){
-        var tripPlanOrder = {
-            startPlace: '北京',
-            destination: '上海',
-            startAt: '2015-12-30 11:12:12',
-            budget: '1000',
+
+    //
+    //
+    //describe("API.tripPlan.getTripPlanOrderById", function() {
+    //    it("#getTripPlanOrderById should be ok", function(done) {
+    //        //console.info("get orderId=>", orderId);
+    //        tripPlan.getTripPlanOrderById.call(self, orderId, function(err, ret){
+    //            if (err) {
+    //                throw err;
+    //            }
+    //            done();
+    //        })
+    //    });
+    //})
+    //
+    //
+    //describe("API.tripPlan.listTripPlanOrder", function() {
+    //    it("#deleteTripPlanOrder should be ok", function(done) {
+    //        tripPlan.deleteTripPlanOrder.call(self, orderId, function(err, ret){
+    //            if (err) {
+    //                throw err;
+    //            }
+    //            done();
+    //        })
+    //    });
+    //})
+    //
+    //
+    //describe("API.tripPlan.listTripPlanOrder", function() {
+    //    it("#listTripPlanOrder should be ok", function(done) {
+    //        tripPlan.listTripPlanOrder.call(self, {}, function(err, ret){
+    //            if (err) {
+    //                throw err;
+    //            }
+    //            //console.info("共列出计划单=>", ret.length);
+    //            done();
+    //        })
+    //    });
+    //})
+    //
+    //
+    //describe("API.tripPlan.countTripPlanNum", function() {
+    //    it("#countTripPlanNum should be ok", function(done) {
+    //        tripPlan.countTripPlanNum.call(self, {companyId: companyId}, function(err, ret){
+    //            if (err) {
+    //                throw err;
+    //            }
+    //            done();
+    //        })
+    //    });
+    //})
+    //
+    //
+    //describe("API.tripPlan.saveConsumeDetail", function() {
+    //    it("#saveConsumeDetail should be ok", function(done){
+    //        var tripPlanOrder = {
+    //            orderId: "bb9dc000-ade2-11e5-a7fa-35aeb147987c",
+    //            type: -1,
+    //            startTime: '2015-12-31 10:00:00',
+    //            invoiceType: 1,
+    //            startPlace: '北京',
+    //            destination: '上海',
+    //            budget: '1000',
+    //        }
+    //        tripPlan.saveConsumeDetail.call(self, tripPlanOrder, function(err, ret){
+    //            if(err){
+    //                throw err;
+    //            }
+    //            orderId = ret.id;
+    //            done();
+    //        })
+    //    })
+    //});
+
+
+    var agencyId = "";
+    var agencyUserId = "";
+    var companyId = "";
+    var staffId = "";
+    var orderId = "";
+    var self = {accountId: ""};
+    /**
+     * 测试前先注册代理商，由代理商创建企业
+     */
+    before(function(done) {
+        var agency = {
+            email: "miaomiao.yu@tulingdao.com",
+            userName: "喵喵",
+            name: '计划单测使用代理商',
+            mobile: "12345678901",
+            remark: '计划单测使用代理商'
+        };
+
+        var company = {
+            email: "miaomiao.yu@tulingdao.com",
+            userName: "喵喵",
+            name: '计划单测试用企业',
+            mobile: "12345678901",
+            domain: 'tulingdao.com'
         }
-        tripPlan.savePlanOrder.call(self, tripPlanOrder, function(err, ret){
+
+        API.agency.registerAgency(agency, function(err, a){
             if(err){
                 throw err;
             }
-            orderId = ret.id;
-            //console.info("save orderId=>", orderId);
-            done();
+            agencyId = a.agency.id;
+            agencyUserId = a.agencyUser.id;
+            self.accountId = agencyUserId;
+            //console.info("agencyId=>", agencyId);
+            //console.info("agencyUserId=>", agencyUserId);
+            company.agencyId = agencyId;
+            //console.info((new Error()).stack);
+            API.client.company.createCompany.call(self, company, function(err, c){
+                if(err){
+                    throw err;
+                }
+                companyId = c.company.id;
+                staffId = c.company.createUser;
+                //console.info("create companyId=>", companyId);
+
+
+                //console.info("company agencyI=>", c.company.agencyId);
+                done();
+            })
+        })
+    });
+
+    after(function(done) {
+        Q.all([
+            API.agency.deleteAgency({agencyId: agencyId, userId: agencyUserId}),
+            API.company.deleteCompany({companyId: companyId, userId: staffId}),
+            API.staff.deleteStaff({id: staffId})
+        ])
+            .then(function(){
+                done();
+            })
+            .catch(function(err){
+                throw err;
+            })
+    });
+
+    describe("API.tripPlan.savePlanOrder", function() {
+        it("#savePlanOrder should be ok", function(done){
+            var tripPlanOrder = {
+                startPlace: '北京',
+                destination: '上海',
+                budget: 1000,
+                startAt: '2015-12-30 11:12:12',
+            }
+            var self = {accountId: staffId};
+            API.client.tripPlan.savePlanOrder.call(self, tripPlanOrder, function(err, ret){
+                if(err){
+                    throw err;
+                }
+                orderId = ret.id;
+                //console.info("save orderId=>", orderId);
+                done();
+            })
         })
     })
 
-    it("#getTripPlanOrderById should be ok", function(done) {
-        //console.info("get orderId=>", orderId);
-        tripPlan.getTripPlanOrderById.call(self, orderId, function(err, ret){
-            if (err) {
-                throw err;
-            }
-            done();
-        })
-    });
 
-    it("#deleteTripPlanOrder should be ok", function(done) {
-        tripPlan.deleteTripPlanOrder.call(self, orderId, function(err, ret){
-            if (err) {
-                throw err;
-            }
-            done();
-        })
-    });
-
-    it("#listTripPlanOrder should be ok", function(done) {
-        tripPlan.listTripPlanOrder.call(self, {}, function(err, ret){
-            if (err) {
-                throw err;
-            }
-            //console.info("共列出计划单=>", ret.length);
-            done();
-        })
-    });
-
-    it("#countTripPlanNum should be ok", function(done) {
-        tripPlan.countTripPlanNum.call(self, {companyId: companyId}, function(err, ret){
-            if (err) {
-                throw err;
-            }
-            done();
-        })
-    });
-
-
-    it("#saveConsumeDetail should be ok", function(done){
-        var tripPlanOrder = {
-            orderId: "bb9dc000-ade2-11e5-a7fa-35aeb147987c",
-            type: -1,
-            startTime: '2015-12-31 10:00:00',
-            invoiceType: 1,
-            startPlace: '北京',
-            destination: '上海',
-            budget: '1000',
-        }
-        tripPlan.saveConsumeDetail.call(self, tripPlanOrder, function(err, ret){
-            if(err){
-                throw err;
-            }
-            orderId = ret.id;
-            done();
-        })
+    describe("API.tripPlan.countTripPlanNum", function() {
+        it("#countTripPlanNum should be ok", function(done) {
+            var self = {accountId: staffId};
+            API.client.tripPlan.countTripPlanNum.call(self, {companyId: companyId}, function(err, ret){
+                if (err) {
+                    throw err;
+                }
+                //console.info("查询的计划单数目是=>", ret);
+                done();
+            })
+        });
     })
+
+
+    describe("API.tripPlan.countTripPlanNumByAgency", function() {
+        it("#countTripPlanNumByAgency should be ok", function(done) {
+            var self = {accountId: agencyUserId};
+            //console.info("test companyId=>", companyId);
+            API.client.tripPlan.countTripPlanNumByAgency.call(self, {companyId: companyId}, function(err, ret){
+                if (err) {
+                    throw err;
+                }
+                //console.info("查询的计划单数目是=>", ret);
+                done();
+            })
+        });
+    })
+
 })
