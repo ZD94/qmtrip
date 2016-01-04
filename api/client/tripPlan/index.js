@@ -126,54 +126,6 @@ tripPlan.uploadInvoice = function(params, callback){
 }
 
 /**
- * 审核票据
- * @param params
- * @param params.status审核结果状态
- * @param params。consumeId 审核消费单id
- * @param params.userId 用户id
- * @param callback
- * @returns {*|*|Promise}
- */
-tripPlan.approveInvoice = function(params, callback){
-    params.userId = this.accountId;
-    var consumeId = params.consumeId;
-    return API.tripPlan.getConsumeDetail({consumeId: consumeId})
-        .then(function(consumeDetail){
-            if(consumeDetail && consumeDetail.accountId){
-                return consumeDetail.accountId;
-            }
-        })
-        .then(function(accountId){
-            return API.staff.getStaff({id:accountId})
-                .then(function(result){
-                    if(result && result.companyId){
-                        return result.companyId;
-                    }else{
-                        throw {msg:"该员工不存在或员工所在企业不存在"};
-                    }
-                })
-        })
-        .then(function(companyId){
-            return API.company.getCompany({companyId: companyId})
-                .then(function(company){
-                    if(company && company.agencyId){
-                        return company.agencyId;
-                    }else{
-                        throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
-                    }
-                })
-        })
-        .then(function(agencyId){
-            if(agencyId == this.accountId){
-                return API.tripPlan.approveInvoice(params);
-            }else{
-                throw {msg:"无权限"};
-            }
-        })
-        .nodeify(callback);
-};
-
-/**
  * 根据条件统计计划单数目
  * @param params
  * @param callback
@@ -191,32 +143,5 @@ tripPlan.countTripPlanNum = function(params, callback){
     .nodeify(callback);
 }
 
-/**
- * 代理商统计计划单数目(根据企业id和员工id,员工id为空的时候查询企业所有员工的数据)
- * @param params
- * @param callback
- * @returns {*}
- */
-tripPlan.countTripPlanNumByAgency = function(params, callback){
-    var self = this;
-    var accountId = self.accountId; //代理商用户Id
-    if(!params.companyId){
-        throw {code: -1, msg: 'companyId不能为空'};
-    }
-    var companyId = params.companyId;
-    return Q.all([
-        API.agency.getAgencyUser({id: accountId, columns: ['id', 'agencyId']}),
-        API.company.getCompany({companyId: companyId, columns: ['agencyId']})
-    ])
-        .spread(function(user, company){
-            if(user.agencyId != company.agencyId){
-                throw {code: -2, msg: '没有权限'};
-            }
-        })
-        .then(function(ret){
-            return API.tripPlan.countTripPlanNum(params);
-        })
-    .nodeify(callback);
-}
 
 module.exports = tripPlan;

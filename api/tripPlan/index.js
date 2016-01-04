@@ -108,10 +108,6 @@ tripPlan.getTripPlanOrder = function(params, callback){
                         defer.reject(L.ERR.TRIP_PLAN_ORDER_NOT_EXIST);
                         return defer.promise;
                     }
-                    if(order.accountId != userId){ //权限不足
-                        defer.reject(L.ERR.PERMISSION_DENY);
-                        return defer.promise;
-                    }
                     order.outTraffic = outTraffic;
                     order.backTraffic = backTraffic;
                     order.hotel = hotel;

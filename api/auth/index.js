@@ -462,13 +462,19 @@ authServer.bindMobile = function(data, callback) {
  * @param callback
  * @returns {*}
  */
-authServer.getAccount = function(id, callback){
+authServer.getAccount = function(params, callback){
+    var id = params.id;
+    var attributes = params.attributes;
     var defer = Q.defer();
     if(!id){
         defer.reject({code: -1, msg: "id不能为空"});
         return defer.promise.nodeify(callback);
     }
-    return Models.Account.findById(id)
+    var options = {};
+    options.where = {id: id};
+    if(attributes)
+        options.attributes = attributes;
+    return Models.Account.findOne(options)
         .nodeify(callback);
 }
 
