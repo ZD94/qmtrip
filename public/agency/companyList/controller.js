@@ -6,6 +6,7 @@ module.exports = (function(){
 	API.require("agency");
 	API.require("staff");
 	API.require("tripPlan");
+	API.require("agencyTripPlan");
 	var companyList ={};
 	companyList.CompanyListController = function($scope){
 		loading(true);
@@ -22,11 +23,15 @@ module.exports = (function(){
 							// console.info(company.createUser)
 							return Q.all([
 								API.company.getCompanyFundsAccount(company.id),
-								API.staff.getStaffByAgency(company.createUser)
+								API.staff.getStaffByAgency(company.createUser),
+                        		API.staff.statisticStaffs({companyId:company.id}),
+								API.agencyTripPlan.countTripPlanNum({companyId: company.id})
 								])
-							.spread(function(funds,staff){
+							.spread(function(funds,staff,staffnum,trip){
 								company.funds = funds;
 								company.staff = staff;
+								company.staffnum = staffnum;
+								company.tirpnum = trip;
 								return company;
 							})
 							.catch(function(err) {
@@ -67,19 +72,15 @@ module.exports = (function(){
 						
 						$scope.$apply();
                         loading(true);
-                        // API.tripPlan.countTripPlanNum({}, function(err, ret){
-                        // 	console.info(err);
-                        // 	console.info(ret);
-                        // })
                         Q.all([
                         	API.staff.getStaffByAgency(staffId),
                         	API.company.getCompanyFundsAccount(companyId),
                         	API.staff.statisticStaffs({companyId:companyId}),
                         	// API.tripPlan.countTripPlanNum()
-                        	API.tripPlan.countTripPlanNumByAgency(companyId)
+                        	API.agencyTripPlan.countTripPlanNum({companyId: companyId})
                         ])
                         .spread(function(staff,funds,staffnum,trip){
-                        	console.info(trip);
+                        	$scope.tripnum = trip;
                         	$scope.staff = staff;
                         	$scope.funds = funds;
                         	$scope.staffnum = staffnum.all;

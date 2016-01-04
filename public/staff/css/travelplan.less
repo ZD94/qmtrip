@@ -158,11 +158,23 @@
         }
       }
       .content_bottom {
-        .uploadbtn {
-          width: 100px;
-          height: 30px;
-          line-height: 30px;
-          margin-left: 22px;
+        a{
+          display: inline-block;
+          position: relative;
+          .file{
+            position: absolute;
+            width: 100px;
+            height: 30px;
+            line-height: 30px;
+            opacity: 0;
+            left: 0;
+            cursor: pointer;
+          }
+          .uploadbtn {
+            width: 100px;
+            height: 30px;
+            line-height: 30px;
+          }
         }
         .icon {
           width: 70px;
