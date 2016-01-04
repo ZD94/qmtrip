@@ -105,6 +105,18 @@ describe("api/client/staff.js", function() {
         })
     })
 
+    //查询人数
+    describe("API.staff.statisticStaffsRole", function() {
+        it("API.staff.statisticStaffsRole", function(done) {
+            API.staff.statisticStaffsRole({companyId: '9f20e3c0-9f24-11e5-beab-31a51ecd9fc2'}, function(err, result) {//查询条件此处用staffId或者staff_id均可
+                assert.equal(err, null);
+                //console.log(err);
+                console.log(result);
+                done();
+            });
+        })
+    })
+
     //删除员工信息
     describe("API.staff.deleteStaff", function() {
         it("API.staff.deleteStaff", function(done) {

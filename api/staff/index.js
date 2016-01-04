@@ -664,6 +664,44 @@ staff.statisticStaffs = function(params, callback){
                 })
         }).nodeify(callback);
 }
+/**
+ * 得到企业管理员 普通员工 未激活人数
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+staff.statisticStaffsRole = function(params, callback){
+    var defer = Q.defer();
+    if(!params.companyId){
+        defer.reject({code: -1, msg: '企业Id不能为空'});
+        return defer.promise;
+    }
+    var companyId = params.companyId;
+    var adminNum = 0
+    var commonStaffNum = 0;
+    var unActiveNum = 0;
+    return staffModel.findAll({where: {companyId: companyId}})
+        .then(function(staffs){
+            return Q.all(staffs.map(function(s){
+                if(s.roleId == 2){
+                    adminNum++;
+                }else if(s.roleId = 1){
+                    commonStaffNum++;
+                }
+                return API.auth.getAccount({id: s.id})
+                    .then(function(acc){
+                        if(acc.status == 0){
+                            unActiveNum++;
+                        }
+                    })
+            }))
+                .then(function(){
+                    var result = {adminNum: adminNum, commonStaffNum: commonStaffNum, unActiveNum: unActiveNum};
+                    return result;
+                })
+        })
+        .nodeify(callback);
+}
 
 /**
  * 得到可以查看用户票据的账号id （目前暂定代理商可查看用于审核）

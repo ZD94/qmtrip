@@ -1,0 +1,48 @@
+<style>html,body {background: #F5F5F5;}</style>
+<div class="travel-record">
+    <div class="travelList">
+        <div class="mainbox_top">待审核出差记录</div>
+        <div class="mainbox_bottom">
+            <div class="content">
+                <table style="width: 100%">
+                    <tr>
+                        <th align="center">企业名称</th>
+                        <th align="center">出差人</th>
+                        <th align="center">出发时间</th>
+                        <th align="center">服务</th>
+                        <th align="center">预算单内容简介</th>
+                        <th align="center">状态</th>
+                        <th align="center">操作</th>
+                    </tr>
+                    <tr ng-repeat="item in travelListitems" ng-click="enterDetail(item.id)">
+                        <td align="center">
+
+                        </td>
+                        <td align="center">
+
+                        </td>
+                        <td align="center">
+
+                        </td>
+                        <td align="center">
+
+                        </td>
+                        <td align="center">
+
+                        </td>
+                        <td align="center">
+
+                        </td>
+                        <td align="center">
+
+                        </td>
+                    </tr>
+                </table>
+                <input type="button" value="删除" ng-click="deletePlan()">
+            </div>
+        </div>
+    </div>
+
+
+
+</div>

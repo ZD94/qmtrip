@@ -313,4 +313,16 @@ staff.statisticStaffs = function(params, callback){
     return API.staff.statisticStaffs(params, callback);
 }
 
+/**
+ * @method API.staff.statisticStaffsRole
+ * 统计企业管理员 普通员工 未激活人数
+ * @param params
+ * @param {uuid} params.companyId
+ * @param callback
+ * @returns {promise} {adminNum: '管理员人数', commonStaffNum: '普通员工人数', unActiveNum: '未激活人数'};
+ */
+staff.statisticStaffsRole = function(params, callback){
+    return API.staff.statisticStaffsRole(params, callback);
+}
+
 module.exports = staff;
