@@ -144,7 +144,8 @@ authServer.sendResetPwdEmail = function(params, callback) {
  * 找回密码
  *
  * @param {Object} params
- * @param {UUID} params.accountId 账号ID
+ * @param {UUID} params.email 账号ID
+ * @param {Integer} params.type 类型 1.企业员工 2.代理商员工
  * @param {String} params.sign 签名
  * @param {String} params.timestamp 时间戳
  * @param {String} params.pwd 新密码
@@ -152,8 +153,8 @@ authServer.sendResetPwdEmail = function(params, callback) {
  * @return {Promise} true|error
  */
 authServer.resetPwdByEmail = function(params, callback) {
-    console.info(params)
-    var accountId = params.accountId;
+    var accountId = params.email;
+    var type = params.type || ACCOUNT_TYPE.COMPANY_STAFF
     var sign = params.sign;
     var timestamp = params.timestamp;
     var pwd = params.pwd;
@@ -176,7 +177,7 @@ authServer.resetPwdByEmail = function(params, callback) {
                 throw L.ERR.PWD_EMPTY;
             }
 
-            return Models.Account.findById(accountId)
+            return Models.Account.findOne({where: {email: email, type: type}})
         })
         .then(function(account) {
             var _sign = makeActiveSign(account.pwdToken, accountId, timestamp);
