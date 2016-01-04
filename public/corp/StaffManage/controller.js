@@ -63,17 +63,16 @@ var staff = (function(){
         $scope.initstafflist = function(){
             //加载多个API方法
             API.onload(function(){
-                console.log(123);
-
                 API.staff.getCurrentStaff()//qh获取当前登录人员的企业id
                     .then(function(staff){
                         //console.log(Q);
                         return Q.all([
                             API.travelPolicy.getAllTravelPolicy({where: {companyId:staff.companyId}}),//获取当前所有的差旅标准名称
-                            API.staff.listAndPaginateStaff({companyId:staff.companyId})//加载所有的员工记录
+                            API.staff.listAndPaginateStaff({companyId:staff.companyId}),//加载所有的员工记录
+                            API.staff.statisticStaffsRole({companyId:staff.companyId})//统计企业员工（管理员 普通员工 未激活员工）数量
                         ])
-                            .spread(function(travelPolicies,staffinfo){
-                                console.log(456);
+                            .spread(function(travelPolicies,staffinfo,staffRole){
+                                //获取差旅标准
                                 $scope.companyId = staff.companyId;
                                 var arr = travelPolicies;
                                 var i ;
@@ -84,6 +83,7 @@ var staff = (function(){
                                     //console.info(id);
 
                                 }
+                                //加载员工列表
                                 $scope.staffs = staffinfo.items;
                                 //console.info($scope.staff);
                                 var tasks = $scope.staffs
@@ -94,6 +94,11 @@ var staff = (function(){
                                                 $scope.$apply();
                                             })
                                     });
+                                //统计企业员工（管理员 普通员工 未激活员工）数量
+                                $scope.forActive = staffRole.unActiveNum;
+                                $scope.manager = staffRole.adminNum;
+                                $scope.publicStaff = staffRole.commonStaffNum;
+                                $scope.isOrNotActive = staffRole.accStatus;
                                 return Q.all(tasks)
                                     .then(function(){
                                         //console.log(6768);
@@ -114,6 +119,9 @@ var staff = (function(){
 
 
         $scope.initstafflist();
+
+        // 统计企业员工（管理员 普通员工 未激活员工）数量
+
 
         //对员工信息进行保存的操作
         $scope.saveStaffInfo = function() {
@@ -146,6 +154,12 @@ var staff = (function(){
                             $(".add_staff").hide();
                             $("#add").removeClass("onCheck");
                             //$scope.initstafflist();
+                            $("#staffName").val("");
+                            $("#staffEmail").val("");
+                            $("#staffTel").val("");
+                            $("#staffDepartment").val("");
+                            $scope.selectkey = "";
+                            $("#staffPower").val("");
                             $scope.initStaff();
                             $scope.$apply();
                         }).catch(function (err) {
