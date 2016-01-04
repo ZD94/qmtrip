@@ -281,8 +281,7 @@ auth.sendResetPwdEmail = function(params, callback) {
  * 找回密码
  *
  * @param {Object} params
- * @param {UUID} params.email 账号ID
- * @param {Integer} params.type 账户类型
+ * @param {UUID} params.accountId 账号ID
  * @param {String} params.sign 签名
  * @param {String} params.timestamp 时间戳
  * @param {String} params.pwd 新密码
