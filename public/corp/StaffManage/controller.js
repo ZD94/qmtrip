@@ -87,11 +87,20 @@ var staff = (function(){
                                 //console.info($scope.staff);
                                 var tasks = $scope.staffs
                                     .map(function($staff){ //通过id拿到差旅标准的名字
-                                        return API.travelPolicy.getTravelPolicy({id:$staff.travelLevel})
+                                        return Q.all([
+                                            API.travelPolicy.getTravelPolicy({id:$staff.travelLevel}),
+                                            API.auth.getAccountStatus({id:$staff.id})
+                                        ])
+                                            .spread(function(travelLevel, acc){
+                                                $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
+                                                $staff.accStatus = acc.status==0?'未激活':(acc.status == -1?'禁用': '已激活');//账户激活状态
+                                                $scope.$apply();
+                                            })
+                                        /*return API.travelPolicy.getTravelPolicy({id:$staff.travelLevel})
                                             .then(function(travelLevel){
                                                 $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
                                                 $scope.$apply();
-                                            })
+                                            })*/
                                     });
                                 return Q.all(tasks)
                                     .then(function(){
@@ -102,7 +111,6 @@ var staff = (function(){
                             })
                     })
                     .catch(function(err){
-                        console.log(123456);
                         console.info(err);
                     })
 
