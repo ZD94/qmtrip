@@ -30,6 +30,9 @@ var travelPlan=(function(){
                         console.info (result);
                         $scope.$apply();
                     })
+                    .catch(function(err){
+                        console.info(err);
+                    })
             })
         }
         //已完成列表
@@ -40,6 +43,9 @@ var travelPlan=(function(){
                         $scope.finishPlanListitems = result;
                         console.info (result);
                         $scope.$apply();
+                    })
+                    .catch(function(err){
+                        console.info(err);
                     })
             })
         }

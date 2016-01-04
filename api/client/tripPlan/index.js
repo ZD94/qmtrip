@@ -57,14 +57,25 @@ tripPlan.getTripPlanOrderById = function(orderId, callback){
  * @param callback
  * @returns {*}
  */
-tripPlan.listTripPlanOrder = function(query, callback){
-    var accountId = this.accountId;
-    query.accountId = accountId;
-    var params = {
-        userId: accountId,
-        query: query
+tripPlan.listTripPlanOrder = function(params, callback){
+    if(typeof params == "function"){
+        callback = params;
+        params = {};
     }
-    return API.tripPlan.listTripPlanOrder(params, callback);
+    if(!params){
+        params = {}
+    }
+    var accountId = this.accountId;
+    return API.staff.getStaff({id: accountId, columns: ['companyId']})
+        .then(function(staff){
+            var companyId = staff.companyId;
+            return companyId;
+        })
+        .then(function(companyId){
+            params.companyId = companyId;
+            return API.tripPlan.listTripPlanOrder(params);
+        })
+        .nodeify(callback);
 }
 
 /**
