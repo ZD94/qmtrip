@@ -1,14 +1,20 @@
 <style>html,body {background: #F5F5F5;}</style>
 <div class="travel-plan">
-    <div class="mainbox">
+    <div class="planList">
         <ul class="mainbox_top">
-            <li class="active">待上传票据</li>
-            <li>已完成</li>
+            <li class="active">待上传票据
+                <span ng-if="planListitems.length">({{planListitems.length}})</span>
+                <span ng-if="!planListitems.length">(0)</span>
+            </li>
+            <li>已完成
+                <span ng-if="finishPlanListitems.length">({{finishPlanListitems.length}})</span>
+                <span ng-if="!finishPlanListitems.length">(0)</span>
+            </li>
         </ul>
         <div class="mainbox_bottom">
             <div class="search">
-                <input type="text" class="common_text" placeholder="输入出发时间/内容简介" style="width: 238px; margin-top: 19px;">
-                <input type="button" value="预算单搜索" class="common_btn1" style="width: 120px; margin: 19px 0 0 20px;">
+                <input type="text" class="common_text" ng-model="keyword" placeholder="输入出发时间/内容简介" style="width: 238px; margin-top: 19px;">
+                <input type="button" value="预算单搜索" class="common_btn1" ng-click="searchKeyword()" style="width: 120px; margin: 19px 0 0 20px;">
             </div>
             <div class="content">
                 <table style="width: 100%">
@@ -30,7 +36,7 @@
                             <p ng-if="item.isNeedHotel" class="live_icon web-icon-font3">&#xe914;</p>
                         </td>
                         <td align="center">
-                            <p ng-if="item.isNeedTraffic"><a>{{item.startPlace}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="staff/images/dancheng_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.destination}}</a></p>
+                            <p ng-if="item.isNeedTraffic"><a>{{item.startPlace}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="staff/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.destination}}</a></p>
                             <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
                         </td>
                         <td width="150" align="center">¥{{item.budget}}</td>
@@ -41,6 +47,93 @@
                         </td>
                         <td width="150" align="center">
                             <p ng-if="item.outTraffic.length!=0">
+                                <span ng-if="item.outTraffic[0].invoice.length==0"><a href="#">上传票据</a></span>
+                                <span ng-if="item.outTraffic[0].invoice.length!=0">
+                                    <span class="shenhe" ng-if="item.outTraffic[0].invoice.status=='-1'">未通过</span>
+                                    <span class="shenhe" ng-if="item.outTraffic[0].invoice.status==0">待审核</span>
+                                    <span class="shenhe" ng-if="item.outTraffic[0].invoice.status==1">审核通过</span>
+                                </span>
+                            </p>
+                            <p ng-if="item.hotel.length!=0">
+                                <span ng-if="item.hotel[0].invoice.length==0"><a href="#">上传票据</a></span>
+                                <span ng-if="item.hotel[0].invoice.length!=0">
+                                    <span class="shenhe" ng-if="item.hotel[0].invoice.status=='-1'">未通过</span>
+                                    <span class="shenhe" ng-if="item.hotel[0].invoice.status==0">待审核</span>
+                                    <span class="shenhe" ng-if="item.hotel[0].invoice.status==1">审核通过</span>
+                                </span>
+                            </p>
+                            <p ng-if="item.backTraffic.length!=0">
+                                <span ng-if="item.backTraffic[0].invoice.length==0"><a href="#">上传票据</a></span>
+                                <span ng-if="item.backTraffic[0].invoice.length!=0">
+                                    <span class="shenhe" ng-if="item.backTraffic[0].invoice.status=='-1'">未通过</span>
+                                    <span class="shenhe" ng-if="item.backTraffic[0].invoice.status==0">待审核</span>
+                                    <span class="shenhe" ng-if="item.backTraffic[0].invoice.status==1">审核通过</span>
+                                </span>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+                <input type="button" value="删除" ng-click="deletePlan()">
+            </div>
+        </div>
+
+        <div class="mainbox_bottom" style="display: none;">
+            <div class="search">
+                <input type="text" class="common_text" ng-model="finishKeyword" placeholder="输入出发时间/内容简介" style="width: 238px; margin-top: 19px;">
+                <input type="button" value="预算单搜索" class="common_btn1" style="width: 120px; margin: 19px 0 0 20px;">
+            </div>
+            <div class="content">
+                <table style="width: 100%">
+                    <tr>
+                        <th align="center">出发时间</th>
+                        <th align="center">服务</th>
+                        <th align="center">预算单内容简介</th>
+                        <th align="center">预算</th>
+                        <th align="center">上传进度</th>
+                        <th align="center">操作</th>
+                    </tr>
+                    <tr ng-repeat="item in finishPlanListitems" ng-click="enterDetail(item.id)">
+                        <td width="150" align="center">
+                            <p ng-if="item.startAt">{{item.startAt | date: 'yyyy-MM-dd'}}</p>
+                            <p ng-if="!item.startAt">{{item.hotel[0].startTime | date: 'yyyy-MM-dd'}}</p>
+                        </td>
+                        <td width="150" align="center">
+                            <p ng-if="item.isNeedTraffic" class="traffic_icon web-icon-font3">&#xe90e;</p>
+                            <p ng-if="item.isNeedHotel" class="live_icon web-icon-font3">&#xe914;</p>
+                        </td>
+                        <td align="center">
+                            <p ng-if="item.isNeedTraffic"><a>{{item.startPlace}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="staff/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.destination}}</a></p>
+                            <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
+                        </td>
+                        <td width="150" align="center">¥{{item.budget}}</td>
+                        <td width="150" align="center">
+                            <p ng-if="item.outTraffic.length!=0">去程行程单</p>
+                            <p ng-if="item.hotel.length!=0">住宿发票</p>
+                            <p ng-if="item.backTraffic.length!=0">回程行程单</p>
+                        </td>
+                        <td width="150" align="center">
+                            <p ng-if="item.outTraffic.length!=0">
+                                <span ng-if="item.outTraffic[0].invoice.length==0"><a href="#">上传票据</a></span>
+                                <span ng-if="item.outTraffic[0].invoice.length!=0">
+                                    <span class="shenhe" ng-if="item.outTraffic[0].invoice.status=='-1'">未通过</span>
+                                    <span class="shenhe" ng-if="item.outTraffic[0].invoice.status==0">待审核</span>
+                                    <span class="shenhe" ng-if="item.outTraffic[0].invoice.status==1">审核通过</span>
+                                </span>
+                            </p>
+                            <p ng-if="item.hotel.length!=0">
+                                <span ng-if="item.hotel[0].invoice.length==0"><a href="#">上传票据</a></span>
+                                <span ng-if="item.hotel[0].invoice.length!=0">
+                                    <span class="shenhe" ng-if="item.hotel[0].invoice.status=='-1'">未通过</span>
+                                    <span class="shenhe" ng-if="item.hotel[0].invoice.status==0">待审核</span>
+                                    <span class="shenhe" ng-if="item.hotel[0].invoice.status==1">审核通过</span>
+                                </span>
+                            </p>
+                            <p ng-if="item.backTraffic.length!=0">
+                                <span ng-if="item.backTraffic[0].invoice.length==0"><a href="#">上传票据</a></span>
+                                <span ng-if="item.backTraffic[0].invoice.length!=0">
+                                    <span class="shenhe" ng-if="item.backTraffic[0].invoice.status=='-1'">未通过</span>
+                                    <span class="shenhe" ng-if="item.backTraffic[0].invoice.status==0">待审核</span>
+                                    <span class="shenhe" ng-if="item.backTraffic[0].invoice.status==1">审核通过</span>
                                 <span ng-if="item.status==0">
                                     <!-- <a href="#">上传票据</a> -->
                                     <input type="hidden" name="good[picture]" id="invoice_to" value="">

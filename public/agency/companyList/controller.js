@@ -17,6 +17,7 @@ module.exports = (function(){
 			API.onload(function(){
 				API.company.getCompanyListByAgency()
 					.then(function(companylist){
+						console.info(companylist);
 						var promises = companylist.map(function(company){
 							// console.info(company.createUser)
 							return Q.all([
@@ -73,11 +74,12 @@ module.exports = (function(){
                         Q.all([
                         	API.staff.getStaffByAgency(staffId),
                         	API.company.getCompanyFundsAccount(companyId),
-                        	API.staff.statisticStaffs({companyId:companyId})
+                        	API.staff.statisticStaffs({companyId:companyId}),
                         	// API.tripPlan.countTripPlanNum()
+                        	API.tripPlan.countTripPlanNumByAgency(companyId)
                         ])
-                        .spread(function(staff,funds,staffnum){
-                        	// console.info(trip);
+                        .spread(function(staff,funds,staffnum,trip){
+                        	console.info(trip);
                         	$scope.staff = staff;
                         	$scope.funds = funds;
                         	$scope.staffnum = staffnum.all;

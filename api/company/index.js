@@ -115,7 +115,11 @@ company.getCompany = function(params, callback){
     return checkParams(['companyId'], params)
         .then(function(){
             var companyId = params.companyId;
-            return Company.findById(companyId);
+            var options = {};
+            if(params.columns){
+                options.attributes = params.columns;
+            }
+            return Company.findById(companyId, options);
         })
         .then(function(company){
             if(!company){

@@ -16,6 +16,7 @@
     "angular-ui-router": "^0.2.15",
     "app-module-path": "^1.0.5",
     "bindings": "^1.2.1",
+    "bluebird": "^3.1.1",
     "body-parser": "^1.14.1",
     "callsite": "^1.0.0",
     "co": "^4.6.0",
@@ -79,6 +80,7 @@
     "through2": "^2.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.6.1"
+    "watchify": "^3.6.1",
+    "ws": "^1.0.0"
   }
 }

@@ -393,7 +393,9 @@ var auth=(function(){
     }
 
     //忘记密码页
-    auth.ForgetpwdController = function($scope) {
+    auth.ForgetpwdController = function($scope,$routeParams) {
+        //alert(3333);
+        var accountId = $routeParams.accountId;
         $scope.toRegister = function () {
             window.location.href = "#/auth/register";
         }
@@ -412,16 +414,50 @@ var auth=(function(){
         })
         //换一换图片验证码
         $scope.changePicCode = function () {
-            console.info("click me...")
+            //console.info("click me...")
             API.onload(function () {
-                console.info("here...")
+                //console.info("here...")
                 API.checkcode.getPicCheckCode({width: imgW, height: imgH, quality: 100, length: 4})
                     .then(function (result) {
                         //console.info("获取验证码图片", result);
                         $("#imgCode").attr("src", result.captcha);
                         picTicket = result.ticket;
+                        return picTicket;
                     }).catch(function (err) {
                         console.info(err);
+                    }).done();
+            })
+        }
+
+        //点击下一步进行邮件发送
+        $scope.nextStep = function(){
+            //alert(2222);
+            var mail = $("#loginMail").val();
+            var picCode = $("#picCode").val();
+
+            API.onload(function () {
+                API.auth.sendResetPwdEmail({accountId:accountId,code:picCode,ticket:picTicket})
+                    .then(function (forgetPwd) {
+                        //alert("已发送邮件");
+                        $(".changeContentOne").hide();
+                        $scope.changePwdMail = mail;
+                        $(".changeContentTwo").show();
+                        $(".step>ul>li:nth-child(2)").addClass("on").siblings("li").removeClass("on");
+                        $scope.$apply();
+                    }).catch(function (err) {
+                        console.info(err);
+                    }).done();
+            })
+        }
+        //重发一封
+        $scope.sendAgainActiveMail = function(){
+            API.onload(function(){
+                API.auth.sendActiveEmail({email:mail})
+                    .then(function(){
+                        console.info("发送成功");
+                        $scope.$apply();
+                    }).catch(function(err){
+                        console.error(err);
                     }).done();
             })
         }
@@ -510,11 +546,59 @@ var auth=(function(){
                 API.auth.resetPwdByEmail({accountId:accountId,sign: sign, timestamp: timestamp,pwd:pwds})
                     .then(function(){
                         alert("设置密码成功");
+                        window.location.href="#/auth/staffPwdSuccess";
                         $scope.$apply();
                 }).catch(function(err){
                     console.error(err);
                 }).done();
             })
+        }
+    }
+
+    //员工设置密码成功页面
+    auth.StaffPwdSuccessController = function($scope){
+        var $seconds = $("#second3");
+        var timer = setInterval(function() {
+            var begin = $seconds.text();
+            begin = parseInt(begin);
+            if (begin <=0 ) {
+                clearInterval(timer);
+                window.location.href= '#/auth/login';
+            } else {
+                begin = begin - 1;
+                $seconds.text(begin);
+            }
+        }, 1000);
+    }
+
+    //修改密码页面
+    auth.ChangePwdController = function($scope) {
+
+        $scope.checkChangePwd = function(){
+
+            var old = $("#oldPwd").val();
+            var first = $("#newFirstPwd").val();
+            var second = $("#newSecondPwd").val();
+            var commit = true;
+
+            if(commit){
+                if(old == first){
+                    alert("新旧密码不能一致！");
+                }else if(first != second){
+                    alert("两次输入密码不一致！");
+                }
+                API.onload(function() {
+                    API.auth.resetPwdByOldPwd({oldPwd:old,newPwd:second})
+                        .then(function(){
+                            alert("重置密码成功");
+                            window.location.href= '#/auth/login';
+                            $scope.$apply();
+                        }).catch(function(err){
+                            console.error(err);
+                        }).done();
+                })
+            }
+
         }
     }
 
