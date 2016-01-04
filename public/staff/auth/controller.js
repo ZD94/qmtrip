@@ -453,13 +453,18 @@ var auth=(function(){
         }
         //重发一封
         $scope.sendAgainActiveMail = function(){
-            API.onload(function(){
-                API.auth.sendActiveEmail({email:$scope.changePwdMail})
-                    .then(function(){
-                        console.info("发送成功");
-                        $scope.$apply();
-                    }).catch(function(err){
-                        console.error(err);
+
+            $(".changeContentTwo").hide();
+            $(".changeContentOne").show();
+            $(".step>ul>li:nth-child(1)").addClass("on").siblings("li").removeClass("on");
+            //$scope.changePwdMail = mail;
+            API.onload(function () {
+                API.checkcode.getPicCheckCode({width: imgW, height: imgH, quality: 100, length: 4, type: 1})
+                    .then(function (result) {
+                        $("#imgCode").attr("src", result.captcha);
+                        picTicket = result.ticket;
+                    }).catch(function (err) {
+                        console.info(err);
                     }).done();
             })
         }
