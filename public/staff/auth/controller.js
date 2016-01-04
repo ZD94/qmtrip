@@ -51,6 +51,7 @@ var auth=(function(){
                         }).catch(function(err){
                             if (err.msg) {
                                 alert(err.msg);
+
                                 console.log(err.msg);
                                 //Myalert("提示信息", err.msg);
                             } else {
@@ -190,6 +191,7 @@ var auth=(function(){
 
         //获取短信验证码
         $scope.getMCode = function() {
+            console.info(1111);
             var mobile = $('#corpMobile').val();
             if(!mobile){
                 $scope.err_msg_phone = "联系人电话不能为空";
@@ -452,7 +454,7 @@ var auth=(function(){
         //重发一封
         $scope.sendAgainActiveMail = function(){
             API.onload(function(){
-                API.auth.sendActiveEmail({email:mail})
+                API.auth.sendActiveEmail({email:$scope.changePwdMail})
                     .then(function(){
                         console.info("发送成功");
                         $scope.$apply();
