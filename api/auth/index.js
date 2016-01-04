@@ -88,23 +88,25 @@ authServer.activeByEmail = function(data, callback) {
  * @method sendResetPwdEmail 发送设置密码邮件
  *
  * @param {Object} params
- * @param {UUID} params.accountId 账号ID
+ * @param {UUID} params.email 账号ID
+ * @param {Integer} params.type 1. 企业员工 2.代理商
  * @param {Boolean} params.isFirstSet true|false 是否首次设置密码
  * @param {Function} [callback]
  * @returns {Promise} true|error
  */
 authServer.sendResetPwdEmail = function(params, callback) {
-    var accountId = params.accountId;
+    var email = params.email;
     var isFirstSet = params.isFirstSet;
+    var type = params.type || 1;
     return Q()
         .then(function() {
-            if (!accountId) {
+            if (!email) {
                 throw L.ERR.ACCOUNT_NOT_EXIST;
             }
-            return accountId;
+            return email;
         })
-        .then(function(id) {
-            return Models.Account.findById(id)
+        .then(function(email) {
+            return Models.Account.findOne({where: {email: email, type: type}})
                 .then(function(account) {
                     if (!account) {
                         throw L.ERR.ACCOUNT_NOT_EXIST;
@@ -314,7 +316,7 @@ authServer.newAccount = function(data, callback) {
         })
         .then(function(account) {
             if (!account.pwd) {
-                return authServer.sendResetPwdEmail({accountId: account.id, isFirstSet: true})
+                return authServer.sendResetPwdEmail({email: account.email, type: 1, isFirstSet: true})
                     .then(function() {
                         return account;
                     })
