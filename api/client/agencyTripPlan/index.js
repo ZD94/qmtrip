@@ -45,14 +45,28 @@ agencyTripPlan.getTripPlanOrderById = function(orderId, callback){
  * @param callback
  * @returns {*}
  */
-agencyTripPlan.listTripPlanOrder = function(query, callback){
-    var accountId = this.accountId;
-    query.accountId = accountId;
+agencyTripPlan.listAllTripPlanOrder = function(callback){
+    var self = this;
+    var accountId = self.accountId;
     var params = {
-        userId: accountId,
-        query: query
+        userId: accountId
     }
-    return API.tripPlan.listTripPlanOrder(params, callback);
+    return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
+        .then(function(user){
+            return user.agencyId;
+        })
+        .then(function(agencyId){
+            params.agencyId = agencyId;
+            return API.company.listCompany(params)
+        })
+        .then(function(companys){
+            var companyIdList = companys.map(function(company){
+                return company.id;
+            });
+            params.companyId = {$in: companyIdList};
+            return API.tripPlan.listTripPlanOrder(params);
+        })
+        .nodeify(callback);
 }
 
 

@@ -27,7 +27,7 @@ var agency = {};
  * @param callback
  */
 agency.registerAgency = function(params, callback){
-    var agency = checkAndGetParams(['name', 'email', 'mobile', 'userName'], [], params, true);
+    var agency = checkAndGetParams(['name', 'email', 'mobile', 'userName'], ['description', 'remark'], params, true);
     var userName = params.userName;
     var agencyId = uuid.v1() || params.agencyId;
     agency.id = agencyId;
