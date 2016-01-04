@@ -316,7 +316,7 @@ authServer.newAccount = function(data, callback) {
         })
         .then(function(account) {
             if (!account.pwd) {
-                return authServer.sendResetPwdEmail({accountId: account.id, isFirstSet: true})
+                return authServer.sendResetPwdEmail({email: account.email, type: 1, isFirstSet: true})
                     .then(function() {
                         return account;
                     })
