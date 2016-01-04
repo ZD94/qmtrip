@@ -30,7 +30,8 @@ var tripPlan = {}
  */
 tripPlan.savePlanOrder = function(params, callback){
     var checkArr = ['accountId', 'companyId', 'type', 'destination', 'budget'];
-    var _planOrder = checkAndGetParams(checkArr, [], params, true);
+    var getArr = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark'];
+    var _planOrder = checkAndGetParams(checkArr, getArr, params, true);
     return API.seeds.getSeedNo('tripPlanOrderNo')
         .then(function(orderNo){
             var orderId = uuid.v1();
