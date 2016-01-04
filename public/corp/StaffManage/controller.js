@@ -63,7 +63,7 @@ var staff = (function(){
         $scope.initstafflist = function(){
             //加载多个API方法
             API.onload(function(){
-                //console.log(123);
+                console.log(123);
 
                 API.staff.getCurrentStaff()//qh获取当前登录人员的企业id
                     .then(function(staff){
@@ -73,6 +73,7 @@ var staff = (function(){
                             API.staff.listAndPaginateStaff({companyId:staff.companyId})//加载所有的员工记录
                         ])
                             .spread(function(travelPolicies,staffinfo){
+                                console.log(456);
                                 $scope.companyId = staff.companyId;
                                 var arr = travelPolicies;
                                 var i ;
