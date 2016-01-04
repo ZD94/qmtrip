@@ -70,7 +70,6 @@ var businessTravel=(function(){
                         if ($scope.startplaceitems.length) {
                             $(".placelist1").show();
                         }
-                        console.info (result);
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -93,7 +92,6 @@ var businessTravel=(function(){
                         if ($scope.endplaceitems.length) {
                             $(".placelist2").show();
                         }
-                        console.info (result);
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -180,7 +178,6 @@ var businessTravel=(function(){
                         if ($scope.endplaceitems.length) {
                             $(".placelist1").show();
                         }
-                        console.info (result);
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -203,7 +200,6 @@ var businessTravel=(function(){
                         if ($scope.liveplaceitems.length) {
                             $(".placelist2").show();
                         }
-                        console.info (result);
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -272,7 +268,6 @@ var businessTravel=(function(){
                         if ($scope.startplaceitems.length) {
                             $(".placelist1").show();
                         }
-                        console.info (result);
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -295,7 +290,6 @@ var businessTravel=(function(){
                         if ($scope.endplaceitems.length) {
                             $(".placelist2").show();
                         }
-                        console.info (result);
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -319,7 +313,6 @@ var businessTravel=(function(){
                         if ($scope.liveplaceitems.length) {
                             $(".placelist2").show();
                         }
-                        console.info (result);
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -401,7 +394,6 @@ var businessTravel=(function(){
                 Myalert("温馨提示","离店日期不能小于入住日期");
                 return false;
             }
-            console.info (parameter);
             window.location.href = "#/businessTravel/CreateResult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&spval="+startplace+"&epval="+endplace+"&lpval="+liveplace+"&"+parameter;
         }
 
@@ -454,7 +446,6 @@ var businessTravel=(function(){
                     .spread(function(ret1,ret2) {
                         $scope.companyId = ret1.companyId;
                         $scope.onlytraffic = ret2;
-                        console.info (ret2);
                         $(".creating").hide();
                         $(".createresult,.tianxun").show();
                         $scope.totalprice = ret2.price;
@@ -482,7 +473,6 @@ var businessTravel=(function(){
                     .spread(function(ret1,ret2) {
                         $scope.companyId = ret1.companyId;
                         $scope.onlylive = ret2;
-                        console.info (ret2);
                         $(".creating").hide();
                         $(".createresult,.tianxun").show();
                         $scope.totalprice = ret2.price;
@@ -518,7 +508,6 @@ var businessTravel=(function(){
                     .spread(function(ret1,ret2) {
                         $scope.companyId = ret1.companyId;
                         $scope.trafficlive = ret2;
-                        console.info (ret2);
                         $(".creating").hide();
                         $(".createresult,.tianxun").show();
                         $scope.totalprice = ret2.price;
@@ -537,7 +526,6 @@ var businessTravel=(function(){
 
         //生成记录
         $scope.createRecord = function () {
-            console.info(1111111111);
             API.onload(function(){
 
                 var consumeDetails = [];
@@ -554,10 +542,14 @@ var businessTravel=(function(){
                     isNeedTraffic:$scope.tra,
                     isNeedHotel:$scope.liv
                 }
+                if ($scope.endtime) {
+                    order.backAt = $scope.endtime;
+                }
                 //住宿
                 if(liv==1){
                     var consumeDetails_hotel = {
                         type:0,
+                        city:$scope.endplace,
                         hotelName:$scope.liveplace,
                         startTime:$scope.livetime,
                         endTime:$scope.leavetime,
@@ -578,7 +570,7 @@ var businessTravel=(function(){
                         invoiceType:1
                     }
                     if($scope.endtime){
-                        consumeDetails_outTraffic.endtime = $scope.endtime;
+                        consumeDetails_outTraffic.endTime = $scope.endtime;
                     }
                     if($scope.starttimelate){
                         consumeDetails_outTraffic.latestArriveTime = $scope.starttime+' '+$scope.starttimelate;
@@ -614,7 +606,6 @@ var businessTravel=(function(){
 
                 API.tripPlan.savePlanOrder(order)
                     .then(function(result){
-                        console.info(result);
                         $(".bottom1").hide();
                         $(".bottom2").show();
                         Myalert("温馨提示","生成出差记录成功");
