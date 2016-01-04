@@ -93,26 +93,24 @@ tripPlan.savePlanOrder = function(params, callback){
 tripPlan.getTripPlanOrder = function(params, callback){
     var defer = Q.defer();
     var checkArr = ['userId', 'orderId'];
-    return checkParams(checkArr, params)
-        .then(function(){
-            var orderId = params.orderId;
-            var userId = params.userId;
-            return Q.all([
-                PlanOrder.findById(orderId),
-                ConsumeDetails.findAll({where: {orderId: orderId, type: -1}}),
-                ConsumeDetails.findAll({where: {orderId: orderId, type: 1}}),
-                ConsumeDetails.findAll({where: {orderId: orderId, type: 0}})
-            ])
-                .spread(function(order, outTraffic, backTraffic, hotel){
-                    if(!order || order.status == -2){
-                        defer.reject(L.ERR.TRIP_PLAN_ORDER_NOT_EXIST);
-                        return defer.promise;
-                    }
-                    order.outTraffic = outTraffic;
-                    order.backTraffic = backTraffic;
-                    order.hotel = hotel;
-                    return order;
-                })
+    params = checkAndGetParams(checkArr, [], params, true);
+    var orderId = params.orderId;
+    var userId = params.userId;
+    return Q.all([
+        PlanOrder.findById(orderId),
+        ConsumeDetails.findAll({where: {orderId: orderId, type: -1, status: {$ne: -2}}}),
+        ConsumeDetails.findAll({where: {orderId: orderId, type: 1, status: {$ne: -2}}}),
+        ConsumeDetails.findAll({where: {orderId: orderId, type: 0, status: {$ne: -2}}})
+    ])
+        .spread(function(order, outTraffic, backTraffic, hotel){
+            if(!order || order.status == -2){
+                defer.reject(L.ERR.TRIP_PLAN_ORDER_NOT_EXIST);
+                return defer.promise;
+            }
+            order.outTraffic = outTraffic;
+            order.backTraffic = backTraffic;
+            order.hotel = hotel;
+            return order;
         })
         .catch(errorHandle)
         .nodeify(callback);

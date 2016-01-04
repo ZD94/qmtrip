@@ -65,7 +65,9 @@ tripPlan.listTripPlanOrder = function(params, callback){
     if(!params){
         params = {}
     }
-    var accountId = this.accountId;
+    var self = this;
+    var accountId = self.accountId;
+    params.accountId = accountId;
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function(staff){
             var companyId = staff.companyId;
@@ -84,13 +86,23 @@ tripPlan.listTripPlanOrder = function(params, callback){
  * @param callback
  * @returns {*}
  */
-tripPlan.listTripPlanOrderByCompany = function(query, callback){
-    query.companyId = this.companyId; //test
-    var params = {
-        userId: this.accountId,
-        query: query
+tripPlan.listTripPlanOrderByCompany = function(params, callback){
+    if(typeof params == "function"){
+        callback = params;
+        params = {}
     }
-    return API.tripPlan.listTripPlanOrder(params, callback);
+    if(!params){ params = {}};
+    var self = this;
+    var accountId = self.accountId;
+    return API.staff.getStaff({id: accountId, columns: ['companyId']})
+    .then(function(staff){
+            return staff.companyId;
+        })
+    .then(function(companyId){
+            params.companyId = companyId;
+            return API.tripPlan.listTripPlanOrder(params);
+        })
+    .nodeify(callback);
 }
 
 /**

@@ -163,6 +163,33 @@ describe("api/client/tripPlan.js", function() {
     });
 
 
+    describe("API.tripPlan.listTripPlanOrder", function() {
+        it("#listTripPlanOrder should be ok", function(done) {
+            var self = {accountId: staffId};
+            API.client.tripPlan.listTripPlanOrder.call(self, function(err, ret){
+                if (err) {
+                    throw err;
+                }
+                done();
+            })
+        });
+    });
+
+
+    describe("API.tripPlan.listTripPlanOrderByCompany", function() {
+        it("#listTripPlanOrderByCompany should be ok", function(done) {
+            var self = {accountId: staffId};
+            API.client.tripPlan.listTripPlanOrderByCompany.call(self, {status: -2}, function(err, ret){
+                if (err) {
+                    throw err;
+                }
+                //console.info(ret);
+                done();
+            })
+        });
+    });
+
+
     describe("API.tripPlan.countTripPlanNum", function() {
         it("#countTripPlanNum should be ok", function(done) {
             var self = {accountId: staffId};
