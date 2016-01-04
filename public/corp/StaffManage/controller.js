@@ -4,6 +4,7 @@ var staff = (function(){
 
     API.require('staff');
     API.require('travelPolicy');
+    API.require('auth');
     var  staff = {};
 
     //员工管理界面
@@ -38,10 +39,11 @@ var staff = (function(){
                                 $scope.staffs = staffinfo.items;
                                 //console.info($scope.staff);
                                 var tasks = $scope.staffs
-                                    .map(function($staff){ //通过id拿到差旅标准的名字
+                                    .map(function($staff, acc){ //通过id拿到差旅标准的名字
                                         return API.travelPolicy.getTravelPolicy({id:$staff.travelLevel})
                                             .then(function(travelLevel){
                                                 $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
+                                                $staff.accStatus = acc.status==0?'未激活':(acc.status == -1?'禁用': '已激活');//账户激活状态
                                                 $scope.$apply();
                                             })
                                     });
@@ -107,7 +109,6 @@ var staff = (function(){
                                 $scope.forActive = staffRole.unActiveNum;
                                 $scope.manager = staffRole.adminNum;
                                 $scope.publicStaff = staffRole.commonStaffNum;
-                                $scope.isOrNotActive = staffRole.accStatus;
                                 return Q.all(tasks)
                                     .then(function(){
                                         //console.log(6768);
@@ -127,9 +128,6 @@ var staff = (function(){
 
 
         $scope.initstafflist();
-
-        // 统计企业员工（管理员 普通员工 未激活员工）数量
-
 
         //对员工信息进行保存的操作
         $scope.saveStaffInfo = function() {
