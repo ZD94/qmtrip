@@ -118,6 +118,20 @@ describe("api/client/company.js", function() {
     });
 
 
+    describe("API.client.getCompanyFundsAccount company", function(){
+        it("#getCompanyFundsAccount should be ok", function(done) {
+            var self = {accountId: ownerUserId};
+            API.client.company.getCompanyFundsAccount.call(self, companyId, function(err, ret){
+                if(err){
+                    throw err;
+                }
+                console.info(ret);
+                done();
+            })
+        });
+    });
+
+
     describe("delete company by test", function(){
         it("#delete company should be ok", function(done) {
             Q.all([

@@ -416,14 +416,10 @@ tripPlan.approveInvoice = function(params, callback){
  * @param callback
  */
 tripPlan.countTripPlanNum = function(params, callback){
-    return checkParams(['companyId'], params)
-        .then(function(){
-            var query = {
-                companyId: params.companyId
-            }
-            logger.info(query);
-            return PlanOrder.count({where: query})
-        }).nodeify(callback);
+    var query = checkAndGetParams(['companyId'], ['accountId', 'status'], params, true);
+    query.status = {$ne: -2};
+    return PlanOrder.count({where: query})
+        .nodeify(callback);
 }
 
 

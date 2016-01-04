@@ -20,7 +20,7 @@ describe("api/client/agencyTripPlan.js", function() {
      */
     before(function(done) {
         var agency = {
-            email: "miaomiao002.yu@tulingdao.com",
+            email: "agencyTripPlan.test@tulingdao.com",
             userName: "喵喵",
             name: '喵喵的代理商',
             description: '代理商计划单测试使用',
@@ -29,7 +29,7 @@ describe("api/client/agencyTripPlan.js", function() {
         };
 
         var company = {
-            email: "miaomiao002.yu@tulingdao.com",
+            email: "agencyTripPlan.test@tulingdao.com",
             userName: "喵喵",
             name: '喵喵的企业',
             mobile: "15269866804",
@@ -103,6 +103,9 @@ describe("api/client/agencyTripPlan.js", function() {
             })
         });
     });
+
+
+
 
 
     describe("API.agencyTripPlan.listTripPlanOrder", function() {
