@@ -224,3 +224,17 @@
 | sta.all   |在职员工|integer
 | sta.inNum |入职员工|integer
 | sta.outNum  |离职员工|integer
+
+>. 统计企业员工（管理员 普通员工 未激活员工）数量 API.staff.statisticStaffsRole(params,callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 参数             | json             |-------
+| params.companyId                      | 企业Id             |uuid           |必填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| adminNum   |管理员人数|integer
+| commonStaffNum |普通员工数|integer
+| unActiveNum  |未激活人数|integer

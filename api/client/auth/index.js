@@ -291,6 +291,17 @@ auth.sendResetPwdEmail = function(params, callback) {
 auth.resetPwdByEmail = API.auth.resetPwdByEmail;
 
 /**
+ * 得到账号激活状态
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+auth.getAccountStatus = function(params, callback) {
+    params.attributes = ["status"];
+    return API.auth.getAccount(params, callback);
+}
+
+/**
  * @method resetPwdByOldPwd
  *
  * 根据旧密码重置密码

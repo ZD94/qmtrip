@@ -63,17 +63,16 @@ var staff = (function(){
         $scope.initstafflist = function(){
             //加载多个API方法
             API.onload(function(){
-                console.log(123);
-
                 API.staff.getCurrentStaff()//qh获取当前登录人员的企业id
                     .then(function(staff){
                         //console.log(Q);
                         return Q.all([
                             API.travelPolicy.getAllTravelPolicy({where: {companyId:staff.companyId}}),//获取当前所有的差旅标准名称
-                            API.staff.listAndPaginateStaff({companyId:staff.companyId})//加载所有的员工记录
+                            API.staff.listAndPaginateStaff({companyId:staff.companyId}),//加载所有的员工记录
+                            API.staff.statisticStaffsRole({companyId:staff.companyId})//统计企业员工（管理员 普通员工 未激活员工）数量
                         ])
-                            .spread(function(travelPolicies,staffinfo){
-                                console.log(456);
+                            .spread(function(travelPolicies,staffinfo,staffRole){
+                                //获取差旅标准
                                 $scope.companyId = staff.companyId;
                                 var arr = travelPolicies;
                                 var i ;
@@ -84,16 +83,31 @@ var staff = (function(){
                                     //console.info(id);
 
                                 }
+                                //加载员工列表
                                 $scope.staffs = staffinfo.items;
                                 //console.info($scope.staff);
                                 var tasks = $scope.staffs
                                     .map(function($staff){ //通过id拿到差旅标准的名字
-                                        return API.travelPolicy.getTravelPolicy({id:$staff.travelLevel})
+                                        return Q.all([
+                                            API.travelPolicy.getTravelPolicy({id:$staff.travelLevel}),
+                                            API.auth.getAccountStatus({id:$staff.id})
+                                        ])
+                                            .spread(function(travelLevel, acc){
+                                                $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
+                                                $staff.accStatus = acc.status==0?'未激活':(acc.status == -1?'禁用': '已激活');//账户激活状态
+                                                $scope.$apply();
+                                            })
+                                        /*return API.travelPolicy.getTravelPolicy({id:$staff.travelLevel})
                                             .then(function(travelLevel){
                                                 $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
                                                 $scope.$apply();
-                                            })
+                                            })*/
                                     });
+                                //统计企业员工（管理员 普通员工 未激活员工）数量
+                                $scope.forActive = staffRole.unActiveNum;
+                                $scope.manager = staffRole.adminNum;
+                                $scope.publicStaff = staffRole.commonStaffNum;
+                                $scope.isOrNotActive = staffRole.accStatus;
                                 return Q.all(tasks)
                                     .then(function(){
                                         //console.log(6768);
@@ -103,7 +117,6 @@ var staff = (function(){
                             })
                     })
                     .catch(function(err){
-                        console.log(123456);
                         console.info(err);
                     })
 
@@ -114,6 +127,9 @@ var staff = (function(){
 
 
         $scope.initstafflist();
+
+        // 统计企业员工（管理员 普通员工 未激活员工）数量
+
 
         //对员工信息进行保存的操作
         $scope.saveStaffInfo = function() {
@@ -146,6 +162,12 @@ var staff = (function(){
                             $(".add_staff").hide();
                             $("#add").removeClass("onCheck");
                             //$scope.initstafflist();
+                            $("#staffName").val("");
+                            $("#staffEmail").val("");
+                            $("#staffTel").val("");
+                            $("#staffDepartment").val("");
+                            $scope.selectkey = "";
+                            $("#staffPower").val("");
                             $scope.initStaff();
                             $scope.$apply();
                         }).catch(function (err) {
