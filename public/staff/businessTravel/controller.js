@@ -411,7 +411,7 @@ var businessTravel=(function(){
      * @constructor
      */
     businessTravel.CreateResultController = function($scope, $routeParams) {
-        loading(true);
+        loading(false);
         $("title").html("我要出差");
         var tra = $routeParams.tra;
         var liv = $routeParams.liv;
@@ -450,13 +450,12 @@ var businessTravel=(function(){
                         $(".createresult,.tianxun").show();
                         $scope.totalprice = ret2.price;
                         $scope.trafficprice = $scope.onlytraffic.price;
+                        loading(true);
                         $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
-                        $(".messagebox_close").click(function(){
-                            location.reload();
-                        });
+                        Myalert("温馨提示","生成预算失败，请重新生成");
                     });
             })
         }
@@ -479,13 +478,12 @@ var businessTravel=(function(){
                         $(".createresult,.tianxun").show();
                         $scope.totalprice = ret2.price;
                         $scope.liveprice = $scope.onlylive.price;
+                        loading(true);
                         $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
-                        $(".messagebox_close").click(function(){
-                            location.reload();
-                        });
+                        Myalert("温馨提示","生成预算失败，请重新生成");
                     });
             })
 
@@ -515,13 +513,12 @@ var businessTravel=(function(){
                         $scope.totalprice = ret2.price;
                         $scope.trafficprice = $scope.trafficlive.traffic;
                         $scope.liveprice = $scope.trafficlive.hotel;
+                        loading(true);
                         $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
-                        $(".messagebox_close").click(function(){
-                            location.reload();
-                        });
+                        Myalert("温馨提示","生成预算失败，请重新生成");
                     });
             })
         }
@@ -529,7 +526,6 @@ var businessTravel=(function(){
         //生成记录
         $scope.createRecord = function () {
             API.onload(function(){
-
                 var consumeDetails = [];
                 var order = {
                     companyId:$scope.companyId,
@@ -597,14 +593,6 @@ var businessTravel=(function(){
                     consumeDetails.push(consumeDetails_backTraffic);
                 }
                 order.consumeDetails = consumeDetails;
-
-
-
-
-
-
-
-
 
                 API.tripPlan.savePlanOrder(order)
                     .then(function(result){
