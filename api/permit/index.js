@@ -9,6 +9,12 @@ var API = require("common/api");
 var L = require("common/language");
 var Q = require("q");
 
+var ROLE_ID = {
+    OWNER: 0,
+    STAFF: 1,
+    ADMIN: 2
+};
+
 var permit = module.exports = {};
 
 var roles = {
@@ -87,15 +93,20 @@ updateRole(agency_roles);
  */
 function getRoleOfAccount(data) {
     var accountId = data.accountId;
+    var s = {};
     return API.staff.getStaff({id:data.accountId})
         .then(function(staff) {
+            s = staff;
             return API.company.getCompany({companyId: staff.companyId});
         })
         .then(function(company) {
             if (company.createUser == accountId) {
                 return roles.owner;
+            }else if(s.roleId == ROLE_ID.ADMIN){
+                return roles.admin;
+            }else{
+                return roles.staff;
             }
-            return roles.staff;
         });
 }
 
