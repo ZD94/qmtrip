@@ -80,9 +80,44 @@ agencyTripPlan.listAllTripPlanOrder = function(callback){
  * @returns {*|*|Promise}
  */
 agencyTripPlan.approveInvoice = function(params, callback){
-    params.userId = this.accountId;
+    var user_id = this.accountId;
+    params.userId = user_id;
     var consumeId = params.consumeId;
     return API.agencyTripPlan.getConsumeDetail({consumeId: consumeId})
+        .then(function(consumeDetail){
+            if(consumeDetail && consumeDetail.accountId){
+                return consumeDetail.accountId;
+            }else{
+                throw {msg:"该消费单缺少accountId"};
+            }
+        })
+        .then(function(staffId){
+            return Q.all([
+                API.staff.getStaff({id: staffId}),
+                API.agencyUser.getAgencyUser({id: this.accountId})
+            ])
+                .spread(function(staff, agencyUser){
+                    if(!staff.companyId){
+                        throw {msg:"该员工不存在或员工所在企业不存在"};
+                    }
+                    return Q.all([
+                            API.company.getCompany({companyId: staff.companyId}),
+                            API.agency.getAgency({agencyId: agencyUser.agencyId, userId: user_id})
+                        ])
+                        .spread(function(company, agency){
+                            if(!company.agencyId){
+                                throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
+                            }
+                            if(company.agencyId == agency.id){
+                                return API.agencyTripPlan.approveInvoice(params);
+                            }else{
+                                throw {msg:"无权限"};
+                            }
+                        })
+                })
+        })
+        .nodeify(callback);
+    /*return API.agencyTripPlan.getConsumeDetail({consumeId: consumeId})
         .then(function(consumeDetail){
             if(consumeDetail && consumeDetail.accountId){
                 return consumeDetail.accountId;
@@ -115,7 +150,7 @@ agencyTripPlan.approveInvoice = function(params, callback){
                 throw {msg:"无权限"};
             }
         })
-        .nodeify(callback);
+        .nodeify(callback);*/
 };
 
 

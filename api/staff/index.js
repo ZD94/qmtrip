@@ -79,6 +79,9 @@ staff.createStaff = function(data, callback){
                 });
         })
         .then(function(staff) {
+            if(staff.travelLevel || staff.travelLevel == ""){
+                delete staff.travelLevel;
+            }
             return staffModel.create(staff);
         })
         .nodeify(callback);
