@@ -69,16 +69,17 @@ company.createCompany = function(params, callback){
 };
 
 /**
- * 更新企业信息
+ * 更新企业信息(企业创建者)
  * @param params
  * @param callback
  * @returns {*}
  */
 company.updateCompany = checkPermission(["company.edit"],
-    function(params, callback){
+    function updateCompany(params, callback){
         var self = this;
-        params.createUser = self.accountId;
-        return staff.getCurrentStaff()
+        var accountId = self.accountId;
+        params.createUser = accountId;
+        return API.staff.getStaff({id: accountId})
             .then(function(staff){
                 params.companyId = staff.companyId;
                 return API.company.updateCompany(params)

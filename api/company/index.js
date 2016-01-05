@@ -59,8 +59,7 @@ company.checkBlackDomain = function(params, callback) {
     var domain = params.domain;
     var defer = Q.defer();
     if (!domain) {
-        defer.reject({code: -1, msg: "域名不存在或不合法"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "域名不存在或不合法"};
     }
 
     return Models.BlackDomain.findOne({where: {domain: domain}})
@@ -80,11 +79,12 @@ company.checkBlackDomain = function(params, callback) {
  * @returns {*}
  */
 company.updateCompany = function(params, callback){
-    return checkParams(['companyId'], params)
-        .then(function(){
-            var companyId = params.companyId;
-            return Company.findById(companyId, {attributes: ['createUser']});
-        })
+    var fields = getColsFromParams(Company.attributes, []);
+    delete fields.companyNo; delete fields.createUser; delete fields.createAt;
+    console.info(fields);
+    var params = checkAndGetParams(['companyId'], fields, params, true);
+    var companyId = params.companyId;
+    return Company.findById(companyId, {attributes: ['createUser']})
         .then(function(company){
             if(!company){
                 throw L.ERR.COMPANY_NOT_EXIST;
@@ -216,11 +216,9 @@ company.getCompanyFundsAccount = function(params, callback){
  * @returns {*}
  */
 company.moneyChange = function(params, callback){
-    return checkParams(['money', 'channel', 'userId', 'type', 'companyId', 'remark'], params)
-        .then(function() {
-            var id = params.companyId;
-            return FundsAccounts.findById(id);
-        })
+    var params = checkAndGetParams(['money', 'channel', 'userId', 'type', 'companyId', 'remark'], [], params, true);
+    var id = params.companyId;
+    return FundsAccounts.findById(id)
         .then(function(funds){
             if(!funds){
                 throw {code: -2, msg: '企业资金账户不存在'};

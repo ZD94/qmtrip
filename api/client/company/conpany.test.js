@@ -22,7 +22,7 @@ describe("api/client/company.js", function() {
             domain: 'tulingdao.com',
             description: '企业API测试用',
             email: 'company.test@tulingdao.com',
-            mobile: '15269866802',
+            mobile: '15269866802'
         }
 
         before(function(done) {
@@ -77,6 +77,20 @@ describe("api/client/company.js", function() {
         });
 
     });
+
+
+    describe("API.client.updateCompany company", function(){
+        it("#updateCompany should be ok", function(done) {
+            var self = {accountId: ownerUserId};
+            API.client.company.updateCompany.call(self, {channel: '企业账户充值API测试', money: 1000, companyId: companyId}, function(err, ret){
+                if(err){
+                    throw err;
+                }
+                done();
+            })
+        });
+    });
+
 
 
     describe("API.client.fundsCharge company", function(){
