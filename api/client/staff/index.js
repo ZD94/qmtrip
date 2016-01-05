@@ -116,7 +116,8 @@ staff.getStaff = auth.checkPermission(["user.query"],
     });
 
 //代理商根据id得到员工信息
-staff.getStaffByAgency = function(staffId, callback){
+staff.getStaffByAgency = function(params, callback){
+    var staffId = params.id;
     var user_id = this.accountId;
     return API.agency.getAgencyUser({id: user_id})
     .then(function(user){

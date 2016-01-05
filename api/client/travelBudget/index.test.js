@@ -9,8 +9,8 @@ var moment = require("moment");
 
 var Q = require("q");
 var pg_promise = require('pg-promise');
-var pgp = pg_promise({ promiseLib: Q});
-var config = require("config");
+//var pgp = pg_promise({ promiseLib: Q});
+//var config = require("config");
 
 var CITY = {
     BeiJing: "CT_131",
@@ -38,24 +38,27 @@ describe("api/client/travelBudget.js", function() {
     after(function(done) {
         done();
     });
+    var self = {"accountId": "e31dc0a0-b358-11e5-bac8-cb0726cc8453"};
 
     var outboundDate = moment().add("1", "months").format("YYYY-MM-DD");
-    var inboundDate = moment().add("a", "months").add("2", "days").format("YYYY-MM-DD");
+    var inboundDate = moment().add("1", "months").add("2", "days").format("YYYY-MM-DD");
 
     it("#getHotelBudget should be ok", function(done) {
-        travelBudget.getHotelBudget({cityId: "CT_131", checkInDate: inboundDate, checkOutDate: outboundDate}, function(err, result) {
+        travelBudget.getHotelBudget.call(self, {cityId: "CT_131", checkInDate: outboundDate, checkOutDate: inboundDate}, function(err, result) {
             //console.info(result);
+            if (err) {
+                throw err;
+            }
+
             var price = result.price ? true: false;
-            //var hotel = result.hotel ? true: false;
             assert.equal(price, true);
-            //assert.equal(hotel, true);
             done();
         })
     })
 
     it("#getTravelPolicyBudget should be ok", function(done) {
         //this.timeout(5000);
-        travelBudget.getTravelPolicyBudget({originPlace: "CT_131", destinationPlace: "CT_289",
+        travelBudget.getTravelPolicyBudget.call(self, {originPlace: "CT_131", destinationPlace: "CT_289",
             outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
             if (err) {
                 throw err;
@@ -68,7 +71,6 @@ describe("api/client/travelBudget.js", function() {
                     throw err;
                 }
             }
-            //console.info(result);
             var traffic = result.traffic ? true: false;
             var hotel = result.hotel ? true : false;
 
@@ -81,7 +83,7 @@ describe("api/client/travelBudget.js", function() {
     it("#getTravelPlicyBudget should be ok with isRoundTrip=true", function(done) {
 
         //this.timeout(5000);
-        travelBudget.getTravelPolicyBudget({originPlace: CITY.BeiJing, destinationPlace: CITY.ShangHai,
+        travelBudget.getTravelPolicyBudget.call(self, {originPlace: CITY.BeiJing, destinationPlace: CITY.ShangHai,
             outboundDate: outboundDate, inboundDate: inboundDate, isRoundTrip: true}, function(err, result) {
             if (err) {
                 throw err;
@@ -94,6 +96,9 @@ describe("api/client/travelBudget.js", function() {
                     throw err;
                 }
             }
+            console.info("=========>")
+            console.info(result);
+            console.info(result.price);
             var ret = result.price > 0 ?true: false;
             assert.equal(ret, true);
             done();
@@ -102,7 +107,7 @@ describe("api/client/travelBudget.js", function() {
 
     it("#getTravelPolicyBudget should throw error without air information", function(done) {
         //this.timeout(5000);
-        travelBudget.getTravelPolicyBudget({originPlace: "abcd", destinationPlace: "CT_289", outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
+        travelBudget.getTravelPolicyBudget.call(self, {originPlace: "abcd", destinationPlace: "CT_289", outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
             if (err) {
                 done();
             }  else {
@@ -113,7 +118,7 @@ describe("api/client/travelBudget.js", function() {
 
 
     it("#getTraiffic should be ok", function(done) {
-        travelBudget.getTrafficBudget({originPlace: "CT_131", destinationPlace: "CT_289",
+        travelBudget.getTrafficBudget.call(self, {originPlace: "CT_131", destinationPlace: "CT_289",
             outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
             if (err) {
                 throw err;
