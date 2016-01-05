@@ -751,7 +751,7 @@ staff.getInvoiceViewer = function(params, callback){
     return staff.getStaff({id: id})
         .then(function(obj){
             if(obj && obj.companyId){
-                return API.company.getCompany(obj.companyId)
+                return API.company.getCompany({companyId: obj.companyId})
                     .then(function(company){
                         if(company && company.agencyId){
                             viewerId.push(company.agencyId);

@@ -102,7 +102,6 @@ function getImg(req, res, next) {
 //    var userId = 'ee3eb6a0-9f22-11e5-8540-8b3d4cdf6eb6';
     API.attachment.getAttachment({md5key: md5key, userId: userId})
         .then(function(result){
-            result = result.attachment;
             if(!result.isPublic){
                 if(result && ((result.hasId && result.hasId.join(",").indexOf(userId) != -1))){
                     res.write(result.content, "hex");
