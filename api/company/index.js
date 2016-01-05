@@ -63,11 +63,9 @@ company.createCompany = function(params, callback){
  */
 company.checkBlackDomain = function(params, callback) {
     var domain = params.domain;
-    var defer = Q.defer();
     if (!domain) {
         throw {code: -1, msg: "域名不存在或不合法"};
     }
-
     return Models.BlackDomain.findOne({where: {domain: domain}})
         .then(function(result) {
             if (result) {
@@ -116,18 +114,18 @@ company.updateCompany = function(params, callback){
  * @returns {*}
  */
 company.getCompany = function(params, callback){
-    return checkParams(['companyId'], params)
-        .then(function(){
-            var companyId = params.companyId;
-            var options = {};
-            if(params.columns){
-                options.attributes = params.columns;
-            }
-            return Company.findById(companyId, options);
-        })
+    if(!params.companyId){
+        throw {code: -1, msg: 'companyId不能为空'};
+    }
+    var companyId = params.companyId;
+    var options = {};
+    if(params.columns){
+        options.attributes = params.columns;
+    }
+    return Company.findById(companyId, options)
         .then(function(company){
             if(!company || company.status == -2){
-                throw L.ERR.NOT_FOUND;
+                throw L.ERR.COMPANY_NOT_EXIST;
             }
             return company;
         })
@@ -142,13 +140,11 @@ company.getCompany = function(params, callback){
  * @returns {*}
  */
 company.listCompany = function(params, callback){
-    return checkParams(['agencyId'], params)
-        .then(function(){
-            var agencyId = params.agencyId;
-            return Company.findAll({where: {agencyId: agencyId, status: {$ne: -2}}})
-                .then(function(companys){
-                    return companys;
-                })
+    var query = getColsFromParams(['agencyId'], [], params, true);
+    var agencyId = params.agencyId;
+    return Company.findAll({where: {agencyId: agencyId, status: {$ne: -2}}})
+        .then(function(companys){
+            return companys;
         })
         .catch(errorHandle)
         .nodeify(callback);

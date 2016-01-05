@@ -1,12 +1,17 @@
 /**
  * Created by yumiao on 15-12-9.
  */
-
+"use strict";
 /**
  * @module API
  */
-var API = require('../../../common/api');
-var Logger = require('../../../common/logger');
+
+var Q = require("q");
+var API = require('common/api');
+var Logger = require('common/logger');
+var utils = require("common/utils");
+var getColsFromParams = utils.getColsFromParams;
+var checkAndGetParams = utils.checkAndGetParams;
 var logger = new Logger();
 
 /**
@@ -30,7 +35,8 @@ var agency = {}
  * @returns {Promise} {code: 0, msg: '注册成功||错误信息'}
  */
 agency.registerAgency = function(params, callback){
-    return API.agency.registerAgency(params, callback);
+    var agency = checkAndGetParams(['name', 'email', 'mobile', 'userName'], ['description', 'remark'], params, true);
+    return API.agency.registerAgency(agency, callback);
 }
 
 /**
@@ -43,6 +49,8 @@ agency.registerAgency = function(params, callback){
  */
 agency.updateAgency = function(params, callback){
     var self = this;
+    params = checkAndGetParams(['agencyId'],
+        ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark'], params, true);
     params.userId = self.accountId;
     return API.agency.updateAgency(params, callback);
 }
@@ -90,16 +98,13 @@ agency.deleteAgency = function(agencyId, callback){
 
 /**************** 代理商用户相关 ****************/
 
-agency.createAgencyUser = function(params, callback){
+agency.createAgencyUser = function(agencyUser){
     var self = this;
-    var accountId = self.accountId;
-    return API.agency.getAgencyUser({id: accountId})
+    return API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']})
         .then(function(user){
-            var agencyId = user.agencyId;
-            params.agencyId = agencyId;
-            return API.agency.createAgencyUser(params)
+            agencyUser.agencyId = user.agencyId;
+            return API.agency.createAgencyUser(agencyUser)
         })
-        .nodeify(callback);
 };
 
 /**
@@ -107,14 +112,10 @@ agency.createAgencyUser = function(params, callback){
  * @param callback
  * @returns {*}
  */
-agency.getCurrentAgencyUser = function(callback){
+agency.getCurrentAgencyUser = function(){
     var self = this;
     var accountId = self.accountId;
     return API.agency.getAgencyUser({id: accountId})
-        .then(function(data){
-            return data;
-        })
-        .nodeify(callback);
 }
 
 /**
@@ -123,53 +124,66 @@ agency.getCurrentAgencyUser = function(callback){
  * @param callback
  * @returns {*}
  */
-agency.deleteAgencyUser = function(params, callback){
-    var user_id = this.accountId;
-    return API.agency.getAgencyUser({id: user_id})
-        .then(function(data){
-            return API.agency.getAgencyUser({id:params.id})
-                .then(function(target){
-                    if(data.agencyId != target.agencyId){
-                        throw L.ERR.PERMISSION_DENY;
-                    }else{
-                        return API.agency.deleteAgencyUser(params);
-                    }
-                })
+agency.deleteAgencyUser = function(agencyUserId){
+    var self = this;
+    var accountId = self.accountId;
+    return Q.all([
+        API.agency.getAgencyUser({id: accountId, columns: ['agencyId']}),
+        API.agency.getAgencyUser({id:agencyUserId, columns: ['agencyId']})
+    ])
+    .spread(function(user, target){
+            if(user.agencyId != target.agencyId){
+                throw L.ERR.PERMISSION_DENY;
+            }
+            return API.agency.deleteAgencyUser({id: agencyUserId});
         })
-        .nodeify(callback);
 }
 
-agency.updateAgencyUser = function(params, callback) {
-    var user_id = this.accountId;
+/**
+ * 更新代理商用户
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+agency.updateAgencyUser = function(params) {
+    var params = checkAndGetParams(['id'], ['status', 'name', 'sex', 'email', 'mobile', 'avatar', 'roleId'], params, true);
+    var self = this;
+    var accountId = self.accountId;
     var id = params.id;
-    return API.agency.getAgencyUser({id:user_id})
-        .then(function(data){
-            return API.agency.getAgencyUser({id:id})
-                .then(function(target){
-                    if(data.agencyId != target.agencyId){
-                        throw L.ERR.PERMISSION_DENY;
-                    }else{
-                        return API.agency.updateAgencyUser(params);
-                    }
-                })
+    return Q.all([
+        API.agency.getAgencyUser({id: accountId, columns: ['agencyId']}),
+        API.agency.getAgencyUser({id: id, columns: ['agencyId']})
+    ])
+    .spread(function(user, target){
+            if(user.agencyId != target.agencyId){
+                throw L.ERR.PERMISSION_DENY;
+            }
+            return API.agency.updateAgencyUser(params);
         })
-        .nodeify(callback);
 }
 
-agency.getAgencyUser = function(params, callback){
-    var user_id = this.accountId;
-    return API.agency.getAgencyUser({id: user_id})
-        .then(function(data){
-            return API.agency.getAgencyUser({id:params.id})
-                .then(function(target){
-                    if(data.agencyId != target.agencyId){
-                        throw L.ERR.PERMISSION_DENY;
-                    }else{
-                        return API.agency.getAgencyUser(params);
-                    }
-                })
+/**
+ * 获取代理商用户
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+agency.getAgencyUser = function(agencyUserId){
+    var self = this;
+    var accountId = self.accountId;
+    if(!agencyUserId){
+        throw {code: -1, msg: '用户id不能为空'};
+    }
+    return Q.all([
+        API.agency.getAgencyUser({id: accountId, columns: ['agencyId']}),
+        API.agency.getAgencyUser({id: agencyUserId})
+    ])
+    .spread(function(user, agencyUser){
+            if(user.agencyId != agencyUser.agencyId){
+                throw L.ERR.PERMISSION_DENY;
+            }
+            return agencyUser;
         })
-        .nodeify(callback);
 }
 
 agency.listAndPaginateAgencyUser = function(params, callback) {

@@ -1,6 +1,7 @@
 /**
  * Created by yumiao on 15-12-9.
  */
+"use strict";
 var Q = require('q');
 var sequelize = require("common/model").importModel("./models");
 var Models = sequelize.models;
@@ -26,8 +27,8 @@ var agency = {};
  * @param params
  * @param callback
  */
-agency.registerAgency = function(params, callback){
-    var agency = checkAndGetParams(['name', 'email', 'mobile', 'userName'], ['description', 'remark'], params, true);
+agency.registerAgency = function(params){
+    var agency = params;
     var userName = params.userName;
     var agencyId = uuid.v1() || params.agencyId;
     agency.id = agencyId;
@@ -65,8 +66,9 @@ agency.registerAgency = function(params, callback){
             return {code: 0, msg: '注册成功', agency: agency, agencyUser: agencyUser}
         })
         .catch(function(err){
+            console.info(err);
             logger.error(err);
-            return Agency.findOne({where: {$or: [{mobile: mobile}, {email: email}]}, attributes: ['id']})
+            return Agency.findOne({where: {$or: [{mobile: mobile}, {email: email}], status: {$ne: -2}}, attributes: ['id']})
                 .then(function(agency){
                     if(agency){
                         throw {code: -4, msg: '手机号或邮箱已经注册'};
@@ -75,7 +77,6 @@ agency.registerAgency = function(params, callback){
                     }
                 })
         })
-        .nodeify(callback);
 }
 
 /**
@@ -84,35 +85,27 @@ agency.registerAgency = function(params, callback){
  * @param callback
  * @returns {*}
  */
-agency.updateAgency = function(params, callback){
-    var defer = Q.defer();
-    var _agency = checkAndGetParams(['agencyId', 'userId'],
-        ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark'], params);
-    var agencyId = params.agencyId;
-    var userId = params.userId;
+agency.updateAgency = function(_agency){
+    var agencyId = _agency.agencyId;
+    var userId = _agency.userId;
     return Agency.findById(agencyId, {attributes: ['createUser']})
         .then(function(agency){
             if(!agency || agency.status == -2){
-                defer.reject(L.ERR.AGENCY_NOT_EXIST);
-                return defer.promise;
+                throw L.ERR.AGENCY_NOT_EXIST;
             }
             if(agency.createUser != userId){
-                defer.reject(L.ERR.PERMISSION_DENY);
-                return defer.promise;
+                throw L.ERR.PERMISSION_DENY;
             }
             _agency.updateAt = utils.now();
             var cols = getColsFromParams(_agency);
             return Agency.update(_agency, {returning: true, where: {id: agencyId}, fields: cols})
                 .spread(function(rows, agencies){
                     if(!rows || rows == "NaN"){
-                        defer.reject({code: -2, msg: '更新代理商信息失败'});
-                        return defer.promise;
+                        throw {code: -2, msg: '更新代理商信息失败'};
                     }
                     return agencies[0];
                 })
         })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 /**
@@ -121,21 +114,17 @@ agency.updateAgency = function(params, callback){
  * @param callback
  * @returns {*}
  */
-agency.getAgency = function(params, callback){
-    return checkParams(['agencyId', 'userId'], params)
-        .then(function(){
-            var agencyId = params.agencyId;
-            var userId = params.userId;
-            return Agency.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updateAt']})
-                .then(function(agency){
-                    if(!agency || agency.status == -2){
-                        throw {code: -2, msg: '没有代理商'};
-                    }
-                    return agency;
-                })
+agency.getAgency = function(params){
+    var params = checkAndGetParams(['agencyId', 'userId'], [], params, true);
+    var agencyId = params.agencyId;
+    var userId = params.userId;
+    return Agency.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updateAt']})
+        .then(function(agency){
+            if(!agency || agency.status == -2){
+                throw L.ERR.AGENCY_NOT_EXIST;
+            }
+            return agency;
         })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 /**
@@ -145,16 +134,12 @@ agency.getAgency = function(params, callback){
  * @returns {*}
  */
 agency.listAgency = function(params, callback){
-    return checkParams(['userId'], params)
-        .then(function(){
-            //var agencyId = params.agencyId;
-            var userId = params.userId;
-            delete params.userId;
-            return Agency.findAll({where: params})
-                .then(function(ret){
-                    return ret;
-                })
-        })
+    if(!params.userId){
+        throw {code: -1, msg: '参数userId不能为空'};
+    }
+    var userId = params.userId;
+    delete params.userId;
+    return Agency.findAll({where: params})
         .catch(errorHandle)
         .nodeify(callback);
 }
@@ -165,62 +150,43 @@ agency.listAgency = function(params, callback){
  * @param callback
  * @returns {*}
  */
-agency.deleteAgency = function(params, callback){
-    return checkParams(['agencyId', 'userId'], params)
-        .then(function(){
-            var agencyId = params.agencyId;
-            var userId = params.userId;
-            return Q.all([
-                Agency.findById(agencyId, {attributes: ['createUser']}),
-                AgencyUser.findAll({where: {agencyId: agencyId, status: {$ne: -2}}, attributes: ['id']})
-            ])
-                .spread(function(agency, users){
-                    if(!agency || agency.status == -2){
-                        throw L.ERR.AGENCY_NOT_EXIST;
-                    }
-                    if(agency.createUser != userId){
-                        throw L.ERR.PERMISSION_DENY;
-                    }
-
-                    return sequelize.transaction(function(t){
-                        return Q.all([
-                            Agency.update({status: -2, updateAt: utils.now()},
-                                {where: {id: agencyId}, fields: ['status', 'updateAt'], transaction: t}),
-                            AgencyUser.update({status: -2, updateAt: utils.now()},
-                                {where: {agencyId: agencyId}, fields: ['status', 'updateAt'], transaction: t})
-                        ])
-                    })
-                        .then(function(){
-                            return users.map(function(user){
-                                return API.auth.remove({accountId: user.id})
-                            })
-                        })
-                })
-                .then(function(){
-                    return {code: 0, msg: '删除成功'};
-                })
+agency.deleteAgency = function(params){
+    var params = checkAndGetParams(['agencyId', 'userId'], [], params, true);
+    var agencyId = params.agencyId;
+    var userId = params.userId;
+    return Q.all([
+        Agency.findById(agencyId, {attributes: ['createUser']}),
+        AgencyUser.findAll({where: {agencyId: agencyId, status: {$ne: -2}}, attributes: ['id']})
+    ])
+        .spread(function(agency, users){
+            if(!agency || agency.status == -2){
+                throw L.ERR.AGENCY_NOT_EXIST;
+            }
+            if(agency.createUser != userId){
+                throw L.ERR.PERMISSION_DENY;
+            }
+            return users;
         })
-        .catch(errorHandle)
-        .nodeify(callback);
+        .then(function(users){
+            return sequelize.transaction(function(t){
+                return Q.all([
+                    Agency.update({status: -2, updateAt: utils.now()},
+                        {where: {id: agencyId}, fields: ['status', 'updateAt'], transaction: t}),
+                    AgencyUser.update({status: -2, updateAt: utils.now()},
+                        {where: {agencyId: agencyId}, fields: ['status', 'updateAt'], transaction: t})
+                ])
+                    .then(function(){
+                        return users.map(function(user){
+                            return API.auth.remove({accountId: user.id})
+                        })
+                    })
+            })
+        })
+        .then(function(){
+            return {code: 0, msg: '删除成功'};
+        })
 }
 
-
-///检查参数是否存在,
-function checkParams(checkArray, params, callback){
-    var defer = Q.defer();
-    for(var key in checkArray){
-        var name = checkArray[key];
-        if(!params[name] && params[name] !== false && params[name] !== 0){
-            defer.reject({code:'-1', msg:'参数 params.' + name + '不能为空'});
-            return defer.promise.nodeify(callback);
-        }
-    }
-    defer.resolve({code: 0});
-    return defer.promise.nodeify(callback);
-}
-
-
-/************************** 代理商用户 **************************/
 
 /**
  * 创建代理商
@@ -228,47 +194,16 @@ function checkParams(checkArray, params, callback){
  * @param callback
  * @returns {*}
  */
-agency.createAgencyUser = function(data, callback){
-    var defer = Q.defer();
-    var accountId = data.accountId;
-    if (!data) {
-        defer.reject(L.ERR.DATA_NOT_EXIST);
-        return defer.promise.nodeify(callback);
-    }
-    if (!data.email) {
-        defer.reject({code: -1, msg: "邮箱不能为空"});
-        return defer.promise.nodeify(callback);
-    }
-    if (!data.mobile) {
-        defer.reject({code: -2, msg: "手机号不能为空"});
-        return defer.promise.nodeify(callback);
-    }
-    if (!data.name) {
-        defer.reject({code: -3, msg: "姓名不能为空"});
-        return defer.promise.nodeify(callback);
-    }
-    if(!data.agencyId){
-        defer.reject({code: -4, msg: "代理商不能为空"});
-        return defer.promise.nodeify(callback);
-    }
-    return Q()
-        .then(function() {
-            if (accountId) {
-                data.id = accountId;
-                return data;
-            }
-            var accData = {email: data.email, mobile: data.mobile, pwd: "123456", type: 2};//初始密码暂定123456
-            return API.auth.newAccount(accData)
-                .then(function(account){
-                    data.id = account.id;
-                    return data;
-                });
+agency.createAgencyUser = function(data){
+    var fields = getColsFromParams(AgencyUser.attributes);
+    var _agencyUser = checkAndGetParams(['email', 'mobile', 'agencyId', 'name'], fields, data, true);
+    _agencyUser.id = data.accountId || uuid.v1();
+    var accData = {email: _agencyUser.email, mobile: _agencyUser.mobile, pwd: "123456", type: 2};//初始密码暂定123456
+    return API.auth.newAccount(accData)
+    .then(function(account){
+            _agencyUser.id = account.id;
+            return AgencyUser.create(_agencyUser);
         })
-        .then(function(agencyUser) {
-            return AgencyUser.create(agencyUser);
-        })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 /**
@@ -277,28 +212,24 @@ agency.createAgencyUser = function(data, callback){
  * @param callback
  * @returns {*}
  */
-agency.deleteAgencyUser = function(params, callback){
-    var defer = Q.defer();
-    var id = params.id;
-    if (!id) {
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
+agency.deleteAgencyUser = function(params){
+    var userId = params.id;
+    if (!userId) {
+        throw {code: -1, msg: "id不能为空"};
     }
-    return AgencyUser.findById(id, {attributes: ['status', 'id']})
+    return AgencyUser.findById(userId, {attributes: ['status', 'id']})
         .then(function(user){
             if(!user || user.status == -2){
                 throw {code: -2, msg: '用户不存在'};
             }
             return Q.all([
-                API.auth.remove({accountId: id}),
-                AgencyUser.update({status: -2}, {where: {id: id}, fields: ['status']})
+                API.auth.remove({accountId: userId}),
+                AgencyUser.update({status: -2}, {where: {id: userId}, fields: ['status']})
             ])
         })
         .then(function(){
             return {code: 0, msg: '删除用户成功'};
         })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 /**
@@ -308,12 +239,10 @@ agency.deleteAgencyUser = function(params, callback){
  * @param callback
  * @returns {*}
  */
-agency.updateAgencyUser = function(data, callback){
-    var defer = Q.defer();
+agency.updateAgencyUser = function(data){
     var id = data.id;
     if(!id){
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "id不能为空"};
     }
     delete data.id;
     var options = {};
@@ -323,8 +252,6 @@ agency.updateAgencyUser = function(data, callback){
         .spread(function(rows, users){
             return users[0];
         })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 /**
