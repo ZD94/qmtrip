@@ -48,7 +48,6 @@ travelBudget.getTravelPolicyBudget = function(params, callback) {
     var outLatestArriveTime = params.outLatestArriveTime;
     var inLatestArriveTime = params.inLatestArriveTime;
     var self = this;
-
     return Q()
         .then(function() {
             if (!outboundDate || !validate.isDate(outboundDate)) {
@@ -74,7 +73,6 @@ travelBudget.getTravelPolicyBudget = function(params, callback) {
             if (!checkOutDate) {
                 checkOutDate = inboundDate;
             }
-
             return travelBudget.getHotelBudget.call(self, {
                 cityId: destinationPlace,
                 businessDistrict: businessDistrict,
@@ -87,29 +85,14 @@ travelBudget.getTravelPolicyBudget = function(params, callback) {
                 originPlace: originPlace,
                 destinationPlace: destinationPlace,
                 outboundDate: outboundDate,
-                outLatestArriveTime: outLatestArriveTime
+                inboundDate: inboundDate,
+                outLatestArriveTime: outLatestArriveTime,
+                inLatestArriveTime: inLatestArriveTime,
+                isRoundTrip: isRoundTrip
             })
             .then(function(traffic) {
-                return {hotel: hotel.price, goTraffic: traffic.price};
+                return {hotel: hotel.price, traffic: traffic.price, goTraffic: traffic.goTraffic, backTraffic: traffic.backTraffic};
             })
-        })
-        .then(function(result) {
-            if (isRoundTrip) {
-                return travelBudget.getTrafficBudget.call(self, {
-                    originPlace: destinationPlace,
-                    destinationPlace: originPlace,
-                    outboundDate: inboundDate,
-                    outLatestArriveTime: inLatestArriveTime
-                })
-                    .then(function(backTraffic) {
-                        result.backTraffic = backTraffic.price;
-                        result.traffic = Number(result.goTraffic + backTraffic.price);
-                        return result;
-                    })
-            } else {
-                result.traffic = result.goTraffic;
-                return result;
-            }
         })
         .then(function(result) {
             result.price = result.hotel + result.traffic;
@@ -141,6 +124,7 @@ travelBudget.getHotelBudget = function(params, callback) {
     var businessDistrict = params.businessDistrict;
     var checkInDate = params.checkInDate;
     var checkOutDate = params.checkOutDate;
+
     return Q()
         .then(function() {
             if (!cityId) {
@@ -154,6 +138,11 @@ travelBudget.getHotelBudget = function(params, callback) {
             if (!checkOutDate || !validate.isDate(checkOutDate)) {
                 throw L.ERR.CHECK_OUT_DATE_FORMAT_ERROR;
             }
+
+            if (new Date(checkOutDate) < new Date(checkInDate)) {
+                throw {code: -1, msg: "离开日期大于入住日期"};
+            }
+
             //查询员工信息
             return API.staff.getStaff({id: accountId})
         })
@@ -185,7 +174,8 @@ travelBudget.getHotelBudget = function(params, callback) {
                 checkOutDate: checkOutDate
             }
 
-            return API.travelbudget.getHotelBudget(data)
+            var getHotelBudget = Q.denodeify(API.travelbudget.getHotelBudget);
+            return getHotelBudget(data)
                 .then(function(result) {
                     //如果没有查询到结果,直接扔回最大金额
                     if (result.price <=0) {
@@ -194,6 +184,10 @@ travelBudget.getHotelBudget = function(params, callback) {
                     }
                     return result;
                 })
+        })
+        .then(function(result) {
+            console.info("====>住店数据", result);
+            return result;
         })
         .nodeify(callback);
 }
@@ -206,12 +200,14 @@ travelBudget.getHotelBudget = function(params, callback) {
  * @param {String} params.destinationPlace 目的地
  * @param {String} params.outboundDate 出发时间 YYYY-MM-DD
  * @param {String} params.inboundDate 返回时间(可选) YYYY-MM-DD
- * @param {String} params.latestArriveTime 最晚到达时间 HH:mm
+ * @param {String} params.outLatestArriveTime 最晚到达时间 HH:mm
+ * @param {String} params.inLatestArriveTime 返程最晚到达时间 HH:mm
  * @param {Boolean} params.isRoundTrip 是否往返 [如果为true,inboundDate必须存在]
  * @param {Function} [callback] (err, {price: "1000"})
  * @return {Promise} {price: "1000"}
  */
 travelBudget.getTrafficBudget = function(params, callback) {
+    var self = this;
     return Q()
         .then(function() {
             if (!params) {
@@ -227,14 +223,58 @@ travelBudget.getTrafficBudget = function(params, callback) {
             }
 
             if (!params.outboundDate) {
-                throw new Error({code: -1, msg: "出发时间不存在"});
+                throw {code: -1, msg: "出发时间不存在"};
             }
 
             if (params.isRoundTrip && !params.inboundDate) {
-                throw new Error({code: -1, msg: "往返预算,返程日期不能为空"});
+                throw {code: -1, msg: "往返预算,返程日期不能为空"};
             }
 
-            return API.travelbudget.getTrafficBudget(params);
+            var getTrafficBudget = Q.denodeify(API.travelbudget.getTrafficBudget);
+            if (params.isRoundTrip) {
+                return Q.all([
+                    getTrafficBudget({
+                        originPlace: params.originPlace,
+                        destinationPlace: params.destinationPlace,
+                        outboundDate: params.outboundDate,
+                        inboundDate: params.inboundDate,
+                        outLatestArriveTime: params.outLatestArriveTime
+                    }),
+                    getTrafficBudget({
+                        originPlace: params.destinationPlace,
+                        destinationPlace: params.originPlace,
+                        outboundDate: params.inboundDate,
+                        outLatestArriveTime: params.inLatestArriveTime
+                    })
+                ])
+                    .spread(function(goTraffic, backTraffic) {
+
+                        var result = {
+                            goTraffic: goTraffic.price,
+                            backTraffic: backTraffic.price,
+                            traffic: Number(goTraffic.price) + Number(backTraffic.price),
+                            price: Number(goTraffic.price) + Number(backTraffic.price)
+                        };
+                        return result;
+                    })
+            } else {
+                return getTrafficBudget({
+                    originPlace: params.originPlace,
+                    destinationPlace: params.destinationPlace,
+                    outboundDate: params.outboundDate,
+                    inboundDate: params.inboundDate,
+                    outLatestArriveTime: params.outLatestArriveTime
+                })
+                .then(function(traffic) {
+                    var result = {
+                        goTraffic: traffic.price,
+                        backTraffic: 0,
+                        traffic: traffic.price,
+                        price: traffic.price
+                    }
+                    return result;
+                })
+            }
         })
         .nodeify(callback);
 }
