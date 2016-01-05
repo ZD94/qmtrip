@@ -5,19 +5,19 @@
 
 var gulplib = require('./common/gulplib');
 
-gulplib.bundle_lib('ws', ['ws'], {exclude:['bufferutil', 'utf-8-validate']});
-gulplib.bundle_lib('api', ['dnode', 'shoe', 'q', 'md5', 'moment', 'tiny-cookie'], {external:['ws']});
-gulplib.bundle_lib('angular', ['angular', 'angular-route', 'angular-ui-router', 'angular-sanitize', 'angular-touch']);
-gulplib.bundle_lib('jquery', ['jquery', 'jquery-ui']);
-gulplib.bundle_lib('bootstrap', ["bootstrap"]);
-gulplib.bundle_lib('notie', ['notie']);
-gulplib.bundle_lib('swiper', ['swiper']);
+
+gulplib.bundle_lib('ws', {require:['ws'], exclude:['bufferutil', 'utf-8-validate']});
+gulplib.bundle_lib('api', {require:['q', 'md5', 'moment', 'tiny-cookie', './common/client/api.js:api']});
+gulplib.bundle_lib('jquery', {require:['jquery', 'jquery-ui']});
+gulplib.bundle_lib('ngapp', './common/client/ngapp.js', {exclude:['api', 'q', 'jquery', 'jquery-ui', 'notie']});
+gulplib.bundle_lib('bootstrap', {require:["bootstrap"]});
+gulplib.bundle_lib('notie', {require:['notie']});
+gulplib.bundle_lib('swiper', {require:['swiper']});
 
 gulplib.angular_app('staff');
 gulplib.angular_app('corp');
 gulplib.angular_app('agency');
 gulplib.angular_app('demo');
-
 
 gulplib.dist(function(){
     var gulp = require('gulp');
