@@ -191,17 +191,18 @@ company.deleteCompany = function(params, callback){
  * @returns {*}
  */
 company.getCompanyFundsAccount = function(params, callback){
-    return checkParams(['companyId', 'userId'], params)
-        .then(function(){
-            var companyId = params.companyId;
-            var userId = params.userId;
-            return FundsAccounts.findById(companyId, {attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createAt', 'updateAt']})  //{attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createAt', 'updateAt']}
-                .then(function(funds){
-                    if(!funds || funds.status == -2){
-                        throw {code: -4, msg: '企业资金账户不存在'};
-                    }
-                    return funds;
-                })
+    var params = checkAndGetParams(['companyId', 'userId'], [], params, true);
+    var companyId = params.companyId;
+    var userId = params.userId;
+    return FundsAccounts.findById(companyId, {
+        raw: false,
+        attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createAt', 'updateAt']
+    })
+        .then(function(funds){
+            if(!funds || funds.status == -2){
+                throw {code: -4, msg: '企业资金账户不存在'};
+            }
+            return funds.toJSON();
         })
         .catch(errorHandle)
         .nodeify(callback);

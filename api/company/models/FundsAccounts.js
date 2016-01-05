@@ -18,14 +18,22 @@ module.exports = function (Db, DataType) {
         isSetPwd   : {type: DataType.BOOLEAN,                       field: "is_set_pwd", defaultValue: false},
         updateAt   : {type: "timestamp without time zone",          field: "update_at"},
         balance    : {
-            type: DataType.VIRTUAL,
+            type: new DataType.VIRTUAL(DataType.NUMERIC(15, 2)),
             get: function () {
                 return this.income - this.consume - this.frozen;
             }
         }
+        //,
+        //isDelete    : {
+        //    type    : new DataType.VIRTUAL(DataType.BOOLEAN, ['status']),
+        //    get     : function(){
+        //        return this.get('status') == -2;
+        //    }
+        //}
     }, {
         tableName : "funds_accounts",
         timestamps: false,
+        row: true,
         schema    : "company"
     })
 }

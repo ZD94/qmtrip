@@ -108,7 +108,7 @@ describe("api/client/company.js", function() {
     describe("API.client.consumeMoney company", function(){
         it("#consumeMoney should be ok", function(done) {
             var self = {accountId: ownerUserId};
-            API.client.company.consumeMoney.call(self, {channel: '企业账户消费API测试', money: 100, companyId: companyId}, function(err, ret){
+            API.client.company.consumeMoney.call(self, {channel: '企业账户消费API测试', money: 100.01, companyId: companyId}, function(err, ret){
                 if(err){
                     throw err;
                 }
@@ -125,7 +125,6 @@ describe("api/client/company.js", function() {
                 if(err){
                     throw err;
                 }
-                console.info(ret);
                 done();
             })
         });
