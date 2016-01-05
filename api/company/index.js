@@ -39,8 +39,14 @@ company.createCompany = function(params, callback){
             Company.create(_company, {transaction: t}),
             FundsAccounts.create(funds, {transaction: t})
         ])
-            .spread(function(company, funds){
-                return company;
+            .spread(function(c, funds){
+                return {
+                    id: c.id,
+                    name: c.name,
+                    mobile: c.mobile,
+                    email: c.email,
+                    createUser: c.createUser
+                };
             });
     })
         .catch(errorHandle)
@@ -79,14 +85,12 @@ company.checkBlackDomain = function(params, callback) {
  * @returns {*}
  */
 company.updateCompany = function(params, callback){
-    var fields = getColsFromParams(Company.attributes, []);
-    delete fields.companyNo; delete fields.createUser; delete fields.createAt;
-    console.info(fields);
+    var fields = getColsFromParams(Company.attributes, ['companyNo', 'createUser', 'createAt']);
     var params = checkAndGetParams(['companyId'], fields, params, true);
     var companyId = params.companyId;
     return Company.findById(companyId, {attributes: ['createUser']})
         .then(function(company){
-            if(!company){
+            if(!company || company.status == -2){
                 throw L.ERR.COMPANY_NOT_EXIST;
             }
             var companyId = params.companyId;

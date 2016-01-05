@@ -20,6 +20,9 @@ var Paginate = require("../../common/paginate").Paginate;
 var logger = new Logger("staff");
 //var auth = require("../auth/index");
 //var travelPolicy = require("../travelPolicy/index");
+var getColsFromParams = utils.getColsFromParams;
+var checkAndGetParams = utils.checkAndGetParams;
+
 var staff = {};
 
 
@@ -81,6 +84,20 @@ staff.createStaff = function(data, callback){
         .then(function(staff) {
             return staffModel.create(staff);
         })
+        .nodeify(callback);
+}
+
+/**
+ * 创建企业拥有者(员工)
+ * @param params
+ * @param callback
+ */
+staff.createCompanyOwner = function(params, callback){
+    var checkFields = ['mobile', 'email', 'companyId', 'name'];
+    var fields = getColsFromParams(staffModel.attributes, checkFields);
+    var _staff = checkAndGetParams(checkFields, fields, params, true);
+    _staff.id = _staff.id || uuid.v1();
+    return staffModel.create(_staff)
         .nodeify(callback);
 }
 
