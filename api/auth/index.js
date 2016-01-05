@@ -182,7 +182,12 @@ authServer.resetPwdByEmail = function(params, callback) {
             var _sign = makeActiveSign(account.pwdToken, accountId, timestamp);
             if (_sign.toLowerCase() == sign.toLowerCase()) {
                 pwd = utils.md5(pwd);
-                return Models.Account.update({pwd: pwd, pwdToken: null}, {where:{id: accountId}})
+                //如果从来没有设置过密码,将账号类型设为激活
+                var status = ACCOUNT_STATUS.NOT_ACTIVE;
+                if (account.status == ACCOUNT_STATUS.NOT_ACTIVE && !account.pwd) {
+                    status = ACCOUNT_STATUS.ACTIVE;
+                }
+                return Models.Account.update({pwd: pwd, pwdToken: null, status: status}, {where:{id: accountId}})
             }
             throw L.ERR.SIGN_ERROR;
         })
