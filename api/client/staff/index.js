@@ -116,21 +116,19 @@ staff.getStaff = auth.checkPermission(["user.query"],
     });
 
 //代理商根据id得到员工信息
-staff.getStaffByAgency = function(staffId, callback){
+staff.getStaffByAgency = function(params, callback){
+    var staffId = params.id;
     var user_id = this.accountId;
-    return API.agency.getAgencyUser({id: user_id})
-    .then(function(user){
-        var agencyId = user.agencyId;
-        return agencyId;
-    })
-    .then(function(agencyId){
-        return API.staff.getStaff({id: staffId})
-        .then(function(staff){
-            // if(agencyId != staff.companyId){
-            //     throw L.ERR.PERMISSION_DENY;
-            // }
-            return staff;
-        })
+    return API.staff.getStaff({id: staffId})
+    .then(function(staff){
+            return API.company.getCompany({companyId: staff.companyId})
+                .then(function(company){
+                    if(company.agencyId == user_id){
+                        return staff;
+                    }else{
+                        throw {msg:"无权限"};
+                    }
+                })
     }).nodeify(callback);
 }
 
