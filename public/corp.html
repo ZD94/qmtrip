@@ -56,7 +56,7 @@
     					$scope.staff = ret;
     					var company_id = ret.companyId;
 //    					console.info(ret);
-    					API.company.getCompany(company_id)
+    					API.company.getCompanyById(company_id)
 		    				.then(function(company){
 		    					$scope.company = company;
 //		    					console.info(company);
