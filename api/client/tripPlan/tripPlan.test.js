@@ -2,7 +2,7 @@
  * Created by wyl on 15-12-12.
  */
 //var API = require('common/api');
-
+"use strict";
 var assert = require("assert");
 var Q = require("q");
 var uuid = require("node-uuid");
@@ -22,19 +22,19 @@ describe("api/client/tripPlan.js", function() {
     before(function(done) {
         var agency = {
             email: "trippan.test@tulingdao.com",
-            userName: "计划单测使用代理商用户",
-            name: '喵喵的代理商',
+            userName: "白菜帮九袋长老",
+            name: '白菜帮',
             mobile: "15269866803",
-            description: '计划单测使用代理商'
+            description: '计划单测试用代理商'
         };
 
         var company = {
             email: "trippan.test@tulingdao.com",
-            userName: "喵喵",
-            name: '喵喵的企业',
+            userName: "白菜帮九袋长老",
+            name: '白菜帮',
             mobile: "15269866803",
             domain: 'tulingdao.com',
-            description: '计划单测使用企业'
+            description: '计划单测试用企业'
         }
 
         API.agency.registerAgency(agency, function(err, a){
@@ -45,8 +45,6 @@ describe("api/client/tripPlan.js", function() {
             agencyUserId = a.agencyUser.id;
             self.accountId = agencyUserId;
             company.agencyId = agencyId;
-            //console.info("agencyId=>", agencyId);
-            //console.info("agencyUserId=>", agencyUserId);
             API.client.company.createCompany.call(self, company, function(err, c){
                 if(err){
                     throw err;
@@ -72,7 +70,17 @@ describe("api/client/tripPlan.js", function() {
             })
     });
 
-    describe("API.tripPlan.savePlanOrder", function() {
+    describe("savePlanOrder", function(){
+        after(function(done){
+            API.tripPlan.deleteTripPlanOrder({orderId: orderId, userId: staffId}, function(err, ret){
+                if(err){
+                    throw err;
+                }
+                assert.equal(ret.code, 0);
+                done();
+            })
+        })
+
         it("#savePlanOrder should be ok", function(done){
             var tripPlanOrder = {
                 startPlace: '北京',
@@ -86,76 +94,117 @@ describe("api/client/tripPlan.js", function() {
                     throw err;
                 }
                 orderId = ret.id;
+                assert.equal(ret.budget, 1000);
                 done();
             })
         })
-    });
+    })
 
-
-    describe("API.tripPlan.getTripPlanOrderById", function() {
-        it("#getTripPlanOrderById should be ok", function(done) {
-            var self = {accountId: staffId};
-            API.client.tripPlan.getTripPlanOrderById.call(self, orderId, function(err, ret){
-                if (err) {
+    describe("deleteTripPlanOrder", function(){
+        var newOrderId = "";
+        before(function(done){
+            var tripPlanOrder = {
+                startPlace: '北京',
+                destination: '上海',
+                budget: 1000,
+                startAt: '2015-12-30 11:12:12',
+            }
+            API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder, function(err, ret){
+                if(err){
                     throw err;
                 }
+                newOrderId = ret.id;
                 done();
             })
         });
-    });
 
-
-    describe("API.tripPlan.listTripPlanOrder", function() {
-        it("#listTripPlanOrder should be ok", function(done) {
+        it("#deleteTripPlanOrder should be ok", function(done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.listTripPlanOrder.call(self, function(err, ret){
+            API.client.tripPlan.deleteTripPlanOrder.call(self, newOrderId, function(err, ret){
                 if (err) {
                     throw err;
                 }
-                done();
-            })
-        });
-    });
-
-
-    describe("API.tripPlan.listTripPlanOrderByCompany", function() {
-        it("#listTripPlanOrderByCompany should be ok", function(done) {
-            var self = {accountId: staffId};
-            API.client.tripPlan.listTripPlanOrderByCompany.call(self, {status: -2}, function(err, ret){
-                if (err) {
-                    throw err;
-                }
-                //console.info(ret);
-                done();
-            })
-        });
-    });
-
-
-    describe("API.tripPlan.countTripPlanNum", function() {
-        it("#countTripPlanNum should be ok", function(done) {
-            var self = {accountId: staffId};
-            API.client.tripPlan.countTripPlanNum.call(self, {companyId: companyId}, function(err, ret){
-                if (err) {
-                    throw err;
-                }
-                //console.info("查询的计划单数目是=>", ret);
+                assert.equal(ret.code, 0);
                 done();
             })
         });
     })
 
 
-    describe("API.tripPlan.deleteTripPlanOrder", function() {
-        it("#deleteTripPlanOrder should be ok", function(done) {
-            var self = {accountId: staffId};
-            API.client.tripPlan.deleteTripPlanOrder.call(self, orderId, function(err, ret){
-                if (err) {
+    describe("options based on tripPlanOrder created", function(){
+        var newOrderId = "";
+        before(function(done){
+            var tripPlanOrder = {
+                startPlace: '北京',
+                destination: '上海',
+                budget: 1000,
+                startAt: '2015-12-30 11:12:12',
+            }
+            API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder, function(err, ret){
+                if(err){
                     throw err;
                 }
+                newOrderId = ret.id;
                 done();
             })
         });
-    });
+
+        after(function(done){
+            API.tripPlan.deleteTripPlanOrder({orderId: newOrderId, userId: staffId}, function(err, ret){
+                if(err){
+                    throw err;
+                }
+                assert.equal(ret.code, 0);
+                done();
+            })
+        })
+
+
+        it("#getTripPlanOrderById should be ok", function(done) {
+            var self = {accountId: staffId};
+            API.client.tripPlan.getTripPlanOrderById.call(self, newOrderId, function(err, ret){
+                if (err) {
+                    throw err;
+                }
+                assert.equal(ret.id, newOrderId);
+                done();
+            })
+        });
+
+        it("#listTripPlanOrder should be ok", function(done) {
+            var self = {accountId: staffId};
+            API.client.tripPlan.listTripPlanOrder.call(self, function(err, ret){
+                if (err) {
+                    throw err;
+                }
+                assert(ret.length >= 0);
+                done();
+            })
+        });
+
+        it("#listTripPlanOrderByCompany should be ok", function(done) {
+            var self = {accountId: staffId};
+            API.client.tripPlan.listTripPlanOrderByCompany.call(self, {status: -2}, function(err, ret){
+                if (err) {
+                    throw err;
+                }
+                assert(ret.length >= 0);
+                done();
+            })
+        });
+
+
+        it("#countTripPlanNum should be ok", function(done) {
+            var self = {accountId: staffId};
+            API.client.tripPlan.countTripPlanNum.call(self, {companyId: companyId}, function(err, ret){
+                if (err) {
+                    throw err;
+                }
+                assert(ret >= 0);
+                done();
+            })
+        });
+
+    })
 
 })
