@@ -18,7 +18,7 @@ module.exports = (function(){
 			API.onload(function(){
 				API.company.getCompanyListByAgency()
 					.then(function(companylist){
-						console.info(companylist);
+						// console.info(companylist);
 						var promises = companylist.map(function(company){
 							// console.info(company.createUser)
 							return Q.all([
@@ -42,7 +42,6 @@ module.exports = (function(){
 						return Q.all(promises);
 					})
 					.then(function(companylist){
-						console.info(companylist);
 						$scope.companylist = companylist;
 						$scope.$apply();
                         loading(true);

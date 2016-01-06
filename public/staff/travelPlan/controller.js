@@ -106,8 +106,68 @@ var travelPlan=(function(){
                     $scope.hotel = $scope.planDetail.hotel[0];
                     $scope.outTraffic = $scope.planDetail.outTraffic[0];
                     console.info (result);
+                    var customerId = "";
+                    $(".file").AjaxFileUpload({
+                        action: '/upload/ajax-upload-file?type=invoice',
+                        onComplete: function(filename, response) {
+                            $scope.ref = $(this).attr("ref");
+                            $scope.md5 = response.md5key;
+                            if (response.ret == 0 ) {
+                                var htmlStr = '<img src="/upload/get-img-file/'+response.md5key+'" alt="">';
+                                // $(this).siblings("input[type=hidden]").val(response.md5key);
+                                $scope.htmlStr = htmlStr;
+                              console.info(response);
+                              // $scope.fileUrl = response.fileUrl;
+                            } else {
+                              alertDemo(response.errMsg);
+                            }
+                            updateinvoice("上传");
+                            position();
+                        }
+                    });
+                    var invoice = {
+                        userId: $scope.staff.id,
+                        consumeId:$scope.ref;
+                        picture:$scope.md5;
+                    }
+                    
                     $scope.$apply();
                 })
+                function updateToServer() {
+                    var invoice = {
+                        userId: $scope.staff.id,
+                        consumeId:$scope.ref;
+                        picture:$scope.md5;
+                    }
+                    API.onload(function(){
+                        API.tripPlan.uploadInvoice(invoice)
+                            .then(function(ret){
+                                console.info(err)
+                            })
+                            .catch(function(err){
+                                console.info(err)
+                            })
+                    })
+                }
+                function updateinvoice(title) {
+                    $(".messagebox_fixed").remove();
+                    var str = "";
+                    var htmlStr="";
+                    str += "<div class='messagebox_fixed'>";
+                    str += "<div class='messagebox_box'>";
+                    str += "<div class='messagebox_title'>"+title+"<div class='messagebox_close' onclick='messagebox_close()'><img src='/images/closezjx.png' style='display: block;'></div></div>";
+                    str += "<div class='messagebox_content'>"+$scope.htmlStr+"</div>";
+                    str += "</div>";
+                    str += "</div>";
+                    $("body").append(str);
+                    $(".messagebox_fixed").fadeIn();
+                }
+                function position() {
+                    var boxwidth = $('.messagebox_box').width();
+                    var boxheight = $('.messagebox_box').height();
+                    $(".messagebox_box").css('margin-left',-boxwidth/2);
+                    $(".messagebox_box").css('margin-top',-boxheight/2);
+                }
         })
 
     }

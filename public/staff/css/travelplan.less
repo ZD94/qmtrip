@@ -1,4 +1,14 @@
 @import "common.less";
+.messagebox_fixed{
+  z-index: 5;
+  .messagebox_content{
+    img {
+      width: 770px;
+      height: 350px;
+    }
+  }
+}
+
 .travel-plan {
   width: 100%;
   height: auto;
@@ -100,6 +110,7 @@
       box-shadow: 0 3px 10px rgba(0, 0, 0, .3);
       background: @background-color-second;
       overflow: hidden;
+      position: relative;
       .title_top {
         width: 960px;
         height: 40px;
@@ -158,23 +169,23 @@
         }
       }
       .content_bottom {
-        a{
-          display: inline-block;
+        .po_r{
           position: relative;
-          .file{
-            position: absolute;
-            width: 100px;
-            height: 30px;
-            line-height: 30px;
-            opacity: 0;
-            left: 0;
-            cursor: pointer;
-          }
-          .uploadbtn {
-            width: 100px;
-            height: 30px;
-            line-height: 30px;
-          }
+        }
+        .file{
+          position: absolute;
+          width: 100px;
+          height: 30px;
+          line-height: 30px;
+          opacity: 0;
+          left: 22px;
+          cursor: pointer;
+        }
+        .uploadbtn {
+          width: 100px;
+          height: 30px;
+          line-height: 30px;
+          margin-left: 22px;
         }
         .icon {
           width: 70px;
@@ -217,6 +228,16 @@
           line-height: 30px;
           padding: 15px 0;
         }
+      }
+      .cmask{
+        background: #000;
+        opacity: 0.6;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 11;
       }
     }
   }

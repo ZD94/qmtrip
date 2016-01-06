@@ -56,6 +56,8 @@ function uploadActionFile(req, res, next) {
                 if (type && type == 'avatar'){//上传头像
                     imgObj = {md5key: md5key,content: data, userId: user_id, isPublic: true,fileType:file_type};
                 }
+                console.log(type);
+                console.log("console.log(type);console.log(type);console.log(type);");
                 if (type && type == 'invoice'){//上传票据
                     API.staff.getInvoiceViewer({accountId: user_id})
                         .then(function(data){
@@ -102,7 +104,6 @@ function getImg(req, res, next) {
 //    var userId = 'ee3eb6a0-9f22-11e5-8540-8b3d4cdf6eb6';
     API.attachment.getAttachment({md5key: md5key, userId: userId})
         .then(function(result){
-            result = result.attachment;
             if(!result.isPublic){
                 if(result && ((result.hasId && result.hasId.join(",").indexOf(userId) != -1))){
                     res.write(result.content, "hex");
