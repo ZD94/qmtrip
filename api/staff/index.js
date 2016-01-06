@@ -98,7 +98,7 @@ staff.createStaff = function(data, callback){
 staff.createCompanyOwner = function(params, callback){
     var checkFields = ['mobile', 'email', 'companyId', 'name'];
     var fields = getColsFromParams(staffModel.attributes, checkFields);
-    var _staff = checkAndGetParams(checkFields, fields, params, true);
+    var _staff = checkAndGetParams(checkFields, fields, params);
     _staff.id = _staff.id || uuid.v1();
     return staffModel.create(_staff)
         .nodeify(callback);

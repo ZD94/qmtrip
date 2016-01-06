@@ -35,7 +35,7 @@ var agency = {}
  * @returns {Promise} {code: 0, msg: '注册成功||错误信息'}
  */
 agency.registerAgency = function(params, callback){
-    var agency = checkAndGetParams(['name', 'email', 'mobile', 'userName'], ['description', 'remark'], params, true);
+    var agency = checkAndGetParams(['name', 'email', 'mobile', 'userName'], ['description', 'remark'], params);
     return API.agency.registerAgency(agency, callback);
 }
 
@@ -50,7 +50,7 @@ agency.registerAgency = function(params, callback){
 agency.updateAgency = function(params, callback){
     var self = this;
     params = checkAndGetParams(['agencyId'],
-        ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark'], params, true);
+        ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark'], params);
     params.userId = self.accountId;
     return API.agency.updateAgency(params, callback);
 }
@@ -146,7 +146,7 @@ agency.deleteAgencyUser = function(agencyUserId){
  * @returns {*}
  */
 agency.updateAgencyUser = function(params) {
-    var params = checkAndGetParams(['id'], ['status', 'name', 'sex', 'email', 'mobile', 'avatar', 'roleId'], params, true);
+    var params = checkAndGetParams(['id'], ['status', 'name', 'sex', 'email', 'mobile', 'avatar', 'roleId'], params);
     var self = this;
     var accountId = self.accountId;
     var id = params.id;
