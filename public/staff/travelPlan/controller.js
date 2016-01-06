@@ -14,7 +14,7 @@ var travelPlan=(function(){
      * @constructor
      */
     travelPlan.PlanListController = function($scope) {
-        loading(true);
+        loading(false);
         $("title").html("出差单列表");
         //待上传票据列表
         $scope.initPlanList = function () {
@@ -27,7 +27,7 @@ var travelPlan=(function(){
                 API.tripPlan.listTripPlanOrder(params)
                     .then(function(result){
                         $scope.planListitems = result;
-                        console.info (result);
+                        loading(true);
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -66,9 +66,10 @@ var travelPlan=(function(){
         $scope.deletePlan = function () {
             API.onload(function() {
                 console.info(1111111111);
-                API.tripPlan.deleteTripPlanOrder('d3a389b0-ae13-11e5-b799-3fa6e9e1404b')
+                API.tripPlan.deleteTripPlanOrder('dc221660-b2be-11e5-9399-b58583583699')
                     .then(function(result){
                         Myalert("温馨提示","删除成功");
+                        $scope.initPlanList();
                         $scope.$apply();
                     })
                     .catch(function(err){
