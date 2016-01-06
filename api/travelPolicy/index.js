@@ -18,7 +18,7 @@ var travelPolicy = {};
  * @returns {*}
  */
 travelPolicy.createTravelPolicy = function(data, callback){
-    return checkParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","hotelPrice","companyId"], data)
+    return checkParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"], data)
         .then(function(){
             return travalPolicyModel.create(data);
         })
