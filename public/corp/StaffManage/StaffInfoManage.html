@@ -15,7 +15,7 @@
             <span>设置公司组织架构</span>
         </div>
         <div class="staff_function">
-            <i>目前共23名员工</i>
+            <i>目前共{{staffs.length}}名员工</i>
             <span>待激活{{forActive}}名|管理员{{manager}}名|普通员工{{publicStaff}}名</span>
             <a ng-click="addStaff()" id="add">添加员工</a>
             <a id="add_lot" ng-click="addALotStaff()">批量导入</a>
@@ -301,9 +301,6 @@
             dataType: 'json',
             data: { id: 'aaa', name: 'bbb' },
             onComplete: function(filename, response) {
-//                console.log(filename);
-//                console.log(response);
-//                console.log(response.md5key);
                 $("#fileMd5key").val(response.md5key);
                 $(".upload_text").val(filename);
                 $(".tip_text").hide();

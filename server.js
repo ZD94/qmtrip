@@ -40,6 +40,21 @@ server.api_path = path.join(__dirname, 'api');
 server.api_port = config.apiPort;
 server.api_config = config.api;
 
+
+server.on('init.api', function(API){
+    API.registerAuthWeb(function(params){
+        var self = this;
+        return API.auth.authentication({user_id:params.accountid, token_id:params.tokenid, token_sign:params.tokensign, timestamp:params.timestamp})
+            .then(function(res){
+                if (res.code) {
+                    return false;
+                }
+                self.accountId = params.accountid;
+                self.tokenId = params.tokenid;
+                return true;
+            });
+    });
+});
 server.on('init.http', function(server){
     if(config.debug){
         var shoe = require('shoe');

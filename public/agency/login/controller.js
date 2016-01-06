@@ -27,9 +27,9 @@ var login=(function(){
                     API.auth.login({email:name,pwd:pwd, type: 2})
                         .then(function(data){
                             Cookie.set("agent_id", data.user_id, { expires:30 });
-                            Cookie.set("token_sign", data.token_sign, { expires:30 });
-                            Cookie.set("timestamp", data.timestamp, { expires:30 });
-                            Cookie.set("token_id", data.token_id, { expires:30 });
+                            Cookie.set("agent_token_id", data.token_id, { expires:30 });
+                            Cookie.set("agent_token_sign", data.token_sign, { expires:30 });
+                            Cookie.set("agent_token_timestamp", data.timestamp, { expires:30 });
                             alert("登录成功");
                             API.reload_all_modules();
                             window.location.href= backUrl;
