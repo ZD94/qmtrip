@@ -38,6 +38,7 @@ describe("api/client/agencyTripPlan.js", function() {
     var companyId = "";
     var staffId = "";
     var orderId = "";
+    var consumeId = "";
     before(function(done) {
         API.agency.registerAgency(agency, function(err, a){
             if(err){
@@ -52,10 +53,19 @@ describe("api/client/agencyTripPlan.js", function() {
                 }
                 companyId = c.company.id;
                 staffId = c.company.createUser;
+                tripPlanOrder.consumeDetails = [{
+                    type: 0,
+                    startTime: '2016-01-07 10:22:00',
+                    invoiceType: 2,
+                    budget: 1000,
+                    newInvoice: '票据详情'
+                }]
                 API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder, function(err, ret){
                     if(err){
                         throw err;
                     }
+                    assert(ret.hotel.length > 0);
+                    consumeId = ret.hotel[0].id;
                     orderId = ret.id;
                     done();
                 })
@@ -99,7 +109,7 @@ describe("api/client/agencyTripPlan.js", function() {
             assert(ret.length >= 0);
             done();
         })
-    });;
+    });
 
     it("#countTripPlanNum should be ok", function(done) {
         var self = {accountId: agencyUserId};
@@ -108,6 +118,17 @@ describe("api/client/agencyTripPlan.js", function() {
                 throw err;
             }
             assert(ret >= 0)
+            done();
+        })
+    });
+
+    it("#approveInvoice should be ok", function(done) {
+        var self = {accountId: agencyUserId};
+        API.client.agencyTripPlan.approveInvoice.call(self, {consumeId: consumeId, status: 1, expenditure: '450', remark: '审核票据测试'}, function(err, ret){
+            if (err) {
+                throw err;
+            }
+            assert.equal(ret.status, 1);
             done();
         })
     });

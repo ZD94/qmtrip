@@ -224,15 +224,10 @@ tripPlan.saveConsumeRecord = function(params, options, callback){
         options = {};
     }
     var checkArr = ['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'];
-    return checkParams(checkArr, params)
-        .then(function(){
-            options.fields = getColsFromParams(params);
-            return ConsumeDetails.create(params, options)
-                .then(function(ret){
-                    return ret;
-                })
-        })
-        .catch(errorHandle)
+    var fields = getColsFromParams(ConsumeDetails.attributes);
+    params = checkAndGetParams(checkArr, fields, params);
+    options.fields = getColsFromParams(params);
+    return ConsumeDetails.create(params, options)
         .nodeify(callback);
 }
 
@@ -342,17 +337,21 @@ tripPlan.uploadInvoice = function(params, callback){
         .nodeify(callback);
 }
 
-
-tripPlan.getConsumeDetail = function(params, callback){
-    return ConsumeDetails.findOne({where: {id: params.consumeId}})
+/**
+ * 查询计划单消费记录
+ * @param params
+ * @returns {*}
+ */
+tripPlan.getConsumeDetail = function(params){
+    var params = checkAndGetParams(['consumeId', 'userId'], [], params);
+    var consumeId = params.consumeId;
+    return ConsumeDetails.findById(consumeId)
         .then(function(consumeDetail){
-            if(consumeDetail){
-                return consumeDetail;
-            }else{
-                throw {msg: "查询记录不存在"};
+            if(!consumeDetail || consumeDetail.status == -2){
+                throw {code: -4, msg: '查询记录不存在'};
             }
+            return consumeDetail;
         })
-        .nodeify(callback);
 }
 
 /**
@@ -364,19 +363,31 @@ tripPlan.getConsumeDetail = function(params, callback){
  * @param callback
  * @returns {*|Promise}
  */
-tripPlan.approveInvoice = function(params, callback){
-    var params = checkAndGetParams(['status', 'consumeId', 'userId'], [], params);
-    return ConsumeDetails.findOne({where: {id: params.consumeId}})
-        .then(function(custome){
-            if(!custome)
+tripPlan.approveInvoice = function(params){
+    var params = checkAndGetParams(['status', 'consumeId', 'userId', 'expenditure'], ['remark'], params);
+    return ConsumeDetails.findById(params.consumeId)
+        .then(function(consume){
+            if(!consume || consume.status == -2)
                 throw L.ERR.NOT_FOUND;
-            var invoiceJson = custome.invoice;
+            if(!consume.newInvoice){
+                throw {code: -2, msg: '没有上传票据'};
+            }
+            var invoiceJson = consume.invoice;
             if(invoiceJson && invoiceJson.length > 0){
                 invoiceJson[invoiceJson.length-1].status = params.status;
                 invoiceJson[invoiceJson.length-1].remark = params.remark;
-                invoiceJson[invoiceJson.length-1].approve_at = moment().format('YYYY-MM-DD HH:mm');
+                invoiceJson[invoiceJson.length-1].approve_at = utils.now();
             }
-            var updates = {invoice: JSON.stringify(invoiceJson), updateAt: moment().format(), status: params.status, auditRemark: params.remark};
+
+            var updates = {
+                invoice: JSON.stringify(invoiceJson),
+                updateAt: moment().format(),
+                status: params.status,
+                expenditure: params.expenditure
+            };
+            if(params.remark){
+                updates.auditRemark = params.remark;
+            }
             var logs = {consumeId: params.consumeId, userId: params.userId, status: params.status, remark: "审核票据-"+params.remark};
             return sequelize.transaction(function(t){
                 return Q.all([
@@ -385,13 +396,12 @@ tripPlan.approveInvoice = function(params, callback){
                 ]);
             });
         })
-        .spread(function(update, create) {
+        .spread(function(update) {
             return update;
         })
         .spread(function(rownum, rows){
             return rows[0];
         })
-        .nodeify(callback);
 }
 
 /**
