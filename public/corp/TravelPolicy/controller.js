@@ -96,7 +96,8 @@ var TravelPolicy=(function(){
                         console.info (result);
                     })
                     .catch(function(err){
-                        Myalert("温馨提示","内容不完整，请重新填写");
+//                        Myalert("温馨提示","内容不完整，请重新填写");
+                        Myalert("温馨提示", err.msg);
                         console.info (err);
                     });
             })

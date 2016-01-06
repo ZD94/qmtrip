@@ -154,6 +154,8 @@ travelPolicy.listAndPaginateTravelPolicy = auth.checkPermission(["travelPolicy.q
     function(params, callback){
     var defer = Q.defer();
     var user_id = this.accountId;
+    var options = {order: [["create_at", "asc"]]}
+    params.options = options;
     return API.staff.getStaff({id: user_id})
         .then(function(data){
             if(data){

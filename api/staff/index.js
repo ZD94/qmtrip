@@ -82,8 +82,8 @@ staff.createStaff = function(data, callback){
                 });
         })
         .then(function(staff) {
-            if(staff.travelLevel || staff.travelLevel == ""){
-                delete staff.travelLevel;
+            if(!data.travelLevel || data.travelLevel == ""){
+                data.travelLevel = null;
             }
             return staffModel.create(staff);
         })
@@ -146,8 +146,8 @@ staff.updateStaff = function(data, callback){
     var options = {};
     options.where = {id: id};
     options.returning = true;
-    if(data.travelLevel || data.travelLevel == ""){
-        delete data.travelLevel;
+    if(!data.travelLevel || data.travelLevel == ""){
+        data.travelLevel = null;
     }
     return Q()
         .then(function(){
@@ -220,10 +220,23 @@ staff.findOneStaff = function(params, callback){
     options.where = params;
     return staffModel.findOne(options)
         .then(function(staff){
-            /*if(!staff){
-                throw {code: -1, msg: '员工不存在'};
-            }*/
             return staff;
+        })
+        .nodeify(callback);
+}
+
+/**
+ * 根据属性查找员工
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+staff.findStaffs = function(params, callback){
+    var options = {};
+    options.where = params;
+    return staffModel.findAll(options)
+        .then(function(staffs){
+            return staffs;
         })
         .nodeify(callback);
 }
