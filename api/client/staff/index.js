@@ -121,7 +121,7 @@ staff.getStaffByAgency = function(params, callback){
     var user_id = this.accountId;
     return Q.all([
             API.staff.getStaff({id: staffId}),
-            API.agencyUser.getAgencyUser({id: this.accountId})
+            API.agency.getAgencyUser({id: this.accountId})
         ])
     .spread(function(staff, agencyUser){
             if(!staff.companyId){
