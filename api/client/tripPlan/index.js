@@ -1,10 +1,11 @@
 /**
  * Created by yumiao on 15-12-12.
  */
-
+"use strict";
 var API = require("common/api");
 var Q = require("q");
 var Logger = require('common/logger');
+var L = require("common/language");
 
 var tripPlan = {};
 
@@ -14,7 +15,7 @@ var tripPlan = {};
  * @param callback
  * @returns {*}
  */
-tripPlan.savePlanOrder = function(params, callback){
+tripPlan.savePlanOrder = function(params){
     var self = this;
     var accountId = self.accountId;
     params.accountId = accountId;
@@ -24,7 +25,6 @@ tripPlan.savePlanOrder = function(params, callback){
             params.companyId = staff.companyId;
             return API.tripPlan.savePlanOrder(params);
         })
-    .nodeify(callback);
 }
 
 /**
@@ -43,12 +43,23 @@ tripPlan.saveConsumeDetail = function(params, callback){
  * @param orderId
  * @param callback
  */
-tripPlan.getTripPlanOrderById = function(orderId, callback){
+tripPlan.getTripPlanOrderById = function(orderId){
+    var self = this;
+    var accountId = self.accountId;
     var params = {
         orderId: orderId,
-        userId: this.accountId
+        userId: accountId
     }
-    return API.tripPlan.getTripPlanOrder(params, callback);
+    return Q.all([
+        API.tripPlan.getTripPlanOrder(params),
+        API.staff.getStaff({id: accountId, columns: ['companyId']})
+    ])
+        .spread(function(order, staff){
+            if(order.companyId != staff.companyId){
+                throw L.ERR.PERMISSION_DENY;
+            }
+            return order;
+        })
 }
 
 /**

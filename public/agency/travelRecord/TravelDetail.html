@@ -1,0 +1,89 @@
+<style>html,body {background: #F5F5F5;}</style>
+<div class="travel-record">
+    <div class="travelDetail">
+        <div class="travelpath">待审核列表&nbsp;>&nbsp;<span>审核详情页</span></div>
+        <div class="mainbox">
+            <div class="title_top">
+                <table width="100%">
+                    <tr>
+                        <td width="220" height="40" align="left">生成时间：{{planDetail.createAt | date: 'yyyy-MM-dd HH:mm'}}</td>
+                        <td height="40" align="center">您于
+                            <span ng-if="planDetail.startAt">{{planDetail.startAt | date: 'yyyy月MM月dd日'}}</span>
+                            <span ng-if="!planDetail.startAt">{{planDetail.hotel[0].startTime | date: 'yyyy月MM月dd日'}}</span>
+                            的出差状况
+                        </td>
+                        <td width="220" height="40" align="right">{{planDetail.remark}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="content_top">
+                <dl>
+                    <dt>动态标准预算</dt>
+                    <dd>¥{{planDetail.budget}}</dd>
+                </dl>
+                <dl>
+                    <dt>实际支出</dt>
+                    <dd>无</dd>
+                </dl>
+                <dl>
+                    <dt>为公司节省</dt>
+                    <dd>无</dd>
+                </dl>
+                <dl>
+                    <dt>获得积分</dt>
+                    <dd>无</dd>
+                </dl>
+            </div>
+            <div class="title_bottom"><span></span>差旅消费明细</div>
+            <div class="content_bottom">
+                <table width="100%" border="1" bordercolor="#E5E5E5">
+                    <tr>
+                        <th height="40">明细</th>
+                        <th height="40">预算</th>
+                        <th height="40">实际支出</th>
+                        <th height="40">出差票据</th>
+                    </tr>
+                    <tr ng-if="planDetail.outTraffic.length!=0">
+                        <td>
+                            <div class="icon web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
+                            <div class="startplace">{{outTraffic.startPlace}}</div>
+                            <div class="description">{{outTraffic.startTime | date: 'yyyy-MM-dd'}}<span ng-if="outTraffic.latestArriveTime!=undefined && outTraffic.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{outTraffic.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
+                            <div class="endplace">{{outTraffic.arrivalPlace}}</div>
+                        </td>
+                        <td width="135" align="center">¥{{outTraffic.budget}}</td>
+                        <td width="135" align="center">无</td>
+                        <td width="135" align="center">
+                        </td>
+                    </tr>
+                    <tr ng-if="planDetail.hotel.length!=0">
+                        <td>
+                            <div class="icon web-icon-font3" style="color: #5248C8;">&#xe914;</div>
+                            <div class="hoteldescription">
+                                <p>入住地：{{hotel.city}}&nbsp;{{hotel.hotelName}}附近</p>
+                                <p>入住日期：{{hotel.startTime | date: 'yyyy-MM-dd'}}&nbsp;&nbsp;&nbsp;&nbsp;退房日期：{{hotel.endTime | date: 'yyyy-MM-dd'}}</p>
+                            </div>
+                        </td>
+                        <td width="135" align="center">¥{{hotel.budget}}</td>
+                        <td width="135" align="center">无</td>
+                        <td width="135" align="center">
+
+                        </td>
+                    </tr>
+                    <tr ng-if="planDetail.backTraffic.length!=0">
+                        <td>
+                            <div class="icon web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
+                            <div class="startplace">{{backTraffic.arrivalPlace}}</div>
+                            <div class="description">{{backTraffic.endTime | date: 'yyyy-MM-dd'}}<span ng-if="backTraffic.latestArriveTime!=undefined && backTraffic.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{backTraffic.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
+                            <div class="endplace">{{backTraffic.startPlace}}</div>
+                        </td>
+                        <td width="135" align="center">¥{{backTraffic.budget}}</td>
+                        <td width="135" align="center">无</td>
+                        <td width="135" align="center">
+
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

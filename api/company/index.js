@@ -29,7 +29,7 @@ var company = {};
  * @returns {Promise}
  */
 company.createCompany = function(params, callback){
-    var _company = checkAndGetParams(['createUser', 'name', 'domainName', 'mobile', 'email'], ['id', 'agencyId', 'description', 'telephone', 'remark'], params, true);
+    var _company = checkAndGetParams(['createUser', 'name', 'domainName', 'mobile', 'email'], ['id', 'agencyId', 'description', 'telephone', 'remark'], params);
     if(!_company.id){
         _company.id = uuid.v1();
     }
@@ -42,6 +42,7 @@ company.createCompany = function(params, callback){
             .spread(function(c, funds){
                 return {
                     id: c.id,
+                    status: c.status,
                     name: c.name,
                     mobile: c.mobile,
                     email: c.email,
@@ -84,7 +85,7 @@ company.checkBlackDomain = function(params, callback) {
  */
 company.updateCompany = function(params, callback){
     var fields = getColsFromParams(Company.attributes, ['companyNo', 'createUser', 'createAt']);
-    var params = checkAndGetParams(['companyId'], fields, params, true);
+    var params = checkAndGetParams(['companyId'], fields, params);
     var companyId = params.companyId;
     return Company.findById(companyId, {attributes: ['createUser']})
         .then(function(company){
@@ -113,9 +114,9 @@ company.updateCompany = function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.getCompany = function(params, callback){
+company.getCompany = function(params){
     if(!params.companyId){
-        throw {code: -1, msg: 'companyId不能为空'};
+        throw {code: -1, msg: 'companyId 不能为空'};
     }
     var companyId = params.companyId;
     var options = {};
@@ -129,8 +130,6 @@ company.getCompany = function(params, callback){
             }
             return company;
         })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 /**
@@ -139,15 +138,10 @@ company.getCompany = function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.listCompany = function(params, callback){
-    var query = getColsFromParams(['agencyId'], [], params, true);
-    var agencyId = params.agencyId;
+company.listCompany = function(params){
+    var query = checkAndGetParams(['agencyId'], [], params);
+    var agencyId = query.agencyId;
     return Company.findAll({where: {agencyId: agencyId, status: {$ne: -2}}})
-        .then(function(companys){
-            return companys;
-        })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 /**
@@ -156,32 +150,30 @@ company.listCompany = function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.deleteCompany = function(params, callback){
-    return checkParams(['companyId', 'userId'], params)
-        .then(function(){
-            var companyId = params.companyId;
-            var userId = params.userId;
-            return Company.findById(companyId, {attributes: ['createUser']})
-                .then(function(company){
-                    if(!company || company.status == -2){
-                        throw L.ERR.COMPANY_NOT_EXIST;
-                    }
-                    if(company.createUser != userId){
-                        throw L.ERR.PERMISSION_DENY;
-                    }
-                    return sequelize.transaction(function(t){
-                        return Q.all([
-                            Company.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt']}),
-                            FundsAccounts.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt']})
-                        ])
-                    })
-                })
-                .then(function(){
-                    return {code: 0, msg: '删除成功'};
-                })
+company.deleteCompany = function(params){
+    var params = checkAndGetParams(['companyId', 'userId'], [], params);
+    var companyId = params.companyId;
+    var userId = params.userId;
+    return Company.findById(companyId, {attributes: ['createUser']})
+        .then(function(company){
+            if(!company || company.status == -2){
+                throw L.ERR.COMPANY_NOT_EXIST;
+            }
+            if(company.createUser != userId){
+                throw L.ERR.PERMISSION_DENY;
+            }
         })
-        .catch(errorHandle)
-        .nodeify(callback);
+        .then(function(){
+            return sequelize.transaction(function(t){
+                return Q.all([
+                    Company.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt']}),
+                    FundsAccounts.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt']})
+                ])
+            })
+        })
+        .then(function(){
+            return {code: 0, msg: '删除成功'};
+        })
 }
 
 /**
@@ -190,8 +182,8 @@ company.deleteCompany = function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.getCompanyFundsAccount = function(params, callback){
-    var params = checkAndGetParams(['companyId', 'userId'], [], params, true);
+company.getCompanyFundsAccount = function(params){
+    var params = checkAndGetParams(['companyId', 'userId'], [], params);
     var companyId = params.companyId;
     var userId = params.userId;
     return FundsAccounts.findById(companyId, {
@@ -204,8 +196,6 @@ company.getCompanyFundsAccount = function(params, callback){
             }
             return funds.toJSON();
         })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 /**
@@ -215,12 +205,12 @@ company.getCompanyFundsAccount = function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.moneyChange = function(params, callback){
-    var params = checkAndGetParams(['money', 'channel', 'userId', 'type', 'companyId', 'remark'], [], params, true);
+company.moneyChange = function(params){
+    var params = checkAndGetParams(['money', 'channel', 'userId', 'type', 'companyId', 'remark'], [], params);
     var id = params.companyId;
-    return FundsAccounts.findById(id)
+    return FundsAccounts.findById(id, {raw: false})
         .then(function(funds){
-            if(!funds){
+            if(!funds || funds.status == -2){
                 throw {code: -2, msg: '企业资金账户不存在'};
             }
             var id = funds.id;
@@ -272,7 +262,7 @@ company.moneyChange = function(params, callback){
             return sequelize.transaction(function(t){
                 var cols = getColsFromParams(fundsUpdates);
                 return Q.all([
-                    FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: cols, transaction: t}),
+                    FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: cols, transaction: t, raw: false}),
                     MoneyChanges.create(moneyChange, {transaction: t})
                 ])
                 .spread(function(update, create){
@@ -284,25 +274,8 @@ company.moneyChange = function(params, callback){
             if(rownum != 1){
                 throw {code: -3, msg: '充值失败'};
             }
-            return rows[0];
+            return rows[0].toJSON();
         })
-        .catch(errorHandle)
-        .nodeify(callback);
-}
-
-
-function checkParams(checkArray, params, callback){
-    var defer = Q.defer();
-    ///检查参数是否存在
-    for(var key in checkArray){
-        var name = checkArray[key];
-        if(!params[name] && params[name] !== false && params[name] !== 0){
-            defer.reject({code:'-1', msg:'参数 params.' + name + '不能为空'});
-            return defer.promise.nodeify(callback);
-        }
-    }
-    defer.resolve({code: 0});
-    return defer.promise.nodeify(callback);
 }
 
 module.exports = company;

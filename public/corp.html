@@ -11,6 +11,9 @@
 	<link rel="stylesheet" type="text/css" href="/corp/css/staffawardplan.css">
 	<link rel="stylesheet" type="text/css" href="/corp/css/policylist.css">
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
+    <script type="text/javascript">
+        var jQuery = $ = require('jquery');
+    </script>
     <script type="text/javascript" src="/script/libs/bundle.api.js"></script>
 	<script type="text/javascript" src="/script/libs/bundle.ngapp.js"></script>
     <script type="text/javascript" src="/script/messagebox.js"></script>
@@ -33,7 +36,8 @@
 			var token_id = Cookie.get('token_id');
 			var token_sign = Cookie.get('token_sign');
 			var timestamp = Cookie.get("timestamp");
-			remote.authenticate(user_id, token_id, timestamp, token_sign, callback);
+			remote.authenticate({ accountid: user_id, tokenid: token_id, tokensign: token_sign, timestamp: timestamp },
+					callback);
 		};
 		function logout(){
 			API.require('auth');
@@ -56,7 +60,7 @@
     					$scope.staff = ret;
     					var company_id = ret.companyId;
 //    					console.info(ret);
-    					API.company.getCompany(company_id)
+    					API.company.getCompanyById(company_id)
 		    				.then(function(company){
 		    					$scope.company = company;
 //		    					console.info(company);

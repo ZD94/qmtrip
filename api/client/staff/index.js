@@ -55,6 +55,9 @@ staff.deleteStaff = auth.checkPermission(["user.delete"],
         var user_id = this.accountId;
         return API.staff.getStaff({id: user_id})
             .then(function(data){
+                if(this.accountId == params.id){
+                    throw {msg: "不可删除自身信息"};
+                }
                 return API.staff.getStaff({id:params.id})
                     .then(function(target){
                         if(data.companyId != target.companyId){
@@ -121,7 +124,7 @@ staff.getStaffByAgency = function(params, callback){
     var user_id = this.accountId;
     return Q.all([
             API.staff.getStaff({id: staffId}),
-            API.agencyUser.getAgencyUser({id: this.accountId})
+            API.agency.getAgencyUser({id: this.accountId})
         ])
     .spread(function(staff, agencyUser){
             if(!staff.companyId){

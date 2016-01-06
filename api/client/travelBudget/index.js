@@ -174,8 +174,7 @@ travelBudget.getHotelBudget = function(params, callback) {
                 checkOutDate: checkOutDate
             }
 
-            var getHotelBudget = Q.denodeify(API.travelbudget.getHotelBudget);
-            return getHotelBudget(data)
+            return API.travelbudget.getHotelBudget(data)
                 .then(function(result) {
                     //如果没有查询到结果,直接扔回最大金额
                     if (result.price <=0) {
@@ -184,10 +183,6 @@ travelBudget.getHotelBudget = function(params, callback) {
                     }
                     return result;
                 })
-        })
-        .then(function(result) {
-            console.info("====>住店数据", result);
-            return result;
         })
         .nodeify(callback);
 }

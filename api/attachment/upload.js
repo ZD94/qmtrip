@@ -56,8 +56,6 @@ function uploadActionFile(req, res, next) {
                 if (type && type == 'avatar'){//上传头像
                     imgObj = {md5key: md5key,content: data, userId: user_id, isPublic: true,fileType:file_type};
                 }
-                console.log(type);
-                console.log("console.log(type);console.log(type);console.log(type);");
                 if (type && type == 'invoice'){//上传票据
                     API.staff.getInvoiceViewer({accountId: user_id})
                         .then(function(data){

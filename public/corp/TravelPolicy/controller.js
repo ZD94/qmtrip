@@ -142,7 +142,7 @@ var TravelPolicy=(function(){
             else if (index == 5  || index == 11) {
                 $(".update_policy").css({'top':'450px','left':'505px'});
             }
-            var obj = {0:"不限",8:"8折及以下",7:"7折及以下",6:"6折及以下",5:"5折及以下",4:"4折及以下"};
+            var obj = {0:"全价",8:"最高8折",7:"最高7折",6:"最高6折",5:"最高5折",4:"最高4折"};
             var discountTxt = $scope.PolicyList[index].planeDiscount;
             $(".update_policy .Cname").val($scope.PolicyList[index].name);
             $(".update_policy .CplaneLevel").html($scope.PolicyList[index].planeLevel);
@@ -151,6 +151,12 @@ var TravelPolicy=(function(){
             $(".update_policy .Ccheckbox").attr('checked',$scope.PolicyList[index].isChangeLevel);
             $(".update_policy .ChotelTevel").html($scope.PolicyList[index].hotelLevel);
             $(".update_policy .ChotelPrice").val($scope.PolicyList[index].hotelPrice);
+            if ($scope.PolicyList[index].isChangeLevel==true) {
+                $(" .Ccheckboxlabel").html('&#xe9ec;');
+            }
+            else {
+                $(".Ccheckboxlabel").html('');
+            }
             $(".update_policy").show();
             $(".create_policy").hide();
             $(".policy_page li").css('opacity','0.2');
@@ -194,9 +200,29 @@ var TravelPolicy=(function(){
             $(".CplaneLevel").html("不限");
             $(".CplaneDiscount").html("不限").attr("selectValue","0");
             $(".CtrainLevel").html("不限");
-            $(".Ccheckbox").is(':checked',false);
+            $(".Ccheckbox").attr('checked',false);
+            $(".Ccheckboxlabel").html('');
             $(".ChotelTevel").html("不限");
             $(".ChotelPrice").val("");
+        }
+
+        //修改自定义复选框
+        $scope.updateChangecheck = function () {
+            if ($(".update_policy .Ccheckbox").is(':checked')==false) {
+                $(".update_policy .Ccheckboxlabel").html('&#xe9ec;');
+            }
+            else {
+                $(".update_policy .Ccheckboxlabel").html('');
+            }
+        }
+        //创建自定义复选框
+        $scope.createChangecheck = function () {
+            if ($(".create_policy .Ccheckbox").is(':checked')==false) {
+                $(".create_policy .Ccheckboxlabel").html('&#xe9ec;');
+            }
+            else {
+                $(".create_policy .Ccheckboxlabel").html('');
+            }
         }
     }
 

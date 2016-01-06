@@ -15,7 +15,7 @@ var agencyTripPlan = {};
  * @param orderId
  * @param callback
  */
-agencyTripPlan.getTripPlanOrderById = function(orderId, callback){
+agencyTripPlan.getTripPlanOrderById = function(orderId){
     var self = this;
     var params = {
         orderId: orderId,
@@ -23,20 +23,20 @@ agencyTripPlan.getTripPlanOrderById = function(orderId, callback){
     };
 
     var accountId = self.accountId;
-    return API.tripPlan.getTripPlanOrder(params)
-    .then(function(order) {
+    return Q.all([
+        API.tripPlan.getTripPlanOrder(params),
+        API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
+    ])
+    .spread(function(order, user){
             var companyId = order.companyId;
-            return Q.all([
-                API.agency.getAgencyUser({id: accountId, columns: ['agencyId']}),
-                API.company.getCompany({companyId: companyId, columns: ['agencyId']})
-            ])
-                .spread(function (user, company) {
-                    if (user.agencyId != company.agencyId) {
+            return API.company.getCompany({companyId: companyId, columns: ['agencyId']})
+            .then(function(company){
+                    if(company.agencyId != user.agencyId){
                         throw L.ERR.PERMISSION_DENY;
                     }
                     return order;
                 })
-        }).nodeify(callback);
+        })
 }
 
 /**
@@ -79,78 +79,39 @@ agencyTripPlan.listAllTripPlanOrder = function(callback){
  * @param callback
  * @returns {*|*|Promise}
  */
-agencyTripPlan.approveInvoice = function(params, callback){
-    var user_id = this.accountId;
+agencyTripPlan.approveInvoice = function(params){
+    var self = this;
+    var user_id = self.accountId;
     params.userId = user_id;
     var consumeId = params.consumeId;
-    return API.agencyTripPlan.getConsumeDetail({consumeId: consumeId})
+    return API.tripPlan.getConsumeDetail({consumeId: consumeId})
         .then(function(consumeDetail){
-            if(consumeDetail && consumeDetail.accountId){
-                return consumeDetail.accountId;
-            }else{
-                throw {msg:"该消费单缺少accountId"};
+            if(!consumeDetail.accountId){
+                throw {code: -6, msg: '消费记录异常'};
             }
+            return consumeDetail.accountId;
         })
         .then(function(staffId){
+            API.staff.getStaff({id: staffId, columns: ['companyId']})
+        })
+        .then(function(staff){
+            if(!staff.companyId){
+                throw {msg:"该员工不存在或员工所在企业不存在"};
+            }
             return Q.all([
-                API.staff.getStaff({id: staffId}),
-                API.agencyUser.getAgencyUser({id: this.accountId})
+                API.company.getCompany({companyId: staff.companyId, columns: ['agencyId']}),
+                API.agencyUser.getAgencyUser({id: user_id, columns: ['agencyId']})
             ])
-                .spread(function(staff, agencyUser){
-                    if(!staff.companyId){
-                        throw {msg:"该员工不存在或员工所在企业不存在"};
-                    }
-                    return Q.all([
-                            API.company.getCompany({companyId: staff.companyId}),
-                            API.agency.getAgency({agencyId: agencyUser.agencyId, userId: user_id})
-                        ])
-                        .spread(function(company, agency){
-                            if(!company.agencyId){
-                                throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
-                            }
-                            if(company.agencyId == agency.id){
-                                return API.agencyTripPlan.approveInvoice(params);
-                            }else{
-                                throw {msg:"无权限"};
-                            }
-                        })
-                })
         })
-        .nodeify(callback);
-    /*return API.agencyTripPlan.getConsumeDetail({consumeId: consumeId})
-        .then(function(consumeDetail){
-            if(consumeDetail && consumeDetail.accountId){
-                return consumeDetail.accountId;
+        .spread(function(company, user){
+            if(!company.agencyId){
+                throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
             }
-        })
-        .then(function(accountId){
-            return API.staff.getStaff({id:accountId})
-                .then(function(result){
-                    if(result && result.companyId){
-                        return result.companyId;
-                    }else{
-                        throw {msg:"该员工不存在或员工所在企业不存在"};
-                    }
-                })
-        })
-        .then(function(companyId){
-            return API.company.getCompany({companyId: companyId})
-                .then(function(company){
-                    if(company && company.agencyId){
-                        return company.agencyId;
-                    }else{
-                        throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
-                    }
-                })
-        })
-        .then(function(agencyId){
-            if(agencyId == this.accountId){
-                return API.agencyTripPlan.approveInvoice(params);
-            }else{
-                throw {msg:"无权限"};
+            if(company.agencyId != user.agencyId){
+                throw L.ERR.PERMISSION_DENY;
             }
+            return API.tripPlan.approveInvoice(params);
         })
-        .nodeify(callback);*/
 };
 
 

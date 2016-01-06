@@ -115,7 +115,7 @@ agency.updateAgency = function(_agency){
  * @returns {*}
  */
 agency.getAgency = function(params){
-    var params = checkAndGetParams(['agencyId', 'userId'], [], params, true);
+    var params = checkAndGetParams(['agencyId', 'userId'], [], params);
     var agencyId = params.agencyId;
     var userId = params.userId;
     return Agency.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updateAt']})
@@ -151,7 +151,7 @@ agency.listAgency = function(params, callback){
  * @returns {*}
  */
 agency.deleteAgency = function(params){
-    var params = checkAndGetParams(['agencyId', 'userId'], [], params, true);
+    var params = checkAndGetParams(['agencyId', 'userId'], [], params);
     var agencyId = params.agencyId;
     var userId = params.userId;
     return Q.all([
@@ -196,7 +196,7 @@ agency.deleteAgency = function(params){
  */
 agency.createAgencyUser = function(data){
     var fields = getColsFromParams(AgencyUser.attributes);
-    var _agencyUser = checkAndGetParams(['email', 'mobile', 'agencyId', 'name'], fields, data, true);
+    var _agencyUser = checkAndGetParams(['email', 'mobile', 'agencyId', 'name'], fields, data);
     _agencyUser.id = data.accountId || uuid.v1();
     var accData = {email: _agencyUser.email, mobile: _agencyUser.mobile, pwd: "123456", type: 2};//初始密码暂定123456
     return API.auth.newAccount(accData)
@@ -261,8 +261,7 @@ agency.updateAgencyUser = function(data){
  * @param callback
  * @returns {*}
  */
-agency.getAgencyUser = function(params, callback){
-    var defer = Q.defer();
+agency.getAgencyUser = function(params){
     var id = params.id;
     if(!id){
         throw {code: -1, msg: "id不能为空"}
@@ -278,8 +277,6 @@ agency.getAgencyUser = function(params, callback){
             }
             return agencyUser;
         })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 /**
