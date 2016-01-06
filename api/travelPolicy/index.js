@@ -18,8 +18,12 @@ var travelPolicy = {};
  * @returns {*}
  */
 travelPolicy.createTravelPolicy = function(data, callback){
+    if (!data.hotelPrice || !/^\d+(.\d{1,2})?$/.test(data.hotelPrice)) {
+        data.hotelPrice = null;
+    }
     return checkParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"], data)
         .then(function(){
+            console.log(data);
             return travalPolicyModel.create(data);
         })
         .nodeify(callback);
@@ -70,6 +74,9 @@ travelPolicy.updateTravelPolicy = function(data, callback){
     var options = {};
     options.where = {id: id};
     options.returning = true;
+    if (!data.hotelPrice || !/^\d+(.\d{1,2})?$/.test(data.hotelPrice)) {
+        data.hotelPrice = null;
+    }
     return travalPolicyModel.update(data, options)
         .spread(function(rownum, rows){
             return rows[0];
