@@ -49,25 +49,25 @@
                             <p ng-if="item.outTraffic.length!=0">
                                 <span ng-if="item.outTraffic[0].invoice.length==0"><a href="#">上传票据</a></span>
                                 <span ng-if="item.outTraffic[0].invoice.length!=0">
-                                    <span class="shenhe" ng-if="item.outTraffic[0].invoice.status=='-1'">未通过</span>
-                                    <span class="shenhe" ng-if="item.outTraffic[0].invoice.status==0">待审核</span>
-                                    <span class="shenhe" ng-if="item.outTraffic[0].invoice.status==1">审核通过</span>
+                                    <span class="shenhe" ng-if="item.outTraffic[0].status=='-1'">未通过</span>
+                                    <span class="shenhe" ng-if="item.outTraffic[0].status==0">待审核</span>
+                                    <span class="shenhe" ng-if="item.outTraffic[0].status==1">审核通过</span>
                                 </span>
                             </p>
                             <p ng-if="item.hotel.length!=0">
                                 <span ng-if="item.hotel[0].invoice.length==0"><a href="#">上传票据</a></span>
                                 <span ng-if="item.hotel[0].invoice.length!=0">
-                                    <span class="shenhe" ng-if="item.hotel[0].invoice.status=='-1'">未通过</span>
-                                    <span class="shenhe" ng-if="item.hotel[0].invoice.status==0">待审核</span>
-                                    <span class="shenhe" ng-if="item.hotel[0].invoice.status==1">审核通过</span>
+                                    <span class="shenhe" ng-if="item.hotel[0].status=='-1'">未通过</span>
+                                    <span class="shenhe" ng-if="item.hotel[0].status==0">待审核</span>
+                                    <span class="shenhe" ng-if="item.hotel[0].status==1">审核通过</span>
                                 </span>
                             </p>
                             <p ng-if="item.backTraffic.length!=0">
                                 <span ng-if="item.backTraffic[0].invoice.length==0"><a href="#">上传票据</a></span>
                                 <span ng-if="item.backTraffic[0].invoice.length!=0">
-                                    <span class="shenhe" ng-if="item.backTraffic[0].invoice.status=='-1'">未通过</span>
-                                    <span class="shenhe" ng-if="item.backTraffic[0].invoice.status==0">待审核</span>
-                                    <span class="shenhe" ng-if="item.backTraffic[0].invoice.status==1">审核通过</span>
+                                    <span class="shenhe" ng-if="item.backTraffic[0].status=='-1'">未通过</span>
+                                    <span class="shenhe" ng-if="item.backTraffic[0].status==0">待审核</span>
+                                    <span class="shenhe" ng-if="item.backTraffic[0].status==1">审核通过</span>
                                 </span>
                             </p>
                         </td>

@@ -1,7 +1,7 @@
 /**
  * Created by yumiao on 15-12-10.
  */
-
+"use strict";
 var Q = require("q");
 var moment = require("moment");
 var sequelize = require("common/model").importModel("./models");
@@ -28,7 +28,7 @@ var tripPlan = {}
  * @param callback
  * @returns {*}
  */
-tripPlan.savePlanOrder = function(params, callback){
+tripPlan.savePlanOrder = function(params){
     var checkArr = ['accountId', 'companyId', 'type', 'destination', 'budget'];
     var getArr = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark'];
     var _planOrder = checkAndGetParams(checkArr, getArr, params);
@@ -38,8 +38,8 @@ tripPlan.savePlanOrder = function(params, callback){
             _planOrder.id = orderId;
             _planOrder.orderNo = orderNo;
             var userId = params.accountId;
-            return sequelize.transaction(function(t) {
-                var execArr = new Array();
+            var execArr = new Array();
+            return sequelize.transaction(function(t){
                 execArr.push(PlanOrder.create(_planOrder, {transaction: t})); //保存计划单
                 if(params.consumeDetails){ //保存计划单预算和消费详情
                     var details = params.consumeDetails;
@@ -58,31 +58,27 @@ tripPlan.savePlanOrder = function(params, callback){
                 }
                 execArr.push(TripOrderLogs.create(logs, {transaction: t})); //记录计划单操作日志
                 return Q.all(execArr)
-                    .then(function(arr){
-                        var order = arr[0].dataValues;
-                        order.outTraffic = new Array();
-                        order.backTraffic = new Array();
-                        order.hotel = new Array();
-                        for(var j = 1; j < arr.length; j++){
-                            var obj = arr[j];
-                            if(obj.type === -1){
-                                order.outTraffic.push(obj);
-                            }else if(obj.type === 0){
-                                order.hotel.push(obj);
-                            }else if(obj.type === 1){
-                                order.backTraffic.push(obj);
-                            }
-                        }
-                        return order;
-                    })
             })
-                .then(function(ret){
-                    return ret;
-                })
         })
-        .catch(errorHandle)
-        .nodeify(callback);
+        .then(function(arr){
+            var order = arr[0].dataValues;
+            order.outTraffic = new Array();
+            order.backTraffic = new Array();
+            order.hotel = new Array();
+            for(var j = 1; j < arr.length; j++){
+                var obj = arr[j];
+                if(obj.type === -1){
+                    order.outTraffic.push(obj);
+                }else if(obj.type === 0){
+                    order.hotel.push(obj);
+                }else if(obj.type === 1){
+                    order.backTraffic.push(obj);
+                }
+            }
+            return order;
+        })
 }
+
 
 /**
  * 获取计划单/预算单信息
@@ -90,10 +86,8 @@ tripPlan.savePlanOrder = function(params, callback){
  * @param callback
  * @returns {*}
  */
-tripPlan.getTripPlanOrder = function(params, callback){
-    var defer = Q.defer();
-    var checkArr = ['userId', 'orderId'];
-    params = checkAndGetParams(checkArr, [], params);
+tripPlan.getTripPlanOrder = function(params){
+    params = checkAndGetParams(['userId', 'orderId'], [], params);
     var orderId = params.orderId;
     var userId = params.userId;
     return Q.all([
@@ -104,16 +98,13 @@ tripPlan.getTripPlanOrder = function(params, callback){
     ])
         .spread(function(order, outTraffic, backTraffic, hotel){
             if(!order || order.status == -2){
-                defer.reject(L.ERR.TRIP_PLAN_ORDER_NOT_EXIST);
-                return defer.promise;
+                throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
             }
             order.outTraffic = outTraffic;
             order.backTraffic = backTraffic;
             order.hotel = hotel;
             return order;
         })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 /**
@@ -233,15 +224,10 @@ tripPlan.saveConsumeRecord = function(params, options, callback){
         options = {};
     }
     var checkArr = ['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'];
-    return checkParams(checkArr, params)
-        .then(function(){
-            options.fields = getColsFromParams(params);
-            return ConsumeDetails.create(params, options)
-                .then(function(ret){
-                    return ret;
-                })
-        })
-        .catch(errorHandle)
+    var fields = getColsFromParams(ConsumeDetails.attributes);
+    params = checkAndGetParams(checkArr, fields, params);
+    options.fields = getColsFromParams(params);
+    return ConsumeDetails.create(params, options)
         .nodeify(callback);
 }
 
@@ -251,32 +237,28 @@ tripPlan.saveConsumeRecord = function(params, options, callback){
  * @param callback
  * @returns {*}
  */
-tripPlan.deleteTripPlanOrder = function(params, callback){
-    return checkParams(['userId', 'orderId'], params)
-        .then(function(){
-            var orderId = params.orderId;
-            var userId = params.userId;
-            return PlanOrder.findById(orderId, {attributes: ['accountId', 'status']})
-                .then(function(order){
-                    if(!order || order.status == -2){
-                        throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST
-                    }
-                    if(order.accountId != userId){ //权限不足
-                        throw L.ERR.PERMISSION_DENY;
-                    }
-                    return sequelize.transaction(function(t){
-                        return Q.all([
-                            PlanOrder.update({status: -2}, {where: {id: orderId}, fields: ['status'], transaction: t}),
-                            ConsumeDetails.update({status: -2}, {where: {orderId: orderId}, fields: ['status'], transaction: t})
-                        ])
-                            .then(function(){
-                                return {code: 0, msg: '删除成功'};
-                            })
-                    })
-                })
+tripPlan.deleteTripPlanOrder = function(params){
+    var params = checkAndGetParams(['userId', 'orderId'], [], params);
+    var orderId = params.orderId;
+    var userId = params.userId;
+    return PlanOrder.findById(orderId, {attributes: ['accountId', 'status']})
+        .then(function(order){
+            if(!order || order.status == -2){
+                throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST
+            }
+            if(order.accountId != userId){ //权限不足
+                throw L.ERR.PERMISSION_DENY;
+            }
+            return sequelize.transaction(function(t){
+                return Q.all([
+                    PlanOrder.update({status: -2}, {where: {id: orderId}, fields: ['status'], transaction: t}),
+                    ConsumeDetails.update({status: -2}, {where: {orderId: orderId}, fields: ['status'], transaction: t})
+                ])
+            })
         })
-        .catch(errorHandle)
-        .nodeify(callback);
+        .then(function(){
+            return {code: 0, msg: '删除成功'};
+        })
 }
 
 /**
@@ -355,17 +337,21 @@ tripPlan.uploadInvoice = function(params, callback){
         .nodeify(callback);
 }
 
-
-tripPlan.getConsumeDetail = function(params, callback){
-    return ConsumeDetails.findOne({where: {id: params.consumeId}})
+/**
+ * 查询计划单消费记录
+ * @param params
+ * @returns {*}
+ */
+tripPlan.getConsumeDetail = function(params){
+    var params = checkAndGetParams(['consumeId', 'userId'], [], params);
+    var consumeId = params.consumeId;
+    return ConsumeDetails.findById(consumeId)
         .then(function(consumeDetail){
-            if(consumeDetail){
-                return consumeDetail;
-            }else{
-                throw {msg: "查询记录不存在"};
+            if(!consumeDetail || consumeDetail.status == -2){
+                throw {code: -4, msg: '查询记录不存在'};
             }
+            return consumeDetail;
         })
-        .nodeify(callback);
 }
 
 /**
@@ -377,21 +363,31 @@ tripPlan.getConsumeDetail = function(params, callback){
  * @param callback
  * @returns {*|Promise}
  */
-tripPlan.approveInvoice = function(params, callback){
-    return checkParams(['status', 'consumeId', 'userId'], params)
-        .then(function(){
-            return ConsumeDetails.findOne({where: {id: params.consumeId}});
-        })
-        .then(function(custome){
-            if(!custome)
+tripPlan.approveInvoice = function(params){
+    var params = checkAndGetParams(['status', 'consumeId', 'userId', 'expenditure'], ['remark'], params);
+    return ConsumeDetails.findById(params.consumeId)
+        .then(function(consume){
+            if(!consume || consume.status == -2)
                 throw L.ERR.NOT_FOUND;
-            var invoiceJson = custome.invoice;
+            if(!consume.newInvoice){
+                throw {code: -2, msg: '没有上传票据'};
+            }
+            var invoiceJson = consume.invoice;
             if(invoiceJson && invoiceJson.length > 0){
                 invoiceJson[invoiceJson.length-1].status = params.status;
                 invoiceJson[invoiceJson.length-1].remark = params.remark;
-                invoiceJson[invoiceJson.length-1].approve_at = moment().format('YYYY-MM-DD HH:mm');
+                invoiceJson[invoiceJson.length-1].approve_at = utils.now();
             }
-            var updates = {invoice: JSON.stringify(invoiceJson), updateAt: moment().format(), status: params.status, auditRemark: params.remark};
+
+            var updates = {
+                invoice: JSON.stringify(invoiceJson),
+                updateAt: moment().format(),
+                status: params.status,
+                expenditure: params.expenditure
+            };
+            if(params.remark){
+                updates.auditRemark = params.remark;
+            }
             var logs = {consumeId: params.consumeId, userId: params.userId, status: params.status, remark: "审核票据-"+params.remark};
             return sequelize.transaction(function(t){
                 return Q.all([
@@ -400,13 +396,12 @@ tripPlan.approveInvoice = function(params, callback){
                 ]);
             });
         })
-        .spread(function(update, create) {
+        .spread(function(update) {
             return update;
         })
         .spread(function(rownum, rows){
             return rows[0];
         })
-        .nodeify(callback);
 }
 
 /**

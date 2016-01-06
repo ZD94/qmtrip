@@ -200,7 +200,7 @@ CREATE TABLE consume_details (
     hotel_name character varying,
     start_time timestamp without time zone,
     end_time timestamp without time zone,
-    latest_arrive_time timestamp without time zone
+    latest_arrive_time timestamp without time zone,
     budget numeric(15,2),
     expenditure numeric(15,2),
     invoice_type integer,
@@ -393,12 +393,6 @@ COMMENT ON COLUMN tripplan.trip_order_logs.remark IS '备注';
 --
 COMMENT ON COLUMN tripplan.trip_order_logs.create_at IS '记录时间';
 
--- Completed on 2015-12-09 11:37:14 CST
-
---
--- PostgreSQL database dump complete
---
-
 
 CREATE TABLE tripplan.consume_details_logs
 (
@@ -416,3 +410,10 @@ COMMENT ON COLUMN tripplan.consume_details_logs.user_id IS '操作人id';
 COMMENT ON COLUMN tripplan.consume_details_logs.status IS '审批状态';
 COMMENT ON COLUMN tripplan.consume_details_logs.remark IS '备注';
 COMMENT ON COLUMN tripplan.consume_details_logs.create_at IS '记录时间';
+
+
+-- Completed on 2015-12-09 11:37:14 CST
+
+--
+-- PostgreSQL database dump complete
+--

@@ -143,7 +143,7 @@ var TravelPolicy=(function(){
             else if (index == 5  || index == 11) {
                 $(".update_policy").css({'top':'450px','left':'505px'});
             }
-            var obj = {0:"不限",8:"8折及以下",7:"7折及以下",6:"6折及以下",5:"5折及以下",4:"4折及以下"};
+            var obj = {0:"全价",8:"最高8折",7:"最高7折",6:"最高6折",5:"最高5折",4:"最高4折"};
             var discountTxt = $scope.PolicyList[index].planeDiscount;
             $(".update_policy .Cname").val($scope.PolicyList[index].name);
             $(".update_policy .CplaneLevel").html($scope.PolicyList[index].planeLevel);
@@ -207,14 +207,17 @@ var TravelPolicy=(function(){
             $(".ChotelPrice").val("");
         }
 
-        //自定义复选框
-        $scope.changecheck = function () {
-            if ($(".Ccheckbox").is(':checked')==false) {
-                $(".Ccheckboxlabel").html('&#xe9ec;');
+        //修改自定义复选框
+        $scope.updateChangecheck = function () {
+            if ($(".update_policy .Ccheckbox").is(':checked')==false) {
+                $(".update_policy .Ccheckboxlabel").html('&#xe9ec;');
             }
             else {
-                $(".Ccheckboxlabel").html('');
+                $(".update_policy .Ccheckboxlabel").html('');
             }
+        }
+        //创建自定义复选框
+        $scope.createChangecheck = function () {
             if ($(".create_policy .Ccheckbox").is(':checked')==false) {
                 $(".create_policy .Ccheckboxlabel").html('&#xe9ec;');
             }
@@ -222,7 +225,6 @@ var TravelPolicy=(function(){
                 $(".create_policy .Ccheckboxlabel").html('');
             }
         }
-        $scope.changecheck();
     }
 
     return TravelPolicy;

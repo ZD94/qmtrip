@@ -57,7 +57,7 @@
 | msg     | 错误消息 |
 
 
->. 获取企业信息 API.company.getCompany(companyId, callback);
+>. 获取企业信息 API.company.getCompanyById(companyId, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -108,6 +108,31 @@
 | params.companyId                     |企业id                   |uuid             |
 | params.money                           |冻结金额           |numeric(15,2)         |
 | params.remark                        |冻结原因                |varchar          |
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code    | 返回码 | 0.成功，其他失败 |
+| msg     | 错误消息 |
+
+
+>. 代理商获取企业列表 API.company.getCompanyListByAgency(callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code    | 返回码 | 0.成功，其他失败 |
+| msg     | 错误消息 |
+
+
+>. 获取企业资金账户信息 API.company.getCompanyFundsAccount(companyId, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| companyId             |企业id    |uuid       |必填
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |

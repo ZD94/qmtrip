@@ -56,9 +56,8 @@
                         <td align="center">¥{{outTraffic.budget}}</td>
                         <td align="center">无</td>
                         <td align="center" class="po_r">
-                                <input type="button" class="common_btn1 uploadbtn" value="上传123" ng-if="outTraffic.invoice.length==0">
-                                <input type="hidden" name="" id="invoice_hotel" value="" dataid="{{outTraffic.id}}">
-                                <input type="file" class="file" name="tmpFile" value='' id="i_outTraffic" ref="{{outTraffic.id}}">
+                                <input type="button" class="common_btn1 uploadbtn" value="上传" ng-if="outTraffic.invoice.length==0">
+                                <input type="file" class="file" name="tmpFile" value='' id="i_outTraffic" ref="{{outTraffic.id}}" data-type = "1" ng-if="outTraffic.invoice.length==0">
                             <span ng-if="outTraffic.invoice.length!=0">
                                 <span ng-if="outTraffic.status=='-1'">未通过</span>
                                 <span ng-if="outTraffic.status==0">待审核</span>
@@ -81,13 +80,12 @@
                         <td align="center">无</td>
                         <td align="center" class="po_r">
                             <input type="button" class="common_btn1 uploadbtn" value="上传" ng-if="hotel.invoice.length==0">
-                            <input type="hidden" name="" id="invoice_hotel" value="" dataid="{{hotel.id}}">
-                            <input type="file" class="file" name="tmpFile" value='选择文件' id="i_hotel">
+                            <input type="file" class="file" name="tmpFile" value='选择文件' id="i_hotel" ref="{{hotel.id}}" data-type = "2" ng-if="hotel.invoice.length==0">
                             <span ng-if="hotel.invoice.length!=0">
                                 <span ng-if="hotel.status=='-1'">未通过</span>
                                 <span ng-if="hotel.status==0">待审核</span>
                                 <span ng-if="hotel.status==1">审核通过</span>
-                                <a href="#">去程交通票据</a>
+                                <a href="#">住宿发票</a>
                             </span>
                         </td>
                     </tr>
@@ -104,18 +102,24 @@
                         <td align="center">无</td>
                         <td align="center" class="po_r">
                             <input type="button" class="common_btn1 uploadbtn" value="上传" ng-if="backTraffic.invoice.length==0">
-                            <input type="hidden" name="" id="invoice_back" value="" dataid="{{backTraffic.id}}">
-                            <input type="file" class="file" name="tmpFile" value='选择文件' id="i_backTraffic">
+                            <input type="file" class="file" name="tmpFile" value='选择文件' id="i_backTraffic" ref="{{backTraffic.id}}" data-type = "3" ng-if="backTraffic.invoice.length==0">
                             <span ng-if="backTraffic.invoice.length!=0">
                                 <span ng-if="backTraffic.status=='-1'">未通过</span>
                                 <span ng-if="backTraffic.status==0">待审核</span>
                                 <span ng-if="backTraffic.status==1">审核通过</span>
-                                <a href="#">去程交通票据</a>
+                                <a href="#">回程交通票据</a>
                             </span>
                         </td>
                     </tr>
                 </table>
             </div>
         </div>
+    </div>
+</div>
+<div class='messagebox_fixed'>
+    <div class='messagebox_box'>
+        <div class='messagebox_title'>上传<div class='messagebox_close' onclick='messagebox_close()'><img src='/images/closezjx.png' style='display: block;'></div></div>
+        <div class='messagebtns'><em>{{invoiceType}}</em><span>核对无误后点击确认按钮，上传后需等待审核</span><a class='message_cancel' onclick='messagebox_close()'>取消</a><a class='message_sure' ng-click='updateToServer()'>确认</a></div>
+        <div class='messagebox_content'><img alt=""></div>
     </div>
 </div>
