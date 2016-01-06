@@ -10,4 +10,4 @@ node_modules
 /public/*/css/*.css
 *.map
 controller.all.js
-
+/temp
