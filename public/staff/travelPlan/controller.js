@@ -127,8 +127,8 @@ var travelPlan=(function(){
                     });
                     var invoice = {
                         userId: $scope.staff.id,
-                        consumeId:$scope.ref;
-                        picture:$scope.md5;
+                        consumeId:$scope.ref,
+                        picture:$scope.md5
                     }
                     
                     $scope.$apply();
@@ -136,8 +136,8 @@ var travelPlan=(function(){
                 function updateToServer() {
                     var invoice = {
                         userId: $scope.staff.id,
-                        consumeId:$scope.ref;
-                        picture:$scope.md5;
+                        consumeId:$scope.ref,
+                        picture:$scope.md5
                     }
                     API.onload(function(){
                         API.tripPlan.uploadInvoice(invoice)
