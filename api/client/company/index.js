@@ -82,7 +82,7 @@ company.updateCompany = checkPermission(["company.edit"],
         var self = this;
         var accountId = self.accountId;
         params.createUser = accountId;
-        return API.staff.getStaff({id: accountId})
+        return API.staff.getStaff({id: accountId, columns: ['companyId']})
             .then(function(staff){
                 params.companyId = staff.companyId;
                 return API.company.updateCompany(params)
@@ -95,7 +95,7 @@ company.updateCompany = checkPermission(["company.edit"],
  * @param callback
  * @returns {*}
  */
-company.getCompany = function(companyId, callback){
+company.getCompanyById = function(companyId, callback){
     var self = this;
     var params = {
         companyId: companyId,
@@ -118,7 +118,7 @@ company.getCompanyListByAgency = //checkAgencyPermission(["company.query"],
             userId: accountId
         }
         
-        return API.agency.getAgencyUser({id: accountId})
+        return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
             .then(function(user){
                 params.agencyId = user.agencyId;
                 return API.company.listCompany(params)
