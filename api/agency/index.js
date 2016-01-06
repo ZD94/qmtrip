@@ -261,8 +261,7 @@ agency.updateAgencyUser = function(data){
  * @param callback
  * @returns {*}
  */
-agency.getAgencyUser = function(params, callback){
-    var defer = Q.defer();
+agency.getAgencyUser = function(params){
     var id = params.id;
     if(!id){
         throw {code: -1, msg: "id不能为空"}
@@ -278,8 +277,6 @@ agency.getAgencyUser = function(params, callback){
             }
             return agencyUser;
         })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 /**

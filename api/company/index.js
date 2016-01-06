@@ -42,6 +42,7 @@ company.createCompany = function(params, callback){
             .spread(function(c, funds){
                 return {
                     id: c.id,
+                    status: c.status,
                     name: c.name,
                     mobile: c.mobile,
                     email: c.email,
@@ -113,9 +114,9 @@ company.updateCompany = function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.getCompany = function(params, callback){
+company.getCompany = function(params){
     if(!params.companyId){
-        throw {code: -1, msg: 'companyId不能为空'};
+        throw {code: -1, msg: 'companyId 不能为空'};
     }
     var companyId = params.companyId;
     var options = {};
@@ -129,8 +130,6 @@ company.getCompany = function(params, callback){
             }
             return company;
         })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 /**
@@ -139,15 +138,10 @@ company.getCompany = function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.listCompany = function(params, callback){
-    var query = getColsFromParams(['agencyId'], [], params, true);
-    var agencyId = params.agencyId;
+company.listCompany = function(params){
+    var query = checkAndGetParams(['agencyId'], [], params, true);
+    var agencyId = query.agencyId;
     return Company.findAll({where: {agencyId: agencyId, status: {$ne: -2}}})
-        .then(function(companys){
-            return companys;
-        })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 /**
@@ -190,7 +184,7 @@ company.deleteCompany = function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.getCompanyFundsAccount = function(params, callback){
+company.getCompanyFundsAccount = function(params){
     var params = checkAndGetParams(['companyId', 'userId'], [], params, true);
     var companyId = params.companyId;
     var userId = params.userId;
@@ -204,8 +198,6 @@ company.getCompanyFundsAccount = function(params, callback){
             }
             return funds.toJSON();
         })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 /**
@@ -215,12 +207,12 @@ company.getCompanyFundsAccount = function(params, callback){
  * @param callback
  * @returns {*}
  */
-company.moneyChange = function(params, callback){
+company.moneyChange = function(params){
     var params = checkAndGetParams(['money', 'channel', 'userId', 'type', 'companyId', 'remark'], [], params, true);
     var id = params.companyId;
-    return FundsAccounts.findById(id)
+    return FundsAccounts.findById(id, {raw: false})
         .then(function(funds){
-            if(!funds){
+            if(!funds || funds.status == -2){
                 throw {code: -2, msg: '企业资金账户不存在'};
             }
             var id = funds.id;
@@ -272,7 +264,7 @@ company.moneyChange = function(params, callback){
             return sequelize.transaction(function(t){
                 var cols = getColsFromParams(fundsUpdates);
                 return Q.all([
-                    FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: cols, transaction: t}),
+                    FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: cols, transaction: t, raw: false}),
                     MoneyChanges.create(moneyChange, {transaction: t})
                 ])
                 .spread(function(update, create){
@@ -284,10 +276,8 @@ company.moneyChange = function(params, callback){
             if(rownum != 1){
                 throw {code: -3, msg: '充值失败'};
             }
-            return rows[0];
+            return rows[0].toJSON();
         })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 
