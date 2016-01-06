@@ -31,7 +31,7 @@ var tripPlan = {}
 tripPlan.savePlanOrder = function(params, callback){
     var checkArr = ['accountId', 'companyId', 'type', 'destination', 'budget'];
     var getArr = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark'];
-    var _planOrder = checkAndGetParams(checkArr, getArr, params, true);
+    var _planOrder = checkAndGetParams(checkArr, getArr, params);
     return API.seeds.getSeedNo('tripPlanOrderNo')
         .then(function(orderNo){
             var orderId = uuid.v1();
@@ -93,7 +93,7 @@ tripPlan.savePlanOrder = function(params, callback){
 tripPlan.getTripPlanOrder = function(params, callback){
     var defer = Q.defer();
     var checkArr = ['userId', 'orderId'];
-    params = checkAndGetParams(checkArr, [], params, true);
+    params = checkAndGetParams(checkArr, [], params);
     var orderId = params.orderId;
     var userId = params.userId;
     return Q.all([
@@ -192,7 +192,7 @@ tripPlan.updateConsumeDetail = function(params, callback){
  * @returns {*}
  */
 tripPlan.listTripPlanOrder = function(params, callback){
-    var query = checkAndGetParams(['companyId'], ['accountId', 'status'], params, true);
+    var query = checkAndGetParams(['companyId'], ['accountId', 'status'], params);
     query.status = {$ne: -2};
     return PlanOrder.findAll({where: query})
         .then(function(orders){
@@ -416,7 +416,7 @@ tripPlan.approveInvoice = function(params, callback){
  * @param callback
  */
 tripPlan.countTripPlanNum = function(params, callback){
-    var query = checkAndGetParams(['companyId'], ['accountId', 'status'], params, true);
+    var query = checkAndGetParams(['companyId'], ['accountId', 'status'], params);
     query.status = {$ne: -2};
     return PlanOrder.count({where: query})
         .nodeify(callback);

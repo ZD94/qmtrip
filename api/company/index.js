@@ -29,7 +29,7 @@ var company = {};
  * @returns {Promise}
  */
 company.createCompany = function(params, callback){
-    var _company = checkAndGetParams(['createUser', 'name', 'domainName', 'mobile', 'email'], ['id', 'agencyId', 'description', 'telephone', 'remark'], params, true);
+    var _company = checkAndGetParams(['createUser', 'name', 'domainName', 'mobile', 'email'], ['id', 'agencyId', 'description', 'telephone', 'remark'], params);
     if(!_company.id){
         _company.id = uuid.v1();
     }
@@ -85,7 +85,7 @@ company.checkBlackDomain = function(params, callback) {
  */
 company.updateCompany = function(params, callback){
     var fields = getColsFromParams(Company.attributes, ['companyNo', 'createUser', 'createAt']);
-    var params = checkAndGetParams(['companyId'], fields, params, true);
+    var params = checkAndGetParams(['companyId'], fields, params);
     var companyId = params.companyId;
     return Company.findById(companyId, {attributes: ['createUser']})
         .then(function(company){
@@ -139,7 +139,7 @@ company.getCompany = function(params){
  * @returns {*}
  */
 company.listCompany = function(params){
-    var query = checkAndGetParams(['agencyId'], [], params, true);
+    var query = checkAndGetParams(['agencyId'], [], params);
     var agencyId = query.agencyId;
     return Company.findAll({where: {agencyId: agencyId, status: {$ne: -2}}})
 }
@@ -151,6 +151,7 @@ company.listCompany = function(params){
  * @returns {*}
  */
 company.deleteCompany = function(params, callback){
+    var params = checkAndGetParams(['companyId', 'userId'], [], params);
     return checkParams(['companyId', 'userId'], params)
         .then(function(){
             var companyId = params.companyId;
@@ -185,7 +186,7 @@ company.deleteCompany = function(params, callback){
  * @returns {*}
  */
 company.getCompanyFundsAccount = function(params){
-    var params = checkAndGetParams(['companyId', 'userId'], [], params, true);
+    var params = checkAndGetParams(['companyId', 'userId'], [], params);
     var companyId = params.companyId;
     var userId = params.userId;
     return FundsAccounts.findById(companyId, {
@@ -208,7 +209,7 @@ company.getCompanyFundsAccount = function(params){
  * @returns {*}
  */
 company.moneyChange = function(params){
-    var params = checkAndGetParams(['money', 'channel', 'userId', 'type', 'companyId', 'remark'], [], params, true);
+    var params = checkAndGetParams(['money', 'channel', 'userId', 'type', 'companyId', 'remark'], [], params);
     var id = params.companyId;
     return FundsAccounts.findById(id, {raw: false})
         .then(function(funds){
