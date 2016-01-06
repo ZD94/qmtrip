@@ -146,6 +146,9 @@ staff.updateStaff = function(data, callback){
     var options = {};
     options.where = {id: id};
     options.returning = true;
+    if(data.travelLevel || data.travelLevel == ""){
+        delete data.travelLevel;
+    }
     return Q()
         .then(function(){
             if(data.email){
