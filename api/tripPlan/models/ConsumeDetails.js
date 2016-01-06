@@ -10,7 +10,6 @@ module.exports = function (Db, DataType) {
         id          : {type: DataType.UUID,             defaultValue: uuid.v1, primaryKey: true},
         orderId     : {type: DataType.STRING,           field: "order_id"}, //计划单id
         accountId   : {type: DataType.UUID,             field: "account_id"}, //单据所属人
-        orderNo     : {type: DataType.STRING,           field: "order_no"}, //计划/预算单号
         type        : {type: DataType.INTEGER }, //消费类型（交通和酒店）
         status      : {type: DataType.INTEGER,          defaultValue: 0, field: "status"}, //状态
         startPlace  : {type: DataType.STRING,           field: "start_place"}, //出发地点

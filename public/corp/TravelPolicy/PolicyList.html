@@ -21,12 +21,12 @@
                         <span ng-if="item.planeDiscount==6">最高6折</span>
                         <span ng-if="item.planeDiscount==5">最高5折</span>
                         <span ng-if="item.planeDiscount==4">最高4折</span>
-                        ，仓位{{item.planeLevel}}
+                        ，舱位{{item.planeLevel}}
                     </td>
                 </tr>
                 <tr ng-if="item.isChangeLevel==true">
                     <td width="70" height="20" align="right"></td>
-                    <td height="20" style="color: #9B9BAF;">当高级仓位低于上述标准时，可选择高级仓位</td>
+                    <td height="20" style="color: #9B9BAF;">当高级舱位低于上述标准时，可选择高级舱位</td>
                 </tr>
                 <tr>
                     <td width="70" height="34" align="right">火车：</td>
@@ -49,7 +49,7 @@
                     <td width="70" height="56" align="right">飞机：</td>
                     <td>
                         <dl class="selectbox w180">
-                            <dt class="common_select CplaneLevel">请选择仓位</dt>
+                            <dt class="common_select CplaneLevel">请选择舱位</dt>
                             <dd class="common_option">
                                 <div>不限</div>
                                 <div>经济舱</div>
@@ -74,7 +74,10 @@
                 </tr>
                 <tr>
                     <td width="70" height="36" align="right"></td>
-                    <td><input type="checkbox" class="Ccheckbox" style="width: 14px; height: 14px; margin-top: 2px; float: left;"><label style="padding-left: 5px; float: left;">当高级仓位低于上述标准时，可选择高级仓位</label></td>
+                    <td>
+                        <input type="checkbox" class="Ccheckbox" id="Ccheckboxx" checked="" style="display: none;">
+                        <label for="Ccheckboxx" class="Ccheckboxlabel web-icon-font2" ng-click="changecheck()" style="width: 16px; height: 16px; line-height: 16px; text-align: center; color: #ffffff; background:#118FD6; margin-top: 1px; float: left;"></label>
+                        <span style="padding-left: 5px; float: left;">当高级舱位低于上述标准时，可选择高级舱位</span></td>
                 </tr>
                 <tr>
                     <td width="70" height="56" align="right">火车：</td>
@@ -85,7 +88,7 @@
                                 <div>不限</div>
                                 <div>商务座/高级软卧</div>
                                 <div>一等座/软卧</div>
-                                <div>二等座/软卧</div>
+                                <div>二等座/硬卧</div>
                                 <div>软卧</div>
                                 <div>硬卧</div>
                             </dd>
@@ -154,7 +157,10 @@
                 </tr>
                 <tr>
                     <td width="70" height="36" align="right"></td>
-                    <td><input type="checkbox" class="Ccheckbox" style="width: 14px; height: 14px; margin-top: 2px; float: left;"><label style="padding-left: 5px; float: left;">当高级仓位低于上述标准时，可选择高级仓位</label></td>
+                    <td>
+                        <input type="checkbox" class="Ccheckbox" id="Ccheckbox" checked="" style="display: none;">
+                        <label for="Ccheckbox" class="Ccheckboxlabel web-icon-font2" ng-click="changecheck()" style="width: 16px; height: 16px; line-height: 16px; text-align: center; color: #ffffff; background:#118FD6; margin-top: 1px; float: left;"></label>
+                        <span style="padding-left: 5px; float: left;">当高级舱位低于上述标准时，可选择高级舱位</span></td>
                 </tr>
                 <tr>
                     <td width="70" height="56" align="right">火车：</td>
@@ -165,7 +171,7 @@
                                 <div>不限</div>
                                 <div>商务座/高级软卧</div>
                                 <div>一等座/软卧</div>
-                                <div>二等座/软卧</div>
+                                <div>二等座/硬卧</div>
                                 <div>软卧</div>
                                 <div>硬卧</div>
                             </dd>

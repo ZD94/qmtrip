@@ -151,6 +151,12 @@ var TravelPolicy=(function(){
             $(".update_policy .Ccheckbox").attr('checked',$scope.PolicyList[index].isChangeLevel);
             $(".update_policy .ChotelTevel").html($scope.PolicyList[index].hotelLevel);
             $(".update_policy .ChotelPrice").val($scope.PolicyList[index].hotelPrice);
+            if ($scope.PolicyList[index].isChangeLevel==true) {
+                $(" .Ccheckboxlabel").html('&#xe9ec;');
+            }
+            else {
+                $(".Ccheckboxlabel").html('');
+            }
             $(".update_policy").show();
             $(".create_policy").hide();
             $(".policy_page li").css('opacity','0.2');
@@ -194,10 +200,28 @@ var TravelPolicy=(function(){
             $(".CplaneLevel").html("不限");
             $(".CplaneDiscount").html("不限").attr("selectValue","0");
             $(".CtrainLevel").html("不限");
-            $(".Ccheckbox").is(':checked',false);
+            $(".Ccheckbox").attr('checked',false);
+            $(".Ccheckboxlabel").html('');
             $(".ChotelTevel").html("不限");
             $(".ChotelPrice").val("");
         }
+
+        //自定义复选框
+        $scope.changecheck = function () {
+            if ($(".Ccheckbox").is(':checked')==false) {
+                $(".Ccheckboxlabel").html('&#xe9ec;');
+            }
+            else {
+                $(".Ccheckboxlabel").html('');
+            }
+            if ($(".create_policy .Ccheckbox").is(':checked')==false) {
+                $(".create_policy .Ccheckboxlabel").html('&#xe9ec;');
+            }
+            else {
+                $(".create_policy .Ccheckboxlabel").html('');
+            }
+        }
+        $scope.changecheck();
     }
 
     return TravelPolicy;
