@@ -23,7 +23,7 @@ module.exports = (function(){
 							// console.info(company.createUser)
 							return Q.all([
 								API.company.getCompanyFundsAccount(company.id),
-								API.staff.getStaffByAgency(company.createUser),
+								API.staff.getStaffByAgency({id: company.createUser}),
                         		API.staff.statisticStaffs({companyId:company.id}),
 								API.agencyTripPlan.countTripPlanNum({companyId: company.id})
 								])

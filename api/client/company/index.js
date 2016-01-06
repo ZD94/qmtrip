@@ -55,30 +55,34 @@ company.createCompany = function(params, callback){
         })
         .then(function(account){
             var companyId = params.companyId || uuid.v1();
-            return Q.all([
-                API.company.createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain,
-                    mobile:mobile, email: email, agencyId: params.agencyId, remark: params.remark, description: params.description}),
-                API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
-                    mobile: mobile, name: userName, roleId: 0})
-            ])
+            return API.company.createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain,
+                mobile:mobile, email: email, agencyId: params.agencyId, remark: params.remark, description: params.description})
+            .then(function(c){
+                    return API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
+                        mobile: mobile, name: userName, roleId: 0})
+                    .then(function(s){
+                            return [c, s];
+                        })
+                })
         })
-        .spread(function(company){
-            return {code: 0, msg: '创建成功', company: company};
+        .spread(function(company, staff){
+            return {code: 0, msg: '创建成功', company: company, staff: {id: staff.id}};
         })
         .nodeify(callback);
 };
 
 /**
- * 更新企业信息
+ * 更新企业信息(企业创建者)
  * @param params
  * @param callback
  * @returns {*}
  */
 company.updateCompany = checkPermission(["company.edit"],
-    function(params, callback){
+    function updateCompany(params, callback){
         var self = this;
-        params.createUser = self.accountId;
-        return staff.getCurrentStaff()
+        var accountId = self.accountId;
+        params.createUser = accountId;
+        return API.staff.getStaff({id: accountId})
             .then(function(staff){
                 params.companyId = staff.companyId;
                 return API.company.updateCompany(params)

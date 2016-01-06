@@ -1,6 +1,7 @@
 /**
  * Created by wyl on 15-12-11.
  */
+"use strict";
 var assert = require("assert");
 var uuid = require("node-uuid");
 var API = require("common/api");
@@ -8,172 +9,232 @@ var Q = require('q');
 
 describe("api/client/agency.js", function() {
 
-    var agencyId = "";
-    var agencyUserId = "";
-    var newUserId = "";
-
-    var agency = {
-        email: "agency.test.yu@tulingdao.com",
-        userName: "喵喵",
-        name: '喵喵的代理商',
-        description: '代理商API测试用',
-        mobile: "15269866801",
-    };
-
-    var accountId = "";
-    var self = {accountId: accountId};
-
 
     describe("registerAgency", function() {
 
-        it("registerAgency should be ok", function(done) {
+        var agencyId = "";
+        var agencyUserId = "";
+
+        var agency = {
+            email: "agency0.test.yu@tulingdao.com",
+            userName: "喵喵",
+            name: '喵喵的代理商',
+            description: '代理商API测试用',
+            mobile: "15269866801"
+        };
+        after(function(done){
+            API.agency.deleteAgency({agencyId: agencyId, userId: agencyUserId}, function (err, ret) {
+                if (err) {
+                    throw err;
+                }
+                assert.equal(ret.code, 0);
+                done();
+            })
+        });
+
+        it("registerAgency with wrong params should be error", function(done) {
+            API.client.agency.registerAgency({}, function(err, ret) {
+                assert.equal(ret, null);
+                assert.equal(err.code, -1);
+                done();
+            });
+        });
+
+        it("registerAgency with correct params should be ok", function(done) {
             API.client.agency.registerAgency(agency, function(err, ret) {
                 if (err) {
                     throw err;
                 }
+                assert.equal(ret.agency.status, 0);
                 agencyId = ret.agency.id;
                 agencyUserId = ret.agencyUser.id;
-                //console.info("registerAgency agencyId=>", agencyId);
-                //console.info("registerAgency agencyUserId=>", agencyUserId);
-                self.accountId = agencyUserId;
                 done();
             });
         });
+
     });
 
-    /**
-     * 更新代理商
-     */
-    describe("updateAgency", function() {
+
+    describe("agency and agencyUser options", function() {
+        var agencyId = "";
+        var agencyUserId = "";
+
+        var agency = {
+            email: "agency1.test.yu@tulingdao.com",
+            userName: "喵喵",
+            name: '喵喵的代理商',
+            description: '代理商API测试用',
+            mobile: "15269866811"
+        };
+        before(function(done){
+            API.client.agency.registerAgency(agency, function(err, ret) {
+                if (err) {
+                    throw err;
+                }
+                assert.equal(ret.agency.status, 0);
+                agencyId = ret.agency.id;
+                agencyUserId = ret.agencyUser.id;
+                done();
+            });
+        });
+
+        after(function(done){
+            API.agency.deleteAgency({agencyId: agencyId, userId: agencyUserId}, function (err, ret) {
+                if (err) {
+                    throw err;
+                }
+                assert.equal(ret.code, 0);
+                done();
+            })
+        });
+
         it("updateAgency should be ok", function(done) {
-            API.client.agency.updateAgency.call(self, {agencyId: agencyId, status: '1'}, function(err, ret) {
+            var self = {accountId: agencyUserId};
+            API.client.agency.updateAgency.call(self, {agencyId: agencyId, status: '1', remark: '代理商更新测试', wrongParams: 'wrongParams'}, function(err, ret) {
                 if (err) {
                     throw err;
                 }
+                assert.equal(ret.status, 1);
                 done();
-            });
-        })
-    })
+            })
+        });
 
 
-    /**
-     * 根据id获取代理商
-     */
-    describe("getAgencyById", function() {
         it("getAgencyById should be ok", function(done) {
-            API.client.agency.getAgencyById.call(self, agencyId, function(err, ret) {
+            API.client.agency.getAgencyById.call({accountId: agencyUserId}, agencyId, function(err, ret) {
                 if (err) {
                     throw err;
                 }
-                //console.info("****************代理商****************");
-                //console.info(ret);
+                assert.equal(ret.id, agencyId);
                 done();
-            });
-        })
-    });
+            })
+        });
 
-    //代理商用户==========================================================start
-    /**
-     * 获取当前代理商用户
-     */
-    describe("getCurrentAgencyUser", function() {
-        it("getCurrentAgencyUser should be ok", function(done) {
-            API.client.agency.getCurrentAgencyUser.call(self, function(err, ret) {
-                if (err) {
-                    throw err;
-                }
-                //console.info("****************当前代理商用户****************");
-                //console.info(ret);
-                done();
-            });
-        })
-    });
 
-    /**
-     * 创建代理商用户
-     */
-    describe("createAgencyUser", function() {
         it("createAgencyUser should be ok", function(done) {
-            API.client.agency.createAgencyUser.call(self, {name: '测试代理商用户', email: "test123456@tulingdao.com", mobile: '12345678777', agencyId: agencyId}, function(err, ret) {
+            API.client.agency.createAgencyUser.call({accountId: agencyUserId},
+                {name: '测试代理商用户', email: "test123456@tulingdao.com", mobile: '12345678777', agencyId: agencyId},
+                function(err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+                    assert.equal(ret.status, 0);
+                    done();
+            });
+        })
+
+
+        it("updateAgencyUser should be ok", function(done) {
+            API.client.agency.updateAgencyUser.call({accountId: agencyUserId}, {status: 1, roleId: 2, id: agencyUserId}, function(err, ret) {
                 if (err) {
                     throw err;
                 }
-                newUserId = ret.id;
+                assert.equal(ret.status, 1);
+                assert.equal(ret.roleId, 2);
                 done();
             });
         })
-    });
 
-    /**
-     * 获取新建的代理商用户
-     */
-    describe("getAgencyUser", function() {
+
+        it("getCurrentAgencyUser should be ok", function(done) {
+            API.client.agency.getCurrentAgencyUser.call({accountId: agencyUserId}, function(err, ret) {
+                if (err) {
+                    throw err;
+                }
+                assert.equal(ret.id, agencyUserId);
+                done();
+            })
+        });
+
+
+
         it("getAgencyUser should be ok", function(done) {
-            API.client.agency.getAgencyUser.call(self, {id:newUserId}, function(err, ret) {
+            API.client.agency.getAgencyUser.call({accountId: agencyUserId}, agencyUserId, function(err, ret) {
                 if (err) {
                     throw err;
                 }
-                //console.info("****************新建的代理商用户****************");
-                //console.info(ret);
+                assert.equal(ret.id, agencyUserId);
                 done();
-            });
-        })
+            })
+        });
+
+
+        it("API.agency.listAndPaginateAgencyUser", function(done) {
+            API.client.agency.listAndPaginateAgencyUser.call({accountId: agencyUserId}, {}, function(err, ret) {
+                if (err) {
+                    throw err;
+                }
+                done();
+            })
+        });
+
+
+        it("deleteAgency should be ok", function (done) {
+            API.client.agency.deleteAgency.call({accountId: agencyUserId}, agencyId, function (err, ret) {
+                if (err) {
+                    throw err;
+                }
+                assert.equal(ret.code, 0);
+                done();
+            })
+        });
+
     });
 
 
+    describe("deleteAgencyUser", function(){
+        var _newAgencyUser = "";
+        var _agencyId = "";
+        var _agencyUserId = "";
 
-
-
-    //查询代理商集合
-    describe("API.agency.listAndPaginateAgencyUser", function() {
-        it("API.agency.listAndPaginateAgencyUser", function(done) {
-            API.client.agency.listAndPaginateAgencyUser.call(self, {}, function(err, ret) {
+        var agency = {
+            email: "agency2.test.yu@tulingdao.com",
+            userName: "喵喵",
+            name: '喵喵的代理商',
+            description: '代理商API测试用',
+            mobile: "15269866821"
+        };
+        before(function(done){
+            API.client.agency.registerAgency(agency, function(err, ret) {
                 if (err) {
                     throw err;
                 }
-                done();
+                assert.equal(ret.agency.status, 0);
+                _agencyId = ret.agency.id;
+                _agencyUserId = ret.agencyUser.id;
+                API.client.agency.createAgencyUser.call({accountId: _agencyUserId},
+                    {name: '测试代理商用户', email: "test123456@tulingdao.com", mobile: '12345678777', agencyId: _agencyId},
+                    function(err, ret) {
+                        if (err) {
+                            throw err;
+                        }
+                        assert.equal(ret.status, 0);
+                        _newAgencyUser = ret.id;
+                        done();
+                    });
             });
-        })
-    })
+        });
 
-    //更新代理商用户信息
-    describe("API.agency.updateAgencyUser", function() {
-             it("API.agency.updateAgencyUser", function(done) {
-                 var obj = {email:"test.test@test.com"};
-                 obj.id = newUserId;
-                 API.client.agency.updateAgencyUser.call(self, obj, function(err, ret) {
-                     if (err) {
-                         throw err;
-                     }
-                     done();
-                 });
-             })
-         })
-
-    //删除代理商用户
-    describe("deleteAgencyUser", function() {
-        it("deleteAgencyUser should be ok", function(done) {
-            API.client.agency.deleteAgencyUser.call(self, {id:newUserId}, function (err, ret) {
+        after(function(done){
+            API.agency.deleteAgency({agencyId: _agencyId, userId: _agencyUserId}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
-            })
-            done();
-        })
-    })
-
-    //代理商用户==========================================================end
-
-    //删除代理商
-    describe("deleteAgency", function() {
-        it("deleteAgency should be ok", function (done) {
-            API.client.agency.deleteAgency.call(self, agencyId, function (err, ret) {
-                if (err) {
-                    throw err;
-                }
+                assert.equal(ret.code, 0);
                 done();
             })
-        })
+        });
+
+        it("deleteAgencyUser should be ok", function(done) {
+            API.client.agency.deleteAgencyUser.call({accountId: _agencyUserId}, _newAgencyUser, function (err, ret) {
+                if (err) {
+                    throw err;
+                };
+                assert.equal(ret.code, 0);
+                done();
+            })
+        });
     })
+
 
 })

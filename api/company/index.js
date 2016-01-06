@@ -39,8 +39,14 @@ company.createCompany = function(params, callback){
             Company.create(_company, {transaction: t}),
             FundsAccounts.create(funds, {transaction: t})
         ])
-            .spread(function(company, funds){
-                return company;
+            .spread(function(c, funds){
+                return {
+                    id: c.id,
+                    name: c.name,
+                    mobile: c.mobile,
+                    email: c.email,
+                    createUser: c.createUser
+                };
             });
     })
         .catch(errorHandle)
@@ -57,12 +63,9 @@ company.createCompany = function(params, callback){
  */
 company.checkBlackDomain = function(params, callback) {
     var domain = params.domain;
-    var defer = Q.defer();
     if (!domain) {
-        defer.reject({code: -1, msg: "域名不存在或不合法"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "域名不存在或不合法"};
     }
-
     return Models.BlackDomain.findOne({where: {domain: domain}})
         .then(function(result) {
             if (result) {
@@ -80,13 +83,12 @@ company.checkBlackDomain = function(params, callback) {
  * @returns {*}
  */
 company.updateCompany = function(params, callback){
-    return checkParams(['companyId'], params)
-        .then(function(){
-            var companyId = params.companyId;
-            return Company.findById(companyId, {attributes: ['createUser']});
-        })
+    var fields = getColsFromParams(Company.attributes, ['companyNo', 'createUser', 'createAt']);
+    var params = checkAndGetParams(['companyId'], fields, params, true);
+    var companyId = params.companyId;
+    return Company.findById(companyId, {attributes: ['createUser']})
         .then(function(company){
-            if(!company){
+            if(!company || company.status == -2){
                 throw L.ERR.COMPANY_NOT_EXIST;
             }
             var companyId = params.companyId;
@@ -112,18 +114,18 @@ company.updateCompany = function(params, callback){
  * @returns {*}
  */
 company.getCompany = function(params, callback){
-    return checkParams(['companyId'], params)
-        .then(function(){
-            var companyId = params.companyId;
-            var options = {};
-            if(params.columns){
-                options.attributes = params.columns;
-            }
-            return Company.findById(companyId, options);
-        })
+    if(!params.companyId){
+        throw {code: -1, msg: 'companyId不能为空'};
+    }
+    var companyId = params.companyId;
+    var options = {};
+    if(params.columns){
+        options.attributes = params.columns;
+    }
+    return Company.findById(companyId, options)
         .then(function(company){
             if(!company || company.status == -2){
-                throw L.ERR.NOT_FOUND;
+                throw L.ERR.COMPANY_NOT_EXIST;
             }
             return company;
         })
@@ -138,13 +140,11 @@ company.getCompany = function(params, callback){
  * @returns {*}
  */
 company.listCompany = function(params, callback){
-    return checkParams(['agencyId'], params)
-        .then(function(){
-            var agencyId = params.agencyId;
-            return Company.findAll({where: {agencyId: agencyId, status: {$ne: -2}}})
-                .then(function(companys){
-                    return companys;
-                })
+    var query = getColsFromParams(['agencyId'], [], params, true);
+    var agencyId = params.agencyId;
+    return Company.findAll({where: {agencyId: agencyId, status: {$ne: -2}}})
+        .then(function(companys){
+            return companys;
         })
         .catch(errorHandle)
         .nodeify(callback);
@@ -216,11 +216,9 @@ company.getCompanyFundsAccount = function(params, callback){
  * @returns {*}
  */
 company.moneyChange = function(params, callback){
-    return checkParams(['money', 'channel', 'userId', 'type', 'companyId', 'remark'], params)
-        .then(function() {
-            var id = params.companyId;
-            return FundsAccounts.findById(id);
-        })
+    var params = checkAndGetParams(['money', 'channel', 'userId', 'type', 'companyId', 'remark'], [], params, true);
+    var id = params.companyId;
+    return FundsAccounts.findById(id)
         .then(function(funds){
             if(!funds){
                 throw {code: -2, msg: '企业资金账户不存在'};

@@ -30,12 +30,11 @@
 | msg     | 提示信息 |
 | json数据   | 代理商用户|json
 
->. 删除代理商用户 API.agency.deleteAgencyUser(params, callback);
+>. 删除代理商用户 API.agency.deleteAgencyUser(agencyUserId, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
-| params                                | 传入参数             |json              |------
-| params.id                        | 代理商id              |uuid               |必填
+| agencyUserId                        | 代理商id              |uuid               |必填
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |
@@ -63,12 +62,11 @@
 | msg     | 提示信息 |
 | json数据   | 代理商用户信息|json
 
->. 查询代理商用户信息 API.agency.getAgencyUser(params,callback);
+>. 查询代理商用户信息 API.agency.getAgencyUser(agencyUserId,callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
-| params                                | 更新信息             |json              |------
-| params.id                                | 代理商id             | uuid             |必填
+| agencyUserId                                | 代理商id             | uuid             |必填
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |

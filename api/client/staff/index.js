@@ -116,21 +116,31 @@ staff.getStaff = auth.checkPermission(["user.query"],
     });
 
 //代理商根据id得到员工信息
-staff.getStaffByAgency = function(staffId, callback){
+staff.getStaffByAgency = function(params, callback){
+    var staffId = params.id;
     var user_id = this.accountId;
-    return API.agency.getAgencyUser({id: user_id})
-    .then(function(user){
-        var agencyId = user.agencyId;
-        return agencyId;
-    })
-    .then(function(agencyId){
-        return API.staff.getStaff({id: staffId})
-        .then(function(staff){
-            // if(agencyId != staff.companyId){
-            //     throw L.ERR.PERMISSION_DENY;
-            // }
-            return staff;
-        })
+    return Q.all([
+            API.staff.getStaff({id: staffId}),
+            API.agencyUser.getAgencyUser({id: this.accountId})
+        ])
+    .spread(function(staff, agencyUser){
+            if(!staff.companyId){
+                throw {msg:"该员工不存在或员工所在企业不存在"};
+            }
+            return Q.all([
+                    API.company.getCompany({companyId: staff.companyId}),
+                    API.agency.getAgency({agencyId: agencyUser.agencyId, userId: user_id})
+            ])
+                .spread(function(company, agency){
+                    if(!company.agencyId){
+                        throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
+                    }
+                    if(company.agencyId == agency.id){
+                        return staff;
+                    }else{
+                        throw {msg:"无权限"};
+                    }
+                })
     }).nodeify(callback);
 }
 
@@ -170,10 +180,34 @@ staff.listAndPaginateStaff = auth.checkPermission(["user.query"],
  * @type {*|Function}
  */
 staff.increaseStaffPoint = function(params, callback){
-//    params.accountId = "2c97ec70-ae0d-11e5-96d7-fd1b1d070149";
     params.accountId = this.accountId;//当前登录代理商id
-    var id = params.id;//加积分的员工id
-    return API.staff.getStaff({id:id})
+    var user_id = this.accountId;
+    var staffId = params.id;//加积分的员工id
+    return Q.all([
+            API.staff.getStaff({id: staffId}),
+            API.agencyUser.getAgencyUser({id: this.accountId})
+        ])
+        .spread(function(staff, agencyUser){
+            if(!staff.companyId){
+                throw {msg:"该员工不存在或员工所在企业不存在"};
+            }
+            return Q.all([
+                    API.company.getCompany({companyId: staff.companyId}),
+                    API.agency.getAgency({agencyId: agencyUser.agencyId, userId: user_id})
+                ])
+                .spread(function(company, agency){
+                    if(!company.agencyId){
+                        throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
+                    }
+                    if(company.agencyId == agency.id){
+                        return API.staff.increaseStaffPoint(params);
+                    }else{
+                        throw {msg:"无权限"};
+                    }
+                })
+        }).nodeify(callback);
+
+    /*return API.staff.getStaff({id:id})
         .then(function(result){
             if(result && result.companyId){
                 return result.companyId;
@@ -198,7 +232,7 @@ staff.increaseStaffPoint = function(params, callback){
                 throw {msg:"无权限"};
             }
         })
-        .nodeify(callback);
+        .nodeify(callback);*/
 
 };
 
@@ -210,8 +244,33 @@ staff.increaseStaffPoint = function(params, callback){
  */
 staff.decreaseStaffPoint = function(params, callback){
     params.accountId = this.accountId;//当前登录代理商id
-    var id = params.id;//加积分的员工id
-    return API.staff.getStaff({id:id})
+    var user_id = this.accountId;
+    var staffId = params.id;//加积分的员工id
+    return Q.all([
+            API.staff.getStaff({id: staffId}),
+            API.agencyUser.getAgencyUser({id: this.accountId})
+        ])
+        .spread(function(staff, agencyUser){
+            if(!staff.companyId){
+                throw {msg:"该员工不存在或员工所在企业不存在"};
+            }
+            return Q.all([
+                    API.company.getCompany({companyId: staff.companyId}),
+                    API.agency.getAgency({agencyId: agencyUser.agencyId, userId: user_id})
+                ])
+                .spread(function(company, agency){
+                    if(!company.agencyId){
+                        throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
+                    }
+                    if(company.agencyId == agency.id){
+                        return API.staff.decreaseStaffPoint(params);
+                    }else{
+                        throw {msg:"无权限"};
+                    }
+                })
+        }).nodeify(callback);
+
+    /*return API.staff.getStaff({id:id})
         .then(function(result){
             if(result && result.companyId){
                 return result.companyId;
@@ -236,7 +295,7 @@ staff.decreaseStaffPoint = function(params, callback){
                 throw {msg:"无权限"};
             }
         })
-        .nodeify(callback);
+        .nodeify(callback);*/
 };
 
 

@@ -20,6 +20,9 @@ var Paginate = require("../../common/paginate").Paginate;
 var logger = new Logger("staff");
 //var auth = require("../auth/index");
 //var travelPolicy = require("../travelPolicy/index");
+var getColsFromParams = utils.getColsFromParams;
+var checkAndGetParams = utils.checkAndGetParams;
+
 var staff = {};
 
 
@@ -31,46 +34,47 @@ var staff = {};
  * @returns {*}
  */
 staff.createStaff = function(data, callback){
-    var defer = Q.defer();
     var type = data.type;//若type为import则为导入添加
     if(type)
         delete data.type;
-    if (!data) {
-        defer.reject(L.ERR.DATA_NOT_EXIST);
-        return defer.promise.nodeify(callback);
-    }
-
     var accountId = data.accountId;
-    //如果账号存在,不进行创建了
-    if (!accountId) {
-        if (!data.email) {
-            defer.reject({code: -1, msg: "邮箱不能为空"});
-            return defer.promise.nodeify(callback);
-        }
-        if (!data.mobile) {
-            defer.reject({code: -2, msg: "手机号不能为空"});
-            return defer.promise.nodeify(callback);
-        }
-    }
-
-    if (!data.name) {
-        defer.reject({code: -3, msg: "姓名不能为空"});
-        return defer.promise.nodeify(callback);
-    }
-    if (!data.companyId) {
-        defer.reject({code: -4, msg: "所属企业不能为空"});
-        return defer.promise.nodeify(callback);
-    }
     return Q()
         .then(function() {
+            if (!data) {
+                throw L.ERR.DATA_NOT_EXIST;
+            }
+            //如果账号存在,不进行创建了
+            if (!accountId) {
+                if (!data.email) {
+                    throw {code: -1, msg: "邮箱不能为空"};
+                }
+                if (!data.mobile) {
+                    throw {code: -2, msg: "手机号不能为空"};
+                }
+            }
+            if (!data.name) {
+                throw {code: -3, msg: "姓名不能为空"};
+            }
+            if (!data.companyId) {
+                throw {code: -4, msg: "所属企业不能为空"};
+            }
+            return API.company.getCompany({companyId: data.companyId})
+                .then(function(company){
+                    return company;
+                })
+        })
+        .then(function(company){
+            if (!company) {
+                throw {code: -5, msg: "所属企业不存在"};
+            }
+            if(company && company.domainName && company.domainName != "" && data.email.indexOf(company.domainName) == -1){
+                throw {code: -5, msg: "邮箱格式不符合要求"};
+            }
             if (accountId) {
                 data.id = accountId;
                 return data;
             }
-            var accData = {email: data.email, mobile: data.mobile, status: 1};
-            if(type && type == "import"){
-                accData = {email: data.email, mobile: data.mobile, status: 1}//若为导入员工置为激活状态 不设置密码
-            }
+            var accData = {email: data.email, mobile: data.mobile, status: 0}//若为导入员工置为激活状态 不设置密码
             return API.auth.newAccount(accData)
                 .then(function(account){
                     data.id = account.id;
@@ -78,8 +82,25 @@ staff.createStaff = function(data, callback){
                 });
         })
         .then(function(staff) {
+            if(staff.travelLevel || staff.travelLevel == ""){
+                delete staff.travelLevel;
+            }
             return staffModel.create(staff);
         })
+        .nodeify(callback);
+}
+
+/**
+ * 创建企业拥有者(员工)
+ * @param params
+ * @param callback
+ */
+staff.createCompanyOwner = function(params, callback){
+    var checkFields = ['mobile', 'email', 'companyId', 'name'];
+    var fields = getColsFromParams(staffModel.attributes, checkFields);
+    var _staff = checkAndGetParams(checkFields, fields, params, true);
+    _staff.id = _staff.id || uuid.v1();
+    return staffModel.create(_staff)
         .nodeify(callback);
 }
 
@@ -378,6 +399,7 @@ staff.beforeImportExcel = function(params, callback){
     var emailAttr = [];
     var mobileAttr = [];
     var companyId = "";
+    var domainName = "";
     var xlsxObj;
     return API.attachment.getAttachment({md5key: md5key, userId: userId})
         .then(function(att){
@@ -386,9 +408,13 @@ staff.beforeImportExcel = function(params, callback){
         })
         .then(function(sf){
             companyId = sf.companyId;
-            return API.travelPolicy.getAllTravelPolicy({company_id: companyId});
+            return Q.all([
+                API.travelPolicy.getAllTravelPolicy({company_id: companyId}),
+                API.company.getCompany({companyId: companyId})
+            ])
         })
-        .then(function(results){
+        .spread(function(results, com){
+            domainName = com.domainName;
             for(var t=0;t<results.length;t++){
                 var tp = results[t];
                 travalPolicies[tp.name] = tp.id;
@@ -439,6 +465,14 @@ staff.beforeImportExcel = function(params, callback){
                     if(!staffObj.email || staffObj.email==""){
                         staffObj.reason = "邮箱为空";
                         s[6] = "邮箱为空";
+                        noAddObj.push(staffObj);
+                        downloadNoAddObj.push(s);
+                        return;
+                    }
+                    console.info("domainName", domainName);
+                    if(staffObj.email && domainName && domainName != "" && staffObj.email.indexOf(domainName) == -1){
+                        staffObj.reason = "邮箱不符合要求";
+                        s[6] = "邮箱不符合要求";
                         noAddObj.push(staffObj);
                         downloadNoAddObj.push(s);
                         return;

@@ -2,7 +2,6 @@
  * Created by wyl on 15-12-12.
  */
 var assert = require("assert");
-var Company = require("./index");
 var API = require("common/api");
 var Q = require("q");
 var self = {accountId: ""};
@@ -18,11 +17,11 @@ describe("api/client/company.js", function() {
 
         var company = {
             name: '喵喵的企业',
-            userName: '测试企业姓名',
+            userName: '喵喵',
             domain: 'tulingdao.com',
             description: '企业API测试用',
             email: 'company.test@tulingdao.com',
-            mobile: '15269866802',
+            mobile: '15269866802'
         }
 
         before(function(done) {
@@ -40,6 +39,8 @@ describe("api/client/company.js", function() {
                 }
                 agencyId = ret.agency.id;
                 agencyUserId = ret.agencyUser.id;
+                //console.info("agencyId=>", agencyId);
+                //console.info("agencyUserId=>", agencyUserId);
                 done();
             });
         });
@@ -55,20 +56,20 @@ describe("api/client/company.js", function() {
 
         it("#createCompany should be ok", function(done) {
             var self = {accountId: agencyUserId};
-            Company.createCompany.call(self, company, function(err, ret){
+            API.client.company.createCompany.call(self, company, function(err, ret){
                 if (err) {
                     throw err;
                 }
-                var company = ret.company;
-                companyId = company.id;
-                ownerUserId = company.createUser;
+                var c = ret.company;
+                companyId = c.id;
+                ownerUserId = c.createUser;
                 done();
             })
         });
 
         it("#getCompanyListByAgency should be ok", function(done) {
             var self = {accountId: agencyUserId};
-            Company.getCompanyListByAgency.call(self, function(err, ret){
+            API.client.company.getCompanyListByAgency.call(self, function(err, ret){
                 if (err) {
                     throw err;
                 }
@@ -79,7 +80,20 @@ describe("api/client/company.js", function() {
     });
 
 
-    describe("API.client.fundsCharge company", function(){
+    describe("API.company.updateCompany", function(){
+        it("#updateCompany should be ok", function(done) {
+            var self = {accountId: ownerUserId};
+            API.client.company.updateCompany.call(self, {companyId: companyId, address: '更新企业测试'}, function(err, ret){
+                if(err){
+                    throw err;
+                }
+                done();
+            })
+        });
+    });
+
+
+    describe("API.client.fundsCharge", function(){
         it("#fundsCharge should be ok", function(done) {
             var self = {accountId: agencyUserId};
             API.client.company.fundsCharge.call(self, {channel: '企业账户充值API测试', money: 1000, companyId: companyId}, function(err, ret){
@@ -92,7 +106,7 @@ describe("api/client/company.js", function() {
     });
 
 
-    describe("API.client.frozenMoney company", function(){
+    describe("API.client.frozenMoney", function(){
         it("#frozenMoney should be ok", function(done) {
             var self = {accountId: ownerUserId};
             API.client.company.frozenMoney.call(self, {channel: '企业账户冻结资金API测试', money: 100, companyId: companyId}, function(err, ret){
@@ -105,7 +119,7 @@ describe("api/client/company.js", function() {
     });
 
 
-    describe("API.client.consumeMoney company", function(){
+    describe("API.client.consumeMoney", function(){
         it("#consumeMoney should be ok", function(done) {
             var self = {accountId: ownerUserId};
             API.client.company.consumeMoney.call(self, {channel: '企业账户消费API测试', money: 100.01, companyId: companyId}, function(err, ret){
@@ -118,7 +132,7 @@ describe("api/client/company.js", function() {
     });
 
 
-    describe("API.client.getCompanyFundsAccount company", function(){
+    describe("API.client.getCompanyFundsAccount", function(){
         it("#getCompanyFundsAccount should be ok", function(done) {
             var self = {accountId: ownerUserId};
             API.client.company.getCompanyFundsAccount.call(self, companyId, function(err, ret){

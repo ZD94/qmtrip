@@ -412,6 +412,7 @@ var businessTravel=(function(){
      */
     businessTravel.CreateResultController = function($scope, $routeParams) {
         loading(false);
+        loading(true);
         $("title").html("我要出差");
         var tra = $routeParams.tra;
         var liv = $routeParams.liv;
@@ -440,7 +441,9 @@ var businessTravel=(function(){
                         destinationPlace:$scope.endplaceval,
                         outboundDate:$scope.starttime,
                         inboundDate:$scope.endtime,
-                        latestArriveTime:$scope.starttimelate
+                        outLatestArriveTime:$scope.starttimelate,
+                        inLatestArriveTime:$scope.endtimelate,
+                        isRoundTrip:$scope.endtime
                     })
                 ])
                     .spread(function(ret1,ret2) {
@@ -449,8 +452,10 @@ var businessTravel=(function(){
                         $(".creating").hide();
                         $(".createresult,.tianxun").show();
                         $scope.totalprice = ret2.price;
-                        $scope.trafficprice = $scope.onlytraffic.price;
-                        loading(true);
+                        $scope.goTraffic = $scope.onlytraffic.goTraffic;
+                        $scope.backTraffic = $scope.onlytraffic.backTraffic;
+                        console.info (ret1);
+                        console.info (ret2);
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -478,7 +483,8 @@ var businessTravel=(function(){
                         $(".createresult,.tianxun").show();
                         $scope.totalprice = ret2.price;
                         $scope.liveprice = $scope.onlylive.price;
-                        loading(true);
+                        console.info (ret1);
+                        console.info (ret2);
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -502,7 +508,8 @@ var businessTravel=(function(){
                         inLatestArriveTime:$scope.endtimelate,
                         businessDistrict:$scope.businessDistrict,
                         checkInDate:$scope.livetime,
-                        checkOutDate:$scope.leavetime
+                        checkOutDate:$scope.leavetime,
+                        isRoundTrip:$scope.endtime
                     })
                 ])
                     .spread(function(ret1,ret2) {
@@ -513,7 +520,10 @@ var businessTravel=(function(){
                         $scope.totalprice = ret2.price;
                         $scope.trafficprice = $scope.trafficlive.traffic;
                         $scope.liveprice = $scope.trafficlive.hotel;
-                        loading(true);
+                        $scope.goTraffic = $scope.trafficlive.goTraffic;
+                        $scope.backTraffic = $scope.trafficlive.backTraffic;
+                        console.info (ret1);
+                        console.info (ret2);
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -564,7 +574,7 @@ var businessTravel=(function(){
                         startPlace:$scope.startplace,
                         arrivalPlace:$scope.endplace,
                         startTime:$scope.starttime,
-                        budget:0,
+                        budget:$scope.goTraffic,
                         invoiceType:1
                     }
                     if($scope.endtime){
@@ -584,7 +594,7 @@ var businessTravel=(function(){
                         arrivalPlace:$scope.endplace,
                         startTime:$scope.starttime,
                         endTime:$scope.endtime,
-                        budget:0,
+                        budget:$scope.backTraffic,
                         invoiceType:1
                     }
                     if($scope.endtimelate){

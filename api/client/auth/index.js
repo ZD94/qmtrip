@@ -173,12 +173,12 @@ auth.registryCompany = function(params, callback) {
             return API.auth.newAccount({mobile: mobile, email: email, pwd: pwd, status: status});
         })
         .then(function(account) {
-            return Q.all([
-                    API.company.createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain,
-                        mobile:mobile, email: email}),
-                    API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
+            return API.company.createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain,
+                mobile:mobile, email: email})
+            .then(function(c){
+                    return API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
                         mobile: mobile, name: name, roleId: 0})
-                ]);
+                })
         })
         .then(function() {
             return true;
