@@ -5,6 +5,9 @@
 var travelRecord=(function(){
 
     API.require('agencyTripPlan');
+    API.require("staff");
+    API.require("company");
+
 
     var  travelRecord = {};
 
@@ -18,20 +21,37 @@ var travelRecord=(function(){
         $("title").html("出差单列表");
         //待上传票据列表
         $scope.initPlanList = function () {
+            $(".left_nav li").removeClass("on").eq(0).addClass("on");
             API.onload(function () {
                 API.agencyTripPlan.listAllTripPlanOrder()
-                    .then(function (result) {
-                        $scope.travelListitems = result;
+                    .then(function(result){
+                        console.log(API.staff);
                         console.info(result);
-                        $scope.$apply();
+                        result.map(function(company){
+                            Q.all([
+                                API.staff.getStaffByAgency({id:company.accountId}),
+                                API.company.getCompany(company.companyId)
+                            ])
+                                .spread(function(ret1,ret2){
+                                    company.travelerName = ret1;
+                                    company.companyName = ret2;
+                                    $scope.travelListitems = result;
+                                    $scope.$apply();
+                                    loading(true);
+                                })
+                                .catch(function(err) {
+                                    console.info(err);
+                                    return company;
+                                });
+                        });
                     })
             })
         }
         $scope.initPlanList();
 
         //进入详情页
-        $scope.enterDetail = function (id) {
-            window.location.href = "#/travelPlan/PlanDetail?planId=" + id;
+        $scope.enterDetail = function (orderId) {
+            window.location.href = "#/travelRecord/TravelDetail?orderId=" + orderId;
         }
     }
 
@@ -43,22 +63,22 @@ var travelRecord=(function(){
      * @param $scope
      * @constructor
      */
-    //travelPlan.PlanDetailController = function($scope, $routeParams) {
-    //    loading(true);
-    //    $("title").html("出差单明细");
-    //    var planId = $routeParams.planId;
-    //    API.onload(function() {
-    //        API.tripPlan.getTripPlanOrderById(planId)
-    //            .then(function(result){
-    //                $scope.planDetail = result;
-    //                $scope.backTraffic = $scope.planDetail.backTraffic[0];
-    //                $scope.hotel = $scope.planDetail.hotel[0];
-    //                $scope.outTraffic = $scope.planDetail.outTraffic[0];
-    //                console.info (result);
-    //                $scope.$apply();
-    //            })
-    //    })
-    //}
+    travelRecord.TravelDetailController = function($scope, $routeParams) {
+        loading(true);
+        $("title").html("出差单明细");
+        var orderId = $routeParams.orderId;
+        API.onload(function() {
+            API.agencyTripPlan.getTripPlanOrderById(orderId)
+                .then(function(result){
+                    $scope.planDetail = result;
+                    $scope.backTraffic = $scope.planDetail.backTraffic[0];
+                    $scope.hotel = $scope.planDetail.hotel[0];
+                    $scope.outTraffic = $scope.planDetail.outTraffic[0];
+                    console.info (result);
+                    $scope.$apply();
+                })
+        })
+    }
 
 
 

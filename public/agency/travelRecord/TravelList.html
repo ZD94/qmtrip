@@ -15,26 +15,31 @@
                         <th align="center">操作</th>
                     </tr>
                     <tr ng-repeat="item in travelListitems" ng-click="enterDetail(item.id)">
-                        <td align="center">
-
+                        <td width="160" align="center">
+                            <p><a>{{item.companyName.name}}</a></p>
+                        </td>
+                        <td width="80" align="center">
+                            <p>{{item.travelerName.name}}</p>
+                        </td>
+                        <td width="110" align="center">
+                            <p ng-if="item.startAt">{{item.startAt | date: 'yyyy-MM-dd'}}</p>
+                            <p ng-if="!item.startAt">{{item.hotel[0].startTime | date: 'yyyy-MM-dd'}}</p>
+                        </td>
+                        <td width="80" align="center">
+                            <p ng-if="item.isNeedTraffic" class="traffic_icon web-icon-font3">&#xe90e;</p>
+                            <p ng-if="item.isNeedHotel" class="live_icon web-icon-font3">&#xe914;</p>
                         </td>
                         <td align="center">
-
+                            <p ng-if="item.isNeedTraffic"><a>{{item.startPlace}}&nbsp;&nbsp;<img src="agency/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="agency/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.destination}}</a></p>
+                            <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
                         </td>
-                        <td align="center">
-
+                        <td width="140" align="center">
+                            <p ng-if="item.outTraffic.length!=0">去程行程单</p>
+                            <p ng-if="item.hotel.length!=0">住宿发票</p>
+                            <p ng-if="item.backTraffic.length!=0">回程行程单</p>
                         </td>
-                        <td align="center">
-
-                        </td>
-                        <td align="center">
-
-                        </td>
-                        <td align="center">
-
-                        </td>
-                        <td align="center">
-
+                        <td width="90" align="center">
+                            <p><a>去审核</a></p>
                         </td>
                     </tr>
                 </table>
