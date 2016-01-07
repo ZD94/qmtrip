@@ -83,8 +83,9 @@ agencyTripPlan.approveInvoice = function(params){
     var self = this;
     var user_id = self.accountId;
     params.userId = user_id;
+    params.remark = params.remark || '审核票据';
     var consumeId = params.consumeId;
-    return API.tripPlan.getConsumeDetail({consumeId: consumeId})
+    return API.tripPlan.getConsumeDetail({consumeId: consumeId, userId: user_id})
         .then(function(consumeDetail){
             if(!consumeDetail.accountId){
                 throw {code: -6, msg: '消费记录异常'};

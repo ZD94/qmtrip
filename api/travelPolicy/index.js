@@ -23,8 +23,17 @@ travelPolicy.createTravelPolicy = function(data, callback){
     }
     return checkParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"], data)
         .then(function(){
-            console.log(data);
-            return travalPolicyModel.create(data);
+            return travalPolicyModel.findOne({where: {name: data.name}})
+                .then(function(result){
+                    return result;
+                })
+        })
+        .then(function(result){
+            if(result){
+                throw {msg: "该等级名称已存在，请重新设置"};
+            }else{
+                return travalPolicyModel.create(data);
+            }
         })
         .nodeify(callback);
 }
@@ -42,10 +51,10 @@ travelPolicy.deleteTravelPolicy = function(params, callback){
         defer.reject({code: -1, msg: "id不能为空"});
         return defer.promise.nodeify(callback);
     }
-    return API.staff.findOneStaff({travelLevel: id})
-        .then(function(staff){
-            if(staff){
-                throw {code: -1, msg: '差旅标准被引用不能删除'};
+    return API.staff.findStaffs({travelLevel: id})
+        .then(function(staffs){
+            if(staffs && staffs.length > 0){
+                throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准 暂不能删除，给这些员工匹配新的差旅标准后再进行操作'};
             }else{
                 return travalPolicyModel.destroy({where: params})
                     .then(function(obj){

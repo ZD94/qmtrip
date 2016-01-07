@@ -60,6 +60,9 @@ staff.deleteStaff = auth.checkPermission(["user.delete"],
                 }
                 return API.staff.getStaff({id:params.id})
                     .then(function(target){
+                        if(target.roleId == 0){
+                            throw {msg: "企业创建人不能被删除"};
+                        }
                         if(data.companyId != target.companyId){
                             throw L.ERR.PERMISSION_DENY;
                         }else{

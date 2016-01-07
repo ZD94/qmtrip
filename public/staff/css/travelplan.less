@@ -1,10 +1,63 @@
 @import "common.less";
 .messagebox_fixed{
   z-index: 5;
-  .messagebox_content{
-    img {
-      width: 770px;
-      height: 350px;
+  display: none;
+  .messagebox_box {
+    padding: 0;
+    height: 36px;
+    line-height: 36px;
+    display: inline-table;
+    .messagebox_title{
+      background: #e5e5e5;
+      .messagebox_close{
+        top: 4px;
+      }
+    }
+    .messagebox_content{
+      background: #fff;
+      padding-top: 0;
+      img {
+        width: 770px;
+        height: 350px;
+      }
+    }
+    .messagebtns{
+      font-size: 16px;
+      color: #4a4a4a;
+      font-weight: bold;
+      height: 40px;
+      padding: 10px;
+      background: #fff;
+      em{
+        font-size: 16px;
+        color: #4a4a4a;
+        font-style: normal;
+      }
+      span{
+        font-size: 14px;
+        color: #9b9b9b;
+        margin-left: 25px;
+        font-weight: normal;
+      }
+      a{
+        float: right;
+        width: 60px;
+        height: 36px;
+        line-height: 36px;
+        text-align: center;
+        font-weight: normal;
+        border-radius: 2px;
+        cursor: pointer;
+        &.message_sure{
+          background: #007fba;
+          color: #fff;
+        }
+        &.message_cancel{
+          background: #e5e5e5;
+          color: #4a4a4a;
+          margin-left: 20px;
+        }
+      }
     }
   }
 }
@@ -68,6 +121,25 @@
         }
         td {
           padding: 15px 0;
+          .po_r{
+          position: relative;
+          }
+          .file{
+            position: absolute;
+            width: 56px;
+            height: 19px;
+            line-height: 30px;
+            opacity: 0;
+            left: 0px;
+            top: 0;
+            cursor: pointer;
+          }
+          .uploadbtn {
+            width: 100px;
+            height: 30px;
+            line-height: 30px;
+            margin-left: 22px;
+          }
           p {
             height: 30px;
             line-height: 30px;
