@@ -34,9 +34,10 @@ tripPlan.savePlanOrder = function(params){
  * @param callback
  * @returns {*}
  */
-tripPlan.saveConsumeDetail = function(params, callback){
-    params.accountId = this.accountId;
-    return API.tripPlan.saveConsumeRecord(params, callback);
+tripPlan.saveConsumeDetail = function(params){
+    var self = this;
+    params.accountId = self.accountId;
+    return API.tripPlan.saveConsumeRecord(params);
 }
 
 /**

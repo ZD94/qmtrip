@@ -7,6 +7,9 @@ process.env.NODE_PATH = '.:'+process.env.NODE_PATH;
 
 require('app-module-path').addPath(path.normalize(path.join(__dirname, '..')));
 
+Promise = require('bluebird');
+Promise.promisifyAll(require('fs'));
+
 var config = require("../config");
 
 var Logger = require('common/logger');
@@ -30,4 +33,4 @@ API.init(path.join(__dirname, '../api'), config.api)
         logger.error(e.stack?e.stack:e);
         console.error(e.stack?e.stack:e);
         process.exit();
-    })
+    });

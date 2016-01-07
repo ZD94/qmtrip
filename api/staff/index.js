@@ -18,6 +18,7 @@ var config = require('../../config');
 var fs = require('fs');
 var Paginate = require("../../common/paginate").Paginate;
 var logger = new Logger("staff");
+var validate = require("common/validate");
 //var auth = require("../auth/index");
 //var travelPolicy = require("../travelPolicy/index");
 var getColsFromParams = utils.getColsFromParams;
@@ -48,10 +49,10 @@ staff.createStaff = function(data, callback){
                 if (!data.email) {
                     throw {code: -1, msg: "邮箱不能为空"};
                 }
-                /*if (!data.mobile) {
-                    throw {code: -2, msg: "手机号不能为空"};
-                }*/
             }
+            if (data.mobile && !validate.isMobile(data.mobile)) {
+                throw {code: -2, msg: "手机号格式不正确"};
+             }
             if (!data.name) {
                 throw {code: -3, msg: "姓名不能为空"};
             }
@@ -68,7 +69,7 @@ staff.createStaff = function(data, callback){
                 throw {code: -5, msg: "所属企业不存在"};
             }
             if(company && company.domainName && company.domainName != "" && data.email.indexOf(company.domainName) == -1){
-                throw {code: -5, msg: "邮箱格式不符合要求"};
+                throw {code: -6, msg: "邮箱格式不符合要求"};
             }
             if (accountId) {
                 data.id = accountId;
@@ -454,7 +455,8 @@ staff.beforeImportExcel = function(params, callback){
                         downloadNoAddObj.push(s);
                         return;
                     }
-                    if(utils.trim(staffObj.mobile) != "" && !/^[\d]{11}$/.test(staffObj.mobile)){
+//                    /^[\d]{11}$/.test(staffObj.mobile)
+                    if(utils.trim(staffObj.mobile) != "" && validate.isMobile(staffObj.mobile)){
                         staffObj.reason = "手机号格式不正确";
                         s[6] = "手机号格式不正确";
                         noAddObj.push(staffObj);

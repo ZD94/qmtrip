@@ -102,7 +102,7 @@ describe("api/client/agencyTripPlan.js", function() {
 
     it("#pageTripPlanOrderByAgency should be ok", function(done) {
         var self = {accountId: agencyUserId};
-        API.client.agencyTripPlan.pageTripPlanOrderByAgency.call(self, {}, function(err, ret){
+        API.client.agencyTripPlan.pageTripPlanOrder.call(self, {}, function(err, ret){
             if (err) {
                 throw err;
             }
@@ -122,15 +122,37 @@ describe("api/client/agencyTripPlan.js", function() {
         })
     });
 
-    it("#approveInvoice should be ok", function(done) {
+    it("#approveInvoice should be error without params.expenditure", function(done) {
+        var self = {accountId: agencyUserId};
+        API.client.agencyTripPlan.approveInvoice.call(self, {consumeId: consumeId, status: 1, remark: '审核票据测试'}, function(err, ret){
+            assert.equal(err.code, -4);
+            assert.equal(ret, null);
+            done();
+        })
+    });
+
+    it("#approveInvoice should be ok when audit not pass", function(done) {
+        var self = {accountId: agencyUserId};
+        API.client.agencyTripPlan.approveInvoice.call(self, {consumeId: consumeId, status: -1, expenditure: '450', remark: '审核票据测试'}, function(err, ret){
+            if (err) {
+                throw err;
+            }
+            assert.equal(ret.status, -1);
+            done();
+        })
+    });
+
+    it("#approveInvoice should be ok when audit pass", function(done) {
         var self = {accountId: agencyUserId};
         API.client.agencyTripPlan.approveInvoice.call(self, {consumeId: consumeId, status: 1, expenditure: '450', remark: '审核票据测试'}, function(err, ret){
             if (err) {
                 throw err;
             }
             assert.equal(ret.status, 1);
+            assert(ret.expenditure > 0);
             done();
         })
     });
+
 
 })

@@ -47,7 +47,8 @@ var staff = (function(){
                                             ])
                                             .spread(function(travelLevel, acc){
                                                 $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
-                                                $staff.accStatus = acc.status==0?'未激活':(acc.status == -1?'禁用': '已激活');//账户激活状态
+//                                                $staff.accStatus = acc.status==0?'未激活':(acc.status == -1?'禁用': '已激活');//账户激活状态
+                                                $staff.accStatus = acc.status==0?'未激活':'';
                                                 $scope.$apply();
                                             })
                                     });
@@ -101,7 +102,8 @@ var staff = (function(){
                                         ])
                                             .spread(function(travelLevel, acc){
                                                 $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
-                                                $staff.accStatus = acc.status==0?'未激活':(acc.status == -1?'禁用': '已激活');//账户激活状态
+//                                                $staff.accStatus = acc.status==0?'未激活':(acc.status == -1?'禁用': '已激活');//账户激活状态
+                                                $staff.accStatus = acc.status==0?'未激活':'';
                                                 $scope.$apply();
                                             })
                                         /*return API.travelPolicy.getTravelPolicy({id:$staff.travelLevel})
@@ -176,7 +178,14 @@ var staff = (function(){
                             $scope.initStaff();
                             $scope.$apply();
                         }).catch(function (err) {
-                            $scope.block_tip_err = err.msg;
+                            if(err.code == -29){
+                                $scope.block_tip_err = "该邮箱对应的账户已存在";
+                            }
+                            if(err.code == -6){
+                                $scope.block_tip_err = "邮箱与创建人邮箱后缀不一致";
+                            }else{
+                                $scope.block_tip_err = err.msg;
+                            }
                             $(".block_tip").show();
                             $scope.$apply();
                             console.info(err);
