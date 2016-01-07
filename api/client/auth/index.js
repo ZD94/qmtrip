@@ -116,39 +116,36 @@ auth.registryCompany = function(params, callback) {
     var pwd = params.pwd;
 
     if (!picCode || !picTicket) {
-        defer.reject({code: -1, msg: "验证码错误"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "验证码错误"};
     }
 
     if (!msgCode || !msgTicket) {
-        defer.reject({code: -1, msg: "短信验证码错误"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "短信验证码错误"};
     }
 
     if (!mobile || !validate.isMobile(mobile)) {
-        defer.reject(L.ERR.MOBILE_FORMAT_ERROR);
-        return defer.promise.nodeify(callback);
+        throw L.ERR.MOBILE_FORMAT_ERROR;
     }
 
     if (!name) {
-        defer.reject({code: -1, msg: "联系人姓名为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "联系人姓名为空"};
     }
 
     if (!companyName) {
-        defer.reject({code: -1, msg: "公司名称为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "公司名称为空"};
     }
 
     if (!pwd) {
-        defer.reject({code: -1, msg: "密码不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "密码不能为空"};
     }
     var companyId = uuid.v1();
     var domain = email.split(/@/)[1];
 
+    console.info("start test......");
     return Q()
         .then(function() {
+            console.info("step 1");
+            console.info(process.env["NODE_ENV"]);
             if (process.env["NODE_ENV"] == 'test') {
                 return true;
             }
@@ -156,6 +153,7 @@ auth.registryCompany = function(params, callback) {
             return API.checkcode.validatePicCheckCode({code: picCode, ticket: picTicket});
         })
         .then(function() {
+            console.info("step 2");
             if (process.env["NODE_ENV"] == 'test') {
                 return true;
             }
@@ -163,6 +161,7 @@ auth.registryCompany = function(params, callback) {
             return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
         })
         .then(function(){
+            console.info("*******************************");
             return API.company.checkBlackDomain({domain: domain});
         })
         .then(function() {

@@ -22,11 +22,11 @@ var travelPlan=(function(){
             if ($scope.keyword !='' && $scope.keyword !=undefined) {
                 params.$like = ['startPlace', '%' + $scope.keyword + '%'];
             }
-            console.info (params);
             API.onload(function() {
                 API.tripPlan.pageTripPlanOrder(params)
                     .then(function(result){
-                        $scope.planListitems = result;
+                        console.info(result);
+                        $scope.planListitems = result.items;
                         loading(true);
                         $scope.$apply();
                         $(".content input").click(function(event){
