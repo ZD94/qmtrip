@@ -25,7 +25,7 @@
 
 
 
->. 代理商获取差旅计划单列表 API.tripPlan.pageTripPlanOrderCompany(params, callback);
+>. 代理商获取差旅计划单列表 API.tripPlan.pageTripPlanOrder(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------

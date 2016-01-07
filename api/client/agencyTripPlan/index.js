@@ -40,43 +40,13 @@ agencyTripPlan.getTripPlanOrderById = function(orderId){
         })
 }
 
-/**
- * 获取差旅计划单列表
- * @param params
- * @param callback
- * @returns {*}
- */
-agencyTripPlan.listAllTripPlanOrder = function(callback){
-    var self = this;
-    var accountId = self.accountId;
-    var params = {
-        userId: accountId
-    }
-    return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
-        .then(function(user){
-            return user.agencyId;
-        })
-        .then(function(agencyId){
-            params.agencyId = agencyId;
-            return API.company.listCompany(params)
-        })
-        .then(function(companys){
-            var companyIdList = companys.map(function(company){
-                return company.id;
-            });
-            params.companyId = {$in: companyIdList};
-            return API.tripPlan.listTripPlanOrder(params);
-        })
-        .nodeify(callback);
-}
-
 
 /**
  * 代理商获取员工计划单分页列表
  * @param callback
  * @returns {*}
  */
-agencyTripPlan.pageTripPlanOrderByAgency = function(params){
+agencyTripPlan.pageTripPlanOrder = function(params){
     if(typeof params == 'function'){
         throw {code: -2, msg: '参数不正确'};
     }
