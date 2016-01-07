@@ -28,3 +28,6 @@ INSERT INTO travelpolicy.travel_policy(
             hotel_price, is_change_level, company_id, create_at)
     VALUES ('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a', '系统默认标准', '经济舱', 8.0, '二等座/硬卧', '四星级/高档型',
             400, true, null, now());
+
+DROP SCHEMA if exists travelstandard CASCADE;
+DROP SCHEMA if exists travalpolicy CASCADE;
