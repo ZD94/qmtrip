@@ -92,7 +92,7 @@ agencyTripPlan.approveInvoice = function(params){
             return consumeDetail.accountId;
         })
         .then(function(staffId){
-            API.staff.getStaff({id: staffId, columns: ['companyId']})
+            return API.staff.getStaff({id: staffId, columns: ['companyId']})
         })
         .then(function(staff){
             if(!staff.companyId){
@@ -100,7 +100,7 @@ agencyTripPlan.approveInvoice = function(params){
             }
             return Q.all([
                 API.company.getCompany({companyId: staff.companyId, columns: ['agencyId']}),
-                API.agencyUser.getAgencyUser({id: user_id, columns: ['agencyId']})
+                API.agency.getAgencyUser({id: user_id, columns: ['agencyId']})
             ])
         })
         .spread(function(company, user){
