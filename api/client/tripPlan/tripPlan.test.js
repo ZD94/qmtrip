@@ -131,17 +131,17 @@ describe("api/client/tripPlan.js", function() {
     })
 
 
-    describe("options based on tripPlanOrder created", function(){
+    describe("options based on tripPlanOrder created", function() {
         var newOrderId = "";
-        before(function(done){
+        before(function (done) {
             var tripPlanOrder = {
                 startPlace: '北京',
                 destination: '上海',
                 budget: 1000,
                 startAt: '2015-12-30 11:12:12',
             }
-            API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder, function(err, ret){
-                if(err){
+            API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder, function (err, ret) {
+                if (err) {
                     throw err;
                 }
                 newOrderId = ret.id;
@@ -149,9 +149,9 @@ describe("api/client/tripPlan.js", function() {
             })
         });
 
-        after(function(done){
-            API.tripPlan.deleteTripPlanOrder({orderId: newOrderId, userId: staffId}, function(err, ret){
-                if(err){
+        after(function (done) {
+            API.tripPlan.deleteTripPlanOrder({orderId: newOrderId, userId: staffId}, function (err, ret) {
+                if (err) {
                     throw err;
                 }
                 assert.equal(ret.code, 0);
@@ -160,9 +160,9 @@ describe("api/client/tripPlan.js", function() {
         })
 
 
-        it("#getTripPlanOrderById should be ok", function(done) {
+        it("#getTripPlanOrderById should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.getTripPlanOrderById.call(self, newOrderId, function(err, ret){
+            API.client.tripPlan.getTripPlanOrderById.call(self, newOrderId, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -171,38 +171,46 @@ describe("api/client/tripPlan.js", function() {
             })
         });
 
-        it("#pageCompleteTripPlanOrder should be error without params", function(done) {
+        it("#pageCompleteTripPlanOrder should be error without params", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.pageCompleteTripPlanOrder.call(self, function(err, ret){
+            API.client.tripPlan.pageCompleteTripPlanOrder.call(self, function (err, ret) {
                 assert.equal(err.code, -2);
                 assert.equal(ret, null);
                 done();
             })
         });
 
-        it("#pageCompleteTripPlanOrder should be ok", function(done) {
+        it("#pageCompleteTripPlanOrder should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.pageCompleteTripPlanOrder.call(self, {page: 1}, function(err, ret){
-                if(err){ throw err;}
+            API.client.tripPlan.pageCompleteTripPlanOrder.call(self, {page: 1}, function (err, ret) {
+                if (err) {
+                    throw err;
+                }
                 assert.equal(ret.page, 1);
                 assert.equal(ret.perPage, 10);
                 done();
             })
         });
 
-        it("#pageTripPlanOrder should be ok", function(done) {
+        it("#pageTripPlanOrder should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.pageTripPlanOrder.call(self, {page: 1, isUpload: false, audit: 'N'}, function(err, ret){
-                if(err){ throw err;}
+            API.client.tripPlan.pageTripPlanOrder.call(self, {
+                page: 1,
+                isUpload: false,
+                audit: 'N'
+            }, function (err, ret) {
+                if (err) {
+                    throw err;
+                }
                 assert.equal(ret.page, 1);
                 assert.equal(ret.perPage, 10);
                 done();
             })
         });
 
-        it("#pageTripPlanOrderByCompany should be ok", function(done) {
+        it("#pageTripPlanOrderByCompany should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.pageTripPlanOrderByCompany.call(self, {page: 1, isUpload: false}, function(err, ret){
+            API.client.tripPlan.pageTripPlanOrderByCompany.call(self, {page: 1, isUpload: false}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -212,9 +220,9 @@ describe("api/client/tripPlan.js", function() {
         });
 
 
-        it("#countTripPlanNum should be ok", function(done) {
+        it("#countTripPlanNum should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.countTripPlanNum.call(self, {companyId: companyId}, function(err, ret){
+            API.client.tripPlan.countTripPlanNum.call(self, {companyId: companyId}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -222,6 +230,34 @@ describe("api/client/tripPlan.js", function() {
                 done();
             })
         });
+
+        it("#saveConsumeDetail should be ok", function (done) {
+            var self = {accountId: staffId};
+            var detail = {
+                orderId: newOrderId,
+                type: 0,
+                startTime: '2016-01-10 11:00:00',
+                invoiceType: 2,
+                budget: 350
+            }
+            API.client.tripPlan.saveConsumeDetail.call(self, detail, function (err, ret) {
+                if (err) {
+                    throw err;
+                }
+                assert.equal(ret.status, 0);
+                done();
+            })
+        });
+
+        //describe('consume details options', function(){
+        //    before(function(done){
+        //        API.tripPlan.saveConsumeRecord({}, function(err, ret){
+        //            if(err){ throw err; }
+        //            assert.equal(ret.status, 0);
+        //            done();
+        //        })
+        //    })
+        //})
 
     })
 

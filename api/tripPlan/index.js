@@ -159,16 +159,16 @@ tripPlan.updateTripPlanOrder = function(params, callback){
  * @param callback
  */
 tripPlan.updateConsumeDetail = function(params){
-    return checkParams(['userId', 'id', 'updates'], params)
-        .then(function(){
-            return ConsumeDetails.findById(params.id)
-        })
+    var updates = checkAndGetParams(['userId', 'id'], [], params, false);
+    var id = params.id;
+    var userId = params.userId;
+    return ConsumeDetails.findById(params.id, {attributes: ['status']})
         .then(function(record){
             if(!record || record.status == -2){
-                throw {code: -2, msg: '记录不存在'}
+                throw {code: -2, msg: '记录不存在'};
             }
-            var cols = getColsFromParams(params.updates);
-            return ConsumeDetails.update(params.updates, {returning: true, where: {id: params.id}, fields: cols});
+            var cols = getColsFromParams(updates);
+            return ConsumeDetails.update(updates, {returning: true, where: {id: params.id}, fields: cols});
         })
 }
 
@@ -228,6 +228,7 @@ tripPlan.saveConsumeRecord = function(params, options, callback){
     }
     var checkArr = ['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'];
     var fields = getColsFromParams(ConsumeDetails.attributes);
+    params.status = 0;
     params = checkAndGetParams(checkArr, fields, params);
     options.fields = getColsFromParams(params);
     return ConsumeDetails.create(params, options)
@@ -270,30 +271,23 @@ tripPlan.deleteTripPlanOrder = function(params){
  * @param callback
  * @returns {*}
  */
-tripPlan.deleteConsumeDetail = function(params, callback){
-    var defer = Q.defer();
-    return checkParams(['userId', 'id'], params)
-        .then(function(){
-            var id = params.id;
-            var userId = params.userId;
-            return ConsumeDetails.findById(id, {attributes: ['accountId']})
-                .then(function(detail){
-                    if(!detail){
-                        defer.reject(L.ERR.CONSUME_DETAIL_NOT_EXIST);
-                        return defer.promise;
-                    }
-                    if(detail.accountId != userId){
-                        defer.reject(L.ERR.PERMISSION_DENY);
-                        return defer.promise;
-                    }
-                    return ConsumeDetails.destory({where: {id: id}})
-                        .then(function(){
-                            return {code: 0, msg: '删除成功'}
-                        })
-                })
+tripPlan.deleteConsumeDetail = function(params){
+    var params = checkAndGetParams(['userId', 'id'], [], params);
+    var id = params.id;
+    var userId = params.userId;
+    return ConsumeDetails.findById(id, {attributes: ['accountId']})
+        .then(function(detail){
+            if(!detail || detail.status == -2){
+                throw L.ERR.CONSUME_DETAIL_NOT_EXIST;
+            }
+            if(detail.accountId != userId){
+                throw L.ERR.PERMISSION_DENY;
+            }
+            return ConsumeDetails.update({status: -2, updateAt: utils.now()}, {where: {id: id}, fields: ['status', 'updateAt']})
         })
-        .catch(errorHandle)
-        .nodeify(callback);
+        .then(function(){
+            return {code: 0, msg: '删除成功'}
+        })
 }
 
 /**
@@ -306,20 +300,13 @@ tripPlan.deleteConsumeDetail = function(params, callback){
  * @returns {*}
  */
 tripPlan.uploadInvoice = function(params, callback){
-    return checkParams(['userId', 'consumeId', 'picture'], params)
-        .then(function(code){
-            return ConsumeDetails.findOne({where: {id: params.consumeId, account_id: params.userId}});
-        })
+    var params = checkAndGetParams(['userId', 'consumeId', 'picture'], [], params);
+    return ConsumeDetails.findOne({where: {id: params.consumeId, account_id: params.userId}})
         .then(function(custome){
-            if(!custome)
+            if(!custome || custome.status == -2)
                 throw L.ERR.NOT_FOUND;
-
             var invoiceJson = custome.invoice;
             var times = invoiceJson.length ? invoiceJson.length+1 : 1;
-            /*if(invoiceJson && invoiceJson.length > 0){
-             invoiceJson[invoiceJson.length-1].status = custome.status;
-             invoiceJson[invoiceJson.length-1].remark = custome.audit_remark;
-             }*/
             var currentInvoice = {times:times, picture:params.picture, create_at:moment().format('YYYY-MM-DD HH:mm'), status:0, remark: '', approve_at: ''};
             invoiceJson.push(currentInvoice);
             var updates = {newInvoice: params.picture, invoice: JSON.stringify(invoiceJson), updateAt: moment().format(), status: 0, auditRemark: ""};
@@ -367,7 +354,7 @@ tripPlan.getConsumeDetail = function(params){
  * @returns {*|Promise}
  */
 tripPlan.approveInvoice = function(params){
-    var params = checkAndGetParams(['status', 'consumeId', 'userId', 'expenditure'], ['remark'], params);
+    var params = checkAndGetParams(['status', 'consumeId', 'userId'], ['remark', 'expenditure'], params);
     return ConsumeDetails.findById(params.consumeId)
         .then(function(consume){
             if(!consume || consume.status == -2)
@@ -375,16 +362,27 @@ tripPlan.approveInvoice = function(params){
             if(!consume.newInvoice){
                 throw {code: -2, msg: '没有上传票据'};
             }
+            if(consume.status == 1){
+                throw {code: -3, msg: '该票据已审核通过，不能重复审核'};
+            }
+            return PlanOrder.findById(consume.orderId, {attributes: ['id', 'expenditure', 'status']})
+            .then(function(order){
+                    if(!order || order.status == -2){
+                        throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST
+                    }
+                    return [order, consume];
+                })
+        })
+        .spread(function(order, consume){
             var invoiceJson = consume.invoice;
             if(invoiceJson && invoiceJson.length > 0){
                 invoiceJson[invoiceJson.length-1].status = params.status;
                 invoiceJson[invoiceJson.length-1].remark = params.remark;
                 invoiceJson[invoiceJson.length-1].approve_at = utils.now();
             }
-
             var updates = {
                 invoice: JSON.stringify(invoiceJson),
-                updateAt: moment().format(),
+                updateAt: utils.now(),
                 status: params.status,
                 expenditure: params.expenditure
             };
@@ -396,11 +394,26 @@ tripPlan.approveInvoice = function(params){
                 return Q.all([
                     ConsumeDetails.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
                     ConsumeDetailsLogs.create(logs,{transaction: t})
-                ]);
+                ])
+                    .spread(function(ret){
+                        var status = params.status;
+                        if(status != 1){
+                            return ret;
+                        }
+                        if(!params.expenditure)
+                            throw {code: -4, msg: '支出金额不能为空'}
+                        var expenditure = (parseFloat(params.expenditure) + parseFloat(order.expenditure)).toFixed(2);
+                        var order_updates = {
+                            expenditure: expenditure,
+                            updateAt: utils.now()
+                        }
+                        var fields = getColsFromParams(order_updates);
+                        return PlanOrder.update(order_updates, {where: {id: order.id}, fields: fields, transaction: t})
+                        .then(function(){
+                                return ret;
+                            })
+                    })
             });
-        })
-        .spread(function(update) {
-            return update;
         })
         .spread(function(rownum, rows){
             return rows[0];
@@ -418,22 +431,6 @@ tripPlan.countTripPlanNum = function(params, callback){
     query.status = {$ne: -2};
     return PlanOrder.count({where: query})
         .nodeify(callback);
-}
-
-
-
-function checkParams(checkArray, params, callback){
-    var defer = Q.defer();
-    ///检查参数是否存在
-    for(var key in checkArray){
-        var name = checkArray[key];
-        if(!params[name] && params[name] !== false && params[name] !== 0){
-            defer.reject({code:'-1', msg:'参数 params.' + name + '不能为空'});
-            return defer.promise.nodeify(callback);
-        }
-    }
-    defer.resolve({code: 0});
-    return defer.promise.nodeify(callback);
 }
 
 module.exports = tripPlan;
