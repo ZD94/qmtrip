@@ -33,6 +33,7 @@ var staff = (function(){
             API.onload(function(){
                 API.staff.getCurrentStaff()//获取当前登录人员的企业id
                     .then(function(staff){
+                        $scope.roleId = staff.roleId;
                         API.staff.listAndPaginateStaff({companyId:staff.companyId})
                             .then(function(staffinfo){
                                 //console.info(staffinfo);
@@ -70,6 +71,7 @@ var staff = (function(){
             API.onload(function(){
                 API.staff.getCurrentStaff()//qh获取当前登录人员的企业id
                     .then(function(staff){
+                        $scope.roleId = staff.roleId;
                         //console.log(Q);
                         return Q.all([
                             API.travelPolicy.getAllTravelPolicy({where: {companyId:staff.companyId}}),//获取当前所有的差旅标准名称

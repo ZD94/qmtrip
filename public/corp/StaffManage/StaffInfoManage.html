@@ -53,11 +53,11 @@
                         </li>
                         <li>
                             <span style="color: #f56d23;padding-right: 5px;">*</span>权限:
-                            <select name="select" id="staffPower" class="">
+                            <select name="select" id="staffPower" class="" ng-disabled="roleId == 2">
                                 <option value="">请设置权限</option>
                                 <option value="2">管理员</option>
                                 <option value="3">财务人员</option>
-                                <option value="1">普通员工</option>
+                                <option value="1" ng-selected="roleId == 2">普通员工</option>
                             </select>
                         </li>
                     </ul>
@@ -126,7 +126,7 @@
                             </li>
                             <li>
                                 <span style="color: #f56d23;padding-right: 5px;">*</span>权限:
-                                <select name="select" id="staffPower{{$index}}" class="" ng-disabled="item.roleId == 0">
+                                <select name="select" id="staffPower{{$index}}" class="" ng-disabled="item.roleId == 0 || roleId == 2">
                                     <option value="">请设置权限</option>
                                     <option value="2" ng-selected="item.roleId == 2">管理员</option>
                                     <option value="3" ng-selected="item.roleId == 3">财务人员</option>

@@ -48,9 +48,9 @@ staff.createStaff = function(data, callback){
                 if (!data.email) {
                     throw {code: -1, msg: "邮箱不能为空"};
                 }
-                if (!data.mobile) {
+                /*if (!data.mobile) {
                     throw {code: -2, msg: "手机号不能为空"};
-                }
+                }*/
             }
             if (!data.name) {
                 throw {code: -3, msg: "姓名不能为空"};
@@ -414,6 +414,7 @@ staff.beforeImportExcel = function(params, callback){
     var downloadNoAddObj = [];
     var emailAttr = [];
     var mobileAttr = [];
+    var repeatEmail = [];
     var companyId = "";
     var domainName = "";
     var xlsxObj;
@@ -445,106 +446,61 @@ staff.beforeImportExcel = function(params, callback){
 //                    var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
                 var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
                 item = staffObj;
-                if(index>0 && index<200){//不取等于0的过滤抬头标题栏
-                    if(!staffObj.name || staffObj.name==""){
+                if(index>0 && index<202){//不取等于0的过滤抬头标题栏
+                    if(utils.trim(staffObj.name) == ""){
                         staffObj.reason = "姓名为空";
                         s[6] = "姓名为空";
                         noAddObj.push(staffObj);
                         downloadNoAddObj.push(s);
                         return;
                     }
-                    if(!staffObj.mobile || staffObj.mobile==""){
-                        staffObj.reason = "手机号为空";
-                        s[6] = "手机号为空";
+                    if(utils.trim(staffObj.mobile) != "" && !/^[\d]{11}$/.test(staffObj.mobile)){
+                        staffObj.reason = "手机号格式不正确";
+                        s[6] = "手机号格式不正确";
                         noAddObj.push(staffObj);
                         downloadNoAddObj.push(s);
                         return;
                     }
-                    if(mobileAttr.join(",").indexOf(s[1]) != -1){
-                        staffObj.reason = "手机号与本次导入中手机号重复";
-                        s[6] = "手机号与本次导入中手机号重复";
-                        noAddObj.push(staffObj);
-                        downloadNoAddObj.push(s)
-                        //addObj中删除重复手机号的用户
-                        for(var i=0;i<addObj.length;i++){
-                            var addStaff = addObj[i];
-                            if(addStaff.mobile == s[1]){
-                                addObj.splice(i, 1);
-                                downloadAddObj.splice(i, 1);
-                                noAddObj.push(addStaff);
-                                downloadNoAddObj.push(downloadAddObj[i]);
-                            }
-                        }
-                        return;
-                    }
-                    mobileAttr.push(s[1]);
-                    if(!staffObj.email || staffObj.email==""){
+                    if(utils.trim(staffObj.email) == ""){
                         staffObj.reason = "邮箱为空";
                         s[6] = "邮箱为空";
                         noAddObj.push(staffObj);
                         downloadNoAddObj.push(s);
                         return;
                     }
-                    console.info("domainName", domainName);
-                    if(staffObj.email && domainName && domainName != "" && staffObj.email.indexOf(domainName) == -1){
+                    if(domainName && domainName != "" && staffObj.email.indexOf(domainName) == -1){
                         staffObj.reason = "邮箱不符合要求";
                         s[6] = "邮箱不符合要求";
                         noAddObj.push(staffObj);
                         downloadNoAddObj.push(s);
                         return;
                     }
-                    if(emailAttr.join(",").indexOf(s[2]) != -1){
+                    if(emailAttr.join(",").indexOf(utils.trim(s[2])) != -1){
                         staffObj.reason = "邮箱与本次导入中邮箱重复";
                         s[6] = "邮箱与本次导入中邮箱重复";
                         noAddObj.push(staffObj);
                         downloadNoAddObj.push(s);
-                        //addObj中删除重复邮箱的用户
-                        for(var i=0;i<addObj.length;i++){
-                            var addStaff = addObj[i];
-                            if(addStaff.email == s[2]){
-                                addObj.splice(i, 1);
-                                downloadAddObj.splice(i, 1);
-                                noAddObj.push(addStaff);
-                                downloadNoAddObj.push(downloadAddObj[i]);
-                            }
-                        }
+                        repeatEmail.push(utils.trim(s[2]));
                         return;
                     }
                     emailAttr.push(s[2]);
-                    if(!staffObj.department || staffObj.department==""){
-                        staffObj.reason = "部门为空";
-                        s[6] = "部门为空";
+                    if(s[4] && utils.trim(s[4]) != "" && staffObj.travelLevel == ""){
+                        staffObj.reason = "差旅标准不符合要求";
+                        s[6] = "差旅标准不符合要求";
                         noAddObj.push(staffObj);
                         downloadNoAddObj.push(s);
                         return;
                     }
-                    if(!staffObj.travelLevel || staffObj.travelLevel==""){
-                        staffObj.reason = "差旅标准为空或不符合要求";
-                        s[6] = "差旅标准为空或不符合要求";
-                        noAddObj.push(staffObj);
-                        downloadNoAddObj.push(s);
-                        return;
-                    }
-                    return Q.all([
-                        staffModel.findOne({where: {email: s[2]}}),
-                        API.auth.checkAccExist({mobile: s[1]})//acc表手机号不能重复 staff暂且不控制
-                    ])
-                        .spread(function(staff, account){
+                    return staffModel.findOne({where: {email: s[2]}})
+                        .then(function(staff){
                             if(staff){
                                 staffObj.reason = "邮箱与已有用户重复";
                                 s[6] = "邮箱与已有用户重复";
                                 noAddObj.push(staffObj);
                                 downloadNoAddObj.push(s);
                             }else{
-                                if(account){
-                                    staffObj.reason = "手机号与已有用户重复";
-                                    s[6] = "手机号与已有用户重复";
-                                    noAddObj.push(staffObj);
-                                    downloadNoAddObj.push(s);
-                                }else{
-                                    addObj.push(staffObj);
-                                    downloadAddObj.push(s);
-                                }
+                                addObj.push(staffObj);
+                                downloadAddObj.push(s);
                             }
                             return item;
                         }).catch(function(err){
@@ -561,6 +517,21 @@ staff.beforeImportExcel = function(params, callback){
                 }
             })).then(function(items){
                 data = items;
+                for(var k=0; k<repeatEmail.length; k++){
+                    var rEmail = repeatEmail[k];
+                    //addObj中删除重复邮箱的用户
+                    for(var i=0;i<addObj.length;i++){
+                        var addStaff = addObj[i];
+                        if(utils.trim(addStaff.email) == rEmail){
+                            addObj.splice(i, 1);
+                            downloadAddObj.splice(i, 1);
+                            addStaff.reason = "邮箱与本次导入中邮箱重复";
+                            downloadAddObj[i][6] = "邮箱与本次导入中邮箱重复";
+                            noAddObj.push(addStaff);
+                            downloadNoAddObj.push(downloadAddObj[i]);
+                        }
+                    }
+                }
                 return {addObj: JSON.stringify(addObj), downloadAddObj: JSON.stringify(downloadAddObj), noAddObj: JSON.stringify(noAddObj), downloadNoAddObj: JSON.stringify(downloadNoAddObj)};
             })
         })
@@ -735,7 +706,7 @@ staff.statisticStaffsRole = function(params, callback){
             return Q.all(staffs.map(function(s){
                 if(s.roleId == 2){
                     adminNum++;
-                }else if(s.roleId = 1){
+                }else if(s.roleId == 1){
                     commonStaffNum++;
                 }
                 return API.auth.getAccount({id: s.id})

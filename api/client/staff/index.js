@@ -174,6 +174,8 @@ staff.listAndPaginateStaff = auth.checkPermission(["user.query"],
         return API.staff.getStaff({id:user_id})
             .then(function(data){
                 params.companyId = data.companyId;
+//                var options = {perPage : 20};
+//                params.options = options;
                 return API.staff.listAndPaginateStaff(params);
             })
             .nodeify(callback);
