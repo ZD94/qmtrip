@@ -102,7 +102,7 @@ travelPolicy.getTravelPolicy = function(params, callback){
     return API.staff.getStaff({id: user_id})
         .then(function(data){
             if(!id){
-                if(data.companyId){
+                /*if(data.companyId){
                     //若该员工没有指定差旅标准 默认返回该企业最早添加的差旅标准
                     var options = {where: {companyId: data.companyId}};
                     options.order = "create_at asc";//[["create_at", "desc"]]
@@ -124,7 +124,11 @@ travelPolicy.getTravelPolicy = function(params, callback){
                         .then(function(tp){
                             return tp;
                         })
-                }
+                }*/
+                return API.travelPolicy.getTravelPolicy({id:'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a'})
+                    .then(function(tp){
+                        return tp;
+                    })
             }else{
                 return API.travelPolicy.getTravelPolicy({id:id})
                     .then(function(tp){

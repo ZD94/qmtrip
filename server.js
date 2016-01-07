@@ -6,11 +6,14 @@
 require('app-module-path').addPath(__dirname);
 
 //服务器启动性能日志
-//var perf = require('common/perf');
+var perf = require('common/perf');
 //perf.init('init');
 
+Promise = require('bluebird');
+Promise.promisifyAll(require("redis"));
+Promise.promisifyAll(require("fs"));
+
 var path = require('path');
-var Q = require('q');
 var fs = require("fs");
 
 var config = require("./config");
