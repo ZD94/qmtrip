@@ -148,20 +148,23 @@ var staff = (function(){
                 if(!name){
                     $scope.block_tip_err = "姓名是必填项！";
                     $(".block_tip").show();
+                    return;
                 }else if(!mail){
                     $scope.block_tip_err = "邮箱是必填项！";
                     $(".block_tip").show();
-                }else if(!tel){
-                    $scope.block_tip_err = "手机号是必填项！";
-                    $(".block_tip").show();
+                    return;
                 }else if(!power){
                     $scope.block_tip_err = "权限是必选项！";
                     $(".block_tip").show();
+                    return;
+                }else{
+                    $(".block_tip").hide();
                 }
                 API.onload(function() {//创建员工
                     API.staff.createStaff({name:name,mobile:tel,email:mail,companyId:$scope.companyId,department:department,travelLevel:standard,roleId:power})
                         .then(function(staffinfo){
                             $(".add_staff").hide();
+                            $(".block_tip").hide();
                             $("#add").removeClass("onCheck");
                             //$scope.initstafflist();
                             $("#staffName").val("");
