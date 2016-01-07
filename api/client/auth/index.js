@@ -141,11 +141,8 @@ auth.registryCompany = function(params, callback) {
     var companyId = uuid.v1();
     var domain = email.split(/@/)[1];
 
-    console.info("start test......");
     return Q()
         .then(function() {
-            console.info("step 1");
-            console.info(process.env["NODE_ENV"]);
             if (process.env["NODE_ENV"] == 'test') {
                 return true;
             }
@@ -153,7 +150,6 @@ auth.registryCompany = function(params, callback) {
             return API.checkcode.validatePicCheckCode({code: picCode, ticket: picTicket});
         })
         .then(function() {
-            console.info("step 2");
             if (process.env["NODE_ENV"] == 'test') {
                 return true;
             }
@@ -161,7 +157,6 @@ auth.registryCompany = function(params, callback) {
             return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
         })
         .then(function(){
-            console.info("*******************************");
             return API.company.checkBlackDomain({domain: domain});
         })
         .then(function() {
