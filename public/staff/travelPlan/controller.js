@@ -18,13 +18,13 @@ var travelPlan=(function(){
         $("title").html("出差单列表");
         //待上传票据列表
         $scope.initPlanList = function () {
-            var params = {auditStatus: [-1, 0]};
+            var params = {isUpload: false};
             if ($scope.keyword !='' && $scope.keyword !=undefined) {
                 params.$like = ['startPlace', '%' + $scope.keyword + '%'];
             }
             console.info (params);
             API.onload(function() {
-                API.tripPlan.listTripPlanOrder(params)
+                API.tripPlan.pageTripPlanOrder(params)
                     .then(function(result){
                         $scope.planListitems = result;
                         loading(true);
@@ -89,10 +89,10 @@ var travelPlan=(function(){
         //已完成列表
         $scope.initFinishPlanList = function () {
             API.onload(function() {
-                API.tripPlan.listTripPlanOrder({auditStatus: [1]})
-                    .then(function(result){
-                        $scope.finishPlanListitems = result;
-                        console.info (result);
+                API.tripPlan.pageCompleteTripPlanOrder({})
+                    .then(function(ret){
+                        console.info(ret);
+                        $scope.finishPlanListitems = ret.items;;
                         $scope.$apply();
                     })
                     .catch(function(err){
