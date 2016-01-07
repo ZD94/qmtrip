@@ -100,13 +100,13 @@ describe("api/client/agencyTripPlan.js", function() {
         })
     });
 
-    it("#listTripPlanOrder should be ok", function(done) {
+    it("#pageTripPlanOrderByAgency should be ok", function(done) {
         var self = {accountId: agencyUserId};
-        API.client.agencyTripPlan.listAllTripPlanOrder.call(self, orderId, function(err, ret){
+        API.client.agencyTripPlan.pageTripPlanOrderByAgency.call(self, {}, function(err, ret){
             if (err) {
                 throw err;
             }
-            assert(ret.length >= 0);
+            assert.equal(ret.page, 1);
             done();
         })
     });

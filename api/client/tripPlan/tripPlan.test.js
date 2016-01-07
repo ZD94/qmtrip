@@ -171,24 +171,42 @@ describe("api/client/tripPlan.js", function() {
             })
         });
 
-        it("#listTripPlanOrder should be ok", function(done) {
+        it("#pageCompleteTripPlanOrder should be error without params", function(done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.listTripPlanOrder.call(self, function(err, ret){
-                if (err) {
-                    throw err;
-                }
-                assert(ret.length >= 0);
+            API.client.tripPlan.pageCompleteTripPlanOrder.call(self, function(err, ret){
+                assert.equal(err.code, -2);
+                assert.equal(ret, null);
                 done();
             })
         });
 
-        it("#listTripPlanOrderByCompany should be ok", function(done) {
+        it("#pageCompleteTripPlanOrder should be ok", function(done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.listTripPlanOrderByCompany.call(self, {status: -2}, function(err, ret){
+            API.client.tripPlan.pageCompleteTripPlanOrder.call(self, {page: 1}, function(err, ret){
+                if(err){ throw err;}
+                assert.equal(ret.page, 1);
+                assert.equal(ret.perPage, 10);
+                done();
+            })
+        });
+
+        it("#pageTripPlanOrder should be ok", function(done) {
+            var self = {accountId: staffId};
+            API.client.tripPlan.pageTripPlanOrder.call(self, {page: 1, isUpload: false, audit: 'N'}, function(err, ret){
+                if(err){ throw err;}
+                assert.equal(ret.page, 1);
+                assert.equal(ret.perPage, 10);
+                done();
+            })
+        });
+
+        it("#pageTripPlanOrderByCompany should be ok", function(done) {
+            var self = {accountId: staffId};
+            API.client.tripPlan.pageTripPlanOrderByCompany.call(self, {page: 1, isUpload: false}, function(err, ret){
                 if (err) {
                     throw err;
                 }
-                assert(ret.length >= 0);
+                assert.equal(ret.page, 1);
                 done();
             })
         });

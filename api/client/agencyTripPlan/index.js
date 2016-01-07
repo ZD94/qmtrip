@@ -6,6 +6,7 @@ var API = require("common/api");
 var Q = require("q");
 var Logger = require('common/logger');
 var L = require("common/language");
+var checkAndGetParams = require("common/utils").checkAndGetParams;
 
 var agencyTripPlan = {};
 
@@ -67,6 +68,61 @@ agencyTripPlan.listAllTripPlanOrder = function(callback){
             return API.tripPlan.listTripPlanOrder(params);
         })
         .nodeify(callback);
+}
+
+
+/**
+ * 代理商获取员工计划单分页列表
+ * @param callback
+ * @returns {*}
+ */
+agencyTripPlan.pageTripPlanOrderByAgency = function(params){
+    if(typeof params == 'function'){
+        throw {code: -2, msg: '参数不正确'};
+    }
+    var self = this;
+    var accountId = self.accountId;
+
+    (params.isUpload === true)?params.status={$gt: 0}:params.status = {$gte: -1}; //查询条件为是否上传票据，设定查询参数status
+    if(params.audit){ //判断计划单的审核状态，设定auditStatus参数
+        var audit = params.audit;
+        params.status = 1;
+        if(audit == 'Y'){
+            params.auditStatus = 1;
+        }else if(audit == "P"){
+            params.auditStatus = 0;
+        }else if(audit == 'N'){
+            params.status = 0; //待上传状态
+            params.auditStatus = -1;
+        }
+    }
+
+    return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
+        .then(function(user){
+            return user.agencyId;
+        })
+        .then(function(agencyId){
+            params.agencyId = agencyId;
+            return API.company.listCompany(params)
+        })
+        .then(function(companys){
+            var companyIdList = companys.map(function(company){
+                return company.id;
+            });
+            params.companyId = params.companyId || {$in: companyIdList};
+            var query = checkAndGetParams(['companyId'],
+                ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure'], params);
+            var page = params.page;
+            var perPage = params.perPage;
+            typeof page== 'number'?"":page=1;
+            typeof perPage == 'number'?"":perPage=10;
+            var options = {
+                where: query,
+                limit: perPage,
+                offset: perPage * (page - 1)
+            }
+            return API.tripPlan.listTripPlanOrder(options);
+        })
 }
 
 

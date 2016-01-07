@@ -141,7 +141,13 @@ company.getCompany = function(params){
 company.listCompany = function(params){
     var query = checkAndGetParams(['agencyId'], [], params);
     var agencyId = query.agencyId;
-    return Company.findAll({where: {agencyId: agencyId, status: {$ne: -2}}})
+    var options = {
+        where: {agencyId: agencyId, status: {$ne: -2}}
+    };
+    if(params.columns){
+        options.attributes =  params.columns;
+    }
+    return Company.findAll(options)
 }
 
 /**

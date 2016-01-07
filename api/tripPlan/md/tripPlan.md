@@ -87,13 +87,26 @@
 | msg     | 错误消息 |
 
 
->. 员工获取差旅计划单列表 API.tripPlan.listTripPlanOrder(params, callback);
+>. 员工获取已完成差旅计划单列表(分页) API.tripPlan.pageCompleteTripPlanOrder(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
 | params                                | 消费支出详情（交通/酒店）             |json              |------
-| params.type        |类型： 1：预算单 2： 计划单      |
-| params.status        |状态计划单/预算单状态 -1：失效 0：待上传状态 1：待审核状态      ||
+| params.page             |需要查询的页数  |integer  |选填，默认为1
+| params.perPage              |每页查询的数据数目     |integer     |选填，默认为10
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code    | 返回码 |  |
+| msg     | 错误消息 |
+
+
+>. 员工获取差旅计划单列表 API.tripPlan.pageTripPlanOrderCompany(params, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 消费支出详情（交通/酒店）             |json              |------
+| params.page             |需要查询的页数  |integer  |选填，默认为1
+| params.perPage              |每页查询的数据数目     |integer     |选填，默认为10
 | params.startPlace        |出发地       |      |
 | params.destination        |目的地      |      |
 | params.startAt        |出发时间      |      |
@@ -103,11 +116,7 @@
 | params.description        |描述      |       |
 | params.budget        |预算      |         |
 | params.expenditure        |支出      |       |
-| params.auditStatus            |审核状态 -1：未通过 0：待审核 1：审核通过     |        |
-| params.score                |获取的积分      ||
-| params.remark        |备注      |         |
-| params.expireAt      |失效时间    |        |
-| params.createAt          |创建时间 |        |
+| params.audit            |审核状态 N：未通过 P：待审核 Y：审核通过     |        |
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |
@@ -116,13 +125,13 @@
 | msg     | 错误消息 |
 
 
->. 企业获取差旅计划单列表 API.tripPlan.listTripPlanOrderByCompany(params, callback);
+>. 企业获取差旅计划单列表 API.tripPlan.pageTripPlanOrderCompany(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
 | params                                | 消费支出详情（交通/酒店）             |json              |------
-| params.type        |类型： 1：预算单 2： 计划单      |
-| params.status        |状态计划单/预算单状态 -1：失效 0：待上传状态 1：待审核状态      ||
+| params.page             |需要查询的页数  |integer  |选填，默认为1
+| params.perPage              |每页查询的数据数目     |integer     |选填，默认为10
 | params.startPlace        |出发地       |      |
 | params.destination        |目的地      |      |
 | params.startAt        |出发时间      |      |
@@ -132,11 +141,7 @@
 | params.description        |描述      |       |
 | params.budget        |预算      |         |
 | params.expenditure        |支出      |       |
-| params.auditStatus            |审核状态 -1：未通过 0：待审核 1：审核通过     |        |
-| params.score                |获取的积分      ||
-| params.remark        |备注      |         |
-| params.expireAt      |失效时间    |        |
-| params.createAt          |创建时间 |        |
+| params.audit            |审核状态 N：未通过 P：待审核 Y：审核通过     |        |
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |

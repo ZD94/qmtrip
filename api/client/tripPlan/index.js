@@ -6,6 +6,7 @@ var API = require("common/api");
 var Q = require("q");
 var Logger = require('common/logger');
 var L = require("common/language");
+var checkAndGetParams = require("common/utils").checkAndGetParams;
 
 var tripPlan = {};
 
@@ -63,32 +64,131 @@ tripPlan.getTripPlanOrderById = function(orderId){
 }
 
 /**
- * 获取差旅计划单列表(员工)
- * @param params
+ * 获取员工已完成计划单分页列表
  * @param callback
  * @returns {*}
  */
-tripPlan.listTripPlanOrder = function(params, callback){
-    if(typeof params == "function"){
-        callback = params;
-        params = {};
-    }
-    if(!params){
-        params = {}
+tripPlan.pageCompleteTripPlanOrder = function(params){
+    if(typeof params == 'function'){
+        throw {code: -2, msg: '参数不正确'};
     }
     var self = this;
     var accountId = self.accountId;
-    params.accountId = accountId;
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function(staff){
-            var companyId = staff.companyId;
-            return companyId;
+            return staff.companyId;
+        })
+        .then(function(companyId){
+            params.accountId = self.accountId;
+            params.companyId = companyId;
+            params.auditStatus = 1; //已完成计划单
+            var query = checkAndGetParams(['companyId'], ['accountId', 'status', 'auditStatus'], params);
+            var page = params.page;
+            var perPage = params.perPage;
+            typeof page== 'number'?"":page=1;
+            typeof perPage == 'number'?"":perPage=10;
+            var options = {
+                where: query,
+                limit: perPage,
+                offset: perPage * (page - 1)
+            }
+            return API.tripPlan.listTripPlanOrder(options);
+        })
+}
+
+
+/**
+ * 获取员工计划单分页列表
+ * @param callback
+ * @returns {*}
+ */
+tripPlan.pageTripPlanOrder = function(params){
+    if(typeof params == 'function'){
+        throw {code: -2, msg: '参数不正确'};
+    }
+    var self = this;
+    var accountId = self.accountId;
+
+    (params.isUpload === true)?params.status={$gt: 0}:params.status={$gte: -1}; //查询条件为是否上传票据，设定查询参数status
+    if(params.audit){ //判断计划单的审核状态，设定auditStatus参数
+        var audit = params.audit;
+        params.status = 1;
+        if(audit == 'Y'){
+            params.auditStatus = 1;
+        }else if(audit == "P"){
+            params.auditStatus = 0;
+        }else if(audit == 'N'){
+            params.status = 0; //待上传状态
+            params.auditStatus = -1;
+        }
+    }
+    return API.staff.getStaff({id: accountId, columns: ['companyId']})
+        .then(function(staff){
+            return staff.companyId;
+        })
+        .then(function(companyId){
+            params.accountId = self.accountId;
+            params.companyId = companyId;
+            var query = checkAndGetParams(['companyId'],
+                ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure'], params);
+            var page = params.page;
+            var perPage = params.perPage;
+            typeof page== 'number'?"":page=1;
+            typeof perPage == 'number'?"":perPage=10;
+            var options = {
+                where: query,
+                limit: perPage,
+                offset: perPage * (page - 1)
+            }
+            return API.tripPlan.listTripPlanOrder(options);
+        })
+}
+
+
+/**
+ * 获取员工计划单分页列表(企业)
+ * @param callback
+ * @returns {*}
+ */
+tripPlan.pageTripPlanOrderByCompany = function(params){
+    if(typeof params == 'function'){
+        throw {code: -2, msg: '参数不正确'};
+    }
+    var self = this;
+    var accountId = self.accountId;
+
+    (params.isUpload === true)?params.status={$gt: 0}:params.status=0; //查询条件为是否上传票据，设定查询参数status
+    if(params.audit){ //判断计划单的审核状态，设定auditStatus参数
+        var audit = params.audit;
+        params.status = 1;
+        if(audit == 'Y'){
+            params.auditStatus = 1;
+        }else if(audit == "P"){
+            params.auditStatus = 0;
+        }else if(audit == 'N'){
+            params.status = 0; //待上传状态
+            params.auditStatus = -1;
+        }
+    }
+    return API.staff.getStaff({id: accountId, columns: ['companyId']})
+        .then(function(staff){
+            return staff.companyId;
         })
         .then(function(companyId){
             params.companyId = companyId;
-            return API.tripPlan.listTripPlanOrder(params);
+            var query = checkAndGetParams(['companyId'],
+                ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure'], params);
+            var page = params.page;
+            var perPage = params.perPage;
+            typeof page== 'number'?"":page=1;
+            typeof perPage == 'number'?"":perPage=10;
+            var options = {
+                where: query,
+                limit: perPage,
+                offset: perPage * (page - 1)
+            }
+            return API.tripPlan.listTripPlanOrder(options);
         })
-        .nodeify(callback);
 }
 
 /**
