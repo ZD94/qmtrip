@@ -100,7 +100,7 @@
 | msg     | 错误消息 |
 
 
->. 员工获取差旅计划单列表 API.tripPlan.pageTripPlanOrderCompany(params, callback);
+>. 员工获取差旅计划单列表 API.tripPlan.pageTripPlanOrder(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -125,7 +125,7 @@
 | msg     | 错误消息 |
 
 
->. 企业获取差旅计划单列表 API.tripPlan.pageTripPlanOrderCompany(params, callback);
+>. 企业获取差旅计划单列表 API.tripPlan.pageTripPlanOrderByCompany(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------

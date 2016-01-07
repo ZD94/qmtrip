@@ -12,7 +12,7 @@ describe("api/client/auth/index.js", function() {
     var testCase = {
         companyName: "测试公司",
         name: "测试名字",
-        email: "wanglihui.sjz@gmail.com",
+        email: "register.test@gmail.com",
         pwd: "time9818",
         status: 1,
         mobile: "15501149655",
