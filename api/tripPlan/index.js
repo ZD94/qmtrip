@@ -18,6 +18,7 @@ var getColsFromParams = utils.getColsFromParams;
 var checkAndGetParams = utils.checkAndGetParams;
 var API = require('common/api');
 var errorHandle = require("common/errorHandle");
+var Paginate = require("common/paginate").Paginate;
 var logger = new Logger("company");
 
 var tripPlan = {}
@@ -115,14 +116,12 @@ tripPlan.getTripPlanOrder = function(params){
  */
 tripPlan.updateTripPlanOrder = function(params, callback){
     var checkArr = ['userId', 'orderId', 'optLog', 'updates'];
-    return checkParams(checkArr, params)
-        .then(function(){
-            var orderId = params.orderId;
-            var userId = params.userId;
-            var optLog = params.optLog;
-            var updates = params.updates;
-            return PlanOrder.findById(orderId, {attributes: ['id', 'accountId', 'companyId', 'status']});
-        })
+    var params = checkAndGetParams(checkArr, [], params);
+    var orderId = params.orderId;
+    var userId = params.userId;
+    var optLog = params.optLog;
+    var updates = params.updates;
+    return PlanOrder.findById(orderId, {attributes: ['id', 'accountId', 'companyId', 'status']})
         .then(function(order){
             if(!order || order.status == -2){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
@@ -159,7 +158,7 @@ tripPlan.updateTripPlanOrder = function(params, callback){
  * @param params
  * @param callback
  */
-tripPlan.updateConsumeDetail = function(params, callback){
+tripPlan.updateConsumeDetail = function(params){
     return checkParams(['userId', 'id', 'updates'], params)
         .then(function(){
             return ConsumeDetails.findById(params.id)
@@ -171,8 +170,6 @@ tripPlan.updateConsumeDetail = function(params, callback){
             var cols = getColsFromParams(params.updates);
             return ConsumeDetails.update(params.updates, {returning: true, where: {id: params.id}, fields: cols});
         })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 
@@ -182,11 +179,19 @@ tripPlan.updateConsumeDetail = function(params, callback){
  * @param callback
  * @returns {*}
  */
-tripPlan.listTripPlanOrder = function(params, callback){
-    var query = checkAndGetParams(['companyId'], ['accountId', 'status'], params);
-    query.status = {$ne: -2};
-    return PlanOrder.findAll({where: query})
-        .then(function(orders){
+tripPlan.listTripPlanOrder = function(options){
+    var query = options.where;
+    var status = query.status;
+    typeof status == 'object'?query.status.$ne = -2:query.status = status;
+    if(!query.status && query.status != 0){
+        query.status = {$ne: -2};
+    }
+    return PlanOrder.findAndCount(options)
+        .then(function(ret){
+            if(!ret || ret.rows .length === 0){
+                return new Paginate(options.offset/options.limit + 1, options.limit, ret.count, []);
+            }
+            var orders = ret.rows;
             return Q.all(orders.map(function(order){
                 var orderId = order.id;
                 return Q.all([
@@ -201,12 +206,10 @@ tripPlan.listTripPlanOrder = function(params, callback){
                         return order;
                     })
             }))
-                .then(function(orders){
-                    return orders;
+            .then(function(orders){
+                    return new Paginate(options.offset/options.limit + 1, options.limit, ret.count, orders);
                 })
         })
-        .catch(errorHandle)
-        .nodeify(callback);
 }
 
 /**
