@@ -33,6 +33,7 @@ var staff = (function(){
             API.onload(function(){
                 API.staff.getCurrentStaff()//获取当前登录人员的企业id
                     .then(function(staff){
+                        $scope.roleId = staff.roleId;
                         API.staff.listAndPaginateStaff({companyId:staff.companyId})
                             .then(function(staffinfo){
                                 //console.info(staffinfo);
@@ -70,6 +71,7 @@ var staff = (function(){
             API.onload(function(){
                 API.staff.getCurrentStaff()//qh获取当前登录人员的企业id
                     .then(function(staff){
+                        $scope.roleId = staff.roleId;
                         //console.log(Q);
                         return Q.all([
                             API.travelPolicy.getAllTravelPolicy({where: {companyId:staff.companyId}}),//获取当前所有的差旅标准名称
@@ -146,20 +148,23 @@ var staff = (function(){
                 if(!name){
                     $scope.block_tip_err = "姓名是必填项！";
                     $(".block_tip").show();
+                    return;
                 }else if(!mail){
                     $scope.block_tip_err = "邮箱是必填项！";
                     $(".block_tip").show();
-                }else if(!tel){
-                    $scope.block_tip_err = "手机号是必填项！";
-                    $(".block_tip").show();
+                    return;
                 }else if(!power){
                     $scope.block_tip_err = "权限是必选项！";
                     $(".block_tip").show();
+                    return;
+                }else{
+                    $(".block_tip").hide();
                 }
                 API.onload(function() {//创建员工
                     API.staff.createStaff({name:name,mobile:tel,email:mail,companyId:$scope.companyId,department:department,travelLevel:standard,roleId:power})
                         .then(function(staffinfo){
                             $(".add_staff").hide();
+                            $(".block_tip").hide();
                             $("#add").removeClass("onCheck");
                             //$scope.initstafflist();
                             $("#staffName").val("");

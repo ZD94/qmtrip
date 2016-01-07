@@ -42,7 +42,7 @@
                     <td width="70" height="34" align="right">火车：</td>
                     <td height="34">
                         <span ng-if="item.trainLevel=='不限'">座次不限</span>
-                        <span ng-if="item.trainLevel!='不限'">{{item.trainLevel}}</span>
+                        <span ng-if="item.trainLevel!='不限'">{{item.trainLevel.replace(',', '/')}}</span>
                     </td>
                 </tr>
                 <tr>
@@ -52,7 +52,7 @@
                             <span ng-if="!item.hotelPrice">酒店任意住</span>
                             <span ng-if="item.hotelPrice">每晚不超过{{item.hotelPrice}}元</span>
                         </span>
-                        <span ng-if="item.hotelLevel!='不限'">{{item.hotelLevel}}<span ng-if="item.hotelPrice">且每晚不超过{{item.hotelPrice}}元</span></span>
+                        <span ng-if="item.hotelLevel!='不限'">{{item.hotelLevel.replace(',', '/')}}<span ng-if="item.hotelPrice">且每晚不超过{{item.hotelPrice}}元</span></span>
                 </tr>
             </table>
         </li>

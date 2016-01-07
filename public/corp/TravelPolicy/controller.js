@@ -83,9 +83,9 @@ var TravelPolicy=(function(){
                         name:$(".create_policy .Cname").val(),
                         planeLevel:$(".create_policy .CplaneLevel").html(),
                         planeDiscount:$(".create_policy .CplaneDiscount").attr('selectValue'),
-                        trainLevel:$(".create_policy .CtrainLevel").html(),
+                        trainLevel:$(".create_policy .CtrainLevel").html().replace('/',','),
                         isChangeLevel:$(".create_policy .Ccheckbox").is(':checked'),
-                        hotelLevel:$(".create_policy .ChotelTevel").html(),
+                        hotelLevel:$(".create_policy .ChotelTevel").html().replace('/',','),
                         hotelPrice:$(".create_policy .ChotelPrice").val(),
                         companyTd:companyId
                     })

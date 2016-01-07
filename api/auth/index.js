@@ -309,7 +309,7 @@ authServer.newAccount = function(data, callback) {
                 throw L.ERR.EMAIL_HAS_REGISTRY;
             }
 
-            if (account2) {
+            if (account2 && account2.mobile && account2.mobile != "") {
                 throw L.ERR.MOBILE_HAS_REGISTRY;
             }
             return true;
