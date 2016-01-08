@@ -171,15 +171,16 @@ var travelPlan=(function(){
                     $scope.hotel = $scope.planDetail.hotel[0];
                     $scope.outTraffic = $scope.planDetail.outTraffic[0];
                     console.info (result);
-                    var customerId = "";
+                    $scope.$apply();
                     $(".file").AjaxFileUpload({
                         action: '/upload/ajax-upload-file?type=invoice',
                         onComplete: function(filename, response) {
+                            console.info("000000");
                             $scope.ref = $(this).attr("ref");
                             $scope.md5 = response.md5key;
                             if (response.ret == 0 ) {
-                                var ImgSrc = '/upload/get-img-file/'+response.md5key;// var htmlStr = '<img src="/upload/get-img-file/'+response.md5key+'" alt="">';
-                                var invoiceType = "";// $scope.htmlStr = htmlStr;
+                                var ImgSrc = '/upload/get-img-file/'+response.md5key;
+                                var invoiceType = "";
                                 if ($(this).attr("data-type") == 1) {
                                     invoiceType = "去程交通票据";
                                 }else if ($(this).attr("data-type") == 2) {
@@ -197,7 +198,7 @@ var travelPlan=(function(){
                             }
                         }
                     });
-                    $scope.$apply();
+                    
                 })
                 .catch(function(err){
                     console.info(err);
