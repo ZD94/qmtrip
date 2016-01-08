@@ -77,11 +77,13 @@ var staff = (function(){
                         return Q.all([
                             API.travelPolicy.getAllTravelPolicy({where: {companyId:staff.companyId}}),//获取当前所有的差旅标准名称
                             API.staff.listAndPaginateStaff({companyId:staff.companyId}),//加载所有的员工记录
-                            API.staff.statisticStaffsRole({companyId:staff.companyId})//统计企业员工（管理员 普通员工 未激活员工）数量
+                            API.staff.statisticStaffsRole({companyId:staff.companyId}),//统计企业员工（管理员 普通员工 未激活员工）数量
+                            API.staff.getStaffCountByCompany({companyId:staff.companyId})//统计企业员工总数量
                         ])
-                            .spread(function(travelPolicies,staffinfo,staffRole){
+                            .spread(function(travelPolicies,staffinfo,staffRole, totalCount){
                                 //获取差旅标准
                                 $scope.companyId = staff.companyId;
+                                $scope.totalCount = totalCount;
                                 var arr = travelPolicies;
                                 var i ;
                                 for(i=0; i<arr.length; i++){
@@ -106,11 +108,6 @@ var staff = (function(){
                                                 $staff.accStatus = acc.status==0?'未激活':'';
                                                 $scope.$apply();
                                             })
-                                        /*return API.travelPolicy.getTravelPolicy({id:$staff.travelLevel})
-                                            .then(function(travelLevel){
-                                                $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
-                                                $scope.$apply();
-                                            })*/
                                     });
                                 //统计企业员工（管理员 普通员工 未激活员工）数量
                                 $scope.forActive = staffRole.unActiveNum;
@@ -126,9 +123,6 @@ var staff = (function(){
                     .catch(function(err){
                         console.info(err);
                     })
-
-
-
             })
         }
 
@@ -144,8 +138,8 @@ var staff = (function(){
             var n = $("#staffStandard").val().length;//获取差旅标准id的长度
             var standard   = $("#staffStandard").val().substr(7,n);
             var power      = $("#staffPower").val();
-            var commit = true;
-
+            var commit = true
+            var filter  = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
             if(commit){
                 if(!name){
                     $scope.block_tip_err = "姓名是必填项！";
@@ -153,6 +147,10 @@ var staff = (function(){
                     return;
                 }else if(!mail){
                     $scope.block_tip_err = "邮箱是必填项！";
+                    $(".block_tip").show();
+                    return;
+                }else if(!filter.test(mail)){
+                    $scope.block_tip_err = "邮箱格式错误！";
                     $(".block_tip").show();
                     return;
                 }else if(!power){
@@ -175,20 +173,19 @@ var staff = (function(){
                             $("#staffDepartment").val("");
                             $scope.selectkey = "";
                             $("#staffPower").val("");
-                            $scope.initStaff();
+                            $scope.initstafflist();
                             $scope.$apply();
                         }).catch(function (err) {
+                            console.log(err);
                             if(err.code == -29){
                                 $scope.block_tip_err = "该邮箱对应的账户已存在";
-                            }
-                            if(err.code == -6){
+                            }else if(err.code == -6){
                                 $scope.block_tip_err = "邮箱与创建人邮箱后缀不一致";
                             }else{
                                 $scope.block_tip_err = err.msg;
                             }
                             $(".block_tip").show();
                             $scope.$apply();
-                            console.info(err);
                         }).done();
                 })
             }
@@ -227,7 +224,7 @@ var staff = (function(){
                     .then(function(newStaff){
                         $(".add_staff2").hide();
                         //$scope.initstafflist();
-                        $scope.initStaff();
+                        $scope.initstafflist();
                         $scope.$apply();
                     }).catch(function(err){
                         console.info(err);
@@ -246,9 +243,8 @@ var staff = (function(){
             API.onload(function(){
                 API.staff.deleteStaff({id:id})
                     .then(function(newStaff){
-                        //console.info(456);
-                        $scope.staffs.splice(index, 1);
-                        //$scope.initstafflist();
+//                        $scope.staffs.splice(index, 1);
+                        $scope.initstafflist();
                         $scope.$apply();
                     }).catch(function(err){
                         console.info(err);
@@ -271,7 +267,7 @@ var staff = (function(){
             $(".staff_tab_import").hide();
             $(".staff_tab_valid").hide();
             $(".staff_import_success").hide();
-            $scope.initStaff();
+            $scope.initstafflist();
         }
 
         //上传文件进入预览页

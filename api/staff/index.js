@@ -447,7 +447,7 @@ staff.beforeImportExcel = function(params, callback){
 //                    var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
                 var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
                 item = staffObj;
-                if(index>0 && index<202){//不取等于0的过滤抬头标题栏
+                if(index>0 && index<201){//不取等于0的过滤抬头标题栏
                     if(utils.trim(staffObj.name) == ""){
                         staffObj.reason = "姓名为空";
                         s[6] = "姓名为空";
@@ -724,6 +724,25 @@ staff.statisticStaffsRole = function(params, callback){
                 })
         })
         .nodeify(callback);
+}
+
+/**
+ * 统计企业内的员工总数
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+staff.getStaffCountByCompany = function(params, callback){
+    var defer = Q.defer();
+    if(!params.companyId){
+        defer.reject({code: -1, msg: '企业Id不能为空'});
+        return defer.promise;
+    }
+    var companyId = params.companyId;
+    return staffModel.count({where: {companyId: companyId}})
+        .then(function(all){
+            return all || 1;
+        }).nodeify(callback);
 }
 
 /**

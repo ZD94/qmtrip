@@ -1,0 +1,1 @@
+UPDATE travelpolicy.travel_policy set train_level='二等座,硬卧', hotel_price=null, hotel_level='三星级,舒适型' where id='dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a';
