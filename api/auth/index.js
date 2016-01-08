@@ -498,11 +498,20 @@ authServer.updataAccount = function(id, data, callback){
     var options = {};
     options.where = {id: id};
     options.returning = true;
-    return Models.Account.update(data, options)
-        .spread(function(rownum, rows){
-            if(!rownum)
-                throw L.ERR.NOT_FOUND;
-            return rows[0];
+    return Models.Account.findOne(options)
+        .then(function(oldAcc){
+            return Models.Account.update(data, options)
+                .spread(function(rownum, rows){
+                    if(!rownum)
+                        throw L.ERR.NOT_FOUND;
+                    if(oldAcc.email != rows[0].email){
+                        return authServer.sendResetPwdEmail({email: rows[0].email, type: 1, isFirstSet: true})
+                            .then(function() {
+                                return rows[0];
+                            })
+                    }
+                    return rows[0];
+                })
         })
         .nodeify(callback);
 }

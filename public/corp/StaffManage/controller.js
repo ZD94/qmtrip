@@ -48,6 +48,7 @@ var staff = (function(){
                                             .spread(function(travelLevel, acc){
                                                 $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
 //                                                $staff.accStatus = acc.status==0?'未激活':(acc.status == -1?'禁用': '已激活');//账户激活状态
+                                                $staff.activeStatus = acc.status;
                                                 $staff.accStatus = acc.status==0?'未激活':'';
                                                 $scope.$apply();
                                             })
@@ -107,6 +108,7 @@ var staff = (function(){
                                             .spread(function(travelLevel, acc){
                                                 $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
 //                                                $staff.accStatus = acc.status==0?'未激活':(acc.status == -1?'禁用': '已激活');//账户激活状态
+                                                $staff.activeStatus = acc.status;
                                                 $staff.accStatus = acc.status==0?'未激活':'';
                                                 $scope.$apply();
                                             })
