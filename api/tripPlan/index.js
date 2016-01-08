@@ -38,6 +38,7 @@ tripPlan.savePlanOrder = function(params){
             var orderId = uuid.v1();
             _planOrder.id = orderId;
             _planOrder.orderNo = orderNo;
+            _planOrder.createAt = utils.now();
             var userId = params.accountId;
             var execArr = new Array();
             return sequelize.transaction(function(t){
@@ -422,7 +423,6 @@ tripPlan.approveInvoice = function(params){
                                     order_updates.status = 1;
                                 }
                                 var fields = getColsFromParams(order_updates);
-                                console.info(order_updates);
                                 return PlanOrder.update(order_updates, {where: {id: order.id}, fields: fields, transaction: t})
                                     .then(function(){
                                         return ret;
@@ -443,11 +443,69 @@ tripPlan.approveInvoice = function(params){
  * @param params
  * @param callback
  */
-tripPlan.countTripPlanNum = function(params, callback){
+tripPlan.countTripPlanNum = function(params){
     var query = checkAndGetParams(['companyId'], ['accountId', 'status'], params);
     query.status = {$ne: -2};
-    return PlanOrder.count({where: query})
-        .nodeify(callback);
+    return PlanOrder.count({where: query});
+}
+
+/**
+ * 统计计划单的动态预算/计划金额和实际支出
+ * @param params
+ */
+tripPlan.statPlanOrderMoney = function(params){
+    var query = checkAndGetParams(['companyId'], [], params);
+    var createAt = {};
+    if(params.startTime){
+        createAt.$gte = params.startTime;
+    }
+    if(params.endTime){
+        createAt.$lte = params.endTime;
+    }
+    return PlanOrder.findAll({where: query, attributes: ['id']})
+        .then(function(orders){
+            return orders.map(function(order){
+                return order.id;
+            })
+        })
+        .then(function(idList){
+            var q1 = {
+                orderId: {$in: idList},
+                status: {$ne: -2}
+            }
+            var q2 = {
+                orderId: {$in: idList},
+                status: 1
+            }
+            if(!isObjNull(createAt)){
+                q1.createAt = createAt;
+                q2.createAt = createAt;
+            }
+            return Q.all([
+                ConsumeDetails.sum('budget', {where: q1}),
+                ConsumeDetails.sum('budget', {where: q2}),
+                ConsumeDetails.sum('expenditure', {where: q2})
+            ])
+        })
+        .spread(function(n1, n2, n3){
+            return {
+                qmBudget: n1 || 0,
+                planMoney: n2 || 0,
+                expenditure: n3 || 0
+            }
+        })
+}
+
+/**
+ * 判断JSON对象是否为空
+ * @param obj
+ * @returns {boolean}
+ */
+function isObjNull(obj){
+    for (var s in obj){
+        return false;
+    }
+    return true;
 }
 
 module.exports = tripPlan;

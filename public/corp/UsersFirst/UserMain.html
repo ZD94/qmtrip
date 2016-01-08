@@ -17,6 +17,11 @@
 	<div class="corp_chart">
 		<h3>{{}}结算信息</h3>
 		<div id="charts" style="width:100%;height:245px;"></div>
+		<div class="charts_legend">
+			<p>动态预算：员工当月出差记录的累计支出</p>
+			<p>计划支出：对应当月已完成出差记录的动态预算累计</p>
+			<p>实际支出：当月已完成出差记录的实际支出</p>
+		</div>
 	</div>
 	<div class="corp_staff">
 		<h3>员工信息管理<a href="#/StaffManage/StaffInfoManage">查看详细>></a></h3>
@@ -81,6 +86,7 @@
 </div>
 <script type="text/javascript">
     var myChart = window.echarts.init(document.getElementById('charts')); 
+    var c_data = [50,20,30];
     var option = {
 		    tooltip: {
 		        trigger: 'item'
@@ -139,7 +145,7 @@
 		                    color: function(params) {
 		                        // build a color map as your need.
 		                        var colorList = [
-		                          '#d61f25','#464cc3','#c19943'
+		                          '#00EACF','#FD6961','#8250FE'
 		                        ];
 		                        return colorList[params.dataIndex]
 		                    },
@@ -154,15 +160,19 @@
 		            	data: [
 		            		// [
 		            		// 	{name:"first",xAxis:'计划支出',yAxis: 20,type:"max"},
-		            		// 	{name:"second",xAxis:'实际支出',yAxis: 20,type:"max"}
+		            		// 	{name:"second",xAxis:'实际支出',yAxis: 20,type:"min"}
 		            		// ]
 		            		[
-		            			{type:'max',name:'first'},
-		            			{type:'min',name:"two"}
+		            			{name:"计划支出",xAxis:1,yAxis: 20},
+		            			{name:"实际支出",xAxis:2,yAxis: 20}
 		            		]
+		            		// [
+		            		// 	{type:'max',name:'first'},
+		            		// 	{type:'min',name:"two"}
+		            		// ]
 		            	]
 		            },
-		            data: [12,21,10]
+		            data: [15,5,10]
 		        }
 		    ]
 		};
