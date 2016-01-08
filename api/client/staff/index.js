@@ -63,6 +63,9 @@ staff.deleteStaff = auth.checkPermission(["user.delete"],
                         if(target.roleId == 0){
                             throw {msg: "企业创建人不能被删除"};
                         }
+                        if(data.roleId == target.roleId){
+                            throw {msg: "不能删除统计用户"};
+                        }
                         if(data.companyId != target.companyId){
                             throw L.ERR.PERMISSION_DENY;
                         }else{
@@ -191,13 +194,11 @@ staff.increaseStaffPoint = function(params, callback){
     params.accountId = this.accountId;//当前登录代理商id
     var user_id = this.accountId;
     var staffId = params.id;//加积分的员工id
-    console.info("staffId", staffId);
     return Q.all([
             API.staff.getStaff({id: staffId}),
             API.agency.getAgencyUser({id: this.accountId})
         ])
         .spread(function(staff, agencyUser){
-            console.info("s11111111", staff);
             if(!staff.companyId){
                 throw {msg:"该员工不存在或员工所在企业不存在"};
             }
@@ -216,33 +217,6 @@ staff.increaseStaffPoint = function(params, callback){
                     }
                 })
         }).nodeify(callback);
-
-    /*return API.staff.getStaff({id:id})
-        .then(function(result){
-            if(result && result.companyId){
-                return result.companyId;
-            }else{
-                throw {msg:"该员工不存在或员工所在企业不存在"};
-            }
-        })
-        .then(function(companyId){
-            return API.company.getCompany({companyId: companyId})
-                .then(function(company){
-                    if(company && company.agencyId){
-                        return company.agencyId;
-                    }else{
-                        throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
-                    }
-                })
-        })
-        .then(function(agencyId){
-            if(agencyId == this.accountId){
-                return API.staff.increaseStaffPoint(params);
-            }else{
-                throw {msg:"无权限"};
-            }
-        })
-        .nodeify(callback);*/
 
 };
 
@@ -280,32 +254,6 @@ staff.decreaseStaffPoint = function(params, callback){
                 })
         }).nodeify(callback);
 
-    /*return API.staff.getStaff({id:id})
-        .then(function(result){
-            if(result && result.companyId){
-                return result.companyId;
-            }else{
-                throw {msg:"该员工不存在或员工所在企业不存在"};
-            }
-        })
-        .then(function(companyId){
-            return API.company.getCompany({companyId: companyId})
-                .then(function(company){
-                    if(company && company.agencyId){
-                        return company.agencyId;
-                    }else{
-                        throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
-                    }
-                })
-        })
-        .then(function(agencyId){
-            if(agencyId == this.accountId){
-                return API.staff.decreaseStaffPoint(params);
-            }else{
-                throw {msg:"无权限"};
-            }
-        })
-        .nodeify(callback);*/
 };
 
 
@@ -379,7 +327,40 @@ staff.downloadExcle = function(params, callback){
  * @return {promise} {code: 0, msg: 'success', sta: {all: 0, inNum: 0, outNum: 0};
  */
 staff.statisticStaffs = function(params, callback){
-    return API.staff.statisticStaffs(params, callback);
+    var user_id = this.accountId;
+    return API.staff.getStaff({id: user_id})
+        .then(function(data){
+            if(data){
+                var companyId = data.companyId;
+                params.companyId = companyId;
+                return API.staff.statisticStaffs(params);
+            }else{
+                throw {msg:"无权限"};
+            }
+        })
+        .nodeify(callback);
+}
+
+/**
+ * 统计企业员工总数
+ * @param params
+ * @param {String} params.companyId
+ * @param callback
+ * @returns {*}
+ */
+staff.getStaffCountByCompany = function(params, callback){
+    var user_id = this.accountId;
+    return API.staff.getStaff({id: user_id})
+        .then(function(data){
+            if(data){
+                var companyId = data.companyId;
+                params.companyId = companyId;
+                return API.staff.getStaffCountByCompany(params);
+            }else{
+                throw {msg:"无权限"};
+            }
+        })
+        .nodeify(callback);
 }
 
 /**
@@ -391,7 +372,18 @@ staff.statisticStaffs = function(params, callback){
  * @returns {promise} {adminNum: '管理员人数', commonStaffNum: '普通员工人数', unActiveNum: '未激活人数'};
  */
 staff.statisticStaffsRole = function(params, callback){
-    return API.staff.statisticStaffsRole(params, callback);
+    var user_id = this.accountId;
+    return API.staff.getStaff({id: user_id})
+        .then(function(data){
+            if(data){
+                var companyId = data.companyId;
+                params.companyId = companyId;
+                return API.staff.statisticStaffsRole(params);
+            }else{
+                throw {msg:"无权限"};
+            }
+        })
+        .nodeify(callback);
 }
 
 module.exports = staff;

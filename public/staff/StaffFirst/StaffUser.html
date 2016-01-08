@@ -49,8 +49,8 @@
 			<p>飞机：{{travelpolicy.planeLevel}}最高{{travelpolicy.planeDiscount}}折<br/>
 				<span ng-if="travelpolicy.isChangeLevel == true">当高级舱位价格低于上述标准时，可选择高级舱位</span>
 			</p>
-			<p>火车：{{travelpolicy.trainLevel}}</p>
-			<p>住宿：{{travelpolicy.hotelLevel}}</p>
+			<p>火车：{{travelpolicy.trainLevel.replace(',', '/')}}</p>
+			<p>住宿：{{travelpolicy.hotelLevel.replace(',', '/')}}</p>
 		</div>
 		<!-- <div ng-if="staff.travelLevel == null">
 			<div class="travelnull">
