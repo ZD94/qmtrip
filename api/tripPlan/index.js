@@ -401,17 +401,34 @@ tripPlan.approveInvoice = function(params){
                             return ret;
                         }
                         if(!params.expenditure)
-                            throw {code: -4, msg: '支出金额不能为空'}
-                        var expenditure = (parseFloat(params.expenditure) + parseFloat(order.expenditure)).toFixed(2);
+                            throw {code: -4, msg: '支出金额不能为空'};
+                        var ex_expenditure = order.expenditure || 0;
+                        var expenditure = (parseFloat(params.expenditure) + parseFloat(ex_expenditure)).toFixed(2);
                         var order_updates = {
                             expenditure: expenditure,
                             updateAt: utils.now()
                         }
-                        var fields = getColsFromParams(order_updates);
-                        return PlanOrder.update(order_updates, {where: {id: order.id}, fields: fields, transaction: t})
-                        .then(function(){
-                                return ret;
+                        return ConsumeDetails.findAll({where: {orderId: ret.orderId, status: {$ne: -2}}, attributes: ['status']})
+                            .then(function(list){
+                                for(var i=0; i<list.length; i++){
+                                    if(list[i].status != 1){
+                                        return false;
+                                    }
+                                }
+                                return true;
                             })
+                            .then(function(isAllAudit){
+                                if(isAllAudit){
+                                    order_updates.status = 1;
+                                }
+                                var fields = getColsFromParams(order_updates);
+                                console.info(order_updates);
+                                return PlanOrder.update(order_updates, {where: {id: order.id}, fields: fields, transaction: t})
+                                    .then(function(){
+                                        return ret;
+                                    })
+                            })
+
                     })
             });
         })
