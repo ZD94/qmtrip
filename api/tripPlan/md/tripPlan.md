@@ -210,9 +210,8 @@
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
 | params                                | 参数             |json              |------
-| params.userId                         |用户id            |uuid                 |必填
-| params.consumeId                         |消费单id            |uuid                 |必填
-| params.picture                         |上传票据图片MD5key            |string                |必填
+| params.startTime                         |统计开始时间段            |date                 |必填
+| params.endTime                         |统计结束时间段            |date                 |必填
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |
