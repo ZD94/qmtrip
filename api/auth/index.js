@@ -152,7 +152,6 @@ authServer.sendResetPwdEmail = function(params, callback) {
  * @return {Promise} true|error
  */
 authServer.resetPwdByEmail = function(params, callback) {
-    console.info(params)
     var accountId = params.accountId;
     var sign = params.sign;
     var timestamp = params.timestamp;
@@ -183,7 +182,7 @@ authServer.resetPwdByEmail = function(params, callback) {
             if (_sign.toLowerCase() == sign.toLowerCase()) {
                 pwd = utils.md5(pwd);
                 //如果从来没有设置过密码,将账号类型设为激活
-                var status = ACCOUNT_STATUS.NOT_ACTIVE;
+                var status = account.status;
                 if (account.status == ACCOUNT_STATUS.NOT_ACTIVE && !account.pwd) {
                     status = ACCOUNT_STATUS.ACTIVE;
                 }
