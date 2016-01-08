@@ -249,15 +249,44 @@ describe("api/client/tripPlan.js", function() {
             })
         });
 
-        //describe('consume details options', function(){
-        //    before(function(done){
-        //        API.tripPlan.saveConsumeRecord({}, function(err, ret){
-        //            if(err){ throw err; }
-        //            assert.equal(ret.status, 0);
-        //            done();
-        //        })
-        //    })
-        //})
+        describe('options based on consume details created', function(){
+            before(function(done){
+                Q.all([
+                    API.tripPlan.saveConsumeRecord({orderId: newOrderId, accountId: staffId, type: 0, startTime: '2016-01-11 11:22:22', invoiceType: 2, budget: 150}),
+                    API.tripPlan.saveConsumeRecord({orderId: newOrderId, accountId: staffId, type: 1, startTime: '2016-01-12 11:33:44', invoiceType: 2, budget: 300})
+                ])
+                    .spread(function(ret1, ret2){
+                        assert.equal(ret1.type, 0);
+                        assert.equal(ret2.type, 1);
+                        return API.tripPlan.uploadInvoice({userId: staffId, consumeId: ret1.id, picture: '测试图片'})
+                            .then(function(t){
+                                assert(t.newInvoice != null);
+                                return  API.client.agencyTripPlan.approveInvoice.call({accountId: agencyUserId}, {consumeId: ret1.id, status: 1, expenditure: '521', remark: '审核票据测试'})
+                                    .then(function(r){
+                                        assert.equal(r.status, 1);
+                                        done()
+                                    })
+                            })
+                    })
+                    .catch(function(err){
+                        throw err;
+                    })
+            });
+
+            it("#statPlanOrderMoneyByCompany should be ok", function (done) {
+                var self = {accountId: staffId};
+                API.client.tripPlan.statPlanOrderMoneyByCompany.call(self, {startTime: '2016-01-01 00:00:00'}, function (err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+                    assert(ret != null);
+                    assert(ret.qmBudget >= 0);
+                    assert(ret.planMoney >= 0);
+                    assert(ret.expenditure >= 0);
+                    done();
+                })
+            });
+        })
 
     })
 

@@ -23,11 +23,17 @@
                 </dl>
                 <dl>
                     <dt>实际支出</dt>
-                    <dd>无</dd>
+                    <dd>
+                        <span ng-if="!planDetail.expenditure">无</span>
+                        <span ng-if="planDetail.expenditure">¥{{planDetail.expenditure.toFixed(2)}}</span>
+                    </dd>
                 </dl>
                 <dl>
                     <dt>为公司节省</dt>
-                    <dd>无</dd>
+                    <dd>
+                        <span ng-if="!planDetail.expenditure">无</span>
+                        <span ng-if="planDetail.expenditure">¥{{(planDetail.budget-planDetail.expenditure).toFixed(2)}}</span>
+                    </dd>
                 </dl>
                 <dl>
                     <dt>获得积分</dt>
@@ -51,8 +57,15 @@
                             <div class="endplace">{{outTraffic.arrivalPlace}}</div>
                         </td>
                         <td width="135" align="center">¥{{outTraffic.budget}}</td>
-                        <td width="135" align="center">无</td>
                         <td width="135" align="center">
+                            <span ng-if="outTraffic.expenditure">¥{{outTraffic.expenditure.toFixed(2)}}</span>
+                            <span ng-if="!outTraffic.expenditure">无</span>
+                        </td>
+                        <td width="135" align="center">
+                            <p ng-if="outTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
+                            <p ng-if="outTraffic.status==0" style="color: #DE492A;">【待审核】</p>
+                            <p ng-if="outTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
+                            <p><a>去程交通票据</a></p>
                         </td>
                     </tr>
                     <tr ng-if="planDetail.hotel.length!=0">
@@ -64,9 +77,15 @@
                             </div>
                         </td>
                         <td width="135" align="center">¥{{hotel.budget}}</td>
-                        <td width="135" align="center">无</td>
                         <td width="135" align="center">
-
+                            <span ng-if="hotel.expenditure">¥{{hotel.expenditure.toFixed(2)}}</span>
+                            <span ng-if="!hotel.expenditure">无</span>
+                        </td>
+                        <td width="135" align="center">
+                            <p ng-if="hotel.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
+                            <p ng-if="hotel.status==0" style="color: #DE492A;">【待审核】</p>
+                            <p ng-if="hotel.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
+                            <p><a>酒店发票</a></p>
                         </td>
                     </tr>
                     <tr ng-if="planDetail.backTraffic.length!=0">
@@ -77,13 +96,150 @@
                             <div class="endplace">{{backTraffic.startPlace}}</div>
                         </td>
                         <td width="135" align="center">¥{{backTraffic.budget}}</td>
-                        <td width="135" align="center">无</td>
                         <td width="135" align="center">
-
+                            <span ng-if="outTraffic.expenditure">¥{{outTraffic.expenditure.toFixed(2)}}</span>
+                            <span ng-if="!outTraffic.expenditure">无</span>
+                        </td>
+                        <td width="135" align="center">
+                            <p ng-if="backTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
+                            <p ng-if="backTraffic.status==0" style="color: #DE492A;">【待审核】</p>
+                            <p ng-if="backTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
+                            <p><a>回程交通票据</a></p>
                         </td>
                     </tr>
                 </table>
             </div>
         </div>
+        <dl class="invoice" ng-if="outTraffic.newInvoice">
+            <dt>去程交通发票
+                <span ng-if="outTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</span>
+                <span ng-if="outTraffic.status==0" style="color: #DE492A;">【待审核】</span>
+                <span ng-if="outTraffic.status==1" style="color: #9B9B9B;">【审核通过】</span>
+            </dt>
+            <dd>
+                <table width="100%">
+                    <tr style="border-bottom: 1px #E5E5E5 solid">
+                        <td>
+                            <p>{{outTraffic.invoice[outTraffic.invoice.length-1].create_at}}&nbsp;&nbsp;上传</p>
+                            <p>{{outTraffic.invoice[outTraffic.invoice.length-1].approve_at}}&nbsp;&nbsp;<span ng-if="outTraffic.status=='-1'">审核未通过&nbsp;&nbsp;&nbsp;&nbsp;理由：{{outTraffic.auditRemark}}</span><span ng-if="outTraffic.status==1">审核通过</span></p>
+                        </td>
+                        <td>
+                            <div ng-if="outTraffic.status==0">
+                                <input type="button" class="common_btn1" value="审核未通过" ng-click="invoiceNopassShow('outTraffic')" style="float: right;">
+                                <input type="button" class="common_btn1" value="审核通过" ng-click="invoicePassShow('outTraffic')" style="margin-right: 20px; float: right;">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" colspan="2"><img src="/upload/get-img-file/{{outTraffic.newInvoice}}" alt=""></td>
+                    </tr>
+                </table>
+            </dd>
+        </dl>
+        <dl class="invoice" ng-if="hotel.newInvoice">
+            <dt>酒店发票
+                <span ng-if="hotel.status=='-1'" style="color: #9B9B9B;">【审核未通过】</span>
+                <span ng-if="hotel.status==0" style="color: #DE492A;">【待审核】</span>
+                <span ng-if="hotel.status==1" style="color: #9B9B9B;">【审核通过】</span>
+            </dt>
+            <dd>
+                <table width="100%">
+                    <tr style="border-bottom: 1px #E5E5E5 solid">
+                        <td>
+                            <p>{{hotel.invoice[hotel.invoice.length-1].create_at}}&nbsp;&nbsp;上传</p>
+                            <p>{{hotel.invoice[hotel.invoice.length-1].approve_at}}&nbsp;&nbsp;<span ng-if="hotel.status=='-1'">审核未通过&nbsp;&nbsp;&nbsp;&nbsp;理由：{{hotel.auditRemark}}</span><span ng-if="hotel.status==1">审核通过</span></p>
+                        </td>
+                        <td>
+                            <div ng-if="hotel.status==0">
+                                <input type="button" class="common_btn1" value="审核未通过" ng-click="invoiceNopassShow('hotel')" style="float: right;">
+                                <input type="button" class="common_btn1" value="审核通过" ng-click="invoicePassShow('hotel')" style="margin-right: 20px; float: right;">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" colspan="2"><img src="/upload/get-img-file/{{hotel.newInvoice}}" alt=""></td>
+                    </tr>
+                </table>
+            </dd>
+        </dl>
+        <dl class="invoice" ng-if="backTraffic.newInvoice">
+            <dt>回程交通发票
+                <span ng-if="backTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</span>
+                <span ng-if="backTraffic.status==0" style="color: #DE492A;">【待审核】</span>
+                <span ng-if="backTraffic.status==1" style="color: #9B9B9B;">【审核通过】</span>
+            </dt>
+            <dd>
+                <table width="100%">
+                    <tr style="border-bottom: 1px #E5E5E5 solid">
+                        <td>
+                            <p>{{backTraffic.invoice[backTraffic.invoice.length-1].create_at}}&nbsp;&nbsp;上传</p>
+                            <p>{{backTraffic.invoice[backTraffic.invoice.length-1].approve_at}}&nbsp;&nbsp;<span ng-if="backTraffic.status=='-1'">审核未通过&nbsp;&nbsp;&nbsp;&nbsp;理由：{{backTraffic.auditRemark}}</span><span ng-if="backTraffic.status==1">审核通过</span></p>
+                        </td>
+                        <td>
+                            <div ng-if="backTraffic.status==0">
+                                <input type="button" class="common_btn1" value="审核未通过" ng-click="invoiceNopassShow('backTraffic')" style="float: right;">
+                                <input type="button" class="common_btn1" value="审核通过" ng-click="invoicePassShow('backTraffic')" style="margin-right: 20px; float: right;">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" colspan="2"><img src="/upload/get-img-file/{{backTraffic.newInvoice}}" alt=""></td>
+                    </tr>
+                </table>
+            </dd>
+        </dl>
     </div>
 </div>
+
+
+<section class="invoicePass">
+    <div class="invoicebox">
+        <div class="invoicebox_t">
+            <span style="float: left;">审核通过提示</span>
+            <span ng-click="invoiceColse()" style="float: right;"><img src="agency/images/close.jpg"></span>
+        </div>
+        <div class="invoicebox_p">
+            <div class="error" style="height: 25px; line-height: 25px; color: #DE492A;"></div>
+            <div style="height: 30px; line-height: 30px;">录入票据实际支出：</div>
+            <div><input type="text" class="expenditure common_text" style="width: 336px;"></div>
+            <div style="margin-top: 20px;">
+                <input type="button" value="发送" ng-click="invoicePass()" class="common_btn1" style="width: 60px; margin-left: 100px;">
+                <input type="button" value="取消" ng-click="invoiceColse()" class="common_btn2" style="width: 60px; margin-left: 20px;">
+            </div>
+
+            <div class="success">
+                <div class="success_icon">
+                    <span class="web-icon-font2">&#xe9ec;</span>
+                </div>
+                <div class="success_text"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<section class="invoiceNoPass">
+    <div class="invoicebox">
+        <div class="invoicebox_t">
+            <span style="float: left;">审核未通过提示</span>
+            <span ng-click="invoiceColse()" style="float: right;"><img src="agency/images/close.jpg"></span>
+        </div>
+        <div class="invoicebox_p">
+            <div class="error" style="height: 25px; line-height: 25px; color: #DE492A;"></div>
+            <div style="height: 30px; line-height: 30px;">请填写理由：</div>
+            <div><input type="text" class="remark common_text" style="width: 336px;"></div>
+            <div style="margin-top: 20px;">
+                <input type="button" value="发送" ng-click="invoiceNoPass()" class="common_btn1" style="width: 60px; margin-left: 100px;">
+                <input type="button" value="取消" ng-click="invoiceColse()" class="common_btn2" style="width: 60px; margin-left: 20px;">
+            </div>
+
+            <div class="success">
+                <div class="success_icon">
+                    <span class="web-icon-font2">&#xe9ec;</span>
+                </div>
+                <div class="success_text"></div>
+            </div>
+        </div>
+    </div>
+</section>

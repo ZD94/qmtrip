@@ -61,6 +61,7 @@
     "del": "^2.2.0",
     "glob": "^6.0.1",
     "gulp": "^3.9.0",
+    "gulp-eslint": "^1.1.1",
     "gulp-filter": "^3.0.1",
     "gulp-gzip": "^1.2.0",
     "gulp-less-sourcemap": "^1.4.2",

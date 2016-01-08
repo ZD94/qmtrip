@@ -16,13 +16,13 @@ var tripPlan = {};
  * @param callback
  * @returns {*}
  */
-tripPlan.savePlanOrder = function(params){
+tripPlan.savePlanOrder = function (params) {
     var self = this;
     var accountId = self.accountId;
     params.accountId = accountId;
     params.type = params.type | 2;
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
-        .then(function(staff){
+        .then(function (staff) {
             params.companyId = staff.companyId;
             return API.tripPlan.savePlanOrder(params);
         })
@@ -34,7 +34,7 @@ tripPlan.savePlanOrder = function(params){
  * @param callback
  * @returns {*}
  */
-tripPlan.saveConsumeDetail = function(params){
+tripPlan.saveConsumeDetail = function (params) {
     var self = this;
     params.accountId = self.accountId;
     return API.tripPlan.saveConsumeRecord(params);
@@ -45,7 +45,7 @@ tripPlan.saveConsumeDetail = function(params){
  * @param orderId
  * @param callback
  */
-tripPlan.getTripPlanOrderById = function(orderId){
+tripPlan.getTripPlanOrderById = function (orderId) {
     var self = this;
     var accountId = self.accountId;
     var params = {
@@ -56,8 +56,8 @@ tripPlan.getTripPlanOrderById = function(orderId){
         API.tripPlan.getTripPlanOrder(params),
         API.staff.getStaff({id: accountId, columns: ['companyId']})
     ])
-        .spread(function(order, staff){
-            if(order.companyId != staff.companyId){
+        .spread(function (order, staff) {
+            if (order.companyId != staff.companyId) {
                 throw L.ERR.PERMISSION_DENY;
             }
             return order;
@@ -69,25 +69,25 @@ tripPlan.getTripPlanOrderById = function(orderId){
  * @param callback
  * @returns {*}
  */
-tripPlan.pageCompleteTripPlanOrder = function(params){
-    if(typeof params == 'function'){
+tripPlan.pageCompleteTripPlanOrder = function (params) {
+    if (typeof params == 'function') {
         throw {code: -2, msg: '参数不正确'};
     }
     var self = this;
     var accountId = self.accountId;
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
-        .then(function(staff){
+        .then(function (staff) {
             return staff.companyId;
         })
-        .then(function(companyId){
+        .then(function (companyId) {
             params.accountId = self.accountId;
             params.companyId = companyId;
             params.auditStatus = 1; //已完成计划单
             var query = checkAndGetParams(['companyId'], ['accountId', 'status', 'auditStatus'], params);
             var page = params.page;
             var perPage = params.perPage;
-            typeof page== 'number'?"":page=1;
-            typeof perPage == 'number'?"":perPage=10;
+            typeof page == 'number' ? "" : page = 1;
+            typeof perPage == 'number' ? "" : perPage = 10;
             var options = {
                 where: query,
                 limit: perPage,
@@ -103,39 +103,44 @@ tripPlan.pageCompleteTripPlanOrder = function(params){
  * @param callback
  * @returns {*}
  */
-tripPlan.pageTripPlanOrder = function(params){
-    if(typeof params == 'function'){
+tripPlan.pageTripPlanOrder = function (params) {
+    if (typeof params == 'function') {
         throw {code: -2, msg: '参数不正确'};
     }
     var self = this;
     var accountId = self.accountId;
 
-    (params.isUpload === true)?params.status={$gt: 0}:params.status={$gte: -1}; //查询条件为是否上传票据，设定查询参数status
-    if(params.audit){ //判断计划单的审核状态，设定auditStatus参数
+    params.status = {$gte: -1};
+    if (params.isUpload === true) {
+        params.status = {$gt: 0}
+    } else if (params.isUpload === false) {
+        params.status = {$in: [-1, 0]};
+    }
+    if (params.audit) { //判断计划单的审核状态，设定auditStatus参数
         var audit = params.audit;
         params.status = 1;
-        if(audit == 'Y'){
+        if (audit == 'Y') {
             params.auditStatus = 1;
-        }else if(audit == "P"){
+        } else if (audit == "P") {
             params.auditStatus = 0;
-        }else if(audit == 'N'){
+        } else if (audit == 'N') {
             params.status = 0; //待上传状态
             params.auditStatus = -1;
         }
     }
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
-        .then(function(staff){
+        .then(function (staff) {
             return staff.companyId;
         })
-        .then(function(companyId){
+        .then(function (companyId) {
             params.accountId = self.accountId;
             params.companyId = companyId;
             var query = checkAndGetParams(['companyId'],
                 ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure'], params);
             var page = params.page;
             var perPage = params.perPage;
-            typeof page== 'number'?"":page=1;
-            typeof perPage == 'number'?"":perPage=10;
+            typeof page == 'number' ? "" : page = 1;
+            typeof perPage == 'number' ? "" : perPage = 10;
             var options = {
                 where: query,
                 limit: perPage,
@@ -151,38 +156,38 @@ tripPlan.pageTripPlanOrder = function(params){
  * @param callback
  * @returns {*}
  */
-tripPlan.pageTripPlanOrderByCompany = function(params){
-    if(typeof params == 'function'){
+tripPlan.pageTripPlanOrderByCompany = function (params) {
+    if (typeof params == 'function') {
         throw {code: -2, msg: '参数不正确'};
     }
     var self = this;
     var accountId = self.accountId;
 
-    (params.isUpload === true)?params.status={$gt: 0}:params.status=0; //查询条件为是否上传票据，设定查询参数status
-    if(params.audit){ //判断计划单的审核状态，设定auditStatus参数
+    (params.isUpload === true) ? params.status = {$gt: 0} : params.status = 0; //查询条件为是否上传票据，设定查询参数status
+    if (params.audit) { //判断计划单的审核状态，设定auditStatus参数
         var audit = params.audit;
         params.status = 1;
-        if(audit == 'Y'){
+        if (audit == 'Y') {
             params.auditStatus = 1;
-        }else if(audit == "P"){
+        } else if (audit == "P") {
             params.auditStatus = 0;
-        }else if(audit == 'N'){
+        } else if (audit == 'N') {
             params.status = 0; //待上传状态
             params.auditStatus = -1;
         }
     }
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
-        .then(function(staff){
+        .then(function (staff) {
             return staff.companyId;
         })
-        .then(function(companyId){
+        .then(function (companyId) {
             params.companyId = companyId;
             var query = checkAndGetParams(['companyId'],
                 ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure'], params);
             var page = params.page;
             var perPage = params.perPage;
-            typeof page== 'number'?"":page=1;
-            typeof perPage == 'number'?"":perPage=10;
+            typeof page == 'number' ? "" : page = 1;
+            typeof perPage == 'number' ? "" : perPage = 10;
             var options = {
                 where: query,
                 limit: perPage,
@@ -198,23 +203,26 @@ tripPlan.pageTripPlanOrderByCompany = function(params){
  * @param callback
  * @returns {*}
  */
-tripPlan.listTripPlanOrderByCompany = function(params, callback){
-    if(typeof params == "function"){
+tripPlan.listTripPlanOrderByCompany = function (params, callback) {
+    if (typeof params == "function") {
         callback = params;
         params = {}
     }
-    if(!params){ params = {}};
+    if (!params) {
+        params = {}
+    }
+    ;
     var self = this;
     var accountId = self.accountId;
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
-    .then(function(staff){
+        .then(function (staff) {
             return staff.companyId;
         })
-    .then(function(companyId){
+        .then(function (companyId) {
             params.companyId = companyId;
             return API.tripPlan.listTripPlanOrder(params);
         })
-    .nodeify(callback);
+        .nodeify(callback);
 }
 
 /**
@@ -223,7 +231,7 @@ tripPlan.listTripPlanOrderByCompany = function(params, callback){
  * @param callback
  * @returns {*}
  */
-tripPlan.deleteTripPlanOrder = function(orderId, callback){
+tripPlan.deleteTripPlanOrder = function (orderId, callback) {
     var self = this;
     var params = {
         orderId: orderId,
@@ -238,7 +246,7 @@ tripPlan.deleteTripPlanOrder = function(orderId, callback){
  * @param callback
  * @returns {*}
  */
-tripPlan.deleteConsumeDetail = function(id, callback){
+tripPlan.deleteConsumeDetail = function (id, callback) {
     var params = {
         id: id,
         userId: this.accountId
@@ -255,7 +263,7 @@ tripPlan.deleteConsumeDetail = function(id, callback){
  * @param callback
  * @returns {*}
  */
-tripPlan.uploadInvoice = function(params, callback){
+tripPlan.uploadInvoice = function (params, callback) {
     params.userId = this.accountId;
     return API.tripPlan.uploadInvoice(params, callback);
 }
@@ -266,16 +274,30 @@ tripPlan.uploadInvoice = function(params, callback){
  * @param callback
  * @returns {*}
  */
-tripPlan.countTripPlanNum = function(params, callback){
+tripPlan.countTripPlanNum = function (params, callback) {
     var self = this;
     var accountId = self.accountId;
     return API.staff.getStaff({id: accountId})
-        .then(function(staff){
+        .then(function (staff) {
             var companyId = staff.companyId;
             params.companyId = companyId;
             return API.tripPlan.countTripPlanNum(params);
         })
-    .nodeify(callback);
+        .nodeify(callback);
+}
+
+/**
+ * 统计计划单的动态预算/计划金额和实际支出
+ * @param params
+ */
+tripPlan.statPlanOrderMoneyByCompany = function (params) {
+    var self = this;
+    var params = checkAndGetParams([], ['startTime', 'endTime'], params);
+    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
+        .then(function (staff) {
+            params.companyId = staff.companyId;
+            return API.tripPlan.statPlanOrderMoney(params);
+        })
 }
 
 
