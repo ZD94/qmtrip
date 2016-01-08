@@ -402,7 +402,8 @@ tripPlan.approveInvoice = function(params){
                         }
                         if(!params.expenditure)
                             throw {code: -4, msg: '支出金额不能为空'};
-                        var expenditure = (parseFloat(params.expenditure) + parseFloat(order.expenditure)).toFixed(2);
+                        var ex_expenditure = order.expenditure || 0;
+                        var expenditure = (parseFloat(params.expenditure) + parseFloat(ex_expenditure)).toFixed(2);
                         var order_updates = {
                             expenditure: expenditure,
                             updateAt: utils.now()
@@ -421,6 +422,7 @@ tripPlan.approveInvoice = function(params){
                                     order_updates.status = 1;
                                 }
                                 var fields = getColsFromParams(order_updates);
+                                console.info(order_updates);
                                 return PlanOrder.update(order_updates, {where: {id: order.id}, fields: fields, transaction: t})
                                     .then(function(){
                                         return ret;
