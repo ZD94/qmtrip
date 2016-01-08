@@ -13,9 +13,14 @@ global.Promise = require('bluebird');
 Promise.promisifyAll(require("redis"));
 Promise.promisifyAll(require("fs"));
 
-var path = require('path');
-
 var config = require("./config");
+
+Promise.config({ warnings: false });
+if(config.debug) {
+    Promise.config({ longStackTraces: true });
+}
+
+var path = require('path');
 
 var Logger = require('common/logger');
 Logger.init(config.logger);
