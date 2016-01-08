@@ -16,7 +16,6 @@ var getColsFromParams = utils.getColsFromParams;
 var checkAndGetParams = utils.checkAndGetParams;
 var API = require("common/api");
 var Paginate = require("common/paginate").Paginate;
-var errorHandle = require("common/errorHandle");
 var md5 = require("common/utils").md5;
 
 var agency = {};
@@ -130,18 +129,15 @@ agency.getAgency = function(params){
 /**
  * 获取代理商列表
  * @param params
- * @param callback
  * @returns {*}
  */
-agency.listAgency = function(params, callback){
+agency.listAgency = function(params){
     if(!params.userId){
         throw {code: -1, msg: '参数userId不能为空'};
     }
     var userId = params.userId;
     delete params.userId;
-    return Agency.findAll({where: params})
-        .catch(errorHandle)
-        .nodeify(callback);
+    return Agency.findAll({where: params});
 }
 
 /**
@@ -283,9 +279,8 @@ agency.getAgencyUser = function(params){
  * 分页查询代理商集合
  * @param params 查询条件 params.company_id 企业id
  * @param options options.perPage 每页条数 options.page当前页
- * @param callback
  */
-agency.listAndPaginateAgencyUser = function(params, callback){
+agency.listAndPaginateAgencyUser = function(params){
     var options = {};
     if(params.options){
         options = params.options;
@@ -313,9 +308,7 @@ agency.listAndPaginateAgencyUser = function(params, callback){
     return AgencyUser.findAndCountAll(options)
         .then(function(result){
             return new Paginate(page, perPage, result.count, result.rows);
-        })
-        .catch(errorHandle)
-        .nodeify(callback);
+        });
 }
 
 

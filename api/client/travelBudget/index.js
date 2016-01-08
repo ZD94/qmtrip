@@ -225,17 +225,16 @@ travelBudget.getTrafficBudget = function(params, callback) {
                 throw {code: -1, msg: "往返预算,返程日期不能为空"};
             }
 
-            var getTrafficBudget = Q.denodeify(API.travelbudget.getTrafficBudget);
             if (params.isRoundTrip) {
                 return Q.all([
-                    getTrafficBudget({
+                    API.travelbudget.getTrafficBudget({
                         originPlace: params.originPlace,
                         destinationPlace: params.destinationPlace,
                         outboundDate: params.outboundDate,
                         inboundDate: params.inboundDate,
                         outLatestArriveTime: params.outLatestArriveTime
                     }),
-                    getTrafficBudget({
+                    API.travelbudget.getTrafficBudget({
                         originPlace: params.destinationPlace,
                         destinationPlace: params.originPlace,
                         outboundDate: params.inboundDate,
@@ -243,17 +242,16 @@ travelBudget.getTrafficBudget = function(params, callback) {
                     })
                 ])
                     .spread(function(goTraffic, backTraffic) {
-
                         var result = {
-                            goTraffic: goTraffic.price,
-                            backTraffic: backTraffic.price,
-                            traffic: Number(goTraffic.price) + Number(backTraffic.price),
-                            price: Number(goTraffic.price) + Number(backTraffic.price)
+                            goTraffic: goTraffic.price || 0,
+                            backTraffic: backTraffic.price || 0,
+                            traffic: Number(goTraffic.price) + Number(backTraffic.price) || 0,
+                            price: Number(goTraffic.price) + Number(backTraffic.price) || 0
                         };
                         return result;
                     })
             } else {
-                return getTrafficBudget({
+                return API.travelbudget.getTrafficBudget({
                     originPlace: params.originPlace,
                     destinationPlace: params.destinationPlace,
                     outboundDate: params.outboundDate,
@@ -262,10 +260,10 @@ travelBudget.getTrafficBudget = function(params, callback) {
                 })
                 .then(function(traffic) {
                     var result = {
-                        goTraffic: traffic.price,
+                        goTraffic: traffic.price || 0,
                         backTraffic: 0,
-                        traffic: traffic.price,
-                        price: traffic.price
+                        traffic: traffic.price || 0,
+                        price: traffic.price || 0
                     }
                     return result;
                 })

@@ -22,6 +22,9 @@
 			<p>计划支出：对应当月已完成出差记录的动态预算累计</p>
 			<p>实际支出：当月已完成出差记录的实际支出</p>
 		</div>
+		<div class="charts_diff">
+			<p>{{different}}</p>
+		</div>
 	</div>
 	<div class="corp_staff">
 		<h3>员工信息管理<a href="#/StaffManage/StaffInfoManage">查看详细>></a></h3>
@@ -84,99 +87,3 @@
 		</div>
 	</div>
 </div>
-<script type="text/javascript">
-    var myChart = window.echarts.init(document.getElementById('charts')); 
-    var c_data = [50,20,30];
-    var option = {
-		    tooltip: {
-		        trigger: 'item'
-		    },
-		    toolbox: {
-		        show: false,							//工具箱
-		        feature: {
-		            dataView: {show: true, readOnly: false},
-		            restore: {show: true},
-		            saveAsImage: {show: true}
-		        }
-		    },
-		    calculable: false,							//禁止拖拽
-		    grid: {
-		        borderWidth: 0,
-		        borderColor:'#fff',
-		        x:0,
-		        y: 80,
-		        y2: 30
-		    },
-		    xAxis: [
-		        {
-		            type: 'category',
-		            show: true,							//x轴是否显示
-		            axisLine : {						//轴线
-		            	lineStyle:{
-		            		color:'#ededed',
-		            		type:'solid',
-		            		width:4
-		            	}
-		            },
-		            axisTick:{							//轴标记
-		            	show:false
-		            },
-		            axisLabel:{	
-		            	textStyle:{
-		            		fontSize:14
-		            	}
-		            },
-		            splitLine: {show:false},			//分隔线
-		            boundaryGap: true,
-		            data: ['动态预算', '计划支出', '实际支出']
-		        }
-		    ],
-		    yAxis: [
-		        {
-		            type: 'value',
-		            show: false
-		        }
-		    ],
-		    series: [
-		        {
-		            type: 'bar',
-		            itemStyle: {
-		                normal: {
-		                    color: function(params) {
-		                        // build a color map as your need.
-		                        var colorList = [
-		                          '#00EACF','#FD6961','#8250FE'
-		                        ];
-		                        return colorList[params.dataIndex]
-		                    },
-		                    label: {
-		                        show: true,
-		                        position: 'top',
-		                        formatter: '￥{c}'
-		                    }
-		                }
-		            },
-		            markLine:{
-		            	data: [
-		            		// [
-		            		// 	{name:"first",xAxis:'计划支出',yAxis: 20,type:"max"},
-		            		// 	{name:"second",xAxis:'实际支出',yAxis: 20,type:"min"}
-		            		// ]
-		            		[
-		            			{name:"计划支出",xAxis:1,yAxis: 20},
-		            			{name:"实际支出",xAxis:2,yAxis: 20}
-		            		]
-		            		// [
-		            		// 	{type:'max',name:'first'},
-		            		// 	{type:'min',name:"two"}
-		            		// ]
-		            	]
-		            },
-		            data: [15,5,10]
-		        }
-		    ]
-		};
-    // 为echarts对象加载数据 
-    myChart.setOption(option); 
-        
-</script>

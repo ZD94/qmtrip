@@ -14,7 +14,6 @@ var getRndStr = require("../../common/utils").getRndStr;
 var C = require("../../config");
 var moment = require("moment");
 var API = require("../../common/api");
-var errorHandle = require("common/errorHandle");
 var utils = require("common/utils");
 
 var ACCOUNT_STATUS = {
@@ -56,8 +55,7 @@ authServer.activeByEmail = function(data, callback) {
     var defer = Q.defer();
     //失效了
     if (!timestamp || nowTime - timestamp > 0) {
-        defer.reject(L.ERR.ACTIVE_URL_INVALID);
-        return defer.promise.nodeify(callback);
+        throw L.ERR.ACTIVE_URL_INVALID;
     }
 
     return Models.Account.findOne({where: {id: accountId}})
@@ -80,7 +78,6 @@ authServer.activeByEmail = function(data, callback) {
                     return true;
                 })
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -225,7 +222,6 @@ authServer.active = function(data, callback) {
                     }}
                 })
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -246,7 +242,6 @@ authServer.remove = function(data, callback) {
             .then(function() {
                 return {code: 0, msg: "ok"};
             })
-            .catch(errorHandle)
             .nodeify(callback);
 }
 
@@ -269,31 +264,26 @@ authServer.remove = function(data, callback) {
 authServer.newAccount = function(data, callback) {
     var defer = Q.defer();
     if (!data) {
-        defer.reject(L.ERR.DATA_NOT_EXIST);
-        return defer.promise.nodeify(callback);
+        throw L.ERR.DATA_NOT_EXIST;
     }
 
     if (!data.email) {
-        defer.reject(L.ERR.EMAIL_EMPTY);
-        return defer.promise.nodeify(callback);
+        throw L.ERR.EMAIL_EMPTY;
     }
 
     if (!validate.isEmail(data.email)) {
-        defer.reject(L.ERR.EMAIL_EMPTY);
-        return defer.promise.nodeify(callback);
+        throw L.ERR.EMAIL_EMPTY;
     }
 
     if (data.pwd) {
         var pwd = data.pwd;
         pwd = md5(pwd);
-        //defer.reject(L.ERR.PASSWORD_EMPTY);
-        //return defer.promise.nodeify(callback);
+        //throw L.ERR.PASSWORD_EMPTY;
     }
 
     var mobile = data.mobile;
     if (mobile && !validate.isMobile(mobile)) {
-        defer.reject(L.ERR.MOBILE_FORMAT_ERROR);
-        return defer.promise.nodeify(callback);
+        throw L.ERR.MOBILE_FORMAT_ERROR;
     }
 
     var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
@@ -413,11 +403,9 @@ authServer.login = function(data, callback) {
  * @return {Promise} {code:0, msg: "Ok"}
  */
 authServer.authentication = function(params, callback) {
-    var defer = Q.defer();
     if ((!params.userId && !params.user_id) || (!params.tokenId && !params.token_id)
         || !params.timestamp || (!params.tokenSign && !params.token_sign)) {
-        defer.resolve({code: -1, msg: "token expire"});
-        return defer.promise.nodeify(callback);
+        return Promise.resolve({code: -1, msg: "token expire"});
     }
     var userId = params.userId || params.user_id;
     var tokenId = params.tokenId || params.token_id;
@@ -437,7 +425,6 @@ authServer.authentication = function(params, callback) {
 
             return {code: -1, msg: "已经失效"};
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -455,9 +442,7 @@ authServer.authentication = function(params, callback) {
  * @return {Promise} {code: 0, msg: "ok};
  */
 authServer.bindMobile = function(data, callback) {
-    var defer = Q.defer();
-    defer.resolve({code: 0, msg: "ok"});
-    return defer.promise.nodeify(callback);
+    return Promise.resolve({code: 0, msg: "ok"});
 }
 
 /**
@@ -471,8 +456,7 @@ authServer.getAccount = function(params, callback){
     var attributes = params.attributes;
     var defer = Q.defer();
     if(!id){
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "id不能为空"};
     }
     var options = {};
     options.where = {id: id};
@@ -492,8 +476,7 @@ authServer.getAccount = function(params, callback){
 authServer.updataAccount = function(id, data, callback){
     var defer = Q.defer();
     if(!id){
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "id不能为空"};
     }
     var options = {};
     options.where = {id: id};
@@ -610,8 +593,7 @@ function _sendActiveEmail(accountId) {
             var sign = makeActiveSign(activeToken, account.id, expireAt);
             var url = C.host + "/staff.html#/auth/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
             //发送激活邮件
-            var sendEmailRequest = Q.denodeify(API.mail.sendMailRequest);
-            return  sendEmailRequest({toEmails: account.email, templateName: "qm_active_email", values: [account.email, url]})
+            return API.mail.sendMailRequest({toEmails: account.email, templateName: "qm_active_email", values: [account.email, url]})
                 .then(function(result) {
                     account.activeToken = activeToken;
                     return Models.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
@@ -633,13 +615,11 @@ authServer.sendActiveEmail = function(params, callback) {
     var email = params.email;
     var defer = Q.defer();
     if (!email) {
-        defer.reject(L.ERR.EMAIL_EMPTY);
-        return defer.promise.nodeify(callback);
+        throw L.ERR.EMAIL_EMPTY;
     }
 
     if (!validate.isEmail(email)) {
-        defer.reject(L.ERR.EMAIL_FORMAT_INVALID);
-        return defer.promise.nodeify(callback);
+        throw L.ERR.EMAIL_FORMAT_INVALID;
     }
 
     return Models.Account.findOne({where: {email: email}})
@@ -653,7 +633,6 @@ authServer.sendActiveEmail = function(params, callback) {
     .then(function() {
         return {code: 0, msg: "ok"};
     })
-    .catch(errorHandle)
     .nodeify(callback);
 }
 
@@ -678,7 +657,6 @@ authServer.logout = function (params, callback) {
             }
             return {code: 0, msg: "ok"};
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 

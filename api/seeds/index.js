@@ -8,7 +8,6 @@ var Q = require("q");
 var Seeds = require("common/model").importModel("./models").models.Seeds;
 var Logger = require('../../common/logger');
 var logger = new Logger("seeds");
-var errorHandle = require("common/errorHandle")
 var typeString = "^tripPlanOrderNo^";
 var seeds = {};
 
@@ -37,8 +36,7 @@ seeds.getSingleSeedCode = function(type, options, callback){
     }
     var str = '^' + type + '^';
     if(typeString.indexOf(str) !== 0){
-        defer.reject({code: -1, msg: '编号类型不在配置中'});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: '编号类型不在配置中'};
     }
 
     return Seeds.findOne({type: type})
@@ -60,7 +58,6 @@ seeds.getSingleSeedCode = function(type, options, callback){
         .then(function(seed) {
             return seed.nowNo;
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -79,7 +76,6 @@ seeds.getSeedNo = function(type, options, callback){
             var now = moment().format(formatDate);
             return now + seeds;
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 

@@ -15,7 +15,6 @@ var logger = new Logger("company");
 var utils = require("common/utils");
 var getColsFromParams = utils.getColsFromParams;
 var checkAndGetParams = utils.checkAndGetParams;
-var errorHandle = require("common/errorHandle");
 
 var company = {};
 
@@ -50,7 +49,6 @@ company.createCompany = function(params, callback){
                 };
             });
     })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -104,7 +102,6 @@ company.updateCompany = function(params, callback){
             }
             return rows[0];
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 

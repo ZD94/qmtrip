@@ -31,12 +31,13 @@ var StaffFirst = (function(){
 						var travelLevel =ret.travelLevel;
 						var str = ret.name;
 						$scope.firstname=str.substring(0,2);
+						console.info(ret)
 						Q.all([
-							API.tripPlan.pageTripPlanOrder({}),
+							API.tripPlan.countTripPlanNum({accountId:ret.id}),
 							API.travelPolicy.getTravelPolicy({id: travelLevel})
 						])
 						.spread(function(tripPlanOrders,travelPolicy){
-							$scope.businesstimes = tripPlanOrders.length;
+							$scope.businesstimes = tripPlanOrders;
 							$scope.travelpolicy = travelPolicy;
 							dataloading(true);
 							$scope.$apply();

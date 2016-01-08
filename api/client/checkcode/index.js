@@ -8,7 +8,6 @@
 
 var API = require("common/api");
 var Q = require("q");
-var errorHandle = require("common/errorHandle");
 /**
  * @class checkcode 验证码
  * @type {{__public: boolean, getMsgCheckCode: module.exports.getMsgCheckCode, getPicCheckCode: module.exports.getPicCheckCode}}
@@ -44,13 +43,11 @@ var checkcode = {
     getMsgCheckCode: function(params, callback) {
         var type = 1;
         params.type = type;
-        var fn = Q.denodeify(API.checkcode.getMsgCheckCode);
-        return fn(params)
+        return API.checkcode.getMsgCheckCode(params)
             .then(function(result) {
                 console.info(result);
                 return result;
             })
-            .catch(errorHandle)
             .nodeify(callback);
     },
     /**
@@ -76,9 +73,7 @@ var checkcode = {
     getPicCheckCode: function(params, callback) {
         var type = 1;
         params.type = type;
-        var fn = Q.denodeify(API.checkcode.getPicCheckCode);
-        return fn(params)
-            .catch(errorHandle)
+        return API.checkcode.getPicCheckCode(params)
             .nodeify(callback)
     },
     /**
@@ -107,9 +102,7 @@ var checkcode = {
      * ```
      */
     isMatchPicCheckCode: function(params, callback) {
-        var fn = Q.denodeify(API.checkcode.isMatchPicCheckCode);
-        return fn(params)
-            .catch(errorHandle)
+        return API.checkcode.isMatchPicCheckCode(params)
             .nodeify(callback);
     },
     /**
@@ -139,9 +132,7 @@ var checkcode = {
      * ```
      */
     isMatchMsgCheckCode: function(params, callback) {
-        var fn = Q.denodeify(API.checkcode.isMatchMsgCheckCode);
-        return fn(params)
-            .catch(errorHandle)
+        return API.checkcode.isMatchMsgCheckCode(params)
             .nodeify(callback);
     }
 }

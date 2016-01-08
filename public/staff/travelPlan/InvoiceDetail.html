@@ -1,0 +1,30 @@
+<style>html,body {background: #F5F5F5;}</style>
+<div class="travel-plan">
+    <div class="invoiceDetail">
+        <div class="invoicepath">我的账户&nbsp;>&nbsp;我的出差记录&nbsp;>&nbsp;出差详情页&nbsp;>&nbsp;<span>票据详情页</span></div>
+        <div class="mainbox">
+            <div class="mainbox_top">
+                <p ng-if="status=='outTraffic'">去程交通行程单&nbsp;
+                    <span ng-if="InvoiceDetail.status=='-1'">【审核未通过】</span>
+                    <span ng-if="InvoiceDetail.status==0">【待审核】</span>
+                    <span ng-if="InvoiceDetail.status==1">【审核通过】</span>
+                </p>
+                <p ng-if="status=='backTraffic'">回程交通行程单&nbsp;
+                    <span ng-if="InvoiceDetail.status=='-1'">【审核未通过】</span>
+                    <span ng-if="InvoiceDetail.status==0">【待审核】</span>
+                    <span ng-if="InvoiceDetail.status==1">【审核通过】</span>
+                </p>
+                <p ng-if="status=='hotel'">酒店发票&nbsp;
+                    <span ng-if="InvoiceDetail.status=='-1'">【审核未通过】</span>
+                    <span ng-if="InvoiceDetail.status==0">【待审核】</span>
+                    <span ng-if="InvoiceDetail.status==1">【审核通过】</span>
+                </p>
+                <span>{{InvoiceDetail.invoice[InvoiceDetail.invoice.length-1].create_at}}上传</span>
+                <input type="button" value="返回" class="common_btn2" ng-click="goDetail()">
+            </div>
+            <div class="mainbox_bottom">
+                <img src="/upload/get-img-file/{{InvoiceDetail.newInvoice}}" alt="">
+            </div>
+        </div>
+    </div>
+</div>
