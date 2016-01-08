@@ -279,6 +279,10 @@ describe("api/client/tripPlan.js", function() {
                     if (err) {
                         throw err;
                     }
+                    assert(ret != null);
+                    assert(ret.qmBudget >= 0);
+                    assert(ret.planMoney >= 0);
+                    assert(ret.expenditure >= 0);
                     done();
                 })
             });

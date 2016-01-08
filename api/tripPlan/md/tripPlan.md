@@ -217,4 +217,7 @@
 
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
-| json数据 | 消费单信息 |obj.invoice含义[{times:上传次数, picture:票据md5key, create_at:时间, status:审核状态, remark: 审核备注, approve_at: 审核时间}]
+|ret  |json
+|ret.qmBudget |动态预算(全麦预算)   | number  |
+|ret.planMoney |预算金额   | number  |
+|ret.expenditure |实际支出   | number  |

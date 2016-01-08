@@ -423,7 +423,6 @@ tripPlan.approveInvoice = function(params){
                                     order_updates.status = 1;
                                 }
                                 var fields = getColsFromParams(order_updates);
-                                console.info(order_updates);
                                 return PlanOrder.update(order_updates, {where: {id: order.id}, fields: fields, transaction: t})
                                     .then(function(){
                                         return ret;
@@ -469,6 +468,12 @@ tripPlan.statPlanOrderMoney = function(params){
             var q2 = {
                 orderId: {$in: idList},
                 status: 1
+            }
+            if(params.startTime){
+                q1.createAt?q1.createAt.$gte = params.startTime:q1.createAt = {$gte: params.startTime};
+            }
+            if(params.endTime){
+                q1.createAt?q1.createAt.$lte = params.startTime:q1.createAt = {$gle: params.endTime};
             }
             return Q.all([
                 ConsumeDetails.sum('budget', {where: q1}),

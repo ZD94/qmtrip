@@ -292,6 +292,7 @@ tripPlan.countTripPlanNum = function (params, callback) {
  */
 tripPlan.statPlanOrderMoneyByCompany = function (params) {
     var self = this;
+    var params = checkAndGetParams([], ['startTime', 'endTime'], params);
     return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
         .then(function (staff) {
             params.companyId = staff.companyId;
