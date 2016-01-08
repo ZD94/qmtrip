@@ -6,15 +6,14 @@
 require('app-module-path').addPath(__dirname);
 
 //服务器启动性能日志
-var perf = require('common/perf');
+//var perf = require('common/perf');
 //perf.init('init');
 
-Promise = require('bluebird');
+global.Promise = require('bluebird');
 Promise.promisifyAll(require("redis"));
 Promise.promisifyAll(require("fs"));
 
 var path = require('path');
-var fs = require("fs");
 
 var config = require("./config");
 
@@ -67,14 +66,14 @@ server.on('init.http', function(server){
             var client = redis.createClient(config.redis.url);
             client.subscribe('checkcode:msg');
             client.on("message", function (channel, message) {
-                var message = JSON.parse(message);
-                stream.write(message.mobile + " : " + message.code + " <br>\n");
-                console.log("client channel " + channel + ": " + message);
+                var msg = JSON.parse(message);
+                stream.write(msg.mobile + " : " + msg.code + " <br>\n");
+                logger.info("client channel " + channel + ": " + msg);
             });
             stream.on('close', function(){
-                console.log('client disconnected.');
+                logger.info('client disconnected.');
                 client.end();
-            })
+            });
         });
         sock.install(server, '/checkcode.sub');
     }
