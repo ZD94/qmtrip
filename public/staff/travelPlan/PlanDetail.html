@@ -19,19 +19,28 @@
             <div class="content_top">
                 <dl>
                     <dt>动态标准预算</dt>
-                    <dd>¥{{planDetail.budget}}</dd>
+                    <dd>
+                        <span ng-if="!planDetail.budget">无</span>
+                        <span ng-if="planDetail.budget">¥{{planDetail.budget.toFixed(2)}}</span>
+                    </dd>
                 </dl>
                 <dl>
                     <dt>实际支出</dt>
-                    <dd>¥10000</dd>
+                    <dd>
+                        <span ng-if="!planDetail.expenditure">无</span>
+                        <span ng-if="planDetail.expenditure">¥{{planDetail.expenditure.toFixed(2)}}</span>
+                    </dd>
                 </dl>
                 <dl>
                     <dt>为公司节省</dt>
-                    <dd>¥10000</dd>
+                    <dd>
+                        <span ng-if="!planDetail.expenditure">无</span>
+                        <span ng-if="planDetail.expenditure">¥{{(planDetail.budget-planDetail.expenditure).toFixed(2)}}</span>
+                    </dd>
                 </dl>
                 <dl>
                     <dt>获得积分</dt>
-                    <dd>¥10000</dd>
+                    <dd>无</dd>
                 </dl>
             </div>
             <div class="title_bottom"><span></span>差旅消费明细</div>
@@ -53,17 +62,20 @@
                             <div class="description">{{outTraffic.startTime | date: 'yyyy-MM-dd'}}<span ng-if="outTraffic.latestArriveTime!=undefined && outTraffic.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{outTraffic.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
                             <div class="endplace">{{outTraffic.arrivalPlace}}</div>
                         </td>
-                        <td align="center">¥{{outTraffic.budget}}</td>
-                        <td align="center">无</td>
+                        <td align="center">¥{{outTraffic.budget.toFixed(2)}}</td>
+                        <td align="center">
+                            <span ng-if="outTraffic.expenditure">¥{{outTraffic.expenditure.toFixed(2)}}</span>
+                            <span ng-if="!outTraffic.expenditure">无</span>
+                        </td>
                         <td align="center" class="po_r">
                                 <input type="button" class="common_btn1 uploadbtn" value="上传" ng-if="outTraffic.invoice.length==0">
-                                <input type="file" class="file" name="tmpFile" value='' id="i_outTraffic" ref="{{outTraffic.id}}" data-type = "1" ng-if="outTraffic.invoice.length==0">
-                            <span ng-if="outTraffic.invoice.length!=0">
-                                <span ng-if="outTraffic.status=='-1'">未通过</span>
-                                <span ng-if="outTraffic.status==0">待审核</span>
-                                <span ng-if="outTraffic.status==1">审核通过</span>
-                                <a href="#">去程交通票据</a>
-                            </span>
+                            <input type="file" class="file" name="tmpFile" value='' id="i_outTraffic" ref="{{outTraffic.id}}" data-type = "1" ng-if="outTraffic.invoice.length==0">
+                            <div ng-if="outTraffic.invoice.length!=0">
+                                <p ng-if="outTraffic.status=='-1'">【审核未通过】</p>
+                                <p ng-if="outTraffic.status==0">【待审核】</p>
+                                <p ng-if="outTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
+                                <p ng-if="outTraffic.status!='-1'"><a ng-click="goDetail('outTraffic',outTraffic.newInvoice)">去程交通票据</a></p>
+                            </div>
                         </td>
                     </tr>
                     <tr ng-if="planDetail.hotel.length!=0">
@@ -76,17 +88,20 @@
                                 <p>入住日期：{{hotel.startTime | date: 'yyyy-MM-dd'}}&nbsp;&nbsp;&nbsp;&nbsp;退房日期：{{hotel.endTime | date: 'yyyy-MM-dd'}}</p>
                             </div>
                         </td>
-                        <td align="center">¥{{hotel.budget}}</td>
-                        <td align="center">无</td>
+                        <td align="center">¥{{hotel.budget.toFixed(2)}}</td>
+                        <td align="center">
+                            <span ng-if="hotel.expenditure">¥{{hotel.expenditure.toFixed(2)}}</span>
+                            <span ng-if="!hotel.expenditure">无</span>
+                        </td>
                         <td align="center" class="po_r">
                             <input type="button" class="common_btn1 uploadbtn" value="上传" ng-if="hotel.invoice.length==0">
                             <input type="file" class="file" name="tmpFile" value='选择文件' id="i_hotel" ref="{{hotel.id}}" data-type = "2" ng-if="hotel.invoice.length==0">
-                            <span ng-if="hotel.invoice.length!=0">
-                                <span ng-if="hotel.status=='-1'">未通过</span>
-                                <span ng-if="hotel.status==0">待审核</span>
-                                <span ng-if="hotel.status==1">审核通过</span>
-                                <a href="#">住宿发票</a>
-                            </span>
+                            <div ng-if="hotel.invoice.length!=0">
+                                <p ng-if="hotel.status=='-1'">【审核未通过】</p>
+                                <p ng-if="hotel.status==0">【待审核】</p>
+                                <p ng-if="hotel.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
+                                <p ng-if="hotel.status!='-1'"><a ng-click="goDetail('hotel',hotel.newInvoice)">酒店发票</a></p>
+                            </div>
                         </td>
                     </tr>
                     <tr ng-if="planDetail.backTraffic.length!=0">
@@ -98,17 +113,20 @@
                             <div class="description">{{backTraffic.endTime | date: 'yyyy-MM-dd'}}<span ng-if="backTraffic.latestArriveTime!=undefined && backTraffic.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{backTraffic.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
                             <div class="endplace">{{backTraffic.startPlace}}</div>
                         </td>
-                        <td align="center">¥{{backTraffic.budget}}</td>
-                        <td align="center">无</td>
+                        <td align="center">¥{{backTraffic.budget.toFixed(2)}}</td>
+                        <td align="center">
+                            <span ng-if="backTraffic.expenditure">¥{{backTraffic.expenditure.toFixed(2)}}</span>
+                            <span ng-if="!backTraffic.expenditure">无</span>
+                        </td>
                         <td align="center" class="po_r">
                             <input type="button" class="common_btn1 uploadbtn" value="上传" ng-if="backTraffic.invoice.length==0">
                             <input type="file" class="file" name="tmpFile" value='选择文件' id="i_backTraffic" ref="{{backTraffic.id}}" data-type = "3" ng-if="backTraffic.invoice.length==0">
-                            <span ng-if="backTraffic.invoice.length!=0">
-                                <span ng-if="backTraffic.status=='-1'">未通过</span>
-                                <span ng-if="backTraffic.status==0">待审核</span>
-                                <span ng-if="backTraffic.status==1">审核通过</span>
-                                <a href="#">回程交通票据</a>
-                            </span>
+                            <div ng-if="backTraffic.invoice.length!=0">
+                                <p ng-if="backTraffic.status=='-1'">【审核未通过】</p>
+                                <p ng-if="backTraffic.status==0">【待审核】</p>
+                                <p ng-if="backTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
+                                <p ng-if="backTraffic.status!='-1'"><a ng-click="goDetail('backTraffic',backTraffic.newInvoice)">回程交通票据</a></p>
+                            </div>
                         </td>
                     </tr>
                 </table>

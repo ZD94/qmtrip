@@ -68,11 +68,13 @@ var staff = (function(){
 
         //初始化所有的记录
         $scope.initstafflist = function(){
+            $scope.selectClass = [];
             //加载多个API方法
             API.onload(function(){
                 API.staff.getCurrentStaff()//qh获取当前登录人员的企业id
                     .then(function(staff){
                         $scope.roleId = staff.roleId;
+                        $scope.currentStaff = staff;
                         //console.log(Q);
                         return Q.all([
                             API.travelPolicy.getAllTravelPolicy({where: {companyId:staff.companyId}}),//获取当前所有的差旅标准名称

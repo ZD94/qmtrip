@@ -19,7 +19,7 @@
             <div class="content_top">
                 <dl>
                     <dt>动态标准预算</dt>
-                    <dd>¥{{planDetail.budget}}</dd>
+                    <dd>¥{{planDetail.budget.toFixed(2)}}</dd>
                 </dl>
                 <dl>
                     <dt>实际支出</dt>
@@ -56,11 +56,8 @@
                             <div class="description">{{outTraffic.startTime | date: 'yyyy-MM-dd'}}<span ng-if="outTraffic.latestArriveTime!=undefined && outTraffic.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{outTraffic.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
                             <div class="endplace">{{outTraffic.arrivalPlace}}</div>
                         </td>
-                        <td width="135" align="center">¥{{outTraffic.budget}}</td>
-                        <td width="135" align="center">
-                            <span ng-if="outTraffic.expenditure">¥{{outTraffic.expenditure.toFixed(2)}}</span>
-                            <span ng-if="!outTraffic.expenditure">无</span>
-                        </td>
+                        <td width="135" align="center">¥{{outTraffic.budget.toFixed(2)}}</td>
+                        <td width="135" align="center">¥{{outTraffic.expenditure.toFixed(2)}}</td>
                         <td width="135" align="center">
                             <p ng-if="outTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
                             <p ng-if="outTraffic.status==0" style="color: #DE492A;">【待审核】</p>
@@ -76,11 +73,8 @@
                                 <p>入住日期：{{hotel.startTime | date: 'yyyy-MM-dd'}}&nbsp;&nbsp;&nbsp;&nbsp;退房日期：{{hotel.endTime | date: 'yyyy-MM-dd'}}</p>
                             </div>
                         </td>
-                        <td width="135" align="center">¥{{hotel.budget}}</td>
-                        <td width="135" align="center">
-                            <span ng-if="hotel.expenditure">¥{{hotel.expenditure.toFixed(2)}}</span>
-                            <span ng-if="!hotel.expenditure">无</span>
-                        </td>
+                        <td width="135" align="center">¥{{hotel.budget.toFixed(2)}}</td>
+                        <td width="135" align="center">¥{{hotel.expenditure.toFixed(2)}}</td>
                         <td width="135" align="center">
                             <p ng-if="hotel.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
                             <p ng-if="hotel.status==0" style="color: #DE492A;">【待审核】</p>
@@ -95,11 +89,8 @@
                             <div class="description">{{backTraffic.endTime | date: 'yyyy-MM-dd'}}<span ng-if="backTraffic.latestArriveTime!=undefined && backTraffic.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{backTraffic.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
                             <div class="endplace">{{backTraffic.startPlace}}</div>
                         </td>
-                        <td width="135" align="center">¥{{backTraffic.budget}}</td>
-                        <td width="135" align="center">
-                            <span ng-if="outTraffic.expenditure">¥{{outTraffic.expenditure.toFixed(2)}}</span>
-                            <span ng-if="!outTraffic.expenditure">无</span>
-                        </td>
+                        <td width="135" align="center">¥{{backTraffic.budget.toFixed(2)}}</td>
+                        <td width="135" align="center">¥{{backTraffic.expenditure.toFixed(2)}}</td>
                         <td width="135" align="center">
                             <p ng-if="backTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
                             <p ng-if="backTraffic.status==0" style="color: #DE492A;">【待审核】</p>
@@ -121,13 +112,13 @@
                     <tr style="border-bottom: 1px #E5E5E5 solid">
                         <td>
                             <p>{{outTraffic.invoice[outTraffic.invoice.length-1].create_at}}&nbsp;&nbsp;上传</p>
-                            <p>{{outTraffic.invoice[outTraffic.invoice.length-1].approve_at}}&nbsp;&nbsp;<span ng-if="outTraffic.status=='-1'">审核未通过&nbsp;&nbsp;&nbsp;&nbsp;理由：{{outTraffic.auditRemark}}</span><span ng-if="outTraffic.status==1">审核通过</span></p>
+                            <p>{{outTraffic.invoice[outTraffic.invoice.length-1].approve_at}}&nbsp;&nbsp;<span ng-if="outTraffic.status=='-1'">审核未通过</span><span ng-if="outTraffic.status==1">审核通过</span></p>
                         </td>
                         <td>
-                            <div ng-if="outTraffic.status==0">
-                                <input type="button" class="common_btn1" value="审核未通过" ng-click="invoiceNopassShow('outTraffic')" style="float: right;">
-                                <input type="button" class="common_btn1" value="审核通过" ng-click="invoicePassShow('outTraffic')" style="margin-right: 20px; float: right;">
-                            </div>
+                            <div ng-if="hotel.status==0">
+                                    <input type="button" class="common_btn1" value="审核未通过" ng-click="invoiceNopassShow('outTraffic')" style="float: right;">
+                                    <input type="button" class="common_btn1" value="审核通过" ng-click="invoicePassShow('outTraffic')" style="margin-right: 20px; float: right;">
+                                </div>
                         </td>
                     </tr>
                     <tr>
@@ -147,7 +138,7 @@
                     <tr style="border-bottom: 1px #E5E5E5 solid">
                         <td>
                             <p>{{hotel.invoice[hotel.invoice.length-1].create_at}}&nbsp;&nbsp;上传</p>
-                            <p>{{hotel.invoice[hotel.invoice.length-1].approve_at}}&nbsp;&nbsp;<span ng-if="hotel.status=='-1'">审核未通过&nbsp;&nbsp;&nbsp;&nbsp;理由：{{hotel.auditRemark}}</span><span ng-if="hotel.status==1">审核通过</span></p>
+                            <p>{{hotel.invoice[hotel.invoice.length-1].approve_at}}&nbsp;&nbsp;<span ng-if="hotel.status=='-1'">审核未通过</span><span ng-if="hotel.status==1">审核通过</span></p>
                         </td>
                         <td>
                             <div ng-if="hotel.status==0">
@@ -173,13 +164,11 @@
                     <tr style="border-bottom: 1px #E5E5E5 solid">
                         <td>
                             <p>{{backTraffic.invoice[backTraffic.invoice.length-1].create_at}}&nbsp;&nbsp;上传</p>
-                            <p>{{backTraffic.invoice[backTraffic.invoice.length-1].approve_at}}&nbsp;&nbsp;<span ng-if="backTraffic.status=='-1'">审核未通过&nbsp;&nbsp;&nbsp;&nbsp;理由：{{backTraffic.auditRemark}}</span><span ng-if="backTraffic.status==1">审核通过</span></p>
+                            <p>{{backTraffic.invoice[backTraffic.invoice.length-1].approve_at}}&nbsp;&nbsp;<span ng-if="backTraffic.status=='-1'">审核未通过</span><span ng-if="backTraffic.status==1">审核通过</span></p>
                         </td>
                         <td>
-                            <div ng-if="backTraffic.status==0">
-                                <input type="button" class="common_btn1" value="审核未通过" ng-click="invoiceNopassShow('backTraffic')" style="float: right;">
-                                <input type="button" class="common_btn1" value="审核通过" ng-click="invoicePassShow('backTraffic')" style="margin-right: 20px; float: right;">
-                            </div>
+                            <input type="button" class="common_btn1" value="审核未通过" ng-click="invoiceNopassShow('backTraffic')" style="float: right;">
+                            <input type="button" class="common_btn1" value="审核通过" ng-click="invoicePassShow('backTraffic')" style="margin-right: 20px; float: right;">
                         </td>
                     </tr>
                     <tr>
