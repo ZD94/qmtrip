@@ -242,12 +242,11 @@ travelBudget.getTrafficBudget = function(params, callback) {
                     })
                 ])
                     .spread(function(goTraffic, backTraffic) {
-
                         var result = {
-                            goTraffic: goTraffic.price,
-                            backTraffic: backTraffic.price,
-                            traffic: Number(goTraffic.price) + Number(backTraffic.price),
-                            price: Number(goTraffic.price) + Number(backTraffic.price)
+                            goTraffic: goTraffic.price || 0,
+                            backTraffic: backTraffic.price || 0,
+                            traffic: Number(goTraffic.price) + Number(backTraffic.price) || 0,
+                            price: Number(goTraffic.price) + Number(backTraffic.price) || 0
                         };
                         return result;
                     })
@@ -261,10 +260,10 @@ travelBudget.getTrafficBudget = function(params, callback) {
                 })
                 .then(function(traffic) {
                     var result = {
-                        goTraffic: traffic.price,
+                        goTraffic: traffic.price || 0,
                         backTraffic: 0,
-                        traffic: traffic.price,
-                        price: traffic.price
+                        traffic: traffic.price || 0,
+                        price: traffic.price || 0
                     }
                     return result;
                 })
