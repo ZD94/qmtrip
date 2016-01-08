@@ -39,8 +39,7 @@ var place = {
 place.queryPlace = function(placeName, callback) {
     var defer = Q.defer();
     if (!placeName) {
-        defer.reject({code: -1, msg: "地点名称不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "地点名称不能为空"};
     }
 
     return API.place.queryCity(placeName, callback);

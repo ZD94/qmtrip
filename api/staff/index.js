@@ -115,8 +115,7 @@ staff.deleteStaff = function(params){
     var defer = Q.defer();
     var id = params.id;
     if (!id) {
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "id不能为空"};
     }
     return API.auth.remove({accountId: id})
         .then(function(acc){
@@ -146,8 +145,7 @@ staff.updateStaff = function(data, callback){
     var id = data.id;
     var defer = Q.defer();
     if(!id){
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "id不能为空"};
     }
     var options = {};
     options.where = {id: id};
@@ -197,8 +195,7 @@ staff.getStaff = function(params, callback){
     var id = params.id;
     var defer = Q.defer();
     if(!id){
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "id不能为空"};
     }
     var cols = params.columns;
     var options = {};
@@ -298,12 +295,10 @@ staff.increaseStaffPoint = function(params, callback) {
     var increasePoint = params.increasePoint;
     var defer = Q.defer();
     if(!id){
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "id不能为空"};
     }
     if(!increasePoint){
-        defer.reject({code: -2, msg: "increasePoint不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -2, msg: "increasePoint不能为空"};
     }
     return staffModel.findById(id)
         .then(function(obj) {
@@ -336,12 +331,10 @@ staff.decreaseStaffPoint = function(params, callback) {
     var operatorId = params.accountId;
     var defer = Q.defer();
     if(!id){
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "id不能为空"};
     }
     if(!decreasePoint){
-        defer.reject({code: -2, msg: "decreasePoint不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -2, msg: "decreasePoint不能为空"};
     }
     return staffModel.findById(id)
         .then(function(obj) {
@@ -560,8 +553,7 @@ staff.beforeImportExcel = function(params, callback){
 staff.importExcelAction = function(params, callback){
     var defer = Q.defer();
     if(!params.addObj){
-        defer.reject({code: -1, msg: "params.addObj不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "params.addObj不能为空"};
     }
     var data = params.addObj;
     var noAddObj = [];
@@ -611,26 +603,21 @@ staff.downloadExcle = function (params, callback){
     }
     var data = params.objAttr;
     var nowStr = moment().format('YYYYMMDDHHmm');
-    var defer = Q.defer();
     if(!data){
-        defer.reject({code: -1, msg: "params.objAttr为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "params.objAttr为空"};
     }
     if(!params.accountId){
-        defer.reject({code: -1, msg: "params.accountId为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "params.accountId为空"};
     }
     var md5 = crypto.createHash("md5");
     var fileName = md5.update(params.accountId+nowStr).digest("hex");
     data = JSON.parse(data);
     if(!(data instanceof Array)){
-        defer.reject({code: -1, msg: "params.objAttr类型错误"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "params.objAttr类型错误"};
     }
     var buffer = nodeXlsx.build([{name: "Sheet1", data: data}]);
     fs.writeFileSync(config.upload.tmpDir+'/'+ fileName +'.xlsx', buffer, 'binary');
-    defer.resolve({code: 0, fileName: fileName+".xlsx"});
-    return defer.promise.nodeify(callback);
+    return Promise.resolve({code: 0, fileName: fileName+".xlsx"});
 }
 
 /**

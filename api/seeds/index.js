@@ -36,8 +36,7 @@ seeds.getSingleSeedCode = function(type, options, callback){
     }
     var str = '^' + type + '^';
     if(typeString.indexOf(str) !== 0){
-        defer.reject({code: -1, msg: '编号类型不在配置中'});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: '编号类型不在配置中'};
     }
 
     return Seeds.findOne({type: type})

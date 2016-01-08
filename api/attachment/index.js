@@ -13,65 +13,52 @@ var attachment = {};
 /**
  * 创建附件记录
  * @param data
- * @param callback
  * @returns {*}
  */
-attachment.createAttachment = function(data, callback){
+attachment.createAttachment = function(data){
     return checkParams(["md5key","content"], data)
         .then(function(){
             return attachmentModel.create(data);
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
  * 删除附件记录
  * @param params
- * @param callback
  * @returns {*}
  */
-attachment.deleteAttachment = function(params, callback){
-    return attachmentModel.destroy({where: params})
-        .nodeify(callback);
+attachment.deleteAttachment = function(params){
+    return attachmentModel.destroy({where: params});
 }
 
 /**
  * 得到全部附件记录
  * @param params
- * @param callback
  * @returns {*}
  */
-attachment.getAllAttachment = function(params, callback){
+attachment.getAllAttachment = function(params){
     var options = {};
     options.where = params;
-    return attachmentModel.findAll(options)
-        .nodeify(callback);
+    return attachmentModel.findAll(options);
 }
 
 /**
  * 得到一条附件记录
  * @param params
- * @param callback
  * @returns {*}
  */
-attachment.getAttachment = function(params, callback){
+attachment.getAttachment = function(params){
     var options = {};
     options.where = params;
-    return attachmentModel.findOne(options)
-        .nodeify(callback);
+    return attachmentModel.findOne(options);
 }
 
 /**
  * 分页查询附件记录集合
  * @param params 查询条件
  * @param options options.perPage 每页条数 options.page当前页
- * @param callback
  */
-attachment.listAndPaginateAttachment = function(params, options, callback){
-    if (typeof options == 'function') {
-        callback = options;
-        options = {};
-    }
+attachment.listAndPaginateAttachment = function(params, options){
     if (!options) {
         options = {};
     }
@@ -98,18 +85,16 @@ attachment.listAndPaginateAttachment = function(params, options, callback){
     return attachmentModel.findAndCountAll(options)
         .then(function(result){
             return new Paginate(page, perPage, result.count, result.rows);
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
  * 查看未被引用附件
  * @param params
  * @param opts
- * @param callback
  * @returns {*}
  */
-attachment.getNoUseList = function(params, opts, callback){
+attachment.getNoUseList = function(params, opts){
     var page = opts.page || 1;
     var perPage = opts.perPage || 10;
     return getUsedList()
@@ -117,36 +102,28 @@ attachment.getNoUseList = function(params, opts, callback){
 //            if(data && data.size()>0){
             params.where = {"md5key": {not: data}};
             return attachment.listAndPaginateAttachment(params, {page: page, perPage: perPage, orderBy: 'create_at desc'})
-                .then(function(paginate){
-                    return paginate;
-                })
 //            }
         })
-        .nodeify(callback);
+        .then(function(paginate){
+            return paginate;
+        });
 }
 
-function getUsedList(callback) {
-    var usedAttach = [];
-    return  Q.all([
-        ])
-        .spread(function(){
-            return usedAttach;
-        })
-        .nodeify(callback);
+function getUsedList() {
+    return Q([]);
 }
 
 function checkParams(checkArray, params, callback){
-    var defer = Q.defer();
-    ///检查参数是否存在
-    for(var key in checkArray){
-        var name = checkArray[key];
-        if(!params[name] && params[name] !== false && params[name] !== 0){
-            defer.reject({code:'-1', msg:'参数 params.' + name + '不能为空'});
-            return defer.promise.nodeify(callback);
+    return new Promise(function(resolve, reject){
+        ///检查参数是否存在
+        for(var key in checkArray){
+            var name = checkArray[key];
+            if(!params[name] && params[name] !== false && params[name] !== 0){
+                return reject({code:'-1', msg:'参数 params.' + name + '不能为空'});
+            }
         }
-    }
-    defer.resolve({code: 0});
-    return defer.promise.nodeify(callback);
+        resolve(true);
+    });
 }
 
 attachment.__initHttpApp = require('./upload');

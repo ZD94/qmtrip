@@ -48,8 +48,7 @@ travelPolicy.deleteTravelPolicy = function(params, callback){
     var defer = Q.defer();
     var id = params.id;
     if (!id) {
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "id不能为空"};
     }
     return API.staff.findStaffs({travelLevel: id})
         .then(function(staffs){
@@ -76,8 +75,7 @@ travelPolicy.updateTravelPolicy = function(data, callback){
     var id = data.id;
     var defer = Q.defer();
     if(!id){
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "id不能为空"};
     }
     delete data.id;
     var options = {};
@@ -103,8 +101,7 @@ travelPolicy.getTravelPolicy = function(params, callback){
     var id = params.id;
     var defer = Q.defer();
     if(!id){
-        defer.reject({code: -1, msg: "id不能为空"});
-        return defer.promise.nodeify(callback);
+        throw {code: -1, msg: "id不能为空"};
     }
     return travalPolicyModel.findById(id)
         .nodeify(callback);
@@ -160,17 +157,16 @@ travelPolicy.listAndPaginateTravelPolicy = function(params, callback){
         .nodeify(callback);
 }
 
-function checkParams(checkArray, params, callback){
-    var defer = Q.defer();
-    ///检查参数是否存在
-    for(var key in checkArray){
-        var name = checkArray[key];
-        if(!params[name] && params[name] !== false && params[name] !== 0){
-            defer.reject({code:'-1', msg:'参数 params.' + name + '不能为空'});
-            return defer.promise.nodeify(callback);
+function checkParams(checkArray, params){
+    return new Promise(function(resolve, reject){
+        ///检查参数是否存在
+        for(var key in checkArray){
+            var name = checkArray[key];
+            if(!params[name] && params[name] !== false && params[name] !== 0){
+                return reject({code:'-1', msg:'参数 params.' + name + '不能为空'});
+            }
         }
-    }
-    defer.resolve({code: 0});
-    return defer.promise.nodeify(callback);
+        resolve({code: 0});
+    });
 }
 module.exports = travelPolicy;
