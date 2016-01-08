@@ -596,8 +596,7 @@ function _sendActiveEmail(accountId) {
             var sign = makeActiveSign(activeToken, account.id, expireAt);
             var url = C.host + "/staff.html#/auth/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
             //发送激活邮件
-            var sendEmailRequest = Q.denodeify(API.mail.sendMailRequest);
-            return  sendEmailRequest({toEmails: account.email, templateName: "qm_active_email", values: [account.email, url]})
+            return API.mail.sendMailRequest({toEmails: account.email, templateName: "qm_active_email", values: [account.email, url]})
                 .then(function(result) {
                     account.activeToken = activeToken;
                     return Models.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});

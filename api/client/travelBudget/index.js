@@ -225,17 +225,16 @@ travelBudget.getTrafficBudget = function(params, callback) {
                 throw {code: -1, msg: "往返预算,返程日期不能为空"};
             }
 
-            var getTrafficBudget = Q.denodeify(API.travelbudget.getTrafficBudget);
             if (params.isRoundTrip) {
                 return Q.all([
-                    getTrafficBudget({
+                    API.travelbudget.getTrafficBudget({
                         originPlace: params.originPlace,
                         destinationPlace: params.destinationPlace,
                         outboundDate: params.outboundDate,
                         inboundDate: params.inboundDate,
                         outLatestArriveTime: params.outLatestArriveTime
                     }),
-                    getTrafficBudget({
+                    API.travelbudget.getTrafficBudget({
                         originPlace: params.destinationPlace,
                         destinationPlace: params.originPlace,
                         outboundDate: params.inboundDate,
@@ -253,7 +252,7 @@ travelBudget.getTrafficBudget = function(params, callback) {
                         return result;
                     })
             } else {
-                return getTrafficBudget({
+                return API.travelbudget.getTrafficBudget({
                     originPlace: params.originPlace,
                     destinationPlace: params.destinationPlace,
                     outboundDate: params.outboundDate,
