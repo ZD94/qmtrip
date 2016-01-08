@@ -111,7 +111,7 @@ staff.createCompanyOwner = function(params, callback){
  * @param callback
  * @returns {*}
  */
-staff.deleteStaff = function(params, callback){
+staff.deleteStaff = function(params){
     var defer = Q.defer();
     var id = params.id;
     if (!id) {
@@ -120,14 +120,19 @@ staff.deleteStaff = function(params, callback){
     }
     return API.auth.remove({accountId: id})
         .then(function(acc){
-            if(acc.code == 0){
-                return staffModel.destroy({where: {id: id}})
-                    .then(function(obj){
-                        return {code: 0, msg: "删除成功"}
-                    })
+            if(acc.code != 0){
+                throw acc;
             }
         })
-        .nodeify(callback);
+        .then(function(){
+            return staffModel.update({status: -1, quitTime: utils.now()}, {where: {id: id}, fields: ['status', 'quitTime']})
+        })
+        .spread(function(num){
+            if(num != 1){
+                throw {code: -2, msg: '删除失败'};
+            }
+            return {code: 0, msg: "删除成功"}
+        })
 }
 
 /**
@@ -447,7 +452,7 @@ staff.beforeImportExcel = function(params, callback){
 //                    var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
                 var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
                 item = staffObj;
-                if(index>0 && index<202){//不取等于0的过滤抬头标题栏
+                if(index>0 && index<201){//不取等于0的过滤抬头标题栏
                     if(utils.trim(staffObj.name) == ""){
                         staffObj.reason = "姓名为空";
                         s[6] = "姓名为空";
@@ -658,21 +663,15 @@ staff.isStaffInCompany = function(staffId, companyId, callback){
  * @returns {*}
  */
 staff.statisticStaffs = function(params, callback){
-    var defer = Q.defer();
     if(!params.companyId){
-        defer.reject({code: -1, msg: '企业Id不能为空'});
-        return defer.promise;
+        throw {code: -1, msg: '企业Id不能为空'};
     }
     var companyId = params.companyId;
-    var start = params.startTime;
-    var end = params.endTime;
-    if(!start || !end){
-        start = moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
-        end = moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
-    }
+    var start = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
+    var end = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
     return Q.all([
-        staffModel.count({where: {companyId: companyId}}),
-        staffModel.count({where: {companyId: companyId, createAt: {$gte: start, $lte: end}, status: 1}}),
+        staffModel.count({where: {companyId: companyId, status: {$gte: 0}}}),
+        staffModel.count({where: {companyId: companyId, createAt: {$gte: start, $lte: end}}}),
         staffModel.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: -1 }})
     ])
         .spread(function(all, inNum, outNum){
@@ -724,6 +723,37 @@ staff.statisticStaffsRole = function(params, callback){
                 })
         })
         .nodeify(callback);
+}
+
+/**
+ * 统计企业内的员工总数
+ * @param params
+ * @param callback
+ * @returns {*}
+ */
+staff.getStaffCountByCompany = function(params, callback){
+    var defer = Q.defer();
+    if(!params.companyId){
+        defer.reject({code: -1, msg: '企业Id不能为空'});
+        return defer.promise;
+    }
+    var companyId = params.companyId;
+    return staffModel.count({where: {companyId: companyId}})
+        .then(function(all){
+            return all || 1;
+        }).nodeify(callback);
+}
+
+/**
+ * 删除企业的所有员工
+ * @param params
+ * @returns {*}
+ */
+staff.deleteAllStaffs = function(params){
+    return staffModel.destroy({where: {companyId: params.company}})
+        .then(function(){
+            return {code: 0, msg: '删除成功'};
+        })
 }
 
 /**

@@ -200,7 +200,7 @@ agency.createAgencyUser = function(data){
     _agencyUser.id = data.accountId || uuid.v1();
     var accData = {email: _agencyUser.email, mobile: _agencyUser.mobile, pwd: "123456", type: 2};//初始密码暂定123456
     return API.auth.newAccount(accData)
-    .then(function(account){
+        .then(function(account){
             _agencyUser.id = account.id;
             return AgencyUser.create(_agencyUser);
         })

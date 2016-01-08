@@ -31,7 +31,7 @@ describe("api/client/staff.js", function() {
         userName: '喵喵',
         domain: 'tulingdao.com',
         description: '企业API测试用',
-        email: 'company.test@tulingdao.com',
+        email: 'unique.test@tulingdao.com',
         mobile: '15269866802'
     }
 
@@ -40,7 +40,7 @@ describe("api/client/staff.js", function() {
     describe("API.staff", function() {
         before(function(done) {
             var agency = {
-                email: "company.test@tulingdao.com",
+                email: "unique.test@tulingdao.com",
                 userName: "喵喵",
                 name: '喵喵的代理商',
                 mobile: "15269866802",
@@ -102,7 +102,7 @@ describe("api/client/staff.js", function() {
             API.client.staff.createStaff.call(ownerSelf, obj, function(err, result) {
                 assert.equal(err, null);
                 //console.log(err);
-                console.log(result);
+//                console.log(result);
                 id = result.dataValues.id;//回调为何不能直接.id
                 done();
             });
@@ -167,7 +167,16 @@ describe("api/client/staff.js", function() {
 
     //查询人数
         it("API.staff.statisticStaffsRole", function(done) {
-            API.client.staff.statisticStaffsRole.call(ownerSelf, {companyId: '9f20e3c0-9f24-11e5-beab-31a51ecd9fc2'}, function(err, result) {//查询条件此处用staffId或者staff_id均可
+            API.client.staff.statisticStaffsRole.call(ownerSelf, {companyId: companyId}, function(err, result) {//查询条件此处用staffId或者staff_id均可
+                assert.equal(err, null);
+                //console.log(err);
+                console.log(result);
+                done();
+            });
+        })
+    //查询员工总数
+        it("API.staff.getStaffCountByCompany", function(done) {
+            API.client.staff.getStaffCountByCompany.call(ownerSelf, {companyId: companyId}, function(err, result) {//查询条件此处用staffId或者staff_id均可
                 assert.equal(err, null);
                 //console.log(err);
                 console.log(result);

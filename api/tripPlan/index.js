@@ -421,6 +421,7 @@ tripPlan.approveInvoice = function(params){
                             .then(function(isAllAudit){
                                 if(isAllAudit){
                                     order_updates.status = 1;
+                                    order_updates.auditStatus = 1;
                                 }
                                 var fields = getColsFromParams(order_updates);
                                 return PlanOrder.update(order_updates, {where: {id: order.id}, fields: fields, transaction: t})
