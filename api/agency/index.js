@@ -16,7 +16,6 @@ var getColsFromParams = utils.getColsFromParams;
 var checkAndGetParams = utils.checkAndGetParams;
 var API = require("common/api");
 var Paginate = require("common/paginate").Paginate;
-var errorHandle = require("common/errorHandle");
 var md5 = require("common/utils").md5;
 
 var agency = {};
@@ -140,7 +139,6 @@ agency.listAgency = function(params, callback){
     var userId = params.userId;
     delete params.userId;
     return Agency.findAll({where: params})
-        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -314,7 +312,6 @@ agency.listAndPaginateAgencyUser = function(params, callback){
         .then(function(result){
             return new Paginate(page, perPage, result.count, result.rows);
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 

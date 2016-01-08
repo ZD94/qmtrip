@@ -14,7 +14,6 @@ var getRndStr = require("../../common/utils").getRndStr;
 var C = require("../../config");
 var moment = require("moment");
 var API = require("../../common/api");
-var errorHandle = require("common/errorHandle");
 var utils = require("common/utils");
 
 var ACCOUNT_STATUS = {
@@ -80,7 +79,6 @@ authServer.activeByEmail = function(data, callback) {
                     return true;
                 })
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -225,7 +223,6 @@ authServer.active = function(data, callback) {
                     }}
                 })
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -246,7 +243,6 @@ authServer.remove = function(data, callback) {
             .then(function() {
                 return {code: 0, msg: "ok"};
             })
-            .catch(errorHandle)
             .nodeify(callback);
 }
 
@@ -437,7 +433,6 @@ authServer.authentication = function(params, callback) {
 
             return {code: -1, msg: "已经失效"};
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 
@@ -644,7 +639,6 @@ authServer.sendActiveEmail = function(params, callback) {
     .then(function() {
         return {code: 0, msg: "ok"};
     })
-    .catch(errorHandle)
     .nodeify(callback);
 }
 
@@ -669,7 +663,6 @@ authServer.logout = function (params, callback) {
             }
             return {code: 0, msg: "ok"};
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 

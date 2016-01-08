@@ -9,7 +9,6 @@ var validate = require("common/validate");
 var md5 = require("common/utils").md5;
 var uuid = require('node-uuid');
 var logger = new Logger("auth");
-var errorHandle = require("common/errorHandle");
 
 /**
  * @class auth 用户认证

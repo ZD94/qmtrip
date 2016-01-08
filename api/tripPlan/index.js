@@ -17,7 +17,6 @@ var utils = require('common/utils');
 var getColsFromParams = utils.getColsFromParams;
 var checkAndGetParams = utils.checkAndGetParams;
 var API = require('common/api');
-var errorHandle = require("common/errorHandle");
 var Paginate = require("common/paginate").Paginate;
 var logger = new Logger("company");
 
@@ -150,7 +149,6 @@ tripPlan.updateTripPlanOrder = function(params, callback){
         .spread(function(rownum, rows){
             return rows[0];
         })
-        .catch(errorHandle)
         .nodeify(callback);
 }
 
