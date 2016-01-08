@@ -151,6 +151,20 @@ var travelPlan=(function(){
             window.location.href = "#/travelPlan/PlanDetail?planId="+id;
         }
 
+        //删除
+        $scope.deletePlan = function () {
+            API.onload(function() {
+                API.tripPlan.deleteTripPlanOrder('f0f4f8c0-b5e6-11e5-88bb-9f621eb43a70')
+                    .then(function(result){
+                        console.info (result);
+                        $scope.$apply();
+                    })
+                    .catch(function(err){
+                        console.info(err);
+                    })
+            })
+        }
+
 
         //未完成已完成选项卡
         $('.mainbox_top li').click(function(){
