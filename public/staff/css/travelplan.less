@@ -101,6 +101,15 @@
       border: 1px @border-color solid;
       background: @background-color-second;
       margin-top: -1px;
+      .pass {
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        color: @btn-text-color;
+        border-radius: 50%;
+        background: #69B754;
+        display: inline-block;
+      }
       .search {
         width: 958px;
         height: 76px;
@@ -280,7 +289,7 @@
         .startplace {
           height: 90px;
           line-height: 112px;
-          padding-right: 20px;
+          padding-right: 10px;
           float: left;
         }
         .description {
@@ -293,12 +302,29 @@
         .endplace {
           height: 90px;
           line-height: 112px;
-          padding-left: 20px;
+          padding-left: 10px;
           float: left;
         }
         .hoteldescription {
           line-height: 30px;
           padding: 15px 0;
+        }
+        p {
+          height: 25px;
+          line-height: 25px;
+          color: #9B9B9B;
+          span {
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            color: @btn-text-color;
+            border-radius: 50%;
+            background: #69B754;
+            display: inline-block;
+          }
+          a {
+            color: @color-theme1;
+          }
         }
       }
       .cmask{
@@ -310,6 +336,54 @@
         bottom: 0;
         left: 0;
         z-index: 11;
+      }
+    }
+  }
+  .invoiceDetail {
+    width: 1000px;
+    height: auto;
+    margin: 30px auto 0 auto;
+    .invoicepath {
+      width: 100%;
+      height: 30px;
+      line-height: 30px;
+      font-size: 15px;
+      span {
+        color: #9B9B9B;
+      }
+    }
+    .mainbox {
+      width: 958px;
+      height: auto;
+      border: 1px @border-color solid;
+      background: @background-color-second;
+      padding: 20px;
+      .mainbox_top {
+        width: 100%;
+        height: auto;
+        line-height: 25px;
+        position: relative;
+        p {
+          font-size: 15px;
+        }
+        span {
+          color: #9B9B9B;
+        }
+        input {
+          width: 60px;
+          position: absolute;
+          top: 0;
+          right: 0;
+        }
+      }
+      .mainbox_bottom {
+        width: 100%;
+        height: auto;
+        text-align: center;
+        overflow: hidden;
+        img {
+          max-width: 958px;
+        }
       }
     }
   }

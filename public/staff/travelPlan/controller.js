@@ -19,10 +19,10 @@ var travelPlan=(function(){
         //待上传票据列表
         $scope.initPlanList = function () {
             API.onload(function() {
-                API.tripPlan.pageTripPlanOrder({isUpload: false, page:$scope.page,perPage:10})
+                API.tripPlan.pageTripPlanOrder({isUpload: false, page:$scope.page1})
                     .then(function(result){
                         console.info (result);
-                        $scope.total = result.total;
+                        $scope.total1 = result.total;
                         $scope.planListitems = result.items;
                         loading(true);
                         $scope.$apply();
@@ -84,38 +84,14 @@ var travelPlan=(function(){
             })
         }
 
-        //分页
-        $scope.pagination = function () {
-            if ($scope.total) {
-                $.jqPaginator('#pagination', {
-                    totalCounts: $scope.total,
-                    pageSize: 10,
-                    currentPage: 1,
-                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
-                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
-                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
-                    onPageChange: function (num) {
-                        $scope.page = num;
-                        $scope.initPlanList();
-                    }
-                });
-                clearInterval (pagenum);
-            }
-        }
-        var pagenum =setInterval($scope.pagination,1);
-
-
-
-
-
-
         //已完成列表
         $scope.initFinishPlanList = function () {
             API.onload(function() {
-                API.tripPlan.pageCompleteTripPlanOrder({})
-                    .then(function(ret){
-                        console.info(ret);
-                        $scope.finishPlanListitems = ret.items;
+                API.tripPlan.pageCompleteTripPlanOrder({page:$scope.page2})
+                    .then(function(result){
+                        console.info (result);
+                        $scope.total2 = result.total;
+                        $scope.finishPlanListitems = result.items;
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -123,32 +99,67 @@ var travelPlan=(function(){
                     })
             })
         }
+
+
+        //未完成分页
+        $scope.pagination1 = function () {
+            if ($scope.total1) {
+                $.jqPaginator('#pagination1', {
+                    totalCounts: $scope.total1,
+                    pageSize: 10,
+                    currentPage: 1,
+                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+                    onPageChange: function (num) {
+                        $scope.page1 = num;
+                        $scope.initPlanList();
+                    }
+                });
+                clearInterval (pagenum1);
+            }
+        }
+        var pagenum1 =setInterval($scope.pagination1,1);
+
+        //已完成分页
+        $scope.pagination2 = function () {
+            if ($scope.total2) {
+                $.jqPaginator('#pagination2', {
+                    totalCounts: $scope.total2,
+                    pageSize: 10,
+                    currentPage: 1,
+                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+                    onPageChange: function (num) {
+                        $scope.page2 = num;
+                        $scope.initFinishPlanList();
+                    }
+                });
+                clearInterval (pagenum2);
+            }
+        }
+        var pagenum2 =setInterval($scope.pagination2,1);
+
+
         $scope.initPlanList();
         $scope.initFinishPlanList();
 
-
-        $scope.countSec = function () {
-
-        }
-        setTimeout($scope.countSec, 1500);
 
         //进入详情页
         $scope.enterDetail = function (id) {
             window.location.href = "#/travelPlan/PlanDetail?planId="+id;
         }
 
-        //未完成关键字模糊查询
-        $scope.searchKeyword = function () {
-            $scope.initPlanList();
-        }
 
         //未完成已完成选项卡
         $('.mainbox_top li').click(function(){
             var i = $(this).index();
             $('.mainbox_top li').removeClass('active');
             $(this).addClass('active');
-            $('.mainbox_bottom').hide();
+            $('.mainbox_bottom,.pagination').hide();
             $('.mainbox_bottom').eq(i).show();
+            $('.pagination').eq(i).show();
         })
     }
 
@@ -227,6 +238,51 @@ var travelPlan=(function(){
                     $(".messagebox_box").css('margin-top',-boxheight/2);
                 }
         })
+        $scope.goDetail = function (status,invoiceId) {
+            window.location.href = "#/travelPlan/InvoiceDetail?planId="+planId+"&status="+status+"&invoiceId="+invoiceId;
+        }
+    }
+
+
+
+
+
+
+    /*
+     行程单详细
+     * @param $scope
+     * @constructor
+     */
+    travelPlan.InvoiceDetailController = function($scope, $routeParams) {
+        loading(true);
+        $("title").html("行程单明细");
+        var planId = $routeParams.planId;
+        $scope.status = $routeParams.status;
+        $scope.invoiceId = $routeParams.invoiceId;
+        API.onload(function() {
+            API.tripPlan.getTripPlanOrderById(planId)
+                .then(function(result){
+                    $scope.planDetail = result;
+                    if ($scope.status=='outTraffic') {
+                        $scope.InvoiceDetail = $scope.planDetail.outTraffic[0];
+                    }
+                    if ($scope.status=='backTraffic') {
+                        $scope.InvoiceDetail = $scope.planDetail.backTraffic[0];
+                    }
+                    if ($scope.status=='hotel') {
+                        $scope.InvoiceDetail = $scope.planDetail.hotel[0];
+                    }
+
+                    console.info (result);
+                    $scope.$apply();
+                })
+                .catch(function(err){
+                    console.info(err);
+                })
+        })
+        $scope.goDetail = function () {
+            window.location.href = "#/travelPlan/PlanDetail?planId="+planId;
+        }
     }
 
 
