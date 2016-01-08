@@ -203,3 +203,18 @@
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
 | json数据 | 消费单信息 |obj.invoice含义[{times:上传次数, picture:票据md5key, create_at:时间, status:审核状态, remark: 审核备注, approve_at: 审核时间}]
+
+
+>. 企业统计计划单预算和支出 API.tripPlan.statPlanOrderMoneyByCompany(callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 参数             |json              |------
+| params.userId                         |用户id            |uuid                 |必填
+| params.consumeId                         |消费单id            |uuid                 |必填
+| params.picture                         |上传票据图片MD5key            |string                |必填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| json数据 | 消费单信息 |obj.invoice含义[{times:上传次数, picture:票据md5key, create_at:时间, status:审核状态, remark: 审核备注, approve_at: 审核时间}]

@@ -38,6 +38,7 @@ tripPlan.savePlanOrder = function(params){
             var orderId = uuid.v1();
             _planOrder.id = orderId;
             _planOrder.orderNo = orderNo;
+            _planOrder.createAt = utils.now();
             var userId = params.accountId;
             var execArr = new Array();
             return sequelize.transaction(function(t){
@@ -441,11 +442,45 @@ tripPlan.approveInvoice = function(params){
  * @param params
  * @param callback
  */
-tripPlan.countTripPlanNum = function(params, callback){
+tripPlan.countTripPlanNum = function(params){
     var query = checkAndGetParams(['companyId'], ['accountId', 'status'], params);
     query.status = {$ne: -2};
-    return PlanOrder.count({where: query})
-        .nodeify(callback);
+    return PlanOrder.count({where: query});
+}
+
+/**
+ * 统计计划单的动态预算/计划金额和实际支出
+ * @param params
+ */
+tripPlan.statPlanOrderMoney = function(params){
+    return PlanOrder.findAll({where: params, attributes: ['id']})
+        .then(function(orders){
+            return orders.map(function(order){
+                return order.id;
+            })
+        })
+        .then(function(idList){
+            var q1 = {
+                orderId: {$in: idList},
+                status: {$ne: -2}
+            }
+            var q2 = {
+                orderId: {$in: idList},
+                status: 1
+            }
+            return Q.all([
+                ConsumeDetails.sum('budget', {where: q1}),
+                ConsumeDetails.sum('budget', {where: q2}),
+                ConsumeDetails.sum('expenditure', {where: q2})
+            ])
+        })
+        .spread(function(n1, n2, n3){
+            return {
+                qmBudget: n1 || 0,
+                planMoney: n2 || 0,
+                expenditure: n3 || 0
+            }
+        })
 }
 
 module.exports = tripPlan;
