@@ -275,7 +275,7 @@ describe("api/client/tripPlan.js", function() {
 
             it("#statPlanOrderMoneyByCompany should be ok", function (done) {
                 var self = {accountId: staffId};
-                API.client.tripPlan.statPlanOrderMoneyByCompany.call(self, function (err, ret) {
+                API.client.tripPlan.statPlanOrderMoneyByCompany.call(self, {startTime: '2016-01-01 00:00:00'}, function (err, ret) {
                     if (err) {
                         throw err;
                     }

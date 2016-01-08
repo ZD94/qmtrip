@@ -455,11 +455,12 @@ tripPlan.countTripPlanNum = function(params){
  */
 tripPlan.statPlanOrderMoney = function(params){
     var query = checkAndGetParams(['companyId'], [], params);
+    var createAt = {};
     if(params.startTime){
-        query.createAt?query.createAt.$gte = params.startTime:query.createAt = {$gte: params.startTime};
+        createAt.$gte = params.startTime;
     }
     if(params.endTime){
-        query.createAt?query.createAt.$lte = params.startTime:query.createAt = {$gle: params.endTime};
+        createAt.$lte = params.endTime;
     }
     return PlanOrder.findAll({where: query, attributes: ['id']})
         .then(function(orders){
@@ -476,14 +477,10 @@ tripPlan.statPlanOrderMoney = function(params){
                 orderId: {$in: idList},
                 status: 1
             }
-            if(params.startTime){
-                q1.createAt?q1.createAt.$gte = params.startTime:q1.createAt = {$gte: params.startTime};
+            if(!isObjNull(createAt)){
+                q1.createAt = createAt;
+                q2.createAt = createAt;
             }
-            if(params.endTime){
-                q1.createAt?q1.createAt.$lte = params.startTime:q1.createAt = {$gle: params.endTime};
-            }
-            console.info(q1);
-            console.info(q2);
             return Q.all([
                 ConsumeDetails.sum('budget', {where: q1}),
                 ConsumeDetails.sum('budget', {where: q2}),
@@ -497,6 +494,18 @@ tripPlan.statPlanOrderMoney = function(params){
                 expenditure: n3 || 0
             }
         })
+}
+
+/**
+ * 判断JSON对象是否为空
+ * @param obj
+ * @returns {boolean}
+ */
+function isObjNull(obj){
+    for (var s in obj){
+        return false;
+    }
+    return true;
 }
 
 module.exports = tripPlan;
