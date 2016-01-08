@@ -12,7 +12,6 @@ var Q = require("q");
 
 /**
  * @class place 地点信息
- * @type {{__public: boolean}}
  */
 var place = {
     __public: true
@@ -60,6 +59,29 @@ place.queryPlace = function(placeName, callback) {
  */
 place.queryBusinessDistrict = function(params, callback) {
     return API.place.queryBusinessDistrict(params, callback);
+}
+
+/**
+ * 热门城市
+ *
+ * @param {Object} params
+ * @param {Function} [callback] 如果存在将调用callback形式
+ * @return {Promise} [{id: "ID", name: "Name"}]
+ */
+place.hotCities = function(params, callback) {
+    return API.place.hotCities({}, callback);
+}
+
+/**
+ * 热门商圈
+ *
+ * @param {Object} params
+ * @param {String} params.cityId 城市ID
+ * @param {Function} [callback]
+ * @return {Promise} [{id:"ID", name:"Name"}]
+ */
+place.hotBusinessDistricts = function(params, callback) {
+    return API.place.hotBusinessDistricts(params, callback);
 }
 
 module.exports = place;
