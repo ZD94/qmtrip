@@ -3,8 +3,8 @@
  */
 "use strict";
 
+var gulp = require('gulp');
 var gulplib = require('./common/gulplib');
-
 
 gulplib.bundle_lib('ws', {require:['ws'], exclude:['bufferutil', 'utf-8-validate']});
 gulplib.bundle_lib('api', {require:['q', 'md5', 'moment', 'tiny-cookie', 'shoe', './common/client/api.js:api']});
@@ -20,7 +20,6 @@ gulplib.angular_app('agency');
 gulplib.angular_app('demo');
 
 gulplib.dist(function(){
-    var gulp = require('gulp');
     var filter = require('gulp-filter');
     var dist_all = [
         gulp.src(['public/**/*'])
@@ -53,3 +52,91 @@ gulplib.dist(function(){
 });
 
 gulplib.final('qmtrip');
+
+var eslint = require('gulp-eslint');
+gulp.task('eslint.server', function () {
+    var files = [
+        '**/*.js',
+        '!node_modules/**',
+        '!public/**',
+        '!common/client/**',
+        '!**/*.test.js',
+        '!test/**',
+        '!common/test/**'
+    ];
+    var options = {
+        "extends": "eslint:recommended",
+        "rules": {
+            "indent": [1, 4],
+            "quotes": [0, "single"],
+            "linebreak-style": [2, "unix"],
+            "semi": [2, "always"]
+        },
+        "env": {
+            "es6": true,
+            "node": true
+        },
+        "globals": {}
+    };
+    return gulp.src(files)
+        .pipe(eslint(options))
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError());
+});
+gulp.task('eslint.mocha', function () {
+    var files = [
+        'test/**',
+        'common/test/**',
+        '**/*.test.js'
+    ];
+    var options = {
+        "extends": "eslint:recommended",
+        "rules": {
+            "indent": [1, 4],
+            "quotes": [0, "single"],
+            "linebreak-style": [2, "unix"],
+            "semi": [2, "always"]
+        },
+        "env": {
+            "es6": true,
+            "node": true
+        },
+        "globals": {
+            describe: function(){},
+            it: function(){},
+            before: function(){},
+            after: function(){}
+        }
+    };
+    return gulp.src(files)
+        .pipe(eslint(options))
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError());
+});
+gulp.task('eslint.browser', function () {
+    var files = [
+        'public/**/controller.js'
+    ];
+    var options = {
+        "extends": "eslint:recommended",
+        "rules": {
+            "indent": [1, 4],
+            "quotes": [0, "single"],
+            "linebreak-style": [2, "unix"],
+            "semi": [2, "always"]
+        },
+        "env": {
+            "es6": false,
+            "browser": true
+        },
+        "globals": {
+            API: function(){},
+            $: function(){}
+        }
+    };
+    return gulp.src(files)
+        .pipe(eslint(options))
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError());
+});
+gulp.task('eslint', ['eslint.server', 'eslint.mocha', 'eslint.browser']);

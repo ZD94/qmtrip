@@ -156,7 +156,7 @@ staff.updateStaff = function(data, callback){
                 return staffModel.findById(id)
                     .then(function(old){
                         if(old.email != data.email){
-                            return API.auth.getAccount(id)//暂无此接口
+                            return API.auth.getAccount({id:id})//暂无此接口
                                 .then(function(acc){
                                     if(acc.status != 0)
                                         throw {code: -2, msg: "该账号不允许修改邮箱"};
@@ -456,7 +456,7 @@ staff.beforeImportExcel = function(params, callback){
                         return;
                     }
 //                    /^[\d]{11}$/.test(staffObj.mobile)
-                    if(utils.trim(staffObj.mobile) != "" && validate.isMobile(staffObj.mobile)){
+                    if(utils.trim(staffObj.mobile) != "" && !validate.isMobile(staffObj.mobile)){
                         staffObj.reason = "手机号格式不正确";
                         s[6] = "手机号格式不正确";
                         noAddObj.push(staffObj);

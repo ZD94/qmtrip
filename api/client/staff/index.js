@@ -191,11 +191,13 @@ staff.increaseStaffPoint = function(params, callback){
     params.accountId = this.accountId;//当前登录代理商id
     var user_id = this.accountId;
     var staffId = params.id;//加积分的员工id
+    console.info("staffId", staffId);
     return Q.all([
             API.staff.getStaff({id: staffId}),
-            API.agencyUser.getAgencyUser({id: this.accountId})
+            API.agency.getAgencyUser({id: this.accountId})
         ])
         .spread(function(staff, agencyUser){
+            console.info("s11111111", staff);
             if(!staff.companyId){
                 throw {msg:"该员工不存在或员工所在企业不存在"};
             }
@@ -256,7 +258,7 @@ staff.decreaseStaffPoint = function(params, callback){
     var staffId = params.id;//加积分的员工id
     return Q.all([
             API.staff.getStaff({id: staffId}),
-            API.agencyUser.getAgencyUser({id: this.accountId})
+            API.agency.getAgencyUser({id: this.accountId})
         ])
         .spread(function(staff, agencyUser){
             if(!staff.companyId){
@@ -320,7 +322,7 @@ staff.listAndPaginatePointChange = function(params, callback){
     var user_id = this.accountId;
     return API.staff.getStaff({id:user_id})
         .then(function(data){
-            params.companyId = data.companyId;
+            params.staffId = data.id;
             return API.staff.listAndPaginatePointChange(params);
         })
         .nodeify(callback);

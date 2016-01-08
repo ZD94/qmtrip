@@ -18,20 +18,17 @@ var travelPlan=(function(){
         $("title").html("出差单列表");
         //待上传票据列表
         $scope.initPlanList = function () {
-            var params = {isUpload: false};
-            if ($scope.keyword !='' && $scope.keyword !=undefined) {
-                params.$like = ['startPlace', '%' + $scope.keyword + '%'];
-            }
             API.onload(function() {
-                API.tripPlan.pageTripPlanOrder(params)
+                API.tripPlan.pageTripPlanOrder({isUpload: false, page:$scope.page,perPage:10})
                     .then(function(result){
-                        console.info(result);
+                        console.info (result);
+                        $scope.total = result.total;
                         $scope.planListitems = result.items;
                         loading(true);
                         $scope.$apply();
                         $(".content input").click(function(event){
                             event.stopPropagation();
-                        })
+                        });
                         $(".file").AjaxFileUpload({
                             action: '/upload/ajax-upload-file?type=invoice',
                             onComplete: function(filename, response) {
@@ -86,13 +83,39 @@ var travelPlan=(function(){
                     }
             })
         }
+
+        //分页
+        $scope.pagination = function () {
+            if ($scope.total) {
+                $.jqPaginator('#pagination', {
+                    totalCounts: $scope.total,
+                    pageSize: 10,
+                    currentPage: 1,
+                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+                    onPageChange: function (num) {
+                        $scope.page = num;
+                        $scope.initPlanList();
+                    }
+                });
+                clearInterval (pagenum);
+            }
+        }
+        var pagenum =setInterval($scope.pagination,1);
+
+
+
+
+
+
         //已完成列表
         $scope.initFinishPlanList = function () {
             API.onload(function() {
                 API.tripPlan.pageCompleteTripPlanOrder({})
                     .then(function(ret){
                         console.info(ret);
-                        $scope.finishPlanListitems = ret.items;;
+                        $scope.finishPlanListitems = ret.items;
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -103,6 +126,12 @@ var travelPlan=(function(){
         $scope.initPlanList();
         $scope.initFinishPlanList();
 
+
+        $scope.countSec = function () {
+
+        }
+        setTimeout($scope.countSec, 1500);
+
         //进入详情页
         $scope.enterDetail = function (id) {
             window.location.href = "#/travelPlan/PlanDetail?planId="+id;
@@ -111,22 +140,6 @@ var travelPlan=(function(){
         //未完成关键字模糊查询
         $scope.searchKeyword = function () {
             $scope.initPlanList();
-        }
-
-        //删除
-        $scope.deletePlan = function () {
-            API.onload(function() {
-                console.info(1111111111);
-                API.tripPlan.deleteTripPlanOrder('dc221660-b2be-11e5-9399-b58583583699')
-                    .then(function(result){
-                        Myalert("温馨提示","删除成功");
-                        $scope.initPlanList();
-                        $scope.$apply();
-                    })
-                    .catch(function(err){
-                        console.info(err);
-                    });
-            })
         }
 
         //未完成已完成选项卡
@@ -158,15 +171,16 @@ var travelPlan=(function(){
                     $scope.hotel = $scope.planDetail.hotel[0];
                     $scope.outTraffic = $scope.planDetail.outTraffic[0];
                     console.info (result);
-                    var customerId = "";
+                    $scope.$apply();
                     $(".file").AjaxFileUpload({
                         action: '/upload/ajax-upload-file?type=invoice',
                         onComplete: function(filename, response) {
+                            console.info("000000");
                             $scope.ref = $(this).attr("ref");
                             $scope.md5 = response.md5key;
                             if (response.ret == 0 ) {
-                                var ImgSrc = '/upload/get-img-file/'+response.md5key;// var htmlStr = '<img src="/upload/get-img-file/'+response.md5key+'" alt="">';
-                                var invoiceType = "";// $scope.htmlStr = htmlStr;
+                                var ImgSrc = '/upload/get-img-file/'+response.md5key;
+                                var invoiceType = "";
                                 if ($(this).attr("data-type") == 1) {
                                     invoiceType = "去程交通票据";
                                 }else if ($(this).attr("data-type") == 2) {
@@ -184,7 +198,7 @@ var travelPlan=(function(){
                             }
                         }
                     });
-                    $scope.$apply();
+                    
                 })
                 .catch(function(err){
                     console.info(err);
