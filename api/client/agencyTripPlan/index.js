@@ -7,6 +7,7 @@ var Q = require("q");
 var Logger = require('common/logger');
 var L = require("common/language");
 var checkAndGetParams = require("common/utils").checkAndGetParams;
+var checkAgencyPermission = require('../auth').checkAgencyPermission;
 
 var agencyTripPlan = {};
 
@@ -105,41 +106,42 @@ agencyTripPlan.pageTripPlanOrder = function(params){
  * @param callback
  * @returns {*|*|Promise}
  */
-agencyTripPlan.approveInvoice = function(params){
-    var self = this;
-    var user_id = self.accountId;
-    params.userId = user_id;
-    params.remark = params.remark || '审核票据';
-    var consumeId = params.consumeId;
-    return API.tripPlan.getConsumeDetail({consumeId: consumeId, userId: user_id})
-        .then(function(consumeDetail){
-            if(!consumeDetail.accountId){
-                throw {code: -6, msg: '消费记录异常'};
-            }
-            return consumeDetail.accountId;
-        })
-        .then(function(staffId){
-            return API.staff.getStaff({id: staffId, columns: ['companyId']})
-        })
-        .then(function(staff){
-            if(!staff.companyId){
-                throw {msg:"该员工不存在或员工所在企业不存在"};
-            }
-            return Q.all([
-                API.company.getCompany({companyId: staff.companyId, columns: ['agencyId']}),
-                API.agency.getAgencyUser({id: user_id, columns: ['agencyId']})
-            ])
-        })
-        .spread(function(company, user){
-            if(!company.agencyId){
-                throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
-            }
-            if(company.agencyId != user.agencyId){
-                throw L.ERR.PERMISSION_DENY;
-            }
-            return API.tripPlan.approveInvoice(params);
-        })
-};
+agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
+    function(params){
+        var self = this;
+        var user_id = self.accountId;
+        params.userId = user_id;
+        params.remark = params.remark || '审核票据';
+        var consumeId = params.consumeId;
+        return API.tripPlan.getConsumeDetail({consumeId: consumeId, userId: user_id})
+            .then(function(consumeDetail){
+                if(!consumeDetail.accountId){
+                    throw {code: -6, msg: '消费记录异常'};
+                }
+                return consumeDetail.accountId;
+            })
+            .then(function(staffId){
+                return API.staff.getStaff({id: staffId, columns: ['companyId']})
+            })
+            .then(function(staff){
+                if(!staff.companyId){
+                    throw {msg:"该员工不存在或员工所在企业不存在"};
+                }
+                return Q.all([
+                    API.company.getCompany({companyId: staff.companyId, columns: ['agencyId']}),
+                    API.agency.getAgencyUser({id: user_id, columns: ['agencyId']})
+                ])
+            })
+            .spread(function(company, user){
+                if(!company.agencyId){
+                    throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
+                }
+                if(company.agencyId != user.agencyId){
+                    throw L.ERR.PERMISSION_DENY;
+                }
+                return API.tripPlan.approveInvoice(params);
+            })
+    });
 
 
 /**

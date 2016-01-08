@@ -47,7 +47,7 @@ var agency_roles = {
     admin: {
         name: '管理员',
         inherit: ['staff'],
-        permission: ['company.add', 'company.delete', 'company.edit', 'user.add', 'user.delete', 'user.edit', "staff.increaseStaffPoint", "staff.decreaseStaffPoint", "tripPlan.approveInvoice"]
+        permission: ['company.query', 'company.add', 'company.delete', 'company.edit', 'user.add', 'user.query', 'user.delete', 'user.edit', "staff.increaseStaffPoint", "staff.decreaseStaffPoint", "tripPlan.approveInvoice"]
     }
 };
 
@@ -110,6 +110,32 @@ function getRoleOfAccount(data) {
         });
 }
 
+/**
+ * 获取代理商角色权限
+ *
+ * @param {Object}    params
+ * @param {uuid}      params.accountId
+ * @param {Function}  callback
+ */
+function getRoleOfAgency(params){
+    var accountId = params.accountId;
+    var u = {};
+    return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
+        .then(function(user){
+            u = user;
+            return API.agency.getAgency({agencyId: u.agencyId, userId: accountId})
+        })
+        .then(function(agency){
+            if(agency.createUser == accountId){
+                return agency_roles.admin;
+            }else if(u.roleId == ROLE_ID.ADMIN){
+                return agency_roles.admin;
+            }else{
+                return agency_roles.staff;
+            }
+        })
+}
+
 function getRoleList(roles){
     Object.keys(roles)
         .map(function(id){
@@ -156,7 +182,17 @@ permit.checkPermission = function(params, callback) {
     //如果要验证代理商权限,直接返回True
     //todo 实现代理商权限认证
     if (type == 2) {
-        return Q(true);
+        return getRoleOfAgency({accountId: accountId})
+            .then(function(role){
+                if(role == undefined)
+                    throw L.ERR.NOT_FOUND;
+                for(var p of permissions){
+                    if(role.permission[p] != true)
+                        throw L.ERR.PERMISSION_DENY;
+                }
+                return true;
+            })
+        .nodeify(callback);
     }
 
     return getRoleOfAccount({accountId: accountId})

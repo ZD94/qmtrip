@@ -231,6 +231,24 @@ auth.checkPermission = function(permissions, fn) {
 };
 
 /**
+ * 验证代理商权限
+ * @param permissions
+ * @param fn
+ * @returns {Function}
+ */
+auth.checkAgencyPermission = function(permissions, fn) {
+    return function(params, callback) {
+        var self = this;
+        var accountId = self.accountId;
+        return API.permit.checkPermission({accountId: accountId, permission: permissions, type: 2})
+            .then(function(ret) {
+                return fn.call(self, params);
+            })
+            .nodeify(callback);
+    }
+};
+
+/**
  * @method sendResetPwdEmail
  *
  * 发送重置密码邮件

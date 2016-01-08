@@ -11,6 +11,7 @@ var Logger = require('common/logger');
 var md5 = require("common/utils").md5;
 var Q = require('q');
 var checkPermission = require('../auth').checkPermission;
+var checkAgencyPermission = require('../auth').checkAgencyPermission;
 var logger = new Logger();
 var uuid = require("node-uuid");
 
@@ -110,20 +111,20 @@ company.getCompanyById = function(companyId, callback){
  * @param callback
  * @returns {*}
  */
-company.getCompanyListByAgency = //checkAgencyPermission(["company.query"],
+company.getCompanyListByAgency = checkAgencyPermission(["company.query"],
     function(callback){
         var self = this;
         var accountId = self.accountId;
         var params = {
             userId: accountId
         }
-        
+
         return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
             .then(function(user){
                 params.agencyId = user.agencyId;
                 return API.company.listCompany(params)
             }).nodeify(callback);
-    };
+    });
 
 /**
  * 删除企业信息
