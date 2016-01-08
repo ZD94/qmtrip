@@ -454,7 +454,14 @@ tripPlan.countTripPlanNum = function(params){
  * @param params
  */
 tripPlan.statPlanOrderMoney = function(params){
-    return PlanOrder.findAll({where: params, attributes: ['id']})
+    var query = checkAndGetParams(['companyId'], [], params);
+    if(params.startTime){
+        query.createAt?query.createAt.$gte = params.startTime:query.createAt = {$gte: params.startTime};
+    }
+    if(params.endTime){
+        query.createAt?query.createAt.$lte = params.startTime:query.createAt = {$gle: params.endTime};
+    }
+    return PlanOrder.findAll({where: query, attributes: ['id']})
         .then(function(orders){
             return orders.map(function(order){
                 return order.id;
@@ -475,6 +482,8 @@ tripPlan.statPlanOrderMoney = function(params){
             if(params.endTime){
                 q1.createAt?q1.createAt.$lte = params.startTime:q1.createAt = {$gle: params.endTime};
             }
+            console.info(q1);
+            console.info(q2);
             return Q.all([
                 ConsumeDetails.sum('budget', {where: q1}),
                 ConsumeDetails.sum('budget', {where: q2}),
