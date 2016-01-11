@@ -16,14 +16,14 @@ describe("api/client/agency.js", function() {
         var agencyUserId = "";
 
         var agency = {
-            email: "agency0.test.yu@tulingdao.com",
+            email: "agency.test@tulingdao.com",
             userName: "喵喵",
             name: '喵喵的代理商',
             description: '代理商API测试用',
             mobile: "15269866801"
         };
-        after(function(done){
-            API.agency.deleteAgency({agencyId: agencyId, userId: agencyUserId}, function (err, ret) {
+        before(function(done){
+            API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -32,7 +32,17 @@ describe("api/client/agency.js", function() {
             })
         });
 
-        it("registerAgency with wrong params should be error", function(done) {
+        after(function(done){
+            API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}, function (err, ret) {
+                if (err) {
+                    throw err;
+                }
+                assert.equal(ret.code, 0);
+                done();
+            })
+        });
+
+        it("#registerAgency with wrong params should be error", function(done) {
             API.client.agency.registerAgency({}, function(err, ret) {
                 assert.equal(ret, null);
                 assert.equal(err.code, -1);
@@ -40,7 +50,7 @@ describe("api/client/agency.js", function() {
             });
         });
 
-        it("registerAgency with correct params should be ok", function(done) {
+        it("#registerAgency with correct params should be ok", function(done) {
             API.client.agency.registerAgency(agency, function(err, ret) {
                 if (err) {
                     throw err;
@@ -60,35 +70,50 @@ describe("api/client/agency.js", function() {
         var agencyUserId = "";
 
         var agency = {
-            email: "agency1.test.yu@tulingdao.com",
+            email: "agency.test@tulingdao.com",
             userName: "喵喵",
             name: '喵喵的代理商',
             description: '代理商API测试用',
             mobile: "15269866811"
         };
         before(function(done){
-            API.client.agency.registerAgency(agency, function(err, ret) {
-                if (err) {
+            Q.all([
+                API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
+                API.agency.deleteAgencyByTest({email: 'agencyUser.test@tulingdao.com', mobile: agency.mobile})
+            ])
+                .spread(function(ret1, ret2){
+                    assert.equal(ret1.code, 0);
+                    assert.equal(ret2.code, 0);
+                    return API.client.agency.registerAgency(agency)
+                })
+                .then(function(ret){
+                    assert.equal(ret.agency.status, 0);
+                    agencyId = ret.agency.id;
+                    agencyUserId = ret.agencyUser.id;
+                    done();
+                })
+                .catch(function(err){
                     throw err;
-                }
-                assert.equal(ret.agency.status, 0);
-                agencyId = ret.agency.id;
-                agencyUserId = ret.agencyUser.id;
-                done();
-            });
+                })
+
         });
 
         after(function(done){
-            API.agency.deleteAgency({agencyId: agencyId, userId: agencyUserId}, function (err, ret) {
-                if (err) {
+            Q.all([
+                API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
+                API.agency.deleteAgencyByTest({email: 'agencyUser.test@tulingdao.com', mobile: agency.mobile})
+            ])
+                .spread(function(ret1, ret2){
+                    assert.equal(ret1.code, 0);
+                    assert.equal(ret2.code, 0);
+                    done();
+                })
+                .catch(function(err){
                     throw err;
-                }
-                assert.equal(ret.code, 0);
-                done();
-            })
+                })
         });
 
-        it("updateAgency should be ok", function(done) {
+        it("#updateAgency should be ok", function(done) {
             var self = {accountId: agencyUserId};
             API.client.agency.updateAgency.call(self, {agencyId: agencyId, status: '1', remark: '代理商更新测试', wrongParams: 'wrongParams'}, function(err, ret) {
                 if (err) {
@@ -113,7 +138,7 @@ describe("api/client/agency.js", function() {
 
         it("createAgencyUser should be ok", function(done) {
             API.client.agency.createAgencyUser.call({accountId: agencyUserId},
-                {name: '测试代理商用户', email: "test123456@tulingdao.com", mobile: '12345678777', agencyId: agencyId},
+                {name: '测试代理商用户', email: "agencyUser.test@tulingdao.com", mobile: '12345678777', agencyId: agencyId},
                 function(err, ret) {
                     if (err) {
                         throw err;
@@ -188,41 +213,54 @@ describe("api/client/agency.js", function() {
         var _agencyUserId = "";
 
         var agency = {
-            email: "agency2.test.yu@tulingdao.com",
+            email: "agency.test@tulingdao.com",
             userName: "喵喵",
             name: '喵喵的代理商',
             description: '代理商API测试用',
             mobile: "15269866821"
         };
         before(function(done){
-            API.client.agency.registerAgency(agency, function(err, ret) {
-                if (err) {
+            Q.all([
+                API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
+                API.agency.deleteAgencyByTest({email: 'agencyUser.test@tulingdao.com', mobile: agency.mobile})
+            ])
+                .spread(function(ret1, ret2){
+                    assert.equal(ret1.code, 0);
+                    assert.equal(ret2.code, 0);
+                    return API.client.agency.registerAgency(agency)
+                })
+                .then(function(ret){
+                    assert.equal(ret.agency.status, 0);
+                    _agencyId = ret.agency.id;
+                    _agencyUserId = ret.agencyUser.id;
+                })
+                .then(function(ret){
+                    return  API.client.agency.createAgencyUser.call({accountId: _agencyUserId},
+                        {name: '测试代理商用户', email: "agencyUser.test@tulingdao.com", mobile: '12345678777', agencyId: _agencyId})
+                })
+                .then(function(ret){
+                    assert.equal(ret.status, 0);
+                    _newAgencyUser = ret.id;
+                    done();
+                })
+                .catch(function(err){
                     throw err;
-                }
-                assert.equal(ret.agency.status, 0);
-                _agencyId = ret.agency.id;
-                _agencyUserId = ret.agencyUser.id;
-                API.client.agency.createAgencyUser.call({accountId: _agencyUserId},
-                    {name: '测试代理商用户', email: "test123456@tulingdao.com", mobile: '12345678777', agencyId: _agencyId},
-                    function(err, ret) {
-                        if (err) {
-                            throw err;
-                        }
-                        assert.equal(ret.status, 0);
-                        _newAgencyUser = ret.id;
-                        done();
-                    });
-            });
+                })
         });
 
         after(function(done){
-            API.agency.deleteAgency({agencyId: _agencyId, userId: _agencyUserId}, function (err, ret) {
-                if (err) {
+            Q.all([
+                API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
+                API.agency.deleteAgencyByTest({email: 'agencyUser.test@tulingdao.com', mobile: agency.mobile})
+            ])
+                .spread(function(ret1, ret2){
+                    assert.equal(ret1.code, 0);
+                    assert.equal(ret2.code, 0);
+                    done();
+                })
+                .catch(function(err){
                     throw err;
-                }
-                assert.equal(ret.code, 0);
-                done();
-            })
+                })
         });
 
         it("deleteAgencyUser should be ok", function(done) {

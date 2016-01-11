@@ -75,7 +75,7 @@ staff.createStaff = function(data, callback){
                 data.id = accountId;
                 return data;
             }
-            var accData = {email: data.email, mobile: data.mobile, status: 0}//若为导入员工置为激活状态 不设置密码
+            var accData = {email: data.email, mobile: data.mobile, status: 0, type: 1}//若为导入员工置为激活状态 不设置密码
             return API.auth.newAccount(accData)
                 .then(function(account){
                     data.id = account.id;
@@ -112,7 +112,6 @@ staff.createCompanyOwner = function(params, callback){
  * @returns {*}
  */
 staff.deleteStaff = function(params){
-    var defer = Q.defer();
     var id = params.id;
     if (!id) {
         throw {code: -1, msg: "id不能为空"};
@@ -772,6 +771,19 @@ staff.getInvoiceViewer = function(params, callback){
             }
         })
         .nodeify(callback);
+}
+
+staff.deleteAllStaffByTest = function(params){
+    var companyId = params.companyId;
+    var mobile = params.mobile;
+    var email = params.email;
+    return Q.all([
+        API.auth.remove({email: email, type: 1}),
+        staffModel.destroy({where: {$or: [{companyId: companyId}, {mobile: mobile}, {email: email}]}})
+    ])
+        .spread(function(){
+            return {code: 0, msg: '删除成功'}
+        })
 }
 
 module.exports = staff;

@@ -341,6 +341,36 @@ staff.statisticStaffs = function(params, callback){
         .nodeify(callback);
 }
 
+
+/**
+ * @method API.staff.statisticStaffs
+ *
+ * 代理商统计时间段内企业员工数量（在职 入职 离职）
+ *
+ * @param {object} params
+ * @param {String} params.companyId
+ * @param {String} params.startTime
+ * @param {String} params.endTime
+ * @param {Function} callback
+ * @return {promise} {code: 0, msg: 'success', sta: {all: 0, inNum: 0, outNum: 0};
+ */
+staff.statisticStaffsByAgency = function(params){
+    var user_id = this.accountId;
+    if(!params.companyId){
+        throw {code: -1, msg: "企业ID不能为空"};
+    }
+    return Q.all([
+        API.agency.getAgencyUser({id: user_id}),
+        API.company.getCompany({companyId: params.companyId})
+        ])
+    .spread(function(user, company){
+        if(user.agencyId != company.agencyId){
+            throw {code: -2, msg: '权限不足'};
+        }
+        return API.staff.statisticStaffs(params);
+    })
+}
+
 /**
  * 统计企业员工总数
  * @param params
