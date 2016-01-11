@@ -24,32 +24,36 @@ describe("api/client/travelPolicy.js", function() {
         companyId: companyId
     }
     var company = {
-        name: '喵喵的企业',
-        userName: '喵喵',
+        name: 'travelPolicyTest的企业',
+        userName: 'travelPolicyTest企业',
         domain: 'tulingdao.com',
         description: '企业API测试用',
-        email: 'unique.test@tulingdao.com',
-        mobile: '15269866802'
+        email: 'travelPolicy.company.test@tulingdao.com',
+        mobile: '15269866999'
     }
 
     //创建差旅标准
-    describe("API.travelPolicy", function() {
+    describe("API.travelPolicy before", function() {
         before(function(done) {
             var agency = {
-                email: "unique.test@tulingdao.com",
-                userName: "喵喵",
-                name: '喵喵的代理商',
-                mobile: "15269866802",
+                email: "travelPolicy.agency.test@tulingdao.com",
+                userName: "travelPolicyTest代理商",
+                name: 'travelPolicyTest的代理商',
+                mobile: "15269866777",
                 description: '企业API测试用'
             };
-
-            API.agency.registerAgency(agency, function(err, ret) {
+            API.agency.deleteAgencyByTest({email: "travelPolicy.agency.test@tulingdao.com",mobile:"15269866777"}, function(err, ret) {
                 if (err) {
                     throw err;
                 }
-                agencyId = ret.agency.id;
-                agencyUserId = ret.agencyUser.id;
-                done();
+                API.agency.registerAgency(agency, function(err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+                    agencyId = ret.agency.id;
+                    agencyUserId = ret.agencyUser.id;
+                    done();
+                });
             });
         });
 
@@ -63,8 +67,6 @@ describe("api/client/travelPolicy.js", function() {
         });
         describe("API.travelPolicy", function() {
             before(function(done){
-                company.mobile = '15269866812';
-                company.email = 'company2.test@tulingdao.com';
                 API.client.company.createCompany.call({accountId: agencyUserId}, company, function(err, ret){
                     if(err){
                         throw err;
@@ -89,7 +91,7 @@ describe("api/client/travelPolicy.js", function() {
                         throw err;
                     })
             });
-            it("API.travelPolicy.createTravelPolicy", function(done) {
+            it("#createTravelPolicy should be ok", function(done) {
                 API.client.travelPolicy.createTravelPolicy.call(self, obj, function(err, result) {
                     assert.equal(err, null);
                     id = result.id;
@@ -98,7 +100,7 @@ describe("api/client/travelPolicy.js", function() {
                 });
             })
         //查询差旅标准
-            it("API.travelPolicy.getTravelPolicy", function(done) {
+            it("#getTravelPolicy should be ok", function(done) {
                 API.client.travelPolicy.getTravelPolicy.call(self, {id: id}, function(err, result) {
                     assert.equal(err, null);
                     //console.log(result);
@@ -106,7 +108,7 @@ describe("api/client/travelPolicy.js", function() {
                 });
             })
         //查询差旅标准集合
-            it("API.travelPolicy.listAndPaginateTravelPolicy", function(done) {
+            it("#listAndPaginateTravelPolicy should be ok", function(done) {
                 API.client.travelPolicy.listAndPaginateTravelPolicy.call(self, {companyId: companyId}, function(err, result) {
                     assert.equal(err, null);
                     //console.log(result);
@@ -114,7 +116,7 @@ describe("api/client/travelPolicy.js", function() {
                     done();
                 });
             })
-            it("API.travelPolicy.getAllTravelPolicy", function(done) {
+            it("#getAllTravelPolicy should be ok", function(done) {
                 API.client.travelPolicy.getAllTravelPolicy.call(self, {companyId: companyId}, function(err, result) {
                     assert.equal(err, null);
                     //console.log(result);
@@ -123,7 +125,7 @@ describe("api/client/travelPolicy.js", function() {
                 });
             })
         //更新差旅标准信息
-            it("API.travelPolicy.updateTravelPolicy", function(done) {
+            it("#updateTravelPolicy should be ok", function(done) {
                 obj.id = id;
                 API.client.travelPolicy.updateTravelPolicy.call(self, obj, function(err, result) {
                     assert.equal(err, null);
@@ -132,7 +134,7 @@ describe("api/client/travelPolicy.js", function() {
                 });
             })
         //删除差旅标准信息
-            it("API.travelPolicy.deleteTravelPolicy", function(done) {
+            it("#deleteTravelPolicy should be ok", function(done) {
                 API.client.travelPolicy.deleteTravelPolicy.call(self, {id: id}, function(err, result) {
                     assert.equal(err, null);
                     //console.log(result);

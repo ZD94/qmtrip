@@ -27,12 +27,12 @@ describe("api/client/staff.js", function() {
     }
 
     var company = {
-        name: '喵喵的企业',
-        userName: '喵喵',
+        name: 'staffTest的企业',
+        userName: 'staffTest企业',
         domain: 'tulingdao.com',
         description: '企业API测试用',
-        email: 'unique.test@tulingdao.com',
-        mobile: '15269866802'
+        mobile:  '15269866812',
+        email: 'staff.company.test@tulingdao.com'
     }
 
 
@@ -40,22 +40,29 @@ describe("api/client/staff.js", function() {
     describe("API.staff", function() {
         before(function(done) {
             var agency = {
-                email: "unique.test@tulingdao.com",
-                userName: "喵喵",
-                name: '喵喵的代理商',
+                email: "staff.agency.test@tulingdao.com",
+                userName: "staffTest代理商",
+                name: 'staffTest的代理商',
                 mobile: "15269866802",
                 description: '企业API测试用'
             };
 
-            API.agency.registerAgency(agency, function(err, ret) {
+
+            API.agency.deleteAgencyByTest({email: "staff.agency.test@tulingdao.com",mobile:"15269866802"}, function(err, ret) {
                 if (err) {
                     throw err;
                 }
-                agencyId = ret.agency.id;
-                agencyUserId = ret.agencyUser.id;
-                agencySelf = {accountId: agencyUserId};
-                done();
-            });
+                API.agency.registerAgency(agency, function(err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+                    agencyId = ret.agency.id;
+                    agencyUserId = ret.agencyUser.id;
+                    agencySelf = {accountId: agencyUserId};
+                    done();
+                });
+            })
+
         });
 
         after(function(done) {
@@ -70,18 +77,22 @@ describe("api/client/staff.js", function() {
         describe("API.staff", function(){
 
             before(function(done){
-                company.mobile = '15269866812';
-                company.email = 'company2.test@tulingdao.com';
-                API.client.company.createCompany.call({accountId: agencyUserId}, company, function(err, ret){
+                API.staff.deleteAllStaffByTest({email:"staff.company.test@tulingdao.com", mobile:"15269866812"}, function(err, ret){
                     if(err){
                         throw err;
                     }
-                    assert.equal(ret.company.status, 0);
-                    companyId = ret.company.id;
-                    accountId = ret.company.createUser;
-                    ownerSelf = {accountId: accountId};
-                    done();
+                    API.client.company.createCompany.call({accountId: agencyUserId}, company, function(err, ret){
+                        if(err){
+                            throw err;
+                        }
+                        assert.equal(ret.company.status, 0);
+                        companyId = ret.company.id;
+                        accountId = ret.company.createUser;
+                        ownerSelf = {accountId: accountId};
+                        done();
+                    })
                 })
+
             });
 
             after(function(done){
@@ -97,7 +108,7 @@ describe("api/client/staff.js", function() {
                     })
             });
 
-        it("API.staff.createStaff", function(done) {
+        it("#createStaff should be ok", function(done) {
             obj.companyId = companyId;
             API.client.staff.createStaff.call(ownerSelf, obj, function(err, result) {
                 assert.equal(err, null);
@@ -108,7 +119,7 @@ describe("api/client/staff.js", function() {
             });
         })
     //查询员工集合
-        it("API.staff.listAndPaginateStaff", function(done) {
+        it("#listAndPaginateStaff should be ok", function(done) {
             API.client.staff.listAndPaginateStaff.call(ownerSelf, {}, function(err, result) {
                 assert.equal(err, null);
                 //console.log(err);
@@ -119,7 +130,7 @@ describe("api/client/staff.js", function() {
         })
 
     //更新员工信息
-        it("API.staff.updateStaff", function(done) {
+        it("#updateStaff should be ok", function(done) {
             updateobj.id = id;
             API.client.staff.updateStaff.call(ownerSelf, updateobj, function(err, result) {
                 assert.equal(err, null);
@@ -129,7 +140,7 @@ describe("api/client/staff.js", function() {
             });
         })
     //通过id得到员工
-        it("API.staff.getStaff", function(done) {
+        it("#getStaff should be ok", function(done) {
             API.client.staff.getStaff.call(ownerSelf, {id:id}, function(err, result) {
                 assert.equal(err, null);
                 //console.log(err);
@@ -138,7 +149,7 @@ describe("api/client/staff.js", function() {
             });
         })
     //加积分
-        it("API.staff.increaseStaffPoint", function(done) {
+        it("#increaseStaffPoint should be ok", function(done) {
             API.client.staff.increaseStaffPoint.call(agencySelf, {id: id, increasePoint: 1000, remark: "差旅省钱加积分"}, function(err, result) {
                 assert.equal(err, null);
                 //console.log(err);
@@ -147,7 +158,7 @@ describe("api/client/staff.js", function() {
             });
         })
     //减积分
-        it("API.staff.decreaseStaffPoint", function(done) {
+        it("#decreaseStaffPoint should be ok", function(done) {
             API.client.staff.decreaseStaffPoint.call(agencySelf, {id: id, decreasePoint: 1000, remark: "兑换礼品减积分"}, function(err, result) {
                 assert.equal(err, null);
                 //console.log(err);
@@ -156,7 +167,7 @@ describe("api/client/staff.js", function() {
             });
         })
     //积分记录查询
-        it("API.staff.listAndPaginatePointChange", function(done) {
+        it("#listAndPaginatePointChange should be ok", function(done) {
             API.client.staff.listAndPaginatePointChange.call(ownerSelf, {staffId: id}, function(err, result) {//查询条件此处用staffId或者staff_id均可
                 assert.equal(err, null);
                 //console.log(err);
@@ -166,7 +177,7 @@ describe("api/client/staff.js", function() {
         })
 
     //查询人数
-        it("API.staff.statisticStaffsRole", function(done) {
+        it("#statisticStaffsRole should be ok", function(done) {
             API.client.staff.statisticStaffsRole.call(ownerSelf, {companyId: companyId}, function(err, result) {//查询条件此处用staffId或者staff_id均可
                 assert.equal(err, null);
                 //console.log(err);
@@ -175,7 +186,7 @@ describe("api/client/staff.js", function() {
             });
         })
     //查询员工总数
-        it("API.staff.getStaffCountByCompany", function(done) {
+        it("#getStaffCountByCompany should be ok", function(done) {
             API.client.staff.getStaffCountByCompany.call(ownerSelf, {companyId: companyId}, function(err, result) {//查询条件此处用staffId或者staff_id均可
                 assert.equal(err, null);
                 //console.log(err);
@@ -185,7 +196,7 @@ describe("api/client/staff.js", function() {
         })
 
     //删除员工信息
-        it("API.staff.deleteStaff", function(done) {
+        it("#deleteStaff should be ok", function(done) {
             API.client.staff.deleteStaff.call(ownerSelf, {id: id}, function(err, result) {
                 assert.equal(err, null);
                 //console.log(err);

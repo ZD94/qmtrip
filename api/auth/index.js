@@ -238,8 +238,11 @@ authServer.remove = function(data, callback) {
     var accountId = data.accountId;
     var email = data.email;
     var type = data.type || 1;
-
-    return Models.Account.destroy({where: {$or: [{id: accountId}, {email: email}], type: type}})
+    var where = {$or: [{id: accountId}, {email: email}]};
+    if(!accountId){
+        where.type = type;
+    }
+    return Models.Account.destroy({where: where})
         .then(function() {
             return {code: 0, msg: "ok"};
         })
