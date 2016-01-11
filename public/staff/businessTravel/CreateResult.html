@@ -3,9 +3,10 @@
     <section class="creating">
         <table width="100%">
             <tr>
-                <td align="center" height="50" class="loadtxt" style="border-bottom: 1px #E5E5E5 solid;">
+                <td height="50" class="loadtxt" style="border-bottom: 1px #E5E5E5 solid;">
+                    今天 {{nowtime | date: 'HH:mm'}}<br>
                     您计划&nbsp;&nbsp;&nbsp;<span ng-if="starttime!=undefined">{{starttime}}&nbsp;&nbsp;&nbsp;{{startplace}}-{{endplace}}&nbsp;&nbsp;&nbsp;</span><span ng-if="starttimelate!=undefined && starttimelate!=''">最晚{{starttime}} {{starttimelate}}到达</span><br>
-                    <span ng-if="liveplace!=undefined">在{{liveplace}}附近酒店入住&nbsp;&nbsp;&nbsp;</span><span ng-if="livetime!=undefined">计划住店时间为{{livetime}}到{{leavetime}}</span>
+                    <span ng-if="liveplace!=undefined">　　　&nbsp;&nbsp;&nbsp;在{{liveplace}}附近酒店入住&nbsp;&nbsp;&nbsp;</span><span ng-if="livetime!=undefined">计划住店时间为{{livetime}}到{{leavetime}}</span>
                 </td>
             </tr>
             <tr>
@@ -16,6 +17,7 @@
 
     <section class="createresult">
         <div class="top">本次出差预算：
+            <span class="createtime" ng-bind-html="createTime | date:'yyyy-MM-dd'" style="position: absolute; left: 20px;"></span>
             <span ng-if="tra==1&&liv==0">¥{{onlytraffic.price}}</span>
             <span ng-if="tra==0&&liv==1">¥{{onlylive.price}}</span>
             <span ng-if="tra==1&&liv==1">¥{{trafficlive.price}}</span>
@@ -80,6 +82,7 @@
         <div class="bottom2">
             <div>
                 <div class="bottom_txt">出差记录已生成，可在&nbsp;<a href="#/StaffFirst/StaffUser">我的账户</a>&nbsp;>&nbsp;<a href="#/travelPlan/PlanList">出差记录</a>&nbsp;中查找</div>
+                <div style="text-align: center; font-size: 13px; padding-bottom: 15px;">提示：出差完成后，您需将相关票据上传至对应出差记录</div>
                 <input type="button" value="去预定" class="common_btn2 w120" ng-click="bookTicket()" style="margin-left: 370px;">
                 <input type="button" value="上传票据" class="common_btn2 w120" style="margin-left: 20px;">
             </div>
