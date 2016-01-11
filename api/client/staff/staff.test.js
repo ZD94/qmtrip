@@ -35,176 +35,168 @@ describe("api/client/staff.js", function() {
         email: 'staff.company.test@tulingdao.com'
     }
 
+    var agency = {
+        email: "staff.agency.test@tulingdao.com",
+        userName: "staffTest代理商",
+        name: 'staffTest的代理商',
+        mobile: "15269866802",
+        description: '企业API测试用'
+    };
+
 
     //创建员工
-    describe("API.staff", function() {
-        before(function(done) {
-            var agency = {
-                email: "staff.agency.test@tulingdao.com",
-                userName: "staffTest代理商",
-                name: 'staffTest的代理商',
-                mobile: "15269866802",
-                description: '企业API测试用'
-            };
-
-
-            API.agency.deleteAgencyByTest({email: "staff.agency.test@tulingdao.com",mobile:"15269866802"}, function(err, ret) {
-                if (err) {
-                    throw err;
-                }
-                API.agency.registerAgency(agency, function(err, ret) {
-                    if (err) {
-                        throw err;
-                    }
-                    agencyId = ret.agency.id;
-                    agencyUserId = ret.agencyUser.id;
-                    agencySelf = {accountId: agencyUserId};
-                    done();
-                });
+    before(function(done) {
+        Q.all([
+                API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
+                API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
+                API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile}),
+                API.staff.deleteAllStaffByTest({email: updateobj.email, mobile: updateobj.mobile}),
+                API.staff.deleteAllStaffByTest({email: obj.email, mobile: obj.mobile})
+            ])
+            .spread(function(ret1, ret2, ret3, ret4, ret5){
+                assert.equal(ret1.code, 0);
+                assert.equal(ret2.code, 0);
+                assert.equal(ret3.code, 0);
+                assert.equal(ret4.code, 0);
+                assert.equal(ret5.code, 0);
+                return API.agency.registerAgency(agency);
             })
-
-        });
-
-        after(function(done) {
-            API.agency.deleteAgency({agencyId: agencyId, userId: agencyUserId}, function (err, ret) {
-                if (err) {
-                    throw err;
-                }
+            .then(function(ret){
+                agencyId = ret.agency.id;
+                agencyUserId = ret.agencyUser.id;
+                agencySelf = {accountId: agencyUserId};
+                return API.client.company.createCompany.call({accountId: agencyUserId}, company);
+            })
+            .then(function(ret){
+                assert.equal(ret.company.status, 0);
+                companyId = ret.company.id;
+                accountId = ret.company.createUser;
+                ownerSelf = {accountId: accountId};
                 done();
             })
-        });
+            .catch(function(err){
+                console.info(err);
+                throw err;
+            })
+    });
 
-        describe("API.staff", function(){
+    after(function(done) {
+        Q.all([
+                API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
+                API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
+                API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile}),
+                API.staff.deleteAllStaffByTest({email: updateobj.email, mobile: updateobj.mobile}),
+                API.staff.deleteAllStaffByTest({email: obj.email, mobile: obj.mobile})
+            ])
+            .spread(function(ret1, ret2, ret3, ret4, ret5){
+                assert.equal(ret1.code, 0);
+                assert.equal(ret2.code, 0);
+                assert.equal(ret3.code, 0);
+                assert.equal(ret4.code, 0);
+                assert.equal(ret5.code, 0);
+                done();
+            })
+            .catch(function(err){
+                console.info(err);
+                throw err;
+            })
+    });
 
-            before(function(done){
-                API.staff.deleteAllStaffByTest({email:"staff.company.test@tulingdao.com", mobile:"15269866812"}, function(err, ret){
-                    if(err){
-                        throw err;
-                    }
-                    API.client.company.createCompany.call({accountId: agencyUserId}, company, function(err, ret){
-                        if(err){
-                            throw err;
-                        }
-                        assert.equal(ret.company.status, 0);
-                        companyId = ret.company.id;
-                        accountId = ret.company.createUser;
-                        ownerSelf = {accountId: accountId};
-                        done();
-                    })
-                })
-
-            });
-
-            after(function(done){
-                Q.all([
-                        API.company.deleteCompany({companyId: companyId, userId: accountId}),
-                        API.staff.deleteStaff({id: accountId})
-                    ])
-                    .then(function(){
-                        done();
-                    })
-                    .catch(function(err){
-                        throw err;
-                    })
-            });
-
-        it("#createStaff should be ok", function(done) {
-            obj.companyId = companyId;
-            API.client.staff.createStaff.call(ownerSelf, obj, function(err, result) {
-                assert.equal(err, null);
-                //console.log(err);
+    it("#createStaff should be ok", function(done) {
+        obj.companyId = companyId;
+        API.client.staff.createStaff.call(ownerSelf, obj, function(err, result) {
+            assert.equal(err, null);
+            //console.log(err);
 //                console.log(result);
-                id = result.dataValues.id;//回调为何不能直接.id
-                done();
-            });
-        })
-    //查询员工集合
-        it("#listAndPaginateStaff should be ok", function(done) {
-            API.client.staff.listAndPaginateStaff.call(ownerSelf, {}, function(err, result) {
-                assert.equal(err, null);
-                //console.log(err);
-                //console.log(result);
-//                console.log(result.items);//item dataValues里存放的才是记录信息
-                done();
-            });
-        })
-
-    //更新员工信息
-        it("#updateStaff should be ok", function(done) {
-            updateobj.id = id;
-            API.client.staff.updateStaff.call(ownerSelf, updateobj, function(err, result) {
-                assert.equal(err, null);
-                //console.log(err);
-                //console.log(result);
-                done();
-            });
-        })
-    //通过id得到员工
-        it("#getStaff should be ok", function(done) {
-            API.client.staff.getStaff.call(ownerSelf, {id:id}, function(err, result) {
-                assert.equal(err, null);
-                //console.log(err);
-                //console.log(result);
-                done();
-            });
-        })
-    //加积分
-        it("#increaseStaffPoint should be ok", function(done) {
-            API.client.staff.increaseStaffPoint.call(agencySelf, {id: id, increasePoint: 1000, remark: "差旅省钱加积分"}, function(err, result) {
-                assert.equal(err, null);
-                //console.log(err);
-                //console.log(result);
-                done();
-            });
-        })
-    //减积分
-        it("#decreaseStaffPoint should be ok", function(done) {
-            API.client.staff.decreaseStaffPoint.call(agencySelf, {id: id, decreasePoint: 1000, remark: "兑换礼品减积分"}, function(err, result) {
-                assert.equal(err, null);
-                //console.log(err);
-                //console.log(result);
-                done();
-            });
-        })
-    //积分记录查询
-        it("#listAndPaginatePointChange should be ok", function(done) {
-            API.client.staff.listAndPaginatePointChange.call(ownerSelf, {staffId: id}, function(err, result) {//查询条件此处用staffId或者staff_id均可
-                assert.equal(err, null);
-                //console.log(err);
-                //console.log(result);
-                done();
-            });
-        })
-
-    //查询人数
-        it("#statisticStaffsRole should be ok", function(done) {
-            API.client.staff.statisticStaffsRole.call(ownerSelf, {companyId: companyId}, function(err, result) {//查询条件此处用staffId或者staff_id均可
-                assert.equal(err, null);
-                //console.log(err);
-                console.log(result);
-                done();
-            });
-        })
-    //查询员工总数
-        it("#getStaffCountByCompany should be ok", function(done) {
-            API.client.staff.getStaffCountByCompany.call(ownerSelf, {companyId: companyId}, function(err, result) {//查询条件此处用staffId或者staff_id均可
-                assert.equal(err, null);
-                //console.log(err);
-                console.log(result);
-                done();
-            });
-        })
-
-    //删除员工信息
-        it("#deleteStaff should be ok", function(done) {
-            API.client.staff.deleteStaff.call(ownerSelf, {id: id}, function(err, result) {
-                assert.equal(err, null);
-                //console.log(err);
-                //console.log(result);
-                done();
-            });
-        })
+            id = result.dataValues.id;//回调为何不能直接.id
+            done();
+        });
     })
+//查询员工集合
+    it("#listAndPaginateStaff should be ok", function(done) {
+        API.client.staff.listAndPaginateStaff.call(ownerSelf, {}, function(err, result) {
+            assert.equal(err, null);
+            //console.log(err);
+            //console.log(result);
+//                console.log(result.items);//item dataValues里存放的才是记录信息
+            done();
+        });
+    })
+
+//更新员工信息
+    it("#updateStaff should be ok", function(done) {
+        updateobj.id = id;
+        API.client.staff.updateStaff.call(ownerSelf, updateobj, function(err, result) {
+            assert.equal(err, null);
+            //console.log(err);
+            //console.log(result);
+            done();
+        });
+    })
+//通过id得到员工
+    it("#getStaff should be ok", function(done) {
+        API.client.staff.getStaff.call(ownerSelf, {id:id}, function(err, result) {
+            assert.equal(err, null);
+            //console.log(err);
+            //console.log(result);
+            done();
+        });
+    })
+//加积分
+    it("#increaseStaffPoint should be ok", function(done) {
+        API.client.staff.increaseStaffPoint.call(agencySelf, {id: id, increasePoint: 1000, remark: "差旅省钱加积分"}, function(err, result) {
+            assert.equal(err, null);
+            //console.log(err);
+            //console.log(result);
+            done();
+        });
+    })
+//减积分
+    it("#decreaseStaffPoint should be ok", function(done) {
+        API.client.staff.decreaseStaffPoint.call(agencySelf, {id: id, decreasePoint: 1000, remark: "兑换礼品减积分"}, function(err, result) {
+            assert.equal(err, null);
+            //console.log(err);
+            //console.log(result);
+            done();
+        });
+    })
+//积分记录查询
+    it("#listAndPaginatePointChange should be ok", function(done) {
+        API.client.staff.listAndPaginatePointChange.call(ownerSelf, {staffId: id}, function(err, result) {//查询条件此处用staffId或者staff_id均可
+            assert.equal(err, null);
+            //console.log(err);
+            //console.log(result);
+            done();
+        });
+    })
+
+//查询人数
+    it("#statisticStaffsRole should be ok", function(done) {
+        API.client.staff.statisticStaffsRole.call(ownerSelf, {companyId: companyId}, function(err, result) {//查询条件此处用staffId或者staff_id均可
+            assert.equal(err, null);
+            //console.log(err);
+            console.log(result);
+            done();
+        });
+    })
+//查询员工总数
+    it("#getStaffCountByCompany should be ok", function(done) {
+        API.client.staff.getStaffCountByCompany.call(ownerSelf, {companyId: companyId}, function(err, result) {//查询条件此处用staffId或者staff_id均可
+            assert.equal(err, null);
+            //console.log(err);
+            console.log(result);
+            done();
+        });
+    })
+
+//删除员工信息
+    it("#deleteStaff should be ok", function(done) {
+        API.client.staff.deleteStaff.call(ownerSelf, {id: id}, function(err, result) {
+            assert.equal(err, null);
+            //console.log(err);
+            //console.log(result);
+            done();
+        });
     })
     //导入员工
     //describe("API.staff.importExcel", function() {

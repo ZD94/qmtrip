@@ -237,8 +237,9 @@ authServer.active = function(data, callback) {
 authServer.remove = function(data, callback) {
     var accountId = data.accountId;
     var email = data.email;
+    var mobile = data.mobile;
     var type = data.type || 1;
-    var where = {$or: [{id: accountId}, {email: email}]};
+    var where = {$or: [{id: accountId}, {email: email}, {mobile: mobile}]};
     if(!accountId){
         where.type = type;
     }
