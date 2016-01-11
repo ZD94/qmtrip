@@ -13,7 +13,6 @@ var tripPlan = {};
 /**
  * 生成计划单
  * @param params
- * @param callback
  * @returns {*}
  */
 tripPlan.savePlanOrder = function (params) {
@@ -31,7 +30,6 @@ tripPlan.savePlanOrder = function (params) {
 /**
  * 保存消费支出明细
  * @param params
- * @param callback
  * @returns {*}
  */
 tripPlan.saveConsumeDetail = function (params) {
@@ -43,7 +41,6 @@ tripPlan.saveConsumeDetail = function (params) {
 /**
  * 获取计划单详情
  * @param orderId
- * @param callback
  */
 tripPlan.getTripPlanOrderById = function (orderId) {
     var self = this;
@@ -66,7 +63,6 @@ tripPlan.getTripPlanOrderById = function (orderId) {
 
 /**
  * 获取员工已完成计划单分页列表
- * @param callback
  * @returns {*}
  */
 tripPlan.pageCompleteTripPlanOrder = function (params) {
@@ -83,6 +79,7 @@ tripPlan.pageCompleteTripPlanOrder = function (params) {
             params.accountId = self.accountId;
             params.companyId = companyId;
             params.auditStatus = 1; //已完成计划单
+            params.status = {$gte: 1};
             var query = checkAndGetParams(['companyId'], ['accountId', 'status', 'auditStatus'], params);
             var page = params.page;
             var perPage = params.perPage;
@@ -100,7 +97,6 @@ tripPlan.pageCompleteTripPlanOrder = function (params) {
 
 /**
  * 获取员工计划单分页列表
- * @param callback
  * @returns {*}
  */
 tripPlan.pageTripPlanOrder = function (params) {
@@ -114,16 +110,17 @@ tripPlan.pageTripPlanOrder = function (params) {
     if (params.isUpload === true) {
         params.status = {$gt: 0}
     } else if (params.isUpload === false) {
-        params.status = {$in: [-1, 0]};
+        params.status = 0;
     }
-    if (params.audit) { //判断计划单的审核状态，设定auditStatus参数
+    if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
         var audit = params.audit;
         params.status = 1;
-        if (audit == 'Y') {
+        if(audit == 'Y'){
+            params.status = {$gte: 1};
             params.auditStatus = 1;
-        } else if (audit == "P") {
+        }else if(audit == "P"){
             params.auditStatus = 0;
-        } else if (audit == 'N') {
+        }else if(audit == 'N'){
             params.status = 0; //待上传状态
             params.auditStatus = -1;
         }
@@ -153,7 +150,6 @@ tripPlan.pageTripPlanOrder = function (params) {
 
 /**
  * 获取员工计划单分页列表(企业)
- * @param callback
  * @returns {*}
  */
 tripPlan.pageTripPlanOrderByCompany = function (params) {
@@ -163,15 +159,20 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
     var self = this;
     var accountId = self.accountId;
 
-    (params.isUpload === true) ? params.status = {$gt: 0} : params.status = 0; //查询条件为是否上传票据，设定查询参数status
-    if (params.audit) { //判断计划单的审核状态，设定auditStatus参数
+    if (params.isUpload === true) {
+        params.status = {$gt: 0}
+    } else if (params.isUpload === false) {
+        params.status = 0;
+    }
+    if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
         var audit = params.audit;
         params.status = 1;
-        if (audit == 'Y') {
+        if(audit == 'Y'){
+            params.status = {$gte: 1};
             params.auditStatus = 1;
-        } else if (audit == "P") {
+        }else if(audit == "P"){
             params.auditStatus = 0;
-        } else if (audit == 'N') {
+        }else if(audit == 'N'){
             params.status = 0; //待上传状态
             params.auditStatus = -1;
         }
@@ -186,8 +187,8 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
                 ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure'], params);
             var page = params.page;
             var perPage = params.perPage;
-            typeof page == 'number' ? "" : page = 1;
-            typeof perPage == 'number' ? "" : perPage = 10;
+            page = typeof page == 'number' ? page : 1;
+            perPage = typeof perPage == 'number' ? perPage : 10;
             var options = {
                 where: query,
                 limit: perPage,
@@ -200,18 +201,12 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
 /**
  * 获取差旅计划单列表(企业)
  * @param params
- * @param callback
  * @returns {*}
  */
-tripPlan.listTripPlanOrderByCompany = function (params, callback) {
-    if (typeof params == "function") {
-        callback = params;
-        params = {}
-    }
+tripPlan.listTripPlanOrderByCompany = function (params) {
     if (!params) {
         params = {}
     }
-    ;
     var self = this;
     var accountId = self.accountId;
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
@@ -221,37 +216,34 @@ tripPlan.listTripPlanOrderByCompany = function (params, callback) {
         .then(function (companyId) {
             params.companyId = companyId;
             return API.tripPlan.listTripPlanOrder(params);
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
  * 删除差旅计划单/预算单
  * @param orderId
- * @param callback
  * @returns {*}
  */
-tripPlan.deleteTripPlanOrder = function (orderId, callback) {
+tripPlan.deleteTripPlanOrder = function (orderId) {
     var self = this;
     var params = {
         orderId: orderId,
         userId: self.accountId
     }
-    return API.tripPlan.deleteTripPlanOrder(params, callback);
+    return API.tripPlan.deleteTripPlanOrder(params);
 }
 
 /**
  * 删除差旅消费明细
  * @param orderId
- * @param callback
  * @returns {*}
  */
-tripPlan.deleteConsumeDetail = function (id, callback) {
+tripPlan.deleteConsumeDetail = function (id) {
     var params = {
         id: id,
         userId: this.accountId
     }
-    return API.tripPlan.deleteConsumeDetail(params, callback);
+    return API.tripPlan.deleteConsumeDetail(params);
 }
 
 /**
@@ -260,21 +252,19 @@ tripPlan.deleteConsumeDetail = function (id, callback) {
  * @param params.userId 用户id
  * @param params.consumeId 消费详情id
  * @param params.picture 新上传的票据md5key
- * @param callback
  * @returns {*}
  */
-tripPlan.uploadInvoice = function (params, callback) {
+tripPlan.uploadInvoice = function (params) {
     params.userId = this.accountId;
-    return API.tripPlan.uploadInvoice(params, callback);
+    return API.tripPlan.uploadInvoice(params);
 }
 
 /**
  * 根据条件统计计划单数目
  * @param params
- * @param callback
  * @returns {*}
  */
-tripPlan.countTripPlanNum = function (params, callback) {
+tripPlan.countTripPlanNum = function (params) {
     var self = this;
     var accountId = self.accountId;
     return API.staff.getStaff({id: accountId})
@@ -282,8 +272,7 @@ tripPlan.countTripPlanNum = function (params, callback) {
             var companyId = staff.companyId;
             params.companyId = companyId;
             return API.tripPlan.countTripPlanNum(params);
-        })
-        .nodeify(callback);
+        });
 }
 
 /**

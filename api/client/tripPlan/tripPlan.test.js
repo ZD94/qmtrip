@@ -15,55 +15,64 @@ describe("api/client/tripPlan.js", function() {
     var companyId = "";
     var staffId = "";
     var orderId = "";
-    var self = {accountId: ""};
-    /**
-     * 测试前先注册代理商，由代理商创建企业
-     */
-    before(function(done) {
-        var agency = {
-            email: "trippan.test@tulingdao.com",
-            userName: "白菜帮九袋长老",
-            name: '白菜帮',
-            mobile: "15269866803",
-            description: '计划单测试用代理商'
-        };
 
-        var company = {
-            email: "trippan.test@tulingdao.com",
-            userName: "白菜帮九袋长老",
-            name: '白菜帮',
-            mobile: "15269866803",
-            domain: 'tulingdao.com',
-            description: '计划单测试用企业'
-        }
+    var agency = {
+        email: "tripPlan.test@tulingdao.com",
+        userName: "白菜帮九袋长老",
+        name: '白菜帮',
+        mobile: "15269866803",
+        description: '计划单测试用代理商'
+    };
 
-        API.agency.registerAgency(agency, function(err, a){
-            if(err){
-                throw err;
-            }
-            agencyId = a.agency.id;
-            agencyUserId = a.agencyUser.id;
-            self.accountId = agencyUserId;
-            company.agencyId = agencyId;
-            API.client.company.createCompany.call(self, company, function(err, c){
-                if(err){
-                    throw err;
-                }
-                companyId = c.company.id;
-                staffId = c.company.createUser;
+    var company = {
+        email: "tripPlan.test@tulingdao.com",
+        userName: "白菜帮九袋长老",
+        name: '白菜帮',
+        mobile: "15269866803",
+        domain: 'tulingdao.com',
+        description: '计划单测试用企业'
+    }
+
+    before(function(done){
+        Q.all([
+            API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
+            API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
+            API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})
+        ])
+            .spread(function(ret1, ret2, ret3){
+                assert.equal(ret1.code, 0);
+                assert.equal(ret2.code, 0);
+                assert.equal(ret3.code, 0);
+                return API.agency.registerAgency(agency);
+            })
+            .then(function(ret){
+                agencyId = ret.agency.id;
+                agencyUserId = ret.agencyUser.id;
+                return API.client.company.createCompany.call({accountId: agencyUserId}, company);
+            })
+            .then(function(ret){
+                companyId = ret.company.id;
+                staffId = ret.company.createUser;
                 done();
             })
-        })
-    });
+            .catch(function(err){
+                console.info(err);
+                throw err;
+            })
+    })
+
 
     after(function(done) {
         Q.all([
-            API.agency.deleteAgency({agencyId: agencyId, userId: agencyUserId}),
-            API.company.deleteCompany({companyId: companyId, userId: staffId}),
-            API.staff.deleteStaff({id: staffId})
+            API.agency.deleteAgencyByTest({email: agency.email}),
+            API.company.deleteCompanyByTest({email: company.email}),
+            API.staff.deleteAllStaffByTest({email: company.email})
         ])
-            .then(function(){
-                done();
+            .spread(function(ret1, ret2, ret3){
+                assert.equal(ret1.code, 0);
+                assert.equal(ret2.code, 0);
+                assert.equal(ret3.code, 0);
+                done()
             })
             .catch(function(err){
                 throw err;
@@ -250,6 +259,7 @@ describe("api/client/tripPlan.js", function() {
         });
 
         describe('options based on consume details created', function(){
+            var consumeId = "";
             before(function(done){
                 Q.all([
                     API.tripPlan.saveConsumeRecord({orderId: newOrderId, accountId: staffId, type: 0, startTime: '2016-01-11 11:22:22', invoiceType: 2, budget: 150}),
@@ -258,9 +268,10 @@ describe("api/client/tripPlan.js", function() {
                     .spread(function(ret1, ret2){
                         assert.equal(ret1.type, 0);
                         assert.equal(ret2.type, 1);
+                        consumeId = ret2.id;
                         return API.tripPlan.uploadInvoice({userId: staffId, consumeId: ret1.id, picture: '测试图片'})
                             .then(function(t){
-                                assert(t.newInvoice != null);
+                                assert.equal(t.code, 0);
                                 return  API.client.agencyTripPlan.approveInvoice.call({accountId: agencyUserId}, {consumeId: ret1.id, status: 1, expenditure: '521', remark: '审核票据测试'})
                                     .then(function(r){
                                         assert.equal(r.status, 1);
@@ -271,6 +282,17 @@ describe("api/client/tripPlan.js", function() {
                     .catch(function(err){
                         throw err;
                     })
+            });
+
+            it("#uploadInvoice should be ok", function (done) {
+                var self = {accountId: staffId};
+                API.client.tripPlan.uploadInvoice.call(self, {consumeId: consumeId, picture: '测试上传图片'}, function (err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+                    assert.equal(ret.code, 0);
+                    done();
+                })
             });
 
             it("#statPlanOrderMoneyByCompany should be ok", function (done) {

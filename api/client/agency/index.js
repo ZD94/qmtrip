@@ -31,12 +31,11 @@ var agency = {}
  * @param {string} params.mobile 手机号 必填
  * @param {string} params.email 邮箱 必填
  * @param {string} params.pwd 密码 选填，如果手机号和邮箱在全麦注册过，则密码还是以前的密码
- * @param {Function} [callback]
  * @returns {Promise} {code: 0, msg: '注册成功||错误信息'}
  */
-agency.registerAgency = function(params, callback){
+agency.registerAgency = function(params){
     var agency = checkAndGetParams(['name', 'email', 'mobile', 'userName'], ['description', 'remark'], params);
-    return API.agency.registerAgency(agency, callback);
+    return API.agency.registerAgency(agency);
 }
 
 /**
@@ -44,56 +43,52 @@ agency.registerAgency = function(params, callback){
  *
  * 更新代理商信息
  * @param params
- * @param callback
  * @returns {*}
  */
-agency.updateAgency = function(params, callback){
+agency.updateAgency = function(params){
     var self = this;
     params = checkAndGetParams(['agencyId'],
         ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark'], params);
     params.userId = self.accountId;
-    return API.agency.updateAgency(params, callback);
+    return API.agency.updateAgency(params);
 }
 
 /**
  * 获取代理商信息
  * @param agencyId
- * @param callback
  * @returns {*}
  */
-agency.getAgencyById = function(agencyId, callback){
+agency.getAgencyById = function(agencyId){
     var self = this;
     var params = {
         agencyId: agencyId,
         userId: self.accountId
     }
-    return API.agency.getAgency(params, callback);
+    return API.agency.getAgency(params);
 }
 
 /**
  * 根据查询条件获取代理商列表
  * @param params
- * @param callback
  * @returns {*}
  */
-agency.listAgency = function(params, callback){
+agency.listAgency = function(params){
     params.userId = this.accountId;
-    return API.agency.listAgency(params, callback);
+    return API.agency.listAgency(params);
 }
 
 /**
  * 删除代理商信息
  * @param agencyId
- * @param callback
  * @returns {*}
  */
-agency.deleteAgency = function(agencyId, callback){
+agency.deleteAgency = function(agencyId){
     var self = this;
     var params = {
         agencyId: agencyId,
         userId: self.accountId
     }
-    return API.agency.deleteAgency(params, callback);
+    return API.agency.deleteAgency(params);
 }
 
 /**************** 代理商用户相关 ****************/
@@ -109,7 +104,6 @@ agency.createAgencyUser = function(agencyUser){
 
 /**
  * 获取当前代理商用户
- * @param callback
  * @returns {*}
  */
 agency.getCurrentAgencyUser = function(){
@@ -121,7 +115,6 @@ agency.getCurrentAgencyUser = function(){
 /**
  * 删除代理商用户
  * @param userId
- * @param callback
  * @returns {*}
  */
 agency.deleteAgencyUser = function(agencyUserId){
@@ -142,7 +135,6 @@ agency.deleteAgencyUser = function(agencyUserId){
 /**
  * 更新代理商用户
  * @param params
- * @param callback
  * @returns {*}
  */
 agency.updateAgencyUser = function(params) {
@@ -165,7 +157,6 @@ agency.updateAgencyUser = function(params) {
 /**
  * 获取代理商用户
  * @param params
- * @param callback
  * @returns {*}
  */
 agency.getAgencyUser = function(agencyUserId){
@@ -186,14 +177,13 @@ agency.getAgencyUser = function(agencyUserId){
         })
 }
 
-agency.listAndPaginateAgencyUser = function(params, callback) {
+agency.listAndPaginateAgencyUser = function(params) {
     var user_id = this.accountId;
     return API.agency.getAgencyUser({id:user_id})
         .then(function(data){
             params.agencyId = data.agencyId;
             return API.agency.listAndPaginateAgencyUser(params);
-        })
-        .nodeify(callback);
+        });
 }
 
 module.exports = agency;
