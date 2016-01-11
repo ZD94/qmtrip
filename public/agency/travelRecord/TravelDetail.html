@@ -57,7 +57,10 @@
                             <div class="endplace">{{outTraffic.arrivalPlace}}</div>
                         </td>
                         <td width="135" align="center">¥{{outTraffic.budget.toFixed(2)}}</td>
-                        <td width="135" align="center">¥{{outTraffic.expenditure.toFixed(2)}}</td>
+                        <td width="135" align="center">
+                            <span ng-if="outTraffic.expenditure">¥{{outTraffic.expenditure.toFixed(2)}}</span>
+                            <span ng-if="!outTraffic.expenditure">无</span>
+                        </td>
                         <td width="135" align="center">
                             <p ng-if="outTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
                             <p ng-if="outTraffic.status==0" style="color: #DE492A;">【待审核】</p>
@@ -74,7 +77,10 @@
                             </div>
                         </td>
                         <td width="135" align="center">¥{{hotel.budget.toFixed(2)}}</td>
-                        <td width="135" align="center">¥{{hotel.expenditure.toFixed(2)}}</td>
+                        <td width="135" align="center">
+                            <span ng-if="hotel.expenditure">¥{{hotel.expenditure.toFixed(2)}}</span>
+                            <span ng-if="!hotel.expenditure">无</span>
+                        </td>
                         <td width="135" align="center">
                             <p ng-if="hotel.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
                             <p ng-if="hotel.status==0" style="color: #DE492A;">【待审核】</p>
@@ -90,7 +96,10 @@
                             <div class="endplace">{{backTraffic.startPlace}}</div>
                         </td>
                         <td width="135" align="center">¥{{backTraffic.budget.toFixed(2)}}</td>
-                        <td width="135" align="center">¥{{backTraffic.expenditure.toFixed(2)}}</td>
+                        <td width="135" align="center">
+                            <span ng-if="backTraffic.expenditure">¥{{backTraffic.expenditure.toFixed(2)}}</span>
+                            <span ng-if="!backTraffic.expenditure">无</span>
+                        </td>
                         <td width="135" align="center">
                             <p ng-if="backTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
                             <p ng-if="backTraffic.status==0" style="color: #DE492A;">【待审核】</p>
@@ -115,7 +124,7 @@
                             <p>{{outTraffic.invoice[outTraffic.invoice.length-1].approve_at}}&nbsp;&nbsp;<span ng-if="outTraffic.status=='-1'">审核未通过</span><span ng-if="outTraffic.status==1">审核通过</span></p>
                         </td>
                         <td>
-                            <div ng-if="hotel.status==0">
+                            <div ng-if="outTraffic.status==0">
                                     <input type="button" class="common_btn1" value="审核未通过" ng-click="invoiceNopassShow('outTraffic')" style="float: right;">
                                     <input type="button" class="common_btn1" value="审核通过" ng-click="invoicePassShow('outTraffic')" style="margin-right: 20px; float: right;">
                                 </div>
