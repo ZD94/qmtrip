@@ -78,6 +78,7 @@ describe("api/client/staff.js", function() {
                 console.info(err);
                 throw err;
             })
+            .done();
     });
 
     after(function(done) {
@@ -100,6 +101,7 @@ describe("api/client/staff.js", function() {
                 console.info(err);
                 throw err;
             })
+            .done();
     });
 
     it("#createStaff should be ok", function(done) {

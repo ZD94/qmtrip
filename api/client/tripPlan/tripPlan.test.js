@@ -59,6 +59,7 @@ describe("api/client/tripPlan.js", function() {
                 console.info(err);
                 throw err;
             })
+            .done();
     })
 
 
@@ -77,6 +78,7 @@ describe("api/client/tripPlan.js", function() {
             .catch(function(err){
                 throw err;
             })
+            .done();
     });
 
     describe("savePlanOrder", function(){
@@ -274,7 +276,7 @@ describe("api/client/tripPlan.js", function() {
                                 assert.equal(t.code, 0);
                                 return  API.client.agencyTripPlan.approveInvoice.call({accountId: agencyUserId}, {consumeId: ret1.id, status: 1, expenditure: '521', remark: '审核票据测试'})
                                     .then(function(r){
-                                        assert.equal(r.status, 1);
+                                        assert.equal(r.code, 0);
                                         done()
                                     })
                             })
@@ -282,6 +284,7 @@ describe("api/client/tripPlan.js", function() {
                     .catch(function(err){
                         throw err;
                     })
+                    .done();
             });
 
             it("#uploadInvoice should be ok", function (done) {

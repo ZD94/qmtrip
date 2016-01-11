@@ -69,7 +69,7 @@ describe("api/client/travelPolicy.js", function() {
                 console.info(err);
                 throw err;
             })
-
+            .done();
     });
 
     after(function(done) {
@@ -88,6 +88,7 @@ describe("api/client/travelPolicy.js", function() {
                 console.info(err);
                 throw err;
             })
+            .done();
     });
     it("#createTravelPolicy should be ok", function(done) {
         API.client.travelPolicy.createTravelPolicy.call(self, obj, function(err, result) {

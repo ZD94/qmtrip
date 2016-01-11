@@ -410,7 +410,7 @@ var businessTravel=(function(){
      * @param $scope
      * @constructor
      */
-    businessTravel.CreateResultController = function($scope, $routeParams) {
+    businessTravel.CreateResultController = function($scope, $routeParams, $filter) {
         loading(false);
         loading(true);
         $("title").html("我要出差");
@@ -419,7 +419,7 @@ var businessTravel=(function(){
         $scope.purposename = $routeParams.purposename;//出差目的
         $scope.tra = $routeParams.tra;//是否交通
         $scope.liv = $routeParams.liv;//是否住宿
-        console.info ($routeParams);
+        $scope.nowtime = new Date();
         //只选交通
         if (tra==1&&liv==0) {
             $scope.startplace = $routeParams.sp;//出发城市
@@ -618,8 +618,10 @@ var businessTravel=(function(){
 
                 API.tripPlan.savePlanOrder(order)
                     .then(function(result){
+                        $scope.createTime = result.createAt;
                         $(".bottom1").hide();
                         $(".bottom2").show();
+                        $('.createtime').html("生成时间："+$filter('date')($scope.createTime,'yyyy-MM-dd'));
                         Myalert("温馨提示","生成出差记录成功");
                     })
                     .catch(function(err){
