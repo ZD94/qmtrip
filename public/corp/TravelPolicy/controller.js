@@ -213,8 +213,8 @@ var TravelPolicy=(function(){
             $(".CplaneLevel").html("不限");
             $(".CplaneDiscount").html("不限").attr("selectValue","0");
             $(".CtrainLevel").html("不限");
-            $(".Ccheckbox").attr('checked',false);
-            $(".Ccheckboxlabel").html('');
+            $(".Ccheckbox").attr('checked',true);
+            $(".Ccheckboxlabel").html('&#xe9ec;');
             $(".ChotelTevel").html("不限");
             $(".ChotelPrice").val("");
         }
