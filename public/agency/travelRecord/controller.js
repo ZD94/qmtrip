@@ -76,7 +76,7 @@ var travelRecord=(function(){
                 clearInterval (pagenum);
             }
         }
-        var pagenum =setInterval($scope.pagination,1000);
+        var pagenum =setInterval($scope.pagination,10);
     }
 
 

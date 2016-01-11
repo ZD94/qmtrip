@@ -25,8 +25,7 @@ var TravelPolicy=(function(){
             API.onload(function(){
                 var params = {};
                 var options = {order: [["create_at", "asc"]]};
-                options.perPage = 6;
-                options.page = $scope.page;
+                options.perPage = 100;
                 params.options = options;
                 API.travelPolicy.listAndPaginateTravelPolicy(params)
                     .then(function(result){
@@ -36,6 +35,14 @@ var TravelPolicy=(function(){
                         if ($scope.PolicyTotal==0) {
                             $(".create_policy").show();
                         }
+                        $(window).scroll(function() {
+                            if ($(window).scrollTop()>20) {
+                                $(".policy_title").addClass('policy_titlefixed');
+                            }
+                            else {
+                                $(".policy_title").removeClass('policy_titlefixed');
+                            }
+                        });
                         loading(true);
                         $scope.$apply();
                     })
@@ -231,27 +238,6 @@ var TravelPolicy=(function(){
             }
         }
 
-
-
-        //分页
-        $scope.pagination = function () {
-            if ($scope.PolicyTotal) {
-                $.jqPaginator('#pagination', {
-                    totalCounts: $scope.PolicyTotal,
-                    pageSize: 6,
-                    currentPage: 1,
-                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
-                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
-                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
-                    onPageChange: function (num) {
-                        $scope.page = num;
-                        $scope.initPolicyList();
-                    }
-                });
-                clearInterval (pagenum);
-            }
-        }
-        var pagenum =setInterval($scope.pagination,1000);
     }
 
     return TravelPolicy;
