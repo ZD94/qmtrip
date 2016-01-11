@@ -173,7 +173,7 @@ agency.deleteAgency = function(params){
                 ])
                     .then(function(){
                         return users.map(function(user){
-                            return API.auth.remove({accountId: user.id})
+                            return API.auth.remove({accountId: user.id, type: 2})
                         })
                     })
             })
