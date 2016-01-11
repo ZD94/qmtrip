@@ -79,6 +79,7 @@ describe("api/client/agencyTripPlan.js", function() {
                 console.info(err);
                 throw err;
             })
+            .done();
     })
 
 
@@ -99,6 +100,7 @@ describe("api/client/agencyTripPlan.js", function() {
             .catch(function(err){
                 throw err;
             })
+            .done();
     });
 
 
