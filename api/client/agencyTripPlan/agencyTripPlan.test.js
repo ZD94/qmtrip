@@ -178,7 +178,7 @@ describe("api/client/agencyTripPlan.js", function() {
             if (err) {
                 throw err;
             }
-            assert.equal(ret.status, -1);
+            assert.equal(ret.code, 0);
             done();
         })
     });
@@ -189,8 +189,7 @@ describe("api/client/agencyTripPlan.js", function() {
             if (err) {
                 throw err;
             }
-            assert.equal(ret.status, 1);
-            assert(ret.expenditure > 0);
+            assert.equal(ret.code, 0);
             done();
         })
     });

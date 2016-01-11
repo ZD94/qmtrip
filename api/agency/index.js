@@ -98,12 +98,12 @@ agency.updateAgency = function(_agency){
             _agency.updateAt = utils.now();
             var cols = getColsFromParams(_agency);
             return Agency.update(_agency, {returning: true, where: {id: agencyId}, fields: cols})
-                .spread(function(rows, agencies){
-                    if(!rows || rows == "NaN"){
-                        throw {code: -2, msg: '更新代理商信息失败'};
-                    }
-                    return agencies[0];
-                })
+        })
+        .spread(function(rows, agencies){
+            if(!rows || rows == "NaN"){
+                throw {code: -2, msg: '更新代理商信息失败'};
+            }
+            return agencies[0];
         })
 }
 

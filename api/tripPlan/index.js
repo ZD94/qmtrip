@@ -298,12 +298,14 @@ tripPlan.deleteConsumeDetail = function(params){
  * @param callback
  * @returns {*}
  */
-tripPlan.uploadInvoice = function(params, callback){
+tripPlan.uploadInvoice = function(params){
     var params = checkAndGetParams(['userId', 'consumeId', 'picture'], [], params);
+    var orderId = "";
     return ConsumeDetails.findOne({where: {id: params.consumeId, account_id: params.userId}})
         .then(function(custome){
             if(!custome || custome.status == -2)
                 throw L.ERR.NOT_FOUND;
+            orderId = custome.orderId;
             var invoiceJson = custome.invoice;
             var times = invoiceJson.length ? invoiceJson.length+1 : 1;
             var currentInvoice = {times:times, picture:params.picture, create_at:moment().format('YYYY-MM-DD HH:mm'), status:0, remark: '', approve_at: ''};
@@ -317,13 +319,19 @@ tripPlan.uploadInvoice = function(params, callback){
                 ]);
             })
         })
-        .spread(function(update, create) {
-            return update;
+        .spread(function() {
+            return ConsumeDetails.findAll({where: {orderId: orderId}})
         })
-        .spread(function(rownum, rows){
-            return rows[0];
+        .then(function(list){
+            for(var i=0; i<list.length; i++){
+                if(!list[i].newInvoice)
+                    return;
+            }
+            return PlanOrder.update({status: 1, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'updateAt'], returning: true})
         })
-        .nodeify(callback);
+        .then(function(){
+            return {code: 0, msg: '上传成功'};
+        })
 }
 
 /**
@@ -396,8 +404,8 @@ tripPlan.approveInvoice = function(params){
                 ])
                     .spread(function(ret){
                         var status = params.status;
-                        if(status != 1){
-                            return ret;
+                        if(status == -1){
+                            return PlanOrder.update({status: 0, auditStatus: -1, updateAt: utils.now()}, {where: {id: order.id}, fields: ['auditStatus', 'status', 'updateAt'], transaction: t})
                         }
                         if(!params.expenditure)
                             throw {code: -4, msg: '支出金额不能为空'};
@@ -418,21 +426,18 @@ tripPlan.approveInvoice = function(params){
                             })
                             .then(function(isAllAudit){
                                 if(isAllAudit){
-                                    order_updates.status = 1;
+                                    order_updates.status = 2;
                                     order_updates.auditStatus = 1;
                                 }
                                 var fields = getColsFromParams(order_updates);
                                 return PlanOrder.update(order_updates, {where: {id: order.id}, fields: fields, transaction: t})
-                                    .then(function(){
-                                        return ret;
-                                    })
                             })
 
                     })
             });
         })
-        .spread(function(rownum, rows){
-            return rows[0];
+        .then(function(){
+            return {code: 0};
         })
 }
 
