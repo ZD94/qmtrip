@@ -142,7 +142,6 @@ staff.deleteStaff = function(params){
  */
 staff.updateStaff = function(data, callback){
     var id = data.id;
-    var defer = Q.defer();
     if(!id){
         throw {code: -1, msg: "id不能为空"};
     }
@@ -778,7 +777,7 @@ staff.deleteAllStaffByTest = function(params){
     var mobile = params.mobile;
     var email = params.email;
     return Q.all([
-        API.auth.remove({email: email, type: 1}),
+        API.auth.remove({email: email, mobile: mobile, type: 1}),
         staffModel.destroy({where: {$or: [{companyId: companyId}, {mobile: mobile}, {email: email}]}})
     ])
         .spread(function(){
