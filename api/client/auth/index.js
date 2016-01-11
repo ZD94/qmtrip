@@ -209,12 +209,13 @@ auth.logout = function() {
  * @return {Function}
  */
 auth.checkPermission = function(permissions, fn) {
-    return function(params) {
+    return function() {
+        var args = arguments;
         var self = this;
         var accountId = self.accountId;
         return API.permit.checkPermission({accountId: accountId, permission: permissions})
-            .then(function(result) {
-                return fn.call(self, params);
+            .then(function() {
+                return fn.apply(self, args);
             });
     }
 };
@@ -226,12 +227,13 @@ auth.checkPermission = function(permissions, fn) {
  * @returns {Function}
  */
 auth.checkAgencyPermission = function(permissions, fn) {
-    return function(params) {
+    return function() {
+        var args = arguments;
         var self = this;
         var accountId = self.accountId;
         return API.permit.checkPermission({accountId: accountId, permission: permissions, type: 2})
-            .then(function(ret) {
-                return fn.call(self, params);
+            .then(function() {
+                return fn.apply(self, args);
             });
     }
 };

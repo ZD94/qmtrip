@@ -357,12 +357,12 @@ tripPlan.approveInvoice = function(params){
                 throw {code: -3, msg: '该票据已审核通过，不能重复审核'};
             }
             return PlanOrder.findById(consume.orderId, {attributes: ['id', 'expenditure', 'status']})
-        })
-        .then(function(order){
-            if(!order || order.status == -2){
-                throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST
-            }
-            return [order, consume];
+                .then(function(order){
+                    if(!order || order.status == -2){
+                        throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST
+                    }
+                    return [order, consume];
+                })
         })
         .spread(function(order, consume){
             var invoiceJson = consume.invoice;
