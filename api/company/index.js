@@ -289,7 +289,16 @@ company.moneyChange = function(params){
 company.deleteCompanyByTest = function(params){
     var mobile = params.mobile;
     var email = params.email;
-    return Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}})
+    return Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
+        .then(function(companys){
+            return companys.map(function(c){
+                var id = c.id;
+                return FundsAccounts.destroy({where: {id: id}});
+            })
+        })
+        .then(function(){
+            return Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
+        })
         .then(function(){
             return {code: 0}
         })
