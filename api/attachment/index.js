@@ -113,7 +113,7 @@ function getUsedList() {
     return Q([]);
 }
 
-function checkParams(checkArray, params, callback){
+function checkParams(checkArray, params){
     return new Promise(function(resolve, reject){
         ///检查参数是否存在
         for(var key in checkArray){

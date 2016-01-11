@@ -15,7 +15,6 @@ var agencyTripPlan = {};
 /**
  * 获取计划单详情
  * @param orderId
- * @param callback
  */
 agencyTripPlan.getTripPlanOrderById = function(orderId){
     var self = this;
@@ -44,7 +43,6 @@ agencyTripPlan.getTripPlanOrderById = function(orderId){
 
 /**
  * 代理商获取员工计划单分页列表
- * @param callback
  * @returns {*}
  */
 agencyTripPlan.pageTripPlanOrder = function(params){
@@ -91,13 +89,13 @@ agencyTripPlan.pageTripPlanOrder = function(params){
                 ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure'], params);
             var page = params.page;
             var perPage = params.perPage;
-            typeof page== 'number'?"":page=1;
-            typeof perPage == 'number'?"":perPage=10;
+            page = typeof(page) == 'number'?page:1;
+            perPage = typeof(perPage) == 'number'?perPage:10;
             var options = {
                 where: query,
                 limit: perPage,
                 offset: perPage * (page - 1)
-            }
+            };
             return API.tripPlan.listTripPlanOrder(options);
         })
 }
@@ -109,7 +107,6 @@ agencyTripPlan.pageTripPlanOrder = function(params){
  * @param params.status审核结果状态
  * @param params。consumeId 审核消费单id
  * @param params.userId 用户id
- * @param callback
  * @returns {*|*|Promise}
  */
 agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
@@ -146,17 +143,16 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                     throw L.ERR.PERMISSION_DENY;
                 }
                 return API.tripPlan.approveInvoice(params);
-            })
+            });
     });
 
 
 /**
  * 代理商统计计划单数目(根据企业id和员工id,员工id为空的时候查询企业所有员工的数据)
  * @param params
- * @param callback
  * @returns {*}
  */
-agencyTripPlan.countTripPlanNum = function(params, callback){
+agencyTripPlan.countTripPlanNum = function(params){
     var self = this;
     var accountId = self.accountId; //代理商用户Id
     if(!params.companyId){
@@ -174,8 +170,7 @@ agencyTripPlan.countTripPlanNum = function(params, callback){
         })
         .then(function(ret){
             return API.tripPlan.countTripPlanNum(params);
-        })
-    .nodeify(callback);
+        });
 }
 
 module.exports = agencyTripPlan;

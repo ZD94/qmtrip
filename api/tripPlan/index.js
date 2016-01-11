@@ -25,7 +25,6 @@ var tripPlan = {}
 /**
  * 保存预算单/差旅计划单
  * @param params
- * @param callback
  * @returns {*}
  */
 tripPlan.savePlanOrder = function(params){
@@ -84,7 +83,6 @@ tripPlan.savePlanOrder = function(params){
 /**
  * 获取计划单/预算单信息
  * @param params
- * @param callback
  * @returns {*}
  */
 tripPlan.getTripPlanOrder = function(params){
@@ -111,10 +109,9 @@ tripPlan.getTripPlanOrder = function(params){
 /**
  * 更新计划单/预算单信息
  * @param params
- * @param callback
  * @returns {*}
  */
-tripPlan.updateTripPlanOrder = function(params, callback){
+tripPlan.updateTripPlanOrder = function(params){
     var checkArr = ['userId', 'orderId', 'optLog', 'updates'];
     var params = checkAndGetParams(checkArr, [], params);
     var orderId = params.orderId;
@@ -148,14 +145,12 @@ tripPlan.updateTripPlanOrder = function(params, callback){
         })
         .spread(function(rownum, rows){
             return rows[0];
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
  * 更新消费详情
  * @param params
- * @param callback
  */
 tripPlan.updateConsumeDetail = function(params){
     var updates = checkAndGetParams(['userId', 'id'], [], params, false);
@@ -175,7 +170,6 @@ tripPlan.updateConsumeDetail = function(params){
 /**
  * 获取差旅计划单/预算单列表
  * @param params
- * @param callback
  * @returns {*}
  */
 tripPlan.listTripPlanOrder = function(options){
@@ -214,14 +208,9 @@ tripPlan.listTripPlanOrder = function(options){
 /**
  * 保存消费记录详情
  * @param params
- * @param callback
  * @returns {*}
  */
-tripPlan.saveConsumeRecord = function(params, options, callback){
-    if(typeof options == 'function'){
-        callback = options;
-        options = {};
-    }
+tripPlan.saveConsumeRecord = function(params, options){
     if(!options){
         options = {};
     }
@@ -230,14 +219,12 @@ tripPlan.saveConsumeRecord = function(params, options, callback){
     params.status = 0;
     params = checkAndGetParams(checkArr, fields, params);
     options.fields = getColsFromParams(params);
-    return ConsumeDetails.create(params, options)
-        .nodeify(callback);
+    return ConsumeDetails.create(params, options);
 }
 
 /**
  * 删除差旅计划单/预算单;用户自己可以删除自己的计划单
  * @param params
- * @param callback
  * @returns {*}
  */
 tripPlan.deleteTripPlanOrder = function(params){
@@ -267,7 +254,6 @@ tripPlan.deleteTripPlanOrder = function(params){
 /**
  * 删除差旅消费明细
  * @param params
- * @param callback
  * @returns {*}
  */
 tripPlan.deleteConsumeDetail = function(params){
@@ -295,7 +281,6 @@ tripPlan.deleteConsumeDetail = function(params){
  * @param params.userId 用户id
  * @param params.consumeId 消费详情id
  * @param params.picture 新上传的票据md5key
- * @param callback
  * @returns {*}
  */
 tripPlan.uploadInvoice = function(params){
@@ -357,7 +342,6 @@ tripPlan.getConsumeDetail = function(params){
  * @param params.status审核结果状态
  * @param params。consumeId 审核消费单id
  * @param params.userId 用户id
- * @param callback
  * @returns {*|Promise}
  */
 tripPlan.approveInvoice = function(params){
@@ -373,12 +357,12 @@ tripPlan.approveInvoice = function(params){
                 throw {code: -3, msg: '该票据已审核通过，不能重复审核'};
             }
             return PlanOrder.findById(consume.orderId, {attributes: ['id', 'expenditure', 'status']})
-            .then(function(order){
-                    if(!order || order.status == -2){
-                        throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST
-                    }
-                    return [order, consume];
-                })
+        })
+        .then(function(order){
+            if(!order || order.status == -2){
+                throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST
+            }
+            return [order, consume];
         })
         .spread(function(order, consume){
             var invoiceJson = consume.invoice;
@@ -445,7 +429,6 @@ tripPlan.approveInvoice = function(params){
  * 统计计划单数量
  *
  * @param params
- * @param callback
  */
 tripPlan.countTripPlanNum = function(params){
     var query = checkAndGetParams(['companyId'], ['accountId', 'status'], params);

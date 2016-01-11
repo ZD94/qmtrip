@@ -32,7 +32,6 @@ var API = require("common/api");
  * @param {String} data.sign
  * @param {String} data.accountId
  * @param {String} data.timestamp
- * @param {Function} callback
  * @return {promise}
  * @public
  */
@@ -47,7 +46,6 @@ auth.activeByEmail = API.auth.activeByEmail;
  * @param {String} data.email 邮箱 (可选,如果email提供优先使用)
  * @param {String} data.pwd 密码
  * @param {String} [data.mobile] 手机号(可选,如果email提供则优先使用email)
- * @param {Callback} [callback] 可选回调函数
  * @return {Promise} {code:0, msg: "ok", data: {user_id: "账号ID", token_sign: "签名", token_id: "TOKEN_ID", timestamp:"时间戳"}
  */
 auth.login = API.auth.login;
@@ -62,7 +60,6 @@ auth.login = API.auth.login;
  * @param {String} data.mobile 要绑定的手机号
  * @param {String} data.code 手机验证码
  * @param {String} data.pwd 登录密码
- * @param {Callback} callback
  * @return {Promise} {code: 0, msg: "ok};
  */
 auth.bindMobile =API.auth.bindMobile;
@@ -75,7 +72,6 @@ auth.bindMobile =API.auth.bindMobile;
  *
  * @param {Object} params
  * @param {String} params.domain 域名
- * @param {Function} callback
  * @return {Promise} {code: 0}, {code: -1, msg: "域名已占用或者不合法"}
  */
 auth.checkBlackDomain = API.company.checkBlackDomain;
@@ -95,11 +91,9 @@ auth.checkBlackDomain = API.company.checkBlackDomain;
  * @param {String} params.msgTicket 验证码凭证
  * @param {String} params.picCode 图片验证码
  * @param {String} params.picTicket 图片验证码凭证
- * @param {Function} callback
  * @return {Promise}
  */
-auth.registryCompany = function(params, callback) {
-    var defer = Q.defer();
+auth.registryCompany = function(params) {
     //先创建登录账号
     if (!params) {
         params = {};
@@ -175,8 +169,7 @@ auth.registryCompany = function(params, callback) {
         })
         .then(function() {
             return true;
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
@@ -186,11 +179,10 @@ auth.registryCompany = function(params, callback) {
  *
  * @param {Object} params
  * @param {String} params.email 邮件账号
- * @param {Function} callback
  * @return {Promise} {code: 0, msg: "OK"}
  */
-auth.sendActiveEmail = function(params, callback) {
-    return API.auth.sendActiveEmail(params, callback);
+auth.sendActiveEmail = function(params) {
+    return API.auth.sendActiveEmail(params);
 }
 
 /**
@@ -198,14 +190,13 @@ auth.sendActiveEmail = function(params, callback) {
  *
  * 退出登录
  *
- * @param [callback] 可选回调函数
  * @return {Promise} {code: 0}, {code: -1}
  */
-auth.logout = function(callback) {
+auth.logout = function() {
     var self = this;
     var accountId = self.accountId;
     var tokenId = self.tokenId;
-    return API.auth.logout({accountId: accountId, tokenId: tokenId}, callback);
+    return API.auth.logout({accountId: accountId, tokenId: tokenId});
 }
 
 /**
@@ -218,14 +209,13 @@ auth.logout = function(callback) {
  * @return {Function}
  */
 auth.checkPermission = function(permissions, fn) {
-    return function(params, callback) {
+    return function(params) {
         var self = this;
         var accountId = self.accountId;
         return API.permit.checkPermission({accountId: accountId, permission: permissions})
             .then(function(result) {
                 return fn.call(self, params);
-            })
-            .nodeify(callback);
+            });
     }
 };
 
@@ -236,14 +226,13 @@ auth.checkPermission = function(permissions, fn) {
  * @returns {Function}
  */
 auth.checkAgencyPermission = function(permissions, fn) {
-    return function(params, callback) {
+    return function(params) {
         var self = this;
         var accountId = self.accountId;
         return API.permit.checkPermission({accountId: accountId, permission: permissions, type: 2})
             .then(function(ret) {
                 return fn.call(self, params);
-            })
-            .nodeify(callback);
+            });
     }
 };
 
@@ -257,10 +246,9 @@ auth.checkAgencyPermission = function(permissions, fn) {
  * @param {String} params.type 1.企业员工 2.代理商员工
  * @param {String} params.code 验证码
  * @param {String} params.ticket 验证码凭证
- * @param {Function} [callback]
  * @return {Promise} true|error
  */
-auth.sendResetPwdEmail = function(params, callback) {
+auth.sendResetPwdEmail = function(params) {
     var code = params.code;
     var ticket = params.ticket;
     var email = params.email;
@@ -281,9 +269,8 @@ auth.sendResetPwdEmail = function(params, callback) {
                 email: email,
                 isFirstSet: false
             };
-            return  API.auth.sendResetPwdEmail(data, callback);
-        })
-        .nodeify(callback);
+            return  API.auth.sendResetPwdEmail(data);
+        });
 }
 
 /**
@@ -296,7 +283,6 @@ auth.sendResetPwdEmail = function(params, callback) {
  * @param {String} params.sign 签名
  * @param {String} params.timestamp 时间戳
  * @param {String} params.pwd 新密码
- * @param {Function} [callback] (null, true)
  * @return {Promise} true|error
  */
 auth.resetPwdByEmail = API.auth.resetPwdByEmail;
@@ -304,12 +290,11 @@ auth.resetPwdByEmail = API.auth.resetPwdByEmail;
 /**
  * 得到账号激活状态
  * @param params
- * @param callback
  * @returns {*}
  */
-auth.getAccountStatus = function(params, callback) {
+auth.getAccountStatus = function(params) {
     params.attributes = ["status"];
-    return API.auth.getAccount(params, callback);
+    return API.auth.getAccount(params);
 }
 
 /**
@@ -320,17 +305,16 @@ auth.getAccountStatus = function(params, callback) {
  * @param {Object} params
  * @param {String} params.oldPwd 旧密码
  * @param {String} params.newPwd 新密码
- * @param {Function} [callback] true|error
  * @return {Promise}
  */
-auth.resetPwdByOldPwd = function(params, callback) {
+auth.resetPwdByOldPwd = function(params) {
     var self = this;
     var data = {};
     var accountId = self.accountId;
     data.oldPwd = params.oldPwd;
     data.newPwd = params.newPwd;
     data.accountId = accountId;
-    return API.auth.resetPwdByOldPwd(data, callback);
+    return API.auth.resetPwdByOldPwd(data);
 }
 
 module.exports = auth;

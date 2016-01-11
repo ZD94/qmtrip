@@ -31,39 +31,32 @@ var staff = {};
  * 创建员工
  * @param data
  * @param data.accountId 已经有登录账号
- * @param callback
  * @returns {*}
  */
-staff.createStaff = function(data, callback){
+staff.createStaff = function(data){
     var type = data.type;//若type为import则为导入添加
     if(type)
         delete data.type;
     var accountId = data.accountId;
-    return Q()
-        .then(function() {
-            if (!data) {
-                throw L.ERR.DATA_NOT_EXIST;
-            }
-            //如果账号存在,不进行创建了
-            if (!accountId) {
-                if (!data.email) {
-                    throw {code: -1, msg: "邮箱不能为空"};
-                }
-            }
-            if (data.mobile && !validate.isMobile(data.mobile)) {
-                throw {code: -2, msg: "手机号格式不正确"};
-             }
-            if (!data.name) {
-                throw {code: -3, msg: "姓名不能为空"};
-            }
-            if (!data.companyId) {
-                throw {code: -4, msg: "所属企业不能为空"};
-            }
-            return API.company.getCompany({companyId: data.companyId})
-                .then(function(company){
-                    return company;
-                })
-        })
+    if (!data) {
+        throw L.ERR.DATA_NOT_EXIST;
+    }
+    //如果账号存在,不进行创建了
+    if (!accountId) {
+        if (!data.email) {
+            throw {code: -1, msg: "邮箱不能为空"};
+        }
+    }
+    if (data.mobile && !validate.isMobile(data.mobile)) {
+        throw {code: -2, msg: "手机号格式不正确"};
+     }
+    if (!data.name) {
+        throw {code: -3, msg: "姓名不能为空"};
+    }
+    if (!data.companyId) {
+        throw {code: -4, msg: "所属企业不能为空"};
+    }
+    return API.company.getCompany({companyId: data.companyId})
         .then(function(company){
             if (!company) {
                 throw {code: -5, msg: "所属企业不存在"};
@@ -87,28 +80,24 @@ staff.createStaff = function(data, callback){
                 data.travelLevel = null;
             }
             return staffModel.create(staff);
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
  * 创建企业拥有者(员工)
  * @param params
- * @param callback
  */
-staff.createCompanyOwner = function(params, callback){
+staff.createCompanyOwner = function(params){
     var checkFields = ['mobile', 'email', 'companyId', 'name'];
     var fields = getColsFromParams(staffModel.attributes, checkFields);
     var _staff = checkAndGetParams(checkFields, fields, params);
     _staff.id = _staff.id || uuid.v1();
-    return staffModel.create(_staff)
-        .nodeify(callback);
+    return staffModel.create(_staff);
 }
 
 /**
  * 删除员工
  * @param params
- * @param callback
  * @returns {*}
  */
 staff.deleteStaff = function(params){
@@ -137,10 +126,9 @@ staff.deleteStaff = function(params){
  * 更新员工
  * @param id
  * @param data
- * @param callback
  * @returns {*}
  */
-staff.updateStaff = function(data, callback){
+staff.updateStaff = function(data){
     var id = data.id;
     if(!id){
         throw {code: -1, msg: "id不能为空"};
@@ -179,19 +167,16 @@ staff.updateStaff = function(data, callback){
         })
         .spread(function(rownum, rows){
             return rows[0];
-        })
-        .nodeify(callback);
+        });
 }
 /**
  * 根据id查询员工
  * @param id
  * @param data
- * @param callback
  * @returns {*}
  */
-staff.getStaff = function(params, callback){
+staff.getStaff = function(params){
     var id = params.id;
-    var defer = Q.defer();
     if(!id){
         throw {code: -1, msg: "id不能为空"};
     }
@@ -206,49 +191,37 @@ staff.getStaff = function(params, callback){
                 throw {code: -2, msg: '员工不存在'};
             }
             return staff;
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
  * 根据属性查找一个员工
  * @param params
- * @param callback
  * @returns {*}
  */
-staff.findOneStaff = function(params, callback){
+staff.findOneStaff = function(params){
     var options = {};
     options.where = params;
-    return staffModel.findOne(options)
-        .then(function(staff){
-            return staff;
-        })
-        .nodeify(callback);
+    return staffModel.findOne(options);
 }
 
 /**
  * 根据属性查找员工
  * @param params
- * @param callback
  * @returns {*}
  */
-staff.findStaffs = function(params, callback){
+staff.findStaffs = function(params){
     var options = {};
     options.where = params;
-    return staffModel.findAll(options)
-        .then(function(staffs){
-            return staffs;
-        })
-        .nodeify(callback);
+    return staffModel.findAll(options);
 }
 
 /**
  * 分页查询员工集合
  * @param params 查询条件 params.company_id 企业id
  * @param options options.perPage 每页条数 options.page当前页
- * @param callback
  */
-staff.listAndPaginateStaff = function(params, callback){
+staff.listAndPaginateStaff = function(params){
     var options = {};
     if(params.options){
         options = params.options;
@@ -276,22 +249,19 @@ staff.listAndPaginateStaff = function(params, callback){
     return staffModel.findAndCountAll(options)
         .then(function(result){
             return new Paginate(page, perPage, result.count, result.rows);
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
  * 增加员工积分
  * @param params{id: 员工id, increasePoint: 增加分数， remark: 增加原因}
  * @param options
- * @param callback
  * @returns {*}
  */
-staff.increaseStaffPoint = function(params, callback) {
+staff.increaseStaffPoint = function(params) {
     var id = params.id;
     var operatorId = params.accountId;
     var increasePoint = params.increasePoint;
-    var defer = Q.defer();
     if(!id){
         throw {code: -1, msg: "id不能为空"};
     }
@@ -313,21 +283,18 @@ staff.increaseStaffPoint = function(params, callback) {
         })
         .spread(function(increment, create){
             return increment;
-        })
-        .nodeify(callback);
+        });
 }
 /**
  * 减少员工积分
  * @param params{id: 员工id, increasePoint: 减少分数， remark: 减少原因}
  * @param options
- * @param callback
  * @returns {*}
  */
-staff.decreaseStaffPoint = function(params, callback) {
+staff.decreaseStaffPoint = function(params) {
     var id = params.id;
     var decreasePoint = params.decreasePoint;
     var operatorId = params.accountId;
-    var defer = Q.defer();
     if(!id){
         throw {code: -1, msg: "id不能为空"};
     }
@@ -351,17 +318,15 @@ staff.decreaseStaffPoint = function(params, callback) {
         })
         .spread(function(decrement,create){
             return decrement;
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
  * 分页查询员工积分记录
  * @param params 查询条件 params.staff_id 员工id
  * @param options options.perPage 每页条数 options.page当前页
- * @param callback
  */
-staff.listAndPaginatePointChange = function(params, callback){
+staff.listAndPaginatePointChange = function(params){
     var options = {};
     if(params.options){
         options = params.options;
@@ -390,17 +355,15 @@ staff.listAndPaginatePointChange = function(params, callback){
     return pointChangeModel.findAndCountAll(options)
         .then(function(result){
             return new Paginate(page, perPage, result.count, result.rows);
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
  * 检查导入员工数据
  * @param params
- * @param callback
  * @returns {*}
  */
-staff.beforeImportExcel = function(params, callback){
+staff.beforeImportExcel = function(params){
     var userId = params.accountId;
     var md5key = params.md5key;
 //    var obj = nodeXlsx.parse(fileUrl);
@@ -537,19 +500,16 @@ staff.beforeImportExcel = function(params, callback){
             return API.attachment.deleteAttachment({md5key: md5key, userId: userId})//
                 .then(function(result){
                     return data;
-                })
-        })
-        .nodeify(callback);
+                });
+        });
 }
 
 /**
  * 执行导入员工数据
  * @param params
- * @param callback
  * @returns {*}
  */
-staff.importExcelAction = function(params, callback){
-    var defer = Q.defer();
+staff.importExcelAction = function(params){
     if(!params.addObj){
         throw {code: -1, msg: "params.addObj不能为空"};
     }
@@ -584,18 +544,16 @@ staff.importExcelAction = function(params, callback){
         })).then(function(items){
             data = items;
             return {addObj: JSON.stringify(addObj), noAddObj: JSON.stringify(noAddObj)};
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
  * 通过数据生成要下载的excle
  * @param params
  * @param params.objAttr 需要下载的数据列表
- * @param callback
  * @returns {*}
  */
-staff.downloadExcle = function (params, callback){
+staff.downloadExcle = function (params){
     if (!fs.existsSync(config.upload.tmpDir)) {
         fs.mkdirSync(config.upload.tmpDir);
     }
@@ -622,32 +580,27 @@ staff.downloadExcle = function (params, callback){
  * 判断员工是否在企业中
  * @param staffId
  * @param companyId
- * @param callback
  * @returns {*}
  */
-staff.isStaffInCompany = function(staffId, companyId, callback){
-    var defer = Q.defer();
+staff.isStaffInCompany = function(staffId, companyId){
     return staffModel.findById(staffId, {attributes: ['companyId']})
         .then(function(staff){
             if(!staff){
-                defer.reject({code: 1, msg: '没有找到该员工'});
-                return defer.promise;
+                throw {code: 1, msg: '没有找到该员工'};
             }
             if(staff.companyId != companyId){
-                defer.reject({code: 2, msg: '员工不在该企业'});
-                return defer.promise;
+                throw {code: 2, msg: '员工不在该企业'};
             }
             return {code: 0, msg: true};
-        }).nodeify(callback);
+        });
 }
 
 /**
  * 统计企业内的员工数据
  * @param params
- * @param callback
  * @returns {*}
  */
-staff.statisticStaffs = function(params, callback){
+staff.statisticStaffs = function(params){
     if(!params.companyId){
         throw {code: -1, msg: '企业Id不能为空'};
     }
@@ -669,19 +622,16 @@ staff.statisticStaffs = function(params, callback){
                 .then(function(){
                     return sta;
                 })
-        }).nodeify(callback);
+        });
 }
 /**
  * 得到企业管理员 普通员工 未激活人数
  * @param params
- * @param callback
  * @returns {*}
  */
-staff.statisticStaffsRole = function(params, callback){
-    var defer = Q.defer();
+staff.statisticStaffsRole = function(params){
     if(!params.companyId){
-        defer.reject({code: -1, msg: '企业Id不能为空'});
-        return defer.promise;
+        throw {code: -1, msg: '企业Id不能为空'};
     }
     var companyId = params.companyId;
     var adminNum = 0
@@ -702,31 +652,26 @@ staff.statisticStaffsRole = function(params, callback){
                         }
                     })
             }))
-                .then(function(){
-                    var result = {adminNum: adminNum, commonStaffNum: commonStaffNum, unActiveNum: unActiveNum};
-                    return result;
-                })
         })
-        .nodeify(callback);
+        .then(function(){
+            return {adminNum: adminNum, commonStaffNum: commonStaffNum, unActiveNum: unActiveNum};
+        });
 }
 
 /**
  * 统计企业内的员工总数
  * @param params
- * @param callback
  * @returns {*}
  */
-staff.getStaffCountByCompany = function(params, callback){
-    var defer = Q.defer();
+staff.getStaffCountByCompany = function(params){
     if(!params.companyId){
-        defer.reject({code: -1, msg: '企业Id不能为空'});
-        return defer.promise;
+        throw {code: -1, msg: '企业Id不能为空'};
     }
     var companyId = params.companyId;
     return staffModel.count({where: {companyId: companyId}})
         .then(function(all){
             return all || 1;
-        }).nodeify(callback);
+        });
 }
 
 /**
@@ -744,16 +689,13 @@ staff.deleteAllStaffs = function(params){
 /**
  * 得到可以查看用户票据的账号id （目前暂定代理商可查看用于审核）
  * @param params
- * @param callback
  * @returns {*}
  */
-staff.getInvoiceViewer = function(params, callback){
+staff.getInvoiceViewer = function(params){
     var viewerId = [];
-    var defer = Q.defer();
     var id = params.accountId;
     if(!id){
-        defer.reject({msg: 'accountId不能为空'});
-        return defer.promise;
+        throw {msg: 'accountId不能为空'};
     }
     return staff.getStaff({id: id})
         .then(function(obj){
@@ -768,8 +710,7 @@ staff.getInvoiceViewer = function(params, callback){
             }else{
                 return viewerId;
             }
-        })
-        .nodeify(callback);
+        });
 }
 
 staff.deleteAllStaffByTest = function(params){
