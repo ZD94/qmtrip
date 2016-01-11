@@ -246,6 +246,7 @@ describe("api/client/agency.js", function() {
                 .catch(function(err){
                     throw err;
                 })
+                .done();
         });
 
         after(function(done){

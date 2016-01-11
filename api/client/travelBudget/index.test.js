@@ -100,6 +100,7 @@ describe("api/client/travelBudget.js", function() {
                 console.info(err);
                 throw err;
             })
+            .done();
     })
 
 
@@ -120,6 +121,7 @@ describe("api/client/travelBudget.js", function() {
             .catch(function(err){
                 throw err;
             })
+            .done();
     });
 
     var outboundDate = moment().add("1", "months").format("YYYY-MM-DD");
