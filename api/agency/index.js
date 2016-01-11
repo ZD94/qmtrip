@@ -311,5 +311,23 @@ agency.listAndPaginateAgencyUser = function(params){
         });
 }
 
+/**
+ * 测试用例使用删除代理商和用户的操作，不在client里调用
+ * @param params
+ */
+agency.deleteAgencyByTest = function(params){
+    var email = params.email;
+    var mobile = params.mobile;
+    var name = params.name;
+    return Q.all([
+        API.auth.remove({email: email}),
+        Agency.destroy({where: {$or: [{email:email}, {mobile:mobile}, {name: name}]}}),
+        AgencyUser.destroy({where: {$or: [{email:email}, {mobile:mobile}, {name: name}]}})
+    ])
+        .then(function(){
+            return {code: 0, msg: '删除成功'}
+        })
+}
+
 
 module.exports = agency;
