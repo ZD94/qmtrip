@@ -463,8 +463,8 @@ staff.beforeImportExcel = function(params){
                         return;
                     }
                     return Q.all([
-                            API.authServer.checkAccExist({email: s[2], type: 1}),
-                            API.authServer.checkAccExist({mobile: s[1], type: 1})
+                            API.auth.checkAccExist({email: s[2], type: 1}),
+                            API.auth.checkAccExist({mobile: s[1], type: 1})
                     ])
                         .spread(function(staff1, staff2){
                             if(staff1){
@@ -516,7 +516,7 @@ staff.beforeImportExcel = function(params){
                     //addObj中删除重复邮箱的用户
                     for(var i=0;i<addObj.length;i++){
                         var addStaff = addObj[i];
-                        if(utils.trim(addStaff.email) == rMobile){
+                        if(utils.trim(addStaff.mobile) == rMobile){
                             addObj.splice(i, 1);
                             downloadAddObj.splice(i, 1);
                             addStaff.reason = "手机号与本次导入中手机号重复";
