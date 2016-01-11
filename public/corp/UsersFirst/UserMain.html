@@ -55,7 +55,38 @@
 			<a href="#/TravelPolicy/PolicyList" class="web-icon-font">&#xf08e;&nbsp;进行设置</a>
 		</div>
 	</div>
-	<div class="corp_welfare" ng-if="">
+	<!-- <div class="corp_welfare" ng-if="funds.balance == 0">
+		<h3>员工福利信息<a href="">查看详细>></a></h3>
+		<ul>
+			<li>
+				<img src="corp/images/JD.png">
+				<p>JD ￥50 e卡</p>
+			</li>
+
+			<li>
+				<img src="corp/images/JD.png">
+				<p>JD ￥100 e卡</p>
+			</li>
+			<li>
+				<img src="corp/images/JD.png">
+				<p>JD ￥200 e卡</p>
+			</li>
+		</ul>
+		<div class="corp_count">
+			<div class="corp_funds">
+				<span>￥{{funds.income-funds.consume-funds.frozen}}</span>
+				<p>增收节支专项奖励账户余额</p>
+			</div>
+			<div>
+				<div class="ranking">
+					<span>1</span>
+					<p>行业排名</p>
+				</div>
+				<div class="fund_all">公司累计投入专项奖金共：￥{{funds.income}}</div>
+			</div>
+		</div>
+	</div> -->
+	<div class="corp_welfare" ng-if="funds.balance != 0 &&funds.income != 0">
 		<h3>员工福利信息<a href="">查看详细>></a></h3>
 		<ul>
 			<li>
@@ -86,63 +117,33 @@
 			</div>
 		</div>
 	</div>
-	<div class="corp_welfare" ng-if="">
+	<div class="corp_welfare nocharge" ng-if="funds.income == 0">
 		<h3>员工福利信息<a href="">查看详细>></a></h3>
 		<ul>
 			<li>
-				<img src="corp/images/JD.png">
-				<p>JD ￥50 e卡</p>
-			</li>
-
-			<li>
-				<img src="corp/images/JD.png">
-				<p>JD ￥100 e卡</p>
+				<h4>员工贡献</h4>
+				<p>当前员工累计积分为{{}}}，累计为公司节省￥{{}}，超过80%的行业员工。</p>
 			</li>
 			<li>
+				<h4>福利奖品</h4>
+				<p>点亮后员工才可以积分兑换</p>
 				<img src="corp/images/JD.png">
-				<p>JD ￥200 e卡</p>
+			</li>
+			<li>
+				<h4>如何为员工点亮福利</h4>
+				<p>每个企业对应一个员工奖励增收节支专项奖励账户，此账户资金仅用于员工奖励向账户充值，点亮福利奖品。</p>
+				<div class="pointscale">1积分=1元</div>
 			</li>
 		</ul>
 		<div class="corp_count">
 			<div class="corp_funds">
-				<span>￥{{funds.income-funds.consume-funds.frozen}}</span>
+				<span>￥{{funds.income-funds.consume-funds.frozen}}<a href="javascript:void(0);">充值</a></span>
 				<p>增收节支专项奖励账户余额</p>
 			</div>
 			<div>
 				<div class="ranking">
-					<span>1</span>
-					<p>行业排名</p>
-				</div>
-				<div class="fund_all">公司累计投入专项奖金共：￥{{funds.income}}</div>
-			</div>
-		</div>
-	</div>
-	<div class="corp_welfare" ng-if="">
-		<h3>员工福利信息<a href="">查看详细>></a></h3>
-		<ul>
-			<li>
-				<img src="corp/images/JD.png">
-				<p>JD ￥50 e卡</p>
-			</li>
-
-			<li>
-				<img src="corp/images/JD.png">
-				<p>JD ￥100 e卡</p>
-			</li>
-			<li>
-				<img src="corp/images/JD.png">
-				<p>JD ￥200 e卡</p>
-			</li>
-		</ul>
-		<div class="corp_count">
-			<div class="corp_funds">
-				<span>￥{{funds.income-funds.consume-funds.frozen}}</span>
-				<p>增收节支专项奖励账户余额</p>
-			</div>
-			<div>
-				<div class="ranking">
-					<span>1</span>
-					<p>行业排名</p>
+					<span>…</span>
+					<p>没有名次</p>
 				</div>
 				<div class="fund_all">公司累计投入专项奖金共：￥{{funds.income}}</div>
 			</div>

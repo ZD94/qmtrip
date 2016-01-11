@@ -19,8 +19,6 @@ var UsersFirst = (function(){
 						var travelLevel = staff.travelLevel;
 						var start = moment().startOf('Month').format('YYYY-MM-DD 00:00:00');
 						var end = moment().endOf('Month').format('YYYY-MM-DD 23:59:59');
-						console.info(start)
-						console.info(end)
 						Q.all([
 							API.company.getCompanyFundsAccount(company_id),
 							API.staff.statisticStaffs({companyId:company_id}),
@@ -30,6 +28,7 @@ var UsersFirst = (function(){
 							.spread(function(resutlt,num,travel_level,date){
 								$scope.funds = resutlt;
 								$scope.num = num;
+								console.info(resutlt);
 								$scope.travelLevel = travel_level;
 								if(date.planMoney>date.expenditure) {
 									$scope.different =  "节省 "+Math.round((date.planMoney-date.expenditure)*100/date.planMoney)+"%";
@@ -56,6 +55,7 @@ var UsersFirst = (function(){
 		$scope.initCorpMain();
 		$scope.initCharts = function(first,second,third){
 			var myChart = window.echarts.init(document.getElementById('charts')); 
+			var saving = (second-third).toFixed(2);
 		    var option = {
 				    tooltip: {
 				        trigger: 'item'
@@ -132,7 +132,7 @@ var UsersFirst = (function(){
 				            		// 	{name:"second",xAxis:'实际支出',yAxis: 20,type:"min"}
 				            		// ]##01BDFF
 				            		[
-				            			{name:"节省",value:second-third,xAxis:1,yAxis: second,
+				            			{name:"节省",value:saving,xAxis:1,yAxis: second,
 				            				itemStyle:{
 				            					normal:{
 				            							color:'#01BDFF',
