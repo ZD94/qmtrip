@@ -45,7 +45,6 @@ travelPolicy.createTravelPolicy = function(data, callback){
  * @returns {*}
  */
 travelPolicy.deleteTravelPolicy = function(params, callback){
-    var defer = Q.defer();
     var id = params.id;
     if (!id) {
         throw {code: -1, msg: "id不能为空"};
@@ -62,6 +61,13 @@ travelPolicy.deleteTravelPolicy = function(params, callback){
             }
         })
         .nodeify(callback);
+}
+
+travelPolicy.deleteTravelPolicyByTest = function(params){
+    return travalPolicyModel.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
+        .then(function(){
+            return {code: 0, msg: '删除成功'};
+        })
 }
 
 /**

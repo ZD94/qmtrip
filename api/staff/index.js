@@ -142,7 +142,6 @@ staff.deleteStaff = function(params){
  */
 staff.updateStaff = function(data, callback){
     var id = data.id;
-    var defer = Q.defer();
     if(!id){
         throw {code: -1, msg: "id不能为空"};
     }

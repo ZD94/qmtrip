@@ -172,11 +172,8 @@ agency.deleteAgency = function(params){
                         {where: {agencyId: agencyId}, fields: ['status', 'updateAt'], transaction: t})
                 ])
                     .then(function(){
-                        console.log("为什么删不掉呢 没进来吧");
-                        console.log(users);
                         return users.map(function(user){
-                            console.log(user);
-                            return API.auth.remove({accountId: user.id})
+                            return API.auth.remove({accountId: user.id, type: 2})
                         })
                     })
             })
