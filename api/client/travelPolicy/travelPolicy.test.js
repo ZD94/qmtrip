@@ -117,7 +117,7 @@ describe("api/client/travelPolicy.js", function() {
     it("#getAllTravelPolicy should be ok", function(done) {
         API.client.travelPolicy.getAllTravelPolicy.call(self, {companyId: companyId}, function(err, result) {
             assert.equal(err, null);
-            //console.log(result);
+//            console.log(result);
 //                console.log(result.items);//item dataValues里存放的才是记录信息
             done();
         });
@@ -131,11 +131,28 @@ describe("api/client/travelPolicy.js", function() {
             done();
         });
     })
+//得到企业最新差旅标准
+    it("#getLatestTravelPolicy should be ok", function(done) {
+        obj.id = id;
+        API.client.travelPolicy.getLatestTravelPolicy.call(self, {}, function(err, result) {
+            assert.equal(err, null);
+//            console.log(result);
+            done();
+        });
+    })
 //删除差旅标准信息
     it("#deleteTravelPolicy should be ok", function(done) {
         API.client.travelPolicy.deleteTravelPolicy.call(self, {id: id}, function(err, result) {
             assert.equal(err, null);
             //console.log(result);
+            done();
+        });
+    })
+    //企业没有设置差旅标准的情况下得到系统默认差旅标准
+    it("#getLatestTravelPolicy get default travelPolicy should be ok", function(done) {
+        obj.id = id;
+        API.client.travelPolicy.getLatestTravelPolicy.call(self, {}, function(err, result) {
+            assert.equal(err, null);
             done();
         });
     })

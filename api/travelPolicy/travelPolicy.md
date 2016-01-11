@@ -67,7 +67,7 @@
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
-| params                                | 更新信息             |json              |------
+| params                                | 参数信息             |json              |------
 | params.id                                | 差旅标准id             | uuid             |必填
 | callback                              | 回调函数             |function              |支持promise
 
@@ -75,6 +75,7 @@
 |---------|------|-----|
 | msg     | 提示信息 |
 | json数据   | 差旅标准信息|json
+
 
 >. 分页查询差旅标准信息 API.travelPolicy.listAndPaginateTravelPolicy(params, callback);
 
@@ -117,3 +118,15 @@
 |---------|------|-----|
 | code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
+
+>. 查询最新差旅标准信息 API.travelPolicy.getLatestTravelPolicy(params,callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 参数信息             |json              |必填
+| params                                | 参数信息             |json              |查询最新差旅标准params为{}即可
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| json数据   | 最新差旅标准信息|json

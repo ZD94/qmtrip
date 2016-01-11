@@ -24,10 +24,9 @@ var company = {};
  * @param {UUID} params.createUser 创建人
  * @param {String} params.name 企业名称
  * @param {String} params.domainName 域名,邮箱后缀
- * @param {Function} callback
  * @returns {Promise}
  */
-company.createCompany = function(params, callback){
+company.createCompany = function(params){
     var _company = checkAndGetParams(['createUser', 'name', 'domainName', 'mobile', 'email'], ['id', 'agencyId', 'description', 'telephone', 'remark'], params);
     if(!_company.id){
         _company.id = uuid.v1();
@@ -48,8 +47,7 @@ company.createCompany = function(params, callback){
                     createUser: c.createUser
                 };
             });
-    })
-        .nodeify(callback);
+    });
 }
 
 /**
@@ -57,10 +55,9 @@ company.createCompany = function(params, callback){
  *
  * @param {Object} params 参数
  * @param {String} params.domain 域名
- * @param {Function} callback 可选回调函数
  * @return {Promise}
  */
-company.checkBlackDomain = function(params, callback) {
+company.checkBlackDomain = function(params) {
     var domain = params.domain;
     if (!domain) {
         throw {code: -1, msg: "域名不存在或不合法"};
@@ -71,17 +68,15 @@ company.checkBlackDomain = function(params, callback) {
                 throw {code: -1, msg: "域名不能使用"}
             }
             return true;
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
  * 更新企业信息
  * @param params
- * @param callback
  * @returns {*}
  */
-company.updateCompany = function(params, callback){
+company.updateCompany = function(params){
     var fields = getColsFromParams(Company.attributes, ['companyNo', 'createUser', 'createAt']);
     var params = checkAndGetParams(['companyId'], fields, params);
     var companyId = params.companyId;
@@ -101,14 +96,12 @@ company.updateCompany = function(params, callback){
                 throw {code: -2, msg: '更新企业信息失败'};
             }
             return rows[0];
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
  * 获取企业信息
  * @param companyId
- * @param callback
  * @returns {*}
  */
 company.getCompany = function(params){
@@ -126,13 +119,12 @@ company.getCompany = function(params){
                 throw L.ERR.COMPANY_NOT_EXIST;
             }
             return company;
-        })
+        });
 }
 
 /**
  * 获取企业列表
  * @param params
- * @param callback
  * @returns {*}
  */
 company.listCompany = function(params){
@@ -144,13 +136,12 @@ company.listCompany = function(params){
     if(params.columns){
         options.attributes =  params.columns;
     }
-    return Company.findAll(options)
+    return Company.findAll(options);
 }
 
 /**
  * 删除企业
  * @param params
- * @param callback
  * @returns {*}
  */
 company.deleteCompany = function(params){
@@ -176,13 +167,12 @@ company.deleteCompany = function(params){
         })
         .then(function(){
             return {code: 0, msg: '删除成功'};
-        })
+        });
 }
 
 /**
  * 获取企业资金账户信息
  * @param params
- * @param callback
  * @returns {*}
  */
 company.getCompanyFundsAccount = function(params){
@@ -198,14 +188,13 @@ company.getCompanyFundsAccount = function(params){
                 throw {code: -4, msg: '企业资金账户不存在'};
             }
             return funds.toJSON();
-        })
+        });
 }
 
 /**
  * 企业资金账户金额变动
  * @param params
  * @param params.type -2: 冻结账户资金 -1： 账户余额减少 1：账户余额增加 2：解除账户冻结金额
- * @param callback
  * @returns {*}
  */
 company.moneyChange = function(params){
@@ -277,8 +266,8 @@ company.moneyChange = function(params){
             if(rownum != 1){
                 throw {code: -3, msg: '充值失败'};
             }
-            return rows[0].toJSON();
-        })
+            return rows[0];
+        });
 }
 
 /**
