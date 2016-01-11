@@ -150,6 +150,60 @@ travelPolicy.getTravelPolicy = function(params, callback){
 /**
  * 企业分页查询差旅标准
  * @param params
+ * @param params.options
+ * @param callback
+ * @returns {*|Promise}
+ */
+travelPolicy.listAndPaginateTravelPolicy = auth.checkPermission(["travelPolicy.query"],
+    function(params, callback){
+    var user_id = this.accountId;
+    return API.staff.getStaff({id: user_id})
+        .then(function(data){
+            if(data){
+                params.companyId = data.companyId;//只允许查询该企业下的差旅标准
+                return API.travelPolicy.listAndPaginateTravelPolicy(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        })
+        .nodeify(callback);
+});
+
+
+/**
+ * 查询企业最新差旅标准
+ * @param params
+ * @param params.options
+ * @param callback
+ * @returns {*|Promise}
+ */
+travelPolicy.getLatestTravelPolicy = auth.checkPermission(["travelPolicy.query"],
+    function(params, callback){
+    var user_id = this.accountId;
+    return API.staff.getStaff({id: user_id})
+        .then(function(data){
+            if(data){
+                params.companyId = data.companyId;//只允许查询该企业下的差旅标准
+                return API.travelPolicy.listAndPaginateTravelPolicy(params)
+                    .then(function(result){
+                        if(result && result.items && result.items.length>0){
+                            return result.items[0];
+                        }else{
+                            return API.travelPolicy.getTravelPolicy({id:'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a'})
+                                .then(function(tp){
+                                    return tp;
+                                })
+                        }
+                    })
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        })
+        .nodeify(callback);
+});
+/**
+ * 企业分页查询差旅标准
+ * @param params
  * @param options
  * @param callback
  * @returns {*|Promise}
@@ -158,7 +212,6 @@ travelPolicy.listAndPaginateTravelPolicy = auth.checkPermission(["travelPolicy.q
     function(params, callback){
     var defer = Q.defer();
     var user_id = this.accountId;
-
     return API.staff.getStaff({id: user_id})
         .then(function(data){
             if(data){

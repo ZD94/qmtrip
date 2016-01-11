@@ -79,7 +79,6 @@ travelPolicy.deleteTravelPolicyByTest = function(params){
  */
 travelPolicy.updateTravelPolicy = function(data, callback){
     var id = data.id;
-    var defer = Q.defer();
     if(!id){
         throw {code: -1, msg: "id不能为空"};
     }
@@ -105,7 +104,6 @@ travelPolicy.updateTravelPolicy = function(data, callback){
  */
 travelPolicy.getTravelPolicy = function(params, callback){
     var id = params.id;
-    var defer = Q.defer();
     if(!id){
         throw {code: -1, msg: "id不能为空"};
     }

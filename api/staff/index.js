@@ -412,6 +412,7 @@ staff.beforeImportExcel = function(params, callback){
     var emailAttr = [];
     var mobileAttr = [];
     var repeatEmail = [];
+    var repeatMobile = [];
     var companyId = "";
     var domainName = "";
     var xlsxObj;
@@ -459,6 +460,15 @@ staff.beforeImportExcel = function(params, callback){
                         downloadNoAddObj.push(s);
                         return;
                     }
+                    if(utils.trim(staffObj.mobile) != "" && mobileAttr.join(",").indexOf(utils.trim(s[1])) != -1){
+                        staffObj.reason = "手机号与本次导入中手机号重复";
+                        s[6] = "手机号与本次导入中手机号重复";
+                        noAddObj.push(staffObj);
+                        downloadNoAddObj.push(s);
+                        repeatMobile.push(utils.trim(s[1]));
+                        return;
+                    }
+                    mobileAttr.push(s[1]);
                     if(utils.trim(staffObj.email) == ""){
                         staffObj.reason = "邮箱为空";
                         s[6] = "邮箱为空";
@@ -489,11 +499,19 @@ staff.beforeImportExcel = function(params, callback){
                         downloadNoAddObj.push(s);
                         return;
                     }
-                    return staffModel.findOne({where: {email: s[2]}})
-                        .then(function(staff){
-                            if(staff){
+                    return Q.all([
+                            API.authServer.checkAccExist({email: s[2], type: 1}),
+                            API.authServer.checkAccExist({mobile: s[1], type: 1})
+                    ])
+                        .spread(function(staff1, staff2){
+                            if(staff1){
                                 staffObj.reason = "邮箱与已有用户重复";
                                 s[6] = "邮箱与已有用户重复";
+                                noAddObj.push(staffObj);
+                                downloadNoAddObj.push(s);
+                            }else if(staff2 && staff2.mobile && staff2.mobile != ""){
+                                staffObj.reason = "手机号与已有用户重复";
+                                s[6] = "手机号与已有用户重复";
                                 noAddObj.push(staffObj);
                                 downloadNoAddObj.push(s);
                             }else{
@@ -525,6 +543,21 @@ staff.beforeImportExcel = function(params, callback){
                             downloadAddObj.splice(i, 1);
                             addStaff.reason = "邮箱与本次导入中邮箱重复";
                             downloadAddObj[i][6] = "邮箱与本次导入中邮箱重复";
+                            noAddObj.push(addStaff);
+                            downloadNoAddObj.push(downloadAddObj[i]);
+                        }
+                    }
+                }
+                for(var k=0; k<repeatMobile.length; k++){
+                    var rMobile = repeatMobile[k];
+                    //addObj中删除重复邮箱的用户
+                    for(var i=0;i<addObj.length;i++){
+                        var addStaff = addObj[i];
+                        if(utils.trim(addStaff.email) == rMobile){
+                            addObj.splice(i, 1);
+                            downloadAddObj.splice(i, 1);
+                            addStaff.reason = "手机号与本次导入中手机号重复";
+                            downloadAddObj[i][6] = "手机号与本次导入中手机号重复";
                             noAddObj.push(addStaff);
                             downloadNoAddObj.push(downloadAddObj[i]);
                         }
