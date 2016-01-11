@@ -42,7 +42,7 @@ describe("api/client/agency.js", function() {
             })
         });
 
-        it("#registerAgency with wrong params should be error", function(done) {
+        it("#registerAgency should be error with wrong params", function(done) {
             API.client.agency.registerAgency({}, function(err, ret) {
                 assert.equal(ret, null);
                 assert.equal(err.code, -1);
@@ -50,7 +50,7 @@ describe("api/client/agency.js", function() {
             });
         });
 
-        it("#registerAgency with correct params should be ok", function(done) {
+        it("#registerAgency should be ok with correct params", function(done) {
             API.client.agency.registerAgency(agency, function(err, ret) {
                 if (err) {
                     throw err;
@@ -246,6 +246,7 @@ describe("api/client/agency.js", function() {
                 .catch(function(err){
                     throw err;
                 })
+                .done();
         });
 
         after(function(done){

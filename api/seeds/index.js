@@ -17,13 +17,8 @@ var seeds = {};
  * @param params.type goods_no:商品编号 goods_order_no:实物商品订单编号
  * @param cb
  */
-seeds.getSingleSeedCode = function(type, options, callback){
-    var defer = Q.defer();
+seeds.getSingleSeedCode = function(type, options){
     if (!options) {
-        options = {};
-    }
-    if (typeof options == 'function') {
-        callback = options;
         options = {};
     }
     var minNo = options.minNo;
@@ -57,17 +52,12 @@ seeds.getSingleSeedCode = function(type, options, callback){
         })
         .then(function(seed) {
             return seed.nowNo;
-        })
-        .nodeify(callback);
+        });
 }
 
 
-seeds.getSeedNo = function(type, options, callback){
+seeds.getSeedNo = function(type, options){
     if (!options) {
-        options = {};
-    }
-    if (typeof options == 'function') {
-        callback = options;
         options = {};
     }
     var formatDate = formatDate = options.formatDate || "YYMMDDHHmmss";
@@ -75,8 +65,7 @@ seeds.getSeedNo = function(type, options, callback){
         .then(function(seeds){
             var now = moment().format(formatDate);
             return now + seeds;
-        })
-        .nodeify(callback);
+        });
 }
 
 module.exports = seeds;

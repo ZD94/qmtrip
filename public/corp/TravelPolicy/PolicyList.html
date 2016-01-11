@@ -5,12 +5,8 @@
     </div>
     <ul class="policy_page">
         <li ng-repeat="item in PolicyList">
-            <div class="policy_t"><span style="float: left;">差旅标准{{$index+1}}</span><a href="javascript:void(0);" ng-click="updatePolicyShow(item.id,$index)">修改</a><span style="font-size: 13px;">&nbsp;|&nbsp;</span><a href="javascript:void(0);" ng-click="deletePolicy(item.id,item.name)">删除</a></div>
+            <div class="policy_t"><span style="float: left;">{{item.name}}</span><a href="javascript:void(0);" ng-click="updatePolicyShow(item.id,$index)">修改</a><span style="font-size: 13px;">&nbsp;|&nbsp;</span><a href="javascript:void(0);" ng-click="deletePolicy(item.id,item.name)">删除</a></div>
             <table width="100%">
-                <tr>
-                    <td width="70" height="34" align="right">等级名称：</td>
-                    <td height="34">{{item.name}}</td>
-                </tr>
                 <tr>
                     <td width="70" height="34" align="right">飞机：</td>
                     <td height="34">
@@ -60,7 +56,7 @@
             <div class="policy_t">增加差旅标准</div>
             <table width="100%">
                 <tr>
-                    <td width="70" height="56" align="right">等级名称：</td>
+                    <td width="70" height="56" align="right">等级：</td>
                     <td><input class="common_text w350 Cname" maxlength="10" placeholder="自定义差旅标准名称，限制10个汉字，例&quot;员工级&quot;"></td>
                 </tr>
                 <tr>
@@ -94,7 +90,7 @@
                     <td width="70" height="36" align="right"></td>
                     <td>
                         <input type="checkbox" class="Ccheckbox" id="Ccheckboxx" checked="" style="display: none;">
-                        <label for="Ccheckboxx" class="Ccheckboxlabel web-icon-font2" ng-click="createChangecheck()" style="width: 16px; height: 16px; line-height: 16px; text-align: center; color: #ffffff; background:#118FD6; margin-top: 1px; float: left;"></label>
+                        <label for="Ccheckboxx" class="Ccheckboxlabel web-icon-font2 labletrue" ng-click="createChangecheck()"></label>
                         <span style="padding-left: 5px; float: left;">当高级舱位低于上述标准时，可选择高级舱位</span></td>
                 </tr>
                 <tr>
@@ -143,7 +139,7 @@
             <div class="policy_t">修改差旅标准</div>
             <table width="100%">
                 <tr>
-                    <td width="70" height="56" align="right">等级名称：</td>
+                    <td width="70" height="56" align="right">等级：</td>
                     <td><input class="common_text w350 Cname"></td>
                 </tr>
                 <tr>
@@ -177,7 +173,7 @@
                     <td width="70" height="36" align="right"></td>
                     <td>
                         <input type="checkbox" class="Ccheckbox" id="Ccheckbox" checked="" style="display: none;">
-                        <label for="Ccheckbox" class="Ccheckboxlabel web-icon-font2" ng-click="updateChangecheck()" style="width: 16px; height: 16px; line-height: 16px; text-align: center; color: #ffffff; background:#118FD6; margin-top: 1px; float: left;"></label>
+                        <label for="Ccheckbox" class="Ccheckboxlabel web-icon-font2 labletrue" ng-click="updateChangecheck()"></label>
                         <span style="padding-left: 5px; float: left;">当高级舱位低于上述标准时，可选择高级舱位</span></td>
                 </tr>
                 <tr>

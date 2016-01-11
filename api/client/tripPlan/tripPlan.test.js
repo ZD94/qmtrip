@@ -259,6 +259,7 @@ describe("api/client/tripPlan.js", function() {
         });
 
         describe('options based on consume details created', function(){
+            var consumeId = "";
             before(function(done){
                 Q.all([
                     API.tripPlan.saveConsumeRecord({orderId: newOrderId, accountId: staffId, type: 0, startTime: '2016-01-11 11:22:22', invoiceType: 2, budget: 150}),
@@ -267,9 +268,10 @@ describe("api/client/tripPlan.js", function() {
                     .spread(function(ret1, ret2){
                         assert.equal(ret1.type, 0);
                         assert.equal(ret2.type, 1);
+                        consumeId = ret2.id;
                         return API.tripPlan.uploadInvoice({userId: staffId, consumeId: ret1.id, picture: '测试图片'})
                             .then(function(t){
-                                assert(t.newInvoice != null);
+                                assert.equal(t.code, 0);
                                 return  API.client.agencyTripPlan.approveInvoice.call({accountId: agencyUserId}, {consumeId: ret1.id, status: 1, expenditure: '521', remark: '审核票据测试'})
                                     .then(function(r){
                                         assert.equal(r.status, 1);
@@ -280,6 +282,17 @@ describe("api/client/tripPlan.js", function() {
                     .catch(function(err){
                         throw err;
                     })
+            });
+
+            it("#uploadInvoice should be ok", function (done) {
+                var self = {accountId: staffId};
+                API.client.tripPlan.uploadInvoice.call(self, {consumeId: consumeId, picture: '测试上传图片'}, function (err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+                    assert.equal(ret.code, 0);
+                    done();
+                })
             });
 
             it("#statPlanOrderMoneyByCompany should be ok", function (done) {

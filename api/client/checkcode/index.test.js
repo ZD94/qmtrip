@@ -4,7 +4,7 @@
 /**
  * Created by wlh on 15/12/28.
  */
-var checkcode = require("./");
+var API = require("common/api");
 var assert = require("assert");
 
 describe("api/checkcode/index.js", function() {
@@ -16,7 +16,7 @@ describe("api/checkcode/index.js", function() {
 
     it("#getMsgCheckCode should be ok", function(done) {
 
-        checkcode.getMsgCheckCode(testCase, function(err, result) {
+        API.client.checkcode.getMsgCheckCode(testCase, function(err, result) {
             if (err) {
                 throw err;
             }
@@ -26,7 +26,7 @@ describe("api/checkcode/index.js", function() {
     })
 
     it("#getPicCheckCode should be ok", function(done) {
-        checkcode.getPicCheckCode({}, function(err, result) {
+        API.client.checkcode.getPicCheckCode({}, function(err, result) {
             if (err) {
                 throw err;
             }

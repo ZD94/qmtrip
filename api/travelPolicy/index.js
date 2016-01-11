@@ -14,37 +14,30 @@ var travelPolicy = {};
 /**
  * 创建差旅标准
  * @param data
- * @param callback
  * @returns {*}
  */
-travelPolicy.createTravelPolicy = function(data, callback){
+travelPolicy.createTravelPolicy = function(data){
     if (!data.hotelPrice || !/^\d+(.\d{1,2})?$/.test(data.hotelPrice)) {
         data.hotelPrice = null;
     }
     return checkParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"], data)
         .then(function(){
-            return travalPolicyModel.findOne({where: {name: data.name}})
-                .then(function(result){
-                    return result;
-                })
+            return travalPolicyModel.findOne({where: {name: data.name}});
         })
         .then(function(result){
             if(result){
                 throw {msg: "该等级名称已存在，请重新设置"};
-            }else{
-                return travalPolicyModel.create(data);
             }
-        })
-        .nodeify(callback);
+            return travalPolicyModel.create(data);
+        });
 }
 
 /**
  * 删除差旅标准
  * @param params
- * @param callback
  * @returns {*}
  */
-travelPolicy.deleteTravelPolicy = function(params, callback){
+travelPolicy.deleteTravelPolicy = function(params){
     var id = params.id;
     if (!id) {
         throw {code: -1, msg: "id不能为空"};
@@ -53,14 +46,12 @@ travelPolicy.deleteTravelPolicy = function(params, callback){
         .then(function(staffs){
             if(staffs && staffs.length > 0){
                 throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准 暂不能删除，给这些员工匹配新的差旅标准后再进行操作'};
-            }else{
-                return travalPolicyModel.destroy({where: params})
-                    .then(function(obj){
-                        return {code: 0, msg: "删除成功"}
-                    })
             }
+            return travalPolicyModel.destroy({where: params});
         })
-        .nodeify(callback);
+        .then(function(obj){
+            return {code: 0, msg: "删除成功"}
+        });
 }
 
 travelPolicy.deleteTravelPolicyByTest = function(params){
@@ -74,10 +65,9 @@ travelPolicy.deleteTravelPolicyByTest = function(params){
  * 更新差旅标准
  * @param id
  * @param data
- * @param callback
  * @returns {*}
  */
-travelPolicy.updateTravelPolicy = function(data, callback){
+travelPolicy.updateTravelPolicy = function(data){
     var id = data.id;
     if(!id){
         throw {code: -1, msg: "id不能为空"};
@@ -92,34 +82,29 @@ travelPolicy.updateTravelPolicy = function(data, callback){
     return travalPolicyModel.update(data, options)
         .spread(function(rownum, rows){
             return rows[0];
-        })
-        .nodeify(callback);
+        });
 }
 /**
  * 根据id查询差旅标准
  * @param id
  * @param data
- * @param callback
  * @returns {*}
  */
-travelPolicy.getTravelPolicy = function(params, callback){
+travelPolicy.getTravelPolicy = function(params){
     var id = params.id;
     if(!id){
         throw {code: -1, msg: "id不能为空"};
     }
-    return travalPolicyModel.findById(id)
-        .nodeify(callback);
+    return travalPolicyModel.findById(id);
 }
 
 /**
  * 得到全部差旅标准
  * @param params
- * @param callback
  * @returns {*}
  */
-travelPolicy.getAllTravelPolicy = function(options, callback){
-    return travalPolicyModel.findAll(options)
-        .nodeify(callback);
+travelPolicy.getAllTravelPolicy = function(options){
+    return travalPolicyModel.findAll(options);
 }
 
 
@@ -127,9 +112,8 @@ travelPolicy.getAllTravelPolicy = function(options, callback){
  * 分页查询差旅标准集合
  * @param params 查询条件 params.company_id 企业id
  * @param options options.perPage 每页条数 options.page当前页
- * @param callback
  */
-travelPolicy.listAndPaginateTravelPolicy = function(params, callback){
+travelPolicy.listAndPaginateTravelPolicy = function(params){
     var options = {};
     if(params.options){
         options = params.options;
@@ -157,8 +141,7 @@ travelPolicy.listAndPaginateTravelPolicy = function(params, callback){
     return travalPolicyModel.findAndCountAll(options)
         .then(function(result){
             return new Paginate(page, perPage, result.count, result.rows);
-        })
-        .nodeify(callback);
+        });
 }
 
 function checkParams(checkArray, params){

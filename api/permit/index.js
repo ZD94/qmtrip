@@ -89,7 +89,6 @@ updateRole(agency_roles);
  *
  * @param {Object} data
  * @param {UUID} data.accountId 账号ID
- * @param {Function} callback
  */
 function getRoleOfAccount(data) {
     var accountId = data.accountId;
@@ -115,7 +114,6 @@ function getRoleOfAccount(data) {
  *
  * @param {Object}    params
  * @param {uuid}      params.accountId
- * @param {Function}  callback
  */
 function getRoleOfAgency(params){
     var accountId = params.accountId;
@@ -165,9 +163,8 @@ permit.listRoles = function(params, callback) {
  * @param {UUID} params.accountId 账号ID
  * @param {String} params.permission 要检查的权限
  * @param {String} params.type 权限所属 1.企业 2.代理商 默认 1.企业
- * @param {Function} callback {code: 0, msg: "ok"}, {code: -1, msg: "权限不足"};
  */
-permit.checkPermission = function(params, callback) {
+permit.checkPermission = function(params) {
     var accountId = params.accountId;
     var permissions = params.permission;
 
@@ -191,8 +188,7 @@ permit.checkPermission = function(params, callback) {
                         throw L.ERR.PERMISSION_DENY;
                 }
                 return true;
-            })
-        .nodeify(callback);
+            });
     }
 
     return getRoleOfAccount({accountId: accountId})
@@ -204,7 +200,6 @@ permit.checkPermission = function(params, callback) {
                     throw L.ERR.PERMISSION_DENY;
             }
             return true;
-        })
-        .nodeify(callback);
+        });
 };
 

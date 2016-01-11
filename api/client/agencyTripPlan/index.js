@@ -15,7 +15,6 @@ var agencyTripPlan = {};
 /**
  * 获取计划单详情
  * @param orderId
- * @param callback
  */
 agencyTripPlan.getTripPlanOrderById = function(orderId){
     var self = this;
@@ -44,7 +43,6 @@ agencyTripPlan.getTripPlanOrderById = function(orderId){
 
 /**
  * 代理商获取员工计划单分页列表
- * @param callback
  * @returns {*}
  */
 agencyTripPlan.pageTripPlanOrder = function(params){
@@ -54,11 +52,17 @@ agencyTripPlan.pageTripPlanOrder = function(params){
     var self = this;
     var accountId = self.accountId;
 
-    (params.isUpload === true)?params.status={$gt: 0}:params.status = {$gte: -1}; //查询条件为是否上传票据，设定查询参数status
-    if(params.audit){ //判断计划单的审核状态，设定auditStatus参数
+    /* status -2:删除状态，不对外显示 -1:失效状态 0:待上传状态 1:已上传待审核状态 2:审核完成状态 */
+    if (params.isUpload === true) {
+        params.status = {$gt: 0}
+    } else if (params.isUpload === false) {
+        params.status = 0;
+    }
+    if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
         var audit = params.audit;
         params.status = 1;
         if(audit == 'Y'){
+            params.status = {$gte: 1};
             params.auditStatus = 1;
         }else if(audit == "P"){
             params.auditStatus = 0;
@@ -85,13 +89,13 @@ agencyTripPlan.pageTripPlanOrder = function(params){
                 ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure'], params);
             var page = params.page;
             var perPage = params.perPage;
-            typeof page== 'number'?"":page=1;
-            typeof perPage == 'number'?"":perPage=10;
+            page = typeof(page) == 'number'?page:1;
+            perPage = typeof(perPage) == 'number'?perPage:10;
             var options = {
                 where: query,
                 limit: perPage,
                 offset: perPage * (page - 1)
-            }
+            };
             return API.tripPlan.listTripPlanOrder(options);
         })
 }
@@ -103,7 +107,6 @@ agencyTripPlan.pageTripPlanOrder = function(params){
  * @param params.status审核结果状态
  * @param params。consumeId 审核消费单id
  * @param params.userId 用户id
- * @param callback
  * @returns {*|*|Promise}
  */
 agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
@@ -140,17 +143,16 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                     throw L.ERR.PERMISSION_DENY;
                 }
                 return API.tripPlan.approveInvoice(params);
-            })
+            });
     });
 
 
 /**
  * 代理商统计计划单数目(根据企业id和员工id,员工id为空的时候查询企业所有员工的数据)
  * @param params
- * @param callback
  * @returns {*}
  */
-agencyTripPlan.countTripPlanNum = function(params, callback){
+agencyTripPlan.countTripPlanNum = function(params){
     var self = this;
     var accountId = self.accountId; //代理商用户Id
     if(!params.companyId){
@@ -168,8 +170,7 @@ agencyTripPlan.countTripPlanNum = function(params, callback){
         })
         .then(function(ret){
             return API.tripPlan.countTripPlanNum(params);
-        })
-    .nodeify(callback);
+        });
 }
 
 module.exports = agencyTripPlan;
