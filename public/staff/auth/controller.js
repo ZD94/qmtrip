@@ -83,7 +83,7 @@ var auth=(function(){
                 $("#corpName").siblings(".err_msg").children("i").html("&#xf06a;");
                 $("#corpName").siblings(".err_msg").children("i").removeClass("right");
                 $("#corpName").siblings(".err_msg").show();
-                $("#corpName").focus();
+                //$("#corpName").focus();
                 $scope.$apply();
                 return false;
             }else{
@@ -102,7 +102,7 @@ var auth=(function(){
                 $("#corpRegistryName").siblings(".err_msg").children("i").html("&#xf06a;");
                 $("#corpRegistryName").siblings(".err_msg").children("i").removeClass("right");
                 $("#corpRegistryName").siblings(".err_msg").show();
-                $("#corpRegistryName").focus();
+                //$("#corpRegistryName").focus();
                 $scope.$apply();
                 return false;
             }else{
@@ -122,7 +122,7 @@ var auth=(function(){
                 $("#corpMail").siblings(".err_msg").children("i").html("&#xf06a;");
                 $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
                 $("#corpMail").siblings(".err_msg").show();
-                $("#corpMail").focus();
+                //$("#corpMail").focus();
                 $(".tip_div").hide();
                 $scope.$apply();
                 return false;
@@ -132,7 +132,7 @@ var auth=(function(){
                 $("#corpMail").siblings(".err_msg").children("i").html("&#xf057;");
                 $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
                 $("#corpMail").siblings(".err_msg").show();
-                $("#corpMail").focus();
+                //$("#corpMail").focus();
                 $(".tip_div").hide();
                 $scope.$apply();
                 return false;
@@ -154,7 +154,7 @@ var auth=(function(){
                 $("#corpMobile").siblings(".err_msg").children("i").html("&#xf06a;");
                 $("#corpMobile").siblings(".err_msg").children("i").removeClass("right");
                 $("#corpMobile").siblings(".err_msg").show();
-                $("#corpMobile").focus();
+                //$("#corpMobile").focus();
                 $scope.$apply();
                 return false;
             }else if(!mobile.match(/^[1][0-9]{10}$/)){
@@ -162,7 +162,7 @@ var auth=(function(){
                 $("#corpMobile").siblings(".err_msg").children("i").html("&#xf057;");
                 $("#corpMobile").siblings(".err_msg").children("i").removeClass("right");
                 $("#corpMobile").siblings(".err_msg").show();
-                $("#corpMobile").focus();
+                //$("#corpMobile").focus();
                 $scope.$apply();
                 return false;
             }else{
@@ -191,7 +191,7 @@ var auth=(function(){
 
         //获取短信验证码
         $scope.getMCode = function() {
-            console.info(1111);
+            //console.info(1111);
             var mobile = $('#corpMobile').val();
             if(!mobile){
                 $scope.err_msg_phone = "联系人电话不能为空";
