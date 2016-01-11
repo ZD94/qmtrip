@@ -3,12 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="stylesheet" href="css/style.css" />
-		<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
-		<script type="text/javascript">
-			var jQuery = $ = require('jquery');
-		</script>
-		<script type="text/javascript" src="/script/ddfullscreenslider.js"></script>
-		<script src="/script/fullpage.js"></script>
+		<script type="text/javascript" src="js/jquery.js"></script>
+		<script type="text/javascript" src="js/ddfullscreenslider.js"></script>
+		<script src="js/fullpage.js"></script>
 		<title></title>
 	</head>
 	<body>
@@ -24,10 +21,10 @@
 						<a href="#">
 							<li class="on">首页</li>
 						</a>
-						<a href="#">
+						<a href="#twoSlider">
 							<li>服务</li>
 						</a>
-						<a href="">
+						<a href="#threeSlider">
 							<li>客户</li>
 						</a>
 						<a href="#">
@@ -87,7 +84,7 @@
 				</div>
 			</div>
 			<div class="section">
-				<div class="twoSlider">
+				<div class="twoSlider" id="twoSlider">
 					<ul>
 						<li>
 							<img src="img/CleverQm.png" />
@@ -131,7 +128,7 @@
 				</div>
 			</div>
 			<div class="section">
-				<div class="threeSlider" style="width: 1030px;margin: 0 auto;">
+				<div class="threeSlider" id="threeSlider" style="width: 1030px;margin: 0 auto;">
 					<h3>合作伙伴</h3>
 					<ul>
 						<li>京东</li>
