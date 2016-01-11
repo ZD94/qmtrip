@@ -27,10 +27,9 @@ var company = {}
  * 代理商创建企业
  *
  * @param params
- * @param callback
  * @returns {*}
  */
-company.createCompany = function(params, callback){
+company.createCompany = function(params){
     var self = this;
     var accountId = self.accountId;
     params.createUser = accountId;
@@ -68,18 +67,16 @@ company.createCompany = function(params, callback){
         })
         .spread(function(company, staff){
             return {code: 0, msg: '创建成功', company: company, staff: {id: staff.id}};
-        })
-        .nodeify(callback);
+        });
 };
 
 /**
  * 更新企业信息(企业创建者)
  * @param params
- * @param callback
  * @returns {*}
  */
 company.updateCompany = checkPermission(["company.edit"],
-    function updateCompany(params, callback){
+    function updateCompany(params){
         var self = this;
         var accountId = self.accountId;
         params.createUser = accountId;
@@ -87,32 +84,30 @@ company.updateCompany = checkPermission(["company.edit"],
             .then(function(staff){
                 params.companyId = staff.companyId;
                 return API.company.updateCompany(params)
-            }).nodeify(callback);
+            });
     });
 
 /**
  * 获取企业信息
  * @param companyId
- * @param callback
  * @returns {*}
  */
-company.getCompanyById = function(companyId, callback){
+company.getCompanyById = function(companyId){
     var self = this;
     var params = {
         companyId: companyId,
         userId: self.accountId
     }
-    return API.company.getCompany(params, callback);
+    return API.company.getCompany(params);
 };
 
 /**
  * 根据查询条件获取企业列表
  * @param params
- * @param callback
  * @returns {*}
  */
 company.getCompanyListByAgency = checkAgencyPermission(["company.query"],
-    function(callback){
+    function(){
         var self = this;
         var accountId = self.accountId;
         var params = {
@@ -123,82 +118,77 @@ company.getCompanyListByAgency = checkAgencyPermission(["company.query"],
             .then(function(user){
                 params.agencyId = user.agencyId;
                 return API.company.listCompany(params)
-            }).nodeify(callback);
+            });
     });
 
 /**
  * 删除企业信息
  * @param companyId
- * @param callback
  * @returns {*}
  */
 company.deleteCompany = checkPermission(["company.delete"],
-    function(companyId, callback){
+    function(companyId){
         var self = this;
         var params = {
             companyId: companyId,
             userId: self.accountId
         };
-        return API.company.deleteCompany(params, callback);
+        return API.company.deleteCompany(params);
     });
 
 /**
  * 企业资金账户充值
  * @param params
- * @param callback
  * @returns {*}
  */
-company.fundsCharge = function(params, callback){
+company.fundsCharge = function(params){
     var self = this;
     params.userId = self.accountId;
     params.type = 1;
     params.remark = params.remark || '充值';
-    return API.company.moneyChange(params, callback);
+    return API.company.moneyChange(params);
 }
 
 /**
  * 冻结账户资金
  * @param params
- * @param callback
  * @returns {*}
  */
-company.frozenMoney = function(params, callback){
+company.frozenMoney = function(params){
     var self = this;
     params.userId = self.accountId;
     params.type = -2;
     params.channel = params.channel || '冻结';
     params.remark = params.remark || '冻结账户资金';
-    return API.company.moneyChange(params, callback);
+    return API.company.moneyChange(params);
 }
 
 /**
  * 消费企业账户余额
  * @param params
- * @param callback
  * @returns {boolean|*|{options, src}|{src}|{files, tasks}}
  */
-company.consumeMoney = function(params, callback){
+company.consumeMoney = function(params){
     var self = this;
     params.userId = self.accountId;
     params.type = -1;
     params.channel = params.channel || '消费';
     params.remark = params.remark || '账户余额消费';
-    return API.company.moneyChange(params, callback);
+    return API.company.moneyChange(params);
 }
 
 /**
  * 获取企业资金账户信息
  * @param companyId
- * @param callback
  * @returns {*}
  */
-company.getCompanyFundsAccount = function(companyId, callback){
+company.getCompanyFundsAccount = function(companyId){
     var self = this;
     var params = {
         userId: self.accountId,
         companyId: companyId
     };
-    return API.company.getCompanyFundsAccount(params, callback);
+    return API.company.getCompanyFundsAccount(params);
 }
 
 

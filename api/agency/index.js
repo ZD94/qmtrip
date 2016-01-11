@@ -24,7 +24,6 @@ var agency = {};
 /**
  * 注册代理商，生成代理商id
  * @param params
- * @param callback
  */
 agency.registerAgency = function(params){
     var agency = params;
@@ -58,7 +57,7 @@ agency.registerAgency = function(params){
                 return Q.all([
                     Agency.create(agency, {transaction: t}),
                     AgencyUser.create(agencyUser, {transaction: t})
-                ])
+                ]);
             })
         })
         .spread(function(agency, agencyUser){
@@ -75,13 +74,12 @@ agency.registerAgency = function(params){
                         throw {code: -3, msg: '注册异常'};
                     }
                 })
-        })
+        });
 }
 
 /**
  * 更新代理商信息
  * @param params
- * @param callback
  * @returns {*}
  */
 agency.updateAgency = function(_agency){
@@ -110,7 +108,6 @@ agency.updateAgency = function(_agency){
 /**
  * 获取代理商信息
  * @param agencyId
- * @param callback
  * @returns {*}
  */
 agency.getAgency = function(params){
@@ -143,7 +140,6 @@ agency.listAgency = function(params){
 /**
  * 删除代理商
  * @param params
- * @param callback
  * @returns {*}
  */
 agency.deleteAgency = function(params){
@@ -187,7 +183,6 @@ agency.deleteAgency = function(params){
 /**
  * 创建代理商
  * @param data
- * @param callback
  * @returns {*}
  */
 agency.createAgencyUser = function(data){
@@ -205,7 +200,6 @@ agency.createAgencyUser = function(data){
 /**
  * 删除代理商
  * @param params
- * @param callback
  * @returns {*}
  */
 agency.deleteAgencyUser = function(params){
@@ -232,7 +226,6 @@ agency.deleteAgencyUser = function(params){
  * 更新代理商
  * @param id
  * @param data
- * @param callback
  * @returns {*}
  */
 agency.updateAgencyUser = function(data){
@@ -254,7 +247,6 @@ agency.updateAgencyUser = function(data){
  * 根据id查询代理商
  * @param id
  * @param data
- * @param callback
  * @returns {*}
  */
 agency.getAgencyUser = function(params){
@@ -320,7 +312,7 @@ agency.deleteAgencyByTest = function(params){
     var mobile = params.mobile;
     var name = params.name;
     return Q.all([
-        API.auth.remove({email: email, type: 2}),
+        API.auth.remove({email: email, mobile:mobile, type: 2}),
         Agency.destroy({where: {$or: [{email:email}, {mobile:mobile}, {name: name}]}}),
         AgencyUser.destroy({where: {$or: [{email:email}, {mobile:mobile}, {name: name}]}})
     ])

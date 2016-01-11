@@ -26,7 +26,6 @@ var checkcode = {
      * @param {Object} params
      * @param {String} params.mobile 手机号
      * @param {String} [params.ip] ip地址
-     * @param {Function} callback
      * @example
      * ```
      *   API.checkcode.getMsgCheckCode({mobile: "15501149644"}, function(err, result) {
@@ -40,15 +39,14 @@ var checkcode = {
      *   })
      * ```
      */
-    getMsgCheckCode: function(params, callback) {
+    getMsgCheckCode: function(params) {
         var type = 1;
         params.type = type;
         return API.checkcode.getMsgCheckCode(params)
             .then(function(result) {
                 console.info(result);
                 return result;
-            })
-            .nodeify(callback);
+            });
     },
     /**
      * @method getPicCheckCode
@@ -56,7 +54,6 @@ var checkcode = {
      * 获取图形验证码
      *
      * @param {Object} params 参数
-     * @param {Function} callback
      * @example
      * ```
      *  API.checkcode.getPicCheckCode({}, function(err, result) {
@@ -70,11 +67,10 @@ var checkcode = {
      *  })
      * ```
      */
-    getPicCheckCode: function(params, callback) {
+    getPicCheckCode: function(params) {
         var type = 1;
         params.type = type;
-        return API.checkcode.getPicCheckCode(params)
-            .nodeify(callback)
+        return API.checkcode.getPicCheckCode(params);
     },
     /**
      * @method isMatchPicCheckCode
@@ -84,7 +80,6 @@ var checkcode = {
      * @param {Object} params
      * @param {String} params.ticket 凭证
      * @param {String} params.code 验证码
-     * @param {Function} [callback] 回调函数 {code: 0, msg: "Ok"}, {code: -1, msg: "验证码已失效"}
      * @return {Promise} {code: 0, msg: "Ok"}, {code: -1, msg: "验证码已失效"}
      * @example
      * ```
@@ -101,9 +96,8 @@ var checkcode = {
      *  })
      * ```
      */
-    isMatchPicCheckCode: function(params, callback) {
-        return API.checkcode.isMatchPicCheckCode(params)
-            .nodeify(callback);
+    isMatchPicCheckCode: function(params) {
+        return API.checkcode.isMatchPicCheckCode(params);
     },
     /**
      * @method isMatchMsgCheckCode
@@ -113,7 +107,6 @@ var checkcode = {
      * @param {Object} params   参数
      * @param {String} params.ticket 凭证
      * @param {String} params.code 验证码
-     * @param {Function} [callback] 可选回调函数 {code: 0, msg: "OK"}, {code: -1, msg: "已失效或者不存在"}
      * @return {Promise} {code: 0, msg: "OK"}, {code: -1, msg: "已失效或者不存在"}
      * @example
      * ```
@@ -131,9 +124,8 @@ var checkcode = {
      * })
      * ```
      */
-    isMatchMsgCheckCode: function(params, callback) {
-        return API.checkcode.isMatchMsgCheckCode(params)
-            .nodeify(callback);
+    isMatchMsgCheckCode: function(params) {
+        return API.checkcode.isMatchMsgCheckCode(params);
     }
 }
 
