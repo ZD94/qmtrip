@@ -24,7 +24,7 @@ module.exports = (function(){
 							return Q.all([
 								API.company.getCompanyFundsAccount(company.id),
 								API.staff.getStaffByAgency({id: company.createUser}),
-                        		API.staff.statisticStaffs({companyId:company.id}),
+                        		API.staff.statisticStaffsByAgency({companyId:company.id}),
 								API.agencyTripPlan.countTripPlanNum({companyId: company.id})
 								])
 							.spread(function(funds,staff,staffnum,trip){
@@ -62,19 +62,19 @@ module.exports = (function(){
 			$(".left_nav li").removeClass("on").eq(1).addClass("on");
 			loading(false);
 			API.onload(function(){
-				API.company.getCompany(companyId)
+				API.company.getCompanyById(companyId)
 					.then(function(company){
 						// console.info(company);
 						$scope.company = company;
 						var staffId = company.createUser;
 						var companyId = company.id;
-						
+						console.info(company)
 						$scope.$apply();
                         loading(true);
                         Q.all([
-                        	API.staff.getStaffByAgency(staffId),
+                        	API.staff.getStaffByAgency({id:staffId}),
                         	API.company.getCompanyFundsAccount(companyId),
-                        	API.staff.statisticStaffs({companyId:companyId}),
+                        	API.staff.statisticStaffsByAgency({companyId:companyId}),
                         	// API.tripPlan.countTripPlanNum()
                         	API.agencyTripPlan.countTripPlanNum({companyId: companyId})
                         ])
