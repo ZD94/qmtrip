@@ -12,6 +12,14 @@ describe("api/client/company.js", function() {
     var ownerUserId = "";
     var agencyUserId = "";
 
+    var agency = {
+        email: "company.test@tulingdao.com",
+        userName: "喵喵",
+        name: '喵喵的代理商',
+        mobile: "15269866802",
+        description: '企业API测试用'
+    };
+
     var company = {
         name: '喵喵的企业',
         userName: '喵喵',
@@ -24,38 +32,51 @@ describe("api/client/company.js", function() {
     describe("company options by agency", function() {
 
         before(function(done) {
-            var agency = {
-                email: "company.test@tulingdao.com",
-                userName: "喵喵",
-                name: '喵喵的代理商',
-                mobile: "15269866802",
-                description: '企业API测试用'
-            };
-
-            API.agency.registerAgency(agency, function(err, ret) {
-                if (err) {
+            API.agency.deleteAgencyByTest({mobile: agency.mobile, email: agency.email})
+                .then(function(ret){
+                    assert.equal(ret.code, 0);
+                    return API.agency.registerAgency(agency)
+                })
+                .then(function(ret){
+                    agencyId = ret.agency.id;
+                    agencyUserId = ret.agencyUser.id;
+                    done();
+                })
+                .catch(function(err){
                     throw err;
-                }
-                agencyId = ret.agency.id;
-                agencyUserId = ret.agencyUser.id;
-                done();
-            });
+                })
         });
 
         after(function(done) {
-            API.agency.deleteAgency({agencyId: agencyId, userId: agencyUserId}, function (err, ret) {
+            API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
+                assert.equal(ret.code, 0);
                 done();
             })
         });
 
         describe("createCompany", function(){
+            before(function(done){
+                Q.all([
+                    API.company.deleteCompanyByTest({mobile: company.mobile, email: company.email}),
+                    API.staff.deleteAllStaffByTest({mobile: company.mobile, email: company.email})
+                ])
+                    .spread(function(ret1, ret2){
+                        assert.equal(ret1.code, 0);
+                        assert.equal(ret2.code, 0);
+                        done();
+                    })
+                .catch(function(err){
+                        throw err;
+                    })
+            })
+
             after(function(done){
                 Q.all([
-                    API.company.deleteCompany({companyId: companyId, userId: ownerUserId}),
-                    API.staff.deleteStaff({id: ownerUserId})
+                    API.company.deleteCompanyByTest({mobile: company.mobile}),
+                    API.staff.deleteAllStaffByTest({companyId: companyId, mobile: company.mobile, email: company.email})
                 ])
                     .then(function(){
                         done();
@@ -84,24 +105,35 @@ describe("api/client/company.js", function() {
 
             before(function(done){
                 company.mobile = '15269866812';
-                company.email = 'company2.test@tulingdao.com';
-                API.client.company.createCompany.call({accountId: agencyUserId}, company, function(err, ret){
-                    if(err){
+                company.email = 'company.test@tulingdao.com';
+                Q.all([
+                    API.company.deleteCompanyByTest({mobile: company.mobile, email: company.email}),
+                    API.staff.deleteAllStaffByTest({mobile: company.mobile, email: company.email})
+                ])
+                    .spread(function(ret1, ret2){
+                        assert.equal(ret1.code, 0);
+                        assert.equal(ret2.code, 0);
+                        return API.client.company.createCompany.call({accountId: agencyUserId}, company)
+                    })
+                    .then(function(ret){
+                        assert.equal(ret.company.status, 0);
+                        companyId = ret.company.id;
+                        ownerUserId = ret.company.createUser;
+                        done();
+                    })
+                    .catch(function(err){
                         throw err;
-                    }
-                    assert.equal(ret.company.status, 0);
-                    companyId = ret.company.id;
-                    ownerUserId = ret.company.createUser;
-                    done();
-                })
+                    })
             });
 
             after(function(done){
                 Q.all([
-                    API.company.deleteCompany({companyId: companyId, userId: ownerUserId}),
-                    API.staff.deleteStaff({id: ownerUserId})
+                    API.company.deleteCompanyByTest({mobile: company.mobile, email: company.email}),
+                    API.staff.deleteAllStaffByTest({companyId: companyId, mobile: company.mobile, email: company.email})
                 ])
-                    .then(function(){
+                    .spread(function(ret1, ret2){
+                        assert.equal(ret1.code, 0);
+                        assert.equal(ret2.code, 0);
                         done();
                     })
                     .catch(function(err){

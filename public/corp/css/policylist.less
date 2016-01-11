@@ -15,11 +15,17 @@
       color: @color-theme1;
     }
   }
+  .policy_titlefixed {
+    position: fixed;
+    z-index: 9999;
+    margin-top: 0;
+  }
   .policy_page {
     width: 1000px;
     height: auto;
     margin: 0 auto;
     position: relative;
+    overflow: hidden;
     li {
       width: 453px;
       height: 208px;
@@ -91,6 +97,25 @@
         }
       }
     }
-
+  }
+  .labletrue {
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    text-align: center;
+    color: #ffffff;
+    background:#118FD6;
+    margin-top: 1px;
+    float: left;
+  }
+  .lablefalse {
+    width: 14px;
+    height: 14px;
+    line-height: 14px;
+    text-align: center;
+    background:#ffffff;
+    border: 1px @border-color solid;
+    margin-top: 1px;
+    float: left;
   }
 }

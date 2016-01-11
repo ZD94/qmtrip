@@ -3,7 +3,6 @@
  */
 var API = require('common/api');
 var Q = require("q");
-var auth = require("./index");
 
 var assert = require("assert");
 
@@ -43,7 +42,7 @@ describe("api/client/auth/index.js", function() {
         });
 
         it("#registryCompany should be ok", function(done) {
-            auth.registryCompany(testCase, function(err, result) {
+            API.client.auth.registryCompany(testCase, function(err, result) {
                 if (err) {
                     throw err;
                 }

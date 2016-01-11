@@ -42,17 +42,15 @@ var authServer = {};
  * @param {String} data.sign 签名
  * @param {UUID} data.accountId 账号ID
  * @param {String} data.timestamp 时间戳
- * @param {Function} callback
  * @return {Promise}
  * @public
  */
-authServer.activeByEmail = function(data, callback) {
+authServer.activeByEmail = function(data) {
     var sign = data.sign;
     var accountId = data.accountId;
     var timestamp = data.timestamp;
     var nowTime = Date.now();
 
-    var defer = Q.defer();
     //失效了
     if (!timestamp || nowTime - timestamp > 0) {
         throw L.ERR.ACTIVE_URL_INVALID;
@@ -73,12 +71,11 @@ authServer.activeByEmail = function(data, callback) {
                 throw L.ERR.ACTIVE_URL_INVALID;
             }
 
-            return Models.Account.update({status: ACCOUNT_STATUS.ACTIVE, activeToken: null}, {where: {id: account.id}})
-                .then(function() {
-                    return true;
-                })
+            return Models.Account.update({status: ACCOUNT_STATUS.ACTIVE, activeToken: null}, {where: {id: account.id}});
         })
-        .nodeify(callback);
+        .then(function() {
+            return true;
+        });
 }
 
 /**
@@ -88,10 +85,9 @@ authServer.activeByEmail = function(data, callback) {
  * @param {UUID} params.email 账号ID
  * @param {Integer} params.type 1. 企业员工 2.代理商
  * @param {Boolean} params.isFirstSet true|false 是否首次设置密码
- * @param {Function} [callback]
  * @returns {Promise} true|error
  */
-authServer.sendResetPwdEmail = function(params, callback) {
+authServer.sendResetPwdEmail = function(params) {
     var email = params.email;
     var isFirstSet = params.isFirstSet;
     var type = params.type || 1;
@@ -132,8 +128,7 @@ authServer.sendResetPwdEmail = function(params, callback) {
         })
         .then(function() {
             return true;
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
@@ -145,10 +140,9 @@ authServer.sendResetPwdEmail = function(params, callback) {
  * @param {String} params.sign 签名
  * @param {String} params.timestamp 时间戳
  * @param {String} params.pwd 新密码
- * @param {Function} [callback] (null, true)
  * @return {Promise} true|error
  */
-authServer.resetPwdByEmail = function(params, callback) {
+authServer.resetPwdByEmail = function(params) {
     var accountId = params.accountId;
     var sign = params.sign;
     var timestamp = params.timestamp;
@@ -176,21 +170,20 @@ authServer.resetPwdByEmail = function(params, callback) {
         })
         .then(function(account) {
             var _sign = makeActiveSign(account.pwdToken, accountId, timestamp);
-            if (_sign.toLowerCase() == sign.toLowerCase()) {
-                pwd = utils.md5(pwd);
-                //如果从来没有设置过密码,将账号类型设为激活
-                var status = account.status;
-                if (account.status == ACCOUNT_STATUS.NOT_ACTIVE && !account.pwd) {
-                    status = ACCOUNT_STATUS.ACTIVE;
-                }
-                return Models.Account.update({pwd: pwd, pwdToken: null, status: status}, {where:{id: accountId}})
+            if (_sign.toLowerCase() != sign.toLowerCase()) {
+                throw L.ERR.SIGN_ERROR;
             }
-            throw L.ERR.SIGN_ERROR;
+            pwd = utils.md5(pwd);
+            //如果从来没有设置过密码,将账号类型设为激活
+            var status = account.status;
+            if (account.status == ACCOUNT_STATUS.NOT_ACTIVE && !account.pwd) {
+                status = ACCOUNT_STATUS.ACTIVE;
+            }
+            return Models.Account.update({pwd: pwd, pwdToken: null, status: status}, {where:{id: accountId}});
         })
         .then(function() {
             return true;
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
@@ -200,49 +193,50 @@ authServer.resetPwdByEmail = function(params, callback) {
  *
  * @param {Object} data
  * @param {UUID} data.accountId 账号ID
- * @param {Function} callback
  * @return {Promise}
  */
-authServer.active = function(data, callback) {
+authServer.active = function(data) {
     var accountId = data.accountId;
     return Models.Account.findOne({where: {id: accountId}})
         .then(function(account) {
             if (!account) {
-                return L.ERR.ACCOUNT_NOT_EXIST;
+                throw L.ERR.ACCOUNT_NOT_EXIST;
             }
 
             account.status = 1;
             return account.save()
-                .then(function(account) {
-                    return {code: 0, msg: "ok", data: {
-                        id: account.id,
-                        mobile: account.mobile,
-                        email: account.email,
-                        status: account.status
-                    }}
-                })
         })
-        .nodeify(callback);
-}
+        .then(function(account) {
+            return {code: 0, msg: "ok", data: {
+                id: account.id,
+                mobile: account.mobile,
+                email: account.email,
+                status: account.status
+            }}
+        });
+};
 
 /**
  * @method remove 删除账号
  *
  * @param {Object} data
  * @param {UUID} data.accountId 账号ID
- * @param {Function} callback
  * @return {Promise}
  * @public
  */
-authServer.remove = function(data, callback) {
-        var accountId = data.accountId;
-        var email = data.email;
-
-        return Models.Account.destroy({where: {$or: [{id: accountId}, {email: email}]}})
-            .then(function() {
-                return {code: 0, msg: "ok"};
-            })
-            .nodeify(callback);
+authServer.remove = function(data) {
+    var accountId = data.accountId;
+    var email = data.email;
+    var mobile = data.mobile;
+    var type = data.type || 1;
+    var where = {$or: [{id: accountId}, {email: email}, {mobile: mobile}]};
+    if(!accountId){
+        where.type = type;
+    }
+    return Models.Account.destroy({where: where})
+        .then(function() {
+            return {code: 0, msg: "ok"};
+        });
 }
 
 
@@ -257,12 +251,10 @@ authServer.remove = function(data, callback) {
  * @param {String} [data.pwd] 密码
  * @param {Integer} data.type  账号类型 默认1.企业员工 2.代理商员工
  * @param {INTEGER} data.status 账号状态 0未激活, 1.已激活 如果为0将发送激活邮件,如果1则不发送
- * @param {Callback} callback 回调函数
  * @return {Promise} {accountId: 账号ID, email: "邮箱", status: "状态"}
  * @public
  */
-authServer.newAccount = function(data, callback) {
-    var defer = Q.defer();
+authServer.newAccount = function(data) {
     if (!data) {
         throw L.ERR.DATA_NOT_EXIST;
     }
@@ -324,8 +316,7 @@ authServer.newAccount = function(data, callback) {
             }
 
             return account;
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
@@ -338,55 +329,46 @@ authServer.newAccount = function(data, callback) {
  * @param {String} data.pwd 密码
  * @param {Integer} data.type 1.企业员工 2.代理商员工 默认是企业员工
  * @param {String} data.mobile 手机号(可选,如果email提供则优先使用email)
- * @param {Callback} callback 可选回调函数
  * @return {Promise} {code:0, msg: "ok", data: {user_id: "账号ID", token_sign: "签名", token_id: "TOKEN_ID", timestamp:"时间戳"}
  * @public
  */
-authServer.login = function(data, callback) {
-    return Q()
-        .then(function() {
-            if (!data) {
-                throw L.ERR.DATA_NOT_EXIST;
+authServer.login = function(data) {
+    if (!data) {
+        throw L.ERR.DATA_NOT_EXIST;
+    }
+    if (!data.email && !data.mobile) {
+        throw L.ERR.EMAIL_EMPTY;
+    }
+    if (!validate.isEmail((data.email))) {
+        throw L.ERR.EMAIL_EMPTY;
+    }
+    if (!data.pwd) {
+        throw L.ERR.PWD_EMPTY;
+    }
+
+    var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
+
+    return Models.Account.findOne({where: {email: data.email, type: type}})
+        .then(function (loginAccount) {
+            var pwd = md5(data.pwd);
+            if (!loginAccount) {
+                throw L.ERR.ACCOUNT_NOT_EXIST
             }
 
-            if (!data.email && !data.mobile) {
-                throw L.ERR.EMAIL_EMPTY;
+            if (loginAccount.pwd != pwd) {
+                throw L.ERR.PASSWORD_NOT_MATCH
             }
 
-            if (!validate.isEmail((data.email))) {
-                throw L.ERR.EMAIL_EMPTY;
+            if (loginAccount.status == 0) {
+                throw L.ERR.ACCOUNT_NOT_ACTIVE;
             }
 
-            if (!data.pwd) {
-                throw L.ERR.PWD_EMPTY;
+            if (loginAccount.status != 1) {
+                throw L.ERR.ACCOUNT_FORBIDDEN;
             }
 
-            var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
-
-
-            return Models.Account.findOne({where: {email: data.email, type: type}})
-                .then(function (loginAccount) {
-                    var pwd = md5(data.pwd);
-                    if (!loginAccount) {
-                        throw L.ERR.ACCOUNT_NOT_EXIST
-                    }
-
-                    if (loginAccount.pwd != pwd) {
-                        throw L.ERR.PASSWORD_NOT_MATCH
-                    }
-
-                    if (loginAccount.status == 0) {
-                        throw L.ERR.ACCOUNT_NOT_ACTIVE;
-                    }
-
-                    if (loginAccount.status != 1) {
-                        throw L.ERR.ACCOUNT_FORBIDDEN;
-                    }
-
-                    return makeAuthenticateSign(loginAccount.id);
-                })
-        })
-        .nodeify(callback);
+            return makeAuthenticateSign(loginAccount.id);
+        });
 }
 
 /**
@@ -399,10 +381,9 @@ authServer.login = function(data, callback) {
  * @param {UUID} params.tokenId
  * @param {Number} params.timestamp
  * @param {String} params.tokenSign
- * @param {Function} callback
  * @return {Promise} {code:0, msg: "Ok"}
  */
-authServer.authentication = function(params, callback) {
+authServer.authentication = function(params) {
     if ((!params.userId && !params.user_id) || (!params.tokenId && !params.token_id)
         || !params.timestamp || (!params.tokenSign && !params.token_sign)) {
         return Promise.resolve({code: -1, msg: "token expire"});
@@ -424,9 +405,8 @@ authServer.authentication = function(params, callback) {
             }
 
             return {code: -1, msg: "已经失效"};
-        })
-        .nodeify(callback);
-}
+        });
+};
 
 /**
  * @method bindMobile
@@ -438,23 +418,20 @@ authServer.authentication = function(params, callback) {
  * @param {String} data.mobile 要绑定的手机号
  * @param {String} data.code 手机验证码
  * @param {String} data.pwd 登录密码
- * @param {Callback} callback
  * @return {Promise} {code: 0, msg: "ok};
  */
-authServer.bindMobile = function(data, callback) {
+authServer.bindMobile = function(data) {
     return Promise.resolve({code: 0, msg: "ok"});
-}
+};
 
 /**
  * 由id查询账户信息
  * @param id
- * @param callback
  * @returns {*}
  */
-authServer.getAccount = function(params, callback){
+authServer.getAccount = function(params){
     var id = params.id;
     var attributes = params.attributes;
-    var defer = Q.defer();
     if(!id){
         throw {code: -1, msg: "id不能为空"};
     }
@@ -462,50 +439,47 @@ authServer.getAccount = function(params, callback){
     options.where = {id: id};
     if(attributes)
         options.attributes = attributes;
-    return Models.Account.findOne(options)
-        .nodeify(callback);
+    return Models.Account.findOne(options);
 }
 
 /**
  * 修改账户信息
  * @param id
  * @param data
- * @param callback
  * @returns {*}
  */
-authServer.updataAccount = function(id, data, callback){
-    var defer = Q.defer();
+authServer.updataAccount = function(id, data){
     if(!id){
         throw {code: -1, msg: "id不能为空"};
     }
     var options = {};
     options.where = {id: id};
     options.returning = true;
+    var old_email;
     return Models.Account.findOne(options)
         .then(function(oldAcc){
-            return Models.Account.update(data, options)
-                .spread(function(rownum, rows){
-                    if(!rownum)
-                        throw L.ERR.NOT_FOUND;
-                    if(oldAcc.email != rows[0].email){
-                        return authServer.sendResetPwdEmail({email: rows[0].email, type: 1, isFirstSet: true})
-                            .then(function() {
-                                return rows[0];
-                            })
-                    }
-                    return rows[0];
-                })
+            old_email = oldAcc.email;
+            return Models.Account.update(data, options);
         })
-        .nodeify(callback);
+        .spread(function(rownum, rows){
+            if(!rownum)
+                throw L.ERR.NOT_FOUND;
+            if(old_email == rows[0].email){
+                return rows[0];
+            }
+            return authServer.sendResetPwdEmail({email: rows[0].email, type: 1, isFirstSet: true})
+                .then(function() {
+                    return rows[0];
+                });
+        });
 }
 
 /**
  * 根据条件查询一条账户信息
  * @param params
- * @param callback
  * @returns {*}
  */
-authServer.findOneAcc = function(params, callback){
+authServer.findOneAcc = function(params){
     var options = {};
     options.where = params;
     return Models.Account.findOne(options)
@@ -513,45 +487,33 @@ authServer.findOneAcc = function(params, callback){
             if(!obj)
                 throw L.ERR.NOT_FOUND;
             return obj;
-        })
-        .nodeify(callback);
+        });
 }
 
 /**
  * 检查账户是否存在
  * @param params
- * @param callback
  * @returns {*}
  */
-authServer.checkAccExist = function(params, callback){
+authServer.checkAccExist = function(params){
     var options = {};
     options.where = params;
-    return Models.Account.findOne(options)
-        .then(function(obj){
-            return obj;
-        })
-        .nodeify(callback);
-}
+    return Models.Account.findOne(options);
+};
 
 //生成登录凭证
-function makeAuthenticateSign(accountId, os, callback) {
-    if (typeof os == 'function') {
-        callback = os;
-        os  = 'web';
-    }
-
+function makeAuthenticateSign(accountId, os) {
     if (!os) {
         os = 'web';
     }
 
-    var defer = Q.defer();
     return Models.Token.findOne({where:{accountId: accountId, os: os}})
         .then(function(m) {
             var refreshAt = moment().format("YYYY-MM-DD HH:mm:ss");
-            var expireAt = moment().add(2, "hours").format("YYYY-MM-DD HH:mm:ss")
+            var expireAt = moment().add(2, "hours").format("YYYY-MM-DD HH:mm:ss");
             if (m) {
-                m.refreshAt = refreshAt
-                m.expireAt = expireAt
+                m.refreshAt = refreshAt;
+                m.expireAt = expireAt;
                 return m.save();
             } else {
                 m = Models.Token.build({id: uuid.v1(), accountId: accountId, token: getRndStr(10), refreshAt: refreshAt, expireAt: expireAt});
@@ -569,8 +531,7 @@ function makeAuthenticateSign(accountId, os, callback) {
                 token_sign: tokenSign,
                 timestamp: timestamp
             }
-        })
-        .nodeify(callback);
+        });
 }
 
 function getTokenSign(accountId, tokenId, token, timestamp) {
@@ -608,12 +569,10 @@ function _sendActiveEmail(accountId) {
  *
  * @param {Object} params
  * @param {String} params.email 要发送的邮件
- * @param {Function} [callback] 可选回调函数
  * @return {Promise} {code: 0, msg: "OK", submit: "ID"}
  */
-authServer.sendActiveEmail = function(params, callback) {
+authServer.sendActiveEmail = function(params) {
     var email = params.email;
-    var defer = Q.defer();
     if (!email) {
         throw L.ERR.EMAIL_EMPTY;
     }
@@ -623,17 +582,15 @@ authServer.sendActiveEmail = function(params, callback) {
     }
 
     return Models.Account.findOne({where: {email: email}})
-    .then(function(account) {
-        if (!account) {
-            throw L.ERR.EMAIL_NOT_REGISTRY;
-        }
-
-        return _sendActiveEmail(account.id);
-    })
-    .then(function() {
-        return {code: 0, msg: "ok"};
-    })
-    .nodeify(callback);
+        .then(function(account) {
+            if (!account) {
+                throw L.ERR.EMAIL_NOT_REGISTRY;
+            }
+            return _sendActiveEmail(account.id);
+        })
+        .then(function() {
+            return {code: 0, msg: "ok"};
+        });
 }
 
 /**
@@ -641,24 +598,19 @@ authServer.sendActiveEmail = function(params, callback) {
  * @param {Object} params
  * @param {UUID} params.accountId
  * @param {UUID} params.tokenId
- * @param {Function} callback
  * @return {Promise}
  */
-authServer.logout = function (params, callback) {
+authServer.logout = function (params) {
     var accountId = params.accountId;
     var tokenId = params.tokenId;
-    return Q.all([])
-        .then(function() {
-            if (accountId && tokenId) {
-                return Models.Token.destroy({where: {accountId: accountId, id: tokenId}})
-                    .then(function() {
-                        return {code: 0, msg: "OK"};
-                    })
-            }
-            return {code: 0, msg: "ok"};
-        })
-        .nodeify(callback);
-}
+    if (accountId && tokenId) {
+        return Models.Token.destroy({where: {accountId: accountId, id: tokenId}})
+            .then(function() {
+                return {code: 0, msg: "OK"};
+            })
+    }
+    return Q({code: 0, msg: "ok"});
+};
 
 
 /**
@@ -669,30 +621,26 @@ authServer.logout = function (params, callback) {
  * @param {Object} params
  * @param {String} params.oldPwd 旧密码
  * @param {String} params.newPwd 新密码
- * @param {Function} [callback] true|error
  * @return {Promise}
  */
-authServer.resetPwdByOldPwd = function(params, callback) {
+authServer.resetPwdByOldPwd = function(params) {
     var oldPwd = params.oldPwd;
     var newPwd = params.newPwd;
     var accountId = params.accountId;
 
-    return Q()
-        .then(function() {
-            if (!accountId) {
-                throw L.ERR.NEED_LOGIN;
-            }
+    if (!accountId) {
+        throw L.ERR.NEED_LOGIN;
+    }
 
-            if (!oldPwd || !newPwd) {
-                throw L.ERR.PWD_EMPTY;
-            }
+    if (!oldPwd || !newPwd) {
+        throw L.ERR.PWD_EMPTY;
+    }
 
-            if (oldPwd == newPwd) {
-                throw {code: -1, msg: "新旧密码不能一致"};
-            }
+    if (oldPwd == newPwd) {
+        throw {code: -1, msg: "新旧密码不能一致"};
+    }
 
-            return Models.Account.findById(accountId)
-        })
+    return Models.Account.findById(accountId)
         .then(function(account) {
             if (!account) {
                 throw L.ERR.ACCOUNT_NOT_EXIST;
@@ -708,8 +656,7 @@ authServer.resetPwdByOldPwd = function(params, callback) {
         })
         .then(function() {
             return true;
-        })
-        .nodeify(callback);
-}
+        });
+};
 
 module.exports = authServer;
