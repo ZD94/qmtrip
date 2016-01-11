@@ -135,6 +135,7 @@ travelBudget.getHotelBudget = function(params) {
         throw {code: -1, msg: "离开日期大于入住日期"};
     }
 
+    var policy;
     //查询员工信息
     return API.staff.getStaff({id: accountId})
         .then(function(staff) {
@@ -148,6 +149,7 @@ travelBudget.getHotelBudget = function(params) {
             if (!travelPolicy) {
                 throw L.ERR.TRAVEL_POLICY_NOT_EXIST;
             }
+            policy = travelPolicy;
             var hotelStar = 3;
             if (/四星级/g.test(travelPolicy.hotelLevel)) {
                 hotelStar = 4;
@@ -171,7 +173,7 @@ travelBudget.getHotelBudget = function(params) {
             //如果没有查询到结果,直接扔回最大金额
             if (result.price <=0) {
                 var days = utils.diffDate(checkInDate, checkOutDate) || 1;
-                return {price: travelPolicy.hotelPrice * days};
+                return {price: policy.hotelPrice * days};
             }
             return result;
         });
