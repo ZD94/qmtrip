@@ -281,4 +281,18 @@ company.moneyChange = function(params){
         })
 }
 
+/**
+ * 测试用例删除企业，不在client调用
+ * @param params
+ * @returns {*}
+ */
+company.deleteCompanyByTest = function(params){
+    var mobile = params.mobile;
+    var email = params.email;
+    return Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}})
+        .then(function(){
+            return {code: 0}
+        })
+}
+
 module.exports = company;

@@ -235,14 +235,15 @@ authServer.active = function(data, callback) {
  * @public
  */
 authServer.remove = function(data, callback) {
-        var accountId = data.accountId;
-        var email = data.email;
+    var accountId = data.accountId;
+    var email = data.email;
+    var type = data.type || 1;
 
-        return Models.Account.destroy({where: {$or: [{id: accountId}, {email: email}]}})
-            .then(function() {
-                return {code: 0, msg: "ok"};
-            })
-            .nodeify(callback);
+    return Models.Account.destroy({where: {$or: [{id: accountId}, {email: email}], type: type}})
+        .then(function() {
+            return {code: 0, msg: "ok"};
+        })
+        .nodeify(callback);
 }
 
 
