@@ -46,55 +46,6 @@ describe("api/client/agencyTripPlan.js", function() {
     var staffId = "";
     var orderId = "";
     var consumeId = "";
-    //before(function(done) {
-    //    API.agency.registerAgency(agency, function(err, a){
-    //        if(err){
-    //            throw err;
-    //        }
-    //        agencyId = a.agency.id;
-    //        agencyUserId = a.agencyUser.id;
-    //        company.agencyId = agencyId;
-    //        API.client.company.createCompany.call({accountId: agencyUserId}, company, function(err, c){
-    //            if(err){
-    //                throw err;
-    //            }
-    //            companyId = c.company.id;
-    //            staffId = c.company.createUser;
-    //            tripPlanOrder.consumeDetails = [{
-    //                type: 0,
-    //                startTime: '2016-01-07 10:22:00',
-    //                invoiceType: 2,
-    //                budget: 1000,
-    //                newInvoice: '票据详情'
-    //            }]
-    //            API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder, function(err, ret){
-    //                if(err){
-    //                    throw err;
-    //                }
-    //                assert(ret.hotel.length > 0);
-    //                consumeId = ret.hotel[0].id;
-    //                orderId = ret.id;
-    //                done();
-    //            })
-    //        })
-    //    })
-    //});
-    //
-    //after(function(done) {
-    //    Q.all([
-    //        API.agency.deleteAgency({agencyId: agencyId, userId: agencyUserId}),
-    //        API.company.deleteCompany({companyId: companyId, userId: staffId}),
-    //        API.staff.deleteStaff({id: staffId}),
-    //        API.tripPlan.deleteTripPlanOrder({orderId: orderId, userId: staffId})
-    //    ])
-    //        .then(function(){
-    //            done();
-    //        })
-    //        .catch(function(err){
-    //            throw err;
-    //        })
-    //});
-
 
     before(function(done){
         Q.all([
@@ -162,13 +113,41 @@ describe("api/client/agencyTripPlan.js", function() {
         })
     });
 
-    it("#pageTripPlanOrderByAgency should be ok", function(done) {
+    it("#pageTripPlanOrderByAgency return values length should be 1 when params={}", function(done) {
         var self = {accountId: agencyUserId};
         API.client.agencyTripPlan.pageTripPlanOrder.call(self, {}, function(err, ret){
             if (err) {
                 throw err;
             }
             assert.equal(ret.page, 1);
+            assert.equal(ret.currentPageTotal, 1);
+            assert.equal(ret.items.length, 1);
+            done();
+        })
+    });
+
+    it("#pageTripPlanOrderByAgency return values length should be 0 when isUpload is true", function(done) {
+        var self = {accountId: agencyUserId};
+        API.client.agencyTripPlan.pageTripPlanOrder.call(self, {isUpload: true}, function(err, ret){
+            if (err) {
+                throw err;
+            }
+            assert.equal(ret.page, 1);
+            assert.equal(ret.currentPageTotal, 0);
+            assert.equal(ret.items.length, 0);
+            done();
+        })
+    });
+
+    it("#pageTripPlanOrderByAgency return values length should be 0 when audit is Y", function(done) {
+        var self = {accountId: agencyUserId};
+        API.client.agencyTripPlan.pageTripPlanOrder.call(self, {isUpload: true, audit: 'Y'}, function(err, ret){
+            if (err) {
+                throw err;
+            }
+            assert.equal(ret.page, 1);
+            assert.equal(ret.currentPageTotal, 0);
+            assert.equal(ret.items.length, 0);
             done();
         })
     });

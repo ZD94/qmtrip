@@ -83,6 +83,7 @@ tripPlan.pageCompleteTripPlanOrder = function (params) {
             params.accountId = self.accountId;
             params.companyId = companyId;
             params.auditStatus = 1; //已完成计划单
+            params.status = {$gte: 1};
             var query = checkAndGetParams(['companyId'], ['accountId', 'status', 'auditStatus'], params);
             var page = params.page;
             var perPage = params.perPage;
@@ -114,16 +115,17 @@ tripPlan.pageTripPlanOrder = function (params) {
     if (params.isUpload === true) {
         params.status = {$gt: 0}
     } else if (params.isUpload === false) {
-        params.status = {$in: [-1, 0]};
+        params.status = 0;
     }
-    if (params.audit) { //判断计划单的审核状态，设定auditStatus参数
+    if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
         var audit = params.audit;
         params.status = 1;
-        if (audit == 'Y') {
+        if(audit == 'Y'){
+            params.status = {$gte: 1};
             params.auditStatus = 1;
-        } else if (audit == "P") {
+        }else if(audit == "P"){
             params.auditStatus = 0;
-        } else if (audit == 'N') {
+        }else if(audit == 'N'){
             params.status = 0; //待上传状态
             params.auditStatus = -1;
         }
@@ -163,15 +165,20 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
     var self = this;
     var accountId = self.accountId;
 
-    (params.isUpload === true) ? params.status = {$gt: 0} : params.status = 0; //查询条件为是否上传票据，设定查询参数status
-    if (params.audit) { //判断计划单的审核状态，设定auditStatus参数
+    if (params.isUpload === true) {
+        params.status = {$gt: 0}
+    } else if (params.isUpload === false) {
+        params.status = 0;
+    }
+    if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
         var audit = params.audit;
         params.status = 1;
-        if (audit == 'Y') {
+        if(audit == 'Y'){
+            params.status = {$gte: 1};
             params.auditStatus = 1;
-        } else if (audit == "P") {
+        }else if(audit == "P"){
             params.auditStatus = 0;
-        } else if (audit == 'N') {
+        }else if(audit == 'N'){
             params.status = 0; //待上传状态
             params.auditStatus = -1;
         }

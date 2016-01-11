@@ -54,11 +54,17 @@ agencyTripPlan.pageTripPlanOrder = function(params){
     var self = this;
     var accountId = self.accountId;
 
-    (params.isUpload === true)?params.status={$gt: 0}:params.status = {$gte: -1}; //查询条件为是否上传票据，设定查询参数status
-    if(params.audit){ //判断计划单的审核状态，设定auditStatus参数
+    /* status -2:删除状态，不对外显示 -1:失效状态 0:待上传状态 1:已上传待审核状态 2:审核完成状态 */
+    if (params.isUpload === true) {
+        params.status = {$gt: 0}
+    } else if (params.isUpload === false) {
+        params.status = 0;
+    }
+    if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
         var audit = params.audit;
         params.status = 1;
         if(audit == 'Y'){
+            params.status = {$gte: 1};
             params.auditStatus = 1;
         }else if(audit == "P"){
             params.auditStatus = 0;
