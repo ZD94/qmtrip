@@ -777,7 +777,7 @@ staff.deleteAllStaffByTest = function(params){
     var mobile = params.mobile;
     var email = params.email;
     return Q.all([
-        API.auth.remove({email: email, type: 1}),
+        API.auth.remove({email: email, mobile: mobile, type: 1}),
         staffModel.destroy({where: {$or: [{companyId: companyId}, {mobile: mobile}, {email: email}]}})
     ])
         .spread(function(){

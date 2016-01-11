@@ -35,9 +35,9 @@ describe("api/client/tripPlan.js", function() {
 
     before(function(done){
         Q.all([
-            API.agency.deleteAgencyByTest({email: agency.email}),
-            API.company.deleteCompanyByTest({email: company.email}),
-            API.staff.deleteAllStaffByTest({email: company.email})
+            API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
+            API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
+            API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})
         ])
             .spread(function(ret1, ret2, ret3){
                 assert.equal(ret1.code, 0);
