@@ -320,7 +320,7 @@ agency.deleteAgencyByTest = function(params){
     var mobile = params.mobile;
     var name = params.name;
     return Q.all([
-        API.auth.remove({email: email}),
+        API.auth.remove({email: email, type: 2}),
         Agency.destroy({where: {$or: [{email:email}, {mobile:mobile}, {name: name}]}}),
         AgencyUser.destroy({where: {$or: [{email:email}, {mobile:mobile}, {name: name}]}})
     ])
