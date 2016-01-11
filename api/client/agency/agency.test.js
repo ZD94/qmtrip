@@ -100,8 +100,8 @@ describe("api/client/agency.js", function() {
 
         after(function(done){
             Q.all([
-                API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
-                API.agency.deleteAgencyByTest({email: 'agencyUser.test@tulingdao.com', mobile: agency.mobile})
+                API.agency.deleteAgencyByTest({email: agency.email, mobile: '12345678777'}),
+                API.agency.deleteAgencyByTest({email: 'agencyUser.test@tulingdao.com', mobile: '12345678777'})
             ])
                 .spread(function(ret1, ret2){
                     assert.equal(ret1.code, 0);
@@ -246,6 +246,7 @@ describe("api/client/agency.js", function() {
                 .catch(function(err){
                     throw err;
                 })
+                .done();
         });
 
         after(function(done){
@@ -261,6 +262,7 @@ describe("api/client/agency.js", function() {
                 .catch(function(err){
                     throw err;
                 })
+                .done();
         });
 
         it("deleteAgencyUser should be ok", function(done) {

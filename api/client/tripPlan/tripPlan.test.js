@@ -59,6 +59,7 @@ describe("api/client/tripPlan.js", function() {
                 console.info(err);
                 throw err;
             })
+            .done();
     })
 
 
@@ -77,6 +78,7 @@ describe("api/client/tripPlan.js", function() {
             .catch(function(err){
                 throw err;
             })
+            .done();
     });
 
     describe("savePlanOrder", function(){
@@ -282,6 +284,7 @@ describe("api/client/tripPlan.js", function() {
                     .catch(function(err){
                         throw err;
                     })
+                    .done();
             });
 
             it("#uploadInvoice should be ok", function (done) {

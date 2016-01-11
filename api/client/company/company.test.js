@@ -68,9 +68,10 @@ describe("api/client/company.js", function() {
                         assert.equal(ret2.code, 0);
                         done();
                     })
-                .catch(function(err){
+                    .catch(function(err){
                         throw err;
                     })
+                    .done();
             })
 
             after(function(done){
@@ -84,6 +85,7 @@ describe("api/client/company.js", function() {
                     .catch(function(err){
                         throw err;
                     })
+                    .done();
             })
 
             it("#createCompany should be ok", function(done) {
@@ -124,6 +126,7 @@ describe("api/client/company.js", function() {
                     .catch(function(err){
                         throw err;
                     })
+                    .done();
             });
 
             after(function(done){
@@ -139,6 +142,7 @@ describe("api/client/company.js", function() {
                     .catch(function(err){
                         throw err;
                     })
+                    .done();
             });
 
 
