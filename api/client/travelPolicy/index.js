@@ -61,19 +61,21 @@ travelPolicy.deleteTravelPolicy = auth.checkPermission(["travelPolicy.delete"],
  */
 travelPolicy.updateTravelPolicy = auth.checkPermission(["travelPolicy.update"],
     function(params){
-    var user_id = this.accountId;
-    return API.staff.getStaff({id: user_id})
-        .then(function(data){
-            return API.travelPolicy.getTravelPolicy({id: params.id});
-        })
-        .then(function(tp){
-            if(tp.companyId != data.companyId){
-                throw {code: -1, msg: '无权限'};
-            }
-            params.companyId = data.companyId;//只允许删除该企业下的差旅标准
-            return API.travelPolicy.updateTravelPolicy(params);
-        });
-});
+        var user_id = this.accountId;
+        var company_id;
+        return API.staff.getStaff({id: user_id})
+            .then(function(data){
+                company_id = data.companyId;
+                return API.travelPolicy.getTravelPolicy({id: params.id});
+            })
+            .then(function(tp){
+                if(tp.companyId != company_id){
+                    throw {code: -1, msg: '无权限'};
+                }
+                params.companyId = company_id;//只允许删除该企业下的差旅标准
+                return API.travelPolicy.updateTravelPolicy(params);
+            });
+    });
 
 /**
  * 企业根据id查询差旅标准
