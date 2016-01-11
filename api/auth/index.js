@@ -455,14 +455,16 @@ authServer.updataAccount = function(id, data){
     var options = {};
     options.where = {id: id};
     options.returning = true;
+    var old_email;
     return Models.Account.findOne(options)
         .then(function(oldAcc){
+            old_email = oldAcc.email;
             return Models.Account.update(data, options);
         })
         .spread(function(rownum, rows){
             if(!rownum)
                 throw L.ERR.NOT_FOUND;
-            if(oldAcc.email == rows[0].email){
+            if(old_email == rows[0].email){
                 return rows[0];
             }
             return authServer.sendResetPwdEmail({email: rows[0].email, type: 1, isFirstSet: true})
