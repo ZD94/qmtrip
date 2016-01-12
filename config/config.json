@@ -32,6 +32,9 @@
   "upload":{
     "tmpDir": "${{ROOT_DIR}}/temp"
   },
+  "template":{
+    "file": "${{ROOT_DIR}}/public/templatefile"
+  },
   "api": {
     "postgres": "${{postgres.url}}",
     "remotes": [
