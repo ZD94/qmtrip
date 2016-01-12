@@ -203,6 +203,8 @@ travelBudget.getHotelBudget = function(params) {
  */
 travelBudget.getTrafficBudget = function(params) {
     var self = this;
+    var accountId = self.accountId;
+
     if (!params) {
         throw new Error(L.ERR.DATA_FORMAT_ERROR);
     }
