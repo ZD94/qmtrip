@@ -245,7 +245,6 @@ var staff = (function(){
         //删除员工的信息
         $scope.delStaffInfo = function(id, index) {
             //console.log(index);
-            console.log(id);
             API.onload(function(){
                 API.staff.deleteStaff({id:id})
                     .then(function(newStaff){
