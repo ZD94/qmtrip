@@ -22,7 +22,7 @@ travelPolicy.createTravelPolicy = function(data){
     }
     return checkParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"], data)
         .then(function(){
-            return travalPolicyModel.findOne({where: {name: data.name}});
+            return travalPolicyModel.findOne({where: {name: data.name, companyId: data.companyId}});
         })
         .then(function(result){
             if(result){

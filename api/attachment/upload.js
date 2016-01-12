@@ -121,6 +121,9 @@ function getImg(req, res, next) {
 function downloadExcle(req, res, next){
     var fileName = req.params.fileName;
     var filePath = config.upload.tmpDir+"/" + fileName;
+    if(fileName.indexOf('template') != -1){
+        filePath = config.template.file+"/" + fileName;
+    }
     fs.exists(filePath, function (exists) {
         if(!exists){
             res.send("文件不存在");
@@ -133,15 +136,16 @@ function downloadExcle(req, res, next){
         });
         res.write(data);
         res.end();
-        fs.exists(filePath, function (exists) {
-            if(exists){
-                fs.unlinkSync(filePath);
-                console.log("删除临时文件");
-            }
-        });
+        if(fileName.indexOf('template') == -1){
+            fs.exists(filePath, function (exists) {
+                if(exists){
+                    fs.unlinkSync(filePath);
+                    console.log("删除临时文件");
+                }
+            });
+        }
     })
 }
-
 module.exports = function(app){
     app.post('/upload/ajax-upload-file', uploadActionFile);
     app.get('/upload/get-img-file/:md5key', getImg);
