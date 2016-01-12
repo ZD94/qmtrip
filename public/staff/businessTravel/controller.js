@@ -73,6 +73,7 @@ var businessTravel=(function(){
                         $scope.$apply();
                     })
                     .catch(function(err){
+                        $(".placelist1").hide();
                         console.log(err);
                     });
             })
@@ -82,6 +83,9 @@ var businessTravel=(function(){
             $(".traffic1").attr("checkval",id);
             $(".placelist1").hide();
         }
+        $(".traffic1").blur(function(){
+            setTimeout('$(".placelist1").hide()', 500);
+        })
 
         //目的地城市获取
         $scope.endplace = function () {
@@ -104,6 +108,9 @@ var businessTravel=(function(){
             $(".traffic2").attr("checkval",id);
             $(".placelist2").hide();
         }
+        $(".traffic2").blur(function(){
+            setTimeout('$(".placelist2").hide()', 500);
+        })
         //生成预算
         $scope.budget = function () {
             var startplace = $(".traffic1").attr("checkval"),//出发城市id
@@ -190,6 +197,9 @@ var businessTravel=(function(){
             $(".live1").attr("checkval",id);
             $(".placelist1").hide();
         }
+        $(".live1").blur(function(){
+            setTimeout('$(".placelist1").hide()', 500);
+        })
 
         //住宿位置获取
         $scope.liveplace = function () {
@@ -199,6 +209,9 @@ var businessTravel=(function(){
                         $scope.liveplaceitems = result;
                         if ($scope.liveplaceitems.length) {
                             $(".placelist2").show();
+                        }
+                        if (!$scope.liveplaceitems.length) {
+                            $(".placelist2").hide();
                         }
                         $scope.$apply();
                     })
@@ -212,6 +225,9 @@ var businessTravel=(function(){
             $(".live2").attr("checkval",id);
             $(".placelist2").hide();
         }
+        $(".live2").blur(function(){
+            setTimeout('$(".placelist2").hide()', 500);
+        })
 
         //生成预算
         $scope.budget = function () {
@@ -280,6 +296,9 @@ var businessTravel=(function(){
             $(".traffic1").attr("checkval",id);
             $(".placelist1").hide();
         }
+        $(".traffic1").blur(function(){
+            setTimeout('$(".placelist1").hide()', 500);
+        })
 
         //目的地城市获取
         $scope.endplace = function () {
@@ -302,6 +321,9 @@ var businessTravel=(function(){
             $(".traffic2").attr("checkval",id);
             $(".placelist2").hide();
         }
+        $(".traffic2").blur(function(){
+            setTimeout('$(".placelist2").hide()', 500);
+        })
 
 
         //住宿位置获取
@@ -325,6 +347,9 @@ var businessTravel=(function(){
             $(".live2").attr("checkval",id);
             $(".placelist2").hide();
         }
+        $(".live2").blur(function(){
+            setTimeout('$(".placelist2").hide()', 500);
+        })
 
         //下一步
         $scope.nextStep = function () {
