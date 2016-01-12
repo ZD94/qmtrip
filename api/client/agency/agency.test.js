@@ -234,7 +234,7 @@ describe("api/client/agency.js", function() {
                     _agencyId = ret.agency.id;
                     _agencyUserId = ret.agencyUser.id;
                 })
-                .then(function(ret){
+                .then(function(){
                     return  API.client.agency.createAgencyUser.call({accountId: _agencyUserId},
                         {name: '测试代理商用户', email: "agencyUser.test@tulingdao.com", mobile: '12345678777', agencyId: _agencyId})
                 })
