@@ -30,6 +30,7 @@ module.exports = (function(){
 							.spread(function(funds,staff,staffnum,trip){
 								company.funds = funds;
 								company.staff = staff;
+								// console.info(staff)
 								company.staffnum = staffnum;
 								company.tirpnum = trip;
 								return company;

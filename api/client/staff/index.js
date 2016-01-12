@@ -131,12 +131,13 @@ staff.getStaffByAgency = function(params){
                 if(!staff.companyId){
                     throw {msg:"该员工不存在或员工所在企业不存在"};
                 }
-                return Q.all([
+                return [
+                        staff,
                         API.company.getCompany({companyId: staff.companyId}),
                         API.agency.getAgency({agencyId: agencyUser.agencyId, userId: user_id})
-                ]);
+                ];
         })
-        .spread(function(company, agency){
+        .spread(function(staff, company, agency){
             if(!company.agencyId){
                 throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
             }
