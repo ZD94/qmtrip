@@ -257,6 +257,7 @@ travelBudget.getTrafficBudget = function(params) {
             var trainCabinClass = '二等座,硬卧';
             if (travelPolicy.trainLevel) {
                 trainCabinClass = travelPolicy.trainLevel;
+                trainCabinClass = trainCabinClass.replace(/\//g, ",");
             }
 
             if (params.isRoundTrip) {
