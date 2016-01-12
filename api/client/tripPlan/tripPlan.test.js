@@ -99,13 +99,19 @@ describe("api/client/tripPlan.js", function() {
                 budget: 1000,
                 startAt: '2015-12-30 11:12:12',
             }
+            tripPlanOrder.consumeDetails = [{
+                startTime: '2016-12-30 11:11:11',
+                budget: 300,
+                invoiceType: 2,
+                type: 0
+            }]
             var self = {accountId: staffId};
             API.client.tripPlan.savePlanOrder.call(self, tripPlanOrder, function(err, ret){
                 if(err){
                     throw err;
                 }
                 orderId = ret.id;
-                assert.equal(ret.budget, 1000);
+                assert.equal(ret.status, 0);
                 done();
             })
         })
@@ -119,6 +125,12 @@ describe("api/client/tripPlan.js", function() {
                 destination: '上海',
                 budget: 1000,
                 startAt: '2015-12-30 11:12:12',
+                consumeDetails: [{
+                    startTime: '2016-12-30 11:11:11',
+                    budget: 300,
+                    invoiceType: 2,
+                    type: 0
+                }]
             }
             API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder, function(err, ret){
                 if(err){
@@ -150,6 +162,12 @@ describe("api/client/tripPlan.js", function() {
                 destination: '上海',
                 budget: 1000,
                 startAt: '2015-12-30 11:12:12',
+                consumeDetails: [{
+                    startTime: '2016-12-30 11:11:11',
+                    budget: 300,
+                    invoiceType: 2,
+                    type: 0
+                }]
             }
             API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder, function (err, ret) {
                 if (err) {
@@ -205,11 +223,20 @@ describe("api/client/tripPlan.js", function() {
 
         it("#pageTripPlanOrder should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.pageTripPlanOrder.call(self, {
-                page: 1,
-                isUpload: false,
-                audit: 'N'
-            }, function (err, ret) {
+            API.client.tripPlan.pageTripPlanOrder.call(self, {page: 1}, function (err, ret) {
+                if (err) {
+                    throw err;
+                }
+                assert.equal(ret.page, 1);
+                assert.equal(ret.perPage, 10);
+                done();
+            })
+        });
+
+
+        it("#pageTripPlanOrder should be ok", function (done) {
+            var self = {accountId: staffId};
+            API.client.tripPlan.pageTripPlanOrder.call(self, {page: 1, isUpload: false, audit: 'Y'}, function (err, ret) {
                 if (err) {
                     throw err;
                 }

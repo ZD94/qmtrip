@@ -3,11 +3,11 @@
     <div class="planList">
         <ul class="mainbox_top">
             <li class="active">待上传票据
-                <span ng-if="planListitems.length">({{planListitems.length}})</span>
+                <span ng-if="planListitems.length">({{total1}})</span>
                 <span ng-if="!planListitems.length">(0)</span>
             </li>
             <li>已完成
-                <span ng-if="finishPlanListitems.length">({{finishPlanListitems.length}})</span>
+                <span ng-if="finishPlanListitems.length">({{total2}})</span>
                 <span ng-if="!finishPlanListitems.length">(0)</span>
             </li>
         </ul>
@@ -31,7 +31,7 @@
                             <p ng-if="item.startAt">{{item.startAt | date: 'yyyy-MM-dd'}}</p>
                             <p ng-if="!item.startAt">{{item.hotel[0].startTime | date: 'yyyy-MM-dd'}}</p>
                         </td>
-                        <td width="150" align="center">
+                        <td width="120" align="center">
                             <p ng-if="item.isNeedTraffic" class="traffic_icon web-icon-font3">&#xe90e;</p>
                             <p ng-if="item.isNeedHotel" class="live_icon web-icon-font3">&#xe914;</p>
                         </td>
@@ -99,15 +99,16 @@
                         <th align="center">服务</th>
                         <th align="center">预算单内容简介</th>
                         <th align="center">预算</th>
-                        <th align="center">上传进度</th>
-                        <th align="center">状态</th>
+                        <th align="center">实际价格</th>
+                        <th align="center">节省</th>
+                        <th align="center">积分</th>
                     </tr>
                     <tr ng-repeat="item in finishPlanListitems" ng-click="enterDetail(item.id)">
-                        <td width="150" align="center">
+                        <td width="120" align="center">
                             <p ng-if="item.startAt">{{item.startAt | date: 'yyyy-MM-dd'}}</p>
                             <p ng-if="!item.startAt">{{item.hotel[0].startTime | date: 'yyyy-MM-dd'}}</p>
                         </td>
-                        <td width="150" align="center">
+                        <td width="120" align="center">
                             <p ng-if="item.isNeedTraffic" class="traffic_icon web-icon-font3">&#xe90e;</p>
                             <p ng-if="item.isNeedHotel" class="live_icon web-icon-font3">&#xe914;</p>
                         </td>
@@ -115,15 +116,13 @@
                             <p ng-if="item.isNeedTraffic"><a>{{item.startPlace}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="staff/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.destination}}</a></p>
                             <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
                         </td>
-                        <td width="150" align="center">¥{{item.budget}}</td>
-                        <td width="150" align="center">
-                            <p ng-if="item.outTraffic.length!=0">去程行程单</p>
-                            <p ng-if="item.hotel.length!=0">住宿发票</p>
-                            <p ng-if="item.backTraffic.length!=0">回程行程单</p>
+                        <td width="120" align="center">¥{{item.budget.toFixed(2)}}</td>
+                        <td width="120" align="center">¥{{item.expenditure.toFixed(2)}}</td>
+                        <td width="120" align="center">
+                            <span ng-if="item.budget-item.expenditure>0">¥{{(item.budget-item.expenditure).toFixed(2)}}</span>
+                            <span ng-if="item.budget-item.expenditure<=0">¥0.00</span>
                         </td>
-                        <td width="150" align="center">
-                            <span class="pass web-icon-font2">&#xe9ec;</span>
-                        </td>
+                        <td width="120" align="center">{{item.score}}</td>
                     </tr>
                 </table>
             </div>
