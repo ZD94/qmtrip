@@ -208,7 +208,7 @@ describe("api/client/staff.js", function() {
      if(result){
      fs.exists(filePath, function (exists) {
      if(exists){
-     fs.unlinkSync(filePath);
+     fs.unlink(filePath);
      console.log("删除临时文件");
      }
      });
