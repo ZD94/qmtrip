@@ -27,7 +27,6 @@ describe("api/client/agency.js", function() {
                 if (err) {
                     throw err;
                 }
-                assert.equal(ret.code, 0);
                 done();
             })
         });
@@ -37,7 +36,6 @@ describe("api/client/agency.js", function() {
                 if (err) {
                     throw err;
                 }
-                assert.equal(ret.code, 0);
                 done();
             })
         });
@@ -82,8 +80,6 @@ describe("api/client/agency.js", function() {
                 API.agency.deleteAgencyByTest({email: 'agencyUser.test@tulingdao.com', mobile: agency.mobile})
             ])
                 .spread(function(ret1, ret2){
-                    assert.equal(ret1.code, 0);
-                    assert.equal(ret2.code, 0);
                     return API.client.agency.registerAgency(agency)
                 })
                 .then(function(ret){
@@ -104,8 +100,6 @@ describe("api/client/agency.js", function() {
                 API.agency.deleteAgencyByTest({email: 'agencyUser.test@tulingdao.com', mobile: '12345678777'})
             ])
                 .spread(function(ret1, ret2){
-                    assert.equal(ret1.code, 0);
-                    assert.equal(ret2.code, 0);
                     done();
                 })
                 .catch(function(err){
@@ -199,7 +193,6 @@ describe("api/client/agency.js", function() {
                 if (err) {
                     throw err;
                 }
-                assert.equal(ret.code, 0);
                 done();
             })
         });
@@ -225,8 +218,6 @@ describe("api/client/agency.js", function() {
                 API.agency.deleteAgencyByTest({email: 'agencyUser.test@tulingdao.com', mobile: agency.mobile})
             ])
                 .spread(function(ret1, ret2){
-                    assert.equal(ret1.code, 0);
-                    assert.equal(ret2.code, 0);
                     return API.client.agency.registerAgency(agency)
                 })
                 .then(function(ret){
@@ -255,8 +246,6 @@ describe("api/client/agency.js", function() {
                 API.agency.deleteAgencyByTest({email: 'agencyUser.test@tulingdao.com', mobile: agency.mobile})
             ])
                 .spread(function(ret1, ret2){
-                    assert.equal(ret1.code, 0);
-                    assert.equal(ret2.code, 0);
                     done();
                 })
                 .catch(function(err){
@@ -269,8 +258,7 @@ describe("api/client/agency.js", function() {
             API.client.agency.deleteAgencyUser.call({accountId: _agencyUserId}, _newAgencyUser, function (err, ret) {
                 if (err) {
                     throw err;
-                };
-                assert.equal(ret.code, 0);
+                }
                 done();
             })
         });

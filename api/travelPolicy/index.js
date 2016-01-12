@@ -50,14 +50,14 @@ travelPolicy.deleteTravelPolicy = function(params){
             return travalPolicyModel.destroy({where: params});
         })
         .then(function(obj){
-            return {code: 0, msg: "删除成功"}
+            return true;
         });
 }
 
 travelPolicy.deleteTravelPolicyByTest = function(params){
     return travalPolicyModel.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
         .then(function(){
-            return {code: 0, msg: '删除成功'};
+            return true;
         })
 }
 
@@ -153,7 +153,7 @@ function checkParams(checkArray, params){
                 return reject({code:'-1', msg:'参数 params.' + name + '不能为空'});
             }
         }
-        resolve({code: 0});
+        resolve(true);
     });
 }
 module.exports = travelPolicy;

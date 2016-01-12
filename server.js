@@ -53,7 +53,7 @@ server.on('init.api', function(API){
         var self = this;
         return API.auth.authentication({user_id:params.accountid, token_id:params.tokenid, token_sign:params.tokensign, timestamp:params.timestamp})
             .then(function(res){
-                if (res.code) {
+                if (!res) {
                     return false;
                 }
                 self.accountId = params.accountid;

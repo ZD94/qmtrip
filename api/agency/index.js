@@ -61,10 +61,9 @@ agency.registerAgency = function(params){
             })
         })
         .spread(function(agency, agencyUser){
-            return {code: 0, msg: '注册成功', agency: agency, agencyUser: agencyUser}
+            return {agency: agency, agencyUser: agencyUser}
         })
         .catch(function(err){
-            console.info(err);
             logger.error(err);
             return Agency.findOne({where: {$or: [{mobile: mobile}, {email: email}], status: {$ne: -2}}, attributes: ['id']})
                 .then(function(agency){
@@ -175,7 +174,7 @@ agency.deleteAgency = function(params){
             })
         })
         .then(function(){
-            return {code: 0, msg: '删除成功'};
+            return true;
         })
 }
 
@@ -218,7 +217,7 @@ agency.deleteAgencyUser = function(params){
             ])
         })
         .then(function(){
-            return {code: 0, msg: '删除用户成功'};
+            return true;
         })
 }
 
@@ -317,7 +316,7 @@ agency.deleteAgencyByTest = function(params){
         AgencyUser.destroy({where: {$or: [{email:email}, {mobile:mobile}, {name: name}]}})
     ])
         .then(function(){
-            return {code: 0, msg: '删除成功'}
+            return true;
         })
 }
 

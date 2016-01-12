@@ -55,18 +55,20 @@ company.createCompany = function(params){
         })
         .then(function(account){
             var companyId = params.companyId || uuid.v1();
-            return API.company.createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain,
-                mobile:mobile, email: email, agencyId: params.agencyId, remark: params.remark, description: params.description})
-            .then(function(c){
-                    return API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
-                        mobile: mobile, name: userName, roleId: 0})
-                    .then(function(s){
-                            return [c, s];
-                        })
-                })
+            return [account, API.company.createCompany({
+                    id: companyId, createUser: account.id, name: companyName, domainName: domain,
+                    mobile:mobile, email: email, agencyId: params.agencyId,
+                    remark: params.remark, description: params.description
+                })];
+        })
+        .spread(function(account, company){
+            return [company, API.staff.createStaff({
+                accountId: account.id, companyId: company.id, email: email,
+                mobile: mobile, name: userName, roleId: 0
+            })];
         })
         .spread(function(company, staff){
-            return {code: 0, msg: '创建成功', company: company, staff: {id: staff.id}};
+            return company;
         });
 };
 

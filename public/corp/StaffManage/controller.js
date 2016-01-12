@@ -330,9 +330,8 @@ var staff = (function(){
                             objAttr = $scope.downloadValidData;
                         }
                         API.staff.downloadExcle({accountId:staffid.id,objAttr:objAttr})
-                            .then(function(invalidData){
-                                console.info(invalidData);
-                                var filename = invalidData.fileName;
+                            .then(function(filename){
+                                console.info(filename);
                                 window.open('/download/excle-file/'+filename, "_blank");
                                 $scope.$apply();
                             }).catch(function(err){

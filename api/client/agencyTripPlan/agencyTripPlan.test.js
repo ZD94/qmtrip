@@ -54,9 +54,6 @@ describe("api/client/agencyTripPlan.js", function() {
             API.staff.deleteAllStaffByTest({email: company.email})
         ])
             .spread(function(ret1, ret2, ret3){
-                assert.equal(ret1.code, 0);
-                assert.equal(ret2.code, 0);
-                assert.equal(ret3.code, 0);
                 return API.agency.registerAgency(agency);
             })
             .then(function(ret){
@@ -64,9 +61,9 @@ describe("api/client/agencyTripPlan.js", function() {
                 agencyUserId = ret.agencyUser.id;
                 return API.client.company.createCompany.call({accountId: agencyUserId}, company);
             })
-            .then(function(ret){
-                companyId = ret.company.id;
-                staffId = ret.company.createUser;
+            .then(function(company){
+                companyId = company.id;
+                staffId = company.createUser;
                 return API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder);
             })
             .then(function(ret){
@@ -91,10 +88,6 @@ describe("api/client/agencyTripPlan.js", function() {
             API.tripPlan.deleteTripPlanOrder({orderId: orderId, userId: staffId})
         ])
             .spread(function(ret1, ret2, ret3, ret4){
-                assert.equal(ret1.code, 0);
-                assert.equal(ret2.code, 0);
-                assert.equal(ret3.code, 0);
-                assert.equal(ret4.code, 0);
                 done()
             })
             .catch(function(err){

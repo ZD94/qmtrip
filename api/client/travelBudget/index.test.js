@@ -56,10 +56,6 @@ describe("api/client/travelBudget.js", function() {
             API.travelPolicy.deleteTravelPolicyByTest({name: travelPolicy.name})
         ])
             .spread(function(ret1, ret2, ret3, ret4){
-                assert.equal(ret1.code, 0);
-                assert.equal(ret2.code, 0);
-                assert.equal(ret3.code, 0);
-                assert.equal(ret4.code, 0);
                 return API.agency.registerAgency(agency);
             })
             .then(function(ret){
@@ -67,9 +63,9 @@ describe("api/client/travelBudget.js", function() {
                 agencyUserId = ret.agencyUser.id;
                 return API.client.company.createCompany.call({accountId: agencyUserId}, company);
             })
-            .then(function(ret){
-                companyId = ret.company.id;
-                staffId = ret.company.createUser;
+            .then(function(company){
+                companyId = company.id;
+                staffId = company.createUser;
                 travelPolicy.companyId = companyId;
                 return API.travelPolicy.createTravelPolicy(travelPolicy);
             })
@@ -97,10 +93,6 @@ describe("api/client/travelBudget.js", function() {
             API.travelPolicy.deleteTravelPolicyByTest({name: travelPolicy.name})
         ])
             .spread(function(ret1, ret2, ret3, ret4){
-                assert.equal(ret1.code, 0);
-                assert.equal(ret2.code, 0);
-                assert.equal(ret3.code, 0);
-                assert.equal(ret4.code, 0);
                 done()
             })
             .catch(function(err){

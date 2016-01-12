@@ -34,7 +34,6 @@ describe("api/client/company.js", function() {
         before(function(done) {
             API.agency.deleteAgencyByTest({mobile: agency.mobile, email: agency.email})
                 .then(function(ret){
-                    assert.equal(ret.code, 0);
                     return API.agency.registerAgency(agency)
                 })
                 .then(function(ret){
@@ -52,7 +51,6 @@ describe("api/client/company.js", function() {
                 if (err) {
                     throw err;
                 }
-                assert.equal(ret.code, 0);
                 done();
             })
         });
@@ -64,8 +62,6 @@ describe("api/client/company.js", function() {
                     API.staff.deleteAllStaffByTest({mobile: company.mobile, email: company.email})
                 ])
                     .spread(function(ret1, ret2){
-                        assert.equal(ret1.code, 0);
-                        assert.equal(ret2.code, 0);
                         done();
                     })
                     .catch(function(err){
@@ -90,13 +86,12 @@ describe("api/client/company.js", function() {
 
             it("#createCompany should be ok", function(done) {
                 var self = {accountId: agencyUserId};
-                API.client.company.createCompany.call(self, company, function(err, ret){
+                API.client.company.createCompany.call(self, company, function(err, company){
                     if (err) {
                         throw err;
                     }
-                    var c = ret.company;
-                    companyId = c.id;
-                    ownerUserId = c.createUser;
+                    companyId = company.id;
+                    ownerUserId = company.createUser;
                     done();
                 })
             });
@@ -113,18 +108,13 @@ describe("api/client/company.js", function() {
                     API.staff.deleteAllStaffByTest({mobile: company.mobile, email: company.email})
                 ])
                     .spread(function(ret1, ret2){
-                        assert.equal(ret1.code, 0);
-                        assert.equal(ret2.code, 0);
                         return API.client.company.createCompany.call({accountId: agencyUserId}, company)
                     })
-                    .then(function(ret){
-                        assert.equal(ret.company.status, 0);
-                        companyId = ret.company.id;
-                        ownerUserId = ret.company.createUser;
+                    .then(function(company){
+                        assert.equal(company.status, 0);
+                        companyId = company.id;
+                        ownerUserId = company.createUser;
                         done();
-                    })
-                    .catch(function(err){
-                        throw err;
                     })
                     .done();
             });
@@ -135,8 +125,6 @@ describe("api/client/company.js", function() {
                     API.staff.deleteAllStaffByTest({companyId: companyId, mobile: company.mobile, email: company.email})
                 ])
                     .spread(function(ret1, ret2){
-                        assert.equal(ret1.code, 0);
-                        assert.equal(ret2.code, 0);
                         done();
                     })
                     .catch(function(err){

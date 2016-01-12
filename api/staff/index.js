@@ -110,11 +110,6 @@ staff.deleteStaff = function(params){
         throw {code: -1, msg: "id不能为空"};
     }
     return API.auth.remove({accountId: id})
-        .then(function(acc){
-            if(acc.code != 0){
-                throw acc;
-            }
-        })
         .then(function(){
             return staffModel.update({status: STAFF_STATUS.DELETE, quitTime: utils.now()}, {where: {id: id}, fields: ['status', 'quitTime']})
         })
@@ -122,7 +117,7 @@ staff.deleteStaff = function(params){
             if(num != 1){
                 throw {code: -2, msg: '删除失败'};
             }
-            return {code: 0, msg: "删除成功"}
+            return true;
         })
 }
 
@@ -611,8 +606,10 @@ staff.downloadExcle = function (params){
         throw {code: -1, msg: "params.objAttr类型错误"};
     }
     var buffer = nodeXlsx.build([{name: "Sheet1", data: data}]);
-    fs.writeFileSync(config.upload.tmpDir+'/'+ fileName +'.xlsx', buffer, 'binary');
-    return Promise.resolve({code: 0, fileName: fileName+".xlsx"});
+    return fs.writeFileAsync(config.upload.tmpDir+'/'+ fileName +'.xlsx', buffer, 'binary')
+        .then(function(){
+            return {fileName: fileName+".xlsx"};
+        });
 }
 
 /**
@@ -630,7 +627,7 @@ staff.isStaffInCompany = function(staffId, companyId){
             if(staff.companyId != companyId){
                 throw {code: 2, msg: '员工不在该企业'};
             }
-            return {code: 0, msg: true};
+            return true;
         });
 }
 
@@ -725,7 +722,7 @@ staff.getStaffCountByCompany = function(params){
 staff.deleteAllStaffs = function(params){
     return staffModel.destroy({where: {companyId: params.company}})
         .then(function(){
-            return {code: 0, msg: '删除成功'};
+            return true;
         })
 }
 
@@ -765,7 +762,7 @@ staff.deleteAllStaffByTest = function(params){
         staffModel.destroy({where: {$or: [{companyId: companyId}, {mobile: mobile}, {email: email}]}})
     ])
         .spread(function(){
-            return {code: 0, msg: '删除成功'}
+            return true;
         })
 }
 
