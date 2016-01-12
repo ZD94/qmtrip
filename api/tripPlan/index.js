@@ -28,6 +28,9 @@ var tripPlan = {}
  * @returns {*}
  */
 tripPlan.savePlanOrder = function(params){
+    if(!params.consumeDetails){
+        throw {code: -1, msg: '预算详情 consumeDetails 不能为空'};
+    }
     var checkArr = ['accountId', 'companyId', 'type', 'destination', 'budget'];
     var getArr = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark'];
     var _planOrder = checkAndGetParams(checkArr, getArr, params);
@@ -37,45 +40,55 @@ tripPlan.savePlanOrder = function(params){
             _planOrder.id = orderId;
             _planOrder.orderNo = orderNo;
             _planOrder.createAt = utils.now();
-            var userId = params.accountId;
-            var execArr = new Array();
-            return sequelize.transaction(function(t){
-                execArr.push(PlanOrder.create(_planOrder, {transaction: t})); //保存计划单
-                if(params.consumeDetails){ //保存计划单预算和消费详情
-                    var details = params.consumeDetails;
-                    for(var i in details){
-                        var obj = details[i];
-                        obj.orderId = orderId;
-                        obj.accountId = params.accountId;
-                        execArr.push(tripPlan.saveConsumeRecord(obj, {transaction: t}));
-                    }
-                }
-                var logs = {
-                    orderId: orderId,
-                    userId: userId,
-                    remark: '新增计划单 ' + orderNo,
-                    createAt: utils.now()
-                }
-                execArr.push(TripOrderLogs.create(logs, {transaction: t})); //记录计划单操作日志
-                return Q.all(execArr)
-            })
-        })
-        .then(function(arr){
-            var order = arr[0].dataValues;
-            order.outTraffic = new Array();
-            order.backTraffic = new Array();
-            order.hotel = new Array();
-            for(var j = 1; j < arr.length; j++){
-                var obj = arr[j];
-                if(obj.type === -1){
-                    order.outTraffic.push(obj);
-                }else if(obj.type === 0){
-                    order.hotel.push(obj);
-                }else if(obj.type === 1){
-                    order.backTraffic.push(obj);
-                }
+            var details = params.consumeDetails;
+            var total_budget = 0;
+            for(var i in details) {
+                var obj = details[i];
+                total_budget = parseFloat(total_budget) + parseFloat(obj.budget);
             }
-            return order;
+            _planOrder.budget = total_budget;
+            return sequelize.transaction(function(t){
+                var order = {}
+                return PlanOrder.create(_planOrder, {transaction: t})
+                    .then(function(ret){
+                        order = ret.toJSON();
+                        order.outTraffic = new Array();
+                        order.backTraffic = new Array();
+                        order.hotel = new Array();
+                        var details = params.consumeDetails;
+                        return Q.all(details.map(function(s){
+                            s.orderId = order.id;
+                            s.accountId = order.accountId;
+                            s.status = 0;
+                            return ConsumeDetails.create(s, {transaction: t})
+                                .then(function(ret){
+                                    return ret.toJSON();
+                                })
+                        }))
+                    })
+                    .then(function(list){
+                        for(var j = 0; j < list.length; j++){
+                            var obj = list[j];
+                            if(obj.type === -1){
+                                order.outTraffic.push(obj);
+                            }else if(obj.type === 0){
+                                order.hotel.push(obj);
+                            }else if(obj.type === 1){
+                                order.backTraffic.push(obj);
+                            }
+                        }
+                        var logs = {
+                            orderId: order.id,
+                            userId: params.accountId,
+                            remark: '新增计划单 ' + order.orderNo,
+                            createAt: utils.now()
+                        }
+                        return TripOrderLogs.create(logs, {transaction: t});
+                    })
+                    .then(function(){
+                        return order;
+                    })
+            })
         })
 }
 
