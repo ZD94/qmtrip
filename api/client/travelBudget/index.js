@@ -86,9 +86,9 @@ travelBudget.getTravelPolicyBudget = function(params) {
                 inLatestArriveTime: inLatestArriveTime,
                 isRoundTrip: isRoundTrip
             })
-        })
-        .then(function(traffic) {
-            return {hotel: hotel.price, traffic: traffic.price, goTraffic: traffic.goTraffic, backTraffic: traffic.backTraffic};
+            .then(function(traffic) {
+                return {hotel: hotel.price, traffic: traffic.price, goTraffic: traffic.goTraffic, backTraffic: traffic.backTraffic};
+            })
         })
         .then(function(result) {
             result.price = result.hotel + result.traffic;
