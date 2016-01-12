@@ -110,6 +110,30 @@ staff.deleteStaff = function(params){
             if(acc.code != 0){
                 throw acc;
             }
+            return acc;
+        })
+        .then(function(acc){
+            console.log("这应该根被进不来吧啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊");
+            return staffModel.update({status: -1, quitTime: utils.now()}, {where: {id: id}, fields: ['status', 'quitTime']})
+        })
+        .spread(function(num){
+            if(num != 1){
+                throw {code: -2, msg: '删除失败'};
+            }
+            return {code: 0, msg: "删除成功"}
+        })
+}
+
+/*staff.deleteStaff = function(params){
+    var id = params.id;
+    if (!id) {
+        throw {code: -1, msg: "id不能为空"};
+    }
+    return API.auth.remove({accountId: id})
+        .then(function(acc){
+            if(acc.code != 0){
+                throw acc;
+            }
         })
         .then(function(){
             return staffModel.update({status: -1, quitTime: utils.now()}, {where: {id: id}, fields: ['status', 'quitTime']})
@@ -120,7 +144,7 @@ staff.deleteStaff = function(params){
             }
             return {code: 0, msg: "删除成功"}
         })
-}
+}*/
 
 /**
  * 更新员工
@@ -243,6 +267,7 @@ staff.listAndPaginateStaff = function(params){
     if (!options.order) {
         options.order = [["create_at", "desc"]]
     }
+    params.status = {$ne: -1};//只查询在职人员
     options.limit = limit;
     options.offset = offset;
     options.where = params;
@@ -670,24 +695,28 @@ staff.statisticStaffsRole = function(params){
     var adminNum = 0
     var commonStaffNum = 0;
     var unActiveNum = 0;
-    return staffModel.findAll({where: {companyId: companyId}})
+    var totalCount = 0;
+    return staffModel.findAll({where: {companyId: companyId, status: {$ne: -1}}})
         .then(function(staffs){
-            return Q.all(staffs.map(function(s){
-                if(s.roleId == 2){
-                    adminNum++;
-                }else if(s.roleId == 1){
-                    commonStaffNum++;
-                }
-                return API.auth.getAccount({id: s.id})
-                    .then(function(acc){
-                        if(acc.status == 0){
-                            unActiveNum++;
-                        }
-                    })
-            }))
+            if(staffs){
+                totalCount = staffs.length;
+                return Q.all(staffs.map(function(s){
+                    if(s.roleId == 2){
+                        adminNum++;
+                    }else if(s.roleId == 1){
+                        commonStaffNum++;
+                    }
+                    return API.auth.getAccount({id: s.id})
+                        .then(function(acc){
+                            if(acc && acc.status == 0){
+                                unActiveNum++;
+                            }
+                        })
+                }))
+            }
         })
         .then(function(){
-            return {adminNum: adminNum, commonStaffNum: commonStaffNum, unActiveNum: unActiveNum};
+            return {totalCount: totalCount, adminNum: adminNum, commonStaffNum: commonStaffNum, unActiveNum: unActiveNum};
         });
 }
 
@@ -701,7 +730,7 @@ staff.getStaffCountByCompany = function(params){
         throw {code: -1, msg: '企业Id不能为空'};
     }
     var companyId = params.companyId;
-    return staffModel.count({where: {companyId: companyId}})
+    return staffModel.count({where: {companyId: companyId, status:{$ne: -1}}})
         .then(function(all){
             return all || 1;
         });

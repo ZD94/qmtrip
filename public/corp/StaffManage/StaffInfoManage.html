@@ -89,7 +89,7 @@
             <li>{{item.name}}</li>
             <li>{{item.email}}</li>
             <li>{{item.mobile}}</li>
-            <li><!--<span ng-if="item.department == null">暂未设置</span>--><span>{{item.department || '我的企业'}}{{item.activeStatus}}</span></li>
+            <li><!--<span ng-if="item.department == null">暂未设置</span>--><span>{{item.department || '我的企业'}}</span></li>
             <li><span>{{item.travelLeverName}}</span></li>
             <li><span ng-if="item.roleId == 0">创建者</span><span ng-if="item.roleId == 1">普通员工</span><span ng-if="item.roleId == 2">管理员</span><span ng-if="item.roleId == 3">财务人员</span></li>
             <li><a ng-if="!((item.roleId == 2 || item.roleId == 0) && roleId == 2 && currentStaff.id != item.id)"><span ng-click="editStaffInfo($index)" id="change">修改</span></a>
