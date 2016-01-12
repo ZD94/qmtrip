@@ -15,7 +15,7 @@
 		</table>
 	</div> -->
 	<div class="corp_chart">
-		<h3>{{}}结算信息</h3>
+		<h3>{{month}}月结算信息</h3>
 		<div id="charts" style="width:100%;height:245px;"></div>
 		<div class="charts_legend">
 			<p>动态预算：员工当月出差记录的累计支出</p>
@@ -45,9 +45,23 @@
 			<div class="business_standard">
 				<span class="b_name">{{travelLevel.name}}</span>
 				<ul>
-					<li><img src="corp/images/Air.png"><p>{{travelLevel.planeLevel}}</p></li>
-					<li><img src="corp/images/Hotel.png"><p>{{travelLevel.hotelLevel}}</p></li>
-					<li><img src="corp/images/Subway.png"><p>{{travelLevel.trainLevel}}</p></li>
+					<li>
+						<span class="web-icon-font3">&#xe90e;</span>
+						<p ng-if="travelLevel.planeLevel != '不限'">{{travelLevel.planeLevel}}</p>
+						<p ng-if="travelLevel.planeLevel == '不限' && travelLevel.planeDiscount != 0">最高{{travelLevel.planeDiscount}}折</p>
+						<p ng-if="travelLevel.planeLevel == '不限' && travelLevel.planeDiscount == 0">任意飞</p>
+					</li>
+					<li>
+						<span class="web-icon-font3">&#xe914;</span>
+						<p ng-if="travelLevel.hotelLevel == '不限' && travelLevel.hotelPrice == null">任意住</p>
+						<p ng-if="travelLevel.hotelLevel == '不限' && travelLevel.hotelPrice != null">{{travelLevel.hotelPrice}}元/晚</p>
+						<p ng-if="travelLevel.hotelLevel != '不限'">{{travelLevel.hotelLevel}}</p>
+					</li>
+					<li>
+						<span class="web-icon-font3">&#xe911;</span>
+						<p ng-if="travelLevel.trainLevel == '不限'">不限座次</p>
+						<p ng-if="travelLevel.trainLevel != '不限'">{{travelLevel.trainLevel}}</p>
+					</li>
 				</ul>
 			</div>
 		</div>
@@ -86,6 +100,38 @@
 			</div>
 		</div>
 	</div> -->
+	<div class="corp_welfare nocharge" ng-if="funds.income == 0">
+		<h3>员工福利信息<a href="">查看详细>></a></h3>
+		<ul>
+			<li>
+				<h4>员工贡献</h4>
+				<p>当前员工累计积分为{{}}，累计为公司节省￥{{}}，超过80%的行业员工。</p>
+			</li>
+			<li>
+				<h4>福利奖品</h4>
+				<p>点亮后员工才可以积分兑换</p>
+				<img src="corp/images/JD.png">
+			</li>
+			<li>
+				<h4>如何为员工点亮福利</h4>
+				<p>每个企业对应一个员工奖励增收节支专项奖励账户，此账户资金仅用于员工奖励向账户充值，点亮福利奖品。</p>
+				<div class="pointscale">1积分=1元</div>
+			</li>
+		</ul>
+		<div class="corp_count">
+			<div class="corp_funds">
+				<span>￥{{funds.income-funds.consume-funds.frozen}}<a href="javascript:void(0);" ng-click="withoutcharge()">充值</a></span>
+				<p>增收节支专项奖励账户余额</p>
+			</div>
+			<div>
+				<div class="ranking">
+					<span>…</span>
+					<p>没有名次</p>
+				</div>
+				<div class="fund_all">公司累计投入专项奖金共：￥{{funds.income}}</div>
+			</div>
+		</div>
+	</div>
 	<div class="corp_welfare" ng-if="funds.balance != 0 &&funds.income != 0">
 		<h3>员工福利信息<a href="">查看详细>></a></h3>
 		<ul>
@@ -117,36 +163,18 @@
 			</div>
 		</div>
 	</div>
-	<div class="corp_welfare nocharge" ng-if="funds.income == 0">
-		<h3>员工福利信息<a href="">查看详细>></a></h3>
-		<ul>
-			<li>
-				<h4>员工贡献</h4>
-				<p>当前员工累计积分为{{}}}，累计为公司节省￥{{}}，超过80%的行业员工。</p>
-			</li>
-			<li>
-				<h4>福利奖品</h4>
-				<p>点亮后员工才可以积分兑换</p>
-				<img src="corp/images/JD.png">
-			</li>
-			<li>
-				<h4>如何为员工点亮福利</h4>
-				<p>每个企业对应一个员工奖励增收节支专项奖励账户，此账户资金仅用于员工奖励向账户充值，点亮福利奖品。</p>
-				<div class="pointscale">1积分=1元</div>
-			</li>
-		</ul>
-		<div class="corp_count">
-			<div class="corp_funds">
-				<span>￥{{funds.income-funds.consume-funds.frozen}}<a href="javascript:void(0);">充值</a></span>
-				<p>增收节支专项奖励账户余额</p>
-			</div>
-			<div>
-				<div class="ranking">
-					<span>…</span>
-					<p>没有名次</p>
-				</div>
-				<div class="fund_all">公司累计投入专项奖金共：￥{{funds.income}}</div>
-			</div>
-		</div>
+</div>
+<div class="wayToCharge">
+	<div class="ToCharge_box">
+		 <div class='ToCharge_title'>采购方法<div class='ToCharge_close' ng-click='closeToCharge()'><img src='/images/closezjx.png' style='display: block;'></div></div>
+		 <div class="ToCharge_content">
+            <p>直接转账到公司基本户账户，转账成功后请电话联系或QQ 截图留言；</p>
+            <p>审核核通过后，该笔记录会在员工专项奖励余额中体现；</p>
+            <p>户名：途灵岛信息技术股份有限公司</p>
+            <p>开户行：招商银行东直门分行</p>
+            <p>账号：6578 2354 8765 9009</p>
+            <p>联系电话：010-6374876 <span class="qq">QQ：<i>85478547 在线</i></span></p>
+            <p class="tip_block">线上支付开发中，敬请期待</p>
+		 </div>
 	</div>
 </div>
