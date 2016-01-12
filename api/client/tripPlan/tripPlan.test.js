@@ -303,7 +303,7 @@ describe("api/client/tripPlan.js", function() {
                                 assert.equal(t.code, 0);
                                 return  API.client.agencyTripPlan.approveInvoice.call({accountId: agencyUserId}, {consumeId: ret1.id, status: 1, expenditure: '521', remark: '审核票据测试'})
                                     .then(function(r){
-                                        assert.equal(r.code, 0);
+                                        assert.equal(r, true);
                                         done()
                                     })
                             })
