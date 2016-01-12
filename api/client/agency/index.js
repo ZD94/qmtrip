@@ -31,7 +31,7 @@ var agency = {}
  * @param {string} params.mobile 手机号 必填
  * @param {string} params.email 邮箱 必填
  * @param {string} params.pwd 密码 选填，如果手机号和邮箱在全麦注册过，则密码还是以前的密码
- * @returns {Promise} {code: 0, msg: '注册成功||错误信息'}
+ * @returns {Promise} true||error
  */
 agency.registerAgency = function(params){
     var agency = checkAndGetParams(['name', 'email', 'mobile', 'userName'], ['description', 'remark'], params);

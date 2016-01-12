@@ -40,9 +40,6 @@ describe("api/client/tripPlan.js", function() {
             API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})
         ])
             .spread(function(ret1, ret2, ret3){
-                assert.equal(ret1.code, 0);
-                assert.equal(ret2.code, 0);
-                assert.equal(ret3.code, 0);
                 return API.agency.registerAgency(agency);
             })
             .then(function(ret){
@@ -50,9 +47,9 @@ describe("api/client/tripPlan.js", function() {
                 agencyUserId = ret.agencyUser.id;
                 return API.client.company.createCompany.call({accountId: agencyUserId}, company);
             })
-            .then(function(ret){
-                companyId = ret.company.id;
-                staffId = ret.company.createUser;
+            .then(function(company){
+                companyId = company.id;
+                staffId = company.createUser;
                 done();
             })
             .catch(function(err){
@@ -70,9 +67,6 @@ describe("api/client/tripPlan.js", function() {
             API.staff.deleteAllStaffByTest({email: company.email})
         ])
             .spread(function(ret1, ret2, ret3){
-                assert.equal(ret1.code, 0);
-                assert.equal(ret2.code, 0);
-                assert.equal(ret3.code, 0);
                 done()
             })
             .catch(function(err){
@@ -87,7 +81,6 @@ describe("api/client/tripPlan.js", function() {
                 if(err){
                     throw err;
                 }
-                assert.equal(ret.code, 0);
                 done();
             })
         })
@@ -99,13 +92,19 @@ describe("api/client/tripPlan.js", function() {
                 budget: 1000,
                 startAt: '2015-12-30 11:12:12',
             }
+            tripPlanOrder.consumeDetails = [{
+                startTime: '2016-12-30 11:11:11',
+                budget: 300,
+                invoiceType: 2,
+                type: 0
+            }]
             var self = {accountId: staffId};
             API.client.tripPlan.savePlanOrder.call(self, tripPlanOrder, function(err, ret){
                 if(err){
                     throw err;
                 }
                 orderId = ret.id;
-                assert.equal(ret.budget, 1000);
+                assert.equal(ret.status, 0);
                 done();
             })
         })
@@ -119,6 +118,12 @@ describe("api/client/tripPlan.js", function() {
                 destination: '上海',
                 budget: 1000,
                 startAt: '2015-12-30 11:12:12',
+                consumeDetails: [{
+                    startTime: '2016-12-30 11:11:11',
+                    budget: 300,
+                    invoiceType: 2,
+                    type: 0
+                }]
             }
             API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder, function(err, ret){
                 if(err){
@@ -135,7 +140,6 @@ describe("api/client/tripPlan.js", function() {
                 if (err) {
                     throw err;
                 }
-                assert.equal(ret.code, 0);
                 done();
             })
         });
@@ -150,6 +154,12 @@ describe("api/client/tripPlan.js", function() {
                 destination: '上海',
                 budget: 1000,
                 startAt: '2015-12-30 11:12:12',
+                consumeDetails: [{
+                    startTime: '2016-12-30 11:11:11',
+                    budget: 300,
+                    invoiceType: 2,
+                    type: 0
+                }]
             }
             API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder, function (err, ret) {
                 if (err) {
@@ -165,7 +175,6 @@ describe("api/client/tripPlan.js", function() {
                 if (err) {
                     throw err;
                 }
-                assert.equal(ret.code, 0);
                 done();
             })
         })
@@ -205,11 +214,20 @@ describe("api/client/tripPlan.js", function() {
 
         it("#pageTripPlanOrder should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.pageTripPlanOrder.call(self, {
-                page: 1,
-                isUpload: false,
-                audit: 'N'
-            }, function (err, ret) {
+            API.client.tripPlan.pageTripPlanOrder.call(self, {page: 1}, function (err, ret) {
+                if (err) {
+                    throw err;
+                }
+                assert.equal(ret.page, 1);
+                assert.equal(ret.perPage, 10);
+                done();
+            })
+        });
+
+
+        it("#pageTripPlanOrder should be ok", function (done) {
+            var self = {accountId: staffId};
+            API.client.tripPlan.pageTripPlanOrder.call(self, {page: 1, isUpload: false, audit: 'Y'}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -271,15 +289,14 @@ describe("api/client/tripPlan.js", function() {
                         assert.equal(ret1.type, 0);
                         assert.equal(ret2.type, 1);
                         consumeId = ret2.id;
-                        return API.tripPlan.uploadInvoice({userId: staffId, consumeId: ret1.id, picture: '测试图片'})
-                            .then(function(t){
-                                assert.equal(t.code, 0);
-                                return  API.client.agencyTripPlan.approveInvoice.call({accountId: agencyUserId}, {consumeId: ret1.id, status: 1, expenditure: '521', remark: '审核票据测试'})
-                                    .then(function(r){
-                                        assert.equal(r.code, 0);
-                                        done()
-                                    })
-                            })
+                        return [ret1.id, API.tripPlan.uploadInvoice({userId: staffId, consumeId: ret1.id, picture: '测试图片'})];
+                    })
+                    .spread(function(consumeId){
+                        return  API.client.agencyTripPlan.approveInvoice.call({accountId: agencyUserId}, {consumeId: consumeId, status: 1, expenditure: '521', remark: '审核票据测试'})
+                    })
+                    .then(function(r){
+                        assert.equal(r, true);
+                        done()
                     })
                     .catch(function(err){
                         throw err;
@@ -293,7 +310,6 @@ describe("api/client/tripPlan.js", function() {
                     if (err) {
                         throw err;
                     }
-                    assert.equal(ret.code, 0);
                     done();
                 })
             });

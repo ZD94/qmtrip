@@ -21,7 +21,7 @@
             <span ng-if="tra==1&&liv==0">¥{{onlytraffic.price}}</span>
             <span ng-if="tra==0&&liv==1">¥{{onlylive.price}}</span>
             <span ng-if="tra==1&&liv==1">¥{{trafficlive.price}}</span>
-            <span style="position: absolute; right: 20px;">{{purposename}}项目</span>
+            <span style="position: absolute; right: 20px;">{{purposename}}</span>
         </div>
         <div class="center">
             <table width="100%" border="1" bordercolor="#E5E5E5">
@@ -83,8 +83,8 @@
             <div>
                 <div class="bottom_txt">出差记录已生成，可在&nbsp;<a href="#/StaffFirst/StaffUser">我的账户</a>&nbsp;>&nbsp;<a href="#/travelPlan/PlanList">出差记录</a>&nbsp;中查找</div>
                 <div style="text-align: center; font-size: 13px; padding-bottom: 15px;">提示：出差完成后，您需将相关票据上传至对应出差记录</div>
-                <input type="button" value="去预定" class="common_btn2 w120" ng-click="bookTicket()" style="margin-left: 370px;">
-                <input type="button" value="上传票据" class="common_btn2 w120" style="margin-left: 20px;">
+                <a class="common_btn2 w120" href="http://www.tianxun.com/" target="_blank" style="margin-left: 370px;">去预订</a>
+                <input type="button" value="上传票据" class="common_btn2 w120" ng-click="upLoad()" style="margin-left: 20px;">
             </div>
         </div>
     </section>

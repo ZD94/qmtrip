@@ -1,7 +1,7 @@
 <div class="travel-policy">
     <div class="policy_title">
         <span style="float: left;">共设置了{{PolicyTotal}}级差旅标准</span>
-        <input type="button" value="增加标准" class="common_btn1" ng-click="createPolicyShow()" style="float: right; margin-top: 11px;">
+        <input type="button" value="增加标准" class="common_btn1 w100" ng-click="createPolicyShow()" style="float: right; margin-top: 11px;">
     </div>
     <ul class="policy_page">
         <li ng-repeat="item in PolicyList">
@@ -100,7 +100,6 @@
                             <dt class="common_select CtrainLevel">请选择座次</dt>
                             <dd class="common_option">
                                 <div>不限</div>
-                                <div>商务座/高级软卧</div>
                                 <div>一等座/软卧</div>
                                 <div>二等座/硬卧</div>
                                 <div>软座</div>
@@ -128,8 +127,8 @@
                 <tr>
                     <td width="70" height="56" align="right"></td>
                     <td>
-                        <input type="button" value="保存设置" class="common_btn1" ng-click="createPolicy()">
-                        <input type="button" value="取消" class="common_btn2" ng-click="createClose()" style="margin-left: 20px;">
+                        <input type="button" value="保存设置" class="common_btn1 w100" ng-click="createPolicy()">
+                        <input type="button" value="取消" class="common_btn2 w100" ng-click="createClose()" style="margin-left: 20px;">
                     </td>
                 </tr>
             </table>
@@ -183,7 +182,6 @@
                             <dt class="common_select CtrainLevel">不限</dt>
                             <dd class="common_option">
                                 <div>不限</div>
-                                <div>商务座/高级软卧</div>
                                 <div>一等座/软卧</div>
                                 <div>二等座/硬卧</div>
                                 <div>软座</div>
@@ -211,8 +209,8 @@
                 <tr>
                     <td width="70" height="56" align="right"></td>
                     <td>
-                        <input type="button" value="保存设置" class="common_btn1" ng-click="updatePolicy()">
-                        <input type="button" value="取消" class="common_btn2" ng-click="updateClose()" style="margin-left: 20px;">
+                        <input type="button" value="保存设置" class="common_btn1 w100" ng-click="updatePolicy()">
+                        <input type="button" value="取消" class="common_btn2 w100" ng-click="updateClose()" style="margin-left: 20px;">
                     </td>
                 </tr>
             </table>
@@ -220,5 +218,4 @@
 
 
     </ul>
-    <ul class="pagination" id="pagination"></ul>
 </div>

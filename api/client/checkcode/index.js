@@ -80,7 +80,7 @@ var checkcode = {
      * @param {Object} params
      * @param {String} params.ticket 凭证
      * @param {String} params.code 验证码
-     * @return {Promise} {code: 0, msg: "Ok"}, {code: -1, msg: "验证码已失效"}
+     * @return {Promise} true||error
      * @example
      * ```
      *  API.checkcode.isMatchPicCheckCode({ticket: "TICKET", code: "CODE"}, function(err, result) {
@@ -107,7 +107,7 @@ var checkcode = {
      * @param {Object} params   参数
      * @param {String} params.ticket 凭证
      * @param {String} params.code 验证码
-     * @return {Promise} {code: 0, msg: "OK"}, {code: -1, msg: "已失效或者不存在"}
+     * @return {Promise} true||error
      * @example
      * ```
      * API.checkcode.isMatchMsgCheckCode({ticket: "TICKET", code: "CODE"}, function(err, result) {

@@ -54,9 +54,6 @@ describe("api/client/agencyTripPlan.js", function() {
             API.staff.deleteAllStaffByTest({email: company.email})
         ])
             .spread(function(ret1, ret2, ret3){
-                assert.equal(ret1.code, 0);
-                assert.equal(ret2.code, 0);
-                assert.equal(ret3.code, 0);
                 return API.agency.registerAgency(agency);
             })
             .then(function(ret){
@@ -64,9 +61,9 @@ describe("api/client/agencyTripPlan.js", function() {
                 agencyUserId = ret.agencyUser.id;
                 return API.client.company.createCompany.call({accountId: agencyUserId}, company);
             })
-            .then(function(ret){
-                companyId = ret.company.id;
-                staffId = ret.company.createUser;
+            .then(function(company){
+                companyId = company.id;
+                staffId = company.createUser;
                 return API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder);
             })
             .then(function(ret){
@@ -91,10 +88,6 @@ describe("api/client/agencyTripPlan.js", function() {
             API.tripPlan.deleteTripPlanOrder({orderId: orderId, userId: staffId})
         ])
             .spread(function(ret1, ret2, ret3, ret4){
-                assert.equal(ret1.code, 0);
-                assert.equal(ret2.code, 0);
-                assert.equal(ret3.code, 0);
-                assert.equal(ret4.code, 0);
                 done()
             })
             .catch(function(err){
@@ -176,11 +169,11 @@ describe("api/client/agencyTripPlan.js", function() {
 
     it("#approveInvoice should be ok when audit not pass", function(done) {
         var self = {accountId: agencyUserId};
-        API.client.agencyTripPlan.approveInvoice.call(self, {consumeId: consumeId, status: -1, expenditure: '450', remark: '审核票据测试'}, function(err, ret){
+        API.client.agencyTripPlan.approveInvoice.call(self, {consumeId: consumeId, status: -1, remark: '审核票据测试'}, function(err, ret){
             if (err) {
                 throw err;
             }
-            assert.equal(ret.code, 0);
+            assert.equal(ret, true);
             done();
         })
     });
@@ -191,7 +184,7 @@ describe("api/client/agencyTripPlan.js", function() {
             if (err) {
                 throw err;
             }
-            assert.equal(ret.code, 0);
+            assert.equal(ret, true);
             done();
         })
     });

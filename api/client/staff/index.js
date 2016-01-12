@@ -53,24 +53,23 @@ staff.deleteStaff = auth.checkPermission(["user.delete"],
     function(params) {
         var user_id = this.accountId;
         return API.staff.getStaff({id: user_id})
-            .then(function(data){
+            .then(function(staff){
                 if(this.accountId == params.id){
                     throw {msg: "不可删除自身信息"};
                 }
-                return API.staff.getStaff({id:params.id})
-                    .then(function(target){
-                        if(target.roleId == 0){
-                            throw {msg: "企业创建人不能被删除"};
-                        }
-                        if(data.roleId == target.roleId){
-                            throw {msg: "不能删除统计用户"};
-                        }
-                        if(data.companyId != target.companyId){
-                            throw L.ERR.PERMISSION_DENY;
-                        }else{
-                            return API.staff.deleteStaff(params);
-                        }
-                    })
+                return [staff, API.staff.getStaff({id:params.id})];
+            })
+            .spread(function(staff, target){
+                if(target.roleId == 0){
+                    throw {msg: "企业创建人不能被删除"};
+                }
+                if(staff.roleId == target.roleId){
+                    throw {msg: "不能删除统计用户"};
+                }
+                if(staff.companyId != target.companyId){
+                    throw L.ERR.PERMISSION_DENY;
+                }
+                return API.staff.deleteStaff(params);
             });
     });
 
@@ -312,7 +311,7 @@ staff.downloadExcle = function(params){
  * @param {String} params.companyId
  * @param {String} params.startTime
  * @param {String} params.endTime
- * @return {promise} {code: 0, msg: 'success', sta: {all: 0, inNum: 0, outNum: 0};
+ * @return {promise} true||error
  */
 staff.statisticStaffs = function(params){
     var user_id = this.accountId;
@@ -338,8 +337,7 @@ staff.statisticStaffs = function(params){
  * @param {String} params.companyId
  * @param {String} params.startTime
  * @param {String} params.endTime
- * @param {Function} callback
- * @return {promise} {code: 0, msg: 'success', sta: {all: 0, inNum: 0, outNum: 0};
+ * @return {promise} true||error
  */
 staff.statisticStaffsByAgency = function(params){
     var user_id = this.accountId;

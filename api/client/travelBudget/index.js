@@ -86,9 +86,9 @@ travelBudget.getTravelPolicyBudget = function(params) {
                 inLatestArriveTime: inLatestArriveTime,
                 isRoundTrip: isRoundTrip
             })
-        })
-        .then(function(traffic) {
-            return {hotel: hotel.price, traffic: traffic.price, goTraffic: traffic.goTraffic, backTraffic: traffic.backTraffic};
+            .then(function(traffic) {
+                return {hotel: hotel.price, traffic: traffic.price, goTraffic: traffic.goTraffic, backTraffic: traffic.backTraffic};
+            })
         })
         .then(function(result) {
             result.price = result.hotel + result.traffic;
@@ -102,6 +102,7 @@ travelBudget.getTravelPolicyBudget = function(params) {
  * 获取酒店住宿预算
  *
  * @param {Object} params
+ * @param {UUID} params.accountId 账号ID
  * @param {String} params.cityId    城市ID
  * @param {String} params.businessDistrict 商圈ID
  * @param {String} params.checkInDate 入住时间
@@ -151,6 +152,14 @@ travelBudget.getHotelBudget = function(params) {
             }
             policy = travelPolicy;
             var hotelStar = 3;
+            if (/二星级/g.test(travelPolicy.hotelLevel)) {
+                hotelStar = 2;
+            }
+
+            if (/三星级/g.test(travelPolicy.hotelLevel)) {
+                hotelStar = 3;
+            }
+
             if (/四星级/g.test(travelPolicy.hotelLevel)) {
                 hotelStar = 4;
             }
@@ -194,6 +203,8 @@ travelBudget.getHotelBudget = function(params) {
  */
 travelBudget.getTrafficBudget = function(params) {
     var self = this;
+    var accountId = self.accountId;
+
     if (!params) {
         throw new Error(L.ERR.DATA_FORMAT_ERROR);
     }
@@ -214,49 +225,92 @@ travelBudget.getTrafficBudget = function(params) {
         throw {code: -1, msg: "往返预算,返程日期不能为空"};
     }
 
-    if (params.isRoundTrip) {
-        return Q.all([
-            API.travelbudget.getTrafficBudget({
-                originPlace: params.originPlace,
-                destinationPlace: params.destinationPlace,
-                outboundDate: params.outboundDate,
-                inboundDate: params.inboundDate,
-                outLatestArriveTime: params.outLatestArriveTime
-            }),
-            API.travelbudget.getTrafficBudget({
-                originPlace: params.destinationPlace,
-                destinationPlace: params.originPlace,
-                outboundDate: params.inboundDate,
-                outLatestArriveTime: params.inLatestArriveTime
-            })
-        ])
-            .spread(function(goTraffic, backTraffic) {
-                var result = {
-                    goTraffic: goTraffic.price || 0,
-                    backTraffic: backTraffic.price || 0,
-                    traffic: Number(goTraffic.price) + Number(backTraffic.price) || 0,
-                    price: Number(goTraffic.price) + Number(backTraffic.price) || 0
-                };
-                return result;
-            });
-    } else {
-        return API.travelbudget.getTrafficBudget({
-            originPlace: params.originPlace,
-            destinationPlace: params.destinationPlace,
-            outboundDate: params.outboundDate,
-            inboundDate: params.inboundDate,
-            outLatestArriveTime: params.outLatestArriveTime
+    //查询员工信息
+    return API.staff.getStaff({id: accountId})
+        .then(function(staff) {
+            if (!staff || !staff.travelLevel) {
+                throw L.ERR.TRAVEL_POLICY_NOT_EXIST;
+            }
+            //查询员工差旅标准
+            return API.travelPolicy.getTravelPolicy({id: staff.travelLevel})
         })
-        .then(function(traffic) {
-            var result = {
-                goTraffic: traffic.price || 0,
-                backTraffic: 0,
-                traffic: traffic.price || 0,
-                price: traffic.price || 0
-            };
-            return result;
-        });
-    }
+        .then(function(travelPolicy) {
+            if (!travelPolicy) {
+                throw L.ERR.TRAVEL_POLICY_NOT_EXIST;
+            }
+
+            return travelPolicy;
+        })
+        .then(function(travelPolicy) {
+            var cabinClass = 'Economy';
+
+            if (travelPolicy.planeLevel == '经济舱') {
+                cabinClass = 'Economy';
+            } else if (travelPolicy.planeLevel == '高端经济舱') {
+                cabinClass = 'PremiumEconomy'
+            } else if (travelPolicy.planeLevel == '商务舱') {
+                cabinClass = 'Business';
+            } else if (travelPolicy.planeLevel == '头等舱') {
+                cabinClass = 'First';
+            }
+
+            var trainCabinClass = '二等座,硬卧';
+            if (travelPolicy.trainLevel) {
+                trainCabinClass = travelPolicy.trainLevel;
+                trainCabinClass = trainCabinClass.replace(/\//g, ",");
+            }
+
+            if (params.isRoundTrip) {
+                return Q.all([
+                        API.travelbudget.getTrafficBudget({
+                            originPlace: params.originPlace,
+                            destinationPlace: params.destinationPlace,
+                            outboundDate: params.outboundDate,
+                            inboundDate: params.inboundDate,
+                            outLatestArriveTime: params.outLatestArriveTime,
+                            cabinClass: cabinClass,
+                            trainCabinClass: trainCabinClass
+                        }),
+                        API.travelbudget.getTrafficBudget({
+                            originPlace: params.destinationPlace,
+                            destinationPlace: params.originPlace,
+                            outboundDate: params.inboundDate,
+                            outLatestArriveTime: params.inLatestArriveTime,
+                            cabinClass: cabinClass,
+                            trainCabinClass: trainCabinClass
+                        })
+                    ])
+                    .spread(function(goTraffic, backTraffic) {
+                        var result = {
+                            goTraffic: goTraffic.price || 0,
+                            backTraffic: backTraffic.price || 0,
+                            traffic: Number(goTraffic.price) + Number(backTraffic.price) || 0,
+                            price: Number(goTraffic.price) + Number(backTraffic.price) || 0
+                        };
+                        return result;
+                    });
+            } else {
+                return API.travelbudget.getTrafficBudget({
+                        originPlace: params.originPlace,
+                        destinationPlace: params.destinationPlace,
+                        outboundDate: params.outboundDate,
+                        inboundDate: params.inboundDate,
+                        outLatestArriveTime: params.outLatestArriveTime,
+                        cabinClass: cabinClass,
+                        trainCabinClass: trainCabinClass
+                    })
+                    .then(function(traffic) {
+                        var result = {
+                            goTraffic: traffic.price || 0,
+                            backTraffic: 0,
+                            traffic: traffic.price || 0,
+                            price: traffic.price || 0
+                        };
+                        return result;
+                    });
+            }
+        })
+
 }
 
 module.exports = travelBudget;
