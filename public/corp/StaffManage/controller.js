@@ -80,13 +80,11 @@ var staff = (function(){
                         return Q.all([
                             API.travelPolicy.getAllTravelPolicy({where: {companyId:staff.companyId}}),//获取当前所有的差旅标准名称
                             API.staff.listAndPaginateStaff({companyId:staff.companyId}),//加载所有的员工记录
-                            API.staff.statisticStaffsRole({companyId:staff.companyId}),//统计企业员工（管理员 普通员工 未激活员工）数量
-                            API.staff.getStaffCountByCompany({companyId:staff.companyId})//统计企业员工总数量
+                            API.staff.statisticStaffsRole({companyId:staff.companyId}),//统计企业员工（管理员 普通员工 未激活员工 总数）数量
                         ])
-                            .spread(function(travelPolicies,staffinfo,staffRole, totalCount){
+                            .spread(function(travelPolicies,staffinfo,staffRole){
                                 //获取差旅标准
                                 $scope.companyId = staff.companyId;
-                                $scope.totalCount = totalCount;
                                 var arr = travelPolicies;
                                 var i ;
                                 for(i=0; i<arr.length; i++){
@@ -108,8 +106,10 @@ var staff = (function(){
                                             .spread(function(travelLevel, acc){
                                                 $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
 //                                                $staff.accStatus = acc.status==0?'未激活':(acc.status == -1?'禁用': '已激活');//账户激活状态
-                                                $staff.activeStatus = acc.status;
-                                                $staff.accStatus = acc.status==0?'未激活':'';
+                                                if(acc){
+                                                    $staff.activeStatus = acc.status;
+                                                    $staff.accStatus = acc.status==0?'未激活':'';
+                                                }
                                                 $scope.$apply();
                                             })
                                     });
@@ -117,6 +117,7 @@ var staff = (function(){
                                 $scope.forActive = staffRole.unActiveNum;
                                 $scope.manager = staffRole.adminNum;
                                 $scope.publicStaff = staffRole.commonStaffNum;
+                                $scope.totalCount = staffRole.totalCount;
                                 return Q.all(tasks)
                                     .then(function(){
                                         //console.log(6768);
@@ -244,12 +245,13 @@ var staff = (function(){
         //删除员工的信息
         $scope.delStaffInfo = function(id, index) {
             //console.log(index);
+            console.log(id);
             API.onload(function(){
                 API.staff.deleteStaff({id:id})
                     .then(function(newStaff){
-//                        $scope.staffs.splice(index, 1);
-                        $scope.initstafflist();
+                        $scope.staffs.splice(index, 1);
                         $scope.$apply();
+                        $scope.initstafflist();
                     }).catch(function(err){
                         console.info(err);
                     }).done();
