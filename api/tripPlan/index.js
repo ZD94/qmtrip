@@ -393,7 +393,6 @@ tripPlan.approveInvoice = function(params){
             if(params.remark){
                 updates.auditRemark = params.remark;
             }
-            console.info(updates);
             var logs = {consumeId: params.consumeId, userId: params.userId, status: params.status, remark: "审核票据-"+params.remark};
             return sequelize.transaction(function(t){
                 return Q.all([

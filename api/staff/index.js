@@ -25,7 +25,11 @@ var getColsFromParams = utils.getColsFromParams;
 var checkAndGetParams = utils.checkAndGetParams;
 
 var staff = {};
-
+var STAFF_STATUS = {
+    ON_JOB: 0,
+    QUIT_JOB: -1,
+    DELETE: -2
+};
 
 /**
  * 创建员工
@@ -110,11 +114,9 @@ staff.deleteStaff = function(params){
             if(acc.code != 0){
                 throw acc;
             }
-            return acc;
         })
-        .then(function(acc){
-            console.log("这应该根被进不来吧啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊");
-            return staffModel.update({status: -1, quitTime: utils.now()}, {where: {id: id}, fields: ['status', 'quitTime']})
+        .then(function(){
+            return staffModel.update({status: STAFF_STATUS.DELETE, quitTime: utils.now()}, {where: {id: id}, fields: ['status', 'quitTime']})
         })
         .spread(function(num){
             if(num != 1){
@@ -124,27 +126,6 @@ staff.deleteStaff = function(params){
         })
 }
 
-/*staff.deleteStaff = function(params){
-    var id = params.id;
-    if (!id) {
-        throw {code: -1, msg: "id不能为空"};
-    }
-    return API.auth.remove({accountId: id})
-        .then(function(acc){
-            if(acc.code != 0){
-                throw acc;
-            }
-        })
-        .then(function(){
-            return staffModel.update({status: -1, quitTime: utils.now()}, {where: {id: id}, fields: ['status', 'quitTime']})
-        })
-        .spread(function(num){
-            if(num != 1){
-                throw {code: -2, msg: '删除失败'};
-            }
-            return {code: 0, msg: "删除成功"}
-        })
-}*/
 
 /**
  * 更新员工
@@ -267,7 +248,7 @@ staff.listAndPaginateStaff = function(params){
     if (!options.order) {
         options.order = [["create_at", "desc"]]
     }
-    params.status = {$ne: -1};//只查询在职人员
+    params.status = {$ne: STAFF_STATUS.DELETE};//只查询在职人员
     options.limit = limit;
     options.offset = offset;
     options.where = params;
@@ -668,7 +649,7 @@ staff.statisticStaffs = function(params){
     return Q.all([
         staffModel.count({where: {companyId: companyId, status: {$gte: 0}}}),
         staffModel.count({where: {companyId: companyId, createAt: {$gte: start, $lte: end}}}),
-        staffModel.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: -1 }})
+        staffModel.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: STAFF_STATUS.QUIT_JOB }})
     ])
         .spread(function(all, inNum, outNum){
             var sta = {
@@ -696,7 +677,7 @@ staff.statisticStaffsRole = function(params){
     var commonStaffNum = 0;
     var unActiveNum = 0;
     var totalCount = 0;
-    return staffModel.findAll({where: {companyId: companyId, status: {$ne: -1}}})
+    return staffModel.findAll({where: {companyId: companyId, status: {$ne: STAFF_STATUS.DELETE}}})
         .then(function(staffs){
             if(staffs){
                 totalCount = staffs.length;
@@ -730,7 +711,7 @@ staff.getStaffCountByCompany = function(params){
         throw {code: -1, msg: '企业Id不能为空'};
     }
     var companyId = params.companyId;
-    return staffModel.count({where: {companyId: companyId, status:{$ne: -1}}})
+    return staffModel.count({where: {companyId: companyId, status:{$ne: STAFF_STATUS.DELETE}}})
         .then(function(all){
             return all || 1;
         });
