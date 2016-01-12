@@ -10,6 +10,7 @@ var UsersFirst = (function(){
 	UsersFirst.UserMainController = function($scope){
 		$("title").html("差旅管理首页");
 		$(".left_nav li").removeClass("on").eq(0).addClass("on");
+		$scope.funds={};
 		//企业管理首页信息
 		$scope.initCorpMain = function(){
 			API.onload(function(){
@@ -22,13 +23,13 @@ var UsersFirst = (function(){
 						Q.all([
 							API.company.getCompanyFundsAccount(company_id),
 							API.staff.statisticStaffs({companyId:company_id}),
-							API.travelPolicy.getTravelPolicy({id: travelLevel}),
+							API.travelPolicy.getLatestTravelPolicy({}),
 							API.tripPlan.statPlanOrderMoneyByCompany({startTime:start,endTime:end})
 						])
 							.spread(function(resutlt,num,travel_level,date){
 								$scope.funds = resutlt;
 								$scope.num = num;
-								console.info(resutlt);
+								$scope.month = moment().startOf('Month').format('M');
 								$scope.travelLevel = travel_level;
 								if(date.planMoney>date.expenditure) {
 									$scope.different =  "节省 "+Math.round((date.planMoney-date.expenditure)*100/date.planMoney)+"%";
@@ -156,6 +157,13 @@ var UsersFirst = (function(){
 				};
 		    // 为echarts对象加载数据 
 		    myChart.setOption(option); 
+		}
+		$scope.withoutcharge = function(){
+            $(".ToCharge_box").css({'margin-left':-250,'margin-top':-154});
+			$(".wayToCharge").show();
+		}
+		$scope.closeToCharge = function(){
+			$(".wayToCharge").hide();
 		}
 	}
 
