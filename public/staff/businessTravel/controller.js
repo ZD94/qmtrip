@@ -643,7 +643,9 @@ var businessTravel=(function(){
 
                 API.tripPlan.savePlanOrder(order)
                     .then(function(result){
+                        console.info (result);
                         $scope.createTime = result.createAt;
+                        $scope.orderId = result.id;
                         $(".bottom1").hide();
                         $(".bottom2").show();
                         $('.createtime').html("生成时间："+$filter('date')($scope.createTime,'yyyy-MM-dd'));
@@ -670,13 +672,9 @@ var businessTravel=(function(){
         $scope.cancel = function () {
             window.location.href = "#/businessTravel/Index";
         }
-        //去预订
-        $scope.bookTicket = function () {
-            window.location.href = "http://www.tianxun.com/"
-        }
         //上传票据
         $scope.upLoad = function () {
-            window.location.href = "#/travelPlan/PlanList"
+            window.location.href = "#/travelPlan/PlanDetail?planId="+$scope.orderId;
         }
     }
 
