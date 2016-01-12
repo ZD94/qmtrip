@@ -19,7 +19,7 @@ var travelPlan=(function(){
         //待上传票据列表
         $scope.initPlanList = function () {
             API.onload(function() {
-                API.tripPlan.pageTripPlanOrder({auditStatus:0,page:$scope.page1})
+                API.tripPlan.pageTripPlanOrder({auditStatus:[0,-1],page:$scope.page1})
                     .then(function(result){
                         console.info (result);
                         $scope.total1 = result.total;
