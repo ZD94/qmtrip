@@ -588,8 +588,8 @@ staff.importExcelAction = function(params){
  * @returns {*}
  */
 staff.downloadExcle = function (params){
-    if (!fs.existsSync(config.upload.tmpDir)) {
-        fs.mkdirSync(config.upload.tmpDir);
+    if (!fs.exists(config.upload.tmpDir)) {
+        fs.mkdir(config.upload.tmpDir);
     }
     var data = params.objAttr;
     var nowStr = moment().format('YYYYMMDDHHmm');
