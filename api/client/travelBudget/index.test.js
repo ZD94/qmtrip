@@ -16,22 +16,7 @@ var CITY = {
     ShangHai: "CT_289"
 };
 
-//注册企业
-//创建差旅标准
-//使用差旅标准
-//获取差旅预算
-
 describe("api/client/travelBudget.js", function() {
-
-    //before(function(done) {
-    //    var db = pgp(config.postgres.url);
-    //    //var queries = [];
-    //    //queries.push("INSERT INTO auth.staff() values()");
-    //    //queries.push("INSERT INTO company.company");
-    //    //queries.push("INSERT INTO travelpolicy.travel_policy");
-    //    //queries.push("UPDATE auth.staff SET travel_level=");
-    //    done();
-    //});
     var agencyId = "";
     var agencyUserId = "";
     var companyId = "";
@@ -128,6 +113,7 @@ describe("api/client/travelBudget.js", function() {
     var inboundDate = moment().add("1", "months").add("2", "days").format("YYYY-MM-DD");
 
     it("#getHotelBudget should be ok", function(done) {
+        this.timeout(60 * 1000);
         API.client.travelBudget.getHotelBudget.call({accountId: staffId}, {cityId: "CT_131", checkInDate: outboundDate, checkOutDate: inboundDate}, function(err, result) {
             if (err) {
                 throw err;
@@ -139,7 +125,7 @@ describe("api/client/travelBudget.js", function() {
     })
 
     it("#getTravelPolicyBudget should be ok", function(done) {
-        //this.timeout(5000);
+        this.timeout(60 * 1000);
         API.client.travelBudget.getTravelPolicyBudget.call({accountId: staffId}, {originPlace: "CT_131", destinationPlace: "CT_289",
             outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
             if (err) {
@@ -163,8 +149,7 @@ describe("api/client/travelBudget.js", function() {
     });
 
     it("#getTravelPlicyBudget should be ok with isRoundTrip=true", function(done) {
-
-        //this.timeout(5000);
+        this.timeout(60 * 1000);
         API.client.travelBudget.getTravelPolicyBudget.call({accountId: staffId}, {originPlace: CITY.BeiJing, destinationPlace: CITY.ShangHai,
             outboundDate: outboundDate, inboundDate: inboundDate, isRoundTrip: true}, function(err, result) {
             if (err) {
@@ -188,7 +173,7 @@ describe("api/client/travelBudget.js", function() {
     })
 
     it("#getTravelPolicyBudget should throw error without air information", function(done) {
-        //this.timeout(5000);
+        this.timeout(60 * 1000);
         API.client.travelBudget.getTravelPolicyBudget.call({accountId: staffId}, {originPlace: "abcd", destinationPlace: "CT_289", outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
             if (err) {
                 done();
@@ -200,6 +185,7 @@ describe("api/client/travelBudget.js", function() {
 
 
     it("#getTraiffic should be ok", function(done) {
+        this.timeout(60 * 1000);
         API.client.travelBudget.getTrafficBudget.call({accountId: staffId}, {originPlace: "CT_131", destinationPlace: "CT_289",
             outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
             if (err) {
