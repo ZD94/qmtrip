@@ -369,7 +369,7 @@ tripPlan.approveInvoice = function(params){
             if(consume.status == 1){
                 throw {code: -3, msg: '该票据已审核通过，不能重复审核'};
             }
-            return PlanOrder.findById(consume.orderId, {attributes: ['id', 'expenditure', 'status']})
+            return PlanOrder.findById(consume.orderId, {attributes: ['id', 'expenditure', 'status', 'budget']})
                 .then(function(order){
                     if(!order || order.status == -2){
                         throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST
@@ -393,6 +393,7 @@ tripPlan.approveInvoice = function(params){
             if(params.remark){
                 updates.auditRemark = params.remark;
             }
+            console.info(updates);
             var logs = {consumeId: params.consumeId, userId: params.userId, status: params.status, remark: "审核票据-"+params.remark};
             return sequelize.transaction(function(t){
                 return Q.all([
@@ -412,10 +413,10 @@ tripPlan.approveInvoice = function(params){
                             expenditure: expenditure,
                             updateAt: utils.now()
                         }
-                        return ConsumeDetails.findAll({where: {orderId: ret.orderId, status: {$ne: -2}}, attributes: ['status']})
+                        return ConsumeDetails.findAll({where: {orderId: order.id, status: {$ne: -2}}, attributes: ['id', 'status']})
                             .then(function(list){
                                 for(var i=0; i<list.length; i++){
-                                    if(list[i].status != 1){
+                                    if(list[i].status != 1 && list[i].id != ret[1][0].id){
                                         return false;
                                     }
                                 }
@@ -423,18 +424,20 @@ tripPlan.approveInvoice = function(params){
                             })
                             .then(function(isAllAudit){
                                 if(isAllAudit){
+                                    var score = 0;
+                                    (order.budget - order_updates.expenditure)>0?score=parseInt(order.budget - order_updates.expenditure):score=0;
                                     order_updates.status = 2;
                                     order_updates.auditStatus = 1;
+                                    order_updates.score = score;
                                 }
                                 var fields = getColsFromParams(order_updates);
                                 return PlanOrder.update(order_updates, {where: {id: order.id}, fields: fields, transaction: t})
                             })
-
                     })
             });
         })
         .then(function(){
-            return {code: 0};
+            return true;
         })
 }
 

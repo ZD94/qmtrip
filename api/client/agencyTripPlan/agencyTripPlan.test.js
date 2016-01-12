@@ -176,11 +176,11 @@ describe("api/client/agencyTripPlan.js", function() {
 
     it("#approveInvoice should be ok when audit not pass", function(done) {
         var self = {accountId: agencyUserId};
-        API.client.agencyTripPlan.approveInvoice.call(self, {consumeId: consumeId, status: -1, expenditure: '450', remark: '审核票据测试'}, function(err, ret){
+        API.client.agencyTripPlan.approveInvoice.call(self, {consumeId: consumeId, status: -1, remark: '审核票据测试'}, function(err, ret){
             if (err) {
                 throw err;
             }
-            assert.equal(ret.code, 0);
+            assert.equal(ret, true);
             done();
         })
     });
@@ -191,7 +191,7 @@ describe("api/client/agencyTripPlan.js", function() {
             if (err) {
                 throw err;
             }
-            assert.equal(ret.code, 0);
+            assert.equal(ret, true);
             done();
         })
     });
