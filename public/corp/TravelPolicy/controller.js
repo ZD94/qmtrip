@@ -148,23 +148,53 @@ var TravelPolicy=(function(){
         //修改标准
         $scope.updatePolicyShow = function (id,index) {
             $scope.updateId = id;
-            if (index == 0  || index == 6) {
+            if (index == 0) {
                 $(".update_policy").css({'top':'10px','left':'0px'});
             }
-            else if (index == 1  || index == 7) {
+            else if (index == 1) {
                 $(".update_policy").css({'top':'10px','left':'505px'});
             }
-            else if (index == 2  || index == 8) {
+            else if (index == 2) {
                 $(".update_policy").css({'top':'230px','left':'0px'});
             }
-            else if (index == 3  || index == 9) {
+            else if (index == 3) {
                 $(".update_policy").css({'top':'230px','left':'505px'});
             }
-            else if (index == 4  || index == 10) {
+            else if (index == 4) {
                 $(".update_policy").css({'top':'450px','left':'0px'});
             }
-            else if (index == 5  || index == 11) {
+            else if (index == 5) {
                 $(".update_policy").css({'top':'450px','left':'505px'});
+            }
+            else if (index == 6) {
+                $(".update_policy").css({'top':'670px','left':'0px'});
+            }
+            else if (index == 7) {
+                $(".update_policy").css({'top':'670px','left':'505px'});
+            }
+            else if (index == 8) {
+                $(".update_policy").css({'top':'890px','left':'0px'});
+            }
+            else if (index == 9) {
+                $(".update_policy").css({'top':'890px','left':'505px'});
+            }
+            else if (index == 10) {
+                $(".update_policy").css({'top':'1110px','left':'0px'});
+            }
+            else if (index == 11) {
+                $(".update_policy").css({'top':'1110px','left':'505px'});
+            }
+            else if (index == 12) {
+                $(".update_policy").css({'top':'1330px','left':'0px'});
+            }
+            else if (index == 13) {
+                $(".update_policy").css({'top':'1330px','left':'505px'});
+            }
+            else if (index == 14) {
+                $(".update_policy").css({'top':'1550px','left':'0px'});
+            }
+            else if (index == 15) {
+                $(".update_policy").css({'top':'1550px','left':'505px'});
             }
             var obj = {0:"全价",8:"最高8折",7:"最高7折",6:"最高6折",5:"最高5折",4:"最高4折"};
             var discountTxt = $scope.PolicyList[index].planeDiscount;
