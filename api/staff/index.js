@@ -775,7 +775,17 @@ staff.getInvoiceViewer = function(params){
  * @param params
  */
 staff.statStaffPoints = function(params){
-    //
+    var query = checkAndGetParams(['companyId'], [], params);
+    return Q.all([
+        staffModel.sum('total_points', query),
+        staffModel.sum('balance_points', query)
+    ])
+        .spread(function(all, balance){
+            return {
+                totalPoints: all || 0,
+                balancePoints: balance || 0
+            }
+        })
 }
 
 staff.deleteAllStaffByTest = function(params){

@@ -5,12 +5,11 @@
 "use strict";
 var assert = require("assert");
 var Q = require("q");
-var uuid = require("node-uuid");
 var API = require("common/api");
 
 describe("api/client/tripPlan.js", function() {
 
-    var agencyId = "";
+    //var agencyId = "";
     var agencyUserId = "";
     var companyId = "";
     var staffId = "";
@@ -226,7 +225,6 @@ describe("api/client/tripPlan.js", function() {
                 }
                 assert.equal(ret.page, 1);
                 assert.equal(ret.perPage, 10);
-                console.info(ret.items[0]);
                 //console.info(ret.items[0].toJSON());
                 done();
             })
@@ -335,6 +333,7 @@ describe("api/client/tripPlan.js", function() {
                     done();
                 })
             });
+
         })
 
     })

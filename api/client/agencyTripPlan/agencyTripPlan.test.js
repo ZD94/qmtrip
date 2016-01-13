@@ -5,7 +5,6 @@
 
 var assert = require("assert");
 var Q = require("q");
-var uuid = require("node-uuid");
 var API = require("common/api");
 
 describe("api/client/agencyTripPlan.js", function() {
@@ -40,7 +39,7 @@ describe("api/client/agencyTripPlan.js", function() {
             newInvoice: '票据详情'
         }]
     }
-    var agencyId = "";
+    //var agencyId = "";
     var agencyUserId = "";
     var companyId = "";
     var staffId = "";

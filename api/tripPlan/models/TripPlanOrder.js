@@ -34,6 +34,6 @@ module.exports = function (Db, DataType) {
         tableName : "trip_plan_order",
         timestamps: false,
         schema    : "tripplan"
-    })
+    });
 };
 

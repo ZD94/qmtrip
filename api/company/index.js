@@ -10,8 +10,6 @@ var FundsAccounts = Models.FundsAccounts;
 var MoneyChanges = Models.MoneyChanges;
 var uuid = require("node-uuid");
 var L = require("common/language");
-var Logger = require('common/logger');
-var logger = new Logger("company");
 var utils = require("common/utils");
 var getColsFromParams = utils.getColsFromParams;
 var checkAndGetParams = utils.checkAndGetParams;
@@ -62,6 +60,7 @@ company.checkBlackDomain = function(params) {
     if (!domain) {
         throw {code: -1, msg: "域名不存在或不合法"};
     }
+    domain = domain.toLowerCase();
     return Models.BlackDomain.findOne({where: {domain: domain}})
         .then(function(result) {
             if (result) {

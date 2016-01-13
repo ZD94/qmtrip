@@ -531,10 +531,27 @@ var auth=(function(){
 
     //员工设置密码页
     auth.ResetPwdController = function($scope, $routeParams){
-        //alert(456);
         var accountId = $routeParams.accountId;
         var sign = $routeParams.sign;
         var timestamp = $routeParams.timestamp;
+        $scope.isValid = 'checking';
+
+        API.onload(function() {
+            API.auth.checkResetPwdUrlValid({accountId: accountId, sign: sign, timestamp: timestamp})
+            .then(function(result) {
+                if (!result) {
+                    $scope.isValid = false;
+                } else {
+                    $scope.isValid = true;
+                }
+                $scope.$apply();
+            })
+            .catch(function(err) {
+                console.error(err);
+                $scope.isValid = false;
+                $scope.$apply();
+            })
+        });
 
         $scope.checkStaffPwd = function(){
             //alert(123);

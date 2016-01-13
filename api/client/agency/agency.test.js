@@ -3,7 +3,6 @@
  */
 "use strict";
 var assert = require("assert");
-var uuid = require("node-uuid");
 var API = require("common/api");
 var Q = require('q');
 
@@ -11,9 +10,6 @@ describe("api/client/agency.js", function() {
 
 
     describe("registerAgency", function() {
-
-        var agencyId = "";
-        var agencyUserId = "";
 
         var agency = {
             email: "agency.test@tulingdao.com",

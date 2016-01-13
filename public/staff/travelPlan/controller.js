@@ -47,7 +47,7 @@ var travelPlan=(function(){
                                     }
                                     $(".messagebox_content img").attr("src",ImgSrc);
                                     $(".messagebtns em").html(invoiceType);
-                                    $(".messagebox_fixed").show();
+                                    $("#uploadimg").show();
                                     position();
                                 } else {
                                   alertDemo(response.errMsg);
@@ -68,7 +68,8 @@ var travelPlan=(function(){
                             API.tripPlan.uploadInvoice(invoice)
                                 .then(function(ret){
                                     console.info(ret);
-                                    location.reload();
+                                    $scope.initPlanList();
+                                    $("#uploadimg").hide();
                                 })
                                 .catch(function(err){
                                     console.info(err);
@@ -76,10 +77,10 @@ var travelPlan=(function(){
                         })
                     }
                     function position() {
-                        var boxwidth = $('.messagebox_box').width();
-                        var boxheight = $('.messagebox_box').height();
-                        $(".messagebox_box").css('margin-left',-boxwidth/2);
-                        $(".messagebox_box").css('margin-top',-boxheight/2);
+                        var boxwidth = $('#uploadimg .messagebox_box').width();
+                        var boxheight = $('#uploadimg .messagebox_box').height();
+                        $("#uploadimg .messagebox_box").css('margin-left',-boxwidth/2);
+                        $("#uploadimg .messagebox_box").css('margin-top',-boxheight/2);
                     }
             })
         }
@@ -216,7 +217,7 @@ var travelPlan=(function(){
                                 }
                                 $(".messagebox_content img").attr("src",ImgSrc);
                                 $(".messagebtns em").html(invoiceType);
-                                $(".messagebox_fixed").show();
+                                $("#uploadimg").show();
                                 position();
                             } else {
                               alertDemo(response.errMsg);
@@ -238,7 +239,7 @@ var travelPlan=(function(){
                         API.tripPlan.uploadInvoice(invoice)
                             .then(function(ret){
                                 console.info(ret);
-                                location.reload();
+                                $("#uploadimg").hide();
                             })
                             .catch(function(err){
                                 console.info(err);
@@ -246,10 +247,10 @@ var travelPlan=(function(){
                     })
                 }
                 function position() {
-                    var boxwidth = $('.messagebox_box').width();
-                    var boxheight = $('.messagebox_box').height();
-                    $(".messagebox_box").css('margin-left',-boxwidth/2);
-                    $(".messagebox_box").css('margin-top',-boxheight/2);
+                    var boxwidth = $('#uploadimg .messagebox_box').width();
+                    var boxheight = $('#uploadimg .messagebox_box').height();
+                    $("#uploadimg .messagebox_box").css('margin-left',-boxwidth/2);
+                    $("#uploadimg .messagebox_box").css('margin-top',-boxheight/2);
                 }
         })
         $scope.goDetail = function (status,invoiceId) {

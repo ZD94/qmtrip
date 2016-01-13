@@ -6,7 +6,6 @@
 /**
  * @module API
  */
-var Q = require("q");
 var API = require("common/api");
 var auth = require("../auth");
 /**
