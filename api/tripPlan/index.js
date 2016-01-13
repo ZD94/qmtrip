@@ -228,15 +228,45 @@ tripPlan.listTripPlanOrder = function(options){
  * @returns {*}
  */
 tripPlan.saveConsumeRecord = function(params, options){
-    if(!options){
-        options = {};
-    }
+    var options = {};
     var checkArr = ['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'];
     var fields = getColsFromParams(ConsumeDetails.attributes);
     params.status = 0;
-    params = checkAndGetParams(checkArr, fields, params);
+    var record = checkAndGetParams(checkArr, fields, params);
     options.fields = getColsFromParams(params);
-    return ConsumeDetails.create(params, options);
+
+    return PlanOrder.findById(params.orderId, {attributes: ['id', 'status', 'accountId', 'budget']})
+        .then(function(order){
+            if(!order || order.status == -2){
+                throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
+            }
+            if(order.accountId != params.accountId){
+                L.ERR.PERMISSION_DENY;
+            }
+            if(order.status == -1){
+                throw {code: -3, msg: '该计划单已失效'};
+            }
+            if(order.status > 1){
+                throw {code: -4, msg: '该计划单已审核，不能添加消费记录'};
+            }
+            var budget = params.budget || 0;
+            order.increment(['budget'], { by: parseFloat(budget) });
+            order.status = 0;
+            order.updateAt = utils.now();
+            return [record, order];
+        })
+        .spread(function(record, order){
+            return sequelize.transaction(function(t){
+                options.transaction = t;
+                return Q.all([
+                    ConsumeDetails.create(record, options),
+                    order.save()
+                ])
+            })
+        })
+        .spread(function(r){
+            return r;
+        })
 }
 
 /**
