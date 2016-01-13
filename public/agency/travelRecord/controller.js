@@ -146,15 +146,15 @@ var travelRecord=(function(){
             $(".invoicePass").show();
         }
         $scope.invoicePass = function () {
-            var reg = /[^0-9]/;
+            var moneyReg = /^\d+(.\d{1,2})?$/;
             $scope.expenditure = $(".expenditure").val();
             $('.error').empty();
             if ($scope.expenditure=='') {
                 $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>实际支出不能为空");
                 return false;
             }
-            if (reg.test($scope.expenditure)) {
-                $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>实际支出不能为非数字");
+            if (!moneyReg.test($scope.expenditure)) {
+                $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>实际支出格式不正确");
                 return false;
             }
             API.onload(function() {
