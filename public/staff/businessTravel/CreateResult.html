@@ -6,6 +6,7 @@
                 <td height="50" class="loadtxt" style="border-bottom: 1px #E5E5E5 solid;">
                     今天 {{nowtime | date: 'HH:mm'}}<br>
                     您计划&nbsp;&nbsp;&nbsp;<span ng-if="starttime!=undefined">{{starttime}}&nbsp;&nbsp;&nbsp;{{startplace}}-{{endplace}}&nbsp;&nbsp;&nbsp;</span><span ng-if="starttimelate!=undefined && starttimelate!=''">最晚{{starttime}} {{starttimelate}}到达</span><br>
+                    <span ng-if="endtime!=undefined">　　　&nbsp;&nbsp;&nbsp;<span ng-if="endtime!=undefined">{{endtime}}&nbsp;&nbsp;&nbsp;{{endplace}}-{{startplace}}&nbsp;&nbsp;&nbsp;</span><span ng-if="endtimelate!=undefined && endtimelate!=''">最晚{{endtime}} {{endtimelate}}到达</span></span><br>
                     <span ng-if="liveplace!=undefined">　　　&nbsp;&nbsp;&nbsp;在{{liveplace}}附近酒店入住&nbsp;&nbsp;&nbsp;</span><span ng-if="livetime!=undefined">计划住店时间为{{livetime}}到{{leavetime}}</span>
                 </td>
             </tr>
