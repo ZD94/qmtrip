@@ -32,5 +32,5 @@ module.exports = function (Db, DataType) {
         tableName : "consume_details",
         timestamps: false,
         schema    : "tripplan"
-    })
+    });
 };
