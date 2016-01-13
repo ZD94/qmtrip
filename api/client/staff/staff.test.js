@@ -190,6 +190,68 @@ describe("api/client/staff.js", function() {
             done();
         });
     })
+
+
+    describe("statStaffPointsByCompany", function(){
+        var newOrderId = "";
+        var consumeId = "";
+        before(function (done) {
+            var tripPlanOrder = {
+                startPlace: '北京',
+                destination: '上海',
+                budget: 1000,
+                startAt: '2015-12-30 11:12:12',
+                consumeDetails: [{
+                    startTime: '2016-12-30 11:11:11',
+                    budget: 500,
+                    invoiceType: 2,
+                    type: 0
+                }]
+            }
+
+            API.client.tripPlan.savePlanOrder.call(ownerSelf, tripPlanOrder)
+                .then(function(ret) {
+                    newOrderId = ret.id;
+                    consumeId = ret.hotel[0].id;
+                    return API.tripPlan.uploadInvoice({userId: ownerSelf.accountId, consumeId: consumeId, picture: '测试图片'});
+                })
+                .then(function(ret){
+                    return  API.client.agencyTripPlan.approveInvoice.call({accountId: agencyUserId}, {consumeId: consumeId, status: 1, expenditure: '112', remark: '审核票据测试'})
+                })
+                .then(function(ret){
+                    assert.equal(ret, true);
+                    done();
+                })
+                .catch(function(err){
+                    throw err;
+                })
+                .done();
+        });
+
+        after(function (done) {
+            API.tripPlan.deleteTripPlanOrder({orderId: newOrderId, userId: ownerSelf.accountId})
+                .then(function(ret) {
+                    assert.equal(ret, true);
+                    done();
+                })
+                .catch(function(err){
+                    throw err;
+                })
+                .done();
+        });
+
+        it("#statStaffPointsByCompany should be ok", function(done) {
+            API.client.staff.statStaffPointsByCompany.call(ownerSelf, function(err, ret) {
+                if(err){
+                    throw err;
+                }
+                done();
+            });
+        })
+    })
+
+
+
     //导入员工
     //describe("API.staff.importExcel", function() {
     //    it("API.staff.importExcel", function(done) {
