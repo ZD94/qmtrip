@@ -99,6 +99,11 @@ var travelRecord=(function(){
                         $scope.backTraffic = $scope.planDetail.backTraffic[0];
                         $scope.hotel = $scope.planDetail.hotel[0];
                         $scope.outTraffic = $scope.planDetail.outTraffic[0];
+                        API.staff.getStaffByAgency({id:$scope.planDetail.accountId})
+                            .then(function(result){
+                                $scope.travelerName = result.name;
+                                $scope.$apply();
+                            })
                         console.info (result);
                         $scope.$apply();
                     })
