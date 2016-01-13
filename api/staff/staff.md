@@ -238,3 +238,15 @@
 | adminNum   |管理员人数|integer
 | commonStaffNum |普通员工数|integer
 | unActiveNum  |未激活人数|integer
+
+>. 统计企业员工积分（总积分和可用积分）数量 API.staff.statStaffPointsByCompany();
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 参数             | json             |-------
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| totalPoints   |企业员工总共获得的积分|integer
+| balancePoints |企业员工当前可用积分|integer
