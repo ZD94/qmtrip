@@ -8,19 +8,25 @@
     </div>
 </div>
 <div class="auth_content">
-    <div class="title">
-        设置密码
+    <div ng-if="isValid== 'checking'">系统验证中...</div>
+    <div ng-if="!isValid">链接已经失效</div>
+
+    <div ng-if="isValid === true">
+        <div class="title">
+            设置密码
+        </div>
+        <div class="input">
+            <!--<span class="tip_err"><i class="web-icon-font"></i>{{err_msg_tip}}</span>-->
+            <input id="firstPwd" class="" type="password" value="" placeholder="设置新密码"/>
+            <!--<span class="err_msg"><i class="web-icon-font"></i>{{err_msg_mail}}</span>-->
+        </div>
+        <div class="input">
+            <input id="secondPwd" class="" type="password" value="" placeholder="再次输入新密码"/>
+            <!--<span class="err_msg"><i class="web-icon-font"></i>{{err_msg_pwd}}</span>-->
+        </div>
+        <a id="" class="register" ng-click="checkStaffPwd()">确定</a>
     </div>
-    <div class="input">
-        <!--<span class="tip_err"><i class="web-icon-font"></i>{{err_msg_tip}}</span>-->
-        <input id="firstPwd" class="" type="password" value="" placeholder="设置新密码"/>
-        <!--<span class="err_msg"><i class="web-icon-font"></i>{{err_msg_mail}}</span>-->
-    </div>
-    <div class="input">
-        <input id="secondPwd" class="" type="password" value="" placeholder="再次输入新密码"/>
-        <!--<span class="err_msg"><i class="web-icon-font"></i>{{err_msg_pwd}}</span>-->
-    </div>
-    <a id="" class="register" ng-click="checkStaffPwd()">确定</a>
+
 </div>
 <script>
     $(function(){

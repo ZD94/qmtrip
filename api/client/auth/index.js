@@ -239,6 +239,20 @@ auth.checkAgencyPermission = function(permissions, fn) {
 };
 
 /**
+ * @method checkResetPwdUrlValid
+ *
+ * 检查充值密码链接是否有效
+ *
+ * @param {Object} params
+ * @param {String} params.sign 签名
+ * @param {String} params.timestamp 时间戳
+ * @param {String} params.accountId 账户ID
+ * @return {Promise}
+ */
+auth.checkResetPwdUrlValid = API.auth.checkResetPwdUrlValid;
+
+
+/**
  * @method sendResetPwdEmail
  *
  * 发送重置密码邮件
