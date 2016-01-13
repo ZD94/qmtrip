@@ -87,7 +87,7 @@ var travelRecord=(function(){
      * @param $scope
      * @constructor
      */
-    travelRecord.TravelDetailController = function($scope, $routeParams) {
+    travelRecord.TravelDetailController = function($scope, $routeParams, $location, $anchorScroll) {
         loading(true);
         $("title").html("出差单明细");
         var orderId = $routeParams.orderId;
@@ -105,7 +105,24 @@ var travelRecord=(function(){
             })
         }
         $scope.initTravelDetail();
+        $scope.outTraffichref = function () {
+            loading(true);
+            $location.hash('outTraffic');
+            $anchorScroll();
 
+        }
+        $scope.hotelhref = function () {
+            loading(true);
+            $location.hash('hotel');
+            $anchorScroll();
+
+        }
+        $scope.backTraffichref = function () {
+            loading(true);
+            $location.hash('backTraffic');
+            $anchorScroll();
+
+        }
 
 
         //审核通过
