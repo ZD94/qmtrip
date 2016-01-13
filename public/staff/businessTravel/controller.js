@@ -121,7 +121,7 @@ var businessTravel=(function(){
                 endtimelate = $scope.end_timelate,//返回最晚到达时间
                 parameter = $("form").serialize();//表单所有数据传参
             var dateReg = /^\d{4}-\d{2}-\d{2}$/;
-            var timeReg = /^\d{2}:\d{2}$/;
+            var timeReg = /^\d{1,2}:\d{2}$/;
             if (startplace == "") {
                 Myalert("温馨提示","请选择出发城市");
                 return false;
