@@ -347,8 +347,8 @@ authServer.login = function(data) {
     }
 
     var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
-
-    return Models.Account.findOne({where: {email: data.email, type: type}})
+    var email = data.email.toLowerCase();
+    return Models.Account.findOne({where: {email: email, type: type}})
         .then(function (loginAccount) {
             var pwd = md5(data.pwd);
             if (!loginAccount) {
