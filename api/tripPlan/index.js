@@ -196,6 +196,7 @@ tripPlan.listTripPlanOrder = function(options){
     if(!query.status && query.status != 0){
         query.status = {$ne: -2};
     }
+    options.raw = true;
     return PlanOrder.findAndCount(options)
         .then(function(ret){
             if(!ret || ret.rows .length === 0){
@@ -205,9 +206,9 @@ tripPlan.listTripPlanOrder = function(options){
             return Q.all(orders.map(function(order){
                 var orderId = order.id;
                 return Q.all([
-                    ConsumeDetails.findAll({where: {orderId: orderId, type: -1, status: {$ne: -2}}}),
-                    ConsumeDetails.findAll({where: {orderId: orderId, type: 0, status: {$ne: -2}}}),
-                    ConsumeDetails.findAll({where: {orderId: orderId, type: 1, status: {$ne: -2}}})
+                    ConsumeDetails.findAll({raw: true, where: {orderId: orderId, type: -1, status: {$ne: -2}}}),
+                    ConsumeDetails.findAll({raw: true, where: {orderId: orderId, type: 0, status: {$ne: -2}}}),
+                    ConsumeDetails.findAll({raw: true, where: {orderId: orderId, type: 1, status: {$ne: -2}}})
                 ])
                     .spread(function(outTraffic, hotel, backTraffic){
                         order.outTraffic = outTraffic;

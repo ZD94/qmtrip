@@ -753,6 +753,14 @@ staff.getInvoiceViewer = function(params){
         });
 }
 
+/**
+ *
+ * @param params
+ */
+staff.statStaffPoints = function(params){
+    //
+}
+
 staff.deleteAllStaffByTest = function(params){
     var companyId = params.companyId;
     var mobile = params.mobile;
