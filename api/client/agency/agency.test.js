@@ -50,8 +50,8 @@ describe("api/client/agency.js", function() {
                     throw err;
                 }
                 assert.equal(ret.agency.status, 0);
-                agencyId = ret.agency.id;
-                agencyUserId = ret.agencyUser.id;
+                var agencyId = ret.agency.id;
+                var agencyUserId = ret.agencyUser.id;
                 done();
             });
         });
