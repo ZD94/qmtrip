@@ -18,6 +18,11 @@ var checkAndGetParams = utils.checkAndGetParams;
 
 var company = {};
 
+company.companyCols = Object.keys(Company.attributes);
+
+company.fundsAccountCols = Object.keys(FundsAccounts.attributes);
+
+
 /**
  * 创建企业
  * @param {Object} params
@@ -88,8 +93,7 @@ company.updateCompany = function(params){
             var companyId = params.companyId;
             delete params.companyId;
             params.updateAt = utils.now();
-            var cols = getColsFromParams(params);
-            return Company.update(params, {returning: true, where: {id: companyId}, fields: cols})
+            return Company.update(params, {returning: true, where: {id: companyId}, fields: Object.keys(params)})
         })
         .spread(function(rownum, rows){
             if(!rownum || rownum == "NaN"){
@@ -252,9 +256,8 @@ company.moneyChange = function(params){
             }
 
             return sequelize.transaction(function(t){
-                var cols = getColsFromParams(fundsUpdates);
                 return Q.all([
-                    FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: cols, transaction: t, raw: false}),
+                    FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: Object.keys(fundsUpdates), transaction: t, raw: false}),
                     MoneyChanges.create(moneyChange, {transaction: t})
                 ])
                 .spread(function(update, create){

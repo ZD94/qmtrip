@@ -14,7 +14,6 @@ var uuid = require("node-uuid");
 var L = require("common/language");
 var Logger = require('common/logger');
 var utils = require('common/utils');
-var getColsFromParams = utils.getColsFromParams;
 var checkAndGetParams = utils.checkAndGetParams;
 var API = require('common/api');
 var Paginate = require("common/paginate").Paginate;
@@ -22,14 +21,20 @@ var logger = new Logger("company");
 
 var tripPlan = {}
 
+tripPlan.PlanOrderCols = Object.keys(PlanOrder.attributes);
+
+tripPlan.ConsumeDetailsCols = Object.keys(ConsumeDetails.attributes);
+
 /**
  * 保存预算单/差旅计划单
  * @param params
  * @returns {*}
- */tripPlan.savePlanOrder = function(params){
+ */
+tripPlan.savePlanOrder = function(params){
     if(!params.consumeDetails){
         throw {code: -1, msg: '预算详情 consumeDetails 不能为空'};
     }
+    var ConsumeDetailsCols = this.ConsumeDetailsCols;
     var checkArr = ['accountId', 'companyId', 'type', 'destination', 'budget'];
     var getArr = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark', 'description'];
     var _planOrder = checkAndGetParams(checkArr, getArr, params);
@@ -59,7 +64,7 @@ var tripPlan = {}
                             s.orderId = order.id;
                             s.accountId = order.accountId;
                             s.status = 0;
-                            s = checkAndGetParams(['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'], getColsFromParams(ConsumeDetails.attributes), s);
+                            s = checkAndGetParams(['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'], ConsumeDetailsCols, s);
                             return ConsumeDetails.create(s, {transaction: t})
                                 .then(function(ret){
                                     return ret.toJSON();
@@ -106,20 +111,19 @@ tripPlan.getTripPlanOrder = function(params){
         params.columns.push('status');
         options.attributes = params.columns;
     }
-    options.raw = true;
     return Q.all([
         PlanOrder.findById(orderId, options),
-        ConsumeDetails.findAll({raw:true, where: {orderId: orderId, type: -1, status: {$ne: -2}}}),
-        ConsumeDetails.findAll({raw:true, where: {orderId: orderId, type: 1, status: {$ne: -2}}}),
-        ConsumeDetails.findAll({raw:true, where: {orderId: orderId, type: 0, status: {$ne: -2}}})
+        ConsumeDetails.findAll({where: {orderId: orderId, type: -1, status: {$ne: -2}}}),
+        ConsumeDetails.findAll({where: {orderId: orderId, type: 1, status: {$ne: -2}}}),
+        ConsumeDetails.findAll({where: {orderId: orderId, type: 0, status: {$ne: -2}}})
     ])
         .spread(function(order, outTraffic, backTraffic, hotel){
             if(!order || order.status == -2){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
             }
-            order.outTraffic = outTraffic;
-            order.backTraffic = backTraffic;
-            order.hotel = hotel;
+            order.setDataValue("outTraffic", outTraffic);
+            order.setDataValue("backTraffic", backTraffic);
+            order.setDataValue("hotel", hotel);
             return order;
         })
 }
@@ -150,10 +154,9 @@ tripPlan.updateTripPlanOrder = function(params){
                 remark: optLog,
                 createAt: utils.now
             }
-            var cols = getColsFromParams(updates);
             return sequelize.transaction(function(t){
                 return Q.all([
-                        PlanOrder.update(updates, {returning: true, where: {id: orderId}, fields: cols, transaction: t}),
+                        PlanOrder.update(updates, {returning: true, where: {id: orderId}, fields: Object.keys(updates), transaction: t}),
                         TripOrderLogs.create(logs, {transaction: t})
                     ]);
             })
@@ -179,8 +182,7 @@ tripPlan.updateConsumeDetail = function(params){
             if(!record || record.status == -2){
                 throw {code: -2, msg: '记录不存在'};
             }
-            var cols = getColsFromParams(updates);
-            return ConsumeDetails.update(updates, {returning: true, where: {id: params.id}, fields: cols});
+            return ConsumeDetails.update(updates, {returning: true, where: {id: params.id}, fields: Object.keys(updates)});
         })
 }
 
@@ -197,7 +199,7 @@ tripPlan.listTripPlanOrder = function(options){
     if(!query.status && query.status != 0){
         query.status = {$ne: -2};
     }
-    options.raw = true;
+    options.order = [['create_at', 'desc']]; //默认排序，创建时间
     return PlanOrder.findAndCount(options)
         .then(function(ret){
             if(!ret || ret.rows .length === 0){
@@ -207,14 +209,14 @@ tripPlan.listTripPlanOrder = function(options){
             return Q.all(orders.map(function(order){
                 var orderId = order.id;
                 return Q.all([
-                    ConsumeDetails.findAll({raw: true, where: {orderId: orderId, type: -1, status: {$ne: -2}}}),
-                    ConsumeDetails.findAll({raw: true, where: {orderId: orderId, type: 0, status: {$ne: -2}}}),
-                    ConsumeDetails.findAll({raw: true, where: {orderId: orderId, type: 1, status: {$ne: -2}}})
+                    ConsumeDetails.findAll({where: {orderId: orderId, type: -1, status: {$ne: -2}}}),
+                    ConsumeDetails.findAll({where: {orderId: orderId, type: 0, status: {$ne: -2}}}),
+                    ConsumeDetails.findAll({where: {orderId: orderId, type: 1, status: {$ne: -2}}})
                 ])
                     .spread(function(outTraffic, hotel, backTraffic){
-                        order.outTraffic = outTraffic;
-                        order.backTraffic = backTraffic;
-                        order.hotel = hotel;
+                        order.setDataValue("outTraffic", outTraffic);
+                        order.setDataValue("backTraffic", backTraffic);
+                        order.setDataValue("hotel", hotel);
                         return order;
                     })
             }))
@@ -229,13 +231,12 @@ tripPlan.listTripPlanOrder = function(options){
  * @param params
  * @returns {*}
  */
-tripPlan.saveConsumeRecord = function(params, options){
+tripPlan.saveConsumeRecord = function(params){
     var options = {};
     var checkArr = ['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'];
-    var fields = getColsFromParams(ConsumeDetails.attributes);
     params.status = 0;
-    var record = checkAndGetParams(checkArr, fields, params);
-    options.fields = getColsFromParams(params);
+    var record = checkAndGetParams(checkArr, this.ConsumeDetailsCols, params);
+    options.fields = Object.keys(params);
 
     return PlanOrder.findById(params.orderId, {attributes: ['id', 'status', 'accountId', 'budget']})
         .then(function(order){
@@ -465,8 +466,7 @@ tripPlan.approveInvoice = function(params){
                                     order_updates.auditStatus = 1;
                                     order_updates.score = score;
                                 }
-                                var fields = getColsFromParams(order_updates);
-                                return PlanOrder.update(order_updates, {where: {id: order.id}, fields: fields, transaction: t})
+                                return PlanOrder.update(order_updates, {where: {id: order.id}, fields: Object.keys(order_updates), transaction: t})
                             })
                     })
             });

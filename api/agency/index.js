@@ -12,7 +12,6 @@ var L = require("common/language");
 var Logger = require('common/logger');
 var logger = new Logger("agency");
 var utils = require("common/utils");
-var getColsFromParams = utils.getColsFromParams;
 var checkAndGetParams = utils.checkAndGetParams;
 var API = require("common/api");
 var Paginate = require("common/paginate").Paginate;
@@ -20,6 +19,9 @@ var md5 = require("common/utils").md5;
 
 var agency = {};
 
+agency.agencyCols = Object.keys(Agency.attributes);
+
+agency.agencyUserCols = Object.keys(AgencyUser.attributes);
 
 /**
  * 注册代理商，生成代理商id
@@ -93,8 +95,7 @@ agency.updateAgency = function(_agency){
                 throw L.ERR.PERMISSION_DENY;
             }
             _agency.updateAt = utils.now();
-            var cols = getColsFromParams(_agency);
-            return Agency.update(_agency, {returning: true, where: {id: agencyId}, fields: cols})
+            return Agency.update(_agency, {returning: true, where: {id: agencyId}, fields: Object.keys(_agency)})
         })
         .spread(function(rows, agencies){
             if(!rows || rows == "NaN"){
@@ -185,8 +186,7 @@ agency.deleteAgency = function(params){
  * @returns {*}
  */
 agency.createAgencyUser = function(data){
-    var fields = getColsFromParams(AgencyUser.attributes);
-    var _agencyUser = checkAndGetParams(['email', 'mobile', 'agencyId', 'name'], fields, data);
+    var _agencyUser = checkAndGetParams(['email', 'mobile', 'agencyId', 'name'], this.agencyUserCols, data);
     _agencyUser.id = data.accountId || uuid.v1();
     var accData = {email: _agencyUser.email, mobile: _agencyUser.mobile, pwd: "123456", type: 2};//初始密码暂定123456
     return API.auth.newAccount(accData)

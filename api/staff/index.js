@@ -21,7 +21,6 @@ var logger = new Logger("staff");
 var validate = require("common/validate");
 //var auth = require("../auth/index");
 //var travelPolicy = require("../travelPolicy/index");
-var getColsFromParams = utils.getColsFromParams;
 var checkAndGetParams = utils.checkAndGetParams;
 
 var staff = {};
@@ -30,6 +29,8 @@ var STAFF_STATUS = {
     QUIT_JOB: -1,
     DELETE: -2
 };
+
+staff.staffCols = Object.keys(staffModel.attributes);
 
 /**
  * 创建员工
@@ -87,17 +88,6 @@ staff.createStaff = function(data){
         });
 }
 
-/**
- * 创建企业拥有者(员工)
- * @param params
- */
-staff.createCompanyOwner = function(params){
-    var checkFields = ['mobile', 'email', 'companyId', 'name'];
-    var fields = getColsFromParams(staffModel.attributes, checkFields);
-    var _staff = checkAndGetParams(checkFields, fields, params);
-    _staff.id = _staff.id || uuid.v1();
-    return staffModel.create(_staff);
-}
 
 /**
  * 删除员工
@@ -212,7 +202,10 @@ staff.findOneStaff = function(params){
  */
 staff.findStaffs = function(params){
     var options = {};
-    options.where = params;
+    options.where = checkAndGetParams([], this.staffCols, params);
+    if(params.columns){
+        options.attributes = params.columns;
+    }
     return staffModel.findAll(options);
 }
 

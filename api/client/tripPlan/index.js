@@ -31,11 +31,10 @@ tripPlan.savePlanOrder = function (params) {
             params.companyId = staff.companyId;
             return Q.all([
                 API.tripPlan.savePlanOrder(params),
-                API.company.getCompany({companyId: staff.companyId, columns: ['email']})
+                API.staff.findStaffs({companyId: staff.companyId, columns: ['name','email']})
             ])
-            return API.tripPlan.savePlanOrder(params);
         })
-        .spread(function(_order, c){
+        .spread(function(_order, staffs){
             order = _order;
             var go = '无', back = '无', hotel = '无';
             if(order.outTraffic.length > 0){
@@ -50,11 +49,14 @@ tripPlan.savePlanOrder = function (params) {
                 var h = order.hotel[0];
                 hotel = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTiem).format('YYYY-MM-DD') + ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
             }
-            return API.mail.sendMailRequest({
-                toEmails: c.email, //'miao.yu@tulingdao.com',
-                templateName: 'qm_notify_new_travelbudget',
-                titleValues: [staffName],
-                values: [staffName, email, moment(order.createAt).format('YYYY-MM-DD HH:mm:ss'), order.description, go, back, hotel, '￥'+order.budget, 'http://www.baidu.com']
+            //http://qm.tulingdao.com:4002/staff.html#/travelPlan/PlanDetail?planId=b4408b90-b80e-11e5-8f1d-1f65c7617c6c
+            return staffs.map(function(s){
+                return API.mail.sendMailRequest({
+                    toEmails: s.email, //'miao.yu@tulingdao.com',
+                    templateName: 'qm_notify_new_travelbudget',
+                    titleValues: [staffName],
+                    values: [s.name, staffName, email, moment(order.createAt).format('YYYY-MM-DD HH:mm:ss'), order.description, go, back, hotel, '￥'+order.budget, 'http://www.baidu.com']
+                })
             })
         })
         .then(function(){

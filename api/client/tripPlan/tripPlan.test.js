@@ -335,6 +335,33 @@ describe("api/client/tripPlan.js", function() {
                 })
             });
 
+            ///**
+            // * test
+            // */
+            //it("#testListTripPlanOrder should be ok", function (done) {
+            //    var self = {accountId: staffId};
+            //    var options = {
+            //        where: {companyId: "89b7e930-b9c7-11e5-a66c-dd520db5b907"},
+            //        limit: 20,
+            //        offset: 0
+            //    }
+            //    API.tripPlan.listTripPlanOrder(options, function (err, ret) {
+            //        if (err) {
+            //            throw err;
+            //        }
+            //        //console.info(ret.items);
+            //
+            //        var moment = require('moment');
+            //        console.info("************************");
+            //        for(var i=0;i<ret.items.length;i++){
+            //            var s = ret.items[i];
+            //            console.info(moment(s.createAt).format('YYYY-MM-DD HH:mm:ss'));
+            //        }
+            //        done();
+            //    })
+            //});
+
+
         })
 
     })
