@@ -59,7 +59,7 @@ var tripPlan = {}
                             s.orderId = order.id;
                             s.accountId = order.accountId;
                             s.status = 0;
-                            s = checkAndGetParams(['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'], ConsumeDetails.attributes, s);
+                            s = checkAndGetParams(['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'], getColsFromParams(ConsumeDetails.attributes), s);
                             return ConsumeDetails.create(s, {transaction: t})
                                 .then(function(ret){
                                     return ret.toJSON();

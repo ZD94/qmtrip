@@ -327,7 +327,6 @@ describe("api/client/tripPlan.js", function() {
                         throw err;
                     }
                     assert(ret != null);
-                    console.info(ret);
                     assert(ret.qmBudget >= 0);
                     assert(ret.planMoney >= 0);
                     assert(ret.expenditure >= 0);
