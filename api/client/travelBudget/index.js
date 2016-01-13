@@ -301,8 +301,8 @@ travelBudget.getTrafficBudget = function(params) {
                     })
                     .then(function(traffic) {
                         var result = {
-                            goTraffic: traffic.price || -1,
-                            backTraffic: -1,
+                            goTraffic: traffic,
+                            backTraffic: {},
                             traffic: traffic.price || -1,
                             price: traffic.price || -1
                         };
