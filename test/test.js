@@ -7,7 +7,7 @@ process.env.NODE_PATH = '.:'+process.env.NODE_PATH;
 
 require('app-module-path').addPath(path.normalize(path.join(__dirname, '..')));
 
-Promise = require('bluebird');
+global.Promise = require('bluebird');
 Promise.config({ longStackTraces: true });
 Promise.promisifyAll(require('fs'));
 
