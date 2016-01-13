@@ -475,8 +475,8 @@ var businessTravel=(function(){
                         $(".creating").hide();
                         $(".createresult,.tianxun").show();
                         $scope.totalprice = ret2.price;
-                        $scope.goTraffic = $scope.onlytraffic.goTraffic;
-                        $scope.backTraffic = $scope.onlytraffic.backTraffic;
+                        $scope.goTraffic = ret2.goTraffic.price;
+                        $scope.backTraffic = ret2.backTraffic.price;
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -559,8 +559,8 @@ var businessTravel=(function(){
                         $scope.totalprice = ret2.price;
                         $scope.trafficprice = $scope.trafficlive.traffic;
                         $scope.liveprice = $scope.trafficlive.hotel;
-                        $scope.goTraffic = $scope.trafficlive.goTraffic;
-                        $scope.backTraffic = $scope.trafficlive.backTraffic;
+                        $scope.goTraffic = ret2.goTraffic.price;
+                        $scope.backTraffic = ret2.backTraffic.price;
                         $scope.$apply();
                     })
                     .catch(function(err){
