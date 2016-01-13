@@ -17,7 +17,10 @@ var Logger = require('common/logger');
 Logger.init({
     path: path.join(__dirname, "../log"),
     prefix: "mocha_",
-    console: false
+    console: false,
+    mods: {
+        sequelize: { console: false }
+    }
 });
 var logger = new Logger('test');
 
