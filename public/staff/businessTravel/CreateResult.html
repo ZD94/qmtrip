@@ -38,8 +38,8 @@
                         <div class="endplace">{{endplace}}</div>
                     </td>
                     <td height="90" style="font-size: 14px;" align="center">
-                        <span ng-if="liv==0">¥{{onlytraffic.goTraffic}}</span>
-                        <span ng-if="liv==1">¥{{trafficlive.goTraffic}}</span>
+                        <span ng-if="liv==0">¥{{onlytraffic.goTraffic.price}}</span>
+                        <span ng-if="liv==1">¥{{trafficlive.goTraffic.price}}</span>
                     </td>
                 </tr>
                 <tr ng-if="tra==1 && endtime">
@@ -50,8 +50,8 @@
                         <div class="endplace">{{startplace}}</div>
                     </td>
                     <td height="90" style="font-size: 14px;" align="center">
-                        <span ng-if="liv==0">¥{{onlytraffic.backTraffic}}</span>
-                        <span ng-if="liv==1">¥{{trafficlive.backTraffic}}</span>
+                        <span ng-if="liv==0">¥{{onlytraffic.backTraffic.price}}</span>
+                        <span ng-if="liv==1">¥{{trafficlive.backTraffic.price}}</span>
                     </td>
                 </tr>
                 <tr ng-if="liv==1">
