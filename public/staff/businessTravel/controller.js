@@ -577,7 +577,7 @@ var businessTravel=(function(){
                 var order = {
                     companyId:$scope.companyId,
                     type:1,
-                    remark:$scope.purposename,
+                    description:$scope.purposename,
                     startPlace:$scope.startplace,
                     destination:$scope.endplace,
                     startAt:$scope.starttime,
@@ -627,8 +627,8 @@ var businessTravel=(function(){
                 if($scope.endtime){
                     var consumeDetails_backTraffic = {
                         type:1,
-                        startPlace:$scope.startplace,
-                        arrivalPlace:$scope.endplace,
+                        startPlace:$scope.endplace,
+                        arrivalPlace:$scope.startplace,
                         startTime:$scope.starttime,
                         endTime:$scope.endtime,
                         budget:$scope.backTraffic,
