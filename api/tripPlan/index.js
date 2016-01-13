@@ -264,7 +264,7 @@ tripPlan.deleteTripPlanOrder = function(params){
             })
         })
         .then(function(){
-            return {code: 0, msg: '删除成功'};
+            return true;
         })
 }
 
@@ -288,7 +288,7 @@ tripPlan.deleteConsumeDetail = function(params){
             return ConsumeDetails.update({status: -2, updateAt: utils.now()}, {where: {id: id}, fields: ['status', 'updateAt']})
         })
         .then(function(){
-            return {code: 0, msg: '删除成功'}
+            return true;
         })
 }
 
@@ -332,7 +332,7 @@ tripPlan.uploadInvoice = function(params){
             return PlanOrder.update({status: 1, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'updateAt'], returning: true})
         })
         .then(function(){
-            return {code: 0, msg: '上传成功'};
+            return true;
         })
 }
 

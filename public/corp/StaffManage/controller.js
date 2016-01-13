@@ -245,7 +245,6 @@ var staff = (function(){
         //删除员工的信息
         $scope.delStaffInfo = function(id, index) {
             //console.log(index);
-            console.log(id);
             API.onload(function(){
                 API.staff.deleteStaff({id:id})
                     .then(function(newStaff){
@@ -331,9 +330,8 @@ var staff = (function(){
                             objAttr = $scope.downloadValidData;
                         }
                         API.staff.downloadExcle({accountId:staffid.id,objAttr:objAttr})
-                            .then(function(invalidData){
-                                console.info(invalidData);
-                                var filename = invalidData.fileName;
+                            .then(function(filename){
+                                console.info(filename);
                                 window.open('/download/excle-file/'+filename, "_blank");
                                 $scope.$apply();
                             }).catch(function(err){

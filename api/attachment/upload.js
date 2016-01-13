@@ -21,7 +21,7 @@ function uploadActionFile(req, res, next) {
     form.maxFieldsSize = config.upload.maxSize;
     form.keepExtensions = true;
     var filePath = '';//file.tmpFile.path
-    if (!fs.existsSync(config.upload.tmpDir)) {
+    if (!fs.exists(config.upload.tmpDir)) {
         fs.mkdirSync(config.upload.tmpDir);
     }
     form.parse(req, function (err, fields, file) {
@@ -38,7 +38,7 @@ function uploadActionFile(req, res, next) {
         if (type && type == 'xls' && ('.xls.xlsx').indexOf(fileExt.toLowerCase()) === -1) {//导入excle
             fs.exists(filePath, function (exists) {
                 if(exists){
-                    fs.unlinkSync(filePath);
+                    fs.unlink(filePath);
                 }
             });
             res.send('{"ret":-1, "errMsg":"仅允许上传“xls,xlsx”格式文件"}');
@@ -66,7 +66,7 @@ function uploadActionFile(req, res, next) {
                                         .then(function(result){
                                             fs.exists(filePath, function (exists) {
                                                 if(exists){
-                                                    fs.unlinkSync(filePath);
+                                                    fs.unlink(filePath);
                                                     console.log("删除临时文件");
                                                 }
                                             });
@@ -82,7 +82,7 @@ function uploadActionFile(req, res, next) {
                                 .then(function(result){
                                     fs.exists(filePath, function (exists) {
                                         if(exists){
-                                            fs.unlinkSync(filePath);
+                                            fs.unlink(filePath);
                                             console.log("删除临时文件");
                                         }
                                     });
@@ -121,6 +121,9 @@ function getImg(req, res, next) {
 function downloadExcle(req, res, next){
     var fileName = req.params.fileName;
     var filePath = config.upload.tmpDir+"/" + fileName;
+    if(fileName.indexOf('template') != -1){
+        filePath = config.template.file+"/" + fileName;
+    }
     fs.exists(filePath, function (exists) {
         if(!exists){
             res.send("文件不存在");
@@ -133,15 +136,16 @@ function downloadExcle(req, res, next){
         });
         res.write(data);
         res.end();
-        fs.exists(filePath, function (exists) {
-            if(exists){
-                fs.unlinkSync(filePath);
-                console.log("删除临时文件");
-            }
-        });
+        if(fileName.indexOf('template') == -1){
+            fs.exists(filePath, function (exists) {
+                if(exists){
+                    fs.unlink(filePath);
+                    console.log("删除临时文件");
+                }
+            });
+        }
     })
 }
-
 module.exports = function(app){
     app.post('/upload/ajax-upload-file', uploadActionFile);
     app.get('/upload/get-img-file/:md5key', getImg);

@@ -166,7 +166,7 @@ company.deleteCompany = function(params){
             })
         })
         .then(function(){
-            return {code: 0, msg: '删除成功'};
+            return true;
         });
 }
 
@@ -289,7 +289,7 @@ company.deleteCompanyByTest = function(params){
             return Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
         })
         .then(function(){
-            return {code: 0}
+            return true;
         })
 }
 

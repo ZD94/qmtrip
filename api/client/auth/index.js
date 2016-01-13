@@ -60,7 +60,7 @@ auth.login = API.auth.login;
  * @param {String} data.mobile 要绑定的手机号
  * @param {String} data.code 手机验证码
  * @param {String} data.pwd 登录密码
- * @return {Promise} {code: 0, msg: "ok};
+ * @return {Promise} true||error;
  */
 auth.bindMobile =API.auth.bindMobile;
 
@@ -72,7 +72,7 @@ auth.bindMobile =API.auth.bindMobile;
  *
  * @param {Object} params
  * @param {String} params.domain 域名
- * @return {Promise} {code: 0}, {code: -1, msg: "域名已占用或者不合法"}
+ * @return {Promise} true||error
  */
 auth.checkBlackDomain = API.company.checkBlackDomain;
 
@@ -162,7 +162,7 @@ auth.registryCompany = function(params) {
         .then(function(account) {
             return API.company.createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain,
                 mobile:mobile, email: email})
-            .then(function(c){
+            .then(function(){
                     return API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
                         mobile: mobile, name: name, roleId: 0})
                 })
@@ -179,7 +179,7 @@ auth.registryCompany = function(params) {
  *
  * @param {Object} params
  * @param {String} params.email 邮件账号
- * @return {Promise} {code: 0, msg: "OK"}
+ * @return {Promise} true||error
  */
 auth.sendActiveEmail = function(params) {
     return API.auth.sendActiveEmail(params);
@@ -190,7 +190,7 @@ auth.sendActiveEmail = function(params) {
  *
  * 退出登录
  *
- * @return {Promise} {code: 0}, {code: -1}
+ * @return {Promise} true||error
  */
 auth.logout = function() {
     var self = this;

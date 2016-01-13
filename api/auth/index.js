@@ -207,12 +207,12 @@ authServer.active = function(data) {
             return account.save()
         })
         .then(function(account) {
-            return {code: 0, msg: "ok", data: {
+            return {
                 id: account.id,
                 mobile: account.mobile,
                 email: account.email,
                 status: account.status
-            }}
+            };
         });
 };
 
@@ -235,7 +235,7 @@ authServer.remove = function(data) {
     }
     return Models.Account.destroy({where: where})
         .then(function() {
-            return {code: 0, msg: "ok"};
+            return true;
         });
 }
 
@@ -396,15 +396,15 @@ authServer.authentication = function(params) {
     return Models.Token.findOne({where: {id: tokenId, accountId: userId}})
         .then(function(m) {
             if (!m) {
-                return {code: -1, msg: "已经失效"};
+                return false;
             }
 
             var sign = getTokenSign(userId, tokenId, m.token, timestamp);
-            if (sign == tokenSign) {
-                return {code: 0, msg: "ok"};
+            if (sign != tokenSign) {
+                return false;
             }
 
-            return {code: -1, msg: "已经失效"};
+            return true;
         });
 };
 
@@ -418,10 +418,10 @@ authServer.authentication = function(params) {
  * @param {String} data.mobile 要绑定的手机号
  * @param {String} data.code 手机验证码
  * @param {String} data.pwd 登录密码
- * @return {Promise} {code: 0, msg: "ok};
+ * @return {Promise} true||error;
  */
 authServer.bindMobile = function(data) {
-    return Promise.resolve({code: 0, msg: "ok"});
+    throw L.ERR.NOT_IMPLEMENTED;
 };
 
 /**
@@ -555,7 +555,7 @@ function _sendActiveEmail(accountId) {
             var url = C.host + "/staff.html#/auth/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
             //发送激活邮件
             return API.mail.sendMailRequest({toEmails: account.email, templateName: "qm_active_email", values: [account.email, url]})
-                .then(function(result) {
+                .then(function() {
                     account.activeToken = activeToken;
                     return Models.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
                 })
@@ -569,7 +569,7 @@ function _sendActiveEmail(accountId) {
  *
  * @param {Object} params
  * @param {String} params.email 要发送的邮件
- * @return {Promise} {code: 0, msg: "OK", submit: "ID"}
+ * @return {Promise} true||error
  */
 authServer.sendActiveEmail = function(params) {
     var email = params.email;
@@ -589,7 +589,7 @@ authServer.sendActiveEmail = function(params) {
             return _sendActiveEmail(account.id);
         })
         .then(function() {
-            return {code: 0, msg: "ok"};
+            return true;
         });
 }
 
@@ -606,10 +606,10 @@ authServer.logout = function (params) {
     if (accountId && tokenId) {
         return Models.Token.destroy({where: {accountId: accountId, id: tokenId}})
             .then(function() {
-                return {code: 0, msg: "OK"};
+                return true;
             })
     }
-    return Q({code: 0, msg: "ok"});
+    return Q(true);
 };
 
 

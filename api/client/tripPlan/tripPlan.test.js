@@ -40,9 +40,6 @@ describe("api/client/tripPlan.js", function() {
             API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})
         ])
             .spread(function(ret1, ret2, ret3){
-                assert.equal(ret1.code, 0);
-                assert.equal(ret2.code, 0);
-                assert.equal(ret3.code, 0);
                 return API.agency.registerAgency(agency);
             })
             .then(function(ret){
@@ -50,9 +47,9 @@ describe("api/client/tripPlan.js", function() {
                 agencyUserId = ret.agencyUser.id;
                 return API.client.company.createCompany.call({accountId: agencyUserId}, company);
             })
-            .then(function(ret){
-                companyId = ret.company.id;
-                staffId = ret.company.createUser;
+            .then(function(company){
+                companyId = company.id;
+                staffId = company.createUser;
                 done();
             })
             .catch(function(err){
@@ -70,9 +67,6 @@ describe("api/client/tripPlan.js", function() {
             API.staff.deleteAllStaffByTest({email: company.email})
         ])
             .spread(function(ret1, ret2, ret3){
-                assert.equal(ret1.code, 0);
-                assert.equal(ret2.code, 0);
-                assert.equal(ret3.code, 0);
                 done()
             })
             .catch(function(err){
@@ -87,7 +81,6 @@ describe("api/client/tripPlan.js", function() {
                 if(err){
                     throw err;
                 }
-                assert.equal(ret.code, 0);
                 done();
             })
         })
@@ -153,7 +146,6 @@ describe("api/client/tripPlan.js", function() {
                 if (err) {
                     throw err;
                 }
-                assert.equal(ret.code, 0);
                 done();
             })
         });
@@ -189,7 +181,6 @@ describe("api/client/tripPlan.js", function() {
                 if (err) {
                     throw err;
                 }
-                assert.equal(ret.code, 0);
                 done();
             })
         })
@@ -304,15 +295,14 @@ describe("api/client/tripPlan.js", function() {
                         assert.equal(ret1.type, 0);
                         assert.equal(ret2.type, 1);
                         consumeId = ret2.id;
-                        return API.tripPlan.uploadInvoice({userId: staffId, consumeId: ret1.id, picture: '测试图片'})
-                            .then(function(t){
-                                assert.equal(t.code, 0);
-                                return  API.client.agencyTripPlan.approveInvoice.call({accountId: agencyUserId}, {consumeId: ret1.id, status: 1, expenditure: '521', remark: '审核票据测试'})
-                                    .then(function(r){
-                                        assert.equal(r, true);
-                                        done()
-                                    })
-                            })
+                        return [ret1.id, API.tripPlan.uploadInvoice({userId: staffId, consumeId: ret1.id, picture: '测试图片'})];
+                    })
+                    .spread(function(consumeId){
+                        return  API.client.agencyTripPlan.approveInvoice.call({accountId: agencyUserId}, {consumeId: consumeId, status: 1, expenditure: '521', remark: '审核票据测试'})
+                    })
+                    .then(function(r){
+                        assert.equal(r, true);
+                        done()
                     })
                     .catch(function(err){
                         throw err;
@@ -326,7 +316,6 @@ describe("api/client/tripPlan.js", function() {
                     if (err) {
                         throw err;
                     }
-                    assert.equal(ret.code, 0);
                     done();
                 })
             });
