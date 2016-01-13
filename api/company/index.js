@@ -62,6 +62,7 @@ company.checkBlackDomain = function(params) {
     if (!domain) {
         throw {code: -1, msg: "域名不存在或不合法"};
     }
+    domain = domain.toLowerCase();
     return Models.BlackDomain.findOne({where: {domain: domain}})
         .then(function(result) {
             if (result) {

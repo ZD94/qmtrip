@@ -87,7 +87,7 @@ var travelRecord=(function(){
      * @param $scope
      * @constructor
      */
-    travelRecord.TravelDetailController = function($scope, $routeParams) {
+    travelRecord.TravelDetailController = function($scope, $routeParams, $location, $anchorScroll) {
         loading(true);
         $("title").html("出差单明细");
         var orderId = $routeParams.orderId;
@@ -99,13 +99,35 @@ var travelRecord=(function(){
                         $scope.backTraffic = $scope.planDetail.backTraffic[0];
                         $scope.hotel = $scope.planDetail.hotel[0];
                         $scope.outTraffic = $scope.planDetail.outTraffic[0];
+                        API.staff.getStaffByAgency({id:$scope.planDetail.accountId})
+                            .then(function(result){
+                                $scope.travelerName = result.name;
+                                $scope.$apply();
+                            })
                         console.info (result);
                         $scope.$apply();
                     })
             })
         }
         $scope.initTravelDetail();
+        $scope.outTraffichref = function () {
+            loading(true);
+            $location.hash('outTraffic');
+            $anchorScroll();
 
+        }
+        $scope.hotelhref = function () {
+            loading(true);
+            $location.hash('hotel');
+            $anchorScroll();
+
+        }
+        $scope.backTraffichref = function () {
+            loading(true);
+            $location.hash('backTraffic');
+            $anchorScroll();
+
+        }
 
 
         //审核通过
@@ -124,15 +146,15 @@ var travelRecord=(function(){
             $(".invoicePass").show();
         }
         $scope.invoicePass = function () {
-            var reg = /[^0-9]/;
+            var moneyReg = /^\d+(.\d{1,2})?$/;
             $scope.expenditure = $(".expenditure").val();
             $('.error').empty();
             if ($scope.expenditure=='') {
                 $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>实际支出不能为空");
                 return false;
             }
-            if (reg.test($scope.expenditure)) {
-                $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>实际支出不能为非数字");
+            if (!moneyReg.test($scope.expenditure)) {
+                $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>实际支出格式不正确");
                 return false;
             }
             API.onload(function() {
