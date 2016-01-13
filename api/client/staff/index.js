@@ -398,4 +398,8 @@ staff.statisticStaffsRole = function(params){
         });
 }
 
+staff.statScore = function(params){
+    //
+}
+
 module.exports = staff;

@@ -124,7 +124,7 @@ authServer.sendResetPwdEmail = function(params) {
             } else {
                 templateName = 'qm_reset_pwd_email';
             }
-            return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: [timeStr, url]});
+            return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: [account.email, timeStr, url]});
         })
         .then(function() {
             return true;

@@ -588,9 +588,13 @@ staff.importExcelAction = function(params){
  * @returns {*}
  */
 staff.downloadExcle = function (params){
-    if (!fs.exists(config.upload.tmpDir)) {
+    fs.exists(config.upload.tmpDir, function (exists) {
+        if(!exists)
+            fs.mkdir(config.upload.tmpDir);
+    });
+    /*if (!fs.exists(config.upload.tmpDir)) {
         fs.mkdir(config.upload.tmpDir);
-    }
+    }*/
     var data = params.objAttr;
     var nowStr = moment().format('YYYYMMDDHHmm');
     if(!data){
@@ -751,6 +755,14 @@ staff.getInvoiceViewer = function(params){
                 return viewerId;
             }
         });
+}
+
+/**
+ *
+ * @param params
+ */
+staff.statStaffPoints = function(params){
+    //
 }
 
 staff.deleteAllStaffByTest = function(params){

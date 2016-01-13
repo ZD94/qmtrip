@@ -226,6 +226,8 @@ describe("api/client/tripPlan.js", function() {
                 }
                 assert.equal(ret.page, 1);
                 assert.equal(ret.perPage, 10);
+                console.info(ret.items[0]);
+                //console.info(ret.items[0].toJSON());
                 done();
             })
         });
