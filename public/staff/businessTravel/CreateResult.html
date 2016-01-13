@@ -31,9 +31,7 @@
                 </tr>
                 <tr ng-if="tra==1">
                     <td height="90" style="font-size: 14px;">
-                        <div class="icon">
-                            <span>行</span>
-                        </div>
+                        <div class="icon web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
                         <div class="startplace">{{startplace}}</div>
                         <div class="description">{{starttime}}<span ng-if="starttimelate!=undefined && starttimelate!=''">&nbsp;&nbsp;&nbsp;最晚{{starttime}}&nbsp;{{starttimelate}}到达</span></div>
                         <div class="endplace">{{endplace}}</div>
@@ -45,9 +43,7 @@
                 </tr>
                 <tr ng-if="tra==1 && endtime">
                     <td height="90" style="font-size: 14px;">
-                        <div class="icon">
-                            <span>行</span>
-                        </div>
+                        <div class="icon  web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
                         <div class="startplace">{{endplace}}</div>
                         <div class="description">{{endtime}}<span ng-if="endtimelate!=undefined && endtimelate!=''">&nbsp;&nbsp;&nbsp;最晚{{endtime}}&nbsp;{{endtimelate}}到达</span></div>
                         <div class="endplace">{{startplace}}</div>
@@ -59,9 +55,7 @@
                 </tr>
                 <tr ng-if="liv==1">
                     <td height="90" style="font-size: 14px;">
-                        <div class="icon">
-                            <span>住</span>
-                        </div>
+                        <div class="icon  web-icon-font3" style="color: #5248C8;">&#xe914;</div>
                         <div style="line-height: 35px; padding: 10px 0; float: left;">入住地：{{endplace}}&nbsp;{{liveplace}}附近<br>入住日期：{{livetime}}&nbsp;&nbsp;&nbsp;退房日期：{{leavetime}}</div>
                     </td>
                     <td height="90" style="font-size: 14px;" align="center">

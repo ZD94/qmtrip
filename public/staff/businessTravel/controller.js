@@ -121,7 +121,7 @@ var businessTravel=(function(){
                 endtimelate = $scope.end_timelate,//返回最晚到达时间
                 parameter = $("form").serialize();//表单所有数据传参
             var dateReg = /^\d{4}-\d{2}-\d{2}$/;
-            var timeReg = /^\d{2}:\d{2}$/;
+            var timeReg = /^\d{1,2}:\d{2}$/;
             if (startplace == "") {
                 Myalert("温馨提示","请选择出发城市");
                 return false;
@@ -475,8 +475,8 @@ var businessTravel=(function(){
                         $(".creating").hide();
                         $(".createresult,.tianxun").show();
                         $scope.totalprice = ret2.price;
-                        $scope.goTraffic = $scope.onlytraffic.goTraffic;
-                        $scope.backTraffic = $scope.onlytraffic.backTraffic;
+                        $scope.goTraffic = ret2.goTraffic.price;
+                        $scope.backTraffic = ret2.backTraffic.price;
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -559,8 +559,8 @@ var businessTravel=(function(){
                         $scope.totalprice = ret2.price;
                         $scope.trafficprice = $scope.trafficlive.traffic;
                         $scope.liveprice = $scope.trafficlive.hotel;
-                        $scope.goTraffic = $scope.trafficlive.goTraffic;
-                        $scope.backTraffic = $scope.trafficlive.backTraffic;
+                        $scope.goTraffic = ret2.goTraffic.price;
+                        $scope.backTraffic = ret2.backTraffic.price;
                         $scope.$apply();
                     })
                     .catch(function(err){

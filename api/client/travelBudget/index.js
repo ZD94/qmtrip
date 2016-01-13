@@ -267,7 +267,7 @@ travelBudget.getTrafficBudget = function(params) {
                             destinationPlace: params.destinationPlace,
                             outboundDate: params.outboundDate,
                             inboundDate: params.inboundDate,
-                            outLatestArriveTime: params.outLatestArriveTime,
+                            latestArriveTime: params.outLatestArriveTime,
                             cabinClass: cabinClass,
                             trainCabinClass: trainCabinClass
                         }),
@@ -275,17 +275,17 @@ travelBudget.getTrafficBudget = function(params) {
                             originPlace: params.destinationPlace,
                             destinationPlace: params.originPlace,
                             outboundDate: params.inboundDate,
-                            outLatestArriveTime: params.inLatestArriveTime,
+                            latestArriveTime: params.inLatestArriveTime,
                             cabinClass: cabinClass,
                             trainCabinClass: trainCabinClass
                         })
                     ])
                     .spread(function(goTraffic, backTraffic) {
                         var result = {
-                            goTraffic: goTraffic.price || 0,
-                            backTraffic: backTraffic.price || 0,
-                            traffic: Number(goTraffic.price) + Number(backTraffic.price) || 0,
-                            price: Number(goTraffic.price) + Number(backTraffic.price) || 0
+                            goTraffic: goTraffic,
+                            backTraffic: backTraffic,
+                            traffic: Number(goTraffic.price) + Number(backTraffic.price) || -1,
+                            price: Number(goTraffic.price) + Number(backTraffic.price) || -1
                         };
                         return result;
                     });
@@ -295,16 +295,16 @@ travelBudget.getTrafficBudget = function(params) {
                         destinationPlace: params.destinationPlace,
                         outboundDate: params.outboundDate,
                         inboundDate: params.inboundDate,
-                        outLatestArriveTime: params.outLatestArriveTime,
+                        latestArriveTime: params.outLatestArriveTime,
                         cabinClass: cabinClass,
                         trainCabinClass: trainCabinClass
                     })
                     .then(function(traffic) {
                         var result = {
-                            goTraffic: traffic.price || 0,
-                            backTraffic: 0,
-                            traffic: traffic.price || 0,
-                            price: traffic.price || 0
+                            goTraffic: traffic.price || -1,
+                            backTraffic: -1,
+                            traffic: traffic.price || -1,
+                            price: traffic.price || -1
                         };
                         return result;
                     });
