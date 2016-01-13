@@ -520,7 +520,7 @@ authServer.updateAccount = function(id, data){
         });
 }
 
-authServer.updataAccounct = authServer.updateAccount;
+authServer.updataAccount = authServer.updateAccount;
 
 /**
  * 根据条件查询一条账户信息
