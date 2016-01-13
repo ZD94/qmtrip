@@ -267,7 +267,7 @@ travelBudget.getTrafficBudget = function(params) {
                             destinationPlace: params.destinationPlace,
                             outboundDate: params.outboundDate,
                             inboundDate: params.inboundDate,
-                            outLatestArriveTime: params.outLatestArriveTime,
+                            latestArriveTime: params.outLatestArriveTime,
                             cabinClass: cabinClass,
                             trainCabinClass: trainCabinClass
                         }),
@@ -275,7 +275,7 @@ travelBudget.getTrafficBudget = function(params) {
                             originPlace: params.destinationPlace,
                             destinationPlace: params.originPlace,
                             outboundDate: params.inboundDate,
-                            outLatestArriveTime: params.inLatestArriveTime,
+                            latestArriveTime: params.inLatestArriveTime,
                             cabinClass: cabinClass,
                             trainCabinClass: trainCabinClass
                         })
@@ -295,7 +295,7 @@ travelBudget.getTrafficBudget = function(params) {
                         destinationPlace: params.destinationPlace,
                         outboundDate: params.outboundDate,
                         inboundDate: params.inboundDate,
-                        outLatestArriveTime: params.outLatestArriveTime,
+                        latestArriveTime: params.outLatestArriveTime,
                         cabinClass: cabinClass,
                         trainCabinClass: trainCabinClass
                     })
