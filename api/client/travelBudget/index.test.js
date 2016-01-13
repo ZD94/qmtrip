@@ -188,4 +188,15 @@ describe.skip("api/client/travelBudget.js", function() {
             done();
         })
     })
+
+    it("#getTraiffic goTraffic should be object", function(done) {
+        this.timeout(60 * 1000);
+        API.client.travelBudget.getTrafficBudget.call({accountId: staffId}, {originPlace: "CT_131", destinationPlace: "CT_289",
+            outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
+            assert.equal(err, null);
+            assert.equal(result.price ? true: false, true);
+            assert.equal(typeof result.goTraffic == 'object', true);
+            done();
+        })
+    })
 });
