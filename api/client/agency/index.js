@@ -8,11 +8,9 @@
 
 var Q = require("q");
 var API = require('common/api');
-var Logger = require('common/logger');
 var utils = require("common/utils");
-var getColsFromParams = utils.getColsFromParams;
+var L = require("common/language");
 var checkAndGetParams = utils.checkAndGetParams;
-var logger = new Logger();
 
 /**
  * @class agency 代理商

@@ -29,6 +29,11 @@ var STAFF_STATUS = {
     QUIT_JOB: -1,
     DELETE: -2
 };
+var AGENCY_ROLE = {
+    OWNER: 0,
+    COMMON: 1,
+    ADMIN: 2
+};
 
 staff.staffCols = Object.keys(staffModel.attributes);
 
@@ -739,8 +744,16 @@ staff.getInvoiceViewer = function(params){
             if(obj && obj.companyId){
                 return API.company.getCompany({companyId: obj.companyId})
                     .then(function(company){
+                        return company;
+                    })
+                    .then(function(company){
                         if(company && company.agencyId){
-                            viewerId.push(company.agencyId);
+                            return API.agency.getAgencyUsersId({agencyId: company.agencyId, roleId: [AGENCY_ROLE.OWNER, AGENCY_ROLE.ADMIN]})
+                                .then(function(ids){
+                                    for(var i=0;i<ids.length;i++){
+                                        viewerId.push(ids[i]);
+                                    }
+                                })
                         }
                         return viewerId;
                     })

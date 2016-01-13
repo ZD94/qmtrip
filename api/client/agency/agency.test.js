@@ -3,7 +3,6 @@
  */
 "use strict";
 var assert = require("assert");
-var uuid = require("node-uuid");
 var API = require("common/api");
 var Q = require('q');
 
@@ -11,9 +10,6 @@ describe("api/client/agency.js", function() {
 
 
     describe("registerAgency", function() {
-
-        var agencyId = "";
-        var agencyUserId = "";
 
         var agency = {
             email: "agency.test@tulingdao.com",
@@ -54,8 +50,8 @@ describe("api/client/agency.js", function() {
                     throw err;
                 }
                 assert.equal(ret.agency.status, 0);
-                agencyId = ret.agency.id;
-                agencyUserId = ret.agencyUser.id;
+                var agencyId = ret.agency.id;
+                var agencyUserId = ret.agencyUser.id;
                 done();
             });
         });

@@ -47,11 +47,13 @@ var TravelPolicy=(function(){
                             $(".create_policy").show();
                         }
                         $(window).scroll(function() {
-                            if ($(window).scrollTop()>20) {
-                                $(".policy_title").addClass('policy_titlefixed');
+                            console.info ($(window).scrollTop());
+                            if ($(window).scrollTop()<=64) {
+                                $(".policy_title").removeClass('policy_titlefixed');
+
                             }
                             else {
-                                $(".policy_title").removeClass('policy_titlefixed');
+                                $(".policy_title").addClass('policy_titlefixed');
                             }
                         });
                         loading(true);

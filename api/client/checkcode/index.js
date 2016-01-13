@@ -7,7 +7,6 @@
  */
 
 var API = require("common/api");
-var Q = require("q");
 /**
  * @class checkcode 验证码
  * @type {{__public: boolean, getMsgCheckCode: module.exports.getMsgCheckCode, getPicCheckCode: module.exports.getPicCheckCode}}
@@ -127,6 +126,6 @@ var checkcode = {
     isMatchMsgCheckCode: function(params) {
         return API.checkcode.isMatchMsgCheckCode(params);
     }
-}
+};
 
 module.exports = checkcode;

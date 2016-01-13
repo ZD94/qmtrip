@@ -36,24 +36,37 @@ gulplib.dist(function(){
         'package.json',
         'server.js'
     ];
-    for(var i=0; i<copy.length; i++){
-        var fname = copy[i];
+    copy.forEach(function(fname){
         dist_all.push(gulp.src(fname).pipe(gulp.dest('dist')));
-    }
+    });
     copy = [
         'config',
         'public'
     ];
-    for(var i=0; i<copy.length; i++){
-        var fname = copy[i];
+    copy.forEach(function(fname){
         dist_all.push(gulp.src(fname+'/**/*').pipe(gulp.dest('dist/'+fname)));
-    }
+    });
     return dist_all;
 });
 
 gulplib.final('qmtrip');
 
+var path = require('path');
 var eslint = require('gulp-eslint');
+function eslintformater(results, config){
+    var rules = config ? (config.rules || {}) : {};
+    results.forEach(function (res) {
+        var file = path.resolve(res.filePath);
+        res.messages.forEach(function (msg) {
+            var msgtype = 'WARN';
+            if(msg.fatal || rules[msg.ruleId] === 2)
+                msgtype = 'ERROR'
+            var message = msg.message ? msg.message : '<undefined message>';
+            console.error("%s: %s [%s]", msgtype, message, msg.ruleId);
+            console.error('    at (%s:%d:%d)', file, msg.line, msg.column);
+        });
+    });
+}
 gulp.task('eslint.server', function () {
     var files = [
         '**/*.js',
@@ -62,15 +75,18 @@ gulp.task('eslint.server', function () {
         '!common/client/**',
         '!**/*.test.js',
         '!test/**',
+        '!doc/**',
         '!common/test/**'
     ];
     var options = {
         "extends": "eslint:recommended",
         "rules": {
-            "indent": [1, 4],
+            "indent": [0, 4],
             "quotes": [0, "single"],
             "linebreak-style": [2, "unix"],
-            "semi": [2, "always"]
+            "semi": [0, "always"],
+            "no-console": 0,
+            "no-unused-vars": [2, { "args": "none" }]
         },
         "env": {
             "es6": true,
@@ -80,7 +96,7 @@ gulp.task('eslint.server', function () {
     };
     return gulp.src(files)
         .pipe(eslint(options))
-        .pipe(eslint.format())
+        .pipe(eslint.format(eslintformater))
         .pipe(eslint.failAfterError());
 });
 gulp.task('eslint.mocha', function () {
@@ -95,7 +111,8 @@ gulp.task('eslint.mocha', function () {
             "indent": [1, 4],
             "quotes": [0, "single"],
             "linebreak-style": [2, "unix"],
-            "semi": [2, "always"]
+            "semi": [2, "always"],
+            "no-unused-vars": [2, { "args": "none" }]
         },
         "env": {
             "es6": true,
@@ -110,7 +127,7 @@ gulp.task('eslint.mocha', function () {
     };
     return gulp.src(files)
         .pipe(eslint(options))
-        .pipe(eslint.format())
+        .pipe(eslint.format(eslintformater))
         .pipe(eslint.failAfterError());
 });
 gulp.task('eslint.browser', function () {
@@ -123,7 +140,8 @@ gulp.task('eslint.browser', function () {
             "indent": [1, 4],
             "quotes": [0, "single"],
             "linebreak-style": [2, "unix"],
-            "semi": [2, "always"]
+            "semi": [2, "always"],
+            "no-unused-vars": [2, { "args": "none" }]
         },
         "env": {
             "es6": false,
@@ -136,7 +154,7 @@ gulp.task('eslint.browser', function () {
     };
     return gulp.src(files)
         .pipe(eslint(options))
-        .pipe(eslint.format())
+        .pipe(eslint.format(eslintformater))
         .pipe(eslint.failAfterError());
 });
 gulp.task('eslint', ['eslint.server', 'eslint.mocha', 'eslint.browser']);

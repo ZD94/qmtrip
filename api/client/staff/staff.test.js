@@ -10,7 +10,7 @@ describe("api/client/staff.js", function() {
     var id = "";
     var companyId = "";
     var accountId = "";
-    var agencyId = "";
+    //var agencyId = "";
     var agencyUserId = "";
     var ownerSelf = {};
     var agencySelf = {};

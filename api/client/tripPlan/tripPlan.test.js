@@ -5,12 +5,11 @@
 "use strict";
 var assert = require("assert");
 var Q = require("q");
-var uuid = require("node-uuid");
 var API = require("common/api");
 
 describe("api/client/tripPlan.js", function() {
 
-    var agencyId = "";
+    //var agencyId = "";
     var agencyUserId = "";
     var companyId = "";
     var staffId = "";

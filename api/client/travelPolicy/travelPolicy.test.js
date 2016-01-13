@@ -9,7 +9,7 @@ var Q = require("q");
 describe("api/client/travelPolicy.js", function() {
 
     var id = "";
-    var agencyId = "";
+    //var agencyId = "";
     var agencyUserId = "";
     var self = {};
     var companyId = "";

@@ -7,12 +7,12 @@
                 <table width="100%">
                     <tr>
                         <td width="220" height="40" align="left">生成时间：{{planDetail.createAt | date: 'yyyy-MM-dd HH:mm'}}</td>
-                        <td height="40" align="center">您于
+                        <td height="40" align="center">{{travelerName}}于
                             <span ng-if="planDetail.startAt">{{planDetail.startAt | date: 'yyyy月MM月dd日'}}</span>
                             <span ng-if="!planDetail.startAt">{{planDetail.hotel[0].startTime | date: 'yyyy月MM月dd日'}}</span>
                             的出差状况
                         </td>
-                        <td width="220" height="40" align="right">{{planDetail.remark}}</td>
+                        <td width="220" height="40" align="right">{{planDetail.description}}</td>
                     </tr>
                 </table>
             </div>
@@ -68,7 +68,7 @@
                             <p ng-if="outTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
                             <p ng-if="outTraffic.status==0" style="color: #DE492A;">【待审核】</p>
                             <p ng-if="outTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
-                            <p><a>去程交通票据</a></p>
+                            <p><a ng-click="outTraffichref()">去程交通票据</a></p>
                         </td>
                     </tr>
                     <tr ng-if="planDetail.hotel.length!=0">
@@ -88,7 +88,7 @@
                             <p ng-if="hotel.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
                             <p ng-if="hotel.status==0" style="color: #DE492A;">【待审核】</p>
                             <p ng-if="hotel.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
-                            <p><a>酒店发票</a></p>
+                            <p><a ng-click="hotelhref()">酒店发票</a></p>
                         </td>
                     </tr>
                     <tr ng-if="planDetail.backTraffic.length!=0">
@@ -107,12 +107,13 @@
                             <p ng-if="backTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
                             <p ng-if="backTraffic.status==0" style="color: #DE492A;">【待审核】</p>
                             <p ng-if="backTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
-                            <p><a>回程交通票据</a></p>
+                            <p><a ng-click="backTraffichref()">回程交通票据</a></p>
                         </td>
                     </tr>
                 </table>
             </div>
         </div>
+        <a id="outTraffic"></a>
         <dl class="invoice" ng-if="outTraffic.newInvoice">
             <dt>去程交通发票
                 <span ng-if="outTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</span>
@@ -139,6 +140,7 @@
                 </table>
             </dd>
         </dl>
+        <a id="hotel"></a>
         <dl class="invoice" ng-if="hotel.newInvoice">
             <dt>酒店发票
                 <span ng-if="hotel.status=='-1'" style="color: #9B9B9B;">【审核未通过】</span>
@@ -165,6 +167,7 @@
                 </table>
             </dd>
         </dl>
+        <a id="backTraffic"></a>
         <dl class="invoice" ng-if="backTraffic.newInvoice">
             <dt>回程交通发票
                 <span ng-if="backTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</span>
@@ -206,7 +209,7 @@
             <div style="height: 30px; line-height: 30px;">录入票据实际支出：</div>
             <div><input type="text" class="expenditure common_text" style="width: 336px;"></div>
             <div style="margin-top: 20px;">
-                <input type="button" value="发送" ng-click="invoicePass()" class="common_btn1" style="width: 60px; margin-left: 100px;">
+                <input type="button" value="确认" ng-click="invoicePass()" class="common_btn1" style="width: 60px; margin-left: 100px;">
                 <input type="button" value="取消" ng-click="invoiceColse()" class="common_btn2" style="width: 60px; margin-left: 20px;">
             </div>
 
@@ -233,7 +236,7 @@
             <div style="height: 30px; line-height: 30px;">请填写理由：</div>
             <div><input type="text" class="remark common_text" style="width: 336px;"></div>
             <div style="margin-top: 20px;">
-                <input type="button" value="发送" ng-click="invoiceNoPass()" class="common_btn1" style="width: 60px; margin-left: 100px;">
+                <input type="button" value="确认" ng-click="invoiceNoPass()" class="common_btn1" style="width: 60px; margin-left: 100px;">
                 <input type="button" value="取消" ng-click="invoiceColse()" class="common_btn2" style="width: 60px; margin-left: 20px;">
             </div>
 

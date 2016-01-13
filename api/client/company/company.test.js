@@ -4,10 +4,9 @@
 var assert = require("assert");
 var API = require("common/api");
 var Q = require("q");
-var uuid = require("node-uuid");
 
 describe("api/client/company.js", function() {
-    var agencyId = "";
+    //var agencyId = "";
     var companyId = "";
     var ownerUserId = "";
     var agencyUserId = "";

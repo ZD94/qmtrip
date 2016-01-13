@@ -79,6 +79,52 @@ authServer.activeByEmail = function(data) {
 }
 
 /**
+ * @method checkResetPwdUrlValid
+ *
+ * 检查充值密码链接是否有效
+ *
+ * @param {Object} params
+ * @param {String} params.sign 签名
+ * @param {String} params.timestamp 时间戳
+ * @param {String} params.accountId 账户ID
+ * @return {Promise}
+ */
+authServer.checkResetPwdUrlValid = function(params) {
+    var accountId = params.accountId;
+    var sign = params.sign;
+    var timestamp = params.timestamp;
+
+    return Q()
+    .then(function() {
+        if (!accountId) {
+            throw L.ERR.ACCOUNT_NOT_EXIST;
+        }
+
+        if (!sign) {
+            throw L.ERR.SIGN_ERROR;
+        }
+
+        if (!timestamp || timestamp < Date.now()) {
+            throw L.ERR.TIMESTAMP_TIMEOUT;
+        }
+
+        return Models.Account.findById(accountId)
+        .then(function(account) {
+            if (!account) {
+                throw L.ERR.ACCOUNT_NOT_EXIST;
+            }
+
+            var sysSign = makeActiveSign(account.pwdToken, account.id, timestamp);
+            if (sysSign.toLowerCase() != sign.toLowerCase()) {
+                throw L.ERR.SIGN_ERROR;
+            }
+
+            return true;
+        })
+    });
+}
+
+/**
  * @method sendResetPwdEmail 发送设置密码邮件
  *
  * @param {Object} params
@@ -347,8 +393,8 @@ authServer.login = function(data) {
     }
 
     var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
-
-    return Models.Account.findOne({where: {email: data.email, type: type}})
+    var email = data.email.toLowerCase();
+    return Models.Account.findOne({where: {email: email, type: type}})
         .then(function (loginAccount) {
             var pwd = md5(data.pwd);
             if (!loginAccount) {
@@ -448,7 +494,7 @@ authServer.getAccount = function(params){
  * @param data
  * @returns {*}
  */
-authServer.updataAccount = function(id, data){
+authServer.updateAccount = function(id, data){
     if(!id){
         throw {code: -1, msg: "id不能为空"};
     }
@@ -473,6 +519,8 @@ authServer.updataAccount = function(id, data){
                 });
         });
 }
+
+authServer.updataAccount = authServer.updateAccount;
 
 /**
  * 根据条件查询一条账户信息

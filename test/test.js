@@ -7,7 +7,7 @@ process.env.NODE_PATH = '.:'+process.env.NODE_PATH;
 
 require('app-module-path').addPath(path.normalize(path.join(__dirname, '..')));
 
-Promise = require('bluebird');
+global.Promise = require('bluebird');
 Promise.config({ longStackTraces: true });
 Promise.promisifyAll(require('fs'));
 
@@ -17,7 +17,10 @@ var Logger = require('common/logger');
 Logger.init({
     path: path.join(__dirname, "../log"),
     prefix: "mocha_",
-    console: false
+    console: false,
+    mods: {
+        sequelize: { console: false }
+    }
 });
 var logger = new Logger('test');
 
