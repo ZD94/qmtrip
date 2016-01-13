@@ -4,7 +4,6 @@
 
 var API = require("common/api");
 var Q = require("q");
-var Logger = require('common/logger');
 var L = require("common/language");
 var checkAndGetParams = require("common/utils").checkAndGetParams;
 var checkAgencyPermission = require('../auth').checkAgencyPermission;

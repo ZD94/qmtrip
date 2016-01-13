@@ -10,8 +10,6 @@
 var Q = require("q");
 var API = require("common/api");
 var auth = require("../auth");
-var Logger = require("common/logger");
-var logger = new Logger("staff");
 var L = require("common/language");
 /**
  * @class staff 员工信息

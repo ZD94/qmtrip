@@ -9,10 +9,8 @@
 var API = require('common/api');
 var Logger = require('common/logger');
 var md5 = require("common/utils").md5;
-var Q = require('q');
 var checkPermission = require('../auth').checkPermission;
 var checkAgencyPermission = require('../auth').checkAgencyPermission;
-var logger = new Logger();
 var uuid = require("node-uuid");
 
 /**

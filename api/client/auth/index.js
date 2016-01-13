@@ -6,9 +6,7 @@ var Q = require("q");
 var L = require("common/language");
 var Logger = require("common/logger");
 var validate = require("common/validate");
-var md5 = require("common/utils").md5;
 var uuid = require('node-uuid');
-var logger = new Logger("auth");
 
 /**
  * @class auth 用户认证
@@ -164,13 +162,13 @@ auth.registryCompany = function(params) {
                 mobile:mobile, email: email})
             .then(function(){
                     return API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
-                        mobile: mobile, name: name, roleId: 0})
-                })
+                        mobile: mobile, name: name, roleId: 0});
+                });
         })
         .then(function() {
             return true;
         });
-}
+};
 
 /**
  * @method sendActiveEmail
@@ -183,7 +181,7 @@ auth.registryCompany = function(params) {
  */
 auth.sendActiveEmail = function(params) {
     return API.auth.sendActiveEmail(params);
-}
+};
 
 /**
  * @method logout

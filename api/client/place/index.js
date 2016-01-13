@@ -8,7 +8,6 @@
  */
 
 var API = require("common/api");
-var Q = require("q");
 
 /**
  * @class place 地点信息

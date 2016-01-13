@@ -2,12 +2,9 @@
  * Created by wyl on 15-12-12.
  */
 'use strict';
-var Q = require("q");
 var sequelize = require("common/model").importModel("./models");
 var travalPolicyModel = sequelize.models.TravelPolicy;
 var Paginate = require("../../common/paginate").Paginate;
-var uuid = require("node-uuid");
-var L = require("../../common/language");
 var API = require("../../common/api");
 var travelPolicy = {};
 

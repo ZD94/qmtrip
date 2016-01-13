@@ -7,7 +7,7 @@ var moment = require("moment");
 var API = require("common/api");
 var Q = require("q");
 
-var pg_promise = require('pg-promise');
+//var pg_promise = require('pg-promise');
 //var pgp = pg_promise({ promiseLib: Q});
 //var config = require("config");
 

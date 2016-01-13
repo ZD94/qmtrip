@@ -4,7 +4,6 @@
 "use strict";
 var API = require("common/api");
 var Q = require("q");
-var Logger = require('common/logger');
 var L = require("common/language");
 var checkAndGetParams = require("common/utils").checkAndGetParams;
 var moment = require('moment');
@@ -32,8 +31,7 @@ tripPlan.savePlanOrder = function (params) {
             return Q.all([
                 API.tripPlan.savePlanOrder(params),
                 API.company.getCompany({companyId: staff.companyId, columns: ['email']})
-            ])
-            return API.tripPlan.savePlanOrder(params);
+            ]);
         })
         .spread(function(_order, c){
             order = _order;
