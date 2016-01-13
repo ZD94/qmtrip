@@ -588,9 +588,13 @@ staff.importExcelAction = function(params){
  * @returns {*}
  */
 staff.downloadExcle = function (params){
-    if (!fs.exists(config.upload.tmpDir)) {
+    fs.exists(config.upload.tmpDir, function (exists) {
+        if(!exists)
+            fs.mkdir(config.upload.tmpDir);
+    });
+    /*if (!fs.exists(config.upload.tmpDir)) {
         fs.mkdir(config.upload.tmpDir);
-    }
+    }*/
     var data = params.objAttr;
     var nowStr = moment().format('YYYYMMDDHHmm');
     if(!data){
@@ -758,7 +762,17 @@ staff.getInvoiceViewer = function(params){
  * @param params
  */
 staff.statStaffPoints = function(params){
-    //
+    var query = checkAndGetParams(['companyId'], [], params);
+    return Q.all([
+        staffModel.sum('total_points', query),
+        staffModel.sum('balance_points', query)
+    ])
+        .spread(function(all, balance){
+            return {
+                totalPoints: all || 0,
+                balancePoints: balance || 0
+            }
+        })
 }
 
 staff.deleteAllStaffByTest = function(params){

@@ -398,8 +398,13 @@ staff.statisticStaffsRole = function(params){
         });
 }
 
-staff.statScore = function(params){
-    //
+
+staff.statStaffPointsByCompany = function(){
+    var self = this;
+    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
+        .then(function(staff){
+            return API.staff.statStaffPoints({companyId: staff.companyId})
+        })
 }
 
 module.exports = staff;

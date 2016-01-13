@@ -106,11 +106,12 @@ tripPlan.getTripPlanOrder = function(params){
         params.columns.push('status');
         options.attributes = params.columns;
     }
+    options.raw = true;
     return Q.all([
         PlanOrder.findById(orderId, options),
-        ConsumeDetails.findAll({where: {orderId: orderId, type: -1, status: {$ne: -2}}}),
-        ConsumeDetails.findAll({where: {orderId: orderId, type: 1, status: {$ne: -2}}}),
-        ConsumeDetails.findAll({where: {orderId: orderId, type: 0, status: {$ne: -2}}})
+        ConsumeDetails.findAll({raw:true, where: {orderId: orderId, type: -1, status: {$ne: -2}}}),
+        ConsumeDetails.findAll({raw:true, where: {orderId: orderId, type: 1, status: {$ne: -2}}}),
+        ConsumeDetails.findAll({raw:true, where: {orderId: orderId, type: 0, status: {$ne: -2}}})
     ])
         .spread(function(order, outTraffic, backTraffic, hotel){
             if(!order || order.status == -2){
