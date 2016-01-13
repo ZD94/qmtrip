@@ -131,15 +131,101 @@
       height: 100%;
       border-right: 1px solid @color-border2;
       //padding-top: 20px;
+      float: left;
       .circle{
+        width: 90px;
         margin-left: 20px;
         border-right:none;
         padding-top: 20px;
+        margin-right: 0;
+        float: left;
         div{
           width: 76px;
           height: 76px;
           border-radius: 50%;
           border: 5px solid #01dbff;
+          span{
+            display: block;
+            width: 76px;
+            text-align: center;
+            &:first-child{
+              font-size: @h16;
+              margin-top: 10px;
+              line-height: 20px;
+              color: #01dbff;
+            }
+            &:nth-child(2){
+              font-size: @h14;
+              color: #9b9b9b;
+              margin-top: 10px;
+            }
+          }
+        }
+      }
+      .text{
+        line-height: 130px;
+        margin-right: 20px;
+        font-size: @h14;
+        float: right;
+      }
+    }
+    &:nth-child(2){
+      line-height: 130px;
+      font-size: @h14;
+      padding-left: 20px;
+      float: left;
+    }
+  }
+}
+.apply{
+  clear: both;
+  width: 100%;
+  div {
+    &:first-child {
+      width: 290px;
+      height: 300px;
+      float: left;
+      //border-right: 1px solid #9b9b9b;
+    }
+    &:nth-child(2){
+      font-size: @h14;
+      float: left;
+      div{
+        width: 100%;
+        float: left;
+        clear: both;
+        margin-top: 40px;
+        height: auto;
+        padding-left: 20px;
+        span{
+          font-size: @h16;
+        }
+        .apply_text{
+          float: right;
+          //padding-left: 100px;
+          margin-right: 120px;
+          color: #de492a !important;
+          display: none;
+        }
+        p{
+          margin-top: 20px;
+          line-height: 45px;
+          font-size: @h12;
+          color: #9b9b9b;
+          span{
+            cursor: pointer;
+            display: block;
+            font-size: @h14;
+            width: 120px;
+            height: 35px;
+            line-height: 35px;
+            text-align: center;
+            border: 1px solid @color-border2;
+            border-radius: @border-radius-2;
+            float: left;
+            margin-right: 20px;
+            color: @color-text;
+          }
         }
       }
     }
