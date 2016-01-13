@@ -7,6 +7,7 @@ var Q = require("q");
 var Logger = require('common/logger');
 var L = require("common/language");
 var checkAndGetParams = require("common/utils").checkAndGetParams;
+var moment = require('moment');
 
 var tripPlan = {};
 
@@ -20,10 +21,44 @@ tripPlan.savePlanOrder = function (params) {
     var accountId = self.accountId;
     params.accountId = accountId;
     params.type = params.type | 2;
-    return API.staff.getStaff({id: accountId, columns: ['companyId']})
+    var order = {};
+    var email = "";
+    var staffName = "";
+    return API.staff.getStaff({id: accountId, columns: ['companyId', 'email', 'name']})
         .then(function (staff) {
+            email = staff.email;
+            staffName = staff.name;
             params.companyId = staff.companyId;
+            return Q.all([
+                API.tripPlan.savePlanOrder(params),
+                API.company.getCompany({companyId: staff.companyId, columns: ['email']})
+            ])
             return API.tripPlan.savePlanOrder(params);
+        })
+        .spread(function(_order, c){
+            order = _order;
+            var go = '无', back = '无', hotel = '无';
+            if(order.outTraffic.length > 0){
+                var g = order.outTraffic[0];
+                go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.startPlace + ' 到 ' + g.arrivalPlace + ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达, 动态预算￥' + g.budget;
+            }
+            if(order.backTraffic.length > 0){
+                var b = order.backTraffic[0];
+                back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.startPlace + ' 到 ' + b.arrivalPlace + ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达, 动态预算￥' + b.budget;
+            }
+            if(order.hotel.length > 0){
+                var h = order.hotel[0];
+                hotel = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTiem).format('YYYY-MM-DD') + ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
+            }
+            return API.mail.sendMailRequest({
+                toEmails: c.email, //'miao.yu@tulingdao.com',
+                templateName: 'qm_notify_new_travelbudget',
+                titleValues: [staffName],
+                values: [staffName, email, moment(order.createAt).format('YYYY-MM-DD HH:mm:ss'), order.description, go, back, hotel, '￥'+order.budget, 'http://www.baidu.com']
+            })
+        })
+        .then(function(){
+            return order;
         })
 }
 

@@ -26,13 +26,12 @@ var tripPlan = {}
  * 保存预算单/差旅计划单
  * @param params
  * @returns {*}
- */
-tripPlan.savePlanOrder = function(params){
+ */tripPlan.savePlanOrder = function(params){
     if(!params.consumeDetails){
         throw {code: -1, msg: '预算详情 consumeDetails 不能为空'};
     }
     var checkArr = ['accountId', 'companyId', 'type', 'destination', 'budget'];
-    var getArr = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark'];
+    var getArr = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark', 'description'];
     var _planOrder = checkAndGetParams(checkArr, getArr, params);
     return API.seeds.getSeedNo('tripPlanOrderNo')
         .then(function(orderNo){
@@ -60,6 +59,7 @@ tripPlan.savePlanOrder = function(params){
                             s.orderId = order.id;
                             s.accountId = order.accountId;
                             s.status = 0;
+                            s = checkAndGetParams(['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'], ConsumeDetails.attributes, s);
                             return ConsumeDetails.create(s, {transaction: t})
                                 .then(function(ret){
                                     return ret.toJSON();
@@ -99,11 +99,15 @@ tripPlan.savePlanOrder = function(params){
  * @returns {*}
  */
 tripPlan.getTripPlanOrder = function(params){
-    params = checkAndGetParams(['userId', 'orderId'], [], params);
+    params = checkAndGetParams(['orderId'], ['columns'], params);
     var orderId = params.orderId;
-    var userId = params.userId;
+    var options = {};
+    if(params.columns){
+        params.columns.push('status');
+        options.attributes = params.columns;
+    }
     return Q.all([
-        PlanOrder.findById(orderId),
+        PlanOrder.findById(orderId, options),
         ConsumeDetails.findAll({where: {orderId: orderId, type: -1, status: {$ne: -2}}}),
         ConsumeDetails.findAll({where: {orderId: orderId, type: 1, status: {$ne: -2}}}),
         ConsumeDetails.findAll({where: {orderId: orderId, type: 0, status: {$ne: -2}}})
@@ -457,6 +461,8 @@ tripPlan.countTripPlanNum = function(params){
  */
 tripPlan.statPlanOrderMoney = function(params){
     var query = checkAndGetParams(['companyId'], [], params);
+    var query_complete = utils.copyObj(query);
+    query_complete.status = {$gte: 2};
     var createAt = {};
     if(params.startTime){
         createAt.$gte = params.startTime;
@@ -464,19 +470,21 @@ tripPlan.statPlanOrderMoney = function(params){
     if(params.endTime){
         createAt.$lte = params.endTime;
     }
-    return PlanOrder.findAll({where: query, attributes: ['id']})
-        .then(function(orders){
-            return orders.map(function(order){
-                return order.id;
-            })
+    return Q.all([
+        PlanOrder.findAll({where: query, attributes: ['id']}),
+        PlanOrder.findAll({where: query_complete, attributes: ['id']})
+    ])
+        .spread(function(orders, orders1){
+            return [orders.map(function(order){ return order.id; }),
+                orders1.map(function(order){ return order.id; })]
         })
-        .then(function(idList){
+        .spread(function(idList, idComplete){
             var q1 = {
                 orderId: {$in: idList},
                 status: {$ne: -2}
             }
             var q2 = {
-                orderId: {$in: idList},
+                orderId: {$in: idComplete},
                 status: 1
             }
             if(!isObjNull(createAt)){

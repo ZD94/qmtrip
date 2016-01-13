@@ -97,14 +97,17 @@ describe("api/client/tripPlan.js", function() {
                 startPlace: '北京',
                 destination: '上海',
                 budget: 1000,
+                description: '发送邮件测试计划单',
                 startAt: '2015-12-30 11:12:12',
+                consumeDetails: [{
+                    startTime: '2016-12-30 11:11:11',
+                    budget: 300,
+                    city: '上海市',
+                    hotelName: '丐帮',
+                    invoiceType: 2,
+                    type: 0
+                }]
             }
-            tripPlanOrder.consumeDetails = [{
-                startTime: '2016-12-30 11:11:11',
-                budget: 300,
-                invoiceType: 2,
-                type: 0
-            }]
             var self = {accountId: staffId};
             API.client.tripPlan.savePlanOrder.call(self, tripPlanOrder, function(err, ret){
                 if(err){
@@ -124,10 +127,13 @@ describe("api/client/tripPlan.js", function() {
                 startPlace: '北京',
                 destination: '上海',
                 budget: 1000,
+                description: '发送邮件测试计划单',
                 startAt: '2015-12-30 11:12:12',
                 consumeDetails: [{
                     startTime: '2016-12-30 11:11:11',
                     budget: 300,
+                    city: '上海市',
+                    hotelName: '丐帮',
                     invoiceType: 2,
                     type: 0
                 }]
@@ -164,7 +170,7 @@ describe("api/client/tripPlan.js", function() {
                 startAt: '2015-12-30 11:12:12',
                 consumeDetails: [{
                     startTime: '2016-12-30 11:11:11',
-                    budget: 300,
+                    budget: 400,
                     invoiceType: 2,
                     type: 0
                 }]
@@ -332,6 +338,7 @@ describe("api/client/tripPlan.js", function() {
                         throw err;
                     }
                     assert(ret != null);
+                    console.info(ret);
                     assert(ret.qmBudget >= 0);
                     assert(ret.planMoney >= 0);
                     assert(ret.expenditure >= 0);
