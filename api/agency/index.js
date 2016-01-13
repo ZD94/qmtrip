@@ -303,6 +303,18 @@ agency.listAndPaginateAgencyUser = function(params){
 }
 
 /**
+ * 得到代理商用户 用于获取查看票据的代理商用户id 不需要暴露给客户端
+ * @param params
+ * @returns {*|Promise}
+ */
+agency.getAgencyUsersId = function(params){
+    return AgencyUser.findAll({where: params, attributes: ['id']})
+        .then(function(result){
+            return result;
+        });
+}
+
+/**
  * 测试用例使用删除代理商和用户的操作，不在client里调用
  * @param params
  */
