@@ -68,7 +68,8 @@ var travelPlan=(function(){
                             API.tripPlan.uploadInvoice(invoice)
                                 .then(function(ret){
                                     console.info(ret);
-                                    location.reload();
+                                    $scope.initPlanList();
+                                    $(".messagebox_fixed").hide();
                                 })
                                 .catch(function(err){
                                     console.info(err);
