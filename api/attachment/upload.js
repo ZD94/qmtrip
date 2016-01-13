@@ -21,9 +21,13 @@ function uploadActionFile(req, res, next) {
     form.maxFieldsSize = config.upload.maxSize;
     form.keepExtensions = true;
     var filePath = '';//file.tmpFile.path
-    if (!fs.exists(config.upload.tmpDir)) {
-        fs.mkdirSync(config.upload.tmpDir);
-    }
+    fs.exists(config.upload.tmpDir, function (exists) {
+        if(!exists)
+            fs.mkdir(config.upload.tmpDir);
+    });
+    /*if (!fs.exists(config.upload.tmpDir)) {
+        fs.mkdir(config.upload.tmpDir);
+    }*/
     form.parse(req, function (err, fields, file) {
         if(file.tmpFile){
             filePath = file.tmpFile.path;
