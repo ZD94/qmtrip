@@ -225,21 +225,21 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                 if(ret.status == 2){
                     var s = order.budget - order.expenditure;
                     if(s <0){s = 0;}
-                    var score = order.score;
-                    if(score> 0 ){ score += '积分已发放到您的积分账户'; }
+                    var _score = order.score;
+                    if(_score> 0 ){ _score += '积分已发放到您的积分账户'; }
                     var total = '全麦预算￥' + order.budget + ',实际支出￥' + order.expenditure + ',节省￥' + s;
                     API.mail.sendMailRequest({
                         toEmails: staffEmail,
                         //toEmails: 'miao.yu@tulingdao.com',
                         templateName: "qm_notify_invoice_all_pass",
                         titleValues: [],
-                        values: [staffName, moment(ret.startAt).format('YYYY-MM-DD'), ret.description, go, back, hotel, total, score, url]
+                        values: [staffName, moment(ret.startAt).format('YYYY-MM-DD'), ret.description, go, back, hotel, total, _score, url]
                     })
                 }
                 if(ret.status != 2 || ret.score == 0){ //status == 2 是审核通过的状态，通过后要给企业用户增加积分操作，积分为0时不需要此操作
                     return true;
                 }
-                return API.staff.increaseStaffPoint({id: staffId, accountId: user_id, increasePoint: score})
+                return API.staff.increaseStaffPoint({id: staffId, accountId: user_id, increasePoint: ret.score})
             })
             .then(function(){
                 return true;
