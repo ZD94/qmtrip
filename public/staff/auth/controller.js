@@ -385,7 +385,7 @@ var auth=(function(){
             API.onload(function(){
                 API.auth.sendActiveEmail({email:$scope.userMail})
                     .then(function(){
-                        console.info("发送成功");
+                        Myalert("温馨提示","发送成功");
                         $scope.$apply();
                     }).catch(function(err){
                         console.error(err);
