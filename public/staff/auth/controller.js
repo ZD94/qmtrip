@@ -612,7 +612,46 @@ var auth=(function(){
 
     //修改密码页面
     auth.ChangePwdController = function($scope) {
-
+        $("#oldPwd").blur(function(){
+            var oPwd   = $('#oldPwd').val();
+            if(!oPwd){
+                $scope.err_msg1 = "请输入原密码";
+                $("#oldPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#oldPwd").siblings(".err_msg").children("i").removeClass("right");
+                $("#oldPwd").siblings(".err_msg").show();
+                $scope.$apply();
+                return false;
+            }else{
+                $("#oldPwd").siblings(".err_msg").hide();
+            }
+        })
+        $("#newFirstPwd").blur(function(){
+            var nPwd1   = $('#newFirstPwd').val();
+            if(!nPwd1){
+                $scope.err_msg2 = "请输入新密码";
+                $("#newFirstPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#newFirstPwd").siblings(".err_msg").children("i").removeClass("right");
+                $("#newFirstPwd").siblings(".err_msg").show();
+                $scope.$apply();
+                return false;
+            }else{
+                $("#newFirstPwd").siblings(".err_msg").hide();
+            }
+        })
+        $("#newSecondPwd").blur(function(){
+            var nPwd1   = $('#newFirstPwd').val();
+            var nPwd2   = $('#newSecondPwd').val();
+            if(nPwd2 != nPwd1){
+                $scope.err_msg3 = "2次密码设置不一致";
+                $("#newSecondPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#newSecondPwd").siblings(".err_msg").children("i").removeClass("right");
+                $("#newSecondPwd").siblings(".err_msg").show();
+                $scope.$apply();
+                return false;
+            }else{
+                $("#newSecondPwd").siblings(".err_msg").hide();
+            }
+        })
         $scope.checkChangePwd = function(){
 
             var old = $("#oldPwd").val();
@@ -621,23 +660,44 @@ var auth=(function(){
             var commit = true;
 
             if(commit){
-                if(old == first){
-                    alert("新旧密码不能一致！");
-                }else if(first != second){
-                    alert("两次输入密码不一致！");
-                }
+                // if(old == first){
+                //     alert("新旧密码不能一致！");
+                // }else if(first != second){
+                //     alert("两次输入密码不一致！");
+                // }
                 API.onload(function() {
                     API.auth.resetPwdByOldPwd({oldPwd:old,newPwd:second})
                         .then(function(){
-                            alert("重置密码成功");
-                            window.location.href= '#/auth/login';
+                            // alert("重置密码成功");
+                            // window.location.href= '#/auth/login';
+                            $(".confirmFixed").show();
+                            $scope.seconds = 3;
+                            var $seconds = $("#second3");
+                            var timer = setInterval(function() {
+                                var begin = $seconds.text();
+                                begin = parseInt(begin);
+                                if (begin <=0 ) {
+                                    clearInterval(timer);
+                                    window.location.href= '#/auth/login';
+                                } else {
+                                    begin = begin - 1;
+                                    $seconds.text(begin);
+                                }
+                            }, 1000);
                             $scope.$apply();
                         }).catch(function(err){
                             console.error(err);
+                            $scope.err_msg1 = err.msg;
+                            $("#oldPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                            $("#oldPwd").siblings(".err_msg").children("i").removeClass("right");
+                            $("#oldPwd").siblings(".err_msg").show();
+                            $scope.$apply();
                         }).done();
                 })
             }
-
+        }
+        $scope.toReLogin = function(){
+            $scope.$apply();
         }
     }
 
