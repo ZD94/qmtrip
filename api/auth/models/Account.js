@@ -24,7 +24,8 @@ module.exports = function (Db, DataType) {
         lastLoginIp      : {type: DataType.STRING(50),      field: "last_login_ip"}, //最近登录Ip
         activeToken      : {type: DataType.STRING(50),      field: "active_token"},
         pwdToken         : {type: DataType.STRING(50),      field: "pwd_token"},
-        type             : {type: DataType.INTEGER,         defaultValue: ACCOUNT_TYPE.COMMON_STAFF}
+        type             : {type: DataType.INTEGER,         defaultValue: ACCOUNT_TYPE.COMMON_STAFF},
+        isFirstLogin     : {type: DataType.BOOLEAN,         defaultValue: true, field: "is_first_login"}
     }, {
         tableName : "accounts",
         timestamps: false,
