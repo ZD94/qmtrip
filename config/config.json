@@ -30,7 +30,8 @@
     "main":{"addr":"api.local.tulingdao.com", "port":4101}
   },
   "upload":{
-    "tmpDir": "${{ROOT_DIR}}/temp"
+    "tmpDir": "${{ROOT_DIR}}/public/temp",
+    "pubDir": "${{ROOT_DIR}}/public/upload"
   },
   "template":{
     "file": "${{ROOT_DIR}}/public/templatefile"

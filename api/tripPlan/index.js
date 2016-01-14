@@ -387,6 +387,55 @@ tripPlan.getConsumeDetail = function(params){
 }
 
 /**
+ * 判断某用户是否有访问该消费记录票据权限
+ * @param params
+ * @returns {Promise.<Instance>}
+ */
+tripPlan.getVisitPermission = function(params){
+    var params = checkAndGetParams(['consumeId', 'userId'], [], params);
+    var userId = params.userId;
+    var consumeId = params.consumeId;
+    return ConsumeDetails.findById(consumeId)
+        .then(function(consume){
+            if(!consume || consume.status == -2){
+                throw {code: -4, msg: '查询记录不存在'};
+            }
+            if(consume.accountId == userId){//允许自己查看
+                return {allow: true, md5key: consume.newInvoice}
+            }else{
+                return PlanOrder.findById(consume.orderId)
+                    .then(function(order){
+                        if(!order){
+                            throw {code: -4, msg: '订单记录不存在'};
+                        }
+                        return order.companyId;
+                    })
+                    .then(function(companyId){
+                        return API.company.getCompanyById(companyId)
+                            .then(function(company){
+                                if(!company){
+                                    throw {code: -5, msg: "企业不存在"}
+                                }
+                                return company.agencyId;
+                            })
+                    })
+                    .then(function(agencyId){
+                        return API.agency.getAgencyUser({id: userId})
+                            .then(function(agencyUser){
+                                if(agencyUser && agencyUser.roleId != 1 && agencyUser.agencyId == agencyId){//允许代理商创建人管理员访问
+                                    return {allow: true, md5key: consume.newInvoice};
+                                }else{
+                                    return {allow: false};
+                                }
+                            })
+                    })
+            }
+        })
+
+}
+
+
+/**
  * 审核票据
  * @param params
  * @param params.status审核结果状态
