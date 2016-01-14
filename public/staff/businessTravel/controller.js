@@ -551,16 +551,16 @@ var businessTravel=(function(){
                     })
                 ])
                     .spread(function(ret1,ret2) {
-                        console.info (ret2);
                         $scope.companyId = ret1.companyId;
                         $scope.trafficlive = ret2;
                         $(".creating").hide();
                         $(".createresult,.tianxun").show();
-                        $scope.totalprice = ret2.price;
-                        $scope.trafficprice = $scope.trafficlive.traffic;
-                        $scope.liveprice = $scope.trafficlive.hotel;
-                        $scope.goTraffic = ret2.goTraffic.price;
-                        $scope.backTraffic = ret2.backTraffic.price;
+                        var tipMsg = '需手工处理';
+                        $scope.totalprice = ret2.price == -1 ? tipMsg: ret2.price;
+                        $scope.trafficprice = $scope.trafficlive.traffic == -1 ? tipMsg: $scope.trafficlive.traffic;
+                        $scope.liveprice = $scope.trafficlive.hotel == -1 ? tipMsg : $scope.trafficlive.hotel;
+                        $scope.goTraffic = ret2.goTraffic.price == -1 ? tipMsg: ret2.goTraffic.price;
+                        $scope.backTraffic = ret2.backTraffic.price == -1 ? tipMsg : ret2.backTraffic.price;
                         $scope.$apply();
                     })
                     .catch(function(err){

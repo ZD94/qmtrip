@@ -91,7 +91,12 @@ travelBudget.getTravelPolicyBudget = function(params) {
             })
         })
         .then(function(result) {
-            result.price = result.hotel + result.traffic;
+            var price = -1;
+            if (result.hotel > 0 && result.traffic > 0) {
+                price = Number(result.hotel) + Number(result.traffic);
+            }
+
+            result.price = price;
             return result;
         });
 }
@@ -180,9 +185,9 @@ travelBudget.getHotelBudget = function(params) {
         })
         .then(function(result) {
             //如果没有查询到结果,直接扔回最大金额
-            if (result.price <=0) {
+            if (!result.price || result.price <=0) {
                 var days = utils.diffDate(checkInDate, checkOutDate) || 1;
-                return {price: policy.hotelPrice * days};
+                return {price: policy.hotelPrice * days || -1};
             }
             return result;
         });
@@ -281,11 +286,29 @@ travelBudget.getTrafficBudget = function(params) {
                         })
                     ])
                     .spread(function(goTraffic, backTraffic) {
+                        var goTrafficPrice = -1;
+                        var backTrafficPrice = -1;
+                        var traffic = -1;
+                        var price = -1;
+
+                        if (goTraffic && goTraffic.price != -1) {
+                            goTrafficPrice = goTraffic.price;
+                        }
+
+                        if (backTraffic && backTraffic.price != -1) {
+                            backTrafficPrice = backTraffic.price;
+                        }
+
+                        if (goTrafficPrice >0 && backTrafficPrice > 0) {
+                            traffic = Number(goTrafficPrice) + Number(backTrafficPrice);
+                        }
+
+                        price = traffic;
                         var result = {
                             goTraffic: goTraffic,
                             backTraffic: backTraffic,
-                            traffic: Number(goTraffic.price) + Number(backTraffic.price) || -1,
-                            price: Number(goTraffic.price) + Number(backTraffic.price) || -1
+                            traffic: traffic,
+                            price: price
                         };
                         return result;
                     });
