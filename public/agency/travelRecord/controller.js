@@ -24,7 +24,7 @@ var travelRecord=(function(){
         $scope.initTravelList = function () {
             $(".left_nav li").removeClass("on").eq(0).addClass("on");
             API.onload(function () {
-                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page})
+                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page, isUpload: true, audit: 'P'})
                     .then(function(result){
                         console.info (result);
                         $scope.total = result.total;

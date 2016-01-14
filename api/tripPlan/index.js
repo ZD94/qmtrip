@@ -363,7 +363,7 @@ tripPlan.uploadInvoice = function(params){
                 if(!list[i].newInvoice)
                     return;
             }
-            return PlanOrder.update({status: 1, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'updateAt'], returning: true})
+            return PlanOrder.update({status: 1, auditStatus: 0, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'auditStatus', 'updateAt'], returning: true})
         })
         .then(function(){
             return true;
