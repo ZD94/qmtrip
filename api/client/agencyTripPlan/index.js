@@ -7,6 +7,8 @@ var Q = require("q");
 var L = require("common/language");
 var checkAndGetParams = require("common/utils").checkAndGetParams;
 var checkAgencyPermission = require('../auth').checkAgencyPermission;
+var C = require("../../../config");
+var moment = require("moment");
 
 var agencyTripPlan = {};
 
@@ -117,22 +119,34 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
         var consumeId = params.consumeId;
         var orderId = "";
         var staffId = "";
+        var staffEmail = "";
+        var staffName = "";
+        var invoiceName = "";
         return API.tripPlan.getConsumeDetail({consumeId: consumeId, userId: user_id})
             .then(function(consumeDetail){
                 if(!consumeDetail.accountId){
                     throw {code: -6, msg: '消费记录异常'};
                 }
                 orderId = consumeDetail.orderId;
+                if(consumeDetail.type === -1){
+                    invoiceName = '去程交通票据'
+                }else if(consumeDetail.type === 0){
+                    invoiceName = '酒店发票';
+                }else if(consumeDetail === 1){
+                    invoiceName = '回程交通票据';
+                }
                 return consumeDetail.accountId;
             })
             .then(function(_staffId){
                 staffId = _staffId;
-                return API.staff.getStaff({id: staffId, columns: ['companyId']})
+                return API.staff.getStaff({id: staffId, columns: ['companyId', 'name', 'email']})
             })
             .then(function(staff){
                 if(!staff.companyId){
                     throw {msg:"该员工不存在或员工所在企业不存在"};
                 }
+                staffName = staff.name;
+                staffEmail = staff.email;
                 return Q.all([
                     API.company.getCompany({companyId: staff.companyId, columns: ['agencyId']}),
                     API.agency.getAgencyUser({id: user_id, columns: ['agencyId']})
@@ -152,17 +166,68 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                 if(!isSuccess){
                     return isSuccess;
                 }
-                return API.tripPlan.getTripPlanOrder({orderId: orderId, columns: ['status', 'score']});
+                return API.tripPlan.getTripPlanOrder({orderId: orderId, columns: ['status', 'score', 'budget', 'expenditure', 'description', 'startAt']});
             })
             .then(function(ret){
                 //判断ret类型，如果是Boolean则直接返回
-                if(typeof ret == Boolean){
+                if(typeof ret == 'Boolean'){
                     return ret;
+                }
+                var order = ret;
+                if(typeof ret.toJSON == 'function'){
+                    order = order.toJSON();
+                }
+                var go = '无', back = '无', hotel = '无';
+                if(order.outTraffic.length > 0){
+                    var g = order.outTraffic[0];
+                    go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.startPlace + ' 到 ' + g.arrivalPlace + ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达, 动态预算￥' + g.budget;
+                    if(g.expenditure){
+                        go += ',实际支出￥' + g.expenditure;
+                    }
+                }
+                if(order.backTraffic.length > 0){
+                    var b = order.backTraffic[0];
+                    back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.startPlace + ' 到 ' + b.arrivalPlace + ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达, 动态预算￥' + b.budget;
+                    if(b.expenditure){
+                        back += ',实际支出￥' + b.expenditure;
+                    }
+                }
+                if(order.hotel.length > 0){
+                    var h = order.hotel[0];
+                    hotel = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') + ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
+                    if(h.expenditure){
+                        hotel += ',实际支出￥' + h.expenditure;
+                    }
+                }
+                var url = C.host + '/staff.html#/travelPlan/PlanDetail?planId=' + order.id;
+                //审核完成后给用户发送邮件
+                if(params.status == -1){ //审核不通过
+                    API.mail.sendMailRequest({
+                        toEmails: staffEmail,
+                        //toEmails: 'miao.yu@tulingdao.com',
+                        templateName: "qm_notify_invoice_not_pass",
+                        titleValues: [],
+                        values: [staffName, invoiceName, params.remark, ret.description, go, back, hotel, '全麦预算￥'+order.budget, url]
+                    })
+                }
+                if(ret.status == 2){
+                    var s = order.budget - order.expenditure;
+                    if(s <0){s = 0;}
+                    var score = order.score;
+                    if(score> 0 ){ score += '积分已发放到您的积分账户'; }
+                    var total = '全麦预算￥' + order.budget + ',实际支出￥' + order.expenditure + ',节省￥' + s;
+                    API.mail.sendMailRequest({
+                        toEmails: staffEmail,
+                        //toEmails: 'miao.yu@tulingdao.com',
+                        templateName: "qm_notify_invoice_all_pass",
+                        titleValues: [],
+                        values: [staffName, moment(ret.startAt).format('YYYY-MM-DD'), ret.description, go, back, hotel, total, score, url]
+                    })
                 }
                 if(ret.status != 2 || ret.score == 0){ //status == 2 是审核通过的状态，通过后要给企业用户增加积分操作，积分为0时不需要此操作
                     return true;
                 }
-                var score = ret.score;
+                var score = parseInt(ret.score/2);
                 return API.staff.increaseStaffPoint({id: staffId, accountId: user_id, increasePoint: score})
             })
             .then(function(){

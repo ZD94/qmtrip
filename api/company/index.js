@@ -183,7 +183,6 @@ company.getCompanyFundsAccount = function(params){
     var companyId = params.companyId;
     var userId = params.userId;
     return FundsAccounts.findById(companyId, {
-        raw: false,
         attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createAt', 'updateAt']
     })
         .then(function(funds){
@@ -203,7 +202,7 @@ company.getCompanyFundsAccount = function(params){
 company.moneyChange = function(params){
     var params = checkAndGetParams(['money', 'channel', 'userId', 'type', 'companyId', 'remark'], [], params);
     var id = params.companyId;
-    return FundsAccounts.findById(id, {raw: false})
+    return FundsAccounts.findById(id)
         .then(function(funds){
             if(!funds || funds.status == -2){
                 throw {code: -2, msg: '企业资金账户不存在'};
@@ -256,7 +255,7 @@ company.moneyChange = function(params){
 
             return sequelize.transaction(function(t){
                 return Q.all([
-                    FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: Object.keys(fundsUpdates), transaction: t, raw: false}),
+                    FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: Object.keys(fundsUpdates), transaction: t}),
                     MoneyChanges.create(moneyChange, {transaction: t})
                 ])
                 .spread(function(update, create){

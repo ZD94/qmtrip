@@ -439,7 +439,7 @@ tripPlan.approveInvoice = function(params){
                     .spread(function(ret){
                         var status = params.status;
                         if(status == -1){
-                            return PlanOrder.update({status: 0, auditStatus: -1, updateAt: utils.now()}, {where: {id: order.id}, fields: ['auditStatus', 'status', 'updateAt'], transaction: t})
+                            return PlanOrder.update({status: 0, auditStatus: -1, updateAt: utils.now()}, {where: {id: order.id}, fields: ['auditStatus', 'status', 'updateAt'], transaction: t});
                         }
                         if(!params.expenditure)
                             throw {code: -4, msg: '支出金额不能为空'};
