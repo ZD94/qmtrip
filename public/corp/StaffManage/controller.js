@@ -78,7 +78,7 @@ var staff = (function(){
                         $scope.currentStaff = staff;
                         var params = {};
                         var options = {};
-                        options.perPage = 10;
+                        options.perPage = 20;
                         options.page = $scope.page;
                         params.options = options;
                         params.companyId = staff.companyId;
@@ -144,7 +144,7 @@ var staff = (function(){
             if ($scope.total) {
                 $.jqPaginator('#pagination', {
                     totalCounts: $scope.total,
-                    pageSize: 10,
+                    pageSize: 20,
                     currentPage: 1,
                     prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
                     next: '<li class="next"><a href="javascript:;">下一页</a></li>',
