@@ -196,12 +196,10 @@ var travelPlan=(function(){
                     $scope.backTraffic = $scope.planDetail.backTraffic[0];
                     $scope.hotel = $scope.planDetail.hotel[0];
                     $scope.outTraffic = $scope.planDetail.outTraffic[0];
-                    console.info (result);
                     $scope.$apply();
                     $(".file").AjaxFileUpload({
                         action: '/upload/ajax-upload-file?type=invoice',
                         onComplete: function(filename, response) {
-                            console.info("000000");
                             $scope.ref = $(this).attr("ref");
                             $scope.md5 = response.md5key;
                             if (response.ret == 0 ) {
@@ -239,7 +237,7 @@ var travelPlan=(function(){
                         API.tripPlan.uploadInvoice(invoice)
                             .then(function(ret){
                                 console.info(ret);
-                                $("#uploadimg").hide();
+                                location.reload();
                             })
                             .catch(function(err){
                                 console.info(err);
