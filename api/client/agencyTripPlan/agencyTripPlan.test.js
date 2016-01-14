@@ -31,7 +31,7 @@ describe("api/client/agencyTripPlan.js", function() {
         destination: '上海',
         description: '审核发票用测试',
         budget: 1000,
-        startAt: '2015-12-30 11:12:12',
+        //startAt: '2015-12-30 11:12:12',
         consumeDetails: [{
             type: 0,
             startTime: '2016-01-07 10:22:00',

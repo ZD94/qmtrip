@@ -43,7 +43,10 @@
                 </dl>
                 <dl>
                     <dt>获得积分</dt>
-                    <dd>无</dd>
+                    <dd>
+                        <span ng-if="planDetail.score">{{planDetail.score}}</span>
+                        <span ng-if="!planDetail.score">暂无</span>
+                    </dd>
                 </dl>
             </div>
             <div class="title_bottom"><span></span>差旅消费明细</div>

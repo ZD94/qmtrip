@@ -158,7 +158,11 @@ auth.registryCompany = function(params) {
             return API.auth.newAccount({mobile: mobile, email: email, pwd: pwd, status: status});
         })
         .then(function(account) {
-            return API.company.createCompany({id: companyId, createUser: account.id, name: companyName, domainName: domain,
+            var agencyId = params.agencyId;
+            if(!agencyId){
+                agencyId = '00000000-0000-0000-0000-000000000001';
+            }
+            return API.company.createCompany({id: companyId, agencyId: agencyId, createUser: account.id, name: companyName, domainName: domain,
                 mobile:mobile, email: email})
             .then(function(){
                     return API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
