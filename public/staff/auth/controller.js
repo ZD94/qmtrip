@@ -8,6 +8,12 @@ var auth=(function(){
 
     //登录页面
     auth.LoginController = function ($scope, $routeParams) {
+        var email = Cookie.get("email");
+        var pwd = Cookie.get("pwd");
+
+        $scope.email = email;
+        $scope.pwd = pwd;
+        console.info(email, pwd);
         $scope.toRegister = function(){
             window.location.href = "#/auth/register";
         }
@@ -18,6 +24,8 @@ var auth=(function(){
         $scope.checkLogin = function() {
             var name = $('#name').val();
             var pwd  = $('#pwd').val();
+            var remember = $("#remember").val();
+
             var commit = true;
             if(commit){
                 if(!name){
@@ -40,12 +48,20 @@ var auth=(function(){
                 API.onload(function(){
                     API.auth.login({email:name,pwd:pwd})
                         .then(function(data){
-                            console.info(data);
                             Cookie.set("user_id", data.user_id, { expires:30 });
                             Cookie.set("token_sign", data.token_sign, { expires:30 });
                             Cookie.set("timestamp", data.timestamp, { expires:30 });
                             Cookie.set("token_id", data.token_id, { expires:30 });
-                            console.log("登录成功");
+                            if (remember == true || remember == 'true') {
+                                Cookie.set("email", name);
+                                Cookie.set("pwd", pwd);
+                                Cookie.set("remember", remember);
+                            } else {
+                                Cookie.remove("email");
+                                Cookie.remove("pwd");
+                                Cookie.remove("remember");
+                            }
+
                             API.reload_all_modules();
                             window.location.href= backUrl+"?logintime="+data.is_first_login;
                         }).catch(function(err){
