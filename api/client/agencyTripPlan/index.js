@@ -239,7 +239,6 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                 if(ret.status != 2 || ret.score == 0){ //status == 2 是审核通过的状态，通过后要给企业用户增加积分操作，积分为0时不需要此操作
                     return true;
                 }
-                var score = parseInt(ret.score/2);
                 return API.staff.increaseStaffPoint({id: staffId, accountId: user_id, increasePoint: score})
             })
             .then(function(){

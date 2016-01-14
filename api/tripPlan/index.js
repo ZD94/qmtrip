@@ -464,7 +464,7 @@ tripPlan.approveInvoice = function(params){
                                     (order.budget - order_updates.expenditure)>0?score=parseInt(order.budget - order_updates.expenditure):score=0;
                                     order_updates.status = 2;
                                     order_updates.auditStatus = 1;
-                                    order_updates.score = score;
+                                    order_updates.score = parseInt(score/2);
                                 }
                                 return PlanOrder.update(order_updates, {where: {id: order.id}, fields: Object.keys(order_updates), transaction: t})
                             })
