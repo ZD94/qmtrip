@@ -123,6 +123,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
         var staffName = "";
         var invoiceName = "";
         var expenditure = '0';
+        var _startTime = "";
         return API.tripPlan.getConsumeDetail({consumeId: consumeId, userId: user_id})
             .then(function(consumeDetail){
                 if(!consumeDetail.accountId){
@@ -137,6 +138,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                     invoiceName = '回程交通票据';
                 }
                 expenditure = '￥' + params.expenditure;
+                _startTime = consumeDetail.startTime;
                 return consumeDetail.accountId;
             })
             .then(function(_staffId){
@@ -201,6 +203,9 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                         hotel += ',实际支出￥' + h.expenditure;
                     }
                 }
+                var orderTime = ret.startAt;
+                if(!orderTime){ orderTime = _startTime}
+                orderTime = moment(orderTime).format('YYYY-MM-DD');
                 var url = C.host + '/staff.html#/travelPlan/PlanDetail?planId=' + order.id;
                 //审核完成后给用户发送邮件
                 if(params.status == -1){ //审核不通过
@@ -219,7 +224,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                         //toEmails: 'miao.yu@tulingdao.com',
                         templateName: "qm_notify_invoice_one_pass",
                         titleValues: [],
-                        values: [staffName, invoiceName, expenditure, ret.description, moment(ret.startAt).format('YYYY-MM-DD'), go, back, hotel, '全麦预算￥'+order.budget, url]
+                        values: [staffName, invoiceName, expenditure, ret.description, orderTime, go, back, hotel, '全麦预算￥'+order.budget, url]
                     })
                 }
                 if(ret.status == 2){
@@ -233,7 +238,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                         //toEmails: 'miao.yu@tulingdao.com',
                         templateName: "qm_notify_invoice_all_pass",
                         titleValues: [],
-                        values: [staffName, moment(ret.startAt).format('YYYY-MM-DD'), ret.description, go, back, hotel, total, _score, url]
+                        values: [staffName, orderTime, ret.description, go, back, hotel, total, _score, url]
                     })
                 }
                 if(ret.status != 2 || ret.score == 0){ //status == 2 是审核通过的状态，通过后要给企业用户增加积分操作，积分为0时不需要此操作
