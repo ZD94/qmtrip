@@ -116,7 +116,7 @@ var auth=(function(){
         //对联系人邮箱进行判断
         $("#corpMail").blur(function(){
             var mail   = $('#corpMail').val();
-            var reg = /^\w+[\w\-\.]+\w@\w[\w\-\.]+\w$/;
+            var reg = /^[\w\.-]+?@([\w\-]+\.){1,2}[a-zA-Z]{2,3}$/;
             if(!mail){
                 $scope.err_msg_mail = "联系人邮箱不能为空";
                 $("#corpMail").siblings(".err_msg").children("i").html("&#xf06a;");
@@ -385,7 +385,7 @@ var auth=(function(){
             API.onload(function(){
                 API.auth.sendActiveEmail({email:$scope.userMail})
                     .then(function(){
-                        console.info("发送成功");
+                        Myalert("温馨提示","发送成功");
                         $scope.$apply();
                     }).catch(function(err){
                         console.error(err);

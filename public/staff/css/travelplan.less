@@ -250,6 +250,9 @@
         }
       }
       .content_bottom {
+        th {
+          color: @default-text-color;
+        }
         .po_r{
           position: relative;
         }
@@ -273,18 +276,8 @@
           height: 90px;
           line-height: 90px;
           text-align: center;
+          font-size: 35px;
           float: left;
-          span {
-            width: 30px;
-            height: 30px;
-            line-height: 30px;
-            font-weight: bold;
-            text-align: center;
-            color: @btn-text-color;
-            background: @color-theme2;
-            border-radius: 50%;
-            display: inline-block;
-          }
         }
         .startplace {
           height: 90px;
@@ -308,12 +301,18 @@
         .hoteldescription {
           line-height: 30px;
           padding: 15px 0;
+          p {
+            color: #000000;
+            span {
+              color: @default-text-color;
+            }
+          }
         }
         p {
           height: 25px;
           line-height: 25px;
           color: #9B9B9B;
-          span {
+          .tongguo {
             width: 20px;
             height: 20px;
             line-height: 20px;

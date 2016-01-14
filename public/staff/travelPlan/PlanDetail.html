@@ -6,13 +6,13 @@
             <div class="title_top">
                 <table width="100%">
                     <tr>
-                        <td width="220" height="40" align="left">生成时间：{{planDetail.createAt | date: 'yyyy-MM-dd HH:mm'}}</td>
+                        <td width="220" height="40" align="left" style="font-size: 13px;">生成时间：{{planDetail.createAt | date: 'yyyy-MM-dd HH:mm'}}</td>
                         <td height="40" align="center">您于
                             <span ng-if="planDetail.startAt">{{planDetail.startAt | date: 'yyyy月MM月dd日'}}</span>
                             <span ng-if="!planDetail.startAt">{{planDetail.hotel[0].startTime | date: 'yyyy月MM月dd日'}}</span>
                             的出差状况
                         </td>
-                        <td width="220" height="40" align="right">{{planDetail.remark}}</td>
+                        <td width="220" height="40" align="right">{{planDetail.description}}</td>
                     </tr>
                 </table>
             </div>
@@ -58,9 +58,7 @@
                     </tr>
                     <tr ng-if="planDetail.outTraffic.length!=0">
                         <td>
-                            <div class="icon">
-                                <span>行</span>
-                            </div>
+                            <div class="icon web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
                             <div class="startplace">{{outTraffic.startPlace}}</div>
                             <div class="description">{{outTraffic.startTime | date: 'yyyy-MM-dd'}}<span ng-if="outTraffic.latestArriveTime!=undefined && outTraffic.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{outTraffic.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
                             <div class="endplace">{{outTraffic.arrivalPlace}}</div>
@@ -79,7 +77,7 @@
                                     <input type="file" class="file" name="tmpFile" value='选择文件' id="i_hotel" ref="{{outTraffic.id}}" data-type = "2">
                                 </p>
                                 <p ng-if="outTraffic.status=='-1'">【审核未通过】</p>
-                                <p ng-if="outTraffic.status==0">【待审核】</p>
+                                <p ng-if="outTraffic.status==0" style="color: #CF2520;">【待审核】</p>
                                 <p ng-if="outTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
                                 <p ng-if="outTraffic.status!='-1'"><a ng-click="goDetail('outTraffic',outTraffic.newInvoice)">去程交通票据</a></p>
                             </div>
@@ -87,12 +85,10 @@
                     </tr>
                     <tr ng-if="planDetail.hotel.length!=0">
                         <td>
-                            <div class="icon">
-                                <span>住</span>
-                            </div>
+                            <div class="icon web-icon-font3" style="color: #5248C8;">&#xe914;</div>
                             <div class="hoteldescription">
-                                <p>入住地：{{hotel.city}}&nbsp;{{hotel.hotelName}}附近</p>
-                                <p>入住日期：{{hotel.startTime | date: 'yyyy-MM-dd'}}&nbsp;&nbsp;&nbsp;&nbsp;退房日期：{{hotel.endTime | date: 'yyyy-MM-dd'}}</p>
+                                <p><span>入住地：</span>{{hotel.city}}&nbsp;{{hotel.hotelName}}附近</p>
+                                <p><span>入住日期：</span>{{hotel.startTime | date: 'yyyy-MM-dd'}}&nbsp;&nbsp;&nbsp;&nbsp;<span>退房日期：</span>{{hotel.endTime | date: 'yyyy-MM-dd'}}</p>
                             </div>
                         </td>
                         <td align="center">¥{{hotel.budget.toFixed(2)}}</td>
@@ -109,7 +105,7 @@
                                     <input type="file" class="file" name="tmpFile" value='选择文件' id="i_hotel" ref="{{hotel.id}}" data-type = "2">
                                 </p>
                                 <p ng-if="hotel.status=='-1'">【审核未通过】</p>
-                                <p ng-if="hotel.status==0">【待审核】</p>
+                                <p ng-if="hotel.status==0" style="color: #CF2520;">【待审核】</p>
                                 <p ng-if="hotel.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
                                 <p ng-if="hotel.status!='-1'"><a ng-click="goDetail('hotel',hotel.newInvoice)">酒店发票</a></p>
                             </div>
@@ -117,9 +113,7 @@
                     </tr>
                     <tr ng-if="planDetail.backTraffic.length!=0">
                         <td>
-                            <div class="icon">
-                                <span>行</span>
-                            </div>
+                            <div class="icon web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
                             <div class="startplace">{{backTraffic.arrivalPlace}}</div>
                             <div class="description">{{backTraffic.endTime | date: 'yyyy-MM-dd'}}<span ng-if="backTraffic.latestArriveTime!=undefined && backTraffic.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{backTraffic.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
                             <div class="endplace">{{backTraffic.startPlace}}</div>
@@ -138,7 +132,7 @@
                                     <input type="file" class="file" name="tmpFile" value='选择文件' id="i_hotel" ref="{{backTraffic.id}}" data-type = "2">
                                 </p>
                                 <p ng-if="backTraffic.status=='-1'">【审核未通过】</p>
-                                <p ng-if="backTraffic.status==0">【待审核】</p>
+                                <p ng-if="backTraffic.status==0" style="color: #CF2520;">【待审核】</p>
                                 <p ng-if="backTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
                                 <p ng-if="backTraffic.status!='-1'"><a ng-click="goDetail('backTraffic',backTraffic.newInvoice)">回程交通票据</a></p>
                             </div>

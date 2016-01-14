@@ -10,8 +10,8 @@ var FundsAccounts = Models.FundsAccounts;
 var MoneyChanges = Models.MoneyChanges;
 var uuid = require("node-uuid");
 var L = require("common/language");
+var _ = require('lodash');
 var utils = require("common/utils");
-var getColsFromParams = utils.getColsFromParams;
 var checkAndGetParams = utils.checkAndGetParams;
 
 var company = {};
@@ -81,7 +81,7 @@ company.checkBlackDomain = function(params) {
  * @returns {*}
  */
 company.updateCompany = function(params){
-    var fields = getColsFromParams(Company.attributes, ['companyNo', 'createUser', 'createAt']);
+    var fields = _.difference(Object.keys(Company.attributes), ['companyNo', 'createUser', 'createAt']);
     var params = checkAndGetParams(['companyId'], fields, params);
     var companyId = params.companyId;
     return Company.findById(companyId, {attributes: ['createUser']})
@@ -183,7 +183,6 @@ company.getCompanyFundsAccount = function(params){
     var companyId = params.companyId;
     var userId = params.userId;
     return FundsAccounts.findById(companyId, {
-        raw: false,
         attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createAt', 'updateAt']
     })
         .then(function(funds){
@@ -203,7 +202,7 @@ company.getCompanyFundsAccount = function(params){
 company.moneyChange = function(params){
     var params = checkAndGetParams(['money', 'channel', 'userId', 'type', 'companyId', 'remark'], [], params);
     var id = params.companyId;
-    return FundsAccounts.findById(id, {raw: false})
+    return FundsAccounts.findById(id)
         .then(function(funds){
             if(!funds || funds.status == -2){
                 throw {code: -2, msg: '企业资金账户不存在'};
@@ -256,7 +255,7 @@ company.moneyChange = function(params){
 
             return sequelize.transaction(function(t){
                 return Q.all([
-                    FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: Object.keys(fundsUpdates), transaction: t, raw: false}),
+                    FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: Object.keys(fundsUpdates), transaction: t}),
                     MoneyChanges.create(moneyChange, {transaction: t})
                 ])
                 .spread(function(update, create){
