@@ -289,7 +289,7 @@ var staff = (function(){
 
         //批量添加员工
         $scope.addALotStaff = function(){
-            $(".staff_tab_content").hide();
+            $(".staff_tab_content,.pagination").hide();
             $(".staff_tab_import").show();
             $(".staff_tab_valid").hide();
             $(".staff_import_success").hide();
@@ -298,7 +298,7 @@ var staff = (function(){
 
         //从批量添加返回到员工管理页面
         $scope.backToAddStaff = function(){
-            $(".staff_tab_content").show();
+            $(".staff_tab_content,.pagination").show();
             $(".staff_tab_import").hide();
             $(".staff_tab_valid").hide();
             $(".staff_import_success").hide();
