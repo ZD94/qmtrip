@@ -15,7 +15,7 @@
 		<div class="staff_record">
 			<ul>
 				<li>
-					<a href="">
+					<a href="#/travelPlan/PlanList">
 						<strong>{{businesstimes}}</strong>
 						<span>出差记录</span>
 					</a>
@@ -27,7 +27,7 @@
 					</a>
 				</li>
 				<li>
-					<a href="">
+					<a href="#/Points/ExchangePoints">
 						<strong>0</strong>
 						<span>兑换</span>
 					</a>
@@ -38,19 +38,26 @@
 	<div class="staff_menu">
 		<ul>
 			<a href="#/businessTravel/Index"><li>我要出差</li></a>
-			<a href=""><li>我要上传票据</li></a>
-			<a href=""><li>我要兑换礼品</li></a>
+			<a href="#/travelPlan/PlanList"><li>我要上传票据</li></a>
+			<a href="#/Points/MyPoints"><li>我要兑换礼品</li></a>
 		</ul>
 	</div>
 	<div class="staff_standards">
 		<h3>我的差旅标准</h3>
 		<div>
 			<p>等级：{{travelpolicy.name}}</p>
-			<p>飞机：{{travelpolicy.planeLevel}}最高{{travelpolicy.planeDiscount}}折<br/>
+			<p ng-if="travelpolicy.planeLevel == '不限' && travelpolicy.planeDiscount == 0">飞机：全价机票，舱位不限，想飞就飞
+			<p ng-if="travelpolicy.planeLevel == '不限' && travelpolicy.planeDiscount != 0">飞机：最高{{travelpolicy.planeDiscount}}折,舱位不限
+			<p ng-if="travelpolicy.planeLevel != '不限' && travelpolicy.planeDiscount == 0">飞机：全价{{travelpolicy.planeLevel}}
+			<p ng-if="travelpolicy.planeLevel != '不限' && travelpolicy.planeDiscount != 0">飞机：最高{{travelpolicy.planeDiscount}}折,{{travelpolicy.planeLevel}}
+			<br/>
 				<span ng-if="travelpolicy.isChangeLevel == true">当高级舱位价格低于上述标准时，可选择高级舱位</span>
 			</p>
-			<p>火车：{{travelpolicy.trainLevel.replace(',', '/')}}</p>
-			<p>住宿：{{travelpolicy.hotelLevel.replace(',', '/')}}</p>
+			<p ng-if="travelpolicy.trainLevel == '不限'">火车：座次不限</p>
+			<p ng-if="travelpolicy.trainLevel == '不限'">火车：{{travelpolicy.trainLevel.replace(',', '/')}}</p>
+			<p ng-if="travelpolicy.hotelLevel == '不限' && travelpolicy.hotelPrice == 0">住宿：酒店任意住</p>
+			<p ng-if="travelpolicy.hotelLevel != '不限' && travelpolicy.hotelPrice == 0">住宿：{{travelpolicy.hotelLevel.replace(',', '/')}}</p>
+			<p ng-if="travelpolicy.hotelLevel != '不限' && travelpolicy.hotelPrice != 0">住宿：{{travelpolicy.hotelLevel.replace(',', '/')}}且每晚不超过{{travelpolicy.hotelPrice}}元</p>
 		</div>
 		<!-- <div ng-if="staff.travelLevel == null">
 			<div class="travelnull">
