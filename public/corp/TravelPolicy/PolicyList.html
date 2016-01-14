@@ -5,7 +5,7 @@
     </div>
     <ul class="policy_page">
         <li ng-repeat="item in PolicyList">
-            <div class="policy_t"><span style="float: left;">{{item.name}}</span><a href="javascript:void(0);" ng-click="updatePolicyShow(item.id,$index)">修改</a><span style="font-size: 13px;">&nbsp;|&nbsp;</span><a href="javascript:void(0);" ng-click="deletePolicy(item.id,item.name)">删除</a></div>
+            <div class="policy_t"><span style="float: left;">{{item.name}}</span><a href="javascript:void(0);" ng-click="updatePolicyShow(item.id,$index)">修改</a><span style="font-size: 13px;">&nbsp;|&nbsp;</span><a href="javascript:void(0);" ng-click="deletePolicyShow(item.id,item.name)">删除</a></div>
             <table width="100%">
                 <tr>
                     <td width="70" height="34" align="right">飞机：</td>
@@ -215,7 +215,29 @@
                 </tr>
             </table>
         </div>
-
-
     </ul>
 </div>
+
+<section class="confirmFixed">
+    <div class="confirmbox">
+        <div class="confirmbox_t">
+            <span style="float: left;">提示</span>
+            <span ng-click="confirmClose()" style="float: right;"><img src="agency/images/close.jpg"></span>
+        </div>
+        <div class="confirmbox_p">
+            <div class="error" style="height: 25px; line-height: 25px; color: #DE492A;"></div>
+            <div class="messageText" style="height: 30px; line-height: 30px; text-align: center;">您确定删除"李明月"差旅标准吗？</div>
+            <div style="margin-top: 20px;">
+                <input type="button" value="确认" ng-click="deletePolicy()" class="common_btn1" style="width: 60px; margin-left: 105px;">
+                <input type="button" value="取消" ng-click="confirmClose()" class="common_btn2" style="width: 60px; margin-left: 20px;">
+            </div>
+
+            <div class="deleteFail">
+                <div class="deleteFail_text"></div>
+                <div>
+                    <input type="button" value="确认" ng-click="confirmClose()" class="common_btn1" style="width: 60px; margin-left: 170px;">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
