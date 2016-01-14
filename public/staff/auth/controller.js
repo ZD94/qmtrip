@@ -47,7 +47,7 @@ var auth=(function(){
                             Cookie.set("token_id", data.token_id, { expires:30 });
                             console.log("登录成功");
                             API.reload_all_modules();
-                            window.location.href= backUrl;
+                            window.location.href= backUrl+"?logintime="+data.is_first_login;
                         }).catch(function(err){
                             if (err.msg) {
                                 alert(err.msg);
