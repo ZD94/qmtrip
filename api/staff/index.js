@@ -244,6 +244,7 @@ staff.listAndPaginateStaff = function(params){
     params.status = {$ne: STAFF_STATUS.DELETE};//只查询在职人员
     options.limit = limit;
     options.offset = offset;
+    params.status = {$get: 0};
     options.where = params;
     return staffModel.findAndCountAll(options)
         .then(function(result){

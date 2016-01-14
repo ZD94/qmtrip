@@ -122,6 +122,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
         var staffEmail = "";
         var staffName = "";
         var invoiceName = "";
+        var expenditure = '0';
         return API.tripPlan.getConsumeDetail({consumeId: consumeId, userId: user_id})
             .then(function(consumeDetail){
                 if(!consumeDetail.accountId){
@@ -135,6 +136,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                 }else if(consumeDetail === 1){
                     invoiceName = '回程交通票据';
                 }
+                expenditure = '￥' + params.expenditure;
                 return consumeDetail.accountId;
             })
             .then(function(_staffId){
@@ -208,6 +210,16 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                         templateName: "qm_notify_invoice_not_pass",
                         titleValues: [],
                         values: [staffName, invoiceName, params.remark, ret.description, go, back, hotel, '全麦预算￥'+order.budget, url]
+                    })
+                }
+                //"%s,您好<br/>您有1张%s票据被审核通过，实际支出为%s，关联出差记录如下：<br/>项目名称:%s<br/>出差时间：%s<br/>去程交通:%s<br/>回程交通:%s<br/>住宿:%s<br/>总计：%s<br/><a href="%s">点击此处查看出差详情</a>"
+                if(params.status == 1){
+                    API.mail.sendMailRequest({
+                        toEmails: staffEmail,
+                        //toEmails: 'miao.yu@tulingdao.com',
+                        templateName: "qm_notify_invoice_one_pass",
+                        titleValues: [],
+                        values: [staffName, invoiceName, expenditure, ret.description, moment(ret.startAt).format('YYYY-MM-DD'), go, back, hotel, '全麦预算￥'+order.budget, url]
                     })
                 }
                 if(ret.status == 2){
