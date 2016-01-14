@@ -14,6 +14,7 @@ var uuid = require("node-uuid");
 var L = require("common/language");
 var Logger = require('common/logger');
 var utils = require('common/utils');
+var _ = require('lodash');
 var checkAndGetParams = utils.checkAndGetParams;
 var API = require('common/api');
 var Paginate = require("common/paginate").Paginate;
@@ -174,7 +175,7 @@ tripPlan.updateTripPlanOrder = function(params){
  * @param params
  */
 tripPlan.updateConsumeDetail = function(params){
-    var updates = checkAndGetParams(['userId', 'id'], [], params, false);
+    var updates = checkAndGetParams(['userId', 'id'], Object.keys(ConsumeDetails.attributes), params, false);
     var id = params.id;
     var userId = params.userId;
     return ConsumeDetails.findById(params.id, {attributes: ['status']})
@@ -493,7 +494,7 @@ tripPlan.countTripPlanNum = function(params){
  */
 tripPlan.statPlanOrderMoney = function(params){
     var query = checkAndGetParams(['companyId'], [], params);
-    var query_complete = utils.copyObj(query);
+    var query_complete = _.cloneDeep(query);
     query_complete.status = {$gte: 2};
     var createAt = {};
     if(params.startTime){
