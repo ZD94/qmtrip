@@ -348,7 +348,7 @@ var auth=(function(){
                     $("#imgCode").parent("div").siblings(".err_msg").show();
                     return false;
                 }else if(agree != "true"){
-                    $scope.err_msg_pic = '请同意注册协议';
+                    alert('请同意注册协议');
                     return false;
                 }
                 API.onload(function(){
