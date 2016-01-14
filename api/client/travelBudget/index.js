@@ -10,7 +10,7 @@ var API = require("common/api");
 var validate = require("common/validate");
 var Q = require("q");
 var L = require("common/language");
-var utils = require("common/utils");
+var moment = require('moment');
 
 /**
  * @class travelBudget 旅行预算
@@ -186,7 +186,8 @@ travelBudget.getHotelBudget = function(params) {
         .then(function(result) {
             //如果没有查询到结果,直接扔回最大金额
             if (!result.price || result.price <=0) {
-                var days = utils.diffDate(checkInDate, checkOutDate) || 1;
+                var days = moment(checkOutDate).diff(checkInDate, 'days');
+                days = days<=0?1:days;
                 return {price: policy.hotelPrice * days || -1};
             }
             return result;

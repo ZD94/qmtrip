@@ -1,0 +1,1 @@
+alter table auth.accounts add is_first_login boolean default true;

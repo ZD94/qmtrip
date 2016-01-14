@@ -115,9 +115,9 @@ tripPlan.pageCompleteTripPlanOrder = function (params) {
         .then(function (companyId) {
             params.accountId = self.accountId;
             params.companyId = companyId;
-            params.auditStatus = 1; //已完成计划单
-            params.status = {$gte: 1};
-            var query = checkAndGetParams(['companyId'], ['accountId', 'status', 'auditStatus'], params);
+            params.auditStatus = 1; //审核状态为审核通过
+            params.status = {$gt: 1}; //计划单状态为已完成（2），可能会有结算完毕状态（3）
+            var query = checkAndGetParams(['companyId', 'accountId'], ['status', 'auditStatus'], params);
             var page = params.page;
             var perPage = params.perPage;
             typeof page == 'number' ? "" : page = 1;
@@ -205,7 +205,7 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
         var audit = params.audit;
         params.status = 1;
         if(audit == 'Y'){
-            params.status = {$gte: 1};
+            params.status = {$gt: 1};
             params.auditStatus = 1;
         }else if(audit == "P"){
             params.auditStatus = 0;

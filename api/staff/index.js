@@ -7,6 +7,7 @@ var nodeXlsx = require("node-xlsx");
 var uuid = require("node-uuid");
 var moment = require("moment");
 var crypto = require("crypto");
+var _ = require('lodash');
 var utils = require("common/utils");
 var sequelize = require("common/model").importModel("./models");
 var Logger = require("common/logger");
@@ -408,7 +409,7 @@ staff.beforeImportExcel = function(params){
                 var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
                 item = staffObj;
                 if(index>0 && index<201){//不取等于0的过滤抬头标题栏
-                    if(utils.trim(staffObj.name) == ""){
+                    if(_.trim(staffObj.name) == ""){
                         staffObj.reason = "姓名为空";
                         s[6] = "姓名为空";
                         noAddObj.push(staffObj);
@@ -416,23 +417,23 @@ staff.beforeImportExcel = function(params){
                         return;
                     }
 //                    /^[\d]{11}$/.test(staffObj.mobile)
-                    if(utils.trim(staffObj.mobile) != "" && !validate.isMobile(staffObj.mobile)){
+                    if(_.trim(staffObj.mobile) != "" && !validate.isMobile(staffObj.mobile)){
                         staffObj.reason = "手机号格式不正确";
                         s[6] = "手机号格式不正确";
                         noAddObj.push(staffObj);
                         downloadNoAddObj.push(s);
                         return;
                     }
-                    if(utils.trim(staffObj.mobile) != "" && mobileAttr.join(",").indexOf(utils.trim(s[1])) != -1){
+                    if(_.trim(staffObj.mobile) != "" && mobileAttr.join(",").indexOf(_.trim(s[1])) != -1){
                         staffObj.reason = "手机号与本次导入中手机号重复";
                         s[6] = "手机号与本次导入中手机号重复";
                         noAddObj.push(staffObj);
                         downloadNoAddObj.push(s);
-                        repeatMobile.push(utils.trim(s[1]));
+                        repeatMobile.push(_.trim(s[1]));
                         return;
                     }
                     mobileAttr.push(s[1]);
-                    if(utils.trim(staffObj.email) == ""){
+                    if(_.trim(staffObj.email) == ""){
                         staffObj.reason = "邮箱为空";
                         s[6] = "邮箱为空";
                         noAddObj.push(staffObj);
@@ -446,16 +447,16 @@ staff.beforeImportExcel = function(params){
                         downloadNoAddObj.push(s);
                         return;
                     }
-                    if(emailAttr.join(",").indexOf(utils.trim(s[2])) != -1){
+                    if(emailAttr.join(",").indexOf(_.trim(s[2])) != -1){
                         staffObj.reason = "邮箱与本次导入中邮箱重复";
                         s[6] = "邮箱与本次导入中邮箱重复";
                         noAddObj.push(staffObj);
                         downloadNoAddObj.push(s);
-                        repeatEmail.push(utils.trim(s[2]));
+                        repeatEmail.push(_.trim(s[2]));
                         return;
                     }
                     emailAttr.push(s[2]);
-                    if(s[4] && utils.trim(s[4]) != "" && staffObj.travelLevel == ""){
+                    if(s[4] && _.trim(s[4]) != "" && staffObj.travelLevel == ""){
                         staffObj.reason = "差旅标准不符合要求";
                         s[6] = "差旅标准不符合要求";
                         noAddObj.push(staffObj);
@@ -501,7 +502,7 @@ staff.beforeImportExcel = function(params){
                     //addObj中删除重复邮箱的用户
                     for(var i=0;i<addObj.length;i++){
                         var addStaff = addObj[i];
-                        if(utils.trim(addStaff.email) == rEmail){
+                        if(_.trim(addStaff.email) == rEmail){
                             addObj.splice(i, 1);
                             downloadAddObj.splice(i, 1);
                             addStaff.reason = "邮箱与本次导入中邮箱重复";
@@ -516,7 +517,7 @@ staff.beforeImportExcel = function(params){
                     //addObj中删除重复邮箱的用户
                     for(var i=0;i<addObj.length;i++){
                         var addStaff = addObj[i];
-                        if(utils.trim(addStaff.mobile) == rMobile){
+                        if(_.trim(addStaff.mobile) == rMobile){
                             addObj.splice(i, 1);
                             downloadAddObj.splice(i, 1);
                             addStaff.reason = "手机号与本次导入中手机号重复";
