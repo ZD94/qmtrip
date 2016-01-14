@@ -121,7 +121,6 @@ var TravelPolicy=(function(){
                         console.info (result);
                     })
                     .catch(function(err){
-//                        Myalert("温馨提示","内容不完整，请重新填写");
                         Myalert("温馨提示", err.msg);
                         console.info (err);
                     });
@@ -130,21 +129,38 @@ var TravelPolicy=(function(){
 
 
         //删除标准
-        $scope.deletePolicy = function (id,name) {
-//            Myalert("温馨提示","删除成功");
+        $scope.deletePolicyShow = function (id,name) {
+            $scope.deleteId = id;
+            $scope.deleteName = name;
+            $(".messageText").html("您确定删除&quot;"+$scope.deleteName+"&quot;差旅标准吗？");
+            $(".confirmFixed").show();
+        }
+        $scope.deletePolicy = function () {
             API.onload(function(){
-                API.travelPolicy.deleteTravelPolicy({id:id})
+                API.travelPolicy.deleteTravelPolicy({id:$scope.deleteId})
                     .then(function(result){
-                        Myalert("温馨提示","删除&nbsp;<span>'"+name+"'&nbsp;</span>成功");
+                        $(".confirmFixed").hide();
                         $scope.initPolicyList();
                         console.info (result);
                     })
                     .catch(function(err){
-                        Myalert("温馨提示",err.msg);
+                        $(".deleteFail").show();
+                        $(".deleteFail_text").html(err.msg);
                         console.info (err);
                     });
             })
         }
+
+        //关闭弹窗
+        $scope.confirmClose = function () {
+            $(".confirmFixed,.deleteFail").hide();
+        }
+
+
+
+
+
+
 
 
         //修改标准

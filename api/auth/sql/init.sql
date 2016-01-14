@@ -13,7 +13,8 @@ create table auth.accounts (
     last_login_ip varchar(50),
     active_token varchar(50),
     pwd_token varchar(50),
-    type integer default 1
+    type integer default 1,
+    is_first_login boolean default true
 );
 
 

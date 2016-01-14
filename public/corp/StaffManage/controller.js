@@ -287,6 +287,32 @@ var staff = (function(){
             })
         }
 
+
+
+        //删除员工信息
+        $scope.deleteInfoShow = function (id,name) {
+            $scope.deleteId = id;
+            $scope.deleteName = name;
+            $(".messageText").html("您确定删除&quot;"+$scope.deleteName+"&quot;吗？");
+            $(".confirmFixed").show();
+        }
+        $scope.deleteInfo = function () {
+            API.onload(function(){
+                API.staff.deleteStaff({id:$scope.deleteId})
+                    .then(function(newStaff){
+                        $(".confirmFixed").hide();
+                        $scope.initstafflist();
+                    }).catch(function(err){
+                        console.info(err);
+                    }).done();
+            })
+        }
+
+        //关闭弹窗
+        $scope.confirmClose = function () {
+            $(".confirmFixed,.deleteFail").hide();
+        }
+
         //批量添加员工
         $scope.addALotStaff = function(){
             $(".staff_tab_content,.pagination").hide();
