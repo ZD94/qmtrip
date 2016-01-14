@@ -489,6 +489,10 @@ var auth=(function(){
         var accountId = $routeParams.accountId;
         var timestamp = $routeParams.timestamp;
 
+        $scope.toLogin = function() {
+            window.location.href = "#/auth/login";
+        }
+
         API.onload(function() {
             API.auth.activeByEmail({sign: sign, accountId: accountId, timestamp: timestamp})
                 .then(function(result) {
@@ -528,8 +532,6 @@ var auth=(function(){
                     $scope.$apply();
                 })
         })
-
-            //$scope.activeResult = "恭喜您账号成功激活,关闭页面";
     }
 
     //登出页面
