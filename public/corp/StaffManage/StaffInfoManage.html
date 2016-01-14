@@ -93,7 +93,7 @@
             <li><span>{{item.travelLeverName}}</span></li>
             <li><span ng-if="item.roleId == 0">创建者</span><span ng-if="item.roleId == 1">普通员工</span><span ng-if="item.roleId == 2">管理员</span><span ng-if="item.roleId == 3">财务人员</span></li>
             <li><a ng-if="!((item.roleId == 2 || item.roleId == 0) && roleId == 2 && currentStaff.id != item.id)"><span ng-click="editStaffInfo($index)" id="change">修改</span></a>
-                <a ng-if="item.roleId != 0 && !(item.roleId == 2 && roleId == 2)">&nbsp;|&nbsp;<span ng-click="delStaffInfo(item.id, $index)">删除</span></a></li>
+                <a ng-if="item.roleId != 0 && !(item.roleId == 2 && roleId == 2)">&nbsp;|&nbsp;<span ng-click="deleteInfoShow(item.id, item.name)">删除</span></a></li>
             <li class="orange">{{item.accStatus}}</li>
             <div class="add_staff2">
                 <div class="little_triangle2">
@@ -296,6 +296,31 @@
     </div>
 </div>
 <ul class="pagination" id="pagination"></ul>
+
+
+<section class="confirmFixed">
+    <div class="confirmbox">
+        <div class="confirmbox_t">
+            <span style="float: left;">提示</span>
+            <span ng-click="confirmClose()" style="float: right;"><img src="agency/images/close.jpg"></span>
+        </div>
+        <div class="confirmbox_p">
+            <div class="error" style="height: 25px; line-height: 25px; color: #DE492A;"></div>
+            <div class="messageText" style="height: 30px; line-height: 30px; text-align: center;"></div>
+            <div style="margin-top: 20px;">
+                <input type="button" value="确认" ng-click="deleteInfo()" class="common_btn1" style="width: 60px; margin-left: 105px;">
+                <input type="button" value="取消" ng-click="confirmClose()" class="common_btn2" style="width: 60px; margin-left: 20px;">
+            </div>
+
+            <div class="deleteFail">
+                <div class="deleteFail_text"></div>
+                <div>
+                    <input type="button" value="确认" ng-click="confirmClose()" class="common_btn1" style="width: 60px; margin-left: 170px;">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <script>
     $(function(){
