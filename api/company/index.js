@@ -10,8 +10,8 @@ var FundsAccounts = Models.FundsAccounts;
 var MoneyChanges = Models.MoneyChanges;
 var uuid = require("node-uuid");
 var L = require("common/language");
+var _ = require('lodash');
 var utils = require("common/utils");
-var getColsFromParams = utils.getColsFromParams;
 var checkAndGetParams = utils.checkAndGetParams;
 
 var company = {};
@@ -81,7 +81,7 @@ company.checkBlackDomain = function(params) {
  * @returns {*}
  */
 company.updateCompany = function(params){
-    var fields = getColsFromParams(Company.attributes, ['companyNo', 'createUser', 'createAt']);
+    var fields = _.difference(Object.keys(Company.attributes), ['companyNo', 'createUser', 'createAt']);
     var params = checkAndGetParams(['companyId'], fields, params);
     var companyId = params.companyId;
     return Company.findById(companyId, {attributes: ['createUser']})
