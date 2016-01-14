@@ -67,6 +67,14 @@
             var token_id = Cookie.get('token_id');
             var token_sign = Cookie.get('token_sign');
             var timestamp = Cookie.get("timestamp");
+            //如果参数不存在,没必要验证了
+            if (!user_id || !token_id || !token_sign || !timestamp) {
+                var backUrl = window.location.href;
+                backUrl = encodeURIComponent(backUrl);
+                window.location.href = "/staff.html#/auth/login?backurl=" + backUrl;
+                return;
+            }
+
             remote.authenticate({ accountid: user_id, tokenid: token_id, tokensign: token_sign, timestamp: timestamp },
                     callback);
         };
