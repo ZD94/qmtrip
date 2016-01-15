@@ -154,7 +154,7 @@ describe("api/client/staff.js", function() {
     })
 //积分记录查询
     it("#listAndPaginatePointChange should be ok", function(done) {
-        API.client.staff.listAndPaginatePointChange.call(ownerSelf, {staffId: id}, function(err, result) {//查询条件此处用staffId或者staff_id均可
+        API.client.staff.listAndPaginatePointChange.call(ownerSelf, {staffId: id}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
             //console.log(result);
@@ -164,16 +164,25 @@ describe("api/client/staff.js", function() {
 
 //查询人数
     it("#statisticStaffsRole should be ok", function(done) {
-        API.client.staff.statisticStaffsRole.call(ownerSelf, {companyId: companyId}, function(err, result) {//查询条件此处用staffId或者staff_id均可
+        API.client.staff.statisticStaffsRole.call(ownerSelf, {companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
             console.log(result);
             done();
         });
     })
+//查询企业已有部门
+    it("#getDistinctDepartment should be ok", function(done) {
+        API.client.staff.getDistinctDepartment.call(ownerSelf, {companyId: companyId}, function(err, result) {
+            assert.equal(err, null);
+            //console.log(err);
+//            console.log(result);
+            done();
+        });
+    })
 //查询员工总数
     it("#getStaffCountByCompany should be ok", function(done) {
-        API.client.staff.getStaffCountByCompany.call(ownerSelf, {companyId: companyId}, function(err, result) {//查询条件此处用staffId或者staff_id均可
+        API.client.staff.getStaffCountByCompany.call(ownerSelf, {companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
             console.log(result);
