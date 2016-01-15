@@ -520,11 +520,15 @@ authServer.getAccount = function(params){
  * 修改账户信息
  * @param id
  * @param data
+ * @param companyName
  * @returns {*}
  */
-authServer.updateAccount = function(id, data){
+authServer.updateAccount = function(id, data, companyName){
     if(!id){
         throw {code: -1, msg: "id不能为空"};
+    }
+    if (!companyName) {
+        companyName = '';
     }
     var options = {};
     options.where = {id: id};
@@ -541,7 +545,7 @@ authServer.updateAccount = function(id, data){
             if(old_email == rows[0].email){
                 return rows[0];
             }
-            return authServer.sendResetPwdEmail({email: rows[0].email, type: 1, isFirstSet: true})
+            return authServer.sendResetPwdEmail({companyName: companyName, email: rows[0].email, type: 1, isFirstSet: true})
                 .then(function() {
                     return rows[0];
                 });
