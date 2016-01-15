@@ -130,6 +130,30 @@ attachment.getAttachment = function(params){
 }
 
 /**
+ * 通过md5key查询附件记录并组合has_id
+ * @param params
+ * @returns {*|Promise}
+ */
+attachment.getAttachmentJointHasId = function(params){
+    var options = {};
+    options.where = params;
+    var has_id = [];
+    return attachmentModel.findAll(options)
+        .then(function(datas){
+            if(datas && datas.length>0){
+                for(var i=0;i<datas.length;i++){
+                    has_id.push.apply(has_id, datas[i].hasId);
+                }
+            }
+            return datas[0];
+        })
+        .then(function(result){
+            result.hasId = has_id;
+            return result;
+        })
+}
+
+/**
  * 分页查询附件记录集合
  * @param params 查询条件
  * @param options options.perPage 每页条数 options.page当前页
