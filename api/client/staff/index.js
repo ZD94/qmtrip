@@ -376,6 +376,26 @@ staff.getStaffCountByCompany = function(params){
 }
 
 /**
+ * 统计企业员工总数
+ * @param params
+ * @param {String} params.companyId
+ * @returns {*}
+ */
+staff.getDistinctDepartment = function(params){
+    var user_id = this.accountId;
+    return API.staff.getStaff({id: user_id})
+        .then(function(data){
+            if(data){
+                var companyId = data.companyId;
+                params.companyId = companyId;
+                return API.staff.getDistinctDepartment(params);
+            }else{
+                throw {msg:"无权限"};
+            }
+        });
+}
+
+/**
  * @method API.staff.statisticStaffsRole
  * 统计企业管理员 普通员工 未激活人数
  * @param params

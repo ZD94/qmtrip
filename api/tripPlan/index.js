@@ -376,7 +376,9 @@ tripPlan.uploadInvoice = function(params){
  * @returns {*}
  */
 tripPlan.getConsumeDetail = function(params){
-    var params = checkAndGetParams(['consumeId', 'userId'], [], params);
+    if(!params.consumeId){
+        throw {code: -1, msg: '参数 consumeId 不能为空'};
+    }
     var consumeId = params.consumeId;
     return ConsumeDetails.findById(consumeId)
         .then(function(consumeDetail){
@@ -475,6 +477,7 @@ tripPlan.approveInvoice = function(params){
                 invoice: JSON.stringify(invoiceJson),
                 updateAt: utils.now(),
                 status: params.status,
+                auditUser: params.userId,
                 expenditure: params.expenditure
             };
             if(params.remark){

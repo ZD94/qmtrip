@@ -36,8 +36,6 @@ var AGENCY_ROLE = {
     ADMIN: 2
 };
 
-staff.staffCols = Object.keys(staffModel.attributes);
-
 /**
  * 创建员工
  * @param data
@@ -198,7 +196,7 @@ staff.getStaff = function(params){
 staff.findOneStaff = function(params){
     var options = {};
     options.where = params;
-    return staffModel.findOne(options);
+    return staffModel.findOne(options)
 }
 
 /**
@@ -208,7 +206,7 @@ staff.findOneStaff = function(params){
  */
 staff.findStaffs = function(params){
     var options = {};
-    options.where = checkAndGetParams([], this.staffCols, params);
+    options.where = checkAndGetParams([], Object.keys(staffModel.attributes), params);
     if(params.columns){
         options.attributes = params.columns;
     }
@@ -650,7 +648,7 @@ staff.statisticStaffs = function(params){
     return Q.all([
         staffModel.count({where: {companyId: companyId, status: {$gte: 0}}}),
         staffModel.count({where: {companyId: companyId, createAt: {$gte: start, $lte: end}}}),
-        staffModel.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: STAFF_STATUS.QUIT_JOB }})
+        staffModel.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: {$lt: 0} }})
     ])
         .spread(function(all, inNum, outNum){
             var sta = {
@@ -719,6 +717,28 @@ staff.getStaffCountByCompany = function(params){
 }
 
 /**
+ * 查询企业部门
+ * @param params
+ * @returns {*}
+ */
+staff.getDistinctDepartment = function(params){
+    if(!params.companyId){
+        throw {code: -1, msg: '企业Id不能为空'};
+    }
+    var departmentAttr = [];
+    var companyId = params.companyId;
+    return staffModel.findAll({where: {companyId: companyId, status:{$ne: STAFF_STATUS.DELETE}}, attributes:[[sequelize.literal('distinct department'),'department']]})
+        .then(function(departments){
+            for(var i=0;i<departments.length;i++){
+                if(departments[i] && departments[i].department){
+                    departmentAttr.push(departments[i].department);
+                }
+            }
+            return departmentAttr;
+        });
+}
+
+/**
  * 删除企业的所有员工
  * @param params
  * @returns {*}
@@ -753,8 +773,9 @@ staff.getInvoiceViewer = function(params){
                             return API.agency.getAgencyUsersId({agencyId: company.agencyId, roleId: [AGENCY_ROLE.OWNER, AGENCY_ROLE.ADMIN]})
                                 .then(function(ids){
                                     for(var i=0;i<ids.length;i++){
-                                        viewerId.push(ids[i]);
+                                        viewerId.push(ids[i].id);
                                     }
+                                    return viewerId;
                                 })
                         }
                         return viewerId;
