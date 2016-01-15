@@ -207,6 +207,7 @@ CREATE TABLE consume_details (
     invoice jsonb DEFAULT '[]'::jsonb, -- 票据[{times:1, picture:md5key, create_at:时间, status:审核结果, remark: 备注}]
     remark character varying,
     audit_remark character varying,
+    audit_user uuid,
     create_at timestamp without time zone default now(),
     update_at timestamp without time zone,
     new_invoice character varying -- 新上传票据

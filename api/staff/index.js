@@ -36,8 +36,6 @@ var AGENCY_ROLE = {
     ADMIN: 2
 };
 
-staff.staffCols = Object.keys(staffModel.attributes);
-
 /**
  * 创建员工
  * @param data
@@ -198,7 +196,7 @@ staff.getStaff = function(params){
 staff.findOneStaff = function(params){
     var options = {};
     options.where = params;
-    return staffModel.findOne(options);
+    return staffModel.findOne(options)
 }
 
 /**
@@ -208,7 +206,7 @@ staff.findOneStaff = function(params){
  */
 staff.findStaffs = function(params){
     var options = {};
-    options.where = checkAndGetParams([], this.staffCols, params);
+    options.where = checkAndGetParams([], Object.keys(staffModel.attributes), params);
     if(params.columns){
         options.attributes = params.columns;
     }

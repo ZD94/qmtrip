@@ -124,7 +124,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
         var invoiceName = "";
         var expenditure = '0';
         var _startTime = "";
-        return API.tripPlan.getConsumeDetail({consumeId: consumeId, userId: user_id})
+        return API.tripPlan.getConsumeDetail({consumeId: consumeId})
             .then(function(consumeDetail){
                 if(!consumeDetail.accountId){
                     throw {code: -6, msg: '消费记录异常'};
@@ -184,14 +184,22 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                 var go = '无', back = '无', hotel = '无';
                 if(order.outTraffic.length > 0){
                     var g = order.outTraffic[0];
-                    go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.startPlace + ' 到 ' + g.arrivalPlace + ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达, 动态预算￥' + g.budget;
+                    go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.startPlace + ' 到 ' + g.arrivalPlace;
+                    if(g.latestArriveTime){
+                        go += ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达';
+                    }
+                    go += ', 动态预算￥' + g.budget;
                     if(g.expenditure){
                         go += ',实际支出￥' + g.expenditure;
                     }
                 }
                 if(order.backTraffic.length > 0){
                     var b = order.backTraffic[0];
-                    back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.startPlace + ' 到 ' + b.arrivalPlace + ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达, 动态预算￥' + b.budget;
+                    back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.startPlace + ' 到 ' + b.arrivalPlace;
+                    if(b.latestArriveTime){
+                        back += ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达';
+                    }
+                    back += ', 动态预算￥' + b.budget;
                     if(b.expenditure){
                         back += ',实际支出￥' + b.expenditure;
                     }
@@ -234,8 +242,8 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                     if(_score> 0 ){ _score += '积分已发放到您的积分账户'; }
                     var total = '全麦预算￥' + order.budget + ',实际支出￥' + order.expenditure + ',节省￥' + s;
                     API.mail.sendMailRequest({
-                        toEmails: staffEmail,
-                        //toEmails: 'miao.yu@tulingdao.com',
+                        //toEmails: staffEmail,
+                        toEmails: 'miao.yu@tulingdao.com',
                         templateName: "qm_notify_invoice_all_pass",
                         titleValues: [],
                         values: [staffName, orderTime, ret.description, go, back, hotel, total, _score, url]
