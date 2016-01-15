@@ -147,7 +147,7 @@ function checkParams(checkArray, params){
         for(var key in checkArray){
             var name = checkArray[key];
             if(!params[name] && params[name] !== false && params[name] !== 0){
-                return reject({code:'-1', msg:'参数 params.' + name + '不能为空'});
+                return reject({code:'-1', msg:'参数 params.' + name + ' 不能为空'});
             }
         }
         resolve(true);

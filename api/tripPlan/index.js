@@ -31,25 +31,21 @@ tripPlan.ConsumeDetailsCols = Object.keys(ConsumeDetails.attributes);
  * @returns {*}
  */
 tripPlan.savePlanOrder = savePlanOrder;
-savePlanOrder.required_params = ['accountId', 'companyId', 'type', 'destination', 'budget'];
-savePlanOrder.accepted_params = _.union(savePlanOrder.required_params,
-    ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark', 'description']);
+savePlanOrder.required_params = ['consumeDetails', 'accountId', 'companyId', 'type', 'destination', 'budget'];
+savePlanOrder.optional_params = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark', 'description'];
 var ConsumeDetails_create_required_fields = ['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'];
 var ConsumeDetails_create_accepted_fields = _.union(tripPlan.ConsumeDetailsCols, ConsumeDetails_create_required_fields);
 function savePlanOrder(params){
-    if(!params.consumeDetails){
-        throw {code: -1, msg: '预算详情 consumeDetails 不能为空'};
-    }
-    var ConsumeDetailsCols = tripPlan.ConsumeDetailsCols;
-    utils.requiredParams(params, savePlanOrder.required_params);
-    var _planOrder = _.pick(params, savePlanOrder.accepted_params);
+    var consumeDetails = params.consumeDetails;
+    delete params.consumeDetails;
+    var _planOrder = params;
     return API.seeds.getSeedNo('tripPlanOrderNo')
         .then(function(orderNo){
             var orderId = uuid.v1();
             _planOrder.id = orderId;
             _planOrder.orderNo = orderNo;
             _planOrder.createAt = utils.now();
-            var details = params.consumeDetails;
+            var details = consumeDetails;
             var total_budget = 0;
             for(var i in details) {
                 var obj = details[i];
@@ -64,7 +60,7 @@ function savePlanOrder(params){
                         order.outTraffic = new Array();
                         order.backTraffic = new Array();
                         order.hotel = new Array();
-                        var details = params.consumeDetails;
+                        var details = consumeDetails;
                         return Q.all(details.map(function(s){
                             s.orderId = order.id;
                             s.accountId = order.accountId;
@@ -111,10 +107,8 @@ function savePlanOrder(params){
  */
 tripPlan.getTripPlanOrder = getTripPlanOrder;
 getTripPlanOrder.required_params = ['orderId'];
-getTripPlanOrder.accepted_params = _.union(getTripPlanOrder.required_params, ['columns']);
+getTripPlanOrder.optional_params = ['columns'];
 function getTripPlanOrder(params){
-    utils.requiredParams(params, getTripPlanOrder.required_params);
-    params = _.pick(params, getTripPlanOrder.accepted_params);
     var orderId = params.orderId;
     var options = {};
     if(params.columns){
@@ -143,10 +137,9 @@ function getTripPlanOrder(params){
  * @param params
  * @returns {*}
  */
-tripPlan.updateTripPlanOrder = function(params){
-    var required_params = ['userId', 'orderId', 'optLog', 'updates'];
-    utils.requiredParams(params, required_params);
-    var params = _.pick(params, required_params);
+tripPlan.updateTripPlanOrder = updateTripPlanOrder;
+updateTripPlanOrder.required_params = ['userId', 'orderId', 'optLog', 'updates'];
+function updateTripPlanOrder(params){
     var orderId = params.orderId;
     var userId = params.userId;
     var optLog = params.optLog;
@@ -185,11 +178,10 @@ tripPlan.updateTripPlanOrder = function(params){
  * @param params
  */
 tripPlan.updateConsumeDetail = updateConsumeDetail;
-updateConsumeDetail.required_params = ['userId', 'id'];
-updateConsumeDetail.accepted_params = _.keys(ConsumeDetails.attributes);
+updateConsumeDetail.required_params = ['id'];
+updateConsumeDetail.optional_params = _.keys(ConsumeDetails.attributes);
 function updateConsumeDetail(params){
-    utils.requiredParams(params, updateConsumeDetail.required_params);
-    var updates = _.pick(params, updateConsumeDetail.accepted_params);
+    var updates = params;
     return ConsumeDetails.findById(params.id, {attributes: ['status']})
         .then(function(record){
             if(!record || record.status == -2){
@@ -246,10 +238,9 @@ tripPlan.listTripPlanOrder = function(options){
  */
 tripPlan.saveConsumeRecord = saveConsumeRecord;
 saveConsumeRecord.required_params = ['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'];
-saveConsumeRecord.accepted_params = _.union(saveConsumeRecord.required_params, tripPlan.ConsumeDetailsCols);
+saveConsumeRecord.optional_params = tripPlan.ConsumeDetailsCols;
 function saveConsumeRecord(params){
-    utils.requiredParams(params, saveConsumeRecord.required_params);
-    var record = _.pick(params, saveConsumeRecord.accepted_params);
+    var record = params;
     record.status = 0;
     var options = {};
     options.fields = Object.keys(record);
@@ -293,10 +284,9 @@ function saveConsumeRecord(params){
  * @param params
  * @returns {*}
  */
-tripPlan.deleteTripPlanOrder = function(params){
-    var required_params = ['userId', 'orderId'];
-    utils.requiredParams(params, required_params);
-    var params = _.pick(params, required_params);
+tripPlan.deleteTripPlanOrder = deleteTripPlanOrder;
+deleteTripPlanOrder.required_params = ['userId', 'orderId'];
+function deleteTripPlanOrder(params){
     var orderId = params.orderId;
     var userId = params.userId;
     return PlanOrder.findById(orderId, {attributes: ['accountId', 'status']})
@@ -324,10 +314,9 @@ tripPlan.deleteTripPlanOrder = function(params){
  * @param params
  * @returns {*}
  */
-tripPlan.deleteConsumeDetail = function(params){
-    var required_params = ['userId', 'id'];
-    utils.requiredParams(params, required_params);
-    var params = _.pick(params, required_params);
+tripPlan.deleteConsumeDetail = deleteConsumeDetail;
+deleteConsumeDetail.required_params = ['userId', 'id'];
+function deleteConsumeDetail(params){
     var id = params.id;
     var userId = params.userId;
     return ConsumeDetails.findById(id, {attributes: ['accountId']})
@@ -353,10 +342,9 @@ tripPlan.deleteConsumeDetail = function(params){
  * @param params.picture 新上传的票据md5key
  * @returns {*}
  */
-tripPlan.uploadInvoice = function(params){
-    var required_params = ['userId', 'consumeId', 'picture'];
-    utils.requiredParams(params, required_params);
-    var params = _.pick(params, required_params);
+tripPlan.uploadInvoice = uploadInvoice;
+uploadInvoice.required_params = ['userId', 'consumeId', 'picture'];
+function uploadInvoice(params){
     var orderId = "";
     return ConsumeDetails.findOne({where: {id: params.consumeId, account_id: params.userId}})
         .then(function(custome){
@@ -415,10 +403,9 @@ tripPlan.getConsumeDetail = function(params){
  * @param params
  * @returns {Promise.<Instance>}
  */
-tripPlan.getVisitPermission = function(params){
-    var required_params = ['consumeId', 'userId'];
-    utils.requiredParams(params, required_params);
-    var params = _.pick(params, required_params);
+tripPlan.getVisitPermission = getVisitPermission;
+getVisitPermission.required_params = ['consumeId', 'userId'];
+function getVisitPermission(params){
     var userId = params.userId;
     var consumeId = params.consumeId;
     return ConsumeDetails.findById(consumeId)
@@ -471,10 +458,8 @@ tripPlan.getVisitPermission = function(params){
  */
 tripPlan.approveInvoice = approveInvoice;
 approveInvoice.required_params = ['status', 'consumeId', 'userId'];
-approveInvoice.accepted_params = _.union(approveInvoice.required_params, ['remark', 'expenditure']);
+approveInvoice.optional_params = ['remark', 'expenditure'];
 function approveInvoice(params){
-    utils.requiredParams(params, approveInvoice.required_params);
-    params = _.pick(params, approveInvoice.accepted_params);
     return ConsumeDetails.findById(params.consumeId)
         .then(function(consume){
             if(!consume || consume.status == -2)
@@ -563,10 +548,9 @@ function approveInvoice(params){
  */
 tripPlan.countTripPlanNum = countTripPlanNum;
 countTripPlanNum.required_params = ['companyId'];
-countTripPlanNum.accepted_params = _.union(countTripPlanNum.required_params, ['accountId', 'status']);
+countTripPlanNum.optional_params = ['accountId', 'status'];
 function countTripPlanNum(params){
-    utils.requiredParams(params, countTripPlanNum.required_params);
-    var query = _.pick(params, countTripPlanNum.accepted_params);
+    var query = params;
     query.status = {$ne: -2};
     return PlanOrder.count({where: query});
 }
@@ -575,10 +559,11 @@ function countTripPlanNum(params){
  * 统计计划单的动态预算/计划金额和实际支出
  * @param params
  */
-tripPlan.statPlanOrderMoney = function(params){
-    var required_params = ['companyId'];
-    utils.requiredParams(params, required_params);
-    var query = _.pick(params, required_params);
+tripPlan.statPlanOrderMoney = statPlanOrderMoney;
+statPlanOrderMoney.required_params = ['companyId'];
+statPlanOrderMoney.optional_params = ['startTime', 'endTime'];
+function statPlanOrderMoney(params){
+    var query = params;
     var query_complete = {
         companyId: query.companyId,
         status: {$gte: 2},
@@ -588,9 +573,11 @@ tripPlan.statPlanOrderMoney = function(params){
     var startAt = {};
     if(params.startTime){
         startAt.$gte = params.startTime;
+        delete params.startTime;
     }
     if(params.endTime){
         startAt.$lte = params.endTime;
+        delete params.endTime;
     }
     if(!isObjNull(startAt)){
         query.startAt = startAt;

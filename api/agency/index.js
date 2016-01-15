@@ -143,10 +143,9 @@ agency.listAgency = function(params){
  * @param params
  * @returns {*}
  */
-agency.deleteAgency = function(params){
-    var required_params = ['agencyId', 'userId'];
-    utils.requiredParams(params, required_params);
-    var params = _.pick(params, required_params);
+agency.deleteAgency = deleteAgency;
+deleteAgency.required_params = ['agencyId', 'userId'];
+function deleteAgency(params){
     var agencyId = params.agencyId;
     var userId = params.userId;
     return Q.all([
@@ -190,10 +189,9 @@ agency.deleteAgency = function(params){
  */
 agency.createAgencyUser = createAgencyUser;
 createAgencyUser.required_params = ['email', 'mobile', 'agencyId', 'name'];
-createAgencyUser.accepted_params = _.union(agency.agencyUserCols, createAgencyUser.required_params);
+createAgencyUser.optional_params = agency.agencyUserCols;
 function createAgencyUser(data){
-    utils.requiredParams(data, createAgencyUser.required_params);
-    var _agencyUser = _.pick(data, createAgencyUser.accepted_params);
+    var _agencyUser = data;
     _agencyUser.id = data.accountId || uuid.v1();
     var accData = {email: _agencyUser.email, mobile: _agencyUser.mobile, pwd: "123456", type: 2};//初始密码暂定123456
     return API.auth.newAccount(accData)
