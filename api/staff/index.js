@@ -801,10 +801,10 @@ staff.getInvoiceViewer = function(params){
  *
  * @param params
  */
-staff.statStaffPoints = function(params){
-    var required_params = ['companyId'];
-    utils.requiredParams(params, required_params);
-    var query = _.pick(params, required_params);
+staff.statStaffPoints = statStaffPoints;
+statStaffPoints.required_params = ['companyId'];
+function statStaffPoints(params){
+    var query = params;
     return Q.all([
         staffModel.sum('total_points', {where: query}),
         staffModel.sum('balance_points', {where: query})

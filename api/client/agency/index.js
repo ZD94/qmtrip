@@ -33,11 +33,9 @@ var agency = {}
  */
 agency.registerAgency = registerAgency;
 registerAgency.required_params = ['name', 'email', 'mobile', 'userName'];
-registerAgency.accepted_params = _.union(registerAgency.required_params, ['description', 'remark']);
+registerAgency.optional_params = ['description', 'remark'];
 function registerAgency(params){
-    utils.requiredParams(params, registerAgency.required_params);
-    var agency = _.pick(params, registerAgency.accepted_params);
-    return API.agency.registerAgency(agency);
+    return API.agency.registerAgency(params);
 }
 
 /**
@@ -49,12 +47,9 @@ function registerAgency(params){
  */
 agency.updateAgency = updateAgency;
 updateAgency.required_params = ['agencyId'];
-updateAgency.accepted_params = _.union(updateAgency.required_params,
-    ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark']);
+updateAgency.optional_params = ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark'];
 function updateAgency(params){
     var self = this;
-    utils.requiredParams(params, updateAgency.required_params);
-    params = _.pick(params, updateAgency.accepted_params);
     params.userId = self.accountId;
     return API.agency.updateAgency(params);
 }
@@ -149,11 +144,8 @@ agency.deleteAgencyUser = function(agencyUserId){
 
 agency.updateAgencyUser = updateAgencyUser;
 updateAgencyUser.required_params = ['id'];
-updateAgencyUser.accepted_params = _.union(updateAgencyUser.required_params,
-    ['status', 'name', 'sex', 'email', 'mobile', 'avatar', 'roleId']);
+updateAgencyUser.optional_params = ['status', 'name', 'sex', 'email', 'mobile', 'avatar', 'roleId'];
 function updateAgencyUser(params) {
-    utils.requiredParams(params, updateAgencyUser.required_params);
-    params = _.pick(params, updateAgencyUser.accepted_params);
     var self = this;
     var accountId = self.accountId;
     var id = params.id;
