@@ -31,7 +31,7 @@ tripPlan.savePlanOrder = function (params) {
             params.companyId = staff.companyId;
             return Q.all([
                 API.tripPlan.savePlanOrder(params),
-                API.staff.findStaffs({companyId: staff.companyId, columns: ['name','email']})
+                API.staff.findStaffs({companyId: staff.companyId, roleId: {$ne: 1}, columns: ['name','email']})
             ])
         })
         .spread(function(_order, staffs){
