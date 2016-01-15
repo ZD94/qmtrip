@@ -104,7 +104,7 @@ staff.deleteStaff = function(params){
     }
     return API.auth.remove({accountId: id})
         .then(function(){
-            return staffModel.update({status: STAFF_STATUS.DELETE, quitTime: utils.now()}, {where: {id: id}, return : true, returning: true})
+            return staffModel.update({status: STAFF_STATUS.DELETE, quitTime: utils.now()}, {where: {id: id}, returning: true})
         })
         .spread(function(num, rows){
             return API.company.getCompany({companyId:rows[0].companyId})

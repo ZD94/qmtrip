@@ -91,7 +91,6 @@ var staff = (function(){
                             API.staff.getDistinctDepartment({companyId:staff.companyId})//企业部门
                         ])
                             .spread(function(travelPolicies,staffinfo,staffRole, departments){
-                                console.log(departments);
                                 $scope.total = staffinfo.total;
                                 //获取差旅标准
                                 $scope.companyId = staff.companyId;
