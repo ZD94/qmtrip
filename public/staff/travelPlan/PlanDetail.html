@@ -73,11 +73,11 @@
                         </td>
                         <td align="center" class="po_r">
                                 <input type="button" class="common_btn1 uploadbtn" value="上传" ng-if="outTraffic.invoice.length==0">
-                            <input type="file" class="file" name="tmpFile" value='' id="i_outTraffic" ref="{{outTraffic.id}}" data-type = "1" ng-if="outTraffic.invoice.length==0">
+                            <input type="file" class="file" name="tmpFile" value='' id="i_outTraffic" ref="{{outTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png" ng-if="outTraffic.invoice.length==0">
                             <div ng-if="outTraffic.invoice.length!=0">
                                 <p ng-if="outTraffic.status=='-1'">
                                     <input type="button" class="common_btn1 uploadbtn" value="重新上传">
-                                    <input type="file" class="file" name="tmpFile" value='选择文件' id="i_hotel" ref="{{outTraffic.id}}" data-type = "2">
+                                    <input type="file" class="file" name="tmpFile" value='选择文件' id="i_hotel" ref="{{outTraffic.id}}" data-type = "2" accept="image/gif,image/jpeg,image/jpg,image/png">
                                 </p>
                                 <p ng-if="outTraffic.status=='-1'">【审核未通过】</p>
                                 <p ng-if="outTraffic.status==0" style="color: #CF2520;">【待审核】</p>
@@ -101,11 +101,11 @@
                         </td>
                         <td align="center" class="po_r">
                             <input type="button" class="common_btn1 uploadbtn" value="上传" ng-if="hotel.invoice.length==0">
-                            <input type="file" class="file" name="tmpFile" value='选择文件' id="i_hotel" ref="{{hotel.id}}" data-type = "2" ng-if="hotel.invoice.length==0">
+                            <input type="file" class="file" name="tmpFile" value='选择文件' id="i_hotel" ref="{{hotel.id}}" data-type = "2" accept="image/gif,image/jpeg,image/jpg,image/png" ng-if="hotel.invoice.length==0">
                             <div ng-if="hotel.invoice.length!=0">
                                 <p ng-if="hotel.status=='-1'">
                                     <input type="button" class="common_btn1 uploadbtn" value="重新上传">
-                                    <input type="file" class="file" name="tmpFile" value='选择文件' id="i_hotel" ref="{{hotel.id}}" data-type = "2">
+                                    <input type="file" class="file" name="tmpFile" value='选择文件' id="i_hotel" ref="{{hotel.id}}" data-type = "2" accept="image/gif,image/jpeg,image/jpg,image/png">
                                 </p>
                                 <p ng-if="hotel.status=='-1'">【审核未通过】</p>
                                 <p ng-if="hotel.status==0" style="color: #CF2520;">【待审核】</p>
@@ -128,11 +128,11 @@
                         </td>
                         <td align="center" class="po_r">
                             <input type="button" class="common_btn1 uploadbtn" value="上传" ng-if="backTraffic.invoice.length==0">
-                            <input type="file" class="file" name="tmpFile" value='选择文件' id="i_backTraffic" ref="{{backTraffic.id}}" data-type = "3" ng-if="backTraffic.invoice.length==0">
+                            <input type="file" class="file" name="tmpFile" value='选择文件' id="i_backTraffic" ref="{{backTraffic.id}}" data-type = "3" accept="image/gif,image/jpeg,image/jpg,image/png" ng-if="backTraffic.invoice.length==0">
                             <div ng-if="backTraffic.invoice.length!=0">
                                 <p ng-if="backTraffic.status=='-1'">
                                     <input type="button" class="common_btn1 uploadbtn" value="重新上传">
-                                    <input type="file" class="file" name="tmpFile" value='选择文件' id="i_hotel" ref="{{backTraffic.id}}" data-type = "2">
+                                    <input type="file" class="file" name="tmpFile" value='选择文件' id="i_hotel" ref="{{backTraffic.id}}" data-type = "2" accept="image/gif,image/jpeg,image/jpg,image/png">
                                 </p>
                                 <p ng-if="backTraffic.status=='-1'">【审核未通过】</p>
                                 <p ng-if="backTraffic.status==0" style="color: #CF2520;">【待审核】</p>
