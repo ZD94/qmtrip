@@ -9,7 +9,9 @@
 </div>
 <div class="auth_content">
     <div ng-if="isValid== 'checking'">系统验证中...</div>
-    <div ng-if="!isValid">链接已经失效</div>
+    <div ng-if="!isValid" style="padding:200px 0 0 0;text-align:center;font-size:24px;">
+        <span class="web-icon-font3" style="color:#de492a;vertical-align: middle;margin-right:10px;">&#xe909;</span>链接已经失效
+    </div>
 
     <div ng-if="isValid === true">
         <div class="title">

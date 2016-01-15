@@ -131,12 +131,15 @@ authServer.checkResetPwdUrlValid = function(params) {
  * @param {UUID} params.email 账号ID
  * @param {Integer} params.type 1. 企业员工 2.代理商
  * @param {Boolean} params.isFirstSet true|false 是否首次设置密码
+ * @param {String} params.companyName 公司名称
  * @returns {Promise} true|error
  */
 authServer.sendResetPwdEmail = function(params) {
     var email = params.email;
     var isFirstSet = params.isFirstSet;
     var type = params.type || 1;
+    var companyName = params.companyName || '';
+
     return Q()
         .then(function() {
             if (!email) {
@@ -167,7 +170,7 @@ authServer.sendResetPwdEmail = function(params) {
             var templateName;
             if (isFirstSet) {
                 templateName = 'qm_first_set_pwd_email';
-                return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: [timeStr, url]});
+                return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: [companyName, timeStr, url]});
             } else {
                 templateName = 'qm_reset_pwd_email';
                 return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: [account.email, timeStr, url, url]});
@@ -298,6 +301,7 @@ authServer.remove = function(data) {
  * @param {String} [data.pwd] 密码
  * @param {Integer} data.type  账号类型 默认1.企业员工 2.代理商员工
  * @param {INTEGER} data.status 账号状态 0未激活, 1.已激活 如果为0将发送激活邮件,如果1则不发送
+ * @param {String} data.companyName 公司名称,发邮件时使用
  * @return {Promise} {accountId: 账号ID, email: "邮箱", status: "状态"}
  * @public
  */
@@ -321,6 +325,7 @@ authServer.newAccount = function(data) {
     }
 
     var mobile = data.mobile;
+    var companyName = data.companyName || '';
     if (mobile && !validate.isMobile(mobile)) {
         throw L.ERR.MOBILE_FORMAT_ERROR;
     }
@@ -349,7 +354,7 @@ authServer.newAccount = function(data) {
         })
         .then(function(account) {
             if (!account.pwd) {
-                return authServer.sendResetPwdEmail({email: account.email, type: 1, isFirstSet: true})
+                return authServer.sendResetPwdEmail({email: account.email, type: 1, isFirstSet: true, companyName: companyName})
                     .then(function() {
                         return account;
                     })
