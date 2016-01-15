@@ -47,7 +47,6 @@ var TravelPolicy=(function(){
                             $(".create_policy").show();
                         }
                         $(window).scroll(function() {
-                            console.info ($(window).scrollTop());
                             if ($(window).scrollTop()<=64) {
                                 $(".policy_title").removeClass('policy_titlefixed');
 
