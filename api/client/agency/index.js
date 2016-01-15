@@ -58,11 +58,14 @@ agency.updateAgency = function(params){
  */
 agency.getAgencyById = function(agencyId){
     var self = this;
-    var params = {
-        agencyId: agencyId,
-        userId: self.accountId
-    }
-    return API.agency.getAgency(params);
+    return API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']})
+        .then(function(user){
+            if(user.agencyId != agencyId){
+                throw L.ERR.PERMISSION_DENY;
+            }
+            return API.agency.getAgency({agencyId: agencyId});
+        })
+
 }
 
 /**

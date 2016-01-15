@@ -111,9 +111,10 @@ agency.updateAgency = function(_agency){
  * @returns {*}
  */
 agency.getAgency = function(params){
-    var params = checkAndGetParams(['agencyId', 'userId'], [], params);
+    if(!params.agencyId){
+        throw {code: -1, msg: '参数 agencyId 不能为空'};
+    }
     var agencyId = params.agencyId;
-    var userId = params.userId;
     return Agency.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updateAt']})
         .then(function(agency){
             if(!agency || agency.status == -2){
