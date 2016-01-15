@@ -105,7 +105,7 @@
 		<ul>
 			<li>
 				<h4>员工贡献</h4>
-				<p>当前员工累计积分为{{}}，累计为公司节省￥{{}}，超过80%的行业员工。</p>
+				<p>当前员工累计积分为{{point.totalPoints}}，累计为公司节省￥{{point.totalPoints*2}}。</p>
 			</li>
 			<li>
 				<h4>福利奖品</h4>
@@ -133,7 +133,7 @@
 		</div>
 	</div>
 	<div class="corp_welfare" ng-if="funds.balance != 0 &&funds.income != 0">
-		<h3>员工福利信息<a href="">查看详细>></a></h3>
+		<h3>员工福利信息<a href="#/StaffAwardPlan/StaffAwardPlan">查看详细>></a></h3>
 		<ul>
 			<li>
 				<img src="corp/images/JD.png">
