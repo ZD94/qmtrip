@@ -13,7 +13,7 @@ var L = require("common/language");
 var _ = require('lodash');
 var utils = require("common/utils");
 var Paginate = require("common/paginate").Paginate;
-var C = require("common/config");
+var C = require("config");
 var company = {};
 
 company.companyCols = Object.keys(Company.attributes);
@@ -34,8 +34,7 @@ company.domainIsExist = function(params) {
         if (!domain) {
             throw {code: -1, msg: "domain not exist!"};
         }
-
-        if (C.is_allow_repeat_domain) {
+        if (C.is_allow_domain_repeat) {
             return false;
         }
 
