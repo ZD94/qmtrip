@@ -167,10 +167,11 @@ authServer.sendResetPwdEmail = function(params) {
             var templateName;
             if (isFirstSet) {
                 templateName = 'qm_first_set_pwd_email';
+                return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: [timeStr, url]});
             } else {
                 templateName = 'qm_reset_pwd_email';
+                return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: [account.email, timeStr, url, url]});
             }
-            return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: [account.email, timeStr, url, url]});
         })
         .then(function() {
             return true;
