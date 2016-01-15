@@ -326,5 +326,17 @@ tripPlan.statPlanOrderMoneyByCompany = function (params) {
         })
 }
 
+tripPlan.getProjectsList = function(){
+    var self = this;
+    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
+        .then(function(staff){
+            return API.tripPlan.getProjects({companyId: staff.companyId})
+        })
+        .then(function(list){
+            return list.map(function(s){
+                return s.description;
+            })
+        })
+}
 
 module.exports = tripPlan;

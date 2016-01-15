@@ -220,3 +220,13 @@
 |ret.qmBudget |动态预算(全麦预算)   | number  |
 |ret.planMoney |预算金额   | number  |
 |ret.expenditure |实际支出   | number  |
+
+>. 获取企业所有项目列表 API.tripPlan.getProjectsList(callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+|ret  |Array
