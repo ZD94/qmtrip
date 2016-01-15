@@ -457,7 +457,7 @@ authServer.login = function(data) {
 authServer.authentication = function(params) {
     if ((!params.userId && !params.user_id) || (!params.tokenId && !params.token_id)
         || !params.timestamp || (!params.tokenSign && !params.token_sign)) {
-        return Promise.resolve({code: -1, msg: "token expire"});
+        return Promise.resolve(false);
     }
     var userId = params.userId || params.user_id;
     var tokenId = params.tokenId || params.token_id;
