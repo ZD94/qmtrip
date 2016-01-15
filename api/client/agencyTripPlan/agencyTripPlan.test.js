@@ -43,7 +43,7 @@ describe("api/client/agencyTripPlan.js", function() {
             newInvoice: '票据详情'
         }]
     }
-    //var agencyId = "";
+    var agencyId = "";
     var agencyUserId = "";
     var companyId = "";
     var staffId = "";
@@ -192,5 +192,15 @@ describe("api/client/agencyTripPlan.js", function() {
         })
     });
 
+    it("#statPlanOrderMoneyByAgency should be ok when audit pass", function(done) {
+        var self = {accountId: agencyUserId};
+        API.client.agencyTripPlan.statPlanOrderMoneyByAgency.call(self, {companyId: companyId}, function(err, ret){
+            if (err) {
+                throw err;
+            }
+            assert(ret != null);
+            done();
+        })
+    });
 
 })
