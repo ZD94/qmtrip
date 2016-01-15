@@ -22,7 +22,6 @@ var logger = new Logger("staff");
 var validate = require("common/validate");
 //var auth = require("../auth/index");
 //var travelPolicy = require("../travelPolicy/index");
-var checkAndGetParams = utils.checkAndGetParams;
 
 var staff = {};
 var STAFF_STATUS = {
@@ -206,7 +205,7 @@ staff.findOneStaff = function(params){
  */
 staff.findStaffs = function(params){
     var options = {};
-    options.where = checkAndGetParams([], Object.keys(staffModel.attributes), params);
+    options.where = _.pick(params, Object.keys(staffModel.attributes));
     if(params.columns){
         options.attributes = params.columns;
     }
@@ -386,7 +385,7 @@ staff.beforeImportExcel = function(params){
         .then(function(sf){
             companyId = sf.companyId;
             return Q.all([
-                API.travelPolicy.getAllTravelPolicy({company_id: companyId}),
+                API.travelPolicy.getAllTravelPolicy({where: {companyId: companyId}}),
                 API.company.getCompany({companyId: companyId})
             ])
         })
@@ -791,10 +790,12 @@ staff.getInvoiceViewer = function(params){
  * @param params
  */
 staff.statStaffPoints = function(params){
-    var query = checkAndGetParams(['companyId'], [], params);
+    var required_params = ['companyId'];
+    utils.requiredParams(params, required_params);
+    var query = _.pick(params, required_params);
     return Q.all([
-        staffModel.sum('total_points', query),
-        staffModel.sum('balance_points', query)
+        staffModel.sum('total_points', {where: query}),
+        staffModel.sum('balance_points', {where: query})
     ])
         .spread(function(all, balance){
             return {

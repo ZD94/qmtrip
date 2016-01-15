@@ -404,7 +404,7 @@ staff.getDistinctDepartment = function(params){
  */
 staff.statisticStaffsRole = function(params){
     var user_id = this.accountId;
-    return API.staff.getStaff({id: user_id})
+    return API.staff.getStaff({id: user_id, columns: ['companyId']})
         .then(function(data){
             if(data){
                 var companyId = data.companyId;
