@@ -14,6 +14,8 @@ var travelPlan=(function(){
      * @constructor
      */
     travelPlan.PlanListController = function($scope) {
+        $(".staff_menu_t ul li").removeClass("on");
+        $(".staff_menu_t ul a").eq(1).find("li").addClass("on");
         loading(false);
         $("title").html("出差单列表");
         //待上传票据列表
@@ -184,6 +186,8 @@ var travelPlan=(function(){
      * @constructor
      */
     travelPlan.PlanDetailController = function($scope, $routeParams) {
+        $(".staff_menu_t ul li").removeClass("on");
+        $(".staff_menu_t ul a").eq(1).find("li").addClass("on");
         loading(true);
         $("title").html("出差单明细");
         var planId = $routeParams.planId;
