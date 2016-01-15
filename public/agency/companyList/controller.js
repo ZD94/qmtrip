@@ -16,8 +16,9 @@ module.exports = (function(){
 			$(".left_nav li").removeClass("on").eq(1).addClass("on");
 			loading(false);
 			API.onload(function(){
-				API.company.getCompanyListByAgency()
-					.then(function(companylist){
+				API.company.getCompanyListByAgency({})
+					.then(function(ret){
+						var companylist = ret.items;
 						// console.info(companylist);
 						var promises = companylist.map(function(company){
 							// console.info(company.createUser)
