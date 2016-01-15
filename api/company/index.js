@@ -20,6 +20,31 @@ company.companyCols = Object.keys(Company.attributes);
 
 company.fundsAccountCols = Object.keys(FundsAccounts.attributes);
 
+/**
+ * 域名是否已被占用
+ *
+ * @param {Object} params
+ * @param {String} params.domain 域名
+ * @return {Promise} true|false
+ */
+company.domainIsExist = function(params) {
+    var domain = params.domain;
+    return Q()
+    .then(function() {
+        if (!domain) {
+            throw {code: -1, msg: "domain not exist!"};
+        }
+
+        return Models.Company.findOne({where: {domainName: domain}})
+        .then(function(company) {
+            if (company) {
+                return true;
+            } else {
+                return false;
+            }
+        })
+    });
+}
 
 /**
  * 创建企业
@@ -64,7 +89,7 @@ function createCompany(params){
  * @param {String} params.domain 域名
  * @return {Promise}
  */
-company.checkBlackDomain = function(params) {
+company.isBlackDomain = function(params) {
     var domain = params.domain;
     if (!domain) {
         throw {code: -1, msg: "域名不存在或不合法"};
@@ -73,9 +98,9 @@ company.checkBlackDomain = function(params) {
     return Models.BlackDomain.findOne({where: {domain: domain}})
         .then(function(result) {
             if (result) {
-                throw {code: -1, msg: "域名不能使用"}
+                return true;
             }
-            return true;
+            return false;
         });
 }
 
