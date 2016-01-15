@@ -242,8 +242,8 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                     if(_score> 0 ){ _score += '积分已发放到您的积分账户'; }
                     var total = '全麦预算￥' + order.budget + ',实际支出￥' + order.expenditure + ',节省￥' + s;
                     API.mail.sendMailRequest({
-                        //toEmails: staffEmail,
-                        toEmails: 'miao.yu@tulingdao.com',
+                        toEmails: staffEmail,
+                        //toEmails: 'miao.yu@tulingdao.com',
                         templateName: "qm_notify_invoice_all_pass",
                         titleValues: [],
                         values: [staffName, orderTime, ret.description, go, back, hotel, total, _score, url]
