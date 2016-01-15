@@ -12,6 +12,7 @@ var uuid = require("node-uuid");
 var L = require("common/language");
 var _ = require('lodash');
 var utils = require("common/utils");
+var Paginate = require("common/paginate").Paginate;
 
 var company = {};
 
@@ -152,6 +153,21 @@ company.listCompany = function(params){
     options.order = [['create_at', 'desc']];
     return Company.findAll(options);
 }
+
+/**
+ * 获取企业列表
+ * @param params
+ * @returns {*}
+ */
+company.pageCompany = function(options){
+    options.where.status = {$ne: -2};
+    options.order = [['create_at', 'desc']];
+    return Company.findAndCount(options)
+        .then(function(ret){
+            return new Paginate(options.offset/options.limit + 1, options.limit, ret.count, ret.rows);
+        })
+}
+
 
 /**
  * 删除企业
