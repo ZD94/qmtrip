@@ -21,9 +21,7 @@ var logger = new Logger("company");
 
 var tripPlan = {}
 
-tripPlan.PlanOrderCols = Object.keys(PlanOrder.attributes);
-
-tripPlan.ConsumeDetailsCols = Object.keys(ConsumeDetails.attributes);
+var ConsumeDetailsCols = Object.keys(ConsumeDetails.attributes);
 
 /**
  * 保存预算单/差旅计划单
@@ -33,10 +31,11 @@ tripPlan.ConsumeDetailsCols = Object.keys(ConsumeDetails.attributes);
 tripPlan.savePlanOrder = savePlanOrder;
 savePlanOrder.required_params = ['consumeDetails', 'accountId', 'companyId', 'type', 'destination', 'budget'];
 savePlanOrder.optional_params = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark', 'description'];
-var ConsumeDetails_create_required_fields = ['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'];
-var ConsumeDetails_create_accepted_fields = _.union(tripPlan.ConsumeDetailsCols, ConsumeDetails_create_required_fields);
 function savePlanOrder(params){
-    var consumeDetails = params.consumeDetails;
+    var consumeDetails = params.consumeDetails.map(function(detail){
+        utils.requiredParams(detail, ['type', 'startTime', 'invoiceType', 'budget']);
+        return _.pick(detail, ConsumeDetailsCols);
+    });
     delete params.consumeDetails;
     var _planOrder = params;
     return API.seeds.getSeedNo('tripPlanOrderNo')
@@ -45,10 +44,9 @@ function savePlanOrder(params){
             _planOrder.id = orderId;
             _planOrder.orderNo = orderNo;
             _planOrder.createAt = utils.now();
-            var details = consumeDetails;
             var total_budget = 0;
-            for(var i in details) {
-                var obj = details[i];
+            for(var i in consumeDetails) {
+                var obj = consumeDetails[i];
                 total_budget = parseFloat(total_budget) + parseFloat(obj.budget);
             }
             _planOrder.budget = total_budget;
@@ -60,14 +58,11 @@ function savePlanOrder(params){
                         order.outTraffic = new Array();
                         order.backTraffic = new Array();
                         order.hotel = new Array();
-                        var details = consumeDetails;
-                        return Q.all(details.map(function(s){
-                            s.orderId = order.id;
-                            s.accountId = order.accountId;
-                            s.status = 0;
-                            utils.requiredParams(s, ConsumeDetails_create_required_fields);
-                            s = _.pick(s, ConsumeDetails_create_accepted_fields);
-                            return ConsumeDetails.create(s, {transaction: t})
+                        return Q.all(consumeDetails.map(function(detail){
+                            detail.orderId = order.id;
+                            detail.accountId = order.accountId;
+                            detail.status = 0;
+                            return ConsumeDetails.create(detail, {transaction: t})
                                 .then(function(ret){
                                     return ret.toJSON();
                                 })
@@ -238,7 +233,7 @@ tripPlan.listTripPlanOrder = function(options){
  */
 tripPlan.saveConsumeRecord = saveConsumeRecord;
 saveConsumeRecord.required_params = ['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'];
-saveConsumeRecord.optional_params = tripPlan.ConsumeDetailsCols;
+saveConsumeRecord.optional_params = ConsumeDetailsCols;
 function saveConsumeRecord(params){
     var record = params;
     record.status = 0;
