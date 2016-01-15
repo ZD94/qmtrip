@@ -116,8 +116,7 @@ company.getCompanyListByAgency = checkAgencyPermission(["company.query"],
         typeof perPage == 'number' ? "" : perPage = 10;
         return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
             .then(function(user){
-                params.agencyId = user.agencyId;
-                return API.company.pageCompany({where: params, limit: perPage, offset: perPage * (page - 1)})
+                return API.company.pageCompany({where: {agencyId: user.agencyId}, limit: perPage, offset: perPage * (page - 1)})
             });
     });
 
