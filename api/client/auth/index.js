@@ -72,7 +72,25 @@ auth.bindMobile =API.auth.bindMobile;
  * @param {String} params.domain 域名
  * @return {Promise} true||error
  */
-auth.checkBlackDomain = API.company.checkBlackDomain;
+auth.checkBlackDomain = function(params) {
+    var domain = params.domain;
+    return Q.all([
+        API.company.isBlackDomain({domain: domain}),
+        API.company.domainIsExist({domain: domain})
+    ])
+    .spread(function(isBlackDomain, isExist) {
+        console.info(domain);
+        if (isBlackDomain) {
+            throw L.ERR.EMAIL_IS_PUBLIC;
+        }
+
+        if (isExist) {
+            throw L.ERR.DOMAIN_HAS_EXIST;
+        }
+
+        return false;
+    })
+}
 
 /**
  * @method registryCompany
@@ -148,7 +166,7 @@ auth.registryCompany = function(params) {
             return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
         })
         .then(function(){
-            return API.company.checkBlackDomain({domain: domain});
+            return auth.checkBlackDomain({domain: domain});
         })
         .then(function() {
             var status = 0;
