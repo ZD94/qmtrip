@@ -160,6 +160,7 @@ describe("api/client/tripPlan.js", function() {
                 destination: '上海',
                 budget: 1000,
                 startAt: '2015-12-30 11:12:12',
+                description: '我要去出差',
                 consumeDetails: [{
                     startTime: '2016-12-30 11:11:11',
                     budget: 400,
@@ -285,6 +286,17 @@ describe("api/client/tripPlan.js", function() {
             })
         });
 
+        it("#getProjectsList should be ok", function (done) {
+            var self = {accountId: staffId};
+            API.client.tripPlan.getProjectsList.call(self, function (err, ret) {
+                if (err) {
+                    throw err;
+                }
+                assert(ret.length > 0 );
+                done();
+            })
+        });
+
         describe('options based on consume details created', function(){
             var consumeId = "";
             before(function(done){
@@ -334,34 +346,6 @@ describe("api/client/tripPlan.js", function() {
                     done();
                 })
             });
-
-            ///**
-            // * test
-            // */
-            //it("#testListTripPlanOrder should be ok", function (done) {
-            //    var self = {accountId: staffId};
-            //    var options = {
-            //        where: {companyId: "89b7e930-b9c7-11e5-a66c-dd520db5b907"},
-            //        limit: 20,
-            //        offset: 0
-            //    }
-            //    API.tripPlan.listTripPlanOrder(options, function (err, ret) {
-            //        if (err) {
-            //            throw err;
-            //        }
-            //        //console.info(ret.items);
-            //
-            //        var moment = require('moment');
-            //        console.info("************************");
-            //        for(var i=0;i<ret.items.length;i++){
-            //            var s = ret.items[i];
-            //            console.info(moment(s.createAt).format('YYYY-MM-DD HH:mm:ss'));
-            //        }
-            //        done();
-            //    })
-            //});
-
-
         })
 
     })

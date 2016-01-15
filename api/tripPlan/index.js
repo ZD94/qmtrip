@@ -592,6 +592,14 @@ tripPlan.statPlanOrderMoney = function(params){
         })
 }
 
+
+tripPlan.getProjects = function(params){
+    if(!params.companyId){
+        throw {code: -1, msg: '企业Id不能为空'};
+    }
+    return PlanOrder.findAll({where: {companyId: params.companyId}, group: ['description'], attributes: ['description']})
+}
+
 /**
  * 判断JSON对象是否为空
  * @param obj
