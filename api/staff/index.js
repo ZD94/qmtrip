@@ -388,7 +388,7 @@ staff.beforeImportExcel = function(params){
         .then(function(sf){
             companyId = sf.companyId;
             return Q.all([
-                API.travelPolicy.getAllTravelPolicy({company_id: companyId}),
+                API.travelPolicy.getAllTravelPolicy({where: {companyId: companyId}}),
                 API.company.getCompany({companyId: companyId})
             ])
         })

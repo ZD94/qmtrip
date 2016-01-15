@@ -87,29 +87,6 @@ travelPolicy.getTravelPolicy = function(params){
     return API.staff.getStaff({id: user_id})
         .then(function(data){
             if(!id){
-                /*if(data.companyId){
-                    //若该员工没有指定差旅标准 默认返回该企业最早添加的差旅标准
-                    var options = {where: {companyId: data.companyId}};
-                    options.order = "create_at asc";//[["create_at", "desc"]]
-                    return API.travelPolicy.getAllTravelPolicy(options)
-                        .then(function(obj){
-                            if(obj && obj.length > 0){
-                               return obj[0];
-                            }else{
-                                //若该企业没有差旅标准默认返回系统默认差旅标准
-                                return API.travelPolicy.getTravelPolicy({id:'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a'})
-                                    .then(function(tp){
-                                        return tp;
-                                    })
-                            }
-                        })
-                }else{
-                    //若该员工没有所属企业
-                    return API.travelPolicy.getTravelPolicy({id:'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a'})
-                        .then(function(tp){
-                            return tp;
-                        })
-                }*/
                 return API.travelPolicy.getTravelPolicy({id:'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a'});
             }
             return API.travelPolicy.getTravelPolicy({id:id})
