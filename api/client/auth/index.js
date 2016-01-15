@@ -79,12 +79,13 @@ auth.checkBlackDomain = function(params) {
         API.company.domainIsExist({domain: domain})
     ])
     .spread(function(isBlackDomain, isExist) {
+        console.info(domain);
         if (isBlackDomain) {
-            throw L.ERR.DOMAIN_HAS_EXIST;
+            throw L.ERR.EMAIL_IS_PUBLIC;
         }
 
         if (isExist) {
-            throw L.ERR.EMAIL_IS_PUBLIC;
+            throw L.ERR.DOMAIN_HAS_EXIST;
         }
 
         return false;
