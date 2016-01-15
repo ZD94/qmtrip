@@ -24,10 +24,11 @@ var travelRecord=(function(){
         $scope.initTravelList = function () {
             $(".left_nav li").removeClass("on").eq(0).addClass("on");
             API.onload(function () {
-                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page, isUpload: true, audit: 'P'})
+                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page, perPage:20, isUpload: true, audit: 'P'})
                     .then(function(result){
                         console.info (result);
                         $scope.total = result.total;
+                        $scope.pages = result.pages;
                         var travelList = result.items;
                         travelList.map(function(company){
                             Q.all([
@@ -63,12 +64,15 @@ var travelRecord=(function(){
             if ($scope.total) {
                 $.jqPaginator('#pagination', {
                     totalCounts: $scope.total,
-                    pageSize: 10,
+                    pageSize: 20,
                     currentPage: 1,
                     prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
                     next: '<li class="next"><a href="javascript:;">下一页</a></li>',
                     page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
                     onPageChange: function (num) {
+                        if ($scope.pages==1) {
+                            $("#pagination").hide();
+                        }
                         $scope.page = num;
                         $scope.initTravelList();
                     }
