@@ -3,6 +3,7 @@
  */
 var API = require('common/api');
 var assert = require("assert");
+var Q = require("q");
 
 describe("api/client/auth/index.js", function() {
 
@@ -19,6 +20,8 @@ describe("api/client/auth/index.js", function() {
         picCode: "test"
     }
 
+    var companyId = "";
+
     describe("#registryCompany", function() {
         before(function(done) {
             API.auth.remove({email: testCase.email}, function(err) {
@@ -31,12 +34,18 @@ describe("api/client/auth/index.js", function() {
         });
 
         after(function(done) {
-            API.auth.remove({email: testCase.email}, function(err) {
-                if (err) {
+            Q.all([
+                API.auth.remove({email: testCase.email}),
+                API.company.deleteCompanyByTest({email: testCase.email}),
+                API.staff.deleteAllStaffByTest({email: testCase.email})
+            ])
+                .spread(function(ret1, ret2, ret3){
+                    done();
+                })
+                .catch(function(err){
                     throw err;
-                }
-                done();
-            })
+                })
+                .done();
         });
 
         it("#registryCompany should be ok", function(done) {
