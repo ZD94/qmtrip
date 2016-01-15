@@ -31,9 +31,14 @@ var ConsumeDetailsCols = Object.keys(ConsumeDetails.attributes);
 tripPlan.savePlanOrder = savePlanOrder;
 savePlanOrder.required_params = ['consumeDetails', 'accountId', 'companyId', 'type', 'destination', 'budget'];
 savePlanOrder.optional_params = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark', 'description'];
+var consumeDetails_required_fields = ['type', 'startTime', 'invoiceType', 'budget'];
 function savePlanOrder(params){
     var consumeDetails = params.consumeDetails.map(function(detail){
-        utils.requiredParams(detail, ['type', 'startTime', 'invoiceType', 'budget']);
+        consumeDetails_required_fields.forEach(function(key){
+            if(!_.has(detail, key)){
+                throw {code: '-1', msg: 'consumeDetails的属性' + key + '没有指定'};
+            }
+        })
         return _.pick(detail, ConsumeDetailsCols);
     });
     delete params.consumeDetails;
