@@ -794,8 +794,8 @@ staff.statStaffPoints = function(params){
     utils.requiredParams(params, required_params);
     var query = _.pick(params, required_params);
     return Q.all([
-        staffModel.sum('total_points', query),
-        staffModel.sum('balance_points', query)
+        staffModel.sum('total_points', {where: query}),
+        staffModel.sum('balance_points', {where: query})
     ])
         .spread(function(all, balance){
             return {
