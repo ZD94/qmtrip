@@ -76,13 +76,20 @@ var staff = (function(){
                     .then(function(staff){
                         $scope.roleId = staff.roleId;
                         $scope.currentStaff = staff;
+                        var params = {};
+                        var options = {};
+                        options.perPage = 20;
+                        options.page = $scope.page;
+                        params.options = options;
+                        params.companyId = staff.companyId;
                         //console.log(Q);
                         return Q.all([
                             API.travelPolicy.getAllTravelPolicy({where: {companyId:staff.companyId}}),//获取当前所有的差旅标准名称
-                            API.staff.listAndPaginateStaff({companyId:staff.companyId}),//加载所有的员工记录
-                            API.staff.statisticStaffsRole({companyId:staff.companyId}),//统计企业员工（管理员 普通员工 未激活员工 总数）数量
+                            API.staff.listAndPaginateStaff(params),//加载所有的员工记录
+                            API.staff.statisticStaffsRole({companyId:staff.companyId})//统计企业员工（管理员 普通员工 未激活员工 总数）数量
                         ])
                             .spread(function(travelPolicies,staffinfo,staffRole){
+                                $scope.total = staffinfo.total;
                                 //获取差旅标准
                                 $scope.companyId = staff.companyId;
                                 var arr = travelPolicies;
@@ -132,7 +139,30 @@ var staff = (function(){
         }
 
 
+        //分页
+        $scope.pagination = function () {
+            if ($scope.total) {
+                $.jqPaginator('#pagination', {
+                    totalCounts: $scope.total,
+                    pageSize: 20,
+                    currentPage: 1,
+                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+                    onPageChange: function (num) {
+                        $scope.page = num;
+                        $scope.initstafflist();
+                    }
+                });
+                clearInterval (pagenum);
+            }
+        }
+        var pagenum =setInterval($scope.pagination,10);
+
+
         $scope.initstafflist();
+
+
 
         //对员工信息进行保存的操作
         $scope.saveStaffInfo = function() {
@@ -257,9 +287,35 @@ var staff = (function(){
             })
         }
 
+
+
+        //删除员工信息
+        $scope.deleteInfoShow = function (id,name) {
+            $scope.deleteId = id;
+            $scope.deleteName = name;
+            $(".messageText").html("您确定删除&quot;"+$scope.deleteName+"&quot;吗？");
+            $(".confirmFixed").show();
+        }
+        $scope.deleteInfo = function () {
+            API.onload(function(){
+                API.staff.deleteStaff({id:$scope.deleteId})
+                    .then(function(newStaff){
+                        $(".confirmFixed").hide();
+                        $scope.initstafflist();
+                    }).catch(function(err){
+                        console.info(err);
+                    }).done();
+            })
+        }
+
+        //关闭弹窗
+        $scope.confirmClose = function () {
+            $(".confirmFixed,.deleteFail").hide();
+        }
+
         //批量添加员工
         $scope.addALotStaff = function(){
-            $(".staff_tab_content").hide();
+            $(".staff_tab_content,.pagination").hide();
             $(".staff_tab_import").show();
             $(".staff_tab_valid").hide();
             $(".staff_import_success").hide();
@@ -268,7 +324,7 @@ var staff = (function(){
 
         //从批量添加返回到员工管理页面
         $scope.backToAddStaff = function(){
-            $(".staff_tab_content").show();
+            $(".staff_tab_content,.pagination").show();
             $(".staff_tab_import").hide();
             $(".staff_tab_valid").hide();
             $(".staff_import_success").hide();

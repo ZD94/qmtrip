@@ -7,10 +7,28 @@ var UsersFirst = (function(){
 	API.require("travelPolicy");
 	API.require("tripPlan");
 	var UsersFirst ={};
-	UsersFirst.UserMainController = function($scope){
+	UsersFirst.UserMainController = function($scope, $routeParams){
 		$("title").html("差旅管理首页");
 		$(".left_nav li").removeClass("on").eq(0).addClass("on");
 		$scope.funds={};
+
+		//判断是否第一次登录
+		var logintime = $routeParams.logintime;
+		if (logintime=='true') {
+			$(".confirmFixed").show();
+		}
+		else {
+			$(".confirmFixed").hide();
+		}
+		$scope.goPolicyList = function () {
+			window.location.href = "#/TravelPolicy/PolicyList";
+		}
+		//关闭弹窗
+		$scope.confirmClose = function () {
+			$(".confirmFixed").hide();
+		}
+
+
 		//企业管理首页信息
 		$scope.initCorpMain = function(){
 			API.onload(function(){

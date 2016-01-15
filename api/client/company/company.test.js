@@ -61,6 +61,8 @@ describe("api/client/company.js", function() {
                     API.staff.deleteAllStaffByTest({mobile: company.mobile, email: company.email})
                 ])
                     .spread(function(ret1, ret2){
+                        assert.equal(ret1, true);
+                        assert.equal(ret2, true);
                         done();
                     })
                     .catch(function(err){

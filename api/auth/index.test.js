@@ -43,5 +43,15 @@ describe("api/auth/index.js", function() {
             assert.equal(result, true);
             done();
         });
+    });
+
+    it("#login should be ok", function(done) {
+
+        API.auth.login({email: "test@test.com", pwd: "time9818"}, function(err, result) {
+            console.info(result);
+            assert.equal(err, null);
+            assert.equal(result.timestamp?true: false, true);
+            done();
+        })
     })
 })

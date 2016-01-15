@@ -93,7 +93,7 @@
             <li><span>{{item.travelLeverName}}</span></li>
             <li><span ng-if="item.roleId == 0">创建者</span><span ng-if="item.roleId == 1">普通员工</span><span ng-if="item.roleId == 2">管理员</span><span ng-if="item.roleId == 3">财务人员</span></li>
             <li><a ng-if="!((item.roleId == 2 || item.roleId == 0) && roleId == 2 && currentStaff.id != item.id)"><span ng-click="editStaffInfo($index)" id="change">修改</span></a>
-                <a ng-if="item.roleId != 0 && !(item.roleId == 2 && roleId == 2)">&nbsp;|&nbsp;<span ng-click="delStaffInfo(item.id, $index)">删除</span></a></li>
+                <a ng-if="item.roleId != 0 && !(item.roleId == 2 && roleId == 2)">&nbsp;|&nbsp;<span ng-click="deleteInfoShow(item.id, item.name)">删除</span></a></li>
             <li class="orange">{{item.accStatus}}</li>
             <div class="add_staff2">
                 <div class="little_triangle2">
@@ -150,6 +150,7 @@
         </ul>
     </div>
 
+
     <!--批量导入页面-->
     <div class="staff_tab_import">
         <div class="staff_tab_import_head">
@@ -163,48 +164,48 @@
         </div>
         <div class="staff_tab_import_bottom">
             <p>导入说明:</p>
-            <p class="p_title">1、请使用excel等软件创建一个CSV文件，格式如下<a href="/download/excle-file/template_staff.xlsx" target="_blank">（点击下载模板）</a>：</p>
+            <p class="p_title">1、请使用excel等软件创建一个文件，格式如下<a href="/download/excle-file/template_staff.xlsx" target="_blank">（点击下载模板）</a>：</p>
             <table>
                 <tr>
                     <td></td>
                     <td>姓名</td>
-                    <td>邮箱</td>
                     <td>手机号</td>
+                    <td>邮箱</td>
                     <td>部门</td>
                     <td>差旅标准</td>
                 </tr>
                 <tr>
                     <td>1</td>
                     <td>王鹏</td>
-                    <td>peng.wang@tulingdao.com</td>
                     <td>13522415203</td>
+                    <td>peng.wang@tulingdao.com</td>
                     <td>销售部</td>
                     <td>普通员工级</td>
                 </tr>
                 <tr>
                     <td>2</td>
                     <td>许倩</td>
-                    <td>qian.xu@tulingdao.com</td>
                     <td>13522415203</td>
+                    <td>qian.xu@tulingdao.com</td>
                     <td>技术部</td>
                     <td>普通员工级</td>
                 </tr>
                 <tr>
                     <td>3</td>
                     <td>张贵英</td>
-                    <td>guiying.zhang@tulingdao.com</td>
                     <td>13522415203</td>
+                    <td>guiying.zhang@tulingdao.com</td>
                     <td>设计部</td>
                     <td>普通员工级</td>
                 </tr>
             </table>
             <p class="p_title">
-                2、各列内容依次为：姓名、邮箱、手机、所属部门、差旅政策等级</br>
+                2、各列内容依次为：姓名、手机、邮箱、所属部门、差旅政策等级</br>
             </p>
             <p class="p_text">
                 姓名：员工姓名</br>
-                邮箱：员工企业邮箱，用于员工登录账号</br>
                 手机：员工手机号</br>
+                邮箱：员工企业邮箱，用于员工登录账号</br>
                 所属部门：员工所属部门名称;建议先进行公司<a>组织架构设置</a> <span>若未设置组织架构，则员工默认归属我的企业</span></br>
                 差旅政策：员工对应的差旅政策等级;建议先进行公司<a>差旅政策设置</a> <span>若未设置公司差旅标准，则员工默认无差旅标准</span>
             </p>
@@ -294,6 +295,32 @@
         </div>
     </div>
 </div>
+<ul class="pagination" id="pagination"></ul>
+
+
+<section class="confirmFixed">
+    <div class="confirmbox">
+        <div class="confirmbox_t">
+            <span style="float: left;">提示</span>
+            <span ng-click="confirmClose()" style="float: right;"><img src="agency/images/close.jpg"></span>
+        </div>
+        <div class="confirmbox_p">
+            <div class="error" style="height: 25px; line-height: 25px; color: #DE492A;"></div>
+            <div class="messageText" style="height: 30px; line-height: 30px; text-align: center;"></div>
+            <div style="margin-top: 20px;">
+                <input type="button" value="确认" ng-click="deleteInfo()" class="common_btn1" style="width: 60px; margin-left: 105px;">
+                <input type="button" value="取消" ng-click="confirmClose()" class="common_btn2" style="width: 60px; margin-left: 20px;">
+            </div>
+
+            <div class="deleteFail">
+                <div class="deleteFail_text"></div>
+                <div>
+                    <input type="button" value="确认" ng-click="confirmClose()" class="common_btn1" style="width: 60px; margin-left: 170px;">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <script>
     $(function(){

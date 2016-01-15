@@ -40,7 +40,10 @@
                 </dl>
                 <dl>
                     <dt>获得积分</dt>
-                    <dd>无</dd>
+                    <dd>
+                        <span ng-if="planDetail.score">{{planDetail.score}}</span>
+                        <span ng-if="!planDetail.score">暂无</span>
+                    </dd>
                 </dl>
             </div>
             <div class="title_bottom"><span></span>差旅消费明细</div>
@@ -228,7 +231,7 @@
 <section class="invoiceNoPass">
     <div class="invoicebox">
         <div class="invoicebox_t">
-            <span style="float: left;">审核未通过提示</span>
+            <span style="float: left;">审核未通过理由</span>
             <span ng-click="invoiceColse()" style="float: right;"><img src="agency/images/close.jpg"></span>
         </div>
         <div class="invoicebox_p">

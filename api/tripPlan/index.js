@@ -14,6 +14,7 @@ var uuid = require("node-uuid");
 var L = require("common/language");
 var Logger = require('common/logger');
 var utils = require('common/utils');
+var _ = require('lodash');
 var checkAndGetParams = utils.checkAndGetParams;
 var API = require('common/api');
 var Paginate = require("common/paginate").Paginate;
@@ -174,7 +175,7 @@ tripPlan.updateTripPlanOrder = function(params){
  * @param params
  */
 tripPlan.updateConsumeDetail = function(params){
-    var updates = checkAndGetParams(['userId', 'id'], [], params, false);
+    var updates = checkAndGetParams(['userId', 'id'], Object.keys(ConsumeDetails.attributes), params, false);
     var id = params.id;
     var userId = params.userId;
     return ConsumeDetails.findById(params.id, {attributes: ['status']})
@@ -362,7 +363,7 @@ tripPlan.uploadInvoice = function(params){
                 if(!list[i].newInvoice)
                     return;
             }
-            return PlanOrder.update({status: 1, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'updateAt'], returning: true})
+            return PlanOrder.update({status: 1, auditStatus: 0, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'auditStatus', 'updateAt'], returning: true})
         })
         .then(function(){
             return true;
@@ -385,6 +386,55 @@ tripPlan.getConsumeDetail = function(params){
             return consumeDetail;
         })
 }
+
+/**
+ * 判断某用户是否有访问该消费记录票据权限
+ * @param params
+ * @returns {Promise.<Instance>}
+ */
+tripPlan.getVisitPermission = function(params){
+    var params = checkAndGetParams(['consumeId', 'userId'], [], params);
+    var userId = params.userId;
+    var consumeId = params.consumeId;
+    return ConsumeDetails.findById(consumeId)
+        .then(function(consume){
+            if(!consume || consume.status == -2){
+                throw {code: -4, msg: '查询记录不存在'};
+            }
+            if(consume.accountId == userId){//允许自己查看
+                return {allow: true, md5key: consume.newInvoice}
+            }else{
+                return PlanOrder.findById(consume.orderId)
+                    .then(function(order){
+                        if(!order){
+                            throw {code: -4, msg: '订单记录不存在'};
+                        }
+                        return order.companyId;
+                    })
+                    .then(function(companyId){
+                        return API.company.getCompanyById(companyId)
+                            .then(function(company){
+                                if(!company){
+                                    throw {code: -5, msg: "企业不存在"}
+                                }
+                                return company.agencyId;
+                            })
+                    })
+                    .then(function(agencyId){
+                        return API.agency.getAgencyUser({id: userId})
+                            .then(function(agencyUser){
+                                if(agencyUser && agencyUser.roleId != 1 && agencyUser.agencyId == agencyId){//允许代理商创建人管理员访问
+                                    return {allow: true, md5key: consume.newInvoice};
+                                }else{
+                                    return {allow: false};
+                                }
+                            })
+                    })
+            }
+        })
+
+}
+
 
 /**
  * 审核票据
@@ -439,7 +489,7 @@ tripPlan.approveInvoice = function(params){
                     .spread(function(ret){
                         var status = params.status;
                         if(status == -1){
-                            return PlanOrder.update({status: 0, auditStatus: -1, updateAt: utils.now()}, {where: {id: order.id}, fields: ['auditStatus', 'status', 'updateAt'], transaction: t})
+                            return PlanOrder.update({status: 0, auditStatus: -1, updateAt: utils.now()}, {where: {id: order.id}, fields: ['auditStatus', 'status', 'updateAt'], transaction: t});
                         }
                         if(!params.expenditure)
                             throw {code: -4, msg: '支出金额不能为空'};
@@ -464,7 +514,7 @@ tripPlan.approveInvoice = function(params){
                                     (order.budget - order_updates.expenditure)>0?score=parseInt(order.budget - order_updates.expenditure):score=0;
                                     order_updates.status = 2;
                                     order_updates.auditStatus = 1;
-                                    order_updates.score = score;
+                                    order_updates.score = parseInt(score/2);
                                 }
                                 return PlanOrder.update(order_updates, {where: {id: order.id}, fields: Object.keys(order_updates), transaction: t})
                             })
@@ -493,14 +543,22 @@ tripPlan.countTripPlanNum = function(params){
  */
 tripPlan.statPlanOrderMoney = function(params){
     var query = checkAndGetParams(['companyId'], [], params);
-    var query_complete = utils.copyObj(query);
-    query_complete.status = {$gte: 2};
-    var createAt = {};
+    var query_complete = {
+        companyId: query.companyId,
+        status: {$gte: 2},
+        auditStatus: 1
+    }
+    query.status = {$gte: 0};
+    var startAt = {};
     if(params.startTime){
-        createAt.$gte = params.startTime;
+        startAt.$gte = params.startTime;
     }
     if(params.endTime){
-        createAt.$lte = params.endTime;
+        startAt.$lte = params.endTime;
+    }
+    if(!isObjNull(startAt)){
+        query.startAt = startAt;
+        query_complete.startAt = startAt;
     }
     return Q.all([
         PlanOrder.findAll({where: query, attributes: ['id']}),
@@ -518,10 +576,6 @@ tripPlan.statPlanOrderMoney = function(params){
             var q2 = {
                 orderId: {$in: idComplete},
                 status: 1
-            }
-            if(!isObjNull(createAt)){
-                q1.createAt = createAt;
-                q2.createAt = createAt;
             }
             return Q.all([
                 ConsumeDetails.sum('budget', {where: q1}),

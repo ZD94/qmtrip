@@ -7,6 +7,7 @@ var Q = require("q");
 var L = require("common/language");
 var checkAndGetParams = require("common/utils").checkAndGetParams;
 var moment = require('moment');
+var C = require("../../../config");
 
 var tripPlan = {};
 
@@ -46,15 +47,15 @@ tripPlan.savePlanOrder = function (params) {
             }
             if(order.hotel.length > 0){
                 var h = order.hotel[0];
-                hotel = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTiem).format('YYYY-MM-DD') + ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
+                hotel = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') + ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
             }
-            //http://qm.tulingdao.com:4002/staff.html#/travelPlan/PlanDetail?planId=b4408b90-b80e-11e5-8f1d-1f65c7617c6c
+            var url = C.host + '/staff.html#/travelPlan/PlanDetail?planId=' + order.id;
             return staffs.map(function(s){
                 return API.mail.sendMailRequest({
                     toEmails: s.email, //'miao.yu@tulingdao.com',
                     templateName: 'qm_notify_new_travelbudget',
                     titleValues: [staffName],
-                    values: [s.name, staffName, email, moment(order.createAt).format('YYYY-MM-DD HH:mm:ss'), order.description, go, back, hotel, '￥'+order.budget, 'http://www.baidu.com']
+                    values: [s.name, staffName, email, moment(order.createAt).format('YYYY-MM-DD HH:mm:ss'), order.description, go, back, hotel, '￥'+order.budget, url]
                 })
             })
         })
@@ -114,9 +115,9 @@ tripPlan.pageCompleteTripPlanOrder = function (params) {
         .then(function (companyId) {
             params.accountId = self.accountId;
             params.companyId = companyId;
-            params.auditStatus = 1; //已完成计划单
-            params.status = {$gte: 1};
-            var query = checkAndGetParams(['companyId'], ['accountId', 'status', 'auditStatus'], params);
+            params.auditStatus = 1; //审核状态为审核通过
+            params.status = {$gt: 1}; //计划单状态为已完成（2），可能会有结算完毕状态（3）
+            var query = checkAndGetParams(['companyId', 'accountId'], ['status', 'auditStatus'], params);
             var page = params.page;
             var perPage = params.perPage;
             typeof page == 'number' ? "" : page = 1;
@@ -204,7 +205,7 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
         var audit = params.audit;
         params.status = 1;
         if(audit == 'Y'){
-            params.status = {$gte: 1};
+            params.status = {$gt: 1};
             params.auditStatus = 1;
         }else if(audit == "P"){
             params.auditStatus = 0;

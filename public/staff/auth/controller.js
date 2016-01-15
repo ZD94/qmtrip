@@ -8,6 +8,12 @@ var auth=(function(){
 
     //登录页面
     auth.LoginController = function ($scope, $routeParams) {
+        var email = Cookie.get("email");
+        var pwd = Cookie.get("pwd");
+
+        $scope.email = email;
+        $scope.pwd = pwd;
+        console.info(email, pwd);
         $scope.toRegister = function(){
             window.location.href = "#/auth/register";
         }
@@ -18,6 +24,8 @@ var auth=(function(){
         $scope.checkLogin = function() {
             var name = $('#name').val();
             var pwd  = $('#pwd').val();
+            var remember = $("#remember").val();
+
             var commit = true;
             if(commit){
                 if(!name){
@@ -40,14 +48,22 @@ var auth=(function(){
                 API.onload(function(){
                     API.auth.login({email:name,pwd:pwd})
                         .then(function(data){
-                            console.info(data);
                             Cookie.set("user_id", data.user_id, { expires:30 });
                             Cookie.set("token_sign", data.token_sign, { expires:30 });
                             Cookie.set("timestamp", data.timestamp, { expires:30 });
                             Cookie.set("token_id", data.token_id, { expires:30 });
-                            console.log("登录成功");
+                            if (remember == true || remember == 'true') {
+                                Cookie.set("email", name);
+                                Cookie.set("pwd", pwd);
+                                Cookie.set("remember", remember);
+                            } else {
+                                Cookie.remove("email");
+                                Cookie.remove("pwd");
+                                Cookie.remove("remember");
+                            }
+
                             API.reload_all_modules();
-                            window.location.href= backUrl;
+                            window.location.href= backUrl+"?logintime="+data.is_first_login;
                         }).catch(function(err){
                             if (err.msg) {
                                 alert(err.msg);
@@ -116,7 +132,7 @@ var auth=(function(){
         //对联系人邮箱进行判断
         $("#corpMail").blur(function(){
             var mail   = $('#corpMail').val();
-            var reg = /^\w+[\w\-\.]+\w@\w[\w\-\.]+\w$/;
+            var reg = /^[\w\.-]+?@([\w\-]+\.){1,2}[a-zA-Z]{2,3}$/;
             if(!mail){
                 $scope.err_msg_mail = "联系人邮箱不能为空";
                 $("#corpMail").siblings(".err_msg").children("i").html("&#xf06a;");
@@ -332,6 +348,7 @@ var auth=(function(){
                     $("#imgCode").parent("div").siblings(".err_msg").show();
                     return false;
                 }else if(agree != "true"){
+                    alert('请同意注册协议');
                     return false;
                 }
                 API.onload(function(){
@@ -385,7 +402,7 @@ var auth=(function(){
             API.onload(function(){
                 API.auth.sendActiveEmail({email:$scope.userMail})
                     .then(function(){
-                        console.info("发送成功");
+                        Myalert("温馨提示","发送成功");
                         $scope.$apply();
                     }).catch(function(err){
                         console.error(err);
@@ -473,6 +490,10 @@ var auth=(function(){
         var accountId = $routeParams.accountId;
         var timestamp = $routeParams.timestamp;
 
+        $scope.toLogin = function() {
+            window.location.href = "#/auth/login";
+        }
+
         API.onload(function() {
             API.auth.activeByEmail({sign: sign, accountId: accountId, timestamp: timestamp})
                 .then(function(result) {
@@ -512,8 +533,6 @@ var auth=(function(){
                     $scope.$apply();
                 })
         })
-
-            //$scope.activeResult = "恭喜您账号成功激活,关闭页面";
     }
 
     //登出页面
@@ -594,7 +613,46 @@ var auth=(function(){
 
     //修改密码页面
     auth.ChangePwdController = function($scope) {
-
+        $("#oldPwd").blur(function(){
+            var oPwd   = $('#oldPwd').val();
+            if(!oPwd){
+                $scope.err_msg1 = "请输入原密码";
+                $("#oldPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#oldPwd").siblings(".err_msg").children("i").removeClass("right");
+                $("#oldPwd").siblings(".err_msg").show();
+                $scope.$apply();
+                return false;
+            }else{
+                $("#oldPwd").siblings(".err_msg").hide();
+            }
+        })
+        $("#newFirstPwd").blur(function(){
+            var nPwd1   = $('#newFirstPwd').val();
+            if(!nPwd1){
+                $scope.err_msg2 = "请输入新密码";
+                $("#newFirstPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#newFirstPwd").siblings(".err_msg").children("i").removeClass("right");
+                $("#newFirstPwd").siblings(".err_msg").show();
+                $scope.$apply();
+                return false;
+            }else{
+                $("#newFirstPwd").siblings(".err_msg").hide();
+            }
+        })
+        $("#newSecondPwd").blur(function(){
+            var nPwd1   = $('#newFirstPwd').val();
+            var nPwd2   = $('#newSecondPwd').val();
+            if(nPwd2 != nPwd1){
+                $scope.err_msg3 = "2次密码设置不一致";
+                $("#newSecondPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#newSecondPwd").siblings(".err_msg").children("i").removeClass("right");
+                $("#newSecondPwd").siblings(".err_msg").show();
+                $scope.$apply();
+                return false;
+            }else{
+                $("#newSecondPwd").siblings(".err_msg").hide();
+            }
+        })
         $scope.checkChangePwd = function(){
 
             var old = $("#oldPwd").val();
@@ -603,23 +661,44 @@ var auth=(function(){
             var commit = true;
 
             if(commit){
-                if(old == first){
-                    alert("新旧密码不能一致！");
-                }else if(first != second){
-                    alert("两次输入密码不一致！");
-                }
+                // if(old == first){
+                //     alert("新旧密码不能一致！");
+                // }else if(first != second){
+                //     alert("两次输入密码不一致！");
+                // }
                 API.onload(function() {
                     API.auth.resetPwdByOldPwd({oldPwd:old,newPwd:second})
                         .then(function(){
-                            alert("重置密码成功");
-                            window.location.href= '#/auth/login';
+                            // alert("重置密码成功");
+                            // window.location.href= '#/auth/login';
+                            $(".confirmFixed").show();
+                            $scope.seconds = 3;
+                            var $seconds = $("#second3");
+                            var timer = setInterval(function() {
+                                var begin = $seconds.text();
+                                begin = parseInt(begin);
+                                if (begin <=0 ) {
+                                    clearInterval(timer);
+                                    window.location.href= '#/auth/login';
+                                } else {
+                                    begin = begin - 1;
+                                    $seconds.text(begin);
+                                }
+                            }, 1000);
                             $scope.$apply();
                         }).catch(function(err){
                             console.error(err);
+                            $scope.err_msg1 = err.msg;
+                            $("#oldPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                            $("#oldPwd").siblings(".err_msg").children("i").removeClass("right");
+                            $("#oldPwd").siblings(".err_msg").show();
+                            $scope.$apply();
                         }).done();
                 })
             }
-
+        }
+        $scope.toReLogin = function(){
+            $scope.$apply();
         }
     }
 

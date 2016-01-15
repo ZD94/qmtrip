@@ -3,6 +3,10 @@
  */
 'use strict';
 var Q = require("q");
+var fs = require("fs");
+var crypto = require("crypto");
+var config = require('config');
+var utils = require("common/utils");
 var sequelize = require("common/model").importModel("./models");
 var attachmentModel = sequelize.models.Attachment;
 var Paginate = require("../../common/paginate").Paginate;
@@ -19,6 +23,78 @@ attachment.createAttachment = function(data){
     return checkParams(["md5key","content"], data)
         .then(function(){
             return attachmentModel.create(data);
+        });
+}
+
+/**
+ * 将上传到临时文件夹下的文件保存到数据库(暂时无用)
+ * @param params
+ * @param params.md5key  //temp目录下文件名称
+ * @param params.userId  当前用户id
+ * @param params.isPublic  文件是否公开
+ * @returns {*|Promise}
+ */
+attachment.saveAttachmentFromTmp = function(params){
+    return checkParams(["md5key"], params)
+        .then(function(){
+            var publicDir = config.upload.pubDir;
+            var md5key = params.md5key;
+            var userId = params.userId;
+            var isPublic = params.isPublic || false;
+            var filePath = config.upload.tmpDir+"/"+md5key;
+            fs.exists(publicDir, function (exists) {
+                if(!exists) {
+                    fs.mkdir(publicDir);
+                }
+                fs.exists(filePath, function (exists) {
+                    if(exists){
+                        fs.readFile(filePath, function (err, data) {
+                            if (err) {
+                                throw {"ret": -1, "errMsg": err.message};
+                            } else {
+                                var md5 = crypto.createHash("md5");
+                                var md5key = md5.update(data).digest("hex");
+                                var attObj = {md5key: md5key,content: data, userId: userId, isPublic: isPublic,fileType:md5key.split(".")[1]};
+                                return attachmentModel.findOne({where: {md5key: md5key,userId: userId}})
+                                    .then(function(att){
+                                        if(!att){
+                                            return attachmentModel.create(attObj);
+                                        }else{
+                                            return att;
+                                        }
+                                    })
+                                    .then(function(attachObj){
+                                        if(isPublic){
+                                            return fs.rename(filePath,publicDir+"/"+md5key, function(err){
+                                                if(err){
+                                                    throw err;
+                                                }
+                                                fs.exists(filePath, function (exists) {
+                                                    if(exists){
+                                                        fs.unlink(filePath);
+                                                        console.log("删除临时文件");
+                                                    }
+                                                    return attachObj.md5key;
+                                                });
+                                            })
+                                        }else{
+                                            return fs.exists(filePath, function (exists) {
+                                                if(exists){
+                                                    fs.unlink(filePath);
+                                                    console.log("删除临时文件");
+                                                }
+                                                return attachObj.md5key;
+                                            });
+                                        }
+                                    })
+                            }
+                        });
+                    }else{
+                        throw {msg: "文件不存在"};
+                    }
+                });
+            });
+
         });
 }
 

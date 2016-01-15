@@ -413,8 +413,27 @@ authServer.login = function(data) {
                 throw L.ERR.ACCOUNT_FORBIDDEN;
             }
 
-            return makeAuthenticateSign(loginAccount.id);
-        });
+            return makeAuthenticateSign(loginAccount.id)
+                .then(function(ret) {
+                    //判断是否首次登陆
+                    if (loginAccount.isFirstLogin) {
+                        loginAccount.isFirstLogin = false;
+                        return loginAccount.save()
+                        .then(function() {
+                            ret.is_first_login = true;
+                            return ret;
+                        })
+                    }
+
+                    ret.is_first_login = false;
+                    return ret;
+                });
+        })
+        .then(function(ret) {
+            console.info('返回结果:', ret);
+            return ret;
+        })
+
 }
 
 /**

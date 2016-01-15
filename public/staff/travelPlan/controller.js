@@ -21,7 +21,6 @@ var travelPlan=(function(){
             API.onload(function() {
                 API.tripPlan.pageTripPlanOrder({auditStatus:[0,-1],page:$scope.page1})
                     .then(function(result){
-                        console.info (result);
                         $scope.total1 = result.total;
                         $scope.planListitems = result.items;
                         loading(true);
@@ -90,7 +89,6 @@ var travelPlan=(function(){
             API.onload(function() {
                 API.tripPlan.pageCompleteTripPlanOrder({page:$scope.page2})
                     .then(function(result){
-                        console.info (result);
                         $scope.total2 = result.total;
                         $scope.finishPlanListitems = result.items;
                         $scope.$apply();

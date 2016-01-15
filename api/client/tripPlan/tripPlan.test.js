@@ -9,7 +9,7 @@ var API = require("common/api");
 
 describe("api/client/tripPlan.js", function() {
 
-    //var agencyId = "";
+    var agencyId = "";
     var agencyUserId = "";
     var companyId = "";
     var staffId = "";
@@ -92,7 +92,8 @@ describe("api/client/tripPlan.js", function() {
                 description: '发送邮件测试计划单',
                 startAt: '2015-12-30 11:12:12',
                 consumeDetails: [{
-                    startTime: '2016-12-30 11:11:11',
+                    startTime: '2016-01-15 11:11:11',
+                    endTime: '2016-01-30 22:11:56',
                     budget: 300,
                     city: '上海市',
                     hotelName: '丐帮',
@@ -245,7 +246,7 @@ describe("api/client/tripPlan.js", function() {
 
         it("#pageTripPlanOrderByCompany should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.pageTripPlanOrderByCompany.call(self, {page: 1, isUpload: false}, function (err, ret) {
+            API.client.tripPlan.pageTripPlanOrderByCompany.call(self, {page: 1, audit: 'P'}, function (err, ret) {
                 if (err) {
                     throw err;
                 }

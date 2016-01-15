@@ -13,14 +13,15 @@
     </div>
     <div class="input">
         <span class="tip_err"><i class="web-icon-font"></i>{{err_msg_tip}}</span>
-        <input id="name" class="" type="text" value="" placeholder="请输入企业邮箱"/>
+        <input id="name" ng-model="email" class="" type="text" value="" placeholder="请输入企业邮箱"/>
         <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_mail}}</span>
     </div>
     <div class="input">
-        <input id="pwd" class="" type="password" value="" placeholder="密码"/>
+        <input id="pwd" class="" ng-model="pwd" type="password" value="" placeholder="密码"/>
         <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_pwd}}</span>
     </div>
     <div class="remember">
+        <input type="hidden" value="false" id="remember"/>
         <span id="remember1"><i class="web-icon-font2" checkvalue="false">&#xea2f;</i>记住账号</span>
         <span id="remember2" style="display: none;"><i class="web-icon-font2" checkvalue="true">&#xea2e;</i>记住账号</span>
         <span class="forget" ng-click="toForget()">忘记密码?</span>
@@ -35,12 +36,14 @@
         $("#remember1").click(function(){
             $(this).hide();
             $(this).removeClass("check");
+            $("#remember").val(true);
             $("#remember2").show();
             $("#remember2").addClass("check");
         })
         $("#remember2").click(function(){
             $(this).hide();
             $(this).removeClass("check");
+            $("#remember").val(false);
             $("#remember1").show();
             $("#remember1").addClass("check");
         })
