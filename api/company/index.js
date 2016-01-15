@@ -139,6 +139,7 @@ company.listCompany = function(params){
     if(params.columns){
         options.attributes =  params.columns;
     }
+    options.order = [['create_at', 'desc']];
     return Company.findAll(options);
 }
 

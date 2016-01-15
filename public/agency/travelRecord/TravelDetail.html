@@ -127,13 +127,15 @@
                 <table width="100%">
                     <tr style="border-bottom: 1px #E5E5E5 solid">
                         <td>
-                            <p>{{outTraffic.invoice[outTraffic.invoice.length-1].create_at}}&nbsp;&nbsp;上传</p>
-                            <p>{{outTraffic.invoice[outTraffic.invoice.length-1].approve_at}}&nbsp;&nbsp;<span ng-if="outTraffic.status=='-1'">审核未通过</span><span ng-if="outTraffic.status==1">审核通过</span></p>
+                            <div ng-repeat="item in outTraffic.invoice">
+                                <p>{{item.create_at}}&nbsp;&nbsp;第{{item.times}}次上传</p>
+                                <p ng-if="item.status!=0">{{item.approve_at}}&nbsp;&nbsp;<span ng-if="item.status=='-1'">审核未通过&nbsp;&nbsp;&nbsp;{{item.remark}}&nbsp;&nbsp;&nbsp;操作人：{{outTraffic.auditName.name}}</span><span ng-if="item.status==1">审核通过</span></p>
+                            </div>
                         </td>
-                        <td>
+                        <td valign="bottom">
                             <div ng-if="outTraffic.status==0">
-                                    <input type="button" class="common_btn1" value="审核未通过" ng-click="invoiceNopassShow('outTraffic')" style="float: right;">
-                                    <input type="button" class="common_btn1" value="审核通过" ng-click="invoicePassShow('outTraffic')" style="margin-right: 20px; float: right;">
+                                    <input type="button" class="common_btn1 w100" value="审核未通过" ng-click="invoiceNopassShow('outTraffic')" style="float: right;">
+                                    <input type="button" class="common_btn1 w100" value="审核通过" ng-click="invoicePassShow('outTraffic')" style="margin-right: 20px; float: right;">
                                 </div>
                         </td>
                     </tr>
@@ -154,13 +156,15 @@
                 <table width="100%">
                     <tr style="border-bottom: 1px #E5E5E5 solid">
                         <td>
-                            <p>{{hotel.invoice[hotel.invoice.length-1].create_at}}&nbsp;&nbsp;上传</p>
-                            <p>{{hotel.invoice[hotel.invoice.length-1].approve_at}}&nbsp;&nbsp;<span ng-if="hotel.status=='-1'">审核未通过</span><span ng-if="hotel.status==1">审核通过</span></p>
+                            <div ng-repeat="item in hotel.invoice">
+                                <p>{{item.create_at}}&nbsp;&nbsp;第{{item.times}}次上传</p>
+                                <p ng-if="item.status!=0">{{item.approve_at}}&nbsp;&nbsp;<span ng-if="item.status=='-1'">审核未通过&nbsp;&nbsp;&nbsp;{{item.remark}}&nbsp;&nbsp;&nbsp;操作人：{{hotel.auditName.name}}</span><span ng-if="item.status==1">审核通过</span></p>
+                            </div>
                         </td>
-                        <td>
+                        <td valign="bottom">
                             <div ng-if="hotel.status==0">
-                                <input type="button" class="common_btn1" value="审核未通过" ng-click="invoiceNopassShow('hotel')" style="float: right;">
-                                <input type="button" class="common_btn1" value="审核通过" ng-click="invoicePassShow('hotel')" style="margin-right: 20px; float: right;">
+                                <input type="button" class="common_btn1 w100" value="审核未通过" ng-click="invoiceNopassShow('hotel')" style="float: right;">
+                                <input type="button" class="common_btn1 w100" value="审核通过" ng-click="invoicePassShow('hotel')" style="margin-right: 20px; float: right;">
                             </div>
                         </td>
                     </tr>
@@ -181,13 +185,15 @@
                 <table width="100%">
                     <tr style="border-bottom: 1px #E5E5E5 solid">
                         <td>
-                            <p>{{backTraffic.invoice[backTraffic.invoice.length-1].create_at}}&nbsp;&nbsp;上传</p>
-                            <p>{{backTraffic.invoice[backTraffic.invoice.length-1].approve_at}}&nbsp;&nbsp;<span ng-if="backTraffic.status=='-1'">审核未通过</span><span ng-if="backTraffic.status==1">审核通过</span></p>
+                            <div ng-repeat="item in backTraffic.invoice">
+                                <p>{{item.create_at}}&nbsp;&nbsp;第{{item.times}}次上传</p>
+                                <p ng-if="item.status!=0">{{item.approve_at}}&nbsp;&nbsp;<span ng-if="item.status=='-1'">审核未通过&nbsp;&nbsp;&nbsp;{{item.remark}}&nbsp;&nbsp;&nbsp;操作人：{{backTraffic.auditName.name}}</span><span ng-if="item.status==1">审核通过</span></p>
+                            </div>
                         </td>
                         <td>
                             <div ng-if="backTraffic.status==0">
-                                <input type="button" class="common_btn1" value="审核未通过" ng-click="invoiceNopassShow('backTraffic')" style="float: right;">
-                                <input type="button" class="common_btn1" value="审核通过" ng-click="invoicePassShow('backTraffic')" style="margin-right: 20px; float: right;">
+                                <input type="button" class="common_btn1 w100" value="审核未通过" ng-click="invoiceNopassShow('backTraffic')" style="float: right;">
+                                <input type="button" class="common_btn1 w100" value="审核通过" ng-click="invoicePassShow('backTraffic')" style="margin-right: 20px; float: right;">
                             </div>
                         </td>
                     </tr>

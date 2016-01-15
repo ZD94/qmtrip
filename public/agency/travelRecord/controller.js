@@ -96,9 +96,55 @@ var travelRecord=(function(){
                 API.agencyTripPlan.getTripPlanOrderById(orderId)
                     .then(function(result){
                         $scope.planDetail = result;
+                        $scope.outTraffic = $scope.planDetail.outTraffic[0];
                         $scope.backTraffic = $scope.planDetail.backTraffic[0];
                         $scope.hotel = $scope.planDetail.hotel[0];
-                        $scope.outTraffic = $scope.planDetail.outTraffic[0];
+                        var outTraffic = $scope.planDetail.outTraffic;
+                        var backTraffic = $scope.planDetail.backTraffic;
+                        var hotel = $scope.planDetail.hotel;
+                        outTraffic.map(function(outTrafficauditUser){
+                            API.agency.getAgencyUser(outTrafficauditUser.auditUser)
+                                .then(function(result){
+                                    outTrafficauditUser.auditName = result;
+                                    $scope.$apply();
+                                    loading(true);
+                                })
+                                .catch(function(err) {
+                                    console.info(err);
+                                });
+                        });
+                        backTraffic.map(function(backTrafficauditUser){
+                            API.agency.getAgencyUser(backTrafficauditUser.auditUser)
+                                .then(function(result){
+                                    backTrafficauditUser.auditName = result;
+                                    $scope.$apply();
+                                    loading(true);
+                                })
+                                .catch(function(err) {
+                                    console.info(err);
+                                });
+                        });
+                        hotel.map(function(hotelauditUser){
+                            API.agency.getAgencyUser(hotelauditUser.auditUser)
+                                .then(function(result){
+                                    hotelauditUser.auditName = result;
+                                    $scope.$apply();
+                                    loading(true);
+                                })
+                                .catch(function(err) {
+                                    console.info(err);
+                                });
+                        });
+
+
+
+
+
+
+
+
+
+
                         API.staff.getStaffByAgency({id:$scope.planDetail.accountId})
                             .then(function(result){
                                 $scope.travelerName = result.name;
@@ -110,6 +156,8 @@ var travelRecord=(function(){
             })
         }
         $scope.initTravelDetail();
+
+
         $scope.outTraffichref = function () {
             loading(true);
             $location.hash('outTraffic');
