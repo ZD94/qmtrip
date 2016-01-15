@@ -502,6 +502,9 @@ authServer.getAccount = function(params){
     }
     var options = {};
     options.where = {id: id};
+    if(params.type){
+        options.where.type = params.type;
+    }
     if(attributes)
         options.attributes = attributes;
     return Models.Account.findOne(options);

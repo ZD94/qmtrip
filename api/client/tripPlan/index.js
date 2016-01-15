@@ -31,7 +31,7 @@ tripPlan.savePlanOrder = function (params) {
             params.companyId = staff.companyId;
             return Q.all([
                 API.tripPlan.savePlanOrder(params),
-                API.staff.findStaffs({companyId: staff.companyId, roleId: {$ne: 1}, columns: ['name','email']})
+                API.staff.findStaffs({companyId: staff.companyId, roleId: {$ne: 1}, columns: ['id', 'name','email']})
             ])
         })
         .spread(function(_order, staffs){
@@ -51,12 +51,19 @@ tripPlan.savePlanOrder = function (params) {
             }
             var url = C.host + '/staff.html#/travelPlan/PlanDetail?planId=' + order.id;
             return staffs.map(function(s){
-                return API.mail.sendMailRequest({
-                    toEmails: s.email, //'miao.yu@tulingdao.com',
-                    templateName: 'qm_notify_new_travelbudget',
-                    titleValues: [staffName],
-                    values: [s.name, staffName, email, moment(order.createAt).format('YYYY-MM-DD HH:mm:ss'), order.description, go, back, hotel, '￥'+order.budget, url]
-                })
+                return API.auth.getAccount({id: s.id, type: 1, attributes: ['status']})
+                    .then(function(a){
+                        if(a.status != 1){
+                            return {code: 0};
+                        }else{
+                            return API.mail.sendMailRequest({
+                                toEmails: s.email, //'miao.yu@tulingdao.com',
+                                templateName: 'qm_notify_new_travelbudget',
+                                titleValues: [staffName],
+                                values: [s.name, staffName, email, moment(order.createAt).format('YYYY-MM-DD HH:mm:ss'), order.description, go, back, hotel, '￥'+order.budget, url]
+                            })
+                        }
+                    })
             })
         })
         .then(function(){
