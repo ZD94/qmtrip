@@ -100,7 +100,7 @@ function uploadActionFile(req, res, next) {
 function getImg(req, res, next) {
     var md5key = req.params.md5key;
     var userId = req.cookies.user_id;
-    API.attachment.getAttachment({md5key: md5key})
+    API.attachment.getAttachmentJointHasId({md5key: md5key})
         .then(function(result){
             if(!result.isPublic){
                 if(result && ((result.hasId && result.hasId.join(",").indexOf(userId) != -1))){

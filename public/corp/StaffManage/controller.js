@@ -69,7 +69,6 @@ var staff = (function(){
 
         //初始化所有的记录
         $scope.initstafflist = function(){
-            $scope.selectClass = [];
             //加载多个API方法
             API.onload(function(){
                 API.staff.getCurrentStaff()//qh获取当前登录人员的企业id
@@ -94,6 +93,7 @@ var staff = (function(){
                                 $scope.companyId = staff.companyId;
                                 var arr = travelPolicies;
                                 var i ;
+                                $scope.selectClass = [];//清空selectClass避免出现重复
                                 for(i=0; i<arr.length; i++){
                                     var name = arr[i].name;
                                     var id = arr[i].id;
