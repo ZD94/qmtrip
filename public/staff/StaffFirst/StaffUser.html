@@ -55,9 +55,9 @@
 			</p>
 			<p ng-if="travelpolicy.trainLevel == '不限'">火车：座次不限</p>
 			<p ng-if="travelpolicy.trainLevel != '不限'">火车：{{travelpolicy.trainLevel.replace(',', '/')}}</p>
-			<p ng-if="travelpolicy.hotelLevel == '不限' && travelpolicy.hotelPrice == 0">住宿：酒店任意住</p>
-			<p ng-if="travelpolicy.hotelLevel != '不限' && travelpolicy.hotelPrice == 0">住宿：{{travelpolicy.hotelLevel.replace(',', '/')}}</p>
-			<p ng-if="travelpolicy.hotelLevel != '不限' && travelpolicy.hotelPrice != 0">住宿：{{travelpolicy.hotelLevel.replace(',', '/')}}且每晚不超过{{travelpolicy.hotelPrice}}元</p>
+			<p ng-if="travelpolicy.hotelLevel == '不限' && travelpolicy.hotelPrice == null">住宿：酒店任意住</p>
+			<p ng-if="travelpolicy.hotelLevel != '不限' && travelpolicy.hotelPrice == null">住宿：{{travelpolicy.hotelLevel.replace(',', '/')}}</p>
+			<p ng-if="travelpolicy.hotelLevel != '不限' && travelpolicy.hotelPrice != null">住宿：{{travelpolicy.hotelLevel.replace(',', '/')}}且每晚不超过{{travelpolicy.hotelPrice}}元</p>
 		</div>
 		<!-- <div ng-if="staff.travelLevel == null">
 			<div class="travelnull">
