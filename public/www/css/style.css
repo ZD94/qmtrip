@@ -293,7 +293,7 @@ body {
 .staff_header .s_header_main .staff_menu_t {
 	height: 80px;
 	line-height: 80px;
-	width: 500px;
+	width: 600px;
 	margin: 0 auto;
 }
 
@@ -546,7 +546,7 @@ body {
 .fp-auto-height .fp-tableCell{
 	height: auto !important;
 }
-.copyright { padding: 10px 0; text-align: center;width: 1030px;margin: 10px auto; font-size: 15px;line-height: 25px;}
+.copyright { padding: 10px 0; text-align: center;width: 1030px;margin: 10px auto 0px; font-size: 15px;line-height: 25px;color: #fff;}
 .copyright p{
 	margin: 0;padding: 0;
 }
@@ -563,6 +563,7 @@ body {
 .code img{
 	width: 175px;
 	margin-top: 10px;
+	float: right;
 }
 
 /*底部结束*/
