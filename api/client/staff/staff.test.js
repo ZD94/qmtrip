@@ -10,7 +10,7 @@ describe("api/client/staff.js", function() {
     var id = "";
     var companyId = "";
     var accountId = "";
-    //var agencyId = "";
+    var agencyId = "";
     var agencyUserId = "";
     var ownerSelf = {};
     var agencySelf = {};
@@ -254,6 +254,16 @@ describe("api/client/staff.js", function() {
                 if(err){
                     throw err;
                 }
+                done();
+            });
+        })
+
+        it("#statStaffPointsByAgency should be ok", function(done) {
+            API.client.staff.statStaffPointsByAgency.call({accountId: agencyUserId}, companyId, function(err, ret) {
+                if(err){
+                    throw err;
+                }
+                assert(ret.totalPoints >= 0);
                 done();
             });
         })
