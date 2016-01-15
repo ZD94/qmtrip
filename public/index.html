@@ -6,10 +6,11 @@
 		<script type="text/javascript" src="www/js/jquery.js"></script>
 		<script type="text/javascript" src="www/js/ddfullscreenslider.js"></script>
 		<script src="www/js/fullpage.js"></script>
+		<script src="www/js/jquery.fullPage.js"></script>
 		<title></title>
 	</head>
 	<body>
-		<div class="staff_header">
+		<div class="staff_header ml-nav">
 			<div class="s_header_main">
 				<div class="staff_logo">
 					<a>
@@ -21,15 +22,21 @@
 						<a href="#">
 							<li class="on">首页</li>
 						</a>
-						<a href="#twoSlider">
-							<li>服务</li>
+						<a href="">
+							<li>功能</li>
 						</a>
-						<a href="#threeSlider">
-							<li>客户</li>
+						<a href="">
+							<li>加入我们</li>
 						</a>
 						<a href="#">
 							<li>关于我们</li>
 						</a>
+					</ul>
+				</div>
+				<div class="login">
+					<ul>
+						<li><a href="staff.html#/auth/login"><img src="/www/img/login.png"></a></li>
+						<li><a href="staff.html#/auth/register"><img src="/www/img/register.png" style="opacity: .4;"></a></li>
 					</ul>
 				</div>
 			</div>
@@ -39,16 +46,18 @@
 				<div class="slide" style="background: url(www/img/slider1.png) bottom center no-repeat;background-color: #2d50bc;">
 					<div class="slide_text">
 						<h3>老板最爱的差旅服务</h3>
-						<div>
-							员工出差多，管理有难题。</br>
-							差旅政策很难搞，每次审批无依据。</br>
+						<p>
+							员工出差多，管理有难题。
+							差旅政策很难搞，每次审批无依据。<br>
 							全麦商旅，帮助企业节省差旅费用超过30%
-						</div>
+						</p>
 					</div>
 					<div class="start">
-						<img src="www/img/startto.png" />
+						<a href="staff.html#/auth/login"><img src="www/img/startto.png" /></a>
 					</div>
 				</div>
+			</div>
+			<div class="section">
 				<div class="slide" style="background: url(www/img/slider2.png) 50% 75% no-repeat;background-color: #5c5db4;">
 					<div class="slide_text">
 						<h3>全方位的差旅费用统计分析</h3>
@@ -57,9 +66,11 @@
 						</p>
 					</div>
 					<div class="start">
-						<img src="www/img/startto.png" />
+						<a href="staff.html#/auth/login"><img src="www/img/startto.png" /></a>
 					</div>
 				</div>
+			</div>
+			<div class="section">
 				<div class="slide" style="background: url(www/img/slider3.png) bottom center no-repeat;background-color: #a07518;">
 					<div class="slide_text">
 						<h3>给公司省钱就是给自己赚钱</h3>
@@ -68,18 +79,26 @@
 						</p>
 					</div>
 					<div class="start">
-						<img src="www/img/startto.png" />
+						<a href="staff.html#/auth/login"><img src="www/img/startto.png" /></a>
 					</div>
 				</div>
+			</div>
+			<div class="section">
 				<div class="slide" style="background: url(www/img/slider4.png) bottom center no-repeat;background-color: #46b0f1;">
 					<div class="slide_text">
 						<h3>来自硅谷的员工激励方式</h3>
-						<div class="special">
-							来自硅谷众多企业如Google、Facebook、Amazon，都在使用动态差旅标准，员工主动帮助企业节省的差旅费用做为奖励返还员工，员工和企业满意度均有大幅提升。这也是全麦商旅的初衷。
+						<p>
+							来自硅谷的众多企业都在使用动态差旅标准
+						</p>
+						<div class="specialPic">
+							<img src="www/img/f1.png"/>
+							<img src="www/img/f2.png" style="margin-top: 5px;"/>
+							<img src="www/img/f3.png"/>
+							<img src="www/img/f4.png" style="margin-top: 5px;"/>
 						</div>
 					</div>
 					<div class="start">
-						<img src="www/img/startto.png" />
+						<a href="staff.html#/auth/login"><img src="www/img/startto.png" /></a>
 					</div>
 				</div>
 			</div>
@@ -107,7 +126,7 @@
 						<li>
 							<img src="www/img/allqm.png" />
 							<div class="little_text">
-								<h3>全面的全麦商旅</h3>
+								<h3>精明的全麦商旅</h3>
 								<p>
 									全方位的统计分析功能，不仅准确记录总支出、分项支出以及个人支出，还对费用节省进行统计，为绩效管理提供依据。
 								</p>
@@ -124,24 +143,56 @@
 						</li>
 						<div style="clear: both;"></div>
 					</ul>
+					<div class="next_to">
+						<img src="www/img/nextto.png" />
+					</div>
 					<div style="clear: both;"></div>
 				</div>
 			</div>
-			<div class="section">
+			<div class="section three">
 				<div class="threeSlider" id="threeSlider" style="width: 1030px;margin: 0 auto;">
 					<h3>合作伙伴</h3>
 					<ul>
-						<li>京东</li>
-						<li>天巡</li>
-						<li>锐思锐拓</li>
-						<li>游世界</li>
+						<li><img src="www/img/logo-11.png"/> </li>
+						<li><img src="www/img/logo-12.png"/></li>
+						<li><img src="www/img/logo-13.png"/></li>
+						<li><img src="www/img/logo-14.png"/></li>
 						<div style="clear: both;"></div>
 					</ul>
 					<div style="clear: both;"></div>
 				</div>
-				<div class="footer">
-					<p>由途灵岛信息股份有限公司提供技术支持</p>
-					<p>联系电话：010-57371105</p>
+			</div>
+			<div class="section fp-auto-height">
+				<div class="footer-link">
+					<div class="center-wrap">
+						<div class="clearfix">
+							<dl>
+								<dt>企业咨询</dt>
+								<dd><a href="javascript:">QQ：1068625</a></dd>
+								<dd><a href="javascript:">Tel：010-57371105</a></dd>
+							</dl>
+
+							<dl>
+								<dt>合作加盟</dt>
+								<dd><a href="javascript:">QQ：11623403</a></dd>
+								<dd><a href="javascript:">Email：shuang.cao@tulingdao.com</a></dd>
+							</dl>
+
+						</div>
+						<div style="clear:both;"></div>
+					</div>
+					<div class="code">
+						<img src="www/img/5050.jpg"/>
+					</div>
+					<div style="clear:both;"></div>
+				</div>
+
+				<div class="copyright">
+					<p>由途灵岛（北京）信息技术有限公司提供技术支持</p>
+					<p>
+						友情链接：<a href="www.tulingdao.com">www.tulingdao.com</a>
+					</p>
+					<p>Copyright©2016 tulingdao.All Rights Reserved. 途灵岛信息技术版权所有.</p>
 				</div>
 			</div>
 		</div>
@@ -150,82 +201,31 @@
 	<script>
 		$(function() {
 			var action = 0;
+			var $mlNav = $('.staff_header');
 			$('#dowebok').fullpage({
-				sectionsColor: ['#1bbc9b', '#b04b4a', '#61a214'],
+				sectionsColor: ['#1bbc9b', '','','','#55b06d', '#3a88df','#282a2a'],
 				resize: true,
-				loopHorizontal: true,
+				loopHorizontal: false,
 				css3: true,
 				loopBottom: false,
 				navigation: true,
 				slidesNavigation: true,
 				slidesNavPosition: "bottom",
-				afterLoad: function(anchorLink, index) {
-					var loadedSection = $(this);
-					//using index
-					if (index == 2) {
-						if (action == 0) {
-							$('.twoSlider').append('<div id="ball"></div>');
-							action = 1;
-//							setInterval(function() {
-								$('#ball').css({
-									"width": "200px",
-									"height": "200px",
-									"margin-top":"-100px",
-									"margin-left":"-100px"
-								});
-//							}, 3000)
-							setTimeout(function() {
-								var cri = "";
-								cri += '<div class="circle">';
-								cri += '<div class="pie_left"><div class="lleft"></div></div>';
-								cri += '<div class="pie_right"><div class="rright"></div></div>';
-								cri += '<div class="mask"><a>全麦商旅</a><span style="display:none;">0</span></div>';
-								cri += '</div>';
-								$('.twoSlider').append(cri);
-								var a = 0;
-								setInterval(function() {
-									if (a < 100) {
-										a++;
-										$('.mask').children('span').text(a);
-										time();
-									} else {}
-								}, 30)
-
-								function time() {
-									$('.circle').each(function(index, el) {
-										var num = $(this).find('span').text() * 3.6;
-										if (num <= 180) {
-											$(this).find('.rright').css('transform', "rotate(" + num + "deg)");
-										} else {
-											$(this).find('.rright').css('transform', "rotate(180deg)");
-											$(this).find('.lleft').css('transform', "rotate(" + (num - 180) + "deg)");
-										};
-									});
-								}
-								setTimeout(function() {
-									var fourBall = "";
-									fourBall += '<div class="leftBall"></div>';
-									fourBall += '<div class="rightBall"></div>';
-									$('.twoSlider > .circle > .mask').append(fourBall);
-								}, 3000)
-								setTimeout(function() {
-									$('#ball').hide();
-									$('.circle').hide();
-									$('.twoSlider > ul').show();
-									var next_to = "";
-									next_to += '<div class="next_to">';
-									next_to += '<img src="www/img/nextto.png" />';
-									next_to += '</div>';
-									$('.twoSlider').append(next_to);
-								}, 5500)
-							}, 3500);
-						}
+				onLeave: function(index, nextIndex, direction){
+					if(index == 6 && direction == 'down'){
+						$mlNav.animate({
+							top: -80
+						}, 400);
+					}else{
+						$mlNav.animate({
+							top: 0
+						}, 400);
 					}
 				}
 			});
 			setInterval(function() {
 				$.fn.fullpage.moveSlideRight();
-			}, 4000);
+			}, 7000);
 			var wh = $(window).height();
 			console.info(wh);
 			$(".slide").css("height", wh);
@@ -234,6 +234,8 @@
 				$('.twoSlider >ul >li >img').css("width","180px");
 				$('.twoSlider').css("padding-top","100px");
 				$('.next_to').css("margin-top","50px !important");
+				$('.threeSlider').css("padding-top","100px");
+				$('.slide_text').css("padding-top","100px");
 			}
 		});
 	</script>
