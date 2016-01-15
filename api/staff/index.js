@@ -104,10 +104,10 @@ staff.deleteStaff = function(params){
     }
     return API.auth.remove({accountId: id})
         .then(function(){
-            return staffModel.update({status: STAFF_STATUS.DELETE, quitTime: utils.now()}, {where: {id: id}, fields: ['status', 'quitTime']})
+            return staffModel.update({status: STAFF_STATUS.DELETE, quitTime: utils.now()}, {where: {id: id}, return : true, returning: true})
         })
         .spread(function(num, rows){
-            return API.company.getCompanyById(rows[0].companyId)
+            return API.company.getCompany({companyId:rows[0].companyId})
                 .then(function(company){
                     return API.mail.sendMailRequest({toEmails: rows[0].email, templateName: "qm_notify_remove_staff", values: [utils.now(),company.name]})
                         .then(function() {
