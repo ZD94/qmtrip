@@ -76,7 +76,7 @@ staff.createStaff = function(data){
                 data.id = accountId;
                 return data;
             }
-            var accData = {email: data.email, mobile: data.mobile, status: 0, type: 1}//若为导入员工置为激活状态 不设置密码
+            var accData = {email: data.email, mobile: data.mobile, status: 0, type: 1, companyName: company.name}//若为导入员工置为激活状态 不设置密码
             return API.auth.newAccount(accData)
                 .then(function(account){
                     data.id = account.id;
@@ -104,13 +104,20 @@ staff.deleteStaff = function(params){
     }
     return API.auth.remove({accountId: id})
         .then(function(){
-            return staffModel.update({status: STAFF_STATUS.DELETE, quitTime: utils.now()}, {where: {id: id}, fields: ['status', 'quitTime']})
+            return staffModel.update({status: STAFF_STATUS.DELETE, quitTime: utils.now()}, {where: {id: id}, returning: true})
         })
-        .spread(function(num){
-            if(num != 1){
-                throw {code: -2, msg: '删除失败'};
-            }
-            return true;
+        .spread(function(num, rows){
+            return API.company.getCompany({companyId:rows[0].companyId})
+                .then(function(company){
+                    return API.mail.sendMailRequest({toEmails: rows[0].email, templateName: "qm_notify_remove_staff", values: [utils.now(),company.name]})
+                        .then(function() {
+                            if(num != 1){
+                                throw {code: -2, msg: '删除失败'};
+                            }
+                            return true;
+                        });
+                })
+
         })
 }
 
@@ -283,6 +290,7 @@ staff.increaseStaffPoint = function(params) {
             return increment;
         });
 }
+
 /**
  * 减少员工积分
  * @param params{id: 员工id, increasePoint: 减少分数， remark: 减少原因}

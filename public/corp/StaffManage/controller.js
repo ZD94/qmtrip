@@ -27,6 +27,8 @@ var staff = (function(){
         $scope.selectClass = [
             {val:"",name:"请选择对应的差旅等级"}
         ]
+        $scope.department = "";
+
 
         //初始化员工记录的方法
         $scope.initStaff = function() {
@@ -85,9 +87,10 @@ var staff = (function(){
                         return Q.all([
                             API.travelPolicy.getAllTravelPolicy({where: {companyId:staff.companyId}}),//获取当前所有的差旅标准名称
                             API.staff.listAndPaginateStaff(params),//加载所有的员工记录
-                            API.staff.statisticStaffsRole({companyId:staff.companyId})//统计企业员工（管理员 普通员工 未激活员工 总数）数量
+                            API.staff.statisticStaffsRole({companyId:staff.companyId}),//统计企业员工（管理员 普通员工 未激活员工 总数）数量
+                            API.staff.getDistinctDepartment({companyId:staff.companyId})//企业部门
                         ])
-                            .spread(function(travelPolicies,staffinfo,staffRole){
+                            .spread(function(travelPolicies,staffinfo,staffRole, departments){
                                 $scope.total = staffinfo.total;
                                 //获取差旅标准
                                 $scope.companyId = staff.companyId;

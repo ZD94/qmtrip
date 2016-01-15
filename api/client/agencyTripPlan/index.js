@@ -290,4 +290,28 @@ agencyTripPlan.countTripPlanNum = function(params){
         });
 }
 
+/**
+ * 统计计划单的动态预算/计划金额和实际支出
+ * @param params
+ */
+agencyTripPlan.statPlanOrderMoneyByAgency = function (params) {
+    var self = this;
+    if(!params.companyId){
+        throw {code: -1, msg: '企业Id不能为空'};
+    }
+    var companyId = params.companyId;
+    var params = _.pick(params, ['companyId', 'startTime', 'endTime']);
+    return Q.all([
+        API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']}),
+        API.company.getCompany({companyId: companyId, columns: ['agencyId']})
+    ])
+        .spread(function(u, c){
+            if(u.agencyId != c.agencyId){
+                throw L.ERR.PERMISSION_DENY;
+            }
+            params.companyId = companyId;
+            return API.tripPlan.statPlanOrderMoney(params);
+        })
+}
+
 module.exports = agencyTripPlan;
