@@ -20,8 +20,6 @@ describe.skip("api/client/auth/index.js", function() {
         picCode: "test"
     }
 
-    var companyId = "";
-
     describe("#registryCompany", function() {
         before(function(done) {
             API.auth.remove({email: testCase.email}, function(err) {
