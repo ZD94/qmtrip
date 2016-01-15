@@ -16,9 +16,12 @@ module.exports = (function(){
 			$(".left_nav li").removeClass("on").eq(1).addClass("on");
 			loading(false);
 			API.onload(function(){
-				API.company.getCompanyListByAgency()
-					.then(function(companylist){
-						// console.info(companylist);
+				API.company.getCompanyListByAgency({page:$scope.page,perPage:20})
+					.then(function(ret){
+						//console.info (ret);
+						$scope.total = ret.total;
+						$scope.pages = ret.pages;
+						var companylist = ret.items;
 						var promises = companylist.map(function(company){
 							// console.info(company.createUser)
 							return Q.all([
@@ -53,6 +56,29 @@ module.exports = (function(){
 			})
 		}
 		$scope.initCompanyList();
+
+		//分页
+		$scope.pagination = function () {
+			if ($scope.total) {
+				$.jqPaginator('#pagination', {
+					totalCounts: $scope.total,
+					pageSize: 20,
+					currentPage: 1,
+					prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+					next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+					page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+					onPageChange: function (num) {
+						if ($scope.pages==1) {
+							$("#pagination").hide();
+						}
+						$scope.page = num;
+						$scope.initCompanyList();
+					}
+				});
+				clearInterval (pagenum);
+			}
+		}
+		var pagenum =setInterval($scope.pagination,10);
 	}
 	companyList.CompanyDetailController = function($scope,$routeParams){
 		loading(true);

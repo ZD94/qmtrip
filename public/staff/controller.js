@@ -28,6 +28,7 @@ module.exports = (function(){
                 })
                 .catch(function (err) {
                     console.info(err)
+                    location.reload();
                 })
         };
     }

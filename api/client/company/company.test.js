@@ -141,7 +141,7 @@ describe("api/client/company.js", function() {
                     if (err) {
                         throw err;
                     }
-                    assert(ret.length >= 0);
+                    assert(ret.items.length >= 0);
                     done();
                 })
             });

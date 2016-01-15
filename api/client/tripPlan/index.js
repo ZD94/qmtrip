@@ -5,7 +5,7 @@
 var API = require("common/api");
 var Q = require("q");
 var L = require("common/language");
-var checkAndGetParams = require("common/utils").checkAndGetParams;
+var _ = require('lodash');
 var moment = require('moment');
 var C = require("../../../config");
 
@@ -31,7 +31,7 @@ tripPlan.savePlanOrder = function (params) {
             params.companyId = staff.companyId;
             return Q.all([
                 API.tripPlan.savePlanOrder(params),
-                API.staff.findStaffs({companyId: staff.companyId, columns: ['name','email']})
+                API.staff.findStaffs({companyId: staff.companyId, roleId: {$ne: 1}, columns: ['id', 'name','email']})
             ])
         })
         .spread(function(_order, staffs){
@@ -51,12 +51,19 @@ tripPlan.savePlanOrder = function (params) {
             }
             var url = C.host + '/staff.html#/travelPlan/PlanDetail?planId=' + order.id;
             return staffs.map(function(s){
-                return API.mail.sendMailRequest({
-                    toEmails: s.email, //'miao.yu@tulingdao.com',
-                    templateName: 'qm_notify_new_travelbudget',
-                    titleValues: [staffName],
-                    values: [s.name, staffName, email, moment(order.createAt).format('YYYY-MM-DD HH:mm:ss'), order.description, go, back, hotel, '￥'+order.budget, url]
-                })
+                return API.auth.getAccount({id: s.id, type: 1, attributes: ['status']})
+                    .then(function(a){
+                        if(a.status != 1){
+                            return {code: 0};
+                        }else{
+                            return API.mail.sendMailRequest({
+                                toEmails: s.email, //'miao.yu@tulingdao.com',
+                                templateName: 'qm_notify_new_travelbudget',
+                                titleValues: [staffName],
+                                values: [s.name, staffName, email, moment(order.createAt).format('YYYY-MM-DD HH:mm:ss'), order.description, go, back, hotel, '￥'+order.budget, url]
+                            })
+                        }
+                    })
             })
         })
         .then(function(){
@@ -108,20 +115,20 @@ tripPlan.pageCompleteTripPlanOrder = function (params) {
     }
     var self = this;
     var accountId = self.accountId;
+    var page = params.page;
+    var perPage = params.perPage;
+    typeof page == 'number' ? "" : page = 1;
+    typeof perPage == 'number' ? "" : perPage = 10;
+    var query = {};
+    query.accountId = self.accountId;
+    query.auditStatus = 1; //审核状态为审核通过
+    query.status = {$gt: 1}; //计划单状态为已完成（2），可能会有结算完毕状态（3）
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {
             return staff.companyId;
         })
         .then(function (companyId) {
-            params.accountId = self.accountId;
-            params.companyId = companyId;
-            params.auditStatus = 1; //审核状态为审核通过
-            params.status = {$gt: 1}; //计划单状态为已完成（2），可能会有结算完毕状态（3）
-            var query = checkAndGetParams(['companyId', 'accountId'], ['status', 'auditStatus'], params);
-            var page = params.page;
-            var perPage = params.perPage;
-            typeof page == 'number' ? "" : page = 1;
-            typeof perPage == 'number' ? "" : perPage = 10;
+            query.companyId = companyId;
             var options = {
                 where: query,
                 limit: perPage,
@@ -162,19 +169,19 @@ tripPlan.pageTripPlanOrder = function (params) {
             params.auditStatus = -1;
         }
     }
+    var page = params.page;
+    var perPage = params.perPage;
+    typeof page == 'number' ? "" : page = 1;
+    typeof perPage == 'number' ? "" : perPage = 10;
+    var query = _.pick(params,
+        ['status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure']);
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {
             return staff.companyId;
         })
         .then(function (companyId) {
-            params.accountId = self.accountId;
-            params.companyId = companyId;
-            var query = checkAndGetParams(['companyId'],
-                ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure'], params);
-            var page = params.page;
-            var perPage = params.perPage;
-            typeof page == 'number' ? "" : page = 1;
-            typeof perPage == 'number' ? "" : perPage = 10;
+            query.accountId = self.accountId;
+            query.companyId = companyId;
             var options = {
                 where: query,
                 limit: perPage,
@@ -214,18 +221,18 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
             params.auditStatus = -1;
         }
     }
+    var page = params.page;
+    var perPage = params.perPage;
+    page = typeof page == 'number' ? page : 1;
+    perPage = typeof perPage == 'number' ? perPage : 10;
+    var query = _.pick(params,
+        ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure']);
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {
             return staff.companyId;
         })
         .then(function (companyId) {
-            params.companyId = companyId;
-            var query = checkAndGetParams(['companyId'],
-                ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure'], params);
-            var page = params.page;
-            var perPage = params.perPage;
-            page = typeof page == 'number' ? page : 1;
-            perPage = typeof perPage == 'number' ? perPage : 10;
+            query.companyId = companyId;
             var options = {
                 where: query,
                 limit: perPage,
@@ -318,7 +325,7 @@ tripPlan.countTripPlanNum = function (params) {
  */
 tripPlan.statPlanOrderMoneyByCompany = function (params) {
     var self = this;
-    var params = checkAndGetParams([], ['startTime', 'endTime'], params);
+    var params = _.pick(params, ['startTime', 'endTime']);
     return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
         .then(function (staff) {
             params.companyId = staff.companyId;

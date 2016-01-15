@@ -36,6 +36,7 @@
   "template":{
     "file": "${{ROOT_DIR}}/public/templatefile"
   },
+  "is_allow_domain_repeat": false,
   "api": {
     "postgres": "${{postgres.url}}",
     "remotes": [

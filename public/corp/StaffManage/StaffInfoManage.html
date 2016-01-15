@@ -2,17 +2,20 @@
     <div class="staff_tab">
         <ul>
             <li class="check1">员工信息管理</li>
-            <li>组织架构</li>
+            <!--<li>组织架构</li>-->
         </ul>
     </div>
     <div class="staff_tab_content">
         <div class="organize_select">
-            <select name="select" id="" class="">
+            <!--<select name="select" id="department" class="" ng-model="department" ng-options="item for item in departments">
+                <option value="" selected>-- 请选择 --</option>
+            </select>-->
+            <!--<select name="select" id="" class="">
                 <option value="我的企业">我的企业</option>
                 <option value="销售部">销售部</option>
                 <option value="产品部">产品部</option>
-            </select>
-            <span>设置公司组织架构</span>
+            </select>-->
+            <!--<span>设置公司组织架构</span>-->
         </div>
         <div class="staff_function">
             <i>目前共{{totalCount}}名员工</i>
@@ -206,8 +209,8 @@
                 姓名：员工姓名</br>
                 手机：员工手机号</br>
                 邮箱：员工企业邮箱，用于员工登录账号</br>
-                所属部门：员工所属部门名称;建议先进行公司<a>组织架构设置</a> <span>若未设置组织架构，则员工默认归属我的企业</span></br>
-                差旅政策：员工对应的差旅政策等级;建议先进行公司<a>差旅政策设置</a> <span>若未设置公司差旅标准，则员工默认无差旅标准</span>
+                所属部门：员工所属部门名称；建议先进行公司组织架构设置 <span>若未设置组织架构，则员工默认归属我的企业</span></br>
+                差旅政策：员工对应的差旅政策等级；建议先进行公司<a href="#/TravelPolicy/PolicyList">差旅政策设置</a> <span>若未设置公司差旅标准，则员工默认无差旅标准</span>
             </p>
             <p class="p_title">
                 3、请使用GB系列编码保存文件

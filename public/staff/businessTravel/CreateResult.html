@@ -19,9 +19,9 @@
     <section class="createresult">
         <div class="top">本次出差预算：
             <span class="createtime" ng-bind-html="createTime | date:'yyyy-MM-dd'" style="position: absolute; left: 20px;"></span>
-            <span ng-if="tra==1&&liv==0">¥{{onlytraffic.price}}</span>
-            <span ng-if="tra==0&&liv==1">¥{{onlylive.price}}</span>
-            <span ng-if="tra==1&&liv==1">¥{{trafficlive.price}}</span>
+            <span ng-if="tra==1&&liv==0">¥{{(onlytraffic.price).toFixed(2)}}</span>
+            <span ng-if="tra==0&&liv==1">¥{{(onlylive.price).toFixed(2)}}</span>
+            <span ng-if="tra==1&&liv==1">¥{{(trafficlive.price).toFixed(2)}}</span>
             <span style="position: absolute; right: 20px;">{{purposename}}</span>
         </div>
         <div class="center">

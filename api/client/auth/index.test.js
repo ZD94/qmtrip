@@ -3,13 +3,14 @@
  */
 var API = require('common/api');
 var assert = require("assert");
+var Q = require("q");
 
-describe("api/client/auth/index.js", function() {
+describe.skip("api/client/auth/index.js", function() {
 
     var testCase = {
         companyName: "测试公司",
         name: "测试名字",
-        email: "register.test@gmail.com",
+        email: "register.test@gmailxxoo.com",
         pwd: "time9818",
         status: 1,
         mobile: "15501149655",
@@ -31,12 +32,18 @@ describe("api/client/auth/index.js", function() {
         });
 
         after(function(done) {
-            API.auth.remove({email: testCase.email}, function(err) {
-                if (err) {
+            Q.all([
+                API.auth.remove({email: testCase.email}),
+                API.company.deleteCompanyByTest({email: testCase.email}),
+                API.staff.deleteAllStaffByTest({email: testCase.email})
+            ])
+                .spread(function(ret1, ret2, ret3){
+                    done();
+                })
+                .catch(function(err){
                     throw err;
-                }
-                done();
-            })
+                })
+                .done();
         });
 
         it("#registryCompany should be ok", function(done) {

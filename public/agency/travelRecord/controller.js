@@ -23,20 +23,22 @@ var travelRecord=(function(){
         //待上传票据列表
         $scope.initTravelList = function () {
             $(".left_nav li").removeClass("on").eq(0).addClass("on");
+
             API.onload(function () {
-                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page, isUpload: true, audit: 'P'})
+                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page, perPage:20, isUpload: true, audit: 'P'})
                     .then(function(result){
                         console.info (result);
                         $scope.total = result.total;
+                        $scope.pages = result.pages;
                         var travelList = result.items;
-                        travelList.map(function(company){
+                        travelList.map(function(s){
                             Q.all([
-                                API.staff.getStaffByAgency({id:company.accountId}),
-                                API.company.getCompanyById(company.companyId)
+                                API.staff.getStaffByAgency({id:s.accountId}),
+                                API.company.getCompanyById(s.companyId)
                             ])
                                 .spread(function(ret1,ret2){
-                                    company.travelerName = ret1;
-                                    company.companyName = ret2;
+                                    s.travelerName = ret1;
+                                    s.companyName = ret2;
                                     $scope.travelListitems = travelList;
                                     $scope.$apply();
                                     loading(true);
@@ -63,12 +65,15 @@ var travelRecord=(function(){
             if ($scope.total) {
                 $.jqPaginator('#pagination', {
                     totalCounts: $scope.total,
-                    pageSize: 10,
+                    pageSize: 20,
                     currentPage: 1,
                     prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
                     next: '<li class="next"><a href="javascript:;">下一页</a></li>',
                     page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
                     onPageChange: function (num) {
+                        if ($scope.pages==1) {
+                            $("#pagination").hide();
+                        }
                         $scope.page = num;
                         $scope.initTravelList();
                     }
@@ -96,9 +101,55 @@ var travelRecord=(function(){
                 API.agencyTripPlan.getTripPlanOrderById(orderId)
                     .then(function(result){
                         $scope.planDetail = result;
+                        $scope.outTraffic = $scope.planDetail.outTraffic[0];
                         $scope.backTraffic = $scope.planDetail.backTraffic[0];
                         $scope.hotel = $scope.planDetail.hotel[0];
-                        $scope.outTraffic = $scope.planDetail.outTraffic[0];
+                        var outTraffic = $scope.planDetail.outTraffic;
+                        var backTraffic = $scope.planDetail.backTraffic;
+                        var hotel = $scope.planDetail.hotel;
+                        outTraffic.map(function(outTrafficauditUser){
+                            API.agency.getAgencyUser(outTrafficauditUser.auditUser)
+                                .then(function(result){
+                                    outTrafficauditUser.auditName = result;
+                                    $scope.$apply();
+                                    loading(true);
+                                })
+                                .catch(function(err) {
+                                    console.info(err);
+                                });
+                        });
+                        backTraffic.map(function(backTrafficauditUser){
+                            API.agency.getAgencyUser(backTrafficauditUser.auditUser)
+                                .then(function(result){
+                                    backTrafficauditUser.auditName = result;
+                                    $scope.$apply();
+                                    loading(true);
+                                })
+                                .catch(function(err) {
+                                    console.info(err);
+                                });
+                        });
+                        hotel.map(function(hotelauditUser){
+                            API.agency.getAgencyUser(hotelauditUser.auditUser)
+                                .then(function(result){
+                                    hotelauditUser.auditName = result;
+                                    $scope.$apply();
+                                    loading(true);
+                                })
+                                .catch(function(err) {
+                                    console.info(err);
+                                });
+                        });
+
+
+
+
+
+
+
+
+
+
                         API.staff.getStaffByAgency({id:$scope.planDetail.accountId})
                             .then(function(result){
                                 $scope.travelerName = result.name;
@@ -110,6 +161,8 @@ var travelRecord=(function(){
             })
         }
         $scope.initTravelDetail();
+
+
         $scope.outTraffichref = function () {
             loading(true);
             $location.hash('outTraffic');

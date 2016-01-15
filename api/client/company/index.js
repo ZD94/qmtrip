@@ -107,17 +107,16 @@ company.getCompanyById = function(companyId){
  * @returns {*}
  */
 company.getCompanyListByAgency = checkAgencyPermission(["company.query"],
-    function(){
+    function(params){
         var self = this;
         var accountId = self.accountId;
-        var params = {
-            userId: accountId
-        }
-
+        var page = params.page;
+        var perPage = params.perPage;
+        typeof page == 'number' ? "" : page = 1;
+        typeof perPage == 'number' ? "" : perPage = 10;
         return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
             .then(function(user){
-                params.agencyId = user.agencyId;
-                return API.company.listCompany(params)
+                return API.company.pageCompany({where: {agencyId: user.agencyId}, limit: perPage, offset: perPage * (page - 1)})
             });
     });
 

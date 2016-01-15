@@ -10,7 +10,7 @@ var staff = (function(){
     //员工管理界面
     staff.StaffInfoManageController = function($scope){
 
-        $(".left_nav li").removeClass("on").eq(2).addClass("on");
+        $(".left_nav li").removeClass("on").eq(1).addClass("on");
         //添加员工信息
         $scope.addStaff = function() {
             $("#add").addClass("onCheck");
@@ -27,6 +27,8 @@ var staff = (function(){
         $scope.selectClass = [
             {val:"",name:"请选择对应的差旅等级"}
         ]
+        $scope.department = "";
+
 
         //初始化员工记录的方法
         $scope.initStaff = function() {
@@ -69,7 +71,6 @@ var staff = (function(){
 
         //初始化所有的记录
         $scope.initstafflist = function(){
-            $scope.selectClass = [];
             //加载多个API方法
             API.onload(function(){
                 API.staff.getCurrentStaff()//qh获取当前登录人员的企业id
@@ -86,14 +87,16 @@ var staff = (function(){
                         return Q.all([
                             API.travelPolicy.getAllTravelPolicy({where: {companyId:staff.companyId}}),//获取当前所有的差旅标准名称
                             API.staff.listAndPaginateStaff(params),//加载所有的员工记录
-                            API.staff.statisticStaffsRole({companyId:staff.companyId})//统计企业员工（管理员 普通员工 未激活员工 总数）数量
+                            API.staff.statisticStaffsRole({companyId:staff.companyId}),//统计企业员工（管理员 普通员工 未激活员工 总数）数量
+                            API.staff.getDistinctDepartment({companyId:staff.companyId})//企业部门
                         ])
-                            .spread(function(travelPolicies,staffinfo,staffRole){
+                            .spread(function(travelPolicies,staffinfo,staffRole, departments){
                                 $scope.total = staffinfo.total;
                                 //获取差旅标准
                                 $scope.companyId = staff.companyId;
                                 var arr = travelPolicies;
                                 var i ;
+                                $scope.selectClass = [];//清空selectClass避免出现重复
                                 for(i=0; i<arr.length; i++){
                                     var name = arr[i].name;
                                     var id = arr[i].id;
