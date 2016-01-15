@@ -425,4 +425,21 @@ staff.statStaffPointsByCompany = function(){
         })
 }
 
+staff.statStaffPointsByAgency = function(companyId){
+    var self = this;
+    if(typeof companyId != 'string'){
+        throw {code: 0, msg: '参数格式不正确'};
+    }
+    return Q.all([
+        API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']}),
+        API.company.getCompany({companyId: companyId, columns: ['agencyId']})
+    ])
+        .spread(function(u, c){
+            if(u.agencyId != c.agencyId){
+                throw L.ERR.PERMISSION_DENY;
+            }
+            return API.staff.statStaffPoints({companyId: companyId});
+        })
+}
+
 module.exports = staff;
