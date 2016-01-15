@@ -56,9 +56,10 @@ function uploadActionFile(req, res, next) {
                         imgObj = {md5key: md5key,content: data, userId: user_id, isPublic: true,fileType:file_type};
                     }
                     if (type && type == 'invoice'){//上传票据
-                        API.staff.getInvoiceViewer({accountId: user_id})
+                        return API.staff.getInvoiceViewer({accountId: user_id})
                             .then(function(data){
                                 has_id.push.apply(has_id, data);
+                                imgObj.hasId = JSON.stringify(has_id);
                                 return API.attachment.deleteAttachment({md5key: md5key,userId: user_id})
                                     .then(function(){
                                         return API.attachment.createAttachment(imgObj)
