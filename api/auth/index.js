@@ -170,7 +170,7 @@ authServer.sendResetPwdEmail = function(params) {
             } else {
                 templateName = 'qm_reset_pwd_email';
             }
-            return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: [account.email, timeStr, url]});
+            return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: [account.email, timeStr, url, url]});
         })
         .then(function() {
             return true;
@@ -502,6 +502,9 @@ authServer.getAccount = function(params){
     }
     var options = {};
     options.where = {id: id};
+    if(params.type){
+        options.where.type = params.type;
+    }
     if(attributes)
         options.attributes = attributes;
     return Models.Account.findOne(options);

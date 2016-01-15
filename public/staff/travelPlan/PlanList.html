@@ -49,7 +49,7 @@
                             <p ng-if="item.outTraffic.length!=0">
                                 <span ng-if="item.outTraffic[0].invoice.length==0" class="po_r">
                                     <a href="#">上传票据</a>
-                                    <input type="file" class="file" name="tmpFile" value='' ref="{{item.outTraffic[0].id}}" data-type = "1">
+                                    <input type="file" class="file" name="tmpFile" value='' ref="{{item.outTraffic[0].id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png">
                                 </span>
                                 <span ng-if="item.outTraffic[0].invoice.length!=0">
                                     <span class="shenhe" ng-if="item.outTraffic[0].status=='-1'" style="color: #D81F2A;">【审核未通过】</span>
@@ -60,7 +60,7 @@
                             <p ng-if="item.hotel.length!=0">
                                 <span ng-if="item.hotel[0].invoice.length==0" class="po_r">
                                     <a href="#">上传票据</a>
-                                    <input type="file" class="file" name="tmpFile" value='' ref="{{item.hotel[0].id}}" data-type = "2">
+                                    <input type="file" class="file" name="tmpFile" value='' ref="{{item.hotel[0].id}}" data-type = "2" accept="image/gif,image/jpeg,image/jpg,image/png">
                                 </span>
                                 <span ng-if="item.hotel[0].invoice.length!=0">
                                     <span class="shenhe" ng-if="item.hotel[0].status=='-1'" style="color: #D81F2A;">【审核未通过】</span>
@@ -71,7 +71,7 @@
                             <p ng-if="item.backTraffic.length!=0">
                                 <span ng-if="item.backTraffic[0].invoice.length==0" class="po_r">
                                     <a href="#">上传票据</a>
-                                    <input type="file" class="file" name="tmpFile" value='' ref="{{item.backTraffic[0].id}}" data-type = "3">
+                                    <input type="file" class="file" name="tmpFile" value='' ref="{{item.backTraffic[0].id}}" data-type = "3" accept="image/gif,image/jpeg,image/jpg,image/png">
                                 </span>
                                 <span ng-if="item.backTraffic[0].invoice.length!=0">
                                     <span class="shenhe" ng-if="item.backTraffic[0].status=='-1'" style="color: #D81F2A;">【审核未通过】</span>
