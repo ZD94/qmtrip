@@ -79,8 +79,6 @@ auth.checkBlackDomain = function(params) {
         API.company.domainIsExist({domain: domain})
     ])
     .spread(function(isBlackDomain, isExist) {
-        console.info(isBlackDomain)
-        console.info(isExist);
         if (isBlackDomain) {
             throw L.ERR.DOMAIN_HAS_EXIST;
         }
@@ -167,7 +165,7 @@ auth.registryCompany = function(params) {
             return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
         })
         .then(function(){
-            return auth.isBlackDomain({domain: domain});
+            return auth.checkBlackDomain({domain: domain});
         })
         .then(function() {
             var status = 0;
