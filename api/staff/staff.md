@@ -250,3 +250,16 @@
 |---------|------|-----|
 | totalPoints   |企业员工总共获得的积分|integer
 | balancePoints |企业员工当前可用积分|integer
+
+
+>. 代理商统计企业员工积分（总积分和可用积分）数量 API.staff.statStaffPointsByAgency();
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| companyId                                | 参数             | string             |-------
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| totalPoints   |企业员工总共获得的积分|integer
+| balancePoints |企业员工当前可用积分|integer
