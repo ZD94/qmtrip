@@ -119,7 +119,8 @@ tripPlan.pageCompleteTripPlanOrder = function (params) {
     var perPage = params.perPage;
     typeof page == 'number' ? "" : page = 1;
     typeof perPage == 'number' ? "" : perPage = 10;
-    var query = {};
+    var query = _.pick(params,
+        ['status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
     query.accountId = self.accountId;
     query.auditStatus = 1; //审核状态为审核通过
     query.status = {$gt: 1}; //计划单状态为已完成（2），可能会有结算完毕状态（3）
@@ -174,7 +175,7 @@ tripPlan.pageTripPlanOrder = function (params) {
     typeof page == 'number' ? "" : page = 1;
     typeof perPage == 'number' ? "" : perPage = 10;
     var query = _.pick(params,
-        ['status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure']);
+        ['status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {
             return staff.companyId;

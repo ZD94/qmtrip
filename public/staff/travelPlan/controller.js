@@ -21,8 +21,13 @@ var travelPlan=(function(){
         //待上传票据列表
         $scope.initPlanList = function () {
             API.onload(function() {
-                API.tripPlan.pageTripPlanOrder({auditStatus:[0,-1],page:$scope.page1})
+                var params = {auditStatus:[0,-1],page:$scope.page1};
+                if ($scope.keyword != '' && $scope.keyword != undefined) {
+                    params.remark = {$like: '%'+ $scope.keyword + '%'};
+                }
+                API.tripPlan.pageTripPlanOrder(params)
                     .then(function(result){
+                        console.info (result);
                         $scope.total1 = result.total;
                         $scope.planListitems = result.items;
                         loading(true);
@@ -89,8 +94,13 @@ var travelPlan=(function(){
         //已完成列表
         $scope.initFinishPlanList = function () {
             API.onload(function() {
-                API.tripPlan.pageCompleteTripPlanOrder({page:$scope.page2})
+                var params = {page:$scope.page2};
+                if ($scope.finishKeyword != '' && $scope.finishKeyword != undefined) {
+                    params.remark = {$like: '%'+ $scope.finishKeyword + '%'};
+                }
+                API.tripPlan.pageCompleteTripPlanOrder(params)
                     .then(function(result){
+                        console.info (result);
                         $scope.total2 = result.total;
                         $scope.finishPlanListitems = result.items;
                         $scope.$apply();
@@ -142,6 +152,26 @@ var travelPlan=(function(){
         }
         var pagenum2 =setInterval($scope.pagination2,1);
 
+        $scope.searchKeyword = function () {
+            if ($scope.keyword != '' && $scope.keyword != undefined) {
+                $scope.initPlanList();
+                setTimeout($scope.pagination1,100);
+            }
+            else {
+                $scope.initPlanList();
+            }
+        }
+
+        $scope.searchFinishKeyword = function () {
+            if ($scope.finishKeyword != '' && $scope.finishKeyword != undefined) {
+                $scope.initFinishPlanList();
+                setTimeout($scope.pagination2,100);
+            }
+            else {
+                $scope.initFinishPlanList();
+            }
+        }
+
 
         $scope.initPlanList();
         $scope.initFinishPlanList();
@@ -176,6 +206,7 @@ var travelPlan=(function(){
             $('.mainbox_bottom').eq(i).show();
             $('.pagination').eq(i).show();
         })
+
     }
 
 
