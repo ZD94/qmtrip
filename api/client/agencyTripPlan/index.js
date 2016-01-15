@@ -5,7 +5,7 @@
 var API = require("common/api");
 var Q = require("q");
 var L = require("common/language");
-var checkAndGetParams = require("common/utils").checkAndGetParams;
+var _ = require('lodash');
 var checkAgencyPermission = require('../auth').checkAgencyPermission;
 var C = require("../../../config");
 var moment = require("moment");
@@ -55,7 +55,7 @@ agencyTripPlan.pageTripPlanOrder = function(params){
 
     /* status -2:删除状态，不对外显示 -1:失效状态 0:待上传状态 1:已上传待审核状态 2:审核完成状态 */
     if (params.isUpload === true) {
-        params.status = {$gt: 0}
+        params.status = {$gt: 0};
     } else if (params.isUpload === false) {
         params.status = 0;
     }
@@ -73,21 +73,26 @@ agencyTripPlan.pageTripPlanOrder = function(params){
         }
     }
 
+    var query = _.pick(params,
+        ['companyId', 'accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure']);
+
     return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
         .then(function(user){
             return user.agencyId;
         })
         .then(function(agencyId){
-            params.agencyId = agencyId;
-            return API.company.listCompany(params)
+            return API.company.listCompany({agencyId:agencyId});
         })
         .then(function(companys){
             var companyIdList = companys.map(function(company){
                 return company.id;
             });
-            params.companyId = params.companyId || {$in: companyIdList};
-            var query = checkAndGetParams(['companyId'],
-                ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure'], params);
+            if(query.companyId){
+                if(companyIdList.indexOf(query.companyId) == -1)
+                    throw L.ERR.PERMISSION_DENY;
+            } else {
+                query.companyId = {$in: companyIdList};
+            }
             var page = params.page;
             var perPage = params.perPage;
             page = typeof(page) == 'number'?page:1;

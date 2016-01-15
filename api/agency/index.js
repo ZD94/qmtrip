@@ -12,7 +12,7 @@ var L = require("common/language");
 var Logger = require('common/logger');
 var logger = new Logger("agency");
 var utils = require("common/utils");
-var checkAndGetParams = utils.checkAndGetParams;
+var _ = require('lodash');
 var API = require("common/api");
 var Paginate = require("common/paginate").Paginate;
 var md5 = require("common/utils").md5;
@@ -144,7 +144,9 @@ agency.listAgency = function(params){
  * @returns {*}
  */
 agency.deleteAgency = function(params){
-    var params = checkAndGetParams(['agencyId', 'userId'], [], params);
+    var required_params = ['agencyId', 'userId'];
+    utils.requiredParams(params, required_params);
+    var params = _.pick(params, required_params);
     var agencyId = params.agencyId;
     var userId = params.userId;
     return Q.all([
@@ -186,8 +188,12 @@ agency.deleteAgency = function(params){
  * @param data
  * @returns {*}
  */
-agency.createAgencyUser = function(data){
-    var _agencyUser = checkAndGetParams(['email', 'mobile', 'agencyId', 'name'], this.agencyUserCols, data);
+agency.createAgencyUser = createAgencyUser;
+createAgencyUser.required_params = ['email', 'mobile', 'agencyId', 'name'];
+createAgencyUser.accepted_params = _.union(agency.agencyUserCols, createAgencyUser.required_params);
+function createAgencyUser(data){
+    utils.requiredParams(data, createAgencyUser.required_params);
+    var _agencyUser = _.pick(data, createAgencyUser.accepted_params);
     _agencyUser.id = data.accountId || uuid.v1();
     var accData = {email: _agencyUser.email, mobile: _agencyUser.mobile, pwd: "123456", type: 2};//初始密码暂定123456
     return API.auth.newAccount(accData)

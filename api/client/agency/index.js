@@ -10,7 +10,7 @@ var Q = require("q");
 var API = require('common/api');
 var utils = require("common/utils");
 var L = require("common/language");
-var checkAndGetParams = utils.checkAndGetParams;
+var _ = require('lodash');
 
 /**
  * @class agency 代理商
@@ -31,8 +31,12 @@ var agency = {}
  * @param {string} params.pwd 密码 选填，如果手机号和邮箱在全麦注册过，则密码还是以前的密码
  * @returns {Promise} true||error
  */
-agency.registerAgency = function(params){
-    var agency = checkAndGetParams(['name', 'email', 'mobile', 'userName'], ['description', 'remark'], params);
+agency.registerAgency = registerAgency;
+registerAgency.required_params = ['name', 'email', 'mobile', 'userName'];
+registerAgency.accepted_params = _.union(registerAgency.required_params, ['description', 'remark']);
+function registerAgency(params){
+    utils.requiredParams(params, registerAgency.required_params);
+    var agency = _.pick(params, registerAgency.accepted_params);
     return API.agency.registerAgency(agency);
 }
 
@@ -43,10 +47,14 @@ agency.registerAgency = function(params){
  * @param params
  * @returns {*}
  */
-agency.updateAgency = function(params){
+agency.updateAgency = updateAgency;
+updateAgency.required_params = ['agencyId'];
+updateAgency.accepted_params = _.union(updateAgency.required_params,
+    ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark']);
+function updateAgency(params){
     var self = this;
-    params = checkAndGetParams(['agencyId'],
-        ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark'], params);
+    utils.requiredParams(params, updateAgency.required_params);
+    params = _.pick(params, updateAgency.accepted_params);
     params.userId = self.accountId;
     return API.agency.updateAgency(params);
 }
@@ -138,8 +146,14 @@ agency.deleteAgencyUser = function(agencyUserId){
  * @param params
  * @returns {*}
  */
-agency.updateAgencyUser = function(params) {
-    var params = checkAndGetParams(['id'], ['status', 'name', 'sex', 'email', 'mobile', 'avatar', 'roleId'], params);
+
+agency.updateAgencyUser = updateAgencyUser;
+updateAgencyUser.required_params = ['id'];
+updateAgencyUser.accepted_params = _.union(updateAgencyUser.required_params,
+    ['status', 'name', 'sex', 'email', 'mobile', 'avatar', 'roleId']);
+function updateAgencyUser(params) {
+    utils.requiredParams(params, updateAgencyUser.required_params);
+    params = _.pick(params, updateAgencyUser.accepted_params);
     var self = this;
     var accountId = self.accountId;
     var id = params.id;
