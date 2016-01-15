@@ -268,6 +268,7 @@ var travelPlan=(function(){
         loading(true);
         $("title").html("行程单明细");
         var planId = $routeParams.planId;
+        $scope.planId = planId;
         $scope.status = $routeParams.status;
         $scope.invoiceId = $routeParams.invoiceId;
         API.onload(function() {
