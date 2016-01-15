@@ -648,7 +648,7 @@ staff.statisticStaffs = function(params){
     return Q.all([
         staffModel.count({where: {companyId: companyId, status: {$gte: 0}}}),
         staffModel.count({where: {companyId: companyId, createAt: {$gte: start, $lte: end}}}),
-        staffModel.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: STAFF_STATUS.QUIT_JOB }})
+        staffModel.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: {$lt: 0} }})
     ])
         .spread(function(all, inNum, outNum){
             var sta = {

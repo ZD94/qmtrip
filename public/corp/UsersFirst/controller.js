@@ -42,11 +42,13 @@ var UsersFirst = (function(){
 							API.company.getCompanyFundsAccount(company_id),
 							API.staff.statisticStaffs({companyId:company_id}),
 							API.travelPolicy.getLatestTravelPolicy({}),
-							API.tripPlan.statPlanOrderMoneyByCompany({startTime:start,endTime:end})
+							API.tripPlan.statPlanOrderMoneyByCompany({startTime:start,endTime:end}),
+							API.staff.statStaffPointsByCompany({})
 						])
-							.spread(function(resutlt,num,travel_level,date){
+							.spread(function(resutlt,num,travel_level,date,point){
 								$scope.funds = resutlt;
 								$scope.num = num;
+								$scope.point = point;
 								$scope.month = moment().startOf('Month').format('M');
 								$scope.travelLevel = travel_level;
 								if(date.planMoney>date.expenditure) {

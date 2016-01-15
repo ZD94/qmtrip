@@ -218,8 +218,8 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                 //审核完成后给用户发送邮件
                 if(params.status == -1){ //审核不通过
                     API.mail.sendMailRequest({
-                        //toEmails: staffEmail,
-                        toEmails: 'miao.yu@tulingdao.com',
+                        toEmails: staffEmail,
+                        //toEmails: 'miao.yu@tulingdao.com',
                         templateName: "qm_notify_invoice_not_pass",
                         titleValues: [],
                         values: [staffName, invoiceName, params.remark, ret.description, go, back, hotel, '全麦预算￥'+order.budget, url]
@@ -228,8 +228,8 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                 //"%s,您好<br/>您有1张%s票据被审核通过，实际支出为%s，关联出差记录如下：<br/>项目名称:%s<br/>出差时间：%s<br/>去程交通:%s<br/>回程交通:%s<br/>住宿:%s<br/>总计：%s<br/><a href="%s">点击此处查看出差详情</a>"
                 if(params.status == 1){
                     API.mail.sendMailRequest({
-                        //toEmails: staffEmail,
-                        toEmails: 'miao.yu@tulingdao.com',
+                        toEmails: staffEmail,
+                        //toEmails: 'miao.yu@tulingdao.com',
                         templateName: "qm_notify_invoice_one_pass",
                         titleValues: [],
                         values: [staffName, invoiceName, expenditure, ret.description, orderTime, go, back, hotel, '全麦预算￥'+order.budget, url]
