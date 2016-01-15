@@ -23,6 +23,7 @@ var travelRecord=(function(){
         //待上传票据列表
         $scope.initTravelList = function () {
             $(".left_nav li").removeClass("on").eq(0).addClass("on");
+
             API.onload(function () {
                 API.agencyTripPlan.pageTripPlanOrder({page:$scope.page, perPage:20, isUpload: true, audit: 'P'})
                     .then(function(result){
@@ -30,14 +31,14 @@ var travelRecord=(function(){
                         $scope.total = result.total;
                         $scope.pages = result.pages;
                         var travelList = result.items;
-                        travelList.map(function(company){
+                        travelList.map(function(s){
                             Q.all([
-                                API.staff.getStaffByAgency({id:company.accountId}),
-                                API.company.getCompanyById(company.companyId)
+                                API.staff.getStaffByAgency({id:s.accountId}),
+                                API.company.getCompanyById(s.companyId)
                             ])
                                 .spread(function(ret1,ret2){
-                                    company.travelerName = ret1;
-                                    company.companyName = ret2;
+                                    s.travelerName = ret1;
+                                    s.companyName = ret2;
                                     $scope.travelListitems = travelList;
                                     $scope.$apply();
                                     loading(true);
