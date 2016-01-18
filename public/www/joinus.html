@@ -23,12 +23,12 @@
                 <a href="../index.html">
                     <li>首页</li>
                 </a>
-                <a href="#">
-                    <li>体验</li>
-                </a>
-                <a href="#">
-                    <li>功能</li>
-                </a>
+                <!--<a href="#">-->
+                    <!--<li>体验</li>-->
+                <!--</a>-->
+                <!--<a href="#">-->
+                    <!--<li>功能</li>-->
+                <!--</a>-->
                 <a href="#">
                     <li class="on">加入我们</li>
                 </a>
@@ -46,8 +46,8 @@
     </div>
 </div>
 <div id="">
-    <div class="head_banner" style="width: 100%;background-color: #5eaff5;">
-    </div>
+    <!--<div class="head_banner" style="width: 100%;background-color: #5eaff5;">-->
+    <!--</div>-->
     <div class="">
         <div class="content">
             <div class="left_nav">
@@ -143,30 +143,39 @@
         var wh = $(window).height();
         var one = $('.about').height();
         var two = $('.team').height();
-        var three = $('.map').height();
         $(window).scroll(function (){
-            var asd = $(window).scrollTop();
-            if (asd >= wh) {
-                $(".left_nav").css("top",asd-wh+150);
-                if(asd <one+wh){
+            var scrollTop = $(window).scrollTop();
+                $(".left_nav").css("top",scrollTop+150);
+                if(scrollTop <one+wh){
                     $('.left_nav>ul>li:nth-child(1)').addClass("on").siblings().removeClass("on");
                 }
-                if(one+wh <=asd && asd<one +two +wh){
+                if(one+wh <=scrollTop && scrollTop<one +two +wh){
                     $('.left_nav>ul>li:nth-child(2)').addClass("on").siblings().removeClass("on");
                 }
-                if(one +two+wh <=asd){
+                if(one +two+wh <=scrollTop){
                     $('.left_nav>ul>li:nth-child(3)').addClass("on").siblings().removeClass("on");
                 }
-            }
-            else {
-                $(".left_nav").css("top","150px");
-            }
-
+            //修改之前
+//            if (scrollTop >= wh) {
+//                $(".left_nav").css("top",scrollTop-wh+150);
+//                if(scrollTop <one+wh){
+//                    $('.left_nav>ul>li:nth-child(1)').addClass("on").siblings().removeClass("on");
+//                }
+//                if(one+wh <=scrollTop && scrollTop<one +two +wh){
+//                    $('.left_nav>ul>li:nth-child(2)').addClass("on").siblings().removeClass("on");
+//                }
+//                if(one +two+wh <=scrollTop){
+//                    $('.left_nav>ul>li:nth-child(3)').addClass("on").siblings().removeClass("on");
+//                }
+//            }
+//            else {
+//                $(".left_nav").css("top","150px");
+//            }
         })
         $(".head_banner").css("height", wh);
 //        $('.left_nav>ul>li:nth-child(1)').click(function(){
 ////            $('.left_nav>ul>li:nth-child(1)').addClass("on").siblings().removeClass("on");
-            $('.left_nav').css("top","50px");
+            $('.left_nav').css("top","150px");
 //            $('html, body').animate({scrollTop:wh-100},600);
 ////            $('.left_nav').animate({top:0},600);
 //        })
