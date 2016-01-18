@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<link rel="stylesheet" href="www/css/style.css" />
+		<link rel="stylesheet" href="www/style/style.css" />
 		<script type="text/javascript" src="www/js/jquery.js"></script>
 		<script type="text/javascript" src="www/js/ddfullscreenslider.js"></script>
 		<script src="www/js/fullpage.js"></script>
@@ -181,7 +181,7 @@
 							<dl>
 								<dt>合作加盟</dt>
 								<dd><a href="javascript:">QQ：11623403</a></dd>
-								<dd><a href="javascript:">Email：shuang.cao@tulingdao.com</a></dd>
+								<dd><a href="javascript:">Email：BD@tulingdao.com</a></dd>
 							</dl>
 
 						</div>
@@ -198,7 +198,9 @@
 					<p>
 						友情链接：<a href="www.tulingdao.com">www.tulingdao.com</a>
 					</p>
-					<p>Copyright©2016 tulingdao.All Rights Reserved. 途灵岛信息技术版权所有.</p>
+					<p>
+						Copyright©2016 tulingdao.All Rights Reserved.京ICP备14028756号.途灵岛信息技术版权所有
+					</p>
 				</div>
 			</div>
 		</div>
@@ -236,17 +238,19 @@
 			console.info(wh);
 			$(".slide").css("height", wh);
 			if(wh <= 800){
+				$('.start').css("top","500px");
 				$('.start img').css("width","400px");
 				$('.twoSlider >ul >li >img').css("width","180px");
 				$('.twoSlider').css("padding-top","100px");
-				$('.next_to').css("margin-top","30px !important");
-				$('.threeSlider').css("padding-top","100px");
+				$('.next_to').css("margin-top","20px !important");
+				$('#threeSlider').css("padding-top","100px");
+				$('.threeSlider ul').css("margin-top","80px");
 				$('.slide_text').css("padding-top","100px");
 				$('.down').css("margin","80px auto");
 			}else if(wh >1080){
 				$('.twoSlider').css("padding-top","200px");
 				$('.next_to').css("margin-top","160px !important");
-				$('.threeSlider').css("padding-top","200px");
+				$('#threeSlider').css("padding-top","200px");
 				$('.slide_text').css("padding-top","200px");
 			}
 		});
