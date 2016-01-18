@@ -13,15 +13,15 @@
     position: absolute;
     left: 0;
 }
-.content .qwe{
-    width: 30%;
-    height: 100px;
-    float: left;
-    overflow: hidden;
-    display: none;
-    /*position: fixed;*/
+/*.content .qwe{*/
+    /*width: 30%;*/
+    /*height: 100px;*/
+    /*float: left;*/
+    /*overflow: hidden;*/
+    /*display: none;*/
+    /*/!*position: fixed;*!/*/
 
-}
+/*}*/
 .content .left_nav ul{
     width: 70%;
     margin: 65px auto 0px;
