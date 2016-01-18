@@ -130,6 +130,8 @@ var UsersFirst = (function(){
 				    series: [
 				        {
 				            type: 'bar',
+				            barWidth:'60',
+				            barCategoryGap:'5',
 				            itemStyle: {
 				                normal: {
 				                    color: function(params) {

@@ -242,10 +242,23 @@ var travelRecord=(function(){
             $(".expenditure").val("");
             $(".invoiceNoPass").show();
         }
+
+
+        var reason1 = "",
+            reason2 = "";
+        $scope.checkreason1 = function () {
+            $(".reason1 i").toggleClass("check");
+            reason1 = $(".reason1 .check").next().html();
+        }
+        $scope.checkreason2 = function () {
+            $(".reason2 i").toggleClass("check");
+            reason2 = $(".reason2 .check").next().html();
+        }
         $scope.invoiceNoPass = function () {
-            $scope.remark = $(".remark").val();
+            var reasontext = $(".invoiceNoPass .remark").val();
+            $scope.remark = reason1 + " " + reason2 + " " + reasontext;
             $('.error').empty();
-            if ($scope.remark=='') {
+            if (reason1 =='' && reason2 == '' && reasontext == '') {
                 $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>理由不能为空");
                 return false;
             }
@@ -258,6 +271,10 @@ var travelRecord=(function(){
                 })
                     .then(function(result){
                         $(".invoicePass,.invoiceNoPass").hide();
+                        $(".reason1 i,.reason2 i").removeClass("check");
+                        reason1 = '';
+                        reason2 = '';
+                        reasontext = '';
                         $scope.initTravelDetail();
                     })
                     .catch(function(err){
