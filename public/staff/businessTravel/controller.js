@@ -585,7 +585,8 @@ var businessTravel=(function(){
                     endTime:$scope.leavetime,
                     budget:$scope.totalprice,
                     isNeedTraffic:$scope.tra,
-                    isNeedHotel:$scope.liv
+                    isNeedHotel:$scope.liv,
+                    remark:$scope.startplace+$scope.endplace+$scope.starttime+$scope.liveplace+$scope.livetime
                 }
                 if ($scope.endtime) {
                     order.backAt = $scope.endtime;

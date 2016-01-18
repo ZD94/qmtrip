@@ -10,7 +10,7 @@ var StaffAwardPlan=(function(){
     //员工奖励计划
     StaffAwardPlan.StaffAwardPlanController = function($scope) {
         $("title").html("员工奖励计划");
-        $(".left_nav li").removeClass("on").eq(4).addClass("on");
+        $(".left_nav li").removeClass("on").eq(3).addClass("on");
         loading(true);
         API.onload(function(){
             API.staff.statStaffPointsByCompany({})

@@ -103,13 +103,15 @@ module.exports = (function(){
                         	API.company.getCompanyFundsAccount(companyId),
                         	API.staff.statisticStaffsByAgency({companyId:companyId}),
                         	// API.tripPlan.countTripPlanNum()
-                        	API.agencyTripPlan.countTripPlanNum({companyId: companyId})
+                        	API.agencyTripPlan.countTripPlanNum({companyId: companyId}),
+							API.staff.statStaffPointsByAgency(companyId)
                         ])
-                        .spread(function(staff,funds,staffnum,trip){
+                        .spread(function(staff,funds,staffnum,trip, points){
                         	$scope.tripnum = trip;
                         	$scope.staff = staff;
                         	$scope.funds = funds;
                         	$scope.staffnum = staffnum.all;
+								$scope.points = points;
                         	$scope.$apply();
                         })
 					})

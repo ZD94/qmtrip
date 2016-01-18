@@ -145,19 +145,23 @@ staff.updateStaff = function(data){
                 return staffModel.findById(id)
                     .then(function(old){
                         if(old.email != data.email){
-                            return API.auth.getAccount({id:id})//暂无此接口
-                                .then(function(acc){
-                                    if(acc.status != 0)
-                                        throw {code: -2, msg: "该账号不允许修改邮箱"};
-                                    var accData = {email: data.email};
-                                    return Q.all([
-                                        API.auth.updataAccount(id, accData),//暂无此接口
-                                        staffModel.update(data, options)
-                                    ]);
-                                })
-                                .spread(function(updateaccount, updatestaff) {
-                                    return updatestaff;
-                                });
+                            return Q.all([
+                                API.auth.getAccount({id:id}),//暂无此接口
+                                API.company.getCompany({companyId: old.companyId})
+                            ])
+                            .spread(function(acc, company){
+                                console.info("company==>", company);
+                                if(acc.status != 0)
+                                    throw {code: -2, msg: "该账号不允许修改邮箱"};
+                                var accData = {email: data.email};
+                                return Q.all([
+                                    API.auth.updataAccount(id, accData, company.name),//暂无此接口
+                                    staffModel.update(data, options)
+                                ]);
+                            })
+                            .spread(function(updateaccount, updatestaff) {
+                                return updatestaff;
+                            });
                         }
                         return staffModel.update(data, options);
                     });
