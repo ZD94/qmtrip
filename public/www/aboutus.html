@@ -23,10 +23,10 @@
                 <a href="../index.html">
                     <li>首页</li>
                 </a>
-                <a href="#">
-                    <li>体验</li>
-                </a>
-                <a href="#">
+                <!--<a href="#">-->
+                    <!--<li>体验</li>-->
+                <!--</a>-->
+                <a href="function.html">
                     <li>功能</li>
                 </a>
                 <a href="joinus.html">
@@ -46,8 +46,8 @@
     </div>
 </div>
 <div id="">
-    <div class="head_banner" style="width: 100%;background-color: #5eaff5;">
-    </div>
+    <!--<div class="head_banner" style="width: 100%;background-color: #5eaff5;">-->
+    <!--</div>-->
     <div class="">
         <div class="content">
             <div class="left_nav">
@@ -57,7 +57,6 @@
                     <li>联系方式</li>
                 </ul>
             </div>
-            <div class="qwe"></div>
             <div class="right_content">
                 <div class="about">
                     <h3>关于我们</h3>
@@ -204,49 +203,58 @@
         var wh = $(window).height();
         var one = $('.about').height();
         var two = $('.team').height();
-        var three = $('.map').height();
+//        var three = $('.map').height();
         $(window).scroll(function (){
-            var asd = $(window).scrollTop();
-            if (asd >= wh) {
-                $(".left_nav").css("top",asd-wh+150);
-//                $(".left_nav").css("position","fixed");
-//                $(".qwe").show();
-                if(asd <one+wh){
+            var scrollTop = $(window).scrollTop();
+                $(".left_nav").css("top",scrollTop+150);
+                if(scrollTop <one){
                     $('.left_nav>ul>li:nth-child(1)').addClass("on").siblings().removeClass("on");
                 }
-                if(one+wh <=asd && asd<one +two +wh){
+                if(one <=scrollTop && scrollTop<one +two){
                     $('.left_nav>ul>li:nth-child(2)').addClass("on").siblings().removeClass("on");
                 }
-                if(one +two+wh <=asd){
+                if(one +two <=scrollTop){
                     $('.left_nav>ul>li:nth-child(3)').addClass("on").siblings().removeClass("on");
                 }
-            }
-            else {
-                $(".left_nav").css("top","150px");
-//                $(".left_nav").css("position","relative");
-//                $(".qwe").hide();
-            }
+            //修改之前
+//            if (scrollTop >= wh) {
+//                $(".left_nav").css("top",scrollTop-wh+150);
+//                if(scrollTop <one+wh){
+//                    $('.left_nav>ul>li:nth-child(1)').addClass("on").siblings().removeClass("on");
+//                }
+//                if(one+wh <=scrollTop && scrollTop<one +two +wh){
+//                    $('.left_nav>ul>li:nth-child(2)').addClass("on").siblings().removeClass("on");
+//                }
+//                if(one +two+wh <=scrollTop){
+//                    $('.left_nav>ul>li:nth-child(3)').addClass("on").siblings().removeClass("on");
+//                }
+//            }
+//            else {
+//                $(".left_nav").css("top","150px");
+//            }
 
         })
         $(".head_banner").css("height", wh);
         $('.left_nav>ul>li:nth-child(1)').click(function(){
-//            $('.left_nav>ul>li:nth-child(1)').addClass("on").siblings().removeClass("on");
-//            $('.left_nav').css("margin-top","0px");
-            $('html, body').animate({scrollTop:wh-100},600);
-//            $('.left_nav').animate({top:0},600);
+            $('html, body').animate({scrollTop:-100},600);
         })
         $('.left_nav>ul>li:nth-child(2)').click(function(){
-//            $('.left_nav>ul>li:nth-child(2)').addClass("on").siblings().removeClass("on");
-//            $('.left_nav').css("margin-top",one +100+"px");
-            $('html, body').animate({scrollTop:one+wh},600);
-//            $('.left_nav').animate({top:1000},600);
+            $('html, body').animate({scrollTop:one},600);
         })
         $('.left_nav>ul>li:nth-child(3)').click(function(){
-//            $('.left_nav>ul>li:nth-child(3)').addClass("on").siblings().removeClass("on");
-//            $('.left_nav').css("margin-top",one + two + 250 + "px");
-            $('html, body').animate({scrollTop:one +two +wh +150},600);
-//            $('.left_nav').animate({top:one + two + 150},600);
+            $('html, body').animate({scrollTop:one +two +150},600);
         })
+        //修改之前
+//        $(".head_banner").css("height", wh);
+//        $('.left_nav>ul>li:nth-child(1)').click(function(){
+//            $('html, body').animate({scrollTop:wh-100},600);
+//        })
+//        $('.left_nav>ul>li:nth-child(2)').click(function(){
+//            $('html, body').animate({scrollTop:one+wh},600);
+//        })
+//        $('.left_nav>ul>li:nth-child(3)').click(function(){
+//            $('html, body').animate({scrollTop:one +two +wh +150},600);
+//        })
     });
 </script>
 

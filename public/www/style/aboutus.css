@@ -1,7 +1,8 @@
 .content{
     width: 1030px;
     margin: 0 auto;
-    padding-top: 70px;
+    /*padding-top: 70px; 原有高度*/
+    padding-top: 100px;/*没有顶部图片时的高度*/
     position: relative;
 }
 .content .left_nav{
@@ -12,15 +13,15 @@
     position: absolute;
     left: 0;
 }
-.content .qwe{
-    width: 30%;
-    height: 100px;
-    float: left;
-    overflow: hidden;
-    display: none;
-    /*position: fixed;*/
+/*.content .qwe{*/
+    /*width: 30%;*/
+    /*height: 100px;*/
+    /*float: left;*/
+    /*overflow: hidden;*/
+    /*display: none;*/
+    /*/!*position: fixed;*!/*/
 
-}
+/*}*/
 .content .left_nav ul{
     width: 70%;
     margin: 65px auto 0px;

@@ -650,7 +650,6 @@ var businessTravel=(function(){
                         $(".bottom1").hide();
                         $(".bottom2").show();
                         $('.createtime').html("生成时间："+$filter('date')($scope.createTime,'yyyy-MM-dd'));
-                        Myalert("温馨提示","生成出差记录成功");
                     })
                     .catch(function(err){
                         console.info (err);

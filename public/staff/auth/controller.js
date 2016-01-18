@@ -661,40 +661,63 @@ var auth=(function(){
             var commit = true;
 
             if(commit){
-                // if(old == first){
-                //     alert("新旧密码不能一致！");
-                // }else if(first != second){
-                //     alert("两次输入密码不一致！");
-                // }
-                API.onload(function() {
-                    API.auth.resetPwdByOldPwd({oldPwd:old,newPwd:second})
-                        .then(function(){
-                            // alert("重置密码成功");
-                            // window.location.href= '#/auth/login';
-                            $(".confirmFixed").show();
-                            $scope.seconds = 3;
-                            var $seconds = $("#second3");
-                            var timer = setInterval(function() {
-                                var begin = $seconds.text();
-                                begin = parseInt(begin);
-                                if (begin <=0 ) {
-                                    clearInterval(timer);
-                                    window.location.href= '#/auth/login';
-                                } else {
-                                    begin = begin - 1;
-                                    $seconds.text(begin);
-                                }
-                            }, 1000);
-                            $scope.$apply();
-                        }).catch(function(err){
-                            console.error(err);
-                            $scope.err_msg1 = err.msg;
-                            $("#oldPwd").siblings(".err_msg").children("i").html("&#xf06a;");
-                            $("#oldPwd").siblings(".err_msg").children("i").removeClass("right");
-                            $("#oldPwd").siblings(".err_msg").show();
-                            $scope.$apply();
-                        }).done();
-                })
+                var pwdReg = /^[a-z\dA-Z]+$/;
+                if(!pwdReg.test(old)){
+                    $scope.err_msg1 = "格式错误,只能为数字或字母";
+                    $("#oldPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                    $("#oldPwd").siblings(".err_msg").children("i").removeClass("right");
+                    $("#oldPwd").siblings(".err_msg").show();
+                    return false;
+                } else if (!pwdReg.test(first)) {
+                    $scope.err_msg2 = "格式错误,只能为数字或字母";
+                    $("#newFirstPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                    $("#newFirstPwd").siblings(".err_msg").children("i").removeClass("right");
+                    $("#newFirstPwd").siblings(".err_msg").show();
+                    return false;
+                } else if(old == first){
+                    $scope.err_msg2 = "新旧密码重复";
+                    $("#newFirstPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                    $("#newFirstPwd").siblings(".err_msg").children("i").removeClass("right");
+                    $("#newFirstPwd").siblings(".err_msg").show();
+                    return false;
+                } else if(first != second){
+                    $scope.err_msg3 = "2次密码设置不一致";
+                    $("#newSecondPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                    $("#newSecondPwd").siblings(".err_msg").children("i").removeClass("right");
+                    $("#newSecondPwd").siblings(".err_msg").show();
+                    return false;
+                }else{
+
+                    API.onload(function() {
+                        API.auth.resetPwdByOldPwd({oldPwd:old,newPwd:second})
+                            .then(function(){
+                                // alert("重置密码成功");
+                                // window.location.href= '#/auth/login';
+                                $(".confirmFixed").show();
+                                $scope.seconds = 3;
+                                var $seconds = $("#second3");
+                                var timer = setInterval(function() {
+                                    var begin = $seconds.text();
+                                    begin = parseInt(begin);
+                                    if (begin <=0 ) {
+                                        clearInterval(timer);
+                                        window.location.href= '#/auth/login';
+                                    } else {
+                                        begin = begin - 1;
+                                        $seconds.text(begin);
+                                    }
+                                }, 1000);
+                                $scope.$apply();
+                            }).catch(function(err){
+                                console.error(err);
+                                $scope.err_msg1 = err.msg;
+                                $("#oldPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                                $("#oldPwd").siblings(".err_msg").children("i").removeClass("right");
+                                $("#oldPwd").siblings(".err_msg").show();
+                                $scope.$apply();
+                            }).done();
+                    })
+                }
             }
         }
         $scope.toReLogin = function(){
