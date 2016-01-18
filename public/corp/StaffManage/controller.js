@@ -92,6 +92,7 @@ var staff = (function(){
                         ])
                             .spread(function(travelPolicies,staffinfo,staffRole, departments){
                                 $scope.total = staffinfo.total;
+                                $scope.departments = departments;
                                 //获取差旅标准
                                 $scope.companyId = staff.companyId;
                                 var arr = travelPolicies;
@@ -130,7 +131,6 @@ var staff = (function(){
                                 $scope.totalCount = staffRole.totalCount;
                                 return Q.all(tasks)
                                     .then(function(){
-                                        //console.log(6768);
                                         $scope.$apply();
                                     })
                             })
@@ -164,6 +164,10 @@ var staff = (function(){
 
 
         $scope.initstafflist();
+
+        $scope.departmentChange = function(department){
+
+        }
 
 
 
