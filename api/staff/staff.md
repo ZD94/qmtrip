@@ -250,3 +250,15 @@
 |---------|------|-----|
 | totalPoints   |企业员工总共获得的积分|integer
 | balancePoints |企业员工当前可用积分|integer
+
+>. 企业部门API.staff.getDistinctDepartment();
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 参数             | json             |-------
+| params。companyId                     | 企业id             | uuid            |-------
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+|    | 部门数组 | array
