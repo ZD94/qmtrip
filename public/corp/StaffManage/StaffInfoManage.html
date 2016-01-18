@@ -18,14 +18,14 @@
             <!--<span>设置公司组织架构</span>-->
         </div>
         <div class="staff_function">
-            <i>目前共{{totalCount}}名员工</i>
-            <span>待激活{{forActive}}名|管理员{{manager+1}}名|普通员工{{publicStaff}}名</span>
+            <i style="font-size: 16px;">目前共{{totalCount}}名员工</i>
+            <span>待激活{{forActive}}名&nbsp;|&nbsp;管理员{{manager+1}}名&nbsp;|&nbsp;普通员工{{publicStaff}}名</span>
             <a ng-click="addStaff()" id="add">添加员工</a>
             <a id="add_lot" ng-click="addALotStaff()">批量导入</a>
         </div>
         <div class="add_staff">
             <div class="little_triangle">
-
+                <img src="corp/images/sanjiao-staff.png">
             </div>
             <div class="add_staff_block">
                 <div class="block_tip">
@@ -96,7 +96,7 @@
             <li><span>{{item.travelLeverName}}</span></li>
             <li><span ng-if="item.roleId == 0">创建者</span><span ng-if="item.roleId == 1">普通员工</span><span ng-if="item.roleId == 2">管理员</span><span ng-if="item.roleId == 3">财务人员</span></li>
             <li><a ng-if="!((item.roleId == 2 || item.roleId == 0) && roleId == 2 && currentStaff.id != item.id)"><span ng-click="editStaffInfo($index)" id="change">修改</span></a>
-                <a ng-if="item.roleId != 0 && !(item.roleId == 2 && roleId == 2)">&nbsp;|&nbsp;<span ng-click="deleteInfoShow(item.id, item.name)">删除</span></a></li>
+                <a ng-if="item.roleId != 0 && !(item.roleId == 2 && roleId == 2)"><span style="color:#dedede;">|</span>&nbsp;<span ng-click="deleteInfoShow(item.id, item.name)">删除</span></a></li>
             <li class="orange">{{item.accStatus}}</li>
             <div class="add_staff2">
                 <div class="little_triangle2">

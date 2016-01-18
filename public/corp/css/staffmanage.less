@@ -20,7 +20,7 @@
   color: @color-theme1;
 }
 .orange{
-  color: @color-alert-wrong;
+  color: #f56d23;
 }
 .staffManageContent{
   width: 1000px;
@@ -80,8 +80,8 @@
     }
     .staff_function{
       width: 100%;
-      height: 35px;
-      line-height: 35px;
+      height: 36px;
+      line-height: 36px;
       font-size: @h14;
       clear: both;
       color: @color-text;
@@ -98,12 +98,13 @@
         float: right;
         margin-right: 20px;
         width: 100px;
-        height: 35px;
+        height: 36px;
         text-align: center;
         text-decoration: none;
         color: @color-white;
         background-color: @color-theme1;
         cursor: pointer;
+        border-radius: @border-radius-2;
         &.onCheck{
           background-color: @color-white !important;
           color: #f56d23 !important;
@@ -116,6 +117,14 @@
       font-size: @h14;
       color: @color-text;
       display: none;
+      .little_triangle{
+        clear: both;
+        img{
+          float: right;
+          margin-top: -9px;
+          margin-right: 40px;
+        }
+      }
       .add_staff_block{
         width: 100%;
         border: 1px solid @color-border2;
@@ -134,21 +143,23 @@
             line-height: 35px;
             text-align: right;
             input{
-              width: 190px;
-              height: 35px;
-              line-height: 35px;
+              width: 188px;
+              height: 34px;
+              line-height: 34px;
               border: 1px solid @color-border2;
               margin-left: 5px;
               padding-left: 10px;
+              border-radius: @border-radius-2;
             }
             select{
               width: 200px;
-              height: 35px;
-              line-height: 35px;
+              height: 34px;
+              line-height: 34px;
               border: 1px solid @color-border2;
               padding-left: 5px;
               margin-left: 5px;
               color: #9b9b9b;
+              border-radius: @border-radius-2;
             }
           }
         }
@@ -175,12 +186,13 @@
             display: block;
             width: 60px;
             text-align: center;
-            height: 35px;
-            line-height: 35px;
+            height: 36px;
+            line-height: 36px;
             font-size: @h14;
             margin-top: 20px;
             margin-right: 20px;
             cursor: pointer;
+            border-radius: @border-radius-2;
             &:first-child{
               background-color: @color-theme1;
               color: @color-white;
