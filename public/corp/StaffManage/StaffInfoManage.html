@@ -7,9 +7,9 @@
     </div>
     <div class="staff_tab_content">
         <div class="organize_select">
-            <!--<select name="select" id="department" class="" ng-model="department" ng-options="item for item in departments" ng-change="departmentChange(department)">
+            <select name="select" id="department" class="" ng-model="department" ng-options="item for item in departments" ng-change="departmentChange(department)">
                 <option value="" selected>-- 请选择 --</option>
-            </select>-->
+            </select>
             <!--<select name="select" id="" class="">
                 <option value="我的企业">我的企业</option>
                 <option value="销售部">销售部</option>
@@ -123,7 +123,10 @@
                         <ul>
                             <li>
                                 部门:
-                                <input id="staffDepartment{{$index}}" type="text" placeholder="请输入员工所属部门" value="{{item.department}}"/>
+                                <input id="staffDepartment{{$index}}" type="text" placeholder="请输入员工所属部门" value="{{item.department}}" ng-focus="showDepartments()"/>
+                                <!--<ul class="departmentlist">
+                                    <li ng-repeat="item in departments" ng-click="chooseStartplace(item)">{{item}}</li>
+                                </ul>-->
                             <li>
                                 差旅标准:
                                 <select name="select" id="staffStandard{{$index}}" class="" ng-model="selectkey" ng-options="item.val as item.name for item in selectClass"></select>
