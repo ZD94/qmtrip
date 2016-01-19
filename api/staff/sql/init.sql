@@ -40,8 +40,10 @@ create table staff.point_changes (
     staff_id uuid,
     status integer default 1,
     points integer not null,
+    current_point integer,
     create_at timestamp default now(),
     remark text
 );
 
 comment on table staff.point_changes is '员工积分变动';
+COMMENT ON COLUMN staff.point_changes.current_point IS '当前积分';
