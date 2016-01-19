@@ -73,6 +73,21 @@
     background-image: url("../img/function6.png");
 }
 
+.e1{
+    background-image: url("../img/experience1.png");
+}
+.e2{
+    background-image: url("../img/experience2.png");
+}
+.e3{
+    background-image: url("../img/experience3.png");
+}
+.e4{
+    background-image: url("../img/experience4.png");
+}
+.e5{
+    background-image: url("../img/experience5.png");
+}
 /*对于文字的统一样式*/
 .function_text{
     color: #fff;
@@ -83,6 +98,11 @@
 .function_text h3{
     font-size: 44px;
     font-weight: normal;
+}
+.function_text h2{
+    font-size: 44px;
+    font-weight: normal;
+    color: #f8e900;
 }
 .function_text p{
     font-weight: normal;
