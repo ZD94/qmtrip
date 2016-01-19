@@ -150,7 +150,6 @@ staff.updateStaff = function(data){
                                 API.company.getCompany({companyId: old.companyId})
                             ])
                             .spread(function(acc, company){
-                                console.info("company==>", company);
                                 if(acc.status != 0)
                                     throw {code: -2, msg: "该账号不允许修改邮箱"};
                                 var accData = {email: data.email};

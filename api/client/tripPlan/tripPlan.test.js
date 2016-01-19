@@ -310,10 +310,13 @@ describe("api/client/tripPlan.js", function() {
                         consumeId = ret2.id;
                         return [ret1.id, API.tripPlan.uploadInvoice({userId: staffId, consumeId: ret1.id, picture: '测试图片'})];
                     })
-                    .spread(function(consumeId){
-                        return  API.client.agencyTripPlan.approveInvoice.call({accountId: agencyUserId}, {consumeId: consumeId, status: 1, expenditure: '521', remark: '审核票据测试'})
-                    })
-                    .then(function(r){
+                    //.spread(function(consumeId){
+                    //    return [consumeId, API.tripPlan.commitTripPlanOrder({accountId: staffId, orderId: newOrderId})];
+                    //})
+                    //.spread(function(consumeId){
+                    //    return  API.client.agencyTripPlan.approveInvoice.call({accountId: agencyUserId}, {consumeId: consumeId, status: 1, expenditure: '521', remark: '审核票据测试'})
+                    //})
+                    .spread(function(consumeId, r){
                         assert.equal(r, true);
                         done()
                     })

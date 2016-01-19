@@ -197,7 +197,7 @@ agency.getAgencyUser = function(agencyUserId){
 
 agency.listAndPaginateAgencyUser = function(params) {
     var user_id = this.accountId;
-    return API.agency.getAgencyUser({id:user_id})
+    return API.agency.getAgencyUser({id:user_id, columns: ['agencyId']})
         .then(function(data){
             params.agencyId = data.agencyId;
             return API.agency.listAndPaginateAgencyUser(params);

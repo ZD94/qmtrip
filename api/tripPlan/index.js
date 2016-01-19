@@ -376,16 +376,16 @@ tripPlan.uploadInvoice = function(params){
                 ]);
             })
         })
-        .spread(function() {
-            return ConsumeDetails.findAll({where: {orderId: orderId}})
-        })
-        .then(function(list){
-            for(var i=0; i<list.length; i++){
-                if(!list[i].newInvoice)
-                    return;
-            }
-            return PlanOrder.update({status: 1, auditStatus: 0, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'auditStatus', 'updateAt'], returning: true})
-        })
+        //.spread(function() {
+        //    return ConsumeDetails.findAll({where: {orderId: orderId}})
+        //})
+        //.then(function(list){
+        //    for(var i=0; i<list.length; i++){
+        //        if(!list[i].newInvoice)
+        //            return;
+        //    }
+        //    return PlanOrder.update({status: 1, auditStatus: 0, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'auditStatus', 'updateAt'], returning: true})
+        //})
         .then(function(){
             return true;
         })
@@ -489,6 +489,9 @@ function approveInvoice(params){
                 .then(function(order){
                     if(!order || order.status == -2){
                         throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST
+                    }
+                    if(order.status != 1 || order.auditStatus != 0){
+                        throw {code: -3, msg: '该订单未提交，不能审核'};
                     }
                     return [order, consume];
                 })
@@ -628,12 +631,64 @@ tripPlan.statPlanOrderMoney = function(params){
         })
 }
 
-
+/**
+ * 获取项目名称列表
+ * @param params
+ * @returns {*}
+ */
 tripPlan.getProjects = function(params){
     if(!params.companyId){
         throw {code: -1, msg: '企业Id不能为空'};
     }
     return PlanOrder.findAll({where: {companyId: params.companyId}, group: ['description'], attributes: ['description']})
+}
+
+tripPlan.commitTripPlanOrder = function(params){
+    var required_params = ['orderId', 'accountId'];
+    utils.requiredParams(params, required_params);
+    var id = params.orderId;
+    return Q.all([
+        PlanOrder.findById(id, {attributes: ['status', 'auditStatus', 'accountId']}),
+        ConsumeDetails.findAll({where:{orderId: id}, attributes: ['status', 'newInvoice']})
+    ])
+        .spread(function(order, list){
+            if(!order || order.status == -2){
+                throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
+            }
+            if(order.accountId != params.accountId){
+                throw L.ERR.PERMISSION_DENY;
+            }
+            if(order.status == -1){
+                throw {code: -3, msg: '订单已失效，不能提交'};
+            }
+            if(order.status == 1){
+                throw {code: -4, msg: '该订单已提交，不能重复提交'};
+            }
+            if(order.status > 1 || order.auditStatus == 1){
+                throw {code: -5, msg: '该订单已经审核通过，不能提交'};
+            }
+            if(list.length <= 0){
+                throw {code: -6, msg: '该订单没有票据提交'};
+            }
+            console.info("###################################");
+            for(var i=0; i<list.length; i++){
+                var s = list[i];
+                console.info(list.length);
+                console.info(s.status);
+                console.info(s.newInvoice);
+                if(s.status != 0 || !s.newInvoice){
+                    throw {code: -7, msg: '票据没有上传完'};
+                }
+            }
+            console.info("###################################");
+        })
+        .then(function(){
+            return PlanOrder.update({status: 1, auditStatus: 0, updateAt: utils.now()}, {where: {id: id}, fields: ['status', 'auditStatus', 'updateAt']})
+        })
+        .then(function(){
+            console.info("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+            return true;
+        })
 }
 
 /**

@@ -167,7 +167,6 @@ describe("api/client/staff.js", function() {
         API.client.staff.statisticStaffsRole.call(ownerSelf, {companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
-            console.log(result);
             done();
         });
     })
