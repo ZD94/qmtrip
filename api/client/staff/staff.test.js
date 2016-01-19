@@ -176,7 +176,6 @@ describe("api/client/staff.js", function() {
         API.client.staff.statisticStaffsRole.call(ownerSelf, {companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
-            console.log(result);
             done();
         });
     })
@@ -232,6 +231,9 @@ describe("api/client/staff.js", function() {
                     newOrderId = ret.id;
                     consumeId = ret.hotel[0].id;
                     return API.tripPlan.uploadInvoice({userId: ownerSelf.accountId, consumeId: consumeId, picture: '测试图片'});
+                })
+                .then(function(){
+                    return API.tripPlan.commitTripPlanOrder({accountId: ownerSelf.accountId, orderId: newOrderId})
                 })
                 .then(function(ret){
                     return  API.client.agencyTripPlan.approveInvoice.call({accountId: agencyUserId}, {consumeId: consumeId, status: 1, expenditure: '112', remark: '审核票据测试'})

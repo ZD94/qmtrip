@@ -154,6 +154,7 @@ describe("api/client/tripPlan.js", function() {
 
     describe("options based on tripPlanOrder created", function() {
         var newOrderId = "";
+        var consumeId = "";
         before(function (done) {
             var tripPlanOrder = {
                 startPlace: '北京',
@@ -173,6 +174,7 @@ describe("api/client/tripPlan.js", function() {
                     throw err;
                 }
                 newOrderId = ret.id;
+                consumeId = ret.hotel[0].id;
                 done();
             })
         });
@@ -268,23 +270,37 @@ describe("api/client/tripPlan.js", function() {
             })
         });
 
-        it("#saveConsumeDetail should be ok", function (done) {
-            var self = {accountId: staffId};
-            var detail = {
-                orderId: newOrderId,
-                type: 0,
-                startTime: '2016-01-10 11:00:00',
-                invoiceType: 2,
-                budget: 350
-            }
-            API.client.tripPlan.saveConsumeDetail.call(self, detail, function (err, ret) {
-                if (err) {
-                    throw err;
-                }
-                assert.equal(ret.status, 0);
-                done();
+        describe("#saveConsumeDetail", function(){
+            var newDetailId = "";
+            after(function(done){
+                API.client.tripPlan.uploadInvoice.call({accountId: staffId}, {consumeId: newDetailId, picture: '测试上传图片'}, function (err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+                    assert(ret, true);
+                    done();
+                })
             })
-        });
+
+            it("#saveConsumeDetail should be ok", function (done) {
+                var self = {accountId: staffId};
+                var detail = {
+                    orderId: newOrderId,
+                    type: 0,
+                    startTime: '2016-01-10 11:00:00',
+                    invoiceType: 2,
+                    budget: 350
+                }
+                API.client.tripPlan.saveConsumeDetail.call(self, detail, function (err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+                    assert.equal(ret.status, 0);
+                    newDetailId = ret.id;
+                    done();
+                })
+            });
+        })
 
         it("#getProjectsList should be ok", function (done) {
             var self = {accountId: staffId};
@@ -298,21 +314,8 @@ describe("api/client/tripPlan.js", function() {
         });
 
         describe('options based on consume details created', function(){
-            var consumeId = "";
             before(function(done){
-                Q.all([
-                    API.tripPlan.saveConsumeRecord({orderId: newOrderId, accountId: staffId, type: 0, startTime: '2016-01-11 11:22:22', invoiceType: 2, budget: 150}),
-                    API.tripPlan.saveConsumeRecord({orderId: newOrderId, accountId: staffId, type: 1, startTime: '2016-01-12 11:33:44', invoiceType: 2, budget: 300})
-                ])
-                    .spread(function(ret1, ret2){
-                        assert.equal(ret1.type, 0);
-                        assert.equal(ret2.type, 1);
-                        consumeId = ret2.id;
-                        return [ret1.id, API.tripPlan.uploadInvoice({userId: staffId, consumeId: ret1.id, picture: '测试图片'})];
-                    })
-                    .spread(function(consumeId){
-                        return  API.client.agencyTripPlan.approveInvoice.call({accountId: agencyUserId}, {consumeId: consumeId, status: 1, expenditure: '521', remark: '审核票据测试'})
-                    })
+                API.tripPlan.uploadInvoice({userId: staffId, consumeId: consumeId, picture: '测试图片'})
                     .then(function(r){
                         assert.equal(r, true);
                         done()
@@ -329,6 +332,18 @@ describe("api/client/tripPlan.js", function() {
                     if (err) {
                         throw err;
                     }
+                    assert(ret, true);
+                    done();
+                })
+            });
+
+            it("#commitTripPlanOrder should be ok", function (done) {
+                var self = {accountId: staffId};
+                API.client.tripPlan.commitTripPlanOrder.call(self, newOrderId, function (err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+                    assert(ret, true);
                     done();
                 })
             });

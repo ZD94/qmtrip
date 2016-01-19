@@ -5,15 +5,22 @@ var auth=(function(){
     API.require('checkcode');
     var  auth = {};
     var Cookie = require('tiny-cookie');
-
     //登录页面
     auth.LoginController = function ($scope, $routeParams) {
+        //function err_attention(id,err,errforh){
+        //    $scope.errforh = err;
+        //    $('#'+id).siblings(".err_msg").children("i").html("&#xf06a;");
+        //    $('#'+id).siblings(".err_msg").children("i").removeClass("right");
+        //    $('#'+id).siblings(".err_msg").show();
+        //    console.info("$$$$$$$$$$$$");
+        //    return false;
+        //}
+        //err_attention(email,'邮箱不能为空',err_msg_mail);
+        //console.info(err_attention())
         var email = Cookie.get("email");
         var pwd = Cookie.get("pwd");
-
         $scope.email = email;
         $scope.pwd = pwd;
-        console.info(email, pwd);
         $scope.toRegister = function(){
             window.location.href = "#/auth/register";
         }
@@ -417,6 +424,19 @@ var auth=(function(){
         $scope.toRegister = function () {
             window.location.href = "#/auth/register";
         }
+        $("#loginMail").blur(function(){
+            var email   = $('#loginMail').val();
+            if(!email){
+                $scope.err_msg_mail = "联系人邮箱不能为空";
+                $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
+                $("#loginMail").siblings(".err_msg").show();
+                $scope.$apply();
+                return false;
+            }else{
+                $("#loginMail").siblings(".err_msg").hide();
+            }
+        })
         //图片验证码加载
         var imgW = $('#imgCode').attr("width");
         var imgH = $('#imgCode').attr("height");
@@ -452,6 +472,19 @@ var auth=(function(){
             var mail = $("#loginMail").val();
             var picCode = $("#picCode").val();
 
+            if(!mail){
+                $scope.err_msg_mail = "联系人邮箱不能为空";
+                $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
+                $("#loginMail").siblings(".err_msg").show();
+                return false;
+            }else if(!picCode){
+                $scope.err_msg_pic = "图片验证码不能为空";
+                $("#picCode").parent("div").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#picCode").parent("div").siblings(".err_msg").children("i").removeClass("right");
+                $("#picCode").parent("div").siblings(".err_msg").show();
+                return false;
+            }
             API.onload(function () {
                 API.auth.sendResetPwdEmail({email:mail,code:picCode,ticket:picTicket})
                     .then(function (result) {
@@ -461,7 +494,7 @@ var auth=(function(){
                         $(".step>ul>li:nth-child(2)").addClass("on").siblings("li").removeClass("on");
                         $scope.$apply();
                     }).catch(function (err) {
-                        alert(err.msg);
+                        //alert(err.msg);
                     }).done();
             })
         }

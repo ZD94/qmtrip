@@ -230,3 +230,15 @@
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
 |ret  |Array
+
+
+>. 企业员工提交计划单 API.tripPlan.commitTripPlanOrder(orderId, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| orderId                              |计划单id      |uuid |必填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+|ret  |true或者是错误信息
