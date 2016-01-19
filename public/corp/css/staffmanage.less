@@ -20,7 +20,7 @@
   color: @color-theme1;
 }
 .orange{
-  color: #f56d23;
+  color: #f56d23!important;
 }
 .staffManageContent{
   width: 1000px;
@@ -165,8 +165,8 @@
         }
         .block_tip{
            width: 760px;
-           height: 30px;
-           line-height: 30px;
+           height: 36px;
+           line-height: 36px;
            background-color: #fef2dc;
            color: #f5a623;
            border:1px solid #f5a623;
@@ -323,6 +323,14 @@
   clear: both;
   margin: 10px auto;
   display: none;
+  .little_triangle2{
+    clear: both;
+    img{
+      float: right;
+      margin-top: -9px;
+      margin-right: 100px;
+    }
+  }
   .add_staff_block2{
     width: 100%;
     border: 1px solid @color-border2;
@@ -342,21 +350,23 @@
         text-align: right;
         border: none !important;
         input{
-          width: 190px;
-          height: 35px;
-          line-height: 35px;
+          width: 188px;
+          height: 34px;
+          line-height: 34px;
           border: 1px solid @color-border2;
           margin-left: 5px;
           padding-left: 10px;
+          border-radius: @border-radius-2;
         }
         select{
           width: 200px;
-          height: 35px;
-          line-height: 35px;
+          height: 34px;
+          line-height: 34px;
           border: 1px solid @color-border2;
           padding-left: 5px;
           margin-left: 5px;
           color: #9b9b9b;
+          border-radius: @border-radius-2;
         }
       }
     }
@@ -383,12 +393,13 @@
         display: block;
         width: 60px;
         text-align: center;
-        height: 35px;
+        height: 36px;
         line-height: 35px;
         font-size: @h14;
         margin-top: 20px;
         margin-right: 20px;
         cursor: pointer;
+        border-radius: @border-radius-2;
         &:first-child{
           background-color: @color-theme1;
           color: @color-white;
@@ -420,8 +431,8 @@
     padding-bottom: 20px;
     .staff_import_head{
       width: 100%;
-      height: 35px;
-      line-height: 35px;
+      height: 36px;
+      line-height: 36px;
       margin-top: 25px;
       font-size: @h16;
       color: @color-text;
@@ -430,13 +441,13 @@
           cursor: pointer;
           float: right;
           display: block;
-          width: 80px;
-          height: 33px;
+          width: 78px;
+          height: 34px;
           border: 1px solid @color-border2;
           border-radius: @border-radius-2;
           color: @color-theme1;
           text-align: center;
-          line-height: 33px;
+          line-height: 34px;
           font-size: @h14;
         }
       }
@@ -446,7 +457,7 @@
     position: relative;
     display: block;
     width: 100px;
-    height: 35px;
+    height: 36px;
     text-align: center;
     background: @color-theme1;
     border: 1px solid @color-border2;
@@ -455,17 +466,18 @@
     color: @color-white;
     text-decoration: none;
     text-indent: 0;
-    line-height: 35px;
+    line-height: 36px;
     margin-bottom: 10px;
     cursor: pointer;
     input {
       width: 100px;
-      height: 35px;
+      height: 36px;
       position: absolute;
       font-size: 100px;
       right: 0;
       top: 0;
       opacity: 0;
+      border-radius: @border-radius-2;
       &:hover {
         background: #AADFFD;
         border-color: #78C3F3;
@@ -475,13 +487,14 @@
     }
   }
   .upload_text{
-    width: 400px;
-    height: 35px;
-    line-height: 35px;
+    width: 398px;
+    height: 34px;
+    line-height: 34px;
     border: 1px solid @color-border2;
     clear: both;
     padding-left: 10px;
     color: #9b9b9b;
+    border-radius: @border-radius-2;
   }
   .tip_text{
     line-height: 35px;
@@ -602,13 +615,14 @@
       span{
         &:first-child{
           font-weight: bold;
+          font-size: 20px;
         }
         &:nth-child(2){
           cursor: pointer;
           float: right;
           display: block;
-          width: 80px;
-          height: 33px;
+          width: 78px;
+          height: 34px;
           border: 1px solid @color-border2;
           border-radius: @border-radius-2;
           color: @color-theme1;
@@ -634,7 +648,7 @@
     height: 35px;
     overflow: hidden;
     .blue_block{
-      width: 5px;
+      width: 4px;
       height: 16px;
       display: block;
       background-color: #01dbff;
@@ -744,7 +758,7 @@
     margin-bottom: 30px;
   }
   .import_btn{
-    height: 35px;
+    height: 36px;
     margin-left: 20px;
     margin-right: 20px;
     padding-bottom: 20px;
@@ -753,18 +767,18 @@
       float: left;
       font-size: @h14;
       text-align: center;
-      line-height: 35px;
+      line-height: 36px;
       border-radius: @border-radius-2;
       cursor: pointer;
       &:first-child{
         width: 60px;
-        height: 35px;
+        height: 36px;
         background-color: @color-theme1;
         color: @color-white;
       }
       &:last-child{
         width: 60px;
-        height: 35px;
+        height: 36px;
         background-color: @color-border2;
         color: @color-text;
         margin-left: 20px;
@@ -799,16 +813,17 @@
       span{
         &:first-child{
           font-weight: bold;
+          font-size: 20px;
         }
         &:nth-child(2){
           cursor: pointer;
           float: right;
           display: block;
           width: 120px;
-          height: 35px;
+          height: 36px;
           background-color: @color-theme1;
           color: @color-white;
-          line-height: 35px;
+          line-height: 36px;
           font-size: @h14;
           text-align: center;
           border-radius: @border-radius-2;
@@ -818,13 +833,13 @@
           cursor: pointer;
           float: right;
           display: block;
-          width: 80px;
-          height: 33px;
+          width: 78px;
+          height: 34px;
           border: 1px solid @color-border2;
           border-radius: @border-radius-2;
           color: @color-theme1;
           text-align: center;
-          line-height: 33px;
+          line-height: 34px;
           font-size: @h14;
         }
       }
@@ -835,7 +850,7 @@
     margin-top: 100px;
     text-align: center;
     p{
-      font-size: @h14;
+      font-size: @h16;
       line-height: 35px;
       color: #9b9b9b;
       &:first-child{
