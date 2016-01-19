@@ -353,4 +353,24 @@ auth.resetPwdByOldPwd = function(params) {
     return API.auth.resetPwdByOldPwd(data);
 }
 
+/**
+ * @method getQRCodeUrl
+ *
+ * 获取二维码登录链接
+ *
+ * @param {Object} params
+ * @param {String} params.backUrl 登陆后跳转链接
+ * @return {Promise} 返回二维码中包含内容链接
+ */
+auth.getQRCodeUrl = function(params) {
+    var self = this;
+    var accountId = self.accountId;
+    if (!accountId) {
+        throw L.ERR.NEED_LOGIN;
+    }
+
+    var backUrl = params.backUrl;
+    return API.auth.getQRCodeUrl({accountId: accountId, backUrl: backUrl});
+}
+
 module.exports = auth;

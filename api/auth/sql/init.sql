@@ -13,6 +13,7 @@ create table auth.accounts (
     last_login_ip varchar(50),
     active_token varchar(50),
     pwd_token varchar(50),
+    qrcode_token varchar(50),
     type integer default 1,
     is_first_login boolean default true
 );
@@ -29,6 +30,7 @@ comment on column auth.accounts.login_fail_times is '连续登录错误次数';
 comment on column auth.accounts.last_login_at is '最后登录时间';
 comment on column auth.accounts.last_login_ip is '最后登录IP地址';
 comment on column auth.accounts.active_token is '激活账号秘钥';
+comment on column auth.accounts.qrcode_token is '二维码登录秘钥';
 comment on column auth.accounts.pwd_token is '设置或找回密码秘钥';
 comment on column auth.accounts.type is '账号类型 1.企业员工 2.代理商员工';
 

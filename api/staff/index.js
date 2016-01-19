@@ -146,7 +146,7 @@ staff.updateStaff = function(data){
                     .then(function(old){
                         if(old.email != data.email){
                             return Q.all([
-                                API.auth.getAccount({id:id}),//暂无此接口
+                                API.auth.getAccount({id:id}),
                                 API.company.getCompany({companyId: old.companyId})
                             ])
                             .spread(function(acc, company){
@@ -154,7 +154,7 @@ staff.updateStaff = function(data){
                                     throw {code: -2, msg: "该账号不允许修改邮箱"};
                                 var accData = {email: data.email};
                                 return Q.all([
-                                    API.auth.updataAccount(id, accData, company.name),//暂无此接口
+                                    API.auth.updataAccount(id, accData, company.name),
                                     staffModel.update(data, options)
                                 ]);
                             })
@@ -364,6 +364,41 @@ staff.listAndPaginatePointChange = function(params){
     return pointChangeModel.findAndCountAll(options)
         .then(function(result){
             return new Paginate(page, perPage, result.count, result.rows);
+        });
+}
+
+/**
+ * 获取某个时间段员工的积分变动
+ * @param params
+ * @param params.staffId  员工id
+ * @param params.startTime  开始时间
+ * @param params.endTime  结束时间
+ * @returns {*|Promise}
+ */
+staff.getStaffPointsChange = function(params){
+    var staffId = params.staffId;
+    var startTime = params.startTime;
+    var endTime = params.endTime;
+    var changeNum = 0;
+    if(!staffId){
+        throw {code: -1, msg: "staffId不能为空"};
+    }
+    if(!startTime){
+        throw {code: -1, msg: "startTime不能为空"};
+    }
+    if(!endTime){
+        throw {code: -1, msg: "endTime不能为空"};
+    }
+    var options = {};
+    options.where = {staffId: staffId, createAt: {$gte: startTime, $lte: endTime}};
+    return pointChangeModel.findAndCountAll(options)
+        .then(function(result){
+            if(result && result.length > 0){
+                for(var i=0;i<result.length;i++){
+                    changeNum = changeNum + (result[i].points * result.status)
+                }
+            }
+            return changeNum;
         });
 }
 

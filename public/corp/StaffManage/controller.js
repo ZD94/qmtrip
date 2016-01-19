@@ -57,7 +57,9 @@ var staff = (function(){
                                 $scope.companyId = staff.companyId;
                                 var arr = travelPolicies;
                                 var i ;
-                                $scope.selectClass = [];//清空selectClass避免出现重复
+                                $scope.selectClass = [
+                                    {val:"",name:"请选择对应的差旅等级"}
+                                ]//清空selectClass避免出现重复
                                 for(i=0; i<arr.length; i++){
                                     var name = arr[i].name;
                                     var id = arr[i].id;
@@ -272,7 +274,9 @@ var staff = (function(){
                             $("#staffTel").val("");
                             $("#staffDepartment").val("");
                             $scope.selectkey = "";
-                            $("#staffPower").val("");
+                            if($scope.roleId != 2){
+                                $("#staffPower").val("");
+                            }
                             $scope.initstafflist();
                             $scope.$apply();
                         }).catch(function (err) {
@@ -293,13 +297,13 @@ var staff = (function(){
 
 
         //对员工的信息进行修改
-        $scope.editStaffInfo = function(index) {
+        $scope.editStaffInfo = function(id) {
+            $("#change").addClass("orange");
             API.onload(function(){
-                API.staff.listAndPaginateStaff({companyId:$scope.companyId})
+                API.staff.getStaff({id: id})
                     .then(function(staffinfo){
-                        $scope.travellevel = staffinfo.items[index].travelLevel;
-                        //console.info ($scope.travellevel);
-                        $scope.selectkey = $scope.travellevel;
+                        $scope.travellevel = staffinfo.staff.travelLevel;
+                        $scope.selectkey = $scope.travellevel || "";
                         $scope.$apply();
                     }).catch(function(err){
                         console.info(err);
@@ -307,8 +311,11 @@ var staff = (function(){
             })
         }
 
+
+
         //对员工所修改的信息进行保存
         $scope.updateStaffInfo = function(id,index){
+            $("#change").removeClass("orange");
             //alert(id);
             var name = $("#staffName"+index).val();
             var mail = $("#staffEmail"+index).val();
@@ -334,6 +341,7 @@ var staff = (function(){
 
         //取消对员工信息的修改
         $scope.cancelAddStaffInfo = function(){
+            $("#change").removeClass("orange");
             $(".add_staff2").hide();
         }
 
@@ -451,8 +459,8 @@ var staff = (function(){
                             objAttr = $scope.downloadValidData;
                         }
                         API.staff.downloadExcle({accountId:staffid.id,objAttr:objAttr})
-                            .then(function(filename){
-                                console.info(filename);
+                            .then(function(result){
+                                var filename = result.fileName;
                                 window.open('/download/excle-file/'+filename, "_blank");
                                 $scope.$apply();
                             }).catch(function(err){

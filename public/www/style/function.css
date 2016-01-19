@@ -76,12 +76,12 @@
 /*对于文字的统一样式*/
 .function_text{
     color: #fff;
-    font-size: 24px;
+    font-size: 20px;
     width: 500px;
     text-align: left;
 }
 .function_text h3{
-    font-size: 48px;
+    font-size: 44px;
     font-weight: normal;
 }
 .function_text p{
