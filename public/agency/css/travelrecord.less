@@ -82,7 +82,7 @@
     .mainbox {
       width: 1000px;
       height: auto;
-      border-radius: 3px;
+      border-radius: 2px;
       box-shadow: 0 3px 10px rgba(0, 0, 0, .3);
       background: @background-color-second;
       overflow: hidden;
@@ -330,6 +330,32 @@
       position: relative;
       div {
         overflow: hidden;
+      }
+      .reason1,.reason2 {
+        width: 100%;
+        height: 25px;
+        line-height: 25px;
+        i {
+          width: 12px;
+          height: 12px;
+          line-height: 12px;
+          text-align: center;
+          font-size: 8px;
+          color: @btn-text-color;
+          border: 1px @border-color solid;
+          display: inline-block;
+          cursor: pointer;
+        }
+        .check {
+          border: 1px @color-theme1 solid;
+          background: @color-theme1;
+        }
+        .reason1_text,.reason2_text {
+          height: 14px;
+          line-height: 14px;
+          padding-left: 10px;
+          display: inline-block;
+        }
       }
       .success {
         width: 100%;
