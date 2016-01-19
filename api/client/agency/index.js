@@ -11,6 +11,7 @@ var API = require('common/api');
 var utils = require("common/utils");
 var L = require("common/language");
 var _ = require('lodash');
+var checkAgencyPermission = require('../auth').checkAgencyPermission;
 
 /**
  * @class agency 代理商
@@ -102,14 +103,15 @@ agency.deleteAgency = function(agencyId){
 
 /**************** 代理商用户相关 ****************/
 
-agency.createAgencyUser = function(agencyUser){
+agency.createAgencyUser = checkAgencyPermission("user.add",
+    function(agencyUser){
     var self = this;
     return API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']})
         .then(function(user){
             agencyUser.agencyId = user.agencyId;
             return API.agency.createAgencyUser(agencyUser)
         })
-};
+});
 
 /**
  * 获取当前代理商用户
@@ -126,7 +128,8 @@ agency.getCurrentAgencyUser = function(){
  * @param userId
  * @returns {*}
  */
-agency.deleteAgencyUser = function(agencyUserId){
+agency.deleteAgencyUser = checkAgencyPermission("user.delete",
+    function(agencyUserId){
     var self = this;
     var accountId = self.accountId;
     return Q.all([
@@ -139,7 +142,7 @@ agency.deleteAgencyUser = function(agencyUserId){
             }
             return API.agency.deleteAgencyUser({id: agencyUserId});
         })
-}
+});
 
 /**
  * 更新代理商用户
@@ -147,7 +150,7 @@ agency.deleteAgencyUser = function(agencyUserId){
  * @returns {*}
  */
 
-agency.updateAgencyUser = updateAgencyUser;
+agency.updateAgencyUser = checkAgencyPermission("user.edit", updateAgencyUser);
 updateAgencyUser.required_params = ['id'];
 updateAgencyUser.accepted_params = _.union(updateAgencyUser.required_params,
     ['status', 'name', 'sex', 'email', 'mobile', 'avatar', 'roleId']);
