@@ -259,11 +259,22 @@ staff.decreaseStaffPoint = function(params){
  */
 staff.listAndPaginatePointChange = function(params){
     var user_id = this.accountId;
-    return API.staff.getStaff({id:user_id})
-        .then(function(data){
-            params.staffId = data.id;
-            return API.staff.listAndPaginatePointChange(params);
-        });
+    params.staffId = user_id;
+    return API.staff.listAndPaginatePointChange(params);
+}
+/**
+ * @method getStaffPointsChange
+ * 查询员工某时间段内积分变动
+ * @param params
+ * @param params.staffId  员工id
+ * @param params.startTime  开始时间
+ * @param params.endTime  结束时间
+ * @returns {promise|*}
+ */
+staff.getStaffPointsChange = function(params){
+    var staffId = this.accountId;
+    params.staffId = staffId;
+    return API.staff.getStaffPointsChange(params);
 }
 
 /**

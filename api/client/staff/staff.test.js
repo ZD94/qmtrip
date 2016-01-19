@@ -136,7 +136,7 @@ describe("api/client/staff.js", function() {
     })
 //加积分
     it("#increaseStaffPoint should be ok", function(done) {
-        API.client.staff.increaseStaffPoint.call(agencySelf, {id: id, increasePoint: 1000, remark: "差旅省钱加积分"}, function(err, result) {
+        API.client.staff.increaseStaffPoint.call(agencySelf, {id: id, increasePoint: 2000, remark: "test差旅省钱加积分"}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
             //console.log(result);
@@ -145,7 +145,7 @@ describe("api/client/staff.js", function() {
     })
 //减积分
     it("#decreaseStaffPoint should be ok", function(done) {
-        API.client.staff.decreaseStaffPoint.call(agencySelf, {id: id, decreasePoint: 1000, remark: "兑换礼品减积分"}, function(err, result) {
+        API.client.staff.decreaseStaffPoint.call(agencySelf, {id: id, decreasePoint: 1000, remark: "test兑换礼品减积分"}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
             //console.log(result);
@@ -158,6 +158,15 @@ describe("api/client/staff.js", function() {
             assert.equal(err, null);
             //console.log(err);
             //console.log(result);
+            done();
+        });
+    })
+//查询积分变动
+    it("#getStaffPointsChange should be ok", function(done) {
+        API.client.staff.getStaffPointsChange.call({accountId: id}, {staffId: id}, function(err, result) {
+            assert.equal(err, null);
+            //console.log(err);
+            console.log(result);
             done();
         });
     })

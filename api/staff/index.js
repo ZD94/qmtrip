@@ -280,7 +280,7 @@ staff.increaseStaffPoint = function(params) {
         .then(function(obj) {
             var totalPoints = obj.totalPoints + increasePoint;
             var balancePoints = obj.balancePoints + increasePoint;
-            var pointChange = {staffId: id, status: 1, points: increasePoint, remark: params.remark||"增加积分", operatorId: operatorId};
+            var pointChange = {staffId: id, status: 1, points: increasePoint, remark: params.remark||"增加积分", operatorId: operatorId, currentPoint: balancePoints};
             return sequelize.transaction(function(t) {
                 return Q.all([
                         staffModel.update({totalPoints: totalPoints, balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
@@ -316,7 +316,7 @@ staff.decreaseStaffPoint = function(params) {
                 throw {code: -3, msg: "积分不足"};
             }
             var balancePoints = obj.balancePoints - decreasePoint;
-            var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分", operatorId: operatorId}//此处也应该用model里的属性名封装obj
+            var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分", operatorId: operatorId, currentPoint: balancePoints}//此处也应该用model里的属性名封装obj
             return sequelize.transaction(function(t) {
                 return Q.all([
                         staffModel.update({balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
@@ -375,30 +375,35 @@ staff.listAndPaginatePointChange = function(params){
  * @param params.endTime  结束时间
  * @returns {*|Promise}
  */
-staff.getStaffPointsChange = function(params){
+staff.getStaffPointsChange = getStaffPointsChange;
+getStaffPointsChange.required_params = ['staffId'];
+function getStaffPointsChange(params){
     var staffId = params.staffId;
-    var startTime = params.startTime;
-    var endTime = params.endTime;
+    var startTime = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
+    var endTime = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
     var changeNum = 0;
-    if(!staffId){
-        throw {code: -1, msg: "staffId不能为空"};
-    }
-    if(!startTime){
-        throw {code: -1, msg: "startTime不能为空"};
-    }
-    if(!endTime){
-        throw {code: -1, msg: "endTime不能为空"};
-    }
     var options = {};
+    var changeDate = [];
+    var changePoint = [];
     options.where = {staffId: staffId, createAt: {$gte: startTime, $lte: endTime}};
-    return pointChangeModel.findAndCountAll(options)
+    return pointChangeModel.findAll(options)
         .then(function(result){
             if(result && result.length > 0){
                 for(var i=0;i<result.length;i++){
-                    changeNum = changeNum + (result[i].points * result.status)
+                    result[i] = result[i].toJSON();
+                    changePoint.push(result[i].currentPoint);
+                    changeDate.push(moment(result[i].createAt).format("YYYY-MM-DD HH:mm:ss"));
+                    /*if((i+1)!= result.length && moment(result[i].createAt).format("YYYY-MM-DD") != moment(result[i+1].toJSON().createAt).format("YYYY-MM-DD")){
+                        changePoint.push(result[i].currentPoint);
+                        changeDate.push(moment(result[i].createAt).format("YYYY-MM-DD"));
+                    }else if((i+1) == result.length){
+                        changePoint.push(result[i].currentPoint);
+                        changeDate.push(moment(result[i].createAt).format("YYYY-MM-DD"));
+                    }*/
+                    changeNum = changeNum + (result[i].points * result[i].status)
                 }
             }
-            return changeNum;
+            return {changeNum: changeNum, changeDate: changeDate, changePoint: changePoint};
         });
 }
 
