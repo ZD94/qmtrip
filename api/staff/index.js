@@ -109,13 +109,21 @@ staff.deleteStaff = function(params){
         .spread(function(num, rows){
             return API.company.getCompany({companyId:rows[0].companyId})
                 .then(function(company){
-                    return API.mail.sendMailRequest({toEmails: rows[0].email, templateName: "qm_notify_remove_staff", values: [utils.now(),company.name]})
-                        .then(function() {
-                            if(num != 1){
-                                throw {code: -2, msg: '删除失败'};
-                            }
-                            return true;
-                        });
+                    var vals = {
+                        time: utils.now(),
+                        companyName: company.name
+                    }
+                    return API.mail.sendMailRequest({
+                            toEmails: rows[0].email,
+                            templateName: "qm_notify_remove_staff",
+                            values: vals
+                    })
+                    .then(function() {
+                        if(num != 1){
+                            throw {code: -2, msg: '删除失败'};
+                        }
+                        return true;
+                    });
                 })
 
         })
