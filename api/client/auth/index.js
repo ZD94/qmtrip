@@ -354,6 +354,8 @@ auth.resetPwdByOldPwd = function(params) {
 }
 
 /**
+ * @method getQRCodeUrl
+ *
  * 获取二维码登录链接
  *
  * @param {Object} params
