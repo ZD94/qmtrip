@@ -470,7 +470,7 @@ function approveInvoice(params){
             if(consume.status == 1){
                 throw {code: -3, msg: '该票据已审核通过，不能重复审核'};
             }
-            return PlanOrder.findById(consume.orderId, {attributes: ['id', 'expenditure', 'status', 'budget']})
+            return PlanOrder.findById(consume.orderId, {attributes: ['id', 'expenditure', 'status', 'budget', 'auditStatus']})
                 .then(function(order){
                     if(!order || order.status == -2){
                         throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST
@@ -630,9 +630,14 @@ tripPlan.getProjects = function(params){
     return PlanOrder.findAll({where: {companyId: params.companyId}, group: ['description'], attributes: ['description']})
 }
 
-tripPlan.commitTripPlanOrder = function(params){
-    var required_params = ['orderId', 'accountId'];
-    utils.requiredParams(params, required_params);
+/**
+ * 提交计划单
+ * @param params
+ * @returns {*}
+ */
+tripPlan.commitTripPlanOrder = commitTripPlanOrder;
+commitTripPlanOrder.required_params = ['orderId', 'accountId'];
+function commitTripPlanOrder(params){
     var id = params.orderId;
     return Q.all([
         PlanOrder.findById(id, {attributes: ['status', 'auditStatus', 'accountId']}),
@@ -646,34 +651,28 @@ tripPlan.commitTripPlanOrder = function(params){
                 throw L.ERR.PERMISSION_DENY;
             }
             if(order.status == -1){
-                throw {code: -3, msg: '订单已失效，不能提交'};
+                throw {code: -3, msg: '计划单已失效，不能提交'};
             }
             if(order.status == 1){
-                throw {code: -4, msg: '该订单已提交，不能重复提交'};
+                throw {code: -4, msg: '该计划单已提交，不能重复提交'};
             }
             if(order.status > 1 || order.auditStatus == 1){
-                throw {code: -5, msg: '该订单已经审核通过，不能提交'};
+                throw {code: -5, msg: '该计划单已经审核通过，不能提交'};
             }
             if(list.length <= 0){
-                throw {code: -6, msg: '该订单没有票据提交'};
+                throw {code: -6, msg: '该计划单没有票据提交'};
             }
-            console.info("###################################");
             for(var i=0; i<list.length; i++){
                 var s = list[i];
-                console.info(list.length);
-                console.info(s.status);
-                console.info(s.newInvoice);
                 if(s.status != 0 || !s.newInvoice){
                     throw {code: -7, msg: '票据没有上传完'};
                 }
             }
-            console.info("###################################");
         })
         .then(function(){
             return PlanOrder.update({status: 1, auditStatus: 0, updateAt: utils.now()}, {where: {id: id}, fields: ['status', 'auditStatus', 'updateAt']})
         })
         .then(function(){
-            console.info("^^^^^^^^^^^^^^^^^^^^^^^^^^^");
             return true;
         })
 }

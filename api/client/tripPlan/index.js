@@ -356,7 +356,7 @@ tripPlan.commitTripPlanOrder = function(orderId){
         throw {code: -1, msg: '参数不正确'};
     }
     var self = this;
-    return API.tripPlan.commitTripPlanOrder({id: orderId, accountId: self.accountId})
+    return API.tripPlan.commitTripPlanOrder({orderId: orderId, accountId: self.accountId})
 }
 
 module.exports = tripPlan;
