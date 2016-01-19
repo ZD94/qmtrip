@@ -12,6 +12,7 @@ var validate = require("../../common/validate");
 var md5 = require("../../common/utils").md5;
 var getRndStr = require("../../common/utils").getRndStr;
 var C = require("../../config");
+var QRCODE_LOGIN_URL = '/auth/qrcode-login';
 var moment = require("moment");
 var API = require("../../common/api");
 var utils = require("common/utils");
@@ -738,5 +739,163 @@ authServer.resetPwdByOldPwd = function(params) {
             return true;
         });
 };
+
+/**
+ * 二维码扫描登录接口
+ *
+ * @param {Object} params 参数
+ * @param {UUID} params.accountId 账号ID
+ * @param {String} params.sign签名信息
+ * @param {String} params.timestamp 失效时间戳
+ * @return {Promise}
+ */
+authServer.qrCodeLogin = function(params) {
+    var accountId = params.accountId;
+    var sign = params.sign;
+    var timestamp = params.timestamp;
+    var backUrl = params.backUrl;   //登录后返回地址
+    return Q()
+    .then(function() {
+        if (!params) {
+            throw L.ERR.DATA_FORMAT_ERROR;
+        }
+
+        if (!accountId) {
+            throw L.ERR.ACCOUNT_NOT_EXIST;
+        }
+
+        if (!sign) {
+            throw L.ERR.SIGN_ERROR;
+        }
+
+        if (!timestamp) {
+            throw L.ERR.TIMESTAMP_TIMEOUT;
+        }
+
+        if (timestamp < Date.now()) {
+            throw L.ERR.TIMESTAMP_TIMEOUT;
+        }
+
+        return Models.Account.findById(accountId)
+    })
+    .then(function(account) {
+        if (!account) {
+            throw L.ERR.ACCOUNT_NOT_EXIST;
+        }
+
+        if (!account.qrcodeToken) {
+            throw L.ERR.SIGN_ERROR;
+        }
+
+        var data = {
+            key: account.qrcodeToken,
+            timestamp: timestamp,
+            accountId: account.id,
+            backUrl: backUrl
+        };
+        var sysSign = cryptoData(data);
+        if (sysSign.toLowerCase() != sign.toLowerCase()) {
+            throw L.ERR.SIGN_ERROR;
+        }
+        return makeAuthenticateSign(account.id, 'wx');
+    });
+}
+
+/**
+ * 获取二维码中展示链接
+ *
+ * @param {Object} params 参数
+ * @param {String} params.accountId 账号ID
+ * @param {String} params.backUrl
+ */
+authServer.getQRCodeUrl = function(params) {
+    var accountId = params.accountId;
+    var backUrl = params.backUrl;
+
+    return Q()
+    .then(function(){
+        if (!params) {
+            throw L.ERR.DATA_FORMAT_ERROR;
+        }
+
+        if (!accountId) {
+            throw L.ERR.ACCOUNT_NOT_EXIST;
+        }
+
+        if (!backUrl) {
+            throw {code: -1, msg: "跳转链接不存在"};
+        }
+
+        return API.shorturl.long2short({longurl: backUrl})
+    })
+    .then(function(shortUrl) {
+        backUrl = shortUrl;
+        return Models.Account.findById(accountId)
+    })
+    .then(function(account) {
+        if (!account) {
+            throw L.ERR.ACCOUNT_NOT_EXIST;
+        }
+
+        var qrcodeToken = getRndStr(8);
+        account.qrcodeToken = qrcodeToken;
+        return account.save();
+    })
+    .then(function(account) {
+        var timestamp = Date.now() + 1000 * 150;
+        var data = {accountId: account.id, timestamp: timestamp, key: account.qrcodeToken, backUrl: backUrl};
+        var sign = cryptoData(data);
+        var urlParams = {accountId: account.id, timestamp: timestamp, sign: sign, backUrl: backUrl};
+        urlParams = combineData(urlParams);
+        return C.host + QRCODE_LOGIN_URL +"?"+urlParams;
+    })
+}
+
+//拼接字符串
+function combineData(obj) {
+    if (typeof obj != 'object') {
+        throw new Error("combineStr params must be object");
+    }
+
+    var strs = [];
+    for(var key in obj) {
+        strs.push(key+"="+obj[key]);
+    }
+    strs.sort();
+    strs = strs.join("&");
+    return strs;
+}
+
+//加密对象
+function cryptoData(obj) {
+    if (typeof obj == 'string') {
+        return md5(obj);
+    }
+
+    var strs = combineData(obj);
+    return md5(strs);
+}
+
+authServer.__initHttpApp = function(app) {
+    app.all("/auth/qrcode-login", function(req, res, next) {
+        var accountId = req.query.accountId;
+        var timestamp = req.query.timestamp;
+        var sign = req.query.sign;
+        var backUrl = req.query.backUrl;
+
+        authServer.qrCodeLogin({accountId: accountId, sign: sign, timestamp: timestamp, backUrl: backUrl})
+        .then(function(result) {
+            res.cookie("token_id", result.token_id);
+            res.cookie("user_id", result.user_id);
+            res.cookie("timestamp", result.timestamp);
+            res.cookie("sign", result.sign);
+            res.redirect(backUrl);
+        })
+        .catch(function(err) {
+            console.info(err);
+            res.send("链接已经失效或者不存在");
+        })
+    });
+}
 
 module.exports = authServer;

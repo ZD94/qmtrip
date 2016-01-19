@@ -25,14 +25,14 @@
             <!--<span>设置公司组织架构</span>-->
         </div>
         <div class="staff_function">
-            <i>目前共{{totalCount}}名员工</i>
-            <span>待激活{{forActive}}名|管理员{{manager+1}}名|普通员工{{publicStaff}}名</span>
+            <i style="font-size: 16px;">目前共{{totalCount}}名员工</i>
+            <span>待激活{{forActive}}名&nbsp;|&nbsp;管理员{{manager+1}}名&nbsp;|&nbsp;普通员工{{publicStaff}}名</span>
             <a ng-click="addStaff()" id="add">添加员工</a>
             <a id="add_lot" ng-click="addALotStaff()">批量导入</a>
         </div>
         <div class="add_staff">
             <div class="little_triangle">
-
+                <img src="corp/images/sanjiao-staff.png">
             </div>
             <div class="add_staff_block">
                 <div class="block_tip">
@@ -66,7 +66,6 @@
                             <select name="select" id="staffPower" class="" ng-disabled="roleId == 2">
                                 <option value="">请设置权限</option>
                                 <option value="2">管理员</option>
-                                <option value="3">财务人员</option>
                                 <option value="1" ng-selected="roleId == 2">普通员工</option>
                             </select>
                         </li>
@@ -102,11 +101,12 @@
             <li><!--<span ng-if="item.department == null">暂未设置</span>--><span>{{item.department || '我的企业'}}</span></li>
             <li><span>{{item.travelLeverName}}</span></li>
             <li><span ng-if="item.roleId == 0">创建者</span><span ng-if="item.roleId == 1">普通员工</span><span ng-if="item.roleId == 2">管理员</span><span ng-if="item.roleId == 3">财务人员</span></li>
-            <li><a ng-if="!((item.roleId == 2 || item.roleId == 0) && roleId == 2 && currentStaff.id != item.id)"><span ng-click="editStaffInfo($index)" id="change">修改</span></a>
-                <a ng-if="item.roleId != 0 && !(item.roleId == 2 && roleId == 2)">&nbsp;|&nbsp;<span ng-click="deleteInfoShow(item.id, item.name)">删除</span></a></li>
+            <li><a ng-if="!((item.roleId == 2 || item.roleId == 0) && roleId == 2 && currentStaff.id != item.id)"><span ng-click="editStaffInfo(item.id)" id="change">修改</span></a>
+                <a ng-if="item.roleId != 0 && !(item.roleId == 2 && roleId == 2)"><span style="color:#dedede;">|</span>&nbsp;<span ng-click="deleteInfoShow(item.id, item.name)">删除</span></a></li>
             <li class="orange">{{item.accStatus}}</li>
             <div class="add_staff2">
                 <div class="little_triangle2">
+                    <img src="corp/images/sanjiao-staff.png">
                 </div>
                 <div class="add_staff_block2">
                     <div class="block_tip2">
@@ -143,7 +143,7 @@
                                 <select name="select" id="staffPower{{$index}}" class="" ng-disabled="item.roleId == 0 || roleId == 2">
                                     <option value="">请设置权限</option>
                                     <option value="2" ng-selected="item.roleId == 2">管理员</option>
-                                    <option value="3" ng-selected="item.roleId == 3">财务人员</option>
+                                    <!--<option value="3" ng-selected="item.roleId == 3">财务人员</option>-->
                                     <option value="1" ng-selected="item.roleId == 1">普通员工</option>
                                     <option value="0" ng-if="item.roleId == 0" ng-selected="item.roleId == 0">创建者</option>
                                 </select>
@@ -220,7 +220,7 @@
                 手机：员工手机号</br>
                 邮箱：员工企业邮箱，用于员工登录账号</br>
                 所属部门：员工所属部门名称；建议先进行公司组织架构设置 <span>若未设置组织架构，则员工默认归属我的企业</span></br>
-                差旅政策：员工对应的差旅政策等级；建议先进行公司<a href="#/TravelPolicy/PolicyList">差旅政策设置</a> <span>若未设置公司差旅标准，则员工默认无差旅标准</span>
+                差旅政策：员工对应的差旅政策等级；建议先进行公司<a href="#/TravelPolicy/PolicyList">差旅政策设置</a> <span>若未设置公司差旅标准，则员工默认为系统默认差旅标准</span>
             </p>
             <p class="p_title">
                 3、请使用GB系列编码保存文件
@@ -236,7 +236,7 @@
                 <span ng-click="backToImport()">返回</span>
             </div>
             <p>
-                导入总数为：<span>{{validData + invalidData}}</span>，有效数为：<span>{{validData}}</span>，无效数为：<span style="color: #de492a;">{{invalidData}}</span>
+                导入总数为：<span>{{validData + invalidData}}</span>，有效数为：<span>{{validData}}</span>，无效数为：<span style="color: #f56d23;">{{invalidData}}</span>
             </p>
         </div>
         <div class="staff_no_valid">
