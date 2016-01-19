@@ -1,3 +1,10 @@
+<style>
+    .illegal{
+        color: red;
+    }
+
+</style>
+
 <div class="staffManageContent">
     <div class="staff_tab">
         <ul>
@@ -247,11 +254,11 @@
                 <li>原因</li>
             </ul>
             <ul class="preview_data" ng-repeat="item in invalid track by $index" >
-                <li>{{item.name}}</li>
-                <li>{{item.email}}</li>
-                <li>{{item.mobile}}</li>
-                <li>{{item.department}}</li>
-                <li>{{item.travelLevelName}}</li>
+                <li ng-class="item.reason.indexOf('姓名')!=-1 ? 'illegal':''">{{item.name || '------'}}</li>
+                <li ng-class="item.reason.indexOf('邮箱')!=-1 ? 'illegal':''">{{item.email || '------'}}</li>
+                <li ng-class="item.reason.indexOf('手机')!=-1 ? 'illegal':''">{{item.mobile || '------'}}</li>
+                <li ng-class="item.reason.indexOf('部门')!=-1 ? 'illegal':''">{{item.department || '------'}}</li>
+                <li ng-class="item.reason.indexOf('差旅标准')!=-1 ? 'illegal':''">{{item.travelLevelName || '------'}}</li>
                 <li class="special">{{item.reason}}</li>
             </ul>
         </div>
