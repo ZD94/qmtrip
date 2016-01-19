@@ -347,4 +347,16 @@ tripPlan.getProjectsList = function(){
         })
 }
 
+/**
+ * 用户提交订单(上传完票据后，提交订单后不可修改)
+ * @param orderId
+ */
+tripPlan.commitTripPlanOrder = function(orderId){
+    if(!orderId || typeof orderId == 'function'){
+        throw {code: -1, msg: '参数不正确'};
+    }
+    var self = this;
+    return API.tripPlan.commitTripPlanOrder({orderId: orderId, accountId: self.accountId})
+}
+
 module.exports = tripPlan;

@@ -758,6 +758,21 @@ var auth=(function(){
         }
     }
 
+    auth.QrcodeLoginController = function($scope) {
+        var backUrl = "http://localhost:4002/staff.html";
+        API.require("auth");
+        API.onload(function() {
+            API.auth.getQRCodeUrl({backUrl: backUrl})
+                .then(function(content) {
+                    new QRCode(document.getElementById("qrcode"), content);
+                })
+                .catch(function(err) {
+                    alert(err);
+                })
+                .done();
+        })
+    }
+
     return auth;
 })();
 
