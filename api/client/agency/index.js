@@ -11,6 +11,7 @@ var API = require('common/api');
 var utils = require("common/utils");
 var L = require("common/language");
 var _ = require('lodash');
+var checkAgencyPermission = require('../auth').checkAgencyPermission;
 
 /**
  * @class agency 代理商
@@ -33,11 +34,9 @@ var agency = {}
  */
 agency.registerAgency = registerAgency;
 registerAgency.required_params = ['name', 'email', 'mobile', 'userName'];
-registerAgency.accepted_params = _.union(registerAgency.required_params, ['description', 'remark']);
+registerAgency.optional_params = ['description', 'remark'];
 function registerAgency(params){
-    utils.requiredParams(params, registerAgency.required_params);
-    var agency = _.pick(params, registerAgency.accepted_params);
-    return API.agency.registerAgency(agency);
+    return API.agency.registerAgency(params);
 }
 
 /**
@@ -49,12 +48,9 @@ function registerAgency(params){
  */
 agency.updateAgency = updateAgency;
 updateAgency.required_params = ['agencyId'];
-updateAgency.accepted_params = _.union(updateAgency.required_params,
-    ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark']);
+updateAgency.optional_params = ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark'];
 function updateAgency(params){
     var self = this;
-    utils.requiredParams(params, updateAgency.required_params);
-    params = _.pick(params, updateAgency.accepted_params);
     params.userId = self.accountId;
     return API.agency.updateAgency(params);
 }
@@ -102,14 +98,15 @@ agency.deleteAgency = function(agencyId){
 
 /**************** 代理商用户相关 ****************/
 
-agency.createAgencyUser = function(agencyUser){
+agency.createAgencyUser = checkAgencyPermission("user.add",
+    function(agencyUser){
     var self = this;
     return API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']})
         .then(function(user){
             agencyUser.agencyId = user.agencyId;
             return API.agency.createAgencyUser(agencyUser)
         })
-};
+});
 
 /**
  * 获取当前代理商用户
@@ -126,7 +123,8 @@ agency.getCurrentAgencyUser = function(){
  * @param userId
  * @returns {*}
  */
-agency.deleteAgencyUser = function(agencyUserId){
+agency.deleteAgencyUser = checkAgencyPermission("user.delete",
+    function(agencyUserId){
     var self = this;
     var accountId = self.accountId;
     return Q.all([
@@ -139,7 +137,7 @@ agency.deleteAgencyUser = function(agencyUserId){
             }
             return API.agency.deleteAgencyUser({id: agencyUserId});
         })
-}
+});
 
 /**
  * 更新代理商用户
@@ -147,13 +145,10 @@ agency.deleteAgencyUser = function(agencyUserId){
  * @returns {*}
  */
 
-agency.updateAgencyUser = updateAgencyUser;
+agency.updateAgencyUser = checkAgencyPermission("user.edit", updateAgencyUser);
 updateAgencyUser.required_params = ['id'];
-updateAgencyUser.accepted_params = _.union(updateAgencyUser.required_params,
-    ['status', 'name', 'sex', 'email', 'mobile', 'avatar', 'roleId']);
+updateAgencyUser.optional_params = ['status', 'name', 'sex', 'email', 'mobile', 'avatar', 'roleId'];
 function updateAgencyUser(params) {
-    utils.requiredParams(params, updateAgencyUser.required_params);
-    params = _.pick(params, updateAgencyUser.accepted_params);
     var self = this;
     var accountId = self.accountId;
     var id = params.id;

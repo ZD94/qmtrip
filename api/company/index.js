@@ -59,10 +59,9 @@ company.domainIsExist = function(params) {
  */
 company.createCompany = createCompany;
 createCompany.required_params = ['createUser', 'name', 'domainName', 'mobile', 'email'];
-createCompany.accepted_params = _.union(createCompany.required_params, ['id', 'agencyId', 'description', 'telephone', 'remark']);
+createCompany.optional_params = ['id', 'agencyId', 'description', 'telephone', 'remark'];
 function createCompany(params){
-    utils.requiredParams(params, createCompany.required_params);
-    var _company = _.pick(params, createCompany.accepted_params);
+    var _company = params;
     if(!_company.id){
         _company.id = uuid.v1();
     }
@@ -112,14 +111,10 @@ company.isBlackDomain = function(params) {
  * @param params
  * @returns {*}
  */
-var updateCompany_required_params = ['companyId'];
-var updateCompany_optional_params = _(Company.attributes).keys()
-                                    .difference(['companyNo', 'createUser', 'createAt'])
-                                    .union(updateCompany_required_params)
-                                    .value();
-company.updateCompany = function(params){
-    utils.requiredParams(params, updateCompany_required_params);
-    params = _.pick(params, updateCompany_optional_params);
+company.updateCompany = updateCompany;
+updateCompany.required_params = ['companyId'];
+updateCompany.optional_params = _.difference(_.keys(Company.attributes), ['companyNo', 'createUser', 'createAt']);
+function updateCompany(params){
     var companyId = params.companyId;
     return Company.findById(companyId, {attributes: ['createUser']})
         .then(function(company){
@@ -167,16 +162,18 @@ company.getCompany = function(params){
  * @param params
  * @returns {*}
  */
-company.listCompany = function(params){
-    var required_params = ['agencyId'];
-    utils.requiredParams(params, required_params);
-    var query = _.pick(params, required_params);
+company.listCompany = listCompany;
+listCompany.required_params = ['agencyId'];
+listCompany.optional_params = ['columns'];
+function listCompany(params){
+    var query = params;
     var agencyId = query.agencyId;
     var options = {
         where: {agencyId: agencyId, status: {$ne: -2}}
     };
-    if(params.columns){
-        options.attributes =  params.columns;
+    if(query.columns){
+        options.attributes =  query.columns;
+        delete query.columns;
     }
     options.order = [['create_at', 'desc']];
     return Company.findAll(options);
@@ -202,10 +199,9 @@ company.pageCompany = function(options){
  * @param params
  * @returns {*}
  */
-company.deleteCompany = function(params){
-    var required_params = ['companyId', 'userId'];
-    utils.requiredParams(params, required_params);
-    var params = _.pick(params, required_params);
+company.deleteCompany = deleteCompany;
+deleteCompany.required_params = ['companyId', 'userId'];
+function deleteCompany(params){
     var companyId = params.companyId;
     var userId = params.userId;
     return Company.findById(companyId, {attributes: ['createUser']})
@@ -235,10 +231,9 @@ company.deleteCompany = function(params){
  * @param params
  * @returns {*}
  */
-company.getCompanyFundsAccount = function(params){
-    var required_params = ['companyId', 'userId'];
-    utils.requiredParams(params, required_params);
-    var params = _.pick(params, required_params);
+company.getCompanyFundsAccount = getCompanyFundsAccount;
+getCompanyFundsAccount.required_params = ['companyId', 'userId'];
+function getCompanyFundsAccount(params){
     var companyId = params.companyId;
     var userId = params.userId;
     return FundsAccounts.findById(companyId, {
@@ -258,10 +253,9 @@ company.getCompanyFundsAccount = function(params){
  * @param params.type -2: 冻结账户资金 -1： 账户余额减少 1：账户余额增加 2：解除账户冻结金额
  * @returns {*}
  */
-company.moneyChange = function(params){
-    var required_params = ['money', 'channel', 'userId', 'type', 'companyId', 'remark'];
-    utils.requiredParams(params, required_params);
-    var params = _.pick(params, required_params);
+company.moneyChange = moneyChange;
+moneyChange.required_params = ['money', 'channel', 'userId', 'type', 'companyId', 'remark'];
+function moneyChange(params){
     var id = params.companyId;
     return FundsAccounts.findById(id)
         .then(function(funds){

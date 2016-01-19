@@ -131,7 +131,6 @@ var UsersFirst = (function(){
 				        {
 				            type: 'bar',
 				            barWidth:'60',
-				            barCategoryGap:'5',
 				            itemStyle: {
 				                normal: {
 				                    color: function(params) {
