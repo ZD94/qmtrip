@@ -345,4 +345,32 @@ agencyTripPlan.statPlanOrderMoneyByAgency = function (params) {
         })
 }
 
+agencyTripPlan.editTripPlanBudget = editTripPlanBudget;
+editTripPlanBudget.required_params = ['consumeId', 'budget'];
+function editTripPlanBudget(params){
+    var self = this;
+    var accountId = self.accountId;
+    var consumeId = params.consumeId;
+    return Q.all([
+        API.agency.getAgencyUser({id: accountId, columns: ['agencyId']}),
+        API.tripPlan.getConsumeDetail({consumeId: consumeId, columns: ['accountId']})
+    ])
+        .spread(function(user, detail){
+            return [user.agencyId, API.staff.getStaff({id: detail.accountId, columns: ['companyId']})]
+        })
+        .spread(function(agencyId, staff){
+            return [agencyId, API.company.getCompany({companyId: staff.companyId, columns: ['agencyId']})]
+        })
+        .spread(function(agencyId, c){
+            if(agencyId != c.agencyId){
+                throw L.ERR.PERMISSION_DENY;
+            }
+        })
+        .then(function(){
+            var updates = {id: consumeId, budget: params.budget};
+            if(params.remark){ updates.remark = params.remark; }
+            return API.tripPlan.updateConsumeBudget(updates)
+        })
+}
+
 module.exports = agencyTripPlan;
