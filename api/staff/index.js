@@ -289,6 +289,9 @@ staff.increaseStaffPoint = function(params) {
             var totalPoints = obj.totalPoints + increasePoint;
             var balancePoints = obj.balancePoints + increasePoint;
             var pointChange = {staffId: id, status: 1, points: increasePoint, remark: params.remark||"增加积分", operatorId: operatorId, currentPoint: balancePoints};
+            if(params.orderId){
+                pointChange.orderId = params.orderId;
+            }
             return sequelize.transaction(function(t) {
                 return Q.all([
                         staffModel.update({totalPoints: totalPoints, balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
