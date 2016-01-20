@@ -132,7 +132,7 @@
                                 <p ng-if="item.status!=0">{{item.approve_at}}　<span ng-if="item.status=='-1'">审核未通过　　理由：{{item.remark}}　　操作人：{{outTraffic.auditName.name}}</span><span ng-if="item.status==1">审核通过</span></p>
                             </div>
                         </td>
-                        <td valign="bottom">
+                        <td width="250" valign="bottom">
                             <div ng-if="outTraffic.status==0">
                                     <input type="button" class="common_btn1 w100" value="审核未通过" ng-click="invoiceNopassShow('outTraffic')" style="float: right;">
                                     <input type="button" class="common_btn1 w100" value="审核通过" ng-click="invoicePassShow('outTraffic')" style="margin-right: 20px; float: right;">
@@ -161,7 +161,7 @@
                                 <p ng-if="item.status!=0">{{item.approve_at}}　<span ng-if="item.status=='-1'">审核未通过　　理由：{{item.remark}}　　操作人：{{hotel.auditName.name}}</span><span ng-if="item.status==1">审核通过</span></p>
                             </div>
                         </td>
-                        <td valign="bottom">
+                        <td width="250" valign="bottom">
                             <div ng-if="hotel.status==0">
                                 <input type="button" class="common_btn1 w100" value="审核未通过" ng-click="invoiceNopassShow('hotel')" style="float: right;">
                                 <input type="button" class="common_btn1 w100" value="审核通过" ng-click="invoicePassShow('hotel')" style="margin-right: 20px; float: right;">
@@ -190,7 +190,7 @@
                                 <p ng-if="item.status!=0">{{item.approve_at}}　<span ng-if="item.status=='-1'">审核未通过　　理由：{{item.remark}}　　操作人：{{backTraffic.auditName.name}}</span><span ng-if="item.status==1">审核通过</span></p>
                             </div>
                         </td>
-                        <td valign="bottom">
+                        <td width="250" valign="bottom">
                             <div ng-if="backTraffic.status==0">
                                 <input type="button" class="common_btn1 w100" value="审核未通过" ng-click="invoiceNopassShow('backTraffic')" style="float: right;">
                                 <input type="button" class="common_btn1 w100" value="审核通过" ng-click="invoicePassShow('backTraffic')" style="margin-right: 20px; float: right;">
