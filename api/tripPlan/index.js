@@ -132,6 +132,23 @@ function getTripPlanOrder(params){
         })
 }
 
+tripPlan.getConsumeDetail = getConsumeDetail;
+getConsumeDetail.required_params = ['consumeId'];
+getConsumeDetail.optional_params = ['columns'];
+function getConsumeDetail(params){
+    var options = {}
+    if(params.columns){
+        options.attributes = _.pick(params.columns, ConsumeDetailsCols);
+    }
+    return ConsumeDetails.findById(params.consumeId, options)
+        .then(function(detail){
+            if(!detail || detail.status == -2){
+                throw {code: -2, msg: '消费记录不存在'};
+            }
+            return detail;
+        })
+}
+
 /**
  * 更新计划单/预算单信息
  * @param params
@@ -165,7 +182,7 @@ function updateTripPlanOrder(params){
                     ]);
             })
         })
-        .spread(function(update, create){
+        .spread(function(update){
             return update;
         })
         .spread(function(rownum, rows){
@@ -185,9 +202,42 @@ function updateConsumeDetail(params){
     return ConsumeDetails.findById(params.id, {attributes: ['status']})
         .then(function(record){
             if(!record || record.status == -2){
-                throw {code: -2, msg: '记录不存在'};
+                throw {code: -2, msg: '票据不存在'};
+            }
+            if(record.status == 1){
+                throw {code: -3, msg: '该票据已经审核通过，不能修改'};
             }
             return ConsumeDetails.update(updates, {returning: true, where: {id: params.id}, fields: Object.keys(updates)});
+        })
+}
+
+tripPlan.updateConsumeBudget = updateConsumeBudget;
+updateConsumeBudget.required_params = ['id', 'budget'];
+function updateConsumeBudget(params){
+    var id = params.id;
+    return ConsumeDetails.findById(id, {attributes: ['status', 'budget', 'orderId']})
+        .then(function(ret){
+            if(!ret ||ret.status == -2){
+                throw {code: -2, msg: '票据不存在'};
+            }
+            if(ret.status == 1){
+                throw {code: -3, msg: '该票据已经审核通过，不能修改'};
+            }
+            return [ret.budget, PlanOrder.findById(ret.orderId, {attributes: ['id', 'budget', 'status']})];
+        })
+        .spread(function(o_budget, order){
+            var budget = params.budget;
+            var c_budget = parseFloat(order.budget) - parseFloat(o_budget) + parseFloat(budget);
+            //return [budget, c_budget, order.id, sequelize.transaction()]
+            return sequelize.transaction(function(t){
+                return Q.all([
+                    PlanOrder.update({budget: c_budget, updateAt: utils.now()}, {where: {id: order.id}, fields: ['budget', 'updateAt'], transaction: t}),
+                    ConsumeDetails.update({budget: budget, updateAt: utils.now()}, {where: {id: id}, fields: ['budget', 'updateAt'], transaction: t})
+                ])
+            })
+        })
+        .then(function(){
+            return true;
         })
 }
 
@@ -379,24 +429,6 @@ function uploadInvoice(params){
         })
 }
 
-/**
- * 查询计划单消费记录
- * @param params
- * @returns {*}
- */
-tripPlan.getConsumeDetail = function(params){
-    if(!params.consumeId){
-        throw {code: -1, msg: '参数 consumeId 不能为空'};
-    }
-    var consumeId = params.consumeId;
-    return ConsumeDetails.findById(consumeId)
-        .then(function(consumeDetail){
-            if(!consumeDetail || consumeDetail.status == -2){
-                throw {code: -4, msg: '查询记录不存在'};
-            }
-            return consumeDetail;
-        })
-}
 
 /**
  * 判断某用户是否有访问该消费记录票据权限
@@ -473,7 +505,7 @@ function approveInvoice(params){
             return PlanOrder.findById(consume.orderId, {attributes: ['id', 'expenditure', 'status', 'budget', 'auditStatus']})
                 .then(function(order){
                     if(!order || order.status == -2){
-                        throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST
+                        throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
                     }
                     if(order.status != 1 || order.auditStatus != 0){
                         throw {code: -3, msg: '该订单未提交，不能审核'};
