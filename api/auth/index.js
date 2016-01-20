@@ -169,12 +169,19 @@ authServer.sendResetPwdEmail = function(params) {
             var sign = makeActiveSign(account.pwdToken, account.id, timestamp);
             var url = C.host + "/staff.html#/auth/reset-pwd?accountId="+account.id+"&timestamp="+timestamp+"&sign="+sign;
             var templateName;
+            var vals = {
+                username: account.email,
+                time: timeStr,
+                url: url,
+                companyName: companyName
+            };
+
             if (isFirstSet) {
                 templateName = 'qm_first_set_pwd_email';
-                return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: [companyName, timeStr, url]});
+                return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
             } else {
                 templateName = 'qm_reset_pwd_email';
-                return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: [account.email, timeStr, url, url]});
+                return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
             }
         })
         .then(function() {
@@ -635,7 +642,8 @@ function _sendActiveEmail(accountId) {
             var sign = makeActiveSign(activeToken, account.id, expireAt);
             var url = C.host + "/staff.html#/auth/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
             //发送激活邮件
-            return API.mail.sendMailRequest({toEmails: account.email, templateName: "qm_active_email", values: [account.email, url]})
+            var vals = {username: account.email, url: url};
+            return API.mail.sendMailRequest({toEmails: account.email, templateName: "qm_active_email", values: vals})
                 .then(function() {
                     account.activeToken = activeToken;
                     return Models.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
