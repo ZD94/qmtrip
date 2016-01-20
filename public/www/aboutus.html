@@ -209,7 +209,12 @@
 //        var three = $('.map').height();
         $(window).scroll(function (){
             var scrollTop = $(window).scrollTop();
-                $(".left_nav").css("top",scrollTop+150);
+//                $(".left_nav").css("top",scrollTop+150);
+                if(scrollTop>1902){
+                    $(".left_nav").css("top",1902+150);
+                }else{
+                    $(".left_nav").css("top",scrollTop+150);
+                }
                 if(scrollTop <one){
                     $('.left_nav>ul>li:nth-child(1)').addClass("on").siblings().removeClass("on");
                 }
