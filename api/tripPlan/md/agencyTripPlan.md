@@ -88,7 +88,7 @@
 | params                                | 参数             |json              |------
 | params.consumeId                         |出差消费详情id            |uuid                 |必填
 | params.budget                         |新的预算            |integer                |必填
-| params.remark                         |审核备注              |integer                |选填
+| params.remark                         |备注              |string                |选填
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |

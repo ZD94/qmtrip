@@ -242,7 +242,6 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                         values: vals
                     })
                 }
-                //"%s,您好<br/>您有1张%s票据被审核通过，实际支出为%s，关联出差记录如下：<br/>项目名称:%s<br/>出差时间：%s<br/>去程交通:%s<br/>回程交通:%s<br/>住宿:%s<br/>总计：%s<br/><a href="%s">点击此处查看出差详情</a>"
                 if(params.status == 1){
                     var vals = {
                         username: staffName,

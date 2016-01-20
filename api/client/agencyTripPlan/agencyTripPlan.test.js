@@ -221,13 +221,22 @@ describe("api/client/agencyTripPlan.js", function() {
         })
     });
 
-    it("#editTripPlanBudget", function(done) {
+    it("#editTripPlanBudget should be ok", function(done) {
         var self = {accountId: agencyUserId};
         API.client.agencyTripPlan.editTripPlanBudget.call(self, {consumeId: consumeId, budget: '3333'}, function(err, ret){
             if (err) {
                 throw err;
             }
             assert.equal(ret, true);
+            done();
+        })
+    });
+
+    it("#editTripPlanBudget should be error if params.budget is null", function(done) {
+        var self = {accountId: agencyUserId};
+        API.client.agencyTripPlan.editTripPlanBudget.call(self, {consumeId: consumeId}, function(err, ret){
+            assert.equal(err.code, -1);
+            assert.equal(ret, null);
             done();
         })
     });
