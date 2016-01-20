@@ -859,6 +859,43 @@ authServer.getQRCodeUrl = function(params) {
     })
 }
 
+/**
+ * @method isEmailUserd
+ *
+ * 邮箱是否被使用
+ *
+ * @param {Object} params
+ * @param {String} params.email 邮箱
+ * @param {Integer} [params.type] 1.企业  2.代理商 默认 1
+ * @reutnr {Promise} true 使用 false未使用
+ */
+authServer.isEmailUsed = function(params) {
+    if (!params) {
+        params = {};
+    }
+    var email = params.email;
+    var type = params.type;
+
+    return Q()
+    .then(function() {
+        if (!validate.isEmail(email)) {
+            throw L.ERR.EMAIL_FORMAT_INVALID;
+        }
+
+        if (type !== 1 && type !== 2) {
+            type = 1;
+        }
+
+        return Models.Account.findOne({where: {email: email, type: type}})
+    })
+    .then(function(account) {
+        if (account) {
+            return true;
+        }
+        return false;
+    })
+}
+
 //拼接字符串
 function combineData(obj) {
     if (typeof obj != 'object') {
