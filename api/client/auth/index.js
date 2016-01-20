@@ -373,4 +373,15 @@ auth.getQRCodeUrl = function(params) {
     return API.auth.getQRCodeUrl({accountId: accountId, backUrl: backUrl});
 }
 
+/**
+ * @method isEmailUsed
+ *
+ * 邮箱是否被使用
+ * @param {Object} params
+ * @param {String} params.email 邮箱
+ * @param {Integer} [params.type] 1.企业 2.代理商  默认是1
+ * @return {Promise} true 使用  false未使用
+ */
+auth.isEmailUsed = API.auth.isEmailUsed;
+
 module.exports = auth;
