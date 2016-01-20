@@ -5,9 +5,9 @@
             <tr>
                 <td height="50" class="loadtxt" style="border-bottom: 1px #E5E5E5 solid;">
                     <p>今天 {{nowtime | date: 'HH:mm'}}</p>
-                    <p>您计划&nbsp;&nbsp;&nbsp;<span ng-if="starttime!=undefined">{{starttime}}&nbsp;&nbsp;&nbsp;{{startplace}}-{{endplace}}&nbsp;&nbsp;&nbsp;</span><span ng-if="starttimelate!=undefined && starttimelate!=''">最晚{{starttime}} {{starttimelate}}到达</span></p>
+                    <p><span ng-if="starttime!=undefined">您计划&nbsp;&nbsp;&nbsp;{{starttime}}&nbsp;&nbsp;&nbsp;{{startplace}}-{{endplace}}&nbsp;&nbsp;&nbsp;</span><span ng-if="starttimelate!=undefined && starttimelate!=''">最晚{{starttime}} {{starttimelate}}到达</span></p>
                     <p ng-if="endtime!='' && endtime!=undefined">　　　&nbsp;&nbsp;&nbsp;{{endtime}}&nbsp;&nbsp;&nbsp;{{endplace}}-{{startplace}}&nbsp;&nbsp;&nbsp;<span ng-if="endtimelate!=undefined && endtimelate!=''">最晚{{endtime}} {{endtimelate}}到达</span></p>
-                    <p><span ng-if="liveplace!=undefined">　　　&nbsp;&nbsp;&nbsp;在{{liveplace}}附近酒店入住&nbsp;&nbsp;&nbsp;</span><span ng-if="livetime!=undefined">计划住店时间为{{livetime}}到{{leavetime}}</span></p>
+                    <p><span ng-if="liveplace!=undefined"><span ng-if="starttime==undefined">您计划</span><span ng-if="starttime!=undefined">　　　</span>&nbsp;&nbsp;&nbsp;在{{liveplace}}附近酒店入住&nbsp;&nbsp;&nbsp;</span><span ng-if="livetime!=undefined">计划住店时间为{{livetime}}到{{leavetime}}</span></p>
                 </td>
             </tr>
             <tr>
