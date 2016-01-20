@@ -86,9 +86,6 @@ travelPolicy.getTravelPolicy = function(params){
     var user_id = this.accountId;
     return API.staff.getStaff({id: user_id})
         .then(function(data){
-            if(!id){
-                return API.travelPolicy.getTravelPolicy({id:'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a'});
-            }
             return API.travelPolicy.getTravelPolicy({id:id})
                 .then(function(tp){
                     if(!tp){
