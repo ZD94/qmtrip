@@ -74,7 +74,7 @@ agencyTripPlan.pageTripPlanOrder = function(params){
     }
 
     var query = _.pick(params,
-        ['companyId', 'accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure']);
+        ['companyId', 'accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
 
     return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
         .then(function(user){
@@ -345,6 +345,10 @@ agencyTripPlan.statPlanOrderMoneyByAgency = function (params) {
         })
 }
 
+/**
+ * 代理商修改出差计划预算
+ * @type {editTripPlanBudget}
+ */
 agencyTripPlan.editTripPlanBudget = editTripPlanBudget;
 editTripPlanBudget.required_params = ['consumeId', 'budget'];
 function editTripPlanBudget(params){
