@@ -284,6 +284,17 @@ var travelPlan=(function(){
                     $("#uploadimg .messagebox_box").css('margin-top',-boxheight/2);
                 }
         })
+        $scope.tijiao = function () {
+            API.onload(function() {
+                API.tripPlan.commitTripPlanOrder(planId)
+                    .then(function(result){
+                        alert ("提交成功");
+                    })
+                    .catch(function(err){
+                        console.info (err);
+                    })
+            })
+        }
         $scope.goDetail = function (status,invoiceId) {
             window.location.href = "#/travelPlan/InvoiceDetail?planId="+planId+"&status="+status+"&invoiceId="+invoiceId;
         }

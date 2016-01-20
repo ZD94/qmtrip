@@ -79,3 +79,18 @@
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
 | json数据     | 消费单信息 |
+
+
+>. 代理商修改出差计划预算 API.agencyTripPlan.editTripPlanBudget(params, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 参数             |json              |------
+| params.consumeId                         |出差消费详情id            |uuid                 |必填
+| params.budget                         |新的预算            |integer                |必填
+| params.remark                         |审核备注              |integer                |选填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| json数据     | 消费单信息 |
