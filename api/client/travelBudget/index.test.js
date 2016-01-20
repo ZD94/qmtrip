@@ -189,6 +189,19 @@ describe.skip("api/client/travelBudget.js", function() {
         })
     })
 
+    it("#getTraiffic should be ok with originPlace=北京 destinationPlace=上海", function(done) {
+        this.timeout(60 * 1000);
+        API.client.travelBudget.getTrafficBudget.call({accountId: staffId}, {originPlace: "北京市", destinationPlace: "上海市",
+            outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
+            if (err) {
+                throw err;
+            }
+
+            assert.equal(result.price ? true: false, true);
+            done();
+        })
+    })
+
     it("#getTraiffic goTraffic should be object", function(done) {
         this.timeout(60 * 1000);
         API.client.travelBudget.getTrafficBudget.call({accountId: staffId}, {originPlace: "CT_131", destinationPlace: "CT_289",
