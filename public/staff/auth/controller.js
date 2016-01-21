@@ -68,14 +68,24 @@ var auth=(function(){
                                 Cookie.remove("pwd");
                                 Cookie.remove("remember");
                             }
-
                             API.reload_all_modules();
                             window.location.href= backUrl+"?logintime="+data.is_first_login;
                         }).catch(function(err){
                             if (err.msg) {
-                                alert(err.msg);
-
-                                console.log(err.msg);
+                                //alert(err.msg);
+                                if(err.msg =='账号不存在'){
+                                    $('.tip_err>a').text("马上注册");
+                                    $scope.err_msg_tip = "该账号还未注册，";
+                                    $('.tip_err').children("i").html("&#xf057;");
+                                    $('.tip_err').show();
+                                    $scope.$apply();
+                                }else{
+                                    $scope.err_msg_tip = err.msg;
+                                    $('.tip_err').children("i").html("&#xf057;");
+                                    $('.tip_err').show();
+                                    //console.log(err.msg);
+                                    $scope.$apply();
+                                }
                                 //Myalert("提示信息", err.msg);
                             } else {
                                 //Myalert("系统错误", err);
