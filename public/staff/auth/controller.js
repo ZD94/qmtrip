@@ -620,15 +620,26 @@ var auth=(function(){
             var pwd = $("#firstPwd").val();
             var pwds = $("#secondPwd").val();
 
+            if(!pwd){
+                $scope.err_msg_new_pwd = "请输入密码";
+                $("#firstPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#firstPwd").siblings(".err_msg").children("i").removeClass("right");
+                $("#firstPwd").siblings(".err_msg").show();
+                return false;
+            }
             if(pwd != pwds){
                 alert("两次密码输入不一致");
+                $scope.err_msg_second_pwd = "2次密码设置不一致";
+                $("#secondPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#secondPwd").siblings(".err_msg").children("i").removeClass("right");
+                $("#secondPwd").siblings(".err_msg").show();
                 return false;
             }
 
             API.onload(function() {
                 API.auth.resetPwdByEmail({accountId:accountId,sign: sign, timestamp: timestamp,pwd:pwds})
                     .then(function(){
-                        alert("设置密码成功");
+                        //alert("设置密码成功");
                         window.location.href="#/auth/staffPwdSuccess";
                         $scope.$apply();
                 }).catch(function(err){
