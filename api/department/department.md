@@ -120,4 +120,17 @@
 | msg     | 提示信息 |
 | json数组   | 部门信息|json
 
+>. 查询企业所有部门并组装成树形结构 API.department.getDepartmentStructure(params,callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 参数信息             |json              |------
+| params.companyId                                | 企业id             | uuid             |必填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| msg     | 提示信息 |
+| json数组   | 部门信息|json
+
 

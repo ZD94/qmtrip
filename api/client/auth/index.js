@@ -79,7 +79,6 @@ auth.checkBlackDomain = function(params) {
         API.company.domainIsExist({domain: domain})
     ])
     .spread(function(isBlackDomain, isExist) {
-        console.info(domain);
         if (isBlackDomain) {
             throw L.ERR.EMAIL_IS_PUBLIC;
         }
@@ -183,8 +182,11 @@ auth.registryCompany = function(params) {
             return API.company.createCompany({id: companyId, agencyId: agencyId, createUser: account.id, name: companyName, domainName: domain,
                 mobile:mobile, email: email})
             .then(function(){
-                    return API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
-                        mobile: mobile, name: name, roleId: 0});
+                    return Q.all([
+                        API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
+                            mobile: mobile, name: name, roleId: 0}),
+                        API.department.createDepartment({name: "我的企业", isDefault: true, companyId: companyId})
+                    ])
                 });
         })
         .then(function() {

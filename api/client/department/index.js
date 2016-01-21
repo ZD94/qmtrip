@@ -35,6 +35,26 @@ department.createDepartment = auth.checkPermission(["department.add"],
 });
 
 /**
+ * @method createDepartment
+ * 查询企业全部部门结构
+ * @param params
+ * @param params。companyId 企业id
+ * @returns {*|Promise}
+ */
+department.getDepartmentStructure = auth.checkPermission(["department.query"],
+    function(params){
+    var user_id = this.accountId;
+    return API.staff.getStaff({id: user_id})
+        .then(function(data){
+            if(data.code){
+                throw {code: -1, msg: '无权限'};
+            }
+            params.companyId = data.companyId;//只允许添加该企业下的部门
+            return API.department.getDepartmentStructure(params);
+        });
+});
+
+/**
  * @method deleteDepartment
  * 企业删除部门
  * @param params

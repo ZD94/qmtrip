@@ -415,11 +415,15 @@ authServer.login = function(data) {
                 throw L.ERR.ACCOUNT_NOT_EXIST
             }
 
+            if (!loginAccount.pwd && loginAccount.status == ACCOUNT_STATUS.NOT_ACTIVE) {
+                throw L.ERR.ACCOUNT_NOT_ACTIVE;
+            }
+
             if (loginAccount.pwd != pwd) {
                 throw L.ERR.PASSWORD_NOT_MATCH
             }
 
-            if (loginAccount.status == 0) {
+            if (loginAccount.status == ACCOUNT_STATUS.NOT_ACTIVE) {
                 throw L.ERR.ACCOUNT_NOT_ACTIVE;
             }
 
