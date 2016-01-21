@@ -30,23 +30,79 @@ department.createDepartment = function(data){
         });
 }
 
-/*department.getDepartmentStructure = getDepartmentStructure;
+/**
+ * 查询所有的组织架构并组装数据
+ * @type {getDepartmentStructure}
+ */
+department.getDepartmentStructure = getDepartmentStructure;
 getDepartmentStructure.required_params = ["companyId"];
 function getDepartmentStructure(params){
     var allDepartmentMap = {};
-    var allDepartments = [];
-    var resultDepartment = [];
-    return departmentModel.findAll({companyId: params.companyId})
+    var noParentDep = [];
+    var childOrderId = [];
+    var finalResult = [];
+    return departmentModel.findAll({where: {companyId: params.companyId}, order: [["create_at", "desc"]]})
         .then(function(result){
-            for(var de of result){
+            //封装allDepartmentMap组装元素结构
+            for(var d=0;d< result.length;d++){
+                var de = result[d].toJSON();
                 de.children = [];
                 allDepartmentMap[de.id] = de;
                 if(de.parentId){
                     allDepartmentMap[de.parentId].children.push(de);
+                    childOrderId.push(de.id);
+                }else{
+                    noParentDep.push(de.id);
                 }
             }
+            //去除已确定被挂在的最外层元素
+            for(var key in allDepartmentMap){
+                if(allDepartmentMap[key].children.length == 0 && allDepartmentMap[key].parentId){
+                    delete allDepartmentMap[key];
+                    for(var j=0;j<childOrderId.length;j++){
+                        if(key == childOrderId[j]){
+                            childOrderId.splice(j,1);
+                        }
+                    }
+                }
+            }
+            //childOrderId控制顺序 将既有子级又有父级的元素按顺序挂载至父级元素
+            for(var j=0;j<childOrderId.length;j++){
+                var id = childOrderId[j];
+                var par = allDepartmentMap[id];
+                if(par){
+                    var pid = par.parentId;
+                    if(allDepartmentMap[pid]){
+                        for(var i=0;i<allDepartmentMap[pid].children.length;i++){
+                            var child = allDepartmentMap[pid].children[i];
+                            if(child.id == id){
+                                allDepartmentMap[pid].children[i] = allDepartmentMap[id];
+                            }
+                        }
+                        delete allDepartmentMap[id];
+                    }else{
+                        console.log("此分支父级元素已被归位执行顺序有问题");
+                    }
+                }else{
+                    console.log("childOrderId与allDepartmentMap对应有问题");
+                }
+            }
+            for(var k=0;k<noParentDep.length;k++){
+                var np = noParentDep[k];
+                finalResult.push(allDepartmentMap[np]);
+            }
+            /*console.log(childOrderId);
+            console.info("noParentDep"+noParentDep);
+            console.info("allDepartmentMap"+allDepartmentMap);
+            console.info(finalResult);
+            console.log(finalResult[0].children);
+            console.log(finalResult[0].children[0].children);
+            console.log(finalResult[0].children[0].children[2]);
+            console.log(finalResult[0].children[0].children[2].children);
+            console.log("==================================");*/
+            return finalResult;
         })
-}*/
+}
 
 /**
  * 删除部门
@@ -69,12 +125,6 @@ function deleteDepartment(params){
         });
 }
 
-department.deleteDepartmentByTest = function(params){
-    return departmentModel.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
-        .then(function(){
-            return true;
-        })
-}
 
 /**
  * 更新部门
@@ -206,6 +256,12 @@ function getAllChildDepartmentsId(params){
         })
 }
 
+department.deleteDepartmentByTest = function(params){
+    return departmentModel.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
+        .then(function(){
+            return true;
+        })
+}
 
 /*function getAllChildren(parentId){
     return _children(parentId);
