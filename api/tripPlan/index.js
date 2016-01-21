@@ -396,10 +396,12 @@ tripPlan.uploadInvoice = uploadInvoice;
 uploadInvoice.required_params = ['userId', 'consumeId', 'picture'];
 function uploadInvoice(params){
     var orderId = "";
-    return ConsumeDetails.findOne({where: {id: params.consumeId, account_id: params.userId}})
+    return ConsumeDetails.findOne({where: {id: params.consumeId}})
         .then(function(custome){
             if(!custome || custome.status == -2)
                 throw L.ERR.NOT_FOUND;
+            if(custome.accountId != params.userId)
+                throw L.ERR.PERMISSION_DENY;
             orderId = custome.orderId;
             var invoiceJson = custome.invoice;
             var times = invoiceJson.length ? invoiceJson.length+1 : 1;
@@ -414,16 +416,6 @@ function uploadInvoice(params){
                 ]);
             })
         })
-        //.spread(function() {
-        //    return ConsumeDetails.findAll({where: {orderId: orderId}})
-        //})
-        //.then(function(list){
-        //    for(var i=0; i<list.length; i++){
-        //        if(!list[i].newInvoice)
-        //            return;
-        //    }
-        //    return PlanOrder.update({status: 1, auditStatus: 0, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'auditStatus', 'updateAt'], returning: true})
-        //})
         .then(function(){
             return true;
         })
