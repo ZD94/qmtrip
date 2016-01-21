@@ -9,8 +9,35 @@ var point=(function(){
 
     //我的积分页面
     point.MyPointsController = function($scope) {
-        //alert(222222);
+        // alert(222222);
         loading(true);
+        $scope.initMyPoint = function(){
+            API.onload(function(){
+                API.staff.getCurrentStaff()
+                    .then(function (ret) {
+                        var staffId = ret.id;
+                        $scope.balancePoints = ret.balancePoints;
+                        // var points = ret.balancePoints;
+                        // points = points.replace(/([0-9])(?=(\d{3})+$)/g,'$1,');
+                        Q.all([
+                            API.staff.listAndPaginatePointChange({staffId:staffId}),
+                            API.staff.getStaffPointsChange({staffId:staffId})
+                            ])
+                            .spread(function(record,changes){
+                                console.info(changes);
+                                $scope.changes = changes;
+                                $scope.record = record.items;
+                                console.info($scope.record);
+                                $scope.$apply();
+                            })
+                        $scope.$apply();
+                    })
+                    .catch(function (err) {
+                        console.info(err)
+                    });
+            })
+        }
+        $scope.initMyPoint();
         $scope.initCharts = function(first,second,third){
             var myChart = window.echarts.init(document.getElementById('pointChart')); 
             var option = {

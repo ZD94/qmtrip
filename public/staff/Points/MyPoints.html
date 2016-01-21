@@ -8,13 +8,43 @@
     <div class="staff_tab_content">
         <div class="pointsChart">
             <div class="pointsChart_Left">
-                <div></div>
-                <div></div>
+                <div>
+                    <span class="web-icon-font3">&#xe912;</span>
+                    <p>{{balancePoints}}</p>
+                    <p>目前积分总额</p>
+                </div>
+                <div>
+                    <span class="web-icon-font3">&#xe91a;</span>
+                    <p>{{changes.changeNum}}</p>
+                    <p>本月新增积分</p>
+                </div>
             </div>
             <div class="pointsChart_right">
                 <div id="pointChart"></div>
             </div>
             <div style="clear:both;"></div>
+        </div>
+        <div class="pointRecord">
+            <ul>
+                <li class="on"><a href="javascript:void(0)">全部</a></li>
+                <li><a href="javascript:void(0)">收入</a></li>
+                <li><a href="javascript:void(0)">支出</a></li>
+            </ul>
+            <div class="recordList">
+                <table>
+                    <tr>
+                        <td width="200">积分变动时间</td>
+                        <td width="180">积分变动</td>
+                        <td width="620">状态</td>
+                    </tr>
+                    <tr ng-repeat="items in record">
+                        <td>{{items.createAt | date: 'yyyy-MM-dd'}}</td>
+                        <td ng-if="items.status == 1">+{{items.points}}</td>
+                        <td ng-if="items.status == -1" class="reducePoint">-{{items.points}}</td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
 </div>

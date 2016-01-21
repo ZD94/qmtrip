@@ -65,19 +65,88 @@
         width: 200px;
         height: 100px;
         border: 1px solid @color-border2;
-        line-height: 100px;
+        // line-height: 100px;
         float: left;
         margin-bottom: 10px;
         &:first-child{
-
+          span{
+            color: #c19943;
+          }
         }
         &:nth-child(2){
           margin-bottom: 0px;
+        }
+        span{
+          float: left;
+          font-size: 60px;
+          line-height: 100px;
+          color: #69b754;
+          margin-left: 18px;
+        }
+        p{
+          line-height: 30px;
+          font-size: 14px;
+          color: #9b9b9b;
+          text-align: center;
+          &:nth-child(2){
+            margin-top: 20px;
+            font-size: 20px;
+            color: #4a4a4a;
+          }
         }
       }
     }
     .pointsChart_Right{
       float: left;
+    }
+  }
+  .pointRecord{
+    ul{
+      overflow: hidden;
+      height: 30px;
+      margin: 20px 10px 10px;
+      li{
+        float: left;
+        width: 95px;
+        height: 10px;
+        line-height: 10px;
+        text-align: center;
+        margin: 10px 0;
+        border-right: 2px solid #e5e5e5;
+        a{
+          color: #4a4a4a;
+        }
+        &.on{
+          a{
+            color: #01bdff;
+          }
+        }
+      }
+    }
+    .recordList{
+      table{
+        width: 100%;
+        tr{
+          height: 60px;
+          line-height: 60px;
+          border-bottom: 1px solid #e5e5e5;
+          background: #fff;
+          &:nth-child(1){
+            background: #ededed;
+            height: 40px;
+            line-height: 40px;
+            color: #9b9b9b;
+            border-top: 1px solid #e5e5e5;
+            border-bottom: 1px solid #e5e5e5;
+          }
+          td{
+            text-align: center;
+            &.reducePoint{
+              color: #de492a;
+            }
+          }
+        }
+      }
     }
   }
 }
