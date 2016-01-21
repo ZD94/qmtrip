@@ -189,6 +189,15 @@ describe("api/client/tripPlan.js", function() {
         })
 
 
+        it("#getTripPlanOrderById should be error when param is not uuid", function (done) {
+            var self = {accountId: staffId};
+            API.client.tripPlan.getTripPlanOrderById.call(self, "123456", function (err, ret) {
+                assert(err != null);
+                assert.equal(ret, null);
+                done();
+            })
+        });
+
         it("#getTripPlanOrderById should be ok", function (done) {
             var self = {accountId: staffId};
             API.client.tripPlan.getTripPlanOrderById.call(self, newOrderId, function (err, ret) {
