@@ -38,6 +38,7 @@ COMMENT ON COLUMN staff.staffs.operator_id IS '操作人id';
 create table staff.point_changes (
     id uuid primary key,
     staff_id uuid,
+    order_id uuid,
     status integer default 1,
     points integer not null,
     current_point integer,
@@ -47,3 +48,4 @@ create table staff.point_changes (
 
 comment on table staff.point_changes is '员工积分变动';
 COMMENT ON COLUMN staff.point_changes.current_point IS '当前积分';
+COMMENT ON COLUMN staff.point_changes.order_id IS '产生积分的计划单id';

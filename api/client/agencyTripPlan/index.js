@@ -74,7 +74,7 @@ agencyTripPlan.pageTripPlanOrder = function(params){
     }
 
     var query = _.pick(params,
-        ['companyId', 'accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure']);
+        ['companyId', 'accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
 
     return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
         .then(function(user){
@@ -123,6 +123,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
         params.remark = params.remark || '审核票据';
         var consumeId = params.consumeId;
         var orderId = "";
+        var orderNo = "";
         var staffId = "";
         var staffEmail = "";
         var staffName = "";
@@ -175,7 +176,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                 if(!isSuccess){
                     return isSuccess;
                 }
-                return API.tripPlan.getTripPlanOrder({orderId: orderId, columns: ['status', 'score', 'budget', 'expenditure', 'description', 'startAt']});
+                return API.tripPlan.getTripPlanOrder({orderId: orderId, columns: ['orderNo', 'status', 'score', 'budget', 'expenditure', 'description', 'startAt']});
             })
             .then(function(ret){
                 //判断ret类型，如果是Boolean则直接返回
@@ -183,6 +184,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                     return ret;
                 }
                 var order = ret;
+                orderNo = order.orderNo;
                 if(typeof ret.toJSON == 'function'){
                     order = order.toJSON();
                 }
@@ -240,7 +242,6 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                         values: vals
                     })
                 }
-                //"%s,您好<br/>您有1张%s票据被审核通过，实际支出为%s，关联出差记录如下：<br/>项目名称:%s<br/>出差时间：%s<br/>去程交通:%s<br/>回程交通:%s<br/>住宿:%s<br/>总计：%s<br/><a href="%s">点击此处查看出差详情</a>"
                 if(params.status == 1){
                     var vals = {
                         username: staffName,
@@ -288,7 +289,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                 if(ret.status != 2 || ret.score == 0){ //status == 2 是审核通过的状态，通过后要给企业用户增加积分操作，积分为0时不需要此操作
                     return true;
                 }
-                return API.staff.increaseStaffPoint({id: staffId, accountId: user_id, increasePoint: ret.score})
+                return API.staff.increaseStaffPoint({id: staffId, accountId: user_id, increasePoint: ret.score, orderId: orderId, remark: '计划单' + orderNo + '产生积分'})
             })
             .then(function(){
                 return true;
@@ -345,6 +346,10 @@ agencyTripPlan.statPlanOrderMoneyByAgency = function (params) {
         })
 }
 
+/**
+ * 代理商修改出差计划预算
+ * @type {editTripPlanBudget}
+ */
 agencyTripPlan.editTripPlanBudget = editTripPlanBudget;
 editTripPlanBudget.required_params = ['consumeId', 'budget'];
 function editTripPlanBudget(params){

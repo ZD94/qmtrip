@@ -297,8 +297,8 @@ var staff = (function(){
 
 
         //对员工的信息进行修改
-        $scope.editStaffInfo = function(id) {
-            $("#change").addClass("orange");
+        $scope.editStaffInfo = function(id,index) {
+            //$("#change"+index).addClass("orange");
             API.onload(function(){
                 API.staff.getStaff({id: id})
                     .then(function(staffinfo){
@@ -315,7 +315,7 @@ var staff = (function(){
 
         //对员工所修改的信息进行保存
         $scope.updateStaffInfo = function(id,index){
-            $("#change").removeClass("orange");
+            $(".includeChange").removeClass("orange");
             //alert(id);
             var name = $("#staffName"+index).val();
             var mail = $("#staffEmail"+index).val();
@@ -341,7 +341,7 @@ var staff = (function(){
 
         //取消对员工信息的修改
         $scope.cancelAddStaffInfo = function(){
-            $("#change").removeClass("orange");
+            $(".includeChange").removeClass("orange");
             $(".add_staff2").hide();
         }
 
