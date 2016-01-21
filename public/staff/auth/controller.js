@@ -29,7 +29,16 @@ var auth=(function(){
         }
         var backUrl = $routeParams.backurl || "#";
         $scope.sendActiveMail = function(){
-
+            var mail = $('#name').val();
+            API.onload(function(){
+                API.auth.sendActiveEmail({email:mail})
+                    .then(function(){
+                        Myalert("温馨提示","发送成功");
+                        $scope.$apply();
+                    }).catch(function(err){
+                        console.error(err);
+                    }).done();
+            })
         }
         $scope.checkLogin = function() {
             var mail = $('#name').val();
@@ -83,9 +92,14 @@ var auth=(function(){
                                     $('.tip_err').show();
                                     $scope.$apply();
                                 }
-                                //if(err.msg == '您的账号还未激活'){
-                                //
-                                //}
+                                if(err.msg == '您的账号还未激活'){
+                                    $('.tip_err>a').text("");
+                                    $('.tip_err>span').text("重新发送激活邮件");
+                                    $scope.err_msg_tip = "该邮箱暂未激活，";
+                                    $('.tip_err').children("i").html("&#xf057;");
+                                    $('.tip_err').show();
+                                    $scope.$apply();
+                                }
                                 else{
                                     $scope.err_msg_tip = err.msg;
                                     $('.tip_err').children("i").html("&#xf057;");
