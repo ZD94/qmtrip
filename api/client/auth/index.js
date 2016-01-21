@@ -79,7 +79,6 @@ auth.checkBlackDomain = function(params) {
         API.company.domainIsExist({domain: domain})
     ])
     .spread(function(isBlackDomain, isExist) {
-        console.info(domain);
         if (isBlackDomain) {
             throw L.ERR.EMAIL_IS_PUBLIC;
         }
