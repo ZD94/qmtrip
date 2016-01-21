@@ -171,12 +171,31 @@ describe("api/client/company.js", function() {
 
 
             it("#getCompanyFundsAccount should be ok", function(done) {
-                var self = {accountId: ownerUserId};
-                API.client.company.getCompanyFundsAccount.call(self, companyId, function(err, ret){
+                API.client.company.getCompanyFundsAccount.call({accountId: ownerUserId}, function(err, ret){
                     if(err){
                         throw err;
                     }
                     assert.equal(ret.id, companyId);
+                    done();
+                })
+            });
+
+
+            it("#getCompanyFundsAccountByAgency should be ok", function(done) {
+                API.client.company.getCompanyFundsAccountByAgency.call({accountId: agencyUserId}, companyId, function(err, ret){
+                    if(err){
+                        throw err;
+                    }
+                    assert.equal(ret.id, companyId);
+                    done();
+                })
+            });
+
+
+            it("#getCompanyFundsAccountByAgency should be error with wrong user", function(done) {
+                API.client.company.getCompanyFundsAccountByAgency.call({accountId: ownerUserId}, companyId, function(err, ret){
+                    assert.equal(err.code, -2);
+                    assert.equal(ret, null);
                     done();
                 })
             });

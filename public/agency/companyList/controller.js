@@ -25,7 +25,7 @@ module.exports = (function(){
 						var promises = companylist.map(function(company){
 							// console.info(company.createUser)
 							return Q.all([
-								API.company.getCompanyFundsAccount(company.id),
+								API.company.getCompanyFundsAccountByAgency(company.id),
 								API.staff.getStaffByAgency({id: company.createUser}),
                         		API.staff.statisticStaffsByAgency({companyId:company.id}),
 								API.agencyTripPlan.countTripPlanNum({companyId: company.id})
@@ -100,7 +100,7 @@ module.exports = (function(){
                         loading(true);
                         Q.all([
                         	API.staff.getStaffByAgency({id:staffId}),
-                        	API.company.getCompanyFundsAccount(companyId),
+                        	API.company.getCompanyFundsAccountByAgency(companyId),
                         	API.staff.statisticStaffsByAgency({companyId:companyId}),
                         	// API.tripPlan.countTripPlanNum()
                         	API.agencyTripPlan.countTripPlanNum({companyId: companyId}),
