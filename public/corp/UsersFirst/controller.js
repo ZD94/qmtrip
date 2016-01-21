@@ -39,7 +39,7 @@ var UsersFirst = (function(){
 						var start = moment().startOf('Month').format('YYYY-MM-DD 00:00:00');
 						var end = moment().endOf('Month').format('YYYY-MM-DD 23:59:59');
 						Q.all([
-							API.company.getCompanyFundsAccount(company_id),
+							API.company.getCompanyFundsAccount(),
 							API.staff.statisticStaffs({companyId:company_id}),
 							API.travelPolicy.getLatestTravelPolicy({}),
 							API.tripPlan.statPlanOrderMoneyByCompany({startTime:start,endTime:end}),

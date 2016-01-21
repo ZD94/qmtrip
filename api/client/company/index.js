@@ -12,6 +12,8 @@ var md5 = require("common/utils").md5;
 var checkPermission = require('../auth').checkPermission;
 var checkAgencyPermission = require('../auth').checkAgencyPermission;
 var uuid = require("node-uuid");
+var L = require("common/language");
+var Q = require('q');
 
 /**
  * @class company 公司信息
@@ -79,7 +81,7 @@ company.updateCompany = checkPermission(["company.edit"],
     function updateCompany(params){
         var self = this;
         var accountId = self.accountId;
-        params.createUser = accountId;
+        params.userId = accountId;
         return API.staff.getStaff({id: accountId, columns: ['companyId']})
             .then(function(staff){
                 params.companyId = staff.companyId;
@@ -177,18 +179,39 @@ company.consumeMoney = function(params){
 }
 
 /**
- * 获取企业资金账户信息
+ * 获取企业资金账户信息,企业和员工
  * @param companyId
  * @returns {*}
  */
-company.getCompanyFundsAccount = function(companyId){
+company.getCompanyFundsAccount = function(){
     var self = this;
-    var params = {
-        userId: self.accountId,
-        companyId: companyId
-    };
-    return API.company.getCompanyFundsAccount(params);
+    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
+        .then(function(staff){
+            return API.company.getCompanyFundsAccount({companyId: staff.companyId});
+        })
 }
 
+
+/**
+ * 代理商获取企业资金账户信息
+ * @param companyId
+ * @returns {*}
+ */
+company.getCompanyFundsAccountByAgency = function(companyId){
+    var self = this;
+    if(!companyId)
+        throw {code: -1, msg: '企业id不能为空'};
+    if(typeof companyId == 'function')
+        throw {code: -2, msg: '参数不正确'};
+    return Q.all([
+        API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']}),
+        API.company.getCompany({companyId: companyId, columns: ['agencyId']})
+    ])
+        .spread(function(user, c){
+            if(user.agencyId != c.agencyId)
+                throw L.ERR.PERMISSION_DENY;
+            return API.company.getCompanyFundsAccount({companyId: companyId});
+        })
+}
 
 module.exports = company;

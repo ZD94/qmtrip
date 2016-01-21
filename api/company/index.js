@@ -71,17 +71,17 @@ function createCompany(params){
             Company.create(_company, {transaction: t}),
             FundsAccounts.create(funds, {transaction: t})
         ])
-            .spread(function(c, funds){
-                return {
-                    id: c.id,
-                    status: c.status,
-                    name: c.name,
-                    mobile: c.mobile,
-                    email: c.email,
-                    createUser: c.createUser
-                };
-            });
-    });
+    })
+        .spread(function(c){
+            return {
+                id: c.id,
+                status: c.status,
+                name: c.name,
+                mobile: c.mobile,
+                email: c.email,
+                createUser: c.createUser
+            };
+        });
 }
 
 /**
@@ -116,7 +116,7 @@ updateCompany.required_params = ['companyId'];
 updateCompany.optional_params = _.difference(_.keys(Company.attributes), ['companyNo', 'createUser', 'createAt']);
 function updateCompany(params){
     var companyId = params.companyId;
-    return Company.findById(companyId, {attributes: ['createUser']})
+    return Company.findById(companyId, {attributes: ['createUser', 'status']})
         .then(function(company){
             if(!company || company.status == -2){
                 throw L.ERR.COMPANY_NOT_EXIST;
@@ -139,10 +139,10 @@ function updateCompany(params){
  * @param companyId
  * @returns {*}
  */
-company.getCompany = function(params){
-    if(!params.companyId){
-        throw {code: -1, msg: 'companyId 不能为空'};
-    }
+company.getCompany = getCompany;
+getCompany.required_params = ['companyId'];
+getCompany.optional_params = ['columns'];
+function getCompany(params){
     var companyId = params.companyId;
     var options = {};
     if(params.columns){
@@ -184,7 +184,8 @@ function listCompany(params){
  * @param params
  * @returns {*}
  */
-company.pageCompany = function(options){
+company.pageCompany = pageCompany;
+function pageCompany(options){
     options.where.status = {$ne: -2};
     options.order = [['create_at', 'desc']];
     return Company.findAndCount(options)
@@ -232,10 +233,9 @@ function deleteCompany(params){
  * @returns {*}
  */
 company.getCompanyFundsAccount = getCompanyFundsAccount;
-getCompanyFundsAccount.required_params = ['companyId', 'userId'];
+getCompanyFundsAccount.required_params = ['companyId'];
 function getCompanyFundsAccount(params){
     var companyId = params.companyId;
-    var userId = params.userId;
     return FundsAccounts.findById(companyId, {
         attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createAt', 'updateAt']
     })
