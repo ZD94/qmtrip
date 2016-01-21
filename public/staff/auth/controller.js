@@ -28,6 +28,9 @@ var auth=(function(){
             window.location.href = "#/auth/forgetpwd";
         }
         var backUrl = $routeParams.backurl || "#";
+        $scope.sendActiveMail = function(){
+
+        }
         $scope.checkLogin = function() {
             var mail = $('#name').val();
             var pwd  = $('#pwd').val();
@@ -79,7 +82,11 @@ var auth=(function(){
                                     $('.tip_err').children("i").html("&#xf057;");
                                     $('.tip_err').show();
                                     $scope.$apply();
-                                }else{
+                                }
+                                //if(err.msg == '您的账号还未激活'){
+                                //
+                                //}
+                                else{
                                     $scope.err_msg_tip = err.msg;
                                     $('.tip_err').children("i").html("&#xf057;");
                                     $('.tip_err').show();
@@ -424,23 +431,36 @@ var auth=(function(){
                             window.location.href = "#/auth/corplaststep?email="+mail;
                         })
                         .catch(function(err){
+                            //console.info(err);
                             if (err.msg) {
                                 //alert(err.msg);
+                                if(err.msg == '手机号已注册'){
+                                    $scope.err_msg_phone = "手机号已注册";
+                                    $("#seconds").text(0);
+                                    $('#msgCode').val("");
+                                    $('#picCode').val("");
+                                    $("#corpMobile").siblings(".err_msg").children("i").html("&#xf06a;");
+                                    $("#corpMobile").siblings(".err_msg").children("i").removeClass("right");
+                                    $("#corpMobile").siblings(".err_msg").show();
+                                }
                                 if(err.msg == '短信验证码错误'){
                                     $scope.err_msg_msg = "手机验证码错误";
+                                    $('#msgCode').val("");
+                                    $('#picCode').val("");
                                     $("#msgCode").parent("div").siblings(".err_msg").children("i").html("&#xf06a;");
                                     $("#msgCode").parent("div").siblings(".err_msg").children("i").removeClass("right");
                                     $("#msgCode").parent("div").siblings(".err_msg").show();
                                 }
                                 if(err.msg=='验证码错误'){
                                     $scope.err_msg_pic = "图片验证码错误";
+                                    $('#picCode').val("");
                                     $("#picCode").parent("div").siblings(".err_msg").children("i").html("&#xf057;");
                                     $("#picCode").parent("div").siblings(".err_msg").children("i").removeClass("right");
                                     $("#picCode").parent("div").siblings(".err_msg").show();
-                                    $scope.$apply();
-                                    return false;
                                 }
                                 $scope.changePicCode();
+                                $('#msgCode').val("");
+                                $('#picCode').val("");
                                 $scope.$apply();
                                 return;
                             }
