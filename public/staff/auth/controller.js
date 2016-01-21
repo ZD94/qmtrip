@@ -17,9 +17,9 @@ var auth=(function(){
         //}
         //err_attention(email,'邮箱不能为空',err_msg_mail);
         //console.info(err_attention())
-        var email = Cookie.get("email");
+        var mail = Cookie.get("email");
         var pwd = Cookie.get("pwd");
-        $scope.email = email;
+        $scope.email = mail;
         $scope.pwd = pwd;
         $scope.toRegister = function(){
             window.location.href = "#/auth/register";
@@ -29,13 +29,13 @@ var auth=(function(){
         }
         var backUrl = $routeParams.backurl || "#";
         $scope.checkLogin = function() {
-            var name = $('#name').val();
+            var mail = $('#name').val();
             var pwd  = $('#pwd').val();
             var remember = $("#remember").val();
 
             var commit = true;
             if(commit){
-                if(!name){
+                if(!mail){
                     $scope.err_msg_mail = "请输入账号邮箱";
                     $("#name").siblings(".err_msg").children("i").html("&#xf06a;");
                     $("#name").siblings(".err_msg").children("i").removeClass("right");
@@ -53,14 +53,14 @@ var auth=(function(){
                     return false;
                 }
                 API.onload(function(){
-                    API.auth.login({email:name,pwd:pwd})
+                    API.auth.login({email:mail,pwd:pwd})
                         .then(function(data){
                             Cookie.set("user_id", data.user_id, { expires:30 });
                             Cookie.set("token_sign", data.token_sign, { expires:30 });
                             Cookie.set("timestamp", data.timestamp, { expires:30 });
                             Cookie.set("token_id", data.token_id, { expires:30 });
                             if (remember == true || remember == 'true') {
-                                Cookie.set("email", name);
+                                Cookie.set("email", mail);
                                 Cookie.set("pwd", pwd);
                                 Cookie.set("remember", remember);
                             } else {
@@ -72,7 +72,7 @@ var auth=(function(){
                             window.location.href= backUrl+"?logintime="+data.is_first_login;
                         }).catch(function(err){
                             if (err.msg) {
-                                //alert(err.msg);
+                                alert(err.msg);
                                 if(err.msg =='账号不存在'){
                                     $('.tip_err>a').text("马上注册");
                                     $scope.err_msg_tip = "该账号还未注册，";
@@ -152,6 +152,7 @@ var auth=(function(){
             var reg = /^[\w\.-]+?@([\w\-]+\.){1,2}[a-zA-Z]{2,3}$/;
             if(!mail){
                 $scope.err_msg_mail = "联系人邮箱不能为空";
+                $("#corpMail").siblings(".err_msg").children("a").html("");
                 $("#corpMail").siblings(".err_msg").children("i").html("&#xf06a;");
                 $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
                 $("#corpMail").siblings(".err_msg").show();
@@ -162,6 +163,7 @@ var auth=(function(){
             }else if(!reg.test(mail)){
                 $scope.err_msg_mail = "邮箱格式不正确";
                 //console.info(456);
+                $("#corpMail").siblings(".err_msg").children("a").html("");
                 $("#corpMail").siblings(".err_msg").children("i").html("&#xf057;");
                 $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
                 $("#corpMail").siblings(".err_msg").show();
@@ -171,6 +173,7 @@ var auth=(function(){
                 return false;
             }else{
                 $scope.err_msg_mail = "";
+                $("#corpMail").siblings(".err_msg").children("a").html("");
                 $("#corpMail").siblings(".err_msg").children("i").html("&#xf058;");
                 $("#corpMail").siblings(".err_msg").children("i").addClass("right");
                 $(".tip_div").hide();
@@ -331,6 +334,7 @@ var auth=(function(){
                     return false;
                 }else if(!mail){
                     $scope.err_msg_mail = "联系人邮箱不能为空";
+                    $("#corpMail").siblings(".err_msg").children("a").html("");
                     $("#corpMail").siblings(".err_msg").children("i").html("&#xf06a;");
                     $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
                     $("#corpMail").siblings(".err_msg").show();
@@ -360,9 +364,9 @@ var auth=(function(){
                     return false;
                 }else if(!pCode){
                     $scope.err_msg_pic = "图片验证码不能为空";
-                    $("#imgCode").parent("div").siblings(".err_msg").children("i").html("&#xf06a;");
-                    $("#imgCode").parent("div").siblings(".err_msg").children("i").removeClass("right");
-                    $("#imgCode").parent("div").siblings(".err_msg").show();
+                    $("#picCode").parent("div").siblings(".err_msg").children("i").html("&#xf06a;");
+                    $("#picCode").parent("div").siblings(".err_msg").children("i").removeClass("right");
+                    $("#picCode").parent("div").siblings(".err_msg").show();
                     return false;
                 }else if(agree != "true"){
                     alert('请同意注册协议');
@@ -373,13 +377,40 @@ var auth=(function(){
                     if (domain && domain.length > 1) {
                         domain = domain[1];
                     } else {
-                        alert("邮箱不合法");
+                        //alert("邮箱不合法");
+                        $scope.err_msg_mail = "邮箱格式不正确";
+                        //console.info(456);
+                        $("#corpMail").siblings(".err_msg").children("a").html("");
+                        $("#corpMail").siblings(".err_msg").children("i").html("&#xf057;");
+                        $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
+                        $("#corpMail").siblings(".err_msg").show();
                         return false;
                     }
 
                     API.auth.checkBlackDomain({domain: domain})
                         .catch(function(err){
-                            alert("邮箱后缀不合法或者已被使用");
+                            //alert("邮箱后缀不合法或者已被使用");
+                            if(err.code==-34){
+                                $("#corpMail").siblings(".err_msg").children("a").html("");
+                                $scope.err_msg_mail = "暂不支持公共邮箱，请使用企业邮箱注册";
+                                $("#corpMail").siblings(".err_msg").children("i").html("&#xf057;");
+                                $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
+                                $("#corpMail").siblings(".err_msg").show();
+                                $(".tip_div").hide();
+                                $scope.$apply();
+                                return false;
+                            }
+                            if(err.code == -33){
+                                $scope.err_msg_mail = "该邮箱已注册过，";
+                                $("#corpMail").siblings(".err_msg").children("a").html("马上登录");
+                                $("#corpMail").siblings(".err_msg").children("i").html("&#xf057;");
+                                $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
+                                $("#corpMail").siblings(".err_msg").show();
+                                $(".tip_div").hide();
+                                $scope.$apply();
+                                return false;
+                            }
+                            console.info(err.code);
                             throw {};
                         })
                         .then(function(result) {
@@ -394,7 +425,21 @@ var auth=(function(){
                         })
                         .catch(function(err){
                             if (err.msg) {
-                                alert(err.msg);
+                                //alert(err.msg);
+                                if(err.msg == '短信验证码错误'){
+                                    $scope.err_msg_msg = "手机验证码错误";
+                                    $("#msgCode").parent("div").siblings(".err_msg").children("i").html("&#xf06a;");
+                                    $("#msgCode").parent("div").siblings(".err_msg").children("i").removeClass("right");
+                                    $("#msgCode").parent("div").siblings(".err_msg").show();
+                                }
+                                if(err.msg=='验证码错误'){
+                                    $scope.err_msg_pic = "图片验证码错误";
+                                    $("#picCode").parent("div").siblings(".err_msg").children("i").html("&#xf057;");
+                                    $("#picCode").parent("div").siblings(".err_msg").children("i").removeClass("right");
+                                    $("#picCode").parent("div").siblings(".err_msg").show();
+                                    $scope.$apply();
+                                    return false;
+                                }
                                 $scope.changePicCode();
                                 $scope.$apply();
                                 return;
@@ -620,15 +665,26 @@ var auth=(function(){
             var pwd = $("#firstPwd").val();
             var pwds = $("#secondPwd").val();
 
+            if(!pwd){
+                $scope.err_msg_new_pwd = "请输入密码";
+                $("#firstPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#firstPwd").siblings(".err_msg").children("i").removeClass("right");
+                $("#firstPwd").siblings(".err_msg").show();
+                return false;
+            }
             if(pwd != pwds){
                 alert("两次密码输入不一致");
+                $scope.err_msg_second_pwd = "2次密码设置不一致";
+                $("#secondPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#secondPwd").siblings(".err_msg").children("i").removeClass("right");
+                $("#secondPwd").siblings(".err_msg").show();
                 return false;
             }
 
             API.onload(function() {
                 API.auth.resetPwdByEmail({accountId:accountId,sign: sign, timestamp: timestamp,pwd:pwds})
                     .then(function(){
-                        alert("设置密码成功");
+                        //alert("设置密码成功");
                         window.location.href="#/auth/staffPwdSuccess";
                         $scope.$apply();
                 }).catch(function(err){
