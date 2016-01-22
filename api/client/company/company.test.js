@@ -109,6 +109,8 @@ describe("api/client/company.js", function() {
                     API.staff.deleteAllStaffByTest({mobile: company.mobile, email: company.email})
                 ])
                     .spread(function(ret1, ret2){
+                        assert.equal(ret1, true);
+                        assert.equal(ret2, true);
                         return API.client.company.createCompany.call({accountId: agencyUserId}, company)
                     })
                     .then(function(company){
@@ -126,6 +128,8 @@ describe("api/client/company.js", function() {
                     API.staff.deleteAllStaffByTest({companyId: companyId, mobile: company.mobile, email: company.email})
                 ])
                     .spread(function(ret1, ret2){
+                        assert.equal(ret1, true);
+                        assert.equal(ret2, true);
                         done();
                     })
                     .catch(function(err){
@@ -171,12 +175,31 @@ describe("api/client/company.js", function() {
 
 
             it("#getCompanyFundsAccount should be ok", function(done) {
-                var self = {accountId: ownerUserId};
-                API.client.company.getCompanyFundsAccount.call(self, companyId, function(err, ret){
+                API.client.company.getCompanyFundsAccount.call({accountId: ownerUserId}, function(err, ret){
                     if(err){
                         throw err;
                     }
                     assert.equal(ret.id, companyId);
+                    done();
+                })
+            });
+
+
+            it("#getCompanyFundsAccountByAgency should be ok", function(done) {
+                API.client.company.getCompanyFundsAccountByAgency.call({accountId: agencyUserId}, companyId, function(err, ret){
+                    if(err){
+                        throw err;
+                    }
+                    assert.equal(ret.id, companyId);
+                    done();
+                })
+            });
+
+
+            it("#getCompanyFundsAccountByAgency should be error with wrong user", function(done) {
+                API.client.company.getCompanyFundsAccountByAgency.call({accountId: ownerUserId}, companyId, function(err, ret){
+                    assert.equal(err.code, -2);
+                    assert.equal(ret, null);
                     done();
                 })
             });

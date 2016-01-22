@@ -12,7 +12,7 @@
         登录
     </div>
     <div class="input">
-        <span class="tip_err"><i class="web-icon-font"></i>{{err_msg_tip}}<a href="#/auth/register"></a></span>
+        <span class="tip_err"><i class="web-icon-font"></i>{{err_msg_tip}}<a href="#/auth/register"></a><span ng-click="sendActiveMail()"></span></span>
         <!--<span class="tip_err"><i class="web-icon-font"></i>aaaaaaa</span>-->
         <input id="name" ng-model="email" class="" type="text" value="" placeholder="请输入企业邮箱" onkeyup="checkAccount()"/>
         <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_mail}}</span>
