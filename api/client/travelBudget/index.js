@@ -188,7 +188,11 @@ travelBudget.getHotelBudget = function(params) {
             if (!result.price || result.price <=0) {
                 var days = moment(checkOutDate).diff(checkInDate, 'days');
                 days = days<=0?1:days;
-                return {price: policy.hotelPrice * days || -1};
+                if (policy.hotelPrice) {
+                    return {price: policy.hotelPrice * days};
+                } else {
+                    return {price: _getDefaultPrice(hotelStar) * days};
+                }
             }
             return result;
         });
@@ -334,7 +338,32 @@ travelBudget.getTrafficBudget = function(params) {
                     });
             }
         })
+}
 
+//获取酒店默认价格
+function _getDefaultPrice(hotelStar) {
+    var price;
+    if (typeof hotelStar != 'number') {
+        hotelStar = parseInt(hotelStar);
+    }
+
+    switch(hotelStar) {
+        case 5:
+            price = 500;
+            break;
+        case 4:
+            price = 450;
+            break;
+        case 3:
+            price = 400;
+            break;
+        case 2:
+            price = 350;
+            break;
+        default:
+            price = 500;
+    }
+    return price;
 }
 
 module.exports = travelBudget;
