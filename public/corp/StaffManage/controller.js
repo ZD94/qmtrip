@@ -517,28 +517,22 @@ var staff = (function(){
                                 var defaultname = defaulDepartment;
                                 $scope.departmentName = defaultname[0].name;
                                 $scope.departmentId = defaultname[0].id;
-
                                 //获取部门列表
                                 API.department.getChildDepartments({parentId:$scope.departmentId})
                                     .then(function(departmentlist){
                                         $scope.departmentlist = departmentlist;
-                                        console.info ($scope.departmentlist);
-                                        $scope.$apply();
+                                        departmentlist.map(function(s){
+                                        API.staff.getCountByDepartment({departmentId:s.id})
+                                            .then(function(num){
+                                                s.peoplenum = num;
+                                                console.info ($scope.departmentlist);
+                                                $scope.$apply();
+                                                loading(true);
+                                            })
+                                        });
                                     })
-                                    .catch(function(err){
-                                        console.info(err);
-                                    })
-                                loading(true);
-                                $scope.$apply();
-                            })
-                            .catch(function(err){
-                                console.info(err);
                             })
                     })
-                    .catch(function(err){
-                        console.info(err);
-                    })
-
             })
         }
         $scope.initdepartment();
@@ -583,16 +577,18 @@ var staff = (function(){
         }
 
         //修改子部门名称
-        $scope.updatechildDepartmentShow = function (index) {
-
+        $scope.updatechildDepartmentShow = function (index,id) {
+            $scope.index = index;
+            $scope.childDepartmentId = id;
+            $(".updatechildDepartment").hide();
+            $(".updatechildDepartment").eq(index).show();
         }
         $scope.updatechildDepartment = function () {
             API.onload(function(){
-                API.department.createDepartment({companyId:$scope.companyId,parentId:$scope.departmentId,name:$(".createcompany .common_text").val()})
+                API.department.updateDepartment({id:$scope.childDepartmentId,name:$(".updatechildDepartment .common_text").eq($scope.index).val()})
                     .then(function(result){
-                        Myalert("温馨提示","添加成功");
+                        Myalert("温馨提示","修改成功");
                         $scope.initdepartment();
-                        $(".createcompany").hide();
                     })
                     .catch(function(err){
                         console.info(err);
@@ -600,10 +596,34 @@ var staff = (function(){
             })
         }
 
-        $scope.asdasd = function () {
-            alert (1);
+        //删除子部门
+        $scope.deleteDepartmentShow = function (name,id) {
+            $scope.deleteId = id;
+            $scope.deleteName = name;
+            $(".messageText").html("确定删除&quot;"+$scope.deleteName+"&quot;？");
+            $(".confirmFixed").show();
+        }
+        $scope.deleteDepartment = function () {
+            API.onload(function(){
+                API.department.deleteDepartment({id:$scope.deleteId})
+                    .then(function(result){
+                        $scope.initdepartment();
+                        $(".confirmFixed").hide();
+                    })
+                    .catch(function(err){
+                        console.info(err);
+                    })
+            })
         }
 
+        //关闭窗口
+        $scope.departmentClose = function () {
+            $(".updatecompany,.createcompany,.updatechildDepartment").hide();
+        }
+
+        $scope.confirmClose = function () {
+            $(".confirmFixed").hide();
+        }
     }
 
 
