@@ -5,6 +5,7 @@ var staff = (function(){
     API.require('staff');
     API.require('travelPolicy');
     API.require('auth');
+    API.require('department');
     var  staff = {};
 
     //员工管理界面
@@ -491,6 +492,102 @@ var staff = (function(){
             })
         }
     }
+
+
+
+
+
+
+
+
+    staff.DepartmentController = function($scope){
+        $("title").html("组织架构");
+        $(".left_nav li").removeClass("on").eq(1).addClass("on");
+        loading(false);
+        //初始化
+        $scope.initdepartment = function(){
+            API.onload(function(){
+                //获取个人信息
+                API.staff.getCurrentStaff()
+                    .then(function(result){
+                        $scope.companyId = result.companyId;
+                        //获取我的部门
+                        API.department.getFirstClassDepartments({companyId:$scope.companyId})
+                            .then(function(defaulDepartment){
+                                var defaultname = defaulDepartment;
+                                $scope.departmentName = defaultname[0].name;
+                                $scope.departmentId = defaultname[0].id;
+
+                                //获取部门列表
+                                API.department.getChildDepartments({parentId:$scope.departmentId})
+                                    .then(function(departmentList){
+                                        $scope.departmentList = departmentList;
+                                        console.info (departmentList);
+                                    })
+                                    .catch(function(err){
+                                        console.info(err);
+                                    })
+                                loading(true);
+                                $scope.$apply();
+                            })
+                            .catch(function(err){
+                                console.info(err);
+                            })
+                    })
+                    .catch(function(err){
+                        console.info(err);
+                    })
+
+            })
+        }
+        $scope.initdepartment();
+
+
+        //修改企业名称
+        $scope.updateDepartmentShow = function () {
+            $(".createcompany").hide();
+            $(".updatecompany").show();
+        }
+        $scope.updateDepartment = function () {
+            API.onload(function(){
+                API.department.updateDepartment({id:$scope.departmentId,name:$(".updatecompany .common_text").val()})
+                    .then(function(result){
+                        Myalert("温馨提示","修改成功");
+                        $scope.initdepartment();
+                        $(".updatecompany").hide();
+                    })
+                    .catch(function(err){
+                        console.info(err);
+                    })
+            })
+        }
+
+        //添加子部门
+        $scope.createDepartmentShow = function () {
+            $(".updatecompany").hide();
+            $(".createcompany").show();
+        }
+        $scope.createDepartment = function () {
+            API.onload(function(){
+                API.department.createDepartment({companyId:$scope.companyId,parentId:$scope.departmentId,name:$(".createcompany .common_text").val()})
+                    .then(function(result){
+                        Myalert("温馨提示","添加成功");
+                        $scope.initdepartment();
+                        $(".createcompany").hide();
+                    })
+                    .catch(function(err){
+                        console.info(err);
+                    })
+            })
+        }
+
+    }
+
+
+
+
+
+
 
     return staff;
 })();
