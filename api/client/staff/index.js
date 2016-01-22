@@ -26,18 +26,22 @@ var staff = {};
  */
 staff.createStaff = auth.checkPermission(["user.add"],
     function(params) {
-    var user_id = this.accountId;
-    return API.staff.getStaff({id: user_id})
-        .then(function(data){
-            if(data){
-                var companyId = data.companyId;
+        var self = this;
+        var user_id = self.accountId;
+        return API.staff.getStaff({id: user_id, columns: ['companyId']})
+            .then(function(staff){
+                var companyId = staff.companyId;
                 params.companyId = companyId;
+                return API.company.getCompany({companyId: companyId, columns: ['name']})
+            })
+            .then(function(c){
+                if(c.domainName && c.domainName != "" && params.email.indexOf(c.domainName) == -1){
+                    throw {code: -6, msg: "邮箱格式不符合要求"};
+                }
+                params.companyName = c.name;
                 return API.staff.createStaff(params);
-            }else{
-                return API.staff.createStaff(params);//员工注册的时候
-            }
-        });
-});
+            })
+    });
 
 /**
  * @method deleteStaff
