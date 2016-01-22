@@ -16,7 +16,7 @@ var CITY = {
     ShangHai: "CT_289"
 };
 
-describe("api/client/travelBudget.js", function() {
+describe.skip("api/client/travelBudget.js", function() {
     var agencyId = "";
     var agencyUserId = "";
     var companyId = "";

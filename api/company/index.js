@@ -113,7 +113,7 @@ company.isBlackDomain = function(params) {
  */
 company.updateCompany = updateCompany;
 updateCompany.required_params = ['companyId'];
-updateCompany.optional_params = _.difference(_.keys(Company.attributes), ['companyNo', 'createUser', 'createAt']);
+updateCompany.optional_params = _.difference(_.keys(Company.attributes), ['companyNo', 'createUser', 'createAt', 'email']);
 function updateCompany(params){
     var companyId = params.companyId;
     return Company.findById(companyId, {attributes: ['createUser', 'status']})

@@ -181,7 +181,7 @@ auth.registryCompany = function(params) {
             }
             return API.company.createCompany({id: companyId, agencyId: agencyId, createUser: account.id, name: companyName, domainName: domain,
                 mobile:mobile, email: email})
-            .then(function(){
+                .then(function(){
                     return Q.all([
                         API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
                             mobile: mobile, name: name, roleId: 0}),
