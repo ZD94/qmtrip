@@ -36,7 +36,7 @@ feedback.sendFeedback = function(data){
                 username: data.userName || "匿名"
             }
             return API.mail.sendMailRequest({
-                toEmails: "yali.wang@tulingdao.com",
+                toEmails: "bd@tulingdao.com",
                 templateName: "qm_feedback_email",
                 values: vals
             })
@@ -45,7 +45,6 @@ feedback.sendFeedback = function(data){
                 })
                 .catch(function(err){
                     console.log(err);
-                    console.log(err.stack);
                 })
         })
 }
