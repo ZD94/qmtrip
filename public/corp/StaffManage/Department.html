@@ -21,6 +21,18 @@
                     <input type="button" value="取消" class="common_btn2 w60" style="margin-left: 20px;">
                 </div>
             </h1>
+            <ul>
+                <li ng-repeat="item in departmentlist">
+                    <span><img src="corp/images/Departmentline.png"></span>
+                    <span style="padding-top: 45px;">{{item.name}}</span>
+                    <span style="padding-top: 45px;"><a ng-click="updatechildDepartmentShow($index)">修改部门名称</a>　<a>删除</a></span>
+                    <div class="updatechildDepartment">
+                        <input type="text" value="{{departmentName}}" class="common_text w280">
+                        <input type="button" value="确定" ng-click="updateDepartment()" class="common_btn1 w60" style="margin-left: 20px;">
+                        <input type="button" value="取消" class="common_btn2 w60" style="margin-left: 20px;">
+                    </div>
+                </li>
+            </ul>
         </div>
     </div>
 </div>

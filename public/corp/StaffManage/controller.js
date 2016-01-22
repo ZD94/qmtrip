@@ -520,9 +520,10 @@ var staff = (function(){
 
                                 //获取部门列表
                                 API.department.getChildDepartments({parentId:$scope.departmentId})
-                                    .then(function(departmentList){
-                                        $scope.departmentList = departmentList;
-                                        console.info (departmentList);
+                                    .then(function(departmentlist){
+                                        $scope.departmentlist = departmentlist;
+                                        console.info ($scope.departmentlist);
+                                        $scope.$apply();
                                     })
                                     .catch(function(err){
                                         console.info(err);
@@ -579,6 +580,28 @@ var staff = (function(){
                         console.info(err);
                     })
             })
+        }
+
+        //修改子部门名称
+        $scope.updatechildDepartmentShow = function (index) {
+
+        }
+        $scope.updatechildDepartment = function () {
+            API.onload(function(){
+                API.department.createDepartment({companyId:$scope.companyId,parentId:$scope.departmentId,name:$(".createcompany .common_text").val()})
+                    .then(function(result){
+                        Myalert("温馨提示","添加成功");
+                        $scope.initdepartment();
+                        $(".createcompany").hide();
+                    })
+                    .catch(function(err){
+                        console.info(err);
+                    })
+            })
+        }
+
+        $scope.asdasd = function () {
+            alert (1);
         }
 
     }
