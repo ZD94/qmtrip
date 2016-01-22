@@ -206,6 +206,16 @@ staff.findOneStaff = function(params){
 }
 
 /**
+ * 根据部门id查询部门下员工数
+ * @type {getCountByDepartment}
+ */
+staff.getCountByDepartment = getCountByDepartment;
+getCountByDepartment.required_params = ["departmentId"];
+function getCountByDepartment(params){
+    return staffModel.count({where: {departmentId: params.departmentId, status: {$gte: 0}}})
+}
+
+/**
  * 根据属性查找员工
  * @param params
  * @returns {*}
