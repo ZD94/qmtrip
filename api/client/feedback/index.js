@@ -25,7 +25,6 @@ var feedback = {};
  * @returns {*|Promise}
  */
 feedback.sendFeedback = function(params){
-    console.log("11111111111111111111111");
     var user_id = this.accountId;
     params.userId = user_id;
     return API.staff.getStaff({id: user_id})
@@ -38,7 +37,6 @@ feedback.sendFeedback = function(params){
         })
         .then(function(company){
             params.companyName = company.name;
-            console.log(params);
             return API.feedback.sendFeedback(params);
         });
 }

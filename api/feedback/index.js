@@ -19,8 +19,6 @@ var feedback = {};
  * @returns {*}
  */
 feedback.sendFeedback = function(data){
-    console.log(data);
-    console.log("111111111111111111112222222222222222");
     var content = data.content;
     if(!content){
         throw {code: -1, msg:"content不能为空"};
@@ -35,10 +33,8 @@ feedback.sendFeedback = function(data){
                 time: utils.now(),
                 content: content,
                 companyName: companyName,
-                userName: data.userName || "匿名"
+                username: data.userName || "匿名"
             }
-            console.log(vals);
-            console.log("=====================================");
             return API.mail.sendMailRequest({
                 toEmails: "yali.wang@tulingdao.com",
                 templateName: "qm_feedback_email",
@@ -49,8 +45,6 @@ feedback.sendFeedback = function(data){
                 })
                 .catch(function(err){
                     console.log(err);
-                    console.log(err.message);
-                    console.log(err.msg);
                     console.log(err.stack);
                 })
         })
