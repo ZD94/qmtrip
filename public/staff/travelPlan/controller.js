@@ -127,7 +127,7 @@ var travelPlan=(function(){
                         $scope.initPlanList();
                     }
                 });
-                clearInterval (pagenum1);
+                clearInterval(pagenum1);
             }
         }
         var pagenum1 =setInterval($scope.pagination1,1);
@@ -147,7 +147,7 @@ var travelPlan=(function(){
                         $scope.initFinishPlanList();
                     }
                 });
-                clearInterval (pagenum2);
+                clearInterval(pagenum2);
             }
         }
         var pagenum2 =setInterval($scope.pagination2,1);
