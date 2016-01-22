@@ -278,6 +278,16 @@ staff.getStaffPointsChange = function(params){
 }
 
 /**
+ * 根据部门id查询部门下员工数
+ * @param params
+ * @param .departmentId 部门id
+ * @returns {*}
+ */
+staff.getCountByDepartment = function(params){
+    return API.staff.getCountByDepartment(params);
+}
+
+/**
  * @method importExcel
  *
  * 批量导入员工
