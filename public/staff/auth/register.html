@@ -21,7 +21,7 @@
     </div>
     <div class="input">
         <input id="corpMail" class="" type="text" value="" placeholder="联系人邮箱（请使用企业邮箱,作为登录账号使用)">
-        <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_mail}}</span>
+        <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_mail}}<a href="#/auth/login" style="color: #1194d7!important;text-decoration: none;"></a></span>
         <div class="tip_div">
             <img src="../../images/sanjiao.jpg"/>
             <span>
@@ -32,12 +32,12 @@
         </div>
     </div>
     <div class="input">
-        <input id="corpMobile" class="" type="text" value="" placeholder="联系人电话" maxlength="13">
+        <input id="corpMobile" class="" type="text" value="" placeholder="联系人电话" maxlength="11">
         <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_phone}}</span>
     </div>
     <div class="input">
         <input id="corpPwd" class="" type="password" value="" onkeyup="checkPwd()" maxlength="20" placeholder="设置登录密码">
-        <span class="err_msg"><i class="web-icon-font"></i>{{err_msg_pwd}}</span>
+        <span class="err_msg"><i class="web-icon-font"></i><a>{{err_msg_pwd}}</a></span>
         <div class="pwdStrength">
             <ul>
                 <li class="on">弱</li>
@@ -54,7 +54,7 @@
     </div>
     <div class="inputs">
         <div>
-            <input id="msgCode" class="" type="text" value="" placeholder="短信验证码" style="height: 40px;">
+            <input id="msgCode" class="" type="text" value="" placeholder="短信验证码" style="height: 40px;" maxlength="6">
         </div>
         <span class="getCode v_code" ng-click="getMCode()">免费获取短信验证码</span>
         <span id="timer" class="getCode" style="display:none;background-color: #ededed;">(<span id="seconds">90</span>)s后重新发送</span>
@@ -89,6 +89,7 @@
     function checkPwd(){
         var pwd = $('#corpPwd').val();
         if(pwd.length > 5){
+            $("#corpPwd").siblings(".err_msg").children("a").html("");
             $("#corpPwd").siblings(".err_msg").children("i").html("&#xf058;");
             $("#corpPwd").siblings(".err_msg").children("i").addClass("right");
             $("#corpPwd").siblings(".err_msg").show();
@@ -102,6 +103,7 @@
                 $(".pwdStrength>ul>li:nth-child(2)").addClass("on").siblings().removeClass("on");
             }
         }else{
+            $("#corpPwd").siblings(".err_msg").children("a").html("密码不足六位");
             $("#corpPwd").siblings(".err_msg").children("i").html("&#xf057;");
             $("#corpPwd").siblings(".err_msg").children("i").removeClass("right");
             $("#corpPwd").siblings(".err_msg").show();
