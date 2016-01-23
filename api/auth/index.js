@@ -938,7 +938,7 @@ authServer.__initHttpApp = function(app) {
             res.cookie("token_id", result.token_id);
             res.cookie("user_id", result.user_id);
             res.cookie("timestamp", result.timestamp);
-            res.cookie("sign", result.sign);
+            res.cookie("token_sign", result.sign);
             res.redirect(backUrl);
         })
         .catch(function(err) {
