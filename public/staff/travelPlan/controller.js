@@ -5,6 +5,7 @@
 var travelPlan=(function(){
 
     API.require('tripPlan');
+    API.require("auth");
 
     var  travelPlan = {};
 
@@ -222,6 +223,7 @@ var travelPlan=(function(){
         loading(true);
         $("title").html("出差单明细");
         var planId = $routeParams.planId;
+        console.info(planId)
         API.onload(function() {
             API.tripPlan.getTripPlanOrderById(planId)
                 .then(function(result){
@@ -297,6 +299,52 @@ var travelPlan=(function(){
         }
         $scope.goDetail = function (status,invoiceId) {
             window.location.href = "#/travelPlan/InvoiceDetail?planId="+planId+"&status="+status+"&invoiceId="+invoiceId;
+        }
+        $scope.initscan = function(){
+            var backUrl = "http://"+window.location.host+"/mobile.html";
+            API.onload(function() {
+                API.auth.getQRCodeUrl({backUrl: backUrl})
+                    .then(function(content) {
+                        new QRCode(document.getElementById("qrcode"), content);
+                    })
+                    .catch(function(err) {
+                        alert(err);
+                    })
+                    .done();
+            })
+        }
+        var time;
+        var start = 60;
+        var max = 60;
+        $scope.alertScan = function(){
+            var sw = $(".scancode").width()/2;
+            var sh = $(".scancode").height()/2;
+            $(".scancode").css({"margin-top":-sh,"margin-left":-sw});
+            $(".scan_fixed").show();
+            if(time){
+                clearInterval(time);
+            }
+
+            time = setInterval(function(){
+                if(start<=0) {
+                    $("#qrcode").find("img").remove();
+                    $scope.initscan();
+                    start=max;
+                }else if(start >= max){
+                    $scope.initscan();   
+                }
+
+                start = start -1;
+                $scope.seconds = start;
+                $scope.$apply();
+            },1000);
+            
+        }
+        $scope.close_scan = function(){
+            start = max;
+            $scope.seconds = start;
+            $(".scan_fixed #qrcode").find("img").remove();
+            $(".scan_fixed").hide();
         }
     }
 
