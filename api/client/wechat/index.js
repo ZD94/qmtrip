@@ -4,6 +4,7 @@
 
 
 var service = {};
+var API = require("common/api");
 
 /**
  * 获取微信公众号jsdk信息
