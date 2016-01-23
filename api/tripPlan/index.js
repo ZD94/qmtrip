@@ -627,17 +627,21 @@ function statPlanOrderMoney(params){
                 orderId: {$in: idComplete},
                 status: 1
             }
+            console.info("*************************");
+            console.info(query_complete);
             return Q.all([
                 ConsumeDetails.sum('budget', {where: q1}),
                 ConsumeDetails.sum('budget', {where: q2}),
-                ConsumeDetails.sum('expenditure', {where: q2})
+                ConsumeDetails.sum('expenditure', {where: q2}),
+                PlanOrder.count({where: query_complete})
             ])
         })
-        .spread(function(n1, n2, n3){
+        .spread(function(n1, n2, n3, n4){
             return {
                 qmBudget: n1 || 0,
                 planMoney: n2 || 0,
-                expenditure: n3 || 0
+                expenditure: n3 || 0,
+                NumOfStaff: n4 || 0
             }
         })
 }
