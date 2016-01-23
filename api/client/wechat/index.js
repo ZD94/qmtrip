@@ -14,6 +14,8 @@ var API = require("common/api");
  * @param {String} data.jsApiList 要使用的js api详情参考微信jssdk 文档
  * @return {Promise} config 如果成功返回微信配置信息  weixin.config(返回的配置信息);
  */
-service.getJSDKParams = API.wechat.getJSDKParams;
+service.getJSDKParams = function(params) {
+    return API.wechat.getJSDKParams(params);
+}
 
 module.exports = service;
