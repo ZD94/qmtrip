@@ -173,7 +173,7 @@ function updateTripPlanOrder(params){
                 orderId: order.id,
                 userId: userId,
                 remark: optLog,
-                createAt: utils.now
+                createAt: utils.now()
             }
             return sequelize.transaction(function(t){
                 return Q.all([
@@ -212,7 +212,7 @@ function updateConsumeDetail(params){
 }
 
 tripPlan.updateConsumeBudget = updateConsumeBudget;
-updateConsumeBudget.required_params = ['id', 'budget'];
+updateConsumeBudget.required_params = ['id', 'budget', 'userId'];
 function updateConsumeBudget(params){
     var id = params.id;
     return ConsumeDetails.findById(id, {attributes: ['status', 'budget', 'orderId']})
@@ -228,11 +228,17 @@ function updateConsumeBudget(params){
         .spread(function(o_budget, order){
             var budget = params.budget;
             var c_budget = parseFloat(order.budget) - parseFloat(o_budget) + parseFloat(budget);
-            //return [budget, c_budget, order.id, sequelize.transaction()]
+            var logs = {
+                orderId: order.id,
+                userId: params.userId,
+                remark: "更新预算",
+                createAt: utils.now()
+            }
             return sequelize.transaction(function(t){
                 return Q.all([
                     PlanOrder.update({budget: c_budget, updateAt: utils.now()}, {where: {id: order.id}, fields: ['budget', 'updateAt'], transaction: t}),
-                    ConsumeDetails.update({budget: budget, updateAt: utils.now()}, {where: {id: id}, fields: ['budget', 'updateAt'], transaction: t})
+                    ConsumeDetails.update({budget: budget, updateAt: utils.now()}, {where: {id: id}, fields: ['budget', 'updateAt'], transaction: t}),
+                    TripOrderLogs.create(logs, {transaction: t})
                 ])
             })
         })
@@ -318,8 +324,15 @@ function saveConsumeRecord(params){
         .spread(function(record, order){
             return sequelize.transaction(function(t){
                 options.transaction = t;
+                var logs = {
+                    orderId: order.id,
+                    userId: params.accountId,
+                    remark: "增加新的预算",
+                    createAt: utils.now()
+                }
                 return Q.all([
                     ConsumeDetails.create(record, options),
+                    TripOrderLogs.create(logs, {transaction: t}),
                     order.save()
                 ])
             })
@@ -396,7 +409,7 @@ tripPlan.uploadInvoice = uploadInvoice;
 uploadInvoice.required_params = ['userId', 'consumeId', 'picture'];
 function uploadInvoice(params){
     var orderId = "";
-    return ConsumeDetails.findOne({where: {id: params.consumeId}})
+    return ConsumeDetails.findById(params.consumeId, {attributes: ['status', 'orderId', 'invoice', 'accountId']})
         .then(function(custome){
             if(!custome || custome.status == -2)
                 throw L.ERR.NOT_FOUND;
@@ -409,10 +422,12 @@ function uploadInvoice(params){
             invoiceJson.push(currentInvoice);
             var updates = {newInvoice: params.picture, invoice: JSON.stringify(invoiceJson), updateAt: moment().format(), status: 0, auditRemark: ""};
             var logs = {consumeId: params.consumeId, userId: params.userId, remark: "上传票据"};
+            var orderLogs = {orderId: custome.orderId, userId: params.userId, remark: '上传票据', createAt: utils.now()};
             return sequelize.transaction(function(t){
                 return Q.all([
                     ConsumeDetails.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
-                    ConsumeDetailsLogs.create(logs,{transaction: t})
+                    ConsumeDetailsLogs.create(logs,{transaction: t}),
+                    TripOrderLogs.create(orderLogs, {transaction: t})
                 ]);
             })
         })
@@ -471,6 +486,25 @@ function getVisitPermission(params){
 
 }
 
+/**
+ * 保存出差计划日志
+ * @type {saveOrderLogs}
+ */
+tripPlan.saveOrderLogs = saveOrderLogs;
+saveOrderLogs.required_params = ['userId', 'orderId', 'remark']
+function saveOrderLogs(logs){
+    return PlanOrder.findById(params.orderId, {attributes: ['status']})
+        .then(function(order){
+            if(!order || order,status == -2){
+                throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
+            }
+            if(order.status == 2){
+                throw {code: -2, msg: '该计划单已完成，不能增加日志'};
+            }
+            logs.createAt = utils.now();
+            return TripOrderLogs.create(logs);
+        })
+}
 
 /**
  * 审核票据
@@ -627,8 +661,6 @@ function statPlanOrderMoney(params){
                 orderId: {$in: idComplete},
                 status: 1
             }
-            console.info("*************************");
-            console.info(query_complete);
             return Q.all([
                 ConsumeDetails.sum('budget', {where: q1}),
                 ConsumeDetails.sum('budget', {where: q2}),

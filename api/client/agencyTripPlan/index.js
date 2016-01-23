@@ -374,6 +374,7 @@ function editTripPlanBudget(params){
         .then(function(){
             var updates = {id: consumeId, budget: params.budget};
             if(params.remark){ updates.remark = params.remark; }
+            updates.userId = self.accountId;
             return API.tripPlan.updateConsumeBudget(updates)
         })
 }
