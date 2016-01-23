@@ -220,6 +220,7 @@
 |ret.qmBudget |动态预算(全麦预算)   | number  |
 |ret.planMoney |预算金额   | number  |
 |ret.expenditure |实际支出   | number  |
+|ret.NumOfStaff   |完成出差人次数 | number    |
 
 >. 获取企业所有项目列表 API.tripPlan.getProjectsList(callback);
 
