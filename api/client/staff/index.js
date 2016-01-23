@@ -26,18 +26,22 @@ var staff = {};
  */
 staff.createStaff = auth.checkPermission(["user.add"],
     function(params) {
-    var user_id = this.accountId;
-    return API.staff.getStaff({id: user_id})
-        .then(function(data){
-            if(data){
-                var companyId = data.companyId;
+        var self = this;
+        var user_id = self.accountId;
+        return API.staff.getStaff({id: user_id, columns: ['companyId']})
+            .then(function(staff){
+                var companyId = staff.companyId;
                 params.companyId = companyId;
+                return API.company.getCompany({companyId: companyId, columns: ['name']})
+            })
+            .then(function(c){
+                if(c.domainName && c.domainName != "" && params.email.indexOf(c.domainName) == -1){
+                    throw {code: -6, msg: "邮箱格式不符合要求"};
+                }
+                params.companyName = c.name;
                 return API.staff.createStaff(params);
-            }else{
-                return API.staff.createStaff(params);//员工注册的时候
-            }
-        });
-});
+            })
+    });
 
 /**
  * @method deleteStaff
@@ -259,11 +263,22 @@ staff.decreaseStaffPoint = function(params){
  */
 staff.listAndPaginatePointChange = function(params){
     var user_id = this.accountId;
-    return API.staff.getStaff({id:user_id})
-        .then(function(data){
-            params.staffId = data.id;
-            return API.staff.listAndPaginatePointChange(params);
-        });
+    params.staffId = user_id;
+    return API.staff.listAndPaginatePointChange(params);
+}
+/**
+ * @method getStaffPointsChange
+ * 查询员工某时间段内积分变动
+ * @param params
+ * @param params.staffId  员工id
+ * @param params.startTime  开始时间
+ * @param params.endTime  结束时间
+ * @returns {promise|*}
+ */
+staff.getStaffPointsChange = function(params){
+    var staffId = this.accountId;
+    params.staffId = staffId;
+    return API.staff.getStaffPointsChange(params);
 }
 
 /**

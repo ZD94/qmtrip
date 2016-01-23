@@ -222,22 +222,43 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                 var url = C.host + '/staff.html#/travelPlan/PlanDetail?planId=' + order.id;
                 //审核完成后给用户发送邮件
                 if(params.status == -1){ //审核不通过
+                    var vals = {
+                        username: staffName,
+                        email: staffEmail,
+                        ticket: invoiceName,
+                        goTrafficBudget: go,
+                        backTrafficBudget: back,
+                        hotelBudget: hotel,
+                        totalBudget: '全麦预算￥'+order.budget,
+                        url: url,
+                        reason: params.remark,
+                        projectName: ret.description
+                    }
                     API.mail.sendMailRequest({
                         toEmails: staffEmail,
-                        //toEmails: 'miao.yu@tulingdao.com',
                         templateName: "qm_notify_invoice_not_pass",
-                        titleValues: [],
-                        values: [staffName, invoiceName, params.remark, ret.description, go, back, hotel, '全麦预算￥'+order.budget, url]
+                        values: vals
                     })
                 }
                 //"%s,您好<br/>您有1张%s票据被审核通过，实际支出为%s，关联出差记录如下：<br/>项目名称:%s<br/>出差时间：%s<br/>去程交通:%s<br/>回程交通:%s<br/>住宿:%s<br/>总计：%s<br/><a href="%s">点击此处查看出差详情</a>"
                 if(params.status == 1){
+                    var vals = {
+                        username: staffName,
+                        ticket: invoiceName,
+                        consume: expenditure,
+                        projectName:ret.description,
+                        time: orderTime,
+                        goTrafficBudget: go,
+                        backTrafficBudget: back,
+                        hotelBudget: hotel,
+                        totalBudget: '全麦预算￥'+order.budget,
+                        url: url
+                    }
                     API.mail.sendMailRequest({
                         toEmails: staffEmail,
-                        //toEmails: 'miao.yu@tulingdao.com',
                         templateName: "qm_notify_invoice_one_pass",
                         titleValues: [],
-                        values: [staffName, invoiceName, expenditure, ret.description, orderTime, go, back, hotel, '全麦预算￥'+order.budget, url]
+                        values: vals
                     })
                 }
                 if(ret.status == 2){
@@ -246,12 +267,22 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                     var _score = order.score;
                     if(_score> 0 ){ _score += '积分已发放到您的积分账户'; }
                     var total = '全麦预算￥' + order.budget + ',实际支出￥' + order.expenditure + ',节省￥' + s;
+                    var vals = {
+                        username: staffName,
+                        time: orderTime,
+                        projectName: ret.description,
+                        goTrafficBudget: go,
+                        backTrafficBudget: back,
+                        hotelBudget: hotel,
+                        totalBudget: total,
+                        score: _score,
+                        url: url
+                    }
                     API.mail.sendMailRequest({
                         toEmails: staffEmail,
-                        //toEmails: 'miao.yu@tulingdao.com',
                         templateName: "qm_notify_invoice_all_pass",
                         titleValues: [],
-                        values: [staffName, orderTime, ret.description, go, back, hotel, total, _score, url]
+                        values: vals
                     })
                 }
                 if(ret.status != 2 || ret.score == 0){ //status == 2 是审核通过的状态，通过后要给企业用户增加积分操作，积分为0时不需要此操作

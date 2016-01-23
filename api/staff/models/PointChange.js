@@ -11,6 +11,7 @@ module.exports = function (Db, DataType) {
         staffId : {type: DataType.UUID,     field: "staff_id"}, //员工id
         status  : {type: DataType.INTEGER , defaultValue: 1}, //状态1表示增加-1表示减少
         points  : {type: DataType.INTEGER }, //积分数量
+        currentPoint  : {type: DataType.INTEGER, field: "current_point" }, //积分数量
         remark  : {type: DataType.TEXT }, //备注
         createAt: {type: "timestamp",       defaultValue: now, field: "create_at"} //创建时间
     }, {

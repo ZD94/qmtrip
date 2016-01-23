@@ -56,11 +56,22 @@ tripPlan.savePlanOrder = function (params) {
                         if(a.status != 1){
                             return {code: 0};
                         }else{
+                            var vals = {
+                                managerName: s.name,
+                                username: staffName,
+                                email: email,
+                                time: moment(order.createAt).format('YYYY-MM-DD HH:mm:ss'),
+                                projectName: order.description,
+                                goTrafficBudget: go,
+                                backTrafficBudget: back,
+                                hotelBudget: hotel,
+                                totalBudget: '￥'+order.budget,
+                                url: url
+                            }
                             return API.mail.sendMailRequest({
                                 toEmails: s.email, //'miao.yu@tulingdao.com',
                                 templateName: 'qm_notify_new_travelbudget',
-                                titleValues: [staffName],
-                                values: [s.name, staffName, email, moment(order.createAt).format('YYYY-MM-DD HH:mm:ss'), order.description, go, back, hotel, '￥'+order.budget, url]
+                                values: vals
                             })
                         }
                     })
@@ -345,6 +356,18 @@ tripPlan.getProjectsList = function(){
                 return s.description;
             })
         })
+}
+
+/**
+ * 用户提交订单(上传完票据后，提交订单后不可修改)
+ * @param orderId
+ */
+tripPlan.commitTripPlanOrder = function(orderId){
+    if(!orderId || typeof orderId == 'function'){
+        throw {code: -1, msg: '参数不正确'};
+    }
+    var self = this;
+    return API.tripPlan.commitTripPlanOrder({orderId: orderId, accountId: self.accountId})
 }
 
 module.exports = tripPlan;

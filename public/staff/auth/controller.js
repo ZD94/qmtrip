@@ -5,15 +5,22 @@ var auth=(function(){
     API.require('checkcode');
     var  auth = {};
     var Cookie = require('tiny-cookie');
-
     //登录页面
     auth.LoginController = function ($scope, $routeParams) {
+        //function err_attention(id,err,errforh){
+        //    $scope.errforh = err;
+        //    $('#'+id).siblings(".err_msg").children("i").html("&#xf06a;");
+        //    $('#'+id).siblings(".err_msg").children("i").removeClass("right");
+        //    $('#'+id).siblings(".err_msg").show();
+        //    console.info("$$$$$$$$$$$$");
+        //    return false;
+        //}
+        //err_attention(email,'邮箱不能为空',err_msg_mail);
+        //console.info(err_attention())
         var email = Cookie.get("email");
         var pwd = Cookie.get("pwd");
-
         $scope.email = email;
         $scope.pwd = pwd;
-        console.info(email, pwd);
         $scope.toRegister = function(){
             window.location.href = "#/auth/register";
         }
@@ -417,6 +424,19 @@ var auth=(function(){
         $scope.toRegister = function () {
             window.location.href = "#/auth/register";
         }
+        $("#loginMail").blur(function(){
+            var email   = $('#loginMail').val();
+            if(!email){
+                $scope.err_msg_mail = "联系人邮箱不能为空";
+                $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
+                $("#loginMail").siblings(".err_msg").show();
+                $scope.$apply();
+                return false;
+            }else{
+                $("#loginMail").siblings(".err_msg").hide();
+            }
+        })
         //图片验证码加载
         var imgW = $('#imgCode').attr("width");
         var imgH = $('#imgCode').attr("height");
@@ -452,6 +472,19 @@ var auth=(function(){
             var mail = $("#loginMail").val();
             var picCode = $("#picCode").val();
 
+            if(!mail){
+                $scope.err_msg_mail = "联系人邮箱不能为空";
+                $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
+                $("#loginMail").siblings(".err_msg").show();
+                return false;
+            }else if(!picCode){
+                $scope.err_msg_pic = "图片验证码不能为空";
+                $("#picCode").parent("div").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#picCode").parent("div").siblings(".err_msg").children("i").removeClass("right");
+                $("#picCode").parent("div").siblings(".err_msg").show();
+                return false;
+            }
             API.onload(function () {
                 API.auth.sendResetPwdEmail({email:mail,code:picCode,ticket:picTicket})
                     .then(function (result) {
@@ -461,7 +494,7 @@ var auth=(function(){
                         $(".step>ul>li:nth-child(2)").addClass("on").siblings("li").removeClass("on");
                         $scope.$apply();
                     }).catch(function (err) {
-                        alert(err.msg);
+                        //alert(err.msg);
                     }).done();
             })
         }
@@ -661,45 +694,83 @@ var auth=(function(){
             var commit = true;
 
             if(commit){
-                // if(old == first){
-                //     alert("新旧密码不能一致！");
-                // }else if(first != second){
-                //     alert("两次输入密码不一致！");
-                // }
-                API.onload(function() {
-                    API.auth.resetPwdByOldPwd({oldPwd:old,newPwd:second})
-                        .then(function(){
-                            // alert("重置密码成功");
-                            // window.location.href= '#/auth/login';
-                            $(".confirmFixed").show();
-                            $scope.seconds = 3;
-                            var $seconds = $("#second3");
-                            var timer = setInterval(function() {
-                                var begin = $seconds.text();
-                                begin = parseInt(begin);
-                                if (begin <=0 ) {
-                                    clearInterval(timer);
-                                    window.location.href= '#/auth/login';
-                                } else {
-                                    begin = begin - 1;
-                                    $seconds.text(begin);
-                                }
-                            }, 1000);
-                            $scope.$apply();
-                        }).catch(function(err){
-                            console.error(err);
-                            $scope.err_msg1 = err.msg;
-                            $("#oldPwd").siblings(".err_msg").children("i").html("&#xf06a;");
-                            $("#oldPwd").siblings(".err_msg").children("i").removeClass("right");
-                            $("#oldPwd").siblings(".err_msg").show();
-                            $scope.$apply();
-                        }).done();
-                })
+                var pwdReg = /^[a-z\dA-Z]+$/;
+                if(!pwdReg.test(old)){
+                    $scope.err_msg1 = "格式错误,只能为数字或字母";
+                    $("#oldPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                    $("#oldPwd").siblings(".err_msg").children("i").removeClass("right");
+                    $("#oldPwd").siblings(".err_msg").show();
+                    return false;
+                } else if (!pwdReg.test(first)) {
+                    $scope.err_msg2 = "格式错误,只能为数字或字母";
+                    $("#newFirstPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                    $("#newFirstPwd").siblings(".err_msg").children("i").removeClass("right");
+                    $("#newFirstPwd").siblings(".err_msg").show();
+                    return false;
+                } else if(old == first){
+                    $scope.err_msg2 = "新旧密码重复";
+                    $("#newFirstPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                    $("#newFirstPwd").siblings(".err_msg").children("i").removeClass("right");
+                    $("#newFirstPwd").siblings(".err_msg").show();
+                    return false;
+                } else if(first != second){
+                    $scope.err_msg3 = "2次密码设置不一致";
+                    $("#newSecondPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                    $("#newSecondPwd").siblings(".err_msg").children("i").removeClass("right");
+                    $("#newSecondPwd").siblings(".err_msg").show();
+                    return false;
+                }else{
+
+                    API.onload(function() {
+                        API.auth.resetPwdByOldPwd({oldPwd:old,newPwd:second})
+                            .then(function(){
+                                // alert("重置密码成功");
+                                // window.location.href= '#/auth/login';
+                                $(".confirmFixed").show();
+                                $scope.seconds = 3;
+                                var $seconds = $("#second3");
+                                var timer = setInterval(function() {
+                                    var begin = $seconds.text();
+                                    begin = parseInt(begin);
+                                    if (begin <=0 ) {
+                                        clearInterval(timer);
+                                        window.location.href= '#/auth/login';
+                                    } else {
+                                        begin = begin - 1;
+                                        $seconds.text(begin);
+                                    }
+                                }, 1000);
+                                $scope.$apply();
+                            }).catch(function(err){
+                                console.error(err);
+                                $scope.err_msg1 = err.msg;
+                                $("#oldPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                                $("#oldPwd").siblings(".err_msg").children("i").removeClass("right");
+                                $("#oldPwd").siblings(".err_msg").show();
+                                $scope.$apply();
+                            }).done();
+                    })
+                }
             }
         }
         $scope.toReLogin = function(){
             $scope.$apply();
         }
+    }
+
+    auth.QrcodeLoginController = function($scope) {
+        var backUrl = "http://localhost:4002/staff.html";
+        API.require("auth");
+        API.onload(function() {
+            API.auth.getQRCodeUrl({backUrl: backUrl})
+                .then(function(content) {
+                    new QRCode(document.getElementById("qrcode"), content);
+                })
+                .catch(function(err) {
+                    alert(err);
+                })
+                .done();
+        })
     }
 
     return auth;

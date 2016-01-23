@@ -64,31 +64,21 @@ staff.createStaff = function(data){
     if (!data.companyId) {
         throw {code: -4, msg: "所属企业不能为空"};
     }
-    return API.company.getCompany({companyId: data.companyId})
-        .then(function(company){
-            if (!company) {
-                throw {code: -5, msg: "所属企业不存在"};
+    return Q()
+        .then(function(){
+            if(accountId) {
+                return {id: accountId};
             }
-            if(company && company.domainName && company.domainName != "" && data.email.indexOf(company.domainName) == -1){
-                throw {code: -6, msg: "邮箱格式不符合要求"};
-            }
-            if (accountId) {
-                data.id = accountId;
-                return data;
-            }
-            var accData = {email: data.email, mobile: data.mobile, status: 0, type: 1, companyName: company.name}//若为导入员工置为激活状态 不设置密码
+            var accData = {email: data.email, mobile: data.mobile, status: 0, type: 1, companyName: data.companyName}//若为导入员工置为激活状态 不设置密码
             return API.auth.newAccount(accData)
-                .then(function(account){
-                    data.id = account.id;
-                    return data;
-                });
         })
-        .then(function(staff) {
+        .then(function(account){
+            data.id = account.id;
             if(!data.travelLevel || data.travelLevel == ""){
                 data.travelLevel = null;
             }
-            return staffModel.create(staff);
-        });
+            return staffModel.create(data);
+        })
 }
 
 
@@ -109,13 +99,21 @@ staff.deleteStaff = function(params){
         .spread(function(num, rows){
             return API.company.getCompany({companyId:rows[0].companyId})
                 .then(function(company){
-                    return API.mail.sendMailRequest({toEmails: rows[0].email, templateName: "qm_notify_remove_staff", values: [utils.now(),company.name]})
-                        .then(function() {
-                            if(num != 1){
-                                throw {code: -2, msg: '删除失败'};
-                            }
-                            return true;
-                        });
+                    var vals = {
+                        time: utils.now(),
+                        companyName: company.name
+                    }
+                    return API.mail.sendMailRequest({
+                            toEmails: rows[0].email,
+                            templateName: "qm_notify_remove_staff",
+                            values: vals
+                    })
+                    .then(function() {
+                        if(num != 1){
+                            throw {code: -2, msg: '删除失败'};
+                        }
+                        return true;
+                    });
                 })
 
         })
@@ -146,16 +144,15 @@ staff.updateStaff = function(data){
                     .then(function(old){
                         if(old.email != data.email){
                             return Q.all([
-                                API.auth.getAccount({id:id}),//暂无此接口
+                                API.auth.getAccount({id:id}),
                                 API.company.getCompany({companyId: old.companyId})
                             ])
                             .spread(function(acc, company){
-                                console.info("company==>", company);
                                 if(acc.status != 0)
                                     throw {code: -2, msg: "该账号不允许修改邮箱"};
                                 var accData = {email: data.email};
                                 return Q.all([
-                                    API.auth.updataAccount(id, accData, company.name),//暂无此接口
+                                    API.auth.updataAccount(id, accData, company.name),
                                     staffModel.update(data, options)
                                 ]);
                             })
@@ -184,10 +181,9 @@ staff.getStaff = function(params){
     if(!id){
         throw {code: -1, msg: "id不能为空"};
     }
-    var cols = params.columns;
     var options = {};
-    if(cols){
-        options.attributes = cols
+    if(params.columns){
+        options.attributes = params.columns
     }
     return staffModel.findById(id, options)
         .then(function(staff){
@@ -281,7 +277,7 @@ staff.increaseStaffPoint = function(params) {
         .then(function(obj) {
             var totalPoints = obj.totalPoints + increasePoint;
             var balancePoints = obj.balancePoints + increasePoint;
-            var pointChange = {staffId: id, status: 1, points: increasePoint, remark: params.remark||"增加积分", operatorId: operatorId};
+            var pointChange = {staffId: id, status: 1, points: increasePoint, remark: params.remark||"增加积分", operatorId: operatorId, currentPoint: balancePoints};
             return sequelize.transaction(function(t) {
                 return Q.all([
                         staffModel.update({totalPoints: totalPoints, balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
@@ -317,7 +313,7 @@ staff.decreaseStaffPoint = function(params) {
                 throw {code: -3, msg: "积分不足"};
             }
             var balancePoints = obj.balancePoints - decreasePoint;
-            var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分", operatorId: operatorId}//此处也应该用model里的属性名封装obj
+            var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分", operatorId: operatorId, currentPoint: balancePoints}//此处也应该用model里的属性名封装obj
             return sequelize.transaction(function(t) {
                 return Q.all([
                         staffModel.update({balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
@@ -365,6 +361,46 @@ staff.listAndPaginatePointChange = function(params){
     return pointChangeModel.findAndCountAll(options)
         .then(function(result){
             return new Paginate(page, perPage, result.count, result.rows);
+        });
+}
+
+/**
+ * 获取某个时间段员工的积分变动
+ * @param params
+ * @param params.staffId  员工id
+ * @param params.startTime  开始时间
+ * @param params.endTime  结束时间
+ * @returns {*|Promise}
+ */
+staff.getStaffPointsChange = getStaffPointsChange;
+getStaffPointsChange.required_params = ['staffId'];
+function getStaffPointsChange(params){
+    var staffId = params.staffId;
+    var startTime = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
+    var endTime = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
+    var changeNum = 0;
+    var options = {};
+    var changeDate = [];
+    var changePoint = [];
+    options.where = {staffId: staffId, createAt: {$gte: startTime, $lte: endTime}};
+    return pointChangeModel.findAll(options)
+        .then(function(result){
+            if(result && result.length > 0){
+                for(var i=0;i<result.length;i++){
+                    result[i] = result[i].toJSON();
+                    changePoint.push(result[i].currentPoint);
+                    changeDate.push(moment(result[i].createAt).format("YYYY-MM-DD HH:mm:ss"));
+                    /*if((i+1)!= result.length && moment(result[i].createAt).format("YYYY-MM-DD") != moment(result[i+1].toJSON().createAt).format("YYYY-MM-DD")){
+                        changePoint.push(result[i].currentPoint);
+                        changeDate.push(moment(result[i].createAt).format("YYYY-MM-DD"));
+                    }else if((i+1) == result.length){
+                        changePoint.push(result[i].currentPoint);
+                        changeDate.push(moment(result[i].createAt).format("YYYY-MM-DD"));
+                    }*/
+                    changeNum = changeNum + (result[i].points * result[i].status)
+                }
+            }
+            return {changeNum: changeNum, changeDate: changeDate, changePoint: changePoint};
         });
 }
 

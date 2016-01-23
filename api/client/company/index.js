@@ -27,16 +27,12 @@ var company = {}
  * @param params
  * @returns {*}
  */
-company.createCompany = function(params){
+company.createCompany = createCompany;
+createCompany.required_params = ['mobile', 'name', 'email', 'domain', 'userName'];
+function createCompany(params){
     var self = this;
     var accountId = self.accountId;
     params.createUser = accountId;
-    if(!params.mobile || !params.email || !params.name || !params.domain){
-        throw {code: -1, msg: '参数不正确'};
-    }
-    if(!params.userName){
-        throw {code: -2, msg: '联系人姓名不能为空'};
-    }
     var mobile = params.mobile;
     var email = params.email;
     var pwd = params.pwd || md5('123456');
@@ -65,7 +61,7 @@ company.createCompany = function(params){
                 mobile: mobile, name: userName, roleId: 0
             })];
         })
-        .spread(function(company, staff){
+        .spread(function(company){
             return company;
         });
 };

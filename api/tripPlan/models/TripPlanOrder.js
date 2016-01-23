@@ -23,7 +23,7 @@ module.exports = function (Db, DataType) {
         budget       : {type: DataType.NUMERIC(15, 2) }, //预算
         expenditure   : {type: DataType.NUMERIC(15, 2),  field: "expenditure", defaultValue: 0}, //预定支出
         expendInfo   : {type: DataType.JSONB,           field: "expend_info"}, //支出详情
-        auditStatus  : {type: DataType.INTEGER,         field: "audit_status"}, //审核状态
+        auditStatus  : {type: DataType.INTEGER,         field: "audit_status", defaultValue: 0}, //审核状态
         auditRemark  : {type: DataType.STRING,          field: 'audit_remark'}, //审核备注
         score        : {type: DataType.INTEGER,         field: 'score', defaultValue: 0}, //获取的积分
         expireAt     : {type: "timestamp without time zone", field: "expire_at"}, //失效时间

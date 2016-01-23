@@ -251,6 +251,16 @@
 | totalPoints   |企业员工总共获得的积分|integer
 | balancePoints |企业员工当前可用积分|integer
 
+>. 企业部门API.staff.getDistinctDepartment();
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 参数             | json             |-------
+| params.companyId                     | 企业id             | uuid            |-------
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+|    | 部门数组 | array
 
 >. 代理商统计企业员工积分（总积分和可用积分）数量 API.staff.statStaffPointsByAgency();
 
@@ -263,3 +273,19 @@
 |---------|------|-----|
 | totalPoints   |企业员工总共获得的积分|integer
 | balancePoints |企业员工当前可用积分|integer
+
+>. 查询员工积分变动 API.staff.getStaffPointsChange(params, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 查询条件参数             |json              |------
+| params.staffId                                | 员工id             |uuid              |选填
+| params.startTime                                | 开始时间             |string              |选填 默认本月第一天
+| params.endTime                                | 结束时间             |string              |选填 默认本月最后一天
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| changeNum     | 变动积分 |Integer
+| changeDate     | 变动时间数组 | Array
+| changePoint     | 变动时间点积分数组 |Array

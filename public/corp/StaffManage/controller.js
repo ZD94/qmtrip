@@ -29,46 +29,6 @@ var staff = (function(){
         ]
         $scope.department = "";
 
-
-        //初始化员工记录的方法
-        $scope.initStaff = function() {
-            API.onload(function(){
-                API.staff.getCurrentStaff()//获取当前登录人员的企业id
-                    .then(function(staff){
-                        $scope.roleId = staff.roleId;
-                        API.staff.listAndPaginateStaff({companyId:staff.companyId})
-                            .then(function(staffinfo){
-                                //console.info(staffinfo);
-                                $scope.staffs = staffinfo.items;
-                                //console.info($scope.staff);
-                                var tasks = $scope.staffs
-                                    .map(function($staff){ //通过id拿到差旅标准的名字
-                                        return Q.all([
-                                                API.travelPolicy.getTravelPolicy({id:$staff.travelLevel}),
-                                                API.auth.getAccountStatus({id:$staff.id})
-                                            ])
-                                            .spread(function(travelLevel, acc){
-                                                $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
-//                                                $staff.accStatus = acc.status==0?'未激活':(acc.status == -1?'禁用': '已激活');//账户激活状态
-                                                $staff.activeStatus = acc.status;
-                                                $staff.accStatus = acc.status==0?'未激活':'';
-                                                $scope.$apply();
-                                            })
-                                    });
-                                Q.all(tasks)
-                                    .then(function(){
-                                        //console.log(6768);
-                                        $scope.$apply();
-                                    })
-                            }).catch(function(err){
-                                console.info(err);
-                            })
-                    }).catch(function(err){
-                        console.info(err);
-                    }).done();
-            })
-        }
-
         //初始化所有的记录
         $scope.initstafflist = function(){
             //加载多个API方法
@@ -92,11 +52,14 @@ var staff = (function(){
                         ])
                             .spread(function(travelPolicies,staffinfo,staffRole, departments){
                                 $scope.total = staffinfo.total;
+                                $scope.departments = departments;
                                 //获取差旅标准
                                 $scope.companyId = staff.companyId;
                                 var arr = travelPolicies;
                                 var i ;
-                                $scope.selectClass = [];//清空selectClass避免出现重复
+                                $scope.selectClass = [
+                                    {val:"",name:"请选择对应的差旅等级"}
+                                ]//清空selectClass避免出现重复
                                 for(i=0; i<arr.length; i++){
                                     var name = arr[i].name;
                                     var id = arr[i].id;
@@ -130,7 +93,6 @@ var staff = (function(){
                                 $scope.totalCount = staffRole.totalCount;
                                 return Q.all(tasks)
                                     .then(function(){
-                                        //console.log(6768);
                                         $scope.$apply();
                                     })
                             })
@@ -165,7 +127,109 @@ var staff = (function(){
 
         $scope.initstafflist();
 
+        $scope.justInitList = function(department){
+            API.onload(function(){
+                var params = {};
+                var options = {};
+                options.perPage = 20;
+                options.page = $scope.page;
+                params.options = options;
+                params.companyId = $scope.currentStaff.companyId;
+                if(department && department!= ""){
+                    params.department = department;
+                }
+                return API.staff.listAndPaginateStaff(params)//加载所有的员工记录
+                    .then(function(staffinfo){
+                        console.log(staffinfo);
+                        $scope.total = staffinfo.total;
+                        //加载员工列表
+                        $scope.staffs = staffinfo.items;
+                        var tasks = $scope.staffs
+                            .map(function($staff){ //通过id拿到差旅标准的名字
+                                return Q.all([
+                                        API.travelPolicy.getTravelPolicy({id:$staff.travelLevel}),
+                                        API.auth.getAccountStatus({id:$staff.id})
+                                    ])
+                                    .spread(function(travelLevel, acc){
+                                        $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
+//                                                $staff.accStatus = acc.status==0?'未激活':(acc.status == -1?'禁用': '已激活');//账户激活状态
+                                        if(acc){
+                                            $staff.activeStatus = acc.status;
+                                            $staff.accStatus = acc.status==0?'未激活':'';
+                                        }
+                                        $scope.$apply();
+                                    })
+                            });
+                        return Q.all(tasks)
+                            .then(function(){
+                                $scope.$apply();
+                            })
+                    })
+                    .catch(function(err){
+                        console.info(err);
+                    })
+            })
+        }
 
+        $scope.departmentChange = function(department){
+            API.onload(function(){
+                var params = {};
+                var options = {};
+                options.perPage = 20;
+                options.page = $scope.page;
+                params.options = options;
+                params.companyId = $scope.currentStaff.companyId;
+                if(department && department!= ""){
+                    params.department = department;
+                }
+                return API.staff.listAndPaginateStaff(params)//加载所有的员工记录
+                    .then(function(staffinfo){
+                        console.log(staffinfo);
+                        $scope.total = staffinfo.total;
+                        $.jqPaginator('#pagination', {
+                            totalCounts: $scope.total,
+                            pageSize: 20,
+                            currentPage: 1,
+                            prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+                            next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+                            page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+                            onPageChange: function (num) {
+                                $scope.page = num;
+                                $scope.justInitList(department);
+                            }
+                        });
+                        //加载员工列表
+                        $scope.staffs = staffinfo.items;
+                        var tasks = $scope.staffs
+                            .map(function($staff){ //通过id拿到差旅标准的名字
+                                return Q.all([
+                                        API.travelPolicy.getTravelPolicy({id:$staff.travelLevel}),
+                                        API.auth.getAccountStatus({id:$staff.id})
+                                    ])
+                                    .spread(function(travelLevel, acc){
+                                        $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
+                                        if(acc){
+                                            $staff.activeStatus = acc.status;
+                                            $staff.accStatus = acc.status==0?'未激活':'';
+                                        }
+                                        $scope.$apply();
+                                    })
+                            });
+                        return Q.all(tasks)
+                            .then(function(){
+                                $scope.$apply();
+                            })
+                    })
+                    .catch(function(err){
+                        console.info(err);
+                    })
+            })
+
+        }
+
+        /*$scope.showDepartments = function(){
+            $(".departmentlist").show();
+        }*/
 
         //对员工信息进行保存的操作
         $scope.saveStaffInfo = function() {
@@ -176,7 +240,7 @@ var staff = (function(){
             var n = $("#staffStandard").val().length;//获取差旅标准id的长度
             var standard   = $("#staffStandard").val().substr(7,n);
             var power      = $("#staffPower").val();
-            var commit = true
+            var commit = true;
             var filter  = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
             if(commit){
                 if(!name){
@@ -210,7 +274,9 @@ var staff = (function(){
                             $("#staffTel").val("");
                             $("#staffDepartment").val("");
                             $scope.selectkey = "";
-                            $("#staffPower").val("");
+                            if($scope.roleId != 2){
+                                $("#staffPower").val("");
+                            }
                             $scope.initstafflist();
                             $scope.$apply();
                         }).catch(function (err) {
@@ -231,13 +297,13 @@ var staff = (function(){
 
 
         //对员工的信息进行修改
-        $scope.editStaffInfo = function(index) {
+        $scope.editStaffInfo = function(id) {
+            $("#change").addClass("orange");
             API.onload(function(){
-                API.staff.listAndPaginateStaff({companyId:$scope.companyId})
+                API.staff.getStaff({id: id})
                     .then(function(staffinfo){
-                        $scope.travellevel = staffinfo.items[index].travelLevel;
-                        //console.info ($scope.travellevel);
-                        $scope.selectkey = $scope.travellevel;
+                        $scope.travellevel = staffinfo.staff.travelLevel;
+                        $scope.selectkey = $scope.travellevel || "";
                         $scope.$apply();
                     }).catch(function(err){
                         console.info(err);
@@ -245,8 +311,11 @@ var staff = (function(){
             })
         }
 
+
+
         //对员工所修改的信息进行保存
         $scope.updateStaffInfo = function(id,index){
+            $("#change").removeClass("orange");
             //alert(id);
             var name = $("#staffName"+index).val();
             var mail = $("#staffEmail"+index).val();
@@ -272,6 +341,7 @@ var staff = (function(){
 
         //取消对员工信息的修改
         $scope.cancelAddStaffInfo = function(){
+            $("#change").removeClass("orange");
             $(".add_staff2").hide();
         }
 
@@ -389,8 +459,8 @@ var staff = (function(){
                             objAttr = $scope.downloadValidData;
                         }
                         API.staff.downloadExcle({accountId:staffid.id,objAttr:objAttr})
-                            .then(function(filename){
-                                console.info(filename);
+                            .then(function(result){
+                                var filename = result.fileName;
                                 window.open('/download/excle-file/'+filename, "_blank");
                                 $scope.$apply();
                             }).catch(function(err){

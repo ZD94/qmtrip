@@ -138,7 +138,7 @@ var businessTravel=(function(){
                 Myalert("温馨提示","返程日期格式不正确");
                 return false;
             }
-            if (starttime>=endtime&&endtime!=undefined) {
+            if (starttime>endtime&&endtime!=undefined) {
                 Myalert("温馨提示","返程日期不能小于出发日期");
                 return false;
             }
@@ -249,7 +249,7 @@ var businessTravel=(function(){
                 Myalert("温馨提示","离店日期不存在或格式不正确");
                 return false;
             }
-            if (livetime>=leavetime&&leavetime!=undefined) {
+            if (livetime>leavetime&&leavetime!=undefined) {
                 Myalert("温馨提示","离店日期不能小于入住日期");
                 return false;
             }
@@ -378,7 +378,7 @@ var businessTravel=(function(){
                 Myalert("温馨提示","返程日期格式不正确");
                 return false;
             }
-            if (starttime>=endtime&&endtime!=undefined) {
+            if (starttime>endtime&&endtime!=undefined) {
                 Myalert("温馨提示","返程日期不能小于出发日期");
                 return false;
             }
@@ -415,7 +415,7 @@ var businessTravel=(function(){
                 Myalert("温馨提示","离店日期不存在或格式不正确");
                 return false;
             }
-            if (livetime>=leavetime&&leavetime!=undefined) {
+            if (livetime>leavetime&&leavetime!=undefined) {
                 Myalert("温馨提示","离店日期不能小于入住日期");
                 return false;
             }
@@ -650,7 +650,6 @@ var businessTravel=(function(){
                         $(".bottom1").hide();
                         $(".bottom2").show();
                         $('.createtime').html("生成时间："+$filter('date')($scope.createTime,'yyyy-MM-dd'));
-                        Myalert("温馨提示","生成出差记录成功");
                     })
                     .catch(function(err){
                         console.info (err);
