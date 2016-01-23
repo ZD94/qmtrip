@@ -808,7 +808,7 @@ authServer.qrCodeLogin = function(params) {
         if (sysSign.toLowerCase() != sign.toLowerCase()) {
             throw L.ERR.SIGN_ERROR;
         }
-        return makeAuthenticateSign(account.id, 'wx');
+        return makeAuthenticateSign(account.id);
     });
 }
 
