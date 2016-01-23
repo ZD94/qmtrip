@@ -36,7 +36,7 @@
             var token_id = Cookie.get('token_id');
             var token_sign = Cookie.get('token_sign');
             var timestamp = Cookie.get("timestamp");
-            remote.authenticate({ accountid: user_id, tokenid: token_id, timestamp: timestamp, tokenSign: token_sign },
+            remote.authenticate({ accountid: user_id, tokenid: token_id, timestamp: timestamp, tokensign: token_sign },
                     callback);
         };
 	</script>
