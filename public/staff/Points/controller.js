@@ -4,13 +4,164 @@
 'use strict';
 var point=(function(){
     API.require("staff");
+    API.require("tripPlan");
 
     var point = {};
 
     //我的积分页面
     point.MyPointsController = function($scope) {
-        //alert(222222);
+        // alert(222222);
         loading(true);
+        $scope.initMyPoint = function(){
+            API.onload(function(){
+                API.staff.getCurrentStaff()
+                    .then(function (staff) {
+                        var staffId = staff.id;
+                        $scope.balancePoints = staff.balancePoints;
+                        // var points = staff.balancePoints;
+                        // points = points.replace(/([0-9])(?=(\d{3})+$)/g,'$1,');
+                        // var params = {staffId:staffId,page:$scope.pageAllPoint}
+                        Q.all([
+                            API.staff.listAndPaginatePointChange({staffId:staffId,options: {page:$scope.pageAllPoint}}),
+                            API.staff.getStaffPointsChange({staffId:staffId})
+                            ])
+                            .spread(function(record,changes){
+                                console.info(changes);
+                                $scope.changes = changes;
+                                record.items.map(function(c){
+                                    var orderId = c.orderId;
+                                    API.tripPlan.getTripPlanOrderById(orderId)
+                                        .then(function(order){
+                                            c.orderCreateAt = moment(order.createAt).format('YYYY-MM-DD');
+                                            $scope.$apply();
+                                        })
+                                    
+                                })
+                                // console.info($scope.record);
+                                $scope.record = record.items;
+                                $scope.totalAll = record.total;
+                                $scope.$apply();
+                            })
+                    })
+                    .catch(function (err) {
+                        console.info(err)
+                    });
+            })
+        }
+        $scope.initMyPoint();
+        //进入详情页
+        $scope.enterDetail = function (id) {
+            window.location.href = "#/travelPlan/PlanDetail?planId="+id;
+        }
+        $scope.incomePoint = function(){
+            API.onload(function(){
+                API.staff.getCurrentStaff()
+                    .then(function(staff){
+                        var staffId = staff.id;
+                        API.staff.listAndPaginatePointChange({staffId:staffId,status:1,options: {page:$scope.pageIncomePoint}})
+                            .then(function(record){
+                                record.items.map(function(c){
+                                    var orderId = c.orderId;
+                                    API.tripPlan.getTripPlanOrderById(orderId)
+                                        .then(function(order){
+                                            c.orderCreateAt = moment(order.createAt).format('YYYY-MM-DD');
+                                            $scope.$apply();
+                                        })
+                                })
+                                $scope.incomerecord = record.items;
+                                $scope.totalIncome = record.total;
+                                $scope.$apply();
+                            })
+                    })
+                    .catch(function(err){
+                        console.info(err);
+                    })
+            })
+        }
+        $scope.incomePoint();
+        $scope.payPoint = function(){
+            API.onload(function(){
+                API.staff.getCurrentStaff()
+                    .then(function(staff){
+                        var staffId = staff.id;
+                        API.staff.listAndPaginatePointChange({staffId:staffId,status:-1,options: {page:$scope.pagePayPoint}})
+                            .then(function(record){
+                                record.items.map(function(c){
+                                    var orderId = c.orderId;
+                                    API.tripPlan.getTripPlanOrderById(orderId)
+                                        .then(function(order){
+                                            c.orderCreateAt = moment(order.createAt).format('YYYY-MM-DD');
+                                            $scope.$apply();
+                                        })
+                                    
+                                })
+                                $scope.payrecord = record.items;
+                                $scope.totalPay = record.total;
+                                $scope.$apply();
+                            })
+                    })
+                    .catch(function(err){
+                        console.info(err);
+                    })
+            })
+        }
+        $scope.payPoint();
+        //全部分页
+        $scope.paginationAll = function () {
+            if ($scope.totalAll) {
+                $.jqPaginator('#pagination1', {
+                    totalCounts: $scope.totalAll,
+                    pageSize: 6,
+                    currentPage: 1,
+                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+                    onPageChange: function (num) {
+                        $scope.pageAllPoint = num;
+                        $scope.initMyPoint();
+                    }
+                });
+                clearInterval(pagenum1);
+            }
+        }
+        var pagenum1 =setInterval($scope.paginationAll,1);
+        $scope.paginationIncome = function () {
+            if ($scope.totalIncome) {
+                $.jqPaginator('#pagination2', {
+                    totalCounts: $scope.totalIncome,
+                    pageSize: 6,
+                    currentPage: 1,
+                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+                    onPageChange: function (num) {
+                        $scope.pageIncomePoint = num;
+                        $scope.incomePoint();
+                    }
+                });
+                clearInterval(pagenum2);
+            }
+        }
+        var pagenum2 =setInterval($scope.paginationIncome,1);
+        $scope.paginationPay = function () {
+            if ($scope.totalPay) {
+                $.jqPaginator('#pagination3', {
+                    totalCounts: $scope.totalPay,
+                    pageSize: 6,
+                    currentPage: 1,
+                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+                    onPageChange: function (num) {
+                        $scope.pagePayPoint = num;
+                        $scope.payPoint();
+                    }
+                });
+                clearInterval(pagenum3);
+            }
+        }
+        var pagenum3 =setInterval($scope.paginationPay,1);
+        //积分变化图表
         $scope.initCharts = function(first,second,third){
             var myChart = window.echarts.init(document.getElementById('pointChart')); 
             var option = {
@@ -114,6 +265,14 @@ var point=(function(){
             // 为echarts对象加载数据 
             myChart.setOption(option); 
         }
+        //选项卡切换
+        $(".pointRecord ul li a").click(function(){
+            $(".pointRecord ul li").removeClass("on");
+            $(this).closest("li").addClass("on");
+            var index = $(this).closest("li").index();
+            $(".recordList").hide();
+            $(".recordList").eq(index).show();
+           }) 
     }
 
     point.ExchangePointsController = function($scope) {
