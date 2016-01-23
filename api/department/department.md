@@ -134,3 +134,8 @@
 | json数组   | 部门信息|json
 
 
+注: 代理商代企业管理组织架构api与以上企业管理组织架构api 一一对应
+    规则： 将所有api名字前加上agency并将首字母大写
+    例如：企业添加部门api名称为 createDepartment
+         代理商代理企业管理部门api名称即为 agencyCreateDepartment
+

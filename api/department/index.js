@@ -48,6 +48,8 @@ function getDepartmentStructure(params){
                 var de = result[d].toJSON();
                 de.children = [];
                 allDepartmentMap[de.id] = de;
+            }
+            for(var d=0;d< result.length;d++){
                 if(de.parentId){
                     allDepartmentMap[de.parentId].children.push(de);
                     childOrderId.push(de.id);
