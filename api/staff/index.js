@@ -64,31 +64,21 @@ staff.createStaff = function(data){
     if (!data.companyId) {
         throw {code: -4, msg: "所属企业不能为空"};
     }
-    return API.company.getCompany({companyId: data.companyId})
-        .then(function(company){
-            if (!company) {
-                throw {code: -5, msg: "所属企业不存在"};
+    return Q()
+        .then(function(){
+            if(accountId) {
+                return {id: accountId};
             }
-            if(company && company.domainName && company.domainName != "" && data.email.indexOf(company.domainName) == -1){
-                throw {code: -6, msg: "邮箱格式不符合要求"};
-            }
-            if (accountId) {
-                data.id = accountId;
-                return data;
-            }
-            var accData = {email: data.email, mobile: data.mobile, status: 0, type: 1, companyName: company.name}//若为导入员工置为激活状态 不设置密码
+            var accData = {email: data.email, mobile: data.mobile, status: 0, type: 1, companyName: data.companyName}//若为导入员工置为激活状态 不设置密码
             return API.auth.newAccount(accData)
-                .then(function(account){
-                    data.id = account.id;
-                    return data;
-                });
         })
-        .then(function(staff) {
+        .then(function(account){
+            data.id = account.id;
             if(!data.travelLevel || data.travelLevel == ""){
                 data.travelLevel = null;
             }
-            return staffModel.create(staff);
-        });
+            return staffModel.create(data);
+        })
 }
 
 
@@ -191,10 +181,9 @@ staff.getStaff = function(params){
     if(!id){
         throw {code: -1, msg: "id不能为空"};
     }
-    var cols = params.columns;
     var options = {};
-    if(cols){
-        options.attributes = cols
+    if(params.columns){
+        options.attributes = params.columns
     }
     return staffModel.findById(id, options)
         .then(function(staff){

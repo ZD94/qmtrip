@@ -784,9 +784,9 @@ authServer.qrCodeLogin = function(params) {
             throw L.ERR.TIMESTAMP_TIMEOUT;
         }
 
-        if (timestamp < Date.now()) {
-            throw L.ERR.TIMESTAMP_TIMEOUT;
-        }
+        //if (timestamp < Date.now()) {
+        //    throw L.ERR.TIMESTAMP_TIMEOUT;
+        //}
 
         return Models.Account.findById(accountId)
     })
@@ -802,14 +802,13 @@ authServer.qrCodeLogin = function(params) {
         var data = {
             key: account.qrcodeToken,
             timestamp: timestamp,
-            accountId: account.id,
-            backUrl: backUrl
+            accountId: account.id
         };
         var sysSign = cryptoData(data);
         if (sysSign.toLowerCase() != sign.toLowerCase()) {
             throw L.ERR.SIGN_ERROR;
         }
-        return makeAuthenticateSign(account.id, 'wx');
+        return makeAuthenticateSign(account.id);
     });
 }
 
@@ -841,7 +840,7 @@ authServer.getQRCodeUrl = function(params) {
         return API.shorturl.long2short({longurl: backUrl})
     })
     .then(function(shortUrl) {
-        backUrl = shortUrl;
+        backUrl = encodeURIComponent(shortUrl);
         return Models.Account.findById(accountId)
     })
     .then(function(account) {
@@ -855,7 +854,7 @@ authServer.getQRCodeUrl = function(params) {
     })
     .then(function(account) {
         var timestamp = Date.now() + 1000 * 150;
-        var data = {accountId: account.id, timestamp: timestamp, key: account.qrcodeToken, backUrl: backUrl};
+        var data = {accountId: account.id, timestamp: timestamp, key: account.qrcodeToken};
         var sign = cryptoData(data);
         var urlParams = {accountId: account.id, timestamp: timestamp, sign: sign, backUrl: backUrl};
         urlParams = combineData(urlParams);
@@ -917,11 +916,13 @@ function combineData(obj) {
 
 //加密对象
 function cryptoData(obj) {
+    console.info('调用加密===>', obj, typeof obj);
     if (typeof obj == 'string') {
         return md5(obj);
     }
 
     var strs = combineData(obj);
+    console.info(strs);
     return md5(strs);
 }
 
@@ -934,10 +935,11 @@ authServer.__initHttpApp = function(app) {
 
         authServer.qrCodeLogin({accountId: accountId, sign: sign, timestamp: timestamp, backUrl: backUrl})
         .then(function(result) {
+            console.info(result);
             res.cookie("token_id", result.token_id);
             res.cookie("user_id", result.user_id);
             res.cookie("timestamp", result.timestamp);
-            res.cookie("sign", result.sign);
+            res.cookie("token_sign", result.token_sign);
             res.redirect(backUrl);
         })
         .catch(function(err) {

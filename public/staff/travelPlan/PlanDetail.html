@@ -49,7 +49,7 @@
                     </dd>
                 </dl>
             </div>
-            <div class="title_bottom"><span></span>差旅消费明细</div>
+            <div class="title_bottom"><span></span>差旅消费明细<a class="scan" ng-click="alertScan()">使用手机上传票据</a></div>
             <div id="img"></div>
             <div class="content_bottom">
                 <table width="100%" border="1" bordercolor="#E5E5E5">
@@ -154,3 +154,13 @@
         <div class='messagebox_content'><img alt=""></div>
     </div>
 </div>
+<div class="scan_fixed">
+    <div class="scancode">
+        <div class="scantitle">手机上传票据二维码<div class='scan_close' ng-click='close_scan()'><img src='/images/closezjx.png' style='display: block;'></div></div>
+        <div id="qrcode">
+            <p>使用微信扫一扫,扫描下方二维码</p>
+            <p>还有{{seconds}}秒失效</p>
+        </div>
+    </div>
+</div>
+<script src="/script/qrcode.min.js"></script>

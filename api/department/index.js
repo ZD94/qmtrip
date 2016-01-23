@@ -201,7 +201,7 @@ function getFirstClassDepartments(params){
     params.parentId = null;
     options.where = params;
     options.order = [["create_at", "desc"]];
-    return departmentModel.findAll(params);
+    return departmentModel.findAll(options);
 }
 
 /**
@@ -215,7 +215,7 @@ function getChildDepartments(params){
     var options = {};
     options.where = params;
     options.order = [["create_at", "desc"]];
-    return departmentModel.findAll(params);
+    return departmentModel.findAll(options);
 }
 
 /**
