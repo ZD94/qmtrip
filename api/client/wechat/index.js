@@ -2,11 +2,15 @@
  * Created by wlh on 16/1/23.
  */
 
-
+/**
+ * @class wechat
+ */
 var service = {};
 var API = require("common/api");
-
+var utils = require("common/utils");
 /**
+ * @method getJSDKParams
+ *
  * 获取微信公众号jsdk信息
  *
  * @param {Object} data
@@ -16,6 +20,34 @@ var API = require("common/api");
  */
 service.getJSDKParams = function(params) {
     return API.wechat.getJSDKParams(params);
+}
+
+/**
+ * @method mediaId2key
+ * 使用mediaId换取图像key
+ *
+ * @param {Object} params
+ * @param {String} params.mediaId
+ * @return {Promise} 图像md5后的key
+ */
+service.mediaId2key = function(params) {
+    var accountId = this.accountId;
+    var mediaId = piarams.mediaId;
+
+    return Q()
+    .then(function() {
+        if (!mediaId) {
+            throw {code: -1, msg: "缺少mediaId"}
+        }
+    })
+    .then(function() {
+        return API.wechat.downloadMedia({mediaId: mediaId})
+    })
+    .then(function(content) {
+        var buffers = new String(content, 'base64');
+        var md5key = utils.md5(buffers);
+        return API.attachement.createAttachment({md5key: md5key, content: buffers, has_id: [accountId]})
+    })
 }
 
 module.exports = service;
