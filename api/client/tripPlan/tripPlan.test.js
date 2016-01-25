@@ -94,7 +94,7 @@ describe("api/client/tripPlan.js", function() {
                 consumeDetails: [{
                     startTime: '2016-01-15 11:11:11',
                     endTime: '2016-01-30 22:11:56',
-                    budget: 300,
+                    budget: '300',
                     city: '上海市',
                     hotelName: '丐帮',
                     invoiceType: 2,
@@ -110,7 +110,32 @@ describe("api/client/tripPlan.js", function() {
                 assert.equal(ret.status, 0);
                 done();
             })
-        })
+        });
+
+        it("#savePlanOrder should be error when budget is not number", function(done){
+            var tripPlanOrder = {
+                startPlace: '北京',
+                destination: '上海',
+                budget: 1000,
+                description: '发送邮件测试计划单',
+                startAt: '2015-12-30 11:12:12',
+                consumeDetails: [{
+                    startTime: '2016-01-15 11:11:11',
+                    endTime: '2016-01-30 22:11:56',
+                    budget: 'gg',
+                    city: '上海市',
+                    hotelName: '丐帮',
+                    invoiceType: 2,
+                    type: 0
+                }]
+            }
+            var self = {accountId: staffId};
+            API.client.tripPlan.savePlanOrder.call(self, tripPlanOrder, function(err, ret){
+                assert.equal(err.code, -2);
+                assert.equal(ret, null);
+                done();
+            })
+        });
     })
 
     describe("deleteTripPlanOrder", function(){

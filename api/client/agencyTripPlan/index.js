@@ -313,10 +313,10 @@ agencyTripPlan.countTripPlanNum = function(params){
     ])
         .spread(function(user, company){
             if(user.agencyId != company.agencyId){
-                throw {code: -2, msg: '没有权限'};
+                throw L.ERR.PERMISSION_DENY;
             }
         })
-        .then(function(ret){
+        .then(function(){
             return API.tripPlan.countTripPlanNum(params);
         });
 }
