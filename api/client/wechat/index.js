@@ -35,7 +35,9 @@ service.getJSDKParams = function(params) {
 service.mediaId2key = function(params) {
     var accountId = this.accountId;
     var mediaId = params.mediaId;
-
+    var type = params.type;
+    var md5key;
+    var buffers;
     return Q()
     .then(function() {
         if (!mediaId) {
@@ -46,17 +48,35 @@ service.mediaId2key = function(params) {
         return API.wechat.downloadMedia({mediaId: mediaId})
     })
     .then(function(content) {
-        var buffers = new String(content, 'base64');
-        var md5key = utils.md5(buffers);
-        var hasId = [];
-        if (accountId) {
-            hasId.push(accountId);
-        }
-        hasId = JSON.stringify(hasId);
-        return API.attachment.createAttachment({md5key: md5key, content: buffers, hasId: hasId, userId: accountId})
+        buffers = new String(content, 'base64');
+        md5key = utils.md5(buffers);
+        return API.attachment.getAttachment({md5key: md5key, userId: accountId})
     })
-    .then(function(result) {
-        return result.md5key;
+    .then(function(attachement) {
+        if (attachement) {
+            return attachement;
+        }
+
+        return Q()
+        .then(function() {
+            if (type && type == 'invoice') {
+                return API.staff.getInvoiceViewer({accountId: accountId})
+                    .then(function(viewUsers) {
+                        var hasId = viewUsers;
+                        hasId.push(accountId);
+                        return hasId;
+                    })
+            } else {
+                return [accountId];
+            }
+        })
+        .then(function(hasId) {
+            hasId = JSON.stringify(hasId);
+            return API.attachment.createAttachment({md5key: md5key, content: buffers, hasId: hasId, userId: accountId})
+        })
+    })
+    .then(function(attachement) {
+        return attachement.md5key;
     })
 }
 

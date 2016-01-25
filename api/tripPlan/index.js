@@ -50,11 +50,19 @@ function savePlanOrder(params){
             _planOrder.orderNo = orderNo;
             _planOrder.createAt = utils.now();
             var total_budget = 0;
+            var isBudget = true;
             for(var i in consumeDetails) {
                 var obj = consumeDetails[i];
-                total_budget = parseFloat(total_budget) + parseFloat(obj.budget);
+                if(!/^-?\d+$/.test(obj.budget))
+                    throw {code: -2, nsg: '预算格式不正确'};
+                if(obj.budget > 0)
+                    total_budget = parseFloat(total_budget) + parseFloat(obj.budget);
+                else
+                    isBudget = false;
             }
             _planOrder.budget = total_budget;
+            if(!isBudget)
+                _planOrder.status = -1; //待录入预算状态
             return sequelize.transaction(function(t){
                 var order = {}
                 return PlanOrder.create(_planOrder, {transaction: t})
@@ -138,7 +146,7 @@ getConsumeDetail.optional_params = ['columns'];
 function getConsumeDetail(params){
     var options = {}
     if(params.columns){
-        options.attributes = _.pick(params.columns, ConsumeDetailsCols);
+        options.attributes = _.intersection(params.columns, ConsumeDetailsCols);
     }
     return ConsumeDetails.findById(params.consumeId, options)
         .then(function(detail){
@@ -227,7 +235,11 @@ function updateConsumeBudget(params){
         })
         .spread(function(o_budget, order){
             var budget = params.budget;
-            var c_budget = parseFloat(order.budget) - parseFloat(o_budget) + parseFloat(budget);
+            var c_budget = 0;
+            if(o_budget > 0)
+                c_budget = parseFloat(order.budget) - parseFloat(o_budget) + parseFloat(budget);
+            else
+                c_budget = parseFloat(order.budget) + parseFloat(budget)
             var logs = {
                 orderId: order.id,
                 userId: params.userId,
@@ -236,11 +248,22 @@ function updateConsumeBudget(params){
             }
             return sequelize.transaction(function(t){
                 return Q.all([
+                    order.id,
                     PlanOrder.update({budget: c_budget, updateAt: utils.now()}, {where: {id: order.id}, fields: ['budget', 'updateAt'], transaction: t}),
                     ConsumeDetails.update({budget: budget, updateAt: utils.now()}, {where: {id: id}, fields: ['budget', 'updateAt'], transaction: t}),
                     TripOrderLogs.create(logs, {transaction: t})
                 ])
             })
+        })
+        .spread(function(orderId){
+            return [orderId, ConsumeDetails.findAll({where: {orderId: orderId}, attributes: ['budget']})];
+        })
+        .spread(function(orderId, list){
+            for(var i=0; i<list.length; i++){
+                if(list[i].budget < 0)
+                    return true;
+            }
+            return PlanOrder.update({status: 0}, {where: {id: orderId}, fields: ['status']})
         })
         .then(function(){
             return true;
@@ -316,8 +339,12 @@ function saveConsumeRecord(params){
                 throw {code: -4, msg: '该计划单已审核，不能添加消费记录'};
             }
             var budget = params.budget || 0;
-            order.increment(['budget'], { by: parseFloat(budget) });
-            order.status = 0;
+            if(budget >0){
+                order.increment(['budget'], { by: parseFloat(budget) });
+            }
+            if(order.status > 0){
+                order.status = 0;
+            }
             order.updateAt = utils.now();
             return [record, order];
         })
@@ -410,12 +437,18 @@ uploadInvoice.required_params = ['userId', 'consumeId', 'picture'];
 function uploadInvoice(params){
     var orderId = "";
     return ConsumeDetails.findById(params.consumeId, {attributes: ['status', 'orderId', 'invoice', 'accountId']})
-        .then(function(custome){
+        .then(function(custome, order){
             if(!custome || custome.status == -2)
                 throw L.ERR.NOT_FOUND;
             if(custome.accountId != params.userId)
                 throw L.ERR.PERMISSION_DENY;
             orderId = custome.orderId;
+            return [orderId, custome, PlanOrder.findById(orderId, {attributes: ['status']})]
+        })
+        .spread(function(orderId, custome, order){
+            if(order.status == -1){
+                throw {code: -2, msg: '还没有录入出差预算'};
+            }
             var invoiceJson = custome.invoice;
             var times = invoiceJson.length ? invoiceJson.length+1 : 1;
             var currentInvoice = {times:times, picture:params.picture, create_at:moment().format('YYYY-MM-DD HH:mm'), status:0, remark: '', approve_at: ''};

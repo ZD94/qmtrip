@@ -150,6 +150,7 @@ module.exports = (function(){
 
 	//创建公司页面
 	companyList.CreateCorpController = function($scope) {
+		loading(true);
 		$scope.createCorp = function(){
 			var corpname = $("#corpName").val();
 			var name = $("#connectName").val();
@@ -179,11 +180,14 @@ module.exports = (function(){
 					return false;
 				}
 				console.info(domain);
+				console.info(domain[1]);
 				API.onload(function(){
 					console.info(API.company.createCompany());
-					API.company.createCompany({name:corpname,userName:name,email:email,mobile:mobile,domain:domain})
+					API.company.createCompany({name:corpname,userName:name,email:email,mobile:mobile,domain:domain[1]})
 						.then(function(company){
 							console.info(company);
+							var id = company.id;
+							window.location.href = "#/companyList/CompanyDetail?company=" + id;
 						})
 						.catch(function(err){
 							console.info(err);
