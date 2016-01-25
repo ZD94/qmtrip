@@ -14,7 +14,13 @@ var _ = require('lodash');
 var utils = require("common/utils");
 var Paginate = require("common/paginate").Paginate;
 var C = require("config");
+var API = require("../../common/api");
 var company = {};
+var AGENCY_ROLE = {
+    OWNER: 0,
+    COMMON: 1,
+    ADMIN: 2
+};
 
 company.companyCols = Object.keys(Company.attributes);
 
@@ -191,6 +197,64 @@ function pageCompany(options){
     return Company.findAndCount(options)
         .then(function(ret){
             return new Paginate(options.offset/options.limit + 1, options.limit, ret.count, ret.rows);
+        })
+}
+
+/**
+ * 得到企业代理商管理员地id
+ * @type {getCompanyAgencies}
+ */
+company.getCompanyAgencies = getCompanyAgencies;
+getCompanyAgencies.required_params = ['companyId'];
+function getCompanyAgencies(params){
+    var agencies = [];
+    return API.company.getCompany({companyId: params.companyId})
+        .then(function(company){
+            return company;
+        })
+        .then(function(company){
+            if(company && company.agencyId){
+                return API.agency.getAgencyUsersId({agencyId: company.agencyId, roleId: [AGENCY_ROLE.OWNER, AGENCY_ROLE.ADMIN]})
+                    .then(function(ids){
+                        for(var i=0;i<ids.length;i++){
+                            agencies.push(ids[i].id);
+                        }
+                        return agencies;
+                    })
+            }
+            return agencies;
+        })
+
+}
+
+/**
+ * 判断某代理商是否有权限访问某企业
+ * @param params
+ * @param params.userId 代理商id
+ * @param params.companyId 企业id
+ */
+company.checkAgencyCompany = checkAgencyCompany;
+checkAgencyCompany.required_params = ['companyId','userId'];
+function checkAgencyCompany(params){
+    var userId = params.userId;
+    var companyId = params.companyId;
+    return Q.all([
+            Company.findById(companyId),
+            API.agency.getAgencyUser({id: userId})
+        ])
+        .spread(function(com,agency){
+            if(!com){
+                throw {code:-1, msg:"企业不存在"};
+            }
+            if(!agency){
+                throw {code:-1, msg:"代理商用户不存在"};
+            }
+            if(com.agencyId == agency.agencyId && (agency.roleId == AGENCY_ROLE.OWNER || agency.roleId == AGENCY_ROLE.ADMIN)){
+                return true;
+            }else{
+                return false;
+            }
+
         })
 }
 

@@ -79,6 +79,12 @@ module.exports = (function(){
 			}
 		}
 		var pagenum =setInterval($scope.pagination,10);
+
+
+		//进入创建企业页面
+		$scope.goCreateCorp = function(){
+			window.location.href = "#/companyList/CreateCorp";
+		}
 	}
 	companyList.CompanyDetailController = function($scope,$routeParams){
 		loading(true);
@@ -142,5 +148,54 @@ module.exports = (function(){
 		}
 	}
 
+	//创建公司页面
+	companyList.CreateCorpController = function($scope) {
+		loading(true);
+		$scope.createCorp = function(){
+			var corpname = $("#corpName").val();
+			var name = $("#connectName").val();
+			var email = $("#connectEmail").val();
+			var mobile = $("#connectMobile").val();
+			var reg = /^[\w\.-]+?@([\w\-]+\.){1,2}[a-zA-Z]{2,3}$/;
+			var domain = email.split(/@/);
+			var commit = true;
+			if(commit){
+				if(!corpname){
+					alert("企业名称是必填项！");
+					return false;
+				}else if(!name){
+					alert("联系人姓名是必填项！");
+					return false;
+				}else if(!email){
+					alert("邮箱是必填项！");
+					return false;
+				}else if(!reg.test(email)){
+					alert("邮箱格式不正确！");
+					return false;
+				}else if(!mobile){
+					alert("手机号是必填项！");
+					return false;
+				}else if(!mobile.match(/^[1][0-9]{10}$/)){
+					alert("手机号格式不正确！");
+					return false;
+				}
+				console.info(domain);
+				console.info(domain[1]);
+				API.onload(function(){
+					console.info(API.company.createCompany());
+					API.company.createCompany({name:corpname,userName:name,email:email,mobile:mobile,domain:domain[1]})
+						.then(function(company){
+							console.info(company);
+							var id = company.id;
+							window.location.href = "#/companyList/CompanyDetail?company=" + id;
+						})
+						.catch(function(err){
+							console.info(err);
+							alert(err.msg);
+						}).done()
+				})
+			}
+		}
+	}
 	return companyList;
 })();

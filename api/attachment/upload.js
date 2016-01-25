@@ -60,34 +60,48 @@ function uploadActionFile(req, res, next) {
                             .then(function(data){
                                 has_id.push.apply(has_id, data);
                                 imgObj.hasId = JSON.stringify(has_id);
-                                return API.attachment.deleteAttachment({md5key: md5key,userId: user_id})
-                                    .then(function(){
-                                        return API.attachment.createAttachment(imgObj)
-                                            .then(function(result){
-                                                fs.exists(filePath, function (exists) {
-                                                    if(exists){
-                                                        fs.unlink(filePath);
-                                                        console.log("删除临时文件");
-                                                    }
-                                                });
-                                                res.send('{"ret":0, "errMsg":"", "md5key":"'+md5key+'"}');
-                                            })
-                                    })
-                            })
-                            .catch(next).done();
-                    }else{
-                        API.attachment.deleteAttachment({md5key: md5key,userId: user_id})
-                            .then(function(){
-                                return API.attachment.createAttachment(imgObj)
-                                    .then(function(result){
+                                return API.attachment.getAttachment({md5key: md5key,userId: user_id})
+                                    .then(function(att){
+                                        var retMd5key = "";
+                                        if(att){
+                                            retMd5key = att.md5key;
+                                        }else{
+                                            return API.attachment.createAttachment(imgObj)
+                                                .then(function(result){
+                                                    retMd5key = md5key;
+                                                })
+                                        }
                                         fs.exists(filePath, function (exists) {
                                             if(exists){
                                                 fs.unlink(filePath);
                                                 console.log("删除临时文件");
                                             }
                                         });
-                                        res.send('{"ret":0, "errMsg":"", "md5key":"'+md5key+'"}');
+                                        res.send('{"ret":0, "errMsg":"", "md5key":"'+retMd5key+'"}');
+
                                     })
+                            })
+                            .catch(next).done();
+                    }else{
+                        return API.attachment.getAttachment({md5key: md5key,userId: user_id})
+                            .then(function(att){
+                                var retMd5key = "";
+                                if(att){
+                                    retMd5key = att.md5key;
+                                }else{
+                                    return API.attachment.createAttachment(imgObj)
+                                        .then(function(result){
+                                            retMd5key = md5key;
+                                        })
+                                }
+                                fs.exists(filePath, function (exists) {
+                                    if(exists){
+                                        fs.unlink(filePath);
+                                        console.log("删除临时文件");
+                                    }
+                                });
+                                res.send('{"ret":0, "errMsg":"", "md5key":"'+retMd5key+'"}');
+
                             })
                             .catch(next).done();
                     }

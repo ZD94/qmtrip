@@ -935,10 +935,11 @@ authServer.__initHttpApp = function(app) {
 
         authServer.qrCodeLogin({accountId: accountId, sign: sign, timestamp: timestamp, backUrl: backUrl})
         .then(function(result) {
+            console.info(result);
             res.cookie("token_id", result.token_id);
             res.cookie("user_id", result.user_id);
             res.cookie("timestamp", result.timestamp);
-            res.cookie("token_sign", result.sign);
+            res.cookie("token_sign", result.token_sign);
             res.redirect(backUrl);
         })
         .catch(function(err) {
