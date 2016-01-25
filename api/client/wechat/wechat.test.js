@@ -6,7 +6,7 @@ var API = require("common/api");
 var assert = require("assert");
 var path = require("path");
 
-describe("api/client/wechat/index.js", function() {
+describe.skip("api/client/wechat/index.js", function() {
     this.timeout(60 * 1000);
 
     var key;
