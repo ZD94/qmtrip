@@ -8,6 +8,8 @@
 var service = {};
 var API = require("common/api");
 var utils = require("common/utils");
+var Q = require("q");
+
 /**
  * @method getJSDKParams
  *
@@ -32,8 +34,9 @@ service.getJSDKParams = function(params) {
  */
 service.mediaId2key = function(params) {
     var accountId = this.accountId;
-    var mediaId = piarams.mediaId;
-
+    var mediaId = params.mediaId;
+    var md5key;
+    var buffers;
     return Q()
     .then(function() {
         if (!mediaId) {
@@ -44,9 +47,23 @@ service.mediaId2key = function(params) {
         return API.wechat.downloadMedia({mediaId: mediaId})
     })
     .then(function(content) {
-        var buffers = new String(content, 'base64');
-        var md5key = utils.md5(buffers);
-        return API.attachement.createAttachment({md5key: md5key, content: buffers, has_id: [accountId]})
+        buffers = new String(content, 'base64');
+        md5key = utils.md5(buffers);
+        return API.attachment.getAttachment({md5key: md5key, userId: accountId})
+    })
+    .then(function(attachement) {
+        if (attachement) {
+            return attachement;
+        }
+        var hasId = [];
+        if (accountId) {
+            hasId.push(accountId);
+        }
+        hasId = JSON.stringify(hasId);
+        return API.attachment.createAttachment({md5key: md5key, content: buffers, hasId: hasId, userId: accountId})
+    })
+    .then(function(attachement) {
+        return attachement.md5key;
     })
 }
 
