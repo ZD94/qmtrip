@@ -35,6 +35,7 @@ service.getJSDKParams = function(params) {
 service.mediaId2key = function(params) {
     var accountId = this.accountId;
     var mediaId = params.mediaId;
+    var type = params.type;
     var md5key;
     var buffers;
     return Q()
@@ -55,12 +56,24 @@ service.mediaId2key = function(params) {
         if (attachement) {
             return attachement;
         }
-        var hasId = [];
-        if (accountId) {
-            hasId.push(accountId);
-        }
-        hasId = JSON.stringify(hasId);
-        return API.attachment.createAttachment({md5key: md5key, content: buffers, hasId: hasId, userId: accountId})
+
+        return Q()
+        .then(function() {
+            if (type && type == 'invoice') {
+                return API.staff.getInvoiceViewer({accountId: accountId})
+                    .then(function(viewUsers) {
+                        var hasId = viewUsers;
+                        hasId.push(accountId);
+                        return hasId;
+                    })
+            } else {
+                return [accountId];
+            }
+        })
+        .then(function(hasId) {
+            hasId = JSON.stringify(hasId);
+            return API.attachment.createAttachment({md5key: md5key, content: buffers, hasId: hasId, userId: accountId})
+        })
     })
     .then(function(attachement) {
         return attachement.md5key;

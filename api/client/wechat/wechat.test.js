@@ -31,4 +31,5 @@ describe("api/client/wechat/index.js", function() {
             done();
         })
     })
+
 })
