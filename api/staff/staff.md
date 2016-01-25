@@ -30,11 +30,44 @@
 | msg     | 提示信息 |
 | json数据   | 员工信息|json
 
+>. 代理商创建员工 API.staff.agencyCreateStaff(params, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 传入参数             |json              |------
+| params.name                        | 员工姓名              |varchar               |必填
+| params.mobile                        | 员工手机              |varchar               |必填
+| params.email                          |员工邮箱           |varchar               |必填
+| params.companyId                          |所属企业id           |uuid               |必填
+| params.department                          |部门名称           |varchar               |选填
+| params.travelLevel                          |差旅标准id           |uuid               |选填
+| params.roleId                          |权限           |integer               |选填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| msg     | 提示信息 |
+| json数据   | 员工信息|json
+
 >. 删除员工 API.staff.deleteStaff(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
 | params                                | 传入参数             |json              |------
+| params.id                        | 员工id              |uuid               |必填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code     | 返回代码0正确 其他错误 |
+| msg     | 提示信息 |
+
+>. 代理商删除员工 API.staff.agencyDeleteStaff(params, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 传入参数             |json              |------
+| params.companyId                          |所属企业id           |uuid               |必填
 | params.id                        | 员工id              |uuid               |必填
 | callback                              | 回调函数             |function              |支持promise
 
@@ -63,11 +96,45 @@
 | msg     | 提示信息 |
 | json数据   | 员工信息|json
 
+>. 代理商修改员工信息 API.staff.agencyUpdateStaff(params, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 更新信息             |json              |------
+| params.companyId                          |所属企业id           |uuid               |必填
+| params.id                                | 员工id             | uuid             |必填
+| params.name                        | 员工姓名              |varchar               |选填
+| params.mobile                        | 员工手机              |varchar               |选填
+| params.email                          |员工邮箱           |varchar               |选填
+| params.department                          |部门名称           |varchar               |选填
+| params.travelLevel                          |差旅标准id           |uuid               |选填
+| params.roleId                          |权限           |integer               |选填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| msg     | 提示信息 |
+| json数据   | 员工信息|json
+
 >. 查询员工信息 API.staff.getStaff(params,callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
 | params                                | 更新信息             |json              |------
+| params.id                                | 员工id             | uuid             |必填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| msg     | 提示信息 |
+| json数据   | 员工信息|json
+
+>. 代理商查询员工信息 API.staff.agencyGetStaff(params,callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 更新信息             |json              |------
+| params.companyId                          |所属企业id           |uuid               |必填
 | params.id                                | 员工id             | uuid             |必填
 | callback                              | 回调函数             |function              |支持promise
 
@@ -95,6 +162,32 @@
 | params.mobile                        | 员工手机              |varchar               |选填
 | params.email                          |员工邮箱           |varchar               |选填
 | params.companyId                          |所属企业id           |uuid               |选填
+| params.department                          |部门名称           |varchar               |选填
+| params.travelLevel                          |差旅标准id           |uuid               |选填
+| params.roleId                          |权限           |integer               |选填
+| params.options                                | 分页参数             |json              |------
+| params.options.perPage                                | 每页条数             |integer              |选填默认为6
+| params.options.page                                | 当前页             |integer              |选填默认为1
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code     | 返回代码0正确 其他错误 |
+| page     | 提示信息 |: 当前页
+| pages     | 提示信息 |: 总页数
+| perPage     | 提示信息 |: 每页条数
+| total     | 提示信息 |: 总记录数
+| items   | 员工信息|json
+
+>. 代理商分页查询员工信息 API.staff.agencyListAndPaginateStaff(params, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 查询条件参数             |json              |------
+| params.name                        | 员工姓名              |varchar               |选填
+| params.mobile                        | 员工手机              |varchar               |选填
+| params.email                          |员工邮箱           |varchar               |选填
+| params.companyId                          |所属企业id           |uuid               |必填
 | params.department                          |部门名称           |varchar               |选填
 | params.travelLevel                          |差旅标准id           |uuid               |选填
 | params.roleId                          |权限           |integer               |选填
@@ -225,7 +318,40 @@
 | sta.inNum |入职员工|integer
 | sta.outNum  |离职员工|integer
 
+>. 代理商统计时间段内企业员工数量（在职 入职 离职） API.staff.agencyGtatisticStaffs(params,callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 参数             | json             |-------
+| params.companyId                      | 企业Id             |uuid           |必填
+| params.startTime                     | 起始时间            | date            | 选填，默认当前月开始日期
+| params.endTime                       | 结束时间               | date            |选填，默认当前月结束时间
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| code     | 返回代码0正确 其他错误 |
+| msg     | 提示信息 |
+| sta   | 员工信息|json
+| sta.all   |在职员工|integer
+| sta.inNum |入职员工|integer
+| sta.outNum  |离职员工|integer
+
 >. 统计企业员工（管理员 普通员工 未激活员工）数量 API.staff.statisticStaffsRole(params,callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 参数             | json             |-------
+| params.companyId                      | 企业Id             |uuid           |必填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| adminNum   |管理员人数|integer
+| commonStaffNum |普通员工数|integer
+| unActiveNum  |未激活人数|integer
+
+>. 代理商统计企业员工（管理员 普通员工 未激活员工）数量 API.staff.agencyStatisticStaffsRole(params,callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------

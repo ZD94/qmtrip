@@ -97,7 +97,7 @@ travelPolicy.getTravelPolicy = function(params){
 
     if(!id){
         if (isReturnDefault) {
-            return API.travelPolicy.getTravelPolicy({id:'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a'});
+            return travalPolicyModel.findById('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a');
         } else {
             throw {code: -1, msg: "id不能为空"};
         }
