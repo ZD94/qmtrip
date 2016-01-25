@@ -13,6 +13,7 @@ describe("api/client/department.js", function() {
     var parentId = "";
     var parentId2 = "";
     var agencyUserId = "";
+    var agencySelf = {};
     var self = {};
     var companyId = "";
     var accountId = "";
@@ -30,7 +31,7 @@ describe("api/client/department.js", function() {
 
     var agency = {
         email: "department.agency.test@tulingdao.com",
-        userName: "departmentTest代理商",
+        userName: "departmentTest代理商User",
         name: 'departmentTest的代理商',
         mobile: "15269866777",
         description: '企业API测试用'
@@ -47,8 +48,8 @@ describe("api/client/department.js", function() {
                 return API.agency.registerAgency(agency);
             })
             .then(function(ret){
-                agencyId = ret.agency.id;
                 agencyUserId = ret.agencyUser.id;
+                agencySelf = {accountId: ret.agencyUser.id};
                 return API.client.company.createCompany.call({accountId: agencyUserId}, company);
             })
             .then(function(company){
@@ -140,7 +141,7 @@ describe("api/client/department.js", function() {
             assert.equal(err, null);
             id = result.id;
             parentId2 = result.id;
-            //console.log(result);
+//            console.log(result);
             done();
         });
     })
@@ -203,7 +204,7 @@ describe("api/client/department.js", function() {
     it("#getAllChildDepartments should be ok", function(done) {
         API.client.department.getAllChildDepartments.call(self, {parentId: parentId_f}, function(err, result) {
             assert.equal(err, null);
-                console.log(result);
+//                console.log(result);
             done();
         });
     })
@@ -211,7 +212,7 @@ describe("api/client/department.js", function() {
     it("#getAllChildDepartmentsid should be ok", function(done) {
         API.client.department.getAllChildDepartmentsId.call(self, {parentId: parentId_f}, function(err, result) {
             assert.equal(err, null);
-            console.info("parentId_f:",result);
+//            console.info("parentId_f:",result);
 //                console.log(result.items);//item dataValues里存放的才是记录信息
             done();
         });
@@ -220,7 +221,7 @@ describe("api/client/department.js", function() {
     it("#getAllChildDepartmentsid should be ok", function(done) {
         API.client.department.getAllChildDepartmentsId.call(self, {parentId: parentId}, function(err, result) {
             assert.equal(err, null);
-            console.info("parentId:",result);
+//            console.info("parentId:",result);
 //                console.log(result.items);//item dataValues里存放的才是记录信息
             done();
         });
@@ -229,7 +230,6 @@ describe("api/client/department.js", function() {
     it("#getDepartmentStructure should be ok", function(done) {
         API.client.department.getDepartmentStructure.call(self, {companyId: companyId}, function(err, result) {
             assert.equal(err, null);
-            console.info("getDepartmentStructure:",result);
 //                console.log(result.items);//item dataValues里存放的才是记录信息
             done();
         });
@@ -237,6 +237,8 @@ describe("api/client/department.js", function() {
 //更新部门信息
     it("#updateDepartment should be ok", function(done) {
         obj.id = id;
+        delete obj.name;
+        delete obj.parentId;
         API.client.department.updateDepartment.call(self, obj, function(err, result) {
             assert.equal(err, null);
             //console.log(result);
@@ -244,20 +246,192 @@ describe("api/client/department.js", function() {
         });
     })
 
-//删除部门信息
-    it("#deleteDepartment should be ok", function(done) {
-        API.client.department.deleteDepartment.call(self, {id: id}, function(err, result) {
+
+
+    /************************代理商管理企业部门**********************/
+    //创建默认部门
+    it("#agencyCreateDepartment should be ok", function(done) {
+        obj.companyId = companyId;
+        API.client.department.agencyCreateDepartment.call(agencySelf, {name: "agency我的企业1", isDefault: true, companyId: companyId}, function(err, result) {
+            assert.equal(err, null);
+            parentId_f = result.id;
+            //console.log(result);
+            done();
+        });
+    })
+    it("#agencyCreateDepartment should be ok", function(done) {
+        obj.companyId = companyId;
+        API.client.department.agencyCreateDepartment.call(agencySelf, {name: "agency我的企业2", isDefault: true, companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(result);
             done();
         });
     })
+    //创建部门
+    it("#agencyCreateDepartment should be ok", function(done) {
+        obj.companyId = companyId;
+        obj.parentId = parentId_f;
+        obj.name = "agency销售部";
+        API.client.department.agencyCreateDepartment.call(agencySelf, obj, function(err, result) {
+            assert.equal(err, null);
+            id = result.id;
+            parentId = result.id;
+            //console.log(result);
+            done();
+        });
+    })
+    it("#agencyCreateDepartment should be ok", function(done) {
+        obj.companyId = companyId;
+        obj.parentId = parentId;
+        obj.name = "agency销售一部";
+        API.client.department.agencyCreateDepartment.call(agencySelf, obj, function(err, result) {
+            assert.equal(err, null);
+            id = result.id;
+            //console.log(result);
+            done();
+        });
+    })
+    it("#agencyCreateDepartment should be ok", function(done) {
+        obj.companyId = companyId;
+        obj.parentId = parentId;
+        obj.name = "agency销售二部";
+        API.client.department.agencyCreateDepartment.call(agencySelf, obj, function(err, result) {
+            assert.equal(err, null);
+            id = result.id;
+            //console.log(result);
+            done();
+        });
+    })
+    it("#agencyCreateDepartment should be ok", function(done) {
+        obj.companyId = companyId;
+        obj.parentId = parentId;
+        obj.name = "agency销售三部";
+        API.client.department.agencyCreateDepartment.call(agencySelf, obj, function(err, result) {
+            assert.equal(err, null);
+            id = result.id;
+            parentId2 = result.id;
+            done();
+        });
+    })
+
+    it("#agencyCreateDepartment should be ok", function(done) {
+        obj.companyId = companyId;
+        obj.parentId = parentId2;
+        obj.name = "agency销售三(1)部";
+        API.client.department.agencyCreateDepartment.call(agencySelf, obj, function(err, result) {
+            assert.equal(err, null);
+            //console.log(result);
+            done();
+        });
+    })
+    it("#agencyCreateDepartment should be ok", function(done) {
+        obj.companyId = companyId;
+        obj.parentId = parentId2;
+        obj.name = "agency销售三(2)部";
+        API.client.department.agencyCreateDepartment.call(agencySelf, obj, function(err, result) {
+            assert.equal(err, null);
+            //console.log(result);
+            done();
+        });
+    })
+//根据id查询部门
+    it("#agencyGetDepartment should be ok", function(done) {
+        API.client.department.agencyGetDepartment.call(agencySelf, {id: id, companyId: companyId}, function(err, result) {
+            assert.equal(err, null);
+            //console.log(result);
+            done();
+        });
+    })
+//查询默认部门
+    it("#agencyGetDefaultDepartment should be ok", function(done) {
+        API.client.department.agencyGetDepartment.call(agencySelf, {id: null, companyId: companyId}, function(err, result) {
+            assert.equal(err, null);
+            //console.log(result);
+            done();
+        });
+    })
+//查询一级部门集合
+    it("#agencyGetFirstClassDepartments should be ok", function(done) {
+        API.client.department.agencyGetFirstClassDepartments.call(agencySelf, {companyId: companyId}, function(err, result) {
+            assert.equal(err, null);
+            //console.log(result);
+//                console.log(result.items);//item dataValues里存放的才是记录信息
+            done();
+        });
+    })
+//查询直接子级部门集合
+    it("#agencyGetChildDepartments should be ok", function(done) {
+        API.client.department.agencyGetChildDepartments.call(agencySelf, {parentId: parentId, companyId: companyId}, function(err, result) {
+            assert.equal(err, null);
+            //console.log(result);
+//                console.log(result.items);//item dataValues里存放的才是记录信息
+            done();
+        });
+    })
+//查询所有子级部门集合
+    it("#agencyGetAllChildDepartments should be ok", function(done) {
+        API.client.department.agencyGetAllChildDepartments.call(agencySelf, {parentId: parentId_f, companyId: companyId}, function(err, result) {
+            assert.equal(err, null);
+//                console.log(result);
+            done();
+        });
+    })
+//查询所有子级部门id集合
+    it("#agencyGetAllChildDepartmentsid should be ok", function(done) {
+        API.client.department.agencyGetAllChildDepartmentsId.call(agencySelf, {parentId: parentId_f, companyId: companyId}, function(err, result) {
+            assert.equal(err, null);
+//            console.info("parentId_f:",result);
+//                console.log(result.items);//item dataValues里存放的才是记录信息
+            done();
+        });
+    })
+
+    it("#agencyGetAllChildDepartmentsid should be ok", function(done) {
+        API.client.department.agencyGetAllChildDepartmentsId.call(agencySelf, {parentId: parentId, companyId: companyId}, function(err, result) {
+            assert.equal(err, null);
+//            console.info("parentId:",result);
+//                console.log(result.items);//item dataValues里存放的才是记录信息
+            done();
+        });
+    })
+
+    it("#agencyGetDepartmentStructure should be ok", function(done) {
+        API.client.department.agencyGetDepartmentStructure.call(agencySelf, {companyId: companyId}, function(err, result) {
+            assert.equal(err, null);
+            console.info("agencyGetDepartmentStructure:",result);
+//                console.log(result.items);//item dataValues里存放的才是记录信息
+            done();
+        });
+    })
+//更新部门信息
+    it("#agencyUpdateDepartment should be ok", function(done) {
+        obj.id = id;
+        obj.companyId = companyId;
+        delete obj.parentId;
+        delete obj.name;
+        API.client.department.agencyUpdateDepartment.call(agencySelf, obj, function(err, result) {
+            assert.equal(err, null);
+            //console.log(result);
+            done();
+        });
+    })
+
+    /************************代理商管理企业部门**********************/
+
+//删除部门信息
+    /*it("#agencyDeleteDepartment should be ok", function(done) {
+        API.client.department.agencyDeleteDepartment.call(agencySelf, {id: id, companyId: companyId}, function(err, result) {
+            assert.equal(err, null);
+            //console.log(result);
+            done();
+        });
+    })*/
 //删除企业所有部门
-    it("#deleteDepartmentByTest should be ok", function(done) {
+    /*it("#deleteDepartmentByTest should be ok", function(done) {
         API.department.deleteDepartmentByTest({companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(result);
             done();
         });
-    })
+    })*/
 })

@@ -41,7 +41,8 @@ agency.registerAgency = function(params){
         agencyId: agencyId,
         name: userName,
         mobile: mobile,
-        email: email
+        email: email,
+        roleId: 0
     };
     return API.auth.checkAccExist({type: 2, $or: [{mobile: mobile}, {email: email}]})
         .then(function(ret){
