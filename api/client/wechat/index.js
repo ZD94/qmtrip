@@ -53,7 +53,7 @@ service.mediaId2key = function(params) {
         return API.attachment.getAttachment({md5key: md5key, userId: accountId})
     })
     .then(function(attachement) {
-        if (attachement) {
+        if (attachement && attachement.id) {
             return attachement;
         }
 

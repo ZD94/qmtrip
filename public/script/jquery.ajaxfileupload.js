@@ -29,7 +29,7 @@
 
 		API.onload(function() {
 			var url = window.location.href;
-			API.wechat.getJSDKParams({url: url, debug: true})
+			API.wechat.getJSDKParams({url: url, debug: true, jsApiList: ["uploadImage", "chooseImage", "previewImage"]})
 					.then(function(config) {
 						wx.config(config);
 					})
@@ -170,8 +170,9 @@
 				isShowProgressTips: 1, // 默认为1，显示进度提示
 				success: function (res) {
 					var serverId = res.serverId; // 返回图片的服务器端ID
-					API.wechat.mediaId2key({meidaId: serverId})
+					API.wechat.mediaId2key({mediaId: serverId})
 						.then(function(key) {
+							console.info('返回的结果:', key);
 							settings.onComplete(localid, {code: 0, errmsg: "", key: key});
 						})
 						.catch(function(err) {
