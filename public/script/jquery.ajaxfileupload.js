@@ -10,6 +10,37 @@
  */
 
 (function($) {
+
+	function isWeixin() {
+		var reg = /micromessenger/i;
+		return reg.test(window.navigator.userAgent);
+	}
+
+	if (isWeixin()) {
+		if (!window.API) {
+			throw new Erorr("此项目依赖API,请先引入api.js");
+		}
+
+		if (!window.wx) {
+			throw new Error("此项目依赖于weixin.js 请先引入weixin.js");
+		}
+
+		API.require("wechat");
+
+		API.onload(function() {
+			var url = window.location.href;
+			API.wechat.getJSDKParams({url: url, debug: true})
+					.then(function(config) {
+						wx.config(config);
+					})
+					.catch(function(err) {
+						console.error(err);
+					});
+		})
+	} else {
+		console.info("没有在微信中,初始化默认ajaxFileUpload");
+	}
+
 	$.fn.AjaxFileUpload = function(options) {
 		
 		var defaults = {
@@ -29,7 +60,11 @@
 		return this.each(function() {
 			var $this = $(this);
 			if ($this.is("input") && $this.attr("type") === "file") {
-				$this.bind("change", onChange);
+				if (isWeixin()) {
+					$this.bind("click", bootstapWx);
+				} else {
+					$this.bind("change", onChange);
+				}
 			}
 		});
 		
@@ -111,6 +146,39 @@
 				})
 				.hide()
 				.appendTo("body");
+		}
+
+		//调用微信
+		function bootstapWx() {
+			event.preventDefault();
+			wx.ready(function() {
+				wx.chooseImage({
+					count: 1, // 默认9
+					success: function (res) {
+						var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+						if (localIds) {
+							wxUploadImg(localIds[0]);
+						}
+					}
+				});
+			});
+		}
+
+		function wxUploadImg(localid) {
+			wx.uploadImage({
+				localId: localid, // 需要上传的图片的本地ID，由chooseImage接口获得
+				isShowProgressTips: 1, // 默认为1，显示进度提示
+				success: function (res) {
+					var serverId = res.serverId; // 返回图片的服务器端ID
+					API.wechat.mediaId2key({meidaId: serverId})
+						.then(function(key) {
+							settings.onComplete(localid, {code: 0, errmsg: "", key: key});
+						})
+						.catch(function(err) {
+							console.error(err);
+						});
+				}
+			});
 		}
 	};
 })(jQuery);

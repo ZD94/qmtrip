@@ -2,4 +2,15 @@
 	<div class="orderdetail">
 		<p><span></span></p>
 	</div>
+
+	<input type="file" id="uploadFile"/>
 </div>
+<script src="/script/jquery.ajaxfileupload.js"></script>
+<script>
+	$("#uploadFile").AjaxFileUpload({
+		onComplete: function(filename, response) {
+			alert(filename);
+			alert(response);
+		}
+	});
+</script>
