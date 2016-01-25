@@ -8,6 +8,8 @@
 var service = {};
 var API = require("common/api");
 var utils = require("common/utils");
+var Q = require("q");
+
 /**
  * @method getJSDKParams
  *
@@ -32,7 +34,7 @@ service.getJSDKParams = function(params) {
  */
 service.mediaId2key = function(params) {
     var accountId = this.accountId;
-    var mediaId = piarams.mediaId;
+    var mediaId = params.mediaId;
 
     return Q()
     .then(function() {
@@ -46,7 +48,15 @@ service.mediaId2key = function(params) {
     .then(function(content) {
         var buffers = new String(content, 'base64');
         var md5key = utils.md5(buffers);
-        return API.attachement.createAttachment({md5key: md5key, content: buffers, has_id: [accountId]})
+        var hasId = [];
+        if (accountId) {
+            hasId.push(accountId);
+        }
+        hasId = JSON.stringify(hasId);
+        return API.attachment.createAttachment({md5key: md5key, content: buffers, hasId: hasId, userId: accountId})
+    })
+    .then(function(result) {
+        return result.md5key;
     })
 }
 
