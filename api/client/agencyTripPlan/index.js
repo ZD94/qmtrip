@@ -25,19 +25,19 @@ agencyTripPlan.getTripPlanOrderById = function(orderId){
     };
 
     var accountId = self.accountId;
-    return Q.all([
-        API.tripPlan.getTripPlanOrder(params),
-        API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
-    ])
-    .spread(function(order, user){
-            var companyId = order.companyId;
-            return API.company.getCompany({companyId: companyId, columns: ['agencyId']})
-            .then(function(company){
-                    if(company.agencyId != user.agencyId){
-                        throw L.ERR.PERMISSION_DENY;
-                    }
-                    return order;
-                })
+    return API.tripPlan.getTripPlanOrder(params)
+        .then(function(order){
+            return Q.all([
+                order,
+                API.company.getCompany({companyId: order.companyId, columns: ['agencyId']}),
+                API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
+            ])
+        })
+        .spread(function(order, company, user){
+            if(company.agencyId != user.agencyId){
+                throw L.ERR.PERMISSION_DENY;
+            }
+            return order;
         })
 }
 
@@ -129,7 +129,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
         var invoiceName = "";
         var expenditure = '0';
         var _startTime = "";
-        return API.tripPlan.getConsumeDetail({consumeId: consumeId})
+        return API.tripPlan.getConsumeDetail({consumeId: consumeId, columns: ['accountId', 'orderId', 'type', 'startTime']})
             .then(function(consumeDetail){
                 if(!consumeDetail.accountId){
                     throw {code: -6, msg: '消费记录异常'};

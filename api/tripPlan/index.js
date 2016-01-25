@@ -132,6 +132,23 @@ function getTripPlanOrder(params){
         })
 }
 
+tripPlan.getConsumeDetail = getConsumeDetail;
+getConsumeDetail.required_params = ['consumeId'];
+getConsumeDetail.optional_params = ['columns'];
+function getConsumeDetail(params){
+    var options = {}
+    if(params.columns){
+        options.attributes = _.intersection(params.columns, ConsumeDetailsCols);
+    }
+    return ConsumeDetails.findById(params.consumeId, options)
+        .then(function(detail){
+            if(!detail || detail.status == -2){
+                throw {code: -2, msg: '消费记录不存在'};
+            }
+            return detail;
+        })
+}
+
 /**
  * 更新计划单/预算单信息
  * @param params
