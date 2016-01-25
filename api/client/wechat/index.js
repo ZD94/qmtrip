@@ -35,7 +35,8 @@ service.getJSDKParams = function(params) {
 service.mediaId2key = function(params) {
     var accountId = this.accountId;
     var mediaId = params.mediaId;
-
+    var md5key;
+    var buffers;
     return Q()
     .then(function() {
         if (!mediaId) {
@@ -46,8 +47,14 @@ service.mediaId2key = function(params) {
         return API.wechat.downloadMedia({mediaId: mediaId})
     })
     .then(function(content) {
-        var buffers = new String(content, 'base64');
-        var md5key = utils.md5(buffers);
+        buffers = new String(content, 'base64');
+        md5key = utils.md5(buffers);
+        return API.attachment.getAttachment({md5key: md5key, userId: accountId})
+    })
+    .then(function(attachement) {
+        if (attachement) {
+            return attachement;
+        }
         var hasId = [];
         if (accountId) {
             hasId.push(accountId);
@@ -55,8 +62,8 @@ service.mediaId2key = function(params) {
         hasId = JSON.stringify(hasId);
         return API.attachment.createAttachment({md5key: md5key, content: buffers, hasId: hasId, userId: accountId})
     })
-    .then(function(result) {
-        return result.md5key;
+    .then(function(attachement) {
+        return attachement.md5key;
     })
 }
 
