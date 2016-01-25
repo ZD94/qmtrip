@@ -4,6 +4,7 @@
 'use strict';
 //可以直接require服务器根目录下的模块
 require('app-module-path').addPath(__dirname);
+require('common/typescript');
 
 //服务器启动性能日志
 //var perf = require('common/perf');

@@ -85,6 +85,7 @@
     "notie": "^2.1.0",
     "swiper": "^3.2.7",
     "through2": "^2.0.0",
+    "typescript": "^1.7.5",
     "typescript-require": "newclear/typescript-require",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
