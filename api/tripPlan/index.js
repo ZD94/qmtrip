@@ -138,7 +138,7 @@ getConsumeDetail.optional_params = ['columns'];
 function getConsumeDetail(params){
     var options = {}
     if(params.columns){
-        options.attributes = _.pick(params.columns, ConsumeDetailsCols);
+        options.attributes = _.intersection(params.columns, ConsumeDetailsCols);
     }
     return ConsumeDetails.findById(params.consumeId, options)
         .then(function(detail){
