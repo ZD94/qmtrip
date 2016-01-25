@@ -174,9 +174,6 @@ function updateTripPlanOrder(params){
             if(!order || order.status == -2){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
             }
-            if(order.accountId != userId){ //权限不足
-                throw L.ERR.PERMISSION_DENY;
-            }
             var logs = {
                 orderId: order.id,
                 userId: userId,
@@ -256,7 +253,7 @@ function updateConsumeBudget(params){
             })
         })
         .spread(function(orderId){
-            return [orderId, ConsumeDetails.findAll({where: {orderId: orderId}, attributes: ['budget']})];
+            return [orderId, ConsumeDetails.findAll({where: {orderId: orderId, status: {$ne: -2}}, attributes: ['budget']})];
         })
         .spread(function(orderId, list){
             for(var i=0; i<list.length; i++){
@@ -389,8 +386,8 @@ function deleteTripPlanOrder(params){
             }
             return sequelize.transaction(function(t){
                 return Q.all([
-                    PlanOrder.update({status: -2}, {where: {id: orderId}, fields: ['status'], transaction: t}),
-                    ConsumeDetails.update({status: -2}, {where: {orderId: orderId}, fields: ['status'], transaction: t})
+                    PlanOrder.update({status: -2, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'updateAt'], transaction: t}),
+                    ConsumeDetails.update({status: -2, updateAt: utils.now()}, {where: {orderId: orderId}, fields: ['status', 'updateAt'], transaction: t})
                 ])
             })
         })
@@ -437,7 +434,7 @@ uploadInvoice.required_params = ['userId', 'consumeId', 'picture'];
 function uploadInvoice(params){
     var orderId = "";
     return ConsumeDetails.findById(params.consumeId, {attributes: ['status', 'orderId', 'invoice', 'accountId']})
-        .then(function(custome, order){
+        .then(function(custome){
             if(!custome || custome.status == -2)
                 throw L.ERR.NOT_FOUND;
             if(custome.accountId != params.userId)
