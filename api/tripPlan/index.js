@@ -460,7 +460,7 @@ function uploadInvoice(params){
             var times = invoiceJson.length ? invoiceJson.length+1 : 1;
             var currentInvoice = {times:times, picture:params.picture, create_at:moment().format('YYYY-MM-DD HH:mm'), status:0, remark: '', approve_at: ''};
             invoiceJson.push(currentInvoice);
-            var updates = {newInvoice: params.picture, invoice: JSON.stringify(invoiceJson), updateAt: moment().format(), status: 0, auditRemark: ""};
+            var updates = {newInvoice: params.picture, invoice: JSON.stringify(invoiceJson), updateAt: moment().format("YYYY-MM-DD HH:mm:ss"), status: 0, auditRemark: ""};
             var logs = {consumeId: params.consumeId, userId: params.userId, remark: "上传票据"};
             var orderLogs = {orderId: custome.orderId, userId: params.userId, remark: '上传票据', createAt: utils.now()};
             return sequelize.transaction(function(t){
