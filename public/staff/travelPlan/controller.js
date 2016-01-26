@@ -223,7 +223,6 @@ var travelPlan=(function(){
         loading(true);
         $("title").html("出差单明细");
         var planId = $routeParams.planId;
-        console.info(planId)
         API.onload(function() {
             API.tripPlan.getTripPlanOrderById(planId)
                 .then(function(result){
@@ -301,7 +300,7 @@ var travelPlan=(function(){
             window.location.href = "#/travelPlan/InvoiceDetail?planId="+planId+"&status="+status+"&invoiceId="+invoiceId;
         }
         $scope.initscan = function(){
-            var backUrl = "http://"+window.location.host+"/mobile.html";
+            var backUrl = "http://"+window.location.host+"/mobile.html#/uploadtoserver/uploadImg?planId="+planId;
             API.onload(function() {
                 API.auth.getQRCodeUrl({backUrl: backUrl})
                     .then(function(content) {
@@ -324,7 +323,6 @@ var travelPlan=(function(){
             if(time){
                 clearInterval(time);
             }
-
             time = setInterval(function(){
                 if(start<=0) {
                     $("#qrcode").find("img").remove();
@@ -333,12 +331,10 @@ var travelPlan=(function(){
                 }else if(start >= max){
                     $scope.initscan();   
                 }
-
                 start = start -1;
                 $scope.seconds = start;
                 $scope.$apply();
             },1000);
-            
         }
         $scope.close_scan = function(){
             start = max;
