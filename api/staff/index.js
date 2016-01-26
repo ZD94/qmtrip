@@ -64,8 +64,12 @@ staff.createStaff = function(data){
     if (!data.companyId) {
         throw {code: -4, msg: "所属企业不能为空"};
     }
-    return Q()
-        .then(function(){
+    return API.company.getCompany({companyId: data.companyId, columns: ['name','domainName']})
+        .then(function(c){
+            if(c.domainName && c.domainName != "" && data.email.indexOf(c.domainName) == -1){
+                throw {code: -6, msg: "邮箱格式不符合要求"};
+            }
+            data.companyName = c.name;
             if(accountId) {
                 return {id: accountId};
             }
