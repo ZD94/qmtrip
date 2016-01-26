@@ -249,12 +249,20 @@ function updateConsumeBudget(params){
             }
 
             if(ret.status == 1){
-                throw {code: -3, msg: '该票据已经审核通过，不能修改'};
+                throw {code: -3, msg: '该票据已经审核通过，不能修改预算'};
             }
 
             return [ret.budget, PlanOrder.findById(ret.orderId, {attributes: ['id', 'budget', 'status']})];
         })
         .spread(function(o_budget, order){
+            if(order.status == 1){
+                throw {code: -4, msg: '该次出差计划已经提交，不能修改预算'};
+            }
+
+            if(order.status > 1){
+                throw {code: -5, msg: '该次出差计划已经审核通过，不能修改预算'};
+            }
+
             var budget = params.budget;
             var c_budget = 0;
 
@@ -364,12 +372,12 @@ function saveConsumeRecord(params){
                 L.ERR.PERMISSION_DENY;
             }
 
-            if(order.status == -1){
-                throw {code: -3, msg: '该计划单已失效'};
+            if(order.status == 1){
+                throw {code: -3, msg: '该订单已提交，不能添加消费单据'};
             }
 
             if(order.status > 1){
-                throw {code: -4, msg: '该计划单已审核，不能添加消费记录'};
+                throw {code: -4, msg: '该计划单已审核，不能添加消费单据'};
             }
 
             var budget = params.budget || 0;
