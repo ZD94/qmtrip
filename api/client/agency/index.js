@@ -77,9 +77,9 @@ agency.getAgencyById = function(agencyId){
  * @param params
  * @returns {*}
  */
-agency.listAgency = function(params){
-    params.userId = this.accountId;
-    return API.agency.listAgency(params);
+agency.listAgency = function(){
+    var self = this;
+    return API.agency.listAgency({userId: self.accountId});
 }
 
 /**
@@ -125,33 +125,36 @@ agency.getCurrentAgencyUser = function(){
  */
 agency.deleteAgencyUser = checkAgencyPermission("user.delete",
     function(agencyUserId){
-    var self = this;
-    var accountId = self.accountId;
-    return Q.all([
-        API.agency.getAgencyUser({id: accountId, columns: ['agencyId']}),
-        API.agency.getAgencyUser({id:agencyUserId, columns: ['agencyId']})
-    ])
-    .spread(function(user, target){
-            if(user.agencyId != target.agencyId){
-                throw L.ERR.PERMISSION_DENY;
-            }
-            return API.agency.deleteAgencyUser({id: agencyUserId});
-        })
-});
+        var self = this;
+        var accountId = self.accountId;
+
+        return Q.all([
+            API.agency.getAgencyUser({id: accountId, columns: ['agencyId']}),
+            API.agency.getAgencyUser({id:agencyUserId, columns: ['agencyId']})
+        ])
+            .spread(function(user, target){
+                if(user.agencyId != target.agencyId){
+                    throw L.ERR.PERMISSION_DENY;
+                }
+
+                return API.agency.deleteAgencyUser({id: agencyUserId});
+            })
+    });
 
 /**
  * 更新代理商用户
  * @param params
  * @returns {*}
  */
-
 agency.updateAgencyUser = checkAgencyPermission("user.edit", updateAgencyUser);
 updateAgencyUser.required_params = ['id'];
 updateAgencyUser.optional_params = ['status', 'name', 'sex', 'email', 'mobile', 'avatar', 'roleId'];
+
 function updateAgencyUser(params) {
     var self = this;
     var accountId = self.accountId;
     var id = params.id;
+
     return Q.all([
         API.agency.getAgencyUser({id: accountId, columns: ['agencyId']}),
         API.agency.getAgencyUser({id: id, columns: ['agencyId']})
@@ -160,6 +163,7 @@ function updateAgencyUser(params) {
             if(user.agencyId != target.agencyId){
                 throw L.ERR.PERMISSION_DENY;
             }
+
             return API.agency.updateAgencyUser(params);
         })
 }
@@ -183,15 +187,19 @@ agency.getAgencyUser = function(agencyUserId){
             if(user.agencyId != agencyUser.agencyId){
                 throw L.ERR.PERMISSION_DENY;
             }
+
             return agencyUser;
         })
 }
 
 agency.listAndPaginateAgencyUser = function(params) {
-    var user_id = this.accountId;
+    var self = this;
+    var user_id = self.accountId;
+
     return API.agency.getAgencyUser({id:user_id, columns: ['agencyId']})
         .then(function(data){
             params.agencyId = data.agencyId;
+
             return API.agency.listAndPaginateAgencyUser(params);
         });
 }
