@@ -231,7 +231,7 @@ var travelPlan=(function(){
         loading(true);
         $("title").html("出差单明细");
         var planId = $routeParams.planId;
-        console.info(planId)
+        API.require("attachment");
         API.onload(function() {
             API.tripPlan.getTripPlanOrderById(planId)
                 .then(function(result){
@@ -245,21 +245,29 @@ var travelPlan=(function(){
                         onComplete: function(filename, response) {
                             $scope.ref = $(this).attr("ref");
                             $scope.md5 = response.md5key;
+
                             if (response.ret == 0 ) {
-                                var ImgSrc = '/upload/get-img-file/'+response.md5key;
-                                var invoiceType = "";
-                                if ($(this).attr("data-type") == 1) {
-                                    invoiceType = "去程交通票据";
-                                }else if ($(this).attr("data-type") == 2) {
-                                    invoiceType = "住宿票据";
-                                }
-                                else if ($(this).attr("data-type") == 3) {
-                                    invoiceType = "返程交通票据";
-                                }
-                                $(".messagebox_content img").attr("src",ImgSrc);
-                                $(".messagebtns em").html(invoiceType);
-                                $("#uploadimg").show();
-                                position();
+                                API.attachment.previewSelfImg({
+                                    key: response.md5key
+                                }, function(err, img) {
+                                    if (err) {
+                                        return alertDemo(err.msg);
+                                    }
+                                    var ImgSrc = img;
+                                    var invoiceType = "";
+                                    if ($(this).attr("data-type") == 1) {
+                                        invoiceType = "去程交通票据";
+                                    }else if ($(this).attr("data-type") == 2) {
+                                        invoiceType = "住宿票据";
+                                    }
+                                    else if ($(this).attr("data-type") == 3) {
+                                        invoiceType = "返程交通票据";
+                                    }
+                                    $(".messagebox_content img").attr("src",ImgSrc);
+                                    $(".messagebtns em").html(invoiceType);
+                                    $("#uploadimg").show();
+                                    position();
+                                })
                             } else {
                               alertDemo(response.errMsg);
                             }

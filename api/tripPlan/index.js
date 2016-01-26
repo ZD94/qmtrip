@@ -142,6 +142,32 @@ function getTripPlanOrder(params){
         })
 }
 
+tripPlan.getConsumeInvoiceImg = function(params) {
+    var consumeId = params.consumeId;
+    return Q()
+    .then(function() {
+        if (!consumeId) {
+            throw {code: -1, msg: "consumeId不能为空"};
+        }
+
+        return ConsumeDetails.findById(consumeId)
+            .then(function(consumeDetail) {
+                return API.attachments.getAttachment({id: consumeDetail.newInvoice})
+            })
+            .then(function(attachment) {
+                if (!attachment) {
+                    L.ERR.NOT_FOUND;
+                }
+
+                return 'data:image/jpg;base64,' + attachment.content;
+            })
+            .then(function(result) {
+                return result;
+            })
+    })
+
+}
+
 tripPlan.getConsumeDetail = getConsumeDetail;
 getConsumeDetail.required_params = ['consumeId'];
 getConsumeDetail.optional_params = ['columns'];
