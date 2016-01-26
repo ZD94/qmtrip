@@ -182,7 +182,7 @@ tripPlan.pageTripPlanOrder = function (params) {
     if (params.isUpload === true) {
         params.status = {$gt: 0}
     } else if (params.isUpload === false) {
-        params.status = 0;
+        params.status = {$in: [-1, 0]};
     }
 
     if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
@@ -239,16 +239,17 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
     if (params.isUpload === true) {
         params.status = {$gt: 0}
     } else if (params.isUpload === false) {
-        params.status = 0;
+        params.status = {$in: [-1, 0]};
     }
 
     if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
         var audit = params.audit;
-        params.status = 1;
+        params.status = 0;
         if(audit == 'Y'){
             params.status = {$gt: 1};
             params.auditStatus = 1;
         }else if(audit == "P"){
+            params.status = 1;
             params.auditStatus = 0;
         }else if(audit == 'N'){
             params.status = 0; //待上传状态
