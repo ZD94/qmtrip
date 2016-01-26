@@ -778,6 +778,35 @@ function commitTripPlanOrder(params){
 }
 
 /**
+ * @method previewConsumeInvoice 预览发票图片
+ *
+ * @param {Object} params
+ * @param {UUID} params.consumeId
+ * @param {UUID} params.accountId
+ */
+tripPlan.previewConsumeInvoice = function (params) {
+    var consumeId = params.consumeId;
+    var accountId = params.accountId;
+
+    return tripPlan.getVisitPermission({
+        consumeId: consumeId,
+        userId: accountId
+    })
+    .then(function(result) {
+        if (!result.allow) {
+            throw L.ERR.PERMISSION_DENY;
+        }
+        return ConsumeDetails.findOne({where: {orderId: orderId, id: consumeId}})
+    })
+    .then(function(consume) {
+        return API.attachments.getAttachment({id: consume.newInvoice});
+    })
+    .then(function(attachment) {
+        return "data:image/jpg;base64,"+attachment.content;
+    })
+}
+
+/**
  * 判断JSON对象是否为空
  * @param obj
  * @returns {boolean}

@@ -28,7 +28,6 @@ var travelPlan=(function(){
                 }
                 API.tripPlan.pageTripPlanOrder(params)
                     .then(function(result){
-                        console.info (result);
                         $scope.total1 = result.total;
                         $scope.planListitems = result.items;
                         loading(true);
@@ -39,6 +38,7 @@ var travelPlan=(function(){
                         $(".file").AjaxFileUpload({
                             action: '/upload/ajax-upload-file?type=invoice',
                             onComplete: function(filename, response) {
+                                console.info(filename);
                                 $scope.ref = $(this).attr("ref");
                                 $scope.md5 = response.md5key;
                                 if (response.ret == 0 ) {

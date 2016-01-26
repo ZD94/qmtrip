@@ -9,10 +9,47 @@ var config = require('config');
 var utils = require("common/utils");
 var sequelize = require("common/model").importModel("./models");
 var attachmentModel = sequelize.models.Attachment;
+var Owner = sequelize.models.Owner;
 var Paginate = require("../../common/paginate").Paginate;
 var L = require("../../common/language");
 var API = require("../../common/api");
 var attachment = {};
+
+/**
+ * 绑定拥有者
+ *
+ * @param {Object} params
+ * @param {String} params.key
+ * @param {UUID} params.accountId
+ */
+attachment.bindOwner = function(params) {
+    var key = params.key;
+    var accountId = params.accountId;
+    return Owner.create({
+        key: key,
+        accountId: accountId
+    })
+}
+
+/**
+ * 获取自己上传的附件
+ *
+ * @param {Object} params
+ * @param {String} params.key
+ * @param {UUID} params.accountId
+ */
+attachment.getSelfAttachment = function(params) {
+    var key = params.key;
+    var accountId = params.accountId;
+    return Owner.findOne({key: key, accountId: accountId})
+    .then(function(owner) {
+        if (!owner) {
+            throw L.ERR.PERMISSION_DENY;
+        }
+        return API.attachments.getAttachment({id: key});
+    })
+}
+
 
 /**
  * 创建附件记录
