@@ -127,6 +127,32 @@
 | msg     | 提示信息 |
 | json数据   | 部门信息|json
 
+>. 查询所有部门信息 API.department.getAllDepartment(params,callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 参数信息             |json              |------
+| params.companyId                                | 企业id             | uuid             |必填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| msg     | 提示信息 |
+| json数据   | 部门信息|json
+
+>. 代理商查询所有部门信息 API.department.agencyGetAllDepartment(params,callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 参数信息             |json              |------
+| params.companyId                                | 企业id             | uuid             |必填
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| msg     | 提示信息 |
+| json数据   | 部门信息|json
+
 >. 查询企业一级部门 API.department.getFirstClassDepartments(params,callback);
 
 | 参数                                    | 含义               |类型                  | 备注

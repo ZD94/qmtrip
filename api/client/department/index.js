@@ -195,6 +195,34 @@ department.agencyGetDepartment = function(params){
 };
 
 /**
+ * 根据企业id得到企业所有部门
+ * @param params
+ * @returns {*|Promise}
+ */
+department.getAllDepartment = function(params){
+    var user_id = this.accountId;
+    return API.staff.getStaff({id: user_id})
+        .then(function(data){
+            return API.department.getAllDepartment({companyId: data.companyId});
+        });
+};
+
+department.agencyGetAllDepartment = function(params){
+    var user_id = this.accountId;
+    if(!params.companyId){
+        throw {code:-1, msg:"companyId不能为空"};
+    }
+    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+        .then(function(result){
+            if(result){
+                return API.department.getAllDepartment({companyId: params.companyId});
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        })
+};
+
+/**
  * @method getFirstClassDepartments
  * 查询企业一级部门
  * @param params

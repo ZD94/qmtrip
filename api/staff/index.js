@@ -431,6 +431,7 @@ staff.beforeImportExcel = function(params){
     var md5key = params.md5key;
 //    var obj = nodeXlsx.parse(fileUrl);
     var travalPolicies = {};
+    var departmentMaps = {};
     var addObj = [];
     var noAddObj = [];
     var downloadAddObj = [];
@@ -442,33 +443,43 @@ staff.beforeImportExcel = function(params){
     var companyId = "";
     var domainName = "";
     var xlsxObj;
-    return API.attachment.getAttachment({md5key: md5key, userId: userId})
+    return API.attachment.getAttachment({md5key: md5key})
         .then(function(att){
-            xlsxObj = nodeXlsx.parse(att.content);
-            return staff.getStaff({id: userId});
+            if(att){
+                xlsxObj = nodeXlsx.parse(att.content);
+                return staff.getStaff({id: userId});
+            }else{
+                throw {code:-1, msg:"附件记录不存在"};
+            }
         })
         .then(function(sf){
             companyId = sf.companyId;
             return Q.all([
                 API.travelPolicy.getAllTravelPolicy({where: {companyId: companyId}}),
+                API.department.getAllDepartment({where: {companyId: companyId}}),//得到部门
                 API.company.getCompany({companyId: companyId})
             ])
         })
-        .spread(function(results, com){
+        .spread(function(results,depts, com){
             domainName = com.domainName;
             for(var t=0;t<results.length;t++){
                 var tp = results[t];
                 travalPolicies[tp.name] = tp.id;
             }
-            return travalPolicies;
+            for(var k=0;k<depts.length;k++){
+                var dep = depts[k];
+                departmentMaps[dep.name] = dep.id;
+            }
+            return [travalPolicies,departmentMaps];
         })
-        .then(function(travalps){
+        .spread(function(travalps, departments){
             var data = xlsxObj[0].data;
             return Q.all(data.map(function(item, index){
                 var s = data[index];
                 s[1] = s[1] ? s[1]+"" : "";
 //                    var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
-                var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
+//                var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
+                var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', departmentId: departments[s[3]]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
                 item = staffObj;
                 if(index>0 && index<201){//不取等于0的过滤抬头标题栏
                     if(_.trim(staffObj.name) == ""){

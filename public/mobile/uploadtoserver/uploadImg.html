@@ -1,75 +1,113 @@
 <div class="uploadImg">
 	<div class="orderdetail">
-		<p><span></span></p>
+		<p><span>{{plan.createAt | date: 'yyyy-MM-dd'}}出差记录</span><em>{{name}}</em></p>
+		<p class="porgramtit">{{plan.description}}</p>
+		<p class="outline" ng-if="plan.outTraffic.length!=0">从{{outTraffic.startPlace}}到{{outTraffic.arrivalPlace}},预算￥{{outTraffic.budget}}</p>
+		<p class="address" ng-if="plan.hotel.length!=0">{{hotel.city}},{{hotel.hotelname}},预算￥{{hotel.budget}}</p>
+		<p class="backline" ng-if="plan.backTraffic.length!=0">从{{backTraffic.startPlace}}到{{backTraffic.arrivalPlace}},预算￥{{backTraffic.budget}}</p>
 	</div>
-	<div>
+	<div class="maincontent">
 		<div class="messagebox_content">
 			<img src="" alt="">
 		</div>
-		<div ng-if="planDetail.outTraffic.length!=0">
+		<div ng-if="plan.outTraffic.length!=0" class="outTraffic">
 			<div class="po_r unupload" ng-if="outTraffic.invoice.length==0">
 				<span>交通票据</span>
 				<span>去程</span>
 				<span>点击上传</span>
 				<input type="file" class="file" ref="{{outTraffic.id}}" data-type = "1" name="tmpFile" accept="image/gif,image/jpeg,image/jpg,image/png">
 			</div>
-			<div class="po_r imgdown" ng-if="outTraffic.invoice.length!=0 && ">
+			<div class="po_r imgdown" ng-if="outTraffic.invoice.length!=0 && outTraffic.status =='0'">
 				<span>交通票据</span>
 				<span>去程</span>
 				<span>点击修改</span>
 				<input type="file" class="file" ref="{{outTraffic.id}}" data-type = "1" name="tmpFile" accept="image/gif,image/jpeg,image/jpg,image/png">
 			</div>
-			<div class="po_r fail" ng-if="outTraffic.invoice.length!=0 && hotel.status=='-1'">
+			<div class="po_r fail" ng-if="outTraffic.invoice.length!=0 && outTraffic.status=='-1'">
 				<span>交通票据</span>
 				<span>去程</span>
 				<span>重新上传</span>
 				<input type="file" class="file" ref="{{outTraffic.id}}" name="tmpFile" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png">
 			</div>
-			<div class="po_r ready" ng-if="outTraffic.invoice.length!=0 && hotel.status=='1'">
+			<div class="po_r ready" ng-if="outTraffic.invoice.length!=0 && outTraffic.status=='1'">
 				<span>交通票据</span>
 				<span>去程</span>
 				<span>审核通过</span>
 				<input type="file" class="file" ref="{{outTraffic.id}}" name="tmpFile" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png">
 			</div>
 		</div>
-		<div ng-if="planDetail.hotel.length!=0">
-			<div class="po_r">
+		<div ng-if="plan.hotel.length!=0" class="hotel">
+			<div class="po_r unupload" ng-if="outTraffic.invoice.length==0">
 				<span>住宿发票</span>
 				<span>点击上传</span>
 				<input type="file" class="file" ref="" name="tmpFile" data-type = "2" accept="image/gif,image/jpeg,image/jpg,image/png">
 			</div>
+			<div class="po_r imgdown" ng-if="hotel.invoice.length!=0 && hotel.status =='0'">
+				<span>住宿发票</span>
+				<span>点击修改</span>
+				<input type="file" class="file" ref="{{hotel.id}}" data-type = "2" name="tmpFile" accept="image/gif,image/jpeg,image/jpg,image/png">
+			</div>
+			<div class="po_r fail" ng-if="hotel.invoice.length!=0 && hotel.status=='-1'">
+				<span>住宿发票</span>
+				<span>重新上传</span>
+				<input type="file" class="file" ref="{{hotel.id}}" name="tmpFile" data-type = "2" accept="image/gif,image/jpeg,image/jpg,image/png">
+			</div>
+			<div class="po_r ready" ng-if="hotel.invoice.length!=0 && hotel.status=='1'">
+				<span>住宿发票</span>
+				<span>审核通过</span>
+				<input type="file" class="file" ref="{{hotel.id}}" name="tmpFile" data-type = "2" accept="image/gif,image/jpeg,image/jpg,image/png">
+			</div>
 		</div>
-		<div ng-if="planDetail.backTraffic.length!=0">
-			<div class="po_r">
+		<div ng-if="plan.backTraffic.length!=0" class="backTraffic">
+			<div class="po_r unupload" ng-if="backTraffic.invoice.length==0">
 				<span>交通票据</span>
 				<span>回程</span>
 				<span>点击上传</span>
-				<input type="file" class="file" ref="" name="tmpFile" data-type = "3" accept="image/gif,image/jpeg,image/jpg,image/png">
+				<input type="file" class="file" ref="{{backTraffic.id}}" data-type = "3" name="tmpFile" accept="image/gif,image/jpeg,image/jpg,image/png">
+			</div>
+			<div class="po_r imgdown" ng-if="backTraffic.invoice.length!=0 && backTraffic.status =='0'">
+				<span>交通票据</span>
+				<span>回程</span>
+				<span>点击修改</span>
+				<input type="file" class="file" ref="{{backTraffic.id}}" data-type = "3" name="tmpFile" accept="image/gif,image/jpeg,image/jpg,image/png">
+			</div>
+			<div class="po_r fail" ng-if="backTraffic.invoice.length!=0 && backTraffic.status=='-1'">
+				<span>交通票据</span>
+				<span>回程</span>
+				<span>重新上传</span>
+				<input type="file" class="file" ref="{{backTraffic.id}}" name="tmpFile" data-type = "3" accept="image/gif,image/jpeg,image/jpg,image/png">
+			</div>
+			<div class="po_r ready" ng-if="backTraffic.invoice.length!=0 && backTraffic.status=='1'">
+				<span>交通票据</span>
+				<span>回程</span>
+				<span>审核通过</span>
+				<input type="file" class="file" ref="{{backTraffic.id}}" name="tmpFile" data-type = "3" accept="image/gif,image/jpeg,image/jpg,image/png">
 			</div>
 		</div>
 		
+	</div>
+	<div class="footer">
+		<span>票据上传完成后提交审核，一经提交不可再修改</span>
 		<input type="button" ng-click="push()" value="提交审核">
 	</div>
 </div>
 
-	<input type="file" id="uploadFile"/>
-	<input type="button" value="预览" id="preview"/>
-</div>
+	<!-- <input type="file" id="uploadFile"/>
+	<input type="button" value="预览" id="preview"/> -->
 <script src="/script/jquery.ajaxfileupload.js"></script>
 <script>
 	$("#uploadFile").AjaxFileUpload({
 		onComplete: function(filename, response) {
 			console.info(filename);
+			console.info("^^^^^^^^^^^^^^^");
 			console.info(response);
 		}
 	});
-
-//	$("#preview").click(function() {
-//		wx.ready(function() {
-//			wx.previewImage({
-//				current: "wxLocalResource://imageid123456789987654321",
-//				urls: ["wxLocalResource://imageid123456789987654321", "wxLocalResource://imageid123456789987654321"]
-//			})
-//		})
-//	});
+	$(".file").AjaxFileUpload({
+		onComplete: function(filename, response) {
+			console.info(filename);
+			console.info("$$$$$$$$$$$$$");
+			console.info(response);
+		}
+	});
 </script>

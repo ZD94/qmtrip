@@ -220,7 +220,7 @@ var travelPlan=(function(){
     travelPlan.PlanDetailController = function($scope, $routeParams) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(1).find("li").addClass("on");
-        loading(true);
+        loading(false);
         $("title").html("出差单明细");
         var planId = $routeParams.planId;
         API.onload(function() {
@@ -230,7 +230,6 @@ var travelPlan=(function(){
                     $scope.backTraffic = $scope.planDetail.backTraffic[0];
                     $scope.hotel = $scope.planDetail.hotel[0];
                     $scope.outTraffic = $scope.planDetail.outTraffic[0];
-                    $scope.$apply();
                     $(".file").AjaxFileUpload({
                         action: '/upload/ajax-upload-file?type=invoice',
                         onComplete: function(filename, response) {
@@ -256,7 +255,8 @@ var travelPlan=(function(){
                             }
                         }
                     });
-                    
+                    loading(true);
+                    $scope.$apply();
                 })
                 .catch(function(err){
                     console.info(err);
@@ -285,17 +285,24 @@ var travelPlan=(function(){
                     $("#uploadimg .messagebox_box").css('margin-top',-boxheight/2);
                 }
         })
-        $scope.tijiao = function () {
+        $scope.submit = function () {
             API.onload(function() {
                 API.tripPlan.commitTripPlanOrder(planId)
                     .then(function(result){
                         alert ("提交成功");
                     })
                     .catch(function(err){
+                        $(".confirmFixed").show();
                         console.info (err);
                     })
             })
         }
+
+        //关闭弹窗
+        $scope.confirmClose = function () {
+            $(".confirmFixed").hide();
+        }
+
         $scope.goDetail = function (status,invoiceId) {
             window.location.href = "#/travelPlan/InvoiceDetail?planId="+planId+"&status="+status+"&invoiceId="+invoiceId;
         }
