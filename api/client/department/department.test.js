@@ -174,6 +174,15 @@ describe("api/client/department.js", function() {
             done();
         });
     })
+
+    //根据企业id查询所有部门
+    it("#getAllDepartment should be ok", function(done) {
+        API.client.department.getAllDepartment.call(self, {companyId: companyId}, function(err, result) {
+            assert.equal(err, null);
+            //console.log(result);
+            done();
+        });
+    })
 //查询默认部门
     it("#getDefaultDepartment should be ok", function(done) {
         API.client.department.getDepartment.call(self, {id: null}, function(err, result) {
@@ -337,6 +346,14 @@ describe("api/client/department.js", function() {
 //根据id查询部门
     it("#agencyGetDepartment should be ok", function(done) {
         API.client.department.agencyGetDepartment.call(agencySelf, {id: id, companyId: companyId}, function(err, result) {
+            assert.equal(err, null);
+            //console.log(result);
+            done();
+        });
+    })
+//根据企业id查询所有部门
+    it("#agencyGetAllDepartment should be ok", function(done) {
+        API.client.department.agencyGetAllDepartment.call(agencySelf, {companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(result);
             done();

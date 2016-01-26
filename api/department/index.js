@@ -163,6 +163,18 @@ function getDepartment(params){
 }
 
 /**
+ * 根据companyId查询企业所有部门
+ * @param params
+ * @param params.companyId
+ * @returns {*}
+ */
+department.getAllDepartment = getAllDepartment;
+getAllDepartment.required_params = ["companyId"];
+function getAllDepartment(params){
+    return departmentModel.findAll({where: params});
+}
+
+/**
  * 查询企业默认部门
  * @param params
  * @returns {*}
