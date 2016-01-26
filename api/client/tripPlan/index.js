@@ -24,11 +24,13 @@ tripPlan.savePlanOrder = function (params) {
     var order = {};
     var email = "";
     var staffName = "";
+
     return API.staff.getStaff({id: accountId, columns: ['companyId', 'email', 'name']})
         .then(function (staff) {
             email = staff.email;
             staffName = staff.name;
             params.companyId = staff.companyId;
+
             return Q.all([
                 API.tripPlan.savePlanOrder(params),
                 API.staff.findStaffs({companyId: staff.companyId, roleId: {$ne: 1}, columns: ['id', 'name','email']})
@@ -37,19 +39,27 @@ tripPlan.savePlanOrder = function (params) {
         .spread(function(_order, staffs){
             order = _order;
             var go = '无', back = '无', hotel = '无';
+
             if(order.outTraffic.length > 0){
                 var g = order.outTraffic[0];
-                go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.startPlace + ' 到 ' + g.arrivalPlace + ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达, 动态预算￥' + g.budget;
+                go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.startPlace + ' 到 ' + g.arrivalPlace +
+                    ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达, 动态预算￥' + g.budget;
             }
+
             if(order.backTraffic.length > 0){
                 var b = order.backTraffic[0];
-                back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.startPlace + ' 到 ' + b.arrivalPlace + ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达, 动态预算￥' + b.budget;
+                back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.startPlace + ' 到 ' + b.arrivalPlace +
+                    ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达, 动态预算￥' + b.budget;
             }
+
             if(order.hotel.length > 0){
                 var h = order.hotel[0];
-                hotel = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') + ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
+                hotel = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') +
+                    ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
             }
+
             var url = C.host + '/staff.html#/travelPlan/PlanDetail?planId=' + order.id;
+
             return staffs.map(function(s){
                 return API.auth.getAccount({id: s.id, type: 1, attributes: ['status']})
                     .then(function(a){
@@ -68,6 +78,7 @@ tripPlan.savePlanOrder = function (params) {
                                 totalBudget: '￥'+order.budget,
                                 url: url
                             }
+
                             return API.mail.sendMailRequest({
                                 toEmails: s.email, //'miao.yu@tulingdao.com',
                                 templateName: 'qm_notify_new_travelbudget',
@@ -104,6 +115,7 @@ tripPlan.getTripPlanOrderById = function (orderId) {
         orderId: orderId,
         userId: accountId
     }
+
     return Q.all([
         API.tripPlan.getTripPlanOrder(params),
         API.staff.getStaff({id: accountId, columns: ['companyId']})
@@ -112,6 +124,7 @@ tripPlan.getTripPlanOrderById = function (orderId) {
             if (order.companyId != staff.companyId) {
                 throw L.ERR.PERMISSION_DENY;
             }
+
             return order;
         })
 }
@@ -130,11 +143,13 @@ tripPlan.pageCompleteTripPlanOrder = function (params) {
     var perPage = params.perPage;
     typeof page == 'number' ? "" : page = 1;
     typeof perPage == 'number' ? "" : perPage = 10;
+
     var query = _.pick(params,
         ['status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
     query.accountId = self.accountId;
     query.auditStatus = 1; //审核状态为审核通过
     query.status = {$gt: 1}; //计划单状态为已完成（2），可能会有结算完毕状态（3）
+
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {
             return staff.companyId;
@@ -146,6 +161,7 @@ tripPlan.pageCompleteTripPlanOrder = function (params) {
                 limit: perPage,
                 offset: perPage * (page - 1)
             }
+
             return API.tripPlan.listTripPlanOrder(options);
         })
 }
@@ -168,6 +184,7 @@ tripPlan.pageTripPlanOrder = function (params) {
     } else if (params.isUpload === false) {
         params.status = 0;
     }
+
     if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
         var audit = params.audit;
         params.status = 1;
@@ -181,12 +198,15 @@ tripPlan.pageTripPlanOrder = function (params) {
             params.auditStatus = -1;
         }
     }
+
     var page = params.page;
     var perPage = params.perPage;
     typeof page == 'number' ? "" : page = 1;
     typeof perPage == 'number' ? "" : perPage = 10;
+
     var query = _.pick(params,
         ['status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
+
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {
             return staff.companyId;
@@ -199,6 +219,7 @@ tripPlan.pageTripPlanOrder = function (params) {
                 limit: perPage,
                 offset: perPage * (page - 1)
             }
+
             return API.tripPlan.listTripPlanOrder(options);
         })
 }
@@ -220,6 +241,7 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
     } else if (params.isUpload === false) {
         params.status = 0;
     }
+
     if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
         var audit = params.audit;
         params.status = 1;
@@ -233,12 +255,14 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
             params.auditStatus = -1;
         }
     }
+
     var page = params.page;
     var perPage = params.perPage;
     page = typeof page == 'number' ? page : 1;
     perPage = typeof perPage == 'number' ? perPage : 10;
     var query = _.pick(params,
         ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure']);
+
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {
             return staff.companyId;
@@ -250,6 +274,7 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
                 limit: perPage,
                 offset: perPage * (page - 1)
             }
+
             return API.tripPlan.listTripPlanOrder(options);
         })
 }
@@ -265,6 +290,7 @@ tripPlan.listTripPlanOrderByCompany = function (params) {
     }
     var self = this;
     var accountId = self.accountId;
+
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {
             return staff.companyId;
@@ -368,6 +394,7 @@ tripPlan.commitTripPlanOrder = function(orderId){
         throw {code: -1, msg: '参数不正确'};
     }
     var self = this;
+
     return API.tripPlan.commitTripPlanOrder({orderId: orderId, accountId: self.accountId})
 }
 

@@ -39,10 +39,13 @@ function savePlanOrder(params){
                 throw {code: '-1', msg: 'consumeDetails的属性' + key + '没有指定'};
             }
         })
+
         return _.pick(detail, ConsumeDetailsCols);
     });
+
     delete params.consumeDetails;
     var _planOrder = params;
+
     return API.seeds.getSeedNo('tripPlanOrderNo')
         .then(function(orderNo){
             var orderId = uuid.v1();
@@ -51,6 +54,7 @@ function savePlanOrder(params){
             _planOrder.createAt = utils.now();
             var total_budget = 0;
             var isBudget = true;
+
             for(var i in consumeDetails) {
                 var obj = consumeDetails[i];
                 if(!/^-?\d+$/.test(obj.budget))
@@ -60,9 +64,11 @@ function savePlanOrder(params){
                 else
                     isBudget = false;
             }
+
             _planOrder.budget = total_budget;
             if(!isBudget)
                 _planOrder.status = -1; //待录入预算状态
+
             return sequelize.transaction(function(t){
                 var order = {}
                 return PlanOrder.create(_planOrder, {transaction: t})
@@ -71,10 +77,12 @@ function savePlanOrder(params){
                         order.outTraffic = new Array();
                         order.backTraffic = new Array();
                         order.hotel = new Array();
+
                         return Q.all(consumeDetails.map(function(detail){
                             detail.orderId = order.id;
                             detail.accountId = order.accountId;
                             detail.status = 0;
+
                             return ConsumeDetails.create(detail, {transaction: t})
                                 .then(function(ret){
                                     return ret.toJSON();
@@ -92,12 +100,14 @@ function savePlanOrder(params){
                                 order.backTraffic.push(obj);
                             }
                         }
+
                         var logs = {
                             orderId: order.id,
                             userId: params.accountId,
                             remark: '新增计划单 ' + order.orderNo,
                             createAt: utils.now()
                         }
+
                         return TripOrderLogs.create(logs, {transaction: t});
                     })
                     .then(function(){
@@ -138,6 +148,7 @@ function getTripPlanOrder(params){
             order.setDataValue("outTraffic", outTraffic);
             order.setDataValue("backTraffic", backTraffic);
             order.setDataValue("hotel", hotel);
+
             return order;
         })
 }
@@ -179,12 +190,14 @@ function updateTripPlanOrder(params){
             if(!order || order.status == -2){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
             }
+
             var logs = {
                 orderId: order.id,
                 userId: userId,
                 remark: optLog,
                 createAt: utils.now()
             }
+
             return sequelize.transaction(function(t){
                 return Q.all([
                         PlanOrder.update(updates, {returning: true, where: {id: orderId}, fields: Object.keys(updates), transaction: t}),
@@ -215,9 +228,11 @@ function updateConsumeDetail(params){
             if(!record || record.status == -2){
                 throw {code: -2, msg: '票据不存在'};
             }
+
             if(record.status == 1){
                 throw {code: -3, msg: '该票据已经审核通过，不能修改'};
             }
+
             return ConsumeDetails.update(updates, {returning: true, where: {id: params.id}, fields: Object.keys(updates)});
         })
 }
@@ -232,9 +247,11 @@ function updateConsumeBudget(params){
             if(!ret ||ret.status == -2){
                 throw {code: -2, msg: '票据不存在'};
             }
+
             if(ret.status == 1){
                 throw {code: -3, msg: '该票据已经审核通过，不能修改'};
             }
+
             return [ret.budget, PlanOrder.findById(ret.orderId, {attributes: ['id', 'budget', 'status']})];
         })
         .spread(function(o_budget, order){
@@ -253,6 +270,7 @@ function updateConsumeBudget(params){
                 remark: "更新预算",
                 createAt: utils.now()
             }
+
             return sequelize.transaction(function(t){
                 return Q.all([
                     order.id,
@@ -270,6 +288,7 @@ function updateConsumeBudget(params){
                 if(list[i].budget < 0)
                     return true;
             }
+
             return PlanOrder.update({status: 0}, {where: {id: orderId}, fields: ['status']})
         })
         .then(function(){
@@ -287,16 +306,20 @@ tripPlan.listTripPlanOrder = function(options){
     var query = options.where;
     var status = query.status;
     typeof status == 'object'?query.status.$ne = -2:query.status = status;
+
     if(!query.status && query.status != 0){
         query.status = {$ne: -2};
     }
+
     options.order = [['create_at', 'desc']]; //默认排序，创建时间
+
     return PlanOrder.findAndCount(options)
         .then(function(ret){
             if(!ret || ret.rows .length === 0){
                 return new Paginate(options.offset/options.limit + 1, options.limit, ret.count, []);
             }
             var orders = ret.rows;
+
             return Q.all(orders.map(function(order){
                 var orderId = order.id;
                 return Q.all([
@@ -336,34 +359,42 @@ function saveConsumeRecord(params){
             if(!order || order.status == -2){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
             }
+
             if(order.accountId != params.accountId){
                 L.ERR.PERMISSION_DENY;
             }
+
             if(order.status == -1){
                 throw {code: -3, msg: '该计划单已失效'};
             }
+
             if(order.status > 1){
                 throw {code: -4, msg: '该计划单已审核，不能添加消费记录'};
             }
+
             var budget = params.budget || 0;
             if(budget >0){
                 order.increment(['budget'], { by: parseFloat(budget) });
             }
+
             if(order.status > 0){
                 order.status = 0;
             }
+
             order.updateAt = utils.now();
             return [record, order];
         })
         .spread(function(record, order){
             return sequelize.transaction(function(t){
                 options.transaction = t;
+
                 var logs = {
                     orderId: order.id,
                     userId: params.accountId,
                     remark: "增加新的预算",
                     createAt: utils.now()
                 }
+
                 return Q.all([
                     ConsumeDetails.create(record, options),
                     TripOrderLogs.create(logs, {transaction: t}),
@@ -388,12 +419,15 @@ function deleteTripPlanOrder(params){
     var userId = params.userId;
     return PlanOrder.findById(orderId, {attributes: ['accountId', 'status']})
         .then(function(order){
+
             if(!order || order.status == -2){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST
             }
+
             if(order.accountId != userId){ //权限不足
                 throw L.ERR.PERMISSION_DENY;
             }
+
             return sequelize.transaction(function(t){
                 return Q.all([
                     PlanOrder.update({status: -2, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'updateAt'], transaction: t}),
@@ -416,14 +450,17 @@ deleteConsumeDetail.required_params = ['userId', 'id'];
 function deleteConsumeDetail(params){
     var id = params.id;
     var userId = params.userId;
+
     return ConsumeDetails.findById(id, {attributes: ['accountId']})
         .then(function(detail){
             if(!detail || detail.status == -2){
                 throw L.ERR.CONSUME_DETAIL_NOT_EXIST;
             }
+
             if(detail.accountId != userId){
                 throw L.ERR.PERMISSION_DENY;
             }
+
             return ConsumeDetails.update({status: -2, updateAt: utils.now()}, {where: {id: id}, fields: ['status', 'updateAt']})
         })
         .then(function(){
@@ -443,26 +480,33 @@ tripPlan.uploadInvoice = uploadInvoice;
 uploadInvoice.required_params = ['userId', 'consumeId', 'picture'];
 function uploadInvoice(params){
     var orderId = "";
+
     return ConsumeDetails.findById(params.consumeId, {attributes: ['status', 'orderId', 'invoice', 'accountId']})
         .then(function(custome){
             if(!custome || custome.status == -2)
                 throw L.ERR.NOT_FOUND;
+
             if(custome.accountId != params.userId)
                 throw L.ERR.PERMISSION_DENY;
+
             orderId = custome.orderId;
+
             return [orderId, custome, PlanOrder.findById(orderId, {attributes: ['status']})]
         })
         .spread(function(orderId, custome, order){
             if(order.status == -1){
                 throw {code: -2, msg: '还没有录入出差预算'};
             }
+
             var invoiceJson = custome.invoice;
             var times = invoiceJson.length ? invoiceJson.length+1 : 1;
             var currentInvoice = {times:times, picture:params.picture, create_at:moment().format('YYYY-MM-DD HH:mm'), status:0, remark: '', approve_at: ''};
             invoiceJson.push(currentInvoice);
+
             var updates = {newInvoice: params.picture, invoice: JSON.stringify(invoiceJson), updateAt: moment().format(), status: 0, auditRemark: ""};
             var logs = {consumeId: params.consumeId, userId: params.userId, remark: "上传票据"};
             var orderLogs = {orderId: custome.orderId, userId: params.userId, remark: '上传票据', createAt: utils.now()};
+
             return sequelize.transaction(function(t){
                 return Q.all([
                     ConsumeDetails.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
@@ -487,11 +531,13 @@ getVisitPermission.required_params = ['consumeId', 'userId'];
 function getVisitPermission(params){
     var userId = params.userId;
     var consumeId = params.consumeId;
+
     return ConsumeDetails.findById(consumeId)
         .then(function(consume){
             if(!consume || consume.status == -2){
                 throw {code: -4, msg: '查询记录不存在'};
             }
+
             if(consume.accountId == userId){//允许自己查看
                 return {allow: true, md5key: consume.newInvoice}
             }else{
@@ -538,9 +584,11 @@ function saveOrderLogs(logs){
             if(!order || order,status == -2){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
             }
+
             if(order.status == 2){
                 throw {code: -2, msg: '该计划单已完成，不能增加日志'};
             }
+
             logs.createAt = utils.now();
             return TripOrderLogs.create(logs);
         })
@@ -562,30 +610,37 @@ function approveInvoice(params){
         .then(function(consume){
             if(!consume || consume.status == -2)
                 throw L.ERR.NOT_FOUND;
+
             if(!consume.newInvoice){
                 throw {code: -2, msg: '没有上传票据'};
             }
+
             if(consume.status == 1){
                 throw {code: -3, msg: '该票据已审核通过，不能重复审核'};
             }
+
             return PlanOrder.findById(consume.orderId, {attributes: ['id', 'expenditure', 'status', 'budget', 'auditStatus']})
                 .then(function(order){
                     if(!order || order.status == -2){
                         throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
                     }
+
                     if(order.status != 1 || order.auditStatus != 0){
                         throw {code: -3, msg: '该订单未提交，不能审核'};
                     }
+
                     return [order, consume];
                 })
         })
         .spread(function(order, consume){
             var invoiceJson = consume.invoice;
+
             if(invoiceJson && invoiceJson.length > 0){
                 invoiceJson[invoiceJson.length-1].status = params.status;
                 invoiceJson[invoiceJson.length-1].remark = params.remark;
                 invoiceJson[invoiceJson.length-1].approve_at = utils.now();
             }
+
             var updates = {
                 invoice: JSON.stringify(invoiceJson),
                 updateAt: utils.now(),
@@ -593,10 +648,13 @@ function approveInvoice(params){
                 auditUser: params.userId,
                 expenditure: params.expenditure
             };
+
             if(params.remark){
                 updates.auditRemark = params.remark;
             }
+
             var logs = {consumeId: params.consumeId, userId: params.userId, status: params.status, remark: "审核票据-"+params.remark};
+
             return sequelize.transaction(function(t){
                 return Q.all([
                     ConsumeDetails.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
@@ -604,17 +662,22 @@ function approveInvoice(params){
                 ])
                     .spread(function(ret){
                         var status = params.status;
+
                         if(status == -1){
-                            return PlanOrder.update({status: 0, auditStatus: -1, updateAt: utils.now()}, {where: {id: order.id}, fields: ['auditStatus', 'status', 'updateAt'], transaction: t});
+                            return PlanOrder.update({status: 0, auditStatus: -1, updateAt: utils.now()},
+                                {where: {id: order.id}, fields: ['auditStatus', 'status', 'updateAt'], transaction: t});
                         }
+
                         if(!params.expenditure)
                             throw {code: -4, msg: '支出金额不能为空'};
+
                         var ex_expenditure = order.expenditure || 0;
                         var expenditure = (parseFloat(params.expenditure) + parseFloat(ex_expenditure)).toFixed(2);
                         var order_updates = {
                             expenditure: expenditure,
                             updateAt: utils.now()
                         }
+
                         return ConsumeDetails.findAll({where: {orderId: order.id, status: {$ne: -2}}, attributes: ['id', 'status']})
                             .then(function(list){
                                 for(var i=0; i<list.length; i++){
@@ -622,6 +685,7 @@ function approveInvoice(params){
                                         return false;
                                     }
                                 }
+
                                 return true;
                             })
                             .then(function(isAllAudit){
@@ -632,6 +696,7 @@ function approveInvoice(params){
                                     order_updates.auditStatus = 1;
                                     order_updates.score = parseInt(score/2);
                                 }
+
                                 return PlanOrder.update(order_updates, {where: {id: order.id}, fields: Object.keys(order_updates), transaction: t})
                             })
                     })
@@ -672,18 +737,22 @@ function statPlanOrderMoney(params){
     }
     query.status = {$gte: 0};
     var startAt = {};
+
     if(params.startTime){
         startAt.$gte = params.startTime;
         delete params.startTime;
     }
+
     if(params.endTime){
         startAt.$lte = params.endTime;
         delete params.endTime;
     }
+
     if(!isObjNull(startAt)){
         query.startAt = startAt;
         query_complete.startAt = startAt;
     }
+
     return Q.all([
         PlanOrder.findAll({where: query, attributes: ['id']}),
         PlanOrder.findAll({where: query_complete, attributes: ['id']})
@@ -697,10 +766,12 @@ function statPlanOrderMoney(params){
                 orderId: {$in: idList},
                 status: {$ne: -2}
             }
+
             var q2 = {
                 orderId: {$in: idComplete},
                 status: 1
             }
+
             return Q.all([
                 ConsumeDetails.sum('budget', {where: q1}),
                 ConsumeDetails.sum('budget', {where: q2}),
@@ -727,6 +798,7 @@ tripPlan.getProjects = function(params){
     if(!params.companyId){
         throw {code: -1, msg: '企业Id不能为空'};
     }
+
     return PlanOrder.findAll({where: {companyId: params.companyId}, group: ['description'], attributes: ['description']})
 }
 
@@ -747,21 +819,27 @@ function commitTripPlanOrder(params){
             if(!order || order.status == -2){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
             }
+
             if(order.accountId != params.accountId){
                 throw L.ERR.PERMISSION_DENY;
             }
+
             if(order.status == -1){
-                throw {code: -3, msg: '计划单已失效，不能提交'};
+                throw {code: -3, msg: '计划单还没有预算，不能提交'};
             }
+
             if(order.status == 1){
                 throw {code: -4, msg: '该计划单已提交，不能重复提交'};
             }
+
             if(order.status > 1 || order.auditStatus == 1){
                 throw {code: -5, msg: '该计划单已经审核通过，不能提交'};
             }
+
             if(list.length <= 0){
                 throw {code: -6, msg: '该计划单没有票据提交'};
             }
+
             for(var i=0; i<list.length; i++){
                 var s = list[i];
                 if(s.status != 0 || !s.newInvoice){
