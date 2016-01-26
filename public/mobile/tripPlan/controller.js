@@ -2,13 +2,13 @@
  * Created by chenhao on 2016/1/22.
  */
  'use strict';
- var uploadtoserver =(function(){
+ var tripPlan =(function(){
  	API.require("staff");
  	API.require("tripPlan");
  	API.require("wechat");
- 	var uploadtoserver ={};
+ 	var tripPlan ={};
 
- 	uploadtoserver.UploadImgController = function($scope, $routeParams){
+ 	tripPlan.UploadImgController = function($scope, $routeParams){
  		loading(true);
  		var planId = $routeParams.planId;
  		API.onload(function(){
@@ -66,6 +66,6 @@
             })
         }
  	}
- 	return uploadtoserver;
+ 	return tripPlan;
  })();
- module.exports = uploadtoserver;
+ module.exports = tripPlan;
