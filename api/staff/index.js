@@ -443,10 +443,14 @@ staff.beforeImportExcel = function(params){
     var companyId = "";
     var domainName = "";
     var xlsxObj;
-    return API.attachment.getAttachment({md5key: md5key, userId: userId})
+    return API.attachment.getAttachment({md5key: md5key})
         .then(function(att){
-            xlsxObj = nodeXlsx.parse(att.content);
-            return staff.getStaff({id: userId});
+            if(att){
+                xlsxObj = nodeXlsx.parse(att.content);
+                return staff.getStaff({id: userId});
+            }else{
+                throw {code:-1, msg:"附件记录不存在"};
+            }
         })
         .then(function(sf){
             companyId = sf.companyId;
