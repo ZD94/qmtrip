@@ -64,9 +64,10 @@ agencyTripPlan.pageTripPlanOrder = function(params){
         var audit = params.audit;
         params.status = 1;
         if(audit == 'Y'){
-            params.status = {$gte: 1};
+            params.status = {$gt: 1};
             params.auditStatus = 1;
         }else if(audit == "P"){
+            params.status = 1;
             params.auditStatus = 0;
         }else if(audit == 'N'){
             params.status = 0; //待上传状态
