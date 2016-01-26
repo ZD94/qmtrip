@@ -119,10 +119,12 @@ getTripPlanOrder.optional_params = ['columns'];
 function getTripPlanOrder(params){
     var orderId = params.orderId;
     var options = {};
+
     if(params.columns){
         params.columns.push('status');
         options.attributes = params.columns;
     }
+
     return Q.all([
         PlanOrder.findById(orderId, options),
         ConsumeDetails.findAll({where: {orderId: orderId, type: -1, status: {$ne: -2}}}),
@@ -145,9 +147,11 @@ getConsumeDetail.required_params = ['consumeId'];
 getConsumeDetail.optional_params = ['columns'];
 function getConsumeDetail(params){
     var options = {}
+
     if(params.columns){
         options.attributes = _.intersection(params.columns, ConsumeDetailsCols);
     }
+
     return ConsumeDetails.findById(params.consumeId, options)
         .then(function(detail){
             if(!detail || detail.status == -2){
@@ -169,6 +173,7 @@ function updateTripPlanOrder(params){
     var userId = params.userId;
     var optLog = params.optLog;
     var updates = params.updates;
+
     return PlanOrder.findById(orderId, {attributes: ['id', 'accountId', 'companyId', 'status']})
         .then(function(order){
             if(!order || order.status == -2){
@@ -204,6 +209,7 @@ updateConsumeDetail.required_params = ['id'];
 updateConsumeDetail.optional_params = _.keys(ConsumeDetails.attributes);
 function updateConsumeDetail(params){
     var updates = params;
+
     return ConsumeDetails.findById(params.id, {attributes: ['status']})
         .then(function(record){
             if(!record || record.status == -2){
@@ -220,6 +226,7 @@ tripPlan.updateConsumeBudget = updateConsumeBudget;
 updateConsumeBudget.required_params = ['id', 'budget', 'userId'];
 function updateConsumeBudget(params){
     var id = params.id;
+
     return ConsumeDetails.findById(id, {attributes: ['status', 'budget', 'orderId']})
         .then(function(ret){
             if(!ret ||ret.status == -2){
@@ -233,10 +240,13 @@ function updateConsumeBudget(params){
         .spread(function(o_budget, order){
             var budget = params.budget;
             var c_budget = 0;
-            if(o_budget > 0)
+
+            if(o_budget > 0) {
                 c_budget = parseFloat(order.budget) - parseFloat(o_budget) + parseFloat(budget);
-            else
+            } else {
                 c_budget = parseFloat(order.budget) + parseFloat(budget)
+            }
+
             var logs = {
                 orderId: order.id,
                 userId: params.userId,
