@@ -81,17 +81,19 @@ function uploadActionFile(req, res, next) {
     });
 }
 
-function getImg(req, res, next) {
-    var md5key = req.params.md5key;
-    var userId = req.cookies.user_id;
-    API.attachment.getSelfAttachment({key: md5key, accountId: userId})
-    .then(function(attachment) {
-        res.set("Content-Type", attachment.contentType);
-        var content = new Buffer(attachment.content, 'base64');
-        res.write(content);
-        res.end();
-    }).catch(next).done();
-}
+//function getImg(req, res, next) {
+//    var md5key = req.params.md5key;
+//    var userId = req.cookies.user_id;
+//    API.attachment.getSelfAttachment({key: md5key, accountId: userId})
+//    .then(function(attachment) {
+//        res.set("Content-Type", attachment.contentType);
+//        var content = new Buffer(attachment.content, 'base64');
+//        res.write(content);
+//        res.end();
+//    }).catch(function(err) {
+//        res.send(err);
+//    }).done();
+//}
 
 function downloadExcle(req, res, next){
     var fileName = req.params.fileName;
@@ -243,7 +245,7 @@ function getTripplanInvoice(req, res, next){
 
 module.exports = function(app){
     app.post('/upload/ajax-upload-file', uploadActionFile);
-    app.get('/upload/get-img-file/:md5key', getImg);
+    //app.get('/upload/get-img-file/:md5key', getImg);
     app.get('/download/excle-file/:fileName', downloadExcle);
     app.get('/upload/:md5key', getUploadFile);
     app.get('/tripplan/:id/invoice', getTripplanInvoice);

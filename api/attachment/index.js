@@ -41,7 +41,7 @@ attachment.bindOwner = function(params) {
 attachment.getSelfAttachment = function(params) {
     var key = params.key;
     var accountId = params.accountId;
-    return Owner.findOne({key: key, accountId: accountId})
+    return Owner.findOne({where: {key: key, accountId: accountId}})
     .then(function(owner) {
         if (!owner) {
             throw L.ERR.PERMISSION_DENY;

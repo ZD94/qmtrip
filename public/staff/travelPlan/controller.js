@@ -21,6 +21,7 @@ var travelPlan=(function(){
         $("title").html("出差单列表");
         //待上传票据列表
         $scope.initPlanList = function () {
+            API.require("attachment");
             API.onload(function() {
                 var params = {auditStatus:[0,-1],page:$scope.page1};
                 if ($scope.keyword != '' && $scope.keyword != undefined) {
@@ -42,20 +43,27 @@ var travelPlan=(function(){
                                 $scope.ref = $(this).attr("ref");
                                 $scope.md5 = response.md5key;
                                 if (response.ret == 0 ) {
-                                    var ImgSrc = '/upload/get-img-file/'+response.md5key;// var htmlStr = '<img src="/upload/get-img-file/'+response.md5key+'" alt="">';
-                                    var invoiceType = "";// $scope.htmlStr = htmlStr;
-                                    if ($(this).attr("data-type") == 1) {
-                                        invoiceType = "去程交通票据";
-                                    }else if ($(this).attr("data-type") == 2) {
-                                        invoiceType = "住宿票据";
-                                    }
-                                    else if ($(this).attr("data-type") == 3) {
-                                        invoiceType = "返程交通票据";
-                                    }
-                                    $(".messagebox_content img").attr("src",ImgSrc);
-                                    $(".messagebtns em").html(invoiceType);
-                                    $("#uploadimg").show();
-                                    position();
+                                    API.attachment.previewSelfImg({key: response.md5key}, function(err, img) {
+                                        if (err) {
+                                            return alertDemo(err.msg);
+                                        }
+
+                                        var ImgSrc = img;
+                                        var invoiceType = "";// $scope.htmlStr = htmlStr;
+                                        if ($(this).attr("data-type") == 1) {
+                                            invoiceType = "去程交通票据";
+                                        }else if ($(this).attr("data-type") == 2) {
+                                            invoiceType = "住宿票据";
+                                        }
+                                        else if ($(this).attr("data-type") == 3) {
+                                            invoiceType = "返程交通票据";
+                                        }
+                                        $(".messagebox_content img").attr("src",ImgSrc);
+                                        $(".messagebtns em").html(invoiceType);
+                                        $("#uploadimg").show();
+                                        position();
+                                    })
+
                                 } else {
                                   alertDemo(response.errMsg);
                                 }
@@ -365,26 +373,38 @@ var travelPlan=(function(){
         $scope.planId = planId;
         $scope.status = $routeParams.status;
         $scope.invoiceId = $routeParams.invoiceId;
+        API.require("attachment");
         API.onload(function() {
             API.tripPlan.getTripPlanOrderById(planId)
-                .then(function(result){
-                    $scope.planDetail = result;
-                    if ($scope.status=='outTraffic') {
-                        $scope.InvoiceDetail = $scope.planDetail.outTraffic[0];
-                    }
-                    if ($scope.status=='backTraffic') {
-                        $scope.InvoiceDetail = $scope.planDetail.backTraffic[0];
-                    }
-                    if ($scope.status=='hotel') {
-                        $scope.InvoiceDetail = $scope.planDetail.hotel[0];
-                    }
+            .then(function(result){
+                var InvoiceDetail;
+                $scope.planDetail = result;
 
-                    console.info (result);
+                if ($scope.status=='outTraffic') {
+                    InvoiceDetail = result.outTraffic[0];
+                }
+                if ($scope.status=='backTraffic') {
+                    InvoiceDetail = result.backTraffic[0];
+                }
+                if ($scope.status=='hotel') {
+                    InvoiceDetail = result.hotel[0];
+                }
+                return InvoiceDetail;
+            })
+            .then(function(invoiceDetail) {
+                $scope.InvoiceDetail = invoiceDetail;
+                console.info(invoiceDetail)
+                return API.attachment.previewSelfImg({
+                    key: invoiceDetail.newInvoice
+                })
+                .then(function(invoiceImg) {
+                    $scope.invoiceImg = invoiceImg;
                     $scope.$apply();
                 })
-                .catch(function(err){
-                    console.info(err);
-                })
+            })
+            .catch(function(err){
+                console.info(err);
+            })
         })
         $scope.goDetail = function () {
             window.location.href = "#/travelPlan/PlanDetail?planId="+planId;
