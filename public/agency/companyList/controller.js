@@ -5,11 +5,11 @@ module.exports = (function(){
 	API.require("company");
 	API.require("agency");
 	API.require("staff");
+	API.require('auth');
 	API.require("tripPlan");
 	API.require("agencyTripPlan");
-	API.require('travelPolicy');
-	API.require('auth');
 	API.require('department');
+	API.require('travelPolicy');
 	var companyList ={};
 	companyList.CompanyListController = function($scope){
 		loading(true);
@@ -150,12 +150,59 @@ module.exports = (function(){
 					})
 			})
 		}
-
-		//页面跳转
-		//$scope.goStaffList = function() {
-		//	window.location.href = "#/companyList/StaffList?company=" + companyId;
-		//}
 	}
+
+	//创建公司页面
+	companyList.CreateCorpController = function($scope) {
+		loading(true);
+		$scope.createCorp = function(){
+			var corpname = $("#corpName").val();
+			var name = $("#connectName").val();
+			var email = $("#connectEmail").val();
+			var mobile = $("#connectMobile").val();
+			var reg = /^[\w\.-]+?@([\w\-]+\.){1,2}[a-zA-Z]{2,3}$/;
+			var domain = email.split(/@/);
+			var commit = true;
+			if(commit){
+				if(!corpname){
+					alert("企业名称是必填项！");
+					return false;
+				}else if(!name){
+					alert("联系人姓名是必填项！");
+					return false;
+				}else if(!email){
+					alert("邮箱是必填项！");
+					return false;
+				}else if(!reg.test(email)){
+					alert("邮箱格式不正确！");
+					return false;
+				}else if(!mobile){
+					alert("手机号是必填项！");
+					return false;
+				}else if(!mobile.match(/^[1][0-9]{10}$/)){
+					alert("手机号格式不正确！");
+					return false;
+				}
+				console.info(domain);
+				console.info(domain[1]);
+				API.onload(function(){
+					console.info(API.company.createCompany());
+					API.company.createCompany({name:corpname,userName:name,email:email,mobile:mobile,domain:domain[1]})
+						.then(function(company){
+							console.info(company);
+							var id = company.id;
+							window.location.href = "#/companyList/CompanyDetail?company=" + id;
+						})
+						.catch(function(err){
+							console.info(err);
+							alert(err.msg);
+						}).done()
+				})
+			}
+		}
+	}
+
+
 
 	//创建公司页面
 	companyList.CreateCorpController = function($scope) {
@@ -211,6 +258,7 @@ module.exports = (function(){
 	companyList.StaffListController = function($scope,$routeParams) {
 		loading(true);
 		var companyId = $routeParams.company;
+		$scope.companyId = companyId;
 		$(".left_nav li").removeClass("on").eq(1).addClass("on");
 
 		//初始化所有的记录
@@ -424,8 +472,8 @@ module.exports = (function(){
 		}
 
 		$scope.showDepartments = function(){
-		 $(".departmentlist").show();
-		 }
+			$(".departmentlist").show();
+		}
 
 		//对员工信息进行保存的操作
 		$scope.saveStaffInfo = function() {
@@ -610,30 +658,30 @@ module.exports = (function(){
 			API.onload(function(){
 				//API.staff.getCurrentStaff()//获取当前登录人员的id
 				//	.then(function(staffid){
-						//console.info(staffid);
-						//console.info(staffid.id);
-						//console.info(md5key);
-						API.staff.beforeImportExcel({md5key:md5key, companyId: companyId})
-							.then(function(allData){
-								//console.info(allData);
-								//console.info(allData.noAddObj);
-								$scope.invalid = JSON.parse(allData.noAddObj);
-								$scope.valid = JSON.parse(allData.addObj);
-								$scope.downloadInvalidData = allData.downloadNoAddObj;
-								$scope.downloadValidData = allData.downloadAddObj;
-								$scope.validData = JSON.parse(allData.addObj).length;
-								$scope.invalidData = JSON.parse(allData.noAddObj).length;
-								//$scope.totalData =
-								//return $scope.valid;
-								$scope.$apply();
-							})
-							.catch(function(err){
-								console.info(err);
-							})
+				//console.info(staffid);
+				//console.info(staffid.id);
+				//console.info(md5key);
+				API.staff.beforeImportExcel({md5key:md5key, companyId: companyId})
+					.then(function(allData){
+						//console.info(allData);
+						//console.info(allData.noAddObj);
+						$scope.invalid = JSON.parse(allData.noAddObj);
+						$scope.valid = JSON.parse(allData.addObj);
+						$scope.downloadInvalidData = allData.downloadNoAddObj;
+						$scope.downloadValidData = allData.downloadAddObj;
+						$scope.validData = JSON.parse(allData.addObj).length;
+						$scope.invalidData = JSON.parse(allData.noAddObj).length;
+						//$scope.totalData =
+						//return $scope.valid;
+						$scope.$apply();
 					})
-					/*.catch(function(err){
+					.catch(function(err){
 						console.info(err);
-					}).done();*/
+					})
+			})
+			/*.catch(function(err){
+			 console.info(err);
+			 }).done();*/
 			//})
 		}
 
@@ -650,21 +698,21 @@ module.exports = (function(){
 			API.onload(function(){
 				//API.staff.getCurrentStaff()//获取当前登录人员的id
 				//	.then(function(staffid){
-						var objAttr = $scope.downloadInvalidData;
-						if(type == "valid"){
-							objAttr = $scope.downloadValidData;
-						}
-						API.staff.downloadExcle({accountId:staffid.id,objAttr:objAttr})
-							.then(function(result){
-								var filename = result.fileName;
-								window.open('/download/excle-file/'+filename, "_blank");
-								$scope.$apply();
-							}).catch(function(err){
-								console.info(err);
-							})
+				var objAttr = $scope.downloadInvalidData;
+				if(type == "valid"){
+					objAttr = $scope.downloadValidData;
+				}
+				API.staff.downloadExcle({accountId:staffid.id,objAttr:objAttr})
+					.then(function(result){
+						var filename = result.fileName;
+						window.open('/download/excle-file/'+filename, "_blank");
+						$scope.$apply();
 					}).catch(function(err){
 						console.info(err);
-					}).done();
+					})
+			}).catch(function(err){
+				console.info(err);
+			}).done();
 			//})
 		}
 
@@ -685,6 +733,130 @@ module.exports = (function(){
 						console.info(err);
 					}).done();
 			})
+		}
+	}
+
+
+	//组织架构页面
+	companyList.DepartmentController = function($scope,  $routeParams) {
+		$("title").html("组织架构");
+		loading(false);
+		//初始化
+		$scope.companyId = $routeParams.companyId;
+		$scope.initdepartment = function(){
+			API.onload(function(){
+				API.department.agencyGetFirstClassDepartments({companyId:$scope.companyId})
+					.then(function(defaulDepartment){
+						console.info (defaulDepartment);
+						var defaultname = defaulDepartment;
+						$scope.departmentName = defaultname[0].name;
+						$scope.departmentId = defaultname[0].id;
+						//获取部门列表
+						API.department.agencyGetChildDepartments({companyId:$scope.companyId,parentId:$scope.departmentId})
+							.then(function(departmentlist){
+								$scope.departmentlist = departmentlist;
+								departmentlist.map(function(s){
+									API.staff.getCountByDepartment({departmentId:s.id})
+										.then(function(num){
+											s.peoplenum = num;
+											console.info ($scope.departmentlist);
+											$scope.$apply();
+										})
+								});
+							})
+						$scope.$apply();
+						loading(true);
+					})
+			})
+		}
+		$scope.initdepartment();
+
+
+		//修改企业名称
+		$scope.updateDepartmentShow = function () {
+			$(".createcompany").hide();
+			$(".updatecompany").show();
+		}
+		$scope.updateDepartment = function () {
+			API.onload(function(){
+				API.department.agencyUpdateDepartment({companyId:$scope.companyId,id:$scope.departmentId,name:$(".updatecompany .common_text").val()})
+					.then(function(result){
+						Myalert("温馨提示","修改成功");
+						$scope.initdepartment();
+						$(".updatecompany").hide();
+					})
+					.catch(function(err){
+						console.info(err);
+					})
+			})
+		}
+
+		//添加子部门
+		$scope.createDepartmentShow = function () {
+			$(".updatecompany").hide();
+			$(".createcompany").show();
+		}
+		$scope.createDepartment = function () {
+			API.onload(function(){
+				API.department.agencyCreateDepartment({companyId:$scope.companyId,parentId:$scope.departmentId,name:$(".createcompany .common_text").val()})
+					.then(function(result){
+						Myalert("温馨提示","添加成功");
+						$scope.initdepartment();
+						$(".createcompany").hide();
+					})
+					.catch(function(err){
+						console.info(err);
+					})
+			})
+		}
+
+		//修改子部门名称
+		$scope.updatechildDepartmentShow = function (index,id) {
+			$scope.index = index;
+			$scope.childDepartmentId = id;
+			$(".updatechildDepartment").hide();
+			$(".updatechildDepartment").eq(index).show();
+		}
+		$scope.updatechildDepartment = function () {
+			API.onload(function(){
+				API.department.agencyUpdateDepartment({companyId:$scope.companyId,id:$scope.childDepartmentId,name:$(".updatechildDepartment .common_text").eq($scope.index).val()})
+					.then(function(result){
+						Myalert("温馨提示","修改成功");
+						$scope.initdepartment();
+					})
+					.catch(function(err){
+						console.info(err);
+					})
+			})
+		}
+
+		//删除子部门
+		$scope.deleteDepartmentShow = function (name,id) {
+			$scope.deleteId = id;
+			$scope.deleteName = name;
+			$(".messageText").html("确定删除&quot;"+$scope.deleteName+"&quot;？");
+			$(".confirmFixed").show();
+		}
+		$scope.deleteDepartment = function () {
+			API.onload(function(){
+				API.department.agencyDeleteDepartment({companyId:$scope.companyId,id:$scope.deleteId})
+					.then(function(result){
+						$scope.initdepartment();
+						$(".confirmFixed").hide();
+					})
+					.catch(function(err){
+						console.info(err);
+					})
+			})
+		}
+
+		//关闭窗口
+		$scope.departmentClose = function () {
+			$(".updatecompany,.createcompany,.updatechildDepartment").hide();
+		}
+
+		$scope.confirmClose = function () {
+			$(".confirmFixed").hide();
 		}
 	}
 	return companyList;
