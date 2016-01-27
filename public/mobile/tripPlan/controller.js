@@ -8,13 +8,56 @@
  	API.require("wechat");
  	var tripPlan ={};
 
- 	tripPlan.UploadImgController = function($scope, $routeParams){
+ 	tripPlan.UploadImgController = function($scope, $routeParams, FileUploader){
+
+        var uploadConf = {
+            url: "/upload/ajax-upload-file?type=invoice",
+            alias: "tmpFile",
+            autoUpload: true
+        };
+
+        var trafficUploadConfig = JSON.parse(JSON.stringify(uploadConf));
+        trafficUploadConfig.onCompleteItem= function (item, resp) {
+            uploadInvoice($scope.outTraffic.id, resp.md5key);
+        }
+
+        var hotelUploadConfig = JSON.parse(JSON.stringify(uploadConf));
+        hotelUploadConfig.onCompleteItem = function(item, resp) {
+            uploadInvoice($scope.hotel.id, resp.md5key);
+        }
+
+        var backTrafficUploadConfig = JSON.parse(JSON.stringify(uploadConf));
+        backTrafficUploadConfig.onCompleteItem = function(item, resp) {
+            uploadInvoice($scope.backTraffic.id, resp.md5key);
+        }
+
+        function uploadInvoice(consumeId, picture) {
+            API.tripPlan.uploadInvoice({
+                    consumeId: consumeId,
+                    picture: picture
+                })
+                .then(function() {
+                    alert("上传成功");
+                    window.location.reload();
+                    //var ImgSrc = '/upload/get-img-file/'+resp.md5key;
+                    //$(".messagebox_content img").attr("src",ImgSrc);
+                    //$(".messagebtns em").html('去程交通票据');
+                    //$("#uploadimg").show();
+                })
+                .catch(function(err) {
+                    alert(err.msg);
+                })
+        }
+
+        $scope.TrafficUploader = new FileUploader(trafficUploadConfig);
+        $scope.HotelUploader = new FileUploader(hotelUploadConfig);
+        $scope.BackTrafficUploader = new FileUploader(backTrafficUploadConfig);
+
  		loading(true);
  		var planId = $routeParams.planId;
  		API.onload(function(){
  			API.tripPlan.getTripPlanOrderById(planId)
  				.then(function(plan){
- 					console.info(plan);
  					$scope.plan = plan;
  					$scope.backTraffic = plan.backTraffic[0];
                     $scope.hotel = plan.hotel[0];
@@ -24,34 +67,6 @@
                     		$scope.name = staff.name;
                     		$scope.$apply();
                     	})
-                    $(".file").AjaxFileUpload({
-                        action: '/upload/ajax-upload-file?type=invoice',
-                        onComplete: function(filename, response) {
-                            $scope.ref = $(this).attr("ref");
-                            $scope.md5 = response.md5key;
-                            $scope.$apply();
-                            console.info(filename);
-                            if (response.ret == 0 ) {
-                                var ImgSrc = '/upload/get-img-file/'+response.md5key;
-                                var invoiceType = "";
-                                if ($(this).attr("data-type") == 1) {
-                                    invoiceType = "去程交通票据";
-                                }else if ($(this).attr("data-type") == 2) {
-                                    invoiceType = "住宿票据";
-                                }
-                                else if ($(this).attr("data-type") == 3) {
-                                    invoiceType = "返程交通票据";
-                                }
-                                $(".messagebox_content img").attr("src",ImgSrc);
-                                $(".messagebtns em").html(invoiceType);
-                                $("#uploadimg").show();
-                                position();
-                            } else {
-                              console.info(response.errMsg);
-                              console.info("#############");
-                            }
-                        }
-                    });
  				})
  		})
 		$scope.push = function () {
