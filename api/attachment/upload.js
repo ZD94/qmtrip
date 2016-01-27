@@ -27,12 +27,16 @@ function uploadActionFile(req, res, next) {
             if(file.tmpFile){
                 filePath = file.tmpFile.path;
             } else {
+                res.send('{"ret":-1, "errMsg":"文件不存在"}');
+                return;
+
                 for(var key in file){
                     if( file[key].path && filePath==='' ){
                         filePath = file[key].path;
                     }
                 }
             }
+
             var fileExt = filePath.substring(filePath.lastIndexOf('.'));
             if (type && type == 'xls' && ('.xls.xlsx').indexOf(fileExt.toLowerCase()) === -1) {//导入excle
                 fs.exists(filePath, function (exists) {
