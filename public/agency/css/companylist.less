@@ -174,7 +174,127 @@
 	  }
 	}
   }
+
+  .policy_title {
+	width: 938px;
+	height: 58px;
+	line-height: 58px;
+	font-size: 15px;
+	font-weight: bold;
+	text-align: right;
+	background: @background-color-second;
+	border: 1px @border-color solid;
+	padding: 0 30px;
+	margin: 20px auto 0 auto;
+	a {
+	  color: @color-theme1;
+	}
+  }
+  .policy_titlefixed {
+	position: fixed;
+	z-index: 9999;
+	margin-top: 0;
+  }
+  .policy_page {
+	width: 1000px;
+	height: auto;
+	margin: 0 auto;
+	position: relative;
+	li {
+	  width: 453px;
+	  height: 208px;
+	  background: @background-color-second;
+	  border: 1px @border-color solid;
+	  padding: 0 20px;
+	  margin: 10px 10px 0 0;
+	  float: left;
+	  position: relative;
+	  .policy_t {
+		width: 439px;
+		height: 20px;
+		line-height: 20px;
+		font-weight: bold;
+		text-align: right;
+		border-left: 4px @color-theme2 solid;
+		padding-left: 10px;
+		margin: 10px 0 5px 0;
+		a {
+		  color: @color-theme1;
+		}
+	  }
+	}
+	:nth-child(even) {
+	  margin-right: 0;
+	}
+	.create_policy {
+	  width: 453px;
+	  height: auto;
+	  box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+	  background: @background-color-second;
+	  padding: 0 20px 20px 20px;
+	  z-index: 1;
+	  .policy_t {
+		width: 439px;
+		height: 20px;
+		line-height: 20px;
+		font-weight: bold;
+		text-align: left;
+		border-left: 4px @color-theme2 solid;
+		padding-left: 10px;
+		margin: 10px 0 5px 0;
+		a {
+		  color: @color-theme1;
+		}
+	  }
+	}
+	.update_policy {
+	  width: 453px;
+	  height: auto;
+	  box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+	  background: @background-color-second;
+	  padding: 0 20px 20px 20px;
+	  position: absolute;
+	  top: 10px;
+	  left: 0;
+	  z-index: 1;
+	  .policy_t {
+		width: 439px;
+		height: 20px;
+		line-height: 20px;
+		font-weight: bold;
+		text-align: left;
+		border-left: 4px @color-theme2 solid;
+		padding-left: 10px;
+		margin: 10px 0 5px 0;
+		a {
+		  color: @color-theme1;
+		}
+	  }
+	}
+  }
+  .labletrue {
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
+	text-align: center;
+	color: #ffffff;
+	background:#118FD6;
+	margin-top: 1px;
+	float: left;
+  }
+  .lablefalse {
+	width: 14px;
+	height: 14px;
+	line-height: 14px;
+	text-align: center;
+	background:#ffffff;
+	border: 1px @border-color solid;
+	margin-top: 1px;
+	float: left;
+  }
 }
+
+
 
 
 
