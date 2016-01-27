@@ -868,7 +868,9 @@ authServer.getQRCodeUrl = function(params) {
         }
 
         var qrcodeToken = getRndStr(8);
+        account.oldQrcodeToken = account.qrcodeToken;
         account.qrcodeToken = qrcodeToken;
+
         return account.save();
     })
     .then(function(account) {
