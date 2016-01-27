@@ -9,6 +9,7 @@ module.exports = (function(){
 	API.require("tripPlan");
 	API.require("agencyTripPlan");
 	API.require('department');
+	API.require('travelPolicy');
 	var companyList ={};
 	companyList.CompanyListController = function($scope){
 		loading(true);
@@ -92,6 +93,7 @@ module.exports = (function(){
 		loading(true);
 		$("title").html("公司详情");
 		var companyId = $routeParams.company;
+		$scope.companyId = companyId;
 		//企业管理详情页
 		$scope.initCompanyDetail = function(){
 			$(".left_nav li").removeClass("on").eq(1).addClass("on");
@@ -256,6 +258,7 @@ module.exports = (function(){
 	companyList.StaffListController = function($scope,$routeParams) {
 		loading(true);
 		var companyId = $routeParams.company;
+		$scope.companyId = companyId;
 		$(".left_nav li").removeClass("on").eq(1).addClass("on");
 
 		//初始化所有的记录
