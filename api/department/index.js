@@ -168,11 +168,11 @@ function getDepartment(params){
  * @param params.companyId
  * @returns {*}
  */
-department.getAllDepartment = getAllDepartment;
+/*department.getAllDepartment = getAllDepartment;
 getAllDepartment.required_params = ["companyId"];
 function getAllDepartment(params){
     return departmentModel.findAll({where: params});
-}
+}*/
 
 /**
  * 查询企业默认部门
