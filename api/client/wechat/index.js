@@ -38,6 +38,7 @@ service.mediaId2key = function(params) {
     var type = params.type;
     var md5key;
     var buffers;
+    console.info('获取到的参数====>', params);
     return Q()
     .then(function() {
         if (!mediaId) {
@@ -48,7 +49,7 @@ service.mediaId2key = function(params) {
         return API.wechat.downloadMedia({mediaId: mediaId})
     })
     .then(function(content) {
-        buffers = new String(content, 'base64');
+        buffers = new Buffer(content, 'base64');
         md5key = utils.md5(buffers);
         return API.attachment.getAttachment({md5key: md5key, userId: accountId})
     })
