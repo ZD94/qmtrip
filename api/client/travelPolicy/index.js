@@ -252,7 +252,7 @@ travelPolicy.agencyGetAllTravelPolicy = function(params){
         params.attributes = options.columns;
         delete params.columns;
     }
-    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+    return API.company.checkAgencyCompany({companyId: params.where.companyId,userId: user_id})
         .then(function(result){
             if(result){
                 return API.travelPolicy.getAllTravelPolicy(params);
