@@ -200,8 +200,6 @@ module.exports = (function(){
 		}
 	}
 
-
-
 	//组织架构页面
 	companyList.DepartmentController = function($scope,  $routeParams) {
 		$("title").html("组织架构");
@@ -325,9 +323,5 @@ module.exports = (function(){
 			$(".confirmFixed").hide();
 		}
 	}
-
-
-
-
 	return companyList;
 })();

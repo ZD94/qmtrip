@@ -90,16 +90,14 @@
 		<span>票据上传完成后提交审核，一经提交不可再修改</span>
 		<input type="button" ng-click="push()" value="提交审核">
 	</div>
+	<input type="file" id="uploadFile"/>
+	<input type="button" value="预览" id="preview"/>
 </div>
-
-	<!-- <input type="file" id="uploadFile"/>
-	<input type="button" value="预览" id="preview"/> -->
 <script src="/script/jquery.ajaxfileupload.js"></script>
 <script>
 	$("#uploadFile").AjaxFileUpload({
 		onComplete: function(filename, response) {
 			console.info(filename);
-			console.info("^^^^^^^^^^^^^^^");
 			console.info(response);
 		}
 	});
@@ -110,4 +108,12 @@
 			console.info(response);
 		}
 	});
+//	$("#preview").click(function() {
+//		wx.ready(function() {
+//			wx.previewImage({
+//				current: "wxLocalResource://imageid123456789987654321",
+//				urls: ["wxLocalResource://imageid123456789987654321", "wxLocalResource://imageid123456789987654321"]
+//			})
+//		})
+//	});
 </script>
