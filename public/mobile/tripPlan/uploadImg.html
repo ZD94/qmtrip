@@ -63,47 +63,6 @@
 	</div>
 	<div class="footer">
 		<span>票据上传完成后提交审核，一经提交不可再修改</span>
-		<input type="button" ng-click="push()" value="提交审核">
+		<input type="button" ng-click="push()" value="提交审核" ng-disabled="plan.status==1? 'disabled': false">
 	</div>
-
-	<input type="button" value="预览" id="preview"/>
 </div>
-<script>
-
-//	$(document).ready(function() {
-//		setTimeout(function() {
-//			$("#uploadFile").AjaxFileUpload({
-//				onComplete: function(filename, response) {
-//					console.info(filename);
-//					console.info(response);
-//				}
-//			});
-//
-//			setTimeout(function() {
-//				$("#uploadFile").click(function() {
-//					alert("click me");
-//					event.preventDefault();
-//				});
-//			}, 2000);
-//
-//			$(".file").click(function() {
-//				alert("click me");
-//			}).AjaxFileUpload({
-//				onComplete: function(filename, response) {
-//					console.info(filename);
-//					console.info("$$$$$$$$$$$$$");
-//					console.info(response);
-//				}
-//			});
-//		}, 1000);
-//	})
-
-//	$("#preview").click(function() {
-//		wx.ready(function() {
-//			wx.previewImage({
-//				current: "wxLocalResource://imageid123456789987654321",
-//				urls: ["wxLocalResource://imageid123456789987654321", "wxLocalResource://imageid123456789987654321"]
-//			})
-//		})
-//	});
-</script>
