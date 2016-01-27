@@ -59,16 +59,19 @@
 		
 		return this.each(function() {
 			var $this = $(this);
-			if ($this.is("input") && $this.attr("type") === "file") {
-				if (isWeixin()) {
-					$this.bind("click", bootstapWx);
-				} else {
+
+			if (isWeixin()) {
+				$this.bind("click", bootstapWx);
+			} else {
+				console.info($this);
+				if ($this.is("input") && $this.attr("type") === "file") {
 					$this.bind("change", onChange);
 				}
 			}
 		});
 		
 		function onChange(e) {
+			console.info("onchange");
 			var $element = $(e.target),
 				id       = $element.attr('id'),
 				$clone   = $element.removeAttr('id').clone().attr('id', id).AjaxFileUpload(options),
