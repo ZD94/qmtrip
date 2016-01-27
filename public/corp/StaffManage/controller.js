@@ -11,7 +11,7 @@ var staff = (function(){
     //员工管理界面
     staff.StaffInfoManageController = function($scope){
 
-        $(".left_nav li").removeClass("on").eq(1).addClass("on");
+        $(".left_nav li").removeClass("on").eq(2).addClass("on");
         //添加员工信息
         $scope.addStaff = function() {
             $("#add").addClass("onCheck");

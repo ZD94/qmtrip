@@ -17,7 +17,7 @@ var TravelPolicy=(function(){
     TravelPolicy.PolicyListController = function($scope) {
         $("title").html("差旅标准");
         Myselect();
-        $(".left_nav li").removeClass("on").eq(2).addClass("on");
+        $(".left_nav li").removeClass("on").eq(3).addClass("on");
 
         API.onload(function(){
             API.staff.getCurrentStaff()

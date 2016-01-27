@@ -1,9 +1,54 @@
-<section>
+<!-- <section>
     <div>结算信息</div>
     <div><span>2016年01月</span>
         &nbsp;&nbsp;&nbsp;<span>完成出差人次{{stat.NumOfStaff}}</span>
         &nbsp;&nbsp;&nbsp;<span>计划支出{{stat.planMoney}}</span>
         &nbsp;&nbsp;&nbsp;<span>实际支出{{stat.expenditure}}</span>
-        &nbsp;&nbsp;&nbsp;<span>节省{{stat.planMoney - stat.expenditure}}</span>
+        &nbsp;&nbsp;&nbsp;<span>节省{{(stat.planMoney - stat.expenditure).toFixed(2)}}</span>
         </div>
+</section> -->
+<section>
+	<div class="settlement">
+		<ul>
+			<li class="on">结算信息</li>
+			<li>员工积分</li>
+			<li>出差分布</li>
+			<li>出差记录</li>
+		</ul>
+		<div class="settle_main">
+			<div class="settle_chart"></div>
+			<div class="settle_list">
+				<table width="100%">
+					<tr>
+						<td width="150">时间</td>
+						<td>完成出差人次</td>
+						<td>计划支出</td>
+						<td>实际支出</td>
+						<td>节省</td>
+					</tr>
+					<tr>
+						<td>{{ymcommon}}上旬</td>
+						<td>{{s.NumOfStaff}}</td>
+						<td>￥{{s.planMoney}}</td>
+						<td>￥{{s.expenditure}}</td>
+						<td>￥{{(s.planMoney - s.expenditure).toFixed(2)}}</td>
+					</tr>
+					<tr>
+						<td>{{ymcommon}}中旬</td>
+						<td>{{z.NumOfStaff}}</td>
+						<td>￥{{z.planMoney}}</td>
+						<td>￥{{z.expenditure}}</td>
+						<td>￥{{(z.planMoney - z.expenditure).toFixed(2)}}</td>
+					</tr>
+					<tr>
+						<td>{{ymcommon}}下旬</td>
+						<td>{{x.NumOfStaff}}</td>
+						<td>￥{{x.planMoney}}</td>
+						<td>￥{{x.expenditure}}</td>
+						<td>￥{{(x.planMoney - x.expenditure).toFixed(2)}}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
 </section>
