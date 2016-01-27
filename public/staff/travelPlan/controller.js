@@ -307,7 +307,7 @@ var travelPlan=(function(){
             window.location.href = "#/travelPlan/InvoiceDetail?planId="+planId+"&status="+status+"&invoiceId="+invoiceId;
         }
         $scope.initscan = function(){
-            var backUrl = "http://"+window.location.host+"/mobile.html#/uploadtoserver/uploadImg?planId="+planId;
+            var backUrl = "http://"+window.location.host+"/mobile.html#/tripPlan/uploadImg?planId="+planId;
             API.onload(function() {
                 API.auth.getQRCodeUrl({backUrl: backUrl})
                     .then(function(content) {
