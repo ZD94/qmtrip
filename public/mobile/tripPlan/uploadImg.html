@@ -23,7 +23,15 @@
 				<span ng-if="outTraffic.invoice.length!=0 && outTraffic.status=='-1'">重新上传</span>
 				<span ng-if="outTraffic.invoice.length!=0 && outTraffic.status=='1'">审核通过</span>
 				<img ng-if="outTraffic.invoice.length!=0" ng-src="/upload/get-img-file/{{outTraffic.newInvoice}}" style="width:100%;"/>
-				<input type="file" nv-file-select="" id="{{outTraffic.id}}" uploader="TrafficUploader" class="file" ref="{{outTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png">
+
+				<span ng-show="isInWeixin">
+					<!--微信中上传-->
+					<input type="file" ng-click="uploadInvoice(outTraffic.id)"/>
+				</span>
+
+				<span ng-hide="isInWeixin">
+					<input type="file" nv-file-select="" id="{{outTraffic.id}}" uploader="TrafficUploader" class="file" ref="{{outTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png">
+				</span>
 			</div>
 
 
@@ -59,7 +67,6 @@
 				<input type="file" nv-file-select="" uploader="BackTrafficUploader" class="file" ref="{{backTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png">
 			</div>
 		</div>
-		
 	</div>
 	<div class="footer">
 		<span>票据上传完成后提交审核，一经提交不可再修改</span>
