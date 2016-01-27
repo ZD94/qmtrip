@@ -1,3 +1,4 @@
+@import (reference) "common.less";
 .companylist{
 	background: #fff;
 	margin-top: 20px;
@@ -115,4 +116,122 @@
 			}
 		}
 	}
+
+
+  .department {
+	width: 958px;
+	height: auto;
+	padding: 20px;
+	h1 {
+	  width: 100%;
+	  height: 36px;
+	  line-height: 36px;
+	  font-weight: normal;
+	  .companyname {
+		font-size: 18px;
+		padding-right: 50px;
+		float: left;
+	  }
+	  a {
+		color: @color-theme1;
+		float: left;
+	  }
+	  span {
+		font-size: 12px;
+		float: left;
+	  }
+	  .updatecompany,.createcompany {
+		width: 500px;
+		height: 36px;
+		margin-left: 30px;
+		float: left;
+		display: none;
+	  }
+	}
+	ul {
+	  padding-left: 30px;
+	  padding-top: 20px;
+	  li {
+		width: 100%;
+		height: auto;
+		margin-top: -12px;
+		overflow: hidden;
+		span {
+		  line-height: 22px;
+		  font-size: 16px;
+		  display: inline-block;
+		  padding-right: 20px;
+		  float: left;
+		  a {
+			font-size: 13px;
+			color: @color-theme1;
+		  }
+		}
+		.updatechildDepartment {
+		  padding-top: 35px;
+		  display: none;
+		}
+	  }
+	}
+  }
 }
+
+
+
+
+
+
+.confirmFixed {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  display: none;
+  .confirmbox {
+	width: 398px;
+	height: auto;
+	border: 1px @border-color solid;
+	background: @background-color-second;
+	margin: -102px 0 0 -200px;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	z-index: 99999;
+	.confirmbox_t {
+	  width: 358px;
+	  height: 35px;
+	  line-height: 35px;
+	  background: @border-color;
+	  padding: 0 20px;
+	}
+	.confirmbox_p {
+	  width: 358px;
+	  height: 150px;
+	  padding: 10px 20px 0 20px;
+	  position: relative;
+	  .deleteFail {
+		width: 100%;
+		height: 160px;
+		background: @background-color-second;
+		position: absolute;
+		top: 0;
+		left: 0;
+		display: none;
+		.deleteFail_text {
+		  text-align: center;
+		  line-height: 25px;
+		  padding: 20px;
+		}
+	  }
+
+	  div {
+		overflow: hidden;
+	  }
+	}
+  }
+}
+
+
