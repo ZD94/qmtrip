@@ -5,11 +5,11 @@ module.exports = (function(){
 	API.require("company");
 	API.require("agency");
 	API.require("staff");
+	API.require('auth');
 	API.require("tripPlan");
 	API.require("agencyTripPlan");
-	API.require('travelPolicy');
-	API.require('auth');
 	API.require('department');
+	API.require('travelPolicy');
 	var companyList ={};
 	companyList.CompanyListController = function($scope){
 		loading(true);
@@ -150,12 +150,59 @@ module.exports = (function(){
 					})
 			})
 		}
-
-		//页面跳转
-		//$scope.goStaffList = function() {
-		//	window.location.href = "#/companyList/StaffList?company=" + companyId;
-		//}
 	}
+
+	//创建公司页面
+	companyList.CreateCorpController = function($scope) {
+		loading(true);
+		$scope.createCorp = function(){
+			var corpname = $("#corpName").val();
+			var name = $("#connectName").val();
+			var email = $("#connectEmail").val();
+			var mobile = $("#connectMobile").val();
+			var reg = /^[\w\.-]+?@([\w\-]+\.){1,2}[a-zA-Z]{2,3}$/;
+			var domain = email.split(/@/);
+			var commit = true;
+			if(commit){
+				if(!corpname){
+					alert("企业名称是必填项！");
+					return false;
+				}else if(!name){
+					alert("联系人姓名是必填项！");
+					return false;
+				}else if(!email){
+					alert("邮箱是必填项！");
+					return false;
+				}else if(!reg.test(email)){
+					alert("邮箱格式不正确！");
+					return false;
+				}else if(!mobile){
+					alert("手机号是必填项！");
+					return false;
+				}else if(!mobile.match(/^[1][0-9]{10}$/)){
+					alert("手机号格式不正确！");
+					return false;
+				}
+				console.info(domain);
+				console.info(domain[1]);
+				API.onload(function(){
+					console.info(API.company.createCompany());
+					API.company.createCompany({name:corpname,userName:name,email:email,mobile:mobile,domain:domain[1]})
+						.then(function(company){
+							console.info(company);
+							var id = company.id;
+							window.location.href = "#/companyList/CompanyDetail?company=" + id;
+						})
+						.catch(function(err){
+							console.info(err);
+							alert(err.msg);
+						}).done()
+				})
+			}
+		}
+	}
+
+
 
 	//创建公司页面
 	companyList.CreateCorpController = function($scope) {
@@ -211,6 +258,7 @@ module.exports = (function(){
 	companyList.StaffListController = function($scope,$routeParams) {
 		loading(true);
 		var companyId = $routeParams.company;
+		$scope.companyId = companyId;
 		$(".left_nav li").removeClass("on").eq(1).addClass("on");
 
 		//初始化所有的记录
@@ -424,8 +472,8 @@ module.exports = (function(){
 		}
 
 		$scope.showDepartments = function(){
-		 $(".departmentlist").show();
-		 }
+			$(".departmentlist").show();
+		}
 
 		//对员工信息进行保存的操作
 		$scope.saveStaffInfo = function() {
@@ -610,30 +658,30 @@ module.exports = (function(){
 			API.onload(function(){
 				//API.staff.getCurrentStaff()//获取当前登录人员的id
 				//	.then(function(staffid){
-						//console.info(staffid);
-						//console.info(staffid.id);
-						//console.info(md5key);
-						API.staff.beforeImportExcel({md5key:md5key, companyId: companyId})
-							.then(function(allData){
-								//console.info(allData);
-								//console.info(allData.noAddObj);
-								$scope.invalid = JSON.parse(allData.noAddObj);
-								$scope.valid = JSON.parse(allData.addObj);
-								$scope.downloadInvalidData = allData.downloadNoAddObj;
-								$scope.downloadValidData = allData.downloadAddObj;
-								$scope.validData = JSON.parse(allData.addObj).length;
-								$scope.invalidData = JSON.parse(allData.noAddObj).length;
-								//$scope.totalData =
-								//return $scope.valid;
-								$scope.$apply();
-							})
-							.catch(function(err){
-								console.info(err);
-							})
+				//console.info(staffid);
+				//console.info(staffid.id);
+				//console.info(md5key);
+				API.staff.beforeImportExcel({md5key:md5key, companyId: companyId})
+					.then(function(allData){
+						//console.info(allData);
+						//console.info(allData.noAddObj);
+						$scope.invalid = JSON.parse(allData.noAddObj);
+						$scope.valid = JSON.parse(allData.addObj);
+						$scope.downloadInvalidData = allData.downloadNoAddObj;
+						$scope.downloadValidData = allData.downloadAddObj;
+						$scope.validData = JSON.parse(allData.addObj).length;
+						$scope.invalidData = JSON.parse(allData.noAddObj).length;
+						//$scope.totalData =
+						//return $scope.valid;
+						$scope.$apply();
 					})
-					/*.catch(function(err){
+					.catch(function(err){
 						console.info(err);
-					}).done();*/
+					})
+			})
+			/*.catch(function(err){
+			 console.info(err);
+			 }).done();*/
 			//})
 		}
 
@@ -650,21 +698,21 @@ module.exports = (function(){
 			API.onload(function(){
 				//API.staff.getCurrentStaff()//获取当前登录人员的id
 				//	.then(function(staffid){
-						var objAttr = $scope.downloadInvalidData;
-						if(type == "valid"){
-							objAttr = $scope.downloadValidData;
-						}
-						API.staff.downloadExcle({accountId:staffid.id,objAttr:objAttr})
-							.then(function(result){
-								var filename = result.fileName;
-								window.open('/download/excle-file/'+filename, "_blank");
-								$scope.$apply();
-							}).catch(function(err){
-								console.info(err);
-							})
+				var objAttr = $scope.downloadInvalidData;
+				if(type == "valid"){
+					objAttr = $scope.downloadValidData;
+				}
+				API.staff.downloadExcle({accountId:staffid.id,objAttr:objAttr})
+					.then(function(result){
+						var filename = result.fileName;
+						window.open('/download/excle-file/'+filename, "_blank");
+						$scope.$apply();
 					}).catch(function(err){
 						console.info(err);
-					}).done();
+					})
+			}).catch(function(err){
+				console.info(err);
+			}).done();
 			//})
 		}
 
@@ -687,5 +735,450 @@ module.exports = (function(){
 			})
 		}
 	}
+
+
+	//组织架构页面
+	companyList.DepartmentController = function($scope, $routeParams) {
+		$("title").html("组织架构");
+		loading(false);
+		//初始化
+		$scope.companyId = $routeParams.companyId;
+		$scope.initdepartment = function(){
+			API.onload(function(){
+				API.department.agencyGetFirstClassDepartments({companyId:$scope.companyId})
+					.then(function(defaulDepartment){
+						console.info (defaulDepartment);
+						var defaultname = defaulDepartment;
+						$scope.departmentName = defaultname[0].name;
+						$scope.departmentId = defaultname[0].id;
+						//获取部门列表
+						API.department.agencyGetChildDepartments({companyId:$scope.companyId,parentId:$scope.departmentId})
+							.then(function(departmentlist){
+								$scope.departmentlist = departmentlist;
+								departmentlist.map(function(s){
+									API.staff.getCountByDepartment({departmentId:s.id})
+										.then(function(num){
+											s.peoplenum = num;
+											console.info ($scope.departmentlist);
+											$scope.$apply();
+										})
+								});
+							})
+						$scope.$apply();
+						loading(true);
+					})
+			})
+		}
+		$scope.initdepartment();
+
+
+		//修改企业名称
+		$scope.updateDepartmentShow = function () {
+			$(".createcompany").hide();
+			$(".updatecompany").show();
+		}
+		$scope.updateDepartment = function () {
+			API.onload(function(){
+				API.department.agencyUpdateDepartment({companyId:$scope.companyId,id:$scope.departmentId,name:$(".updatecompany .common_text").val()})
+					.then(function(result){
+						Myalert("温馨提示","修改成功");
+						$scope.initdepartment();
+						$(".updatecompany").hide();
+					})
+					.catch(function(err){
+						console.info(err);
+					})
+			})
+		}
+
+		//添加子部门
+		$scope.createDepartmentShow = function () {
+			$(".updatecompany").hide();
+			$(".createcompany").show();
+		}
+		$scope.createDepartment = function () {
+			API.onload(function(){
+				API.department.agencyCreateDepartment({companyId:$scope.companyId,parentId:$scope.departmentId,name:$(".createcompany .common_text").val()})
+					.then(function(result){
+						Myalert("温馨提示","添加成功");
+						$scope.initdepartment();
+						$(".createcompany").hide();
+					})
+					.catch(function(err){
+						console.info(err);
+					})
+			})
+		}
+
+		//修改子部门名称
+		$scope.updatechildDepartmentShow = function (index,id) {
+			$scope.index = index;
+			$scope.childDepartmentId = id;
+			$(".updatechildDepartment").hide();
+			$(".updatechildDepartment").eq(index).show();
+		}
+		$scope.updatechildDepartment = function () {
+			API.onload(function(){
+				API.department.agencyUpdateDepartment({companyId:$scope.companyId,id:$scope.childDepartmentId,name:$(".updatechildDepartment .common_text").eq($scope.index).val()})
+					.then(function(result){
+						Myalert("温馨提示","修改成功");
+						$scope.initdepartment();
+					})
+					.catch(function(err){
+						console.info(err);
+					})
+			})
+		}
+
+		//删除子部门
+		$scope.deleteDepartmentShow = function (name,id) {
+			$scope.deleteId = id;
+			$scope.deleteName = name;
+			$(".messageText").html("确定删除&quot;"+$scope.deleteName+"&quot;？");
+			$(".confirmFixed").show();
+		}
+		$scope.deleteDepartment = function () {
+			API.onload(function(){
+				API.department.agencyDeleteDepartment({companyId:$scope.companyId,id:$scope.deleteId})
+					.then(function(result){
+						$scope.initdepartment();
+						$(".confirmFixed").hide();
+					})
+					.catch(function(err){
+						console.info(err);
+					})
+			})
+		}
+
+		//关闭窗口
+		$scope.departmentClose = function () {
+			$(".updatecompany,.createcompany,.updatechildDepartment").hide();
+		}
+
+		$scope.confirmClose = function () {
+			$(".confirmFixed").hide();
+		}
+	}
+
+
+
+
+
+
+
+
+	/*
+	 差旅标准列表
+	 * @param $scope
+	 * @constructor
+	 */
+	companyList.PolicyListController = function($scope, $routeParams) {
+		$("title").html("差旅标准");
+		Myselect();
+		$scope.companyId = $routeParams.companyId;
+
+		//获取差旅标准列表
+		$scope.initPolicyList = function () {
+			loading(false);
+			API.onload(function(){
+				var params = {};
+				var options = {order: [["create_at", "asc"]]};
+				options.perPage = 100;
+				params.options = options;
+				params.companyId = $scope.companyId;
+				API.travelPolicy.agencyListAndPaginateTravelPolicy(params)
+					.then(function(result){
+						console.info (result);
+						$scope.PolicyTotal = result.total;
+						$scope.PolicyList = result.items;
+						if ($scope.PolicyTotal==0) {
+							$(".create_policy").show();
+						}
+						$(window).scroll(function() {
+							if ($(window).scrollTop()<=64) {
+								$(".policy_title").removeClass('policy_titlefixed');
+
+							}
+							else {
+								$(".policy_title").addClass('policy_titlefixed');
+							}
+						});
+						loading(true);
+						$scope.$apply();
+					})
+					.catch(function(err){
+						console.info (err);
+					});
+			})
+		}
+		$scope.initPolicyList();
+
+
+		//增加标准
+		$scope.createPolicyShow = function () {
+			$scope.resetting();
+			$(".create_policy").show();
+			$(".update_policy").hide();
+			$(".policy_page li").css('opacity','1');
+		}
+		//增加标准取消
+		$scope.createClose = function () {
+			$(".create_policy").hide();
+			$(".policy_page li").css('opacity','1');
+		}
+		$scope.createPolicy = function () {
+			if ($(".create_policy .Cname").val()=="") {
+				Myalert("温馨提示","请填写等级名称");
+				return false;
+			}
+			if ($(".create_policy .CplaneLevel").html()=="请选择仓位") {
+				Myalert("温馨提示","请选择飞机仓位");
+				return false;
+			}
+			if ($(".create_policy .CplaneDiscount").html()=="请选择折扣") {
+				Myalert("温馨提示","请选择飞机折扣");
+				return false;
+			}
+			if ($(".create_policy .CtrainLevel").html()=="请选择座次") {
+				Myalert("温馨提示","请选择火车座次");
+				return false;
+			}
+			if ($(".create_policy .ChotelTevel").html()=="星级标准") {
+				Myalert("温馨提示","请选择住宿标准");
+				return false;
+			}
+
+
+
+			API.onload(function(){
+				API.travelPolicy.agencyCreateTravelPolicy({
+					name:$(".create_policy .Cname").val(),
+					planeLevel:$(".create_policy .CplaneLevel").html(),
+					planeDiscount:$(".create_policy .CplaneDiscount").attr('selectValue'),
+					trainLevel:$(".create_policy .CtrainLevel").html().replace('/',','),
+					isChangeLevel:$(".create_policy .Ccheckbox").is(':checked'),
+					hotelLevel:$(".create_policy .ChotelTevel").html().replace('/',','),
+					hotelPrice:$(".create_policy .ChotelPrice").val(),
+					companyId:$scope.companyId
+				})
+					.then(function(result){
+						Myalert("温馨提示","增加成功");
+						$scope.initPolicyList();
+						$(".create_policy").hide();
+						console.info (result);
+					})
+					.catch(function(err){
+						Myalert("温馨提示", err.msg);
+						console.info (err);
+					});
+			})
+		}
+
+
+		//删除标准
+		$scope.deletePolicyShow = function (id,name) {
+			$scope.deleteId = id;
+			$scope.deleteName = name;
+			$(".messageText").html("您确定删除&quot;"+$scope.deleteName+"&quot;差旅标准吗？");
+			$(".confirmFixed").show();
+		}
+		$scope.deletePolicy = function () {
+			API.onload(function(){
+				API.travelPolicy.agencyDeleteTravelPolicy({companyId:$scope.companyId,id:$scope.deleteId})
+					.then(function(result){
+						$(".confirmFixed").hide();
+						$scope.initPolicyList();
+						console.info (result);
+					})
+					.catch(function(err){
+						$(".deleteFail").show();
+						$(".deleteFail_text").html(err.msg);
+						console.info (err);
+					});
+			})
+		}
+
+		//关闭弹窗
+		$scope.confirmClose = function () {
+			$(".confirmFixed,.deleteFail").hide();
+		}
+
+
+
+
+
+
+
+
+		//修改标准
+		$scope.updatePolicyShow = function (id,index) {
+			$scope.updateId = id;
+			if (index == 0) {
+				$(".update_policy").css({'top':'10px','left':'0px'});
+			}
+			else if (index == 1) {
+				$(".update_policy").css({'top':'10px','left':'505px'});
+			}
+			else if (index == 2) {
+				$(".update_policy").css({'top':'230px','left':'0px'});
+			}
+			else if (index == 3) {
+				$(".update_policy").css({'top':'230px','left':'505px'});
+			}
+			else if (index == 4) {
+				$(".update_policy").css({'top':'450px','left':'0px'});
+			}
+			else if (index == 5) {
+				$(".update_policy").css({'top':'450px','left':'505px'});
+			}
+			else if (index == 6) {
+				$(".update_policy").css({'top':'670px','left':'0px'});
+			}
+			else if (index == 7) {
+				$(".update_policy").css({'top':'670px','left':'505px'});
+			}
+			else if (index == 8) {
+				$(".update_policy").css({'top':'890px','left':'0px'});
+			}
+			else if (index == 9) {
+				$(".update_policy").css({'top':'890px','left':'505px'});
+			}
+			else if (index == 10) {
+				$(".update_policy").css({'top':'1110px','left':'0px'});
+			}
+			else if (index == 11) {
+				$(".update_policy").css({'top':'1110px','left':'505px'});
+			}
+			else if (index == 12) {
+				$(".update_policy").css({'top':'1330px','left':'0px'});
+			}
+			else if (index == 13) {
+				$(".update_policy").css({'top':'1330px','left':'505px'});
+			}
+			else if (index == 14) {
+				$(".update_policy").css({'top':'1550px','left':'0px'});
+			}
+			else if (index == 15) {
+				$(".update_policy").css({'top':'1550px','left':'505px'});
+			}
+			var obj = {0:"全价",8:"最高8折",7:"最高7折",6:"最高6折",5:"最高5折",4:"最高4折"};
+			var discountTxt = $scope.PolicyList[index].planeDiscount;
+			$(".update_policy .Cname").val($scope.PolicyList[index].name);
+			$(".update_policy .CplaneLevel").html($scope.PolicyList[index].planeLevel);
+			$(".update_policy .CplaneDiscount").html(obj[discountTxt]).attr("selectValue",discountTxt);
+			$(".update_policy .CtrainLevel").html($scope.PolicyList[index].trainLevel);
+			$(".update_policy .Ccheckbox").attr('checked',$scope.PolicyList[index].isChangeLevel);
+			$(".update_policy .ChotelTevel").html($scope.PolicyList[index].hotelLevel);
+			$(".update_policy .ChotelPrice").val($scope.PolicyList[index].hotelPrice);
+			if ($scope.PolicyList[index].isChangeLevel==true) {
+				$(".Ccheckboxlabel").removeClass('lablefalse');
+				$(" .Ccheckboxlabel").html('&#xe9ec;');
+			}
+			else {
+				$(".Ccheckboxlabel").addClass('lablefalse');
+				$(".Ccheckboxlabel").html('');
+			}
+			$(".update_policy").show();
+			$(".create_policy").hide();
+			$(".policy_page li").css('opacity','0.2');
+		}
+		//修改标准取消
+		$scope.updateClose = function () {
+			$(".update_policy").hide();
+			$(".policy_page li").css('opacity','1');
+		}
+		$scope.updatePolicy = function () {
+			if ($(".update_policy .Cname").val()=="") {
+				Myalert("温馨提示","请填写等级名称");
+				return false;
+			}
+			if ($(".update_policy .CplaneLevel").html()=="请选择仓位") {
+				Myalert("温馨提示","请选择飞机仓位");
+				return false;
+			}
+			if ($(".update_policy .CplaneDiscount").html()=="请选择折扣") {
+				Myalert("温馨提示","请选择飞机折扣");
+				return false;
+			}
+			if ($(".update_policy .CtrainLevel").html()=="请选择座次") {
+				Myalert("温馨提示","请选择火车座次");
+				return false;
+			}
+			if ($(".update_policy .ChotelTevel").html()=="星级标准") {
+				Myalert("温馨提示","请选择住宿标准");
+				return false;
+			}
+
+
+			API.onload(function(){
+				API.travelPolicy.agencyUpdateTravelPolicy({
+					id:$scope.updateId,
+					name:$(".update_policy .Cname").val(),
+					planeLevel:$(".update_policy .CplaneLevel").html(),
+					planeDiscount:$(".update_policy .CplaneDiscount").attr('selectValue'),
+					trainLevel:$(".update_policy .CtrainLevel").html(),
+					isChangeLevel:$(".update_policy .Ccheckbox").is(':checked'),
+					hotelLevel:$(".update_policy .ChotelTevel").html(),
+					hotelPrice:$(".update_policy .ChotelPrice").val(),
+					companyId:$scope.companyId
+				})
+					.then(function(result){
+						Myalert("温馨提示","修改成功");
+						$scope.initPolicyList();
+						$(".update_policy").hide();
+						$(".policy_page li").css('opacity','1');
+						console.info (result);
+					})
+					.catch(function(err){
+						Myalert("温馨提示","内容不完整，请重新填写");
+						console.info (err);
+					});
+			})
+		}
+
+
+		//重置
+		$scope.resetting = function () {
+			$(".Cname").val("");
+			$(".CplaneLevel").html("不限");
+			$(".CplaneDiscount").html("不限").attr("selectValue","0");
+			$(".CtrainLevel").html("不限");
+			$(".Ccheckbox").attr('checked',true);
+			$(".Ccheckboxlabel").removeClass('lablefalse');
+			$(".Ccheckboxlabel").html('&#xe9ec;');
+			$(".ChotelTevel").html("不限");
+			$(".ChotelPrice").val("");
+		}
+
+		//修改自定义复选框
+		$scope.updateChangecheck = function () {
+			if ($(".update_policy .Ccheckbox").is(':checked')==false) {
+				$(".update_policy .Ccheckboxlabel").removeClass('lablefalse');
+				$(".update_policy .Ccheckboxlabel").html('&#xe9ec;');
+			}
+			else {
+				$(".update_policy .Ccheckboxlabel").addClass('lablefalse');
+				$(".update_policy .Ccheckboxlabel").html('');
+			}
+		}
+		//创建自定义复选框
+		$scope.createChangecheck = function () {
+			if ($(".create_policy .Ccheckbox").is(':checked')==false) {
+				$(".create_policy .Ccheckboxlabel").removeClass('lablefalse');
+				$(".create_policy .Ccheckboxlabel").html('&#xe9ec;');
+			}
+			else {
+				$(".create_policy .Ccheckboxlabel").addClass('lablefalse');
+				$(".create_policy .Ccheckboxlabel").html('');
+			}
+		}
+
+	}
+
+
+
+
+
+
 	return companyList;
 })();

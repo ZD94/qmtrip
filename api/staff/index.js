@@ -581,12 +581,13 @@ staff.beforeImportExcel = function(params){
                     for(var i=0;i<addObj.length;i++){
                         var addStaff = addObj[i];
                         if(_.trim(addStaff.email) == rEmail){
+                            var obj = downloadAddObj[i];
                             addObj.splice(i, 1);
                             downloadAddObj.splice(i, 1);
                             addStaff.reason = "邮箱与本次导入中邮箱重复";
-                            downloadAddObj[i][6] = "邮箱与本次导入中邮箱重复";
+                            obj[6] = "邮箱与本次导入中邮箱重复";
                             noAddObj.push(addStaff);
-                            downloadNoAddObj.push(downloadAddObj[i]);
+                            downloadNoAddObj.push(obj);
                         }
                     }
                 }
@@ -596,12 +597,13 @@ staff.beforeImportExcel = function(params){
                     for(var i=0;i<addObj.length;i++){
                         var addStaff = addObj[i];
                         if(_.trim(addStaff.mobile) == rMobile){
+                            var obj = downloadAddObj[i];
                             addObj.splice(i, 1);
                             downloadAddObj.splice(i, 1);
                             addStaff.reason = "手机号与本次导入中手机号重复";
-                            downloadAddObj[i][6] = "手机号与本次导入中手机号重复";
+                            obj[6] = "手机号与本次导入中手机号重复";
                             noAddObj.push(addStaff);
-                            downloadNoAddObj.push(downloadAddObj[i]);
+                            downloadNoAddObj.push(obj);
                         }
                     }
                 }

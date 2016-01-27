@@ -332,7 +332,6 @@ tripPlan.deleteConsumeDetail = function (id) {
 /**
  * 上传票据
  * @param params
- * @param params.userId 用户id
  * @param params.consumeId 消费详情id
  * @param params.picture 新上传的票据md5key
  * @returns {*}
