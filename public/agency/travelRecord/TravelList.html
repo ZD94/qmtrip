@@ -6,15 +6,18 @@
             <div class="content">
                 <table style="width: 100%">
                     <tr>
-                        <th align="center">企业名称</th>
-                        <th align="center">出差人</th>
+                        <th align="center">公司名称</th>
+                        <th align="center">姓名</th>
                         <th align="center">出发时间</th>
                         <th align="center">服务</th>
-                        <th align="center">预算单内容简介</th>
+                        <th align="center">内容简介</th>
+                        <th align="center">预算</th>
+                        <th align="center">实际价格</th>
+                        <th align="center">获得积分</th>
                         <th align="center">状态</th>
                         <th align="center">操作</th>
                     </tr>
-                    <tr ng-repeat="item in travelListitems" ng-click="enterDetail(item.id)">
+                    <tr ng-repeat="item in travelListitems">
                         <td width="160" align="center">
                             <p style="width: 140px; color: #118FD6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px;"><a>{{item.companyName.name}}</a></p>
                         </td>
@@ -26,20 +29,34 @@
                             <p ng-if="!item.startAt">{{item.hotel[0].startTime | date: 'yyyy-MM-dd'}}</p>
                         </td>
                         <td width="80" align="center">
-                            <p ng-if="item.isNeedTraffic" class="traffic_icon web-icon-font3">&#xe90e;</p>
-                            <p ng-if="item.isNeedHotel" class="live_icon web-icon-font3">&#xe914;</p>
+                            <p ng-if="item.isNeedTraffic">交通</p>
+                            <p ng-if="item.isNeedHotel">住宿</p>
                         </td>
                         <td align="center">
-                            <p ng-if="item.isNeedTraffic"><a>{{item.startPlace}}&nbsp;&nbsp;<img src="agency/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="agency/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.destination}}</a></p>
-                            <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
+                            <p ng-if="item.isNeedTraffic">{{item.startPlace}}<span ng-if="item.backTraffic.length!=0">往返</span><span ng-if="item.backTraffic.length==0">到</span>{{item.destination}}</p>
+                            <p ng-if="item.isNeedHotel">{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</p>
                         </td>
                         <td width="140" align="center">
-                            <p ng-if="item.outTraffic.length!=0">去程行程单</p>
-                            <p ng-if="item.hotel.length!=0">住宿发票</p>
-                            <p ng-if="item.backTraffic.length!=0">回程行程单</p>
+                            <span ng-if="item.status!='-1'">¥{{item.budget}}</span>
+                            <span ng-if="item.status=='-1'">暂无</span>
+                        </td>
+                        <td width="140" align="center">
+                            <span ng-if="item.expenditure!=0">¥{{item.expenditure}}</span>
+                            <span ng-if="item.expenditure==0">暂无</span>
+                        </td>
+                        <td width="140" align="center">
+                            <span ng-if="item.score!=0">¥{{item.score}}</span>
+                            <span ng-if="item.score==0">暂无</span>
+                        </td>
+                        <td width="140" align="center">
+                            <span ng-if="item.status=='-1'">待出预算</span>
+                            <span ng-if="item.status==1">
+                                <span ng-if="item.auditStatus==0">待审核</span>
+                            </span>
                         </td>
                         <td width="90" align="center">
-                            <p><a>去审核</a></p>
+                            <a ng-if="item.status!='-1'" ng-click="enterDetail(item.id)">查看详情</a>
+                            <a ng-if="item.status=='-1'" ng-click="enterDetail(item.id)">录入预算</a>
                         </td>
                     </tr>
                 </table>
