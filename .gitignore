@@ -11,3 +11,5 @@ node_modules
 *.map
 controller.all.js
 /temp
+/public/temp
+/public/temp/*
