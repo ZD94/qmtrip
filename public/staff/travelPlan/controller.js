@@ -276,6 +276,8 @@ var travelPlan=(function(){
                     $scope.backTraffic = $scope.planDetail.backTraffic[0];
                     $scope.hotel = $scope.planDetail.hotel[0];
                     $scope.outTraffic = $scope.planDetail.outTraffic[0];
+                    loading(true);
+                    $scope.$apply();
                     $(".file").AjaxFileUpload({
                         action: '/upload/ajax-upload-file?type=invoice',
                         onComplete: function(filename, response) {
@@ -301,8 +303,7 @@ var travelPlan=(function(){
                             }
                         }
                     });
-                    loading(true);
-                    $scope.$apply();
+
                 })
                 .catch(function(err){
                     console.info(err);

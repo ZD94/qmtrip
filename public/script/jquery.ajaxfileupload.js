@@ -43,7 +43,7 @@
 	}
 
 	$.fn.AjaxFileUpload = function(options) {
-		
+
 		var defaults = {
 			action:     "/upload-action",
 			onChange:   function(filename) {},
@@ -57,7 +57,7 @@
 				return "_AjaxFileUpload" + id++;
 			};
 		})();
-		
+
 		return this.each(function() {
 			var $this = $(this);
 
