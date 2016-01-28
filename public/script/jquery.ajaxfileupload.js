@@ -16,17 +16,20 @@
 		return reg.test(window.navigator.userAgent);
 	}
 
+	var wxJSDKReady = false;
 	if (isWeixin()) {
+		wxJSDKReady = true;
 		if (!window.API) {
-			throw new Erorr("此项目依赖API,请先引入api.js");
+			console.warn("此项目依赖API,请先引入api.js");
+			wxJSDKReady = false;
+		} else if (!window.wx) {
+			console.warn("没有找打weixin.js 使用默认上传方式");
+			wxJSDKReady = false;
 		}
+	}
 
-		if (!window.wx) {
-			throw new Error("此项目依赖于weixin.js 请先引入weixin.js");
-		}
-
+	if (wxJSDKReady) {
 		API.require("wechat");
-
 		API.onload(function() {
 			var url = window.location.href;
 			API.wechat.getJSDKParams({url: url, debug: true, jsApiList: ["uploadImage", "chooseImage", "previewImage"]})
@@ -37,8 +40,6 @@
 						console.error(err);
 					});
 		})
-	} else {
-		console.info("没有在微信中,初始化默认ajaxFileUpload");
 	}
 
 	$.fn.AjaxFileUpload = function(options) {
@@ -60,10 +61,9 @@
 		return this.each(function() {
 			var $this = $(this);
 
-			if (isWeixin()) {
+			if (wxJSDKReady) {
 				$this.bind("click", bootstapWx);
 			} else {
-				console.info($this);
 				if ($this.is("input") && $this.attr("type") === "file") {
 					$this.bind("change", onChange);
 				}
@@ -71,7 +71,6 @@
 		});
 		
 		function onChange(e) {
-			console.info("onchange");
 			var $element = $(e.target),
 				id       = $element.attr('id'),
 				$clone   = $element.removeAttr('id').clone().attr('id', id).AjaxFileUpload(options),
