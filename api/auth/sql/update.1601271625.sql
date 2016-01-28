@@ -1,0 +1,1 @@
+alter table auth.accounts add old_qrcode_token varchar(50);
