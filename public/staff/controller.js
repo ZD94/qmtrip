@@ -23,12 +23,13 @@ module.exports = (function(){
                 return;
             API.auth.logout()
                 .then(function (ret) {
-                    location.reload();
+                    //location.reload();
+                    window.location.href = "/staff.html#/auth/login";
                     //window.location.href = "/staff.html#/auth/login?backurl=" + encodeURIComponent(window.location.href);
                 })
                 .catch(function (err) {
                     console.info(err)
-                    location.reload();
+                    //location.reload();
                 })
         };
     }

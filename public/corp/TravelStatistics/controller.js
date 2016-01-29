@@ -83,25 +83,6 @@ var TravelStatistics = (function(){
                             .done();
                 })
         })
-        //API.onload(function(){
-        //    API.staff.getCurrentStaff()//获取当前登录人员的企业id
-        //        .then(function(staff){
-        //            console.info(staff);
-        //            var companyId = staff.companyId;
-        //            console.info(companyId);
-        //            return API.staff.statStaffPointsByCompany({companyId:companyId})//企业积分统计，总积分，可用积分。
-        //                    .then(function(point){
-        //                        console.info(point);
-        //                        $scope.allPoints = point.totalPoints;
-        //                        $scope.remianPoints = point.balancePoints;
-        //                        $scope.$apply();
-        //                    })
-        //        })
-        //        .catch(function(err) {
-        //            console.info(err);
-        //        })
-        //        .done();
-        //})
     }
 
     return TravelStatistics;
