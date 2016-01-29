@@ -131,6 +131,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
         var consumeId = params.consumeId;
         var orderId = "";
         var staffId = "";
+        var companyId = "";
         var staffEmail = "";
         var staffName = "";
         var invoiceName = "";
@@ -154,7 +155,6 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
 
                 expenditure = '￥' + params.expenditure;
                 _startTime = consumeDetail.startTime;
-
                 return consumeDetail.accountId;
             })
             .then(function(_staffId){
@@ -166,6 +166,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                     throw {msg:"该员工不存在或员工所在企业不存在"};
                 }
 
+                companyId = staff.companyId;
                 staffName = staff.name;
                 staffEmail = staff.email;
 
@@ -324,7 +325,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                     return true;
                 }
 
-                return API.staff.increaseStaffPoint({id: staffId, accountId: user_id, increasePoint: ret.score})
+                return API.staff.increaseStaffPoint({id: staffId, accountId: user_id, increasePoint: ret.score, companyId: companyId})
             })
             .then(function(){
                 return true;

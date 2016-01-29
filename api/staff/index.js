@@ -277,16 +277,12 @@ staff.listAndPaginateStaff = function(params){
  * @param options
  * @returns {*}
  */
-staff.increaseStaffPoint = function(params) {
+staff.increaseStaffPoint = increaseStaffPoint;
+increaseStaffPoint.required_params = ['id', 'companyId', 'accountId', 'increasePoint'];
+function increaseStaffPoint(params) {
     var id = params.id;
     var operatorId = params.accountId;
     var increasePoint = params.increasePoint;
-    if(!id){
-        throw {code: -1, msg: "id不能为空"};
-    }
-    if(!increasePoint){
-        throw {code: -2, msg: "increasePoint不能为空"};
-    }
     return staffModel.findById(id)
         .then(function(obj) {
             var totalPoints = obj.totalPoints + increasePoint;
@@ -295,16 +291,16 @@ staff.increaseStaffPoint = function(params) {
             if(params.orderId){
                 pointChange.orderId = params.orderId;
             }
+            pointChange.companyId = params.companyId;
             return sequelize.transaction(function(t) {
                 return Q.all([
                         staffModel.update({totalPoints: totalPoints, balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
-//                        obj.increment(['total_points','balance_points'], {by: increasePoint, transaction: t}),//此处为toJSON对象不能使用instance的方法
                         pointChangeModel.create(pointChange, {transaction: t})
                     ]);
             });
         })
-        .spread(function(increment, create){
-            return increment;
+        .then(function(){
+            return true;
         });
 }
 
@@ -330,17 +326,17 @@ staff.decreaseStaffPoint = function(params) {
                 throw {code: -3, msg: "积分不足"};
             }
             var balancePoints = obj.balancePoints - decreasePoint;
-            var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分", operatorId: operatorId, currentPoint: balancePoints}//此处也应该用model里的属性名封装obj
+            var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分",
+                operatorId: operatorId, currentPoint: balancePoints, companyId: params.companyId}//此处也应该用model里的属性名封装obj
             return sequelize.transaction(function(t) {
                 return Q.all([
                         staffModel.update({balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
-//                        obj.decrement('balance_points', {by: decreasePoint, transaction: t}),
                         pointChangeModel.create(pointChange, {transaction: t})
                     ]);
             });
         })
-        .spread(function(decrement,create){
-            return decrement;
+        .then(function(){
+            return true;
         });
 }
 
@@ -382,6 +378,47 @@ staff.listAndPaginatePointChange = function(params){
 }
 
 /**
+ * 统计企业员工月度积分变动情况
+ * @param options
+ * @returns {*}
+ */
+staff.listAndPagePointsChangeByMonth = function(params) {
+    var options = {};
+    options.attributes = ['points'];
+    options.raw = true;
+    options.count = ['points'];
+    options.companyId = '00000000-0000-0000-0000-000000000001';
+    options.limit = 30;
+    options.order = ['create_at'];
+
+    var count = params.count;
+    var dateArr = [];
+    for(var i=0; i< count; i++){
+        var month = moment().subtract(i, 'months').format('YYYY-MM');
+        dateArr.push(month);
+    }
+
+    return Q.all(dateArr.map(function(month){
+        var start_time = moment(month + '-01').format('YYYY-MM-DD HH:mm:ss');
+        var end_time = moment(month + '-01').endOf('month').format("YYYY-MM-DD")+" 23:59:59";
+        return Q.all([
+            pointChangeModel.sum('points', {where: {status: 1, createAt: {$gte: start_time, $lte: end_time}}}),
+            pointChangeModel.sum('points', {where: {status: -1, createAt: {$gte: start_time, $lte: end_time}}})
+        ])
+            .spread(function(a, b){
+                a = a || 0;
+                b = b || 0;
+                return {
+                    month: month,
+                    increase: a,
+                    decrease: b,
+                    balance: a-b
+                };
+            })
+    }))
+}
+
+/**
  * 获取某个时间段员工的积分变动
  * @param params
  * @param params.staffId  员工id
@@ -420,6 +457,8 @@ function getStaffPointsChange(params){
             return {changeNum: changeNum, changeDate: changeDate, changePoint: changePoint};
         });
 }
+
+
 
 /**
  * 检查导入员工数据
