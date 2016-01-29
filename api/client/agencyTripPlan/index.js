@@ -68,7 +68,7 @@ agencyTripPlan.pageTripPlanOrder = function(params){
             params.status = {$gt: 1};
             params.auditStatus = 1;
         }else if(audit == "P"){
-            params.status = 1;
+            params.status = {$in: [-1, 1]};
             params.auditStatus = 0;
         }else if(audit == 'N'){
             params.status = 0; //待上传状态
@@ -107,6 +107,7 @@ agencyTripPlan.pageTripPlanOrder = function(params){
                 limit: perPage,
                 offset: perPage * (page - 1)
             };
+            console.info(options.where.status);
 
             return API.tripPlan.listTripPlanOrder(options);
         })
