@@ -16,44 +16,47 @@
                     </tr>
                 </table>
             </div>
-            <div class="content_top">
-                <dl>
-                    <dt>动态标准预算</dt>
-                    <dd>¥{{planDetail.budget.toFixed(2)}}</dd>
-                </dl>
-                <dl>
-                    <dt>实际支出</dt>
-                    <dd>
-                        <span ng-if="!planDetail.expenditure">无</span>
-                        <span ng-if="planDetail.expenditure">¥{{planDetail.expenditure.toFixed(2)}}</span>
-                    </dd>
-                </dl>
-                <dl>
-                    <dt>为公司节省</dt>
-                    <dd>
-                        <span ng-if="!planDetail.expenditure">无</span>
-                        <span ng-if="planDetail.expenditure">
-                            <span ng-if="planDetail.budget-planDetail.expenditure>0">¥{{(planDetail.budget-planDetail.expenditure).toFixed(2)}}</span>
-                            <span ng-if="planDetail.budget-planDetail.expenditure<=0">¥0.00</span>
-                        </span>
-                    </dd>
-                </dl>
-                <dl>
-                    <dt>获得积分</dt>
-                    <dd>
-                        <span ng-if="planDetail.score">{{planDetail.score}}</span>
-                        <span ng-if="!planDetail.score">暂无</span>
-                    </dd>
-                </dl>
-            </div>
-            <div class="title_bottom"><span></span>差旅消费明细</div>
+            <!--<div class="content_top">-->
+                <!--<dl>-->
+                    <!--<dt>动态标准预算</dt>-->
+                    <!--<dd>-->
+                        <!--<span ng-if="planDetail.status=='-1'">暂无</span>-->
+                        <!--<span ng-if="planDetail.status!='-1'">¥{{planDetail.budget.toFixed(2)}}</span>-->
+                    <!--</dd>-->
+                <!--</dl>-->
+                <!--<dl>-->
+                    <!--<dt>实际支出</dt>-->
+                    <!--<dd>-->
+                        <!--<span ng-if="!planDetail.expenditure">暂无</span>-->
+                        <!--<span ng-if="planDetail.expenditure">¥{{planDetail.expenditure.toFixed(2)}}</span>-->
+                    <!--</dd>-->
+                <!--</dl>-->
+                <!--<dl>-->
+                    <!--<dt>为公司节省</dt>-->
+                    <!--<dd>-->
+                        <!--<span ng-if="!planDetail.expenditure">暂无</span>-->
+                        <!--<span ng-if="planDetail.expenditure">-->
+                            <!--<span ng-if="planDetail.budget-planDetail.expenditure>0">¥{{(planDetail.budget-planDetail.expenditure).toFixed(2)}}</span>-->
+                            <!--<span ng-if="planDetail.budget-planDetail.expenditure<=0">¥0.00</span>-->
+                        <!--</span>-->
+                    <!--</dd>-->
+                <!--</dl>-->
+                <!--<dl>-->
+                    <!--<dt>获得积分</dt>-->
+                    <!--<dd>-->
+                        <!--<span ng-if="planDetail.score">{{planDetail.score}}</span>-->
+                        <!--<span ng-if="!planDetail.score">暂无</span>-->
+                    <!--</dd>-->
+                <!--</dl>-->
+            <!--</div>-->
+            <!--<div class="title_bottom"><span></span>差旅消费明细</div>-->
             <div class="content_bottom">
                 <table width="100%" border="1" bordercolor="#E5E5E5">
                     <tr>
                         <th height="40">明细</th>
-                        <th height="40">预算</th>
-                        <th height="40">实际支出</th>
-                        <th height="40">出差票据</th>
+                        <th width="135" height="40">预算</th>
+                        <th width="135" height="40">实际支出</th>
+                        <th width="135" height="40">出差票据</th>
                     </tr>
                     <tr ng-if="planDetail.outTraffic.length!=0">
                         <td>
@@ -62,16 +65,22 @@
                             <div class="description">{{outTraffic.startTime | date: 'yyyy-MM-dd'}}<span ng-if="outTraffic.latestArriveTime!=undefined && outTraffic.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{outTraffic.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
                             <div class="endplace">{{outTraffic.arrivalPlace}}</div>
                         </td>
-                        <td width="135" align="center">¥{{outTraffic.budget.toFixed(2)}}</td>
                         <td width="135" align="center">
-                            <span ng-if="outTraffic.expenditure">¥{{outTraffic.expenditure.toFixed(2)}}</span>
-                            <span ng-if="!outTraffic.expenditure">无</span>
+                            <span ng-if="outTraffic.budget!='-1'">¥{{outTraffic.budget.toFixed(2)}}</span>
+                            <a ng-if="outTraffic.budget=='-1'" ng-click="editBudgetShow(outTraffic.id)">录入预算</a>
                         </td>
                         <td width="135" align="center">
-                            <p ng-if="outTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
-                            <p ng-if="outTraffic.status==0" style="color: #DE492A;">【待审核】</p>
-                            <p ng-if="outTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
-                            <p><a ng-click="outTraffichref()">去程交通票据</a></p>
+                            <span ng-if="outTraffic.expenditure">¥{{outTraffic.expenditure.toFixed(2)}}</span>
+                            <span ng-if="!outTraffic.expenditure">暂无</span>
+                        </td>
+                        <td width="135" align="center">
+                            <div ng-if="outTraffic.budget!='-1'">
+                                <p ng-if="outTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
+                                <p ng-if="outTraffic.status==0" style="color: #DE492A;">【待审核】</p>
+                                <p ng-if="outTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
+                                <p><a ng-click="outTraffichref()">去程交通票据</a></p>
+                            </div>
+                            <div ng-if="outTraffic.budget=='-1'">暂无</div>
                         </td>
                     </tr>
                     <tr ng-if="planDetail.hotel.length!=0">
@@ -82,16 +91,22 @@
                                 <p>入住日期：{{hotel.startTime | date: 'yyyy-MM-dd'}}&nbsp;&nbsp;&nbsp;&nbsp;退房日期：{{hotel.endTime | date: 'yyyy-MM-dd'}}</p>
                             </div>
                         </td>
-                        <td width="135" align="center">¥{{hotel.budget.toFixed(2)}}</td>
                         <td width="135" align="center">
-                            <span ng-if="hotel.expenditure">¥{{hotel.expenditure.toFixed(2)}}</span>
-                            <span ng-if="!hotel.expenditure">无</span>
+                            <span ng-if="hotel.budget!='-1'">¥{{hotel.budget.toFixed(2)}}</span>
+                            <a ng-if="hotel.budget=='-1'" ng-click="editBudgetShow(hotel.id)">录入预算</a>
                         </td>
                         <td width="135" align="center">
-                            <p ng-if="hotel.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
-                            <p ng-if="hotel.status==0" style="color: #DE492A;">【待审核】</p>
-                            <p ng-if="hotel.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
-                            <p><a ng-click="hotelhref()">酒店发票</a></p>
+                            <span ng-if="hotel.expenditure">¥{{hotel.expenditure.toFixed(2)}}</span>
+                            <span ng-if="!hotel.expenditure">暂无</span>
+                        </td>
+                        <td width="135" align="center">
+                            <div ng-if="hotel.budget!='-1'">
+                                <p ng-if="hotel.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
+                                <p ng-if="hotel.status==0" style="color: #DE492A;">【待审核】</p>
+                                <p ng-if="hotel.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
+                                <p><a ng-click="hotelhref()">酒店发票</a></p>
+                            </div>
+                            <div ng-if="hotel.budget=='-1'">暂无</div>
                         </td>
                     </tr>
                     <tr ng-if="planDetail.backTraffic.length!=0">
@@ -101,16 +116,22 @@
                             <div class="description">{{backTraffic.endTime | date: 'yyyy-MM-dd'}}<span ng-if="backTraffic.latestArriveTime!=undefined && backTraffic.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{backTraffic.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
                             <div class="endplace">{{backTraffic.startPlace}}</div>
                         </td>
-                        <td width="135" align="center">¥{{backTraffic.budget.toFixed(2)}}</td>
                         <td width="135" align="center">
-                            <span ng-if="backTraffic.expenditure">¥{{backTraffic.expenditure.toFixed(2)}}</span>
-                            <span ng-if="!backTraffic.expenditure">无</span>
+                            <span ng-if="backTraffic.budget!='-1'">¥{{backTraffic.budget.toFixed(2)}}</span>
+                            <a ng-if="backTraffic.budget=='-1'" ng-click="editBudgetShow(backTraffic.id)">录入预算</a>
                         </td>
                         <td width="135" align="center">
-                            <p ng-if="backTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
-                            <p ng-if="backTraffic.status==0" style="color: #DE492A;">【待审核】</p>
-                            <p ng-if="backTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
-                            <p><a ng-click="backTraffichref()">回程交通票据</a></p>
+                            <span ng-if="backTraffic.expenditure">¥{{backTraffic.expenditure.toFixed(2)}}</span>
+                            <span ng-if="!backTraffic.expenditure">暂无</span>
+                        </td>
+                        <td width="135" align="center">
+                            <div ng-if="backTraffic.budget!='-1'">
+                                <p ng-if="backTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
+                                <p ng-if="backTraffic.status==0" style="color: #DE492A;">【待审核】</p>
+                                <p ng-if="backTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
+                                <p><a ng-click="backTraffichref()">回程交通票据</a></p>
+                            </div>
+                            <div ng-if="backTraffic.budget=='-1'">暂无</div>
                         </td>
                     </tr>
                 </table>
@@ -206,6 +227,26 @@
     </div>
 </div>
 
+
+
+
+<section class="editBudget">
+    <div class="editBudgetbox">
+        <div class="editBudgetbox_t">
+            <span style="float: left;">录入预算</span>
+            <span ng-click="invoiceColse()" style="float: right;"><img src="agency/images/close.jpg"></span>
+        </div>
+        <div class="editBudgetbox_p">
+            <div class="error" style="height: 25px; line-height: 25px; color: #DE492A;"></div>
+            <div style="height: 30px; line-height: 30px;">录入预算金额：</div>
+            <div><input type="text" class="budget common_text" style="width: 336px;"></div>
+            <div style="margin-top: 20px;">
+                <input type="button" value="确认" ng-click="editBudget()" class="common_btn1" style="width: 60px; margin-left: 100px;">
+                <input type="button" value="取消" ng-click="invoiceColse()" class="common_btn2" style="width: 60px; margin-left: 20px;">
+            </div>
+        </div>
+    </div>
+</section>
 
 <section class="invoicePass">
     <div class="invoicebox">
