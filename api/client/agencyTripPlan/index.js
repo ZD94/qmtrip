@@ -107,7 +107,6 @@ agencyTripPlan.pageTripPlanOrder = function(params){
                 limit: perPage,
                 offset: perPage * (page - 1)
             };
-            console.info(options.where.status);
 
             return API.tripPlan.listTripPlanOrder(options);
         })

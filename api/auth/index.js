@@ -448,7 +448,7 @@ authServer.login = function(data) {
                 });
         })
         .then(function(ret) {
-            console.info('返回结果:', ret);
+            //console.info('返回结果:', ret);
             return ret;
         })
 

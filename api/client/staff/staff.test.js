@@ -151,7 +151,6 @@ describe("api/client/staff.js", function() {
                 if(err){
                     throw err;
                 }
-                console.info(ret);
                 assert.equal(ret, true);
                 done();
             })
@@ -171,7 +170,6 @@ describe("api/client/staff.js", function() {
     it("#listAndPaginatePointChange should be ok", function(done) {
         API.client.staff.listAndPaginatePointChange.call(ownerSelf, {staffId: id}, function(err, ret) {
             assert.equal(err, null);
-            console.info(ret);
             //console.log(err);
             //console.log(result);
             done();
@@ -182,7 +180,6 @@ describe("api/client/staff.js", function() {
         API.client.staff.getStaffPointsChange.call({accountId: id}, {staffId: id}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
-            console.log(result);
             done();
         });
     })
@@ -218,7 +215,6 @@ describe("api/client/staff.js", function() {
         API.client.staff.getStaffCountByCompany.call(ownerSelf, {companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
-            console.log(result);
             done();
         });
     })
@@ -311,7 +307,6 @@ describe("api/client/staff.js", function() {
                     throw err;
                 }
                 assert.equal(ret.length, 6);
-                console.info(ret);
                 done();
             });
         })
@@ -410,7 +405,6 @@ describe("api/client/staff.js", function() {
         API.client.staff.agencyGetStaffCountByCompany.call(agencySelf, {companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
-            console.log(result);
             done();
         });
     })

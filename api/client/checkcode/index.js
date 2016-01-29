@@ -43,7 +43,6 @@ var checkcode = {
         params.type = type;
         return API.checkcode.getMsgCheckCode(params)
             .then(function(result) {
-                console.info(result);
                 return result;
             });
     },

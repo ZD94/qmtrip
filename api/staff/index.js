@@ -420,7 +420,7 @@ staff.getStaffPointsChangeByMonth = function(params) {
                 b = b || 0;
                 c = c || 0;
                 d = d || 0;
-                
+
                 return {
                     month: month,
                     increase: a,
