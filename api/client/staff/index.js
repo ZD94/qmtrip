@@ -344,7 +344,7 @@ staff.getStaffPointsChange = function(params){
  * @param params
  * @returns {*}
  */
-staff.listAndPagePointsChangeByMonth = function(params) {
+staff.getStaffPointsChangeByMonth = function(params) {
     var self = this;
     return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
         .then(function(staff){
@@ -354,11 +354,9 @@ staff.listAndPagePointsChangeByMonth = function(params) {
             params.companyId = companyId;
             var count = params.count;
             typeof count == 'number' ? "" : count = 6;
-
-            params = _.pick(params, ['companyId', 'staffId']);
             params.count = count;
 
-            return API.staff.listAndPagePointsChangeByMonth(params);
+            return API.staff.getStaffPointsChangeByMonth(params);
         })
 }
 

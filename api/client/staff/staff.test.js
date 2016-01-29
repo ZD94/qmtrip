@@ -305,19 +305,20 @@ describe("api/client/staff.js", function() {
         });
 
         //查询月度积分变动统计
-        it("#listAndPagePointsChangeByMonth should be ok", function(done) {
-            API.client.staff.listAndPagePointsChangeByMonth.call(ownerSelf, {}, function(err, ret) {
+        it("#getStaffPointsChangeByMonth should be ok", function(done) {
+            API.client.staff.getStaffPointsChangeByMonth.call(ownerSelf, {}, function(err, ret) {
                 if(err){
                     throw err;
                 }
                 assert.equal(ret.length, 6);
+                console.info(ret);
                 done();
             });
         })
 
         //查询月度积分变动统计
-        it("#listAndPagePointsChangeByMonth should be ok", function(done) {
-            API.client.staff.listAndPagePointsChangeByMonth.call(ownerSelf, {count: 7}, function(err, ret) {
+        it("#getStaffPointsChangeByMonth should be ok", function(done) {
+            API.client.staff.getStaffPointsChangeByMonth.call(ownerSelf, {count: 7}, function(err, ret) {
                 if(err){
                     throw err;
                 }

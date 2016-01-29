@@ -415,3 +415,20 @@
 | changeNum     | 变动积分 |Integer
 | changeDate     | 变动时间数组 | Array
 | changePoint     | 变动时间点积分数组 |Array
+
+
+>. 统计企业员工月度积分变化 API.staff.getStaffPointsChangeByMonth(params, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 查询条件参数             |json              |------
+| params.staffId                                | 员工id             |uuid              |选填, 不填则统计该企业所有员工积分
+| params.count                                | 从当前月开始，统计count个月前的员工积分情况             |string              |选填 默认本月第一天
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| month     | 月份 | string
+| increase     | 当月增加的积分 | integer
+| decrease     | 当月减少的积分 | integer
+| balance     | 当月的积分余额 | integer

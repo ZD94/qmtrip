@@ -382,14 +382,18 @@ staff.listAndPaginatePointChange = function(params){
  * @param options
  * @returns {*}
  */
-staff.listAndPagePointsChangeByMonth = function(params) {
-    var options = {};
-    options.attributes = ['points'];
-    options.raw = true;
-    options.count = ['points'];
-    options.companyId = '00000000-0000-0000-0000-000000000001';
-    options.limit = 30;
-    options.order = ['create_at'];
+staff.getStaffPointsChangeByMonth = function(params) {
+
+    params.companyId = '00000000-0000-0000-0000-000000000001';
+    var q1  = _.pick(params, ['companyId', 'staffId']);
+    var q2  = _.pick(params, ['companyId', 'staffId']);
+    var q3 = _.pick(params, ['companyId', 'staffId']);
+    var q4 = _.pick(params, ['companyId', 'staffId']);
+
+    q1.status = 1;
+    q2.status = -1;
+    q3.status = 1;
+    q4.status = -1;
 
     var count = params.count;
     var dateArr = [];
@@ -401,18 +405,27 @@ staff.listAndPagePointsChangeByMonth = function(params) {
     return Q.all(dateArr.map(function(month){
         var start_time = moment(month + '-01').format('YYYY-MM-DD HH:mm:ss');
         var end_time = moment(month + '-01').endOf('month').format("YYYY-MM-DD")+" 23:59:59";
+        q1.createAt = {$gte: start_time, $lte: end_time};
+        q2.createAt = {$gte: start_time, $lte: end_time};
+        q3.createAt = {$lte: end_time};
+        q4.createAt = {$lte: end_time};
         return Q.all([
-            pointChangeModel.sum('points', {where: {status: 1, createAt: {$gte: start_time, $lte: end_time}}}),
-            pointChangeModel.sum('points', {where: {status: -1, createAt: {$gte: start_time, $lte: end_time}}})
+            pointChangeModel.sum('points', {where: q1}),
+            pointChangeModel.sum('points', {where: q2}),
+            pointChangeModel.sum('points', {where: q3}),
+            pointChangeModel.sum('points', {where: q4})
         ])
-            .spread(function(a, b){
+            .spread(function(a, b, c, d){
                 a = a || 0;
                 b = b || 0;
+                c = c || 0;
+                d = d || 0;
+                
                 return {
                     month: month,
                     increase: a,
                     decrease: b,
-                    balance: a-b
+                    balance: c - d
                 };
             })
     }))
