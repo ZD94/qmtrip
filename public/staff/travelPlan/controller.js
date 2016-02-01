@@ -15,7 +15,7 @@ var travelPlan=(function(){
      * @param $scope
      * @constructor
      */
-    travelPlan.PlanListController = function($scope, FileUploader) {
+    travelPlan.PlanListController = function($scope) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(1).find("li").addClass("on");
         loading(false);
@@ -62,9 +62,9 @@ var travelPlan=(function(){
                 })
         }
 
-        $scope.TrafficUploader = new FileUploader(trafficUploadConfig);
-        $scope.HotelUploader = new FileUploader(hotelUploadConfig);
-        $scope.BackTrafficUploader = new FileUploader(backTrafficUploadConfig);
+//        $scope.TrafficUploader = new FileUploader(trafficUploadConfig);
+//        $scope.HotelUploader = new FileUploader(hotelUploadConfig);
+//        $scope.BackTrafficUploader = new FileUploader(backTrafficUploadConfig);
         //待上传票据列表
         $scope.initPlanList = function () {
             API.onload(function() {

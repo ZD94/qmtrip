@@ -13,10 +13,6 @@ function agentGetTripplanInvoice(req, res, next){
     var token_id = req.cookies.agent_token_id;
     var token_sign = req.cookies.agent_token_sign;
     var timestamp = req.cookies.agent_token_timestamp;
-    console.info("userIduserId", userId);
-    console.info("token_idtoken_id", token_id);
-    console.info("token_signtoken_sign", token_sign);
-    console.info("timestamptimestamp", timestamp);
     return API.auth.authentication({user_id: userId, token_id: token_id, token_sign: token_sign, timestamp: timestamp})
         .then(function(result){
             if (!result) {
