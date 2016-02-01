@@ -84,6 +84,8 @@
             var trafficUploadConfig = JSON.parse(JSON.stringify(uploadConf));
             trafficUploadConfig.onCompleteItem= function (item, resp) {
                 uploadInvoice($scope.outTraffic.id, resp.md5key);
+                var img = "<img src="+'/upload/get-img-file/'+$scope.outTraffic.newInvoice+">";
+                console.info(img);
             }
 
             var hotelUploadConfig = JSON.parse(JSON.stringify(uploadConf));
@@ -165,7 +167,6 @@
                             $scope.backClass = "ready";
                         }
                     }
-                    console.info("##############");
                     console.info(plan);
                     // $scope.$apply();
                     API.staff.getCurrentStaff()
