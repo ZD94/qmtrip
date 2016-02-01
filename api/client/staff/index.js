@@ -11,6 +11,8 @@ var Q = require("q");
 var API = require("common/api");
 var auth = require("../auth");
 var L = require("common/language");
+var _ = require('lodash');
+
 /**
  * @class staff 员工信息
  */
@@ -251,6 +253,7 @@ staff.increaseStaffPoint = function(params){
             if(!staff.companyId){
                 throw {msg:"该员工不存在或员工所在企业不存在"};
             }
+            params.companyId = staff.companyId;
             return Q.all([
                     API.company.getCompany({companyId: staff.companyId}),
                     API.agency.getAgency({agencyId: agencyUser.agencyId})
@@ -287,6 +290,7 @@ staff.decreaseStaffPoint = function(params){
             if(!staff.companyId){
                 throw {msg:"该员工不存在或员工所在企业不存在"};
             }
+            params.companyId = staff.companyId;
             return Q.all([
                     API.company.getCompany({companyId: staff.companyId}),
                     API.agency.getAgency({agencyId: agencyUser.agencyId})
@@ -332,6 +336,28 @@ staff.getStaffPointsChange = function(params){
     var staffId = this.accountId;
     params.staffId = staffId;
     return API.staff.getStaffPointsChange(params);
+}
+
+/**
+ * 获取企业或员工月度积分变动统计(增加、消费、积分余额)
+ * @param params.staffId //可选参数，如果不写则查询当前企业所有员工的积分统计
+ * @param params
+ * @returns {*}
+ */
+staff.getStaffPointsChangeByMonth = function(params) {
+    var self = this;
+    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
+        .then(function(staff){
+            return staff.companyId;
+        })
+        .then(function(companyId){
+            params.companyId = companyId;
+            var count = params.count;
+            typeof count == 'number' ? "" : count = 6;
+            params.count = count;
+
+            return API.staff.getStaffPointsChangeByMonth(params);
+        })
 }
 
 /**

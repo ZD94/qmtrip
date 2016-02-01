@@ -8,6 +8,8 @@
  */
 var API = require("common/api");
 var auth = require("../auth");
+var _ = require('lodash');
+
 /**
  * @class travelPolicy 出差标准
  */
@@ -239,23 +241,38 @@ travelPolicy.getAllTravelPolicy = auth.checkPermission(["travelPolicy.query"],
                 throw {code: -1, msg: '无权限'};
             }
             options.where.companyId = staff.companyId;//只允许查询该企业下的差旅标准
+
             return API.travelPolicy.getAllTravelPolicy(options);
         });
 });
 
-travelPolicy.agencyGetAllTravelPolicy = function(params){
-    var user_id = this.accountId;
-    if(!params.where){
-        params.where = {}
-    }
+/**
+ * 代理商获取企业的差旅标准
+ * @param params
+ * @returns {*}
+ */
+travelPolicy.agencyGetAllTravelPolicy = agencyGetAllTravelPolicy;
+agencyGetAllTravelPolicy.required_params = ['companyId'];
+function agencyGetAllTravelPolicy(params){
+    var self = this;
+    var companyId = params.companyId;
+
+    var options = {
+        where: _.pick(params, ['name', 'planeLevel', 'planeDiscount', 'trainLevel', 'hotelLevel', 'hotelPrice', 'companyId', 'isChangeLevel', 'createAt'])
+    };
+
     if(params.columns){
-        params.attributes = options.columns;
-        delete params.columns;
+        options.attributes = params.columns;
     }
-    return API.company.checkAgencyCompany({companyId: params.where.companyId,userId: user_id})
+
+    if(params.order){
+        options.order = params.order;
+    }
+
+    return API.company.checkAgencyCompany({companyId: companyId, userId: self.accountId})
         .then(function(result){
             if(result){
-                return API.travelPolicy.getAllTravelPolicy(params);
+                return API.travelPolicy.getAllTravelPolicy(options);
             }else{
                 throw {code: -1, msg: '无权限'};
             }

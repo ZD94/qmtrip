@@ -258,24 +258,23 @@ function checkAgencyCompany(params){
     var userId = params.userId;
     var companyId = params.companyId;
     return Q.all([
-            Company.findById(companyId),
-            API.agency.getAgencyUser({id: userId})
-        ])
-        .spread(function(com,agency){
-            if(!com){
+        Company.findById(companyId, {attributes: ['agencyId', 'status']}),
+        API.agency.getAgencyUser({id: userId}, {attributes: ['agencyId', 'status', 'roleId']})
+    ])
+        .spread(function(c, agency){
+            if(!c || c.status == -2){
                 throw {code:-1, msg:"企业不存在"};
             }
 
-            if(!agency){
+            if(!agency || agency.status == -2){
                 throw {code:-1, msg:"代理商用户不存在"};
             }
 
-            if(com.agencyId == agency.agencyId && (agency.roleId == AGENCY_ROLE.OWNER || agency.roleId == AGENCY_ROLE.ADMIN)){
+            if(c.agencyId == agency.agencyId && (agency.roleId == AGENCY_ROLE.OWNER || agency.roleId == AGENCY_ROLE.ADMIN)){
                 return true;
             }else{
-                return false;
+                throw L.ERR.PERMISSION_DENY;
             }
-
         })
 }
 

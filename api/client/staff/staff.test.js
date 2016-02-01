@@ -136,25 +136,39 @@ describe("api/client/staff.js", function() {
     })
 //加积分
     it("#increaseStaffPoint should be ok", function(done) {
-        API.client.staff.increaseStaffPoint.call(agencySelf, {id: id, increasePoint: 2000, remark: "test差旅省钱加积分"}, function(err, result) {
+        API.client.staff.increaseStaffPoint.call(agencySelf, {id: accountId, increasePoint: 2000, remark: "test差旅省钱加积分"}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
             //console.log(result);
             done();
         });
     })
+
 //减积分
-    it("#decreaseStaffPoint should be ok", function(done) {
-        API.client.staff.decreaseStaffPoint.call(agencySelf, {id: id, decreasePoint: 1000, remark: "test兑换礼品减积分"}, function(err, result) {
-            assert.equal(err, null);
-            //console.log(err);
-            //console.log(result);
-            done();
-        });
+    describe("decreaseStaffPoint", function(){
+        before(function(done){
+            API.staff.increaseStaffPoint({id: accountId, companyId: companyId, accountId: agencySelf.accountId, increasePoint: 1000}, function(err, ret){
+                if(err){
+                    throw err;
+                }
+                assert.equal(ret, true);
+                done();
+            })
+        })
+
+        it("#decreaseStaffPoint should be ok", function(done) {
+            API.client.staff.decreaseStaffPoint.call(agencySelf, {id: accountId, decreasePoint: 1000, remark: "test兑换礼品减积分"}, function(err, ret) {
+                assert.equal(err, null);
+                assert.equal(ret, true);
+                done();
+            });
+        })
     })
+
+
 //积分记录查询
     it("#listAndPaginatePointChange should be ok", function(done) {
-        API.client.staff.listAndPaginatePointChange.call(ownerSelf, {staffId: id}, function(err, result) {
+        API.client.staff.listAndPaginatePointChange.call(ownerSelf, {staffId: id}, function(err, ret) {
             assert.equal(err, null);
             //console.log(err);
             //console.log(result);
@@ -166,7 +180,6 @@ describe("api/client/staff.js", function() {
         API.client.staff.getStaffPointsChange.call({accountId: id}, {staffId: id}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
-            console.log(result);
             done();
         });
     })
@@ -202,7 +215,6 @@ describe("api/client/staff.js", function() {
         API.client.staff.getStaffCountByCompany.call(ownerSelf, {companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
-            console.log(result);
             done();
         });
     })
@@ -284,6 +296,28 @@ describe("api/client/staff.js", function() {
                     throw err;
                 }
                 assert(ret.totalPoints >= 0);
+                done();
+            });
+        });
+
+        //查询月度积分变动统计
+        it("#getStaffPointsChangeByMonth should be ok", function(done) {
+            API.client.staff.getStaffPointsChangeByMonth.call(ownerSelf, {}, function(err, ret) {
+                if(err){
+                    throw err;
+                }
+                assert.equal(ret.length, 6);
+                done();
+            });
+        })
+
+        //查询月度积分变动统计
+        it("#getStaffPointsChangeByMonth should be ok", function(done) {
+            API.client.staff.getStaffPointsChangeByMonth.call(ownerSelf, {count: 7}, function(err, ret) {
+                if(err){
+                    throw err;
+                }
+                assert.equal(ret.length, 7);
                 done();
             });
         })
@@ -371,7 +405,6 @@ describe("api/client/staff.js", function() {
         API.client.staff.agencyGetStaffCountByCompany.call(agencySelf, {companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
-            console.log(result);
             done();
         });
     })
@@ -392,6 +425,7 @@ describe("api/client/staff.js", function() {
             done();
         });
     })
+
     /**************代理商管理企业员工*****************/
 
 
