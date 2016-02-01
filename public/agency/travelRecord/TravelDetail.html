@@ -58,7 +58,7 @@
                         <th width="135" height="40">实际支出</th>
                         <th width="135" height="40">出差票据</th>
                     </tr>
-                    <tr ng-if="planDetail.outTraffic.length!=0">
+                    <tr ng-if="outTraffic.length!=0">
                         <td>
                             <div class="icon web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
                             <div class="startplace">{{outTraffic.startPlace}}</div>
@@ -161,7 +161,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td align="center" colspan="2"><img src="/upload/get-img-file/{{outTraffic.newInvoice}}" alt=""></td>
+                        <td align="center" colspan="2"><img ng-src="{{outTrafficInvoiceImg || ''}}" alt="去程交通票据"></td>
                     </tr>
                 </table>
             </dd>
@@ -190,7 +190,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td align="center" colspan="2"><img src="/upload/get-img-file/{{hotel.newInvoice}}" alt=""></td>
+                        <td align="center" colspan="2"><img ng-src="{{hotelInvoiceImg || ''}}" alt=""></td>
                     </tr>
                 </table>
             </dd>
@@ -219,7 +219,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td align="center" colspan="2"><img src="/upload/get-img-file/{{backTraffic.newInvoice}}" alt=""></td>
+                        <td align="center" colspan="2"><img ng-src="{{backTrafficInvoiceImg || ''}}" alt=""></td>
                     </tr>
                 </table>
             </dd>
