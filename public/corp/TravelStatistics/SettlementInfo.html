@@ -21,14 +21,21 @@
 					{{ymcommon}}
 				</div>
 				<div>
-					<span></span>
+					<span>{{stat.NumOfStaff}}</span>
 					<em>完成出差人次</em>
 				</div>
 				<div>
-					
+					<span>￥{{stat.planMoney}}</span>
+					<em>计划支出</em>
 				</div>
-				<div></div>
-				<div></div>
+				<div>
+					<span>￥{{stat.expenditure}}</span>
+					<em>实际支出</em>
+				</div>
+				<div>
+					<span>￥{{(stat.planMoney - stat.expenditure)}}</span>
+					<em>实际支出</em>
+				</div>
 			</div>
 			<div class="settle_chart"></div>
 			<div class="settle_list">

@@ -100,55 +100,153 @@ var travelRecord=(function(){
             API.onload(function() {
                 API.agencyTripPlan.getTripPlanOrderById(orderId)
                     .then(function(result){
+                        var outTraffic = result.outTraffic[0];
+                        var backTraffic = result.backTraffic[0];
+                        var hotel = result.hotel[0];
+
+
                         $scope.planDetail = result;
                         $scope.outTraffic = $scope.planDetail.outTraffic[0];
                         $scope.backTraffic = $scope.planDetail.backTraffic[0];
                         $scope.hotel = $scope.planDetail.hotel[0];
-                        var outTraffic = $scope.planDetail.outTraffic;
-                        var backTraffic = $scope.planDetail.backTraffic;
-                        var hotel = $scope.planDetail.hotel;
-                        outTraffic.map(function(outTrafficauditUser){
-                            API.agency.getAgencyUser(outTrafficauditUser.auditUser)
-                                .then(function(result){
-                                    outTrafficauditUser.auditName = result;
+                        console.info("执行到A==>", hotel, backTraffic, outTraffic);
+
+                        var outTraffics = $scope.planDetail.outTraffic;
+                        var backTraffics = $scope.planDetail.backTraffic;
+                        var hotels = $scope.planDetail.hotel;
+
+                        if (hotel && hotel.newInvoice) {
+                            $scope.hotelInvoiceImg = "/consume/invoice/" + hotel.id;
+                            /*API.agencyTripPlan.getConsumeInvoiceImg({
+                                consumeId: hotel.id
+                            })
+                            .then(function(hotelInvoiceImg) {
+                                $scope.hotelInvoiceImg = hotelInvoiceImg;
+                                $scope.$apply();
+                            })
+                            .catch(function(err) {
+                                console.info(err);
+                            })*/
+                        }
+
+                        if (backTraffic && backTraffic.newInvoice) {
+                            $scope.backTrafficInvoiceImg = "/consume/invoice/" + backTraffic.id;
+                            /*API.agencyTripPlan.getConsumeInvoiceImg({
+                                    consumeId: backTraffic.id
+                                })
+                                .then(function(backTrafficInvoiceImg) {
+                                    $scope.backTrafficInvoiceImg = backTrafficInvoiceImg;
                                     $scope.$apply();
-                                    loading(true);
                                 })
                                 .catch(function(err) {
                                     console.info(err);
-                                });
-                        });
-                        backTraffic.map(function(backTrafficauditUser){
-                            API.agency.getAgencyUser(backTrafficauditUser.auditUser)
-                                .then(function(result){
-                                    backTrafficauditUser.auditName = result;
+                                })*/
+                        }
+
+                        if (outTraffic && outTraffic.newInvoice) {
+                            $scope.outTrafficInvoiceImg = "/consume/invoice/" + outTraffic.id;
+                            /*API.agencyTripPlan.getConsumeInvoiceImg({
+                                    consumeId: outTraffic.id
+                                })
+                                .then(function(outTrafficInvoiceImg) {
+                                    $scope.outTrafficInvoiceImg = outTrafficInvoiceImg;
                                     $scope.$apply();
-                                    loading(true);
                                 })
                                 .catch(function(err) {
                                     console.info(err);
-                                });
+                                })*/
+                        }
+
+                        outTraffics.map(function(outTraffic){
+                            return Q.all([
+                                API.agency.getAgencyUser(outTraffic.auditUser),
+                                API.agencyTripPlan.getConsumeInvoiceImg({consumeId: outTraffic.id})
+                            ])
+                            .spread(function(auditName, invoiceImg) {
+                                outTraffic.auditName = auditName;
+                                outTraffic.invoiceImg = invoiceImg;
+                                return outTraffic;
+                            })
+                            //
+                            //API.agency.getAgencyUser(outTrafficauditUser.auditUser)
+                            //    .then(function(result){
+                            //        outTrafficauditUser.auditName = result;
+                            //        $scope.$apply();
+                            //        loading(true);
+                            //    })
+                            //    .catch(function(err) {
+                            //        console.info(err);
+                            //    });
                         });
-                        hotel.map(function(hotelauditUser){
-                            API.agency.getAgencyUser(hotelauditUser.auditUser)
-                                .then(function(result){
-                                    hotelauditUser.auditName = result;
-                                    $scope.$apply();
-                                    loading(true);
+                        backTraffics.map(function(backTraffic){
+                            return Q.all([
+                                    API.agency.getAgencyUser(backTraffic.auditUser),
+                                    API.agencyTripPlan.getConsumeInvoiceImg({consumeId: backTraffic.id})
+                                ])
+                                .spread(function(auditName, invoiceImg) {
+                                    backTraffic.auditName = auditName;
+                                    backTraffic.invoiceImg = invoiceImg;
+                                    return backTraffic;
                                 })
-                                .catch(function(err) {
-                                    console.info(err);
-                                });
+
+                            //API.agency.getAgencyUser(backTrafficauditUser.auditUser)
+                            //    .then(function(result){
+                            //        backTrafficauditUser.auditName = result;
+                            //        $scope.$apply();
+                            //        loading(true);
+                            //    })
+                            //    .catch(function(err) {
+                            //        console.info(err);
+                            //    });
                         });
 
+                        hotels = hotels.map(function(hotel){
+                            return Q.all([
+                                    API.agency.getAgencyUser(hotel.auditUser),
+                                    API.agencyTripPlan.getConsumeInvoiceImg({consumeId: hotel.id})
+                                ])
+                                .spread(function(auditName, invoiceImg) {
+                                    hotel.auditName = auditName;
+                                    hotel.invoiceImg = invoiceImg;
+                                    return hotel;
+                                })
+                            //API.agency.getAgencyUser(hotel.auditUser)
+                            //    .then(function(result){
+                            //        hotel.auditName = result;
+                            //        $scope.$apply();
+                            //        loading(true);
+                            //    })
+                            //    .catch(function(err) {
+                            //        console.info(err);
+                            //    });
+                        });
 
+                        Q.all(hotels)
+                        .then(function(hotels) {
+                            $scope.hotels = hotels;
+                            $scope.$apply();
+                        })
+                        .catch(function(err) {
+                            console.info(err);
+                        })
 
+                        Q.all(outTraffics)
+                        .then(function(outTraffics) {
+                            $scope.outTraffics = outTraffics;
+                            $scope.$apply();
+                        })
+                        .catch(function(err) {
+                            console.info(err);
+                        })
 
-
-
-
-
-
+                        Q.all(backTraffics)
+                        .then(function(backTraffics) {
+                            $scope.backTraffics = backTraffics;
+                            $scope.$apply();
+                        })
+                        .catch(function(err) {
+                            console.info(err);
+                        })
 
                         API.staff.getStaffByAgency({id:$scope.planDetail.accountId})
                             .then(function(result){
