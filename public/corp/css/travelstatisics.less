@@ -1,0 +1,102 @@
+@import (reference) "common.less";
+@color-theme1:#118FD6;
+@color-theme2:#58b0e2;
+@color-white:#ffffff;
+@color-gray:#ededed;
+@color-footer:#292b2b;
+@color-alert-wrong:#de492a;
+@color-alert-right:#5cca2e;
+@color-text:#4a4a4a;
+@color-border:#d9d9d9;
+@color-border2:#e5e5e5;
+@border-radius-2:2px;
+@h30:30px;
+@h20:20px;
+@h18:18px;
+@h16:16px;
+@h15:15px;
+@h14:14px;
+@h12:12px;
+.settlement{
+	width: 1000px;
+	margin: 20px auto;
+	ul{
+		display: inline-flex;
+		li{
+			float: left;
+			display: inline-block;
+			width: 102px;
+			height: 40px;
+			line-height: 40px;
+			text-align: center;
+			&.on{
+				background: #fff;
+				border:1px solid #e5e5e5;
+				border-bottom: 0;
+			}
+		}
+	}
+	.settle_main{
+		background: #fff;
+		border:1px solid #e5e5e5;
+		margin-top: -1px;
+		padding-top: 20px;
+		.settle_title{
+			width: 958px;
+			height: 98px;
+			margin: 0 auto;
+			border:1px solid #e5e5e5;
+		}
+		.settle_list{
+			text-align: center;
+			table{
+				tr{
+					height: 56px;
+					line-height: 56px;
+					&:nth-child(1){
+						background: #ededed;
+						height: 38px;
+						line-height: 38px;
+					}
+				}
+			}
+		}
+		
+	}
+}
+/*积分三个统计块*/
+.point_block{
+  padding: 20px 90px;
+  div{
+	width: 250px;
+	height: 100px;
+	border: 1px solid @color-border2;
+	text-align: center;
+	&:first-child{
+	  float: left;
+	}
+	&:nth-child(2){
+	  margin: 0 auto;
+	}
+	&:nth-child(3){
+	  float: right;
+	  margin-top: -100px;
+	}
+	p{
+	  text-align: center;
+	  width: 100%;
+	  &:first-child{
+		color: @color-theme1;
+		font-size: @h18;
+		line-height: 40px;
+		margin-top: 10px;
+		height: 40px;
+	  }
+	  &:nth-child(2){
+		color: @color-text;
+		font-size: @h14;
+		line-height: 35px;
+	  }
+	}
+  }
+}

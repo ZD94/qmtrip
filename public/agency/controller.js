@@ -25,7 +25,8 @@ module.exports = (function(){
                 return;
             API.auth.logout()
                 .then(function (ret) {
-                    location.reload();
+                    window.location.href = "/staff.html#/auth/login";
+                    //location.reload();
                     //window.location.href = "/agency.html#/login/login?backurl=" + encodeURIComponent(window.location.href);
                 })
                 .catch(function (err) {

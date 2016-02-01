@@ -17,7 +17,7 @@ var TravelPolicy=(function(){
     TravelPolicy.PolicyListController = function($scope) {
         $("title").html("差旅标准");
         Myselect();
-        $(".left_nav li").removeClass("on").eq(2).addClass("on");
+        $(".left_nav li").removeClass("on").eq(3).addClass("on");
 
         API.onload(function(){
             API.staff.getCurrentStaff()
@@ -111,7 +111,7 @@ var TravelPolicy=(function(){
                         isChangeLevel:$(".create_policy .Ccheckbox").is(':checked'),
                         hotelLevel:$(".create_policy .ChotelTevel").html().replace('/',','),
                         hotelPrice:$(".create_policy .ChotelPrice").val(),
-                        companyTd:$scope.company_id
+                        companyId:$scope.company_id
                     })
                     .then(function(result){
                         Myalert("温馨提示","增加成功");

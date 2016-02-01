@@ -9,6 +9,7 @@
 	<link rel="stylesheet" type="text/css" href="/corp/css/user.css">
 	<link rel="stylesheet" type="text/css" href="/corp/css/staffmanage.css">
 	<link rel="stylesheet" type="text/css" href="/corp/css/staffawardplan.css">
+	<link rel="stylesheet" type="text/css" href="/corp/css/travelstatisics.css">
 	<link rel="stylesheet" type="text/css" href="/corp/css/policylist.css">
 	<!--<link rel="stylesheet" type="text/css" href="/corp/css/editcorp.css">-->
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
@@ -47,7 +48,8 @@
 			API.onload(function(){
 				API.auth.logout()
 					.then(function (data) {
-						location.reload();
+//						location.reload();
+							window.location.href = "/staff.html#/auth/login";
 					}).catch(function(error){
 						console.log(error);
 				}).done();
@@ -119,9 +121,9 @@
 			<li>
 				<a href="#/UsersFirst/UserMain"><span class="web-icon-font3">&#xe916;</span>差旅管理首页</a>
 			</li>
-			<!--<li>-->
-				<!--<a href=""><span class="web-icon-font3">&#xe908;</span>出差统计</a>-->
-			<!--</li>-->
+			<li>
+				<a href="#/TravelStatistics/SettlementInfo"><span class="web-icon-font3">&#xe908;</span>出差统计</a>
+			</li>
 			<li>
 				<a href="#/StaffManage/StaffInfoManage"><span class="web-icon-font3">&#xe91D;</span>员工信息管理</a>
 			</li>

@@ -37,6 +37,7 @@ COMMENT ON COLUMN staff.staffs.operator_id IS '操作人id';
 
 create table staff.point_changes (
     id uuid primary key,
+    company_id uuid,
     staff_id uuid,
     order_id uuid,
     status integer default 1,

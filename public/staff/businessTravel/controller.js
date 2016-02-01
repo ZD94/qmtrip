@@ -485,6 +485,7 @@ var businessTravel=(function(){
                     })
                 ])
                     .spread(function(ret1,ret2) {
+                        console.info (ret2);
                         $scope.companyId = ret1.companyId;
                         $scope.onlytraffic = ret2;
                         $(".creating").hide();
@@ -519,6 +520,7 @@ var businessTravel=(function(){
                     })
                 ])
                     .spread(function(ret1,ret2) {
+                        console.info (ret2);
                         $scope.companyId = ret1.companyId;
                         $scope.onlylive = ret2;
                         $(".creating").hide();
@@ -577,16 +579,16 @@ var businessTravel=(function(){
                     })
                 ])
                     .spread(function(ret1,ret2) {
+                        console.info (ret2);
                         $scope.companyId = ret1.companyId;
                         $scope.trafficlive = ret2;
                         $(".creating").hide();
                         $(".createresult,.tianxun").show();
-                        var tipMsg = '需手工处理';
-                        $scope.totalprice = ret2.price == -1 ? tipMsg: ret2.price;
-                        $scope.trafficprice = $scope.trafficlive.traffic == -1 ? tipMsg: $scope.trafficlive.traffic;
-                        $scope.liveprice = $scope.trafficlive.hotel == -1 ? tipMsg : $scope.trafficlive.hotel;
-                        $scope.goTraffic = ret2.goTraffic.price == -1 ? tipMsg: ret2.goTraffic.price;
-                        $scope.backTraffic = ret2.backTraffic.price == -1 ? tipMsg : ret2.backTraffic.price;
+                        $scope.totalprice = ret2.price;
+                        $scope.trafficprice = $scope.trafficlive.traffic;
+                        $scope.liveprice = $scope.trafficlive.hotel;
+                        $scope.goTraffic = ret2.goTraffic.price;
+                        $scope.backTraffic = ret2.backTraffic.price;
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -609,7 +611,7 @@ var businessTravel=(function(){
                     startAt:$scope.starttime,
                     startTime:$scope.livetime,
                     endTime:$scope.leavetime,
-                    budget:$scope.totalprice,
+                    budget:Number($scope.totalprice),
                     isNeedTraffic:$scope.tra,
                     isNeedHotel:$scope.liv,
                     remark:$scope.startplace+$scope.endplace+$scope.starttime+$scope.liveplace+$scope.livetime
@@ -625,7 +627,7 @@ var businessTravel=(function(){
                         hotelName:$scope.liveplace,
                         startTime:$scope.livetime,
                         endTime:$scope.leavetime,
-                        budget:$scope.liveprice,
+                        budget:Number($scope.liveprice),
                         invoiceType:2
                     }
                     consumeDetails.push(consumeDetails_hotel);
@@ -638,7 +640,7 @@ var businessTravel=(function(){
                         startPlace:$scope.startplace,
                         arrivalPlace:$scope.endplace,
                         startTime:$scope.starttime,
-                        budget:$scope.goTraffic,
+                        budget:Number($scope.goTraffic),
                         invoiceType:1
                     }
                     if($scope.endtime){
@@ -658,7 +660,7 @@ var businessTravel=(function(){
                         arrivalPlace:$scope.startplace,
                         startTime:$scope.starttime,
                         endTime:$scope.endtime,
-                        budget:$scope.backTraffic,
+                        budget:Number($scope.backTraffic),
                         invoiceType:1
                     }
                     if($scope.endtimelate){
@@ -667,7 +669,6 @@ var businessTravel=(function(){
                     consumeDetails.push(consumeDetails_backTraffic);
                 }
                 order.consumeDetails = consumeDetails;
-
                 API.tripPlan.savePlanOrder(order)
                     .then(function(result){
                         $scope.createTime = result.createAt;

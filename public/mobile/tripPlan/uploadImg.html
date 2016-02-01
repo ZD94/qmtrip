@@ -1,0 +1,89 @@
+<div class="uploadImg">
+	<div class="orderdetail">
+		<p><span>{{plan.createAt | date: 'yyyy-MM-dd'}}出差记录</span><em>{{name}}</em></p>
+		<p class="porgramtit">{{plan.description}}</p>
+		<p class="outline" ng-if="plan.outTraffic.length!=0">从{{outTraffic.startPlace}}到{{outTraffic.arrivalPlace}},预算￥{{outTraffic.budget}}</p>
+		<p class="address" ng-if="plan.hotel.length!=0">{{hotel.city}},{{hotel.hotelname}},预算￥{{hotel.budget}}</p>
+		<p class="backline" ng-if="plan.backTraffic.length!=0">从{{backTraffic.startPlace}}到{{backTraffic.arrivalPlace}},预算￥{{backTraffic.budget}}</p>
+	</div>
+	<div class="maincontent">
+		<div class="messagebox_content">
+			<img src="" alt="">
+		</div>
+
+		<div ng-if="plan.outTraffic.length!=0" class="outTraffic">
+			<div class="po_r" ng-class='outTraffic.invoice.length==0? "unupload": ""'
+				 ng-class="outTraffic.invoice.length!=0 && outTraffic.status =='0'?'imgdown':''"
+				 ng-class="outTraffic.invoice.length!=0 && outTraffic.status=='-1'?'fail': ''"
+				 ng-class="outTraffic.invoice.length!=0 && outTraffic.status=='1'? 'ready': ''">
+				<span>交通票据</span>
+				<span>去程</span>
+				<span ng-if="outTraffic.invoice.length==0">点击上传</span>
+				<span ng-if="outTraffic.invoice.length!=0 && outTraffic.status =='0'">点击修改</span>
+				<span ng-if="outTraffic.invoice.length!=0 && outTraffic.status=='-1'">重新上传</span>
+				<span ng-if="outTraffic.invoice.length!=0 && outTraffic.status=='1'">审核通过</span>
+				<img ng-if="outTraffic.invoice.length!=0" ng-src="/upload/get-img-file/{{outTraffic.newInvoice}}" style="width:100%;"/>
+
+				<span ng-show="isInWeixin">
+					<!--微信中上传-->
+					<input type="file" ng-click="uploadInvoice(outTraffic.id)"/>
+				</span>
+
+				<span ng-hide="isInWeixin">
+					<input type="file" nv-file-select="" id="{{outTraffic.id}}" uploader="TrafficUploader" class="file" ref="{{outTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png">
+				</span>
+			</div>
+
+
+		</div>
+		<div ng-if="plan.hotel.length!=0" class="hotel">
+			<div class="po_r" ng-class='hotel.invoice.length==0? "unupload": ""'
+				 ng-class="hotel.invoice.length!=0 && hotel.status =='0'?'imgdown':''"
+				 ng-class="hotel.invoice.length!=0 && hotel.status=='-1'?'fail': ''"
+				 ng-class="hotel.invoice.length!=0 && hotel.status=='1'? 'ready': ''">
+				<span>住宿发票</span>
+				<span></span>
+				<span ng-if="hotel.invoice.length==0">点击上传</span>
+				<span ng-if="hotel.invoice.length!=0 && hotel.status =='0'">点击修改</span>
+				<span ng-if="hotel.invoice.length!=0 && hotel.status=='-1'">重新上传</span>
+				<span ng-if="hotel.invoice.length!=0 && hotel.status=='1'">审核通过</span>
+				<img ng-if="hotel.invoice.length!=0" ng-src="/upload/get-img-file/{{hotel.newInvoice}}" style="width:100%;"/>
+				<span ng-show="isInWeixin">
+					<!--微信中上传-->
+					<input type="file" ng-click="uploadInvoice(hotel.id)"/>
+				</span>
+
+				<span ng-hide="isInWeixin">
+					<input type="file" nv-file-select="" uploader="HotelUploader" class="file" ref="{{hotel.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png">
+				</span>
+			</div>
+		</div>
+
+		<div ng-if="plan.backTraffic.length!=0" class="backTraffic">
+			<div class="po_r" ng-class='backTraffic.invoice.length==0? "unupload": ""'
+				 ng-class="backTraffic.invoice.length!=0 && hotel.status =='0'?'imgdown':''"
+				 ng-class="backTraffic.invoice.length!=0 && hotel.status=='-1'?'fail': ''"
+				 ng-class="backTraffic.invoice.length!=0 && hotel.status=='1'? 'ready': ''">
+				<span>交通票据</span>
+				<span>回程</span>
+				<span ng-if="backTraffic.invoice.length==0">点击上传</span>
+				<span ng-if="backTraffic.invoice.length!=0 && backTraffic.status =='0'">点击修改</span>
+				<span ng-if="backTraffic.invoice.length!=0 && backTraffic.status=='-1'">重新上传</span>
+				<span ng-if="backTraffic.invoice.length!=0 && backTraffic.status=='1'">审核通过</span>
+				<img ng-if="backTraffic.invoice.length!=0" ng-src="/upload/get-img-file/{{backTraffic.newInvoice}}" style="width:100%;"/>
+				<span ng-show="isInWeixin">
+					<!--微信中上传-->
+					<input type="file" ng-click="uploadInvoice(backTraffic.id)"/>
+				</span>
+
+				<span ng-hide="isInWeixin">
+					<input type="file" nv-file-select="" uploader="BackTrafficUploader" class="file" ref="{{backTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png">
+				</span>
+			</div>
+		</div>
+	</div>
+	<div class="footer">
+		<span>票据上传完成后提交审核，一经提交不可再修改</span>
+		<input type="button" ng-click="push()" value="提交审核" ng-disabled="plan.status==1? 'disabled': false">
+	</div>
+</div>

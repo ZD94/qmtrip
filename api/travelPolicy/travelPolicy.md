@@ -212,13 +212,13 @@
 | code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
 
->. 代理商获取企业所有差旅标准 API.travelPolicy.agencyGetAllTravelPolicy(options, callback);
+>. 代理商获取企业所有差旅标准 API.travelPolicy.agencyGetAllTravelPolicy(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
 | params                                | 传入参数             |json              |------
 | params.companyId                          |所属企业id           |uuid               |必填
-| params.where                        | 查询条件              |json               |{}
+| params.name           |标准名称    |string |选填
 | params.columns                         |选择查询列      |Array            |eg:options.columns = ['id', 'name']
 | params.order                         |排序            |string   |'name' || 'name desc'
 | callback                              | 回调函数             |function              |支持promise

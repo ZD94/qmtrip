@@ -380,9 +380,45 @@ var travelRecord=(function(){
                     })
             })
         }
+
+
+        //录入预算
+        $scope.editBudgetShow = function (id) {
+            $scope.editBudgetId = id;
+            $('.error').empty();
+            $(".budget").val("");
+            $(".editBudget").show();
+        }
+        $scope.editBudget = function () {
+            var budget = $(".editBudget .budget").val();
+            var moneyReg = /^\d+(.\d{1,2})?$/;
+            $('.error').empty();
+            if (budget=='') {
+                $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>预算不能为空");
+                return false;
+            }
+            if (!moneyReg.test(budget)) {
+                $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>预算格式不正确");
+                return false;
+            }
+            API.onload(function() {
+                API.agencyTripPlan.editTripPlanBudget({
+                    consumeId:$scope.editBudgetId,
+                    budget:budget
+                })
+                    .then(function(result){
+                        $(".invoicePass,.invoiceNoPass,.editBudget").hide();
+                        $scope.initTravelDetail();
+                    })
+                    .catch(function(err){
+                        console.info(err);
+                    })
+            })
+        }
+
         //关闭弹窗
         $scope.invoiceColse = function () {
-            $(".invoicePass,.invoiceNoPass").hide();
+            $(".invoicePass,.invoiceNoPass,.editBudget").hide();
             $(".success").hide();
         }
     }

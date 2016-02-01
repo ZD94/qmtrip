@@ -56,7 +56,6 @@ describe("api/auth/index.js", function() {
     it("#login should be ok", function(done) {
 
         API.auth.login({email: "test@test1231.com", pwd: "time9818"}, function(err, result) {
-            console.info(result);
             assert.equal(err, null);
             assert.equal(result.timestamp?true: false, true);
             done();

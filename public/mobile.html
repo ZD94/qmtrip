@@ -4,20 +4,17 @@
 	<meta charset="UTF-8">
 	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
 	<title>上传票据</title>
+	<link rel="stylesheet" type="text/css" href="/mobile/css/upload.css">
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
     <script type="text/javascript">
         var jQuery = $ = require('jquery');
     </script>
 	<!--out site script-->
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
-
-    <!--bundle script-->
-    <script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.api.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.notie.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.swiper.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.ngapp.js"></script>
-    <script type="text/javascript" src="/script/jquery.ajaxfileupload.js"></script>
     <script type="text/javascript" src="/mobile/controller.all.js"></script>
 
     <script type="text/javascript">
@@ -25,7 +22,7 @@
         var moment = require('moment');
         var md5 = require('md5');
         var Cookie = require('tiny-cookie');
-        var TLD = TLD_angular_app('qmtrip', 'mobile', '/uploadtoserver/uploadImg');
+        var TLD = TLD_angular_app('qmtrip', 'mobile', '/tripPlan/uploadImg');
         API.onlogin(function(){
             var backUrl = window.location.href;
             backUrl = encodeURIComponent(backUrl);
@@ -42,7 +39,6 @@
 	</script>
 </head>
 <body>
-adfadf
 	<div id="angular-view" ui-view></div>
 </body>
 </html>

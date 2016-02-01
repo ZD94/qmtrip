@@ -33,10 +33,12 @@ agency.registerAgency = function(params){
     var agencyId = uuid.v1() || params.agencyId;
     agency.id = agencyId;
     delete agency.userName;
+
     var pwd = params.pwd || md5('123456');
     var mobile = params.mobile;
     var email = params.email;
     var account = {email: email, mobile: mobile, pwd: pwd, type: 2};
+
     var agencyUser = {
         agencyId: agencyId,
         name: userName,
@@ -44,6 +46,7 @@ agency.registerAgency = function(params){
         email: email,
         roleId: 0
     };
+
     return API.auth.checkAccExist({type: 2, $or: [{mobile: mobile}, {email: email}]})
         .then(function(ret){
             if(!ret){
@@ -56,6 +59,7 @@ agency.registerAgency = function(params){
             var accountId = account.id;
             agency.createUser = accountId;
             agencyUser.id = accountId;
+
             return sequelize.transaction(function(t){
                 return Q.all([
                     Agency.create(agency, {transaction: t}),
@@ -68,6 +72,7 @@ agency.registerAgency = function(params){
         })
         .catch(function(err){
             logger.error(err);
+
             return Agency.findOne({where: {$or: [{mobile: mobile}, {email: email}], status: {$ne: -2}}, attributes: ['id']})
                 .then(function(agency){
                     if(agency){
@@ -92,16 +97,20 @@ agency.updateAgency = function(_agency){
             if(!agency || agency.status == -2){
                 throw L.ERR.AGENCY_NOT_EXIST;
             }
+
             if(agency.createUser != userId){
                 throw L.ERR.PERMISSION_DENY;
             }
+
             _agency.updateAt = utils.now();
+
             return Agency.update(_agency, {returning: true, where: {id: agencyId}, fields: Object.keys(_agency)})
         })
         .spread(function(rows, agencies){
             if(!rows || rows == "NaN"){
                 throw {code: -2, msg: '更新代理商信息失败'};
             }
+
             return agencies[0];
         })
 }
@@ -121,12 +130,13 @@ agency.getAgency = function(params){
             if(!agency || agency.status == -2){
                 throw L.ERR.AGENCY_NOT_EXIST;
             }
+
             return agency;
         })
 }
 
 /**
- * 获取代理商列表
+ * 管理员获取代理商列表
  * @param params
  * @returns {*}
  */
@@ -134,9 +144,8 @@ agency.listAgency = function(params){
     if(!params.userId){
         throw {code: -1, msg: '参数userId不能为空'};
     }
-    var userId = params.userId;
-    delete params.userId;
-    return Agency.findAll({where: params});
+
+    return Agency.findAll({where: {status: {$ne: -2}}});
 }
 
 /**
@@ -149,6 +158,7 @@ deleteAgency.required_params = ['agencyId', 'userId'];
 function deleteAgency(params){
     var agencyId = params.agencyId;
     var userId = params.userId;
+
     return Q.all([
         Agency.findById(agencyId, {attributes: ['createUser']}),
         AgencyUser.findAll({where: {agencyId: agencyId, status: {$ne: -2}}, attributes: ['id']})
@@ -157,9 +167,11 @@ function deleteAgency(params){
             if(!agency || agency.status == -2){
                 throw L.ERR.AGENCY_NOT_EXIST;
             }
+
             if(agency.createUser != userId){
                 throw L.ERR.PERMISSION_DENY;
             }
+
             return users;
         })
         .then(function(users){
@@ -194,10 +206,13 @@ createAgencyUser.optional_params = agency.agencyUserCols;
 function createAgencyUser(data){
     var _agencyUser = data;
     _agencyUser.id = data.accountId || uuid.v1();
+
     var accData = {email: _agencyUser.email, mobile: _agencyUser.mobile, pwd: "123456", type: 2};//初始密码暂定123456
+
     return API.auth.newAccount(accData)
         .then(function(account){
             _agencyUser.id = account.id;
+
             return AgencyUser.create(_agencyUser);
         })
 }
@@ -209,14 +224,17 @@ function createAgencyUser(data){
  */
 agency.deleteAgencyUser = function(params){
     var userId = params.id;
+
     if (!userId) {
         throw {code: -1, msg: "id不能为空"};
     }
+
     return AgencyUser.findById(userId, {attributes: ['status', 'id']})
         .then(function(user){
             if(!user || user.status == -2){
                 throw {code: -2, msg: '用户不存在'};
             }
+
             return Q.all([
                 API.auth.remove({accountId: userId}),
                 AgencyUser.update({status: -2}, {where: {id: userId}, fields: ['status']})
@@ -233,17 +251,28 @@ agency.deleteAgencyUser = function(params){
  * @param data
  * @returns {*}
  */
-agency.updateAgencyUser = function(data){
+agency.updateAgencyUser = updateAgencyUser;
+updateAgencyUser.required_params = ['id'];
+updateAgencyUser.optional_params = ['name', 'sex', 'mobile', 'avatar', 'roleId', 'status'];
+function updateAgencyUser(data){
     var id = data.id;
-    if(!id){
-        throw {code: -1, msg: "id不能为空"};
-    }
-    delete data.id;
-    var options = {};
-    options.where = {id: id};
-    options.returning = true;
-    return AgencyUser.update(data, options)
+
+    return AgencyUser.findById(id, {attributes: ['status']})
+        .then(function(user){
+            if(!user || user.status == -2) {
+                throw L.ERR.NOT_FOUND;
+            }
+
+            var options = {};
+            options.where = {id: id};
+            options.returning = true;
+
+            return AgencyUser.update(data, options);
+        })
         .spread(function(rows, users){
+            if(rows != 1) {
+                throw {code: -2, msg: '操作失败'};
+            }
             return users[0];
         })
 }
@@ -254,20 +283,23 @@ agency.updateAgencyUser = function(data){
  * @param data
  * @returns {*}
  */
-agency.getAgencyUser = function(params){
+agency.getAgencyUser = getAgencyUser;
+getAgencyUser.required_params = ['id'];
+
+function getAgencyUser(params){
     var id = params.id;
-    if(!id){
-        throw {code: -1, msg: "id不能为空"}
-    }
     var options = {};
+
     if(params.columns){
         options.attributes = params.columns;
     }
+
     return AgencyUser.findById(id, options)
         .then(function(agencyUser){
             if(!agencyUser || agencyUser.status == -2){
                 throw {code: -2, msg: '用户不存在'};
             }
+
             return agencyUser;
         })
 }

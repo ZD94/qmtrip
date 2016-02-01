@@ -35,16 +35,15 @@ company.fundsAccountCols = Object.keys(FundsAccounts.attributes);
  */
 company.domainIsExist = function(params) {
     var domain = params.domain;
-    return Q()
-    .then(function() {
-        if (!domain) {
-            throw {code: -1, msg: "domain not exist!"};
-        }
-        if (C.is_allow_domain_repeat) {
-            return false;
-        }
+    if (!domain) {
+        throw {code: -1, msg: "domain not exist!"};
+    }
 
-        return Models.Company.findOne({where: {domainName: domain}})
+    if (C.is_allow_domain_repeat) {
+        return false;
+    }
+
+    return Models.Company.findOne({where: {domainName: domain}})
         .then(function(company) {
             if (company) {
                 return true;
@@ -52,8 +51,8 @@ company.domainIsExist = function(params) {
                 return false;
             }
         })
-    });
 }
+
 
 /**
  * 创建企业
@@ -66,26 +65,32 @@ company.domainIsExist = function(params) {
 company.createCompany = createCompany;
 createCompany.required_params = ['createUser', 'name', 'domainName', 'mobile', 'email'];
 createCompany.optional_params = ['id', 'agencyId', 'description', 'telephone', 'remark'];
+
 function createCompany(params){
     var _company = params;
+
     if(!_company.id){
         _company.id = uuid.v1();
     }
+
     var funds = { id: _company.id };
+
     return sequelize.transaction(function(t){
         return Q.all([
             Company.create(_company, {transaction: t}),
             FundsAccounts.create(funds, {transaction: t})
         ])
     })
-        .spread(function(c){
+        .spread(function(c, f){
             return {
                 id: c.id,
                 status: c.status,
                 name: c.name,
                 mobile: c.mobile,
                 email: c.email,
-                createUser: c.createUser
+                createUser: c.createUser,
+                balance: f.balance,
+                staffReward: f.staffReward
             };
         });
 }
@@ -99,10 +104,12 @@ function createCompany(params){
  */
 company.isBlackDomain = function(params) {
     var domain = params.domain;
+
     if (!domain) {
         throw {code: -1, msg: "域名不存在或不合法"};
     }
     domain = domain.toLowerCase();
+
     return Models.BlackDomain.findOne({where: {domain: domain}})
         .then(function(result) {
             if (result) {
@@ -119,23 +126,28 @@ company.isBlackDomain = function(params) {
  */
 company.updateCompany = updateCompany;
 updateCompany.required_params = ['companyId'];
-updateCompany.optional_params = _.difference(_.keys(Company.attributes), ['companyNo', 'createUser', 'createAt', 'email']);
+updateCompany.optional_params = _.difference(_.keys(Company.attributes), ['id', 'companyNo', 'createUser', 'createAt', 'email']);
+
 function updateCompany(params){
     var companyId = params.companyId;
+
     return Company.findById(companyId, {attributes: ['createUser', 'status']})
         .then(function(company){
             if(!company || company.status == -2){
                 throw L.ERR.COMPANY_NOT_EXIST;
             }
+
             var companyId = params.companyId;
             delete params.companyId;
             params.updateAt = utils.now();
+
             return Company.update(params, {returning: true, where: {id: companyId}, fields: Object.keys(params)})
         })
         .spread(function(rownum, rows){
             if(!rownum || rownum == "NaN"){
                 throw {code: -2, msg: '更新企业信息失败'};
             }
+
             return rows[0];
         });
 }
@@ -151,14 +163,17 @@ getCompany.optional_params = ['columns'];
 function getCompany(params){
     var companyId = params.companyId;
     var options = {};
+
     if(params.columns){
         options.attributes = params.columns;
     }
+
     return Company.findById(companyId, options)
         .then(function(company){
             if(!company || company.status == -2){
                 throw L.ERR.COMPANY_NOT_EXIST;
             }
+
             return company;
         });
 }
@@ -175,13 +190,15 @@ function listCompany(params){
     var query = params;
     var agencyId = query.agencyId;
     var options = {
-        where: {agencyId: agencyId, status: {$ne: -2}}
+        where: {agencyId: agencyId, status: {$ne: -2}},
+        order: [['create_at', 'desc']]
     };
+
     if(query.columns){
         options.attributes =  query.columns;
         delete query.columns;
     }
-    options.order = [['create_at', 'desc']];
+
     return Company.findAll(options);
 }
 
@@ -194,6 +211,7 @@ company.pageCompany = pageCompany;
 function pageCompany(options){
     options.where.status = {$ne: -2};
     options.order = [['create_at', 'desc']];
+
     return Company.findAndCount(options)
         .then(function(ret){
             return new Paginate(options.offset/options.limit + 1, options.limit, ret.count, ret.rows);
@@ -208,6 +226,7 @@ company.getCompanyAgencies = getCompanyAgencies;
 getCompanyAgencies.required_params = ['companyId'];
 function getCompanyAgencies(params){
     var agencies = [];
+
     return API.company.getCompany({companyId: params.companyId})
         .then(function(company){
             return company;
@@ -239,22 +258,23 @@ function checkAgencyCompany(params){
     var userId = params.userId;
     var companyId = params.companyId;
     return Q.all([
-            Company.findById(companyId),
-            API.agency.getAgencyUser({id: userId})
-        ])
-        .spread(function(com,agency){
-            if(!com){
+        Company.findById(companyId, {attributes: ['agencyId', 'status']}),
+        API.agency.getAgencyUser({id: userId}, {attributes: ['agencyId', 'status', 'roleId']})
+    ])
+        .spread(function(c, agency){
+            if(!c || c.status == -2){
                 throw {code:-1, msg:"企业不存在"};
             }
-            if(!agency){
+
+            if(!agency || agency.status == -2){
                 throw {code:-1, msg:"代理商用户不存在"};
             }
-            if(com.agencyId == agency.agencyId && (agency.roleId == AGENCY_ROLE.OWNER || agency.roleId == AGENCY_ROLE.ADMIN)){
+
+            if(c.agencyId == agency.agencyId && (agency.roleId == AGENCY_ROLE.OWNER || agency.roleId == AGENCY_ROLE.ADMIN)){
                 return true;
             }else{
-                return false;
+                throw L.ERR.PERMISSION_DENY;
             }
-
         })
 }
 
@@ -269,11 +289,13 @@ deleteCompany.required_params = ['companyId', 'userId'];
 function deleteCompany(params){
     var companyId = params.companyId;
     var userId = params.userId;
+
     return Company.findById(companyId, {attributes: ['createUser']})
         .then(function(company){
             if(!company || company.status == -2){
                 throw L.ERR.COMPANY_NOT_EXIST;
             }
+
             if(company.createUser != userId){
                 throw L.ERR.PERMISSION_DENY;
             }
@@ -300,6 +322,7 @@ company.getCompanyFundsAccount = getCompanyFundsAccount;
 getCompanyFundsAccount.required_params = ['companyId'];
 function getCompanyFundsAccount(params){
     var companyId = params.companyId;
+
     return FundsAccounts.findById(companyId, {
         attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createAt', 'updateAt']
     })
@@ -307,6 +330,7 @@ function getCompanyFundsAccount(params){
             if(!funds || funds.status == -2){
                 throw {code: -4, msg: '企业资金账户不存在'};
             }
+
             return funds.toJSON();
         });
 }
@@ -326,6 +350,7 @@ function moneyChange(params){
             if(!funds || funds.status == -2){
                 throw {code: -2, msg: '企业资金账户不存在'};
             }
+
             var id = funds.id;
             var money = params.money;
             var userId = params.userId;
@@ -333,6 +358,7 @@ function moneyChange(params){
             var fundsUpdates = {
                 updateAt: utils.now()
             };
+
             var moneyChange = {
                 fundsAccountId: id,
                 status: type,
@@ -341,8 +367,10 @@ function moneyChange(params){
                 userId: userId,
                 remark: params.remark
             }
+
             var income = funds.income;
             var frozen = funds.frozen;
+
             if(type == 1){
                 if(money <= 0){
                     throw {code: -5, msg: '充值金额不正确'};
@@ -402,6 +430,7 @@ company.deleteCompanyByTest = function(params){
         .then(function(companys){
             return companys.map(function(c){
                 var id = c.id;
+
                 return FundsAccounts.destroy({where: {id: id}});
             })
         })

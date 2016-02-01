@@ -185,10 +185,9 @@ describe("api/client/travelPolicy.js", function() {
     })
     //得到所有差旅标准
     it("#agencyGetAllTravelPolicy should be ok", function(done) {
-        API.client.travelPolicy.agencyGetAllTravelPolicy.call(agencySelf, {companyId: companyId}, function(err, result) {
+        API.client.travelPolicy.agencyGetAllTravelPolicy.call(agencySelf, {companyId: companyId}, function(err, ret) {
             assert.equal(err, null);
-//            console.log(result);
-//                console.log(result.items);//item dataValues里存放的才是记录信息
+            assert(ret.length >= 0);
             done();
         });
     })
