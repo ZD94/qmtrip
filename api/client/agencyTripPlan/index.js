@@ -41,6 +41,14 @@ agencyTripPlan.getTripPlanOrderById = function(orderId){
         })
 }
 
+agencyTripPlan.getConsumeInvoiceImg = function(params) {
+    var accountId = this.accountId;
+    var consumeId = params.consumeId;
+    return API.tripPlan.getConsumeInvoiceImg({
+        consumeId: consumeId
+    });
+}
+
 
 /**
  * 代理商获取员工计划单分页列表
