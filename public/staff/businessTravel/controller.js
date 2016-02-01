@@ -367,6 +367,7 @@ var businessTravel=(function(){
             var dateReg = /^\d{4}-\d{2}-\d{2}$/;
             var timeReg = /^\d{2}:\d{2}$/;
             $scope.live_time = starttime;
+            $scope.leave_time = endtime;
             if (startplace == "") {
                 Myalert("温馨提示","请选择出发城市");
                 return false;
@@ -502,7 +503,7 @@ var businessTravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        Myalert("温馨提示","生成预算失败，请重新生成");
+                        Myconfirm("生成预算失败，请重新生成","确认","取消");
                     });
             })
         }
@@ -536,7 +537,7 @@ var businessTravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        Myalert("温馨提示","生成预算失败，请重新生成");
+                        Myconfirm("生成预算失败，请重新生成","确认","取消");
                     });
             })
 
@@ -598,7 +599,7 @@ var businessTravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        Myalert("温馨提示","生成预算失败，请重新生成");
+                        Myconfirm("生成预算失败，请重新生成","确认","取消");
                     });
             })
         }
