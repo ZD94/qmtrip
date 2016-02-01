@@ -519,7 +519,7 @@ function getVisitPermission(params){
                 throw {code: -4, msg: '查询记录不存在'};
             }
             if(consume.accountId == userId){//允许自己查看
-                return {allow: true, md5key: consume.newInvoice}
+                return {allow: true, fileId: consume.newInvoice}
             }else{
                 return PlanOrder.findById(consume.orderId)
                     .then(function(order){
@@ -529,7 +529,7 @@ function getVisitPermission(params){
                         return order.companyId;
                     })
                     .then(function(companyId){
-                        return API.company.getCompanyById(companyId)
+                        return API.company.getCompany({companyId: companyId})
                             .then(function(company){
                                 if(!company){
                                     throw {code: -5, msg: "企业不存在"}
@@ -541,13 +541,16 @@ function getVisitPermission(params){
                         return API.agency.getAgencyUser({id: userId})
                             .then(function(agencyUser){
                                 if(agencyUser && agencyUser.roleId != 1 && agencyUser.agencyId == agencyId){//允许代理商创建人管理员访问
-                                    return {allow: true, md5key: consume.newInvoice};
+                                    return {allow: true, fileId: consume.newInvoice};
                                 }else{
                                     return {allow: false};
                                 }
                             })
                     })
             }
+        })
+        .catch(function(err){
+            console.log(err);
         })
 
 }
@@ -844,4 +847,5 @@ function isObjNull(obj){
     return true;
 }
 
+tripPlan.__initHttpApp = require('./invoice');
 module.exports = tripPlan;

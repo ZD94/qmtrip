@@ -20,12 +20,12 @@ COMMENT ON COLUMN attachment.attachment.is_public IS '是否公开';
 
 create table attachment.owners (
     id serial primary key,
-    "key" varchar(32),
+    file_id UUID,
     "accountId" UUID,
     "createAt" timestamp default now(),
     "updateAt" timestamp default now()
 );
 
-create index idx_attachment_owners_key_accountId on attachment.owners("key", "accountId");
+create index idx_attachment_owners_key_accountId on attachment.owners("file_id", "accountId");
 
 

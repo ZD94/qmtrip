@@ -116,7 +116,8 @@ var travelRecord=(function(){
                         var hotels = $scope.planDetail.hotel;
 
                         if (hotel && hotel.newInvoice) {
-                            API.agencyTripPlan.getConsumeInvoiceImg({
+                            $scope.hotelInvoiceImg = "/consume/invoice/" + hotel.id;
+                            /*API.agencyTripPlan.getConsumeInvoiceImg({
                                 consumeId: hotel.id
                             })
                             .then(function(hotelInvoiceImg) {
@@ -125,11 +126,12 @@ var travelRecord=(function(){
                             })
                             .catch(function(err) {
                                 console.info(err);
-                            })
+                            })*/
                         }
 
                         if (backTraffic && backTraffic.newInvoice) {
-                            API.agencyTripPlan.getConsumeInvoiceImg({
+                            $scope.backTrafficInvoiceImg = "/consume/invoice/" + backTraffic.id;
+                            /*API.agencyTripPlan.getConsumeInvoiceImg({
                                     consumeId: backTraffic.id
                                 })
                                 .then(function(backTrafficInvoiceImg) {
@@ -138,11 +140,12 @@ var travelRecord=(function(){
                                 })
                                 .catch(function(err) {
                                     console.info(err);
-                                })
+                                })*/
                         }
 
                         if (outTraffic && outTraffic.newInvoice) {
-                            API.agencyTripPlan.getConsumeInvoiceImg({
+                            $scope.outTrafficInvoiceImg = "/consume/invoice/" + outTraffic.id;
+                            /*API.agencyTripPlan.getConsumeInvoiceImg({
                                     consumeId: outTraffic.id
                                 })
                                 .then(function(outTrafficInvoiceImg) {
@@ -151,7 +154,7 @@ var travelRecord=(function(){
                                 })
                                 .catch(function(err) {
                                     console.info(err);
-                                })
+                                })*/
                         }
 
                         outTraffics.map(function(outTraffic){

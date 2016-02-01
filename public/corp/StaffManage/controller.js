@@ -411,14 +411,14 @@ var staff = (function(){
             $(".staff_tab_content").hide();
             $(".staff_tab_import").hide();
             $(".staff_import_success").hide();
-            var md5key = $("#fileMd5key").val();
+            var fileId = $("#fileId").val();
             API.onload(function(){
                 API.staff.getCurrentStaff()//获取当前登录人员的id
                     .then(function(staffid){
                         //console.info(staffid);
                         //console.info(staffid.id);
-                        //console.info(md5key);
-                        API.staff.beforeImportExcel({accountId:staffid.id,md5key:md5key})
+                        //console.info(fileId);
+                        API.staff.beforeImportExcel({accountId:staffid.id,fileId:fileId})
                             .then(function(allData){
                                 //console.info(allData);
                                 //console.info(allData.noAddObj);

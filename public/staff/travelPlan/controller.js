@@ -41,9 +41,10 @@ var travelPlan=(function(){
                             onComplete: function(filename, response) {
                                 console.info(filename);
                                 $scope.ref = $(this).attr("ref");
-                                $scope.md5 = response.md5key;
+                                $scope.fileId = response.fileId;
                                 if (response.ret == 0 ) {
-                                    API.attachment.previewSelfImg({key: response.md5key}, function(err, img) {
+                                    //上传本人预览图片方法一通过api访问预览
+                                    API.attachment.previewSelfImg({fileId: response.fileId}, function(err, img) {
                                         if (err) {
                                             return alertDemo(err.msg);
                                         }
@@ -64,6 +65,23 @@ var travelPlan=(function(){
                                         position();
                                     })
 
+                                    //上传本人预览图片方法二通过路由访问预览
+                                    /*var invoiceType = "";// $scope.htmlStr = htmlStr;
+                                    if ($(this).attr("data-type") == 1) {
+                                        invoiceType = "去程交通票据";
+                                    }else if ($(this).attr("data-type") == 2) {
+                                        invoiceType = "住宿票据";
+                                    }
+                                    else if ($(this).attr("data-type") == 3) {
+                                        invoiceType = "返程交通票据";
+                                    }
+                                    $(".messagebox_content img").attr("src","/self/attachments/"+response.fileId);
+                                    $(".messagebtns em").html(invoiceType);
+                                    $("#uploadimg").show();
+                                    position();*/
+
+
+
                                 } else {
                                   alertDemo(response.errMsg);
                                 }
@@ -77,7 +95,7 @@ var travelPlan=(function(){
                         var invoice = {
                             userId: $scope.staff.id,
                             consumeId:$scope.ref,
-                            picture:$scope.md5
+                            picture:$scope.fileId
                         }
                         API.onload(function(){
                             API.tripPlan.uploadInvoice(invoice)
@@ -240,21 +258,21 @@ var travelPlan=(function(){
                     $scope.hotel = $scope.planDetail.hotel[0];
                     $scope.outTraffic = $scope.planDetail.outTraffic[0];
                     $scope.$apply();
+
                     $(".file").AjaxFileUpload({
                         action: '/upload/ajax-upload-file?type=invoice',
                         onComplete: function(filename, response) {
                             $scope.ref = $(this).attr("ref");
-                            $scope.md5 = response.md5key;
-
+                            $scope.fileId = response.fileId;
                             if (response.ret == 0 ) {
-                                API.attachment.previewSelfImg({
-                                    key: response.md5key
-                                }, function(err, img) {
+                                //上传本人预览图片方法一通过api访问预览
+                                API.attachment.previewSelfImg({fileId: response.fileId}, function(err, img) {
                                     if (err) {
                                         return alertDemo(err.msg);
                                     }
+
                                     var ImgSrc = img;
-                                    var invoiceType = "";
+                                    var invoiceType = "";// $scope.htmlStr = htmlStr;
                                     if ($(this).attr("data-type") == 1) {
                                         invoiceType = "去程交通票据";
                                     }else if ($(this).attr("data-type") == 2) {
@@ -269,11 +287,10 @@ var travelPlan=(function(){
                                     position();
                                 })
                             } else {
-                              alertDemo(response.errMsg);
+                                alertDemo(response.errMsg);
                             }
                         }
                     });
-                    
                 })
                 .catch(function(err){
                     console.info(err);
@@ -282,7 +299,7 @@ var travelPlan=(function(){
                     var invoice = {
                         userId: $scope.staff.id,
                         consumeId:$scope.ref,
-                        picture:$scope.md5
+                        picture:$scope.fileId
                     }
                     API.onload(function(){
                         API.tripPlan.uploadInvoice(invoice)
@@ -401,10 +418,7 @@ var travelPlan=(function(){
             })
             .then(function(invoiceDetail) {
                 $scope.InvoiceDetail = invoiceDetail;
-                console.info(invoiceDetail)
-                return API.attachment.previewSelfImg({
-                    key: invoiceDetail.newInvoice
-                })
+                return  API.attachment.previewSelfImg({fileId: invoiceDetail.newInvoice})
                 .then(function(invoiceImg) {
                     $scope.invoiceImg = invoiceImg;
                     $scope.$apply();

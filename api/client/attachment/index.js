@@ -14,11 +14,10 @@ var API = require("common/api");
  */
 attachment.getSelfAttachment = function(params) {
     var accountId = this.accountId;
-    var key = params.key;
-
+    var fileId = params.fileId;
     return API.attachment.getSelfAttachment({
         accountId: accountId,
-        key: key
+        fileId: fileId
     });
 }
 
@@ -31,10 +30,10 @@ attachment.getSelfAttachment = function(params) {
  */
 attachment.previewSelfImg = function(params) {
     var accountId = this.accountId;
-    var key = params.key;
+    var fileId = params.fileId;
     return API.attachment.getSelfAttachment({
         accountId: accountId,
-        key: key
+        fileId: fileId
     })
     .then(function(attachment) {
         return 'data:image/jpg;base64,' + attachment.content;

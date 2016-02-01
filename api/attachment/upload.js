@@ -12,88 +12,186 @@ var API = require("common/api");
 
 function uploadActionFile(req, res, next) {
     var user_id = req.cookies.user_id;
+    var token_id = req.cookies.token_id;
+    var token_sign = req.cookies.token_sign;
+    var timestamp = req.cookies.timestamp;
     var type = req.query.type;
-    var has_id = [];
     var form = new formidable.IncomingForm();
     form.uploadDir = config.upload.tmpDir;
     form.maxFieldsSize = config.upload.maxSize;
     form.keepExtensions = true;
     var filePath = '';//file.tmpFile.path
-    fs.exists(config.upload.tmpDir, function (exists) {
-        if(!exists){
-            fs.mkdir(config.upload.tmpDir);
-        }
-        form.parse(req, function (err, fields, file) {
-            if(file.tmpFile){
-                filePath = file.tmpFile.path;
-            } else {
-                for(var key in file){
-                    if( file[key].path && filePath==='' ){
-                        filePath = file[key].path;
-                    }
-                }
+
+    return API.auth.authentication({user_id: user_id, token_id: token_id, token_sign: token_sign, timestamp: timestamp})
+        .then(function(result){
+            if (!result) {
+                return false;
             }
-            var fileExt = filePath.substring(filePath.lastIndexOf('.'));
-            if (type && type == 'xls' && ('.xls.xlsx').indexOf(fileExt.toLowerCase()) === -1) {//导入excle
-                fs.exists(filePath, function (exists) {
-                    if(exists){
-                        fs.unlink(filePath);
+            fs.exists(config.upload.tmpDir, function (exists) {
+                if(!exists){
+                    fs.mkdir(config.upload.tmpDir);
+                }
+                form.parse(req, function (err, fields, file) {
+                    if(file.tmpFile){
+                        filePath = file.tmpFile.path;
+                    } else {
+                        for(var key in file){
+                            if( file[key].path && filePath==='' ){
+                                filePath = file[key].path;
+                            }
+                        }
                     }
+                    var fileExt = filePath.substring(filePath.lastIndexOf('.'));
+                    if (type && type == 'xls' && ('.xls.xlsx').indexOf(fileExt.toLowerCase()) === -1) {//导入excle
+                        fs.exists(filePath, function (exists) {
+                            if(exists){
+                                fs.unlink(filePath);
+                            }
+                        });
+                        res.send('{"ret":-1, "errMsg":"仅允许上传“xls,xlsx”格式文件"}');
+                        return;
+                    }
+
+                    fs.readFile(filePath, function (err, data) {
+                        if (err) {
+                            res.send('{"ret":-1, "errMsg":"'+err.message+'"}');
+                        } else {
+                            var file_type = file.tmpFile.type;
+                            var isPublic = false;
+                            if (type && type == 'avatar'){//上传头像
+                                isPublic = true;
+                            }
+
+                            var content = data.toString("base64")
+                            var contentType = file_type;
+                            API.attachments.saveAttachment({
+                                content: content,
+                                contentType: contentType,
+                                isPublic: isPublic
+                            })
+                                .then(function(fileid) {
+                                    return API.attachment.bindOwner({
+                                        accountId: user_id,
+                                        fileId: fileid
+                                    })
+                                        .then(function(own) {
+                                            return fileid
+                                        })
+                                })
+                                .then(function(fileid) {
+                                    fs.exists(filePath, function (exists) {
+                                        if(exists){
+                                            fs.unlink(filePath);
+                                            console.log("删除临时文件");
+                                        }
+                                    });
+                                    res.send('{"ret":0, "errMsg":"", "fileId":"'+fileid+'"}');
+                                })
+                                .catch(function(err){
+                                    console.log(err);
+                                }).done();
+                        }
+                    });
                 });
-                res.send('{"ret":-1, "errMsg":"仅允许上传“xls,xlsx”格式文件"}');
-                return;
-            }
-
-            fs.readFile(filePath, function (err, data) {
-                if (err) {
-                    res.send('{"ret":-1, "errMsg":"'+err.message+'"}');
-                } else {
-                    var file_type = file.tmpFile.type;
-                    var isPublic = false;
-                    if (type && type == 'avatar'){//上传头像
-                        isPublic = true;
-                    }
-
-                    var content = data.toString("base64")
-                    var contentType = file_type;
-
-                    API.attachments.saveAttachment({
-                        content: content,
-                        contentType: contentType,
-                        isPublic: isPublic
-                    })
-                    .then(function(key) {
-                        return API.attachment.bindOwner({
-                            accountId: user_id,
-                            key: key
-                        })
-                        .then(function() {
-                            return key
-                        })
-                    })
-                    .then(function(key) {
-                        res.send('{"ret":0, "errMsg":"", "md5key":"'+key+'"}');
-                    })
-                    .catch(next).done();
-                }
             });
         });
-    });
+
 }
 
-//function getImg(req, res, next) {
-//    var md5key = req.params.md5key;
-//    var userId = req.cookies.user_id;
-//    API.attachment.getSelfAttachment({key: md5key, accountId: userId})
-//    .then(function(attachment) {
-//        res.set("Content-Type", attachment.contentType);
-//        var content = new Buffer(attachment.content, 'base64');
-//        res.write(content);
-//        res.end();
-//    }).catch(function(err) {
-//        res.send(err);
-//    }).done();
-//}
+/**
+ * 访问公共文件
+ * @param req
+ * @param res
+ * @param next
+ * @returns {*}
+ */
+function getPublicFile(req, res, next) {
+    var attachmentPath = path.join(__dirname, "../../public/upload");
+    var id = req.params.id;
+    if (!id) {
+        return next(404);
+    }
+
+    return API.attachments.getAttachment({id: id})
+        .then(function(attachment) {
+
+            if (!attachment || !attachment.isPublic) {
+                return res.send(404);
+            }
+
+            fs.exists(attachmentPath, function(result) {
+                if (!result) {
+                    fs.mkdir(attachmentPath, function(err) {
+                        if (err) {
+                            return next(err);
+                        }
+
+                        doneAttachmentDir(attachment);
+                    })
+                }
+                doneAttachmentDir(attachment);
+            });
+        })
+        .catch(next).done();
+
+    function doneAttachmentDir(attachment) {
+        ////写入缓存文件
+        var filepath = path.join(attachmentPath, attachment.id);
+        fs.writeFile(filepath, attachment.content, {encoding: "binary"}, function(err) {
+            if (err) {
+                return next(err);
+            }
+
+            res.set("Content-Type", attachment.contentType);
+            var content = new Buffer(attachment.content, "base64");
+            res.write(content);
+            res.end();
+        })
+    }
+}
+
+/**
+ * 上传者访问上传附件（eg:上传前预览文件）
+ * @param req
+ * @param res
+ * @param next
+ * @returns {*}
+ */
+function getSelfFile(req, res, next){
+    var fileId = req.params.id;
+    var accountId = req.cookies.user_id;
+    var token_id = req.cookies.token_id;
+    var token_sign = req.cookies.token_sign;
+    var timestamp = req.cookies.timestamp;
+    if (!fileId) {
+        return next(404);
+    }
+    return API.auth.authentication({user_id: accountId, token_id: token_id, token_sign: token_sign, timestamp: timestamp})
+        .then(function(result){
+            if (!result) {
+                return false;
+            }
+
+            return API.attachment.getOwner({fileId: fileId, user_id: accountId})
+                .then(function(result){
+                    if(result){
+                        return API.attachments.getAttachment({id: fileId})
+                            .then(function(attachment) {
+                                res.set("Content-Type", attachment.contentType);
+                                var content = new Buffer(attachment.content, 'base64');
+                                res.write(content);
+                                res.end();
+                            })
+                            .catch(function(err){
+                                console.log(err);
+                            }).done();
+                    }else{
+                        return next(404);;
+                    }
+                })
+        })
+
+}
 
 function downloadExcle(req, res, next){
     var fileName = req.params.fileName;
@@ -124,72 +222,6 @@ function downloadExcle(req, res, next){
     })
 }
 
-function uploadActionFile_2(req, res, next) {
-    var user_id = req.cookies.user_id;
-    var type = req.query.type;
-    var isPublic = req.query.isPublic || false;
-    var has_id = [];
-    var form = new formidable.IncomingForm();
-    form.uploadDir = config.upload.tmpDir;
-    form.maxFieldsSize = config.upload.maxSize;
-    form.keepExtensions = true;
-    var filePath = '';//file.tmpFile.path
-    fs.exists(config.upload.tmpDir, function (exists) {
-        if(!exists){
-            fs.mkdir(config.upload.tmpDir);
-        }
-        form.parse(req, function (err, fields, file) {
-            if(file.tmpFile){
-                filePath = file.tmpFile.path;
-            } else {
-                for(var key in file){
-                    if( file[key].path && filePath==='' ){
-                        filePath = file[key].path;
-                    }
-                }
-            }
-            var fileExt = filePath.substring(filePath.lastIndexOf('.'));
-            if (type && type == 'xls' && ('.xls.xlsx').indexOf(fileExt.toLowerCase()) === -1) {//导入excle
-                fs.exists(filePath, function (exists) {
-                    if(exists){
-                        fs.unlink(filePath);
-                    }
-                });
-                res.send('{"ret":-1, "errMsg":"仅允许上传“xls,xlsx”格式文件"}');
-                return;
-            }
-            fs.readFile(filePath, function (err, data) {
-                if (err) {
-                    res.send('{"ret":-1, "errMsg":"'+err.message+'"}');
-                } else {
-                    var md5 = crypto.createHash("md5");
-                    var md5key = md5.update(data).digest("hex");
-                    has_id.push(user_id);
-                    var imgObj = {md5key: md5key,content: data, userId: user_id, isPublic: isPublic, hasId: JSON.stringify(has_id),fileType:fileExt};
-                    return API.attachment.getAttachment({md5key: md5key,userId: user_id})
-                        .then(function(att){
-                            if(!att){
-                                return API.attachment.createAttachment(imgObj);
-                            }else{
-                                return att;
-                            }
-                        })
-                        .then(function(){
-                            fs.exists(filePath, function (exists) {
-                                if(exists){
-                                    fs.unlink(filePath);
-                                    console.log("删除临时文件");
-                                }
-                            });
-                            res.send('{"ret":0, "errMsg":"", "md5key":"'+md5key+'"}');
-                        })
-                        .catch(next).done();
-                }
-            });
-        });
-    });
-
-}
 
 /**
  * 访问公有附件
@@ -197,7 +229,7 @@ function uploadActionFile_2(req, res, next) {
  * @param res
  * @param next
  */
-function getUploadFile(req, res, next) {
+/*function getUploadFile(req, res, next) {
     var md5key = req.params.md5key;
     var userId = req.cookies.user_id;
     API.attachment.getAttachment({md5key: md5key, userId: userId, isPublic: true})
@@ -222,32 +254,16 @@ function getUploadFile(req, res, next) {
             }
         })
         .catch(next).done();
-}
-
-function getTripplanInvoice(req, res, next){
-    var consumeId = req.params.id;
-    var userId = req.cookies.user_id;
-    API.tripPlan.getVisitPermission({consumeId: consumeId, userId: userId})
-        .then(function(data){
-            if(data.allow){
-                return API.attachment.getAttachment({md5key: data.md5key})
-                    .then(function(result){
-                        res.write(result.content, "hex");
-                        res.end();
-                    })
-            }else{
-                res.write("您没有权限访问该图片", "utf-8");
-                res.end();
-            }
-        })
-}
+}*/
 
 
 module.exports = function(app){
     app.post('/upload/ajax-upload-file', uploadActionFile);
+    app.get("/attachments/:id", getPublicFile);
+    app.get("/self/attachments/:id", getSelfFile);
     //app.get('/upload/get-img-file/:md5key', getImg);
     app.get('/download/excle-file/:fileName', downloadExcle);
-    app.get('/upload/:md5key', getUploadFile);
-    app.get('/tripplan/:id/invoice', getTripplanInvoice);
+//    app.get('/upload/:md5key', getUploadFile);
+
 };
 

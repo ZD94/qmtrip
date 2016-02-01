@@ -23,12 +23,25 @@ var attachment = {};
  * @param {UUID} params.accountId
  */
 attachment.bindOwner = function(params) {
-    var key = params.key;
+    var fileId = params.fileId;
     var accountId = params.accountId;
     return Owner.create({
-        key: key,
+        fileId: fileId,
         accountId: accountId
     })
+}
+
+attachment.getOwner = function(params) {
+    var fileId = params.fileId;
+    var accountId = params.user_id;
+    return Owner.findOne({where:{accountId: accountId, fileId: fileId}})
+        .then(function(owner){
+            if(owner){
+                return true;
+            }else{
+                return false;
+            }
+        })
 }
 
 /**
@@ -39,14 +52,14 @@ attachment.bindOwner = function(params) {
  * @param {UUID} params.accountId
  */
 attachment.getSelfAttachment = function(params) {
-    var key = params.key;
+    var fileId = params.fileId;
     var accountId = params.accountId;
-    return Owner.findOne({where: {key: key, accountId: accountId}})
+    return Owner.findOne({where: {fileId: fileId, accountId: accountId}})
     .then(function(owner) {
         if (!owner) {
             throw L.ERR.PERMISSION_DENY;
         }
-        return API.attachments.getAttachment({id: key});
+        return API.attachments.getAttachment({id: fileId});
     })
 }
 
@@ -160,11 +173,11 @@ attachment.getAllAttachment = function(params){
  * @param params
  * @returns {*}
  */
-attachment.getAttachment = function(params){
+/*attachment.getAttachment = function(params){
     var options = {};
     options.where = params;
     return attachmentModel.findOne(options);
-}
+}*/
 
 /**
  * 通过md5key查询附件记录并组合has_id
