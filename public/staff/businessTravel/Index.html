@@ -19,8 +19,8 @@
                 <li class="live" ng-click="chooseLive()"><img src="staff/images/live2.jpg" class="liveimg"></li>
             </ul>
             <div class="nextBtn">
-                <input type="button" value="下一步" class="common_btn2 w308" ng-if="trafficimg=='none'&&liveimg=='none'">
-                <input type="button" value="下一步" class="common_btn1 w308" ng-if="trafficimg!='none' || liveimg!='none'" ng-click="NextStep()">
+                <input type="button" value="下一步" class="common_btn2 w308" ng-if="(trafficimg=='none' && liveimg=='none') || (purposename==undefined || purposename=='')">
+                <input type="button" value="下一步" class="common_btn1 w308" ng-if="(trafficimg!='none' || liveimg!='none') && (purposename!=undefined && purposename!='')" ng-click="NextStep()">
             </div>
         </div>
     </section>
