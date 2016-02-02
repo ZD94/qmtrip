@@ -56,6 +56,15 @@
                             <select name="select" id="staffStandard" class="" ng-model="selectkey" ng-options="item.val as item.name for item in selectClass"></select>
                         </li>
                         <li>
+                            <!--<span style="color: #f56d23;padding-right: 5px;">*</span>权限:-->
+                            <!--<dl class="selectbox w198" style="margin-left: 12px;">-->
+                                <!--<dt class="common_select CplaneDiscount h34 w188"  name="select" id="staffPower">请设置权限</dt>-->
+                                <!--<dd class="common_option">-->
+                                    <!--<div value="2">管理员</div>-->
+                                    <!--<div value="1">普通员工</div>-->
+                                <!--</dd>-->
+                                <!--<div style="clear: both;"></div>-->
+                            <!--</dl>-->
                             <span style="color: #f56d23;padding-right: 5px;">*</span>权限:
                             <select name="select" id="staffPower" class="" ng-disabled="roleId == 2">
                                 <option value="">请设置权限</option>
