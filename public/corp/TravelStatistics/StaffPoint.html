@@ -31,11 +31,11 @@
                         <td>兑换积分</td>
                         <td>积分余量</td>
                     </tr>
-                    <tr>
-                        <td>{{}}</td>
-                        <td>{{}}</td>
-                        <td>{{}}</td>
-                        <td>{{}}</td>
+                    <tr ng-repeat="item in points">
+                        <td>{{item.month}}</td>
+                        <td>{{item.increase}}</td>
+                        <td>{{item.decrease}}</td>
+                        <td>{{item.balance}}</td>
                     </tr>
                 </table>
             </div>
