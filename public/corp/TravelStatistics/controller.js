@@ -84,7 +84,38 @@ var TravelStatistics = (function(){
     }
     /*出差记录页面*/
     TravelStatistics.PlanListController = function($scope) {
-        alert("zzzz");
+        // alert("zzzz");
+        $("title").html("员工积分");
+        $(".left_nav li").removeClass("on").eq(1).addClass("on");
+        API.onload(function(){
+            var params = {page:$scope.page}
+            API.tripPlan.pageTripPlanOrderByCompany(params)
+                .then(function(list){
+                    // console.info(list);
+                    // $scope.planlist = list.items;
+                    var planlist = list.items;
+                    planlist.map(function(plan){
+                        Q.all([
+                            API.tripPlan.getTripPlanOrderById(plan.id),
+                            API.staff.getStaff({id:plan.accountId})
+                        ])
+                            .spread(function(order,staff){
+                                // console.info(order);
+                                // console.info(staff);
+                                plan.staffName = staff.staff.name;
+                                console.info(plan);
+                                $scope.planlist = planlist;
+                                $scope.$apply();
+                            })
+                            .catch(function(err){
+                                console.info(err);
+                            })
+                    })
+                })
+                .catch(function(err){
+                    console.info(err)
+                })
+        })
     }
     return TravelStatistics;
 })();

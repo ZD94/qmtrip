@@ -20,51 +20,6 @@ var travelPlan=(function(){
         $(".staff_menu_t ul a").eq(1).find("li").addClass("on");
         loading(false);
         $("title").html("出差单列表");
-        //uploadinvoice
-        var uploadConf = {
-            url: "/upload/ajax-upload-file?type=invoice",
-            alias: "tmpFile",
-            autoUpload: true
-        };
-
-        var trafficUploadConfig = JSON.parse(JSON.stringify(uploadConf));
-        trafficUploadConfig.onCompleteItem= function (item, resp) {
-            uploadInvoice($scope.outTraffic.id, resp.md5key);
-        }
-
-        var hotelUploadConfig = JSON.parse(JSON.stringify(uploadConf));
-        hotelUploadConfig.onCompleteItem = function(item, resp) {
-            console.info(item)
-            console.info(resp)
-            uploadInvoice($scope.hotel.id, resp.md5key);
-        }
-
-        var backTrafficUploadConfig = JSON.parse(JSON.stringify(uploadConf));
-        backTrafficUploadConfig.onCompleteItem = function(item, resp) {
-            uploadInvoice($scope.backTraffic.id, resp.md5key);
-        }
-
-        function uploadInvoice(consumeId, picture) {
-            API.tripPlan.uploadInvoice({
-                    consumeId: consumeId,
-                    picture: picture
-                })
-                .then(function() {
-                    alert("上传成功");
-                    window.location.reload();
-                    //var ImgSrc = '/upload/get-img-file/'+resp.md5key;
-                    //$(".messagebox_content img").attr("src",ImgSrc);
-                    //$(".messagebtns em").html('去程交通票据');
-                    //$("#uploadimg").show();
-                })
-                .catch(function(err) {
-                    alert(err.msg);
-                })
-        }
-
-//        $scope.TrafficUploader = new FileUploader(trafficUploadConfig);
-//        $scope.HotelUploader = new FileUploader(hotelUploadConfig);
-//        $scope.BackTrafficUploader = new FileUploader(backTrafficUploadConfig);
         //待上传票据列表
         $scope.initPlanList = function () {
             API.onload(function() {

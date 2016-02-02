@@ -2,42 +2,33 @@
     <div class="settlement">
         <ul>
             <li>结算信息</li>
-            <li class="on">员工积分</li>
+            <li>员工积分</li>
             <li>出差分布</li>
-            <li>出差记录</li>
+            <li class="on">出差记录</li>
         </ul>
         <div class="settle_main">
-            <div class="point_block">
-                <div>
-                    <p>{{allPoints}}</p>
-                    <p>总积分</p>
-                </div>
-                <div>
-                    <p>{{allPoints - remianPoints}}</p>
-                    <p>已兑积分</p>
-                </div>
-                <div>
-                    <p>{{remianPoints}}</p>
-                    <p>积分余量</p>
-                </div>
-                <span style="display: block;width: 100%;clear: both;"></span>
-            </div>
             <div class="settle_chart"></div>
             <div class="settle_list">
                 <table width="100%">
                     <tr>
-                        <td width="150">时间</td>
-                        <td>新增积分</td>
-                        <td>兑换积分</td>
-                        <td>积分余量</td>
-                        <td width="150">时间</td>
-                        <td>新增积分</td>
-                        <td>兑换积分</td>
-                        <td>积分余量</td>
-                        <td width="150">时间</td>
-                        <td>新增积分</td>
+                        <td>姓名</td>
+                        <td>出发时间</td>
+                        <td>服务</td>
+                        <td>内容简要</td>
+                        <td>项目</td>
+                        <td>预算</td>
+                        <td>实际价格</td>
+                        <td>节省</td>
+                        <td>获得积分</td>
+                        <td>操作</td>
                     </tr>
-                    <tr>
+                    <tr ng-repeat="item in planlist">
+                        <td>{{item.staffName}}</td>
+                        <td>{{item.startAt}}</td>
+                        <td>{{}}</td>
+                        <td>{{}}</td>
+                        <td>{{}}</td>
+                        <td>{{}}</td>
                         <td>{{}}</td>
                         <td>{{}}</td>
                         <td>{{}}</td>
