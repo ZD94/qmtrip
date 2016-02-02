@@ -59,10 +59,11 @@ var TravelStatistics = (function(){
                 .then(function(staff){
                     console.info(staff);
                     var companyId = staff.companyId;
+                    var staffId = staff.id;
                     console.info(companyId);
                     return Q.all([
-                            API.staff.statStaffPointsByCompany({companyId:companyId}), //企业积分统计，总积分，可用积分。
-                            API.staff.listAndPaginatePointChange()
+                            API.staff.statStaffPointsByCompany({}), //企业积分统计，总积分，可用积分。
+                            API.staff.getStaffPointsChangeByMonth({})//企业统计员工所有变动记录
                             ])
                             .spread(function(point,piontschange){
                                 console.info(point);
@@ -70,12 +71,9 @@ var TravelStatistics = (function(){
                                 $scope.remianPoints = point.balancePoints;
 
                                 console.info(piontschange);
+                                $scope.points = piontschange;
 
                                 $scope.$apply();
-                                //return Q.all()
-                                //    .then(function(){
-                                //        $scope.$apply();
-                                //    })
                             })
                             .catch(function(err) {
                                 console.info(err);
