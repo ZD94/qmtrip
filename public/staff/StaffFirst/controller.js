@@ -20,7 +20,8 @@ var StaffFirst = (function(){
 		dataloading(false);
 		loading(true);
 		$("title").html("首页");
-		$(".left_nav li").removeClass("on").eq(0).addClass("on");
+		$(".staff_menu_t ul li").removeClass("on");
+		$(".staff_menu_t ul a").eq(0).find("li").addClass("on");
 		//企业管理首页信息
 		$scope.initStaffUser = function(){
 			// loading(true)
