@@ -9,10 +9,60 @@ var config = require('config');
 var utils = require("common/utils");
 var sequelize = require("common/model").importModel("./models");
 var attachmentModel = sequelize.models.Attachment;
+var Owner = sequelize.models.Owner;
 var Paginate = require("../../common/paginate").Paginate;
 var L = require("../../common/language");
 var API = require("../../common/api");
 var attachment = {};
+
+/**
+ * 绑定拥有者
+ *
+ * @param {Object} params
+ * @param {String} params.key
+ * @param {UUID} params.accountId
+ */
+attachment.bindOwner = function(params) {
+    var fileId = params.fileId;
+    var accountId = params.accountId;
+    return Owner.create({
+        fileId: fileId,
+        accountId: accountId
+    })
+}
+
+attachment.getOwner = function(params) {
+    var fileId = params.fileId;
+    var accountId = params.user_id;
+    return Owner.findOne({where:{accountId: accountId, fileId: fileId}})
+        .then(function(owner){
+            if(owner){
+                return true;
+            }else{
+                return false;
+            }
+        })
+}
+
+/**
+ * 获取自己上传的附件
+ *
+ * @param {Object} params
+ * @param {String} params.key
+ * @param {UUID} params.accountId
+ */
+attachment.getSelfAttachment = function(params) {
+    var fileId = params.fileId;
+    var accountId = params.accountId;
+    return Owner.findOne({where: {fileId: fileId, accountId: accountId}})
+    .then(function(owner) {
+        if (!owner) {
+            throw L.ERR.PERMISSION_DENY;
+        }
+        return API.attachments.getAttachment({id: fileId});
+    })
+}
+
 
 /**
  * 创建附件记录
@@ -123,11 +173,11 @@ attachment.getAllAttachment = function(params){
  * @param params
  * @returns {*}
  */
-attachment.getAttachment = function(params){
+/*attachment.getAttachment = function(params){
     var options = {};
     options.where = params;
     return attachmentModel.findOne(options);
-}
+}*/
 
 /**
  * 通过md5key查询附件记录并组合has_id

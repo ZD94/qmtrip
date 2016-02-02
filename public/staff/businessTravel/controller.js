@@ -366,6 +366,8 @@ var businessTravel=(function(){
                 parameter = $("form").serialize();//表单所有数据传参
             var dateReg = /^\d{4}-\d{2}-\d{2}$/;
             var timeReg = /^\d{2}:\d{2}$/;
+            $scope.live_time = starttime;
+            $scope.leave_time = endtime;
             if (startplace == "") {
                 Myalert("温馨提示","请选择出发城市");
                 return false;
@@ -429,6 +431,10 @@ var businessTravel=(function(){
         //返回上一步
         $scope.prevstep = function () {
             window.location.href = "#/businessTravel/Index";
+        }
+        $scope.prevstep2 = function () {
+            $(".live_step1").hide();
+            $(".traffic_step1").show();
         }
 
     }
@@ -497,7 +503,7 @@ var businessTravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        Myalert("温馨提示","生成预算失败，请重新生成");
+                        Myconfirm("生成预算失败，请重新生成","确认","取消");
                     });
             })
         }
@@ -531,7 +537,7 @@ var businessTravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        Myalert("温馨提示","生成预算失败，请重新生成");
+                        Myconfirm("生成预算失败，请重新生成","确认","取消");
                     });
             })
 
@@ -593,7 +599,7 @@ var businessTravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        Myalert("温馨提示","生成预算失败，请重新生成");
+                        Myconfirm("生成预算失败，请重新生成","确认","取消");
                     });
             })
         }

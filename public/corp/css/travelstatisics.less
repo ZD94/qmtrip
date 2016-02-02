@@ -29,6 +29,8 @@
 			height: 40px;
 			line-height: 40px;
 			text-align: center;
+			cursor: pointer;
+			border-radius: 2px;
 			&.on{
 				background: #fff;
 				border:1px solid #e5e5e5;
@@ -44,8 +46,41 @@
 		.settle_title{
 			width: 958px;
 			height: 98px;
-			margin: 0 auto;
+			margin: 0 auto 20px;
 			border:1px solid #e5e5e5;
+			background: #ededed;
+			div{
+				float: left;
+				width: 189px;
+				height: 60px;
+				margin-top: 20px;
+				text-align: center;
+				position: relative;
+				border-right: 1px solid #fff;
+				&:nth-child(1){
+					background: #fff;
+					width: 197px;
+					height: 98px;
+					margin: 0;
+					border-right: 0;
+				}
+				&:nth-child(2){
+					border-left: 1px solid #e5e5e5;
+				}
+				&:last-child{
+					border-right: 0;
+				}
+				span{
+					display: inherit;
+					line-height: 30px;
+					color: #14c1fd;
+					font-weight: bold;
+				}
+				em{
+					font-style: normal;
+					line-height: 30px;
+				}
+			}
 		}
 		.settle_list{
 			text-align: center;

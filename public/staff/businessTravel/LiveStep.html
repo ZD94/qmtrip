@@ -42,7 +42,8 @@
             </tr>
             <tr>
                 <td colspan="3" height="60" align="center">
-                    <input type="button" value="生成预算单" class="common_btn1 w308" ng-click="budget()" style="float: none; margin: 0 auto;">
+                    <input type="button" value="生成预算单" class="common_btn2 w308" ng-if="(live_time==undefined || live_time=='') || (leave_time==undefined || leave_time=='') || (endplacename==undefined || endplacename=='')" style="float: none; margin: 0 auto;">
+                    <input type="button" value="生成预算单" class="common_btn1 w308" ng-if="(live_time!=undefined && live_time!='') && (leave_time!=undefined && leave_time!='') && (endplacename!=undefined && endplacename!='')" ng-click="budget()" style="float: none; margin: 0 auto;">
                 </td>
             </tr>
             <tr>

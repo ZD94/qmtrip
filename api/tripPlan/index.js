@@ -153,6 +153,32 @@ function getTripPlanOrder(params){
         })
 }
 
+tripPlan.getConsumeInvoiceImg = function(params) {
+    var consumeId = params.consumeId;
+    return Q()
+    .then(function() {
+        if (!consumeId) {
+            throw {code: -1, msg: "consumeId不能为空"};
+        }
+
+        return ConsumeDetails.findById(consumeId)
+            .then(function(consumeDetail) {
+                return API.attachments.getAttachment({id: consumeDetail.newInvoice})
+            })
+            .then(function(attachment) {
+                if (!attachment) {
+                    L.ERR.NOT_FOUND;
+                }
+
+                return 'data:image/jpg;base64,' + attachment.content;
+            })
+            .then(function(result) {
+                return result;
+            })
+    })
+
+}
+
 tripPlan.getConsumeDetail = getConsumeDetail;
 getConsumeDetail.required_params = ['consumeId'];
 getConsumeDetail.optional_params = ['columns'];
@@ -546,7 +572,7 @@ function getVisitPermission(params){
             }
 
             if(consume.accountId == userId){//允许自己查看
-                return {allow: true, md5key: consume.newInvoice}
+                return {allow: true, fileId: consume.newInvoice}
             }else{
                 return PlanOrder.findById(consume.orderId)
                     .then(function(order){
@@ -556,7 +582,7 @@ function getVisitPermission(params){
                         return order.companyId;
                     })
                     .then(function(companyId){
-                        return API.company.getCompanyById(companyId)
+                        return API.company.getCompany({companyId: companyId})
                             .then(function(company){
                                 if(!company){
                                     throw {code: -5, msg: "企业不存在"}
@@ -568,13 +594,16 @@ function getVisitPermission(params){
                         return API.agency.getAgencyUser({id: userId})
                             .then(function(agencyUser){
                                 if(agencyUser && agencyUser.roleId != 1 && agencyUser.agencyId == agencyId){//允许代理商创建人管理员访问
-                                    return {allow: true, md5key: consume.newInvoice};
+                                    return {allow: true, fileId: consume.newInvoice};
                                 }else{
                                     return {allow: false};
                                 }
                             })
                     })
             }
+        })
+        .catch(function(err){
+            console.log(err);
         })
 
 }
@@ -863,6 +892,35 @@ function commitTripPlanOrder(params){
 }
 
 /**
+ * @method previewConsumeInvoice 预览发票图片
+ *
+ * @param {Object} params
+ * @param {UUID} params.consumeId
+ * @param {UUID} params.accountId
+ */
+tripPlan.previewConsumeInvoice = function (params) {
+    var consumeId = params.consumeId;
+    var accountId = params.accountId;
+
+    return tripPlan.getVisitPermission({
+        consumeId: consumeId,
+        userId: accountId
+    })
+    .then(function(result) {
+        if (!result.allow) {
+            throw L.ERR.PERMISSION_DENY;
+        }
+        return ConsumeDetails.findOne({where: {orderId: orderId, id: consumeId}})
+    })
+    .then(function(consume) {
+        return API.attachments.getAttachment({id: consume.newInvoice});
+    })
+    .then(function(attachment) {
+        return "data:image/jpg;base64,"+attachment.content;
+    })
+}
+
+/**
  * 判断JSON对象是否为空
  * @param obj
  * @returns {boolean}
@@ -874,4 +932,5 @@ function isObjNull(obj){
     return true;
 }
 
+tripPlan.__initHttpApp = require('./invoice');
 module.exports = tripPlan;

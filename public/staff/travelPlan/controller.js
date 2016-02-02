@@ -6,6 +6,7 @@ var travelPlan=(function(){
 
     API.require('tripPlan');
     API.require("auth");
+    API.require("attachment");
 
     var  travelPlan = {};
 
@@ -14,7 +15,7 @@ var travelPlan=(function(){
      * @param $scope
      * @constructor
      */
-    travelPlan.PlanListController = function($scope, FileUploader) {
+    travelPlan.PlanListController = function($scope) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(1).find("li").addClass("on");
         loading(false);
@@ -61,12 +62,11 @@ var travelPlan=(function(){
                 })
         }
 
-        $scope.TrafficUploader = new FileUploader(trafficUploadConfig);
-        $scope.HotelUploader = new FileUploader(hotelUploadConfig);
-        $scope.BackTrafficUploader = new FileUploader(backTrafficUploadConfig);
+//        $scope.TrafficUploader = new FileUploader(trafficUploadConfig);
+//        $scope.HotelUploader = new FileUploader(hotelUploadConfig);
+//        $scope.BackTrafficUploader = new FileUploader(backTrafficUploadConfig);
         //待上传票据列表
         $scope.initPlanList = function () {
-            
             API.onload(function() {
                 var params = {auditStatus:[0,-1],page:$scope.page1};
                 if ($scope.keyword != '' && $scope.keyword != undefined) {
@@ -74,13 +74,63 @@ var travelPlan=(function(){
                 }
                 API.tripPlan.pageTripPlanOrder(params)
                     .then(function(result){
-                        console.info (result);
                         $scope.total1 = result.total;
                         $scope.planListitems = result.items;
                         loading(true);
                         $scope.$apply();
                         $(".content input").click(function(event){
                             event.stopPropagation();
+                        });
+                        $(".file").AjaxFileUpload({
+                            action: '/upload/ajax-upload-file?type=invoice',
+                            onComplete: function(filename, response) {
+                                console.info(filename);
+                                $scope.ref = $(this).attr("ref");
+                                $scope.fileId = response.fileId;
+                                if (response.ret == 0 ) {
+                                    //上传本人预览图片方法一通过api访问预览
+                                    API.attachment.previewSelfImg({fileId: response.fileId}, function(err, img) {
+                                        if (err) {
+                                            return alertDemo(err.msg);
+                                        }
+
+                                        var ImgSrc = img;
+                                        var invoiceType = "";// $scope.htmlStr = htmlStr;
+                                        if ($(this).attr("data-type") == 1) {
+                                            invoiceType = "去程交通票据";
+                                        }else if ($(this).attr("data-type") == 2) {
+                                            invoiceType = "住宿票据";
+                                        }
+                                        else if ($(this).attr("data-type") == 3) {
+                                            invoiceType = "返程交通票据";
+                                        }
+                                        $(".messagebox_content img").attr("src",ImgSrc);
+                                        $(".messagebtns em").html(invoiceType);
+                                        $("#uploadimg").show();
+                                        position();
+                                    })
+
+                                    //上传本人预览图片方法二通过路由访问预览
+                                    /*var invoiceType = "";// $scope.htmlStr = htmlStr;
+                                    if ($(this).attr("data-type") == 1) {
+                                        invoiceType = "去程交通票据";
+                                    }else if ($(this).attr("data-type") == 2) {
+                                        invoiceType = "住宿票据";
+                                    }
+                                    else if ($(this).attr("data-type") == 3) {
+                                        invoiceType = "返程交通票据";
+                                    }
+                                    $(".messagebox_content img").attr("src","/self/attachments/"+response.fileId);
+                                    $(".messagebtns em").html(invoiceType);
+                                    $("#uploadimg").show();
+                                    position();*/
+
+
+
+                                } else {
+                                  alertDemo(response.errMsg);
+                                }
+                            }
                         });
                         // $(".file").AjaxFileUpload({
                         //     action: '/upload/ajax-upload-file?type=invoice',
@@ -115,7 +165,7 @@ var travelPlan=(function(){
                         var invoice = {
                             userId: $scope.staff.id,
                             consumeId:$scope.ref,
-                            picture:$scope.md5
+                            picture:$scope.fileId
                         }
                         API.onload(function(){
                             API.tripPlan.uploadInvoice(invoice)
@@ -278,32 +328,39 @@ var travelPlan=(function(){
                     $scope.outTraffic = $scope.planDetail.outTraffic[0];
                     loading(true);
                     $scope.$apply();
+
                     $(".file").AjaxFileUpload({
                         action: '/upload/ajax-upload-file?type=invoice',
                         onComplete: function(filename, response) {
                             $scope.ref = $(this).attr("ref");
-                            $scope.md5 = response.md5key;
+                            $scope.fileId = response.fileId;
                             if (response.ret == 0 ) {
-                                var ImgSrc = '/upload/get-img-file/'+response.md5key;
-                                var invoiceType = "";
-                                if ($(this).attr("data-type") == 1) {
-                                    invoiceType = "去程交通票据";
-                                }else if ($(this).attr("data-type") == 2) {
-                                    invoiceType = "住宿票据";
-                                }
-                                else if ($(this).attr("data-type") == 3) {
-                                    invoiceType = "返程交通票据";
-                                }
-                                $(".messagebox_content img").attr("src",ImgSrc);
-                                $(".messagebtns em").html(invoiceType);
-                                $("#uploadimg").show();
-                                position();
+                                //上传本人预览图片方法一通过api访问预览
+                                API.attachment.previewSelfImg({fileId: response.fileId}, function(err, img) {
+                                    if (err) {
+                                        return alertDemo(err.msg);
+                                    }
+
+                                    var ImgSrc = img;
+                                    var invoiceType = "";// $scope.htmlStr = htmlStr;
+                                    if ($(this).attr("data-type") == 1) {
+                                        invoiceType = "去程交通票据";
+                                    }else if ($(this).attr("data-type") == 2) {
+                                        invoiceType = "住宿票据";
+                                    }
+                                    else if ($(this).attr("data-type") == 3) {
+                                        invoiceType = "返程交通票据";
+                                    }
+                                    $(".messagebox_content img").attr("src",ImgSrc);
+                                    $(".messagebtns em").html(invoiceType);
+                                    $("#uploadimg").show();
+                                    position();
+                                })
                             } else {
-                              alertDemo(response.errMsg);
+                                alertDemo(response.errMsg);
                             }
                         }
                     });
-
                 })
                 .catch(function(err){
                     console.info(err);
@@ -312,7 +369,7 @@ var travelPlan=(function(){
                     var invoice = {
                         userId: $scope.staff.id,
                         consumeId:$scope.ref,
-                        picture:$scope.md5
+                        picture:$scope.fileId
                     }
                     API.onload(function(){
                         API.tripPlan.uploadInvoice(invoice)
@@ -415,26 +472,35 @@ var travelPlan=(function(){
         $scope.planId = planId;
         $scope.status = $routeParams.status;
         $scope.invoiceId = $routeParams.invoiceId;
+        API.require("attachment");
         API.onload(function() {
             API.tripPlan.getTripPlanOrderById(planId)
-                .then(function(result){
-                    $scope.planDetail = result;
-                    if ($scope.status=='outTraffic') {
-                        $scope.InvoiceDetail = $scope.planDetail.outTraffic[0];
-                    }
-                    if ($scope.status=='backTraffic') {
-                        $scope.InvoiceDetail = $scope.planDetail.backTraffic[0];
-                    }
-                    if ($scope.status=='hotel') {
-                        $scope.InvoiceDetail = $scope.planDetail.hotel[0];
-                    }
+            .then(function(result){
+                var InvoiceDetail;
+                $scope.planDetail = result;
 
-                    console.info (result);
+                if ($scope.status=='outTraffic') {
+                    InvoiceDetail = result.outTraffic[0];
+                }
+                if ($scope.status=='backTraffic') {
+                    InvoiceDetail = result.backTraffic[0];
+                }
+                if ($scope.status=='hotel') {
+                    InvoiceDetail = result.hotel[0];
+                }
+                return InvoiceDetail;
+            })
+            .then(function(invoiceDetail) {
+                $scope.InvoiceDetail = invoiceDetail;
+                return  API.attachment.previewSelfImg({fileId: invoiceDetail.newInvoice})
+                .then(function(invoiceImg) {
+                    $scope.invoiceImg = invoiceImg;
                     $scope.$apply();
                 })
-                .catch(function(err){
-                    console.info(err);
-                })
+            })
+            .catch(function(err){
+                console.info(err);
+            })
         })
         $scope.goDetail = function () {
             window.location.href = "#/travelPlan/PlanDetail?planId="+planId;

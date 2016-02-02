@@ -480,7 +480,7 @@ function getStaffPointsChange(params){
  */
 staff.beforeImportExcel = function(params){
     var userId = params.accountId;
-    var md5key = params.md5key;
+    var fileId = params.fileId;
 //    var obj = nodeXlsx.parse(fileUrl);
     var travalPolicies = {};
     var departmentMaps = {};
@@ -496,10 +496,11 @@ staff.beforeImportExcel = function(params){
     var p_companyId = params.companyId;
     var domainName = "";
     var xlsxObj;
-    return API.attachment.getAttachment({md5key: md5key})
+    return API.attachment.getSelfAttachment({fileId: fileId, accountId: userId})
         .then(function(att){
             if(att){
-                xlsxObj = nodeXlsx.parse(att.content);
+                var content = new Buffer(att.content, 'base64');
+                xlsxObj = nodeXlsx.parse(content);
                 if(p_companyId){
                     return {companyId: p_companyId};
                 }else{
@@ -663,7 +664,7 @@ staff.beforeImportExcel = function(params){
             })
         })
         .then(function(data){
-            return API.attachment.deleteAttachment({md5key: md5key, userId: userId})//
+            return API.attachments.removeFileAndAttach({id: fileId})
                 .then(function(result){
                     return data;
                 });
@@ -721,12 +722,10 @@ staff.importExcelAction = function(params){
  */
 staff.downloadExcle = function (params){
     fs.exists(config.upload.tmpDir, function (exists) {
-        if(!exists)
+        if(!exists){
             fs.mkdir(config.upload.tmpDir);
+        }
     });
-    /*if (!fs.exists(config.upload.tmpDir)) {
-        fs.mkdir(config.upload.tmpDir);
-    }*/
     var data = params.objAttr;
     var nowStr = moment().format('YYYYMMDDHHmm');
     if(!data){
