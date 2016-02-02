@@ -84,7 +84,10 @@ var TravelStatistics = (function(){
                 })
         })
     }
-
+    /*出差记录页面*/
+    TravelStatistics.PlanListController = function($scope) {
+        alert("zzzz");
+    }
     return TravelStatistics;
 })();
 
