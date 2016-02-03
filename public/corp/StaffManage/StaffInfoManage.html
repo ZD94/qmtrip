@@ -8,15 +8,10 @@
     </div>
     <div class="staff_tab_content">
         <div class="organize_select">
-            <select name="select" id="department" class="" ng-model="department" ng-options="item for item in departments" ng-change="departmentChange(department)">
+            <select name="department" class="" id="queryDepartment" ng-model="queryDepartment" ng-options="item.val as item.name for item in departments" ng-change="departmentChange()"></select>
+            <!--<select name="select" id="department" class="" ng-model="department" ng-options="item for item in departments" ng-change="departmentChange(department)">
                 <option value="" selected>-- 请选择 --</option>
-            </select>
-            <!--<select name="select" id="" class="">
-                <option value="我的企业">我的企业</option>
-                <option value="销售部">销售部</option>
-                <option value="产品部">产品部</option>
             </select>-->
-            <!--<span>设置公司组织架构</span>-->
         </div>
         <div class="staff_function">
             <i style="font-size: 16px;">目前共{{totalCount}}名员工</i>
@@ -50,7 +45,8 @@
                     <ul>
                         <li>
                             部门:
-                            <input id="staffDepartment" type="text" placeholder="请输入员工所属部门"/>
+                            <!--<input id="staffDepartment" type="text" placeholder="请输入员工所属部门"/>-->
+                            <select name="department" id="staffDepartment" class="" ng-model="department" ng-options="item.val as item.name for item in departments"></select>
                         <li>
                             差旅标准:
                             <select name="select" id="staffStandard" class="" ng-model="selectkey" ng-options="item.val as item.name for item in selectClass"></select>
@@ -101,7 +97,7 @@
             <li>{{item.name}}</li>
             <li>{{item.email}}</li>
             <li>{{item.mobile}}</li>
-            <li><!--<span ng-if="item.department == null">暂未设置</span>--><span>{{item.department || '我的企业'}}</span></li>
+            <li><!--<span ng-if="item.department == null">暂未设置</span>--><span>{{item.department}}</span></li>
             <li><span>{{item.travelLeverName}}</span></li>
             <li><span ng-if="item.roleId == 0">创建者</span><span ng-if="item.roleId == 1">普通员工</span><span ng-if="item.roleId == 2">管理员</span><span ng-if="item.roleId == 3">财务人员</span></li>
             <li><a ng-if="!((item.roleId == 2 || item.roleId == 0) && roleId == 2 && currentStaff.id != item.id)"><span ng-click="editStaffInfo(item.id)" id="change" class="includeChange">修改</span></a>
@@ -133,8 +129,9 @@
                         <ul>
                             <li>
                                 部门:
-                                <input id="staffDepartment{{$index}}" type="text" placeholder="请输入员工所属部门" value="{{item.department}}" ng-focus="showDepartments()"/>
-                                <!--<ul class="departmentlist">
+                                <select name="department" id="staffDepartment{{$index}}" class="" ng-model="department" ng-options="item.val as item.name for item in departments"></select>
+                                <!--<input id="staffDepartment{{$index}}" type="text" placeholder="请输入员工所属部门" value="{{item.department}}" ng-focus="showDepartments()"/>
+                                <ul class="departmentlist">
                                     <li ng-repeat="item in departments" ng-click="chooseStartplace(item)">{{item}}</li>
                                 </ul>-->
                             <li>
