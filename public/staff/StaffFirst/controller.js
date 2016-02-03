@@ -31,8 +31,7 @@ var StaffFirst = (function(){
 						var company_id = ret.companyId;
 						var travelLevel =ret.travelLevel;
 						var str = ret.name;
-						$scope.firstname=str.substring(0,2);
-						console.info(ret)
+						$scope.firstname=str.substring(str.length-2,str.length);
 						Q.all([
 							API.tripPlan.countTripPlanNum({accountId:ret.id}),
 							API.travelPolicy.getTravelPolicy({id: travelLevel})
