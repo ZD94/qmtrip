@@ -339,6 +339,7 @@ staff.getStaffPointsChange = function(params){
 }
 
 /**
+ * @method getStaffPointsChangeByMonth
  * 获取企业或员工月度积分变动统计(增加、消费、积分余额)
  * @param params.staffId //可选参数，如果不写则查询当前企业所有员工的积分统计
  * @param params
@@ -355,7 +356,6 @@ staff.getStaffPointsChangeByMonth = function(params) {
             var count = params.count;
             typeof count == 'number' ? "" : count = 6;
             params.count = count;
-
             return API.staff.getStaffPointsChangeByMonth(params);
         })
 }

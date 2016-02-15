@@ -22,6 +22,64 @@ var TravelStatistics = (function(){
 
         function initPageData() {
             API.onload(function(){
+                API.staff.getStaffPointsChangeByMonth({})
+                .then(function(statistic) {
+                    //对数据进行处理
+                    var incomes = [];
+                    var consumes = [];
+                    var balances = [];
+                    var incomeObj = {};
+                    var consumeObj = {};
+                    var balanceObj = {};
+                    var months = [];
+                    for(var i=0, ii=statistic.length; i<ii; i++) {
+                        months.push(statistic[i].month);
+                        incomeObj[statistic[i].month] = statistic[i].increase;
+                        consumeObj[statistic[i].month] = statistic[i].decrease;
+                        balanceObj[statistic[i].month] = statistic[i].balance;
+                        months.sort();
+                    }
+                    for(var i=0, ii=months.length; i<ii; i++) {
+                        incomes.push(incomeObj[months[i]]);
+                        consumes.push(consumeObj[months[i]]);
+                        balances.push(balanceObj[months[i]]);
+                    }
+
+                    var myChart = echarts.init(document.getElementById('settle_chart'));
+                    // 指定图表的配置项和数据
+                    var option = {
+                        tooltip: {},
+                        legend: {
+                            data:['新增积分', '兑换积分', '剩余积分']
+                        },
+                        color: ["#00eacf", "#fd6961", "#8250fe"],
+                        xAxis: {
+                            data: months
+                        },
+                        yAxis: {},
+                        series: [{
+                            name: '新增积分',
+                            type: 'bar',
+                            data: incomes
+                        }, {
+                            name: "兑换积分",
+                            type: "bar",
+                            data: consumes
+                        }, {
+                            name: "剩余积分",
+                            type: "line",
+                            data: balances
+                        }]
+                    };
+
+                    // 使用刚指定的配置项和数据显示图表。
+                    myChart.setOption(option);
+                })
+                .catch(function(err) {
+                    alert("统计数据加载失败");
+                    console.error(err);
+                });
+
                 var monthStart = moment().startOf('Month').format('YYYY-MM-DD 00:00:00');
                 var monthEnd = moment().endOf('Month').format('YYYY-MM-DD 23:59:59');
                 var YMcommon = moment().startOf('Month').format('YYYY-MM')
