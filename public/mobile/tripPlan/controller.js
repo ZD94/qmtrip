@@ -158,7 +158,6 @@
                     if(plan.backTraffic.length!=0){
                         if(backTraffic.invoice.length==0){
                             $scope.backClass = "unupload";
-                            alert(2);
                         }else if(backTraffic.invoice.length!=0 && backTraffic.status =='0'){
                             $scope.backClass = "imgdown";
                         }else if(backTraffic.invoice.length!=0 && backTraffic.status=='-1'){
