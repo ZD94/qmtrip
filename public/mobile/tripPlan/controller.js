@@ -83,18 +83,34 @@
 
             var trafficUploadConfig = JSON.parse(JSON.stringify(uploadConf));
             trafficUploadConfig.onCompleteItem= function (item, resp) {
-                uploadInvoice($scope.outTraffic.id, resp.md5key);
-                var img = "<img src="+'/consume/invoice/'+$scope.outTraffic.id+">";
+                uploadInvoice($scope.outTraffic.id, resp.md5key,function(){
+                    $(".upload_sure").find("img").remove();
+                    var img = "<img src="+'/self/attachments/'+$scope.outTraffic.newInvoice+">";
+                    $(".upload_sure").append(img);
+                    $(".upload_sure").show();
+                });
+                console.info($scope.outTraffic.newInvoice)
+                
             }
 
             var hotelUploadConfig = JSON.parse(JSON.stringify(uploadConf));
             hotelUploadConfig.onCompleteItem = function(item, resp) {
-                uploadInvoice($scope.hotel.id, resp.md5key);
+                uploadInvoice($scope.hotel.id, resp.md5key,function(){
+                    $(".upload_sure").find("img").remove();
+                    var img = "<img src="+'/self/attachments/'+$scope.hotel.newInvoice+">";
+                    $(".upload_sure").append(img);
+                    $(".upload_sure").show();
+                });
             }
 
             var backTrafficUploadConfig = JSON.parse(JSON.stringify(uploadConf));
             backTrafficUploadConfig.onCompleteItem = function(item, resp) {
-                uploadInvoice($scope.backTraffic.id, resp.md5key);
+                uploadInvoice($scope.backTraffic.id, resp.md5key,function(){
+                    $(".upload_sure").find("img").remove();
+                    var img = "<img src="+'/self/attachments/'+$scope.backTraffic.newInvoice+">";
+                    $(".upload_sure").append(img);
+                    $(".upload_sure").show();
+                });
             }
 
             $scope.TrafficUploader = new FileUploader(trafficUploadConfig);
@@ -102,14 +118,16 @@
             $scope.BackTrafficUploader = new FileUploader(backTrafficUploadConfig);
         }
 
-        function uploadInvoice(consumeId, picture) {
+        function uploadInvoice(consumeId, picture, callback) {
             API.tripPlan.uploadInvoice({
                     consumeId: consumeId,
                     picture: picture
                 })
-                .then(function() {
-                    alert("上传成功");
-                    window.location.reload();
+                .then(function(ret) {
+                    callback();
+                    // alert("上传成功");
+                    console.info(ret);
+                    // window.location.reload();
                     //var ImgSrc = '/upload/get-img-file/'+resp.md5key;
                     //$(".messagebox_content img").attr("src",ImgSrc);
                     //$(".messagebtns em").html('去程交通票据');
@@ -179,11 +197,15 @@
                 API.tripPlan.commitTripPlanOrder(planId)
                     .then(function(result){
                         alert ("提交成功");
+                        window.location.href = '#/tripPlan/uploadDown';
                     })
                     .catch(function(err){
                         alert (err.msg);
                     })
             })
+        }
+        $scope.close_pre = function() {
+            $(".upload_sure").hide();
         }
  	}
  	return tripPlan;

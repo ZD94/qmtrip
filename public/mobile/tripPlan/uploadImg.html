@@ -19,7 +19,7 @@
 				<span ng-if="outTraffic.invoice.length!=0 && outTraffic.status =='0'">点击修改</span>
 				<span ng-if="outTraffic.invoice.length!=0 && outTraffic.status=='-1'">重新上传</span>
 				<span ng-if="outTraffic.invoice.length!=0 && outTraffic.status=='1'">审核通过</span>
-				<img ng-if="outTraffic.invoice.length!=0" ng-src="/self/attachments/{{outTraffic.newInvoice}}" style="width:100%;"/>
+				<!-- <img ng-if="outTraffic.invoice.length!=0" ng-src="/self/attachments/{{outTraffic.newInvoice}}" style="width:100%;"/> -->
 				<!--微信中上传-->
 				<input type="file" ng-click="uploadInvoice(outTraffic.id)" ng-show="isInWeixin" ng-if="outTraffic.status !='1'"/>
 
@@ -31,17 +31,14 @@
 
 		</div>
 		<div ng-if="plan.hotel.length!=0" class="hotel">
-			<div class="po_r {{hotelClass}}" ng-class='hotel.invoice.length==0? "unupload": ""'
-				 ng-class="hotel.invoice.length!=0 && hotel.status =='0'?'imgdown':''"
-				 ng-class="hotel.invoice.length!=0 && hotel.status=='-1'?'fail': ''"
-				 ng-class="hotel.invoice.length!=0 && hotel.status=='1'? 'ready': ''">
+			<div class="po_r {{hotelClass}}">
 				<span>住宿发票</span>
 				<span></span>
 				<span ng-if="hotel.invoice.length==0">点击上传</span>
 				<span ng-if="hotel.invoice.length!=0 && hotel.status =='0'">点击修改</span>
 				<span ng-if="hotel.invoice.length!=0 && hotel.status=='-1'">重新上传</span>
 				<span ng-if="hotel.invoice.length!=0 && hotel.status=='1'">审核通过</span>
-				<img ng-if="hotel.invoice.length!=0" ng-src="self/attachments/{{hotel.newInvoice}}" style="width:100%;"/>
+				<!-- <img ng-if="hotel.invoice.length!=0" ng-src="self/attachments/{{hotel.newInvoice}}" style="width:100%;"/> -->
 				<span ng-show="isInWeixin" ng-if="hotel.status !='1'">
 					<!--微信中上传-->
 					<input type="file" ng-click="uploadInvoice(hotel.id)"/>
@@ -54,17 +51,14 @@
 		</div>
 
 		<div ng-if="plan.backTraffic.length!=0" class="backTraffic">
-			<div class="po_r {{backClass}}" ng-class='backTraffic.invoice.length==0? "unupload": ""'
-				 ng-class="backTraffic.invoice.length!=0 && hotel.status =='0'?'imgdown':''"
-				 ng-class="backTraffic.invoice.length!=0 && hotel.status=='-1'?'fail': ''"
-				 ng-class="backTraffic.invoice.length!=0 && hotel.status=='1'? 'ready': ''">
+			<div class="po_r {{backClass}}">
 				<span>交通票据</span>
 				<span>回程</span>
 				<span ng-if="backTraffic.invoice.length==0">点击上传</span>
 				<span ng-if="backTraffic.invoice.length!=0 && backTraffic.status =='0'">点击修改</span>
 				<span ng-if="backTraffic.invoice.length!=0 && backTraffic.status=='-1'">重新上传</span>
 				<span ng-if="backTraffic.invoice.length!=0 && backTraffic.status=='1'">审核通过</span>
-				<img ng-if="backTraffic.invoice.length!=0" ng-src="/self/attachments/{{backTraffic.newInvoice}}" style="width:100%;"/>
+				<!-- <img ng-if="backTraffic.invoice.length!=0" ng-src="/self/attachments/{{backTraffic.newInvoice}}" style="width:100%;"/> -->
 				<span ng-show="isInWeixin" ng-if="backTraffic.status !='1'">
 					<!--微信中上传-->
 					<input type="file" ng-click="uploadInvoice(backTraffic.id)"/>
@@ -81,10 +75,13 @@
 		<input type="button" ng-click="push()" value="提交审核" ng-disabled="plan.status==1? 'disabled': false">
 	</div>
 </div>
-<div class="upload_sure" style="background:blue">
+<div class="upload_sure">
 	<div class="img_tit">
 		<span class="web-icon-font3">&#xe90e;</span>
 		<strong></strong>
 		<em></em>
+	</div>
+	<div class="img_button">
+		<div class="" ng-click="close_pre()">确定</div>
 	</div>
 </div>

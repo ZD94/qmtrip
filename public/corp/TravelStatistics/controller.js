@@ -91,7 +91,7 @@ var TravelStatistics = (function(){
             var params = {page:$scope.page}
             API.tripPlan.pageTripPlanOrderByCompany(params)
                 .then(function(list){
-                    // console.info(list);
+                    console.info(list);
                     // $scope.planlist = list.items;
                     var planlist = list.items;
                     planlist.map(function(plan){
@@ -103,7 +103,7 @@ var TravelStatistics = (function(){
                                 // console.info(order);
                                 // console.info(staff);
                                 plan.staffName = staff.staff.name;
-                                console.info(plan);
+                                // console.info(plan);
                                 $scope.planlist = planlist;
                                 $scope.$apply();
                             })
@@ -116,6 +116,37 @@ var TravelStatistics = (function(){
                     console.info(err)
                 })
         })
+    }
+    // 出差记录详情页
+    TravelStatistics.PlanDetailController = function($scope) {
+        alert(5555);
+        //进入详情页
+        $scope.enterDetail = function (orderId) {
+            window.location.href = "#/travelRecord/TravelDetail?orderId=" + orderId;
+        }
+
+        //分页
+        $scope.pagination = function () {
+            if ($scope.total) {
+                $.jqPaginator('#pagination', {
+                    totalCounts: $scope.total,
+                    pageSize: 20,
+                    currentPage: 1,
+                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+                    onPageChange: function (num) {
+                        if ($scope.pages==1) {
+                            $("#pagination").hide();
+                        }
+                        $scope.page = num;
+                        $scope.initTravelList();
+                    }
+                });
+                clearInterval (pagenum);
+            }
+        }
+        var pagenum =setInterval($scope.pagination,10);
     }
     return TravelStatistics;
 })();

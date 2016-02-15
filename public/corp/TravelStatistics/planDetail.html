@@ -1,0 +1,53 @@
+<div class="travel-plan">
+    <div class="planDetail">
+        <div class="planpath"><a href="#/StaffFirst/StaffUser">我的账户</a>&nbsp;>&nbsp;<a href="#/travelPlan/PlanList">我的出差记录</a>&nbsp;>&nbsp;<span>出差详情页</span></div>
+        <div class="mainbox">
+            <div class="title_top">
+                <table width="100%">
+                    <tr>
+                        <td width="220" height="40" align="left" style="font-size: 13px;">生成时间：{{planDetail.createAt | date: 'yyyy-MM-dd HH:mm'}}</td>
+                        <td height="40" align="center">您于
+                            <span ng-if="planDetail.startAt">{{planDetail.startAt | date: 'yyyy月MM月dd日'}}</span>
+                            <span ng-if="!planDetail.startAt">{{planDetail.hotel[0].startTime | date: 'yyyy月MM月dd日'}}</span>
+                            的出差概括
+                        </td>
+                        <td width="220" height="40" align="right">{{planDetail.description}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="content_top">
+                <dl>
+                    <dt>动态标准预算</dt>
+                    <dd>
+                        <span ng-if="planDetail.status=='-1'">暂无</span>
+                        <span ng-if="planDetail.status!='-1'">¥{{planDetail.budget.toFixed(2)}}</span>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>实际支出</dt>
+                    <dd>
+                        <span ng-if="!planDetail.expenditure">暂无</span>
+                        <span ng-if="planDetail.expenditure">¥{{planDetail.expenditure.toFixed(2)}}</span>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>为公司节省</dt>
+                    <dd>
+                        <span ng-if="!planDetail.expenditure">暂无</span>
+                        <span ng-if="planDetail.expenditure">
+                            <span ng-if="planDetail.budget-planDetail.expenditure>0">¥{{(planDetail.budget-planDetail.expenditure).toFixed(2)}}</span>
+                            <span ng-if="planDetail.budget-planDetail.expenditure<=0">¥0.00</span>
+                        </span>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>获得积分</dt>
+                    <dd>
+                        <span ng-if="planDetail.score">{{planDetail.score}}</span>
+                        <span ng-if="!planDetail.score">暂无</span>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>

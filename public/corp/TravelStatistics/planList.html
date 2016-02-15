@@ -23,16 +23,31 @@
                         <td>操作</td>
                     </tr>
                     <tr ng-repeat="item in planlist">
-                        <td>{{item.staffName}}</td>
-                        <td>{{item.startAt}}</td>
-                        <td>{{}}</td>
-                        <td>{{}}</td>
-                        <td>{{}}</td>
-                        <td>{{}}</td>
-                        <td>{{}}</td>
-                        <td>{{}}</td>
-                        <td>{{}}</td>
-                        <td>{{}}</td>
+                        <td align="center">{{item.staffName}}</td>
+                        <td align="center">{{item.startAt | date: 'yyyy-MM-dd'}}</td>
+                        <td align="center">
+                        	<p ng-if="item.isNeedTraffic" class="traffic_icon web-icon-font3">&#xe90e;</p>
+                            <p ng-if="item.isNeedHotel" class="live_icon web-icon-font3">&#xe914;</p>
+                        </td align="center">
+                        <td align="center">
+                        	<p ng-if="item.isNeedTraffic"><a>{{item.startPlace}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="staff/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.destination}}</a></p>
+                            <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
+                        </td>
+                        <td align="center">{{item.description}}</td>
+                        <td align="center">
+							<span ng-if="item.status!='-1'">¥{{item.budget}}</span>
+                            <span ng-if="item.status=='-1'">暂无</span>
+                        </td>
+                        <td align="center">
+							<span ng-if="item.expenditure!=0">¥{{item.expenditure}}</span>
+                            <span ng-if="item.expenditure==0">暂无</span>
+                        </td>
+                        <td align="center">¥{{item.budget-item.expenditure}}</td>
+                        <td align="center">
+							<span ng-if="item.score!=0">¥{{item.score}}</span>
+                            <span ng-if="item.score==0">暂无</span>
+                        </td>
+                        <td align="center"><a href="" ng-click="enterDetail(item.id)">查看详情</a></td>
                     </tr>
                 </table>
             </div>
