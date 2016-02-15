@@ -407,7 +407,7 @@ staff.listAndPaginatePointChange = function(params){
  */
 staff.getStaffPointsChangeByMonth = function(params) {
 
-    params.companyId = '00000000-0000-0000-0000-000000000001';
+    //params.companyId = '00000000-0000-0000-0000-000000000001';
     var q1  = _.pick(params, ['companyId', 'staffId']);
     var q2  = _.pick(params, ['companyId', 'staffId']);
     var q3 = _.pick(params, ['companyId', 'staffId']);
