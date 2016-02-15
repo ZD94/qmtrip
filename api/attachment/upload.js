@@ -88,7 +88,7 @@ function uploadActionFile(req, res, next) {
                                             console.log("删除临时文件");
                                         }
                                     });
-                                    res.send('{"ret":0, "errMsg":"", "fileId":"'+fileid+'"}');
+                                    res.send('{"ret":0, "errMsg":"", "fileId":"'+fileid+'", "md5key":"'+fileid+'"}');
                                 })
                                 .catch(function(err){
                                     console.log(err);
