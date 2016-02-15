@@ -84,8 +84,7 @@
             var trafficUploadConfig = JSON.parse(JSON.stringify(uploadConf));
             trafficUploadConfig.onCompleteItem= function (item, resp) {
                 uploadInvoice($scope.outTraffic.id, resp.md5key);
-                var img = "<img src="+'/upload/get-img-file/'+$scope.outTraffic.newInvoice+">";
-                console.info(img);
+                var img = "<img src="+'/consume/invoice/'+$scope.outTraffic.id+">";
             }
 
             var hotelUploadConfig = JSON.parse(JSON.stringify(uploadConf));
@@ -158,7 +157,6 @@
                     if(plan.backTraffic.length!=0){
                         if(backTraffic.invoice.length==0){
                             $scope.backClass = "unupload";
-                            alert(2);
                         }else if(backTraffic.invoice.length!=0 && backTraffic.status =='0'){
                             $scope.backClass = "imgdown";
                         }else if(backTraffic.invoice.length!=0 && backTraffic.status=='-1'){
