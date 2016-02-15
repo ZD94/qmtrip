@@ -85,19 +85,17 @@
             trafficUploadConfig.onCompleteItem= function (item, resp) {
                 uploadInvoice($scope.outTraffic.id, resp.md5key,function(){
                     $(".upload_sure").find("img").remove();
-                    var img = "<img src="+'/self/attachments/'+$scope.outTraffic.newInvoice+">";
+                    var img = "<img src="+'/self/attachments/'+resp.md5key+">";
                     $(".upload_sure").append(img);
                     $(".upload_sure").show();
                 });
-                console.info($scope.outTraffic.newInvoice)
-                
             }
 
             var hotelUploadConfig = JSON.parse(JSON.stringify(uploadConf));
             hotelUploadConfig.onCompleteItem = function(item, resp) {
                 uploadInvoice($scope.hotel.id, resp.md5key,function(){
                     $(".upload_sure").find("img").remove();
-                    var img = "<img src="+'/self/attachments/'+$scope.hotel.newInvoice+">";
+                    var img = "<img src="+'/self/attachments/'+resp.md5key+">";
                     $(".upload_sure").append(img);
                     $(".upload_sure").show();
                 });
@@ -107,7 +105,7 @@
             backTrafficUploadConfig.onCompleteItem = function(item, resp) {
                 uploadInvoice($scope.backTraffic.id, resp.md5key,function(){
                     $(".upload_sure").find("img").remove();
-                    var img = "<img src="+'/self/attachments/'+$scope.backTraffic.newInvoice+">";
+                    var img = "<img src="+'/self/attachments/'+resp.md5key+">";
                     $(".upload_sure").append(img);
                     $(".upload_sure").show();
                 });
@@ -125,13 +123,6 @@
                 })
                 .then(function(ret) {
                     callback();
-                    // alert("上传成功");
-                    console.info(ret);
-                    // window.location.reload();
-                    //var ImgSrc = '/upload/get-img-file/'+resp.md5key;
-                    //$(".messagebox_content img").attr("src",ImgSrc);
-                    //$(".messagebtns em").html('去程交通票据');
-                    //$("#uploadimg").show();
                 })
                 .catch(function(err) {
                     alert(err.msg);
