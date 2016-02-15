@@ -834,17 +834,24 @@ staff.statisticStaffsRole = function(params){
     if(!params.companyId){
         throw {code: -1, msg: '企业Id不能为空'};
     }
+    var where = {};
     var companyId = params.companyId;
+    var departmentId = params.departmentId;
+    where.companyId = companyId;
+    if(departmentId){
+        where.departmentId = departmentId;
+    }
+    where.status = {$ne: STAFF_STATUS.DELETE};
     var adminNum = 0
     var commonStaffNum = 0;
     var unActiveNum = 0;
     var totalCount = 0;
-    return staffModel.findAll({where: {companyId: companyId, status: {$ne: STAFF_STATUS.DELETE}}})
+    return staffModel.findAll({where: where})
         .then(function(staffs){
-            if(staffs){
+            if(staffs && staffs.length>0){
                 totalCount = staffs.length;
                 return Q.all(staffs.map(function(s){
-                    if(s.roleId == 2){
+                    if(s.roleId == 2 || s.roleId == 0){
                         adminNum++;
                     }else if(s.roleId == 1){
                         commonStaffNum++;
@@ -859,6 +866,7 @@ staff.statisticStaffsRole = function(params){
             }
         })
         .then(function(){
+            console.log(adminNum);
             return {totalCount: totalCount, adminNum: adminNum, commonStaffNum: commonStaffNum, unActiveNum: unActiveNum};
         });
 }
