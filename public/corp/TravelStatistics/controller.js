@@ -115,22 +115,16 @@ var TravelStatistics = (function(){
         API.onload(function(){
             API.staff.getCurrentStaff()//获取当前登录人员的企业id
                 .then(function(staff){
-                    console.info(staff);
                     var companyId = staff.companyId;
                     var staffId = staff.id;
-                    console.info(companyId);
                     return Q.all([
                             API.staff.statStaffPointsByCompany({}), //企业积分统计，总积分，可用积分。
                             API.staff.getStaffPointsChangeByMonth({})//企业统计员工所有变动记录
                             ])
                             .spread(function(point,piontschange){
-                                console.info(point);
                                 $scope.allPoints = point.totalPoints;
                                 $scope.remianPoints = point.balancePoints;
-
-                                console.info(piontschange);
                                 $scope.points = piontschange;
-
                                 $scope.$apply();
                             })
                             .catch(function(err) {
