@@ -14,7 +14,10 @@ module.exports = function (Db, DataType) {
         status      : {type: DataType.INTEGER,          defaultValue: 0, field: "status"}, //状态
         startPlace  : {type: DataType.STRING,           field: "start_place"}, //出发地点
         arrivalPlace: {type: DataType.STRING,           field: "arrival_place"}, //目的地点
-        city        : {type: DataType.STRING },
+        city        : {type: DataType.STRING,           field: "city"},
+        startPlaceCode   : {type: DataType.STRING,      field: "start_place_code"}, //出发地城市代码
+        arrivalPlaceCode  : {type: DataType.STRING,      field: "arrival_place_code"}, //出差目的地城市代码
+        cityCode        : {type: DataType.STRING,           field: "city_code"},
         hotelName   : {type: DataType.STRING,           field: "hotel_name"},
         startTime   : {type: "timestamp without time zone", field: "start_time"}, //开始时间
         endTime     : {type: "timestamp without time zone", field: "end_time"}, //结束时间
