@@ -152,9 +152,18 @@ var staff = (function(){
                 if(department && department!= ""){
                     params.departmentId = department;
                 }
-                return API.staff.listAndPaginateStaff(params)//加载所有的员工记录
-                    .then(function(staffinfo){
-                        console.log(staffinfo);
+
+                return Q.all([
+                    API.staff.statisticStaffsRole(params),//统计企业员工（管理员 普通员工 未激活员工 总数）数量
+                    API.staff.listAndPaginateStaff(params)//加载所有的员工记录
+                ])
+                    .spread(function(staffRole, staffinfo){
+                        //统计企业员工（管理员 普通员工 未激活员工）数量
+                        $scope.forActive = staffRole.unActiveNum;
+                        $scope.manager = staffRole.adminNum;
+                        $scope.publicStaff = staffRole.commonStaffNum;
+                        $scope.totalCount = staffRole.totalCount;
+
                         $scope.total = staffinfo.total;
                         //加载员工列表
                         $scope.staffs = staffinfo.items;
@@ -216,6 +225,7 @@ var staff = (function(){
                                 }
                             });
                         }else{
+                            $scope.justInitList(queryDepartment);
                             console.log("没记录");
                         }
                         //加载员工列表
