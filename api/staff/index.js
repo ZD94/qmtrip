@@ -81,8 +81,8 @@ staff.createStaff = function(data){
             if(!data.travelLevel || data.travelLevel == ""){
                 data.travelLevel = null;
             }
-            if(!data.department || data.department == ""){
-                data.department = null;
+            if(!data.departmentId || data.departmentId == ""){
+                data.departmentId = null;
             }
             return staffModel.create(data);
         })
@@ -143,6 +143,9 @@ staff.updateStaff = function(data){
     options.returning = true;
     if(!data.travelLevel || data.travelLevel == ""){
         data.travelLevel = null;
+    }
+    if(!data.departmentId || data.departmentId == ""){
+        data.departmentId = null;
     }
     return Q()
         .then(function(){
@@ -281,7 +284,7 @@ staff.listAndPaginateStaff = function(params){
     limit = perPage;
     offset = (page - 1) * perPage;
     if (!options.order) {
-        options.order = [["create_at", "desc"]]
+        options.order = [["id", "desc"]]
     }
     params.status = {$ne: STAFF_STATUS.DELETE};//只查询在职人员
     options.limit = limit;
