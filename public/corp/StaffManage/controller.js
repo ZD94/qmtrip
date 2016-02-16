@@ -559,10 +559,11 @@ var staff = (function(){
                                             .then(function(num){
                                                 s.peoplenum = num;
                                                 console.info ($scope.departmentlist);
-                                                $scope.$apply();
                                                 loading(true);
                                             })
                                         });
+                                        $scope.$apply();
+                                        loading(true);
                                     })
                             })
                     })
