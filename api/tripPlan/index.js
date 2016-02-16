@@ -18,6 +18,7 @@ var _ = require('lodash');
 var API = require('common/api');
 var Paginate = require("common/paginate").Paginate;
 var logger = new Logger("company");
+var validate = require("common/validate");
 
 var tripPlan = {}
 
@@ -57,12 +58,16 @@ function savePlanOrder(params){
 
             for(var i in consumeDetails) {
                 var obj = consumeDetails[i];
-                if(!/^-?\d+$/.test(obj.budget))
-                    throw {code: -2, nsg: '预算格式不正确'};
-                if(obj.budget > 0)
+
+                if(!validate.isMoney(obj.budget)) {
+                    throw {code: -2, nsg: '预算金额格式不正确'};
+                }
+
+                if(obj.budget > 0) {
                     total_budget = parseFloat(total_budget) + parseFloat(obj.budget);
-                else
+                } else {
                     isBudget = false;
+                }
             }
 
             _planOrder.budget = total_budget;
