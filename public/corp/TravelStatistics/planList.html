@@ -6,10 +6,10 @@
             <li>出差分布</li>
             <li class="on">出差记录</li>
         </ul>
-        <div class="settle_main">
+        <div class="settle_main mainbox_bottom">
             <div class="settle_chart"></div>
-            <div class="settle_list">
-                <table width="100%">
+            <div class="settle_list ">
+                <table width="100%" class="content">
                     <tr>
                         <td>姓名</td>
                         <td>出发时间</td>
@@ -44,7 +44,7 @@
                         </td>
                         <td align="center">¥{{item.budget-item.expenditure}}</td>
                         <td align="center">
-							<span ng-if="item.score!=0">¥{{item.score}}</span>
+							<span ng-if="item.score!=0">{{item.score}}</span>
                             <span ng-if="item.score==0">暂无</span>
                         </td>
                         <td align="center"><a href="" ng-click="enterDetail(item.id)">查看详情</a></td>

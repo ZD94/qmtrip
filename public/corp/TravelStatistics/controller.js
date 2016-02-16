@@ -7,6 +7,7 @@ var TravelStatistics = (function(){
 
     API.require('tripPlan');
     API.require("staff");
+    API.require("agency");
 
     var  TravelStatistics = {};
 
@@ -168,14 +169,118 @@ var TravelStatistics = (function(){
                     console.info(err)
                 })
         })
-    }
-    // 出差记录详情页
-    TravelStatistics.PlanDetailController = function($scope) {
-        alert(5555);
         //进入详情页
         $scope.enterDetail = function (orderId) {
-            window.location.href = "#/travelRecord/TravelDetail?orderId=" + orderId;
+            window.location.href = "#/TravelStatistics/planDetail?orderId=" + orderId;
         }
+    }
+    // 出差记录详情页
+    TravelStatistics.PlanDetailController = function($scope,$routeParams) {
+        var planId = $routeParams.orderId;
+        API.onload(function(){
+            API.tripPlan.getTripPlanOrderById(planId)
+                .then(function(result){
+                    console.info(result);
+                    $scope.planDetail = result;
+                    $scope.backTraffic = $scope.planDetail.backTraffic[0];
+                    $scope.hotel = $scope.planDetail.hotel[0];
+                    $scope.outTraffic = $scope.planDetail.outTraffic[0];
+
+                    var outTraffic = result.outTraffic[0];
+                    var backTraffic = result.backTraffic[0];
+                    var hotel = result.hotel[0];
+
+                    var outTraffics = $scope.planDetail.outTraffic;
+                    var backTraffics = $scope.planDetail.backTraffic;
+                    var hotels = $scope.planDetail.hotel;
+
+                    if (hotel && hotel.newInvoice) {
+                        $scope.hotelInvoiceImg = "/consume/invoice/" + hotel.id;
+                    }
+
+                    if (backTraffic && backTraffic.newInvoice) {
+                        $scope.backTrafficInvoiceImg = "/consume/invoice/" + backTraffic.id;
+                    }
+
+                    if (outTraffic && outTraffic.newInvoice) {
+                        $scope.outTrafficInvoiceImg = "/consume/invoice/" + outTraffic.id;
+                    }
+
+                    outTraffics.map(function(outTraffic){
+                        return Q.all([
+                            API.agency.getAgencyUser(outTraffic.auditUser),
+                            API.tripPlan.getConsumeInvoiceImg({consumeId: outTraffic.id})
+                        ])
+                        .spread(function(auditName, invoiceImg) {
+                            outTraffic.auditName = auditName;
+                            outTraffic.invoiceImg = invoiceImg;
+                            return outTraffic;
+                        })
+                    });
+
+                    backTraffics.map(function(backTraffic){
+                        return Q.all([
+                                API.agency.getAgencyUser(backTraffic.auditUser),
+                                API.tripPlan.getConsumeInvoiceImg({consumeId: backTraffic.id})
+                            ])
+                            .spread(function(auditName, invoiceImg) {
+                                backTraffic.auditName = auditName;
+                                backTraffic.invoiceImg = invoiceImg;
+                                return backTraffic;
+                            })
+                    });
+
+                    hotels = hotels.map(function(hotel){
+                        return Q.all([
+                                API.agency.getAgencyUser(hotel.auditUser),
+                                API.tripPlan.getConsumeInvoiceImg({consumeId: hotel.id})
+                            ])
+                            .spread(function(auditName, invoiceImg) {
+                                hotel.auditName = auditName;
+                                hotel.invoiceImg = invoiceImg;
+                                return hotel;
+                            })
+                    });
+
+                    Q.all(hotels)
+                    .then(function(hotels) {
+                        $scope.hotels = hotels;
+                        $scope.$apply();
+                    })
+                    .catch(function(err) {
+                        console.info(err);
+                    })
+
+                    Q.all(outTraffics)
+                    .then(function(outTraffics) {
+                        $scope.outTraffics = outTraffics;
+                        $scope.$apply();
+                    })
+                    .catch(function(err) {
+                        console.info(err);
+                    })
+
+                    Q.all(backTraffics)
+                    .then(function(backTraffics) {
+                        $scope.backTraffics = backTraffics;
+                        $scope.$apply();
+                    })
+                    .catch(function(err) {
+                        console.info(err);
+                    })
+                    API.staff.getStaff({id:$scope.planDetail.accountId})
+                        .then(function(result){
+                            $scope.travelerName = result.name;
+                            $scope.$apply();
+                        })
+                    loading(true);
+                    console.info(result);
+                    $scope.$apply();
+                })
+                .catch(function(err){
+                    console.info(err);
+                })
+        })
 
         //分页
         $scope.pagination = function () {
