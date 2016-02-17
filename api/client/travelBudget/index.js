@@ -252,8 +252,7 @@ travelBudget.getTrafficBudget = function(params) {
             return travelPolicy;
         })
         .then(function(travelPolicy) {
-            var cabinClass = 'Economy';
-
+            var cabinClass = '';
             if (travelPolicy.planeLevel == '经济舱') {
                 cabinClass = 'Economy';
             } else if (travelPolicy.planeLevel == '高端经济舱') {
