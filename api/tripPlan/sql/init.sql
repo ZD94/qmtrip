@@ -47,7 +47,9 @@ CREATE TABLE trip_plan_order (
     score integer,
     expire_at timestamp without time zone,
     create_at timestamp without time zone default now(),
-    update_at timestamp without time zone
+    update_at timestamp without time zone,
+    start_place_code character varying,
+    destination_code character varying,
 );
 
 --
@@ -210,7 +212,10 @@ CREATE TABLE consume_details (
     audit_user uuid,
     create_at timestamp without time zone default now(),
     update_at timestamp without time zone,
-    new_invoice character varying -- 新上传票据
+    new_invoice character varying, -- 新上传票据
+    start_place_code character varying,
+    arrival_place_code character varying,
+    city_code character varying
 );
 
 

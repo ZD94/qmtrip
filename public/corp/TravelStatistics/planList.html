@@ -1,0 +1,56 @@
+<section>
+    <div class="settlement">
+        <ul>
+            <li><a href="#/TravelStatistics/SettlementInfo">结算信息</a></li>
+            <li><a href="#/TravelStatistics/StaffPoint">员工积分</a></li>
+            <li><a href="">出差分布</a></li>
+            <li class="on"><a href="#/TravelStatistics/planList">出差记录</a></li>
+        </ul>
+        <div class="settle_main mainbox_bottom">
+            <div class="settle_chart"></div>
+            <div class="settle_list ">
+                <table width="100%" class="content">
+                    <tr>
+                        <td>姓名</td>
+                        <td>出发时间</td>
+                        <td>服务</td>
+                        <td>内容简要</td>
+                        <td>项目</td>
+                        <td>预算</td>
+                        <td>实际价格</td>
+                        <td>节省</td>
+                        <td>获得积分</td>
+                        <td>操作</td>
+                    </tr>
+                    <tr ng-repeat="item in planlist">
+                        <td align="center">{{item.staffName}}</td>
+                        <td align="center">{{item.startAt | date: 'yyyy-MM-dd'}}</td>
+                        <td align="center">
+                        	<p ng-if="item.isNeedTraffic" class="traffic_icon web-icon-font3">&#xe90e;</p>
+                            <p ng-if="item.isNeedHotel" class="live_icon web-icon-font3">&#xe914;</p>
+                        </td align="center">
+                        <td align="center">
+                        	<p ng-if="item.isNeedTraffic"><a>{{item.startPlace}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="staff/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.destination}}</a></p>
+                            <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
+                        </td>
+                        <td align="center">{{item.description}}</td>
+                        <td align="center">
+							<span ng-if="item.status!='-1'">¥{{item.budget}}</span>
+                            <span ng-if="item.status=='-1'">暂无</span>
+                        </td>
+                        <td align="center">
+							<span ng-if="item.expenditure!=0">¥{{item.expenditure}}</span>
+                            <span ng-if="item.expenditure==0">暂无</span>
+                        </td>
+                        <td align="center">¥{{item.budget-item.expenditure}}</td>
+                        <td align="center">
+							<span ng-if="item.score!=0">{{item.score}}</span>
+                            <span ng-if="item.score==0">暂无</span>
+                        </td>
+                        <td align="center"><a href="" ng-click="enterDetail(item.id)">查看详情</a></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

@@ -13,12 +13,11 @@ gulplib.bundle_lib('notie', {require:['notie']});
 gulplib.bundle_lib('ngapp', './common/client/ngapp.js', {external:['api']});
 gulplib.bundle_lib('bootstrap', {require:["bootstrap"]});
 gulplib.bundle_lib('swiper', {require:['swiper']});
-
 gulplib.angular_app('staff');
 gulplib.angular_app('corp');
 gulplib.angular_app('agency');
 gulplib.angular_app('demo');
-
+gulplib.angular_app('mobile');
 gulplib.dist(function(){
     var filter = require('gulp-filter');
     var dist_all = [

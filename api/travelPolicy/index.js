@@ -83,15 +83,26 @@ travelPolicy.updateTravelPolicy = function(data){
 }
 /**
  * 根据id查询差旅标准
- * @param id
- * @param data
+ * @param {String} params.id
+ * @param {Boolean} params.isReturnDefault 如果不存在返回默认 default true,
  * @returns {*}
  */
 travelPolicy.getTravelPolicy = function(params){
     var id = params.id;
-    if(!id){
-        throw {code: -1, msg: "id不能为空"};
+
+    var isReturnDefault = params.isReturnDefault;
+    if (isReturnDefault !== false) {
+        isReturnDefault = true;
     }
+
+    if(!id){
+        if (isReturnDefault) {
+            return travalPolicyModel.findById('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a');
+        } else {
+            throw {code: -1, msg: "id不能为空"};
+        }
+    }
+
     return travalPolicyModel.findById(id);
 }
 

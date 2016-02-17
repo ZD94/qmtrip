@@ -15,7 +15,9 @@ module.exports = function (Db, DataType) {
         description  : {type: DataType.TEXT }, //预算/计划单描述
         status       : {type: DataType.INTEGER,         defaultValue: 0 }, //企业状态
         startPlace   : {type: DataType.STRING,          field: "start_place"}, //出发地
-        destination  : {type: DataType.STRING}, //出差目的地
+        destination  : {type: DataType.STRING,          field: "destination"}, //出差目的地
+        startPlaceCode   : {type: DataType.STRING,      field: "start_place_code"}, //出发地城市代码
+        destinationCode  : {type: DataType.STRING,      field: "destination_code"}, //出差目的地城市代码
         startAt      : {type: "timestamp without time zone", field: "start_at"}, //出发时间
         backAt       : {type: "timestamp without time zone", field: "back_at"}, //结束时间
         isNeedTraffic: {type: DataType.BOOLEAN,         field: "is_need_traffic"}, //是否需要交通服务

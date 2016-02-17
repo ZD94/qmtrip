@@ -64,8 +64,12 @@ staff.createStaff = function(data){
     if (!data.companyId) {
         throw {code: -4, msg: "所属企业不能为空"};
     }
-    return Q()
-        .then(function(){
+    return API.company.getCompany({companyId: data.companyId, columns: ['name','domainName']})
+        .then(function(c){
+            if(c.domainName && c.domainName != "" && data.email.indexOf(c.domainName) == -1){
+                throw {code: -6, msg: "邮箱格式不符合要求"};
+            }
+            data.companyName = c.name;
             if(accountId) {
                 return {id: accountId};
             }
@@ -76,6 +80,9 @@ staff.createStaff = function(data){
             data.id = account.id;
             if(!data.travelLevel || data.travelLevel == ""){
                 data.travelLevel = null;
+            }
+            if(!data.departmentId || data.departmentId == ""){
+                data.departmentId = null;
             }
             return staffModel.create(data);
         })
@@ -137,6 +144,9 @@ staff.updateStaff = function(data){
     if(!data.travelLevel || data.travelLevel == ""){
         data.travelLevel = null;
     }
+    if(!data.departmentId || data.departmentId == ""){
+        data.departmentId = null;
+    }
     return Q()
         .then(function(){
             if(data.email){
@@ -167,7 +177,27 @@ staff.updateStaff = function(data){
             }
         })
         .spread(function(rownum, rows){
-            return rows[0];
+            return Q.all([
+                    API.travelPolicy.getTravelPolicy({id: rows[0].travelLevel}),
+                    API.company.getCompany({companyId: rows[0].companyId})
+            ])
+                .spread(function(tp, com){
+                    var vals = {
+                        username: rows[0].name,
+                        mobile: rows[0].mobile,
+                        travelPolicy: tp.name,
+                        time: utils.now(),
+                        companyName: com.name
+                    }
+                    return API.mail.sendMailRequest({
+                        toEmails: "yali.wang@tulingdao.com",
+                        templateName: "staff_update_email",
+                        values: vals
+                    })
+                        .then(function(result) {
+                            return rows[0];
+                        });
+                })
         });
 }
 /**
@@ -203,6 +233,16 @@ staff.findOneStaff = function(params){
     var options = {};
     options.where = params;
     return staffModel.findOne(options)
+}
+
+/**
+ * 根据部门id查询部门下员工数
+ * @type {getCountByDepartment}
+ */
+staff.getCountByDepartment = getCountByDepartment;
+getCountByDepartment.required_params = ["departmentId"];
+function getCountByDepartment(params){
+    return staffModel.count({where: {departmentId: params.departmentId, status: {$gte: 0}}})
 }
 
 /**
@@ -244,7 +284,7 @@ staff.listAndPaginateStaff = function(params){
     limit = perPage;
     offset = (page - 1) * perPage;
     if (!options.order) {
-        options.order = [["create_at", "desc"]]
+        options.order = [["id", "desc"]]
     }
     params.status = {$ne: STAFF_STATUS.DELETE};//只查询在职人员
     options.limit = limit;
@@ -263,31 +303,30 @@ staff.listAndPaginateStaff = function(params){
  * @param options
  * @returns {*}
  */
-staff.increaseStaffPoint = function(params) {
+staff.increaseStaffPoint = increaseStaffPoint;
+increaseStaffPoint.required_params = ['id', 'companyId', 'accountId', 'increasePoint'];
+function increaseStaffPoint(params) {
     var id = params.id;
     var operatorId = params.accountId;
     var increasePoint = params.increasePoint;
-    if(!id){
-        throw {code: -1, msg: "id不能为空"};
-    }
-    if(!increasePoint){
-        throw {code: -2, msg: "increasePoint不能为空"};
-    }
     return staffModel.findById(id)
         .then(function(obj) {
             var totalPoints = obj.totalPoints + increasePoint;
             var balancePoints = obj.balancePoints + increasePoint;
             var pointChange = {staffId: id, status: 1, points: increasePoint, remark: params.remark||"增加积分", operatorId: operatorId, currentPoint: balancePoints};
+            if(params.orderId){
+                pointChange.orderId = params.orderId;
+            }
+            pointChange.companyId = params.companyId;
             return sequelize.transaction(function(t) {
                 return Q.all([
                         staffModel.update({totalPoints: totalPoints, balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
-//                        obj.increment(['total_points','balance_points'], {by: increasePoint, transaction: t}),//此处为toJSON对象不能使用instance的方法
                         pointChangeModel.create(pointChange, {transaction: t})
                     ]);
             });
         })
-        .spread(function(increment, create){
-            return increment;
+        .then(function(){
+            return true;
         });
 }
 
@@ -313,17 +352,17 @@ staff.decreaseStaffPoint = function(params) {
                 throw {code: -3, msg: "积分不足"};
             }
             var balancePoints = obj.balancePoints - decreasePoint;
-            var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分", operatorId: operatorId, currentPoint: balancePoints}//此处也应该用model里的属性名封装obj
+            var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分",
+                operatorId: operatorId, currentPoint: balancePoints, companyId: params.companyId}//此处也应该用model里的属性名封装obj
             return sequelize.transaction(function(t) {
                 return Q.all([
                         staffModel.update({balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
-//                        obj.decrement('balance_points', {by: decreasePoint, transaction: t}),
                         pointChangeModel.create(pointChange, {transaction: t})
                     ]);
             });
         })
-        .spread(function(decrement,create){
-            return decrement;
+        .then(function(){
+            return true;
         });
 }
 
@@ -362,6 +401,58 @@ staff.listAndPaginatePointChange = function(params){
         .then(function(result){
             return new Paginate(page, perPage, result.count, result.rows);
         });
+}
+
+/**
+ * 统计企业员工月度积分变动情况
+ * @param options
+ * @returns {*}
+ */
+staff.getStaffPointsChangeByMonth = function(params) {
+    var q1  = _.pick(params, ['companyId', 'staffId']);
+    var q2  = _.pick(params, ['companyId', 'staffId']);
+    var q3 = _.pick(params, ['companyId', 'staffId']);
+    var q4 = _.pick(params, ['companyId', 'staffId']);
+
+    q1.status = 1;
+    q2.status = -1;
+    q3.status = 1;
+    q4.status = -1;
+
+    var count = params.count;
+    var dateArr = [];
+    for(var i=0; i< count; i++){
+        var month = moment().subtract(i, 'months').format('YYYY-MM');
+        dateArr.push(month);
+    }
+
+    return Q.all(dateArr.map(function(month){
+        var start_time = moment(month + '-01').format('YYYY-MM-DD HH:mm:ss');
+        var end_time = moment(month + '-01').endOf('month').format("YYYY-MM-DD")+" 23:59:59";
+        q1.createAt = {$gte: start_time, $lte: end_time};
+        q2.createAt = {$gte: start_time, $lte: end_time};
+        q3.createAt = {$lte: end_time};
+        q4.createAt = {$lte: end_time};
+        return Q.all([
+            pointChangeModel.sum('points', {where: q1}),
+            pointChangeModel.sum('points', {where: q2}),
+            pointChangeModel.sum('points', {where: q3}),
+            pointChangeModel.sum('points', {where: q4})
+        ])
+            .spread(function(a, b, c, d){
+                a = a || 0;
+                b = b || 0;
+                c = c || 0;
+                d = d || 0;
+
+                return {
+                    month: month,
+                    increase: a,
+                    decrease: b,
+                    balance: c - d
+                };
+            })
+    }))
 }
 
 /**
@@ -404,6 +495,8 @@ function getStaffPointsChange(params){
         });
 }
 
+
+
 /**
  * 检查导入员工数据
  * @param params
@@ -411,9 +504,10 @@ function getStaffPointsChange(params){
  */
 staff.beforeImportExcel = function(params){
     var userId = params.accountId;
-    var md5key = params.md5key;
+    var fileId = params.fileId;
 //    var obj = nodeXlsx.parse(fileUrl);
     var travalPolicies = {};
+    var departmentMaps = {};
     var addObj = [];
     var noAddObj = [];
     var downloadAddObj = [];
@@ -423,35 +517,51 @@ staff.beforeImportExcel = function(params){
     var repeatEmail = [];
     var repeatMobile = [];
     var companyId = "";
+    var p_companyId = params.companyId;
     var domainName = "";
     var xlsxObj;
-    return API.attachment.getAttachment({md5key: md5key, userId: userId})
+    return API.attachment.getSelfAttachment({fileId: fileId, accountId: userId})
         .then(function(att){
-            xlsxObj = nodeXlsx.parse(att.content);
-            return staff.getStaff({id: userId});
+            if(att){
+                var content = new Buffer(att.content, 'base64');
+                xlsxObj = nodeXlsx.parse(content);
+                if(p_companyId){
+                    return {companyId: p_companyId};
+                }else{
+                    return staff.getStaff({id: userId});
+                }
+            }else{
+                throw {code:-1, msg:"附件记录不存在"};
+            }
         })
         .then(function(sf){
             companyId = sf.companyId;
             return Q.all([
                 API.travelPolicy.getAllTravelPolicy({where: {companyId: companyId}}),
+                API.department.getAllDepartment({companyId: companyId}),//得到部门
                 API.company.getCompany({companyId: companyId})
             ])
         })
-        .spread(function(results, com){
+        .spread(function(results,depts, com){
             domainName = com.domainName;
             for(var t=0;t<results.length;t++){
                 var tp = results[t];
                 travalPolicies[tp.name] = tp.id;
             }
-            return travalPolicies;
+            for(var k=0;k<depts.length;k++){
+                var dep = depts[k];
+                departmentMaps[dep.name] = dep.id;
+            }
+            return [travalPolicies,departmentMaps];
         })
-        .then(function(travalps){
+        .spread(function(travalps, departments){
             var data = xlsxObj[0].data;
             return Q.all(data.map(function(item, index){
                 var s = data[index];
                 s[1] = s[1] ? s[1]+"" : "";
 //                    var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
-                var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
+//                var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
+                var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', departmentId: departments[s[3]] || null, department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
                 item = staffObj;
                 if(index>0 && index<201){//不取等于0的过滤抬头标题栏
                     if(_.trim(staffObj.name) == ""){
@@ -508,6 +618,13 @@ staff.beforeImportExcel = function(params){
                         downloadNoAddObj.push(s);
                         return;
                     }
+                    if(s[3] && _.trim(s[3]) != "" && !staffObj.departmentId){
+                        staffObj.reason = "部门不符合要求";
+                        s[6] = "部门不符合要求";
+                        noAddObj.push(staffObj);
+                        downloadNoAddObj.push(s);
+                        return;
+                    }
                     return Q.all([
                             API.auth.checkAccExist({email: s[2], type: 1}),
                             API.auth.checkAccExist({mobile: s[1], type: 1})
@@ -548,12 +665,13 @@ staff.beforeImportExcel = function(params){
                     for(var i=0;i<addObj.length;i++){
                         var addStaff = addObj[i];
                         if(_.trim(addStaff.email) == rEmail){
+                            var obj = downloadAddObj[i];
                             addObj.splice(i, 1);
                             downloadAddObj.splice(i, 1);
                             addStaff.reason = "邮箱与本次导入中邮箱重复";
-                            downloadAddObj[i][6] = "邮箱与本次导入中邮箱重复";
+                            obj[6] = "邮箱与本次导入中邮箱重复";
                             noAddObj.push(addStaff);
-                            downloadNoAddObj.push(downloadAddObj[i]);
+                            downloadNoAddObj.push(obj);
                         }
                     }
                 }
@@ -563,12 +681,13 @@ staff.beforeImportExcel = function(params){
                     for(var i=0;i<addObj.length;i++){
                         var addStaff = addObj[i];
                         if(_.trim(addStaff.mobile) == rMobile){
+                            var obj = downloadAddObj[i];
                             addObj.splice(i, 1);
                             downloadAddObj.splice(i, 1);
                             addStaff.reason = "手机号与本次导入中手机号重复";
-                            downloadAddObj[i][6] = "手机号与本次导入中手机号重复";
+                            obj[6] = "手机号与本次导入中手机号重复";
                             noAddObj.push(addStaff);
-                            downloadNoAddObj.push(downloadAddObj[i]);
+                            downloadNoAddObj.push(obj);
                         }
                     }
                 }
@@ -576,7 +695,7 @@ staff.beforeImportExcel = function(params){
             })
         })
         .then(function(data){
-            return API.attachment.deleteAttachment({md5key: md5key, userId: userId})//
+            return API.attachments.removeFileAndAttach({id: fileId})
                 .then(function(result){
                     return data;
                 });
@@ -598,7 +717,7 @@ staff.importExcelAction = function(params){
     return Q.all(data.map(function(item, index){
             var s = data[index];
 //                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, roleId: s.roleId, companyId: s.companyId};//company_id默认为当前登录人的company_id
-            var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, companyId: s.companyId, type:"import"};//company_id默认为当前登录人的company_id
+            var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,departmentId: s.departmentId,travelLevel: s.travelLevel, companyId: s.companyId, type:"import"};//company_id默认为当前登录人的company_id
             if(index>=0 && index<200){
                 return staff.createStaff(staffObj)
                     .then(function(ret){
@@ -634,12 +753,10 @@ staff.importExcelAction = function(params){
  */
 staff.downloadExcle = function (params){
     fs.exists(config.upload.tmpDir, function (exists) {
-        if(!exists)
+        if(!exists){
             fs.mkdir(config.upload.tmpDir);
+        }
     });
-    /*if (!fs.exists(config.upload.tmpDir)) {
-        fs.mkdir(config.upload.tmpDir);
-    }*/
     var data = params.objAttr;
     var nowStr = moment().format('YYYYMMDDHHmm');
     if(!data){
@@ -718,17 +835,24 @@ staff.statisticStaffsRole = function(params){
     if(!params.companyId){
         throw {code: -1, msg: '企业Id不能为空'};
     }
+    var where = {};
     var companyId = params.companyId;
+    var departmentId = params.departmentId;
+    where.companyId = companyId;
+    if(departmentId){
+        where.departmentId = departmentId;
+    }
+    where.status = {$ne: STAFF_STATUS.DELETE};
     var adminNum = 0
     var commonStaffNum = 0;
     var unActiveNum = 0;
     var totalCount = 0;
-    return staffModel.findAll({where: {companyId: companyId, status: {$ne: STAFF_STATUS.DELETE}}})
+    return staffModel.findAll({where: where})
         .then(function(staffs){
-            if(staffs){
+            if(staffs && staffs.length>0){
                 totalCount = staffs.length;
                 return Q.all(staffs.map(function(s){
-                    if(s.roleId == 2){
+                    if(s.roleId == 2 || s.roleId == 0){
                         adminNum++;
                     }else if(s.roleId == 1){
                         commonStaffNum++;
@@ -743,6 +867,7 @@ staff.statisticStaffsRole = function(params){
             }
         })
         .then(function(){
+            console.log(adminNum);
             return {totalCount: totalCount, adminNum: adminNum, commonStaffNum: commonStaffNum, unActiveNum: unActiveNum};
         });
 }

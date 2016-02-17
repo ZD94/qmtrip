@@ -17,7 +17,7 @@ var TravelPolicy=(function(){
     TravelPolicy.PolicyListController = function($scope) {
         $("title").html("差旅标准");
         Myselect();
-        $(".left_nav li").removeClass("on").eq(2).addClass("on");
+        $(".left_nav li").removeClass("on").eq(3).addClass("on");
 
         API.onload(function(){
             API.staff.getCurrentStaff()
@@ -111,7 +111,7 @@ var TravelPolicy=(function(){
                         isChangeLevel:$(".create_policy .Ccheckbox").is(':checked'),
                         hotelLevel:$(".create_policy .ChotelTevel").html().replace('/',','),
                         hotelPrice:$(".create_policy .ChotelPrice").val(),
-                        companyTd:$scope.company_id
+                        companyId:$scope.company_id
                     })
                     .then(function(result){
                         Myalert("温馨提示","增加成功");
@@ -240,6 +240,28 @@ var TravelPolicy=(function(){
             $(".policy_page li").css('opacity','1');
         }
         $scope.updatePolicy = function () {
+            if ($(".update_policy .Cname").val()=="") {
+                Myalert("温馨提示","请填写等级名称");
+                return false;
+            }
+            if ($(".update_policy .CplaneLevel").html()=="请选择仓位") {
+                Myalert("温馨提示","请选择飞机仓位");
+                return false;
+            }
+            if ($(".update_policy .CplaneDiscount").html()=="请选择折扣") {
+                Myalert("温馨提示","请选择飞机折扣");
+                return false;
+            }
+            if ($(".update_policy .CtrainLevel").html()=="请选择座次") {
+                Myalert("温馨提示","请选择火车座次");
+                return false;
+            }
+            if ($(".update_policy .ChotelTevel").html()=="星级标准") {
+                Myalert("温馨提示","请选择住宿标准");
+                return false;
+            }
+
+
             API.onload(function(){
                 API.travelPolicy.updateTravelPolicy({
                     id:$scope.updateId,

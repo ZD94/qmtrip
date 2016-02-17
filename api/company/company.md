@@ -31,7 +31,7 @@
 | msg     | 错误消息 |
 
 
->. 新增企业 API.company.updateCompany(params, callback);
+>. 修改企业信息 API.company.updateCompany(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------

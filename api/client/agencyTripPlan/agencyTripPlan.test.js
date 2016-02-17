@@ -91,9 +91,14 @@ describe("api/client/agencyTripPlan.js", function() {
             API.tripPlan.deleteTripPlanOrder({orderId: orderId, userId: staffId})
         ])
             .spread(function(ret1, ret2, ret3, ret4){
+                assert.equal(ret1, true);
+                assert.equal(ret2, true);
+                assert.equal(ret3, true);
+                assert.equal(ret4, true);
                 done()
             })
             .catch(function(err){
+                console.info(err);
                 throw err;
             })
             .done();
@@ -212,6 +217,26 @@ describe("api/client/agencyTripPlan.js", function() {
                 throw err;
             }
             assert(ret != null);
+            done();
+        })
+    });
+
+    it("#editTripPlanBudget should be ok", function(done) {
+        var self = {accountId: agencyUserId};
+        API.client.agencyTripPlan.editTripPlanBudget.call(self, {consumeId: consumeId, budget: '3333'}, function(err, ret){
+            if (err) {
+                throw err;
+            }
+            assert.equal(ret, true);
+            done();
+        })
+    });
+
+    it("#editTripPlanBudget should be error if params.budget is null", function(done) {
+        var self = {accountId: agencyUserId};
+        API.client.agencyTripPlan.editTripPlanBudget.call(self, {consumeId: consumeId}, function(err, ret){
+            assert.equal(err.code, -1);
+            assert.equal(ret, null);
             done();
         })
     });

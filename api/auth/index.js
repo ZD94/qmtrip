@@ -415,11 +415,15 @@ authServer.login = function(data) {
                 throw L.ERR.ACCOUNT_NOT_EXIST
             }
 
+            if (!loginAccount.pwd && loginAccount.status == ACCOUNT_STATUS.NOT_ACTIVE) {
+                throw L.ERR.ACCOUNT_NOT_ACTIVE;
+            }
+
             if (loginAccount.pwd != pwd) {
                 throw L.ERR.PASSWORD_NOT_MATCH
             }
 
-            if (loginAccount.status == 0) {
+            if (loginAccount.status == ACCOUNT_STATUS.NOT_ACTIVE) {
                 throw L.ERR.ACCOUNT_NOT_ACTIVE;
             }
 
@@ -444,7 +448,7 @@ authServer.login = function(data) {
                 });
         })
         .then(function(ret) {
-            console.info('返回结果:', ret);
+            //console.info('返回结果:', ret);
             return ret;
         })
 
@@ -761,7 +765,7 @@ authServer.qrCodeLogin = function(params) {
     var accountId = params.accountId;
     var sign = params.sign;
     var timestamp = params.timestamp;
-    var backUrl = params.backUrl;   //登录后返回地址
+    //var backUrl = params.backUrl;   //登录后返回地址
     return Q()
     .then(function() {
         if (!params) {
@@ -798,14 +802,32 @@ authServer.qrCodeLogin = function(params) {
         var data = {
             key: account.qrcodeToken,
             timestamp: timestamp,
-            accountId: account.id,
-            backUrl: backUrl
+            accountId: account.id
         };
         var sysSign = cryptoData(data);
-        if (sysSign.toLowerCase() != sign.toLowerCase()) {
+        var signCmpResult = false;
+        //优先使用新签名判断
+        if (sysSign.toLowerCase() == sign.toLowerCase() ) {
+            signCmpResult = true;
+        }
+        //新签名不正确,使用旧签名判断
+        if (!signCmpResult && account.oldQrcodeToken) {
+            data = {
+                key: account.oldQrcodeToken,
+                timestamp: timestamp,
+                accountId: account.id
+            };
+            sysSign = cryptoData(data);
+            if (sysSign.toLowerCase() == sign.toLowerCase()) {
+                signCmpResult = true;
+            }
+        }
+
+        if (!signCmpResult) {
             throw L.ERR.SIGN_ERROR;
         }
-        return makeAuthenticateSign(account.id, 'wx');
+
+        return makeAuthenticateSign(account.id);
     });
 }
 
@@ -837,7 +859,7 @@ authServer.getQRCodeUrl = function(params) {
         return API.shorturl.long2short({longurl: backUrl})
     })
     .then(function(shortUrl) {
-        backUrl = shortUrl;
+        backUrl = encodeURIComponent(shortUrl);
         return Models.Account.findById(accountId)
     })
     .then(function(account) {
@@ -846,16 +868,55 @@ authServer.getQRCodeUrl = function(params) {
         }
 
         var qrcodeToken = getRndStr(8);
+        account.oldQrcodeToken = account.qrcodeToken;
         account.qrcodeToken = qrcodeToken;
+
         return account.save();
     })
     .then(function(account) {
-        var timestamp = Date.now() + 1000 * 150;
-        var data = {accountId: account.id, timestamp: timestamp, key: account.qrcodeToken, backUrl: backUrl};
+        var timestamp = Date.now() + 1000 * 60 * 5;
+        var data = {accountId: account.id, timestamp: timestamp, key: account.qrcodeToken};
         var sign = cryptoData(data);
         var urlParams = {accountId: account.id, timestamp: timestamp, sign: sign, backUrl: backUrl};
         urlParams = combineData(urlParams);
         return C.host + QRCODE_LOGIN_URL +"?"+urlParams;
+    })
+}
+
+/**
+ * @method isEmailUserd
+ *
+ * 邮箱是否被使用
+ *
+ * @param {Object} params
+ * @param {String} params.email 邮箱
+ * @param {Integer} [params.type] 1.企业  2.代理商 默认 1
+ * @reutnr {Promise} true 使用 false未使用
+ */
+authServer.isEmailUsed = function(params) {
+    if (!params) {
+        params = {};
+    }
+    var email = params.email;
+    var type = params.type;
+
+    return Q()
+    .then(function() {
+        if (!validate.isEmail(email)) {
+            throw L.ERR.EMAIL_FORMAT_INVALID;
+        }
+
+        if (type !== 1 && type !== 2) {
+            type = 1;
+        }
+
+        return Models.Account.findOne({where: {email: email, type: type}})
+    })
+    .then(function(account) {
+        if (account) {
+            return true;
+        }
+        return false;
     })
 }
 
@@ -876,6 +937,7 @@ function combineData(obj) {
 
 //加密对象
 function cryptoData(obj) {
+    console.info('调用加密===>', obj, typeof obj);
     if (typeof obj == 'string') {
         return md5(obj);
     }
@@ -896,7 +958,7 @@ authServer.__initHttpApp = function(app) {
             res.cookie("token_id", result.token_id);
             res.cookie("user_id", result.user_id);
             res.cookie("timestamp", result.timestamp);
-            res.cookie("sign", result.sign);
+            res.cookie("token_sign", result.token_sign);
             res.redirect(backUrl);
         })
         .catch(function(err) {

@@ -16,11 +16,20 @@
 @h15:15px;
 @h14:14px;
 @h12:12px;
+.fr{float: right!important;}
+.p0{padding: 0;}
+.pl10{padding-left: 10px;}
+.h34{
+  height: 34px;
+}
 .blue{
   color: @color-theme1;
 }
 .orange{
   color: #f56d23!important;
+}
+.illegal{
+  color: #f56d23;
 }
 .staffManageContent{
   width: 1000px;
@@ -50,7 +59,7 @@
     }
   }
   .staff_tab_content{
-    width: 100%;
+    width: 998px;
     height: auto;
     float: left;
     clear: both;
@@ -201,6 +210,62 @@
               background-color: #e5e5e5;
               color: @color-text;
             }
+          }
+        }
+      }
+    }
+    .department {
+      width: 958px;
+      height: auto;
+      padding: 20px;
+      h1 {
+        width: 100%;
+        height: 36px;
+        line-height: 36px;
+        font-weight: normal;
+        .companyname {
+          font-size: 18px;
+          padding-right: 50px;
+          float: left;
+        }
+        a {
+          color: @color-theme1;
+          float: left;
+        }
+        span {
+          font-size: 12px;
+          float: left;
+        }
+        .updatecompany,.createcompany {
+          width: 500px;
+          height: 36px;
+          margin-left: 30px;
+          float: left;
+          display: none;
+        }
+      }
+      ul {
+        padding-left: 30px;
+        padding-top: 20px;
+        li {
+          width: 100%;
+          height: auto;
+          margin-top: -12px;
+          overflow: hidden;
+          span {
+            line-height: 22px;
+            font-size: 16px;
+            display: inline-block;
+            padding-right: 20px;
+            float: left;
+            a {
+              font-size: 13px;
+              color: @color-theme1;
+            }
+          }
+          .updatechildDepartment {
+            padding-top: 35px;
+            display: none;
           }
         }
       }
@@ -441,7 +506,7 @@
           cursor: pointer;
           float: right;
           display: block;
-          width: 78px;
+          width: 58px;
           height: 34px;
           border: 1px solid @color-border2;
           border-radius: @border-radius-2;
@@ -621,7 +686,7 @@
           cursor: pointer;
           float: right;
           display: block;
-          width: 78px;
+          width: 58px;
           height: 34px;
           border: 1px solid @color-border2;
           border-radius: @border-radius-2;
@@ -833,7 +898,7 @@
           cursor: pointer;
           float: right;
           display: block;
-          width: 78px;
+          width: 58px;
           height: 34px;
           border: 1px solid @color-border2;
           border-radius: @border-radius-2;

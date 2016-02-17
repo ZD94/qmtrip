@@ -11,6 +11,8 @@ var Q = require("q");
 var API = require("common/api");
 var auth = require("../auth");
 var L = require("common/language");
+var _ = require('lodash');
+
 /**
  * @class staff 员工信息
  */
@@ -32,16 +34,21 @@ staff.createStaff = auth.checkPermission(["user.add"],
             .then(function(staff){
                 var companyId = staff.companyId;
                 params.companyId = companyId;
-                return API.company.getCompany({companyId: companyId, columns: ['name']})
-            })
-            .then(function(c){
-                if(c.domainName && c.domainName != "" && params.email.indexOf(c.domainName) == -1){
-                    throw {code: -6, msg: "邮箱格式不符合要求"};
-                }
-                params.companyName = c.name;
                 return API.staff.createStaff(params);
             })
     });
+
+staff.agencyCreateStaff = function(params){
+    var user_id = this.accountId;
+    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+        .then(function(result){
+            if(result){
+                return API.staff.createStaff(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        })
+};
 
 /**
  * @method deleteStaff
@@ -75,6 +82,18 @@ staff.deleteStaff = auth.checkPermission(["user.delete"],
             });
     });
 
+staff.agencyDeleteStaff = function(params){
+    var user_id = this.accountId;
+    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+        .then(function(result){
+            if(result){
+                return API.staff.deleteStaff(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        })
+};
+
 /**
  * @method updateStaff
  *
@@ -99,6 +118,18 @@ staff.updateStaff = auth.checkPermission(["user.edit"],//三个参数权限判�
             });
     });
 
+staff.agencyUpdateStaff = function(params){
+    var user_id = this.accountId;
+    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+        .then(function(result){
+            if(result){
+                return API.staff.updateStaff(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        })
+};
+
 /**
  * @method getStaff
  *
@@ -120,6 +151,18 @@ staff.getStaff = auth.checkPermission(["user.query"],
                     })
             });
     });
+
+staff.agencyGetStaff = function(params){
+    var user_id = this.accountId;
+    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+        .then(function(result){
+            if(result){
+                return API.staff.getStaff(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        })
+};
 
 //代理商根据id得到员工信息
 staff.getStaffByAgency = function(params){
@@ -180,6 +223,18 @@ staff.listAndPaginateStaff = auth.checkPermission(["user.query"],
             });
     });
 
+staff.agencyListAndPaginateStaff = function(params){
+    var user_id = this.accountId;
+    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+        .then(function(result){
+            if(result){
+                return API.staff.listAndPaginateStaff(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        })
+};
+
 /**
  * @method increaseStaffPoint
  *
@@ -198,9 +253,10 @@ staff.increaseStaffPoint = function(params){
             if(!staff.companyId){
                 throw {msg:"该员工不存在或员工所在企业不存在"};
             }
+            params.companyId = staff.companyId;
             return Q.all([
                     API.company.getCompany({companyId: staff.companyId}),
-                    API.agency.getAgency({agencyId: agencyUser.agencyId, userId: user_id})
+                    API.agency.getAgency({agencyId: agencyUser.agencyId})
                 ])
                 .spread(function(company, agency){
                     if(!company.agencyId){
@@ -234,9 +290,10 @@ staff.decreaseStaffPoint = function(params){
             if(!staff.companyId){
                 throw {msg:"该员工不存在或员工所在企业不存在"};
             }
+            params.companyId = staff.companyId;
             return Q.all([
                     API.company.getCompany({companyId: staff.companyId}),
-                    API.agency.getAgency({agencyId: agencyUser.agencyId, userId: user_id})
+                    API.agency.getAgency({agencyId: agencyUser.agencyId})
                 ]);
         })
         .spread(function(company, agency){
@@ -279,6 +336,38 @@ staff.getStaffPointsChange = function(params){
     var staffId = this.accountId;
     params.staffId = staffId;
     return API.staff.getStaffPointsChange(params);
+}
+
+/**
+ * @method getStaffPointsChangeByMonth
+ * 获取企业或员工月度积分变动统计(增加、消费、积分余额)
+ * @param params.staffId //可选参数，如果不写则查询当前企业所有员工的积分统计
+ * @param params
+ * @returns {*}
+ */
+staff.getStaffPointsChangeByMonth = function(params) {
+    var self = this;
+    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
+        .then(function(staff){
+            return staff.companyId;
+        })
+        .then(function(companyId){
+            params.companyId = companyId;
+            var count = params.count;
+            typeof count == 'number' ? "" : count = 6;
+            params.count = count;
+            return API.staff.getStaffPointsChangeByMonth(params);
+        })
+}
+
+/**
+ * 根据部门id查询部门下员工数
+ * @param params
+ * @param .departmentId 部门id
+ * @returns {*}
+ */
+staff.getCountByDepartment = function(params){
+    return API.staff.getCountByDepartment(params);
 }
 
 /**
@@ -341,6 +430,18 @@ staff.statisticStaffs = function(params){
         });
 }
 
+staff.agencyStatisticStaffs = function(params){
+    var user_id = this.accountId;
+    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+        .then(function(result){
+            if(result){
+                return API.staff.statisticStaffs(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        })
+};
+
 
 /**
  * @method API.staff.statisticStaffs
@@ -390,8 +491,20 @@ staff.getStaffCountByCompany = function(params){
         });
 }
 
+staff.agencyGetStaffCountByCompany = function(params){
+    var user_id = this.accountId;
+    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+        .then(function(result){
+            if(result){
+                return API.staff.getStaffCountByCompany(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        })
+};
+
 /**
- * 统计企业员工总数
+ * 得到企业部门
  * @param params
  * @param {String} params.companyId
  * @returns {*}
@@ -430,6 +543,18 @@ staff.statisticStaffsRole = function(params){
             }
         });
 }
+
+staff.agencyStatisticStaffsRole = function(params){
+    var user_id = this.accountId;
+    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+        .then(function(result){
+            if(result){
+                return API.staff.statisticStaffsRole(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        })
+};
 
 
 staff.statStaffPointsByCompany = function(){

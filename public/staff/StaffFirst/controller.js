@@ -20,7 +20,8 @@ var StaffFirst = (function(){
 		dataloading(false);
 		loading(true);
 		$("title").html("首页");
-		$(".left_nav li").removeClass("on").eq(0).addClass("on");
+		$(".staff_menu_t ul li").removeClass("on");
+		$(".staff_menu_t ul a").eq(0).find("li").addClass("on");
 		//企业管理首页信息
 		$scope.initStaffUser = function(){
 			// loading(true)
@@ -30,8 +31,7 @@ var StaffFirst = (function(){
 						var company_id = ret.companyId;
 						var travelLevel =ret.travelLevel;
 						var str = ret.name;
-						$scope.firstname=str.substring(0,2);
-						console.info(ret)
+						$scope.firstname=str.substring(str.length-2,str.length);
 						Q.all([
 							API.tripPlan.countTripPlanNum({accountId:ret.id}),
 							API.travelPolicy.getTravelPolicy({id: travelLevel})

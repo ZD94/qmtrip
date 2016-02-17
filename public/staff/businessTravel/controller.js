@@ -18,6 +18,8 @@ var businessTravel=(function(){
      * @constructor
      */
     businessTravel.IndexController = function($scope) {
+        $(".staff_menu_t ul li").removeClass("on");
+        $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
         loading(true);
         $("title").html("我要出差");
         Myselect();
@@ -55,6 +57,8 @@ var businessTravel=(function(){
      * @constructor
      */
     businessTravel.TrafficStepController = function($scope, $routeParams) {
+        $(".staff_menu_t ul li").removeClass("on");
+        $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
         loading(true);
         $("title").html("我要出差");
         Myselect();
@@ -113,8 +117,10 @@ var businessTravel=(function(){
         })
         //生成预算
         $scope.budget = function () {
-            var startplace = $(".traffic1").attr("checkval"),//出发城市id
-                endplace = $(".traffic2").attr("checkval"),//目的地城市id
+            var startplaceval = $(".traffic1").attr("checkval"),//出发城市id
+                endplaceval = $(".traffic2").attr("checkval"),//目的地城市id
+                startplace = $(".traffic1").val(),
+                endplace = $(".traffic2").val(),
                 starttime = $scope.start_time,//出发时间
                 starttimelate = $scope.start_timelate,//出发最晚到达时间
                 endtime = $scope.end_time,//返回时间
@@ -154,7 +160,7 @@ var businessTravel=(function(){
                 Myalert("温馨提示","最晚到达时间格式时间格式不正确");
                 return false;
             }
-            window.location.href = "#/businessTravel/CreateResult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&spval="+startplace+"&epval="+endplace+"&"+parameter;
+            window.location.href = "#/businessTravel/CreateResult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&spval="+startplaceval+"&epval="+endplaceval+"&"+parameter;
         }
         //返回上一步
         $scope.prevstep = function () {
@@ -170,6 +176,8 @@ var businessTravel=(function(){
      * @constructor
      */
     businessTravel.LiveStepController = function($scope, $routeParams) {
+        $(".staff_menu_t ul li").removeClass("on");
+        $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
         loading(true);
         $("title").html("我要出差");
         Myselect();
@@ -269,6 +277,8 @@ var businessTravel=(function(){
      * @constructor
      */
     businessTravel.TrafficLiveController = function($scope, $routeParams) {
+        $(".staff_menu_t ul li").removeClass("on");
+        $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
         loading(true);
         $("title").html("我要出差");
         Myselect();
@@ -353,8 +363,10 @@ var businessTravel=(function(){
 
         //下一步
         $scope.nextStep = function () {
-            var startplace = $(".traffic1").attr("checkval"),//出发城市id
-                endplace = $(".traffic2").attr("checkval"),//目的地城市id
+            var startplaceval = $(".traffic1").attr("checkval"),//出发城市id
+                endplaceval = $(".traffic2").attr("checkval"),//目的地城市id
+                startplace = $(".traffic1").val(),//出发城市id
+                endplace = $(".traffic2").val(),//目的地城市id
                 starttime = $scope.start_time,//出发时间
                 starttimelate = $scope.start_timelate,//出发最晚到达时间
                 endtime = $scope.end_time,//返回时间
@@ -362,6 +374,8 @@ var businessTravel=(function(){
                 parameter = $("form").serialize();//表单所有数据传参
             var dateReg = /^\d{4}-\d{2}-\d{2}$/;
             var timeReg = /^\d{2}:\d{2}$/;
+            $scope.live_time = starttime;
+            $scope.leave_time = endtime;
             if (startplace == "") {
                 Myalert("温馨提示","请选择出发城市");
                 return false;
@@ -400,8 +414,8 @@ var businessTravel=(function(){
 
         //生成预算
         $scope.budget = function () {
-            var startplace = $(".traffic1").attr("checkval"),//出发城市id
-                endplace = $(".traffic2").attr("checkval"),//目的地城市id
+            var startplaceval = $(".traffic1").attr("checkval"),//出发城市id
+                endplaceval = $(".traffic2").attr("checkval"),//目的地城市id
                 liveplace = $(".live2").attr("checkval"),//住宿位置id
                 livetime = $scope.live_time,//入住时间
                 leavetime = $scope.leave_time,//离店时间
@@ -419,12 +433,16 @@ var businessTravel=(function(){
                 Myalert("温馨提示","离店日期不能小于入住日期");
                 return false;
             }
-            window.location.href = "#/businessTravel/CreateResult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&spval="+startplace+"&epval="+endplace+"&lpval="+liveplace+"&"+parameter;
+            window.location.href = "#/businessTravel/CreateResult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&spval="+startplaceval+"&epval="+endplaceval+"&lpval="+liveplace+"&"+parameter;
         }
 
         //返回上一步
         $scope.prevstep = function () {
             window.location.href = "#/businessTravel/Index";
+        }
+        $scope.prevstep2 = function () {
+            $(".live_step1").hide();
+            $(".traffic_step1").show();
         }
 
     }
@@ -436,6 +454,8 @@ var businessTravel=(function(){
      * @constructor
      */
     businessTravel.CreateResultController = function($scope, $routeParams, $filter) {
+        $(".staff_menu_t ul li").removeClass("on");
+        $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
         loading(false);
         loading(true);
         $("title").html("我要出差");
@@ -448,9 +468,21 @@ var businessTravel=(function(){
         //只选交通
         if (tra==1&&liv==0) {
             $scope.startplace = $routeParams.sp;//出发城市
-            $scope.startplaceval = $routeParams.spval;//出发城市代码
+            //$scope.startplaceval = $routeParams.spval;//出发城市代码
+            if ($routeParams.spval=="") {
+                $scope.startplaceval = $routeParams.sp;
+            }
+            else if ($routeParams.spval!="") {
+                $scope.startplaceval = $routeParams.spval;
+            }
             $scope.endplace = $routeParams.ep;//目的地城市
-            $scope.endplaceval = $routeParams.epval;//目的地城市代码
+            //$scope.endplaceval = $routeParams.epval;//目的地城市代码
+            if ($routeParams.epval=="") {
+                $scope.endplaceval = $routeParams.ep;
+            }
+            else if ($routeParams.epval!="") {
+                $scope.endplaceval = $routeParams.epval;
+            }
             $scope.starttime = $routeParams.st;//出发日期
             $scope.starttimelate = $routeParams.stl;//出发最晚到达时间
             $scope.endtime = $routeParams.et;//返回日期
@@ -481,7 +513,7 @@ var businessTravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        Myalert("温馨提示","生成预算失败，请重新生成");
+                        Myconfirm("生成预算失败，请重新生成","确认","取消");
                     });
             })
         }
@@ -515,7 +547,7 @@ var businessTravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        Myalert("温馨提示","生成预算失败，请重新生成");
+                        Myconfirm("生成预算失败，请重新生成","确认","取消");
                     });
             })
 
@@ -523,9 +555,21 @@ var businessTravel=(function(){
         //交通+住宿
         if (tra==1&&liv==1) {
             $scope.startplace = $routeParams.sp;//出发城市
-            $scope.startplaceval = $routeParams.spval;//出发城市代码
+            //$scope.startplaceval = $routeParams.spval;//出发城市代码
+            if ($routeParams.spval=="") {
+                $scope.startplaceval = $routeParams.sp;
+            }
+            else if ($routeParams.spval!="") {
+                $scope.startplaceval = $routeParams.spval;
+            }
             $scope.endplace = $routeParams.ep;//目的地城市
-            $scope.endplaceval = $routeParams.epval;//目的地城市代码
+            //$scope.endplaceval = $routeParams.epval;//目的地城市代码
+            if ($routeParams.epval=="") {
+                $scope.endplaceval = $routeParams.ep;
+            }
+            else if ($routeParams.epval!="") {
+                $scope.endplaceval = $routeParams.epval;
+            }
             $scope.starttime = $routeParams.st;//出发日期
             $scope.starttimelate = $routeParams.stl;//出发最晚到达时间
             $scope.endtime = $routeParams.et;//返回日期
@@ -551,21 +595,21 @@ var businessTravel=(function(){
                     })
                 ])
                     .spread(function(ret1,ret2) {
+                        console.info (ret2);
                         $scope.companyId = ret1.companyId;
                         $scope.trafficlive = ret2;
                         $(".creating").hide();
                         $(".createresult,.tianxun").show();
-                        var tipMsg = '需手工处理';
-                        $scope.totalprice = ret2.price == -1 ? tipMsg: ret2.price;
-                        $scope.trafficprice = $scope.trafficlive.traffic == -1 ? tipMsg: $scope.trafficlive.traffic;
-                        $scope.liveprice = $scope.trafficlive.hotel == -1 ? tipMsg : $scope.trafficlive.hotel;
-                        $scope.goTraffic = ret2.goTraffic.price == -1 ? tipMsg: ret2.goTraffic.price;
-                        $scope.backTraffic = ret2.backTraffic.price == -1 ? tipMsg : ret2.backTraffic.price;
+                        $scope.totalprice = ret2.price;
+                        $scope.trafficprice = $scope.trafficlive.traffic;
+                        $scope.liveprice = $scope.trafficlive.hotel;
+                        $scope.goTraffic = ret2.goTraffic.price;
+                        $scope.backTraffic = ret2.backTraffic.price;
                         $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
-                        Myalert("温馨提示","生成预算失败，请重新生成");
+                        Myconfirm("生成预算失败，请重新生成","确认","取消");
                     });
             })
         }
@@ -583,7 +627,7 @@ var businessTravel=(function(){
                     startAt:$scope.starttime,
                     startTime:$scope.livetime,
                     endTime:$scope.leavetime,
-                    budget:$scope.totalprice,
+                    budget:Number($scope.totalprice),
                     isNeedTraffic:$scope.tra,
                     isNeedHotel:$scope.liv,
                     remark:$scope.startplace+$scope.endplace+$scope.starttime+$scope.liveplace+$scope.livetime
@@ -599,7 +643,7 @@ var businessTravel=(function(){
                         hotelName:$scope.liveplace,
                         startTime:$scope.livetime,
                         endTime:$scope.leavetime,
-                        budget:$scope.liveprice,
+                        budget:Number($scope.liveprice),
                         invoiceType:2
                     }
                     consumeDetails.push(consumeDetails_hotel);
@@ -612,7 +656,7 @@ var businessTravel=(function(){
                         startPlace:$scope.startplace,
                         arrivalPlace:$scope.endplace,
                         startTime:$scope.starttime,
-                        budget:$scope.goTraffic,
+                        budget:Number($scope.goTraffic),
                         invoiceType:1
                     }
                     if($scope.endtime){
@@ -632,7 +676,7 @@ var businessTravel=(function(){
                         arrivalPlace:$scope.startplace,
                         startTime:$scope.starttime,
                         endTime:$scope.endtime,
-                        budget:$scope.backTraffic,
+                        budget:Number($scope.backTraffic),
                         invoiceType:1
                     }
                     if($scope.endtimelate){
@@ -641,10 +685,8 @@ var businessTravel=(function(){
                     consumeDetails.push(consumeDetails_backTraffic);
                 }
                 order.consumeDetails = consumeDetails;
-
                 API.tripPlan.savePlanOrder(order)
                     .then(function(result){
-                        console.info (result);
                         $scope.createTime = result.createAt;
                         $scope.orderId = result.id;
                         $(".bottom1").hide();

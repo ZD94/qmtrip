@@ -5,9 +5,9 @@
             <tr>
                 <td height="50" class="loadtxt" style="border-bottom: 1px #E5E5E5 solid;">
                     <p>今天 {{nowtime | date: 'HH:mm'}}</p>
-                    <p>您计划&nbsp;&nbsp;&nbsp;<span ng-if="starttime!=undefined">{{starttime}}&nbsp;&nbsp;&nbsp;{{startplace}}-{{endplace}}&nbsp;&nbsp;&nbsp;</span><span ng-if="starttimelate!=undefined && starttimelate!=''">最晚{{starttime}} {{starttimelate}}到达</span></p>
+                    <p><span ng-if="starttime!=undefined">您计划&nbsp;&nbsp;&nbsp;{{starttime}}&nbsp;&nbsp;&nbsp;{{startplace}}-{{endplace}}&nbsp;&nbsp;&nbsp;</span><span ng-if="starttimelate!=undefined && starttimelate!=''">最晚{{starttime}} {{starttimelate}}到达</span></p>
                     <p ng-if="endtime!='' && endtime!=undefined">　　　&nbsp;&nbsp;&nbsp;{{endtime}}&nbsp;&nbsp;&nbsp;{{endplace}}-{{startplace}}&nbsp;&nbsp;&nbsp;<span ng-if="endtimelate!=undefined && endtimelate!=''">最晚{{endtime}} {{endtimelate}}到达</span></p>
-                    <p><span ng-if="liveplace!=undefined">　　　&nbsp;&nbsp;&nbsp;在{{liveplace}}附近酒店入住&nbsp;&nbsp;&nbsp;</span><span ng-if="livetime!=undefined">计划住店时间为{{livetime}}到{{leavetime}}</span></p>
+                    <p><span ng-if="liveplace!=undefined"><span ng-if="starttime==undefined">您计划</span><span ng-if="starttime!=undefined">　　　</span>&nbsp;&nbsp;&nbsp;在{{liveplace}}附近酒店入住&nbsp;&nbsp;&nbsp;</span><span ng-if="livetime!=undefined">计划住店时间为{{livetime}}到{{leavetime}}</span></p>
                 </td>
             </tr>
             <tr>
@@ -19,9 +19,18 @@
     <section class="createresult">
         <div class="top">本次出差预算：
             <span class="createtime" ng-bind-html="createTime | date:'yyyy-MM-dd'" style="position: absolute; left: 20px;"></span>
-            <span ng-if="tra==1&&liv==0">¥{{(onlytraffic.price).toFixed(2)}}</span>
-            <span ng-if="tra==0&&liv==1">¥{{(onlylive.price).toFixed(2)}}</span>
-            <span ng-if="tra==1&&liv==1">¥{{(trafficlive.price).toFixed(2)}}</span>
+            <span ng-if="tra==1&&liv==0">
+                <span ng-if="onlytraffic.price!='-1'">¥{{(onlytraffic.price).toFixed(2)}}</span>
+                <span ng-if="onlytraffic.price=='-1'">暂无</span>
+            </span>
+            <span ng-if="tra==0&&liv==1">
+                <span ng-if="onlylive.price!='-1'">¥{{(onlylive.price).toFixed(2)}}</span>
+                <span ng-if="onlylive.price=='-1'">暂无</span>
+            </span>
+            <span ng-if="tra==1&&liv==1">
+                <span ng-if="trafficlive.price!='-1'">¥{{(trafficlive.price).toFixed(2)}}</span>
+                <span ng-if="trafficlive.price=='-1'">暂无</span>
+            </span>
             <span style="position: absolute; right: 20px;">{{purposename}}</span>
         </div>
         <div class="center">
@@ -38,8 +47,14 @@
                         <div class="endplace">{{endplace}}</div>
                     </td>
                     <td height="90" style="font-size: 14px;" align="center">
-                        <span ng-if="liv==0">¥{{onlytraffic.goTraffic.price}}</span>
-                        <span ng-if="liv==1">¥{{trafficlive.goTraffic.price}}</span>
+                        <span ng-if="liv==0">
+                            <span ng-if="onlytraffic.goTraffic.price!='-1'">¥{{onlytraffic.goTraffic.price}}</span>
+                            <span ng-if="onlytraffic.goTraffic.price=='-1'">此路迢迢<br>暂无预算</span>
+                        </span>
+                        <span ng-if="liv==1">
+                            <span ng-if="trafficlive.goTraffic.price!='-1'">¥{{trafficlive.goTraffic.price}}</span>
+                            <span ng-if="trafficlive.goTraffic.price=='-1'">此路迢迢<br>暂无预算</span>
+                        </span>
                     </td>
                 </tr>
                 <tr ng-if="liv==1">
@@ -48,8 +63,14 @@
                         <div style="line-height: 35px; padding: 10px 0; float: left;">入住地：{{endplace}}&nbsp;{{liveplace}}附近<br>入住日期：{{livetime}}&nbsp;&nbsp;&nbsp;退房日期：{{leavetime}}</div>
                     </td>
                     <td height="90" style="font-size: 14px;" align="center">
-                        <span ng-if="tra==0">¥{{onlylive.price}}</span>
-                        <span ng-if="tra==1">¥{{trafficlive.hotel}}</span>
+                        <span ng-if="tra==0">
+                            <span ng-if="onlylive.price!='-1'">¥{{onlylive.price}}</span>
+                            <span ng-if="onlylive.price=='-1'">此路迢迢<br>暂无预算</span>
+                        </span>
+                        <span ng-if="tra==1">
+                            <span ng-if="trafficlive.hotel!='-1'">¥{{trafficlive.hotel}}</span>
+                            <span ng-if="trafficlive.hotel=='-1'">此路迢迢<br>暂无预算</span>
+                        </span>
                     </td>
                 </tr>
                 <tr ng-if="tra==1 && endtime">
@@ -60,8 +81,14 @@
                         <div class="endplace">{{startplace}}</div>
                     </td>
                     <td height="90" style="font-size: 14px;" align="center">
-                        <span ng-if="liv==0">¥{{onlytraffic.backTraffic.price}}</span>
-                        <span ng-if="liv==1">¥{{trafficlive.backTraffic.price}}</span>
+                        <span ng-if="liv==0">
+                            <span ng-if="onlytraffic.backTraffic.price!='-1'">¥{{onlytraffic.backTraffic.price}}</span>
+                            <span ng-if="onlytraffic.backTraffic.price=='-1'">此路迢迢<br>暂无预算</span>
+                        </span>
+                        <span ng-if="liv==1">
+                            <span ng-if="trafficlive.backTraffic.price!='-1'">¥{{trafficlive.backTraffic.price}}</span>
+                            <span ng-if="trafficlive.backTraffic.price=='-1'">此路迢迢<br>暂无预算</span>
+                        </span>
                     </td>
                 </tr>
             </table>
