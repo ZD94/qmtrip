@@ -359,7 +359,7 @@ tripPlan.countTripPlanNum = function (params) {
 }
 
 /**
- * 统计计划单的动态预算/计划金额和实际支出
+ * @method statPlanOrderMoneyByCompany 统计计划单的动态预算/计划金额和实际支出
  * @param params
  */
 tripPlan.statPlanOrderMoneyByCompany = function (params) {
