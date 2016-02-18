@@ -398,4 +398,11 @@ tripPlan.commitTripPlanOrder = function(orderId){
     return API.tripPlan.commitTripPlanOrder({orderId: orderId, accountId: self.accountId})
 }
 
+tripPlan.getConsumeInvoiceImg = function(params) {
+    var consumeId = params.consumeId;
+    return API.tripPlan.getConsumeInvoiceImg({
+        consumeId: consumeId
+    });
+}
+
 module.exports = tripPlan;
