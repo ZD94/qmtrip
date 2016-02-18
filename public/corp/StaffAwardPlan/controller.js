@@ -20,7 +20,7 @@ var StaffAwardPlan=(function(){
                     $scope.$apply();
                 })
                 .catch(function(err){
-                    console.info(err)
+                    TLDAlert(err.msg || err);
                 })
         })
     }

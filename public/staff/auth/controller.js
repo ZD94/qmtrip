@@ -242,7 +242,7 @@ var auth=(function(){
                     $("#imgCode").attr("src",result.captcha);
                     picTicket = result.ticket;
                 }).catch(function(err){
-                    console.info(err);
+                    TLDAlert(err.msg || err);
                 }).done();
         })
 
@@ -289,10 +289,7 @@ var auth=(function(){
                                 }
                             }, 1000);
                     }).catch(function(err){
-                        if(err.msg) {
-                            alert(err.msg);
-                        }
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     }).done();
             })
 
@@ -323,7 +320,7 @@ var auth=(function(){
                         $("#imgCode").attr("src",result.captcha);
                         picTicket = result.ticket;
                     }).catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     }).done();
             })
         }
@@ -446,7 +443,6 @@ var auth=(function(){
                             window.location.href = "#/auth/corplaststep?email="+mail;
                         })
                         .catch(function(err){
-                            //console.info(err);
                             if (err.msg) {
                                 //alert(err.msg);
                                 if(err.msg == '手机号已注册'){
@@ -537,7 +533,7 @@ var auth=(function(){
                     $("#imgCode").attr("src", result.captcha);
                     picTicket = result.ticket;
                 }).catch(function (err) {
-                    console.info(err);
+                    TLDAlert(err.msg || err);
                 }).done();
         })
         //换一换图片验证码
@@ -551,7 +547,7 @@ var auth=(function(){
                         picTicket = result.ticket;
                         return picTicket;
                     }).catch(function (err) {
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     }).done();
             })
         }
@@ -601,7 +597,7 @@ var auth=(function(){
                         $("#imgCode").attr("src", result.captcha);
                         picTicket = result.ticket;
                     }).catch(function (err) {
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     }).done();
             })
         }
@@ -645,7 +641,7 @@ var auth=(function(){
                     $scope.$apply();
                 })
                 .catch(function(err) {
-                    console.info(err);
+                    TLDAlert(err.msg || err);
                     $("#success_tip").hide();
                     $("#fail_tip").show();
                     if (err.code) {

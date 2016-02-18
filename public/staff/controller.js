@@ -15,7 +15,7 @@ module.exports = (function(){
                     $scope.$apply();
                 })
                 .catch(function (err) {
-                    console.info(err)
+                    TLDAlert(err.msg || err)
                 });
         });
         $scope.logout = function () {
@@ -28,7 +28,7 @@ module.exports = (function(){
                     //window.location.href = "/staff.html#/auth/login?backurl=" + encodeURIComponent(window.location.href);
                 })
                 .catch(function (err) {
-                    console.info(err)
+                    TLDAlert(err.msg || err)
                     //location.reload();
                 })
         };

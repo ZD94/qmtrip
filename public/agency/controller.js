@@ -6,7 +6,7 @@ module.exports = (function(){
     agency.IndexController = function($scope) {
         API.require("agency", function (err, mod) { //API.require 使用回调函数时,不会导致页面跳转登录
             if (err || !mod) {
-                //console.log('load agency err:', err);
+                TLDAlert(err);
                 return;
             }
             API.onload(function(){
@@ -17,20 +17,15 @@ module.exports = (function(){
                         $scope.$apply();
                     })
                     .catch(function(err){
-                        console.info(err)
+                        TLDAlert(err.msg || err);
                     })
             });
         $scope.logout = function () {
             if (!API.auth)
                 return;
             API.auth.logout()
-                .then(function (ret) {
+                .done(function() {
                     window.location.href = "/staff.html#/auth/login";
-                    //location.reload();
-                    //window.location.href = "/agency.html#/login/login?backurl=" + encodeURIComponent(window.location.href);
-                })
-                .catch(function (err) {
-                    console.info(err)
                 })
             };
         })
