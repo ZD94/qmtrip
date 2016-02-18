@@ -30,7 +30,7 @@ var API = require("common/api");
  * @param {String} data.sign
  * @param {String} data.accountId
  * @param {String} data.timestamp
- * @return {promise}
+ * @return {promise} true when success, throw err has error
  * @public
  */
 auth.activeByEmail = API.auth.activeByEmail;
@@ -44,7 +44,7 @@ auth.activeByEmail = API.auth.activeByEmail;
  * @param {String} data.email 邮箱 (可选,如果email提供优先使用)
  * @param {String} data.pwd 密码
  * @param {String} [data.mobile] 手机号(可选,如果email提供则优先使用email)
- * @return {Promise} {code:0, msg: "ok", data: {user_id: "账号ID", token_sign: "签名", token_id: "TOKEN_ID", timestamp:"时间戳"}
+ * @return {Promise} {user_id: "账号ID", token_sign: "签名", token_id: "TOKEN_ID", timestamp:"时间戳"}
  */
 auth.login = API.auth.login;
 
@@ -58,7 +58,7 @@ auth.login = API.auth.login;
  * @param {String} data.mobile 要绑定的手机号
  * @param {String} data.code 手机验证码
  * @param {String} data.pwd 登录密码
- * @return {Promise} true||error;
+ * @return {Promise} true when success, throw error has error
  */
 auth.bindMobile =API.auth.bindMobile;
 
@@ -70,7 +70,7 @@ auth.bindMobile =API.auth.bindMobile;
  *
  * @param {Object} params
  * @param {String} params.domain 域名
- * @return {Promise} true||error
+ * @return {Promise} false |error
  */
 auth.checkBlackDomain = function(params) {
     var domain = params.domain;
@@ -106,7 +106,7 @@ auth.checkBlackDomain = function(params) {
  * @param {String} params.msgTicket 验证码凭证
  * @param {String} params.picCode 图片验证码
  * @param {String} params.picTicket 图片验证码凭证
- * @return {Promise}
+ * @return {Promise} back true when success
  */
 auth.registryCompany = function(params) {
     //先创建登录账号
@@ -201,7 +201,7 @@ auth.registryCompany = function(params) {
  *
  * @param {Object} params
  * @param {String} params.email 邮件账号
- * @return {Promise} true||error
+ * @return {Promise} true|error
  */
 auth.sendActiveEmail = function(params) {
     return API.auth.sendActiveEmail(params);
@@ -211,10 +211,10 @@ auth.sendActiveEmail = function(params) {
  * @method logout
  *
  * 退出登录
- *
+ * @param {Object} params
  * @return {Promise} true||error
  */
-auth.logout = function() {
+auth.logout = function(params) {
     var self = this;
     var accountId = self.accountId;
     var tokenId = self.tokenId;
@@ -229,6 +229,7 @@ auth.logout = function() {
  * @param fn
  * @param permissions
  * @return {Function}
+ * @private
  */
 auth.checkPermission = function(permissions, fn) {
     return function() {
@@ -247,6 +248,7 @@ auth.checkPermission = function(permissions, fn) {
  * @param permissions
  * @param fn
  * @returns {Function}
+ * @private
  */
 auth.checkAgencyPermission = function(permissions, fn) {
     return function() {
@@ -269,7 +271,7 @@ auth.checkAgencyPermission = function(permissions, fn) {
  * @param {String} params.sign 签名
  * @param {String} params.timestamp 时间戳
  * @param {String} params.accountId 账户ID
- * @return {Promise}
+ * @return {Promise} true when success ,otherwise throw err
  */
 auth.checkResetPwdUrlValid = API.auth.checkResetPwdUrlValid;
 
@@ -326,9 +328,13 @@ auth.sendResetPwdEmail = function(params) {
 auth.resetPwdByEmail = API.auth.resetPwdByEmail;
 
 /**
+ * @method getAccountStatus
+ *
  * 得到账号激活状态
- * @param params
- * @returns {*}
+ *
+ * @param {Object} params
+ * @param {String|Array} params.attributes
+ * @returns {Promise} object 账户状态
  */
 auth.getAccountStatus = function(params) {
     params.attributes = ["status"];
@@ -343,7 +349,7 @@ auth.getAccountStatus = function(params) {
  * @param {Object} params
  * @param {String} params.oldPwd 旧密码
  * @param {String} params.newPwd 新密码
- * @return {Promise}
+ * @return {Promise} true when success otherwise throw err
  */
 auth.resetPwdByOldPwd = function(params) {
     var self = this;
@@ -362,7 +368,7 @@ auth.resetPwdByOldPwd = function(params) {
  *
  * @param {Object} params
  * @param {String} params.backUrl 登陆后跳转链接
- * @return {Promise} 返回二维码中包含内容链接
+ * @return {Promise} URL 返回二维码中包含内容链接
  */
 auth.getQRCodeUrl = function(params) {
     var self = this;
