@@ -880,7 +880,8 @@ function commitTripPlanOrder(params){
 
             for(var i=0; i<list.length; i++){
                 var s = list[i];
-                if(s.status != 0 || !s.newInvoice){
+
+                if((s.status != 0 && !s.newInvoice) || s.status == -1){
                     throw {code: -7, msg: '票据没有上传完'};
                 }
             }
