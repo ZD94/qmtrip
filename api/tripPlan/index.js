@@ -55,7 +55,6 @@ function savePlanOrder(params){
             _planOrder.createAt = utils.now();
             var total_budget = 0;
             var isBudget = true;
-
             for(var i in consumeDetails) {
                 var obj = consumeDetails[i];
 
@@ -158,6 +157,7 @@ function getTripPlanOrder(params){
         })
 }
 
+
 tripPlan.getConsumeInvoiceImg = function(params) {
     var consumeId = params.consumeId;
     return Q()
@@ -189,7 +189,6 @@ getConsumeDetail.required_params = ['consumeId'];
 getConsumeDetail.optional_params = ['columns'];
 function getConsumeDetail(params){
     var options = {}
-
     if(params.columns){
         options.attributes = _.intersection(params.columns, ConsumeDetailsCols);
     }
@@ -296,7 +295,6 @@ function updateConsumeBudget(params){
 
             var budget = params.budget;
             var c_budget = 0;
-
             if(o_budget > 0) {
                 c_budget = parseFloat(order.budget) - parseFloat(o_budget) + parseFloat(budget);
             } else {
@@ -327,7 +325,6 @@ function updateConsumeBudget(params){
                 if(list[i].budget < 0)
                     return true;
             }
-
             return PlanOrder.update({status: 0}, {where: {id: orderId}, fields: ['status']})
         })
         .then(function(){
@@ -415,6 +412,7 @@ function saveConsumeRecord(params){
             if(budget >0){
                 order.increment(['budget'], { by: parseFloat(budget) });
             }
+
 
             if(order.status > 0){
                 order.status = 0;
@@ -521,7 +519,7 @@ function uploadInvoice(params){
     var orderId = "";
 
     return ConsumeDetails.findById(params.consumeId, {attributes: ['status', 'orderId', 'invoice', 'accountId']})
-        .then(function(custome){
+        .then(function(custome, order){
             if(!custome || custome.status == -2)
                 throw L.ERR.NOT_FOUND;
 
@@ -529,14 +527,12 @@ function uploadInvoice(params){
                 throw L.ERR.PERMISSION_DENY;
 
             orderId = custome.orderId;
-
             return [orderId, custome, PlanOrder.findById(orderId, {attributes: ['status']})]
         })
         .spread(function(orderId, custome, order){
             if(order.status == -1){
                 throw {code: -2, msg: '还没有录入出差预算'};
             }
-
             var invoiceJson = custome.invoice;
             var times = invoiceJson.length ? invoiceJson.length+1 : 1;
             var currentInvoice = {times:times, picture:params.picture, create_at:moment().format('YYYY-MM-DD HH:mm'), status:0, remark: '', approve_at: ''};
