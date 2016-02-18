@@ -400,7 +400,7 @@ tripPlan.commitTripPlanOrder = function(orderId){
 
 /**
  * 获取发票图片
- * 
+ *
  * @param params
  */
 tripPlan.getConsumeInvoiceImg = function(params) {
