@@ -88,6 +88,8 @@ describe("api/client/tripPlan.js", function() {
             var tripPlanOrder = {
                 startPlace: '北京',
                 destination: '上海',
+                startPlaceCode: 'BJ123',
+                destinationCode: 'SH123',
                 budget: 1000,
                 description: '发送邮件测试计划单',
                 startAt: '2015-12-30 11:12:12',
@@ -96,6 +98,7 @@ describe("api/client/tripPlan.js", function() {
                     endTime: '2016-01-30 22:11:56',
                     budget: '300',
                     city: '上海市',
+                    cityCode: 'SH123',
                     hotelName: '丐帮',
                     invoiceType: 2,
                     type: 0
@@ -116,6 +119,8 @@ describe("api/client/tripPlan.js", function() {
             var tripPlanOrder = {
                 startPlace: '北京',
                 destination: '上海',
+                startPlaceCode: 'BJ123',
+                destinationCode: 'SH123',
                 budget: 1000,
                 description: '发送邮件测试计划单',
                 startAt: '2015-12-30 11:12:12',
@@ -124,6 +129,7 @@ describe("api/client/tripPlan.js", function() {
                     endTime: '2016-01-30 22:11:56',
                     budget: 'gg',
                     city: '上海市',
+                    cityCode: 'SH123',
                     hotelName: '丐帮',
                     invoiceType: 2,
                     type: 0
@@ -144,6 +150,8 @@ describe("api/client/tripPlan.js", function() {
             var tripPlanOrder = {
                 startPlace: '北京',
                 destination: '上海',
+                startPlaceCode: 'BJ123',
+                destinationCode: 'SH123',
                 budget: 1000,
                 description: '发送邮件测试计划单',
                 startAt: '2015-12-30 11:12:12',
@@ -151,6 +159,7 @@ describe("api/client/tripPlan.js", function() {
                     startTime: '2016-12-30 11:11:11',
                     budget: 300,
                     city: '上海市',
+                    cityCode: 'SH123',
                     hotelName: '丐帮',
                     invoiceType: 2,
                     type: 0
@@ -184,6 +193,8 @@ describe("api/client/tripPlan.js", function() {
             var tripPlanOrder = {
                 startPlace: '北京',
                 destination: '上海',
+                startPlaceCode: 'BJ123',
+                destinationCode: 'SH123',
                 budget: 1000,
                 startAt: '2015-12-30 11:12:12',
                 description: '我要去出差',

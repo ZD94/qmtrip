@@ -561,7 +561,8 @@ function uploadInvoice(params){
                 return Q.all([
                     ConsumeDetails.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
                     ConsumeDetailsLogs.create(logs,{transaction: t}),
-                    TripOrderLogs.create(orderLogs, {transaction: t})
+                    TripOrderLogs.create(orderLogs, {transaction: t}),
+                    PlanOrder.update({status: 0, updateAt: utils.now()}, {where: {id: orderId}})
                 ]);
             })
         })
@@ -895,7 +896,8 @@ function commitTripPlanOrder(params){
 
             for(var i=0; i<list.length; i++){
                 var s = list[i];
-                if(s.status != 0 || !s.newInvoice){
+
+                if((s.status != 0 && !s.newInvoice) || s.status == -1){
                     throw {code: -7, msg: '票据没有上传完'};
                 }
             }

@@ -84,7 +84,7 @@ var auth=(function(){
                             window.location.href= backUrl+"?logintime="+data.is_first_login;
                         }).catch(function(err){
                             if (err.msg) {
-                                alert(err.msg);
+                                //alert(err.msg);
                                 if(err.msg =='账号不存在'){
                                     $('.tip_err>a').text("马上注册");
                                     $scope.err_msg_tip = "该账号还未注册，";
@@ -92,7 +92,7 @@ var auth=(function(){
                                     $('.tip_err').show();
                                     $scope.$apply();
                                 }
-                                if(err.msg == '您的账号还未激活'){
+                                else if(err.msg == '您的账号还未激活'){
                                     $('.tip_err>a').text("");
                                     $('.tip_err>span').text("重新发送激活邮件");
                                     $scope.err_msg_tip = "该邮箱暂未激活，";
@@ -411,6 +411,7 @@ var auth=(function(){
                     API.auth.checkBlackDomain({domain: domain})
                         .catch(function(err){
                             //alert("邮箱后缀不合法或者已被使用");
+                            console.info(err.code);
                             if(err.code==-34){
                                 $("#corpMail").siblings(".err_msg").children("a").html("");
                                 $scope.err_msg_mail = "暂不支持公共邮箱，请使用企业邮箱注册";

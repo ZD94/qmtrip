@@ -29,6 +29,8 @@ describe("api/client/agencyTripPlan.js", function() {
     var tripPlanOrder = {
         startPlace: '北京',
         destination: '上海',
+        startPlaceCode: 'BJ123',
+        destinationCode: 'SH123',
         description: '审核发票用测试',
         budget: 1000,
         //startAt: '2015-12-30 11:12:12',
@@ -37,6 +39,7 @@ describe("api/client/agencyTripPlan.js", function() {
             startTime: '2016-01-07 10:22:00',
             endTime: '2016-01-30 11:12:34',
             city: '北京市',
+            cityCode: 'BJ123',
             hotelName: '丐帮总部',
             invoiceType: 2,
             budget: 1000,

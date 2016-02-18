@@ -16,26 +16,32 @@ function agentGetTripplanInvoice(req, res, next){
     return API.auth.authentication({user_id: userId, token_id: token_id, token_sign: token_sign, timestamp: timestamp})
         .then(function(result){
             if (!result) {
-                return false;
-            }else{
-                return API.tripPlan.getVisitPermission({consumeId: consumeId, userId: userId})
-                    .then(function(data){
-                        if(data.allow){
-                            return API.attachments.getAttachment({id: data.fileId})
-                                .then(function(attachment) {
-                                    res.set("Content-Type", attachment.contentType);
-                                    var content = new Buffer(attachment.content, 'base64');
-                                    res.write(content);
-                                    res.end();
-                                })
-                                .catch(next).done();
-                        }else{
-                            res.write("您没有权限访问该图片", "utf-8");
-                            res.end();
-                        }
-                    })
+                res.send(403);
+                return;
             }
+
+            return API.tripPlan.getVisitPermission({consumeId: consumeId, userId: userId})
+                .then(function(data){
+                    if (!data.allow) {
+                        res.send(403);
+                        return;
+                    }
+
+                    return API.attachments.getAttachment({id: data.fileId})
+                        .then(function(attachment) {
+                            if (!attachment || !attachment.content) {
+                                res.send(404);
+                                return;
+                            }
+
+                            res.set("Content-Type", attachment.contentType);
+                            var content = new Buffer(attachment.content, 'base64');
+                            res.write(content);
+                            res.end();
+                        })
+                })
         })
+        .catch(next).done();
 }
 
 
