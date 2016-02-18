@@ -545,7 +545,8 @@ function uploadInvoice(params){
                 return Q.all([
                     ConsumeDetails.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
                     ConsumeDetailsLogs.create(logs,{transaction: t}),
-                    TripOrderLogs.create(orderLogs, {transaction: t})
+                    TripOrderLogs.create(orderLogs, {transaction: t}),
+                    PlanOrder.update({status: 0, updateAt: utils.now()}, {where: {id: orderId}})
                 ]);
             })
         })
