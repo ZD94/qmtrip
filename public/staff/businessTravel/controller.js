@@ -623,7 +623,9 @@ var businessTravel=(function(){
                     type:1,
                     description:$scope.purposename,
                     startPlace:$scope.startplace,
+                    startPlaceCode:$scope.startplaceval,
                     destination:$scope.endplace,
+                    destinationCode:$scope.endplaceval,
                     startAt:$scope.starttime,
                     startTime:$scope.livetime,
                     endTime:$scope.leavetime,
@@ -640,6 +642,7 @@ var businessTravel=(function(){
                     var consumeDetails_hotel = {
                         type:0,
                         city:$scope.endplace,
+                        cityCode:$scope.endplaceval,
                         hotelName:$scope.liveplace,
                         startTime:$scope.livetime,
                         endTime:$scope.leavetime,
@@ -654,7 +657,9 @@ var businessTravel=(function(){
                     var consumeDetails_outTraffic = {
                         type:-1,
                         startPlace:$scope.startplace,
+                        startPlaceCode:$scope.startplaceval,
                         arrivalPlace:$scope.endplace,
+                        arrivalPlaceCode:$scope.endplaceval,
                         startTime:$scope.starttime,
                         budget:Number($scope.goTraffic),
                         invoiceType:1
@@ -673,7 +678,9 @@ var businessTravel=(function(){
                     var consumeDetails_backTraffic = {
                         type:1,
                         startPlace:$scope.endplace,
+                        startPlaceCode:$scope.endplaceval,
                         arrivalPlace:$scope.startplace,
+                        arrivalPlaceCode:$scope.startplaceval,
                         startTime:$scope.starttime,
                         endTime:$scope.endtime,
                         budget:Number($scope.backTraffic),
