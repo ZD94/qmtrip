@@ -44,7 +44,7 @@ var point=(function(){
                             })
                     })
                     .catch(function (err) {
-                        console.info(err)
+                        TLDAlert(err.msg || err)
                     });
             })
         }
@@ -74,7 +74,7 @@ var point=(function(){
                             })
                     })
                     .catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
             })
         }
@@ -101,7 +101,7 @@ var point=(function(){
                             })
                     })
                     .catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
             })
         }

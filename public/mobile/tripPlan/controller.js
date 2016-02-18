@@ -36,7 +36,6 @@
         //                wx.config(config);
         //            })
         //            .catch(function(err) {
-        //                console.info(err);
         //                alert("系统错误,请稍后重试");
         //            });
         //    })

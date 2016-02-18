@@ -54,7 +54,7 @@ module.exports = (function(){
                         loading(true);
 					})
 					.catch(function(err){
-						console.info(err)
+						TLDAlert(err.msg || err);
 					})
 			})
 		}
@@ -126,7 +126,7 @@ module.exports = (function(){
                         })
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			})
 		}
@@ -146,7 +146,7 @@ module.exports = (function(){
 						$scope.$apply();
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			})
 		}
@@ -194,8 +194,7 @@ module.exports = (function(){
 							window.location.href = "#/companyList/CompanyDetail?company=" + id;
 						})
 						.catch(function(err){
-							console.info(err);
-							alert(err.msg);
+							TLDAlert(err.msg || err);;
 						}).done()
 				})
 			}
@@ -246,8 +245,7 @@ module.exports = (function(){
 							window.location.href = "#/companyList/CompanyDetail?company=" + id;
 						})
 						.catch(function(err){
-							console.info(err);
-							alert(err.msg);
+							TLDAlert(err.msg || err);;
 						}).done()
 				})
 			}
@@ -323,7 +321,7 @@ module.exports = (function(){
 								$scope.$apply();
 							})
 					}).catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			})
 		}
@@ -410,7 +408,7 @@ module.exports = (function(){
 							})
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			})
 		}
@@ -465,7 +463,7 @@ module.exports = (function(){
 							})
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			})
 
@@ -550,7 +548,7 @@ module.exports = (function(){
 						$scope.selectkey = $scope.travellevel || "";
 						$scope.$apply();
 					}).catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					}).done();
 			})
 		}
@@ -578,7 +576,7 @@ module.exports = (function(){
 						$scope.initstafflist();
 						$scope.$apply();
 					}).catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					}).done();
 			})
 		}
@@ -599,7 +597,7 @@ module.exports = (function(){
 						$scope.$apply();
 						$scope.initstafflist();
 					}).catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					}).done();
 			})
 		}
@@ -620,7 +618,7 @@ module.exports = (function(){
 						$(".confirmFixed").hide();
 						$scope.initstafflist();
 					}).catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					}).done();
 			})
 		}
@@ -676,13 +674,9 @@ module.exports = (function(){
 						$scope.$apply();
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			})
-			/*.catch(function(err){
-			 console.info(err);
-			 }).done();*/
-			//})
 		}
 
 		//从预览界面返回至员工批量导入
@@ -708,10 +702,10 @@ module.exports = (function(){
 						window.open('/download/excle-file/'+filename, "_blank");
 						$scope.$apply();
 					}).catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			}).catch(function(err){
-				console.info(err);
+				TLDAlert(err.msg || err);;
 			}).done();
 			//})
 		}
@@ -730,7 +724,7 @@ module.exports = (function(){
 						$(".staff_tab_import").hide();
 						$scope.$apply();
 					}).catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					}).done();
 			})
 		}
@@ -786,7 +780,7 @@ module.exports = (function(){
 						$(".updatecompany").hide();
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			})
 		}
@@ -805,7 +799,7 @@ module.exports = (function(){
 						$(".createcompany").hide();
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			})
 		}
@@ -825,7 +819,7 @@ module.exports = (function(){
 						$scope.initdepartment();
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			})
 		}
@@ -845,7 +839,7 @@ module.exports = (function(){
 						$(".confirmFixed").hide();
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			})
 		}

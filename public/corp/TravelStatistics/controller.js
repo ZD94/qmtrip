@@ -84,8 +84,7 @@ var TravelStatistics = (function(){
                         $scope.$apply();
                     })
                     .catch(function(err) {
-                        alert("数据加载失败,请稍后重试");
-                        console.info(err);
+                        TLDAlert("数据加载失败,请稍后重试");
                     })
                     .done();
             })
@@ -164,7 +163,7 @@ var TravelStatistics = (function(){
                                 $scope.$apply();
                             })
                             .catch(function(err) {
-                                console.info(err);
+                                TLDAlert(err.msg || err);
                             })
                             .done();
                 })
@@ -196,12 +195,12 @@ var TravelStatistics = (function(){
                                 $scope.$apply();
                             })
                             .catch(function(err){
-                                console.info(err);
+                                TLDAlert(err.msg || err);
                             })
                     })
                 })
                 .catch(function(err){
-                    console.info(err)
+                    TLDAlert(err.msg || err)
                 })
         })
         //进入详情页
@@ -283,7 +282,7 @@ var TravelStatistics = (function(){
                         $scope.$apply();
                     })
                     .catch(function(err) {
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
 
                     Q.all(outTraffics)
@@ -292,7 +291,7 @@ var TravelStatistics = (function(){
                         $scope.$apply();
                     })
                     .catch(function(err) {
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
 
                     Q.all(backTraffics)
@@ -301,7 +300,7 @@ var TravelStatistics = (function(){
                         $scope.$apply();
                     })
                     .catch(function(err) {
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
                     API.staff.getStaff({id:$scope.planDetail.accountId})
                         .then(function(result){
@@ -313,7 +312,7 @@ var TravelStatistics = (function(){
                     $scope.$apply();
                 })
                 .catch(function(err){
-                    console.info(err);
+                    TLDAlert(err.msg || err);
                 })
         })
 
