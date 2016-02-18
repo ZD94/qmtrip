@@ -91,7 +91,7 @@ var staff = (function(){
                                         ])
                                             .spread(function(travelLevel, department, acc){
                                                 $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
-                                                $staff.department = department.name;//部门
+                                                $staff.department = department? department.name: '-';//部门
 //                                                $staff.accStatus = acc.status==0?'未激活':(acc.status == -1?'禁用': '已激活');//账户激活状态
                                                 if(acc){
                                                     $staff.activeStatus = acc.status;
