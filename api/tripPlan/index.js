@@ -30,8 +30,8 @@ var ConsumeDetailsCols = Object.keys(ConsumeDetails.attributes);
  * @returns {*}
  */
 tripPlan.savePlanOrder = savePlanOrder;
-savePlanOrder.required_params = ['consumeDetails', 'accountId', 'companyId', 'type', 'destination', 'budget'];
-savePlanOrder.optional_params = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark', 'description'];
+savePlanOrder.required_params = ['consumeDetails', 'accountId', 'companyId', 'type', 'destination', 'budget', 'destinationCode'];
+savePlanOrder.optional_params = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark', 'description', 'destinationCode', 'startPlaceCode'];
 var consumeDetails_required_fields = ['type', 'startTime', 'invoiceType', 'budget'];
 function savePlanOrder(params){
     var consumeDetails = params.consumeDetails.map(function(detail){
@@ -41,11 +41,27 @@ function savePlanOrder(params){
             }
         })
 
+        if(detail.startPlace && !detail.startPlaceCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        if(detail.arrivalPlace && !detail.arrivalPlaceCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        if(detail.city && !detail.cityCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
         return _.pick(detail, ConsumeDetailsCols);
     });
 
     delete params.consumeDetails;
     var _planOrder = params;
+
+    if(_planOrder.startPlace && !_planOrder.startPlaceCode) {
+        throw {code: -3, msg: '城市代码不能为空'};
+    }
 
     return API.seeds.getSeedNo('tripPlanOrderNo')
         .then(function(orderNo){
