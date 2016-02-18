@@ -559,7 +559,7 @@ var staff = (function(){
                                             .then(function(num){
                                                 s.peoplenum = num;
                                                 console.info ($scope.departmentlist);
-                                                loading(true);
+                                                $scope.$apply();
                                             })
                                         });
                                         $scope.$apply();
