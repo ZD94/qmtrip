@@ -363,7 +363,7 @@ tripPlan.listTripPlanOrder = function(options){
         query.status = {$ne: -2};
     }
 
-    options.order = [['create_at', 'desc']]; //默认排序，创建时间
+    options.order = [['start_at', 'desc'], ['create_at', 'desc']]; //默认排序，创建时间
 
     return PlanOrder.findAndCount(options)
         .then(function(ret){
@@ -562,7 +562,7 @@ function uploadInvoice(params){
                     ConsumeDetails.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
                     ConsumeDetailsLogs.create(logs,{transaction: t}),
                     TripOrderLogs.create(orderLogs, {transaction: t}),
-                    PlanOrder.update({status: 0, updateAt: utils.now()}, {where: {id: orderId}})
+                    PlanOrder.update({status: 0, auditStatus: 0, updateAt: utils.now()}, {where: {id: orderId}})
                 ]);
             })
         })
@@ -679,9 +679,9 @@ function approveInvoice(params){
                         throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
                     }
 
-                    if(order.status != 1 || order.auditStatus != 0){
-                        throw {code: -3, msg: '该订单未提交，不能审核'};
-                    }
+                    //if(order.status != 1){
+                    //    throw {code: -3, msg: '该订单未提交，不能审核'};
+                    //}
 
                     return [order, consume];
                 })
@@ -718,7 +718,7 @@ function approveInvoice(params){
                         var status = params.status;
 
                         if(status == -1){
-                            return PlanOrder.update({status: 0, auditStatus: -1, updateAt: utils.now()},
+                            return PlanOrder.update({status: 1, auditStatus: -1, updateAt: utils.now()},
                                 {where: {id: order.id}, fields: ['auditStatus', 'status', 'updateAt'], transaction: t});
                         }
 
