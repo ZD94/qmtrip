@@ -354,7 +354,7 @@ var travelRecord=(function(){
         }
         $scope.invoiceNoPass = function () {
             var reasontext = $(".invoiceNoPass .remark").val();
-            $scope.remark = reason1 + " " + reason2 + " " + reasontext;
+            $scope.remark = reason1 + "," + reason2 + "," + reasontext;
             $('.error').empty();
             if (reason1 =='' && reason2 == '' && reasontext == '') {
                 $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>理由不能为空");
