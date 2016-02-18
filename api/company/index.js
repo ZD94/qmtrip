@@ -39,18 +39,21 @@ company.domainIsExist = function(params) {
         throw {code: -1, msg: "domain not exist!"};
     }
 
-    if (C.is_allow_domain_repeat) {
-        return false;
-    }
+    return Q()
+    .then(function() {
+        if (C.is_allow_domain_repeat) {
+            return false;
+        }
 
-    return Models.Company.findOne({where: {domainName: domain}})
-        .then(function(company) {
-            if (company) {
-                return true;
-            } else {
-                return false;
-            }
-        })
+        return Models.Company.findOne({where: {domainName: domain}})
+            .then(function(company) {
+                if (company) {
+                    return true;
+                } else {
+                    return false;
+                }
+            })
+    })
 }
 
 
