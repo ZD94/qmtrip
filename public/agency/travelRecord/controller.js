@@ -44,12 +44,12 @@ var travelRecord=(function(){
                                     loading(true);
                                 })
                                 .catch(function(err) {
-                                    console.info(err);
+                                    TLDAlert(err.msg || err);
                                 });
                         });
                     })
                     .catch(function(err) {
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     });
             })
         }
@@ -117,44 +117,14 @@ var travelRecord=(function(){
 
                         if (hotel && hotel.newInvoice) {
                             $scope.hotelInvoiceImg = "/consume/invoice/" + hotel.id;
-                            /*API.agencyTripPlan.getConsumeInvoiceImg({
-                                consumeId: hotel.id
-                            })
-                            .then(function(hotelInvoiceImg) {
-                                $scope.hotelInvoiceImg = hotelInvoiceImg;
-                                $scope.$apply();
-                            })
-                            .catch(function(err) {
-                                console.info(err);
-                            })*/
                         }
 
                         if (backTraffic && backTraffic.newInvoice) {
                             $scope.backTrafficInvoiceImg = "/consume/invoice/" + backTraffic.id;
-                            /*API.agencyTripPlan.getConsumeInvoiceImg({
-                                    consumeId: backTraffic.id
-                                })
-                                .then(function(backTrafficInvoiceImg) {
-                                    $scope.backTrafficInvoiceImg = backTrafficInvoiceImg;
-                                    $scope.$apply();
-                                })
-                                .catch(function(err) {
-                                    console.info(err);
-                                })*/
                         }
 
                         if (outTraffic && outTraffic.newInvoice) {
                             $scope.outTrafficInvoiceImg = "/consume/invoice/" + outTraffic.id;
-                            /*API.agencyTripPlan.getConsumeInvoiceImg({
-                                    consumeId: outTraffic.id
-                                })
-                                .then(function(outTrafficInvoiceImg) {
-                                    $scope.outTrafficInvoiceImg = outTrafficInvoiceImg;
-                                    $scope.$apply();
-                                })
-                                .catch(function(err) {
-                                    console.info(err);
-                                })*/
                         }
 
                         outTraffics.map(function(outTraffic){
@@ -167,16 +137,6 @@ var travelRecord=(function(){
                                 outTraffic.invoiceImg = invoiceImg;
                                 return outTraffic;
                             })
-                            //
-                            //API.agency.getAgencyUser(outTrafficauditUser.auditUser)
-                            //    .then(function(result){
-                            //        outTrafficauditUser.auditName = result;
-                            //        $scope.$apply();
-                            //        loading(true);
-                            //    })
-                            //    .catch(function(err) {
-                            //        console.info(err);
-                            //    });
                         });
                         backTraffics.map(function(backTraffic){
                             return Q.all([
@@ -189,15 +149,6 @@ var travelRecord=(function(){
                                     return backTraffic;
                                 })
 
-                            //API.agency.getAgencyUser(backTrafficauditUser.auditUser)
-                            //    .then(function(result){
-                            //        backTrafficauditUser.auditName = result;
-                            //        $scope.$apply();
-                            //        loading(true);
-                            //    })
-                            //    .catch(function(err) {
-                            //        console.info(err);
-                            //    });
                         });
 
                         hotels = hotels.map(function(hotel){
@@ -210,15 +161,6 @@ var travelRecord=(function(){
                                     hotel.invoiceImg = invoiceImg;
                                     return hotel;
                                 })
-                            //API.agency.getAgencyUser(hotel.auditUser)
-                            //    .then(function(result){
-                            //        hotel.auditName = result;
-                            //        $scope.$apply();
-                            //        loading(true);
-                            //    })
-                            //    .catch(function(err) {
-                            //        console.info(err);
-                            //    });
                         });
 
                         Q.all(hotels)
@@ -227,7 +169,7 @@ var travelRecord=(function(){
                             $scope.$apply();
                         })
                         .catch(function(err) {
-                            console.info(err);
+                            TLDAlert(err.msg || err);
                         })
 
                         Q.all(outTraffics)
@@ -236,7 +178,7 @@ var travelRecord=(function(){
                             $scope.$apply();
                         })
                         .catch(function(err) {
-                            console.info(err);
+                            TLDAlert(err.msg || err);
                         })
 
                         Q.all(backTraffics)
@@ -245,7 +187,7 @@ var travelRecord=(function(){
                             $scope.$apply();
                         })
                         .catch(function(err) {
-                            console.info(err);
+                            TLDAlert(err.msg || err);
                         })
 
                         API.staff.getStaffByAgency({id:$scope.planDetail.accountId})
@@ -253,7 +195,6 @@ var travelRecord=(function(){
                                 $scope.travelerName = result.name;
                                 $scope.$apply();
                             })
-                        console.info (result);
                         $scope.$apply();
                     })
             })
@@ -321,7 +262,7 @@ var travelRecord=(function(){
                         $scope.initTravelDetail();
                     })
                     .catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
             })
         }
@@ -354,7 +295,7 @@ var travelRecord=(function(){
         }
         $scope.invoiceNoPass = function () {
             var reasontext = $(".invoiceNoPass .remark").val();
-            $scope.remark = reason1 + " " + reason2 + " " + reasontext;
+            $scope.remark = reason1 + "," + reason2 + "," + reasontext;
             $('.error').empty();
             if (reason1 =='' && reason2 == '' && reasontext == '') {
                 $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>理由不能为空");
@@ -376,7 +317,7 @@ var travelRecord=(function(){
                         $scope.initTravelDetail();
                     })
                     .catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
             })
         }
@@ -411,7 +352,7 @@ var travelRecord=(function(){
                         $scope.initTravelDetail();
                     })
                     .catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
             })
         }

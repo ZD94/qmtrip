@@ -47,12 +47,9 @@
 			API.require('auth');
 			API.onload(function(){
 				API.auth.logout()
-					.then(function (data) {
-//						location.reload();
+						.done(function() {
 							window.location.href = "/staff.html#/auth/login";
-					}).catch(function(error){
-						console.log(error);
-				}).done();
+						});
 			});
 		};
     	//获取页面基本信息
@@ -66,7 +63,7 @@
     					$scope.staff = ret;
     					var company_id = ret.companyId;
 							companyId = company_id;
-    					API.company.getCompanyById(company_id)
+    					return API.company.getCompanyById(company_id)
 		    				.then(function(company){
 		    					$scope.company = company;
 		    					var companyName = company.name;
@@ -75,23 +72,14 @@
 		    					}else{
 		    						$scope.companyName = companyName;
 		    					}
-//		    					console.info(company);
 		    					$scope.$apply();
-		    				})
-		    				.catch(function(err){
-		    					console.info(err)
 		    				})
     					$scope.$apply();
     				})
     				.catch(function(err){
-    					console.info(err)
+    					TLDAlert(err);
     				})
     		})
-
-//			$scope.goEditCorp = function(){
-//				var id = companyId;
-//				window.location.href = "#/EditCorp/editcorp?companyId="+ id;
-//			}
     	}])
     </script>
     <script type="text/javascript">
@@ -101,7 +89,6 @@
     		var $that = $(this).closest("li");
     		$(".left_nav li").removeClass("on");
     		$that.addClass("on");
-//    		console.info($that)
     	})
     	function resize(){
     		var ww = $(window).width();

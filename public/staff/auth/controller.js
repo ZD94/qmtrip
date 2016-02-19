@@ -84,7 +84,7 @@ var auth=(function(){
                             window.location.href= backUrl+"?logintime="+data.is_first_login;
                         }).catch(function(err){
                             if (err.msg) {
-                                alert(err.msg);
+                                //alert(err.msg);
                                 if(err.msg =='账号不存在'){
                                     $('.tip_err>a').text("马上注册");
                                     $scope.err_msg_tip = "该账号还未注册，";
@@ -92,7 +92,7 @@ var auth=(function(){
                                     $('.tip_err').show();
                                     $scope.$apply();
                                 }
-                                if(err.msg == '您的账号还未激活'){
+                                else if(err.msg == '您的账号还未激活'){
                                     $('.tip_err>a').text("");
                                     $('.tip_err>span').text("重新发送激活邮件");
                                     $scope.err_msg_tip = "该邮箱暂未激活，";
@@ -242,7 +242,7 @@ var auth=(function(){
                     $("#imgCode").attr("src",result.captcha);
                     picTicket = result.ticket;
                 }).catch(function(err){
-                    console.info(err);
+                    TLDAlert(err.msg || err);
                 }).done();
         })
 
@@ -289,10 +289,7 @@ var auth=(function(){
                                 }
                             }, 1000);
                     }).catch(function(err){
-                        if(err.msg) {
-                            alert(err.msg);
-                        }
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     }).done();
             })
 
@@ -323,7 +320,7 @@ var auth=(function(){
                         $("#imgCode").attr("src",result.captcha);
                         picTicket = result.ticket;
                     }).catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     }).done();
             })
         }
@@ -411,6 +408,7 @@ var auth=(function(){
                     API.auth.checkBlackDomain({domain: domain})
                         .catch(function(err){
                             //alert("邮箱后缀不合法或者已被使用");
+                            console.info(err.code);
                             if(err.code==-34){
                                 $("#corpMail").siblings(".err_msg").children("a").html("");
                                 $scope.err_msg_mail = "暂不支持公共邮箱，请使用企业邮箱注册";
@@ -445,7 +443,6 @@ var auth=(function(){
                             window.location.href = "#/auth/corplaststep?email="+mail;
                         })
                         .catch(function(err){
-                            //console.info(err);
                             if (err.msg) {
                                 //alert(err.msg);
                                 if(err.msg == '手机号已注册'){
@@ -536,7 +533,7 @@ var auth=(function(){
                     $("#imgCode").attr("src", result.captcha);
                     picTicket = result.ticket;
                 }).catch(function (err) {
-                    console.info(err);
+                    TLDAlert(err.msg || err);
                 }).done();
         })
         //换一换图片验证码
@@ -550,7 +547,7 @@ var auth=(function(){
                         picTicket = result.ticket;
                         return picTicket;
                     }).catch(function (err) {
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     }).done();
             })
         }
@@ -560,9 +557,16 @@ var auth=(function(){
             //alert(2222);
             var mail = $("#loginMail").val();
             var picCode = $("#picCode").val();
+            var reg = /^[\w\.-]+?@([\w\-]+\.){1,2}[a-zA-Z]{2,3}$/;
 
             if(!mail){
                 $scope.err_msg_mail = "联系人邮箱不能为空";
+                $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
+                $("#loginMail").siblings(".err_msg").show();
+                return false;
+            }else if(!reg.test(mail)){
+                $scope.err_msg_mail = "邮箱格式不正确";
                 $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
                 $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
                 $("#loginMail").siblings(".err_msg").show();
@@ -574,17 +578,45 @@ var auth=(function(){
                 $("#picCode").parent("div").siblings(".err_msg").show();
                 return false;
             }
-            API.onload(function () {
-                API.auth.sendResetPwdEmail({email:mail,code:picCode,ticket:picTicket})
-                    .then(function (result) {
-                        $(".changeContentOne").hide();
-                        $scope.changePwdMail = mail;
-                        $(".changeContentTwo").show();
-                        $(".step>ul>li:nth-child(2)").addClass("on").siblings("li").removeClass("on");
-                        $scope.$apply();
+            API.onload(function() {
+                API.auth.isEmailUsed({email:mail})
+                    .then(function(isUsed){
+                        if(isUsed){
+                            API.auth.sendResetPwdEmail({email:mail,code:picCode,ticket:picTicket})
+                                .then(function (result) {
+                                    $(".changeContentOne").hide();
+                                    $scope.changePwdMail = mail;
+                                    $(".changeContentTwo").show();
+                                    $(".step>ul>li:nth-child(2)").addClass("on").siblings("li").removeClass("on");
+                                    $scope.$apply();
+                                })
+                        }
+                        else{
+                            $scope.err_msg_mail = "用户邮箱不存在";
+                            $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
+                            $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
+                            $("#loginMail").siblings(".err_msg").show();
+                            $scope.$apply();
+                            return false;
+                        }
                     }).catch(function (err) {
-                        //alert(err.msg);
+                        console.info(err.msg);
+                        $scope.err_msg_mail = err.msg;
+                        $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
+                        $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
+                        $("#loginMail").siblings(".err_msg").show();
+                        $scope.$apply();
                     }).done();
+                //API.auth.sendResetPwdEmail({email:mail,code:picCode,ticket:picTicket})
+                //    .then(function (result) {
+                //        $(".changeContentOne").hide();
+                //        $scope.changePwdMail = mail;
+                //        $(".changeContentTwo").show();
+                //        $(".step>ul>li:nth-child(2)").addClass("on").siblings("li").removeClass("on");
+                //        $scope.$apply();
+                //    }).catch(function (err) {
+                //        console.info(err.msg);
+                //    }).done();
             })
         }
         //重发一封
@@ -600,7 +632,7 @@ var auth=(function(){
                         $("#imgCode").attr("src", result.captcha);
                         picTicket = result.ticket;
                     }).catch(function (err) {
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     }).done();
             })
         }
@@ -644,7 +676,7 @@ var auth=(function(){
                     $scope.$apply();
                 })
                 .catch(function(err) {
-                    console.info(err);
+                    TLDAlert(err.msg || err);
                     $("#success_tip").hide();
                     $("#fail_tip").show();
                     if (err.code) {

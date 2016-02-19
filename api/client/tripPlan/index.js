@@ -398,6 +398,11 @@ tripPlan.commitTripPlanOrder = function(orderId){
     return API.tripPlan.commitTripPlanOrder({orderId: orderId, accountId: self.accountId})
 }
 
+/**
+ * 获取发票图片
+ *
+ * @param params
+ */
 tripPlan.getConsumeInvoiceImg = function(params) {
     var consumeId = params.consumeId;
     return API.tripPlan.getConsumeInvoiceImg({

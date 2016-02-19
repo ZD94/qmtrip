@@ -34,13 +34,10 @@ var login=(function(){
                             API.reload_all_modules();
                             window.location.href= backUrl;
                         }).catch(function(err){
-                            console.info(err);
                             if (err.msg) {
-                                alert(err.msg);
-                                //Myalert("提示信息", err.msg);
+                                TLDAlert(err.msg);
                             } else {
-                                //Myalert("系统错误", err);
-                                alert(err);
+                                TLDAlert(err);
                             }
                         }).done();
                 })
