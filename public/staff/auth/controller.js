@@ -557,9 +557,16 @@ var auth=(function(){
             //alert(2222);
             var mail = $("#loginMail").val();
             var picCode = $("#picCode").val();
+            var reg = /^[\w\.-]+?@([\w\-]+\.){1,2}[a-zA-Z]{2,3}$/;
 
             if(!mail){
                 $scope.err_msg_mail = "联系人邮箱不能为空";
+                $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
+                $("#loginMail").siblings(".err_msg").show();
+                return false;
+            }else if(!reg.test(mail)){
+                $scope.err_msg_mail = "邮箱格式不正确";
                 $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
                 $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
                 $("#loginMail").siblings(".err_msg").show();
@@ -571,17 +578,45 @@ var auth=(function(){
                 $("#picCode").parent("div").siblings(".err_msg").show();
                 return false;
             }
-            API.onload(function () {
-                API.auth.sendResetPwdEmail({email:mail,code:picCode,ticket:picTicket})
-                    .then(function (result) {
-                        $(".changeContentOne").hide();
-                        $scope.changePwdMail = mail;
-                        $(".changeContentTwo").show();
-                        $(".step>ul>li:nth-child(2)").addClass("on").siblings("li").removeClass("on");
-                        $scope.$apply();
+            API.onload(function() {
+                API.auth.isEmailUsed({email:mail})
+                    .then(function(isUsed){
+                        if(isUsed){
+                            API.auth.sendResetPwdEmail({email:mail,code:picCode,ticket:picTicket})
+                                .then(function (result) {
+                                    $(".changeContentOne").hide();
+                                    $scope.changePwdMail = mail;
+                                    $(".changeContentTwo").show();
+                                    $(".step>ul>li:nth-child(2)").addClass("on").siblings("li").removeClass("on");
+                                    $scope.$apply();
+                                })
+                        }
+                        else{
+                            $scope.err_msg_mail = "用户邮箱不存在";
+                            $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
+                            $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
+                            $("#loginMail").siblings(".err_msg").show();
+                            $scope.$apply();
+                            return false;
+                        }
                     }).catch(function (err) {
-                        //alert(err.msg);
+                        console.info(err.msg);
+                        $scope.err_msg_mail = err.msg;
+                        $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
+                        $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
+                        $("#loginMail").siblings(".err_msg").show();
+                        $scope.$apply();
                     }).done();
+                //API.auth.sendResetPwdEmail({email:mail,code:picCode,ticket:picTicket})
+                //    .then(function (result) {
+                //        $(".changeContentOne").hide();
+                //        $scope.changePwdMail = mail;
+                //        $(".changeContentTwo").show();
+                //        $(".step>ul>li:nth-child(2)").addClass("on").siblings("li").removeClass("on");
+                //        $scope.$apply();
+                //    }).catch(function (err) {
+                //        console.info(err.msg);
+                //    }).done();
             })
         }
         //重发一封
