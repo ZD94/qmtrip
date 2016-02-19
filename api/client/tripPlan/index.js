@@ -410,4 +410,35 @@ tripPlan.getConsumeInvoiceImg = function(params) {
     });
 }
 
+/**
+ * 统计时间段内城市内的员工数
+ * @type {statStaffsByCity}
+ */
+tripPlan.statStaffsByCity = statStaffsByCity;
+statStaffsByCity.required_params = ['statTime'];
+function statStaffsByCity(params) {
+    var self = this;
+    var date = params.statTime;
+    var query = {status: {$ne: -2}, startAt: {$lte: date}, backAt: {$gte: date}};
+
+    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
+        .then(function(staff){
+            query.companyId = staff.companyId;
+            query.companyId = "00000000-0000-0000-0000-000000000001";
+            return API.tripPlan.findOrdersByOption({where: query, order: ['ddd', 'dd']})
+        })
+        .then(function(list){
+            var ret = {};
+            for(var i= 0,ii=list.length; i<ii; i++) {
+                var order = list[i];
+                var cityCode = order.destinationCode;
+                if(!ret[cityCode]) {
+                    ret[cityCode] = new Array();
+                }
+                ret[cityCode].push(order);
+            }
+            return ret;
+        })
+}
+
 module.exports = tripPlan;

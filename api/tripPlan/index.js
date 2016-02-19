@@ -74,7 +74,7 @@ function savePlanOrder(params){
             for(var i in consumeDetails) {
                 var obj = consumeDetails[i];
 
-                if(!validate.isMoney(obj.budget)) {
+                if(!/^-?\d+(\.\d{1,2})?$/.test(obj.budget)) {
                     throw {code: -2, nsg: '预算金额格式不正确'};
                 }
 
@@ -390,6 +390,13 @@ tripPlan.listTripPlanOrder = function(options){
                     return new Paginate(options.offset/options.limit + 1, options.limit, ret.count, orders);
                 })
         })
+}
+
+
+tripPlan.findOrdersByOption = findOrdersByOption;
+findOrdersByOption.required_params = ['where'];
+function findOrdersByOption(options) {
+    return PlanOrder.findAll(options);
 }
 
 /**
@@ -897,7 +904,7 @@ function commitTripPlanOrder(params){
             for(var i=0; i<list.length; i++){
                 var s = list[i];
 
-                if((s.status != 0 && !s.newInvoice) || s.status == -1){
+                if((s.status === 0 && !s.newInvoice) || s.status == -1){
                     throw {code: -7, msg: '票据没有上传完'};
                 }
             }
