@@ -574,7 +574,7 @@ var staff = (function(){
 
         //修改企业名称
         $scope.updateDepartmentShow = function () {
-            $(".createcompany").hide();
+            $(".updatechildDepartment,.updatecompany,.createcompany").hide();
             $(".updatecompany").show();
         }
         $scope.updateDepartment = function () {
@@ -593,7 +593,7 @@ var staff = (function(){
 
         //添加子部门
         $scope.createDepartmentShow = function () {
-            $(".updatecompany").hide();
+            $(".updatechildDepartment,.updatecompany,.createcompany").hide();
             $(".createcompany").show();
         }
         $scope.createDepartment = function () {
@@ -605,7 +605,7 @@ var staff = (function(){
                         $(".createcompany").hide();
                     })
                     .catch(function(err){
-                        TLDAlert(err.msg || err);;
+                        TLDAlert(err.msg || err);
                     })
             })
         }
@@ -614,7 +614,7 @@ var staff = (function(){
         $scope.updatechildDepartmentShow = function (index,id) {
             $scope.index = index;
             $scope.childDepartmentId = id;
-            $(".updatechildDepartment").hide();
+            $(".updatechildDepartment,.updatecompany,.createcompany").hide();
             $(".updatechildDepartment").eq(index).show();
         }
         $scope.updatechildDepartment = function () {
@@ -625,7 +625,7 @@ var staff = (function(){
                         $scope.initdepartment();
                     })
                     .catch(function(err){
-                        TLDAlert(err.msg || err);;
+                        TLDAlert(err.msg || err);
                     })
             })
         }
@@ -645,7 +645,7 @@ var staff = (function(){
                         $(".confirmFixed").hide();
                     })
                     .catch(function(err){
-                        TLDAlert(err.msg || err);;
+                        TLDAlert(err.msg || err);
                     })
             })
         }

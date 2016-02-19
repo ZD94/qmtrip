@@ -768,7 +768,7 @@ module.exports = (function(){
 
 		//修改企业名称
 		$scope.updateDepartmentShow = function () {
-			$(".createcompany").hide();
+			$(".updatechildDepartment,.updatecompany,.createcompany").hide();
 			$(".updatecompany").show();
 		}
 		$scope.updateDepartment = function () {
@@ -780,14 +780,14 @@ module.exports = (function(){
 						$(".updatecompany").hide();
 					})
 					.catch(function(err){
-						TLDAlert(err.msg || err);;
+						TLDAlert(err.msg || err);
 					})
 			})
 		}
 
 		//添加子部门
 		$scope.createDepartmentShow = function () {
-			$(".updatecompany").hide();
+			$(".updatechildDepartment,.updatecompany,.createcompany").hide();
 			$(".createcompany").show();
 		}
 		$scope.createDepartment = function () {
@@ -799,7 +799,7 @@ module.exports = (function(){
 						$(".createcompany").hide();
 					})
 					.catch(function(err){
-						TLDAlert(err.msg || err);;
+						TLDAlert(err.msg || err);
 					})
 			})
 		}
@@ -808,7 +808,7 @@ module.exports = (function(){
 		$scope.updatechildDepartmentShow = function (index,id) {
 			$scope.index = index;
 			$scope.childDepartmentId = id;
-			$(".updatechildDepartment").hide();
+			$(".updatechildDepartment,.updatecompany,.createcompany").hide();
 			$(".updatechildDepartment").eq(index).show();
 		}
 		$scope.updatechildDepartment = function () {
@@ -819,7 +819,7 @@ module.exports = (function(){
 						$scope.initdepartment();
 					})
 					.catch(function(err){
-						TLDAlert(err.msg || err);;
+						TLDAlert(err.msg || err);
 					})
 			})
 		}
@@ -839,7 +839,7 @@ module.exports = (function(){
 						$(".confirmFixed").hide();
 					})
 					.catch(function(err){
-						TLDAlert(err.msg || err);;
+						TLDAlert(err.msg || err);
 					})
 			})
 		}
