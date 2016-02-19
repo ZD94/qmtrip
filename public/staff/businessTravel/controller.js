@@ -637,6 +637,9 @@ var businessTravel=(function(){
                 if ($scope.endtime) {
                     order.backAt = $scope.endtime;
                 }
+                if (liv==1 && tra==0) {
+                    order.startAt = $scope.livetime;
+                }
                 //住宿
                 if(liv==1){
                     var consumeDetails_hotel = {

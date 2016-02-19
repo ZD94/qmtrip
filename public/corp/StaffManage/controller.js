@@ -91,7 +91,7 @@ var staff = (function(){
                                         ])
                                             .spread(function(travelLevel, department, acc){
                                                 $staff.travelLeverName = travelLevel.name;//将相应的名字赋给页面中的travelLevelName
-                                                $staff.department = department.name;//部门
+                                                $staff.department = department? department.name: '-';//部门
 //                                                $staff.accStatus = acc.status==0?'未激活':(acc.status == -1?'禁用': '已激活');//账户激活状态
                                                 if(acc){
                                                     $staff.activeStatus = acc.status;
@@ -112,7 +112,7 @@ var staff = (function(){
                             })
                     })
                     .catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
             })
         }
@@ -191,7 +191,7 @@ var staff = (function(){
                             })
                     })
                     .catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
             })
         }
@@ -253,7 +253,7 @@ var staff = (function(){
                             })
                     })
                     .catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
             })
 
@@ -340,7 +340,7 @@ var staff = (function(){
                         $scope.department = staffinfo.staff.departmentId || "";
                         $scope.$apply();
                     }).catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     }).done();
             })
         }
@@ -368,7 +368,7 @@ var staff = (function(){
                         $scope.initstafflist();
                         $scope.$apply();
                     }).catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     }).done();
             })
         }
@@ -389,7 +389,7 @@ var staff = (function(){
                         $scope.$apply();
                         $scope.initstafflist();
                     }).catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);;
                     }).done();
             })
         }
@@ -410,7 +410,7 @@ var staff = (function(){
                         $(".confirmFixed").hide();
                         $scope.initstafflist();
                     }).catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);;
                     }).done();
             })
         }
@@ -466,11 +466,11 @@ var staff = (function(){
                                 $scope.$apply();
                             })
                             .catch(function(err){
-                                console.info(err);
+                                TLDAlert(err.msg || err);;
                             })
                     })
                     .catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);;
                     }).done();
             })
         }
@@ -498,10 +498,10 @@ var staff = (function(){
                                 window.open('/download/excle-file/'+filename, "_blank");
                                 $scope.$apply();
                             }).catch(function(err){
-                                console.info(err);
+                                TLDAlert(err.msg || err);;
                             })
                     }).catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);;
                     }).done();
             })
         }
@@ -520,7 +520,7 @@ var staff = (function(){
                         $(".staff_tab_import").hide();
                         $scope.$apply();
                     }).catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);;
                     }).done();
             })
         }
@@ -535,7 +535,7 @@ var staff = (function(){
 
     staff.DepartmentController = function($scope){
         $("title").html("组织架构");
-        $(".left_nav li").removeClass("on").eq(1).addClass("on");
+        $(".left_nav li").removeClass("on").eq(2).addClass("on");
         loading(false);
         //初始化
         $scope.initdepartment = function(){
@@ -559,7 +559,7 @@ var staff = (function(){
                                             .then(function(num){
                                                 s.peoplenum = num;
                                                 console.info ($scope.departmentlist);
-                                                loading(true);
+                                                $scope.$apply();
                                             })
                                         });
                                         $scope.$apply();
@@ -574,7 +574,7 @@ var staff = (function(){
 
         //修改企业名称
         $scope.updateDepartmentShow = function () {
-            $(".createcompany").hide();
+            $(".updatechildDepartment,.updatecompany,.createcompany").hide();
             $(".updatecompany").show();
         }
         $scope.updateDepartment = function () {
@@ -586,14 +586,14 @@ var staff = (function(){
                         $(".updatecompany").hide();
                     })
                     .catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);;
                     })
             })
         }
 
         //添加子部门
         $scope.createDepartmentShow = function () {
-            $(".updatecompany").hide();
+            $(".updatechildDepartment,.updatecompany,.createcompany").hide();
             $(".createcompany").show();
         }
         $scope.createDepartment = function () {
@@ -605,7 +605,7 @@ var staff = (function(){
                         $(".createcompany").hide();
                     })
                     .catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
             })
         }
@@ -614,7 +614,7 @@ var staff = (function(){
         $scope.updatechildDepartmentShow = function (index,id) {
             $scope.index = index;
             $scope.childDepartmentId = id;
-            $(".updatechildDepartment").hide();
+            $(".updatechildDepartment,.updatecompany,.createcompany").hide();
             $(".updatechildDepartment").eq(index).show();
         }
         $scope.updatechildDepartment = function () {
@@ -625,7 +625,7 @@ var staff = (function(){
                         $scope.initdepartment();
                     })
                     .catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
             })
         }
@@ -645,7 +645,7 @@ var staff = (function(){
                         $(".confirmFixed").hide();
                     })
                     .catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
             })
         }

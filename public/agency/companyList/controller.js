@@ -54,7 +54,7 @@ module.exports = (function(){
                         loading(true);
 					})
 					.catch(function(err){
-						console.info(err)
+						TLDAlert(err.msg || err);
 					})
 			})
 		}
@@ -126,7 +126,7 @@ module.exports = (function(){
                         })
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			})
 		}
@@ -146,7 +146,7 @@ module.exports = (function(){
 						$scope.$apply();
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			})
 		}
@@ -194,8 +194,7 @@ module.exports = (function(){
 							window.location.href = "#/companyList/CompanyDetail?company=" + id;
 						})
 						.catch(function(err){
-							console.info(err);
-							alert(err.msg);
+							TLDAlert(err.msg || err);;
 						}).done()
 				})
 			}
@@ -246,8 +245,7 @@ module.exports = (function(){
 							window.location.href = "#/companyList/CompanyDetail?company=" + id;
 						})
 						.catch(function(err){
-							console.info(err);
-							alert(err.msg);
+							TLDAlert(err.msg || err);;
 						}).done()
 				})
 			}
@@ -323,7 +321,7 @@ module.exports = (function(){
 								$scope.$apply();
 							})
 					}).catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			})
 		}
@@ -410,7 +408,7 @@ module.exports = (function(){
 							})
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			})
 		}
@@ -465,7 +463,7 @@ module.exports = (function(){
 							})
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			})
 
@@ -550,7 +548,7 @@ module.exports = (function(){
 						$scope.selectkey = $scope.travellevel || "";
 						$scope.$apply();
 					}).catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					}).done();
 			})
 		}
@@ -578,7 +576,7 @@ module.exports = (function(){
 						$scope.initstafflist();
 						$scope.$apply();
 					}).catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					}).done();
 			})
 		}
@@ -599,7 +597,7 @@ module.exports = (function(){
 						$scope.$apply();
 						$scope.initstafflist();
 					}).catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					}).done();
 			})
 		}
@@ -620,7 +618,7 @@ module.exports = (function(){
 						$(".confirmFixed").hide();
 						$scope.initstafflist();
 					}).catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					}).done();
 			})
 		}
@@ -676,13 +674,9 @@ module.exports = (function(){
 						$scope.$apply();
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			})
-			/*.catch(function(err){
-			 console.info(err);
-			 }).done();*/
-			//})
 		}
 
 		//从预览界面返回至员工批量导入
@@ -708,10 +702,10 @@ module.exports = (function(){
 						window.open('/download/excle-file/'+filename, "_blank");
 						$scope.$apply();
 					}).catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					})
 			}).catch(function(err){
-				console.info(err);
+				TLDAlert(err.msg || err);;
 			}).done();
 			//})
 		}
@@ -730,7 +724,7 @@ module.exports = (function(){
 						$(".staff_tab_import").hide();
 						$scope.$apply();
 					}).catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);;
 					}).done();
 			})
 		}
@@ -774,7 +768,7 @@ module.exports = (function(){
 
 		//修改企业名称
 		$scope.updateDepartmentShow = function () {
-			$(".createcompany").hide();
+			$(".updatechildDepartment,.updatecompany,.createcompany").hide();
 			$(".updatecompany").show();
 		}
 		$scope.updateDepartment = function () {
@@ -786,14 +780,14 @@ module.exports = (function(){
 						$(".updatecompany").hide();
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);
 					})
 			})
 		}
 
 		//添加子部门
 		$scope.createDepartmentShow = function () {
-			$(".updatecompany").hide();
+			$(".updatechildDepartment,.updatecompany,.createcompany").hide();
 			$(".createcompany").show();
 		}
 		$scope.createDepartment = function () {
@@ -805,7 +799,7 @@ module.exports = (function(){
 						$(".createcompany").hide();
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);
 					})
 			})
 		}
@@ -814,7 +808,7 @@ module.exports = (function(){
 		$scope.updatechildDepartmentShow = function (index,id) {
 			$scope.index = index;
 			$scope.childDepartmentId = id;
-			$(".updatechildDepartment").hide();
+			$(".updatechildDepartment,.updatecompany,.createcompany").hide();
 			$(".updatechildDepartment").eq(index).show();
 		}
 		$scope.updatechildDepartment = function () {
@@ -825,7 +819,7 @@ module.exports = (function(){
 						$scope.initdepartment();
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);
 					})
 			})
 		}
@@ -845,7 +839,7 @@ module.exports = (function(){
 						$(".confirmFixed").hide();
 					})
 					.catch(function(err){
-						console.info(err);
+						TLDAlert(err.msg || err);
 					})
 			})
 		}
@@ -956,10 +950,10 @@ module.exports = (function(){
 					planeLevel:$(".create_policy .CplaneLevel").html(),
 					planeDiscount:$(".create_policy .CplaneDiscount").attr('selectValue'),
 					trainLevel:$(".create_policy .CtrainLevel").html().replace('/',','),
-					isChangeLevel:$(".create_policy .Ccheckbox").is(':checked'),
+					isChangeLevel:$(".create_policy .Ccheckbox").attr('checkedd'),
 					hotelLevel:$(".create_policy .ChotelTevel").html().replace('/',','),
 					hotelPrice:$(".create_policy .ChotelPrice").val(),
-					companyId:$scope.companyId
+					companyId:$scope.company_id
 				})
 					.then(function(result){
 						Myalert("温馨提示","增加成功");
@@ -1117,10 +1111,10 @@ module.exports = (function(){
 					planeLevel:$(".update_policy .CplaneLevel").html(),
 					planeDiscount:$(".update_policy .CplaneDiscount").attr('selectValue'),
 					trainLevel:$(".update_policy .CtrainLevel").html(),
-					isChangeLevel:$(".update_policy .Ccheckbox").is(':checked'),
+					isChangeLevel:$(".update_policy .Ccheckbox").attr('checkedd'),
 					hotelLevel:$(".update_policy .ChotelTevel").html(),
 					hotelPrice:$(".update_policy .ChotelPrice").val(),
-					companyId:$scope.companyId
+					companyTd:$scope.company_id
 				})
 					.then(function(result){
 						Myalert("温馨提示","修改成功");
@@ -1143,7 +1137,7 @@ module.exports = (function(){
 			$(".CplaneLevel").html("不限");
 			$(".CplaneDiscount").html("不限").attr("selectValue","0");
 			$(".CtrainLevel").html("不限");
-			$(".Ccheckbox").attr('checked',true);
+			$(".Ccheckbox").attr('checkedd',1);
 			$(".Ccheckboxlabel").removeClass('lablefalse');
 			$(".Ccheckboxlabel").html('&#xe9ec;');
 			$(".ChotelTevel").html("不限");
@@ -1152,24 +1146,28 @@ module.exports = (function(){
 
 		//修改自定义复选框
 		$scope.updateChangecheck = function () {
-			if ($(".update_policy .Ccheckbox").is(':checked')==false) {
+			if ($(".update_policy .Ccheckbox").attr('checkedd')!=1) {
 				$(".update_policy .Ccheckboxlabel").removeClass('lablefalse');
 				$(".update_policy .Ccheckboxlabel").html('&#xe9ec;');
+				$(".update_policy .Ccheckbox").attr('checkedd',1);
 			}
 			else {
 				$(".update_policy .Ccheckboxlabel").addClass('lablefalse');
 				$(".update_policy .Ccheckboxlabel").html('');
+				$(".update_policy .Ccheckbox").attr('checkedd',0);
 			}
 		}
 		//创建自定义复选框
 		$scope.createChangecheck = function () {
-			if ($(".create_policy .Ccheckbox").is(':checked')==false) {
+			if ($(".create_policy .Ccheckbox").attr('checkedd')!=1) {
 				$(".create_policy .Ccheckboxlabel").removeClass('lablefalse');
 				$(".create_policy .Ccheckboxlabel").html('&#xe9ec;');
+				$(".create_policy .Ccheckbox").attr('checkedd',1);
 			}
 			else {
 				$(".create_policy .Ccheckboxlabel").addClass('lablefalse');
 				$(".create_policy .Ccheckboxlabel").html('');
+				$(".create_policy .Ccheckbox").attr('checkedd',0);
 			}
 		}
 

@@ -114,7 +114,7 @@ var travelPlan=(function(){
                         // });
                     })
                     .catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
                     $scope.updateToServer = function() {
                         var invoice = {
@@ -130,7 +130,7 @@ var travelPlan=(function(){
                                     $("#uploadimg").hide();
                                 })
                                 .catch(function(err){
-                                    console.info(err);
+                                    TLDAlert(err.msg || err);
                                 })
                         })
                     }
@@ -158,7 +158,7 @@ var travelPlan=(function(){
                         $scope.$apply();
                     })
                     .catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
             })
         }
@@ -243,7 +243,7 @@ var travelPlan=(function(){
                         $scope.$apply();
                     })
                     .catch(function(err){
-                        console.info(err);
+                        TLDAlert(err.msg || err);
                     })
             })
         }
@@ -318,7 +318,7 @@ var travelPlan=(function(){
                     });
                 })
                 .catch(function(err){
-                    console.info(err);
+                    TLDAlert(err.msg || err);
                 })
                 $scope.updateToServer = function() {
                     var invoice = {
@@ -333,7 +333,7 @@ var travelPlan=(function(){
                                 location.reload();
                             })
                             .catch(function(err){
-                                console.info(err);
+                                TLDAlert(err.msg || err);
                             })
                     })
                 }
@@ -454,7 +454,7 @@ var travelPlan=(function(){
                 })
             })
             .catch(function(err){
-                console.info(err);
+                TLDAlert(err.msg || err);
             })
         })
         $scope.goDetail = function () {
