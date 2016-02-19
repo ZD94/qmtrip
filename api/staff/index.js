@@ -291,10 +291,18 @@ staff.listAndPaginateStaff = function(params){
     options.offset = offset;
     params.status = {$gte: 0};
     options.where = params;
-    return staffModel.findAndCountAll(options)
-        .then(function(result){
-            return new Paginate(page, perPage, result.count, result.rows);
-        });
+    return API.department.getDefaultDepartment({companyId: params.companyId})
+        .then(function(defaultDept){
+            if(defaultDept.id == params.departmentId){
+                params.$or = [{departmentId: params.departmentId},["department_id is null"]];
+                delete params.departmentId;
+                options.where = params;
+            }
+            return staffModel.findAndCountAll(options)
+                .then(function(result){
+                    return new Paginate(page, perPage, result.count, result.rows);
+                });
+        })
 }
 
 /**
@@ -847,29 +855,35 @@ staff.statisticStaffsRole = function(params){
     var commonStaffNum = 0;
     var unActiveNum = 0;
     var totalCount = 0;
-    return staffModel.findAll({where: where})
-        .then(function(staffs){
-            if(staffs && staffs.length>0){
-                totalCount = staffs.length;
-                return Q.all(staffs.map(function(s){
-                    if(s.roleId == 2 || s.roleId == 0){
-                        adminNum++;
-                    }else if(s.roleId == 1){
-                        commonStaffNum++;
-                    }
-                    return API.auth.getAccount({id: s.id})
-                        .then(function(acc){
-                            if(acc && acc.status == 0){
-                                unActiveNum++;
-                            }
-                        })
-                }))
+    return API.department.getDefaultDepartment({companyId: params.companyId})
+        .then(function(defaultDept){
+            if(defaultDept.id == params.departmentId){
+                where.$or = [{departmentId: params.departmentId},["department_id is null"]];
+                delete where.departmentId;
             }
+            return staffModel.findAll({where: where})
+                .then(function(staffs){
+                    if(staffs && staffs.length>0){
+                        totalCount = staffs.length;
+                        return Q.all(staffs.map(function(s){
+                            if(s.roleId == 2 || s.roleId == 0){
+                                adminNum++;
+                            }else if(s.roleId == 1){
+                                commonStaffNum++;
+                            }
+                            return API.auth.getAccount({id: s.id})
+                                .then(function(acc){
+                                    if(acc && acc.status == 0){
+                                        unActiveNum++;
+                                    }
+                                })
+                        }))
+                    }
+                })
+                .then(function(){
+                    return {totalCount: totalCount, adminNum: adminNum, commonStaffNum: commonStaffNum, unActiveNum: unActiveNum};
+                });
         })
-        .then(function(){
-            console.log(adminNum);
-            return {totalCount: totalCount, adminNum: adminNum, commonStaffNum: commonStaffNum, unActiveNum: unActiveNum};
-        });
 }
 
 /**
