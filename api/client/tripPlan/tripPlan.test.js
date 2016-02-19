@@ -403,6 +403,15 @@ describe("api/client/tripPlan.js", function() {
                     done();
                 })
             });
+
+            it("statStaffsByCity should be ok", function(done) {
+                API.client.tripPlan.statStaffsByCity.call({accountId: staffId}, {statTime: '2016-02-25', endTime: '2016-02-19'}, function(err, ret) {
+                    if(err) {
+                        throw err;
+                    }
+                    done();
+                })
+            });
         })
 
     })
