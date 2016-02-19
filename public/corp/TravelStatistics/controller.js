@@ -275,13 +275,13 @@ var TravelStatistics = (function(){
                                 return hotel;
                             })
                     });
-
                     Q.all(hotels)
                     .then(function(hotels) {
                         $scope.hotels = hotels;
                         $scope.$apply();
                     })
                     .catch(function(err) {
+                        console.info("%%%%%%%%%%");
                         TLDAlert(err.msg || err);
                     })
 
@@ -291,6 +291,7 @@ var TravelStatistics = (function(){
                         $scope.$apply();
                     })
                     .catch(function(err) {
+                        console.info("#########");
                         TLDAlert(err.msg || err);
                     })
 
@@ -300,6 +301,7 @@ var TravelStatistics = (function(){
                         $scope.$apply();
                     })
                     .catch(function(err) {
+                        console.info("&&&&&&&&&&&");
                         TLDAlert(err.msg || err);
                     })
                     API.staff.getStaff({id:$scope.planDetail.accountId})
@@ -313,6 +315,7 @@ var TravelStatistics = (function(){
                 })
                 .catch(function(err){
                     TLDAlert(err.msg || err);
+                    console.info(err)
                 })
         })
 
