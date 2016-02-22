@@ -40,20 +40,20 @@ company.domainIsExist = function(params) {
     }
 
     return Q()
-    .then(function() {
-        if (C.is_allow_domain_repeat) {
-            return false;
-        }
+        .then(function() {
+            if (C.is_allow_domain_repeat) {
+                return false;
+            }
 
-        return Models.Company.findOne({where: {domainName: domain}})
-            .then(function(company) {
-                if (company) {
-                    return true;
-                } else {
-                    return false;
-                }
-            })
-    })
+            return Models.Company.findOne({where: {domainName: domain}})
+                .then(function(company) {
+                    if (company) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                })
+        })
 }
 
 
@@ -266,7 +266,7 @@ function checkAgencyCompany(params){
     ])
         .spread(function(c, agency){
             if(!c || c.status == -2){
-                throw {code:-1, msg:"企业不存在"};
+                throw L.ERR.COMPANY_NOT_EXIST;
             }
 
             if(!agency || agency.status == -2){
@@ -408,9 +408,9 @@ function moneyChange(params){
                     FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: Object.keys(fundsUpdates), transaction: t}),
                     MoneyChanges.create(moneyChange, {transaction: t})
                 ])
-                .spread(function(update, create){
-                    return update;
-                })
+                    .spread(function(update, create){
+                        return update;
+                    })
             })
         })
         .spread(function(rownum, rows){
