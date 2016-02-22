@@ -420,7 +420,6 @@ describe("api/client/tripPlan.js", function() {
                     if(err) {
                         throw err;
                     }
-
                     done();
                 })
             });
