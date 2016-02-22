@@ -42,7 +42,10 @@
 							<span ng-if="item.expenditure!=0">¥{{item.expenditure}}</span>
                             <span ng-if="item.expenditure==0">暂无</span>
                         </td>
-                        <td align="center">¥{{item.budget-item.expenditure}}</td>
+                        <td align="center">
+                            <span ng-if="item.expenditure!=0&&item.status!='-1'">¥{{item.budget-item.expenditure}}</span>
+                            <span ng-if="item.expenditure==0">暂无</span>
+                            </td>
                         <td align="center">
 							<span ng-if="item.score!=0">{{item.score}}</span>
                             <span ng-if="item.score==0">暂无</span>

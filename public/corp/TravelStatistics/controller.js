@@ -172,7 +172,7 @@ var TravelStatistics = (function(){
     /*出差记录页面*/
     TravelStatistics.PlanListController = function($scope) {
         // alert("zzzz");
-        $("title").html("员工积分");
+        $("title").html("出差记录");
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
         API.onload(function(){
             var params = {page:$scope.page}
@@ -192,6 +192,8 @@ var TravelStatistics = (function(){
                                 plan.staffName = staff.staff.name;
                                 // console.info(plan);
                                 $scope.planlist = planlist;
+                                console.info(planlist.budget)
+                                // console.info(planlist.expenditure)
                                 $scope.$apply();
                             })
                             .catch(function(err){
@@ -210,6 +212,8 @@ var TravelStatistics = (function(){
     }
     // 出差记录详情页
     TravelStatistics.PlanDetailController = function($scope,$routeParams, $location, $anchorScroll) {
+        $("title").html("出差记录");
+        $(".left_nav li").removeClass("on").eq(1).addClass("on");
         var planId = $routeParams.orderId;
         API.onload(function(){
             API.tripPlan.getTripPlanOrderById(planId)
@@ -248,11 +252,11 @@ var TravelStatistics = (function(){
                                 })
                         }else{
                             return Q.all([
-                                API.agency.getAgencyUser(outTraffic.auditUser),
+                                API.agency.getAgencyUserByCompany({agencyUserId: outTraffic.auditUser}),
                                 API.tripPlan.getConsumeInvoiceImg({consumeId: outTraffic.id})
                             ])
                             .spread(function(auditName, invoiceImg) {
-                                outTraffic.auditName = auditName;
+                                outTraffic.auditName = auditName.name;
                                 outTraffic.invoiceImg = invoiceImg;
                                 return outTraffic;
                             })
@@ -268,11 +272,11 @@ var TravelStatistics = (function(){
                                 })
                         }else{
                             return Q.all([
-                                API.agency.getAgencyUser(backTraffic.auditUser),
+                                API.agency.getAgencyUserByCompany({agencyUserId: backTraffic.auditUser}),
                                 API.tripPlan.getConsumeInvoiceImg({consumeId: backTraffic.id})
                             ])
                             .spread(function(auditName, invoiceImg) {
-                                backTraffic.auditName = auditName;
+                                backTraffic.auditName = auditName.name;
                                 backTraffic.invoiceImg = invoiceImg;
                                 return backTraffic;
                             })
@@ -294,7 +298,7 @@ var TravelStatistics = (function(){
                             ])
                             .spread(function(auditName, invoiceImg) {
                                 console.info(auditName)
-                                hotel.auditName = auditName;
+                                hotel.auditName = auditName.name;
                                 hotel.invoiceImg = invoiceImg;
                                 return hotel;
                             })
@@ -308,7 +312,6 @@ var TravelStatistics = (function(){
                         $scope.$apply();
                     })
                     .catch(function(err) {
-                        console.info("^^^^^^^^^^^^^")
                         TLDAlert(err.msg || err);
                     })
 
@@ -318,7 +321,6 @@ var TravelStatistics = (function(){
                         $scope.$apply();
                     })
                     .catch(function(err) {
-                        console.info("&&&&&&&&&&&&&")
                         TLDAlert(err.msg || err);
                     })
 
@@ -328,7 +330,6 @@ var TravelStatistics = (function(){
                         $scope.$apply();
                     })
                     .catch(function(err) {
-                        console.info("%%%%%%%%%%%%%")
                         TLDAlert(err.msg || err);
                     })
                     
