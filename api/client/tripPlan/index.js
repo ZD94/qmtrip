@@ -425,6 +425,7 @@ function statStaffsByCity(params) {
         .then(function(staff){
             query.companyId = staff.companyId;
             //query.companyId = "00000000-0000-0000-0000-000000000001";
+
             return API.tripPlan.findOrdersByOption({where: query, order: ['ddd', 'dd']})
         })
         .then(function(list){
