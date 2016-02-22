@@ -74,7 +74,7 @@ function savePlanOrder(params){
             for(var i in consumeDetails) {
                 var obj = consumeDetails[i];
 
-                if(!validate.isMoney(obj.budget)) {
+                if(!/^-?\d+(\.\d{1,2})?$/.test(obj.budget)) {
                     throw {code: -2, nsg: '预算金额格式不正确'};
                 }
 
@@ -102,6 +102,7 @@ function savePlanOrder(params){
                             detail.orderId = order.id;
                             detail.accountId = order.accountId;
                             detail.status = 0;
+                            detail.isCommit = false;
 
                             return ConsumeDetails.create(detail, {transaction: t})
                                 .then(function(ret){
@@ -177,26 +178,26 @@ function getTripPlanOrder(params){
 tripPlan.getConsumeInvoiceImg = function(params) {
     var consumeId = params.consumeId;
     return Q()
-    .then(function() {
-        if (!consumeId) {
-            throw {code: -1, msg: "consumeId不能为空"};
-        }
+        .then(function() {
+            if (!consumeId) {
+                throw {code: -1, msg: "consumeId不能为空"};
+            }
 
-        return ConsumeDetails.findById(consumeId)
-            .then(function(consumeDetail) {
-                return API.attachments.getAttachment({id: consumeDetail.newInvoice})
-            })
-            .then(function(attachment) {
-                if (!attachment) {
-                    L.ERR.NOT_FOUND;
-                }
+            return ConsumeDetails.findById(consumeId)
+                .then(function(consumeDetail) {
+                    return API.attachments.getAttachment({id: consumeDetail.newInvoice})
+                })
+                .then(function(attachment) {
+                    if (!attachment) {
+                        L.ERR.NOT_FOUND;
+                    }
 
-                return 'data:image/jpg;base64,' + attachment.content;
-            })
-            .then(function(result) {
-                return result;
-            })
-    })
+                    return 'data:image/jpg;base64,' + attachment.content;
+                })
+                .then(function(result) {
+                    return result;
+                })
+        })
 
 }
 
@@ -246,9 +247,9 @@ function updateTripPlanOrder(params){
 
             return sequelize.transaction(function(t){
                 return Q.all([
-                        PlanOrder.update(updates, {returning: true, where: {id: orderId}, fields: Object.keys(updates), transaction: t}),
-                        TripOrderLogs.create(logs, {transaction: t})
-                    ]);
+                    PlanOrder.update(updates, {returning: true, where: {id: orderId}, fields: Object.keys(updates), transaction: t}),
+                    TripOrderLogs.create(logs, {transaction: t})
+                ]);
             })
         })
         .spread(function(update){
@@ -386,10 +387,17 @@ tripPlan.listTripPlanOrder = function(options){
                         return order;
                     })
             }))
-            .then(function(orders){
+                .then(function(orders){
                     return new Paginate(options.offset/options.limit + 1, options.limit, ret.count, orders);
                 })
         })
+}
+
+
+tripPlan.findOrdersByOption = findOrdersByOption;
+findOrdersByOption.required_params = ['where'];
+function findOrdersByOption(options) {
+    return PlanOrder.findAll(options);
 }
 
 /**
@@ -402,6 +410,7 @@ saveConsumeRecord.required_params = ['orderId', 'accountId', 'type', 'startTime'
 saveConsumeRecord.optional_params = ConsumeDetailsCols;
 function saveConsumeRecord(params){
     var record = params;
+    record.isCommit = false;
     record.status = 0;
     var options = {};
     options.fields = Object.keys(record);
@@ -535,7 +544,7 @@ function uploadInvoice(params){
     var orderId = "";
 
     return ConsumeDetails.findById(params.consumeId, {attributes: ['status', 'orderId', 'invoice', 'accountId']})
-        .then(function(custome, order){
+        .then(function(custome){
             if(!custome || custome.status == -2)
                 throw L.ERR.NOT_FOUND;
 
@@ -553,7 +562,13 @@ function uploadInvoice(params){
             var times = invoiceJson.length ? invoiceJson.length+1 : 1;
             var currentInvoice = {times:times, picture:params.picture, create_at:moment().format('YYYY-MM-DD HH:mm'), status:0, remark: '', approve_at: ''};
             invoiceJson.push(currentInvoice);
-            var updates = {newInvoice: params.picture, invoice: JSON.stringify(invoiceJson), updateAt: moment().format("YYYY-MM-DD HH:mm:ss"), status: 0, auditRemark: ""};
+            var updates = {
+                newInvoice: params.picture,
+                invoice: JSON.stringify(invoiceJson),
+                updateAt: moment().format("YYYY-MM-DD HH:mm:ss"),
+                status: 0,
+                auditRemark: params.auditRemark || ''
+            };
             var logs = {consumeId: params.consumeId, userId: params.userId, remark: "上传票据"};
             var orderLogs = {orderId: custome.orderId, userId: params.userId, remark: '上传票据', createAt: utils.now()};
 
@@ -710,6 +725,9 @@ function approveInvoice(params){
             var logs = {consumeId: params.consumeId, userId: params.userId, status: params.status, remark: "审核票据-"+params.remark};
 
             return sequelize.transaction(function(t){
+                if(updates.status == -1) {
+                    updates.isCommit =false;
+                }
                 return Q.all([
                     ConsumeDetails.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
                     ConsumeDetailsLogs.create(logs,{transaction: t})
@@ -867,7 +885,7 @@ function commitTripPlanOrder(params){
     var id = params.orderId;
     return Q.all([
         PlanOrder.findById(id, {attributes: ['status', 'auditStatus', 'accountId']}),
-        ConsumeDetails.findAll({where:{orderId: id}, attributes: ['status', 'newInvoice']})
+        ConsumeDetails.findAll({where:{orderId: id}, attributes: ['status', 'newInvoice', 'isCommit']})
     ])
         .spread(function(order, list){
             if(!order || order.status == -2){
@@ -897,13 +915,16 @@ function commitTripPlanOrder(params){
             for(var i=0; i<list.length; i++){
                 var s = list[i];
 
-                if((s.status != 0 && !s.newInvoice) || s.status == -1){
+                if((s.status === 0 && !s.newInvoice) || s.status == -1){
                     throw {code: -7, msg: '票据没有上传完'};
                 }
             }
         })
         .then(function(){
-            return PlanOrder.update({status: 1, auditStatus: 0, updateAt: utils.now()}, {where: {id: id}, fields: ['status', 'auditStatus', 'updateAt']})
+            return Q.all([
+                PlanOrder.update({status: 1, auditStatus: 0, updateAt: utils.now(), isCommit: true}, {where: {id: id}, fields: ['status', 'auditStatus', 'updateAt', 'isCommit']}),
+                ConsumeDetails.update({isCommit: true, updateAt: utils.now()}, {where: {orderId: id}})
+            ])
         })
         .then(function(){
             return true;
@@ -925,18 +946,18 @@ tripPlan.previewConsumeInvoice = function (params) {
         consumeId: consumeId,
         userId: accountId
     })
-    .then(function(result) {
-        if (!result.allow) {
-            throw L.ERR.PERMISSION_DENY;
-        }
-        return ConsumeDetails.findOne({where: {orderId: orderId, id: consumeId}})
-    })
-    .then(function(consume) {
-        return API.attachments.getAttachment({id: consume.newInvoice});
-    })
-    .then(function(attachment) {
-        return "data:image/jpg;base64,"+attachment.content;
-    })
+        .then(function(result) {
+            if (!result.allow) {
+                throw L.ERR.PERMISSION_DENY;
+            }
+            return ConsumeDetails.findOne({where: {orderId: orderId, id: consumeId}})
+        })
+        .then(function(consume) {
+            return API.attachments.getAttachment({id: consume.newInvoice});
+        })
+        .then(function(attachment) {
+            return "data:image/jpg;base64,"+attachment.content;
+        })
 }
 
 /**

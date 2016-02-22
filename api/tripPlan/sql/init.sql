@@ -31,6 +31,7 @@ CREATE TABLE trip_plan_order (
     company_id uuid not null,
     type integer,
     status integer default 0,
+    is_commit boolean default false,
     start_place character varying,
     destination character varying,
     start_at timestamp without time zone,
@@ -215,7 +216,8 @@ CREATE TABLE consume_details (
     new_invoice character varying, -- 新上传票据
     start_place_code character varying,
     arrival_place_code character varying,
-    city_code character varying
+    city_code character varying,
+    is_commit boolean default false
 );
 
 
