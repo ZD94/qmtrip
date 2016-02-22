@@ -686,9 +686,9 @@ function approveInvoice(params){
                         throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
                     }
 
-                    //if(order.status != 1){
-                    //    throw {code: -3, msg: '该订单未提交，不能审核'};
-                    //}
+                    if(order.status === 0 && order.auditStatus == 0){
+                        throw {code: -3, msg: '该订单未提交，不能审核'};
+                    }
 
                     return [order, consume];
                 })
