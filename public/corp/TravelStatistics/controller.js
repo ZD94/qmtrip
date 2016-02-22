@@ -210,6 +210,8 @@ var TravelStatistics = (function(){
     }
     // 出差记录详情页
     TravelStatistics.PlanDetailController = function($scope,$routeParams) {
+        $("title").html("员工积分");
+        $(".left_nav li").removeClass("on").eq(1).addClass("on");
         var planId = $routeParams.orderId;
         API.onload(function(){
             API.tripPlan.getTripPlanOrderById(planId)
@@ -301,14 +303,12 @@ var TravelStatistics = (function(){
                         }
                         
                     });
-
                     Q.all(hotels)
                     .then(function(hotels) {
                         $scope.hotels = hotels;
                         $scope.$apply();
                     })
                     .catch(function(err) {
-                        console.info("^^^^^^^^^^^^^")
                         TLDAlert(err.msg || err);
                     })
 
@@ -318,7 +318,6 @@ var TravelStatistics = (function(){
                         $scope.$apply();
                     })
                     .catch(function(err) {
-                        console.info("&&&&&&&&&&&&&")
                         TLDAlert(err.msg || err);
                     })
 
@@ -328,7 +327,6 @@ var TravelStatistics = (function(){
                         $scope.$apply();
                     })
                     .catch(function(err) {
-                        console.info("%%%%%%%%%%%%%")
                         TLDAlert(err.msg || err);
                     })
                     
@@ -346,6 +344,7 @@ var TravelStatistics = (function(){
                 })
                 .catch(function(err){
                     TLDAlert(err.msg || err);
+                    console.info(err)
                 })
         })
 
