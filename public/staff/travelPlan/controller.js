@@ -27,6 +27,7 @@ var travelPlan=(function(){
                 if ($scope.keyword != '' && $scope.keyword != undefined) {
                     params.remark = {$like: '%'+ $scope.keyword + '%'};
                 }
+                params.perPage = 20; //默认20条/页
                 API.tripPlan.pageTripPlanOrder(params)
                     .then(function(result){
                         $scope.total1 = result.total;
@@ -92,7 +93,7 @@ var travelPlan=(function(){
             if ($scope.total1) {
                 $.jqPaginator('#pagination1', {
                     totalCounts: $scope.total1,
-                    pageSize: 10,
+                    pageSize: 20,
                     currentPage: 1,
                     prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
                     next: '<li class="next"><a href="javascript:;">下一页</a></li>',
