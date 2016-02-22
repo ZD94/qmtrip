@@ -285,7 +285,7 @@ function updateAgencyUser(data){
  */
 agency.getAgencyUser = getAgencyUser;
 getAgencyUser.required_params = ['id'];
-
+getAgencyUser.optional_params = ['columns'];
 function getAgencyUser(params){
     var id = params.id;
     var options = {};

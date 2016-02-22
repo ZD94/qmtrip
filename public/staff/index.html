@@ -46,12 +46,37 @@
     </div>
     
 </div>
+<div class="staff_float_nav">
+    <div class="on" id="wechat_kefu">
+        <p>微信</p>
+        <p>客服</p>
+    </div>
+    <div>
+        <p>帮助</p>
+        <p>中心</p>
+    </div>
+    <div ng-click="feedback()">
+        <p>意见</p>
+        <p>反馈</p>
+    </div>
+    <img id="wechat_code" src="staff/images/wexinkefu.png"/>
+</div>
 <script type="text/javascript">
     $(function () {
         $(".staff_menu_t a li").click(function () {
             var $that = $(this);
             $(".staff_menu_t li").removeClass("on");
             $that.addClass("on");
+        })
+        $('#wechat_kefu').mouseover(function(){
+            $("#wechat_code").show();
+        }).mouseout(function(){
+            $("#wechat_code").hide();
+        })
+        $('.staff_float_nav div').mouseover(function(){
+            $(this).addClass("on").siblings().removeClass("on");
+        }).mouseout(function(){
+            $('.staff_float_nav div').removeClass("on");
         })
     })
 </script>

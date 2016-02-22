@@ -192,6 +192,24 @@ agency.getAgencyUser = function(agencyUserId){
         })
 }
 
+/**
+ * 获取代理商用户
+ * @param params
+ * @returns {*}
+ */
+
+agency.getAgencyUserByCompany = getAgencyUserByCompany;
+getAgencyUserByCompany.required_params = ['agencyUserId'];
+function getAgencyUserByCompany(params){
+    var agencyUserId = params.agencyUserId;
+
+    return API.agency.getAgencyUser({id: agencyUserId, columns: ['name']})
+        .then(function(agencyUser){
+            console.info(agencyUser);
+            return agencyUser;
+        })
+}
+
 agency.listAndPaginateAgencyUser = function(params) {
     var self = this;
     var user_id = self.accountId;

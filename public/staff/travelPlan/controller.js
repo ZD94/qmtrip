@@ -27,6 +27,7 @@ var travelPlan=(function(){
                 if ($scope.keyword != '' && $scope.keyword != undefined) {
                     params.remark = {$like: '%'+ $scope.keyword + '%'};
                 }
+                params.perPage = 20; //默认20条/页
                 API.tripPlan.pageTripPlanOrder(params)
                     .then(function(result){
                         $scope.total1 = result.total;
@@ -169,7 +170,7 @@ var travelPlan=(function(){
             if ($scope.total1) {
                 $.jqPaginator('#pagination1', {
                     totalCounts: $scope.total1,
-                    pageSize: 10,
+                    pageSize: 20,
                     currentPage: 1,
                     prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
                     next: '<li class="next"><a href="javascript:;">下一页</a></li>',
@@ -385,6 +386,7 @@ var travelPlan=(function(){
             var sw = $(".scancode").width()/2;
             var sh = $(".scancode").height()/2;
             $(".scancode").css({"margin-top":-sh,"margin-left":-sw});
+            $("#qrcode").find("canvas").remove();
             $(".scan_fixed").show();
             if(time){
                 clearInterval(time);
@@ -392,6 +394,7 @@ var travelPlan=(function(){
             time = setInterval(function(){
                 if(start<=0) {
                     $("#qrcode").find("img").remove();
+                    $("#qrcode").find("canvas").remove();
                     $scope.initscan();
                     start=max;
                 }else if(start >= max){
@@ -404,6 +407,7 @@ var travelPlan=(function(){
         }
         $scope.close_scan = function(){
             start = max;
+            clearInterval(time);
             $scope.seconds = start;
             $(".scan_fixed #qrcode").find("img").remove();
             $(".scan_fixed").hide();
