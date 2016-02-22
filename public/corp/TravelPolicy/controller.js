@@ -232,7 +232,7 @@ var TravelPolicy=(function(){
             }
             $(".update_policy").show();
             $(".create_policy").hide();
-            $(".policy_page li").css('opacity','0.2');
+            $(".policy_page li").css('opacity','0.3');
         }
         //修改标准取消
         $scope.updateClose = function () {
