@@ -2,12 +2,20 @@
 <div class="travel-plan">
     <div class="planList">
         <ul class="mainbox_top">
-            <li class="active">待上传票据
+            <li class="active">全部
                 <span ng-if="planListitems.length">({{total1}})</span>
                 <span ng-if="!planListitems.length">(0)</span>
             </li>
-            <li>已完成
+            <li>待出预算
                 <span ng-if="finishPlanListitems.length">({{total2}})</span>
+                <span ng-if="!finishPlanListitems.length">(0)</span>
+            </li>
+            <li>待上传票据
+                <span ng-if="finishPlanListitems.length">({{total3}})</span>
+                <span ng-if="!finishPlanListitems.length">(0)</span>
+            </li>
+            <li>已完成
+                <span ng-if="finishPlanListitems.length">({{total4}})</span>
                 <span ng-if="!finishPlanListitems.length">(0)</span>
             </li>
         </ul>
@@ -75,10 +83,124 @@
         <ul class="pagination" id="pagination1"></ul>
 
         <div class="mainbox_bottom" style="display: none;">
-            <div class="search">
-                <input type="text" class="common_text" ng-model="finishKeyword" placeholder="输入出发时间/内容简介" style="width: 238px; margin-top: 19px;">
-                <input type="button" value="预算单搜索" class="common_btn1" ng-click="searchFinishKeyword()" style="width: 120px; margin: 19px 0 0 20px;">
+            <div class="content">
+                <table style="width: 100%">
+                    <tr>
+                        <th align="center">出发时间</th>
+                        <th align="center">服务</th>
+                        <th align="center">预算单内容简介</th>
+                        <th align="center">预算</th>
+                        <th align="center">实际支出</th>
+                        <th align="center">积分</th>
+                        <th align="center">状态</th>
+                        <th align="center">操作</th>
+                    </tr>
+                    <tr ng-repeat="item in planListitems2">
+                        <td align="center">
+                            <p ng-if="item.startAt">{{item.startAt | date: 'yyyy-MM-dd'}}</p>
+                            <p ng-if="!item.startAt">{{item.hotel[0].startTime | date: 'yyyy-MM-dd'}}</p>
+                        </td>
+                        <td align="center">
+                            <p ng-if="item.isNeedTraffic" class="traffic_icon web-icon-font3">&#xe90e;</p>
+                            <p ng-if="item.isNeedHotel" class="live_icon web-icon-font3">&#xe914;</p>
+                        </td>
+                        <td align="center">
+                            <p ng-if="item.isNeedTraffic"><a>{{item.startPlace}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="staff/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.destination}}</a></p>
+                            <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
+                        </td>
+                        <td align="center">
+                            <span ng-if="item.status!='-1'">¥{{item.budget}}</span>
+                            <span ng-if="item.status=='-1'">暂无</span>
+                        </td>
+                        <td align="center">
+                            <span ng-if="item.expenditure!=0">¥{{item.expenditure}}</span>
+                            <span ng-if="item.expenditure==0">暂无</span>
+                        </td>
+                        <td align="center">
+                            <span ng-if="item.score!=0">¥{{item.score}}</span>
+                            <span ng-if="item.score==0">暂无</span>
+                        </td>
+                        <td align="center">
+                            <span ng-if="item.status=='-1'">待出预算</span>
+                            <span ng-if="item.status==0">待上传票据</span>
+                            <span ng-if="item.status==1">
+                                <span ng-if="item.auditStatus=='-1'">审核未通过</span>
+                                <span ng-if="item.auditStatus==0">待审核</span>
+                                <span ng-if="item.auditStatus==1">审核通过</span>
+                            </span>
+                            <span ng-if="item.status==2">已完成</span>
+                        </td>
+                        <td align="center">
+                            <a ng-if="item.status==0" ng-click="enterDetail(item.id)">上传票据</a>
+                            <a ng-if="item.status!=0" ng-click="enterDetail(item.id)">查看详情</a>
+                        </td>
+                    </tr>
+                </table>
+                <!--<input type="button" value="删除" ng-click="deletePlan()">-->
             </div>
+        </div>
+        <ul class="pagination" id="pagination2" style="display: none;"></ul>
+
+        <div class="mainbox_bottom" style="display: none;">
+            <div class="content">
+                <table style="width: 100%">
+                    <tr>
+                        <th align="center">出发时间</th>
+                        <th align="center">服务</th>
+                        <th align="center">预算单内容简介</th>
+                        <th align="center">预算</th>
+                        <th align="center">实际支出</th>
+                        <th align="center">积分</th>
+                        <th align="center">状态</th>
+                        <th align="center">操作</th>
+                    </tr>
+                    <tr ng-repeat="item in planListitems3">
+                        <td align="center">
+                            <p ng-if="item.startAt">{{item.startAt | date: 'yyyy-MM-dd'}}</p>
+                            <p ng-if="!item.startAt">{{item.hotel[0].startTime | date: 'yyyy-MM-dd'}}</p>
+                        </td>
+                        <td align="center">
+                            <p ng-if="item.isNeedTraffic" class="traffic_icon web-icon-font3">&#xe90e;</p>
+                            <p ng-if="item.isNeedHotel" class="live_icon web-icon-font3">&#xe914;</p>
+                        </td>
+                        <td align="center">
+                            <p ng-if="item.isNeedTraffic"><a>{{item.startPlace}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="staff/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.destination}}</a></p>
+                            <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
+                        </td>
+                        <td align="center">
+                            <span ng-if="item.status!='-1'">¥{{item.budget}}</span>
+                            <span ng-if="item.status=='-1'">暂无</span>
+                        </td>
+                        <td align="center">
+                            <span ng-if="item.expenditure!=0">¥{{item.expenditure}}</span>
+                            <span ng-if="item.expenditure==0">暂无</span>
+                        </td>
+                        <td align="center">
+                            <span ng-if="item.score!=0">¥{{item.score}}</span>
+                            <span ng-if="item.score==0">暂无</span>
+                        </td>
+                        <td align="center">
+                            <span ng-if="item.status=='-1'">待出预算</span>
+                            <span ng-if="item.status==0">待上传票据</span>
+                            <span ng-if="item.status==1">
+                                <span ng-if="item.auditStatus=='-1'">审核未通过</span>
+                                <span ng-if="item.auditStatus==0">待审核</span>
+                                <span ng-if="item.auditStatus==1">审核通过</span>
+                            </span>
+                            <span ng-if="item.status==2">已完成</span>
+                        </td>
+                        <td align="center">
+                            <a ng-if="item.status==0" ng-click="enterDetail(item.id)">上传票据</a>
+                            <a ng-if="item.status!=0" ng-click="enterDetail(item.id)">查看详情</a>
+                        </td>
+                    </tr>
+                </table>
+                <!--<input type="button" value="删除" ng-click="deletePlan()">-->
+            </div>
+        </div>
+        <ul class="pagination" id="pagination3" style="display: none;"></ul>
+
+        <div class="mainbox_bottom" style="display: none;">
             <div class="content">
                 <table style="width: 100%">
                     <tr>
@@ -114,7 +236,7 @@
                 </table>
             </div>
         </div>
-        <ul class="pagination" id="pagination2" style="display: none;"></ul>
+        <ul class="pagination" id="pagination4" style="display: none;"></ul>
     </div>
 
 

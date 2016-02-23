@@ -13,7 +13,8 @@ module.exports = function (Db, DataType) {
         companyId    : {type: DataType.UUID,            field: "company_id"}, //企业id
         type         : {type: DataType.INTEGER}, //单据类型
         description  : {type: DataType.TEXT }, //预算/计划单描述
-        status       : {type: DataType.INTEGER,         defaultValue: 0 }, //企业状态
+        status       : {type: DataType.INTEGER,         defaultValue: 0,    field: 'status'}, //企业状态
+        isCommit    : {type: DataType.BOOLEAN,          defaultValue: false, field: 'is_commit'}, //票据是否提交
         startPlace   : {type: DataType.STRING,          field: "start_place"}, //出发地
         destination  : {type: DataType.STRING,          field: "destination"}, //出差目的地
         startPlaceCode   : {type: DataType.STRING,      field: "start_place_code"}, //出发地城市代码

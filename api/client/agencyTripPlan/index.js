@@ -153,11 +153,11 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                 orderId = consumeDetail.orderId;
 
                 if(consumeDetail.type === -1){
-                    invoiceName = '去程交通票据'
+                    invoiceName = '去程交通'
                 }else if(consumeDetail.type === 0){
                     invoiceName = '酒店发票';
-                }else if(consumeDetail === 1){
-                    invoiceName = '回程交通票据';
+                }else if(consumeDetail.type === 1){
+                    invoiceName = '回程交通';
                 }
 
                 expenditure = '￥' + params.expenditure;
@@ -199,7 +199,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                     return isSuccess;
                 }
 
-                return API.tripPlan.getTripPlanOrder({orderId: orderId, columns: ['status', 'score', 'budget', 'expenditure', 'description', 'startAt']});
+                return API.tripPlan.getTripPlanOrder({orderId: orderId, columns: ['id', 'status', 'score', 'budget', 'expenditure', 'description', 'startAt']});
             })
             .then(function(ret){
                 //判断ret类型，如果是Boolean则直接返回
@@ -273,7 +273,8 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                         totalBudget: '全麦预算￥'+order.budget,
                         url: url,
                         reason: params.remark,
-                        projectName: ret.description
+                        projectName: ret.description,
+                        url: url
                     }
                     API.mail.sendMailRequest({
                         toEmails: staffEmail,
@@ -308,7 +309,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                     if(s <0){s = 0;}
                     var _score = order.score;
                     if(_score> 0 ){ _score += '积分已发放到您的积分账户'; }
-                    var total = '全麦预算￥' + order.budget + ',实际支出￥' + order.expenditure + ',节省￥' + s;
+                    var total = '全麦预算￥' + order.budget + ',实际支出￥' + order.expenditure + ',节省￥' + s.toFixed(2);
                     var vals = {
                         username: staffName,
                         time: orderTime,
