@@ -305,6 +305,7 @@ var travelPlan=(function(){
             API.onload(function() {
                 API.tripPlan.commitTripPlanOrder(planId)
                     .then(function(result){
+                        location.reload();
                         alert ("提交成功");
                     })
                     .catch(function(err){
