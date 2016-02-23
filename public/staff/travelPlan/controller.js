@@ -342,6 +342,7 @@ var travelPlan=(function(){
             var sw = $(".scancode").width()/2;
             var sh = $(".scancode").height()/2;
             $(".scancode").css({"margin-top":-sh,"margin-left":-sw});
+            $("#qrcode").find("canvas").remove();
             $(".scan_fixed").show();
             if(time){
                 clearInterval(time);
@@ -349,6 +350,7 @@ var travelPlan=(function(){
             time = setInterval(function(){
                 if(start<=0) {
                     $("#qrcode").find("img").remove();
+                    $("#qrcode").find("canvas").remove();
                     $scope.initscan();
                     start=max;
                 }else if(start >= max){
@@ -361,6 +363,7 @@ var travelPlan=(function(){
         }
         $scope.close_scan = function(){
             start = max;
+            clearInterval(time);
             $scope.seconds = start;
             $(".scan_fixed #qrcode").find("img").remove();
             $(".scan_fixed").hide();
