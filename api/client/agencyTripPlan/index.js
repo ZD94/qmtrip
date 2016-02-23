@@ -505,6 +505,7 @@ function editTripPlanBudget(params){
 
                 //给员工发送邮件
                 var values = {
+                    subjectTime: moment(order.startAt).format('YYYY-MM-DD'),
                     username: staffName,
                     time: moment(order.createAt).format('YYYY-MM-DD HH:mm:ss'),
                     projectName: order.description,
