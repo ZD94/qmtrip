@@ -20,7 +20,7 @@
 .settlement{
 	width: 1000px;
 	margin: 20px auto;
-	ul{
+	ul.settle_tab{
 		display: inline-flex;
 		li{
 			float: left;
@@ -93,6 +93,9 @@
               height: 38px;
               line-height: 38px;
               color: #9b9b9b;
+            }
+            &:hover{
+              background: #eff3f5;
             }
           }
         }
@@ -180,7 +183,14 @@
           }
         }
 		}
-		
+		.list_none{
+      text-align: center;
+      span{
+        color: #9b9b9b;
+        margin-top: 20px;
+        line-height: 80px;
+      }
+    }
 	}
 }
 /*积分三个统计块*/

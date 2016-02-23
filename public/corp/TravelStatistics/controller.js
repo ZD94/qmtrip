@@ -174,38 +174,65 @@ var TravelStatistics = (function(){
         // alert("zzzz");
         $("title").html("员工积分");
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
-        API.onload(function(){
-            var params = {page:$scope.page}
-            API.tripPlan.pageTripPlanOrderByCompany(params)
-                .then(function(list){
-                    console.info(list);
-                    // $scope.planlist = list.items;
-                    var planlist = list.items;
-                    planlist.map(function(plan){
-                        Q.all([
-                            API.tripPlan.getTripPlanOrderById(plan.id),
-                            API.staff.getStaff({id:plan.accountId})
-                        ])
-                            .spread(function(order,staff){
-                                // console.info(order);
-                                // console.info(staff);
-                                plan.staffName = staff.staff.name;
-                                // console.info(plan);
-                                $scope.planlist = planlist;
-                                $scope.$apply();
-                            })
-                            .catch(function(err){
-                                TLDAlert(err.msg || err);
-                            })
+        $scope.initPlanlist = function() {
+            API.onload(function(){
+                var params = {page:$scope.page}
+                API.tripPlan.pageTripPlanOrderByCompany(params)
+                    .then(function(list){
+                        console.info(list);
+                        // $scope.planlist = list.items;
+                        var planlist = list.items;
+                        $scope.total = list.total;
+                        planlist.map(function(plan){
+                            Q.all([
+                                API.tripPlan.getTripPlanOrderById(plan.id),
+                                API.staff.getStaff({id:plan.accountId})
+                            ])
+                                .spread(function(order,staff){
+                                    // console.info(order);
+                                    // console.info(staff);
+                                    plan.staffName = staff.staff.name;
+                                    // console.info(plan);
+                                    $scope.planlist = planlist;
+                                    $scope.$apply();
+                                })
+                                .catch(function(err){
+                                    TLDAlert(err.msg || err);
+                                })
+                        })
                     })
-                })
-                .catch(function(err){
-                    TLDAlert(err.msg || err)
-                })
-        })
+                    .catch(function(err){
+                        TLDAlert(err.msg || err)
+                    })
+            })
+        }
+        $scope.initPlanlist();
+        //分页
+        $scope.pagination = function () {
+            if ($scope.total) {
+                $.jqPaginator('#pagination', {
+                    totalCounts: $scope.total,
+                    pageSize: 10,
+                    currentPage: 1,
+                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+                    onPageChange: function (num) {
+                        if ($scope.pages==1) {
+                            $("#pagination").hide();
+                        }
+                        $scope.page = num;
+                        $scope.initPlanlist();
+                    }
+                });
+                clearInterval (pagenum);
+            }
+        }
+        var pagenum =setInterval($scope.pagination,10);
+
         //进入详情页
         $scope.enterDetail = function (orderId) {
-            window.location.href = "#/TravelStatistics/planDetail?orderId=" + orderId;
+            window.open("#/TravelStatistics/planDetail?orderId=" + orderId);
         }
     }
     // 出差记录详情页
@@ -347,29 +374,6 @@ var TravelStatistics = (function(){
                     console.info(err)
                 })
         })
-
-        //分页
-        $scope.pagination = function () {
-            if ($scope.total) {
-                $.jqPaginator('#pagination', {
-                    totalCounts: $scope.total,
-                    pageSize: 20,
-                    currentPage: 1,
-                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
-                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
-                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
-                    onPageChange: function (num) {
-                        if ($scope.pages==1) {
-                            $("#pagination").hide();
-                        }
-                        $scope.page = num;
-                        $scope.initTravelList();
-                    }
-                });
-                clearInterval (pagenum);
-            }
-        }
-        var pagenum =setInterval($scope.pagination,10);
     }
     return TravelStatistics;
 })();
