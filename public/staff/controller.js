@@ -32,6 +32,10 @@ module.exports = (function(){
                     //location.reload();
                 })
         };
+
+        $scope.feedback = function() {
+            window.location.href = "/extendfunction.html#/feedback/feedback";
+        }
     }
     return staff;
 })();

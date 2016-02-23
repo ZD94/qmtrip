@@ -314,6 +314,26 @@ auth.sendResetPwdEmail = function(params) {
 }
 
 /**
+ * @method sendActivateEmail
+ * 发送激活邮件
+ * @param params
+ * @param params.email 邮箱
+ * @param params.companyName  企业名称
+ * @param params
+ * @returns {Promise}
+ */
+auth.sendActivateEmail = function(params) {
+    var email = params.email;
+    var companyName = params.companyName;
+    var data = {
+        email: email,
+        companyName: companyName,
+        isFirstSet: true
+    };
+    return  API.auth.sendResetPwdEmail(data);
+}
+
+/**
  * @method resetPwdByEmail
  *
  * 找回密码
