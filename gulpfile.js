@@ -15,6 +15,7 @@ gulplib.bundle_lib('bootstrap', {require:["bootstrap"]});
 gulplib.bundle_lib('swiper', {require:['swiper']});
 gulplib.angular_app('staff');
 gulplib.angular_app('corp');
+gulplib.angular_app('extendfunction');
 gulplib.angular_app('agency');
 gulplib.angular_app('demo');
 gulplib.angular_app('mobile');
