@@ -95,6 +95,7 @@ var travelRecord=(function(){
             API.onload(function() {
                 API.agencyTripPlan.getTripPlanOrderById(orderId)
                     .then(function(result){
+                        console.info (result);
                         var outTraffic = result.outTraffic[0];
                         var backTraffic = result.backTraffic[0];
                         var hotel = result.hotel[0];
@@ -104,7 +105,7 @@ var travelRecord=(function(){
                         $scope.outTraffic = $scope.planDetail.outTraffic[0];
                         $scope.backTraffic = $scope.planDetail.backTraffic[0];
                         $scope.hotel = $scope.planDetail.hotel[0];
-                        console.info("执行到A==>", hotel, backTraffic, outTraffic);
+                        //console.info("执行到A==>", hotel, backTraffic, outTraffic);
 
                         var outTraffics = $scope.planDetail.outTraffic;
                         var backTraffics = $scope.planDetail.backTraffic;
@@ -122,68 +123,105 @@ var travelRecord=(function(){
                             $scope.outTrafficInvoiceImg = "/consume/invoice/" + outTraffic.id;
                         }
 
-                        outTraffics.map(function(outTraffic){
-                            return Q.all([
-                                API.agency.getAgencyUser(outTraffic.auditUser),
-                                API.agencyTripPlan.getConsumeInvoiceImg({consumeId: outTraffic.id})
-                            ])
-                            .spread(function(auditName, invoiceImg) {
-                                outTraffic.auditName = auditName;
-                                outTraffic.invoiceImg = invoiceImg;
+                        outTraffic = outTraffics.map(function(outTraffic){
+                            if(!outTraffic.newInvoice) {
                                 return outTraffic;
-                            })
+                            }
+
+                            return API.agencyTripPlan.getConsumeInvoiceImg({consumeId: outTraffic.id})
+                                .then(function(invoiceImg){
+                                    outTraffic.invoiceImg = invoiceImg;
+
+                                    if(!outTraffic.auditUser){
+                                        return outTraffic;
+                                    }
+
+                                    return API.agency.getAgencyUser(outTraffic.auditUser)
+                                        .then(function(auditName) {
+                                            outTraffic.auditName = auditName;
+                                            return outTraffic
+                                        })
+                                })
+
                         });
-                        backTraffics.map(function(backTraffic){
-                            return Q.all([
-                                    API.agency.getAgencyUser(backTraffic.auditUser),
-                                    API.agencyTripPlan.getConsumeInvoiceImg({consumeId: backTraffic.id})
-                                ])
-                                .spread(function(auditName, invoiceImg) {
-                                    backTraffic.auditName = auditName;
+
+                        backTraffics = backTraffics.map(function(backTraffic){
+                            if(!backTraffic.newInvoice) {
+                                return backTraffic;
+                            }
+
+                            return API.agencyTripPlan.getConsumeInvoiceImg({consumeId: backTraffic.id})
+                                .then(function(invoiceImg){
                                     backTraffic.invoiceImg = invoiceImg;
-                                    return backTraffic;
+
+                                    if(!backTraffic.auditUser){
+                                        return backTraffic;
+                                    }
+
+                                    return API.agency.getAgencyUser(backTraffic.auditUser)
+                                        .then(function(auditName) {
+                                            backTraffic.auditName = auditName;
+                                            return backTraffic
+                                        })
                                 })
 
                         });
 
                         hotels = hotels.map(function(hotel){
-                            return Q.all([
-                                    API.agency.getAgencyUser(hotel.auditUser),
-                                    API.agencyTripPlan.getConsumeInvoiceImg({consumeId: hotel.id})
-                                ])
-                                .spread(function(auditName, invoiceImg) {
-                                    hotel.auditName = auditName;
+                            if(!hotel.newInvoice) {
+                                return hotel;
+                            }
+
+                            return API.agencyTripPlan.getConsumeInvoiceImg({consumeId: hotel.id})
+                                .then(function(invoiceImg){
                                     hotel.invoiceImg = invoiceImg;
-                                    return hotel;
+
+                                    if(!hotel.auditUser){
+                                        return hotel;
+                                    }
+
+                                    return API.agency.getAgencyUser(hotel.auditUser)
+                                        .then(function(auditName) {
+                                            hotel.auditName = auditName;
+                                            return hotel
+                                        })
                                 })
+
                         });
 
                         Q.all(hotels)
-                        .then(function(hotels) {
-                            $scope.hotels = hotels;
-                            $scope.$apply();
-                        })
-                        .catch(function(err) {
-                            TLDAlert(err.msg || err);
-                        })
+                            .then(function(hotels) {
+                                $scope.hotels = hotels;
+                                $scope.$apply();
+                            })
+                            .catch(function(err) {
+                                console.info("hotels");
+                                console.info(err);
+                                TLDAlert(err.msg || err);
+                            })
 
                         Q.all(outTraffics)
-                        .then(function(outTraffics) {
-                            $scope.outTraffics = outTraffics;
-                            $scope.$apply();
-                        })
-                        .catch(function(err) {
-                            TLDAlert(err.msg || err);
-                        })
+                            .then(function(outTraffics) {
+                                $scope.outTraffics = outTraffics;
+                                console.info(outTraffics);
+                                $scope.$apply();
+                            })
+                            .catch(function(err) {
+                                console.info("outTraffics");
+                                console.info(err);
+                                TLDAlert(err.msg || err);
+                            })
 
                         Q.all(backTraffics)
-                        .then(function(backTraffics) {
-                            $scope.backTraffics = backTraffics;
-                            $scope.$apply();
-                        })
-                        .catch(function(err) {
-                            TLDAlert(err.msg || err);
-                        })
+                            .then(function(backTraffics) {
+                                $scope.backTraffics = backTraffics;
+                                $scope.$apply();
+                            })
+                            .catch(function(err) {
+                                console.info("backTraffics");
+                                console.info(err);
+                                TLDAlert(err.msg || err);
+                            })
 
                         API.staff.getStaffByAgency({id:$scope.planDetail.accountId})
                             .then(function(result){
