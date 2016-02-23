@@ -90,7 +90,7 @@ tripPlan.savePlanOrder = function (params) {
                             }
 
                             return API.mail.sendMailRequest({
-                                toEmails: '1014418876@qq.com', //s.email, //'miao.yu@tulingdao.com',
+                                toEmails: s.email, //'miao.yu@tulingdao.com',
                                 templateName: 'qm_notify_new_travelbudget',
                                 values: vals
                             })
@@ -188,7 +188,12 @@ tripPlan.pageTripPlanOrder = function (params) {
     var self = this;
     var accountId = self.accountId;
 
-
+    params.status = {$gte: -1};
+    if (params.isUpload === true) {
+        params.status = {$gt: 0}
+    } else if (params.isUpload === false) {
+        params.status = {$in: [-1, 0]};
+    }
 
     if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
         var audit = params.audit;
