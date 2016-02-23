@@ -82,34 +82,75 @@
 
             var trafficUploadConfig = JSON.parse(JSON.stringify(uploadConf));
             trafficUploadConfig.onCompleteItem= function (item, resp) {
-                uploadInvoice($scope.outTraffic.id, resp.md5key,function(){
+                $(".upload_sure span strong").html("交通票据");
+                $(".upload_sure span em").html("去程");
+                $scope.type = 'outTraffic';
+                $scope.consumeId = $scope.outTraffic.id;
+                $scope.md5key = resp.md5key;
+                $scope.$apply();
+                preview(resp.md5key);
+            }
+
+            function preview(key) {
                     $(".upload_sure").find("img").remove();
-                    var img = "<img src="+'/self/attachments/'+resp.md5key+">";
+                    var img = "<img src="+'/self/attachments/'+key+">";
                     $(".upload_sure").append(img);
                     $(".upload_sure").show();
+            }
+
+            $scope.previewOk = function() {
+                uploadInvoice($scope.consumeId, $scope.md5key, function(err, result){
+                    console.info(err)
+                    console.info(result)
+                    if (err ) {
+                        TLDAlert(err.msg || err);
+                        return;
+                    }
+                    $scope.initall();
+                    $scope.close_pre();
                 });
             }
+            
 
             var hotelUploadConfig = JSON.parse(JSON.stringify(uploadConf));
             hotelUploadConfig.onCompleteItem = function(item, resp) {
-                uploadInvoice($scope.hotel.id, resp.md5key,function(){
-                    $(".upload_sure").find("img").remove();
-                    var img = "<img src="+'/self/attachments/'+resp.md5key+">";
-                    $(".upload_sure").append(img);
-                    $(".upload_sure").show();
-                });
+                $(".upload_sure span strong").html("酒店发票");
+                $scope.type = 'hotel';
+                $scope.consumeId = $scope.hotel.id;
+                $scope.md5key = resp.md5key;
+                $scope.$apply();
+                preview(resp.md5key);
             }
 
             var backTrafficUploadConfig = JSON.parse(JSON.stringify(uploadConf));
             backTrafficUploadConfig.onCompleteItem = function(item, resp) {
-                uploadInvoice($scope.backTraffic.id, resp.md5key,function(){
-                    $(".upload_sure").find("img").remove();
-                    var img = "<img src="+'/self/attachments/'+resp.md5key+">";
-                    $(".upload_sure").append(img);
-                    $(".upload_sure").show();
-                });
+                $(".upload_sure span strong").html("交通票据");
+                $(".upload_sure span em").html("回程");
+                $scope.type = 'backTraffic';
+                $scope.consumeId = $scope.backTraffic.id;
+                $scope.md5key = resp.md5key;
+                $scope.$apply();
+                preview(resp.md5key);
             }
 
+            trafficUploadConfig.onBeforeUpload = function(){
+                $(".upload_sure").find("img").remove();
+                var img = "<img src="+'/images/data-loading.gif'+">";
+                $(".upload_sure").append(img);
+                $(".upload_sure").show();
+            }
+            hotelUploadConfig.onBeforeUpload = function(){
+                $(".upload_sure").find("img").remove();
+                var img = "<img src="+'/images/data-loading.gif'+">";
+                $(".upload_sure").append(img);
+                $(".upload_sure").show();
+            }
+            backTrafficUploadConfig.onBeforeUpload = function(){
+                $(".upload_sure").find("img").remove();
+                var img = "<img src="+'/images/data-loading.gif'+">";
+                $(".upload_sure").append(img);
+                $(".upload_sure").show();
+            }
             $scope.TrafficUploader = new FileUploader(trafficUploadConfig);
             $scope.HotelUploader = new FileUploader(hotelUploadConfig);
             $scope.BackTrafficUploader = new FileUploader(backTrafficUploadConfig);
@@ -130,58 +171,61 @@
 
  		loading(true);
  		var planId = $routeParams.planId;
- 		API.onload(function(){
- 			API.tripPlan.getTripPlanOrderById(planId)
- 				.then(function(plan){
- 					$scope.plan = plan;
- 					$scope.backTraffic = plan.backTraffic[0];
-                    $scope.hotel = plan.hotel[0];
-                    $scope.outTraffic = plan.outTraffic[0];
-                    var backTraffic = plan.backTraffic[0];
-                    var hotel = plan.hotel[0];
-                    var outTraffic = plan.outTraffic[0];
-                    if(plan.outTraffic.length!=0) {
-                        if(outTraffic.invoice.length==0){
-                            $scope.outClass = "unupload";
-                        }else if(outTraffic.invoice.length!=0 && outTraffic.status =='0'){
-                            $scope.outClass = "imgdown";
-                        }else if(outTraffic.invoice.length!=0 && outTraffic.status=='-1'){
-                            $scope.outClass = "fail";
-                        }else if(outTraffic.invoice.length!=0 && outTraffic.status=='1'){
-                            $scope.outClass = "ready";
+        $scope.initall = function() {
+            API.onload(function(){
+                API.tripPlan.getTripPlanOrderById(planId)
+                    .then(function(plan){
+                        $scope.plan = plan;
+                        $scope.backTraffic = plan.backTraffic[0];
+                        $scope.hotel = plan.hotel[0];
+                        $scope.outTraffic = plan.outTraffic[0];
+                        var backTraffic = plan.backTraffic[0];
+                        var hotel = plan.hotel[0];
+                        var outTraffic = plan.outTraffic[0];
+                        if(plan.outTraffic.length!=0) {
+                            if(outTraffic.invoice.length==0){
+                                $scope.outClass = "unupload";
+                            }else if(outTraffic.invoice.length!=0 && outTraffic.status =='0'){
+                                $scope.outClass = "imgdown";
+                            }else if(outTraffic.invoice.length!=0 && outTraffic.status=='-1'){
+                                $scope.outClass = "fail";
+                            }else if(outTraffic.invoice.length!=0 && outTraffic.status=='1'){
+                                $scope.outClass = "ready";
+                            }
                         }
-                    }
-                    if (plan.hotel.length!=0) {
-                        if(hotel.invoice.length==0){
-                            $scope.hotelClass = "unupload";
-                        }else if(hotel.invoice.length!=0 && hotel.status =='0'){
-                            $scope.hotelClass = "imgdown";
-                        }else if(hotel.invoice.length!=0 && hotel.status=='-1'){
-                            $scope.hotelClass = "fail";
-                        }else if(hotel.invoice.length!=0 && hotel.status=='1'){
-                            $scope.hotelClass = "ready";
+                        if (plan.hotel.length!=0) {
+                            if(hotel.invoice.length==0){
+                                $scope.hotelClass = "unupload";
+                            }else if(hotel.invoice.length!=0 && hotel.status =='0'){
+                                $scope.hotelClass = "imgdown";
+                            }else if(hotel.invoice.length!=0 && hotel.status=='-1'){
+                                $scope.hotelClass = "fail";
+                            }else if(hotel.invoice.length!=0 && hotel.status=='1'){
+                                $scope.hotelClass = "ready";
+                            }
                         }
-                    }
-                    if(plan.backTraffic.length!=0){
-                        if(backTraffic.invoice.length==0){
-                            $scope.backClass = "unupload";
-                        }else if(backTraffic.invoice.length!=0 && backTraffic.status =='0'){
-                            $scope.backClass = "imgdown";
-                        }else if(backTraffic.invoice.length!=0 && backTraffic.status=='-1'){
-                            $scope.backClass = "fail";
-                        }else if(backTraffic.invoice.length!=0 && backTraffic.status=='1'){
-                            $scope.backClass = "ready";
+                        if(plan.backTraffic.length!=0){
+                            if(backTraffic.invoice.length==0){
+                                $scope.backClass = "unupload";
+                            }else if(backTraffic.invoice.length!=0 && backTraffic.status =='0'){
+                                $scope.backClass = "imgdown";
+                            }else if(backTraffic.invoice.length!=0 && backTraffic.status=='-1'){
+                                $scope.backClass = "fail";
+                            }else if(backTraffic.invoice.length!=0 && backTraffic.status=='1'){
+                                $scope.backClass = "ready";
+                            }
                         }
-                    }
-                    console.info(plan);
-                    // $scope.$apply();
-                    API.staff.getCurrentStaff()
-                    	.then(function(staff){
-                    		$scope.name = staff.name;
-                    		$scope.$apply();
-                    	})
- 				})
- 		})
+                        console.info(plan);
+                        // $scope.$apply();
+                        API.staff.getCurrentStaff()
+                            .then(function(staff){
+                                $scope.name = staff.name;
+                                $scope.$apply();
+                            })
+                    })
+            })
+        }
+ 		$scope.initall();
 		$scope.push = function () {
             API.onload(function() {
                 API.tripPlan.commitTripPlanOrder(planId)
