@@ -20,7 +20,7 @@
 .settlement{
 	width: 1000px;
 	margin: 20px auto;
-	ul{
+	ul.settle_tab{
 		display: inline-flex;
 		li{
 			float: left;
@@ -93,6 +93,9 @@
               height: 38px;
               line-height: 38px;
               color: #9b9b9b;
+            }
+            &:hover{
+              background: #eff3f5;
             }
           }
         }
@@ -180,7 +183,34 @@
           }
         }
 		}
-		
+		.list_none{
+      text-align: center;
+      span{
+        color: #9b9b9b;
+        margin-top: 20px;
+        line-height: 80px;
+      }
+    }
+    .set_map_date{
+      width: 112px;
+      overflow: hidden;
+      .selectbox{
+        width: 112px;
+        .common_select{
+          width: 90px;
+        }
+      }
+      span{
+        display: inline-block;
+        width: 112px;
+        height: 36px;
+        line-height: 36px;
+        text-align: center;
+        &:hover{
+          background: #eff3f5;
+        }
+      }
+    }
 	}
 }
 /*积分三个统计块*/

@@ -21,6 +21,7 @@
     <script type="text/javascript" src="/script/libs/bundle.api.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.ngapp.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.notie.js"></script>
+    <script type="text/javascript" src="/script/libs/bundle.arale-qrcode.js"></script>
     <script type="text/javascript" src="/script/selectbox.js"></script>
     <script type="text/javascript" src="/script/header.js"></script>
     <script type="text/javascript" src="/staff/controller.all.js"></script>
@@ -70,8 +71,7 @@
             var token_sign = Cookie.get('token_sign');
             var timestamp = Cookie.get("timestamp");
 
-            remote.authenticate({ accountid: user_id, tokenid: token_id, tokensign: token_sign, timestamp: timestamp },
-                    callback);
+            remote.authenticate({ accountid: user_id, tokenid: token_id, tokensign: token_sign, timestamp: timestamp },callback);
         };
         // function logout(){
         // 	API.require('auth');
