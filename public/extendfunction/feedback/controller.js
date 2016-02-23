@@ -1,5 +1,5 @@
 /**
- * Created by zj on 2015/12/15.
+ * Created by qp on 2016/2/22.
  */
 'use strict';
 var feedback=(function(){
@@ -10,10 +10,10 @@ var feedback=(function(){
 
     var  feedback = {};
 
-    feedback.IndexController = function($scope) {
+    feedback.FeedbackController = function($scope) {
         loading(true);
         $("title").html("意见反馈");
-        Myselect();
+        //$(".staff_header").hide();
         $scope.subFeedback = function(){
             var params = {};
             var content = $("#content").val();
@@ -31,14 +31,13 @@ var feedback=(function(){
                         return API.company.getCompanyById(staff.companyId)
                     })
                     .then(function(company){
-                        console.log(company);
                         params.companyName = company.name;
                         return API.feedback.sendFeedback(params)
                     })
                     .then(function(fb){
-                        console.log(fb);
                         if(fb){
                             Myalert("温馨提示","您的意见已成功提交");
+                            $("#content").val("");
                         }
                     })
                     .catch(function(err){
