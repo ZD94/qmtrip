@@ -67,8 +67,8 @@
                             <div class="endplace">{{outTraffic.arrivalPlace}}</div>
                         </td>
                         <td align="center">
-                            <span ng-if="outTraffic.status=='-1'">小编正在为您查询<br>请耐心等待</span>
-                            <span ng-if="outTraffic.status!='-1'">¥{{outTraffic.budget.toFixed(2)}}</span>
+                            <span ng-if="outTraffic.budget=='-1'">小编正在为您查询<br>请耐心等待</span>
+                            <span ng-if="outTraffic.budget!='-1'">¥{{outTraffic.budget.toFixed(2)}}</span>
                         </td>
                         <td align="center">
                             <span ng-if="outTraffic.expenditure">¥{{outTraffic.expenditure.toFixed(2)}}</span>
