@@ -12,6 +12,7 @@ var staff = (function(){
     staff.StaffInfoManageController = function($scope){
 
         $(".left_nav li").removeClass("on").eq(2).addClass("on");
+        Myselect();
         //添加员工信息
         $scope.addStaff = function() {
             $("#add").addClass("onCheck");
@@ -28,6 +29,7 @@ var staff = (function(){
         $scope.selectClass = [
             {val:"",name:"请选择对应的差旅等级"}
         ]
+        //$scope.selectClass = [];
         $scope.department = "";
         $scope.queryDepartment = "";
         $scope.departments = [
@@ -71,6 +73,7 @@ var staff = (function(){
                                 }
                                 var arr = travelPolicies;
                                 var i ;
+                                //$scope.selectClass = [];
                                 $scope.selectClass = [
                                     {val:"",name:"请选择对应的差旅等级"}
                                 ]//清空selectClass避免出现重复
@@ -463,6 +466,8 @@ var staff = (function(){
                                 $scope.invalidData = JSON.parse(allData.noAddObj).length;
                                 if($scope.validData == 0){
                                     Myalert("温馨提示","无可导入成员，请预览检查调整后重新上传");
+                                    $('.import_btn>.blue_btn').hide();
+                                    $('.import_btn>.disabled').show();
                                 }
                                 //return $scope.valid;
                                 $scope.$apply();
