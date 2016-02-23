@@ -39,7 +39,7 @@ tripPlan.savePlanOrder = function (params) {
         .spread(function(_order, staffs){
             order = _order;
 
-            if(order.budget <= 0 ) {
+            if(order.budget <= 0 || order.status === -1) {
                 return order;
             }
 
