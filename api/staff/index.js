@@ -73,7 +73,7 @@ staff.createStaff = function(data){
             if(accountId) {
                 return {id: accountId};
             }
-            var accData = {email: data.email, mobile: data.mobile, status: 0, type: 1, companyName: data.companyName}//若为导入员工置为激活状态 不设置密码
+            var accData = {email: data.email, mobile: data.mobile, status: 0, type: 1, companyName: data.companyName}
             return API.auth.newAccount(accData)
         })
         .then(function(account){
@@ -104,9 +104,15 @@ staff.deleteStaff = function(params){
             return staffModel.update({status: STAFF_STATUS.DELETE, quitTime: utils.now()}, {where: {id: id}, returning: true})
         })
         .spread(function(num, rows){
-            return API.company.getCompany({companyId:rows[0].companyId})
+            var staff = rows[0];
+            if (!staff) {
+                throw L.ERR.ACCOUNT_NOT_EXIST;
+            }
+
+            return API.company.getCompany({companyId:staff.companyId})
                 .then(function(company){
                     var vals = {
+                        name: staff.name || "",
                         time: utils.now(),
                         companyName: company.name
                     }
@@ -293,7 +299,8 @@ staff.listAndPaginateStaff = function(params){
     options.where = params;
     return API.department.getDefaultDepartment({companyId: params.companyId})
         .then(function(defaultDept){
-            if(defaultDept.id == params.departmentId){
+
+            if(!defaultDept || defaultDept.id == params.departmentId){
                 params.$or = [{departmentId: params.departmentId},["department_id is null"]];
                 delete params.departmentId;
                 options.where = params;
