@@ -461,7 +461,9 @@ var staff = (function(){
                                 $scope.downloadValidData = allData.downloadAddObj;
                                 $scope.validData = JSON.parse(allData.addObj).length;
                                 $scope.invalidData = JSON.parse(allData.noAddObj).length;
-                                //$scope.totalData =
+                                if($scope.validData == 0){
+                                    Myalert("温馨提示","无可导入成员，请预览检查调整后重新上传");
+                                }
                                 //return $scope.valid;
                                 $scope.$apply();
                             })
