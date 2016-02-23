@@ -90,7 +90,7 @@ function savePlanOrder(params){
                 _planOrder.status = -1; //待录入预算状态
 
             return sequelize.transaction(function(t){
-                var order = {}
+                var order = {};
                 return PlanOrder.create(_planOrder, {transaction: t})
                     .then(function(ret){
                         order = ret.toJSON();

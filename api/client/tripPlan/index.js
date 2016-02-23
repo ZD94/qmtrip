@@ -38,6 +38,11 @@ tripPlan.savePlanOrder = function (params) {
         })
         .spread(function(_order, staffs){
             order = _order;
+
+            if(order.budget <= 0 ) {
+                return order;
+            }
+
             var go = '无', back = '无', hotel = '无';
 
             if(order.outTraffic.length > 0){
@@ -86,7 +91,8 @@ tripPlan.savePlanOrder = function (params) {
                                 backTrafficBudget: back,
                                 hotelBudget: hotel,
                                 totalBudget: '￥'+order.budget,
-                                url: url
+                                url: url,
+                                detailUrl: url
                             }
 
                             return API.mail.sendMailRequest({
