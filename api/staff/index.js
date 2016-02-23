@@ -29,6 +29,12 @@ var STAFF_STATUS = {
     QUIT_JOB: -1,
     DELETE: -2
 };
+var STAFF_ROLE = {
+    OWNER: 0,
+    COMMON: 1,
+    ADMIN: 2,
+    FINANCE: 3
+};
 var AGENCY_ROLE = {
     OWNER: 0,
     COMMON: 1,
@@ -147,56 +153,72 @@ staff.updateStaff = function(data){
     if(!data.departmentId || data.departmentId == ""){
         data.departmentId = null;
     }
-    return Q()
-        .then(function(){
-            if(data.email){
-                return staffModel.findById(id)
-                    .then(function(old){
+    var send_email = true;
+    var accobj = {};
+    var com = {};
+    return Q.all([
+        staffModel.findById(id),
+        API.auth.getAccount({id:id}),
+    ])
+        .spread(function(old, acc){
+            accobj = acc;
+            return API.company.getCompany({companyId: old.companyId})
+                .then(function(company){
+                    com = company;
+                    if(data.email){
                         if(old.email != data.email){
+                            if(acc.status != 0)
+                                throw {code: -2, msg: "该账号不允许修改邮箱"};
+                            var accData = {email: data.email};
                             return Q.all([
-                                API.auth.getAccount({id:id}),
-                                API.company.getCompany({companyId: old.companyId})
+                                API.auth.updataAccount(id, accData, company.name),
+                                staffModel.update(data, options)
                             ])
-                            .spread(function(acc, company){
-                                if(acc.status != 0)
-                                    throw {code: -2, msg: "该账号不允许修改邮箱"};
-                                var accData = {email: data.email};
-                                return Q.all([
-                                    API.auth.updataAccount(id, accData, company.name),
-                                    staffModel.update(data, options)
-                                ]);
-                            })
-                            .spread(function(updateaccount, updatestaff) {
-                                return updatestaff;
-                            });
+                                .spread(function(updateaccount, updatestaff) {
+                                    send_email = false;
+                                    return updatestaff;
+                                });
                         }
                         return staffModel.update(data, options);
-                    });
-            }else{
-                return staffModel.update(data, options);
-            }
+                    }else{
+                        return staffModel.update(data, options);
+                    }
+                })
         })
         .spread(function(rownum, rows){
             return Q.all([
-                    API.travelPolicy.getTravelPolicy({id: rows[0].travelLevel}),
-                    API.company.getCompany({companyId: rows[0].companyId})
+                API.travelPolicy.getTravelPolicy({id: rows[0].travelLevel}),
+                API.department.getDepartment({id: rows[0].departmentId})
             ])
-                .spread(function(tp, com){
-                    var vals = {
-                        username: rows[0].name,
-                        mobile: rows[0].mobile,
-                        travelPolicy: tp.name,
-                        time: utils.now(),
-                        companyName: com.name
+                .spread(function(tp, dept){
+                    if(accobj.status != 0 && send_email){
+                        //已激活账户
+                        var vals = {
+                            username: rows[0].name,
+                            mobile: rows[0].mobile,
+                            travelPolicy: tp.name,
+                            time: utils.now(),
+                            companyName: com.name,
+                            department: dept.name,
+                            permission: rows[0].roleId == STAFF_ROLE.ADMIN ? "管理员" : (rows[0].roleId == STAFF_ROLE.OWNER ? "创建者" : "普通员工")
+                        }
+                        return API.mail.sendMailRequest({
+                            toEmails: rows[0].email,
+                            templateName: "staff_update_email",
+                            values: vals
+                        })
+                            .then(function(result) {
+                                return rows[0];
+                            });
+                    }else if(accobj.status == 0 && send_email){
+                        //未激活账户 并且未通过修改邮箱更新账户信息发送激活邮件
+                        return API.auth.sendResetPwdEmail({companyName: com.name, email: rows[0].email, type: 1, isFirstSet: true})
+                            .then(function() {
+                                return rows[0];
+                            });
+                    }else{
+                        return rows[0];
                     }
-                    return API.mail.sendMailRequest({
-                        toEmails: "yali.wang@tulingdao.com",
-                        templateName: "staff_update_email",
-                        values: vals
-                    })
-                        .then(function(result) {
-                            return rows[0];
-                        });
                 })
         });
 }
