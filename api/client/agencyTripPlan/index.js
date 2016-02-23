@@ -516,7 +516,6 @@ function editTripPlanBudget(params){
                     detailUrl: url
                 }
 
-                staffEmail = '1014418876@qq.com';
                 API.mail.sendMailRequest({
                     toEmails: staffEmail,
                     templateName: 'qm_notify_agency_budget',
@@ -545,7 +544,6 @@ function editTripPlanBudget(params){
                                 }
 
                                 var toEmail = s.email;
-                                toEmail = '1014418876@qq.com';
                                 API.mail.sendMailRequest({
                                     toEmails: toEmail,
                                     templateName: 'qm_notify_new_travelbudget',
