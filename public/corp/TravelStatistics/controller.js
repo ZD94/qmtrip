@@ -236,9 +236,9 @@ var TravelStatistics = (function(){
         }
     }
     // 出差记录详情页
-    TravelStatistics.PlanDetailController = function($scope,$routeParams) {
-        $("title").html("员工积分");
-        $(".left_nav li").removeClass("on").eq(1).addClass("on");
+    TravelStatistics.PlanDetailController = function($scope,$routeParams, $location, $anchorScroll) {
+        //$("title").html("员工积分");
+        //$(".left_nav li").removeClass("on").eq(1).addClass("on");
         var planId = $routeParams.orderId;
         API.onload(function(){
             API.tripPlan.getTripPlanOrderById(planId)
@@ -373,6 +373,56 @@ var TravelStatistics = (function(){
                     TLDAlert(err.msg || err);
                     console.info(err)
                 })
+        })
+        $scope.outTraffichref = function () {
+            loading(true);
+            $location.hash('outTraffic');
+            $anchorScroll();
+
+        }
+        $scope.hotelhref = function () {
+            loading(true);
+            $location.hash('hotel');
+            $anchorScroll();
+
+        }
+        $scope.backTraffichref = function () {
+            loading(true);
+            $location.hash('backTraffic');
+            $anchorScroll();
+
+        }
+        // //分页
+        // $scope.pagination = function () {
+        //     if ($scope.total) {
+        //         $.jqPaginator('#pagination', {
+        //             totalCounts: $scope.total,
+        //             pageSize: 20,
+        //             currentPage: 1,
+        //             prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+        //             next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+        //             page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+        //             onPageChange: function (num) {
+        //                 if ($scope.pages==1) {
+        //                     $("#pagination").hide();
+        //                 }
+        //                 $scope.page = num;
+        //                 $scope.initTravelList();
+        //             }
+        //         });
+        //         clearInterval (pagenum);
+        //     }
+        // }
+        // var pagenum =setInterval($scope.pagination,10);
+    }
+    //出差分布页面
+    TravelStatistics.SettlemapController = function($scope) {
+        $("title").html("出差分布");
+        $(".left_nav li").removeClass("on").eq(1).addClass("on");
+        API.onload(function(){
+            for (var i = 1; i < 31; i++) {
+                $(".set_map_date").append("<span>"+i+"</span>")
+            }
         })
     }
     return TravelStatistics;

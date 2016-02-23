@@ -183,7 +183,17 @@ department.getDefaultDepartment = getDefaultDepartment;
 getDefaultDepartment.required_params = ["companyId"];
 function getDefaultDepartment(params){
     params.isDefault = true;
-    return departmentModel.findOne({where: params});
+    return departmentModel.findOne({where: params})
+    .then(function(department) {
+        if (department) {
+            return department;
+        }
+
+        return departmentModel.create({name: "我的企业", isDefault: true, companyId: params.companyId})
+        .then(function(result) {
+            return result;
+        })
+    })
 }
 
 /**

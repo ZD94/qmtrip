@@ -20,10 +20,10 @@ var travelPlan=(function(){
         $(".staff_menu_t ul a").eq(1).find("li").addClass("on");
         loading(false);
         $("title").html("出差单列表");
-        //待上传票据列表
+        //全部列表
         $scope.initPlanList = function () {
             API.onload(function() {
-                var params = {auditStatus:[0,-1],page:$scope.page1};
+                var params = {page:$scope.page1};
                 if ($scope.keyword != '' && $scope.keyword != undefined) {
                     params.remark = {$like: '%'+ $scope.keyword + '%'};
                 }
@@ -34,127 +34,50 @@ var travelPlan=(function(){
                         $scope.planListitems = result.items;
                         loading(true);
                         $scope.$apply();
-                        $(".content input").click(function(event){
-                            event.stopPropagation();
-                        });
-                        $(".file").AjaxFileUpload({
-                            action: '/upload/ajax-upload-file?type=invoice',
-                            onComplete: function(filename, response) {
-                                console.info(filename);
-                                $scope.ref = $(this).attr("ref");
-                                $scope.fileId = response.fileId;
-                                if (response.ret == 0 ) {
-                                    //上传本人预览图片方法一通过api访问预览
-                                    API.attachment.previewSelfImg({fileId: response.fileId}, function(err, img) {
-                                        if (err) {
-                                            return alertDemo(err.msg);
-                                        }
-
-                                        var ImgSrc = img;
-                                        var invoiceType = "";// $scope.htmlStr = htmlStr;
-                                        if ($(this).attr("data-type") == 1) {
-                                            invoiceType = "去程交通票据";
-                                        }else if ($(this).attr("data-type") == 2) {
-                                            invoiceType = "住宿票据";
-                                        }
-                                        else if ($(this).attr("data-type") == 3) {
-                                            invoiceType = "返程交通票据";
-                                        }
-                                        $(".messagebox_content img").attr("src",ImgSrc);
-                                        $(".messagebtns em").html(invoiceType);
-                                        $("#uploadimg").show();
-                                        position();
-                                    })
-
-                                    //上传本人预览图片方法二通过路由访问预览
-                                    /*var invoiceType = "";// $scope.htmlStr = htmlStr;
-                                    if ($(this).attr("data-type") == 1) {
-                                        invoiceType = "去程交通票据";
-                                    }else if ($(this).attr("data-type") == 2) {
-                                        invoiceType = "住宿票据";
-                                    }
-                                    else if ($(this).attr("data-type") == 3) {
-                                        invoiceType = "返程交通票据";
-                                    }
-                                    $(".messagebox_content img").attr("src","/self/attachments/"+response.fileId);
-                                    $(".messagebtns em").html(invoiceType);
-                                    $("#uploadimg").show();
-                                    position();*/
-
-
-
-                                } else {
-                                  alertDemo(response.errMsg);
-                                }
-                            }
-                        });
-                        // $(".file").AjaxFileUpload({
-                        //     action: '/upload/ajax-upload-file?type=invoice',
-                        //     onComplete: function(filename, response) {
-                        //         $scope.ref = $(this).attr("ref");
-                        //         $scope.md5 = response.md5key;
-                        //         if (response.ret == 0 ) {
-                        //             var ImgSrc = '/upload/get-img-file/'+response.md5key;// var htmlStr = '<img src="/upload/get-img-file/'+response.md5key+'" alt="">';
-                        //             var invoiceType = "";// $scope.htmlStr = htmlStr;
-                        //             if ($(this).attr("data-type") == 1) {
-                        //                 invoiceType = "去程交通票据";
-                        //             }else if ($(this).attr("data-type") == 2) {
-                        //                 invoiceType = "住宿票据";
-                        //             }
-                        //             else if ($(this).attr("data-type") == 3) {
-                        //                 invoiceType = "返程交通票据";
-                        //             }
-                        //             $(".messagebox_content img").attr("src",ImgSrc);
-                        //             $(".messagebtns em").html(invoiceType);
-                        //             $("#uploadimg").show();
-                        //             position();
-                        //         } else {
-                        //           alertDemo(response.errMsg);
-                        //         }
-                        //     }
-                        // });
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
                     })
-                    $scope.updateToServer = function() {
-                        var invoice = {
-                            userId: $scope.staff.id,
-                            consumeId:$scope.ref,
-                            picture:$scope.fileId
-                        }
-                        API.onload(function(){
-                            API.tripPlan.uploadInvoice(invoice)
-                                .then(function(ret){
-                                    console.info(ret);
-                                    $scope.initPlanList();
-                                    $("#uploadimg").hide();
-                                })
-                                .catch(function(err){
-                                    TLDAlert(err.msg || err);
-                                })
-                        })
-                    }
-                    function position() {
-                        var boxwidth = $('#uploadimg .messagebox_box').width();
-                        var boxheight = $('#uploadimg .messagebox_box').height();
-                        $("#uploadimg .messagebox_box").css('margin-left',-boxwidth/2);
-                        $("#uploadimg .messagebox_box").css('margin-top',-boxheight/2);
-                    }
+            })
+        }
+
+        //待出预算列表
+        $scope.initPlanList2 = function () {
+            API.onload(function() {
+                API.tripPlan.pageTripPlanOrder({status:'-1',page:$scope.page2})
+                    .then(function(result){
+                        console.info (result);
+                        $scope.total2 = result.total;
+                        $scope.planListitems2 = result.items;
+                        $scope.$apply();
+                    })
+                    .catch(function(err){
+                        TLDAlert(err.msg || err);
+                    })
+            })
+        }
+
+        //待上传票据列表
+        $scope.initPlanList3 = function () {
+            API.onload(function() {
+                API.tripPlan.pageTripPlanOrder({status:0,page:$scope.page3})
+                    .then(function(result){
+                        $scope.total3 = result.total;
+                        $scope.planListitems3 = result.items;
+                        $scope.$apply();
+                    })
+                    .catch(function(err){
+                        TLDAlert(err.msg || err);
+                    })
             })
         }
 
         //已完成列表
         $scope.initFinishPlanList = function () {
             API.onload(function() {
-                var params = {page:$scope.page2};
-                if ($scope.finishKeyword != '' && $scope.finishKeyword != undefined) {
-                    params.remark = {$like: '%'+ $scope.finishKeyword + '%'};
-                }
-                API.tripPlan.pageCompleteTripPlanOrder(params)
+                API.tripPlan.pageCompleteTripPlanOrder({page:$scope.page4})
                     .then(function(result){
-                        console.info (result);
-                        $scope.total2 = result.total;
+                        $scope.total4 = result.total;
                         $scope.finishPlanListitems = result.items;
                         $scope.$apply();
                     })
@@ -165,7 +88,7 @@ var travelPlan=(function(){
         }
 
 
-        //未完成分页
+        //全部分页
         $scope.pagination1 = function () {
             if ($scope.total1) {
                 $.jqPaginator('#pagination1', {
@@ -185,7 +108,7 @@ var travelPlan=(function(){
         }
         var pagenum1 =setInterval($scope.pagination1,1);
 
-        //已完成分页
+        //待出预算分页
         $scope.pagination2 = function () {
             if ($scope.total2) {
                 $.jqPaginator('#pagination2', {
@@ -197,13 +120,53 @@ var travelPlan=(function(){
                     page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
                     onPageChange: function (num) {
                         $scope.page2 = num;
-                        $scope.initFinishPlanList();
+                        $scope.initPlanList2();
                     }
                 });
                 clearInterval(pagenum2);
             }
         }
         var pagenum2 =setInterval($scope.pagination2,1);
+
+        //待上传票据分页
+        $scope.pagination3 = function () {
+            if ($scope.total3) {
+                $.jqPaginator('#pagination3', {
+                    totalCounts: $scope.total3,
+                    pageSize: 10,
+                    currentPage: 1,
+                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+                    onPageChange: function (num) {
+                        $scope.page3 = num;
+                        $scope.initPlanList3();
+                    }
+                });
+                clearInterval(pagenum3);
+            }
+        }
+        var pagenum3 =setInterval($scope.pagination3,1);
+
+        //已完成分页
+        $scope.pagination4 = function () {
+            if ($scope.total4) {
+                $.jqPaginator('#pagination4', {
+                    totalCounts: $scope.total4,
+                    pageSize: 10,
+                    currentPage: 1,
+                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+                    onPageChange: function (num) {
+                        $scope.page4 = num;
+                        $scope.initFinishPlanList();
+                    }
+                });
+                clearInterval(pagenum4);
+            }
+        }
+        var pagenum4 =setInterval($scope.pagination4,1);
 
         $scope.searchKeyword = function () {
             if ($scope.keyword != '' && $scope.keyword != undefined) {
@@ -215,18 +178,10 @@ var travelPlan=(function(){
             }
         }
 
-        $scope.searchFinishKeyword = function () {
-            if ($scope.finishKeyword != '' && $scope.finishKeyword != undefined) {
-                $scope.initFinishPlanList();
-                setTimeout($scope.pagination2,100);
-            }
-            else {
-                $scope.initFinishPlanList();
-            }
-        }
-
 
         $scope.initPlanList();
+        $scope.initPlanList2();
+        $scope.initPlanList3();
         $scope.initFinishPlanList();
 
 

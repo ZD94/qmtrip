@@ -71,8 +71,7 @@
             var token_sign = Cookie.get('token_sign');
             var timestamp = Cookie.get("timestamp");
 
-            remote.authenticate({ accountid: user_id, tokenid: token_id, tokensign: token_sign, timestamp: timestamp },
-                    callback);
+            remote.authenticate({ accountid: user_id, tokenid: token_id, tokensign: token_sign, timestamp: timestamp },callback);
         };
         // function logout(){
         // 	API.require('auth');
