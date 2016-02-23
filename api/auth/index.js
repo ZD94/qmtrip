@@ -164,12 +164,29 @@ authServer.sendResetPwdEmail = function(params) {
         })
         .spread(function(affect, rows) {
             var account = rows[0];
+            if (account.type != 1) {//如果是普通员工,发送姓名,如果是代理商直接发送邮箱
+                return account;
+            }
+
+            return API.staff.getStaff({id: account.id})
+            .catch(function(err) {
+                return {};
+            })
+            .then(function(staff) {
+                account = account.toJSON();
+                account.realname = staff.name;
+                return account;
+            })
+        })
+        .then(function(account) {
             var timeStr = utils.now();
-            var timestamp = Date.now() + 20 * 24 * 60 * 60 * 1000;  //失效时间20天
+            var oneDay = 24 * 60 * 60 * 1000
+            var timestamp = Date.now() + 2 * oneDay;  //失效时间2天
             var sign = makeActiveSign(account.pwdToken, account.id, timestamp);
             var url = C.host + "/staff.html#/auth/reset-pwd?accountId="+account.id+"&timestamp="+timestamp+"&sign="+sign;
             var templateName;
             var vals = {
+                name: account.realname || account.email,
                 username: account.email,
                 time: timeStr,
                 url: url,
@@ -201,6 +218,7 @@ authServer.sendResetPwdEmail = function(params) {
  * @return {Promise} true|error
  */
 authServer.resetPwdByEmail = function(params) {
+    console.info("resetPwdByEmail=====>", params)
     var accountId = params.accountId;
     var sign = params.sign;
     var timestamp = params.timestamp;

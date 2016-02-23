@@ -305,7 +305,6 @@ var TravelStatistics = (function(){
                         }
                         
                     });
-
                     Q.all(hotels)
                     .then(function(hotels) {
                         $scope.hotels = hotels;
@@ -347,6 +346,7 @@ var TravelStatistics = (function(){
                 })
                 .catch(function(err){
                     TLDAlert(err.msg || err);
+                    console.info(err)
                 })
         })
         $scope.outTraffichref = function () {
@@ -367,28 +367,6 @@ var TravelStatistics = (function(){
             $anchorScroll();
 
         }
-        //分页
-        $scope.pagination = function () {
-            if ($scope.total) {
-                $.jqPaginator('#pagination', {
-                    totalCounts: $scope.total,
-                    pageSize: 20,
-                    currentPage: 1,
-                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
-                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
-                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
-                    onPageChange: function (num) {
-                        if ($scope.pages==1) {
-                            $("#pagination").hide();
-                        }
-                        $scope.page = num;
-                        $scope.initTravelList();
-                    }
-                });
-                clearInterval (pagenum);
-            }
-        }
-        var pagenum =setInterval($scope.pagination,10);
     }
     //出差分布页面
     TravelStatistics.SettlemapController = function($scope) {

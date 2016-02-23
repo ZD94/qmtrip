@@ -12,6 +12,7 @@ module.exports = function (Db, DataType) {
         accountId   : {type: DataType.UUID,             field: "account_id"}, //单据所属人
         type        : {type: DataType.INTEGER }, //消费类型（交通和酒店）
         status      : {type: DataType.INTEGER,          defaultValue: 0, field: "status"}, //状态
+        isCommit    : {type: DataType.BOOLEAN, defaultValue: false, field: 'is_commit'}, //票据是否提交
         startPlace  : {type: DataType.STRING,           field: "start_place"}, //出发地点
         arrivalPlace: {type: DataType.STRING,           field: "arrival_place"}, //目的地点
         city        : {type: DataType.STRING,           field: "city"},
