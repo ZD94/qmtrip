@@ -86,8 +86,10 @@ function savePlanOrder(params){
             }
 
             _planOrder.budget = total_budget;
-            if(!isBudget)
+            if(!isBudget) {
                 _planOrder.status = -1; //待录入预算状态
+                _planOrder.budget = -1;
+            }
 
             return sequelize.transaction(function(t){
                 var order = {};
@@ -345,7 +347,6 @@ function updateConsumeBudget(params){
                 c_budget += parseFloat(budget);
             }
 
-            console.info("*****************************");
             return PlanOrder.update({status: 0, budget: c_budget, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'budget', 'updateAt']})
         })
         .then(function(){
