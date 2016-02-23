@@ -79,7 +79,8 @@
                             <div ng-if="outTraffic.budget!='-1'">
                                 <p ng-if="!outTraffic.newInvoice && outTraffic.isCommit==false">暂无</p>
                                 <div ng-if="outTraffic.isCommit==true">
-                                    <p ng-if="outTraffic.status==0">【待审核】</p>
+                                    <p ng-if="outTraffic.status==0 && !outTraffic.newInvoice" style="color: #DE492A;">【待上传】</p>
+                                    <p ng-if="outTraffic.status==0 && outTraffic.newInvoice" style="color: #DE492A;">【待审核】</p>
                                     <p ng-if="outTraffic.status==1">【审核通过】</p>
                                     <p>去程交通票据</p>
                                 </div>
@@ -111,7 +112,8 @@
                             <div ng-if="hotel.budget!='-1'">
                                 <p ng-if="!hotel.newInvoice && hotel.isCommit==false">暂无</p>
                                 <div ng-if="hotel.isCommit==true">
-                                    <p ng-if="hotel.status==0">【待审核】</p>
+                                    <p ng-if="hotel.status==0 && !hotel.newInvoice" style="color: #DE492A;">【待上传】</p>
+                                    <p ng-if="hotel.status==0 && hotel.newInvoice" style="color: #DE492A;">【待审核】</p>
                                     <p ng-if="hotel.status==1">【审核通过】</p>
                                     <p>酒店发票</p>
                                 </div>
@@ -142,7 +144,8 @@
                             <div ng-if="backTraffic.budget!='-1'">
                                 <p ng-if="!backTraffic.newInvoice && backTraffic.isCommit==false">暂无</p>
                                 <div ng-if="backTraffic.isCommit==true">
-                                    <p ng-if="backTraffic.status==0">【待审核】</p>
+                                    <p ng-if="backTraffic.status==0 && !backTraffic.newInvoice" style="color: #DE492A;">【待上传】</p>
+                                    <p ng-if="backTraffic.status==0 && backTraffic.newInvoice" style="color: #DE492A;">【待审核】</p>
                                     <p ng-if="backTraffic.status==1">【审核通过】</p>
                                     <p>回程交通票据</p>
                                 </div>
