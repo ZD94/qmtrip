@@ -504,7 +504,6 @@ function editTripPlanBudget(params){
                 var url = C.host + '/staff.html#/travelPlan/PlanDetail?planId=' + order.id;
 
                 //给员工发送邮件
-                var staffEmail = '1014418876@qq.com';
                 var values = {
                     username: staffName,
                     time: moment(order.createAt).format('YYYY-MM-DD HH:mm:ss'),
