@@ -55,11 +55,6 @@ var travelRecord=(function(){
         }
         $scope.initTravelList();
 
-        //进入详情页
-        $scope.enterDetail = function (orderId) {
-            window.location.href = "#/travelRecord/TravelDetail?orderId=" + orderId;
-        }
-
         //分页
         $scope.pagination = function () {
             if ($scope.total) {
