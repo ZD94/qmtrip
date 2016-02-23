@@ -684,8 +684,7 @@ var businessTravel=(function(){
                         startPlaceCode:$scope.endplaceval,
                         arrivalPlace:$scope.startplace,
                         arrivalPlaceCode:$scope.startplaceval,
-                        startTime:$scope.starttime,
-                        endTime:$scope.endtime,
+                        startTime:$scope.endtime,
                         budget:Number($scope.backTraffic),
                         invoiceType:1
                     }
