@@ -19,7 +19,7 @@ var businessTravel=(function(){
      */
     businessTravel.IndexController = function($scope) {
         $(".staff_menu_t ul li").removeClass("on");
-        $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
+        $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
         loading(true);
         $("title").html("我要出差");
         Myselect();
@@ -58,7 +58,7 @@ var businessTravel=(function(){
      */
     businessTravel.TrafficStepController = function($scope, $routeParams) {
         $(".staff_menu_t ul li").removeClass("on");
-        $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
+        $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
         loading(true);
         $("title").html("我要出差");
         Myselect();
@@ -177,7 +177,7 @@ var businessTravel=(function(){
      */
     businessTravel.LiveStepController = function($scope, $routeParams) {
         $(".staff_menu_t ul li").removeClass("on");
-        $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
+        $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
         loading(true);
         $("title").html("我要出差");
         Myselect();
@@ -278,7 +278,7 @@ var businessTravel=(function(){
      */
     businessTravel.TrafficLiveController = function($scope, $routeParams) {
         $(".staff_menu_t ul li").removeClass("on");
-        $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
+        $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
         loading(true);
         $("title").html("我要出差");
         Myselect();
@@ -455,7 +455,7 @@ var businessTravel=(function(){
      */
     businessTravel.CreateResultController = function($scope, $routeParams, $filter) {
         $(".staff_menu_t ul li").removeClass("on");
-        $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
+        $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
         loading(false);
         loading(true);
         $("title").html("我要出差");
