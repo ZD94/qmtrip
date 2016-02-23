@@ -233,6 +233,7 @@ var travelPlan=(function(){
         API.onload(function() {
             API.tripPlan.getTripPlanOrderById(planId)
                 .then(function(result){
+                    console.info (result);
                     $scope.planDetail = result;
                     $scope.backTraffic = $scope.planDetail.backTraffic[0];
                     $scope.hotel = $scope.planDetail.hotel[0];
@@ -304,6 +305,7 @@ var travelPlan=(function(){
             API.onload(function() {
                 API.tripPlan.commitTripPlanOrder(planId)
                     .then(function(result){
+                        location.reload();
                         alert ("提交成功");
                     })
                     .catch(function(err){

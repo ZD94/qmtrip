@@ -42,14 +42,24 @@ tripPlan.savePlanOrder = function (params) {
 
             if(order.outTraffic.length > 0){
                 var g = order.outTraffic[0];
-                go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.startPlace + ' 到 ' + g.arrivalPlace +
-                    ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达, 动态预算￥' + g.budget;
+                go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.startPlace + ' 到 ' + g.arrivalPlace;
+
+                if(g.latestArriveTime){
+                    go += ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达';
+                }
+
+                go += ', 动态预算￥' + g.budget;
             }
 
             if(order.backTraffic.length > 0){
                 var b = order.backTraffic[0];
-                back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.startPlace + ' 到 ' + b.arrivalPlace +
-                    ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达, 动态预算￥' + b.budget;
+                back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.startPlace + ' 到 ' + b.arrivalPlace;
+
+                if(b.latestArriveTime){
+                    back += ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达';
+                }
+
+                back += ', 动态预算￥' + b.budget;
             }
 
             if(order.hotel.length > 0){
@@ -178,7 +188,12 @@ tripPlan.pageTripPlanOrder = function (params) {
     var self = this;
     var accountId = self.accountId;
 
-
+    params.status = {$gte: -1};
+    if (params.isUpload === true) {
+        params.status = {$gt: 0}
+    } else if (params.isUpload === false) {
+        params.status = {$in: [-1, 0]};
+    }
 
     if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
         var audit = params.audit;
