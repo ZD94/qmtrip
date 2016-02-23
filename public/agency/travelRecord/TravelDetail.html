@@ -1,7 +1,8 @@
 <style>html,body {background: #F5F5F5;}</style>
 <div class="travel-record">
     <div class="travelDetail">
-        <div class="travelpath">待审核列表&nbsp;>&nbsp;<span>审核详情页</span></div>
+        <div class="travelpath" ng-if="planDetail.status!='-1'">待审核列表&nbsp;>&nbsp;<span>审核详情页</span></div>
+        <div class="travelpath" ng-if="planDetail.status=='-1'">待出预算列表&nbsp;>&nbsp;<span>待出预算详情页</span></div>
         <div class="mainbox">
             <div class="title_top">
                 <table width="100%">
@@ -67,21 +68,27 @@
                         </td>
                         <td width="135" align="center">
                             <span ng-if="outTraffic.budget!='-1'">¥{{outTraffic.budget.toFixed(2)}}</span>
-                            <a ng-if="outTraffic.budget=='-1'" ng-click="editBudgetShow(outTraffic.id)">录入预算</a>
+                            <a ng-if="outTraffic.budget=='-1'" ng-click="editBudgetShow(outTraffic.id)" style="color: #118FD6;">录入预算</a>
                         </td>
                         <td width="135" align="center">
                             <span ng-if="outTraffic.expenditure">¥{{outTraffic.expenditure.toFixed(2)}}</span>
                             <span ng-if="!outTraffic.expenditure">暂无</span>
                         </td>
                         <td width="135" align="center">
+                            <p ng-if="outTraffic.budget=='-1'">暂无</p>
                             <div ng-if="outTraffic.budget!='-1'">
-                                <p ng-if="outTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
-                                <p ng-if="outTraffic.status==0 && !outTraffic.newInvoice" style="color: #DE492A;">【待上传】</p>
-                                <p ng-if="outTraffic.status==0 && outTraffic.newInvoice" style="color: #DE492A;">【待审核】</p>
-                                <p ng-if="outTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
-                                <p><a ng-click="outTraffichref()">去程交通票据</a></p>
+                                <p ng-if="!outTraffic.newInvoice && outTraffic.isCommit==false">暂无</p>
+                                <div ng-if="outTraffic.isCommit==true">
+                                    <p ng-if="outTraffic.status==0 && !outTraffic.newInvoice" style="color: #DE492A;">【待上传】</p>
+                                    <p ng-if="outTraffic.status==0 && outTraffic.newInvoice" style="color: #DE492A;">【待审核】</p>
+                                    <p ng-if="outTraffic.status==1">【审核通过】</p>
+                                    <p>去程交通票据</p>
+                                </div>
+                                <div ng-if="outTraffic.status=='-1'">
+                                    <p>【审核未通过】</p>
+                                    <p>去程交通票据</p>
+                                </div>
                             </div>
-                            <div ng-if="outTraffic.budget=='-1'">暂无</div>
                         </td>
                     </tr>
                     <tr ng-if="planDetail.hotel.length!=0">
@@ -94,21 +101,27 @@
                         </td>
                         <td width="135" align="center">
                             <span ng-if="hotel.budget!='-1'">¥{{hotel.budget.toFixed(2)}}</span>
-                            <a ng-if="hotel.budget=='-1'" ng-click="editBudgetShow(hotel.id)">录入预算</a>
+                            <a ng-if="hotel.budget=='-1'" ng-click="editBudgetShow(hotel.id)" style="color: #118FD6;">录入预算</a>
                         </td>
                         <td width="135" align="center">
                             <span ng-if="hotel.expenditure">¥{{hotel.expenditure.toFixed(2)}}</span>
                             <span ng-if="!hotel.expenditure">暂无</span>
                         </td>
                         <td width="135" align="center">
+                            <p ng-if="hotel.budget=='-1'">暂无</p>
                             <div ng-if="hotel.budget!='-1'">
-                                <p ng-if="hotel.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
-                                <p ng-if="hotel.status==0 && !hotel.newInvoice" style="color: #DE492A;">【待上传】</p>
-                                <p ng-if="hotel.status==0 && hotel.newInvoice" style="color: #DE492A;">【待审核】</p>
-                                <p ng-if="hotel.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
-                                <p><a ng-click="hotelhref()">酒店发票</a></p>
+                                <p ng-if="!hotel.newInvoice && hotel.isCommit==false">暂无</p>
+                                <div ng-if="hotel.isCommit==true">
+                                    <p ng-if="hotel.status==0 && !hotel.newInvoice" style="color: #DE492A;">【待上传】</p>
+                                    <p ng-if="hotel.status==0 && hotel.newInvoice" style="color: #DE492A;">【待审核】</p>
+                                    <p ng-if="hotel.status==1">【审核通过】</p>
+                                    <p>酒店发票</p>
+                                </div>
+                                <div ng-if="hotel.status=='-1'">
+                                    <p>【审核未通过】</p>
+                                    <p>酒店发票</p>
+                                </div>
                             </div>
-                            <div ng-if="hotel.budget=='-1'">暂无</div>
                         </td>
                     </tr>
                     <tr ng-if="planDetail.backTraffic.length!=0">
@@ -120,21 +133,27 @@
                         </td>
                         <td width="135" align="center">
                             <span ng-if="backTraffic.budget!='-1'">¥{{backTraffic.budget.toFixed(2)}}</span>
-                            <a ng-if="backTraffic.budget=='-1'" ng-click="editBudgetShow(backTraffic.id)">录入预算</a>
+                            <a ng-if="backTraffic.budget=='-1'" ng-click="editBudgetShow(backTraffic.id)" style="color: #118FD6;">录入预算</a>
                         </td>
                         <td width="135" align="center">
                             <span ng-if="backTraffic.expenditure">¥{{backTraffic.expenditure.toFixed(2)}}</span>
                             <span ng-if="!backTraffic.expenditure">暂无</span>
                         </td>
                         <td width="135" align="center">
+                            <p ng-if="backTraffic.budget=='-1'">暂无</p>
                             <div ng-if="backTraffic.budget!='-1'">
-                                <p ng-if="backTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
-                                <p ng-if="backTraffic.status==0 && !backTraffic.newInvoice" style="color: #DE492A;">【待上传】</p>
-                                <p ng-if="backTraffic.status==0 && backTraffic.newInvoice" style="color: #DE492A;">【待审核】</p>
-                                <p ng-if="backTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
-                                <p><a ng-click="backTraffichref()">回程交通票据</a></p>
+                                <p ng-if="!backTraffic.newInvoice && backTraffic.isCommit==false">暂无</p>
+                                <div ng-if="backTraffic.isCommit==true">
+                                    <p ng-if="backTraffic.status==0 && !backTraffic.newInvoice" style="color: #DE492A;">【待上传】</p>
+                                    <p ng-if="backTraffic.status==0 && backTraffic.newInvoice" style="color: #DE492A;">【待审核】</p>
+                                    <p ng-if="backTraffic.status==1">【审核通过】</p>
+                                    <p>回程交通票据</p>
+                                </div>
+                                <div ng-if="backTraffic.status=='-1'">
+                                    <p>【审核未通过】</p>
+                                    <p>回程交通票据</p>
+                                </div>
                             </div>
-                            <div ng-if="backTraffic.budget=='-1'">暂无</div>
                         </td>
                     </tr>
                 </table>

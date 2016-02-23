@@ -172,34 +172,41 @@ var TravelStatistics = (function(){
     /*出差记录页面*/
     TravelStatistics.PlanListController = function($scope) {
         // alert("zzzz");
-        $("title").html("员工积分");
+        $("title").html("出差记录");
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
         $scope.initPlanlist = function() {
             API.onload(function(){
                 var params = {page:$scope.page}
                 API.tripPlan.pageTripPlanOrderByCompany(params)
                     .then(function(list){
-                        console.info(list);
-                        // $scope.planlist = list.items;
+                        // console.info(list);
+                        // list.items.map(function(s){
+                        //     console.info('step1=>',s.auditStatus);
+                        // })
+                        $scope.planlist = list.items;
                         var planlist = list.items;
                         $scope.total = list.total;
-                        planlist.map(function(plan){
-                            Q.all([
-                                API.tripPlan.getTripPlanOrderById(plan.id),
-                                API.staff.getStaff({id:plan.accountId})
-                            ])
-                                .spread(function(order,staff){
-                                    // console.info(order);
-                                    // console.info(staff);
+                        planlist = planlist.map(function(plan){
+                            return API.staff.getStaff({id:plan.accountId})
+                                .then(function(staff){
                                     plan.staffName = staff.staff.name;
-                                    // console.info(plan);
-                                    $scope.planlist = planlist;
-                                    $scope.$apply();
+                                    return plan;
                                 })
                                 .catch(function(err){
                                     TLDAlert(err.msg || err);
                                 })
                         })
+
+                        Q.all(planlist)
+                            .then(function(ret){
+                                $scope.planlist = ret;
+                                ret.map(function(s){
+                                })
+                                $scope.$apply();
+                            })
+                            .catch(function(err){
+                                TLDAlert(err.msg || err)
+                            })
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err)
@@ -212,7 +219,7 @@ var TravelStatistics = (function(){
             if ($scope.total) {
                 $.jqPaginator('#pagination', {
                     totalCounts: $scope.total,
-                    pageSize: 10,
+                    pageSize: 20,
                     currentPage: 1,
                     prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
                     next: '<li class="next"><a href="javascript:;">下一页</a></li>',
@@ -237,8 +244,8 @@ var TravelStatistics = (function(){
     }
     // 出差记录详情页
     TravelStatistics.PlanDetailController = function($scope,$routeParams, $location, $anchorScroll) {
-        //$("title").html("员工积分");
-        //$(".left_nav li").removeClass("on").eq(1).addClass("on");
+        $("title").html("出差记录");
+        $(".left_nav li").removeClass("on").eq(1).addClass("on");
         var planId = $routeParams.orderId;
         API.onload(function(){
             API.tripPlan.getTripPlanOrderById(planId)
@@ -277,11 +284,11 @@ var TravelStatistics = (function(){
                                 })
                         }else{
                             return Q.all([
-                                API.agency.getAgencyUser(outTraffic.auditUser),
+                                API.agency.getAgencyUserByCompany({agencyUserId: outTraffic.auditUser}),
                                 API.tripPlan.getConsumeInvoiceImg({consumeId: outTraffic.id})
                             ])
                             .spread(function(auditName, invoiceImg) {
-                                outTraffic.auditName = auditName;
+                                outTraffic.auditName = auditName.name;
                                 outTraffic.invoiceImg = invoiceImg;
                                 return outTraffic;
                             })
@@ -297,11 +304,11 @@ var TravelStatistics = (function(){
                                 })
                         }else{
                             return Q.all([
-                                API.agency.getAgencyUser(backTraffic.auditUser),
+                                API.agency.getAgencyUserByCompany({agencyUserId: backTraffic.auditUser}),
                                 API.tripPlan.getConsumeInvoiceImg({consumeId: backTraffic.id})
                             ])
                             .spread(function(auditName, invoiceImg) {
-                                backTraffic.auditName = auditName;
+                                backTraffic.auditName = auditName.name;
                                 backTraffic.invoiceImg = invoiceImg;
                                 return backTraffic;
                             })
@@ -323,7 +330,7 @@ var TravelStatistics = (function(){
                             ])
                             .spread(function(auditName, invoiceImg) {
                                 console.info(auditName)
-                                hotel.auditName = auditName;
+                                hotel.auditName = auditName.name;
                                 hotel.invoiceImg = invoiceImg;
                                 return hotel;
                             })
