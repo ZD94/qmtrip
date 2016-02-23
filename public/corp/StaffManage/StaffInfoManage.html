@@ -48,14 +48,22 @@
                             <!--<input id="staffDepartment" type="text" placeholder="请输入员工所属部门"/>-->
                             <select name="department" id="staffDepartment" class="" ng-model="department" ng-options="item.val as item.name for item in departments"></select>
                         <li>
+                            <!--差旅标准:-->
+                            <!--<dl class="selectbox w200 fr" style="margin-left: 12px;">-->
+                                <!--<dt class="common_select h34 w178 tl gray9"  name="select" id="staffStandard" selectValue="">请选择对应的差旅等级</dt>-->
+                                <!--<dd class="common_option tl">-->
+                                    <!--<div class="option" ng-repeat="item in selectClass" value="{{item.val}}" selectValue="{{item.val}}">{{item.name}}</div>-->
+                                <!--</dd>-->
+                                <!--<div style="clear: both;"></div>-->
+                            <!--</dl>-->
                             差旅标准:
                             <select name="select" id="staffStandard" class="" ng-model="selectkey" ng-options="item.val as item.name for item in selectClass"></select>
                         </li>
                         <li>
                             <!--<span style="color: #f56d23;padding-right: 5px;">*</span>权限:-->
-                            <!--<dl class="selectbox w198" style="margin-left: 12px;">-->
-                                <!--<dt class="common_select CplaneDiscount h34 w188"  name="select" id="staffPower">请设置权限</dt>-->
-                                <!--<dd class="common_option">-->
+                            <!--<dl class="selectbox w200 fr" style="margin-left: 12px;">-->
+                                <!--<dt class="common_select h34 w178 tl gray9"  name="select" id="staffPower">请设置权限</dt>-->
+                                <!--<dd class="common_option tl">-->
                                     <!--<div value="2">管理员</div>-->
                                     <!--<div value="1">普通员工</div>-->
                                 <!--</dd>-->
@@ -287,8 +295,9 @@
             </ul>
         </div>
         <div class="import_btn">
-            <span ng-click="importData()">导入</span>
-            <span ng-click="backToImport()">取消</span>
+            <span class="blue_btn" ng-click="importData()">导入</span>
+            <span class="gray_btn disabled" style="display: none;">导入</span>
+            <span class="gray_btn" ng-click="backToImport()">取消</span>
         </div>
     </div>
 
@@ -337,6 +346,14 @@
 
 <script>
     $(function(){
+//        $(document).on("click",".selectbox div",function(){
+//            console.log(123);
+//            var index = $(this).index();
+//            var x = $(this).text();
+//            $(this).parent().siblings(".common_select").html(x);
+//            var value = $(this).attr('selectValue');
+//            $(this).parent().siblings(".common_select").attr('selectValue',value);
+//        })
         $(".file").AjaxFileUpload({
             action: '/upload/ajax-upload-file?type=xls',
             dataType: 'json',
