@@ -76,7 +76,8 @@
                         <td width="135" align="center">
                             <div ng-if="outTraffic.budget!='-1'">
                                 <p ng-if="outTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
-                                <p ng-if="outTraffic.status==0" style="color: #DE492A;">【待审核】</p>
+                                <p ng-if="outTraffic.status==0 && !outTraffic.newInvoice" style="color: #DE492A;">【待上传】</p>
+                                <p ng-if="outTraffic.status==0 && outTraffic.newInvoice" style="color: #DE492A;">【待审核】</p>
                                 <p ng-if="outTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
                                 <p><a ng-click="outTraffichref()">去程交通票据</a></p>
                             </div>
@@ -102,7 +103,8 @@
                         <td width="135" align="center">
                             <div ng-if="hotel.budget!='-1'">
                                 <p ng-if="hotel.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
-                                <p ng-if="hotel.status==0" style="color: #DE492A;">【待审核】</p>
+                                <p ng-if="hotel.status==0 && !hotel.newInvoice" style="color: #DE492A;">【待上传】</p>
+                                <p ng-if="hotel.status==0 && hotel.newInvoice" style="color: #DE492A;">【待审核】</p>
                                 <p ng-if="hotel.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
                                 <p><a ng-click="hotelhref()">酒店发票</a></p>
                             </div>
@@ -127,7 +129,8 @@
                         <td width="135" align="center">
                             <div ng-if="backTraffic.budget!='-1'">
                                 <p ng-if="backTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
-                                <p ng-if="backTraffic.status==0" style="color: #DE492A;">【待审核】</p>
+                                <p ng-if="backTraffic.status==0 && !backTraffic.newInvoice" style="color: #DE492A;">【待上传】</p>
+                                <p ng-if="backTraffic.status==0 && backTraffic.newInvoice" style="color: #DE492A;">【待审核】</p>
                                 <p ng-if="backTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
                                 <p><a ng-click="backTraffichref()">回程交通票据</a></p>
                             </div>
