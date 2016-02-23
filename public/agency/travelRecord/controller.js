@@ -55,11 +55,6 @@ var travelRecord=(function(){
         }
         $scope.initTravelList();
 
-        //进入详情页
-        $scope.enterDetail = function (orderId) {
-            window.location.href = "#/travelRecord/TravelDetail?orderId=" + orderId;
-        }
-
         //分页
         $scope.pagination = function () {
             if ($scope.total) {
@@ -100,6 +95,7 @@ var travelRecord=(function(){
             API.onload(function() {
                 API.agencyTripPlan.getTripPlanOrderById(orderId)
                     .then(function(result){
+                        console.info (result);
                         var outTraffic = result.outTraffic[0];
                         var backTraffic = result.backTraffic[0];
                         var hotel = result.hotel[0];
@@ -109,7 +105,7 @@ var travelRecord=(function(){
                         $scope.outTraffic = $scope.planDetail.outTraffic[0];
                         $scope.backTraffic = $scope.planDetail.backTraffic[0];
                         $scope.hotel = $scope.planDetail.hotel[0];
-                        console.info("执行到A==>", hotel, backTraffic, outTraffic);
+                        //console.info("执行到A==>", hotel, backTraffic, outTraffic);
 
                         var outTraffics = $scope.planDetail.outTraffic;
                         var backTraffics = $scope.planDetail.backTraffic;
