@@ -42,14 +42,24 @@ tripPlan.savePlanOrder = function (params) {
 
             if(order.outTraffic.length > 0){
                 var g = order.outTraffic[0];
-                go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.startPlace + ' 到 ' + g.arrivalPlace +
-                    ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达, 动态预算￥' + g.budget;
+                go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.startPlace + ' 到 ' + g.arrivalPlace;
+
+                if(g.latestArriveTime){
+                    go += ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达';
+                }
+
+                go += ', 动态预算￥' + g.budget;
             }
 
             if(order.backTraffic.length > 0){
                 var b = order.backTraffic[0];
-                back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.startPlace + ' 到 ' + b.arrivalPlace +
-                    ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达, 动态预算￥' + b.budget;
+                back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.startPlace + ' 到 ' + b.arrivalPlace;
+
+                if(b.latestArriveTime){
+                    back += ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达';
+                }
+
+                back += ', 动态预算￥' + b.budget;
             }
 
             if(order.hotel.length > 0){
@@ -80,7 +90,7 @@ tripPlan.savePlanOrder = function (params) {
                             }
 
                             return API.mail.sendMailRequest({
-                                toEmails: s.email, //'miao.yu@tulingdao.com',
+                                toEmails: '1014418876@qq.com', //s.email, //'miao.yu@tulingdao.com',
                                 templateName: 'qm_notify_new_travelbudget',
                                 values: vals
                             })
