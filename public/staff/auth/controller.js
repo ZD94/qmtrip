@@ -406,9 +406,15 @@ var auth=(function(){
                     }
 
                     API.auth.checkBlackDomain({domain: domain})
+                        .then(function(result) {
+                            return API.auth.registryCompany({companyName:cName,name:name,email:mail,mobile:mobile,
+                                pwd:pwd,msgCode:mCode,msgTicket:msgTicket,picCode:pCode,picTicket:picTicket})
+                        })
+                        .then(function(result){
+                            //window.location.href = "#/auth/login";
+                            window.location.href = "#/auth/corplaststep?email="+mail;
+                        })
                         .catch(function(err){
-                            //alert("邮箱后缀不合法或者已被使用");
-                            console.info(err.code);
                             if(err.code==-34){
                                 $("#corpMail").siblings(".err_msg").children("a").html("");
                                 $scope.err_msg_mail = "暂不支持公共邮箱，请使用企业邮箱注册";
@@ -419,7 +425,8 @@ var auth=(function(){
                                 $scope.$apply();
                                 return false;
                             }
-                            if(err.code == -33){
+                            if(err.code == -33 || err.code == -29){
+                                TLDAlert(err.msg || err);
                                 $scope.err_msg_mail = "该邮箱已注册过，";
                                 $("#corpMail").siblings(".err_msg").children("a").html("马上登录");
                                 $("#corpMail").siblings(".err_msg").children("i").html("&#xf057;");
@@ -429,20 +436,7 @@ var auth=(function(){
                                 $scope.$apply();
                                 return false;
                             }
-                            console.info(err.code);
-                            throw {};
-                        })
-                        .then(function(result) {
-                            return API.auth.registryCompany({companyName:cName,name:name,email:mail,mobile:mobile,
-                                pwd:pwd,msgCode:mCode,msgTicket:msgTicket,picCode:pCode,picTicket:picTicket});
-                        })
-                        .then(function(result){
-                            console.info("注册返回的结果", result);
-                            //alert("注册成功");
-                            //window.location.href = "#/auth/login";
-                            window.location.href = "#/auth/corplaststep?email="+mail;
-                        })
-                        .catch(function(err){
+
                             if (err.msg) {
                                 //alert(err.msg);
                                 if(err.msg == '手机号已注册'){
@@ -462,6 +456,7 @@ var auth=(function(){
                                     $("#msgCode").parent("div").siblings(".err_msg").children("i").removeClass("right");
                                     $("#msgCode").parent("div").siblings(".err_msg").show();
                                 }
+
                                 if(err.msg=='验证码错误'){
                                     $scope.err_msg_pic = "图片验证码错误";
                                     $('#picCode').val("");
@@ -469,6 +464,7 @@ var auth=(function(){
                                     $("#picCode").parent("div").siblings(".err_msg").children("i").removeClass("right");
                                     $("#picCode").parent("div").siblings(".err_msg").show();
                                 }
+
                                 $scope.changePicCode();
                                 $('#msgCode').val("");
                                 $('#picCode').val("");
@@ -557,9 +553,16 @@ var auth=(function(){
             //alert(2222);
             var mail = $("#loginMail").val();
             var picCode = $("#picCode").val();
+            var reg = /^[\w\.-]+?@([\w\-]+\.){1,2}[a-zA-Z]{2,3}$/;
 
             if(!mail){
                 $scope.err_msg_mail = "联系人邮箱不能为空";
+                $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
+                $("#loginMail").siblings(".err_msg").show();
+                return false;
+            }else if(!reg.test(mail)){
+                $scope.err_msg_mail = "邮箱格式不正确";
                 $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
                 $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
                 $("#loginMail").siblings(".err_msg").show();
@@ -571,16 +574,34 @@ var auth=(function(){
                 $("#picCode").parent("div").siblings(".err_msg").show();
                 return false;
             }
-            API.onload(function () {
-                API.auth.sendResetPwdEmail({email:mail,code:picCode,ticket:picTicket})
-                    .then(function (result) {
-                        $(".changeContentOne").hide();
-                        $scope.changePwdMail = mail;
-                        $(".changeContentTwo").show();
-                        $(".step>ul>li:nth-child(2)").addClass("on").siblings("li").removeClass("on");
-                        $scope.$apply();
+            API.onload(function() {
+                API.auth.isEmailUsed({email:mail})
+                    .then(function(isUsed){
+                        if(isUsed){
+                            return API.auth.sendResetPwdEmail({email:mail,code:picCode,ticket:picTicket})
+                                .then(function (result) {
+                                    $(".changeContentOne").hide();
+                                    $scope.changePwdMail = mail;
+                                    $(".changeContentTwo").show();
+                                    $(".step>ul>li:nth-child(2)").addClass("on").siblings("li").removeClass("on");
+                                    $scope.$apply();
+                                })
+                        }
+                        else{
+                            $scope.err_msg_mail = "用户邮箱不存在";
+                            $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
+                            $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
+                            $("#loginMail").siblings(".err_msg").show();
+                            $scope.$apply();
+                            return false;
+                        }
                     }).catch(function (err) {
-                        //alert(err.msg);
+                        console.info(err.msg);
+                        $scope.err_msg_mail = err.msg;
+                        $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
+                        $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
+                        $("#loginMail").siblings(".err_msg").show();
+                        $scope.$apply();
                     }).done();
             })
         }

@@ -1,6 +1,6 @@
 <div class="travel-plan">
     <div class="planDetail">
-        <div class="planpath"><a href="#/StaffFirst/StaffUser">我的账户</a>&nbsp;>&nbsp;<a href="#/travelPlan/PlanList">我的出差记录</a>&nbsp;>&nbsp;<span>出差详情页</span></div>
+        <div class="planpath"><a href="#/travelPlan/PlanList">我的出差记录</a>&nbsp;>&nbsp;<span>出差详情页</span></div>
         <div class="mainbox">
             <div class="title_top">
                 <table width="100%">
@@ -56,7 +56,7 @@
                         <th width="135" height="40">实际支出</th>
                         <th width="135" height="40">出差票据</th>
                     </tr>
-                    <tr ng-if="outTraffic.length!=0">
+                    <tr ng-if="planDetail.outTraffic.length!=0">
                         <td>
                             <div class="icon web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
                             <div class="startplace">{{outTraffic.startPlace}}</div>
@@ -110,9 +110,9 @@
                     <tr ng-if="planDetail.backTraffic.length!=0">
                         <td>
                             <div class="icon web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
-                            <div class="startplace">{{backTraffic.arrivalPlace}}</div>
+                            <div class="startplace">{{backTraffic.startPlace}}</div>
                             <div class="description">{{backTraffic.endTime | date: 'yyyy-MM-dd'}}<span ng-if="backTraffic.latestArriveTime!=undefined && backTraffic.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{backTraffic.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
-                            <div class="endplace">{{backTraffic.startPlace}}</div>
+                            <div class="endplace">{{backTraffic.arrivalPlace}}</div>
                         </td>
                         <td width="135" align="center">
                             <span ng-if="backTraffic.budget!='-1'">¥{{backTraffic.budget.toFixed(2)}}</span>
@@ -152,10 +152,10 @@
                             </div>
                         </td>
                         <td width="250" valign="bottom">
-                            <div ng-if="outTraffic.status==0">
-                                    <input type="button" class="common_btn1 w100" value="审核未通过" ng-click="invoiceNopassShow('outTraffic')" style="float: right;">
-                                    <input type="button" class="common_btn1 w100" value="审核通过" ng-click="invoicePassShow('outTraffic')" style="margin-right: 20px; float: right;">
-                                </div>
+                            <!-- <div ng-if="outTraffic.status==0">
+                                <input type="button" class="common_btn1 w100" value="审核未通过" ng-click="invoiceNopassShow('outTraffic')" style="float: right;">
+                                <input type="button" class="common_btn1 w100" value="审核通过" ng-click="invoicePassShow('outTraffic')" style="margin-right: 20px; float: right;">
+                            </div> -->
                         </td>
                     </tr>
                     <tr>
@@ -181,10 +181,10 @@
                             </div>
                         </td>
                         <td width="250" valign="bottom">
-                            <div ng-if="hotel.status==0">
+                            <!-- <div ng-if="hotel.status==0">
                                 <input type="button" class="common_btn1 w100" value="审核未通过" ng-click="invoiceNopassShow('hotel')" style="float: right;">
                                 <input type="button" class="common_btn1 w100" value="审核通过" ng-click="invoicePassShow('hotel')" style="margin-right: 20px; float: right;">
-                            </div>
+                            </div> -->
                         </td>
                     </tr>
                     <tr>
@@ -210,10 +210,10 @@
                             </div>
                         </td>
                         <td width="250" valign="bottom">
-                            <div ng-if="backTraffic.status==0">
+                            <!-- <div ng-if="backTraffic.status==0">
                                 <input type="button" class="common_btn1 w100" value="审核未通过" ng-click="invoiceNopassShow('backTraffic')" style="float: right;">
                                 <input type="button" class="common_btn1 w100" value="审核通过" ng-click="invoicePassShow('backTraffic')" style="margin-right: 20px; float: right;">
-                            </div>
+                            </div> -->
                         </td>
                     </tr>
                     <tr>

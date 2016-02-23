@@ -209,17 +209,18 @@ var TravelStatistics = (function(){
         }
     }
     // 出差记录详情页
-    TravelStatistics.PlanDetailController = function($scope,$routeParams) {
+    TravelStatistics.PlanDetailController = function($scope,$routeParams, $location, $anchorScroll) {
+        //$("title").html("员工积分");
+        //$(".left_nav li").removeClass("on").eq(1).addClass("on");
         var planId = $routeParams.orderId;
         API.onload(function(){
             API.tripPlan.getTripPlanOrderById(planId)
                 .then(function(result){
-                    console.info(result);
                     $scope.planDetail = result;
                     $scope.backTraffic = $scope.planDetail.backTraffic[0];
                     $scope.hotel = $scope.planDetail.hotel[0];
                     $scope.outTraffic = $scope.planDetail.outTraffic[0];
-
+                    
                     var outTraffic = result.outTraffic[0];
                     var backTraffic = result.backTraffic[0];
                     var hotel = result.hotel[0];
@@ -241,19 +242,34 @@ var TravelStatistics = (function(){
                     }
 
                     outTraffics.map(function(outTraffic){
-                        return Q.all([
-                            API.agency.getAgencyUser(outTraffic.auditUser),
-                            API.tripPlan.getConsumeInvoiceImg({consumeId: outTraffic.id})
-                        ])
-                        .spread(function(auditName, invoiceImg) {
-                            outTraffic.auditName = auditName;
-                            outTraffic.invoiceImg = invoiceImg;
-                            return outTraffic;
-                        })
+                        if(!outTraffics.auditUser) {
+                            API.tripPlan.getConsumeInvoiceImg({consumeId: outTraffics.id})
+                                .then(function(invoiceImg){
+                                    outTraffics.invoiceImg = invoiceImg;
+                                    return outTraffics;
+                                })
+                        }else{
+                            return Q.all([
+                                API.agency.getAgencyUser(outTraffic.auditUser),
+                                API.tripPlan.getConsumeInvoiceImg({consumeId: outTraffic.id})
+                            ])
+                            .spread(function(auditName, invoiceImg) {
+                                outTraffic.auditName = auditName;
+                                outTraffic.invoiceImg = invoiceImg;
+                                return outTraffic;
+                            })
+                        }
                     });
 
                     backTraffics.map(function(backTraffic){
-                        return Q.all([
+                        if(!backTraffic.auditUser) {
+                            API.tripPlan.getConsumeInvoiceImg({consumeId: backTraffic.id})
+                                .then(function(invoiceImg){
+                                    backTraffic.invoiceImg = invoiceImg;
+                                    return backTraffic;
+                                })
+                        }else{
+                            return Q.all([
                                 API.agency.getAgencyUser(backTraffic.auditUser),
                                 API.tripPlan.getConsumeInvoiceImg({consumeId: backTraffic.id})
                             ])
@@ -262,20 +278,31 @@ var TravelStatistics = (function(){
                                 backTraffic.invoiceImg = invoiceImg;
                                 return backTraffic;
                             })
+                        }
                     });
 
                     hotels = hotels.map(function(hotel){
-                        return Q.all([
-                                API.agency.getAgencyUser(hotel.auditUser),
+                        if(!hotel.auditUser) {
+                            API.tripPlan.getConsumeInvoiceImg({consumeId: hotel.id})
+                                .then(function(invoiceImg){
+                                    hotel.invoiceImg = invoiceImg;
+                                    return hotel;
+                                })
+                        }else{
+                            console.info(hotel.auditUser)
+                            return Q.all([
+                                API.agency.getAgencyUserByCompany({agencyUserId: hotel.auditUser}),
                                 API.tripPlan.getConsumeInvoiceImg({consumeId: hotel.id})
                             ])
                             .spread(function(auditName, invoiceImg) {
+                                console.info(auditName)
                                 hotel.auditName = auditName;
                                 hotel.invoiceImg = invoiceImg;
                                 return hotel;
                             })
+                        }
+                        
                     });
-
                     Q.all(hotels)
                     .then(function(hotels) {
                         $scope.hotels = hotels;
@@ -302,10 +329,14 @@ var TravelStatistics = (function(){
                     .catch(function(err) {
                         TLDAlert(err.msg || err);
                     })
+                    
                     API.staff.getStaff({id:$scope.planDetail.accountId})
                         .then(function(result){
-                            $scope.travelerName = result.name;
+                            $scope.travelerName = result.staff.name;
                             $scope.$apply();
+                        })
+                        .catch(function(err){
+                            console.info(err);
                         })
                     loading(true);
                     console.info(result);
@@ -313,9 +344,27 @@ var TravelStatistics = (function(){
                 })
                 .catch(function(err){
                     TLDAlert(err.msg || err);
+                    console.info(err)
                 })
         })
+        $scope.outTraffichref = function () {
+            loading(true);
+            $location.hash('outTraffic');
+            $anchorScroll();
 
+        }
+        $scope.hotelhref = function () {
+            loading(true);
+            $location.hash('hotel');
+            $anchorScroll();
+
+        }
+        $scope.backTraffichref = function () {
+            loading(true);
+            $location.hash('backTraffic');
+            $anchorScroll();
+
+        }
         //分页
         $scope.pagination = function () {
             if ($scope.total) {
@@ -338,6 +387,16 @@ var TravelStatistics = (function(){
             }
         }
         var pagenum =setInterval($scope.pagination,10);
+    }
+    //出差分布页面
+    TravelStatistics.SettlemapController = function($scope) {
+        $("title").html("出差分布");
+        $(".left_nav li").removeClass("on").eq(1).addClass("on");
+        API.onload(function(){
+            for (var i = 1; i < 31; i++) {
+                $(".set_map_date").append("<span>"+i+"</span>")
+            }
+        })
     }
     return TravelStatistics;
 })();
