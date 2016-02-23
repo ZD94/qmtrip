@@ -90,7 +90,7 @@ tripPlan.savePlanOrder = function (params) {
                             }
 
                             return API.mail.sendMailRequest({
-                                toEmails: '1014418876@qq.com', //s.email, //'miao.yu@tulingdao.com',
+                                toEmails: s.email, //'miao.yu@tulingdao.com',
                                 templateName: 'qm_notify_new_travelbudget',
                                 values: vals
                             })
