@@ -86,11 +86,13 @@ function savePlanOrder(params){
             }
 
             _planOrder.budget = total_budget;
-            if(!isBudget)
+            if(!isBudget) {
                 _planOrder.status = -1; //待录入预算状态
+                _planOrder.budget = -1;
+            }
 
             return sequelize.transaction(function(t){
-                var order = {}
+                var order = {};
                 return PlanOrder.create(_planOrder, {transaction: t})
                     .then(function(ret){
                         order = ret.toJSON();
@@ -310,12 +312,12 @@ function updateConsumeBudget(params){
             }
 
             var budget = params.budget;
-            var c_budget = 0;
-            if(o_budget > 0) {
-                c_budget = parseFloat(order.budget) - parseFloat(o_budget) + parseFloat(budget);
-            } else {
-                c_budget = parseFloat(order.budget) + parseFloat(budget)
-            }
+            //var c_budget = 0;
+            //if(o_budget > 0) {
+            //    c_budget = parseFloat(order.budget) - parseFloat(o_budget) + parseFloat(budget);
+            //} else {
+            //    c_budget = parseFloat(order.budget) + parseFloat(budget)
+            //}
 
             var logs = {
                 orderId: order.id,
@@ -327,7 +329,6 @@ function updateConsumeBudget(params){
             return sequelize.transaction(function(t){
                 return Q.all([
                     order.id,
-                    PlanOrder.update({budget: c_budget, updateAt: utils.now()}, {where: {id: order.id}, fields: ['budget', 'updateAt'], transaction: t}),
                     ConsumeDetails.update({budget: budget, updateAt: utils.now()}, {where: {id: id}, fields: ['budget', 'updateAt'], transaction: t}),
                     TripOrderLogs.create(logs, {transaction: t})
                 ])
@@ -337,11 +338,16 @@ function updateConsumeBudget(params){
             return [orderId, ConsumeDetails.findAll({where: {orderId: orderId, status: {$ne: -2}}, attributes: ['budget']})];
         })
         .spread(function(orderId, list){
+            var c_budget = 0;
             for(var i=0; i<list.length; i++){
-                if(list[i].budget < 0)
+                var budget = list[i].budget;
+                if(budget < 0) {
                     return true;
+                }
+                c_budget += parseFloat(budget);
             }
-            return PlanOrder.update({status: 0}, {where: {id: orderId}, fields: ['status']})
+
+            return PlanOrder.update({status: 0, budget: c_budget, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'budget', 'updateAt']})
         })
         .then(function(){
             return true;

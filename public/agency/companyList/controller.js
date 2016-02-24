@@ -21,7 +21,7 @@ module.exports = (function(){
 			API.onload(function(){
 				API.company.getCompanyListByAgency({page:$scope.page,perPage:20})
 					.then(function(ret){
-						//console.info (ret);
+						// console.info (ret);
 						$scope.total = ret.total;
 						$scope.pages = ret.pages;
 						var companylist = ret.items;

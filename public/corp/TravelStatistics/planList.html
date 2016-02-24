@@ -3,7 +3,7 @@
         <ul class="settle_tab">
             <li><a href="#/TravelStatistics/SettlementInfo">结算信息</a></li>
             <li><a href="#/TravelStatistics/StaffPoint">员工积分</a></li>
-            <li><a href="">出差分布</a></li>
+            <!-- <li><a href="">出差分布</a></li> -->
             <li class="on"><a href="#/TravelStatistics/planList">出差记录</a></li>
         </ul>
         <div class="settle_main mainbox_bottom">
@@ -44,12 +44,15 @@
                         </td>
                         <td align="center">
                             <span ng-if="item.expenditure!=0 &&item.expenditure > item.budget">0</span>
-                            <span ng-if="item.expenditure!=0 && item.status!='-1' && item.expenditure < item.budget">¥{{item.budget-item.expenditure}}</span>
+                            <span ng-if="item.expenditure!=0 && item.status!='-1' && item.expenditure < item.budget">¥{{item.budget.toFixed(2)-item.expenditure.toFixed(2)}}</span>
                             <span ng-if="item.expenditure==0">暂无</span>
                         </td>
                         <td align="center">
-							<span ng-if="item.score!=0"><span class="web-icon-font2" style="color: #C19943;">&#xe967;</span>&nbsp;{{item.score}}</span>
-                            <span ng-if="item.score==0">暂无</span>
+                            <span ng-if="item.auditStatus!=0">
+                                <span ng-if="item.score!=0"><span class="web-icon-font2" style="color: #C19943;">&#xe967;</span>&nbsp;{{item.score}}</span>
+                                <span ng-if="item.score==0">0</span>
+                            </span>
+                            <span ng-if="item.auditStatus==0">暂无</span>
                         </td>
                         <td align="center"><a href="" ng-click="enterDetail(item.id)">查看详情</a></td>
                     </tr>

@@ -38,7 +38,7 @@ function createCompany(params){
 
     var mobile = params.mobile;
     var email = params.email;
-    var pwd = params.pwd || md5('123456');
+    var pwd = params.pwd || '123456';
     var domain = params.domain;
     var companyName = params.name;
     var userName = params.userName;

@@ -19,14 +19,18 @@
 .fr{float: right!important;}
 .p0{padding: 0;}
 .pl10{padding-left: 10px;}
+.tl{text-align: left;}
 .h34{
-  height: 34px;
+  height: 34px!important;
 }
 .blue{
   color: @color-theme1;
 }
 .orange{
   color: #f56d23!important;
+}
+.gray9{
+  color: #9b9b9b;
 }
 .illegal{
   color: #f56d23;
@@ -835,13 +839,13 @@
       line-height: 36px;
       border-radius: @border-radius-2;
       cursor: pointer;
-      &:first-child{
+      &.blue_btn{
         width: 60px;
         height: 36px;
         background-color: @color-theme1;
         color: @color-white;
       }
-      &:last-child{
+      &.gray_btn{
         width: 60px;
         height: 36px;
         background-color: @color-border2;
