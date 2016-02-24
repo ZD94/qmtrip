@@ -73,7 +73,7 @@ tripPlan.savePlanOrder = function (params) {
                     ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
             }
 
-            var url = C.host + '/staff.html#/travelPlan/PlanDetail?planId=' + order.id;
+            var url = C.host + '/corp.html#/TravelStatistics/planDetail?orderId=' + order.id;
 
             return staffs.map(function(s){
                 return API.auth.getAccount({id: s.id, type: 1, attributes: ['status']})
