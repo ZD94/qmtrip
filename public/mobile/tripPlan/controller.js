@@ -135,17 +135,20 @@
 
             trafficUploadConfig.onBeforeUpload = function(){
                 $(".upload_sure").find("img").remove();
+                console.info("onBeforeUpload");
                 var img = "<img src="+'/images/data-loading.gif'+">";
                 $(".upload_sure").append(img);
                 $(".upload_sure").show();
             }
             hotelUploadConfig.onBeforeUpload = function(){
+                console.info("onBeforeUpload");
                 $(".upload_sure").find("img").remove();
                 var img = "<img src="+'/images/data-loading.gif'+">";
                 $(".upload_sure").append(img);
                 $(".upload_sure").show();
             }
             backTrafficUploadConfig.onBeforeUpload = function(){
+                console.info("onBeforeUpload");
                 $(".upload_sure").find("img").remove();
                 var img = "<img src="+'/images/data-loading.gif'+">";
                 $(".upload_sure").append(img);

@@ -14,11 +14,11 @@ function Myselect () {
 		$(".selectbox").find(".common_option").hide();
 	});
 	$(".selectbox div").click(function() {
+		console.log(123);
 		var index = $(this).index();
 		var x = $(this).text();
 		$(this).parent().siblings(".common_select").html(x);
 		var value = $(this).attr('selectValue');
 		$(this).parent().siblings(".common_select").attr('selectValue',value);
 	});
-
 }
