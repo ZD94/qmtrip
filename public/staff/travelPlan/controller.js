@@ -323,12 +323,39 @@ var travelPlan=(function(){
         $scope.goDetail = function (status,invoiceId) {
             window.location.href = "#/travelPlan/InvoiceDetail?planId="+planId+"&status="+status+"&invoiceId="+invoiceId;
         }
+        $scope.scantwo = function(){
+            var qrcode = require('arale-qrcode');
+            var backUrl = "http://"+window.location.host+"/mobile.html#/tripPlan/uploadImg?planId="+planId;
+            var qrnode = new qrcode({
+                correctLevel: 0,
+                render: 'svg',
+                text: backUrl,
+                size: 200,
+                pdground: '#00aaee',
+                image : 'staff/images/s_menu1.png',
+                imageSize:30
+            });
+            document.getElementById('qrcode').appendChild(qrnode);
+        }
+        
         $scope.initscan = function(){
             var backUrl = "http://"+window.location.host+"/mobile.html#/tripPlan/uploadImg?planId="+planId;
             API.onload(function() {
                 API.auth.getQRCodeUrl({backUrl: backUrl})
                     .then(function(content) {
-                        new QRCode(document.getElementById("qrcode"), content);
+                        console.info(content);
+                        // new QRCode(document.getElementById("qrcode"), content);
+                        var qrcode = require('arale-qrcode');
+                        var qrnode = new qrcode({
+                            correctLevel: 3,
+                            render: 'canvas',
+                            text: content,
+                            size: 256,
+                            pdground: '#000000',
+                            image : 'staff/images/s_menu1.png',
+                            imageSize:50
+                        });
+                        document.getElementById('qrcode').appendChild(qrnode);
                     })
                     .catch(function(err) {
                         alert(err);
@@ -367,6 +394,7 @@ var travelPlan=(function(){
             clearInterval(time);
             $scope.seconds = start;
             $(".scan_fixed #qrcode").find("img").remove();
+            $("#qrcode").find("canvas").remove();
             $(".scan_fixed").hide();
         }
     }
