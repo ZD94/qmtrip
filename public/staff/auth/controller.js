@@ -81,7 +81,7 @@ var auth=(function(){
                                 Cookie.remove("remember");
                             }
                             API.reload_all_modules();
-                            window.location.href= backUrl+"?logintime="+data.is_first_login;
+                            window.location.href= backUrl;
                         }).catch(function(err){
                             if (err.msg) {
                                 //alert(err.msg);
