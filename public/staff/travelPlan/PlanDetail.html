@@ -49,7 +49,7 @@
                     </dd>
                 </dl>
             </div>
-            <div class="title_bottom"><span></span>差旅消费明细<a class="scan" ng-click="alertScan()" style="color: #75491F;" ng-if="planDetail.status!=2 && planDetail.status!=1">使用手机上传票据</a></div>
+            <div class="title_bottom"><span></span>差旅消费明细<a class="scan" ng-click="alertScan()" style="color: #75491F;" ng-if="planDetail.status!=2 && planDetail.status!=1">扫一扫上传票据</a></div>
             <div id="img"></div>
             <div class="content_bottom">
                 <table width="100%" border="1" bordercolor="#E5E5E5">
@@ -67,8 +67,8 @@
                             <div class="endplace">{{outTraffic.arrivalPlace}}</div>
                         </td>
                         <td align="center">
-                            <span ng-if="outTraffic.status=='-1'">小编正在为您查询<br>请耐心等待</span>
-                            <span ng-if="outTraffic.status!='-1'">¥{{outTraffic.budget.toFixed(2)}}</span>
+                            <span ng-if="outTraffic.budget=='-1'" style="color: #E05134;">小编正在为您查询<br>请耐心等待</span>
+                            <span ng-if="outTraffic.budget!='-1'">¥{{outTraffic.budget.toFixed(2)}}</span>
                         </td>
                         <td align="center">
                             <span ng-if="outTraffic.expenditure">¥{{outTraffic.expenditure.toFixed(2)}}</span>
@@ -80,19 +80,19 @@
                                 <input type="file" class="file" name="tmpFile" value='选择文件'  id="{{outTraffic.id}}" ref="{{outTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png" ng-if="!outTraffic.newInvoice && outTraffic.isCommit==false">
                                 <input type="button" class="common_btn3 uploadbtn" value="上传票据" ng-if="!outTraffic.newInvoice && outTraffic.isCommit==false">
                                 <div ng-if="outTraffic.newInvoice && outTraffic.isCommit==false && outTraffic.status==0">
-                                    <p>回程行程单</p>
+                                    <p>去程交通票据</p>
                                     <input type="file" class="file" name="tmpFile" value='选择文件'  id="{{outTraffic.id}}" ref="{{outTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png" style="width: 60px; left: 82px; bottom: 33px;">
                                     <input type="button" class="common_btn3 uploadbtn" value="查看" ng-click="goDetail('outTraffic',outTraffic.newInvoice)" style="width: 60px; margin-left: 12px;"><input type="button" class="common_btn3 uploadbtn" value="修改" style="width: 60px; margin-left: 10px;">
                                 </div>
                                 <div ng-if="outTraffic.isCommit==true">
                                     <p ng-if="outTraffic.status==0">【待审核】</p>
                                     <p ng-if="outTraffic.status==1">【审核通过】</p>
-                                    <p>回程行程单</p>
+                                    <p>去程交通票据</p>
                                     <input type="button" class="common_btn3 uploadbtn" value="查看" ng-click="goDetail('outTraffic',outTraffic.newInvoice)" style="width: 60px; margin-left: 47px;">
                                 </div>
                                 <div ng-if="outTraffic.status=='-1'">
                                     <p>【审核未通过】</p>
-                                    <p>回程行程单</p>
+                                    <p>去程交通票据</p>
                                     <input type="file" class="file" name="tmpFile" value='选择文件'  id="{{outTraffic.id}}" ref="{{outTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png" style="bottom: 20px;">
                                     <input type="button" class="common_btn3 uploadbtn" value="重新上传">
                                 </div>
@@ -108,7 +108,7 @@
                             </div>
                         </td>
                         <td align="center">
-                            <span ng-if="hotel.budget=='-1'">小编正在为您查询<br>请耐心等待</span>
+                            <span ng-if="hotel.budget=='-1'" style="color: #E05134;">小编正在为您查询<br>请耐心等待</span>
                             <span ng-if="hotel.budget!='-1'">¥{{hotel.budget.toFixed(2)}}</span>
                         </td>
                         <td align="center">
@@ -121,19 +121,19 @@
                                 <input type="file" class="file" name="tmpFile" value='选择文件'  id="{{hotel.id}}" ref="{{hotel.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png" ng-if="!hotel.newInvoice && hotel.isCommit==false">
                                 <input type="button" class="common_btn3 uploadbtn" value="上传票据" ng-if="!hotel.newInvoice && hotel.isCommit==false">
                                 <div ng-if="hotel.newInvoice && hotel.isCommit==false && hotel.status==0">
-                                    <p>回程行程单</p>
+                                    <p>酒店发票</p>
                                     <input type="file" class="file" name="tmpFile" value='选择文件'  id="{{hotel.id}}" ref="{{hotel.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png" style="width: 60px; left: 82px; bottom: 33px;">
                                     <input type="button" class="common_btn3 uploadbtn" value="查看" ng-click="goDetail('hotel',hotel.newInvoice)" style="width: 60px; margin-left: 12px;"><input type="button" class="common_btn3 uploadbtn" value="修改" style="width: 60px; margin-left: 10px;">
                                 </div>
                                 <div ng-if="hotel.isCommit==true">
                                     <p ng-if="hotel.status==0">【待审核】</p>
                                     <p ng-if="hotel.status==1">【审核通过】</p>
-                                    <p>回程行程单</p>
+                                    <p>酒店发票</p>
                                     <input type="button" class="common_btn3 uploadbtn" value="查看" ng-click="goDetail('hotel',hotel.newInvoice)" style="width: 60px; margin-left: 47px;">
                                 </div>
                                 <div ng-if="hotel.status=='-1'">
                                     <p>【审核未通过】</p>
-                                    <p>回程行程单</p>
+                                    <p>酒店发票</p>
                                     <input type="file" class="file" name="tmpFile" value='选择文件'  id="{{hotel.id}}" ref="{{hotel.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png" style="bottom: 20px;">
                                     <input type="button" class="common_btn3 uploadbtn" value="重新上传">
                                 </div>
@@ -148,7 +148,7 @@
                             <div class="endplace">{{backTraffic.arrivalPlace}}</div>
                         </td>
                         <td align="center">
-                            <span ng-if="backTraffic.budget=='-1'">小编正在为您查询<br>请耐心等待</span>
+                            <span ng-if="backTraffic.budget=='-1'" style="color: #E05134;">小编正在为您查询<br>请耐心等待</span>
                             <span ng-if="backTraffic.budget!='-1'">¥{{backTraffic.budget.toFixed(2)}}</span>
                         </td>
                         <td align="center">
@@ -161,19 +161,19 @@
                                 <input type="file" class="file" name="tmpFile" value='选择文件'  id="{{backTraffic.id}}" ref="{{backTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png" ng-if="!backTraffic.newInvoice && backTraffic.isCommit==false">
                                 <input type="button" class="common_btn3 uploadbtn" value="上传票据" ng-if="!backTraffic.newInvoice && backTraffic.isCommit==false">
                                 <div ng-if="backTraffic.newInvoice && backTraffic.isCommit==false && backTraffic.status==0">
-                                    <p>回程行程单</p>
+                                    <p>回程交通票据</p>
                                     <input type="file" class="file" name="tmpFile" value='选择文件'  id="{{backTraffic.id}}" ref="{{backTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png" style="width: 60px; left: 82px; bottom: 33px;">
                                     <input type="button" class="common_btn3 uploadbtn" value="查看" ng-click="goDetail('backTraffic',backTraffic.newInvoice)" style="width: 60px; margin-left: 12px;"><input type="button" class="common_btn3 uploadbtn" value="修改" style="width: 60px; margin-left: 10px;">
                                 </div>
                                 <div ng-if="backTraffic.isCommit==true">
                                     <p ng-if="backTraffic.status==0">【待审核】</p>
                                     <p ng-if="backTraffic.status==1">【审核通过】</p>
-                                    <p>回程行程单</p>
+                                    <p>回程交通票据</p>
                                     <input type="button" class="common_btn3 uploadbtn" value="查看" ng-click="goDetail('backTraffic',backTraffic.newInvoice)" style="width: 60px; margin-left: 47px;">
                                 </div>
                                 <div ng-if="backTraffic.status=='-1'">
                                     <p>【审核未通过】</p>
-                                    <p>回程行程单</p>
+                                    <p>回程交通票据</p>
                                     <input type="file" class="file" name="tmpFile" value='选择文件'  id="{{backTraffic.id}}" ref="{{backTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png" style="bottom: 20px;">
                                     <input type="button" class="common_btn3 uploadbtn" value="重新上传">
                                 </div>
@@ -206,7 +206,7 @@
 </div>
 <div class="scan_fixed">
     <div class="scancode">
-        <div class="scantitle">手机上传票据二维码<div class='scan_close' ng-click='close_scan()'><img src='/images/closezjx.png' style='display: block;'></div></div>
+        <div class="scantitle">扫一扫上传票据<div class='scan_close' ng-click='close_scan()'><img src='/images/closezjx.png' style='display: block;'></div></div>
         <div id="qrcode">
             <p>使用微信扫一扫,扫描下方二维码</p>
             <p>还有{{seconds}}秒失效</p>

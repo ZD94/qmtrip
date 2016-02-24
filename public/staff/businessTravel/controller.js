@@ -19,7 +19,7 @@ var businessTravel=(function(){
      */
     businessTravel.IndexController = function($scope) {
         $(".staff_menu_t ul li").removeClass("on");
-        $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
+        $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
         loading(true);
         $("title").html("我要出差");
         Myselect();
@@ -58,7 +58,7 @@ var businessTravel=(function(){
      */
     businessTravel.TrafficStepController = function($scope, $routeParams) {
         $(".staff_menu_t ul li").removeClass("on");
-        $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
+        $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
         loading(true);
         $("title").html("我要出差");
         Myselect();
@@ -177,7 +177,7 @@ var businessTravel=(function(){
      */
     businessTravel.LiveStepController = function($scope, $routeParams) {
         $(".staff_menu_t ul li").removeClass("on");
-        $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
+        $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
         loading(true);
         $("title").html("我要出差");
         Myselect();
@@ -278,7 +278,7 @@ var businessTravel=(function(){
      */
     businessTravel.TrafficLiveController = function($scope, $routeParams) {
         $(".staff_menu_t ul li").removeClass("on");
-        $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
+        $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
         loading(true);
         $("title").html("我要出差");
         Myselect();
@@ -459,7 +459,7 @@ var businessTravel=(function(){
             st = $routeParams.st,
             et = $routeParams.et;
         $(".staff_menu_t ul li").removeClass("on");
-        $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
+        $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
         loading(false);
         loading(true);
         $("title").html("我要出差");
@@ -704,8 +704,7 @@ var businessTravel=(function(){
                         startPlaceCode:$scope.endplaceval,
                         arrivalPlace:$scope.startplace,
                         arrivalPlaceCode:$scope.startplaceval,
-                        startTime:$scope.starttime,
-                        endTime:$scope.endtime,
+                        startTime:$scope.endtime,
                         budget:Number($scope.backTraffic),
                         invoiceType:1
                     }

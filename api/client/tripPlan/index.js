@@ -38,6 +38,11 @@ tripPlan.savePlanOrder = function (params) {
         })
         .spread(function(_order, staffs){
             order = _order;
+
+            if(order.budget <= 0 || order.status === -1) {
+                return order;
+            }
+
             var go = '无', back = '无', hotel = '无';
 
             if(order.outTraffic.length > 0){
@@ -68,7 +73,7 @@ tripPlan.savePlanOrder = function (params) {
                     ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
             }
 
-            var url = C.host + '/staff.html#/travelPlan/PlanDetail?planId=' + order.id;
+            var url = C.host + '/corp.html#/TravelStatistics/planDetail?orderId=' + order.id;
 
             return staffs.map(function(s){
                 return API.auth.getAccount({id: s.id, type: 1, attributes: ['status']})
@@ -86,7 +91,8 @@ tripPlan.savePlanOrder = function (params) {
                                 backTrafficBudget: back,
                                 hotelBudget: hotel,
                                 totalBudget: '￥'+order.budget,
-                                url: url
+                                url: url,
+                                detailUrl: url
                             }
 
                             return API.mail.sendMailRequest({
@@ -188,12 +194,12 @@ tripPlan.pageTripPlanOrder = function (params) {
     var self = this;
     var accountId = self.accountId;
 
-    params.status = {$gte: -1};
-    if (params.isUpload === true) {
-        params.status = {$gt: 0}
-    } else if (params.isUpload === false) {
-        params.status = {$in: [-1, 0]};
-    }
+    //params.status = {$gte: -1};
+    //if (params.isUpload === true) {
+    //    params.status = {$gt: 0}
+    //} else if (params.isUpload === false) {
+    //    params.status = {$in: [-1, 0]};
+    //}
 
     if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
         var audit = params.audit;

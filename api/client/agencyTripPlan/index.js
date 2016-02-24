@@ -42,7 +42,6 @@ agencyTripPlan.getTripPlanOrderById = function(orderId){
 }
 
 agencyTripPlan.getConsumeInvoiceImg = function(params) {
-    var accountId = this.accountId;
     var consumeId = params.consumeId;
     return API.tripPlan.getConsumeInvoiceImg({
         consumeId: consumeId
@@ -274,7 +273,8 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                         url: url,
                         reason: params.remark,
                         projectName: ret.description,
-                        url: url
+                        url: url,
+                        detailUrl: url
                     }
                     API.mail.sendMailRequest({
                         toEmails: staffEmail,
@@ -294,7 +294,8 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                         backTrafficBudget: back,
                         hotelBudget: hotel,
                         totalBudget: '全麦预算￥'+order.budget,
-                        url: url
+                        url: url,
+                        detailUrl: url
                     }
                     API.mail.sendMailRequest({
                         toEmails: staffEmail,
@@ -319,7 +320,8 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                         hotelBudget: hotel,
                         totalBudget: total,
                         score: _score,
-                        url: url
+                        url: url,
+                        detailUrl: url
                     }
                     API.mail.sendMailRequest({
                         toEmails: staffEmail,
@@ -403,23 +405,30 @@ function editTripPlanBudget(params){
     var self = this;
     var accountId = self.accountId;
     var consumeId = params.consumeId;
+    var orderId = '';
+    var staffName = '';
+    var staffEmail = '';
 
     return Q.all([
         API.agency.getAgencyUser({id: accountId, columns: ['agencyId']}),
-        API.tripPlan.getConsumeDetail({consumeId: consumeId, columns: ['accountId']})
+        API.tripPlan.getConsumeDetail({consumeId: consumeId, columns: ['accountId', 'orderId']})
     ])
         .spread(function(user, detail){
-            return [user.agencyId, API.staff.getStaff({id: detail.accountId, columns: ['companyId']})]
+            orderId = detail.orderId;
+            return [user.agencyId, API.staff.getStaff({id: detail.accountId, columns: ['companyId', 'name', 'email']})]
         })
         .spread(function(agencyId, staff){
-            return [agencyId, API.company.getCompany({companyId: staff.companyId, columns: ['agencyId']})]
+            staffName = staff.name;
+            staffEmail = staff.email;
+            return [agencyId, API.company.getCompany({companyId: staff.companyId, columns: ['id', 'agencyId']})]
         })
         .spread(function(agencyId, c){
             if(agencyId != c.agencyId){
                 throw L.ERR.PERMISSION_DENY;
             }
+            return c.id;
         })
-        .then(function(){
+        .then(function(companyId){
             var updates = {id: consumeId, budget: params.budget};
             if(params.remark){
                 updates.remark = params.remark;
@@ -427,7 +436,126 @@ function editTripPlanBudget(params){
 
             updates.userId = self.accountId;
 
-            return API.tripPlan.updateConsumeBudget(updates)
+            return [API.tripPlan.updateConsumeBudget(updates), companyId];
+        })
+        .spread(function(ret, companyId){
+            return [
+                ret,
+                API.tripPlan.getTripPlanOrder({orderId: orderId}),
+                API.staff.findStaffs({companyId: companyId, roleId: {$ne: 1}, columns: ['id', 'name','email']})]
+        })
+        .spread(function(ret, order, staffs){
+            if(order.budget > 0) {
+                //发送邮件
+
+                if(order.budget <= 0 ) {
+                    return order;
+                }
+
+                if(order.toJSON) {
+                    order = order.toJSON();
+                }
+
+                var go = '无', back = '无', hotel = '无';
+
+                if(order.outTraffic.length > 0){
+                    var g = order.outTraffic[0];
+                    var changeBudget = g.budget;
+                    if(changeBudget === -1) {
+                        changeBudget = params.budget;
+                    }
+
+                    go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.startPlace + ' 到 ' + g.arrivalPlace;
+
+                    if(g.latestArriveTime){
+                        go += ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达';
+                    }
+
+                    go += ', 动态预算￥' + changeBudget;
+                }
+
+                if(order.backTraffic.length > 0){
+                    var b = order.backTraffic[0];
+                    var changeBudget = b.budget;
+                    if(changeBudget === -1) {
+                        changeBudget = params.budget;
+                    }
+
+                    back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.startPlace + ' 到 ' + b.arrivalPlace;
+
+                    if(b.latestArriveTime){
+                        back += ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达';
+                    }
+
+                    back += ', 动态预算￥' + changeBudget;
+                }
+
+                if(order.hotel.length > 0){
+                    var h = order.hotel[0];
+                    var changeBudget = h.budget;
+                    if(changeBudget === -1) {
+                        changeBudget = params.budget;
+                    }
+
+                    hotel = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') +
+                        ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + changeBudget;
+                }
+
+                var url = C.host + '/staff.html#/travelPlan/PlanDetail?planId=' + order.id;
+
+                //给员工发送邮件
+                var values = {
+                    subjectTime: moment(order.startAt).format('YYYY-MM-DD'),
+                    username: staffName,
+                    time: moment(order.createAt).format('YYYY-MM-DD HH:mm:ss'),
+                    projectName: order.description,
+                    goTrafficBudget: go,
+                    backTrafficBudget: back,
+                    hotelBudget: hotel,
+                    totalBudget: '￥'+order.budget,
+                    url: url,
+                    detailUrl: url
+                }
+
+                API.mail.sendMailRequest({
+                    toEmails: staffEmail,
+                    templateName: 'qm_notify_agency_budget',
+                    values: values
+                });
+
+                var c_url = C.host + '/corp.html#/TravelStatistics/planDetail?orderId=' + order.id;
+                //给企业管理员发送邮件
+                staffs.map(function(s){
+                    API.auth.getAccount({id: s.id, type: 1})
+                        .then(function(a){
+                            if(a.status != 1){
+                                return {code: 0};
+                            }else{
+                                var vals = {
+                                    managerName: s.name,
+                                    username: staffName,
+                                    email: staffEmail,
+                                    time: moment(order.createAt).format('YYYY-MM-DD HH:mm:ss'),
+                                    projectName: order.description,
+                                    goTrafficBudget: go,
+                                    backTrafficBudget: back,
+                                    hotelBudget: hotel,
+                                    totalBudget: '￥'+order.budget,
+                                    url: c_url,
+                                    detailUrl: c_url
+                                }
+
+                                var toEmail = s.email;
+                                API.mail.sendMailRequest({
+                                    toEmails: toEmail,
+                                    templateName: 'qm_notify_new_travelbudget',
+                                    values: vals
+                                })
+                            }
+                        })
+                })
+            }
+            return ret;
         })
 }
 

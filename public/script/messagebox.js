@@ -11,3 +11,6 @@ function cancel () {
 function Myconfirm (title,yes,no) {
 	notie.confirm(title,yes,no,cancel);
 }
+function messagebox_close () {
+	$(".messagebox_fixed").hide();
+}
