@@ -454,6 +454,10 @@ var businessTravel=(function(){
      * @constructor
      */
     businessTravel.CreateResultController = function($scope, $routeParams, $filter) {
+        var spval = $routeParams.spval,
+            epval = $routeParams.epval,
+            st = $routeParams.st,
+            et = $routeParams.et;
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
         loading(false);
@@ -498,10 +502,18 @@ var businessTravel=(function(){
                         outLatestArriveTime:$scope.starttimelate,
                         inLatestArriveTime:$scope.endtimelate,
                         isRoundTrip:$scope.endtime
+                    }),
+                    API.travelBudget.getBookUrl({
+                        spval : spval,
+                        epval : epval,
+                        st : st,
+                        et : et
                     })
                 ])
-                    .spread(function(ret1,ret2) {
+                    .spread(function(ret1,ret2, url) {
                         console.info (ret2);
+                        console.info (url);
+                        $scope.bookurl = url;
                         $scope.companyId = ret1.companyId;
                         $scope.onlytraffic = ret2;
                         $(".creating").hide();
@@ -592,10 +604,18 @@ var businessTravel=(function(){
                         checkInDate:$scope.livetime,
                         checkOutDate:$scope.leavetime,
                         isRoundTrip:$scope.endtime
+                    }),
+                    API.travelBudget.getBookUrl({
+                        spval : spval,
+                        epval : epval,
+                        st : st,
+                        et : et
                     })
                 ])
-                    .spread(function(ret1,ret2) {
+                    .spread(function(ret1,ret2,url) {
                         console.info (ret2);
+                        console.info (url);
+                        $scope.bookurl = url;
                         $scope.companyId = ret1.companyId;
                         $scope.trafficlive = ret2;
                         $(".creating").hide();
