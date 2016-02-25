@@ -348,8 +348,8 @@ describe("api/client/tripPlan.js", function() {
         })
 
         it("#getProjectsList should be ok", function (done) {
-            var self = {accountId: "00000000-0000-0000-0000-000000000002"};
-            API.client.tripPlan.getProjectsList.call(self, {project_name: '打'}, function (err, ret) {
+            var self = {accountId: staffId};
+            API.client.tripPlan.getProjectsList.call(self, {}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
