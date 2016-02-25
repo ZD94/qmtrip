@@ -513,6 +513,10 @@ var businessTravel=(function(){
                     .spread(function(ret1,ret2, url) {
                         console.info (ret2);
                         console.info (url);
+                        console.info(ret2.goTraffic.type);
+                        if(ret2.goTraffic.type == "train"){
+                            url = "https://kyfw.12306.cn/otn/leftTicket/init";
+                        }
                         $scope.bookurl = url;
                         $scope.companyId = ret1.companyId;
                         $scope.onlytraffic = ret2;
@@ -615,6 +619,9 @@ var businessTravel=(function(){
                     .spread(function(ret1,ret2,url) {
                         console.info (ret2);
                         console.info (url);
+                        if(ret2.goTraffic.type == "train"){
+                            url = "https://kyfw.12306.cn/otn/leftTicket/init";
+                        }
                         $scope.bookurl = url;
                         $scope.companyId = ret1.companyId;
                         $scope.trafficlive = ret2;
