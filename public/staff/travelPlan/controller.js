@@ -323,29 +323,36 @@ var travelPlan=(function(){
         $scope.goDetail = function (status,invoiceId) {
             window.location.href = "#/travelPlan/InvoiceDetail?planId="+planId+"&status="+status+"&invoiceId="+invoiceId;
         }
-        $scope.scantwo = function(){
-            var qrcode = require('arale-qrcode');
-            var backUrl = "http://"+window.location.host+"/mobile.html#/tripPlan/uploadImg?planId="+planId;
-            var qrnode = new qrcode({
-                correctLevel: 0,
-                render: 'svg',
-                text: backUrl,
-                size: 200,
-                pdground: '#00aaee',
-                image : 'staff/images/s_menu1.png',
-                imageSize:30
-            });
-            document.getElementById('qrcode').appendChild(qrnode);
-        }
         
         $scope.initscan = function(){
             var backUrl = "http://"+window.location.host+"/mobile.html#/tripPlan/uploadImg?planId="+planId;
             API.onload(function() {
                 API.auth.getQRCodeUrl({backUrl: backUrl})
                     .then(function(content) {
-                        console.info(content);
+                        // console.info(content);
                         // new QRCode(document.getElementById("qrcode"), content);
                         var qrcode = require('arale-qrcode');
+                        var browser = navigator.appName;
+                        var b_version = navigator.appVersion;
+                        var version = b_version.split(";");
+                        if (version.length > 1) {
+                            var trim_Version = parseInt(version[1].replace(/[ ]/g, "").replace(/MSIE/g, ""));
+                            if (trim_Version < 9) {
+                                // alert(“LowB,快升级你的IE”)
+                                var qrnode = new qrcode({
+                                    correctLevel: 3,
+                                    render: 'svg',
+                                    text: content,
+                                    size: 256,
+                                    pdground: '#000000',
+                                    image : 'staff/images/s_menu1.png',
+                                    imageSize:50
+                                });
+                                document.getElementById('qrcode').appendChild(qrnode);
+                                return false;
+                            }
+                        }
+                        
                         var qrnode = new qrcode({
                             correctLevel: 3,
                             render: 'canvas',
@@ -356,6 +363,7 @@ var travelPlan=(function(){
                             imageSize:50
                         });
                         document.getElementById('qrcode').appendChild(qrnode);
+                        return true;
                     })
                     .catch(function(err) {
                         alert(err);
