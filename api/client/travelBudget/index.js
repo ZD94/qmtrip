@@ -198,6 +198,38 @@ travelBudget.getHotelBudget = function(params) {
         });
 }
 
+travelBudget.getBookUrl = function(params) {
+    var spval = params.spval,
+        epval = params.epval,
+        st = params.st,
+        et = params.et,
+        url = "";
+    if(!st || st == "" ){
+        throw {code:-1, msg:"出发时间不能为空"};
+    }
+    return Q.all([
+        API.place.getCityInfo(spval),
+        API.place.getCityInfo(epval)
+    ])
+        .spread(function(startPlace, endPlace){
+            var scode = "",
+                ecode = "";
+            if(startPlace && startPlace.skyCode){
+                scode = startPlace.skyCode.split("-")[0].toLowerCase();
+            }
+            if(endPlace && endPlace.skyCode){
+                ecode = endPlace.skyCode.split("-")[0].toLowerCase();
+            }
+            if(et && et != ""){
+                url = "http://www.tianxun.com/round-"+ scode +"-"+ ecode +".html?depdate="+st+"&rtndate="+et+"&cabin=Economy";
+            }else{
+                url = "http://www.tianxun.com/oneway-"+ scode +"-"+ ecode +".html?depdate="+st+"&cabin=Economy";
+            }
+            return url;
+        })
+
+}
+
 /**
  * @method getTrafficBudget
  * 获取交通预算
