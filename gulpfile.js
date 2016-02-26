@@ -18,7 +18,6 @@ gulplib.angular_app('staff');
 gulplib.angular_app('corp');
 gulplib.angular_app('extendfunction');
 gulplib.angular_app('agency');
-gulplib.angular_app('demo');
 gulplib.angular_app('mobile');
 gulplib.dist(function(){
     var filter = require('gulp-filter');
