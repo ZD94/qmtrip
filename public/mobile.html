@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
-	<title>上传票据</title>
+	<title>全麦商旅</title>
 	<link rel="stylesheet" type="text/css" href="/mobile/css/upload.css">
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
     <script type="text/javascript">
@@ -36,9 +36,35 @@
             remote.authenticate({ accountid: user_id, tokenid: token_id, timestamp: timestamp, tokensign: token_sign },
                     callback);
         };
+        function is_weixn(){
+            var ua = navigator.userAgent.toLowerCase();
+            if(ua.match(/MicroMessenger/i)=="micromessenger") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        function showheader(display) {
+            if(display) {
+                //$('.statusbar').show();
+                $('.headerbar').show();
+            }else{
+                //$('.statusbar').hide();
+                $('.headerbar').hide();
+            }
+        }
+        $(document).ready(function(){
+            showheader(!is_weixn());
+        });
 	</script>
 </head>
 <body>
+    <div class="headerbar" style="position: relative">
+        <span style="position:absolute; left:10px;" ><a href="javascript:history.go(-1)" class="font-white">&lt;返回</a></span>
+        <span id="header" style="font-size: 19px;" ng-bind="pageTitle || '全麦商旅'">全麦商旅</span>
+        <span style="position:absolute; right:10px;" onclick="showheader(false);">隐藏</span>
+    </div>
+    <div id="loading" style="text-align: center;position: absolute;top: 40%;left: 48%;z-index: 1000;"><img src="/images/loading.gif" style="width: 30px;"/></div>
 	<div id="angular-view" ui-view></div>
 </body>
 </html>
