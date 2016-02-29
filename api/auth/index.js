@@ -218,7 +218,6 @@ authServer.sendResetPwdEmail = function(params) {
  * @return {Promise} true|error
  */
 authServer.resetPwdByEmail = function(params) {
-    console.info("resetPwdByEmail=====>", params)
     var accountId = params.accountId;
     var sign = params.sign;
     var timestamp = params.timestamp;
@@ -664,7 +663,7 @@ function _sendActiveEmail(accountId) {
             var sign = makeActiveSign(activeToken, account.id, expireAt);
             var url = C.host + "/staff.html#/auth/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
             //发送激活邮件
-            var vals = {username: account.email, url: url};
+            var vals = {name: account.email, username: account.email, url: url};
             return API.mail.sendMailRequest({toEmails: account.email, templateName: "qm_active_email", values: vals})
                 .then(function() {
                     account.activeToken = activeToken;

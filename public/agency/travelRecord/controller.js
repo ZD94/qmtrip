@@ -20,18 +20,18 @@ var travelRecord=(function(){
     travelRecord.TravelListController = function($scope) {
         loading(true);
         $("title").html("出差单列表");
-        //待上传票据列表
-        $scope.initTravelList = function () {
+        //全部
+        $scope.initTravelList1 = function () {
             $(".left_nav li").removeClass("on").eq(0).addClass("on");
 
             API.onload(function () {
-                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page, perPage:20, isUpload: true, audit: 'P'})
+                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page1, perPage:20, isUpload: true, audit: 'P'})
                     .then(function(result){
                         console.info (result);
-                        $scope.total = result.total;
-                        $scope.pages = result.pages;
-                        var travelList = result.items;
-                        travelList.map(function(s){
+                        $scope.total1 = result.total;
+                        $scope.pages1 = result.pages;
+                        var travelList1 = result.items;
+                        travelList1.map(function(s){
                             Q.all([
                                 API.staff.getStaffByAgency({id:s.accountId}),
                                 API.company.getCompanyById(s.companyId)
@@ -39,7 +39,7 @@ var travelRecord=(function(){
                                 .spread(function(ret1,ret2){
                                     s.travelerName = ret1;
                                     s.companyName = ret2;
-                                    $scope.travelListitems = travelList;
+                                    $scope.travelListitems1 = travelList1;
                                     $scope.$apply();
                                     loading(true);
                                 })
@@ -53,35 +53,146 @@ var travelRecord=(function(){
                     });
             })
         }
-        $scope.initTravelList();
 
-        //进入详情页
-        $scope.enterDetail = function (orderId) {
-            window.location.href = "#/travelRecord/TravelDetail?orderId=" + orderId;
+        //待出预算
+        $scope.initTravelList2 = function () {
+            API.onload(function () {
+                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page2, perPage:20, isUpload: true, budget: {lt: 0}, audit: 'P'})
+                    .then(function(result){
+                        console.info (result);
+                        $scope.total2 = result.total;
+                        $scope.pages2 = result.pages;
+                        var travelList2 = result.items;
+                        travelList2.map(function(s){
+                            Q.all([
+                                API.staff.getStaffByAgency({id:s.accountId}),
+                                API.company.getCompanyById(s.companyId)
+                            ])
+                                .spread(function(ret1,ret2){
+                                    s.travelerName = ret1;
+                                    s.companyName = ret2;
+                                    $scope.travelListitems2 = travelList2;
+                                    $scope.$apply();
+                                    loading(true);
+                                })
+                                .catch(function(err) {
+                                    TLDAlert(err.msg || err);
+                                });
+                        });
+                    })
+                    .catch(function(err) {
+                        TLDAlert(err.msg || err);
+                    });
+            })
         }
 
-        //分页
-        $scope.pagination = function () {
-            if ($scope.total) {
-                $.jqPaginator('#pagination', {
-                    totalCounts: $scope.total,
+        //待审核
+        $scope.initTravelList3 = function () {
+            API.onload(function () {
+                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page3, perPage:20, isUpload: true, budget: {gt: 0}, audit: 'P'})
+                    .then(function(result){
+                        console.info (result);
+                        $scope.total3 = result.total;
+                        $scope.pages3 = result.pages;
+                        var travelList3 = result.items;
+                        travelList3.map(function(s){
+                            Q.all([
+                                API.staff.getStaffByAgency({id:s.accountId}),
+                                API.company.getCompanyById(s.companyId)
+                            ])
+                                .spread(function(ret1,ret2){
+                                    s.travelerName = ret1;
+                                    s.companyName = ret2;
+                                    $scope.travelListitems3 = travelList3;
+                                    $scope.$apply();
+                                    loading(true);
+                                })
+                                .catch(function(err) {
+                                    TLDAlert(err.msg || err);
+                                });
+                        });
+                    })
+                    .catch(function(err) {
+                        TLDAlert(err.msg || err);
+                    });
+            })
+        }
+        $scope.initTravelList1();
+        $scope.initTravelList2();
+        $scope.initTravelList3();
+
+        //分页1
+        $scope.pagination1 = function () {
+            if ($scope.total1) {
+                $.jqPaginator('#pagination1', {
+                    totalCounts: $scope.total1,
                     pageSize: 20,
                     currentPage: 1,
                     prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
                     next: '<li class="next"><a href="javascript:;">下一页</a></li>',
                     page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
                     onPageChange: function (num) {
-                        if ($scope.pages==1) {
-                            $("#pagination").hide();
-                        }
-                        $scope.page = num;
-                        $scope.initTravelList();
+                        $scope.page1 = num;
+                        $scope.initTravelList1();
                     }
                 });
-                clearInterval (pagenum);
+                clearInterval (pagenum1);
             }
         }
-        var pagenum =setInterval($scope.pagination,10);
+        var pagenum1 =setInterval($scope.pagination1,10);
+
+
+        //分页2
+        $scope.pagination2 = function () {
+            if ($scope.total2) {
+                $.jqPaginator('#pagination2', {
+                    totalCounts: $scope.total2,
+                    pageSize: 20,
+                    currentPage: 1,
+                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+                    onPageChange: function (num) {
+                        $scope.page2 = num;
+                        $scope.initTravelList2();
+                    }
+                });
+                clearInterval (pagenum2);
+            }
+        }
+        var pagenum2 =setInterval($scope.pagination2,10);
+
+        //分页3
+        $scope.pagination3 = function () {
+            if ($scope.total3) {
+                $.jqPaginator('#pagination3', {
+                    totalCounts: $scope.total3,
+                    pageSize: 20,
+                    currentPage: 1,
+                    prev: '<li class="prev"><a href="javascript:;">上一页</a></li>',
+                    next: '<li class="next"><a href="javascript:;">下一页</a></li>',
+                    page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+                    onPageChange: function (num) {
+                        $scope.page3 = num;
+                        $scope.initTravelList3();
+                    }
+                });
+                clearInterval (pagenum3);
+            }
+        }
+        var pagenum3 =setInterval($scope.pagination3,10);
+
+
+
+        //未完成已完成选项卡
+        $('.mainbox_top li').click(function(){
+            var i = $(this).index();
+            $('.mainbox_top li').removeClass('active');
+            $(this).addClass('active');
+            $('.mainbox_bottom,.pagination').hide();
+            $('.mainbox_bottom').eq(i).show();
+            $('.pagination').eq(i).show();
+        })
     }
 
 
@@ -100,6 +211,7 @@ var travelRecord=(function(){
             API.onload(function() {
                 API.agencyTripPlan.getTripPlanOrderById(orderId)
                     .then(function(result){
+                        console.info (result);
                         var outTraffic = result.outTraffic[0];
                         var backTraffic = result.backTraffic[0];
                         var hotel = result.hotel[0];
@@ -109,7 +221,7 @@ var travelRecord=(function(){
                         $scope.outTraffic = $scope.planDetail.outTraffic[0];
                         $scope.backTraffic = $scope.planDetail.backTraffic[0];
                         $scope.hotel = $scope.planDetail.hotel[0];
-                        console.info("执行到A==>", hotel, backTraffic, outTraffic);
+                        //console.info("执行到A==>", hotel, backTraffic, outTraffic);
 
                         var outTraffics = $scope.planDetail.outTraffic;
                         var backTraffics = $scope.planDetail.backTraffic;
@@ -127,68 +239,105 @@ var travelRecord=(function(){
                             $scope.outTrafficInvoiceImg = "/consume/invoice/" + outTraffic.id;
                         }
 
-                        outTraffics.map(function(outTraffic){
-                            return Q.all([
-                                API.agency.getAgencyUser(outTraffic.auditUser),
-                                API.agencyTripPlan.getConsumeInvoiceImg({consumeId: outTraffic.id})
-                            ])
-                            .spread(function(auditName, invoiceImg) {
-                                outTraffic.auditName = auditName;
-                                outTraffic.invoiceImg = invoiceImg;
+                        outTraffic = outTraffics.map(function(outTraffic){
+                            if(!outTraffic.newInvoice) {
                                 return outTraffic;
-                            })
+                            }
+
+                            return API.agencyTripPlan.getConsumeInvoiceImg({consumeId: outTraffic.id})
+                                .then(function(invoiceImg){
+                                    outTraffic.invoiceImg = invoiceImg;
+
+                                    if(!outTraffic.auditUser){
+                                        return outTraffic;
+                                    }
+
+                                    return API.agency.getAgencyUser(outTraffic.auditUser)
+                                        .then(function(auditName) {
+                                            outTraffic.auditName = auditName;
+                                            return outTraffic
+                                        })
+                                })
+
                         });
-                        backTraffics.map(function(backTraffic){
-                            return Q.all([
-                                    API.agency.getAgencyUser(backTraffic.auditUser),
-                                    API.agencyTripPlan.getConsumeInvoiceImg({consumeId: backTraffic.id})
-                                ])
-                                .spread(function(auditName, invoiceImg) {
-                                    backTraffic.auditName = auditName;
+
+                        backTraffics = backTraffics.map(function(backTraffic){
+                            if(!backTraffic.newInvoice) {
+                                return backTraffic;
+                            }
+
+                            return API.agencyTripPlan.getConsumeInvoiceImg({consumeId: backTraffic.id})
+                                .then(function(invoiceImg){
                                     backTraffic.invoiceImg = invoiceImg;
-                                    return backTraffic;
+
+                                    if(!backTraffic.auditUser){
+                                        return backTraffic;
+                                    }
+
+                                    return API.agency.getAgencyUser(backTraffic.auditUser)
+                                        .then(function(auditName) {
+                                            backTraffic.auditName = auditName;
+                                            return backTraffic
+                                        })
                                 })
 
                         });
 
                         hotels = hotels.map(function(hotel){
-                            return Q.all([
-                                    API.agency.getAgencyUser(hotel.auditUser),
-                                    API.agencyTripPlan.getConsumeInvoiceImg({consumeId: hotel.id})
-                                ])
-                                .spread(function(auditName, invoiceImg) {
-                                    hotel.auditName = auditName;
+                            if(!hotel.newInvoice) {
+                                return hotel;
+                            }
+
+                            return API.agencyTripPlan.getConsumeInvoiceImg({consumeId: hotel.id})
+                                .then(function(invoiceImg){
                                     hotel.invoiceImg = invoiceImg;
-                                    return hotel;
+
+                                    if(!hotel.auditUser){
+                                        return hotel;
+                                    }
+
+                                    return API.agency.getAgencyUser(hotel.auditUser)
+                                        .then(function(auditName) {
+                                            hotel.auditName = auditName;
+                                            return hotel
+                                        })
                                 })
+
                         });
 
                         Q.all(hotels)
-                        .then(function(hotels) {
-                            $scope.hotels = hotels;
-                            $scope.$apply();
-                        })
-                        .catch(function(err) {
-                            TLDAlert(err.msg || err);
-                        })
+                            .then(function(hotels) {
+                                $scope.hotels = hotels;
+                                $scope.$apply();
+                            })
+                            .catch(function(err) {
+                                console.info("hotels");
+                                console.info(err);
+                                TLDAlert(err.msg || err);
+                            })
 
                         Q.all(outTraffics)
-                        .then(function(outTraffics) {
-                            $scope.outTraffics = outTraffics;
-                            $scope.$apply();
-                        })
-                        .catch(function(err) {
-                            TLDAlert(err.msg || err);
-                        })
+                            .then(function(outTraffics) {
+                                $scope.outTraffics = outTraffics;
+                                console.info(outTraffics);
+                                $scope.$apply();
+                            })
+                            .catch(function(err) {
+                                console.info("outTraffics");
+                                console.info(err);
+                                TLDAlert(err.msg || err);
+                            })
 
                         Q.all(backTraffics)
-                        .then(function(backTraffics) {
-                            $scope.backTraffics = backTraffics;
-                            $scope.$apply();
-                        })
-                        .catch(function(err) {
-                            TLDAlert(err.msg || err);
-                        })
+                            .then(function(backTraffics) {
+                                $scope.backTraffics = backTraffics;
+                                $scope.$apply();
+                            })
+                            .catch(function(err) {
+                                console.info("backTraffics");
+                                console.info(err);
+                                TLDAlert(err.msg || err);
+                            })
 
                         API.staff.getStaffByAgency({id:$scope.planDetail.accountId})
                             .then(function(result){
