@@ -1,6 +1,7 @@
 <div class="travel-plan">
     <div class="planDetail">
-        <div class="planpath"><a href="#/TravelStatistics/PlanList">出差统计</a>&nbsp;>&nbsp;<span>出差详情页</span></div>
+        <div class="planpath"><a href="#/TravelStatistics/PlanList" style="color:#4a4a4a;font-size:16px;">出差记录</a>&nbsp;>&nbsp;<span>{{travelerName}}于<span ng-if="planDetail.startAt">{{planDetail.startAt | date: 'yyyy月MM月dd日'}}</span><span ng-if="!planDetail.startAt">{{planDetail.hotel[0].startTime | date: 'yyyy月MM月dd日'}}</span>的出差概括</span>
+        </div>
         <div class="mainbox">
             <div class="title_top">
                 <table width="100%">
@@ -43,11 +44,15 @@
                 <dl>
                     <dt>获得积分</dt>
                     <dd>
-                        <span ng-if="planDetail.score">{{planDetail.score}}</span>
-                        <span ng-if="!planDetail.score">暂无</span>
+                        <span ng-if="planDetail.auditStatus!=0">
+                            <span ng-if="planDetail.score!=0"><span class="web-icon-font2" style="color: #C19943;">&#xe967;</span>&nbsp;{{planDetail.score}}</span>
+                            <span ng-if="planDetail.score==0">0</span>
+                        </span>
+                        <span ng-if="planDetail.auditStatus==0">暂无</span>
                     </dd>
                 </dl>
             </div>
+            <div class="title_bottom"><span></span>差旅消费明细</div>
             <div class="content_bottom">
                 <table width="100%" border="1" bordercolor="#E5E5E5">
                     <tr>
