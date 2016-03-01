@@ -349,7 +349,7 @@ describe("api/client/tripPlan.js", function() {
 
         it("#getProjectsList should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.getProjectsList.call(self, function (err, ret) {
+            API.client.tripPlan.getProjectsList.call(self, {}, function (err, ret) {
                 if (err) {
                     throw err;
                 }

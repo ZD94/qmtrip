@@ -23,6 +23,34 @@ var businessTravel=(function(){
         loading(true);
         $("title").html("我要出差");
         Myselect();
+
+        $scope.searchPurposeName = function () {
+            API.onload(function() {
+                API.tripPlan.getProjectsList({project_name: $scope.purposename})
+                    .then(function(result) {
+                        $scope.PurposeNameitems = result;
+                        if ($scope.PurposeNameitems) {
+                            $(".PurposeNamelist").show();
+                        }
+                        console.info (result);
+                        $scope.$apply();
+                    })
+                    .catch(function(err){
+                        console.log(err);
+                    });
+            })
+        }
+        $scope.choosepPurposeName = function (project_name) {
+            $scope.purposename = project_name;
+            $(".PurposeNamelist").hide();
+        }
+        $(".purposename").blur(function(){
+            setTimeout('$(".PurposeNamelist").hide()', 500);
+        })
+
+
+
+
         //step1 获取选择状态
         $scope.trafficimg = $(".trafficimg").css("display");
         $scope.liveimg = $(".liveimg").css("display");

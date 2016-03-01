@@ -388,11 +388,23 @@ tripPlan.statPlanOrderMoneyByCompany = function (params) {
         })
 }
 
-tripPlan.getProjectsList = function(){
+/**
+ * 获取项目列表
+ * @returns {*}
+ */
+tripPlan.getProjectsList = function(params){
     var self = this;
+    var query = {};
+
+    var project_name = params.project_name;
+    if(project_name) {
+        query.description = {$like: '%' + project_name + '%'};
+    }
+
     return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
         .then(function(staff){
-            return API.tripPlan.getProjects({companyId: staff.companyId})
+            query.companyId = staff.companyId;
+            return API.tripPlan.getProjects(query)
         })
         .then(function(list){
             return list.map(function(s){
