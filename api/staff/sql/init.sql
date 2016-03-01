@@ -4,7 +4,7 @@ create table staff.staffs (
     name varchar(50),
     avatar text,
     company_id uuid,
-    status integer,
+    status integer default 0,
     total_points integer default 0,
     balance_points integer default 0,
     department_id uuid,
