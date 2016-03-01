@@ -73,7 +73,7 @@ tripPlan.savePlanOrder = function (params) {
                     ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
             }
 
-            var url = C.host + '/staff.html#/travelPlan/PlanDetail?planId=' + order.id;
+            var url = C.host + '/corp.html#/TravelStatistics/planDetail?orderId=' + order.id;
 
             return staffs.map(function(s){
                 return API.auth.getAccount({id: s.id, type: 1, attributes: ['status']})
@@ -388,11 +388,23 @@ tripPlan.statPlanOrderMoneyByCompany = function (params) {
         })
 }
 
-tripPlan.getProjectsList = function(){
+/**
+ * 获取项目列表
+ * @returns {*}
+ */
+tripPlan.getProjectsList = function(params){
     var self = this;
+    var query = {};
+
+    var project_name = params.project_name;
+    if(project_name) {
+        query.description = {$like: '%' + project_name + '%'};
+    }
+
     return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
         .then(function(staff){
-            return API.tripPlan.getProjects({companyId: staff.companyId})
+            query.companyId = staff.companyId;
+            return API.tripPlan.getProjects(query)
         })
         .then(function(list){
             return list.map(function(s){

@@ -505,6 +505,7 @@ function editTripPlanBudget(params){
 
                 //给员工发送邮件
                 var values = {
+                    subjectTime: moment(order.startAt).format('YYYY-MM-DD'),
                     username: staffName,
                     time: moment(order.createAt).format('YYYY-MM-DD HH:mm:ss'),
                     projectName: order.description,
@@ -520,8 +521,9 @@ function editTripPlanBudget(params){
                     toEmails: staffEmail,
                     templateName: 'qm_notify_agency_budget',
                     values: values
-                })
+                });
 
+                var c_url = C.host + '/corp.html#/TravelStatistics/planDetail?orderId=' + order.id;
                 //给企业管理员发送邮件
                 staffs.map(function(s){
                     API.auth.getAccount({id: s.id, type: 1})
@@ -539,8 +541,8 @@ function editTripPlanBudget(params){
                                     backTrafficBudget: back,
                                     hotelBudget: hotel,
                                     totalBudget: '￥'+order.budget,
-                                    url: url,
-                                    detailUrl: url
+                                    url: c_url,
+                                    detailUrl: c_url
                                 }
 
                                 var toEmail = s.email;

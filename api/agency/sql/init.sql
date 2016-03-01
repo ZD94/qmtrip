@@ -80,19 +80,6 @@ COMMENT ON COLUMN agency.name IS '代理商名称';
 --
 COMMENT ON COLUMN agency.description IS '代理商描述/简介';
 
---
--- TOC entry 1007 (class 0 OID 0)
--- Dependencies: 100
--- Name: COLUMN agency.address; Type: COMMENT; Schema: agency; Owner: -
---
-COMMENT ON COLUMN agency.address IS '代理商地址';
-
---
--- TOC entry 1008 (class 0 OID 0)
--- Dependencies: 100
--- Name: COLUMN agency.website; Type: COMMENT; Schema: agency; Owner: -
---
-COMMENT ON COLUMN agency.website IS '代理商网站';
 
 --
 -- TOC entry 1009 (class 0 OID 0)
