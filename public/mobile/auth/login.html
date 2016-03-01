@@ -1,1 +1,32 @@
-登录已失效!
+<!--登录已失效!-->
+<div class="user_photo">
+    <img src="/mobile/images/logo.png">
+</div>
+<div class="corp_mail w85 common_text">
+    <i class="web-icon-font">&#xf0e0;</i>
+    <input id="name" ng-model="email" class="" type="text" value="" placeholder="企业邮箱" onkeyup="checkAccount()"/>
+    <span class="web-icon-font">&#xf057;</span>
+</div>
+<div class="corp_pwd w85 common_text">
+    <i class="web-icon-font lock">&#xf023;</i>
+    <input id="pwd" class="" ng-model="pwd" type="password" value="" placeholder="密码" onkeyup="checkAccountPwd()"/>
+    <span class="web-icon-font">&#xf057;</span>
+</div>
+<button id="" class="login w85 common_btn2" ng-click="checkLogin()" disabled>登录</button>
+<script>
+    $(function(){
+
+    })
+    function checkAccount(){
+        var name = $('#name').val();
+        if(name){
+            $("#name").siblings(".err_msg").hide();
+        }
+    }
+    function checkAccountPwd(){
+        var pwd  = $('#pwd').val();
+        if(pwd){
+            $("#pwd").siblings(".err_msg").hide();
+        }
+    }
+</script>
