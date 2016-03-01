@@ -50,7 +50,7 @@ CREATE TABLE trip_plan_order (
     create_at timestamp without time zone default now(),
     update_at timestamp without time zone,
     start_place_code character varying,
-    destination_code character varying,
+    destination_code character varying
 );
 
 --

@@ -8,7 +8,7 @@
             <div class="policy_t"><span style="float: left;">{{item.name}}</span><a href="javascript:void(0);" ng-click="updatePolicyShow(item.id,$index)">修改</a><span style="font-size: 13px;">&nbsp;|&nbsp;</span><a href="javascript:void(0);" ng-click="deletePolicyShow(item.id,item.name)">删除</a></div>
             <table width="100%">
                 <tr>
-                    <td width="70" height="34" align="right">飞机：</td>
+                    <td width="45" height="34" align="right">飞机：</td>
                     <td height="34">
                         <span ng-if="item.planeLevel=='不限'">
                             <span ng-if="item.planeDiscount==0">全价机票，舱位不限，想飞就飞</span>
@@ -31,18 +31,18 @@
                     </td>
                 </tr>
                 <tr ng-if="item.isChangeLevel==true">
-                    <td width="70" height="20" align="right"></td>
+                    <td width="45" height="20" align="right"></td>
                     <td height="20" style="color: #9B9BAF;">当高级舱位低于上述标准时，可选择高级舱位</td>
                 </tr>
                 <tr>
-                    <td width="70" height="34" align="right">火车：</td>
+                    <td width="45" height="34" align="right">火车：</td>
                     <td height="34">
                         <span ng-if="item.trainLevel=='不限'">座次不限</span>
                         <span ng-if="item.trainLevel!='不限'">{{item.trainLevel.replace(',', '/')}}</span>
                     </td>
                 </tr>
                 <tr>
-                    <td width="70" height="34" align="right">住宿：</td>
+                    <td width="45" height="34" align="right">住宿：</td>
                     <td height="34">
                         <span ng-if="item.hotelLevel=='不限'">
                             <span ng-if="!item.hotelPrice">酒店任意住</span>

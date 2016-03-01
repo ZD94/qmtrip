@@ -871,12 +871,11 @@ function statPlanOrderMoney(params){
  * @param params
  * @returns {*}
  */
-tripPlan.getProjects = function(params){
-    if(!params.companyId){
-        throw {code: -1, msg: '企业Id不能为空'};
-    }
-
-    return PlanOrder.findAll({where: {companyId: params.companyId}, group: ['description'], attributes: ['description']})
+tripPlan.getProjects = getProjects;
+getProjects.required_params = ['companyId'];
+getProjects.optional_params = ['description'];
+function getProjects(params){
+    return PlanOrder.findAll({where: params, group: ['description'], attributes: ['description']})
 }
 
 /**
