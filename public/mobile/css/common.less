@@ -69,6 +69,7 @@ ul,ol,li,dl,dt,dd{list-style-type:none; }
   border-radius: 0.2rem;
   background: @background-color-default;
   padding: 0 2rem;
+  display: block;
 }
 /*默认按钮1样式*/
 .common_btn1 {
@@ -79,16 +80,30 @@ ul,ol,li,dl,dt,dd{list-style-type:none; }
   font-size: 1.8rem;
   background: @color-theme1;
   border: none;
+  display: block;
 }
 /*默认按钮2样式*/
 .common_btn2 {
   height: 5rem;
   line-height: 5rem;
   text-align: center;
-  color: @default-text-color;
+  color: @color-theme3;
   font-size: 1.8rem;
   background: @background-color-second;
   border: none;
+  display: block;
+}
+/*默认按钮3样式*/
+.common_btn3 {
+  height: 5rem;
+  line-height: 5rem;
+  text-align: center;
+  color: @color-theme1;
+  font-size: 1.8rem;
+  background: @background-color-default;
+  border: none;
+  border-top: 1px @border-color solid;
+  display: block;
 }
 
 .w10 { width: 10%;}
@@ -103,6 +118,18 @@ ul,ol,li,dl,dt,dd{list-style-type:none; }
 .w90 { width: 90%;}
 .w100 { width: 100%;}
 
+.margin_c {
+  margin: 0 auto;
+}
+.margin_b {
+  margin-bottom: 1.2rem;
+}
+.button_fix {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+}
+
 
 /*默认黑色导航条*/
 .statusbar {
@@ -113,6 +140,7 @@ ul,ol,li,dl,dt,dd{list-style-type:none; }
   font-size: 12px;
   text-align: center;
   display: none;
+  z-index: 99999;
 }
 .headerbar {
   background: #1a1a1a;
