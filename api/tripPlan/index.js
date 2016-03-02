@@ -693,21 +693,18 @@ function approveInvoice(params){
                 throw {code: -3, msg: '该票据已审核通过，不能重复审核'};
             }
 
-            return PlanOrder.findById(consume.orderId, {attributes: ['id', 'expenditure', 'status', 'budget', 'auditStatus']})
-                .then(function(order){
-                    if(!order || order.status == -2){
-                        throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
-                    }
-
-                    if(order.status === 0 && order.auditStatus == 0){
-                        throw {code: -3, msg: '该订单未提交，不能审核'};
-                    }
-
-                    return [order, consume];
-                })
+            return [PlanOrder.findById(consume.orderId, {attributes: ['id', 'expenditure', 'status', 'budget', 'auditStatus']}), consume]
         })
         .spread(function(order, consume){
             var invoiceJson = consume.invoice;
+
+            if(!order || order.status == -2){
+                throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
+            }
+
+            if(order.status === 0 && order.auditStatus == 0){
+                throw {code: -3, msg: '该订单未提交，不能审核'};
+            }
 
             if(invoiceJson && invoiceJson.length > 0){
                 invoiceJson[invoiceJson.length-1].status = params.status;
