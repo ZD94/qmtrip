@@ -1,0 +1,67 @@
+@import "common.less";
+.blue { color: @color-theme1;}
+.blue_bc { background-color: @color-theme1;}
+.user_photo {
+  width: 8rem;
+  height: 8rem;
+  margin: 6rem auto 3rem;
+  img {
+    width: 100%;
+    height: 100%;
+  }
+}
+.corp_mail,.corp_pwd{
+  i {
+    color: @color-theme2;
+  }
+  input {
+    margin-left: 0.5rem;
+    line-height: 4.4rem;
+    width: 80%;
+    outline: medium;
+    color: @color-theme2;
+  }
+  span {
+    float: right;
+    color: @color-theme2;
+    font-size: 1.6rem;
+    display: none;
+  }
+}
+.corp_mail {
+  margin: 0 auto;
+  border: 0.1rem solid @border-color;
+  border-radius: 0.2rem 0.2rem 0 0;
+  border-bottom: 0;
+}
+.corp_pwd {
+  margin: 0 auto;
+  border: 0.1rem solid @border-color;
+  border-radius: 0 0 0.2rem 0.2rem;
+}
+.lock {
+  font-size: 1.6rem;
+  padding-left: 0.2rem;
+  padding-right: 0.3rem;
+}
+.login {
+  display: block;
+  margin: 2rem auto;
+  color: @color-theme3;
+}
+
+.err_alert {
+  display: none;
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  height: 4.4rem;
+  line-height: 4.4rem;
+  background: rgba(74,74,74,0.8);
+  color: @color-theme3;
+  padding: 0 10px;
+  border-radius: 0.2rem;
+  //width: auto!important;
+  max-width: 80%;
+  text-align: center;
+}

@@ -1,0 +1,117 @@
+@import "common.less";
+
+.business_travel {
+  width: 100%;
+  height: auto;
+  .input_title {
+    height: 4.5rem;
+    line-height: 4.5rem;
+    color: @color-theme2;
+  }
+}
+
+.traffic_step {
+  width: 100%;
+  height: auto;
+  position: fixed;
+  top: 44px;
+  left: 0;
+
+  .halfinput {
+    width: 48%;
+    float: left;
+  }
+}
+
+.live_step {
+  width: 100%;
+  height: auto;
+  position: fixed;
+  top: 44px;
+  left: 0;
+  display: none;
+  .halfinput {
+    width: 48%;
+    float: left;
+  }
+}
+
+.create_result {
+  width: 100%;
+  height: auto;
+  .result_content {
+    height: auto;
+    color: @color-theme3;
+    padding-bottom: 1rem;
+    background: -webkit-linear-gradient(#2190E5, #64BBFF);
+    background: -o-linear-gradient(#2190E5, #64BBFF);
+    background: -moz-linear-gradient(#2190E5, #64BBFF);
+    background: linear-gradient(#2190E5, #64BBFF);
+    .result_time {
+      height: 3rem;
+      line-height: 3rem;
+    }
+    .result_money {
+      height: 4.8rem;
+      line-height: 4.8rem;
+      text-align: center;
+      font-size: 3.2rem;
+    }
+    .result_text {
+      height: auto;
+      text-align: center;
+    }
+  }
+  .purpose_name {
+    height: auto;
+    line-height: 2.2rem;
+    color: @default-text-color;
+    background: #F1F1F1;
+    padding: 1rem;
+  }
+  .result_list {
+    height: auto;
+    li {
+      border-bottom: 1px @border-color solid;
+      background: @color-theme3;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      .list_top {
+        height: 2.5rem;
+        line-height: 2.5rem;
+        overflow: hidden;
+        .icon {
+          width: 2.5rem;
+          height: auto;
+          font-size: 2rem;
+          color: #C8C8C8;
+          float: left;
+        }
+        .description {
+          height: auto;
+          font-size: 1.6rem;
+          float: left;
+          span {
+            color: @color-theme1;
+            padding: 0 0.5rem;
+          }
+        }
+      }
+      .list_bottom {
+        height: 2.5rem;
+        line-height: 2.5rem;
+        overflow: hidden;
+        .time {
+          width: 20rem;
+          height: auto;
+          color: #A3A3A3;
+          float: left;
+        }
+        .money {
+          height: auto;
+          float: right;
+        }
+      }
+    }
+  }
+}
