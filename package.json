@@ -50,6 +50,7 @@
     "shoe": "0.0.15",
     "tiny-cookie": "^0.5.5",
     "traverse": "^0.6.6",
+    "typescript-require": "^0.2.9",
     "weak": "^1.0.0"
   },
   "optionalDependency": {
