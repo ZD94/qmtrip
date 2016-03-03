@@ -165,32 +165,17 @@ ul,ol,li,dl,dt,dd{list-style-type:none; }
   top: 0;
   z-index: 99999;
   background: #fff;
-  .monthTitle{
-    margin: 1rem 0 0.3rem;
-    text-align: center;
-    font-weight: normal;
-    color: #4a4a4a;
-    font-size: 1.5rem;
-  }
   table{
     width: 100%;
     text-align: center;
     border-collapse: collapse;
-    &.weekbar{
-      td{
-        border:0;
-        background: #ededed;
-        font-weight: normal;
-        height: 3rem;
-      }
-    }
     tr{
       td{
         border:1px solid #e5e5e5;
         border-right: 0;
         font-weight: bold;
         width: 14.5%;
-        height: 4rem;
+        height: 2rem;
         &:nth-child(1){
           border-left: 0;
           color: #eb5434;
@@ -211,17 +196,12 @@ ul,ol,li,dl,dt,dd{list-style-type:none; }
         }
         &[isrestday="true"]{
           position: relative;
-          background: url(/images/restday.png) top right no-repeat;
-          background-size: 1.5rem;
-          background-position-y: 1rem; 
+          background: url(/images/restday.png) 1rem right no-repeat;
         }
         i{
           display: block;
-          font-weight: normal;
           font-style: normal;
           color: #9b9b9b;
-          height: 1rem;
-          font-size: 1rem;
         }
       }
     }
@@ -255,7 +235,7 @@ ul,ol,li,dl,dt,dd{list-style-type:none; }
         transform: rotate(180deg);
         -webkit-transform: rotate(180deg);
         -moz-transform: rotate(180deg);
-        -0-transform: rotate(180deg);
+        -o-transform: rotate(180deg);
       }
       100%{
         transform: rotate(360deg);
@@ -319,5 +299,4 @@ ul,ol,li,dl,dt,dd{list-style-type:none; }
      top: 0.5rem;
      left: 0.5rem;
   }
-  
 }
