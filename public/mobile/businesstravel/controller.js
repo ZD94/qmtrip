@@ -30,7 +30,7 @@ var businesstravel=(function(){
     businesstravel.TrafficliveController = function($scope) {
         $("title").html("我要出差");
         loading(true);
-        $scope.dateChooese = function(){
+        $scope.dateChooese = function($event){
             mobileSelectDate({
                 isShowMonth: true
             }, {
@@ -39,7 +39,8 @@ var businesstravel=(function(){
                 displayMonthNum: 12
             })
                 .then(function(selectedDate) {
-                    alert("您选择的日期是:"+selectedDate);
+                    //alert("您选择的日期是:"+selectedDate);
+                    $($event.target).html(selectedDate);
                 })
                 .catch(function(err) {
                     console.error(err);
