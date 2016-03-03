@@ -26,12 +26,32 @@ function mobileSelectDate(config, options) {
     config.isShowWeekDayName = false;
     config.isShowMonth = true;
     config.holiday = {
-        "2016-2-27": "春节",
-        "2016-2-28": "元宵节"
+        "2016-4-3": "清明节",
+        "2016-5-1": "劳动节",
+        "2016-6-9": "端午节",
+        "2016-9-15": "中秋节",
+        "2016-10-1": "国庆节"
     }
     config.restday = {
-        "2016-2-29": "true",
-        "2016-3-7": "true"
+        "2016-4-2": "true",
+        "2016-4-3": "true",
+        "2016-4-4": "true",
+        "2016-4-30": "true",
+        "2016-5-1": "true",
+        "2016-5-2": "true",
+        "2016-6-09": "true",
+        "2016-6-10": "true",
+        "2016-6-11": "true",
+        "2016-9-15": "true",
+        "2016-9-16": "true",
+        "2016-9-17": "true",
+        "2016-10-1": "true",
+        "2016-10-2": "true",
+        "2016-10-3": "true",
+        "2016-10-4": "true",
+        "2016-10-5": "true",
+        "2016-10-6": "true",
+        "2016-10-7": "true"
     }
     var PromiseLib = options.PromiseLib || window.Promise;
     var containerId = "cal_" + Math.random();
@@ -41,15 +61,11 @@ function mobileSelectDate(config, options) {
         divObj.className = "calendar";
         divObj.id = containerId;
         divObj.innerHTML = data.join("");
-        // var weekBar = document.createElement("div");
-        // weekBar.className = "weekBar";
         var weekBar = document.createElement("table");
-        weekBar.innerHTML = '<tr><td>日</td><td>一</td><td>二</td><td>三</td><td>四</td><td>五</td><td>六</td></tr>'
+        weekBar.innerHTML = '<tr><td>日</td><td>一</td><td>二</td><td>三</td><td>四</td><td>五</td><td>六</td></tr>';
+        weekBar.className = "weekbar";
         divObj.insertBefore(weekBar,divObj.childNodes[0]);
-        console.info(weekBar)
         document.getElementsByTagName("body")[0].appendChild(divObj);
-        // $("#"+containerId).prepend(weekBar);
-        // console.info($("#"+containerId)[0])
     }
 
     if (!PromiseLib) {
