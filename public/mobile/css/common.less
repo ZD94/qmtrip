@@ -155,3 +155,149 @@ ul,ol,li,dl,dt,dd{list-style-type:none; }
 .font-white {
   color: #cccccc;
 }
+
+/*日历控件移动端样式*/
+.calendar{
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: 0;
+  z-index: 99999;
+  background: #fff;
+  table{
+    width: 100%;
+    text-align: center;
+    border-collapse: collapse;
+    tr{
+      td{
+        border:1px solid #e5e5e5;
+        border-right: 0;
+        font-weight: bold;
+        width: 14.3%;
+        height: 4rem;
+        &:nth-child(1){
+          border-left: 0;
+          color: #eb5434;
+        }
+        &:last-child{
+          color: #eb5434;
+        }
+        &[today='true']{
+          color: #fff;
+          background: #3ca5f6;
+          i{
+            color: #fff;
+          }
+
+        }
+        &[expire="true"]{
+          color: #cccccc;
+        }
+        &[isrestday="true"]{
+          position: relative;
+          background: url(/images/restday.png) top right no-repeat;
+          background-size: 1.2rem;
+          background-position-y: 1rem;
+        }
+        i{
+          display: block;
+          font-style: normal;
+          color: #9b9b9b;
+        }
+      }
+    }
+  }
+}
+
+/*移动端loading样式*/
+.mask_loading{
+  position: fixed;
+  left: 50%;
+  top: 30%;
+  width: 8rem;
+  height: 8rem;
+  margin-left: -4rem;
+  opacity: 0.8;
+  background: #4a4a4a;
+  border-radius: 0.6rem;
+  line-height: 8rem;
+  text-align: center;
+  font-size: 1rem;
+  color: #fff;
+  z-index: 99999;
+  @keyframes loading {
+      0%{
+        transform: rotate(0deg);
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+      }
+      50%{
+        transform: rotate(180deg);
+        -webkit-transform: rotate(180deg);
+        -moz-transform: rotate(180deg);
+        -o-transform: rotate(180deg);
+      }
+      100%{
+        transform: rotate(360deg);
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+      }
+  }
+  @-webkit-keyframes loading {
+      0%{
+        transform: rotate(0deg);
+        -webkit-transform: rotate(0deg);
+      }
+      50%{
+        transform: rotate(180deg);
+        -webkit-transform: rotate(180deg);
+      }
+      100%{
+        transform: rotate(360deg);
+        -webkit-transform: rotate(360deg);
+      }
+  }
+  @-moz-keyframes loading {
+      0%{
+        transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+      }
+      50%{
+        transform: rotate(180deg);
+        -moz-transform: rotate(180deg);
+      }
+      100%{
+        transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+      }
+  }
+  @-o-keyframes loading {
+      0%{
+        transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+      }
+      50%{
+        transform: rotate(180deg);
+        -o-transform: rotate(180deg);
+      }
+      100%{
+        transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+      }
+  }
+  .loading_m{
+     width: 7rem;
+     height: 7rem;
+     animation:gogogo 1.4s infinite cubic-bezier(0,0,0,0) ;
+     -webkit-animation:loading 1.4s infinite cubic-bezier(0,0,0,0) ;
+     -o-animation:gogogo 1.4s infinite cubic-bezier(0,0,0,0) ;
+     -moz-animation:gogogo 1.4s infinite cubic-bezier(0,0,0,0) ;
+     background: url(/images/loading_m.png) no-repeat;
+     background-size: 7rem;
+     position: absolute;
+     top: 0.5rem;
+     left: 0.5rem;
+  }
+}

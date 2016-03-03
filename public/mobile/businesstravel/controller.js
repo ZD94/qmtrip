@@ -30,6 +30,23 @@ var businesstravel=(function(){
     businesstravel.TrafficliveController = function($scope) {
         $("title").html("我要出差");
         loading(true);
+        $scope.dateChooese = function($event){
+            var thismonth = moment().startOf('month').format('M');
+            mobileSelectDate({
+                isShowMonth: true
+            }, {
+                month: thismonth,
+                year: 2016,
+                displayMonthNum: 12
+            })
+                .then(function(selectedDate) {
+                    //alert("您选择的日期是:"+selectedDate);
+                    $($event.target).html(selectedDate);
+                })
+                .catch(function(err) {
+                    console.error(err);
+                })
+        }
     }
 
     /*
