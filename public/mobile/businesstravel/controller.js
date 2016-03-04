@@ -31,10 +31,11 @@ var businesstravel=(function(){
         $("title").html("我要出差");
         loading(true);
         $scope.dateChooese = function($event){
+            var thismonth = moment().startOf('month').format('M');
             mobileSelectDate({
                 isShowMonth: true
             }, {
-                month: 3,
+                month: thismonth,
                 year: 2016,
                 displayMonthNum: 12
             })
