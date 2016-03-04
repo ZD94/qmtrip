@@ -2,7 +2,6 @@
  * Created by yumiao on 15-12-10.
  */
 "use strict";
-var Q = require("q");
 var moment = require("moment");
 var sequelize = require("common/model").importModel("./models");
 var Models = sequelize.models;
@@ -100,7 +99,7 @@ function savePlanOrder(params){
                         order.backTraffic = new Array();
                         order.hotel = new Array();
 
-                        return Q.all(consumeDetails.map(function(detail){
+                        return Promise.all(consumeDetails.map(function(detail){
                             detail.orderId = order.id;
                             detail.accountId = order.accountId;
                             detail.status = 0;
@@ -158,7 +157,7 @@ function getTripPlanOrder(params){
         options.attributes = params.columns;
     }
 
-    return Q.all([
+    return Promise.all([
         PlanOrder.findById(orderId, options),
         ConsumeDetails.findAll({where: {orderId: orderId, type: -1, status: {$ne: -2}}}),
         ConsumeDetails.findAll({where: {orderId: orderId, type: 1, status: {$ne: -2}}}),
@@ -247,7 +246,7 @@ function updateTripPlanOrder(params){
             }
 
             return sequelize.transaction(function(t){
-                return Q.all([
+                return Promise.all([
                     PlanOrder.update(updates, {returning: true, where: {id: orderId}, fields: Object.keys(updates), transaction: t}),
                     TripOrderLogs.create(logs, {transaction: t})
                 ]);
@@ -327,7 +326,7 @@ function updateConsumeBudget(params){
             }
 
             return sequelize.transaction(function(t){
-                return Q.all([
+                return Promise.all([
                     order.id,
                     ConsumeDetails.update({budget: budget, updateAt: utils.now()}, {where: {id: id}, fields: ['budget', 'updateAt'], transaction: t}),
                     TripOrderLogs.create(logs, {transaction: t})
@@ -378,9 +377,9 @@ tripPlan.listTripPlanOrder = function(options){
             }
             var orders = ret.rows;
 
-            return Q.all(orders.map(function(order){
+            return Promise.all(orders.map(function(order){
                 var orderId = order.id;
-                return Q.all([
+                return Promise.all([
                     ConsumeDetails.findAll({where: {orderId: orderId, type: -1, status: {$ne: -2}}}),
                     ConsumeDetails.findAll({where: {orderId: orderId, type: 0, status: {$ne: -2}}}),
                     ConsumeDetails.findAll({where: {orderId: orderId, type: 1, status: {$ne: -2}}})
@@ -462,7 +461,7 @@ function saveConsumeRecord(params){
                     createAt: utils.now()
                 }
 
-                return Q.all([
+                return Promise.all([
                     ConsumeDetails.create(record, options),
                     TripOrderLogs.create(logs, {transaction: t}),
                     order.save()
@@ -496,7 +495,7 @@ function deleteTripPlanOrder(params){
             }
 
             return sequelize.transaction(function(t){
-                return Q.all([
+                return Promise.all([
                     PlanOrder.update({status: -2, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'updateAt'], transaction: t}),
                     ConsumeDetails.update({status: -2, updateAt: utils.now()}, {where: {orderId: orderId}, fields: ['status', 'updateAt'], transaction: t})
                 ])
@@ -578,7 +577,7 @@ function uploadInvoice(params){
             var orderLogs = {orderId: custome.orderId, userId: params.userId, remark: '上传票据', createAt: utils.now()};
 
             return sequelize.transaction(function(t){
-                return Q.all([
+                return Promise.all([
                     ConsumeDetails.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
                     ConsumeDetailsLogs.create(logs,{transaction: t}),
                     TripOrderLogs.create(orderLogs, {transaction: t}),
@@ -730,7 +729,7 @@ function approveInvoice(params){
                 if(updates.status == -1) {
                     updates.isCommit =false;
                 }
-                return Q.all([
+                return Promise.all([
                     ConsumeDetails.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
                     ConsumeDetailsLogs.create(logs,{transaction: t})
                 ])
@@ -827,7 +826,7 @@ function statPlanOrderMoney(params){
         query_complete.startAt = startAt;
     }
 
-    return Q.all([
+    return Promise.all([
         PlanOrder.findAll({where: query, attributes: ['id']}),
         PlanOrder.findAll({where: query_complete, attributes: ['id']})
     ])
@@ -846,7 +845,7 @@ function statPlanOrderMoney(params){
                 status: 1
             }
 
-            return Q.all([
+            return Promise.all([
                 ConsumeDetails.sum('budget', {where: q1}),
                 ConsumeDetails.sum('budget', {where: q2}),
                 ConsumeDetails.sum('expenditure', {where: q2}),
@@ -884,7 +883,7 @@ tripPlan.commitTripPlanOrder = commitTripPlanOrder;
 commitTripPlanOrder.required_params = ['orderId', 'accountId'];
 function commitTripPlanOrder(params){
     var id = params.orderId;
-    return Q.all([
+    return Promise.all([
         PlanOrder.findById(id, {attributes: ['status', 'auditStatus', 'accountId']}),
         ConsumeDetails.findAll({where:{orderId: id}, attributes: ['status', 'newInvoice', 'isCommit']})
     ])
@@ -922,7 +921,7 @@ function commitTripPlanOrder(params){
             }
         })
         .then(function(){
-            return Q.all([
+            return Promise.all([
                 PlanOrder.update({status: 1, auditStatus: 0, updateAt: utils.now(), isCommit: true}, {where: {id: id}, fields: ['status', 'auditStatus', 'updateAt', 'isCommit']}),
                 ConsumeDetails.update({isCommit: true, updateAt: utils.now()}, {where: {orderId: id}})
             ])
@@ -1006,7 +1005,7 @@ function checkBudgetExist(params){
                 return false;
             }
 
-            return [order[0].id, Q.all(consumeDetails.map(function(detail) {
+            return [order[0].id, Promise.all(consumeDetails.map(function(detail) {
                 detail.status = {$ne: -2};
                 return ConsumeDetails.findAll({where: detail})
             }))]

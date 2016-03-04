@@ -2,7 +2,6 @@
  * Created by yumiao on 15-12-9.
  */
 
-var Q = require('q');
 var sequelize = require("common/model").importModel("./models");
 var Models = sequelize.models;
 var Company = Models.Company;
@@ -39,20 +38,17 @@ company.domainIsExist = function(params) {
         throw {code: -1, msg: "domain not exist!"};
     }
 
-    return Q()
-        .then(function() {
-            if (C.is_allow_domain_repeat) {
+    if (C.is_allow_domain_repeat) {
+        return false;
+    }
+
+    return Models.Company.findOne({where: {domainName: domain}})
+        .then(function(company) {
+            if (company) {
+                return true;
+            } else {
                 return false;
             }
-
-            return Models.Company.findOne({where: {domainName: domain}})
-                .then(function(company) {
-                    if (company) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                })
         })
 }
 
@@ -79,7 +75,7 @@ function createCompany(params){
     var funds = { id: _company.id };
 
     return sequelize.transaction(function(t){
-        return Q.all([
+        return Promise.all([
             Company.create(_company, {transaction: t}),
             FundsAccounts.create(funds, {transaction: t})
         ])
@@ -260,7 +256,7 @@ checkAgencyCompany.required_params = ['companyId','userId'];
 function checkAgencyCompany(params){
     var userId = params.userId;
     var companyId = params.companyId;
-    return Q.all([
+    return Promise.all([
         Company.findById(companyId, {attributes: ['agencyId', 'status']}),
         API.agency.getAgencyUser({id: userId}, {attributes: ['agencyId', 'status', 'roleId']})
     ])
@@ -305,7 +301,7 @@ function deleteCompany(params){
         })
         .then(function(){
             return sequelize.transaction(function(t){
-                return Q.all([
+                return Promise.all([
                     Company.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt'], transaction: t}),
                     FundsAccounts.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt'], transaction: t})
                 ])
@@ -404,7 +400,7 @@ function moneyChange(params){
             }
 
             return sequelize.transaction(function(t){
-                return Q.all([
+                return Promise.all([
                     FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: Object.keys(fundsUpdates), transaction: t}),
                     MoneyChanges.create(moneyChange, {transaction: t})
                 ])
