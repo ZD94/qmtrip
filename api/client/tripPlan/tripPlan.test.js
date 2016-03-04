@@ -144,28 +144,29 @@ describe("api/client/tripPlan.js", function() {
         });
     })
 
+    var _tripPlanOrder = {
+        startPlace: '北京',
+        destination: '上海',
+        startPlaceCode: 'BJ123',
+        destinationCode: 'SH123',
+        budget: 1000,
+        description: '发送邮件测试计划单',
+        startAt: '2015-12-30 11:12:12',
+        consumeDetails: [{
+            startTime: '2016-12-30 11:11:11',
+            budget: 300,
+            city: '上海市',
+            cityCode: 'SH123',
+            hotelName: '丐帮',
+            invoiceType: 2,
+            type: 0
+        }]
+    }
     describe("deleteTripPlanOrder", function(){
         var newOrderId = "";
         before(function(done){
-            var tripPlanOrder = {
-                startPlace: '北京',
-                destination: '上海',
-                startPlaceCode: 'BJ123',
-                destinationCode: 'SH123',
-                budget: 1000,
-                description: '发送邮件测试计划单',
-                startAt: '2015-12-30 11:12:12',
-                consumeDetails: [{
-                    startTime: '2016-12-30 11:11:11',
-                    budget: 300,
-                    city: '上海市',
-                    cityCode: 'SH123',
-                    hotelName: '丐帮',
-                    invoiceType: 2,
-                    type: 0
-                }]
-            }
-            API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder, function(err, ret){
+
+            API.client.tripPlan.savePlanOrder.call({accountId: staffId}, _tripPlanOrder, function(err, ret){
                 if(err){
                     throw err;
                 }
@@ -180,6 +181,28 @@ describe("api/client/tripPlan.js", function() {
                 if (err) {
                     throw err;
                 }
+                done();
+            })
+        });
+
+        it("checkBudgetExist should be ok", function(done) {
+            _tripPlanOrder.consumeDetails[0].type = 0;
+            API.client.tripPlan.checkBudgetExist.call({accountId: staffId}, _tripPlanOrder, function(err, ret) {
+                if(err) {
+                    throw err;
+                }
+                assert.equal(typeof ret, 'string');
+                done();
+            })
+        });
+
+        it("checkBudgetExist result should be false when there's no budget", function(done) {
+            _tripPlanOrder.consumeDetails[0].type = 1;
+            API.client.tripPlan.checkBudgetExist.call({accountId: staffId}, _tripPlanOrder, function(err, ret) {
+                if(err) {
+                    throw err;
+                }
+                assert.equal(ret, false);
                 done();
             })
         });
