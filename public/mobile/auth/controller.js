@@ -21,15 +21,6 @@ module.exports = (function() {
             $($event.target).siblings('input').val('');
             $('#login').attr('disabled',true).removeClass('blue_bc');
         }
-        //错误显示
-        $scope.err_log = function(){
-            var err_w = $('.err_alert').width();
-            $('.err_alert').css('margin-left',-(err_w/2+10));
-            $('.err_alert').show();
-            setInterval(function(){
-                $('.err_alert').hide();
-            },3000);
-        }
         $scope.check_login = function() {
             var mail = $('#name').val();
             var pwd  = $('#pwd').val();
@@ -48,7 +39,7 @@ module.exports = (function() {
                             //console.info(err.msg);
                             $scope.err_msg = err.msg;
                             $scope.$apply();
-                            $scope.err_log();//显示错误消息
+                            black_err();//显示错误消息
                         }).done();
                 })
             }

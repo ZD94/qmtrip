@@ -13,6 +13,16 @@ var reset = function () {
     });
 };
 
+//半透明框提示
+function black_err() {
+    var err_w = $('.err_alert').width();
+    $('.err_alert').css('margin-left',-(err_w/2+10));
+    $('.err_alert').show();
+    setInterval(function(){
+        $('.err_alert').hide();
+    },3000);
+}
+
 var message = "提示框";
 
 function alert(message){
