@@ -24,7 +24,7 @@
 				<input type="file" ng-click="uploadInvoice(outTraffic.id)" ng-show="isInWeixin" ng-if="outTraffic.status !='1'"/>
 
 				<span ng-hide="isInWeixin" ng-if="outTraffic.status !='1'">
-					<input type="file" nv-file-select="" id="{{outTraffic.id}}" uploader="TrafficUploader" class="file" ref="{{outTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png">
+					<input type="file" nv-file-select="" id="{{outTraffic.id}}" uploader="uploader" class="file" ref="{{outTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png">
 				</span>
 			</div>
 
@@ -45,7 +45,7 @@
 				</span>
 
 				<span ng-hide="isInWeixin" ng-if="hotel.status !='1'">
-					<input type="file" nv-file-select="" uploader="HotelUploader" class="file" ref="{{hotel.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png">
+					<input type="file" nv-file-select="" uploader="uploader" options= "{a:120}" class="file" ref="{{hotel.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png">
 				</span>
 			</div>
 		</div>
@@ -65,7 +65,7 @@
 				</span>
 
 				<span ng-hide="isInWeixin" ng-if="backTraffic.status !='1'">
-					<input type="file" nv-file-select="" uploader="BackTrafficUploader" class="file" ref="{{backTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png">
+					<input type="file" nv-file-select="" uploader="uploader" class="file" ref="{{backTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png">
 				</span>
 			</div>
 		</div>
@@ -80,6 +80,7 @@
 		<span class="web-icon-font3">&#xe90e;<em></em><strong></strong></span>
 		
 	</div>
+	<div ng-thumb = '{ file:uploader.queue._file,height:100}'></div>
 	<div class="img_button">
 		<div class="reupload" ng-click="close_pre()">取消</div>
 		<div class="" ng-click="previewOk()">确定</div>

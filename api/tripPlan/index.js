@@ -962,6 +962,68 @@ tripPlan.previewConsumeInvoice = function (params) {
 }
 
 /**
+ * 判断用户是否已经生成改预算
+ * @param params
+ */
+tripPlan.checkBudgetExist = checkBudgetExist;
+checkBudgetExist.required_params = ['consumeDetails', 'accountId', 'companyId', 'type', 'destination', 'destinationCode'];
+checkBudgetExist.optional_params = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'description', 'destinationCode', 'startPlaceCode'];
+var consumeDetails_required_fields = ['type', 'startTime', 'invoiceType'];
+function checkBudgetExist(params){
+    var consumeDetails = params.consumeDetails.map(function(detail){
+        consumeDetails_required_fields.forEach(function(key){
+            if(!_.has(detail, key)){
+                throw {code: '-1', msg: 'consumeDetails的属性' + key + '没有指定'};
+            }
+        })
+
+        if(detail.startPlace && !detail.startPlaceCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        if(detail.arrivalPlace && !detail.arrivalPlaceCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        if(detail.city && !detail.cityCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        return _.pick(detail, ConsumeDetailsCols);
+    });
+
+    delete params.consumeDetails;
+    var _planOrder = params;
+
+    if(_planOrder.startPlace && !_planOrder.startPlaceCode) {
+        throw {code: -3, msg: '城市代码不能为空'};
+    }
+
+    _planOrder.status = {$ne: -2};
+    return PlanOrder.findAll({where: _planOrder})
+        .then(function(order){
+            if(order.length <= 0) {
+                return false;
+            }
+
+            return [order[0].id, Q.all(consumeDetails.map(function(detail) {
+                detail.status = {$ne: -2};
+                return ConsumeDetails.findAll({where: detail})
+            }))]
+        })
+        .spread(function(order_id, array) {
+            var result = order_id;
+            array.map(function(details) {
+                if(details.length <= 0) {
+                    result = false;
+                }
+            });
+
+            return result;
+        })
+}
+
+/**
  * 判断JSON对象是否为空
  * @param obj
  * @returns {boolean}

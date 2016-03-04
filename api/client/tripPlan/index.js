@@ -470,4 +470,22 @@ function statStaffsByCity(params) {
         })
 }
 
+/**
+ * 判断用户是否已经生成改预算
+ * @param params
+ * @returns {*}
+ */
+tripPlan.checkBudgetExist = function(params) {
+    var self = this;
+    var accountId = self.accountId;
+    params.accountId = accountId;
+
+    return API.staff.getStaff({id: accountId, columns: ['companyId']})
+        .then(function (staff) {
+            params.companyId = staff.companyId;
+
+            return API.tripPlan.checkBudgetExist(params)
+        })
+}
+
 module.exports = tripPlan;
