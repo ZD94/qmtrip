@@ -4,7 +4,6 @@
 //var API = require('common/api');
 
 var assert = require("assert");
-var Q = require("q");
 var API = require("common/api");
 
 describe("api/client/agencyTripPlan.js", function() {
@@ -54,7 +53,7 @@ describe("api/client/agencyTripPlan.js", function() {
     var consumeId = "";
 
     before(function(done){
-        Q.all([
+        Promise.all([
             API.agency.deleteAgencyByTest({email: agency.email}),
             API.company.deleteCompanyByTest({email: company.email}),
             API.staff.deleteAllStaffByTest({email: company.email})
@@ -87,7 +86,7 @@ describe("api/client/agencyTripPlan.js", function() {
 
 
     after(function(done) {
-        Q.all([
+        Promise.all([
             API.agency.deleteAgencyByTest({email: agency.email}),
             API.company.deleteCompanyByTest({email: company.email}),
             API.staff.deleteAllStaffByTest({email: company.email}),

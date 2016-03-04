@@ -3,7 +3,6 @@
  */
 "use strict";
 var API = require("common/api");
-var Q = require("q");
 var L = require("common/language");
 var _ = require('lodash');
 var moment = require('moment');
@@ -31,7 +30,7 @@ tripPlan.savePlanOrder = function (params) {
             staffName = staff.name;
             params.companyId = staff.companyId;
 
-            return Q.all([
+            return Promise.all([
                 API.tripPlan.savePlanOrder(params),
                 API.staff.findStaffs({companyId: staff.companyId, roleId: {$ne: 1}, columns: ['id', 'name','email']})
             ])
@@ -132,7 +131,7 @@ tripPlan.getTripPlanOrderById = function (orderId) {
         userId: accountId
     }
 
-    return Q.all([
+    return Promise.all([
         API.tripPlan.getTripPlanOrder(params),
         API.staff.getStaff({id: accountId, columns: ['companyId']})
     ])

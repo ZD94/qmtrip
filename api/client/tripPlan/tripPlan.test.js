@@ -4,7 +4,6 @@
 //var API = require('common/api');
 "use strict";
 var assert = require("assert");
-var Q = require("q");
 var API = require("common/api");
 
 describe("api/client/tripPlan.js", function() {
@@ -33,7 +32,7 @@ describe("api/client/tripPlan.js", function() {
     }
 
     before(function(done){
-        Q.all([
+        Promise.all([
             API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
             API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
             API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})
@@ -60,7 +59,7 @@ describe("api/client/tripPlan.js", function() {
 
 
     after(function(done) {
-        Q.all([
+        Promise.all([
             API.agency.deleteAgencyByTest({email: agency.email}),
             API.company.deleteCompanyByTest({email: company.email}),
             API.staff.deleteAllStaffByTest({email: company.email})
