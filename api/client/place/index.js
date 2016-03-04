@@ -74,6 +74,8 @@ place.hotCities = function(params) {
 }
 
 /**
+ * @method hotBusinessDistricts
+ *
  * 热门商圈
  *
  * @param {Object} params
