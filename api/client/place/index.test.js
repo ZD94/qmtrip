@@ -6,9 +6,12 @@ var API = require("common/api");
 var util = require("util")
 var assert = require("assert");
 
+
 describe("api/client/place.js", function() {
 
+
     it("#queryBusinessStrict should be ok", function(done) {
+        console.info("xxoo")
 
         API.client.place.queryBusinessDistrict({keyword: "国贸", code: "CT_131"}, function(err, result) {
             if (err) {
@@ -34,4 +37,16 @@ describe("api/client/place.js", function() {
             done();
         })
     });
+
+    it("#hotCities should be ok", function(done) {
+        API.client.place.hotCities({limit: 20}, function(err, result) {
+            if (err) {
+                throw err;
+            }
+
+            var ret = util.isArray(result);
+            assert.equal(ret, true);
+            done();
+        })
+    })
 })
