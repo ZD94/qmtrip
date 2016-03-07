@@ -57,16 +57,25 @@ place.queryBusinessDistrict = function(params) {
 }
 
 /**
+ * @method hotCities
+ *
  * 热门城市
  *
  * @param {Object} params
+ * @param {Number} params.limit
  * @return {Promise} [{id: "ID", name: "Name"}]
  */
 place.hotCities = function(params) {
-    return API.place.hotCities({});
+    if (!params) {
+        params = {};
+    }
+
+    return API.place.queryHotCity(params);
 }
 
 /**
+ * @method hotBusinessDistricts
+ *
  * 热门商圈
  *
  * @param {Object} params
