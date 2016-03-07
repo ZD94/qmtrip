@@ -28,7 +28,7 @@
                         <td align="center">
                         	<p ng-if="item.isNeedTraffic" class="traffic_icon web-icon-font3">&#xe90e;</p>
                             <p ng-if="item.isNeedHotel" class="live_icon web-icon-font3">&#xe914;</p>
-                        </td align="center">
+                        </td>
                         <td align="center">
                         	<p ng-if="item.isNeedTraffic"><a>{{item.startPlace}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.png" ng-if="item.backTraffic.length!=0"><img src="staff/images/danchen_ico.png" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.destination}}</a></p>
                             <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
