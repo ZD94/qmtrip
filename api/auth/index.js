@@ -954,7 +954,6 @@ function combineData(obj) {
 
 //加密对象
 function cryptoData(obj) {
-    console.info('调用加密===>', obj, typeof obj);
     if (typeof obj == 'string') {
         return md5(obj);
     }
@@ -964,6 +963,7 @@ function cryptoData(obj) {
 }
 
 authServer.__initHttpApp = function(app) {
+    //二维码自动登录
     app.all("/auth/qrcode-login", function(req, res, next) {
         var accountId = req.query.accountId;
         var timestamp = req.query.timestamp;
@@ -983,6 +983,11 @@ authServer.__initHttpApp = function(app) {
             res.send("链接已经失效或者不存在");
         })
     });
+
+    //微信自动登录
+    app.all("/auth/wx-login", function(req, res, next) {
+
+    })
 }
 
 module.exports = authServer;
