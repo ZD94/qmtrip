@@ -13,15 +13,20 @@ var reset = function () {
     });
 };
 
-//半透明框提示
+//半透明框提示，直接传参数就可以。eg:black_err(str);
 function black_err(str) {
+    var timer = setInterval(function(){
+        $('.err_alert').hide();
+        clearInterval(timer);
+    },3000);
+    $('body').find('.err_alert').remove();
+    var err = '<div class="err_alert"></div>';
+    $('body').append(err);
     $('.err_alert').text(str);
     var err_w = $('.err_alert').width();
     $('.err_alert').css('margin-left',-(err_w/2+10));
     $('.err_alert').show();
-    setInterval(function(){
-        $('.err_alert').hide();
-    },3000);
+    timer;
 }
 
 //var message = "提示框";
