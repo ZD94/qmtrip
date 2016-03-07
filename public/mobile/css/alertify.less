@@ -1,22 +1,24 @@
+@import "common.less";
 /*提示框*/
 .alertify {
   font-family: sans-serif;
   background: #FFF;
-  border: 2px solid #41a8f3; /* browsers that don't support rgba */
-  border-radius: 2px;
+  border: 0.1rem solid #fff; /* browsers that don't support rgba */
+  border-radius: 0.2rem;
   -webkit-background-clip: padding;     /* Safari 4? Chrome 6? */
   -moz-background-clip: padding;     /* Firefox 3.6 */
   background-clip: padding-box; /* Firefox 4, Safari 5, Opera 10, IE 9 */
   position: fixed;
   z-index: 99999;
-  top: 50px; left: 50%;
-  width: 550px;
+  top: 25%; left: 50%;
+  width: 75%;
+  height: 13rem;
   margin-left: -275px;
   opacity: 1;
 }
 
 .alertify-dialog {
-  padding: 10px;
+  /*padding: 10px;*/
 }
 /*提示框消失的动画*/
 .alertify-hidden {
@@ -36,14 +38,20 @@
 
 .alertify-inner {
   text-align: center;
+  p{
+    font-size: 1.6rem;
+    line-height: 2.5rem;
+    padding: 2rem 2rem 0;
+    margin: 0;
+  }
 }
 /*除了提示框之外覆盖全屏的背景块*/
 .alertify-cover {
   position: fixed; z-index: 99999;
   top: 0; right: 0; bottom: 0; left: 0;
-  background-color:white;
-  filter:alpha(opacity=0);
-  opacity:0;
+  background-color:#4a4a4a;
+  filter:alpha(opacity=0.3);
+  opacity:0.3;
 }
 .alertify-cover-hidden {
   display: none;
@@ -52,14 +60,21 @@
 
 /*提示框内按钮*/
 .alertify-buttons {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  display: -webkit-box;
 }
 .alertify-button {
-  border-radius: 4px;
-  color: #FFF;
+  color: @color-theme1;
   font-weight: bold;
-  padding: 6px 15px;
+  padding: 0.6rem 1.5rem;
   text-decoration: none;
-
+  -moz-box-flex: 1;
+  -webkit-box-flex: 1;
+  box-flex: 1;
+  background-color: #fff;
+  border-top: 0.1rem solid #e5e5e5!important;
 }
 .alertify-button,
 .alertify-button:hover,
@@ -71,9 +86,8 @@
   /* line-height and font-size for input button */
   line-height: 1.5;
   font-size: 100%;
-  display: inline-block;
+  display: block;
   cursor: pointer;
-  margin-left: 5px;
   outline: none;
 }
 .alertify-button:hover,
@@ -86,12 +100,13 @@
 .alertify-button-cancel,
 .alertify-button-cancel:hover,
 .alertify-button-cancel:focus {
-  background-color: #e5e5e5;
+  /*background-color: #e5e5e5;*/
 }
 .alertify-button-ok,
 .alertify-button-ok:hover,
 .alertify-button-ok:focus {
-  background-color: #41a8f3;
+  /*background-color: #41a8f3;*/
+  border-right: 0.1rem solid #e5e5e5;
 }
 
 /*底部弹出提示*/
@@ -198,13 +213,13 @@
 @media only screen and (max-width: 680px) {
   .alertify,
   .alertify-logs {
-    width: 90%;
+    width: 75%;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
   }
   .alertify {
-    left: 5%;
+    left: 13%;
     margin: 0;
   }
 }
