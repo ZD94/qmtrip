@@ -20,6 +20,11 @@ var Paginate = require("common/paginate").Paginate;
 var logger = new Logger("company");
 var validate = require("common/validate");
 
+var STATUS = {
+    DELETE: -2,
+
+}
+
 var tripPlan = {}
 
 var ConsumeDetailsCols = Object.keys(ConsumeDetails.attributes);
@@ -67,13 +72,12 @@ function savePlanOrder(params){
         API.seeds.getSeedNo('tripPlanOrderNo'),
         getProjectByName({companyId: _planOrder.companyId, name: _planOrder.description, userId: _planOrder.accountId, isCreate: true})
     ])
-        .spread(function(orderNo, result){
-            console.info("&&&&&&&&&&&&&&&&&&");
-            console.info(result.id);
+        .spread(function(orderNo, project){
             var orderId = uuid.v1();
             _planOrder.id = orderId;
             _planOrder.orderNo = orderNo;
             _planOrder.createAt = utils.now();
+            _planOrder.projectId = project.id;
             var total_budget = 0;
             var isBudget = true;
             for(var i in consumeDetails) {
@@ -646,7 +650,7 @@ function getVisitPermission(params){
             }
         })
         .catch(function(err){
-            console.log(err);
+            console.error(err);
         })
 
 }
@@ -1032,8 +1036,6 @@ tripPlan.getProjectList = getProjectList;
 getProjectList.require_params = ['companyId'];
 getProjectList.optionnal_params = ['code', 'name'];
 function getProjectList(params) {
-    console.info("*************************");
-    console.info(params);
     return Projects.findAll({where: params})
 }
 
@@ -1059,7 +1061,6 @@ function getProjectByName(params) {
                     companyId: params.companyId,
                     createAt: utils.now()
                 }
-                console.info(p);
                 return Projects.create(p)
             }else {
                 return project;

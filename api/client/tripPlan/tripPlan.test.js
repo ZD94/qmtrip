@@ -51,7 +51,7 @@ describe("api/client/tripPlan.js", function() {
                 done();
             })
             .catch(function(err){
-                console.info(err);
+                console.error(err);
                 throw err;
             })
             .done();
@@ -78,7 +78,6 @@ describe("api/client/tripPlan.js", function() {
             if(err) {
                 throw err;
             }
-            console.info(ret);
             done();
         })
     })
@@ -310,7 +309,6 @@ describe("api/client/tripPlan.js", function() {
                 }
                 assert.equal(ret.page, 1);
                 assert.equal(ret.perPage, 10);
-                //console.info(ret.items[0].toJSON());
                 done();
             })
         });

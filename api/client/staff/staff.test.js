@@ -237,6 +237,7 @@ describe("api/client/staff.js", function() {
             var tripPlanOrder = {
                 startPlace: '北京',
                 destination: '上海',
+                description: '员工模块测试',
                 startPlaceCode: 'BJ123',
                 destinationCode: 'SH123',
                 budget: 1000,

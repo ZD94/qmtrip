@@ -34,6 +34,7 @@ CREATE TABLE trip_plan_order (
     is_commit boolean default false,
     start_place character varying,
     destination character varying,
+    project_id uuid,
     start_at timestamp without time zone,
     back_at timestamp without time zone,
     is_need_traffic boolean default false,
