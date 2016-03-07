@@ -7,7 +7,7 @@ module.exports = (function() {
 
     user.IndexController = function($scope) {
         loading(true);
-        alert(111);
+        console.info(123);
     }
     return user;
 })();
