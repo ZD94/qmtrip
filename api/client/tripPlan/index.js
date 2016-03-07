@@ -487,4 +487,18 @@ tripPlan.checkBudgetExist = function(params) {
         })
 }
 
+/**
+ * 获取项目名称列表
+ * @param params
+ * @returns {*}
+ */
+tripPlan.getProjectList = function(params) {
+    var self = this;
+    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
+        .then(function(staff) {
+            params.companyId = staff.companyId;
+            return API.tripPlan.getProjectList(params);
+        })
+}
+
 module.exports = tripPlan;
