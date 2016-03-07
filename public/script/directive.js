@@ -8,7 +8,6 @@
     * @lastChanges:2016-03-04
     */
     function initUpload(model) {
-        console.info(model);
         model.directive('ngThumb', ['$window', function($window) {
             var helper = {
                 support: !!($window.FileReader && $window.CanvasRenderingContext2D),
@@ -20,7 +19,6 @@
                     return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
                 }
             };
-            console.info("000");
             return {
                 restrict: 'A',
                 template: '<canvas/>',
@@ -29,7 +27,7 @@
                     console.info(element);
                     console.info(attributes);
                     if (!helper.support) return;
-                    console.info("##########")
+                    
                     var params = scope.$eval(attributes.ngThumb);
                     console.info(params);
                     if (!helper.isFile(params.file)) return;
@@ -44,7 +42,6 @@
                         var img = new Image();
                         img.onload = onLoadImage;
                         img.src = event.target.result;
-                        console.info(event.target)
                     }
 
                     function onLoadImage() {

@@ -89,15 +89,23 @@
             // $scope.TrafficUploader = new FileUploader(trafficUploadConfig);
             // $scope.HotelUploader = new FileUploader(hotelUploadConfig);
             // $scope.BackTrafficUploader = new FileUploader(backTrafficUploadConfig);
-            var uploader = $scope.uploader = new FileUploader(uploadConf)
-            console.info(uploader);
-            
+            var uploader = $scope.uploader = new FileUploader(uploadConf);
+            uploader.filters.push({
+                name: 'customFilter',
+                fn: function(item /*{File|FileLikeObject}*/, options) {
+                    return this.queue.length < 10;
+                }
+            });
             uploader.onAfterAddingFile = function(file) {
                 preview(file);
-                initUpload(TLD);
-                console.info("&&&&&&&&&&&&&&");
-                console.info(file);
+                // initUpload(TLD);
+                console.info(uploader.queue[0]._file);
+                console.info("##############")
+                // console.info(file);
             }
+            uploader.onProgressItem = function(fileItem, progress) {
+                console.info('onProgressItem', fileItem, progress);
+            };
             // trafficUploadConfig.onCompleteItem= function (item, resp) {
             //     $(".upload_sure span strong").html("交通票据");
             //     $(".upload_sure span em").html("去程");

@@ -31,7 +31,7 @@
 
 		</div>
 		<div ng-if="plan.hotel.length!=0" class="hotel">
-			<div class="po_r {{hotelClass}}">
+			<div class="po_r {{hotelClass}}" ng-repeat="item in uplaoder">
 				<span>住宿发票</span>
 				<span></span>
 				<span ng-if="hotel.invoice.length==0">点击上传</span>
@@ -47,6 +47,7 @@
 				<span ng-hide="isInWeixin" ng-if="hotel.status !='1'">
 					<input type="file" nv-file-select="" uploader="uploader" options= "{a:120}" class="file" ref="{{hotel.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png">
 				</span>
+				<div ng-thumb= {'file:uploader.queue[0]._file,height:100'}></div>
 			</div>
 		</div>
 
@@ -80,7 +81,7 @@
 		<span class="web-icon-font3">&#xe90e;<em></em><strong></strong></span>
 		
 	</div>
-	<div ng-thumb = '{ file:uploader.queue._file,height:100}'></div>
+	<div ng-thumb = '{ file:uploader.queue[0]._file,height:100}'></div>
 	<div class="img_button">
 		<div class="reupload" ng-click="close_pre()">取消</div>
 		<div class="" ng-click="previewOk()">确定</div>
