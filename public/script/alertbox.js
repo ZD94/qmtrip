@@ -14,7 +14,8 @@ var reset = function () {
 };
 
 //°ëÍ¸Ã÷¿òÌáÊ¾
-function black_err() {
+function black_err(str) {
+    $('.err_alert').text(str);
     var err_w = $('.err_alert').width();
     $('.err_alert').css('margin-left',-(err_w/2+10));
     $('.err_alert').show();
