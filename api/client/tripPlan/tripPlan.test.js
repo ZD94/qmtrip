@@ -51,7 +51,7 @@ describe("api/client/tripPlan.js", function() {
                 done();
             })
             .catch(function(err){
-                console.info(err);
+                console.error(err);
                 throw err;
             })
             .done();
@@ -72,6 +72,15 @@ describe("api/client/tripPlan.js", function() {
             })
             .done();
     });
+
+    it("getProjectList should be ok", function(done) {
+        API.client.tripPlan.getProjectList.call({accountId: staffId}, {companyId: companyId}, function(err, ret){
+            if(err) {
+                throw err;
+            }
+            done();
+        })
+    })
 
     describe("savePlanOrder", function(){
         after(function(done){
@@ -300,7 +309,6 @@ describe("api/client/tripPlan.js", function() {
                 }
                 assert.equal(ret.page, 1);
                 assert.equal(ret.perPage, 10);
-                //console.info(ret.items[0].toJSON());
                 done();
             })
         });
@@ -451,6 +459,6 @@ describe("api/client/tripPlan.js", function() {
             });
         })
 
-    })
+    });
 
 })

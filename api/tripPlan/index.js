@@ -9,6 +9,7 @@ var PlanOrder = Models.TripPlanOrder;
 var ConsumeDetails = Models.ConsumeDetails;
 var TripOrderLogs = Models.TripOrderLogs;
 var ConsumeDetailsLogs = Models.ConsumeDetailsLogs;
+var Projects = Models.Projects;
 var uuid = require("node-uuid");
 var L = require("common/language");
 var Logger = require('common/logger');
@@ -18,6 +19,11 @@ var API = require('common/api');
 var Paginate = require("common/paginate").Paginate;
 var logger = new Logger("company");
 var validate = require("common/validate");
+
+var STATUS = {
+    DELETE: -2,
+
+}
 
 var tripPlan = {}
 
@@ -29,8 +35,8 @@ var ConsumeDetailsCols = Object.keys(ConsumeDetails.attributes);
  * @returns {*}
  */
 tripPlan.savePlanOrder = savePlanOrder;
-savePlanOrder.required_params = ['consumeDetails', 'accountId', 'companyId', 'type', 'destination', 'budget', 'destinationCode'];
-savePlanOrder.optional_params = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark', 'description', 'destinationCode', 'startPlaceCode'];
+savePlanOrder.required_params = ['consumeDetails', 'accountId', 'companyId', 'type', 'destination', 'budget', 'destinationCode', 'description'];
+savePlanOrder.optional_params = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark', 'destinationCode', 'startPlaceCode', 'projectId'];
 var consumeDetails_required_fields = ['type', 'startTime', 'invoiceType', 'budget'];
 function savePlanOrder(params){
     var consumeDetails = params.consumeDetails.map(function(detail){
@@ -62,12 +68,16 @@ function savePlanOrder(params){
         throw {code: -3, msg: '城市代码不能为空'};
     }
 
-    return API.seeds.getSeedNo('tripPlanOrderNo')
-        .then(function(orderNo){
+    return Promise.all([
+        API.seeds.getSeedNo('tripPlanOrderNo'),
+        getProjectByName({companyId: _planOrder.companyId, name: _planOrder.description, userId: _planOrder.accountId, isCreate: true})
+    ])
+        .spread(function(orderNo, project){
             var orderId = uuid.v1();
             _planOrder.id = orderId;
             _planOrder.orderNo = orderNo;
             _planOrder.createAt = utils.now();
+            _planOrder.projectId = project.id;
             var total_budget = 0;
             var isBudget = true;
             for(var i in consumeDetails) {
@@ -640,7 +650,7 @@ function getVisitPermission(params){
             }
         })
         .catch(function(err){
-            console.log(err);
+            console.error(err);
         })
 
 }
@@ -1019,6 +1029,48 @@ function checkBudgetExist(params){
             });
 
             return result;
+        })
+}
+
+tripPlan.getProjectList = getProjectList;
+getProjectList.require_params = ['companyId'];
+getProjectList.optionnal_params = ['code', 'name'];
+function getProjectList(params) {
+    return Projects.findAll({where: params})
+}
+
+tripPlan.createNewProject = createNewProject;
+createNewProject.required_params = ['name', 'createUser', 'company_id'];
+createNewProject.optional_params = ['code']
+function createNewProject(params) {
+    params.createAt = utils.now();
+    return Projects.create(params);
+}
+
+tripPlan.getProjectByName = getProjectByName;
+getProjectByName.required_params = ['userId', 'name'];
+getProjectByName.optional_params = ['companyId', 'isCreate']
+function getProjectByName(params) {
+    return Projects.findOne({name: params.name})
+        .then(function(project){
+            if(!project && params.isCreate === true) {
+                var p = {
+                    name: params.name,
+                    createUser: params.userId,
+                    code: '',
+                    companyId: params.companyId,
+                    createAt: utils.now()
+                }
+                return Projects.create(p)
+            }else {
+                return project;
+            }
+        })
+        .then(function(project){
+            if(!project) {
+                throw {code: -2, msg: '查找项目不存在'};
+            }
+            return project;
         })
 }
 
