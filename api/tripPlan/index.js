@@ -1023,6 +1023,17 @@ function checkBudgetExist(params){
 }
 
 /**
+ * 保存出差计划改动日志
+ * @type {saveTripPlanLog}
+ */
+tripPlan.saveTripPlanLog = saveTripPlanLog;
+saveTripPlanLog.require_params = ['orderId', 'userId', 'remark'];
+function saveTripPlanLog(params) {
+    params.createAt = utils.now();
+    return TripOrderLogs.create(params);
+}
+
+/**
  * 判断JSON对象是否为空
  * @param obj
  * @returns {boolean}
