@@ -20,6 +20,30 @@ var businesstravel=(function(){
     businesstravel.IndexController = function($scope) {
         $("title").html("我要出差");
         loading(true);
+
+
+        $scope.selectCity = function () {
+            API.onload(function() {
+                API.place.hotCities({})
+                    .then(function(result){
+                        selectPage('#selectPurpose',result,{
+                            isAllowAdd: false,
+                            showDefault: true,
+                            title: '最新项目',
+                            placeholder: '输入项目具体名称',
+                            limit: 10
+                        });
+                        console.info (selectPage);
+                    })
+                    .catch(function(err){
+                        console.info (err);
+                    })
+            })
+        }
+
+        $scope.nextStep = function () {
+            alert ($('#selectPurpose').html());
+        }
     }
 
     /*

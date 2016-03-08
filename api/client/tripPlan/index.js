@@ -94,11 +94,20 @@ tripPlan.savePlanOrder = function (params) {
                                 detailUrl: url
                             }
 
-                            return API.mail.sendMailRequest({
-                                toEmails: s.email, //'miao.yu@tulingdao.com',
-                                templateName: 'qm_notify_new_travelbudget',
-                                values: vals
-                            })
+                            var log = {
+                                userId: accountId,
+                                orderId: order.id,
+                                remark: order.orderNo + '给企业管理员' + s.name + '发送邮件'
+                            };
+
+                            return Promise.all([
+                                API.mail.sendMailRequest({
+                                    toEmails: s.email, //'miao.yu@tulingdao.com',
+                                    templateName: 'qm_notify_new_travelbudget',
+                                    values: vals
+                                }),
+                                API.tripPlan.saveTripPlanLog(log)
+                            ])
                         }
                     })
             })
@@ -484,6 +493,20 @@ tripPlan.checkBudgetExist = function(params) {
             params.companyId = staff.companyId;
 
             return API.tripPlan.checkBudgetExist(params)
+        })
+}
+
+/**
+ * 获取项目名称列表
+ * @param params
+ * @returns {*}
+ */
+tripPlan.getProjectList = function(params) {
+    var self = this;
+    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
+        .then(function(staff) {
+            params.companyId = staff.companyId;
+            return API.tripPlan.getProjectList(params);
         })
 }
 

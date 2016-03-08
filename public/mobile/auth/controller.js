@@ -37,9 +37,9 @@ module.exports = (function() {
                             window.location.href= backUrl;
                         }).catch(function(err){
                             //console.info(err.msg);
-                            $scope.err_msg = err.msg;
+                            var str = err.msg;
                             $scope.$apply();
-                            black_err();//显示错误消息
+                            black_err(str);//显示错误消息
                         }).done();
                 })
             }

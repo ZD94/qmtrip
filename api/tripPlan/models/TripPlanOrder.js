@@ -12,6 +12,7 @@ module.exports = function (Db, DataType) {
         accountId    : {type: DataType.UUID,            field: "account_id"}, //单据所属人
         companyId    : {type: DataType.UUID,            field: "company_id"}, //企业id
         type         : {type: DataType.INTEGER}, //单据类型
+        projectId    : {type: DataType.UUID,            field: "project_id"},
         description  : {type: DataType.TEXT }, //预算/计划单描述
         status       : {type: DataType.INTEGER,         defaultValue: 0,    field: 'status'}, //企业状态
         isCommit    : {type: DataType.BOOLEAN,          defaultValue: false, field: 'is_commit'}, //票据是否提交
