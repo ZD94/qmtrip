@@ -89,6 +89,7 @@
             // $scope.TrafficUploader = new FileUploader(trafficUploadConfig);
             // $scope.HotelUploader = new FileUploader(hotelUploadConfig);
             // $scope.BackTrafficUploader = new FileUploader(backTrafficUploadConfig);
+            $scope.winWidth = $(window).width();
             var uploader = $scope.uploader = new FileUploader(uploadConf);
             uploader.filters.push({
                 name: 'customFilter',
@@ -96,35 +97,32 @@
                     return this.queue.length < 10;
                 }
             });
+            uploader.onWhenAddingFileFailed = function(item /*{File|FileLikeObject}*/, filter, options) {
+                console.info('onWhenAddingFileFailed', item, filter, options);
+            };
             uploader.onAfterAddingFile = function(file) {
                 preview(file);
-                // initUpload(TLD);
-                console.info(uploader.queue[0]._file);
-                console.info("##############")
-                // console.info(file);
             }
+            uploader.onBeforeUploadItem = function(item) {
+                console.info('onBeforeUploadItem', item);
+            };
             uploader.onProgressItem = function(fileItem, progress) {
                 console.info('onProgressItem', fileItem, progress);
             };
-            // trafficUploadConfig.onCompleteItem= function (item, resp) {
-            //     $(".upload_sure span strong").html("交通票据");
-            //     $(".upload_sure span em").html("去程");
-            //     $scope.type = 'outTraffic';
-            //     $scope.consumeId = $scope.outTraffic.id;
-            //     $scope.md5key = resp.md5key;
-            //     $scope.$apply();
-            //     preview(resp.md5key);
-            // }
-
-            function preview(key) {
-                    // $(".upload_sure").find("img").remove();
-                    // var img = "<img src="+'/self/attachments/'+key+">";
-                    // $(".upload_sure").append(img);
-                    $(".upload_sure").show();
-            }
-
-            $scope.previewOk = function() {
-                uploadInvoice($scope.consumeId, $scope.md5key, function(err, result){
+            uploader.onCompleteItem = function(fileItem, response, status, headers) {
+                console.info('onCompleteItem', fileItem, response, status, headers);
+                var consumeId;
+                if(fileItem.traffictype == '去程'){
+                    consumeId = $scope.outTraffic.id;
+                }
+                if(fileItem.traffictype == ''){
+                    consumeId = $scope.hotel.id;
+                }
+                if(fileItem.traffictype == '回程'){
+                    consumeId = $scope.backTraffic.id;
+                }
+                var md5key = response.md5key;
+                uploadInvoice(consumeId, md5key, function(err, result){
                     console.info(err)
                     console.info(result)
                     if (err ) {
@@ -132,68 +130,26 @@
                         return;
                     }
                     $scope.initall();
-                    $scope.close_pre();
                 });
+                
+                $scope.close_pre();
+            };
+            function preview(file) {
+                console.info(file);
+                $scope.invoicetype = file.invoicetype;
+                $scope.traffictype = file.traffictype;
+                $(".upload_sure").show();
+            }
+            $scope.close_pre = function() {
+                $(".upload_sure").hide();
+                $(".ngthumb").hide();
             }
             
-
-            // hotelUploadConfig.onCompleteItem = function(item, resp) {
-            //     $(".upload_sure span strong").html("酒店发票");
-            //     $scope.type = 'hotel';
-            //     $scope.consumeId = $scope.hotel.id;
-            //     $scope.md5key = resp.md5key;
-            //     $scope.$apply();
-            //     preview(resp.md5key);
-            // }
-
-            // var backTrafficUploadConfig = JSON.parse(JSON.stringify(uploadConf));
-            // backTrafficUploadConfig.onCompleteItem = function(item, resp) {
-            //     $(".upload_sure span strong").html("交通票据");
-            //     $(".upload_sure span em").html("回程");
-            //     $scope.type = 'backTraffic';
-            //     $scope.consumeId = $scope.backTraffic.id;
-            //     $scope.md5key = resp.md5key;
-            //     $scope.$apply();
-            //     preview(resp.md5key);
-            // }
-
-            // trafficUploadConfig.onBeforeUpload = function(){
-            //     $(".upload_sure").find("img").remove();
-            //     console.info("onBeforeUpload");
-            //     var img = "<img src="+'/images/data-loading.gif'+">";
-            //     $(".upload_sure").append(img);
-            //     $(".upload_sure").show();
-            // }
-            // hotelUploadConfig.onBeforeUpload = function(){
-            //     console.info("onBeforeUpload");
-            //     $(".upload_sure").find("img").remove();
-            //     var img = "<img src="+'/images/data-loading.gif'+">";
-            //     $(".upload_sure").append(img);
-            //     $(".upload_sure").show();
-            // }
-            // backTrafficUploadConfig.onBeforeUpload = function(){
-            //     console.info("onBeforeUpload");
-            //     $(".upload_sure").find("img").remove();
-            //     var img = "<img src="+'/images/data-loading.gif'+">";
-            //     $(".upload_sure").append(img);
-            //     $(".upload_sure").show();
-            // }
-            // $scope.TrafficUploader = new FileUploader(trafficUploadConfig);
-            // $scope.HotelUploader = new FileUploader(hotelUploadConfig);
-            // $scope.BackTrafficUploader = new FileUploader(backTrafficUploadConfig);
-        //}
-
         function uploadInvoice(consumeId, picture, callback) {
             API.tripPlan.uploadInvoice({
                     consumeId: consumeId,
                     picture: picture
-                })
-                .then(function(ret) {
-                    callback();
-                })
-                .catch(function(err) {
-                    alert(err.msg);
-                })
+                }, callback);
         }
 
  		loading(true);
@@ -265,9 +221,7 @@
                     })
             })
         }
-        $scope.close_pre = function() {
-            $(".upload_sure").hide();
-        }
+        
  	}
  	return tripPlan;
  })();
