@@ -1,5 +1,5 @@
 @import "common.less";
-/*��ʾ��*/
+/*提示框*/
 .alertify {
   font-family: sans-serif;
   background: #FFF;
@@ -20,7 +20,7 @@
 .alertify-dialog {
   /*padding: 10px;*/
 }
-/*��ʾ����ʧ�Ķ���*/
+/*提示框消失的动画*/
 .alertify-hidden {
   -webkit-transform: translate(0,-150px);
   -moz-transform: translate(0,-150px);
@@ -45,16 +45,12 @@
     margin: 0;
   }
 }
-/*������ʾ��֮�⸲��ȫ���ı�����*/
+/*除了提示框之外覆盖全屏的背景块*/
 .alertify-cover {
   position: fixed; z-index: 99999;
   top: 0; right: 0; bottom: 0; left: 0;
   background-color:#4a4a4a;
-<<<<<<< HEAD
-  filter:alpha(opacity=0);
-=======
   filter:alpha(opacity=30);
->>>>>>> e3f9a96383f7ac474c297e690b1bcea191062998
   opacity:0.3;
 }
 .alertify-cover-hidden {
@@ -62,7 +58,7 @@
 }
 
 
-/*��ʾ���ڰ�ť*/
+/*提示框内按钮*/
 .alertify-buttons {
   position: absolute;
   bottom: 0px;
@@ -114,7 +110,7 @@
   border-right: 0.1rem solid #e5e5e5;
 }
 
-/*�ײ�������ʾ*/
+/*底部弹出提示*/
 .alertify-log {
   background: #1F1F1F;
   background: rgba(0,0,0,.9);
@@ -131,7 +127,7 @@
   background: #5CB811;
   background: rgba(92,184,17,.9);
 }
-/*λ��*/
+/*位置*/
 .alertify-logs {
   position: fixed;
   z-index: 5000;
@@ -142,7 +138,7 @@
 .alertify-logs-hidden {
   display: none;
 }
-/*�ײ����������ʽ*/
+/*底部弹出框的样式*/
 .alertify-log {
   display: block;
   margin-top: 10px;
@@ -164,7 +160,7 @@
 }
 
 
-/*prompt�������ʽ*/
+/*prompt输入框样式*/
 .alertify-text {
   border: 1px solid #CCC;
   padding: 10px;
@@ -189,7 +185,7 @@
   position: absolute;
   width: 1px;
 }
-/*��ʾ����ֺ���ʧ�Ķ���*/
+/*提示框出现和消失的动画*/
 .alertify,
 .alertify-show,
 .alertify-log {
