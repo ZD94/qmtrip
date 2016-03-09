@@ -23,13 +23,11 @@
                 restrict: 'A',
                 template: '<canvas/>',
                 link: function(scope, element, attributes) {
-                    console.info(scope);
-                    console.info(element);
-                    console.info(attributes);
+                    
                     if (!helper.support) return;
                     
                     var params = scope.$eval(attributes.ngThumb);
-                    console.info(params);
+                    
                     if (!helper.isFile(params.file)) return;
                     if (!helper.isImage(params.file)) return;
                     var canvas = element.find('canvas');
@@ -37,7 +35,7 @@
 
                     reader.onload = onLoadFile;
                     reader.readAsDataURL(params.file);
-                    console.info(reader)
+                    
                     function onLoadFile(event) {
                         var img = new Image();
                         img.onload = onLoadImage;

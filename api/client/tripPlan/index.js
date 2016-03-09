@@ -363,7 +363,7 @@ tripPlan.deleteConsumeDetail = function (id) {
 tripPlan.uploadInvoice = function (params) {
     var self = this;
     params.userId = self.accountId;
-    return API.tripPlan.uploadInvoice(params);
+    return API.tripPlan.uploadInvoice(params)
 }
 
 /**
@@ -392,6 +392,21 @@ tripPlan.statPlanOrderMoneyByCompany = function (params) {
     return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
         .then(function (staff) {
             params.companyId = staff.companyId;
+            return API.tripPlan.statPlanOrderMoney(params);
+        })
+}
+
+/**
+ * @method statPlanOrderMoneyByCompany 统计计划单的动态预算/计划金额和实际支出
+ * @param params
+ */
+tripPlan.statPlanOrderMoney = function (params) {
+    var self = this;
+    var params = _.pick(params, ['startTime', 'endTime']);
+    return API.staff.getStaff({id: self.accountId, columns: ['id', 'companyId']})
+        .then(function (staff) {
+            params.companyId = staff.companyId;
+            params.accountid = staff.id;
             return API.tripPlan.statPlanOrderMoney(params);
         })
 }
