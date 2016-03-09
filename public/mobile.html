@@ -34,13 +34,13 @@
         var moment = require('moment');
         var md5 = require('md5');
         var Cookie = require('tiny-cookie');
-        var TLD = TLD_angular_app('qmtrip', 'mobile', '/tripPlan/uploadImg');
+        var TLD = TLD_angular_app('qmtrip', 'mobile', '/usercenter/index');
         initUpload(TLD);
         API.onlogin(function(){
             var backUrl = window.location.href;
             backUrl = encodeURIComponent(backUrl);
             window.location.href = "#/auth/login?backurl="+backUrl;
-        });
+        })
         API.authenticate = function(remote, callback){
             var user_id = Cookie.get('user_id');
             var token_id = Cookie.get('token_id');
