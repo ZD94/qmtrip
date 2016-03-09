@@ -6,74 +6,40 @@
 <div class="plan_list">
     <div class="list_tab">
         <div class="line"></div>
-        <dl>
-            <dt>状态：未完成</dt>
-            <dd>未完成</dd>
-            <dd>待出预算</dd>
-            <dd>待上传票据</dd>
-            <dd>票据审核中</dd>
-            <dd>审核不通过</dd>
-            <dd>已完成</dd>
-        </dl>
-        <dl>
-            <dt>排序：默认</dt>
-            <dd>默认</dd>
-            <dd>预算最大</dd>
-            <dd>预算最小</dd>
-        </dl>
+        <div class="dropdown">
+            <div class="dropdown-header">状态：{{STATUS}}</div>
+            <ul class="dropdown-menu">
+                <li ng-repeat="status in statuses" ng-click="selectStatus($index)">{{status}}</li>
+            </ul>
+        </div>
+        <div class="dropdown">
+            <div class="dropdown-header">排序：{{ORDER}}</div>
+            <ul class="dropdown-menu">
+                <li ng-repeat="order in orders" ng-click="selectOrder($index)">{{order}}</li>
+            </ul>
+        </div>
     </div>
     <ul class="list_content">
-        <li class="margin_b">
+        <div class="veil"></div>
+        <li class="margin_b" ng-repeat="item in items" ng-click="enterDetail(item.id)">
             <div class="list_top w100">
-                <div class="left">北京--上海<span class="icon web-icon-font3">&#xe90e;</span></div>
+                <div class="left">
+                    {{item.startPlace}}——{{item.destination}}
+                    <span class="icon web-icon-font3" ng-show="item.outTraffic.length===1">&#xe90e;</span>
+                    <span class="icon web-icon-font3" ng-show="item.hotel.length===1">&#xe914;</span>
+                </div>
                 <div class="right">待传票据</div>
             </div>
             <div class="list_bottom">
                 <div class="left">
-                    <p>2015年12月12日-2012年12月13日</p>
-                    <p>项目：雅客益牙木糖醇</p>
+                    <p>{{item.startAt | date:'yyyy年MM月dd日'}} - {{item.backAt | date:'yyyy年MM月dd日'}}</p>
+                    <p>项目：{{item.description}}</p>
                 </div>
-                <div class="right">预算：<span>¥1234.00</span></div>
+                <div class="right">预算：<span>{{item.budget | currency:"￥"}}</span></div>
             </div>
         </li>
-        <li class="margin_b">
-            <div class="list_top w100">
-                <div class="left">北京--上海<span class="icon web-icon-font3">&#xe90e;</span></div>
-                <div class="right">待传票据</div>
-            </div>
-            <div class="list_bottom">
-                <div class="left">
-                    <p>2015年12月12日-2012年12月13日</p>
-                    <p>项目：雅客益牙木糖醇</p>
-                </div>
-                <div class="right">预算：<span>¥1234.00</span></div>
-            </div>
-        </li>
-        <li class="margin_b">
-            <div class="list_top w100">
-                <div class="left">北京--上海<span class="icon web-icon-font3">&#xe90e;</span></div>
-                <div class="right">待传票据</div>
-            </div>
-            <div class="list_bottom">
-                <div class="left">
-                    <p>2015年12月12日-2012年12月13日</p>
-                    <p>项目：雅客益牙木糖醇</p>
-                </div>
-                <div class="right">预算：<span>¥1234.00</span></div>
-            </div>
-        </li>
-        <li class="margin_b">
-            <div class="list_top w100">
-                <div class="left">北京--上海<span class="icon web-icon-font3">&#xe90e;</span></div>
-                <div class="right">待传票据</div>
-            </div>
-            <div class="list_bottom">
-                <div class="left">
-                    <p>2015年12月12日-2012年12月13日</p>
-                    <p>项目：雅客益牙木糖醇</p>
-                </div>
-                <div class="right">预算：<span>¥1234.00</span></div>
-            </div>
-        </li>
+
+        <p class="tips" ng-if="tips">{{tips}}</p>
+
     </ul>
 </div>
