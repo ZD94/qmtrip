@@ -94,11 +94,20 @@ tripPlan.savePlanOrder = function (params) {
                                 detailUrl: url
                             }
 
-                            return API.mail.sendMailRequest({
-                                toEmails: s.email, //'miao.yu@tulingdao.com',
-                                templateName: 'qm_notify_new_travelbudget',
-                                values: vals
-                            })
+                            var log = {
+                                userId: accountId,
+                                orderId: order.id,
+                                remark: order.orderNo + '给企业管理员' + s.name + '发送邮件'
+                            };
+
+                            return Promise.all([
+                                API.mail.sendMailRequest({
+                                    toEmails: s.email, //'miao.yu@tulingdao.com',
+                                    templateName: 'qm_notify_new_travelbudget',
+                                    values: vals
+                                }),
+                                API.tripPlan.saveTripPlanLog(log)
+                            ])
                         }
                     })
             })
@@ -354,7 +363,7 @@ tripPlan.deleteConsumeDetail = function (id) {
 tripPlan.uploadInvoice = function (params) {
     var self = this;
     params.userId = self.accountId;
-    return API.tripPlan.uploadInvoice(params);
+    return API.tripPlan.uploadInvoice(params)
 }
 
 /**
