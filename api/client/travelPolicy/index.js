@@ -131,13 +131,37 @@ travelPolicy.getTravelPolicy = function(params){
                         if(!tp){
                             throw {code: -1, msg: '查询结果不存在'};
                         }
-                        if(tp.companyId != data.companyId){
+
+                        if(tp.companyId && tp.companyId != data.companyId){
                             throw {code: -1, msg: '无权限'};
                         }
                         return tp;
                     });
             });
     }
+};
+
+
+/**
+ * 员工获取自身差旅标准
+ * @returns {*|Promise}
+ */
+travelPolicy.getCurrentStaffTp = function(){
+    var user_id = this.accountId;
+    return API.staff.getStaff({id: user_id})
+        .then(function(data){
+            if(data.travelLevel){
+                return API.travelPolicy.getTravelPolicy({id:id})
+                    .then(function(tp){
+                        if(!tp){
+                            throw {code: -1, msg: '查询结果不存在'};
+                        }
+                        return tp;
+                    });
+            }else{
+                return API.travelPolicy.getTravelPolicy({id:'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a'});
+            }
+        });
 };
 
 travelPolicy.agencyGetTravelPolicy = function(params){
