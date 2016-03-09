@@ -26,7 +26,7 @@ function mobileSelectDate(config, options) {
     config.isShowWeekDayName = false;
     config.isShowMonth = true;
     config.holiday = {
-        "2016-4-3": "清明节",
+        "2016-4-4": "清明节",
         "2016-5-1": "劳动节",
         "2016-6-9": "端午节",
         "2016-9-15": "中秋节",

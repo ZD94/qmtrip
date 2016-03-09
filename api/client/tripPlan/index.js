@@ -363,7 +363,7 @@ tripPlan.deleteConsumeDetail = function (id) {
 tripPlan.uploadInvoice = function (params) {
     var self = this;
     params.userId = self.accountId;
-    return API.tripPlan.uploadInvoice(params);
+    return API.tripPlan.uploadInvoice(params)
 }
 
 /**
