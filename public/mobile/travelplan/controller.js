@@ -18,7 +18,9 @@ var travelplan=(function(){
      */
     travelplan.PlanlistController = function($scope) {
         
-        var p={page:1};//API参数：要显示的页数
+        var p={
+            page:1
+        };//API参数：要显示的页数
 
         $scope.STATUS="未完成";
         $scope.statuses=["未完成","待出预算","待上传票据","票据审核中","审核不通过","已完成"];
@@ -41,13 +43,22 @@ var travelplan=(function(){
 
         $scope.selectStatus=function(i){
             $scope.STATUS=$scope.statuses[i];
+            //if( statuses[i]==="已完成" ){
+            //    $scope.getList( {page:1,status:2} );
+            //}
         }
 
         $scope.selectOrder=function(i){
             $scope.ORDER=$scope.orders[i];
         }
 
-        $scope.getList = function(){//获取员工出差列表并将列表显示在页面上。每执行一次该函数，列表中的记录增加十条。
+        $scope.setItemStatus=function(p){
+            //if( p===-1 ){
+            //    return "审核未通过";
+            //}
+        }
+
+        $scope.getList = function( p ){//获取员工出差列表并将列表显示在页面上。每执行一次该函数，列表中的记录增加十条。
             $scope.tips="正在加载更多";
             API.onload(function(){
                 API.tripPlan.pageTripPlanOrder( p )
@@ -99,7 +110,7 @@ var travelplan=(function(){
 
         $scope.handleScroll = function(){//当页面滚动到底部时执行该函数
             if( $(document).scrollTop()==($(document).height()-$(window).height()) ){//如果滚动条已经到达页面底部
-                $scope.getList();
+                $scope.getList( p );
             }
         }
 
@@ -120,7 +131,7 @@ var travelplan=(function(){
         $(".title").html("出差记录");
         loading(true);
 
-        $scope.getList();
+        $scope.getList( p );
         $(window).on("scroll",$scope.handleScroll);
         $(".dropdown-header").on("click",enterSelectingMode);
         $(".veil").on("click",quitSelectingMode);
