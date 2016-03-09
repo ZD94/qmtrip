@@ -4,9 +4,10 @@
   width: 100%;
   height: auto;
   .list_tab {
+    position: relative;
     width: 100%;
     height: 4.5rem;
-    position: relative;
+    z-index:1;
     .line {
       width: 1px;
       height: 2rem;
@@ -15,11 +16,11 @@
       left: 50%;
       top: 1.2rem;
     }
-    dl {
+    .dropdown {
       width: 50%;
       height: 4.5rem;
       float: left;
-      dt {
+      .dropdown-header {
         height: 4.5rem;
         line-height: 4.5rem;
         font-size: 1.6rem;
@@ -27,19 +28,29 @@
         color: @color-theme3;
         background: @color-theme1;
       }
-      dd {
-        height: 4.2rem;
-        line-height: 4.2rem;
-        text-align: center;
-        border-bottom: 1px @border-color solid;
-        background: @color-theme3;
-        display: none;
+      .dropdown-menu {display:none;
+        li {
+          height: 4.2rem;
+          line-height: 4.2rem;
+          text-align: center;
+          border-bottom: 1px @border-color solid;
+          background: @color-theme3;
+        }
       }
     }
   }
   .list_content {
+    position:relative;
     width: 100%;
     height: auto;
+    .veil {
+      position:absolute;
+      width:100%;
+      height:100%;
+      background:black;
+      opacity:0.8;
+      display:none;
+    }
     li {
       background: @color-theme3;
       padding: 0 1rem;
@@ -78,6 +89,7 @@
         }
       }
     }
+    .tips {padding:15px 0 15px 0;text-align:center;}
   }
 }
 

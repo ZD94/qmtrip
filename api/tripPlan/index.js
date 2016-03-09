@@ -813,7 +813,7 @@ function countTripPlanNum(params){
  */
 tripPlan.statPlanOrderMoney = statPlanOrderMoney;
 statPlanOrderMoney.required_params = ['companyId'];
-statPlanOrderMoney.optional_params = ['startTime', 'endTime'];
+statPlanOrderMoney.optional_params = ['startTime', 'endTime', 'accountId'];
 function statPlanOrderMoney(params){
     var query = params;
     var query_complete = {
@@ -832,6 +832,10 @@ function statPlanOrderMoney(params){
     if(params.endTime){
         startAt.$lte = params.endTime;
         delete params.endTime;
+    }
+
+    if(params.accountId){
+        query_complete.accountId = params.accountId;
     }
 
     if(!isObjNull(startAt)){
