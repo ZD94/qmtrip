@@ -194,9 +194,10 @@ staff.updateStaff = function(data){
         .spread(function(rownum, rows){
             return Q.all([
                 API.travelPolicy.getTravelPolicy({id: rows[0].travelLevel}),
-                API.department.getDepartment({id: rows[0].departmentId})
+                API.department.getDepartment({id: rows[0].departmentId}),
+                API.department.getDefaultDepartment({companyId: rows[0].companyId})
             ])
-                .spread(function(tp, dept){
+                .spread(function(tp, dept, defaultDept){
                     if(accobj.status != 0 && send_email){
                         //已激活账户
                         var vals = {
@@ -205,7 +206,7 @@ staff.updateStaff = function(data){
                             travelPolicy: tp.name,
                             time: utils.now(),
                             companyName: com.name,
-                            department: dept.name,
+                            department: dept ? dept.name : defaultDept.name,
                             permission: rows[0].roleId == STAFF_ROLE.ADMIN ? "管理员" : (rows[0].roleId == STAFF_ROLE.OWNER ? "创建者" : "普通员工")
                         }
                         return API.mail.sendMailRequest({

@@ -5,46 +5,93 @@
 </style>
 <div class="create_result">
     <div class="result_content w100">
-        <div class="result_time w90 margin_c">生成时间：2012-12-12</div>
-        <div class="result_money w100">¥2222.22</div>
+        <div class="result_time w90 margin_c"></div>
+        <div class="result_money w100" ng-if="tra==1&&liv==0">
+            <span ng-if="onlytraffic.price!='-1'">¥{{(onlytraffic.price).toFixed(2)}}</span>
+            <span ng-if="onlytraffic.price=='-1'">暂无</span>
+        </div>
+        <div class="result_money w100" ng-if="tra==0&&liv==1">
+            <span ng-if="onlylive.price!='-1'">¥{{(onlylive.price).toFixed(2)}}</span>
+            <span ng-if="onlylive.price=='-1'">暂无</span>
+        </div>
+        <div class="result_money w100" ng-if="tra==1&&liv==1">
+            <span ng-if="trafficlive.price!='-1'">¥{{(trafficlive.price).toFixed(2)}}</span>
+            <span ng-if="trafficlive.price=='-1'">暂无</span>
+        </div>
         <div class="result_text w100">总预算</div>
     </div>
-    <div class="purpose_name">项目：2002年的第一场雪比以往时候来的都晚一些2002年的第一场雪比以往时候来的都晚一些</div>
+    <div class="purpose_name">项目：{{purposename}}</div>
     <ul class="result_list">
-        <li>
+        <li ng-if="tra==1">
             <div class="list_top">
                 <div class="icon web-icon-font3">&#xe90e;</div>
-                <div class="description">北京<span>去程</span>上海</div>
+                <div class="description">{{startPlace}}<span>去程</span>{{endPlace}}</div>
             </div>
             <div class="list_bottom">
-                <div class="time">2012-12-12出发　15:00前到达</div>
-                <div class="money">¥2000.00</div>
+                <div class="time">{{startTime}}出发　<span ng-if="startTimeLate">{{startTimeLate}}前到达</span></div>
+                <div class="money">
+                    <span ng-if="liv==0">
+                            <span ng-if="onlytraffic.goTraffic.price!='-1'">¥{{onlytraffic.goTraffic.price}}</span>
+                            <span ng-if="onlytraffic.goTraffic.price=='-1'">此路迢迢<br>暂无预算</span>
+                        </span>
+                        <span ng-if="liv==1">
+                            <span ng-if="trafficlive.goTraffic.price!='-1'">¥{{trafficlive.goTraffic.price}}</span>
+                            <span ng-if="trafficlive.goTraffic.price=='-1'">此路迢迢<br>暂无预算</span>
+                        </span>
+                </div>
             </div>
         </li>
-        <li>
+        <li ng-if="tra==1 && endTime">
             <div class="list_top">
                 <div class="icon web-icon-font3">&#xe90e;</div>
-                <div class="description">北京<span>回程</span>上海</div>
+                <div class="description">{{endPlace}}<span>回程</span>{{startPlace}}</div>
             </div>
             <div class="list_bottom">
-                <div class="time">2012-12-12出发　15:00前到达</div>
-                <div class="money">¥2000.00</div>
+                <div class="time">{{endTime}}出发　<span ng-if="endTimeLate">{{endTimeLate}}前到达</span></div>
+                <div class="money">
+                    <span ng-if="liv==0">
+                            <span ng-if="onlytraffic.backTraffic.price!='-1'">¥{{onlytraffic.backTraffic.price}}</span>
+                            <span ng-if="onlytraffic.backTraffic.price=='-1'">此路迢迢<br>暂无预算</span>
+                        </span>
+                        <span ng-if="liv==1">
+                            <span ng-if="trafficlive.backTraffic.price!='-1'">¥{{trafficlive.backTraffic.price}}</span>
+                            <span ng-if="trafficlive.backTraffic.price=='-1'">此路迢迢<br>暂无预算</span>
+                        </span>
+                </div>
             </div>
         </li>
-        <li>
+        <li ng-if="liv==1">
             <div class="list_top">
                 <div class="icon web-icon-font3">&#xe90e;</div>
-                <div class="description">上海　上海军事博物馆附近</div>
+                <div class="description">{{endPlace}}　{{landmark}}附近</div>
             </div>
             <div class="list_bottom">
-                <div class="time">2012-12-12至2012-12-12</div>
-                <div class="money">¥2000.00</div>
+                <div class="time">{{liveTime}}至{{leaveTime}}</div>
+                <div class="money">
+                    <span ng-if="tra==0">
+                            <span ng-if="onlylive.price!='-1'">¥{{onlylive.price}}</span>
+                            <span ng-if="onlylive.price=='-1'">此路迢迢<br>暂无预算</span>
+                        </span>
+                        <span ng-if="tra==1">
+                            <span ng-if="trafficlive.hotel!='-1'">¥{{trafficlive.hotel}}</span>
+                            <span ng-if="trafficlive.hotel=='-1'">此路迢迢<br>暂无预算</span>
+                        </span>
+                </div>
             </div>
         </li>
     </ul>
     <div class="w90 margin_c">温馨提示：点击生成出差记录，生成成功后企业管理员将会受到通知</div>
     <div class="w100 button_fix">
-        <input type="button" value="返回上一步" class="common_btn3 w50" style="float: left;">
-        <input type="button" value="生成预算单" class="common_btn1 w50" style="float: right;">
+        <input type="button" value="返回上一步" class="common_btn3 w50" ng-click="prevStep()" style="float: left;">
+        <input type="button" value="生成预算单" class="common_btn1 w50" ng-click="createRecord()" style="float: right;">
     </div>
 </div>
+
+<section class="loading_result">
+    <div class="mask_loading">
+        <div class="loading_m">
+            <!-- <img src="two-airplane.png"> -->
+        </div>
+        全麦商旅
+    </div>
+</section>

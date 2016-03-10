@@ -31,7 +31,6 @@ function selectPage (el , content , options) {
 	var el = $(el);
 
 	var str = "";
-
 	str += "<dl class='select_page'>";
 	str += "<div class='select_input'><input type='text' class='common_text w100 select_input1' placeholder="+options.placeholder+"></div>";
 	str += "<dt>"+options.title+"</dt>";
@@ -40,7 +39,7 @@ function selectPage (el , content , options) {
 		if (content[i].name == undefined) {
 			break;
 		}
-		str += "<dd ng-click='asd()'>"+content[i].name+"</dd>";
+		str += "<dd code='"+content[i].id+"'>"+content[i].name+"</dd>";
 	}
 
 	str += "</dl>";
@@ -54,10 +53,16 @@ function selectPage (el , content , options) {
 		$('.select_page dt,.select_page dd').hide();
 	}
 
+
+	var key,id;
+
 	$('.select_page dd').click(function(){
-		el.html($(this).html());
+		key = $(this).html();
+		id = $(this).attr('code');
+		el.html(key);
+		el.attr("code",id);
+		console.info (el.attr("code"));
 		$('.select_page').remove();
 	});
 
-	return $('.select_input1').val();
 }

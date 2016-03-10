@@ -8,6 +8,28 @@
     line-height: 4.5rem;
     color: @color-theme2;
   }
+  .icon {
+    width: 2rem;
+    height: 2rem;
+    line-height: 2rem;
+    text-align: center;
+    font-size: 1.8rem;
+    color: #C5C5C5;
+    position: absolute;
+    left: 0.3rem;
+    top: 1.5rem;
+  }
+  .choose {
+    width: 2rem;
+    height: 2rem;
+    background: url('../images/choose1_bg.jpg');
+    position: absolute;
+    top: 1.5rem;
+    right: 1rem;
+    img {
+      display: none;
+    }
+  }
 }
 
 .traffic_step {
@@ -29,7 +51,6 @@
   position: fixed;
   top: 44px;
   left: 0;
-  display: none;
   .halfinput {
     width: 48%;
     float: left;
@@ -55,7 +76,9 @@
       height: 4.8rem;
       line-height: 4.8rem;
       text-align: center;
-      font-size: 3.2rem;
+      span {
+        font-size: 3.2rem;
+      }
     }
     .result_text {
       height: auto;
@@ -114,4 +137,14 @@
       }
     }
   }
+}
+
+.loading_result {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
 }
