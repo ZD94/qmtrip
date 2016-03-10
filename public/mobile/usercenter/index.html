@@ -20,21 +20,21 @@
     </div>
     <div class="consume">
         <div>
-            <p>￥8495.00</p>
+            <p>{{total_budget}}</p>
             <p>总预算</p>
             <span></span>
         </div>
         <div>
-            <p>￥7284.00</p>
+            <p>{{actual_consume}}</p>
             <p>实际花费</p>
             <span></span>
         </div>
         <div>
-            <p>￥1211.00</p>
+            <p>{{total_budget - actual_consume}}</p>
             <p>为公司节省</p>
         </div>
     </div>
-    <div class="business_trip">
+    <div class="business_trip" ng-click="go_business()">
         我要出差
     </div>
     <div style="clear: both;"></div>
@@ -42,24 +42,24 @@
 <div class="plan_record">
     <div class="go_plan">
         出差记录
-        <span>查看全部出差记录&nbsp;<i class="web-icon-font">&#xf054;</i></span>
+        <span ng-click="go_planlist()">查看全部出差记录&nbsp;<i class="web-icon-font">&#xf054;</i></span>
     </div>
     <div class="all_detail">
         <div>
             <p>
-                <i><img src="/mobile/images/staff_money.png"><span>3</span></i>
+                <i><img src="/mobile/images/staff_money.png"><span id="total1">{{total1}}</span></i>
             </p>
             <p>待出预算</p>
         </div>
         <div>
             <p>
-                <i><img src="/mobile/images/staff_invoice.png" style="width: 2rem;"><span>1</span></i>
+                <i><img src="/mobile/images/staff_invoice.png" style="width: 2rem;"><span id="total2">{{total2}}</span></i>
             </p>
             <p>待传票据</p>
         </div>
         <div>
             <p>
-                <i><img src="/mobile/images/staff_alert_tip.png"><span>2</span></i>
+                <i><img src="/mobile/images/staff_alert_tip.png"><span id="total3">{{total3}}</span></i>
             </p>
             <p>审核未通过</p>
         </div>
@@ -67,5 +67,5 @@
 </div>
 <div class="plan_standard">
     我的差旅标准
-    <span>经理级&nbsp;<i class="web-icon-font">&#xf054;</i></span>
+    <span ng-click="go_travelstandard()">{{travelpolicy.name}}&nbsp;<i class="web-icon-font">&#xf054;</i></span>
 </div>

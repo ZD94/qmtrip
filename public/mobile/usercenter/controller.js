@@ -10,12 +10,11 @@ module.exports = (function() {
     var user = {};
 
     user.IndexController = function($scope) {
-        console.info(123);
+
         $scope.initStaffUser = function(){
             API.onload(function(){
                 API.staff.getCurrentStaff()
                     .then(function(ret){
-                        console.info(ret);
                         var company_id = ret.companyId;
                         var travelLevel =ret.travelLevel;
                         var str = ret.name;
@@ -30,14 +29,42 @@ module.exports = (function() {
                             $scope.power = "普通员工";
                         }
                         Q.all([
-                            API.tripPlan.countTripPlanNum({accountId:ret.id}),
-                            API.travelPolicy.getTravelPolicy({id: travelLevel})
+                            API.tripPlan.statPlanOrderMoney({}),
+                            API.travelPolicy.getTravelPolicy({id: travelLevel}),
+                            API.tripPlan.pageTripPlanOrder({status:-1}),
+                            API.tripPlan.pageTripPlanOrder({status:0}),
+                            API.tripPlan.pageTripPlanOrder({status:1,auditStatus:-1})
                         ])
-                            .spread(function(tripPlanOrders,travelPolicy){
-                                $scope.businesstimes = tripPlanOrders;
+                            .spread(function(planMoney,travelPolicy,plan_status_1,plan_status_2,plan_status_3){
+
+                                $scope.total_budget = planMoney.planMoney;
+                                $scope.actual_consume = planMoney.expenditure;
+
+                                console.info(travelPolicy);
                                 $scope.travelpolicy = travelPolicy;
-                                //dataloading(true);
+                                $scope.tavel_id = travelPolicy.id;
+
+                                $scope.total1 = plan_status_1.total;
+                                $scope.total2 = plan_status_2.total;
+                                $scope.total3 = plan_status_3.total;
                                 $scope.$apply();
+
+                                function judge(id){
+                                    var num = $('#'+id).text();
+                                    if(num == 0){
+                                        $('#'+id).hide();
+                                    }else if (num > 9 && num <100){
+                                        $('#'+id).css('font-size','1rem');
+                                        $('#'+id).show();
+                                    }else if (num > 99){
+                                        $('#'+id).css({'font-size':'1rem','width':'2rem'});
+                                        $('#'+id).html('99+');
+                                        $('#'+id).show();
+                                    }
+                                }
+                                judge('total1');
+                                judge('total2');
+                                judge('total3');
                             })
                             .catch(function(err){
                                 TLDAlert(err.msg || err)
@@ -48,9 +75,49 @@ module.exports = (function() {
                     .catch(function(err){
                         TLDAlert(err.msg || err)
                     })
+
             })
         }
         $scope.initStaffUser();
+
+        $scope.go_business = function() {
+            window.location.href = "#/businesstravel/index";
+        }
+
+        $scope.go_planlist = function() {
+            window.location.href = "#/travelplan/planlist";
+        }
+
+        $scope.go_travelstandard = function () {
+            window.location.href = "#/usercenter/travelpolicy?travelId=" + $scope.tavel_id;
+        }
     }
+
+    user.TravelpolicyController = function($scope,$routeParams) {
+        console.info(111);
+        loading(true);
+        var travelId = $routeParams.travelId;
+        console.info(travelId);
+        API.onload(function(){
+            API.staff.getCurrentStaff()
+                .then(function(){
+                    API.travelPolicy.getCurrentStaffTp()
+                        .then(function(travelPolicy){
+                            console.info(travelPolicy);
+                            $scope.travelpolicy = travelPolicy;
+                            $scope.$apply();
+                        })
+                        .catch(function(err){
+                            console.info(err || err.msg);
+                        })
+                })
+                .catch(function(err){
+                    console.info(err || err.msg);
+                    //TLDAlert(err.msg || err);
+                })
+                .done();
+        })
+    }
+
     return user;
 })();

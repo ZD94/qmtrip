@@ -238,6 +238,7 @@ var travelplan=(function(){
             })
             .then(function(invoiceDetail) {
                 $scope.InvoiceDetail = invoiceDetail;
+                console.info(invoiceDetail)
                 return  API.attachment.previewSelfImg({fileId: invoiceDetail.newInvoice})
                 .then(function(invoiceImg) {
                     $scope.invoiceImg = invoiceImg;
@@ -249,7 +250,7 @@ var travelplan=(function(){
             })
         })
         $scope.goDetail = function () {
-            window.location.href = "#/travelPlan/PlanDetail?planId="+planId;
+            window.location.href = "#/travelplan/plandetail?planId="+planId;
         }
     }
 
