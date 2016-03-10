@@ -57,7 +57,11 @@
         API.onlogin(function(){
             var backUrl = window.location.href;
             backUrl = encodeURIComponent(backUrl);
-            window.location.href = "#/auth/login?backurl="+backUrl;
+            if(is_weixn()) {
+                window.location.href = "/auth/wx-login?redirect_url=" + backUrl;
+            }else {
+                window.location.href = "#/auth/login?backurl="+backUrl;
+            }
         })
         API.authenticate = function(remote, callback){
             var user_id = Cookie.get('user_id');
