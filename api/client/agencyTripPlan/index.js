@@ -3,7 +3,6 @@
  */
 
 var API = require("common/api");
-var Q = require("q");
 var L = require("common/language");
 var _ = require('lodash');
 var checkAgencyPermission = require('../auth').checkAgencyPermission;
@@ -27,7 +26,7 @@ agencyTripPlan.getTripPlanOrderById = function(orderId){
     var accountId = self.accountId;
     return API.tripPlan.getTripPlanOrder(params)
         .then(function(order){
-            return Q.all([
+            return Promise.all([
                 order,
                 API.company.getCompany({companyId: order.companyId, columns: ['agencyId']}),
                 API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
@@ -176,7 +175,7 @@ agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
                 staffName = staff.name;
                 staffEmail = staff.email;
 
-                return Q.all([
+                return Promise.all([
                     API.company.getCompany({companyId: staff.companyId, columns: ['agencyId']}),
                     API.agency.getAgencyUser({id: user_id, columns: ['agencyId']})
                 ])
@@ -356,7 +355,7 @@ agencyTripPlan.countTripPlanNum = function(params){
     }
     var companyId = params.companyId;
 
-    return Q.all([
+    return Promise.all([
         API.agency.getAgencyUser({id: accountId, columns: ['id', 'agencyId']}),
         API.company.getCompany({companyId: companyId, columns: ['agencyId']})
     ])
@@ -382,7 +381,7 @@ agencyTripPlan.statPlanOrderMoneyByAgency = function (params) {
     var companyId = params.companyId;
     var params = _.pick(params, ['companyId', 'startTime', 'endTime']);
 
-    return Q.all([
+    return Promise.all([
         API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']}),
         API.company.getCompany({companyId: companyId, columns: ['agencyId']})
     ])
@@ -409,7 +408,7 @@ function editTripPlanBudget(params){
     var staffName = '';
     var staffEmail = '';
 
-    return Q.all([
+    return Promise.all([
         API.agency.getAgencyUser({id: accountId, columns: ['agencyId']}),
         API.tripPlan.getConsumeDetail({consumeId: consumeId, columns: ['accountId', 'orderId']})
     ])

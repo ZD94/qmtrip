@@ -34,7 +34,7 @@ module.exports = (function(){
         };
 
         $scope.feedback = function() {
-            window.location.href = "/extendfunction.html#/feedback/feedback";
+            window.open( "/extendfunction.html#/feedback/feedback");
         }
     }
     return staff;

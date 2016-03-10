@@ -1,0 +1,320 @@
+@color-theme1:#3CA5F6;
+@color-theme2:#9B9B9B;
+@color-theme3:#FFFFFF;
+@background-color-default:#FFFFFF;
+@background-color-second:#CCCCCC;
+@default-text-color:#4A4A4A;
+@border-color:#E5E5E5;
+
+/*Reset CSS*/
+*{ margin:0; padding:0; border: none; list-style: none; font-size: 1.4rem; font-family:"Arial","微软雅黑", "黑体", "宋体"; box-sizing: border-box;}
+a { text-decoration:none; cursor: pointer;}
+table{ border-collapse:collapse; border-spacing:0; }
+ul,ol,li,dl,dt,dd{list-style-type:none; }
+.clear{ font-size: 0; clear: both; height: 0; border: 0; line-height:0;}
+
+
+/*图标字体样式*/
+@font-face {font-family: 'fontawesome'; src: url('../../font/fontawesome-webfont.ttf'); font-weight: normal; font-style: normal;}
+@font-face {font-family: 'qmsl'; src: url('../../font/qmsl.ttf'); font-weight: normal; font-style: normal;}
+@font-face {font-family: 'icomoon'; src:url('../../font/icomoon.eot?b30uyj'); src:url('../../font/icomoon.eot?b30uyj#iefix') format('embedded-opentype'), url('../../font/icomoon.ttf?b30uyj') format('truetype'), url('../../font/icomoon.woff?b30uyj') format('woff'), url('../../font/icomoon.svg?b30uyj#icomoon') format('svg'); font-weight: normal; font-style: normal;}
+.web-icon-font{font-family: 'fontawesome'; font-style: normal;}
+.web-icon-font2{font-family: 'icomoon'; font-style: normal; text-transform: none;}
+.web-icon-font3{font-family: 'qmsl'; font-style: normal; text-transform: none;}
+
+/*弹性盒子*/
+.elasticbox {
+  display: -webkit-box;
+  .elasticbox_one {
+    -webkit-box-flex: 1;
+  }
+  .elasticbox_two {
+    -webkit-box-flex: 2;
+  }
+  .elasticbox_three {
+    -webkit-box-flex: 3;
+  }
+  .elasticbox_four {
+    -webkit-box-flex: 4;
+  }
+  .elasticbox_five {
+    -webkit-box-flex: 5;
+  }
+}
+
+/*统一rem,适配手机和Ipad*/
+@media (max-width: 767px) {
+  html,body{
+    font-size: 62.5%;
+    color: @default-text-color;
+    background: @background-color-default;
+  }
+  /*宽度小于768px,默认1rem=10像素*/
+}
+@media (min-width: 768px) {
+  html,body {
+    font-size: 87.5%;
+    color: @default-text-color;
+    background: @background-color-default;
+    /*宽度大于768px,默认1rem=14像素*/
+  }
+}
+
+/*默认文本框样式*/
+.common_text {
+  height: 4.8rem;
+  line-height: 4.8rem;
+  font-size: 1.6rem;
+  border: 1px @border-color solid;
+  border-radius: 0.2rem;
+  background: @background-color-default;
+  padding: 0 2rem;
+  display: block;
+}
+/*默认按钮1样式*/
+.common_btn1 {
+  height: 5rem;
+  line-height: 5rem;
+  text-align: center;
+  color: @color-theme3;
+  font-size: 1.8rem;
+  background: @color-theme1;
+  border: none;
+  display: block;
+}
+/*默认按钮2样式*/
+.common_btn2 {
+  height: 5rem;
+  line-height: 5rem;
+  text-align: center;
+  color: @color-theme3;
+  font-size: 1.8rem;
+  background: @background-color-second;
+  border: none;
+  display: block;
+}
+/*默认按钮3样式*/
+.common_btn3 {
+  height: 5rem;
+  line-height: 5rem;
+  text-align: center;
+  color: @color-theme1;
+  font-size: 1.8rem;
+  background: @background-color-default;
+  border: none;
+  border-top: 1px @border-color solid;
+  display: block;
+}
+
+.w10 { width: 10%;}
+.w20 { width: 20%;}
+.w30 { width: 30%;}
+.w40 { width: 40%;}
+.w50 { width: 50%;}
+.w60 { width: 60%;}
+.w70 { width: 70%;}
+.w80 { width: 80%;}
+.w85 { width: 85%;}
+.w90 { width: 90%;}
+.w100 { width: 100%;}
+
+.margin_c {
+  margin: 0 auto;
+}
+.margin_b {
+  margin-bottom: 1.2rem;
+}
+.button_fix {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+}
+
+
+/*默认黑色导航条*/
+.statusbar {
+  background: #1a1a1a;
+  height: 20px;
+  line-height: 20px;
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+  display: none;
+  z-index: 99999;
+}
+.headerbar {
+  background: #1a1a1a;
+  height: 44px;
+  line-height: 44px;
+  padding-left: 5px;
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+  display: none;
+}
+.font-white {
+  color: #cccccc;
+}
+
+/*日历控件移动端样式*/
+.calendar{
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: 0;
+  z-index: 99999;
+  background: #fff;
+  table{
+    width: 100%;
+    text-align: center;
+    border-collapse: collapse;
+    tr{
+      td{
+        border:1px solid #e5e5e5;
+        border-right: 0;
+        font-weight: bold;
+        width: 14.3%;
+        height: 4rem;
+        &:nth-child(1){
+          border-left: 0;
+          color: #eb5434;
+        }
+        &:last-child{
+          color: #eb5434;
+        }
+        &[today='true']{
+          color: #fff;
+          background: #3ca5f6;
+          i{
+            color: #fff;
+          }
+
+        }
+        &[expire="true"]{
+          color: #cccccc;
+        }
+        &[isrestday="true"]{
+          position: relative;
+          background: url(/images/restday.png) top right no-repeat;
+          background-size: 1.2rem;
+          background-position-y: 1rem;
+        }
+        i{
+          display: block;
+          font-style: normal;
+          color: #9b9b9b;
+        }
+      }
+    }
+  }
+}
+
+/*移动端loading样式*/
+.mask_loading{
+  position: fixed;
+  left: 50%;
+  top: 30%;
+  width: 8rem;
+  height: 8rem;
+  margin-left: -4rem;
+  opacity: 0.8;
+  background: #4a4a4a;
+  border-radius: 0.6rem;
+  line-height: 8rem;
+  text-align: center;
+  font-size: 1rem;
+  color: #fff;
+  z-index: 99999;
+  @keyframes loading {
+      0%{
+        transform: rotate(0deg);
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+      }
+      50%{
+        transform: rotate(180deg);
+        -webkit-transform: rotate(180deg);
+        -moz-transform: rotate(180deg);
+        -o-transform: rotate(180deg);
+      }
+      100%{
+        transform: rotate(360deg);
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+      }
+  }
+  @-webkit-keyframes loading {
+      0%{
+        transform: rotate(0deg);
+        -webkit-transform: rotate(0deg);
+      }
+      50%{
+        transform: rotate(180deg);
+        -webkit-transform: rotate(180deg);
+      }
+      100%{
+        transform: rotate(360deg);
+        -webkit-transform: rotate(360deg);
+      }
+  }
+  @-moz-keyframes loading {
+      0%{
+        transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+      }
+      50%{
+        transform: rotate(180deg);
+        -moz-transform: rotate(180deg);
+      }
+      100%{
+        transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+      }
+  }
+  @-o-keyframes loading {
+      0%{
+        transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+      }
+      50%{
+        transform: rotate(180deg);
+        -o-transform: rotate(180deg);
+      }
+      100%{
+        transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+      }
+  }
+  .loading_m{
+     width: 7rem;
+     height: 7rem;
+     animation:gogogo 1.4s infinite cubic-bezier(0,0,0,0) ;
+     -webkit-animation:loading 1.4s infinite cubic-bezier(0,0,0,0) ;
+     -o-animation:gogogo 1.4s infinite cubic-bezier(0,0,0,0) ;
+     -moz-animation:gogogo 1.4s infinite cubic-bezier(0,0,0,0) ;
+     background: url(/images/loading_m.png) no-repeat;
+     background-size: 7rem;
+     position: absolute;
+     top: 0.5rem;
+     left: 0.5rem;
+  }
+}
+
+//黑色半透明提示框
+.err_alert {
+  display: none;
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  height: 4.4rem;
+  line-height: 4.4rem;
+  background: rgba(74,74,74,0.8);
+  color: @color-theme3;
+  padding: 0 10px;
+  border-radius: 0.2rem;
+  //width: auto!important;
+  max-width: 80%;
+  text-align: center;
+}

@@ -13,7 +13,6 @@ var checkPermission = require('../auth').checkPermission;
 var checkAgencyPermission = require('../auth').checkAgencyPermission;
 var uuid = require("node-uuid");
 var L = require("common/language");
-var Q = require('q');
 
 /**
  * @class company 公司信息
@@ -219,7 +218,7 @@ company.getCompanyFundsAccountByAgency = function(companyId){
     if(typeof companyId == 'function')
         throw {code: -2, msg: '参数不正确'};
 
-    return Q.all([
+    return Promise.all([
         API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']}),
         API.company.getCompany({companyId: companyId, columns: ['agencyId']})
     ])

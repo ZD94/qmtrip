@@ -3,7 +3,6 @@
  */
 "use strict";
 var API = require("common/api");
-var Q = require("q");
 var L = require("common/language");
 var _ = require('lodash');
 var moment = require('moment');
@@ -31,7 +30,7 @@ tripPlan.savePlanOrder = function (params) {
             staffName = staff.name;
             params.companyId = staff.companyId;
 
-            return Q.all([
+            return Promise.all([
                 API.tripPlan.savePlanOrder(params),
                 API.staff.findStaffs({companyId: staff.companyId, roleId: {$ne: 1}, columns: ['id', 'name','email']})
             ])
@@ -95,11 +94,20 @@ tripPlan.savePlanOrder = function (params) {
                                 detailUrl: url
                             }
 
-                            return API.mail.sendMailRequest({
-                                toEmails: s.email, //'miao.yu@tulingdao.com',
-                                templateName: 'qm_notify_new_travelbudget',
-                                values: vals
-                            })
+                            var log = {
+                                userId: accountId,
+                                orderId: order.id,
+                                remark: order.orderNo + '给企业管理员' + s.name + '发送邮件'
+                            };
+
+                            return Promise.all([
+                                API.mail.sendMailRequest({
+                                    toEmails: s.email, //'miao.yu@tulingdao.com',
+                                    templateName: 'qm_notify_new_travelbudget',
+                                    values: vals
+                                }),
+                                API.tripPlan.saveTripPlanLog(log)
+                            ])
                         }
                     })
             })
@@ -132,7 +140,7 @@ tripPlan.getTripPlanOrderById = function (orderId) {
         userId: accountId
     }
 
-    return Q.all([
+    return Promise.all([
         API.tripPlan.getTripPlanOrder(params),
         API.staff.getStaff({id: accountId, columns: ['companyId']})
     ])
@@ -467,6 +475,24 @@ function statStaffsByCity(params) {
                 ret[cityCode].push(order);
             }
             return ret;
+        })
+}
+
+/**
+ * 判断用户是否已经生成改预算
+ * @param params
+ * @returns {*}
+ */
+tripPlan.checkBudgetExist = function(params) {
+    var self = this;
+    var accountId = self.accountId;
+    params.accountId = accountId;
+
+    return API.staff.getStaff({id: accountId, columns: ['companyId']})
+        .then(function (staff) {
+            params.companyId = staff.companyId;
+
+            return API.tripPlan.checkBudgetExist(params)
         })
 }
 

@@ -8,6 +8,7 @@ var gulplib = require('./common/gulplib');
 
 gulplib.bundle_lib('ws', {require:['ws'], exclude:['bufferutil', 'utf-8-validate']});
 gulplib.bundle_lib('api', {require:['q', 'md5', 'moment', 'tiny-cookie', 'shoe', './common/client/api.js:api']});
+gulplib.bundle_lib('calendar', {require:["./common/client/calendar.js:calendar"]});
 gulplib.bundle_lib('jquery', {require:['jquery', 'jquery-ui']});
 gulplib.bundle_lib('notie', {require:['notie']});
 gulplib.bundle_lib('arale-qrcode', {require:['arale-qrcode']});
@@ -18,7 +19,6 @@ gulplib.angular_app('staff');
 gulplib.angular_app('corp');
 gulplib.angular_app('extendfunction');
 gulplib.angular_app('agency');
-gulplib.angular_app('demo');
 gulplib.angular_app('mobile');
 gulplib.dist(function(){
     var filter = require('gulp-filter');

@@ -77,24 +77,49 @@
             var uploadConf = {
                 url: "/upload/ajax-upload-file?type=invoice",
                 alias: "tmpFile",
-                autoUpload: true
+                autoUpload: false
             };
 
-            var trafficUploadConfig = JSON.parse(JSON.stringify(uploadConf));
-            trafficUploadConfig.onCompleteItem= function (item, resp) {
-                $(".upload_sure span strong").html("交通票据");
-                $(".upload_sure span em").html("去程");
-                $scope.type = 'outTraffic';
-                $scope.consumeId = $scope.outTraffic.id;
-                $scope.md5key = resp.md5key;
-                $scope.$apply();
-                preview(resp.md5key);
+            // function clone(obj) {
+            //     return JSON.parse(JSON.stringify(obj));
+            // }
+
+            // var trafficUploadConfig = clone(uploadConf);
+            // var hotelUploadConfig = JSON.parse(JSON.stringify(uploadConf));
+            // $scope.TrafficUploader = new FileUploader(trafficUploadConfig);
+            // $scope.HotelUploader = new FileUploader(hotelUploadConfig);
+            // $scope.BackTrafficUploader = new FileUploader(backTrafficUploadConfig);
+            var uploader = $scope.uploader = new FileUploader(uploadConf);
+            uploader.filters.push({
+                name: 'customFilter',
+                fn: function(item /*{File|FileLikeObject}*/, options) {
+                    return this.queue.length < 10;
+                }
+            });
+            uploader.onAfterAddingFile = function(file) {
+                preview(file);
+                // initUpload(TLD);
+                console.info(uploader.queue[0]._file);
+                console.info("##############")
+                // console.info(file);
             }
+            uploader.onProgressItem = function(fileItem, progress) {
+                console.info('onProgressItem', fileItem, progress);
+            };
+            // trafficUploadConfig.onCompleteItem= function (item, resp) {
+            //     $(".upload_sure span strong").html("交通票据");
+            //     $(".upload_sure span em").html("去程");
+            //     $scope.type = 'outTraffic';
+            //     $scope.consumeId = $scope.outTraffic.id;
+            //     $scope.md5key = resp.md5key;
+            //     $scope.$apply();
+            //     preview(resp.md5key);
+            // }
 
             function preview(key) {
-                    $(".upload_sure").find("img").remove();
-                    var img = "<img src="+'/self/attachments/'+key+">";
-                    $(".upload_sure").append(img);
+                    // $(".upload_sure").find("img").remove();
+                    // var img = "<img src="+'/self/attachments/'+key+">";
+                    // $(".upload_sure").append(img);
                     $(".upload_sure").show();
             }
 
@@ -112,51 +137,50 @@
             }
             
 
-            var hotelUploadConfig = JSON.parse(JSON.stringify(uploadConf));
-            hotelUploadConfig.onCompleteItem = function(item, resp) {
-                $(".upload_sure span strong").html("酒店发票");
-                $scope.type = 'hotel';
-                $scope.consumeId = $scope.hotel.id;
-                $scope.md5key = resp.md5key;
-                $scope.$apply();
-                preview(resp.md5key);
-            }
+            // hotelUploadConfig.onCompleteItem = function(item, resp) {
+            //     $(".upload_sure span strong").html("酒店发票");
+            //     $scope.type = 'hotel';
+            //     $scope.consumeId = $scope.hotel.id;
+            //     $scope.md5key = resp.md5key;
+            //     $scope.$apply();
+            //     preview(resp.md5key);
+            // }
 
-            var backTrafficUploadConfig = JSON.parse(JSON.stringify(uploadConf));
-            backTrafficUploadConfig.onCompleteItem = function(item, resp) {
-                $(".upload_sure span strong").html("交通票据");
-                $(".upload_sure span em").html("回程");
-                $scope.type = 'backTraffic';
-                $scope.consumeId = $scope.backTraffic.id;
-                $scope.md5key = resp.md5key;
-                $scope.$apply();
-                preview(resp.md5key);
-            }
+            // var backTrafficUploadConfig = JSON.parse(JSON.stringify(uploadConf));
+            // backTrafficUploadConfig.onCompleteItem = function(item, resp) {
+            //     $(".upload_sure span strong").html("交通票据");
+            //     $(".upload_sure span em").html("回程");
+            //     $scope.type = 'backTraffic';
+            //     $scope.consumeId = $scope.backTraffic.id;
+            //     $scope.md5key = resp.md5key;
+            //     $scope.$apply();
+            //     preview(resp.md5key);
+            // }
 
-            trafficUploadConfig.onBeforeUpload = function(){
-                $(".upload_sure").find("img").remove();
-                console.info("onBeforeUpload");
-                var img = "<img src="+'/images/data-loading.gif'+">";
-                $(".upload_sure").append(img);
-                $(".upload_sure").show();
-            }
-            hotelUploadConfig.onBeforeUpload = function(){
-                console.info("onBeforeUpload");
-                $(".upload_sure").find("img").remove();
-                var img = "<img src="+'/images/data-loading.gif'+">";
-                $(".upload_sure").append(img);
-                $(".upload_sure").show();
-            }
-            backTrafficUploadConfig.onBeforeUpload = function(){
-                console.info("onBeforeUpload");
-                $(".upload_sure").find("img").remove();
-                var img = "<img src="+'/images/data-loading.gif'+">";
-                $(".upload_sure").append(img);
-                $(".upload_sure").show();
-            }
-            $scope.TrafficUploader = new FileUploader(trafficUploadConfig);
-            $scope.HotelUploader = new FileUploader(hotelUploadConfig);
-            $scope.BackTrafficUploader = new FileUploader(backTrafficUploadConfig);
+            // trafficUploadConfig.onBeforeUpload = function(){
+            //     $(".upload_sure").find("img").remove();
+            //     console.info("onBeforeUpload");
+            //     var img = "<img src="+'/images/data-loading.gif'+">";
+            //     $(".upload_sure").append(img);
+            //     $(".upload_sure").show();
+            // }
+            // hotelUploadConfig.onBeforeUpload = function(){
+            //     console.info("onBeforeUpload");
+            //     $(".upload_sure").find("img").remove();
+            //     var img = "<img src="+'/images/data-loading.gif'+">";
+            //     $(".upload_sure").append(img);
+            //     $(".upload_sure").show();
+            // }
+            // backTrafficUploadConfig.onBeforeUpload = function(){
+            //     console.info("onBeforeUpload");
+            //     $(".upload_sure").find("img").remove();
+            //     var img = "<img src="+'/images/data-loading.gif'+">";
+            //     $(".upload_sure").append(img);
+            //     $(".upload_sure").show();
+            // }
+            // $scope.TrafficUploader = new FileUploader(trafficUploadConfig);
+            // $scope.HotelUploader = new FileUploader(hotelUploadConfig);
+            // $scope.BackTrafficUploader = new FileUploader(backTrafficUploadConfig);
         //}
 
         function uploadInvoice(consumeId, picture, callback) {

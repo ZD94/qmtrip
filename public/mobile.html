@@ -3,8 +3,11 @@
 <head>
 	<meta charset="UTF-8">
 	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
-	<title>上传票据</title>
+	<title>全麦商旅</title>
 	<link rel="stylesheet" type="text/css" href="/mobile/css/upload.css">
+	<link rel="stylesheet" type="text/css" href="/mobile/css/businesstravel.css">
+	<link rel="stylesheet" type="text/css" href="/mobile/css/auth.css">
+	<link rel="stylesheet" type="text/css" href="/mobile/css/usercenter.css">
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
     <script type="text/javascript">
         var jQuery = $ = require('jquery');
@@ -15,14 +18,22 @@
     <script type="text/javascript" src="/script/libs/bundle.notie.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.swiper.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.ngapp.js"></script>
+    <script type="text/javascript" src="/script/libs/bundle.calendar.js"></script>
+    <script>
+        var Calendar = require("calendar");
+    </script>
+    <script type="text/javascript" src="/script/calconfig.js"></script>
+    <script type="text/javascript" src="/script/directive.js"></script>
+    <script type="text/javascript" src="/script/alertify.js"></script>
+    <script type="text/javascript" src="/script/alertbox.js"></script>
     <script type="text/javascript" src="/mobile/controller.all.js"></script>
-
     <script type="text/javascript">
 	    var Q = require('q');
         var moment = require('moment');
         var md5 = require('md5');
         var Cookie = require('tiny-cookie');
         var TLD = TLD_angular_app('qmtrip', 'mobile', '/tripPlan/uploadImg');
+        initUpload(TLD);
         API.onlogin(function(){
             var backUrl = window.location.href;
             backUrl = encodeURIComponent(backUrl);
@@ -36,9 +47,41 @@
             remote.authenticate({ accountid: user_id, tokenid: token_id, timestamp: timestamp, tokensign: token_sign },
                     callback);
         };
+        function is_weixn(){
+            var ua = navigator.userAgent.toLowerCase();
+            if(ua.match(/MicroMessenger/i)=="micromessenger") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        function showheader(display) {
+            if(display) {
+                //$('.statusbar').show();
+                $('.headerbar').show();
+            }else{
+                //$('.statusbar').hide();
+                $('.headerbar').hide();
+            }
+        }
+        $(document).ready(function(){
+            showheader(!is_weixn());
+        });
 	</script>
 </head>
 <body>
+    <div class="headerbar" style="position: relative">
+        <span style="position:absolute; left:10px;" ><a href="javascript:history.go(-1)" class="font-white">&lt;返回</a></span>
+        <span id="header" style="font-size: 19px;" ng-bind="pageTitle || '全麦商旅'">全麦商旅</span>
+        <span style="position:absolute; right:10px;" onclick="showheader(false);">隐藏</span>
+    </div>
+    <!-- <div id="loading" style="text-align: center;position: absolute;top: 40%;left: 48%;z-index: 1000;"><img src="/images/loading.gif" style="width: 30px;"/></div> -->
+    <div class="mask_loading" id="loading">
+        <div class="loading_m">
+            <!-- <img src="two-airplane.png"> -->
+        </div>
+        全麦商旅
+    </div>
 	<div id="angular-view" ui-view></div>
 </body>
 </html>
