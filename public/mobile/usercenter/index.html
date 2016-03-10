@@ -45,19 +45,19 @@
         <span ng-click="go_planlist()">查看全部出差记录&nbsp;<i class="web-icon-font">&#xf054;</i></span>
     </div>
     <div class="all_detail">
-        <div>
+        <div ng-click="go_budget()">
             <p>
                 <i><img src="/mobile/images/staff_money.png"><span id="total1">{{total1}}</span></i>
             </p>
             <p>待出预算</p>
         </div>
-        <div>
+        <div ng-click="go_invoice()">
             <p>
                 <i><img src="/mobile/images/staff_invoice.png" style="width: 2rem;"><span id="total2">{{total2}}</span></i>
             </p>
             <p>待传票据</p>
         </div>
-        <div>
+        <div ng-click="go_unpass()">
             <p>
                 <i><img src="/mobile/images/staff_alert_tip.png"><span id="total3">{{total3}}</span></i>
             </p>

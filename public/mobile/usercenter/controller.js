@@ -88,6 +88,18 @@ module.exports = (function() {
             window.location.href = "#/travelplan/planlist";
         }
 
+        $scope.go_budget = function() {
+            window.location.href = "#/travelplan/planlist?status="+"待出预算";
+        }
+
+        $scope.go_invoice = function() {
+            window.location.href = "#/travelplan/planlist?status="+"待上传票据";
+        }
+
+        $scope.go_unpass = function() {
+            window.location.href = "#/travelplan/planlist?status="+"审核不通过";
+        }
+
         $scope.go_travelstandard = function () {
             window.location.href = "#/usercenter/travelpolicy?travelId=" + $scope.tavel_id;
         }
