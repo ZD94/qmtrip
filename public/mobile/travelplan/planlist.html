@@ -21,25 +21,41 @@
     </div>
     <ul class="list_content">
         <div class="veil"></div>
-        <li class="margin_b" ng-repeat="item in items" ng-click="enterDetail(item.id)">
-            <div class="list_top w100">
-                <div class="left">
-                    {{item.startPlace}}——{{item.destination}}
-                    <span class="icon web-icon-font3" ng-show="item.outTraffic.length===1">&#xe90e;</span>
-                    <span class="icon web-icon-font3" ng-show="item.hotel.length===1">&#xe914;</span>
+        <div class="item margin_b" ng-repeat="item in items" ng-click="enterDetail(item.id)">
+            <li class="item-main">
+                <div class="list_top w100">
+                    <div class="left">
+                        {{item.startPlace}}——{{item.destination}}
+                        <span class="icon web-icon-font3" ng-show="item.outTraffic.length===1">&#xe90e;</span>
+                        <span class="icon web-icon-font3" ng-show="item.hotel.length===1">&#xe914;</span>
+                    </div>
+                    <div class="right">{{renderItemStatus($index)}}</div>
                 </div>
-                <div class="right">{{item.status}}</div>
-            </div>
-            <div class="list_bottom">
-                <div class="left">
-                    <p>{{item.startAt | date:'yyyy年MM月dd日'}} - {{item.backAt | date:'yyyy年MM月dd日'}}</p>
-                    <p>项目：{{item.description}}</p>
+                <div class="list_bottom">
+                    <div class="left">
+                        <p>{{item.startAt | date:'yyyy年MM月dd日'}} - {{item.backAt | date:'yyyy年MM月dd日'}}</p>
+                        <p class="projectName">项目：{{item.description}}</p>
+                    </div>
+                    <div class="right">预算：<span>{{item.budget | currency:"￥"}}</span></div>
                 </div>
-                <div class="right">预算：<span>{{item.budget | currency:"￥"}}</span></div>
-            </div>
-        </li>
+            </li>
+            <ul class="complete" ng-if="item.status===2">
+                <li>
+                    <span class="number">{{item.budget | currency:"￥"}}</span><br/>
+                    <span class="name">预算</span>
+                </li>
+                <li>
+                    <span class="number">{{item.expenditure | currency:"￥"}}</span><br/>
+                    <span class="name">实际</span>
+                </li>
+                <li ng-class="{true:'withBalance',false:'withDeficit'}[withBalance]">
+                    <span class="number">{{renderBalance($index) | currency:"￥"}}</span><br/>
+                    <span class="name">{{renderBalanceOrDeficit($index)}}</span>
+                </li>
+            </ul>
+        </div>
 
-        <p class="tips" ng-if="tips">{{tips}}</p>
+        <p class="tips" ng-if="tips" ng-bind-html="tips"></p>
 
     </ul>
 </div>
