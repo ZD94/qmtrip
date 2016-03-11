@@ -7,16 +7,6 @@ var auth=(function(){
     var Cookie = require('tiny-cookie');
     //登录页面
     auth.LoginController = function ($scope, $routeParams) {
-        //function err_attention(id,err,errforh){
-        //    $scope.errforh = err;
-        //    $('#'+id).siblings(".err_msg").children("i").html("&#xf06a;");
-        //    $('#'+id).siblings(".err_msg").children("i").removeClass("right");
-        //    $('#'+id).siblings(".err_msg").show();
-        //    console.info("$$$$$$$$$$$$");
-        //    return false;
-        //}
-        //err_attention(email,'邮箱不能为空',err_msg_mail);
-        //console.info(err_attention())
         var mail = Cookie.get("email");
         var pwd = Cookie.get("pwd");
         $scope.email = mail;
