@@ -16,6 +16,8 @@ var QRCODE_LOGIN_URL = '/auth/qrcode-login';
 var moment = require("moment");
 var API = require("../../common/api");
 var utils = require("common/utils");
+var Logger = require("common/logger");
+var logger = new Logger('');
 
 var ACCOUNT_STATUS = {
     ACTIVE: 1,
@@ -345,9 +347,11 @@ authServer.newAccount = function(data) {
 
     if (data.pwd) {
         var pwd = data.pwd;
-        pwd = md5(pwd);
+        var password = data.pwd.toString();
+        pwd = md5(password);
         //throw L.ERR.PASSWORD_EMPTY;
     }
+
 
     var mobile = data.mobile;
     var companyName = data.companyName || '';
@@ -937,6 +941,56 @@ authServer.isEmailUsed = function(params) {
     })
 }
 
+var AccountOpenid = Models.AccountOpenid;
+/**
+ * 保存openId关联的accountId
+ * @type {saveOrUpdateOpenId}
+ */
+authServer.saveOrUpdateOpenId = saveOrUpdateOpenId;
+saveOrUpdateOpenId.required_params = ['accountId', 'openId'];
+function saveOrUpdateOpenId(params) {
+    if(params.accountId == undefined) {
+        throw {code: -1, msg: 'accountId不能为空'};
+    }
+    params.createAt = utils.now();
+
+    return AccountOpenid.findById(params.openId)
+        .then(function(ap) {
+            if(ap) {
+                return ap;
+            }
+
+            return AccountOpenid.create(params);
+        })
+}
+
+/**
+ * 获取数据库中openId关联的accountId
+ * @type {getAccountIdByOpenId}
+ */
+authServer.getAccountIdByOpenId = getAccountIdByOpenId;
+getAccountIdByOpenId.required_params = ['openId'];
+function getAccountIdByOpenId(params) {
+    return AccountOpenid.findById(params.openId)
+        .then(function(ret) {
+            if(ret) {
+                return ret.accountId;
+            }else {
+                return false;
+            }
+        })
+}
+
+/**
+ * 微信自动登陆接口
+ * @type {wxLogin}
+ */
+authServer.wxLogin = wxLogin;
+function wxLogin(params) {
+    logger.info("微信自动登陆...");
+    logger.info(params);
+}
+
 //拼接字符串
 function combineData(obj) {
     if (typeof obj != 'object') {
@@ -986,7 +1040,67 @@ authServer.__initHttpApp = function(app) {
 
     //微信自动登录
     app.all("/auth/wx-login", function(req, res, next) {
+        var redirectUrl = req.query.redirect_url;
+        redirectUrl = encodeURIComponent(redirectUrl)
+        var backUrl = "http://qmtrip.com.cn/auth/get_access_code?back_url=" + redirectUrl;
+        API.wechat.getOAuthUrl({backUrl: backUrl})
+            .then(function(ret) {
+                res.redirect(ret);
+            })
+    });
 
+    //微信自动登陆
+    app.all("/auth/get_access_code", function(req, res, next) {
+        var query = req.query;
+        var code = query.code;
+        var backUrl = req.url.match(/http.+/)[0];
+        var account_id = req.cookies.user_id;
+        if(account_id == "undefined") {
+            account_id = null;
+        }
+
+        API.wechat.requestOpenIdByCode({code: code}) //获取微信openId
+            .then(function(openid) {
+                return [openid, API.auth.getAccountIdByOpenId({openId: openid})]; //获取数据库中openId对应的accountId
+            })
+            .spread(function(openId, accountId) {
+                //logger.warn("cookies user_id=>", account_id);
+                //logger.warn(accountId);
+                //logger.warn(openId);
+                if(accountId) {//如果数据库有该openId关联的用户，自动登陆，生成登陆凭证
+                    logger.warn("在微信中自动登陆...");
+                    return [makeAuthenticateSign(accountId, 'weChat')];
+                }else if(!account_id || account_id == "undefined"){
+                    var login_back_url = '/auth/wx-login?redirect_url=' + encodeURIComponent('/auth/get_access_code?back_url=' + backUrl);
+                    var loginUrl = '/mobile.html#/auth/login?backurl=' + login_back_url;
+                    logger.warn("没有登陆，跳转至登陆页面...", loginUrl);
+                    return new Promise(function(resolve) {
+                        res.redirect(loginUrl);
+                        resolve([false]);
+                    })
+
+                }else {
+                    logger.warn("第一次在微信登陆,关联openId和accountId...");
+                    return [makeAuthenticateSign(account_id), API.auth.saveOrUpdateOpenId({openId: openId, accountId: account_id})];
+                }
+            })
+            .spread(function(ret) {
+                if(ret !== false) {
+                    res.cookie("token_id", ret.token_id);
+                    res.cookie("user_id", ret.user_id);
+                    res.cookie("timestamp", ret.timestamp);
+                    res.cookie("token_sign", ret.token_sign);
+
+                    var redirectUrl = decodeURIComponent(backUrl);
+                    if(!redirectUrl.match(/^http:\/\/.*\?.*/)) {
+                        redirectUrl = redirectUrl.replace(/&/, '?');
+                    }
+                    res.redirect(redirectUrl);
+                }
+            })
+            .catch(function(err) {
+                logger.error(err);
+            })
     })
 }
 

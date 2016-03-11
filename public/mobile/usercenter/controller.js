@@ -10,6 +10,7 @@ module.exports = (function() {
     var user = {};
 
     user.IndexController = function($scope) {
+        $scope.$root.pageTitle = '个人中心';
 
         $scope.initStaffUser = function(){
             API.onload(function(){
@@ -39,6 +40,7 @@ module.exports = (function() {
 
                                 $scope.total_budget = planMoney.planMoney;
                                 $scope.actual_consume = planMoney.expenditure;
+                                $scope.save_money = $scope.total_budget - $scope.actual_consume;
 
                                 console.info(travelPolicy);
                                 $scope.travelpolicy = travelPolicy;
@@ -106,16 +108,14 @@ module.exports = (function() {
     }
 
     user.TravelpolicyController = function($scope,$routeParams) {
-        console.info(111);
+        $scope.$root.pageTitle = '差旅标准';
         loading(true);
         var travelId = $routeParams.travelId;
-        console.info(travelId);
         API.onload(function(){
             API.staff.getCurrentStaff()
                 .then(function(){
                     API.travelPolicy.getCurrentStaffTp()
                         .then(function(travelPolicy){
-                            console.info(travelPolicy);
                             $scope.travelpolicy = travelPolicy;
                             $scope.$apply();
                         })

@@ -539,9 +539,6 @@ var businessTravel=(function(){
                     })
                 ])
                     .spread(function(ret1,ret2, url) {
-                        console.info (ret2);
-                        console.info (url);
-                        console.info(ret2.goTraffic.type);
                         if(ret2.goTraffic.type == "train"){
                             url = "https://kyfw.12306.cn/otn/leftTicket/init";
                         }
@@ -556,8 +553,9 @@ var businessTravel=(function(){
                         $scope.$apply();
                     })
                     .catch(function(err){
-                        console.info (err);
-                        Myconfirm("生成预算失败，请重新生成","确认","取消");
+                        TLDAlert(err.msg || err);
+                        $(".creating").hide();
+                        $(".budgetFail").show();
                     });
             })
         }
@@ -590,8 +588,9 @@ var businessTravel=(function(){
                         $scope.$apply();
                     })
                     .catch(function(err){
-                        console.info (err);
-                        Myconfirm("生成预算失败，请重新生成","确认","取消");
+                        TLDAlert(err.msg || err);
+                        $(".creating").hide();
+                        $(".budgetFail").show();
                     });
             })
 
@@ -645,8 +644,6 @@ var businessTravel=(function(){
                     })
                 ])
                     .spread(function(ret1,ret2,url) {
-                        console.info (ret2);
-                        console.info (url);
                         if(ret2.goTraffic.type == "train"){
                             url = "https://kyfw.12306.cn/otn/leftTicket/init";
                         }
@@ -663,8 +660,9 @@ var businessTravel=(function(){
                         $scope.$apply();
                     })
                     .catch(function(err){
-                        console.info (err);
-                        Myconfirm("生成预算失败，请重新生成","确认","取消");
+                        TLDAlert(err.msg || err);
+                        $(".creating").hide();
+                        $(".budgetFail").show();
                     });
             })
         }

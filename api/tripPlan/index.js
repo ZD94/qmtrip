@@ -382,6 +382,7 @@ tripPlan.listTripPlanOrder = function(options){
     }
 
     options.order = [['start_at', 'desc'], ['create_at', 'desc']]; //默认排序，创建时间
+    logger.error(query);
 
     return PlanOrder.findAndCount(options)
         .then(function(ret){
