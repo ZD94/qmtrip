@@ -23,29 +23,27 @@
         <div class="veil"></div>
         <div class="item margin_b" ng-repeat="item in items" ng-click="enterDetail(item.id)">
             <li class="item-main">
-                <div class="item-top w100">
-                    <div class="left">
+                <div class="item-left w100">
+                    <div class="top">
                         <span ng-if="item.startPlace">{{item.startPlace}}——</span><span>{{item.destination}}</span>
                         <span class="icon web-icon-font3" ng-show="item.outTraffic.length===1">&#xe90e;</span>
                         <span class="icon web-icon-font3" ng-show="item.hotel.length===1">&#xe914;</span>
                     </div>
-                    <div class="right">{{renderItemStatus($index)}}</div>
-                </div>
-                <div class="item-bottom">
-                    <div class="left">
+                    <div class="bottom">
                         <p>
                             {{item.startAt | date:'yyyy年MM月dd日'}}
                             <span ng-if="item.backAt">- {{item.backAt | date:'yyyy年MM月dd日'}}<span>
                         </p>
                         <p class="projectName">项目：{{item.description}}</p>
-                    </div>
-                    <div class="right">
+                    </div>                    
+                </div>
+                <div class="item-right">
+                    <div class="top">{{renderItemStatus($index)}}</div>
+                    <div class="bottom">
                         <p class="budget" ng-if="item.status!==2">
-                            预算：
-                            <span ng-if="item.budget>=0">{{item.budget | currency:"￥"}}</span>
-                            <span ng-if="item.budget<0">暂无预算</span>
+                            预算：<span ng-if="item.budget>=0">{{item.budget | currency:"￥"}}</span><span ng-if="item.budget<0">暂无</span>
                         </p>
-                        <p class="poingts" ng-if="item.status===2">积分：<span>{{item.score}}</span></p>
+                        <p class="points" ng-if="item.status===2">积分：<span>{{item.score}}</span></p>
                     </div>
                 </div>
             </li>
