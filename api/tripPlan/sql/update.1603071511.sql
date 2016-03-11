@@ -1,5 +1,7 @@
 ALTER TABLE tripplan.trip_plan_order add column project_id uuid;
 
+DROP TABLE IF EXISTS tripplan.projects;
+
 CREATE TABLE tripplan.projects(
     id uuid primary key,
     company_id uuid,

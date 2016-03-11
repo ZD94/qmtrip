@@ -34,9 +34,28 @@ var agency = {}
  */
 agency.registerAgency = registerAgency;
 registerAgency.required_params = ['name', 'email', 'mobile', 'userName'];
-registerAgency.optional_params = ['description', 'remark'];
+registerAgency.optional_params = ['description', 'remark', 'pwd'];
 function registerAgency(params){
-    return API.agency.registerAgency(params);
+    var email = params.email;
+    var mobile = params.mobile;
+    return API.auth.checkAccExist({type: 2, $or: [{mobile: mobile}, {email: email}]})
+        .then(function(ret){
+            if(!ret){
+                var _account = {
+                    email: email,
+                    mobile: mobile,
+                    pwd: params.pwd|'123456',
+                    type: 2
+                }
+                return API.auth.newAccount(_account);
+            }else{
+                return ret;
+            }
+        })
+        .then(function(account) {
+            params.id = account.id;
+            return API.agency.createAgency(params)
+        })
 }
 
 /**

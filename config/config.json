@@ -45,5 +45,12 @@
         "modules": "*"
       }
     ]
+  },
+  "default_agency": {
+    "name": "系统默认代理商",
+    "email": "agency.agency@tulingdao.com",
+    "pwd": "123456",
+    "mobile": "",
+    "user_name": "我是代理商"
   }
 }

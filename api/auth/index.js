@@ -347,9 +347,11 @@ authServer.newAccount = function(data) {
 
     if (data.pwd) {
         var pwd = data.pwd;
-        pwd = md5(pwd);
+        var password = data.pwd.toString();
+        pwd = md5(password);
         //throw L.ERR.PASSWORD_EMPTY;
     }
+
 
     var mobile = data.mobile;
     var companyName = data.companyName || '';
