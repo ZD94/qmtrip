@@ -291,7 +291,7 @@ var travelPlan=(function(){
                                     // location.reload();
                                     $scope.initplandetail();
                                     $("#uploadimg").hide();
-                                    TLDAlert("票据上传成功")；
+                                    TLDAlert("票据上传成功");
                                 })
                                 .catch(function(err){
                                     TLDAlert(err.msg || err);
