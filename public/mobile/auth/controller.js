@@ -25,6 +25,8 @@ module.exports = (function() {
             var mail = $('#name').val();
             var pwd  = $('#pwd').val();
             var commit = true;
+            console.info(mail);
+            console.info(pwd);
             if(commit){
                 API.onload(function(){
                     API.auth.login({email:mail,pwd:pwd})

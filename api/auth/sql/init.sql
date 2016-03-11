@@ -57,4 +57,11 @@ comment on column auth.tokens.expire_at is '失效时间';
 comment on column auth.tokens.refresh_at is '刷新时间';
 comment on column auth.tokens.os is '系统 android|ios|web|wx';
 
+CREATE TABLE auth.account_openid(
+  open_id character varying(255) NOT NULL PRIMARY KEY,
+  account_id uuid,
+  create_at timestamp without time zone,
+  update_at timestamp without time zone
+);
+
 insert into auth.accounts (id, email, pwd, mobile, status, type) values('00000000-0000-0000-0000-000000000001', 'agency.agency@tulingdao.com', 'e10adc3949ba59abbe56e057f20f883e', '12345678900', 1, 2);

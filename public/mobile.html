@@ -57,7 +57,11 @@
         API.onlogin(function(){
             var backUrl = window.location.href;
             backUrl = encodeURIComponent(backUrl);
-            window.location.href = "#/auth/login?backurl="+backUrl;
+            if(is_weixn()) {
+                window.location.href = "/auth/wx-login?redirect_url=" + backUrl;
+            }else {
+                window.location.href = "#/auth/login?backurl="+backUrl;
+            }
         })
         API.authenticate = function(remote, callback){
             var user_id = Cookie.get('user_id');
@@ -92,7 +96,7 @@
 <body>
     <div class="headerbar" style="position: relative">
         <span style="position:absolute; left:10px;" ><a href="javascript:history.go(-1)" class="font-white">&lt;返回</a></span>
-        <span id="header" style="font-size: 19px;" ng-bind="pageTitle || '全麦商旅'">全麦商旅</span>
+        <span id="header" style="font-size: 19px;" ng-bind="pageTitle || '全麦商旅'"></span>
         <span style="position:absolute; right:10px;" onclick="showheader(false);">隐藏</span>
     </div>
     <!-- <div id="loading" style="text-align: center;position: absolute;top: 40%;left: 48%;z-index: 1000;"><img src="/images/loading.gif" style="width: 30px;"/></div> -->

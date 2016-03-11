@@ -128,7 +128,6 @@ var auth=(function(){
     //注册页面
     auth.RegisterController = function($scope) {
         var pCode = $('#picCode').val();
-
         //对企业名称进行判断
         $("#corpName").blur(function(){
             var cName  = $('#corpName').val();
@@ -397,7 +396,7 @@ var auth=(function(){
                     } else {
                         //alert("邮箱不合法");
                         $scope.err_msg_mail = "邮箱格式不正确";
-                        //console.info(456);
+                        console.info(456);
                         $("#corpMail").siblings(".err_msg").children("a").html("");
                         $("#corpMail").siblings(".err_msg").children("i").html("&#xf057;");
                         $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
