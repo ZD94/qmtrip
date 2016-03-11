@@ -39,7 +39,9 @@ company.domainIsExist = function(params) {
     }
 
     if (C.is_allow_domain_repeat) {
-        return false;
+        return new Promise(function(resolve) {
+            resolve(false);
+        })
     }
 
     return Models.Company.findOne({where: {domainName: domain}})
@@ -115,7 +117,7 @@ company.isBlackDomain = function(params) {
                 return true;
             }
             return false;
-        });
+        })
 }
 
 /**
