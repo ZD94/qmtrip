@@ -204,7 +204,7 @@ tripPlan.pageTripPlanOrder = function (params) {
 
     //params.status = {$gte: -1};
     if (params.isComplete === false) {
-        params.status = {$gte: -1};
+        params.status = {$gte: -1, $lte: 1};
     }else if(params.isComplete == true) {
         params.status = 2;
         params.auditStatus = 1;
