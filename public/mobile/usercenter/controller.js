@@ -11,6 +11,7 @@ module.exports = (function() {
 
     user.IndexController = function($scope) {
         $scope.$root.pageTitle = '全麦商旅';
+
         $scope.initStaffUser = function(){
             API.onload(function(){
                 API.staff.getCurrentStaff()
@@ -39,6 +40,7 @@ module.exports = (function() {
 
                                 $scope.total_budget = planMoney.planMoney;
                                 $scope.actual_consume = planMoney.expenditure;
+                                $scope.save_money = $scope.total_budget - $scope.actual_consume;
 
                                 console.info(travelPolicy);
                                 $scope.travelpolicy = travelPolicy;

@@ -20,17 +20,17 @@
     </div>
     <div class="consume">
         <div>
-            <p>{{total_budget}}</p>
+            <p>{{(total_budget).toFixed(2)}}</p>
             <p>总预算</p>
             <span></span>
         </div>
         <div>
-            <p>{{actual_consume}}</p>
+            <p>{{(actual_consume).toFixed(2)}}</p>
             <p>实际花费</p>
             <span></span>
         </div>
         <div>
-            <p>{{total_budget - actual_consume}}</p>
+            <p class="save_money">{{(save_money).toFixed(2)}}</p>
             <p>为公司节省</p>
         </div>
     </div>
