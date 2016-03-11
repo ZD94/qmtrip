@@ -202,6 +202,25 @@ var TravelStatistics = (function(){
                             .then(function(ret){
                                 $scope.planlist = ret;
                                 ret.map(function(s){
+                                    var des = s.description;
+                                    // var des = JSON.stringify(s.description);
+                                    if(s.hotel.length>0){
+                                        var hotelName = s.hotel[0].hotelName;
+                                        var city = s.hotel[0].city;
+                                        if (hotelName && hotelName.length > 5) {
+                                            s.hotel[0].hotelName = hotelName.substr(0, 5) + '…';
+                                        }
+                                        if(city.length >5){
+                                            s.hotel[0].city = city.substr(0, 5) + '…';
+                                        }
+                                    }
+                                    if(des && des.length>10){
+                                        s.description= s.description.substr(0,5) + '…';
+                                    }
+                                    if(s.backTraffic){
+                                        
+                                    }
+                                    return s;
                                 })
                                 $scope.$apply();
                             })
