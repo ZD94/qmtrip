@@ -18,25 +18,36 @@ var travelplan=(function(){
      */
     //alert("no error");
     travelplan.PlanlistController = function($scope,$routeParams) {
-        var p=$routeParams.status?
-        $routeParams.status:
-        {
-            page:1,isComplete:false
-        };//API参数：要显示的页数
+        var PARAMS = (function(){//API参数：要显示的页数
+            if( $routeParams.status ){
+                if( $routeParams.status==="待出预算" ){
+                    return {page:1,status:-1};
+                }else
+                if( $routeParams.status==="待上传票据" ){
+                    return {page:1,status:0};
+                }else
+                if( $routeParams.status==="审核不通过" ){
+                    return {page:1,status:1,isCommit:true,auditStatus:-1};
+                };
+            }else{
+                return {page:1,isComplete:false};
+            }
+        })();
 
-        $scope.STATUS="未完成";
+        $scope.STATUS="未完成";//当前状态
         $scope.statuses=["未完成","待出预算","待上传票据","票据审核中","审核不通过","已完成"];
-        $scope.ORDER="默认";
+        $scope.ORDER="默认";//当前排序
         $scope.orders=["默认","预算最大","预算最小"];
         $scope.items=[];//“员工出差记录”
         $scope.withBalance=true;//状态为“已完成”的“出差记录”的预算是否有节余。
         $scope.total="";
         $scope.tips="";
-
+        //-----------------------------------------------------------
         $scope.enterSelectingMode=function(){//进入“选择模式”
             $(".veil").show();
             $("body").css({overflow:"hidden"});
             $(this).siblings(".dropdown-menu").slideDown();
+            $(this).parent(".dropdown").siblings(".dropdown").find(".dropdown-menu").hide();
         }
         $scope.quitSelectingMode=function(){//退出“选择模式”
             $(".veil").hide();
@@ -48,27 +59,30 @@ var travelplan=(function(){
             $scope.STATUS=$scope.statuses[i];
             $scope.items=[];
             if( $scope.STATUS==="未完成" ){
-                $scope.getList( {page:1} );
+                PARAMS = {page:1,isComplete:false};
             }else
             if( $scope.STATUS==="待出预算" ){
-                $scope.getList( {page:1,status:-1} );
+                PARAMS = {page:1,status:-1};
             }else
             if( $scope.STATUS==="待上传票据" ){
-                $scope.getList( {page:1,status:0} );
+                PARAMS = {page:1,status:0};
             }else
             if( $scope.STATUS==="票据审核中" ){
-                $scope.getList( {page:1,status:1,isCommit:true,auditStatus:0} );
+                PARAMS = {page:1,status:1,isCommit:true,auditStatus:0};
             }else
             if( $scope.STATUS==="审核不通过" ){
-                $scope.getList( {page:1,status:1,isCommit:true,auditStatus:-1} );
+                PARAMS = {page:1,status:1,isCommit:true,auditStatus:-1};
             }else
             if( $scope.STATUS==="已完成" ){
-                $scope.getList( {page:1,status:2} );
+                PARAMS = {page:1,status:2};
             }
+            $scope.getList( PARAMS );
+            $scope.quitSelectingMode();
         }
 
         $scope.selectOrder=function(i){
             $scope.ORDER=$scope.orders[i];
+            $scope.quitSelectingMode();
         }
 
         $scope.renderItemStatus=function(i){
@@ -108,6 +122,7 @@ var travelplan=(function(){
         $scope.getList = function( p ){//获取员工出差列表并将列表显示在页面上。每执行一次该函数，列表中的记录增加十条。
             $scope.tips="正在加载更多";
             API.onload(function(){
+                console.info(p);
                 API.tripPlan
                 .pageTripPlanOrder( p )
                 .then(
@@ -165,7 +180,7 @@ var travelplan=(function(){
 
         $scope.handleScroll = function(){//当页面滚动到底部时执行该函数
             if( $(document).scrollTop()==($(document).height()-$(window).height()) ){//如果滚动条已经到达页面底部
-                $scope.getList( p );
+                $scope.getList( PARAMS );
             }
         }
 
@@ -183,10 +198,11 @@ var travelplan=(function(){
             window.open("#/travelplan/plandetail?orderId=" + orderId);
         }
 
+        //页面上的所有交互All interacitve actions on this page
         $(".title").html("出差记录");
         loading(true);
 
-        $scope.getList( p );
+        $scope.getList( PARAMS );
         $(window).on("scroll",$scope.handleScroll);
         $(".dropdown-header").on("click",$scope.enterSelectingMode);
         $(".veil").on("click",$scope.quitSelectingMode);

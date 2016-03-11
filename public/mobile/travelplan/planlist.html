@@ -7,13 +7,13 @@
     <div class="list_tab">
         <div class="line"></div>
         <div class="dropdown">
-            <div class="dropdown-header">状态：{{STATUS}}</div>
+            <div class="dropdown-header">状态：{{STATUS}}<i class="icon web-icon-font">&#xf0d7;</i></div>
             <ul class="dropdown-menu">
                 <li ng-repeat="status in statuses" ng-click="selectStatus($index)">{{status}}</li>
             </ul>
         </div>
         <div class="dropdown">
-            <div class="dropdown-header">排序：{{ORDER}}</div>
+            <div class="dropdown-header">排序：{{ORDER}}<i class="icon web-icon-font">&#xf0d7;</i></div>
             <ul class="dropdown-menu">
                 <li ng-repeat="order in orders" ng-click="selectOrder($index)">{{order}}</li>
             </ul>
@@ -23,30 +23,40 @@
         <div class="veil"></div>
         <div class="item margin_b" ng-repeat="item in items" ng-click="enterDetail(item.id)">
             <li class="item-main">
-                <div class="list_top w100">
-                    <div class="left">
-                        {{item.startPlace}}——{{item.destination}}
+                <div class="item-left w100">
+                    <div class="top">
+                        <span ng-if="item.startPlace">{{item.startPlace}}——</span><span>{{item.destination}}</span>
                         <span class="icon web-icon-font3" ng-show="item.outTraffic.length===1">&#xe90e;</span>
                         <span class="icon web-icon-font3" ng-show="item.hotel.length===1">&#xe914;</span>
                     </div>
-                    <div class="right">{{renderItemStatus($index)}}</div>
-                </div>
-                <div class="list_bottom">
-                    <div class="left">
-                        <p>{{item.startAt | date:'yyyy年MM月dd日'}} - {{item.backAt | date:'yyyy年MM月dd日'}}</p>
+                    <div class="bottom">
+                        <p>
+                            {{item.startAt | date:'yyyy年MM月dd日'}}
+                            <span ng-if="item.backAt">- {{item.backAt | date:'yyyy年MM月dd日'}}<span>
+                        </p>
                         <p class="projectName">项目：{{item.description}}</p>
+                    </div>                    
+                </div>
+                <div class="item-right">
+                    <div class="top">{{renderItemStatus($index)}}</div>
+                    <div class="bottom">
+                        <p class="budget" ng-if="item.status!==2">
+                            预算：<span ng-if="item.budget>=0">{{item.budget | currency:"￥"}}</span><span ng-if="item.budget<0">暂无</span>
+                        </p>
+                        <p class="points" ng-if="item.status===2">积分：<span>{{item.score}}</span></p>
                     </div>
-                    <div class="right">预算：<span>{{item.budget | currency:"￥"}}</span></div>
                 </div>
             </li>
             <ul class="complete" ng-if="item.status===2">
                 <li>
                     <span class="number">{{item.budget | currency:"￥"}}</span><br/>
-                    <span class="name">预算</span>
+                    <span class="name" style="color:#9B9B9B">预算</span>
+                    <div class="bar"></div>
                 </li>
                 <li>
                     <span class="number">{{item.expenditure | currency:"￥"}}</span><br/>
-                    <span class="name">实际</span>
+                    <span class="name" style="color:#9B9B9B">实际</span>
+                    <div class="bar"></div>
                 </li>
                 <li ng-class="{true:'withBalance',false:'withDeficit'}[withBalance]">
                     <span class="number">{{renderBalance($index) | currency:"￥"}}</span><br/>

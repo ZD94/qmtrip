@@ -16,6 +16,22 @@
         </table>
     </section>
 
+    <section class="creating budgetFail" style="display:none">
+        <table width="100%">
+            <tr>
+                <td height="50" class="loadtxt" style="border-bottom: 1px #E5E5E5 solid;">
+                    <p>今天 {{nowtime | date: 'HH:mm'}}</p>
+                    <p><span ng-if="starttime!=undefined">您计划&nbsp;&nbsp;&nbsp;{{starttime}}&nbsp;&nbsp;&nbsp;{{startplace}}-{{endplace}}&nbsp;&nbsp;&nbsp;</span><span ng-if="starttimelate!=undefined && starttimelate!=''">最晚{{starttime}} {{starttimelate}}到达</span></p>
+                    <p ng-if="endtime!='' && endtime!=undefined">　　　&nbsp;&nbsp;&nbsp;{{endtime}}&nbsp;&nbsp;&nbsp;{{endplace}}-{{startplace}}&nbsp;&nbsp;&nbsp;<span ng-if="endtimelate!=undefined && endtimelate!=''">最晚{{endtime}} {{endtimelate}}到达</span></p>
+                    <p><span ng-if="liveplace!=undefined"><span ng-if="starttime==undefined">您计划</span><span ng-if="starttime!=undefined">　　　</span>&nbsp;&nbsp;&nbsp;在{{liveplace}}附近酒店入住&nbsp;&nbsp;&nbsp;</span><span ng-if="livetime!=undefined">计划住店时间为{{livetime}}到{{leavetime}}</span></p>
+                </td>
+            </tr>
+            <tr>
+                <td align="center" style="padding-top: 30px;font-size: 18px;"><span style="color:red;">预算生成失败</span>&nbsp;&nbsp;<a href="#/businessTravel/Index">重新生成</a></td>
+            </tr>
+        </table>
+    </section>
+
     <section class="createresult">
         <div class="top">本次出差预算：
             <span class="createtime" ng-bind-html="createTime | date:'yyyy-MM-dd'" style="position: absolute; left: 20px;"></span>

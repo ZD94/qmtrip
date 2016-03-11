@@ -177,7 +177,7 @@ auth.registryCompany = function(params) {
         .then(function(account) {
             var agencyId = params.agencyId;
             if(!agencyId){
-                agencyId = '00000000-0000-0000-0000-000000000001';
+                agencyId = API.agency.__defaultAgencyId;
             }
             return API.company.createCompany({id: companyId, agencyId: agencyId, createUser: account.id, name: companyName, domainName: domain,
                 mobile:mobile, email: email})
