@@ -142,6 +142,7 @@ travelBudget.getHotelBudget = function(params) {
     }
 
     var policy;
+    var hotelStar;
     //查询员工信息
     return API.staff.getStaff({id: accountId})
         .then(function(staff) {
@@ -156,7 +157,7 @@ travelBudget.getHotelBudget = function(params) {
                 throw L.ERR.TRAVEL_POLICY_NOT_EXIST;
             }
             policy = travelPolicy;
-            var hotelStar = 3;
+            hotelStar = 3;
             if (/二星级/g.test(travelPolicy.hotelLevel)) {
                 hotelStar = 2;
             }
@@ -185,17 +186,53 @@ travelBudget.getHotelBudget = function(params) {
         })
         .then(function(result) {
             //如果没有查询到结果,直接扔回最大金额
+            var days = moment(checkOutDate).diff(checkInDate, 'days');
             if (!result.price || result.price <=0) {
-                var days = moment(checkOutDate).diff(checkInDate, 'days');
                 days = days<=0?1:days;
                 if (policy.hotelPrice) {
                     return {price: policy.hotelPrice * days};
                 } else {
                     return {price: _getDefaultPrice(hotelStar) * days};
                 }
+            } else if (result.price > policy.hotelPrice) {
+                return {price: policy.hotelPrice * days};
+            } else {
+                return result;
             }
             return result;
         });
+}
+
+travelBudget.getBookUrl = function(params) {
+    var spval = params.spval,
+        epval = params.epval,
+        st = params.st,
+        et = params.et,
+        url = "";
+    if(!st || st == "" ){
+        throw {code:-1, msg:"出发时间不能为空"};
+    }
+    return Q.all([
+        API.place.getCityInfo(spval),
+        API.place.getCityInfo(epval)
+    ])
+        .spread(function(startPlace, endPlace){
+            var scode = "",
+                ecode = "";
+            if(startPlace && startPlace.skyCode){
+                scode = startPlace.skyCode.split("-")[0].toLowerCase();
+            }
+            if(endPlace && endPlace.skyCode){
+                ecode = endPlace.skyCode.split("-")[0].toLowerCase();
+            }
+            if(et && et != ""){
+                url = "http://www.tianxun.com/round-"+ scode +"-"+ ecode +".html?depdate="+st+"&rtndate="+et+"&cabin=Economy";
+            }else{
+                url = "http://www.tianxun.com/oneway-"+ scode +"-"+ ecode +".html?depdate="+st+"&cabin=Economy";
+            }
+            return url;
+        })
+
 }
 
 /**

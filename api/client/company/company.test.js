@@ -3,7 +3,6 @@
  */
 var assert = require("assert");
 var API = require("common/api");
-var Q = require("q");
 
 describe("api/client/company.js", function() {
     //var agencyId = "";
@@ -56,7 +55,7 @@ describe("api/client/company.js", function() {
 
         describe("createCompany", function(){
             before(function(done){
-                Q.all([
+                Promise.all([
                     API.company.deleteCompanyByTest({mobile: company.mobile, email: company.email}),
                     API.staff.deleteAllStaffByTest({mobile: company.mobile, email: company.email})
                 ])
@@ -72,7 +71,7 @@ describe("api/client/company.js", function() {
             })
 
             after(function(done){
-                Q.all([
+                Promise.all([
                     API.company.deleteCompanyByTest({mobile: company.mobile}),
                     API.staff.deleteAllStaffByTest({companyId: companyId, mobile: company.mobile, email: company.email})
                 ])
@@ -104,7 +103,7 @@ describe("api/client/company.js", function() {
             before(function(done){
                 company.mobile = '15269866812';
                 company.email = 'company.test@tulingdao.com';
-                Q.all([
+                Promise.all([
                     API.company.deleteCompanyByTest({mobile: company.mobile, email: company.email}),
                     API.staff.deleteAllStaffByTest({mobile: company.mobile, email: company.email})
                 ])
@@ -123,7 +122,7 @@ describe("api/client/company.js", function() {
             });
 
             after(function(done){
-                Q.all([
+                Promise.all([
                     API.company.deleteCompanyByTest({mobile: company.mobile, email: company.email}),
                     API.staff.deleteAllStaffByTest({companyId: companyId, mobile: company.mobile, email: company.email})
                 ])

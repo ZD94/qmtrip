@@ -25,7 +25,7 @@ module.exports = (function(){
                 return;
             API.auth.logout()
                 .done(function() {
-                    window.location.href = "/staff.html#/auth/login";
+                    window.location.href = "#/login/login";
                 })
             };
         })

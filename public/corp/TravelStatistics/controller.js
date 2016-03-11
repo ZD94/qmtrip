@@ -184,6 +184,7 @@ var TravelStatistics = (function(){
                         //     console.info('step1=>',s.auditStatus);
                         // })
                         $scope.planlist = list.items;
+                        console.log( $scope.planlist );
                         var planlist = list.items;
                         $scope.total = list.total;
                         planlist = planlist.map(function(plan){

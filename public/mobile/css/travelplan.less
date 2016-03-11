@@ -1,0 +1,287 @@
+@import "common.less";
+
+.plan_list {
+  width: 100%;
+  height: auto;
+  .list_tab {
+    position: relative;
+    width: 100%;
+    height: 4.5rem;
+    z-index:1;
+    .line {
+      width: 1px;
+      height: 2rem;
+      background: @color-theme3;
+      position: absolute;
+      left: 50%;
+      top: 1.2rem;
+    }
+    .dropdown {
+      width: 50%;
+      height: 4.5rem;
+      float: left;
+      .dropdown-header {
+        height: 4.5rem;
+        line-height: 4.5rem;
+        font-size: 1.6rem;
+        text-align: center;
+        color: @color-theme3;
+        background: @color-theme1;
+      }
+      .dropdown-menu {display:none;
+        li {
+          height: 4.2rem;
+          line-height: 4.2rem;
+          text-align: center;
+          border-bottom: 1px @border-color solid;
+          background: @color-theme3;
+        }
+      }
+    }
+  }
+  .list_content {
+    position:relative;
+    width: 100%;
+    height: auto;
+    .veil {
+      position:absolute;
+      width:100%;
+      height:1000px;
+      background:black;
+      opacity:0.8;
+      display:none;
+    }
+    .item {
+      .item-main{
+        background: @color-theme3;
+        padding: 0 1rem;
+        .list_top {
+          height: 4.5rem;
+          line-height: 4.5rem;
+          overflow: hidden;
+          .left {
+            font-size: 1.6rem;
+            float: left;
+            span {
+              font-size: 2rem;
+              color: #A3A3A3;
+              padding: 0.5rem;
+            }
+          }
+          .right {
+            float: right;
+          }
+        }
+        .list_bottom {
+          height: 4.8rem;
+          color: #A3A3A3;
+          overflow: hidden;
+          .left {
+            line-height: 2.2rem;
+            float: left;
+            .projectName {width:250px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+          }
+          .right {
+            line-height: 4.8rem;
+            color: #EBBC18;
+            float: right;
+            span {
+              font-size: 1.8rem;
+            }
+          }
+        }
+      }
+      .complete {padding:1rem;border-top:2px solid red;background:white;overflow:hidden;
+        li {float:left;width:33.333333%;text-align:center;
+          .number {font-size:2rem;}
+          .name {}
+          .name.withDeficit {color:#F23B3B!important}
+        }
+        .withBalance {color:@color-theme1!important}
+        .withDeficit {color:#F23B3B!important}
+      }
+    }
+    .tips {padding:15px 0 15px 0;text-align:center;
+      .noRecord {padding:30px 0 30px 0;color:#4A4A4A;font-size:36px;}
+      .seeOtherRecords {color:#9B9B9B;font-size:28px;}
+    }
+  }
+}
+.plan_detail {
+  width: 100%;
+  height: auto;
+  padding-bottom: 5rem;
+  .result_content {
+    height: auto;
+    color: @color-theme3;
+    padding-bottom: 1rem;
+    background: -webkit-linear-gradient(#2190E5, #64BBFF);
+    background: -o-linear-gradient(#2190E5, #64BBFF);
+    background: -moz-linear-gradient(#2190E5, #64BBFF);
+    background: linear-gradient(#2190E5, #64BBFF);
+    .result_time {
+      height: 3rem;
+      line-height: 3rem;
+    }
+    .result_money {
+      height: 4.8rem;
+      line-height: 4.8rem;
+      text-align: center;
+      font-size: 3.2rem;
+    }
+    .result_text {
+      height: auto;
+      text-align: center;
+    }
+  }
+  .money_points {
+    height: 5rem;
+    line-height: 2rem;
+    background: @color-theme3;
+    padding: 0.5rem 0;
+    position: relative;
+    .line1 {
+      width: 1px;
+      height: 1.5rem;
+      border: 1px @border-color solid;
+      position: absolute;
+      left: 33%;
+      top: 1.7rem;
+    }
+    .line2 {
+      width: 1px;
+      height: 1.5rem;
+      border: 1px @border-color solid;
+      position: absolute;
+      right: 33%;
+      top: 1.7rem;
+    }
+    dd {
+      font-size: 1.6rem;
+      text-align: center;
+      span {
+        color: @color-theme2;
+      }
+    }
+  }
+  .purpose_name {
+    height: auto;
+    line-height: 2.2rem;
+    color: @default-text-color;
+    background: #F1F1F1;
+    padding: 1rem;
+  }
+  .result_list {
+    height: auto;
+    li {
+      border-bottom: 1px @border-color solid;
+      background: @color-theme3;
+      padding: 1rem;
+      padding-bottom: 0;
+      margin-bottom: 1rem;
+      .list_top {
+        height: 2.5rem;
+        line-height: 2.5rem;
+        overflow: hidden;
+        .icon {
+          width: 2.5rem;
+          height: auto;
+          font-size: 2rem;
+          color: #C8C8C8;
+          float: left;
+        }
+        .description {
+          height: auto;
+          font-size: 1.6rem;
+          float: left;
+          span {
+            color: @color-theme1;
+            padding: 0 0.5rem;
+          }
+        }
+      }
+      .list_center {
+        height: 2.5rem;
+        line-height: 2.5rem;
+        overflow: hidden;
+        .time {
+          width: 20rem;
+          height: auto;
+          color: #A3A3A3;
+          float: left;
+        }
+        .money {
+          height: auto;
+          float: right;
+        }
+      }
+      .list_bottom {
+        height: 4.3rem;
+        border-top: 1px @border-color solid;
+        .status {
+          height: 4.3rem;
+          line-height: 4.3rem;
+          float: left;
+        }
+        .smallbtn {
+          width: 7.2rem;
+          height: 2.5rem;
+          border: 1px @border-color solid;
+          border-radius: 0.2rem;
+          background: @color-theme3;
+          margin: 0.9rem 0 0 1rem;
+          float: right;
+        }
+      }
+    }
+  }
+}
+.invoice{
+  .i_detail{
+    height: 2.5rem;
+    line-height: 2.5rem;
+    .i_type{
+      font-size: 1.6rem;
+      .web-icon-font3{
+        color: #9b9b9b;
+        padding-right: 0.5rem;
+        float: left;
+        font-size: 2rem;
+      }
+      .i_typedetail{
+        float: left;
+        .out_img{
+          background: url(../images/out_traffic.png) no-repeat;
+          background-size: 2.5rem;
+          display: inline-block;
+          height: 1.1rem;
+          width: 2.5rem;
+          margin: 0 0.5rem;
+        }
+        .back_img{
+          background: url(../images/back_traffic.png) no-repeat;
+          background-size: 2.5rem;
+          display: inline-block;
+          height: 1.1rem;
+          width: 2.5rem;
+          margin: 0 0.5rem;
+        }
+      }
+    }
+  }
+  .i_box{
+    height: 2.5rem;
+    line-height: 2.5rem;
+    padding-left: 0.5rem;
+    background:#fff;
+    .i_status{
+      float: right;
+      padding-right: 1rem;
+    }
+  }
+  .i_images{
+    img{
+      width: 100%;
+    }
+  }
+}

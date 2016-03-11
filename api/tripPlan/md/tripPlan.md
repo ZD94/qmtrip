@@ -222,7 +222,7 @@
 |ret.expenditure |实际支出   | number  |
 |ret.NumOfStaff   |完成出差人次数 | number    |
 
->. 获取企业所有项目列表 API.tripPlan.getProjectsList(callback);
+>. 获取企业所有项目列表 API.tripPlan.getProjectList(callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -243,3 +243,32 @@
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
 |ret  |true或者是错误信息
+
+
+>. 检测出差计划预算是否存在 API.tripPlan.checkBudgetExist(params, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                                | 传入参数             |json              |------
+| params.companyId                    |企业id              |uuid　         |必填
+| params.startPlace              | 出发地           |varchar               |必填
+| params.destination              | 目的地           |varchar               |必填
+| params.startAt              | 开始时间           |date               |必填
+| params.backAt              | 返回时间           |date               |
+| params.isNeedTraffic              | 是否需要交通服务           |boolean               |
+| params.isNeedHotel              | 是否需要酒店服务           |boolean               |
+| params.consumeDetails[]          |消费支出详情（交通/酒店）       |Array(json)         |如果有该字段，下面列出的必填字段不可少
+| params.consumeDetails[N].type        |消费支出类型 -1：去程交通 0：酒店 1：回程交通      |integer      |必填
+| params.consumeDetails[N].startPlace        |出发地，交通消费需要      |varchar |
+| params.consumeDetails[N].arrivalPlace        |目的地，交通消费需要       |varchar  |
+| params.consumeDetails[N].city        |酒店所在地，酒店消费需要      |varchar   |
+| params.consumeDetails[N].hotelName        |酒店名称，酒店消费需要      |varchar  |
+| params.consumeDetails[N].startTime        |开始时间         |date   |必填
+| params.consumeDetails[N].endTime        |结束时间    |date   |
+| params.consumeDetails[N].latestArriveTime  |最晚到达时间  |date |
+| params.consumeDetails[N].invoiceType        |票据类型 1：机票 2：酒店发票      |integer    |
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+| orderId 或者 false    | 如果计划单存在返回计划单id，不存在则返回false | 出现异常返回错误信息 {code: error_code, msg: error_msg } |

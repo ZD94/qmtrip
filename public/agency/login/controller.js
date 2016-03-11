@@ -8,7 +8,7 @@ var login=(function(){
 
     login.LoginController = function ($scope, $routeParams) {
 
-        var backUrl = $routeParams.backurl || "#/";
+        var backUrl = $routeParams.backurl || "#";
         $scope.checkLogin = function() {
             var name = $('#agencyName').val();
             var pwd  = $('#agencyPwd').val();

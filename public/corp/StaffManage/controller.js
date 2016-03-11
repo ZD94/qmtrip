@@ -55,7 +55,7 @@ var staff = (function(){
                             API.travelPolicy.getAllTravelPolicy({where: {companyId:staff.companyId}}),//获取当前所有的差旅标准名称
                             API.department.getAllDepartment(),//获取当前企业所有的部门
                             API.staff.listAndPaginateStaff(params),//加载所有的员工记录
-                            API.staff.statisticStaffsRole({companyId:staff.companyId}),//统计企业员工（管理员 普通员工 未激活员工 总数）数量
+                            API.staff.statisticStaffsRole({companyId:staff.companyId})//统计企业员工（管理员 普通员工 未激活员工 总数）数量
 //                            API.staff.getDistinctDepartment({companyId:staff.companyId})//通过员工companyNamr获得企业部门
                         ])
                             .spread(function(travelPolicies, departments, staffinfo, staffRole){

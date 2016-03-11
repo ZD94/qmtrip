@@ -34,6 +34,7 @@ CREATE TABLE trip_plan_order (
     is_commit boolean default false,
     start_place character varying,
     destination character varying,
+    project_id uuid,
     start_at timestamp without time zone,
     back_at timestamp without time zone,
     is_need_traffic boolean default false,
@@ -419,6 +420,20 @@ COMMENT ON COLUMN tripplan.consume_details_logs.status IS '审批状态';
 COMMENT ON COLUMN tripplan.consume_details_logs.remark IS '备注';
 COMMENT ON COLUMN tripplan.consume_details_logs.create_at IS '记录时间';
 
+
+CREATE TABLE tripplan.projects(
+    id uuid primary key,
+    company_id uuid,
+    code character varying,
+    name character varying,
+    create_user uuid,
+    create_at timestamp without time zone
+);
+
+COMMENT ON TABLE tripplan.projects IS '项目列表';
+COMMENT ON COLUMN tripplan.projects.company_id IS '企业id';
+COMMENT ON COLUMN tripplan.projects.code IS '项目代码';
+COMMENT ON COLUMN tripplan.projects.name IS '项目名称';
 
 -- Completed on 2015-12-09 11:37:14 CST
 

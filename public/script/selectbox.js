@@ -22,3 +22,47 @@ function Myselect () {
 		$(this).parent().siblings(".common_select").attr('selectValue',value);
 	});
 }
+
+
+function selectPage (el , content , options) {
+
+	$('.select_page').remove();
+
+	var el = $(el);
+
+	var str = "";
+	str += "<dl class='select_page'>";
+	str += "<div class='select_input'><input type='text' class='common_text w100 select_input1' placeholder="+options.placeholder+"></div>";
+	str += "<dt>"+options.title+"</dt>";
+
+	for (i=0;i<options.limit;i++) {
+		if (content[i].name == undefined) {
+			break;
+		}
+		str += "<dd code='"+content[i].id+"'>"+content[i].name+"</dd>";
+	}
+
+	str += "</dl>";
+
+	$('#angular-view').append(str);
+
+	if (options.showDefault == true) {
+		$('.select_page dt,.select_page dd').show();
+	}
+	else if (options.showDefault == false) {
+		$('.select_page dt,.select_page dd').hide();
+	}
+
+
+	var key,id;
+
+	$('.select_page dd').click(function(){
+		key = $(this).html();
+		id = $(this).attr('code');
+		el.html(key);
+		el.attr("code",id);
+		console.info (el.attr("code"));
+		$('.select_page').remove();
+	});
+
+}

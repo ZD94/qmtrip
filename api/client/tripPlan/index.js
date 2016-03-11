@@ -3,7 +3,6 @@
  */
 "use strict";
 var API = require("common/api");
-var Q = require("q");
 var L = require("common/language");
 var _ = require('lodash');
 var moment = require('moment');
@@ -31,7 +30,7 @@ tripPlan.savePlanOrder = function (params) {
             staffName = staff.name;
             params.companyId = staff.companyId;
 
-            return Q.all([
+            return Promise.all([
                 API.tripPlan.savePlanOrder(params),
                 API.staff.findStaffs({companyId: staff.companyId, roleId: {$ne: 1}, columns: ['id', 'name','email']})
             ])
@@ -95,11 +94,20 @@ tripPlan.savePlanOrder = function (params) {
                                 detailUrl: url
                             }
 
-                            return API.mail.sendMailRequest({
-                                toEmails: s.email, //'miao.yu@tulingdao.com',
-                                templateName: 'qm_notify_new_travelbudget',
-                                values: vals
-                            })
+                            var log = {
+                                userId: accountId,
+                                orderId: order.id,
+                                remark: order.orderNo + '给企业管理员' + s.name + '发送邮件'
+                            };
+
+                            return Promise.all([
+                                API.mail.sendMailRequest({
+                                    toEmails: s.email, //'miao.yu@tulingdao.com',
+                                    templateName: 'qm_notify_new_travelbudget',
+                                    values: vals
+                                }),
+                                API.tripPlan.saveTripPlanLog(log)
+                            ])
                         }
                     })
             })
@@ -132,7 +140,7 @@ tripPlan.getTripPlanOrderById = function (orderId) {
         userId: accountId
     }
 
-    return Q.all([
+    return Promise.all([
         API.tripPlan.getTripPlanOrder(params),
         API.staff.getStaff({id: accountId, columns: ['companyId']})
     ])
@@ -195,11 +203,18 @@ tripPlan.pageTripPlanOrder = function (params) {
     var accountId = self.accountId;
 
     //params.status = {$gte: -1};
-    //if (params.isUpload === true) {
-    //    params.status = {$gt: 0}
-    //} else if (params.isUpload === false) {
-    //    params.status = {$in: [-1, 0]};
-    //}
+    if (params.isComplete === false) {
+        params.status = {$gte: -1};
+    }else if(params.isComplete == true) {
+        params.status = 2;
+        params.auditStatus = 1;
+    }
+
+    if (params.isUpload === true) {
+        params.status = {$gt: 0}
+    } else if (params.isUpload === false) {
+        params.status = {$in: [-1, 0]};
+    }
 
     if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
         var audit = params.audit;
@@ -355,7 +370,7 @@ tripPlan.deleteConsumeDetail = function (id) {
 tripPlan.uploadInvoice = function (params) {
     var self = this;
     params.userId = self.accountId;
-    return API.tripPlan.uploadInvoice(params);
+    return API.tripPlan.uploadInvoice(params)
 }
 
 /**
@@ -384,6 +399,21 @@ tripPlan.statPlanOrderMoneyByCompany = function (params) {
     return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
         .then(function (staff) {
             params.companyId = staff.companyId;
+            return API.tripPlan.statPlanOrderMoney(params);
+        })
+}
+
+/**
+ * @method statPlanOrderMoneyByCompany 统计计划单的动态预算/计划金额和实际支出
+ * @param params
+ */
+tripPlan.statPlanOrderMoney = function (params) {
+    var self = this;
+    var params = _.pick(params, ['startTime', 'endTime']);
+    return API.staff.getStaff({id: self.accountId, columns: ['id', 'companyId']})
+        .then(function (staff) {
+            params.companyId = staff.companyId;
+            params.accountid = staff.id;
             return API.tripPlan.statPlanOrderMoney(params);
         })
 }
@@ -467,6 +497,38 @@ function statStaffsByCity(params) {
                 ret[cityCode].push(order);
             }
             return ret;
+        })
+}
+
+/**
+ * 判断用户是否已经生成改预算
+ * @param params
+ * @returns {*}
+ */
+tripPlan.checkBudgetExist = function(params) {
+    var self = this;
+    var accountId = self.accountId;
+    params.accountId = accountId;
+
+    return API.staff.getStaff({id: accountId, columns: ['companyId']})
+        .then(function (staff) {
+            params.companyId = staff.companyId;
+
+            return API.tripPlan.checkBudgetExist(params)
+        })
+}
+
+/**
+ * 获取项目名称列表
+ * @param params
+ * @returns {*}
+ */
+tripPlan.getProjectList = function(params) {
+    var self = this;
+    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
+        .then(function(staff) {
+            params.companyId = staff.companyId;
+            return API.tripPlan.getProjectList(params);
         })
 }
 
