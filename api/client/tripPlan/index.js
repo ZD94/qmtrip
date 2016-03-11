@@ -413,7 +413,7 @@ tripPlan.statPlanOrderMoney = function (params) {
     return API.staff.getStaff({id: self.accountId, columns: ['id', 'companyId']})
         .then(function (staff) {
             params.companyId = staff.companyId;
-            params.accountid = staff.id;
+            params.accountId = staff.id;
             return API.tripPlan.statPlanOrderMoney(params);
         })
 }
