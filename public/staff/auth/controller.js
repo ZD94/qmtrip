@@ -7,16 +7,6 @@ var auth=(function(){
     var Cookie = require('tiny-cookie');
     //登录页面
     auth.LoginController = function ($scope, $routeParams) {
-        //function err_attention(id,err,errforh){
-        //    $scope.errforh = err;
-        //    $('#'+id).siblings(".err_msg").children("i").html("&#xf06a;");
-        //    $('#'+id).siblings(".err_msg").children("i").removeClass("right");
-        //    $('#'+id).siblings(".err_msg").show();
-        //    console.info("$$$$$$$$$$$$");
-        //    return false;
-        //}
-        //err_attention(email,'邮箱不能为空',err_msg_mail);
-        //console.info(err_attention())
         var mail = Cookie.get("email");
         var pwd = Cookie.get("pwd");
         $scope.email = mail;
@@ -128,7 +118,6 @@ var auth=(function(){
     //注册页面
     auth.RegisterController = function($scope) {
         var pCode = $('#picCode').val();
-
         //对企业名称进行判断
         $("#corpName").blur(function(){
             var cName  = $('#corpName').val();
@@ -397,7 +386,7 @@ var auth=(function(){
                     } else {
                         //alert("邮箱不合法");
                         $scope.err_msg_mail = "邮箱格式不正确";
-                        //console.info(456);
+                        console.info(456);
                         $("#corpMail").siblings(".err_msg").children("a").html("");
                         $("#corpMail").siblings(".err_msg").children("i").html("&#xf057;");
                         $("#corpMail").siblings(".err_msg").children("i").removeClass("right");

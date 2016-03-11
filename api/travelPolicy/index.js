@@ -39,7 +39,7 @@ travelPolicy.deleteTravelPolicy = function(params){
     if (!id) {
         throw {code: -1, msg: "id不能为空"};
     }
-    return API.staff.findStaffs({travelLevel: id})
+    return API.staff.findStaffs({travelLevel: id, status: 0})
         .then(function(staffs){
             if(staffs && staffs.length > 0){
                 throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准 暂不能删除，给这些员工匹配新的差旅标准后再进行操作'};
