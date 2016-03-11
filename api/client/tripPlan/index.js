@@ -204,7 +204,7 @@ tripPlan.pageTripPlanOrder = function (params) {
 
     //params.status = {$gte: -1};
     if (params.isComplete === false) {
-        params.status = {$gte: -1};
+        params.status = {$gte: -1, $lte: 1};
     }else if(params.isComplete == true) {
         params.status = 2;
         params.auditStatus = 1;
@@ -413,7 +413,7 @@ tripPlan.statPlanOrderMoney = function (params) {
     return API.staff.getStaff({id: self.accountId, columns: ['id', 'companyId']})
         .then(function (staff) {
             params.companyId = staff.companyId;
-            params.accountid = staff.id;
+            params.accountId = staff.id;
             return API.tripPlan.statPlanOrderMoney(params);
         })
 }
