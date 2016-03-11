@@ -1089,6 +1089,10 @@ authServer.__initHttpApp = function(app) {
                     res.cookie("token_sign", ret.token_sign);
 
                     var redirectUrl = decodeURIComponent(backUrl);
+                    logger.error(redirectUrl);
+                    if(!redirectUrl.match(/^http:\/\/.*\?.*/)) {
+                        redirectUrl = redirectUrl.replace(/&/, '?');
+                    }
                     res.redirect(redirectUrl);
                 }
             })
