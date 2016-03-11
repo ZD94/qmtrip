@@ -142,6 +142,7 @@ travelBudget.getHotelBudget = function(params) {
     }
 
     var policy;
+    var hotelStar;
     //查询员工信息
     return API.staff.getStaff({id: accountId})
         .then(function(staff) {
@@ -156,7 +157,7 @@ travelBudget.getHotelBudget = function(params) {
                 throw L.ERR.TRAVEL_POLICY_NOT_EXIST;
             }
             policy = travelPolicy;
-            var hotelStar = 3;
+            hotelStar = 3;
             if (/二星级/g.test(travelPolicy.hotelLevel)) {
                 hotelStar = 2;
             }
