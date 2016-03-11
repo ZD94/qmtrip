@@ -1049,6 +1049,7 @@ authServer.__initHttpApp = function(app) {
             })
     });
 
+    //微信自动登陆
     app.all("/auth/get_access_code", function(req, res, next) {
         var query = req.query;
         var code = query.code;
@@ -1091,7 +1092,6 @@ authServer.__initHttpApp = function(app) {
                     res.cookie("token_sign", ret.token_sign);
 
                     var redirectUrl = decodeURIComponent(backUrl);
-                    logger.error(redirectUrl);
                     if(!redirectUrl.match(/^http:\/\/.*\?.*/)) {
                         redirectUrl = redirectUrl.replace(/&/, '?');
                     }

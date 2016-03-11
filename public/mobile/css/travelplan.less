@@ -58,47 +58,65 @@
     }
     .item {
       .item-main{
-        padding: 0 1rem;background: @color-theme3;
-        .item-top {
-          height: 4.5rem;
-          line-height: 4.5rem;
-          overflow: hidden;
-          .left {
-            float: left;
-            width:70%;
-            font-size: 1.6rem;
+        padding: 1rem;
+        background: @color-theme3;
+        overflow:hidden;
+        .item-left{
+          float:left;
+          width:60%;
+          .top{
+            height:2rem;
+            line-height:2rem;
+            margin-bottom:1rem;
+            overflow:hidden;
+            white-space:nowrap;
+            text-overflow:ellipsis;
+            span{
+              font-size:2rem;
+              color:#4A4A4A;
+            }
             .icon {
-              font-size: 2rem;
-              color: #A3A3A3;
-              padding: 0.5rem;
+              color:#C5C5C5;
             }
           }
-          .right {
-            width:30%;
-            float: right;
-            text-align:right;
+          .bottom{
+            height:4.8rem;
+            line-height:2.4rem;
+            p{
+              font-size:1.6rem;
+              color:#9B9B9B;
+              overflow:hidden;
+              white-space:nowrap;
+              text-overflow:ellipsis;
+            }
           }
         }
-        .item-bottom {
-          height: 4.8rem;
-          color: #A3A3A3;
-          overflow: hidden;
-          .left {
-            line-height: 2.2rem;
-            float: left;
-            .projectName {width:250px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+        .item-right{
+          float:left;
+          width:40%;
+          text-align:right;
+          .top{
+            height:2rem;
+            line-height:2rem;
+            font-size:1.6rem;
+            margin-bottom:1rem;
           }
-          .right {
-            float: right;
-            .budget {
-              line-height: 4.8rem;
-              color: #EBBC18;
-              span {
-                font-size: 1.8rem;
+          .bottom{
+            position:relative;
+            height:4.8rem;
+            line-height:2.4rem;
+            .budget{
+              color:#EBBC18;
+              font-size:1.6rem;
+              span{
+                font-size:2rem;
               }
             }
-            .poingts {line-height:4.8rem;color:black;
-              span {font-size:1.8rem;}
+            .points{
+              font-size:1.6rem;
+              span{
+                font-size:2rem;
+              }
             }
           }
         }

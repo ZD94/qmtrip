@@ -47,6 +47,7 @@ var travelplan=(function(){
             $(".veil").show();
             $("body").css({overflow:"hidden"});
             $(this).siblings(".dropdown-menu").slideDown();
+            $(this).parent(".dropdown").siblings(".dropdown").find(".dropdown-menu").hide();
         }
         $scope.quitSelectingMode=function(){//退出“选择模式”
             $(".veil").hide();
