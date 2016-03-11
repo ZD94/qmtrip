@@ -214,7 +214,7 @@ var TravelPolicy=(function(){
             else if (index == 15) {
                 $(".update_policy").css({'top':'1550px','left':'505px'});
             }
-            var obj = {0:"全价",8:"最高8折",7:"最高7折",6:"最高6折",5:"最高5折",4:"最高4折"};
+            var obj = {0:"全价",9:"最高9折",8:"最高8折",7:"最高7折",6:"最高6折",5:"最高5折",4:"最高4折"};
             var discountTxt = $scope.PolicyList[index].planeDiscount;
             $(".update_policy .Cname").val($scope.PolicyList[index].name);
             $(".update_policy .CplaneLevel").html($scope.PolicyList[index].planeLevel);
