@@ -10,7 +10,7 @@ module.exports = (function() {
     var user = {};
 
     user.IndexController = function($scope) {
-
+        $scope.$root.pageTitle = '全麦商旅';
         $scope.initStaffUser = function(){
             API.onload(function(){
                 API.staff.getCurrentStaff()
@@ -106,16 +106,14 @@ module.exports = (function() {
     }
 
     user.TravelpolicyController = function($scope,$routeParams) {
-        console.info(111);
+        $scope.$root.pageTitle = '差旅标准';
         loading(true);
         var travelId = $routeParams.travelId;
-        console.info(travelId);
         API.onload(function(){
             API.staff.getCurrentStaff()
                 .then(function(){
                     API.travelPolicy.getCurrentStaffTp()
                         .then(function(travelPolicy){
-                            console.info(travelPolicy);
                             $scope.travelpolicy = travelPolicy;
                             $scope.$apply();
                         })
