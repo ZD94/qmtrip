@@ -44,6 +44,7 @@ var TravelPolicy=(function(){
                         $scope.PolicyTotal = result.total;
                         $scope.PolicyList = result.items;
                         if ($scope.PolicyTotal==0) {
+                            $scope.resetting();
                             $(".create_policy").show();
                         }
                         $(window).scroll(function() {
