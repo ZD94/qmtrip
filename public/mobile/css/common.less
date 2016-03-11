@@ -52,6 +52,14 @@ img { display: block;}
   }
   /*宽度小于768px,默认1rem=10像素*/
 }
+@media (max-width: 320px) {
+  html,body{
+    font-size: 50%;
+    color: @default-text-color;
+    background: @background-color-default;
+  }
+  /*宽度小于320px,默认1rem=8像素*/
+}
 @media (min-width: 768px) {
   html,body {
     font-size: 87.5%;
