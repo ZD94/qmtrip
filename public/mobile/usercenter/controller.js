@@ -10,7 +10,7 @@ module.exports = (function() {
     var user = {};
 
     user.IndexController = function($scope) {
-        $scope.$root.pageTitle = '全麦商旅';
+        $scope.$root.pageTitle = '个人中心';
 
         $scope.initStaffUser = function(){
             API.onload(function(){
