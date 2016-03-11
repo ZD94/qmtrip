@@ -27,6 +27,9 @@
                     $('#login').attr('disabled',false).addClass('blue_bc');
                 }
             }
+        }).blur(function(){
+            $('.common_text>i').removeClass('blue');
+            $('.common_text>span').hide();
         })
     })
     function checkAccount(){
