@@ -37,7 +37,7 @@ var travelplan=(function(){
                 if( $routeParams.status==="待上传票据" ){
                     return {page:1,status:0};
                 }else
-                if( $routeParams.status==="审核不通过" ){
+                if( $routeParams.status==="审核未通过" ){
                     return {page:1,status:1,isCommit:true,auditStatus:-1};
                 };
             }else{
