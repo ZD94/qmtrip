@@ -251,6 +251,10 @@ tripPlan.pageTripPlanOrder = function (params) {
                 offset: perPage * (page - 1)
             }
 
+            if(params.order) {
+                options.order = [params.order];
+            }
+
             return API.tripPlan.listTripPlanOrder(options);
         })
 }
