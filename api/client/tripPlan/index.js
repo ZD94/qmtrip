@@ -299,7 +299,7 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
     page = typeof page == 'number' ? page : 1;
     perPage = typeof perPage == 'number' ? perPage : 10;
     var query = _.pick(params,
-        ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure']);
+        ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
 
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {

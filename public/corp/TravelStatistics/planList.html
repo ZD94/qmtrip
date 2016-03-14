@@ -21,7 +21,13 @@
             <div class="search">
                 <ul>
                     <li>出发时间：<input type="text" id="start_time" ng-model="start_time" placeholder="请选择时间">&nbsp;-<input type="text" id="end_time" ng-model="end_time" placeholder="请选择时间"></li>
-                    <li></li>
+                    <li>关联：<span class="purposstype">全部</span><input type="text" ng-model="purposename" placeholder="请选择具体项目/会议" ng-change="searchPurposeName()" class="purposename">
+                        <ul class="PurposeNamelist">
+                            <div ng-repeat="item in PurposeNameitems" ng-click="choosepPurposeName(item)">{{item}}</div>
+                        </ul>
+                        <input type="text" placeholder="请输入员工姓名或邮箱" ng-model="keyword__">
+                    </li>
+                    <input type="button" value="搜索" class="common_btn1" ng-click="searchKeyword()" style="width:60px;margin-left:10px;">
                     <li></li>
                 </ul>
             </div>
