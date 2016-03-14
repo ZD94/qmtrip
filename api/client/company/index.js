@@ -64,7 +64,8 @@ function createCompany(params){
             return [company, API.staff.createStaff({
                 accountId: account.id, companyId: company.id, email: email,
                 mobile: mobile, name: userName, roleId: 0
-            })];
+            }), API.department.createDepartment({
+                name: "我的企业", isDefault: true, companyId: company.id})];
         })
         .spread(function(company){
             return company;

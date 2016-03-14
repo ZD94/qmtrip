@@ -9,13 +9,13 @@
         <div class="dropdown">
             <div class="dropdown-header">状态：{{STATUS}}<i class="icon web-icon-font">&#xf0d7;</i></div>
             <ul class="dropdown-menu">
-                <li ng-repeat="status in statuses" ng-click="selectStatus($index)">{{status}}</li>
+                <li ng-repeat="status in statuses" ng-click="selectStatus($index)" ng-class="{true:'active'}[(status===STATUS)]">{{status}}</li>
             </ul>
         </div>
         <div class="dropdown">
             <div class="dropdown-header">排序：{{ORDER}}<i class="icon web-icon-font">&#xf0d7;</i></div>
             <ul class="dropdown-menu">
-                <li ng-repeat="order in orders" ng-click="selectOrder($index)">{{order}}</li>
+                <li ng-repeat="order in orders" ng-click="selectOrder($index)" ng-class="{true:'active'}[(order===ORDER)]">{{order}}</li>
             </ul>
         </div>
     </div>
@@ -25,7 +25,9 @@
             <li class="item-main">
                 <div class="item-left w100">
                     <div class="top">
-                        <span ng-if="item.startPlace">{{item.startPlace}}——</span><span>{{item.destination}}</span>
+                        <span class="journey">
+                            <span ng-if="item.startPlace">{{item.startPlace}}——</span><span>{{item.destination}}</span>
+                        </span>
                         <span class="icon web-icon-font3" ng-show="item.outTraffic.length===1">&#xe90e;</span>
                         <span class="icon web-icon-font3" ng-show="item.hotel.length===1">&#xe914;</span>
                     </div>
@@ -41,7 +43,7 @@
                     <div class="top">{{renderItemStatus($index)}}</div>
                     <div class="bottom">
                         <p class="budget" ng-if="item.status!==2">
-                            预算：<span ng-if="item.budget>=0">{{item.budget | currency:"￥"}}</span><span ng-if="item.budget<0">暂无</span>
+                            预算：<span ng-if="item.budget>=0">￥{{item.budget.toFixed(2)}}</span><span ng-if="item.budget<0">暂无</span>
                         </p>
                         <p class="points" ng-if="item.status===2">积分：<span>{{item.score}}</span></p>
                     </div>
@@ -49,17 +51,17 @@
             </li>
             <ul class="complete" ng-if="item.status===2">
                 <li>
-                    <span class="number">{{item.budget | currency:"￥"}}</span><br/>
+                    <span class="number">￥{{item.budget.toFixed(2)}}</span><br/>
                     <span class="name" style="color:#9B9B9B">预算</span>
                     <div class="bar"></div>
                 </li>
                 <li>
-                    <span class="number">{{item.expenditure | currency:"￥"}}</span><br/>
+                    <span class="number">￥{{item.expenditure.toFixed(2)}}</span><br/>
                     <span class="name" style="color:#9B9B9B">实际</span>
                     <div class="bar"></div>
                 </li>
                 <li ng-class="{true:'withBalance',false:'withDeficit'}[withBalance]">
-                    <span class="number">{{renderBalance($index) | currency:"￥"}}</span><br/>
+                    <span class="number">￥{{renderBalance($index).toFixed(2)}}</span><br/>
                     <span class="name">{{renderBalanceOrDeficit($index)}}</span>
                 </li>
             </ul>

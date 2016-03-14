@@ -206,7 +206,7 @@ describe("api/client/tripPlan.js", function() {
             startPlaceCode: 'BJ123',
             destinationCode: 'SH123',
             budget: 1000,
-            startAt: '2015-12-30 11:12:12',
+            startAt: '2015-11-22 11:12:12',
             description: '我要去出差',
             consumeDetails: [{
                 startTime: '2016-12-30 11:11:11',
@@ -437,10 +437,12 @@ describe("api/client/tripPlan.js", function() {
 
             it("#statPlanOrderMoneyByCompany should be ok", function (done) {
                 var self = {accountId: staffId};
+                self = {accountId: "00000000-0000-0000-0000-000000000002"};
                 API.client.tripPlan.statPlanOrderMoneyByCompany.call(self, {startTime: '2016-01-01 00:00:00'}, function (err, ret) {
                     if (err) {
                         throw err;
                     }
+                    console.info(ret);
                     assert(ret != null);
                     assert(ret.qmBudget >= 0);
                     assert(ret.planMoney >= 0);
