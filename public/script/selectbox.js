@@ -29,13 +29,8 @@ function selectPage (options) {
 	var fetchDataFunc = options.fetchDataFunc;	//去那个地址去抓数据
 	var displayNameKey = options.displayNameKey;
 	var valueKey = options.valueKey;
-
-	if (options.showDefault == true) {
-		$('.select_page dt,.select_page dd').show();
-	}
-	else if (options.showDefault == false) {
-		$('.select_page dt,.select_page dd').hide();
-	}
+	var showDefault = options.showDefault;
+	var isAllowAdd = options.isAllowAdd;
 
 	return defaultDataFunc()
 		.then(function() {
@@ -57,6 +52,7 @@ function selectPage (options) {
 
 						$("#select-box-search-input").keyup(function() {
 							var val = $(this).val();
+							console.info (val);
 							if (!val) {
 								defaultDataFunc(val)
 									.then(function(data) {
@@ -77,9 +73,21 @@ function selectPage (options) {
 							fetchDataFunc(val)
 								.then(function (data) {
 									if (data.length==0) {
-										console.info ("没有");
+										if (isAllowAdd == true) {
+											$('.select_page .result_none,.select_page .appendclass,.select_page dd').remove();
+											var strr = "";
+											strr += "<div class='result_none'>匹配无结果</div>";
+											strr += "<dd class='appendclass'><span>+</span> 将&quot;"+val+"&quot;添加为出差目的</dd>";
+											$('.select_page').append(strr);
+										}
+
+										$('.select_page dd').click(function () {
+											$('.select_page').remove();
+											resolve([id, val]);
+										});
 									}
-									else {
+									else if (data.length!=0) {
+										$('.select_page .result_none,.select_page .appendclass').remove();
 										appendData(data);
 										var key, id;
 										$('.select_page dd').click(function () {
@@ -112,15 +120,22 @@ function selectPage (options) {
 		var str = '';
 		for(var i= 0, ii=data.length; i<ii; i++) {
 			if (displayNameKey != '' && valueKey != '') {
-				str += "<dd>"+data[i][displayNameKey]+"</dd>";
+				str += "<dd code='"+data[i][valueKey]+"'>"+data[i][displayNameKey]+"</dd>";
 			}
 			else if (displayNameKey == '' && valueKey == '') {
-				str += "<dd code='"+data[i]+"'>"+data[i]+"</dd>";
+				str += "<dd>"+data[i]+"</dd>";
 			}
 
 		}
 		$("#select-box-data").html("");
 		$("#select-box-data").html(str);
+	}
+
+	if (showDefault == true) {
+		$('.select_page dt,.select_page dd').show();
+	}
+	else if (showDefault == false) {
+		$('.select_page dt,.select_page dd').hide();
 	}
 
 }

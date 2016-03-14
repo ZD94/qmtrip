@@ -1,7 +1,7 @@
 <div class="traffic_step">
     <div class="margin_b"></div>
-    <div class="common_text w90 margin_c margin_b" id="startPlace" ng-click="selectStartCity()">出发城市</div>
-    <div class="common_text w90 margin_c margin_b" id="endPlace" ng-click="selectEndCity()">目的地城市</div>
+    <input placeholder="出发城市" class="common_text w90 margin_c margin_b" id="startPlace" ng-model="startCity" ng-click="selectStartCity()">
+    <input placeholder="目的地城市" class="common_text w90 margin_c margin_b" id="endPlace" ng-model="endCity" ng-click="selectEndCity()">
     <div class="w90 margin_c margin_b">
         <div class="common_text margin_c margin_b halfinput" id="startTime" ng-click="chooeseData($event)">出发日期</div>
         <input type="text" placeholder="最晚到达时间" id="startTimeLate" class="common_text margin_c margin_b halfinput" style="float: right;">
