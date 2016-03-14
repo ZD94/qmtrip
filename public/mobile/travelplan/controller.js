@@ -148,7 +148,7 @@ var travelplan=(function(){
                         }
 
                         //$scope.total = list.total;                            
-                        
+                        /*
                         list.items = list.items.map(function(plan){
                             return (
                                 API.staff
@@ -173,7 +173,7 @@ var travelplan=(function(){
                             .catch(function(err){
                                 TLDAlert(err.msg || err)
                             })
-
+                        */
                         $scope.$apply();
                     }
                 )
@@ -204,7 +204,7 @@ var travelplan=(function(){
         }
 
         //页面上的所有交互All interacitve actions on this page
-        $scope.pageTitle="出差记录";
+        $scope.$root.pageTitle="出差记录";
         loading(true);
 
         $scope.getList( PARAMS );
@@ -221,8 +221,44 @@ var travelplan=(function(){
      * @constructor
      */
     travelplan.PlandetailController = function($scope, $routeParams) {
-        $("title").html("出差记录");
-        loading(true);
+        
+
+        console.log($routeParams.orderId);
+
+        $scope.ITEM={};
+        //---------------------------------------------
+        $scope.getData = function( p ){
+
+            API.onload(function(){
+                console.info(p);
+                API.tripPlan
+                .getTripPlanOrderById( p )
+                .then(
+                    function( data ){
+                        console.log(API.tripPlan);
+                        console.log( data );
+                        $scope.ITEM = data;
+                        $scope.$apply();
+                    }
+                )
+                .catch(function(err){
+                    TLDAlert(err.msg || err)
+                })
+            })
+        }
+
+        $scope.checkInvoice = function(){
+
+        }
+
+        function init(){
+            $scope.$root.pageTitle = "详细出差记录";
+            loading(true);
+            $scope.getData( $routeParams.orderId );
+        }
+        
+        init();
+
     }
 
 

@@ -25,7 +25,9 @@
             <li class="item-main">
                 <div class="item-left w100">
                     <div class="top">
-                        <span ng-if="item.startPlace">{{item.startPlace}}——</span><span>{{item.destination}}</span>
+                        <span class="journey">
+                            <span ng-if="item.startPlace">{{item.startPlace}}——</span><span>{{item.destination}}</span>
+                        </span>
                         <span class="icon web-icon-font3" ng-show="item.outTraffic.length===1">&#xe90e;</span>
                         <span class="icon web-icon-font3" ng-show="item.hotel.length===1">&#xe914;</span>
                     </div>
@@ -49,17 +51,17 @@
             </li>
             <ul class="complete" ng-if="item.status===2">
                 <li>
-                    <span class="number">{{item.budget | currency:"￥"}}</span><br/>
+                    <span class="number">￥{{item.budget.toFixed(2)}}</span><br/>
                     <span class="name" style="color:#9B9B9B">预算</span>
                     <div class="bar"></div>
                 </li>
                 <li>
-                    <span class="number">{{item.expenditure | currency:"￥"}}</span><br/>
+                    <span class="number">￥{{item.expenditure.toFixed(2)}}</span><br/>
                     <span class="name" style="color:#9B9B9B">实际</span>
                     <div class="bar"></div>
                 </li>
                 <li ng-class="{true:'withBalance',false:'withDeficit'}[withBalance]">
-                    <span class="number">{{renderBalance($index) | currency:"￥"}}</span><br/>
+                    <span class="number">￥{{renderBalance($index).toFixed(2)}}</span><br/>
                     <span class="name">{{renderBalanceOrDeficit($index)}}</span>
                 </li>
             </ul>
