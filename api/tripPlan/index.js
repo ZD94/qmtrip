@@ -808,75 +808,140 @@ function countTripPlanNum(params){
     return PlanOrder.count({where: query});
 }
 
+
 /**
- * 统计计划单的动态预算/计划金额和实际支出
- * @param params
+ * 按月份统计预算/计划/完成金额
+ * @type {statBudgetByMonth}
  */
-tripPlan.statPlanOrderMoney = statPlanOrderMoney;
-statPlanOrderMoney.required_params = ['companyId'];
-statPlanOrderMoney.optional_params = ['startTime', 'endTime', 'accountId'];
-function statPlanOrderMoney(params){
-    var query = params;
-    var query_complete = {
-        companyId: query.companyId,
-        status: {$gte: STATUS.COMPLETE},
-        auditStatus: 1
-    }
-    query.status = {$gte: STATUS.NO_COMMIT};
-    var startAt = {};
+tripPlan.statBudgetByMonth = statBudgetByMonth;
+statBudgetByMonth.required_params = ['companyId'];
+statBudgetByMonth.optional_params = ['startTime', 'endTime', 'accountId'];
+function statBudgetByMonth(params) {
+    var stTime = params.startTime||moment().format('YYYY-MM-DD');
+    var enTime = params.endTime||moment().format('YYYY-MM-DD');
+    var timeArr = [];
+    do{
+        var t = moment(stTime).format('YYYY-MM-');
+        timeArr.push(t + '0\\d');
+        timeArr.push(t + '1\\d');
+        timeArr.push(t + '2\\d');
+        stTime = moment(stTime).add(1, 'months').format('YYYY-MM-DD');
+    }while(stTime<enTime);
 
-    if(params.startTime){
-        startAt.$gte = params.startTime;
-        delete params.startTime;
-    }
+    var sql = 'select sum(budget) as \"planMoney\",sum(expenditure) as expenditure ' +
+        'from tripplan.trip_plan_order where company_id=\'' + params.companyId + '\'';
 
-    if(params.endTime){
-        startAt.$lte = params.endTime;
-        delete params.endTime;
-    }
-
-    if(params.accountId){
-        query_complete.accountId = params.accountId;
+    if(params.accountId) {
+        sql += ' and account_id=\'' + params.accountId + '\'';
     }
 
-    if(!isObjNull(startAt)){
-        query.startAt = startAt;
-        query_complete.startAt = startAt;
+    var complete_sql = sql + ' and status=2 and to_char(start_at, \'YYYY-MM-DD\') ~ \'';
+
+    sql += ' and status > -1 and to_char(start_at, \'YYYY-MM-DD\') ~ \'';
+
+    return Promise.all(
+        timeArr.map(function(month) {
+            var s_sql = sql + month + '\';';
+            var c_sql = complete_sql + month + '\';';
+
+            var index = month.match(/\d{4}-\d{2}-(\d).*/)[1];
+            var remark = '';
+            if(index === '0') {
+                remark = '上旬';
+            }else if(index === '1') {
+                remark = '中旬';
+            }else if(index === '2') {
+                remark = '下旬';
+            }
+
+            var month = month.match(/\d{4}-\d{2}/)[0];
+            return Promise.all([
+                sequelize.query(s_sql),
+                sequelize.query(c_sql)
+            ])
+                .spread(function(all, complete){
+                    var a = all[0][0];
+                    var c = complete[0][0];
+                    var stat = {
+                        month: month,
+                        qmBudget: a.planMoney|0,
+                        planMoney: c.planMoney|0,
+                        expenditure: c.expenditure|0,
+                        remark: remark
+                    };
+
+                    return stat;
+                })
+        })
+    )
+}
+
+/**
+ * 统计出差计划的预算/计划/完成金额
+ * @type {statBudgetByGroup}
+ */
+tripPlan.statBudgetByGroup = statBudgetByGroup;
+statBudgetByGroup.required_params = ['companyId'];
+statBudgetByGroup.optional_params = ['startTime', 'endTime', 'accountId', 'index'];
+function statBudgetByGroup(params) {
+    var sql = 'select to_char(start_at, \'YYYY-MM\') as month,sum(budget) as \"planMoney\",sum(expenditure) as expenditure ' +
+        'from tripplan.trip_plan_order where company_id=\'' + params.companyId + '\'';
+
+    if(params.accountId) {
+        sql += ' and account_id=\'' + params.accountId + '\'';
     }
+
+    if(params.startTime) {
+        sql += ' and start_at >=\'' + params.startTime + '\'';
+    }
+
+    if(params.endTime) {
+        sql += ' and start_at <=\'' + params.endTime + '\'';
+    }
+
+    var complete_sql = sql + ' and status=2 group by start_at order by start_at;';
+
+    sql += ' and status > -1 group by start_at order by start_at;';
+
+    var index = params.index|'-';
+    var remark = '';
+    if(index === 0) {
+        remark = '上旬';
+    }else if(index === 1) {
+        remark = '中旬';
+    }else if(index === 2) {
+        remark = '下旬';
+    }
+
+    console.info(sql);
+    //sql = 'select to_char(start_at, \'YYYY-MM\') as month,sum(budget) as \"planMoney\",sum(expenditure) as expenditure ' +
+    //    'from tripplan.trip_plan_order where status!=3  group by start_at order by start_at;'
 
     return Promise.all([
-        PlanOrder.findAll({where: query, attributes: ['id']}),
-        PlanOrder.findAll({where: query_complete, attributes: ['id']})
+        sequelize.query(sql),
+        sequelize.query(complete_sql),
     ])
-        .spread(function(orders, orders1){
-            return [orders.map(function(order){ return order.id; }),
-                orders1.map(function(order){ return order.id; })]
-        })
-        .spread(function(idList, idComplete){
-            var q1 = {
-                orderId: {$in: idList},
-                status: {$ne: STATUS.DELETE}
-            }
+        .spread(function(all, complete) {
+            all = all[0];
+            complete = complete[0];
 
-            var q2 = {
-                orderId: {$in: idComplete},
-                status: STATUS.COMMIT
-            }
+            var stat = {};
+            complete.map(function(a) {
+                a.index = index;
+                a.remark = remark;
+                var month = a.month||'null';
+                stat[month] = a;
+            });
 
-            return Promise.all([
-                ConsumeDetails.sum('budget', {where: q1}),
-                ConsumeDetails.sum('budget', {where: q2}),
-                ConsumeDetails.sum('expenditure', {where: q2}),
-                PlanOrder.count({where: query_complete})
-            ])
-        })
-        .spread(function(n1, n2, n3, n4){
-            return {
-                qmBudget: n1 || 0,
-                planMoney: n2 || 0,
-                expenditure: n3 || 0,
-                NumOfStaff: n4 || 0
-            }
+            all.map(function(c) {
+                var month = c.month||'null';
+                if(!stat[month]) {
+                    stat[month] = {};
+                }
+                stat[month].qmBudget = c.planMoney;
+            })
+
+            return stat;
         })
 }
 
