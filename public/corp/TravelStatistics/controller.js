@@ -188,7 +188,7 @@ var TravelStatistics = (function(){
                 var params = {page:$scope.page};
                 console.info($scope.purposename);
                 if ($scope.purposename != '' && $scope.purposename != undefined) {
-                    params.remark = {$like: '%'+ $scope.purposename + '%'};
+                    params.description = {$like: '%'+ $scope.purposename + '%'};
                 }
                 params.startAt = {$gte: $scope.start_time,$lte: $scope.end_time}
                 console.info(params);
