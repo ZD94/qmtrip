@@ -183,15 +183,17 @@ var TravelStatistics = (function(){
         // alert("zzzz");
         $("title").html("出差记录");
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
-        $scope.initPlanlist = function() {
+        var initPlanlist = $scope.initPlanlist = function() {
             API.onload(function(){
-                var params = {page:$scope.page}
+                var params = {page:$scope.page};
+                console.info($scope.purposename);
+                if ($scope.purposename != '' && $scope.purposename != undefined) {
+                    params.remark = {$like: '%'+ $scope.purposename + '%'};
+                }
+                params.startAt = {$gte: $scope.start_time,$lte: $scope.end_time}
+                console.info(params);
                 API.tripPlan.pageTripPlanOrderByCompany(params)
                     .then(function(list){
-                        // console.info(list);
-                        // list.items.map(function(s){
-                        //     console.info('step1=>',s.auditStatus);
-                        // })
                         $scope.planlist = list.items;
                         console.log( $scope.planlist );
                         var planlist = list.items;
@@ -211,10 +213,9 @@ var TravelStatistics = (function(){
                             .then(function(ret){
                                 $scope.planlist = ret;
                                 ret.map(function(s){
-                                    var desc = s.description;//项目名称
-                                    var dest =s.destination;//目的地
-                                    var startP = s.startPlace;//出发地
-                                    // var des = JSON.stringify(s.description);
+                                    var desc = s.description;
+                                    var dest =s.destination;
+                                    var startP = s.startPlace;
                                     if(desc && desc.length>5){
                                         s.description= desc.substr(0,5) + '…';
                                     }
@@ -268,7 +269,7 @@ var TravelStatistics = (function(){
                     })
             })
         }
-        $scope.initPlanlist();
+        initPlanlist();
         //分页
         $scope.pagination = function () {
             if ($scope.total) {
@@ -284,7 +285,7 @@ var TravelStatistics = (function(){
                             $("#pagination").hide();
                         }
                         $scope.page = num;
-                        $scope.initPlanlist();
+                        initPlanlist();
                     }
                 });
                 clearInterval (pagenum);
@@ -295,6 +296,36 @@ var TravelStatistics = (function(){
         //进入详情页
         $scope.enterDetail = function (orderId) {
             window.open("#/TravelStatistics/planDetail?orderId=" + orderId);
+        }
+        //搜索
+        $scope.searchPurposeName = function () {
+            API.onload(function() {
+                API.tripPlan.getProjectsList({project_name: $scope.purposename})
+                    .then(function(result) {
+                        $scope.PurposeNameitems = result;
+                        if ($scope.PurposeNameitems) {
+                            $(".PurposeNamelist").show();
+                        }
+                        console.info (result);
+                        $scope.$apply();
+                    })
+                    .catch(function(err){
+                        console.log(err);
+                    });
+            })
+        }
+        $scope.choosepPurposeName = function (project_name) {
+            $scope.purposename = project_name;
+            $(".PurposeNamelist").hide();
+        }
+        $(".purposename").blur(function(){
+            setTimeout('$(".PurposeNamelist").hide()', 500);
+        })
+        $scope.searchKeyword = function () {
+            if ($scope.keyword != '' && $scope.keyword != undefined) {
+                setTimeout($scope.pagination1,100);
+            }
+            initPlanlist();
         }
     }
     // 出差记录详情页
