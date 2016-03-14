@@ -1,7 +1,7 @@
 <div class="traffic_step">
     <div class="margin_b"></div>
-    <div class="common_text w90 margin_c margin_b" id="startPlace" ng-click="selectStartCity()">出发城市</div>
-    <div class="common_text w90 margin_c margin_b" id="endPlace" ng-click="selectEndCity()">目的地城市</div>
+    <input placeholder="出发城市" class="common_text w90 margin_c margin_b" id="startCity" ng-model="startCity" ng-click="selectStartCity()">
+    <input placeholder="目的地城市" class="common_text w90 margin_c margin_b" id="endCity" ng-model="endCity" ng-click="selectEndCity()">
     <div class="w90 margin_c margin_b">
         <div class="common_text margin_c margin_b halfinput" id="startTime" ng-click="chooeseData($event)">出发日期</div>
         <input type="text" placeholder="最晚到达时间" id="startTimeLate" class="common_text margin_c margin_b halfinput" style="float: right;">
@@ -20,8 +20,8 @@
 
 <div class="live_step">
     <div class="margin_b"></div>
-    <div class="common_text w90 margin_c margin_b" id="livePlace" ng-click="selectLiveCity()">目的地城市</div>
-    <div class="common_text w90 margin_c margin_b" id="landmark" ng-click="selectLivePlace()">住宿地标位置，计划入住在xxx附近</div>
+    <input placeholder="目的地城市" class="common_text w90 margin_c margin_b" ng-model="liveCity" id="liveCity" ng-click="selectLiveCity()">
+    <input placeholder="住宿地标位置，计划入住在xxx附近" class="common_text w90 margin_c margin_b" ng-model="livePlace" id="livePlace" ng-click="selectLivePlace()">
     <div class="w90 margin_c margin_b">
         <div class="common_text margin_c margin_b halfinput" id="liveTime" ng-click="chooeseData($event)">入住时间</div>
         <div class="common_text margin_c margin_b halfinput" id="leaveTime" ng-click="chooeseData($event)" style="float: right;">离店时间</div>

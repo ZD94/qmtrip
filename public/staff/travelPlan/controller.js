@@ -240,7 +240,12 @@ var travelPlan=(function(){
                         $scope.outTraffic = $scope.planDetail.outTraffic[0];
                         loading(true);
                         $scope.$apply();
-
+                        $('.warning i').hover(function(){
+                            console.info(111);
+                            $('.warning .special_warning').show();
+                        },function(){
+                            $('.warning .special_warning').hide();
+                        });
                         $(".file").AjaxFileUpload({
                             action: '/upload/ajax-upload-file?type=invoice',
                             onComplete: function(filename, response) {

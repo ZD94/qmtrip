@@ -6,7 +6,26 @@
             <div class="title_top">
                 <table width="100%">
                     <tr>
-                        <td width="220" height="40" align="left">生成时间：{{planDetail.createAt | date: 'yyyy-MM-dd HH:mm'}}</td>
+                        <td width="220" height="40" align="left" class="po_r">
+                            <a href="" class="standard">Ta的差旅标准</a>
+                            <div class="standard_detail">
+                                <em></em>
+                                <h3>{{travelpolicy.name}}</h3>
+                                <p ng-if="travelpolicy.planeLevel == '不限' && travelpolicy.planeDiscount == 0">飞机：全价机票，舱位不限，想飞就飞
+                                <p ng-if="travelpolicy.planeLevel == '不限' && travelpolicy.planeDiscount != 0">飞机：最高{{travelpolicy.planeDiscount}}折,舱位不限
+                                <p ng-if="travelpolicy.planeLevel != '不限' && travelpolicy.planeDiscount == 0">飞机：全价{{travelpolicy.planeLevel}}
+                                <p ng-if="travelpolicy.planeLevel != '不限' && travelpolicy.planeDiscount != 0">飞机：最高{{travelpolicy.planeDiscount}}折,{{travelpolicy.planeLevel}}
+                                <br/>
+                                    <span ng-if="travelpolicy.isChangeLevel == true">当高级舱位价格低于上述标准时，可选择高级舱位</span>
+                                </p>
+                                <p ng-if="travelpolicy.trainLevel == '不限'">火车：座次不限</p>
+                                <p ng-if="travelpolicy.trainLevel != '不限'">火车：{{travelpolicy.trainLevel.replace(',', '/')}}</p>
+                                <p ng-if="travelpolicy.hotelLevel == '不限' && travelpolicy.hotelPrice == null">住宿：酒店任意住</p>
+                                <p ng-if="travelpolicy.hotelLevel == '不限' && travelpolicy.hotelPrice != null">住宿：每晚不超过{{travelpolicy.hotelPrice}}元</p>
+                                <p ng-if="travelpolicy.hotelLevel != '不限' && travelpolicy.hotelPrice == null">住宿：{{travelpolicy.hotelLevel.replace(',', '/')}}</p>
+                                <p ng-if="travelpolicy.hotelLevel != '不限' && travelpolicy.hotelPrice != null">住宿：{{travelpolicy.hotelLevel.replace(',', '/')}}且每晚不超过{{travelpolicy.hotelPrice}}元</p>
+                            </div>
+                        </td>
                         <td height="40" align="center">{{travelerName}}于
                             <span ng-if="planDetail.startAt">{{planDetail.startAt | date: 'yyyy月MM月dd日'}}</span>
                             <span ng-if="!planDetail.startAt">{{planDetail.hotel[0].startTime | date: 'yyyy月MM月dd日'}}</span>
@@ -79,9 +98,10 @@
                         <td width="135" align="center">
                             <div ng-if="outTraffic.budget!='-1'">
                                 <p ng-if="outTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
-                                <p ng-if="outTraffic.status==0" style="color: #DE492A;">【待审核】</p>
+                                <p ng-if="outTraffic.status==0 && planDetail.isCommit==true" style="color: #DE492A;">【待审核】</p>
+                                <p ng-if="outTraffic.status==0 && planDetail.isCommit==false">暂无</p>
                                 <p ng-if="outTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
-                                <p><a ng-click="outTraffichref()">去程交通票据</a></p>
+                                <p ng-if="planDetail.isCommit!=false"><a ng-click="outTraffichref()">去程交通票据</a></p>
                             </div>
                             <div ng-if="outTraffic.budget=='-1'">暂无</div>
                         </td>
@@ -105,9 +125,10 @@
                         <td width="135" align="center">
                             <div ng-if="hotel.budget!='-1'">
                                 <p ng-if="hotel.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
-                                <p ng-if="hotel.status==0" style="color: #DE492A;">【待审核】</p>
+                                <p ng-if="hotel.status==0 && planDetail.isCommit==true" style="color: #DE492A;">【待审核】</p>
+                                <p ng-if="hotel.status==0 && planDetail.isCommit==false">暂无</p>
                                 <p ng-if="hotel.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
-                                <p><a ng-click="hotelhref()">酒店发票</a></p>
+                                <p ng-if="planDetail.isCommit!=false"><a ng-click="hotelhref()">酒店发票</a></p>
                             </div>
                             <div ng-if="hotel.budget=='-1'">暂无</div>
                         </td>
@@ -130,9 +151,10 @@
                         <td width="135" align="center">
                             <div ng-if="backTraffic.budget!='-1'">
                                 <p ng-if="backTraffic.status=='-1'" style="color: #9B9B9B;">【审核未通过】</p>
-                                <p ng-if="backTraffic.status==0" style="color: #DE492A;">【待审核】</p>
+                                <p ng-if="backTraffic.status==0 && planDetail.isCommit==true" style="color: #DE492A;">【待审核】</p>
+                                <p ng-if="backTraffic.status==0 && planDetail.isCommit==false">暂无</p>
                                 <p ng-if="backTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
-                                <p><a ng-click="backTraffichref()">回程交通票据</a></p>
+                                <p ng-if="planDetail.isCommit!=false"><a ng-click="backTraffichref()">回程交通票据</a></p>
                             </div>
                             <div ng-if="backTraffic.budget=='-1'">暂无</div>
                         </td>

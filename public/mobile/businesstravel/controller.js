@@ -13,6 +13,7 @@ var businesstravel=(function(){
 
     var  businesstravel = {};
 
+
     /*
         我要出差首页
      * @param $scope
@@ -25,15 +26,33 @@ var businesstravel=(function(){
         //选择项目
         $scope.selectPurposeName = function () {
             API.onload(function() {
-                API.place.hotCities({})
+                API.tripPlan.getProjectsList({})
                     .then(function(result){
-                        selectPage('#selectPurpose',result,{
-                            isAllowAdd: false,
+                        return selectPage({
+                            defaultDataFunc: function() {
+                                return new Promise(function(resolve) {
+                                    resolve(result);
+                                    console.info (result);
+                                });
+                            },
+                            fetchDataFunc: function(keyword) {
+                                return new Promise(function(resolve) {
+                                    resolve(API.tripPlan.getProjectsList({project_name:keyword}));
+                                });
+                            },
+                            isAllowAdd: true,
                             showDefault: true,
+                            displayNameKey: "",
+                            valueKey: "",
                             title: '最新项目',
-                            placeholder: '输入项目具体名称',
-                            limit: 10
+                            placeholder: '输入项目具体名称'
                         });
+                    })
+                    .spread(function(cityId, cityName) {
+                        $scope.purposename = cityName;
+                        $scope.cityId = cityId;
+                        $('#selectPurpose').attr('code',$scope.cityId);
+                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -53,9 +72,8 @@ var businesstravel=(function(){
             $scope.liveimg = $(".liveimg").css("display");
         }
         $scope.nextStep = function () {
-            $scope.purposename = $('#selectPurpose').html();
-            if ($scope.purposename=="请输入项目具体名称") {
-                alert("项目名称不能为空");
+            if ($scope.purposename=="" || $scope.purposename==undefined) {
+                Myalert("温馨提示","请填写出差目的");
                 return false;
             }
             if ($(".trafficimg").css('display')=='block' && $(".liveimg").css('display')=='none'){
@@ -97,13 +115,32 @@ var businesstravel=(function(){
                 API.onload(function() {
                     API.place.hotCities({})
                         .then(function(result){
-                            selectPage('#startPlace',result,{
+                            return selectPage({
+                                defaultDataFunc: function() {
+                                    return new Promise(function(resolve) {
+                                        resolve(result);
+                                        console.info (result);
+                                    });
+                                },
+                                fetchDataFunc: function(keyword) {
+                                    return new Promise(function(resolve) {
+                                        resolve(API.place.queryPlace({keyword:keyword}));
+                                    });
+                                },
                                 isAllowAdd: false,
                                 showDefault: true,
-                                title: '热门城市',
-                                placeholder: '输入城市名称进行搜索',
-                                limit: 10
+                                displayNameKey: "name",
+                                valueKey: "id",
+                                title: '出发城市',
+                                placeholder: '输入城市名称'
                             });
+                        })
+                        .spread(function(startCityId, cityName) {
+                            $scope.startCity = cityName;
+                            $scope.startCityId = startCityId;
+                            console.info ($scope.cityId);
+                            $('#startCity').attr('code',$scope.startCityId);
+                            $scope.$apply();
                         })
                         .catch(function(err){
                             console.info (err);
@@ -116,13 +153,32 @@ var businesstravel=(function(){
                 API.onload(function() {
                     API.place.hotCities({})
                         .then(function(result){
-                            selectPage('#endPlace',result,{
+                            return selectPage({
+                                defaultDataFunc: function() {
+                                    return new Promise(function(resolve) {
+                                        resolve(result);
+                                        console.info (result);
+                                    });
+                                },
+                                fetchDataFunc: function(keyword) {
+                                    return new Promise(function(resolve) {
+                                        resolve(API.place.queryPlace({keyword:keyword}));
+                                    });
+                                },
                                 isAllowAdd: false,
                                 showDefault: true,
-                                title: '热门城市',
-                                placeholder: '输入城市名称进行搜索',
-                                limit: 10
+                                displayNameKey: "name",
+                                valueKey: "id",
+                                title: '目的地城市',
+                                placeholder: '输入城市名称'
                             });
+                        })
+                        .spread(function(endCityId, cityName) {
+                            $scope.endCity = cityName;
+                            $scope.endCityId = endCityId;
+                            console.info ($scope.endCityId);
+                            $('#endCity').attr('code',$scope.endCityId);
+                            $scope.$apply();
                         })
                         .catch(function(err){
                             console.info (err);
@@ -138,15 +194,15 @@ var businesstravel=(function(){
 
             //生成预算
             $scope.createResult = function () {
-                var startPlace = $('#startPlace').html(),
-                    endPlace = $('#endPlace').html(),
-                    startPlaceVal = $('#startPlace').attr("code"),
-                    endPlaceVal = $('#endPlace').attr("code"),
+                var startCity = $scope.startCity,
+                    endCity = $scope.endCity,
+                    startCityVal = $('#startCity').attr("code"),
+                    endCityVal = $('#endCity').attr("code"),
                     startTime = $('#startTime').html(),
                     endTime =  $('#endTime').html(),
                     startTimeLate =  $('#startTimeLate').val(),
                     endTimeLate =  $('#endTimeLate').val();
-                window.location.href = "#/businesstravel/createresult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&sp="+startPlace+"&ep="+endPlace+"&spval="+startPlaceVal+"&epval="+endPlaceVal+"&stime="+startTime+"&etime="+endTime+"&stimel="+startTimeLate+"&etimel="+endTimeLate;
+                window.location.href = "#/businesstravel/createresult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&sc="+startCity+"&ec="+endCity+"&scval="+startCityVal+"&ecval="+endCityVal+"&stime="+startTime+"&etime="+endTime+"&stimel="+startTimeLate+"&etimel="+endTimeLate;
             }
         }
 
@@ -163,13 +219,32 @@ var businesstravel=(function(){
                 API.onload(function() {
                     API.place.hotCities({})
                         .then(function(result){
-                            selectPage('#livePlace',result,{
+                            return selectPage({
+                                defaultDataFunc: function() {
+                                    return new Promise(function(resolve) {
+                                        resolve(result);
+                                        console.info (result);
+                                    });
+                                },
+                                fetchDataFunc: function(keyword) {
+                                    return new Promise(function(resolve) {
+                                        resolve(API.place.queryPlace({keyword:keyword}));
+                                    });
+                                },
                                 isAllowAdd: false,
                                 showDefault: true,
-                                title: '目的地城市',
-                                placeholder: '输入城市名称进行搜索',
-                                limit: 10
+                                displayNameKey: "name",
+                                valueKey: "id",
+                                title: '出发城市',
+                                placeholder: '输入城市名称'
                             });
+                        })
+                        .spread(function(liveCityId, cityName) {
+                            $scope.liveCity = cityName;
+                            $scope.liveCityId = liveCityId;
+                            console.info ($scope.liveCityId);
+                            $('#liveCity').attr('code',$scope.liveCityId);
+                            $scope.$apply();
                         })
                         .catch(function(err){
                             console.info (err);
@@ -180,16 +255,34 @@ var businesstravel=(function(){
             //选择地标
             $scope.selectLivePlace = function () {
                 API.onload(function() {
-                    API.place.hotBusinessDistricts({code:$("#livePlace").attr("code")})
+                    API.place.hotBusinessDistricts({code:$("#liveCity").attr("code")})
                         .then(function(result){
-                            console.info (result);
-                            selectPage('#landmark',result,{
+                            return selectPage({
+                                defaultDataFunc: function() {
+                                    return new Promise(function(resolve) {
+                                        resolve(result);
+                                        console.info (result);
+                                    });
+                                },
+                                fetchDataFunc: function(keyword) {
+                                    return new Promise(function(resolve) {
+                                        resolve(API.place.queryBusinessDistrict({keyword:keyword,code:$("#liveCity").attr("code")}));
+                                    });
+                                },
                                 isAllowAdd: false,
                                 showDefault: true,
-                                title: '热门地标',
-                                placeholder: '输入城市名称进行搜索',
-                                limit: 10
+                                displayNameKey: "name",
+                                valueKey: "id",
+                                title: '地标选择',
+                                placeholder: '输入地标名称'
                             });
+                        })
+                        .spread(function(livePlaceId, livePlace) {
+                            $scope.livePlace = livePlace;
+                            $scope.livePlaceId = livePlaceId;
+                            console.info ($scope.livePlaceId);
+                            $('#livePlace').attr('code',$scope.livePlaceId);
+                            $scope.$apply();
                         })
                         .catch(function(err){
                             console.info (err);
@@ -205,13 +298,13 @@ var businesstravel=(function(){
 
             //生成预算
             $scope.createResult = function () {
-                var livePlace = $('#livePlace').html(),
-                    leavePlace = $('#leavePlace').html(),
+                var liveCity = $scope.liveCity,
+                    livePlace = $scope.livePlace,
+                    liveCityVal = $('#liveCity').attr("code"),
                     livePlaceVal = $('#livePlace').attr("code"),
-                    landmarkVal = $('#landmark').attr("code"),
                     liveTime = $('#liveTime').html(),
                     leaveTime = $('#leaveTime').html();
-                window.location.href = "#/businesstravel/createresult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&livep="+livePlace+"&lpval="+livePlaceVal+"&lmval="+landmarkVal+"&livetime="+liveTime+"&leavetime="+leaveTime;
+                window.location.href = "#/businesstravel/createresult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&livec="+liveCity+"&livep="+livePlace+"&lcval="+liveCityVal+"&lpval="+livePlaceVal+"&livetime="+liveTime+"&leavetime="+leaveTime;
             }
         }
 
@@ -225,51 +318,110 @@ var businesstravel=(function(){
                 API.onload(function() {
                     API.place.hotCities({})
                         .then(function(result){
-                            selectPage('#startPlace',result,{
+                            return selectPage({
+                                defaultDataFunc: function() {
+                                    return new Promise(function(resolve) {
+                                        resolve(result);
+                                        console.info (result);
+                                    });
+                                },
+                                fetchDataFunc: function(keyword) {
+                                    return new Promise(function(resolve) {
+                                        resolve(API.place.queryPlace({keyword:keyword}));
+                                    });
+                                },
                                 isAllowAdd: false,
                                 showDefault: true,
-                                title: '热门城市',
-                                placeholder: '输入城市名称进行搜索',
-                                limit: 10
+                                displayNameKey: "name",
+                                valueKey: "id",
+                                title: '出发城市',
+                                placeholder: '输入城市名称'
                             });
+                        })
+                        .spread(function(startCityId, cityName) {
+                            $scope.startCity = cityName;
+                            $scope.startCityId = startCityId;
+                            console.info ($scope.cityId);
+                            $('#startCity').attr('code',$scope.startCityId);
+                            $scope.$apply();
                         })
                         .catch(function(err){
                             console.info (err);
                         })
                 })
             }
+
 
             //选择目的地城市
             $scope.selectEndCity = function () {
                 API.onload(function() {
                     API.place.hotCities({})
                         .then(function(result){
-                            selectPage('#endPlace',result,{
+                            return selectPage({
+                                defaultDataFunc: function() {
+                                    return new Promise(function(resolve) {
+                                        resolve(result);
+                                        console.info (result);
+                                    });
+                                },
+                                fetchDataFunc: function(keyword) {
+                                    return new Promise(function(resolve) {
+                                        resolve(API.place.queryPlace({keyword:keyword}));
+                                    });
+                                },
                                 isAllowAdd: false,
                                 showDefault: true,
-                                title: '热门城市',
-                                placeholder: '输入城市名称进行搜索',
-                                limit: 10
+                                displayNameKey: "name",
+                                valueKey: "id",
+                                title: '目的地城市',
+                                placeholder: '输入城市名称'
                             });
+                        })
+                        .spread(function(endCityId, cityName) {
+                            $scope.endCity = cityName;
+                            $scope.endCityId = endCityId;
+                            console.info ($scope.endCityId);
+                            $('#endCity').attr('code',$scope.endCityId);
+                            $scope.$apply();
                         })
                         .catch(function(err){
                             console.info (err);
                         })
                 })
             }
+
 
             //选择住宿城市
             $scope.selectLiveCity = function () {
                 API.onload(function() {
                     API.place.hotCities({})
                         .then(function(result){
-                            selectPage('#livePlace',result,{
+                            return selectPage({
+                                defaultDataFunc: function() {
+                                    return new Promise(function(resolve) {
+                                        resolve(result);
+                                        console.info (result);
+                                    });
+                                },
+                                fetchDataFunc: function(keyword) {
+                                    return new Promise(function(resolve) {
+                                        resolve(API.place.queryPlace({keyword:keyword}));
+                                    });
+                                },
                                 isAllowAdd: false,
                                 showDefault: true,
-                                title: '目的地城市',
-                                placeholder: '输入城市名称进行搜索',
-                                limit: 10
+                                displayNameKey: "name",
+                                valueKey: "id",
+                                title: '出发城市',
+                                placeholder: '输入城市名称'
                             });
+                        })
+                        .spread(function(liveCityId, cityName) {
+                            $scope.liveCity = cityName;
+                            $scope.liveCityId = liveCityId;
+                            console.info ($scope.liveCityId);
+                            $('#liveCity').attr('code',$scope.liveCityId);
+                            $scope.$apply();
                         })
                         .catch(function(err){
                             console.info (err);
@@ -277,25 +429,45 @@ var businesstravel=(function(){
                 })
             }
 
+
             //选择地标
             $scope.selectLivePlace = function () {
                 API.onload(function() {
-                    API.place.hotBusinessDistricts({code:$("#livePlace").attr("code")})
+                    API.place.hotBusinessDistricts({code:$("#liveCity").attr("code")})
                         .then(function(result){
-                            console.info (result);
-                            selectPage('#landmark',result,{
+                            return selectPage({
+                                defaultDataFunc: function() {
+                                    return new Promise(function(resolve) {
+                                        resolve(result);
+                                        console.info (result);
+                                    });
+                                },
+                                fetchDataFunc: function(keyword) {
+                                    return new Promise(function(resolve) {
+                                        resolve(API.place.queryBusinessDistrict({keyword:keyword,code:$("#liveCity").attr("code")}));
+                                    });
+                                },
                                 isAllowAdd: false,
                                 showDefault: true,
-                                title: '热门地标',
-                                placeholder: '输入城市地标进行搜索',
-                                limit: 10
+                                displayNameKey: "name",
+                                valueKey: "id",
+                                title: '地标选择',
+                                placeholder: '输入地标名称'
                             });
+                        })
+                        .spread(function(livePlaceId, livePlace) {
+                            $scope.livePlace = livePlace;
+                            $scope.livePlaceId = livePlaceId;
+                            console.info ($scope.livePlaceId);
+                            $('#livePlace').attr('code',$scope.livePlaceId);
+                            $scope.$apply();
                         })
                         .catch(function(err){
                             console.info (err);
                         })
                 })
             }
+
 
 
             //返回首页
@@ -317,22 +489,21 @@ var businesstravel=(function(){
 
             //生成预算单
             $scope.createResult = function () {
-                var startPlace = $('#startPlace').html(),
-                    endPlace = $('#endPlace').html(),
-                    startPlaceVal = $('#startPlace').attr("code"),
-                    endPlaceVal = $('#endPlace').attr("code"),
+                var startCity = $scope.startCity,
+                    endCity = $scope.endCity,
+                    startCityVal = $('#startCity').attr("code"),
+                    endCityVal = $('#endCity').attr("code"),
                     startTime = $('#startTime').html(),
                     endTime =  $('#endTime').html(),
                     startTimeLate =  $('#startTimeLate').val(),
                     endTimeLate =  $('#endTimeLate').val(),
-                    livePlace = $('#livePlace').html(),
-                    leavePlace = $('#leavePlace').html(),
+                    liveCity = $scope.liveCity,
+                    livePlace = $scope.livePlace,
+                    liveCityVal = $('#liveCity').attr("code"),
                     livePlaceVal = $('#livePlace').attr("code"),
-                    landmark = $('#landmark').html(),
-                    landmarkVal = $('#landmark').attr("code"),
                     liveTime = $('#liveTime').html(),
                     leaveTime = $('#leaveTime').html();
-                window.location.href = "#/businesstravel/createresult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&sp="+startPlace+"&ep="+endPlace+"&spval="+startPlaceVal+"&epval="+endPlaceVal+"&stime="+startTime+"&etime="+endTime+"&stimel="+startTimeLate+"&etimel="+endTimeLate+"&livep="+livePlace+"&lpval="+livePlaceVal+"&lm="+landmark+"&lmval="+landmarkVal+"&livetime="+liveTime+"&leavetime="+leaveTime;
+                window.location.href = "#/businesstravel/createresult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&sc="+startCity+"&ec="+endCity+"&scval="+startCityVal+"&ecval="+endCityVal+"&stime="+startTime+"&etime="+endTime+"&stimel="+startTimeLate+"&etimel="+endTimeLate+"&livec="+liveCity+"&livep="+livePlace+"&lcval="+liveCityVal+"&lpval="+livePlaceVal+"&livetime="+liveTime+"&leavetime="+leaveTime;
             }
 
         }
@@ -375,10 +546,10 @@ var businesstravel=(function(){
 
         //只选交通
         if ($scope.tra == 1 && $scope.liv == 0) {
-            $scope.startPlace = $routeParams.sp;
-            $scope.endPlace = $routeParams.ep;
-            $scope.startPlaceVal = $routeParams.spval;
-            $scope.endPlaceVal = $routeParams.epval;
+            $scope.startPlace = $routeParams.sc;
+            $scope.endPlace = $routeParams.ec;
+            $scope.startPlaceVal = $routeParams.scval;
+            $scope.endPlaceVal = $routeParams.ecval;
             $scope.startTime = $routeParams.stime;
             $scope.endTime =  $routeParams.etime;
             $scope.startTimeLate =  $routeParams.stimel;
@@ -415,8 +586,10 @@ var businesstravel=(function(){
 
         //只选住宿
         if ($scope.tra == 0 && $scope.liv == 1) {
-            $scope.livePlaceVal = $routeParams.lpval;
-            $scope.landmarkVal = $routeParams.lmval;
+            $scope.livePlaceVal = $routeParams.lcval;
+            $scope.landmarkVal = $routeParams.lpval;
+            $scope.endPlace = $routeParams.livec;
+            $scope.landmark = $routeParams.livep;
             $scope.liveTime = $routeParams.livetime;
             $scope.leaveTime =  $routeParams.leavetime;
 
@@ -447,17 +620,18 @@ var businesstravel=(function(){
 
         //选择交通和住宿
         if ($scope.tra == 1 && $scope.liv == 1) {
-            $scope.startPlace = $routeParams.sp;
-            $scope.endPlace = $routeParams.ep;
-            $scope.startPlaceVal = $routeParams.spval;
-            $scope.endPlaceVal = $routeParams.epval;
+            $scope.startPlace = $routeParams.sc;
+            $scope.endPlace = $routeParams.ec;
+            $scope.startPlaceVal = $routeParams.scval;
+            $scope.endPlaceVal = $routeParams.ecval;
             $scope.startTime = $routeParams.stime;
             $scope.endTime =  $routeParams.etime;
             $scope.startTimeLate =  $routeParams.stimel;
             $scope.endTimeLate =  $routeParams.etimel;
-            $scope.livePlaceVal = $routeParams.lpval;
-            $scope.landmarkVal = $routeParams.lmval;
-            $scope.landmark = $routeParams.lm;
+            $scope.livePlace = $routeParams.lc;
+            $scope.livePlaceVal = $routeParams.lcval;
+            $scope.landmarkVal = $routeParams.lpval;
+            $scope.landmark = $routeParams.lp;
             $scope.liveTime = $routeParams.livetime;
             $scope.leaveTime =  $routeParams.leavetime;
             API.onload(function() {

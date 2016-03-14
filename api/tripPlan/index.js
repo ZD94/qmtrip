@@ -381,8 +381,14 @@ tripPlan.listTripPlanOrder = function(options){
         query.status = {$ne: STATUS.DELETE};
     }
 
-    options.order = [['start_at', 'desc'], ['create_at', 'desc']]; //默认排序，创建时间
-    logger.error(query);
+    if(!options.order) {
+        options.order = [['start_at', 'desc'], ['create_at', 'desc']]; //默认排序，创建时间
+    }
+
+    console.info("******");
+    console.info(options);
+
+    delete options.where.startAt;
 
     return PlanOrder.findAndCount(options)
         .then(function(ret){
@@ -808,6 +814,74 @@ function countTripPlanNum(params){
     return PlanOrder.count({where: query});
 }
 
+
+/**
+ * 按月份统计预算/计划/完成金额
+ * @type {statBudgetByMonth}
+ */
+tripPlan.statBudgetByMonth = statBudgetByMonth;
+statBudgetByMonth.required_params = ['companyId'];
+statBudgetByMonth.optional_params = ['startTime', 'endTime', 'accountId'];
+function statBudgetByMonth(params) {
+    var stTime = params.startTime||moment().format('YYYY-MM-DD');
+    var enTime = params.endTime||moment().format('YYYY-MM-DD');
+    var timeArr = [];
+    do{
+        var t = moment(stTime).format('YYYY-MM-');
+        timeArr.push(t + '0\\d');
+        timeArr.push(t + '1\\d');
+        timeArr.push(t + '2\\d');
+        stTime = moment(stTime).add(1, 'months').format('YYYY-MM-DD');
+    }while(stTime<enTime);
+
+    var sql = 'select sum(budget) as \"planMoney\",sum(expenditure) as expenditure ' +
+        'from tripplan.trip_plan_order where company_id=\'' + params.companyId + '\'';
+
+    if(params.accountId) {
+        sql += ' and account_id=\'' + params.accountId + '\'';
+    }
+
+    var complete_sql = sql + ' and status=2 and to_char(start_at, \'YYYY-MM-DD\') ~ \'';
+
+    sql += ' and status > -1 and to_char(start_at, \'YYYY-MM-DD\') ~ \'';
+
+    return Promise.all(
+        timeArr.map(function(month) {
+            var s_sql = sql + month + '\';';
+            var c_sql = complete_sql + month + '\';';
+
+            var index = month.match(/\d{4}-\d{2}-(\d).*/)[1];
+            var remark = '';
+            if(index === '0') {
+                remark = '上旬';
+            }else if(index === '1') {
+                remark = '中旬';
+            }else if(index === '2') {
+                remark = '下旬';
+            }
+
+            var month = month.match(/\d{4}-\d{2}/)[0];
+            return Promise.all([
+                sequelize.query(s_sql),
+                sequelize.query(c_sql)
+            ])
+                .spread(function(all, complete){
+                    var a = all[0][0];
+                    var c = complete[0][0];
+                    var stat = {
+                        month: month,
+                        qmBudget: a.planMoney|0,
+                        planMoney: c.planMoney|0,
+                        expenditure: c.expenditure|0,
+                        remark: remark
+                    };
+
+                    return stat;
+                })
+        })
+    )
+}
+
 /**
  * 统计计划单的动态预算/计划金额和实际支出
  * @param params
@@ -879,6 +953,7 @@ function statPlanOrderMoney(params){
             }
         })
 }
+
 
 /**
  * 获取项目名称列表
