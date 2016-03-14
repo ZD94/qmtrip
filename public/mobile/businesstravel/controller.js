@@ -13,6 +13,7 @@ var businesstravel=(function(){
 
     var  businesstravel = {};
 
+
     /*
         我要出差首页
      * @param $scope
@@ -25,15 +26,33 @@ var businesstravel=(function(){
         //选择项目
         $scope.selectPurposeName = function () {
             API.onload(function() {
-                API.place.hotCities({})
+                API.tripPlan.getProjectsList({})
                     .then(function(result){
-                        selectPage('#selectPurpose',result,{
+                        return selectPage({
+                            defaultDataFunc: function() {
+                                return new Promise(function(resolve) {
+                                    resolve(result);
+                                    console.info (result);
+                                });
+                            },
+                            fetchDataFunc: function(keyword) {
+                                return new Promise(function(resolve) {
+                                    resolve(API.tripPlan.getProjectsList({project_name:keyword}));
+                                });
+                            },
                             isAllowAdd: false,
                             showDefault: true,
+                            displayNameKey: "",
+                            valueKey: "",
                             title: '最新项目',
-                            placeholder: '输入项目具体名称',
-                            limit: 10
+                            placeholder: '输入项目具体名称'
                         });
+                    })
+                    .spread(function(cityId, cityName) {
+                        $scope.purposename = cityName;
+                        $scope.cityId = cityId;
+                        $('#selectPurpose').attr('code',$scope.cityId);
+                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -53,9 +72,8 @@ var businesstravel=(function(){
             $scope.liveimg = $(".liveimg").css("display");
         }
         $scope.nextStep = function () {
-            $scope.purposename = $('#selectPurpose').html();
-            if ($scope.purposename=="请输入项目具体名称") {
-                alert("项目名称不能为空");
+            if ($scope.purposename=="" || $scope.purposename==undefined) {
+                Myalert("温馨提示","请填写出差目的");
                 return false;
             }
             if ($(".trafficimg").css('display')=='block' && $(".liveimg").css('display')=='none'){
