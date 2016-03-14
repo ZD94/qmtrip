@@ -42,7 +42,7 @@ module.exports = (function() {
                                 $scope.actual_consume = planMoney.expenditure;
                                 $scope.save_money = $scope.total_budget - $scope.actual_consume;
 
-                                console.info(travelPolicy);
+                                //console.info(travelPolicy);
                                 $scope.travelpolicy = travelPolicy;
                                 $scope.tavel_id = travelPolicy.id;
 
@@ -107,25 +107,17 @@ module.exports = (function() {
         }
     }
 
-    user.TravelpolicyController = function($scope,$routeParams) {
+    user.TravelpolicyController = function($scope) {
         $scope.$root.pageTitle = '差旅标准';
         loading(true);
-        var travelId = $routeParams.travelId;
         API.onload(function(){
-            API.staff.getCurrentStaff()
-                .then(function(){
-                    API.travelPolicy.getCurrentStaffTp()
-                        .then(function(travelPolicy){
-                            $scope.travelpolicy = travelPolicy;
-                            $scope.$apply();
-                        })
-                        .catch(function(err){
-                            console.info(err || err.msg);
-                        })
+            API.travelPolicy.getCurrentStaffTp()
+                .then(function(travelPolicy){
+                    $scope.travelpolicy = travelPolicy;
+                    $scope.$apply();
                 })
                 .catch(function(err){
                     console.info(err || err.msg);
-                    //TLDAlert(err.msg || err);
                 })
                 .done();
         })
