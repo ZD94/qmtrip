@@ -1,13 +1,51 @@
 <script type="text/javascript">
     $(function(){
-        $("#live_time,#leave_time").datepicker({
-            prevText: "<",
-            nextText: ">",
-            monthNames: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],
-            dayNamesMin: ["日","一","二","三","四","五","六"],
-            minDate: 0,
-            dateFormat: 'yy-mm-dd'
+        function bindDatePicker(domId, options) {
+            if (!options) {
+                options = {};
+            }
+
+            var minDate = options.minDate;
+            var maxDate = options.maxDate;
+
+            var config = {
+                prevText: "<",
+                nextText: ">",
+                monthNames: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],
+                dayNamesMin: ["日","一","二","三","四","五","六"],
+                minDate: 0,
+                dateFormat: 'yy-mm-dd'
+            }
+
+            if (minDate) {
+                if (!(minDate instanceof Date)) {
+                    minDate = new Date(minDate);
+                }
+                config.minDate = minDate;
+            }
+
+            if (maxDate) {
+                if (!(maxDate instanceof Date)) {
+                    maxDate = new Date(maxDate);
+                }
+                config.maxDate = maxDate;
+            }
+
+            $("#"+domId).datepicker( "destroy").datepicker(config);
+        }
+
+        bindDatePicker("live_time");
+        bindDatePicker("leave_time");
+
+        $("#live_time").change(function() {
+            var minDate = $(this).val();
+            bindDatePicker("leave_time", {minDate: minDate});
         });
+
+        $("#leave_time").change(function() {
+            var maxDate = $(this).val();
+            bindDatePicker("live_time", {maxDate: maxDate});
+        })
     });
 </script>
 <div class="business-travel">
