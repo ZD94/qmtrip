@@ -30,12 +30,6 @@ module.exports = (function() {
                             $scope.power = "普通员工";
                         }
 
-
-                        //isUpload 是否上传 true: 已上传 false： 未上传
-                        //audit 审核状态 未通过: 'N' 待审核: 'P'  审核通过 'Y'
-                        //isComplete 是否完成
-                        //budget : {$lte: 0} ///待出预算
-
                         Q.all([
                             API.tripPlan.statPlanOrderMoney({}),
                             API.travelPolicy.getTravelPolicy({id: travelLevel}),
@@ -48,7 +42,7 @@ module.exports = (function() {
                                 $scope.total_budget = planMoney.planMoney;
                                 $scope.actual_consume = planMoney.expenditure;
                                 $scope.save_money = $scope.total_budget - $scope.actual_consume;
-                                
+
                                 $scope.travelpolicy = travelPolicy;
                                 $scope.tavel_id = travelPolicy.id;
 
