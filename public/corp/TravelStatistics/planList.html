@@ -1,3 +1,14 @@
+<script type="text/javascript">
+    $(function(){
+        $("#start_time,#end_time").datepicker({
+            prevText: "<",
+            nextText: ">",
+            monthNames: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],
+            dayNamesMin: ["日","一","二","三","四","五","六"],
+            dateFormat: 'yy-mm-dd'
+        });
+    });
+</script>
 <section>
     <div class="settlement">
         <ul class="settle_tab">
@@ -7,7 +18,13 @@
             <li class="on"><a href="#/TravelStatistics/planList">出差记录</a></li>
         </ul>
         <div class="settle_main mainbox_bottom">
-            <div class="settle_chart"></div>
+            <div class="search">
+                <ul>
+                    <li>出发时间：<input type="text" id="start_time" ng-model="start_time" placeholder="请选择时间">&nbsp;-<input type="text" id="end_time" ng-model="end_time" placeholder="请选择时间"></li>
+                    <li></li>
+                    <li></li>
+                </ul>
+            </div>
             <div class="settle_list ">
                 <table width="100%" class="content">
                     <tr>
