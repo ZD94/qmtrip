@@ -9,13 +9,13 @@
         <div class="dropdown">
             <div class="dropdown-header">状态：{{STATUS}}<i class="icon web-icon-font">&#xf0d7;</i></div>
             <ul class="dropdown-menu">
-                <li ng-repeat="status in statuses" ng-click="selectStatus($index)">{{status}}</li>
+                <li ng-repeat="status in statuses" ng-click="selectStatus($index)" ng-class="{true:'active'}[(status===STATUS)]">{{status}}</li>
             </ul>
         </div>
         <div class="dropdown">
             <div class="dropdown-header">排序：{{ORDER}}<i class="icon web-icon-font">&#xf0d7;</i></div>
             <ul class="dropdown-menu">
-                <li ng-repeat="order in orders" ng-click="selectOrder($index)">{{order}}</li>
+                <li ng-repeat="order in orders" ng-click="selectOrder($index)" ng-class="{true:'active'}[(order===ORDER)]">{{order}}</li>
             </ul>
         </div>
     </div>
@@ -41,7 +41,7 @@
                     <div class="top">{{renderItemStatus($index)}}</div>
                     <div class="bottom">
                         <p class="budget" ng-if="item.status!==2">
-                            预算：<span ng-if="item.budget>=0">{{item.budget | currency:"￥"}}</span><span ng-if="item.budget<0">暂无</span>
+                            预算：<span ng-if="item.budget>=0">￥{{item.budget.toFixed(2)}}</span><span ng-if="item.budget<0">暂无</span>
                         </p>
                         <p class="points" ng-if="item.status===2">积分：<span>{{item.score}}</span></p>
                     </div>
