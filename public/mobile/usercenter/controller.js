@@ -101,7 +101,7 @@ module.exports = (function() {
         }
 
         $scope.go_unpass = function() {
-            window.location.href = "#/travelplan/planlist?status="+"审核不通过";
+            window.location.href = "#/travelplan/planlist?status="+"审核未通过";
         }
 
         $scope.go_travelstandard = function () {
