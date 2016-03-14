@@ -299,7 +299,7 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
     page = typeof page == 'number' ? page : 1;
     perPage = typeof perPage == 'number' ? perPage : 10;
     var query = _.pick(params,
-        ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure']);
+        ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
 
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {
@@ -313,6 +313,9 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
                 offset: perPage * (page - 1)
             }
 
+            if(params.order) {
+                options.order = [params.order];
+            }
             return API.tripPlan.listTripPlanOrder(options);
         })
 }

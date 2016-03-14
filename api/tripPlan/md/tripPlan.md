@@ -142,6 +142,7 @@
 | params.budget        |预算      |         |
 | params.expenditure        |支出      |       |
 | params.audit            |审核状态 N：未通过 P：待审核 Y：审核通过     |        |
+| params.order       |排序         | eg: ['startAt', 'desc'];       |
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |
