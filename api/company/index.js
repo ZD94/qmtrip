@@ -64,8 +64,8 @@ company.domainIsExist = function(params) {
  * @returns {Promise}
  */
 company.createCompany = createCompany;
-createCompany.required_params = ['createUser', 'name', 'domainName', 'mobile', 'email'];
-createCompany.optional_params = ['id', 'agencyId', 'description', 'telephone', 'remark'];
+createCompany.required_params = ['createUser', 'name', 'domainName', 'mobile', 'email', 'agencyId'];
+createCompany.optional_params = ['id', 'description', 'telephone', 'remark'];
 
 function createCompany(params){
     var _company = params;
