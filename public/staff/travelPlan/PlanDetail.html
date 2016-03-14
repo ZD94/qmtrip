@@ -91,7 +91,14 @@
                                     <input type="button" class="common_btn3 uploadbtn" value="查看" ng-click="goDetail('outTraffic',outTraffic.newInvoice)" style="width: 60px; margin-left: 47px;">
                                 </div>
                                 <div ng-if="outTraffic.status=='-1'">
-                                    <p>【审核未通过】</p>
+                                    <p class="warning">
+                                        【审核未通过】<i class="web-icon-font">&#xf05a;</i>
+                                        <span class="special_warning">
+                                            <em></em>
+                                            <b>审核未通过理由</b></br>
+                                            {{outTraffic.auditRemark}}
+                                        </span>
+                                    </p>
                                     <p>去程交通票据</p>
                                     <input type="file" class="file" name="tmpFile" value='选择文件'  id="{{outTraffic.id}}" ref="{{outTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png" style="bottom: 20px;">
                                     <input type="button" class="common_btn3 uploadbtn" value="重新上传">
@@ -132,7 +139,15 @@
                                     <input type="button" class="common_btn3 uploadbtn" value="查看" ng-click="goDetail('hotel',hotel.newInvoice)" style="width: 60px; margin-left: 47px;">
                                 </div>
                                 <div ng-if="hotel.status=='-1'">
-                                    <p>【审核未通过】</p>
+                                    <!--<p>【审核未通过】</p>-->
+                                    <p class="warning">
+                                        【审核未通过】<i class="web-icon-font">&#xf05a;</i>
+                                        <span class="special_warning">
+                                            <em></em>
+                                            <b>审核未通过理由</b></br>
+                                            {{hotel.auditRemark}}
+                                        </span>
+                                    </p>
                                     <p>酒店发票</p>
                                     <input type="file" class="file" name="tmpFile" value='选择文件'  id="{{hotel.id}}" ref="{{hotel.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png" style="bottom: 20px;">
                                     <input type="button" class="common_btn3 uploadbtn" value="重新上传">
@@ -172,7 +187,15 @@
                                     <input type="button" class="common_btn3 uploadbtn" value="查看" ng-click="goDetail('backTraffic',backTraffic.newInvoice)" style="width: 60px; margin-left: 47px;">
                                 </div>
                                 <div ng-if="backTraffic.status=='-1'">
-                                    <p>【审核未通过】</p>
+                                    <!--<p>【审核未通过】</p>-->
+                                    <p class="warning">
+                                        【审核未通过】<i class="web-icon-font">&#xf05a;</i>
+                                        <span class="special_warning">
+                                            <em></em>
+                                            <b>审核未通过理由</b></br>
+                                            {{backTraffic.auditRemark}}
+                                        </span>
+                                    </p>
                                     <p>回程交通票据</p>
                                     <input type="file" class="file" name="tmpFile" value='选择文件'  id="{{backTraffic.id}}" ref="{{backTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png" style="bottom: 20px;">
                                     <input type="button" class="common_btn3 uploadbtn" value="重新上传">

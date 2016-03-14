@@ -22,7 +22,7 @@
   .choose {
     width: 2rem;
     height: 2rem;
-    background: url('../images/choose1_bg.jpg');
+    background: url('../images/choose1_bg.jpg') no-repeat;
     position: absolute;
     top: 1.5rem;
     right: 1rem;
@@ -147,4 +147,23 @@
   top: 0;
   left: 0;
   z-index: 100;
+}
+
+.result_fail {
+  width: 100%;
+  height: auto;
+  .people {
+    width: 20%;
+    height: auto;
+    margin: 3rem auto 0 auto;
+    img {
+      width: 100%;
+    }
+  }
+  .err_text {
+    width: 100%;
+    height: 5rem;
+    line-height: 5rem;
+    text-align: center;
+  }
 }

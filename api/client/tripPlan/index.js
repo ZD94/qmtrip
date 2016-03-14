@@ -7,6 +7,8 @@ var L = require("common/language");
 var _ = require('lodash');
 var moment = require('moment');
 var C = require("../../../config");
+var Logger = require('common/logger');
+var logger = new Logger('client/tripPlan');
 
 var tripPlan = {};
 
@@ -391,6 +393,76 @@ tripPlan.countTripPlanNum = function (params) {
             params.companyId = companyId;
             return API.tripPlan.countTripPlanNum(params);
         });
+}
+
+/**
+ * @method statBudgetByGroup 统计计划单的动态预算/计划金额和实际支出
+ * @param params
+ */
+tripPlan.statBudgetByGroup = function (params) {
+    var self = this;
+    var params = _.pick(params, ['startTime', 'endTime']);
+    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
+        .then(function (staff) {
+            var companyId = staff.companyId;
+            var params_S = {
+                startTime: params.startTime,
+                endTime: params.endTime,
+                companyId: companyId,
+                index: 0
+            };
+            var params_Z = {
+                startTime: params.startTime,
+                endTime: params.endTime,
+                companyId: companyId,
+                index: 1
+            };
+            var params_X = {
+                startTime: params.startTime,
+                endTime: params.endTime,
+                companyId: companyId,
+                index: 2
+            };
+            return Promise.all([
+                API.tripPlan.statBudgetByGroup(params_S),
+                API.tripPlan.statBudgetByGroup(params_Z),
+                API.tripPlan.statBudgetByGroup(params_X)
+            ])
+                .spread(function(S, Z, X){
+                    var ret = {};
+                    for(var name in S) {
+                        ret[name] = [S[name]];
+                    }
+
+                    for(var name in Z) {
+                        if(!ret[name]){
+                            ret[name] = [];
+                        }
+                        ret[name].push(Z[name]);
+                    }
+                    for(var name in X) {
+                        if(!ret[name]){
+                            ret[name] = [];
+                        }
+                        ret[name].push(X[name]);
+                    }
+                    return ret;
+                })
+        })
+}
+
+/**
+ * 按月份统计预算/计划/完成金额
+ * @type {statBudgetByMonth}
+ */
+tripPlan.statBudgetByMonth = statBudgetByMonth;
+function statBudgetByMonth(params) {
+    var self = this;
+    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
+        .then(function (staff) {
+            params.companyId = staff.companyId;
+            return API.tripPlan.statBudgetByMonth(params)
+        })
 }
 
 /**

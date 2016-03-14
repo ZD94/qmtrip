@@ -13,6 +13,7 @@ var businesstravel=(function(){
 
     var  businesstravel = {};
 
+
     /*
         我要出差首页
      * @param $scope
@@ -25,15 +26,33 @@ var businesstravel=(function(){
         //选择项目
         $scope.selectPurposeName = function () {
             API.onload(function() {
-                API.place.hotCities({})
+                API.tripPlan.getProjectsList({})
                     .then(function(result){
-                        selectPage('#selectPurpose',result,{
-                            isAllowAdd: false,
+                        return selectPage({
+                            defaultDataFunc: function() {
+                                return new Promise(function(resolve) {
+                                    resolve(result);
+                                    console.info (result);
+                                });
+                            },
+                            fetchDataFunc: function(keyword) {
+                                return new Promise(function(resolve) {
+                                    resolve(API.tripPlan.getProjectsList({project_name:keyword}));
+                                });
+                            },
+                            isAllowAdd: true,
                             showDefault: true,
+                            displayNameKey: "",
+                            valueKey: "",
                             title: '最新项目',
-                            placeholder: '输入项目具体名称',
-                            limit: 10
+                            placeholder: '输入项目具体名称'
                         });
+                    })
+                    .spread(function(cityId, cityName) {
+                        $scope.purposename = cityName;
+                        $scope.cityId = cityId;
+                        $('#selectPurpose').attr('code',$scope.cityId);
+                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -53,9 +72,8 @@ var businesstravel=(function(){
             $scope.liveimg = $(".liveimg").css("display");
         }
         $scope.nextStep = function () {
-            $scope.purposename = $('#selectPurpose').html();
-            if ($scope.purposename=="请输入项目具体名称") {
-                alert("项目名称不能为空");
+            if ($scope.purposename=="" || $scope.purposename==undefined) {
+                Myalert("温馨提示","请填写出差目的");
                 return false;
             }
             if ($(".trafficimg").css('display')=='block' && $(".liveimg").css('display')=='none'){
@@ -97,13 +115,32 @@ var businesstravel=(function(){
                 API.onload(function() {
                     API.place.hotCities({})
                         .then(function(result){
-                            selectPage('#startPlace',result,{
+                            return selectPage({
+                                defaultDataFunc: function() {
+                                    return new Promise(function(resolve) {
+                                        resolve(result);
+                                        console.info (result);
+                                    });
+                                },
+                                fetchDataFunc: function(keyword) {
+                                    return new Promise(function(resolve) {
+                                        resolve(API.place.queryPlace({keyword:keyword}));
+                                    });
+                                },
                                 isAllowAdd: false,
                                 showDefault: true,
-                                title: '热门城市',
-                                placeholder: '输入城市名称进行搜索',
-                                limit: 10
+                                displayNameKey: "name",
+                                valueKey: "id",
+                                title: '出发城市',
+                                placeholder: '输入城市名称'
                             });
+                        })
+                        .spread(function(cityId, cityName) {
+                            $scope.startCity = cityName;
+                            $scope.cityId = cityId;
+                            console.info ($scope.cityId);
+                            $('#startPlace').attr('code',$scope.cityId);
+                            $scope.$apply();
                         })
                         .catch(function(err){
                             console.info (err);
@@ -116,13 +153,32 @@ var businesstravel=(function(){
                 API.onload(function() {
                     API.place.hotCities({})
                         .then(function(result){
-                            selectPage('#endPlace',result,{
+                            return selectPage({
+                                defaultDataFunc: function() {
+                                    return new Promise(function(resolve) {
+                                        resolve(result);
+                                        console.info (result);
+                                    });
+                                },
+                                fetchDataFunc: function(keyword) {
+                                    return new Promise(function(resolve) {
+                                        resolve(API.place.queryPlace({keyword:keyword}));
+                                    });
+                                },
                                 isAllowAdd: false,
                                 showDefault: true,
-                                title: '热门城市',
-                                placeholder: '输入城市名称进行搜索',
-                                limit: 10
+                                displayNameKey: "name",
+                                valueKey: "id",
+                                title: '目的地城市',
+                                placeholder: '输入城市名称'
                             });
+                        })
+                        .spread(function(cityId, cityName) {
+                            $scope.endCity = cityName;
+                            $scope.cityId = cityId;
+                            console.info ($scope.cityId);
+                            $('#endPlace').attr('code',$scope.cityId);
+                            $scope.$apply();
                         })
                         .catch(function(err){
                             console.info (err);
@@ -138,8 +194,8 @@ var businesstravel=(function(){
 
             //生成预算
             $scope.createResult = function () {
-                var startPlace = $('#startPlace').html(),
-                    endPlace = $('#endPlace').html(),
+                var startPlace = $scope.startCity,
+                    endPlace = $scope.endCity,
                     startPlaceVal = $('#startPlace').attr("code"),
                     endPlaceVal = $('#endPlace').attr("code"),
                     startTime = $('#startTime').html(),
@@ -408,7 +464,7 @@ var businesstravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        black_err("预算生成失败,请重新生成");
+                        window.location.href = "#/businesstravel/fail";
                     });
             })
         }
@@ -440,7 +496,7 @@ var businesstravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        black_err("预算生成失败,请重新生成");
+                        window.location.href = "#/businesstravel/fail";
                     });
             })
         }
@@ -489,7 +545,7 @@ var businesstravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        black_err("预算生成失败,请重新生成");
+                        window.location.href = "#/businesstravel/fail";
                     });
             })
 
@@ -583,7 +639,7 @@ var businesstravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        black_err("生成计划单失败");
+                        black_err("生成失败,请重新生成");
                     });
             })
         }
@@ -600,8 +656,17 @@ var businesstravel=(function(){
                 window.location.href = "#/businesstravel/trafficlive?purposename="+$scope.purposename+"&tra=1&liv=1";
             }
         }
+    }
 
 
+    /*
+     我要出差首页
+     * @param $scope
+     * @constructor
+     */
+    businesstravel.FailController = function($scope) {
+        $("title").html("错误提示");
+        loading(true);
     }
 
     return businesstravel;

@@ -188,7 +188,7 @@ travelBudget.getHotelBudget = function(params) {
             //如果没有查询到结果,直接扔回最大金额
             var days = moment(checkOutDate).diff(checkInDate, 'days');
             if (!result.price || result.price <=0) {
-                days = days<=0?1:days;
+                days = days<= 0 ? 1 :days;
                 if (policy.hotelPrice) {
                     return {price: policy.hotelPrice * days};
                 } else {
