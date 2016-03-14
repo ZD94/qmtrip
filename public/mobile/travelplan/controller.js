@@ -18,8 +18,19 @@ var travelplan=(function(){
      */
     //alert("no error");
     travelplan.PlanlistController = function($scope,$routeParams) {
+        
+        $scope.STATUS="未完成";//当前状态
+        $scope.statuses=["未完成","待出预算","待上传票据","票据审核中","审核未通过","已完成"];
+        $scope.ORDER="默认";//当前排序
+        $scope.orders=["默认","预算最大","预算最小"];
+        $scope.items=[];//“员工出差记录”
+        $scope.withBalance=true;//状态为“已完成”的“出差记录”的预算是否有节余。
+        //$scope.total="";
+        $scope.tips="";
+
         var PARAMS = (function(){//API参数：要显示的页数
             if( $routeParams.status ){
+                $scope.STATUS=$routeParams.status;
                 if( $routeParams.status==="待出预算" ){
                     return {page:1,status:-1};
                 }else
@@ -33,15 +44,7 @@ var travelplan=(function(){
                 return {page:1,isComplete:false};
             }
         })();
-
-        $scope.STATUS="未完成";//当前状态
-        $scope.statuses=["未完成","待出预算","待上传票据","票据审核中","审核不通过","已完成"];
-        $scope.ORDER="默认";//当前排序
-        $scope.orders=["默认","预算最大","预算最小"];
-        $scope.items=[];//“员工出差记录”
-        $scope.withBalance=true;//状态为“已完成”的“出差记录”的预算是否有节余。
-        $scope.total="";
-        $scope.tips="";
+        
         //-----------------------------------------------------------
         $scope.enterSelectingMode=function(){//进入“选择模式”
             $(".veil").show();
@@ -70,7 +73,7 @@ var travelplan=(function(){
             if( $scope.STATUS==="票据审核中" ){
                 PARAMS = {page:1,status:1,isCommit:true,auditStatus:0};
             }else
-            if( $scope.STATUS==="审核不通过" ){
+            if( $scope.STATUS==="审核未通过" ){
                 PARAMS = {page:1,status:1,isCommit:true,auditStatus:-1};
             }else
             if( $scope.STATUS==="已完成" ){
@@ -96,7 +99,7 @@ var travelplan=(function(){
                 return "票据审核中";
             }else
             if( $scope.items[i].status===1&&$scope.items[i].auditStatus===-1 ){
-                return "审核不通过";
+                return "审核未通过";
             }else
             if( $scope.items[i].status===2 ){
                 return "已完成";
@@ -120,7 +123,7 @@ var travelplan=(function(){
         }
 
         $scope.getList = function( p ){//获取员工出差列表并将列表显示在页面上。每执行一次该函数，列表中的记录增加十条。
-            $scope.tips="正在加载更多";
+            $scope.tips="正在加载更多...";
             API.onload(function(){
                 console.info(p);
                 API.tripPlan
@@ -130,19 +133,21 @@ var travelplan=(function(){
                         console.log(API.tripPlan);
                         console.log(list);
                         console.log($scope.items)
-                        if( $scope.items.length===0 && list.items.length===0 ){
+                        
+                        $scope.items = $scope.items.concat(list.items);
+                        p.page++;
+
+                        if( list.total===0 ){
                             $scope.tips='<p class="noRecord">没有出差记录</p><p class="seeOtherRecords">点击状态切换查看其他记录！</p>';
                         }else
-                        if( list.items.length>0 ){
-                            $scope.items = $scope.items.concat(list.items);
-                            p.page++;
-                            $scope.tips="";
+                        if( list.total<=10 ){
+                            $scope.tips="到底了，没有更多数据了";
                         }else                        
-                        if( $scope.items.length>0 && list.items.length<10){
+                        if( $scope.items.length===list.total ){
                             $scope.tips="到底了，没有更多数据了";
                         }
 
-                        $scope.total = list.total;                            
+                        //$scope.total = list.total;                            
                         
                         list.items = list.items.map(function(plan){
                             return (
@@ -199,7 +204,7 @@ var travelplan=(function(){
         }
 
         //页面上的所有交互All interacitve actions on this page
-        $(".title").html("出差记录");
+        $scope.pageTitle="出差记录";
         loading(true);
 
         $scope.getList( PARAMS );

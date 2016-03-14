@@ -408,7 +408,7 @@ var businesstravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        black_err("预算生成失败,请重新生成");
+                        window.location.href = "#/businesstravel/fail";
                     });
             })
         }
@@ -440,7 +440,7 @@ var businesstravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        black_err("预算生成失败,请重新生成");
+                        window.location.href = "#/businesstravel/fail";
                     });
             })
         }
@@ -489,7 +489,7 @@ var businesstravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        black_err("预算生成失败,请重新生成");
+                        window.location.href = "#/businesstravel/fail";
                     });
             })
 
@@ -583,7 +583,7 @@ var businesstravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        black_err("生成计划单失败");
+                        black_err("生成失败,请重新生成");
                     });
             })
         }
@@ -600,8 +600,17 @@ var businesstravel=(function(){
                 window.location.href = "#/businesstravel/trafficlive?purposename="+$scope.purposename+"&tra=1&liv=1";
             }
         }
+    }
 
 
+    /*
+     我要出差首页
+     * @param $scope
+     * @constructor
+     */
+    businesstravel.FailController = function($scope) {
+        $("title").html("错误提示");
+        loading(true);
     }
 
     return businesstravel;
