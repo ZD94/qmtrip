@@ -151,7 +151,7 @@ travelPolicy.getCurrentStaffTp = function(){
     return API.staff.getStaff({id: user_id})
         .then(function(data){
             if(data.travelLevel){
-                return API.travelPolicy.getTravelPolicy({id:id})
+                return API.travelPolicy.getTravelPolicy({id:data.travelLevel})
                     .then(function(tp){
                         if(!tp){
                             throw {code: -1, msg: '查询结果不存在'};
