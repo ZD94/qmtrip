@@ -384,10 +384,7 @@ tripPlan.listTripPlanOrder = function(options){
     if(!options.order) {
         options.order = [['start_at', 'desc'], ['create_at', 'desc']]; //默认排序，创建时间
     }
-
-    console.info("******");
-    console.info(options);
-
+   
     delete options.where.startAt;
 
     return PlanOrder.findAndCount(options)
