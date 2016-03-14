@@ -101,7 +101,7 @@
                                 <p ng-if="outTraffic.status==0 && planDetail.isCommit==true" style="color: #DE492A;">【待审核】</p>
                                 <p ng-if="outTraffic.status==0 && planDetail.isCommit==false">暂无</p>
                                 <p ng-if="outTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
-                                <p><a ng-click="outTraffichref()">去程交通票据</a></p>
+                                <p ng-if="planDetail.isCommit!=false"><a ng-click="outTraffichref()">去程交通票据</a></p>
                             </div>
                             <div ng-if="outTraffic.budget=='-1'">暂无</div>
                         </td>
@@ -128,7 +128,7 @@
                                 <p ng-if="hotel.status==0 && planDetail.isCommit==true" style="color: #DE492A;">【待审核】</p>
                                 <p ng-if="hotel.status==0 && planDetail.isCommit==false">暂无</p>
                                 <p ng-if="hotel.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
-                                <p><a ng-click="hotelhref()">酒店发票</a></p>
+                                <p ng-if="planDetail.isCommit!=false"><a ng-click="hotelhref()">酒店发票</a></p>
                             </div>
                             <div ng-if="hotel.budget=='-1'">暂无</div>
                         </td>
@@ -154,7 +154,7 @@
                                 <p ng-if="backTraffic.status==0 && planDetail.isCommit==true" style="color: #DE492A;">【待审核】</p>
                                 <p ng-if="backTraffic.status==0 && planDetail.isCommit==false">暂无</p>
                                 <p ng-if="backTraffic.status==1"><span class="tongguo web-icon-font2">&#xe9ec;</span></p>
-                                <p><a ng-click="backTraffichref()">回程交通票据</a></p>
+                                <p ng-if="planDetail.isCommit!=false"><a ng-click="backTraffichref()">回程交通票据</a></p>
                             </div>
                             <div ng-if="backTraffic.budget=='-1'">暂无</div>
                         </td>
