@@ -385,8 +385,6 @@ tripPlan.listTripPlanOrder = function(options){
          options.order = [['start_at', 'desc'], ['create_at', 'desc']]; //默认排序，创建时间
     }
 
-    delete options.where.startAt;
-
     return PlanOrder.findAndCount(options)
         .then(function(ret){
             if(!ret || ret.rows .length === 0){
@@ -893,7 +891,7 @@ function statPlanOrderMoney(params){
         status: STATUS.COMPLETE,
         auditStatus: 1
     }
-    var query_sql = 'select sum(budget-expenditure) as \"savedMoney\" from tripplan.trip_plan_order where company_id=? and status=? and audit_status=1';
+    var query_sql = 'select sum(budget-expenditure) as \"savedMoney\" from tripplan.trip_plan_order where company_id=\''+ params.companyId +'\' and status=2 and audit_status=1';
     query.status = {$gte: STATUS.NO_COMMIT};
     var startAt = {};
 
@@ -926,7 +924,7 @@ function statPlanOrderMoney(params){
         PlanOrder.sum('budget', {where: query_complete}),
         PlanOrder.sum('expenditure', {where: query_complete}),
         PlanOrder.count({where: query_complete}),
-        sequelize.query(query_sql, {replacements: [params.companyId, STATUS.COMPLETE]})
+        sequelize.query(query_sql)
     ])
         .spread(function(n1, n2, n3, n4, n5) {
             var savedMoney = n5[0][0].savedMoney || 0;

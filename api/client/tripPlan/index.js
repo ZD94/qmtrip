@@ -285,7 +285,7 @@ function getQueryByParams(params) {
     }
 
     var query = _.pick(params, ['status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination',
-        'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit']);
+        'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'description', 'remark', 'isCommit']);
 
     return query;
 }
@@ -294,7 +294,11 @@ function getQueryByParams(params) {
  * 获取员工计划单分页列表(企业)
  * @returns {*}
  */
-tripPlan.pageTripPlanOrderByCompany = function (params) {
+tripPlan.pageTripPlanOrderByCompany = pageTripPlanOrderByCompany;
+pageTripPlanOrderByCompany.optional_params = ['audit', 'startTime', 'endTime', 'startPlace', 'destination',
+    'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit', 'isHasBudget', 'isUpload', 'isComplete', 'description'];
+function pageTripPlanOrderByCompany(params) {
+    logger.warn(params);
     if (typeof params == 'function') {
         throw {code: -2, msg: '参数不正确'};
     }
@@ -315,19 +319,20 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
         params.auditStatus = 1;
     }
 
+    if(params.startTime) {
+        params.startAt?params.startAt.$gte = params.startTime:params.startAt = {$gte: params.startTime};
+    }
+
+    if(params.endTime) {
+        params.startAt?params.startAt.$lte = params.endTime:params.startAt = {$lte: params.endTime};
+    }
+
     var query = getQueryByParams(params);
-    logger.error("************************");
-    logger.error(query);
     var status = query.status;
-    logger.error(status);
     if(status == undefined) {
-        logger.warn("&&&&&&&&&&&&&&&&&&&&&");
-        status = query.status = {}
-        logger.warn(typeof query.status);
+        status = query.status = {};
     }
     typeof status == 'object'?query.status.$gt = -1:query.status = status;
-
-    logger.error(query);
 
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {

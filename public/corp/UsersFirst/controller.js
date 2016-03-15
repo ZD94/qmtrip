@@ -20,6 +20,9 @@ var UsersFirst = (function(){
 		else {
 			$(".confirmFixed").hide();
 		}
+		$scope.goDepartment = function () {
+			window.location.href = "#/StaffManage/Department";
+		}
 		$scope.goPolicyList = function () {
 			window.location.href = "#/TravelPolicy/PolicyList";
 		}
