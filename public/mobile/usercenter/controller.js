@@ -34,7 +34,7 @@ module.exports = (function() {
                         Q.all([
                             API.tripPlan.statPlanOrderMoney({}),
                             API.travelPolicy.getTravelPolicy({id: travelLevel}),
-                            API.tripPlan.pageTripPlanOrder({budget : {$lte: 0}}),
+                            API.tripPlan.pageTripPlanOrder({isHasBudget: false}),
                             API.tripPlan.pageTripPlanOrder({isUpload:false}),
                             API.tripPlan.pageTripPlanOrder({audit:"N"})
                         ])

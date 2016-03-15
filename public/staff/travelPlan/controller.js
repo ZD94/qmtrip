@@ -45,7 +45,7 @@ var travelPlan=(function(){
         //待出预算列表
         $scope.initPlanList2 = function () {
             API.onload(function() {
-                API.tripPlan.pageTripPlanOrder({status:'-1',page:$scope.page2})
+                API.tripPlan.pageTripPlanOrder({isHasBudget: false, page:$scope.page2})
                     .then(function(result){
                         console.info (result);
                         $scope.total2 = result.total;
@@ -61,7 +61,7 @@ var travelPlan=(function(){
         //待上传票据列表
         $scope.initPlanList3 = function () {
             API.onload(function() {
-                API.tripPlan.pageTripPlanOrder({status:0,page:$scope.page3})
+                API.tripPlan.pageTripPlanOrder({isUpload: false, page:$scope.page3})
                     .then(function(result){
                         $scope.total3 = result.total;
                         $scope.planListitems3 = result.items;
