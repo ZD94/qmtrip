@@ -316,7 +316,7 @@ describe("api/client/tripPlan.js", function() {
 
         it("#pageTripPlanOrder should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.pageTripPlanOrder.call(self, {page: 1, isUpload: false, audit: 'Y'}, function (err, ret) {
+            API.client.tripPlan.pageTripPlanOrder.call(self, {page: 1, audit: 'P'}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
