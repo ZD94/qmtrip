@@ -114,6 +114,7 @@ function selectPage (options) {
 		str += "<div id='select-box-data'></div>";
 		str += "</dl>";
 		$('#angular-view').append(str);
+		$("#select-box-search-input").focus();
 	}
 
 	function appendData(data) {
