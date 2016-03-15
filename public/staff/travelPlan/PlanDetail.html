@@ -1,16 +1,19 @@
 <style>html,body {background: #F5F5F5;}</style>
 <div class="travel-plan">
     <div class="planDetail">
-        <div class="planpath"><a href="#/StaffFirst/StaffUser">我的账户</a>&nbsp;>&nbsp;<a href="#/travelPlan/PlanList">我的出差记录</a>&nbsp;>&nbsp;<span>出差详情页</span></div>
+        <div class="planpath">
+            <a href="#/StaffFirst/StaffUser">我的账户</a>&nbsp;>&nbsp;<a href="#/travelPlan/PlanList">我的出差记录</a>&nbsp;>&nbsp;<span>出差详情页</span>
+        </div>
         <div class="mainbox">
             <div class="title_top">
                 <table width="100%">
                     <tr>
                         <td width="220" height="40" align="left" style="font-size: 13px;">生成时间：{{planDetail.createAt | date: 'yyyy-MM-dd HH:mm'}}</td>
-                        <td height="40" align="center">您于
+                        <td height="40" align="center">
+                            您于
                             <span ng-if="planDetail.startAt">{{planDetail.startAt | date: 'yyyy月MM月dd日'}}</span>
                             <span ng-if="!planDetail.startAt">{{planDetail.hotel[0].startTime | date: 'yyyy月MM月dd日'}}</span>
-                            的出差概括
+                            的出差记录
                         </td>
                         <td width="220" height="40" align="right">{{planDetail.description}}</td>
                     </tr>
@@ -44,7 +47,7 @@
                 <dl>
                     <dt>获得积分</dt>
                     <dd>
-                        <span ng-if="planDetail.score">{{planDetail.score}}</span>
+                        <span ng-if="planDetail.score"><span class="web-icon-font3" style="color:#EBBC18;font-size:25px">&#xe912;</span>{{planDetail.score}}</span>
                         <span ng-if="!planDetail.score">暂无</span>
                     </dd>
                 </dl>
@@ -52,13 +55,15 @@
             <div class="title_bottom"><span></span>差旅消费明细<a class="scan" ng-click="alertScan()" style="color: #75491F;" ng-if="planDetail.status!=2 && planDetail.status!=1">扫一扫上传票据</a></div>
             <div id="img"></div>
             <div class="content_bottom">
-                <table width="100%" border="1" bordercolor="#E5E5E5">
+                <table width="100%" border="0" bordercolor="#E5E5E5">
                     <tr>
-                        <th height="40" align="left">　　　明细</th>
-                        <th width="155" height="40">预算</th>
-                        <th width="155" height="40">实际支出</th>
-                        <th width="155" height="40">出差票据</th>
+                        <th height="40" align="left" style="color:#B8B8B8!important;">　　　明细</th>
+                        <th width="155" height="40" style="color:#B8B8B8!important">预算</th>
+                        <th width="155" height="40" style="color:#B8B8B8!important">实际支出</th>
+                        <th width="155" height="40" style="color:#B8B8B8!important">出差票据</th>
                     </tr>
+                </table>
+                <table width="100%" border="1" bordercolor="#E5E5E5">
                     <tr ng-if="planDetail.outTraffic.length!=0">
                         <td>
                             <div class="icon web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
@@ -66,15 +71,15 @@
                             <div class="description">{{outTraffic.startTime | date: 'yyyy-MM-dd'}}<span ng-if="outTraffic.latestArriveTime!=undefined && outTraffic.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{outTraffic.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
                             <div class="endplace">{{outTraffic.arrivalPlace}}</div>
                         </td>
-                        <td align="center">
+                        <td width="155" align="center">
                             <span ng-if="outTraffic.budget=='-1'" style="color: #E05134;">小编正在为您查询<br>请耐心等待</span>
                             <span ng-if="outTraffic.budget!='-1'">¥{{outTraffic.budget.toFixed(2)}}</span>
                         </td>
-                        <td align="center">
+                        <td width="155" align="center">
                             <span ng-if="outTraffic.expenditure">¥{{outTraffic.expenditure.toFixed(2)}}</span>
                             <span ng-if="!outTraffic.expenditure">暂无</span>
                         </td>
-                        <td align="center" class="po_r">
+                        <td width="155" align="center" class="po_r">
                             <p ng-if="outTraffic.budget=='-1'">暂无</p>
                             <div ng-if="outTraffic.budget!='-1'">
                                 <input type="file" class="file" name="tmpFile" value='选择文件'  id="{{outTraffic.id}}" ref="{{outTraffic.id}}" data-type = "1" accept="image/gif,image/jpeg,image/jpg,image/png" ng-if="!outTraffic.newInvoice && outTraffic.isCommit==false">
