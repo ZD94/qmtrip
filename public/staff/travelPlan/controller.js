@@ -241,10 +241,13 @@ var travelPlan=(function(){
                         loading(true);
                         $scope.$apply();
                         $('.warning i').hover(function(){
-                            console.info(111);
-                            $('.warning .special_warning').show();
+                            //$('.warning .special_warning').show();
+                            $('.special_warning').hide();
+                            $(this).siblings('.special_warning').show();
                         },function(){
-                            $('.warning .special_warning').hide();
+                            $(this).siblings('.special_warning').hide();
+
+                            //$('.warning .special_warning').hide();
                         });
                         $(".file").AjaxFileUpload({
                             action: '/upload/ajax-upload-file?type=invoice',
