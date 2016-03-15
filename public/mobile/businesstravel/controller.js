@@ -631,7 +631,7 @@ var businesstravel=(function(){
             $scope.livePlace = $routeParams.lc;
             $scope.livePlaceVal = $routeParams.lcval;
             $scope.landmarkVal = $routeParams.lpval;
-            $scope.landmark = $routeParams.lp;
+            $scope.landmark = $routeParams.livep;
             $scope.liveTime = $routeParams.livetime;
             $scope.leaveTime =  $routeParams.leavetime;
             API.onload(function() {
@@ -641,7 +641,6 @@ var businesstravel=(function(){
                         originPlace:$scope.startPlaceVal,
                         destinationPlace:$scope.endPlaceVal,
                         outboundDate:$scope.startTime,
-                        inboundDate:$scope.endTime,
                         outLatestArriveTime:$scope.startTimeLate,
                         inLatestArriveTime:$scope.endTimeLate,
                         businessDistrict:$scope.landmarkVal,
