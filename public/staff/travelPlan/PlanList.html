@@ -7,16 +7,13 @@
                 <span ng-if="!planListitems.length">(0)</span>
             </li>
             <li>待出预算
-                <span ng-if="finishPlanListitems.length">({{total2}})</span>
-                <span ng-if="!finishPlanListitems.length">(0)</span>
+                <span>({{planListitems2.length?total2:0}})</span>
             </li>
             <li>待上传票据
-                <span ng-if="finishPlanListitems.length">({{total3}})</span>
-                <span ng-if="!finishPlanListitems.length">(0)</span>
+                <span>({{planListitems3.length?total3:0}})</span>
             </li>
             <li>已完成
-                <span ng-if="finishPlanListitems.length">({{total4}})</span>
-                <span ng-if="!finishPlanListitems.length">(0)</span>
+                <span>({{finishPlanListitems.length?total4:0}})</span>
             </li>
         </ul>
         <div class="mainbox_bottom">
