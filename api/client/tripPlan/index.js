@@ -296,7 +296,7 @@ function getQueryByParams(params) {
  */
 tripPlan.pageTripPlanOrderByCompany = pageTripPlanOrderByCompany;
 pageTripPlanOrderByCompany.optional_params = ['audit', 'startTime', 'endTime', 'startPlace', 'destination',
-    'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit', 'isHasBudget', 'isUpload', 'isComplete', 'description'];
+    'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit', 'isHasBudget', 'isUpload', 'isComplete', 'description', 'page', 'perPage'];
 function pageTripPlanOrderByCompany(params) {
     logger.warn(params);
     if (typeof params == 'function') {
