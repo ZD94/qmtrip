@@ -46,6 +46,22 @@ var travelplan=(function(){
         })();
         
         //-----------------------------------------------------------
+        function init(){
+            //页面上的所有交互All interacitve actions on this page
+            $scope.$root.pageTitle="出差记录";
+            loading(true);
+
+            $scope.getList( PARAMS );
+            $(window).on("scroll",$scope.handleScroll);
+            $(".dropdown-header").on("click",$scope.enterSelectingMode);
+            $(".veil").on("click",$scope.quitSelectingMode);
+            $(window).on("resize",setWidthOfText)
+        };
+
+        function setWidthOfText(){
+            
+        }
+
         $scope.enterSelectingMode=function(){//进入“选择模式”
             $(".veil").show();
             $("body").css({overflow:"hidden"});
@@ -207,14 +223,8 @@ var travelplan=(function(){
             window.location="#/travelplan/plandetail?orderId=" + orderId;
         }
 
-        //页面上的所有交互All interacitve actions on this page
-        $scope.$root.pageTitle="出差记录";
-        loading(true);
+        init();
 
-        $scope.getList( PARAMS );
-        $(window).on("scroll",$scope.handleScroll);
-        $(".dropdown-header").on("click",$scope.enterSelectingMode);
-        $(".veil").on("click",$scope.quitSelectingMode);
     }
 
 
