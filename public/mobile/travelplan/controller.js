@@ -204,7 +204,7 @@ var travelplan=(function(){
         }
 
         $scope.enterDetail = function (orderId) {//进入详情页
-            window.open("#/travelplan/plandetail?orderId=" + orderId);
+            window.location="#/travelplan/plandetail?orderId=" + orderId;
         }
 
         //页面上的所有交互All interacitve actions on this page
