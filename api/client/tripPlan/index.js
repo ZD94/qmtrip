@@ -316,7 +316,8 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
     }
 
     var query = getQueryByParams(params);
-
+    var status = query.status;
+    typeof status == 'object'?query.status.$ne = -1:query.status = status;
 
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {
