@@ -21,7 +21,7 @@ module.exports = (function() {
             $($event.target).siblings('input').val('');
             $('#login').attr('disabled',true).removeClass('blue_bc');
         }
-        $scope.check_login = function() {
+        var checkLogin = $scope.check_login = function() {
             var mail = $('#name').val();
             var pwd  = $('#pwd').val();
             var commit = true;
@@ -47,7 +47,7 @@ module.exports = (function() {
         API.onload(function(){
             $('#pwd').keydown(function(e){
                 if(e.keyCode==13){
-                    $scope.checkLogin(); //处理事件
+                    checkLogin();
                 }
             })
         })
