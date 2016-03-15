@@ -241,10 +241,13 @@ var travelPlan=(function(){
                         loading(true);
                         $scope.$apply();
                         $('.warning i').hover(function(){
-                            console.info(111);
-                            $('.warning .special_warning').show();
+                            //$('.warning .special_warning').show();
+                            $('.special_warning').hide();
+                            $(this).siblings('.special_warning').show();
                         },function(){
-                            $('.warning .special_warning').hide();
+                            $(this).siblings('.special_warning').hide();
+
+                            //$('.warning .special_warning').hide();
                         });
                         $(".file").AjaxFileUpload({
                             action: '/upload/ajax-upload-file?type=invoice',
@@ -350,13 +353,13 @@ var travelPlan=(function(){
                             if (trim_Version < 9) {
                                 // alert(“LowB,快升级你的IE”)
                                 var qrnode = new qrcode({
-                                    correctLevel: 3,
+                                    correctLevel: 2,
                                     render: 'svg',
                                     text: content,
                                     size: 256,
                                     pdground: '#000000',
-                                    image : 'staff/images/s_menu1.png',
-                                    imageSize:50
+                                    image : 'staff/images/logo.png',
+                                    imageSize:80
                                 });
                                 document.getElementById('qrcode').appendChild(qrnode);
                                 return false;
@@ -364,13 +367,13 @@ var travelPlan=(function(){
                         }
                         
                         var qrnode = new qrcode({
-                            correctLevel: 3,
+                            correctLevel: 2,
                             render: 'canvas',
                             text: content,
                             size: 256,
                             pdground: '#000000',
-                            image : 'staff/images/s_menu1.png',
-                            imageSize:50
+                            image : 'staff/images/logo.png',
+                            imageSize:80
                         });
                         document.getElementById('qrcode').appendChild(qrnode);
                         return true;
