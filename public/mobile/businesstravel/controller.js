@@ -131,14 +131,13 @@ var businesstravel=(function(){
                                 showDefault: true,
                                 displayNameKey: "name",
                                 valueKey: "id",
-                                title: '出发城市',
+                                title: '常用城市',
                                 placeholder: '输入城市名称'
                             });
                         })
                         .spread(function(startCityId, cityName) {
                             $scope.startCity = cityName;
                             $scope.startCityId = startCityId;
-                            console.info ($scope.cityId);
                             $('#startCity').attr('code',$scope.startCityId);
                             $scope.$apply();
                         })
@@ -169,14 +168,13 @@ var businesstravel=(function(){
                                 showDefault: true,
                                 displayNameKey: "name",
                                 valueKey: "id",
-                                title: '目的地城市',
+                                title: '常用城市',
                                 placeholder: '输入城市名称'
                             });
                         })
                         .spread(function(endCityId, cityName) {
                             $scope.endCity = cityName;
                             $scope.endCityId = endCityId;
-                            console.info ($scope.endCityId);
                             $('#endCity').attr('code',$scope.endCityId);
                             $scope.$apply();
                         })
@@ -235,14 +233,13 @@ var businesstravel=(function(){
                                 showDefault: true,
                                 displayNameKey: "name",
                                 valueKey: "id",
-                                title: '出发城市',
+                                title: '常用城市',
                                 placeholder: '输入城市名称'
                             });
                         })
                         .spread(function(liveCityId, cityName) {
                             $scope.liveCity = cityName;
                             $scope.liveCityId = liveCityId;
-                            console.info ($scope.liveCityId);
                             $('#liveCity').attr('code',$scope.liveCityId);
                             $scope.$apply();
                         })
@@ -280,7 +277,6 @@ var businesstravel=(function(){
                         .spread(function(livePlaceId, livePlace) {
                             $scope.livePlace = livePlace;
                             $scope.livePlaceId = livePlaceId;
-                            console.info ($scope.livePlaceId);
                             $('#livePlace').attr('code',$scope.livePlaceId);
                             $scope.$apply();
                         })
@@ -334,14 +330,13 @@ var businesstravel=(function(){
                                 showDefault: true,
                                 displayNameKey: "name",
                                 valueKey: "id",
-                                title: '出发城市',
+                                title: '常用城市',
                                 placeholder: '输入城市名称'
                             });
                         })
                         .spread(function(startCityId, cityName) {
                             $scope.startCity = cityName;
                             $scope.startCityId = startCityId;
-                            console.info ($scope.cityId);
                             $('#startCity').attr('code',$scope.startCityId);
                             $scope.$apply();
                         })
@@ -373,14 +368,13 @@ var businesstravel=(function(){
                                 showDefault: true,
                                 displayNameKey: "name",
                                 valueKey: "id",
-                                title: '目的地城市',
+                                title: '常用城市',
                                 placeholder: '输入城市名称'
                             });
                         })
                         .spread(function(endCityId, cityName) {
                             $scope.endCity = cityName;
                             $scope.endCityId = endCityId;
-                            console.info ($scope.endCityId);
                             $('#endCity').attr('code',$scope.endCityId);
                             $scope.$apply();
                         })
@@ -412,14 +406,13 @@ var businesstravel=(function(){
                                 showDefault: true,
                                 displayNameKey: "name",
                                 valueKey: "id",
-                                title: '出发城市',
+                                title: '常用城市',
                                 placeholder: '输入城市名称'
                             });
                         })
                         .spread(function(liveCityId, cityName) {
                             $scope.liveCity = cityName;
                             $scope.liveCityId = liveCityId;
-                            console.info ($scope.liveCityId);
                             $('#liveCity').attr('code',$scope.liveCityId);
                             $scope.$apply();
                         })
@@ -458,7 +451,6 @@ var businesstravel=(function(){
                         .spread(function(livePlaceId, livePlace) {
                             $scope.livePlace = livePlace;
                             $scope.livePlaceId = livePlaceId;
-                            console.info ($scope.livePlaceId);
                             $('#livePlace').attr('code',$scope.livePlaceId);
                             $scope.$apply();
                         })
