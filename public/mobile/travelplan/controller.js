@@ -25,7 +25,7 @@ var travelplan=(function(){
         $scope.orders=["默认","预算最大","预算最小"];
         $scope.items=[];//“员工出差记录”
         $scope.withBalance=true;//状态为“已完成”的“出差记录”的预算是否有节余。
-        //$scope.total="";
+        $scope.total=null;
         $scope.tips="";
 
         var PARAMS = (function(){//API参数：要显示的页数
@@ -148,6 +148,7 @@ var travelplan=(function(){
                         console.log($scope.items)
                         
                         $scope.items = $scope.items.concat(list.items);
+                        $scope.total = list.total;
                         p.page++;
 
                         if( list.total===0 ){
