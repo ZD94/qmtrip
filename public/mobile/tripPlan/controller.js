@@ -223,6 +223,9 @@
         }
         
  	}
+    tripPlan.UploadDownController = function($scope){
+        loading(true);
+    }
  	return tripPlan;
  })();
  module.exports = tripPlan;
