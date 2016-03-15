@@ -19,9 +19,9 @@
         </div>
     </div>
     <div class="w100 button_fix">
-        <input type="button" value="返回上一步" class="common_btn3 w50" ng-click="returnUrl()" style="float: left;">
-        <input type="button" value="生成预算单" class="common_btn1 w50" ng-if="tra == 1 && liv == 0" ng-click="createResult()" style="float: right;">
-        <input type="button" value="下一步" class="common_btn1 w50" ng-if="tra == 1 && liv == 1" ng-click="nextStep()" style="float: right;">
+        <a class="common_btn3 w50" ng-click="returnUrl()" style="float: left;">返回上一步</a>
+        <a class="common_btn1 w50" ng-if="tra == 1 && liv == 0" ng-click="createResult()" style="float: right;">生成预算单</a>
+        <a class="common_btn1 w50" ng-if="tra == 1 && liv == 1" ng-click="nextStep()" style="float: right;">下一步</a>
     </div>
     <div class="clear"></div>
 </div>
@@ -39,10 +39,10 @@
         <div class="common_text margin_c margin_b halfinput" id="leaveTime" ng-click="chooeseData($event)" style="float: right;">离店时间</div>
     </div>
     <div class="w100 button_fix">
-        <input type="button" value="返回上一步1" class="common_btn3 w50" ng-if="tra == 0 && liv == 1" ng-click="returnUrl()" style="float: left;">
-        <input type="button" value="返回上一步2" class="common_btn3 w50" ng-if="tra == 1 && liv == 1" ng-click="prevStep()" style="float: left;">
-        <input type="button" value="生成预算单1" class="common_btn1 w50" ng-if="tra == 0 && liv == 1" ng-click="createResult()" style="float: right;">
-        <input type="button" value="生成预算单2" class="common_btn1 w50" ng-if="tra == 1 && liv == 1" ng-click="createResult()" style="float: right;">
+        <a class="common_btn3 w50" ng-if="tra == 0 && liv == 1" ng-click="returnUrl()" style="float: left;">返回上一步1</a>
+        <a class="common_btn3 w50" ng-if="tra == 1 && liv == 1" ng-click="prevStep()" style="float: left;">返回上一步2</a>
+        <a class="common_btn1 w50" ng-if="tra == 0 && liv == 1" ng-click="createResult()" style="float: right;">生成预算单1</a>
+        <a class="common_btn1 w50" ng-if="tra == 1 && liv == 1" ng-click="createResult()" style="float: right;">生成预算单2</a>
     </div>
     <div class="clear"></div>
 </div>
