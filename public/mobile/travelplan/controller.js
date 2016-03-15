@@ -32,13 +32,13 @@ var travelplan=(function(){
             if( $routeParams.status ){
                 $scope.STATUS=$routeParams.status;
                 if( $routeParams.status==="待出预算" ){
-                    return {page:1,status:-1};
+                    return {page:1, isHasBudget: false};
                 }else
                 if( $routeParams.status==="待上传票据" ){
-                    return {page:1,status:0};
+                    return {page:1, isUpload: false};
                 }else
                 if( $routeParams.status==="审核未通过" ){
-                    return {page:1,status:1,isCommit:true,auditStatus:-1};
+                    return {page:1, audit: 'N'};
                 };
             }else{
                 return {page:1,isComplete:false};
