@@ -97,9 +97,10 @@ function savePlanOrder(params){
                 }
             }
 
+            //_planOrder.orderStatus = 'NO_BUDGET';
             _planOrder.budget = total_budget;
             if(!isBudget) {
-                _planOrder.status = STATUS.NO_BUDGET; //待录入预算状态
+                _planOrder.orderStatus = 'NO_BUDGET';
                 _planOrder.budget = -1;
             }
 

@@ -264,6 +264,16 @@ tripPlan.pageTripPlanOrder = function (params) {
 
 /**
  * 获取员工计划单分页列表(企业)
+ *
+ * @param params
+ * @param params.page 页数
+ * @param params.perPage 每页记录数
+ * @param params.isUpload 票据是否上传，true 已经上传;false 未上传
+ * @param params.audit 审核状态 'N': 审核未通过 'P': 待审核 'Y': 审核通过
+ *
+ * @param params.startTime 出发时间(开始)
+ * @param params.endTime 出发时间(结束) 默认当前时间
+ *
  * @returns {*}
  */
 tripPlan.pageTripPlanOrderByCompany = function (params) {

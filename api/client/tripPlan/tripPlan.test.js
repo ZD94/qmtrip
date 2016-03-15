@@ -275,6 +275,7 @@ describe("api/client/tripPlan.js", function() {
                 if (err) {
                     throw err;
                 }
+                console.info(ret.toJSON());
                 assert.equal(ret.id, newOrderId);
                 done();
             })
