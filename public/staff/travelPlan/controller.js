@@ -359,7 +359,11 @@ var travelPlan=(function(){
                                     size: 256,
                                     pdground: '#000000',
                                     image : 'staff/images/logo.png',
+<<<<<<< 13569bd56f6f10a8b99b83bb2760c1dd955a0293
                                     imageSize:80
+=======
+                                    imageSize:60
+>>>>>>> qrcode
                                 });
                                 document.getElementById('qrcode').appendChild(qrnode);
                                 return false;
