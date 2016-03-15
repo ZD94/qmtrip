@@ -527,9 +527,56 @@ var businesstravel=(function(){
 
             //下一步
             $scope.nextStep = function () {
+                var startCity = $('#startCity').val(),
+                    endCity = $('#endCity').val(),
+                    startCityVal = $('#startCity').attr("code"),
+                    endCityVal = $('#endCity').attr("code"),
+                    startTime = $('#startTime').val(),
+                    endTime =  $('#endTime').val(),
+                    startTimeLate =  $('#startTimeLate').val(),
+                    endTimeLate =  $('#endTimeLate').val();
+
+                var dateReg = /^\d{4}-\d{2}-\d{2}$/;
+                var timeReg = /^\d{2}:\d{2}$/;
+                if (startCity == "" || startCity == undefined) {
+                    black_err("请选择出发城市");
+                    return false;
+                }
+                if (endCity == "" || endCity == undefined) {
+                    black_err("请选择目的地城市");
+                    return false;
+                }
+                if (!startTime || !dateReg.test(startTime)) {
+                    black_err("出发日期不存在或格式不正确");
+                    return false;
+                }
+                if (!dateReg.test(endTime)&&endTime!="") {
+                    black_err("返程日期格式不正确");
+                    return false;
+                }
+                if (startTime>endTime&&endTime!="") {
+                    black_err("返程日期不能小于出发日期");
+                    return false;
+                }
+                if (startCity == endCity) {
+                    black_err("出发城市与目的地城市不能相同");
+                    return false;
+                }
+                if (!timeReg.test(endTimeLate)&&endTimeLate!="") {
+                    black_err("最晚到达时间格式时间格式不正确");
+                    return false;
+                }
+                if (!timeReg.test(startTimeLate)&&startTimeLate!="") {
+                    black_err("最晚到达时间格式时间格式不正确");
+                    return false;
+                }
+
+
                 $('.traffic_step').fadeOut();
                 $('.live_step').fadeIn();
                 $('#liveCity').val($('#endCity').val());
+                $('#liveTime').val($('#startTime').val());
+                $('#leaveTime').val($('#endTime').val());
             }
 
             //生成预算单
@@ -548,6 +595,23 @@ var businesstravel=(function(){
                     livePlaceVal = $('#livePlace').attr("code"),
                     liveTime = $('#liveTime').val(),
                     leaveTime = $('#leaveTime').val();
+                var dateReg = /^\d{4}-\d{2}-\d{2}$/;
+                if (liveCity == "" || liveCity == undefined) {
+                    black_err("请选择目的地城市");
+                    return false;
+                }
+                if (!liveTime || !dateReg.test(liveTime)) {
+                    black_err("入住日期不存在或格式不正确");
+                    return false;
+                }
+                if (!leaveTime || !dateReg.test(leaveTime)) {
+                    black_err("离店日期不存在或格式不正确");
+                    return false;
+                }
+                if (liveTime>leaveTime&&leaveTime!="") {
+                    black_err("离店日期不能小于入住日期");
+                    return false;
+                }
                 window.location.href = "#/businesstravel/createresult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&sc="+startCity+"&ec="+endCity+"&scval="+startCityVal+"&ecval="+endCityVal+"&stime="+startTime+"&etime="+endTime+"&stimel="+startTimeLate+"&etimel="+endTimeLate+"&livec="+liveCity+"&livep="+livePlace+"&lcval="+liveCityVal+"&lpval="+livePlaceVal+"&livetime="+liveTime+"&leavetime="+leaveTime;
             }
 
