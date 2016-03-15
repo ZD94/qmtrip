@@ -39,10 +39,10 @@ module.exports = (function() {
                             API.tripPlan.pageTripPlanOrder({audit:"N"})
                         ])
                             .spread(function(planMoney,travelPolicy,plan_status_1,plan_status_2,plan_status_3){
-
+                                console.info(planMoney);
                                 $scope.total_budget = planMoney.planMoney;
                                 $scope.actual_consume = planMoney.expenditure;
-                                $scope.save_money = $scope.total_budget - $scope.actual_consume;
+                                $scope.save_money = planMoney.savedMoney;
 
                                 $scope.travelpolicy = travelPolicy;
                                 $scope.tavel_id = travelPolicy.id;
