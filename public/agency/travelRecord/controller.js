@@ -444,13 +444,25 @@ var travelRecord=(function(){
         }
         $scope.invoiceNoPass = function () {
             var reasontext = $(".invoiceNoPass .remark").val();
-            $scope.remark = reason1 + "," + reason2 + "," + reasontext;
+
+            var reason = reason1;
+
+            if(reason2 != '') {
+                reason==''?reason = reason2: reason += ','+reason2;
+            }
+
+            if(reasontext != '') {
+                reason==''?reason = reasontext: reason += ','+reasontext;
+            }
+
+            $scope.remark = reason;
             $('.error').empty();
             if (reason1 =='' && reason2 == '' && reasontext == '') {
                 $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>理由不能为空");
                 return false;
             }
             API.onload(function() {
+                console.info($scope.remark);
                 API.agencyTripPlan.approveInvoice({
                     userId:$scope.planDetail.accountId,
                     consumeId:$scope.consumeId,
