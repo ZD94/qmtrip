@@ -7,6 +7,7 @@ var travelPlan=(function(){
     API.require('tripPlan');
     API.require("auth");
     API.require("attachment");
+    API.require('staff');
 
     var  travelPlan = {};
 
