@@ -273,3 +273,18 @@
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
 | orderId 或者 false    | 如果计划单存在返回计划单id，不存在则返回false | 出现异常返回错误信息 {code: error_code, msg: error_msg } |
+
+
+>. 统计多个月份上中下旬企业的预算/计划/支出情况 API.tripPlan.statBudgetByMonth(params, callback);
+
+| 参数                                    | 含义               |类型                  | 备注
+|------                                 |------               |-----                |------
+| params                              |      |JSON |必填
+| params.startTime               |开始时间 |string |
+| params.endTIme                 |结束时间 |string |
+| callback                              | 回调函数             |function              |支持promise
+
+| 返回参数 | 含义 | 备注 |
+|---------|------|-----|
+|return Array
+|[{month: month, qmBudget: qmBudget, planMoney: planMoney, expenditure: expenditure, remark: remark}]

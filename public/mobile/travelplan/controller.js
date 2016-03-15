@@ -25,7 +25,7 @@ var travelplan=(function(){
         $scope.orders=["默认","预算最大","预算最小"];
         $scope.items=[];//“员工出差记录”
         $scope.withBalance=true;//状态为“已完成”的“出差记录”的预算是否有节余。
-        //$scope.total="";
+        $scope.total=null;
         $scope.tips="";
 
         var PARAMS = (function(){//API参数：要显示的页数
@@ -60,6 +60,7 @@ var travelplan=(function(){
 
         $scope.selectStatus=function(i){//选择“状态”
             $scope.STATUS=$scope.statuses[i];
+            $scope.ORDER="默认";
             $scope.items=[];
             if( $scope.STATUS==="未完成" ){
                 PARAMS = {page:1,isComplete:false};
@@ -85,6 +86,18 @@ var travelplan=(function(){
 
         $scope.selectOrder=function(i){
             $scope.ORDER=$scope.orders[i];
+            $scope.items=[];
+            PARAMS.page=1;
+            if( $scope.ORDER === "默认" ){
+                PARAMS.order = null;
+            }else
+            if( $scope.ORDER === "预算最大" ){
+                PARAMS.order = ["budget","desc"];
+            }else
+            if( $scope.ORDER === "预算最小" ){
+                PARAMS.order = ["budget","asc"];
+            }
+            $scope.getList( PARAMS );
             $scope.quitSelectingMode();
         }
 
@@ -135,6 +148,7 @@ var travelplan=(function(){
                         console.log($scope.items)
                         
                         $scope.items = $scope.items.concat(list.items);
+                        $scope.total = list.total;
                         p.page++;
 
                         if( list.total===0 ){
@@ -188,16 +202,6 @@ var travelplan=(function(){
                 $scope.getList( PARAMS );
             }
         }
-
-        $scope.sortList = function(){//将出差记录排序
-            var A = $scope.items;
-            for( var i=0; i<A.length-1; i++ ){
-                if( A[i].budget < A[i+1].budget ){
-                    var max = A.splice(i+1,1);
-                    
-                }
-            }
-        }    
 
         $scope.enterDetail = function (orderId) {//进入详情页
             window.open("#/travelplan/plandetail?orderId=" + orderId);
