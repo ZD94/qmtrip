@@ -359,7 +359,7 @@ var travelPlan=(function(){
                                     size: 256,
                                     pdground: '#000000',
                                     image : 'staff/images/logo.png',
-                                    imageSize:60
+                                    imageSize:80
                                 });
                                 document.getElementById('qrcode').appendChild(qrnode);
                                 return false;
@@ -373,7 +373,7 @@ var travelPlan=(function(){
                             size: 256,
                             pdground: '#000000',
                             image : 'staff/images/logo.png',
-                            imageSize:60
+                            imageSize:80
                         });
                         document.getElementById('qrcode').appendChild(qrnode);
                         return true;
