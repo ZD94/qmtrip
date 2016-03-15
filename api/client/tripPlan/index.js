@@ -316,8 +316,18 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
     }
 
     var query = getQueryByParams(params);
+    logger.error("************************");
+    logger.error(query);
     var status = query.status;
-    typeof status == 'object'?query.status.$ne = -1:query.status = status;
+    logger.error(status);
+    if(status == undefined) {
+        logger.warn("&&&&&&&&&&&&&&&&&&&&&");
+        status = query.status = {}
+        logger.warn(typeof query.status);
+    }
+    typeof status == 'object'?query.status.$gt = -1:query.status = status;
+
+    logger.error(query);
 
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {
