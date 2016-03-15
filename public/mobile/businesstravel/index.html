@@ -1,6 +1,6 @@
 <div class="business_travel">
     <div class="input_title w90 margin_c">出差目的</div>
-    <div class="common_text w90 margin_c" id="selectPurpose" ng-click="selectPurposeName()">请输入项目具体名称</div>
+    <input placeholder="请输入项目具体名称" value="" class="common_text w90 margin_c" id="selectPurpose" ng-model="purposename" ng-click="selectPurposeName()">
     <div class="input_title w90 margin_c">需要预定</div>
     <div class="common_text w90 margin_c margin_b" ng-click="chooseTraffic()" style="position: relative; padding-left: 2.5rem;">
         <div class="web-icon-font3 icon">&#xe90e;</div>
@@ -12,6 +12,6 @@
         住宿
         <div class="choose"><img src="mobile/images/choose2_bg.jpg" class="liveimg"></div>
     </div>
-    <a class="common_btn2 w100 button_fix" ng-if="(trafficimg=='none' && liveimg=='none') || purposename=='请输入项目具体名称'">下一步</a>
-    <a href="{{trafficliveurl}}" class="common_btn1 w100 button_fix" ng-if="(trafficimg!='none' || liveimg!='none') && purposename!='请输入项目具体名称'" ng-click="nextStep()">下一步</a>
+    <a class="common_btn2 w100 button_fix" ng-if="(trafficimg=='none' && liveimg=='none') || (purposename==undefined || purposename=='')">下一步</a>
+    <a class="common_btn1 w100 button_fix" ng-if="(trafficimg=='block' || liveimg=='block') && (purposename!=undefined && purposename!='')" ng-click="nextStep()">下一步</a>
 </div>

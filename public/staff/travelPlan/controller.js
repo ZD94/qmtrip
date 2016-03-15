@@ -234,14 +234,21 @@ var travelPlan=(function(){
             API.onload(function() {
                 API.tripPlan.getTripPlanOrderById(planId)
                     .then(function(result){
-                        console.info (result);
                         $scope.planDetail = result;
                         $scope.backTraffic = $scope.planDetail.backTraffic[0];
                         $scope.hotel = $scope.planDetail.hotel[0];
                         $scope.outTraffic = $scope.planDetail.outTraffic[0];
                         loading(true);
                         $scope.$apply();
+                        $('.warning i').hover(function(){
+                            //$('.warning .special_warning').show();
+                            $('.special_warning').hide();
+                            $(this).siblings('.special_warning').show();
+                        },function(){
+                            $(this).siblings('.special_warning').hide();
 
+                            //$('.warning .special_warning').hide();
+                        });
                         $(".file").AjaxFileUpload({
                             action: '/upload/ajax-upload-file?type=invoice',
                             onComplete: function(filename, response) {
@@ -346,13 +353,13 @@ var travelPlan=(function(){
                             if (trim_Version < 9) {
                                 // alert(“LowB,快升级你的IE”)
                                 var qrnode = new qrcode({
-                                    correctLevel: 3,
+                                    correctLevel: 2,
                                     render: 'svg',
                                     text: content,
                                     size: 256,
                                     pdground: '#000000',
-                                    image : 'staff/images/s_menu1.png',
-                                    imageSize:50
+                                    image : 'staff/images/logo.png',
+                                    imageSize:80
                                 });
                                 document.getElementById('qrcode').appendChild(qrnode);
                                 return false;
@@ -360,13 +367,13 @@ var travelPlan=(function(){
                         }
                         
                         var qrnode = new qrcode({
-                            correctLevel: 3,
+                            correctLevel: 2,
                             render: 'canvas',
                             text: content,
                             size: 256,
                             pdground: '#000000',
-                            image : 'staff/images/s_menu1.png',
-                            imageSize:50
+                            image : 'staff/images/logo.png',
+                            imageSize:80
                         });
                         document.getElementById('qrcode').appendChild(qrnode);
                         return true;

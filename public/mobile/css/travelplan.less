@@ -1,43 +1,48 @@
 @import "common.less";
 
+@36px:1.8rem;
+@28px:1.4rem;
+@24px:1.2rem;
+
 .plan_list {
   width: 100%;
   height: auto;
+  font-size: @24px;
   .list_tab {
     position: relative;
     width: 100%;
-    height: 4.5rem;
+    height: 4.4rem;
     z-index:99;
     .line {
       position: absolute;
       left: 50%;
-      top: 1.2rem;
+      top: 25%;
       width: 1px;
       height: 2rem;
       background: @color-theme3;
     }
     .dropdown {
       width: 50%;
-      height: 4.5rem;
       float: left;
       .dropdown-header {
-        height: 4.5rem;
-        line-height: 4.5rem;
-        font-size: 1.6rem;
+        height: 4.4rem;
+        line-height: 4.4rem;
+        font-size: @36px;
         text-align: center;
         color: @color-theme3;
         background: @color-theme1;
         .icon {margin-left:1rem;font-size:2rem}
       }
-      .dropdown-menu {display:none;
+      .dropdown-menu {position:absolute;width:50%;display:none;
         li {
-          height: 4.2rem;
-          line-height: 4.2rem;
+          height: 4.4rem;
+          line-height: 4.4rem;
           text-align: center;
           border-bottom: 1px @border-color solid;
           background: @color-theme3;
+          font-size: @36px;
         }
-        li:hover {background:#E5E5E5!important}
+        li.active {background:#E5E5E5!important}
       }
     }
   }
@@ -65,25 +70,28 @@
           float:left;
           width:60%;
           .top{
-            height:2rem;
-            line-height:2rem;
+            height:2.2rem;
+            line-height:2.2rem;
             margin-bottom:1rem;
             overflow:hidden;
             white-space:nowrap;
             text-overflow:ellipsis;
             span{
-              font-size:2rem;
+              font-size:@36px;
               color:#4A4A4A;
+            }
+            .journey {
+              position:relative;
             }
             .icon {
               color:#C5C5C5;
             }
           }
           .bottom{
-            height:4.8rem;
-            line-height:2.4rem;
+            height:4rem;
+            line-height:2rem;
             p{
-              font-size:1.6rem;
+              font-size:@28px;
               color:#9B9B9B;
               overflow:hidden;
               white-space:nowrap;
@@ -96,48 +104,50 @@
           width:40%;
           text-align:right;
           .top{
-            height:2rem;
-            line-height:2rem;
-            font-size:1.6rem;
+            height:2.2rem;
+            line-height:2.2rem;
+            font-size:@28px;
             margin-bottom:1rem;
           }
           .bottom{
             position:relative;
-            height:4.8rem;
-            line-height:2.4rem;
+            height:4rem;
+            line-height:2rem;
             .budget{
               color:#EBBC18;
-              font-size:1.6rem;
+              font-size:@28px;
               span{
-                font-size:2rem;
+                font-size:@36px;
               }
             }
             .points{
-              font-size:1.6rem;
+              font-size:@24px;
               span{
-                font-size:2rem;
+                font-size:@36px;
               }
             }
           }
         }
       }
-      .complete {position:relative;padding:1rem;border-top:2px solid #F1F1F1;background:white;overflow:hidden;
+      .complete {position:relative;padding:0.3rem 1rem;border-top:2px solid #F1F1F1;background:white;overflow:hidden;
         li {float:left;position:relative;width:33.333333%;text-align:center;
-          .number {font-size:2rem;}
-          .name {}
+          .number {font-size:@36px!important;}
+          .name {font-size:@24px;}
           .name.withDeficit {color:#F23B3B!important}
-          .bar {position:absolute;right:0;top:15px;width:2px;height:20px;background:#F1F1F1;}
+          .bar {position:absolute;right:0;top:0.8rem;width:2px;height:20px;background:#F1F1F1;}
         }
         .withBalance {color:@color-theme1!important}
         .withDeficit {color:#F23B3B!important}
       }
     }
-    .tips {padding:0 0 15px 0;text-align:center;font-size:1.6rem;
-      .noRecord {padding:30px 0 30px 0;color:#4A4A4A;font-size:3rem;}
-      .seeOtherRecords {color:#9B9B9B;font-size:28px;}
+    .tips {padding:0 0 15px 0;text-align:center;font-size:@28px;
+      .noRecord {padding:30px 0 30px 0;color:#4A4A4A;font-size:@36px;}
+      .seeOtherRecords {color:#9B9B9B;font-size:@28px;}
     }
   }
 }
+
+
 .plan_detail {
   width: 100%;
   height: auto;

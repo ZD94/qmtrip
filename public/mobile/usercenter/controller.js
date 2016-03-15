@@ -29,12 +29,13 @@ module.exports = (function() {
                         }else{
                             $scope.power = "普通员工";
                         }
+
                         Q.all([
                             API.tripPlan.statPlanOrderMoney({}),
                             API.travelPolicy.getTravelPolicy({id: travelLevel}),
-                            API.tripPlan.pageTripPlanOrder({status:-1}),
-                            API.tripPlan.pageTripPlanOrder({status:0}),
-                            API.tripPlan.pageTripPlanOrder({status:1,auditStatus:-1})
+                            API.tripPlan.pageTripPlanOrder({budget : {$lte: 0}}),
+                            API.tripPlan.pageTripPlanOrder({isUpload:false}),
+                            API.tripPlan.pageTripPlanOrder({audit:"N"})
                         ])
                             .spread(function(planMoney,travelPolicy,plan_status_1,plan_status_2,plan_status_3){
 
@@ -42,7 +43,6 @@ module.exports = (function() {
                                 $scope.actual_consume = planMoney.expenditure;
                                 $scope.save_money = $scope.total_budget - $scope.actual_consume;
 
-                                console.info(travelPolicy);
                                 $scope.travelpolicy = travelPolicy;
                                 $scope.tavel_id = travelPolicy.id;
 
@@ -55,6 +55,8 @@ module.exports = (function() {
                                     var num = $('#'+id).text();
                                     if(num == 0){
                                         $('#'+id).hide();
+                                    }else if(num >0 && num<=9){
+                                        $('#'+id).show();
                                     }else if (num > 9 && num <100){
                                         $('#'+id).css('font-size','1rem');
                                         $('#'+id).show();
@@ -99,7 +101,7 @@ module.exports = (function() {
         }
 
         $scope.go_unpass = function() {
-            window.location.href = "#/travelplan/planlist?status="+"审核不通过";
+            window.location.href = "#/travelplan/planlist?status="+"审核未通过";
         }
 
         $scope.go_travelstandard = function () {
@@ -107,25 +109,17 @@ module.exports = (function() {
         }
     }
 
-    user.TravelpolicyController = function($scope,$routeParams) {
+    user.TravelpolicyController = function($scope) {
         $scope.$root.pageTitle = '差旅标准';
         loading(true);
-        var travelId = $routeParams.travelId;
         API.onload(function(){
-            API.staff.getCurrentStaff()
-                .then(function(){
-                    API.travelPolicy.getCurrentStaffTp()
-                        .then(function(travelPolicy){
-                            $scope.travelpolicy = travelPolicy;
-                            $scope.$apply();
-                        })
-                        .catch(function(err){
-                            console.info(err || err.msg);
-                        })
+            API.travelPolicy.getCurrentStaffTp()
+                .then(function(travelPolicy){
+                    $scope.travelpolicy = travelPolicy;
+                    $scope.$apply();
                 })
                 .catch(function(err){
                     console.info(err || err.msg);
-                    //TLDAlert(err.msg || err);
                 })
                 .done();
         })

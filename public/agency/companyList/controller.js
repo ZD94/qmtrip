@@ -237,7 +237,6 @@ module.exports = (function(){
 				console.info(domain);
 				console.info(domain[1]);
 				API.onload(function(){
-					console.info(API.company.createCompany());
 					API.company.createCompany({name:corpname,userName:name,email:email,mobile:mobile,domain:domain[1]})
 						.then(function(company){
 							console.info(company);
