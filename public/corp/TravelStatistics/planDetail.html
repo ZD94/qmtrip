@@ -57,14 +57,14 @@
                         <span ng-if="!planDetail.expenditure" style="color:#A4A4A4;">暂无</span>
                         <span ng-if="planDetail.expenditure">
                             <span ng-if="planDetail.budget-planDetail.expenditure>0">¥{{(planDetail.budget-planDetail.expenditure).toFixed(2)}}</span>
-                            <span ng-if="planDetail.budget-planDetail.expenditure<=0">¥0.00</span>
+                            <span ng-if="planDetail.budget-planDetail.expenditure<=0">0</span>
                         </span>
                     </dd>
                 </dl>
                 <dl>
                     <dt>获得积分</dt>
                     <dd>
-                        <span ng-if="planDetail.auditStatus!=0">
+                        <span ng-if="planDetail.auditStatus==1">
                             <span ng-if="planDetail.score!=0"><span class="web-icon-font2" style="color: #C19943;">&#xe967;</span>&nbsp;{{planDetail.score}}</span>
                             <span ng-if="planDetail.score==0">0</span>
                         </span>
@@ -138,7 +138,7 @@
                         <td>
                             <div class="icon web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
                             <div class="startplace">{{backTraffic.startPlace}}</div>
-                            <div class="description">{{backTraffic.endTime | date: 'yyyy-MM-dd'}}<span ng-if="backTraffic.latestArriveTime!=undefined && backTraffic.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{backTraffic.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
+                            <div class="description">{{backTraffic.startTime | date: 'yyyy-MM-dd'}}<span ng-if="backTraffic.latestArriveTime!=undefined && backTraffic.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{backTraffic.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
                             <div class="endplace">{{backTraffic.arrivalPlace}}</div>
                         </td>
                         <td width="135" align="center">
