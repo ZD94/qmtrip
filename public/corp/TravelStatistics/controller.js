@@ -186,11 +186,17 @@ var TravelStatistics = (function(){
         var initPlanlist = $scope.initPlanlist = function() {
             API.onload(function(){
                 var params = {page:$scope.page,perPage:20};
-                console.info($scope.purposename);
                 if ($scope.purposename != '' && $scope.purposename != undefined) {
                     params.description = {$like: '%'+ $scope.purposename + '%'};
                 }
-                params.startAt = {$gte: $scope.start_time,$lte: $scope.end_time}
+                if($scope.start_time) {
+                    params.startTime = $scope.start_time;
+                }
+
+                if($scope.end_time) {
+                    params.endTime = $scope.end_time;
+                }
+
                 console.info(params);
                 API.tripPlan.pageTripPlanOrderByCompany(params)
                     .then(function(list){
