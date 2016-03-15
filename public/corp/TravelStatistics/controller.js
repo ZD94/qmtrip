@@ -185,12 +185,18 @@ var TravelStatistics = (function(){
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
         var initPlanlist = $scope.initPlanlist = function() {
             API.onload(function(){
-                var params = {page:$scope.page};
-                console.info($scope.purposename);
+                var params = {page:$scope.page,perPage:20};
                 if ($scope.purposename != '' && $scope.purposename != undefined) {
                     params.description = {$like: '%'+ $scope.purposename + '%'};
                 }
-                params.startAt = {$gte: $scope.start_time,$lte: $scope.end_time}
+                if($scope.start_time) {
+                    params.startTime = $scope.start_time;
+                }
+
+                if($scope.end_time) {
+                    params.endTime = $scope.end_time;
+                }
+
                 console.info(params);
                 API.tripPlan.pageTripPlanOrderByCompany(params)
                     .then(function(list){
@@ -336,6 +342,9 @@ var TravelStatistics = (function(){
         API.onload(function(){
             API.tripPlan.getTripPlanOrderById(planId)
                 .then(function(result){
+                    if(result.description && result.description.length>15){
+                        result.description = result.description.substr(0,15);
+                    }
                     $scope.planDetail = result;
                     $scope.backTraffic = $scope.planDetail.backTraffic[0];
                     $scope.hotel = $scope.planDetail.hotel[0];

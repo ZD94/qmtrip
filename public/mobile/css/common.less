@@ -77,7 +77,7 @@ img { display: block;}
   border: 1px @border-color solid;
   border-radius: 0.2rem;
   background: @background-color-default;
-  padding: 0 2rem;
+  padding: 0 1rem;
   display: block;
 }
 /*默认按钮1样式*/
@@ -116,6 +116,7 @@ img { display: block;}
 }
 
 .w10 { width: 10%;}
+.w15 { width: 15%;}
 .w20 { width: 20%;}
 .w30 { width: 30%;}
 .w40 { width: 40%;}
@@ -173,10 +174,25 @@ img { display: block;}
   top: 0;
   z-index: 99999;
   background: #fff;
+  .monthTitle{
+    margin: 1rem 0 0.3rem;
+    text-align: center;
+    font-weight: normal;
+    color: #4a4a4a;
+    font-size: 1.5rem;
+  }
   table{
     width: 100%;
     text-align: center;
     border-collapse: collapse;
+    &.weekbar{
+      td{
+        border:0;
+        background: #ededed;
+        font-weight: normal;
+        height: 3rem;
+      }
+    }
     tr{
       td{
         border:1px solid #e5e5e5;
@@ -211,6 +227,8 @@ img { display: block;}
         i{
           display: block;
           font-style: normal;
+          font-weight: normal;
+          height: 1rem;
           color: #9b9b9b;
         }
       }
@@ -325,6 +343,12 @@ img { display: block;}
     height: auto;
     background: #EDEDED;
     padding: 1rem;
+    overflow: hidden;
+  }
+  .cancelBtn {
+    height: 4.8rem;
+    line-height: 4.8rem;
+    text-align: center;
   }
   .result_none {
     height: 4.5rem;

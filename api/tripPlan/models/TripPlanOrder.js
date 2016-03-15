@@ -14,7 +14,7 @@ module.exports = function (Db, DataType) {
         type         : {type: DataType.INTEGER}, //单据类型
         projectId    : {type: DataType.UUID,            field: "project_id"},
         description  : {type: DataType.TEXT }, //预算/计划单描述
-        status       : {type: DataType.INTEGER,         defaultValue: 0,    field: 'status'}, //企业状态
+        status       : {type: DataType.INTEGER,         defaultValue: 0,    field: 'status'},
         isCommit    : {type: DataType.BOOLEAN,          defaultValue: false, field: 'is_commit'}, //票据是否提交
         startPlace   : {type: DataType.STRING,          field: "start_place"}, //出发地
         destination  : {type: DataType.STRING,          field: "destination"}, //出差目的地
@@ -39,27 +39,55 @@ module.exports = function (Db, DataType) {
             field: "status",
             set: function (val) {
                 var _status = 0;
+                var _audit_status = 0;
+                var _is_commit = false;
                 switch(val) {
+                    ///删除状态
                     case 'DELETE': _status = -2; break;
-                    case 'NO_BUDGET': _status = -1; break;
-                    case 'NO_COMMIT': _status = 0; break;
-                    case 'COMMIT': _status = 1; break;
-                    case 'COMPLETE': _status = 2; break;
+                    ///待出预算状态
+                    case 'NO_BUDGET': {
+                        _status = -1;
+                        this.setDataValue('budget', -1); //预算要小于0
+                    } break;
+                    ///待上传状态
+                    case 'WAIT_UPLOAD': {
+                        _status = 0;
+                        _is_commit = false;
+                    } break;
+                    ///待审核状态
+                    case 'AUDIT_PENDING': _status = 1; break;
+                    case 'AUDIT_NOT_PASS': { //审核未通过状态
+                        _status = 0;
+                        _audit_status = -1;
+                    } break;
+                    ///已完成状态
+                    case 'COMPLETE': {
+                        _status = 2;
+                        _audit_status = 1;
+                    } break;
                     default : _status = 0; break;
                 }
-                this.setDataValue('status', _status); // Remember to set the data value, otherwise it won't be validated
-                if(_status == -1) {
-                    this.setDataValue('budget', -1);
-                }
+                this.setDataValue('status', _status);
+                this.setDataValue('audit_status', _audit_status);
             },
             get: function () {
                 var val = "";
                 var _status = this.getDataValue('status');
+                var _audit_status = this.getDataValue('audit_status');
                 switch(_status) {
                     case -2: val = 'DELETE'; break;
                     case -1: val = 'NO_BUDGET'; break;
+                    case 0: {
+                        val = 'NO_COMMIT';
+                        _audit_status === 1? val= '':val='';
+                        switch(_audit_status) {
+                            case -1: val = 'AUDIT_NOT_PASS'; break;
+                            case 0: val = 'AUDIT_PENDING'; break;
+                            case 1: val = 'AUDIT_PASS'; break;
+                            default : val = 'COMMIT'; break;
+                        }
+                    } break;
                     case 0: val = 'NO_COMMIT'; break;
-                    case 1: val = 'COMMIT'; break;
                     case 2: val = 'COMPLETE'; break;
                     default : val = 'NO_BUDGET'; break;
                 }

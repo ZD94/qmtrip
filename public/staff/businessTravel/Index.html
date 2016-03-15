@@ -10,7 +10,7 @@
                     <div selectValue="meeting">会议</div>
                 </dd>
             </dl>
-            <input class="common_text Bright purposename" ng-model="purposename" placeholder="本次出差目的-具体项目名称" ng-change="searchPurposeName()">
+            <input class="common_text Bright purposename" ng-model="purposename" placeholder="本次出差目的-具体项目名称" ng-click="searchPurposeName()" ng-change="searchPurposeName()">
             <ul class="PurposeNamelist">
                 <li ng-repeat="item in PurposeNameitems" ng-click="choosepPurposeName(item)">{{item}}</li>
             </ul>

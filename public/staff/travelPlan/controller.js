@@ -7,6 +7,7 @@ var travelPlan=(function(){
     API.require('tripPlan');
     API.require("auth");
     API.require("attachment");
+    API.require('staff');
 
     var  travelPlan = {};
 
@@ -44,7 +45,7 @@ var travelPlan=(function(){
         //待出预算列表
         $scope.initPlanList2 = function () {
             API.onload(function() {
-                API.tripPlan.pageTripPlanOrder({status:'-1',page:$scope.page2})
+                API.tripPlan.pageTripPlanOrder({isHasBudget: false, page:$scope.page2})
                     .then(function(result){
                         console.info (result);
                         $scope.total2 = result.total;
@@ -60,7 +61,7 @@ var travelPlan=(function(){
         //待上传票据列表
         $scope.initPlanList3 = function () {
             API.onload(function() {
-                API.tripPlan.pageTripPlanOrder({status:0,page:$scope.page3})
+                API.tripPlan.pageTripPlanOrder({isUpload: false, page:$scope.page3})
                     .then(function(result){
                         $scope.total3 = result.total;
                         $scope.planListitems3 = result.items;
@@ -241,10 +242,13 @@ var travelPlan=(function(){
                         loading(true);
                         $scope.$apply();
                         $('.warning i').hover(function(){
-                            console.info(111);
-                            $('.warning .special_warning').show();
+                            //$('.warning .special_warning').show();
+                            $('.special_warning').hide();
+                            $(this).siblings('.special_warning').show();
                         },function(){
-                            $('.warning .special_warning').hide();
+                            $(this).siblings('.special_warning').hide();
+
+                            //$('.warning .special_warning').hide();
                         });
                         $(".file").AjaxFileUpload({
                             action: '/upload/ajax-upload-file?type=invoice',
@@ -350,13 +354,13 @@ var travelPlan=(function(){
                             if (trim_Version < 9) {
                                 // alert(“LowB,快升级你的IE”)
                                 var qrnode = new qrcode({
-                                    correctLevel: 3,
+                                    correctLevel: 2,
                                     render: 'svg',
                                     text: content,
                                     size: 256,
                                     pdground: '#000000',
-                                    image : 'staff/images/s_menu1.png',
-                                    imageSize:50
+                                    image : 'staff/images/logo.png',
+                                    imageSize:80
                                 });
                                 document.getElementById('qrcode').appendChild(qrnode);
                                 return false;
@@ -364,13 +368,13 @@ var travelPlan=(function(){
                         }
                         
                         var qrnode = new qrcode({
-                            correctLevel: 3,
+                            correctLevel: 2,
                             render: 'canvas',
                             text: content,
                             size: 256,
                             pdground: '#000000',
-                            image : 'staff/images/s_menu1.png',
-                            imageSize:50
+                            image : 'staff/images/logo.png',
+                            imageSize:80
                         });
                         document.getElementById('qrcode').appendChild(qrnode);
                         return true;

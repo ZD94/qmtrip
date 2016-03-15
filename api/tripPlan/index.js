@@ -386,8 +386,6 @@ tripPlan.listTripPlanOrder = function(options){
          options.order = [['start_at', 'desc'], ['create_at', 'desc']]; //默认排序，创建时间
     }
 
-    delete options.where.startAt;
-
     return PlanOrder.findAndCount(options)
         .then(function(ret){
             if(!ret || ret.rows .length === 0){
@@ -891,25 +889,31 @@ function statPlanOrderMoney(params){
     var query = params;
     var query_complete = {
         companyId: query.companyId,
-        status: {$gte: STATUS.COMPLETE},
+        status: STATUS.COMPLETE,
         auditStatus: 1
     }
+    var query_sql = 'select sum(budget-expenditure) as \"savedMoney\" from tripplan.trip_plan_order where company_id=\''+ params.companyId +'\' and status=2 and audit_status=1';
     query.status = {$gte: STATUS.NO_COMMIT};
     var startAt = {};
 
     if(params.startTime){
         startAt.$gte = params.startTime;
+        query_sql += ' and start_at >=\'' + params.startTime + '\'';
         delete params.startTime;
     }
 
     if(params.endTime){
         startAt.$lte = params.endTime;
+        query_sql += ' and start_at <=\'' + params.endTime + '\'';
         delete params.endTime;
     }
 
     if(params.accountId){
         query_complete.accountId = params.accountId;
+        query_sql += ' and account_id=\'' + params.accountId + '\'';
     }
+
+    query_sql += ' and budget>expenditure;';
 
     if(!isObjNull(startAt)){
         query.startAt = startAt;
@@ -917,36 +921,19 @@ function statPlanOrderMoney(params){
     }
 
     return Promise.all([
-        PlanOrder.findAll({where: query, attributes: ['id']}),
-        PlanOrder.findAll({where: query_complete, attributes: ['id']})
+        PlanOrder.sum('budget', {where: query}),
+        PlanOrder.sum('budget', {where: query_complete}),
+        PlanOrder.sum('expenditure', {where: query_complete}),
+        PlanOrder.count({where: query_complete}),
+        sequelize.query(query_sql)
     ])
-        .spread(function(orders, orders1){
-            return [orders.map(function(order){ return order.id; }),
-                orders1.map(function(order){ return order.id; })]
-        })
-        .spread(function(idList, idComplete){
-            var q1 = {
-                orderId: {$in: idList},
-                status: {$ne: STATUS.DELETE}
-            }
-
-            var q2 = {
-                orderId: {$in: idComplete},
-                status: STATUS.COMMIT
-            }
-
-            return Promise.all([
-                ConsumeDetails.sum('budget', {where: q1}),
-                ConsumeDetails.sum('budget', {where: q2}),
-                ConsumeDetails.sum('expenditure', {where: q2}),
-                PlanOrder.count({where: query_complete})
-            ])
-        })
-        .spread(function(n1, n2, n3, n4){
+        .spread(function(n1, n2, n3, n4, n5) {
+            var savedMoney = n5[0][0].savedMoney || 0;
             return {
                 qmBudget: n1 || 0,
                 planMoney: n2 || 0,
                 expenditure: n3 || 0,
+                savedMoney: savedMoney,
                 NumOfStaff: n4 || 0
             }
         })

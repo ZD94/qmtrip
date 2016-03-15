@@ -32,7 +32,36 @@ module.exports = function (Db, DataType) {
         auditUser   : {type: DataType.UUID,             field: 'audit_user'}, //审核人
         createAt    : {type: "timestamp without time zone", field: "create_at", defaultValue: now}, //创建时间
         remark      : {type: DataType.STRING }, //备注
-        updateAt    : {type: "timestamp without time zone", field: "update_at"}
+        updateAt    : {type: "timestamp without time zone", field: "update_at"},
+        orderStatus: {
+            type: DataType.VIRTUAL,
+            field: "status",
+            set: function (val) {
+                var _status = 0;
+                switch(val) {
+                    case 'DELETE': _status = -2; break;
+                    case 'NO_BUDGET': _status = -1; break;
+                    case 'NO_COMMIT': _status = 0; break;
+                    case 'COMMIT': _status = 1; break;
+                    case 'COMPLETE': _status = 2; break;
+                    default : _status = 0; break;
+                }
+                this.setDataValue('status', _status); // Remember to set the data value, otherwise it won't be validated
+            },
+            get: function () {
+                var val = "";
+                var _status = this.getDataValue('status');
+                switch(_status) {
+                    case -2: val = 'DELETE'; break;
+                    case -1: val = 'NO_BUDGET'; break;
+                    case 0: val = 'NO_COMMIT'; break;
+                    case 1: val = 'COMMIT'; break;
+                    case 2: val = 'COMPLETE'; break;
+                    default : val = 'NO_BUDGET'; break;
+                }
+                return val;
+            }
+        }
     }, {
         tableName : "consume_details",
         timestamps: false,

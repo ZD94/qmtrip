@@ -317,7 +317,7 @@ describe("api/client/tripPlan.js", function() {
 
         it("#pageTripPlanOrder should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.pageTripPlanOrder.call(self, {page: 1, isUpload: false, audit: 'Y'}, function (err, ret) {
+            API.client.tripPlan.pageTripPlanOrder.call(self, {page: 1, audit: 'P'}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -435,6 +435,23 @@ describe("api/client/tripPlan.js", function() {
                     done();
                 })
             });
+
+
+            it("#statPlanOrderMoney should be ok", function (done) {
+                var self = {accountId: staffId};
+                API.client.tripPlan.statPlanOrderMoney.call(self, {startTime: '2016-01-01 00:00:00'}, function (err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+                    console.info(ret);
+                    assert(ret != null);
+                    assert(ret.qmBudget >= 0);
+                    assert(ret.planMoney >= 0);
+                    assert(ret.expenditure >= 0);
+                    done();
+                })
+            });
+
 
             it("#statPlanOrderMoneyByCompany should be ok", function (done) {
                 var self = {accountId: staffId};

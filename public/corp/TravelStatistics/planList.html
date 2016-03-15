@@ -66,7 +66,7 @@
                             <span ng-if="item.expenditure==0">暂无</span>
                         </td>
                         <td align="center">
-                            <span ng-if="item.expenditure!=0 &&item.expenditure > item.budget">0</span>
+                            <span ng-if="item.expenditure!=0 &&item.expenditure >= item.budget">0</span>
                             <span ng-if="item.expenditure!=0 && item.status!='-1' && item.expenditure < item.budget">¥{{(item.budget-item.expenditure).toFixed(2)}}</span>
                             <span ng-if="item.expenditure==0">暂无</span>
                         </td>
