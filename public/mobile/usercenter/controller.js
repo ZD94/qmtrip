@@ -10,6 +10,7 @@ module.exports = (function() {
     var user = {};
 
     user.IndexController = function($scope) {
+        $('title').html('个人中心');
         $scope.$root.pageTitle = '个人中心';
 
         $scope.initStaffUser = function(){
@@ -33,7 +34,7 @@ module.exports = (function() {
                         Q.all([
                             API.tripPlan.statPlanOrderMoney({}),
                             API.travelPolicy.getTravelPolicy({id: travelLevel}),
-                            API.tripPlan.pageTripPlanOrder({budget : {$lte: 0}}),
+                            API.tripPlan.pageTripPlanOrder({isHasBudget: false}),
                             API.tripPlan.pageTripPlanOrder({isUpload:false}),
                             API.tripPlan.pageTripPlanOrder({audit:"N"})
                         ])
@@ -110,6 +111,7 @@ module.exports = (function() {
     }
 
     user.TravelpolicyController = function($scope) {
+        $('title').html('差旅标准');
         $scope.$root.pageTitle = '差旅标准';
         loading(true);
         API.onload(function(){

@@ -174,10 +174,25 @@ img { display: block;}
   top: 0;
   z-index: 99999;
   background: #fff;
+  .monthTitle{
+    margin: 1rem 0 0.3rem;
+    text-align: center;
+    font-weight: normal;
+    color: #4a4a4a;
+    font-size: 1.5rem;
+  }
   table{
     width: 100%;
     text-align: center;
     border-collapse: collapse;
+    &.weekbar{
+      td{
+        border:0;
+        background: #ededed;
+        font-weight: normal;
+        height: 3rem;
+      }
+    }
     tr{
       td{
         border:1px solid #e5e5e5;
@@ -212,6 +227,8 @@ img { display: block;}
         i{
           display: block;
           font-style: normal;
+          font-weight: normal;
+          height: 1rem;
           color: #9b9b9b;
         }
       }

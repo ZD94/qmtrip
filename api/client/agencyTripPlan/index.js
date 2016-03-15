@@ -59,22 +59,15 @@ agencyTripPlan.pageTripPlanOrder = function(params){
     var self = this;
     var accountId = self.accountId;
 
-    /* status -2:删除状态，不对外显示 -1:失效状态 0:待上传状态 1:已上传待审核状态 2:审核完成状态 */
-    params.status = {$gte: -1};
-    if (params.isUpload === true) {
-        params.status = {$gt: 0};
-    } else if (params.isUpload === false) {
-        params.status = {$in: [-1, 0]};
-    }
-
-    if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
+    //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
+    if(params.audit){
         var audit = params.audit;
         params.status = 1;
         if(audit == 'Y'){
-            params.status = {$gt: 1};
+            params.status = 2;
             params.auditStatus = 1;
         }else if(audit == "P"){
-            params.status = {$in: [-1, 1]};
+            params.status = 1;
             params.auditStatus = 0;
         }else if(audit == 'N'){
             params.status = 0; //待上传状态
@@ -82,8 +75,20 @@ agencyTripPlan.pageTripPlanOrder = function(params){
         }
     }
 
+    if(params.isHasBudget === false) {
+        params.status = -1; //状态是未出预算
+        params.budget = {$lte: 0}; //预算结果小于0
+    }
+
+    if(params.agencyAll === true) {
+        params.status = {$in: ['-1', 1]};
+        params.auditStatus = {$ne: 1};
+    }
+
     var query = _.pick(params,
-        ['companyId', 'accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
+        ['companyId', 'accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination',
+            'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit']);
+
 
     return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
         .then(function(user){
@@ -113,6 +118,10 @@ agencyTripPlan.pageTripPlanOrder = function(params){
                 limit: perPage,
                 offset: perPage * (page - 1)
             };
+
+            if(params.order) {
+                options.order = [params.order];
+            }
 
             return API.tripPlan.listTripPlanOrder(options);
         })
