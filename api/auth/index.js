@@ -185,7 +185,7 @@ authServer.sendResetPwdEmail = function(params) {
             var oneDay = 24 * 60 * 60 * 1000
             var timestamp = Date.now() + 2 * oneDay;  //失效时间2天
             var sign = makeActiveSign(account.pwdToken, account.id, timestamp);
-            var url = "accountId="+account.id+"&timestamp="+timestamp+"&sign="+sign;
+            var url = "accountId="+account.id+"&timestamp="+timestamp+"&sign="+sign+"&email="+account.email;
             var templateName;
             var vals = {
                 name: account.realname || account.email,
