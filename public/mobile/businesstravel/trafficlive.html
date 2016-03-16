@@ -1,10 +1,12 @@
 <script>
     $(function () {
         $('#startTimeLate,#endTimeLate').focus(function(){
-            $(this).attr('type','time').focus();
+            $(this).attr('type','time');
+            $(this).focus();
         })
         $('#startTimeLate,#endTimeLate').blur(function(){
             $(this).attr('type','text').blur();
+            $(this).focus();
         })
     })
 </script>
