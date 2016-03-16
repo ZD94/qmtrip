@@ -83,6 +83,9 @@ function selectPage (options) {
 										var strr = "";
 										strr += "<div class='result_none'>匹配无结果</div>";
 										if (isAllowAdd == true) {
+											if (val.length>8) {
+												val = val.substring(0,5)+"....."+val.substring(val.length-4);
+											}
 											strr += "<dd class='appendclass'><span>+</span> 将&quot;"+val+"&quot;添加为出差目的</dd>";
 										}
 										$('.select_page').append(strr);
