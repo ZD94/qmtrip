@@ -108,6 +108,20 @@ module.exports = function (Db, DataType) {
                 }
                 return val;
             }
+        },
+        STATUS: {
+            type: DataType.VIRTUAL,
+            get: function() {
+                "use strict";
+                return {
+                    NO_BUDGET: 'NO_BUDGET',
+                    WAIT_UPLOAD: 'WAIT_UPLOAD',
+                    WAIT_COMMIT: 'WAIT_COMMIT',
+                    WAIT_AUDIT: 'WAIT_AUDIT',
+                    AUDIT_NOT_PASS: 'AUDIT_NOT_PASS',
+                    COMPLETE: 'COMPLETE'
+                };
+            }
         }
     }, {
         tableName : "trip_plan_order",

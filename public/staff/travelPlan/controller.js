@@ -235,6 +235,7 @@ var travelPlan=(function(){
             API.onload(function() {
                 API.tripPlan.getTripPlanOrderById({orderId: planId})
                     .then(function(result){
+                        console.info(result);
                         $scope.planDetail = result;
                         $scope.backTraffic = $scope.planDetail.backTraffic[0];
                         $scope.hotel = $scope.planDetail.hotel[0];

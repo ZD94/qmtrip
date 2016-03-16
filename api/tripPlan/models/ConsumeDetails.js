@@ -8,7 +8,7 @@ var now = require("../../../common/utils").now;
 module.exports = function (Db, DataType) {
     return Db.define("ConsumeDetails", {
         id          : {type: DataType.UUID,             defaultValue: uuid.v1, primaryKey: true},
-        orderId     : {type: DataType.STRING,           field: "order_id"}, //计划单id
+        orderId     : {type: DataType.UUID,             field: "order_id"},
         accountId   : {type: DataType.UUID,             field: "account_id"}, //单据所属人
         type        : {type: DataType.INTEGER }, //消费类型（交通和酒店）
         status      : {type: DataType.INTEGER,          defaultValue: 0, field: "status"}, //状态
