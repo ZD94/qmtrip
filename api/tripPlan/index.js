@@ -752,7 +752,7 @@ function approveInvoice(params){
                         var status = params.status;
 
                         if(status == STATUS.NO_BUDGET){
-                            return PlanOrder.update({status: STATUS.COMMIT, auditStatus: -1, updateAt: utils.now()},
+                            return PlanOrder.update({status: STATUS.NO_COMMIT, auditStatus: -1, updateAt: utils.now()},
                                 {where: {id: order.id}, fields: ['auditStatus', 'status', 'updateAt'], transaction: t});
                         }
 

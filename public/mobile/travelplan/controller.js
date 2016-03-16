@@ -121,13 +121,13 @@ var travelplan=(function(){
             if( $scope.items[i].status===-1 ){
                 return "待出预算";
             }else
-            if( $scope.items[i].status===0 ){
+            if( $scope.items[i].status===0&&$scope.items[i].isCommit===false ){
                 return "待上传票据";
             }else
-            if( $scope.items[i].status===1&&$scope.items[i].auditStatus===0 ){
+            if( $scope.items[i].isCommit===true&&$scope.items[i].auditStatus===0 ){
                 return "票据审核中";
             }else
-            if( $scope.items[i].status===1&&$scope.items[i].auditStatus===-1 ){
+            if( $scope.items[i].isCommit===true&&$scope.items[i].auditStatus===-1 ){
                 return "审核未通过";
             }else
             if( $scope.items[i].status===2 ){

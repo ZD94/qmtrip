@@ -6,8 +6,16 @@
 <div class="plan_detail">
     <div class="HEADER w100">
         <div class="timeStamp w90 margin_c">生成时间：{{ITEM.createAt | date:"yyyy-MM-dd HH:mm:ss"}}</div>
-        <div class="totalBudget w100">¥{{ITEM.budget.toFixed(2)}}</div>
-        <div class="totalBudgetText w100">总预算</div>
+        <div class="totalBudget w100">
+            <span ng-if="ITEM.status===-1">暂无</span>
+            <span ng-if="ITEM.status===0">¥{{ITEM.budget.toFixed(2)}}</span>
+            <span ng-if="ITEM.status===1">¥{{ITEM.budget.toFixed(2)}}</span>
+            <span ng-if="ITEM.status===2">{{ITEM.score}}</span>
+        </div>
+        <div class="text w100">
+            <span ng-if="ITEM.status!==2">总预算</span>
+            <span ng-if="ITEM.status===2">积分</span>
+        </div>
     </div>
     <dl class="complete elasticbox" ng-if="ITEM.status===2">
         <dt class="line1"></dt>
@@ -37,7 +45,7 @@
                 <div class="budget">¥{{ITEM.outTraffic[0].budget.toFixed(2)}}</div>
             </div>
             <div class="list_bottom">
-                <div class="status">{{renderDepartureStatus()}}</div>
+                <div class="status">{{111}}</div>
                 <input type="button" value="查看票据" class="smallbtn">
                 <input type="button" value="预订" class="smallbtn">
             </div>
