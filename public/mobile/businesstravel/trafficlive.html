@@ -1,21 +1,21 @@
 <div class="traffic_step">
     <div class="margin_b"></div>
     <div class="common_text w90 margin_c margin_b">
-        <input placeholder="出发城市" class="hidden_input" id="startCity" ng-model="startCity" ng-click="selectStartCity()">
+        <input placeholder="出发城市" class="hidden_input" id="startCity" ng-model="startCity" ng-click="selectStartCity()" readonly>
     </div>
     <div class="common_text w90 margin_c margin_b">
-        <input placeholder="目的地城市" class="hidden_input" id="endCity" ng-model="endCity" ng-click="selectEndCity()">
+        <input placeholder="目的地城市" class="hidden_input" id="endCity" ng-model="endCity" ng-click="selectEndCity()" readonly>
     </div>
     <div class="w90 margin_c margin_b">
-        <input type="text" placeholder="出发日期" class="common_text margin_c margin_b halfinput" id="startTime" ng-click="chooeseData($event)">
+        <input type="text" placeholder="出发日期" class="common_text margin_c margin_b halfinput" id="startTime" ng-click="chooeseData($event)" readonly>
         <div class="common_text margin_c margin_b halfinput" style="float: right;">
-            <input type="text" placeholder="最晚到达时间(选填)" id="startTimeLate" class="hidden_input" style="width: 100%;">
+            <input type="text" placeholder="最晚到达时间(选填)" id="startTimeLate" class="hidden_input" style="width: 100%;" readonly>
         </div>
     </div>
     <div class="w90 margin_c margin_b">
-        <input type="text" placeholder="返程日期" class="common_text margin_c margin_b halfinput" id="endTime" ng-click="chooeseData($event)">
+        <input type="text" placeholder="返程日期" class="common_text margin_c margin_b halfinput" id="endTime" ng-click="chooeseData($event)" readonly>
         <div class="common_text margin_c margin_b halfinput" style="float: right;">
-            <input type="text" placeholder="最晚到达时间(选填)" id="endTimeLate" class="hidden_input" style="width: 100%;">
+            <input type="text" placeholder="最晚到达时间(选填)" id="endTimeLate" class="hidden_input" style="width: 100%;" readonly>
         </div>
     </div>
     <div class="w100 button_fix">
@@ -29,14 +29,14 @@
 <div class="live_step">
     <div class="margin_b"></div>
     <div class="common_text w90 margin_c margin_b">
-        <input placeholder="目的地城市" class="hidden_input" ng-model="liveCity" id="liveCity" ng-click="selectLiveCity()">
+        <input placeholder="目的地城市" class="hidden_input" ng-model="liveCity" id="liveCity" ng-click="selectLiveCity()" readonly>
     </div>
     <div class="common_text w90 margin_c margin_b">
-        <input placeholder="住宿地标位置，计划入住在xxx附近(选填)" class="hidden_input" id="livePlace" ng-click="selectLivePlace()">
+        <input placeholder="住宿地标位置，计划入住在xxx附近(选填)" class="hidden_input" id="livePlace" ng-click="selectLivePlace()" readonly>
     </div>
     <div class="w90 margin_c margin_b">
-        <input type="text" placeholder="入住时间" class="common_text margin_c margin_b halfinput" id="liveTime" ng-click="chooeseData($event)">
-        <input type="text" placeholder="离店时间" class="common_text margin_c margin_b halfinput" id="leaveTime" ng-click="chooeseData($event)" style="float: right;">
+        <input type="text" placeholder="入住时间" class="common_text margin_c margin_b halfinput" id="liveTime" ng-click="chooeseData($event)"  readonly>
+        <input type="text" placeholder="离店时间" class="common_text margin_c margin_b halfinput" id="leaveTime" ng-click="chooeseData($event)" style="float: right;"  readonly>
     </div>
     <div class="w100 button_fix">
         <a class="common_btn3 w50" ng-if="tra == 0 && liv == 1" ng-click="returnUrl()" style="float: left;">返回上一步</a>
