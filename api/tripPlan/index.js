@@ -1111,7 +1111,11 @@ tripPlan.getProjectList = getProjectList;
 getProjectList.require_params = ['companyId'];
 getProjectList.optionnal_params = ['code', 'name'];
 function getProjectList(params) {
-    return Projects.findAll({where: params})
+    var options = {
+        where: params,
+        order: [['create_at', 'desc']]
+    }
+    return Projects.findAll(options)
 }
 
 tripPlan.createNewProject = createNewProject;
