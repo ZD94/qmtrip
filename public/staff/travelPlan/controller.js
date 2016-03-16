@@ -8,6 +8,7 @@ var travelPlan=(function(){
     API.require("auth");
     API.require("attachment");
     API.require('staff');
+    API.require("travelBudget");
 
     var  travelPlan = {};
 
@@ -240,6 +241,58 @@ var travelPlan=(function(){
                         $scope.backTraffic = $scope.planDetail.backTraffic[0];
                         $scope.hotel = $scope.planDetail.hotel[0];
                         $scope.outTraffic = $scope.planDetail.outTraffic[0];
+                        if(result.outTraffic.length!=0){
+                            var type = "air";
+                            if($scope.outTraffic.invoiceType == 0){
+                                type = "train";
+                            }
+                            API.travelBudget.getBookListUrl({
+                                spval : $scope.outTraffic.startPlace,
+                                epval : $scope.outTraffic.arrivalPlace,
+                                st : $scope.outTraffic.startTime,
+                                type : type
+                            })
+                            .then(function(outTrafficBookListUrl){
+                                $scope.outTrafficBookListUrl = outTrafficBookListUrl;
+                                $scope.$apply();
+                            })
+                            .catch(function(err){
+                                TLDAlert(err.msg || err);
+                            })
+                        }
+                        if(result.backTraffic.length!=0){
+                            var type = "air";
+                            if($scope.backTraffic.invoiceType == 0){
+                                type = "train";
+                            }
+                            API.travelBudget.getBookListUrl({
+                                spval : $scope.backTraffic.startPlace,
+                                epval : $scope.backTraffic.arrivalPlace,
+                                st : $scope.backTraffic.startTime,
+                                type : type
+                            })
+                            .then(function(backTrafficBookListUrl){
+                                $scope.backTrafficBookListUrl = backTrafficBookListUrl;
+                                $scope.$apply();
+                            })
+                            .catch(function(err){
+                                TLDAlert(err.msg || err);
+                            })
+                        }
+                        if(result.hotel.length!=0){
+                            API.travelBudget.getBookListUrl({
+                                hotelCity : $scope.hotel.city,
+                                hotelAddress : $scope.hotel.hotelName,
+                                type : "hotel"
+                            })
+                            .then(function(hotelBookListUrl){
+                                $scope.hotelBookListUrl = hotelBookListUrl;
+                                $scope.$apply();
+                            })
+                            .catch(function(err){
+                                TLDAlert(err.msg || err);
+                            })
+                        }
                         loading(true);
                         $scope.$apply();
                         $('.warning i').hover(function(){

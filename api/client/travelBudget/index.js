@@ -77,6 +77,8 @@ travelBudget.getTravelPolicyBudget = function(params) {
         checkOutDate: checkOutDate
     })
         .then(function(hotel) {
+            console.log(hotel);
+            console.log("******************************====================");
             return travelBudget.getTrafficBudget.call(self, {
                 originPlace: originPlace,
                 destinationPlace: destinationPlace,
@@ -190,12 +192,12 @@ travelBudget.getHotelBudget = function(params) {
             if (!result.price || result.price <=0) {
                 days = days<= 0 ? 1 :days;
                 if (policy.hotelPrice) {
-                    return {price: policy.hotelPrice * days};
+                    return {price: policy.hotelPrice * days, bookListUrl: result.bookListUrl};
                 } else {
-                    return {price: _getDefaultPrice(hotelStar) * days};
+                    return {price: _getDefaultPrice(hotelStar) * days, bookListUrl: result.bookListUrl};
                 }
             } else if (policy.hotelPrice && result.price > policy.hotelPrice) {
-                return {price: policy.hotelPrice * days};
+                return {price: policy.hotelPrice * days, bookListUrl: result.bookListUrl};
             } else {
                 return result;
             }
@@ -232,6 +234,76 @@ travelBudget.getBookUrl = function(params) {
             }
             return url;
         })
+
+}
+
+/**
+ *@method
+ * 得到飞机 火车 酒店预订列表链接
+ * @param params
+ * @param params.spval  出发城市id或出发地名称
+ * @param params.epval  目的地城市id或目的地名称
+ * @param params.st      出发时间
+ * @param params.hotelCity   订酒店城市
+ * @param params.hotelAddress  酒店所在商圈
+ * @param params.type 类型 air (飞机) train（火车） hotel（酒店）
+ * @returns {*}
+ */
+travelBudget.getBookListUrl = function(params) {
+    var spval = params.spval,
+        epval = params.epval,
+        st = params.st,
+        hotelCity = params.hotelCity,
+        hotelAddress = params.hotelAddress,
+        type = params.type,
+        url = "";
+    if(!type || type == "" ){
+        throw {code:-1, msg:"类型不能为空"};
+    }
+    if(type == "air"){
+        if(!spval || spval == "" ){
+            throw {code:-1, msg:"出发城市不能为空"};
+        }
+        if(!epval || epval == "" ){
+            throw {code:-1, msg:"目的地不能为空"};
+        }
+        if(!st || st == "" ){
+            throw {code:-1, msg:"出发时间不能为空"};
+        }
+        return Q.all([
+                API.place.getCityInfo(spval),
+                API.place.getCityInfo(epval)
+            ])
+            .spread(function(startPlace, endPlace){
+                var scode = "",
+                    ecode = "";
+                if(startPlace && startPlace.skyCode){
+                    scode = startPlace.skyCode.split("-")[0].toLowerCase();
+                }
+                if(endPlace && endPlace.skyCode){
+                    ecode = endPlace.skyCode.split("-")[0].toLowerCase();
+                }
+                url = "http://www.tianxun.com/oneway-"+ scode +"-"+ ecode +".html?depdate="+st+"&cabin=Economy";
+                return url;
+            })
+    }else if(type == "train"){
+        url = "https://kyfw.12306.cn/otn/leftTicket/init";
+        return url;
+    }else if(type == "hotel"){
+        if(!hotelCity || hotelCity == "" ){
+            throw {code:-1, msg:"目的地不能为空"};
+        }
+        return API.place.getCityInfo(hotelCity)
+        .then(function(result){
+            if(!hotelAddress || hotelAddress == "" ){
+                url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/";
+            }else{
+                url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/key_"+hotelAddress;
+            }
+            return url;
+        })
+
+    }
 
 }
 
