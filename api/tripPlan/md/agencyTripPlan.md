@@ -11,11 +11,11 @@
 ### Client API列表
 ---
 
->. 代理商获取差旅计划单明细 API.agencyTripPlan.getTripPlanOrderById(tripPlanId, callback);
+>. 代理商获取差旅计划单明细 API.agencyTripPlan.getTripPlanOrderById(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
-| orderId                                | 计划单id             |uuid              |必填
+| params.orderId                                | 计划单id             |uuid              |必填
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |

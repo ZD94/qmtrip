@@ -209,7 +209,7 @@ var travelRecord=(function(){
         var orderId = $routeParams.orderId;
         $scope.initTravelDetail = function () {
             API.onload(function() {
-                API.agencyTripPlan.getTripPlanOrderById(orderId)
+                API.agencyTripPlan.getTripPlanOrderById({orderId: orderId})
                     .then(function(result){
                         console.info (result);
                         var outTraffic = result.outTraffic[0];

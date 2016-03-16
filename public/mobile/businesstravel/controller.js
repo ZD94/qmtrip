@@ -567,7 +567,7 @@ var businesstravel=(function(){
                     return false;
                 }
                 if (!timeReg.test(startTimeLate)&&startTimeLate!="") {
-                    black_err("最晚到达时间格式时间格式不正确");
+                    black_err("最晚返回时间格式时间格式不正确");
                     return false;
                 }
 
@@ -575,8 +575,10 @@ var businesstravel=(function(){
                 $('.traffic_step').fadeOut();
                 $('.live_step').fadeIn();
                 $('#liveCity').val($('#endCity').val());
+                $('#liveCity').attr('code',$('#endCity').attr('code'));
                 $('#liveTime').val($('#startTime').val());
                 $('#leaveTime').val($('#endTime').val());
+                $scope.liveCityId = $('#liveCity').attr('code');
             }
 
             //生成预算单
@@ -862,7 +864,11 @@ var businesstravel=(function(){
                 API.tripPlan.savePlanOrder(order)
                     .then(function(result){
                         console.info (result);
-                        black_err("生成计划单成功");
+                        black_err("已成功生成出差记录");
+                        function plandetail () {
+                            window.location.href='#/travelplan/plandetail?orderId='+result.id;
+                        }
+                        setTimeout(plandetail,3000);
                     })
                     .catch(function(err){
                         console.info (err);
