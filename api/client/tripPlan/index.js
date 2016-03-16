@@ -34,7 +34,7 @@ tripPlan.savePlanOrder = function (params) {
 
             return Promise.all([
                 API.tripPlan.savePlanOrder(params),
-                API.staff.findStaffs({companyId: staff.companyId, roleId: {$ne: 1}, columns: ['id', 'name','email']})
+                API.staff.findStaffs({companyId: staff.companyId, roleId: {$ne: 1}, status: {$gte: 0}, columns: ['id', 'name','email']})
             ])
         })
         .spread(function(_order, staffs){
