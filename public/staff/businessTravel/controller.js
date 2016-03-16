@@ -578,7 +578,7 @@ var businessTravel=(function(){
                     })
                 ])
                     .spread(function(ret1,ret2) {
-                        console.info (ret2);
+                        $scope.bookurl = ret2.bookListUrl;
                         $scope.companyId = ret1.companyId;
                         $scope.onlylive = ret2;
                         $(".creating").hide();
