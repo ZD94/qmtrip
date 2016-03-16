@@ -185,20 +185,21 @@ authServer.sendResetPwdEmail = function(params) {
             var oneDay = 24 * 60 * 60 * 1000
             var timestamp = Date.now() + 2 * oneDay;  //失效时间2天
             var sign = makeActiveSign(account.pwdToken, account.id, timestamp);
-            var url = C.host + "/staff.html#/auth/reset-pwd?accountId="+account.id+"&timestamp="+timestamp+"&sign="+sign;
+            var url = "accountId="+account.id+"&timestamp="+timestamp+"&sign="+sign;
             var templateName;
             var vals = {
                 name: account.realname || account.email,
                 username: account.email,
                 time: timeStr,
-                url: url,
                 companyName: companyName
             };
 
             if (isFirstSet) {
+                vals.url = C.host + "/staff.html#/auth/first-set-pwd?" + url;
                 templateName = 'qm_first_set_pwd_email';
                 return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
             } else {
+                vals.url = C.host + "/staff.html#/auth/reset-pwd?" + url;
                 templateName = 'qm_reset_pwd_email';
                 return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
             }
