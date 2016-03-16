@@ -270,6 +270,7 @@ travelBudget.getBookListUrl = function(params) {
         if(!st || st == "" ){
             throw {code:-1, msg:"出发时间不能为空"};
         }
+        st = moment(st).format('YYYY-MM-DD');
         return Q.all([
                 API.place.getCityInfo(spval),
                 API.place.getCityInfo(epval)
