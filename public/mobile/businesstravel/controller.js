@@ -13,7 +13,6 @@ var businesstravel=(function(){
 
     var  businesstravel = {};
 
-
     /*
         我要出差首页
      * @param $scope
@@ -620,14 +619,18 @@ var businesstravel=(function(){
 
         }
 
+        var calendar = require("calendar");
+
         //选择日期
-        $scope.chooeseData = function($event){
-            var thismonth = moment().startOf('month').format('M');
-            mobileSelectDate({
-                isShowMonth: true
-            }, {
-                month: thismonth,
-                year: 2016,
+        $scope.chooeseData = function($event, begintime){
+            if(begintime){
+                begintime = $('#'+begintime).val();
+                if(! begintime.match(/\d{4}-\d{2}-\d{2}/))
+                    begintime = undefined;
+            }
+            calendar.selectDate({
+                accept_begin: begintime,
+                selected: $event.target.value,
                 displayMonthNum: 12
             })
                 .then(function(selectedDate) {
