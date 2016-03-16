@@ -57,7 +57,9 @@
                 </tr>
                 <tr ng-if="tra==1">
                     <td height="90" style="font-size: 14px;">
-                        <div class="icon web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
+                        <div class="icon web-icon-font3" style="color: #CF2520;" ng-if="onlytraffic.goTraffic.price!='-1'&& trafficlive.goTraffic.price!='-1'">&#xe90e;</div>
+                        <div class="icon  web-icon-font2" style="color: #9a9a9a;" ng-if="liv==0 && onlytraffic.goTraffic.price=='-1'">&#xe9e5;</div>
+                        <div class="icon  web-icon-font2" style="color: #9a9a9a;" ng-if="liv==1 && trafficlive.goTraffic.price=='-1'">&#xe9e5;</div>
                         <div class="startplace">{{startplace}}</div>
                         <div class="description">{{starttime}}<span ng-if="starttimelate!=undefined && starttimelate!=''">&nbsp;&nbsp;&nbsp;最晚{{starttime}}&nbsp;{{starttimelate}}到达</span></div>
                         <div class="endplace">{{endplace}}</div>
@@ -75,7 +77,9 @@
                 </tr>
                 <tr ng-if="liv==1">
                     <td height="90" style="font-size: 14px;">
-                        <div class="icon  web-icon-font3" style="color: #5248C8;">&#xe914;</div>
+                        <div class="icon  web-icon-font3" style="color: #5248C8;" ng-if="onlylive.price!='-1'&& trafficlive.hotel!='-1'">&#xe914;</div>
+                        <div class="icon  web-icon-font2" style="color: #9a9a9a;" ng-if="tra==0 && onlylive.price=='-1'">&#xe9e5;</div>
+                        <div class="icon  web-icon-font2" style="color: #9a9a9a;" ng-if="tra==1 && trafficlive.hotel=='-1'">&#xe9e5;</div>
                         <div style="line-height: 35px; padding: 10px 0; float: left;">入住地：{{endplace}}&nbsp;{{liveplace}}附近<br>入住日期：{{livetime}}&nbsp;&nbsp;&nbsp;退房日期：{{leavetime}}</div>
                     </td>
                     <td height="90" style="font-size: 14px;" align="center">
@@ -91,7 +95,9 @@
                 </tr>
                 <tr ng-if="tra==1 && endtime">
                     <td height="90" style="font-size: 14px;">
-                        <div class="icon  web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
+                        <div class="icon  web-icon-font3" style="color: #CF2520;" ng-if="onlytraffic.backTraffic.price!='-1'&& trafficlive.backTraffic.price!='-1'">&#xe90e;</div>
+                        <div class="icon  web-icon-font2" style="color: #9a9a9a;" ng-if="liv==0 && onlytraffic.backTraffic.price=='-1'">&#xe9e5;</div>
+                        <div class="icon  web-icon-font2" style="color: #9a9a9a;" ng-if="liv==1 && trafficlive.backTraffic.price=='-1'">&#xe9e5;</div>
                         <div class="startplace">{{endplace}}</div>
                         <div class="description">{{endtime}}<span ng-if="endtimelate!=undefined && endtimelate!=''">&nbsp;&nbsp;&nbsp;最晚{{endtime}}&nbsp;{{endtimelate}}到达</span></div>
                         <div class="endplace">{{startplace}}</div>
@@ -113,8 +119,8 @@
             <div>
                 <input type="button" value="返回上一步" class="common_btn2 w120" ng-click="prevstep()" style="margin-left: 300px;">
                 <input type="button" value="取消" class="common_btn2 w120" ng-click="cancel()" style="margin-left: 20px;">
-                <input type="button" value="生成出差记录" class="common_btn1 w120" ng-click="createRecord()" style="margin-left: 20px;">
-                <div class="bottom_txt">提示：生成出差记录同时会发送邮件通知给企业管理人员</div>
+                <input type="button" value="生成出差记录" class="common_btn2 w120" ng-click="createRecord()" style="margin-left: 20px;">
+                <div class="bottom_txt">提示：生成出差记录后，会在24小时内给您返回预算结果，返回预算结果的同时发送短消息通知企业管理人员</div>
             </div>
         </div>
         <div class="bottom2">

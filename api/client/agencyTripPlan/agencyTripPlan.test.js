@@ -133,7 +133,7 @@ describe("api/client/agencyTripPlan.js", function() {
 
     it("#pageTripPlanOrderByAgency return values length should be 0 when isUpload is true", function(done) {
         var self = {accountId: agencyUserId};
-        API.client.agencyTripPlan.pageTripPlanOrder.call(self, {isUpload: true}, function(err, ret){
+        API.client.agencyTripPlan.pageTripPlanOrder.call(self, {isUpload: true, audit: 'P'}, function(err, ret){
             if (err) {
                 throw err;
             }
@@ -146,7 +146,7 @@ describe("api/client/agencyTripPlan.js", function() {
 
     it("#pageTripPlanOrderByAgency return values length should be 0 when audit is Y", function(done) {
         var self = {accountId: agencyUserId};
-        API.client.agencyTripPlan.pageTripPlanOrder.call(self, {isUpload: true, audit: 'Y'}, function(err, ret){
+        API.client.agencyTripPlan.pageTripPlanOrder.call(self, {audit: 'Y'}, function(err, ret){
             if (err) {
                 throw err;
             }

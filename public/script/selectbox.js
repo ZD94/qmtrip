@@ -29,13 +29,8 @@ function selectPage (options) {
 	var fetchDataFunc = options.fetchDataFunc;	//去那个地址去抓数据
 	var displayNameKey = options.displayNameKey;
 	var valueKey = options.valueKey;
-
-	if (options.showDefault == true) {
-		$('.select_page dt,.select_page dd').show();
-	}
-	else if (options.showDefault == false) {
-		$('.select_page dt,.select_page dd').hide();
-	}
+	var showDefault = options.showDefault;
+	var isAllowAdd = options.isAllowAdd;
 
 	return defaultDataFunc()
 		.then(function() {
@@ -48,6 +43,9 @@ function selectPage (options) {
 				})
 				.then(function() {
 					return new Promise(function(resolve) {
+						$('.cancelBtn').click(function(){
+							$('.select_page').remove();
+						});
 						$('.select_page dd').click(function () {
 							key = $(this).html();
 							id = $(this).attr('code');
@@ -55,12 +53,16 @@ function selectPage (options) {
 							resolve([id, key]);
 						});
 
-						$("#select-box-search-input").keyup(function() {
+						$("#select-box-search-input").bind('input propertychange', function() {
 							var val = $(this).val();
-							if (!val) {
+							if (!val || val == '') {
 								defaultDataFunc(val)
 									.then(function(data) {
 										appendData(data);
+										$('#select-box-data').prepend("<dt>"+options.title+"</dt>");
+										$('.cancelBtn').click(function(){
+											$('.select_page').remove();
+										});
 										var key, id;
 										$('.select_page dd').click(function () {
 											key = $(this).html();
@@ -77,9 +79,23 @@ function selectPage (options) {
 							fetchDataFunc(val)
 								.then(function (data) {
 									if (data.length==0) {
-										console.info ("没有");
+										$('.select_page .result_none,.select_page .appendclass,.select_page dt,.select_page dd').remove();
+										var strr = "";
+										strr += "<div class='result_none'>匹配无结果</div>";
+										if (isAllowAdd == true) {
+											strr += "<dd class='appendclass'><span>+</span> 将&quot;"+val+"&quot;添加为出差目的</dd>";
+										}
+										$('.select_page').append(strr);
+										$('.cancelBtn').click(function(){
+											$('.select_page').remove();
+										});
+										$('.select_page dd').click(function () {
+											$('.select_page').remove();
+											resolve([id, val]);
+										});
 									}
-									else {
+									else if (data.length!=0) {
+										$('.select_page .result_none,.select_page .appendclass,.select_page dt,.select_page dd').remove();
 										appendData(data);
 										var key, id;
 										$('.select_page dd').click(function () {
@@ -101,26 +117,35 @@ function selectPage (options) {
 		$('.select_page').remove();
 		var str = "";
 		str += "<dl class='select_page'>";
-		str += "<div class='select_input'><input type='text' class='common_text w100 select_input1' placeholder="+options.placeholder+" id='select-box-search-input'></div>";
+		str += "<div class='select_input'><input type='text' class='common_text w85 select_input1' style='float: left;' placeholder="+options.placeholder+" id='select-box-search-input'><div class='w15 cancelBtn' style='float: right;'>取消</div></div>";
 		str += "<dt>"+options.title+"</dt>";
 		str += "<div id='select-box-data'></div>";
 		str += "</dl>";
 		$('#angular-view').append(str);
+		$("#select-box-search-input").focus();
 	}
 
 	function appendData(data) {
 		var str = '';
 		for(var i= 0, ii=data.length; i<ii; i++) {
 			if (displayNameKey != '' && valueKey != '') {
-				str += "<dd>"+data[i][displayNameKey]+"</dd>";
+				str += "<dd code='"+data[i][valueKey]+"'>"+data[i][displayNameKey]+"</dd>";
 			}
 			else if (displayNameKey == '' && valueKey == '') {
-				str += "<dd code='"+data[i]+"'>"+data[i]+"</dd>";
+				str += "<dd>"+data[i]+"</dd>";
 			}
-
 		}
 		$("#select-box-data").html("");
 		$("#select-box-data").html(str);
+	}
+
+
+
+	if (showDefault == true) {
+		$('.select_page dt,.select_page dd').show();
+	}
+	else if (showDefault == false) {
+		$('.select_page dt,.select_page dd').hide();
 	}
 
 }

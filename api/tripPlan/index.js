@@ -384,8 +384,6 @@ tripPlan.listTripPlanOrder = function(options){
     if(!options.order) {
          options.order = [['start_at', 'desc'], ['create_at', 'desc']]; //默认排序，创建时间
     }
-   
-    logger.error(options);
 
     return PlanOrder.findAndCount(options)
         .then(function(ret){
@@ -811,6 +809,74 @@ function countTripPlanNum(params){
     return PlanOrder.count({where: query});
 }
 
+
+/**
+ * 按月份统计预算/计划/完成金额
+ * @type {statBudgetByMonth}
+ */
+tripPlan.statBudgetByMonth = statBudgetByMonth;
+statBudgetByMonth.required_params = ['companyId'];
+statBudgetByMonth.optional_params = ['startTime', 'endTime', 'accountId'];
+function statBudgetByMonth(params) {
+    var stTime = params.startTime||moment().format('YYYY-MM-DD');
+    var enTime = params.endTime||moment().format('YYYY-MM-DD');
+    var timeArr = [];
+    do{
+        var t = moment(stTime).format('YYYY-MM-');
+        timeArr.push(t + '0\\d');
+        timeArr.push(t + '1\\d');
+        timeArr.push(t + '2\\d');
+        stTime = moment(stTime).add(1, 'months').format('YYYY-MM-DD');
+    }while(stTime<enTime);
+
+    var sql = 'select sum(budget) as \"planMoney\",sum(expenditure) as expenditure ' +
+        'from tripplan.trip_plan_order where company_id=\'' + params.companyId + '\'';
+
+    if(params.accountId) {
+        sql += ' and account_id=\'' + params.accountId + '\'';
+    }
+
+    var complete_sql = sql + ' and status=2 and to_char(start_at, \'YYYY-MM-DD\') ~ \'';
+
+    sql += ' and status > -1 and to_char(start_at, \'YYYY-MM-DD\') ~ \'';
+
+    return Promise.all(
+        timeArr.map(function(month) {
+            var s_sql = sql + month + '\';';
+            var c_sql = complete_sql + month + '\';';
+
+            var index = month.match(/\d{4}-\d{2}-(\d).*/)[1];
+            var remark = '';
+            if(index === '0') {
+                remark = '上旬';
+            }else if(index === '1') {
+                remark = '中旬';
+            }else if(index === '2') {
+                remark = '下旬';
+            }
+
+            var month = month.match(/\d{4}-\d{2}/)[0];
+            return Promise.all([
+                sequelize.query(s_sql),
+                sequelize.query(c_sql)
+            ])
+                .spread(function(all, complete){
+                    var a = all[0][0];
+                    var c = complete[0][0];
+                    var stat = {
+                        month: month,
+                        qmBudget: a.planMoney|0,
+                        planMoney: c.planMoney|0,
+                        expenditure: c.expenditure|0,
+                        remark: remark
+                    };
+
+                    return stat;
+                })
+        })
+    )
+}
+
 /**
  * 统计计划单的动态预算/计划金额和实际支出
  * @param params
@@ -822,25 +888,31 @@ function statPlanOrderMoney(params){
     var query = params;
     var query_complete = {
         companyId: query.companyId,
-        status: {$gte: STATUS.COMPLETE},
+        status: STATUS.COMPLETE,
         auditStatus: 1
     }
+    var query_sql = 'select sum(budget-expenditure) as \"savedMoney\" from tripplan.trip_plan_order where company_id=\''+ params.companyId +'\' and status=2 and audit_status=1';
     query.status = {$gte: STATUS.NO_COMMIT};
     var startAt = {};
 
     if(params.startTime){
         startAt.$gte = params.startTime;
+        query_sql += ' and start_at >=\'' + params.startTime + '\'';
         delete params.startTime;
     }
 
     if(params.endTime){
         startAt.$lte = params.endTime;
+        query_sql += ' and start_at <=\'' + params.endTime + '\'';
         delete params.endTime;
     }
 
     if(params.accountId){
         query_complete.accountId = params.accountId;
+        query_sql += ' and account_id=\'' + params.accountId + '\'';
     }
+
+    query_sql += ' and budget>expenditure;';
 
     if(!isObjNull(startAt)){
         query.startAt = startAt;
@@ -848,40 +920,24 @@ function statPlanOrderMoney(params){
     }
 
     return Promise.all([
-        PlanOrder.findAll({where: query, attributes: ['id']}),
-        PlanOrder.findAll({where: query_complete, attributes: ['id']})
+        PlanOrder.sum('budget', {where: query}),
+        PlanOrder.sum('budget', {where: query_complete}),
+        PlanOrder.sum('expenditure', {where: query_complete}),
+        PlanOrder.count({where: query_complete}),
+        sequelize.query(query_sql)
     ])
-        .spread(function(orders, orders1){
-            return [orders.map(function(order){ return order.id; }),
-                orders1.map(function(order){ return order.id; })]
-        })
-        .spread(function(idList, idComplete){
-            var q1 = {
-                orderId: {$in: idList},
-                status: {$ne: STATUS.DELETE}
-            }
-
-            var q2 = {
-                orderId: {$in: idComplete},
-                status: STATUS.COMMIT
-            }
-
-            return Promise.all([
-                ConsumeDetails.sum('budget', {where: q1}),
-                ConsumeDetails.sum('budget', {where: q2}),
-                ConsumeDetails.sum('expenditure', {where: q2}),
-                PlanOrder.count({where: query_complete})
-            ])
-        })
-        .spread(function(n1, n2, n3, n4){
+        .spread(function(n1, n2, n3, n4, n5) {
+            var savedMoney = n5[0][0].savedMoney || 0;
             return {
                 qmBudget: n1 || 0,
                 planMoney: n2 || 0,
                 expenditure: n3 || 0,
+                savedMoney: savedMoney,
                 NumOfStaff: n4 || 0
             }
         })
 }
+
 
 /**
  * 获取项目名称列表

@@ -1,3 +1,14 @@
+<script type="text/javascript">
+    $(function(){
+        $("#start_time,#end_time").datepicker({
+            prevText: "<",
+            nextText: ">",
+            monthNames: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],
+            dayNamesMin: ["日","一","二","三","四","五","六"],
+            dateFormat: 'yy-mm-dd'
+        });
+    });
+</script>
 <section>
     <div class="settlement">
         <ul class="settle_tab">
@@ -7,7 +18,19 @@
             <li class="on"><a href="#/TravelStatistics/planList">出差记录</a></li>
         </ul>
         <div class="settle_main mainbox_bottom">
-            <div class="settle_chart"></div>
+            <div class="search">
+                <ul>
+                    <li>出发时间：<input type="text" id="start_time" ng-model="start_time" placeholder="请选择时间">&nbsp;-<input type="text" id="end_time" ng-model="end_time" placeholder="请选择时间"></li>
+                    <li>关联：<span class="purposstype">全部</span><input type="text" ng-model="purposename" placeholder="请选择具体项目/会议" ng-change="searchPurposeName()" class="purposename">
+                        <ul class="PurposeNamelist">
+                            <div ng-repeat="item in PurposeNameitems" ng-click="choosepPurposeName(item)">{{item}}</div>
+                        </ul>
+                        <input type="text" placeholder="请输入员工姓名或邮箱" ng-model="keyword__">
+                    </li>
+                    <input type="button" value="搜索" class="common_btn1" ng-click="searchKeyword()" style="width:60px;margin-left:10px;">
+                    <li></li>
+                </ul>
+            </div>
             <div class="settle_list ">
                 <table width="100%" class="content">
                     <tr>
@@ -43,7 +66,7 @@
                             <span ng-if="item.expenditure==0">暂无</span>
                         </td>
                         <td align="center">
-                            <span ng-if="item.expenditure!=0 &&item.expenditure > item.budget">0</span>
+                            <span ng-if="item.expenditure!=0 &&item.expenditure >= item.budget">0</span>
                             <span ng-if="item.expenditure!=0 && item.status!='-1' && item.expenditure < item.budget">¥{{(item.budget-item.expenditure).toFixed(2)}}</span>
                             <span ng-if="item.expenditure==0">暂无</span>
                         </td>

@@ -8,6 +8,7 @@ var TravelStatistics = (function(){
     API.require('tripPlan');
     API.require("staff");
     API.require("agency");
+    API.require("travelPolicy");
 
     var  TravelStatistics = {};
 
@@ -170,19 +171,35 @@ var TravelStatistics = (function(){
         })
     }
     /*出差记录页面*/
+    /**
+    status:
+
+    -1 审核未通过
+    0 已提交 待审核
+    1 已完成
+
+    */
     TravelStatistics.PlanListController = function($scope) {
         // alert("zzzz");
         $("title").html("出差记录");
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
-        $scope.initPlanlist = function() {
+        var initPlanlist = $scope.initPlanlist = function() {
             API.onload(function(){
-                var params = {page:$scope.page}
+                var params = {page:$scope.page,perPage:20};
+                if ($scope.purposename != '' && $scope.purposename != undefined) {
+                    params.description = {$like: '%'+ $scope.purposename + '%'};
+                }
+                if($scope.start_time) {
+                    params.startTime = $scope.start_time;
+                }
+
+                if($scope.end_time) {
+                    params.endTime = $scope.end_time;
+                }
+
+                console.info(params);
                 API.tripPlan.pageTripPlanOrderByCompany(params)
                     .then(function(list){
-                        // console.info(list);
-                        // list.items.map(function(s){
-                        //     console.info('step1=>',s.auditStatus);
-                        // })
                         $scope.planlist = list.items;
                         console.log( $scope.planlist );
                         var planlist = list.items;
@@ -202,8 +219,18 @@ var TravelStatistics = (function(){
                             .then(function(ret){
                                 $scope.planlist = ret;
                                 ret.map(function(s){
-                                    var des = s.description;
-                                    // var des = JSON.stringify(s.description);
+                                    var desc = s.description;
+                                    var dest =s.destination;
+                                    var startP = s.startPlace;
+                                    if(desc && desc.length>5){
+                                        s.description= desc.substr(0,5) + '…';
+                                    }
+                                    if(dest && dest.length>5){
+                                        s.destination= dest.substr(0,5) + '…';
+                                    }
+                                    if(startP && startP.length>5){
+                                        s.startPlace= startP.substr(0,5) + '…';
+                                    }
                                     if(s.hotel.length>0){
                                         var hotelName = s.hotel[0].hotelName;
                                         var city = s.hotel[0].city;
@@ -214,11 +241,26 @@ var TravelStatistics = (function(){
                                             s.hotel[0].city = city.substr(0, 5) + '…';
                                         }
                                     }
-                                    if(des && des.length>10){
-                                        s.description= s.description.substr(0,5) + '…';
+
+                                    if(s.backTraffic.length>0){
+                                        var startPlace = s.backTraffic[0].startPlace;
+                                        var arrivalPlace = s.backTraffic[0].arrivalPlace;
+                                        if (startPlace && startPlace.length > 5) {
+                                            s.backTraffic[0].startPlace = startPlace.substr(0, 5) + '…';
+                                        };
+                                        if (arrivalPlace && arrivalPlace.length > 5) {
+                                            s.backTraffic[0].arrivalPlace = arrivalPlace.substr(0, 5) + '…';
+                                        };
                                     }
-                                    if(s.backTraffic){
-                                        
+                                    if(s.outTraffic.length>0){
+                                        var startPlace = s.outTraffic[0].startPlace;
+                                        var arrivalPlace = s.outTraffic[0].arrivalPlace;
+                                        if (startPlace && startPlace.length > 5) {
+                                            s.outTraffic[0].startPlace = startPlace.substr(0, 5) + '…';
+                                        };
+                                        if (arrivalPlace && arrivalPlace.length > 5) {
+                                            s.outTraffic[0].arrivalPlace = arrivalPlace.substr(0, 5) + '…';
+                                        };
                                     }
                                     return s;
                                 })
@@ -233,7 +275,7 @@ var TravelStatistics = (function(){
                     })
             })
         }
-        $scope.initPlanlist();
+        initPlanlist();
         //分页
         $scope.pagination = function () {
             if ($scope.total) {
@@ -249,7 +291,7 @@ var TravelStatistics = (function(){
                             $("#pagination").hide();
                         }
                         $scope.page = num;
-                        $scope.initPlanlist();
+                        initPlanlist();
                     }
                 });
                 clearInterval (pagenum);
@@ -261,6 +303,36 @@ var TravelStatistics = (function(){
         $scope.enterDetail = function (orderId) {
             window.open("#/TravelStatistics/planDetail?orderId=" + orderId);
         }
+        //搜索
+        $scope.searchPurposeName = function () {
+            API.onload(function() {
+                API.tripPlan.getProjectsList({project_name: $scope.purposename})
+                    .then(function(result) {
+                        $scope.PurposeNameitems = result;
+                        if ($scope.PurposeNameitems) {
+                            $(".PurposeNamelist").show();
+                        }
+                        console.info (result);
+                        $scope.$apply();
+                    })
+                    .catch(function(err){
+                        console.log(err);
+                    });
+            })
+        }
+        $scope.choosepPurposeName = function (project_name) {
+            $scope.purposename = project_name;
+            $(".PurposeNamelist").hide();
+        }
+        $(".purposename").blur(function(){
+            setTimeout('$(".PurposeNamelist").hide()', 500);
+        })
+        $scope.searchKeyword = function () {
+            if ($scope.keyword != '' && $scope.keyword != undefined) {
+                setTimeout($scope.pagination1,100);
+            }
+            initPlanlist();
+        }
     }
     // 出差记录详情页
     TravelStatistics.PlanDetailController = function($scope,$routeParams, $location, $anchorScroll) {
@@ -270,6 +342,9 @@ var TravelStatistics = (function(){
         API.onload(function(){
             API.tripPlan.getTripPlanOrderById(planId)
                 .then(function(result){
+                    if(result.description && result.description.length>15){
+                        result.description = result.description.substr(0,15);
+                    }
                     $scope.planDetail = result;
                     $scope.backTraffic = $scope.planDetail.backTraffic[0];
                     $scope.hotel = $scope.planDetail.hotel[0];
@@ -387,13 +462,24 @@ var TravelStatistics = (function(){
                     API.staff.getStaff({id:$scope.planDetail.accountId})
                         .then(function(result){
                             $scope.travelerName = result.staff.name;
+                            var travelLevel = result.staff.travelLevel;
+                            $scope.$apply();
+                            return API.travelPolicy.getTravelPolicy({id: travelLevel});
+                        })
+                        .then(function(travelpolicy){
+                            $scope.travelpolicy = travelpolicy;
                             $scope.$apply();
                         })
                         .catch(function(err){
                             console.info(err);
                         })
                     loading(true);
-                    console.info(result);
+                    $(".title_top .standard").hover(function(){
+                        $(this).siblings(".standard_detail").show();
+                    },function(){
+                        $(".standard_detail").hide();
+                    })
+                    console.info(result)
                     $scope.$apply();
                 })
                 .catch(function(err){

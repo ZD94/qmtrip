@@ -7,6 +7,8 @@ var L = require("common/language");
 var _ = require('lodash');
 var moment = require('moment');
 var C = require("../../../config");
+var Logger = require('common/logger');
+var logger = new Logger('client/tripPlan');
 
 var tripPlan = {};
 
@@ -172,7 +174,7 @@ tripPlan.pageCompleteTripPlanOrder = function (params) {
         ['status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
     query.accountId = self.accountId;
     query.auditStatus = 1; //审核状态为审核通过
-    query.status = {$gt: 1}; //计划单状态为已完成（2），可能会有结算完毕状态（3）
+    query.status = 2; //计划单状态为已完成（2），可能会有结算完毕状态（3）
 
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {
@@ -202,41 +204,21 @@ tripPlan.pageTripPlanOrder = function (params) {
     var self = this;
     var accountId = self.accountId;
 
-    //params.status = {$gte: -1};
-    if (params.isComplete === false) {
-        params.status = {$gte: -1, $lte: 1};
-    }else if(params.isComplete == true) {
-        params.status = 2;
-        params.auditStatus = 1;
-    }
-
-    if (params.isUpload === true) {
-        params.status = {$gt: 0}
-    } else if (params.isUpload === false) {
-        params.status = {$in: [-1, 0]};
-    }
-
-    if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
-        var audit = params.audit;
-        params.status = 1;
-        if(audit == 'Y'){
-            params.status = {$gte: 1};
-            params.auditStatus = 1;
-        }else if(audit == "P"){
-            params.auditStatus = 0;
-        }else if(audit == 'N'){
-            params.status = 0; //待上传状态
-            params.auditStatus = -1;
-        }
-    }
-
     var page = params.page;
     var perPage = params.perPage;
     typeof page == 'number' ? "" : page = 1;
     typeof perPage == 'number' ? "" : perPage = 10;
 
-    var query = _.pick(params,
-        ['status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
+    //判断出差计划是否完成
+    if (params.isComplete === false) {
+        params.status = {$gte: -1, $lte: 1};
+        params.auditStatus = {$ne: 1};
+    }else if(params.isComplete == true) {
+        params.status = 2;
+        params.auditStatus = 1;
+    }
+
+    var query = getQueryByParams(params);
 
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {
@@ -259,29 +241,24 @@ tripPlan.pageTripPlanOrder = function (params) {
         })
 }
 
-
 /**
- * 获取员工计划单分页列表(企业)
+ * 未完成          params.isComplete = false;
+ * 待出预算        params.isHasBudget = false;
+ * 待上传票据      params.isUpload = false;
+ * 票据审核中      params.audit = 'P';
+ * 审核未通过      params.audit = 'N';
+ * 已完成          params.isComplete = true'
+ *
+ * @param params
  * @returns {*}
  */
-tripPlan.pageTripPlanOrderByCompany = function (params) {
-    if (typeof params == 'function') {
-        throw {code: -2, msg: '参数不正确'};
-    }
-    var self = this;
-    var accountId = self.accountId;
-
-    if (params.isUpload === true) {
-        params.status = {$gt: 0}
-    } else if (params.isUpload === false) {
-        params.status = {$in: [-1, 0]};
-    }
-
-    if(params.audit){ //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
+function getQueryByParams(params) {
+    //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
+    if(params.audit){
         var audit = params.audit;
-        params.status = 0;
+        params.status = 1;
         if(audit == 'Y'){
-            params.status = {$gt: 1};
+            params.status = 2;
             params.auditStatus = 1;
         }else if(audit == "P"){
             params.status = 1;
@@ -292,12 +269,70 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
         }
     }
 
+    //判断是否上传
+    if (params.isUpload === true) {
+        params.status = {$gt: 0};
+    } else if (params.isUpload === false) {
+        params.status = 0;
+        params.auditStatus = {$ne: 1}; //审核状态不能是审核通过
+        params.isCommit = false; //未提交
+        params.budget = {$gt: 0}; //预算大于0
+    }
+
+    if(params.isHasBudget === false) {
+        params.status = -1; //状态是未出预算
+        params.budget = {$lte: 0}; //预算结果小于0
+    }
+
+    var query = _.pick(params, ['status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination',
+        'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'description', 'remark', 'isCommit']);
+
+    return query;
+}
+
+/**
+ * 获取员工计划单分页列表(企业)
+ * @returns {*}
+ */
+tripPlan.pageTripPlanOrderByCompany = pageTripPlanOrderByCompany;
+pageTripPlanOrderByCompany.optional_params = ['audit', 'startTime', 'endTime', 'startPlace', 'destination',
+    'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit', 'isHasBudget', 'isUpload', 'isComplete', 'description', 'page', 'perPage'];
+function pageTripPlanOrderByCompany(params) {
+    logger.warn(params);
+    if (typeof params == 'function') {
+        throw {code: -2, msg: '参数不正确'};
+    }
+    var self = this;
+    var accountId = self.accountId;
+
     var page = params.page;
     var perPage = params.perPage;
     page = typeof page == 'number' ? page : 1;
     perPage = typeof perPage == 'number' ? perPage : 10;
-    var query = _.pick(params,
-        ['accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure']);
+
+    //判断出差计划是否完成
+    if (params.isComplete === false) {
+        params.status = {$gt: -1, $lte: 1};
+        params.auditStatus = {$ne: 1};
+    }else if(params.isComplete == true) {
+        params.status = 2;
+        params.auditStatus = 1;
+    }
+
+    if(params.startTime) {
+        params.startAt?params.startAt.$gte = params.startTime:params.startAt = {$gte: params.startTime};
+    }
+
+    if(params.endTime) {
+        params.startAt?params.startAt.$lte = params.endTime:params.startAt = {$lte: params.endTime};
+    }
+
+    var query = getQueryByParams(params);
+    var status = query.status;
+    if(status == undefined) {
+        status = query.status = {};
+    }
+    typeof status == 'object'?query.status.$gt = -1:query.status = status;
 
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {
@@ -311,6 +346,9 @@ tripPlan.pageTripPlanOrderByCompany = function (params) {
                 offset: perPage * (page - 1)
             }
 
+            if(params.order) {
+                options.order = [params.order];
+            }
             return API.tripPlan.listTripPlanOrder(options);
         })
 }
@@ -391,6 +429,76 @@ tripPlan.countTripPlanNum = function (params) {
             params.companyId = companyId;
             return API.tripPlan.countTripPlanNum(params);
         });
+}
+
+/**
+ * @method statBudgetByGroup 统计计划单的动态预算/计划金额和实际支出
+ * @param params
+ */
+tripPlan.statBudgetByGroup = function (params) {
+    var self = this;
+    var params = _.pick(params, ['startTime', 'endTime']);
+    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
+        .then(function (staff) {
+            var companyId = staff.companyId;
+            var params_S = {
+                startTime: params.startTime,
+                endTime: params.endTime,
+                companyId: companyId,
+                index: 0
+            };
+            var params_Z = {
+                startTime: params.startTime,
+                endTime: params.endTime,
+                companyId: companyId,
+                index: 1
+            };
+            var params_X = {
+                startTime: params.startTime,
+                endTime: params.endTime,
+                companyId: companyId,
+                index: 2
+            };
+            return Promise.all([
+                API.tripPlan.statBudgetByGroup(params_S),
+                API.tripPlan.statBudgetByGroup(params_Z),
+                API.tripPlan.statBudgetByGroup(params_X)
+            ])
+                .spread(function(S, Z, X){
+                    var ret = {};
+                    for(var name in S) {
+                        ret[name] = [S[name]];
+                    }
+
+                    for(var name in Z) {
+                        if(!ret[name]){
+                            ret[name] = [];
+                        }
+                        ret[name].push(Z[name]);
+                    }
+                    for(var name in X) {
+                        if(!ret[name]){
+                            ret[name] = [];
+                        }
+                        ret[name].push(X[name]);
+                    }
+                    return ret;
+                })
+        })
+}
+
+/**
+ * 按月份统计预算/计划/完成金额
+ * @type {statBudgetByMonth}
+ */
+tripPlan.statBudgetByMonth = statBudgetByMonth;
+function statBudgetByMonth(params) {
+    var self = this;
+    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
+        .then(function (staff) {
+            params.companyId = staff.companyId;
+            return API.tripPlan.statBudgetByMonth(params)
+        })
 }
 
 /**
