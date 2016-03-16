@@ -265,8 +265,8 @@ var travelplan=(function(){
             return Math.abs($scope.ITEM.budget-$scope.ITEM.expenditure).toFixed(2);
         }
 
-        $scope.checkInvoice = function(){
-            window.location.href="#/travelplan/invoicedetail?planId="+$scope.ITEM.id+"&status=outTraffic&invoiceId=";
+        $scope.checkInvoice = function( p ){
+            window.location.href="#/travelplan/invoicedetail?planId="+$scope.ITEM.id+"&status="+p+"&invoiceId=";
         }
 
         $scope.renderStatus = function( p ){

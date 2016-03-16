@@ -73,7 +73,7 @@
                     <a class="BTN" ng-if="ITEM.outTraffic[0].isCommit===false&&ITEM.outTraffic[0].status===0">预订</a>
                     <a class="BTN" ng-if="ITEM.outTraffic[0].isCommit===false&&ITEM.outTraffic[0].status===0" ng-click="">上传票据</a>
                     <a class="BTN" ng-if="ITEM.outTraffic[0].status===-1" ng-click="">重新上传</a>
-                    <a class="BTN" ng-if="ITEM.outTraffic[0].isCommit===true" ng-click="checkInvoice()">查看票据</a>
+                    <a class="BTN" ng-if="ITEM.outTraffic[0].isCommit===true||ITEM.outTraffic[0].status===-1" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>
                 </div>
             </div>
         </li>
@@ -108,9 +108,12 @@
             </div>
             <div class="list_bottom">
                 <div class="status">{{renderStatus( ITEM.backTraffic[0] )}}</div>
-                <a class="BTN" ng-click="checkInvoice()">查看票据</a>
-                <a class="BTN" ng-click="">重新上传</a>
-                <a class="BTN">预订</a>
+                <div class="buttons" ng-if="ITEM.outTraffic[0].budget!==-1">
+                    <a class="BTN" ng-if="ITEM.outTraffic[0].isCommit===false&&ITEM.outTraffic[0].status===0">预订</a>
+                    <a class="BTN" ng-if="ITEM.outTraffic[0].isCommit===false&&ITEM.outTraffic[0].status===0" ng-click="">上传票据</a>
+                    <a class="BTN" ng-if="ITEM.outTraffic[0].status===-1" ng-click="">重新上传</a>
+                    <a class="BTN" ng-if="ITEM.outTraffic[0].isCommit===true||ITEM.outTraffic[0].status===-1" ng-click="checkInvoice( 'backTraffic' )">查看票据</a>
+                </div>
             </div>
         </li>
         <li class="hotel" ng-if="ITEM.hotel.length!==0">
@@ -141,9 +144,12 @@
             </div>
             <div class="list_bottom">
                 <div class="status">{{renderStatus( ITEM.hotel[0] )}}</div>
-                <a class="BTN" ng-click="checkInvoice()">查看票据</a>
-                <a class="BTN" ng-click="">重新上传</a>
-                <a class="BTN">预订</a>
+                <div class="buttons" ng-if="ITEM.outTraffic[0].budget!==-1">
+                    <a class="BTN" ng-if="ITEM.outTraffic[0].isCommit===false&&ITEM.outTraffic[0].status===0">预订</a>
+                    <a class="BTN" ng-if="ITEM.outTraffic[0].isCommit===false&&ITEM.outTraffic[0].status===0" ng-click="">上传票据</a>
+                    <a class="BTN" ng-if="ITEM.outTraffic[0].status===-1" ng-click="">重新上传</a>
+                    <a class="BTN" ng-if="ITEM.outTraffic[0].isCommit===true||ITEM.outTraffic[0].status===-1" ng-click="checkInvoice( 'hotel' )">查看票据</a>
+                </div>
             </div>
         </li>
     </ul>
