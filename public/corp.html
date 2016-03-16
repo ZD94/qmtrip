@@ -32,7 +32,7 @@
 			return false;
 		}
 		if (!isAuthCreditExist()) {
-			window.location.href = "/staff.html#/auth/login";
+			window.location.href = "/staff.html#/auth/login?backUrl="+window.location.href;
 		}
 	</script>
 	<script src="http://echarts.baidu.com/build/dist/echarts-all.js"></script>
