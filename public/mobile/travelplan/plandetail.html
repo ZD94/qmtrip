@@ -58,8 +58,8 @@
                     <p ng-if="ITEM.outTraffic[0].expenditure===0"></p>
                     <p class="budget">
                         预算：
-                        <span ng-if="ITEM.outTraffic[0].budget===-1">暂无</span>
-                        <span ng-if="ITEM.outTraffic[0].budget!==-1">¥{{ITEM.outTraffic[0].budget.toFixed(2)}}</span>
+                        <span class="number" ng-if="ITEM.outTraffic[0].budget===-1">暂无</span>
+                        <span class="number" ng-if="ITEM.outTraffic[0].budget!==-1">¥{{ITEM.outTraffic[0].budget.toFixed(2)}}</span>
                     </p>
                     <p class="expenditure" ng-if="ITEM.outTraffic[0].expenditure!==0">
                         实际：
@@ -94,8 +94,8 @@
                     <p ng-if="ITEM.backTraffic[0].expenditure===0"></p>
                     <p class="budget">
                         预算：
-                        <span ng-if="ITEM.backTraffic[0].budget===-1">暂无</span>
-                        <span ng-if="ITEM.backTraffic[0].budget!==-1">¥{{ITEM.backTraffic[0].budget.toFixed(2)}}</span>
+                        <span class="number" ng-if="ITEM.backTraffic[0].budget===-1">暂无</span>
+                        <span class="number" ng-if="ITEM.backTraffic[0].budget!==-1">¥{{ITEM.backTraffic[0].budget.toFixed(2)}}</span>
                     </p>
                     <p class="expenditure" ng-if="ITEM.backTraffic[0].expenditure!==0">
                         实际：
@@ -120,15 +120,15 @@
                         </span>
                     </p>
                     <p class="time">
-                        <span>{{ITEM.hotel[0].startTime | date:"yyyy-MM-dd"}}至{{ITEM.hotel[0].endTime | date:"yyyy-MM-dd"}}（共晚）</span>
+                        <span>{{ITEM.hotel[0].startTime | date:"yyyy-MM-dd"}}至{{ITEM.hotel[0].endTime | date:"yyyy-MM-dd"}}（共N晚）</span>
                     </p>
                 </div>
                 <div class="top_right">
                     <p ng-if="ITEM.outTraffic[0].expenditure===0"></p>
                     <p class="budget">
                         预算：
-                        <span ng-if="ITEM.outTraffic[0].budget===-1">暂无</span>
-                        <span ng-if="ITEM.outTraffic[0].budget!==-1">¥{{ITEM.hotel[0].budget.toFixed(2)}}</span>
+                        <span class="number" ng-if="ITEM.outTraffic[0].budget===-1">暂无</span>
+                        <span class="number" ng-if="ITEM.outTraffic[0].budget!==-1">¥{{ITEM.hotel[0].budget.toFixed(2)}}</span>
                     </p>
                     <p class="expenditure" ng-if="ITEM.outTraffic[0].expenditure!==0">
                         实际：
