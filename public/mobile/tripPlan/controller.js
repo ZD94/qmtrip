@@ -80,37 +80,18 @@
                 autoUpload: false
             };
 
-            // function clone(obj) {
-            //     return JSON.parse(JSON.stringify(obj));
-            // }
-
-            // var trafficUploadConfig = clone(uploadConf);
-            // var hotelUploadConfig = JSON.parse(JSON.stringify(uploadConf));
-            // $scope.TrafficUploader = new FileUploader(trafficUploadConfig);
-            // $scope.HotelUploader = new FileUploader(hotelUploadConfig);
-            // $scope.BackTrafficUploader = new FileUploader(backTrafficUploadConfig);
             $scope.winWidth = $(window).width();
             var uploader = $scope.uploader = new FileUploader(uploadConf);
             uploader.filters.push({
                 name: 'customFilter',
-                fn: function(item /*{File|FileLikeObject}*/, options) {
+                fn: function(item, options) {
                     return this.queue.length < 10;
                 }
             });
-            uploader.onWhenAddingFileFailed = function(item /*{File|FileLikeObject}*/, filter, options) {
-                console.info('onWhenAddingFileFailed', item, filter, options);
-            };
             uploader.onAfterAddingFile = function(file) {
                 preview(file);
             }
-            uploader.onBeforeUploadItem = function(item) {
-                console.info('onBeforeUploadItem', item);
-            };
-            uploader.onProgressItem = function(fileItem, progress) {
-                console.info('onProgressItem', fileItem, progress);
-            };
             uploader.onCompleteItem = function(fileItem, response, status, headers) {
-                console.info('onCompleteItem', fileItem, response, status, headers);
                 var consumeId;
                 if(fileItem.traffictype == '去程'){
                     consumeId = $scope.outTraffic.id;
@@ -123,8 +104,6 @@
                 }
                 var md5key = response.md5key;
                 uploadInvoice(consumeId, md5key, function(err, result){
-                    console.info(err)
-                    console.info(result)
                     if (err ) {
                         TLDAlert(err.msg || err);
                         return;
@@ -198,7 +177,6 @@
                                 $scope.backClass = "ready";
                             }
                         }
-                        console.info(plan);
                         // $scope.$apply();
                         API.staff.getCurrentStaff()
                             .then(function(staff){
