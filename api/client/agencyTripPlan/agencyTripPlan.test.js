@@ -109,7 +109,7 @@ describe("api/client/agencyTripPlan.js", function() {
 
     it("#getTripPlanOrderById should be ok", function(done) {
         var self = {accountId: agencyUserId};
-        API.client.agencyTripPlan.getTripPlanOrderById.call(self, orderId, function(err, ret){
+        API.client.agencyTripPlan.getTripPlanOrderById.call(self, {orderId: orderId}, function(err, ret){
             if (err) {
                 throw err;
             }
