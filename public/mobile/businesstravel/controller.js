@@ -192,8 +192,6 @@ var businesstravel=(function(){
 
             //生成预算
             $scope.createResult = function () {
-                alert ($('#endTimeLate').val());
-                return false;
                 var startCity = $scope.startCity,
                     endCity = $scope.endCity,
                     startCityVal = $('#startCity').attr("code"),
@@ -580,6 +578,7 @@ var businesstravel=(function(){
                 $('#liveCity').attr('code',$('#endCity').attr('code'));
                 $('#liveTime').val($('#startTime').val());
                 $('#leaveTime').val($('#endTime').val());
+                $scope.liveCityId = $('#liveCity').attr('code');
             }
 
             //生成预算单
