@@ -1042,7 +1042,7 @@ tripPlan.previewConsumeInvoice = function (params) {
  * @param params
  */
 tripPlan.checkBudgetExist = checkBudgetExist;
-checkBudgetExist.required_params = ['consumeDetails', 'accountId', 'companyId', 'type', 'destination', 'destinationCode'];
+checkBudgetExist.required_params = ['consumeDetails', 'accountId', 'companyId', 'destination', 'destinationCode'];
 checkBudgetExist.optional_params = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'description', 'destinationCode', 'startPlaceCode'];
 var consumeDetails_required_fields = ['type', 'startTime', 'invoiceType'];
 function checkBudgetExist(params){
@@ -1076,18 +1076,26 @@ function checkBudgetExist(params){
     }
 
     _planOrder.status = {$ne: STATUS.DELETE};
+
+    logger.error(_planOrder);
     return PlanOrder.findAll({where: _planOrder})
         .then(function(order){
             if(order.length <= 0) {
-                return false;
+                return [false];
             }
 
-            return [order[0].id, Promise.all(consumeDetails.map(function(detail) {
+            logger.error("*********************************");
+            logger.error(order.length);
+
+            return [true, order[0].id, Promise.all(consumeDetails.map(function(detail) {
                 detail.status = {$ne: STATUS.DELETE};
                 return ConsumeDetails.findAll({where: detail})
             }))]
         })
-        .spread(function(order_id, array) {
+        .spread(function(ret, order_id, array) {
+            if(!ret) {
+                return false;
+            }
             var result = order_id;
             array.map(function(details) {
                 if(details.length <= 0) {

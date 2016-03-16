@@ -735,6 +735,64 @@ var auth=(function(){
         }
     }
 
+    //员工设置密码页
+    auth.FirstSetPwdController = function($scope, $routeParams){
+        var accountId = $routeParams.accountId;
+        var sign = $routeParams.sign;
+        var timestamp = $routeParams.timestamp;
+        $scope.isValid = 'checking';
+
+        API.onload(function() {
+            API.auth.checkResetPwdUrlValid({accountId: accountId, sign: sign, timestamp: timestamp})
+                .then(function(result) {
+                    if (!result) {
+                        $scope.isValid = false;
+                    } else {
+                        $scope.isValid = true;
+                    }
+                    $scope.$apply();
+                })
+                .catch(function(err) {
+                    console.error(err);
+                    $scope.isValid = false;
+                    $scope.$apply();
+                })
+        });
+
+        $scope.checkStaffPwd = function(){
+            //alert(123);
+            var pwd = $("#firstPwd").val();
+            var pwds = $("#secondPwd").val();
+
+            if(!pwd){
+                $scope.err_msg_new_pwd = "请输入密码";
+                $("#firstPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#firstPwd").siblings(".err_msg").children("i").removeClass("right");
+                $("#firstPwd").siblings(".err_msg").show();
+                return false;
+            }
+            if(pwd != pwds){
+                alert("两次密码输入不一致");
+                $scope.err_msg_second_pwd = "2次密码设置不一致";
+                $("#secondPwd").siblings(".err_msg").children("i").html("&#xf06a;");
+                $("#secondPwd").siblings(".err_msg").children("i").removeClass("right");
+                $("#secondPwd").siblings(".err_msg").show();
+                return false;
+            }
+
+            API.onload(function() {
+                API.auth.resetPwdByEmail({accountId:accountId,sign: sign, timestamp: timestamp,pwd:pwds})
+                    .then(function(){
+                        //alert("设置密码成功");
+                        alert("密码设置成功")
+                        $scope.$apply();
+                    }).catch(function(err){
+                    console.error(err);
+                }).done();
+            })
+        }
+    }
+
     //员工设置密码成功页面
     auth.StaffPwdSuccessController = function($scope){
         var $seconds = $("#second3");

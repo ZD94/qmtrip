@@ -11,6 +11,7 @@ var crypto = require("crypto");
 var API = require("common/api");
 
 function uploadActionFile(req, res, next) {
+    req.clearTimeout();
     var user_id = req.cookies.user_id;
     var token_id = req.cookies.token_id;
     var token_sign = req.cookies.token_sign;
@@ -109,6 +110,7 @@ function uploadActionFile(req, res, next) {
  * @returns {*}
  */
 function getPublicFile(req, res, next) {
+    req.clearTimeout();
     var attachmentPath = path.join(__dirname, "../../public/upload");
     var id = req.params.id;
     if (!id) {
@@ -161,6 +163,7 @@ function getPublicFile(req, res, next) {
  * @returns {*}
  */
 function getSelfFile(req, res, next){
+    req.clearTimeout();
     var fileId = req.params.id;
     var accountId = req.cookies.user_id;
     var token_id = req.cookies.token_id;
@@ -197,6 +200,7 @@ function getSelfFile(req, res, next){
 }
 
 function downloadExcle(req, res, next){
+    req.clearTimeout();
     var fileName = req.params.fileName;
     var filePath = config.upload.tmpDir+"/" + fileName;
     if(fileName.indexOf('template') != -1){

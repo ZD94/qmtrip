@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
-<html ng-app="tulingdao.com">
+<html>
 <head>
 	<meta charset="UTF-8">
 	<title ng-bind="pageTitle"></title>
@@ -11,7 +11,6 @@
 	<link rel="stylesheet" type="text/css" href="/corp/css/staffawardplan.css">
 	<link rel="stylesheet" type="text/css" href="/corp/css/travelstatisics.css">
 	<link rel="stylesheet" type="text/css" href="/corp/css/policylist.css">
-	<!--<link rel="stylesheet" type="text/css" href="/corp/css/editcorp.css">-->
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
     <script type="text/javascript">
         var jQuery = $ = require('jquery');
@@ -19,6 +18,23 @@
     <script type="text/javascript" src="/script/libs/bundle.api.js"></script>
 	<script type="text/javascript" src="/script/jqPaginator.js"></script>
 	<script type="text/javascript" src="/script/libs/bundle.ngapp.js"></script>
+	<script>
+		var Cookie = require('tiny-cookie');
+		function isAuthCreditExist() {
+			var user_id = Cookie.get('user_id');
+			var token_id = Cookie.get('token_id');
+			var token_sign = Cookie.get('token_sign');
+			var timestamp = Cookie.get("timestamp");
+
+			if (user_id && token_id && token_sign && token_id) {
+				return true;
+			}
+			return false;
+		}
+		if (!isAuthCreditExist()) {
+			window.location.href = "/staff.html#/auth/login?backurl="+window.location.href;
+		}
+	</script>
 	<script src="http://echarts.baidu.com/build/dist/echarts-all.js"></script>
 	<script type="text/javascript" src="/script/libs/bundle.notie.js"></script>
     <script type="text/javascript" src="/script/selectbox.js"></script>
@@ -28,7 +44,6 @@
     <script type="text/javascript">
     	var Q = require('q');
     	var moment = require('moment');
-		var Cookie = require('tiny-cookie');
 		var TLD = TLD_angular_app('tulingdao.com', 'corp', '/UsersFirst/UserMain');
 		API.onlogin(function(){
 			var backUrl = window.location.href;
@@ -48,6 +63,10 @@
 			API.onload(function(){
 				API.auth.logout()
 						.done(function() {
+							Cookie.remove("user_id");
+							Cookie.remove("token_id");
+							Cookie.remove("token_sign");
+							Cookie.remove("timestamp");
 							window.location.href = "/staff.html#/auth/login";
 						});
 			});
@@ -99,7 +118,7 @@
     })
     </script>
 </head>
-<body ng-controller="MainController">
+<body ng-controller="MainController" ng-app="tulingdao.com">
 	<div class="corp_header">
 		<div class="logo">
 			<img src="/corp/images/logo.png">
