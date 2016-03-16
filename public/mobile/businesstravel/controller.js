@@ -864,7 +864,11 @@ var businesstravel=(function(){
                 API.tripPlan.savePlanOrder(order)
                     .then(function(result){
                         console.info (result);
-                        black_err("生成计划单成功");
+                        black_err("已成功生成出差记录");
+                        function plandetail () {
+                            window.location.href='#/travelplan/plandetail?orderId='+result.id;
+                        }
+                        setTimeout(plandetail,3000);
                     })
                     .catch(function(err){
                         console.info (err);
