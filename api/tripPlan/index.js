@@ -38,7 +38,7 @@ var ConsumeDetailsCols = Object.keys(ConsumeDetails.attributes);
  * @returns {*}
  */
 tripPlan.savePlanOrder = savePlanOrder;
-savePlanOrder.required_params = ['consumeDetails', 'accountId', 'companyId', 'type', 'destination', 'budget', 'destinationCode', 'description'];
+savePlanOrder.required_params = ['consumeDetails', 'accountId', 'companyId', 'destination', 'budget', 'destinationCode', 'description'];
 savePlanOrder.optional_params = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark', 'destinationCode', 'startPlaceCode', 'projectId'];
 var consumeDetails_required_fields = ['type', 'startTime', 'invoiceType', 'budget'];
 function savePlanOrder(params){
@@ -83,6 +83,7 @@ function savePlanOrder(params){
             _planOrder.projectId = project.id;
             var total_budget = 0;
             var isBudget = true;
+
             for(var i in consumeDetails) {
                 var obj = consumeDetails[i];
 
@@ -90,18 +91,11 @@ function savePlanOrder(params){
                     throw {code: -2, nsg: '预算金额格式不正确'};
                 }
 
-                if(obj.budget > 0) {
-                    total_budget = parseFloat(total_budget) + parseFloat(obj.budget);
-                } else {
-                    isBudget = false;
-                }
+                obj.budget>0?total_budget = parseFloat(total_budget) + parseFloat(obj.budget):isBudget = false;;
             }
 
             _planOrder.budget = total_budget;
-            if(!isBudget) {
-                _planOrder.status = STATUS.NO_BUDGET; //待录入预算状态
-                _planOrder.budget = -1;
-            }
+            isBudget?_planOrder.orderStatus = 'WAIT_UPLOAD':_planOrder.orderStatus = 'NO_BUDGET'; //是否有预算，设置出差计划状态
 
             return sequelize.transaction(function(t){
                 var order = {};
@@ -115,8 +109,7 @@ function savePlanOrder(params){
                         return Promise.all(consumeDetails.map(function(detail){
                             detail.orderId = order.id;
                             detail.accountId = order.accountId;
-                            detail.status = STATUS.NO_COMMIT;
-                            detail.isCommit = false;
+                            detail.orderStatus = _planOrder.orderStatus;
 
                             return ConsumeDetails.create(detail, {transaction: t})
                                 .then(function(ret){
@@ -177,7 +170,7 @@ function getTripPlanOrder(params){
         ConsumeDetails.findAll({where: {orderId: orderId, type: 0, status: {$ne: STATUS.DELETE}}})
     ])
         .spread(function(order, outTraffic, backTraffic, hotel){
-            if(!order || order.status == STATUS.DELETE){
+            if(!order || order.orderStatus == 'DELETE'){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
             }
             order.setDataValue("outTraffic", outTraffic);
@@ -245,7 +238,7 @@ function updateTripPlanOrder(params){
     var optLog = params.optLog;
     var updates = params.updates;
 
-    return PlanOrder.findById(orderId, {attributes: ['id', 'accountId', 'companyId', 'status']})
+    return PlanOrder.findById(orderId)
         .then(function(order){
             if(!order || order.status == STATUS.DELETE){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
@@ -283,7 +276,7 @@ updateConsumeDetail.optional_params = _.keys(ConsumeDetails.attributes);
 function updateConsumeDetail(params){
     var updates = params;
 
-    return ConsumeDetails.findById(params.id, {attributes: ['status']})
+    return ConsumeDetails.findById(params.id)
         .then(function(record){
             if(!record || record.status == STATUS.DELETE){
                 throw {code: -2, msg: '票据不存在'};
@@ -302,7 +295,7 @@ updateConsumeBudget.required_params = ['id', 'budget', 'userId'];
 function updateConsumeBudget(params){
     var id = params.id;
 
-    return ConsumeDetails.findById(id, {attributes: ['status', 'budget', 'orderId']})
+    return ConsumeDetails.findById(id)
         .then(function(ret){
             if(!ret ||ret.status == STATUS.DELETE){
                 throw {code: -2, msg: '票据不存在'};
@@ -312,7 +305,7 @@ function updateConsumeBudget(params){
                 throw {code: -3, msg: '该票据已经审核通过，不能修改预算'};
             }
 
-            return [ret.budget, PlanOrder.findById(ret.orderId, {attributes: ['id', 'budget', 'status']})];
+            return [ret.budget, PlanOrder.findById(ret.orderId)];
         })
         .spread(function(o_budget, order){
             if(order.status == STATUS.COMMIT){
@@ -347,7 +340,7 @@ function updateConsumeBudget(params){
             })
         })
         .spread(function(orderId){
-            return [orderId, ConsumeDetails.findAll({where: {orderId: orderId, status: {$ne: -2}}, attributes: ['budget']})];
+            return [orderId, ConsumeDetails.findAll({where: {orderId: orderId, status: {$ne: -2}}})];
         })
         .spread(function(orderId, list){
             var c_budget = 0;
@@ -434,7 +427,7 @@ function saveConsumeRecord(params){
     var options = {};
     options.fields = Object.keys(record);
 
-    return PlanOrder.findById(params.orderId, {attributes: ['id', 'status', 'accountId', 'budget']})
+    return PlanOrder.findById(params.orderId)
         .then(function(order){
             if(!order || order.status == STATUS.DELETE){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
@@ -498,7 +491,7 @@ deleteTripPlanOrder.required_params = ['userId', 'orderId'];
 function deleteTripPlanOrder(params){
     var orderId = params.orderId;
     var userId = params.userId;
-    return PlanOrder.findById(orderId, {attributes: ['accountId', 'status']})
+    return PlanOrder.findById(orderId)
         .then(function(order){
 
             if(!order || order.status == STATUS.DELETE){
@@ -532,7 +525,7 @@ function deleteConsumeDetail(params){
     var id = params.id;
     var userId = params.userId;
 
-    return ConsumeDetails.findById(id, {attributes: ['accountId']})
+    return ConsumeDetails.findById(id)
         .then(function(detail){
             if(!detail || detail.status == STATUS.DELETE){
                 throw L.ERR.CONSUME_DETAIL_NOT_EXIST;
@@ -562,25 +555,36 @@ uploadInvoice.required_params = ['userId', 'consumeId', 'picture'];
 function uploadInvoice(params){
     var orderId = "";
 
-    return ConsumeDetails.findById(params.consumeId, {attributes: ['status', 'orderId', 'invoice', 'accountId']})
+    return ConsumeDetails.findById(params.consumeId)
         .then(function(custome){
-            if(!custome || custome.status == STATUS.DELETE)
+            if(!custome || custome.status == STATUS.DELETE){
                 throw L.ERR.NOT_FOUND;
+            }
 
-            if(custome.accountId != params.userId)
+            if(custome.accountId != params.userId){
                 throw L.ERR.PERMISSION_DENY;
+            }
+
+            if(custome.orderStatus === 'AUDIT_PASS') {
+                throw {code: -3, msg: '已审核通过的票据不能重复上传'};
+            }
 
             orderId = custome.orderId;
-            return [orderId, custome, PlanOrder.findById(orderId, {attributes: ['status']})]
+            return [orderId, custome,
+                PlanOrder.findById(orderId),
+                ConsumeDetails.findAll({where: {orderId: orderId}, attributes: ['id', 'orderStatus', 'status', 'budget', 'isCommit', 'newInvoice']}) //所有的未审核通过的数据
+            ]
         })
-        .spread(function(orderId, custome, order){
+        .spread(function(orderId, custome, order, list){
             if(order.status == STATUS.NO_BUDGET){
                 throw {code: -2, msg: '还没有录入出差预算'};
             }
+
             var invoiceJson = custome.invoice;
             var times = invoiceJson.length ? invoiceJson.length+1 : 1;
             var currentInvoice = {times:times, picture:params.picture, create_at:moment().format('YYYY-MM-DD HH:mm'), status:STATUS.NO_COMMIT, remark: '', approve_at: ''};
             invoiceJson.push(currentInvoice);
+
             var updates = {
                 newInvoice: params.picture,
                 invoice: JSON.stringify(invoiceJson),
@@ -588,15 +592,27 @@ function uploadInvoice(params){
                 status: STATUS.NO_COMMIT,
                 auditRemark: params.auditRemark || ''
             };
+
             var logs = {consumeId: params.consumeId, userId: params.userId, remark: "上传票据"};
             var orderLogs = {orderId: custome.orderId, userId: params.userId, remark: '上传票据', createAt: utils.now()};
+
+            var order_status = 'WAIT_COMMIT';
+            list.map(function(en) {
+                if(en.orderStatus == 'AUDIT_NOT_PASS' && en.id != params.consumeId) {
+                    order_status = 'AUDIT_NOT_PASS';
+                }
+
+                if(en.orderStatus == 'WAIT_UPLOAD' && en.id != params.consumeId) {
+                    order_status = 'WAIT_UPLOAD';
+                }
+            })
 
             return sequelize.transaction(function(t){
                 return Promise.all([
                     ConsumeDetails.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
                     ConsumeDetailsLogs.create(logs,{transaction: t}),
                     TripOrderLogs.create(orderLogs, {transaction: t}),
-                    PlanOrder.update({status: STATUS.NO_COMMIT, auditStatus: 0, updateAt: utils.now()}, {where: {id: orderId}})
+                    PlanOrder.update({orderStatus: order_status, updateAt: utils.now()}, {where: {id: orderId}})
                 ]);
             })
         })
@@ -667,7 +683,7 @@ function getVisitPermission(params){
 tripPlan.saveOrderLogs = saveOrderLogs;
 saveOrderLogs.required_params = ['userId', 'orderId', 'remark']
 function saveOrderLogs(logs){
-    return PlanOrder.findById(params.orderId, {attributes: ['status']})
+    return PlanOrder.findById(params.orderId)
         .then(function(order){
             if(!order || order,status == STATUS.DELETE){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
@@ -707,7 +723,7 @@ function approveInvoice(params){
                 throw {code: -3, msg: '该票据已审核通过，不能重复审核'};
             }
 
-            return [PlanOrder.findById(consume.orderId, {attributes: ['id', 'expenditure', 'status', 'budget', 'auditStatus']}), consume]
+            return [PlanOrder.findById(consume.orderId), consume]
         })
         .spread(function(order, consume){
             var invoiceJson = consume.invoice;
@@ -766,7 +782,7 @@ function approveInvoice(params){
                             updateAt: utils.now()
                         }
 
-                        return ConsumeDetails.findAll({where: {orderId: order.id, status: {$ne: -2}}, attributes: ['id', 'status']})
+                        return ConsumeDetails.findAll({where: {orderId: order.id, status: {$ne: -2}}})
                             .then(function(list){
                                 for(var i=0; i<list.length; i++){
                                     if(list[i].status != STATUS.COMMIT && list[i].id != ret[1][0].id){
@@ -961,8 +977,8 @@ commitTripPlanOrder.required_params = ['orderId', 'accountId'];
 function commitTripPlanOrder(params){
     var id = params.orderId;
     return Promise.all([
-        PlanOrder.findById(id, {attributes: ['status', 'auditStatus', 'accountId']}),
-        ConsumeDetails.findAll({where:{orderId: id}, attributes: ['status', 'newInvoice', 'isCommit']})
+        PlanOrder.findById(id),
+        ConsumeDetails.findAll({where:{orderId: id}})
     ])
         .spread(function(order, list){
             if(!order || order.status == STATUS.DELETE){
@@ -1111,7 +1127,11 @@ tripPlan.getProjectList = getProjectList;
 getProjectList.require_params = ['companyId'];
 getProjectList.optionnal_params = ['code', 'name'];
 function getProjectList(params) {
-    return Projects.findAll({where: params})
+    var options = {
+        where: params,
+        order: [['create_at', 'desc']]
+    }
+    return Projects.findAll(options)
 }
 
 tripPlan.createNewProject = createNewProject;

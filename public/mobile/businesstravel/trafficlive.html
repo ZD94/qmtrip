@@ -1,3 +1,15 @@
+<script>
+    $(function () {
+        $('#startTimeLate,#endTimeLate').focus(function(){
+            $(this).attr('type','time');
+            $(this).focus();
+        })
+        $('#startTimeLate,#endTimeLate').blur(function(){
+            $(this).attr('type','text').blur();
+            $(this).focus();
+        })
+    })
+</script>
 <div class="traffic_step">
     <div class="margin_b"></div>
     <div class="common_text w90 margin_c margin_b">
@@ -7,15 +19,19 @@
         <input placeholder="目的地城市" class="hidden_input" id="endCity" ng-model="endCity" ng-click="selectEndCity()" readonly>
     </div>
     <div class="w90 margin_c margin_b">
-        <input type="text" placeholder="出发日期" class="common_text margin_c margin_b halfinput" id="startTime" ng-click="chooeseData($event)" readonly>
+        <div class="common_text margin_c margin_b halfinput">
+            <input type="text" placeholder="出发日期" class="hidden_input" id="startTime" ng-click="chooeseData($event)" readonly>
+        </div>
         <div class="common_text margin_c margin_b halfinput" style="float: right;">
-            <input type="text" placeholder="最晚到达时间(选填)" id="startTimeLate" class="hidden_input" style="width: 100%;" readonly>
+            <input type="text" placeholder="最晚到达时间(选填)" id="startTimeLate" class="hidden_input" style="width: 100%;">
         </div>
     </div>
     <div class="w90 margin_c margin_b">
-        <input type="text" placeholder="返程日期" class="common_text margin_c margin_b halfinput" id="endTime" ng-click="chooeseData($event)" readonly>
+        <div class="common_text margin_c margin_b halfinput">
+            <input type="text" placeholder="返程日期" class="hidden_input" id="endTime" ng-click="chooeseData($event)" readonly>
+        </div>
         <div class="common_text margin_c margin_b halfinput" style="float: right;">
-            <input type="text" placeholder="最晚到达时间(选填)" id="endTimeLate" class="hidden_input" style="width: 100%;" readonly>
+            <input type="text" placeholder="最晚返回时间(选填)" id="endTimeLate" class="hidden_input" style="width: 100%;">
         </div>
     </div>
     <div class="w100 button_fix">
@@ -31,7 +47,7 @@
     <div class="common_text w90 margin_c margin_b">
         <input placeholder="目的地城市" class="hidden_input" ng-model="liveCity" id="liveCity" ng-click="selectLiveCity()" readonly>
     </div>
-    <div class="common_text w90 margin_c margin_b">
+    <div class="common_text w90 margin_c margin_b" ng-if="liveCityId">
         <input placeholder="住宿地标位置，计划入住在xxx附近(选填)" class="hidden_input" id="livePlace" ng-click="selectLivePlace()" readonly>
     </div>
     <div class="w90 margin_c margin_b">
