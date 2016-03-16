@@ -192,6 +192,8 @@ var businesstravel=(function(){
 
             //生成预算
             $scope.createResult = function () {
+                alert ($('#endTimeLate').val());
+                return false;
                 var startCity = $scope.startCity,
                     endCity = $scope.endCity,
                     startCityVal = $('#startCity').attr("code"),
@@ -567,7 +569,7 @@ var businesstravel=(function(){
                     return false;
                 }
                 if (!timeReg.test(startTimeLate)&&startTimeLate!="") {
-                    black_err("最晚到达时间格式时间格式不正确");
+                    black_err("最晚返回时间格式时间格式不正确");
                     return false;
                 }
 
@@ -575,6 +577,7 @@ var businesstravel=(function(){
                 $('.traffic_step').fadeOut();
                 $('.live_step').fadeIn();
                 $('#liveCity').val($('#endCity').val());
+                $('#liveCity').attr('code',$('#endCity').attr('code'));
                 $('#liveTime').val($('#startTime').val());
                 $('#leaveTime').val($('#endTime').val());
             }

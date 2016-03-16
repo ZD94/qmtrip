@@ -49,17 +49,36 @@
                         abstract: true,
                         controllerProvider: TLD_angular_app_defaultControllerProvider,
                         templateUrl: function (params) {
-                            return '/staff/index.html';
+                            if (isAuthCreditExist()) {
+                                return '/staff/index.html';
+                            }
+                            return '/staff/auth/login.html';
                         }
                     })
                     .state("root.content", {
                         url: "/*path",
                         controllerProvider: TLD_angular_app_defaultControllerProvider,
                         templateUrl: function (params) {
-                            return '/staff/' + params.path + ".html";
+                            if (isAuthCreditExist()) {
+                                return '/staff/' + params.path + ".html";
+                            }
+                            return '/staff/auth/login.html';
                         }
                     });
         });
+
+        function isAuthCreditExist() {
+            var user_id = Cookie.get('user_id');
+            var token_id = Cookie.get('token_id');
+            var token_sign = Cookie.get('token_sign');
+            var timestamp = Cookie.get("timestamp");
+
+            if (user_id && token_id && token_sign && token_id) {
+                return true;
+            }
+            return false;
+        }
+
         API.onlogin(function () {
             var backUrl = window.location.href;
             backUrl = encodeURIComponent(backUrl);
@@ -73,17 +92,7 @@
 
             remote.authenticate({ accountid: user_id, tokenid: token_id, tokensign: token_sign, timestamp: timestamp },callback);
         };
-        // function logout(){
-        // 	API.require('auth');
-        // 	API.onload(function(){
-        // 		API.auth.logout()
-        // 				.then(function (data) {
-        // 					location.reload();
-        // 				}).catch(function(error){
-        // 			console.log(error);
-        // 		}).done();
-        // 	});
-        // };
+
     </script>
 </head>
 <body>
