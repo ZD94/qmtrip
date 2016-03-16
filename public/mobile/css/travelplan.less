@@ -1,8 +1,12 @@
 @import "common.less";
 
+@72px:3.6rem;
 @36px:1.8rem;
+@32px:1.6rem;
+@30px:1.5rem;
 @28px:1.4rem;
 @24px:1.2rem;
+@20px;1rem;
 
 .plan_list {
   width: 100%;
@@ -155,6 +159,17 @@
   width: 100%;
   height: auto;
   padding-bottom: 5rem;
+  .BTN {
+  	width: 7.2rem;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    border: 1px #E5E5E5 solid;
+    border-radius: 0.2rem;
+    background: #FFFFFF;
+    margin: 0.9rem 0 0 1rem;
+    text-align: center;
+    float: right;
+  }
   .HEADER {
     height: auto;
     color: @color-theme3;
@@ -172,7 +187,7 @@
       line-height: 4.8rem;
       text-align: center;
       span {
-        font-size: 3.2rem;
+        font-size: @72px;
       }
     }
     .text {
@@ -181,30 +196,31 @@
     }
   }
   .complete {
+    position: relative;
     height: 5rem;
     line-height: 2rem;
     background: @color-theme3;
     padding: 0.5rem 0;
-    position: relative;
-    .line1 {
-      width: 1px;
-      height: 1.5rem;
-      border: 1px @border-color solid;
-      position: absolute;
-      left: 33%;
-      top: 1.7rem;
-    }
-    .line2 {
-      width: 1px;
-      height: 1.5rem;
-      border: 1px @border-color solid;
-      position: absolute;
-      right: 33%;
-      top: 1.7rem;
-    }
-    dd {
-      font-size: 1.6rem;
+    overflow: hidden;
+    li {
+      position: relative;
+      float: left;
+      width: 33.3333333%;
       text-align: center;
+      font-size: @36px!important;
+      .bar {
+        position: absolute;
+        right: 0;
+        top: 30%;
+        width: 1px;
+        height: 1.5rem;
+        border: 1px @border-color solid;
+        
+      }
+      .number {
+        font-size: @36px!important;
+        color: #4A4A4A;
+      }
       span {
         color: @color-theme2;
       }
@@ -226,42 +242,51 @@
       padding-bottom: 0;
       margin-bottom: 1rem;
       .list_top {
-        height: 2.5rem;
-        line-height: 2.5rem;
         overflow: hidden;
-        .icon {
-          width: 2.5rem;
-          height: auto;
-          font-size: 2rem;
-          color: #C8C8C8;
+        .top_left {
           float: left;
-        }
-        .description {
-          height: auto;
-          font-size: 1.6rem;
-          float: left;
-          span {
-            color: @color-theme1;
-            padding: 0 0.5rem;
+          width: 60%;
+          p {
+          	height: 2.5rem;
+          	line-height: 2.5rem;
+          }
+          .icon {
+            font-size: @32px;
+            color: #C8C8C8;
+          }
+          .description {
+            font-size: @32px;
+            span {
+              color: @color-theme1;
+              padding: 0 0.5rem;
+            }
+          }
+          .time {
+            font-size: @24px;
+            color: #A3A3A3;
+            float: left;
           }
         }
-      }
-      .list_center {
-        height: 2.5rem;
-        line-height: 2.5rem;
-        overflow: hidden;
-        .time {
-          width: 20rem;
-          height: auto;
-          color: #A3A3A3;
+        .top_right {
           float: left;
+          width: 40%;
+          p {
+          	height: 2.5rem;
+          	line-height: 2.5rem;
+            text-align: right;
+          }
+          .budget {
+            color: #EBBC18;
+          }
+          .expenditure {
+          	font-size: @20px;
+            color: black;
+            .number {
+            	font-size: @30px!important;
+            }
+          }
         }
-        .budget {
-          float: right;
-          height: auto;
-          color: #EBBC18;
-        }
-      }
+      }  
       .list_bottom {
         height: 4.3rem;
         border-top: 1px @border-color solid;

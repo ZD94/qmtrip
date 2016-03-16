@@ -236,7 +236,7 @@ var travelplan=(function(){
      */
     travelplan.PlandetailController = function($scope, $routeParams) {
 
-        $scope.ITEM={};
+        $scope.ITEM=null;
         //---------------------------------------------
         $scope.getData = function( p ){
 
@@ -260,22 +260,29 @@ var travelplan=(function(){
             })
         }
 
+        $scope.renderDeficit = function(){
+            return Math.abs($scope.ITEM.budget-$scope.ITEM.expenditure).toFixed(2);
+        }
+
         $scope.checkInvoice = function(){
             window.location.href="#/travelplan/invoicedetail";
         }
 
-        $scope.renderDepartureStatus = function(){
-            if( $scope.ITEM.outTraffic[0].isCommit===false ){
-                return "待传票据";
-            }else
-            if( $scope.ITEM.outTraffic[0].status===-1 ){
-                return "审核未通过";
-            }else
-            if( $scope.ITEM.outTraffic[0].status===0 ){
-                return "已上传";
-            }else
-            if( $scope.ITEM.outTraffic[0].status===-1 ){
-                return "已完成";
+        $scope.renderStatus = function( p ){
+
+            if( p ){
+                if( p.isCommit===false ){
+                    return "待传票据";
+                }else
+                if( p.status===-1 ){
+                    return "审核未通过";
+                }else
+                if( p.status===0 ){
+                    return "已上传";
+                }else
+                if( p.status===1 ){
+                    return "已完成";
+                };
             };
         }
 
