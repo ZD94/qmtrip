@@ -682,6 +682,8 @@ var auth=(function(){
         var accountId = $routeParams.accountId;
         var sign = $routeParams.sign;
         var timestamp = $routeParams.timestamp;
+        var email = $routeParams.email;
+        //console.info(email);
         $scope.isValid = 'checking';
 
         API.onload(function() {
@@ -726,7 +728,8 @@ var auth=(function(){
                 API.auth.resetPwdByEmail({accountId:accountId,sign: sign, timestamp: timestamp,pwd:pwds})
                     .then(function(){
                         //alert("设置密码成功");
-
+                        //console.info(email);
+                        window.location.href="#/auth/forgetpwdtip?email=" + email;
                         $scope.$apply();
                 }).catch(function(err){
                     console.error(err);
@@ -736,8 +739,18 @@ var auth=(function(){
     }
 
     //员工重新设置密码成功页
-    auth.ForgetpwdTipController = function($scope) {
-        //conso
+    auth.ForgetpwdtipController = function($scope,$routeParams) {
+        var name = $routeParams.email;
+        //console.info(name);
+        $scope.name = name;
+
+        $scope.toRegister = function() {
+            window.location.href="#/auth/register";
+        }
+
+        $scope.goLogin = function() {
+            window.location.href="#/auth/login";
+        }
     }
 
     //员工设置密码页
