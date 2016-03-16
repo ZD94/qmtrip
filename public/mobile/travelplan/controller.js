@@ -121,13 +121,13 @@ var travelplan=(function(){
             if( $scope.items[i].status===-1 ){
                 return "待出预算";
             }else
-            if( $scope.items[i].status===0 ){
+            if( $scope.items[i].status===0&&$scope.items[i].isCommit===false ){
                 return "待上传票据";
             }else
-            if( $scope.items[i].status===1&&$scope.items[i].auditStatus===0 ){
+            if( $scope.items[i].isCommit===true&&$scope.items[i].auditStatus===0 ){
                 return "票据审核中";
             }else
-            if( $scope.items[i].status===1&&$scope.items[i].auditStatus===-1 ){
+            if( $scope.items[i].isCommit===true&&$scope.items[i].auditStatus===-1 ){
                 return "审核未通过";
             }else
             if( $scope.items[i].status===2 ){
@@ -235,9 +235,6 @@ var travelplan=(function(){
      * @constructor
      */
     travelplan.PlandetailController = function($scope, $routeParams) {
-        
-
-        console.log($routeParams.orderId);
 
         $scope.ITEM={};
         //---------------------------------------------
@@ -249,9 +246,11 @@ var travelplan=(function(){
                 .getTripPlanOrderById( p )
                 .then(
                     function( data ){
-                        console.log(API.tripPlan);
-                        console.log( data );
+                        //console.log(API.tripPlan);
+                        //console.log( data );
                         $scope.ITEM = data;
+                        console.log( $scope.ITEM );
+                        console.log( $scope.ITEM.outTraffic[0] );
                         $scope.$apply();
                     }
                 )
@@ -262,15 +261,31 @@ var travelplan=(function(){
         }
 
         $scope.checkInvoice = function(){
+            window.location.href="#/travelplan/invoicedetail";
+        }
 
+        $scope.renderDepartureStatus = function(){
+            if( $scope.ITEM.outTraffic[0].isCommit===false ){
+                return "待传票据";
+            }else
+            if( $scope.ITEM.outTraffic[0].status===-1 ){
+                return "审核未通过";
+            }else
+            if( $scope.ITEM.outTraffic[0].status===0 ){
+                return "已上传";
+            }else
+            if( $scope.ITEM.outTraffic[0].status===-1 ){
+                return "已完成";
+            };
         }
 
         function init(){
             $scope.$root.pageTitle = "详细出差记录";
             loading(true);
             $scope.getData( $routeParams.orderId );
+            //console.log( $scope.ITEM.outTraffic[0] );
         }
-        
+        //----------------------------------------------------------------
         init();
 
     }

@@ -447,15 +447,16 @@ var travelRecord=(function(){
 
             var reason = reason1;
 
-            if(reason2 != '') {
+            if(reason2 != '' && reason2!= undefined) {
                 reason==''?reason = reason2: reason += ','+reason2;
             }
 
-            if(reasontext != '') {
+            if(reasontext != ''&& reasontext!= undefined) {
                 reason==''?reason = reasontext: reason += ','+reasontext;
             }
 
             $scope.remark = reason;
+            console.info(reason1,reason2,reasontext);
             $('.error').empty();
             if (reason1 =='' && reason2 == '' && reasontext == '') {
                 $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>理由不能为空");
