@@ -35,29 +35,74 @@ module.exports = function (Db, DataType) {
         updateAt    : {type: "timestamp without time zone", field: "update_at"},
         orderStatus: {
             type: DataType.VIRTUAL,
-            field: "status",
             set: function (val) {
                 var _status = 0;
+                var _is_commit = false;
                 switch(val) {
+                    ///删除状态
                     case 'DELETE': _status = -2; break;
-                    case 'NO_BUDGET': _status = -1; break;
-                    case 'NO_COMMIT': _status = 0; break;
-                    case 'COMMIT': _status = 1; break;
-                    case 'COMPLETE': _status = 2; break;
+                    ///待出预算状态
+                    case 'NO_BUDGET': {
+                        _status = 0;
+                        _is_commit = false;
+                        this.setDataValue('budget', -1); //预算要小于0
+                    } break;
+                    ///待上传状态
+                    case 'WAIT_UPLOAD': {
+                        _status = 0;
+                        _is_commit = false;
+                    } break;
+                    ///待提交
+                    case 'WAIT_COMMIT': {
+                        _status = 0;
+                        _is_commit = false;
+                    } break;
+                    ///待审核状态
+                    case 'WAIT_AUDIT': {
+                        _status = 0;
+                        _is_commit = true;
+                    } break;
+                    ///审核未通过
+                    case 'AUDIT_NOT_PASS': {
+                        _status = -1;
+                        _is_commit = false;
+                    } break;
+                    ///已完成状态
+                    case 'AUDIT_PASS': {
+                        _status = 1;
+                        _is_commit = true;
+                    } break;
                     default : _status = 0; break;
                 }
-                this.setDataValue('status', _status); // Remember to set the data value, otherwise it won't be validated
+                this.setDataValue('status', _status);
+                this.setDataValue('isCommit', _is_commit);
             },
             get: function () {
                 var val = "";
                 var _status = this.getDataValue('status');
+                var _is_commit = this.getDataValue('isCommit');
+                var _invoice = this.getDataValue('newInvoice');
+                var _budget = this.getDataValue('budget');
+
                 switch(_status) {
                     case -2: val = 'DELETE'; break;
-                    case -1: val = 'NO_BUDGET'; break;
-                    case 0: val = 'NO_COMMIT'; break;
-                    case 1: val = 'COMMIT'; break;
-                    case 2: val = 'COMPLETE'; break;
-                    default : val = 'NO_BUDGET'; break;
+                    case -1: val = 'AUDIT_NOT_PASS'; break;
+                    case 0: {
+                        val = 'WAIT_UPLOAD';
+
+                        if(_invoice) {
+                            val = 'WAIT_COMMIT';
+                        }
+
+                        if(_is_commit) {
+                            val = 'WAIT_AUDIT';
+                        }
+
+                        if(_budget <= 0) {
+                            val = 'NO_BUDGET';
+                        }
+                    } break;
+                    case 1: val = 'AUDIT_PASS'; break;
                 }
                 return val;
             }

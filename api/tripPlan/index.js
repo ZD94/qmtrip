@@ -38,7 +38,7 @@ var ConsumeDetailsCols = Object.keys(ConsumeDetails.attributes);
  * @returns {*}
  */
 tripPlan.savePlanOrder = savePlanOrder;
-savePlanOrder.required_params = ['consumeDetails', 'accountId', 'companyId', 'type', 'destination', 'budget', 'destinationCode', 'description'];
+savePlanOrder.required_params = ['consumeDetails', 'accountId', 'companyId', 'destination', 'budget', 'destinationCode', 'description'];
 savePlanOrder.optional_params = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark', 'destinationCode', 'startPlaceCode', 'projectId'];
 var consumeDetails_required_fields = ['type', 'startTime', 'invoiceType', 'budget'];
 function savePlanOrder(params){
@@ -83,6 +83,7 @@ function savePlanOrder(params){
             _planOrder.projectId = project.id;
             var total_budget = 0;
             var isBudget = true;
+
             for(var i in consumeDetails) {
                 var obj = consumeDetails[i];
 
@@ -90,19 +91,11 @@ function savePlanOrder(params){
                     throw {code: -2, nsg: '预算金额格式不正确'};
                 }
 
-                if(obj.budget > 0) {
-                    total_budget = parseFloat(total_budget) + parseFloat(obj.budget);
-                } else {
-                    isBudget = false;
-                }
+                obj.budget>0?total_budget = parseFloat(total_budget) + parseFloat(obj.budget):isBudget = false;;
             }
 
-            //_planOrder.orderStatus = 'NO_BUDGET';
             _planOrder.budget = total_budget;
-            if(!isBudget) {
-                _planOrder.orderStatus = 'NO_BUDGET';
-                _planOrder.budget = -1;
-            }
+            isBudget?_planOrder.orderStatus = 'WAIT_UPLOAD':_planOrder.orderStatus = 'NO_BUDGET'; //是否有预算，设置出差计划状态
 
             return sequelize.transaction(function(t){
                 var order = {};
@@ -116,8 +109,7 @@ function savePlanOrder(params){
                         return Promise.all(consumeDetails.map(function(detail){
                             detail.orderId = order.id;
                             detail.accountId = order.accountId;
-                            detail.status = STATUS.NO_COMMIT;
-                            detail.isCommit = false;
+                            detail.orderStatus = _planOrder.orderStatus;
 
                             return ConsumeDetails.create(detail, {transaction: t})
                                 .then(function(ret){
@@ -178,7 +170,7 @@ function getTripPlanOrder(params){
         ConsumeDetails.findAll({where: {orderId: orderId, type: 0, status: {$ne: STATUS.DELETE}}})
     ])
         .spread(function(order, outTraffic, backTraffic, hotel){
-            if(!order || order.status == STATUS.DELETE){
+            if(!order || order.orderStatus == 'DELETE'){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
             }
             order.setDataValue("outTraffic", outTraffic);
@@ -752,8 +744,8 @@ function approveInvoice(params){
                     .spread(function(ret){
                         var status = params.status;
 
-                        if(status == STATUS.NO_BUDGET){
-                            return PlanOrder.update({status: STATUS.COMMIT, auditStatus: -1, updateAt: utils.now()},
+                        if(status == -1){
+                            return PlanOrder.update({status: STATUS.NO_COMMIT, auditStatus: -1, updateAt: utils.now()},
                                 {where: {id: order.id}, fields: ['auditStatus', 'status', 'updateAt'], transaction: t});
                         }
 
@@ -1043,7 +1035,7 @@ tripPlan.previewConsumeInvoice = function (params) {
  * @param params
  */
 tripPlan.checkBudgetExist = checkBudgetExist;
-checkBudgetExist.required_params = ['consumeDetails', 'accountId', 'companyId', 'type', 'destination', 'destinationCode'];
+checkBudgetExist.required_params = ['consumeDetails', 'accountId', 'companyId', 'destination', 'destinationCode'];
 checkBudgetExist.optional_params = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'description', 'destinationCode', 'startPlaceCode'];
 var consumeDetails_required_fields = ['type', 'startTime', 'invoiceType'];
 function checkBudgetExist(params){

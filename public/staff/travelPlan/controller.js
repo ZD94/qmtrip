@@ -233,7 +233,7 @@ var travelPlan=(function(){
         var planId = $routeParams.planId;
         $scope.initplandetail = function(){
             API.onload(function() {
-                API.tripPlan.getTripPlanOrderById(planId)
+                API.tripPlan.getTripPlanOrderById({orderId: planId})
                     .then(function(result){
                         $scope.planDetail = result;
                         $scope.backTraffic = $scope.planDetail.backTraffic[0];
@@ -440,7 +440,7 @@ var travelPlan=(function(){
         $scope.invoiceId = $routeParams.invoiceId;
         API.require("attachment");
         API.onload(function() {
-            API.tripPlan.getTripPlanOrderById(planId)
+            API.tripPlan.getTripPlanOrderById({orderId: planId})
             .then(function(result){
                 var InvoiceDetail;
                 $scope.planDetail = result;

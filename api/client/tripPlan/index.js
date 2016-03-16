@@ -134,11 +134,11 @@ tripPlan.saveConsumeDetail = function (params) {
  * 获取计划单详情
  * @param orderId
  */
-tripPlan.getTripPlanOrderById = function (orderId) {
+tripPlan.getTripPlanOrderById = function (params) {
     var self = this;
     var accountId = self.accountId;
     var params = {
-        orderId: orderId,
+        orderId: params.orderId,
         userId: accountId
     }
 
@@ -170,11 +170,19 @@ tripPlan.pageCompleteTripPlanOrder = function (params) {
     typeof page == 'number' ? "" : page = 1;
     typeof perPage == 'number' ? "" : perPage = 10;
 
-    var query = _.pick(params,
-        ['status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
+    if(params.startTime) {
+        params.startAt?params.startAt.$gte = params.startTime:params.startAt = {$gte: params.startTime};
+    }
+
+    if(params.endTime) {
+        params.startAt?params.startAt.$lte = params.endTime:params.startAt = {$lte: params.endTime};
+    }
+
+    var query = _.pick(params, ['startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
     query.accountId = self.accountId;
-    query.auditStatus = 1; //审核状态为审核通过
-    query.status = 2; //计划单状态为已完成（2），可能会有结算完毕状态（3）
+    query.status = 2;
+    query.auditStatus = 1;
+    //query.orderStatus = 'COMPLETE';
 
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {
@@ -186,6 +194,10 @@ tripPlan.pageCompleteTripPlanOrder = function (params) {
                 where: query,
                 limit: perPage,
                 offset: perPage * (page - 1)
+            }
+
+            if(params.order) {
+                options.order = [params.order];
             }
 
             return API.tripPlan.listTripPlanOrder(options);
