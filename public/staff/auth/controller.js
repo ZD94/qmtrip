@@ -677,7 +677,7 @@ var auth=(function(){
         })
     }
 
-    //员工设置密码页
+    //员工重新设置密码页
     auth.ResetPwdController = function($scope, $routeParams){
         var accountId = $routeParams.accountId;
         var sign = $routeParams.sign;
@@ -714,7 +714,7 @@ var auth=(function(){
                 return false;
             }
             if(pwd != pwds){
-                alert("两次密码输入不一致");
+                //alert("两次密码输入不一致");
                 $scope.err_msg_second_pwd = "2次密码设置不一致";
                 $("#secondPwd").siblings(".err_msg").children("i").html("&#xf06a;");
                 $("#secondPwd").siblings(".err_msg").children("i").removeClass("right");
@@ -726,13 +726,18 @@ var auth=(function(){
                 API.auth.resetPwdByEmail({accountId:accountId,sign: sign, timestamp: timestamp,pwd:pwds})
                     .then(function(){
                         //alert("设置密码成功");
-                        window.location.href="#/auth/staffPwdSuccess";
+
                         $scope.$apply();
                 }).catch(function(err){
                     console.error(err);
                 }).done();
             })
         }
+    }
+
+    //员工重新设置密码成功页
+    auth.ForgetpwdTipController = function($scope) {
+        //conso
     }
 
     //员工设置密码页
@@ -784,7 +789,7 @@ var auth=(function(){
                 API.auth.resetPwdByEmail({accountId:accountId,sign: sign, timestamp: timestamp,pwd:pwds})
                     .then(function(){
                         //alert("设置密码成功");
-                        alert("密码设置成功")
+                        window.location.href="#/auth/staffPwdSuccess";
                         $scope.$apply();
                     }).catch(function(err){
                     console.error(err);
