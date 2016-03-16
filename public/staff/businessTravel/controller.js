@@ -256,7 +256,7 @@ var businessTravel=(function(){
                         }
                     })
                     .catch(function(err){
-                        console.info (err);
+                        TLDAlert(err.msg || err);
                     });
             })
 
@@ -296,7 +296,7 @@ var businessTravel=(function(){
                         $scope.$apply();
                     })
                     .catch(function(err){
-                        console.log(err);
+                        TLDAlert(err.msg || err);
                     });
             })
         }
@@ -324,7 +324,7 @@ var businessTravel=(function(){
                         $scope.$apply();
                     })
                     .catch(function(err){
-                        console.log(err);
+                        TLDAlert(err.msg || err);
                     });
             })
         }
@@ -395,7 +395,6 @@ var businessTravel=(function(){
                 order.consumeDetails = consumeDetails;
                 API.tripPlan.checkBudgetExist(order)
                     .then(function(result) {
-                        console.info (result);
                         if (result == false) {
                             window.location.href = "#/businessTravel/CreateResult?purposename=" + purposename + "&tra=" + tra + "&liv=" + liv + "&epval=" + endplace + "&lpval=" + liveplace + "&" + parameter;
                         }
@@ -404,8 +403,7 @@ var businessTravel=(function(){
                         }
                     })
                     .catch(function(err){
-                        console.info (err);
-                        alert (2);
+                        TLDAlert(err.msg || err);
                     });
             })
 
@@ -446,7 +444,7 @@ var businessTravel=(function(){
                         $scope.$apply();
                     })
                     .catch(function(err){
-                        console.log(err);
+                        TLDAlert(err.msg || err);
                     });
             })
         }
@@ -471,7 +469,7 @@ var businessTravel=(function(){
                         $scope.$apply();
                     })
                     .catch(function(err){
-                        console.log(err);
+                        TLDAlert(err.msg || err);
                     });
             })
         }
@@ -497,7 +495,7 @@ var businessTravel=(function(){
                         $scope.$apply();
                     })
                     .catch(function(err){
-                        console.log(err);
+                        TLDAlert(err.msg || err);
                     });
             })
         }
@@ -571,7 +569,7 @@ var businessTravel=(function(){
                 starttimelate = $scope.start_timelate,//出发最晚到达时间
                 endtime = $scope.end_time,//返回时间
                 endtimelate = $scope.end_timelate,//返回最晚到达时间
-                startplaceval = $(".traffic1").attr("checkval"),//出发城市id
+                startplaceval = $(".traffic1").attr("checkval"),//A出发城市id
                 endplaceval = $(".traffic2").attr("checkval"),//目的地城市id
                 liveplace = $(".live2").attr("checkval"),//住宿位置id
                 livetime = $scope.live_time,//入住时间
@@ -668,7 +666,6 @@ var businessTravel=(function(){
                 order.consumeDetails = consumeDetails;
                 API.tripPlan.checkBudgetExist(order)
                     .then(function(result) {
-                        console.info (result);
                         if (result == false) {
                             window.location.href = "#/businessTravel/CreateResult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&spval="+startplaceval+"&epval="+endplaceval+"&lpval="+liveplace+"&"+parameter;
                         }
@@ -677,8 +674,7 @@ var businessTravel=(function(){
                         }
                     })
                     .catch(function(err){
-                        console.info (err);
-                        alert (2);
+                        TLDAlert(err.msg || err);
                     });
             })
 
@@ -976,7 +972,7 @@ var businessTravel=(function(){
                         $('.createtime').html("生成时间："+$filter('date')($scope.createTime,'yyyy-MM-dd'));
                     })
                     .catch(function(err){
-                        console.info (err);
+                        TLDAlert(err.msg || err);
                     });
             })
         }
