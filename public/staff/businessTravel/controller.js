@@ -188,7 +188,79 @@ var businessTravel=(function(){
                 Myalert("温馨提示","最晚到达时间格式时间格式不正确");
                 return false;
             }
-            window.location.href = "#/businessTravel/CreateResult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&spval="+startplaceval+"&epval="+endplaceval+"&"+parameter;
+
+
+            API.onload(function() {
+                var consumeDetails = [];
+                var order = {
+                    companyId:$scope.companyId,
+                    type:1,
+                    description:purposename,
+                    startPlace:startplace,
+                    startPlaceCode:startplaceval,
+                    destination:endplace,
+                    destinationCode:endplaceval,
+                    startAt:starttime,
+                    isNeedTraffic:tra,
+                    isNeedHotel:liv,
+                }
+                if (endtime) {
+                    order.backAt = endtime;
+                }
+
+                //去程
+                if(starttime){
+                    var consumeDetails_outTraffic = {
+                        type:-1,
+                        startPlace:startplace,
+                        startPlaceCode:startplaceval,
+                        arrivalPlace:endplace,
+                        arrivalPlaceCode:endplaceval,
+                        startTime:starttime,
+                        invoiceType:1
+                    }
+                    if(endtime){
+                        consumeDetails_outTraffic.endTime = endtime;
+                    }
+                    if(starttimelate){
+                        consumeDetails_outTraffic.latestArriveTime = starttime+' '+starttimelate;
+                    }
+                    consumeDetails.push(consumeDetails_outTraffic);
+                }
+
+                //回程
+                if(endtime){
+                    var consumeDetails_backTraffic = {
+                        type:1,
+                        startPlace:endplace,
+                        startPlaceCode:endplaceval,
+                        arrivalPlace:startplace,
+                        arrivalPlaceCode:startplaceval,
+                        startTime:endtime,
+                        invoiceType:1
+                    }
+                    if(endtimelate){
+                        consumeDetails_backTraffic.latestArriveTime = endtime+' '+endtimelate;
+                    }
+                    consumeDetails.push(consumeDetails_backTraffic);
+                }
+                order.consumeDetails = consumeDetails;
+                API.tripPlan.checkBudgetExist(order)
+                    .then(function(result) {
+                        console.info (result);
+                        if (result == false) {
+                            window.location.href = "#/businessTravel/CreateResult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&spval="+startplaceval+"&epval="+endplaceval+"&"+parameter;
+                        }
+                        if (result != false) {
+                            window.location.href = "#/travelPlan/PlanDetail?planId="+result;
+                        }
+                    })
+                    .catch(function(err){
+                        console.info (err);
+                    });
+            })
+
+
         }
         //返回上一步
         $scope.prevstep = function () {
@@ -267,29 +339,78 @@ var businessTravel=(function(){
 
         //生成预算
         $scope.budget = function () {
-            var endplace = $(".live1").attr("checkval"),//目的地城市id
+            var endplacename = $(".live1").val(),
+                liveplacename = $(".live2").val(),
+                endplace = $(".live1").attr("checkval"),//目的地城市id
                 liveplace = $(".live2").attr("checkval"),//住宿位置id
                 livetime = $scope.live_time,//入住时间
                 leavetime = $scope.leave_time,//离店时间
                 parameter = $("form").serialize();//表单所有数据传参
             var dateReg = /^\d{4}-\d{2}-\d{2}$/;
             if (endplace == "") {
-                Myalert("温馨提示","请选择目的地城市");
+                Myalert("温馨提示", "请选择目的地城市");
                 return false;
             }
             if (!livetime || !dateReg.test(livetime)) {
-                Myalert("温馨提示","入住日期不存在或格式不正确");
+                Myalert("温馨提示", "入住日期不存在或格式不正确");
                 return false;
             }
             if (!leavetime || !dateReg.test(leavetime)) {
-                Myalert("温馨提示","离店日期不存在或格式不正确");
+                Myalert("温馨提示", "离店日期不存在或格式不正确");
                 return false;
             }
-            if (livetime>leavetime&&leavetime!=undefined) {
-                Myalert("温馨提示","离店日期不能小于入住日期");
+            if (livetime > leavetime && leavetime != undefined) {
+                Myalert("温馨提示", "离店日期不能小于入住日期");
                 return false;
             }
-            window.location.href = "#/businessTravel/CreateResult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&epval="+endplace+"&lpval="+liveplace+"&"+parameter;
+
+            API.onload(function(){
+                var consumeDetails = [];
+                var order = {
+                    companyId:$scope.companyId,
+                    type:1,
+                    description:purposename,
+                    destination:endplacename,
+                    destinationCode:endplace,
+                    isNeedTraffic:tra,
+                    isNeedHotel:liv
+                }
+                if (liv==1 && tra==0) {
+                    order.startAt = livetime;
+                    order.backAt = leavetime;
+                }
+                //住宿
+                if(liv==1){
+                    var consumeDetails_hotel = {
+                        type:0,
+                        city:endplacename,
+                        cityCode:endplace,
+                        hotelName:liveplacename,
+                        startTime:livetime,
+                        endTime:leavetime,
+                        invoiceType:2
+                    }
+                    consumeDetails.push(consumeDetails_hotel);
+                }
+                order.consumeDetails = consumeDetails;
+                API.tripPlan.checkBudgetExist(order)
+                    .then(function(result) {
+                        console.info (result);
+                        if (result == false) {
+                            window.location.href = "#/businessTravel/CreateResult?purposename=" + purposename + "&tra=" + tra + "&liv=" + liv + "&epval=" + endplace + "&lpval=" + liveplace + "&" + parameter;
+                        }
+                        if (result != false) {
+                            window.location.href = "#/travelPlan/PlanDetail?planId="+result;
+                        }
+                    })
+                    .catch(function(err){
+                        console.info (err);
+                        alert (2);
+                    });
+            })
+
+
+
         }
         //返回上一步
         $scope.prevstep = function () {
@@ -444,6 +565,14 @@ var businessTravel=(function(){
         $scope.budget = function () {
             var startplaceval = $(".traffic1").attr("checkval"),//出发城市id
                 endplaceval = $(".traffic2").attr("checkval"),//目的地城市id
+                startplace = $(".traffic1").val(),//出发城市id
+                endplace = $(".traffic2").val(),//目的地城市id
+                starttime = $scope.start_time,//出发时间
+                starttimelate = $scope.start_timelate,//出发最晚到达时间
+                endtime = $scope.end_time,//返回时间
+                endtimelate = $scope.end_timelate,//返回最晚到达时间
+                startplaceval = $(".traffic1").attr("checkval"),//出发城市id
+                endplaceval = $(".traffic2").attr("checkval"),//目的地城市id
                 liveplace = $(".live2").attr("checkval"),//住宿位置id
                 livetime = $scope.live_time,//入住时间
                 leavetime = $scope.leave_time,//离店时间
@@ -461,7 +590,99 @@ var businessTravel=(function(){
                 Myalert("温馨提示","离店日期不能小于入住日期");
                 return false;
             }
-            window.location.href = "#/businessTravel/CreateResult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&spval="+startplaceval+"&epval="+endplaceval+"&lpval="+liveplace+"&"+parameter;
+
+
+            API.onload(function() {
+                var consumeDetails = [];
+                var order = {
+                    companyId:$scope.companyId,
+                    type:1,
+                    description:purposename,
+                    startPlace:startplace,
+                    startPlaceCode:startplaceval,
+                    destination:endplace,
+                    destinationCode:endplaceval,
+                    startAt:starttime,
+                    startTime:livetime,
+                    endTime:leavetime,
+                    isNeedTraffic:tra,
+                    isNeedHotel:liv,
+                    remark:startplace+endplace+starttime+liveplace+livetime
+                }
+                if (endtime) {
+                    order.backAt = endtime;
+                }
+                if (liv==1 && tra==0) {
+                    order.startAt = livetime;
+                }
+                //住宿
+                if(liv==1){
+                    var consumeDetails_hotel = {
+                        type:0,
+                        city:endplace,
+                        cityCode:endplaceval,
+                        hotelName:liveplace,
+                        startTime:livetime,
+                        endTime:leavetime,
+                        invoiceType:2
+                    }
+                    consumeDetails.push(consumeDetails_hotel);
+                }
+
+                //去程
+                if(starttime){
+                    var consumeDetails_outTraffic = {
+                        type:-1,
+                        startPlace:startplace,
+                        startPlaceCode:startplaceval,
+                        arrivalPlace:endplace,
+                        arrivalPlaceCode:endplaceval,
+                        startTime:starttime,
+                        invoiceType:1
+                    }
+                    if(endtime){
+                        consumeDetails_outTraffic.endTime = endtime;
+                    }
+                    if(starttimelate){
+                        consumeDetails_outTraffic.latestArriveTime = starttime+' '+starttimelate;
+                    }
+                    consumeDetails.push(consumeDetails_outTraffic);
+                }
+
+                //回程
+                if(endtime){
+                    var consumeDetails_backTraffic = {
+                        type:1,
+                        startPlace:endplace,
+                        startPlaceCode:endplaceval,
+                        arrivalPlace:startplace,
+                        arrivalPlaceCode:startplaceval,
+                        startTime:endtime,
+                        invoiceType:1
+                    }
+                    if(endtimelate){
+                        consumeDetails_backTraffic.latestArriveTime = endtime+' '+endtimelate;
+                    }
+                    consumeDetails.push(consumeDetails_backTraffic);
+                }
+                order.consumeDetails = consumeDetails;
+                API.tripPlan.checkBudgetExist(order)
+                    .then(function(result) {
+                        console.info (result);
+                        if (result == false) {
+                            window.location.href = "#/businessTravel/CreateResult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&spval="+startplaceval+"&epval="+endplaceval+"&lpval="+liveplace+"&"+parameter;
+                        }
+                        if (result != false) {
+                            window.location.href = "#/travelPlan/PlanDetail?planId="+result;
+                        }
+                    })
+                    .catch(function(err){
+                        console.info (err);
+                        alert (2);
+                    });
+            })
+
+
         }
 
         //返回上一步
@@ -680,8 +901,6 @@ var businessTravel=(function(){
                     destination:$scope.endplace,
                     destinationCode:$scope.endplaceval,
                     startAt:$scope.starttime,
-                    startTime:$scope.livetime,
-                    endTime:$scope.leavetime,
                     budget:Number($scope.totalprice),
                     isNeedTraffic:$scope.tra,
                     isNeedHotel:$scope.liv,
@@ -692,6 +911,7 @@ var businessTravel=(function(){
                 }
                 if (liv==1 && tra==0) {
                     order.startAt = $scope.livetime;
+                    order.backAt = $scope.leavetime;
                 }
                 //住宿
                 if(liv==1){
