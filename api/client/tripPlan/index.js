@@ -308,17 +308,20 @@ function getQueryByParams(params) {
  */
 tripPlan.pageTripPlanOrderByCompany = pageTripPlanOrderByCompany;
 pageTripPlanOrderByCompany.optional_params = ['audit', 'startTime', 'endTime', 'startPlace', 'destination',
-    'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit', 'isHasBudget', 'isUpload', 'isComplete', 'description', 'page', 'perPage'];
+    'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit', 'isHasBudget', 'isUpload',
+    'isComplete', 'description', 'page', 'perPage', 'emailOrName'];
 function pageTripPlanOrderByCompany(params) {
-    logger.warn(params);
     if (typeof params == 'function') {
         throw {code: -2, msg: '参数不正确'};
     }
     var self = this;
     var accountId = self.accountId;
 
+    //var {page, perPage, startTime, endTime} = params;
+
     var page = params.page;
     var perPage = params.perPage;
+    var emailOrName = params.emailOrName;
     page = typeof page == 'number' ? page : 1;
     perPage = typeof perPage == 'number' ? perPage : 10;
 
@@ -361,6 +364,27 @@ function pageTripPlanOrderByCompany(params) {
             if(params.order) {
                 options.order = [params.order];
             }
+
+            if(!emailOrName) {
+                return [options, []];
+            }
+
+            return [options,
+                API.staff.findStaffs({companyId: companyId,
+                    $or: [{name: {$like: '%' + emailOrName +'%'}}, {email: {$like: '%' + emailOrName +'%'}}],
+                    status: {$ne: -2},
+                    columns: ['id']
+                    })];
+        })
+        .spread(function(options, staffs) {
+            if(staffs && staffs.length > 0) {
+                var idArr = staffs.map(function(staff) {
+                    return staff.id;
+                });
+
+                options.where.accountId = {$in: idArr};
+            }
+
             return API.tripPlan.listTripPlanOrder(options);
         })
 }

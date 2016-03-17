@@ -51,8 +51,12 @@
         <input placeholder="住宿地标位置，计划入住在xxx附近(选填)" class="hidden_input" id="livePlace" ng-click="selectLivePlace()" readonly>
     </div>
     <div class="w90 margin_c margin_b">
-        <input type="text" placeholder="入住时间" class="common_text margin_c margin_b halfinput" id="liveTime" ng-click="chooeseData($event)"  readonly>
-        <input type="text" placeholder="离店时间" class="common_text margin_c margin_b halfinput" id="leaveTime" ng-click="chooeseData($event)" style="float: right;"  readonly>
+        <div class="common_text margin_c margin_b halfinput">
+            <input type="text" placeholder="入住时间" class="hidden_input" id="liveTime" ng-click="chooeseData($event)"  readonly>
+        </div>
+        <div class="common_text margin_c margin_b halfinput" style="float: right;">
+            <input type="text" placeholder="离店时间" class="hidden_input" id="leaveTime" ng-click="chooeseData($event)"  readonly>
+        </div>
     </div>
     <div class="w100 button_fix">
         <a class="common_btn3 w50" ng-if="tra == 0 && liv == 1" ng-click="returnUrl()" style="float: left;">返回上一步</a>

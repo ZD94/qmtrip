@@ -316,6 +316,7 @@ var businesstravel=(function(){
                         .spread(function(livePlaceId, livePlace) {
                             $scope.livePlace = livePlace;
                             $scope.livePlaceId = livePlaceId;
+                            $('#livePlace').val($scope.livePlace);
                             $('#livePlace').attr('code',$scope.livePlaceId);
                             $scope.$apply();
                         })
