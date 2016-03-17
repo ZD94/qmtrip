@@ -185,7 +185,7 @@ var TravelStatistics = (function(){
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
         var initPlanlist = $scope.initPlanlist = function() {
             API.onload(function(){
-                var params = {page:$scope.page,perPage:20};
+                var params = {page:$scope.page||1,perPage:20};
                 if ($scope.purposename != '' && $scope.purposename != undefined) {
                     params.description = {$like: '%'+ $scope.purposename + '%'};
                 }
