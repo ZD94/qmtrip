@@ -329,7 +329,7 @@ describe("api/client/tripPlan.js", function() {
 
         it("#pageTripPlanOrderByCompany should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.pageTripPlanOrderByCompany.call(self, {page: 1, audit: 'P'}, function (err, ret) {
+            API.client.tripPlan.pageTripPlanOrderByCompany.call(self, {page: 1, audit: 'P', emailOrName: '白菜帮'}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
