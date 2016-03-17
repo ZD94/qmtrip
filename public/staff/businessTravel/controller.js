@@ -10,6 +10,12 @@ var businessTravel=(function(){
     API.require("tripPlan");
     API.require("travelBudget");
 
+    var INVOICE_TYPE = {
+        TRAIN: 'TRAIN',
+        PLANE: 'PLANE',
+        HOTEL: 'HOTEL'
+    }
+
     var  businessTravel = {};
 
     /*
@@ -217,7 +223,7 @@ var businessTravel=(function(){
                         arrivalPlace:endplace,
                         arrivalPlaceCode:endplaceval,
                         startTime:starttime,
-                        invoiceType:1
+                        invoiceType: INVOICE_TYPE.PLANE
                     }
                     if(endtime){
                         consumeDetails_outTraffic.endTime = endtime;
@@ -237,7 +243,7 @@ var businessTravel=(function(){
                         arrivalPlace:startplace,
                         arrivalPlaceCode:startplaceval,
                         startTime:endtime,
-                        invoiceType:1
+                        invoiceType: INVOICE_TYPE.PLANE
                     }
                     if(endtimelate){
                         consumeDetails_backTraffic.latestArriveTime = endtime+' '+endtimelate;
@@ -388,7 +394,7 @@ var businessTravel=(function(){
                         hotelName:liveplacename,
                         startTime:livetime,
                         endTime:leavetime,
-                        invoiceType:2
+                        invoiceType: INVOICE_TYPE.PLANE
                     }
                     consumeDetails.push(consumeDetails_hotel);
                 }
@@ -622,7 +628,7 @@ var businessTravel=(function(){
                         hotelName:liveplace,
                         startTime:livetime,
                         endTime:leavetime,
-                        invoiceType:2
+                        invoiceType: INVOICE_TYPE.HOTEL
                     }
                     consumeDetails.push(consumeDetails_hotel);
                 }
@@ -636,7 +642,7 @@ var businessTravel=(function(){
                         arrivalPlace:endplace,
                         arrivalPlaceCode:endplaceval,
                         startTime:starttime,
-                        invoiceType:1
+                        invoiceType: INVOICE_TYPE.PLANE
                     }
                     if(endtime){
                         consumeDetails_outTraffic.endTime = endtime;
@@ -656,7 +662,7 @@ var businessTravel=(function(){
                         arrivalPlace:startplace,
                         arrivalPlaceCode:startplaceval,
                         startTime:endtime,
-                        invoiceType:1
+                        invoiceType: INVOICE_TYPE.PLANE
                     }
                     if(endtimelate){
                         consumeDetails_backTraffic.latestArriveTime = endtime+' '+endtimelate;
@@ -919,7 +925,7 @@ var businessTravel=(function(){
                         startTime:$scope.livetime,
                         endTime:$scope.leavetime,
                         budget:Number($scope.liveprice),
-                        invoiceType:2
+                        invoiceType: INVOICE_TYPE.HOTEL
                     }
                     consumeDetails.push(consumeDetails_hotel);
                 }
@@ -934,7 +940,7 @@ var businessTravel=(function(){
                         arrivalPlaceCode:$scope.endplaceval,
                         startTime:$scope.starttime,
                         budget:Number($scope.goTraffic),
-                        invoiceType:1
+                        invoiceType: INVOICE_TYPE.PLANE
                     }
                     if($scope.endtime){
                         consumeDetails_outTraffic.endTime = $scope.endtime;
@@ -955,7 +961,7 @@ var businessTravel=(function(){
                         arrivalPlaceCode:$scope.startplaceval,
                         startTime:$scope.endtime,
                         budget:Number($scope.backTraffic),
-                        invoiceType:1
+                        invoiceType: INVOICE_TYPE.PLANE
                     }
                     if($scope.endtimelate){
                         consumeDetails_backTraffic.latestArriveTime = $scope.endtime+' '+$scope.endtimelate;
