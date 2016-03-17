@@ -793,7 +793,7 @@ var businesstravel=(function(){
                     startPlace:$scope.startPlace,
                     startPlaceCode:$scope.startPlaceVal,
                     destination:$scope.endPlace,
-                    destinationCode:$scope.endPlaceVal,
+                    destinationCode:$scope.livePlaceVal,
                     startAt:$scope.startTime,
                     startTime:$scope.liveTime,
                     endTime:$scope.leaveTime,
@@ -813,7 +813,7 @@ var businesstravel=(function(){
                     var consumeDetails_hotel = {
                         type:0,
                         city:$scope.endPlace,
-                        cityCode:$scope.endPlaceVal,
+                        cityCode:$scope.livePlaceVal,
                         hotelName:$scope.landmark,
                         startTime:$scope.liveTime,
                         endTime:$scope.leaveTime,
