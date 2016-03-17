@@ -53,6 +53,10 @@ agencyTripPlan.getConsumeInvoiceImg = function(params) {
  * @returns {*}
  */
 agencyTripPlan.pageTripPlanOrder = function(params){
+    if(!params) {
+        throw {code: -10, msg: '参数不能为空'};
+    }
+
     if(typeof params == 'function'){
         throw {code: -2, msg: '参数不正确'};
     }
