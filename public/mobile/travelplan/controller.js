@@ -35,11 +35,9 @@ var travelplan=(function(){
                 $scope.STATUS=$routeParams.status;
                 if( $routeParams.status==="待出预算" ){
                     return {page:1,isHasBudget:false};
-                }else
-                if( $routeParams.status==="待上传票据" ){
+                }else if( $routeParams.status==="待上传票据" ){
                     return {page:1,isUpload:false};
-                }else
-                if( $routeParams.status==="审核未通过" ){
+                }else if( $routeParams.status==="审核未通过" ){
                     return {page:1,audit:'N'};
                 }else{
                     return {page:1,isComplete:false};
@@ -48,6 +46,8 @@ var travelplan=(function(){
                 return {page:1,isComplete:false};
             }
         })();
+        console.info(PARAMS);
+        console.info("step 2...");
         
         //-----------------------------------------------------------
         function init(){
@@ -158,15 +158,11 @@ var travelplan=(function(){
         $scope.getList = function( p ){//获取员工出差列表并将列表显示在页面上。每执行一次该函数，列表中的记录增加十条。
             $scope.tips="正在加载更多...";
             API.onload(function(){
-                console.info(p);
                 API.tripPlan
                 .pageTripPlanOrder( p )
                 .then(
                     function(list){
-                        console.log(API.tripPlan);
-                        console.log(list);
-                        console.log($scope.items)
-                        
+
                         $scope.items = $scope.items.concat(list.items);
                         $scope.total = list.total;
                         p.page++;
@@ -251,12 +247,8 @@ var travelplan=(function(){
                 .getTripPlanOrderById( {orderId: p} )
                 .then(
                     function( data ){
-                        //console.log(API.tripPlan);
-                        //console.log( data );
                         $scope.ITEM = data;
-                        console.log( $scope.ITEM );
-                        //console.log( $scope.ITEM.outTraffic[0] );
-                        
+
                         if( $scope.ITEM.outTraffic.length!==0 ){//获取预订去程的机票或火车票的网页的URL
                             var type = "air";
                             if( $scope.ITEM.outTraffic[0].invoiceType === 'TRAIN' ){
@@ -270,7 +262,6 @@ var travelplan=(function(){
                             })
                             .then( function(outTrafficBookListUrl){
                                 $scope.URL.outTrafficBookListUrl = outTrafficBookListUrl;
-                                console.log( $scope.URL );
                                 $scope.$apply();
                             })
                             .catch(function(err){
@@ -291,7 +282,6 @@ var travelplan=(function(){
                             })
                             .then( function(backTrafficBookListUrl){
                                 $scope.URL.backTrafficBookListUrl = backTrafficBookListUrl;
-                                console.log( $scope.URL );
                                 $scope.$apply();
                             })
                             .catch(function(err){
@@ -307,7 +297,6 @@ var travelplan=(function(){
                             })
                             .then( function( r ){
                                 $scope.URL.hotelBookListUrl = r;
-                                //console.log( $scope.URL );
                                 $scope.$apply();
                             })
                             .catch(function(err){
@@ -408,7 +397,6 @@ var travelplan=(function(){
             $scope.$root.pageTitle = "详细出差记录";
             loading(true);
             $scope.getData( $routeParams.orderId );
-            //console.log( $scope.ITEM.outTraffic[0] );
         }
         //----------------------------------------------------------------
         init();
@@ -449,7 +437,6 @@ var travelplan=(function(){
             })
             .then(function(invoiceDetail) {
                 $scope.InvoiceDetail = invoiceDetail;
-                console.info(invoiceDetail)
                 return  API.attachment.previewSelfImg({fileId: invoiceDetail.newInvoice})
                 .then(function(invoiceImg) {
                     $scope.invoiceImg = invoiceImg;

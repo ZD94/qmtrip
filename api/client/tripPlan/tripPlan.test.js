@@ -74,7 +74,7 @@ describe("api/client/tripPlan.js", function() {
     });
 
     it("getProjectList should be ok", function(done) {
-        API.client.tripPlan.getProjectList.call({accountId: staffId}, {companyId: companyId}, function(err, ret){
+        API.client.tripPlan.getProjectList.call({accountId: '00000000-0000-0000-0000-000000000002'}, {companyId: companyId, count: 2}, function(err, ret){
             if(err) {
                 throw err;
             }
