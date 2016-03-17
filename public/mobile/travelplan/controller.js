@@ -41,6 +41,8 @@ var travelplan=(function(){
                 }else
                 if( $routeParams.status==="审核未通过" ){
                     return {page:1,audit:'N'};
+                }else{
+                    return {page:1,isComplete:false};
                 };
             }else{
                 return {page:1,isComplete:false};
@@ -52,7 +54,7 @@ var travelplan=(function(){
             //页面上的所有交互All interacitve actions on this page
             $scope.$root.pageTitle="出差记录";
             loading(true);
-
+            console.log( PARAMS );
             $scope.getList( PARAMS );
             $(window).on("scroll",$scope.handleScroll);
             $(".dropdown-header").on("click",$scope.enterSelectingMode);
@@ -383,7 +385,9 @@ var travelplan=(function(){
 
         $scope.commit = function () {
             if( $scope.ITEM.orderStatus==="WAIT_COMMIT" ){
-                alert("22222");
+                alert("111");
+                console.log( confirm );
+                confirm( '确认提交','返回检查','票据一经提交将无法进行修改，是否确认提交？',function(){console.log("333");} );
                 /*
                 API.onload(function() {
                     API.tripPlan.commitTripPlanOrder( $scope.ITEM.id )
