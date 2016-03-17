@@ -238,13 +238,13 @@ var travelplan=(function(){
      */
     travelplan.PlandetailController = function($scope, $routeParams) {
 
-        $scope.ITEM=null;
+        $scope.ITEM={};
         $scope.URL={};
         //---------------------------------------------
         $scope.getData = function( p ){
 
             API.onload(function(){
-                console.info(p);
+                //console.info(p);
                 API.tripPlan
                 .getTripPlanOrderById( {orderId: p} )
                 .then(
@@ -338,7 +338,7 @@ var travelplan=(function(){
                 if( p.orderStatus==="AUDIT_NOT_PASS" ){
                     return "审核未通过";
                 }else
-                if( p.isCommit===true&&p.status===0 ){
+                if( p.orderStatus==="WAIT_COMMIT" ){
                     return "票据已上传";
                 }else
                 if( p.orderStatus==="AUDIT_PASS" ){
@@ -348,15 +348,12 @@ var travelplan=(function(){
         }
 
         $scope.renderBUTTON = function(){
-            /*
-            if( ITEM.orderStatus==="WAIT_UPLOAD" ){
-                return "提交审核";
-            }else
-            if( ITEM.orderStatus==="WAIT_AUDIT" ){
+
+            if( $scope.ITEM.orderStatus==="WAIT_AUDIT" ){
                 return "票据审核中";
             }else{
-            */    
-            return "提交审核";
+                return "提交审核";
+            };
         }
 
         $scope.book = function( p ){
@@ -367,7 +364,7 @@ var travelplan=(function(){
                 window.location.href=$scope.URL.backTrafficBookListUrl;
             }else
             if( p==="hotel" ){
-                alert( $scope.URL.hotelBookListUrl );
+                //alert( $scope.URL.hotelBookListUrl );
                 window.location.href=$scope.URL.hotelBookListUrl;
             };
         }
@@ -384,8 +381,21 @@ var travelplan=(function(){
             };
         }
 
-        $scope.commit = function(){
-
+        $scope.commit = function () {
+            if( $scope.ITEM.orderStatus==="WAIT_COMMIT" ){
+                window.confirm("22222");
+                API.onload(function() {
+                    API.tripPlan.commitTripPlanOrder( $scope.ITEM.id )
+                        .then(function(result){
+                            location.reload();
+                            alert ("提交成功");
+                        })
+                        .catch(function(err){
+                            $(".confirmFixed").show();
+                            console.info (err);
+                        })
+                })
+            };
         }
 
         function init(){
