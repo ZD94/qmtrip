@@ -189,6 +189,9 @@ var TravelStatistics = (function(){
                 if ($scope.purposename != '' && $scope.purposename != undefined) {
                     params.description = {$like: '%'+ $scope.purposename + '%'};
                 }
+                if ($scope.emailOrName != '' && $scope.emailOrName != undefined) {
+                    params.emailOrName = $scope.emailOrName;
+                }
                 if($scope.start_time) {
                     params.startTime = $scope.start_time;
                 }
@@ -196,7 +199,6 @@ var TravelStatistics = (function(){
                 if($scope.end_time) {
                     params.endTime = $scope.end_time;
                 }
-
                 console.info(params);
                 API.tripPlan.pageTripPlanOrderByCompany(params)
                     .then(function(list){
