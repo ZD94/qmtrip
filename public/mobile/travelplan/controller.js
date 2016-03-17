@@ -317,7 +317,7 @@ var travelplan=(function(){
             return Math.abs($scope.ITEM.budget-$scope.ITEM.expenditure).toFixed(2);
         }
 
-        $scope.renderStatus = function( p ){
+        $scope.renderStatus = function( p,i ){
 
             if( p ){
                 if( p.orderStatus==="NO_BUDGET" ){
@@ -330,7 +330,10 @@ var travelplan=(function(){
                     return "审核未通过";
                 }else
                 if( p.orderStatus==="WAIT_COMMIT" ){
-                    return "票据已上传";
+                    return "已上传";
+                }else
+                if( p.orderStatus==="WAIT_AUDIT" ){
+                    return "票据审核中";
                 }else
                 if( p.orderStatus==="AUDIT_PASS" ){
                     return "已完成";
@@ -375,7 +378,7 @@ var travelplan=(function(){
         $scope.commit = function () {
             if( $scope.ITEM.orderStatus==="WAIT_COMMIT" ){
                 alert("111");
-                //alertify.confirm( '确认提交','返回检查','票据一经提交将无法进行修改，是否确认提交？',function(){console.log("333");} );
+                confirm( '确认提交','返回检查','票据一经提交将无法进行修改，是否确认提交？',function(){console.log("333");} );
                 /*
                 API.onload(function() {
                     API.tripPlan.commitTripPlanOrder( $scope.ITEM.id )
