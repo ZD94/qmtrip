@@ -1,19 +1,7 @@
-function loadCalendar() {
-    var Cal;
-
-    if (window.Calendar) {
-        Cal = window.Calendar;
-    } else if (typeof module == 'object' && typeof module.exports == 'object') {
-        Cal = require("./calendar");
-    } else {
-        throw new Error("cant't found Calendar");
-    }
-    return Cal;
-}
-
-var Calendar = loadCalendar();
+var containerId = "cal_" + Math.floor(Math.random()*1e10);
 
 function mobileSelectDate(config, options) {
+    "use strict";
     if (!config) {
         config = {};
     }
@@ -54,7 +42,6 @@ function mobileSelectDate(config, options) {
         "2016-10-7": "true"
     }
     var PromiseLib = options.PromiseLib || window.Promise;
-    var containerId = "cal_" + Math.random();
 
     config.show = function(data) {
         var divObj = document.createElement("div");
@@ -72,22 +59,33 @@ function mobileSelectDate(config, options) {
         throw new Error("can't find PromiseLib support!");
     }
 
-    var cal = new Calendar(config);
-    cal.renderMonth(options.month, options.year, options.displayMonthNum);
+    var calendar = require("calendar");
+    return calendar.selectDate(options);
+
+    //var cal = new calendar.Calendar(config);
+    //cal.renderMonth(options.month, options.year, options.displayMonthNum);
+
+    var html = calendar.renderMonth({
+        accept_begin: options.accept_begin,
+        selected: options.selected
+    }, options.year, options.month, options.displayMonthNum);
+    var caldiv = document.getElementById(containerId);
+    if(!caldiv){
+        caldiv = document.createElement('div');
+        caldiv.className = "calendar";
+        caldiv.id = containerId;
+        document.body.appendChild(caldiv);
+    }
+    caldiv.innerHTML = html;
 
     //var dayNodes = document.getElementsByClassName("day[^expire=true]");
-    var dayNodes = $("td:not([expire])");
-    $("td[expire]").addClass("unchoose");
-    $("td[today='true']").addClass("today");
     return new PromiseLib(function(resolve) {
-        for(var i= 0, ii=dayNodes.length; i<ii; i++) {
-            dayNodes[i].onclick = function() {
-                var e = event;
-                if (e.srcElement && e.srcElement.attributes["data"] && e.srcElement.attributes["data"].value) {
-                    document.getElementById(containerId).remove(); //删除
-                    resolve(e.srcElement.attributes["data"].value);
-                }
-            }
-        }
+        var dayNodes = $('#'+containerId+' td[data]:not([cal-opt~="expire"])');
+        dayNodes.each(function(i, node){
+            node.onclick = function(){
+                document.getElementById(containerId).remove(); //删除
+                resolve(node.attributes["data"].value);
+            };
+        })
     });
 }
