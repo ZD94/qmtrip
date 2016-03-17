@@ -160,6 +160,10 @@ tripPlan.getTripPlanOrderById = function (params) {
  * @returns {*}
  */
 tripPlan.pageCompleteTripPlanOrder = function (params) {
+    if(!params) {
+        throw {code: -10, msg: '参数不能为空'};
+    }
+
     if (typeof params == 'function') {
         throw {code: -2, msg: '参数不正确'};
     }
@@ -210,6 +214,10 @@ tripPlan.pageCompleteTripPlanOrder = function (params) {
  * @returns {*}
  */
 tripPlan.pageTripPlanOrder = function (params) {
+    if(!params) {
+        throw {code: -10, msg: '参数不能为空'};
+    }
+
     if (typeof params == 'function') {
         throw {code: -2, msg: '参数不正确'};
     }
@@ -311,6 +319,10 @@ pageTripPlanOrderByCompany.optional_params = ['audit', 'startTime', 'endTime', '
     'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit', 'isHasBudget', 'isUpload',
     'isComplete', 'description', 'page', 'perPage', 'emailOrName'];
 function pageTripPlanOrderByCompany(params) {
+    if(!params) {
+        throw {code: -10, msg: '参数不能为空'};
+    }
+
     if (typeof params == 'function') {
         throw {code: -2, msg: '参数不正确'};
     }
@@ -567,31 +579,6 @@ tripPlan.statPlanOrderMoney = function (params) {
 }
 
 /**
- * 获取项目列表
- * @returns {*}
- */
-tripPlan.getProjectsList = function(params){
-    var self = this;
-    var query = {};
-
-    var project_name = params.project_name;
-    if(project_name) {
-        query.description = {$like: '%' + project_name + '%'};
-    }
-
-    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
-        .then(function(staff){
-            query.companyId = staff.companyId;
-            return API.tripPlan.getProjects(query)
-        })
-        .then(function(list){
-            return list.map(function(s){
-                return s.description;
-            })
-        })
-}
-
-/**
  * 用户提交订单(上传完票据后，提交订单后不可修改)
  * @param orderId
  */
@@ -671,13 +658,53 @@ tripPlan.checkBudgetExist = function(params) {
  * @param params
  * @returns {*}
  */
-tripPlan.getProjectList = function(params) {
+tripPlan.getProjectsList = getProjectsList;
+getProjectsList.optionnal_params = ['count', 'project_name'];
+function getProjectsList(params) {
     var self = this;
+    var project_name = params.project_name;
+
+    if(project_name || project_name === '') {
+        params.name = {$like: '%' + project_name + '%'};
+        delete params.project_name;
+    }
+
     return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
         .then(function(staff) {
             params.companyId = staff.companyId;
             return API.tripPlan.getProjectList(params);
         })
+        .then(function(list) {
+            return list.map(function(p) {
+                return p.name;
+            })
+        })
 }
+
+
+///**
+// * 获取项目列表
+// * @returns {*}
+// */
+//tripPlan.getProjectsList = function(params){
+//    var self = this;
+//    var query = {};
+//
+//    var project_name = params.project_name;
+//    if(project_name) {
+//        query.description = {$like: '%' + project_name + '%'};
+//    }
+//
+//    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
+//        .then(function(staff){
+//            query.companyId = staff.companyId;
+//            return API.tripPlan.getProjects(query)
+//        })
+//        .then(function(list){
+//            return list.map(function(s){
+//                return s.description;
+//            })
+//        })
+//}
 
 module.exports = tripPlan;

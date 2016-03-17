@@ -229,10 +229,11 @@
 |ret.expenditure |实际支出   | number  |
 |ret.NumOfStaff   |完成出差人次数 | number    |
 
->. 获取企业所有项目列表 API.tripPlan.getProjectList(callback);
+>. 获取企业所有项目列表 API.tripPlan.getProjectList(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
+| params                                  | count: 要查询的项目名称数目
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |

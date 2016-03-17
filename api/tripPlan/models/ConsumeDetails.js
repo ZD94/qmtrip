@@ -34,8 +34,8 @@ module.exports = function (Db, DataType) {
                 var _value = -1;
                 switch (val) {
                     case 'TRAIN': _value = 0; break; //火车票
-                    case 'PLANE': _value = 0; break; //飞机票
-                    case 'HOTEL': _value = 0; break; //酒店发票
+                    case 'PLANE': _value = 1; break; //飞机票
+                    case 'HOTEL': _value = 2; break; //酒店发票
                     default : ; break;
                 }
                 this.setDataValue('invoiceType', _value);
