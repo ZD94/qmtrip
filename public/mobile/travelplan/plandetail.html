@@ -176,7 +176,7 @@
             </div>
         </li>
     </ul>
-    <div class="w100 button_fix" ng-if="  ITEM.orderStatus!=='COMPLETE'  ">
+    <div class="w100 button_fix" ng-if="  ITEM.orderStatus!=='COMPLETE'&&ITEM.orderStatus!=='NO_BUDGET'  ">
         <a class="BUTTON common_btn2 w100" ng-class="{true:'active'}[ITEM.orderStatus==='WAIT_COMMIT']" ng-click="commit()" style="display:block">{{renderBUTTON()}}</a>
     </div>
 </div>
