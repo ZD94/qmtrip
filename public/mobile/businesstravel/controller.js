@@ -13,7 +13,6 @@ var businesstravel=(function(){
 
     var  businesstravel = {};
 
-
     /*
         我要出差首页
      * @param $scope
@@ -620,14 +619,18 @@ var businesstravel=(function(){
 
         }
 
+        var calendar = require("calendar");
+
         //选择日期
-        $scope.chooeseData = function($event){
-            var thismonth = moment().startOf('month').format('M');
-            mobileSelectDate({
-                isShowMonth: true
-            }, {
-                month: thismonth,
-                year: 2016,
+        $scope.chooeseData = function($event, begintime){
+            if(begintime){
+                begintime = $('#'+begintime).val();
+                if(! begintime.match(/\d{4}-\d{2}-\d{2}/))
+                    begintime = undefined;
+            }
+            calendar.selectDate({
+                accept_begin: begintime,
+                selected: $event.target.value,
                 displayMonthNum: 12
             })
                 .then(function(selectedDate) {
@@ -793,7 +796,7 @@ var businesstravel=(function(){
                     startPlace:$scope.startPlace,
                     startPlaceCode:$scope.startPlaceVal,
                     destination:$scope.endPlace,
-                    destinationCode:$scope.endPlaceVal,
+                    destinationCode:$scope.livePlaceVal,
                     startAt:$scope.startTime,
                     startTime:$scope.liveTime,
                     endTime:$scope.leaveTime,
@@ -813,12 +816,12 @@ var businesstravel=(function(){
                     var consumeDetails_hotel = {
                         type:0,
                         city:$scope.endPlace,
-                        cityCode:$scope.endPlaceVal,
+                        cityCode:$scope.livePlaceVal,
                         hotelName:$scope.landmark,
                         startTime:$scope.liveTime,
                         endTime:$scope.leaveTime,
                         budget:Number($scope.liveprice),
-                        invoiceType:2
+                        invoiceType: 'HOTEL'
                     }
                     consumeDetails.push(consumeDetails_hotel);
                 }
@@ -833,7 +836,7 @@ var businesstravel=(function(){
                         arrivalPlaceCode:$scope.endPlaceVal,
                         startTime:$scope.startTime,
                         budget:Number($scope.goTraffic),
-                        invoiceType:1
+                        invoiceType: 'PLANE'
                     }
                     if($scope.endtime){
                         consumeDetails_outTraffic.endTime = $scope.endTime;
@@ -854,7 +857,7 @@ var businesstravel=(function(){
                         arrivalPlaceCode:$scope.startPlaceVal,
                         startTime:$scope.endTime,
                         budget:Number($scope.backTraffic),
-                        invoiceType:1
+                        invoiceType: 'PLANE'
                     }
                     if($scope.endtimelate){
                         consumeDetails_backTraffic.latestArriveTime = $scope.endTime+' '+$scope.endTimeLate;
