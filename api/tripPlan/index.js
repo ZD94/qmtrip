@@ -26,6 +26,12 @@ var STATUS = {
     NO_COMMIT: 0, //待提交状态
     COMMIT: 1, //已提交待审核状态
     COMPLETE: 2 //审核完，已完成状态
+};
+
+var INVOICE_TYPE = {
+    TRAIN: 0,
+    PLANE: 1,
+    HOTEL: 2
 }
 
 var tripPlan = {}
@@ -1099,9 +1105,9 @@ function checkBudgetExist(params){
                 return [false];
             }
 
-
             return [true, order[0].id, Promise.all(consumeDetails.map(function(detail) {
                 detail.status = {$ne: STATUS.DELETE};
+                detail.invoiceType = INVOICE_TYPE[detail.invoiceType];
                 return ConsumeDetails.findAll({where: detail})
             }))]
         })
