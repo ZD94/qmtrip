@@ -796,7 +796,7 @@ var businesstravel=(function(){
                     startPlace:$scope.startPlace,
                     startPlaceCode:$scope.startPlaceVal,
                     destination:$scope.endPlace,
-                    destinationCode:$scope.endPlaceVal,
+                    destinationCode:$scope.livePlaceVal,
                     startAt:$scope.startTime,
                     startTime:$scope.liveTime,
                     endTime:$scope.leaveTime,
@@ -816,12 +816,12 @@ var businesstravel=(function(){
                     var consumeDetails_hotel = {
                         type:0,
                         city:$scope.endPlace,
-                        cityCode:$scope.endPlaceVal,
+                        cityCode:$scope.livePlaceVal,
                         hotelName:$scope.landmark,
                         startTime:$scope.liveTime,
                         endTime:$scope.leaveTime,
                         budget:Number($scope.liveprice),
-                        invoiceType:2
+                        invoiceType: 'HOTEL'
                     }
                     consumeDetails.push(consumeDetails_hotel);
                 }
@@ -836,7 +836,7 @@ var businesstravel=(function(){
                         arrivalPlaceCode:$scope.endPlaceVal,
                         startTime:$scope.startTime,
                         budget:Number($scope.goTraffic),
-                        invoiceType:1
+                        invoiceType: 'PLANE'
                     }
                     if($scope.endtime){
                         consumeDetails_outTraffic.endTime = $scope.endTime;
@@ -857,7 +857,7 @@ var businesstravel=(function(){
                         arrivalPlaceCode:$scope.startPlaceVal,
                         startTime:$scope.endTime,
                         budget:Number($scope.backTraffic),
-                        invoiceType:1
+                        invoiceType: 'PLANE'
                     }
                     if($scope.endtimelate){
                         consumeDetails_backTraffic.latestArriveTime = $scope.endTime+' '+$scope.endTimeLate;
