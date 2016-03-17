@@ -243,7 +243,7 @@ var travelPlan=(function(){
                         $scope.outTraffic = $scope.planDetail.outTraffic[0];
                         if(result.outTraffic.length!=0){
                             var type = "air";
-                            if($scope.outTraffic.invoiceType == 0){
+                            if($scope.outTraffic.invoiceType == 'TRAIN'){
                                 type = "train";
                             }
                             API.travelBudget.getBookListUrl({
@@ -262,7 +262,7 @@ var travelPlan=(function(){
                         }
                         if(result.backTraffic.length!=0){
                             var type = "air";
-                            if($scope.backTraffic.invoiceType == 0){
+                            if($scope.backTraffic.invoiceType == 'TRAIN'){
                                 type = "train";
                             }
                             API.travelBudget.getBookListUrl({
