@@ -303,7 +303,7 @@ travelBudget.getBookListUrl = function(params) {
                     url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/key_"+hotelAddress;
                 }
             }else{
-                url = "http://hotel.tianxun.com/domestic/";
+                url = "http://hotel.tianxun.com/?_ga=1.18929464.1095670645.1456827902";
             }
             return url;
         })
