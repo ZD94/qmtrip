@@ -1093,15 +1093,12 @@ function checkBudgetExist(params){
 
     _planOrder.status = {$ne: STATUS.DELETE};
 
-    logger.error(_planOrder);
     return PlanOrder.findAll({where: _planOrder})
         .then(function(order){
             if(order.length <= 0) {
                 return [false];
             }
 
-            logger.error("*********************************");
-            logger.error(order.length);
 
             return [true, order[0].id, Promise.all(consumeDetails.map(function(detail) {
                 detail.status = {$ne: STATUS.DELETE};
@@ -1125,12 +1122,19 @@ function checkBudgetExist(params){
 
 tripPlan.getProjectList = getProjectList;
 getProjectList.require_params = ['companyId'];
-getProjectList.optionnal_params = ['code', 'name'];
+getProjectList.optionnal_params = ['code', 'name', 'count'];
 function getProjectList(params) {
     var options = {
         where: params,
+        attributes: ['name'],
         order: [['create_at', 'desc']]
+    };
+
+    if(params.count) {
+        options.limit = params.count;
+        delete params.count;
     }
+
     return Projects.findAll(options)
 }
 
@@ -1146,7 +1150,7 @@ tripPlan.getProjectByName = getProjectByName;
 getProjectByName.required_params = ['userId', 'name'];
 getProjectByName.optional_params = ['companyId', 'isCreate']
 function getProjectByName(params) {
-    return Projects.findOne({name: params.name})
+    return Projects.findOne({where: {name: params.name}})
         .then(function(project){
             if(!project && params.isCreate === true) {
                 var p = {

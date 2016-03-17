@@ -4,8 +4,8 @@
 var reset = function () {
     alertify.set({
         labels : {
-            ok   : "È·ÈÏ",
-            cancel : "È¡Ïû"
+            ok   : "È·ï¿½ï¿½",
+            cancel : "È¡ï¿½ï¿½"
         },
         delay : 5000,
         buttonReverse : false,
@@ -13,7 +13,7 @@ var reset = function () {
     });
 };
 
-//°ëÍ¸Ã÷¿òÌáÊ¾£¬Ö±½Ó´«²ÎÊı¾Í¿ÉÒÔ¡£eg:black_err(str);
+//ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö±ï¿½Ó´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¿ï¿½ï¿½Ô¡ï¿½eg:black_err(str);
 function black_err(str) {
     var timer = setInterval(function(){
         $('.err_alert').hide();
@@ -29,7 +29,7 @@ function black_err(str) {
     timer;
 }
 
-//var message = "ÌáÊ¾¿ò";
+//var message = "ï¿½ï¿½Ê¾ï¿½ï¿½";
 //
 //function alert(message){
 //    reset();
@@ -37,8 +37,8 @@ function black_err(str) {
 //    return false;
 //}
 
-//Á½¸ö°´Å¥£¬²»´øÊäÈë¿ò¡£²ÎÊı£¨°´Å¥ok£¬°´Å¥cancel£¬µã»÷okºóÖ´ĞĞµÄ·½·¨Ãû£©
-function confirm(oks,cancels,sure){
+//confirm('okæŒ‰é’®çš„åå­—','å–æ¶ˆæŒ‰é’®çš„åå­—','è¦æ˜¾ç¤ºçš„å†…å®¹','ç‚¹å‡»ç¡®è®¤åæ‰§è¡Œçš„æ–¹æ³•åå­—')
+function confirm(oks,cancels,message,sure){
     alertify.set({
         labels : {
             ok   : oks,
@@ -51,10 +51,10 @@ function confirm(oks,cancels,sure){
 
     alertify.confirm(message, function (e) {
         if (e) {
-            //alertify.success("µã»÷È·ÈÏ");
+            //alertify.success("ï¿½ï¿½ï¿½È·ï¿½ï¿½");
             sure();
         } else {
-            //alertify.error("µã»÷È¡Ïû");
+            //alertify.error("ï¿½ï¿½ï¿½È¡ï¿½ï¿½");
         }
     });
     return false;
@@ -62,12 +62,12 @@ function confirm(oks,cancels,sure){
 
 //function prompt(){
 //    reset();
-//    alertify.prompt("ÌáÊ¾ÊäÈë¿ò", function (e, str) {
+//    alertify.prompt("ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½", function (e, str) {
 //        if (e) {
-//            alertify.success("µã»÷È·ÈÏ£¬ÊäÈëÄÚÈİÎª: " + str);
+//            alertify.success("ï¿½ï¿½ï¿½È·ï¿½Ï£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª: " + str);
 //        } else {
-////			      alertify.error("µã»÷È¡Ïû");
+////			      alertify.error("ï¿½ï¿½ï¿½È¡ï¿½ï¿½");
 //        }
-//    }, "Ä¬ÈÏÖµ");
+//    }, "Ä¬ï¿½ï¿½Öµ");
 //    return false;
 //}
