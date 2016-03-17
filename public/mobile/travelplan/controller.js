@@ -17,6 +17,7 @@ var travelplan=(function(){
      * @constructor
      */
     //alert("no error");
+    //["未完成","待出预算","待上传票据","票据审核中","审核未通过","已完成"]
     travelplan.PlanlistController = function($scope,$routeParams) {
         
         $scope.STATUS="未完成";//当前状态
@@ -236,14 +237,14 @@ var travelplan=(function(){
      */
     travelplan.PlandetailController = function($scope, $routeParams) {
 
-        $scope.ITEM={};
+        $scope.ITEM=null;
         //---------------------------------------------
         $scope.getData = function( p ){
 
             API.onload(function(){
                 console.info(p);
                 API.tripPlan
-                .getTripPlanOrderById( p )
+                .getTripPlanOrderById( {orderId: p} )
                 .then(
                     function( data ){
                         //console.log(API.tripPlan);
@@ -260,22 +261,32 @@ var travelplan=(function(){
             })
         }
 
-        $scope.checkInvoice = function(){
-            window.location.href="#/travelplan/invoicedetail";
+        $scope.renderDeficit = function(){
+            return Math.abs($scope.ITEM.budget-$scope.ITEM.expenditure).toFixed(2);
         }
 
-        $scope.renderDepartureStatus = function(){
-            if( $scope.ITEM.outTraffic[0].isCommit===false ){
-                return "待传票据";
-            }else
-            if( $scope.ITEM.outTraffic[0].status===-1 ){
-                return "审核未通过";
-            }else
-            if( $scope.ITEM.outTraffic[0].status===0 ){
-                return "已上传";
-            }else
-            if( $scope.ITEM.outTraffic[0].status===-1 ){
-                return "已完成";
+        $scope.checkInvoice = function(){
+            window.location.href="#/travelplan/invoicedetail?planId="+$scope.ITEM.id+"&status=outTraffic&invoiceId=";
+        }
+
+        $scope.renderStatus = function( p ){
+
+            if( p ){
+                if( p.budget===-1 ){
+                    return "待出预算";
+                }else
+                if( p.isCommit===false&&p.status===0 ){
+                    return "待上传票据";
+                }else
+                if( p.status===-1 ){
+                    return "审核未通过";
+                }else
+                if( p.isCommit===true&&p.status===0 ){
+                    return "票据已上传";
+                }else
+                if( p.status===1 ){
+                    return "已完成";
+                };
             };
         }
 
@@ -306,7 +317,7 @@ var travelplan=(function(){
         $scope.invoiceId = $routeParams.invoiceId;
         API.require("attachment");
         API.onload(function() {
-            API.tripPlan.getTripPlanOrderById(planId)
+            API.tripPlan.getTripPlanOrderById({orderId: planId})
             .then(function(result){
                 var InvoiceDetail;
                 $scope.planDetail = result;

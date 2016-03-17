@@ -34,7 +34,7 @@ tripPlan.savePlanOrder = function (params) {
 
             return Promise.all([
                 API.tripPlan.savePlanOrder(params),
-                API.staff.findStaffs({companyId: staff.companyId, roleId: {$ne: 1}, columns: ['id', 'name','email']})
+                API.staff.findStaffs({companyId: staff.companyId, roleId: {$ne: 1}, status: {$gte: 0}, columns: ['id', 'name','email']})
             ])
         })
         .spread(function(_order, staffs){
@@ -134,11 +134,11 @@ tripPlan.saveConsumeDetail = function (params) {
  * 获取计划单详情
  * @param orderId
  */
-tripPlan.getTripPlanOrderById = function (orderId) {
+tripPlan.getTripPlanOrderById = function (params) {
     var self = this;
     var accountId = self.accountId;
     var params = {
-        orderId: orderId,
+        orderId: params.orderId,
         userId: accountId
     }
 
@@ -170,11 +170,19 @@ tripPlan.pageCompleteTripPlanOrder = function (params) {
     typeof page == 'number' ? "" : page = 1;
     typeof perPage == 'number' ? "" : perPage = 10;
 
-    var query = _.pick(params,
-        ['status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
+    if(params.startTime) {
+        params.startAt?params.startAt.$gte = params.startTime:params.startAt = {$gte: params.startTime};
+    }
+
+    if(params.endTime) {
+        params.startAt?params.startAt.$lte = params.endTime:params.startAt = {$lte: params.endTime};
+    }
+
+    var query = _.pick(params, ['startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
     query.accountId = self.accountId;
-    query.auditStatus = 1; //审核状态为审核通过
-    query.status = 2; //计划单状态为已完成（2），可能会有结算完毕状态（3）
+    query.status = 2;
+    query.auditStatus = 1;
+    //query.orderStatus = 'COMPLETE';
 
     return API.staff.getStaff({id: accountId, columns: ['companyId']})
         .then(function (staff) {
@@ -186,6 +194,10 @@ tripPlan.pageCompleteTripPlanOrder = function (params) {
                 where: query,
                 limit: perPage,
                 offset: perPage * (page - 1)
+            }
+
+            if(params.order) {
+                options.order = [params.order];
             }
 
             return API.tripPlan.listTripPlanOrder(options);
@@ -249,7 +261,6 @@ tripPlan.pageTripPlanOrder = function (params) {
  * 票据审核中      params.audit = 'P';
  * 审核未通过      params.audit = 'N';
  * 已完成          params.isComplete = true'
- *
  * @param params
  * @returns {*}
  */
@@ -297,17 +308,20 @@ function getQueryByParams(params) {
  */
 tripPlan.pageTripPlanOrderByCompany = pageTripPlanOrderByCompany;
 pageTripPlanOrderByCompany.optional_params = ['audit', 'startTime', 'endTime', 'startPlace', 'destination',
-    'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit', 'isHasBudget', 'isUpload', 'isComplete', 'description', 'page', 'perPage'];
+    'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit', 'isHasBudget', 'isUpload',
+    'isComplete', 'description', 'page', 'perPage', 'emailOrName'];
 function pageTripPlanOrderByCompany(params) {
-    logger.warn(params);
     if (typeof params == 'function') {
         throw {code: -2, msg: '参数不正确'};
     }
     var self = this;
     var accountId = self.accountId;
 
+    //var {page, perPage, startTime, endTime} = params;
+
     var page = params.page;
     var perPage = params.perPage;
+    var emailOrName = params.emailOrName;
     page = typeof page == 'number' ? page : 1;
     perPage = typeof perPage == 'number' ? perPage : 10;
 
@@ -350,6 +364,27 @@ function pageTripPlanOrderByCompany(params) {
             if(params.order) {
                 options.order = [params.order];
             }
+
+            if(!emailOrName) {
+                return [options, []];
+            }
+
+            return [options,
+                API.staff.findStaffs({companyId: companyId,
+                    $or: [{name: {$like: '%' + emailOrName +'%'}}, {email: {$like: '%' + emailOrName +'%'}}],
+                    status: {$ne: -2},
+                    columns: ['id']
+                    })];
+        })
+        .spread(function(options, staffs) {
+            if(staffs && staffs.length > 0) {
+                var idArr = staffs.map(function(staff) {
+                    return staff.id;
+                });
+
+                options.where.accountId = {$in: idArr};
+            }
+
             return API.tripPlan.listTripPlanOrder(options);
         })
 }

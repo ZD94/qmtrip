@@ -83,7 +83,12 @@ function selectPage (options) {
 										var strr = "";
 										strr += "<div class='result_none'>匹配无结果</div>";
 										if (isAllowAdd == true) {
-											strr += "<dd class='appendclass'><span>+</span> 将&quot;"+val+"&quot;添加为出差目的</dd>";
+											if (val.length>8) {
+												strr += "<dd class='appendclass'><span>+</span> 将&quot;"+val.substring(0,5)+"....."+val.substring(val.length-4)+"&quot;添加为出差目的</dd>";
+											}
+											else {
+												strr += "<dd class='appendclass'><span>+</span> 将&quot;"+val+"&quot;添加为出差目的</dd>";
+											}
 										}
 										$('.select_page').append(strr);
 										$('.cancelBtn').click(function(){

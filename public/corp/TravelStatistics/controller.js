@@ -340,7 +340,7 @@ var TravelStatistics = (function(){
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
         var planId = $routeParams.orderId;
         API.onload(function(){
-            API.tripPlan.getTripPlanOrderById(planId)
+            API.tripPlan.getTripPlanOrderById({orderId: planId})
                 .then(function(result){
                     if(result.description && result.description.length>15){
                         result.description = result.description.substr(0,15);

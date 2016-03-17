@@ -192,8 +192,6 @@ var businesstravel=(function(){
 
             //生成预算
             $scope.createResult = function () {
-                alert ($('#endTimeLate').val());
-                return false;
                 var startCity = $scope.startCity,
                     endCity = $scope.endCity,
                     startCityVal = $('#startCity').attr("code"),
@@ -318,6 +316,7 @@ var businesstravel=(function(){
                         .spread(function(livePlaceId, livePlace) {
                             $scope.livePlace = livePlace;
                             $scope.livePlaceId = livePlaceId;
+                            $('#livePlace').val($scope.livePlace);
                             $('#livePlace').attr('code',$scope.livePlaceId);
                             $scope.$apply();
                         })
@@ -580,6 +579,7 @@ var businesstravel=(function(){
                 $('#liveCity').attr('code',$('#endCity').attr('code'));
                 $('#liveTime').val($('#startTime').val());
                 $('#leaveTime').val($('#endTime').val());
+                $scope.liveCityId = $('#liveCity').attr('code');
             }
 
             //生成预算单
@@ -865,7 +865,11 @@ var businesstravel=(function(){
                 API.tripPlan.savePlanOrder(order)
                     .then(function(result){
                         console.info (result);
-                        black_err("生成计划单成功");
+                        black_err("已成功生成出差记录");
+                        function plandetail () {
+                            window.location.href='#/travelplan/plandetail?orderId='+result.id;
+                        }
+                        setTimeout(plandetail,3000);
                     })
                     .catch(function(err){
                         console.info (err);

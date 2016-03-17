@@ -17,67 +17,133 @@
             <span ng-if="ITEM.status===2">积分</span>
         </div>
     </div>
-    <dl class="complete elasticbox" ng-if="ITEM.status===2">
-        <dt class="line1"></dt>
-        <dt class="line2"></dt>
-        <dd class="elasticbox_one">
-            ¥{{ITEM.budget.toFixed(2)}}<br>
+    <ul class="complete" ng-if="ITEM.status===2">
+        <li>
+            <span class="number">¥{{ITEM.budget.toFixed(2)}}</span><br>
             <span>预算</span>
-        </dd>
-        <dd class="elasticbox_one">
-            ¥{{ITEM.expenditure.toFixed(2)}}<br>
+            <div class="bar"></div>
+        </li>
+        <li>
+            <span class="number">¥{{ITEM.expenditure.toFixed(2)}}</span><br>
             <span>实际</span>
-        </dd>
-        <dd class="elasticbox_one">
-            ¥{{ (ITEM.budget-ITEM.expenditure) }}<br>
-            <span>节省</span>
-        </dd>
-    </dl>
+            <div class="bar"></div>
+        </li>
+        <li>
+            <span class="number" ng-if="ITEM.budget>=ITEM.expenditure" style="color:#3CA5F6">¥{{renderDeficit()}}</span>
+            <span class="number" ng-if="ITEM.budget<ITEM.expenditure" style="color:#F23B3B">¥{{renderDeficit()}}</span>
+            <br>
+            <span ng-if="ITEM.budget>=ITEM.expenditure" style="color:#3CA5F6">节省</span>
+            <span ng-if="ITEM.budget<ITEM.expenditure" style="color:#F23B3B">超支</span>
+        </li>
+    </ul>
     <div class="project">项目：{{ITEM.description}}</div>
     <ul class="CONTENT">
         <li class="departure" ng-if="ITEM.outTraffic.length!==0">
             <div class="list_top">
-                <div class="icon web-icon-font3">&#xe90e;</div>
-                <div class="description">北京<span>去程</span>上海</div>
-            </div>
-            <div class="list_center">
-                <div class="time">2012-12-12出发　15:00前到达</div>
-                <div class="budget">¥{{ITEM.outTraffic[0].budget.toFixed(2)}}</div>
+                <div class="top_left">
+                    <p>
+                        <span class="icon web-icon-font3">&#xe90e;</span>
+                        <span class="description">
+                            {{ITEM.outTraffic[0].startPlace}}
+                            <span>去程</span>
+                            {{ITEM.outTraffic[0].arrivalPlace}}
+                        </span>
+                    </p>
+                    <p class="time">
+                        <span>{{ITEM.outTraffic[0].startTime | date:"yyyy-MM-dd"}}出发</span>
+                        <span ng-if="ITEM.outTraffic[0].latestArriveTime"> {{ITEM.outTraffic[0].latestArriveTime | date:"HH:mm"}}前到达</span>
+                    </p>
+                </div>
+                <div class="top_right">
+                    <p ng-if="ITEM.outTraffic[0].expenditure===0"></p>
+                    <p class="budget">
+                        预算：
+                        <span class="number" ng-if="ITEM.outTraffic[0].budget===-1">暂无</span>
+                        <span class="number" ng-if="ITEM.outTraffic[0].budget!==-1">¥{{ITEM.outTraffic[0].budget.toFixed(2)}}</span>
+                    </p>
+                    <p class="expenditure" ng-if="ITEM.outTraffic[0].expenditure!==0">
+                        实际：
+                        <span class="number">¥{{ITEM.outTraffic[0].expenditure.toFixed(2)}}</span>
+                    </p>
+                </div> 
             </div>
             <div class="list_bottom">
-                <div class="status">{{111}}</div>
-                <input type="button" value="查看票据" class="smallbtn">
-                <input type="button" value="预订" class="smallbtn">
+                <div class="status">{{renderStatus( ITEM.outTraffic[0] )}}</div>
+                <div class="buttons" ng-if="ITEM.outTraffic[0].budget!==-1">
+                    <a class="BTN" ng-if="ITEM.outTraffic[0].isCommit===false&&ITEM.outTraffic[0].status===0">预订</a>
+                    <a class="BTN" ng-if="ITEM.outTraffic[0].isCommit===false&&ITEM.outTraffic[0].status===0" ng-click="">上传票据</a>
+                    <a class="BTN" ng-if="ITEM.outTraffic[0].status===-1" ng-click="">重新上传</a>
+                    <a class="BTN" ng-if="ITEM.outTraffic[0].isCommit===true" ng-click="checkInvoice()">查看票据</a>
+                </div>
             </div>
         </li>
         <li class="return" ng-if="ITEM.backTraffic.length!==0">
             <div class="list_top">
-                <div class="icon web-icon-font3">&#xe90e;</div>
-                <div class="description">北京<span>回程</span>上海</div>
-            </div>
-            <div class="list_center">
-                <div class="time">2012-12-12出发　15:00前到达</div>
-                <div class="budget">¥2000.00</div>
+                <div class="top_left">
+                    <p>
+                        <span class="icon web-icon-font3">&#xe90e;</span>
+                        <span class="description">
+                            {{ITEM.backTraffic[0].startPlace}}
+                            <span>回程</span>
+                            {{ITEM.backTraffic[0].arrivalPlace}}
+                        </span>
+                    </p>
+                    <p class="time">
+                        <span>{{ITEM.backTraffic[0].startTime | date:"yyyy-MM-dd"}}出发</span>
+                        <span ng-if="ITEM.backTraffic[0].latestArriveTime"> {{ITEM.backTraffic[0].latestArriveTime | date:"HH:mm"}}前到达</span>
+                    </p>
+                </div>
+                <div class="top_right">
+                    <p ng-if="ITEM.backTraffic[0].expenditure===0"></p>
+                    <p class="budget">
+                        预算：
+                        <span class="number" ng-if="ITEM.backTraffic[0].budget===-1">暂无</span>
+                        <span class="number" ng-if="ITEM.backTraffic[0].budget!==-1">¥{{ITEM.backTraffic[0].budget.toFixed(2)}}</span>
+                    </p>
+                    <p class="expenditure" ng-if="ITEM.backTraffic[0].expenditure!==0">
+                        实际：
+                        <span class="number">¥{{ITEM.backTraffic[0].expenditure.toFixed(2)}}</span>
+                    </p>
+                </div> 
             </div>
             <div class="list_bottom">
-                <div class="status">待传票据</div>
-                <input type="button" value="查看票据" class="smallbtn">
-                <input type="button" value="预订" class="smallbtn">
+                <div class="status">{{renderStatus( ITEM.backTraffic[0] )}}</div>
+                <a class="BTN" ng-click="checkInvoice()">查看票据</a>
+                <a class="BTN" ng-click="">重新上传</a>
+                <a class="BTN">预订</a>
             </div>
         </li>
         <li class="hotel" ng-if="ITEM.hotel.length!==0">
             <div class="list_top">
-                <div class="icon web-icon-font3">&#xe914;</div>
-                <div class="description">{{ITEM.hotel[0].city}}　{{ITEM.hotel[0].hotelName}}</div>
-            </div>
-            <div class="list_center">
-                <div class="time">2012-12-12至2012-12-12</div>
-                <div class="budget">¥{{ITEM.hotel[0].budget.toFixed(2)}}</div>
+                <div class="top_left">
+                    <p>
+                        <span class="icon web-icon-font3">&#xe914;</span>
+                        <span class="description">
+                            {{ITEM.hotel[0].city}}　{{ITEM.hotel[0].hotelName}}
+                        </span>
+                    </p>
+                    <p class="time">
+                        <span>{{ITEM.hotel[0].startTime | date:"yyyy-MM-dd"}}至{{ITEM.hotel[0].endTime | date:"yyyy-MM-dd"}}（共N晚）</span>
+                    </p>
+                </div>
+                <div class="top_right">
+                    <p ng-if="ITEM.outTraffic[0].expenditure===0"></p>
+                    <p class="budget">
+                        预算：
+                        <span class="number" ng-if="ITEM.outTraffic[0].budget===-1">暂无</span>
+                        <span class="number" ng-if="ITEM.outTraffic[0].budget!==-1">¥{{ITEM.hotel[0].budget.toFixed(2)}}</span>
+                    </p>
+                    <p class="expenditure" ng-if="ITEM.outTraffic[0].expenditure!==0">
+                        实际：
+                        <span class="number">¥{{ITEM.outTraffic[0].expenditure.toFixed(2)}}</span>
+                    </p>
+                </div> 
             </div>
             <div class="list_bottom">
-                <div class="status">待传票据</div>
-                <input type="button" value="查看票据" class="smallbtn" ng-if="ITEM.hotel[0].isCommit" ng-click="checkInvoice()">
-                <input type="button" value="预订" class="smallbtn">
+                <div class="status">{{renderStatus( ITEM.hotel[0] )}}</div>
+                <a class="BTN" ng-click="checkInvoice()">查看票据</a>
+                <a class="BTN" ng-click="">重新上传</a>
+                <a class="BTN">预订</a>
             </div>
         </li>
     </ul>
