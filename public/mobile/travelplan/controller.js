@@ -383,7 +383,8 @@ var travelplan=(function(){
 
         $scope.commit = function () {
             if( $scope.ITEM.orderStatus==="WAIT_COMMIT" ){
-                window.confirm("22222");
+                alert("22222");
+                /*
                 API.onload(function() {
                     API.tripPlan.commitTripPlanOrder( $scope.ITEM.id )
                         .then(function(result){
@@ -395,6 +396,7 @@ var travelplan=(function(){
                             console.info (err);
                         })
                 })
+                */
             };
         }
 
