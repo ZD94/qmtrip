@@ -296,10 +296,14 @@ travelBudget.getBookListUrl = function(params) {
         }
         return API.place.getCityInfo(hotelCity)
         .then(function(result){
-            if(!hotelAddress || hotelAddress == "" ){
-                url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/";
+            if(result){
+                if(!hotelAddress || hotelAddress == "" ){
+                    url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/";
+                }else{
+                    url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/key_"+hotelAddress;
+                }
             }else{
-                url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/key_"+hotelAddress;
+                url = "http://hotel.tianxun.com/domestic/";
             }
             return url;
         })
