@@ -25,7 +25,35 @@ module.exports = function (Db, DataType) {
         latestArriveTime: {type: "timestamp without time zone", field: "latest_arrive_time"}, //最晚到达时间
         budget      : {type: DataType.NUMERIC(15, 2), defaultValue: 0 }, //预算
         expenditure : {type: DataType.NUMERIC(15, 2), defaultValue: 0 }, //支出
-        invoiceType : {type: DataType.INTEGER,          field: "invoice_type"}, //票据类型
+        //invoiceType : {type: DataType.INTEGER,          field: "invoice_type"}, //票据类型
+        invoiceType : {
+            type: DataType.INTEGER,
+            field: 'invoice_type',
+            set: function(val) {
+                "use strict";
+                var _value = -1;
+                switch (val) {
+                    case 'TRAIN': _value = 0; break; //火车票
+                    case 'PLANE': _value = 0; break; //飞机票
+                    case 'HOTEL': _value = 0; break; //酒店发票
+                    default : ; break;
+                }
+                this.setDataValue('invoiceType', _value);
+            },
+            get: function(){
+                "use strict";
+                var _value = this.getDataValue('invoiceType');
+                var result = '';
+                switch (_value) {
+                    case -1: result = 'GET INVOICE TYPE ERROR!'; break;
+                    case  0: result = 'TRAIN'; break;
+                    case  1: result = 'PLANE'; break;
+                    case  2: result = 'HOTEL'; break;
+                    default : result = 'GET INVOICE TYPE ERROR!'; break
+                }
+                return result;
+            }
+        },
         invoice     : {type: 'jsonb',           defaultValue: '[]'}, //历史票据json
         newInvoice  : {type: DataType.STRING,            field: 'new_invoice'}, //新上传票据
         auditRemark : {type: DataType.STRING,            field: 'audit_remark'}, //审核备注

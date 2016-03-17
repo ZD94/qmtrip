@@ -245,7 +245,7 @@ describe("api/client/staff.js", function() {
                 consumeDetails: [{
                     startTime: '2016-12-30 11:11:11',
                     budget: 500,
-                    invoiceType: 2,
+                    invoiceType: 'HOTEL',
                     type: 0
                 }]
             }
