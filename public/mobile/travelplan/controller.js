@@ -239,6 +239,7 @@ var travelplan=(function(){
     travelplan.PlandetailController = function($scope, $routeParams) {
 
         $scope.ITEM=null;
+        $scope.URL={};
         //---------------------------------------------
         $scope.getData = function( p ){
 
@@ -253,8 +254,8 @@ var travelplan=(function(){
                         $scope.ITEM = data;
                         console.log( $scope.ITEM );
                         //console.log( $scope.ITEM.outTraffic[0] );
-                        /*
-                        if( $scope.ITEM.outTraffic.length!==0 ){
+                        
+                        if( $scope.ITEM.outTraffic.length!==0 ){//获取预订去程的机票或火车票的网页的URL
                             var type = "air";
                             if( $scope.ITEM.outTraffic[0].invoiceType === 0 ){
                                 type = "train";
@@ -266,54 +267,51 @@ var travelplan=(function(){
                                 type : type
                             })
                             .then( function(outTrafficBookListUrl){
-                                $scope.outTrafficBookListUrl = outTrafficBookListUrl;
+                                $scope.URL.outTrafficBookListUrl = outTrafficBookListUrl;
+                                console.log( $scope.URL );
                                 $scope.$apply();
                             })
                             .catch(function(err){
                                 TLDAlert(err.msg || err);
                             })
                         }
-                        if(result.backTraffic.length!=0){
+
+                        if( $scope.ITEM.backTraffic.length!==0 ){
                             var type = "air";
-                            if($scope.backTraffic.invoiceType == 0){
+                            if( $scope.ITEM.backTraffic[0].invoiceType === 0 ){
                                 type = "train";
                             }
                             API.travelBudget.getBookListUrl({
-                                spval : $scope.backTraffic.startPlace,
-                                epval : $scope.backTraffic.arrivalPlace,
-                                st : $scope.backTraffic.startTime,
+                                spval : $scope.ITEM.backTraffic[0].startPlace,
+                                epval : $scope.ITEM.backTraffic[0].arrivalPlace,
+                                st : $scope.ITEM.backTraffic[0].startTime,
                                 type : type
                             })
-                            .then(function(backTrafficBookListUrl){
-                                $scope.backTrafficBookListUrl = backTrafficBookListUrl;
+                            .then( function(backTrafficBookListUrl){
+                                $scope.URL.backTrafficBookListUrl = backTrafficBookListUrl;
+                                console.log( $scope.URL );
                                 $scope.$apply();
                             })
                             .catch(function(err){
                                 TLDAlert(err.msg || err);
                             })
                         }
-                        if(result.hotel.length!=0){
+
+                        if( $scope.ITEM.hotel.length!==0 ){
                             API.travelBudget.getBookListUrl({
-                                hotelCity : $scope.hotel.city,
-                                hotelAddress : $scope.hotel.hotelName,
-                                type : "hotel"
+                                hotelCity : $scope.ITEM.hotel[0].city,
+                                hotelAddress : $scope.ITEM.hotel[0].hotelName,
+                                type : 'hotel'
                             })
-                            .then(function(hotelBookListUrl){
-                                $scope.hotelBookListUrl = hotelBookListUrl;
+                            .then( function( r ){
+                                $scope.URL.hotelBookListUrl = r;
+                                //console.log( $scope.URL );
                                 $scope.$apply();
                             })
                             .catch(function(err){
                                 TLDAlert(err.msg || err);
                             })
                         }
-
-                        */
-
-
-
-
-
-
 
                         $scope.$apply();
                     }
@@ -361,8 +359,17 @@ var travelplan=(function(){
             return "提交审核";
         }
 
-        $scope.book = function(){
-
+        $scope.book = function( p ){
+            if( p==="outTraffic" ){
+                window.location.href=$scope.URL.outTrafficBookListUrl;
+            }else
+            if( p==="backTraffic" ){
+                window.location.href=$scope.URL.backTrafficBookListUrl;
+            }else
+            if( p==="hotel" ){
+                alert( $scope.URL.hotelBookListUrl );
+                window.location.href=$scope.URL.hotelBookListUrl;
+            };
         }
 
         $scope.checkInvoice = function( p ){
