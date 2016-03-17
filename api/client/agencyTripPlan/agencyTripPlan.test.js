@@ -40,7 +40,7 @@ describe("api/client/agencyTripPlan.js", function() {
             city: '北京市',
             cityCode: 'BJ123',
             hotelName: '丐帮总部',
-            invoiceType: 2,
+            invoiceType: 'HOTEL',
             budget: 1000,
             newInvoice: '票据详情'
         }]
