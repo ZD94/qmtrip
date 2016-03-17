@@ -74,11 +74,11 @@
 | msg     | 错误消息 |
 
 
->. 获取差旅计划单明细 API.tripPlan.getTripPlanOrderById(tripPlanId, callback);
+>. 获取差旅计划单明细 API.tripPlan.getTripPlanOrderById(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
-| orderId                                | 计划单id             |uuid              |必填
+| params.orderId                                | 计划单id             |uuid              |必填
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |
@@ -117,6 +117,9 @@
 | params.budget        |预算      |         |
 | params.expenditure        |支出      |       |
 | params.audit            |审核状态 N：未通过 P：待审核 Y：审核通过     |        |
+| params.isHasBudget |是否已出预算
+| params.isUpload |是否上传票据
+| params.isComplete |是否已完成
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |
@@ -142,6 +145,9 @@
 | params.budget        |预算      |         |
 | params.expenditure        |支出      |       |
 | params.audit            |审核状态 N：未通过 P：待审核 Y：审核通过     |        |
+| params.isHasBudget |是否已出预算
+| params.isUpload |是否上传票据
+| params.isComplete |是否已完成
 | params.order       |排序         | eg: ['startAt', 'desc'];       |
 | callback                              | 回调函数             |function              |支持promise
 

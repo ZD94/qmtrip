@@ -11,11 +11,11 @@
 ### Client API列表
 ---
 
->. 代理商获取差旅计划单明细 API.agencyTripPlan.getTripPlanOrderById(tripPlanId, callback);
+>. 代理商获取差旅计划单明细 API.agencyTripPlan.getTripPlanOrderById(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
-| orderId                                | 计划单id             |uuid              |必填
+| params.orderId                                | 计划单id             |uuid              |必填
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |
@@ -43,6 +43,8 @@
 | params.budget        |预算      |         |
 | params.expenditure        |支出      |       |
 | params.audit            |审核状态 N：未通过 P：待审核 Y：审核通过     |        |
+| params.isHasBudget | 是否已出预算
+| params.agencyAll   | 代理商是否获取全部的出差计划(包含未出预算和待审核的出差计划)
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |

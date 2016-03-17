@@ -77,7 +77,7 @@ img { display: block;}
   border: 1px @border-color solid;
   border-radius: 0.2rem;
   background: @background-color-default;
-  padding: 0 2rem;
+  padding: 0 1rem;
   display: block;
 }
 /*默认按钮1样式*/
@@ -116,6 +116,7 @@ img { display: block;}
 }
 
 .w10 { width: 10%;}
+.w15 { width: 15%;}
 .w20 { width: 20%;}
 .w30 { width: 30%;}
 .w40 { width: 40%;}
@@ -163,76 +164,6 @@ img { display: block;}
 }
 .font-white {
   color: #cccccc;
-}
-
-/*日历控件移动端样式*/
-.calendar{
-  position: absolute;
-  width: 100%;
-  left: 0;
-  top: 0;
-  z-index: 99999;
-  background: #fff;
-  .monthTitle{
-    margin: 1rem 0 0.3rem;
-    text-align: center;
-    font-weight: normal;
-    color: #4a4a4a;
-    font-size: 1.5rem;
-  }
-  table{
-    width: 100%;
-    text-align: center;
-    border-collapse: collapse;
-    &.weekbar{
-      td{
-        border:0;
-        background: #ededed;
-        font-weight: normal;
-        height: 3rem;
-      }
-    }
-    tr{
-      td{
-        border:1px solid #e5e5e5;
-        border-right: 0;
-        font-weight: bold;
-        width: 14.3%;
-        height: 4rem;
-        &:nth-child(1){
-          border-left: 0;
-          color: #eb5434;
-        }
-        &:last-child{
-          color: #eb5434;
-        }
-        &[today='true']{
-          color: #fff;
-          background: #3ca5f6;
-          i{
-            color: #fff;
-          }
-
-        }
-        &[expire="true"]{
-          color: #cccccc;
-        }
-        &[isrestday="true"]{
-          position: relative;
-          background: url(/images/restday.png) top right no-repeat;
-          background-size: 1.2rem;
-          background-position-y: 1rem;
-        }
-        i{
-          display: block;
-          font-style: normal;
-          font-weight: normal;
-          height: 1rem;
-          color: #9b9b9b;
-        }
-      }
-    }
-  }
 }
 
 /*移动端loading样式*/
@@ -342,6 +273,12 @@ img { display: block;}
     height: auto;
     background: #EDEDED;
     padding: 1rem;
+    overflow: hidden;
+  }
+  .cancelBtn {
+    height: 4.8rem;
+    line-height: 4.8rem;
+    text-align: center;
   }
   .result_none {
     height: 4.5rem;
@@ -374,7 +311,7 @@ img { display: block;}
       line-height: 1.1rem;
       text-align: center;
       color: @color-theme1;
-      border: 2px @color-theme1 solid;
+      border: 1px @color-theme1 solid;
       border-radius: 50%;
       display: inline-block;
     }

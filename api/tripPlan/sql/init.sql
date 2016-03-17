@@ -31,6 +31,7 @@ CREATE TABLE trip_plan_order (
     company_id uuid not null,
     type integer,
     status integer default 0,
+    is_invoice_upload boolean default false,
     is_commit boolean default false,
     start_place character varying,
     destination character varying,
@@ -48,7 +49,7 @@ CREATE TABLE trip_plan_order (
     audit_remark character varying,
     score integer,
     expire_at timestamp without time zone,
-    create_at timestamp without time zone default now(),
+    create_at timestamp without time zone,
     update_at timestamp without time zone,
     start_place_code character varying,
     destination_code character varying
@@ -133,13 +134,6 @@ COMMENT ON COLUMN trip_plan_order.budget IS '预算金额';
 --
 COMMENT ON COLUMN trip_plan_order.expenditure IS '预定支出';
 
---
--- TOC entry 1022 (class 0 OID 0)
--- Dependencies: 101
--- Name: COLUMN trip_plan_order.expend_info; Type: COMMENT; Schema: tripplan; Owner: -
---
-COMMENT ON COLUMN trip_plan_order.expend_info IS '支出明细';
-
 
 --
 -- TOC entry 1023 (class 0 OID 0)
@@ -170,14 +164,6 @@ COMMENT ON COLUMN trip_plan_order.audit_remark IS '审核备注';
 -- Name: COLUMN trip_plan_order.expire_at; Type: COMMENT; Schema: tripplan; Owner: -
 --
 COMMENT ON COLUMN trip_plan_order.expire_at IS '计划单/预算单失效时间';
-
-
---
--- TOC entry 1027 (class 0 OID 0)
--- Dependencies: 101
--- Name: COLUMN trip_plan_order.type; Type: COMMENT; Schema: tripplan; Owner: -
---
-COMMENT ON COLUMN trip_plan_order.type IS '单据类型 1：预算单 2：计划单';
 
 
 --

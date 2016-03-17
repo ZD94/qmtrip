@@ -25,7 +25,7 @@ var travelRecord=(function(){
             $(".left_nav li").removeClass("on").eq(0).addClass("on");
 
             API.onload(function () {
-                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page1, perPage:20, isUpload: true, audit: 'P'})
+                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page1, perPage:20, agencyAll: true})
                     .then(function(result){
                         console.info (result);
                         $scope.total1 = result.total;
@@ -57,7 +57,7 @@ var travelRecord=(function(){
         //待出预算
         $scope.initTravelList2 = function () {
             API.onload(function () {
-                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page2, perPage:20, isUpload: true, budget: {lt: 0}, audit: 'P'})
+                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page2, perPage:20, isHasBudget: false})
                     .then(function(result){
                         console.info (result);
                         $scope.total2 = result.total;
@@ -89,7 +89,7 @@ var travelRecord=(function(){
         //待审核
         $scope.initTravelList3 = function () {
             API.onload(function () {
-                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page3, perPage:20, isUpload: true, budget: {gt: 0}, audit: 'P'})
+                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page3, perPage:20, audit: 'P'})
                     .then(function(result){
                         console.info (result);
                         $scope.total3 = result.total;
@@ -209,7 +209,7 @@ var travelRecord=(function(){
         var orderId = $routeParams.orderId;
         $scope.initTravelDetail = function () {
             API.onload(function() {
-                API.agencyTripPlan.getTripPlanOrderById(orderId)
+                API.agencyTripPlan.getTripPlanOrderById({orderId: orderId})
                     .then(function(result){
                         console.info (result);
                         var outTraffic = result.outTraffic[0];
@@ -444,13 +444,26 @@ var travelRecord=(function(){
         }
         $scope.invoiceNoPass = function () {
             var reasontext = $(".invoiceNoPass .remark").val();
-            $scope.remark = reason1 + "," + reason2 + "," + reasontext;
+
+            var reason = reason1;
+
+            if(reason2 != '' && reason2!= undefined) {
+                reason==''?reason = reason2: reason += ','+reason2;
+            }
+
+            if(reasontext != ''&& reasontext!= undefined) {
+                reason==''?reason = reasontext: reason += ','+reasontext;
+            }
+
+            $scope.remark = reason;
+            console.info(reason1,reason2,reasontext);
             $('.error').empty();
             if (reason1 =='' && reason2 == '' && reasontext == '') {
                 $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>理由不能为空");
                 return false;
             }
             API.onload(function() {
+                console.info($scope.remark);
                 API.agencyTripPlan.approveInvoice({
                     userId:$scope.planDetail.accountId,
                     consumeId:$scope.consumeId,
