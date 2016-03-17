@@ -208,7 +208,7 @@ var businessTravel=(function(){
                     destinationCode:endplaceval,
                     startAt:starttime,
                     isNeedTraffic:tra,
-                    isNeedHotel:liv,
+                    isNeedHotel:liv
                 }
                 if (endtime) {
                     order.backAt = endtime;
@@ -450,7 +450,7 @@ var businessTravel=(function(){
                         $scope.$apply();
                     })
                     .catch(function(err){
-                        TLDAlert(err.msg || err);
+                        console.info (err);
                     });
             })
         }
@@ -475,7 +475,7 @@ var businessTravel=(function(){
                         $scope.$apply();
                     })
                     .catch(function(err){
-                        TLDAlert(err.msg || err);
+                        console.info (err);
                     });
             })
         }
