@@ -21,7 +21,6 @@ var businesstravel=(function(){
     businesstravel.IndexController = function($scope) {
         $("title").html("我要出差");
         loading(true);
-
         //选择项目
         $scope.selectPurposeName = function () {
             API.onload(function() {

@@ -7,11 +7,12 @@
     <div class="i_detail i_box">
 		<div ng-if="status == 'outTraffic'" class="i_type">
 			<span class="web-icon-font3">&#xe90e;</span>
-			<div class="i_typedetail">{{InvoiceDetail.startPlace}}<em class="out_img"></em>{{InvoiceDetail.arrivalPlace}}</div>
+			<!--<div class="i_typedetail">{{InvoiceDetail.startPlace}}去程{{InvoiceDetail.arrivalPlace}}</div>-->
+			<div class="i_typedetail">{{InvoiceDetail.startPlace}}<span style="position:relative;width: 2.5rem;"><em class="out_img">去程</em></span>{{InvoiceDetail.arrivalPlace}}</div>
 		</div>
 		<div ng-if="status == 'backTraffic'" class="i_type">
 			<span class="web-icon-font3">&#xe90e;</span>
-			<div class="i_typedetail">{{InvoiceDetail.startPlace}}<em class="back_img"></em>{{InvoiceDetail.arrivalPlace}}</div>
+			<div class="i_typedetail">{{InvoiceDetail.startPlace}}<em class="back_img">回程</em>{{InvoiceDetail.arrivalPlace}}</div>
 		</div>
 		<div ng-if="status == 'hotel'" class="i_type">
 		    <span class="web-icon-font3">&#xe914;</span>
