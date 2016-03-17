@@ -257,7 +257,7 @@ var travelplan=(function(){
                         
                         if( $scope.ITEM.outTraffic.length!==0 ){//获取预订去程的机票或火车票的网页的URL
                             var type = "air";
-                            if( $scope.ITEM.outTraffic[0].invoiceType === 0 ){
+                            if( $scope.ITEM.outTraffic[0].invoiceType === 'TRAIN' ){
                                 type = "train";
                             }
                             API.travelBudget.getBookListUrl({
@@ -278,7 +278,7 @@ var travelplan=(function(){
 
                         if( $scope.ITEM.backTraffic.length!==0 ){
                             var type = "air";
-                            if( $scope.ITEM.backTraffic[0].invoiceType === 0 ){
+                            if( $scope.ITEM.backTraffic[0].invoiceType === 'TRAIN' ){
                                 type = "train";
                             }
                             API.travelBudget.getBookListUrl({
