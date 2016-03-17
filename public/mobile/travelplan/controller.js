@@ -46,8 +46,6 @@ var travelplan=(function(){
                 return {page:1,isComplete:false};
             }
         })();
-        console.info(PARAMS);
-        console.info("step 2...");
         
         //-----------------------------------------------------------
         function init(){
@@ -249,6 +247,8 @@ var travelplan=(function(){
                     function( data ){
                         $scope.ITEM = data;
 
+                        console.log( $scope.ITEM );
+
                         if( $scope.ITEM.outTraffic.length!==0 ){//获取预订去程的机票或火车票的网页的URL
                             var type = "air";
                             if( $scope.ITEM.outTraffic[0].invoiceType === 'TRAIN' ){
@@ -375,8 +375,7 @@ var travelplan=(function(){
         $scope.commit = function () {
             if( $scope.ITEM.orderStatus==="WAIT_COMMIT" ){
                 alert("111");
-                console.log( confirm );
-                confirm( '确认提交','返回检查','票据一经提交将无法进行修改，是否确认提交？',function(){console.log("333");} );
+                //alertify.confirm( '确认提交','返回检查','票据一经提交将无法进行修改，是否确认提交？',function(){console.log("333");} );
                 /*
                 API.onload(function() {
                     API.tripPlan.commitTripPlanOrder( $scope.ITEM.id )
@@ -390,6 +389,7 @@ var travelplan=(function(){
                         })
                 })
                 */
+
             };
         }
 
