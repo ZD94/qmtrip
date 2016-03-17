@@ -270,6 +270,7 @@ travelBudget.getBookListUrl = function(params) {
         if(!st || st == "" ){
             throw {code:-1, msg:"出发时间不能为空"};
         }
+        st = moment(st).format('YYYY-MM-DD');
         return Q.all([
                 API.place.getCityInfo(spval),
                 API.place.getCityInfo(epval)
@@ -295,10 +296,14 @@ travelBudget.getBookListUrl = function(params) {
         }
         return API.place.getCityInfo(hotelCity)
         .then(function(result){
-            if(!hotelAddress || hotelAddress == "" ){
-                url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/";
+            if(result){
+                if(!hotelAddress || hotelAddress == "" ){
+                    url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/";
+                }else{
+                    url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/key_"+hotelAddress;
+                }
             }else{
-                url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/key_"+hotelAddress;
+                url = "http://hotel.tianxun.com/domestic/";
             }
             return url;
         })

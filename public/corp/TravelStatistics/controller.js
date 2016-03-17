@@ -185,9 +185,12 @@ var TravelStatistics = (function(){
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
         var initPlanlist = $scope.initPlanlist = function() {
             API.onload(function(){
-                var params = {page:$scope.page,perPage:20};
+                var params = {page:$scope.page||1,perPage:20};
                 if ($scope.purposename != '' && $scope.purposename != undefined) {
                     params.description = {$like: '%'+ $scope.purposename + '%'};
+                }
+                if ($scope.emailOrName != '' && $scope.emailOrName != undefined) {
+                    params.emailOrName = $scope.emailOrName;
                 }
                 if($scope.start_time) {
                     params.startTime = $scope.start_time;
@@ -196,7 +199,6 @@ var TravelStatistics = (function(){
                 if($scope.end_time) {
                     params.endTime = $scope.end_time;
                 }
-
                 console.info(params);
                 API.tripPlan.pageTripPlanOrderByCompany(params)
                     .then(function(list){

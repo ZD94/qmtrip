@@ -27,6 +27,7 @@
     "dnode": "^1.2.2",
     "express": "^4.13.4",
     "formidable": "^1.0.17",
+    "hidpi-canvas": "newclear/hidpi-canvas-polyfill",
     "js-format": "^0.2.0",
     "lodash": "^4.6.1",
     "moment": "^2.11.2",
