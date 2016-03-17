@@ -277,6 +277,8 @@ describe("api/client/tripPlan.js", function() {
                     throw err;
                 }
                 assert.equal(ret.id, newOrderId);
+                console.info(ret.toJSON());
+                console.info(ret.toJSON().hotel[0].toJSON());
                 done();
             })
         });

@@ -8,6 +8,7 @@ var travelplan=(function(){
     API.require('auth');
     API.require('attachment');
     API.require('staff');
+    API.require('travelBudget');
 
     var  travelplan = {};
 
@@ -251,7 +252,69 @@ var travelplan=(function(){
                         //console.log( data );
                         $scope.ITEM = data;
                         console.log( $scope.ITEM );
-                        console.log( $scope.ITEM.outTraffic[0] );
+                        //console.log( $scope.ITEM.outTraffic[0] );
+                        /*
+                        if( $scope.ITEM.outTraffic.length!==0 ){
+                            var type = "air";
+                            if( $scope.ITEM.outTraffic[0].invoiceType === 0 ){
+                                type = "train";
+                            }
+                            API.travelBudget.getBookListUrl({
+                                spval : $scope.ITEM.outTraffic[0].startPlace,
+                                epval : $scope.ITEM.outTraffic[0].arrivalPlace,
+                                st : $scope.ITEM.outTraffic[0].startTime,
+                                type : type
+                            })
+                            .then( function(outTrafficBookListUrl){
+                                $scope.outTrafficBookListUrl = outTrafficBookListUrl;
+                                $scope.$apply();
+                            })
+                            .catch(function(err){
+                                TLDAlert(err.msg || err);
+                            })
+                        }
+                        if(result.backTraffic.length!=0){
+                            var type = "air";
+                            if($scope.backTraffic.invoiceType == 0){
+                                type = "train";
+                            }
+                            API.travelBudget.getBookListUrl({
+                                spval : $scope.backTraffic.startPlace,
+                                epval : $scope.backTraffic.arrivalPlace,
+                                st : $scope.backTraffic.startTime,
+                                type : type
+                            })
+                            .then(function(backTrafficBookListUrl){
+                                $scope.backTrafficBookListUrl = backTrafficBookListUrl;
+                                $scope.$apply();
+                            })
+                            .catch(function(err){
+                                TLDAlert(err.msg || err);
+                            })
+                        }
+                        if(result.hotel.length!=0){
+                            API.travelBudget.getBookListUrl({
+                                hotelCity : $scope.hotel.city,
+                                hotelAddress : $scope.hotel.hotelName,
+                                type : "hotel"
+                            })
+                            .then(function(hotelBookListUrl){
+                                $scope.hotelBookListUrl = hotelBookListUrl;
+                                $scope.$apply();
+                            })
+                            .catch(function(err){
+                                TLDAlert(err.msg || err);
+                            })
+                        }
+
+                        */
+
+
+
+
+
+
+
                         $scope.$apply();
                     }
                 )
@@ -265,29 +328,57 @@ var travelplan=(function(){
             return Math.abs($scope.ITEM.budget-$scope.ITEM.expenditure).toFixed(2);
         }
 
-        $scope.checkInvoice = function(){
-            window.location.href="#/travelplan/invoicedetail?planId="+$scope.ITEM.id+"&status=outTraffic&invoiceId=";
-        }
-
         $scope.renderStatus = function( p ){
 
             if( p ){
-                if( p.budget===-1 ){
+                if( p.orderStatus==="NO_BUDGET" ){
                     return "待出预算";
                 }else
-                if( p.isCommit===false&&p.status===0 ){
+                if( p.orderStatus==="WAIT_UPLOAD" ){
                     return "待上传票据";
                 }else
-                if( p.status===-1 ){
+                if( p.orderStatus==="AUDIT_NOT_PASS" ){
                     return "审核未通过";
                 }else
                 if( p.isCommit===true&&p.status===0 ){
                     return "票据已上传";
                 }else
-                if( p.status===1 ){
+                if( p.orderStatus==="AUDIT_PASS" ){
                     return "已完成";
                 };
             };
+        }
+
+        $scope.renderBUTTON = function(){
+            /*
+            if( ITEM.orderStatus==="WAIT_UPLOAD" ){
+                return "提交审核";
+            }else
+            if( ITEM.orderStatus==="WAIT_AUDIT" ){
+                return "票据审核中";
+            }else{
+            */    
+            return "提交审核";
+        }
+
+        $scope.book = function(){
+
+        }
+
+        $scope.checkInvoice = function( p ){
+            if( p==="outTraffic" ){
+                window.location.href="#/travelplan/invoicedetail?planId="+$scope.ITEM.id+"&status="+p+"&invoiceId="+$scope.ITEM.outTraffic[0].newInvoice;
+            }else
+            if( p==="backTraffic" ){
+                window.location.href="#/travelplan/invoicedetail?planId="+$scope.ITEM.id+"&status="+p+"&invoiceId="+$scope.ITEM.backTraffic[0].newInvoice;
+            }else
+            if( p==="hotel" ){
+                window.location.href="#/travelplan/invoicedetail?planId="+$scope.ITEM.id+"&status="+p+"&invoiceId="+$scope.ITEM.hotel[0].newInvoice;
+            };
+        }
+
+        $scope.commit = function(){
+
         }
 
         function init(){
