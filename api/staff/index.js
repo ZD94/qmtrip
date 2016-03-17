@@ -282,6 +282,9 @@ function getCountByDepartment(params){
 staff.findStaffs = function(params){
     var options = {};
     options.where = _.pick(params, Object.keys(staffModel.attributes));
+    if(params.$or) {
+        options.where.$or = params.$or;
+    }
     if(params.columns){
         options.attributes = params.columns;
     }
