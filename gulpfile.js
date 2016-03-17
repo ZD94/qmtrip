@@ -15,6 +15,7 @@ gulplib.bundle_lib('arale-qrcode', {require:['arale-qrcode']});
 gulplib.bundle_lib('ngapp', './common/client/ngapp.js', {external:['api']});
 gulplib.bundle_lib('bootstrap', {require:["bootstrap"]});
 gulplib.bundle_lib('swiper', {require:['swiper']});
+gulplib.bundle_lib('hidpi-canvas', {require:['hidpi-canvas']});
 gulplib.angular_app('staff');
 gulplib.angular_app('corp');
 gulplib.angular_app('extendfunction');
