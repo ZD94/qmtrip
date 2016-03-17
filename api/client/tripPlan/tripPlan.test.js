@@ -108,7 +108,7 @@ describe("api/client/tripPlan.js", function() {
                     city: '上海市',
                     cityCode: 'SH123',
                     hotelName: '丐帮',
-                    invoiceType: '2',
+                    invoiceType: 'HOTEL',
                     type: 0
                 }]
             }
@@ -140,7 +140,7 @@ describe("api/client/tripPlan.js", function() {
                     city: '上海市',
                     cityCode: 'SH123',
                     hotelName: '丐帮',
-                    invoiceType: 2,
+                    invoiceType: 'HOTEL',
                     type: 0
                 }]
             }
@@ -169,7 +169,7 @@ describe("api/client/tripPlan.js", function() {
                 city: '上海市',
                 cityCode: 'SH123',
                 hotelName: '丐帮',
-                invoiceType: 2,
+                invoiceType: 'HOTEL',
                 type: 0
             }]
         }
@@ -212,7 +212,7 @@ describe("api/client/tripPlan.js", function() {
             consumeDetails: [{
                 startTime: '2016-12-30 11:11:11',
                 budget: 400,
-                invoiceType: 2,
+                invoiceType: 'PLANE',
                 type: 0
             }]
         }
@@ -370,7 +370,7 @@ describe("api/client/tripPlan.js", function() {
                     orderId: newOrderId,
                     type: 0,
                     startTime: '2016-01-10 11:00:00',
-                    invoiceType: 2,
+                    invoiceType: 'HOTEL',
                     budget: 350
                 }
                 API.client.tripPlan.saveConsumeDetail.call(self, detail, function (err, ret) {
