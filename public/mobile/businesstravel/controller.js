@@ -650,6 +650,7 @@ var businesstravel=(function(){
      */
     businesstravel.CreateresultController = function($scope , $routeParams) {
         $("title").html("动态预算结果");
+        $scope.$root.pageTitle = '动态预算结果';
         loading(true);
 
         $scope.purposename = $routeParams.purposename;
@@ -684,12 +685,16 @@ var businesstravel=(function(){
                 ])
                     .spread(function(ret1,ret2) {
                         $('.loading_result').hide();
-                        black_err("预算生成成功");
+                        //black_err("预算生成成功");
                         $scope.onlytraffic = ret2;
                         $scope.totalprice = ret2.price;
                         $scope.goTraffic = ret2.goTraffic.price;
                         $scope.backTraffic = ret2.backTraffic.price;
                         $scope.$apply();
+                        if($scope.totalprice == -1){
+                        }else{
+                            black_err("预算生成成功");
+                        }
                     })
                     .catch(function(err){
                         console.info (err);
@@ -719,11 +724,15 @@ var businesstravel=(function(){
                 ])
                     .spread(function(ret1,ret2) {
                         $('.loading_result').hide();
-                        black_err("预算生成成功");
+                        //black_err("预算生成成功");
                         $scope.onlylive = ret2;
                         $scope.totalprice = ret2.price;
                         $scope.liveprice = $scope.onlylive.price;
                         $scope.$apply();
+                        if($scope.totalprice == -1){
+                        }else{
+                            black_err("预算生成成功");
+                        }
                     })
                     .catch(function(err){
                         console.info (err);
@@ -766,7 +775,7 @@ var businesstravel=(function(){
                 ])
                     .spread(function(ret1,ret2) {
                         $('.loading_result').hide();
-                        black_err("预算生成成功");
+                        console.info(ret2);
                         $scope.trafficlive = ret2;
                         $scope.totalprice = ret2.price;
                         $scope.trafficprice = $scope.trafficlive.traffic;
@@ -774,6 +783,10 @@ var businesstravel=(function(){
                         $scope.goTraffic = ret2.goTraffic.price;
                         $scope.backTraffic = ret2.backTraffic.price;
                         $scope.$apply();
+                        if($scope.totalprice == -1){
+                        }else{
+                            black_err("预算生成成功");
+                        }
                     })
                     .catch(function(err){
                         console.info (err);
