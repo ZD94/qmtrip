@@ -32,17 +32,21 @@ var travelplan=(function(){
 
         var PARAMS = (function(){//API参数：要显示的页数
             if( $routeParams.status ){
-                $scope.STATUS=$routeParams.status;
                 if( $routeParams.status==="待出预算" ){
+                    $scope.STATUS=$routeParams.status;
                     return {page:1,isHasBudget:false};
                 }else if( $routeParams.status==="待上传票据" ){
+                    $scope.STATUS=$routeParams.status;
                     return {page:1,isUpload:false};
                 }else if( $routeParams.status==="审核未通过" ){
+                    $scope.STATUS=$routeParams.status;
                     return {page:1,audit:'N'};
                 }else{
+                    $scope.STATUS="未完成";
                     return {page:1,isComplete:false};
                 };
             }else{
+                $scope.STATUS="未完成";
                 return {page:1,isComplete:false};
             }
         })();
@@ -288,6 +292,9 @@ var travelplan=(function(){
                             API.travelBudget.getBookListUrl({
                                 hotelCity : $scope.ITEM.hotel[0].city,
                                 hotelAddress : $scope.ITEM.hotel[0].hotelName,
+                                from : 'mobile',
+                                hotelSt : $scope.ITEM.hotel[0].startTime,
+                                hotelEt : $scope.ITEM.hotel[0].endTime,
                                 type : 'hotel'
                             })
                             .then( function( r ){
@@ -334,6 +341,13 @@ var travelplan=(function(){
                     return "已完成";
                 };
             };
+        }
+
+        $scope.renderTimeSpan = function(){
+            if( $scope.ITEM!=={} ){
+                var t1=$scope.ITEM.hotel[0].startTime;
+                return t1;
+            }
         }
 
         $scope.renderBUTTON = function(){
