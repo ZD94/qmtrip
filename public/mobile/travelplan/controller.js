@@ -202,6 +202,7 @@ var travelplan=(function(){
                             })
                         */
                         $scope.$apply();
+                        loading(true);
                     }
                 )
                 .catch(function(err){
@@ -261,6 +262,7 @@ var travelplan=(function(){
                         })();
 
                         $scope.$apply();
+                        loading(true);
                     }
                 )
                 .catch(function(err){
@@ -408,7 +410,6 @@ var travelplan=(function(){
 
         function init(){
             $scope.$root.pageTitle = "详细出差记录";
-            loading(true);
             $scope.getData( $routeParams.orderId );
         }
         //----------------------------------------------------------------
@@ -424,8 +425,10 @@ var travelplan=(function(){
      * @constructor
      */
     travelplan.InvoicedetailController = function($scope, $routeParams) {
-        loading(true);
+        
         $("title").html("票据详情");
+        $scope.$root.pageTitle = "票据详情";
+
         var planId = $routeParams.planId;
         $scope.planId = planId;
         $scope.status = $routeParams.status;
@@ -454,15 +457,18 @@ var travelplan=(function(){
                 .then(function(invoiceImg) {
                     $scope.invoiceImg = invoiceImg;
                     $scope.$apply();
+                    loading(true);
                 })
             })
             .catch(function(err){
                 TLDAlert(err.msg || err);
             })
         })
+        
         $scope.goDetail = function () {
             window.location.href = "#/travelplan/plandetail?planId="+planId;
         }
+
     }
 
 
