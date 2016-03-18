@@ -25,18 +25,18 @@
         <li ng-if="tra==1">
             <div class="list_top">
                 <div class="icon web-icon-font3">&#xe90e;</div>
-                <div class="description">{{startPlace}}<span>去程</span>{{endPlace}}</div>
+                <div class="description">{{startPlace}}<span class="arrt"><em class="out_img">去程</em></span>&nbsp;&nbsp;{{endPlace}}</div>
             </div>
             <div class="list_bottom">
                 <div class="time">{{startTime}}出发　<span ng-if="startTimeLate">{{startTimeLate}}前到达</span></div>
                 <div class="money">
                     <span ng-if="liv==0">
-                            <span ng-if="onlytraffic.goTraffic.price!='-1'">¥{{onlytraffic.goTraffic.price}}</span>
-                            <span ng-if="onlytraffic.goTraffic.price=='-1'">此路迢迢<br>暂无预算</span>
+                            <span ng-if="onlytraffic.goTraffic.price!='-1'" class="money_color">¥{{onlytraffic.goTraffic.price}}</span>
+                            <span ng-if="onlytraffic.goTraffic.price=='-1'">暂无<br>暂无预算</span>
                         </span>
                         <span ng-if="liv==1">
-                            <span ng-if="trafficlive.goTraffic.price!='-1'">¥{{trafficlive.goTraffic.price}}</span>
-                            <span ng-if="trafficlive.goTraffic.price=='-1'">此路迢迢<br>暂无预算</span>
+                            <span ng-if="trafficlive.goTraffic.price!='-1'" class="money_color">¥{{trafficlive.goTraffic.price}}</span>
+                            <span ng-if="trafficlive.goTraffic.price=='-1'">暂无<br>暂无预算</span>
                         </span>
                 </div>
             </div>
@@ -44,46 +44,47 @@
         <li ng-if="tra==1 && endTime">
             <div class="list_top">
                 <div class="icon web-icon-font3">&#xe90e;</div>
-                <div class="description">{{endPlace}}<span>回程</span>{{startPlace}}</div>
+                <div class="description">{{endPlace}}<span class="arrt"><em class="out_img">回程</em></span>&nbsp;&nbsp;{{startPlace}}</div>
             </div>
             <div class="list_bottom">
                 <div class="time">{{endTime}}出发　<span ng-if="endTimeLate">{{endTimeLate}}前到达</span></div>
                 <div class="money">
                     <span ng-if="liv==0">
-                            <span ng-if="onlytraffic.backTraffic.price!='-1'">¥{{onlytraffic.backTraffic.price}}</span>
-                            <span ng-if="onlytraffic.backTraffic.price=='-1'">此路迢迢<br>暂无预算</span>
+                            <span ng-if="onlytraffic.backTraffic.price!='-1'" class="money_color">¥{{onlytraffic.backTraffic.price}}</span>
+                            <span ng-if="onlytraffic.backTraffic.price=='-1'">暂无<br>暂无预算</span>
                         </span>
                         <span ng-if="liv==1">
-                            <span ng-if="trafficlive.backTraffic.price!='-1'">¥{{trafficlive.backTraffic.price}}</span>
-                            <span ng-if="trafficlive.backTraffic.price=='-1'">此路迢迢<br>暂无预算</span>
+                            <span ng-if="trafficlive.backTraffic.price!='-1'" class="money_color">¥{{trafficlive.backTraffic.price}}</span>
+                            <span ng-if="trafficlive.backTraffic.price=='-1'">暂无<br>暂无预算</span>
                         </span>
                 </div>
             </div>
         </li>
         <li ng-if="liv==1">
             <div class="list_top">
-                <div class="icon web-icon-font3">&#xe90e;</div>
+                <div class="icon web-icon-font3">&#xe914;</div>
                 <div class="description">{{endPlace}}　{{landmark}}附近</div>
             </div>
             <div class="list_bottom">
                 <div class="time">{{liveTime}}至{{leaveTime}}</div>
                 <div class="money">
                     <span ng-if="tra==0">
-                            <span ng-if="onlylive.price!='-1'">¥{{onlylive.price}}</span>
-                            <span ng-if="onlylive.price=='-1'">此路迢迢<br>暂无预算</span>
+                            <span ng-if="onlylive.price!='-1'" class="money_color">¥{{onlylive.price}}</span>
+                            <span ng-if="onlylive.price=='-1'">暂无<br>暂无预算</span>
                         </span>
                         <span ng-if="tra==1">
-                            <span ng-if="trafficlive.hotel!='-1'">¥{{trafficlive.hotel}}</span>
-                            <span ng-if="trafficlive.hotel=='-1'">此路迢迢<br>暂无预算</span>
+                            <span ng-if="trafficlive.hotel!='-1'" class="money_color">¥{{trafficlive.hotel}}</span>
+                            <span ng-if="trafficlive.hotel=='-1'">暂无<br>暂无预算</span>
                         </span>
                 </div>
             </div>
         </li>
     </ul>
-    <div class="w90 margin_c">温馨提示：点击生成出差记录，生成成功后企业管理员将会受到通知</div>
+    <div class="w90 margin_c" ng-if="onlytraffic.price!='-1'&&onlylive.price!='-1'&&trafficlive.price!='-1'">温馨提示：点击生成出差记录，生成成功后企业管理员将会受到通知</div>
+    <div class="w90 margin_c" ng-if="onlytraffic.price=='-1' || onlylive.price=='-1' || trafficlive.price=='-1'">温馨提示：点击生成出差记录，客服会尽快确认预算，确认后您和企业管理员都会立刻收到邮件通知。</div>
     <div class="w100 button_fix">
-        <a class="common_btn3 w50" ng-click="prevStep()" style="float: left;">返回上一步</a>
-        <a class="common_btn1 w50" ng-click="createRecord()" style="float: right;">生成出差记录</a>
+        <a class="common_btn3 w50" ng-click="prevStep()" style="float: left;">返回修改</a>
+        <a class="common_btn1 w50" ng-click="createRecord()" style="float: right;">生成预算单</a>
     </div>
 </div>
 
