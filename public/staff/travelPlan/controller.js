@@ -35,6 +35,7 @@ var travelPlan=(function(){
                         $scope.total1 = result.total;
                         $scope.planListitems = result.items;
                         loading(true);
+                        console.info ($scope.total1);
                         $scope.$apply();
                     })
                     .catch(function(err){

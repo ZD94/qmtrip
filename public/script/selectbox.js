@@ -130,6 +130,16 @@ function selectPage (options) {
 									}
 									else if (data.length!=0) {
 										$('.select_page .result_none,.select_page .appendclass,.select_page dt,.select_page dd').remove();
+										var strr = "";
+										if (isAllowAdd == true) {
+											if (val.length>8) {
+												strr += "<dd class='appendclass'><span>+</span> 将&quot;"+val.substring(0,5)+"....."+val.substring(val.length-4)+"&quot;添加为出差目的</dd>";
+											}
+											else {
+												strr += "<dd class='appendclass'><span>+</span> 将&quot;"+val+"&quot;添加为出差目的</dd>";
+											}
+										}
+										$('.select_page').append(strr);
 										appendData(data);
 										var key, id;
 										$('.select_page dd').click(function () {
@@ -151,7 +161,7 @@ function selectPage (options) {
 		$('.select_page').remove();
 		var str = "";
 		str += "<dl class='select_page'>";
-		str += "<div class='select_input'><input type='text' class='common_text w85 select_input1' style='float: left;' placeholder="+options.placeholder+" id='select-box-search-input'><div class='web-icon-font xiaocha'>&#xf057;</div><div class='w15 cancelBtn' style='float: right;'>取消</div></div>";
+		str += "<div class='select_input'><div class='common_text w85 select_input1' style='float: left;'><input type='text' placeholder='"+options.placeholder+"' class='hidden_input' id='select-box-search-input'><div class='web-icon-font xiaocha'>&#xf057;</div></div><div class='w15 cancelBtn' style='float: right;'>取消</div></div>";
 		str += "<dt>"+options.title+"</dt>";
 		str += "<div id='select-box-data'></div>";
 		str += "</dl>";

@@ -777,7 +777,6 @@ var businesstravel=(function(){
                         $scope.liveprice = $scope.trafficlive.hotel;
                         $scope.goTraffic = ret2.goTraffic.price;
                         $scope.backTraffic = ret2.backTraffic.price;
-                        alert ($scope.liveprice);
                         $scope.$apply();
                     })
                     .catch(function(err){

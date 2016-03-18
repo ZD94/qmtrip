@@ -89,20 +89,20 @@ module.exports = (function() {
             window.location.href = "#/businesstravel/index";
         }
 
-        $scope.go_planlist = function() {
-            window.location.href = "#/travelplan/planlist";
+        $scope.go_planlist = function() {//跳转到“出差记录列表页”。状态为“未完成”。
+            window.location.href = "#/travelplan/planlist?status="+"DEFAULT";
         }
 
         $scope.go_budget = function() {
-            window.location.href = "#/travelplan/planlist?status="+"待出预算";
+            window.location.href = "#/travelplan/planlist?status="+"NO_BUDGET";
         }
 
         $scope.go_invoice = function() {
-            window.location.href = "#/travelplan/planlist?status="+"待上传票据";
+            window.location.href = "#/travelplan/planlist?status="+"WAIT_UPLOAD";
         }
 
         $scope.go_unpass = function() {
-            window.location.href = "#/travelplan/planlist?status="+"审核未通过";
+            window.location.href = "#/travelplan/planlist?status="+"AUDIT_NOT_PASS";
         }
 
         $scope.go_travelstandard = function () {

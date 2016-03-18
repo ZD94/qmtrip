@@ -183,17 +183,25 @@
 
 
 
-<section class="confirmFixed" style="display: block;">
+<section class="confirmFixed" style="display: none;">
 	<div class="confirmbox">
 		<div class="confirmbox_t">
 			<span style="float: left;">提示</span>
 			<span ng-click="confirmClose()" style="float: right;"><img src="agency/images/close.jpg"></span>
 		</div>
 		<div class="confirmbox_p">
-			<div class="messageText" style="height: 30px; line-height: 30px; text-align: center; padding: 20px;">亲，优先设置公司差旅标准和组织架构哦！</div>
-			<div style="margin-top: 10px;">
+			<div class="messageText showall" style="height: 30px; line-height: 30px; text-align: center; padding: 20px; display: none;">亲，优先设置公司差旅标准和组织架构哦！</div>
+			<div class="messageText show1" style="height: 30px; line-height: 30px; text-align: center; padding: 20px; display: none;">亲，优先设置公司组织架构哦！</div>
+			<div class="messageText show2" style="height: 30px; line-height: 30px; text-align: center; padding: 20px; display: none;">亲，优先设置公司差旅标准哦！</div>
+			<div class="showall" style="margin-top: 10px; display: none;">
 				<input type="button" value="设置组织架构" ng-click="goDepartment()" class="common_btn1" style="width: 120px; margin-left: 50px;">
 				<input type="button" value="设置差旅标准" ng-click="goPolicyList()" class="common_btn1" style="width: 120px; margin-left: 20px;">
+			</div>
+			<div class="show1" style="margin-top: 10px; display: none;">
+				<input type="button" value="设置组织架构" ng-click="goDepartment()" class="common_btn1" style="width: 120px; margin-left: 120px;">
+			</div>
+			<div class="show2" style="margin-top: 10px; display: none;">
+				<input type="button" value="设置差旅标准" ng-click="goPolicyList()" class="common_btn1" style="width: 120px; margin-left: 120px;">
 			</div>
 		</div>
 	</div>
