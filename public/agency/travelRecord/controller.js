@@ -428,6 +428,7 @@ var travelRecord=(function(){
             }
             $('.error').empty();
             $(".expenditure").val("");
+            $(".remark").val("");
             $(".invoiceNoPass").show();
         }
 
