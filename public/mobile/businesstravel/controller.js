@@ -691,10 +691,7 @@ var businesstravel=(function(){
                         $scope.goTraffic = ret2.goTraffic.price;
                         $scope.backTraffic = ret2.backTraffic.price;
                         $scope.$apply();
-                        if($scope.totalprice == -1){
-                        }else{
-                            black_err("预算生成成功");
-                        }
+
                     })
                     .catch(function(err){
                         console.info (err);
@@ -729,10 +726,6 @@ var businesstravel=(function(){
                         $scope.totalprice = ret2.price;
                         $scope.liveprice = $scope.onlylive.price;
                         $scope.$apply();
-                        if($scope.totalprice == -1){
-                        }else{
-                            black_err("预算生成成功");
-                        }
                     })
                     .catch(function(err){
                         console.info (err);
@@ -783,10 +776,6 @@ var businesstravel=(function(){
                         $scope.goTraffic = ret2.goTraffic.price;
                         $scope.backTraffic = ret2.backTraffic.price;
                         $scope.$apply();
-                        if($scope.totalprice == -1){
-                        }else{
-                            black_err("预算生成成功");
-                        }
                     })
                     .catch(function(err){
                         console.info (err);
