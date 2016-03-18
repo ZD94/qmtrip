@@ -72,7 +72,7 @@
             <div class="list_bottom">
                 <div class="status" ng-class="{true:'rejected'}[ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS']">{{renderStatus( ITEM.outTraffic[0],$index )}}</div>
                 <div class="buttons" ng-if="  ITEM.outTraffic[0].orderStatus!=='NO_BUDGET'  ">
-                    <a class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'outTraffic' )">预订</a>
+                    <a class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'outTraffic' )" ng-hide="ITEM.outTraffic[0].invoiceType==='TRAIN'">预订</a>
                     <a class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">上传票据</a>
                     <a class="BTN" ng-if="  
                         ITEM.outTraffic[0].orderStatus==='WAIT_COMMIT'||
@@ -119,7 +119,7 @@
             <div class="list_bottom">
                 <div class="status" ng-class="{true:'rejected'}[ITEM.backTraffic[0].orderStatus==='AUDIT_NOT_PASS']">{{renderStatus( ITEM.backTraffic[0] )}}</div>
                 <div class="buttons" ng-if="ITEM.backTraffic[0].budget!==-1">
-                    <a class="BTN" ng-if="  ITEM.backTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'backTraffic' )">预订</a>
+                    <a class="BTN" ng-if="  ITEM.backTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'backTraffic' )" ng-hide="ITEM.backTraffic[0].invoiceType==='TRAIN'">预订</a>
                     <a class="BTN" ng-if="  ITEM.backTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">上传票据</a>
                     <a class="BTN" ng-if="  
                         ITEM.backTraffic[0].orderStatus==='WAIT_COMMIT'||
@@ -143,7 +143,7 @@
                         </span>
                     </p>
                     <p class="time">
-                        <span>{{ITEM.hotel[0].startTime | date:"yyyy-MM-dd"}}至{{ITEM.hotel[0].endTime | date:"yyyy-MM-dd"}}（共N晚）</span>
+                        <span>{{ITEM.hotel[0].startTime | date:"yyyy-MM-dd"}}至{{ITEM.hotel[0].endTime | date:"yyyy-MM-dd"}}（共{{timeSpan}}晚）</span>
                     </p>
                 </div>
                 <div class="top_right">
@@ -162,7 +162,7 @@
             <div class="list_bottom">
                 <div class="status" ng-class="{true:'rejected'}[ITEM.hotel[0].orderStatus==='AUDIT_NOT_PASS']">{{renderStatus( ITEM.hotel[0] )}}</div>
                 <div class="buttons" ng-if="  ITEM.hotel[0].budget!==-1  ">
-                    <a class="BTN" ng-if="  ITEM.hotel[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'hotel' )">预订</a>
+                    <a class="BTN" ng-if="  ITEM.hotel[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'hotel' )" ng-hide="ITEM.hotel[0].invoiceType==='TRAIN'">预订</a>
                     <a class="BTN" ng-if="  ITEM.hotel[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">上传票据</a>
                     <a class="BTN" ng-if="  
                         ITEM.hotel[0].orderStatus==='WAIT_COMMIT'||

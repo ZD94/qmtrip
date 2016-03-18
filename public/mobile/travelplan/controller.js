@@ -32,17 +32,21 @@ var travelplan=(function(){
 
         var PARAMS = (function(){//API参数：要显示的页数
             if( $routeParams.status ){
-                $scope.STATUS=$routeParams.status;
                 if( $routeParams.status==="待出预算" ){
+                    $scope.STATUS=$routeParams.status;
                     return {page:1,isHasBudget:false};
                 }else if( $routeParams.status==="待上传票据" ){
+                    $scope.STATUS=$routeParams.status;
                     return {page:1,isUpload:false};
                 }else if( $routeParams.status==="审核未通过" ){
+                    $scope.STATUS=$routeParams.status;
                     return {page:1,audit:'N'};
                 }else{
+                    $scope.STATUS="未完成";
                     return {page:1,isComplete:false};
                 };
             }else{
+                $scope.STATUS="未完成";
                 return {page:1,isComplete:false};
             }
         })();
@@ -231,6 +235,7 @@ var travelplan=(function(){
 
         $scope.ITEM={};
         $scope.URL={};
+        $scope.timeSpan;//入住酒店的天数
         //---------------------------------------------
         $scope.getData = function( p ){
 
@@ -241,8 +246,20 @@ var travelplan=(function(){
                 .then(
                     function( data ){
                         $scope.ITEM = data;
-
                         console.log( $scope.ITEM );
+                        
+                        $scope.timeSpan = (function(){
+                            if( $scope.ITEM.hotel[0] ){
+                                var t1=$scope.ITEM.hotel[0].startTime;
+                                var t2=$scope.ITEM.hotel[0].endTime;
+                                t1 = new Date(t1).getTime();
+                                t2 = new Date(t2).getTime();
+                                var timeSpan=(t2-t1)/1000/60/60/24;
+                                console.log(t1,t2,timeSpan);
+                                return timeSpan;
+                            };
+                        })();
+                        
 
                         if( $scope.ITEM.outTraffic.length!==0 ){//获取预订去程的机票或火车票的网页的URL
                             var type = "air";
@@ -288,6 +305,9 @@ var travelplan=(function(){
                             API.travelBudget.getBookListUrl({
                                 hotelCity : $scope.ITEM.hotel[0].city,
                                 hotelAddress : $scope.ITEM.hotel[0].hotelName,
+                                from : 'mobile',
+                                hotelSt : $scope.ITEM.hotel[0].startTime,
+                                hotelEt : $scope.ITEM.hotel[0].endTime,
                                 type : 'hotel'
                             })
                             .then( function( r ){
@@ -392,6 +412,7 @@ var travelplan=(function(){
             $scope.$root.pageTitle = "详细出差记录";
             loading(true);
             $scope.getData( $routeParams.orderId );
+            //$scope.renderTimeSpan();
         }
         //----------------------------------------------------------------
         init();
