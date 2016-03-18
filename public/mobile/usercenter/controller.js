@@ -93,7 +93,7 @@ module.exports = (function() {
         }
 
         $scope.go_budget = function() {
-            window.location.href = "#/travelplan/planlist?status="+"NO_BUDGET";
+            window.location.href = "#/travelplan/planlist?status="+"WAIT";
         }
 
         $scope.go_invoice = function() {
@@ -101,7 +101,7 @@ module.exports = (function() {
         }
 
         $scope.go_unpass = function() {
-            window.location.href = "#/travelplan/planlist?status="+"AUDIT_NOT_PASS";
+            window.location.href = "#/travelplan/planlist?status="+"REJECT";
         }
 
         $scope.go_travelstandard = function () {
