@@ -22,7 +22,7 @@
                 <input type="button" value="预算单搜索" class="common_btn1" ng-click="searchKeyword()" style="width: 120px; margin: 19px 0 0 20px;">
             </div>
             <div class="content">
-                <table style="width: 100%">
+                <table style="width: 100%" ng-if="total1!=0">
                     <tr>
                         <th align="center">出发时间</th>
                         <th align="center">服务</th>
@@ -75,13 +75,17 @@
                     </tr>
                 </table>
                 <!--<input type="button" value="删除" ng-click="deletePlan()">-->
+                <div class="content_none" ng-if="total1==0">
+                    <span class="web-icon-font">&#xf06a; </span>暂无内容
+                </div>
             </div>
+
         </div>
         <ul class="pagination" id="pagination1"></ul>
 
         <div class="mainbox_bottom" style="display: none;">
             <div class="content">
-                <table style="width: 100%">
+                <table style="width: 100%" ng-if="total2!=0">
                     <tr>
                         <th align="center">出发时间</th>
                         <th align="center">服务</th>
@@ -134,13 +138,16 @@
                     </tr>
                 </table>
                 <!--<input type="button" value="删除" ng-click="deletePlan()">-->
+                <div class="content_none" ng-if="total2==0">
+                    <span class="web-icon-font">&#xf06a; </span>暂无内容
+                </div>
             </div>
         </div>
         <ul class="pagination" id="pagination2" style="display: none;"></ul>
 
         <div class="mainbox_bottom" style="display: none;">
             <div class="content">
-                <table style="width: 100%">
+                <table style="width: 100%" ng-if="total3!=0">
                     <tr>
                         <th align="center">出发时间</th>
                         <th align="center">服务</th>
@@ -193,13 +200,16 @@
                     </tr>
                 </table>
                 <!--<input type="button" value="删除" ng-click="deletePlan()">-->
+                <div class="content_none" ng-if="total3==0">
+                    <span class="web-icon-font">&#xf06a; </span>暂无内容
+                </div>
             </div>
         </div>
         <ul class="pagination" id="pagination3" style="display: none;"></ul>
 
         <div class="mainbox_bottom" style="display: none;">
             <div class="content">
-                <table style="width: 100%">
+                <table style="width: 100%" ng-if="total4!=0">
                     <tr>
                         <th align="center">出发时间</th>
                         <th align="center">服务</th>
@@ -231,6 +241,9 @@
                         <td width="120" align="center"><span class="web-icon-font2" style="color: #C19943;">&#xe967;</span>&nbsp;{{item.score}}</td>
                     </tr>
                 </table>
+                <div class="content_none" ng-if="total4==0">
+                    <span class="web-icon-font">&#xf06a; </span>暂无内容
+                </div>
             </div>
         </div>
         <ul class="pagination" id="pagination4" style="display: none;"></ul>
