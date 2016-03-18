@@ -21,7 +21,7 @@
 	</div>
 	<div class="i_box">
 		<span class="time_font" ng-if="status == 'backTraffic' || status == 'outTraffic'">{{InvoiceDetail.startTime | date:"yyyy-MM-dd"}}出发</span>
-		<span class="time_font" ng-if="status == 'hotel'">{{InvoiceDetail.startTime | date:"yyyy-MM-dd"}} 至 {{InvoiceDetail.endTime | date:"yyyy-MM-dd"}}(共{{(InvoiceDetail.endTime | date:"dd")-(InvoiceDetail.startTime | date:"dd")+1}}晚)</span>
+		<span class="time_font" ng-if="status == 'hotel'">{{InvoiceDetail.startTime | date:"yyyy-MM-dd"}} 至 {{InvoiceDetail.endTime | date:"yyyy-MM-dd"}}(共{{(InvoiceDetail.endTime | date:"dd")-(InvoiceDetail.startTime | date:"dd")}}晚)</span>
 	</div>
 
 	<div class="i_box"><span class="time_font">上传时间:{{InvoiceDetail.invoice[InvoiceDetail.invoice.length-1].create_at}}</span>
