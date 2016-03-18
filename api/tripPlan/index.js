@@ -298,6 +298,7 @@ function updateConsumeDetail(params){
 
 tripPlan.updateConsumeBudget = updateConsumeBudget;
 updateConsumeBudget.required_params = ['id', 'budget', 'userId'];
+updateConsumeBudget.optional_params = ['invoiceType'];
 function updateConsumeBudget(params){
     var id = params.id;
 
@@ -323,12 +324,6 @@ function updateConsumeBudget(params){
             }
 
             var budget = params.budget;
-            //var c_budget = 0;
-            //if(o_budget > 0) {
-            //    c_budget = parseFloat(order.budget) - parseFloat(o_budget) + parseFloat(budget);
-            //} else {
-            //    c_budget = parseFloat(order.budget) + parseFloat(budget)
-            //}
 
             var logs = {
                 orderId: order.id,
@@ -337,10 +332,18 @@ function updateConsumeBudget(params){
                 createAt: utils.now()
             }
 
+            var updates = {
+                budget: budget,
+                updateAt: utils.now()
+            }
+
+            if(params.invoiceType) {
+                updates.invoiceType = params.invoiceType;
+            }
             return sequelize.transaction(function(t){
                 return Promise.all([
                     order.id,
-                    ConsumeDetails.update({budget: budget, updateAt: utils.now()}, {where: {id: id}, fields: ['budget', 'updateAt'], transaction: t}),
+                    ConsumeDetails.update(updates, {where: {id: id}, transaction: t}),
                     TripOrderLogs.create(logs, {transaction: t})
                 ])
             })
