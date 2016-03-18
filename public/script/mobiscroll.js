@@ -880,7 +880,7 @@
         },
         defaults = {
             // Options
-            width: 70,
+            width: 110,
             height: 40,
             rows: 3,
             delay: 300,
