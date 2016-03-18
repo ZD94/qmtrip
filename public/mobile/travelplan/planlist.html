@@ -28,8 +28,11 @@
                         <span class="journey">
                             <span ng-if="item.startPlace">{{item.startPlace}}——</span><span>{{item.destination}}</span>
                         </span>
-                        <span class="icon web-icon-font3" ng-show="item.outTraffic.length===1">&#xe90e;</span>
-                        <span class="icon web-icon-font3" ng-show="item.hotel.length===1">&#xe914;</span>
+                        <span ng-if=" item.outTraffic.length!==0 ">
+                            <span class="icon web-icon-font3" ng-if=" item.outTraffic.invoiceType==='TRAIN'||item.orderStatus==='NO_BUDGET' ">&#xe911;</span><!--火车图标-->
+                            <span class="icon web-icon-font3" ng-if=" item.outTraffic.invoiceType==='PLANE'||item.orderStatus!=='NO_BUDGET' ">&#xe90e;</span><!--飞机图标-->
+                        </span>
+                        <span class="icon web-icon-font3" ng-if=" item.hotel.length===1 ">&#xe914;</span><!--酒店图标-->
                     </div>
                     <div class="bottom">
                         <p>

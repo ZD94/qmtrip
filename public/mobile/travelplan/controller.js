@@ -32,15 +32,18 @@ var travelplan=(function(){
 
         var PARAMS = (function(){//API参数：要显示的页数
             if( $routeParams.status ){
-                if( $routeParams.status==="待出预算" ){
-                    $scope.STATUS=$routeParams.status;
+                if( $routeParams.status==="NO_BUDGET" ){
+                    $scope.STATUS="待出预算";
                     return {page:1,isHasBudget:false};
-                }else if( $routeParams.status==="待上传票据" ){
-                    $scope.STATUS=$routeParams.status;
+                }else if( $routeParams.status==="WAIT_UPLOAD" ){
+                    $scope.STATUS="待上传票据";
                     return {page:1,isUpload:false};
-                }else if( $routeParams.status==="审核未通过" ){
-                    $scope.STATUS=$routeParams.status;
+                }else if( $routeParams.status==="AUDIT_NOT_PASS" ){
+                    $scope.STATUS="审核未通过";
                     return {page:1,audit:'N'};
+                }else if( $routeParams.status==="DEFAULT" ){
+                    $scope.STATUS="未完成";
+                    return {page:1,isComplete:false};
                 }else{
                     $scope.STATUS="未完成";
                     return {page:1,isComplete:false};
@@ -163,6 +166,8 @@ var travelplan=(function(){
                         $scope.items = $scope.items.concat(list.items);
                         $scope.total = list.total;
                         p.page++;
+
+                        console.log( $scope.items );
 
                         if( list.total===0 ){
                             $scope.tips='<p class="noRecord">没有出差记录</p><p class="seeOtherRecords">点击状态切换查看其他记录！</p>';
