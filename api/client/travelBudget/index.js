@@ -238,7 +238,7 @@ travelBudget.getBookUrl = function(params) {
 }
 
 /**
- *@method
+ *@method getBookListUrl
  * 得到飞机 火车 酒店预订列表链接
  * @param params
  * @param params.spval  出发城市id或出发地名称
@@ -247,6 +247,9 @@ travelBudget.getBookUrl = function(params) {
  * @param params.hotelCity   订酒店城市
  * @param params.hotelAddress  酒店所在商圈
  * @param params.type 类型 air (飞机) train（火车） hotel（酒店）
+ * @param params.from 设备 computer (电脑) mobile（手机）
+ * @param params.hotelSt 住宿开始时间
+ * @param params.hotelEt 住宿结束时间
  * @returns {*}
  */
 travelBudget.getBookListUrl = function(params) {
@@ -256,6 +259,9 @@ travelBudget.getBookListUrl = function(params) {
         hotelCity = params.hotelCity,
         hotelAddress = params.hotelAddress,
         type = params.type,
+        from = params.from,
+        hotelSt = params.hotelSt,
+        hotelEt = params.hotelEt,
         url = "";
     if(!type || type == "" ){
         throw {code:-1, msg:"类型不能为空"};
@@ -304,10 +310,16 @@ travelBudget.getBookListUrl = function(params) {
         return API.place.getCityInfo(hotelCity)
         .then(function(result){
             if(result){
-                if(!hotelAddress || hotelAddress == "" ){
-                    url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/";
+                hotelSt = moment(hotelSt).format('YYYY-MM-DD');
+                hotelEt = moment(hotelEt).format('YYYY-MM-DD');
+                if(from == "computer"){
+                    if(!hotelAddress || hotelAddress == "" ){
+                        url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/";
+                    }else{
+                        url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/key_"+hotelAddress;
+                    }
                 }else{
-                    url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/key_"+hotelAddress;
+                    url = "http://m.tianxun.com/hotel/domestic/"+result.pinyin+"/?hotelDate1="+hotelSt+"&hotelDate2="+hotelEt;
                 }
             }else{
                 url = "http://hotel.tianxun.com/?_ga=1.18929464.1095670645.1456827902";
