@@ -50,7 +50,6 @@ var travelplan=(function(){
         }
         $scope.STATUS = STATUS_STORES[statue];
 
-
         //-----------------------------------------------------------
         function init(){
             //页面上的所有交互All interacitve actions on this page
@@ -163,6 +162,8 @@ var travelplan=(function(){
                         $scope.items = $scope.items.concat(list.items);
                         $scope.total = list.total;
                         p.page++;
+
+                        console.log( $scope.items );
 
                         if( list.total===0 ){
                             $scope.tips='<p class="noRecord">没有出差记录</p><p class="seeOtherRecords">点击状态切换查看其他记录！</p>';
