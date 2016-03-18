@@ -249,13 +249,15 @@ var travelplan=(function(){
                         console.log( $scope.ITEM );
                         
                         $scope.timeSpan = (function(){
-                            var t1=$scope.ITEM.hotel[0].startTime;
-                            var t2=$scope.ITEM.hotel[0].endTime;
-                            t1 = new Date(t1).getTime();
-                            t2 = new Date(t2).getTime();
-                            var timeSpan=(t2-t1)/1000/60/60/24;
-                            console.log(t1,t2,timeSpan);
-                            return timeSpan;
+                            if( $scope.ITEM.hotel[0] ){
+                                var t1=$scope.ITEM.hotel[0].startTime;
+                                var t2=$scope.ITEM.hotel[0].endTime;
+                                t1 = new Date(t1).getTime();
+                                t2 = new Date(t2).getTime();
+                                var timeSpan=(t2-t1)/1000/60/60/24;
+                                console.log(t1,t2,timeSpan);
+                                return timeSpan;
+                            };
                         })();
                         
 

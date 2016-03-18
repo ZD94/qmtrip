@@ -57,7 +57,7 @@
                         <span ng-if="!planDetail.expenditure" style="color:#A4A4A4;">暂无</span>
                         <span ng-if="planDetail.expenditure">
                             <span ng-if="planDetail.budget-planDetail.expenditure>0">¥{{(planDetail.budget-planDetail.expenditure).toFixed(2)}}</span>
-                            <span ng-if="planDetail.budget-planDetail.expenditure<=0">0</span>
+                            <span ng-if="planDetail.budget-planDetail.expenditure<=0">￥0.00</span>
                         </span>
                     </dd>
                 </dl>
@@ -66,7 +66,7 @@
                     <dd>
                         <span ng-if="planDetail.auditStatus==1">
                             <span ng-if="planDetail.score!=0"><span class="web-icon-font2" style="color: #C19943;">&#xe967;</span>&nbsp;{{planDetail.score}}</span>
-                            <span ng-if="planDetail.score==0">0</span>
+                            <span ng-if="planDetail.score==0"><span class="web-icon-font2" style="color: #C19943;">&#xe967;</span>&nbsp;0</span>
                         </span>
                         <span ng-if="planDetail.auditStatus==0" style="color:#A4A4A4;">暂无</span>
                     </dd>
