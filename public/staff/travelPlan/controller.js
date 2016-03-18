@@ -283,6 +283,9 @@ var travelPlan=(function(){
                             API.travelBudget.getBookListUrl({
                                 hotelCity : $scope.hotel.city,
                                 hotelAddress : $scope.hotel.hotelName,
+                                from : "computer",
+                                hotelSt : $scope.hotel.startTime,
+                                hotelEt : $scope.hotel.endTime,
                                 type : "hotel"
                             })
                             .then(function(hotelBookListUrl){
