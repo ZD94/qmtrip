@@ -6,30 +6,15 @@ var UsersFirst = (function(){
 	API.require("staff");
 	API.require("travelPolicy");
 	API.require("tripPlan");
+	API.require("department");
 	var UsersFirst ={};
 	UsersFirst.UserMainController = function($scope, $routeParams){
 		$("title").html("差旅管理首页");
 		$(".left_nav li").removeClass("on").eq(0).addClass("on");
 		$scope.funds={};
 
-		//判断是否第一次登录
-		var logintime = $routeParams.logintime;
-		if (logintime=='true') {
-			$(".confirmFixed").show();
-		}
-		else {
-			$(".confirmFixed").hide();
-		}
-		$scope.goDepartment = function () {
-			window.location.href = "#/StaffManage/Department";
-		}
-		$scope.goPolicyList = function () {
-			window.location.href = "#/TravelPolicy/PolicyList";
-		}
-		//关闭弹窗
-		$scope.confirmClose = function () {
-			$(".confirmFixed").hide();
-		}
+
+
 
 
 		//企业管理首页信息
@@ -41,6 +26,7 @@ var UsersFirst = (function(){
 						var travelLevel = staff.travelLevel;
 						var start = moment().startOf('Month').format('YYYY-MM-DD 00:00:00');
 						var end = moment().endOf('Month').format('YYYY-MM-DD 23:59:59');
+						$scope.companyId = company_id;
 						Q.all([
 							API.company.getCompanyFundsAccount(),
 							API.staff.statisticStaffs({companyId:company_id}),
@@ -77,6 +63,51 @@ var UsersFirst = (function(){
 			})
 		}
 		$scope.initCorpMain();
+
+		API.onload(function(){
+			Q.all([
+				API.travelPolicy.listAndPaginateTravelPolicy({}),
+				API.department.getFirstClassDepartments({companyId:$scope.companyId})
+			])
+				.spread(function(ret1,ret2){
+					console.info(ret1);
+					console.info(ret2);
+					$scope.departmentId = ret2[0].id;
+					API.department.getChildDepartments({parentId:$scope.departmentId})
+						.then(function(result){
+							if (ret1.total==0 || (ret2[0].name=="我的企业" && result.length==0)) {
+								$(".confirmFixed").show();
+							}
+							if (ret1.total==0 && (ret2[0].name=="我的企业" && result.length==0)) {
+								$(".showall").show();
+							}
+							if (ret1.total==0 && (ret2[0].name!="我的企业" || result.length!=0)) {
+								$(".show2").show();
+							}
+							if (ret1.total!=0 && (ret2[0].name=="我的企业" && result.length==0)) {
+								$(".show1").show();
+							}
+						})
+				})
+		})
+
+		$scope.goDepartment = function () {
+			window.location.href = "#/StaffManage/Department";
+		}
+		$scope.goPolicyList = function () {
+			window.location.href = "#/TravelPolicy/PolicyList";
+		}
+		//关闭弹窗
+		$scope.confirmClose = function () {
+			$(".confirmFixed").hide();
+		}
+
+
+
+
+
+
+
 		$scope.initCharts = function(first,second,third){
 			var myChart = window.echarts.init(document.getElementById('charts')); 
 			var saving = (second-third).toFixed(2);
