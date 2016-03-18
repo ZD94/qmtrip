@@ -151,7 +151,7 @@ function selectPage (options) {
 		$('.select_page').remove();
 		var str = "";
 		str += "<dl class='select_page'>";
-		str += "<div class='select_input'><input type='text' class='common_text w85 select_input1' style='float: left;' placeholder="+options.placeholder+" id='select-box-search-input'><span class='web-icon-font xiaocha'>&#xf057;</span><div class='w15 cancelBtn' style='float: right;'>取消</div></div>";
+		str += "<div class='select_input'><input type='text' class='common_text w85 select_input1' style='float: left;' placeholder="+options.placeholder+" id='select-box-search-input'><div class='web-icon-font xiaocha'>&#xf057;</div><div class='w15 cancelBtn' style='float: right;'>取消</div></div>";
 		str += "<dt>"+options.title+"</dt>";
 		str += "<div id='select-box-data'></div>";
 		str += "</dl>";
