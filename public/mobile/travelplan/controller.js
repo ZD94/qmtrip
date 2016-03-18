@@ -235,6 +235,7 @@ var travelplan=(function(){
 
         $scope.ITEM={};
         $scope.URL={};
+        $scope.timeSpan;//入住酒店的天数
         //---------------------------------------------
         $scope.getData = function( p ){
 
@@ -245,8 +246,18 @@ var travelplan=(function(){
                 .then(
                     function( data ){
                         $scope.ITEM = data;
-
                         console.log( $scope.ITEM );
+                        
+                        $scope.timeSpan = (function(){
+                            var t1=$scope.ITEM.hotel[0].startTime;
+                            var t2=$scope.ITEM.hotel[0].endTime;
+                            t1 = new Date(t1).getTime();
+                            t2 = new Date(t2).getTime();
+                            var timeSpan=(t2-t1)/1000/60/60/24;
+                            console.log(t1,t2,timeSpan);
+                            return timeSpan;
+                        })();
+                        
 
                         if( $scope.ITEM.outTraffic.length!==0 ){//获取预订去程的机票或火车票的网页的URL
                             var type = "air";
@@ -343,13 +354,6 @@ var travelplan=(function(){
             };
         }
 
-        $scope.renderTimeSpan = function(){
-            if( $scope.ITEM!=={} ){
-                var t1=$scope.ITEM.hotel[0].startTime;
-                return t1;
-            }
-        }
-
         $scope.renderBUTTON = function(){
 
             if( $scope.ITEM.orderStatus==="WAIT_AUDIT" ){
@@ -406,6 +410,7 @@ var travelplan=(function(){
             $scope.$root.pageTitle = "详细出差记录";
             loading(true);
             $scope.getData( $routeParams.orderId );
+            //$scope.renderTimeSpan();
         }
         //----------------------------------------------------------------
         init();
