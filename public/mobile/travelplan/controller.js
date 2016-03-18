@@ -20,6 +20,7 @@ var travelplan=(function(){
     //alert("no error");
     //["未完成","待出预算","待上传票据","票据审核中","审核未通过","已完成"]
     travelplan.PlanlistController = function($scope,$routeParams) {
+        changeTitle('出差记录',$scope);
         $scope.STATUS="未完成";//当前状态
         $scope.statuses=["未完成","待出预算","待上传票据","票据审核中","审核未通过","已完成"];
         $scope.ORDER="默认";//当前排序
@@ -234,7 +235,7 @@ var travelplan=(function(){
      * @constructor
      */
     travelplan.PlandetailController = function($scope, $routeParams) {
-
+        changeTitle('详细出差记录',$scope);
         $scope.ITEM={};
         $scope.URL={};
         $scope.timeSpan;//入住酒店的天数
@@ -426,9 +427,8 @@ var travelplan=(function(){
      * @constructor
      */
     travelplan.InvoicedetailController = function($scope, $routeParams) {
-        
-        $("title").html("票据详情");
-        $scope.$root.pageTitle = "票据详情";
+
+        changeTitle('票据详情',$scope);
 
         var planId = $routeParams.planId;
         $scope.planId = planId;

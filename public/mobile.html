@@ -89,6 +89,12 @@
                 $('.headerbar').hide();
             }
         }
+        function changeTitle(title,variable){
+//            console.info(title);
+            $('title').html(title);
+            variable.$root.pageTitle = title;
+        }
+
         $(document).ready(function(){
             showheader(!is_weixn());
         });
