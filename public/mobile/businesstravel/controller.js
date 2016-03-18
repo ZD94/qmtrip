@@ -657,7 +657,10 @@ var businesstravel=(function(){
         $scope.tra = $routeParams.tra;
         $scope.liv = $routeParams.liv;
 
-
+        //返回首页
+        $scope.returnUrl = function () {
+            window.location.href = "#/businesstravel/index";
+        }
         //只选交通
         if ($scope.tra == 1 && $scope.liv == 0) {
             $scope.startPlace = $routeParams.sc;
