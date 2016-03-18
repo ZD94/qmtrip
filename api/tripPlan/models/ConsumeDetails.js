@@ -73,7 +73,6 @@ module.exports = function (Db, DataType) {
                     case 'NO_BUDGET': {
                         _status = 0;
                         _is_commit = false;
-                        this.setDataValue('budget', -1); //预算要小于0
                     } break;
                     ///待上传状态
                     case 'WAIT_UPLOAD': {
