@@ -284,6 +284,13 @@ travelBudget.getBookListUrl = function(params) {
                 if(endPlace && endPlace.skyCode){
                     ecode = endPlace.skyCode.split("-")[0].toLowerCase();
                 }
+                if(!scode) {
+                    throw {code: -6, msg: '您选择的出发地没有机场'};
+                }
+
+                if(!ecode) {
+                    throw {code: -6, msg: '您选择的目的地没有机场'};
+                }
                 url = "http://www.tianxun.com/oneway-"+ scode +"-"+ ecode +".html?depdate="+st+"&cabin=Economy";
                 return url;
             })
