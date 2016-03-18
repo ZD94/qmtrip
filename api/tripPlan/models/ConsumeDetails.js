@@ -34,8 +34,8 @@ module.exports = function (Db, DataType) {
                 var _value = -1;
                 switch (val) {
                     case 'TRAIN': _value = 0; break; //火车票
-                    case 'PLANE': _value = 0; break; //飞机票
-                    case 'HOTEL': _value = 0; break; //酒店发票
+                    case 'PLANE': _value = 1; break; //飞机票
+                    case 'HOTEL': _value = 2; break; //酒店发票
                     default : ; break;
                 }
                 this.setDataValue('invoiceType', _value);
@@ -133,6 +133,18 @@ module.exports = function (Db, DataType) {
                     case 1: val = 'AUDIT_PASS'; break;
                 }
                 return val;
+            }
+        },
+        STATUS: {
+            type: DataType.VIRTUAL,
+            get: function(){
+                return {
+                    WAIT_UPLOAD: '待上传',
+                    WAIT_COMMIT: '待提交',
+                    WAIT_AUDIT: '审核中',
+                    AUDIT_NOT_PASS: '审核未通过',
+                    AUDIT_PASS: '审核通过'
+                }
             }
         }
     }, {

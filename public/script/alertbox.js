@@ -37,7 +37,7 @@ function black_err(str) {
 //    return false;
 //}
 
-//confirm('ok按钮的名字','取消按钮的名字','要显示的内容','点击确认后执行的方法名字')
+//confirm('ok按钮的名字','取消按钮的名字','要显示的内容',方法名字)
 function confirm(oks,cancels,message,sure){
     alertify.set({
         labels : {
@@ -45,16 +45,16 @@ function confirm(oks,cancels,message,sure){
             cancel : cancels
         },
         delay : 5000,
-        buttonReverse : false
+        //buttonReverse : false
         //buttonFocus  : "ok"
     });
 
     alertify.confirm(message, function (e) {
         if (e) {
-            //alertify.success("���ȷ��");
+            //alertify.success("");
             sure();
         } else {
-            //alertify.error("���ȡ��");
+            //alertify.error("");
         }
     });
     return false;

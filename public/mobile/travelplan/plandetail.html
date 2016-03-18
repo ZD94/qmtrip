@@ -5,7 +5,7 @@
 </style>
 <div class="plan_detail">
     <div class="HEADER w100">
-        <div class="timeStamp w90 margin_c">生成时间：{{ITEM.createAt | date:"yyyy-MM-dd HH:mm:ss"}}</div>
+        <div class="timeStamp">生成时间：{{ITEM.createAt | date:"yyyy-MM-dd HH:mm:ss"}}</div>
         <div class="totalBudget w100">
             <span ng-if="ITEM.status===-1">暂无</span>
             <span ng-if="ITEM.status===0">¥{{ITEM.budget.toFixed(2)}}</span>
@@ -43,8 +43,8 @@
             <div class="list_top">
                 <div class="top_left">
                     <p>
-                        <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType===0  ">&#xe911;</span><!--火车图标-->
-                        <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType===1  ">&#xe90e;</span><!--飞机图标-->
+                        <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType==='TRAIN'  ">&#xe911;</span><!--火车图标-->
+                        <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType==='PLANE'  ">&#xe90e;</span><!--飞机图标-->
                         <span class="description">
                             {{ITEM.outTraffic[0].startPlace}}
                             <span>去程</span>
@@ -70,7 +70,7 @@
                 </div> 
             </div>
             <div class="list_bottom">
-                <div class="status">{{renderStatus( ITEM.outTraffic[0] )}}</div>
+                <div class="status" ng-class="{true:'rejected'}[ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS']">{{renderStatus( ITEM.outTraffic[0],$index )}}</div>
                 <div class="buttons" ng-if="  ITEM.outTraffic[0].orderStatus!=='NO_BUDGET'  ">
                     <a class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'outTraffic' )">预订</a>
                     <a class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">上传票据</a>
@@ -90,8 +90,8 @@
             <div class="list_top">
                 <div class="top_left">
                     <p>
-                        <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType===0  ">&#xe911;</span><!--火车图标-->
-                        <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType===1  ">&#xe90e;</span><!--飞机图标-->
+                        <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType==='TRAIN'  ">&#xe911;</span><!--火车图标-->
+                        <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType==='PLANE'  ">&#xe90e;</span><!--飞机图标-->
                         <span class="description">
                             {{ITEM.backTraffic[0].startPlace}}
                             <span>回程</span>
@@ -117,7 +117,7 @@
                 </div> 
             </div>
             <div class="list_bottom">
-                <div class="status">{{renderStatus( ITEM.backTraffic[0] )}}</div>
+                <div class="status" ng-class="{true:'rejected'}[ITEM.backTraffic[0].orderStatus==='AUDIT_NOT_PASS']">{{renderStatus( ITEM.backTraffic[0] )}}</div>
                 <div class="buttons" ng-if="ITEM.backTraffic[0].budget!==-1">
                     <a class="BTN" ng-if="  ITEM.backTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'backTraffic' )">预订</a>
                     <a class="BTN" ng-if="  ITEM.backTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">上传票据</a>
@@ -160,8 +160,8 @@
                 </div> 
             </div>
             <div class="list_bottom">
-                <div class="status">{{renderStatus( ITEM.hotel[0] )}}</div>
-                <div class="buttons" ng-if="ITEM.hotel[0].budget!==-1">
+                <div class="status" ng-class="{true:'rejected'}[ITEM.hotel[0].orderStatus==='AUDIT_NOT_PASS']">{{renderStatus( ITEM.hotel[0] )}}</div>
+                <div class="buttons" ng-if="  ITEM.hotel[0].budget!==-1  ">
                     <a class="BTN" ng-if="  ITEM.hotel[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'hotel' )">预订</a>
                     <a class="BTN" ng-if="  ITEM.hotel[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">上传票据</a>
                     <a class="BTN" ng-if="  
@@ -176,7 +176,7 @@
             </div>
         </li>
     </ul>
-    <div class="w100 button_fix">
-        <input type="button" value="{{renderBUTTON()}}" class="common_btn2 w100">
+    <div class="w100 button_fix" ng-if="  ITEM.orderStatus!=='COMPLETE'&&ITEM.orderStatus!=='NO_BUDGET'  ">
+        <a class="BUTTON common_btn2 w100" ng-class="{true:'active'}[ITEM.orderStatus==='WAIT_COMMIT']" ng-click="commit()" style="display:block">{{renderBUTTON()}}</a>
     </div>
 </div>

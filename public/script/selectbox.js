@@ -35,6 +35,7 @@ function selectPage (options) {
 	return defaultDataFunc()
 		.then(function() {
 			wrapHtml();
+			$('.xiaocha').hide();
 		})
 		.then(function() {
 			return defaultDataFunc()
@@ -54,8 +55,10 @@ function selectPage (options) {
 						});
 
 						$("#select-box-search-input").bind('input propertychange', function() {
-							var val = $(this).val();
-							if (!val || val == '') {
+							$('.xiaocha').click(function (){
+								$("#select-box-search-input").val("");
+								$("#select-box-search-input").focus();
+								$('.xiaocha').hide();
 								defaultDataFunc(val)
 									.then(function(data) {
 										appendData(data);
@@ -74,6 +77,32 @@ function selectPage (options) {
 									.catch(function(err) {
 										console.error(err);
 									})
+							})
+							var val = $(this).val();
+							if (!val || val == '') {
+								defaultDataFunc(val)
+									.then(function(data) {
+										$('.xiaocha').hide();
+										appendData(data);
+										$('#select-box-data').prepend("<dt>"+options.title+"</dt>");
+										$('.cancelBtn').click(function(){
+											$('.select_page').remove();
+										});
+										var key, id;
+										$('.select_page dd').click(function () {
+											key = $(this).html();
+											id = $(this).attr('code');
+											$('.select_page').remove();
+											resolve([id, key]);
+										});
+									})
+									.catch(function(err) {
+										console.error(err);
+									})
+							}
+
+							if (val || val != '') {
+								$('.xiaocha').show();
 							}
 
 							fetchDataFunc(val)
@@ -122,7 +151,7 @@ function selectPage (options) {
 		$('.select_page').remove();
 		var str = "";
 		str += "<dl class='select_page'>";
-		str += "<div class='select_input'><input type='text' class='common_text w85 select_input1' style='float: left;' placeholder="+options.placeholder+" id='select-box-search-input'><div class='w15 cancelBtn' style='float: right;'>取消</div></div>";
+		str += "<div class='select_input'><input type='text' class='common_text w85 select_input1' style='float: left;' placeholder="+options.placeholder+" id='select-box-search-input'><span class='web-icon-font xiaocha'>&#xf057;</span><div class='w15 cancelBtn' style='float: right;'>取消</div></div>";
 		str += "<dt>"+options.title+"</dt>";
 		str += "<div id='select-box-data'></div>";
 		str += "</dl>";

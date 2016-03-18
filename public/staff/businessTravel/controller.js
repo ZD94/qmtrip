@@ -186,12 +186,12 @@ var businessTravel=(function(){
                 Myalert("温馨提示","出发城市与目的地城市不能相同");
                 return false;
             }
-            if (!timeReg.test(endtimelate)&&endtimelate!=undefined) {
-                Myalert("温馨提示","最晚到达时间格式时间格式不正确");
+            if (!timeReg.test(endtimelate)&&endtimelate!=undefined&&endtimelate!="") {
+                Myalert("温馨提示","最晚到达时间格式不正确");
                 return false;
             }
-            if (!timeReg.test(starttimelate)&&starttimelate!=undefined) {
-                Myalert("温馨提示","最晚到达时间格式时间格式不正确");
+            if (!timeReg.test(starttimelate)&&starttimelate!=undefined&&starttimelate!="") {
+                Myalert("温馨提示","最晚到达时间格式不正确");
                 return false;
             }
 
@@ -553,12 +553,12 @@ var businessTravel=(function(){
                 Myalert("温馨提示","出发城市与目的地城市不能相同");
                 return false;
             }
-            if (!timeReg.test(endtimelate)&&endtimelate!=undefined) {
-                Myalert("温馨提示","最晚到达时间格式时间格式不正确");
+            if (!timeReg.test(endtimelate)&&endtimelate!=undefined&&endtimelate!="") {
+                Myalert("温馨提示","最晚到达时间格式不正确");
                 return false;
             }
-            if (!timeReg.test(starttimelate)&&starttimelate!=undefined) {
-                Myalert("温馨提示","最晚到达时间格式时间格式不正确");
+            if (!timeReg.test(starttimelate)&&starttimelate!=undefined&&starttimelate!="") {
+                Myalert("温馨提示","最晚到达时间格式不正确");
                 return false;
             }
             $(".traffic_step1").hide();
