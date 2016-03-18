@@ -134,6 +134,18 @@ module.exports = function (Db, DataType) {
                 }
                 return val;
             }
+        },
+        STATUS: {
+            type: DataType.VIRTUAL,
+            get: function(){
+                return {
+                    WAIT_UPLOAD: '待上传',
+                    WAIT_COMMIT: '待提交',
+                    WAIT_AUDIT: '审核中',
+                    AUDIT_NOT_PASS: '审核未通过',
+                    AUDIT_PASS: '审核通过'
+                }
+            }
         }
     }, {
         tableName : "consume_details",
