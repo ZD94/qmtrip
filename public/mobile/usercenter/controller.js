@@ -58,7 +58,7 @@ module.exports = (function() {
                                     }else if(num >0 && num<=9){
                                         $('#'+id).show();
                                     }else if (num > 9 && num <100){
-                                        $('#'+id).css('font-size','1rem');
+                                        $('#'+id).css({'font-size':'1rem','line-height': '1.5rem'});
                                         $('#'+id).show();
                                     }else if (num > 99){
                                         $('#'+id).css({'font-size':'1rem','width':'2rem'});
