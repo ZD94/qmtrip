@@ -446,6 +446,7 @@ function editTripPlanBudget(params){
                 updates.remark = params.remark;
             }
 
+            updates.invoiceType = 'TRAIN'; //代理商录入预算的，默认出行方式为火车
             updates.userId = self.accountId;
 
             return [API.tripPlan.updateConsumeBudget(updates), companyId];
