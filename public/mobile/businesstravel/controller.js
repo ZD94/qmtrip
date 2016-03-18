@@ -656,7 +656,6 @@ var businesstravel=(function(){
         $scope.purposename = $routeParams.purposename;
         $scope.tra = $routeParams.tra;
         $scope.liv = $routeParams.liv;
-        console.info ($routeParams);
 
 
         //只选交通
@@ -782,6 +781,7 @@ var businesstravel=(function(){
                         $scope.liveprice = $scope.trafficlive.hotel;
                         $scope.goTraffic = ret2.goTraffic.price;
                         $scope.backTraffic = ret2.backTraffic.price;
+                        alert ($scope.liveprice);
                         $scope.$apply();
                         if($scope.totalprice == -1){
                         }else{
