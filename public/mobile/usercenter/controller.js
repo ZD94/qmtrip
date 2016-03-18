@@ -94,15 +94,15 @@ module.exports = (function() {
         }
 
         $scope.go_budget = function() {
-            window.location.href = "#/travelplan/planlist?status="+"待出预算";
+            window.location.href = "#/travelplan/planlist?status="+"WAIT";
         }
 
         $scope.go_invoice = function() {
-            window.location.href = "#/travelplan/planlist?status="+"待上传票据";
+            window.location.href = "#/travelplan/planlist?status="+"WAIT_UPLOAD";
         }
 
         $scope.go_unpass = function() {
-            window.location.href = "#/travelplan/planlist?status="+"审核未通过";
+            window.location.href = "#/travelplan/planlist?status="+"REJECT";
         }
 
         $scope.go_travelstandard = function () {
