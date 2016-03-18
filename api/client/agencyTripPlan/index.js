@@ -85,8 +85,8 @@ agencyTripPlan.pageTripPlanOrder = function(params){
     }
 
     if(params.agencyAll === true) {
-        params.status = {$in: ['-1', 1]};
-        params.auditStatus = {$ne: 1};
+        params.status = {$in: [-1, 1]};
+        params.auditStatus = 0;
     }
 
     var query = _.pick(params,
