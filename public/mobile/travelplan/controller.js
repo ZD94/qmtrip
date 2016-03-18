@@ -57,12 +57,7 @@ var travelplan=(function(){
             $(window).on("scroll",$scope.handleScroll);
             $(".dropdown-header").on("click",$scope.enterSelectingMode);
             $(".veil").on("click",$scope.quitSelectingMode);
-            $(window).on("resize",setWidthOfText)
         };
-
-        function setWidthOfText(){
-            
-        }
 
         $scope.enterSelectingMode=function(){//进入“选择模式”
             $(".veil").show();
@@ -358,7 +353,7 @@ var travelplan=(function(){
                 window.location.href=$scope.URL.backTrafficBookListUrl;
             }else
             if( p==="hotel" ){
-                //alert( $scope.URL.hotelBookListUrl );
+                console.log( $scope.URL.hotelBookListUrl );
                 window.location.href=$scope.URL.hotelBookListUrl;
             };
         }
@@ -377,22 +372,19 @@ var travelplan=(function(){
 
         $scope.commit = function () {
             if( $scope.ITEM.orderStatus==="WAIT_COMMIT" ){
-                alert("111");
-                confirm( '确认提交','返回检查','票据一经提交将无法进行修改，是否确认提交？',function(){console.log("333");} );
-                /*
-                API.onload(function() {
-                    API.tripPlan.commitTripPlanOrder( $scope.ITEM.id )
-                        .then(function(result){
-                            location.reload();
-                            alert ("提交成功");
-                        })
-                        .catch(function(err){
-                            $(".confirmFixed").show();
-                            console.info (err);
-                        })
-                })
-                */
-
+                confirm( '确认提交','返回检查','票据一经提交将无法进行修改，是否确认提交？',function(){
+                    API.onload(function() {
+                        API.tripPlan.commitTripPlanOrder( $scope.ITEM.id )
+                            .then(function(result){
+                                location.reload();
+                                black_err("提交审核成功");
+                            })
+                            .catch(function(err){
+                                $(".confirmFixed").show();
+                                console.info (err);
+                            })
+                    })
+                });
             };
         }
 

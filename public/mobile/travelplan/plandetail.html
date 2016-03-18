@@ -43,8 +43,8 @@
             <div class="list_top">
                 <div class="top_left">
                     <p>
-                        <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType===0  ">&#xe911;</span><!--火车图标-->
-                        <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType===1  ">&#xe90e;</span><!--飞机图标-->
+                        <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType==='TRAIN'  ">&#xe911;</span><!--火车图标-->
+                        <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType==='PLANE'  ">&#xe90e;</span><!--飞机图标-->
                         <span class="description">
                             {{ITEM.outTraffic[0].startPlace}}
                             <span>去程</span>
@@ -90,8 +90,8 @@
             <div class="list_top">
                 <div class="top_left">
                     <p>
-                        <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType===0  ">&#xe911;</span><!--火车图标-->
-                        <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType===1  ">&#xe90e;</span><!--飞机图标-->
+                        <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType==='TRAIN'  ">&#xe911;</span><!--火车图标-->
+                        <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType==='PLANE'  ">&#xe90e;</span><!--飞机图标-->
                         <span class="description">
                             {{ITEM.backTraffic[0].startPlace}}
                             <span>回程</span>
