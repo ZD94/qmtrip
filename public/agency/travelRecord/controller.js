@@ -521,7 +521,7 @@ var travelRecord=(function(){
 
         //关闭弹窗
         $scope.invoiceColse = function () {
-            $(".invoicePass,.invoiceNoPass").hide();
+            $(".invoicePass,.invoiceNoPass,.editBudget").hide();
             $(".reason1 i,.reason2 i").removeClass("check");
             reason1 = "";
             reason2 = "";
