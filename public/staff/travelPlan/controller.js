@@ -395,7 +395,7 @@ var travelPlan=(function(){
         }
         
         $scope.initscan = function(){
-            var backUrl = "http://"+window.location.host+"/mobile.html#/tripPlan/uploadImg?planId="+planId;
+            var backUrl = "http://"+window.location.host+"/mobile.html#/travelplan/plandetail?orderId="+planId;
             API.onload(function() {
                 API.auth.getQRCodeUrl({backUrl: backUrl})
                     .then(function(content) {

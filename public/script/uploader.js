@@ -22,14 +22,15 @@ function init_uploader(FileUploader){
     });
     */
     uploader.onAfterAddingFile = function (file) {
-        var traffictype,invoicetype;
-        file.after(function(invoice,traffic){
+        var traffictype,invoicetype,shapetype;
+        file.after(function(invoice,traffic,shape){
             traffictype = traffic;
             invoicetype = invoice;
+            shapetype = shape;
         });
         var data = [];
         data.push('<div class="upload_sure">');
-        data.push('<div class="img_tit"><span class="web-icon-font3">&#xe90e;<em>'+traffictype+'</em><strong>'+invoicetype+'</strong></span></div>');
+        data.push('<div class="img_tit"><span class="web-icon-font3">'+shapetype+'<em>'+traffictype+'</em><strong>'+invoicetype+'</strong></span></div>');
         data.push('<div class="preview_img"><canvas></canvas></div>');
         data.push('<div class="img_button"><div class="reupload">取消</div><div class="uploadall">确定</div></div>');
         data.push('</div>');

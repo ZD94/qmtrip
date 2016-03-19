@@ -17,7 +17,6 @@ var travelplan=(function(){
      * @param $scope
      * @constructor
      */
-    //alert("no error");
     //["未完成","待出预算","待上传票据","票据审核中","审核未通过","已完成"]
     travelplan.PlanlistController = function($scope,$routeParams) {
         
@@ -243,8 +242,65 @@ var travelplan=(function(){
      * @param $scope
      * @constructor
      */
-    travelplan.PlandetailController = function($scope, $routeParams) {
-        
+    travelplan.PlandetailController = function($scope, $routeParams,FileUploader) {
+        //初始化上传图片
+        $scope.winWidth = $(window).width();
+        $scope.uploader = init_uploader(FileUploader);
+        $scope.backtraffic_up = function(cb){
+            var type1='交通票据';
+            var type2 = '回程';
+            var type3 = '&#xe90e;';
+            cb(type1, type2, type3);
+        }
+        $scope.backtraffic_done = function(response){
+            var md5key = response.md5key;
+            uploadInvoice($scope.backId, md5key, function(err, result){
+                if (err ) {
+                    TLDAlert(err.msg || err);
+                    return;
+                }
+                $scope.getData( $routeParams.orderId )
+            });
+        }
+        $scope.outtraffic_up = function(cb){
+            var type1='交通票据';
+            var type2 = '去程';
+            var type3 = '&#xe90e;';
+            cb(type1, type2, type3);
+        }
+        $scope.outtraffic_done = function(response){
+            var md5key = response.md5key;
+            uploadInvoice($scope.outId, md5key, function(err, result){
+                if (err ) {
+                    TLDAlert(err.msg || err);
+                    return;
+                }
+                $scope.getData( $routeParams.orderId )
+            });
+        }
+        $scope.hoteltraffic_up = function(cb){
+            var type1='住宿发票';
+            var type2 = '';
+            var type3 = '&#xe914;';
+            cb(type1, type2, type3);
+        }
+        $scope.hoteltraffic_done = function(response){
+            var md5key = response.md5key;
+            uploadInvoice($scope.hotelId, md5key, function(err, result){
+                if (err ) {
+                    TLDAlert(err.msg || err);
+                    return;
+                }
+                $scope.getData( $routeParams.orderId )
+            });
+        }
+        function uploadInvoice(consumeId, picture, callback) {
+            API.tripPlan.uploadInvoice({
+                consumeId: consumeId,
+                picture: picture
+            }, callback);
+        }
+
         $scope.ITEM={};
         $scope.URL={};
         $scope.timeSpan;//入住酒店的天数
@@ -259,7 +315,9 @@ var travelplan=(function(){
                     function( data ){
                         $scope.ITEM = data;
                         console.log( $scope.ITEM );
-                        
+                        $scope.backId = data.backTraffic[0].id;
+                        $scope.outId = data.outTraffic[0].id;
+                        $scope.hotelId = data.hotel[0].id;
                         $scope.timeSpan = (function(){
                             if( $scope.ITEM.hotel[0] ){
                                 var t1=$scope.ITEM.hotel[0].startTime;
