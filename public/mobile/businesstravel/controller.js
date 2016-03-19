@@ -19,7 +19,7 @@ var businesstravel=(function(){
      * @constructor
      */
     businesstravel.IndexController = function($scope) {
-        changeTitle('我要出差',$scope);
+        $scope.$root.pageTitle = '我要出差';
         loading(true);
         //选择项目
         $scope.selectPurposeName = function () {
@@ -92,7 +92,7 @@ var businesstravel=(function(){
      * @constructor
      */
     businesstravel.TrafficliveController = function($scope , $routeParams) {
-        changeTitle('我要出差',$scope);
+        $scope.$root.pageTitle = '我要出差';
         loading(true);
 
         $scope.tra = $routeParams.tra;
@@ -649,7 +649,7 @@ var businesstravel=(function(){
      * @constructor
      */
     businesstravel.CreateresultController = function($scope , $routeParams) {
-        changeTitle('动态预算结果',$scope);
+        $scope.$root.pageTitle = '动态预算结果';
         loading(true);
 
         $scope.purposename = $routeParams.purposename;
@@ -904,7 +904,7 @@ var businesstravel=(function(){
      * @constructor
      */
     businesstravel.FailController = function($scope) {
-        changeTitle('错误提示',$scope);
+        $scope.$root.pageTitle = '错误提示';
         loading(true);
     }
 

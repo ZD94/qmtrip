@@ -3,19 +3,18 @@
 <head>
 	<meta charset="UTF-8">
 	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
-	<title>全麦商旅</title>
+	<title ng-bind="pageTitle || '全麦商旅'">全麦商旅</title>
+
 	<link rel="stylesheet" type="text/css" href="/mobile/css/upload.css">
 	<link rel="stylesheet" type="text/css" href="/mobile/css/businesstravel.css">
 	<link rel="stylesheet" type="text/css" href="/mobile/css/travelplan.css">
 	<link rel="stylesheet" type="text/css" href="/mobile/css/auth.css">
 	<link rel="stylesheet" type="text/css" href="/mobile/css/usercenter.css">
 	<link rel="stylesheet" type="text/css" href="/mobile/css/mobiscroll.css">
-
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
     <script type="text/javascript">
         var jQuery = $ = require('jquery');
     </script>
-
 	<!--out site script-->
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.api.js"></script>
@@ -30,30 +29,8 @@
     <script type="text/javascript" src="/mobile/controller.all.js"></script>
     <script type="text/javascript" src="/script/selectbox.js"></script>
     <script type="text/javascript">
-	    var Q = require('q');
-        var moment = require('moment');
         var md5 = require('md5');
-        var Cookie = require('tiny-cookie');
         var TLD = TLD_angular_app('qmtrip', 'mobile', '/usercenter/index');
-        initUpload(TLD);
-        // TLD.directive("fileread", [function () {
-        //     return {
-        //         scope: {
-        //             fileread: "="
-        //         },
-        //         link: function (scope, element, attributes) {
-        //             element.bind("change", function (changeEvent) {
-        //                 var reader = new FileReader();
-        //                 reader.onload = function (loadEvent) {
-        //                     scope.$apply(function () {
-        //                         scope.fileread = loadEvent.target.result;
-        //                     });
-        //                 }
-        //                 reader.readAsDataURL(changeEvent.target.files[0]);
-        //             });
-        //         }
-        //     }
-        // }]);
         API.onlogin(function(){
             var backUrl = window.location.href;
             backUrl = encodeURIComponent(backUrl);
@@ -71,40 +48,11 @@
             remote.authenticate({ accountid: user_id, tokenid: token_id, timestamp: timestamp, tokensign: token_sign },
                     callback);
         };
-        function is_weixn(){
-            var ua = navigator.userAgent.toLowerCase();
-            if(ua.match(/MicroMessenger/i)=="micromessenger") {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        function showheader(display) {
-            if(display) {
-                //$('.statusbar').show();
-                $('.headerbar').show();
-            }else{
-                //$('.statusbar').hide();
-                $('.headerbar').hide();
-            }
-        }
-        function changeTitle(title,variable){
-//            console.info(title);
-            $('title').html(title);
-            variable.$root.pageTitle = title;
-        }
 
-        $(document).ready(function(){
-            showheader(!is_weixn());
-        });
+        browserspec.enum_wechat();
 	</script>
 </head>
 <body>
-    <div class="headerbar" style="position: relative">
-        <span style="position:absolute; left:10px;" ><a href="javascript:history.go(-1)" class="font-white">&lt;返回</a></span>
-        <span id="header" style="font-size: 19px;" ng-bind="pageTitle || '全麦商旅'"></span>
-        <span style="position:absolute; right:10px;" onclick="showheader(false);">隐藏</span>
-    </div>
     <div class="mask_loading" id="loading">
         <div class="loading_m">
         </div>

@@ -61,7 +61,7 @@ var travelplan=(function(){
         //-----------------------------------------------------------
         function init(){
             //页面上的所有交互All interacitve actions on this page
-            changeTitle('出差记录',$scope);
+            $scope.$root.pageTitle = '出差记录';
             $scope.$root.pageTitle="出差记录";
             console.log( PARAMS );
             $scope.getList( PARAMS );
@@ -466,7 +466,7 @@ var travelplan=(function(){
         }
 
         function init(){
-            changeTitle('详细出差记录',$scope);
+            $scope.$root.pageTitle = '详细出差记录';
             $scope.$root.pageTitle = "详细出差记录";
             $scope.getData( $routeParams.orderId );
         }
@@ -484,7 +484,7 @@ var travelplan=(function(){
      */
     travelplan.InvoicedetailController = function($scope, $routeParams) {
 
-        changeTitle('票据详情',$scope);
+        $scope.$root.pageTitle = '票据详情';
 
         var planId = $routeParams.planId;
         $scope.planId = planId;

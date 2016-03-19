@@ -11,7 +11,7 @@ module.exports = (function() {
     auth.LoginController = function($scope,$routeParams) {
         //待实现
         loading(true);
-        changeTitle('登录',$scope);
+        $scope.$root.pageTitle = '登录';
         var mail = Cookie.get("email");
         var pwd = Cookie.get("pwd");
         $scope.email = mail;
