@@ -38,7 +38,7 @@
 | params.consumeDetails[N].latestArriveTime  |最晚到达时间  |date |
 | params.consumeDetails[N].budget        |该次消费预算      |numeric(15,2)      |必填
 | params.consumeDetails[N].expenditure        |该次消费支出      |numeric(15,2)  |
-| params.consumeDetails[N].invoiceType        |票据类型 1：机票 2：酒店发票      |integer    |
+| params.consumeDetails[N].invoiceType        |票据类型 'TRAIN': 火车票; 'PLANE'：机票; 'HOTEL'：酒店发票      |string    |
 | params.consumeDetails[N].invoice        |具体票据      |varchar  |
 | params.consumeDetails[N].remark        |备注      |varchar  |
 | callback                              | 回调函数             |function              |支持promise
@@ -63,7 +63,7 @@
 | params.endTime        |结束时间      |
 | params.budget        |该次消费预算      |必填
 | params.expenditure        |该次消费支出      |
-| params.invoiceType        |票据类型 1：机票 2：酒店发票      |
+| params.invoiceType        |'TRAIN': 火车票; 'PLANE'：机票; 'HOTEL'：酒店发票     |
 | params.invoice        |具体票据      |
 | params.remark        |备注      |
 | callback                              | 回调函数             |function              |支持promise
@@ -229,10 +229,11 @@
 |ret.expenditure |实际支出   | number  |
 |ret.NumOfStaff   |完成出差人次数 | number    |
 
->. 获取企业所有项目列表 API.tripPlan.getProjectList(callback);
+>. 获取企业所有项目列表 API.tripPlan.getProjectList(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
+| params                                  | count: 要查询的项目名称数目
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |
@@ -273,7 +274,7 @@
 | params.consumeDetails[N].startTime        |开始时间         |date   |必填
 | params.consumeDetails[N].endTime        |结束时间    |date   |
 | params.consumeDetails[N].latestArriveTime  |最晚到达时间  |date |
-| params.consumeDetails[N].invoiceType        |票据类型 1：机票 2：酒店发票      |integer    |
+| params.consumeDetails[N].invoiceType        |'TRAIN': 火车票; 'PLANE'：机票; 'HOTEL'：酒店发票      |string    |
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |

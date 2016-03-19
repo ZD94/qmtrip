@@ -55,12 +55,12 @@ attachment.getSelfAttachment = function(params) {
     var fileId = params.fileId;
     var accountId = params.accountId;
     return Owner.findOne({where: {fileId: fileId, accountId: accountId}})
-    .then(function(owner) {
-        if (!owner) {
-            throw L.ERR.PERMISSION_DENY;
-        }
-        return API.attachments.getAttachment({id: fileId});
-    })
+        .then(function(owner) {
+            if (!owner) {
+                throw L.ERR.PERMISSION_DENY;
+            }
+            return API.attachments.getAttachment({id: fileId});
+        })
 }
 
 

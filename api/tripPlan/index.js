@@ -26,6 +26,12 @@ var STATUS = {
     NO_COMMIT: 0, //待提交状态
     COMMIT: 1, //已提交待审核状态
     COMPLETE: 2 //审核完，已完成状态
+};
+
+var INVOICE_TYPE = {
+    TRAIN: 0,
+    PLANE: 1,
+    HOTEL: 2
 }
 
 var tripPlan = {}
@@ -292,6 +298,7 @@ function updateConsumeDetail(params){
 
 tripPlan.updateConsumeBudget = updateConsumeBudget;
 updateConsumeBudget.required_params = ['id', 'budget', 'userId'];
+updateConsumeBudget.optional_params = ['invoiceType'];
 function updateConsumeBudget(params){
     var id = params.id;
 
@@ -317,12 +324,6 @@ function updateConsumeBudget(params){
             }
 
             var budget = params.budget;
-            //var c_budget = 0;
-            //if(o_budget > 0) {
-            //    c_budget = parseFloat(order.budget) - parseFloat(o_budget) + parseFloat(budget);
-            //} else {
-            //    c_budget = parseFloat(order.budget) + parseFloat(budget)
-            //}
 
             var logs = {
                 orderId: order.id,
@@ -331,10 +332,18 @@ function updateConsumeBudget(params){
                 createAt: utils.now()
             }
 
+            var updates = {
+                budget: budget,
+                updateAt: utils.now()
+            }
+
+            if(params.invoiceType) {
+                updates.invoiceType = params.invoiceType;
+            }
             return sequelize.transaction(function(t){
                 return Promise.all([
                     order.id,
-                    ConsumeDetails.update({budget: budget, updateAt: utils.now()}, {where: {id: id}, fields: ['budget', 'updateAt'], transaction: t}),
+                    ConsumeDetails.update(updates, {where: {id: id}, transaction: t}),
                     TripOrderLogs.create(logs, {transaction: t})
                 ])
             })
@@ -1093,18 +1102,15 @@ function checkBudgetExist(params){
 
     _planOrder.status = {$ne: STATUS.DELETE};
 
-    logger.error(_planOrder);
     return PlanOrder.findAll({where: _planOrder})
         .then(function(order){
             if(order.length <= 0) {
                 return [false];
             }
 
-            logger.error("*********************************");
-            logger.error(order.length);
-
             return [true, order[0].id, Promise.all(consumeDetails.map(function(detail) {
                 detail.status = {$ne: STATUS.DELETE};
+                detail.invoiceType = INVOICE_TYPE[detail.invoiceType];
                 return ConsumeDetails.findAll({where: detail})
             }))]
         })
@@ -1125,12 +1131,19 @@ function checkBudgetExist(params){
 
 tripPlan.getProjectList = getProjectList;
 getProjectList.require_params = ['companyId'];
-getProjectList.optionnal_params = ['code', 'name'];
+getProjectList.optionnal_params = ['code', 'name', 'count'];
 function getProjectList(params) {
     var options = {
         where: params,
+        attributes: ['name'],
         order: [['create_at', 'desc']]
+    };
+
+    if(params.count) {
+        options.limit = params.count;
+        delete params.count;
     }
+
     return Projects.findAll(options)
 }
 
@@ -1146,7 +1159,7 @@ tripPlan.getProjectByName = getProjectByName;
 getProjectByName.required_params = ['userId', 'name'];
 getProjectByName.optional_params = ['companyId', 'isCreate']
 function getProjectByName(params) {
-    return Projects.findOne({name: params.name})
+    return Projects.findOne({where: {name: params.name}})
         .then(function(project){
             if(!project && params.isCreate === true) {
                 var p = {

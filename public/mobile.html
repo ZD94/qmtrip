@@ -9,10 +9,14 @@
 	<link rel="stylesheet" type="text/css" href="/mobile/css/travelplan.css">
 	<link rel="stylesheet" type="text/css" href="/mobile/css/auth.css">
 	<link rel="stylesheet" type="text/css" href="/mobile/css/usercenter.css">
+	<link rel="stylesheet" type="text/css" href="/mobile/css/alertify.css">
+	<link rel="stylesheet" type="text/css" href="/mobile/css/mobiscroll.css">
+
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
     <script type="text/javascript">
         var jQuery = $ = require('jquery');
     </script>
+
 	<!--out site script-->
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.api.js"></script>
@@ -20,9 +24,12 @@
     <script type="text/javascript" src="/script/libs/bundle.swiper.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.ngapp.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.calendar.js"></script>
+    <script type="text/javascript" src="/script/libs/bundle.hidpi-canvas.js"></script>
     <script type="text/javascript" src="/script/directive.js"></script>
     <script type="text/javascript" src="/script/alertify.js"></script>
+    <script type="text/javascript" src="/script/mobiscroll.js"></script>
     <script type="text/javascript" src="/script/alertbox.js"></script>
+    <script type="text/javascript" src="/script/uploader.js"></script>
     <script type="text/javascript" src="/mobile/controller.all.js"></script>
     <script type="text/javascript" src="/script/selectbox.js"></script>
     <script type="text/javascript">
@@ -84,6 +91,12 @@
                 $('.headerbar').hide();
             }
         }
+        function changeTitle(title,variable){
+//            console.info(title);
+            $('title').html(title);
+            variable.$root.pageTitle = title;
+        }
+
         $(document).ready(function(){
             showheader(!is_weixn());
         });

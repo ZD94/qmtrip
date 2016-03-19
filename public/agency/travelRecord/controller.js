@@ -428,6 +428,7 @@ var travelRecord=(function(){
             }
             $('.error').empty();
             $(".expenditure").val("");
+            $(".remark").val("");
             $(".invoiceNoPass").show();
         }
 
@@ -522,7 +523,10 @@ var travelRecord=(function(){
         //关闭弹窗
         $scope.invoiceColse = function () {
             $(".invoicePass,.invoiceNoPass,.editBudget").hide();
-            $(".success").hide();
+            $(".reason1 i,.reason2 i").removeClass("check");
+            reason1 = "";
+            reason2 = "";
+            $(".remark").val('');
         }
     }
 

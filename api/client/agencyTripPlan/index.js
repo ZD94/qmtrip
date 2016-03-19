@@ -53,6 +53,10 @@ agencyTripPlan.getConsumeInvoiceImg = function(params) {
  * @returns {*}
  */
 agencyTripPlan.pageTripPlanOrder = function(params){
+    if(!params) {
+        throw {code: -10, msg: '参数不能为空'};
+    }
+
     if(typeof params == 'function'){
         throw {code: -2, msg: '参数不正确'};
     }
@@ -81,8 +85,8 @@ agencyTripPlan.pageTripPlanOrder = function(params){
     }
 
     if(params.agencyAll === true) {
-        params.status = {$in: ['-1', 1]};
-        params.auditStatus = {$ne: 1};
+        params.status = {$in: [-1, 1]};
+        params.auditStatus = 0;
     }
 
     var query = _.pick(params,
@@ -442,6 +446,7 @@ function editTripPlanBudget(params){
                 updates.remark = params.remark;
             }
 
+            updates.invoiceType = 'TRAIN'; //代理商录入预算的，默认出行方式为火车
             updates.userId = self.accountId;
 
             return [API.tripPlan.updateConsumeBudget(updates), companyId];

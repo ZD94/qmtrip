@@ -1,14 +1,28 @@
-<script>
+<script type="text/javascript">
     $(function () {
-        $('#startTimeLate,#endTimeLate').focus(function(){
-            $(this).attr('type','time');
-            $(this).focus();
-        })
-        $('#startTimeLate,#endTimeLate').blur(function(){
-            $(this).attr('type','text').blur();
-            $(this).focus();
-        })
-    })
+        var currYear = (new Date()).getFullYear();
+        var opt={};
+
+        opt.time = {preset : 'time'};
+        opt.default = {
+            theme: 'android-ics light', //皮肤样式
+            display: 'modal', //显示方式
+            mode: 'scroller', //日期选择模式
+            dateFormat: 'yyyy-mm-dd',
+            lang: 'zh',
+            showNow: false,
+            nowText: "今天",
+            setText: '确定',
+            cancelText: '取消',
+            timeFormat: 'HH:ii'
+        };
+
+        $("#appDate").mobiscroll($.extend(opt['date'], opt['default']));
+        var optDateTime = $.extend(opt['datetime'], opt['default']);
+        var optTime = $.extend(opt['time'], opt['default']);
+        $("#appDateTime").mobiscroll(optDateTime).datetime(optDateTime);
+        $("#startTimeLate,#endTimeLate").mobiscroll(optTime).time(optTime);
+    });
 </script>
 <div class="traffic_step">
     <div class="margin_b"></div>
@@ -55,7 +69,7 @@
             <input type="text" placeholder="入住时间" class="hidden_input" id="liveTime" ng-click="chooeseData($event)"  readonly>
         </div>
         <div class="common_text margin_c margin_b halfinput" style="float: right;">
-        <input type="text" placeholder="离店时间" class="common_text margin_c margin_b halfinput" id="leaveTime" ng-click="chooeseData($event, 'liveTime')" style="float: right;"  readonly>
+        <input type="text" placeholder="离店时间" class="hidden_input" id="leaveTime" ng-click="chooeseData($event, 'liveTime')"  readonly>
         </div>
     </div>
     <div class="w100 button_fix">
@@ -66,3 +80,5 @@
     </div>
     <div class="clear"></div>
 </div>
+
+

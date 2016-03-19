@@ -19,9 +19,8 @@ var businesstravel=(function(){
      * @constructor
      */
     businesstravel.IndexController = function($scope) {
-        $("title").html("我要出差");
+        changeTitle('我要出差',$scope);
         loading(true);
-
         //选择项目
         $scope.selectPurposeName = function () {
             API.onload(function() {
@@ -93,7 +92,7 @@ var businesstravel=(function(){
      * @constructor
      */
     businesstravel.TrafficliveController = function($scope , $routeParams) {
-        $("title").html("我要出差");
+        changeTitle('我要出差',$scope);
         loading(true);
 
         $scope.tra = $routeParams.tra;
@@ -650,15 +649,17 @@ var businesstravel=(function(){
      * @constructor
      */
     businesstravel.CreateresultController = function($scope , $routeParams) {
-        $("title").html("动态预算结果");
+        changeTitle('动态预算结果',$scope);
         loading(true);
 
         $scope.purposename = $routeParams.purposename;
         $scope.tra = $routeParams.tra;
         $scope.liv = $routeParams.liv;
-        console.info ($routeParams);
 
-
+        //返回首页
+        $scope.returnUrl = function () {
+            window.location.href = "#/businesstravel/index";
+        }
         //只选交通
         if ($scope.tra == 1 && $scope.liv == 0) {
             $scope.startPlace = $routeParams.sc;
@@ -685,12 +686,13 @@ var businesstravel=(function(){
                 ])
                     .spread(function(ret1,ret2) {
                         $('.loading_result').hide();
-                        black_err("预算生成成功");
+                        //black_err("预算生成成功");
                         $scope.onlytraffic = ret2;
                         $scope.totalprice = ret2.price;
                         $scope.goTraffic = ret2.goTraffic.price;
                         $scope.backTraffic = ret2.backTraffic.price;
                         $scope.$apply();
+
                     })
                     .catch(function(err){
                         console.info (err);
@@ -720,7 +722,7 @@ var businesstravel=(function(){
                 ])
                     .spread(function(ret1,ret2) {
                         $('.loading_result').hide();
-                        black_err("预算生成成功");
+                        //black_err("预算生成成功");
                         $scope.onlylive = ret2;
                         $scope.totalprice = ret2.price;
                         $scope.liveprice = $scope.onlylive.price;
@@ -767,7 +769,7 @@ var businesstravel=(function(){
                 ])
                     .spread(function(ret1,ret2) {
                         $('.loading_result').hide();
-                        black_err("预算生成成功");
+                        console.info(ret2);
                         $scope.trafficlive = ret2;
                         $scope.totalprice = ret2.price;
                         $scope.trafficprice = $scope.trafficlive.traffic;
@@ -796,7 +798,7 @@ var businesstravel=(function(){
                     startPlace:$scope.startPlace,
                     startPlaceCode:$scope.startPlaceVal,
                     destination:$scope.endPlace,
-                    destinationCode:$scope.endPlaceVal,
+                    destinationCode:$scope.livePlaceVal,
                     startAt:$scope.startTime,
                     startTime:$scope.liveTime,
                     endTime:$scope.leaveTime,
@@ -816,12 +818,12 @@ var businesstravel=(function(){
                     var consumeDetails_hotel = {
                         type:0,
                         city:$scope.endPlace,
-                        cityCode:$scope.endPlaceVal,
+                        cityCode:$scope.livePlaceVal,
                         hotelName:$scope.landmark,
                         startTime:$scope.liveTime,
                         endTime:$scope.leaveTime,
                         budget:Number($scope.liveprice),
-                        invoiceType:2
+                        invoiceType: 'HOTEL'
                     }
                     consumeDetails.push(consumeDetails_hotel);
                 }
@@ -836,7 +838,7 @@ var businesstravel=(function(){
                         arrivalPlaceCode:$scope.endPlaceVal,
                         startTime:$scope.startTime,
                         budget:Number($scope.goTraffic),
-                        invoiceType:1
+                        invoiceType: 'PLANE'
                     }
                     if($scope.endtime){
                         consumeDetails_outTraffic.endTime = $scope.endTime;
@@ -857,7 +859,7 @@ var businesstravel=(function(){
                         arrivalPlaceCode:$scope.startPlaceVal,
                         startTime:$scope.endTime,
                         budget:Number($scope.backTraffic),
-                        invoiceType:1
+                        invoiceType: 'PLANE'
                     }
                     if($scope.endtimelate){
                         consumeDetails_backTraffic.latestArriveTime = $scope.endTime+' '+$scope.endTimeLate;
@@ -902,7 +904,7 @@ var businesstravel=(function(){
      * @constructor
      */
     businesstravel.FailController = function($scope) {
-        $("title").html("错误提示");
+        changeTitle('错误提示',$scope);
         loading(true);
     }
 

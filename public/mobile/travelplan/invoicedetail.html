@@ -7,11 +7,12 @@
     <div class="i_detail i_box">
 		<div ng-if="status == 'outTraffic'" class="i_type">
 			<span class="web-icon-font3">&#xe90e;</span>
-			<div class="i_typedetail">{{InvoiceDetail.startPlace}}<em class="out_img"></em>{{InvoiceDetail.arrivalPlace}}</div>
+			<!--<div class="i_typedetail">{{InvoiceDetail.startPlace}}去程{{InvoiceDetail.arrivalPlace}}</div>-->
+			<div class="i_typedetail">{{InvoiceDetail.startPlace}}<span class="arr"><em class="out_img">去程</em></span>{{InvoiceDetail.arrivalPlace}}</div>
 		</div>
 		<div ng-if="status == 'backTraffic'" class="i_type">
 			<span class="web-icon-font3">&#xe90e;</span>
-			<div class="i_typedetail">{{InvoiceDetail.startPlace}}<em class="back_img"></em>{{InvoiceDetail.arrivalPlace}}</div>
+			<div class="i_typedetail">{{InvoiceDetail.startPlace}}<span class="arr"><em class="out_img">回程</em></span>{{InvoiceDetail.arrivalPlace}}</div>
 		</div>
 		<div ng-if="status == 'hotel'" class="i_type">
 		    <span class="web-icon-font3">&#xe914;</span>
@@ -19,20 +20,30 @@
 		</div>
 	</div>
 	<div class="i_box">
-		<span ng-if="status == 'backTraffic' || status == 'outTraffic'">{{InvoiceDetail.startTime | date:"yyyy-MM-dd"}}</span>
-		<span ng-if="status == 'hotel'">{{InvoiceDetail.startTime | date:"yyyy-MM-dd"}} 至 {{InvoiceDetail.endTime | date:"yyyy-MM-dd"}}(共{{(InvoiceDetail.endTime | date:"dd")-(InvoiceDetail.startTime | date:"dd")+1}}晚)</span>
+		<span class="time_font" ng-if="status == 'backTraffic' || status == 'outTraffic'">{{InvoiceDetail.startTime | date:"yyyy-MM-dd"}}出发</span>
+		<span class="time_font" ng-if="status == 'hotel'">{{InvoiceDetail.startTime | date:"yyyy-MM-dd"}} 至 {{InvoiceDetail.endTime | date:"yyyy-MM-dd"}}(共{{(InvoiceDetail.endTime | date:"dd")-(InvoiceDetail.startTime | date:"dd")}}晚)</span>
 	</div>
-	<div class="i_box">上传时间:{{InvoiceDetail.invoice[InvoiceDetail.invoice.length-1].create_at}}
-		<p ng-if="InvoiceDetail.isCommit == true" class="i_status">
-			<span ng-if="InvoiceDetail.status=='-1'">审核未通过</span>
-	        <span ng-if="InvoiceDetail.status==0">待审核</span>
-	        <span ng-if="InvoiceDetail.status==1">审核通过</span>
-		</p>
-		<p ng-if="InvoiceDetail.isCommit == false" class="i_status">
-			<span>已上传</span>
+
+	<div class="i_box">
+		<span class="time_font">上传时间:{{InvoiceDetail.invoice[InvoiceDetail.invoice.length-1].create_at}}</span>
+		<!--<p ng-if="InvoiceDetail.isCommit == true" class="i_status">-->
+			<!--<span ng-if="InvoiceDetail.orderStatus=='WAIT_UPLOAD'">待上传</span>-->
+	        <!--<span ng-if="InvoiceDetail.status==0">待审核</span>-->
+	        <!--<span ng-if="InvoiceDetail.status==1">审核通过</span>-->
+		<!--</p>-->
+		<!--<p ng-if="InvoiceDetail.isCommit == false" class="i_status">-->
+			<!--<span style="font-size: 1.5rem;">已上传</span>-->
+		<!--</p>-->
+		<p class="i_status">
+			<!--<span style="font-size: 1.5rem;">{{InvoiceDetail.STATUS[InvoiceDetail.orderStatus]}}</span>-->
+			<span style="font-size: 1.5rem;" ng-if="InvoiceDetail.orderStatus=='WAIT_UPLOAD'">待传票据</span>
+			<span style="font-size: 1.5rem;" ng-if="InvoiceDetail.orderStatus=='WAIT_COMMIT'">已上传</span>
+			<span style="font-size: 1.5rem;" ng-if="InvoiceDetail.orderStatus=='WAIT_AUDIT'">票据审核中</span>
+			<span style="font-size: 1.5rem;" ng-if="InvoiceDetail.orderStatus=='AUDIT_PASS'">已完成</span>
+			<span style="font-size: 1.5rem;" ng-if="InvoiceDetail.orderStatus=='AUDIT_NOT_PASS'">审核未通过</span>
 		</p>
 	</div>
 	<div class="i_images">
-		<img src="{{invoiceImg}}" alt="">
+		<img class="invoiceImg" src="{{invoiceImg}}" alt="">
 	</div>
 </div>

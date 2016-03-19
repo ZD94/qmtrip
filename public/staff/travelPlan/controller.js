@@ -35,6 +35,7 @@ var travelPlan=(function(){
                         $scope.total1 = result.total;
                         $scope.planListitems = result.items;
                         loading(true);
+                        console.info ($scope.total1);
                         $scope.$apply();
                     })
                     .catch(function(err){
@@ -243,7 +244,7 @@ var travelPlan=(function(){
                         $scope.outTraffic = $scope.planDetail.outTraffic[0];
                         if(result.outTraffic.length!=0){
                             var type = "air";
-                            if($scope.outTraffic.invoiceType == 0){
+                            if($scope.outTraffic.invoiceType == 'TRAIN'){
                                 type = "train";
                             }
                             API.travelBudget.getBookListUrl({
@@ -262,7 +263,7 @@ var travelPlan=(function(){
                         }
                         if(result.backTraffic.length!=0){
                             var type = "air";
-                            if($scope.backTraffic.invoiceType == 0){
+                            if($scope.backTraffic.invoiceType == 'TRAIN'){
                                 type = "train";
                             }
                             API.travelBudget.getBookListUrl({
@@ -283,6 +284,9 @@ var travelPlan=(function(){
                             API.travelBudget.getBookListUrl({
                                 hotelCity : $scope.hotel.city,
                                 hotelAddress : $scope.hotel.hotelName,
+                                from : "computer",
+                                hotelSt : $scope.hotel.startTime,
+                                hotelEt : $scope.hotel.endTime,
                                 type : "hotel"
                             })
                             .then(function(hotelBookListUrl){
@@ -391,7 +395,7 @@ var travelPlan=(function(){
         }
         
         $scope.initscan = function(){
-            var backUrl = "http://"+window.location.host+"/mobile.html#/tripPlan/uploadImg?planId="+planId;
+            var backUrl = "http://"+window.location.host+"/mobile.html#/travelplan/plandetail?orderId="+planId;
             API.onload(function() {
                 API.auth.getQRCodeUrl({backUrl: backUrl})
                     .then(function(content) {
