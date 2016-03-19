@@ -11,16 +11,20 @@ module.exports = (function() {
     auth.LoginController = function($scope,$routeParams) {
         //待实现
         loading(true);
+        changeTitle('登录',$scope);
         var mail = Cookie.get("email");
         var pwd = Cookie.get("pwd");
         $scope.email = mail;
         $scope.pwd = pwd;
         var backUrl = $routeParams.backurl || "#";
 
-        $scope.clear_input = function($event) {
+        $('.clear_input').css('display','none');
+
+        $scope.clear_val = function($event) {
             $($event.target).siblings('input').val('');
             $('#login').attr('disabled',true).removeClass('blue_bc');
         }
+
         var checkLogin = $scope.check_login = function() {
             var mail = $('#name').val();
             var pwd  = $('#pwd').val();

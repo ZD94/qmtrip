@@ -10,9 +10,8 @@ module.exports = (function() {
     var user = {};
 
     user.IndexController = function($scope) {
-        $('title').html('个人中心');
-        $scope.$root.pageTitle = '个人中心';
 
+        changeTitle('个人中心',$scope);
         $scope.initStaffUser = function(){
             API.onload(function(){
                 API.staff.getCurrentStaff()
@@ -59,7 +58,7 @@ module.exports = (function() {
                                     }else if(num >0 && num<=9){
                                         $('#'+id).show();
                                     }else if (num > 9 && num <100){
-                                        $('#'+id).css('font-size','1rem');
+                                        $('#'+id).css({'font-size':'1rem','line-height': '1.5rem'});
                                         $('#'+id).show();
                                     }else if (num > 99){
                                         $('#'+id).css({'font-size':'1rem','width':'2rem'});
@@ -94,7 +93,7 @@ module.exports = (function() {
         }
 
         $scope.go_budget = function() {
-            window.location.href = "#/travelplan/planlist?status="+"NO_BUDGET";
+            window.location.href = "#/travelplan/planlist?status="+"WAIT";
         }
 
         $scope.go_invoice = function() {
@@ -102,7 +101,7 @@ module.exports = (function() {
         }
 
         $scope.go_unpass = function() {
-            window.location.href = "#/travelplan/planlist?status="+"AUDIT_NOT_PASS";
+            window.location.href = "#/travelplan/planlist?status="+"REJECT";
         }
 
         $scope.go_travelstandard = function () {
@@ -111,8 +110,7 @@ module.exports = (function() {
     }
 
     user.TravelpolicyController = function($scope) {
-        $('title').html('差旅标准');
-        $scope.$root.pageTitle = '差旅标准';
+        changeTitle('差旅标准',$scope);
         loading(true);
         API.onload(function(){
             API.travelPolicy.getCurrentStaffTp()

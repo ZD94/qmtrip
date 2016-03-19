@@ -20,7 +20,7 @@ var travelplan=(function(){
     //alert("no error");
     //["未完成","待出预算","待上传票据","票据审核中","审核未通过","已完成"]
     travelplan.PlanlistController = function($scope,$routeParams) {
-        
+        changeTitle('出差记录',$scope);
         $scope.STATUS="未完成";//当前状态
         $scope.statuses=["未完成","待出预算","待上传票据","票据审核中","审核未通过","已完成"];
         $scope.ORDER="默认";//当前排序
@@ -30,30 +30,27 @@ var travelplan=(function(){
         $scope.total=null;
         $scope.tips="";
 
-        var PARAMS = (function(){//API参数：要显示的页数
-            if( $routeParams.status ){
-                if( $routeParams.status==="NO_BUDGET" ){
-                    $scope.STATUS="待出预算";
-                    return {page:1,isHasBudget:false};
-                }else if( $routeParams.status==="WAIT_UPLOAD" ){
-                    $scope.STATUS="待上传票据";
-                    return {page:1,isUpload:false};
-                }else if( $routeParams.status==="AUDIT_NOT_PASS" ){
-                    $scope.STATUS="审核未通过";
-                    return {page:1,audit:'N'};
-                }else if( $routeParams.status==="DEFAULT" ){
-                    $scope.STATUS="未完成";
-                    return {page:1,isComplete:false};
-                }else{
-                    $scope.STATUS="未完成";
-                    return {page:1,isComplete:false};
-                };
-            }else{
-                $scope.STATUS="未完成";
-                return {page:1,isComplete:false};
-            }
-        })();
-        
+        var STATUS_STORES = {
+            "WAIT": "待出预算",
+            "WAIT_UPLOAD": "待上传票据",
+            "REJECT": "审核未通过",
+            "UN_FINISH": "未完成"
+        }
+
+        var statue = $routeParams.status || 'UN_FINISH';
+        $routeParams.status = null;
+        var PARAMS = {page: 1};
+        if (statue == 'WAIT') {
+            PARAMS.isHasBudget = false;
+        } else if (statue == 'WAIT_UPLOAD') {
+            PARAMS.isUpload = false;
+        } else if (statue == 'REJECT') {
+            PARAMS.audit = 'N';
+        } else {
+            PARAMS.isComplete = false;
+        }
+        $scope.STATUS = STATUS_STORES[statue];
+
         //-----------------------------------------------------------
         function init(){
             //页面上的所有交互All interacitve actions on this page
@@ -238,7 +235,7 @@ var travelplan=(function(){
      * @constructor
      */
     travelplan.PlandetailController = function($scope, $routeParams) {
-
+        changeTitle('详细出差记录',$scope);
         $scope.ITEM={};
         $scope.URL={};
         $scope.timeSpan;//入住酒店的天数
@@ -430,9 +427,8 @@ var travelplan=(function(){
      * @constructor
      */
     travelplan.InvoicedetailController = function($scope, $routeParams) {
-        
-        $("title").html("票据详情");
-        $scope.$root.pageTitle = "票据详情";
+
+        changeTitle('票据详情',$scope);
 
         var planId = $routeParams.planId;
         $scope.planId = planId;
