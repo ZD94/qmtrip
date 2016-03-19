@@ -74,63 +74,79 @@
         //
         //
         //} else {
-            var uploadConf = {
-                url: "/upload/ajax-upload-file?type=invoice",
-                alias: "tmpFile",
-                autoUpload: false
-            };
+            // var uploadConf = {
+            //     url: "/upload/ajax-upload-file?type=invoice",
+            //     alias: "tmpFile",
+            //     autoUpload: false
+            // };
 
-            $scope.winWidth = $(window).width();
-            var uploader = $scope.uploader = new FileUploader(uploadConf);
-            uploader.filters.push({
-                name: 'customFilter',
-                fn: function(item, options) {
-                    return this.queue.length < 10;
-                }
-            });
-            uploader.onAfterAddingFile = function(file) {
-                preview(file);
-            }
-            uploader.onCompleteItem = function(fileItem, response, status, headers) {
-                var consumeId;
-                if(fileItem.traffictype == '去程'){
-                    consumeId = $scope.outTraffic.id;
-                }
-                if(fileItem.traffictype == ''){
-                    consumeId = $scope.hotel.id;
-                }
-                if(fileItem.traffictype == '回程'){
-                    consumeId = $scope.backTraffic.id;
-                }
-                var md5key = response.md5key;
-                uploadInvoice(consumeId, md5key, function(err, result){
+         //$scope.winWidth = $(window).width();
+         //var uploader = $scope.uploader = new FileUploader(uploadConf);
+         //uploader.filters.push({
+         //    name: 'customFilter',
+         //    fn: function(item, options) {
+         //        return this.queue.length < 10;
+         //    }
+         //});
+         //uploader.onAfterAddingFile = function(file) {
+         //    preview(file);
+         //    console.info(file);
+         //
+         //}
+         //uploader.onCompleteItem = function(fileItem, response, status, headers) {
+         //    var consumeId;
+         //    if(fileItem.traffictype == '去程'){
+         //        consumeId = $scope.outTraffic.id;
+         //    }
+         //    if(fileItem.traffictype == ''){
+         //        consumeId = $scope.hotel.id;
+         //    }
+         //    if(fileItem.traffictype == '回程'){
+         //        consumeId = $scope.backTraffic.id;
+         //    }
+         //    var md5key = response.md5key;
+         //    uploadInvoice(consumeId, md5key, function(err, result){
+         //        if (err ) {
+         //            TLDAlert(err.msg || err);
+         //            return;
+         //        }
+         //        $scope.initall();
+         //    });
+         //
+         //    $scope.close_pre();
+         //};
+         //function preview(file) {
+         //    $scope.invoicetype = file.invoicetype;
+         //    $scope.traffictype = file.traffictype;
+         //    $(".upload_sure").show();
+         //}
+         //$scope.close_pre = function() {
+         //    $(".upload_sure").hide();
+         //    $(".ngthumb").hide();
+         //}
+        $scope.winWidth = $(window).width();
+        $scope.uploader = init_uploader(FileUploader);
+        $scope.backtraffic_up = function(cb){
+            var type1='交通';
+            var type2 = '回程';
+            cb(type1, type2);
+        }
+        $scope.backtraffic_done = function(response){
+            var md5key = response.md5key;
+            uploadInvoice($scope.backTraffic.id, md5key, function(err, result){
                     if (err ) {
                         TLDAlert(err.msg || err);
                         return;
                     }
                     $scope.initall();
                 });
-                
-                $scope.close_pre();
-            };
-            function preview(file) {
-                console.info(file);
-                $scope.invoicetype = file.invoicetype;
-                $scope.traffictype = file.traffictype;
-                $(".upload_sure").show();
-            }
-            $scope.close_pre = function() {
-                $(".upload_sure").hide();
-                $(".ngthumb").hide();
-            }
-            
+        }
         function uploadInvoice(consumeId, picture, callback) {
             API.tripPlan.uploadInvoice({
                     consumeId: consumeId,
                     picture: picture
                 }, callback);
         }
-
  		loading(true);
  		var planId = $routeParams.planId;
         $scope.initall = function() {
