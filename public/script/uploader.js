@@ -34,7 +34,6 @@ function init_uploader(FileUploader){
         data.push('<div class="img_button"><div class="reupload">取消</div><div class="uploadall">确定</div></div>');
         data.push('</div>');
         data = data.join('');
-        console.info(data);
         var fileupload = document.getElementById('upload');
         if(!fileupload){
             fileupload = document.createElement("div");
@@ -51,9 +50,6 @@ function init_uploader(FileUploader){
         })
         var canvas = $("#upload").find('canvas');
         var reader = new FileReader();
-        // console.info(data);
-        // console.info(reader);
-        console.info(file);
         reader.onload = onLoadFile;
         reader.readAsDataURL(file._file);
         
