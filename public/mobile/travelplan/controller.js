@@ -446,19 +446,22 @@ var travelplan=(function(){
 
         $scope.commit = function () {//此函数在用户点击“提交审核”按钮时被调用。
             if( $scope.ITEM.orderStatus==="WAIT_COMMIT" ){
-                confirm( '确认提交','返回检查','票据一经提交将无法进行修改，是否确认提交？',function(){
-                    API.onload(function() {
-                        API.tripPlan.commitTripPlanOrder( $scope.ITEM.id )
-                            .then(function(result){
-                                location.reload();
-                                black_err("提交审核成功");
-                            })
-                            .catch(function(err){
-                                $(".confirmFixed").show();
-                                console.info (err);
-                            })
-                    })
-                });
+                msgbox.confirm('票据一经提交将无法进行修改，是否确认提交？', '确认提交', '返回检查')
+                    .then(function(btn){
+                        if(btn != 'ok')
+                            return;
+                        API.onload(function() {
+                            API.tripPlan.commitTripPlanOrder( $scope.ITEM.id )
+                                .then(function(result){
+                                    location.reload();
+                                    msgbox.log("提交审核成功");
+                                })
+                                .catch(function(err){
+                                    $(".confirmFixed").show();
+                                    console.info (err);
+                                });
+                        })
+                    });
             };
         }
 

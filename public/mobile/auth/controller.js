@@ -43,7 +43,7 @@ module.exports = (function() {
                             //console.info(err.msg);
                             var str = err.msg;
                             $scope.$apply();
-                            black_err(str);//显示错误消息
+                            msgbox.log(str);//显示错误消息
                         }).done();
                 })
             }
