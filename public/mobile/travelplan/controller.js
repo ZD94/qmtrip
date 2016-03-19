@@ -272,6 +272,14 @@ var travelplan=(function(){
         //初始化上传图片
         $scope.winWidth = $(window).width();
         $scope.uploader = init_uploader(FileUploader);
+        function uploadInvoice( consumeId, picture, callback ) {
+            API.tripPlan.uploadInvoice({
+                consumeId: consumeId,
+                picture: picture
+            }, callback);
+        }
+
+
         $scope.backtraffic_up = function(cb){
             var type1='交通票据';
             var type2 = '回程';
@@ -323,12 +331,7 @@ var travelplan=(function(){
                 black_err("票据上传成功");
             });
         }
-        function uploadInvoice(consumeId, picture, callback) {
-            API.tripPlan.uploadInvoice({
-                consumeId: consumeId,
-                picture: picture
-            }, callback);
-        }
+        
         //******************************************************************************
         $scope.ITEM={};//该变量的值为  出差记录详情数据。
         $scope.URL={};//该变量的值为  预订去程、回程和酒店的url。
