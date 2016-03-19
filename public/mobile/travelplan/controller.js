@@ -245,13 +245,8 @@ var travelplan=(function(){
     travelplan.PlandetailController = function($scope, $routeParams,FileUploader) {
         //初始化上传图片
         $scope.winWidth = $(window).width();
-        $scope.uploader = init_uploader(FileUploader);
-        $scope.backtraffic_up = function(cb){
-            var type1='交通票据';
-            var type2 = '回程';
-            var type3 = '&#xe90e;';
-            cb(type1, type2, type3);
-        }
+        $scope.uploader = init_uploader(FileUploader, "/upload/ajax-upload-file?type=invoice");
+        $scope.backtraffic_up = '&#xe90e;<em>回程</em><strong>交通票据</strong>';
         $scope.backtraffic_done = function(response){
             var md5key = response.md5key;
             uploadInvoice($scope.backId, md5key, function(err, result){
@@ -262,12 +257,7 @@ var travelplan=(function(){
                 $scope.getData( $routeParams.orderId )
             });
         }
-        $scope.outtraffic_up = function(cb){
-            var type1='交通票据';
-            var type2 = '去程';
-            var type3 = '&#xe90e;';
-            cb(type1, type2, type3);
-        }
+        $scope.outtraffic_up = '&#xe90e;<em>去程</em><strong>交通票据</strong>';
         $scope.outtraffic_done = function(response){
             var md5key = response.md5key;
             uploadInvoice($scope.outId, md5key, function(err, result){
@@ -278,12 +268,7 @@ var travelplan=(function(){
                 $scope.getData( $routeParams.orderId )
             });
         }
-        $scope.hoteltraffic_up = function(cb){
-            var type1='住宿发票';
-            var type2 = '';
-            var type3 = '&#xe914;';
-            cb(type1, type2, type3);
-        }
+        $scope.hoteltraffic_up = '&#xe914;<em></em><strong>住宿发票</strong>';
         $scope.hoteltraffic_done = function(response){
             var md5key = response.md5key;
             uploadInvoice($scope.hotelId, md5key, function(err, result){
