@@ -58,7 +58,31 @@ var travelplan=(function(){
             PARAMS.isComplete = false;
         }
         //-----------------------------------------------
-
+        /*
+        var PARAMS = (function(){//API参数：要显示的页数
+            if( $routeParams.status ){
+                if( $routeParams.status==="NO_BUDGET" ){
+                    $scope.STATUS="待出预算";
+                    return {page:1,isHasBudget:false};
+                }else if( $routeParams.status==="WAIT_UPLOAD" ){
+                    $scope.STATUS="待上传票据";
+                    return {page:1,isUpload:false};
+                }else if( $routeParams.status==="AUDIT_NOT_PASS" ){
+                    $scope.STATUS="审核未通过";
+                    return {page:1,audit:'N'};
+                }else if( $routeParams.status==="DEFAULT" ){
+                    $scope.STATUS="未完成";
+                    return {page:1,isComplete:false};
+                }else{
+                    $scope.STATUS="未完成";
+                    return {page:1,isComplete:false};
+                };
+            }else{
+                $scope.STATUS="未完成";
+                return {page:1,isComplete:false};
+            };
+        })();
+        */
         //-----------------------------------------------------------
         function init(){
             //页面上的所有交互All interacitve actions on this page
@@ -222,7 +246,7 @@ var travelplan=(function(){
             })
         }
 
-        $scope.handleScroll = function(){//当页面滚动到底部时执行该函数
+        $scope.handleScroll = function(){//该函数在
             if( $(document).scrollTop()==($(document).height()-$(window).height()) ){//如果滚动条已经到达页面底部
                 $scope.getList( PARAMS );
             }
@@ -245,9 +269,9 @@ var travelplan=(function(){
      */
     travelplan.PlandetailController = function($scope, $routeParams) {
         
-        $scope.ITEM={};
-        $scope.URL={};
-        $scope.timeSpan;//入住酒店的天数
+        $scope.ITEM={};//该变量的值为  出差记录详情数据。
+        $scope.URL={};//该变量的值为  预订去程、回程和酒店的url。
+        $scope.timeSpan;//该变量的值为  入住酒店的天数。
         //---------------------------------------------
         $scope.getData = function( p ){//此函数用于获取 出差记录详情数据 并把它存入$scope.ITEM这一变量中。
 
@@ -282,11 +306,11 @@ var travelplan=(function(){
             })
         }
 
-        $scope.renderDeficit = function(){
+        $scope.renderDeficit = function(){//此函数用于计算并渲染 节省的钱数/超支的钱数。
             return Math.abs($scope.ITEM.budget-$scope.ITEM.expenditure).toFixed(2);
         }
 
-        $scope.renderStatus = function( p,i ){
+        $scope.renderStatus = function( p,i ){//此函数用于判断并渲染 某一张票据的状态。
 
             if( p ){
                 if( p.orderStatus==="NO_BUDGET" ){
@@ -310,7 +334,7 @@ var travelplan=(function(){
             };
         }
 
-        $scope.renderBUTTON = function(){
+        $scope.renderBUTTON = function(){//此函数用于判断并渲染 “提交审核”按钮上显示的文字。
 
             if( $scope.ITEM.orderStatus==="WAIT_AUDIT" ){
                 return "票据审核中";
@@ -405,21 +429,23 @@ var travelplan=(function(){
             if( $scope.ITEM.orderStatus==="WAIT_COMMIT" ){
                 confirm( '确认提交','返回检查','票据一经提交将无法进行修改，是否确认提交？',function(){
                     API.onload(function() {
-                        API.tripPlan.commitTripPlanOrder( $scope.ITEM.id )
-                            .then(function(result){
-                                location.reload();
-                                black_err("提交审核成功");
-                            })
-                            .catch(function(err){
-                                $(".confirmFixed").show();
-                                console.info (err);
-                            })
+                        API
+                        .tripPlan
+                        .commitTripPlanOrder( $scope.ITEM.id )
+                        .then(function(result){
+                            location.reload();
+                            black_err("提交审核成功");
+                        })
+                        .catch(function(err){
+                            $(".confirmFixed").show();
+                            console.info (err);
+                        })
                     })
                 });
             };
         }
 
-        function init(){
+        function init(){//此函数被用于初始化页面。
             changeTitle('详细出差记录',$scope);
             $scope.$root.pageTitle = "详细出差记录";
             $scope.getData( $routeParams.orderId );
