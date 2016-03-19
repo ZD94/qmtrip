@@ -20,7 +20,7 @@ var travelplan=(function(){
     //alert("no error");
     //["未完成","待出预算","待上传票据","票据审核中","审核未通过","已完成"]
     travelplan.PlanlistController = function($scope,$routeParams) {
-        changeTitle('出差记录',$scope);
+        
         $scope.STATUS="未完成";//当前状态
         $scope.statuses=["未完成","待出预算","待上传票据","票据审核中","审核未通过","已完成"];
         $scope.ORDER="默认";//当前排序
@@ -30,6 +30,7 @@ var travelplan=(function(){
         $scope.total=null;
         $scope.tips="";
 
+        //-------------------------------------------- Modified by LH on 2016-03-19
         var STATUS_STORES = {
             "WAIT": "待出预算",
             "WAIT_UPLOAD": "待上传票据",
@@ -38,6 +39,13 @@ var travelplan=(function(){
         }
 
         var statue = $routeParams.status || 'UN_FINISH';
+        var display = STATUS_STORES[statue];
+        if (!display) {
+            statue = 'UN_FINISH';
+            display = STATUS_STORES[statue];
+        }
+
+        $scope.STATUS = display;
         $routeParams.status = null;
         var PARAMS = {page: 1};
         if (statue == 'WAIT') {
@@ -49,18 +57,19 @@ var travelplan=(function(){
         } else {
             PARAMS.isComplete = false;
         }
-        $scope.STATUS = STATUS_STORES[statue];
+        //-----------------------------------------------
 
         //-----------------------------------------------------------
         function init(){
             //页面上的所有交互All interacitve actions on this page
+            changeTitle('出差记录',$scope);
             $scope.$root.pageTitle="出差记录";
-            loading(true);
             console.log( PARAMS );
             $scope.getList( PARAMS );
             $(window).on("scroll",$scope.handleScroll);
             $(".dropdown-header").on("click",$scope.enterSelectingMode);
             $(".veil").on("click",$scope.quitSelectingMode);
+            loading(true);
         };
 
         $scope.enterSelectingMode=function(){//进入“选择模式”。该函数在用户点击".dropdown-header"时被调用。
@@ -235,7 +244,7 @@ var travelplan=(function(){
      * @constructor
      */
     travelplan.PlandetailController = function($scope, $routeParams) {
-        changeTitle('详细出差记录',$scope);
+        
         $scope.ITEM={};
         $scope.URL={};
         $scope.timeSpan;//入住酒店的天数
@@ -411,6 +420,7 @@ var travelplan=(function(){
         }
 
         function init(){
+            changeTitle('详细出差记录',$scope);
             $scope.$root.pageTitle = "详细出差记录";
             $scope.getData( $routeParams.orderId );
         }

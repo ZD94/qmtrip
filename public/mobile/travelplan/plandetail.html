@@ -75,10 +75,16 @@
                 <div class="status" ng-class="{true:'rejected'}[ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS']">{{renderStatus( ITEM.outTraffic[0],$index )}}</div>
                 <div class="buttons" ng-if="  ITEM.outTraffic[0].orderStatus!=='NO_BUDGET'  ">
                     <a class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'outTraffic' )" ng-hide="ITEM.outTraffic[0].invoiceType==='TRAIN'">预订</a>
-                    <a class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">上传票据</a>
-                    <a class="BTN" ng-if="  
+                    <div class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">
+                        <input type="file">
+                        上传票据
+                    </div>
+                    <div class="BTN" ng-if="  
                         ITEM.outTraffic[0].orderStatus==='WAIT_COMMIT'||
-                        ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS'  " ng-click="">重新上传</a>
+                        ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS'  " ng-click="">
+                        <input type="file">
+                        重新上传
+                    </div>
                     <a class="BTN" ng-if="  
                         ITEM.outTraffic[0].orderStatus==='WAIT_COMMIT'||
                         ITEM.outTraffic[0].orderStatus==='WAIT_AUDIT'||
@@ -124,10 +130,16 @@
                 <div class="status" ng-class="{true:'rejected'}[ITEM.backTraffic[0].orderStatus==='AUDIT_NOT_PASS']">{{renderStatus( ITEM.backTraffic[0] )}}</div>
                 <div class="buttons" ng-if="ITEM.backTraffic[0].budget!==-1">
                     <a class="BTN" ng-if="  ITEM.backTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'backTraffic' )" ng-hide="ITEM.backTraffic[0].invoiceType==='TRAIN'">预订</a>
-                    <a class="BTN" ng-if="  ITEM.backTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">上传票据</a>
-                    <a class="BTN" ng-if="  
+                    <div class="BTN" ng-if="  ITEM.backTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">
+                        <input type="file">
+                        上传票据
+                    </div>
+                    <div class="BTN" ng-if="  
                         ITEM.backTraffic[0].orderStatus==='WAIT_COMMIT'||
-                        ITEM.backTraffic[0].orderStatus==='AUDIT_NOT_PASS'  " ng-click="">重新上传</a>
+                        ITEM.backTraffic[0].orderStatus==='AUDIT_NOT_PASS'  " ng-click="">
+                        <input type="file">
+                        重新上传
+                    </div>
                     <a class="BTN" ng-if="  
                         ITEM.backTraffic[0].orderStatus==='WAIT_COMMIT'||
                         ITEM.backTraffic[0].orderStatus==='WAIT_AUDIT'||
@@ -167,10 +179,16 @@
                 <div class="status" ng-class="{true:'rejected'}[ITEM.hotel[0].orderStatus==='AUDIT_NOT_PASS']">{{renderStatus( ITEM.hotel[0] )}}</div>
                 <div class="buttons" ng-if="  ITEM.hotel[0].budget!==-1  ">
                     <a class="BTN" ng-if="  ITEM.hotel[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'hotel' )" ng-hide="ITEM.hotel[0].invoiceType==='TRAIN'">预订</a>
-                    <a class="BTN" ng-if="  ITEM.hotel[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">上传票据</a>
-                    <a class="BTN" ng-if="  
+                    <div class="BTN" ng-if="  ITEM.hotel[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">
+                        <input type="file">
+                        上传票据
+                    </div>
+                    <div class="BTN" ng-if="  
                         ITEM.hotel[0].orderStatus==='WAIT_COMMIT'||
-                        ITEM.hotel[0].orderStatus==='AUDIT_NOT_PASS'  " ng-click="">重新上传</a>
+                        ITEM.hotel[0].orderStatus==='AUDIT_NOT_PASS'  " ng-click="">
+                        <input type="file">
+                        重新上传
+                    </div>
                     <a class="BTN" ng-if="  
                         ITEM.hotel[0].orderStatus==='WAIT_COMMIT'||
                         ITEM.hotel[0].orderStatus==='WAIT_AUDIT'||
