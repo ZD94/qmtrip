@@ -66,19 +66,19 @@ var travelplan=(function(){
             $(".veil").on("click",$scope.quitSelectingMode);
         };
 
-        $scope.enterSelectingMode=function(){//进入“选择模式”
+        $scope.enterSelectingMode=function(){//进入“选择模式”。该函数在用户点击".dropdown-header"时被调用。
             $(".veil").show();
             $("body").css({overflow:"hidden"});
             $(this).siblings(".dropdown-menu").slideDown();
             $(this).parent(".dropdown").siblings(".dropdown").find(".dropdown-menu").hide();
         }
-        $scope.quitSelectingMode=function(){//退出“选择模式”
+        $scope.quitSelectingMode=function(){//退出“选择模式”。该函数在用户点击 ".dropdown-menu>li"或".veil" 时被调用。
             $(".veil").hide();
             $(".dropdown-menu").hide();
             $("body").css({overflow:"scroll"});
         }
 
-        $scope.selectStatus=function(i){//选择“状态”
+        $scope.selectStatus=function(i){//该函数在用户点击 ".dropdown-menu>li" 时被调用。
             $scope.STATUS=$scope.statuses[i];
             $scope.ORDER="默认";
             $scope.items=[];
