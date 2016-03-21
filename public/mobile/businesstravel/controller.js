@@ -20,6 +20,7 @@ var businesstravel=(function(){
      */
     businesstravel.IndexController = function($scope) {
         $scope.$root.pageTitle = '我要出差';
+        //console.info($scope.$root.pageTitle);
         loading(true);
         //选择项目
         $scope.selectPurposeName = function () {

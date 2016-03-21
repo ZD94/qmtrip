@@ -12,6 +12,7 @@ module.exports = (function() {
     user.IndexController = function($scope) {
 
         $scope.$root.pageTitle = '个人中心';
+        //console.info($scope.$root.pageTitle);
         $scope.initStaffUser = function(){
             API.onload(function(){
                 API.staff.getCurrentStaff()
