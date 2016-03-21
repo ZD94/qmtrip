@@ -34,12 +34,17 @@ function init_uploader(FileUploader, url){
             document.body.appendChild(fileupload);
         }
         fileupload.innerHTML = data;
-        $(document).on("click",".reupload",function(){
+
+        $(".reupload").bind("click", cancel);
+        $(".uploadall").bind('click', uploadAll);
+        function cancel() {
             $("#upload").remove();
-        })
-        $(document).on("click",".uploadall",function(){
+        }
+
+        function uploadAll() {
             uploader.uploadAll();
-        })
+        }
+
         var canvas = $("#upload").find('canvas');
         var reader = new FileReader();
         reader.onload = onLoadFile;
