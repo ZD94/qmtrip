@@ -868,27 +868,26 @@ function statBudgetByMonth(params) {
 
     return Promise.all(
         timeArr.map(function(month) {
-            var s_sql = sql;
-            var c_sql = complete_sql;
+            var s_sql = sql; // + month + '\\d\';';
+            var c_sql = complete_sql; // + month + '\\d\';';
             var index = month.match(/\d{4}-\d{2}-(\d).*/)[1];
             var remark = '';
+
             if(index === '0') {
                 remark = '上旬';
-                s_sql = sql + month + '0\\d\';';
-                c_sql = complete_sql + month + '0\\d\';';
+                s_sql = sql + month + '\';';
+                c_sql = complete_sql + month + '\';';
             }else if(index === '1') {
                 remark = '中旬';
-                s_sql = sql + month + '1\\d\';';
-                c_sql = complete_sql + month + '1\\d\';';
+                s_sql = sql + month + '\';';
+                c_sql = complete_sql + month + '\';';
             }else if(index === '2' || index === '3') {
                 remark = '下旬';
-                s_sql = sql + month + '(2||3)\\d\';';
-                c_sql = complete_sql + month + '(2||3)\\d\';';
+                var str = month.substr(0, month.length -3);
+                s_sql = sql + str + '(2|3)\\d\';';
+                c_sql = complete_sql + str + '(2|3)\\d\';';
             }
 
-            console.info("*****************************");
-            console.info(s_sql);
-            console.info(c_sql);
             var month = month.match(/\d{4}-\d{2}/)[0];
             return Promise.all([
                 sequelize.query(s_sql),
