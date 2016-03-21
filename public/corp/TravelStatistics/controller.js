@@ -241,6 +241,9 @@ var TravelStatistics = (function(){
                 API.tripPlan.pageTripPlanOrderByCompany(params)
                     .then(function(list){
                         $scope.planlist = list.items;
+                        if($scope.planlist.length == 0){
+                            $("#pagination").hide();
+                        }
                         console.log( $scope.planlist );
                         var planlist = list.items;
                         $scope.total = list.total;
