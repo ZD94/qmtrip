@@ -874,21 +874,21 @@ function statBudgetByMonth(params) {
             var remark = '';
             if(index === '0') {
                 remark = '上旬';
-                s_sql = sql + '0\\d\';';
-                c_sql = complete_sql + '0\\d\';';
+                s_sql = sql + month + '0\\d\';';
+                c_sql = complete_sql + month + '0\\d\';';
             }else if(index === '1') {
                 remark = '中旬';
-                s_sql = sql + '1\\d\';';
-                c_sql = complete_sql + '1\\d\';';
+                s_sql = sql + month + '1\\d\';';
+                c_sql = complete_sql month + + '1\\d\';';
             }else if(index === '2' || index === '3') {
                 remark = '下旬';
-                s_sql = sql + '(2||3)\\d\';';
-                c_sql = complete_sql + '(2||3)\\d\';';
+                s_sql = sql + month + '(2||3)\\d\';';
+                c_sql = complete_sql + month + '(2||3)\\d\';';
             }
 
-            //console.error("*****************************");
-            //console.error(s_sql);
-            //console.error(c_sql);
+            console.info("*****************************");
+            console.info(s_sql);
+            console.info(c_sql);
             var month = month.match(/\d{4}-\d{2}/)[0];
             return Promise.all([
                 sequelize.query(s_sql),
