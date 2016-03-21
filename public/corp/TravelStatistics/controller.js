@@ -41,8 +41,6 @@ var TravelStatistics = (function(){
                         }
                         console.info(date_array);
                         $scope.items=date_array;
-                        // var params = {startTime:$scope.creatmonth+'-01 00:00:00', endTime:monthEnd}
-                        // return API.tripPlan.statBudgetByMonth(params)
                     })
                     .catch(function(err){
                         console.info(err)
