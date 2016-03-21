@@ -42,6 +42,7 @@ function init_uploader(FileUploader, url){
         }
 
         function uploadAll() {
+            loading(false);
             uploader.uploadAll();
         }
 
@@ -82,6 +83,7 @@ function init_uploader(FileUploader, url){
     }
     uploader.onCompleteItem = function (fileItem, response, status, headers) {
         fileItem.done(response);
+        loading(true);
         $("#upload").remove();
     };
     return uploader;
