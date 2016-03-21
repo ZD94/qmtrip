@@ -378,23 +378,25 @@ function pageTripPlanOrderByCompany(params) {
             }
 
             if(!emailOrName) {
-                return [options, []];
+                return [false, options, []];
             }
 
-            return [options,
+            return [true, options,
                 API.staff.findStaffs({companyId: companyId,
                     $or: [{name: {$like: '%' + emailOrName +'%'}}, {email: {$like: '%' + emailOrName +'%'}}],
                     status: {$ne: -2},
                     columns: ['id']
                     })];
         })
-        .spread(function(options, staffs) {
+        .spread(function(isEmailOrName, options, staffs) {
             if(staffs && staffs.length > 0) {
                 var idArr = staffs.map(function(staff) {
                     return staff.id;
                 });
 
                 options.where.accountId = {$in: idArr};
+            }else if(isEmailOrName) {
+                return {page: 1, perPage: 20, items: []};
             }
 
             return API.tripPlan.listTripPlanOrder(options);
