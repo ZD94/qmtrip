@@ -854,14 +854,19 @@ function statBudgetByMonth(params) {
         stTime = moment(stTime).add(1, 'months').format('YYYY-MM-DD');
     }while(stTime<enTime);
 
-    var sql = 'select sum(budget) as \"planMoney\",sum(expenditure) as expenditure ' +
+    var sql = 'select count(account_id) as \"staffNum\", sum(budget) as \"planMoney\",sum(expenditure) as expenditure ' +
         'from tripplan.trip_plan_order where company_id=\'' + params.companyId + '\'';
+
+    var staff_num_sql = 'select count(account_id) as \"staffNum\" from tripplan.trip_plan_order where company_id=\'' + params.companyId + '\'';
 
     if(params.accountId) {
         sql += ' and account_id=\'' + params.accountId + '\'';
+        staff_num_sql += ' and account_id=\'' + params.accountId + '\'';
     }
 
     var complete_sql = sql + ' and status=2 and to_char(start_at, \'YYYY-MM-DD\') ~ \'';
+
+    staff_num_sql += ' and status=2 and to_char(start_at, \'YYYY-MM-DD\') ~ \'';
 
     sql += ' and status > -1 and to_char(start_at, \'YYYY-MM-DD\') ~ \'';
 
@@ -869,6 +874,7 @@ function statBudgetByMonth(params) {
         timeArr.map(function(month) {
             var s_sql = sql + month + '\';';
             var c_sql = complete_sql + month + '\';';
+            var f_sql = staff_num_sql + month + '\';';
 
             var index = month.match(/\d{4}-\d{2}-(\d).*/)[1];
             var remark = '';
@@ -883,7 +889,7 @@ function statBudgetByMonth(params) {
             var month = month.match(/\d{4}-\d{2}/)[0];
             return Promise.all([
                 sequelize.query(s_sql),
-                sequelize.query(c_sql)
+                sequelize.query(c_sql),
             ])
                 .spread(function(all, complete){
                     var a = all[0][0];
@@ -893,6 +899,7 @@ function statBudgetByMonth(params) {
                         qmBudget: a.planMoney|0,
                         planMoney: c.planMoney|0,
                         expenditure: c.expenditure|0,
+                        staffNum: c.staffNum,
                         remark: remark
                     };
 

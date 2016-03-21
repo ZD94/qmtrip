@@ -30,6 +30,8 @@
     <script type="text/javascript" src="/script/selectbox.js"></script>
     <script type="text/javascript">
         var md5 = require('md5');
+        var Cookie = require('tiny-cookie');
+        var calendar = require("calendar");
         var TLD = TLD_angular_app('qmtrip', 'mobile', '/usercenter/index');
         API.onlogin(function(){
             var backUrl = window.location.href;
