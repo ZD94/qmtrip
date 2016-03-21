@@ -105,6 +105,7 @@ var TravelStatistics = (function(){
                     // 使用刚指定的配置项和数据显示图表。
                     myChart.setOption(option);
                 }
+
                 Q.all([
                     API.tripPlan.statPlanOrderMoneyByCompany({startTime: monthStart, endTime: monthEnd}),
                     API.tripPlan.statPlanOrderMoneyByCompany({startTime: YMcommon+'-1 00:00:00', endTime: YMcommon+'-10 23:59:59'}),
@@ -242,7 +243,6 @@ var TravelStatistics = (function(){
                         console.log( $scope.planlist );
                         var planlist = list.items;
                         $scope.total = list.total;
-                        $scope.pages = list.pages;
                         planlist = planlist.map(function(plan){
                             return API.staff.getStaff({id:plan.accountId})
                                 .then(function(staff){
@@ -336,7 +336,7 @@ var TravelStatistics = (function(){
                 clearInterval (pagenum);
             }
         }
-        var pagenum =setInterval($scope.pagination,1000);
+        var pagenum =setInterval($scope.pagination,10);
 
         //进入详情页
         $scope.enterDetail = function (orderId) {
@@ -371,7 +371,6 @@ var TravelStatistics = (function(){
                 setTimeout($scope.pagination1,100);
             }
             initPlanlist();
-            pagenum =setInterval($scope.pagination,1000);
         }
     }
     // 出差记录详情页
