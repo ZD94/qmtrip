@@ -89,7 +89,7 @@ module.exports = (function() {
         }
 
         $scope.go_planlist = function() {//跳转到“出差记录列表页”。状态为“未完成”。
-            window.location.href = "#/travelplan/planlist?status="+"DEFAULT";
+            window.location.href = "#/travelplan/planlist";
         }
 
         $scope.go_budget = function() {

@@ -98,6 +98,8 @@
               text-overflow:ellipsis;
             }
             .icon {
+              vertical-align: top;
+              line-height:2.2rem;
               color:#C5C5C5;
             }
           }
@@ -166,17 +168,6 @@
   width: 100%;
   height: auto;
   padding-bottom: 5rem;
-  .BTN {
-  	width: 7.2rem;
-    height: 2.5rem;
-    line-height: 2.5rem;
-    border: 1px #E5E5E5 solid;
-    border-radius: 0.2rem;
-    background: #FFFFFF;
-    margin: 0.9rem 0 0 1rem;
-    text-align: center;
-    float: left;
-  }
   .HEADER {
     height: auto;
     color: @color-theme3;
@@ -264,6 +255,7 @@
           }
           .description {
             font-size: @f32;
+            line-height: @f32;
             span {
               color: @color-theme1;
               padding: 0 0.5rem;
@@ -311,6 +303,27 @@
         .buttons {
         	float: right;
         	overflow: hidden;
+            .BTN {
+              position: relative;
+              width: 7.2rem;
+              height: 2.5rem;
+              line-height: 2.5rem;
+              border: 1px #CDCDCD solid;
+              border-radius: 0.2rem;
+              background: #FFFFFF;
+              margin: 0.9rem 0 0 1rem;
+              text-align: center;
+              float: left;
+            }
+          input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            z-index: 1;
+          }
         }
         /*
         .smallbtn {
