@@ -62,6 +62,9 @@ var TravelStatistics = (function(){
                         })
                 }
                 function chartload(s,z,x) {
+                    $scope.s = s; //上旬
+                    $scope.z = z; //中旬
+                    $scope.x = x; //下旬
                     var planConsume = [];
                     planConsume.push(s.planMoney);
                     planConsume.push(z.planMoney);
@@ -72,7 +75,7 @@ var TravelStatistics = (function(){
                     factConsume.push(x.expenditure);
                     var travelNumbers = [];
                     travelNumbers.push(s.NumOfStaff, z.NumOfStaff, x.NumOfStaff);
-                    console.info(s,z,x)
+                    console.info(s,z,x);
                     var myChart = echarts.init(document.getElementById('settle_chart'));
                     // 指定图表的配置项和数据
                     var option = {
@@ -113,9 +116,6 @@ var TravelStatistics = (function(){
                     .spread(function(stat, s, z, x) {
                         chartload(s,z,x);
                         $scope.stat = stat;
-                        $scope.s = s; //上旬
-                        $scope.z = z; //中旬
-                        $scope.x = x; //下旬
                         $scope.$apply();
                         Myselect ();
                     })
