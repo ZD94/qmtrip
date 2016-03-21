@@ -298,7 +298,7 @@ var businesstravel=(function(){
      * @constructor
      */
     businesstravel.HotelController = function($scope) {
-        changeTitle('我要出差',$scope);
+        $scope.$root.pageTitle = '动态预算结果';
         loading(true);
 
         //遍历存储数据为undefined
