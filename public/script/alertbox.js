@@ -15,16 +15,18 @@ var reset = function () {
 
 //��͸������ʾ��ֱ�Ӵ������Ϳ��ԡ�eg:black_err(str);
 function black_err(str) {
-    $('body').find('.err_alert').remove();
-    var timer = setTimeout(function(){
+    var timer = setInterval(function(){
         $('.err_alert').hide();
+        clearInterval(timer);
     },3000);
-    var err = '<div class="err_alert">+str+</div>';
+    $('body').find('.err_alert').remove();
+    var err = '<div class="err_alert"></div>';
     $('body').append(err);
+    $('.err_alert').text(str);
     var err_w = $('.err_alert').width();
     $('.err_alert').css('margin-left',-(err_w/2+10));
     $('.err_alert').show();
-
+    timer;
 }
 
 //var message = "��ʾ��";
