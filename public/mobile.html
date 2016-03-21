@@ -30,7 +30,7 @@
     <script type="text/javascript" src="/script/mobiscroll.js"></script>
     <script type="text/javascript" src="/script/alertbox.js"></script>
     <script type="text/javascript" src="/script/uploader.js"></script>
-    <script type="text/javascript" src="/mobile/controller.all.js"></script>
+    <script type="text/javascript" src="/mobile/controller.all.js?v=160321"></script>
     <script type="text/javascript" src="/script/selectbox.js"></script>
     <script type="text/javascript">
 	    var Q = require('q');
@@ -95,6 +95,8 @@
 //            console.info(title);
             $('title').html(title);
             variable.$root.pageTitle = title;
+            console.info(variable.$root.pageTitle);
+            console.info($('title').html());
         }
 
         $(document).ready(function(){
