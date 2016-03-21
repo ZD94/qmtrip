@@ -1,14 +1,8 @@
 var $ = require('jquery');
 
-    function close_pre(){
-        $("#upload").remove();
-    }
-    function uploadAll(){
-        uploader.uploadAll();
-    };
-function init_uploader(FileUploader){
+function init_uploader(FileUploader, url){
     var uploadConf = {
-        url: "/upload/ajax-upload-file?type=invoice",
+        url: url,
         alias: "tmpFile",
         autoUpload: false
     };
@@ -22,15 +16,9 @@ function init_uploader(FileUploader){
     });
     */
     uploader.onAfterAddingFile = function (file) {
-        var traffictype,invoicetype,shapetype;
-        file.after(function(invoice,traffic,shape){
-            traffictype = traffic;
-            invoicetype = invoice;
-            shapetype = shape;
-        });
         var data = [];
         data.push('<div class="upload_sure">');
-        data.push('<div class="img_tit"><span class="web-icon-font3">'+shapetype+'<em>'+traffictype+'</em><strong>'+invoicetype+'</strong></span></div>');
+        data.push('<div class="img_tit"><span class="web-icon-font3">'+file.title+'</span></div>');
         data.push('<div class="preview_img"><canvas></canvas></div>');
         data.push('<div class="img_button"><div class="reupload">取消</div><div class="uploadall">确定</div></div>');
         data.push('</div>');
