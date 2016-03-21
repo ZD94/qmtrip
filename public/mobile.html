@@ -35,6 +35,7 @@
         var Cookie = require('tiny-cookie');
         var calendar = require("calendar");
         var TLD = TLD_angular_app('qmtrip', 'mobile', '/usercenter/index');
+        init_directive(TLD);
         API.onlogin(function(){
             var backUrl = window.location.href;
             backUrl = encodeURIComponent(backUrl);
