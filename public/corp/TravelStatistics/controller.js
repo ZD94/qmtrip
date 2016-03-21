@@ -31,12 +31,16 @@ var TravelStatistics = (function(){
             var startAT = $($event.target).attr("data-zrep");
             $scope.startAT = moment(startAT).startOf('month').format('YYYY-MM-DD');
             $scope.endAT = moment(startAT).endOf('month').format('YYYY-MM-DD 23:59:59');
-            API.tripPlan.statBudgetByMonth({startTime:$scope.startAT, endTime:$scope.endAT})
-                .then(function(stat){
+            Q.all([API.tripPlan.statBudgetByMonth({startTime:$scope.startAT, endTime:$scope.endAT}),
+                API.tripPlan.statPlanOrderMoneyByCompany({startTime: $scope.startAT || monthStart, endTime: $scope.endAT || monthEnd})
+                ])
+                .spread(function(budget,stat){
                     console.info(stat);
-                    var s = stat[0];
-                    var z = stat[1];
-                    var x = stat[2];
+                    console.info("%%%%%");
+                    var s = budget[0];
+                    var z = budget[1];
+                    var x = budget[2];
+                    $scope.stat = stat;
                     chartload(s,z,x);
                 })
                 .catch(function(err){
