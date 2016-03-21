@@ -19,8 +19,7 @@ function black_err(str) {
         $('.err_alert').hide();
         clearInterval(timer);
     },3000);
-    $('body').find('.err_alert').remove();
-    var err = '<div class="err_alert"></div>';
+    var err = '<div class="err_alert">+str+</div>';
     $('body').append(err);
     $('.err_alert').text(str);
     var err_w = $('.err_alert').width();
