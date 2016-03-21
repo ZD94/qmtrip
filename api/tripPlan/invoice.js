@@ -8,6 +8,7 @@ var path = require('path');
 var API = require("common/api");
 
 function agentGetTripplanInvoice(req, res, next){
+    req.clearTimeout();
     var consumeId = req.params.consumeId;
     var userId = req.cookies.agent_id;
     var token_id = req.cookies.agent_token_id;

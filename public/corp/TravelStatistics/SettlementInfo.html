@@ -26,20 +26,20 @@
 	                    </dd>
 	                </dl>
 				</div>
-				<div>
+				<div class="title_part">
 					<span>{{stat.NumOfStaff}}</span>
 					<em>完成出差人次</em>
 				</div>
-				<div>
+				<div class="title_part">
 					<span>￥{{stat.planMoney}}</span>
 					<em>计划支出</em>
 				</div>
-				<div>
+				<div class="title_part">
 					<span>￥{{stat.expenditure}}</span>
 					<em>实际支出</em>
 				</div>
-				<div>
-					<span>￥{{(stat.planMoney.toFixed(2) - stat.expenditure.toFixed(2))}}</span>
+				<div class="title_part">
+					<span>￥{{((stat.planMoney - stat.expenditure).toFixed(2))}}</span>
 					<em>节省</em>
 				</div>
 			</div>
