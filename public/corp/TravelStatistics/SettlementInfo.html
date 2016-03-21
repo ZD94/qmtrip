@@ -20,14 +20,9 @@
 				<div class="title_part">
 					<!-- {{ymcommon}} -->
 					<dl class="selectbox" style="width:198px;margin-top:30px;">
-	                    <dt class="common_select CplaneLevel">{{ymcommon}}</dt>
+	                    <dt class="common_select CplaneLevel" ng-model="creatmonth">{{ymcommon}}</dt>
 	                    <dd class="common_option">
-	                    	<div ng-repeat="item in items">{{item}}</div>
-	                        <div>不限</div>
-	                        <div>经济舱</div>
-	                        <div>高端经济舱</div>
-	                        <div>商务舱</div>
-	                        <div>头等舱</div>
+	                    	<div ng-repeat="item in items" data-zrep = "{{item.cur_en}}" ng-click="initchart($event)">{{item.cur_cn}}</div>
 	                    </dd>
 	                </dl>
 				</div>
