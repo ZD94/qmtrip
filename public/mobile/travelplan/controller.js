@@ -231,7 +231,6 @@ var travelplan = (function () {
     travelplan.PlandetailController = function ($scope, $routeParams, FileUploader) {
         //初始化上传图片
         $scope.winWidth = $(window).width();
-        $scope.uploader = init_uploader(FileUploader, "/upload/ajax-upload-file?type=invoice");
         function uploadInvoice(consumeId, picture, callback) {
             API.tripPlan.uploadInvoice({
                 consumeId: consumeId,
