@@ -61,7 +61,7 @@ var travelplan=(function(){
         //-----------------------------------------------------------
         function init(){
             //页面上的所有交互All interacitve actions on this page
-            changeTitle('出差记录',$scope);
+            $scope.$root.pageTitle = '出差记录';
             $scope.$root.pageTitle="出差记录";
             console.log( PARAMS );
             $scope.getList( PARAMS );
@@ -446,24 +446,27 @@ var travelplan=(function(){
 
         $scope.commit = function () {//此函数在用户点击“提交审核”按钮时被调用。
             if( $scope.ITEM.orderStatus==="WAIT_COMMIT" ){
-                confirm( '确认提交','返回检查','票据一经提交将无法进行修改，是否确认提交？',function(){
-                    API.onload(function() {
-                        API.tripPlan.commitTripPlanOrder( $scope.ITEM.id )
-                            .then(function(result){
-                                location.reload();
-                                black_err("提交审核成功");
-                            })
-                            .catch(function(err){
-                                $(".confirmFixed").show();
-                                console.info (err);
-                            })
-                    })
-                });
+                msgbox.confirm('票据一经提交将无法进行修改，是否确认提交？', '确认提交', '返回检查')
+                    .then(function(btn){
+                        if(btn != 'ok')
+                            return;
+                        API.onload(function() {
+                            API.tripPlan.commitTripPlanOrder( $scope.ITEM.id )
+                                .then(function(result){
+                                    location.reload();
+                                    msgbox.log("提交审核成功");
+                                })
+                                .catch(function(err){
+                                    $(".confirmFixed").show();
+                                    console.info (err);
+                                });
+                        })
+                    });
             };
         }
 
         function init(){
-            changeTitle('详细出差记录',$scope);
+            $scope.$root.pageTitle = '详细出差记录';
             $scope.$root.pageTitle = "详细出差记录";
             $scope.getData( $routeParams.orderId );
         }
@@ -481,7 +484,7 @@ var travelplan=(function(){
      */
     travelplan.InvoicedetailController = function($scope, $routeParams) {
 
-        changeTitle('票据详情',$scope);
+        $scope.$root.pageTitle = '票据详情';
 
         var planId = $routeParams.planId;
         $scope.planId = planId;
