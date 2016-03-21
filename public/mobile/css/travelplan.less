@@ -12,6 +12,7 @@
 @f32:1.6rem;
 @f30:1.5rem;
 @f28:1.4rem;
+@f26:1.3rem;
 @f24:1.2rem;
 @f20:1rem;
 
@@ -193,7 +194,9 @@
     .text {
       height: auto;
       text-align: center;
-      font-size: @f30;
+      span {
+        font-size: @f30;
+      }
     }
   }
   .COMPLETE {
@@ -321,7 +324,7 @@
               margin: 0.9rem 0 0 1rem;
               text-align: center;
               float: left;
-              font-size: @f24;
+              font-size: @f26;
             }
           input[type="file"] {
             position: absolute;
