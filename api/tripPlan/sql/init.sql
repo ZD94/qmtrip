@@ -51,6 +51,7 @@ CREATE TABLE trip_plan_order (
     expire_at timestamp without time zone,
     create_at timestamp without time zone,
     update_at timestamp without time zone,
+    commit_time timestamp without time zone,
     start_place_code character varying,
     destination_code character varying
 );
@@ -204,7 +205,8 @@ CREATE TABLE consume_details (
     start_place_code character varying,
     arrival_place_code character varying,
     city_code character varying,
-    is_commit boolean default false
+    is_commit boolean default false,
+    commit_time timestamp without time zone
 );
 
 

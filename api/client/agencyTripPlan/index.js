@@ -125,6 +125,8 @@ agencyTripPlan.pageTripPlanOrder = function(params){
 
             if(params.order) {
                 options.order = [params.order];
+            }else {
+                options.order = [['commit_time', 'asc']];
             }
 
             return API.tripPlan.listTripPlanOrder(options);

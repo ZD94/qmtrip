@@ -1024,8 +1024,8 @@ function commitTripPlanOrder(params){
         })
         .then(function(){
             return Promise.all([
-                PlanOrder.update({status: STATUS.COMMIT, auditStatus: 0, updateAt: utils.now(), isCommit: true}, {where: {id: id}, fields: ['status', 'auditStatus', 'updateAt', 'isCommit']}),
-                ConsumeDetails.update({isCommit: true, updateAt: utils.now()}, {where: {orderId: id}})
+                PlanOrder.update({status: STATUS.COMMIT, auditStatus: 0, updateAt: utils.now(), isCommit: true, commitTime: utils.now()}, {where: {id: id}, fields: ['status', 'auditStatus', 'updateAt', 'isCommit']}),
+                ConsumeDetails.update({isCommit: true, commitTime: utils.now(), updateAt: utils.now()}, {where: {orderId: id}})
             ])
         })
         .then(function(){
