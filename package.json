@@ -25,6 +25,8 @@
     "connect-timeout": "^1.7.0",
     "cookie-parser": "^1.4.1",
     "dnode": "^1.2.2",
+    "exif-js": "exif-js/exif-js",
+    "exif-orient": "0.0.4",
     "express": "^4.13.4",
     "formidable": "^1.0.17",
     "hidpi-canvas": "newclear/hidpi-canvas-polyfill",

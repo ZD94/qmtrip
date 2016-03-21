@@ -1,4 +1,7 @@
 var $ = require('jquery');
+var EXIF = require("exif-js");
+var exifOrient = require("exif-orient");
+
 
 function init_uploader(FileUploader, url){
     var uploadConf = {
@@ -19,7 +22,7 @@ function init_uploader(FileUploader, url){
         var data = [];
         data.push('<div class="upload_sure">');
         data.push('<div class="img_tit"><span class="web-icon-font3">'+file.title+'</span></div>');
-        data.push('<div class="preview_img"><canvas></canvas></div>');
+        data.push('<div class="preview_img"></div>');
         data.push('<div class="img_button"><div class="reupload">取消</div><div class="uploadall">确定</div></div>');
         data.push('</div>');
         data = data.join('');
@@ -40,19 +43,24 @@ function init_uploader(FileUploader, url){
         var canvas = $("#upload").find('canvas');
         var reader = new FileReader();
         reader.onload = onLoadFile;
-        reader.readAsDataURL(file._file);
-        
+        var f = file._file
+        reader.readAsDataURL(f);
+
         function onLoadFile(event) {
             var img = new Image();
-            img.onload = onLoadImage;
-            img.src = event.target.result;
-        }
-
-        function onLoadImage() {
-            var width = file.imgwidth || this.width / this.height * file.imgheight;
-            var height = file.imgheight || this.height / this.width * file.imgwidth;
-            canvas.attr({ width: width, height: height });
-            canvas[0].getContext('2d').drawImage(this, 0, 0, width, height);
+            img.onload = function() {
+                EXIF.getData(img, function() {
+                    var orientation = img.exifdata.Orientation || 1;
+                    exifOrient(img, orientation, function(err, canvas) {
+                        if (err) {
+                            return alert(err);
+                        }
+                        $(".preview_img").append(canvas);
+                    })
+                });
+            }
+            var url  = event.target.result;
+            img.src = url;
         }
     }
     uploader.onProgress = function(progress){//未完成调试

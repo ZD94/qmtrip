@@ -16,6 +16,8 @@ gulplib.bundle_lib('ngapp', './common/client/ngapp.js', {external:['api']});
 gulplib.bundle_lib('bootstrap', {require:["bootstrap"]});
 gulplib.bundle_lib('swiper', {require:['swiper']});
 gulplib.bundle_lib('hidpi-canvas', {require:['hidpi-canvas']});
+gulplib.bundle_lib("exif-orient", {require:["exif-orient"]});
+gulplib.bundle_lib("exif", {require: ["exif-js"]})
 gulplib.angular_app('staff');
 gulplib.angular_app('corp');
 gulplib.angular_app('extendfunction');

@@ -20,6 +20,7 @@ var businesstravel=(function(){
      */
     businesstravel.IndexController = function($scope) {
         $scope.$root.pageTitle = '我要出差';
+        //console.info($scope.$root.pageTitle);
         loading(true);
 
         if (sessionStorage.isTraffic == undefined) {
@@ -547,7 +548,6 @@ var businesstravel=(function(){
                     .spread(function(ret1,ret2) {
                         console.info (ret2);
                         $('.loading_result').hide();
-                        msgbox.log("预算生成成功");
                         $scope.onlyTraffic = ret2;
                         $scope.totalPrice = ret2.price;
                         $scope.goTrafficPrice = ret2.goTraffic.price;
@@ -555,19 +555,19 @@ var businesstravel=(function(){
                         if (ret2.goTraffic.price == '-1') {
                             $scope.goTrafficType = 'TRAIN';
                         }
-                        if (ret2.goTraffic.type && ret2.goTraffic.type == 'air') {
+                        if (ret2.goTraffic.type == 'air') {
                             $scope.goTrafficType = 'PLANE';
                         }
-                        if (ret2.goTraffic.type && ret2.goTraffic.type == 'train') {
+                        if (ret2.goTraffic.type == 'train') {
                             $scope.goTrafficType = 'TRAIN';
                         }
                         if (ret2.backTraffic.price == '-1') {
                             $scope.backTrafficType = 'TRAIN';
                         }
-                        if (ret2.backTraffic.type && ret2.backTraffic.type == 'air') {
+                        if (ret2.backTraffic.type == 'air') {
                             $scope.backTrafficType = 'PLANE';
                         }
-                        if (ret2.backTraffic.type && ret2.backTraffic.type == 'air') {
+                        if (ret2.backTraffic.type == 'train') {
                             $scope.backTrafficType = 'TRAIN';
                         }
                         $scope.$apply();
@@ -595,7 +595,6 @@ var businesstravel=(function(){
                     .spread(function(ret1,ret2) {
                         console.info (ret2);
                         $('.loading_result').hide();
-                        msgbox.log("预算生成成功");
                         $scope.onlyHotel = ret2;
                         $scope.totalPrice = ret2.price;
                         $scope.hotelPrice = ret2.price;
@@ -639,19 +638,19 @@ var businesstravel=(function(){
                         if (ret2.goTraffic.price == '-1') {
                             $scope.goTrafficType = 'TRAIN';
                         }
-                        if (ret2.goTraffic.type && ret2.goTraffic.type == 'air') {
+                        if (ret2.goTraffic.type == 'air') {
                             $scope.goTrafficType = 'PLANE';
                         }
-                        if (ret2.goTraffic.type && ret2.goTraffic.type == 'train') {
+                        if (ret2.goTraffic.type == 'train') {
                             $scope.goTrafficType = 'TRAIN';
                         }
                         if (ret2.backTraffic.price == '-1') {
                             $scope.backTrafficType = 'TRAIN';
                         }
-                        if (ret2.backTraffic.type && ret2.backTraffic.type == 'air') {
+                        if (ret2.backTraffic.type == 'air') {
                             $scope.backTrafficType = 'PLANE';
                         }
-                        if (ret2.backTraffic.type && ret2.backTraffic.type == 'air') {
+                        if (ret2.backTraffic.type == 'train') {
                             $scope.backTrafficType = 'TRAIN';
                         }
                         $scope.$apply();
@@ -663,6 +662,7 @@ var businesstravel=(function(){
             })
 
         }
+
 
         //生成记录
         $scope.createRecord = function () {
