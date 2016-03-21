@@ -21,13 +21,89 @@ var TravelStatistics = (function(){
         $("title").html("结算信息");
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
         initPageData();
-
         function initPageData() {
             API.onload(function(){
                 var monthStart = moment().startOf('Month').format('YYYY-MM-DD 00:00:00');
                 var monthEnd = moment().endOf('Month').format('YYYY-MM-DD 23:59:59');
                 var YMcommon = moment().startOf('Month').format('YYYY-MM')
                 $scope.ymcommon = moment().startOf('Month').format('YYYY年MM月');
+                var date_array = new Array;
+                API.staff.getCurrentStaff()
+                    .then(function(staff){
+                        return API.company.getCompanyById(staff.companyId)
+                    })
+                    .then(function(company){
+                        var current = moment().startOf('month');
+                        var createAt = moment(company.createAt).startOf('month');
+                        for(var cur = current;!cur.isBefore(createAt);cur.subtract(1, 'month')){
+                            var _item = {cur_cn: cur.format('YYYY年MM月'), cur_en: cur.format('YYYY-MM')}
+                            date_array.push(_item);
+                        }
+                        console.info(date_array);
+                        $scope.items=date_array;
+                    })
+                    .catch(function(err){
+                        console.info(err)
+                    })
+                $scope.initchart = function($event){
+                    console.info($($event.target).attr("data-zrep"));
+                    var startAT = $($event.target).attr("data-zrep");
+                    var endAT = moment(startAT).endOf('month').format('YYYY-MM-DD 23:59:59');
+                    API.tripPlan.statBudgetByMonth({startTime:startAT+'-01 00:00:00', endTime:endAT})
+                        .then(function(stat){
+                            console.info(stat);
+                            var s = stat[0];
+                            var z = stat[1];
+                            var x = stat[2];
+                            chartload(s,z,x);
+                        })
+                        .catch(function(err){
+                            TLDAlert("数据加载失败,请稍后重试");
+                        })
+                }
+                function chartload(s,z,x) {
+                    var planConsume = [];
+                    planConsume.push(s.planMoney);
+                    planConsume.push(z.planMoney);
+                    planConsume.push(x.planMoney);
+                    var factConsume = [];
+                    factConsume.push(s.expenditure);
+                    factConsume.push(z.expenditure);
+                    factConsume.push(x.expenditure);
+                    var travelNumbers = [];
+                    travelNumbers.push(s.NumOfStaff, z.NumOfStaff, x.NumOfStaff);
+                    console.info(s,z,x)
+                    var myChart = echarts.init(document.getElementById('settle_chart'));
+                    // 指定图表的配置项和数据
+                    var option = {
+                        tooltip: {},
+                        legend: {
+                            data:['计划支出', '实际支出', '出差人数']
+                        },
+                        color: ["#00eacf", "#fd6961", "#8250fe"],
+                        xAxis: {
+                            data: ['上旬', '中旬', '下旬']
+                        },
+                        yAxis: {},
+                        series: [{
+                            name: '计划支出',
+                            type: 'bar',
+                            data: planConsume
+                        }, {
+                            name: "实际支出",
+                            type: "bar",
+                            data: factConsume
+                        }, {
+                            name: "出差人数",
+                            type: "line",
+                            data: travelNumbers
+                        }]
+                    };
+
+                    // 使用刚指定的配置项和数据显示图表。
+                    myChart.setOption(option);
+                }
+
                 Q.all([
                     API.tripPlan.statPlanOrderMoneyByCompany({startTime: monthStart, endTime: monthEnd}),
                     API.tripPlan.statPlanOrderMoneyByCompany({startTime: YMcommon+'-1 00:00:00', endTime: YMcommon+'-10 23:59:59'}),
@@ -35,54 +111,13 @@ var TravelStatistics = (function(){
                     API.tripPlan.statPlanOrderMoneyByCompany({startTime: YMcommon+'-21 00:00:00', endTime: monthEnd})
                 ])
                     .spread(function(stat, s, z, x) {
-                        var planConsume = [];
-                        planConsume.push(s.planMoney);
-                        planConsume.push(z.planMoney);
-                        planConsume.push(x.planMoney);
-
-                        var factConsume = [];
-                        factConsume.push(s.expenditure);
-                        factConsume.push(z.expenditure);
-                        factConsume.push(x.expenditure);
-
-                        var travelNumbers = [];
-                        travelNumbers.push(s.NumOfStaff, z.NumOfStaff, x.NumOfStaff);
-
-                        var myChart = echarts.init(document.getElementById('settle_chart'));
-                        // 指定图表的配置项和数据
-                        var option = {
-                            tooltip: {},
-                            legend: {
-                                data:['计划支出', '实际支出', '出差人数']
-                            },
-                            color: ["#00eacf", "#fd6961", "#8250fe"],
-                            xAxis: {
-                                data: ['上旬', '中旬', '下旬']
-                            },
-                            yAxis: {},
-                            series: [{
-                                name: '计划支出',
-                                type: 'bar',
-                                data: planConsume
-                            }, {
-                                name: "实际支出",
-                                type: "bar",
-                                data: factConsume
-                            }, {
-                                name: "出差人数",
-                                type: "line",
-                                data: travelNumbers
-                            }]
-                        };
-
-                        // 使用刚指定的配置项和数据显示图表。
-                        myChart.setOption(option);
-
+                        chartload(s,z,x);
                         $scope.stat = stat;
                         $scope.s = s; //上旬
                         $scope.z = z; //中旬
                         $scope.x = x; //下旬
                         $scope.$apply();
+                        Myselect ();
                     })
                     .catch(function(err) {
                         TLDAlert("数据加载失败,请稍后重试");
@@ -206,6 +241,7 @@ var TravelStatistics = (function(){
                         console.log( $scope.planlist );
                         var planlist = list.items;
                         $scope.total = list.total;
+                        $scope.pages = list.pages;
                         planlist = planlist.map(function(plan){
                             return API.staff.getStaff({id:plan.accountId})
                                 .then(function(staff){
@@ -299,7 +335,7 @@ var TravelStatistics = (function(){
                 clearInterval (pagenum);
             }
         }
-        var pagenum =setInterval($scope.pagination,10);
+        var pagenum =setInterval($scope.pagination,1000);
 
         //进入详情页
         $scope.enterDetail = function (orderId) {
@@ -334,6 +370,7 @@ var TravelStatistics = (function(){
                 setTimeout($scope.pagination1,100);
             }
             initPlanlist();
+            pagenum =setInterval($scope.pagination,1000);
         }
     }
     // 出差记录详情页

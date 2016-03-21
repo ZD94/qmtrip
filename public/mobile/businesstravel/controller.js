@@ -19,7 +19,7 @@ var businesstravel=(function(){
      * @constructor
      */
     businesstravel.IndexController = function($scope) {
-        changeTitle('我要出差',$scope);
+        $scope.$root.pageTitle = '我要出差';
         loading(true);
 
         if (sessionStorage.isTraffic == undefined) {
@@ -104,7 +104,7 @@ var businesstravel=(function(){
      * @constructor
      */
     businesstravel.TrafficController = function($scope) {
-        changeTitle('我要出差',$scope);
+        $scope.$root.pageTitle = '我要出差';
         loading(true);
 
         //遍历存储数据为undefined
@@ -248,31 +248,31 @@ var businesstravel=(function(){
             var endTimeLate = $("#endTimeLate").val();
 
             if ($scope.startCityName == undefined) {
-                black_err("请选择出发城市");
+                msgbox.log("请选择出发城市");
                 return false;
             }
             if ($scope.endCityName == undefined) {
-                black_err("请选择目的地城市");
+                msgbox.log("请选择目的地城市");
                 return false;
             }
             if (!$scope.startDate || !dateReg.test($scope.startDate)) {
-                black_err("出发日期不存在或格式不正确");
+                msgbox.log("出发日期不存在或格式不正确");
                 return false;
             }
             if (!dateReg.test($scope.endDate) && $scope.endDate!=undefined && $scope.endDate!="") {
-                black_err("返程日期格式不正确");
+                msgbox.log("返程日期格式不正确");
                 return false;
             }
             if ($scope.startCityName == $scope.endCityName) {
-                black_err("出发城市与目的地城市不能相同");
+                msgbox.log("出发城市与目的地城市不能相同");
                 return false;
             }
             if (!timeReg.test(startTimeLate)&&startTimeLate!="") {
-                black_err("最晚到达时间格式时间格式不正确");
+                msgbox.log("最晚到达时间格式时间格式不正确");
                 return false;
             }
             if (!timeReg.test(endTimeLate)&&endTimeLate!="") {
-                black_err("最晚到达时间格式时间格式不正确");
+                msgbox.log("最晚到达时间格式时间格式不正确");
                 return false;
             }
             sessionStorage.startCityName = $scope.startCityName;
@@ -459,15 +459,15 @@ var businesstravel=(function(){
         $scope.nextStep = function () {
             var dateReg = /^\d{4}-\d{2}-\d{2}$/;
             if ($scope.hotelCityName == "" || $scope.hotelCityName == undefined) {
-                black_err("请选择目的地城市");
+                msgbox.log("请选择目的地城市");
                 return false;
             }
             if (!$scope.startHotelDate || !dateReg.test($scope.startHotelDate)) {
-                black_err("入住日期不存在或格式不正确");
+                msgbox.log("入住日期不存在或格式不正确");
                 return false;
             }
             if (!$scope.endHotelDate || !dateReg.test($scope.endHotelDate)) {
-                black_err("离店日期不存在或格式不正确");
+                msgbox.log("离店日期不存在或格式不正确");
                 return false;
             }
             sessionStorage.hotelCityName = $scope.hotelCityName;
@@ -487,7 +487,7 @@ var businesstravel=(function(){
      * @constructor
      */
     businesstravel.CreateresultController = function($scope , $routeParams) {
-        changeTitle('动态预算结果',$scope);
+        $scope.$root.pageTitle = '动态预算结果';
         loading(true);
 
         //遍历存储数据为undefined
@@ -547,7 +547,7 @@ var businesstravel=(function(){
                     .spread(function(ret1,ret2) {
                         console.info (ret2);
                         $('.loading_result').hide();
-                        black_err("预算生成成功");
+                        msgbox.log("预算生成成功");
                         $scope.onlyTraffic = ret2;
                         $scope.totalPrice = ret2.price;
                         $scope.goTrafficPrice = ret2.goTraffic.price;
@@ -595,7 +595,7 @@ var businesstravel=(function(){
                     .spread(function(ret1,ret2) {
                         console.info (ret2);
                         $('.loading_result').hide();
-                        black_err("预算生成成功");
+                        msgbox.log("预算生成成功");
                         $scope.onlyHotel = ret2;
                         $scope.totalPrice = ret2.price;
                         $scope.hotelPrice = ret2.price;
@@ -747,7 +747,7 @@ var businesstravel=(function(){
                 API.tripPlan.savePlanOrder(order)
                     .then(function(result){
                         console.info (result);
-                        black_err("已成功生成出差记录");
+                        msgbox.log("已成功生成出差记录");
                         sessionStorage.clear();
                         function plandetail () {
                             window.location.href='#/travelplan/plandetail?orderId='+result.id;
@@ -756,7 +756,7 @@ var businesstravel=(function(){
                     })
                     .catch(function(err){
                         console.info (err);
-                        black_err("生成失败,请重新生成");
+                        msgbox.log("生成失败,请重新生成");
                     });
             })
         }
@@ -774,7 +774,7 @@ var businesstravel=(function(){
      * @constructor
      */
     businesstravel.FailController = function($scope) {
-        changeTitle('错误提示',$scope);
+        $scope.$root.pageTitle = '错误提示';
         loading(true);
     }
 

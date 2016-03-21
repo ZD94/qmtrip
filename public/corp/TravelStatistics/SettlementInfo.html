@@ -17,23 +17,29 @@
 		</ul>
 		<div class="settle_main">
 			<div class="settle_title">
-				<div>
-					{{ymcommon}}
+				<div class="title_part">
+					<!-- {{ymcommon}} -->
+					<dl class="selectbox" style="width:198px;margin-top:30px;">
+	                    <dt class="common_select CplaneLevel" ng-model="creatmonth">{{ymcommon}}</dt>
+	                    <dd class="common_option">
+	                    	<div ng-repeat="item in items" data-zrep = "{{item.cur_en}}" ng-click="initchart($event)">{{item.cur_cn}}</div>
+	                    </dd>
+	                </dl>
 				</div>
-				<div>
+				<div class="title_part">
 					<span>{{stat.NumOfStaff}}</span>
 					<em>完成出差人次</em>
 				</div>
-				<div>
+				<div class="title_part">
 					<span>￥{{stat.planMoney}}</span>
 					<em>计划支出</em>
 				</div>
-				<div>
+				<div class="title_part">
 					<span>￥{{stat.expenditure}}</span>
 					<em>实际支出</em>
 				</div>
-				<div>
-					<span>￥{{(stat.planMoney.toFixed(2) - stat.expenditure.toFixed(2))}}</span>
+				<div class="title_part">
+					<span>￥{{((stat.planMoney - stat.expenditure).toFixed(2))}}</span>
 					<em>节省</em>
 				</div>
 			</div>

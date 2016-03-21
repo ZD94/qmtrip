@@ -17,7 +17,7 @@
             <span ng-if="ITEM.status===2">积分</span>
         </div>
     </div>
-    <ul class="complete" ng-if="ITEM.status===2">
+    <ul class="COMPLETE" ng-if="ITEM.status===2">
         <li>
             <span class="number">¥{{ITEM.budget.toFixed(2)}}</span><br>
             <span>预算</span>
@@ -47,7 +47,7 @@
                         <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType==='PLANE'&&ITEM.outTraffic[0].orderStatus!=='NO_BUDGET'  ">&#xe90e;</span><!--飞机图标-->
                         <span class="description">
                             {{ITEM.outTraffic[0].startPlace}}
-                            <span style="vertical-align:top;display:inline-block;background: url(mobile/images/arr.png) no-repeat bottom;background-size: 100%;">
+                            <span style="vertical-align:top;display:inline-block;background: url(mobile/images/arr.png) no-repeat bottom;background-size: 100%;font-size: 1rem;">
                                 去程
                             </span>
                             {{ITEM.outTraffic[0].arrivalPlace}}
@@ -72,17 +72,18 @@
                 </div> 
             </div>
             <div class="list_bottom">
-                <div class="status" ng-class="{true:'rejected'}[ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS']">{{renderStatus( ITEM.outTraffic[0],$index )}}</div>
+                <div class="status" ng-class="{'rejected':(ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS'),'complete':(ITEM.outTraffic[0].orderStatus==='AUDIT_PASS')}">{{renderStatus( ITEM.outTraffic[0],$index )}}
+                </div>
                 <div class="buttons" ng-if="  ITEM.outTraffic[0].orderStatus!=='NO_BUDGET'  ">
                     <a class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'outTraffic' )" ng-hide="ITEM.outTraffic[0].invoiceType==='TRAIN'">预订</a>
                     <div class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">
-                        <input type="file" nv-file-select="" uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},after:outtraffic_up,done:outtraffic_done}">
+                        <input type="file" nv-file-select="" uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},title:outtraffic_up,done:outtraffic_done}">
                         上传票据
                     </div>
                     <div class="BTN" ng-if="  
                         ITEM.outTraffic[0].orderStatus==='WAIT_COMMIT'||
                         ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS'  " ng-click="">
-                        <input type="file" nv-file-select="" uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},after:outtraffic_up,done:outtraffic_done}">
+                        <input type="file" nv-file-select="" uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},title:outtraffic_up,done:outtraffic_done}">
                         重新上传
                     </div>
                     <a class="BTN" ng-if="  
@@ -102,7 +103,7 @@
                         <span class="icon web-icon-font3" ng-if="  ITEM.backTraffic[0].invoiceType==='PLANE'&&ITEM.backTraffic[0].orderStatus!=='NO_BUDGET'  ">&#xe90e;</span><!--飞机图标-->
                         <span class="description">
                             {{ITEM.backTraffic[0].startPlace}}
-                            <span style="vertical-align:top;display:inline-block;background: url(/mobile/images/arr.png) no-repeat bottom;background-size: 100%;">
+                            <span style="vertical-align:top;display:inline-block;background: url(/mobile/images/arr.png) no-repeat bottom;background-size: 100%;font-size: 1rem;">
                                 回程
                             </span>
                             {{ITEM.backTraffic[0].arrivalPlace}}
@@ -127,17 +128,17 @@
                 </div> 
             </div>
             <div class="list_bottom">
-                <div class="status" ng-class="{true:'rejected'}[ITEM.backTraffic[0].orderStatus==='AUDIT_NOT_PASS']">{{renderStatus( ITEM.backTraffic[0] )}}</div>
+                <div class="status" ng-class="{'rejected':(ITEM.backTraffic[0].orderStatus==='AUDIT_NOT_PASS'),'complete':(ITEM.backTraffic[0].orderStatus==='AUDIT_PASS')}">{{renderStatus( ITEM.backTraffic[0] )}}</div>
                 <div class="buttons" ng-if="ITEM.backTraffic[0].budget!==-1">
                     <a class="BTN" ng-if="  ITEM.backTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'backTraffic' )" ng-hide="ITEM.backTraffic[0].invoiceType==='TRAIN'">预订</a>
                     <div class="BTN" ng-if="  ITEM.backTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">
-                        <input type="file" nv-file-select="" uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},after:backtraffic_up,done:backtraffic_done}">
+                        <input type="file" nv-file-select="" uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},title:backtraffic_up,done:backtraffic_done}">
                         上传票据
                     </div>
                     <div class="BTN" ng-if="  
                         ITEM.backTraffic[0].orderStatus==='WAIT_COMMIT'||
                         ITEM.backTraffic[0].orderStatus==='AUDIT_NOT_PASS'  " ng-click="">
-                        <input type="file" nv-file-select="" uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},after:backtraffic_up,done:backtraffic_done}">
+                        <input type="file" nv-file-select="" uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},title:backtraffic_up,done:backtraffic_done}">
                         重新上传
                     </div>
                     <a class="BTN" ng-if="  
@@ -176,17 +177,17 @@
                 </div> 
             </div>
             <div class="list_bottom">
-                <div class="status" ng-class="{true:'rejected'}[ITEM.hotel[0].orderStatus==='AUDIT_NOT_PASS']">{{renderStatus( ITEM.hotel[0] )}}</div>
+                <div class="status" ng-class="{'rejected':(ITEM.hotel[0].orderStatus==='AUDIT_NOT_PASS'),'complete':(ITEM.hotel[0].orderStatus==='AUDIT_PASS')}">{{renderStatus( ITEM.hotel[0] )}}</div>
                 <div class="buttons" ng-if="  ITEM.hotel[0].budget!==-1  ">
                     <a class="BTN" ng-if="  ITEM.hotel[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'hotel' )" ng-hide="ITEM.hotel[0].invoiceType==='TRAIN'">预订</a>
                     <div class="BTN" ng-if="  ITEM.hotel[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">
-                        <input type="file" nv-file-select="" uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},after:hoteltraffic_up,done:hoteltraffic_done}">
+                        <input type="file" nv-file-select="" uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},title:hoteltraffic_up,done:hoteltraffic_done}">
                         上传票据
                     </div>
                     <div class="BTN" ng-if="  
                         ITEM.hotel[0].orderStatus==='WAIT_COMMIT'||
                         ITEM.hotel[0].orderStatus==='AUDIT_NOT_PASS'  " ng-click="">
-                        <input type="file" nv-file-select="" uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},after:hoteltraffic_up,done:hoteltraffic_done}">
+                        <input type="file" nv-file-select="" uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},title:hoteltraffic_up,done:hoteltraffic_done}">
                         重新上传
                     </div>
                     <a class="BTN" ng-if="  
