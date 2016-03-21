@@ -19,7 +19,7 @@ function black_err(str) {
     var timer = setTimeout(function(){
         $('.err_alert').hide();
     },3000);
-    var err = '<div class="err_alert">+str+</div>';
+    var err = '<div class="err_alert">'+str+'</div>';
     $('body').append(err);
     var err_w = $('.err_alert').width();
     $('.err_alert').css('margin-left',-(err_w/2+10));
