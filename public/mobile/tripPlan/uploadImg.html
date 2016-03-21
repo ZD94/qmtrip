@@ -24,7 +24,7 @@
 				<input type="file" ng-click="uploadInvoice(outTraffic.id)" ng-show="isInWeixin" ng-if="outTraffic.status !='1'"/>
 
 				<span ng-hide="isInWeixin" ng-if="outTraffic.status !='1'">
-					<input type="file" nv-file-select="" id="{{outTraffic.id}}" uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{invoicetype:'交通票据',traffictype:'去程'}" multiple>
+					<input type="file" nv-file-select="" id="{{outTraffic.id}}" uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{invoicetype:'交通票据',traffictype:'去程',after:imagesup}" multiple>
 				</span>
 			</div>
 		</div>
@@ -64,7 +64,7 @@
 				</span>
 
 				<span ng-hide="isInWeixin" ng-if="backTraffic.status !='1'">
-					<input type="file" nv-file-select="" uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{invoicetype:'交通票据',traffictype:'回程'}" multiple>
+					<input type="file" nv-file-select="" uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},after:backtraffic_up,done:backtraffic_done}" multiple>
 				</span>
 			</div>
 		</div>
@@ -74,7 +74,7 @@
 		<input type="button" ng-click="push()" value="提交审核" ng-disabled="plan.status==1? 'disabled': false">
 	</div>
 </div>
-<div class="upload_sure">
+<!-- <div class="upload_sure">
 	<div class="img_tit">
 		<span class="web-icon-font3">&#xe90e;<em>{{traffictype}}</em><strong>{{invoicetype}}</strong></span>
 		
@@ -86,7 +86,6 @@
 	
 	<div class="img_button">
 		<div class="reupload" ng-click="close_pre()">取消</div>
-		<!-- <div class="" ng-click="previewOk()">确定</div> -->
 		<div class="" ng-click="uploader.uploadAll();">确定</div>
 	</div>
-</div>
+</div> -->

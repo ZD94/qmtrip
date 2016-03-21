@@ -68,6 +68,19 @@ img { display: block;}
     /*宽度大于768px,默认1rem=14像素*/
   }
 }
+//@media (device-width:375px) and (-webkit-min-device-pixel-ratio:2){/* 兼容iphone 6 */
+//  html,body{font-size: 62.5%;}
+//  .plan_record .all_detail div p:nth-child(1) i span{
+//    padding-top: -0.2rem;
+//  }
+//}
+//@media (device-width:414px) and (-webkit-min-device-pixel-ratio:3.0){/* 兼容iphone6 plus */
+//  html,body{font-size: 62.5%;}
+//  .plan_record .all_detail div p:nth-child(1) i span{
+//    padding-top: -0.2rem;
+//  }
+//
+//}
 
 /*默认文本框样式*/
 .common_text {
@@ -151,16 +164,6 @@ img { display: block;}
   text-align: center;
   display: none;
   z-index: 99999;
-}
-.headerbar {
-  background: #1a1a1a;
-  height: 44px;
-  line-height: 44px;
-  padding-left: 5px;
-  color: #fff;
-  font-size: 14px;
-  text-align: center;
-  display: none;
 }
 .font-white {
   color: #cccccc;
@@ -343,4 +346,63 @@ img { display: block;}
   //width: auto!important;
   max-width: 80%;
   text-align: center;
+}
+
+//手机端公用上传图片预览样式
+.upload_sure{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #f1f1f1;
+  .img_tit{
+    height: 3rem;
+    background: #fff;
+    line-height: 3rem;
+    padding-left:1rem;
+    .web-icon-font3{
+      font-size: 2rem;
+      color: #2686bd;
+      display: inline-block;
+      strong{
+        font-size: 1.2rem;
+        float: right;
+        color: #4a4a4a;
+        margin: 0 0.7rem 0 0.7rem;
+      }
+      em{
+        font-style: normal;
+        font-size: 0.8rem;
+        float: right;
+        color: #9b9b9b;
+        margin-top: 0.2rem;
+      }
+    }
+  }
+  img{
+    width: 100%;
+  }
+  canvas{
+    width: 100%;
+  }
+  .img_button{
+    height: 4rem;
+    line-height: 4rem;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    text-align: center;
+    color: #2686bd;
+    box-shadow: 0px 0px 2px #9b9b9b;
+    div{
+      width: 50%;
+      float: left;
+      &:active{
+        background: #f5f5f5;
+      }
+    }
+  }
 }

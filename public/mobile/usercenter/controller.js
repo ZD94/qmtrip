@@ -11,7 +11,7 @@ module.exports = (function() {
 
     user.IndexController = function($scope) {
 
-        changeTitle('个人中心',$scope);
+        $scope.$root.pageTitle = '个人中心';
         $scope.initStaffUser = function(){
             API.onload(function(){
                 API.staff.getCurrentStaff()
@@ -58,7 +58,7 @@ module.exports = (function() {
                                     }else if(num >0 && num<=9){
                                         $('#'+id).show();
                                     }else if (num > 9 && num <100){
-                                        $('#'+id).css('font-size','1rem');
+                                        $('#'+id).css({'font-size':'1rem','line-height': '1.5rem'});
                                         $('#'+id).show();
                                     }else if (num > 99){
                                         $('#'+id).css({'font-size':'1rem','width':'2rem'});
@@ -89,7 +89,7 @@ module.exports = (function() {
         }
 
         $scope.go_planlist = function() {//跳转到“出差记录列表页”。状态为“未完成”。
-            window.location.href = "#/travelplan/planlist?status="+"DEFAULT";
+            window.location.href = "#/travelplan/planlist";
         }
 
         $scope.go_budget = function() {
@@ -110,7 +110,7 @@ module.exports = (function() {
     }
 
     user.TravelpolicyController = function($scope) {
-        changeTitle('差旅标准',$scope);
+        $scope.$root.pageTitle = '差旅标准';
         loading(true);
         API.onload(function(){
             API.travelPolicy.getCurrentStaffTp()
