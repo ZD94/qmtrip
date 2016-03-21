@@ -47,7 +47,7 @@ function selectPage (options) {
 						$('.cancelBtn').click(function(){
 							$('.select_page').remove();
 						});
-						$('.select_page dd').click(function () {
+						$('#select-box-data dd').click(function () {
 							key = $(this).html();
 							id = $(this).attr('code');
 							$('.select_page').remove();
@@ -61,13 +61,14 @@ function selectPage (options) {
 								$('.xiaocha').hide();
 								defaultDataFunc(val)
 									.then(function(data) {
+										$('.select_page .result_none,.select_page .appendclass,.select_page dt,.select_page dd').remove();
 										appendData(data);
 										$('#select-box-data').prepend("<dt>"+options.title+"</dt>");
 										$('.cancelBtn').click(function(){
 											$('.select_page').remove();
 										});
 										var key, id;
-										$('.select_page dd').click(function () {
+										$('#select-box-data dd').click(function () {
 											key = $(this).html();
 											id = $(this).attr('code');
 											$('.select_page').remove();
@@ -83,13 +84,14 @@ function selectPage (options) {
 								defaultDataFunc(val)
 									.then(function(data) {
 										$('.xiaocha').hide();
+										$('.select_page .result_none,.select_page .appendclass,.select_page dt,.select_page dd').remove();
 										appendData(data);
 										$('#select-box-data').prepend("<dt>"+options.title+"</dt>");
 										$('.cancelBtn').click(function(){
 											$('.select_page').remove();
 										});
 										var key, id;
-										$('.select_page dd').click(function () {
+										$('#select-box-data dd').click(function () {
 											key = $(this).html();
 											id = $(this).attr('code');
 											$('.select_page').remove();
@@ -100,59 +102,64 @@ function selectPage (options) {
 										console.error(err);
 									})
 							}
-
-							if (val || val != '') {
+							else {
 								$('.xiaocha').show();
+								fetchDataFunc(val)
+									.then(function (data) {
+										if (data.length==0) {
+											$('.select_page .result_none,.select_page .appendclass,.select_page dt,.select_page dd').remove();
+											var strr = "";
+											strr += "<div class='result_none'>匹配无结果</div>";
+											if (isAllowAdd == true) {
+												if (val.length>8) {
+													strr += "<dd class='appendclass'><span>+</span> 将&quot;"+val.substring(0,5)+"....."+val.substring(val.length-4)+"&quot;添加为出差目的</dd>";
+												}
+												else {
+													strr += "<dd class='appendclass'><span>+</span> 将&quot;"+val+"&quot;添加为出差目的</dd>";
+												}
+											}
+											$('.select_page').append(strr);
+											$('.cancelBtn').click(function(){
+												$('.select_page').remove();
+											});
+											$('.appendclass').click(function () {
+												$('.select_page').remove();
+												resolve([id, val]);
+											});
+										}
+										else if (data.length!=0) {
+											$('.select_page .result_none,.select_page .appendclass,.select_page dt,.select_page dd').remove();
+											var strr = "";
+											if (isAllowAdd == true) {
+												if (val.length>8) {
+													strr += "<dd class='appendclass'><span>+</span> 将&quot;"+val.substring(0,5)+"....."+val.substring(val.length-4)+"&quot;添加为出差目的</dd>";
+												}
+												else {
+													strr += "<dd class='appendclass'><span>+</span> 将&quot;"+val+"&quot;添加为出差目的</dd>";
+												}
+											}
+											$('.select_page').append(strr);
+											appendData(data);
+
+											var key, id;
+											$('#select-box-data dd').click(function () {
+												key = $(this).html();
+												id = $(this).attr('code');
+												$('.select_page').remove();
+												resolve([id, key]);
+											});
+											$('.appendclass').click(function () {
+												$('.select_page').remove();
+												resolve([id, val]);
+											});
+										}
+									})
+									.catch(function(err) {
+										console.error(err);
+									});
 							}
 
-							fetchDataFunc(val)
-								.then(function (data) {
-									if (data.length==0) {
-										$('.select_page .result_none,.select_page .appendclass,.select_page dt,.select_page dd').remove();
-										var strr = "";
-										strr += "<div class='result_none'>匹配无结果</div>";
-										if (isAllowAdd == true) {
-											if (val.length>8) {
-												strr += "<dd class='appendclass'><span>+</span> 将&quot;"+val.substring(0,5)+"....."+val.substring(val.length-4)+"&quot;添加为出差目的</dd>";
-											}
-											else {
-												strr += "<dd class='appendclass'><span>+</span> 将&quot;"+val+"&quot;添加为出差目的</dd>";
-											}
-										}
-										$('.select_page').append(strr);
-										$('.cancelBtn').click(function(){
-											$('.select_page').remove();
-										});
-										$('.select_page dd').click(function () {
-											$('.select_page').remove();
-											resolve([id, val]);
-										});
-									}
-									else if (data.length!=0) {
-										$('.select_page .result_none,.select_page .appendclass,.select_page dt,.select_page dd').remove();
-										var strr = "";
-										if (isAllowAdd == true) {
-											if (val.length>8) {
-												strr += "<dd class='appendclass'><span>+</span> 将&quot;"+val.substring(0,5)+"....."+val.substring(val.length-4)+"&quot;添加为出差目的</dd>";
-											}
-											else {
-												strr += "<dd class='appendclass'><span>+</span> 将&quot;"+val+"&quot;添加为出差目的</dd>";
-											}
-										}
-										$('.select_page').append(strr);
-										appendData(data);
-										var key, id;
-										$('.select_page dd').click(function () {
-											key = $(this).html();
-											id = $(this).attr('code');
-											$('.select_page').remove();
-											resolve([id, key]);
-										});
-									}
-								})
-								.catch(function(err) {
-									console.error(err);
-								});
+
 						});
 					});
 				})
@@ -178,8 +185,7 @@ function selectPage (options) {
 				str += "<dd>"+data[i]+"</dd>";
 			}
 		}
-		$("#select-box-data").html("");
-		$("#select-box-data").html(str);
+		$("#select-box-data").append(str);
 	}
 
 
