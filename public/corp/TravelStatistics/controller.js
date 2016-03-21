@@ -21,13 +21,50 @@ var TravelStatistics = (function(){
         $("title").html("结算信息");
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
         initPageData();
-
+        Myselect ();
         function initPageData() {
             API.onload(function(){
                 var monthStart = moment().startOf('Month').format('YYYY-MM-DD 00:00:00');
                 var monthEnd = moment().endOf('Month').format('YYYY-MM-DD 23:59:59');
                 var YMcommon = moment().startOf('Month').format('YYYY-MM')
                 $scope.ymcommon = moment().startOf('Month').format('YYYY年MM月');
+                // var pastyear = currentyear-1;
+                API.staff.getCurrentStaff()
+                    .then(function(staff){
+                        return API.company.getCompanyById(staff.companyId)
+                    })
+                    .then(function(company){
+                        console.info(company)
+                        var current = moment().startOf('Month');
+                        var createAt = moment(company.createAt);
+                        // current = current.format('YYYY年MM月');
+                        console.info(createAt);
+                        for(var cur = current;!cur.isBefore(createAt);cur.subtract(1, 'month')){
+                            console.info(cur, createAt);
+                            cur.format('YYYY年MM月');
+                        }
+                    })
+                var date_array = new Array();
+                // for (var i = currentmonth; i > currentmonth-6; i--) {
+                //     var j;
+                //     if(i<=0){
+                //         j = 12+i;
+                //         if (j<10) {
+                //             j = '0'+j;
+                //         }
+                //         console.info(j);
+                //         date_array.push(pastyear+j+'月');
+                //     }else{
+                //         j=i;
+                //         if (j<10) {
+                //             j = '0'+j;
+                //         }
+                //         date_array.push(currentyear+j+'月');
+                //     }
+                // };
+                
+                console.info($scope.staff);
+                $scope.items=date_array;
                 Q.all([
                     API.tripPlan.statPlanOrderMoneyByCompany({startTime: monthStart, endTime: monthEnd}),
                     API.tripPlan.statPlanOrderMoneyByCompany({startTime: YMcommon+'-1 00:00:00', endTime: YMcommon+'-10 23:59:59'}),
@@ -39,7 +76,7 @@ var TravelStatistics = (function(){
                         planConsume.push(s.planMoney);
                         planConsume.push(z.planMoney);
                         planConsume.push(x.planMoney);
-
+                        console.info(stat)
                         var factConsume = [];
                         factConsume.push(s.expenditure);
                         factConsume.push(z.expenditure);
