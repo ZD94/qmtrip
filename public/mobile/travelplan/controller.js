@@ -19,7 +19,7 @@ var travelplan = (function () {
      */
     //["未完成","待出预算","待上传票据","票据审核中","审核未通过","已完成"]
     travelplan.PlanlistController = function ($scope, $routeParams) {
-
+        $scope.$root.pageTitle = '出差记录';
         $scope.STATUS = "未完成";//当前状态
         $scope.statuses = ["未完成", "待出预算", "待上传票据", "票据审核中", "审核未通过", "已完成"];
         $scope.ORDER = "默认";//当前排序
@@ -230,6 +230,7 @@ var travelplan = (function () {
      */
     travelplan.PlandetailController = function ($scope, $routeParams, FileUploader) {
         //初始化上传图片
+        $scope.$root.pageTitle = '详细出差记录';
         $scope.winWidth = $(window).width();
         $scope.uploader = init_uploader(FileUploader, "/upload/ajax-upload-file?type=invoice");
         function uploadInvoice(consumeId, picture, callback) {
@@ -242,6 +243,7 @@ var travelplan = (function () {
 
         $scope.backtraffic_up = '&#xe90e;<em>回程</em><strong>交通票据</strong>';
         $scope.backtraffic_done = function (response) {
+            loading(false);
             var md5key = response.md5key;
             uploadInvoice($scope.ITEM.backTraffic[0].id, md5key, function (err, result) {
                 if (err) {
@@ -249,11 +251,13 @@ var travelplan = (function () {
                     return;
                 }
                 $scope.getData($routeParams.orderId)
+                loading(true);
                 msgbox.log("票据上传成功");
             });
         }
         $scope.outtraffic_up = '&#xe90e;<em>去程</em><strong>交通票据</strong>';
         $scope.outtraffic_done = function (response) {
+            loading(false);
             var md5key = response.md5key;
             uploadInvoice($scope.ITEM.outTraffic[0].id, md5key, function (err, result) {
                 if (err) {
@@ -261,11 +265,13 @@ var travelplan = (function () {
                     return;
                 }
                 $scope.getData($routeParams.orderId)
+                loading(true);
                 msgbox.log("票据上传成功");
             });
         }
         $scope.hoteltraffic_up = '&#xe914;<em></em><strong>住宿发票</strong>';
         $scope.hoteltraffic_done = function (response) {
+            loading(false);
             var md5key = response.md5key;
             uploadInvoice($scope.ITEM.hotel[0].id, md5key, function (err, result) {
                 if (err) {
@@ -273,6 +279,7 @@ var travelplan = (function () {
                     return;
                 }
                 $scope.getData($routeParams.orderId)
+                loading(true);
                 msgbox.log("票据上传成功");
             });
         }
@@ -292,7 +299,6 @@ var travelplan = (function () {
                     .then(
                         function (data) {
                             $scope.ITEM = data;
-                            console.log($scope.ITEM);
 
                             //$scope.backId = $scope.ITEM.backTraffic[0].id;
                             //$scope.outId = $scope.ITEM.outTraffic[0].id;
@@ -305,7 +311,6 @@ var travelplan = (function () {
                                     t1 = new Date(t1).getTime();
                                     t2 = new Date(t2).getTime();
                                     var timeSpan = (t2 - t1) / 1000 / 60 / 60 / 24;
-                                    console.log(t1, t2, timeSpan);
                                     return timeSpan;
                                 }
                                 ;
