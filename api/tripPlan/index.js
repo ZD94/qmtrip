@@ -857,33 +857,33 @@ function statBudgetByMonth(params) {
     var sql = 'select count(account_id) as \"staffNum\", sum(budget) as \"planMoney\",sum(expenditure) as expenditure ' +
         'from tripplan.trip_plan_order where company_id=\'' + params.companyId + '\'';
 
-    var staff_num_sql = 'select count(account_id) as \"staffNum\" from tripplan.trip_plan_order where company_id=\'' + params.companyId + '\'';
-
     if(params.accountId) {
         sql += ' and account_id=\'' + params.accountId + '\'';
-        staff_num_sql += ' and account_id=\'' + params.accountId + '\'';
     }
 
     var complete_sql = sql + ' and status=2 and to_char(start_at, \'YYYY-MM-DD\') ~ \'';
 
-    staff_num_sql += ' and status=2 and to_char(start_at, \'YYYY-MM-DD\') ~ \'';
 
     sql += ' and status > -1 and to_char(start_at, \'YYYY-MM-DD\') ~ \'';
 
     return Promise.all(
         timeArr.map(function(month) {
-            var s_sql = sql + month + '\';';
-            var c_sql = complete_sql + month + '\';';
-            var f_sql = staff_num_sql + month + '\';';
-
+            var s_sql = sql;
+            var c_sql = complete_sql;
             var index = month.match(/\d{4}-\d{2}-(\d).*/)[1];
             var remark = '';
             if(index === '0') {
                 remark = '上旬';
+                s_sql = sql + '0\';';
+                c_sql = complete_sql + '0\';';
             }else if(index === '1') {
                 remark = '中旬';
-            }else if(index === '2') {
+                s_sql = sql + '1\';';
+                c_sql = complete_sql + '1\';';
+            }else if(index === '2' || index === '3') {
                 remark = '下旬';
+                s_sql = sql + '(2||3)\';';
+                c_sql = complete_sql + '(2||3)\';';
             }
 
             var month = month.match(/\d{4}-\d{2}/)[0];
