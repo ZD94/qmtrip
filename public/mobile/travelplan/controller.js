@@ -57,35 +57,11 @@ var travelplan=(function(){
             PARAMS.isComplete = false;
         }
         //-----------------------------------------------
-        /*
-        var PARAMS = (function(){//API参数：要显示的页数
-            if( $routeParams.status ){
-                if( $routeParams.status==="NO_BUDGET" ){
-                    $scope.STATUS="待出预算";
-                    return {page:1,isHasBudget:false};
-                }else if( $routeParams.status==="WAIT_UPLOAD" ){
-                    $scope.STATUS="待上传票据";
-                    return {page:1,isUpload:false};
-                }else if( $routeParams.status==="AUDIT_NOT_PASS" ){
-                    $scope.STATUS="审核未通过";
-                    return {page:1,audit:'N'};
-                }else if( $routeParams.status==="DEFAULT" ){
-                    $scope.STATUS="未完成";
-                    return {page:1,isComplete:false};
-                }else{
-                    $scope.STATUS="未完成";
-                    return {page:1,isComplete:false};
-                };
-            }else{
-                $scope.STATUS="未完成";
-                return {page:1,isComplete:false};
-            };
-        })();
-        */
+
         //-----------------------------------------------------------
         function init(){
             //页面上的所有交互All interacitve actions on this page
-            changeTitle('出差记录',$scope);
+            $scope.$root.pageTitle = '出差记录';
             $scope.$root.pageTitle="出差记录";
             console.log( PARAMS );
             $scope.getList( PARAMS );
@@ -266,12 +242,10 @@ var travelplan=(function(){
      * @param $scope
      * @constructor
      */
-
-    travelplan.PlandetailController = function( $scope,$routeParams,FileUploader ) {
-        //****************************************************************************** inserted by ChenHao on 2016/03/19
+    travelplan.PlandetailController = function($scope, $routeParams,FileUploader) {
         //初始化上传图片
         $scope.winWidth = $(window).width();
-        $scope.uploader = init_uploader(FileUploader);
+        $scope.uploader = init_uploader(FileUploader, "/upload/ajax-upload-file?type=invoice");
         function uploadInvoice( consumeId, picture, callback ) {
             API.tripPlan.uploadInvoice({
                 consumeId: consumeId,
@@ -280,12 +254,7 @@ var travelplan=(function(){
         }
 
 
-        $scope.backtraffic_up = function(cb){
-            var type1='交通票据';
-            var type2 = '回程';
-            var type3 = '&#xe90e;';
-            cb(type1, type2, type3);
-        }
+        $scope.backtraffic_up = '&#xe90e;<em>回程</em><strong>交通票据</strong>';
         $scope.backtraffic_done = function(response){
             var md5key = response.md5key;
             uploadInvoice( $scope.ITEM.backTraffic[0].id, md5key, function(err, result){
@@ -297,12 +266,7 @@ var travelplan=(function(){
                 black_err("票据上传成功");
             });
         }
-        $scope.outtraffic_up = function(cb){
-            var type1='交通票据';
-            var type2 = '去程';
-            var type3 = '&#xe90e;';
-            cb(type1, type2, type3);
-        }
+        $scope.outtraffic_up = '&#xe90e;<em>去程</em><strong>交通票据</strong>';
         $scope.outtraffic_done = function(response){
             var md5key = response.md5key;
             uploadInvoice( $scope.ITEM.outTraffic[0].id, md5key, function(err, result){
@@ -314,12 +278,7 @@ var travelplan=(function(){
                 black_err("票据上传成功");
             });
         }
-        $scope.hoteltraffic_up = function(cb){
-            var type1='住宿发票';
-            var type2 = '';
-            var type3 = '&#xe914;';
-            cb(type1, type2, type3);
-        }
+        $scope.hoteltraffic_up = '&#xe914;<em></em><strong>住宿发票</strong>';
         $scope.hoteltraffic_done = function(response){
             var md5key = response.md5key;
             uploadInvoice($scope.ITEM.hotel[0].id, md5key, function(err, result){
@@ -496,27 +455,27 @@ var travelplan=(function(){
 
         $scope.commit = function () {//此函数在用户点击“提交审核”按钮时被调用。
             if( $scope.ITEM.orderStatus==="WAIT_COMMIT" ){
-                confirm( '确认提交','返回检查','票据一经提交将无法进行修改，是否确认提交？',function(){
-                    API.onload(function() {
-                        API
-                        .tripPlan
-                        .commitTripPlanOrder( $scope.ITEM.id )
-                        .then(function(result){
+                msgbox.confirm('票据一经提交将无法进行修改，是否确认提交？', '确认提交', '返回检查')
+                    .then(function(btn){
+                        if(btn != 'ok')
+                            return;
+                        API.onload(function() {
+                            API.tripPlan.commitTripPlanOrder( $scope.ITEM.id )
+                            .then(function(result){
                             $scope.getData( $routeParams.orderId );
                             $scope.$apply();
-                            black_err("提交审核成功");
+                                    msgbox.log("提交审核成功");
+                            })
+                            .catch(function(err){
+                                $(".confirmFixed").show();
+                                console.info (err);
+                                });
                         })
-                        .catch(function(err){
-                            $(".confirmFixed").show();
-                            console.info (err);
-                        })
-                    })
-                });
+                    });
             };
         }
 
         function init(){//此函数被用于初始化页面。
-            changeTitle('详细出差记录',$scope);
             $scope.$root.pageTitle = "详细出差记录";
             $scope.getData( $routeParams.orderId );
         }
@@ -534,7 +493,7 @@ var travelplan=(function(){
      */
     travelplan.InvoicedetailController = function($scope, $routeParams) {
 
-        changeTitle('票据详情',$scope);
+        $scope.$root.pageTitle = '票据详情';
 
         var planId = $routeParams.planId;
         $scope.planId = planId;
