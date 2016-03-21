@@ -555,19 +555,19 @@ var businesstravel=(function(){
                         if (ret2.goTraffic.price == '-1') {
                             $scope.goTrafficType = 'TRAIN';
                         }
-                        if (ret2.goTraffic.type && ret2.goTraffic.type == 'air') {
+                        if (ret2.goTraffic.type == 'air') {
                             $scope.goTrafficType = 'PLANE';
                         }
-                        if (ret2.goTraffic.type && ret2.goTraffic.type == 'train') {
+                        if (ret2.goTraffic.type == 'train') {
                             $scope.goTrafficType = 'TRAIN';
                         }
                         if (ret2.backTraffic.price == '-1') {
                             $scope.backTrafficType = 'TRAIN';
                         }
-                        if (ret2.backTraffic.type && ret2.backTraffic.type == 'air') {
+                        if (ret2.backTraffic.type == 'air') {
                             $scope.backTrafficType = 'PLANE';
                         }
-                        if (ret2.backTraffic.type && ret2.backTraffic.type == 'train') {
+                        if (ret2.backTraffic.type == 'train') {
                             $scope.backTrafficType = 'TRAIN';
                         }
                         $scope.$apply();
@@ -638,19 +638,19 @@ var businesstravel=(function(){
                         if (ret2.goTraffic.price == '-1') {
                             $scope.goTrafficType = 'TRAIN';
                         }
-                        if (ret2.goTraffic.type && ret2.goTraffic.type == 'air') {
+                        if (ret2.goTraffic.type == 'air') {
                             $scope.goTrafficType = 'PLANE';
                         }
-                        if (ret2.goTraffic.type && ret2.goTraffic.type == 'train') {
+                        if (ret2.goTraffic.type == 'train') {
                             $scope.goTrafficType = 'TRAIN';
                         }
                         if (ret2.backTraffic.price == '-1') {
                             $scope.backTrafficType = 'TRAIN';
                         }
-                        if (ret2.backTraffic.type && ret2.backTraffic.type == 'air') {
+                        if (ret2.backTraffic.type == 'air') {
                             $scope.backTrafficType = 'PLANE';
                         }
-                        if (ret2.backTraffic.type && ret2.backTraffic.type == 'train') {
+                        if (ret2.backTraffic.type == 'train') {
                             $scope.backTrafficType = 'TRAIN';
                         }
                         $scope.$apply();
@@ -662,6 +662,7 @@ var businesstravel=(function(){
             })
 
         }
+
 
         //生成记录
         $scope.createRecord = function () {
