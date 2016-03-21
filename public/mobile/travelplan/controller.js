@@ -19,7 +19,7 @@ var travelplan = (function () {
      */
     //["未完成","待出预算","待上传票据","票据审核中","审核未通过","已完成"]
     travelplan.PlanlistController = function ($scope, $routeParams) {
-
+        $scope.$root.pageTitle = '出差记录';
         $scope.STATUS = "未完成";//当前状态
         $scope.statuses = ["未完成", "待出预算", "待上传票据", "票据审核中", "审核未通过", "已完成"];
         $scope.ORDER = "默认";//当前排序
@@ -230,6 +230,7 @@ var travelplan = (function () {
      */
     travelplan.PlandetailController = function ($scope, $routeParams, FileUploader) {
         //初始化上传图片
+        $scope.$root.pageTitle = '详细出差记录';
         $scope.winWidth = $(window).width();
         $scope.uploader = init_uploader(FileUploader, "/upload/ajax-upload-file?type=invoice");
         function uploadInvoice(consumeId, picture, callback) {
