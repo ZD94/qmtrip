@@ -41,8 +41,6 @@ var TravelStatistics = (function(){
                         }
                         console.info(date_array);
                         $scope.items=date_array;
-                        // var params = {startTime:$scope.creatmonth+'-01 00:00:00', endTime:monthEnd}
-                        // return API.tripPlan.statBudgetByMonth(params)
                     })
                     .catch(function(err){
                         console.info(err)
@@ -105,6 +103,7 @@ var TravelStatistics = (function(){
                     // 使用刚指定的配置项和数据显示图表。
                     myChart.setOption(option);
                 }
+
                 Q.all([
                     API.tripPlan.statPlanOrderMoneyByCompany({startTime: monthStart, endTime: monthEnd}),
                     API.tripPlan.statPlanOrderMoneyByCompany({startTime: YMcommon+'-1 00:00:00', endTime: YMcommon+'-10 23:59:59'}),
