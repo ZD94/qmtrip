@@ -61,6 +61,7 @@ module.exports = function (Db, DataType) {
         createAt    : {type: "timestamp without time zone", field: "create_at", defaultValue: now}, //创建时间
         remark      : {type: DataType.STRING }, //备注
         updateAt    : {type: "timestamp without time zone", field: "update_at"},
+        commitTime  : {type: "timestamp without time zone", field: "commit_time"},
         orderStatus: {
             type: DataType.VIRTUAL,
             set: function (val) {
