@@ -10,7 +10,7 @@ gulplib.bundle_lib('ws', {require:['ws'], exclude:['bufferutil', 'utf-8-validate
 gulplib.bundle_lib('api', {require:['q', 'md5', 'moment', 'tiny-cookie', 'shoe', './common/client/api.js:api']});
 gulplib.bundle_lib('calendar', {require:['lunar-calendar', "./common/client/calendar.js:calendar"]});
 gulplib.bundle_lib('jquery', {require:['jquery', 'jquery-ui']});
-gulplib.bundle_lib('msgbox', {require:['notie', './common/client/msgbox.js:msgbox']});
+gulplib.bundle_lib('notie', {require:['notie']});
 gulplib.bundle_lib('arale-qrcode', {require:['arale-qrcode']});
 gulplib.bundle_lib('ngapp', './common/client/ngapp.js', {external:['api']});
 gulplib.bundle_lib('bootstrap', {require:["bootstrap"]});

@@ -11,7 +11,7 @@ module.exports = (function() {
 
     user.IndexController = function($scope) {
 
-        $scope.$root.pageTitle = '个人中心';
+        changeTitle('个人中心',$scope);
         $scope.initStaffUser = function(){
             API.onload(function(){
                 API.staff.getCurrentStaff()
@@ -110,7 +110,7 @@ module.exports = (function() {
     }
 
     user.TravelpolicyController = function($scope) {
-        $scope.$root.pageTitle = '差旅标准';
+        changeTitle('差旅标准',$scope);
         loading(true);
         API.onload(function(){
             API.travelPolicy.getCurrentStaffTp()
