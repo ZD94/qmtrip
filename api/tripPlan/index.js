@@ -879,7 +879,7 @@ function statBudgetByMonth(params) {
             }else if(index === '1') {
                 remark = '中旬';
                 s_sql = sql + month + '1\\d\';';
-                c_sql = complete_sql month + + '1\\d\';';
+                c_sql = complete_sql + month + '1\\d\';';
             }else if(index === '2' || index === '3') {
                 remark = '下旬';
                 s_sql = sql + month + '(2||3)\\d\';';
