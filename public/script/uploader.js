@@ -3,6 +3,26 @@ var EXIF = require("exif-js");
 var exifOrient = require("exif-orient");
 
 
+function init_directive($module){
+    "use strict";
+    $module
+        .directive('ngUploader', function ($window) {
+            return {
+                restrict: 'A',
+                transclude: true,
+                template: '<input nv-file-select type="file" style="width:100%;height:100%;position:absolute;left:0;top:0;opacity:0.3;" >',
+                compile: function(element, attributes, transclude){
+                    element.css('position', 'relative');
+                    element.prepend(element.attr('lable'));
+                    var input = element.find('input');
+                    input.attr('uploader', element.attr('ng-uploader'));
+                    input.attr('accept', element.attr('accept'));
+                    input.attr('options', element.attr('options'));
+                }
+            };
+        });
+}
+
 function init_uploader(FileUploader, url){
     var uploadConf = {
         url: url,
@@ -42,6 +62,7 @@ function init_uploader(FileUploader, url){
         }
 
         function uploadAll() {
+            loading(false);
             uploader.uploadAll();
         }
 
@@ -82,6 +103,7 @@ function init_uploader(FileUploader, url){
     }
     uploader.onCompleteItem = function (fileItem, response, status, headers) {
         fileItem.done(response);
+        loading(true);
         $("#upload").remove();
     };
     return uploader;

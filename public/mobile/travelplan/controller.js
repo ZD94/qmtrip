@@ -243,7 +243,6 @@ var travelplan = (function () {
 
         $scope.backtraffic_up = '&#xe90e;<em>回程</em><strong>交通票据</strong>';
         $scope.backtraffic_done = function (response) {
-            loading(false);
             var md5key = response.md5key;
             uploadInvoice($scope.ITEM.backTraffic[0].id, md5key, function (err, result) {
                 if (err) {
@@ -251,13 +250,11 @@ var travelplan = (function () {
                     return;
                 }
                 $scope.getData($routeParams.orderId)
-                loading(true);
                 msgbox.log("票据上传成功");
             });
         }
         $scope.outtraffic_up = '&#xe90e;<em>去程</em><strong>交通票据</strong>';
         $scope.outtraffic_done = function (response) {
-            loading(false);
             var md5key = response.md5key;
             uploadInvoice($scope.ITEM.outTraffic[0].id, md5key, function (err, result) {
                 if (err) {
@@ -265,13 +262,11 @@ var travelplan = (function () {
                     return;
                 }
                 $scope.getData($routeParams.orderId)
-                loading(true);
                 msgbox.log("票据上传成功");
             });
         }
         $scope.hoteltraffic_up = '&#xe914;<em></em><strong>住宿发票</strong>';
         $scope.hoteltraffic_done = function (response) {
-            loading(false);
             var md5key = response.md5key;
             uploadInvoice($scope.ITEM.hotel[0].id, md5key, function (err, result) {
                 if (err) {
@@ -279,7 +274,6 @@ var travelplan = (function () {
                     return;
                 }
                 $scope.getData($routeParams.orderId)
-                loading(true);
                 msgbox.log("票据上传成功");
             });
         }
