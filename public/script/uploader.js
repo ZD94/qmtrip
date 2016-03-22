@@ -2,25 +2,73 @@ var $ = require('jquery');
 var EXIF = require("exif-js");
 var exifOrient = require("exif-orient");
 
+var use_wxChooseImage = false;
 
 function init_directive($module){
     "use strict";
-    $module
-        .directive('ngUploader', function ($window) {
-            return {
-                restrict: 'A',
-                transclude: true,
-                template: '<input nv-file-select type="file" style="width:100%;height:100%;position:absolute;left:0;top:0;opacity:0.3;" >',
-                compile: function(element, attributes, transclude){
-                    element.css('position', 'relative');
-                    element.prepend(element.attr('lable'));
-                    var input = element.find('input');
-                    input.attr('uploader', element.attr('ng-uploader'));
-                    input.attr('accept', element.attr('accept'));
-                    input.attr('options', element.attr('options'));
-                }
-            };
+    if(browserspec.is_wechat){
+        use_wxChooseImage = true;
+        API.require('wechat');
+        API.onload(function(){
+            console.log('checkJsApi');
+            API.wechat.getJSDKParams({url:window.location.href, jsApiList:['chooseImage', 'uploadImage'], debug:true})
+                .then(function(cfg) {
+                    wx.config(cfg);
+                })
+                .catch(function(e){
+                    console.log(e);
+                });
+            wx.ready(function(){
+                console.log('wx.ready');
+            });
         });
+    }
+    if(!use_wxChooseImage){
+        console.log('not use_wxChooseImage.');
+        $module
+            .directive('ngUploader', function () {
+                return {
+                    restrict: 'A',
+                    template: '<input nv-file-select type="file" style="width:100%;height:100%;position:absolute;left:0;top:0;opacity:0.3;" >',
+                    compile: function(element, attributes, transclude){
+                        element.css('position', 'relative');
+                        element.prepend(element.attr('lable'));
+                        var input = element.find('input');
+                        input.attr('uploader', element.attr('ng-uploader'));
+                        input.attr('accept', element.attr('accept'));
+                        input.attr('options', element.attr('options'));
+                    }
+                };
+            });
+    }else{
+        console.log('use_wxChooseImage.');
+        $module
+            .directive('ngUploader', function () {
+                return {
+                    restrict: 'A',
+                    link: function(scope, element, attributes){
+                        var uploader = scope.$eval(attributes.uploader);
+                        var options = scope.$eval(attributes.options);
+                        element.prepend(element.attr('lable'));
+                        element.bind('click', function(e){
+                            wx.chooseImage({
+                                count: 1, // 默认9
+                                sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                                sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+                                success: function (res) {
+                                    console.log(res);
+                                    options._file = res.localIds[0];
+                                    uploader.onAfterAddingFile(options); // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                                },
+                                fail: function(e){
+                                    console.log('fail:', e);
+                                },
+                            });
+                        });
+                    }
+                };
+            });
+    }
 }
 
 function init_uploader(FileUploader, url){
@@ -29,7 +77,27 @@ function init_uploader(FileUploader, url){
         alias: "tmpFile",
         autoUpload: false
     };
-    var uploader = new FileUploader(uploadConf);
+    var uploader;
+    if(use_wxChooseImage) {
+        uploader = {
+            onAfterAddingFile: function(file){
+                wx.uploadImage({
+                    localId: file._file, // 需要上传的图片的本地ID，由chooseImage接口获得
+                    isShowProgressTips: 1, // 默认为1，显示进度提示
+                    success: function (res) {
+                        var serverId = res.serverId; // 返回图片的服务器端ID
+                        API.wechat.mediaId2key({mediaId: serverId})
+                            .then(function(fileId){
+                                file.done({fileid:res});
+                                loading(true);
+                            });
+                    }
+                });
+            }
+        }
+        return uploader;
+    }
+    uploader = new FileUploader(uploadConf);
     /*
     uploader.filters.push({
         name: 'customFilter',
