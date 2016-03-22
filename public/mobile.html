@@ -39,7 +39,7 @@
         API.onlogin(function(){
             var backUrl = window.location.href;
             backUrl = encodeURIComponent(backUrl);
-            if(browserspec.is_wechat && /qmtrip\.com.\cn/.test(window.location.href)) {
+            if(browserspec.is_wechat && /^qmtrip\.com\.cn$/.test(window.location.host)) {
                 window.location.href = "/auth/wx-login?redirect_url=" + backUrl;
             }else {
                 window.location.href = "#/auth/login?backurl="+backUrl;
