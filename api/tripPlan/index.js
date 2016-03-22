@@ -556,11 +556,11 @@ function deleteConsumeDetail(params){
  * @param params
  * @param params.userId 用户id
  * @param params.consumeId 消费详情id
- * @param params.picture 新上传的票据md5key
+ * @param params.picture 新上传的票据fileId
  * @returns {*}
  */
 tripPlan.uploadInvoice = uploadInvoice;
-uploadInvoice.required_params = ['userId', 'consumeId', 'picture'];
+uploadInvoice.required_params = ['consumeId', 'picture', 'userId'];
 function uploadInvoice(params){
     var orderId = "";
 

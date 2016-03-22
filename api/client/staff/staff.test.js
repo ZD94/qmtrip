@@ -341,7 +341,7 @@ describe("api/client/staff.js", function() {
     //})
 
     //导入上传结合测试
-    /*return staffServer.importExcel({accountId: user_id, md5key: md5key})
+    /*return staffServer.importExcel({accountId: user_id, fileId: fileId})
      .then(function(result){
      if(result){
      fs.exists(filePath, function (exists) {

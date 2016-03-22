@@ -243,8 +243,8 @@ var travelplan = (function () {
 
         $scope.backtraffic_up = '&#xe90e;<em>回程</em><strong>交通票据</strong>';
         $scope.backtraffic_done = function (response) {
-            var md5key = response.md5key;
-            uploadInvoice($scope.ITEM.backTraffic[0].id, md5key, function (err, result) {
+            var fileId = response.fileId;
+            uploadInvoice($scope.ITEM.backTraffic[0].id, fileId, function (err, result) {
                 if (err) {
                     TLDAlert(err.msg || err);
                     return;
@@ -255,8 +255,9 @@ var travelplan = (function () {
         }
         $scope.outtraffic_up = '&#xe90e;<em>去程</em><strong>交通票据</strong>';
         $scope.outtraffic_done = function (response) {
-            var md5key = response.md5key;
-            uploadInvoice($scope.ITEM.outTraffic[0].id, md5key, function (err, result) {
+            console.info(response);
+            var fileId = response.fileId;
+            uploadInvoice($scope.ITEM.outTraffic[0].id, fileId, function (err, result) {
                 if (err) {
                     TLDAlert(err.msg || err);
                     return;
@@ -267,8 +268,8 @@ var travelplan = (function () {
         }
         $scope.hoteltraffic_up = '&#xe914;<em></em><strong>住宿发票</strong>';
         $scope.hoteltraffic_done = function (response) {
-            var md5key = response.md5key;
-            uploadInvoice($scope.ITEM.hotel[0].id, md5key, function (err, result) {
+            var fileId = response.fileId;
+            uploadInvoice($scope.ITEM.hotel[0].id, fileId, function (err, result) {
                 if (err) {
                     TLDAlert(err.msg || err);
                     return;

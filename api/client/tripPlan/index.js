@@ -456,7 +456,7 @@ tripPlan.deleteConsumeDetail = function (id) {
  * 上传票据
  * @param params
  * @param params.consumeId 消费详情id
- * @param params.picture 新上传的票据md5key
+ * @param params.picture 新上传的票据fileId
  * @returns {*}
  */
 tripPlan.uploadInvoice = function (params) {

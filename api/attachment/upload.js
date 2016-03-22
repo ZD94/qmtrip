@@ -89,7 +89,7 @@ function uploadActionFile(req, res, next) {
                                             console.log("删除临时文件");
                                         }
                                     });
-                                    res.send('{"ret":0, "errMsg":"", "fileId":"'+fileid+'", "md5key":"'+fileid+'"}');
+                                    res.send('{"ret":0, "errMsg":"", "fileId":"'+fileid+'"}');
                                 })
                                 .catch(function(err){
                                     console.log(err);
@@ -230,47 +230,10 @@ function downloadExcle(req, res, next){
 }
 
 
-/**
- * 访问公有附件
- * @param req
- * @param res
- * @param next
- */
-/*function getUploadFile(req, res, next) {
-    var md5key = req.params.md5key;
-    var userId = req.cookies.user_id;
-    API.attachment.getAttachment({md5key: md5key, userId: userId, isPublic: true})
-        .then(function(result){
-            if(result){
-                fs.exists(config.upload.pubDir, function (exists) {
-                    if(!exists){
-                        fs.mkdir(config.upload.pubDir);
-                    }
-                    var fileName = result.md5key + result.fileType;
-                    fs.exists(config.upload.pubDir+"/"+fileName, function (exists) {
-                        if(exists){
-                            res.redirect("/upload/"+fileName);
-                        }else{
-                            fs.writeFileAsync(config.upload.pubDir+'/'+ fileName , result.content, 'binary')
-                                .then(function(){
-                                    res.redirect("/upload/"+fileName);
-                                });
-                        }
-                    });
-                })
-            }
-        })
-        .catch(next).done();
-}*/
-
-
 module.exports = function(app){
     app.post('/upload/ajax-upload-file', uploadActionFile);
     app.get("/attachments/:id", getPublicFile);
     app.get("/self/attachments/:id", getSelfFile);
-    //app.get('/upload/get-img-file/:md5key', getImg);
     app.get('/download/excle-file/:fileName', downloadExcle);
-//    app.get('/upload/:md5key', getUploadFile);
-
 };
 
