@@ -10,7 +10,7 @@ function hanleError(err) {
 
 function init_directive($module){
     "use strict";
-    if(browserspec.is_wechat){
+    if(browserspec.is_wechat && /^(www\.)?qmtrip\.com\.cn$/.test(window.location.host)){
         use_wxChooseImage = true;
     }
 
