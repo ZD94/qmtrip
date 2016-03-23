@@ -232,7 +232,6 @@ var travelplan = (function () {
         //初始化上传图片
         $scope.$root.pageTitle = '详细出差记录';
         $scope.winWidth = $(window).width();
-        $scope.uploader = init_uploader(FileUploader, "/upload/ajax-upload-file?type=invoice");
         function uploadInvoice(consumeId, picture, callback) {
             API.tripPlan.uploadInvoice({
                 consumeId: consumeId,
