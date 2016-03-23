@@ -239,8 +239,6 @@ var travelplan = (function () {
                 picture: picture
             }, callback);
         }
-
-
         $scope.backtraffic_up = '&#xe90e;<em>回程</em><strong>交通票据</strong>';
         $scope.backtraffic_done = function (response) {
             var fileId = response.fileId;
