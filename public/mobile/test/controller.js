@@ -29,9 +29,10 @@ test.MsgboxController = function($scope){
 test.UploadController = function($scope, FileUploader){
     loading(true);
     $scope.winWidth = $(window).width();
-    $scope.uploader = init_uploader(FileUploader, "/upload/ajax-upload-file?type=invoice");
+    //$scope.uploader = init_uploader(FileUploader, "/upload/ajax-upload-file?type=invoice");
     $scope.upload_tip = '测试上传';
     $scope.upload_done = function (res) {
+        alert('upload_done'+JSON.stringify(res));
         console.log('upload done:', res);
     }
 }

@@ -26,8 +26,10 @@ function uploadActionFile(req, res, next) {
     return API.auth.authentication({user_id: user_id, token_id: token_id, token_sign: token_sign, timestamp: timestamp})
         .then(function(result){
             if (!result) {
-                return false;
+                res.send('{"ret":-1, "errMsg":"您还没有登录"}');
+                return;
             }
+
             fs.exists(config.upload.tmpDir, function (exists) {
                 if(!exists){
                     fs.mkdir(config.upload.tmpDir);
@@ -98,7 +100,10 @@ function uploadActionFile(req, res, next) {
                     });
                 });
             });
-        });
+        })
+    .catch(function(err) {
+        throw err;
+    })
 
 }
 

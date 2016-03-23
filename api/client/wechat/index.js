@@ -44,10 +44,15 @@ service.mediaId2key = function(params) {
         return API.wechat.downloadMedia({mediaId: mediaId})
     })
     .then(function(content) {
-        return API.attachements.saveAttachment({contentType: "image/png", content: content, isPublic: false});
+        return API.attachments.saveAttachment({contentType: "image/png", content: content, isPublic: false});
     })
     .then(function(fileid) {
+        console.info(fileid);
         return fileid;
+    })
+    .catch(function(err) {
+        console.info(err);
+        throw err;
     })
 }
 
