@@ -257,7 +257,6 @@ tripPlan.pageTripPlanOrder = function (params) {
                 options.order = [params.order];
             }
 
-            logger.error(options.where);
             return API.tripPlan.listTripPlanOrder(options);
         })
 }
