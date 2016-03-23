@@ -76,13 +76,13 @@
                 </div>
                 <div class="buttons" ng-if="  ITEM.outTraffic[0].orderStatus!=='NO_BUDGET'  ">
                     <a class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'outTraffic' )" ng-hide="ITEM.outTraffic[0].invoiceType==='TRAIN'">预订</a>
-                    <div class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">
+                    <div class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  ">
                         <input type="file"  label="重新上传" ng-uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},title:outtraffic_up,done:outtraffic_done}">
                         上传票据
                     </div>
                     <div class="BTN" ng-if="  
                         ITEM.outTraffic[0].orderStatus==='WAIT_COMMIT'||
-                        ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS'  " ng-click="">
+                        ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS'  ">
                         <input type="file"  ng-uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},title:outtraffic_up,done:outtraffic_done}">
                         重新上传
                     </div>

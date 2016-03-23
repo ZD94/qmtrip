@@ -33,6 +33,7 @@ service.getJSDKParams = function(params) {
  * @return {Promise} 附件fileId
  */
 service.mediaId2key = function(params) {
+    var self = this;
     var mediaId = params.mediaId;
     return Q()
     .then(function() {
@@ -46,13 +47,11 @@ service.mediaId2key = function(params) {
     .then(function(content) {
         return API.attachments.saveAttachment({contentType: "image/png", content: content, isPublic: false});
     })
-    .then(function(fileid) {
-        console.info(fileid);
-        return fileid;
-    })
-    .catch(function(err) {
-        console.info(err);
-        throw err;
+    .then(function(fileId) {
+        return API.attachment.bindOwner({fileId: fileId, accountId: self.accountId})
+        .then(function() {
+            return fileId;
+        });
     })
 }
 

@@ -18,7 +18,7 @@ var attachment = {};
  * 绑定拥有者
  *
  * @param {Object} params
- * @param {String} params.key
+ * @param {String} params.fileId
  * @param {UUID} params.accountId
  */
 attachment.bindOwner = function(params) {
