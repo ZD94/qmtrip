@@ -58,7 +58,7 @@ function init_directive($module){
                     link: function(scope, element, attributes){
                         API.require('wechat');
                         API.onload(function(){
-                            API.wechat.getJSDKParams({url:window.location.href, jsApiList:['chooseImage', 'uploadImage'], debug:true})
+                            API.wechat.getJSDKParams({url:window.location.href, jsApiList:['chooseImage', 'uploadImage'], debug:false})
                                 .then(function(cfg) {
                                     wx.config(cfg);
                                 })
@@ -72,6 +72,7 @@ function init_directive($module){
                             var options = scope.$eval(attributes.options);
                             element.prepend(element.attr('lable'));
                             element.bind('click', function(e){
+                                e.preventDefault();
                                 wx.chooseImage({
                                     count: 1, // 默认9
                                     sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
@@ -79,7 +80,6 @@ function init_directive($module){
                                     success: function (res) {
                                         options._file = res.localIds[0]; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
                                         onAfterAddingFile(options, function() {
-                                            alert("准备上传文件");
                                             wx.uploadImage({
                                                 localId: options._file, // 需要上传的图片的本地ID，由chooseImage接口获得
                                                 isShowProgressTips: 1, // 默认为1，显示进度提示
@@ -87,9 +87,9 @@ function init_directive($module){
                                                     var serverId = res.serverId; // 返回图片的服务器端ID
                                                     API.wechat.mediaId2key({mediaId: serverId})
                                                         .then(function(fileId){
-                                                            alert({code: 0, fileId: fileId})
                                                             options.done({code: 0, fileId: fileId});
                                                             loading(true);
+                                                            $("#upload").remove();
                                                         })
                                                         .catch(hanleError)
                                                 }
