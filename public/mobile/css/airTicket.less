@@ -1,0 +1,49 @@
+@import "common.less";
+
+@f72:3.6rem;
+@f36:1.8rem;
+@f32:1.6rem;
+@f30:1.5rem;
+@f28:1.4rem;
+@f26:1.3rem;
+@f24:1.2rem;
+@f20:1rem;
+
+.airTicketOrderDetails {
+  .top {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: white;
+    color: red;
+  }
+  .charges {
+    margin-bottom: 1rem;
+    overflow: hidden;
+    background: white;
+    li {
+      position: relative;
+      float: left;
+      width: 25%;
+      text-align: center;
+      .bar {
+        position: absolute;
+        right: 0;
+        top: 30%;
+        width: 1px;
+        height: 1rem;
+        background: grey;
+      }
+    }
+  }
+  .dropdown {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: white;
+  }
+  .buttons {
+    overflow: hidden;
+    a {
+      float: left;
+    }
+  }
+}

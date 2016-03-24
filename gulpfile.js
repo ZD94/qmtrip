@@ -12,7 +12,7 @@ gulplib.bundle_lib('calendar', {require:['lunar-calendar', "calendar"]});
 gulplib.bundle_lib('jquery', {require:['jquery', 'jquery-ui']});
 gulplib.bundle_lib('msgbox', {require:['notie', 'msgbox']});
 gulplib.bundle_lib('arale-qrcode', {require:['arale-qrcode']});
-gulplib.bundle_lib('ngapp', './common/client/ngapp.js', {external:['api']});
+gulplib.bundle_lib('ngapp', './common/client/ngapp/index.js', {require: ['public/script/nglibs:nglibs'], external:['api']});
 gulplib.bundle_lib('bootstrap', {require:["bootstrap"]});
 gulplib.bundle_lib('swiper', {require:['swiper']});
 gulplib.bundle_lib('hidpi-canvas', {require:['hidpi-canvas']});
