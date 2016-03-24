@@ -16,15 +16,17 @@ function init_directive($module){
 
     if(!use_wxChooseImage){
         $module
-            .directive('ngUploader', function (FileUploader) {
+            .directive('ngUploader', function () {
                 return {
                     restrict: 'A',
                     template: '<input nv-file-select uploader="uploader" type="file">',
                     replace: true,
-                    controller: function($scope) {
+                    controller: function($scope, $attrs, FileUploader) {
+                        var url = $attrs.url || '/upload/ajax-upload-file?type=image';
+                        var name = $attrs.name || 'tmpFile';
                         var cnf = {
-                            url: "/upload/ajax-upload-file?type=image",
-                            alias: "tmpFile",
+                            url: url,
+                            alias: name,
                             autoUpload: false
                         }
 
