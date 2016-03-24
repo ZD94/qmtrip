@@ -257,7 +257,6 @@ tripPlan.pageTripPlanOrder = function (params) {
                 options.order = [params.order];
             }
 
-            logger.error(options.where);
             return API.tripPlan.listTripPlanOrder(options);
         })
 }
@@ -378,23 +377,25 @@ function pageTripPlanOrderByCompany(params) {
             }
 
             if(!emailOrName) {
-                return [options, []];
+                return [false, options, []];
             }
 
-            return [options,
+            return [true, options,
                 API.staff.findStaffs({companyId: companyId,
                     $or: [{name: {$like: '%' + emailOrName +'%'}}, {email: {$like: '%' + emailOrName +'%'}}],
                     status: {$ne: -2},
                     columns: ['id']
                     })];
         })
-        .spread(function(options, staffs) {
+        .spread(function(isEmailOrName, options, staffs) {
             if(staffs && staffs.length > 0) {
                 var idArr = staffs.map(function(staff) {
                     return staff.id;
                 });
 
                 options.where.accountId = {$in: idArr};
+            }else if(isEmailOrName) {
+                return {page: 1, perPage: 20, items: []};
             }
 
             return API.tripPlan.listTripPlanOrder(options);
@@ -454,7 +455,7 @@ tripPlan.deleteConsumeDetail = function (id) {
  * 上传票据
  * @param params
  * @param params.consumeId 消费详情id
- * @param params.picture 新上传的票据md5key
+ * @param params.picture 新上传的票据fileId
  * @returns {*}
  */
 tripPlan.uploadInvoice = function (params) {

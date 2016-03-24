@@ -556,11 +556,11 @@ function deleteConsumeDetail(params){
  * @param params
  * @param params.userId 用户id
  * @param params.consumeId 消费详情id
- * @param params.picture 新上传的票据md5key
+ * @param params.picture 新上传的票据fileId
  * @returns {*}
  */
 tripPlan.uploadInvoice = uploadInvoice;
-uploadInvoice.required_params = ['userId', 'consumeId', 'picture'];
+uploadInvoice.required_params = ['consumeId', 'picture', 'userId'];
 function uploadInvoice(params){
     var orderId = "";
 
@@ -854,7 +854,7 @@ function statBudgetByMonth(params) {
         stTime = moment(stTime).add(1, 'months').format('YYYY-MM-DD');
     }while(stTime<enTime);
 
-    var sql = 'select sum(budget) as \"planMoney\",sum(expenditure) as expenditure ' +
+    var sql = 'select count(account_id) as \"staffNum\", sum(budget) as \"planMoney\",sum(expenditure) as expenditure ' +
         'from tripplan.trip_plan_order where company_id=\'' + params.companyId + '\'';
 
     if(params.accountId) {
@@ -863,27 +863,35 @@ function statBudgetByMonth(params) {
 
     var complete_sql = sql + ' and status=2 and to_char(start_at, \'YYYY-MM-DD\') ~ \'';
 
+
     sql += ' and status > -1 and to_char(start_at, \'YYYY-MM-DD\') ~ \'';
 
     return Promise.all(
         timeArr.map(function(month) {
-            var s_sql = sql + month + '\';';
-            var c_sql = complete_sql + month + '\';';
-
+            var s_sql = sql; // + month + '\\d\';';
+            var c_sql = complete_sql; // + month + '\\d\';';
             var index = month.match(/\d{4}-\d{2}-(\d).*/)[1];
             var remark = '';
+
             if(index === '0') {
                 remark = '上旬';
+                s_sql = sql + month + '\';';
+                c_sql = complete_sql + month + '\';';
             }else if(index === '1') {
                 remark = '中旬';
-            }else if(index === '2') {
+                s_sql = sql + month + '\';';
+                c_sql = complete_sql + month + '\';';
+            }else if(index === '2' || index === '3') {
                 remark = '下旬';
+                var str = month.substr(0, month.length -3);
+                s_sql = sql + str + '(2|3)\\d\';';
+                c_sql = complete_sql + str + '(2|3)\\d\';';
             }
 
             var month = month.match(/\d{4}-\d{2}/)[0];
             return Promise.all([
                 sequelize.query(s_sql),
-                sequelize.query(c_sql)
+                sequelize.query(c_sql),
             ])
                 .spread(function(all, complete){
                     var a = all[0][0];
@@ -893,6 +901,7 @@ function statBudgetByMonth(params) {
                         qmBudget: a.planMoney|0,
                         planMoney: c.planMoney|0,
                         expenditure: c.expenditure|0,
+                        staffNum: c.staffNum,
                         remark: remark
                     };
 

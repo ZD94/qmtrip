@@ -8,14 +8,16 @@ var gulplib = require('./common/gulplib');
 
 gulplib.bundle_lib('ws', {require:['ws'], exclude:['bufferutil', 'utf-8-validate']});
 gulplib.bundle_lib('api', {require:['q', 'md5', 'moment', 'tiny-cookie', 'shoe', './common/client/api.js:api']});
-gulplib.bundle_lib('calendar', {require:['lunar-calendar', "./common/client/calendar.js:calendar"]});
+gulplib.bundle_lib('calendar', {require:['lunar-calendar', "calendar"]});
 gulplib.bundle_lib('jquery', {require:['jquery', 'jquery-ui']});
-gulplib.bundle_lib('msgbox', {require:['notie', './common/client/msgbox.js:msgbox']});
+gulplib.bundle_lib('msgbox', {require:['notie', 'msgbox']});
 gulplib.bundle_lib('arale-qrcode', {require:['arale-qrcode']});
 gulplib.bundle_lib('ngapp', './common/client/ngapp.js', {external:['api']});
 gulplib.bundle_lib('bootstrap', {require:["bootstrap"]});
 gulplib.bundle_lib('swiper', {require:['swiper']});
 gulplib.bundle_lib('hidpi-canvas', {require:['hidpi-canvas']});
+gulplib.bundle_lib("exif-orient", {require:["exif-orient"]});
+gulplib.bundle_lib("exif", {require: ["exif-js"]})
 gulplib.angular_app('staff');
 gulplib.angular_app('corp');
 gulplib.angular_app('extendfunction');

@@ -195,7 +195,7 @@ CREATE TABLE consume_details (
     budget numeric(15,2),
     expenditure numeric(15,2),
     invoice_type integer,
-    invoice jsonb DEFAULT '[]'::jsonb, -- 票据[{times:1, picture:md5key, create_at:时间, status:审核结果, remark: 备注}]
+    invoice jsonb DEFAULT '[]'::jsonb, -- 票据[{times:1, picture:fileId, create_at:时间, status:审核结果, remark: 备注}]
     remark character varying,
     audit_remark character varying,
     audit_user uuid,

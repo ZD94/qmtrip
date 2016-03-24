@@ -258,7 +258,7 @@
 |------                                 |------               |-----                |------
 | params                                | 查询条件参数             |json              |------
 | params.accountId                             |员工id             |uuid                |必填
-| params.md5key                                |导入文件MD5key             |string              |必填
+| params.fileId                                |导入文件fileId             |string              |必填
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |

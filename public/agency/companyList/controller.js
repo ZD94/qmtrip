@@ -651,25 +651,16 @@ module.exports = (function(){
 			$(".staff_tab_content").hide();
 			$(".staff_tab_import").hide();
 			$(".staff_import_success").hide();
-			var md5key = $("#fileMd5key").val();
+			var fileId = $("#fileId").val();
 			API.onload(function(){
-				//API.staff.getCurrentStaff()//获取当前登录人员的id
-				//	.then(function(staffid){
-				//console.info(staffid);
-				//console.info(staffid.id);
-				//console.info(md5key);
-				API.staff.beforeImportExcel({md5key:md5key, companyId: companyId})
+				API.staff.beforeImportExcel({fileId:fileId, companyId: companyId})
 					.then(function(allData){
-						//console.info(allData);
-						//console.info(allData.noAddObj);
 						$scope.invalid = JSON.parse(allData.noAddObj);
 						$scope.valid = JSON.parse(allData.addObj);
 						$scope.downloadInvalidData = allData.downloadNoAddObj;
 						$scope.downloadValidData = allData.downloadAddObj;
 						$scope.validData = JSON.parse(allData.addObj).length;
 						$scope.invalidData = JSON.parse(allData.noAddObj).length;
-						//$scope.totalData =
-						//return $scope.valid;
 						$scope.$apply();
 					})
 					.catch(function(err){

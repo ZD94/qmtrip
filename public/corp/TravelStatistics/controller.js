@@ -20,111 +20,116 @@ var TravelStatistics = (function(){
     TravelStatistics.SettlementInfoController = function($scope) {
         $("title").html("结算信息");
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
+        var monthStart = moment().startOf('Month').format('YYYY-MM-DD 00:00:00');
+        var monthEnd = moment().endOf('Month').format('YYYY-MM-DD 23:59:59');
+        var YMcommon = moment().startOf('Month').format('YYYY-MM')
+        $scope.ymcommon = moment().startOf('Month').format('YYYY年MM月');
+        var date_array = new Array;
+        
+        $scope.initchart = function($event){
+            console.info($($event.target).attr("data-zrep"));
+            var startAT = $($event.target).attr("data-zrep");
+            $scope.startAT = moment(startAT).startOf('month').format('YYYY-MM-DD');
+            $scope.endAT = moment(startAT).endOf('month').format('YYYY-MM-DD 23:59:59');
+            Q.all([API.tripPlan.statBudgetByMonth({startTime:$scope.startAT, endTime:$scope.endAT}),
+                API.tripPlan.statPlanOrderMoneyByCompany({startTime: $scope.startAT || monthStart, endTime: $scope.endAT || monthEnd})
+                ])
+                .spread(function(budget,stat){
+                    console.info(stat);
+                    console.info("%%%%%");
+                    var s = budget[0];
+                    var z = budget[1];
+                    var x = budget[2];
+                    $scope.stat = stat;
+                    chartload(s,z,x);
+                })
+                .catch(function(err){
+                    TLDAlert("数据加载失败,请稍后重试");
+                })
+        }
+        function chartload(s,z,x) {
+            $scope.s = s; //上旬
+            $scope.z = z; //中旬
+            $scope.x = x; //下旬
+            $scope.s_month = moment(s.month).startOf('month').format('YYYY年MM月');
+            $scope.z_month = moment(z.month).startOf('month').format('YYYY年MM月');
+            $scope.x_month = moment(x.month).startOf('month').format('YYYY年MM月');
+            $scope.$apply();
+            var planConsume = [];
+            planConsume.push(s.planMoney);
+            planConsume.push(z.planMoney);
+            planConsume.push(x.planMoney);
+            var factConsume = [];
+            factConsume.push(s.expenditure);
+            factConsume.push(z.expenditure);
+            factConsume.push(x.expenditure);
+            var travelNumbers = [];
+            travelNumbers.push(s.NumOfStaff, z.NumOfStaff, x.NumOfStaff);
+            console.info(s,z,x);
+            var myChart = echarts.init(document.getElementById('settle_chart'));
+            // 指定图表的配置项和数据
+            var option = {
+                tooltip: {},
+                legend: {
+                    data:['计划支出', '实际支出', '出差人数']
+                },
+                color: ["#00eacf", "#fd6961", "#8250fe"],
+                xAxis: {
+                    data: ['上旬', '中旬', '下旬']
+                },
+                yAxis: {},
+                series: [{
+                    name: '计划支出',
+                    type: 'bar',
+                    data: planConsume
+                }, {
+                    name: "实际支出",
+                    type: "bar",
+                    data: factConsume
+                }, {
+                    name: "出差人数",
+                    type: "line",
+                    data: travelNumbers
+                }]
+            };
+
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+        // API.tripPlan.statBudgetByMonth({startTime:$scope.startAT+'-01'||monthStart, endTime:$scope.endAT || monthEnd})
         initPageData();
-        Myselect ();
         function initPageData() {
             API.onload(function(){
-                var monthStart = moment().startOf('Month').format('YYYY-MM-DD 00:00:00');
-                var monthEnd = moment().endOf('Month').format('YYYY-MM-DD 23:59:59');
-                var YMcommon = moment().startOf('Month').format('YYYY-MM')
-                $scope.ymcommon = moment().startOf('Month').format('YYYY年MM月');
-                // var pastyear = currentyear-1;
                 API.staff.getCurrentStaff()
                     .then(function(staff){
-                        return API.company.getCompanyById(staff.companyId)
+                        console.info($scope.startAT,$scope.endAT)
+                        return Q.all([
+                            API.company.getCompanyById(staff.companyId),
+                            API.tripPlan.statPlanOrderMoneyByCompany({startTime: monthStart, endTime: monthEnd}),
+                            API.tripPlan.statBudgetByMonth({startTime:$scope.startAT || monthStart, endTime:$scope.endAT || monthEnd})
+                            ])
                     })
-                    .then(function(company){
-                        console.info(company)
-                        var current = moment().startOf('Month');
-                        var createAt = moment(company.createAt);
-                        // current = current.format('YYYY年MM月');
-                        console.info(createAt);
+                    .spread(function(company,stat,budget){
+                        var s = budget[0];
+                        var z = budget[1];
+                        var x = budget[2];
+                        console.info(budget)
+                        var current = moment().startOf('month');
+                        var createAt = moment(company.createAt).startOf('month');
                         for(var cur = current;!cur.isBefore(createAt);cur.subtract(1, 'month')){
-                            console.info(cur, createAt);
-                            cur.format('YYYY年MM月');
+                            var _item = {cur_cn: cur.format('YYYY年MM月'), cur_en: cur.format('YYYY-MM')}
+                            date_array.push(_item);
                         }
-                    })
-                var date_array = new Array();
-                // for (var i = currentmonth; i > currentmonth-6; i--) {
-                //     var j;
-                //     if(i<=0){
-                //         j = 12+i;
-                //         if (j<10) {
-                //             j = '0'+j;
-                //         }
-                //         console.info(j);
-                //         date_array.push(pastyear+j+'月');
-                //     }else{
-                //         j=i;
-                //         if (j<10) {
-                //             j = '0'+j;
-                //         }
-                //         date_array.push(currentyear+j+'月');
-                //     }
-                // };
-                
-                console.info($scope.staff);
-                $scope.items=date_array;
-                Q.all([
-                    API.tripPlan.statPlanOrderMoneyByCompany({startTime: monthStart, endTime: monthEnd}),
-                    API.tripPlan.statPlanOrderMoneyByCompany({startTime: YMcommon+'-1 00:00:00', endTime: YMcommon+'-10 23:59:59'}),
-                    API.tripPlan.statPlanOrderMoneyByCompany({startTime: YMcommon+'-11 00:00:00', endTime: YMcommon+'-20 23:59:59'}),
-                    API.tripPlan.statPlanOrderMoneyByCompany({startTime: YMcommon+'-21 00:00:00', endTime: monthEnd})
-                ])
-                    .spread(function(stat, s, z, x) {
-                        var planConsume = [];
-                        planConsume.push(s.planMoney);
-                        planConsume.push(z.planMoney);
-                        planConsume.push(x.planMoney);
-                        console.info(stat)
-                        var factConsume = [];
-                        factConsume.push(s.expenditure);
-                        factConsume.push(z.expenditure);
-                        factConsume.push(x.expenditure);
-
-                        var travelNumbers = [];
-                        travelNumbers.push(s.NumOfStaff, z.NumOfStaff, x.NumOfStaff);
-
-                        var myChart = echarts.init(document.getElementById('settle_chart'));
-                        // 指定图表的配置项和数据
-                        var option = {
-                            tooltip: {},
-                            legend: {
-                                data:['计划支出', '实际支出', '出差人数']
-                            },
-                            color: ["#00eacf", "#fd6961", "#8250fe"],
-                            xAxis: {
-                                data: ['上旬', '中旬', '下旬']
-                            },
-                            yAxis: {},
-                            series: [{
-                                name: '计划支出',
-                                type: 'bar',
-                                data: planConsume
-                            }, {
-                                name: "实际支出",
-                                type: "bar",
-                                data: factConsume
-                            }, {
-                                name: "出差人数",
-                                type: "line",
-                                data: travelNumbers
-                            }]
-                        };
-
-                        // 使用刚指定的配置项和数据显示图表。
-                        myChart.setOption(option);
-
+                        $scope.items=date_array;
+                        chartload(s,z,x);
                         $scope.stat = stat;
-                        $scope.s = s; //上旬
-                        $scope.z = z; //中旬
-                        $scope.x = x; //下旬
                         $scope.$apply();
+                        Myselect ();
                     })
-                    .catch(function(err) {
+                    .catch(function(err){
                         TLDAlert("数据加载失败,请稍后重试");
+                        console.info(err);
                     })
-                    .done();
             })
         }
     }
@@ -240,6 +245,9 @@ var TravelStatistics = (function(){
                 API.tripPlan.pageTripPlanOrderByCompany(params)
                     .then(function(list){
                         $scope.planlist = list.items;
+                        if($scope.planlist.length == 0){
+                            $("#pagination").hide();
+                        }
                         console.log( $scope.planlist );
                         var planlist = list.items;
                         $scope.total = list.total;
