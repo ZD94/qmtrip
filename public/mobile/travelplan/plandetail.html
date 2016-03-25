@@ -76,14 +76,14 @@
                 </div>
                 <div class="buttons" ng-if="  ITEM.outTraffic[0].orderStatus!=='NO_BUDGET'  ">
                     <a class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'outTraffic' )" ng-hide="ITEM.outTraffic[0].invoiceType==='TRAIN'">预订</a>
-                    <div class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  ">
-                        <input type="file"  label="重新上传" ng-uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},title:outtraffic_up,done:outtraffic_done}">
+                    <div class="BTN" ng-uploader accept="image/*" title="outtraffic_up" done="outtraffic_done"
+                         ng-if="ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'">
                         上传票据
                     </div>
-                    <div class="BTN" ng-if="  
+                    <div class="BTN" ng-uploader accept="image/*" title="outtraffic_up" done="outtraffic_done"
+                         ng-if="
                         ITEM.outTraffic[0].orderStatus==='WAIT_COMMIT'||
-                        ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS'  ">
-                        <input type="file"  ng-uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},title:outtraffic_up,done:outtraffic_done}">
+                        ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS'">
                         重新上传
                     </div>
                     <a class="BTN" ng-if="  
@@ -131,14 +131,14 @@
                 <div class="status" ng-class="{'rejected':(ITEM.backTraffic[0].orderStatus==='AUDIT_NOT_PASS'),'complete':(ITEM.backTraffic[0].orderStatus==='AUDIT_PASS')}">{{renderStatus( ITEM.backTraffic[0] )}}</div>
                 <div class="buttons" ng-if="ITEM.backTraffic[0].budget!==-1">
                     <a class="BTN" ng-if="  ITEM.backTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'backTraffic' )" ng-hide="ITEM.backTraffic[0].invoiceType==='TRAIN'">预订</a>
-                    <div class="BTN" ng-if="  ITEM.backTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">
-                        <input type="file"  ng-uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},title:backtraffic_up,done:backtraffic_done}">
+                    <div class="BTN" ng-uploader accept="image/*" title="backtraffic_up" done="backtraffic_done"
+                         ng-if="  ITEM.backTraffic[0].orderStatus==='WAIT_UPLOAD'  ">
                         上传票据
                     </div>
-                    <div class="BTN" ng-if="  
+                    <div class="BTN" ng-uploader accept="image/*" title="backtraffic_up" done="backtraffic_done"
+                         ng-if="
                         ITEM.backTraffic[0].orderStatus==='WAIT_COMMIT'||
-                        ITEM.backTraffic[0].orderStatus==='AUDIT_NOT_PASS'  " ng-click="">
-                        <input type="file"  ng-uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},title:backtraffic_up,done:backtraffic_done}">
+                        ITEM.backTraffic[0].orderStatus==='AUDIT_NOT_PASS'  ">
                         重新上传
                     </div>
                     <a class="BTN" ng-if="  
@@ -180,14 +180,14 @@
                 <div class="status" ng-class="{'rejected':(ITEM.hotel[0].orderStatus==='AUDIT_NOT_PASS'),'complete':(ITEM.hotel[0].orderStatus==='AUDIT_PASS')}">{{renderStatus( ITEM.hotel[0] )}}</div>
                 <div class="buttons" ng-if="  ITEM.hotel[0].budget!==-1  ">
                     <a class="BTN" ng-if="  ITEM.hotel[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'hotel' )" ng-hide="ITEM.hotel[0].invoiceType==='TRAIN'">预订</a>
-                    <div class="BTN" ng-if="  ITEM.hotel[0].orderStatus==='WAIT_UPLOAD'  " ng-click="">
-                        <input type="file"  ng-uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},title:hoteltraffic_up,done:hoteltraffic_done}">
+                    <div class="BTN" ng-uploader accept="image/*" title="hoteltraffic_up" done="hoteltraffic_done"
+                         ng-if="  ITEM.hotel[0].orderStatus==='WAIT_UPLOAD'  ">
                         上传票据
                     </div>
-                    <div class="BTN" ng-if="  
+                    <div class="BTN" ng-uploader accept="image/*" title="hoteltraffic_up" done="hoteltraffic_done"
+                         ng-if="
                         ITEM.hotel[0].orderStatus==='WAIT_COMMIT'||
-                        ITEM.hotel[0].orderStatus==='AUDIT_NOT_PASS'  " ng-click="">
-                        <input type="file"  ng-uploader="uploader" class="file" accept="image/gif,image/jpeg,image/jpg,image/png" options="{imgwidth:{{winWidth}},title:hoteltraffic_up,done:hoteltraffic_done}">
+                        ITEM.hotel[0].orderStatus==='AUDIT_NOT_PASS'  ">
                         重新上传
                     </div>
                     <a class="BTN" ng-if="  
