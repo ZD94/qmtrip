@@ -20,6 +20,19 @@ var airTicket = (function () {
     airTicket.OrderDetailsController = function ($scope, $routeParams) {
         loading(true);
 
+        //settings
+        $scope.deliveryAddressShown = false;
+
+        $scope.toggle = function( params ){
+            if( params==="deliveryAddress" ){
+                $scope.deliveryAddressShown = ($scope.deliveryAddressShown?false:true);
+            };
+        }
+
+    }
+
+    airTicket.PassengerController = function ($scope, $routeParams) {
+        loading(true);
     }
 
     return airTicket;

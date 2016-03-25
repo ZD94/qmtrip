@@ -2,24 +2,26 @@
     html,body {
         background: #F1F1F1;
     }
+    .iii {
+        color:red;
+    }
+    .iii i {font-size: 50px;}
 </style>
-<script type="text/javascript">
-    angular.module("qmtrip").directive("fff",function(){
-        return {
-            restrict: "E",
-            template: "kaewrkjlwerjlkwe"
-        };
-    });
-    console.log( angular.module("qmtrip") );
-    
 
-</script>
 <div class="airTicketOrderDetails">
+    <icon class="iii" name="hotel"></icon>
     <div class="top">
         <p class="status">待支付</p>
         <p>剩余19分钟</p>
         <p>订单时间：</p>
         <p>订单编号：</p>
+    </div>
+
+    <div>乘机人信息</div>
+
+    <div>
+        李明月<br/>
+        123213254356435345
     </div>
 
     <p>合计</p>
@@ -32,32 +34,37 @@
         </li>
         <li>
             <span>8495</span><br/>
-            <span>票价</span>
+            <span>机建费</span>
             <div class="bar"></div>
         </li>
         <li>
             <span>8495</span><br/>
-            <span>票价</span>
+            <span>税费</span>
             <div class="bar"></div>
         </li>
         <li>
             <span>8495</span><br/>
-            <span>票价</span>
+            <span>配送费</span>
         </li>
     </ul>
 
     <div class="dropdown">
-        <div class="dropdown-header">
+        <div class="dropdown-header" ng-click="toggle('deliveryAddress')">
             <span>账单配送地址</span>
         </div>
-
+        <div class="dropdown-content deliveryAddress" ng-show="deliveryAddressShown">
+            <p>
+                李明月<br/>
+                13611111111<br/>
+                北京市朝阳区
+            </p>
+        </div>
     </div>
 
     <div class="dropdown">
         <div class="dropdown-header">
             <span>查看对应的出差记录</span>
         </div>
-
     </div>
 
     <div class="buttons">
