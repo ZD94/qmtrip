@@ -6,9 +6,11 @@
 var API = require("common/api");
 var L = require("common/language");
 var Logger = require('common/logger');
+var paginate = require("common/paginate");
 var _ = require('lodash');
 
 var logger = new Logger('client/qm_order');
+var Paginate = paginate.Paginate;
 var qm_order = {};
 
 /**
@@ -49,31 +51,7 @@ function create_order(params) {
 }
 
 /**
- * 查询订单列表分页接口
- * @param params
- * @param {integer} params.page   查询页数
- * @param {integer} params.per_page  查询每页记录数目
- * @returns {Array} list
- */
-qm_order.page_qm_orders = page_qm_orders;
-page_qm_orders.optional_params = ['page', 'per_page'];
-function page_qm_orders(params) {
-    var self = this;
-    var account_id = self.accountId;
-
-    return API.staff.getStaff({id: account_id, columns: ['companyId']})
-        .then(function (staff) {
-            return staff.companyId;
-        })
-        .then(function(company_id) {
-            params.company_id = company_id;
-            params.staff_id = account_id;
-            return API.qm_order.page_qm_orders(params);
-        })
-};
-
-/**
- * 获取舱位信息
+ * 获取全麦订单详情
  * @param params
  * @param {uuid} params.order_id  订单id
  * @returns {*}
@@ -82,10 +60,87 @@ qm_order.get_qm_order = get_qm_order;
 get_qm_order.required_params = ['order_id'];
 function get_qm_order(params) {
     var self = this;
-
     return API.staff.getStaff({id: self.accountId})
         .then(function() {
             return API.qm_order.get_order_by_id(params);
+        })
+};
+
+/**
+ * 获取全麦订单详情
+ * @param params
+ * @param {uuid}    params.trip_plan_id  计划单id
+ * @param {Array}   params.order    排序 默认: ['date', 'asc']
+ * @returns {Array}
+ */
+qm_order.get_orders_plan_id = get_orders_plan_id;
+get_orders_plan_id.required_params = ['trip_plan_id'];
+get_orders_plan_id.optional_params = ['order'];
+function get_orders_plan_id(params) {
+    var self = this;
+    return API.staff.getStaff({id: self.accountId, columns: ['id', 'companyId']})
+        .then(function(staff) {
+            params.staff_id = staff.id;
+            params.company_id = staff.companyId;
+
+            var options = {
+                where: _.pick(params, ['staff_id', 'trip_plan_id', 'company_id'])
+            };
+            params.order ? options.order = [params.order] : options.order = [['date', 'asc']];
+
+            return API.qm_order.list_qm_orders(options);
+        })
+        .then(function(ret) {
+            return ret.rows;
+        })
+}
+
+/**
+ * 查询订单列表分页接口
+ * @param params
+ * @param {integer} params.page   查询页数 默认: 1
+ * @param {integer} params.per_page  查询每页记录数目 默认: 10
+ * @param {Array}   params.order    排序 默认: ['date', 'asc']
+ * @returns {Array} list
+ */
+qm_order.page_qm_orders = page_qm_orders;
+page_qm_orders.optional_params = ['page', 'per_page', 'order'];
+function page_qm_orders(params) {
+    var self = this;
+    var account_id = self.accountId;
+    var page = params.page || 1;
+    var per_page = params.per_page || 10;
+
+    return API.staff.getStaff({id: account_id, columns: ['companyId']})
+        .then(function (staff) {
+            return staff.companyId;
+        })
+        .then(function(company_id) {
+            params.company_id = company_id;
+            params.staff_id = account_id;
+
+            var options = {
+                where: _.omit(params, ['page', 'per_page', 'order'])
+            };
+            params.order ? options.order = [params.order] : options.order = [['date', 'asc']];
+
+            return API.qm_order.list_qm_orders(options)
+        })
+        .then(function(ret) {
+            return new Paginate(page, per_page, ret.count, ret.rows);
+        })
+};
+
+qm_order.delete_order = delete_order;
+delete_order.required_params = ['order_id'];
+function delete_order(params) {
+    var self = this;
+
+    return API.staff.getStaff({id: self.accountId, columns: ['id']})
+        .then(function(staff) {
+            params.user_id = staff.id;
+
+            return API.qm_order.delete_qm_order(params);
         })
 }
 
