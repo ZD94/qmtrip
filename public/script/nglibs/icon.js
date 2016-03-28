@@ -3,10 +3,13 @@
 
 module.exports = function ($module){
     var fonts = {
-        fa: 'fa fa-',
+        fa: {
+            font: 'fa fa-',
+            scale: 1.28594
+        },
         customs: {
-            symfont: 'web-icon-font3',
-            symcode: {
+            font: 'web-icon-font3',
+            code: {
                 success: '\ue921',
                 consult: '\ue920',
                 cross: '\ue91F',
@@ -69,15 +72,17 @@ module.exports = function ($module){
             symname = m[2];
         }
         var symconf = fonts[symfont];
-        if(typeof symconf == 'string'){
-            $scope.symfont = symconf;
+        $scope.symfont = symconf.font;
+        if(symconf.code){
+            $scope.symname = '';
+            $scope.symcode = symconf.code[symname];
+        } else {
             $scope.symname = symname;
             $scope.symcode = '';
-        } else {
-            $scope.symfont = symconf.symfont;
-            $scope.symname = '';
-            $scope.symcode = symconf.symcode[symname];
         }
+        $scope.symscale = 1;
+        if(symconf.scale != undefined)
+            $scope.symscale = symconf.scale;
     }
 
     $module.directive("symbol",function(){
@@ -99,7 +104,7 @@ module.exports = function ($module){
                 name: '@'
             },
             link: function(scope, element, attrs){
-                element.css('font-size', element.width()/1.28594);
+                element.css('font-size', element.width()/scope.symscale);
                 element.css('line-height', element.width()+'px');
             },
             controller: iconController
