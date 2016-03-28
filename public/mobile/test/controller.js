@@ -36,3 +36,7 @@ test.UploadController = function($scope, FileUploader){
         console.log('upload done:', res);
     }
 }
+
+test.IconController = function(){
+    loading(true);
+}
