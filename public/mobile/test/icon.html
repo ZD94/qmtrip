@@ -1,59 +1,12 @@
 <style>
-	icon {
-		font-size: 3rem;
-		color: orange;
-	}
+    .test_icon{
+        width: 22px;
+        height: 22px;
+        display: inline-block;
+        border: 1px solid #9e0505;
+    }
 </style>
 
-<div style="font-size: 3rem;">
-	<icon name="success"/> success<br/>
-	<icon name="consult"/> consult<br/>
-	<icon name="cross"/> cross<br/>
-	<icon name="like"/> like<br/>
-	<br/>
-	<icon name="hotel"/> hotel<br/>
-	<icon name="arrow-down"/> arrow-down<br/>
-	<icon name="points"/> points<br/>
-	<icon name="train"/> train<br/>
-	<br/>
-	<icon name="help"/> help<br/>
-	<icon name="arrows"/> arrows<br/>
-	<icon name="info"/> info<br/>
-	<icon name="calendar"/> calendar<br/>
-	<br/>
-	<icon name="close"/> close<br/>
-	<icon name="suitcase"/> suitcase<br/>
-	<icon name="plane"/> plane<br/>
-	<icon name="gift"/> gift<br/>
-	<br/>
-	<icon name="bulb"/> bulb<br/>
-	<icon name="exclaimation"/> exclaimation<br/>
-	<icon name="monitor"/> monitor<br/>
-	<icon name="home"/> home<br/>
-	<br/>
-	<icon name="foot"/> foot<br/>
-	<icon name="arrow-up"/> arrow-up<br/>
-	<icon name="gear"/> gear<br/>
-	<icon name="star"/> star<br/>
-	<br/>
-	<icon name="checkbox"/> checkbox<br/>
-	<icon name="upload"/> upload<br/>
-	<br/>
-	<icon name="employee"/> employee<br/>
-	<icon name="yuan"/> yuan<br/>
-	<icon name="users"/> users<br/>
-	<icon name="new-points"/> new-points<br/>
-	<br/>
-	<icon name="pin"/> pin<br/>
-	<icon name="export"/> export<br/>
-	<icon name="error"/> error<br/>
-	<icon name="charts"/> charts<br/>
-	<br/>
-	<icon name="invoice"/> invoice<br/>
-	<icon name="small-yuan"/> small-yuan<br/>
-	<icon name="small-exlaimation"/> small-exlaimation<br/>
-	<br/>
-	<icon name="query"/> query<br/>
-	<icon name="train-n-plane"/> train-n-plane<br/>
-	<br/>
+<div ng-repeat="sym in symbols" style="font-size: 18px;">
+    <icon class="test_icon" name="{{sym}}"/><symbol name="{{sym}}"/>{{sym}}
 </div>
