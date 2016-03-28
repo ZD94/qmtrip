@@ -23,22 +23,25 @@ CREATE TABLE qm_order.qm_order (
     id uuid PRIMARY KEY,
     trip_plan_id uuid NOT NULL,
     consume_id uuid NOT NULL,
+    company_id uuid NOT NULL,
+    staff_id uuid NOT NULL,
     type VARCHAR,
     order_no VARCHAR,
     out_order_no VARCHAR,
-    company_id uuid NOT NULL,
-    staff_id uuid NOT NULL,
     status INTEGER,
     supplier VARCHAR,
     date DATE,
+    start_station_code VARCHAR(10),
+    end_station_code VARCHAR(10),
     start_time timestamp without time zone,
     end_time timestamp without time zone,
     is_need_invoice boolean,
+    flight_no VARCHAR,
+    train_no VARCHAR,
     cabin_type VARCHAR,
     cabin_name VARCHAR,
     cabin_no VARCHAR,
     seat_no VARCHAR,
-    room_no VARCHAR,
     stop_over VARCHAR,
     punctual_rate VARCHAR,
     meal VARCHAR,
@@ -71,6 +74,7 @@ COMMENT ON COLUMN qm_order.date IS '出行日期';
 COMMENT ON COLUMN qm_order.is_need_invoice IS '是否需要报销凭证';
 COMMENT ON COLUMN qm_order.cabin_type IS '飞机舱位、火车座次、酒店房间类型';
 COMMENT ON COLUMN qm_order.cabin_name IS '飞机舱位、火车座次、酒店房间名称';
+COMMENT ON COLUMN qm_order.cabin_no IS '飞机舱位、火车座次、酒店房间号码';
 COMMENT ON COLUMN qm_order.passenger IS '出行人信息';
 COMMENT ON COLUMN qm_order.connect_person IS '联系人信息';
 COMMENT ON COLUMN qm_order.money IS '订单费用';
