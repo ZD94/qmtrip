@@ -7,6 +7,7 @@
  */
 
 var uuid = require("node-uuid");
+import moment = require('moment');
 
 module.exports = function(Db, DataType) {
     return Db.define("QmOrder", {
@@ -20,7 +21,12 @@ module.exports = function(Db, DataType) {
         out_order_no: { type: DataType.STRING(20),    field: "out_order_no"},
         status: { type: DataType.INTEGER,           field: "status"},
         supplier: { type: DataType.STRING,          field: "supplier"},
-        date: { type: DataType.DATE,                field: "date"},
+        date: { type: DataType.DATE,                field: "date",
+            get: function() {
+                var _date = this.getDataValue('date');
+                return moment(_date).format('YYYY-MM-DD');
+            }
+        },
         is_need_invoice: { type: DataType.BOOLEAN,    field: "is_need_invoice",    defaultValue: false},
         cabin_type: { type: DataType.STRING(5),      field: "cabin_type"},
         cabin_name: { type: DataType.STRING(50),     field: "cabin_name"},
@@ -34,7 +40,14 @@ module.exports = function(Db, DataType) {
         payment_info: { type: DataType.JSONB,        field: "payment_info"},
         start_time: { type: "timestamp without time zone",   field: "start_time"},
         end_time: { type: "timestamp without time zone",     field: "end_time"},
-        create_at: { type: "timestamp without time zone",    field: "create_at"},
+        create_at: {
+            type: "timestamp without time zone",
+            field: "create_at",
+            get: function() {
+                var _create_at = this.getDataValue('create_at');
+                return moment(_create_at).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
         expire_at: { type: "timestamp without time zone",    field: "expire_at"},
         pay_time: { type: "timestamp without time zone",     field: "pay_time"},
         update_at: {type: "timestamp without time zone",     field: "update_at"},
