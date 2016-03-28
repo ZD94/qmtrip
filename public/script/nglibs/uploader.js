@@ -19,8 +19,8 @@ module.exports = function ($module){
             .directive('ngUploader', function () {
                 return {
                     restrict: 'A',
-                    template: '<input nv-file-select uploader="uploader" type="file">',
-                    replace: true,
+                    transclude: true,
+                    template: '<input nv-file-select uploader="uploader" type="file" style="width:100%;height:100%;position:absolute;left:0;top:0;opacity:0;" />',
                     controller: function($scope, $attrs, FileUploader) {
                         var url = $attrs.url || '/upload/ajax-upload-file?type=image';
                         var name = $attrs.name || 'tmpFile';
@@ -37,18 +37,23 @@ module.exports = function ($module){
                             });
                         };
 
-                        uploader.onCompleteItem = function (fileItem, response, status, headers) {
-                            fileItem.done(response);
+                        uploader.onCompleteItem = function (file, response, status, headers) {
+                            file.done(response);
                             loading(true);
                             $("#upload").remove();
                         };
                         $scope.uploader = uploader;
                     },
-                    compile: function(element, attributes) {
-                        element.prepend(element.attr('lable'));
+                    compile: function(element, attributes, trans) {
+                        element.css('position', 'relative');
                         var input = element.find('input');
                         input.attr('accept', element.attr('accept'));
-                        input.attr('options', element.attr('options'));
+                        var title = element.attr('title');
+                        var done = element.attr('done');
+                        input.attr('options', '{title:'+title+',done:'+done+'}');
+                        return function(scope, element, attrs, controller, trans){
+                            element.prepend(trans().html());
+                        };
                     }
                 };
             });
@@ -71,8 +76,10 @@ module.exports = function ($module){
                         });
 
                         function bindUpload() {
-                            var options = scope.$eval(attributes.options);
-                            element.prepend(element.attr('lable'));
+                            var options = {
+                                title: scope.$eval(attributes.title),
+                                done: scope.$eval(attributes.done)
+                            };
                             element.bind('click', function(e){
                                 e.preventDefault();
                                 wx.chooseImage({

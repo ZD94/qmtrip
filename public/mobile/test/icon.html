@@ -1,0 +1,12 @@
+<style>
+    .test_icon{
+        width: 22px;
+        height: 22px;
+        display: inline-block;
+        border: 1px solid #9e0505;
+    }
+</style>
+
+<div ng-repeat="sym in symbols" style="font-size: 18px;">
+    <icon class="test_icon" name="{{sym}}"/><symbol name="{{sym}}"/>{{sym}}
+</div>
