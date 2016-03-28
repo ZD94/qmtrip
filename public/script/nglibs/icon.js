@@ -6,66 +6,66 @@ module.exports = function ($module){
 
         return {
             template: "",
-            link: function( scope,elem,attrs ){
-                console.log( scope,elem,attrs );
+            link: function( scope,elemmmm,attrs ){
+                console.log( scope,elemmmm,attrs );
                 console.log( attrs.name );
                 
-                var name = (function(){
-                    switch( attrs.name ){
-                        
-                        case "success": return "&#xe921;"; break;
-                        case "cnosult": return "&#xe920;"; break;
-                        case "cross": return "&#xe91F;"; break;
-                        case "like": return "&#xe91E;"; break;
-                        
-                        case "hotel": return "&#xe914;"; break;
-                        case "download": return "&#xe913;"; break;
-                        case "points": return "&#xe912;"; break;
-                        case "train": return "&#xe911;"; break;
+                var icons = {
+                    success: "&#xe921;",
+                    consult: "&#xe920;",
+                    cross: "&#xe91F;",
+                    like: "&#xe91E;",
 
-                        case "help": return "&#xe903;"; break;
-                        case "arrows": return "&#xe902;"; break;
-                        case "info": return "&#xe901;"; break;
-                        case "calendar": return "&#xe900;"; break;
+                    hotel: "&#xe914;",
+                    "arrow-down": "&#xe913;",
+                    points: "&#xe912;",
+                    train: "&#xe911;",
 
-                        case "close": return "&#xe910;"; break;
-                        case "suitcase": return "&#xe90F;"; break;
-                        case "plane": return "&#xe914;"; break;
-                        case "gift": return "&#xe90C;"; break;
+                    help: "&#xe903;",
+                    arrows: "&#xe902;",
+                    info: "&#xe901;",
+                    calendar: "&#xe900;",
 
-                        case "bulb": return "&#xe919;"; break;
-                        case "exclaimation": return "&#xe918;"; break;
-                        case "monitor": return "&#xe917;"; break;
-                        case "home": return "&#xe916;"; break;
+                    close: "&#xe910;",
+                    suitcase: "&#xe90F;",
+                    plane: "&#xe90e;",
+                    gift: "&#xe90c;",
 
-                        case "foot": return "&#xe907;"; break;
-                        case "arrow-up": return "&#xe906;"; break;
-                        case "gear": return "&#xe905;"; break;
-                        case "star": return "&#xe904;"; break;
+                    bulb: "&#xe919;",
+                    exclaimation: "&#xe918;",
+                    monitor: "&#xe917;",
+                    home: "&#xe916;",
 
-                        case "checkbox": return "&#xe90d;"; break;
-                        case "upload": return "&#xe915;"; break;
+                    foot: "&#xe907;",
+                    "arrow-up": "&#xe906;",
+                    gear: "&#xe905;",
+                    star: "&#xe904;",
 
-                        case "employee": return "&#xe91d;"; break;
-                        case "yuan": return "&#xe91c;"; break;
-                        case "users": return "&#xe91b;"; break;
-                        case "new-points": return "&#xe91a;"; break;
+                    checkbox: "&#xe90d;",
+                    upload: "&#xe915;",
 
-                        case "pin": return "&#xe90b;"; break;
-                        case "export": return "&#xe90a;"; break;
-                        case "error": return "&#xe909;"; break;
-                        case "charts": return "&#xe908;"; break;
+                    employee: "&#xe91d;",
+                    yuan: "&#xe91c;",
+                    users: "&#xe91b;",
+                    "new-points": "&#xe91a;",
 
-                        case "invoice": return "&#xe92c;"; break;
-                        case "small-yuan": return "&#xe934;"; break;
-                        case "small-exlaimation": return "&#xe914;"; break;
+                    pin: "&#xe90b;",
+                    export: "&#xe90a;",
+                    error: "&#xe909;",
+                    charts: "&#xe908;",
 
-                        case "query": return "&#xe92f;"; break;
-                        case "train-n-plane": return "&#xe90c;"; break;
-                    }
-                })();
+                    invoice: "&#xe92c;",
+                    "small-yuan": "&#xe934;",
+                    "small-exlaimation": "&#xe914;",
+
+                    query: "&#xe92f;",
+                    "train-n-plane": "&#xe90c;"
+
+                }
+
+                var icon = icons[ attrs.name ];
                 
-                elem.html( "<i class='icon web-icon-font3' style='font-size:inherit'>"+name+"</i>" );
+                elemmmm.html( "<i class='icon web-icon-font3' style='font-size:inherit'>" + icon + "</i>" );
             }
         }
         
