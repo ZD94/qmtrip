@@ -6,7 +6,7 @@
 var gulp = require('gulp');
 var gulplib = require('./common/gulplib');
 
-gulplib.bundle_lib('browserify', {require:['lessify', 'buffer', 'querystring', 'string_decoder', 'http', 'https', 'url', 'util', 'events', 'stream', 'zlib', 'inherits'], exclude:[]});
+gulplib.bundle_lib('browserify', {require:['lessify', 'buffer', 'querystring', 'string_decoder', 'http', 'https', 'url', 'util', 'events', 'stream', 'zlib'], exclude:[]});
 gulplib.bundle_lib('ws', {require:['ws', 'crypto'], exclude:['bufferutil', 'utf-8-validate']});
 gulplib.bundle_lib('jquery', {require:['jquery', 'jquery-ui']});
 gulplib.bundle_lib('bootstrap', {require:["bootstrap"]});
