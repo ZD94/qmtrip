@@ -134,4 +134,9 @@ test.IconController = function($scope){
             //console.log('\''+cssclass+'\':', '\'&#x'+rule.style.content.charCodeAt(1).toString(16)+'\',');
         })
     })
+
+}
+
+test.InputController = function($scope){
+    loading(true);
 }
