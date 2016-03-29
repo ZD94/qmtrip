@@ -37,6 +37,27 @@ test.UploadController = function($scope, FileUploader){
     }
 }
 
+
+
+
+
+test.SelectController = function($scope) {
+    loading(true);
+    $scope.selectOpt = "a3";
+    $scope.selectData = [
+        {val: "a1", name: 111},
+        {val: "a2", name: 222},
+        {val: "a3", name: 333},
+        {val: "a4", name: 444},
+        {val: "a5", name: 555},
+        {val: "a6", name: 666}
+    ];
+    $scope.aaaaa = function () {
+        alert($scope.selectOpt);
+    }
+}
+
+
 test.IconController = function($scope){
     loading(true);
     $scope.symbols = [

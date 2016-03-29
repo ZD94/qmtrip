@@ -92,9 +92,48 @@ describe("api/client/tripPlan.js", function() {
         this.timeout(20000);
         var params = {
             flight_no: "MU5693",
-            ip_address: '182.156.122.134'
+            ip_address: '192.168.1.12'
         };
         API.client.airplane.get_plane_details.call({accountId: staffId}, params, function(err, ret) {
+            if(err) {
+                throw err;
+            }
+            console.info(ret);
+            done();
+        });
+    });
+
+    it("#book_ticket should be ok", function(done) {
+        this.timeout(20000);
+        var params = {
+            flight_list: {},
+            trip_plan_id: "4e4d7a00-f48b-11e5-85e0-415f45cc7f39",
+            consume_id: "4e4d7a00-f48b-11e5-85e0-415f45cc7f39",
+            flight_no: 'HU7609',
+            email: "",
+            remark: "",
+            contact_name: "于淼",
+            contact_mobile: "18515073641",
+            adult_num: 1,
+            insurance_price: 20,
+            insurance_type: "151009091743795523",
+            ip_address: "192.168.1.4",
+            passengers: [{
+                name: "于淼",
+                mobile_num: '18515073641',
+                certificate_type: "NI",
+                certificate_number: "130430199008110010",
+                certificate_validity_date: "1807",
+                passenger_type: 1,
+                country: "中国",
+                birthday: "1990-08-11",
+                price: "100",
+                air_tax: "50",
+                tax: 0
+            }]
+        };
+
+        API.client.airplane.book_ticket.call({accountId: staffId}, params, function(err, ret) {
             if(err) {
                 throw err;
             }

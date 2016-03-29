@@ -9,7 +9,7 @@ var sequelize = require("common/model").importModel("./models");
 var utils = require('common/utils');
 var paginate = require("common/paginate");
 var uuid = require('node-uuid');
-import base_class = require('./class');
+import base_class = require('./qm_order_type');
 
 var Models = sequelize.models;
 var logger = new Logger('qm_order');
