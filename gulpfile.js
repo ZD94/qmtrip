@@ -16,7 +16,7 @@ gulplib.bundle_lib('img', {require: ['arale-qrcode', 'hidpi-canvas', 'exif-js', 
 gulplib.bundle_lib('api', {require:['q', 'md5', 'moment', 'tiny-cookie', 'shoe', './common/client/api.js:api']});
 gulplib.bundle_lib('calendar', {require:['lunar-calendar', "calendar"]});
 gulplib.bundle_lib('msgbox', {require:['notie', 'msgbox']});
-gulplib.bundle_lib('ngapp', './common/client/ngapp/index.js', {require: ['public/script/nglibs:nglibs'], external:['api']});
+gulplib.bundle_lib('ngapp', './common/client/ngapp/index.js', {require: ['public/script/nglibs:nglibs','angular-paging'], external:['api']});
 
 gulplib.angular_app('staff');
 gulplib.angular_app('corp');

@@ -19,7 +19,6 @@ module.exports = function(Db, DataType) {
         type: { type: DataType.STRING(1),           field: "type"},
         order_no: { type: DataType.STRING(20),       field: "order_no"},
         out_order_no: { type: DataType.STRING(20),    field: "out_order_no"},
-        status: { type: DataType.INTEGER,           field: "status"},
         supplier: { type: DataType.STRING,          field: "supplier"},
         date: { type: DataType.DATE,                field: "date",
             get: function() {
@@ -28,18 +27,25 @@ module.exports = function(Db, DataType) {
             }
         },
         is_need_invoice: { type: DataType.BOOLEAN,    field: "is_need_invoice",    defaultValue: false},
+        flight_no: { type: DataType.STRING,      field: "flight_no"},
+        train_no: { type: DataType.STRING,     field: "train_no"},
         cabin_type: { type: DataType.STRING(5),      field: "cabin_type"},
         cabin_name: { type: DataType.STRING(50),     field: "cabin_name"},
         cabin_no: { type: DataType.STRING(50),       field: "cabin_no"},
         seat_no: { type: DataType.STRING(50),        field: "seat_no"},
-        room_no: { type: DataType.STRING(50),        field: "room_no"},
         passenger: { type: DataType.JSONB,          field: "passenger"},
         connect_person: { type: DataType.JSONB,      field: "connect_person"},
         money: { type: DataType.NUMERIC(15, 2),     field: "money",    defaultValue: 0},
         payment_method: { type: DataType.INTEGER,    field: "payment_method"},
         payment_info: { type: DataType.JSONB,        field: "payment_info"},
+        start_station_code: { type: DataType.STRING(10),   field: "start_station_code"},
+        end_station_code: { type: DataType.STRING(10),     field: "end_station_code"},
         start_time: { type: "timestamp without time zone",   field: "start_time"},
         end_time: { type: "timestamp without time zone",     field: "end_time"},
+        refund_type: { type: DataType.INTEGER,      field: "refund_type"},
+        refund_money: { type: DataType.NUMERIC(15, 2),     field: "refund_money"},
+        refund_reason: { type: DataType.STRING,      field: "refund_reason"},
+        remark: { type: DataType.STRING,     field: "remark"},
         create_at: {
             type: "timestamp without time zone",
             field: "create_at",
@@ -51,6 +57,45 @@ module.exports = function(Db, DataType) {
         expire_at: { type: "timestamp without time zone",    field: "expire_at"},
         pay_time: { type: "timestamp without time zone",     field: "pay_time"},
         update_at: {type: "timestamp without time zone",     field: "update_at"},
+        status: {
+            type: DataType.INTEGER,
+            field: 'status',
+            get: function() {
+                var _status = this.getDataValue('status');
+                var result = "";
+
+                switch (_status) {
+                    case -4: result = 'DELETE'; break;
+                    case -2: result = 'PAY_FAILED'; break;
+                    case -1: result = 'CANCEL'; break;
+                    case 0: result = 'WAIT_PAY'; break;
+                    case 1: result = 'PAY_SUCCESS'; break;
+                    case 2: result = 'WAIT_TICKET'; break;
+                    case 3: result = 'OUT_TICKET'; break;
+                    case 4: result = 'REFUNDING'; break;
+                    case 5: result = 'REFUND'; break;
+                };
+
+                return result;
+            }
+        },
+        STATUS: {
+            type: DataType.VIRTUAL,
+            get: function() {
+                var _STATUS = {
+                    PAY_FAILED: '支付失败', //支付失败
+                    CANCEL: '已取消', //已取消
+                    WAIT_PAY: '待支付', //待支付
+                    PAY_SUCCESS: '支付成功', //支付成功
+                    WAIT_TICKET: '待出票', //待出票
+                    OUT_TICKET: '已出票', //已出票
+                    REFUNDING: '退款中', //退款中
+                    REFUND: '已退款' //已退款
+                };
+
+                return _STATUS;
+            }
+        },
         TYPE: {
             type: DataType.VIRTUAL,
             get: function() {
