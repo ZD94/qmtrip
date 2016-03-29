@@ -9,8 +9,6 @@
 @f24:1.2rem;
 @f20:1rem;
 
-@BLUE: #3CA5F6;
-
 
 .airTicketOrderDetails {
   .top {
@@ -21,7 +19,7 @@
       padding-bottom: 1.5rem;
       .status {
         font-size: 1.4rem;
-        color: @BLUE;
+        color: @color-theme1;
       }
       .timeLeft {
         float: right;
@@ -38,14 +36,46 @@
     } 
   }
   .middle {
-    .passengerInfo {
+    .row1 {
+      padding: 1.1rem;
+      background: white;
+      border-bottom: 1px solid @border-color;
+    }
+    .row2 {
+      padding: 1.1rem;
+      background: white;
+      ul {
+        overflow: hidden;
+        li {
+          float: left;
+          width: 33.333333%;
+          text-align: center;
+          .time {
+          }
+        }
+      }
+    }
+    .thisHeader {
       padding: 1.1rem;
     }
-    .passengerName {
-      font-size: 1.6rem;
+    .passengerInfoContent {
+      padding: 1.1rem;
+      background: white;
+      .passengerName {
+        font-size: 1.6rem;
+      }
+      .identity {
+        font-size: 1.2rem;
+      }
+    }
+    .price {
+      .total {
+        float: right;
+      }
     }
     .charges {
       margin-bottom: 1rem;
+      padding: 1.1rem;
       overflow: hidden;
       background: white;
       li {
@@ -53,6 +83,12 @@
         float: left;
         width: 25%;
         text-align: center;
+        .number {
+          font-size: 1.4rem;
+        }
+        .text {
+          font-size: 1.2rem;
+        }
         .bar {
           position: absolute;
           right: 0;
@@ -70,26 +106,72 @@
     background: white;
   }
   .buttons {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 4.9rem;
+    background: white;
     overflow: hidden;
     a {
       float: left;
+      width: 50%;
+      height: 100%;
+      line-height: 4.9rem;
+      font-size: 1.8rem;
+      text-align: center;
+      display: block;
+    }
+    .checkout {
+      background: @color-theme1;
+      color: white;
     }
   }
 }
 
-.passenger {
+.infoEditing {
   .row {
-    padding: 1rem;
+    height: 4.4rem;
+    line-height: 4.4rem;
+    padding-left: 1.1rem;
     margin-bottom: 1px;
     background: white;
     overflow: hidden;
     .row-left {
       float: left;
       width: 30%;
+      font-size: 1.4rem;
     }
     .row-right {
       float: right;
       width: 70%;
+      font-size: 1.6rem;
+      input {
+        border: none;
+        height: 100%;
+        line-height: 4.4rem;
+        font-size: 1.6rem;
+      }
     }
+  }
+  .button {
+    height: 4.4rem;
+    margin-left: 2.75rem;
+    margin-right: 2.75rem;
+    border-radius: 3px;
+    line-height: 4.4rem;
+    text-align: center;
+    font-size: 1.8rem;
+    color: white;
+    display: block;
+  }
+  .save {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    background: @color-theme1;
+  }
+  .cancel {
+    color: @color-theme1;
+    background: white;
   }
 }

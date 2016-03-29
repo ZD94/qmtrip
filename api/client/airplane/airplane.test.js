@@ -11,6 +11,8 @@ describe("api/client/tripPlan.js", function() {
     var agencyUserId = "";
     var companyId = "";
     var staffId = "";
+    var tripPlanId = '';
+    var consumeId = '';
 
     var agency = {
         email: "tripPlan.test@tulingdao.com",
@@ -27,7 +29,28 @@ describe("api/client/tripPlan.js", function() {
         mobile: "15269866803",
         domain: 'tulingdao.com',
         description: '计划单测试用企业'
-    }
+    };
+
+    var tripPlanOrder = {
+        startPlace: '北京',
+        destination: '上海',
+        startPlaceCode: 'BJ123',
+        destinationCode: 'SH123',
+        description: '审核发票用测试',
+        budget: 1000,
+        startAt: '2016-04-07',
+        consumeDetails: [{
+            type: -1,
+            startTime: '2016-04-07',
+            endTime: '2016-04-30',
+            startPlace: '北京',
+            startPlaceCode: 'BJ123',
+            arrivalPlace: '上海',
+            arrivalPlaceCode: 'SH123',
+            invoiceType: 'PLANE',
+            budget: 1000,
+        }]
+    };
 
     before(function(done){
         Promise.all([
@@ -46,6 +69,11 @@ describe("api/client/tripPlan.js", function() {
             .then(function(company){
                 companyId = company.id;
                 staffId = company.createUser;
+                return API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder);
+            })
+            .then(function(ret) {
+                tripPlanId = ret.id;
+                consumeId = ret.outTraffic[0].id;
                 done();
             })
             .catch(function(err){
@@ -92,7 +120,8 @@ describe("api/client/tripPlan.js", function() {
         this.timeout(20000);
         var params = {
             flight_no: "MU5693",
-            ip_address: '192.168.1.12'
+            ip_address: '192.168.1.12',
+            query_key: '201603291212098843'
         };
         API.client.airplane.get_plane_details.call({accountId: staffId}, params, function(err, ret) {
             if(err) {
@@ -107,8 +136,8 @@ describe("api/client/tripPlan.js", function() {
         this.timeout(20000);
         var params = {
             flight_list: {},
-            trip_plan_id: "4e4d7a00-f48b-11e5-85e0-415f45cc7f39",
-            consume_id: "4e4d7a00-f48b-11e5-85e0-415f45cc7f39",
+            trip_plan_id: tripPlanId,
+            consume_id: consumeId,
             flight_no: 'HU7609',
             email: "",
             remark: "",
@@ -136,6 +165,9 @@ describe("api/client/tripPlan.js", function() {
         API.client.airplane.book_ticket.call({accountId: staffId}, params, function(err, ret) {
             if(err) {
                 throw err;
+            }
+            if(ret.toJSON) {
+                ret = ret.toJSON();
             }
             console.info(ret);
             done();

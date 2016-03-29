@@ -87,6 +87,14 @@ var travelplan = (function () {
             $scope.STATUS = $scope.statuses[i];
             $scope.ORDER = "默认";
             $scope.items = [];
+            /*
+            var storage = {
+                incomplete: {page: 1, isComplete: false},
+                inAuditing: {page: 1, audit: 'P'},
+                rejected: {page: 1, audit: 'N'},
+                complete: {page: 1, isComplete: true}
+            }
+            */
             if ($scope.STATUS === "未完成") {
                 PARAMS = {page: 1, isComplete: false};
             } else if ($scope.STATUS === "待出预算") {

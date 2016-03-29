@@ -19,41 +19,64 @@
     </div>
 
     <div class="middle">
-        <div class="passengerInfo">乘机人信息</div>
-
-        <div>
-            <span class="passengerName">李明月</span><br/>
-            123213254356435345
+        <div class="row1">
+            <span>上海-南宁 03-03 周六</span>
+            <span>退改签说明</span>
+        </div>
+        <div class="row2">
+            <span>中国联行 | 准点率 | 含餐</span>
+            <ul>
+                <li>
+                    <p class="time">8:00</p>
+                    <p>浦东机场T3</p>
+                </li>
+                <li>
+                    4时34分
+                </li>
+                <li>
+                    <p class="time">8:00</p>
+                    <p>浦东机场T3</p>
+                </li>
+            </ul>
         </div>
 
-        <p>合计</p>
+        <div class="thisHeader">乘机人信息</div>
+
+        <div class="passengerInfoContent">
+            <span class="passengerName">李明月</span><br/>
+            <span class="identity">123213254356435345</span>
+        </div>
+
+        <div class="price thisHeader">
+            票价信息<span class="total">合计：￥610.25</span>
+        </div>
 
         <ul class="charges">
             <li>
-                <span>8495</span><br/>
-                <span>票价</span>
+                <span class="number">8495</span><br/>
+                <span class="text">票价</span>
                 <div class="bar"></div>
             </li>
             <li>
-                <span>8495</span><br/>
-                <span>机建费</span>
+                <span class="number">8495</span><br/>
+                <span class="text">机建费</span>
                 <div class="bar"></div>
             </li>
             <li>
-                <span>8495</span><br/>
-                <span>税费</span>
+                <span class="number">8495</span><br/>
+                <span class="text">税费</span>
                 <div class="bar"></div>
             </li>
             <li>
-                <span>8495</span><br/>
-                <span>配送费</span>
+                <span class="number">8495</span><br/>
+                <span class="text">配送费</span>
             </li>
         </ul>
     </div>
 
     <div class="dropdown">
         <div class="dropdown-header" ng-click="toggle('deliveryAddress')">
-            <span>账单配送地址</span>
+            <span>报销凭证配送地址</span>
         </div>
         <div class="dropdown-content deliveryAddress" ng-show="deliveryAddressShown">
             <p>
@@ -72,11 +95,7 @@
 
     <div class="buttons">
         <a>删除订单</a>
-        <a>去支付</a>
-    </div>
-
-    <fff></fff>
-
-    
+        <a class="checkout">去支付</a>
+    </div>    
 
 </div>
