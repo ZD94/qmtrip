@@ -115,3 +115,7 @@ test.IconController = function($scope){
     })
 
 }
+
+test.InputController = function($scope){
+    loading(true);
+}
