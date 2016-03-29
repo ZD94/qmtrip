@@ -3,5 +3,7 @@
         margin: 20px auto;
     }
 </style>
-<div class="w85 common_text style" login placeholder="企业邮箱"></div>
-<div class="w85 common_text style" login placeholder="登录密码"></div>
+<input class="w85 common_text input style" login placeholder="企业邮箱" ng-model="user.name" required/>
+<input class="w85 common_text input style" login placeholder="登录密码" ng-model="user.pwd" required/>
+<div>{{user.name}}</div>
+<div>{{user.pwd}}</div>
