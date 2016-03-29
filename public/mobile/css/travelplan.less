@@ -45,7 +45,11 @@
         background: @color-theme1;
         .icon {margin-left:1rem;font-size:2rem}
       }
-      .dropdown-menu {position:absolute;width:50%;display:none;
+      .dropdown-menu {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        display: none;
         li {
           height: 4.4rem;
           line-height: 4.4rem;
@@ -98,7 +102,8 @@
               white-space:nowrap;
               text-overflow:ellipsis;
             }
-            .icon {
+            .icon, i {
+              font-size: @f36;
               vertical-align: top;
               line-height:2.2rem;
               color:#C5C5C5;

@@ -9,12 +9,36 @@
 @f24:1.2rem;
 @f20:1rem;
 
+@BLUE: #3CA5F6;
+
+
 .airTicketOrderDetails {
   .top {
-    padding: 1rem;
+    padding: 1.1rem;
     margin-bottom: 1rem;
     background: white;
-    color: red;
+    .top-top{
+      padding-bottom: 1.5rem;
+      .status {
+        font-size: 1.4rem;
+        color: @BLUE;
+      }
+      .timeLeft {
+        float: right;
+      }
+      .time {
+        font-size: 1.1rem;
+      }    
+    }
+    .row {
+      padding: 0.5rem 0 0.5rem 0;
+      span {
+        font-size: 1.1rem;
+      }
+    } 
+  }
+  .passengerInfo {
+    padding: 1.1rem;
   }
   .charges {
     margin-bottom: 1rem;
