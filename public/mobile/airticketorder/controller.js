@@ -31,7 +31,7 @@ var airTicket = (function () {
 
     }
 
-    airTicket.PassengerController = function ($scope, $routeParams) {
+    airTicket.PassengerInfoController = function ($scope, $routeParams) {
         loading(true);
     }
 
