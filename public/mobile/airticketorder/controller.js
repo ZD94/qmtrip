@@ -31,8 +31,34 @@ var airTicket = (function () {
 
     }
 
-    airTicket.PassengerInfoController = function ($scope, $routeParams) {
+    airTicket.InfoEditingController = function ($scope, $routeParams) {
         loading(true);
+        
+        $(document).ready(function(){
+            $(".expireDate").mobiscroll().date({//.date() .time() .datetime()
+                invalid: {
+                    daysOfWeek: [],//[0,1,2,3,4,5]
+                    daysOfMonth: []//['5/1', '12/24', '12/25']
+                },
+                theme: 'android-ics light',
+                display: 'bottom',
+                mode: 'scroller',
+                dateOrder: 'yy mm dd',
+                dateFormat: "yyyy-mm-dd",
+                startYear: "2016",
+                endYear: "2020",
+                yearText: "年",
+                monthText: "月",
+                dayText: "日",
+                showNow: false,
+                nowText: "今天",
+                setText: "完成",
+                cancelText: "取消",
+                rows: 5,
+                showOnFocus: true
+            })
+        });
+
     }
 
     return airTicket;
