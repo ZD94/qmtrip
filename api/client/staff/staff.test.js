@@ -432,4 +432,79 @@ describe("api/client/staff.js", function() {
     /**************代理商管理企业员工*****************/
 
 
+    /************************证件信息begin**********************/
+
+    describe("api/client/StaffPapers.js", function() {
+
+        var id = "";
+        var self = {};
+        var obj = {
+            type: 1,
+            idNo: "123659856985698745",
+            birthday: "1993-02-06",
+            validData: "2020-05-09",
+        }
+
+
+        before(function(done) {
+            API.staff.findOneStaff({})
+                .then(function(staff){
+                    self = {accountId: staff.id}
+                    done();
+                })
+                .catch(function(err){
+                    console.info(err);
+                    throw err;
+                })
+                .done();
+        });
+
+        //创建员工证件信息
+        it("#createPapers should be ok", function(done) {
+            API.client.staff.createPapers.call(self, obj, function(err, result) {
+                assert.equal(err, null);
+                id = result.id;
+                done();
+            });
+        })
+    //查询员工证件信息
+        it("#getPapersById should be ok", function(done) {
+            API.client.staff.getPapersById.call(self, {id: id}, function(err, result) {
+                assert.equal(err, null);
+                //console.log(result);
+                done();
+            });
+        })
+    //查询员工证件信息集合
+        it("#getCurrentUserPapers should be ok", function(done) {
+            API.client.staff.getCurrentUserPapers.call(self, function(err, result) {
+                assert.equal(err, null);
+//            console.log(result);
+                done();
+            });
+        })
+    //更新员工证件信息信息
+        it("#updatePapers should be ok", function(done) {
+            obj.id = id;
+            obj.idNo = '111111111122223333';
+            API.client.staff.updatePapers.call(self, obj, function(err, result) {
+                assert.equal(err, null);
+                //console.log(result);
+                done();
+            });
+        })
+    //删除员工证件信息信息
+        it("#deletePapers should be ok", function(done) {
+         API.client.staff.deletePapers.call(self, {id: id}, function(err, result) {
+         assert.equal(err, null);
+         //console.log(result);
+         done();
+         });
+         })
+
+    })
+
+    /************************证件信息end**********************/
+
+
 })

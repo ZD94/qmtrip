@@ -12,6 +12,7 @@ var utils = require("common/utils");
 var sequelize = require("common/model").importModel("./models");
 var Logger = require("common/logger");
 var staffModel = sequelize.models.Staff;
+var papersModel = sequelize.models.Papers;
 var pointChangeModel = sequelize.models.PointChange;
 var L = require("../../common/language");
 var API = require("../../common/api");
@@ -1037,5 +1038,106 @@ staff.deleteAllStaffByTest = function(params){
             return true;
         })
 }
+
+
+/***********************证件信息begin***********************/
+
+/**
+ * 创建证件信息
+ * @param params
+ * @returns {*}
+ */
+staff.createPapers = createPapers;
+createPapers.required_params = ['type', 'idNo', 'ownerId'];
+createPapers.optional_params = ['validData', 'birthday'];
+function createPapers(params){
+    //查询该用户该类型证件信息是否已经存在 不存在添加 存在则修改
+    return papersModel.findOne({where: {type: params.type, ownerId: params.ownerId}})
+    .then(function(result){
+        if(!result) {
+            return papersModel.create(params);
+        }
+        return result.update(params);
+        /*if(result){
+            return result.update(params);
+            /!*var options = {};
+            options.where = {type: params.type, ownerId: params.ownerId};
+            options.returning = true;
+            return papersModel.update(params, options)
+                .spread(function(rownum, rows){
+                    return rows[0];
+                })*!/;
+        }else{
+            return papersModel.create(params);
+        }*/
+    })
+}
+
+/**
+ * 删除证件信息
+ * @param params
+ * @returns {*}
+ */
+staff.deletePapers = deletePapers;
+deletePapers.required_params = ['id'];
+function deletePapers(params){
+    return papersModel.destroy({where: params})
+        .then(function(obj){
+            return true;
+        });
+}
+
+/**
+ * 更新证件信息
+ * @param params
+ * @returns {*}
+ */
+staff.updatePapers = updatePapers;
+updatePapers.required_params = ['id'];
+updatePapers.optional_params = ['type', 'idNo', 'ownerId', 'validData', 'birthday'];
+function updatePapers(params){
+    var id = params.id;
+    delete params.id;
+    var options = {};
+    options.where = {id: id};
+    options.returning = true;
+    return papersModel.update(params, options)
+        .spread(function(rownum, rows){
+            return rows[0];
+        });
+}
+/**
+ * 根据id查询证件信息
+ * @param {String} params.id
+ * @returns {*}
+ */
+staff.getPapersById = getPapersById;
+getPapersById.required_params = ['id'];
+getPapersById.optional_params = ['attributes'];
+function getPapersById(params){
+    //return papersModel.findById(params.id);
+    var options = {};
+    options.where = {id: params.id};
+    options.attributes = params.attributes? ['*'] :params.attributes;
+    return papersModel.findOne(options);
+}
+
+/**
+ * 根据ownerId得到证件信息
+ * @param params
+ * @returns {*}
+ */
+staff.getPapersByOwner = getPapersByOwner;
+getPapersByOwner.required_params = ['ownerId'];
+getPapersByOwner.optional_params = ['attributes'];
+function getPapersByOwner(params){
+    //return papersModel.findAll({where: {ownerId: params.ownerId}});
+    var options = {};
+    options.where = {ownerId: params.ownerId};
+    options.attributes = params.attributes? ['*'] :params.attributes;
+    return papersModel.findAll(options);
+}
+
+/***********************证件信息end***********************/
 
 module.exports = staff;

@@ -582,4 +582,104 @@ staff.statStaffPointsByAgency = function(companyId){
         })
 }
 
+/*************************证件信息API begin*************************/
+
+/**
+ * @method createMailingAddress
+ *
+ * 创建证件信息
+ *
+ * @param {Object} params
+ * @param {integer} params.type  证件类型（必填）
+ * @param {string} params.idNo   证件号码（必填）
+ * @param {uuid} params.ownerId    用户id（选填）
+ * @param {Date} params.birthday  生日（选填）
+ * @param {Date} params.validData 过期时间（选填）
+ * @returns {*|Promise}
+ */
+staff.createPapers = function(params){
+    params.ownerId = this.accountId;
+    return API.staff.createPapers(params);
+};
+
+
+/**
+ * @method deletePapers
+ *
+ * 删除证件信息
+ *
+ * @param params
+ * @param {uuid} params.id    删除记录id（必填）
+ * @returns {*|Promise}
+ */
+staff.deletePapers = function(params){
+    params.ownerId = this.accountId;
+    return API.staff.deletePapers(params);
+};
+
+/**
+ * @method updatePapers
+ *
+ * 更新证件信息
+ *
+ * @param {Object} params
+ * @param {uuid} params.id    修改记录id（必填）
+ * @param {integer} params.type  证件类型（选填）
+ * @param {string} params.idNo   证件号码（选填）
+ * @param {uuid} params.ownerId    用户id（选填）
+ * @param {Date} params.birthday  生日（选填）
+ * @param {Date} params.validData 过期时间（选填）
+ * @returns {*|Promise}
+ */
+staff.updatePapers = function(params){
+    var user_id = this.accountId;
+    return API.staff.getPapersById({id: params.id})
+        .then(function(ma){
+            if(ma.ownerId != user_id){
+                throw {code: -1, msg: '无权限'};
+            }
+            params.ownerId = user_id;
+            return API.staff.updatePapers(params);
+        });
+};
+
+/**
+ * @method getPapersById
+ *
+ * 根据id查询证件信息
+ *
+ * @param {Object} params
+ * @param {uuid} params.id    查询记录id（必填）
+ * @param {Array<String>} params.attributes    查询列（选填）
+ * @returns {*|Promise}
+ */
+staff.getPapersById = function(params){
+    var id = params.id;
+    var user_id = this.accountId;
+    return API.staff.getPapersById({id:id})
+        .then(function(ma){
+            if(!ma){
+                throw {code: -1, msg: '查询结果不存在'};
+            }
+
+            if(ma.ownerId && ma.ownerId != user_id){
+                throw {code: -1, msg: '无权限'};
+            }
+            return ma;
+        });
+};
+
+/**
+ * @method getCurrentUserPapers
+ *
+ * 根据ownerId得到证件信息
+ *
+ * @returns {*|Promise}
+ */
+staff.getCurrentUserPapers = function(){
+    var user_id = this.accountId;
+    return API.staff.getPapersByOwner({ownerId: user_id});
+};
+
+/*************************证件信息API end*************************/
 module.exports = staff;
