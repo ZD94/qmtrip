@@ -50,3 +50,14 @@ create table staff.point_changes (
 comment on table staff.point_changes is '员工积分变动';
 COMMENT ON COLUMN staff.point_changes.current_point IS '当前积分';
 COMMENT ON COLUMN staff.point_changes.order_id IS '产生积分的计划单id';
+
+CREATE TABLE staff.papers(
+      id uuid primary key,
+      type Integer default 0, -- 证件类型 0 身份证 1 护照
+      id_no character varying(20), -- 证件号
+      birthday timestamp without time zone, -- 生日
+      valid_data timestamp without time zone, -- 有效期
+      owner_id uuid, -- 用户id
+      create_at timestamp without time zone DEFAULT now(), -- 创建时间
+      update_at timestamp without time zone DEFAULT now() -- 更新时间
+)
