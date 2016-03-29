@@ -1,13 +1,24 @@
 @color-theme1:#3CA5F6;
-@color-theme2:#9B9B9B;
-@color-theme3:#FFFFFF;
-@background-color-default:#FFFFFF;
-@background-color-second:#CCCCCC;
+@color-theme2:#355167;
+@color-theme3:#F23B3B;
+@color-theme4:#EB5434;
+@color-theme5:#FFFFFF;
+@background-color-default:#F3F3F3;
+@background-color-second:#FFFFFF;
 @default-text-color:#4A4A4A;
+@second-text-color:#9B9B9B;
+@third-text-color:#CCCCCC;
 @border-color:#E5E5E5;
+@font-size-21:2.1rem;
+@font-size-18:1.8rem;
+@font-size-16:1.6rem;
+@font-size-15:1.5rem;
+@font-size-14:1.4rem;
+@font-size-12:1.2rem;
+@font-size-10:1rem;
 
 /*Reset CSS*/
-*{ margin:0; padding:0; border: none; list-style: none; font-size: 1.4rem; font-family:"Arial","微软雅黑", "黑体", "宋体"; box-sizing: border-box;}
+*{ margin:0; padding:0; border: none; list-style: none; font-size: 1.4rem; font-family:"Helvetial","Rotobo", "Pingfang SC", "Noto Sans Han", "HeiTi SC", "Droid Sans Fallback", "Microsoft Yahei"; box-sizing: border-box;}
 a { text-decoration:none; cursor: pointer;}
 table{ border-collapse:collapse; border-spacing:0; }
 ul,ol,li,dl,dt,dd{list-style-type:none; }
@@ -89,7 +100,7 @@ img { display: block;}
   font-size: 1.6rem;
   border: 1px @border-color solid;
   border-radius: 0.2rem;
-  background: @background-color-default;
+  background: @background-color-second;
   padding: 0 1rem;
   display: block;
 }
@@ -98,7 +109,7 @@ img { display: block;}
   height: 4.8rem;
   line-height: 4.8rem;
   text-align: center;
-  color: @color-theme3;
+  color: @color-theme5;
   font-size: 1.8rem;
   background: @color-theme1;
   border: none;
@@ -109,9 +120,9 @@ img { display: block;}
   height: 4.8rem;
   line-height: 4.8rem;
   text-align: center;
-  color: @color-theme3;
+  color: @color-theme5;
   font-size: 1.8rem;
-  background: @background-color-second;
+  background: @third-text-color;
   border: none;
   display: block;
 }
@@ -122,7 +133,7 @@ img { display: block;}
   text-align: center;
   color: @color-theme1;
   font-size: 1.8rem;
-  background: @background-color-default;
+  background: @background-color-second;
   border: none;
   border-top: 1px @border-color solid;
   display: block;
@@ -266,7 +277,7 @@ img { display: block;}
 .select_page {
   width: 100%;
   min-height: 100%;
-  background: @color-theme3;
+  background: @background-color-second;
   position: absolute;
   left: 0;
   top: 0;
@@ -305,7 +316,7 @@ img { display: block;}
     height: 4.2rem;
     line-height: 4.2rem;
     font-size: 1.6rem;
-    color: @color-theme3;
+    color: @color-theme5;
     background: @color-theme1;
     padding-left: 3rem;
   }
