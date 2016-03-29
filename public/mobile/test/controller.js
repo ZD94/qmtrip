@@ -39,7 +39,7 @@ test.UploadController = function($scope, FileUploader){
 
 test.SelectController = function($scope) {
     loading(true);
-    $scope.selectOpt = {value:"a3"};
+    $scope.selectOpt = {value: {val: 'a3'}};
     $scope.selectData = [
         {val: "a1", name: 111},
         {val: "a2", name: 222},
@@ -48,6 +48,30 @@ test.SelectController = function($scope) {
         {val: "a5", name: 555},
         {val: "a6", name: 666}
     ];
+    $scope.change = function (num) {
+        $scope.selectOpt.value = 'a' + num;
+    }
+};
+
+test.AsyncController = function($scope, $q, $timeout) {
+    loading(true);
+    var get_user = function() {
+        return new Promise(function(resolve, reject){
+            window.setTimeout(function() {
+                resolve({id:1000, name:'Clear'});
+            }, 2000);
+        });
+    };
+    $scope.user = get_user();
+
+    var getMessages = function() {
+        var deferred = $q.defer();
+        $timeout(function() {
+            deferred.resolve(['Hello', 'world!']);
+        }, 2000);
+        return deferred.promise;
+    };
+    $scope.messages = getMessages();
 }
 
 
