@@ -7,9 +7,9 @@ module.exports = function ($module){
         return {
             priority: 1001,
             restrict: 'A',
-            template: '<dl class="selectbox"><div ng-transclude></div>'
-                    + '<dt class="common_select" ng-click="show_options()">{{optionmap[optionval]}}</dt>'
-                    + '<div class="common_option">'
+            template: '<dl class="ng-select"><div ng-transclude></div>'
+                    + '<dt ng-click="show_options()">{{optionmap[optionval]}}</dt>'
+                    + '<div class="dropdown">'
                     + '<dd ng-repeat="(val, text) in optionmap" checkvalue="{{val}}" ng-click="select_option($event)">'
                     + '{{text}}'
                     + '</dd>'
@@ -24,10 +24,10 @@ module.exports = function ($module){
                 $scope.optionmap = {};
                 $scope.optionval = '';
                 $scope.show_options = function($event) {
-                    $element.find('.common_option').toggle();
+                    $element.find('.dropdown').toggle();
                 };
                 $scope.select_option = function($event){
-                    $element.find('.common_option').hide();
+                    $element.find('.dropdown').hide();
                     $scope.optionval = $($event.target).attr('checkvalue');
                     var select = $element.find("select");
                     select.val($scope.optionval);
@@ -46,7 +46,6 @@ module.exports = function ($module){
                 var removeAttr = element.removeAttr("ng-options");
                 element.removeAttr("ng-model");
                 return function (scope, element, attr, controller, transcludeFn) {
-                    element.find("select").css('display', 'none');
                     element.find("option").each(function (index, option) {
                         scope.optionmap[option.value] = option.innerHTML;
                     });
