@@ -19,10 +19,9 @@ export class QmOrder {
     cabin_type: string;
     cabin_name: string;
     cabin_no: string;
-    seat_no: string;
-    room_no: string;
     passenger: string;
-    connect_person: string;
+    contact_name: string;
+    contact_mobile: string;
     money: string;
     payment_method: string;
     payment_info: string;
@@ -48,10 +47,9 @@ export class QmOrder {
         this.cabin_type = params.cabin_type;
         this.cabin_name = params.cabin_name;
         this.cabin_no = params.cabin_no;
-        this.seat_no = params.seat_no;
-        this.room_no = params.room_no;
         this.passenger = params.passenger;
-        this.connect_person = params.connect_person;
+        this.contact_name = params.contact_name;
+        this.contact_mobile = params.contact_mobile;
         this.money = params.money;
         this.payment_method = params. payment_method;
         this.payment_info = params.payment_info;
