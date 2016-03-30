@@ -1,8 +1,3 @@
-<style>
-    body,html{
-        background-color: #f3f3f3;
-    }
-</style>
 <div class="user_center_top">
     <div class="name_point">
         <div class="name_left">
@@ -51,6 +46,12 @@
             </p>
             <p>待出预算</p>
         </div>
+        <div ng-click="go_book()">
+            <p>
+                <i><img src="/mobile/images/staff_money.png"><span id="total4">{{total4}}</span></i>
+            </p>
+            <p>待预订</p>
+        </div>
         <div ng-click="go_invoice()">
             <p>
                 <i><img src="/mobile/images/staff_invoice.png" style="width: 2rem;"><span id="total2">{{total2}}</span></i>
@@ -65,6 +66,11 @@
         </div>
         <p style="display: block;clear: both;"></p>
     </div>
+</div>
+<div class="book_order">
+    <div></div>
+    <div></div>
+    <div></div>
 </div>
 <div class="plan_standard">
     我的差旅标准
