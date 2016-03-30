@@ -1,4 +1,4 @@
-@import "common.less";
+@import (reference) "common.less";
 
 @f72:3.6rem;
 @f36:1.8rem;
@@ -40,6 +40,9 @@
       padding: 1.1rem;
       background: white;
       border-bottom: 1px solid @border-color;
+      .instruction {
+        color: @color-theme1;
+      }
     }
     .row2 {
       padding: 1.1rem;
@@ -51,12 +54,20 @@
           width: 33.333333%;
           text-align: center;
           .time {
+            font-size: 2rem;
+          }
+          .airport {
+            color: @second-text-color;
+          }
+          .transferStation {
+            color: @color-theme1;
           }
         }
       }
     }
     .thisHeader {
       padding: 1.1rem;
+      color: @second-text-color;
     }
     .passengerInfoContent {
       padding: 1.1rem;
@@ -88,6 +99,7 @@
         }
         .text {
           font-size: 1.2rem;
+          color: @second-text-color;
         }
         .bar {
           position: absolute;
@@ -101,9 +113,25 @@
     }
   }
   .dropdown {
-    padding: 1rem;
     margin-bottom: 1rem;
     background: white;
+    .dropdown-header {
+      padding: 1rem;
+    }
+    .dropdown-content {
+      padding: 1rem;
+      border-top: 1px solid @border-color;
+      .name {
+        font-size: 1.6rem;
+      }
+      .address {
+        font-size: 1.2rem;
+      }
+    }
+  }
+  .shadow-buttons {
+    width: 100%;
+    height: 4.9rem;
   }
   .buttons {
     position: fixed;
@@ -130,27 +158,60 @@
 }
 
 .infoEditing {
-  .row {
-    height: 4.4rem;
-    line-height: 4.4rem;
-    padding-left: 1.1rem;
-    margin-bottom: 1px;
-    background: white;
-    overflow: hidden;
-    .row-left {
-      float: left;
-      width: 30%;
-      font-size: 1.4rem;
-    }
-    .row-right {
-      float: right;
-      width: 70%;
+  .veil {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: @default-text-color;
+    opacity: 0.3;
+    z-index: 5;
+    display: none;
+  }
+  .options {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background: @color-theme5;
+    z-index: 10;
+    display: none;
+    li {
+      height: 4.4rem;
+      line-height: 4.4rem;
       font-size: 1.6rem;
-      input {
-        border: none;
-        height: 100%;
-        line-height: 4.4rem;
+      text-align: center;
+    }
+    li:first-child {
+      border-bottom: 1px solid @border-color;
+    }
+    li.active {
+      color: @color-theme1;
+    }
+  }
+  .top {
+    padding-left: 1.1rem;
+    background: @color-theme5;
+    .row {
+      height: 4.4rem;
+      line-height: 4.4rem;
+      border-bottom: 1px solid @border-color;
+      background: white;
+      overflow: hidden;
+      .row-left {
+        float: left;
+        width: 30%;
+        font-size: 1.4rem;
+      }
+      .row-right {
+        float: right;
+        width: 70%;
         font-size: 1.6rem;
+        input {
+          border: none;
+          height: 100%;
+          line-height: 4.4rem;
+          font-size: 1.6rem;
+        }
       }
     }
   }
@@ -168,6 +229,9 @@
   .save {
     margin-top: 2.5rem;
     margin-bottom: 1rem;
+    background: @third-text-color;
+  }
+  .save.active {
     background: @color-theme1;
   }
   .cancel {

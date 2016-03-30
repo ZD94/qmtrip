@@ -33,7 +33,51 @@ var airTicket = (function () {
 
     airTicket.InfoEditingController = function ($scope, $routeParams) {
         loading(true);
+
+        $scope.user;
+
+        $scope.IDType = "身份证";
+
+        $scope.enterSelectingMode = function(){
+            $(".veil").show();
+            $(".options").show();
+        }
+
+        $scope.quitSelectingMode = function(){
+            $(".veil").hide();
+            $(".options").hide();
+        }
+
+        $scope.select = function (string) {
+            if ( string === "身份证" ) {
+                $scope.IDType = "身份证";
+            } else if ( string === "护照" ) {
+                $scope.IDType = "护照";
+            };
+            $scope.quitSelectingMode();
+        }
+
+        $scope.renderTimeLeft = function(){
+            var currentTime = new Date();
+            console.log( currentTime );
+        }
         
+        API.onload( function(){
+            console.log( API.staff );
+            API.staff
+                .getCurrentStaff()
+                .then( function(data){
+                    console.log(data);
+                    $scope.user = data;
+                    console.log( $scope.user.name );
+
+                    $scope.$apply();
+                })
+                .catch(function (err) {
+                    TLDAlert(err.msg || err)
+                })
+        });
+
         $(document).ready(function(){
             $(".expireDate").mobiscroll().date({//.date() .time() .datetime()
                 invalid: {

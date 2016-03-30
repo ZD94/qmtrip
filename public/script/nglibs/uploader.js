@@ -52,7 +52,7 @@ module.exports = function ($module){
                         var done = element.attr('done');
                         input.attr('options', '{title:'+title+',done:'+done+'}');
                         return function(scope, element, attrs, controller, trans){
-                            element.prepend(trans().html());
+                            element.prepend(trans());
                         };
                     }
                 };
