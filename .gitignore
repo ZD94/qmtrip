@@ -8,6 +8,7 @@ node_modules
 /doc
 /config/config.local.json
 /public/*/css/*.css
+!/public/font/css/icomoon.css
 *.map
 controller.all.js
 /temp
