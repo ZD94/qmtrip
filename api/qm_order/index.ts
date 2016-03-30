@@ -10,16 +10,18 @@ var utils = require('common/utils');
 var paginate = require("common/paginate");
 var uuid = require('node-uuid');
 import base_class = require('./qm_order_type');
+import _ = require('lodash');
+import moment = require('moment');
 
 var Models = sequelize.models;
 var logger = new Logger('qm_order');
-var QmOrder = base_class.QmOrder;
-var OrderLogs = base_class.OrderLogs;
 var Paginate = paginate.Paginate;
 var QmOrderModel = Models.QmOrder;
 var OrderLogsModel = Models.OrderLogs;
 var now = utils.now;
 var qm_order : any = {};
+
+var QM_ORDER_COLS = Object.keys(QmOrderModel.attributes);
 
 //订单状态
 var STATUS = {
@@ -44,11 +46,13 @@ var ERROR = {
 /**
  * 创建订单
  * @param order
+ * @param order.status
  */
 qm_order.create_qm_order = function(order) {
-    var _qm_order = new QmOrder(order);
+    var _qm_order : any = _.pick(order, QM_ORDER_COLS);
     _qm_order.status = STATUS.WAIT_PAY;
     _qm_order.create_at = now();
+    _qm_order.expire_at = moment().add(30, 'minutes').format('YYYY-MM-DD HH:mm:ss'); //订单30分钟内未支付失效
     _qm_order.id = order.id || uuid.v1();
 
     return sequelize.transaction(function(t) {
@@ -59,7 +63,11 @@ qm_order.create_qm_order = function(order) {
         ])
     })
         .spread(function(_order) {
-            return _order;
+            if(_order.toJSON) {
+                _order = _order.toJSON();
+            }
+
+            return _.omit(_order, ['train_no']);
         })
 };
 
