@@ -56,6 +56,11 @@ var airTicket = (function () {
             };
             $scope.quitSelectingMode();
         }
+
+        $scope.renderTimeLeft = function(){
+            var currentTime = new Date();
+            console.log( currentTime );
+        }
         
         API.onload( function(){
             console.log( API.staff );
