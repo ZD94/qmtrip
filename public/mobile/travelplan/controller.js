@@ -147,6 +147,7 @@ var travelplan = (function () {
         }
 
         $scope.renderBalanceOrDeficit = function (i) {
+        //
             var balance = $scope.items[i].budget - $scope.items[i].expenditure;
             if (balance >= 0) {
                 $scope.withBalance = true;
