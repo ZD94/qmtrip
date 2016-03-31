@@ -31,7 +31,7 @@ var TravelStatistics = (function(){
             var startAT = $($event.target).attr("data-zrep");
             $scope.startAT = moment(startAT).startOf('month').format('YYYY-MM-DD');
             $scope.endAT = moment(startAT).endOf('month').format('YYYY-MM-DD 23:59:59');
-            Q.all([API.tripPlan.statBudgetByMonth({startTime:$scope.startAT, endTime:$scope.endAT}),
+            Promise.all([API.tripPlan.statBudgetByMonth({startTime:$scope.startAT, endTime:$scope.endAT}),
                 API.tripPlan.statPlanOrderMoneyByCompany({startTime: $scope.startAT || monthStart, endTime: $scope.endAT || monthEnd})
                 ])
                 .spread(function(budget,stat){
@@ -103,7 +103,7 @@ var TravelStatistics = (function(){
                 API.staff.getCurrentStaff()
                     .then(function(staff){
                         console.info($scope.startAT,$scope.endAT)
-                        return Q.all([
+                        return Promise.all([
                             API.company.getCompanyById(staff.companyId),
                             API.tripPlan.statPlanOrderMoneyByCompany({startTime: monthStart, endTime: monthEnd}),
                             API.tripPlan.statBudgetByMonth({startTime:$scope.startAT || monthStart, endTime:$scope.endAT || monthEnd})
@@ -144,7 +144,7 @@ var TravelStatistics = (function(){
                 .then(function(staff){
                     var companyId = staff.companyId;
                     var staffId = staff.id;
-                    return Q.all([
+                    return Promise.all([
                             API.staff.statStaffPointsByCompany({}), //企业积分统计，总积分，可用积分。
                             API.staff.getStaffPointsChangeByMonth({})//企业统计员工所有变动记录
                             ])
@@ -263,7 +263,7 @@ var TravelStatistics = (function(){
                                 })
                         })
 
-                        Q.all(planlist)
+                        Promise.all(planlist)
                             .then(function(ret){
                                 $scope.planlist = ret;
                                 ret.map(function(s){
@@ -427,7 +427,7 @@ var TravelStatistics = (function(){
                                     return outTraffics;
                                 })
                         }else{
-                            return Q.all([
+                            return Promise.all([
                                 API.agency.getAgencyUserByCompany({agencyUserId: outTraffic.auditUser}),
                                 API.tripPlan.getConsumeInvoiceImg({consumeId: outTraffic.id})
                             ])
@@ -447,7 +447,7 @@ var TravelStatistics = (function(){
                                     return backTraffic;
                                 })
                         }else{
-                            return Q.all([
+                            return Promise.all([
                                 API.agency.getAgencyUserByCompany({agencyUserId: backTraffic.auditUser}),
                                 API.tripPlan.getConsumeInvoiceImg({consumeId: backTraffic.id})
                             ])
@@ -468,7 +468,7 @@ var TravelStatistics = (function(){
                                 })
                         }else{
                             console.info(hotel.auditUser)
-                            return Q.all([
+                            return Promise.all([
                                 API.agency.getAgencyUserByCompany({agencyUserId: hotel.auditUser}),
                                 API.tripPlan.getConsumeInvoiceImg({consumeId: hotel.id})
                             ])
@@ -481,7 +481,7 @@ var TravelStatistics = (function(){
                         }
                         
                     });
-                    Q.all(hotels)
+                    Promise.all(hotels)
                     .then(function(hotels) {
                         $scope.hotels = hotels;
                         $scope.$apply();
@@ -490,7 +490,7 @@ var TravelStatistics = (function(){
                         TLDAlert(err.msg || err);
                     })
 
-                    Q.all(outTraffics)
+                    Promise.all(outTraffics)
                     .then(function(outTraffics) {
                         $scope.outTraffics = outTraffics;
                         $scope.$apply();
@@ -499,7 +499,7 @@ var TravelStatistics = (function(){
                         TLDAlert(err.msg || err);
                     })
 
-                    Q.all(backTraffics)
+                    Promise.all(backTraffics)
                     .then(function(backTraffics) {
                         $scope.backTraffics = backTraffics;
                         $scope.$apply();

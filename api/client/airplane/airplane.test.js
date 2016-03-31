@@ -13,6 +13,7 @@ describe("api/client/tripPlan.js", function() {
     var staffId = "";
     var tripPlanId = '';
     var consumeId = '';
+    var query_key = '201603301613047232';
 
     var agency = {
         email: "tripPlan.test@tulingdao.com",
@@ -111,6 +112,7 @@ describe("api/client/tripPlan.js", function() {
                 throw err;
             }
             console.info(ret);
+            query_key = ret[0].query_key;
             done();
         });
     });
@@ -120,8 +122,8 @@ describe("api/client/tripPlan.js", function() {
         this.timeout(20000);
         var params = {
             flight_no: "MU5693",
-            ip_address: '192.168.1.12',
-            query_key: '201603291212098843'
+            ip_address: '192.168.1.3',
+            query_key: query_key
         };
         API.client.airplane.get_plane_details.call({accountId: staffId}, params, function(err, ret) {
             if(err) {

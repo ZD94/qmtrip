@@ -4,6 +4,7 @@
 'use strict';
 var airTicket = (function () {
 
+    //var id_validation = require('../../script/id_validation');
     API.require('tripPlan');
     API.require('auth');
     API.require('attachment');
@@ -34,6 +35,8 @@ var airTicket = (function () {
     airTicket.InfoEditingController = function ($scope, $routeParams) {
         loading(true);
 
+        //console.log( id_validation('370683198909072254').isValid() );
+
         $scope.user;
 
         $scope.IDType = "身份证";
@@ -55,6 +58,11 @@ var airTicket = (function () {
                 $scope.IDType = "护照";
             };
             $scope.quitSelectingMode();
+        }
+
+        $scope.renderTimeLeft = function(){
+            var currentTime = new Date();
+            console.log( currentTime );
         }
         
         API.onload( function(){

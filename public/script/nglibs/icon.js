@@ -60,6 +60,9 @@ module.exports = function ($module){
                 query: '\ue92f',
                 "train-n-plane": '\ue90c'
             }
+        },
+        icomoon: {
+            font: 'icon-'
         }
     };
 
@@ -83,6 +86,14 @@ module.exports = function ($module){
         $scope.symscale = 1;
         if(symconf.scale != undefined)
             $scope.symscale = symconf.scale;
+
+        //*************************************************
+        if( /^icon-/.test($scope.name) ){
+            $scope.symfont = '';
+            $scope.symname = $scope.name;
+        };
+        //*************************************************
+
     }
 
     $module.directive("symbol",function(){
