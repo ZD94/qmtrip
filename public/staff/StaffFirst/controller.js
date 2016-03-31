@@ -40,12 +40,10 @@ var StaffFirst = (function(){
 							$scope.businesstimes = tripPlanOrders;
 							$scope.travelpolicy = travelPolicy;
 							dataloading(true);
-							$scope.$apply();
 						})
 						.catch(function(err){
 							TLDAlert(err.msg || err)
 						})
-						$scope.$apply();
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err)

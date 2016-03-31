@@ -42,7 +42,6 @@ module.exports = (function() {
                         }).catch(function(err){
                             //console.info(err.msg);
                             var str = err.msg;
-                            $scope.$apply();
                             msgbox.log(str);//显示错误消息
                         }).done();
                 })

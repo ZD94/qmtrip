@@ -96,7 +96,6 @@ test2.PagesController = function($scope){
                                     }
                                     return s;
                                 })
-                                $scope.$apply();
                             })
                             .catch(function(err){
                                 TLDAlert(err.msg || err)

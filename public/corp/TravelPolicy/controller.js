@@ -23,7 +23,6 @@ var TravelPolicy=(function(){
             API.staff.getCurrentStaff()
                 .then(function(ret){
                     $scope.company_id = ret.companyId;
-                    $scope.$apply();
                 })
                 .catch(function(err){
                     TLDAlert(err.msg || err)
@@ -57,7 +56,6 @@ var TravelPolicy=(function(){
                             }
                         });
                         loading(true);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
