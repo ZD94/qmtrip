@@ -32,7 +32,7 @@ var travelRecord=(function(){
                         $scope.pages1 = result.pages;
                         var travelList1 = result.items;
                         travelList1.map(function(s){
-                            Q.all([
+                            Promise.all([
                                 API.staff.getStaffByAgency({id:s.accountId}),
                                 API.company.getCompanyById(s.companyId)
                             ])
@@ -64,7 +64,7 @@ var travelRecord=(function(){
                         $scope.pages2 = result.pages;
                         var travelList2 = result.items;
                         travelList2.map(function(s){
-                            Q.all([
+                            Promise.all([
                                 API.staff.getStaffByAgency({id:s.accountId}),
                                 API.company.getCompanyById(s.companyId)
                             ])
@@ -96,7 +96,7 @@ var travelRecord=(function(){
                         $scope.pages3 = result.pages;
                         var travelList3 = result.items;
                         travelList3.map(function(s){
-                            Q.all([
+                            Promise.all([
                                 API.staff.getStaffByAgency({id:s.accountId}),
                                 API.company.getCompanyById(s.companyId)
                             ])
@@ -305,7 +305,7 @@ var travelRecord=(function(){
 
                         });
 
-                        Q.all(hotels)
+                        Promise.all(hotels)
                             .then(function(hotels) {
                                 $scope.hotels = hotels;
                                 $scope.$apply();
@@ -316,7 +316,7 @@ var travelRecord=(function(){
                                 TLDAlert(err.msg || err);
                             })
 
-                        Q.all(outTraffics)
+                        Promise.all(outTraffics)
                             .then(function(outTraffics) {
                                 $scope.outTraffics = outTraffics;
                                 console.info(outTraffics);
@@ -328,7 +328,7 @@ var travelRecord=(function(){
                                 TLDAlert(err.msg || err);
                             })
 
-                        Q.all(backTraffics)
+                        Promise.all(backTraffics)
                             .then(function(backTraffics) {
                                 $scope.backTraffics = backTraffics;
                                 $scope.$apply();

@@ -31,7 +31,7 @@ module.exports = (function() {
                             $scope.power = "普通员工";
                         }
 
-                        Q.all([
+                        Promise.all([
                             API.tripPlan.statPlanOrderMoney({}),
                             API.travelPolicy.getTravelPolicy({id: travelLevel}),
                             API.tripPlan.pageTripPlanOrder({isHasBudget: false}),

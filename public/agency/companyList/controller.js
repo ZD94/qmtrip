@@ -27,7 +27,7 @@ module.exports = (function(){
 						var companylist = ret.items;
 						var promises = companylist.map(function(company){
 							// console.info(company.createUser)
-							return Q.all([
+							return Promise.all([
 								API.company.getCompanyFundsAccountByAgency(company.id),
 								API.staff.getStaffByAgency({id: company.createUser}),
                         		API.staff.statisticStaffsByAgency({companyId:company.id}),
@@ -46,7 +46,7 @@ module.exports = (function(){
 							});
 
 						});
-						return Q.all(promises);
+						return Promise.all(promises);
 					})
 					.then(function(companylist){
 						$scope.companylist = companylist;
@@ -108,7 +108,7 @@ module.exports = (function(){
 						console.info(company)
 						$scope.$apply();
                         loading(true);
-                        Q.all([
+                        Promise.all([
                         	API.staff.getStaffByAgency({id:staffId}),
                         	API.company.getCompanyFundsAccountByAgency(companyId),
                         	API.staff.statisticStaffsByAgency({companyId:companyId}),
@@ -268,7 +268,7 @@ module.exports = (function(){
 				options.page = $scope.page;
 				params.options = options;
 				params.companyId = companyId;
-				Q.all([
+				Promise.all([
 					API.travelPolicy.agencyGetAllTravelPolicy({where: {companyId:companyId}}),//获取当前所有的差旅标准名称
 					API.staff.agencyListAndPaginateStaff(params),//加载所有的员工记录
 					API.staff.agencyStatisticStaffsRole({companyId:companyId}),//统计企业员工（管理员 普通员工 未激活员工 总数）数量
@@ -296,7 +296,7 @@ module.exports = (function(){
 						//console.info($scope.staff);
 						var tasks = $scope.staffs
 							.map(function($staff){ //通过id拿到差旅标准的名字
-								return Q.all([
+								return Promise.all([
 									API.travelPolicy.agencyGetTravelPolicy({id:$staff.travelLevel,companyId: companyId}),
 									API.auth.getAccountStatus({id:$staff.id})
 								])
@@ -315,7 +315,7 @@ module.exports = (function(){
 						$scope.manager = staffRole.adminNum;
 						$scope.publicStaff = staffRole.commonStaffNum;
 						$scope.totalCount = staffRole.totalCount;
-						return Q.all(tasks)
+						return Promise.all(tasks)
 							.then(function(){
 								$scope.$apply();
 							})
@@ -387,7 +387,7 @@ module.exports = (function(){
 						$scope.staffs = staffinfo.items;
 						var tasks = $scope.staffs
 							.map(function($staff){ //通过id拿到差旅标准的名字
-								return Q.all([
+								return Promise.all([
 									API.travelPolicy.agencyGetTravelPolicy({id:$staff.travelLevel,companyId: companyId}),
 									API.auth.getAccountStatus({id:$staff.id})
 								])
@@ -401,7 +401,7 @@ module.exports = (function(){
 										$scope.$apply();
 									})
 							});
-						return Q.all(tasks)
+						return Promise.all(tasks)
 							.then(function(){
 								$scope.$apply();
 							})
@@ -443,7 +443,7 @@ module.exports = (function(){
 						$scope.staffs = staffinfo.items;
 						var tasks = $scope.staffs
 							.map(function($staff){ //通过id拿到差旅标准的名字
-								return Q.all([
+								return Promise.all([
 									API.travelPolicy.agencyGetTravelPolicy({id:$staff.travelLevel,companyId: companyId}),
 									API.auth.getAccountStatus({id:$staff.id})
 								])
@@ -456,7 +456,7 @@ module.exports = (function(){
 										$scope.$apply();
 									})
 							});
-						return Q.all(tasks)
+						return Promise.all(tasks)
 							.then(function(){
 								$scope.$apply();
 							})
