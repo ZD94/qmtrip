@@ -51,7 +51,7 @@
         </div>
 
         <div class="price thisHeader">
-            票价信息<span class="total">合计：<span class="totalPrice">￥610.25</span></span>
+            <symbol name="icon-fare"/> 票价信息<span class="total">合计：<span class="totalPrice">￥610.25</span></span>
         </div>
 
         <ul class="charges">
@@ -80,8 +80,8 @@
     <div class="dropdown">
         <div class="dropdown-header" ng-click="toggle('deliveryAddress')">
             <span>报销凭证配送地址</span>
-            <symbol name="icon-arrowdown" ng-if="!deliveryAddressShown"/>
-            <symbol name="icon-up-arrow" ng-if="deliveryAddressShown"/>
+            <symbol name="icon-down-arrow" class="arrow" ng-if="!deliveryAddressShown"/>
+            <symbol name="icon-up-arrow" class="arrow" ng-if="deliveryAddressShown"/>
         </div>
         <div class="dropdown-content deliveryAddress" ng-show="deliveryAddressShown">
             <p class="name">李明月 13611111111</p>
@@ -92,7 +92,7 @@
     <div class="dropdown">
         <div class="dropdown-header">
             <span>查看对应的出差记录</span>
-            <symbol name="icon-up-arrow"
+            <symbol name="icon-right-arrow" class="arrow"/>
         </div>
     </div>
 
