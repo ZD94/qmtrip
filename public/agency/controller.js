@@ -14,7 +14,6 @@ module.exports = (function(){
                     .then(function(ret){
                         // console.info(ret);
                         $scope.agency = ret;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);

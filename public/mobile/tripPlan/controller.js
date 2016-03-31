@@ -83,11 +83,9 @@
                                 $scope.backClass = "ready";
                             }
                         }
-                        // $scope.$apply();
                         API.staff.getCurrentStaff()
                             .then(function(staff){
                                 $scope.name = staff.name;
-                                $scope.$apply();
                             })
                     })
             })

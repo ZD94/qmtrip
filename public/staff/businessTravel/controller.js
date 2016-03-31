@@ -39,7 +39,6 @@ var businessTravel=(function(){
                             $(".PurposeNamelist").show();
                         }
                         console.info (result);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.log(err);
@@ -108,7 +107,6 @@ var businessTravel=(function(){
                         if ($scope.startplaceitems.length) {
                             $(".placelist1").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         $(".placelist1").hide();
@@ -134,7 +132,6 @@ var businessTravel=(function(){
                         if ($scope.endplaceitems.length) {
                             $(".placelist2").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.log(err);
@@ -299,7 +296,6 @@ var businessTravel=(function(){
                         if ($scope.endplaceitems.length) {
                             $(".placelist1").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -327,7 +323,6 @@ var businessTravel=(function(){
                         if (!$scope.liveplaceitems.length) {
                             $(".placelist2").hide();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -447,7 +442,6 @@ var businessTravel=(function(){
                         if ($scope.startplaceitems.length) {
                             $(".placelist1").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -472,7 +466,6 @@ var businessTravel=(function(){
                         if ($scope.endplaceitems.length) {
                             $(".placelist2").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -498,7 +491,6 @@ var businessTravel=(function(){
                         if ($scope.liveplaceitems.length) {
                             $(".placelist2").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -773,7 +765,6 @@ var businessTravel=(function(){
                         $scope.totalprice = ret2.price;
                         $scope.goTraffic = ret2.goTraffic.price;
                         $scope.backTraffic = ret2.backTraffic.price;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -808,7 +799,6 @@ var businessTravel=(function(){
                         $(".createresult,.tianxun").show();
                         $scope.totalprice = ret2.price;
                         $scope.liveprice = $scope.onlylive.price;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -880,7 +870,6 @@ var businessTravel=(function(){
                         $scope.liveprice = $scope.trafficlive.hotel;
                         $scope.goTraffic = ret2.goTraffic.price;
                         $scope.backTraffic = ret2.backTraffic.price;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);

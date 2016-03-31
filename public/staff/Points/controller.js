@@ -33,14 +33,12 @@ var point=(function(){
                                     API.tripPlan.getTripPlanOrderById({orderId: orderId})
                                         .then(function(order){
                                             c.orderCreateAt = moment(order.createAt).format('YYYY-MM-DD');
-                                            $scope.$apply();
                                         })
                                     
                                 })
                                 // console.info($scope.record);
                                 $scope.record = record.items;
                                 $scope.totalAll = record.total;
-                                $scope.$apply();
                             })
                     })
                     .catch(function (err) {
@@ -65,12 +63,10 @@ var point=(function(){
                                     API.tripPlan.getTripPlanOrderById({orderId: orderId})
                                         .then(function(order){
                                             c.orderCreateAt = moment(order.createAt).format('YYYY-MM-DD');
-                                            $scope.$apply();
                                         })
                                 })
                                 $scope.incomerecord = record.items;
                                 $scope.totalIncome = record.total;
-                                $scope.$apply();
                             })
                     })
                     .catch(function(err){
@@ -91,13 +87,11 @@ var point=(function(){
                                     API.tripPlan.getTripPlanOrderById({orderId: orderId})
                                         .then(function(order){
                                             c.orderCreateAt = moment(order.createAt).format('YYYY-MM-DD');
-                                            $scope.$apply();
                                         })
                                     
                                 })
                                 $scope.payrecord = record.items;
                                 $scope.totalPay = record.total;
-                                $scope.$apply();
                             })
                     })
                     .catch(function(err){

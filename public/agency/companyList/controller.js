@@ -50,7 +50,6 @@ module.exports = (function(){
 					})
 					.then(function(companylist){
 						$scope.companylist = companylist;
-						$scope.$apply();
                         loading(true);
 					})
 					.catch(function(err){
@@ -106,7 +105,6 @@ module.exports = (function(){
 						var staffId = company.createUser;
 						var companyId = company.id;
 						console.info(company)
-						$scope.$apply();
                         loading(true);
                         Promise.all([
                         	API.staff.getStaffByAgency({id:staffId}),
@@ -122,7 +120,6 @@ module.exports = (function(){
                         	$scope.funds = funds;
                         	$scope.staffnum = staffnum.all;
 								$scope.points = points;
-                        	$scope.$apply();
                         })
 					})
 					.catch(function(err){
@@ -143,7 +140,6 @@ module.exports = (function(){
 					.then(function(result){
 						console.info(result);
 						$scope.initCompanyDetail();
-						$scope.$apply();
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err);;
@@ -307,7 +303,6 @@ module.exports = (function(){
 											$staff.activeStatus = acc.status;
 											$staff.accStatus = acc.status==0?'未激活':'';
 										}
-										$scope.$apply();
 									})
 							});
 						//统计企业员工（管理员 普通员工 未激活员工）数量
@@ -315,10 +310,7 @@ module.exports = (function(){
 						$scope.manager = staffRole.adminNum;
 						$scope.publicStaff = staffRole.commonStaffNum;
 						$scope.totalCount = staffRole.totalCount;
-						return Promise.all(tasks)
-							.then(function(){
-								$scope.$apply();
-							})
+						return Promise.all(tasks);
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
 					})
@@ -398,13 +390,9 @@ module.exports = (function(){
 											$staff.activeStatus = acc.status;
 											$staff.accStatus = acc.status==0?'未激活':'';
 										}
-										$scope.$apply();
 									})
 							});
-						return Promise.all(tasks)
-							.then(function(){
-								$scope.$apply();
-							})
+						return Promise.all(tasks);
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err);;
@@ -453,13 +441,9 @@ module.exports = (function(){
 											$staff.activeStatus = acc.status;
 											$staff.accStatus = acc.status==0?'未激活':'';
 										}
-										$scope.$apply();
 									})
 							});
-						return Promise.all(tasks)
-							.then(function(){
-								$scope.$apply();
-							})
+						return Promise.all(tasks);
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err);;
@@ -519,7 +503,6 @@ module.exports = (function(){
 								$("#staffPower").val("");
 							}
 							$scope.initstafflist();
-							$scope.$apply();
 						}).catch(function (err) {
 							console.log(err);
 							if(err.code == -29){
@@ -530,7 +513,6 @@ module.exports = (function(){
 								$scope.block_tip_err = err.msg;
 							}
 							$(".block_tip").show();
-							$scope.$apply();
 						}).done();
 				})
 			}
@@ -545,7 +527,6 @@ module.exports = (function(){
 					.then(function(staffinfo){
 						$scope.travellevel = staffinfo.staff.travelLevel;
 						$scope.selectkey = $scope.travellevel || "";
-						$scope.$apply();
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
 					}).done();
@@ -573,7 +554,6 @@ module.exports = (function(){
 						$(".add_staff2").hide();
 						//$scope.initstafflist();
 						$scope.initstafflist();
-						$scope.$apply();
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
 					}).done();
@@ -593,7 +573,6 @@ module.exports = (function(){
 				API.staff.agencyDeleteStaff({id:id,companyId: companyId})
 					.then(function(newStaff){
 						$scope.staffs.splice(index, 1);
-						$scope.$apply();
 						$scope.initstafflist();
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
@@ -661,7 +640,6 @@ module.exports = (function(){
 						$scope.downloadValidData = allData.downloadAddObj;
 						$scope.validData = JSON.parse(allData.addObj).length;
 						$scope.invalidData = JSON.parse(allData.noAddObj).length;
-						$scope.$apply();
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err);;
@@ -690,7 +668,6 @@ module.exports = (function(){
 					.then(function(result){
 						var filename = result.fileName;
 						window.open('/download/excle-file/'+filename, "_blank");
-						$scope.$apply();
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
 					})
@@ -712,7 +689,6 @@ module.exports = (function(){
 						$(".staff_tab_valid").hide();
 						$(".staff_tab_content").hide();
 						$(".staff_tab_import").hide();
-						$scope.$apply();
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
 					}).done();
@@ -744,11 +720,9 @@ module.exports = (function(){
 										.then(function(num){
 											s.peoplenum = num;
 											console.info ($scope.departmentlist);
-											$scope.$apply();
 										})
 								});
 							})
-						$scope.$apply();
 						loading(true);
 					})
 			})
@@ -888,7 +862,6 @@ module.exports = (function(){
 							}
 						});
 						loading(true);
-						$scope.$apply();
 					})
 					.catch(function(err){
 						console.info (err);
