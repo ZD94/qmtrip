@@ -96,28 +96,48 @@ function book_ticket(params) {
             ])
         })
         .spread(function(consume, staff, order_no, ticket_order) {
-            console.info("**************************");
-            console.info(consume.orderStatus);
-            console.info(ticket_order);
-            console.info(ticket_order.passengers[0]);
+            var segment = ticket_order.segments[0];
+            var dept_date = moment(segment.departure_time).format('YYYY-MM-DD');
+            var flight_list = params.flight_list;
+            var cabin = flight_list.cabin;
+
+            //if(dept_date !== moment(consume.startTime).format('YYYY-MM-DD')) {
+            //    throw {code: -3, msg: '出发日期异常'};
+            //}
+
+            params.airways = flight_list.airways;
+            params.punctual_rate = flight_list.punctual_rate;
+            params.meal = flight_list.meal;
+            params.meal_name = flight_list.meal_name;
+            params.cabin_type = cabin.cabin_type;
+            params.cabin_name = cabin.cabin_name;
+            params.cabin_no = cabin.cabin;
             params.company_id = staff.companyId;
             params.staff_id = account_id;
             params.order_no = order_no;
             params.out_order_no = ticket_order.order_no;
             params.flight_no = ticket_order.flight_no;
             params.type = 'P';
+            params.date = dept_date;
+            params.contact_name = ticket_order.contact_name;
+            params.contact_mobile = ticket_order.contact_mobile;
+            params.status = 0;
+            params.pay_price = ticket_order.pay_price;
+            params.start_time = segment.departure_time;
+            params.end_time = segment.arrival_time;
+            params.ticket_info = segment;
+            params.passenger = ticket_order.passengers;
+            params.start_city_code = consume.startPlaceCode;
+            params.end_city_code = consume.arrivalPlaceCode;
 
-            console.info("***********************");
-            //1603291528210000481
-            //KSLWJM
             return API.qm_order.create_qm_order(params);
         })
 };
 
 
 var _flight = { departure_date: '2016-04-10',
-    departure_city_code: 'PEK',
-    arrival_city_code: 'SHA',
+    dept_station_code: 'PEK',
+    arrival_station_code: 'SHA',
     departure_time: '07:55',
     arrival_time: '12:45',
     flight_no: 'MU5693',
@@ -129,8 +149,7 @@ var _flight = { departure_date: '2016-04-10',
     arrival_term: 'T2',
     stand_price: '1240',
     cabins:
-        [{
-            air_con_fee: '50',
+        [ { air_con_fee: '50',
             bill_price: '740',
             buy_price: '724.46',
             insurance_num: '0',
@@ -157,36 +176,35 @@ var _flight = { departure_date: '2016-04-10',
             ticket_supply: {},
             ticket_type: 'BPET',
             total_seat_num: '',
-            remark: '签转、换开、改签均需收回代理费。改签需要回收代理费' }, {
-            air_con_fee: '50',
-            bill_price: '740',
-            buy_price: '724.46',
-            insurance_num: '0',
-            insurance_type: '151009091743795523',
-            cabin: 'R',
-            cabin_type: '0',
-            cabin_level: '0',
-            cabin_name: '经济舱',
-            discount: '60.0',
-            fuel_tax: '0',
-            market_price: '0.0',
-            note: '退票规定：航班规定离站时间2小时前(含):30%,航班规定离站时间2小时内(不含)及飞后:50%。变更规定：航班规定离站时间2小时前(含):20%,航班规定离站时间2小时内(不含)及飞后:30%。签转规定：不允许自愿签转.温馨提示：仅供参考，最终以航司规定为准！',
-            pay_price: '0.0',
-            policy_id: 'CPS_PTZCdgyy_9f8447a9-abd4-4149-a1d5-4cac47ed8e48',
-            policy_name: '普通',
-            policy_type: 'CPS_PTZC',
-            platform: '3',
-            remain_seat_num: '',
-            sale_price: '740.0',
-            seat_num: 'A',
-            suggest_price: '740.0',
-            tgq_type: '',
-            refund_policy: '退票30%-50%',
-            ticket_supply: {},
-            ticket_type: 'BPET',
-            total_seat_num: '',
-            remark: '签转、换开、改签均需收回代理费。改签需要回收代理费'
-        }],
+            remark: '签转、换开、改签均需收回代理费。改签需要回收代理费' },
+            { air_con_fee: '50',
+                bill_price: '740',
+                buy_price: '724.46',
+                insurance_num: '0',
+                insurance_type: '151009091743795523',
+                cabin: 'R',
+                cabin_type: '0',
+                cabin_level: '0',
+                cabin_name: '经济舱',
+                discount: '60.0',
+                fuel_tax: '0',
+                market_price: '0.0',
+                note: '退票规定：航班规定离站时间2小时前(含):30%,航班规定离站时间2小时内(不含)及飞后:50%。变更规定：航班规定离站时间2小时前(含):20%,航班规定离站时间2小时内(不含)及飞后:30%。签转规定：不允许自愿签转.温馨提示：仅供参考，最终以航司规定为准！',
+                pay_price: '0.0',
+                policy_id: 'CPS_PTZCdgyy_9f8447a9-abd4-4149-a1d5-4cac47ed8e48',
+                policy_name: '普通',
+                policy_type: 'CPS_PTZC',
+                platform: '3',
+                remain_seat_num: '',
+                sale_price: '740.0',
+                seat_num: 'A',
+                suggest_price: '740.0',
+                tgq_type: '',
+                refund_policy: '退票30%-50%',
+                ticket_supply: {},
+                ticket_type: 'BPET',
+                total_seat_num: '',
+                remark: '签转、换开、改签均需收回代理费。改签需要回收代理费' } ],
     flight_mod: '73E',
     stop_over: '1',
     supply_count: '0',
@@ -197,10 +215,11 @@ var _flight = { departure_date: '2016-04-10',
     flight_rate: '0.93' }
 
 var _flight_list = {
+    punctual_rate: '0.93',
     airways: 'MU',
     departure_date: '2016-04-10',
-    departure_city_code: 'PEK',
-    arrival_city_code: 'SHA',
+    dept_station_code: 'PEK',
+    arrival_station_code: 'SHA',
     departure_time: '07:55',
     arrival_time: '12:45',
     flight_no: 'MU5693',
@@ -208,57 +227,47 @@ var _flight_list = {
     air_con_fee: '50',
     fuel_tax: '0',
     meal: 'L',
+    meal_name: '午餐',
     departure_term: 'T2',
     arrival_term: 'T2',
     stand_price: '1240',
     flight_mod: '73E',
     stop_over: '1',
     supply_count: '0',
-    min_buy_price: '0.0',
-    max_buy_price: '0.0',
-    punctual_rate: '0.93',
-    query_key: '201603291216324386',
+    buy_price: '720.76',
+    bill_price: '740',
+    suggest_price: '790.0',
+    discount: '60.0',
+
     cabin: {
         air_con_fee: '50',
-        bill_price: '860',
-        buy_price: '840.22',
+        bill_price: '1230',
+        buy_price: '1199.25',
         insurance_num: '0',
         insurance_type: '151009091743795523',
-        cabin: 'N',
+        cabin: 'B',
         cabin_type: '0',
         cabin_level: '0',
         cabin_name: '经济舱',
-        discount: '69.0',
+        discount: '99.0',
         fuel_tax: '0',
         market_price: '0.0',
-        note: '退票规定：航班规定离站时间2小时前(含):30%,航班规定离站时间2小时内(不含)及飞后:50%。变更规定：航班规定离站时间2小时前(含):20%,航班规定离站时间2小时内(不含)及飞后:30%。签转规定：不允许自愿签转.温馨提示：仅供参考，最终以航司规定为准！',
+        note: '退票规定：航班规定离站时间2小时前(含):5%,航班规定离站时间2小时内(不含)及飞后:10%。变更规定：航班规定离站时间2小时前(含):免费变更,航班规定离站时间2小时内(不含)及飞后:5%。签转规定：.温馨提示：仅供参考，最终以航司规定为准！',
         pay_price: '0.0',
-        policy_id: 'CPS_PTZCdgyy_485da64e-b1ae-4907-bd1b-a0796232556a',
+        policy_id: 'CPS_PTZCdgyy_80e691a5-db77-4a4a-ac2a-a61468092b9b',
         policy_name: '普通',
         policy_type: 'CPS_PTZC',
         platform: '3',
         remain_seat_num: '',
-        sale_price: '860.0',
+        sale_price: '1230.0',
         seat_num: 'A',
-        suggest_price: '860.0',
+        suggest_price: '1230.0',
         tgq_type: '',
-        refund_policy: '退票30%-50%',
+        refund_policy: '退票5%-10%',
         ticket_supply: [Object],
         ticket_type: 'BPET',
         total_seat_num: '',
         remark: '签转、换开、改签均需收回代理费。改签需要回收代理费' },
 };
 
-//this.fuelTax = options.fuel_tax;
-//this.meal = options.meal;
-//this.depTerm = options.departure_term;
-//this.arrTerm = options.arrival_term;
-//this.standPrice = options.stand_price;
-//this.flightMod = options.flight_mod;
-//this.stopOver = options.stop_over;
-//this.supplyCount = options.supply_count;
-//this.minBuyPrice = options.min_buy_price;
-//this.maxBuyPrice = options.max_buy_price;
-////this.carrFlightNo = options.carrFlightNo;
-//this.airways = options.airways;
 module.exports = airplane;

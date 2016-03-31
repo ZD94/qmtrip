@@ -67,6 +67,21 @@ function get_qm_order(params) {
 };
 
 /**
+ * 根据订单号获取订单
+ * @type {getByOutOrderNo}
+ */
+qm_order.getByOutOrderNo = getByOutOrderNo;
+getByOutOrderNo.required_params = ['out_order_no'];
+function getByOutOrderNo(params) {
+    var self = this;
+
+    return API.staff.getStaff({id: self.accountId})
+        .then(function() {
+            return API.qm_order.get_qm_order(params);
+        })
+}
+
+/**
  * 获取全麦订单详情
  * @param params
  * @param {uuid}    params.trip_plan_id  计划单id
