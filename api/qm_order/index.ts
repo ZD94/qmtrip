@@ -9,7 +9,6 @@ var sequelize = require("common/model").importModel("./models");
 var utils = require('common/utils');
 var paginate = require("common/paginate");
 var uuid = require('node-uuid');
-import base_class = require('./qm_order_type');
 import _ = require('lodash');
 import moment = require('moment');
 
@@ -98,6 +97,24 @@ qm_order.get_order_by_id = function(params) {
             return order;
         })
 };
+
+/**
+ * 根据查询条件获取全麦订单
+ * @param params
+ * @returns {Promise<TInstance>}
+ */
+qm_order.get_qm_order = function(params) {
+    var query = _.pick(params, QM_ORDER_COLS);
+
+    return QmOrderModel.findOne(query)
+        .then(function(order) {
+            if(!order || order.status == STATUS.DELETE) {
+                throw ERROR.ORDER_NOT_FOUND;
+            }
+
+            return order;
+        })
+}
 
 /**
  * 删除全麦订单
