@@ -1,0 +1,236 @@
+@import (reference) "common.less";
+
+.flight_list {
+  width: 100%;
+  height: auto;
+  position: relative;
+  .top_nav {
+    width: 100%;
+    height: 4.8rem;
+    background: @background-color-second;
+    dt {
+      height: 4.8rem;
+      line-height: 4.8rem;
+      font-size: @font-size-14;
+      color: @color-theme1;
+      i {
+        font-size: 1.1rem;
+      }
+    }
+    dd {
+      width: 1px;
+      height: 1.4rem;
+      background: @border-color;
+      position: absolute;
+      top: 1.7rem;
+    }
+  }
+  .city_content {
+    width: 100%;
+    height: 3.3rem;
+    line-height: 3.3rem;
+    padding: 0 1rem;
+    .city_name {
+      font-size: @font-size-12;
+      color: @default-text-color;
+      padding-right: 1rem;
+      display: inline-block;
+    }
+    .budget {
+      font-size: @font-size-12;
+      color: @color-theme1;
+      padding-right: 1rem;
+      display: inline-block;
+      span {
+        font-size: @font-size-12;
+        color: @second-text-color;
+      }
+    }
+    .number {
+      font-size: @font-size-12;
+      color: @second-text-color;
+      display: inline-block;
+      float: right;
+    }
+  }
+  ul {
+    width: 100%;
+    height: auto;
+    background: @background-color-second;
+    li {
+      width: 100%;
+      height: 8.5rem;
+      border-bottom: 1px @border-color solid;
+      padding: 0 1rem;
+      .top_content {
+        width: 100%;
+        height: 5.5rem;
+        .plane_icon {
+          width: 3.6rem;
+          height: 5.5rem;
+          line-height: 5.5rem;
+          float: left;
+          i {
+            font-size: @font-size-21;
+            color: @second-text-color;
+          }
+        }
+        .starttime {
+          width: 6rem;
+          height: 5.5rem;
+          line-height: 2rem;
+          font-size: @font-size-18;
+          color: @default-text-color;
+          padding-top: 1.2rem;
+          float: left;
+          span {
+            font-size: @font-size-12;
+            color: @second-text-color;
+          }
+        }
+        .line1 {
+          width: 7rem;
+          height: 5.5rem;
+          padding-top: 2.6rem;
+          float: left;
+          img {
+            width: 5.5rem;
+            float: left;
+          }
+          span {
+            font-size: @font-size-12;
+            color: @color-theme1;
+            margin-left: 1.5rem;
+            float: left;
+          }
+        }
+        .endtime {
+          width: 10rem;
+          height: 5.5rem;
+          line-height: 2rem;
+          font-size: @font-size-18;
+          color: @default-text-color;
+          padding-top: 1.2rem;
+          float: left;
+          position: relative;
+          span {
+            font-size: @font-size-12;
+            color: @second-text-color;
+          }
+          i {
+            font-size: @font-size-10;
+            position: absolute;
+            top: 1rem;
+            left: 4.8rem;
+          }
+        }
+        .price {
+          width: 8.5rem;
+          height: 5.5rem;
+          line-height: 2rem;
+          font-size: @font-size-18;
+          color: @color-theme4;
+          text-align: right;
+          padding-top: 1.2rem;
+          float: right;
+          position: relative;
+          span {
+            font-size: @font-size-12;
+          }
+          .ticketnum {
+            width: 3.5rem;
+            height: 1.2rem;
+            text-align: left;
+            color: @color-theme1;
+            display: inline-block;
+          }
+          .salenum {
+            width: 3.5rem;
+            height: 1.2rem;
+            display: inline-block;
+          }
+          .line {
+            width: 1px;
+            height: 1rem;
+            background: @border-color;
+            position: absolute;
+            top: 4rem;
+            right: 3.3rem;
+          }
+        }
+      }
+      .bottom_content {
+        width: 100%;
+        height: 2.7rem;
+        .left {
+          width: 3rem;
+          height: 2.7rem;
+          line-height: 2.7rem;
+          padding-top: 0.2rem;
+          img {
+            width: 2.3rem;
+          }
+        }
+        .right {
+          height: 2.7rem;
+          line-height: 2.7rem;
+          font-size: @font-size-12;
+          color: @second-text-color;
+        }
+      }
+    }
+  }
+  .bottom_nav {
+    width: 100%;
+    height: 4.8rem;
+    background: @background-color-second;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    dt {
+      height: 4.8rem;
+      font-size: @font-size-12;
+      color: @color-theme1;
+      text-align: center;
+      padding-top: 0.8rem;
+      i {
+        font-size: 1.6rem;
+      }
+    }
+    dd {
+      width: 1px;
+      height: 1.4rem;
+      background: @border-color;
+      position: absolute;
+      top: 1.7rem;
+    }
+  }
+  .city_content {
+    width: 100%;
+    height: 3.3rem;
+    line-height: 3.3rem;
+    padding: 0 1rem;
+    .city_name {
+      font-size: @font-size-12;
+      color: @default-text-color;
+      padding-right: 1rem;
+      display: inline-block;
+    }
+    .budget {
+      font-size: @font-size-12;
+      color: @color-theme1;
+      padding-right: 1rem;
+      display: inline-block;
+      span {
+        font-size: @font-size-12;
+        color: @second-text-color;
+      }
+    }
+    .number {
+      font-size: @font-size-12;
+      color: @second-text-color;
+      display: inline-block;
+      float: right;
+    }
+  }
+}
