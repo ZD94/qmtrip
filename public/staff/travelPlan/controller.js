@@ -479,7 +479,6 @@ var travelPlan=(function(){
      * @constructor
      */
     travelPlan.InvoiceDetailController = function($scope, $routeParams) {
-        loading(true);
         $("title").html("行程单明细");
         var planId = $routeParams.planId;
         $scope.planId = planId;

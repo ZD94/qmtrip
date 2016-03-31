@@ -11,7 +11,6 @@ var StaffAwardPlan=(function(){
     StaffAwardPlan.StaffAwardPlanController = function($scope) {
         $("title").html("员工奖励计划");
         $(".left_nav li").removeClass("on").eq(4).addClass("on");
-        loading(true);
         API.onload(function(){
             API.staff.statStaffPointsByCompany({})
                 .then(function(point){

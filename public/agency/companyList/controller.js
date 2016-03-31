@@ -12,7 +12,6 @@ module.exports = (function(){
 	API.require('travelPolicy');
 	var companyList ={};
 	companyList.CompanyListController = function($scope){
-		loading(true);
 		$("title").html("公司列表");
 		//企业管理首页信息
 		$scope.initCompanyList = function(){
@@ -89,7 +88,6 @@ module.exports = (function(){
 		}
 	}
 	companyList.CompanyDetailController = function($scope,$routeParams){
-		loading(true);
 		$("title").html("公司详情");
 		var companyId = $routeParams.company;
 		$scope.companyId = companyId;
@@ -150,7 +148,6 @@ module.exports = (function(){
 
 	//创建公司页面
 	companyList.CreateCorpController = function($scope) {
-		loading(true);
 		$scope.createCorp = function(){
 			var corpname = $("#corpName").val();
 			var name = $("#connectName").val();
@@ -201,7 +198,6 @@ module.exports = (function(){
 
 	//创建公司页面
 	companyList.CreateCorpController = function($scope) {
-		loading(true);
 		$scope.createCorp = function(){
 			var corpname = $("#corpName").val();
 			var name = $("#connectName").val();
@@ -249,7 +245,6 @@ module.exports = (function(){
 
 	//员工管理页面
 	companyList.StaffListController = function($scope,$routeParams) {
-		loading(true);
 		var companyId = $routeParams.company;
 		$scope.companyId = companyId;
 		$(".left_nav li").removeClass("on").eq(1).addClass("on");

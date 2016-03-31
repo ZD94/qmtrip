@@ -18,7 +18,6 @@ var travelRecord=(function(){
      * @constructor
      */
     travelRecord.TravelListController = function($scope) {
-        loading(true);
         $("title").html("出差单列表");
         //全部
         $scope.initTravelList1 = function () {
@@ -201,7 +200,6 @@ var travelRecord=(function(){
      * @constructor
      */
     travelRecord.TravelDetailController = function($scope, $routeParams, $location, $anchorScroll) {
-        loading(true);
         $("title").html("出差单明细");
         var orderId = $routeParams.orderId;
         $scope.initTravelDetail = function () {

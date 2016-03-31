@@ -4,11 +4,9 @@ declare function loading(boolean) : void;
 declare var msgbox: any;
 
 export function IndexController($scope){
-    loading(true);
 }
 
 export async function StaffController($scope, $q, StaffCache){
-    loading(true);
     var Cookie = require('tiny-cookie');
     var current_staff_id = Cookie.get('user_id');
     console.log(current_staff_id);
@@ -17,7 +15,6 @@ export async function StaffController($scope, $q, StaffCache){
 }
 
 export function AsyncController($scope, $q, $timeout) {
-    loading(true);
     var get_user = function() {
         return new Promise(function(resolve, reject){
             window.setTimeout(function() {
@@ -39,7 +36,6 @@ export function AsyncController($scope, $q, $timeout) {
 
 
 export function MsgboxController($scope){
-    loading(true);
     $scope.msgbox = msgbox;
     $scope.alert = function(){
         msgbox.alert('提示对话框');
@@ -59,7 +55,6 @@ export function MsgboxController($scope){
 }
 
 export function UploadController($scope, FileUploader){
-    loading(true);
     $scope.winWidth = $(window).width();
     //$scope.uploader = init_uploader(FileUploader, "/upload/ajax-upload-file?type=invoice");
     $scope.upload_tip = '测试上传';
@@ -70,7 +65,6 @@ export function UploadController($scope, FileUploader){
 }
 
 export function SelectController($scope) {
-    loading(true);
     $scope.selectOpt = {value: {val: 'a3'}};
     $scope.selectData = [
         {val: "a1", name: 111},
@@ -86,7 +80,6 @@ export function SelectController($scope) {
 };
 
 export function IconController($scope){
-    loading(true);
     $scope.symbols = [
         'customs.success',
         'customs.consult',
@@ -165,7 +158,6 @@ export function IconController($scope){
 }
 
 export function InputController($scope){
-    loading(true);
     $scope.user = {
      name:'',
      pwd:''

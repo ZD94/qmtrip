@@ -10,7 +10,6 @@ module.exports = (function() {
 
     auth.LoginController = function($scope,$routeParams) {
         //待实现
-        loading(true);
         $scope.$root.pageTitle = '登录';
         var mail = Cookie.get("email");
         var pwd = Cookie.get("pwd");

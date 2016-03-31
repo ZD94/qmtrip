@@ -6,7 +6,6 @@ API.require("staff");
 API.require("tripPlan");
 API.require("travelPolicy");
 test2.PagesController = function($scope){
-	loading(true);
 	// alert(1);
 	API.onload(function(){
 		var params = {page:$scope.page||1,perPage:20};

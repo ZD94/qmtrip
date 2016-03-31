@@ -109,7 +109,6 @@ module.exports = (function() {
 
     user.TravelpolicyController = function($scope) {
         $scope.$root.pageTitle = '差旅标准';
-        loading(true);
         API.onload(function(){
             API.travelPolicy.getCurrentStaffTp()
                 .then(function(travelPolicy){
