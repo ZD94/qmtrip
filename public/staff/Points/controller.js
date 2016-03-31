@@ -21,7 +21,7 @@ var point=(function(){
                         // var points = staff.balancePoints;
                         // points = points.replace(/([0-9])(?=(\d{3})+$)/g,'$1,');
                         // var params = {staffId:staffId,page:$scope.pageAllPoint}
-                        Q.all([
+                        Promise.all([
                             API.staff.listAndPaginatePointChange({staffId:staffId,options: {page:$scope.pageAllPoint}}),
                             API.staff.getStaffPointsChange({staffId:staffId})
                             ])

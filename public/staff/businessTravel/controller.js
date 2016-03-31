@@ -743,7 +743,7 @@ var businessTravel=(function(){
             $scope.endtime = $routeParams.et;//返回日期
             $scope.endtimelate = $routeParams.etl;//返回最晚到达时间
             API.onload(function() {
-                Q.all([
+                Promise.all([
                     API.staff.getCurrentStaff(),
                     API.travelBudget.getTrafficBudget({
                         originPlace:$scope.startplaceval,
@@ -791,7 +791,7 @@ var businessTravel=(function(){
             $scope.leavetime = $routeParams.leavet;//离店时间
             $scope.businessDistrict = $routeParams.lpval;   //商圈
             API.onload(function() {
-                Q.all([
+                Promise.all([
                     API.staff.getCurrentStaff(),
                     API.travelBudget.getHotelBudget({
                         cityId:$scope.endplaceval,
@@ -845,7 +845,7 @@ var businessTravel=(function(){
             $scope.leavetime = $routeParams.leavet;//离店时间
             $scope.businessDistrict = $routeParams.lpval;   //商圈
             API.onload(function() {
-                Q.all([
+                Promise.all([
                     API.staff.getCurrentStaff(),
                     API.travelBudget.getTravelPolicyBudget({
                         originPlace:$scope.startplaceval,

@@ -533,7 +533,7 @@ var businesstravel=(function(){
         //只选交通
         if ($scope.isTraffic && !$scope.isHotel) {
             API.onload(function() {
-                Q.all([
+                Promise.all([
                     API.staff.getCurrentStaff(),
                     API.travelBudget.getTrafficBudget({
                         originPlace:$scope.startCityCode,
@@ -583,7 +583,7 @@ var businesstravel=(function(){
         //只选住宿
         if (!$scope.isTraffic && $scope.isHotel) {
             API.onload(function() {
-                Q.all([
+                Promise.all([
                     API.staff.getCurrentStaff(),
                     API.travelBudget.getHotelBudget({
                         cityId:$scope.hotelCityCode,
@@ -610,7 +610,7 @@ var businesstravel=(function(){
         //选择交通和住宿
         if ($scope.isTraffic && $scope.isHotel) {
             API.onload(function() {
-                Q.all([
+                Promise.all([
                     API.staff.getCurrentStaff(),
                     API.travelBudget.getTravelPolicyBudget({
                         originPlace:$scope.startCityCode,

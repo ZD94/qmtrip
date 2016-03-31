@@ -196,7 +196,7 @@ var travelplan = (function () {
                              )
                              })
 
-                             Q.all(list.items)
+                             Promise.all(list.items)
                              .then(function(ret){
                              $scope.planlist = ret;
                              ret.map(function(s){

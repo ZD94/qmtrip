@@ -51,7 +51,7 @@ var staff = (function(){
                         params.options = options;
                         params.companyId = staff.companyId;
                         //console.log(Q);
-                        return Q.all([
+                        return Promise.all([
                             API.travelPolicy.getAllTravelPolicy({where: {companyId:staff.companyId}}),//获取当前所有的差旅标准名称
                             API.department.getAllDepartment(),//获取当前企业所有的部门
                             API.staff.listAndPaginateStaff(params),//加载所有的员工记录
@@ -87,7 +87,7 @@ var staff = (function(){
                                 //console.info($scope.staff);
                                 var tasks = $scope.staffs
                                     .map(function($staff){ //通过id拿到差旅标准的名字
-                                        return Q.all([
+                                        return Promise.all([
                                             API.travelPolicy.getTravelPolicy({id:$staff.travelLevel}),
                                             API.department.getDepartment({id:$staff.departmentId}),
                                             API.auth.getAccountStatus({id:$staff.id})
@@ -108,7 +108,7 @@ var staff = (function(){
                                 $scope.manager = staffRole.adminNum;
                                 $scope.publicStaff = staffRole.commonStaffNum;
                                 $scope.totalCount = staffRole.totalCount;
-                                return Q.all(tasks)
+                                return Promise.all(tasks)
                                     .then(function(){
                                         $scope.$apply();
                                     })
@@ -156,7 +156,7 @@ var staff = (function(){
                     params.departmentId = department;
                 }
 
-                return Q.all([
+                return Promise.all([
                     API.staff.statisticStaffsRole(params),//统计企业员工（管理员 普通员工 未激活员工 总数）数量
                     API.staff.listAndPaginateStaff(params)//加载所有的员工记录
                 ])
@@ -172,7 +172,7 @@ var staff = (function(){
                         $scope.staffs = staffinfo.items;
                         var tasks = $scope.staffs
                             .map(function($staff){ //通过id拿到差旅标准的名字
-                                return Q.all([
+                                return Promise.all([
                                         API.travelPolicy.getTravelPolicy({id:$staff.travelLevel}),
                                         API.department.getDepartment({id:$staff.departmentId}),
                                         API.auth.getAccountStatus({id:$staff.id})
@@ -188,7 +188,7 @@ var staff = (function(){
                                         $scope.$apply();
                                     })
                             });
-                        return Q.all(tasks)
+                        return Promise.all(tasks)
                             .then(function(){
                                 $scope.$apply();
                             })
@@ -235,7 +235,7 @@ var staff = (function(){
                         $scope.staffs = staffinfo.items;
                         var tasks = $scope.staffs
                             .map(function($staff){ //通过id拿到差旅标准的名字
-                                return Q.all([
+                                return Promise.all([
                                         API.travelPolicy.getTravelPolicy({id:$staff.travelLevel}),
                                         API.department.getDepartment({id:$staff.departmentId}),
                                         API.auth.getAccountStatus({id:$staff.id})
@@ -250,7 +250,7 @@ var staff = (function(){
                                         $scope.$apply();
                                     })
                             });
-                        return Q.all(tasks)
+                        return Promise.all(tasks)
                             .then(function(){
                                 $scope.$apply();
                             })
