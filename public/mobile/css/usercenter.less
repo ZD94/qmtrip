@@ -104,7 +104,6 @@
 .plan_record{
   width: 100%;
   margin-top: 1rem;
-  padding: 0 1rem;
   background-color: @color-theme5;
   border-bottom: 0.1rem solid #e5e5e5;
   .go_plan{
@@ -114,6 +113,7 @@
     height: 4.4rem;
     line-height: 4.4rem;
     border-bottom: 0.1rem solid #e5e5e5;
+    padding: 0 1rem;
     span{
       float: right;
       font-size: 1.4rem;
@@ -214,13 +214,28 @@
     padding: 0 1rem 0 0;
     border-bottom: 0.1rem solid #e5e5e5;
     text-align: left;
-    font-size: 1.6rem;
     height: 4.4rem;
     line-height: 4.4rem;
     color: #4a4a4a;
 
     &:last-child{
       border:none;
+    }
+    span{
+      &:first-child{
+        font-size: 1.6rem;
+        i{
+          color: @color-theme1;
+        }
+      }
+      &:last-child{
+        font-size: 1.4rem;
+        color: @color-theme3;
+        float: right;
+        i{
+          color: @second-text-color;
+        }
+      }
     }
   }
 }

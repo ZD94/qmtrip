@@ -100,6 +100,13 @@ var airTicket = (function () {
 
     }
 
+    airTicket.AddaddressController = function ($scope) {
+        loading(true);
+    }
+
+    airTicket.AddresslistController = function ($scope) {
+        loading(true);
+    }
     return airTicket;
 })();
 
