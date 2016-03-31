@@ -32,7 +32,7 @@ var travelRecord=(function(){
                         $scope.pages1 = result.pages;
                         var travelList1 = result.items;
                         travelList1.map(function(s){
-                            Q.all([
+                            Promise.all([
                                 API.staff.getStaffByAgency({id:s.accountId}),
                                 API.company.getCompanyById(s.companyId)
                             ])
@@ -40,7 +40,6 @@ var travelRecord=(function(){
                                     s.travelerName = ret1;
                                     s.companyName = ret2;
                                     $scope.travelListitems1 = travelList1;
-                                    $scope.$apply();
                                     loading(true);
                                 })
                                 .catch(function(err) {
@@ -64,7 +63,7 @@ var travelRecord=(function(){
                         $scope.pages2 = result.pages;
                         var travelList2 = result.items;
                         travelList2.map(function(s){
-                            Q.all([
+                            Promise.all([
                                 API.staff.getStaffByAgency({id:s.accountId}),
                                 API.company.getCompanyById(s.companyId)
                             ])
@@ -72,7 +71,6 @@ var travelRecord=(function(){
                                     s.travelerName = ret1;
                                     s.companyName = ret2;
                                     $scope.travelListitems2 = travelList2;
-                                    $scope.$apply();
                                     loading(true);
                                 })
                                 .catch(function(err) {
@@ -96,7 +94,7 @@ var travelRecord=(function(){
                         $scope.pages3 = result.pages;
                         var travelList3 = result.items;
                         travelList3.map(function(s){
-                            Q.all([
+                            Promise.all([
                                 API.staff.getStaffByAgency({id:s.accountId}),
                                 API.company.getCompanyById(s.companyId)
                             ])
@@ -104,7 +102,6 @@ var travelRecord=(function(){
                                     s.travelerName = ret1;
                                     s.companyName = ret2;
                                     $scope.travelListitems3 = travelList3;
-                                    $scope.$apply();
                                     loading(true);
                                 })
                                 .catch(function(err) {
@@ -305,10 +302,9 @@ var travelRecord=(function(){
 
                         });
 
-                        Q.all(hotels)
+                        Promise.all(hotels)
                             .then(function(hotels) {
                                 $scope.hotels = hotels;
-                                $scope.$apply();
                             })
                             .catch(function(err) {
                                 console.info("hotels");
@@ -316,11 +312,10 @@ var travelRecord=(function(){
                                 TLDAlert(err.msg || err);
                             })
 
-                        Q.all(outTraffics)
+                        Promise.all(outTraffics)
                             .then(function(outTraffics) {
                                 $scope.outTraffics = outTraffics;
                                 console.info(outTraffics);
-                                $scope.$apply();
                             })
                             .catch(function(err) {
                                 console.info("outTraffics");
@@ -328,10 +323,9 @@ var travelRecord=(function(){
                                 TLDAlert(err.msg || err);
                             })
 
-                        Q.all(backTraffics)
+                        Promise.all(backTraffics)
                             .then(function(backTraffics) {
                                 $scope.backTraffics = backTraffics;
-                                $scope.$apply();
                             })
                             .catch(function(err) {
                                 console.info("backTraffics");
@@ -342,9 +336,7 @@ var travelRecord=(function(){
                         API.staff.getStaffByAgency({id:$scope.planDetail.accountId})
                             .then(function(result){
                                 $scope.travelerName = result.name;
-                                $scope.$apply();
                             })
-                        $scope.$apply();
                     })
             })
         }

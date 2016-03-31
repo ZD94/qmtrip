@@ -32,7 +32,7 @@ var StaffFirst = (function(){
 						var travelLevel =ret.travelLevel;
 						var str = ret.name;
 						$scope.firstname=str.substring(str.length-2,str.length);
-						Q.all([
+						Promise.all([
 							API.tripPlan.countTripPlanNum({accountId:ret.id}),
 							API.travelPolicy.getTravelPolicy({id: travelLevel})
 						])
@@ -40,12 +40,10 @@ var StaffFirst = (function(){
 							$scope.businesstimes = tripPlanOrders;
 							$scope.travelpolicy = travelPolicy;
 							dataloading(true);
-							$scope.$apply();
 						})
 						.catch(function(err){
 							TLDAlert(err.msg || err)
 						})
-						$scope.$apply();
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err)

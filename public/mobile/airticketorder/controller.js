@@ -73,8 +73,6 @@ var airTicket = (function () {
                     console.log(data);
                     $scope.user = data;
                     console.log( $scope.user.name );
-
-                    $scope.$apply();
                 })
                 .catch(function (err) {
                     TLDAlert(err.msg || err)

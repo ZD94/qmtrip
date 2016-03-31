@@ -58,7 +58,6 @@ var businesstravel=(function(){
                     })
                     .spread(function(purposeCode, purposeName) {
                         $scope.purposeName = purposeName;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -158,7 +157,6 @@ var businesstravel=(function(){
                         $scope.startCityName = startCityName;
                         $scope.startCityCode = startCityCode;
                         $('#startCity').attr('code',$scope.startCityCode);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -195,7 +193,6 @@ var businesstravel=(function(){
                         $scope.endCityName = endCityName;
                         $scope.endCityCode = endCityCode;
                         $('#endCity').attr('code',$scope.endCityCode);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -210,7 +207,6 @@ var businesstravel=(function(){
             })
                 .then(function(startDate) {
                     $scope.startDate = startDate;
-                    $scope.$apply();
                 })
                 .catch(function(err) {
                     console.error(err);
@@ -231,7 +227,6 @@ var businesstravel=(function(){
             })
                 .then(function(endDate) {
                     $scope.endDate = endDate;
-                    $scope.$apply();
                 })
                 .catch(function(err) {
                     console.error(err);
@@ -368,7 +363,6 @@ var businesstravel=(function(){
                         $scope.hotelCityName = hotelCityName;
                         $scope.hotelCityCode = hotelCityCode;
                         $('#hotelCity').attr('code',$scope.hotelCityCode);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -405,7 +399,6 @@ var businesstravel=(function(){
                         $scope.hotelPlaceName = hotelPlaceName;
                         $scope.hotelPlaceCode = hotelPlaceCode;
                         $('#hotelName').attr('code',$scope.hotelPlaceCode);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -420,7 +413,6 @@ var businesstravel=(function(){
             })
                 .then(function(startHotelDate) {
                     $scope.startHotelDate = startHotelDate;
-                    $scope.$apply();
                 })
                 .catch(function(err) {
                     console.error(err);
@@ -441,7 +433,6 @@ var businesstravel=(function(){
             })
                 .then(function(endHotelDate) {
                     $scope.endHotelDate = endHotelDate;
-                    $scope.$apply();
                 })
                 .catch(function(err) {
                     console.error(err);
@@ -533,7 +524,7 @@ var businesstravel=(function(){
         //只选交通
         if ($scope.isTraffic && !$scope.isHotel) {
             API.onload(function() {
-                Q.all([
+                Promise.all([
                     API.staff.getCurrentStaff(),
                     API.travelBudget.getTrafficBudget({
                         originPlace:$scope.startCityCode,
@@ -570,8 +561,6 @@ var businesstravel=(function(){
                         if (ret2.backTraffic.type == 'train') {
                             $scope.backTrafficType = 'TRAIN';
                         }
-                        $scope.$apply();
-
                     })
                     .catch(function(err){
                         console.info (err);
@@ -583,7 +572,7 @@ var businesstravel=(function(){
         //只选住宿
         if (!$scope.isTraffic && $scope.isHotel) {
             API.onload(function() {
-                Q.all([
+                Promise.all([
                     API.staff.getCurrentStaff(),
                     API.travelBudget.getHotelBudget({
                         cityId:$scope.hotelCityCode,
@@ -598,7 +587,6 @@ var businesstravel=(function(){
                         $scope.onlyHotel = ret2;
                         $scope.totalPrice = ret2.price;
                         $scope.hotelPrice = ret2.price;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -610,7 +598,7 @@ var businesstravel=(function(){
         //选择交通和住宿
         if ($scope.isTraffic && $scope.isHotel) {
             API.onload(function() {
-                Q.all([
+                Promise.all([
                     API.staff.getCurrentStaff(),
                     API.travelBudget.getTravelPolicyBudget({
                         originPlace:$scope.startCityCode,
@@ -653,7 +641,6 @@ var businesstravel=(function(){
                         if (ret2.backTraffic.type == 'train') {
                             $scope.backTrafficType = 'TRAIN';
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);

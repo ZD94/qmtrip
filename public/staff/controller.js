@@ -12,7 +12,6 @@ module.exports = (function(){
             API.staff.getCurrentStaff()
                 .then(function (ret) {
                     $scope.staff = ret;
-                    $scope.$apply();
                 })
                 .catch(function (err) {
                     TLDAlert(err.msg || err)

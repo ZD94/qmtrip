@@ -31,7 +31,7 @@ module.exports = (function() {
                             $scope.power = "普通员工";
                         }
 
-                        Q.all([
+                        Promise.all([
                             API.tripPlan.statPlanOrderMoney({}),
                             API.travelPolicy.getTravelPolicy({id: travelLevel}),
                             API.tripPlan.pageTripPlanOrder({isHasBudget: false}),
@@ -50,8 +50,6 @@ module.exports = (function() {
                                 $scope.total1 = plan_status_1.total;
                                 $scope.total2 = plan_status_2.total;
                                 $scope.total3 = plan_status_3.total;
-                                $scope.$apply();
-
                                 function judge(id){
                                     var num = $('#'+id).text();
                                     if(num == 0){
@@ -74,7 +72,6 @@ module.exports = (function() {
                             .catch(function(err){
                                 TLDAlert(err.msg || err)
                             })
-                        $scope.$apply();
                         loading(true);
                     })
                     .catch(function(err){
@@ -117,7 +114,6 @@ module.exports = (function() {
             API.travelPolicy.getCurrentStaffTp()
                 .then(function(travelPolicy){
                     $scope.travelpolicy = travelPolicy;
-                    $scope.$apply();
                 })
                 .catch(function(err){
                     console.info(err || err.msg);

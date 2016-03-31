@@ -439,7 +439,7 @@ agency.deleteAgencyByTest = function(params){
 }
 
 var isInit = false;
-agency.__initHttpApp = function() {
+agency.__initOnce = function() {
     logger.info("初始化默认代理商...");
     if(isInit) {
         return;

@@ -17,7 +17,6 @@ var StaffAwardPlan=(function(){
                 .then(function(point){
                     console.info(point);
                     $scope.point = point;
-                    $scope.$apply();
                 })
                 .catch(function(err){
                     TLDAlert(err.msg || err);

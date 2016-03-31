@@ -27,7 +27,7 @@ var UsersFirst = (function(){
 						var start = moment().startOf('Month').format('YYYY-MM-DD 00:00:00');
 						var end = moment().endOf('Month').format('YYYY-MM-DD 23:59:59');
 						$scope.companyId = company_id;
-						Q.all([
+						Promise.all([
 							API.company.getCompanyFundsAccount(),
 							API.staff.statisticStaffs({companyId:company_id}),
 							API.travelPolicy.getLatestTravelPolicy({}),
@@ -50,12 +50,10 @@ var UsersFirst = (function(){
 									$scope.different = "持平 0%"
 								}
 								$scope.initCharts(date.qmBudget,date.planMoney,date.expenditure);
-								$scope.$apply();
 							})
 							.catch(function(err){
 								TLDAlert(err.msg || err)
 							})
-						$scope.$apply();
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err)
@@ -65,7 +63,7 @@ var UsersFirst = (function(){
 		$scope.initCorpMain();
 
 		API.onload(function(){
-			Q.all([
+			Promise.all([
 				API.travelPolicy.listAndPaginateTravelPolicy({}),
 				API.department.getFirstClassDepartments({companyId:$scope.companyId})
 			])

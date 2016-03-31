@@ -196,18 +196,19 @@ var travelplan = (function () {
                              )
                              })
 
-                             Q.all(list.items)
+                             Promise.all(list.items)
                              .then(function(ret){
                              $scope.planlist = ret;
                              ret.map(function(s){
                              })
-                             $scope.$apply();
                              })
                              .catch(function(err){
                              TLDAlert(err.msg || err)
                              })
                              */
-                            $scope.$apply();
+
+                            //$scope.$apply();
+
                             loading(true);
                         }
                     )
@@ -317,7 +318,9 @@ var travelplan = (function () {
                                 ;
                             })();
 
-                            $scope.$apply();
+
+                            //$scope.$apply();
+
                             loading(true);
                         }
                     )
@@ -378,7 +381,9 @@ var travelplan = (function () {
                             })
                             .then(function (outTrafficBookListUrl) {
                                 $scope.URL.outTrafficBookListUrl = outTrafficBookListUrl;
-                                $scope.$apply();
+
+                                //$scope.$apply();
+
                                 window.location.href = $scope.URL.outTrafficBookListUrl;
                             })
                             .catch(function (err) {
@@ -400,7 +405,9 @@ var travelplan = (function () {
                         })
                         .then(function (backTrafficBookListUrl) {
                             $scope.URL.backTrafficBookListUrl = backTrafficBookListUrl;
-                            $scope.$apply();
+
+                            //$scope.$apply();
+
                             window.location.href = $scope.URL.backTrafficBookListUrl;
                         })
                         .catch(function (err) {
@@ -419,7 +426,9 @@ var travelplan = (function () {
                         })
                         .then(function (r) {
                             $scope.URL.hotelBookListUrl = r;
-                            $scope.$apply();
+
+                            //$scope.$apply();
+
                             console.log($scope.URL.hotelBookListUrl);
                             window.location.href = $scope.URL.hotelBookListUrl;
                         })
@@ -452,7 +461,9 @@ var travelplan = (function () {
                             API.tripPlan.commitTripPlanOrder($scope.ITEM.id)
                                 .then(function (result) {
                                     $scope.getData($routeParams.orderId);
-                                    $scope.$apply();
+
+                                    //$scope.$apply();
+
                                     msgbox.log("提交审核成功");
                                 })
                                 .catch(function (err) {
@@ -512,7 +523,9 @@ var travelplan = (function () {
                     return API.attachment.previewSelfImg({fileId: invoiceDetail.newInvoice})
                         .then(function (invoiceImg) {
                             $scope.invoiceImg = invoiceImg;
-                            $scope.$apply();
+
+                            //$scope.$apply();
+
                             loading(true);
                         })
                 })

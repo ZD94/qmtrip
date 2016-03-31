@@ -6,6 +6,42 @@ test.IndexController = function($scope){
     loading(true);
 }
 
+test.StaffController = function($scope, $q, StaffCache){
+    loading(true);
+    var Cookie = require('tiny-cookie');
+    console.log(Cookie.get('user_id'));
+    $scope.staff = StaffCache.get(Cookie.get('user_id'));
+    $scope.staff2 = $scope.staff;
+    //$scope.staff2 =  $q(function(resolve, reject) {
+    //    $scope.staff.then(resolve, reject);
+    //});
+    $scope.staff.then(function(staff){
+        $scope.staff_id = staff.id;
+    });
+}
+
+test.AsyncController = function($scope, $q, $timeout) {
+    loading(true);
+    var get_user = function() {
+        return new Promise(function(resolve, reject){
+            window.setTimeout(function() {
+                resolve({id:1000, name:'Clear'});
+            }, 2000);
+        });
+    };
+    $scope.user = get_user();
+
+    var getMessages = function() {
+        var deferred = $q.defer();
+        $timeout(function() {
+            deferred.resolve(['Hello', 'world!']);
+        }, 2000);
+        return deferred.promise;
+    };
+    $scope.messages = getMessages();
+}
+
+
 test.MsgboxController = function($scope){
     loading(true);
     $scope.msgbox = msgbox;
@@ -52,28 +88,6 @@ test.SelectController = function($scope) {
         $scope.selectOpt.value = 'a' + num;
     }
 };
-
-test.AsyncController = function($scope, $q, $timeout) {
-    loading(true);
-    var get_user = function() {
-        return new Promise(function(resolve, reject){
-            window.setTimeout(function() {
-                resolve({id:1000, name:'Clear'});
-            }, 2000);
-        });
-    };
-    $scope.user = get_user();
-
-    var getMessages = function() {
-        var deferred = $q.defer();
-        $timeout(function() {
-            deferred.resolve(['Hello', 'world!']);
-        }, 2000);
-        return deferred.promise;
-    };
-    $scope.messages = getMessages();
-}
-
 
 test.IconController = function($scope){
     loading(true);

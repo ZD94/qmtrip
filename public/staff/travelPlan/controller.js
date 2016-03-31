@@ -36,7 +36,6 @@ var travelPlan=(function(){
                         $scope.planListitems = result.items;
                         loading(true);
                         console.info ($scope.total1);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -52,7 +51,6 @@ var travelPlan=(function(){
                         console.info (result);
                         $scope.total2 = result.total;
                         $scope.planListitems2 = result.items;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -67,7 +65,6 @@ var travelPlan=(function(){
                     .then(function(result){
                         $scope.total3 = result.total;
                         $scope.planListitems3 = result.items;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -82,7 +79,6 @@ var travelPlan=(function(){
                     .then(function(result){
                         $scope.total4 = result.total;
                         $scope.finishPlanListitems = result.items;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -199,7 +195,6 @@ var travelPlan=(function(){
                 API.tripPlan.deleteTripPlanOrder({orderId: 'f0f4f8c0-b5e6-11e5-88bb-9f621eb43a70'})
                     .then(function(result){
                         console.info (result);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -255,7 +250,6 @@ var travelPlan=(function(){
                             })
                             .then(function(outTrafficBookListUrl){
                                 $scope.outTrafficBookListUrl = outTrafficBookListUrl;
-                                $scope.$apply();
                             })
                             .catch(function(err){
                                 TLDAlert(err.msg || err);
@@ -274,7 +268,6 @@ var travelPlan=(function(){
                             })
                             .then(function(backTrafficBookListUrl){
                                 $scope.backTrafficBookListUrl = backTrafficBookListUrl;
-                                $scope.$apply();
                             })
                             .catch(function(err){
                                 TLDAlert(err.msg || err);
@@ -291,14 +284,12 @@ var travelPlan=(function(){
                             })
                             .then(function(hotelBookListUrl){
                                 $scope.hotelBookListUrl = hotelBookListUrl;
-                                $scope.$apply();
                             })
                             .catch(function(err){
                                 TLDAlert(err.msg || err);
                             })
                         }
                         loading(true);
-                        $scope.$apply();
                         $('.warning i').hover(function(){
                             $('.special_warning').hide();
                             $(this).siblings('.special_warning').show();
@@ -517,7 +508,6 @@ var travelPlan=(function(){
                 return  API.attachment.previewSelfImg({fileId: invoiceDetail.newInvoice})
                 .then(function(invoiceImg) {
                     $scope.invoiceImg = invoiceImg;
-                    $scope.$apply();
                 })
             })
             .catch(function(err){

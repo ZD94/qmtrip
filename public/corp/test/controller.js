@@ -47,7 +47,7 @@ test2.PagesController = function($scope){
                                 })
                         })
 
-                        Q.all(planlist)
+                        Promise.all(planlist)
                             .then(function(ret){
                                 $scope.planlist = ret;
                                 ret.map(function(s){
@@ -96,7 +96,6 @@ test2.PagesController = function($scope){
                                     }
                                     return s;
                                 })
-                                $scope.$apply();
                             })
                             .catch(function(err){
                                 TLDAlert(err.msg || err)

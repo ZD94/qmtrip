@@ -16,10 +16,13 @@
         var jQuery = $ = require('jquery');
     </script>
 	<script type="text/javascript" src="/script/libs/bundle.browserify.js"></script>
-    <script type="text/javascript" src="/script/libs/bundle.api.js"></script>
+	<script type="text/javascript" src="/script/libs/bundle.base.js"></script>
+	<script type="text/javascript" src="/script/libs/bundle.api.js"></script>
 	<script type="text/javascript" src="/script/jqPaginator.js"></script>
 	<script type="text/javascript" src="/script/libs/bundle.msgbox.js"></script>
 	<script type="text/javascript" src="/script/libs/bundle.img.js"></script>
+	<script type="text/javascript" src="/script/libs/bundle.angular.js"></script>
+	<script type="text/javascript" src="/script/libs/bundle.nglibs.js"></script>
 	<script type="text/javascript" src="/script/libs/bundle.ngapp.js"></script>
 	<script>
 		var Cookie = require('tiny-cookie');
@@ -44,7 +47,6 @@
     <script type="text/javascript" src="/script/jquery.ajaxfileupload.js"></script>
     <script type="text/javascript" src="/corp/controller.all.js"></script>
     <script type="text/javascript">
-    	var Q = require('q');
     	var moment = require('moment');
 		var TLD = TLD_angular_app('tulingdao.com', 'corp', '/UsersFirst/UserMain');
 		API.onlogin(function(){
@@ -93,9 +95,7 @@
 		    					}else{
 		    						$scope.companyName = companyName;
 		    					}
-		    					$scope.$apply();
 		    				})
-    					$scope.$apply();
     				})
     				.catch(function(err){
     					TLDAlert(err);
