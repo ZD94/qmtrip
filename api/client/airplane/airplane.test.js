@@ -49,7 +49,7 @@ describe("api/client/tripPlan.js", function() {
             arrivalPlace: '上海',
             arrivalPlaceCode: 'SH123',
             invoiceType: 'PLANE',
-            budget: 1000,
+            budget: 1000
         }]
     };
 
@@ -123,7 +123,7 @@ describe("api/client/tripPlan.js", function() {
         var params = {
             flight_no: "MU5693",
             ip_address: '192.168.1.3',
-            query_key: query_key
+            query_key: '201603301859437592'
         };
         API.client.airplane.get_plane_details.call({accountId: staffId}, params, function(err, ret) {
             if(err) {
