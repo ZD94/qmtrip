@@ -17,7 +17,7 @@ var travelRecord=(function(){
      * @param $scope
      * @constructor
      */
-    travelRecord.TravelListController = function($scope) {
+    travelRecord.TravelListController = function($scope, $loading) {
         $("title").html("出差单列表");
         //全部
         $scope.initTravelList1 = function () {
@@ -39,7 +39,7 @@ var travelRecord=(function(){
                                     s.travelerName = ret1;
                                     s.companyName = ret2;
                                     $scope.travelListitems1 = travelList1;
-                                    loading(true);
+                                    $loading.end();
                                 })
                                 .catch(function(err) {
                                     TLDAlert(err.msg || err);
@@ -70,7 +70,7 @@ var travelRecord=(function(){
                                     s.travelerName = ret1;
                                     s.companyName = ret2;
                                     $scope.travelListitems2 = travelList2;
-                                    loading(true);
+                                    $loading.end();
                                 })
                                 .catch(function(err) {
                                     TLDAlert(err.msg || err);
@@ -101,7 +101,7 @@ var travelRecord=(function(){
                                     s.travelerName = ret1;
                                     s.companyName = ret2;
                                     $scope.travelListitems3 = travelList3;
-                                    loading(true);
+                                    $loading.end();
                                 })
                                 .catch(function(err) {
                                     TLDAlert(err.msg || err);
@@ -199,7 +199,7 @@ var travelRecord=(function(){
      * @param $scope
      * @constructor
      */
-    travelRecord.TravelDetailController = function($scope, $routeParams, $location, $anchorScroll) {
+    travelRecord.TravelDetailController = function($scope, $routeParams, $location, $loading, $anchorScroll) {
         $("title").html("出差单明细");
         var orderId = $routeParams.orderId;
         $scope.initTravelDetail = function () {
@@ -342,22 +342,21 @@ var travelRecord=(function(){
 
 
         $scope.outTraffichref = function () {
-            loading(true);
+            $loading.end();
             $location.hash('outTraffic');
             $anchorScroll();
 
         }
         $scope.hotelhref = function () {
-            loading(true);
+            $loading.end();
             $location.hash('hotel');
             $anchorScroll();
 
         }
         $scope.backTraffichref = function () {
-            loading(true);
+            $loading.end();
             $location.hash('backTraffic');
             $anchorScroll();
-
         }
 
 

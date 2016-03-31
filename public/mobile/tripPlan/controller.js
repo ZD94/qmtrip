@@ -37,7 +37,6 @@
                     picture: picture
                 }, callback);
         }
- 		loading(true);
  		var planId = $routeParams.planId;
         $scope.initall = function() {
             API.onload(function(){

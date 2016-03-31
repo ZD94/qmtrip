@@ -23,7 +23,6 @@ var StaffFirst = (function(){
 		$(".staff_menu_t ul a").eq(0).find("li").addClass("on");
 		//企业管理首页信息
 		$scope.initStaffUser = function(){
-			// loading(true)
 			API.onload(function(){
 				API.staff.getCurrentStaff()
 					.then(function(ret){

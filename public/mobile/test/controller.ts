@@ -1,12 +1,11 @@
 "use strict";
 
-declare function loading(boolean) : void;
 declare var msgbox: any;
 
 export function IndexController($scope){
 }
 
-export async function StaffController($scope, $q, StaffCache){
+export async function StaffController($scope, $loading, StaffCache){
     var Cookie = require('tiny-cookie');
     var current_staff_id = Cookie.get('user_id');
     console.log(current_staff_id);
