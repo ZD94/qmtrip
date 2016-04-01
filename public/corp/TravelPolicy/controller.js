@@ -14,7 +14,7 @@ var TravelPolicy=(function(){
      * @param $scope
      * @constructor
      */
-    TravelPolicy.PolicyListController = function($scope) {
+    TravelPolicy.PolicyListController = function($scope, $loading) {
         $("title").html("差旅标准");
         Myselect();
         $(".left_nav li").removeClass("on").eq(3).addClass("on");
@@ -23,7 +23,6 @@ var TravelPolicy=(function(){
             API.staff.getCurrentStaff()
                 .then(function(ret){
                     $scope.company_id = ret.companyId;
-                    $scope.$apply();
                 })
                 .catch(function(err){
                     TLDAlert(err.msg || err)
@@ -32,7 +31,7 @@ var TravelPolicy=(function(){
 
         //获取差旅标准列表
         $scope.initPolicyList = function () {
-            loading(false);
+            $loading.start();
             API.onload(function(){
                 var params = {};
                 var options = {order: [["create_at", "asc"]]};
@@ -56,8 +55,7 @@ var TravelPolicy=(function(){
                                 $(".policy_title").addClass('policy_titlefixed');
                             }
                         });
-                        loading(true);
-                        $scope.$apply();
+                        $loading.end();
                     })
                     .catch(function(err){
                         console.info (err);

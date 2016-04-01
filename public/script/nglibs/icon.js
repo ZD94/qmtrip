@@ -123,5 +123,4 @@ module.exports = function ($module){
 
     });
 
-
 }

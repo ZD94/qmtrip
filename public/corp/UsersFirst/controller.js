@@ -50,12 +50,10 @@ var UsersFirst = (function(){
 									$scope.different = "持平 0%"
 								}
 								$scope.initCharts(date.qmBudget,date.planMoney,date.expenditure);
-								$scope.$apply();
 							})
 							.catch(function(err){
 								TLDAlert(err.msg || err)
 							})
-						$scope.$apply();
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err)

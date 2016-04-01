@@ -11,13 +11,12 @@ module.exports = (function(){
 	API.require('department');
 	API.require('travelPolicy');
 	var companyList ={};
-	companyList.CompanyListController = function($scope){
-		loading(true);
+	companyList.CompanyListController = function($scope, $loading){
 		$("title").html("公司列表");
 		//企业管理首页信息
 		$scope.initCompanyList = function(){
 			$(".left_nav li").removeClass("on").eq(1).addClass("on");
-			loading(false);
+			$loading.start();
 			API.onload(function(){
 				API.company.getCompanyListByAgency({page:$scope.page,perPage:20})
 					.then(function(ret){
@@ -50,8 +49,7 @@ module.exports = (function(){
 					})
 					.then(function(companylist){
 						$scope.companylist = companylist;
-						$scope.$apply();
-                        loading(true);
+						$loading.end();
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err);
@@ -89,15 +87,14 @@ module.exports = (function(){
 			window.location.href = "#/companyList/CreateCorp";
 		}
 	}
-	companyList.CompanyDetailController = function($scope,$routeParams){
-		loading(true);
+	companyList.CompanyDetailController = function($scope,$routeParams,$loading){
 		$("title").html("公司详情");
 		var companyId = $routeParams.company;
 		$scope.companyId = companyId;
 		//企业管理详情页
 		$scope.initCompanyDetail = function(){
 			$(".left_nav li").removeClass("on").eq(1).addClass("on");
-			loading(false);
+			$loading.start();
 			API.onload(function(){
 				API.company.getCompanyById(companyId)
 					.then(function(company){
@@ -106,8 +103,7 @@ module.exports = (function(){
 						var staffId = company.createUser;
 						var companyId = company.id;
 						console.info(company)
-						$scope.$apply();
-                        loading(true);
+						$loading.end();
                         Promise.all([
                         	API.staff.getStaffByAgency({id:staffId}),
                         	API.company.getCompanyFundsAccountByAgency(companyId),
@@ -122,7 +118,6 @@ module.exports = (function(){
                         	$scope.funds = funds;
                         	$scope.staffnum = staffnum.all;
 								$scope.points = points;
-                        	$scope.$apply();
                         })
 					})
 					.catch(function(err){
@@ -143,7 +138,6 @@ module.exports = (function(){
 					.then(function(result){
 						console.info(result);
 						$scope.initCompanyDetail();
-						$scope.$apply();
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err);;
@@ -154,7 +148,6 @@ module.exports = (function(){
 
 	//创建公司页面
 	companyList.CreateCorpController = function($scope) {
-		loading(true);
 		$scope.createCorp = function(){
 			var corpname = $("#corpName").val();
 			var name = $("#connectName").val();
@@ -205,7 +198,6 @@ module.exports = (function(){
 
 	//创建公司页面
 	companyList.CreateCorpController = function($scope) {
-		loading(true);
 		$scope.createCorp = function(){
 			var corpname = $("#corpName").val();
 			var name = $("#connectName").val();
@@ -253,7 +245,6 @@ module.exports = (function(){
 
 	//员工管理页面
 	companyList.StaffListController = function($scope,$routeParams) {
-		loading(true);
 		var companyId = $routeParams.company;
 		$scope.companyId = companyId;
 		$(".left_nav li").removeClass("on").eq(1).addClass("on");
@@ -307,7 +298,6 @@ module.exports = (function(){
 											$staff.activeStatus = acc.status;
 											$staff.accStatus = acc.status==0?'未激活':'';
 										}
-										$scope.$apply();
 									})
 							});
 						//统计企业员工（管理员 普通员工 未激活员工）数量
@@ -315,10 +305,7 @@ module.exports = (function(){
 						$scope.manager = staffRole.adminNum;
 						$scope.publicStaff = staffRole.commonStaffNum;
 						$scope.totalCount = staffRole.totalCount;
-						return Promise.all(tasks)
-							.then(function(){
-								$scope.$apply();
-							})
+						return Promise.all(tasks);
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
 					})
@@ -398,13 +385,9 @@ module.exports = (function(){
 											$staff.activeStatus = acc.status;
 											$staff.accStatus = acc.status==0?'未激活':'';
 										}
-										$scope.$apply();
 									})
 							});
-						return Promise.all(tasks)
-							.then(function(){
-								$scope.$apply();
-							})
+						return Promise.all(tasks);
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err);;
@@ -453,13 +436,9 @@ module.exports = (function(){
 											$staff.activeStatus = acc.status;
 											$staff.accStatus = acc.status==0?'未激活':'';
 										}
-										$scope.$apply();
 									})
 							});
-						return Promise.all(tasks)
-							.then(function(){
-								$scope.$apply();
-							})
+						return Promise.all(tasks);
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err);;
@@ -519,7 +498,6 @@ module.exports = (function(){
 								$("#staffPower").val("");
 							}
 							$scope.initstafflist();
-							$scope.$apply();
 						}).catch(function (err) {
 							console.log(err);
 							if(err.code == -29){
@@ -530,7 +508,6 @@ module.exports = (function(){
 								$scope.block_tip_err = err.msg;
 							}
 							$(".block_tip").show();
-							$scope.$apply();
 						}).done();
 				})
 			}
@@ -545,7 +522,6 @@ module.exports = (function(){
 					.then(function(staffinfo){
 						$scope.travellevel = staffinfo.staff.travelLevel;
 						$scope.selectkey = $scope.travellevel || "";
-						$scope.$apply();
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
 					}).done();
@@ -573,7 +549,6 @@ module.exports = (function(){
 						$(".add_staff2").hide();
 						//$scope.initstafflist();
 						$scope.initstafflist();
-						$scope.$apply();
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
 					}).done();
@@ -593,7 +568,6 @@ module.exports = (function(){
 				API.staff.agencyDeleteStaff({id:id,companyId: companyId})
 					.then(function(newStaff){
 						$scope.staffs.splice(index, 1);
-						$scope.$apply();
 						$scope.initstafflist();
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
@@ -661,7 +635,6 @@ module.exports = (function(){
 						$scope.downloadValidData = allData.downloadAddObj;
 						$scope.validData = JSON.parse(allData.addObj).length;
 						$scope.invalidData = JSON.parse(allData.noAddObj).length;
-						$scope.$apply();
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err);;
@@ -690,7 +663,6 @@ module.exports = (function(){
 					.then(function(result){
 						var filename = result.fileName;
 						window.open('/download/excle-file/'+filename, "_blank");
-						$scope.$apply();
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
 					})
@@ -712,7 +684,6 @@ module.exports = (function(){
 						$(".staff_tab_valid").hide();
 						$(".staff_tab_content").hide();
 						$(".staff_tab_import").hide();
-						$scope.$apply();
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
 					}).done();
@@ -722,12 +693,12 @@ module.exports = (function(){
 
 
 	//组织架构页面
-	companyList.DepartmentController = function($scope, $routeParams) {
+	companyList.DepartmentController = function($scope, $routeParams, $loading) {
 		$("title").html("组织架构");
-		loading(false);
 		//初始化
 		$scope.companyId = $routeParams.companyId;
 		$scope.initdepartment = function(){
+			$loading.start();
 			API.onload(function(){
 				API.department.agencyGetFirstClassDepartments({companyId:$scope.companyId})
 					.then(function(defaulDepartment){
@@ -744,12 +715,10 @@ module.exports = (function(){
 										.then(function(num){
 											s.peoplenum = num;
 											console.info ($scope.departmentlist);
-											$scope.$apply();
 										})
 								});
 							})
-						$scope.$apply();
-						loading(true);
+						$loading.end();
 					})
 			})
 		}
@@ -856,14 +825,14 @@ module.exports = (function(){
 	 * @param $scope
 	 * @constructor
 	 */
-	companyList.PolicyListController = function($scope, $routeParams) {
+	companyList.PolicyListController = function($scope, $routeParams, $loading) {
 		$("title").html("差旅标准");
 		Myselect();
 		$scope.companyId = $routeParams.companyId;
 
 		//获取差旅标准列表
 		$scope.initPolicyList = function () {
-			loading(false);
+			$loading.start();
 			API.onload(function(){
 				var params = {};
 				var options = {order: [["create_at", "asc"]]};
@@ -887,8 +856,7 @@ module.exports = (function(){
 								$(".policy_title").addClass('policy_titlefixed');
 							}
 						});
-						loading(true);
-						$scope.$apply();
+						$loading.end();
 					})
 					.catch(function(err){
 						console.info (err);

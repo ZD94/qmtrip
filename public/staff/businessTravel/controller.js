@@ -26,7 +26,6 @@ var businessTravel=(function(){
     businessTravel.IndexController = function($scope) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
-        loading(true);
         $("title").html("我要出差");
         Myselect();
 
@@ -39,7 +38,6 @@ var businessTravel=(function(){
                             $(".PurposeNamelist").show();
                         }
                         console.info (result);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.log(err);
@@ -93,7 +91,6 @@ var businessTravel=(function(){
     businessTravel.TrafficStepController = function($scope, $routeParams) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
-        loading(true);
         $("title").html("我要出差");
         Myselect();
         var purposename = $routeParams.purposename;
@@ -108,7 +105,6 @@ var businessTravel=(function(){
                         if ($scope.startplaceitems.length) {
                             $(".placelist1").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         $(".placelist1").hide();
@@ -134,7 +130,6 @@ var businessTravel=(function(){
                         if ($scope.endplaceitems.length) {
                             $(".placelist2").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.log(err);
@@ -284,7 +279,6 @@ var businessTravel=(function(){
     businessTravel.LiveStepController = function($scope, $routeParams) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
-        loading(true);
         $("title").html("我要出差");
         Myselect();
         var purposename = $routeParams.purposename;
@@ -299,7 +293,6 @@ var businessTravel=(function(){
                         if ($scope.endplaceitems.length) {
                             $(".placelist1").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -327,7 +320,6 @@ var businessTravel=(function(){
                         if (!$scope.liveplaceitems.length) {
                             $(".placelist2").hide();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -432,7 +424,6 @@ var businessTravel=(function(){
     businessTravel.TrafficLiveController = function($scope, $routeParams) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
-        loading(true);
         $("title").html("我要出差");
         Myselect();
         var purposename = $routeParams.purposename;
@@ -447,7 +438,6 @@ var businessTravel=(function(){
                         if ($scope.startplaceitems.length) {
                             $(".placelist1").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -472,7 +462,6 @@ var businessTravel=(function(){
                         if ($scope.endplaceitems.length) {
                             $(".placelist2").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -498,7 +487,6 @@ var businessTravel=(function(){
                         if ($scope.liveplaceitems.length) {
                             $(".placelist2").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -711,8 +699,6 @@ var businessTravel=(function(){
             et = $routeParams.et;
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
-        loading(false);
-        loading(true);
         $("title").html("我要出差");
         var tra = $routeParams.tra;
         var liv = $routeParams.liv;
@@ -773,7 +759,6 @@ var businessTravel=(function(){
                         $scope.totalprice = ret2.price;
                         $scope.goTraffic = ret2.goTraffic.price;
                         $scope.backTraffic = ret2.backTraffic.price;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -808,7 +793,6 @@ var businessTravel=(function(){
                         $(".createresult,.tianxun").show();
                         $scope.totalprice = ret2.price;
                         $scope.liveprice = $scope.onlylive.price;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -880,7 +864,6 @@ var businessTravel=(function(){
                         $scope.liveprice = $scope.trafficlive.hotel;
                         $scope.goTraffic = ret2.goTraffic.price;
                         $scope.backTraffic = ret2.backTraffic.price;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);

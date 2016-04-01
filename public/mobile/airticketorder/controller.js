@@ -10,6 +10,7 @@ var airTicket = (function () {
     API.require('attachment');
     API.require('staff');
     API.require('travelBudget');
+    API.require('qm_order');
 
     var airTicket = {};
 
@@ -18,8 +19,11 @@ var airTicket = (function () {
      * @param $scope
      * @constructor
      */
-    airTicket.OrderDetailsController = function ($scope, $routeParams) {
-        loading(true);
+
+    airTicket.OrderDetailsController = function ( $scope,$routeParams ) {
+
+        $scope.user;
+        $scope.order;
 
         //settings
         $scope.deliveryAddressShown = false;
@@ -30,11 +34,49 @@ var airTicket = (function () {
             };
         }
 
+        $scope.renderStatus = function(){
+            var statuses = {
+                CANCEL: '已取消',
+                OUT_TICKET: '已出票',
+                PAY_FAILED: '支付失败',
+                PAY_SUCCESS: '支付成功',
+                REFUND: '已退款',
+                REFUNDING: '退款中',
+                WAIT_PAY: '待支付',
+                WAIT_TICKET: '待出票'
+            };
+            return statuses[ $scope.order.status ]||'';
+        }
+
+        API.onload( function(){
+            console.log( API.staff,API.qm_order );
+            
+            API.staff
+                .getCurrentStaff()
+                .then( function(data){
+                    console.log(data);
+                    $scope.user = data;
+                    console.log( $scope.user.name );
+                })
+                .catch(function (err) {
+                    TLDAlert(err.msg || err)
+                });
+            
+            API.qm_order
+                .get_qm_order( {order_id:'c9e5e1f0-f7b7-11e5-be3e-c152128a2f71'} )
+                .then( function(data){
+                    $scope.order = data;
+                    console.log( data );
+                })
+                .catch(function (err) {
+                    TLDAlert(err.msg || err)
+                });
+
+        });
+
     }
 
     airTicket.InfoEditingController = function ($scope, $routeParams) {
-        loading(true);
-
         //console.log( id_validation('370683198909072254').isValid() );
 
         $scope.user;
@@ -66,19 +108,19 @@ var airTicket = (function () {
         }
         
         API.onload( function(){
-            console.log( API.staff );
+            console.log( API.staff,API.qm_order );
+            
             API.staff
                 .getCurrentStaff()
                 .then( function(data){
                     console.log(data);
                     $scope.user = data;
                     console.log( $scope.user.name );
-
-                    $scope.$apply();
                 })
                 .catch(function (err) {
                     TLDAlert(err.msg || err)
-                })
+                });
+
         });
 
         $(document).ready(function(){
