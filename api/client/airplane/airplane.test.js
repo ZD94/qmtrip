@@ -5,7 +5,7 @@
 var assert = require("assert");
 var API = require("common/api");
 
-describe("api/client/tripPlan.js", function() {
+describe("api/client/airplane.js", function() {
 
     var agencyId = "";
     var agencyUserId = "";
@@ -111,7 +111,6 @@ describe("api/client/tripPlan.js", function() {
             if(err) {
                 throw err;
             }
-            console.info(ret);
             query_key = ret[0].query_key;
             done();
         });
@@ -129,7 +128,6 @@ describe("api/client/tripPlan.js", function() {
             if(err) {
                 throw err;
             }
-            console.info(ret);
             done();
         });
     });
@@ -171,7 +169,6 @@ describe("api/client/tripPlan.js", function() {
             if(ret.toJSON) {
                 ret = ret.toJSON();
             }
-            console.info(ret);
             done();
         });
     });

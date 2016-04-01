@@ -81,7 +81,7 @@ function book_ticket(params) {
     params.flight_list = _flight_list;
     return API.tripPlan.getConsumeDetail({consumeId: params.consume_id})
         .then(function(consume) {
-            if(consume.orderStatus !== 'WAIT_UPLOAD') {
+            if(consume.orderStatus !== 'WAIT_BOOK') {
                 throw {code: -2, msg: '预定失败，请检查出差记录状态'};
             }
 
