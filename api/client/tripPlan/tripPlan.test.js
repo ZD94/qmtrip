@@ -109,7 +109,6 @@ describe("api/client/tripPlan.js", function() {
                     throw err;
                 }
                 orderId = ret.id;
-                console.info(ret.hotel);
                 //assert.equal(ret.status, 0);
                 done();
             })
@@ -146,6 +145,7 @@ describe("api/client/tripPlan.js", function() {
 
 
     describe("deleteTripPlanOrder", function(){
+        var consume_id = '';
         var tripPlanOrder = {
             startPlace: '北京',
             destination: '上海',
@@ -165,13 +165,23 @@ describe("api/client/tripPlan.js", function() {
             }]
         }
         var newOrderId = "";
-        before(function(done){
+        beforeEach(function(done){
 
             API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder, function(err, ret){
                 if(err){
                     throw err;
                 }
                 newOrderId = ret.id;
+                consume_id = ret.hotel[0].id;
+                done();
+            })
+        });
+
+        it("#updateConsumeDetail should be ok", function (done) {
+            API.tripPlan.updateConsumeDetail({consumeId: consume_id, optLog: '测试updateConsumeDetail', userId: staffId, updates: {orderStatus: 'BOOKED'}}, function (err, ret) {
+                if (err) {
+                    throw err;
+                }
                 done();
             })
         });
@@ -268,8 +278,6 @@ describe("api/client/tripPlan.js", function() {
                     throw err;
                 }
                 assert.equal(ret.id, newOrderId);
-                console.info(ret.toJSON());
-                console.info(ret.toJSON().hotel[0].toJSON());
                 done();
             })
         });
@@ -436,7 +444,6 @@ describe("api/client/tripPlan.js", function() {
                     if (err) {
                         throw err;
                     }
-                    console.info(ret);
                     assert(ret != null);
                     assert(ret.qmBudget >= 0);
                     assert(ret.planMoney >= 0);
@@ -467,8 +474,6 @@ describe("api/client/tripPlan.js", function() {
                     if (err) {
                         throw err;
                     }
-                    console.info("*********************");
-                    console.info(ret);
                     done();
                 })
             });

@@ -69,6 +69,22 @@ module.exports = function ($module){
     var iconController = function($scope){
         var symfont = 'customs';
         var symname = $scope.name;
+        
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        if( /^qm\./.test($scope.name) ){
+
+            $scope.symfont = '';
+            $scope.symname = $scope.name.replace( /^qm\./,'icon-' );
+
+            return;
+        };
+        if( /^icon-/.test($scope.name) ){
+            $scope.symfont = '';
+            $scope.symname = $scope.name;
+            return;
+        };
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
         var m = $scope.name.match(/^([\w-]+)\.([\w-]+)$/);
         if(m){
             symfont = m[1];
@@ -86,13 +102,6 @@ module.exports = function ($module){
         $scope.symscale = 1;
         if(symconf.scale != undefined)
             $scope.symscale = symconf.scale;
-
-        //*************************************************
-        if( /^icon-/.test($scope.name) ){
-            $scope.symfont = '';
-            $scope.symname = $scope.name;
-        };
-        //*************************************************
 
     }
 

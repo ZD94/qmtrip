@@ -8,7 +8,7 @@ var Q = require("q");
 var Seeds = require("common/model").importModel("./models").models.Seeds;
 var Logger = require('../../common/logger');
 var logger = new Logger("seeds");
-var typeString = "^tripPlanOrderNo^";
+var typeString = ['tripPlanOrderNo', 'qm_order']; //"^tripPlanOrderNo^qm_order^";
 var seeds = {};
 
 /**
@@ -29,22 +29,24 @@ seeds.getSingleSeedCode = function(type, options){
     if (!maxNo) {
         maxNo = 9999;
     }
-    var str = '^' + type + '^';
-    if(typeString.indexOf(str) !== 0){
+    if(typeString.indexOf(type) < 0){
         throw {code: -1, msg: '编号类型不在配置中'};
     }
 
-    return Seeds.findOne({type: type})
+    return Seeds.findOne({where: {type: type}})
         .then(function(seeds) {
             if (!seeds) {
                 return Seeds.create({type: type, minNo: minNo, maxNo: maxNo, nowNo: minNo})
             }
+
             var nowNo = 0;
+
             if (parseInt(seeds.nowNo) >= maxNo) {
                 nowNo = minNo;
             } else {
                 nowNo = parseInt(seeds.nowNo) + 1;
             }
+
             return Seeds.update({nowNo: nowNo}, {returning: true, where: {type: type}})
                 .spread(function(affect, rows) {
                     return rows[0];

@@ -7,8 +7,6 @@
  * @module API
  */
 var API = require("common/api");
-var auth = require("../auth");
-var _ = require('lodash');
 
 /**
  * @class mailingAddress 邮寄地址

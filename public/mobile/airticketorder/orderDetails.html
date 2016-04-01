@@ -24,7 +24,7 @@
             <span class="instruction"> 退改签说明 </span>
         </div>
         <div class="row2">
-            <span>中国联行 | 准点率{{order.punctual_rate||"null"}} | 含餐</span>
+            <span>中国联行 | 准点率{{renderPercentage()}} | 含餐</span>
             <ul>
                 <li>
                     <p class="time">{{order.start_time||"null"}}</p>
@@ -46,12 +46,12 @@
         </div>
 
         <div class="passengerInfoContent">
-            <span class="passengerName">李明月</span><br/>
-            <span class="identity">123213254356435345</span>
+            <span class="passengerName">{{order.passenger[0].name}}</span><br/>
+            <span class="identity">身份证：{{order.passenger[0].identification_no}}</span>
         </div>
 
         <div class="price thisHeader">
-            <symbol name="icon-fare"/> 票价信息<span class="total">合计：<span class="totalPrice">￥610.25</span></span>
+            <symbol name="icon-fare"/> 票价信息<span class="total">合计：<span class="totalPrice">￥{{order.pay_price}}</span></span>
         </div>
 
         <ul class="charges">

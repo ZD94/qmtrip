@@ -5,7 +5,7 @@
 var assert = require("assert");
 var API = require("common/api");
 
-describe("api/client/tripPlan.js", function() {
+describe("api/client/airplane.js", function() {
 
     var agencyId = "";
     var agencyUserId = "";
@@ -49,7 +49,7 @@ describe("api/client/tripPlan.js", function() {
             arrivalPlace: '上海',
             arrivalPlaceCode: 'SH123',
             invoiceType: 'PLANE',
-            budget: 1000,
+            budget: 1000
         }]
     };
 
@@ -111,7 +111,6 @@ describe("api/client/tripPlan.js", function() {
             if(err) {
                 throw err;
             }
-            console.info(ret);
             query_key = ret[0].query_key;
             done();
         });
@@ -123,13 +122,12 @@ describe("api/client/tripPlan.js", function() {
         var params = {
             flight_no: "MU5693",
             ip_address: '192.168.1.3',
-            query_key: query_key
+            query_key: '201603301859437592'
         };
         API.client.airplane.get_plane_details.call({accountId: staffId}, params, function(err, ret) {
             if(err) {
                 throw err;
             }
-            console.info(ret);
             done();
         });
     });
@@ -171,7 +169,6 @@ describe("api/client/tripPlan.js", function() {
             if(ret.toJSON) {
                 ret = ret.toJSON();
             }
-            console.info(ret);
             done();
         });
     });

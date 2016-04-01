@@ -585,7 +585,7 @@ staff.statStaffPointsByAgency = function(companyId){
 /*************************证件信息API begin*************************/
 
 /**
- * @method createMailingAddress
+ * @method createPapers
  *
  * 创建证件信息
  *
