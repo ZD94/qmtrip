@@ -7,14 +7,14 @@
 <div class="airTicketOrderDetails">
     <div class="top">
         <div class="top-top">
-            <span class="status">待支付</span>
+            <span class="status">{{renderStatus()}}</span>
             <span class="timeLeft">剩余时间:</span>
         </div>
         <div class="row">
-            <span class="text">订单时间：</span><span>2016-03-04 13:13</span>
+            <span class="text">订单时间：</span><span>{{order.create_at}}</span>
         </div>
         <div class="row">
-            <span class="text">订单编号：</span><span>187342365426829</span>
+            <span class="text">订单编号：</span><span>{{order.order_no}}</span>
         </div>
     </div>
 
@@ -24,10 +24,10 @@
             <span class="instruction"> 退改签说明 </span>
         </div>
         <div class="row2">
-            <span>中国联行 | 准点率 | 含餐</span>
+            <span>中国联行 | 准点率{{order.punctual_rate||"null"}} | 含餐</span>
             <ul>
                 <li>
-                    <p class="time">8:00</p>
+                    <p class="time">{{order.start_time||"null"}}</p>
                     <p class="airport">浦东机场T3</p>
                 </li>
                 <li>
@@ -35,7 +35,7 @@
                     <p class="transferStation">经停呼和浩特</p>
                 </li>
                 <li>
-                    <p class="time">8:00</p>
+                    <p class="time">{{order.end_time||"null"}}</p>
                     <p class="airport">浦东机场T3</p>
                 </li>
             </ul>
