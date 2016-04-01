@@ -4,12 +4,11 @@
 
 'use strict';
 
-declare var API: any;
-declare var msgbox: any;
+var API = require('api');
+var msgbox = require('msgbox');
 
 API.require('auth');
 var Cookie = require('tiny-cookie');
-var auth = {};
 
 export function LoginController($scope,$routeParams) {
     //待实现
