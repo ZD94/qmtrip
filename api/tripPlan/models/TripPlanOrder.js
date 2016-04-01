@@ -50,6 +50,18 @@ module.exports = function (Db, DataType) {
                         _status = -1;
                         this.setDataValue('budget', -1); //预算要小于0
                     } break;
+                    ///待预定
+                    case 'WAIT_BOOK': {
+                        _status = 3;
+                        _is_upload = false;
+                        _is_commit = false;
+                    } break;
+                    ///已预定
+                    case 'BOOKED': {
+                        _status = 4;
+                        _is_upload = false;
+                        _is_commit = false;
+                    } break;
                     ///待上传
                     case 'WAIT_UPLOAD': {
                         _status = 0;
@@ -105,6 +117,8 @@ module.exports = function (Db, DataType) {
                     } break;
                     case 1: val = 'WAIT_AUDIT'; break;
                     case 2: val = 'COMPLETE'; break;
+                    case 3: val = 'WAIT_BOOK'; break;
+                    case 4: val = 'BOOKED'; break;
                     default : val = 'NO_BUDGET'; break;
                 }
                 return val;
