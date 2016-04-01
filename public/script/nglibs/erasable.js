@@ -5,13 +5,13 @@
 
 
 module.exports = function ($module){
-    $module.directive("login",function(){
+    $module.directive("erasable",function(){
         return {
             priority: 1001,
             restrict: 'A',
             replace: true,
             transclude: "element",
-            template: '<div><span class="clear_input web-icon-font" ng-click="clear_val($event)">&#xf057;</span></div>' ,
+            template: '<div><a class="clear_input web-icon-font" ng-click="clear_val($event)">&#xf057;</a></div>' ,
             controller: function($scope, $element, $transclude) {
                 $scope.clear_val = function($event) {
                     //console.log('clear_val');
@@ -21,14 +21,14 @@ module.exports = function ($module){
             compile:function(element,attrs,$transclude){
                 element.removeAttr("ng-model");
                 //element.css("width",element.find("input").width())
-                console.info(element.find("input").width());
+                //console.info(element.find("input").width());
                 return function(scope, element, attrs, ctrl, transclude){
                     transclude(function(clone, scope) {
+                        clone.attr('required', 'true');
+                        clone.removeClass();
+                        clone.addClass('input');
                         element.prepend(clone);
                     });
-                    var input = element.find('input');
-                    input.removeAttr("class");
-                    input.attr("class",'input');
                 }
             }
         }
