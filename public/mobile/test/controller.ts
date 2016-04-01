@@ -1,6 +1,7 @@
 "use strict";
 
-declare var msgbox: any;
+var msgbox = require('msgbox');
+//import msgbox = require('msgbox');
 
 export function IndexController($scope){
 }
@@ -51,7 +52,7 @@ export function MsgboxController($scope){
             });
     }
     $scope.prompt = function(){
-        msgbox.prompt('输入对话框', 12345)
+        msgbox.prompt('输入对话框', "12345")
             .then(function(ret){
                 console.log(ret[0], ret[1]);
             });
