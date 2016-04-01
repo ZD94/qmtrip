@@ -1,7 +1,3 @@
-/**
- * Created by wlh on 16/1/27.
- */
-
 'use strict';
 
 var API = require('api');
@@ -22,22 +18,18 @@ export function LoginController($scope,$routeParams) {
         $scope.check_passed = ($scope.form.email.length > 0 && $scope.form.pwd.length > 5);
         //$scope.check_changed = true;
     })
-    $scope.email_name = false;
-    $scope.email_pwd =  false;
 
-    $scope.check_changed = function ($event) {
-        console.info($event);
-        var otx = $event.target.id;
-        console.info(otx);
-        console.info($scope.email_name);
-        $scope[otx] = true;
-        //var test = "$('input#email_pwd').is(':focus')";
-        //console.log(test, $scope.$eval(test, {$:$}));
-        //console.info(otx, $scope[otx]);
+    $scope.focused = '';
+    $scope.update_focused = function($event) {
+        if ($event && $event.target)
+            $scope.focused = $event.target;
+        else
+            $scope.focused = '';
+        console.log($scope.focused);
     }
-    var backUrl = $routeParams.backurl || "#";
 
-    $scope.check_login = async function() {
+    var backUrl = $routeParams.backurl || "#";
+    $scope.check_login = async function() : Promise<any> {
         try {
             await API.onload();
             var data = await API.auth.login($scope.form);
@@ -53,10 +45,4 @@ export function LoginController($scope,$routeParams) {
             msgbox.log(str);//显示错误消息
         }
     }
-    $scope.pwd_keydown = function($event){
-        if($event.keyCode==13){
-            $scope.check_login();
-        }
-    }
-
 }
