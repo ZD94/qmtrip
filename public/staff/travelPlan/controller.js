@@ -23,6 +23,7 @@ var travelPlan=(function(){
         $("title").html("出差单列表");
         //全部列表
         $scope.initPlanList = function () {
+            $loading.start();
             API.onload(function() {
                 var params = {page:$scope.page1};
                 if ($scope.keyword != '' && $scope.keyword != undefined) {
@@ -227,6 +228,7 @@ var travelPlan=(function(){
         $("title").html("出差单明细");
         var planId = $routeParams.planId;
         $scope.initplandetail = function(){
+            $loading.start();
             API.onload(function() {
                 API.tripPlan.getTripPlanOrderById({orderId: planId})
                     .then(function(result){

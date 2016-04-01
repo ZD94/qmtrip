@@ -383,6 +383,7 @@ var TravelStatistics = (function(){
         $("title").html("出差记录");
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
         var planId = $routeParams.orderId;
+        $loading.start();
         API.onload(function(){
             API.tripPlan.getTripPlanOrderById({orderId: planId})
                 .then(function(result){
@@ -526,22 +527,16 @@ var TravelStatistics = (function(){
                 })
         })
         $scope.outTraffichref = function () {
-            $loading.end();
             $location.hash('outTraffic');
             $anchorScroll();
-
         }
         $scope.hotelhref = function () {
-            $loading.end();
             $location.hash('hotel');
             $anchorScroll();
-
         }
         $scope.backTraffichref = function () {
-            $loading.end();
             $location.hash('backTraffic');
             $anchorScroll();
-
         }
         // //分页
         // $scope.pagination = function () {

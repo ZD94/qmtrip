@@ -525,6 +525,7 @@ var staff = (function(){
         $(".left_nav li").removeClass("on").eq(2).addClass("on");
         //初始化
         $scope.initdepartment = function(){
+            $loading.start();
             API.onload(function(){
                 //获取个人信息
                 API.staff.getCurrentStaff()

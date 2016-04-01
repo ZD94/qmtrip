@@ -68,8 +68,7 @@ var travelplan = (function () {
             $(window).on("scroll", $scope.handleScroll);
             $(".dropdown-header").on("click", $scope.enterSelectingMode);
             $(".veil").on("click", $scope.quitSelectingMode);
-            $loading.end();
-        };
+        }
 
         $scope.enterSelectingMode = function () {//进入“选择模式”。该函数在用户点击".dropdown-header"时被调用。
             $(".veil").show();
@@ -159,6 +158,7 @@ var travelplan = (function () {
         }
 
         $scope.getList = function (p) {//获取员工出差列表并将列表显示在页面上。每执行一次该函数，列表中的记录增加十条。
+            $loading.start();
             $scope.tips = "正在加载更多...";
             API.onload(function () {
                 API.tripPlan
@@ -290,7 +290,7 @@ var travelplan = (function () {
 
         //---------------------------------------------
         $scope.getData = function (p) {//此函数用于获取 出差记录详情数据 并把它存入$scope.ITEM这一变量中。
-
+            $loading.start();
             API.onload(function () {
                 //console.info(p);
                 API.tripPlan
@@ -484,7 +484,7 @@ var travelplan = (function () {
      * @param $scope
      * @constructor
      */
-    travelplan.InvoicedetailController = function ($scope, $routeParams, $loading) {
+    travelplan.InvoicedetailController = function ($scope, $routeParams) {
 
         $scope.$root.pageTitle = '票据详情';
 
@@ -493,41 +493,39 @@ var travelplan = (function () {
         $scope.status = $routeParams.status;
         $scope.invoiceId = $routeParams.invoiceId;
         API.require("attachment");
-        API.onload(function () {
-            API.tripPlan.getTripPlanOrderById({orderId: planId})
-                .then(function (result) {
-                    var InvoiceDetail;
-                    $scope.planDetail = result;
-
-                    if ($scope.status == 'outTraffic') {
-                        InvoiceDetail = result.outTraffic[0];
-                    }
-                    if ($scope.status == 'backTraffic') {
-                        InvoiceDetail = result.backTraffic[0];
-                    }
-                    if ($scope.status == 'hotel') {
-                        InvoiceDetail = result.hotel[0];
-                    }
-                    return InvoiceDetail;
-                })
-                .then(function (invoiceDetail) {
-                    $scope.InvoiceDetail = invoiceDetail;
-                    return API.attachment.previewSelfImg({fileId: invoiceDetail.newInvoice})
-                        .then(function (invoiceImg) {
-                            $scope.invoiceImg = invoiceImg;
-
-                            $loading.end();
-                        })
-                })
-                .catch(function (err) {
-                    TLDAlert(err.msg || err);
-                })
-        })
 
         $scope.goDetail = function () {
             window.location.href = "#/travelplan/plandetail?planId=" + planId;
         }
+        return API.onload()
+            .then(function () {
+                return API.tripPlan.getTripPlanOrderById({orderId: planId});
+            })
+            .then(function (result) {
+                var InvoiceDetail;
+                $scope.planDetail = result;
 
+                if ($scope.status == 'outTraffic') {
+                    InvoiceDetail = result.outTraffic[0];
+                }
+                if ($scope.status == 'backTraffic') {
+                    InvoiceDetail = result.backTraffic[0];
+                }
+                if ($scope.status == 'hotel') {
+                    InvoiceDetail = result.hotel[0];
+                }
+                return InvoiceDetail;
+            })
+            .then(function (invoiceDetail) {
+                $scope.InvoiceDetail = invoiceDetail;
+                return API.attachment.previewSelfImg({fileId: invoiceDetail.newInvoice})
+            })
+            .then(function (invoiceImg) {
+                $scope.invoiceImg = invoiceImg;
+            })
+            .catch(function (err) {
+                TLDAlert(err.msg || err);
+            });
     }
 
 
