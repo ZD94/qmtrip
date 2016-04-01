@@ -18,13 +18,11 @@ var StaffFirst = (function(){
 	var StaffFirst ={};
 	StaffFirst.StaffUserController = function($scope){
 		dataloading(false);
-		loading(true);
 		$("title").html("首页");
 		$(".staff_menu_t ul li").removeClass("on");
 		$(".staff_menu_t ul a").eq(0).find("li").addClass("on");
 		//企业管理首页信息
 		$scope.initStaffUser = function(){
-			// loading(true)
 			API.onload(function(){
 				API.staff.getCurrentStaff()
 					.then(function(ret){

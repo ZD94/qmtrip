@@ -1,27 +1,19 @@
 "use strict";
 
-var test = module.exports = {}
+declare var msgbox: any;
 
-test.IndexController = function($scope){
-    loading(true);
+export function IndexController($scope){
 }
 
-test.StaffController = function($scope, $q, StaffCache){
-    loading(true);
+export async function StaffController($scope, $loading, StaffCache){
     var Cookie = require('tiny-cookie');
-    console.log(Cookie.get('user_id'));
-    $scope.staff = StaffCache.get(Cookie.get('user_id'));
-    $scope.staff2 = $scope.staff;
-    //$scope.staff2 =  $q(function(resolve, reject) {
-    //    $scope.staff.then(resolve, reject);
-    //});
-    $scope.staff.then(function(staff){
-        $scope.staff_id = staff.id;
-    });
+    var current_staff_id = Cookie.get('user_id');
+    console.log(current_staff_id);
+    $scope.staff = await StaffCache.get(current_staff_id);
+    $scope.staff_id = $scope.staff.id;
 }
 
-test.AsyncController = function($scope, $q, $timeout) {
-    loading(true);
+export function AsyncController($scope, $q, $timeout) {
     var get_user = function() {
         return new Promise(function(resolve, reject){
             window.setTimeout(function() {
@@ -42,8 +34,7 @@ test.AsyncController = function($scope, $q, $timeout) {
 }
 
 
-test.MsgboxController = function($scope){
-    loading(true);
+export function MsgboxController($scope){
     $scope.msgbox = msgbox;
     $scope.alert = function(){
         msgbox.alert('提示对话框');
@@ -62,8 +53,7 @@ test.MsgboxController = function($scope){
     }
 }
 
-test.UploadController = function($scope, FileUploader){
-    loading(true);
+export function UploadController($scope, FileUploader){
     $scope.winWidth = $(window).width();
     //$scope.uploader = init_uploader(FileUploader, "/upload/ajax-upload-file?type=invoice");
     $scope.upload_tip = '测试上传';
@@ -73,8 +63,7 @@ test.UploadController = function($scope, FileUploader){
     }
 }
 
-test.SelectController = function($scope) {
-    loading(true);
+export function SelectController($scope) {
     $scope.selectOpt = {value: {val: 'a3'}};
     $scope.selectData = [
         {val: "a1", name: 111},
@@ -89,8 +78,7 @@ test.SelectController = function($scope) {
     }
 };
 
-test.IconController = function($scope){
-    loading(true);
+export function IconController($scope){
     $scope.symbols = [
         'customs.success',
         'customs.consult',
@@ -168,8 +156,7 @@ test.IconController = function($scope){
 
 }
 
-test.InputController = function($scope){
-    loading(true);
+export function InputController($scope){
     $scope.user = {
      name:'',
      pwd:''

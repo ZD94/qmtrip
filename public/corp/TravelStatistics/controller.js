@@ -379,7 +379,7 @@ var TravelStatistics = (function(){
         }
     }
     // 出差记录详情页
-    TravelStatistics.PlanDetailController = function($scope,$routeParams, $location, $anchorScroll) {
+    TravelStatistics.PlanDetailController = function($scope,$routeParams, $location, $loading, $anchorScroll) {
         $("title").html("出差记录");
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
         var planId = $routeParams.orderId;
@@ -512,7 +512,7 @@ var TravelStatistics = (function(){
                         .catch(function(err){
                             console.info(err);
                         })
-                    loading(true);
+                    $loading.end();
                     $(".title_top .standard").hover(function(){
                         $(this).siblings(".standard_detail").show();
                     },function(){
@@ -526,19 +526,19 @@ var TravelStatistics = (function(){
                 })
         })
         $scope.outTraffichref = function () {
-            loading(true);
+            $loading.end();
             $location.hash('outTraffic');
             $anchorScroll();
 
         }
         $scope.hotelhref = function () {
-            loading(true);
+            $loading.end();
             $location.hash('hotel');
             $anchorScroll();
 
         }
         $scope.backTraffichref = function () {
-            loading(true);
+            $loading.end();
             $location.hash('backTraffic');
             $anchorScroll();
 
