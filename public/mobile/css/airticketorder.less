@@ -297,20 +297,42 @@
   width: 100%;
   border-bottom: 0.1rem solid @border-color;
   padding-left: 1rem;
-  height: 6rem;
+  height: auto;
   background-color: @color-theme5;
   position: relative;
   ul{
     li{
       display: block;
       float: left;
-      &:first-child,&:last-child{
+      padding: 1rem 0.5rem;
+      &:first-child{
         line-height: 6rem;
         width: 10%;
         text-align: center;
+        padding: 0;
       }
-      &:last-child{
+      &:nth-child(2){
+        width: 78%;
+        p{
+          &:first-child{
+            font-size: 1.6rem;
+            line-height: 2.5rem;
+          }
+          &:last-child{
+            font-size: 1.2rem;
+          }
+        }
+      }
+      &:nth-child(3){
+        line-height: 2.4rem;
+        width: 10%;
+        text-align: center;
         float: right;
+        padding: 0;
+        border-left:0.1rem solid @border-color ;
+        height: 2.4rem;
+        margin-top: 1.8rem;
+        color: @color-theme1;
       }
     }
   }
