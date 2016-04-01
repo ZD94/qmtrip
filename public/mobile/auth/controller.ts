@@ -21,7 +21,21 @@ export function LoginController($scope,$routeParams) {
     $scope.check_passed = ($scope.form.email.length > 0 && $scope.form.pwd.length > 5);
     $scope.$watchGroup(['form.email', 'form.pwd'], function(){
         $scope.check_passed = ($scope.form.email.length > 0 && $scope.form.pwd.length > 5);
+        //$scope.check_changed = true;
     })
+    $scope.email_name = false;
+    $scope.email_pwd =  false;
+
+    $scope.check_changed = function ($event) {
+        console.info($event);
+        var otx = $event.target.id;
+        console.info(otx);
+        console.info($scope.email_name);
+        $scope[otx] = true;
+        //var test = "$('input#email_pwd').is(':focus')";
+        //console.log(test, $scope.$eval(test, {$:$}));
+        //console.info(otx, $scope[otx]);
+    }
     var backUrl = $routeParams.backurl || "#";
 
     $scope.check_login = async function() {
