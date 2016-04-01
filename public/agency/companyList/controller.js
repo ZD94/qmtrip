@@ -11,13 +11,12 @@ module.exports = (function(){
 	API.require('department');
 	API.require('travelPolicy');
 	var companyList ={};
-	companyList.CompanyListController = function($scope){
-		loading(true);
+	companyList.CompanyListController = function($scope, $loading){
 		$("title").html("公司列表");
 		//企业管理首页信息
 		$scope.initCompanyList = function(){
 			$(".left_nav li").removeClass("on").eq(1).addClass("on");
-			loading(false);
+			$loading.start();
 			API.onload(function(){
 				API.company.getCompanyListByAgency({page:$scope.page,perPage:20})
 					.then(function(ret){
@@ -50,7 +49,7 @@ module.exports = (function(){
 					})
 					.then(function(companylist){
 						$scope.companylist = companylist;
-                        loading(true);
+						$loading.end();
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err);
@@ -88,15 +87,14 @@ module.exports = (function(){
 			window.location.href = "#/companyList/CreateCorp";
 		}
 	}
-	companyList.CompanyDetailController = function($scope,$routeParams){
-		loading(true);
+	companyList.CompanyDetailController = function($scope,$routeParams,$loading){
 		$("title").html("公司详情");
 		var companyId = $routeParams.company;
 		$scope.companyId = companyId;
 		//企业管理详情页
 		$scope.initCompanyDetail = function(){
 			$(".left_nav li").removeClass("on").eq(1).addClass("on");
-			loading(false);
+			$loading.start();
 			API.onload(function(){
 				API.company.getCompanyById(companyId)
 					.then(function(company){
@@ -105,7 +103,7 @@ module.exports = (function(){
 						var staffId = company.createUser;
 						var companyId = company.id;
 						console.info(company)
-                        loading(true);
+						$loading.end();
                         Promise.all([
                         	API.staff.getStaffByAgency({id:staffId}),
                         	API.company.getCompanyFundsAccountByAgency(companyId),
@@ -150,7 +148,6 @@ module.exports = (function(){
 
 	//创建公司页面
 	companyList.CreateCorpController = function($scope) {
-		loading(true);
 		$scope.createCorp = function(){
 			var corpname = $("#corpName").val();
 			var name = $("#connectName").val();
@@ -201,7 +198,6 @@ module.exports = (function(){
 
 	//创建公司页面
 	companyList.CreateCorpController = function($scope) {
-		loading(true);
 		$scope.createCorp = function(){
 			var corpname = $("#corpName").val();
 			var name = $("#connectName").val();
@@ -249,7 +245,6 @@ module.exports = (function(){
 
 	//员工管理页面
 	companyList.StaffListController = function($scope,$routeParams) {
-		loading(true);
 		var companyId = $routeParams.company;
 		$scope.companyId = companyId;
 		$(".left_nav li").removeClass("on").eq(1).addClass("on");
@@ -698,12 +693,12 @@ module.exports = (function(){
 
 
 	//组织架构页面
-	companyList.DepartmentController = function($scope, $routeParams) {
+	companyList.DepartmentController = function($scope, $routeParams, $loading) {
 		$("title").html("组织架构");
-		loading(false);
 		//初始化
 		$scope.companyId = $routeParams.companyId;
 		$scope.initdepartment = function(){
+			$loading.start();
 			API.onload(function(){
 				API.department.agencyGetFirstClassDepartments({companyId:$scope.companyId})
 					.then(function(defaulDepartment){
@@ -723,7 +718,7 @@ module.exports = (function(){
 										})
 								});
 							})
-						loading(true);
+						$loading.end();
 					})
 			})
 		}
@@ -830,14 +825,14 @@ module.exports = (function(){
 	 * @param $scope
 	 * @constructor
 	 */
-	companyList.PolicyListController = function($scope, $routeParams) {
+	companyList.PolicyListController = function($scope, $routeParams, $loading) {
 		$("title").html("差旅标准");
 		Myselect();
 		$scope.companyId = $routeParams.companyId;
 
 		//获取差旅标准列表
 		$scope.initPolicyList = function () {
-			loading(false);
+			$loading.start();
 			API.onload(function(){
 				var params = {};
 				var options = {order: [["create_at", "asc"]]};
@@ -861,7 +856,7 @@ module.exports = (function(){
 								$(".policy_title").addClass('policy_titlefixed');
 							}
 						});
-						loading(true);
+						$loading.end();
 					})
 					.catch(function(err){
 						console.info (err);

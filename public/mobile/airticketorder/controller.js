@@ -19,8 +19,8 @@ var airTicket = (function () {
      * @param $scope
      * @constructor
      */
+
     airTicket.OrderDetailsController = function ( $scope,$routeParams ) {
-        loading(true);
 
         $scope.user;
         $scope.order;
@@ -77,8 +77,6 @@ var airTicket = (function () {
     }
 
     airTicket.InfoEditingController = function ($scope, $routeParams) {
-        loading(true);
-
         //console.log( id_validation('370683198909072254').isValid() );
 
         $scope.user;

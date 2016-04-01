@@ -11,7 +11,6 @@ var feedback=(function(){
     var  feedback = {};
 
     feedback.FeedbackController = function($scope) {
-        loading(true);
         $("title").html("意见反馈");
         //$(".staff_header").hide();
         $scope.subFeedback = function(){

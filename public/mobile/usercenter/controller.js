@@ -9,11 +9,12 @@ module.exports = (function() {
     API.require("travelPolicy");
     var user = {};
 
-    user.IndexController = function($scope) {
+    user.IndexController = function($scope, $loading) {
 
         $scope.$root.pageTitle = '个人中心';
         //console.info($scope.$root.pageTitle);
         $scope.initStaffUser = function(){
+            $loading.start();
             API.onload(function(){
                 API.staff.getCurrentStaff()
                     .then(function(ret){
@@ -72,7 +73,7 @@ module.exports = (function() {
                             .catch(function(err){
                                 TLDAlert(err.msg || err)
                             })
-                        loading(true);
+                        $loading.end();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err)
@@ -109,7 +110,6 @@ module.exports = (function() {
 
     user.TravelpolicyController = function($scope) {
         $scope.$root.pageTitle = '差旅标准';
-        loading(true);
         API.onload(function(){
             API.travelPolicy.getCurrentStaffTp()
                 .then(function(travelPolicy){

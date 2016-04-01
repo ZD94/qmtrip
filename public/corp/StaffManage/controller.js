@@ -520,12 +520,12 @@ var staff = (function(){
 
 
 
-    staff.DepartmentController = function($scope){
+    staff.DepartmentController = function($scope, $loading){
         $("title").html("组织架构");
         $(".left_nav li").removeClass("on").eq(2).addClass("on");
-        loading(false);
         //初始化
         $scope.initdepartment = function(){
+            $loading.start();
             API.onload(function(){
                 //获取个人信息
                 API.staff.getCurrentStaff()
@@ -548,7 +548,7 @@ var staff = (function(){
                                                 console.info ($scope.departmentlist);
                                             })
                                         });
-                                        loading(true);
+                                        $loading.end();
                                     })
                             })
                     })

@@ -16,7 +16,7 @@ module.exports = function ($module){
 
     if(!use_wxChooseImage){
         $module
-            .directive('ngUploader', function () {
+            .directive('ngUploader', function ($loading) {
                 return {
                     restrict: 'A',
                     transclude: true,
@@ -33,13 +33,14 @@ module.exports = function ($module){
                         var uploader = new FileUploader(cnf);
                         uploader.onAfterAddingFile = function(file) {
                             onAfterAddingFile(file, function() {
+                                $loading.start();
                                 uploader.uploadAll();
                             });
                         };
 
                         uploader.onCompleteItem = function (file, response, status, headers) {
                             file.done(response);
-                            loading(true);
+                            $loading.end();
                             $("#upload").remove();
                         };
                         $scope.uploader = uploader;
@@ -59,7 +60,7 @@ module.exports = function ($module){
             });
     }else{
         $module
-            .directive('ngUploader', function () {
+            .directive('ngUploader', function ($loading) {
                 return {
                     restrict: 'A',
                     link: function(scope, element, attributes){
@@ -89,6 +90,7 @@ module.exports = function ($module){
                                     success: function (res) {
                                         options._file = res.localIds[0]; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
                                         onAfterAddingFile(options, function() {
+                                            $loading.start();
                                             wx.uploadImage({
                                                 localId: options._file, // 需要上传的图片的本地ID，由chooseImage接口获得
                                                 isShowProgressTips: 1, // 默认为1，显示进度提示
@@ -97,7 +99,7 @@ module.exports = function ($module){
                                                     API.wechat.mediaId2key({mediaId: serverId})
                                                         .then(function(fileId){
                                                             options.done({code: 0, fileId: fileId});
-                                                            loading(true);
+                                                            $loading.end();
                                                             $("#upload").remove();
                                                         })
                                                         .catch(hanleError)

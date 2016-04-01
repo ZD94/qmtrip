@@ -17,13 +17,13 @@ var travelPlan=(function(){
      * @param $scope
      * @constructor
      */
-    travelPlan.PlanListController = function($scope) {
+    travelPlan.PlanListController = function($scope, $loading) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(1).find("li").addClass("on");
-        loading(false);
         $("title").html("出差单列表");
         //全部列表
         $scope.initPlanList = function () {
+            $loading.start();
             API.onload(function() {
                 var params = {page:$scope.page1};
                 if ($scope.keyword != '' && $scope.keyword != undefined) {
@@ -34,7 +34,7 @@ var travelPlan=(function(){
                     .then(function(result){
                         $scope.total1 = result.total;
                         $scope.planListitems = result.items;
-                        loading(true);
+                        $loading.end();
                         console.info ($scope.total1);
                     })
                     .catch(function(err){
@@ -222,13 +222,13 @@ var travelPlan=(function(){
      * @param $scope
      * @constructor
      */
-    travelPlan.PlanDetailController = function($scope, $routeParams) {
+    travelPlan.PlanDetailController = function($scope, $routeParams, $loading) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(1).find("li").addClass("on");
-        loading(false);
         $("title").html("出差单明细");
         var planId = $routeParams.planId;
         $scope.initplandetail = function(){
+            $loading.start();
             API.onload(function() {
                 API.tripPlan.getTripPlanOrderById({orderId: planId})
                     .then(function(result){
@@ -289,7 +289,7 @@ var travelPlan=(function(){
                                 TLDAlert(err.msg || err);
                             })
                         }
-                        loading(true);
+                        $loading.end();
                         $('.warning i').hover(function(){
                             $('.special_warning').hide();
                             $(this).siblings('.special_warning').show();
@@ -479,7 +479,6 @@ var travelPlan=(function(){
      * @constructor
      */
     travelPlan.InvoiceDetailController = function($scope, $routeParams) {
-        loading(true);
         $("title").html("行程单明细");
         var planId = $routeParams.planId;
         $scope.planId = planId;
