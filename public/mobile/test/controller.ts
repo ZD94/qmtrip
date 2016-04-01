@@ -5,7 +5,7 @@ declare var msgbox: any;
 export function IndexController($scope){
 }
 
-export async function StaffController($scope, $loading, StaffCache){
+export async function StaffController($scope, StaffCache){
     var Cookie = require('tiny-cookie');
     var current_staff_id = Cookie.get('user_id');
     console.log(current_staff_id);
@@ -13,20 +13,25 @@ export async function StaffController($scope, $loading, StaffCache){
     $scope.staff_id = $scope.staff.id;
 }
 
-export function AsyncController($scope, $q, $timeout) {
+export function AsyncController($scope, $q, $timeout, $loading) {
+    $loading.start();
     var get_user = function() {
         return new Promise(function(resolve, reject){
             window.setTimeout(function() {
                 resolve({id:1000, name:'Clear'});
+                $loading.end();
             }, 2000);
         });
     };
     $scope.user = get_user();
 
+
+    $loading.start();
     var getMessages = function() {
         var deferred = $q.defer();
         $timeout(function() {
             deferred.resolve(['Hello', 'world!']);
+            $loading.end();
         }, 2000);
         return deferred.promise;
     };

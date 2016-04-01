@@ -33,6 +33,7 @@ module.exports = function ($module){
                         var uploader = new FileUploader(cnf);
                         uploader.onAfterAddingFile = function(file) {
                             onAfterAddingFile(file, function() {
+                                $loading.start();
                                 uploader.uploadAll();
                             });
                         };
@@ -89,6 +90,7 @@ module.exports = function ($module){
                                     success: function (res) {
                                         options._file = res.localIds[0]; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
                                         onAfterAddingFile(options, function() {
+                                            $loading.start();
                                             wx.uploadImage({
                                                 localId: options._file, // 需要上传的图片的本地ID，由chooseImage接口获得
                                                 isShowProgressTips: 1, // 默认为1，显示进度提示

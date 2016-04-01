@@ -14,6 +14,7 @@ module.exports = (function() {
         $scope.$root.pageTitle = '个人中心';
         //console.info($scope.$root.pageTitle);
         $scope.initStaffUser = function(){
+            $loading.start();
             API.onload(function(){
                 API.staff.getCurrentStaff()
                     .then(function(ret){

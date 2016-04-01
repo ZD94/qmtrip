@@ -698,6 +698,7 @@ module.exports = (function(){
 		//初始化
 		$scope.companyId = $routeParams.companyId;
 		$scope.initdepartment = function(){
+			$loading.start();
 			API.onload(function(){
 				API.department.agencyGetFirstClassDepartments({companyId:$scope.companyId})
 					.then(function(defaulDepartment){
