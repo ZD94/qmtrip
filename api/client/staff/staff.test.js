@@ -475,6 +475,14 @@ describe("api/client/staff.js", function() {
                 done();
             });
         })
+    //通过证件类型查询某员工证件信息
+        it("#getOnesPapersByType should be ok", function(done) {
+            API.client.staff.getOnesPapersByType.call(self, {type: 1}, function(err, result) {
+                assert.equal(err, null);
+                //console.log(result);
+                done();
+            });
+        })
     //查询员工证件信息集合
         it("#getCurrentUserPapers should be ok", function(done) {
             API.client.staff.getCurrentUserPapers.call(self, function(err, result) {
