@@ -18,7 +18,7 @@ var travelplan = (function () {
      * @constructor
      */
     //["未完成","待出预算","待上传票据","票据审核中","审核未通过","已完成"]
-    travelplan.PlanlistController = function ($scope, $routeParams) {
+    travelplan.PlanlistController = function ($scope, $routeParams, $loading) {
         $scope.$root.pageTitle = '出差记录';
         $scope.STATUS = "未完成";//当前状态
         $scope.statuses = ["未完成", "待出预算", "待上传票据", "票据审核中", "审核未通过", "已完成"];
@@ -68,7 +68,7 @@ var travelplan = (function () {
             $(window).on("scroll", $scope.handleScroll);
             $(".dropdown-header").on("click", $scope.enterSelectingMode);
             $(".veil").on("click", $scope.quitSelectingMode);
-            loading(true);
+            $loading.end();
         };
 
         $scope.enterSelectingMode = function () {//进入“选择模式”。该函数在用户点击".dropdown-header"时被调用。
@@ -201,14 +201,12 @@ var travelplan = (function () {
                              $scope.planlist = ret;
                              ret.map(function(s){
                              })
-                             $scope.$apply();
                              })
                              .catch(function(err){
                              TLDAlert(err.msg || err)
                              })
                              */
-                            $scope.$apply();
-                            loading(true);
+                            $loading.end();
                         }
                     )
                     .catch(function (err) {
@@ -237,7 +235,7 @@ var travelplan = (function () {
      * @param $scope
      * @constructor
      */
-    travelplan.PlandetailController = function ($scope, $routeParams, FileUploader) {
+    travelplan.PlandetailController = function ($scope, $routeParams, $loading, FileUploader) {
         //初始化上传图片
         $scope.$root.pageTitle = '详细出差记录';
         $scope.winWidth = $(window).width();
@@ -314,11 +312,8 @@ var travelplan = (function () {
                                     var timeSpan = (t2 - t1) / 1000 / 60 / 60 / 24;
                                     return timeSpan;
                                 }
-                                ;
                             })();
-
-                            $scope.$apply();
-                            loading(true);
+                            $loading.end();
                         }
                     )
                     .catch(function (err) {
@@ -378,7 +373,9 @@ var travelplan = (function () {
                             })
                             .then(function (outTrafficBookListUrl) {
                                 $scope.URL.outTrafficBookListUrl = outTrafficBookListUrl;
-                                $scope.$apply();
+
+                                //$scope.$apply();
+
                                 window.location.href = $scope.URL.outTrafficBookListUrl;
                             })
                             .catch(function (err) {
@@ -400,7 +397,9 @@ var travelplan = (function () {
                         })
                         .then(function (backTrafficBookListUrl) {
                             $scope.URL.backTrafficBookListUrl = backTrafficBookListUrl;
-                            $scope.$apply();
+
+                            //$scope.$apply();
+
                             window.location.href = $scope.URL.backTrafficBookListUrl;
                         })
                         .catch(function (err) {
@@ -419,7 +418,9 @@ var travelplan = (function () {
                         })
                         .then(function (r) {
                             $scope.URL.hotelBookListUrl = r;
-                            $scope.$apply();
+
+                            //$scope.$apply();
+
                             console.log($scope.URL.hotelBookListUrl);
                             window.location.href = $scope.URL.hotelBookListUrl;
                         })
@@ -452,7 +453,9 @@ var travelplan = (function () {
                             API.tripPlan.commitTripPlanOrder($scope.ITEM.id)
                                 .then(function (result) {
                                     $scope.getData($routeParams.orderId);
-                                    $scope.$apply();
+
+                                    //$scope.$apply();
+
                                     msgbox.log("提交审核成功");
                                 })
                                 .catch(function (err) {
@@ -481,7 +484,7 @@ var travelplan = (function () {
      * @param $scope
      * @constructor
      */
-    travelplan.InvoicedetailController = function ($scope, $routeParams) {
+    travelplan.InvoicedetailController = function ($scope, $routeParams, $loading) {
 
         $scope.$root.pageTitle = '票据详情';
 
@@ -512,8 +515,8 @@ var travelplan = (function () {
                     return API.attachment.previewSelfImg({fileId: invoiceDetail.newInvoice})
                         .then(function (invoiceImg) {
                             $scope.invoiceImg = invoiceImg;
-                            $scope.$apply();
-                            loading(true);
+
+                            $loading.end();
                         })
                 })
                 .catch(function (err) {

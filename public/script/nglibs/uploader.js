@@ -16,7 +16,7 @@ module.exports = function ($module){
 
     if(!use_wxChooseImage){
         $module
-            .directive('ngUploader', function () {
+            .directive('ngUploader', function ($loading) {
                 return {
                     restrict: 'A',
                     transclude: true,
@@ -39,7 +39,7 @@ module.exports = function ($module){
 
                         uploader.onCompleteItem = function (file, response, status, headers) {
                             file.done(response);
-                            loading(true);
+                            $loading.end();
                             $("#upload").remove();
                         };
                         $scope.uploader = uploader;
@@ -59,7 +59,7 @@ module.exports = function ($module){
             });
     }else{
         $module
-            .directive('ngUploader', function () {
+            .directive('ngUploader', function ($loading) {
                 return {
                     restrict: 'A',
                     link: function(scope, element, attributes){
@@ -97,7 +97,7 @@ module.exports = function ($module){
                                                     API.wechat.mediaId2key({mediaId: serverId})
                                                         .then(function(fileId){
                                                             options.done({code: 0, fileId: fileId});
-                                                            loading(true);
+                                                            $loading.end();
                                                             $("#upload").remove();
                                                         })
                                                         .catch(hanleError)

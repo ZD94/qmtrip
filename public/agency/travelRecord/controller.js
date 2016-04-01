@@ -17,8 +17,7 @@ var travelRecord=(function(){
      * @param $scope
      * @constructor
      */
-    travelRecord.TravelListController = function($scope) {
-        loading(true);
+    travelRecord.TravelListController = function($scope, $loading) {
         $("title").html("出差单列表");
         //全部
         $scope.initTravelList1 = function () {
@@ -40,8 +39,7 @@ var travelRecord=(function(){
                                     s.travelerName = ret1;
                                     s.companyName = ret2;
                                     $scope.travelListitems1 = travelList1;
-                                    $scope.$apply();
-                                    loading(true);
+                                    $loading.end();
                                 })
                                 .catch(function(err) {
                                     TLDAlert(err.msg || err);
@@ -72,8 +70,7 @@ var travelRecord=(function(){
                                     s.travelerName = ret1;
                                     s.companyName = ret2;
                                     $scope.travelListitems2 = travelList2;
-                                    $scope.$apply();
-                                    loading(true);
+                                    $loading.end();
                                 })
                                 .catch(function(err) {
                                     TLDAlert(err.msg || err);
@@ -104,8 +101,7 @@ var travelRecord=(function(){
                                     s.travelerName = ret1;
                                     s.companyName = ret2;
                                     $scope.travelListitems3 = travelList3;
-                                    $scope.$apply();
-                                    loading(true);
+                                    $loading.end();
                                 })
                                 .catch(function(err) {
                                     TLDAlert(err.msg || err);
@@ -203,8 +199,7 @@ var travelRecord=(function(){
      * @param $scope
      * @constructor
      */
-    travelRecord.TravelDetailController = function($scope, $routeParams, $location, $anchorScroll) {
-        loading(true);
+    travelRecord.TravelDetailController = function($scope, $routeParams, $location, $loading, $anchorScroll) {
         $("title").html("出差单明细");
         var orderId = $routeParams.orderId;
         $scope.initTravelDetail = function () {
@@ -308,7 +303,6 @@ var travelRecord=(function(){
                         Promise.all(hotels)
                             .then(function(hotels) {
                                 $scope.hotels = hotels;
-                                $scope.$apply();
                             })
                             .catch(function(err) {
                                 console.info("hotels");
@@ -320,7 +314,6 @@ var travelRecord=(function(){
                             .then(function(outTraffics) {
                                 $scope.outTraffics = outTraffics;
                                 console.info(outTraffics);
-                                $scope.$apply();
                             })
                             .catch(function(err) {
                                 console.info("outTraffics");
@@ -331,7 +324,6 @@ var travelRecord=(function(){
                         Promise.all(backTraffics)
                             .then(function(backTraffics) {
                                 $scope.backTraffics = backTraffics;
-                                $scope.$apply();
                             })
                             .catch(function(err) {
                                 console.info("backTraffics");
@@ -342,9 +334,7 @@ var travelRecord=(function(){
                         API.staff.getStaffByAgency({id:$scope.planDetail.accountId})
                             .then(function(result){
                                 $scope.travelerName = result.name;
-                                $scope.$apply();
                             })
-                        $scope.$apply();
                     })
             })
         }
@@ -352,22 +342,21 @@ var travelRecord=(function(){
 
 
         $scope.outTraffichref = function () {
-            loading(true);
+            $loading.end();
             $location.hash('outTraffic');
             $anchorScroll();
 
         }
         $scope.hotelhref = function () {
-            loading(true);
+            $loading.end();
             $location.hash('hotel');
             $anchorScroll();
 
         }
         $scope.backTraffichref = function () {
-            loading(true);
+            $loading.end();
             $location.hash('backTraffic');
             $anchorScroll();
-
         }
 
 

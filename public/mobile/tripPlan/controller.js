@@ -37,7 +37,6 @@
                     picture: picture
                 }, callback);
         }
- 		loading(true);
  		var planId = $routeParams.planId;
         $scope.initall = function() {
             API.onload(function(){
@@ -83,11 +82,9 @@
                                 $scope.backClass = "ready";
                             }
                         }
-                        // $scope.$apply();
                         API.staff.getCurrentStaff()
                             .then(function(staff){
                                 $scope.name = staff.name;
-                                $scope.$apply();
                             })
                     })
             })
@@ -108,7 +105,6 @@
         
  	}
     tripPlan.UploadDownController = function($scope){
-        loading(true);
     }
  	return tripPlan;
  })();

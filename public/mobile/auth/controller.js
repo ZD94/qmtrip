@@ -10,7 +10,6 @@ module.exports = (function() {
 
     auth.LoginController = function($scope,$routeParams) {
         //待实现
-        loading(true);
         $scope.$root.pageTitle = '登录';
         var mail = Cookie.get("email");
         var pwd = Cookie.get("pwd");
@@ -42,7 +41,6 @@ module.exports = (function() {
                         }).catch(function(err){
                             //console.info(err.msg);
                             var str = err.msg;
-                            $scope.$apply();
                             msgbox.log(str);//显示错误消息
                         }).done();
                 })

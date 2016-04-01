@@ -24,12 +24,10 @@
 //                        .then(function(staff){
 //                            console.info(staff);
 //                            $scope.connectname = staff.staff.name;
-//                            $scope.$apply();
 //                        })
 //                        .catch(function(err){
 //                            console.error(err);
 //                        })
-//                    $scope.$apply();
 //                }).catch(function(err){
 //                    console.error(err);
 //                }).done();
@@ -69,7 +67,6 @@
 //                        console.info(result);
 //                        //console.info("获取验证码", result);
 //                        msgTicket = result.ticket;
-//                        $scope.$apply();
 //
 //                        var $seconds = $("#seconds");
 //                        var $timer = $("#timer");

@@ -100,7 +100,6 @@ var staff = (function(){
                                                     $staff.activeStatus = acc.status;
                                                     $staff.accStatus = acc.status==0?'未激活':'';
                                                 }
-                                                $scope.$apply();
                                             })
                                     });
                                 //统计企业员工（管理员 普通员工 未激活员工）数量
@@ -108,10 +107,7 @@ var staff = (function(){
                                 $scope.manager = staffRole.adminNum;
                                 $scope.publicStaff = staffRole.commonStaffNum;
                                 $scope.totalCount = staffRole.totalCount;
-                                return Promise.all(tasks)
-                                    .then(function(){
-                                        $scope.$apply();
-                                    })
+                                return Promise.all(tasks);
                             })
                     })
                     .catch(function(err){
@@ -185,13 +181,9 @@ var staff = (function(){
                                             $staff.activeStatus = acc.status;
                                             $staff.accStatus = acc.status==0?'未激活':'';
                                         }
-                                        $scope.$apply();
                                     })
                             });
-                        return Promise.all(tasks)
-                            .then(function(){
-                                $scope.$apply();
-                            })
+                        return Promise.all(tasks);
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -247,13 +239,9 @@ var staff = (function(){
                                             $staff.activeStatus = acc.status;
                                             $staff.accStatus = acc.status==0?'未激活':'';
                                         }
-                                        $scope.$apply();
                                     })
                             });
-                        return Promise.all(tasks)
-                            .then(function(){
-                                $scope.$apply();
-                            })
+                        return Promise.all(tasks);
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -314,7 +302,6 @@ var staff = (function(){
                                 $("#staffPower").val("");
                             }
                             $scope.initstafflist();
-                            $scope.$apply();
                         }).catch(function (err) {
                             console.log(err);
                             if(err.code == -29){
@@ -325,7 +312,6 @@ var staff = (function(){
                                 $scope.block_tip_err = err.msg;
                             }
                             $(".block_tip").show();
-                            $scope.$apply();
                         }).done();
                 })
             }
@@ -341,7 +327,6 @@ var staff = (function(){
                         $scope.travellevel = staffinfo.staff.travelLevel;
                         $scope.selectkey = $scope.travellevel || "";
                         $scope.department = staffinfo.staff.departmentId || "";
-                        $scope.$apply();
                     }).catch(function(err){
                         TLDAlert(err.msg || err);
                     }).done();
@@ -369,7 +354,6 @@ var staff = (function(){
                         $(".add_staff2").hide();
                         //$scope.initstafflist();
                         $scope.initstafflist();
-                        $scope.$apply();
                     }).catch(function(err){
                         TLDAlert(err.msg || err);
                     }).done();
@@ -389,7 +373,6 @@ var staff = (function(){
                 API.staff.deleteStaff({id:id})
                     .then(function(newStaff){
                         $scope.staffs.splice(index, 1);
-                        $scope.$apply();
                         $scope.initstafflist();
                     }).catch(function(err){
                         TLDAlert(err.msg || err);;
@@ -470,7 +453,6 @@ var staff = (function(){
                                     $('.import_btn>.disabled').show();
                                 }
                                 //return $scope.valid;
-                                $scope.$apply();
                             })
                             .catch(function(err){
                                 TLDAlert(err.msg || err);
@@ -503,7 +485,6 @@ var staff = (function(){
                             .then(function(result){
                                 var filename = result.fileName;
                                 window.open('/download/excle-file/'+filename, "_blank");
-                                $scope.$apply();
                             }).catch(function(err){
                                 TLDAlert(err.msg || err);
                             })
@@ -525,7 +506,6 @@ var staff = (function(){
                         $(".staff_tab_valid").hide();
                         $(".staff_tab_content").hide();
                         $(".staff_tab_import").hide();
-                        $scope.$apply();
                     }).catch(function(err){
                         TLDAlert(err.msg || err);
                     }).done();
@@ -540,10 +520,9 @@ var staff = (function(){
 
 
 
-    staff.DepartmentController = function($scope){
+    staff.DepartmentController = function($scope, $loading){
         $("title").html("组织架构");
         $(".left_nav li").removeClass("on").eq(2).addClass("on");
-        loading(false);
         //初始化
         $scope.initdepartment = function(){
             API.onload(function(){
@@ -566,11 +545,9 @@ var staff = (function(){
                                             .then(function(num){
                                                 s.peoplenum = num;
                                                 console.info ($scope.departmentlist);
-                                                $scope.$apply();
                                             })
                                         });
-                                        $scope.$apply();
-                                        loading(true);
+                                        $loading.end();
                                     })
                             })
                     })
