@@ -12,6 +12,7 @@ describe("api/client/qm_order.js", function() {
     var companyId = "";
     var staffId = "";
     var tripPlanId = "";
+    var consumeId = "";
     var qmOrderId = "";
 
     var agency = {
@@ -49,14 +50,19 @@ describe("api/client/qm_order.js", function() {
             arrivalPlaceCode: 'SH123',
             invoiceType: 'PLANE',
             budget: 1000,
-            newInvoice: '票据详情'
         }]
     };
 
     var qmOrder = {
+        trip_plan_id: tripPlanId,
+        consume_id: consumeId,
+        airways: 'MU',
+        flight_no: 'MU5693',
+        cabin_type: '0',
         date: '2016-04-07',
-        order_no: '1234567890',
-        out_order_no: '12345678900987654321',
+        start_city_code: 'BJ123',
+        end_city_code: 'SH123',
+        pay_price: '1200',
         type: 'P'
     };
 
@@ -81,11 +87,12 @@ describe("api/client/qm_order.js", function() {
             })
             .then(function(tripPlan) {
                 tripPlanId = tripPlan.id;
+                consumeId = tripPlan.outTraffic[0].id
                 qmOrder.trip_plan_id = tripPlanId;
-                qmOrder.consume_id = tripPlan.outTraffic[0].id;
+                qmOrder.consume_id = consumeId;
                 qmOrder.staff_id = staffId;
                 qmOrder.company_id = companyId;
-                return API.qm_order.create_qm_order(qmOrder);
+                return API.client.qm_order.create_order.call({accountId: staffId}, qmOrder);
             })
             .then(function(order) {
                 qmOrderId = order.id;
@@ -116,6 +123,65 @@ describe("api/client/qm_order.js", function() {
     });
 
 
+    describe("create_qm_order", function() {
+        var new_trip_plan_id = '';
+        var new_consume_id = '';
+        var new_qm_order_id = '';
+
+        before(function(done) {
+            API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder)
+                .then(function(trip_plan) {
+                    new_trip_plan_id = trip_plan.id;
+                    new_consume_id = trip_plan.outTraffic[0].id;
+                    done();
+                })
+                .catch(function(err) {
+                    throw err;
+                }).done();
+        });
+
+        after(function(done) {
+            Promise.all([
+                API.tripPlan.deleteTripPlanOrder({orderId: new_trip_plan_id, userId: staffId}),
+                API.qm_order.delete_qm_order({order_id: new_qm_order_id, user_id: staffId})
+            ])
+                .spread(function(){
+                    done()
+                })
+                .catch(function(err){
+                    throw err;
+                })
+                .done();
+        });
+
+        it("create_qm_order should be ok", function(done) {
+            var _qm_order = {
+                trip_plan_id: new_trip_plan_id,
+                consume_id: new_consume_id,
+                flight_no: 'MU5693',
+                start_city_code: 'BJA',
+                end_city_code: 'SHA',
+                airways: 'MU',
+                pay_price: '100.00',
+                cabin_type: '0',
+                date: '2016-04-10'
+            };
+
+            API.client.qm_order.create_order.call({accountId: staffId}, _qm_order, function(err, ret) {
+                if(err) {
+                    throw err;
+                }
+
+                if(ret.toJSON) {
+                    ret = ret.toJSON();
+                }
+                new_qm_order_id = ret.id;
+                done();
+            })
+        });
+    });
+
+
     it("#page_qm_orders should be ok", function(done) {
         var params = {
             page: "1",
@@ -125,7 +191,6 @@ describe("api/client/qm_order.js", function() {
             if(err) {
                 throw err;
             }
-            console.info(ret);
             done();
         });
     });
@@ -138,7 +203,7 @@ describe("api/client/qm_order.js", function() {
             }
 
             if(ret.toJSON) {
-                console.info(ret.toJSON());
+                ret = ret.toJSON();
             }
 
             done();
@@ -152,11 +217,11 @@ describe("api/client/qm_order.js", function() {
                 throw err;
             }
 
-            if(ret.length > 0) {
-                console.info(ret.map(function(c) {
-                    return c.toJSON();
-                }))
-            }
+            //if(ret.length > 0) {
+            //    console.info(ret.map(function(c) {
+            //        return c.toJSON();
+            //    }))
+            //}
 
             done();
         });

@@ -2,7 +2,8 @@
  * Created by ZLW on 2016/03/24.
  */
 'use strict';
-var airTicket = (function () {
+
+module.exports = (function () {
 
     //var id_validation = require('../../script/id_validation');
     API.require('tripPlan');
@@ -12,7 +13,7 @@ var airTicket = (function () {
     API.require('travelBudget');
     API.require('qm_order');
 
-    var airTicket = {};
+    var exported = {};
 
     /*
      机票订单详情页
@@ -20,7 +21,7 @@ var airTicket = (function () {
      * @constructor
      */
 
-    airTicket.OrderDetailsController = function ( $scope,$routeParams ) {
+    exported.OrderDetailsController = function ( $scope,$routeParams ) {
 
         $scope.user;
         $scope.order;
@@ -34,7 +35,7 @@ var airTicket = (function () {
             };
         }
 
-        $scope.renderStatus = function(){
+        $scope.renderStatus = function(){//用于渲染订单状态
             var statuses = {
                 CANCEL: '已取消',
                 OUT_TICKET: '已出票',
@@ -45,17 +46,21 @@ var airTicket = (function () {
                 WAIT_PAY: '待支付',
                 WAIT_TICKET: '待出票'
             };
-            return statuses[ $scope.order.status ]||'';
+            return $scope.order?statuses[ $scope.order.status ]:'';
+        }
+
+        $scope.renderPercentage = function(){//用于渲染准点率
+            return $scope.order?( $scope.order.punctual_rate*100+'%' ):'';
         }
 
         API.onload( function(){
             console.log( API.staff,API.qm_order );
             
-            API.staff
+            $scope.user = API.staff
                 .getCurrentStaff()
                 .then( function(data){
                     console.log(data);
-                    $scope.user = data;
+                    
                     console.log( $scope.user.name );
                 })
                 .catch(function (err) {
@@ -63,7 +68,7 @@ var airTicket = (function () {
                 });
             
             API.qm_order
-                .get_qm_order( {order_id:'c9e5e1f0-f7b7-11e5-be3e-c152128a2f71'} )
+                .get_qm_order( {order_id:'449b2e60-f7da-11e5-b36a-5979044627e6'} )
                 .then( function(data){
                     $scope.order = data;
                     console.log( data );
@@ -76,7 +81,7 @@ var airTicket = (function () {
 
     }
 
-    airTicket.InfoEditingController = function ($scope, $routeParams) {
+    exported.InfoEditingController = function ($scope, $routeParams) {
         //console.log( id_validation('370683198909072254').isValid() );
 
         $scope.user;
@@ -150,7 +155,5 @@ var airTicket = (function () {
 
     }
 
-    return airTicket;
+    return exported;
 })();
-
-module.exports = airTicket;
