@@ -45,17 +45,17 @@ var airTicket = (function () {
                 WAIT_PAY: '待支付',
                 WAIT_TICKET: '待出票'
             };
-            return statuses[ $scope.order.status ]||'';
+            return $scope.order?statuses[ $scope.order.status ]:'';
         }
 
         API.onload( function(){
             console.log( API.staff,API.qm_order );
             
-            API.staff
+            $scope.user = API.staff
                 .getCurrentStaff()
                 .then( function(data){
                     console.log(data);
-                    $scope.user = data;
+                    
                     console.log( $scope.user.name );
                 })
                 .catch(function (err) {
@@ -63,7 +63,7 @@ var airTicket = (function () {
                 });
             
             API.qm_order
-                .get_qm_order( {order_id:'c9e5e1f0-f7b7-11e5-be3e-c152128a2f71'} )
+                .get_qm_order( {order_id:'449b2e60-f7da-11e5-b36a-5979044627e6'} )
                 .then( function(data){
                     $scope.order = data;
                     console.log( data );
