@@ -590,7 +590,7 @@ staff.statStaffPointsByAgency = function(companyId){
  * 创建证件信息
  *
  * @param {Object} params
- * @param {integer} params.type  证件类型（必填）
+ * @param {integer} params.type  证件类型 0表示身份证，1表示护照（必填）
  * @param {string} params.idNo   证件号码（必填）
  * @param {uuid} params.ownerId    用户id（选填）
  * @param {Date} params.birthday  生日（选填）
@@ -664,6 +664,30 @@ staff.getPapersById = function(params){
 
             if(ma.ownerId && ma.ownerId != user_id){
                 throw {code: -1, msg: '无权限'};
+            }
+            return ma;
+        });
+};
+
+
+/**
+ * @method getOnesPapersByType
+ *
+ * 根据类型查询证件信息
+ *
+ * @param {Object} params
+ * @param {uuid} params.ownerId    用户id（查当前登录用户可不填）
+ * @param {uuid} params.type    证件类型（必填）
+ * @param {Array<String>} params.attributes    查询列（选填）
+ * @returns {*|Promise}
+ */
+staff.getOnesPapersByType = function(params){
+    var user_id = this.accountId;
+    params.ownerId = user_id;
+    return API.staff.getOnesPapersByType(params)
+        .then(function(ma){
+            if(!ma){
+                throw {code: -1, msg: '查询结果不存在'};
             }
             return ma;
         });
