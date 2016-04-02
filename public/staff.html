@@ -12,12 +12,6 @@
 	<link rel="stylesheet" type="text/css" href="/staff/css/auth.css"/>
 	<link rel="stylesheet" type="text/css" href="/staff/css/points.css"/>
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
-    <script type="text/javascript">
-        var jQuery = $ = require('jquery');
-        require('jquery-ui');
-    </script>
-    <script type="text/javascript" src="/script/jquery.ajaxfileupload.js"></script>
-    <script type="text/javascript" src="/script/jqPaginator.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.browserify.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.base.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.api.js"></script>
@@ -26,77 +20,11 @@
     <script type="text/javascript" src="/script/libs/bundle.angular.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.nglibs.js"></script>
     <script type="text/javascript" src="/script/libs/bundle.ngapp.js"></script>
+    <script type="text/javascript" src="/staff/controller.all.js"></script>
+    <script type="text/javascript" src="/script/jquery.ajaxfileupload.js"></script>
+    <script type="text/javascript" src="/script/jqPaginator.js"></script>
     <script type="text/javascript" src="/script/selectbox.js"></script>
     <script type="text/javascript" src="/script/header.js"></script>
-    <script type="text/javascript" src="/staff/controller.all.js"></script>
-
-    <script type="text/javascript">
-        var moment = require('moment');
-        var Cookie = require('tiny-cookie');
-        var TLD = TLD_angular_app('qmtrip.staff');
-        TLD.config(function ($stateProvider, $urlRouterProvider) {
-            $urlRouterProvider.otherwise('/StaffFirst/StaffUser');
-            $stateProvider
-                    .state("auth", {
-                        url: "/auth/:path",
-                        controllerProvider: function ($injector, $stateParams){
-                            $stateParams.path = 'auth/' + $stateParams.path;
-                            return $injector.invoke(TLD_angular_app_defaultControllerProvider, this, {$stateParams:$stateParams});
-                        },
-                        templateUrl: function (params) {
-                            return '/staff/auth/' + params.path + ".html";
-                        }
-                    })
-                    .state("root", {
-                        url: "",
-                        abstract: true,
-                        controllerProvider: TLD_angular_app_defaultControllerProvider,
-                        templateUrl: function (params) {
-                            if (isAuthCreditExist()) {
-                                return '/staff/index.html';
-                            }
-                            return '/staff/auth/login.html';
-                        }
-                    })
-                    .state("root.content", {
-                        url: "/*path",
-                        controllerProvider: TLD_angular_app_defaultControllerProvider,
-                        templateUrl: function (params) {
-                            if (isAuthCreditExist()) {
-                                return '/staff/' + params.path + ".html";
-                            }
-                            return '/staff/auth/login.html';
-                        }
-                    });
-        });
-
-        function isAuthCreditExist() {
-            var user_id = Cookie.get('user_id');
-            var token_id = Cookie.get('token_id');
-            var token_sign = Cookie.get('token_sign');
-            var timestamp = Cookie.get("timestamp");
-
-            if (user_id && token_id && token_sign && token_id) {
-                return true;
-            }
-            return false;
-        }
-
-        API.onlogin(function () {
-            var backUrl = window.location.href;
-            backUrl = encodeURIComponent(backUrl);
-            window.location.href = "/staff.html#/auth/login?backurl=" + backUrl;
-        });
-        API.authenticate = function(remote, callback){
-            var user_id = Cookie.get('user_id');
-            var token_id = Cookie.get('token_id');
-            var token_sign = Cookie.get('token_sign');
-            var timestamp = Cookie.get("timestamp");
-
-            remote.authenticate({ accountid: user_id, tokenid: token_id, tokensign: token_sign, timestamp: timestamp },callback);
-        };
-
-    </script>
 </head>
 <body>
 <div id="angular-view" ui-view></div>

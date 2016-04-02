@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
-<html ng-app="tulingdao.com">
+<html lang="zh-cn" ng-app="qm.agency">
 <head>
 	<meta charset="UTF-8">
 	<title ng-bind="pageTitle">代理商管理</title>
@@ -12,75 +11,19 @@
 	<link rel="stylesheet" type="text/css" href="/agency/css/stafflist.css">
 	<link rel="stylesheet" type="text/css" href="/agency/css/travelrecord.css">
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
-	<script type="text/javascript">
-		var jQuery = $ = require('jquery');
-		require('jquery-ui');
-	</script>
-	<script type="text/javascript" src="/script/jquery.ajaxfileupload.js"></script>
-	<script type="text/javascript" src="/script/jqPaginator.js"></script>
 	<script type="text/javascript" src="/script/libs/bundle.browserify.js"></script>
 	<script type="text/javascript" src="/script/libs/bundle.base.js"></script>
 	<script type="text/javascript" src="/script/libs/bundle.api.js"></script>
 	<script type="text/javascript" src="/script/libs/bundle.msgbox.js"></script>
+	<script type="text/javascript" src="/script/libs/bundle.img.js"></script>
 	<script type="text/javascript" src="/script/libs/bundle.angular.js"></script>
 	<script type="text/javascript" src="/script/libs/bundle.nglibs.js"></script>
 	<script type="text/javascript" src="/script/libs/bundle.ngapp.js"></script>
-    <script type="text/javascript" src="/script/selectbox.js"></script>
+	<script type="text/javascript" src="/agency/controller.all.js"></script>
+	<script type="text/javascript" src="/script/selectbox.js"></script>
     <script type="text/javascript" src="/script/header.js"></script>
-    <script type="text/javascript" src="/agency/controller.all.js"></script>
-    <script type="text/javascript">
-    	var moment = require('moment');
-		var Cookie = require('tiny-cookie');
-		var TLD = TLD_angular_app('tulingdao.com');
-		TLD.config(function ($stateProvider, $urlRouterProvider) {
-            $urlRouterProvider.otherwise('/companyList/CompanyList');
-            $stateProvider
-                    .state("login", {
-                        url: "/login/:path",
-                        controllerProvider: function ($injector, $stateParams){
-                            $stateParams.path = 'login/' + $stateParams.path;
-                            return $injector.invoke(TLD_angular_app_defaultControllerProvider, this, {$stateParams:$stateParams});
-                        },
-                        templateUrl: function (params) {
-                            return '/agency/login/' + params.path + ".html";
-                        }
-                    })
-                    .state("root", {
-                        url: "",
-                        abstract: true,
-                        controllerProvider: TLD_angular_app_defaultControllerProvider,
-                        templateUrl: function (params) {
-                            return '/agency/index.html';
-                        }
-                    })
-                    .state("root.content", {
-                        url: "/*path",
-                        controllerProvider: TLD_angular_app_defaultControllerProvider,
-                        templateUrl: function (params) {
-                            return '/agency/' + params.path + ".html";
-                        }
-                    });
-        });
-    	API.onlogin(function(){
-    		var backurl = window.location.href;
-    		return gotoAgentLogin(backurl);
-    	});
-
-    	function gotoAgentLogin(backurl) {
-    		backurl = encodeURIComponent(backurl);
-    		window.location.href = '/agency.html#/login/login?backurl='+backurl;
-    	}
-
-	    API.authenticate = function(remote, callback){
-	        var agent_id = Cookie.get('agent_id');
-	        var token_id = Cookie.get('agent_token_id');
-	        var token_sign = Cookie.get('agent_token_sign');
-	        var timestamp = Cookie.get("agent_token_timestamp");
-            remote.authenticate({ accountid: agent_id, tokenid: token_id, tokensign: token_sign, timestamp: timestamp },
-                    callback);
-	    };
-
-    </script>
+	<script type="text/javascript" src="/script/jquery.ajaxfileupload.js"></script>
+	<script type="text/javascript" src="/script/jqPaginator.js"></script>
 </head>
 <body>
 	<div id="angular-view" ui-view></div>

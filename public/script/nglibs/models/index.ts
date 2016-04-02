@@ -12,8 +12,12 @@ class Staff {
 class StaffCache {
     cache : angular.ICacheObject;
     constructor($cacheFactory){
-        API.require('staff');
         this.cache = $cacheFactory('Staff');
+    }
+
+    $resolve() : Promise<void> {
+      API.require('staff');
+      return API.onload();
     }
 
     async get(id: string) : Promise<Staff> {
@@ -21,11 +25,11 @@ class StaffCache {
         var staff : Staff = self.cache.get<Staff>(id);
         if(staff)
             return staff;
-        await API.onload();
         staff = await API.staff.getCurrentStaff();
         self.cache.put(id, staff);
         return staff;
     }
+
 }
 
 angular.module('qmmodel', [])
