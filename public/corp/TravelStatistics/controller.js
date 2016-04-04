@@ -4,6 +4,7 @@
 'use strict';
 
 var TravelStatistics = (function(){
+    var moment = require('moment');
 
     API.require('tripPlan');
     API.require("staff");

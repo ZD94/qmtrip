@@ -4,6 +4,8 @@
 'use strict';
 var businesstravel=(function(){
 
+    var msgbox = require('msgbox');
+
     API.require("auth");
     API.require("place");
     API.require("staff");

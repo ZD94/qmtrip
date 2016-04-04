@@ -4,6 +4,8 @@
 'use strict';
 var travelplan = (function () {
 
+    var msgbox = require('msgbox');
+
     API.require('tripPlan');
     API.require('auth');
     API.require('attachment');
