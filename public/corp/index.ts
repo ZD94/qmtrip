@@ -77,6 +77,14 @@ app.controller("MainController", ["$scope", function($scope) {
     })
 }])
 
+var dyload = require('dyload');
+dyload('http://echarts.baidu.com/build/dist/echarts-all.js');
+dyload('/script/jqPaginator.js');
+dyload('/script/jquery.ajaxfileupload.js');
+dyload('/script/selectbox.js');
+dyload('/script/header.js');
+dyload('/script/messagebox.js');
+
 function isAuthCreditExist() {
     var user_id = Cookie.get('user_id');
     var token_id = Cookie.get('token_id');

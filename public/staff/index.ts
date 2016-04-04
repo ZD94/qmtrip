@@ -36,46 +36,14 @@ function isAuthCreditExist() {
 
 var ngapp = require('ngapp');
 ngapp.depend('qmmodel');
+ngapp.root('staff', '/StaffFirst/StaffUser');
 ngapp.initializer(require('nglibs'));
-var app = ngapp.create('qmtrip.staff');
+ngapp.useRoutePolicy(ngapp.RoutePolicy.Embed, ['auth']);
+var app = ngapp.create('qm.staff');
 
-app.config(function ($stateProvider, $urlRouterProvider) {
-    $urlRouterProvider.otherwise('/StaffFirst/StaffUser');
-    $stateProvider
-        .state("auth", {
-            url: "/auth/:path",
-            controllerProvider: ngapp.controllerProvider,
-            resolve: {
-                ctrl: function ($injector, $stateParams){
-                    $stateParams.path = 'auth/' + $stateParams.path;
-                    return $injector.invoke(ngapp.controllerResolver, this, {$stateParams:$stateParams});
-                }
-            },
-            templateUrl: function (params) {
-                return '/staff/auth/' + params.path + ".html";
-            }
-        })
-        .state("root", {
-            url: "",
-            abstract: true,
-            controllerProvider: ngapp.controllerProvider,
-            resolve: { ctrl: ngapp.controllerResolver },
-            templateUrl: function (params) {
-                if (isAuthCreditExist()) {
-                    return '/staff/index.html';
-                }
-                return '/staff/auth/login.html';
-            }
-        })
-        .state("root.content", {
-            url: "/*path",
-            controllerProvider: ngapp.controllerProvider,
-            resolve: { ctrl: ngapp.controllerResolver },
-            templateUrl: function (params) {
-                if (isAuthCreditExist()) {
-                    return '/staff/' + params.path + ".html";
-                }
-                return '/staff/auth/login.html';
-            }
-        });
-});
+var dyload = require('dyload');
+dyload('/script/jquery.ajaxfileupload.js');
+dyload('/script/jqPaginator.js');
+dyload('/script/selectbox.js');
+dyload('/script/header.js');
+dyload('/script/messagebox.js');

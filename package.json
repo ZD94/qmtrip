@@ -52,7 +52,7 @@
     "shoe": "0.0.15",
     "tiny-cookie": "^0.5.5",
     "traverse": "^0.6.6",
-    "typescript": "^1.8.7",
+    "typescript": "^1.8.9",
     "typescript-require": "newclear/typescript-require",
     "weak": "^1.0.0",
     "wechat-oauth": "^1.1.1"
@@ -96,6 +96,7 @@
     "jquery": "^2.2.1",
     "jquery-ui": "^1.10.5",
     "lessify": "^1.0.1",
+    "load-script": "^1.0.0",
     "md5": "^2.0.0",
     "notie": "^2.1.0",
     "stringify": "^5.1.0",

@@ -24,40 +24,15 @@ function TLDAlert(msg) {
 
 var ngapp = require('ngapp');
 ngapp.depend('qmmodel');
+ngapp.root('agency', '/companyList/CompanyList');
 ngapp.initializer(require('nglibs'));
+ngapp.useRoutePolicy(ngapp.RoutePolicy.Embed, ['login']);
 var app = ngapp.create('qm.agency');
 
-app.config(function ($stateProvider, $urlRouterProvider) {
-    $urlRouterProvider.otherwise('/companyList/CompanyList');
-    $stateProvider
-        .state("login", {
-            url: "/login/:path",
-            controllerProvider: ngapp.controllerProvider,
-            resolve: {
-                ctrl: function ($injector, $stateParams){
-                    $stateParams.path = 'login/' + $stateParams.path;
-                    return $injector.invoke(ngapp.controllerResolver, this, {$stateParams:$stateParams});
-                }
-            },
-            templateUrl: function (params) {
-                return '/agency/' + params.path + ".html";
-            }
-        })
-        .state("root", {
-            url: "",
-            abstract: true,
-            controllerProvider: ngapp.controllerProvider,
-            resolve: { ctrl: ngapp.controllerResolver },
-            templateUrl: function (params) {
-                return '/agency/index.html';
-            }
-        })
-        .state("root.content", {
-            url: "/*path",
-            controllerProvider: ngapp.controllerProvider,
-            resolve: { ctrl: ngapp.controllerResolver },
-            templateUrl: function (params) {
-                return '/agency/' + params.path + ".html";
-            }
-        });
-});
+var dyload = require('dyload');
+dyload('/script/selectbox.js');
+dyload('/script/header.js');
+dyload('/script/jquery.ajaxfileupload.js');
+dyload('/script/jqPaginator.js');
+dyload('/script/messagebox.js');
+        

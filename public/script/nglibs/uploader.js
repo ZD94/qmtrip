@@ -1,6 +1,7 @@
+"use strict";
+
 var $ = require('jquery');
-var EXIF = require("exif-js");
-var exifOrient = require("exif-orient");
+var dyload = require('dyload');
 
 var use_wxChooseImage = false;
 
@@ -9,14 +10,13 @@ function hanleError(err) {
 }
 
 module.exports = function ($module){
-    "use strict";
-    if(browserspec.is_wechat && /^(www\.)?qmtrip\.com\.cn$/.test(window.location.host)){
-        use_wxChooseImage = true;
-    }
-
-    if(!use_wxChooseImage){
-        $module
-            .directive('ngUploader', function ($loading) {
+    $module
+        .directive('ngUploader', function ($loading) {
+            var browserspec = require('browserspec');
+            if(browserspec.is_wechat && /^(www\.)?qmtrip\.com\.cn$/.test(window.location.host)){
+                use_wxChooseImage = true;
+            }
+            if(!use_wxChooseImage){
                 return {
                     restrict: 'A',
                     transclude: true,
@@ -57,10 +57,7 @@ module.exports = function ($module){
                         };
                     }
                 };
-            });
-    }else{
-        $module
-            .directive('ngUploader', function ($loading) {
+            } else {
                 return {
                     restrict: 'A',
                     link: function(scope, element, attributes){
@@ -114,8 +111,8 @@ module.exports = function ($module){
 
                     }
                 };
-            });
-    }
+            }
+        });
 
     function onAfterAddingFile(file, uploadedCbFn){
         var data = [];
@@ -162,17 +159,24 @@ module.exports = function ($module){
                 return;
             }
 
+            var loaded = dyload('/script/libs/bundle.img.js');
+
             var img = new Image();
             img.onload = function() {
-                EXIF.getData(img, function() {
-                    var orientation = img.exifdata.Orientation || 1;
-                    exifOrient(img, orientation, function(err, canvas) {
-                        if (err) {
-                            return alert(err);
-                        }
-                        $(".preview_img").append(canvas);
-                    })
-                });
+                loaded
+                .then(function(){
+                    var EXIF = require("exif-js");
+                    var exifOrient = require("exif-orient");
+                    EXIF.getData(img, function() {
+                        var orientation = img.exifdata.Orientation || 1;
+                        exifOrient(img, orientation, function(err, canvas) {
+                            if (err) {
+                                return alert(err);
+                            }
+                            $(".preview_img").append(canvas);
+                        })
+                    });
+                })
             }
             img.src = url;
         }

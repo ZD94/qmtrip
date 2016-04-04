@@ -39,7 +39,7 @@ var ngapp = require('ngapp');
 ngapp.depend('qmmodel');
 ngapp.root('admin', '/main/index');
 ngapp.initializer(require('nglibs'));
-var app = ngapp.create('qmtrip');
+var app = ngapp.create('qm.admin');
 
 //获取页面基本信息
 app.controller("MainController", ["$scope", function($scope) {
@@ -71,6 +71,13 @@ app.controller("MainController", ["$scope", function($scope) {
     })
 }])
 
+var dyload = require('dyload');
+dyload('http://echarts.baidu.com/build/dist/echarts-all.js');
+dyload('/script/messagebox.js');
+dyload('/script/selectbox.js');
+dyload('/script/header.js');
+dyload('/script/jquery.ajaxfileupload.js');
+        
 $(function(){
     $(window).resize(function(){resize();})
     $(".left_nav a").click(function(){
