@@ -18,4 +18,3 @@ alter table qm_order.qm_order add column pay_price NUMERIC(15, 2);
 alter table qm_order.qm_order add column start_city_code VARCHAR(10);
 alter table qm_order.qm_order add column end_city_code VARCHAR(10);
 alter table qm_order.qm_order add column airways VARCHAR(5);
-alter table qm_order.qm_order add column meal_name VARCHAR;

@@ -5,6 +5,7 @@
 
 module.exports = (function () {
 
+    var msgbox = require('msgbox');
     //var id_validation = require('../../script/id_validation');
     API.require('tripPlan');
     API.require('auth');
@@ -21,7 +22,9 @@ module.exports = (function () {
      * @constructor
      */
 
-    exported.OrderDetailsController = function ( $scope,$routeParams ) {
+    exported.OrderDetailsController = function ( $scope,$routeParams,$loading ) {
+
+        $loading.end();
 
         $scope.user;
         $scope.order;
@@ -35,7 +38,7 @@ module.exports = (function () {
             };
         }
 
-        $scope.renderStatus = function(){//用于渲染订单状态
+        $scope.renderStatus = function(){//该函数用于判断并返回订单状态。
             var statuses = {
                 CANCEL: '已取消',
                 OUT_TICKET: '已出票',
@@ -49,8 +52,21 @@ module.exports = (function () {
             return $scope.order?statuses[ $scope.order.status ]:'';
         }
 
-        $scope.renderPercentage = function(){//用于渲染准点率
+        $scope.renderPercentage = function(){//该函数用于计算并以“98%”的格式返回准点率。
             return $scope.order?( $scope.order.punctual_rate*100+'%' ):'';
+        }
+
+        $scope.renderTimeSpan = function(){//该函数用于计算并以“10时10分”的格式返回这次飞行所需的时间。
+            if($scope.order){
+                var departure_time = new Date( $scope.order.start_time ).getTime();
+                var arrival_time = new Date( $scope.order.end_time ).getTime();
+                var time_span = (arrival_time - departure_time)/1000;
+                return time_span;
+            };
+        }
+
+        $scope.showInfo = function(){
+            msgbox.alert( $scope.order.ticket_info.tpgd, '确定' );
         }
 
         API.onload( function(){
@@ -68,7 +84,7 @@ module.exports = (function () {
                 });
             
             API.qm_order
-                .get_qm_order( {order_id:'449b2e60-f7da-11e5-b36a-5979044627e6'} )
+                .get_qm_order( {order_id:'e9fd90c0-fb07-11e5-b602-a384e706e5f0'} )
                 .then( function(data){
                     $scope.order = data;
                     console.log( data );
