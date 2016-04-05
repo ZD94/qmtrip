@@ -9,6 +9,7 @@ var sequelize = require("common/model").importModel("./models");
 var utils = require('common/utils');
 var paginate = require("common/paginate");
 var uuid = require('node-uuid');
+var API = require('common/api');
 import _ = require('lodash');
 import moment = require('moment');
 
@@ -40,6 +41,7 @@ var ERROR = {
     ORDER_NOT_FOUND: {code: -2, msg: '没有该订单'},
     UPDATE_ERROR: {code: -50, msg: '更新错误'},
     DELETE_ERROR: {code: -60, msg: '删除订单出错'},
+    PLANE_BOOK_ERROR: {code: -70, msg: '机票预定失败，请检查订单状态'}
 };
 
 /**
@@ -163,6 +165,53 @@ qm_order.delete_qm_order = function(params) {
 
             return true;
         })
+};
+
+/**
+ * options after order payed
+ * 用户支付订单后，预定机票并支付
+ * @param params
+ */
+qm_order.book_and_pay_ticket = function(params) {
+    return QmOrderModel.findOne({where: {order_no: params.order_no}})
+        .then(function(order) {
+            if(order.status != 'WAIT_PAY') {
+                throw ERROR.PLANE_BOOK_ERROR;
+            };
+
+            var book_params : any = _.pick(order, ['flight_list', 'passengers', 'contact_name', 'contact_mobile', 'adult_num']);
+            book_params.ip_address = order.flight_list.ip_address;
+
+            return [order, API.shengyi_ticket.book_ticket_test(book_params)];
+        })
+        .spread(function(order, book_result) {
+            return [order, API.shengyi_ticket.get_ticket_order({order_no: book_result.order_no})];
+        })
+        .spread(function(order, ticket_order) {
+            var segment = ticket_order.segments[0];
+            var updates ={
+                out_order_no: ticket_order.order_no,
+                start_time: segment.departure_time,
+                end_time: segment.arrival_time,
+                ticket_info: segment,
+                status: STATUS.WAIT_TICKET, //待出票状态
+                update_at: utils.now(),
+                pay_time: utils.now() //支付时间
+            };
+
+            return QmOrderModel.update(updates, {returning: true, where: {id: order.id}})
+        })
+        .spread(function(result, orders) {
+            console.info(result);
+            var qm_order = orders[0].toJSON();
+            console.info(qm_order);
+            if(result !== 1) {
+                throw ERROR.PLANE_BOOK_ERROR;
+            }
+
+            return true;
+        })
 }
+
 
 module.exports = qm_order;
