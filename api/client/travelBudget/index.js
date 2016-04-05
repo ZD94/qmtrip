@@ -196,8 +196,6 @@ travelBudget.getHotelBudget = function(params) {
                 }
             } else if (policy.hotelPrice && result.price > policy.hotelPrice) {
                 return {price: policy.hotelPrice * days, bookListUrl: result.bookListUrl};
-            } else {
-                return result;
             }
             return result;
         })

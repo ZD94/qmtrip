@@ -61,31 +61,4 @@ function mobileSelectDate(config, options) {
 
     var calendar = require("calendar");
     return calendar.selectDate(options);
-
-    //var cal = new calendar.Calendar(config);
-    //cal.renderMonth(options.month, options.year, options.displayMonthNum);
-
-    var html = calendar.renderMonth({
-        accept_begin: options.accept_begin,
-        selected: options.selected
-    }, options.year, options.month, options.displayMonthNum);
-    var caldiv = document.getElementById(containerId);
-    if(!caldiv){
-        caldiv = document.createElement('div');
-        caldiv.className = "calendar";
-        caldiv.id = containerId;
-        document.body.appendChild(caldiv);
-    }
-    caldiv.innerHTML = html;
-
-    //var dayNodes = document.getElementsByClassName("day[^expire=true]");
-    return new PromiseLib(function(resolve) {
-        var dayNodes = $('#'+containerId+' td[data]:not([cal-opt~="expire"])');
-        dayNodes.each(function(i, node){
-            node.onclick = function(){
-                document.getElementById(containerId).remove(); //删除
-                resolve(node.attributes["data"].value);
-            };
-        })
-    });
 }
