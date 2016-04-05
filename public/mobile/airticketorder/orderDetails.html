@@ -27,16 +27,16 @@
             <p class="briefing">中国联行{{order.ticket_info.flight_no}}({{order.ticket_info.aircraft_type}}) | 准点率{{renderPercentage()}}<span ng-if="order.meal"> | 含餐</span></p>
             <ul>
                 <li>
-                    <p class="time">{{order.start_time | date:"HH:mm" ||"null"}}</p>
+                    <p class="time">{{order.start_time.substring(0,5) || "null"}}</p>
                     <p class="airport">{{order.ticket_info.dept_station_name}}</p>
                 </li>
                 <li>
-                    <p class="timeSpan"></p>
+                    <p class="timeSpan">{{renderTimeSpan()}}</p>
                     <img class="arrow_with_dot" src="./mobile/images/arrow_with_dot.png"/>
                     <p class="transferStation">经停呼和浩特</p>
                 </li>
                 <li>
-                    <p class="time">{{order.end_time | date:"HH:mm" ||"null"}}</p>
+                    <p class="time">{{order.end_time.substring(0,5) ||"null"}}</p>
                     <p class="airport">{{order.ticket_info.arrival_station_name}}</p>
                 </li>
             </ul>
