@@ -1,0 +1,30 @@
+<div class="order_list">
+    <div class="list_tab">
+        <div class="line"></div>
+        <div class="dropdown">
+            <div class="dropdown-header">状态：{{status}} <i class="fa fa-caret-down"></i></div>
+            <ul class="dropdown-menu">
+                <li ng-repeat="item in statuses" ng-click="selectStatus($index)" ng-class="{true:'active'}[(item===status)]">{{item}}</li>
+            </ul>
+        </div>
+        <div class="dropdown">
+            <div class="dropdown-header">排序：{{order}} <i class="fa fa-caret-down"></i></div>
+            <ul class="dropdown-menu">
+                <li ng-repeat="item in orders" ng-click="selectOrder($index)" ng-class="{true:'active'}[(item===order)]">{{order}}</li>
+            </ul>
+        </div>
+    </div>
+    <ul class="list_content">
+        <div class="veil"></div>
+        <div class="item margin_b" ng-repeat="item in items" ng-click="enterDetail(item.id)">
+            <li class="item_main">
+                <div class="item_left"></div>
+                <div class="item_right"></div>
+            </li>
+            <div class="item_bottom"></div>
+        </div>
+
+        <p class="tips" ng-if="tips" ng-bind-html="tips"></p>
+
+    </ul>
+</div>

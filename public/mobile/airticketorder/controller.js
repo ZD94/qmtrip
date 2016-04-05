@@ -161,6 +161,17 @@ module.exports = (function () {
     exported.AddresslistController = function ($scope) {
     }
 
+    exported.OrderlistController = function ($scope) {
+        API.onload().then(function(){
+            API.qm_order.page_qm_orders({})
+                .then(function(ret) {
+                    $scope.orderlist = ret;
+                    console.info($scope.orderlist);
+                })
+            
+        });
+        
+    }
     return exported;
 })();
 
