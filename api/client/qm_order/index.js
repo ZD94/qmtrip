@@ -166,6 +166,7 @@ function page_qm_orders(params) {
             var options = {
                 where: _.omit(params, ['page', 'per_page', 'order'])
             };
+            options.where.status = {$ne: -4};
             params.order ? options.order = [params.order] : options.order = [['date', 'asc']];
 
             return API.qm_order.list_qm_orders(options)
