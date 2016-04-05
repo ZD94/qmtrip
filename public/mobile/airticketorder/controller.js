@@ -21,7 +21,9 @@ module.exports = (function () {
      * @constructor
      */
 
-    exported.OrderDetailsController = function ( $scope,$routeParams ) {
+    exported.OrderDetailsController = function ( $scope,$routeParams,$loading ) {
+
+        $loading.end();
 
         $scope.user;
         $scope.order;
