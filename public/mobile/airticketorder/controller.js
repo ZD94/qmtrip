@@ -26,6 +26,8 @@ module.exports = (function () {
 
         $loading.end();
 
+        $scope._status = "WAIT_PAY";
+
         $scope.user;
         $scope.order;
 
@@ -56,17 +58,31 @@ module.exports = (function () {
             return $scope.order?( $scope.order.punctual_rate*100+'%' ):'';
         }
 
-        $scope.renderTimeSpan = function(){//该函数用于计算并以“10时10分”的格式返回这次飞行所需的时间。
-            if($scope.order){
-                var departure_time = new Date( $scope.order.start_time ).getTime();
-                var arrival_time = new Date( $scope.order.end_time ).getTime();
-                var time_span = (arrival_time - departure_time)/1000;
-                return time_span;
-            };
+        $scope.renderDay = function(){
+            var day = ['周日','周一','周二','周三','周四','周五','周六'];
+            return (
+                $scope.order?
+                day[new Date($scope.order.flight_list.departure_date).getDay()]
+                :
+                null
+            );
         }
+
+        // $scope.renderTimeSpan = function(){//该函数用于计算并以“10时10分”的格式返回这次飞行所需的时间。
+        //     if($scope.order){
+        //         var departure_time = new Date( $scope.order.start_time ).getTime();
+        //         var arrival_time = new Date( $scope.order.end_time ).getTime();
+        //         var time_span = (arrival_time - departure_time)/1000;
+        //         return time_span;
+        //     };
+        // }
 
         $scope.showInfo = function(){
             msgbox.alert( $scope.order.ticket_info.tpgd, '确定' );
+        }
+
+        $scope.delete = function(){
+            msgbox.confirm( '订单一经删除则无法恢复，确认删除吗？','确认删除','取消' );
         }
 
         API.onload( function(){
@@ -150,22 +166,24 @@ module.exports = (function () {
                     daysOfWeek: [],//[0,1,2,3,4,5]
                     daysOfMonth: []//['5/1', '12/24', '12/25']
                 },
-                theme: 'android-ics light',
+                theme: 'mobiscroll-qm light',
                 display: 'bottom',
                 mode: 'scroller',
                 dateOrder: 'yy mm dd',
                 dateFormat: "yyyy-mm-dd",
                 startYear: "2016",
-                endYear: "2020",
+                endYear: "2050",
                 yearText: "年",
                 monthText: "月",
                 dayText: "日",
                 showNow: false,
                 nowText: "今天",
-                setText: "完成",
+                setText: "确定",
                 cancelText: "取消",
                 rows: 5,
-                showOnFocus: true
+                showOnFocus: true,
+                monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                monthNamesShort: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
             })
         });
 

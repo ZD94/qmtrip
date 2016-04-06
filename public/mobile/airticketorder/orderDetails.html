@@ -20,20 +20,22 @@
 
     <div class="middle">
         <div class="row1">
-            <span>{{order.start_city_code}}-{{order.end_city_code}} {{order.start_time | date:"MM-dd"}} 周六</span>
+            <span>{{order.start_city_code}}-{{order.end_city_code}} {{order.flight_list.departure_date | date:"MM-dd"}} {{renderDay()}}</span>
             <span class="instruction" ng-click=" showInfo() "> 退改签说明 </span>
         </div>
         <div class="row2">
-            <p class="briefing">中国联行{{order.ticket_info.flight_no}}({{order.ticket_info.aircraft_type}}) | 准点率{{renderPercentage()}}<span ng-if="order.meal"> | 含餐</span></p>
+            <p class="briefing">
+                中国联行{{order.ticket_info.flight_no}}({{order.ticket_info.aircraft_type}}) | 准点率{{renderPercentage()}}<span ng-if="order.flight_list.meal"> | 含餐</span>
+            </p>
             <ul>
                 <li>
                     <p class="time">{{order.start_time.substring(0,5) || "null"}}</p>
                     <p class="airport">{{order.ticket_info.dept_station_name}}</p>
                 </li>
                 <li>
-                    <p class="timeSpan">{{renderTimeSpan()}}</p>
+                    <p class="timeSpan">{{order.flight_list.fly_time.split(":")[0]}}时{{order.flight_list.fly_time.split(":")[1]}}分</p>
                     <img class="arrow_with_dot" src="./mobile/images/arrow_with_dot.png"/>
-                    <p class="transferStation">经停呼和浩特</p>
+                    <p class="transferStation">_经停呼和浩特</p>
                 </li>
                 <li>
                     <p class="time">{{order.end_time.substring(0,5) ||"null"}}</p>
@@ -47,32 +49,32 @@
         </div>
 
         <div class="passengerInfoContent">
-            <span class="passengerName">{{order.passenger[0].name}}</span><br/>
-            <span class="identity">身份证：{{order.passenger[0].identification_no}}</span>
+            <span class="passengerName">{{order.passengers[0].name}}</span><br/>
+            <span class="identity">身份证：{{order.passengers[0].certificate_number}}</span>
         </div>
 
         <div class="price thisHeader">
-            <symbol name="icon-fare"/> 票价信息<span class="total">合计：<span class="totalPrice">￥{{order.pay_price}}</span></span>
+            <symbol name="icon-fare"/> 票价信息<span class="total">合计：<span class="totalPrice">￥{{order.flight_list.suggest_price}}</span></span>
         </div>
 
         <ul class="charges">
             <li>
-                <span class="number">￥{{order.ticket_info.price}}</span><br/>
+                <span class="number">￥{{order.flight_list.bill_price}}</span><br/>
                 <span class="text">票价</span>
                 <div class="bar"></div>
             </li>
             <li>
-                <span class="number">￥{{order.passenger[0].air_con_fee}}</span><br/>
+                <span class="number">￥{{order.flight_list.air_con_fee}}</span><br/>
                 <span class="text">机建费</span>
                 <div class="bar"></div>
             </li>
             <li>
-                <span class="number">￥{{order.passenger[0].fuel_tax}}</span><br/>
+                <span class="number">￥{{order.flight_list.fuel_tax}}</span><br/>
                 <span class="text">税费</span>
                 <div class="bar"></div>
             </li>
             <li>
-                <span class="number">￥{{null}}</span><br/>
+                <span class="number">￥_</span><br/>
                 <span class="text">配送费</span>
             </li>
         </ul>
@@ -85,8 +87,8 @@
             <symbol name="icon-up-arrow" class="arrow" ng-if="deliveryAddressShown"/>
         </div>
         <div class="dropdown-content deliveryAddress" ng-show="deliveryAddressShown">
-            <p class="name">李明月 13611111111</p>
-            <p class="address">北京市朝阳区</p>
+            <p class="name">_李明月 _13611111111</p>
+            <p class="address">_北京市朝阳区</p>
         </div>
     </div>
 
@@ -100,9 +102,12 @@
     <div class="shadow-buttons">
     </div>
 
-    <div class="buttons">
-        <a>删除订单</a>
-        <a class="checkout">去支付：￥610.25</a>
-    </div>    
+    <div class="buttons" ng-if=" _status==='WAIT_PAY' ">
+        <a class="delete" ng-click="delete()">删除订单</a>
+        <a class="checkout">去支付：￥{{order.flight_list.suggest_price}}</a>
+    </div>
+    <div class="buttons" ng-if=" _status!=='WAIT_PAY' ">
+        <a class="rebook">重新预订</a>
+    </div>
 
 </div>
