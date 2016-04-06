@@ -15,13 +15,25 @@
         </div>
     </div>
     <ul class="list_content">
-        <div class="veil"></div>
-        <div class="item margin_b" ng-repeat="item in items" ng-click="enterDetail(item.id)">
+        <div class="item margin_b"  ng-click="enterDetail(item.id)">
             <li class="item_main">
-                <div class="item_left"></div>
-                <div class="item_right"></div>
+                <div class="item_left">
+                    <div class="plane_icon"><symbol name="icon-plane-solid"/></div>
+                    <div class="starttime">08:00<br><span>浦东T3</span></div>
+                    <div class="line1"><img src="mobile/images/line2.jpg"><span>经停</span></div>
+                    <div class="endtime">08:00<i>+1天</i><br><span>浦东T3</span></div>
+                    <div class="airline elasticbox">
+                        <div class="left"><img src="mobile/images/logo/sc.gif"></div>
+                        <div class="right elasticbox_one">中国联行KN1234(875中) | 准点率87%</div>
+                    </div>
+                </div>
+                <div class="item_right">¥12345</div>
             </li>
-            <div class="item_bottom"></div>
+            <div class="item_bottom">
+                <a href="" class="sm_btn1">删除</a>
+                <a href="" class="sm_btn2">去支付</a>
+                <a href="" class="sm_btn3">查看票据</a>
+            </div>
         </div>
 
         <p class="tips" ng-if="tips" ng-bind-html="tips"></p>
