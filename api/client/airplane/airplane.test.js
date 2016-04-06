@@ -158,7 +158,7 @@ describe("api/client/airplane.js", function() {
         this.timeout(20000);
         var params = {
             arrival_city: "SHA",
-            date: "2016-04-10",
+            date: "2016-05-10",
             departure_city: "PEK",
             ip_address: '192.168.1.3'
         };
@@ -177,7 +177,7 @@ describe("api/client/airplane.js", function() {
         var params = {
             flight_no: "MU5693",
             ip_address: '192.168.1.3',
-            query_key: '20160401175623aNZB'
+            query_key: '20160406103609Hpsd'
         };
         API.client.airplane.get_plane_details.call({accountId: staffId}, params, function(err, ret) {
             if(err) {
@@ -234,6 +234,7 @@ describe("api/client/airplane.js", function() {
             consume_id: consumeId,
             contact_name: "于淼",
             contact_mobile: "18515073641",
+            cabin: 'B',
             adult_num: 1,
             insurance_price: 20,
             pay_price: 1100,
