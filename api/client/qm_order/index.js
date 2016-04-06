@@ -80,6 +80,7 @@ function create_order(params) {
 }
 
 /**
+ * @method  get_qm_order
  * 获取全麦订单详情
  * @param params
  * @param {uuid} params.order_id  订单id
@@ -111,7 +112,8 @@ function getByOutOrderNo(params) {
 }
 
 /**
- * 获取全麦订单详情
+ * @method  get_orders_plan_id
+ * 根据出差记录获取所有订单信息
  * @param params
  * @param {uuid}    params.trip_plan_id  计划单id
  * @param {Array}   params.order    排序 默认: ['date', 'asc']
@@ -140,6 +142,7 @@ function get_orders_plan_id(params) {
 }
 
 /**
+ * @method  page_qm_orders
  * 查询订单列表分页接口
  * @param params
  * @param {integer} params.page   查询页数 默认: 1
@@ -172,10 +175,18 @@ function page_qm_orders(params) {
             return API.qm_order.list_qm_orders(options)
         })
         .then(function(ret) {
+            console.info(ret);
             return new Paginate(page, per_page, ret.count, ret.rows);
         })
 };
 
+/**
+ * @method  delete_order
+ * 删除订单
+ *
+ * @param {uuiid} params.order_id   订单id
+ * @type {delete_order}
+ */
 qm_order.delete_order = delete_order;
 delete_order.required_params = ['order_id'];
 function delete_order(params) {

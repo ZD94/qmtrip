@@ -11,9 +11,14 @@ var moment = require('moment');
 var getRndStr = require('common/utils').getRndStr;
 
 var logger = new Logger('airplane');
+/**
+ * @class   airplane    机票相关API
+ */
 var airplane = {};
 
 /**
+ * @method get_plane_list
+ *
  * 查询机票列表接口
  * @param params
  * @param {integer} params.query_flag   查询类型 0：国际 1：国内
@@ -27,27 +32,65 @@ var airplane = {};
  */
 airplane.get_plane_list = get_plane_list;
 get_plane_list.required_params = ['departure_city', 'arrival_city', 'date', 'ip_address'];
-get_plane_list.optional_params = ['query_flag', 'travel_type'];
+get_plane_list.optional_params = ['query_flag', 'travel_type', 'dept_station', 'arrival_station'];
 function get_plane_list(params) {
     var self = this;
     var query_key = moment().format('YYYYMMDDHHmmss') + getRndStr(4, 2);
 
-    return API.staff.getStaff({id: self.accountId})
-        .then(function() {
-            params.query_key = query_key;
-            return API.shengyi_ticket.search_ticket(params);
+    return Promise.all([
+        API.staff.getStaff({id: self.accountId}),
+        API.place.getAirPortsByCity({cityCode: params.departure_city}),
+        API.place.getAirPortsByCity({cityCode: params.arrival_city})
+    ])
+        .spread(function(staff, s_stations, e_stations) {
+            var query_params = [];
+            s_stations.map(function(s1) {
+                var dept_station = params.dept_station;
+                if(dept_station && dept_station.indexof(s1.id) < 0) {
+                    return;
+                }
+
+                var query_1 = {start_station: s1.skyCode};
+                e_stations.map(function(s2) {
+                    var arrival_station = params.arrival_station;
+                    if(arrival_station && arrival_station.indexof(s2.id) < 0) {
+                        return;
+                    }
+
+                    query_1.arrival_station = s2.skyCode;
+                    query_params.push({start_station: query_1.start_station, arrival_station: query_1.arrival_station});
+                });
+            });
+
+            return Promise.all(query_params.map(function(q) {
+                params.query_key = query_key + q.start_station + q.arrival_station;
+                params.departure_station = q.start_station;
+                params.arrival_station = q.arrival_station;
+                return API.shengyi_ticket.search_ticket(params);
+            }))
         })
-        .then(function(ret) {
-            return ret.map(function(flight) {
-                flight.query_key = query_key;
-                console.info(flight);
-                return flight;
-            })
+        .then(function(result) {
+            logger.info(result);
+            var flight_list = [];
+            result.map(function(ret) {
+                ret.map(function(flight) {
+                    flight.dept_city = params.departure_city;
+                    flight.arrival_city = params.arrival_city;
+                    flight.query_key = query_key + flight.dept_station_code + flight.arrival_station_code;
+                    flight_list.push(flight);
+                })
+            });
+
+            logger.info(flight_list);
+            console.info(flight_list.length);
+            return flight_list;
         })
+
 };
 
 /**
- * 获取舱位信息
+ * @method  get_plane_details
+ * 获取航班舱位信息
  * @param   params
  * @param   {string}    params.flight_no   航班号
  * @param   {string}    params.ip_address   ip地址
@@ -141,13 +184,26 @@ function book_ticket_new(params) {
 
 
 /**
+ * @method  book_ticket
  * 预定机票API，并创建机票订单
+ * @param   {json}  params.flight_list  航班舱位集合
+ * @param   {string}    params.cabin    舱位
+ * @param   {string}    params.pay_price    需要支付的金额
+ * @param   {uuid}  params.trip_plan_id     出差记录id
+ * @param   {uuid}  params.consume_id       出行记录id
+ * @param   {string}  params.contact_name     联系人姓名
+ * @param   {string}  params.contact_mobile   联系人电话
+ * @param   {string}  params.adult_num        成人数量，默认1
+ * @param   {string}  params.ip_address       id地址
+ * @param   {array}  params.passengers       乘客集合
+ * @param   {string}  params.insurance_type     保险类型
+ * @param   {string}  params.insurance_price     保险金额 获取自舱位信息
  * @type {book_ticket}
  */
 airplane.book_ticket = book_ticket;
-book_ticket.book_ticket = ['flight_list', 'cabin', 'pay_price', 'trip_plan_id', 'consume_id',
+book_ticket.required_params = ['flight_list', 'cabin', 'pay_price', 'trip_plan_id', 'consume_id',
     'contact_name', 'contact_mobile', 'adult_num', 'ip_address', 'passengers'];
-book_ticket.book_ticket = ['insurance_price', 'insurance_type'];
+book_ticket.optional_params = ['insurance_price', 'insurance_type'];
 function book_ticket(params) {
     var self = this;
     var account_id = self.accountId;

@@ -157,9 +157,9 @@ describe("api/client/airplane.js", function() {
     it("#get_plane_list should be ok", function(done) {
         this.timeout(20000);
         var params = {
-            arrival_city: "SHA",
-            date: "2016-04-10",
-            departure_city: "PEK",
+            arrival_city: "CT_289",
+            date: "2016-05-10",
+            departure_city: "CT_131",
             ip_address: '192.168.1.3'
         };
         API.client.airplane.get_plane_list.call({accountId: staffId}, params, function(err, ret) {
@@ -172,12 +172,13 @@ describe("api/client/airplane.js", function() {
     });
 
 
+
     it("#get_plane_details should be ok", function(done) {
         this.timeout(20000);
         var params = {
             flight_no: "MU5693",
             ip_address: '192.168.1.3',
-            query_key: '20160401175623aNZB'
+            query_key: '20160406114229QjDg'
         };
         API.client.airplane.get_plane_details.call({accountId: staffId}, params, function(err, ret) {
             if(err) {
@@ -234,6 +235,7 @@ describe("api/client/airplane.js", function() {
             consume_id: consumeId,
             contact_name: "于淼",
             contact_mobile: "18515073641",
+            cabin: 'B',
             adult_num: 1,
             insurance_price: 20,
             pay_price: 1100,
