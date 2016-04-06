@@ -3,6 +3,7 @@
  */
 'use strict';
 var point=(function(){
+    var moment = require('moment');
     API.require("staff");
     API.require("tripPlan");
 

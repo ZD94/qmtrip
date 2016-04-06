@@ -2,23 +2,33 @@
  * Created by ZLW on 2016/03/24.
  */
 'use strict';
-var airTicket = (function () {
 
+module.exports = (function () {
+
+    var msgbox = require('msgbox');
     //var id_validation = require('../../script/id_validation');
     API.require('tripPlan');
     API.require('auth');
     API.require('attachment');
     API.require('staff');
     API.require('travelBudget');
+    API.require('qm_order');
 
-    var airTicket = {};
+    var exported = {};
 
     /*
      机票订单详情页
      * @param $scope
      * @constructor
      */
-    airTicket.OrderDetailsController = function ($scope, $routeParams) {
+
+    exported.OrderDetailsController = function ( $scope,$routeParams,$loading ) {
+
+        $loading.end();
+
+        $scope.user;
+        $scope.order;
+
         //settings
         $scope.deliveryAddressShown = false;
 
@@ -28,9 +38,66 @@ var airTicket = (function () {
             };
         }
 
+        $scope.renderStatus = function(){//该函数用于判断并返回订单状态。
+            var statuses = {
+                CANCEL: '已取消',
+                OUT_TICKET: '已出票',
+                PAY_FAILED: '支付失败',
+                PAY_SUCCESS: '支付成功',
+                REFUND: '已退款',
+                REFUNDING: '退款中',
+                WAIT_PAY: '待支付',
+                WAIT_TICKET: '待出票'
+            };
+            return $scope.order?statuses[ $scope.order.status ]:'';
+        }
+
+        $scope.renderPercentage = function(){//该函数用于计算并以“98%”的格式返回准点率。
+            return $scope.order?( $scope.order.punctual_rate*100+'%' ):'';
+        }
+
+        $scope.renderTimeSpan = function(){//该函数用于计算并以“10时10分”的格式返回这次飞行所需的时间。
+            if($scope.order){
+                var departure_time = new Date( $scope.order.start_time ).getTime();
+                var arrival_time = new Date( $scope.order.end_time ).getTime();
+                var time_span = (arrival_time - departure_time)/1000;
+                return time_span;
+            };
+        }
+
+        $scope.showInfo = function(){
+            msgbox.alert( $scope.order.ticket_info.tpgd, '确定' );
+        }
+
+        API.onload( function(){
+            console.log( API.staff,API.qm_order );
+            
+            $scope.user = API.staff
+                .getCurrentStaff()
+                .then( function(data){
+                    console.log(data);
+                    
+                    console.log( $scope.user.name );
+                })
+                .catch(function (err) {
+                    TLDAlert(err.msg || err)
+                });
+            
+            API.qm_order
+                .get_qm_order( {order_id:'e9fd90c0-fb07-11e5-b602-a384e706e5f0'} )
+                .then( function(data){
+                    $scope.order = data;
+                    console.log( data );
+                })
+                .catch(function (err) {
+                    TLDAlert(err.msg || err)
+                });
+
+        });
+
     }
 
-    airTicket.InfoEditingController = function ($scope, $routeParams) {
+    exported.InfoEditingController = function ($scope, $routeParams) {
         //console.log( id_validation('370683198909072254').isValid() );
 
         $scope.user;
@@ -62,7 +129,8 @@ var airTicket = (function () {
         }
         
         API.onload( function(){
-            console.log( API.staff );
+            console.log( API.staff,API.qm_order );
+            
             API.staff
                 .getCurrentStaff()
                 .then( function(data){
@@ -72,7 +140,8 @@ var airTicket = (function () {
                 })
                 .catch(function (err) {
                     TLDAlert(err.msg || err)
-                })
+                });
+
         });
 
         $(document).ready(function(){
@@ -102,7 +171,12 @@ var airTicket = (function () {
 
     }
 
-    return airTicket;
+    exported.AddaddressController = function ($scope) {
+    }
+
+    exported.AddresslistController = function ($scope) {
+    }
+
+    return exported;
 })();
 
-module.exports = airTicket;

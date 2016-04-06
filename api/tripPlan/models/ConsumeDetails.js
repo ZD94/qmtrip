@@ -75,6 +75,16 @@ module.exports = function (Db, DataType) {
                         _status = 0;
                         _is_commit = false;
                     } break;
+                    ///待预定
+                    case 'WAIT_BOOK': {
+                        _status = 3;
+                        _is_commit = false;
+                    } break;
+                    ///已预定
+                    case 'BOOKED': {
+                        _status = 4;
+                        _is_commit = false;
+                    } break;
                     ///待上传状态
                     case 'WAIT_UPLOAD': {
                         _status = 0;
@@ -131,6 +141,8 @@ module.exports = function (Db, DataType) {
                         }
                     } break;
                     case 1: val = 'AUDIT_PASS'; break;
+                    case 3: val = 'WAIT_BOOK'; break;
+                    case 4: val = 'BOOKED'; break;
                 }
                 return val;
             }

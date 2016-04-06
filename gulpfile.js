@@ -6,22 +6,24 @@
 var gulp = require('gulp');
 var gulplib = require('./common/gulplib');
 
-gulplib.bundle_lib('browserify', {ts: false, require:[
+gulplib.bundle_lib('browserify', {ex: true, ts: false, require:[
     'lessify', 'buffer', 'querystring', 'string_decoder', 'http', 'https', 'url',
     'util', 'events', 'stream', 'zlib']});
-gulplib.bundle_lib('ws', {ts: false, require:['ws', 'crypto'], exclude:['bufferutil', 'utf-8-validate']});
-gulplib.bundle_lib('jquery', {ts: false, require:['jquery', 'jquery-ui']});
-gulplib.bundle_lib('bootstrap', {ts: false, require:["bootstrap"]});
-gulplib.bundle_lib('angular', './common/client/angular.js', {ts: false, require: ['angular']});
-gulplib.bundle_lib('swiper', {ts: false, require:['swiper']});
-gulplib.bundle_lib('img', {ts: false, require: ['arale-qrcode', 'hidpi-canvas', 'exif-js', 'exif-orient']})
-gulplib.bundle_lib('base', {ts: false, require:['q', 'bluebird', 'md5', 'moment', 'tiny-cookie', 'shoe', 'babel-polyfill']})
+gulplib.bundle_lib('ws', {ex: true, ts: false, require:['ws', 'crypto'], exclude:['bufferutil', 'utf-8-validate']});
+gulplib.bundle_lib('jquery', {ex: true, ts: false, require:['jquery', 'jquery-ui']});
+gulplib.bundle_lib('bootstrap', {ex: true, ts: false, require:["bootstrap"]});
+gulplib.bundle_lib('angular', {ex: true, ts: false, require: ['angular', './common/client/angular.js:angular_init']});
+gulplib.bundle_lib('swiper', {ex: true, ts: false, require:['swiper']});
+gulplib.bundle_lib('img', {ex: true, ts: false, require: ['arale-qrcode', 'hidpi-canvas', 'exif-js', 'exif-orient']})
+gulplib.bundle_lib('base', {ex: true, ts: false, require:['q', 'bluebird', 'md5', 'moment', 'tiny-cookie', 'shoe']})
+
+gulplib.bundle_lib('preload', {ex: true, ts: false, require:['dyload', 'babel-polyfill']});
 
 gulplib.bundle_lib('api', {require:['./common/client/api.js:api']});
 gulplib.bundle_lib('calendar', {require:['lunar-calendar', "calendar"]});
 gulplib.bundle_lib('msgbox', {require:['notie', 'msgbox']});
 gulplib.bundle_lib('nglibs', {require: ['public/script/nglibs:nglibs']});
-gulplib.bundle_lib('ngapp', './common/client/ngapp/index.js');
+gulplib.bundle_lib('ngapp', {require: ['./common/client/ngapp/index.ts:ngapp', 'browserspec']});
 
 gulplib.angular_app('staff');
 gulplib.angular_app('corp');

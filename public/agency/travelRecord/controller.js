@@ -21,6 +21,7 @@ var travelRecord=(function(){
         $("title").html("出差单列表");
         //全部
         $scope.initTravelList1 = function () {
+            $loading.start();
             $(".left_nav li").removeClass("on").eq(0).addClass("on");
 
             API.onload(function () {
@@ -54,6 +55,7 @@ var travelRecord=(function(){
 
         //待出预算
         $scope.initTravelList2 = function () {
+            $loading.start();
             API.onload(function () {
                 API.agencyTripPlan.pageTripPlanOrder({page:$scope.page2, perPage:20, isHasBudget: false})
                     .then(function(result){
@@ -85,6 +87,7 @@ var travelRecord=(function(){
 
         //待审核
         $scope.initTravelList3 = function () {
+            $loading.start();
             API.onload(function () {
                 API.agencyTripPlan.pageTripPlanOrder({page:$scope.page3, perPage:20, audit: 'P'})
                     .then(function(result){
@@ -199,7 +202,7 @@ var travelRecord=(function(){
      * @param $scope
      * @constructor
      */
-    travelRecord.TravelDetailController = function($scope, $routeParams, $location, $loading, $anchorScroll) {
+    travelRecord.TravelDetailController = function($scope, $routeParams, $location, $anchorScroll) {
         $("title").html("出差单明细");
         var orderId = $routeParams.orderId;
         $scope.initTravelDetail = function () {
@@ -342,19 +345,16 @@ var travelRecord=(function(){
 
 
         $scope.outTraffichref = function () {
-            $loading.end();
             $location.hash('outTraffic');
             $anchorScroll();
 
         }
         $scope.hotelhref = function () {
-            $loading.end();
             $location.hash('hotel');
             $anchorScroll();
 
         }
         $scope.backTraffichref = function () {
-            $loading.end();
             $location.hash('backTraffic');
             $anchorScroll();
         }

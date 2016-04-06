@@ -30,18 +30,17 @@ get_plane_list.required_params = ['departure_city', 'arrival_city', 'date', 'ip_
 get_plane_list.optional_params = ['query_flag', 'travel_type'];
 function get_plane_list(params) {
     var self = this;
-    var query_key = moment().format('YYYYMMDDHHmmss') + getRndStr(4, 1);
+    var query_key = moment().format('YYYYMMDDHHmmss') + getRndStr(4, 2);
 
     return API.staff.getStaff({id: self.accountId})
         .then(function() {
             params.query_key = query_key;
-            logger.info("********************");
-            logger.info(params);
             return API.shengyi_ticket.search_ticket(params);
         })
         .then(function(ret) {
             return ret.map(function(flight) {
                 flight.query_key = query_key;
+                console.info(flight);
                 return flight;
             })
         })
@@ -65,23 +64,29 @@ function get_plane_details(params) {
             //return _flight;
             return API.shengyi_ticket.search_more_cabin(params);
         })
+        .then(function(ret) {
+            ret.cabins.map(function(t) {
+                console.info(t.cabin, t.cabin_type, t.cabin_level, t.cabin_name, t.suggest_price);
+            })
+            return ret;
+        })
 };
 
 /**
  * 预定机票API，并创建机票订单
  * @type {book_ticket}
  */
-airplane.book_ticket = book_ticket;
-book_ticket.required_params = ['flight_list', 'flight_no', 'trip_plan_id', 'consume_id', 'contact_name', 'contact_mobile', 'adult_num', 'ip_address', 'passengers'];
-book_ticket.optional_params = ['insurance_price', 'insurance_type'];
-function book_ticket(params) {
+airplane.book_ticket_new = book_ticket_new;
+book_ticket_new.required_params = ['flight_list', 'flight_no', 'trip_plan_id', 'consume_id', 'contact_name', 'contact_mobile', 'adult_num', 'ip_address', 'passengers'];
+book_ticket_new.optional_params = ['insurance_price', 'insurance_type'];
+function book_ticket_new(params) {
     var self = this;
     var account_id = self.accountId;
 
     params.flight_list = _flight_list;
     return API.tripPlan.getConsumeDetail({consumeId: params.consume_id})
         .then(function(consume) {
-            if(consume.orderStatus !== 'WAIT_UPLOAD') {
+            if(consume.orderStatus !== 'WAIT_BOOK') {
                 throw {code: -2, msg: '预定失败，请检查出差记录状态'};
             }
 
@@ -91,7 +96,7 @@ function book_ticket(params) {
             return Promise.all([
                 consume,
                 API.staff.getStaff({id: account_id, columns: ['companyId']}),
-                API.seeds.getSeedNo('tripPlanOrderNo'),
+                API.seeds.getSeedNo('qm_order'),
                 API.shengyi_ticket.get_ticket_order({order_no: ret.order_no})
             ])
         })
@@ -134,6 +139,68 @@ function book_ticket(params) {
         })
 };
 
+
+/**
+ * 预定机票API，并创建机票订单
+ * @type {book_ticket}
+ */
+airplane.book_ticket = book_ticket;
+book_ticket.book_ticket = ['flight_list', 'cabin', 'pay_price', 'trip_plan_id', 'consume_id',
+    'contact_name', 'contact_mobile', 'adult_num', 'ip_address', 'passengers'];
+book_ticket.book_ticket = ['insurance_price', 'insurance_type'];
+function book_ticket(params) {
+    var self = this;
+    var account_id = self.accountId;
+    var consume_id = params.consume_id;
+
+    return API.tripPlan.getConsumeDetail({consumeId: params.consume_id})
+        .then(function(consume) {
+            if(consume.orderStatus !== 'WAIT_BOOK') {
+                throw {code: -2, msg: '预定失败，请检查出差记录状态'};
+            }
+
+            return [
+                consume,
+                API.staff.getStaff({id: account_id, columns: ['companyId']}),
+                API.seeds.getSeedNo('qm_order')
+            ];
+        })
+        .spread(function(consume, staff, order_no) {
+            var dept_date = moment(consume.startTime).format('YYYY-MM-DD');
+            var flight_list = params.flight_list;
+            var cabin = flight_list.cabin;
+
+            params.type = 'P';
+            params.date = dept_date;
+            params.status = 0;
+            params.staff_id = account_id;
+            params.start_city_code = consume.startPlaceCode;
+            params.end_city_code = consume.arrivalPlaceCode;
+            params.company_id = staff.companyId;
+            params.order_no = order_no;
+            params.airways = flight_list.airways;
+            params.punctual_rate = flight_list.punctual_rate;
+            params.flight_no = flight_list.flight_no;
+            params.start_time = flight_list.departure_time;
+            params.end_time = flight_list.arrival_time;
+            params.cabin_type = cabin.cabin_type;
+            params.cabin_name = cabin.cabin_name;
+            params.cabin_no = cabin.cabin;
+
+            return API.qm_order.create_qm_order(params);
+        })
+        .then(function(order) {
+            //更新出差记录详情
+            return [order, API.tripPlan.updateConsumeDetail({consumeId: consume_id, userId: account_id, optLog: '通过全麦商旅预定', updates: {orderStatus: 'BOOKED'}})];
+        })
+        .spread(function(order, result) {
+            if(!result) {
+                throw {code: -2, msg: '更新出差记录异常'};
+            }
+
+            return order;
+        })
+};
 
 var _flight = { departure_date: '2016-04-10',
     dept_station_code: 'PEK',
@@ -252,7 +319,6 @@ var _flight_list = {
         discount: '99.0',
         fuel_tax: '0',
         market_price: '0.0',
-        note: '退票规定：航班规定离站时间2小时前(含):5%,航班规定离站时间2小时内(不含)及飞后:10%。变更规定：航班规定离站时间2小时前(含):免费变更,航班规定离站时间2小时内(不含)及飞后:5%。签转规定：.温馨提示：仅供参考，最终以航司规定为准！',
         pay_price: '0.0',
         policy_id: 'CPS_PTZCdgyy_80e691a5-db77-4a4a-ac2a-a61468092b9b',
         policy_name: '普通',

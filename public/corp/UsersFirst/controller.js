@@ -2,6 +2,7 @@
  * Created by chenhao on 2015/12/18.
  */
 var UsersFirst = (function(){
+	var moment = require('moment');
 	API.require("company");
 	API.require("staff");
 	API.require("travelPolicy");

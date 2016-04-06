@@ -11,42 +11,71 @@ var _ = require('lodash');
 
 var logger = new Logger('client/qm_order');
 var Paginate = paginate.Paginate;
+
+/**
+ * @class   qm_order    全麦订单
+ */
 var qm_order = {};
 
 /**
- * 获取舱位信息
- * @param   {object}    params
- * @param   {uuid}      params.trip_plan_id    出差记录id
- * @param   {uuid}      params.consume_id      对应票据id
- * @param   {string}    params.out_order_no    外部订单号
- * @param   {string}    params.money           订单金额
- * @param   {string}    params.type            订单类型 T: '火车', P: '飞机', H: '酒店'
- * @param   {string}    params.supplier        供应商
- * @param   {string}    params.date            出行/住宿日期
- * @param   {string}    params.cabin_type      舱位/座次/房间类型
- * @param   {string}    params.cabin_name      舱位/座次/房间
- * @param   {string}    params.cabin_no        座位号/房间号
- * @param   {json}      params.passenger       旅客信息
- * @param   {json}      params.connect_person  联系人信息
- * @param   {string}    params.payment_method  支付方式
+ * @method  API.qm_order.create_order
  *
- * @returns {*}
+ * 创建全麦订单
+ * @param   {object}    params
+ * @param   {uuid}      params.trip_plan_id    出差记录id   必须
+ * @param   {uuid}      params.consume_id      对应票据id   必须
+ * @param   {string}    params.flight_no       航班号       必须
+ * @param   {string}    params.start_city_code 出发城市代码     必须
+ * @param   {string}    params.end_city_code   到达城市代码     必须
+ * @param   {string}    params.airways         航空公司     必须
+ * @param   {string}    params.pay_price       支付金额     必须
+ * @param   {string}    params.cabin_type      舱位类型    必须
+ * @param   {string}    params.date            出行/住宿日期
+ * @param   {json}      params.passenger       旅客信息
+ * @param   {string}    params.contact_name    联系人姓名
+ * @param   {string}    params.contact_mobile  联系人手机
+ *
+ * @returns {Promise<T>}   qm_order    订单详情
  */
 qm_order.create_order = create_order;
-create_order.required_params = ['trip_plan_id', 'consume_id', 'out_order_no'];
+create_order.required_params = ['trip_plan_id', 'consume_id', 'flight_no', 'start_city_code', 'end_city_code', 'airways', 'pay_price', 'cabin_type', 'date'];
+create_order.optional_params = ['passenger', 'contact_name', 'contact_mobile']
 function create_order(params) {
     var self = this;
     var account_id = self.accountId;
+    var consume_id = params.consume_id;
 
-    return Promise.all([
-        API.staff.getStaff({id: account_id, columns: ['companyId']}),
-        API.seeds.getSeedNo('tripPlanOrderNo'),
-    ])
-        .spread(function(staff, order_no) {
+    return API.tripPlan.getConsumeDetail({consumeId: consume_id})
+        .then(function(consume) {
+            //只有出差记录状态为待预定时才能创建全麦订单
+            if(consume.orderStatus !== 'WAIT_BOOK') {
+                throw {code: -2, msg: '预定失败，请检查出差记录状态'};
+            }
+
+            return Promise.all([
+                consume,
+                API.staff.getStaff({id: account_id, columns: ['companyId']}),
+                API.seeds.getSeedNo('qm_order'),
+            ])
+        })
+
+        .spread(function(consume, staff, order_no) {
             params.staff_id = account_id;
             params.company_id = staff.companyId;
             params.order_no = order_no;
+            params.type = 'P';
             return API.qm_order.create_qm_order(params);
+        })
+        .then(function(order) {
+            //更新出差记录详情
+            return [order, API.tripPlan.updateConsumeDetail({consumeId: consume_id, userId: account_id, optLog: '通过全麦商旅预定', updates: {orderStatus: 'BOOKED'}})]
+        })
+        .spread(function(qm_order, result) {
+            if(!result) {
+                throw {code: -2, msg: '更新出差记录异常'};
+            }
+
+            return qm_order;
         })
 }
 
@@ -137,6 +166,7 @@ function page_qm_orders(params) {
             var options = {
                 where: _.omit(params, ['page', 'per_page', 'order'])
             };
+            options.where.status = {$ne: -4};
             params.order ? options.order = [params.order] : options.order = [['date', 'asc']];
 
             return API.qm_order.list_qm_orders(options)

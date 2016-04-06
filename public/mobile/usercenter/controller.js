@@ -14,6 +14,7 @@ module.exports = (function() {
         $scope.$root.pageTitle = '个人中心';
         //console.info($scope.$root.pageTitle);
         $scope.initStaffUser = function(){
+            $loading.start();
             API.onload(function(){
                 API.staff.getCurrentStaff()
                     .then(function(ret){
@@ -57,11 +58,11 @@ module.exports = (function() {
                                     }else if(num >0 && num<=9){
                                         $('#'+id).show();
                                     }else if (num > 9 && num <100){
-                                        $('#'+id).css({'font-size':'1rem','line-height': '1.5rem'});
+                                        $('#'+id).addClass('number');
                                         $('#'+id).show();
                                     }else if (num > 99){
-                                        $('#'+id).css({'font-size':'1rem','width':'2rem'});
-                                        $('#'+id).html('99+');
+                                        $('#'+id).addClass('number2');
+                                        $('#'+id).html('+99');
                                         $('#'+id).show();
                                     }
                                 }

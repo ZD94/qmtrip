@@ -4,7 +4,7 @@ var inits = [];
 inits.push(require('./uploader'));
 inits.push(require('./select'));
 inits.push(require('./icon'));
-inits.push(require('./input'));
+inits.push(require('./erasable'));
 inits.push(require('./models'));
 
 module.exports = function($module){

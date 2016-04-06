@@ -101,7 +101,7 @@ function savePlanOrder(params){
             }
 
             _planOrder.budget = total_budget;
-            isBudget?_planOrder.orderStatus = 'WAIT_UPLOAD':_planOrder.orderStatus = 'NO_BUDGET'; //是否有预算，设置出差计划状态
+            isBudget?_planOrder.orderStatus = 'WAIT_BOOK':_planOrder.orderStatus = 'NO_BUDGET'; //是否有预算，设置出差计划状态
 
             return sequelize.transaction(function(t){
                 var order = {};
@@ -258,6 +258,7 @@ function updateTripPlanOrder(params){
             }
 
             return sequelize.transaction(function(t){
+                updates = utils.now();
                 return Promise.all([
                     PlanOrder.update(updates, {returning: true, where: {id: orderId}, fields: Object.keys(updates), transaction: t}),
                     TripOrderLogs.create(logs, {transaction: t})
@@ -277,12 +278,13 @@ function updateTripPlanOrder(params){
  * @param params
  */
 tripPlan.updateConsumeDetail = updateConsumeDetail;
-updateConsumeDetail.required_params = ['id'];
+updateConsumeDetail.required_params = ['consumeId', 'optLog', 'userId', 'updates'];
 updateConsumeDetail.optional_params = _.keys(ConsumeDetails.attributes);
 function updateConsumeDetail(params){
-    var updates = params;
+    var updates = _.pick(params.updates, _.keys(ConsumeDetails.attributes));
+    var trip_plan_id = '';
 
-    return ConsumeDetails.findById(params.id)
+    return ConsumeDetails.findById(params.consumeId)
         .then(function(record){
             if(!record || record.status == STATUS.DELETE){
                 throw {code: -2, msg: '票据不存在'};
@@ -292,7 +294,32 @@ function updateConsumeDetail(params){
                 throw {code: -3, msg: '该票据已经审核通过，不能修改'};
             }
 
-            return ConsumeDetails.update(updates, {returning: true, where: {id: params.id}, fields: Object.keys(updates)});
+            trip_plan_id = record.orderId;
+            updates.updateAt = utils.now();
+
+            return ConsumeDetails.update(updates, {returning: true, where: {id: params.consumeId}, fields: Object.keys(updates)});
+        })
+        .spread(function(result) {
+            if(result < 1) {
+                throw {code: -2, msg: '更新出差明细失败失败'};
+            }
+
+            return ConsumeDetails.findAll({where: {orderId: trip_plan_id, status: {$ne: STATUS.DELETE}}})
+        })
+        .then(function(list) {
+            var orderStatus = '';
+            list.map(function(t) {
+                if(orderStatus != '' && orderStatus != t.orderStatus) {
+                    return true;
+                }
+
+                orderStatus = t.orderStatus;
+            });
+
+            return PlanOrder.update({orderStatus: orderStatus, updateAt: utils.now()}, {returning: true, where: {id: trip_plan_id}})
+        })
+        .then(function() {
+            return true;
         })
 }
 
@@ -319,8 +346,8 @@ function updateConsumeBudget(params){
                 throw {code: -4, msg: '该次出差计划已经提交，不能修改预算'};
             }
 
-            if(order.status > STATUS.COMMIT){
-                throw {code: -5, msg: '该次出差计划已经审核通过，不能修改预算'};
+            if(order.orderStatus !== 'NO_BUDGET'){
+                throw {code: -5, msg: '修改预算失败，请检查出差记录状态'};
             }
 
             var budget = params.budget;
@@ -333,6 +360,7 @@ function updateConsumeBudget(params){
             }
 
             var updates = {
+                orderStatus: 'WAIT_BOOK',
                 budget: budget,
                 updateAt: utils.now()
             }
@@ -450,7 +478,7 @@ function saveConsumeRecord(params){
                 throw {code: -3, msg: '该订单已提交，不能添加消费单据'};
             }
 
-            if(order.status > STATUS.COMMIT){
+            if(order.orderStatus == 'COMPLETE'){
                 throw {code: -4, msg: '该计划单已审核，不能添加消费单据'};
             }
 
@@ -1189,6 +1217,15 @@ function getProjectByName(params) {
             }
             return project;
         })
+}
+
+/**
+ * 根据出差记录id获取出差详情(包括已删除的)
+ * @param params
+ * @returns {Promise<TInstance[]>|any}
+ */
+tripPlan.listConsumesByPlanId = function(params) {
+    return ConsumeDetails.findAll({where: params.trip_plan_id})
 }
 
 /**

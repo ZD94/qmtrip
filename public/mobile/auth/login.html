@@ -1,59 +1,28 @@
 <!--登录已失效!-->
+<style>
+    html,body{
+        background-color: #fff!important;
+    }
+</style>
 <div class="user_photo">
     <img src="/mobile/images/logo.png">
 </div>
 <div class="corp_mail w85 common_text">
-    <i class="web-icon-font c_mail">&#xf0e0;</i>
-    <input id="name" ng-model="email" class="input" type="text" value="" placeholder="企业邮箱" onkeyup="checkAccount()" required/>
-    <span class="web-icon-font clear_input" ng-click="clear_val($event)">&#xf057;</span>
+    <i class="web-icon-font c_mail" ng-class="{blue:focused.id=='email_name'}">&#xf0e0;</i>
+    <input erasable id="email_name" type="text" class="input fr" placeholder="企业邮箱"
+        ng-model="form.email"
+        ng-focus="update_focused($event)" ng-blur="update_focused()"
+        />
 </div>
 <div class="corp_pwd w85 common_text">
-    <i class="web-icon-font lock">&#xf023;</i>
-    <input id="pwd" class="input" ng-model="pwd" type="password" value="" placeholder="密码" onkeyup="checkAccountPwd()" maxlength="20" required/>
-    <span class="web-icon-font clear_input" ng-click="clear_val($event)">&#xf057;</span>
+    <i class="web-icon-font lock"  ng-class="{blue:focused.id=='email_pwd'}">&#xf023;</i>
+    <input erasable id="email_pwd" class="input fr" type="password" placeholder="密码" maxlength="20"
+        ng-model="form.pwd"
+        ng-focus="update_focused($event)" ng-blur="update_focused()"
+        ng-keydown="$event.keyCode==13?check_login():null"
+        />
 </div>
-<button id="login" class="login w85 common_btn2" ng-click="check_login()">登录</button>
-
-<script>
-    $(function(){
-        $('input').click(function(){
-            $('.common_text>i').removeClass('blue');
-            $(this).siblings('i').addClass('blue');
-            $('.common_text>span').hide();
-            $(this).siblings('span').show();
-            $('#login').attr('disabled',true).removeClass('blue_bc');
-            if($(this).val()!= "") {
-                if($(this).parent().siblings('div').children('input').val()!= '') {
-                    $('#login').attr('disabled',false).addClass('blue_bc');
-                }
-            }
-        })
-//            .blur(function(event){
-////            $('.common_text>i').removeClass('blue');
-////            $('.common_text>span').hide();
-//              console.info(event);
-//        })
-    })
-    function checkAccount(){
-        var name_len = $('#name').val().length;
-        var pwd_len  = $('#pwd').val().length;
-        if( name_len > 0) {
-            if( pwd_len > 5) {
-                $('#login').attr('disabled',false).addClass('blue_bc');
-            }
-        }else {
-            $('#login').attr('disabled',true).removeClass('blue_bc');
-        }
-    }
-    function checkAccountPwd(){
-        var name_len = $('#name').val().length;
-        var pwd_len  = $('#pwd').val().length;
-        if( pwd_len > 5) {
-            if( name_len > 0) {
-                $('#login').attr('disabled',false).addClass('blue_bc');
-            }
-        }else {
-            $('#login').attr('disabled',true).removeClass('blue_bc');
-        }
-    }
-</script>
+<button id="login" class="login w85 common_btn2"
+    ng-class="{blue_bc:check_passed}" ng-disabled="!check_passed" ng-click="check_login()">
+    登录
+</button>

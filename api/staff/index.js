@@ -1123,6 +1123,23 @@ function getPapersById(params){
 }
 
 /**
+ * 根据类型查询证件信息
+ * @param {obj} params
+ * @param {uuid} params.ownerId
+ * @param {integer} params.type
+ * @returns {*}
+ */
+staff.getOnesPapersByType = getOnesPapersByType;
+getOnesPapersByType.required_params = ['ownerId', 'type'];
+getOnesPapersByType.optional_params = ['attributes'];
+function getOnesPapersByType(params){
+    var options = {};
+    options.where = {ownerId: params.ownerId, type: params.type};
+    options.attributes = params.attributes? ['*'] :params.attributes;
+    return papersModel.findOne(options);
+}
+
+/**
  * 根据ownerId得到证件信息
  * @param params
  * @returns {*}

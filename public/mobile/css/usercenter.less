@@ -1,7 +1,7 @@
 @import (reference) "common.less";
 .user_center_top{
   width: 100%;
-  background-color: @color-theme3;
+  background-color: @color-theme5;
   padding-bottom: 2rem;
   .name_point{
     width: 100%;
@@ -92,7 +92,7 @@
     width: 11rem;
     height: 3.8rem;
     background-color: @color-theme1;
-    color: @color-theme3;
+    color: @color-theme5;
     line-height: 3.8rem;
     font-size: 1.6rem;
     text-align: center;
@@ -104,8 +104,7 @@
 .plan_record{
   width: 100%;
   margin-top: 1rem;
-  padding: 0 1rem;
-  background-color: @color-theme3;
+  background-color: @color-theme5;
   border-bottom: 0.1rem solid #e5e5e5;
   .go_plan{
     text-align: left;
@@ -114,6 +113,7 @@
     height: 4.4rem;
     line-height: 4.4rem;
     border-bottom: 0.1rem solid #e5e5e5;
+    padding: 0 1rem;
     span{
       float: right;
       font-size: 1.4rem;
@@ -132,7 +132,7 @@
       //-webkit-box-flex: 1;
       //box-flex: 1;
       float: left;
-      width: 33%;
+      width: 24.8%;
       text-align: center;
       padding: 1rem;
       p{
@@ -152,17 +152,26 @@
               display: none;
               width: 1.6rem;
               height: 1.6rem;
-              border-radius: 50%;
-              border: 0.15rem solid #f6753c;
+              border-radius: 0.8rem;
+              //border: 0.15rem solid #f6753c;
               font-size: 1.2rem;
               line-height: 1.6rem;
-              color: #f6753c;
+              color: @color-theme5;
               right: -0.5rem;
               top: 0;
-              background-color: #fff;
+              background-color: @color-theme3;
               overflow: hidden;
               padding: 0;
               margin: 0;
+              text-align: center;
+              &.number{
+                width: 2.4rem;
+                right: -1rem;
+              }
+              &.number2{
+                width: 2.7rem;
+                right: -1.2rem;
+              }
             }
           }
         }
@@ -181,7 +190,7 @@
   line-height: 4.4rem;
   margin-top: 1rem;
   padding: 0 1rem;
-  background-color: @color-theme3;
+  background-color: @color-theme5;
   border-bottom: 0.1rem solid #e5e5e5;
   text-align: left;
   font-size: 1.6rem;
@@ -193,6 +202,41 @@
     i{
       font-size: 1.4rem;
       color: #9b9b9b;
+    }
+  }
+}
+
+.book_order{
+  width: 100%;
+  margin-top: 1rem;
+  background-color: @color-theme5;
+  padding: 0 0 0 1rem;
+  div{
+    padding: 0 1rem 0 0;
+    border-bottom: 0.1rem solid #e5e5e5;
+    text-align: left;
+    height: 4.4rem;
+    line-height: 4.4rem;
+    color: #4a4a4a;
+
+    &:last-child{
+      border:none;
+    }
+    span{
+      &:first-child{
+        font-size: 1.6rem;
+        i{
+          color: @color-theme1;
+        }
+      }
+      &:last-child{
+        font-size: 1.4rem;
+        color: @color-theme3;
+        float: right;
+        i{
+          color: @second-text-color;
+        }
+      }
     }
   }
 }
