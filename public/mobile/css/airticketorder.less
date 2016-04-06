@@ -9,7 +9,179 @@
 @f24:1.2rem;
 @f20:1rem;
 
-
+.order_list {
+  width: 100%;
+  height: auto;
+  font-size: @f24;
+  .list_tab {
+    position: relative;
+    width: 100%;
+    height: 4.4rem;
+    z-index:99;
+    .line {
+      position: absolute;
+      left: 50%;
+      top: 25%;
+      width: 1px;
+      height: 2rem;
+      background: @second-text-color;
+    }
+    .dropdown {
+      width: 50%;
+      float: left;
+      .dropdown-header {
+        height: 4.4rem;
+        line-height: 4.4rem;
+        font-size: @f36;
+        text-align: center;
+        color: @default-text-color;
+        background: @color-theme5;
+        .icon {margin-left:1rem;font-size:2rem}
+      }
+      .dropdown-menu {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        display: none;
+        li {
+          height: 4.4rem;
+          line-height: 4.4rem;
+          text-align: center;
+          border-bottom: 1px @border-color solid;
+          background: @color-theme5;
+          font-size: @f36;
+        }
+        li.active {background:#E5E5E5!important}
+      }
+    }
+  }
+  .list_content.bg_white {background:white;}
+  .list_content {
+    position:relative;
+    width: 100%;
+    height: auto;
+    margin-top: 1rem;
+    .item {
+      background: @color-theme5;
+      .item_main{
+        padding: 0 1rem;
+        overflow:hidden;
+        .item_left{
+          float: left;
+          height: 8.5rem;
+          width: 75%;
+          .plane_icon {
+            width: 2.6rem;
+            height: 5.5rem;
+            line-height: 5.5rem;
+            float: left;
+            i {
+              font-size: @font-size-21;
+              color: @second-text-color;
+            }
+          }
+          .starttime {
+            width: 5rem;
+            height: 5.5rem;
+            line-height: 2rem;
+            font-size: @font-size-18;
+            color: @default-text-color;
+            padding-top: 1.2rem;
+            float: left;
+            span {
+              font-size: @font-size-12;
+              color: @second-text-color;
+            }
+          }
+          .line1 {
+            width: 6rem;
+            height: 5.5rem;
+            padding-top: 2.6rem;
+            float: left;
+            img {
+              width: 5.5rem;
+              float: left;
+            }
+            span {
+              font-size: @font-size-12;
+              color: @color-theme1;
+              margin-left: 1.5rem;
+              float: left;
+            }
+          }
+          .endtime {
+            width: 8rem;
+            height: 5.5rem;
+            line-height: 2rem;
+            font-size: @font-size-18;
+            color: @default-text-color;
+            padding-top: 1.2rem;
+            float: left;
+            position: relative;
+            span {
+              font-size: @font-size-12;
+              color: @second-text-color;
+            }
+            i {
+              font-size: @font-size-10;
+              position: absolute;
+              top: 1rem;
+              left: 4.8rem;
+              font-style: normal;
+            }
+          }
+          .airline{
+            width: 100%;
+            height: 2.7rem;
+            .left {
+              width: 3rem;
+              height: 2.7rem;
+              line-height: 2.7rem;
+              padding-top: 0.2rem;
+              img {
+                width: 2.3rem;
+              }
+            }
+            .right {
+              height: 2.7rem;
+              line-height: 2.7rem;
+              font-size: @font-size-12;
+              color: @second-text-color;
+            }
+          }
+        }
+        .item_right{
+          width: 6.5rem;
+          height: 5.5rem;
+          line-height: 2rem;
+          font-size: @font-size-18;
+          color: @color-theme4;
+          text-align: right;
+          padding-top: 1.2rem;
+          float: right;
+        }
+      }
+      .item_bottom{
+        height: 5rem;
+        border-top: 1px solid @border-color;
+      }
+      .complete {position:relative;padding:0.3rem 1rem;border-top:2px solid #F1F1F1;background:white;overflow:hidden;
+        li {float:left;position:relative;width:33.333333%;text-align:center;
+          .number {font-size: @f36!important;}
+          .name {font-size: @f24;}
+          .name.withDeficit {color:#F23B3B!important}
+          .bar {position:absolute;right:0;top:0.8rem;width:2px;height:20px;background:#F1F1F1;}
+        }
+        .withBalance {color:@color-theme1!important}
+        .withDeficit {color:#F23B3B!important}
+      }
+    }
+    .tips {padding:0 0 15px 0;text-align:center;font-size:@f28;
+      .noRecord {padding:80px 0 30px 0;color:#4A4A4A;font-size:@f36;}
+      .seeOtherRecords {color:#9B9B9B;font-size:@f28;}
+    }
+  }
+}
 .airTicketOrderDetails {
   .top {
     padding: 1.1rem;

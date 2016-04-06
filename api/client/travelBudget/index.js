@@ -77,8 +77,6 @@ travelBudget.getTravelPolicyBudget = function(params) {
         checkOutDate: checkOutDate
     })
         .then(function(hotel) {
-            console.log(hotel);
-            console.log("******************************====================");
             return travelBudget.getTrafficBudget.call(self, {
                 originPlace: originPlace,
                 destinationPlace: destinationPlace,
@@ -202,7 +200,7 @@ travelBudget.getHotelBudget = function(params) {
                 return result;
             }
             return result;
-        });
+        })
 }
 
 travelBudget.getBookUrl = function(params) {

@@ -177,6 +177,25 @@ module.exports = (function () {
     exported.AddresslistController = function ($scope) {
     }
 
+    exported.OrderlistController = function ($scope) {
+        API.onload().then(function(){
+            API.qm_order.page_qm_orders({})
+                .then(function(ret) {
+                    var orderlist = ret.items;
+                    orderlist.map(function(detail){
+                        return API.qm_order.get_qm_order({order_id:detail.id})
+                            .then(function(detail){
+                                console.info(detail);
+                                console.info(detail.STATUS[detail.status]);
+                            })
+                            .catch(function(err){
+                                console.info(err);
+                            })
+                    })
+                })
+            
+        });
+    }
     return exported;
 })();
 

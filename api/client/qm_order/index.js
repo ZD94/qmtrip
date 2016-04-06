@@ -175,6 +175,7 @@ function page_qm_orders(params) {
             return API.qm_order.list_qm_orders(options)
         })
         .then(function(ret) {
+            console.info(ret);
             return new Paginate(page, per_page, ret.count, ret.rows);
         })
 };
