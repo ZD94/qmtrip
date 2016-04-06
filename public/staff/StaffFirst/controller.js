@@ -28,6 +28,7 @@ var StaffFirst = (function(){
 					.then(function(ret){
 						var company_id = ret.companyId;
 						var travelLevel =ret.travelLevel;
+						$scope.staff = ret;
 						var str = ret.name;
 						$scope.firstname=str.substring(str.length-2,str.length);
 						Promise.all([
