@@ -11,9 +11,14 @@ var moment = require('moment');
 var getRndStr = require('common/utils').getRndStr;
 
 var logger = new Logger('airplane');
+/**
+ * @class   airplane    机票相关API
+ */
 var airplane = {};
 
 /**
+ * @method get_plane_list
+ *
  * 查询机票列表接口
  * @param params
  * @param {integer} params.query_flag   查询类型 0：国际 1：国内
@@ -47,7 +52,8 @@ function get_plane_list(params) {
 };
 
 /**
- * 获取舱位信息
+ * @method  get_plane_details
+ * 获取航班舱位信息
  * @param   params
  * @param   {string}    params.flight_no   航班号
  * @param   {string}    params.ip_address   ip地址
@@ -67,7 +73,10 @@ function get_plane_details(params) {
         .then(function(ret) {
             ret.cabins.map(function(t) {
                 console.info(t.cabin, t.cabin_type, t.cabin_level, t.cabin_name, t.suggest_price);
+                console.info(t);
+                console.info(t.insurance_info);
             })
+            logger.info(ret);
             return ret;
         })
 };
@@ -141,13 +150,26 @@ function book_ticket_new(params) {
 
 
 /**
+ * @method  book_ticket
  * 预定机票API，并创建机票订单
+ * @param   {json}  params.flight_list  航班舱位集合
+ * @param   {string}    params.cabin    舱位
+ * @param   {string}    params.pay_price    需要支付的金额
+ * @param   {uuid}  params.trip_plan_id     出差记录id
+ * @param   {uuid}  params.consume_id       出行记录id
+ * @param   {string}  params.contact_name     联系人姓名
+ * @param   {string}  params.contact_mobile   联系人电话
+ * @param   {string}  params.adult_num        成人数量，默认1
+ * @param   {string}  params.ip_address       id地址
+ * @param   {array}  params.passengers       乘客集合
+ * @param   {string}  params.insurance_type     保险类型
+ * @param   {string}  params.insurance_price     保险金额 获取自舱位信息
  * @type {book_ticket}
  */
 airplane.book_ticket = book_ticket;
-book_ticket.book_ticket = ['flight_list', 'cabin', 'pay_price', 'trip_plan_id', 'consume_id',
+book_ticket.required_params = ['flight_list', 'cabin', 'pay_price', 'trip_plan_id', 'consume_id',
     'contact_name', 'contact_mobile', 'adult_num', 'ip_address', 'passengers'];
-book_ticket.book_ticket = ['insurance_price', 'insurance_type'];
+book_ticket.optional_params = ['insurance_price', 'insurance_type'];
 function book_ticket(params) {
     var self = this;
     var account_id = self.accountId;

@@ -81,7 +81,14 @@ qm_order.list_qm_orders = function(options) {
     var status = options.where.status;
     typeof status == 'object'?options.where.status.$ne = STATUS.DELETE:options.where.status = status;
     options.attributes = ['id'];
-    return QmOrderModel.findAndCount(options);
+    return QmOrderModel.findAndCount(options)
+        .then(function(ret) {
+            ret.rows = ret.rows.map(function(r) {
+                return r.id;
+            });
+
+            return ret;
+        })
 };
 
 
