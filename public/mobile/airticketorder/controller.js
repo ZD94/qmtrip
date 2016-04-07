@@ -182,16 +182,21 @@ module.exports = (function () {
             API.qm_order.page_qm_orders({})
                 .then(function(ret) {
                     var orderlist = ret.items;
+                    var orders = [];
                     orderlist.map(function(detail){
-                        return API.qm_order.get_qm_order({order_id:detail.id})
-                            .then(function(detail){
-                                console.info(detail);
-                                console.info(detail.STATUS[detail.status]);
+                        return API.qm_order.get_qm_order({order_id:detail})
+                            .then(function(order){
+                                order.orderstatus = order.STATUS[order.status]
+                                orders.push(order);
+                                $scope.orders = orders;
+                                console.info($scope.orders)
+                                return order;
                             })
                             .catch(function(err){
                                 console.info(err);
                             })
                     })
+                    
                 })
             
         });
