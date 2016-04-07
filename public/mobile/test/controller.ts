@@ -97,24 +97,28 @@ export function WheelpickerController($scope) {
         }
         a.push(ai);
     }
-    $scope.a = a;
-    $scope.o = a[3]; //{value: {val: 'a3'}};
-    $scope.os = [a[3], a[3].subs[2], a[3].subs[2].subs[6]];
+    $scope.m = {};
+    $scope.m.a = a;
+    $scope.m.o = a[3]; //{value: {val: 'a3'}};
+    $scope.m.os = [a[3], a[3].subs[2], a[3].subs[2].subs[6]];
+    $scope.m.as = [a, $scope.m.os[0].subs, $scope.m.os[1].subs];
 
-    $scope.$watch('o', function(){
-        console.log($scope.o);
+    $scope.$watch('m.o', function(){
+        console.log($scope.m.o);
     })
-    $scope.$watch('os[0]', function(newval, oldval, scope){
+    $scope.$watch('m.os[0]', function(newval, oldval, scope){
         if(newval === oldval)
             return;
         //console.log('os[0]', newval.val, oldval.val);
-        $scope.os[1] = newval.subs[0];
+        $scope.m.as[1] = newval.subs;
+        $scope.m.os[1] = newval.subs[0];
     })
-    $scope.$watch('os[1]', function(newval, oldval, scope){
+    $scope.$watch('m.os[1]', function(newval, oldval, scope){
         if(newval === oldval)
             return;
         //console.log('os[1]', newval.val, oldval.val);
-        $scope.os[2] = newval.subs[0];
+        $scope.m.as[2] = newval.subs;
+        $scope.m.os[2] = newval.subs[0];
     })
 };
 

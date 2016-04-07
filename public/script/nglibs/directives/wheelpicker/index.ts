@@ -5,7 +5,23 @@ import angular = require('angular');
 export = function($module) {
     //angular.module('tld.common', ['ngTouch'])
     $module
-        .directive('tldWheelPicker', tldWheelPicker);
+        .directive('tldWheelPicker', tldWheelPicker)
+        .directive('tldMultiWheelPicker', tldMultiWheelPicker);
+}
+
+function tldMultiWheelPicker(){
+    require('./style.less');
+    return {
+        restrict: 'EA',
+        replace: true,
+        template: require('./wheelpicker.multi.tpl.html'),
+        scope: {
+            ngModel: '=',
+            wheelOptions: '=tldWheelOptions',
+            lineHeight: '@tldWheelLineHeight',
+            wheelLabel: '@tldWheelLabel'
+        }
+    };
 }
 
 function tldWheelPicker() {
@@ -14,13 +30,14 @@ function tldWheelPicker() {
         restrict : 'EA',
         replace: true,
         transclude: true,
-        template: require('./template.html'),
+        template: require('./wheelpicker.tpl.html'),
         scope: {
             ngModel: '=',
-            wheelOptions: '=',
-            lineHeight: '@'
+            wheelOptions: '=tldWheelOptions',
+            lineHeight: '@tldWheelLineHeight',
+            wheelLabel: '@tldWheelLabel'
         },
-        controller: function($scope, $element, $attrs){
+        controller: function($scope, $element){
             let initY = ($element.height()-$scope.lineHeight)/2;
             $scope.selectedY = initY;
 
@@ -39,8 +56,8 @@ function tldWheelPicker() {
             updateTranslateY(0, 0, $scope);
             $scope.$watchGroup(['ngModel', 'selectedY'], updateTranslateY);
             function updateOptionTexts(){
-                $scope.wheelTexts = $scope.wheelOptions.map((v, i) => {
-                    return $scope.$eval($attrs.wheelText, {$index: i, $value: v}) ;
+                $scope.wheelLabels = $scope.wheelOptions.map((v, i) => {
+                    return $scope.$eval($scope.wheelLabel, {$index: i, $value: v}) ;
                 })
             }
             updateOptionTexts();
@@ -110,8 +127,6 @@ function tldWheelPicker() {
             $element.on('mousemove touchmove', move);
             $element.on('mouseup touchend', end);
             $element.on('mouseupleave touchcancel', cancel);
-        },
-        link: function(scope, element) {
         }
     }
 }
