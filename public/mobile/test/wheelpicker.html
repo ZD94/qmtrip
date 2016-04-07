@@ -1,0 +1,20 @@
+<style>
+    .test-picker {
+        border: 1px solid;
+        line-height: 20px;
+        display: block;
+    }
+</style>
+
+<tld-wheel-picker class="test-picker" ng-model="o" wheel-options="a" wheel-text="$value.name" line-height="20">
+</tld-wheel-picker>
+
+
+<div style="display:flex;">
+    <tld-wheel-picker style="flex:1;" class="test-picker" ng-model="os[0]" wheel-options="a" wheel-text="$value.name" line-height="20">
+    </tld-wheel-picker>
+    <tld-wheel-picker style="flex:1;" class="test-picker" ng-model="os[1]" wheel-options="os[0].subs" wheel-text="$value.name" line-height="20">
+    </tld-wheel-picker>
+    <tld-wheel-picker style="flex:1;" class="test-picker" ng-model="os[2]" wheel-options="os[1].subs" wheel-text="$value.name" line-height="20">
+    </tld-wheel-picker>
+</div>
