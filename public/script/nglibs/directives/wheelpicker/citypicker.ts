@@ -46,7 +46,6 @@ function tldCityPicker(){
                 if(n!==o || n[0]!==o[0] || n[1]!==o[1] || n[2]!==o[2]){
                     for(let i=0; i<$scope.citySelected.length; i++){
                         $scope.ngModel[i] = getCityName($scope.citySelected[i]);
-                        $scope.$applyAsync();
                     }
                 }
             }
