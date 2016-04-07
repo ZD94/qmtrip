@@ -16,7 +16,7 @@ function tldMultiWheelPicker(){
         replace: true,
         template: require('./wheelpicker.multi.tpl.html'),
         scope: {
-            ngModel: '=',
+            ngModelArray: '=',
             wheelOptions: '=tldWheelOptions',
             lineHeight: '@tldWheelLineHeight',
             wheelLabel: '@tldWheelLabel'
@@ -32,7 +32,7 @@ function tldWheelPicker() {
         transclude: true,
         template: require('./wheelpicker.tpl.html'),
         scope: {
-            ngModel: '=',
+            wheelSelected: '=ngModel',
             wheelOptions: '=tldWheelOptions',
             lineHeight: '@tldWheelLineHeight',
             wheelLabel: '@tldWheelLabel'
@@ -42,7 +42,7 @@ function tldWheelPicker() {
             $scope.selectedY = initY;
 
             $scope.calculateY = (i:number) => {
-                let current = $scope.wheelOptions.indexOf($scope.ngModel);
+                let current = $scope.wheelOptions.indexOf($scope.wheelSelected);
                 if(current < 0)
                     current = 0;
                 let itemY = (i-current)*$scope.lineHeight;
@@ -54,7 +54,7 @@ function tldWheelPicker() {
                 })
             }
             updateTranslateY(0, 0, $scope);
-            $scope.$watchGroup(['ngModel', 'selectedY'], updateTranslateY);
+            $scope.$watchGroup(['wheelSelected', 'selectedY'], updateTranslateY);
             function updateOptionTexts(){
                 $scope.wheelLabels = $scope.wheelOptions.map((v, i) => {
                     return $scope.$eval($scope.wheelLabel, {$index: i, $value: v}) ;
@@ -66,51 +66,45 @@ function tldWheelPicker() {
                 updateOptionTexts();
             });
 
+
+            function getEventY(event) {
+                var originalEvent = event.originalEvent || event;
+                var touches = originalEvent.touches && originalEvent.touches.length ? originalEvent.touches : [originalEvent];
+                var e = (originalEvent.changedTouches && originalEvent.changedTouches[0]) || touches[0];
+                return e.clientY;
+            }
+            let startY = NaN;
             function updateOffsetY(offsetY){
                 $scope.selectedY = initY+offsetY;
 
                 let offset = Math.round(offsetY/$scope.lineHeight);
                 if(offset == 0)
                     return;
-                let current = $scope.wheelOptions.indexOf($scope.ngModel);
+                let current = $scope.wheelOptions.indexOf($scope.wheelSelected);
                 let index = current-offset;
                 if(index < 0 || $scope.wheelOptions.length <= index)
                     return;
-                $scope.ngModel = $scope.wheelOptions[index];
+                $scope.wheelSelected = $scope.wheelOptions[index];
                 let moveY = (index-current)*$scope.lineHeight;
                 $scope.selectedY = $scope.selectedY + moveY;
                 startY = startY - moveY;
             }
-            function getCoordinates(event) {
-                var originalEvent = event.originalEvent || event;
-                var touches = originalEvent.touches && originalEvent.touches.length ? originalEvent.touches : [originalEvent];
-                var e = (originalEvent.changedTouches && originalEvent.changedTouches[0]) || touches[0];
-
-                return {
-                    x: e.clientX,
-                    y: e.clientY
-                };
-            }
-            let startY = NaN;
             function start(e) {
                 e.preventDefault();
-                var coords = getCoordinates(e);
-                startY = coords.y;
+                startY = getEventY(e);
             }
             function move(e){
                 e.preventDefault();
                 if(Number.isNaN(startY))
                     return;
-                var coords = getCoordinates(e);
-                updateOffsetY(coords.y - startY);
+                updateOffsetY(getEventY(e) - startY);
                 $scope.$apply();
             }
             function end(e){
                 e.preventDefault();
                 if(Number.isNaN(startY))
                     return;
-                var coords = getCoordinates(e);
-                updateOffsetY(coords.y - startY);
+                updateOffsetY(getEventY(e) - startY);
                 $scope.selectedY = initY;
                 startY = NaN;
                 $scope.$apply();
@@ -126,7 +120,7 @@ function tldWheelPicker() {
             $element.on('mousedown touchstart', start);
             $element.on('mousemove touchmove', move);
             $element.on('mouseup touchend', end);
-            $element.on('mouseupleave touchcancel', cancel);
+            $element.on('mouseleave touchcancel', cancel);
         }
     }
 }
