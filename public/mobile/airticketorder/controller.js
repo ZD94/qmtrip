@@ -201,13 +201,14 @@ module.exports = (function () {
                 .then(function(ret) {
                     var orderlist = ret.items;
                     var orders = [];
+                    console.info("#####")
                     orderlist.map(function(detail){
                         return API.qm_order.get_qm_order({order_id:detail})
                             .then(function(order){
                                 order.orderstatus = order.STATUS[order.status]
                                 orders.push(order);
                                 $scope.orders = orders;
-                                console.info($scope.orders)
+                                console.info(order)
                                 return order;
                             })
                             .catch(function(err){
