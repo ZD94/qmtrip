@@ -101,23 +101,26 @@ export function WheelpickerController($scope) {
     $scope.m.a = a;
     $scope.m.o = a[3]; //{value: {val: 'a3'}};
     $scope.m.os = [a[3], a[3].subs[2], a[3].subs[2].subs[6]];
-    $scope.m.as = [a, $scope.m.os[0].subs, $scope.m.os[1].subs];
+    $scope.m.city = ['', '', ''];
 
-    $scope.$watch('m.o', function(){
-        console.log($scope.m.o);
-    })
+    $scope.label = function(v){
+        return v.name+'|'+v.val;
+    }
+    $scope.getWheelOptions = function(index){
+        if(index == 0)
+            return $scope.m.a;
+        return $scope.m.os[index-1].subs;
+    }
     $scope.$watch('m.os[0]', function(newval, oldval, scope){
         if(newval === oldval)
             return;
         //console.log('os[0]', newval.val, oldval.val);
-        $scope.m.as[1] = newval.subs;
         $scope.m.os[1] = newval.subs[0];
     })
     $scope.$watch('m.os[1]', function(newval, oldval, scope){
         if(newval === oldval)
             return;
         //console.log('os[1]', newval.val, oldval.val);
-        $scope.m.as[2] = newval.subs;
         $scope.m.os[2] = newval.subs[0];
     })
 };

@@ -7,6 +7,8 @@ export = function($module) {
     $module
         .directive('tldWheelPicker', tldWheelPicker)
         .directive('tldMultiWheelPicker', tldMultiWheelPicker);
+
+    require('./citypicker')($module);
 }
 
 function tldMultiWheelPicker(){
@@ -17,9 +19,9 @@ function tldMultiWheelPicker(){
         template: require('./wheelpicker.multi.tpl.html'),
         scope: {
             ngModelArray: '=',
-            wheelOptions: '=tldWheelOptions',
+            wheelOptionsFunc: '<tldWheelOptionsFunc',
             lineHeight: '@tldWheelLineHeight',
-            wheelLabel: '@tldWheelLabel'
+            wheelLabel: '&tldWheelLabel'
         }
     };
 }
@@ -35,35 +37,41 @@ function tldWheelPicker() {
             wheelSelected: '=ngModel',
             wheelOptions: '=tldWheelOptions',
             lineHeight: '@tldWheelLineHeight',
-            wheelLabel: '@tldWheelLabel'
+            wheelLabel: '&tldWheelLabel'
         },
         controller: function($scope, $element){
-            let initY = ($element.height()-$scope.lineHeight)/2;
+            let lineHeight = $scope.lineHeight;
+            if(!lineHeight || lineHeight=='')
+                lineHeight = 20;
+            let initY = ($element.height()-lineHeight)/2;
             $scope.selectedY = initY;
 
             $scope.calculateY = (i:number) => {
                 let current = $scope.wheelOptions.indexOf($scope.wheelSelected);
                 if(current < 0)
                     current = 0;
-                let itemY = (i-current)*$scope.lineHeight;
+                let itemY = (i-current)*lineHeight;
                 return {'-webkit-transform': 'translateY(' + ($scope.selectedY+itemY) + 'px)'};
             };
-            function updateTranslateY(newvals, oldvals, scope){
-                scope.translateY = scope.wheelOptions.map((v, i) => {
-                    return scope.calculateY(i);
-                })
+            function updateTranslateY(n?, o?, scope?){
+                $scope.translateY = $scope.wheelOptions.map((v, i) => {
+                    return $scope.calculateY(i);
+                });
             }
-            updateTranslateY(0, 0, $scope);
-            $scope.$watchGroup(['wheelSelected', 'selectedY'], updateTranslateY);
             function updateOptionTexts(){
                 $scope.wheelLabels = $scope.wheelOptions.map((v, i) => {
-                    return $scope.$eval($scope.wheelLabel, {$index: i, $value: v}) ;
+                    return $scope.wheelLabel({$index: i, $value: v}) ;
                 })
+                let current = $scope.wheelOptions.indexOf($scope.wheelSelected);
+                if(current < 0)
+                    $scope.wheelSelected = $scope.wheelOptions[0];
             }
             updateOptionTexts();
+            updateTranslateY();
+            $scope.$watchGroup(['wheelSelected', 'selectedY'], updateTranslateY);
             $scope.$watch('wheelOptions', (n, o, scope) => {
-                updateTranslateY(n, o, scope);
                 updateOptionTexts();
+                updateTranslateY();
             });
 
 
@@ -75,9 +83,11 @@ function tldWheelPicker() {
             }
             let startY = NaN;
             function updateOffsetY(offsetY){
+                if($scope.wheelOptions.length == 0)
+                    return;
                 $scope.selectedY = initY+offsetY;
 
-                let offset = Math.round(offsetY/$scope.lineHeight);
+                let offset = Math.round(offsetY/lineHeight);
                 if(offset == 0)
                     return;
                 let current = $scope.wheelOptions.indexOf($scope.wheelSelected);
@@ -85,7 +95,7 @@ function tldWheelPicker() {
                 if(index < 0 || $scope.wheelOptions.length <= index)
                     return;
                 $scope.wheelSelected = $scope.wheelOptions[index];
-                let moveY = (index-current)*$scope.lineHeight;
+                let moveY = (index-current)*lineHeight;
                 $scope.selectedY = $scope.selectedY + moveY;
                 startY = startY - moveY;
             }
