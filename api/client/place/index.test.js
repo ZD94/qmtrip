@@ -48,5 +48,23 @@ describe("api/client/place.js", function() {
             assert.equal(ret, true);
             done();
         })
-    })
+    });
+
+    it("#getCityInfo should be ok", function(done) {
+        API.client.place.getCityInfo({cityCode: "CT_289"}, function(err, result) {
+            if (err) {
+                throw err;
+            }
+            done();
+        })
+    });
+
+    it("#getAirPortsByCity should be ok", function(done) {
+        API.client.place.getAirPortsByCity({cityCode: "CT_289"}, function(err, result) {
+            if (err) {
+                throw err;
+            }
+            done();
+        })
+    });
 })

@@ -1,7 +1,7 @@
 /**
  * Created by wlh on 15/12/12.
  */
-
+"use strict";
 /**
  * @module API
  * @type {API|exports|module.exports}
@@ -84,6 +84,31 @@ place.hotCities = function(params) {
  */
 place.hotBusinessDistricts = function(params) {
     return API.place.hotBusinessDistricts(params);
+}
+
+/**
+ * @method getCityInfo
+ * 获取城市信息(名称)
+ *
+ * @param {string} params.cityCode 城市代码
+ * @return {Promise} {id: id, name: name}
+ */
+place.getCityInfo = getCityInfo;
+getCityInfo.required_params = ['cityCode'];
+function getCityInfo(params) {
+    return API.place.getCityInfo(params)
+}
+
+/**
+ * @method  getAirPortsByCity
+ * 根据城市代码获取机场信息
+ * @param   {string}    params.cityCode     城市代码
+ * @type {Promise} array
+ */
+place.getAirPortsByCity = getAirPortsByCity;
+getAirPortsByCity.required_params = ['cityCode'];
+function getAirPortsByCity(params) {
+    return API.place.getAirPortsByCity(params);
 }
 
 module.exports = place;
