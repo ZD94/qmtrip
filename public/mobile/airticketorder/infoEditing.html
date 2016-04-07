@@ -32,7 +32,7 @@
 				证件号
 			</div>
 			<div class="row-right">
-				<input type="text" placeholder="请输入证件号码" />
+				<input type="text" placeholder="请输入证件号码" ng-model=" data.id " ng-blur=" check_id() "/>
 			</div>
 		</div>
 		<div class="row" ng-show=" IDType==='护照' ">

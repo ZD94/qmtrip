@@ -195,65 +195,6 @@ describe("api/client/qm_order.js", function() {
     });
 
 
-    describe("create_qm_order", function() {
-        var new_trip_plan_id = '';
-        var new_consume_id = '';
-        var new_qm_order_id = '';
-
-        before(function(done) {
-            API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder)
-                .then(function(trip_plan) {
-                    new_trip_plan_id = trip_plan.id;
-                    new_consume_id = trip_plan.outTraffic[0].id;
-                    done();
-                })
-                .catch(function(err) {
-                    throw err;
-                }).done();
-        });
-
-        after(function(done) {
-            Promise.all([
-                API.tripPlan.deleteTripPlanOrder({orderId: new_trip_plan_id, userId: staffId}),
-                API.qm_order.delete_qm_order({order_id: new_qm_order_id, user_id: staffId})
-            ])
-                .spread(function(){
-                    done()
-                })
-                .catch(function(err){
-                    throw err;
-                })
-                .done();
-        });
-
-        it("create_qm_order should be ok", function(done) {
-            var _qm_order = {
-                trip_plan_id: new_trip_plan_id,
-                consume_id: new_consume_id,
-                flight_no: 'MU5693',
-                start_city_code: 'BJA',
-                end_city_code: 'SHA',
-                airways: 'MU',
-                pay_price: '100.00',
-                cabin_type: '0',
-                date: '2016-04-10'
-            };
-
-            API.client.qm_order.create_order.call({accountId: staffId}, _qm_order, function(err, ret) {
-                if(err) {
-                    throw err;
-                }
-
-                if(ret.toJSON) {
-                    ret = ret.toJSON();
-                }
-                new_qm_order_id = ret.id;
-                done();
-            })
-        });
-    });
-
-
     it("#page_qm_orders should be ok", function(done) {
         var params = {
             page: "1",

@@ -2,10 +2,6 @@
  * Created by yumiao on 16-3-24.
  */
 'use strict';
-/**
- * Created by yumiao on 15-12-9.
- */
-
 var uuid = require("node-uuid");
 import moment = require('moment');
 
@@ -103,11 +99,20 @@ module.exports = function(Db, DataType) {
         TYPE: {
             type: DataType.VIRTUAL,
             get: function() {
-                "use strict";
                 return {
                     T: '火车',
                     P: '飞机',
                     H: '酒店'
+                }
+            }
+        },
+        CABIN_TYPE: {
+            type: DataType.VIRTUAL,
+            get: function() {
+                return {
+                    F: '头等舱',
+                    C: '商务舱',
+                    Y: '经济舱'
                 }
             }
         }

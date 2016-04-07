@@ -25,30 +25,71 @@ var airplane = {};
  * @param {integer} params.travel_type  1 单程,2 往返,3 联程,4 缺口
  * @param {string}  params.departure_city  出发城市代码
  * @param {string}  params.arrival_city    到达城市代码
- * @param {date}    params.date     出发时间
- * @param {date}    params.back_date   返回时间
+ * @param {date}    params.date    出发时间
+ * @param {string}    params.dept_station   出发机场 数组，可以传多个
+ * @param {string}    params.arrival_station   到达机场 数组，可以传多个
  * @param {string}  params.ip_address   ip地址
+ * @param {Array}   params.order    排序
  * @returns {Array} list
  */
 airplane.get_plane_list = get_plane_list;
 get_plane_list.required_params = ['departure_city', 'arrival_city', 'date', 'ip_address'];
-get_plane_list.optional_params = ['query_flag', 'travel_type'];
+get_plane_list.optional_params = ['query_flag', 'travel_type', 'dept_station', 'arrival_station'];
 function get_plane_list(params) {
     var self = this;
     var query_key = moment().format('YYYYMMDDHHmmss') + getRndStr(4, 2);
 
-    return API.staff.getStaff({id: self.accountId})
-        .then(function() {
-            params.query_key = query_key;
-            return API.shengyi_ticket.search_ticket(params);
+    return Promise.all([
+        API.staff.getStaff({id: self.accountId}),
+        API.place.getAirPortsByCity({cityCode: params.departure_city}),
+        API.place.getAirPortsByCity({cityCode: params.arrival_city})
+    ])
+        .spread(function(staff, s_stations, e_stations) {
+            var query_params = [];
+            s_stations.map(function(s1) {
+                var dept_station = params.dept_station;
+                if(dept_station && dept_station.indexof(s1.id) < 0) {
+                    return;
+                }
+
+                var query_1 = {start_station: s1.skyCode};
+                e_stations.map(function(s2) {
+                    var arrival_station = params.arrival_station;
+                    if(arrival_station && arrival_station.indexof(s2.id) < 0) {
+                        return;
+                    }
+
+                    query_1.arrival_station = s2.skyCode;
+                    query_params.push({start_station: query_1.start_station, arrival_station: query_1.arrival_station});
+                });
+            });
+
+            return Promise.all(query_params.map(function(q) {
+                params.query_key = query_key + q.start_station + q.arrival_station;
+                params.departure_station = q.start_station;
+                params.arrival_station = q.arrival_station;
+                return API.shengyi_ticket.search_ticket(params);
+            }))
         })
-        .then(function(ret) {
-            return ret.map(function(flight) {
-                flight.query_key = query_key;
-                console.info(flight);
-                return flight;
-            })
+        .then(function(result) {
+            var flight_list = [];
+            result.map(function(ret) {
+                ret.map(function(flight) {
+                    flight.dept_city = params.departure_city;
+                    flight.arrival_city = params.arrival_city;
+                    flight.query_key = query_key + flight.dept_station_code + flight.arrival_station_code;
+                    flight_list.push(flight);
+                })
+            });
+
+            flight_list = _.orderBy(flight_list, ['suggest_price'], ['asc']);
+            flight_list.map(function(s) {
+                console.info(s.flight_no, s.suggest_price, s.query_key);
+            });
+            logger.info(flight_list);
+            return flight_list;
         })
+
 };
 
 /**
@@ -71,12 +112,10 @@ function get_plane_details(params) {
             return API.shengyi_ticket.search_more_cabin(params);
         })
         .then(function(ret) {
+            logger.info(ret);
             ret.cabins.map(function(t) {
                 console.info(t.cabin, t.cabin_type, t.cabin_level, t.cabin_name, t.suggest_price);
-                console.info(t);
-                console.info(t.insurance_info);
             })
-            logger.info(ret);
             return ret;
         })
 };
@@ -352,7 +391,6 @@ var _flight_list = {
         suggest_price: '1230.0',
         tgq_type: '',
         refund_policy: '退票5%-10%',
-        ticket_supply: [Object],
         ticket_type: 'BPET',
         total_seat_num: '',
         remark: '签转、换开、改签均需收回代理费。改签需要回收代理费' },
