@@ -132,7 +132,7 @@ module.exports = (function () {
 
     }
 
-    exported.InfoEditingController = function ($scope, $routeParams) {
+    exported.InfoEditingController = function ($scope, $routeParams, mobiscroll) {
 
         $scope.user;
 
