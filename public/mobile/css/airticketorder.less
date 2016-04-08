@@ -477,7 +477,7 @@
   border-bottom: 0.1rem solid @border-color;
   background-color: @color-theme5;
   div{
-    padding: 0 1rem 0 0;
+    //padding: 0 1rem 0 0;
     border-bottom: 0.1rem solid #e5e5e5;
     text-align: left;
     height: 4.4rem;
@@ -485,12 +485,38 @@
     color: #4a4a4a;
     &:last-child{
       border:none;
+      height: 8.4rem;
+      padding-right: 1rem;
+      span{
+        line-height: 8.4rem;
+      }
+      textarea{
+        width: 72%;
+        height: 6rem;
+        margin: 1.1rem 0.3rem;
+        outline: medium;
+        resize: none;
+      }
     }
     span{
       display: block;
       width: 20%;
       float: left;
     }
+    input{
+      outline: medium;
+    }
+  }
+}
+.little_change{
+  width: 80%;
+  height: 4.3rem!important;
+  float: left;
+  margin-left: 0;
+  padding-left: 0;
+  input{
+    margin-left: 0;
+    color: #4a4a4a!important;
   }
 }
 .ma_t10{
@@ -499,6 +525,18 @@
 .ma_t25{
   margin-top: 2.5rem;
 }
+.text{
+
+}
+.text::-ms-clear { display: none; }
+.clear_text{
+  float: right;
+  color: #9b9b9b;
+  font-size: 1.6rem;
+  display: none;
+  line-height: 8.4rem;
+}
+.text:valid + .clear_text{display: inline;}
 
 .choose_address{
   width: 100%;
