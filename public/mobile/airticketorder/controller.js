@@ -135,27 +135,26 @@ module.exports = (function () {
 
         $scope.user;
 
-        $scope.IDType = "身份证";
+        $scope.inSelectingMode = false;
 
         $scope.data = {
+            type: '身份证',
             id: null
         }
 
         $scope.enterSelectingMode = function(){
-            $(".veil").show();
-            $(".options").show();
+            $scope.inSelectingMode = true;
         }
 
         $scope.quitSelectingMode = function(){
-            $(".veil").hide();
-            $(".options").hide();
+            $scope.inSelectingMode = false;
         }
 
         $scope.select = function (string) {
             if ( string === "身份证" ) {
-                $scope.IDType = "身份证";
+                $scope.data.type = "身份证";
             } else if ( string === "护照" ) {
-                $scope.IDType = "护照";
+                $scope.data.type = "护照";
             };
             $scope.quitSelectingMode();
         }
@@ -190,32 +189,32 @@ module.exports = (function () {
 
         });
 
-        $(document).ready(function(){
-            $(".expireDate").mobiscroll().date({//.date() .time() .datetime()
-                invalid: {
-                    daysOfWeek: [],//[0,1,2,3,4,5]
-                    daysOfMonth: []//['5/1', '12/24', '12/25']
-                },
-                theme: 'mobiscroll-qm light',
-                display: 'bottom',
-                mode: 'scroller',
-                dateOrder: 'yy mm dd',
-                dateFormat: "yyyy-mm-dd",
-                startYear: "2016",
-                endYear: "2050",
-                yearText: "年",
-                monthText: "月",
-                dayText: "日",
-                showNow: false,
-                nowText: "今天",
-                setText: "确定",
-                cancelText: "取消",
-                rows: 5,
-                showOnFocus: true,
-                monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
-                monthNamesShort: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
-            })
-        });
+        // $(document).ready(function(){
+        //     $(".expireDate").mobiscroll().date({//.date() .time() .datetime()
+        //         invalid: {
+        //             daysOfWeek: [],//[0,1,2,3,4,5]
+        //             daysOfMonth: []//['5/1', '12/24', '12/25']
+        //         },
+        //         theme: 'mobiscroll-qm light',
+        //         display: 'bottom',
+        //         mode: 'scroller',
+        //         dateOrder: 'yy mm dd',
+        //         dateFormat: "yyyy-mm-dd",
+        //         startYear: "2016",
+        //         endYear: "2050",
+        //         yearText: "年",
+        //         monthText: "月",
+        //         dayText: "日",
+        //         showNow: false,
+        //         nowText: "今天",
+        //         setText: "确定",
+        //         cancelText: "取消",
+        //         rows: 5,
+        //         showOnFocus: true,
+        //         monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+        //         monthNamesShort: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+        //     })
+        // });
 
     }
 
