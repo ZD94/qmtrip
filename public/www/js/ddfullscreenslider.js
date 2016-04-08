@@ -76,7 +76,6 @@ var ddfullscreenslider = (function($){
 			for (var i=0; i<hasharray.length; i++){
 				if (hasharray[i][0] == hash){
 					return i
-					break
 				}
 			}
 			return 0

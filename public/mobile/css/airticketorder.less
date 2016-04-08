@@ -9,6 +9,7 @@
 @f24:1.2rem;
 @f20:1rem;
 
+/*  */
 .order_list {
   width: 100%;
   height: auto;
@@ -69,7 +70,7 @@
         .item_left{
           float: left;
           height: 8.5rem;
-          width: 75%;
+          width: 73%;
           .plane_icon {
             width: 2.6rem;
             height: 5.5rem;
@@ -81,7 +82,7 @@
             }
           }
           .starttime {
-            width: 5rem;
+            width: 5.5rem;
             height: 5.5rem;
             line-height: 2rem;
             font-size: @font-size-18;
@@ -110,7 +111,7 @@
             }
           }
           .endtime {
-            width: 8rem;
+            width: 7rem;
             height: 5.5rem;
             line-height: 2rem;
             font-size: @font-size-18;
@@ -126,7 +127,7 @@
               font-size: @font-size-10;
               position: absolute;
               top: 1rem;
-              left: 4.8rem;
+              left: 4.1rem;
               font-style: normal;
             }
           }
@@ -151,7 +152,7 @@
           }
         }
         .item_right{
-          width: 6.5rem;
+          width: 7.5rem;
           height: 5.5rem;
           line-height: 2rem;
           font-size: @font-size-18;
@@ -164,6 +165,17 @@
       .item_bottom{
         height: 5rem;
         border-top: 1px solid @border-color;
+        .order_status{
+          float: left;
+          line-height: 5rem;
+          margin-left: 1rem;
+          color: @color-theme1;
+        }
+        a{
+          float: right;
+          margin-right: 1rem;
+          margin-top: 1rem; 
+        }
       }
       .complete {position:relative;padding:0.3rem 1rem;border-top:2px solid #F1F1F1;background:white;overflow:hidden;
         li {float:left;position:relative;width:33.333333%;text-align:center;
@@ -182,6 +194,8 @@
     }
   }
 }
+
+/* 机票订单详情页的样式 */
 .airTicketOrderDetails {
   .top {
     padding: 1.1rem;
@@ -193,8 +207,14 @@
         font-size: 1.4rem;
         color: @color-theme1;
       }
-      .timeLeft {
+      .top-right {
         float: right;
+        font-size: 0.9rem;
+        color: @second-text-color;
+      }
+      .number {
+        font-size: 1.4rem;
+        color: @color-theme4;
       }
       .time {
         font-size: 1.1rem;
@@ -204,6 +224,9 @@
       padding: 0.5rem 0 0.5rem 0;
       span {
         font-size: 1.1rem;
+      }
+      .text {
+        color: @second-text-color;
       }
     }
   }
@@ -336,7 +359,7 @@
     height: 4.9rem;
     background: white;
     overflow: hidden;
-    .delete,.checkout {
+    .delete,.right_button {
       float: left;
       width: 50%;
       height: 100%;
@@ -345,7 +368,7 @@
       text-align: center;
       display: block;
     }
-    .checkout {
+    .right_button {
       background: @color-theme1;
       color: white;
     }
@@ -362,6 +385,7 @@
   }
 }
 
+/* 乘客信息编辑页的样式 */
 .infoEditing {
   .veil {
     position: fixed;

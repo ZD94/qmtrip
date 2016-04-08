@@ -6,7 +6,7 @@
 module.exports = (function () {
 
     var msgbox = require('msgbox');
-    //var id_validation = require('../../script/id_validation');
+    //var card = require('../../script/id_validation');
     API.require('tripPlan');
     API.require('auth');
     API.require('attachment');
@@ -27,13 +27,31 @@ module.exports = (function () {
 
         $loading.end();
 
-        $scope._status = "WAIT_PAY";
+        $scope._status = "CANCEL";
+        $scope.deliveryAddressShown = false;
 
         $scope.user;
         $scope.order;
 
-        //settings
-        $scope.deliveryAddressShown = false;
+        $scope.time_left = null;//该变量的值为该订单的剩余时间。
+
+        setInterval(function(){//每隔一秒给$scope.time_left重新赋值。
+            get_time_left();
+            $scope.$apply();
+        },1000);
+
+        function get_time_left(){//该函数用于获取剩余时间并给$scope.time_left重新赋值。
+            if($scope.order){
+                var now = new Date().getTime();
+                var deadline = new Date('2016-04-08T08:55:11.000Z').getTime();
+                var minutes = ((deadline-now)/1000/60).toFixed(4);
+                var seconds = (Number(minutes.split('.')[1])/10000*60).toFixed(0);
+                minutes = minutes.split('.')[0];
+                seconds = (seconds.length===1)?('0'+seconds):seconds;
+                seconds = (seconds==='60')?('00'):seconds;
+                $scope.time_left = minutes+' : '+seconds;
+            }
+        }        
 
         $scope.toggle = function( params ){
             if( params==="deliveryAddress" ){
@@ -45,9 +63,9 @@ module.exports = (function () {
             var statuses = {
                 CANCEL: '已取消',
                 OUT_TICKET: '已出票',
-                PAY_FAILED: '支付失败',
+                PAY_FAILED: '已取消',
                 PAY_SUCCESS: '支付成功',
-                REFUND: '已退款',
+                REFUND: '已关闭',
                 REFUNDING: '退款中',
                 WAIT_PAY: '待支付',
                 WAIT_TICKET: '待出票'
@@ -115,11 +133,14 @@ module.exports = (function () {
     }
 
     exported.InfoEditingController = function ($scope, $routeParams) {
-        //console.log( id_validation('370683198909072254').isValid() );
 
         $scope.user;
 
         $scope.IDType = "身份证";
+
+        $scope.data = {
+            id: null
+        }
 
         $scope.enterSelectingMode = function(){
             $(".veil").show();
@@ -145,6 +166,15 @@ module.exports = (function () {
             console.log( currentTime );
         }
         
+        $scope.check_id = function(){
+            if(
+                /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$/.test($scope.data.id)||
+                /^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/.test($scope.data.id)
+            ){}else{
+                msgbox.log('身份证号码无效');
+            }
+        }
+
         API.onload( function(){
             console.log( API.staff,API.qm_order );
             
@@ -236,16 +266,22 @@ module.exports = (function () {
             API.qm_order.page_qm_orders({})
                 .then(function(ret) {
                     var orderlist = ret.items;
+                    var orders = [];
+                    console.info("#####")
                     orderlist.map(function(detail){
-                        return API.qm_order.get_qm_order({order_id:detail.id})
-                            .then(function(detail){
-                                console.info(detail);
-                                console.info(detail.STATUS[detail.status]);
+                        return API.qm_order.get_qm_order({order_id:detail})
+                            .then(function(order){
+                                order.orderstatus = order.STATUS[order.status]
+                                orders.push(order);
+                                $scope.orders = orders;
+                                console.info(order)
+                                return order;
                             })
                             .catch(function(err){
                                 console.info(err);
                             })
                     })
+                    
                 })
             
         });
