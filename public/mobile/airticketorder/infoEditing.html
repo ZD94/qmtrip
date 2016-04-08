@@ -41,7 +41,7 @@
 				有效期
 			</div>
 			<div class="row-right">
-				<input type="text" class="expireDate" placeholder="点击设置证件有效期" />
+				<input type="text" class="expireDate" placeholder="点击设置证件有效期" ng-model=" data.expire_date "/>
 			</div>
 		</div>
 		<div class="row" ng-show=" data.type==='护照' ">
@@ -49,10 +49,10 @@
 				生日
 			</div>
 			<div class="row-right">
-				<input type="text" class="birthDate" placeholder="点击设置出行人生日" />
+				<input type="text" class="birthDate" placeholder="点击设置出行人生日" ng-model=" data.birth_date "/>
 			</div>
 		</div>
 	</div>
-	<a class="button save">保存</a>
+	<a class="button save" ng-class=" { 'active':ready_to_save() } ">保存</a>
 	<a class="button cancel">取消</a>
 </div>
