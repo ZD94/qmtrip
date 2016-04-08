@@ -33,11 +33,12 @@ var airplane = {};
  * @returns {Array} list
  */
 airplane.get_plane_list = get_plane_list;
-get_plane_list.required_params = ['departure_city', 'arrival_city', 'date', 'ip_address'];
+get_plane_list.required_params = ['departure_city', 'arrival_city', 'date'];
 get_plane_list.optional_params = ['query_flag', 'travel_type', 'dept_station', 'arrival_station'];
 function get_plane_list(params) {
     var self = this;
     var query_key = moment().format('YYYYMMDDHHmmss') + getRndStr(4, 2);
+    params.ip_address = self.remoteAddress;
 
     return Promise.all([
         API.staff.getStaff({id: self.accountId}),
@@ -125,7 +126,8 @@ function get_plane_details(params) {
  * @type {book_ticket}
  */
 airplane.book_ticket_new = book_ticket_new;
-book_ticket_new.required_params = ['flight_list', 'flight_no', 'trip_plan_id', 'consume_id', 'contact_name', 'contact_mobile', 'adult_num', 'ip_address', 'passengers'];
+book_ticket_new.required_params = ['flight_list', 'flight_no', 'trip_plan_id', 'consume_id', 'contact_name',
+    'contact_mobile', 'adult_num', 'ip_address', 'passengers'];
 book_ticket_new.optional_params = ['insurance_price', 'insurance_type'];
 function book_ticket_new(params) {
     var self = this;
