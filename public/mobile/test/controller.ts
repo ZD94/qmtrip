@@ -84,6 +84,47 @@ export function SelectController($scope) {
     }
 };
 
+export function WheelpickerController($scope) {
+    var a = [];
+    for(let i=1; i<10; i++){
+        let ai = { val: 'a'+i, name: 'A'+i, subs: []};
+        for(let j=1; j<10; j++){
+            let aij = { val: 'a'+i+j, name: 'A'+i+'-'+j, subs: []};
+            for(let k=1; k<10; k++){
+                aij.subs.push({ val: 'a'+i+j+k, name: 'A'+i+'-'+j+'-'+k});
+            }
+            ai.subs.push(aij);
+        }
+        a.push(ai);
+    }
+    $scope.m = {};
+    $scope.m.a = a;
+    $scope.m.o = a[3]; //{value: {val: 'a3'}};
+    $scope.m.os = [a[3], a[3].subs[2], a[3].subs[2].subs[6]];
+    $scope.m.city = ['', '', ''];
+
+    $scope.label = function(v){
+        return v.name+'|'+v.val;
+    }
+    $scope.getWheelOptions = function(index){
+        if(index == 0)
+            return $scope.m.a;
+        return $scope.m.os[index-1].subs;
+    }
+    $scope.$watch('m.os[0]', function(newval, oldval, scope){
+        if(newval === oldval)
+            return;
+        //console.log('os[0]', newval.val, oldval.val);
+        $scope.m.os[1] = newval.subs[0];
+    })
+    $scope.$watch('m.os[1]', function(newval, oldval, scope){
+        if(newval === oldval)
+            return;
+        //console.log('os[1]', newval.val, oldval.val);
+        $scope.m.os[2] = newval.subs[0];
+    })
+};
+
 export function IconController($scope){
     $scope.symbols = [
         'customs.success',

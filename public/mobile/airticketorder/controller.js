@@ -13,6 +13,7 @@ module.exports = (function () {
     API.require('staff');
     API.require('travelBudget');
     API.require('qm_order');
+    API.require('mailingAddress');
 
     var exported = {};
 
@@ -131,7 +132,7 @@ module.exports = (function () {
 
     }
 
-    exported.InfoEditingController = function ($scope, $routeParams) {
+    exported.InfoEditingController = function ($scope, $routeParams, mobiscroll) {
 
         $scope.user;
 
@@ -219,6 +220,41 @@ module.exports = (function () {
     }
 
     exported.AddaddressController = function ($scope) {
+
+        $scope.people = {
+            name : '',
+            mobile : '',
+            //area : '',
+            //address : ''
+        }
+
+        $scope.area = '';
+        $scope.address = '';
+
+        //$scope.check_passed = ($scope.people.name.length > 0 && $scope.people.mobile.length > 0 && $scope.area.length > 0 && $scope.address.length > 0);
+        //$scope.un_passed = ($scope.people.name.length == 0 || $scope.people.mobile.length == 0 || $scope.area.length == 0 || $scope.address.length == 0);
+        //$scope.$watchGroup(['people.email', 'people.mobile', 'area', 'address'], function(){
+        //    $scope.check_passed = ($scope.people.name.length > 0 && $scope.people.mobile.length > 0 && $scope.area.length > 0 && $scope.address.length > 0);
+        //    $scope.un_passed = ($scope.people.name.length == 0 || $scope.people.mobile.length == 0 || $scope.area.length == 0 || $scope.address.length == 0);
+        //})
+
+        $scope.clear_text = function($event) {
+            //$($event.target).siblings('textarea').val('');
+            $scope.address = '';
+        }
+
+        $scope.save = function() {
+            API.onload( function(){
+                API.mailingAddress.createMailingAddress({name:$scope.people.name,mobile:$scope.people.mobile,area:$scope.area,address:$scope.address})
+                    .then(function(){
+
+                    })
+                    .catch(function (err) {
+                        TLDAlert(err.msg || err);
+                    });
+            })
+        }
+
     }
 
     exported.AddresslistController = function ($scope) {

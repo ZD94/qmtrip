@@ -103,7 +103,7 @@ var businesstravel=(function(){
      * @param $scope
      * @constructor
      */
-    businesstravel.TrafficController = function($scope) {
+    businesstravel.TrafficController = function($scope, calendar, mobiscroll) {
         $scope.$root.pageTitle = '我要出差';
         //遍历存储数据为undefined
         for (var i = 0, len = sessionStorage.length; i < len; i++) {
@@ -291,7 +291,7 @@ var businesstravel=(function(){
      * @param $scope
      * @constructor
      */
-    businesstravel.HotelController = function($scope) {
+    businesstravel.HotelController = function($scope, calendar) {
         $scope.$root.pageTitle = '动态预算结果';
         //遍历存储数据为undefined
         for (var i = 0, len = sessionStorage.length; i < len; i++) {

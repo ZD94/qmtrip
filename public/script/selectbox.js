@@ -189,12 +189,13 @@ function selectPage (options) {
 	}
 
 
-
+/*
 	if (showDefault == true) {
 		$('.select_page dt,.select_page dd').show();
 	}
 	else if (showDefault == false) {
 		$('.select_page dt,.select_page dd').hide();
 	}
+*/
 
 }
