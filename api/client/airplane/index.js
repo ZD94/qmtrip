@@ -37,7 +37,16 @@ get_plane_list.optional_params = ['query_flag', 'travel_type', 'dept_station', '
 function get_plane_list(params) {
     var self = this;
     var query_key = moment().format('YYYYMMDDHHmmss') + getRndStr(4, 2);
-    params.ip_address = self.remoteAddress;
+    var ip1 = ['192', '112', '114', '114']
+    var ip2 = ['168', '222', '21', '11'];
+    var ip3 = ['123', '32', '12', '45'];
+    var ip4 = ['133', '43', '55', '66'];
+
+    function getRand(max) {
+        return parseInt(Math.random() * max);
+    }
+    params.ip_address = ip1[getRand(4)]+ ip2[getRand[4]] + ip3[getRand[4]] + ip4[getRand[4]];
+    //params.ip_address = self.remoteAddress;
 
     return Promise.all([
         API.staff.getStaff({id: self.accountId}),
