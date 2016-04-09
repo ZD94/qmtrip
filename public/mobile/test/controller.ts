@@ -15,24 +15,28 @@ export async function StaffController($scope, StaffCache){
 }
 
 export function AsyncController($scope, $q, $timeout, $loading) {
-    $loading.start();
     var get_user = function() {
         return new Promise(function(resolve, reject){
             window.setTimeout(function() {
                 resolve({id:1000, name:'Clear'});
-                $loading.end();
             }, 2000);
         });
     };
     $scope.user = get_user();
 
+    $scope.citycode = 'CT_289';
+    $scope.update = function(){
+        console.log('clicked');
+        if($scope.citycode == 'CT_039')
+            $scope.citycode = 'CT_289';
+        else
+            $scope.citycode = 'CT_039';
+    }
 
-    $loading.start();
     var getMessages = function() {
         var deferred = $q.defer();
         $timeout(function() {
             deferred.resolve(['Hello', 'world!']);
-            $loading.end();
         }, 2000);
         return deferred.promise;
     };
