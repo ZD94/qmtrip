@@ -140,7 +140,9 @@ module.exports = (function () {
 
         $scope.data = {
             type: '身份证',
-            id: null
+            id: null,
+            expire_date: null,
+            birth_date: null
         }
 
         $scope.enterSelectingMode = function(){
@@ -167,11 +169,28 @@ module.exports = (function () {
         
         $scope.check_id = function(){
             if(
-                /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$/.test($scope.data.id)||
-                /^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/.test($scope.data.id)
-            ){}else{
+                ($scope.data.type==='身份证')&&
+                (!/^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$/.test($scope.data.id))&&
+                (!/^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/.test($scope.data.id))
+            ){
                 msgbox.log('身份证号码无效');
+            }else{
+                
             }
+        }
+
+        $scope.ready_to_save = function(){
+            if(
+                ($scope.data.type==='身份证')&&
+                (/^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$/.test($scope.data.id)||
+                /^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/.test($scope.data.id))
+            ){
+                return true;
+            }else if( $scope.data.type==='护照'&&$scope.data.expire_date&&$scope.data.birth_date ){
+                return true;
+            }else{
+                return false;
+            };
         }
 
         API.onload( function(){
@@ -190,32 +209,32 @@ module.exports = (function () {
 
         });
 
-        // $(document).ready(function(){
-        //     $(".expireDate").mobiscroll().date({//.date() .time() .datetime()
-        //         invalid: {
-        //             daysOfWeek: [],//[0,1,2,3,4,5]
-        //             daysOfMonth: []//['5/1', '12/24', '12/25']
-        //         },
-        //         theme: 'mobiscroll-qm light',
-        //         display: 'bottom',
-        //         mode: 'scroller',
-        //         dateOrder: 'yy mm dd',
-        //         dateFormat: "yyyy-mm-dd",
-        //         startYear: "2016",
-        //         endYear: "2050",
-        //         yearText: "年",
-        //         monthText: "月",
-        //         dayText: "日",
-        //         showNow: false,
-        //         nowText: "今天",
-        //         setText: "确定",
-        //         cancelText: "取消",
-        //         rows: 5,
-        //         showOnFocus: true,
-        //         monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
-        //         monthNamesShort: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
-        //     })
-        // });
+        $(document).ready(function(){
+            $(".expireDate,.birthDate").mobiscroll().date({//.date() .time() .datetime()
+                invalid: {
+                    daysOfWeek: [],//[0,1,2,3,4,5]
+                    daysOfMonth: []//['5/1', '12/24', '12/25']
+                },
+                theme: 'mobiscroll-qm light',
+                display: 'bottom',
+                mode: 'scroller',
+                dateOrder: 'yy mm dd',
+                dateFormat: "yyyy-mm-dd",
+                startYear: "2016",
+                endYear: "2050",
+                yearText: "年",
+                monthText: "月",
+                dayText: "日",
+                showNow: false,
+                nowText: "今天",
+                setText: "确定",
+                cancelText: "取消",
+                rows: 5,
+                showOnFocus: true,
+                monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                monthNamesShort: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+            })
+        });
 
     }
 
@@ -266,7 +285,6 @@ module.exports = (function () {
                 .then(function(ret) {
                     var orderlist = ret.items;
                     var orders = [];
-                    console.info("#####")
                     orderlist.map(function(detail){
                         return API.qm_order.get_qm_order({order_id:detail})
                             .then(function(order){
@@ -280,7 +298,14 @@ module.exports = (function () {
                                 console.info(err);
                             })
                     })
-                    
+                    API.qm_order.get_qm_order({order_id:'b377abb0-fb09-11e5-a52d-8f58d663e56b'})
+                        .then(function(order){
+                            $scope.airinfo = order;
+                            console.info(order); 
+                        })
+                        .catch(function(err){
+                            console.info(err);
+                        })
                 })
             
         });

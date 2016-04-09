@@ -9,6 +9,7 @@ inits.push(require('./icon'));
 inits.push(require('./erasable'));
 inits.push(require('./models'));
 inits.push(require('./filters'));
+inits.push(require('./airinfo'));
 
 module.exports = function($module){
     inits.forEach(function(init){
