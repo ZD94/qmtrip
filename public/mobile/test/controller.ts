@@ -209,3 +209,18 @@ export function InputController($scope){
      pwd:''
     };
  }
+
+export function AirportController($scope, AirPort, AirCompany) {
+    console.info(AirPort);
+    console.info('AirPort.get(\'AP_AQG\')', AirPort.get('AP_AQG'))
+    //AirPort.get('AP_AQG')
+    //.then(function(airport) {
+    //    console.info(airport)
+    //})
+
+    $scope.airport = AirPort.get('AP_AQG');
+    $scope.airport2 = AirPort.getByCode("AQG");
+    $scope.aircompany = AirCompany.get('AC_2P');
+    $scope.aricompany2 = AirCompany.getByCode('2P');
+    console.info('测试一下====>', $scope.airport)
+}

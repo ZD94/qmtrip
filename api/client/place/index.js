@@ -102,13 +102,45 @@ function getCityInfo(params) {
 /**
  * @method  getAirPortsByCity
  * 根据城市代码获取机场信息
- * @param   {string}    params.cityCode     城市代码
+ * @param   {string}    params.cityCode 城市代码
  * @type {Promise} array
  */
 place.getAirPortsByCity = getAirPortsByCity;
 getAirPortsByCity.required_params = ['cityCode'];
 function getAirPortsByCity(params) {
     return API.place.getAirPortsByCity(params);
+}
+
+place.getAirportById = (params) => {
+    return API.place.getAirportById(params);
+}
+
+place.getAirportByCode =(params) => {
+    return API.place.getAirportBySkyCode(params);
+}
+
+place.getAirCompanyById = (params) => {
+    return API.place.getAirCompanyById(params)
+    .then(function(aircompany) {
+        console.info(aircompany);
+        return aircompany;
+    })
+    .catch(function(err) {
+        console.error(err);
+        throw err;
+    })
+}
+
+place.getAirCompanyByCode = (params) => {
+    return API.place.getAirCompanyByCode(params)
+    .then(function(aircompany) {
+        console.info(aircompany);
+        return aircompany;
+    })
+    .catch(function(err) {
+        console.info(err);
+        throw err;
+    })
 }
 
 module.exports = place;
