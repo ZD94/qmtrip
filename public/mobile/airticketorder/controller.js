@@ -267,7 +267,6 @@ module.exports = (function () {
                 .then(function(ret) {
                     var orderlist = ret.items;
                     var orders = [];
-                    console.info("#####")
                     orderlist.map(function(detail){
                         return API.qm_order.get_qm_order({order_id:detail})
                             .then(function(order){
@@ -281,7 +280,14 @@ module.exports = (function () {
                                 console.info(err);
                             })
                     })
-                    
+                    API.qm_order.get_qm_order({order_id:'b377abb0-fb09-11e5-a52d-8f58d663e56b'})
+                        .then(function(order){
+                            $scope.airinfo = order;
+                            console.info(order); 
+                        })
+                        .catch(function(err){
+                            console.info(err);
+                        })
                 })
             
         });

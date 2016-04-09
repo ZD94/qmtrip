@@ -15,8 +15,8 @@
         </div>
     </div>
     <ul class="list_content">
-        <div class="item margin_b" ng-repeat="order in orders" ng-click="enterDetail(item.id)">
-            <li class="item_main">
+        <div class="item margin_b" ng-repeat="order in orders">
+            <li class="item_main" ng-click="enterDetail(item.id)">
                 <div class="item_left">
                     <div class="plane_icon"><symbol name="icon-plane-solid"/></div>
                     <div class="starttime">{{order.start_time | date : "HH:mm"}}<br><span>{{order.ticket_info.dept_station_name}}{{order.flight_list.departure_term}}</span></div>
@@ -27,7 +27,7 @@
                         <div class="right elasticbox_one">中国联行KN1234(875中) | 准点率{{order.punctual_rate*100}}%</div>
                     </div>
                 </div>
-                <div class="item_right" ng-bind-html="125.12 | currency_point"></div>
+                <div class="item_right" ng-bind-html="order.flight_list.suggest_price | currency_point"></div>
             </li>
             <div class="item_bottom">
                 <span class="order_status">{{order.orderstatus}}</span>
@@ -35,7 +35,7 @@
                 <a href="" class="sm_btn1">删除</a>
             </div>
         </div>
-
+        <div ng-airinfo></div>
         <p class="tips" ng-if="tips" ng-bind-html="tips"></p>
 
     </ul>
