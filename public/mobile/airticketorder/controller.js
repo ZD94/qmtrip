@@ -132,31 +132,32 @@ module.exports = (function () {
 
     }
 
-    exported.InfoEditingController = function ($scope, $routeParams) {
+    exported.InfoEditingController = function ($scope, $routeParams, mobiscroll) {
 
         $scope.user;
 
-        $scope.IDType = "身份证";
+        $scope.inSelectingMode = false;
 
         $scope.data = {
-            id: null
+            type: '身份证',
+            id: null,
+            expire_date: null,
+            birth_date: null
         }
 
         $scope.enterSelectingMode = function(){
-            $(".veil").show();
-            $(".options").show();
+            $scope.inSelectingMode = true;
         }
 
         $scope.quitSelectingMode = function(){
-            $(".veil").hide();
-            $(".options").hide();
+            $scope.inSelectingMode = false;
         }
 
         $scope.select = function (string) {
             if ( string === "身份证" ) {
-                $scope.IDType = "身份证";
+                $scope.data.type = "身份证";
             } else if ( string === "护照" ) {
-                $scope.IDType = "护照";
+                $scope.data.type = "护照";
             };
             $scope.quitSelectingMode();
         }
@@ -168,11 +169,28 @@ module.exports = (function () {
         
         $scope.check_id = function(){
             if(
-                /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$/.test($scope.data.id)||
-                /^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/.test($scope.data.id)
-            ){}else{
+                ($scope.data.type==='身份证')&&
+                (!/^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$/.test($scope.data.id))&&
+                (!/^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/.test($scope.data.id))
+            ){
                 msgbox.log('身份证号码无效');
+            }else{
+                
             }
+        }
+
+        $scope.ready_to_save = function(){
+            if(
+                ($scope.data.type==='身份证')&&
+                (/^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$/.test($scope.data.id)||
+                /^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/.test($scope.data.id))
+            ){
+                return true;
+            }else if( $scope.data.type==='护照'&&$scope.data.expire_date&&$scope.data.birth_date ){
+                return true;
+            }else{
+                return false;
+            };
         }
 
         API.onload( function(){
@@ -192,7 +210,7 @@ module.exports = (function () {
         });
 
         $(document).ready(function(){
-            $(".expireDate").mobiscroll().date({//.date() .time() .datetime()
+            $(".expireDate,.birthDate").mobiscroll().date({//.date() .time() .datetime()
                 invalid: {
                     daysOfWeek: [],//[0,1,2,3,4,5]
                     daysOfMonth: []//['5/1', '12/24', '12/25']
@@ -297,7 +315,6 @@ module.exports = (function () {
                 .then(function(ret) {
                     var orderlist = ret.items;
                     var orders = [];
-                    console.info("#####")
                     orderlist.map(function(detail){
                         return API.qm_order.get_qm_order({order_id:detail})
                             .then(function(order){
@@ -311,7 +328,14 @@ module.exports = (function () {
                                 console.info(err);
                             })
                     })
-                    
+                    API.qm_order.get_qm_order({order_id:'b377abb0-fb09-11e5-a52d-8f58d663e56b'})
+                        .then(function(order){
+                            $scope.airinfo = order;
+                            console.info(order); 
+                        })
+                        .catch(function(err){
+                            console.info(err);
+                        })
                 })
             
         });
