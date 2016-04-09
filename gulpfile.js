@@ -3,6 +3,9 @@
  */
 "use strict";
 
+require('./common/typescript');
+
+var path = require('path');
 var gulp = require('gulp');
 var gulplib = require('./common/gulplib');
 
@@ -63,8 +66,6 @@ gulplib.dist(function(){
 
 gulplib.final('qmtrip');
 
-var path = require('path');
-var eslint = require('gulp-eslint');
 function eslintformater(results, config){
     var rules = config ? (config.rules || {}) : {};
     results.forEach(function (res) {
@@ -106,6 +107,7 @@ gulp.task('eslint.server', function () {
         },
         "globals": {}
     };
+    var eslint = require('gulp-eslint');
     return gulp.src(files)
         .pipe(eslint(options))
         .pipe(eslint.format(eslintformater))
@@ -137,6 +139,7 @@ gulp.task('eslint.mocha', function () {
             after: function(){}
         }
     };
+    var eslint = require('gulp-eslint');
     return gulp.src(files)
         .pipe(eslint(options))
         .pipe(eslint.format(eslintformater))
@@ -164,6 +167,7 @@ gulp.task('eslint.browser', function () {
             $: function(){}
         }
     };
+    var eslint = require('gulp-eslint');
     return gulp.src(files)
         .pipe(eslint(options))
         .pipe(eslint.format(eslintformater))

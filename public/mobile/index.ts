@@ -30,7 +30,8 @@ function TLDAlert(msg) {
 }
 
 var ngapp = require('ngapp');
-ngapp.depend('qmmodel');
+ngapp.depend('qm.common');
+ngapp.depend('qm.model');
 ngapp.root('mobile', '/usercenter/index');
 ngapp.initializer(require('nglibs'));
 var app = ngapp.create('qm.mobile');
