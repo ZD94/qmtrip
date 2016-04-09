@@ -121,26 +121,10 @@ place.getAirportByCode =(params) => {
 
 place.getAirCompanyById = (params) => {
     return API.place.getAirCompanyById(params)
-    .then(function(aircompany) {
-        console.info(aircompany);
-        return aircompany;
-    })
-    .catch(function(err) {
-        console.error(err);
-        throw err;
-    })
 }
 
 place.getAirCompanyByCode = (params) => {
     return API.place.getAirCompanyByCode(params)
-    .then(function(aircompany) {
-        console.info(aircompany);
-        return aircompany;
-    })
-    .catch(function(err) {
-        console.info(err);
-        throw err;
-    })
 }
 
 module.exports = place;
