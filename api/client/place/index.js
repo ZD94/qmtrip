@@ -111,10 +111,21 @@ function getAirPortsByCity(params) {
     return API.place.getAirPortsByCity(params);
 }
 
+/**
+ * @method getAirportById
+ * 通过id获取机场信息
+ * @param params
+ */
 place.getAirportById = (params) => {
     return API.place.getAirportById(params);
 }
 
+/**
+ * @method getAirportByCode
+ * 通过天巡或胜意代码获取机场信息
+ * @param params
+ * @returns {*}
+ */
 place.getAirportByCode =(params) => {
     return API.place.getAirportBySkyCode(params);
 }
@@ -123,6 +134,10 @@ place.getAirCompanyById = (params) => {
     return API.place.getAirCompanyById(params)
 }
 
+/**
+ * @method getAirCompanyByCode 获取航空公司
+ * @param params
+ */
 place.getAirCompanyByCode = (params) => {
     return API.place.getAirCompanyByCode(params)
 }
