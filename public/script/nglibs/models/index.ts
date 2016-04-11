@@ -1,7 +1,7 @@
 'use strict';
 
-var angular = require('angular');
-var API = require('api');
+import angular = require('angular');
+const API = require('api');
 
 class Staff {
     constructor(){
@@ -45,10 +45,10 @@ class PlaceCache {
     }
 
     async $resolve() : Promise<this> {
-        API.require('place');
-        await API.onload();
-        return this;
-    }
+    API.require('place');
+    await API.onload();
+    return this;
+}
 
     async get(code: string) : Promise<CityInfo> {
         var self = this;
