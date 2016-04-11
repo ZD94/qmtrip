@@ -11,12 +11,34 @@ var _ = require('lodash');
 
 var logger = new Logger('client/qm_order');
 var Paginate = paginate.Paginate;
+var cache = require("common/cache");
 
 /**
  * @class   qm_order    全麦订单
  */
 var qm_order = {};
 
+qm_order.create_qm_order = (params) => {
+    var self = this;
+    var userId = self.user_id;
+    var bookId = params.bookId;
+    var totalPrice = params.totalPrice;  //总价钱
+    var passengers = params.passengers;  //乘机人信息
+    var consumeId = params.consumeId;  //出行单ID
+    var cabinId = params.cabinId;       //仓位ID
+
+    return cache.read(bookId)
+    .then(function(result) {
+        if (!result) {
+            throw new Error('机票信息已经失效,请刷新后重试!');
+        }
+        return API.qm_order.create_qm_order({flightList: result.flight_list, payPrice: totalPrice,
+            consumeId: consumeId, passengers: passengers, staffId: userId})
+    })
+    .then(function(order) {
+        return order.id || order;
+    })
+}
 
 /**
  * @method  get_qm_order
