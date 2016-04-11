@@ -19,16 +19,24 @@ var travelplan = (function () {
      * @param $scope
      * @constructor
      */
-    //["未完成","待出预算","待上传票据","票据审核中","审核未通过","已完成"]
     travelplan.PlanlistController = function ($scope, $routeParams, $loading) {
         $scope.$root.pageTitle = '出差记录';
-        $scope.STATUS = "未完成";//当前状态
-        $scope.statuses = ["未完成", "待出预算", "待上传票据", "票据审核中", "审核未通过", "已完成"];
-        $scope.ORDER = "默认";//当前排序
+        // @data 状态的列表。
+        $scope.statuses = ["未完成", "待出预算", "待预订", "待上传票据", "票据审核中", "审核未通过", "已完成"];
+        // @data 排序选项的列表。
         $scope.orders = ["默认", "预算最大", "预算最小"];
-        $scope.items = [];//“员工出差记录”
-        $scope.withBalance = true;//状态为“已完成”的“出差记录”的预算是否有节余。
+        // @data “员工出差记录”
+        $scope.items = [];
+
+        // @state 当前状态。
+        $scope.STATUS = "未完成";
+        // @state 当前排序的状态。
+        $scope.ORDER = "默认";
+        
+        // 状态为“已完成”的“出差记录”的预算是否有节余。
+        $scope.withBalance = true;
         $scope.total = null;
+        // @state 该变量将在$scope.getList的运行过程中被重新赋值。
         $scope.tips = "";
 
         //-------------------------------------------- Modified by LH on 2016-03-19
@@ -65,14 +73,15 @@ var travelplan = (function () {
             //页面上的所有交互All interacitve actions on this page
             $scope.$root.pageTitle = '出差记录';
             $scope.$root.pageTitle = "出差记录";
-            console.log(PARAMS);
+            console.log('--- initial PARAMS',PARAMS);
             $scope.getList(PARAMS);
             $(window).on("scroll", $scope.handleScroll);
             $(".dropdown-header").on("click", $scope.enterSelectingMode);
             $(".veil").on("click", $scope.quitSelectingMode);
         }
 
-        $scope.enterSelectingMode = function () {//进入“选择模式”。该函数在用户点击".dropdown-header"时被调用。
+        // 进入“选择模式”。该函数在用户点击".dropdown-header"时被调用。
+        $scope.enterSelectingMode = function () {
             $(".veil").show();
             $("body").css({overflow: "hidden"});
             $(this).siblings(".dropdown-menu").slideDown();
@@ -100,6 +109,8 @@ var travelplan = (function () {
                 PARAMS = {page: 1, isComplete: false};
             } else if ($scope.STATUS === "待出预算") {
                 PARAMS = {page: 1, isHasBudget: false};
+            } else if ($scope.STATUS === "待预订") {
+                PARAMS = {page: 1, orderStatus: "WAIT_BOOK"};
             } else if ($scope.STATUS === "待上传票据") {
                 PARAMS = {page: 1, isUpload: false};
             } else if ($scope.STATUS === "票据审核中") {
@@ -128,27 +139,41 @@ var travelplan = (function () {
             $scope.quitSelectingMode();
         }
 
+        // 该函数用于判断并返回某一条记录的状态。
+        // @param {number} i $index
+        // @return {string}
         $scope.renderItemStatus = function (i) {
-            if ($scope.items[i].status === -1) {
+            if ( $scope.items[i].orderStatus==='NO_BUDGET' ) {
+                // $scope.items[i].status === -1
                 return "待出预算";
-            } else if ($scope.items[i].status === 0 && $scope.items[i].isCommit === false) {
+            } else if ( $scope.items[i].orderStatus==='WAIT_UPLOAD' ) {
+                // $scope.items[i].status === 0 && $scope.items[i].isCommit === false
                 return "待上传票据";
-            } else if ($scope.items[i].isCommit === true && $scope.items[i].auditStatus === 0) {
+            } else if ( $scope.items[i].orderStatus==='WAIT_COMMIT' ) {
+                // $scope.items[i].isCommit === true && $scope.items[i].auditStatus === 0
+                return "待上传票据";
+            } else if ( $scope.items[i].orderStatus==='WAIT_AUDIT' ) {
+                // $scope.items[i].isCommit === true && $scope.items[i].auditStatus === 0
                 return "票据审核中";
-            } else if ($scope.items[i].isCommit === true && $scope.items[i].auditStatus === -1) {
+            } else if ( $scope.items[i].orderStatus==='AUDIT_NOT_PASS' ) {
+                // $scope.items[i].isCommit === true && $scope.items[i].auditStatus === -1
                 return "审核未通过";
-            } else if ($scope.items[i].status === 2) {
+            } else if ( $scope.items[i].orderStatus==='COMPLETE' ) {
+                // $scope.items[i].status === 2
                 return "已完成";
             }
         }
 
+        // 该函数用于计算并返回状态为“已完成”的某条记录的“余额”。
         $scope.renderBalance = function (i) {
             var balance = $scope.items[i].budget - $scope.items[i].expenditure;
             return Math.abs(balance);
         }
 
+        // 该函数用于判断状态为“已完成”的某条记录的支出状况为“节省”还是“超支”。
+        // @param {number} i $index
+        // @return {string}
         $scope.renderBalanceOrDeficit = function (i) {
-        //
             var balance = $scope.items[i].budget - $scope.items[i].expenditure;
             if (balance >= 0) {
                 $scope.withBalance = true;
@@ -159,7 +184,9 @@ var travelplan = (function () {
             }
         }
 
-        $scope.getList = function (p) {//获取员工出差列表并将列表显示在页面上。每执行一次该函数，列表中的记录增加十条。
+        // 该函数用于获取列表并将数据存入$scope.items中。
+        // 每执行一次该函数，列表中的记录增加十条。
+        $scope.getList = function (p) {
             $loading.start();
             $scope.tips = "正在加载更多...";
             API.onload(function () {
@@ -172,8 +199,9 @@ var travelplan = (function () {
                             $scope.total = list.total;
                             p.page++;
 
-                            console.log($scope.items);
+                            console.log('---list',$scope.items);
 
+                            // 给$scope.tips重新赋值。
                             if (list.total === 0) {
                                 $scope.tips = '<p class="noRecord">没有出差记录</p><p class="seeOtherRecords">点击状态切换查看其他记录！</p>';
                             } else if (list.total <= 10) {
@@ -217,16 +245,20 @@ var travelplan = (function () {
             })
         }
 
-        $scope.handleScroll = function () {//该函数在
-            if ($(document).scrollTop() == ($(document).height() - $(window).height())) {//如果滚动条已经到达页面底部
+        // 该函数在滚动条滚动时被调用。
+        $scope.handleScroll = function () {
+            // 如果滚动条已经到达页面底部
+            if ($(document).scrollTop() == ($(document).height() - $(window).height())) {
                 $scope.getList(PARAMS);
             }
         }
 
-        $scope.enterDetail = function (orderId) {//进入详情页
+        // 该函数将使页面跳转到“详情页”。
+        $scope.enterDetail = function (orderId) {
             window.location = "#/travelplan/plandetail?orderId=" + orderId;
         }
 
+        // 初始化页面。
         init();
 
     }
@@ -286,12 +318,15 @@ var travelplan = (function () {
         }
 
         //******************************************************************************
-        $scope.ITEM = {};//该变量的值为  出差记录详情数据。
-        $scope.URL = {};//该变量的值为  预订去程、回程和酒店的url。
-        $scope.timeSpan;//该变量的值为  入住酒店的天数。
+        // @data 该变量的值为  出差记录详情数据。
+        $scope.ITEM = {};
+        // @data 该变量的值为  预订去程、回程和酒店的url。
+        $scope.URL = {};
+        // @data 该变量的值为  入住酒店的天数。
+        $scope.timeSpan;
 
-        //---------------------------------------------
-        $scope.getData = function (p) {//此函数用于获取 出差记录详情数据 并把它存入$scope.ITEM这一变量中。
+        // 此函数用于获取 出差记录详情数据 并把它存入$scope.ITEM这一变量中。
+        $scope.getData = function (p) {
             $loading.start();
             API.onload(function () {
                 //console.info(p);
@@ -299,8 +334,9 @@ var travelplan = (function () {
                     .getTripPlanOrderById({orderId: p})
                     .then(
                         function (data) {
+                            console.log('---details',data);
                             $scope.ITEM = data;
-
+                            console.info (data);
                             //$scope.backId = $scope.ITEM.backTraffic[0].id;
                             //$scope.outId = $scope.ITEM.outTraffic[0].id;
                             //$scope.hotelId = $scope.ITEM.hotel[0].id;
@@ -324,15 +360,23 @@ var travelplan = (function () {
             })
         }
 
-        $scope.renderDeficit = function () {//此函数用于计算并渲染 节省的钱数/超支的钱数。
+        // 此函数用于计算并渲染 节省的钱数/超支的钱数。
+        // @return {number}
+        $scope.renderDeficit = function () {
             return Math.abs($scope.ITEM.budget - $scope.ITEM.expenditure).toFixed(2);
         }
 
-        $scope.renderStatus = function (p, i) {//此函数用于判断并渲染 某一张票据的状态。
+        // 此函数用于判断并渲染 某一张票据的状态。
+        // @param p {string}
+        // @param i {number} index
+        // @return {string}
+        $scope.renderStatus = function (p, i) {
 
             if (p) {
                 if (p.orderStatus === "NO_BUDGET") {
                     return "待出预算";
+                } else if (p.orderStatus === "WAIT_BOOK") {
+                    return '待预订';
                 } else if (p.orderStatus === "WAIT_UPLOAD") {
                     return "待上传票据";
                 } else if (p.orderStatus === "AUDIT_NOT_PASS") {
@@ -349,7 +393,9 @@ var travelplan = (function () {
             ;
         }
 
-        $scope.renderBUTTON = function () {//此函数用于判断并渲染 “提交审核”按钮上显示的文字。
+        // 此函数用于判断并渲染 “提交审核”按钮上显示的文字。
+        // @return {string}
+        $scope.renderBUTTON = function () {
 
             if ($scope.ITEM.orderStatus === "WAIT_AUDIT") {
                 return "票据审核中";
@@ -359,82 +405,148 @@ var travelplan = (function () {
             ;
         }
 
-        $scope.book = function (p) {//此函数在用户点击“预订”按钮时被调用。
-            if (p === "outTraffic") {
-                API.onload(function () {
-                    if ($scope.ITEM.outTraffic.length !== 0) {//获取预订去程的机票或火车票的网页的URL
-                        var type = "air";
-                        if ($scope.ITEM.outTraffic[0].invoiceType === 'TRAIN') {
-                            type = "train";
-                        }
-                        API.travelBudget.getBookListUrl({
-                                spval: $scope.ITEM.outTraffic[0].startPlace,
-                                epval: $scope.ITEM.outTraffic[0].arrivalPlace,
-                                st: $scope.ITEM.outTraffic[0].startTime,
-                                type: type
-                            })
-                            .then(function (outTrafficBookListUrl) {
-                                $scope.URL.outTrafficBookListUrl = outTrafficBookListUrl;
 
-                                //$scope.$apply();
+        // // 此函数在用户点击“预订”按钮时被调用。
+        // $scope.book = function (p) {
+        //     if (p === "outTraffic") {
+        //         API.onload(function () {
+        //             if ($scope.ITEM.outTraffic.length !== 0) {//获取预订去程的机票或火车票的网页的URL
+        //                 var type = "air";
+        //                 if ($scope.ITEM.outTraffic[0].invoiceType === 'TRAIN') {
+        //                     type = "train";
+        //                 }
+        //                 API.travelBudget.getBookListUrl({
+        //                         spval: $scope.ITEM.outTraffic[0].startPlace,
+        //                         epval: $scope.ITEM.outTraffic[0].arrivalPlace,
+        //                         st: $scope.ITEM.outTraffic[0].startTime,
+        //                         type: type
+        //                     })
+        //                     .then(function (outTrafficBookListUrl) {
+        //                         $scope.URL.outTrafficBookListUrl = outTrafficBookListUrl;
 
-                                window.location.href = $scope.URL.outTrafficBookListUrl;
-                            })
-                            .catch(function (err) {
-                                TLDAlert(err.msg || err);
-                            })
-                    }
-                });
-            } else if (p === "backTraffic") {
-                if ($scope.ITEM.backTraffic.length !== 0) {
-                    var type = "air";
-                    if ($scope.ITEM.backTraffic[0].invoiceType === 'TRAIN') {
-                        type = "train";
-                    }
-                    API.travelBudget.getBookListUrl({
-                            spval: $scope.ITEM.backTraffic[0].startPlace,
-                            epval: $scope.ITEM.backTraffic[0].arrivalPlace,
-                            st: $scope.ITEM.backTraffic[0].startTime,
-                            type: type
-                        })
-                        .then(function (backTrafficBookListUrl) {
-                            $scope.URL.backTrafficBookListUrl = backTrafficBookListUrl;
+        //                         //$scope.$apply();
 
-                            //$scope.$apply();
+        //                         window.location.href = $scope.URL.outTrafficBookListUrl;
+        //                     })
+        //                     .catch(function (err) {
+        //                         TLDAlert(err.msg || err);
+        //                     })
+        //             }
+        //         });
+        //     } else if (p === "backTraffic") {
+        //         if ($scope.ITEM.backTraffic.length !== 0) {
+        //             var type = "air";
+        //             if ($scope.ITEM.backTraffic[0].invoiceType === 'TRAIN') {
+        //                 type = "train";
+        //             }
+        //             API.travelBudget.getBookListUrl({
+        //                     spval: $scope.ITEM.backTraffic[0].startPlace,
+        //                     epval: $scope.ITEM.backTraffic[0].arrivalPlace,
+        //                     st: $scope.ITEM.backTraffic[0].startTime,
+        //                     type: type
+        //                 })
+        //                 .then(function (backTrafficBookListUrl) {
+        //                     $scope.URL.backTrafficBookListUrl = backTrafficBookListUrl;
 
-                            window.location.href = $scope.URL.backTrafficBookListUrl;
-                        })
-                        .catch(function (err) {
-                            TLDAlert(err.msg || err);
-                        })
-                }
-            } else if (p === "hotel") {
-                if ($scope.ITEM.hotel.length !== 0) {
-                    API.travelBudget.getBookListUrl({
-                            hotelCity: $scope.ITEM.hotel[0].city,
-                            hotelAddress: $scope.ITEM.hotel[0].hotelName,
-                            from: 'mobile',
-                            hotelSt: $scope.ITEM.hotel[0].startTime,
-                            hotelEt: $scope.ITEM.hotel[0].endTime,
-                            type: 'hotel'
-                        })
-                        .then(function (r) {
-                            $scope.URL.hotelBookListUrl = r;
+        //                     //$scope.$apply();
 
-                            //$scope.$apply();
+        //                     window.location.href = $scope.URL.backTrafficBookListUrl;
+        //                 })
+        //                 .catch(function (err) {
+        //                     TLDAlert(err.msg || err);
+        //                 })
+        //         }
+        //     } else if (p === "hotel") {
+        //         if ($scope.ITEM.hotel.length !== 0) {
+        //             API.travelBudget.getBookListUrl({
+        //                     hotelCity: $scope.ITEM.hotel[0].city,
+        //                     hotelAddress: $scope.ITEM.hotel[0].hotelName,
+        //                     from: 'mobile',
+        //                     hotelSt: $scope.ITEM.hotel[0].startTime,
+        //                     hotelEt: $scope.ITEM.hotel[0].endTime,
+        //                     type: 'hotel'
+        //                 })
+        //                 .then(function (r) {
+        //                     $scope.URL.hotelBookListUrl = r;
 
-                            console.log($scope.URL.hotelBookListUrl);
-                            window.location.href = $scope.URL.hotelBookListUrl;
-                        })
-                        .catch(function (err) {
-                            TLDAlert(err.msg || err);
-                        })
-                }
-            }
-            ;
-        }
 
-        $scope.checkInvoice = function (p) {//此函数在用户点击“查看票据”按钮时被调用。
+        //$scope.book = function (p) {//此函数在用户点击“预订”按钮时被调用。
+        //    if (p === "outTraffic") {
+        //        API.onload(function () {
+        //            if ($scope.ITEM.outTraffic.length !== 0) {//获取预订去程的机票或火车票的网页的URL
+        //                var type = "air";
+        //                if ($scope.ITEM.outTraffic[0].invoiceType === 'TRAIN') {
+        //                    type = "train";
+        //                }
+        //                API.travelBudget.getBookListUrl({
+        //                        spval: $scope.ITEM.outTraffic[0].startPlace,
+        //                        epval: $scope.ITEM.outTraffic[0].arrivalPlace,
+        //                        st: $scope.ITEM.outTraffic[0].startTime,
+        //                        type: type
+        //                    })
+        //                    .then(function (outTrafficBookListUrl) {
+        //                        $scope.URL.outTrafficBookListUrl = outTrafficBookListUrl;
+        //
+        //                        //$scope.$apply();
+        //
+        //                        window.location.href = $scope.URL.outTrafficBookListUrl;
+        //                    })
+        //                    .catch(function (err) {
+        //                        TLDAlert(err.msg || err);
+        //                    })
+        //            }
+        //        });
+        //    } else if (p === "backTraffic") {
+        //        if ($scope.ITEM.backTraffic.length !== 0) {
+        //            var type = "air";
+        //            if ($scope.ITEM.backTraffic[0].invoiceType === 'TRAIN') {
+        //                type = "train";
+        //            }
+        //            API.travelBudget.getBookListUrl({
+        //                    spval: $scope.ITEM.backTraffic[0].startPlace,
+        //                    epval: $scope.ITEM.backTraffic[0].arrivalPlace,
+        //                    st: $scope.ITEM.backTraffic[0].startTime,
+        //                    type: type
+        //                })
+        //                .then(function (backTrafficBookListUrl) {
+        //                    $scope.URL.backTrafficBookListUrl = backTrafficBookListUrl;
+        //
+        //                    //$scope.$apply();
+        //
+        //                    window.location.href = $scope.URL.backTrafficBookListUrl;
+        //                })
+        //                .catch(function (err) {
+        //                    TLDAlert(err.msg || err);
+        //                })
+        //        }
+        //    } else if (p === "hotel") {
+        //        if ($scope.ITEM.hotel.length !== 0) {
+        //            API.travelBudget.getBookListUrl({
+        //                    hotelCity: $scope.ITEM.hotel[0].city,
+        //                    hotelAddress: $scope.ITEM.hotel[0].hotelName,
+        //                    from: 'mobile',
+        //                    hotelSt: $scope.ITEM.hotel[0].startTime,
+        //                    hotelEt: $scope.ITEM.hotel[0].endTime,
+        //                    type: 'hotel'
+        //                })
+        //                .then(function (r) {
+        //                    $scope.URL.hotelBookListUrl = r;
+        //
+        //                    //$scope.$apply();
+        //
+        //                    console.log($scope.URL.hotelBookListUrl);
+        //                    window.location.href = $scope.URL.hotelBookListUrl;
+        //                })
+        //                .catch(function (err) {
+        //                    TLDAlert(err.msg || err);
+        //                })
+        //        }
+        //    }
+        //    ;
+        //}
+
+        // 此函数在用户点击“查看票据”按钮时被调用。
+        $scope.checkInvoice = function (p) {
             if (p === "outTraffic") {
                 window.location.href = "#/travelplan/invoicedetail?planId=" + $scope.ITEM.id + "&status=" + p + "&invoiceId=" + $scope.ITEM.outTraffic[0].newInvoice;
             } else if (p === "backTraffic") {
@@ -445,7 +557,8 @@ var travelplan = (function () {
             ;
         }
 
-        $scope.commit = function () {//此函数在用户点击“提交审核”按钮时被调用。
+        // 此函数在用户点击“提交审核”按钮时被调用。
+        $scope.commit = function () {
             if ($scope.ITEM.orderStatus === "WAIT_COMMIT") {
                 msgbox.confirm('票据一经提交将无法进行修改，是否确认提交？', '确认提交', '返回检查')
                     .then(function (btn) {
@@ -470,7 +583,8 @@ var travelplan = (function () {
             ;
         }
 
-        function init() {//此函数被用于初始化页面。
+        // 此函数被用于初始化页面。
+        function init() {
             $scope.$root.pageTitle = "详细出差记录";
             $scope.getData($routeParams.orderId);
         }
