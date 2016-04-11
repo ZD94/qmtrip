@@ -190,7 +190,6 @@
     dt {
       height: 4.8rem;
       font-size: @font-size-12;
-      color: @color-theme1;
       text-align: center;
       padding-top: 0.8rem;
       i {
@@ -203,6 +202,9 @@
       background: @border-color;
       position: absolute;
       top: 1.7rem;
+    }
+    .active {
+      color: @color-theme1;
     }
   }
   .city_content {
@@ -243,6 +245,7 @@
   left: 0;
   top: 0;
   z-index: 10;
+  display: none;
   .shaixuan_box {
     width: 100%;
     height: 30rem;
@@ -350,6 +353,19 @@
     width: 100%;
     height: 8rem;
     background: @background-color-second;
+  }
+  #economy_class {
+    .down {
+      display: none;
+    }
+  }
+  #first_class {
+    dd {
+      display: none;
+    }
+    .up {
+      display: none;
+    }
   }
   dl {
     width: 100%;
