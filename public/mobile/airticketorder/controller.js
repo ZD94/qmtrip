@@ -309,6 +309,12 @@ module.exports = (function () {
             window.location.href = "#/airticketorder/addresslist";
         }
     }
+
+    /*
+     机票订单列表页
+     * @param $scope
+     * @constructor
+     */
     exported.OrderlistController = function ($scope) {
         API.onload().then(function(){
             API.qm_order.page_qm_orders({})
@@ -318,10 +324,21 @@ module.exports = (function () {
                     orderlist.map(function(detail){
                         return API.qm_order.get_qm_order({order_id:detail})
                             .then(function(order){
-                                order.orderstatus = order.STATUS[order.status]
+                                var startTime = new Date(order.flight_list.departure_date+'T'+order.flight_list.departure_time).valueOf();
+                                var currentTime = new Date().valueOf();
+                                var ineffect = startTime - currentTime;
+                                order.pre_again = false;
+                                if (ineffect>0 && order.status =='CANCEL') {
+                                    order.pre_again = true;
+                                }else if (ineffect>0 && order.status =='REFUNDING'){
+                                    order.pre_again = true;
+                                }else if(ineffect>0 && order.status =='REFUND'){
+                                    order.pre_again = true;
+                                }
+                                order.orderstatus = order.STATUS[order.status];
                                 orders.push(order);
                                 $scope.orders = orders;
-                                console.info(order)
+
                                 return order;
                             })
                             .catch(function(err){
@@ -330,7 +347,7 @@ module.exports = (function () {
                     })
                     API.qm_order.get_qm_order({order_id:'b377abb0-fb09-11e5-a52d-8f58d663e56b'})
                         .then(function(order){
-                            $scope.airinfo = order;
+                            $scope.airinfo = order.flight_list;
                             console.info(order); 
                         })
                         .catch(function(err){
@@ -340,6 +357,25 @@ module.exports = (function () {
             
         });
     }
+    /*
+     预定信息填写页
+     * @param $scope
+     * @constructor
+     */
+     exported.BookairticketController = function($scope) {
+        API.onload(function(){
+            console.info(true)
+            $scope.renderDay = function(){
+            var day = ['周日','周一','周二','周三','周四','周五','周六'];
+            return (
+                $scope.order?
+                day[new Date($scope.order.flight_list.departure_date).getDay()]
+                :
+                null
+            );
+        }
+        })
+     }
     return exported;
 })();
 
