@@ -10,6 +10,7 @@ inits.push(require('./erasable'));
 inits.push(require('./models'));
 inits.push(require('./filters'));
 inits.push(require('./airinfo'));
+inits.push(require('./citypicker'));
 
 module.exports = function($module){
     inits.forEach(function(init){

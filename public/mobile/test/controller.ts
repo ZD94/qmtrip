@@ -15,24 +15,28 @@ export async function StaffController($scope, StaffCache){
 }
 
 export function AsyncController($scope, $q, $timeout, $loading) {
-    $loading.start();
     var get_user = function() {
         return new Promise(function(resolve, reject){
             window.setTimeout(function() {
                 resolve({id:1000, name:'Clear'});
-                $loading.end();
             }, 2000);
         });
     };
     $scope.user = get_user();
 
+    $scope.citycode = 'CT_289';
+    $scope.update = function(){
+        console.log('clicked');
+        if($scope.citycode == 'CT_039')
+            $scope.citycode = 'CT_289';
+        else
+            $scope.citycode = 'CT_039';
+    }
 
-    $loading.start();
     var getMessages = function() {
         var deferred = $q.defer();
         $timeout(function() {
             deferred.resolve(['Hello', 'world!']);
-            $loading.end();
         }, 2000);
         return deferred.promise;
     };
@@ -208,7 +212,7 @@ export function InputController($scope){
      name:'',
      pwd:''
     };
- }
+}
 
 export function AirportController($scope, AirPort, AirCompany) {
     console.info(AirPort);
@@ -222,5 +226,31 @@ export function AirportController($scope, AirPort, AirCompany) {
     $scope.airport2 = AirPort.getByCode("AQG");
     $scope.aircompany = AirCompany.get('AC_2P');
     $scope.aricompany2 = AirCompany.getByCode('2P');
-    console.info('测试一下====>', $scope.airport)
+    console.info('测试一下====>', $scope.airport);
+}
+
+export  function CitypickerController($scope) {
+    console.info(111);
+    $scope.m = {};
+    $scope.m.city = ['', '', ''];
+    $scope.label = function(v){
+        return v.name+'|'+v.val;
+    }
+    $scope.getWheelOptions = function(index){
+        if(index == 0)
+            return $scope.m.a;
+        return $scope.m.os[index-1].subs;
+    }
+    $scope.$watch('m.os[0]', function(newval, oldval, scope){
+        if(newval === oldval)
+            return;
+        //console.log('os[0]', newval.val, oldval.val);
+        $scope.m.os[1] = newval.subs[0];
+    })
+    $scope.$watch('m.os[1]', function(newval, oldval, scope){
+        if(newval === oldval)
+            return;
+        //console.log('os[1]', newval.val, oldval.val);
+        $scope.m.os[2] = newval.subs[0];
+    })
 }
