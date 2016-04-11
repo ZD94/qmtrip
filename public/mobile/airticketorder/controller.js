@@ -23,24 +23,29 @@ module.exports = (function () {
      * @constructor
      */
 
-    exported.OrderDetailsController = function ( $scope,$routeParams,$loading ) {
+    exported.OrderDetailsController = function ( $scope,$routeParams,$loading/*,AirPort,AirCompany*/ ) {
 
         $loading.end();
 
         $scope._status = "CANCEL";
+        // @state
         $scope.deliveryAddressShown = false;
 
         $scope.user;
         $scope.order;
+        //该变量的值为该订单的剩余时间。
+        $scope.time_left = null;
 
-        $scope.time_left = null;//该变量的值为该订单的剩余时间。
+        //$scope.ap = AirPort.getByCode('PEK');
 
-        setInterval(function(){//每隔一秒给$scope.time_left重新赋值。
+        //每隔一秒调用get_time_left给$scope.time_left重新赋值。
+        setInterval(function(){
             get_time_left();
             $scope.$apply();
         },1000);
 
-        function get_time_left(){//该函数用于获取剩余时间并给$scope.time_left重新赋值。
+        //该函数用于获取剩余时间并给$scope.time_left重新赋值。
+        function get_time_left(){
             if($scope.order){
                 var now = new Date().getTime();
                 var deadline = new Date('2016-04-08T08:55:11.000Z').getTime();
@@ -53,13 +58,16 @@ module.exports = (function () {
             }
         }        
 
+        //@param {params:string}
         $scope.toggle = function( params ){
             if( params==="deliveryAddress" ){
                 $scope.deliveryAddressShown = ($scope.deliveryAddressShown?false:true);
             };
         }
 
-        $scope.renderStatus = function(){//该函数用于判断并返回订单状态。
+        //该函数用于判断并返回订单状态。
+        //@return {string}
+        $scope.renderStatus = function(){
             var statuses = {
                 CANCEL: '已取消',
                 OUT_TICKET: '已出票',
@@ -73,10 +81,13 @@ module.exports = (function () {
             return $scope.order?statuses[ $scope.order.status ]:'';
         }
 
-        $scope.renderPercentage = function(){//该函数用于计算并以“98%”的格式返回准点率。
+        //该函数用于计算并以“98%”的格式返回准点率。
+        //@return {string}
+        $scope.renderPercentage = function(){
             return $scope.order?( $scope.order.punctual_rate*100+'%' ):'';
         }
 
+        //@return {string}
         $scope.renderDay = function(){
             var day = ['周日','周一','周二','周三','周四','周五','周六'];
             return (
@@ -96,14 +107,17 @@ module.exports = (function () {
         //     };
         // }
 
+        // 该函数在用户点击“退改签说明”之后被调用。
         $scope.showInfo = function(){
             msgbox.alert( $scope.order.ticket_info.tpgd, '确定' );
         }
 
+        // 该函数在用户点击“删除订单”按钮之后被调用。
         $scope.delete = function(){
             msgbox.confirm( '订单一经删除则无法恢复，确认删除吗？','确认删除','取消' );
         }
 
+        //获取当前员工信息和机票订单信息。
         API.onload( function(){
             console.log( API.staff,API.qm_order );
             
@@ -135,7 +149,7 @@ module.exports = (function () {
     exported.InfoEditingController = function ($scope, $routeParams, mobiscroll) {
 
         $scope.user;
-
+        //@state
         $scope.inSelectingMode = false;
 
         $scope.data = {
@@ -153,6 +167,7 @@ module.exports = (function () {
             $scope.inSelectingMode = false;
         }
 
+        // 该函数在用户点击“身份证”或“护照”之后被调用。
         $scope.select = function (string) {
             if ( string === "身份证" ) {
                 $scope.data.type = "身份证";
@@ -167,6 +182,7 @@ module.exports = (function () {
             console.log( currentTime );
         }
         
+        //该函数在“证件号码输入框”失去焦点时被调用，被用来验证输入的证件号码的格式是否合格。        
         $scope.check_id = function(){
             if(
                 ($scope.data.type==='身份证')&&
@@ -179,6 +195,8 @@ module.exports = (function () {
             }
         }
 
+        // 该函数用来判断所需的数据是否已经全部输入完毕。
+        // @return {boolean}
         $scope.ready_to_save = function(){
             if(
                 ($scope.data.type==='身份证')&&
@@ -186,22 +204,26 @@ module.exports = (function () {
                 /^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/.test($scope.data.id))
             ){
                 return true;
-            }else if( $scope.data.type==='护照'&&$scope.data.expire_date&&$scope.data.birth_date ){
+            }else if( 
+                $scope.data.type==='护照'&&
+                $scope.data.id&&
+                $scope.data.expire_date&&
+                $scope.data.birth_date 
+            ){
                 return true;
             }else{
                 return false;
             };
         }
 
+        // 该函数用来获取当前用户的信息。
         API.onload( function(){
             console.log( API.staff,API.qm_order );
-            
             API.staff
                 .getCurrentStaff()
                 .then( function(data){
-                    console.log(data);
+                    console.log('---user',data);
                     $scope.user = data;
-                    console.log( $scope.user.name );
                 })
                 .catch(function (err) {
                     TLDAlert(err.msg || err)
@@ -209,6 +231,7 @@ module.exports = (function () {
 
         });
 
+        // 初始化mobiscroll。
         $(document).ready(function(){
             $(".expireDate,.birthDate").mobiscroll().date({//.date() .time() .datetime()
                 invalid: {

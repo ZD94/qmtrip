@@ -75,7 +75,8 @@
                 <div class="status" ng-class="{'rejected':(ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS'),'complete':(ITEM.outTraffic[0].orderStatus==='AUDIT_PASS')}">{{renderStatus( ITEM.outTraffic[0],$index )}}
                 </div>
                 <div class="buttons" ng-if="  ITEM.outTraffic[0].orderStatus!=='NO_BUDGET'  ">
-                    <a class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'outTraffic' )" ng-hide="ITEM.outTraffic[0].invoiceType==='TRAIN'">预订</a>
+                    <!--<a class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'outTraffic' )" ng-hide="ITEM.outTraffic[0].invoiceType==='TRAIN'">预订</a>-->
+                    <a href="#/airticket/flightlist?BG={{ITEM.outTraffic[0].budget}}&SCN={{ITEM.outTraffic[0].startPlace}}&SCC={{ITEM.outTraffic[0].startPlaceCode}}&ECN={{ITEM.outTraffic[0].arrivalPlace}}&ECC={{ITEM.outTraffic[0].arrivalPlaceCode}}&ST={{ITEM.outTraffic[0].startTime | date:'yyyy-MM-dd'}}" class="BTN" ng-if="ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'" ng-hide="ITEM.outTraffic[0].invoiceType==='TRAIN'">预订</a>
                     <div class="BTN" ng-uploader accept="image/*" title="outtraffic_up" done="outtraffic_done"
                          ng-if="ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'">
                         上传票据

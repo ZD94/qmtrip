@@ -35,7 +35,7 @@ function isAuthCreditExist() {
 }
 
 var ngapp = require('ngapp');
-ngapp.depend('qmmodel');
+ngapp.depend('qm.model');
 ngapp.root('staff', '/StaffFirst/StaffUser');
 ngapp.initializer(require('nglibs'));
 ngapp.useRoutePolicy(ngapp.RoutePolicy.Embed, ['auth']);
