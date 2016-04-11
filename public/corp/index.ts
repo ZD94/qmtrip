@@ -44,7 +44,7 @@ function logout(){
     });
 };
 
-ngapp.depend('qmmodel');
+ngapp.depend('qm.model');
 ngapp.root('corp', '/UsersFirst/UserMain');
 ngapp.initializer(require('nglibs'));
 var app = ngapp.create('qm.corp');

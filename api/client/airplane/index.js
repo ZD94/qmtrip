@@ -32,18 +32,23 @@ var airplane = {};
  * @param {string}  params.departure_city  出发城市代码
  * @param {string}  params.arrival_city    到达城市代码
  * @param {date}    params.date    出发时间
- * @param {string}    params.dept_station   出发机场 数组，可以传多个
+ * @param {string}  params.dept_station   出发机场 数组，可以传多个
+ * @param {string}  params.arrival_station   到达机场 数组，可以传多个
+ * @param {string}  params.ip_address   ip地址
+ * @param {array}   params.cabin_type   匹配舱位类型，数组，不传则查询所有匹配项 F:头等舱 C:商务舱 Y:经济舱
+ * @param {Array}   params.airways  航空公司代码，不传则查询所有匹配项，默认为[]\ * @param {string}    params.dept_station   出发机场 数组，可以传多个
  * @param {string}    params.arrival_station   到达机场 数组，可以传多个
- * @param {Array}   params.order    排序
+ * @param {Array}   params.order    排序eg: ['suggest_price', 'asc|desc']
  * @returns {Array} list
  */
+
 airplane.get_plane_list = get_plane_list;
 get_plane_list.required_params = ['departure_city', 'arrival_city', 'date'];
-get_plane_list.optional_params = ['query_flag', 'travel_type', 'dept_station', 'arrival_station'];
+get_plane_list.optional_params = ['query_flag', 'travel_type', 'dept_station', 'arrival_station', 'order'];
 function get_plane_list(params) {
     var self = this;
     var query_key = moment().format('YYYYMMDDHHmmss') + getRndStr(4, 2);
-    var ip1 = ['192', '112', '114', '114']
+    var ip1 = ['192', '112', '114', '114'];
     var ip2 = ['168', '222', '21', '11'];
     var ip3 = ['123', '32', '12', '45'];
     var ip4 = ['133', '43', '55', '66'];
@@ -87,6 +92,7 @@ function get_plane_list(params) {
             }))
         })
         .then(function(result) {
+            console.info("result.length", result.length);
             var flight_list = [];
             result.map(function(ret) {
                 ret.map(function(flight) {
@@ -97,11 +103,35 @@ function get_plane_list(params) {
                 })
             });
 
-            flight_list = _.orderBy(flight_list, ['suggest_price'], ['asc']);
-            flight_list.map(function(s) {
-                console.info(s.flight_no, s.suggest_price, s.query_key);
-            });
-            logger.info(flight_list);
+            var order_field = 'suggest_price';
+            var order_rule = 'asc';
+
+            if(params.order) {
+                order_field = params.order[0] || 'suggest_price';
+                order_rule = params.order[1] || 'asc';
+            }
+
+            if(flight_list.length > 1) {
+                flight_list = _.orderBy(flight_list, [order_field], [order_rule]);
+
+                var cabin_type = params.cabin_type;
+                var airways = params.airways;
+
+                flight_list.map(function(s) {
+                    if(airways && airways.length > 0 && airways.indexOf(s.airways) < 0){
+                        console.info("!!!!!!");
+                        return;
+                    }
+
+                    if(cabin_type && cabin_type.length > 0 && cabin_type.indexOf(s.cabin_type) < 0){
+                        console.info("######");
+                        return;
+                    }
+
+                    console.info(s.flight_no, s.suggest_price, s.departure_time, s.query_key);
+                });
+            }
+
             return flight_list;
         })
 
@@ -122,26 +152,26 @@ function get_plane_details(params) {
     params.ip_address = self.remoteAddress;
     return API.staff.getStaff({id: self.accountId})
         .then(function() {
-            //return _flight;
             return API.shengyi_ticket.search_more_cabin(params);
         })
         .then(function(ret) {
-            var key = 'bid_' + new Date().valueOf() + getRndStr(4);
-            ret.book_id = key;
-            return cache.write(key, ret)
+            var flight_key = ret.flight_no;
+            ret.book_id = flight_key;
+            return cache.write(flight_key, ret);
         })
         .then(function(ret) {
             logger.info(ret);
-            ret.cabins.map(function(t) {
-                console.info(t.cabin, t.cabin_type, t.cabin_level, t.cabin_name, t.suggest_price);
-            })
-            return ret;
+            return Promise.all(ret.cabins.map(function(cabin) {
+                cabin.cabin_id = 'cabin_' + new Date().valueOf() + getRndStr(4);
+                console.info(cabin.cabin_id, cabin.cabin, cabin.cabin_type, cabin.cabin_level, cabin.cabin_name, cabin.suggest_price);
+                return cache.write(cabin.cabin_id, cabin);
+            }));
         })
-    .catch(function(err) {
-        console.info('catch....')
-        console.info(err.stack || err);
-        throw err;
-    })
+        .catch(function(err) {
+            console.info('catch....')
+            console.info(err.stack || err);
+            throw err;
+        })
 };
 
 /**
@@ -216,8 +246,8 @@ function book_ticket_new(params) {
 /**
  * @method  book_ticket
  * 预定机票API，并创建机票订单
- * @param   {json}  params.flight_list  航班舱位集合
- * @param   {string}    params.cabin    舱位
+ * @param   {json}  params.flight_no  航班舱位集合
+ * @param   {string}    params.cabin_id    舱位
  * @param   {string}    params.pay_price    需要支付的金额
  * @param   {uuid}  params.trip_plan_id     出差记录id
  * @param   {uuid}  params.consume_id       出行记录id
@@ -230,7 +260,7 @@ function book_ticket_new(params) {
  * @type {book_ticket}
  */
 airplane.book_ticket = book_ticket;
-book_ticket.required_params = ['flight_list', 'cabin', 'pay_price', 'trip_plan_id', 'consume_id',
+book_ticket.required_params = ['flight_no', 'cabin_id', 'pay_price', 'trip_plan_id', 'consume_id',
     'contact_name', 'contact_mobile', 'adult_num', 'passengers'];
 book_ticket.optional_params = ['insurance_price', 'insurance_type'];
 function book_ticket(params) {
@@ -238,12 +268,33 @@ function book_ticket(params) {
     params.ip_address = params.remoteAddress;
     var account_id = self.accountId;
     var consume_id = params.consume_id;
+    var flight_no = params.flight_no;
+    var cabin_id = params.cabin_id;
 
-    return API.tripPlan.getConsumeDetail({consumeId: params.consume_id})
-        .then(function(consume) {
+    return Promise.all([
+        API.tripPlan.getConsumeDetail({consumeId: params.consume_id}),
+        cache.read(flight_no),
+        cache.read(cabin_id)
+    ])
+        .spread(function(consume, flight_list, cabin) {
             if(consume.orderStatus !== 'WAIT_BOOK') {
                 throw {code: -2, msg: '预定失败，请检查出差记录状态'};
             }
+
+            if(!flight_list || !cabin) {
+                throw {code: -3, msg: '机票信息已经失效,请刷新后重试!'};
+            }
+
+            flight_list.cabin = cabin;
+            params.flight_list = flight_list;
+            params.airways = flight_list.airways;
+            params.punctual_rate = flight_list.punctual_rate;
+            params.flight_no = params.flight_no;
+            params.start_time = flight_list.departure_time;
+            params.end_time = flight_list.arrival_time;
+            params.cabin_type = cabin.cabin_type;
+            params.cabin_name = cabin.cabin_name;
+            params.cabin_no = cabin.cabin;
 
             return [
                 consume,
@@ -253,8 +304,6 @@ function book_ticket(params) {
         })
         .spread(function(consume, staff, order_no) {
             var dept_date = moment(consume.startTime).format('YYYY-MM-DD');
-            var flight_list = params.flight_list;
-            var cabin = flight_list.cabin;
 
             params.type = 'P';
             params.date = dept_date;
@@ -264,14 +313,7 @@ function book_ticket(params) {
             params.end_city_code = consume.arrivalPlaceCode;
             params.company_id = staff.companyId;
             params.order_no = order_no;
-            params.airways = flight_list.airways;
-            params.punctual_rate = flight_list.punctual_rate;
-            params.flight_no = flight_list.flight_no;
-            params.start_time = flight_list.departure_time;
-            params.end_time = flight_list.arrival_time;
-            params.cabin_type = cabin.cabin_type;
-            params.cabin_name = cabin.cabin_name;
-            params.cabin_no = cabin.cabin;
+
 
             return API.qm_order.create_qm_order(params);
         })
