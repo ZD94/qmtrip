@@ -16,6 +16,11 @@ module.exports = function ($module){
                 $scope.clear_val = function($event) {
                     //console.log('clear_val');
                     $($event.target).siblings('input').val('');
+                    //console.info(222);
+                    //var input = $element.find("input");
+                    //process.nextTick(function(){
+                    //    input.trigger('change');
+                    //});
                 }
             },
             compile:function(element,attrs,$transclude){

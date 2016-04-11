@@ -30,7 +30,8 @@ function TLDAlert(msg) {
 }
 
 var ngapp = require('ngapp');
-ngapp.depend('qmmodel');
+ngapp.depend('qm.common');
+ngapp.depend('qm.model');
 ngapp.root('mobile', '/usercenter/index');
 ngapp.initializer(require('nglibs'));
 var app = ngapp.create('qm.mobile');
@@ -38,7 +39,5 @@ var app = ngapp.create('qm.mobile');
 var dyload = require('dyload');
 
 dyload('/script/libs/bundle.swiper.js');
-dyload('/script/libs/bundle.calendar.js');
 dyload('http://res.wx.qq.com/open/js/jweixin-1.0.0.js');
-dyload('/script/mobiscroll.js');
 dyload('/script/selectbox.js');

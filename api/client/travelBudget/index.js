@@ -196,8 +196,6 @@ travelBudget.getHotelBudget = function(params) {
                 }
             } else if (policy.hotelPrice && result.price > policy.hotelPrice) {
                 return {price: policy.hotelPrice * days, bookListUrl: result.bookListUrl};
-            } else {
-                return result;
             }
             return result;
         })
@@ -213,8 +211,8 @@ travelBudget.getBookUrl = function(params) {
         throw {code:-1, msg:"出发时间不能为空"};
     }
     return Q.all([
-        API.place.getCityInfo(spval),
-        API.place.getCityInfo(epval)
+        API.place.getCityInfo({cityCode: spval}),
+        API.place.getCityInfo({cityCode: epval})
     ])
         .spread(function(startPlace, endPlace){
             var scode = "",
@@ -276,8 +274,8 @@ travelBudget.getBookListUrl = function(params) {
         }
         st = moment(st).format('YYYY-MM-DD');
         return Q.all([
-                API.place.getCityInfo(spval),
-                API.place.getCityInfo(epval)
+                API.place.getCityInfo({cityCode: spval}),
+                API.place.getCityInfo({cityCode: epval})
             ])
             .spread(function(startPlace, endPlace){
                 var scode = "",
@@ -305,7 +303,7 @@ travelBudget.getBookListUrl = function(params) {
         if(!hotelCity || hotelCity == "" ){
             throw {code:-1, msg:"目的地不能为空"};
         }
-        return API.place.getCityInfo(hotelCity)
+        return API.place.getCityInfo({cityCode: hotelCity})
         .then(function(result){
             if(result){
                 hotelSt = moment(hotelSt).format('YYYY-MM-DD');

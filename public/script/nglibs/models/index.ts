@@ -12,7 +12,7 @@ class Staff {
 class StaffCache {
     cache : angular.ICacheObject;
     constructor($cacheFactory){
-        this.cache = $cacheFactory('Staff');
+        this.cache = $cacheFactory('StaffCache');
     }
 
     $resolve() : Promise<void> {
@@ -32,8 +32,38 @@ class StaffCache {
 
 }
 
-angular.module('qmmodel', [])
-    .service('StaffCache', StaffCache);
+class CityInfo {
+    id: string;
+    code: string;
+    name: string;
+}
+
+class PlaceCache {
+    idmap = new Map<string, CityInfo>();
+    codemap = new Map<string, CityInfo>();
+    constructor(){
+    }
+
+    async $resolve() : Promise<this> {
+        API.require('place');
+        await API.onload();
+        return this;
+    }
+
+    async get(code: string) : Promise<CityInfo> {
+        var self = this;
+        var city = self.codemap.get(code);
+        if(city)
+            return city;
+        city = await API.place.getCityInfo({cityCode: code});
+        self.codemap.set(code, city);
+        return city;
+    }
+}
+
+angular.module('qm.model', [])
+    .service('StaffCache', StaffCache)
+    .service('PlaceCache', PlaceCache);
 
 export = function($module){
 }

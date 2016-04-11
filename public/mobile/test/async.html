@@ -6,3 +6,7 @@ name:{{(user | async).name}}<br>
 <ul>
     <li ng-repeat="message in (messages | async)">{{message}}</li>
 </ul>
+
+{{citycode|code2name:this}}
+
+<button ng-click="update()">apply</button>

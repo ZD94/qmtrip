@@ -9,6 +9,7 @@
 @f24:1.2rem;
 @f20:1rem;
 
+/*  */
 .order_list {
   width: 100%;
   height: auto;
@@ -69,7 +70,7 @@
         .item_left{
           float: left;
           height: 8.5rem;
-          width: 75%;
+          width: 73%;
           .plane_icon {
             width: 2.6rem;
             height: 5.5rem;
@@ -81,7 +82,7 @@
             }
           }
           .starttime {
-            width: 5rem;
+            width: 5.5rem;
             height: 5.5rem;
             line-height: 2rem;
             font-size: @font-size-18;
@@ -110,7 +111,7 @@
             }
           }
           .endtime {
-            width: 8rem;
+            width: 7rem;
             height: 5.5rem;
             line-height: 2rem;
             font-size: @font-size-18;
@@ -126,7 +127,7 @@
               font-size: @font-size-10;
               position: absolute;
               top: 1rem;
-              left: 4.8rem;
+              left: 4.1rem;
               font-style: normal;
             }
           }
@@ -151,7 +152,7 @@
           }
         }
         .item_right{
-          width: 6.5rem;
+          width: 7.5rem;
           height: 5.5rem;
           line-height: 2rem;
           font-size: @font-size-18;
@@ -164,6 +165,17 @@
       .item_bottom{
         height: 5rem;
         border-top: 1px solid @border-color;
+        .order_status{
+          float: left;
+          line-height: 5rem;
+          margin-left: 1rem;
+          color: @color-theme1;
+        }
+        a{
+          float: right;
+          margin-right: 1rem;
+          margin-top: 1rem; 
+        }
       }
       .complete {position:relative;padding:0.3rem 1rem;border-top:2px solid #F1F1F1;background:white;overflow:hidden;
         li {float:left;position:relative;width:33.333333%;text-align:center;
@@ -182,6 +194,8 @@
     }
   }
 }
+
+/* 机票订单详情页的样式 */
 .airTicketOrderDetails {
   .top {
     padding: 1.1rem;
@@ -193,8 +207,14 @@
         font-size: 1.4rem;
         color: @color-theme1;
       }
-      .timeLeft {
+      .top-right {
         float: right;
+        font-size: 0.9rem;
+        color: @second-text-color;
+      }
+      .number {
+        font-size: 1.4rem;
+        color: @color-theme4;
       }
       .time {
         font-size: 1.1rem;
@@ -204,6 +224,9 @@
       padding: 0.5rem 0 0.5rem 0;
       span {
         font-size: 1.1rem;
+      }
+      .text {
+        color: @second-text-color;
       }
     }
   }
@@ -336,7 +359,7 @@
     height: 4.9rem;
     background: white;
     overflow: hidden;
-    .delete,.checkout {
+    .delete,.right_button {
       float: left;
       width: 50%;
       height: 100%;
@@ -345,7 +368,7 @@
       text-align: center;
       display: block;
     }
-    .checkout {
+    .right_button {
       background: @color-theme1;
       color: white;
     }
@@ -362,6 +385,7 @@
   }
 }
 
+/* 乘客信息编辑页的样式 */
 .infoEditing {
   .veil {
     position: fixed;
@@ -370,7 +394,6 @@
     background: @default-text-color;
     opacity: 0.3;
     z-index: 5;
-    display: none;
   }
   .options {
     position: fixed;
@@ -379,7 +402,6 @@
     width: 100%;
     background: @color-theme5;
     z-index: 10;
-    display: none;
     li {
       height: 4.4rem;
       line-height: 4.4rem;
@@ -410,6 +432,7 @@
       .row-right {
         float: right;
         width: 70%;
+        padding-right: 1.1rem;
         font-size: 1.6rem;
         input {
           border: none;
@@ -453,7 +476,7 @@
   border-bottom: 0.1rem solid @border-color;
   background-color: @color-theme5;
   div{
-    padding: 0 1rem 0 0;
+    //padding: 0 1rem 0 0;
     border-bottom: 0.1rem solid #e5e5e5;
     text-align: left;
     height: 4.4rem;
@@ -461,12 +484,38 @@
     color: #4a4a4a;
     &:last-child{
       border:none;
+      height: 8.4rem;
+      padding-right: 1rem;
+      span{
+        line-height: 8.4rem;
+      }
+      textarea{
+        width: 72%;
+        height: 6rem;
+        margin: 1.1rem 0.3rem;
+        outline: medium;
+        resize: none;
+      }
     }
     span{
       display: block;
       width: 20%;
       float: left;
     }
+    input{
+      outline: medium;
+    }
+  }
+}
+.little_change{
+  width: 80%;
+  height: 4.3rem!important;
+  float: left;
+  margin-left: 0;
+  padding-left: 0;
+  input{
+    margin-left: 0;
+    color: #4a4a4a!important;
   }
 }
 .ma_t10{
@@ -475,6 +524,18 @@
 .ma_t25{
   margin-top: 2.5rem;
 }
+.text{
+
+}
+.text::-ms-clear { display: none; }
+.clear_text{
+  float: right;
+  color: #9b9b9b;
+  font-size: 1.6rem;
+  display: none;
+  line-height: 8.4rem;
+}
+.text:valid + .clear_text{display: inline;}
 
 .choose_address{
   width: 100%;

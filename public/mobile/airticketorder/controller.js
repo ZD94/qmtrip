@@ -6,13 +6,14 @@
 module.exports = (function () {
 
     var msgbox = require('msgbox');
-    //var id_validation = require('../../script/id_validation');
+    //var card = require('../../script/id_validation');
     API.require('tripPlan');
     API.require('auth');
     API.require('attachment');
     API.require('staff');
     API.require('travelBudget');
     API.require('qm_order');
+    API.require('mailingAddress');
 
     var exported = {};
 
@@ -26,13 +27,31 @@ module.exports = (function () {
 
         $loading.end();
 
-        $scope._status = "WAIT_PAY";
+        $scope._status = "CANCEL";
+        $scope.deliveryAddressShown = false;
 
         $scope.user;
         $scope.order;
 
-        //settings
-        $scope.deliveryAddressShown = false;
+        $scope.time_left = null;//该变量的值为该订单的剩余时间。
+
+        setInterval(function(){//每隔一秒给$scope.time_left重新赋值。
+            get_time_left();
+            $scope.$apply();
+        },1000);
+
+        function get_time_left(){//该函数用于获取剩余时间并给$scope.time_left重新赋值。
+            if($scope.order){
+                var now = new Date().getTime();
+                var deadline = new Date('2016-04-08T08:55:11.000Z').getTime();
+                var minutes = ((deadline-now)/1000/60).toFixed(4);
+                var seconds = (Number(minutes.split('.')[1])/10000*60).toFixed(0);
+                minutes = minutes.split('.')[0];
+                seconds = (seconds.length===1)?('0'+seconds):seconds;
+                seconds = (seconds==='60')?('00'):seconds;
+                $scope.time_left = minutes+' : '+seconds;
+            }
+        }        
 
         $scope.toggle = function( params ){
             if( params==="deliveryAddress" ){
@@ -44,9 +63,9 @@ module.exports = (function () {
             var statuses = {
                 CANCEL: '已取消',
                 OUT_TICKET: '已出票',
-                PAY_FAILED: '支付失败',
+                PAY_FAILED: '已取消',
                 PAY_SUCCESS: '支付成功',
-                REFUND: '已退款',
+                REFUND: '已关闭',
                 REFUNDING: '退款中',
                 WAIT_PAY: '待支付',
                 WAIT_TICKET: '待出票'
@@ -113,28 +132,32 @@ module.exports = (function () {
 
     }
 
-    exported.InfoEditingController = function ($scope, $routeParams) {
-        //console.log( id_validation('370683198909072254').isValid() );
+    exported.InfoEditingController = function ($scope, $routeParams, mobiscroll) {
 
         $scope.user;
 
-        $scope.IDType = "身份证";
+        $scope.inSelectingMode = false;
+
+        $scope.data = {
+            type: '身份证',
+            id: null,
+            expire_date: null,
+            birth_date: null
+        }
 
         $scope.enterSelectingMode = function(){
-            $(".veil").show();
-            $(".options").show();
+            $scope.inSelectingMode = true;
         }
 
         $scope.quitSelectingMode = function(){
-            $(".veil").hide();
-            $(".options").hide();
+            $scope.inSelectingMode = false;
         }
 
         $scope.select = function (string) {
             if ( string === "身份证" ) {
-                $scope.IDType = "身份证";
+                $scope.data.type = "身份证";
             } else if ( string === "护照" ) {
-                $scope.IDType = "护照";
+                $scope.data.type = "护照";
             };
             $scope.quitSelectingMode();
         }
@@ -144,6 +167,32 @@ module.exports = (function () {
             console.log( currentTime );
         }
         
+        $scope.check_id = function(){
+            if(
+                ($scope.data.type==='身份证')&&
+                (!/^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$/.test($scope.data.id))&&
+                (!/^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/.test($scope.data.id))
+            ){
+                msgbox.log('身份证号码无效');
+            }else{
+                
+            }
+        }
+
+        $scope.ready_to_save = function(){
+            if(
+                ($scope.data.type==='身份证')&&
+                (/^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$/.test($scope.data.id)||
+                /^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/.test($scope.data.id))
+            ){
+                return true;
+            }else if( $scope.data.type==='护照'&&$scope.data.expire_date&&$scope.data.birth_date ){
+                return true;
+            }else{
+                return false;
+            };
+        }
+
         API.onload( function(){
             console.log( API.staff,API.qm_order );
             
@@ -161,7 +210,7 @@ module.exports = (function () {
         });
 
         $(document).ready(function(){
-            $(".expireDate").mobiscroll().date({//.date() .time() .datetime()
+            $(".expireDate,.birthDate").mobiscroll().date({//.date() .time() .datetime()
                 invalid: {
                     daysOfWeek: [],//[0,1,2,3,4,5]
                     daysOfMonth: []//['5/1', '12/24', '12/25']
@@ -190,26 +239,103 @@ module.exports = (function () {
     }
 
     exported.AddaddressController = function ($scope) {
+
+        $scope.people = {
+            name : '',
+            mobile : '',
+            //area : '',
+            //address : ''
+        }
+
+        $scope.area = '';
+        $scope.address = '';
+
+        //$scope.check_passed = ($scope.people.name.length > 0 && $scope.people.mobile.length > 0 && $scope.area.length > 0 && $scope.address.length > 0);
+        //$scope.un_passed = ($scope.people.name.length == 0 || $scope.people.mobile.length == 0 || $scope.area.length == 0 || $scope.address.length == 0);
+        //$scope.$watchGroup(['people.email', 'people.mobile', 'area', 'address'], function(){
+        //    $scope.check_passed = ($scope.people.name.length > 0 && $scope.people.mobile.length > 0 && $scope.area.length > 0 && $scope.address.length > 0);
+        //    $scope.un_passed = ($scope.people.name.length == 0 || $scope.people.mobile.length == 0 || $scope.area.length == 0 || $scope.address.length == 0);
+        //})
+
+        $scope.clear_text = function($event) {
+            //$($event.target).siblings('textarea').val('');
+            $scope.address = '';
+        }
+
+        $scope.save = function() {
+            console.info(1111);
+            API.onload( function(){
+                API.mailingAddress.createMailingAddress({name:$scope.people.name,mobile:$scope.people.mobile,area:$scope.area,address:$scope.address})
+                    .then(function(){
+                            alert('添加成功');
+                    })
+                    .catch(function (err) {
+                        TLDAlert(err.msg || err);
+                    });
+            })
+        }
+
+        $scope.back_to_list = function() {
+            window.location.href = "#/airticketorder/addresslist";
+        }
+
     }
 
     exported.AddresslistController = function ($scope) {
+        API.onload( function() {
+            API.staff.getCurrentStaff()
+                .then(function(staff){
+                    console.info(staff);
+                    var user_id = staff.id;
+                    return API.mailingAddress.listAndPaginateMailingAddress({ownerId:user_id});
+                })
+                .then(function(add){
+                    console.info(add);
+                    $scope.addressList = add.items;
+                })
+        })
+
+
+        $scope.go_add_Address = function() {
+            window.location.href = "#/airticketorder/addaddress";
+        }
     }
 
+    exported.AddressdetailController = function() {
+
+
+
+        $scope.back_to_list = function() {
+            window.location.href = "#/airticketorder/addresslist";
+        }
+    }
     exported.OrderlistController = function ($scope) {
         API.onload().then(function(){
             API.qm_order.page_qm_orders({})
                 .then(function(ret) {
                     var orderlist = ret.items;
+                    var orders = [];
                     orderlist.map(function(detail){
-                        return API.qm_order.get_qm_order({order_id:detail.id})
-                            .then(function(detail){
-                                console.info(detail);
-                                console.info(detail.STATUS[detail.status]);
+                        return API.qm_order.get_qm_order({order_id:detail})
+                            .then(function(order){
+                                order.orderstatus = order.STATUS[order.status]
+                                orders.push(order);
+                                $scope.orders = orders;
+                                console.info(order)
+                                return order;
                             })
                             .catch(function(err){
                                 console.info(err);
                             })
                     })
+                    API.qm_order.get_qm_order({order_id:'b377abb0-fb09-11e5-a52d-8f58d663e56b'})
+                        .then(function(order){
+                            $scope.airinfo = order;
+                            console.info(order); 
+                        })
+                        .catch(function(err){
+                            console.info(err);
+                        })
                 })
             
         });
