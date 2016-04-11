@@ -9,8 +9,14 @@ var Logger = require('common/logger');
 var _ = require('lodash');
 var moment = require('moment');
 var getRndStr = require('common/utils').getRndStr;
-
 var logger = new Logger('airplane');
+var cache = require("common/cache");
+
+cache.init({
+    redis_conf: "redis://localhost",
+    prefix: 'airticket'
+});
+
 /**
  * @class   airplane    机票相关API
  */
@@ -120,12 +126,22 @@ function get_plane_details(params) {
             return API.shengyi_ticket.search_more_cabin(params);
         })
         .then(function(ret) {
+            var key = 'bid_' + new Date().valueOf() + getRndStr(4);
+            ret.book_id = key;
+            return cache.write(key, ret)
+        })
+        .then(function(ret) {
             logger.info(ret);
             ret.cabins.map(function(t) {
                 console.info(t.cabin, t.cabin_type, t.cabin_level, t.cabin_name, t.suggest_price);
             })
             return ret;
         })
+    .catch(function(err) {
+        console.info('catch....')
+        console.info(err.stack || err);
+        throw err;
+    })
 };
 
 /**

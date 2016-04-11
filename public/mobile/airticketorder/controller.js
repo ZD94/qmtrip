@@ -263,10 +263,11 @@ module.exports = (function () {
         }
 
         $scope.save = function() {
+            console.info(1111);
             API.onload( function(){
                 API.mailingAddress.createMailingAddress({name:$scope.people.name,mobile:$scope.people.mobile,area:$scope.area,address:$scope.address})
                     .then(function(){
-
+                            alert('添加成功');
                     })
                     .catch(function (err) {
                         TLDAlert(err.msg || err);
@@ -274,10 +275,41 @@ module.exports = (function () {
             })
         }
 
+        $scope.back_to_list = function() {
+            window.location.href = "#/airticketorder/addresslist";
+        }
+
     }
 
     exported.AddresslistController = function ($scope) {
+        API.onload( function() {
+            API.staff.getCurrentStaff()
+                .then(function(staff){
+                    console.info(staff);
+                    var user_id = staff.id;
+                    return API.mailingAddress.listAndPaginateMailingAddress({ownerId:user_id});
+                })
+                .then(function(add){
+                    console.info(add);
+                    $scope.addressList = add.items;
+                })
+        })
+
+
+        $scope.go_add_Address = function() {
+            window.location.href = "#/airticketorder/addaddress";
+        }
     }
+
+    exported.AddressdetailController = function() {
+
+
+
+        $scope.back_to_list = function() {
+            window.location.href = "#/airticketorder/addresslist";
+        }
+    }
+
     /*
      机票订单列表页
      * @param $scope
