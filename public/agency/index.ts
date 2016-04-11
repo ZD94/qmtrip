@@ -23,7 +23,7 @@ function TLDAlert(msg) {
 }
 
 var ngapp = require('ngapp');
-ngapp.depend('qmmodel');
+ngapp.depend('qm.model');
 ngapp.root('agency', '/companyList/CompanyList');
 ngapp.initializer(require('nglibs'));
 ngapp.useRoutePolicy(ngapp.RoutePolicy.Embed, ['login']);

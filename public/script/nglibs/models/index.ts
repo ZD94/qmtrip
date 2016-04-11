@@ -64,6 +64,3 @@ class PlaceCache {
 angular.module('qm.model', [])
     .service('StaffCache', StaffCache)
     .service('PlaceCache', PlaceCache);
-
-export = function($module){
-}
