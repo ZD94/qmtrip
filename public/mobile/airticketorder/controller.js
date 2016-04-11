@@ -33,12 +33,12 @@ module.exports = (function () {
 
         $scope.user;
         $scope.order;
-        //该变量的值为该订单的剩余时间。
+        // 该变量的值为该订单的剩余时间。
         $scope.time_left = null;
 
         //$scope.ap = AirPort.getByCode('PEK');
 
-        //每隔一秒调用get_time_left给$scope.time_left重新赋值。
+        // 每隔一秒调用get_time_left给$scope.time_left重新赋值。
         setInterval(function(){
             get_time_left();
             $scope.$apply();
