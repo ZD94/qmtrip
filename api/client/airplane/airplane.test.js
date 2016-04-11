@@ -164,8 +164,9 @@ describe("api/client/airplane.js", function() {
         var params = {
             departure_city: "CT_289",
             arrival_city: "CT_048",
-            date: "2016-05-10",
-            ip_address: '192.168.1.3'
+            date: "2016-04-07",
+            ip_address: '192.168.1.3',
+            order: ['departure_time', 'asc']
         };
         API.client.airplane.get_plane_list.call({accountId: staffId}, params, function(err, ret) {
             if(err) {
