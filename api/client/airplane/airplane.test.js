@@ -179,11 +179,11 @@ describe("api/client/airplane.js", function() {
 
 
     it("#get_plane_details should be ok", function(done) {
-        this.timeout(20000);
+        this.timeout(60 * 1000);
         var params = {
             flight_no: "MU5611",
             ip_address: '192.168.1.3',
-            query_key: '20160407121028BWWWPVGHRB'
+            query_key: query_key
         };
         API.client.airplane.get_plane_details.call({accountId: staffId}, params, function(err, ret) {
             if(err) {
