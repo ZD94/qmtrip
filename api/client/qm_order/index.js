@@ -20,24 +20,30 @@ var qm_order = {};
 
 qm_order.create_qm_order = (params) => {
     var self = this;
-    var userId = self.user_id;
-    var bookId = params.bookId;
-    var totalPrice = params.totalPrice;  //总价钱
+    var staff_id = self.accountId;
+    var flight_id = params.bookId;
+    var total_price = params.total_price;  //总价钱
     var passengers = params.passengers;  //乘机人信息
-    var consumeId = params.consumeId;  //出行单ID
-    var cabinId = params.cabinId;       //仓位ID
+    var consume_id = params.consume_id;  //出行单ID
+    var cabin_id = params.cabin_id;       //仓位ID
 
-    return cache.read(bookId)
-    .then(function(result) {
-        if (!result) {
-            throw new Error('机票信息已经失效,请刷新后重试!');
-        }
-        return API.qm_order.create_qm_order({flightList: result.flight_list, payPrice: totalPrice,
-            consumeId: consumeId, passengers: passengers, staffId: userId})
-    })
-    .then(function(order) {
-        return order.id || order;
-    })
+    return Promise.all([
+        cache.read(flight_id),
+        cache.read(cabin_id)
+    ])
+        .spread(function(flight_list, cabin) {
+            if (!flight_list || !cabin) {
+                throw new Error('机票信息已经失效,请刷新后重试!');
+            }
+
+            flight_list.cabin = cabin;
+
+            return API.qm_order.create_qm_order({flight_list: flight_list, payPrice: total_price,
+                consumeId: consume_id, passengers: passengers, staffId: staff_id})
+        })
+        .then(function(order) {
+            return order.id || order;
+        })
 }
 
 /**

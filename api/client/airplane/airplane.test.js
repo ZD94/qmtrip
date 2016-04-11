@@ -184,7 +184,7 @@ describe("api/client/airplane.js", function() {
         var params = {
             flight_no: "MU5611",
             ip_address: '192.168.1.3',
-            query_key: query_key
+            query_key: "20160411095256ucXOPVGHRB"
         };
         API.client.airplane.get_plane_details.call({accountId: staffId}, params, function(err, ret) {
             if(err) {
@@ -197,12 +197,12 @@ describe("api/client/airplane.js", function() {
     it("#book_ticket should be ok", function(done) {
         this.timeout(20000);
         var params = {
-            flight_list: _flight_list,
+            flight_no: "MU5611",
+            cabin_id: "cabin_1460340017520iCMD",
             trip_plan_id: tripPlanId,
             consume_id: consumeId,
             contact_name: "于淼",
             contact_mobile: "18515073641",
-            cabin: 'B',
             adult_num: 1,
             insurance_price: 20,
             pay_price: 1100,
