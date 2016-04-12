@@ -13,7 +13,7 @@
         <div class="number">共{{flightlist.length}}条信息</div>
     </div>
     <ul>
-        <li ng-repeat="item in flightlist | orderBy:sort" ng-click="enterDetails(item.flight_no,item.query_key)">
+        <li ng-repeat="item in flightlist | orderBy:sort| filter: filterFunc" ng-click="enterDetails(item.flight_no,item.query_key)">
             <div class="top_content">
                 <div class="plane_icon"><symbol name="icon-plane-solid"/></div>
                 <div class="starttime">{{(item.departure_time).substring(11, 16)}}<br><span>{{item.dept_station_code}}{{item.departure_term}}</span></div>
@@ -43,25 +43,25 @@
 <section class="shaixuan_bg">
     <div class="shaixuan_box">
         <div class="shaixuan_top elasticbox">
-            <div class="elasticbox_one cancel">取消</div>
+            <div class="elasticbox_one cancel" ng-click="shaixuanHide()">取消</div>
             <div class="elasticbox_one name">清除筛选</div>
             <div class="elasticbox_one determine">确定</div>
         </div>
         <div class="elasticbox shaixuan_bottom">
             <dl>
-                <dt class="active">起飞时间</dt>
-                <dt>仓位选择</dt>
-                <dt>直飞航司</dt>
+                <dt ng-class="{'time': 'active'}[selectTab]" ng-click="tabFunc('time')">起飞时间</dt>
+                <dt ng-class="{'cabin': 'active'}[selectTab]" ng-click="tabFunc('cabin')">仓位选择</dt>
+                <dt ng-class="{'air': 'active'}[selectTab]" ng-click="tabFunc('air')">直飞航司</dt>
                 <dd></dd>
             </dl>
-            <ul class="elasticbox_one">
-                <li ng-repeat="item in timeList" ng-click="chooseTime(item.st,item.et)" st="{{item.st}} et="{{item.et}}">{{item.timeName}}</li>
+            <ul class="elasticbox_one" ng-show="selectTab=='time'">
+                <li ng-repeat="timeItem in timeList" ng-click="chooseTime(timeItem.st,item.et)" st="{{timeItem.st}} et="{{item.et}}">{{timeItem.timeName}}</li>
             </ul>
-            <ul class="elasticbox_one" style="display: none;">
-                <li ng-repeat="item in cabinList" cabin="{{item.cabinLeval}}">{{item.cabinName}}</li>
+            <ul class="elasticbox_one" ng-show="selectTab=='cabin'">
+                <li ng-repeat="cabinItem in cabinList" cabin="{{cabinItem.cabinLeval}}">{{cabinItem.cabinName}}</li>
             </ul>
-            <ul class="elasticbox_one" style="display: none;">
-                <li ng-repeat="item in airList" airCode="item.airCode">{{item.airName}}</li>
+            <ul class="elasticbox_one" ng-show="selectTab=='air'">
+                <li ng-repeat="airItem in airList" airCode="airItem.airCode">{{airItem.airName}}</li>
             </ul>
         </div>
     </div>

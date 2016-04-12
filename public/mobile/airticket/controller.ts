@@ -133,7 +133,7 @@ export async function FlightlistController($scope, $routeParams, $filter, $loadi
     $scope.initFlightlist = async function () {
         try {
             await API.onload();
-            $scope.flightlist = await API.airplane.get_plane_list({departure_city:startCityCode,arrival_city:endCityCode,date:$scope.thatDay});
+            $scope.flightlist = await API.airplane.get_plane_list({dept_city:startCityCode,arrival_city:endCityCode,date:$scope.thatDay});
             $loading.end();
             console.info ($scope.flightlist);
         } catch (e) {
@@ -153,6 +153,10 @@ export async function FlightlistController($scope, $routeParams, $filter, $loadi
         $('.shaixuan_bg').show();
     }
 
+    $scope.shaixuanHide = function () {
+        $('.shaixuan_bg').hide();
+    }
+
 
 
     $scope.timeList = [
@@ -164,7 +168,6 @@ export async function FlightlistController($scope, $routeParams, $filter, $loadi
     ];
 
     $scope.cabinList = [
-        {cabinLeval:0, cabinName:'不限'},
         {cabinLeval:0, cabinName:'经济舱'},
         {cabinLeval:6, cabinName:'头等/商务舱'}
     ];
@@ -184,20 +187,44 @@ export async function FlightlistController($scope, $routeParams, $filter, $loadi
         {airName:'海南航空', airCode:'HU'}
     ];
 
+    //function getFilterFn(queryCondition) {
+    //    return function(item) {
+    //        var airCompanyCode = queryCondition.airCompanyCode;
+    //
+    //        //如果有筛选条件出发时间的话,做出发时间筛选
+    //        if (queryCondition.startTime1) {
+    //            if (item.startTime < queryCondition.startTime1) return false;
+    //        }
+    //
+    //        if (queryCondition.endTime1) {
+    //            if (item.startTime > queryCondition.endTime1) return false;
+    //        }
+    //
+    //        if (airCompanyCode) {
+    //            var _airCompanyArr = [];
+    //            if (typeof airCompanyCode == 'string') {
+    //                _airCompanyArr = [airCompanyCode];
+    //            } else {
+    //                _airCompanyArr = airCompanyCode;
+    //            }
+    //
+    //            if (_airCompanyArr.indexOf(item.airCompanyCode) < 0) {
+    //                return false;
+    //            }
+    //        }
+    //
+    //
+    //        return true;
+    //    }
+    //}
+    //
+    //$scope.filterFunc = getFilterFn($scope.condition);
 
 
-    $scope.chooseTime = function (st,et,item) {
-        return item.departure_time == '2016-04-25 08:45:00';
+    $scope.selectTab = 'time';
+    $scope.tabFunc = function (tabFunc) {
+        $scope.selectTab = tabFunc;
     }
-
-    //筛选切换
-    $('.shaixuan_bottom').find('dt').click(function(){
-        var index = $(this).index();
-        $('.shaixuan_bottom').find('dt').removeClass('active');
-        $(this).addClass('active');
-        $('.shaixuan_bottom').find('ul').hide();
-        $('.shaixuan_bottom').find('ul').eq(index).show();
-    })
 
     //进入机票详情页
     $scope.enterDetails = function (flight_no,query_key) {
@@ -229,16 +256,6 @@ export async function FlightdetailsController($scope, $routeParams){
         console.info (e);
     }
 
-    $scope.economy_class = function () {
-        $('#economy_class').find('dd').toggle();
-        $('#economy_class').find('.up').toggle();
-        $('#economy_class').find('.down').toggle();
-    }
 
-    $scope.first_class = function () {
-        $('#first_class').find('dd').toggle();
-        $('#first_class').find('.up').toggle();
-        $('#first_class').find('.down').toggle();
-    }
 
 }
