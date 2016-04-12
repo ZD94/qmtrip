@@ -139,8 +139,10 @@ module.exports = (function () {
                 .then( function(data){
                     $scope.order = data;
 
+                    // 向$scope中添加一些数据库中目前没有的数据。
                     $scope.order.status = 'WAIT_PAY';
                     $scope.order.expire_at = '2016-04-13T08:55:11.000Z';
+                    $scope.order.flight_list.delivery_fee = 15;
 
                     console.log( '---order',data );
                 })
