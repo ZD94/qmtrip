@@ -164,7 +164,7 @@ describe("api/client/airplane.js", function() {
         var params = {
             dept_city: "CT_289",
             arrival_city: "CT_048",
-            date: "2016-04-07",
+            date: "2016-05-10",
             //dept_station: ["AP_PVG"],
             airways: ['MU', 'HO'],
             order: ['departure_time', 'asc']
@@ -183,8 +183,8 @@ describe("api/client/airplane.js", function() {
     it("#get_plane_details should be ok", function(done) {
         this.timeout(60 * 1000);
         var params = {
-            flight_no: "MU5611",
-            query_key: "20160411113751uCVKPVGHRB"
+            flight_no: "MU5615",
+            query_key: "20160412174334AbkkSHAHRB"
         };
         API.client.airplane.get_plane_details.call({accountId: staffId}, params, function(err, ret) {
             if(err) {
@@ -197,14 +197,13 @@ describe("api/client/airplane.js", function() {
     it("#book_ticket should be ok", function(done) {
         this.timeout(20000);
         var params = {
-            flight_no: "MU5611",
-            cabin_id: "cabin_1460346056914BODh",
+            flight_no: "MU5615",
+            cabin_id: "cabin_14604543390564IXH",
             trip_plan_id: tripPlanId,
             consume_id: consumeId,
             contact_name: "于淼",
             contact_mobile: "18515073641",
             adult_num: 1,
-            pay_price: 1100,
             passengers: [{
                 name: "于淼",
                 mobile_num: '18515073641',
