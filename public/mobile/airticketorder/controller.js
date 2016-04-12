@@ -27,11 +27,13 @@ module.exports = (function () {
 
         $loading.end();
 
-        $scope._status = "CANCEL";
         // @state
         $scope.deliveryAddressShown = false;
+        // @state
+        $scope.$root.pageTitle = '机票订单';
 
         $scope.user;
+        // @data
         $scope.order;
         // 该变量的值为该订单的剩余时间。
         $scope.time_left = null;
@@ -48,7 +50,7 @@ module.exports = (function () {
         function get_time_left(){
             if($scope.order){
                 var now = new Date().getTime();
-                var deadline = new Date('2016-04-08T08:55:11.000Z').getTime();
+                var deadline = new Date($scope.order.expire_at).getTime();
                 var minutes = ((deadline-now)/1000/60).toFixed(4);
                 var seconds = (Number(minutes.split('.')[1])/10000*60).toFixed(0);
                 minutes = minutes.split('.')[0];
@@ -117,7 +119,7 @@ module.exports = (function () {
             msgbox.confirm( '订单一经删除则无法恢复，确认删除吗？','确认删除','取消' );
         }
 
-        //获取当前员工信息和机票订单信息。
+        // 获取当前员工信息和机票订单信息。
         API.onload( function(){
             console.log( API.staff,API.qm_order );
             
@@ -136,20 +138,25 @@ module.exports = (function () {
                 .get_qm_order( {order_id:'e9fd90c0-fb07-11e5-b602-a384e706e5f0'} )
                 .then( function(data){
                     $scope.order = data;
-                    console.log( data );
+
+                    $scope.order.status = 'WAIT_PAY';
+                    $scope.order.expire_at = '2016-04-13T08:55:11.000Z';
+
+                    console.log( '---order',data );
                 })
                 .catch(function (err) {
                     TLDAlert(err.msg || err)
                 });
-
         });
 
     }
 
     exported.InfoEditingController = function ($scope, $routeParams, mobiscroll) {
-
+        // @data
         $scope.user;
-        //@state
+        // @state
+        $scope.$root.pageTitle = '出行人编辑';
+        // @state
         $scope.inSelectingMode = false;
 
         $scope.data = {
@@ -175,11 +182,6 @@ module.exports = (function () {
                 $scope.data.type = "护照";
             };
             $scope.quitSelectingMode();
-        }
-
-        $scope.renderTimeLeft = function(){
-            var currentTime = new Date();
-            console.log( currentTime );
         }
         
         //该函数在“证件号码输入框”失去焦点时被调用，被用来验证输入的证件号码的格式是否合格。        
@@ -216,7 +218,7 @@ module.exports = (function () {
             };
         }
 
-        // 该函数用来获取当前用户的信息。
+        // 获取当前用户的信息。
         API.onload( function(){
             console.log( API.staff,API.qm_order );
             API.staff
