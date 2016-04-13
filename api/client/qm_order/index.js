@@ -48,10 +48,51 @@ qm_order.create_qm_order = (params) => {
 
 /**
  * @method  get_qm_order
+ *
  * 获取全麦订单详情
  * @param params
  * @param {uuid} params.order_id  订单id
- * @returns {*}
+ * @returns {object}    qm_order{<br>
+ * id : 全麦订单id <br>
+ * trip_plan_id: 出差记录id <br>
+ * consume_id: 出差详情id <br>
+ * company_id: 企业id <br>
+ * staff_id: 员工id <br>
+ * type: 订单类型 T:火车票订单   P:机票订单  H:酒店订单 <br>
+ * order_no: 订单号 <br>
+ * out_order_no: 外部订单号 <br>
+ * airways: 航空公司id <br>
+ * date: 出发日期 <br>
+ * is_need_invoice: 是否需要发票 <br>
+ * flight_no: 航班号 <br>
+ * punctual_rate: 航班历史准点率 <br>
+ * cabin_type: 舱位类型 <br>
+ * cabin_name: 舱位名称 <br>
+ * cabin_no: 舱位 <br>
+ * contact_name: 联系人姓名 <br>
+ * contact_mobile: 联系人手机 <br>
+ * passengers: { } <br>
+ * adult_num: 成人数量 <br>
+ * flight_list: { } <br>
+ * ticket_info: { } <br>
+ * pay_price: 支付金额 <br>
+ * payment_method: 支付方式 <br>
+ * payment_info: { } <br>
+ * start_city_code: 出发城市代码 <br>
+ * end_city_code: 到达城市代码 <br>
+ * start_time: 出发时间 <br>
+ * end_time: 到达时间 <br>
+ * mailing_info: { } <br>
+ * refund_type: 退款类型 <br>
+ * refund_money: 退款金额 <br>
+ * refund_reason: 退款原因 <br>
+ * remark: 备注 <br>
+ * create_at: 创建时间 <br>
+ * expire_at: 失效时间 <br>
+ * pay_time: 支付时间 <br>
+ * update_at: 更新时间 <br>
+ * status: 订单状态 <br>
+ * }
  */
 qm_order.get_qm_order = get_qm_order;
 get_qm_order.required_params = ['order_id'];
