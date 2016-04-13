@@ -3,7 +3,8 @@
     "target": "ES6",
     "module": "commonjs",
     "outDir": "tmp/tsreq",
-    "sourceMap": true
+    "sourceMap": true,
+    "experimentalDecorators": true
   },
   "exclude": [
     "node_modules",
