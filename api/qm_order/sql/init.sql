@@ -75,7 +75,6 @@ COMMENT ON COLUMN qm_order.is_need_invoice IS '是否需要报销凭证';
 COMMENT ON COLUMN qm_order.cabin_type IS '飞机舱位、火车座次、酒店房间类型';
 COMMENT ON COLUMN qm_order.cabin_name IS '飞机舱位、火车座次、酒店房间名称';
 COMMENT ON COLUMN qm_order.cabin_no IS '飞机舱位、火车座次、酒店房间号码';
-COMMENT ON COLUMN qm_order.passenger IS '出行人信息';
 COMMENT ON COLUMN qm_order.payment_method IS '支付方式';
 COMMENT ON COLUMN qm_order.payment_info IS '支付信息';
 COMMENT ON COLUMN qm_order.expire_at IS '失效时间';
@@ -85,7 +84,6 @@ COMMENT ON COLUMN qm_order.refund_money IS '可退款金额';
 COMMENT ON COLUMN qm_order.refund_reason IS '退款原因';
 COMMENT ON COLUMN qm_order.stop_over IS '经停';
 COMMENT ON COLUMN qm_order.punctual_rate IS '航班/列车准点率';
-COMMENT ON COLUMN qm_order.meal IS '餐类型,空为不含餐';
 
 CREATE TABLE qm_order.order_logs (
     id uuid PRIMARY KEY,

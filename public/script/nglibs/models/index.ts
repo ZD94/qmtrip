@@ -13,11 +13,12 @@ class StaffCache {
     cache : angular.ICacheObject;
     constructor($cacheFactory){
         this.cache = $cacheFactory('StaffCache');
+        API.require('staff');
     }
 
-    $resolve() : Promise<void> {
-      API.require('staff');
-      return API.onload();
+    async $resolve() : Promise<this> {
+        await API.onload();
+        return this;
     }
 
     async get(id: string) : Promise<Staff> {
@@ -42,13 +43,13 @@ class PlaceCache {
     idmap = new Map<string, CityInfo>();
     codemap = new Map<string, CityInfo>();
     constructor(){
+        API.require('place');
     }
 
     async $resolve() : Promise<this> {
-    API.require('place');
-    await API.onload();
-    return this;
-}
+        await API.onload();
+        return this;
+    }
 
     async get(code: string) : Promise<CityInfo> {
         var self = this;
