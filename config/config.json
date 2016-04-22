@@ -2,7 +2,7 @@
   "appName": "qmtrip",
   "debug": false,
 
-  "hostname": "my.tulingdao.com",
+  "hostname": "my.jingli.tech",
   "cluster": false,
   "port": 4002,
   "apiPort": 4102,
@@ -27,7 +27,7 @@
     "url": "redis://localhost:6379"
   },
   "hosts": {
-    "main":{"addr":"api.local.tulingdao.com", "port":4101}
+    "main":{"addr":"api.local.jingli.tech", "port":4101}
   },
   "upload":{
     "tmpDir": "${{ROOT_DIR}}/public/temp",
@@ -48,9 +48,9 @@
   },
   "default_agency": {
     "name": "系统默认代理商",
-    "email": "agency.agency@tulingdao.com",
+    "email": "agency.agency@jingli.tech",
     "pwd": "123456",
     "mobile": "",
-    "user_name": "我是代理商"
+    "user_name": "鲸力代理商"
   }
 }
