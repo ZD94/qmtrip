@@ -56,7 +56,8 @@ gulplib.dist(function(){
     });
     copy = [
         'config',
-        'public'
+        'public',
+        'typings'
     ];
     copy.forEach(function(fname){
         dist_all.push(gulp.src(fname+'/**/*').pipe(gulp.dest('dist/'+fname)));
