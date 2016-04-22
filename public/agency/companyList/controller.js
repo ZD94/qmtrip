@@ -153,7 +153,7 @@ module.exports = (function(){
 			var name = $("#connectName").val();
 			var email = $("#connectEmail").val();
 			var mobile = $("#connectMobile").val();
-			var reg = /^[\w\.-]+?@([\w\-]+\.){1,2}[a-zA-Z]{2,3}$/;
+			var reg = /^[\w\.\-]+@\w[\w\-\.]+\w$/;
 			var domain = email.split(/@/);
 			var commit = true;
 			if(commit){
