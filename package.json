@@ -63,6 +63,7 @@
   },
   "devDependencies": {
     "angular": "^1.5.0",
+    "angular-animate": "^1.5.5",
     "angular-async-filter": "^1.0.1",
     "angular-bluebird-promises": "^1.0.1",
     "angular-file-upload": "^2.2.0",
