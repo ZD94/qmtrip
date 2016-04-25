@@ -32,12 +32,12 @@ function TLDAlert(msg) {
 var ngapp = require('ngapp');
 ngapp.depend('qm.common');
 ngapp.depend('qm.model');
-ngapp.root('ionic', '/index/index');
+ngapp.root('ionic', '/trip/create');
 ngapp.initializer(require('nglibs'));
 ngapp.useRoutePolicy(ngapp.RoutePolicy.None);
 ngapp.routeAddSingle('login');
 ngapp.routePushEmbed('');
-ngapp.routePopEmbed('sidemenu-view');
+ngapp.routePopEmbed();
 var app = ngapp.create('qm.ionic');
 app.config(function($ionicConfigProvider){
     $ionicConfigProvider.views.maxCache(0);
