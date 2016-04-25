@@ -268,6 +268,6 @@ export function MenuController($scope,Menu) {
     }
     Menu.add(item);
     Menu.add(item2);
-    $scope.menus = Menu;
+    $scope.menus = Menu.menus;
     console.info(Menu);
 }

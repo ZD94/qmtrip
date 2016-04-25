@@ -22,6 +22,7 @@
                 </ion-item>
             </ion-list>
             <div class="button-bar"></div>
+            <a ng-repeat="menu in menus" class="button button-light  button-block icon ion-{{menu.icon}}">{{menu.title}}</a>
             <a ui-sref="menu.page1" menu-close="" id="menu-button1" style="text-align:left;" class="button button-light  button-block icon ion-plane">我要出差</a>
             <a ui-sref="menu.page13" menu-close="" id="menu-button19" style="text-align:left;" class="button button-light  button-block icon ion-flag">我的行程</a>
             <div class="spacer" style="width: 268px; height: 24px;"></div>
