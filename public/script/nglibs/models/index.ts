@@ -62,6 +62,43 @@ class PlaceCache {
     }
 }
 
+class Menuitem {
+    icon:string;
+    title:string;
+    name:string;
+}
+class Menu {
+    menus:Menuitem[] = [];
+    get() :any {
+        var self = this;
+        return self.menus;
+
+    }
+    del(title:string) {
+        var self = this;
+        for(var i =0; i<self.menus.length;i++){
+            if(self.menus[i].title ==title) {
+                self.menus.splice(i,1);
+                return true;
+            }
+        }
+        return undefined;
+    }
+    add(item:Menuitem) {
+        var self = this;
+        self.menus.push(item);
+    }
+    set(item:Menuitem) :Menuitem {
+        var self = this;
+        for(var i =0; i<self.menus.length;i++){
+            if(self.menus[i].title ==item.title) {
+                return self.menus[i] = item;
+            }
+        }
+        return undefined;
+    }
+}
 angular.module('qm.model', [])
     .service('StaffCache', StaffCache)
-    .service('PlaceCache', PlaceCache);
+    .service('PlaceCache', PlaceCache)
+    .service('Menu', Menu);
