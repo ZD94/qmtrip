@@ -87,6 +87,7 @@ class Menu {
     add(item:Menuitem) {
         var self = this;
         self.menus.push(item);
+        return self.menus;
     }
     set(item:Menuitem) :Menuitem {
         var self = this;
