@@ -4,7 +4,6 @@
 "use strict";
 var assert = require("assert");
 var API = require("common/api");
-var Q = require('q');
 
 describe("api/client/agency.js", function() {
 
@@ -12,7 +11,7 @@ describe("api/client/agency.js", function() {
     describe("registerAgency", function() {
 
         var agency = {
-            email: "agency.test@tulingdao.com",
+            email: "agency.test@jingli.com",
             userName: "喵喵",
             name: '喵喵的代理商',
             description: '代理商API测试用',
@@ -49,6 +48,7 @@ describe("api/client/agency.js", function() {
                 if (err) {
                     throw err;
                 }
+                c
                 assert.equal(ret.agency.status, 0);
                 var agencyId = ret.agency.id;
                 var agencyUserId = ret.agencyUser.id;
@@ -71,7 +71,7 @@ describe("api/client/agency.js", function() {
             mobile: "15269866811"
         };
         before(function(done){
-            Q.all([
+            Promise.all([
                 API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
                 API.agency.deleteAgencyByTest({email: 'agencyUser.test@tulingdao.com', mobile: agency.mobile})
             ])
@@ -91,7 +91,7 @@ describe("api/client/agency.js", function() {
         });
 
         after(function(done){
-            Q.all([
+            Promise.all([
                 API.agency.deleteAgencyByTest({email: agency.email, mobile: '12345678777'}),
                 API.agency.deleteAgencyByTest({email: 'agencyUser.test@tulingdao.com', mobile: '12345678777'})
             ])
@@ -209,7 +209,7 @@ describe("api/client/agency.js", function() {
             mobile: "15269866821"
         };
         before(function(done){
-            Q.all([
+            Promise.all([
                 API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
                 API.agency.deleteAgencyByTest({email: 'agencyUser.test@tulingdao.com', mobile: agency.mobile})
             ])
@@ -237,7 +237,7 @@ describe("api/client/agency.js", function() {
         });
 
         after(function(done){
-            Q.all([
+            Promise.all([
                 API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
                 API.agency.deleteAgencyByTest({email: 'agencyUser.test@tulingdao.com', mobile: agency.mobile})
             ])
