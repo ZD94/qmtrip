@@ -34,6 +34,7 @@ gulplib.angular_app('corp');
 gulplib.angular_app('extendfunction');
 gulplib.angular_app('agency');
 gulplib.angular_app('mobile');
+gulplib.angular_app('ionic');
 
 gulplib.dist(function(){
     var filter = require('gulp-filter');

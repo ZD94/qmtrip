@@ -35,12 +35,10 @@ ngapp.depend('qm.model');
 ngapp.root('ionic', '/index/index');
 ngapp.initializer(require('nglibs'));
 ngapp.useRoutePolicy(ngapp.RoutePolicy.None);
-ngapp.routePushEmbed('tab');
-ngapp.routeNamedEmbed('tab-dash');
-ngapp.routeNamedEmbed('tab-chats');
-ngapp.routePopEmbed();
-ngapp.routeAddSingle('');
-var app = ngapp.create('qm.mobile');
+ngapp.routeAddSingle('login');
+ngapp.routePushEmbed('');
+ngapp.routePopEmbed('sidemenu-view');
+var app = ngapp.create('qm.ionic');
 app.config(function($ionicConfigProvider){
     $ionicConfigProvider.views.maxCache(0);
 });
