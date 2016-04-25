@@ -90,7 +90,7 @@ function get_plane_list(params) {
                 params.query_key = query_key + q.start_station + q.arrival_station;
                 params.departure_station = q.start_station;
                 params.arrival_station = q.arrival_station;
-                return API.shengyi_ticket.search_ticket(params);
+                // return API.shengyi_ticket.search_ticket(params);
             }))
         })
         .then(function(result) {
@@ -133,7 +133,7 @@ function get_plane_details(params) {
     //params.ip_address = self.remoteAddress;
     return API.staff.getStaff({id: self.accountId})
         .then(function() {
-            return API.shengyi_ticket.search_more_cabin(params);
+            // return API.shengyi_ticket.search_more_cabin(params);
         })
         .then(function(flight) {
             return [

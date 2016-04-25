@@ -254,3 +254,20 @@ export  function CitypickerController($scope) {
         $scope.m.os[2] = newval.subs[0];
     })
 }
+
+export function MenuController($scope,Menu) {
+    var item ={
+        icon:'icon1',
+        title:'title1',
+        name:'name1'
+    };
+    var item2 ={
+        icon:'icon2',
+        title:'title2',
+        name:'name2'
+    }
+    Menu.add(item);
+    Menu.add(item2);
+    $scope.menus = Menu;
+    console.info(Menu);
+}
