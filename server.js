@@ -27,6 +27,9 @@ var Logger = require('common/logger');
 Logger.init(config.logger);
 var logger = new Logger('main');
 
+var cache = require("common/cache");
+cache.init({redis_conf: config.redis.url, prefix: 'times:cache'});
+
 var model = require('common/model');
 model.init(config.postgres.url);
 
