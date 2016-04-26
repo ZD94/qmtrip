@@ -4,6 +4,10 @@
 "use strict";
 var assert = require("assert");
 var API = require("common/api");
+var Agency = require('./index.old');
+
+var agencyId = '';
+var agencyUserId = '';
 
 describe("api/client/agency.js", function() {
 
@@ -48,7 +52,7 @@ describe("api/client/agency.js", function() {
                 if (err) {
                     throw err;
                 }
-                c
+                
                 assert.equal(ret.agency.status, 0);
                 var agencyId = ret.agency.id;
                 var agencyUserId = ret.agencyUser.id;
@@ -109,6 +113,7 @@ describe("api/client/agency.js", function() {
                 if (err) {
                     throw err;
                 }
+                
                 assert.equal(ret.status, 1);
                 done();
             })
@@ -116,14 +121,25 @@ describe("api/client/agency.js", function() {
 
 
         it("getAgencyById should be ok", function(done) {
-            API.client.agency.getAgencyById.call({accountId: agencyUserId}, agencyId, function(err, ret) {
+            API.client.agency.getAgencyById.call({accountId: agencyUserId}, {agencyId: agencyId}, function(err, ret) {
                 if (err) {
                     throw err;
                 }
+
                 assert.equal(ret.id, agencyId);
                 done();
             })
         });
+
+        it("#listAgency should be ok", function(done) {
+            API.client.agency.listAgency.call({accountId: agencyUserId}, {}, function(err, ret) {
+                if (err) {
+                    throw err;
+                }
+
+                done();
+            })
+        })
 
 
         it("createAgencyUser should be ok", function(done) {
@@ -164,7 +180,7 @@ describe("api/client/agency.js", function() {
 
 
         it("getAgencyUser should be ok", function(done) {
-            API.client.agency.getAgencyUser.call({accountId: agencyUserId}, agencyUserId, function(err, ret) {
+            API.client.agency.getAgencyUser.call({accountId: agencyUserId}, {agencyUserId: agencyUserId}, function(err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -179,13 +195,15 @@ describe("api/client/agency.js", function() {
                 if (err) {
                     throw err;
                 }
+
+                assert(ret.items.length >= 0);
                 done();
             })
         });
 
 
         it("deleteAgency should be ok", function (done) {
-            API.client.agency.deleteAgency.call({accountId: agencyUserId}, agencyId, function (err, ret) {
+            API.client.agency.deleteAgency.call({accountId: agencyUserId}, {agencyId: agencyId}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -251,7 +269,7 @@ describe("api/client/agency.js", function() {
         });
 
         it("deleteAgencyUser should be ok", function(done) {
-            API.client.agency.deleteAgencyUser.call({accountId: _agencyUserId}, _newAgencyUser, function (err, ret) {
+            API.client.agency.deleteAgencyUser.call({accountId: _agencyUserId}, {userId: _newAgencyUser}, function (err, ret) {
                 if (err) {
                     throw err;
                 }

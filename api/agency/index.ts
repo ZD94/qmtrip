@@ -4,29 +4,30 @@
 "use strict";
 var sequelize = require("common/model").importModel("./models");
 var Models = sequelize.models;
-var Agency = Models.Agency;
-var AgencyUser = Models.AgencyUser;
+var AgencyModel = Models.Agency;
+var AgencyUserModel = Models.AgencyUser;
 var uuid = require("node-uuid");
 var L = require("common/language");
 var Logger = require('common/logger');
 var logger = new Logger("agency");
 var utils = require("common/utils");
-var _ = require('lodash');
 var API = require("common/api");
 var Paginate = require("common/paginate").Paginate;
 var md5 = require("common/utils").md5;
 
-var STATUS = {
-    DELETE: -2,
-    NOT_ACTIVE: 0,
-    ACTIVE: 1
-}
+import _ = require('lodash');
+import {validateApi} from 'common/api/helper';
+import * as TYPES from "../client/agency/agency.types";
 
-var agency = {};
+var STATUS = TYPES.AGENCY_STATUS;
+var Agency = TYPES.Agency;
+var AgencyUser = TYPES.AgencyUser;
 
-agency.agencyCols = Object.keys(Agency.attributes);
+var agency : any = {};
 
-agency.agencyUserCols = Object.keys(AgencyUser.attributes);
+agency.agencyCols = Object.keys(AgencyModel.attributes);
+
+agency.agencyUserCols = Object.keys(AgencyUserModel.attributes);
 
 /**
  * 注册代理商，生成代理商id
@@ -50,7 +51,7 @@ agency.registerAgency = function(params){
         status: params.status|0
     };
 
-    var agencyUser = {
+    var agencyUser : any = {
         agencyId: agencyId,
         name: userName,
         mobile: mobile,
@@ -74,8 +75,8 @@ agency.registerAgency = function(params){
 
             return sequelize.transaction(function(t){
                 return Promise.all([
-                    Agency.create(agency, {transaction: t}),
-                    AgencyUser.create(agencyUser, {transaction: t})
+                    AgencyModel.create(agency, {transaction: t}),
+                    AgencyUserModel.create(agencyUser, {transaction: t})
                 ]);
             })
         })
@@ -85,7 +86,7 @@ agency.registerAgency = function(params){
         .catch(function(err){
             logger.error(err);
 
-            return Agency.findOne({where: {$or: [{mobile: mobile}, {email: email}], status: {$ne: STATUS.DELETE}}, attributes: ['id']})
+            return AgencyModel.findOne({where: {$or: [{mobile: mobile}, {email: email}], status: {$ne: STATUS.DELETE}}, attributes: ['id']})
                 .then(function(agency){
                     if(agency){
                         throw {code: -4, msg: '手机号或邮箱已经注册'};
@@ -97,8 +98,7 @@ agency.registerAgency = function(params){
 }
 
 agency.createAgency = createAgency;
-createAgency.required_params = ['id', 'name', 'email', 'userName'];
-createAgency.optional_params = ['mobile', 'pwd', 'description', 'remark', 'status'];
+validateApi(createAgency, ['id', 'name', 'email', 'userName'], ['mobile', 'pwd', 'description', 'remark', 'status']);
 function createAgency(params) {
     var mobile = params.mobile;
     var email = params.email;
@@ -120,8 +120,8 @@ function createAgency(params) {
 
     return sequelize.transaction(function(t){
         return Promise.all([
-            Agency.create(_agency, {transaction: t}),
-            AgencyUser.create(_agencyUser, {transaction: t})
+            AgencyModel.create(_agency, {transaction: t}),
+            AgencyUserModel.create(_agencyUser, {transaction: t})
         ]);
     })
         .spread(function(agency, agencyUser){
@@ -130,7 +130,7 @@ function createAgency(params) {
         .catch(function(err){
             logger.error(err);
 
-            return Agency.findOne({where: {$or: [{mobile: mobile}, {email: email}], status: {$ne: STATUS.DELETE}}, attributes: ['id']})
+            return AgencyModel.findOne({where: {$or: [{mobile: mobile}, {email: email}], status: {$ne: STATUS.DELETE}}, attributes: ['id']})
                 .then(function(agency){
                     if(agency){
                         throw {code: -4, msg: '手机号或邮箱已经注册'};
@@ -149,7 +149,7 @@ function createAgency(params) {
 agency.updateAgency = function(_agency){
     var agencyId = _agency.agencyId;
     var userId = _agency.userId;
-    return Agency.findById(agencyId, {attributes: ['createUser']})
+    return AgencyModel.findById(agencyId, {attributes: ['createUser']})
         .then(function(agency){
             if(!agency || agency.status ==STATUS.DELETE){
                 throw L.ERR.AGENCY_NOT_EXIST;
@@ -161,14 +161,14 @@ agency.updateAgency = function(_agency){
 
             _agency.updateAt = utils.now();
 
-            return Agency.update(_agency, {returning: true, where: {id: agencyId}, fields: Object.keys(_agency)})
+            return AgencyModel.update(_agency, {returning: true, where: {id: agencyId}, fields: Object.keys(_agency)})
         })
         .spread(function(rows, agencies){
             if(!rows || rows == "NaN"){
                 throw {code: -2, msg: '更新代理商信息失败'};
             }
 
-            return agencies[0];
+            return new Agency(agencies[0]);
         })
 }
 
@@ -182,13 +182,13 @@ agency.getAgency = function(params){
         throw {code: -1, msg: '参数 agencyId 不能为空'};
     }
     var agencyId = params.agencyId;
-    return Agency.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updateAt']})
+    return AgencyModel.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updateAt']})
         .then(function(agency){
             if(!agency || agency.status == STATUS.DELETE){
                 throw L.ERR.AGENCY_NOT_EXIST;
             }
 
-            return agency;
+            return new Agency(agency);
         })
 }
 
@@ -198,11 +198,7 @@ agency.getAgency = function(params){
  * @returns {*}
  */
 agency.listAgency = function(params){
-    if(!params.userId){
-        throw {code: -1, msg: '参数userId不能为空'};
-    }
-
-    return Agency.findAll({where: {status: {$ne: STATUS.DELETE}}});
+    return AgencyModel.findAll({where: {status: {$ne: STATUS.DELETE}}, attributes: ['id']});
 }
 
 /**
@@ -211,16 +207,16 @@ agency.listAgency = function(params){
  * @returns {*}
  */
 agency.deleteAgency = deleteAgency;
-deleteAgency.required_params = ['agencyId', 'userId'];
+validateApi(deleteAgency, ['agencyId', 'userId']);
 function deleteAgency(params){
     var agencyId = params.agencyId;
     var userId = params.userId;
 
     return Promise.all([
-        Agency.findById(agencyId, {attributes: ['createUser']}),
-        AgencyUser.findAll({where: {agencyId: agencyId, status: {$ne: STATUS.DELETE}}, attributes: ['id']})
+        AgencyModel.findById(agencyId, {attributes: ['createUser']}),
+        AgencyUserModel.findAll({where: {agencyId: agencyId, status: {$ne: STATUS.DELETE}}, attributes: ['id']})
     ])
-        .spread(function(agency, users){
+        .spread(function(agency, users: any){
             if(!agency || agency.status == STATUS.DELETE){
                 throw L.ERR.AGENCY_NOT_EXIST;
             }
@@ -231,12 +227,12 @@ function deleteAgency(params){
 
             return users;
         })
-        .then(function(users){
+        .then(function(users: any){
             return sequelize.transaction(function(t){
                 return Promise.all([
-                    Agency.update({status: STATUS.DELETE, updateAt: utils.now()},
+                    AgencyModel.update({status: STATUS.DELETE, updateAt: utils.now()},
                         {where: {id: agencyId}, fields: ['status', 'updateAt'], transaction: t}),
-                    AgencyUser.update({status: STATUS.DELETE, updateAt: utils.now()},
+                    AgencyUserModel.update({status: STATUS.DELETE, updateAt: utils.now()},
                         {where: {agencyId: agencyId}, fields: ['status', 'updateAt'], transaction: t})
                 ])
                     .then(function(){
@@ -258,8 +254,7 @@ function deleteAgency(params){
  * @returns {*}
  */
 agency.createAgencyUser = createAgencyUser;
-createAgencyUser.required_params = ['email', 'mobile', 'agencyId', 'name'];
-createAgencyUser.optional_params = agency.agencyUserCols;
+validateApi(createAgencyUser, ['email', 'mobile', 'agencyId', 'name'], agency.agencyUserCols);
 function createAgencyUser(data){
     var _agencyUser = data;
     _agencyUser.id = data.accountId || uuid.v1();
@@ -270,7 +265,10 @@ function createAgencyUser(data){
         .then(function(account){
             _agencyUser.id = account.id;
 
-            return AgencyUser.create(_agencyUser);
+            return AgencyUserModel.create(_agencyUser);
+        })
+        .then(function(_agencyUser) {
+            return new AgencyUser(_agencyUser);
         })
 }
 
@@ -286,7 +284,7 @@ agency.deleteAgencyUser = function(params){
         throw {code: -1, msg: "id不能为空"};
     }
 
-    return AgencyUser.findById(userId, {attributes: ['status', 'id']})
+    return AgencyUserModel.findById(userId, {attributes: ['status', 'id']})
         .then(function(user){
             if(!user || user.status == STATUS.DELETE){
                 throw {code: -2, msg: '用户不存在'};
@@ -294,7 +292,7 @@ agency.deleteAgencyUser = function(params){
 
             return Promise.all([
                 API.auth.remove({accountId: userId}),
-                AgencyUser.update({status: STATUS.DELETE}, {where: {id: userId}, fields: ['status']})
+                AgencyUserModel.update({status: STATUS.DELETE}, {where: {id: userId}, fields: ['status']})
             ])
         })
         .then(function(){
@@ -309,28 +307,27 @@ agency.deleteAgencyUser = function(params){
  * @returns {*}
  */
 agency.updateAgencyUser = updateAgencyUser;
-updateAgencyUser.required_params = ['id'];
-updateAgencyUser.optional_params = ['name', 'sex', 'mobile', 'avatar', 'roleId', 'status'];
+validateApi(updateAgencyUser, ['id'], ['name', 'sex', 'mobile', 'avatar', 'roleId', 'status']);
 function updateAgencyUser(data){
     var id = data.id;
 
-    return AgencyUser.findById(id, {attributes: ['status']})
+    return AgencyUserModel.findById(id, {attributes: ['status']})
         .then(function(user){
             if(!user || user.status == STATUS.DELETE) {
                 throw L.ERR.NOT_FOUND;
             }
 
-            var options = {};
+            var options : any = {};
             options.where = {id: id};
             options.returning = true;
 
-            return AgencyUser.update(data, options);
+            return AgencyUserModel.update(data, options);
         })
         .spread(function(rows, users){
             if(rows != 1) {
                 throw {code: -2, msg: '操作失败'};
             }
-            return users[0];
+            return new AgencyUser(users[0]);
         })
 }
 
@@ -341,23 +338,21 @@ function updateAgencyUser(data){
  * @returns {*}
  */
 agency.getAgencyUser = getAgencyUser;
-getAgencyUser.required_params = ['id'];
-getAgencyUser.optional_params = ['columns'];
 function getAgencyUser(params){
     var id = params.id;
-    var options = {};
+    var options : any = {};
 
     if(params.columns){
         options.attributes = params.columns;
     }
 
-    return AgencyUser.findById(id, options)
+    return AgencyUserModel.findById(id, options)
         .then(function(agencyUser){
             if(!agencyUser || agencyUser.status == STATUS.DELETE){
                 throw {code: -2, msg: '用户不存在'};
             }
 
-            return agencyUser;
+            return new AgencyUser(agencyUser);
         })
 }
 
@@ -366,10 +361,10 @@ function getAgencyUser(params){
  * @type {agencyByEmail}
  */
 agency.agencyByEmail = agencyByEmail;
-agencyByEmail.required_params = ['email'];
+validateApi(agencyByEmail, ['email'])
 function agencyByEmail(params) {
     params.status = {$ne: STATUS.DELETE};
-    return Agency.findOne({where: params})
+    return AgencyModel.findOne({where: params})
 }
 
 /**
@@ -378,7 +373,7 @@ function agencyByEmail(params) {
  * @param options options.perPage 每页条数 options.page当前页
  */
 agency.listAndPaginateAgencyUser = function(params){
-    var options = {};
+    var options : any = {};
     if(params.options){
         options = params.options;
         delete params.options;
@@ -402,9 +397,12 @@ agency.listAndPaginateAgencyUser = function(params){
     options.limit = limit;
     options.offset = offset;
     options.where = params;
-    return AgencyUser.findAndCountAll(options)
+    return AgencyUserModel.findAndCountAll(options)
         .then(function(result){
-            return new Paginate(page, perPage, result.count, result.rows);
+            var data = result.rows.map(function(user) {
+                return user.id;
+            })
+            return new Paginate(page, perPage, result.count, data);
         });
 }
 
@@ -414,7 +412,7 @@ agency.listAndPaginateAgencyUser = function(params){
  * @returns {*|Promise}
  */
 agency.getAgencyUsersId = function(params){
-    return AgencyUser.findAll({where: params, attributes: ['id']})
+    return AgencyUserModel.findAll({where: params, attributes: ['id']})
         .then(function(result){
             return result;
         });
@@ -430,8 +428,8 @@ agency.deleteAgencyByTest = function(params){
     var name = params.name;
     return Promise.all([
         API.auth.remove({email: email, mobile:mobile, type: 2}),
-        Agency.destroy({where: {$or: [{email:email}, {mobile:mobile}, {name: name}]}}),
-        AgencyUser.destroy({where: {$or: [{email:email}, {mobile:mobile}, {name: name}]}})
+        AgencyModel.destroy({where: {$or: [{email:email}, {mobile:mobile}, {name: name}]}}),
+        AgencyUserModel.destroy({where: {$or: [{email:email}, {mobile:mobile}, {name: name}]}})
     ])
         .then(function(){
             return true;
@@ -465,7 +463,7 @@ agency.__initOnce = function() {
             var _account = {
                 email: email,
                 mobile: mobile,
-                pwd: pwd|'123456',
+                pwd: pwd||'123456',
                 status: 1,
                 type: 2
             }
@@ -482,7 +480,7 @@ agency.__initOnce = function() {
                 name: default_agency.name,
                 email: email,
                 mobile: mobile,
-                pwd: pwd|'123456',
+                pwd: pwd||'123456',
                 status: 1,
                 userName: user_name,
                 remark: '系统默认代理商'
