@@ -2,11 +2,11 @@
  * Created by yumiao on 16-4-25.
  */
 'use strict';
-var API = require('common/api');
-var utils = require("common/utils");
-var L = require("common/language");
-var Logger = require("common/logger");
-var logger = new Logger("client/agency");
+let API = require('common/api');
+let utils = require("common/utils");
+let L = require("common/language");
+let Logger = require("common/logger");
+let logger = new Logger("client/agency");
 
 import _ = require('lodash');
 import * as TYPES from "./agency.types";

@@ -4,7 +4,6 @@
 "use strict";
 var assert = require("assert");
 var API = require("common/api");
-var Agency = require('./index.old');
 
 var agencyId = '';
 var agencyUserId = '';
