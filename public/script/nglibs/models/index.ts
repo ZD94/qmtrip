@@ -65,13 +65,24 @@ class PlaceCache {
 class Menuitem {
     icon:string;
     title:string;
-    name:string;
+    link:string;
+    badgenum:number;
 }
 class Menu {
     menus:Menuitem[] = [];
+    notie:boolean;
     get() :any {
         var self = this;
         return self.menus;
+
+    }
+    getone(title:string) :any {
+        var self = this;
+        for(var i =0; i<self.menus.length;i++){
+            if(self.menus[i].title ==title) {
+                return self.menus[i];
+            }
+        }
 
     }
     del(title:string) {
@@ -97,6 +108,20 @@ class Menu {
             }
         }
         return undefined;
+    }
+    badge(item:Menuitem) {
+        var self = this;
+        for(var i =0; i<self.menus.length;i++){
+            if(self.menus[i].title ==item.title) {
+                self.menus[i].badgenum +=1;
+                return self.menus[i];
+            }
+        }
+    }
+    newnotice(boolean:boolean) {
+        var self = this;
+        self.notie = boolean;
+        return self.notie;
     }
 }
 angular.module('qm.model', [])
