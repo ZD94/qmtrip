@@ -6,9 +6,9 @@
                 <button class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
             </ion-nav-buttons>
         </ion-nav-bar>
-        <ion-nav-view name="sidemenu-view"></ion-nav-view>
+        <ion-nav-view style="background: url(ionic/images/backgroud.png) no-repeat center;background-size:cover;"></ion-nav-view>
     </ion-side-menu-content>
-    <ion-side-menu side="left" id="sidemenu-view">
+    <ion-side-menu side="left">
         <ion-header-bar class="bar-stable">
             <div class="title">Menu</div>
         </ion-header-bar>
@@ -23,14 +23,26 @@
             </ion-list>
             <div class="button-bar"></div>
             <a ng-repeat="menu in menus" class="button button-light  button-block icon ion-{{menu.icon}}">{{menu.title}}</a>
-            <a ui-sref="menu.page1" menu-close="" id="menu-button1" style="text-align:left;" class="button button-light  button-block icon ion-plane">我要出差</a>
-            <a ui-sref="menu.page13" menu-close="" id="menu-button19" style="text-align:left;" class="button button-light  button-block icon ion-flag">我的行程</a>
+            <a href="#trip/create" menu-close="" id="menu-button1" style="text-align:left;" class="button button-light  button-block icon ion-plane">
+                我要出差
+            </a>
+            <a href="#trip/list" menu-close="" id="menu-button19" style="text-align:left;" class="button button-light  button-block icon ion-flag">
+                我的行程
+            </a>
             <div class="spacer" style="width: 268px; height: 24px;"></div>
-            <a ui-sref="menu.page12" menu-close="" id="menu-button20" style="text-align:left;" class="button button-light  button-block icon ion-podium">审批单</a>
-            <a ui-sref="menu.page3" menu-close="" id="menu-button21" style="text-align:left;" class="button button-light  button-block icon ion-paintbrush">待我审批</a>
+            <a href="#trip-approval/list" menu-close="" id="menu-button20" style="text-align:left;" class="button button-light  button-block icon ion-podium">
+                审批单
+            </a>
+            <a href="#trip-approval/pending" menu-close="" id="menu-button21" style="text-align:left;" class="button button-light  button-block icon ion-paintbrush">
+                待我审批
+            </a>
             <div class="button-bar">
-                <button id="menu-button22" class="button button-light  button-block icon ion-android-notifications">通知</button>
-                <a ui-sref="menu.page17" menu-close="" id="menu-button24" class="button button-light  button-block icon ion-android-exit">退出</a>
+                <button id="menu-button22" class="button button-light  button-block icon ion-android-notifications">
+                    通知
+                </button>
+                <a href="#login/" menu-close="" id="menu-button24" class="button button-light  button-block icon ion-android-exit">
+                    退出
+                </a>
             </div>
         </ion-content>
     </ion-side-menu>
