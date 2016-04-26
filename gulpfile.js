@@ -21,7 +21,6 @@ gulplib.bundle_lib('img', {ex: true, ts: false, require: ['arale-qrcode', 'hidpi
 gulplib.bundle_lib('base', {ex: true, ts: false, require:['q', 'bluebird', 'md5', 'moment', 'tiny-cookie', 'shoe']})
 
 gulplib.bundle_lib('preload', {ex: true, ts: false, require:['dyload', 'babel-polyfill']});
-gulplib.bundle_lib('pre-require', {ts: true, require: ['./common/client/pre-require.ts:pre-require']});
 
 gulplib.bundle_lib('api', {require:['./common/client/api.js:api']});
 gulplib.bundle_lib('calendar', {require:['lunar-calendar', "calendar"]});
