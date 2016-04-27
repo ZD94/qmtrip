@@ -2,31 +2,24 @@
  * Created by yumiao on 15-12-9.
  */
 "use strict";
-var sequelize = require("common/model").importModel("./models");
-var Models = sequelize.models;
-var AgencyModel = Models.Agency;
-var AgencyUserModel = Models.AgencyUser;
-var uuid = require("node-uuid");
-var L = require("common/language");
-var Logger = require('common/logger');
-var logger = new Logger("agency");
-var utils = require("common/utils");
-var API = require("common/api");
-var Paginate = require("common/paginate").Paginate;
-var md5 = require("common/utils").md5;
-
+let sequelize = require("common/model").importModel("./models");
+let Models = sequelize.models;
+let AgencyModel = Models.Agency;
+let AgencyUserModel = Models.AgencyUser;
+let API = require("common/api");
+let uuid = require("node-uuid");
 import _ = require('lodash');
+import L = require("common/language");
+import Logger = require('common/logger');
+import utils = require("common/utils");
 import {validateApi} from 'common/api/helper';
-import * as TYPES from "../client/agency/agency.types";
+import {Paginate} from 'common/paginate';
+import {Agency, AgencyUser, AGENCY_STATUS} from "../client/agency/agency.types";
 
-var STATUS = TYPES.AGENCY_STATUS;
-var Agency = TYPES.Agency;
-var AgencyUser = TYPES.AgencyUser;
-
-var agency : any = {};
+let logger = new Logger("agency");
+let agency : any = {};
 
 agency.agencyCols = Object.keys(AgencyModel.attributes);
-
 agency.agencyUserCols = Object.keys(AgencyUserModel.attributes);
 
 /**
@@ -34,31 +27,15 @@ agency.agencyUserCols = Object.keys(AgencyUserModel.attributes);
  * @param params
  */
 agency.registerAgency = function(params){
-    var agency = params;
-    var userName = params.userName;
-    var agencyId = uuid.v1() || params.agencyId;
+    let agency = new Agency(params);
+    let agencyId = uuid.v1() || params.agencyId;
     agency.id = agencyId;
-    delete agency.userName;
-
-    var pwd = params.pwd || '123456';
-    var mobile = params.mobile;
-    var email = params.email;
-    var account = {
-        email: email,
-        mobile: mobile,
-        pwd: pwd,
-        type: 2,
-        status: params.status|0
-    };
-
-    var agencyUser : any = {
-        agencyId: agencyId,
-        name: userName,
-        mobile: mobile,
-        email: email,
-        status: params.status|0,
-        roleId: 0
-    };
+    let pwd = params.pwd || '123456';
+    let mobile = params.mobile;
+    let email = params.email;
+    let account = {email: email, mobile: mobile, pwd: pwd, type: 2, status: params.status || AGENCY_STATUS.UN_ACTIVE};
+    let agencyUser  = new AgencyUser({agencyId: agencyId, name: params.userName, mobile: mobile, email: email, 
+        status: params.status || AGENCY_STATUS.UN_ACTIVE, roleId: 0});
 
     return API.auth.checkAccExist({type: 2, $or: [{mobile: mobile}, {email: email}]})
         .then(function(ret){
@@ -86,7 +63,7 @@ agency.registerAgency = function(params){
         .catch(function(err){
             logger.error(err);
 
-            return AgencyModel.findOne({where: {$or: [{mobile: mobile}, {email: email}], status: {$ne: STATUS.DELETE}}, attributes: ['id']})
+            return AgencyModel.findOne({where: {$or: [{mobile: mobile}, {email: email}], status: {$ne: AGENCY_STATUS.DELETE}}, attributes: ['id']})
                 .then(function(agency){
                     if(agency){
                         throw {code: -4, msg: '手机号或邮箱已经注册'};
@@ -102,21 +79,12 @@ validateApi(createAgency, ['id', 'name', 'email', 'userName'], ['mobile', 'pwd',
 function createAgency(params) {
     var mobile = params.mobile;
     var email = params.email;
-    var _agency = params;
-    _agency.id = params.id||uuid.v1();
+    var _agency = _.clone(params);
+    _agency.id = params.id || uuid.v1();
     _agency.createUser = _agency.id;
     var userName = params.userName;
-    delete agency.userName;
-
-    var _agencyUser = {
-        id: _agency.id,
-        agencyId: _agency.id,
-        name: userName,
-        mobile: params.mobile,
-        email: params.email,
-        status: params.status|0,
-        roleId: 0
-    };
+    var _agencyUser = {id: _agency.id, agencyId: _agency.id, name: userName, mobile: params.mobile, email: params.email,
+        status: params.status || AGENCY_STATUS.UN_ACTIVE, roleId: 0};
 
     return sequelize.transaction(function(t){
         return Promise.all([
@@ -130,7 +98,7 @@ function createAgency(params) {
         .catch(function(err){
             logger.error(err);
 
-            return AgencyModel.findOne({where: {$or: [{mobile: mobile}, {email: email}], status: {$ne: STATUS.DELETE}}, attributes: ['id']})
+            return AgencyModel.findOne({where: {$or: [{mobile: mobile}, {email: email}], status: {$ne: AGENCY_STATUS.DELETE}}, attributes: ['id']})
                 .then(function(agency){
                     if(agency){
                         throw {code: -4, msg: '手机号或邮箱已经注册'};
@@ -151,7 +119,7 @@ agency.updateAgency = function(_agency){
     var userId = _agency.userId;
     return AgencyModel.findById(agencyId, {attributes: ['createUser']})
         .then(function(agency){
-            if(!agency || agency.status ==STATUS.DELETE){
+            if(!agency || agency.status ==AGENCY_STATUS.DELETE){
                 throw L.ERR.AGENCY_NOT_EXIST;
             }
 
@@ -184,7 +152,7 @@ agency.getAgency = function(params){
     var agencyId = params.agencyId;
     return AgencyModel.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updateAt']})
         .then(function(agency){
-            if(!agency || agency.status == STATUS.DELETE){
+            if(!agency || agency.status == AGENCY_STATUS.DELETE){
                 throw L.ERR.AGENCY_NOT_EXIST;
             }
 
@@ -198,7 +166,7 @@ agency.getAgency = function(params){
  * @returns {*}
  */
 agency.listAgency = function(params){
-    return AgencyModel.findAll({where: {status: {$ne: STATUS.DELETE}}, attributes: ['id']});
+    return AgencyModel.findAll({where: {status: {$ne: AGENCY_STATUS.DELETE}}, attributes: ['id']});
 }
 
 /**
@@ -214,10 +182,10 @@ function deleteAgency(params){
 
     return Promise.all([
         AgencyModel.findById(agencyId, {attributes: ['createUser']}),
-        AgencyUserModel.findAll({where: {agencyId: agencyId, status: {$ne: STATUS.DELETE}}, attributes: ['id']})
+        AgencyUserModel.findAll({where: {agencyId: agencyId, status: {$ne: AGENCY_STATUS.DELETE}}, attributes: ['id']})
     ])
         .spread(function(agency, users: any){
-            if(!agency || agency.status == STATUS.DELETE){
+            if(!agency || agency.status == AGENCY_STATUS.DELETE){
                 throw L.ERR.AGENCY_NOT_EXIST;
             }
 
@@ -230,9 +198,9 @@ function deleteAgency(params){
         .then(function(users: any){
             return sequelize.transaction(function(t){
                 return Promise.all([
-                    AgencyModel.update({status: STATUS.DELETE, updateAt: utils.now()},
+                    AgencyModel.update({status: AGENCY_STATUS.DELETE, updateAt: utils.now()},
                         {where: {id: agencyId}, fields: ['status', 'updateAt'], transaction: t}),
-                    AgencyUserModel.update({status: STATUS.DELETE, updateAt: utils.now()},
+                    AgencyUserModel.update({status: AGENCY_STATUS.DELETE, updateAt: utils.now()},
                         {where: {agencyId: agencyId}, fields: ['status', 'updateAt'], transaction: t})
                 ])
                     .then(function(){
@@ -286,13 +254,13 @@ agency.deleteAgencyUser = function(params){
 
     return AgencyUserModel.findById(userId, {attributes: ['status', 'id']})
         .then(function(user){
-            if(!user || user.status == STATUS.DELETE){
+            if(!user || user.status == AGENCY_STATUS.DELETE){
                 throw {code: -2, msg: '用户不存在'};
             }
 
             return Promise.all([
                 API.auth.remove({accountId: userId}),
-                AgencyUserModel.update({status: STATUS.DELETE}, {where: {id: userId}, fields: ['status']})
+                AgencyUserModel.update({status: AGENCY_STATUS.DELETE}, {where: {id: userId}, fields: ['status']})
             ])
         })
         .then(function(){
@@ -313,7 +281,7 @@ function updateAgencyUser(data){
 
     return AgencyUserModel.findById(id, {attributes: ['status']})
         .then(function(user){
-            if(!user || user.status == STATUS.DELETE) {
+            if(!user || user.status == AGENCY_STATUS.DELETE) {
                 throw L.ERR.NOT_FOUND;
             }
 
@@ -348,7 +316,7 @@ function getAgencyUser(params){
 
     return AgencyUserModel.findById(id, options)
         .then(function(agencyUser){
-            if(!agencyUser || agencyUser.status == STATUS.DELETE){
+            if(!agencyUser || agencyUser.status == AGENCY_STATUS.DELETE){
                 throw {code: -2, msg: '用户不存在'};
             }
 
@@ -363,7 +331,7 @@ function getAgencyUser(params){
 agency.agencyByEmail = agencyByEmail;
 validateApi(agencyByEmail, ['email'])
 function agencyByEmail(params) {
-    params.status = {$ne: STATUS.DELETE};
+    params.status = {$ne: AGENCY_STATUS.DELETE};
     return AgencyModel.findOne({where: params})
 }
 
