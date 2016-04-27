@@ -20,29 +20,22 @@
                     <p>13810590928
                         <br>积分：2019</p>
                 </ion-item>
+                <div ng-repeat="menu in menus">
+                    <a ng-href="#{{menu.link}}" menu-close="" style="text-align:left;" class="button button-light menu-button button-block icon ion-{{menu.icon}}" ng-if="menu.title != ''">
+                        {{menu.title}}
+                        <span class="badge badge-assertive" ng-if="menu.badgenum !='0'">{{menu.badgenum}}</span>
+                    </a>
+                    <div class="spacer" style="height: 24px;" ng-if="menu.title == ''"></div>
+                </div>
+                <div class="button-bar">
+                    <button id="menu-button22" class="button button-light  button-block icon ion-android-notifications">
+                        通知
+                    </button>
+                    <a href="#login/" menu-close="" id="menu-button24" class="button button-light  button-block icon ion-android-exit">
+                        退出
+                    </a>
+                </div>
             </ion-list>
-            <div class="button-bar"></div>
-            <a href="#trip/create" menu-close="" id="menu-button1" style="text-align:left;" class="button button-light  button-block icon ion-plane">
-                我要出差
-            </a>
-            <a href="#trip/list" menu-close="" id="menu-button19" style="text-align:left;" class="button button-light  button-block icon ion-flag">
-                我的行程
-            </a>
-            <div class="spacer" style="width: 268px; height: 24px;"></div>
-            <a href="#trip-approval/list" menu-close="" id="menu-button20" style="text-align:left;" class="button button-light  button-block icon ion-podium">
-                审批单
-            </a>
-            <a href="#trip-approval/pending" menu-close="" id="menu-button21" style="text-align:left;" class="button button-light  button-block icon ion-paintbrush">
-                待我审批
-            </a>
-            <div class="button-bar">
-                <button id="menu-button22" class="button button-light  button-block icon ion-android-notifications">
-                    通知
-                </button>
-                <a href="#login/" menu-close="" id="menu-button24" class="button button-light  button-block icon ion-android-exit">
-                    退出
-                </a>
-            </div>
         </ion-content>
     </ion-side-menu>
 </ion-side-menus>
