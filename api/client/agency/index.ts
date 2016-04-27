@@ -103,7 +103,7 @@ export async function getAgencyById(params: {agencyId: string}){
 /* @method listAgency
  * 查询代理商列表
  * @param params
- * @returns {Promise<Array<Agency>>}
+ * @returns {Promise<string[]>}
  */
 export async function listAgency(){
     let self = this;

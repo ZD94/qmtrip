@@ -300,28 +300,26 @@ function updateAgencyUser(data){
 }
 
 /**
- * 根据id查询代理商
- * @param id
- * @param data
+ * 获取代理商用户
+ * @param params
  * @returns {*}
  */
 agency.getAgencyUser = getAgencyUser;
-function getAgencyUser(params){
-    var id = params.id;
-    var options : any = {};
+async function getAgencyUser(params){
+    let id = params.id;
+    let options : any = {};
 
     if(params.columns){
         options.attributes = params.columns;
     }
 
-    return AgencyUserModel.findById(id, options)
-        .then(function(agencyUser){
-            if(!agencyUser || agencyUser.status == AGENCY_STATUS.DELETE){
-                throw {code: -2, msg: '用户不存在'};
-            }
+    let agencyUser = await AgencyUserModel.findById(id, options);
 
-            return new AgencyUser(agencyUser);
-        })
+    if(!agencyUser || agencyUser.status === AGENCY_STATUS.DELETE){
+        throw {code: -2, msg: '用户不存在'};
+    }
+
+    return new AgencyUser(agencyUser);
 }
 
 /**

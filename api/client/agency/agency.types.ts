@@ -2,7 +2,6 @@
  * Created by yumiao on 16-4-26.
  */
 'use strict';
-import  utils = require('common/utils');
 
 export enum AGENCY_STATUS {
     DELETE = -2, //删除状态
@@ -21,13 +20,13 @@ export class Agency{
     telephone: string; //联系电话
     mobile: string; //联系手机
     companyNum: number; //企业数量
-    createAt: string; //创建时间
+    createAt: Date; //创建时间
     remark: string; //备注
-    updateAt: string;
+    updateAt: Date;
 
     constructor(params) {
         this.id = params.id ? params.id : null;
-        this.agencyNo = params.agencyNo ? params.agencyNo : null;
+        this.agencyNo = params.agencyNo;
         this.createUser = params.createUser ? params.createUser : null;
         this.name = params.name ? params.name : null;
         this.description = params.description ? params.description : null;
@@ -36,7 +35,7 @@ export class Agency{
         this.telephone = params.telephone ? params.telephone : null;
         this.mobile = params.mobile ? params.mobile : null;
         this.companyNum = params.companyNum || 0;
-        this.createAt = params.createAt ? params.createAt : utils.now();
+        this.createAt = params.createAt ? params.createAt : null;
         this.remark = params.remark ? params.remark : null;
         this.updateAt = params.updateAt ? params.updateAt : null;
     };
@@ -51,7 +50,7 @@ export class AgencyUser {
     mobile: string; //电话
     avatar: string; //代理商头像
     agencyId: string; //公司ID
-    roleId: string; //权限ID
+    roleId: number; //权限ID
     createAt: Date; //创建时间
     
     constructor(params) {
@@ -63,7 +62,7 @@ export class AgencyUser {
         this.mobile = params.mobile ? params.mobile : null;
         this.avatar = params.avatar ? params.avatar : null;
         this.agencyId = params.agencyId ? params.agencyId : null;
-        this.roleId = params.roleId ? params.roleId : null;
-        this.createAt = params.createAt ? params.createAt : utils.now();
+        this.roleId = params.roleId ? params.roleId : 1;
+        this.createAt = params.createAt ? params.createAt : null;
     };
 }

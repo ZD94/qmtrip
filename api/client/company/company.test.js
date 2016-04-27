@@ -5,13 +5,13 @@ var assert = require("assert");
 var API = require("common/api");
 
 describe("api/client/company.js", function() {
-    //var agencyId = "";
+    var agencyId = "";
     var companyId = "";
     var ownerUserId = "";
     var agencyUserId = "";
 
     var agency = {
-        email: "company.test@tulingdao.com",
+        email: "company.test@jingli.com",
         userName: "喵喵",
         name: '喵喵的代理商',
         mobile: "15269866802",
@@ -21,9 +21,9 @@ describe("api/client/company.js", function() {
     var company = {
         name: '喵喵的企业',
         userName: '喵喵',
-        domain: 'tulingdao.com',
+        domain: 'jingli.com',
         description: '企业API测试用',
-        email: 'company.test@tulingdao.com',
+        email: 'company.test@jingli.com',
         mobile: '15269866802'
     }
 
@@ -90,6 +90,7 @@ describe("api/client/company.js", function() {
                     if (err) {
                         throw err;
                     }
+
                     companyId = company.id;
                     ownerUserId = company.createUser;
                     done();
@@ -102,7 +103,7 @@ describe("api/client/company.js", function() {
 
             before(function(done){
                 company.mobile = '15269866812';
-                company.email = 'company.test@tulingdao.com';
+                company.email = 'company.test@jingli.com';
                 Promise.all([
                     API.company.deleteCompanyByTest({mobile: company.mobile, email: company.email}),
                     API.staff.deleteAllStaffByTest({mobile: company.mobile, email: company.email})
@@ -156,6 +157,7 @@ describe("api/client/company.js", function() {
                         throw err;
                     }
                     assert.equal(ret.status, 1);
+
                     done();
                 })
             });
@@ -163,7 +165,7 @@ describe("api/client/company.js", function() {
 
             it("#getCompanyById should be ok", function(done) {
                 var self = {accountId: ownerUserId};
-                API.client.company.getCompanyById.call(self, companyId, function(err, ret){
+                API.client.company.getCompanyById.call(self, {companyId: companyId}, function(err, ret){
                     if(err){
                         throw err;
                     }
@@ -185,7 +187,7 @@ describe("api/client/company.js", function() {
 
 
             it("#getCompanyFundsAccountByAgency should be ok", function(done) {
-                API.client.company.getCompanyFundsAccountByAgency.call({accountId: agencyUserId}, companyId, function(err, ret){
+                API.client.company.getCompanyFundsAccountByAgency.call({accountId: agencyUserId}, {companyId: companyId}, function(err, ret){
                     if(err){
                         throw err;
                     }
@@ -196,7 +198,7 @@ describe("api/client/company.js", function() {
 
 
             it("#getCompanyFundsAccountByAgency should be error with wrong user", function(done) {
-                API.client.company.getCompanyFundsAccountByAgency.call({accountId: ownerUserId}, companyId, function(err, ret){
+                API.client.company.getCompanyFundsAccountByAgency.call({accountId: ownerUserId}, {companyId: companyId}, function(err, ret){
                     assert.equal(err.code, -2);
                     assert.equal(ret, null);
                     done();
@@ -247,6 +249,17 @@ describe("api/client/company.js", function() {
                     }
                     assert(ret.consume >= 100);
                     assert(ret.balance >= 0);
+                    done();
+                })
+            });
+
+            it("#deleteCompany should be ok", function(done) {
+                var self = {accountId: agencyUserId};
+                API.client.company.deleteCompany.call(self, {companyId: companyId}, function(err, ret){
+                    if(err){
+                        throw err;
+                    }
+                    assert.equal(ret, true);
                     done();
                 })
             });

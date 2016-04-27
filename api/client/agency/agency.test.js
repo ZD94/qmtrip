@@ -199,6 +199,15 @@ describe("api/client/agency.js", function() {
             })
         });
 
+        it("getAgencyUser should be error whit wrong params", function(done) {
+            var uuid = require('node-uuid');
+            API.client.agency.getAgencyUser.call({accountId: agencyUserId}, {agencyUserId: uuid.v1()}, function(err, ret) {
+                assert.equal(ret, null);
+                assert.equal(err.code, -2);
+                done();
+            })
+        });
+
 
         it("API.agency.listAndPaginateAgencyUser", function(done) {
             API.client.agency.listAndPaginateAgencyUser.call({accountId: agencyUserId}, {}, function(err, ret) {

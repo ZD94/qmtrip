@@ -83,16 +83,9 @@ function createCompany(params){
         ])
     })
         .spread(function(c, f){
-            return {
-                id: c.id,
-                status: c.status,
-                name: c.name,
-                mobile: c.mobile,
-                email: c.email,
-                createUser: c.createUser,
-                balance: f.balance,
-                staffReward: f.staffReward
-            };
+            c = c.toJSON();
+            var result = _.assign(c, {balance: f.balance, staffReward: f.staffReward});
+            return result;
         });
 }
 
@@ -215,7 +208,12 @@ function pageCompany(options){
 
     return Company.findAndCount(options)
         .then(function(ret){
-            return new Paginate(options.offset/options.limit + 1, options.limit, ret.count, ret.rows);
+            var items = ret.rows.map(function(c) {
+                "use strict";
+                return c.id;
+            });
+            
+            return new Paginate(options.offset/options.limit + 1, options.limit, ret.count, items);
         })
 }
 
@@ -297,9 +295,9 @@ function deleteCompany(params){
                 throw L.ERR.COMPANY_NOT_EXIST;
             }
 
-            if(company.createUser != userId){
-                throw L.ERR.PERMISSION_DENY;
-            }
+            // if(company.createUser != userId){
+            //     throw L.ERR.PERMISSION_DENY;
+            // }
         })
         .then(function(){
             return sequelize.transaction(function(t){
