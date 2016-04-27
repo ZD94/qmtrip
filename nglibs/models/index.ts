@@ -3,6 +3,8 @@
 import angular = require('angular');
 const API = require('api');
 
+import * as agencyApi from 'api/client/agency';
+
 class Staff {
     constructor(){
 
@@ -124,7 +126,7 @@ class Menu {
         return self.notie;
     }
 }
-angular.module('qm.model', [])
+angular.module('nglibs')
     .service('StaffCache', StaffCache)
     .service('PlaceCache', PlaceCache)
     .service('Menu', Menu);

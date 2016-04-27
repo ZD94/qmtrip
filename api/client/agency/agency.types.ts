@@ -51,7 +51,7 @@ export class AgencyUser {
     mobile: string; //电话
     avatar: string; //代理商头像
     agencyId: string; //公司ID
-    roleId: string; //权限ID
+    roleId: number; //权限ID
     createAt: Date; //创建时间
     
     constructor(params) {
@@ -63,7 +63,8 @@ export class AgencyUser {
         this.mobile = params.mobile ? params.mobile : null;
         this.avatar = params.avatar ? params.avatar : null;
         this.agencyId = params.agencyId ? params.agencyId : null;
-        this.roleId = params.roleId ? params.roleId : null;
+        // this.roleId = params.roleId ? params.roleId : null;
+        this.roleId = params.roleId;
         this.createAt = params.createAt ? params.createAt : utils.now();
     };
 }

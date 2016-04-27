@@ -34,10 +34,10 @@ function staff_isAuthCreditExist() {
     return false;
 }
 
+require('nglibs');
 var ngapp = require('ngapp');
-ngapp.depend('qm.model');
+ngapp.depend('nglibs');
 ngapp.root('staff', '/StaffFirst/StaffUser');
-ngapp.initializer(require('nglibs'));
 ngapp.useRoutePolicy(ngapp.RoutePolicy.Embed, ['auth']);
 var app = ngapp.create('qm.staff');
 

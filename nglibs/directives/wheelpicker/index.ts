@@ -2,14 +2,12 @@
 
 import angular = require('angular');
 
-export = function($module) {
-    //angular.module('tld.common', ['ngTouch'])
-    $module
-        .directive('tldWheelPicker', tldWheelPicker)
-        .directive('tldMultiWheelPicker', tldMultiWheelPicker);
+angular
+    .module('nglibs')
+    .directive('tldWheelPicker', tldWheelPicker)
+    .directive('tldMultiWheelPicker', tldMultiWheelPicker);
 
-    require('./citypicker')($module);
-}
+import './citypicker';
 
 function tldMultiWheelPicker(){
     require('./style.less');
