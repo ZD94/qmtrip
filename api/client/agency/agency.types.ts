@@ -62,7 +62,7 @@ export class AgencyUser {
         this.mobile = params.mobile ? params.mobile : null;
         this.avatar = params.avatar ? params.avatar : null;
         this.agencyId = params.agencyId ? params.agencyId : null;
-        this.roleId = params.roleId ? params.roleId : 1;
         this.createAt = params.createAt ? params.createAt : null;
+        this.roleId = params.roleId;
     };
 }

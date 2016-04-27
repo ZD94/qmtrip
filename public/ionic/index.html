@@ -14,13 +14,13 @@
         </ion-header-bar>
         <ion-content padding="false" class="side-menu-left has-header">
             <ion-list>
-                <ion-item class="item-thumbnail-left">
+                <ion-item class="item-thumbnail-left" ng-click="modal.show()">
                     <img src="img/iYtCcglyRGxYcYgvIvSS_1.jpg">
                     <h2>李小雨</h2>
                     <p>13810590928
                         <br>积分：2019</p>
                 </ion-item>
-                <div ng-repeat="menu in menus">
+                <div ng-repeat="menu in Menu.menus">
                     <a ng-href="#{{menu.link}}" menu-close="" style="text-align:left;" class="button button-light menu-button button-block icon ion-{{menu.icon}}" ng-if="menu.title != ''">
                         {{menu.title}}
                         <span class="badge badge-assertive" ng-if="menu.badgenum !='0'">{{menu.badgenum}}</span>
@@ -30,6 +30,7 @@
                 <div class="button-bar">
                     <button id="menu-button22" class="button button-light  button-block icon ion-android-notifications">
                         通知
+                        <span class="badge" style="color:red;font-size: 30px;" ng-if="Menu.notie == true">·</span>
                     </button>
                     <a href="#login/" menu-close="" id="menu-button24" class="button button-light  button-block icon ion-android-exit">
                         退出
@@ -38,4 +39,19 @@
             </ion-list>
         </ion-content>
     </ion-side-menu>
+    <script id="template/travelpolicy" type="text/ng-template">
+        <ion-modal-view>
+            <ion-header-bar class="bar bar-header bar-positive">
+                <h1 class="title">差旅标准</h1>
+            </ion-header-bar>
+            <ion-content class="padding">
+                交通:经济舱 最高九折
+                <br/>
+                住宿:三星级
+                <br/>
+                补助:一线城市:150/天
+                <button class="button button-full button-positive" ng-click="modal.hide()">确定</button>
+            </ion-content>
+        </ion-modal-view>
+    </script>
 </ion-side-menus>

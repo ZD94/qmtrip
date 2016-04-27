@@ -9,13 +9,13 @@ var Q = require("q");
 describe("api/client/travelPolicy.js", function() {
 
     var id = "";
-    //var agencyId = "";
+    var agencyId = "";
     var agencyUserId = "";
     var self = {};
     var agencySelf = {};
     var companyId = "";
     var accountId = "";
-    var obj = {
+    var obj= {
         name: "四级标准",
         planeLevel: "经济舱" ,
         planeDiscount: "7.5",
@@ -29,12 +29,12 @@ describe("api/client/travelPolicy.js", function() {
         userName: 'travelPolicyTest企业',
         domain: 'tulingdao.com',
         description: '企业API测试用',
-        email: 'travelPolicy.company.test@tulingdao.com',
+        email: 'tp.company.test@tulingdao.com',
         mobile: '15269866999'
     }
 
     var agency = {
-        email: "travelPolicy.agency.test@tulingdao.com",
+        email: "tp.agency.test@tulingdao.com",
         userName: "travelPolicyTest代理商",
         name: 'travelPolicyTest的代理商',
         mobile: "15269866777",
@@ -90,7 +90,7 @@ describe("api/client/travelPolicy.js", function() {
         API.client.travelPolicy.createTravelPolicy.call(self, obj, function(err, result) {
             assert.equal(err, null);
             id = result.id;
-            //console.log(result);
+            console.info("result=>",result);
             done();
         });
     })
@@ -124,7 +124,7 @@ describe("api/client/travelPolicy.js", function() {
         obj.id = id;
         API.client.travelPolicy.updateTravelPolicy.call(self, obj, function(err, result) {
             assert.equal(err, null);
-            //console.log(result);
+            console.info("updateResult=>", result);
             done();
         });
     })

@@ -2,20 +2,21 @@
  * Created by wlh on 15/12/12.
  */
 
+import {HotelBudget, TrafficBudget} from "./budget.types";
 /**
  * @module API
  */
 
-var API = require("common/api");
-var validate = require("common/validate");
-var Q = require("q");
-var L = require("common/language");
-var moment = require('moment');
+const API = require("common/api");
+const validate = require("common/validate");
+const Q = require("q");
+const L = require("common/language");
+const moment = require('moment');
 
-/**
- * @class travelBudget 旅行预算
- */
-var travelBudget = {};
+// /**
+//  * @class travelBudget 旅行预算
+//  */
+// var travelBudget = {};
 
 /**
  * @method getTravelPolicyBudget
@@ -35,7 +36,9 @@ var travelBudget = {};
  * @param {Boolean} [params.isRoundTrip] 是否往返 [如果为true,inboundDate必须存在]
  * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
  */
-travelBudget.getTravelPolicyBudget = function(params) {
+export function getTravelPolicyBudget(params: {originPlace: string, destinationPlace: string, outboundDate: string, inboundDate: string, 
+    inLatestArriveTime?: string, outLatestArriveTime?: string, checkInDate?: string, checkOutDate?: string, 
+    businessDistrict?: string, isRoundTrip: boolean}) :Promise<any> {
     var outboundDate = params.outboundDate; //离开时间
     var inboundDate = params.inboundDate;   //出发时间
     var isRoundTrip = params.isRoundTrip || false;  //是否往返
@@ -70,27 +73,27 @@ travelBudget.getTravelPolicyBudget = function(params) {
     if (!checkOutDate) {
         checkOutDate = inboundDate;
     }
-    return travelBudget.getHotelBudget.call(self, {
-        cityId: destinationPlace,
-        businessDistrict: businessDistrict,
-        checkInDate: checkInDate,
-        checkOutDate: checkOutDate
-    })
-        .then(function(hotel) {
-            return travelBudget.getTrafficBudget.call(self, {
-                originPlace: originPlace,
-                destinationPlace: destinationPlace,
-                outboundDate: outboundDate,
-                inboundDate: inboundDate,
-                outLatestArriveTime: outLatestArriveTime,
-                inLatestArriveTime: inLatestArriveTime,
-                isRoundTrip: isRoundTrip
-            })
-            .then(function(traffic) {
-                return {hotel: hotel.price, traffic: traffic.price, goTraffic: traffic.goTraffic, backTraffic: traffic.backTraffic};
-            })
+    return getHotelBudget.call(self, {
+            cityId: destinationPlace,
+            businessDistrict: businessDistrict,
+            checkInDate: checkInDate,
+            checkOutDate: checkOutDate
         })
-        .then(function(result) {
+        .then(function(hotel) {
+            return getTrafficBudget.call(self, {
+                    originPlace: originPlace,
+                    destinationPlace: destinationPlace,
+                    outboundDate: outboundDate,
+                    inboundDate: inboundDate,
+                    outLatestArriveTime: outLatestArriveTime,
+                    inLatestArriveTime: inLatestArriveTime,
+                    isRoundTrip: isRoundTrip
+                })
+                .then(function(traffic) {
+                    return {hotel: hotel.price, traffic: traffic.price, goTraffic: traffic.goTraffic, backTraffic: traffic.backTraffic};
+                })
+        })
+        .then(function(result:any) {
             var price = -1;
             if (result.hotel > 0 && result.traffic > 0) {
                 price = Number(result.hotel) + Number(result.traffic);
@@ -114,10 +117,8 @@ travelBudget.getTravelPolicyBudget = function(params) {
  * @param {String} params.checkOutDate 离开时间
  * @return {Promise} {prize: 1000, hotel: "酒店名称"}
  */
-travelBudget.getHotelBudget = function(params) {
-    if (!params || !(typeof params == 'object')) {
-        params = {};
-    }
+export function getHotelBudget(params: {accountId: string, cityId: string, businessDistrict: string,
+    checkInDate: string, checkOutDate: string}) :Promise<HotelBudget> {
     var self = this;
     var cityId = params.cityId;
     var accountId = self.accountId;
@@ -199,9 +200,12 @@ travelBudget.getHotelBudget = function(params) {
             }
             return result;
         })
+        .then(function(result) {
+            return new HotelBudget({price: result.price, bookUrl: result.bookListUrl});
+        })
 }
 
-travelBudget.getBookUrl = function(params) {
+export function getBookUrl(params: {spval: string, epval:string, st: string, et: string}) :Promise<string> {
     var spval = params.spval,
         epval = params.epval,
         st = params.st,
@@ -211,9 +215,9 @@ travelBudget.getBookUrl = function(params) {
         throw {code:-1, msg:"出发时间不能为空"};
     }
     return Q.all([
-        API.place.getCityInfo({cityCode: spval}),
-        API.place.getCityInfo({cityCode: epval})
-    ])
+            API.place.getCityInfo({cityCode: spval}),
+            API.place.getCityInfo({cityCode: epval})
+        ])
         .spread(function(startPlace, endPlace){
             var scode = "",
                 ecode = "";
@@ -230,7 +234,6 @@ travelBudget.getBookUrl = function(params) {
             }
             return url;
         })
-
 }
 
 /**
@@ -248,7 +251,8 @@ travelBudget.getBookUrl = function(params) {
  * @param params.hotelEt 住宿结束时间
  * @returns {*}
  */
-travelBudget.getBookListUrl = function(params) {
+export function getBookListUrl(params: {spval: string, epval: string, st: string, hotelCity: string,
+    hotelAddress: string, type: string, from: string, hotelSt: string, hotelEt: string}) :Promise<string> {
     var spval = params.spval,
         epval = params.epval,
         st = params.st,
@@ -298,34 +302,33 @@ travelBudget.getBookListUrl = function(params) {
             })
     }else if(type == "train"){
         url = "https://kyfw.12306.cn/otn/leftTicket/init";
-        return url;
+        return Promise.resolve(url);
     }else if(type == "hotel"){
         if(!hotelCity || hotelCity == "" ){
             throw {code:-1, msg:"目的地不能为空"};
         }
         return API.place.getCityInfo({cityCode: hotelCity})
-        .then(function(result){
-            if(result){
-                hotelSt = moment(hotelSt).format('YYYY-MM-DD');
-                hotelEt = moment(hotelEt).format('YYYY-MM-DD');
-                if(from == "computer"){
-                    if(!hotelAddress || hotelAddress == "" ){
-                        url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/";
+            .then(function(result){
+                if(result){
+                    hotelSt = moment(hotelSt).format('YYYY-MM-DD');
+                    hotelEt = moment(hotelEt).format('YYYY-MM-DD');
+                    if(from == "computer"){
+                        if(!hotelAddress || hotelAddress == "" ){
+                            url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/";
+                        }else{
+                            url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/key_"+hotelAddress;
+                        }
                     }else{
-                        url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/key_"+hotelAddress;
+                        url = "http://m.tianxun.com/hotel/domestic/"+result.pinyin+"/?hotelDate1="+hotelSt+"&hotelDate2="+hotelEt;
                     }
                 }else{
-                    url = "http://m.tianxun.com/hotel/domestic/"+result.pinyin+"/?hotelDate1="+hotelSt+"&hotelDate2="+hotelEt;
+                    url = "http://hotel.tianxun.com/?_ga=1.18929464.1095670645.1456827902";
                 }
-            }else{
-                url = "http://hotel.tianxun.com/?_ga=1.18929464.1095670645.1456827902";
-            }
-            return url;
-        })
-
+                return url;
+            })
     }
-
 }
+
 
 /**
  * @method getTrafficBudget
@@ -340,7 +343,8 @@ travelBudget.getBookListUrl = function(params) {
  * @param {Boolean} params.isRoundTrip 是否往返 [如果为true,inboundDate必须存在]
  * @return {Promise} {price: "1000"}
  */
-travelBudget.getTrafficBudget = function(params) {
+export function getTrafficBudget(params: {originPlace: string, destinationPlace: string, outboundDate: string,
+    inboundDate: string, outLatestArriveTime: string, inLatestArriveTime: string, isRoundTrip: boolean}) : Promise<any> {
     var self = this;
     var accountId = self.accountId;
 
@@ -349,11 +353,11 @@ travelBudget.getTrafficBudget = function(params) {
     }
 
     if (!params.destinationPlace) {
-        throw new Error({code: -1, msg: "目的地城市信息不存在"});
+        throw new Error(JSON.stringify({code: -1, msg: "目的地城市信息不存在"}));
     }
 
     if (!params.originPlace) {
-        throw new Error({code: -1, msg: "出发城市信息不存在"});
+        throw new Error(JSON.stringify({code: -1, msg: "出发城市信息不存在"}));
     }
 
     if (!params.outboundDate) {
@@ -493,5 +497,3 @@ function _getDefaultPrice(hotelStar) {
     }
     return price;
 }
-
-module.exports = travelBudget;

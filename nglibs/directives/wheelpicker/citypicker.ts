@@ -1,12 +1,14 @@
-"use strict";
 
+import angular = require('angular');
+import {IDirective} from 'angular';
 
-export = function($module){
-    $module
-        .directive('tldCityPicker', tldCityPicker);
-}
+angular
+    .module('nglibs')
+    .directive('tldCityPicker', tldCityPicker)
+    .directive('ngCitypicker', ngCityPicker)
+;
 
-function tldCityPicker(){
+function tldCityPicker(): IDirective {
     var rawCitiesData = require('./citiesdata.json');
     var emptyCitis = [];
     return {
@@ -62,3 +64,40 @@ function tldCityPicker(){
         }
     };
 }
+
+function ngCityPicker(): IDirective{
+    return {
+        restrict: 'A',
+        template: require('./citytemplate.html'),
+        replace: true,
+        scope: {
+            ngModel: "="
+        },
+        controller: function($scope, $element, $transclude) {
+            var back = $element.find(".city_style_black_back");
+            var city = $element.find(".city_style");
+            var choose = $element.find("#city-picker");
+            console.info($scope);
+            //$scope.choose_city = ;
+            $scope.show_city = function() {
+                choose.attr('value',$scope.ngModel[0] + ' ' + $scope.ngModel[1] + ' ' + $scope.ngModel[2]);
+                console.info($scope.ngModel);
+                //choose.attr('value',ngModel);
+                back.show();
+                city.show();
+                console.info($scope.ngModel);
+            }
+            $scope.cancel_city = function() {
+                back.hide();
+                city.hide();
+            }
+            $scope.sure_city = function() {
+                back.hide();
+                city.hide();
+                $scope.choose_city = $scope.ngModel[0] + ' ' + $scope.ngModel[1] + ' ' + $scope.ngModel[2];
+                console.info('click sure====', $scope.ngModel);
+            }
+        }
+    }
+}
+
