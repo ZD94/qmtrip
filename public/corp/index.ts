@@ -1,7 +1,4 @@
 
-
-var ngapp = require('ngapp');
-
 var browserspec = require('browserspec');
 browserspec.enum_wechat();
 
@@ -44,9 +41,10 @@ function corp_logout(){
     });
 };
 
-ngapp.depend('qm.model');
+require('nglibs');
+var ngapp = require('ngapp');
+ngapp.depend('nglibs');
 ngapp.root('corp', '/UsersFirst/UserMain');
-ngapp.initializer(require('nglibs'));
 var app = ngapp.create('qm.corp');
 
 //获取页面基本信息

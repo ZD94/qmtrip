@@ -22,11 +22,11 @@ API.authenticate = function(remote, callback){
             callback);
 };
 
+require('nglibs');
 var ngapp = require('ngapp');
-ngapp.depend('qm.common');
-ngapp.depend('qm.model');
+ngapp.depend('ionic');
+ngapp.depend('nglibs');
 ngapp.root('ionic', '/trip/create');
-ngapp.initializer(require('nglibs'));
 ngapp.useRoutePolicy(ngapp.RoutePolicy.None);
 ngapp.routeAddSingle('login');
 ngapp.routePushEmbed('');
