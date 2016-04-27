@@ -10,7 +10,6 @@ const uuid = require('node-uuid');
 const API = require('common/api');
 
 
-// class Auth implements IAuthService {
 export function activeByEmail(params:{sign:string; accountId:string; timestamp:string}):Promise<boolean>{
     return API.auth.activeByEmail(params)
         .then(function(result) {
