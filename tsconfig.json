@@ -3,11 +3,23 @@
     "target": "ES6",
     "module": "commonjs",
     "outDir": "tmp/tsreq",
+    "noEmitHelpers": true,
     "sourceMap": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "noImplicitUseStrict": false,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": ["*", "*/index", "common/client/*", "common/client/*/index"]
+    }
+  },
+  "compilerOptionsNotUsing": {
+    "emitDecoratorMetadata": true
   },
   "exclude": [
-    "node_modules",
+    "node_modules"
+  ],
+  "excludeNotUsing": [
     "public"
   ]
 }
