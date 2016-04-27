@@ -35,10 +35,11 @@ function admin_logout(){
     });
 };
 
+require('nglibs');
+
 var ngapp = require('ngapp');
-ngapp.depend('qmmodel');
+ngapp.depend('nglibs');
 ngapp.root('admin', '/main/index');
-ngapp.initializer(require('nglibs'));
 var app = ngapp.create('qm.admin');
 
 //获取页面基本信息

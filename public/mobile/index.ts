@@ -29,11 +29,11 @@ function mobile_TLDAlert(msg) {
     notie.alert(3, msg, 2);
 }
 
+require('nglibs');
 var ngapp = require('ngapp');
-ngapp.depend('qm.common');
-ngapp.depend('qm.model');
+ngapp.depend('ionic');
+ngapp.depend('nglibs');
 ngapp.root('mobile', '/usercenter/index');
-ngapp.initializer(require('nglibs'));
 ngapp.useRoutePolicy(ngapp.RoutePolicy.None);
 ngapp.routePushEmbed('tab');
 ngapp.routeNamedEmbed('tab-dash');

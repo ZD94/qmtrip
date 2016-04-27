@@ -17,10 +17,10 @@ function exfunc_TLDAlert(msg) {
     notie.alert(3, msg, 2);
 }
 
+require('nglibs');
 var ngapp = require('ngapp');
-ngapp.depend('qmmodel');
+ngapp.depend('nglibs');
 ngapp.root('extendfunction', '/feedback');
-ngapp.initializer(require('nglibs'));
 var app = ngapp.create('tulingdao.com');
 
 //获取页面基本信息

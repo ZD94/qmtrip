@@ -1,9 +1,11 @@
 "use strict";
 
-require('./select.less');
+import angular = require('angular');
 
-module.exports = function ($module){
-    $module.directive('ngSelect',function(){
+angular
+    .module('nglibs')
+    .directive('ngSelect',function(){
+        require('./select.less');
         return {
             priority: 1001,
             restrict: 'A',
@@ -53,5 +55,5 @@ module.exports = function ($module){
             }
         }
     });
-};
+
 

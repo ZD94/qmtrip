@@ -1,6 +1,6 @@
 "use strict";
 
-export function IndexController($scope,Menu){
+export function IndexController($scope,Menu,$ionicModal){
     var items =[
         {
             icon:'plane',
@@ -35,5 +35,11 @@ export function IndexController($scope,Menu){
         Menu.add(items[i]);
     }
     console.info(Menu);
-    $scope.menus = Menu.menus;
+    $ionicModal.fromTemplateUrl('template/travelpolicy', {
+        scope: $scope
+    }).then(function(modal){
+        console.info(modal);
+        $scope.modal = modal;
+    })
+    $scope.Menu = Menu;
 }

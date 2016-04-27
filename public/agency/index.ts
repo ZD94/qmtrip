@@ -22,10 +22,11 @@ function agency_TLDAlert(msg) {
     notie.alert(3, msg, 2);
 }
 
+require('nglibs');
+
 var ngapp = require('ngapp');
-ngapp.depend('qm.model');
+ngapp.depend('nglibs');
 ngapp.root('agency', '/companyList/CompanyList');
-ngapp.initializer(require('nglibs'));
 ngapp.useRoutePolicy(ngapp.RoutePolicy.Embed, ['login']);
 var app = ngapp.create('qm.agency');
 

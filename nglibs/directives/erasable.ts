@@ -1,11 +1,9 @@
-/**
- * Created by qp on 2016/3/28.
- */
-"use strict";
 
+import angular = require('angular');
 
-module.exports = function ($module){
-    $module.directive("erasable",function(){
+angular
+    .module('nglibs')
+    .directive("erasable",function(){
         return {
             priority: 1001,
             restrict: 'A',
@@ -38,4 +36,3 @@ module.exports = function ($module){
             }
         }
     });
-}

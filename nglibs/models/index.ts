@@ -3,6 +3,8 @@
 import angular = require('angular');
 const API = require('api');
 
+import * as agencyApi from 'api/client/agency';
+
 class Staff {
     constructor(){
 
@@ -70,7 +72,7 @@ class Menuitem {
 }
 class Menu {
     menus:Menuitem[] = [];
-    notie:boolean;
+    notie:boolean = false;
     get() :any {
         var self = this;
         return self.menus;
@@ -118,13 +120,13 @@ class Menu {
             }
         }
     }
-    newnotice(boolean:boolean) {
+    newnotice(istrue:boolean) {
         var self = this;
-        self.notie = boolean;
+        self.notie = istrue;
         return self.notie;
     }
 }
-angular.module('qm.model', [])
+angular.module('nglibs')
     .service('StaffCache', StaffCache)
     .service('PlaceCache', PlaceCache)
     .service('Menu', Menu);
