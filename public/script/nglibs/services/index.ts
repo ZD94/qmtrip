@@ -1,7 +1,10 @@
-"use strict";
+
+
+import './AirCompany';
+import './Airport';
+
 
 var dyload = require('dyload');
-
 function dyloadSerivce(src: string){
     return class {
         $resolve() : Promise<void> {
@@ -10,7 +13,5 @@ function dyloadSerivce(src: string){
     }
 }
 
-export = function($module) {
-    $module
-        .service('mobiscroll', dyloadSerivce('/script/mobiscroll.js'));
-}
+angular.module('nglibs')
+    .service('mobiscroll', dyloadSerivce('/script/mobiscroll.js'));

@@ -2,7 +2,7 @@
 import angular = require('angular');
 
 angular
-    .module('qm.common', [])
+    .module('nglibs')
     .filter('code2name', function (PlaceCache) {
         var codemap = new Map()
         var code2name:any = function(code, scope) {
