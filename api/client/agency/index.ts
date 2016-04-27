@@ -9,12 +9,7 @@ let Logger = require("common/logger");
 let logger = new Logger("client/agency");
 
 import _ = require('lodash');
-import * as TYPES from "./agency.types";
-import {validateApi} from '../../../common/api/helper';
-
-// let STATUS = TYPES.AGENCY_STATUS;
-// let Agency = TYPES.Agency;
-// let AgencyUser = TYPES.AgencyUser;
+import {validateApi} from 'common/api/helper';
 import {Agency, AgencyUser, AGENCY_STATUS} from "./agency.types";
 
 
@@ -57,6 +52,29 @@ export async function registerAgency(params: {name: string, email: string, mobil
     return API.agency.createAgency(_agency);
 
 }
+
+
+// validateApi(createAgency, ['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd', 'id']);
+// export async function createAgency(params: {name: string, email: string, mobile: string, userName: string, description?: string,
+//     remark?: string, pwd?: string}){
+//     console.info("client createAgency...");
+//     let email = params.email;
+//     let mobile = params.mobile;
+//     let password = params.pwd || "123456";
+//     let ACCOUNT_TYPE : number = 2; //账号类型，2为代理商账号
+//     let account = await API.auth.checkAccExist({type: ACCOUNT_TYPE, $or: [{mobile: mobile}, {email: email}]});
+//
+//     if(!account) {
+//         let _account : any = {email: email, mobile: mobile, pwd: password, type: ACCOUNT_TYPE};
+//         account = await API.auth.newAccount(_account);
+//     }
+//
+//     let _agency = new Agency(params);
+//     _agency.id = account.id;
+//     _agency['userName'] = params.userName;
+//
+//     return API.agency.createAgency(_agency);
+// }
 
 
 /**
@@ -119,10 +137,9 @@ export async function updateAgency(params){
 validateApi(deleteAgency, ['agencyId']);
 export function deleteAgency(params: {agencyId: string}){
     let self = this;
-    let _params : any = params;
-    _params.userId = self.accountId
+    params['userId'] = self.accountId;
 
-    return API.agency.deleteAgency(_params);
+    return API.agency.deleteAgency(params);
 }
 
 /**
@@ -138,7 +155,7 @@ export async function createAgencyUser(params: Agency) {
     let agencyUser = new AgencyUser(params);
     agencyUser.agencyId = user.agencyId;
 
-    return API.agency.createAgencyUser(agencyUser)
+    return API.agency.createAgencyUser(agencyUser);
 }
 
 /**
@@ -168,7 +185,7 @@ export async function getAgencyUser(params: {agencyUserId: string}){
  */
 export function getCurrentAgencyUser(){
     let self = this;
-    return API.agency.getAgencyUser({id: self.accountId})
+    return API.agency.getAgencyUser({id: self.accountId});
 }
 
 /**

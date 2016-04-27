@@ -1,7 +1,7 @@
 /**
  * Created by yumiao on 16-4-26.
  */
-'use strict'
+'use strict';
 import  utils = require('common/utils');
 
 export enum AGENCY_STATUS {
@@ -39,17 +39,17 @@ export class Agency{
         this.createAt = params.createAt ? params.createAt : utils.now();
         this.remark = params.remark ? params.remark : null;
         this.updateAt = params.updateAt ? params.updateAt : null;
-    }
+    };
 }
 
 export class AgencyUser {
     id: string;
     status: number;
-    name: string //代理商姓名
+    name: string; //代理商姓名
     sex: string; //性别
     email: string; //邮箱
     mobile: string; //电话
-    avatar: string //代理商头像
+    avatar: string; //代理商头像
     agencyId: string; //公司ID
     roleId: string; //权限ID
     createAt: Date; //创建时间
@@ -65,5 +65,5 @@ export class AgencyUser {
         this.agencyId = params.agencyId ? params.agencyId : null;
         this.roleId = params.roleId ? params.roleId : null;
         this.createAt = params.createAt ? params.createAt : utils.now();
-    }
+    };
 }
