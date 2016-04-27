@@ -15,7 +15,8 @@ gulplib.bundle_lib('browserify', {ex: true, ts: false, require:[
 gulplib.bundle_lib('ws', {ex: true, ts: false, require:['ws', 'crypto'], exclude:['bufferutil', 'utf-8-validate']});
 gulplib.bundle_lib('jquery', {ex: true, ts: false, require:['jquery', 'jquery-ui']});
 gulplib.bundle_lib('bootstrap', {ex: true, ts: false, require:["bootstrap"]});
-gulplib.bundle_lib('angular', {ex: true, ts: false, require: ['angular', './common/client/angular.js:angular_init']});
+gulplib.bundle_lib('angular', {ex: true, ts: false, require: ['angular', 'common/client/angular']});
+gulplib.bundle_lib('ionic', {ex: true, ts: false, require: ['./common/client/ionic/entry.js:ionic']});
 gulplib.bundle_lib('swiper', {ex: true, ts: false, require:['swiper']});
 gulplib.bundle_lib('img', {ex: true, ts: false, require: ['arale-qrcode', 'hidpi-canvas', 'exif-js', 'exif-orient']})
 gulplib.bundle_lib('base', {ex: true, ts: false, require:['q', 'bluebird', 'md5', 'moment', 'tiny-cookie', 'shoe', 'lodash']})

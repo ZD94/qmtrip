@@ -1,4 +1,6 @@
 
+require('ionic');
+
 var browserspec = require('browserspec');
 browserspec.enum_wechat();
 
