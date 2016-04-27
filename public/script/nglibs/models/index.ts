@@ -70,7 +70,7 @@ class Menuitem {
 }
 class Menu {
     menus:Menuitem[] = [];
-    notie:boolean;
+    notie:boolean = false;
     get() :any {
         var self = this;
         return self.menus;
@@ -118,9 +118,9 @@ class Menu {
             }
         }
     }
-    newnotice(boolean:boolean) {
+    newnotice(istrue:boolean) {
         var self = this;
-        self.notie = boolean;
+        self.notie = istrue;
         return self.notie;
     }
 }

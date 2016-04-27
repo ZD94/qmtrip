@@ -1,6 +1,6 @@
 
 var browserspec = require('browserspec');
-browserspec.enum_wechat();
+// browserspec.enum_wechat();
 
 var Cookie = require('tiny-cookie');
 var API = require('api');
