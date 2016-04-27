@@ -23,8 +23,8 @@ API.authenticate = function(remote, callback){
 };
 
 //统一弹出框样式
-window['TLDAlert'] = TLDAlert;
-function TLDAlert(msg) {
+window['TLDAlert'] = mobile_TLDAlert;
+function mobile_TLDAlert(msg) {
     var notie = require("notie");
     notie.alert(3, msg, 2);
 }

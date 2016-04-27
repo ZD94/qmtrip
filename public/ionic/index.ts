@@ -22,13 +22,6 @@ API.authenticate = function(remote, callback){
             callback);
 };
 
-//统一弹出框样式
-window['TLDAlert'] = TLDAlert;
-function TLDAlert(msg) {
-    var notie = require("notie");
-    notie.alert(3, msg, 2);
-}
-
 var ngapp = require('ngapp');
 ngapp.depend('qm.common');
 ngapp.depend('qm.model');

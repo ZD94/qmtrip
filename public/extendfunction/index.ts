@@ -11,8 +11,8 @@ API.authenticate = function(remote, callback){
 };
 
 //统一弹出框样式
-window['TLDAlert'] = TLDAlert;
-function TLDAlert(msg) {
+window['TLDAlert'] = exfunc_TLDAlert;
+function exfunc_TLDAlert(msg) {
     var notie = require("notie");
     notie.alert(3, msg, 2);
 }
@@ -24,7 +24,7 @@ ngapp.initializer(require('nglibs'));
 var app = ngapp.create('tulingdao.com');
 
 //获取页面基本信息
-app.controller("MainController", ["$scope", function($scope) {
+app.controller("MainController", ["$scope", 'msgbox', function($scope, msgbox) {
     API.require("company");
     API.require("staff");
     var companyId;
@@ -34,7 +34,7 @@ app.controller("MainController", ["$scope", function($scope) {
                 $scope.staff = ret;
             })
             .catch(function(err){
-                TLDAlert(err);
+                msgbox.alert(err);
             })
     })
 }])

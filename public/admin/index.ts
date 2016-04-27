@@ -16,14 +16,14 @@ API.authenticate = function(remote, callback){
 };
 
 //统一弹出框样式
-window['TLDAlert'] = TLDAlert;
-function TLDAlert(msg) {
+window['TLDAlert'] = admin_TLDAlert;
+function admin_TLDAlert(msg) {
     var notie = require("notie");
     notie.alert(3, msg, 2);
 }
 
-window['logout'] = logout;
-function logout(){
+window['logout'] = admin_logout;
+function admin_logout(){
     API.require('auth');
     API.onload(function(){
         API.auth.logout()

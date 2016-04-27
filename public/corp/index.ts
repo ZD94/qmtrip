@@ -22,15 +22,15 @@ API.authenticate = function(remote, callback){
 };
 
 //统一弹出框样式
-window['TLDAlert'] = TLDAlert;
-function TLDAlert(msg) {
+window['TLDAlert'] = corp_TLDAlert;
+function corp_TLDAlert(msg) {
     var notie = require("notie");
     notie.alert(3, msg, 2);
     console.error(msg);
 }
 
-window['logout'] = logout;
-function logout(){
+window['logout'] = corp_logout;
+function corp_logout(){
     API.require('auth');
     API.onload(function(){
         API.auth.logout()
@@ -50,7 +50,7 @@ ngapp.initializer(require('nglibs'));
 var app = ngapp.create('qm.corp');
 
 //获取页面基本信息
-app.controller("MainController", ["$scope", function($scope) {
+app.controller("MainController", ["$scope", 'msgbox', function($scope, msgbox) {
     API.require("company");
     API.require("staff");
     var companyId;
@@ -72,7 +72,7 @@ app.controller("MainController", ["$scope", function($scope) {
                     })
             })
             .catch(function(err){
-                TLDAlert(err);
+                msgbox.alert(err);
             })
     })
 }])
@@ -85,7 +85,7 @@ dyload('/script/selectbox.js');
 dyload('/script/header.js');
 dyload('/script/messagebox.js');
 
-function isAuthCreditExist() {
+function corp_isAuthCreditExist() {
     var user_id = Cookie.get('user_id');
     var token_id = Cookie.get('token_id');
     var token_sign = Cookie.get('token_sign');
@@ -96,7 +96,7 @@ function isAuthCreditExist() {
     }
     return false;
 }
-if (!isAuthCreditExist()) {
+if (!corp_isAuthCreditExist()) {
     window.location.href = "/staff.html#/auth/login?backurl="+window.location.href;
 }
 

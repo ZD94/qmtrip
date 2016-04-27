@@ -16,13 +16,13 @@ API.authenticate = function(remote, callback){
 };
 
 //统一弹出框样式
-window['TLDAlert'] = TLDAlert;
-function TLDAlert(msg) {
+window['TLDAlert'] = staff_TLDAlert;
+function staff_TLDAlert(msg) {
     var notie = require("notie");
     notie.alert(3, msg, 2);
 }
 
-function isAuthCreditExist() {
+function staff_isAuthCreditExist() {
     var user_id = Cookie.get('user_id');
     var token_id = Cookie.get('token_id');
     var token_sign = Cookie.get('token_sign');
