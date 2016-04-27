@@ -6,21 +6,22 @@ var sequelize = require("common/model").importModel("./models");
 var travalPolicyModel = sequelize.models.TravelPolicy;
 var Paginate = require("../../common/paginate").Paginate;
 var API = require("../../common/api");
-var travelPolicy = {};
+import {validateApi} from 'common/api/helper';
+import types = require("../client/travelPolicy/travelPolicy.types");
+
 
 /**
  * 创建差旅标准
  * @param data
  * @returns {*}
  */
-travelPolicy.createTravelPolicy = function(data){
+validateApi(createTravelPolicy, ["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"]);
+export function createTravelPolicy(data){
+    console.info("createData=>", data);
     if (!data.hotelPrice || !/^\d+(.\d{1,2})?$/.test(data.hotelPrice)) {
         data.hotelPrice = null;
     }
-    return checkParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"], data)
-        .then(function(){
-            return travalPolicyModel.findOne({where: {name: data.name, companyId: data.companyId}});
-        })
+    return travalPolicyModel.findOne({where: {name: data.name, companyId: data.companyId}})
         .then(function(result){
             if(result){
                 throw {msg: "该等级名称已存在，请重新设置"};
@@ -34,11 +35,9 @@ travelPolicy.createTravelPolicy = function(data){
  * @param params
  * @returns {*}
  */
-travelPolicy.deleteTravelPolicy = function(params){
+validateApi(deleteTravelPolicy, ["id"]);
+export function deleteTravelPolicy(params){
     var id = params.id;
-    if (!id) {
-        throw {code: -1, msg: "id不能为空"};
-    }
     return API.staff.findStaffs({travelLevel: id, status: 0})
         .then(function(staffs){
             if(staffs && staffs.length > 0){
@@ -51,7 +50,7 @@ travelPolicy.deleteTravelPolicy = function(params){
         });
 }
 
-travelPolicy.deleteTravelPolicyByTest = function(params){
+export function deleteTravelPolicyByTest(params){
     return travalPolicyModel.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
         .then(function(){
             return true;
@@ -64,13 +63,11 @@ travelPolicy.deleteTravelPolicyByTest = function(params){
  * @param data
  * @returns {*}
  */
-travelPolicy.updateTravelPolicy = function(data){
+validateApi(updateTravelPolicy, ["id"]);
+export function updateTravelPolicy(data){
     var id = data.id;
-    if(!id){
-        throw {code: -1, msg: "id不能为空"};
-    }
     delete data.id;
-    var options = {};
+    var options : any = {};
     options.where = {id: id};
     options.returning = true;
     if (!data.hotelPrice || !/^\d+(.\d{1,2})?$/.test(data.hotelPrice)) {
@@ -87,7 +84,8 @@ travelPolicy.updateTravelPolicy = function(data){
  * @param {Boolean} params.isReturnDefault 如果不存在返回默认 default true,
  * @returns {*}
  */
-travelPolicy.getTravelPolicy = function(params){
+validateApi(getTravelPolicy, ["id"]);
+export function getTravelPolicy(params){
     var id = params.id;
 
     var isReturnDefault = params.isReturnDefault;
@@ -111,7 +109,7 @@ travelPolicy.getTravelPolicy = function(params){
  * @param params
  * @returns {*}
  */
-travelPolicy.getAllTravelPolicy = function(options){
+export function getAllTravelPolicy(options){
     return travalPolicyModel.findAll(options);
 }
 
@@ -121,8 +119,8 @@ travelPolicy.getAllTravelPolicy = function(options){
  * @param params 查询条件 params.company_id 企业id
  * @param options options.perPage 每页条数 options.page当前页
  */
-travelPolicy.listAndPaginateTravelPolicy = function(params){
-    var options = {};
+export function listAndPaginateTravelPolicy(params){
+    var options: any = {};
     if(params.options){
         options = params.options;
         delete params.options;
@@ -151,17 +149,3 @@ travelPolicy.listAndPaginateTravelPolicy = function(params){
             return new Paginate(page, perPage, result.count, result.rows);
         });
 }
-
-function checkParams(checkArray, params){
-    return new Promise(function(resolve, reject){
-        ///检查参数是否存在
-        for(var key in checkArray){
-            var name = checkArray[key];
-            if(!params[name] && params[name] !== false && params[name] !== 0){
-                return reject({code:'-1', msg:'参数 params.' + name + ' 不能为空'});
-            }
-        }
-        resolve(true);
-    });
-}
-module.exports = travelPolicy;
