@@ -20,7 +20,7 @@ gulplib.bundle_lib('swiper', {ex: true, ts: false, require:['swiper']});
 gulplib.bundle_lib('img', {ex: true, ts: false, require: ['arale-qrcode', 'hidpi-canvas', 'exif-js', 'exif-orient']})
 gulplib.bundle_lib('base', {ex: true, ts: false, require:['q', 'bluebird', 'md5', 'moment', 'tiny-cookie', 'shoe', 'lodash']})
 
-gulplib.bundle_lib('preload', {ex: true, ts: false, require:['dyload', 'babel-polyfill']});
+gulplib.bundle_lib('preload', {ex: true, ts: false, require:['dyload', 'babel-polyfill', './common/ts_helper:typescript_helper']});
 
 gulplib.bundle_lib('api', {require:['./common/client/api.js:api']});
 gulplib.bundle_lib('calendar', {require:['lunar-calendar', "calendar"]});
