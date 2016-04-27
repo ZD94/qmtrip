@@ -25,7 +25,7 @@ gulplib.bundle_lib('preload', {ex: true, ts: false, require:['dyload', 'babel-po
 gulplib.bundle_lib('api', {require:['./common/client/api.js:api']});
 gulplib.bundle_lib('calendar', {require:['lunar-calendar', "calendar"]});
 gulplib.bundle_lib('msgbox', {require:['notie', 'msgbox']});
-gulplib.bundle_lib('nglibs', {require: ['public/script/nglibs:nglibs']});
+gulplib.bundle_lib('nglibs', {require: ['nglibs']});
 gulplib.bundle_lib('ngapp', {require: ['./common/client/ngapp/index.ts:ngapp', 'browserspec']});
 
 gulplib.angular_app('staff');
