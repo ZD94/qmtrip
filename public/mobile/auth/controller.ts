@@ -6,7 +6,7 @@ var msgbox = require('msgbox');
 API.require('auth');
 var Cookie = require('tiny-cookie');
 
-export function LoginController($scope,$routeParams) {
+export function LoginController($scope,$stateParams) {
     //待实现
     $scope.$root.pageTitle = '登录';
     $scope.form = {
@@ -28,7 +28,7 @@ export function LoginController($scope,$routeParams) {
         console.log($scope.focused);
     }
 
-    var backUrl = $routeParams.backurl || "#";
+    var backUrl = $stateParams.backurl || "#";
     $scope.check_login = async function() : Promise<any> {
         try {
             await API.onload();

@@ -202,9 +202,9 @@ var travelRecord=(function(){
      * @param $scope
      * @constructor
      */
-    travelRecord.TravelDetailController = function($scope, $routeParams, $location, $anchorScroll) {
+    travelRecord.TravelDetailController = function($scope, $stateParams, $location, $anchorScroll) {
         $("title").html("出差单明细");
-        var orderId = $routeParams.orderId;
+        var orderId = $stateParams.orderId;
         $scope.initTravelDetail = function () {
             API.onload(function() {
                 API.agencyTripPlan.getTripPlanOrderById({orderId: orderId})

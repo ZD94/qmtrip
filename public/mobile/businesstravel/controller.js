@@ -474,7 +474,7 @@ var businesstravel=(function(){
      * @param $scope
      * @constructor
      */
-    businesstravel.CreateresultController = function($scope , $routeParams) {
+    businesstravel.CreateresultController = function($scope , $stateParams) {
         $scope.$root.pageTitle = '动态预算结果';
         //遍历存储数据为undefined
         for (var i = 0, len = sessionStorage.length; i < len; i++) {

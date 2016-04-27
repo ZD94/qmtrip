@@ -19,7 +19,7 @@ var travelplan = (function () {
      * @param $scope
      * @constructor
      */
-    travelplan.PlanlistController = function ($scope, $routeParams, $loading) {
+    travelplan.PlanlistController = function ($scope, $stateParams, $loading) {
         $scope.$root.pageTitle = '出差记录';
         // @data 状态的列表。
         $scope.statuses = ["未完成", "待出预算", "待预订", "待上传票据", "票据审核中", "审核未通过", "已完成"];
@@ -47,7 +47,7 @@ var travelplan = (function () {
             "UN_FINISH": "未完成"
         }
 
-        var statue = $routeParams.status || 'UN_FINISH';
+        var statue = $stateParams.status || 'UN_FINISH';
         var display = STATUS_STORES[statue];
         if (!display) {
             statue = 'UN_FINISH';
@@ -55,7 +55,7 @@ var travelplan = (function () {
         }
 
         $scope.STATUS = display;
-        $routeParams.status = null;
+        $stateParams.status = null;
         var PARAMS = {page: 1};
         if (statue == 'WAIT') {
             PARAMS.isHasBudget = false;
@@ -269,7 +269,7 @@ var travelplan = (function () {
      * @param $scope
      * @constructor
      */
-    travelplan.PlandetailController = function ($scope, $routeParams, $loading, FileUploader) {
+    travelplan.PlandetailController = function ($scope, $stateParams, $loading, FileUploader) {
         //初始化上传图片
         $scope.$root.pageTitle = '详细出差记录';
         $scope.winWidth = $(window).width();
@@ -287,7 +287,7 @@ var travelplan = (function () {
                     TLDAlert(err.msg || err);
                     return;
                 }
-                $scope.getData($routeParams.orderId)
+                $scope.getData($stateParams.orderId)
                 msgbox.log("票据上传成功");
             });
         }
@@ -300,7 +300,7 @@ var travelplan = (function () {
                     TLDAlert(err.msg || err);
                     return;
                 }
-                $scope.getData($routeParams.orderId)
+                $scope.getData($stateParams.orderId)
                 msgbox.log("票据上传成功");
             });
         }
@@ -312,7 +312,7 @@ var travelplan = (function () {
                     TLDAlert(err.msg || err);
                     return;
                 }
-                $scope.getData($routeParams.orderId)
+                $scope.getData($stateParams.orderId)
                 msgbox.log("票据上传成功");
             });
         }
@@ -506,7 +506,7 @@ var travelplan = (function () {
                         API.onload(function () {
                             API.tripPlan.commitTripPlanOrder($scope.ITEM.id)
                                 .then(function (result) {
-                                    $scope.getData($routeParams.orderId);
+                                    $scope.getData($stateParams.orderId);
 
                                     //$scope.$apply();
 
@@ -525,7 +525,7 @@ var travelplan = (function () {
         // 此函数被用于初始化页面。
         function init() {
             $scope.$root.pageTitle = "详细出差记录";
-            $scope.getData($routeParams.orderId);
+            $scope.getData($stateParams.orderId);
         }
 
         //----------------------------------------------------------------
@@ -539,14 +539,14 @@ var travelplan = (function () {
      * @param $scope
      * @constructor
      */
-    travelplan.InvoicedetailController = function ($scope, $routeParams) {
+    travelplan.InvoicedetailController = function ($scope, $stateParams) {
 
         $scope.$root.pageTitle = '票据详情';
 
-        var planId = $routeParams.planId;
+        var planId = $stateParams.planId;
         $scope.planId = planId;
-        $scope.status = $routeParams.status;
-        $scope.invoiceId = $routeParams.invoiceId;
+        $scope.status = $stateParams.status;
+        $scope.invoiceId = $stateParams.invoiceId;
         API.require("attachment");
 
         $scope.goDetail = function () {

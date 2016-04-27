@@ -87,9 +87,9 @@ module.exports = (function(){
 			window.location.href = "#/companyList/CreateCorp";
 		}
 	}
-	companyList.CompanyDetailController = function($scope,$routeParams,$loading){
+	companyList.CompanyDetailController = function($scope,$stateParams,$loading){
 		$("title").html("公司详情");
-		var companyId = $routeParams.company;
+		var companyId = $stateParams.company;
 		$scope.companyId = companyId;
 		//企业管理详情页
 		$scope.initCompanyDetail = function(){
@@ -244,8 +244,8 @@ module.exports = (function(){
 	}
 
 	//员工管理页面
-	companyList.StaffListController = function($scope,$routeParams) {
-		var companyId = $routeParams.company;
+	companyList.StaffListController = function($scope,$stateParams) {
+		var companyId = $stateParams.company;
 		$scope.companyId = companyId;
 		$(".left_nav li").removeClass("on").eq(1).addClass("on");
 
@@ -693,10 +693,10 @@ module.exports = (function(){
 
 
 	//组织架构页面
-	companyList.DepartmentController = function($scope, $routeParams, $loading) {
+	companyList.DepartmentController = function($scope, $stateParams, $loading) {
 		$("title").html("组织架构");
 		//初始化
-		$scope.companyId = $routeParams.companyId;
+		$scope.companyId = $stateParams.companyId;
 		$scope.initdepartment = function(){
 			$loading.start();
 			API.onload(function(){
@@ -825,10 +825,10 @@ module.exports = (function(){
 	 * @param $scope
 	 * @constructor
 	 */
-	companyList.PolicyListController = function($scope, $routeParams, $loading) {
+	companyList.PolicyListController = function($scope, $stateParams, $loading) {
 		$("title").html("差旅标准");
 		Myselect();
-		$scope.companyId = $routeParams.companyId;
+		$scope.companyId = $stateParams.companyId;
 
 		//获取差旅标准列表
 		$scope.initPolicyList = function () {

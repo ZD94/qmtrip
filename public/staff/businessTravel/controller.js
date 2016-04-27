@@ -88,14 +88,14 @@ var businessTravel=(function(){
      * @param $scope
      * @constructor
      */
-    businessTravel.TrafficStepController = function($scope, $routeParams) {
+    businessTravel.TrafficStepController = function($scope, $stateParams) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
         $("title").html("我要出差");
         Myselect();
-        var purposename = $routeParams.purposename;
-        var tra = $routeParams.tra;
-        var liv = $routeParams.liv;
+        var purposename = $stateParams.purposename;
+        var tra = $stateParams.tra;
+        var liv = $stateParams.liv;
         //出发城市获取
         $scope.startplace = function () {
             API.onload(function() {
@@ -276,14 +276,14 @@ var businessTravel=(function(){
      * @param $scope
      * @constructor
      */
-    businessTravel.LiveStepController = function($scope, $routeParams) {
+    businessTravel.LiveStepController = function($scope, $stateParams) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
         $("title").html("我要出差");
         Myselect();
-        var purposename = $routeParams.purposename;
-        var tra = $routeParams.tra;
-        var liv = $routeParams.liv;
+        var purposename = $stateParams.purposename;
+        var tra = $stateParams.tra;
+        var liv = $stateParams.liv;
         //目的地城市获取
         $scope.endplace = function () {
             API.onload(function() {
@@ -421,14 +421,14 @@ var businessTravel=(function(){
      * @param $scope
      * @constructor
      */
-    businessTravel.TrafficLiveController = function($scope, $routeParams) {
+    businessTravel.TrafficLiveController = function($scope, $stateParams) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
         $("title").html("我要出差");
         Myselect();
-        var purposename = $routeParams.purposename;
-        var tra = $routeParams.tra;
-        var liv = $routeParams.liv;
+        var purposename = $stateParams.purposename;
+        var tra = $stateParams.tra;
+        var liv = $stateParams.liv;
         //出发城市获取
         $scope.startplace = function () {
             API.onload(function() {
@@ -692,42 +692,42 @@ var businessTravel=(function(){
      * @param $scope
      * @constructor
      */
-    businessTravel.CreateResultController = function($scope, $routeParams, $filter) {
-        var spval = $routeParams.spval,
-            epval = $routeParams.epval,
-            st = $routeParams.st,
-            et = $routeParams.et;
+    businessTravel.CreateResultController = function($scope, $stateParams, $filter) {
+        var spval = $stateParams.spval,
+            epval = $stateParams.epval,
+            st = $stateParams.st,
+            et = $stateParams.et;
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
         $("title").html("我要出差");
-        var tra = $routeParams.tra;
-        var liv = $routeParams.liv;
-        $scope.purposename = $routeParams.purposename;//出差目的
-        $scope.tra = $routeParams.tra;//是否交通
-        $scope.liv = $routeParams.liv;//是否住宿
+        var tra = $stateParams.tra;
+        var liv = $stateParams.liv;
+        $scope.purposename = $stateParams.purposename;//出差目的
+        $scope.tra = $stateParams.tra;//是否交通
+        $scope.liv = $stateParams.liv;//是否住宿
         $scope.nowtime = new Date();
         //只选交通
         if (tra==1&&liv==0) {
-            $scope.startplace = $routeParams.sp;//出发城市
-            //$scope.startplaceval = $routeParams.spval;//出发城市代码
-            if ($routeParams.spval=="") {
-                $scope.startplaceval = $routeParams.sp;
+            $scope.startplace = $stateParams.sp;//出发城市
+            //$scope.startplaceval = $stateParams.spval;//出发城市代码
+            if ($stateParams.spval=="") {
+                $scope.startplaceval = $stateParams.sp;
             }
-            else if ($routeParams.spval!="") {
-                $scope.startplaceval = $routeParams.spval;
+            else if ($stateParams.spval!="") {
+                $scope.startplaceval = $stateParams.spval;
             }
-            $scope.endplace = $routeParams.ep;//目的地城市
-            //$scope.endplaceval = $routeParams.epval;//目的地城市代码
-            if ($routeParams.epval=="") {
-                $scope.endplaceval = $routeParams.ep;
+            $scope.endplace = $stateParams.ep;//目的地城市
+            //$scope.endplaceval = $stateParams.epval;//目的地城市代码
+            if ($stateParams.epval=="") {
+                $scope.endplaceval = $stateParams.ep;
             }
-            else if ($routeParams.epval!="") {
-                $scope.endplaceval = $routeParams.epval;
+            else if ($stateParams.epval!="") {
+                $scope.endplaceval = $stateParams.epval;
             }
-            $scope.starttime = $routeParams.st;//出发日期
-            $scope.starttimelate = $routeParams.stl;//出发最晚到达时间
-            $scope.endtime = $routeParams.et;//返回日期
-            $scope.endtimelate = $routeParams.etl;//返回最晚到达时间
+            $scope.starttime = $stateParams.st;//出发日期
+            $scope.starttimelate = $stateParams.stl;//出发最晚到达时间
+            $scope.endtime = $stateParams.et;//返回日期
+            $scope.endtimelate = $stateParams.etl;//返回最晚到达时间
             API.onload(function() {
                 Promise.all([
                     API.staff.getCurrentStaff(),
@@ -769,12 +769,12 @@ var businessTravel=(function(){
         }
         //只选住宿
         if (tra==0&&liv==1) {
-            $scope.endplace = $routeParams.ep;//目的地城市
-            $scope.endplaceval = $routeParams.epval;//目的地城市代码
-            $scope.liveplace = $routeParams.lp;//住宿位置
-            $scope.livetime = $routeParams.livet;//入住时间
-            $scope.leavetime = $routeParams.leavet;//离店时间
-            $scope.businessDistrict = $routeParams.lpval;   //商圈
+            $scope.endplace = $stateParams.ep;//目的地城市
+            $scope.endplaceval = $stateParams.epval;//目的地城市代码
+            $scope.liveplace = $stateParams.lp;//住宿位置
+            $scope.livetime = $stateParams.livet;//入住时间
+            $scope.leavetime = $stateParams.leavet;//离店时间
+            $scope.businessDistrict = $stateParams.lpval;   //商圈
             API.onload(function() {
                 Promise.all([
                     API.staff.getCurrentStaff(),
@@ -804,30 +804,30 @@ var businessTravel=(function(){
         }
         //交通+住宿
         if (tra==1&&liv==1) {
-            $scope.startplace = $routeParams.sp;//出发城市
-            //$scope.startplaceval = $routeParams.spval;//出发城市代码
-            if ($routeParams.spval=="") {
-                $scope.startplaceval = $routeParams.sp;
+            $scope.startplace = $stateParams.sp;//出发城市
+            //$scope.startplaceval = $stateParams.spval;//出发城市代码
+            if ($stateParams.spval=="") {
+                $scope.startplaceval = $stateParams.sp;
             }
-            else if ($routeParams.spval!="") {
-                $scope.startplaceval = $routeParams.spval;
+            else if ($stateParams.spval!="") {
+                $scope.startplaceval = $stateParams.spval;
             }
-            $scope.endplace = $routeParams.ep;//目的地城市
-            //$scope.endplaceval = $routeParams.epval;//目的地城市代码
-            if ($routeParams.epval=="") {
-                $scope.endplaceval = $routeParams.ep;
+            $scope.endplace = $stateParams.ep;//目的地城市
+            //$scope.endplaceval = $stateParams.epval;//目的地城市代码
+            if ($stateParams.epval=="") {
+                $scope.endplaceval = $stateParams.ep;
             }
-            else if ($routeParams.epval!="") {
-                $scope.endplaceval = $routeParams.epval;
+            else if ($stateParams.epval!="") {
+                $scope.endplaceval = $stateParams.epval;
             }
-            $scope.starttime = $routeParams.st;//出发日期
-            $scope.starttimelate = $routeParams.stl;//出发最晚到达时间
-            $scope.endtime = $routeParams.et;//返回日期
-            $scope.endtimelate = $routeParams.etl;//返回最晚到达时间
-            $scope.liveplace = $routeParams.lp;//住宿位置
-            $scope.livetime = $routeParams.livet;//入住时间
-            $scope.leavetime = $routeParams.leavet;//离店时间
-            $scope.businessDistrict = $routeParams.lpval;   //商圈
+            $scope.starttime = $stateParams.st;//出发日期
+            $scope.starttimelate = $stateParams.stl;//出发最晚到达时间
+            $scope.endtime = $stateParams.et;//返回日期
+            $scope.endtimelate = $stateParams.etl;//返回最晚到达时间
+            $scope.liveplace = $stateParams.lp;//住宿位置
+            $scope.livetime = $stateParams.livet;//入住时间
+            $scope.leavetime = $stateParams.leavet;//离店时间
+            $scope.businessDistrict = $stateParams.lpval;   //商圈
             API.onload(function() {
                 Promise.all([
                     API.staff.getCurrentStaff(),

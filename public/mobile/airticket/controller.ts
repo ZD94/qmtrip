@@ -81,16 +81,16 @@ var airlineCodes = {
  机票列表页
  * @param $scope
  */
-export async function FlightlistController($scope, $routeParams, $filter, $loading){
+export async function FlightlistController($scope, $stateParams, $filter, $loading){
 
     $loading.start();
 
-    var budget = $routeParams.BG;
-    var startCityName = $routeParams.SCN;
-    var endCityName = $routeParams.ECN;
-    var startCityCode = $routeParams.SCC;
-    var endCityCode = $routeParams.ECC;
-    var startDate = $routeParams.ST;
+    var budget = $stateParams.BG;
+    var startCityName = $stateParams.SCN;
+    var endCityName = $stateParams.ECN;
+    var startCityCode = $stateParams.SCC;
+    var endCityCode = $stateParams.ECC;
+    var startDate = $stateParams.ST;
 
     $scope.airlineCodes = airlineCodes;
     $scope.budget = parseInt(budget).toFixed(2);
@@ -236,13 +236,13 @@ export async function FlightlistController($scope, $routeParams, $filter, $loadi
  机票详情页
  * @param $scope
  */
-export async function FlightdetailsController($scope, $routeParams){
+export async function FlightdetailsController($scope, $stateParams){
 
-    var budget = $routeParams.BG;
-    var startCityName = $routeParams.SCN;
-    var endCityName = $routeParams.ECN;
-    var flight_no = $routeParams.flight_no;
-    var query_key = $routeParams.query_key;
+    var budget = $stateParams.BG;
+    var startCityName = $stateParams.SCN;
+    var endCityName = $stateParams.ECN;
+    var flight_no = $stateParams.flight_no;
+    var query_key = $stateParams.query_key;
 
     $scope.budget = parseInt(budget).toFixed(2);
     $scope.startCityName = startCityName;

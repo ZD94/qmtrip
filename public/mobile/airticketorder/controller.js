@@ -23,7 +23,7 @@ module.exports = (function () {
      * @constructor
      */
 
-    exported.OrderDetailsController = function ( $scope,$routeParams,$loading/*,AirPort,AirCompany*/ ) {
+    exported.OrderDetailsController = function ( $scope,$stateParams,$loading/*,AirPort,AirCompany*/ ) {
 
         $loading.end();
 
@@ -153,7 +153,7 @@ module.exports = (function () {
 
     }
 
-    exported.InfoEditingController = function ($scope, $routeParams, mobiscroll) {
+    exported.InfoEditingController = function ($scope, $stateParams, mobiscroll) {
         // @data
         $scope.user;
         // @state

@@ -6,7 +6,7 @@ var auth=(function(){
     var  auth = {};
     var Cookie = require('tiny-cookie');
     //登录页面
-    auth.LoginController = function ($scope, $routeParams) {
+    auth.LoginController = function ($scope, $stateParams) {
         var mail = Cookie.get("email");
         var pwd = Cookie.get("pwd");
         $scope.email = mail;
@@ -17,7 +17,7 @@ var auth=(function(){
         $scope.toForget = function(){
             window.location.href = "#/auth/forgetpwd";
         }
-        var backUrl = $routeParams.backurl || "#";
+        var backUrl = $stateParams.backurl || "#";
         $scope.sendActiveMail = function(){
             var mail = $('#name').val();
             API.onload(function(){
@@ -464,8 +464,8 @@ var auth=(function(){
     }
 
     //公司注册最后一步注册完成页面
-    auth.CorplaststepController = function ($scope,$routeParams) {
-        $scope.userMail = $routeParams.email;
+    auth.CorplaststepController = function ($scope,$stateParams) {
+        $scope.userMail = $stateParams.email;
 
         $scope.sendAgainActiveMail = function(){
             API.onload(function(){
@@ -480,8 +480,8 @@ var auth=(function(){
     }
 
     //忘记密码页
-    auth.ForgetpwdController = function($scope,$routeParams) {
-        var accountId = $routeParams.accountId;
+    auth.ForgetpwdController = function($scope,$stateParams) {
+        var accountId = $stateParams.accountId;
         $scope.toRegister = function () {
             window.location.href = "#/auth/register";
         }
@@ -601,10 +601,10 @@ var auth=(function(){
     }
 
     //激活页面
-    auth.ActiveController = function($scope, $routeParams) {
-        var sign = $routeParams.sign;
-        var accountId = $routeParams.accountId;
-        var timestamp = $routeParams.timestamp;
+    auth.ActiveController = function($scope, $stateParams) {
+        var sign = $stateParams.sign;
+        var accountId = $stateParams.accountId;
+        var timestamp = $stateParams.timestamp;
 
         $scope.toLogin = function() {
             window.location.href = "#/auth/login";
@@ -662,11 +662,11 @@ var auth=(function(){
     }
 
     //员工重新设置密码页
-    auth.ResetPwdController = function($scope, $routeParams){
-        var accountId = $routeParams.accountId;
-        var sign = $routeParams.sign;
-        var timestamp = $routeParams.timestamp;
-        var email = $routeParams.email;
+    auth.ResetPwdController = function($scope, $stateParams){
+        var accountId = $stateParams.accountId;
+        var sign = $stateParams.sign;
+        var timestamp = $stateParams.timestamp;
+        var email = $stateParams.email;
         //console.info(email);
         $scope.isValid = 'checking';
 
@@ -720,8 +720,8 @@ var auth=(function(){
     }
 
     //员工重新设置密码成功页
-    auth.ForgetpwdtipController = function($scope,$routeParams) {
-        var name = $routeParams.email;
+    auth.ForgetpwdtipController = function($scope,$stateParams) {
+        var name = $stateParams.email;
         //console.info(name);
         $scope.name = name;
 
@@ -735,10 +735,10 @@ var auth=(function(){
     }
 
     //员工设置密码页
-    auth.FirstSetPwdController = function($scope, $routeParams){
-        var accountId = $routeParams.accountId;
-        var sign = $routeParams.sign;
-        var timestamp = $routeParams.timestamp;
+    auth.FirstSetPwdController = function($scope, $stateParams){
+        var accountId = $stateParams.accountId;
+        var sign = $stateParams.sign;
+        var timestamp = $stateParams.timestamp;
         $scope.isValid = 'checking';
 
         API.onload(function() {

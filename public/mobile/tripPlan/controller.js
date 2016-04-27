@@ -8,7 +8,7 @@
  	API.require("wechat");
  	var tripPlan ={};
 
- 	tripPlan.UploadImgController = function($scope, $routeParams, FileUploader){
+ 	tripPlan.UploadImgController = function($scope, $stateParams, FileUploader){
         function isWeixin() {
             var reg  = /micromessenger/i;
             return reg.test(window.navigator.userAgent);
@@ -37,7 +37,7 @@
                     picture: picture
                 }, callback);
         }
- 		var planId = $routeParams.planId;
+ 		var planId = $stateParams.planId;
         $scope.initall = function() {
             API.onload(function(){
                 API.tripPlan.getTripPlanOrderById({orderId: planId})

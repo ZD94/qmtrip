@@ -222,11 +222,11 @@ var travelPlan=(function(){
      * @param $scope
      * @constructor
      */
-    travelPlan.PlanDetailController = function($scope, $routeParams, $loading) {
+    travelPlan.PlanDetailController = function($scope, $stateParams, $loading) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(1).find("li").addClass("on");
         $("title").html("出差单明细");
-        var planId = $routeParams.planId;
+        var planId = $stateParams.planId;
         $scope.initplandetail = function(){
             $loading.start();
             API.onload(function() {
@@ -478,12 +478,12 @@ var travelPlan=(function(){
      * @param $scope
      * @constructor
      */
-    travelPlan.InvoiceDetailController = function($scope, $routeParams) {
+    travelPlan.InvoiceDetailController = function($scope, $stateParams) {
         $("title").html("行程单明细");
-        var planId = $routeParams.planId;
+        var planId = $stateParams.planId;
         $scope.planId = planId;
-        $scope.status = $routeParams.status;
-        $scope.invoiceId = $routeParams.invoiceId;
+        $scope.status = $stateParams.status;
+        $scope.invoiceId = $stateParams.invoiceId;
         API.require("attachment");
         API.onload(function() {
             API.tripPlan.getTripPlanOrderById({orderId: planId})

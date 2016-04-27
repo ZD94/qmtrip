@@ -6,9 +6,9 @@ var login=(function(){
     var login = {};
     var Cookie = require('tiny-cookie');
 
-    login.LoginController = function ($scope, $routeParams) {
+    login.LoginController = function ($scope, $stateParams) {
 
-        var backUrl = $routeParams.backurl || "#";
+        var backUrl = $stateParams.backurl || "#";
         $scope.checkLogin = function() {
             var name = $('#agencyName').val();
             var pwd  = $('#agencyPwd').val();

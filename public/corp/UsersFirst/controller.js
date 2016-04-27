@@ -9,7 +9,7 @@ var UsersFirst = (function(){
 	API.require("tripPlan");
 	API.require("department");
 	var UsersFirst ={};
-	UsersFirst.UserMainController = function($scope, $routeParams){
+	UsersFirst.UserMainController = function($scope, $stateParams){
 		$("title").html("差旅管理首页");
 		$(".left_nav li").removeClass("on").eq(0).addClass("on");
 		$scope.funds={};

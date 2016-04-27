@@ -9,9 +9,9 @@
 //    API.require('staff');
 //    var corp = {};
 //
-//    corp.EditcorpController = function($scope,$routeParams) {
+//    corp.EditcorpController = function($scope,$stateParams) {
 //        //alert(222);
-//        var companyid = $routeParams.companyId;
+//        var companyid = $stateParams.companyId;
 //        API.onload(function(){
 //            API.company.getCompanyById(companyid)
 //                .then(function(corpInfo){

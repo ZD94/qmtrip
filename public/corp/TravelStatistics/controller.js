@@ -380,10 +380,10 @@ var TravelStatistics = (function(){
         }
     }
     // 出差记录详情页
-    TravelStatistics.PlanDetailController = function($scope,$routeParams, $location, $loading, $anchorScroll) {
+    TravelStatistics.PlanDetailController = function($scope,$stateParams, $location, $loading, $anchorScroll) {
         $("title").html("出差记录");
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
-        var planId = $routeParams.orderId;
+        var planId = $stateParams.orderId;
         $loading.start();
         API.onload(function(){
             API.tripPlan.getTripPlanOrderById({orderId: planId})
