@@ -1,6 +1,6 @@
 "use strict";
 
-export function IndexController($scope,Menu,$ionicModal){
+export function IndexController($scope,Menu,$ionicModal,$ionicPopup){
     var items =[
         {
             icon:'plane',
@@ -21,13 +21,13 @@ export function IndexController($scope,Menu,$ionicModal){
         {
             icon:'podium',
             title:'审批单',
-            link:'trip-approval/list',
+            link:'trip-approval/pending',
             badgenum: 5
         },
         {
             icon:'paintbrush',
             title:'待我审批',
-            link:'trip-approval/pending',
+            link:'trip-approval/list',
             badgenum: 3
         }
     ];
@@ -36,10 +36,22 @@ export function IndexController($scope,Menu,$ionicModal){
     }
     console.info(Menu);
     $ionicModal.fromTemplateUrl('template/travelpolicy', {
-        scope: $scope
+        scope: $scope,
+        animation:'slide-in-down'
     }).then(function(modal){
         console.info(modal);
         $scope.modal = modal;
     })
+    $scope.alertShow = function () {
+        var show = $ionicPopup.alert({
+            title: '差旅标准',
+            template: '交通:商务舱/特等座' +
+            '<br>' +
+            '住宿:三星级' +
+            '<br>' +
+            '补助:5000/天'
+        })
+    }
+
     $scope.Menu = Menu;
 }
