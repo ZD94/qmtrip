@@ -277,7 +277,7 @@ describe("api/client/staff.js", function() {
         });
 
         after(function (done) {
-            API.tripPlan.deleteTripPlanOrder({orderId: newOrderId, userId: ownerSelf.accountId})
+            API.tripPlan.deleteTripPlan({orderId: newOrderId, userId: ownerSelf.accountId})
                 .then(function(ret) {
                     assert.equal(ret, true);
                     done();

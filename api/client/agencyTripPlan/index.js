@@ -52,7 +52,7 @@ agencyTripPlan.getConsumeInvoiceImg = function(params) {
  * 代理商获取员工计划单分页列表
  * @returns {*}
  */
-agencyTripPlan.pageTripPlanOrder = function(params){
+agencyTripPlan.pageTripPlans = function(params){
     if(!params) {
         throw {code: -10, msg: '参数不能为空'};
     }

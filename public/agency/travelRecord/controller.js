@@ -25,7 +25,7 @@ var travelRecord=(function(){
             $(".left_nav li").removeClass("on").eq(0).addClass("on");
 
             API.onload(function () {
-                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page1, perPage:20, agencyAll: true})
+                API.agencyTripPlan.pageTripPlans({page:$scope.page1, perPage:20, agencyAll: true})
                     .then(function(result){
                         console.info (result);
                         $scope.total1 = result.total;
@@ -57,7 +57,7 @@ var travelRecord=(function(){
         $scope.initTravelList2 = function () {
             $loading.start();
             API.onload(function () {
-                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page2, perPage:20, isHasBudget: false})
+                API.agencyTripPlan.pageTripPlans({page:$scope.page2, perPage:20, isHasBudget: false})
                     .then(function(result){
                         console.info (result);
                         $scope.total2 = result.total;
@@ -89,7 +89,7 @@ var travelRecord=(function(){
         $scope.initTravelList3 = function () {
             $loading.start();
             API.onload(function () {
-                API.agencyTripPlan.pageTripPlanOrder({page:$scope.page3, perPage:20, audit: 'P'})
+                API.agencyTripPlan.pageTripPlans({page:$scope.page3, perPage:20, audit: 'P'})
                     .then(function(result){
                         console.info (result);
                         $scope.total3 = result.total;
