@@ -1,7 +1,7 @@
 "use strict";
 var Cookie = require('tiny-cookie');
 
-export function IndexController($scope,Menu,$ionicModal,$ionicPopup, StaffService){
+export async function IndexController($scope,Menu,$ionicModal,$ionicPopup, StaffService){
     var items =[
         {
             icon:'plane',

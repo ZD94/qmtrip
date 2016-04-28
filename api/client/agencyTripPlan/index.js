@@ -16,7 +16,7 @@ var agencyTripPlan = {};
  * 获取计划单详情
  * @param orderId
  */
-agencyTripPlan.getTripPlanOrderById = function(params){
+agencyTripPlan.getTripPlanById = function(params){
     var self = this;
     var params = {
         orderId: params.orderId,

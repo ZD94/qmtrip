@@ -15,7 +15,7 @@ describe("api/client/tripPlan.js", function() {
     var orderId = "";
 
     var agency = {
-        email: "tripPlan.test@tulingdao.com",
+        email: "tripPlan.test@jingli.tech",
         userName: "白菜帮九袋长老",
         name: '白菜帮',
         mobile: "15269866803",
@@ -23,11 +23,11 @@ describe("api/client/tripPlan.js", function() {
     };
 
     var company = {
-        email: "tripPlan.test@tulingdao.com",
+        email: "tripPlan.test@jingli.tech",
         userName: "白菜帮九袋长老",
         name: '白菜帮',
         mobile: "15269866803",
-        domain: 'tulingdao.com',
+        domain: 'jingli.tech',
         description: '计划单测试用企业'
     }
 
@@ -262,18 +262,18 @@ describe("api/client/tripPlan.js", function() {
         });
 
 
-        it("#getTripPlanOrderById should be error when param is not uuid", function (done) {
+        it("#getTripPlanById should be error when param is not uuid", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.getTripPlanOrderById.call(self, {orderId: "123456"}, function (err, ret) {
+            API.client.tripPlan.getTripPlanById.call(self, {orderId: "123456"}, function (err, ret) {
                 assert(err != null);
                 assert.equal(ret, null);
                 done();
             })
         });
 
-        it("#getTripPlanOrderById should be ok", function (done) {
+        it("#getTripPlanById should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.getTripPlanOrderById.call(self, {orderId: newOrderId}, function (err, ret) {
+            API.client.tripPlan.getTripPlanById.call(self, {orderId: newOrderId}, function (err, ret) {
                 if (err) {
                     throw err;
                 }

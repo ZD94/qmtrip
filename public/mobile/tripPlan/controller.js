@@ -40,7 +40,7 @@
  		var planId = $stateParams.planId;
         $scope.initall = function() {
             API.onload(function(){
-                API.tripPlan.getTripPlanOrderById({orderId: planId})
+                API.tripPlan.getTripPlanById({orderId: planId})
                     .then(function(plan){
                         $scope.plan = plan;
                         $scope.backTraffic = plan.backTraffic[0];

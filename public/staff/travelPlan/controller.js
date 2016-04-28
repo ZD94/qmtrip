@@ -230,7 +230,7 @@ var travelPlan=(function(){
         $scope.initplandetail = function(){
             $loading.start();
             API.onload(function() {
-                API.tripPlan.getTripPlanOrderById({orderId: planId})
+                API.tripPlan.getTripPlanById({orderId: planId})
                     .then(function(result){
                         console.info(result);
                         $scope.planDetail = result;
@@ -486,7 +486,7 @@ var travelPlan=(function(){
         $scope.invoiceId = $stateParams.invoiceId;
         API.require("attachment");
         API.onload(function() {
-            API.tripPlan.getTripPlanOrderById({orderId: planId})
+            API.tripPlan.getTripPlanById({orderId: planId})
             .then(function(result){
                 var InvoiceDetail;
                 $scope.planDetail = result;
