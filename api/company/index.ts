@@ -4,7 +4,7 @@
 
 let sequelize = require("common/model").importModel("./models");
 let Models = sequelize.models;
-let Company = Models.Company;
+let CompanyModel = Models.Company;
 let FundsAccounts = Models.FundsAccounts;
 let MoneyChanges = Models.MoneyChanges;
 let uuid = require("node-uuid");
@@ -13,10 +13,11 @@ let _ = require('lodash');
 let utils = require("common/utils");
 let Paginate = require("common/paginate").Paginate;
 let C = require("config");
-let API = require("../../common/api");
+let API = require("common/api");
 // let company = {};
 
 import {validateApi} from "common/api/helper";
+import {COMPANY_STATUS, Company} from '../client/company/company.types';
 
 let AGENCY_ROLE = {
     OWNER: 0,
@@ -24,7 +25,7 @@ let AGENCY_ROLE = {
     ADMIN: 2
 };
 
-export const companyCols = Object.keys(Company.attributes);
+export const companyCols = Object.keys(CompanyModel.attributes);
 export const fundsAccountCols = Object.keys(FundsAccounts.attributes);
 
 /**
@@ -46,7 +47,7 @@ export function domainIsExist(params) {
         })
     }
 
-    return Models.Company.findOne({where: {domainName: domain}})
+    return Models.CompanyModel.findOne({where: {domainName: domain}})
         .then(function(company) {
             if (company) {
                 return true;
@@ -73,7 +74,7 @@ export function createCompany(params){
 
     return sequelize.transaction(function(t){
         return Promise.all([
-            Company.create(_company, {transaction: t}),
+            CompanyModel.create(_company, {transaction: t}),
             FundsAccounts.create(funds, {transaction: t})
         ])
     })
@@ -112,28 +113,23 @@ export function isBlackDomain(params) {
  * @param params
  * @returns {*}
  */
-export function updateCompany(params){
-    var companyId = params.companyId;
+export async function updateCompany(params : {companyId: string}){
+    let companyId = params.companyId;
+    let company = await CompanyModel.findById(companyId, {attributes: ['createUser', 'status']});
+    
+    if(!company || company.status == -2){
+        throw L.ERR.COMPANY_NOT_EXIST;
+    }
 
-    return Company.findById(companyId, {attributes: ['createUser', 'status']})
-        .then(function(company){
-            if(!company || company.status == -2){
-                throw L.ERR.COMPANY_NOT_EXIST;
-            }
+    delete params.companyId;
+    params['updateAt'] = utils.now();
+    
+    let [rownum, rows] = await CompanyModel.update(params, {returning: true, where: {id: companyId}, fields: Object.keys(params)});
+    if(!rownum || rownum == "NaN"){
+        throw {code: -2, msg: '更新企业信息失败'};
+    }
 
-            var companyId = params.companyId;
-            delete params.companyId;
-            params.updateAt = utils.now();
-
-            return Company.update(params, {returning: true, where: {id: companyId}, fields: Object.keys(params)})
-        })
-        .spread(function(rownum, rows){
-            if(!rownum || rownum == "NaN"){
-                throw {code: -2, msg: '更新企业信息失败'};
-            }
-
-            return rows[0];
-        });
+    return new Company(rows[0]);
 }
 
 /**
@@ -142,22 +138,15 @@ export function updateCompany(params){
  * @returns {*}
  */
 validateApi(getCompany, ['companyId'], ['columns']);
-export function getCompany(params){
-    var companyId = params.companyId;
-    var options : any = {};
+export async function getCompany(params){
+    let companyId = params.companyId;
+    let company = await CompanyModel.findById(companyId);
 
-    if(params.columns){
-        options.attributes = params.columns;
+    if(!company || company.status == -2){
+        throw L.ERR.COMPANY_NOT_EXIST;
     }
 
-    return Company.findById(companyId, options)
-        .then(function(company){
-            if(!company || company.status == -2){
-                throw L.ERR.COMPANY_NOT_EXIST;
-            }
-
-            return company;
-        });
+    return new Company(company);
 }
 
 /**
@@ -179,7 +168,7 @@ export function listCompany(params){
         delete query.columns;
     }
 
-    return Company.findAll(options);
+    return CompanyModel.findAll(options);
 }
 
 /**
@@ -187,46 +176,14 @@ export function listCompany(params){
  * @param options
  * @returns {*}
  */
-export function pageCompany(options){
+export async function pageCompany(options){
     options.where.status = {$ne: -2};
     options.order = [['create_at', 'desc']];
-
-    return Company.findAndCount(options)
-        .then(function(ret){
-            var items = ret.rows.map(function(c) {
-                "use strict";
-                return c.id;
-            });
-            
-            return new Paginate(options.offset/options.limit + 1, options.limit, ret.count, items);
-        })
-}
-
-/**
- * 得到企业代理商管理员地id
- * @type {getCompanyAgencies}
- */
-validateApi(getCompanyAgencies, ['companyId']);
-export function getCompanyAgencies(params){
-    var agencies = [];
-
-    return API.company.getCompany({companyId: params.companyId})
-        .then(function(company){
-            return company;
-        })
-        .then(function(company){
-            if(company && company.agencyId){
-                return API.agency.getAgencyUsersId({agencyId: company.agencyId, roleId: [AGENCY_ROLE.OWNER, AGENCY_ROLE.ADMIN]})
-                    .then(function(ids){
-                        for(var i=0;i<ids.length;i++){
-                            agencies.push(ids[i].id);
-                        }
-                        return agencies;
-                    })
-            }
-            return agencies;
-        })
-
+    let ret = await CompanyModel.findAndCount(options);
+    var items = ret.rows.map(function(c) {
+        return c.id;
+    });
+    return new Paginate(options.offset/options.limit + 1, options.limit, ret.count, items);
 }
 
 /**
@@ -236,28 +193,21 @@ export function getCompanyAgencies(params){
  * @param params.companyId 企业id
  */
 validateApi(checkAgencyCompany, ['companyId','userId']);
-export function checkAgencyCompany(params){
+export async function checkAgencyCompany(params){
     var userId = params.userId;
     var companyId = params.companyId;
-    return Promise.all([
-        Company.findById(companyId, {attributes: ['agencyId', 'status']}),
-        API.agency.getAgencyUser({id: userId}, {attributes: ['agencyId', 'status', 'roleId']})
-    ])
-        .spread(function(c, agency){
-            if(!c || c.status == -2){
-                throw L.ERR.COMPANY_NOT_EXIST;
-            }
+    var c = await CompanyModel.findById(companyId, {attributes: ['agencyId', 'status']});
+    var agency = await API.agency.getAgencyUser({id: userId}, {attributes: ['agencyId', 'status', 'roleId']});
+    
+    if(!c || c.status == -2){
+        throw L.ERR.COMPANY_NOT_EXIST;
+    }
 
-            if(!agency || agency.status == -2){
-                throw {code:-1, msg:"代理商用户不存在"};
-            }
+    if(c.agencyId != agency.agencyId || agency.roleId != AGENCY_ROLE.OWNER && agency.roleId != AGENCY_ROLE.ADMIN) {
+        throw L.ERR.PERMISSION_DENY;
+    }
 
-            if(c.agencyId == agency.agencyId && (agency.roleId == AGENCY_ROLE.OWNER || agency.roleId == AGENCY_ROLE.ADMIN)){
-                return true;
-            }else{
-                throw L.ERR.PERMISSION_DENY;
-            }
-        })
+    return true;
 }
 
 
@@ -271,7 +221,7 @@ export function deleteCompany(params){
     var companyId = params.companyId;
     var userId = params.userId;
 
-    return Company.findById(companyId, {attributes: ['createUser']})
+    return CompanyModel.findById(companyId, {attributes: ['createUser']})
         .then(function(company){
             if(!company || company.status == -2){
                 throw L.ERR.COMPANY_NOT_EXIST;
@@ -284,7 +234,7 @@ export function deleteCompany(params){
         .then(function(){
             return sequelize.transaction(function(t){
                 return Promise.all([
-                    Company.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt'], transaction: t}),
+                    CompanyModel.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt'], transaction: t}),
                     FundsAccounts.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt'], transaction: t})
                 ])
             })
@@ -405,7 +355,7 @@ export function moneyChange(params){
 export function deleteCompanyByTest(params){
     var mobile = params.mobile;
     var email = params.email;
-    return Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
+    return CompanyModel.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
         .then(function(companys){
             return companys.map(function(c){
                 var id = c.id;
@@ -414,7 +364,7 @@ export function deleteCompanyByTest(params){
             })
         })
         .then(function(){
-            return Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
+            return CompanyModel.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
         })
         .then(function(){
             return true;

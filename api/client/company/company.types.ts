@@ -29,7 +29,7 @@ export class Company {
 
     constructor(params) {
         this.id = params.id ? params.id : null;
-        this.agencyId = params.agencyId ? params.id : null;
+        this.agencyId = params.agencyId ? params.agencyId : null;
         this.companyNo = params.companyNo;
         this.createUser = params.createUser ? params.createUser : null;
         this.name = params.name ? params.name : null;
