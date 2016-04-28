@@ -1,6 +1,7 @@
 "use strict";
+var Cookie = require('tiny-cookie');
 
-export function IndexController($scope,Menu,$ionicModal,$ionicPopup){
+export function IndexController($scope,Menu,$ionicModal,$ionicPopup, StaffService){
     var items =[
         {
             icon:'plane',
@@ -54,4 +55,7 @@ export function IndexController($scope,Menu,$ionicModal,$ionicPopup){
     }
 
     $scope.Menu = Menu;
+
+    $scope.staff = await StaffService.get(Cookie.get('user_id'));
+
 }
