@@ -31,10 +31,7 @@ export class StaffService extends CachedService<Staff> {
 
     async $get(id: string) : Promise<Staff> {
         var staff_api = require('api/client/staff');
-        return staff_api.getStaff({id: id})
-            .then(function(ret){
-                return ret.staff;
-            });
+        return staff_api.getStaff({id: id});
     }
 
 }
