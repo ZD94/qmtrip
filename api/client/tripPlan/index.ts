@@ -12,7 +12,6 @@ import moment = require('moment');
 import _ = require('lodash');
 import {validateApi} from "common/api/helper";
 import {PLAN_STATUS, TripPlan, Project, ConsumeDetails} from './tripPlan.types';
-import async = Q.async;
 
 
 /**

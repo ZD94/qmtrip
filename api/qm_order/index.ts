@@ -190,10 +190,12 @@ qm_order.book_and_pay_ticket = function(params) {
             var book_params : any = _.pick(order, ['flight_list', 'passengers', 'contact_name', 'contact_mobile', 'adult_num']);
             book_params.ip_address = order.flight_list.ip_address;
 
-            return [order, API.shengyi_ticket.book_ticket_test(book_params)];
+            // return [order, API.shengyi_ticket.book_ticket_test(book_params)];
+            return [order]
         })
         .spread(function(order, book_result) {
-            return [order, API.shengyi_ticket.get_ticket_order({order_no: book_result.order_no})];
+            // return [order, API.shengyi_ticket.get_ticket_order({order_no: book_result.order_no})];
+            return [order];
         })
         .spread(function(order, ticket_order) {
             var segment = ticket_order.segments[0];
