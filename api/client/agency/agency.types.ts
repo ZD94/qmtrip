@@ -9,6 +9,12 @@ export enum AGENCY_STATUS {
     ACTIVE = 1 //激活状态
 }
 
+export enum  AGENCY_ROLE {
+    OWNER = 0,
+    COMMON = 1,
+    ADMIN = 2
+};
+
 export class Agency{
     id: string;
     agencyNo: string;

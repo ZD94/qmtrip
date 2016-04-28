@@ -22,23 +22,23 @@ export class Staff {
         this.name = obj.name;
         this.sex = obj.sex;
         this.avatar = obj.avatar;
-        this.companyId = obj.companyId;
+        this.companyId = (!obj.companyId || obj.companyId=="")? null : obj.companyId;
         this.status = obj.status;
         this.totalPoints = obj.totalPoints;
         this.balancePoints = obj.balancePoints;
-        this.departmentId = obj.departmentId;
+        this.departmentId = (!obj.departmentId || obj.departmentId=="")? null : obj.departmentId;
         this.department = obj.department;
-        this.travelLevel = obj.travelLevel;
+        this.travelLevel = (!obj.travelLevel || obj.travelLevel=="")? null : obj.travelLevel;
         this.roleId = obj.roleId;
         this.email = obj.email;
         this.mobile = obj.mobile;
         this.createAt = obj.createAt;
         this.quitTime = obj.quitTime;
-        this.operatorId = obj.operatorId;
+        this.operatorId = (!obj.operatorId || obj.operatorId=="")? null : obj.operatorId;
     }
 }
 
-export class Papers{
+export class Credentials{
     id: string;
     type: number;
     idNo: string;
@@ -78,4 +78,16 @@ export class PointChange{
         this.remark = obj.remark;
         this.createAt = obj.createAt;
     }
+}
+
+export enum STAFF_STATUS {
+    ON_JOB = 0,
+    QUIT_JOB = -1,
+    DELETE = -2
+}
+export enum STAFF_ROLE {
+    OWNER = 0,
+    COMMON = 1,
+    ADMIN = 2,
+    FINANCE = 3
 }

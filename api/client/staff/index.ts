@@ -11,12 +11,11 @@ var Q = require("q");
 var API = require("common/api");
 var auth = require("../auth");
 var L = require("common/language");
-var _ = require('lodash');
+import {Staff, Credentials, PointChange} from "./staff.types.ts";
 
 /**
  * @class staff 员工信息
  */
-var staff = {};
 
 /**
  * @method createStaff
@@ -26,19 +25,21 @@ var staff = {};
  * @type {*}
  * @return {promise}
  */
-staff.createStaff = auth.checkPermission(["user.add"],
-    function(params) {
+export function createStaff (params) {
         var self = this;
         var user_id = self.accountId;
         return API.staff.getStaff({id: user_id, columns: ['companyId']})
             .then(function(staff){
                 var companyId = staff.companyId;
                 params.companyId = companyId;
-                return API.staff.createStaff(params);
+                return API.staff.createStaff(params)
+                    .then(function(data){
+                        return new Staff(data);
+                    });
             })
-    });
+    }
 
-staff.agencyCreateStaff = function(params){
+export function agencyCreateStaff(params){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
@@ -58,8 +59,7 @@ staff.agencyCreateStaff = function(params){
  * @type {*}
  * @return {promise}
  */
-staff.deleteStaff = auth.checkPermission(["user.delete"],
-    function(params) {
+export function deleteStaff(params) {
         var user_id = this.accountId;
         return API.staff.getStaff({id: user_id})
             .then(function(staff){
@@ -80,9 +80,9 @@ staff.deleteStaff = auth.checkPermission(["user.delete"],
                 }
                 return API.staff.deleteStaff(params);
             });
-    });
+    }
 
-staff.agencyDeleteStaff = function(params){
+export function agencyDeleteStaff(params){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
@@ -101,8 +101,7 @@ staff.agencyDeleteStaff = function(params){
  *
  * @type {*}
  */
-staff.updateStaff = auth.checkPermission(["user.edit"],//三个参数权限判断要修改
-    function(params) {
+export function updateStaff(params) {
         var user_id = this.accountId;
         var id = params.id;
         return API.staff.getStaff({id:user_id})
@@ -112,18 +111,24 @@ staff.updateStaff = auth.checkPermission(["user.edit"],//三个参数权限判�
                         if(data.companyId != target.companyId){
                             throw L.ERR.PERMISSION_DENY;
                         }else{
-                            return API.staff.updateStaff(params);
+                            return API.staff.updateStaff(params)
+                                .then(function(data){
+                                    return new Staff(data);
+                                })
                         }
                     })
             });
-    });
+    }
 
-staff.agencyUpdateStaff = function(params){
+export function agencyUpdateStaff(params){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
             if(result){
-                return API.staff.updateStaff(params);
+                return API.staff.updateStaff(params)
+                    .then(function(data){
+                        return new Staff(data);
+                    })
             }else{
                 throw {code: -1, msg: '无权限'};
             }
@@ -136,8 +141,7 @@ staff.agencyUpdateStaff = function(params){
  * 企业根据id得到员工信息
  * @type {*}
  */
-staff.getStaff = auth.checkPermission(["user.query"],
-    function(params) {
+export function getStaff(params) {
         var user_id = this.accountId;
         return API.staff.getStaff({id: user_id})
             .then(function(data){
@@ -146,18 +150,22 @@ staff.getStaff = auth.checkPermission(["user.query"],
                         if(data.companyId != target.companyId){
                             throw L.ERR.PERMISSION_DENY;
                         }else{
-                            return {staff: target};
+                            // return {staff: new Staff(target)};
+                            return new Staff(target);
                         }
                     })
             });
-    });
+    }
 
-staff.agencyGetStaff = function(params){
+export function agencyGetStaff(params){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
             if(result){
-                return API.staff.getStaff(params);
+                return API.staff.getStaff(params)
+                    .then(function(data){
+                        return new Staff(data);
+                    })
             }else{
                 throw {code: -1, msg: '无权限'};
             }
@@ -165,7 +173,7 @@ staff.agencyGetStaff = function(params){
 };
 
 //代理商根据id得到员工信息
-staff.getStaffByAgency = function(params){
+export function getStaffByAgency (params){
     var staffId = params.id;
     var user_id = this.accountId;
     return Q.all([
@@ -187,7 +195,7 @@ staff.getStaffByAgency = function(params){
                 throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
             }
             if(company.agencyId == agency.id){
-                return staff;
+                return new Staff(staff);
             }else{
                 throw {msg:"无权限"};
             }
@@ -200,9 +208,12 @@ staff.getStaffByAgency = function(params){
  * 得到当前登录员工信息
  * @returns {*}
  */
-staff.getCurrentStaff = function(){
+export function getCurrentStaff(){
     var self = this;
-    return API.staff.getStaff({id: self.accountId});
+    return API.staff.getStaff({id: self.accountId})
+        .then(function(data){
+            return new Staff(data);
+        });
 }
 
 /**
@@ -211,8 +222,7 @@ staff.getCurrentStaff = function(){
  * 企业分页查询员工列表
  * @type {*}
  */
-staff.listAndPaginateStaff = auth.checkPermission(["user.query"],
-    function(params) {
+export function listAndPaginateStaff (params) {
         var user_id = this.accountId;
         return API.staff.getStaff({id:user_id})
             .then(function(data){
@@ -221,9 +231,9 @@ staff.listAndPaginateStaff = auth.checkPermission(["user.query"],
 //                params.options = options;
                 return API.staff.listAndPaginateStaff(params);
             });
-    });
+    }
 
-staff.agencyListAndPaginateStaff = function(params){
+export function agencyListAndPaginateStaff (params){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
@@ -241,7 +251,7 @@ staff.agencyListAndPaginateStaff = function(params){
  * 增加员工积分
  * @type {*|Function}
  */
-staff.increaseStaffPoint = function(params){
+export function increaseStaffPoint(params){
     params.accountId = this.accountId;//当前登录代理商id
     var user_id = this.accountId;
     var staffId = params.id;//加积分的员工id
@@ -278,7 +288,7 @@ staff.increaseStaffPoint = function(params){
  * 减少员工积分
  * @type {*|Function}
  */
-staff.decreaseStaffPoint = function(params){
+export function decreaseStaffPoint(params){
     params.accountId = this.accountId;//当前登录代理商id
     var user_id = this.accountId;
     var staffId = params.id;//加积分的员工id
@@ -318,7 +328,7 @@ staff.decreaseStaffPoint = function(params){
  * @param {object} params
  * @return {promise}
  */
-staff.listAndPaginatePointChange = function(params){
+export function listAndPaginatePointChange(params){
     var user_id = this.accountId;
     params.staffId = user_id;
     return API.staff.listAndPaginatePointChange(params);
@@ -332,7 +342,7 @@ staff.listAndPaginatePointChange = function(params){
  * @param params.endTime  结束时间
  * @returns {promise|*}
  */
-staff.getStaffPointsChange = function(params){
+export function getStaffPointsChange(params){
     var staffId = this.accountId;
     params.staffId = staffId;
     return API.staff.getStaffPointsChange(params);
@@ -345,7 +355,7 @@ staff.getStaffPointsChange = function(params){
  * @param params
  * @returns {*}
  */
-staff.getStaffPointsChangeByMonth = function(params) {
+export function getStaffPointsChangeByMonth(params) {
     var self = this;
     return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
         .then(function(staff){
@@ -366,7 +376,7 @@ staff.getStaffPointsChangeByMonth = function(params) {
  * @param .departmentId 部门id
  * @returns {*}
  */
-staff.getCountByDepartment = function(params){
+export function getCountByDepartment(params){
     return API.staff.getCountByDepartment(params);
 }
 
@@ -378,7 +388,7 @@ staff.getCountByDepartment = function(params){
  * @param {object} params
  * @return {promise}
  */
-staff.beforeImportExcel = function(params){
+export function beforeImportExcel(params){
     params.accountId = this.accountId;
     return API.staff.beforeImportExcel(params);
 }
@@ -389,7 +399,7 @@ staff.beforeImportExcel = function(params){
  * @param params.addObj 导入的数据
  * @returns {*}
  */
-staff.importExcelAction = function(params){
+export function importExcelAction(params){
     params.accountId = this.accountId;
     return API.staff.importExcelAction(params);
 }
@@ -400,7 +410,7 @@ staff.importExcelAction = function(params){
  * @param params.objAttr 需要导出的数据
  * @returns {*}
  */
-staff.downloadExcle = function(params){
+export function downloadExcle(params){
     params.accountId = this.accountId;
     return API.staff.downloadExcle(params);
 }
@@ -416,7 +426,7 @@ staff.downloadExcle = function(params){
  * @param {String} params.endTime
  * @return {promise} true||error
  */
-staff.statisticStaffs = function(params){
+export function statisticStaffs(params){
     var user_id = this.accountId;
     return API.staff.getStaff({id: user_id})
         .then(function(data){
@@ -430,7 +440,7 @@ staff.statisticStaffs = function(params){
         });
 }
 
-staff.agencyStatisticStaffs = function(params){
+export function agencyStatisticStaffs(params){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
@@ -454,7 +464,7 @@ staff.agencyStatisticStaffs = function(params){
  * @param {String} params.endTime
  * @return {promise} true||error
  */
-staff.statisticStaffsByAgency = function(params){
+export function statisticStaffsByAgency(params){
     var user_id = this.accountId;
     if(!params.companyId){
         throw {code: -1, msg: "企业ID不能为空"};
@@ -477,7 +487,7 @@ staff.statisticStaffsByAgency = function(params){
  * @param {String} params.companyId
  * @returns {*}
  */
-staff.getStaffCountByCompany = function(params){
+export function getStaffCountByCompany(params){
     var user_id = this.accountId;
     return API.staff.getStaff({id: user_id})
         .then(function(data){
@@ -491,7 +501,7 @@ staff.getStaffCountByCompany = function(params){
         });
 }
 
-staff.agencyGetStaffCountByCompany = function(params){
+export function agencyGetStaffCountByCompany(params){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
@@ -509,7 +519,7 @@ staff.agencyGetStaffCountByCompany = function(params){
  * @param {String} params.companyId
  * @returns {*}
  */
-staff.getDistinctDepartment = function(params){
+export function getDistinctDepartment(params){
     var user_id = this.accountId;
     return API.staff.getStaff({id: user_id})
         .then(function(data){
@@ -530,7 +540,7 @@ staff.getDistinctDepartment = function(params){
  * @param {uuid} params.companyId
  * @returns {promise} {adminNum: '管理员人数', commonStaffNum: '普通员工人数', unActiveNum: '未激活人数'};
  */
-staff.statisticStaffsRole = function(params){
+export function statisticStaffsRole(params){
     var user_id = this.accountId;
     return API.staff.getStaff({id: user_id, columns: ['companyId']})
         .then(function(data){
@@ -544,7 +554,7 @@ staff.statisticStaffsRole = function(params){
         });
 }
 
-staff.agencyStatisticStaffsRole = function(params){
+export function agencyStatisticStaffsRole(params){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
@@ -557,7 +567,7 @@ staff.agencyStatisticStaffsRole = function(params){
 };
 
 
-staff.statStaffPointsByCompany = function(){
+export function statStaffPointsByCompany(){
     var self = this;
     return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
         .then(function(staff){
@@ -565,7 +575,7 @@ staff.statStaffPointsByCompany = function(){
         })
 }
 
-staff.statStaffPointsByAgency = function(companyId){
+export function statStaffPointsByAgency (companyId){
     var self = this;
     if(typeof companyId != 'string'){
         throw {code: 0, msg: '参数格式不正确'};
@@ -597,9 +607,12 @@ staff.statStaffPointsByAgency = function(companyId){
  * @param {Date} params.validData 过期时间（选填）
  * @returns {*|Promise}
  */
-staff.createPapers = function(params){
+export function createPapers(params){
     params.ownerId = this.accountId;
-    return API.staff.createPapers(params);
+    return API.staff.createPapers(params)
+        .then(function(data){
+            return new Credentials(data);
+        })
 };
 
 
@@ -612,7 +625,7 @@ staff.createPapers = function(params){
  * @param {uuid} params.id    删除记录id（必填）
  * @returns {*|Promise}
  */
-staff.deletePapers = function(params){
+export function deletePapers (params){
     params.ownerId = this.accountId;
     return API.staff.deletePapers(params);
 };
@@ -631,7 +644,7 @@ staff.deletePapers = function(params){
  * @param {Date} params.validData 过期时间（选填）
  * @returns {*|Promise}
  */
-staff.updatePapers = function(params){
+export function updatePapers (params){
     var user_id = this.accountId;
     return API.staff.getPapersById({id: params.id})
         .then(function(ma){
@@ -639,7 +652,10 @@ staff.updatePapers = function(params){
                 throw {code: -1, msg: '无权限'};
             }
             params.ownerId = user_id;
-            return API.staff.updatePapers(params);
+            return API.staff.updatePapers(params)
+                .then(function(data){
+                    return new Credentials(data);
+                })
         });
 };
 
@@ -653,7 +669,7 @@ staff.updatePapers = function(params){
  * @param {Array<String>} params.attributes    查询列（选填）
  * @returns {*|Promise}
  */
-staff.getPapersById = function(params){
+export function getPapersById(params){
     var id = params.id;
     var user_id = this.accountId;
     return API.staff.getPapersById({id:id})
@@ -665,7 +681,7 @@ staff.getPapersById = function(params){
             if(ma.ownerId && ma.ownerId != user_id){
                 throw {code: -1, msg: '无权限'};
             }
-            return ma;
+            return new Credentials(ma);
         });
 };
 
@@ -681,7 +697,7 @@ staff.getPapersById = function(params){
  * @param {Array<String>} params.attributes    查询列（选填）
  * @returns {*|Promise}
  */
-staff.getOnesPapersByType = function(params){
+export function getOnesPapersByType(params){
     var user_id = this.accountId;
     params.ownerId = user_id;
     return API.staff.getOnesPapersByType(params)
@@ -700,10 +716,9 @@ staff.getOnesPapersByType = function(params){
  *
  * @returns {*|Promise}
  */
-staff.getCurrentUserPapers = function(){
+export function getCurrentUserPapers(){
     var user_id = this.accountId;
     return API.staff.getPapersByOwner({ownerId: user_id});
 };
 
 /*************************证件信息API end*************************/
-module.exports = staff;

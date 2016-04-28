@@ -15,13 +15,13 @@ describe("api/client/staff.js", function() {
     var ownerSelf = {};
     var agencySelf = {};
     var obj = {
-        email: "xiaoyu.wang@tulingdao.com",
+        email: "xiaoyu123.wang@tulingdao.com",
         name: "wyll",
         mobile: "18345433986"
     }
 
     var updateobj = {
-        email: "sss@tulingdao.com",
+        email: "wxy123@tulingdao.com",
         name: "wyll",
         mobile: "18345433986"
     }
@@ -32,11 +32,11 @@ describe("api/client/staff.js", function() {
         domain: 'tulingdao.com',
         description: '企业API测试用',
         mobile:  '15269866812',
-        email: 'staff.company.test@tulingdao.com'
+        email: 'cp.teststaff@tulingdao.com'
     }
 
     var agency = {
-        email: "staff.agency.test@tulingdao.com",
+        email: "ag.teststaff@tulingdao.com",
         userName: "staffTest代理商",
         name: 'staffTest的代理商',
         mobile: "15269866802",
@@ -54,15 +54,19 @@ describe("api/client/staff.js", function() {
                 API.staff.deleteAllStaffByTest({email: obj.email, mobile: obj.mobile})
             ])
             .spread(function(ret1, ret2, ret3, ret4, ret5){
+                console.info(ret1, ret2, ret3, ret4, ret5);
                 return API.agency.registerAgency(agency);
             })
             .then(function(ret){
                 agencyId = ret.agency.id;
                 agencyUserId = ret.agencyUser.id;
                 agencySelf = {accountId: agencyUserId};
+                console.info("API.client.company.createCompany");
                 return API.client.company.createCompany.call({accountId: agencyUserId}, company);
             })
             .then(function(company){
+                console.log(company);
+                console.log("=================================================");
                 assert.equal(company.status, 0);
                 companyId = company.id;
                 accountId = company.createUser;
@@ -100,7 +104,7 @@ describe("api/client/staff.js", function() {
             assert.equal(err, null);
             //console.log(err);
 //                console.log(result);
-            id = result.dataValues.id;//回调为何不能直接.id
+            id = result.id;//回调为何不能直接.id
             done();
         });
     })
