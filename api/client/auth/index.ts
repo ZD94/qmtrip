@@ -9,6 +9,7 @@ const L = require("common/language");
 const uuid = require('node-uuid');
 const API = require('common/api');
 
+export var __public = true;
 
 export function activeByEmail(params:{sign:string; accountId:string; timestamp:string}):Promise<boolean>{
     return API.auth.activeByEmail(params)
