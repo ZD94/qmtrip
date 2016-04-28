@@ -11,8 +11,6 @@ export class TravelPolicy {
     isChangeLevel: boolean;
     createAt: Date;
 
-    // constructor(id: string, name: string, planeLevel: string, planeDiscount: number, trainLevel: string, hotelLevel:
-    //     string, hotelPrice: number, companyId: string, isChangeLevel: boolean, createAt: Date) {
     constructor(obj: any) {
         this.id = obj.id;
         this.name = obj.name;
