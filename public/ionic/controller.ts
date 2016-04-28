@@ -1,7 +1,7 @@
 "use strict";
 var Cookie = require('tiny-cookie');
 
-export function IndexController($scope,Menu,$ionicModal,$ionicPopup, StaffService){
+export async function IndexController($scope,Menu,$ionicModal,$ionicPopup, StaffService){
     var items =[
         {
             icon:'plane',
@@ -36,13 +36,7 @@ export function IndexController($scope,Menu,$ionicModal,$ionicPopup, StaffServic
         Menu.add(items[i]);
     }
     console.info(Menu);
-    $ionicModal.fromTemplateUrl('template/travelpolicy', {
-        scope: $scope,
-        animation:'slide-in-down'
-    }).then(function(modal){
-        console.info(modal);
-        $scope.modal = modal;
-    })
+
     $scope.alertShow = function () {
         var show = $ionicPopup.alert({
             title: '差旅标准',
