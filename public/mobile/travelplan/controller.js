@@ -331,7 +331,7 @@ var travelplan = (function () {
             API.onload(function () {
                 //console.info(p);
                 API.tripPlan
-                    .getTripPlanOrderById({orderId: p})
+                    .getTripPlanById({orderId: p})
                     .then(
                         function (data) {
                             console.log('---details',data);
@@ -554,7 +554,7 @@ var travelplan = (function () {
         }
         return API.onload()
             .then(function () {
-                return API.tripPlan.getTripPlanOrderById({orderId: planId});
+                return API.tripPlan.getTripPlanById({orderId: planId});
             })
             .then(function (result) {
                 var InvoiceDetail;
