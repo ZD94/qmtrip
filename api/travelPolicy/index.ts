@@ -4,8 +4,8 @@
 'use strict';
 var sequelize = require("common/model").importModel("./models");
 var travalPolicyModel = sequelize.models.TravelPolicy;
-var Paginate = require("../../common/paginate").Paginate;
-var API = require("../../common/api");
+import {Paginate} from 'common/paginate';
+var API = require("common/api");
 import {validateApi} from 'common/api/helper';
 import types = require("../client/travelPolicy/travelPolicy.types");
 
