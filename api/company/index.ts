@@ -2,28 +2,30 @@
  * Created by yumiao on 15-12-9.
  */
 
-var sequelize = require("common/model").importModel("./models");
-var Models = sequelize.models;
-var Company = Models.Company;
-var FundsAccounts = Models.FundsAccounts;
-var MoneyChanges = Models.MoneyChanges;
-var uuid = require("node-uuid");
-var L = require("common/language");
-var _ = require('lodash');
-var utils = require("common/utils");
-var Paginate = require("common/paginate").Paginate;
-var C = require("config");
-var API = require("../../common/api");
-var company = {};
-var AGENCY_ROLE = {
+let sequelize = require("common/model").importModel("./models");
+let Models = sequelize.models;
+let Company = Models.Company;
+let FundsAccounts = Models.FundsAccounts;
+let MoneyChanges = Models.MoneyChanges;
+let uuid = require("node-uuid");
+let L = require("common/language");
+let _ = require('lodash');
+let utils = require("common/utils");
+let Paginate = require("common/paginate").Paginate;
+let C = require("config");
+let API = require("../../common/api");
+// let company = {};
+
+import {validateApi} from "common/api/helper";
+
+let AGENCY_ROLE = {
     OWNER: 0,
     COMMON: 1,
     ADMIN: 2
 };
 
-company.companyCols = Object.keys(Company.attributes);
-
-company.fundsAccountCols = Object.keys(FundsAccounts.attributes);
+export const companyCols = Object.keys(Company.attributes);
+export const fundsAccountCols = Object.keys(FundsAccounts.attributes);
 
 /**
  * 域名是否已被占用
@@ -32,7 +34,7 @@ company.fundsAccountCols = Object.keys(FundsAccounts.attributes);
  * @param {String} params.domain 域名
  * @return {Promise} true|false
  */
-company.domainIsExist = function(params) {
+export function domainIsExist(params) {
     var domain = params.domain;
     if (!domain) {
         throw {code: -1, msg: "domain not exist!"};
@@ -63,18 +65,11 @@ company.domainIsExist = function(params) {
  * @param {String} params.domainName 域名,邮箱后缀
  * @returns {Promise}
  */
-company.createCompany = createCompany;
-createCompany.required_params = ['createUser', 'name', 'domainName', 'mobile', 'email', 'agencyId'];
-createCompany.optional_params = ['id', 'description', 'telephone', 'remark'];
-
-function createCompany(params){
-    var _company = params;
-
-    if(!_company.id){
-        _company.id = uuid.v1();
-    }
-
-    var funds = { id: _company.id };
+validateApi(createCompany, ['createUser', 'name', 'domainName', 'mobile', 'email', 'agencyId'], ['id', 'description', 'telephone', 'remark'])
+export function createCompany(params){
+    let _company = params;
+    _company.id = _company.id || uuid.v1();
+    let funds = { id: _company.id, createAt: utils.now()};
 
     return sequelize.transaction(function(t){
         return Promise.all([
@@ -84,8 +79,7 @@ function createCompany(params){
     })
         .spread(function(c, f){
             c = c.toJSON();
-            var result = _.assign(c, {balance: f.balance, staffReward: f.staffReward});
-            return result;
+            return _.assign(c, {balance: f.balance, staffReward: f.staffReward});
         });
 }
 
@@ -96,7 +90,7 @@ function createCompany(params){
  * @param {String} params.domain 域名
  * @return {Promise}
  */
-company.isBlackDomain = function(params) {
+export function isBlackDomain(params) {
     var domain = params.domain;
 
     if (!domain) {
@@ -118,11 +112,7 @@ company.isBlackDomain = function(params) {
  * @param params
  * @returns {*}
  */
-company.updateCompany = updateCompany;
-updateCompany.required_params = ['companyId'];
-updateCompany.optional_params = _.difference(_.keys(Company.attributes), ['id', 'companyNo', 'createUser', 'createAt', 'email']);
-
-function updateCompany(params){
+export function updateCompany(params){
     var companyId = params.companyId;
 
     return Company.findById(companyId, {attributes: ['createUser', 'status']})
@@ -151,12 +141,10 @@ function updateCompany(params){
  * @param companyId
  * @returns {*}
  */
-company.getCompany = getCompany;
-getCompany.required_params = ['companyId'];
-getCompany.optional_params = ['columns'];
-function getCompany(params){
+validateApi(getCompany, ['companyId'], ['columns']);
+export function getCompany(params){
     var companyId = params.companyId;
-    var options = {};
+    var options : any = {};
 
     if(params.columns){
         options.attributes = params.columns;
@@ -177,13 +165,11 @@ function getCompany(params){
  * @param params
  * @returns {*}
  */
-company.listCompany = listCompany;
-listCompany.required_params = ['agencyId'];
-listCompany.optional_params = ['columns'];
-function listCompany(params){
+validateApi(listCompany, ['agencyId'], ['columns']);
+export function listCompany(params){
     var query = params;
     var agencyId = query.agencyId;
-    var options = {
+    var options : any = {
         where: {agencyId: agencyId, status: {$ne: -2}},
         order: [['create_at', 'desc']]
     };
@@ -198,11 +184,10 @@ function listCompany(params){
 
 /**
  * 获取企业列表
- * @param params
+ * @param options
  * @returns {*}
  */
-company.pageCompany = pageCompany;
-function pageCompany(options){
+export function pageCompany(options){
     options.where.status = {$ne: -2};
     options.order = [['create_at', 'desc']];
 
@@ -221,9 +206,8 @@ function pageCompany(options){
  * 得到企业代理商管理员地id
  * @type {getCompanyAgencies}
  */
-company.getCompanyAgencies = getCompanyAgencies;
-getCompanyAgencies.required_params = ['companyId'];
-function getCompanyAgencies(params){
+validateApi(getCompanyAgencies, ['companyId']);
+export function getCompanyAgencies(params){
     var agencies = [];
 
     return API.company.getCompany({companyId: params.companyId})
@@ -251,9 +235,8 @@ function getCompanyAgencies(params){
  * @param params.userId 代理商id
  * @param params.companyId 企业id
  */
-company.checkAgencyCompany = checkAgencyCompany;
-checkAgencyCompany.required_params = ['companyId','userId'];
-function checkAgencyCompany(params){
+validateApi(checkAgencyCompany, ['companyId','userId']);
+export function checkAgencyCompany(params){
     var userId = params.userId;
     var companyId = params.companyId;
     return Promise.all([
@@ -283,9 +266,8 @@ function checkAgencyCompany(params){
  * @param params
  * @returns {*}
  */
-company.deleteCompany = deleteCompany;
-deleteCompany.required_params = ['companyId', 'userId'];
-function deleteCompany(params){
+validateApi(deleteCompany, ['companyId', 'userId']);
+export function deleteCompany(params){
     var companyId = params.companyId;
     var userId = params.userId;
 
@@ -317,9 +299,8 @@ function deleteCompany(params){
  * @param params
  * @returns {*}
  */
-company.getCompanyFundsAccount = getCompanyFundsAccount;
-getCompanyFundsAccount.required_params = ['companyId'];
-function getCompanyFundsAccount(params){
+validateApi(getCompanyFundsAccount, ['companyId']);
+export function getCompanyFundsAccount(params){
     var companyId = params.companyId;
 
     return FundsAccounts.findById(companyId, {
@@ -340,9 +321,8 @@ function getCompanyFundsAccount(params){
  * @param params.type -2: 冻结账户资金 -1： 账户余额减少 1：账户余额增加 2：解除账户冻结金额
  * @returns {*}
  */
-company.moneyChange = moneyChange;
-moneyChange.required_params = ['money', 'channel', 'userId', 'type', 'companyId', 'remark'];
-function moneyChange(params){
+validateApi(moneyChange, ['money', 'channel', 'userId', 'type', 'companyId', 'remark']);
+export function moneyChange(params){
     var id = params.companyId;
     return FundsAccounts.findById(id)
         .then(function(funds){
@@ -351,10 +331,10 @@ function moneyChange(params){
             }
 
             var id = funds.id;
-            var money = params.money;
+            var money : number = params.money;
             var userId = params.userId;
             var type = params.type;
-            var fundsUpdates = {
+            var fundsUpdates : any = {
                 updateAt: utils.now()
             };
 
@@ -374,24 +354,24 @@ function moneyChange(params){
                 if(money <= 0){
                     throw {code: -5, msg: '充值金额不正确'};
                 }
-                fundsUpdates.income = parseFloat(income) + parseFloat(money);
+                fundsUpdates.income = income + money;
             }else if(type == -1){
                 var consume = funds.consume;
-                var balance = funds.balance;
-                fundsUpdates.consume = parseFloat(consume) + parseFloat(money);
-                var balance = parseFloat(balance) - parseFloat(money); //账户余额
+                var balance : number = funds.balance;
+                fundsUpdates.consume = parseFloat(consume) + money;
+                var balance : number = balance - money; //账户余额
                 if(balance < 0){
                     throw L.ERR.BALANCE_NOT_ENOUGH; //账户余额不足
                 }
             }else if(type == 2){
-                if(parseFloat(frozen) < parseFloat(money)){
+                if(parseFloat(frozen) < money){
                     throw {code: -4, msg: '账户冻结金额不能小于解除冻结的金额'};
                 }
-                fundsUpdates.frozen = parseFloat(frozen) - parseFloat(money);
+                fundsUpdates.frozen = parseFloat(frozen) - money;
             }else if(type == -2){
-                var balance = funds.balance;
-                fundsUpdates.frozen = parseFloat(frozen) + parseFloat(money);
-                balance = parseFloat(balance) - parseFloat(money); //账户余额
+                var balance : number = funds.balance;
+                fundsUpdates.frozen = parseFloat(frozen) + money;
+                balance = balance - money; //账户余额
                 if(balance < 0){
                     throw L.ERR.BALANCE_NOT_ENOUGH; //账户余额不足
                 }
@@ -422,7 +402,7 @@ function moneyChange(params){
  * @param params
  * @returns {*}
  */
-company.deleteCompanyByTest = function(params){
+export function deleteCompanyByTest(params){
     var mobile = params.mobile;
     var email = params.email;
     return Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
@@ -440,5 +420,3 @@ company.deleteCompanyByTest = function(params){
             return true;
         })
 }
-
-module.exports = company;

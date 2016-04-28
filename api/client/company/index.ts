@@ -4,7 +4,7 @@
 'use strict';
 import L = require("common/language");
 import Logger = require('common/logger');
-import {validateApi} from "../../../common/api/helper";
+import {validateApi} from "common/api/helper";
 import {Company, COMPANY_STATUS} from "./company.types";
 
 let API = require('common/api');
@@ -40,16 +40,16 @@ export async function createCompany(params: {mobile: string, name: string, email
     let email = params.email;
     let userName = params.userName;
     let pwd = params.pwd || '123456';
-    
+
     let agencyUser = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
     let account = await API.auth.newAccount({mobile: mobile, email: email, pwd: pwd, type: 1});
 
-    let _compay = new Company(params);
-    _compay.agencyId = agencyUser.agencyId;
-    _compay.createUser = account.id;
-    _compay.domainName = params.email.match(/.*\@(.*)/)[1]; //企业域名
+    let _company = new Company(params);
+    _company.agencyId = agencyUser.agencyId;
+    _company.createUser = account.id;
+    _company.domainName = params.email.match(/.*\@(.*)/)[1]; //企业域名
 
-    let company = await API.company.createCompany(_compay);
+    let company = await API.company.createCompany(_company);
     let staff = await API.staff.createStaff({accountId: account.id, companyId: company.id, email: email, mobile: mobile, name: userName, roleId: 0});
     let dept = await API.department.createDepartment({name: "我的企业", isDefault: true, companyId: company.id});
 
