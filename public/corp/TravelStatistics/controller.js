@@ -386,7 +386,7 @@ var TravelStatistics = (function(){
         var planId = $stateParams.orderId;
         $loading.start();
         API.onload(function(){
-            API.tripPlan.getTripPlanOrderById({orderId: planId})
+            API.tripPlan.getTripPlanById({orderId: planId})
                 .then(function(result){
                     if(result.description && result.description.length>15){
                         result.description = result.description.substr(0,15);

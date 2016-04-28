@@ -14,7 +14,7 @@ describe("api/client/agency.js", function() {
     describe("registerAgency", function() {
 
         var agency = {
-            email: "agency.test@jingli.com",
+            email: "agency.test@jingli.tech",
             userName: "喵喵",
             name: '喵喵的代理商',
             description: '代理商API测试用',
@@ -78,7 +78,7 @@ describe("api/client/agency.js", function() {
         var agencyUserId = "";
 
         var agency = {
-            email: "agency.test@jingli.com",
+            email: "agency.test@jingli.tech",
             userName: "喵喵",
             name: '喵喵的代理商',
             description: '代理商API测试用',
@@ -87,7 +87,7 @@ describe("api/client/agency.js", function() {
         before(function(done){
             Promise.all([
                 API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
-                API.agency.deleteAgencyByTest({email: 'agencyUser.test@jingli.com', mobile: agency.mobile})
+                API.agency.deleteAgencyByTest({email: 'agencyUser.test@jingli.tech', mobile: agency.mobile})
             ])
                 .spread(function(ret1, ret2){
                     return API.client.agency.registerAgency(agency)
@@ -107,7 +107,7 @@ describe("api/client/agency.js", function() {
         after(function(done){
             Promise.all([
                 API.agency.deleteAgencyByTest({email: agency.email, mobile: '12345678777'}),
-                API.agency.deleteAgencyByTest({email: 'agencyUser.test@jingli.com', mobile: '12345678777'})
+                API.agency.deleteAgencyByTest({email: 'agencyUser.test@jingli.tech', mobile: '12345678777'})
             ])
                 .spread(function(ret1, ret2){
                     done();
@@ -154,7 +154,7 @@ describe("api/client/agency.js", function() {
 
         it("createAgencyUser should be ok", function(done) {
             API.client.agency.createAgencyUser.call({accountId: agencyUserId},
-                {name: '测试代理商用户', email: "agencyUser.test@jingli.com", mobile: '12345678777', agencyId: agencyId},
+                {name: '测试代理商用户', email: "agencyUser.test@jingli.tech", mobile: '12345678777', agencyId: agencyId},
                 function(err, ret) {
                     if (err) {
                         throw err;
@@ -239,7 +239,7 @@ describe("api/client/agency.js", function() {
         var _agencyUserId = "";
 
         var agency = {
-            email: "agency.test@jingli.com",
+            email: "agency.test@jingli.tech",
             userName: "喵喵",
             name: '喵喵的代理商',
             description: '代理商API测试用',
@@ -248,7 +248,7 @@ describe("api/client/agency.js", function() {
         before(function(done){
             Promise.all([
                 API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
-                API.agency.deleteAgencyByTest({email: 'agencyUser.test@jingli.com', mobile: agency.mobile})
+                API.agency.deleteAgencyByTest({email: 'agencyUser.test@jingli.tech', mobile: agency.mobile})
             ])
                 .spread(function(ret1, ret2){
                     return API.client.agency.registerAgency(agency)
@@ -260,7 +260,7 @@ describe("api/client/agency.js", function() {
                 })
                 .then(function(){
                     return  API.client.agency.createAgencyUser.call({accountId: _agencyUserId},
-                        {name: '测试代理商用户', email: "agencyUser.test@jingli.com", mobile: '12345678777', agencyId: _agencyId})
+                        {name: '测试代理商用户', email: "agencyUser.test@jingli.tech", mobile: '12345678777', agencyId: _agencyId})
                 })
                 .then(function(ret){
                     assert.equal(ret.status, 0);
@@ -276,7 +276,7 @@ describe("api/client/agency.js", function() {
         after(function(done){
             Promise.all([
                 API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
-                API.agency.deleteAgencyByTest({email: 'agencyUser.test@jingli.com', mobile: agency.mobile})
+                API.agency.deleteAgencyByTest({email: 'agencyUser.test@jingli.tech', mobile: agency.mobile})
             ])
                 .spread(function(ret1, ret2){
                     done();

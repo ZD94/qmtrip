@@ -11,7 +11,7 @@ describe("api/client/company.js", function() {
     var agencyUserId = "";
 
     var agency = {
-        email: "company.test@jingli.com",
+        email: "company.test@jingli.tech",
         userName: "喵喵",
         name: '喵喵的代理商',
         mobile: "15269866802",
@@ -21,9 +21,9 @@ describe("api/client/company.js", function() {
     var company = {
         name: '喵喵的企业',
         userName: '喵喵',
-        domain: 'jingli.com',
+        domain: 'jingli.tech',
         description: '企业API测试用',
-        email: 'company.test@jingli.com',
+        email: 'company.test@jingli.tech',
         mobile: '15269866802'
     }
 
@@ -103,7 +103,7 @@ describe("api/client/company.js", function() {
 
             before(function(done){
                 company.mobile = '15269866812';
-                company.email = 'company.test@jingli.com';
+                company.email = 'company.test@jingli.tech';
                 Promise.all([
                     API.company.deleteCompanyByTest({mobile: company.mobile, email: company.email}),
                     API.staff.deleteAllStaffByTest({mobile: company.mobile, email: company.email})
