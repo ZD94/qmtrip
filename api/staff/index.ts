@@ -7,40 +7,27 @@ var nodeXlsx = require("node-xlsx");
 var uuid = require("node-uuid");
 var moment = require("moment");
 var crypto = require("crypto");
-var _ = require('lodash');
-var utils = require("common/utils");
 var sequelize = require("common/model").importModel("./models");
-var Logger = require("common/logger");
 var staffModel = sequelize.models.Staff;
 var papersModel = sequelize.models.Papers;
 var pointChangeModel = sequelize.models.PointChange;
-var L = require("../../common/language");
-var API = require("../../common/api");
 var config = require('../../config');
 var fs = require('fs');
-var Paginate = require("../../common/paginate").Paginate;
-var logger = new Logger("staff");
+var API = require("common/api");
 var validate = require("common/validate");
-//var auth = require("../auth/index");
-//var travelPolicy = require("../travelPolicy/index");
 
-var staff = {};
-var STAFF_STATUS = {
-    ON_JOB: 0,
-    QUIT_JOB: -1,
-    DELETE: -2
-};
-var STAFF_ROLE = {
-    OWNER: 0,
-    COMMON: 1,
-    ADMIN: 2,
-    FINANCE: 3
-};
-var AGENCY_ROLE = {
-    OWNER: 0,
-    COMMON: 1,
-    ADMIN: 2
-};
+import _ = require('lodash');
+import L = require("common/language");
+import utils = require("common/utils");
+import {Paginate} from 'common/paginate';
+import {validateApi} from 'common/api/helper';
+import {Staff, Credentials, PointChange, STAFF_ROLE, STAFF_STATUS} from "../client/staff/staff.types.ts";
+import {AGENCY_ROLE} from "../client/agency/agency.types.ts";
+
+
+export const staffCols = Object.keys(staffModel.attributes);
+export const papersCols = Object.keys(papersModel.attributes);
+export const pointChangeCols = Object.keys(pointChangeModel.attributes);
 
 /**
  * 创建员工
@@ -48,7 +35,9 @@ var AGENCY_ROLE = {
  * @param data.accountId 已经有登录账号
  * @returns {*}
  */
-staff.createStaff = function(data){
+var createOptionalParams = staffCols.push("accountId");
+validateApi(createStaff, ["email","name","companyId"], staffCols);
+export function createStaff(data){
     var type = data.type;//若type为import则为导入添加
     if(type)
         delete data.type;
@@ -56,21 +45,10 @@ staff.createStaff = function(data){
     if (!data) {
         throw L.ERR.DATA_NOT_EXIST;
     }
-    //如果账号存在,不进行创建了
-    if (!accountId) {
-        if (!data.email) {
-            throw {code: -1, msg: "邮箱不能为空"};
-        }
-    }
     if (data.mobile && !validate.isMobile(data.mobile)) {
         throw {code: -2, msg: "手机号格式不正确"};
      }
-    if (!data.name) {
-        throw {code: -3, msg: "姓名不能为空"};
-    }
-    if (!data.companyId) {
-        throw {code: -4, msg: "所属企业不能为空"};
-    }
+    data = new Staff(data);
     return API.company.getCompany({companyId: data.companyId, columns: ['name','domainName']})
         .then(function(c){
             if(c.domainName && c.domainName != "" && data.email.indexOf(c.domainName) == -1){
@@ -91,7 +69,10 @@ staff.createStaff = function(data){
             if(!data.departmentId || data.departmentId == ""){
                 data.departmentId = null;
             }
-            return staffModel.create(data);
+            return staffModel.create(data)
+                .then(function(result){
+                    return new Staff(result);
+                })
         })
 }
 
@@ -101,11 +82,9 @@ staff.createStaff = function(data){
  * @param params
  * @returns {*}
  */
-staff.deleteStaff = function(params){
+validateApi(deleteStaff, ["id"]);
+export function deleteStaff(params: {id: string}){
     var id = params.id;
-    if (!id) {
-        throw {code: -1, msg: "id不能为空"};
-    }
     return API.auth.remove({accountId: id})
         .then(function(){
             return staffModel.update({status: STAFF_STATUS.DELETE, quitTime: utils.now()}, {where: {id: id}, returning: true})
@@ -146,23 +125,15 @@ staff.deleteStaff = function(params){
  * @param data
  * @returns {*}
  */
-staff.updateStaff = function(data){
+validateApi(updateStaff, ["id"], staffCols);
+export function updateStaff(data){
     var id = data.id;
-    if(!id){
-        throw {code: -1, msg: "id不能为空"};
-    }
-    var options = {};
+    var options: any = {};
     options.where = {id: id};
     options.returning = true;
-    if(!data.travelLevel || data.travelLevel == ""){
-        data.travelLevel = null;
-    }
-    if(!data.departmentId || data.departmentId == ""){
-        data.departmentId = null;
-    }
     var send_email = true;
-    var accobj = {};
-    var com = {};
+    var accobj: any = {};
+    var com: any = {};
     return Q.all([
         staffModel.findById(id),
         API.auth.getAccount({id:id}),
@@ -236,12 +207,10 @@ staff.updateStaff = function(data){
  * @param data
  * @returns {*}
  */
-staff.getStaff = function(params){
+validateApi(getStaff, ["id"], ["columns"]);
+export function getStaff(params: {id: string, columns?: Array<string>}){
     var id = params.id;
-    if(!id){
-        throw {code: -1, msg: "id不能为空"};
-    }
-    var options = {};
+    var options: any = {};
     if(params.columns){
         options.attributes = params.columns
     }
@@ -259,20 +228,22 @@ staff.getStaff = function(params){
  * @param params
  * @returns {*}
  */
-staff.findOneStaff = function(params){
-    var options = {};
+export function findOneStaff(params){
+    var options: any = {};
     options.where = params;
     return staffModel.findOne(options)
+        .then(function(data){
+            return new Staff(data);
+        })
 }
 
 /**
  * 根据部门id查询部门下员工数
  * @type {getCountByDepartment}
  */
-staff.getCountByDepartment = getCountByDepartment;
-getCountByDepartment.required_params = ["departmentId"];
-function getCountByDepartment(params){
-    return staffModel.count({where: {departmentId: params.departmentId, status: {$gte: 0}}})
+validateApi(getCountByDepartment, ["departmentId"]);
+export function getCountByDepartment(params: {departmentId: string}){
+    return staffModel.count({where: {departmentId: params.departmentId, status: {$gte: STAFF_STATUS.ON_JOB}}})
 }
 
 /**
@@ -280,8 +251,8 @@ function getCountByDepartment(params){
  * @param params
  * @returns {*}
  */
-staff.findStaffs = function(params){
-    var options = {};
+export function findStaffs(params){
+    var options : any = {};
     options.where = _.pick(params, Object.keys(staffModel.attributes));
     if(params.$or) {
         options.where.$or = params.$or;
@@ -297,8 +268,8 @@ staff.findStaffs = function(params){
  * @param params 查询条件 params.company_id 企业id
  * @param options options.perPage 每页条数 options.page当前页
  */
-staff.listAndPaginateStaff = function(params){
-    var options = {};
+export function listAndPaginateStaff(params){
+    var options: any = {};
     if(params.options){
         options = params.options;
         delete params.options;
@@ -345,9 +316,8 @@ staff.listAndPaginateStaff = function(params){
  * @param options
  * @returns {*}
  */
-staff.increaseStaffPoint = increaseStaffPoint;
-increaseStaffPoint.required_params = ['id', 'companyId', 'accountId', 'increasePoint'];
-function increaseStaffPoint(params) {
+validateApi(increaseStaffPoint, ['id', 'companyId', 'accountId', 'increasePoint'], ["orderId", "remark"]);
+export function increaseStaffPoint(params) {
     var id = params.id;
     var operatorId = params.accountId;
     var increasePoint = params.increasePoint;
@@ -355,7 +325,7 @@ function increaseStaffPoint(params) {
         .then(function(obj) {
             var totalPoints = obj.totalPoints + increasePoint;
             var balancePoints = obj.balancePoints + increasePoint;
-            var pointChange = {staffId: id, status: 1, points: increasePoint, remark: params.remark||"增加积分", operatorId: operatorId, currentPoint: balancePoints};
+            var pointChange: PointChange = new PointChange({staffId: id, status: 1, points: increasePoint, remark: params.remark||"增加积分", operatorId: operatorId, currentPoint: balancePoints});
             if(params.orderId){
                 pointChange.orderId = params.orderId;
             }
@@ -378,24 +348,19 @@ function increaseStaffPoint(params) {
  * @param options
  * @returns {*}
  */
-staff.decreaseStaffPoint = function(params) {
+validateApi(decreaseStaffPoint, ['id', 'decreasePoint'], ["accountId", "companyId", "remark"]);
+export function decreaseStaffPoint(params) {
     var id = params.id;
     var decreasePoint = params.decreasePoint;
     var operatorId = params.accountId;
-    if(!id){
-        throw {code: -1, msg: "id不能为空"};
-    }
-    if(!decreasePoint){
-        throw {code: -2, msg: "decreasePoint不能为空"};
-    }
     return staffModel.findById(id)
         .then(function(obj) {
             if(obj.balancePoints < decreasePoint){
                 throw {code: -3, msg: "积分不足"};
             }
             var balancePoints = obj.balancePoints - decreasePoint;
-            var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分",
-                operatorId: operatorId, currentPoint: balancePoints, companyId: params.companyId}//此处也应该用model里的属性名封装obj
+            var pointChange: PointChange = new PointChange({ staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分",
+                operatorId: operatorId, currentPoint: balancePoints, companyId: params.companyId});//此处也应该用model里的属性名封装obj
             return sequelize.transaction(function(t) {
                 return Q.all([
                         staffModel.update({balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
@@ -413,8 +378,8 @@ staff.decreaseStaffPoint = function(params) {
  * @param params 查询条件 params.staff_id 员工id
  * @param options options.perPage 每页条数 options.page当前页
  */
-staff.listAndPaginatePointChange = function(params){
-    var options = {};
+export function listAndPaginatePointChange(params){
+    var options: any = {};
     if(params.options){
         options = params.options;
         delete params.options;
@@ -450,11 +415,11 @@ staff.listAndPaginatePointChange = function(params){
  * @param options
  * @returns {*}
  */
-staff.getStaffPointsChangeByMonth = function(params) {
-    var q1  = _.pick(params, ['companyId', 'staffId']);
-    var q2  = _.pick(params, ['companyId', 'staffId']);
-    var q3 = _.pick(params, ['companyId', 'staffId']);
-    var q4 = _.pick(params, ['companyId', 'staffId']);
+export function  getStaffPointsChangeByMonth (params) {
+    var q1: any  = _.pick(params, ['companyId', 'staffId']);
+    var q2: any   = _.pick(params, ['companyId', 'staffId']);
+    var q3: any  = _.pick(params, ['companyId', 'staffId']);
+    var q4 : any = _.pick(params, ['companyId', 'staffId']);
 
     q1.status = 1;
     q2.status = -1;
@@ -505,14 +470,13 @@ staff.getStaffPointsChangeByMonth = function(params) {
  * @param params.endTime  结束时间
  * @returns {*|Promise}
  */
-staff.getStaffPointsChange = getStaffPointsChange;
-getStaffPointsChange.required_params = ['staffId'];
-function getStaffPointsChange(params){
+validateApi(getStaffPointsChange, ['staffId'], ["startTime", "endTime"])
+export function getStaffPointsChange(params){
     var staffId = params.staffId;
     var startTime = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
     var endTime = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
     var changeNum = 0;
-    var options = {};
+    var options: any = {};
     var changeDate = [];
     var changePoint = [];
     options.where = {staffId: staffId, createAt: {$gte: startTime, $lte: endTime}};
@@ -523,13 +487,6 @@ function getStaffPointsChange(params){
                     result[i] = result[i].toJSON();
                     changePoint.push(result[i].currentPoint);
                     changeDate.push(moment(result[i].createAt).format("YYYY-MM-DD HH:mm:ss"));
-                    /*if((i+1)!= result.length && moment(result[i].createAt).format("YYYY-MM-DD") != moment(result[i+1].toJSON().createAt).format("YYYY-MM-DD")){
-                        changePoint.push(result[i].currentPoint);
-                        changeDate.push(moment(result[i].createAt).format("YYYY-MM-DD"));
-                    }else if((i+1) == result.length){
-                        changePoint.push(result[i].currentPoint);
-                        changeDate.push(moment(result[i].createAt).format("YYYY-MM-DD"));
-                    }*/
                     changeNum = changeNum + (result[i].points * result[i].status)
                 }
             }
@@ -544,12 +501,12 @@ function getStaffPointsChange(params){
  * @param params
  * @returns {*}
  */
-staff.beforeImportExcel = function(params){
+export function beforeImportExcel(params){
     var userId = params.accountId;
     var fileId = params.fileId;
 //    var obj = nodeXlsx.parse(fileUrl);
-    var travalPolicies = {};
-    var departmentMaps = {};
+    var travalPolicies: any = {};
+    var departmentMaps: any = {};
     var addObj = [];
     var noAddObj = [];
     var downloadAddObj = [];
@@ -570,7 +527,7 @@ staff.beforeImportExcel = function(params){
                 if(p_companyId){
                     return {companyId: p_companyId};
                 }else{
-                    return staff.getStaff({id: userId});
+                    return getStaff({id: userId});
                 }
             }else{
                 throw {code:-1, msg:"附件记录不存在"};
@@ -603,7 +560,7 @@ staff.beforeImportExcel = function(params){
                 s[1] = s[1] ? s[1]+"" : "";
 //                    var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
 //                var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
-                var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', departmentId: departments[s[3]] || null, department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
+                var staffObj: any = {name: s[0]||'', mobile: s[1], email: s[2]||'', departmentId: departments[s[3]] || null, department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
                 item = staffObj;
                 if(index>0 && index<201){//不取等于0的过滤抬头标题栏
                     if(_.trim(staffObj.name) == ""){
@@ -749,19 +706,17 @@ staff.beforeImportExcel = function(params){
  * @param params
  * @returns {*}
  */
-staff.importExcelAction = function(params){
-    if(!params.addObj){
-        throw {code: -1, msg: "params.addObj不能为空"};
-    }
+validateApi(importExcelAction, ['addObj'])
+export function importExcelAction(params: {addObj: Array<string>}){
     var data = params.addObj;
     var noAddObj = [];
     var addObj = [];
     return Q.all(data.map(function(item, index){
-            var s = data[index];
+            var s: any = data[index];
 //                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, roleId: s.roleId, companyId: s.companyId};//company_id默认为当前登录人的company_id
-            var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,departmentId: s.departmentId,travelLevel: s.travelLevel, companyId: s.companyId, type:"import"};//company_id默认为当前登录人的company_id
+            var staffObj: any = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,departmentId: s.departmentId,travelLevel: s.travelLevel, companyId: s.companyId, type:"import"};//company_id默认为当前登录人的company_id
             if(index>=0 && index<200){
-                return staff.createStaff(staffObj)
+                return createStaff(staffObj)
                     .then(function(ret){
                         if(ret){
                             item = ret;
@@ -793,7 +748,8 @@ staff.importExcelAction = function(params){
  * @param params.objAttr 需要下载的数据列表
  * @returns {*}
  */
-staff.downloadExcle = function (params){
+validateApi(downloadExcle, ['accountId', 'objAttr']);
+export function downloadExcle (params){
     fs.exists(config.upload.tmpDir, function (exists) {
         if(!exists){
             fs.mkdir(config.upload.tmpDir);
@@ -801,12 +757,6 @@ staff.downloadExcle = function (params){
     });
     var data = params.objAttr;
     var nowStr = moment().format('YYYYMMDDHHmm');
-    if(!data){
-        throw {code: -1, msg: "params.objAttr为空"};
-    }
-    if(!params.accountId){
-        throw {code: -1, msg: "params.accountId为空"};
-    }
     var md5 = crypto.createHash("md5");
     var fileName = md5.update(params.accountId+nowStr).digest("hex");
     data = JSON.parse(data);
@@ -826,13 +776,14 @@ staff.downloadExcle = function (params){
  * @param companyId
  * @returns {*}
  */
-staff.isStaffInCompany = function(staffId, companyId){
-    return staffModel.findById(staffId, {attributes: ['companyId']})
+validateApi(isStaffInCompany, ['staffId','companyId']);
+export function isStaffInCompany (params:{staffId: string, companyId:string}){
+    return staffModel.findById(params.staffId, {attributes: ['companyId']})
         .then(function(staff){
             if(!staff){
                 throw {code: 1, msg: '没有找到该员工'};
             }
-            if(staff.companyId != companyId){
+            if(staff.companyId != params.companyId){
                 throw {code: 2, msg: '员工不在该企业'};
             }
             return true;
@@ -844,10 +795,8 @@ staff.isStaffInCompany = function(staffId, companyId){
  * @param params
  * @returns {*}
  */
-staff.statisticStaffs = function(params){
-    if(!params.companyId){
-        throw {code: -1, msg: '企业Id不能为空'};
-    }
+validateApi(statisticStaffs, ['companyId'], ['startTime', 'endTime']);
+export function statisticStaffs(params){
     var companyId = params.companyId;
     var start = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
     var end = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
@@ -873,11 +822,9 @@ staff.statisticStaffs = function(params){
  * @param params
  * @returns {*}
  */
-staff.statisticStaffsRole = function(params){
-    if(!params.companyId){
-        throw {code: -1, msg: '企业Id不能为空'};
-    }
-    var where = {};
+validateApi(statisticStaffsRole, ['companyId'], ["departmentId"]);
+export function statisticStaffsRole(params: {companyId: string, departmentId?: string}){
+    var where: any = {};
     var companyId = params.companyId;
     var departmentId = params.departmentId;
     where.companyId = companyId;
@@ -925,10 +872,8 @@ staff.statisticStaffsRole = function(params){
  * @param params
  * @returns {*}
  */
-staff.getStaffCountByCompany = function(params){
-    if(!params.companyId){
-        throw {code: -1, msg: '企业Id不能为空'};
-    }
+validateApi(getStaffCountByCompany, ['companyId']);
+export function getStaffCountByCompany (params: {companyId: string}){
     var companyId = params.companyId;
     return staffModel.count({where: {companyId: companyId, status:{$ne: STAFF_STATUS.DELETE}}})
         .then(function(all){
@@ -937,14 +882,12 @@ staff.getStaffCountByCompany = function(params){
 }
 
 /**
- * 查询企业部门
+ * 查询企业部门(可能现在没用了)
  * @param params
  * @returns {*}
  */
-staff.getDistinctDepartment = function(params){
-    if(!params.companyId){
-        throw {code: -1, msg: '企业Id不能为空'};
-    }
+validateApi(getDistinctDepartment, ['companyId']);
+export function getDistinctDepartment(params: {companyId: string}){
     var departmentAttr = [];
     var companyId = params.companyId;
     return staffModel.findAll({where: {companyId: companyId, status:{$ne: STAFF_STATUS.DELETE}}, attributes:[[sequelize.literal('distinct department'),'department']]})
@@ -963,7 +906,8 @@ staff.getDistinctDepartment = function(params){
  * @param params
  * @returns {*}
  */
-staff.deleteAllStaffs = function(params){
+validateApi(deleteAllStaffs, ['company']);
+export function deleteAllStaffs(params: {company: string}){
     return staffModel.destroy({where: {companyId: params.company}})
         .then(function(){
             return true;
@@ -975,13 +919,11 @@ staff.deleteAllStaffs = function(params){
  * @param params
  * @returns {*}
  */
-staff.getInvoiceViewer = function(params){
+validateApi(getInvoiceViewer, ['accountId']);
+export function getInvoiceViewer (params: {accountId: string}){
     var viewerId = [];
     var id = params.accountId;
-    if(!id){
-        throw {msg: 'accountId不能为空'};
-    }
-    return staff.getStaff({id: id})
+    return getStaff({id: id})
         .then(function(obj){
             if(obj && obj.companyId){
                 return API.company.getCompany({companyId: obj.companyId})
@@ -1007,12 +949,11 @@ staff.getInvoiceViewer = function(params){
 }
 
 /**
- *
+ *统计企业员工积分
  * @param params
  */
-staff.statStaffPoints = statStaffPoints;
-statStaffPoints.required_params = ['companyId'];
-function statStaffPoints(params){
+validateApi(statStaffPoints, ['companyId']);
+export function statStaffPoints(params: {accountId: string}){
     var query = params;
     return Q.all([
         staffModel.sum('total_points', {where: query}),
@@ -1026,7 +967,7 @@ function statStaffPoints(params){
         })
 }
 
-staff.deleteAllStaffByTest = function(params){
+export function deleteAllStaffByTest(params){
     var companyId = params.companyId;
     var mobile = params.mobile;
     var email = params.email;
@@ -1047,10 +988,8 @@ staff.deleteAllStaffByTest = function(params){
  * @param params
  * @returns {*}
  */
-staff.createPapers = createPapers;
-createPapers.required_params = ['type', 'idNo', 'ownerId'];
-createPapers.optional_params = ['validData', 'birthday'];
-function createPapers(params){
+validateApi(createPapers, ['type', 'idNo', 'ownerId'], ['validData', 'birthday']);
+export function createPapers(params){
     //查询该用户该类型证件信息是否已经存在 不存在添加 存在则修改
     return papersModel.findOne({where: {type: params.type, ownerId: params.ownerId}})
     .then(function(result){
@@ -1071,6 +1010,9 @@ function createPapers(params){
             return papersModel.create(params);
         }*/
     })
+        .then(function(data){
+            return new Credentials(data);
+        })
 }
 
 /**
@@ -1078,9 +1020,8 @@ function createPapers(params){
  * @param params
  * @returns {*}
  */
-staff.deletePapers = deletePapers;
-deletePapers.required_params = ['id'];
-function deletePapers(params){
+validateApi(deletePapers, ['id']);
+export function deletePapers(params: {id: string}){
     return papersModel.destroy({where: params})
         .then(function(obj){
             return true;
@@ -1092,18 +1033,16 @@ function deletePapers(params){
  * @param params
  * @returns {*}
  */
-staff.updatePapers = updatePapers;
-updatePapers.required_params = ['id'];
-updatePapers.optional_params = ['type', 'idNo', 'ownerId', 'validData', 'birthday'];
-function updatePapers(params){
+validateApi(updatePapers, ['id'], ['type', 'idNo', 'ownerId', 'validData', 'birthday']);
+export function updatePapers(params){
     var id = params.id;
     delete params.id;
-    var options = {};
+    var options: any = {};
     options.where = {id: id};
     options.returning = true;
     return papersModel.update(params, options)
         .spread(function(rownum, rows){
-            return rows[0];
+            return new Credentials(rows[0]);
         });
 }
 /**
@@ -1111,15 +1050,16 @@ function updatePapers(params){
  * @param {String} params.id
  * @returns {*}
  */
-staff.getPapersById = getPapersById;
-getPapersById.required_params = ['id'];
-getPapersById.optional_params = ['attributes'];
-function getPapersById(params){
+validateApi(getPapersById, ['id'], ['attributes']);
+export function getPapersById(params){
     //return papersModel.findById(params.id);
-    var options = {};
+    var options: any = {};
     options.where = {id: params.id};
     options.attributes = params.attributes? ['*'] :params.attributes;
-    return papersModel.findOne(options);
+    return papersModel.findOne(options)
+        .then(function(data){
+            return new Credentials(data);
+        })
 }
 
 /**
@@ -1129,11 +1069,9 @@ function getPapersById(params){
  * @param {integer} params.type
  * @returns {*}
  */
-staff.getOnesPapersByType = getOnesPapersByType;
-getOnesPapersByType.required_params = ['ownerId', 'type'];
-getOnesPapersByType.optional_params = ['attributes'];
-function getOnesPapersByType(params){
-    var options = {};
+validateApi(getOnesPapersByType, ['ownerId', 'type'], ['attributes']);
+export function getOnesPapersByType(params){
+    var options:any = {};
     options.where = {ownerId: params.ownerId, type: params.type};
     options.attributes = params.attributes? ['*'] :params.attributes;
     return papersModel.findOne(options);
@@ -1144,17 +1082,13 @@ function getOnesPapersByType(params){
  * @param params
  * @returns {*}
  */
-staff.getPapersByOwner = getPapersByOwner;
-getPapersByOwner.required_params = ['ownerId'];
-getPapersByOwner.optional_params = ['attributes'];
-function getPapersByOwner(params){
+validateApi(getPapersByOwner, ['ownerId'], ['attributes']);
+export function getPapersByOwner(params){
     //return papersModel.findAll({where: {ownerId: params.ownerId}});
-    var options = {};
+    var options: any = {};
     options.where = {ownerId: params.ownerId};
     options.attributes = params.attributes? ['*'] :params.attributes;
     return papersModel.findAll(options);
 }
 
 /***********************证件信息end***********************/
-
-module.exports = staff;

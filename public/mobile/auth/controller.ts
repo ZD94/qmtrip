@@ -30,19 +30,19 @@ export function LoginController($scope,$stateParams) {
 
     var backUrl = $stateParams.backurl || "#";
     $scope.check_login = async function() : Promise<any> {
-        try {
-            await API.onload();
-            var data = await API.auth.login($scope.form);
-            Cookie.set("user_id", data.user_id, { expires:30 });
-            Cookie.set("token_sign", data.token_sign, { expires:30 });
-            Cookie.set("timestamp", data.timestamp, { expires:30 });
-            Cookie.set("token_id", data.token_id, { expires:30 });
-            API.reload_all_modules();
-            window.location.href= backUrl;
-        } catch(err) {
-            //console.info(err.msg);
-            var str = err.msg;
-            msgbox.log(str);//显示错误消息
+            try {
+                await API.onload();
+                var data = await API.auth.login($scope.form);
+                Cookie.set("user_id", data.user_id, { expires:30 });
+                Cookie.set("token_sign", data.token_sign, { expires:30 });
+                Cookie.set("timestamp", data.timestamp, { expires:30 });
+                Cookie.set("token_id", data.token_id, { expires:30 });
+                API.reload_all_modules();
+                window.location.href= backUrl;
+            } catch(err) {
+                //console.info(err.msg);
+                var str = err.msg;
+                msgbox.log(str);//显示错误消息
         }
     }
 }

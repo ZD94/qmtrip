@@ -296,7 +296,7 @@ export function getAllTravelPolicy(options){
  * @param params
  * @returns {*}
  */
-validateApi(agencyGetAllTravelPolicy, ["companyId"]);
+validateApi(agencyGetAllTravelPolicy, ["companyId"], ["columns", "order"]);
 export function agencyGetAllTravelPolicy(params){
     var self = this;
     var companyId = params.companyId;

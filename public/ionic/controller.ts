@@ -50,7 +50,6 @@ export async function IndexController($scope,Menu,$ionicModal,$ionicPopup, Staff
     }
 
     $scope.Menu = Menu;
-
     $scope.staff = await StaffService.get(Cookie.get('user_id'));
 
 }

@@ -35,9 +35,9 @@ module.exports = (function() {
                         Promise.all([
                             API.tripPlan.statPlanOrderMoney({}),
                             API.travelPolicy.getTravelPolicy({id: travelLevel}),
-                            API.tripPlan.pageTripPlanOrder({isHasBudget: false}),
-                            API.tripPlan.pageTripPlanOrder({isUpload:false}),
-                            API.tripPlan.pageTripPlanOrder({audit:"N"})
+                            API.tripPlan.pageTripPlans({isHasBudget: false}),
+                            API.tripPlan.pageTripPlans({isUpload:false}),
+                            API.tripPlan.pageTripPlans({audit:"N"})
                         ])
                             .spread(function(planMoney,travelPolicy,plan_status_1,plan_status_2,plan_status_3){
                                 console.info(planMoney);

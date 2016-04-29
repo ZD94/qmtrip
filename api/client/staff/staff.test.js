@@ -54,19 +54,15 @@ describe("api/client/staff.js", function() {
                 API.staff.deleteAllStaffByTest({email: obj.email, mobile: obj.mobile})
             ])
             .spread(function(ret1, ret2, ret3, ret4, ret5){
-                console.info(ret1, ret2, ret3, ret4, ret5);
                 return API.agency.registerAgency(agency);
             })
             .then(function(ret){
                 agencyId = ret.agency.id;
                 agencyUserId = ret.agencyUser.id;
                 agencySelf = {accountId: agencyUserId};
-                console.info("API.client.company.createCompany");
                 return API.client.company.createCompany.call({accountId: agencyUserId}, company);
             })
             .then(function(company){
-                console.log(company);
-                console.log("=================================================");
                 assert.equal(company.status, 0);
                 companyId = company.id;
                 accountId = company.createUser;
@@ -103,8 +99,8 @@ describe("api/client/staff.js", function() {
         API.client.staff.createStaff.call(ownerSelf, obj, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
-//                console.log(result);
-            id = result.id;//回调为何不能直接.id
+            // updateobj = result;
+            id = result.id;
             done();
         });
     })
@@ -125,7 +121,6 @@ describe("api/client/staff.js", function() {
         API.client.staff.updateStaff.call(ownerSelf, updateobj, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
-            //console.log(result);
             done();
         });
     })
@@ -277,7 +272,7 @@ describe("api/client/staff.js", function() {
         });
 
         after(function (done) {
-            API.tripPlan.deleteTripPlanOrder({orderId: newOrderId, userId: ownerSelf.accountId})
+            API.tripPlan.deleteTripPlan({orderId: newOrderId, userId: ownerSelf.accountId})
                 .then(function(ret) {
                     assert.equal(ret, true);
                     done();
@@ -365,7 +360,7 @@ describe("api/client/staff.js", function() {
             assert.equal(err, null);
             //console.log(err);
 //                console.log(result);
-            id = result.dataValues.id;//回调为何不能直接.id
+            id = result.id;//回调为何不能直接.id
             done();
         });
     })

@@ -9,13 +9,14 @@ var API = require("common/api");
 import {validateApi} from 'common/api/helper';
 import types = require("../client/travelPolicy/travelPolicy.types");
 
+export const travalPolicyCols = Object.keys(travalPolicyModel.attributes);
 
 /**
  * 创建差旅标准
  * @param data
  * @returns {*}
  */
-validateApi(createTravelPolicy, ["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"]);
+validateApi(createTravelPolicy, ["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"], travalPolicyCols);
 export function createTravelPolicy(data){
     console.info("createData=>", data);
     if (!data.hotelPrice || !/^\d+(.\d{1,2})?$/.test(data.hotelPrice)) {
@@ -63,7 +64,7 @@ export function deleteTravelPolicyByTest(params){
  * @param data
  * @returns {*}
  */
-validateApi(updateTravelPolicy, ["id"]);
+validateApi(updateTravelPolicy, ["id"], travalPolicyCols);
 export function updateTravelPolicy(data){
     var id = data.id;
     delete data.id;

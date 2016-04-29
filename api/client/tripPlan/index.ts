@@ -12,7 +12,6 @@ import moment = require('moment');
 import _ = require('lodash');
 import {validateApi} from "common/api/helper";
 import {PLAN_STATUS, TripPlan, Project, ConsumeDetails} from './tripPlan.types';
-import async = Q.async;
 
 
 /**
@@ -83,7 +82,7 @@ export async function savePlanOrder(params: TripPlan) {
  * @method saveConsumeDetail
  * 保存消费支出明细
  * @param params
- * @returns {*}
+ * @returns {Promise<ConsumeDetails>}
  */
 export function saveConsumeDetail(params) {
     let self = this;
@@ -95,6 +94,7 @@ export function saveConsumeDetail(params) {
  * @method getTripPlanById
  * 获取计划单详情
  * @param {string} params.orderId
+ * @returns {Promise<TripPlan>}
  */
 validateApi(getTripPlanById, ['orderId']);
 export async function getTripPlanById(params: {orderId: string}) {
@@ -106,82 +106,62 @@ export async function getTripPlanById(params: {orderId: string}) {
         throw L.ERR.PERMISSION_DENY;
     }
 
-    return tripPlan;
+    return new TripPlan(tripPlan);
 }
 
 /**
+ * @method pageCompleteTripPlans
  * 获取员工已完成计划单分页列表
- * @returns {*}
+ * @param {object} params
+ * @returns {Promise<Paginate>}
  */
-export function pageCompleteTripPlanOrder(params) {
-    if(!params) {
-        throw {code: -10, msg: '参数不能为空'};
-    }
-
-    if (typeof params == 'function') {
-        throw {code: -2, msg: '参数不正确'};
-    }
-    var self = this;
-    var accountId = self.accountId;
-    var page = params.page;
-    var perPage = params.perPage;
-    typeof page == 'number' ? "" : page = 1;
-    typeof perPage == 'number' ? "" : perPage = 10;
+validateApi(pageCompleteTripPlans, [], ['page', 'perPage', 'startTime', 'endTime', 'order', 'startAt', 'backAt', 'startPlace', 
+    'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
+export async function pageCompleteTripPlans(params) {
+    let self = this;
+    let accountId = self.accountId;
+    let page = typeof params.page == 'number' ? params.page : 1;
+    let perPage = typeof params.perPage == 'number' ? params.perPage : 10;
 
     if(params.startTime) {
-        params.startAt?params.startAt.$gte = params.startTime:params.startAt = {$gte: params.startTime};
+        params.startAt ? params.startAt.$gte = params.startTime:params.startAt = {$gte: params.startTime};
     }
 
     if(params.endTime) {
-        params.startAt?params.startAt.$lte = params.endTime:params.startAt = {$lte: params.endTime};
+        params.startAt ? params.startAt.$lte = params.endTime:params.startAt = {$lte: params.endTime};
     }
 
-    var query : any = _.pick(params, ['startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
-    query.accountId = self.accountId;
+    let query : any = _.pick(params, ['startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
+    query.accountId = accountId;
     query.status = 2;
     query.auditStatus = 1;
-    //query.orderStatus = 'COMPLETE';
+    
+    let staff = await API.staff.getStaff({id: accountId, columns: ['companyId']});
+    query.companyId = staff.companyId;
+    let options : any = {where: query, limit: perPage, offset: perPage * (page - 1)};
 
-    return API.staff.getStaff({id: accountId, columns: ['companyId']})
-        .then(function (staff) {
-            return staff.companyId;
-        })
-        .then(function (companyId) {
-            query.companyId = companyId;
-            var options : any = {
-                where: query,
-                limit: perPage,
-                offset: perPage * (page - 1)
-            }
+    if(params.order) {
+        options.order = [params.order];
+    }
 
-            if(params.order) {
-                options.order = [params.order];
-            }
-
-            return API.tripPlan.listTripPlanOrder(options);
-        })
+    return API.tripPlan.listTripPlanOrder(options);
 }
 
 
 /**
+ * @method pageTripPlans
  * 获取员工计划单分页列表
- * @returns {*}
+ * @param params
+ * @returns {Promise<Paginate>}
  */
-export function pageTripPlanOrder(params) {
-    if(!params) {
-        throw {code: -10, msg: '参数不能为空'};
-    }
-
-    if (typeof params == 'function') {
-        throw {code: -2, msg: '参数不正确'};
-    }
-    var self = this;
-    var accountId = self.accountId;
-
-    var page = params.page;
-    var perPage = params.perPage;
-    typeof page == 'number' ? "" : page = 1;
-    typeof perPage == 'number' ? "" : perPage = 10;
+validateApi(pageTripPlans, [], ['audit', 'startTime', 'endTime', 'startPlace', 'destination',
+    'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit', 'isHasBudget', 'isUpload',
+    'isComplete', 'description', 'page', 'perPage']);
+export async function pageTripPlans(params) {
+    let self = this;
+    let accountId = self.accountId;
+    let page = typeof params.page == 'number' ? params.page : 1;
+    let perPage = typeof params.perPage == 'number' ? params.perPage : 10;
 
     //判断出差计划是否完成
     if (params.isComplete === false) {
@@ -192,27 +172,17 @@ export function pageTripPlanOrder(params) {
         params.auditStatus = 1;
     }
 
-    var query : any = getQueryByParams(params);
+    let query : any = getQueryByParams(params);
+    let staff = await API.staff.getStaff({id: accountId, columns: ['companyId']});
+    query.accountId = accountId;
+    query.companyId = staff.companyId;
+    let options : any = {where: query, limit: perPage, offset: perPage * (page - 1)};
 
-    return API.staff.getStaff({id: accountId, columns: ['companyId']})
-        .then(function (staff) {
-            return staff.companyId;
-        })
-        .then(function (companyId) {
-            query.accountId = self.accountId;
-            query.companyId = companyId;
-            var options : any = {
-                where: query,
-                limit: perPage,
-                offset: perPage * (page - 1)
-            }
+    if(params.order) {
+        options.order = [params.order];
+    }
 
-            if(params.order) {
-                options.order = [params.order];
-            }
-
-            return API.tripPlan.listTripPlanOrder(options);
-        })
+    return API.tripPlan.listTripPlanOrder(options);
 }
 
 /**
@@ -223,12 +193,12 @@ export function pageTripPlanOrder(params) {
  * 审核未通过      params.audit = 'N';
  * 已完成          params.isComplete = true'
  * @param params
- * @returns {*}
+ * @returns {object}
  */
 function getQueryByParams(params) {
     //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
     if(params.audit){
-        var audit = params.audit;
+        let audit = params.audit;
         params.status = 1;
         if(audit == 'Y'){
             params.status = 2;
@@ -257,37 +227,26 @@ function getQueryByParams(params) {
         params.budget = {$lte: 0}; //预算结果小于0
     }
 
-    var query = _.pick(params, ['status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination',
+    let query : any = _.pick(params, ['status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination',
         'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'description', 'remark', 'isCommit']);
 
     return query;
 }
 
 /**
+ * @method pageTripPlansByCompany
  * 获取员工计划单分页列表(企业)
- * @returns {*}
+ * @returns {Promise<Paginate>}
  */
-// pageTripPlanOrderByCompany.optional_params = ['audit', 'startTime', 'endTime', 'startPlace', 'destination',
-//     'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit', 'isHasBudget', 'isUpload',
-//     'isComplete', 'description', 'page', 'perPage', 'emailOrName'];
-export function pageTripPlanOrderByCompany(params) {
-    if(!params) {
-        throw {code: -10, msg: '参数不能为空'};
-    }
-
-    if (typeof params == 'function') {
-        throw {code: -2, msg: '参数不正确'};
-    }
-    var self = this;
-    var accountId = self.accountId;
-
-    //var {page, perPage, startTime, endTime} = params;
-
-    var page = params.page;
-    var perPage = params.perPage;
-    var emailOrName = params.emailOrName;
-    page = typeof page == 'number' ? page : 1;
-    perPage = typeof perPage == 'number' ? perPage : 10;
+validateApi(pageTripPlansByCompany, [], ['audit', 'startTime', 'endTime', 'startPlace', 'destination',
+    'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit', 'isHasBudget', 'isUpload',
+    'isComplete', 'description', 'page', 'perPage', 'emailOrName']);
+export function pageTripPlansByCompany(params) {
+    let self = this;
+    let accountId = self.accountId;
+    let emailOrName = params.emailOrName;
+    let page = typeof params.page == 'number' ? params.page : 1;
+    let perPage = typeof params.perPage == 'number' ? params.perPage : 10;
 
     //判断出差计划是否完成
     if (params.isComplete === false) {
@@ -306,8 +265,8 @@ export function pageTripPlanOrderByCompany(params) {
         params.startAt?params.startAt.$lte = params.endTime:params.startAt = {$lte: params.endTime};
     }
 
-    var query : any = getQueryByParams(params);
-    var status = query.status;
+    let query : any = getQueryByParams(params);
+    let status = query.status;
     if(status == undefined) {
         status = query.status = {};
     }
@@ -319,11 +278,7 @@ export function pageTripPlanOrderByCompany(params) {
         })
         .then(function (companyId) {
             query.companyId = companyId;
-            var options : any = {
-                where: query,
-                limit: perPage,
-                offset: perPage * (page - 1)
-            }
+            let options : any = {where: query, limit: perPage, offset: perPage * (page - 1)};
 
             if(params.order) {
                 options.order = [params.order];
@@ -342,7 +297,7 @@ export function pageTripPlanOrderByCompany(params) {
         })
         .spread(function(isEmailOrName, options, staffs) {
             if(staffs && staffs.length > 0) {
-                var idArr = staffs.map(function(staff) {
+                let idArr = staffs.map(function(staff) {
                     return staff.id;
                 });
 
@@ -355,279 +310,222 @@ export function pageTripPlanOrderByCompany(params) {
         })
 }
 
-/**
- * 获取差旅计划单列表(企业)
- * @param params
- * @returns {*}
- */
-export function listTripPlanOrderByCompany(params) {
-    if (!params) {
-        params = {}
-    }
-    var self = this;
-    var accountId = self.accountId;
-
-    return API.staff.getStaff({id: accountId, columns: ['companyId']})
-        .then(function (staff) {
-            return staff.companyId;
-        })
-        .then(function (companyId) {
-            params.companyId = companyId;
-            return API.tripPlan.listTripPlanOrder(params);
-        });
-}
 
 /**
+ * @method deleteTripPlan
  * 删除差旅计划单/预算单
- * @param orderId
- * @returns {*}
+ * @param params.orderId 出差计划id
+ * @returns {Promise<boolean>}
  */
-export function deleteTripPlanOrder(orderId) {
-    var self = this;
-    var params = {
-        orderId: orderId,
-        userId: self.accountId
-    }
-    return API.tripPlan.deleteTripPlanOrder(params);
+validateApi(deleteTripPlan, ['orderId']);
+export function deleteTripPlan(params: {orderId: string}) {
+    let self = this;
+    params['userId'] = self.accountId;
+    return API.tripPlan.deleteTripPlan(params);
 }
 
 /**
+ * @method deleteConsumeDetail
  * 删除差旅消费明细
- * @param orderId
- * @returns {*}
+ * @param params.id
+ * @returns {Promise<boolean>}
  */
-export function deleteConsumeDetail(id) {
-    var params = {
-        id: id,
-        userId: this.accountId
-    }
+validateApi(deleteConsumeDetail, ['id']);
+export function deleteConsumeDetail(params: {id: string}) {
+    let self = this;
+    params['userId'] = self.accountId;
     return API.tripPlan.deleteConsumeDetail(params);
 }
 
 /**
+ * @method uploadInvoice
  * 上传票据
  * @param params
  * @param params.consumeId 消费详情id
  * @param params.picture 新上传的票据fileId
- * @returns {*}
+ * @returns {Promise<boolean>}
  */
-export function uploadInvoice(params) {
-    var self = this;
-    params.userId = self.accountId;
+validateApi(uploadInvoice, ['consumeId', 'picture']);
+export function uploadInvoice(params: {consumeId: string, picture: string}) {
+    let self = this;
+    params['userId'] = self.accountId;
     return API.tripPlan.uploadInvoice(params)
 }
 
 /**
+ * @method countTripPlanNum
  * 根据条件统计计划单数目
  * @param params
- * @returns {*}
+ * @returns {Promise<object>}
  */
-export function countTripPlanNum(params) {
-    var self = this;
-    var accountId = self.accountId;
-    return API.staff.getStaff({id: accountId})
-        .then(function (staff) {
-            var companyId = staff.companyId;
-            params.companyId = companyId;
-            return API.tripPlan.countTripPlanNum(params);
-        });
+export async function countTripPlanNum(params) {
+    let self = this;
+    let accountId = self.accountId;
+    let {companyId} = await API.staff.getStaff({id: accountId});
+    params.companyId = companyId;
+    return API.tripPlan.countTripPlanNum(params);
 }
 
 /**
- * @method statBudgetByGroup 统计计划单的动态预算/计划金额和实际支出
+ * @method statBudgetByGroup
+ * 统计计划单的动态预算/计划金额和实际支出
  * @param params
+ * @returns {Promise<object>}
  */
-export function statBudgetByGroup(params) {
-    var self = this;
-    var params : any = _.pick(params, ['startTime', 'endTime']);
-    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
-        .then(function (staff) {
-            var companyId = staff.companyId;
-            var params_S = {
-                startTime: params.startTime,
-                endTime: params.endTime,
-                companyId: companyId,
-                index: 0
-            };
-            var params_Z = {
-                startTime: params.startTime,
-                endTime: params.endTime,
-                companyId: companyId,
-                index: 1
-            };
-            var params_X = {
-                startTime: params.startTime,
-                endTime: params.endTime,
-                companyId: companyId,
-                index: 2
-            };
-            return Promise.all([
-                API.tripPlan.statBudgetByGroup(params_S),
-                API.tripPlan.statBudgetByGroup(params_Z),
-                API.tripPlan.statBudgetByGroup(params_X)
-            ])
-                .spread(function(S, Z, X){
-                    var ret = {};
-                    for(var name in S) {
-                        ret[name] = [S[name]];
-                    }
+export async function statBudgetByGroup(params: {startTime: string, endTime: string}) {
+    let self = this;
+    let {companyId} = await API.staff.getStaff({id: self.accountId, columns: ['companyId']});
+    let params_S = {startTime: params.startTime, endTime: params.endTime, companyId: companyId, index: 0};
+    let params_Z = {startTime: params.startTime, endTime: params.endTime, companyId: companyId, index: 1};
+    let params_X = {startTime: params.startTime, endTime: params.endTime, companyId: companyId, index: 2};
+    let S = await API.tripPlan.statBudgetByGroup(params_S);
+    let Z = await API.tripPlan.statBudgetByGroup(params_Z);
+    let X = await API.tripPlan.statBudgetByGroup(params_X);
 
-                    for(var name in Z) {
-                        if(!ret[name]){
-                            ret[name] = [];
-                        }
-                        ret[name].push(Z[name]);
-                    }
-                    for(var name in X) {
-                        if(!ret[name]){
-                            ret[name] = [];
-                        }
-                        ret[name].push(X[name]);
-                    }
-                    return ret;
-                })
-        })
+    let ret = {};
+    for(let name in S) {
+        ret[name] = [S[name]];
+    }
+
+    for(let name in Z) {
+        if(!ret[name]){
+            ret[name] = [];
+        }
+        ret[name].push(Z[name]);
+    }
+    for(let name in X) {
+        if(!ret[name]){
+            ret[name] = [];
+        }
+        ret[name].push(X[name]);
+    }
+
+    return ret;
 }
 
 /**
+ * @method statBudgetByMonth
  * 按月份统计预算/计划/完成金额
- * @type {statBudgetByMonth}
+ * @param params
+ * @returns {Promise<object>}
  */
-export function statBudgetByMonth(params) {
-    var self = this;
-    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
-        .then(function (staff) {
-            params.companyId = staff.companyId;
-            return API.tripPlan.statBudgetByMonth(params)
-        })
+export async function statBudgetByMonth(params) {
+    let self = this;
+    let {companyId} = await API.staff.getStaff({id: self.accountId, columns: ['companyId']});
+    params.companyId = companyId;
+    return API.tripPlan.statBudgetByMonth(params)
 }
 
 /**
  * @method statPlanOrderMoneyByCompany 统计计划单的动态预算/计划金额和实际支出
  * @param params
+ * @returns {Promise<object>}
  */
-export function statPlanOrderMoneyByCompany(params) {
-    var self = this;
-    var params : any = _.pick(params, ['startTime', 'endTime']);
-    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
-        .then(function (staff) {
-            params.companyId = staff.companyId;
-            return API.tripPlan.statPlanOrderMoney(params);
-        })
+export async function statPlanOrderMoneyByCompany(params: {startTime?: string, endTime?: string}) {
+    let self = this;
+    let {companyId} = await API.staff.getStaff({id: self.accountId, columns: ['companyId']});
+    params['companyId'] = companyId;
+    return API.tripPlan.statPlanOrderMoney(params);
 }
 
 /**
  * @method statPlanOrderMoneyByCompany 统计计划单的动态预算/计划金额和实际支出
  * @param params
+ * @returns {Promise<object>}
  */
-export function statPlanOrderMoney(params) {
-    var self = this;
-    var params : any = _.pick(params, ['startTime', 'endTime']);
-    return API.staff.getStaff({id: self.accountId, columns: ['id', 'companyId']})
-        .then(function (staff) {
-            params.companyId = staff.companyId;
-            params.accountId = staff.id;
-            return API.tripPlan.statPlanOrderMoney(params);
-        })
+validateApi(statPlanOrderMoney, [], ['startTime', 'endTime']);
+export async function statPlanOrderMoney(params: {startTime?: string, endTime?: string}) {
+    let self = this;
+    let {companyId, id : accountId} = await API.staff.getStaff({id: self.accountId, columns: ['id', 'companyId']});
+    params['companyId'] = companyId;
+    params['accountId'] = accountId;
+    return API.tripPlan.statPlanOrderMoney(params);
 }
 
 /**
  * 用户提交订单(上传完票据后，提交订单后不可修改)
  * @param orderId
+ * @returns {Promise<boolean>}
  */
-export function commitTripPlanOrder(orderId){
-    if(!orderId || typeof orderId == 'function'){
-        throw {code: -1, msg: '参数不正确'};
-    }
-    var self = this;
-
-    return API.tripPlan.commitTripPlanOrder({orderId: orderId, accountId: self.accountId})
+validateApi(commitTripPlanOrder, ['orderId']);
+export function commitTripPlanOrder(params: {orderId: string}){
+    let self = this;
+    params['accountId'] = self.accountId;
+    return API.tripPlan.commitTripPlanOrder(params);
 }
 
 /**
+ * @method getConsumeInvoiceImg
  * 获取发票图片
- *
+ * @param params
+ * @returns {Promise<any>}
+ */
+export function getConsumeInvoiceImg(params: {consumeId: string}) {
+    return API.tripPlan.getConsumeInvoiceImg(params);
+}
+
+/**
+ * @method statStaffsByCity
+ * 统计时间段内城市内的员工数
  * @param params
  */
-export function getConsumeInvoiceImg(params) {
-    var consumeId = params.consumeId;
-    return API.tripPlan.getConsumeInvoiceImg({
-        consumeId: consumeId
-    });
+validateApi(statStaffsByCity, ['statTime']);
+export async function statStaffsByCity(params: {statTime: string}) {
+    let self = this;
+    let date = params.statTime;
+    let query : any = {status: {$ne: -2}, startAt: {$lte: date}, backAt: {$gte: date}};
+
+    let {companyId} = await API.staff.getStaff({id: self.accountId, columns: ['companyId']});
+    let list = await API.tripPlan.findOrdersByOption({where: query, order: ['ddd', 'dd']});
+
+    let ret = {};
+    for(let i= 0,ii=list.length; i<ii; i++) {
+        let order = list[i];
+        let cityCode = order.destinationCode;
+        if(!ret[cityCode]) {
+            ret[cityCode] = new Array();
+        }
+        ret[cityCode].push(order);
+    }
+    return ret;
 }
 
 /**
- * 统计时间段内城市内的员工数
- * @type {statStaffsByCity}
- */
-// statStaffsByCity.required_params = ['statTime'];
-export function statStaffsByCity(params) {
-    var self = this;
-    var date = params.statTime;
-    var query : any = {status: {$ne: -2}, startAt: {$lte: date}, backAt: {$gte: date}};
-
-    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
-        .then(function(staff){
-            query.companyId = staff.companyId;
-            //query.companyId = "00000000-0000-0000-0000-000000000001";
-
-            return API.tripPlan.findOrdersByOption({where: query, order: ['ddd', 'dd']})
-        })
-        .then(function(list){
-            var ret = {};
-            for(var i= 0,ii=list.length; i<ii; i++) {
-                var order = list[i];
-                var cityCode = order.destinationCode;
-                if(!ret[cityCode]) {
-                    ret[cityCode] = new Array();
-                }
-                ret[cityCode].push(order);
-            }
-            return ret;
-        })
-}
-
-/**
+ * @method checkBudgetExist
  * 判断用户是否已经生成改预算
  * @param params
- * @returns {*}
+ * @returns {Promise<boolean>}
  */
-export function checkBudgetExist(params) {
-    var self = this;
-    var accountId = self.accountId;
+export async function checkBudgetExist(params) {
+    let self = this;
+    let accountId = self.accountId;
+    let {companyId} = await API.staff.getStaff({id: accountId, columns: ['companyId']});
     params.accountId = accountId;
-
-    return API.staff.getStaff({id: accountId, columns: ['companyId']})
-        .then(function (staff) {
-            params.companyId = staff.companyId;
-
-            return API.tripPlan.checkBudgetExist(params)
-        })
+    params.companyId = companyId;
+    return API.tripPlan.checkBudgetExist(params)
 }
 
 /**
+ * @method getProjectsList
  * 获取项目名称列表
  * @param params
- * @returns {*}
+ * @returns {Promise<string[]>}
  */
-// getProjectsList.optionnal_params = ['count', 'project_name'];
-export function getProjectsList(params) {
-    var self = this;
-    var project_name = params.project_name;
+validateApi(getProjectsList, [], ['count', 'project_name']);
+export async function getProjectsList(params: {count?: number, project_name?: string}) {
+    let self = this;
+    let project_name = params.project_name;
 
     if(project_name || project_name === '') {
-        params.name = {$like: '%' + project_name + '%'};
+        params['name'] = {$like: '%' + project_name + '%'};
         delete params.project_name;
     }
 
-    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
-        .then(function(staff) {
-            params.companyId = staff.companyId;
-            return API.tripPlan.getProjectList(params);
-        })
-        .then(function(list) {
-            return list.map(function(p) {
-                return p.name;
-            })
-        })
+    let {companyId} = await API.staff.getStaff({id: self.accountId, columns: ['companyId']});
+    params['companyId'] = companyId;
+    let list = await API.tripPlan.getProjectList(params);
+
+    return list.map(function(p) {
+        return p.name;
+    })
 }

@@ -201,7 +201,7 @@ tripPlan.getConsumeInvoiceImg = function(params) {
         })
         .then(function(attachment) {
             if (!attachment) {
-                L.ERR.NOT_FOUND;
+                throw L.ERR.NOT_FOUND;
             }
 
             return 'data:image/jpg;base64,' + attachment.content;
@@ -523,9 +523,9 @@ function saveConsumeRecord(params){
  * @param params
  * @returns {*}
  */
-tripPlan.deleteTripPlanOrder = deleteTripPlanOrder;
-deleteTripPlanOrder.required_params = ['userId', 'orderId'];
-function deleteTripPlanOrder(params){
+tripPlan.deleteTripPlan = deleteTripPlan;
+deleteTripPlan.required_params = ['userId', 'orderId'];
+function deleteTripPlan(params){
     var orderId = params.orderId;
     var userId = params.userId;
     return PlanOrder.findById(orderId)

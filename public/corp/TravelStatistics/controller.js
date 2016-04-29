@@ -240,7 +240,7 @@ var TravelStatistics = (function(){
                     params.endTime = $scope.end_time;
                 }
                 console.info(params);
-                API.tripPlan.pageTripPlanOrderByCompany(params)
+                API.tripPlan.pageTripPlansByCompany(params)
                     .then(function(list){
                         $scope.planlist = list.items;
                         if($scope.planlist.length == 0){
