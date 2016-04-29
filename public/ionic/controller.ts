@@ -1,7 +1,7 @@
 "use strict";
 var Cookie = require('tiny-cookie');
 
-export async function IndexController($scope,Menu,$ionicModal,$ionicPopup, StaffService){
+export async function IndexController($scope,Menu,$ionicPopup, StaffService){
     var items =[
         {
             icon:'plane',
@@ -36,11 +36,12 @@ export async function IndexController($scope,Menu,$ionicModal,$ionicPopup, Staff
         Menu.add(items[i]);
     }
     console.info(Menu);
+    var staff = await StaffService.get(Cookie.get('user_id'));
 
     $scope.alertShow = function () {
         var show = $ionicPopup.alert({
             title: '差旅标准',
-            template: '交通:商务舱/特等座' +
+            template: staff.name +
             '<br>' +
             '住宿:三星级' +
             '<br>' +
@@ -50,5 +51,5 @@ export async function IndexController($scope,Menu,$ionicModal,$ionicPopup, Staff
 
     $scope.Menu = Menu;
     $scope.staff = await StaffService.get(Cookie.get('user_id'));
-
+    console.info(($scope.staff))
 }
