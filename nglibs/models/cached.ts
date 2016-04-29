@@ -4,7 +4,11 @@ var API = require('api');
 import * as ng from 'angular';
 import {getServices} from './index';
 
-export abstract class CachedService<T> {
+interface ResolvableOrNot {
+    $resolve?: () => Promise<any>;
+}
+
+export abstract class CachedService<T extends ResolvableOrNot> {
     abstract $get(id: string) : Promise<T>;
 
     cache : ng.ICacheObject;
@@ -25,6 +29,9 @@ export abstract class CachedService<T> {
         if(staff)
             return staff;
         staff = await this.$get(id);
+        if(typeof staff.$resolve == 'function') {
+            await staff.$resolve();
+        }
         self.cache.put(id, staff);
         return staff;
     }

@@ -1,4 +1,5 @@
 
+import {regApiType} from "../../common/api/helper";
 var API = require('api');
 
 import { Company } from 'api/client/company/company.types';
@@ -8,6 +9,7 @@ import {getServices, ngService} from './index';
 import { CachedService } from './cached';
 import {CompanyService} from "./company";
 
+@regApiType('API.')
 class Staff extends IStaff{
     private company: Company;
     
@@ -34,9 +36,7 @@ export class StaffService extends CachedService<Staff> {
 
     async $get(id: string) : Promise<Staff> {
         var staff_api = require('api/client/staff');
-        var staff = staff_api.getStaff({id: id});
-        await staff.$resolve();
-        return staff;
+        return staff_api.getStaff({id: id});
     }
 
 }
