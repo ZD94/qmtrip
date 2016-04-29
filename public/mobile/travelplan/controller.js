@@ -191,7 +191,7 @@ var travelplan = (function () {
             $scope.tips = "正在加载更多...";
             API.onload(function () {
                 API.tripPlan
-                    .pageTripPlanOrder(p)
+                    .pageTripPlans(p)
                     .then(
                         function (list) {
 

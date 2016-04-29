@@ -182,7 +182,7 @@ describe("api/client/qm_order.js", function() {
     //        API.agency.deleteAgencyByTest({email: agency.email}),
     //        API.company.deleteCompanyByTest({email: company.email}),
     //        API.staff.deleteAllStaffByTest({email: company.email}),
-    //        API.tripPlan.deleteTripPlanOrder({orderId: tripPlanId, userId: staffId}),
+    //        API.tripPlan.deleteTripPlan({orderId: tripPlanId, userId: staffId}),
     //        API.qm_order.delete_qm_order({order_id: qmOrderId, user_id: staffId})
     //    ])
     //        .spread(function(){

@@ -30,7 +30,7 @@ var travelPlan=(function(){
                     params.remark = {$like: '%'+ $scope.keyword + '%'};
                 }
                 params.perPage = 20; //默认20条/页
-                API.tripPlan.pageTripPlanOrder(params)
+                API.tripPlan.pageTripPlans(params)
                     .then(function(result){
                         $scope.total1 = result.total;
                         $scope.planListitems = result.items;
@@ -46,7 +46,7 @@ var travelPlan=(function(){
         //待出预算列表
         $scope.initPlanList2 = function () {
             API.onload(function() {
-                API.tripPlan.pageTripPlanOrder({isHasBudget: false, page:$scope.page2})
+                API.tripPlan.pageTripPlans({isHasBudget: false, page:$scope.page2})
                     .then(function(result){
                         console.info (result);
                         $scope.total2 = result.total;
@@ -61,7 +61,7 @@ var travelPlan=(function(){
         //待上传票据列表
         $scope.initPlanList3 = function () {
             API.onload(function() {
-                API.tripPlan.pageTripPlanOrder({isUpload: false, page:$scope.page3})
+                API.tripPlan.pageTripPlans({isUpload: false, page:$scope.page3})
                     .then(function(result){
                         $scope.total3 = result.total;
                         $scope.planListitems3 = result.items;
@@ -75,7 +75,7 @@ var travelPlan=(function(){
         //已完成列表
         $scope.initFinishPlanList = function () {
             API.onload(function() {
-                API.tripPlan.pageCompleteTripPlanOrder({page:$scope.page4})
+                API.tripPlan.pageCompleteTripPlans({page:$scope.page4})
                     .then(function(result){
                         $scope.total4 = result.total;
                         $scope.finishPlanListitems = result.items;
@@ -192,7 +192,7 @@ var travelPlan=(function(){
         //删除
         $scope.deletePlan = function () {
             API.onload(function() {
-                API.tripPlan.deleteTripPlanOrder({orderId: 'f0f4f8c0-b5e6-11e5-88bb-9f621eb43a70'})
+                API.tripPlan.deleteTripPlan({orderId: 'f0f4f8c0-b5e6-11e5-88bb-9f621eb43a70'})
                     .then(function(result){
                         console.info (result);
                     })

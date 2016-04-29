@@ -9,16 +9,19 @@ import { CachedService } from './cached';
 import {CompanyService} from "./company";
 
 class Staff extends IStaff{
-    company: Company;
+    private company: Company;
     
     constructor(obj) {
         super(obj);
     }
 
-    async getCompany(): Promise<Company> {
+    getCompany() {
+        return this.company;
+    }
+
+    async $resolve() {
         var CompanyService = getServices<CompanyService>('CompanyService');
         this.company = await CompanyService.get(this.companyId);
-        return this.company;
     }
 }
 
@@ -31,7 +34,9 @@ export class StaffService extends CachedService<Staff> {
 
     async $get(id: string) : Promise<Staff> {
         var staff_api = require('api/client/staff');
-        return staff_api.getStaff({id: id});
+        var staff = staff_api.getStaff({id: id});
+        await staff.$resolve();
+        return staff;
     }
 
 }

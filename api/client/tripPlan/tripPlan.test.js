@@ -75,7 +75,7 @@ describe("api/client/tripPlan.js", function() {
 
     describe("savePlanOrder", function(){
         after(function(done){
-            API.tripPlan.deleteTripPlanOrder({orderId: orderId, userId: staffId}, function(err, ret){
+            API.tripPlan.deleteTripPlan({orderId: orderId, userId: staffId}, function(err, ret){
                 if(err){
                     throw err;
                 }
@@ -144,7 +144,7 @@ describe("api/client/tripPlan.js", function() {
     })
 
 
-    describe("deleteTripPlanOrder", function(){
+    describe("deleteTripPlan", function(){
         var consume_id = '';
         var tripPlanOrder = {
             startPlace: '北京',
@@ -186,9 +186,9 @@ describe("api/client/tripPlan.js", function() {
             })
         });
 
-        it("#deleteTripPlanOrder should be ok", function(done) {
+        it("#deleteTripPlan should be ok", function(done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.deleteTripPlanOrder.call(self, newOrderId, function(err, ret){
+            API.client.tripPlan.deleteTripPlan.call(self, {orderId: newOrderId}, function(err, ret){
                 if (err) {
                     throw err;
                 }
@@ -230,7 +230,7 @@ describe("api/client/tripPlan.js", function() {
         });
 
         after(function (done) {
-            API.tripPlan.deleteTripPlanOrder({orderId: newOrderId, userId: staffId}, function (err, ret) {
+            API.tripPlan.deleteTripPlan({orderId: newOrderId, userId: staffId}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -281,19 +281,21 @@ describe("api/client/tripPlan.js", function() {
                 done();
             })
         });
+        //
+        // it("#pageCompleteTripPlans should be error without params", function (done) {
+        //     var self = {accountId: staffId};
+        //     API.client.tripPlan.pageCompleteTripPlans.call(self, function (err, ret) {
+        //         console.info(err);
+        //         console.info(ret);
+        //         assert.equal(err.code, -2);
+        //         assert.equal(ret, null);
+        //         done();
+        //     })
+        // });
 
-        it("#pageCompleteTripPlanOrder should be error without params", function (done) {
+        it("#pageCompleteTripPlans should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.pageCompleteTripPlanOrder.call(self, function (err, ret) {
-                assert.equal(err.code, -2);
-                assert.equal(ret, null);
-                done();
-            })
-        });
-
-        it("#pageCompleteTripPlanOrder should be ok", function (done) {
-            var self = {accountId: staffId};
-            API.client.tripPlan.pageCompleteTripPlanOrder.call(self, {page: 1}, function (err, ret) {
+            API.client.tripPlan.pageCompleteTripPlans.call(self, {page: 1}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -303,9 +305,9 @@ describe("api/client/tripPlan.js", function() {
             })
         });
 
-        it("#pageTripPlanOrder should be ok", function (done) {
+        it("#pageTripPlans should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.pageTripPlanOrder.call(self, {page: 1}, function (err, ret) {
+            API.client.tripPlan.pageTripPlans.call(self, {page: 1}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -316,9 +318,9 @@ describe("api/client/tripPlan.js", function() {
         });
 
 
-        it("#pageTripPlanOrder should be ok", function (done) {
+        it("#pageTripPlans should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.pageTripPlanOrder.call(self, {page: 1, audit: 'P'}, function (err, ret) {
+            API.client.tripPlan.pageTripPlans.call(self, {page: 1, audit: 'P'}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -328,9 +330,9 @@ describe("api/client/tripPlan.js", function() {
             })
         });
 
-        it("#pageTripPlanOrderByCompany should be ok", function (done) {
+        it("#pageTripPlansByCompany should be ok", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.pageTripPlanOrderByCompany.call(self, {page: 1, audit: 'P', emailOrName: '白菜帮'}, function (err, ret) {
+            API.client.tripPlan.pageTripPlansByCompany.call(self, {page: 1, audit: 'P', emailOrName: '白菜帮'}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -428,7 +430,7 @@ describe("api/client/tripPlan.js", function() {
 
             it("#commitTripPlanOrder should be ok", function (done) {
                 var self = {accountId: staffId};
-                API.client.tripPlan.commitTripPlanOrder.call(self, newOrderId, function (err, ret) {
+                API.client.tripPlan.commitTripPlanOrder.call(self, {orderId: newOrderId}, function (err, ret) {
                     if (err) {
                         throw err;
                     }
