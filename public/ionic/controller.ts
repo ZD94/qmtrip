@@ -2,6 +2,7 @@
 var Cookie = require('tiny-cookie');
 
 export async function IndexController($scope,Menu,$ionicModal,$ionicPopup, StaffService){
+    require('./index.less');
     var items =[
         {
             icon:'plane',
