@@ -15,7 +15,7 @@ class Staff extends IStaff{
         super(obj);
     }
 
-    get company() {
+    getCompany() {
         return this.company;
     }
 
