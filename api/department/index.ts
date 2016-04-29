@@ -6,20 +6,18 @@ var co = require("co");
 var sequelize = require("common/model").importModel("./models");
 var departmentModel = sequelize.models.Department;
 var API = require("../../common/api");
-var department = {};
+import {Department} from "../client/department/department.types.ts";
+import {validateApi} from 'common/api/helper';
+
+export const departmentCols = Object.keys(departmentModel.attributes);
 
 /**
  * 创建部门
  * @param data
  * @returns {*}
  */
-department.createDepartment = function(data){
-    if(!data.name){
-        throw {code: -1, msg:"name不能为空"};
-    }
-    if(!data.companyId){
-        throw {code: -1, msg:"companyId不能为空"};
-    }
+validateApi(createDepartment,["name","companyId"], departmentCols);
+export function createDepartment(data){
 //    data.isDefault = false;//默认部门在企业注册时已经自动生成不允许自己添加
     return departmentModel.findOne({where: {name: data.name, companyId: data.companyId}})
         .then(function(result){
@@ -34,9 +32,8 @@ department.createDepartment = function(data){
  * 查询所有的组织架构并组装数据
  * @type {getDepartmentStructure}
  */
-department.getDepartmentStructure = getDepartmentStructure;
-getDepartmentStructure.required_params = ["companyId"];
-function getDepartmentStructure(params){
+validateApi(getDepartmentStructure, ["companyId"]);
+export function getDepartmentStructure(params: {companyId: string}){
     var allDepartmentMap = {};
     var noParentDep = [];
     var childOrderId = [];
@@ -111,9 +108,8 @@ function getDepartmentStructure(params){
  * @param params
  * @returns {*}
  */
-department.deleteDepartment = deleteDepartment;
-deleteDepartment.required_params = ["id"];
-function deleteDepartment(params){
+validateApi(deleteDepartment, ["id"]);
+export function deleteDepartment(params){
     var id = params.id;
     return API.staff.findStaffs({departmentId: id, status: 0})
         .then(function(staffs){
@@ -134,14 +130,15 @@ function deleteDepartment(params){
  * @param data
  * @returns {*}
  */
-department.updateDepartment = function(data){
+validateApi(updateDepartment, ["id"], departmentCols)
+export function updateDepartment(data){
     var id = data.id;
     if(!id){
         throw {code: -1, msg:"id不能为空"};
     }
     delete data.id;
     //    data.isDefault = false;//默认部门在企业注册时已经自动生成不允许自己添加
-    var options = {};
+    var options: any = {};
     options.where = {id: id};
     options.returning = true;
     return departmentModel.update(data, options)
@@ -155,9 +152,8 @@ department.updateDepartment = function(data){
  * @param params
  * @returns {*}
  */
-department.getDepartment = getDepartment;
-getDepartment.required_params = ["id"];
-function getDepartment(params){
+validateApi(getDepartment, ["id"])
+export function getDepartment(params: {id: string}){
     var id = params.id;
     return departmentModel.findById(id);
 }
@@ -179,9 +175,8 @@ function getAllDepartment(params){
  * @param params
  * @returns {*}
  */
-department.getDefaultDepartment = getDefaultDepartment;
-getDefaultDepartment.required_params = ["companyId"];
-function getDefaultDepartment(params){
+validateApi(getDefaultDepartment, ["companyId"])
+export function getDefaultDepartment(params){
     params.isDefault = true;
     return departmentModel.findOne({where: params})
     .then(function(department) {
@@ -201,10 +196,9 @@ function getDefaultDepartment(params){
  * @param params
  * @returns {*}
  */
-department.getAllDepartment = getAllDepartment;
-getAllDepartment.required_params = ["companyId"];
-function getAllDepartment(params){
-    var options = {};
+validateApi(getAllDepartment, ["companyId"]);
+export function getAllDepartment(params: {companyId: string}){
+    var options: any = {};
     options.where = params;
     options.order = [["create_at", "desc"]];
     return departmentModel.findAll(options);
@@ -216,10 +210,9 @@ function getAllDepartment(params){
  * @param params
  * @returns {*}
  */
-department.getFirstClassDepartments = getFirstClassDepartments;
-getFirstClassDepartments.required_params = ["companyId"];
-function getFirstClassDepartments(params){
-    var options = {};
+validateApi(getFirstClassDepartments, ["companyId"]);
+export function getFirstClassDepartments(params){
+    var options: any = {};
     params.parentId = null;
     options.where = params;
     options.order = [["create_at", "desc"]];
@@ -231,10 +224,9 @@ function getFirstClassDepartments(params){
  * @param params
  * @returns {*}
  */
-department.getChildDepartments = getChildDepartments;
-getChildDepartments.required_params = ["parentId"];
-function getChildDepartments(params){
-    var options = {};
+validateApi(getChildDepartments, ["parentId"]);
+export function getChildDepartments(params: {parentId: string}){
+    var options: any = {};
     options.where = params;
     options.order = [["create_at", "desc"]];
     return departmentModel.findAll(options);
@@ -245,9 +237,8 @@ function getChildDepartments(params){
  * @param params
  * @returns {*}
  */
-department.getAllChildDepartments = getAllChildDepartments;
-getAllChildDepartments.required_params = ["parentId"];
-function getAllChildDepartments(params){
+validateApi(getAllChildDepartments, ["parentId"]);
+export function getAllChildDepartments(params: {parentId: string}){
     var sql = "with RECURSIVE cte as " +
         "( select a.id,a.name,a.parent_id from department.department a where id='"+params.parentId+"' " +
         "union all select k.id,k.name,k.parent_id  from department.department k inner join cte c on c.id = k.parent_id) " +
@@ -263,9 +254,8 @@ function getAllChildDepartments(params){
  * @param params
  * @returns {*}
  */
-department.getAllChildDepartmentsId = getAllChildDepartmentsId;
-getAllChildDepartmentsId.required_params = ["parentId"];
-function getAllChildDepartmentsId(params){
+validateApi(getAllChildDepartmentsId, ["parentId"]);
+export function getAllChildDepartmentsId(params: {parentId: string}){
     var ids = [];
     var sql = "with RECURSIVE cte as " +
         "( select a.id,a.name,a.parent_id from department.department a where id='"+params.parentId+"' " +
@@ -280,7 +270,7 @@ function getAllChildDepartmentsId(params){
         })
 }
 
-department.deleteDepartmentByTest = function(params){
+export function deleteDepartmentByTest(params){
     return departmentModel.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
         .then(function(){
             return true;
@@ -317,5 +307,3 @@ department.deleteDepartmentByTest = function(params){
             console.info(err.stack);
         })
 }, 1000);*/
-
-module.exports = department;
