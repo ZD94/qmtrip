@@ -7,6 +7,7 @@
  * @module API
  */
 var API = require("common/api");
+var L = require("common/language");
 import {Department} from "./department.types.ts";
 import {validateApi} from 'common/api/helper';
 var sequelize = require("common/model").importModel("../../department/models");
@@ -26,20 +27,38 @@ export const departmentCols = Object.keys(departmentModel.attributes);
  */
 export function createDepartment (params){
         var user_id = this.accountId;
-        return API.staff.getStaff({id: user_id})
-            .then(function(data){
-                if(data.code){
-                    throw {code: -1, msg: '无权限'};
+        return API.auth.judgeRoleById({id:user_id})
+            .then(function(role){
+                if(role == L.RoleType.STAFF){
+                    return API.staff.getStaff({id: user_id})
+                        .then(function(data){
+                            if(data.code){
+                                throw {code: -1, msg: '无权限'};
+                            }
+                            params.companyId = data.companyId;//只允许添加该企业下的部门
+                            return API.department.createDepartment(params)
+                                .then(function(data){
+                                    return new Department(data);
+                                })
+                        });
+                }else{
+                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                        .then(function(result){
+                            if(result){
+                                return API.department.createDepartment(params)
+                                    .then(function(data){
+                                        return new Department(data);
+                                    })
+                            }else{
+                                throw {code: -1, msg: '无权限'};
+                            }
+                        })
                 }
-                params.companyId = data.companyId;//只允许添加该企业下的部门
-                return API.department.createDepartment(params)
-                    .then(function(data){
-                        return new Department(data);
-                    })
-            });
+            })
+        
     }
 
-validateApi(agencyCreateDepartment, ["companyId"], departmentCols);
+/*validateApi(agencyCreateDepartment, ["companyId"], departmentCols);
 export function agencyCreateDepartment (params){
         var user_id = this.accountId;
         return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
@@ -53,7 +72,7 @@ export function agencyCreateDepartment (params){
                     throw {code: -1, msg: '无权限'};
                 }
             })
-};
+};*/
 
 /**
  * @method createDepartment
@@ -64,21 +83,33 @@ export function agencyCreateDepartment (params){
  */
 export function getDepartmentStructure (params){
     var user_id = this.accountId;
-    return API.staff.getStaff({id: user_id})
-        .then(function(data){
-            if(data.code){
-                throw {code: -1, msg: '无权限'};
+    return API.auth.judgeRoleById({id:user_id})
+        .then(function(role){
+            if(role == L.RoleType.STAFF){
+                return API.staff.getStaff({id: user_id})
+                    .then(function(data){
+                        if(data.code){
+                            throw {code: -1, msg: '无权限'};
+                        }
+                        params.companyId = data.companyId;//只允许添加该企业下的部门
+                        return API.department.getDepartmentStructure(params);
+                    });
+            }else{
+                return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                    .then(function(result){
+                        if(result){
+                            return API.department.getDepartmentStructure(params);
+                        }else{
+                            throw {code: -1, msg: '无权限'};
+                        }
+                    })
             }
-            params.companyId = data.companyId;//只允许添加该企业下的部门
-            return API.department.getDepartmentStructure(params);
-        });
+        })
+
 }
 
-export function agencyGetDepartmentStructure (params){
+/*export function agencyGetDepartmentStructure (params){
         var user_id = this.accountId;
-        if(!params.companyId){
-            throw {code:-1, msg:"companyId不能为空"};
-        }
         return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
             .then(function(result){
                 if(result){
@@ -87,7 +118,7 @@ export function agencyGetDepartmentStructure (params){
                     throw {code: -1, msg: '无权限'};
                 }
             })
-    };
+    };*/
 
 /**
  * @method deleteDepartment
@@ -96,14 +127,28 @@ export function agencyGetDepartmentStructure (params){
  * @returns {*|Promise}
  */
 export function deleteDepartment(params){
-        return API.department.deleteDepartment(params);
+        var user_id = this.accountId;
+        return API.auth.judgeRoleById({id:user_id})
+            .then(function(role){
+                if(role == L.RoleType.STAFF){
+                    return API.department.deleteDepartment(params);
+                }else{
+                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                        .then(function(result){
+                            delete params.companyId;
+                            if(result){
+                                return API.department.deleteDepartment(params);
+                            }else{
+                                throw {code: -1, msg: '无权限'};
+                            }
+                        })
+                }
+            })
+
 }
 
-export function agencyDeleteDepartment(params){
+/*export function agencyDeleteDepartment(params){
         var user_id = this.accountId;
-        if(!params.companyId){
-            throw {code:-1, msg:"companyId不能为空"};
-        }
         return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
             .then(function(result){
                 delete params.companyId;
@@ -113,7 +158,7 @@ export function agencyDeleteDepartment(params){
                     throw {code: -1, msg: '无权限'};
                 }
             })
-    };
+    };*/
 
 /**
  * @method updateDepartment
@@ -123,30 +168,45 @@ export function agencyDeleteDepartment(params){
  * @returns {*|Promise}
  */
 export function updateDepartment(params){
-        var user_id = this.accountId;
-        var company_id;
-        return API.staff.getStaff({id: user_id})
-            .then(function(data){
-                company_id = data.companyId;
-                return API.department.getDepartment({id: params.id});
-            })
-            .then(function(tp){
-                if(tp.companyId != company_id){
-                    throw {code: -1, msg: '无权限'};
-                }
-                params.companyId = company_id;
-                return API.department.updateDepartment(params)
+    var user_id = this.accountId;
+    var company_id;
+    return API.auth.judgeRoleById({id:user_id})
+        .then(function(role){
+            if(role == L.RoleType.STAFF){
+                return API.staff.getStaff({id: user_id})
                     .then(function(data){
-                        return new Department(data);
+                        company_id = data.companyId;
+                        return API.department.getDepartment({id: params.id});
                     })
-            });
+                    .then(function(tp){
+                        if(tp.companyId != company_id){
+                            throw {code: -1, msg: '无权限'};
+                        }
+                        params.companyId = company_id;
+                        return API.department.updateDepartment(params)
+                            .then(function(data){
+                                return new Department(data);
+                            })
+                    });
+            }else{
+                return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                    .then(function(result){
+                        if(result){
+                            return API.department.updateDepartment(params)
+                                .then(function(data){
+                                    return new Department(data);
+                                })
+                        }else{
+                            throw {code: -1, msg: '无权限'};
+                        }
+                    })
+            }
+        })
+
     }
 
-export function agencyUpdateDepartment(params){
+/*export function agencyUpdateDepartment(params){
         var user_id = this.accountId;
-        if(!params.companyId){
-            throw {code:-1, msg:"companyId不能为空"};
-        }
         return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
             .then(function(result){
                 if(result){
@@ -158,7 +218,7 @@ export function agencyUpdateDepartment(params){
                     throw {code: -1, msg: '无权限'};
                 }
             })
-    };
+    };*/
 
 /**
  * @method getDepartment
@@ -166,28 +226,43 @@ export function agencyUpdateDepartment(params){
  * @param id
  * @returns {*|Promise}
  */
-export function getDepartment(params){
+export function getDepartment(params: {id: string, companyId?: string}){
     var id = params.id;
     var user_id = this.accountId;
-    return API.staff.getStaff({id: user_id})
-        .then(function(data){
-            if(!id){
-                return API.department.getDefaultDepartment({companyId:data.companyId});
+    return API.auth.judgeRoleById({id:user_id})
+        .then(function(role){
+            if(role == L.RoleType.STAFF){
+                return API.staff.getStaff({id: user_id})
+                    .then(function(data){
+                        if(!id){
+                            return API.department.getDefaultDepartment({companyId:data.companyId});
+                        }
+                        return API.department.getDepartment({id:id})
+                            .then(function(tp){
+                                if(!tp){
+                                    throw {code: -1, msg: '查询结果不存在'};
+                                }
+                                if(tp.companyId != data.companyId){
+                                    throw {code: -1, msg: '无权限'};
+                                }
+                                return new Department(tp);
+                            });
+                    });
+            }else{
+                return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                    .then(function(result){
+                        if(result){
+                            return API.department.getDepartment({id:id});
+                        }else{
+                            throw {code: -1, msg: '无权限'};
+                        }
+                    })
             }
-            return API.department.getDepartment({id:id})
-                .then(function(tp){
-                    if(!tp){
-                        throw {code: -1, msg: '查询结果不存在'};
-                    }
-                    if(tp.companyId != data.companyId){
-                        throw {code: -1, msg: '无权限'};
-                    }
-                    return new Department(tp);
-                });
-        });
+        })
+
 };
 
-validateApi(agencyGetDepartment, ["id", "companyId"]);
+/*validateApi(agencyGetDepartment, ["id", "companyId"]);
 export function agencyGetDepartment (params: {id: string, companyId: string}){
     var id = params.id;
     var user_id = this.accountId;
@@ -199,27 +274,39 @@ export function agencyGetDepartment (params: {id: string, companyId: string}){
                 throw {code: -1, msg: '无权限'};
             }
         })
-};
+};*/
 
 /**
  * 根据企业id得到企业所有部门
  * @param params
  * @returns {*|Promise}
  */
-export function getAllDepartment(params){
+export function getAllDepartment(params: {companyId?: string}){
     var user_id = this.accountId;
-    return API.staff.getStaff({id: user_id})
-        .then(function(data){
-            return API.department.getAllDepartment({companyId: data.companyId});
-        });
+    return API.auth.judgeRoleById({id:user_id})
+        .then(function(role){
+            if(role == L.RoleType.STAFF){
+                return API.staff.getStaff({id: user_id})
+                    .then(function(data){
+                        return API.department.getAllDepartment({companyId: data.companyId});
+                    });
+            }else{
+                return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                    .then(function(result){
+                        if(result){
+                            return API.department.getAllDepartment({companyId: params.companyId});
+                        }else{
+                            throw {code: -1, msg: '无权限'};
+                        }
+                    })
+            }
+        })
+
 };
 
-validateApi(agencyGetAllDepartment, ["companyId"]);
+/*validateApi(agencyGetAllDepartment, ["companyId"]);
 export function agencyGetAllDepartment (params: {companyId: string}){
     var user_id = this.accountId;
-    if(!params.companyId){
-        throw {code:-1, msg:"companyId不能为空"};
-    }
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
             if(result){
@@ -228,36 +315,46 @@ export function agencyGetAllDepartment (params: {companyId: string}){
                 throw {code: -1, msg: '无权限'};
             }
         })
-};
+};*/
 
 /**
  * @method getFirstClassDepartments
  * 查询企业一级部门
  * @param params
  * @param params.companyId 企业Id
- * @param callback
  * @returns {*|Promise}
  */
-export function getFirstClassDepartments(params, callback){
+export function getFirstClassDepartments(params: {companyId?: string}){
     var user_id = this.accountId;
-    return API.staff.getStaff({id: user_id})
-        .then(function(data){
-            if(data){
-                params.companyId = data.companyId;//只允许查询该企业下的部门
-                return API.department.getFirstClassDepartments(params);
+    return API.auth.judgeRoleById({id:user_id})
+        .then(function(role){
+            if(role == L.RoleType.STAFF){
+                return API.staff.getStaff({id: user_id})
+                    .then(function(data){
+                        if(data){
+                            params.companyId = data.companyId;//只允许查询该企业下的部门
+                            return API.department.getFirstClassDepartments(params);
+                        }else{
+                            throw {code: -1, msg: '无权限'};
+                        }
+                    })
             }else{
-                throw {code: -1, msg: '无权限'};
+                return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                    .then(function(result){
+                        if(result){
+                            return API.department.getFirstClassDepartments(params);
+                        }else{
+                            throw {code: -1, msg: '无权限'};
+                        }
+                    })
             }
         })
-        .nodeify(callback);
+
 }
 
-validateApi(agencyGetFirstClassDepartments, ["companyId"]);
+/*validateApi(agencyGetFirstClassDepartments, ["companyId"]);
 export function agencyGetFirstClassDepartments (params: {companyId: string}){
     var user_id = this.accountId;
-    if(!params.companyId){
-        throw {code:-1, msg:"companyId不能为空"};
-    }
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
             if(result){
@@ -266,32 +363,44 @@ export function agencyGetFirstClassDepartments (params: {companyId: string}){
                 throw {code: -1, msg: '无权限'};
             }
         })
-};
+};*/
 
 /**
  * @method getChildDepartments
  * 查询部门直接子级部门
  * @param params
  * @param params.parentId 父级Id
- * @param callback
  * @returns {*|Promise}
  */
-export function getChildDepartments(params, callback){
+export function getChildDepartments(params: {companyId?: string, parentId: string}){
     var user_id = this.accountId;
-    return API.staff.getStaff({id: user_id})
-        .then(function(data){
-            if(data){
-                params.companyId = data.companyId;//只允许查询该企业下的部门
-                return API.department.getChildDepartments(params);
+    return API.auth.judgeRoleById({id:user_id})
+        .then(function(role){
+            if(role == L.RoleType.STAFF){
+                return API.staff.getStaff({id: user_id})
+                    .then(function(data){
+                        if(data){
+                            params.companyId = data.companyId;//只允许查询该企业下的部门
+                            return API.department.getChildDepartments(params);
+                        }else{
+                            throw {code: -1, msg: '无权限'};
+                        }
+                    })
             }else{
-                throw {code: -1, msg: '无权限'};
+                return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                    .then(function(result){
+                        if(result){
+                            return API.department.getChildDepartments(params);
+                        }else{
+                            throw {code: -1, msg: '无权限'};
+                        }
+                    })
             }
         })
-        .nodeify(callback);
 }
 
-validateApi(agencyGetChildDepartments, ["companyId"]);
-export function agencyGetChildDepartments(params: {companyId: string}){
+/*validateApi(agencyGetChildDepartments, ["companyId", "parentId"]);
+export function agencyGetChildDepartments(params: {companyId: string, parentId: string}){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
@@ -301,32 +410,45 @@ export function agencyGetChildDepartments(params: {companyId: string}){
                 throw {code: -1, msg: '无权限'};
             }
         })
-};
+};*/
 
 /**
  * @method getAllChildDepartments
  * 查询部门所有子级部门
  * @param params
  * @param params.parentId 父级Id
- * @param callback
  * @returns {*|Promise}
  */
-export function getAllChildDepartments(params, callback){
+export function getAllChildDepartments(params: {companyId?: string, parentId: string}){
     var user_id = this.accountId;
-    return API.staff.getStaff({id: user_id})
-        .then(function(data){
-            if(data){
-                params.companyId = data.companyId;//只允许查询该企业下的部门
-                return API.department.getAllChildDepartments(params);
+    return API.auth.judgeRoleById({id:user_id})
+        .then(function(role){
+            if(role == L.RoleType.STAFF){
+                return API.staff.getStaff({id: user_id})
+                    .then(function(data){
+                        if(data){
+                            params.companyId = data.companyId;//只允许查询该企业下的部门
+                            return API.department.getAllChildDepartments(params);
+                        }else{
+                            throw {code: -1, msg: '无权限'};
+                        }
+                    })
             }else{
-                throw {code: -1, msg: '无权限'};
+                return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                    .then(function(result){
+                        if(result){
+                            return API.department.getAllChildDepartments(params);
+                        }else{
+                            throw {code: -1, msg: '无权限'};
+                        }
+                    })
             }
         })
-        .nodeify(callback);
+
 }
 
-validateApi(agencyGetAllChildDepartments, ["companyId"]);
-export function agencyGetAllChildDepartments(params: {companyId: string}){
+/*validateApi(agencyGetAllChildDepartments, ["companyId", "parentId"]);
+export function agencyGetAllChildDepartments(params: {companyId: string, parentId: string}){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
@@ -336,36 +458,46 @@ export function agencyGetAllChildDepartments(params: {companyId: string}){
                 throw {code: -1, msg: '无权限'};
             }
         })
-};
+};*/
 
 /**
  * @method getAllChildDepartmentsId
  * 查询部门所有子级部门id数组
  * @param params
  * @param params.parentId 父级Id
- * @param callback
  * @returns {*|Promise}
  */
-export function getAllChildDepartmentsId(params, callback){
+export function getAllChildDepartmentsId(params: {companyId?: string, parentId: string}){
     var user_id = this.accountId;
-    return API.staff.getStaff({id: user_id})
-        .then(function(data){
-            if(data){
-                params.companyId = data.companyId;//只允许查询该企业下的部门
-                return API.department.getAllChildDepartmentsId(params);
+    return API.auth.judgeRoleById({id:user_id})
+        .then(function(role){
+            if(role == L.RoleType.STAFF){
+                return API.staff.getStaff({id: user_id})
+                    .then(function(data){
+                        if(data){
+                            params.companyId = data.companyId;//只允许查询该企业下的部门
+                            return API.department.getAllChildDepartmentsId(params);
+                        }else{
+                            throw {code: -1, msg: '无权限'};
+                        }
+                    })
             }else{
-                throw {code: -1, msg: '无权限'};
+                return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                    .then(function(result){
+                        if(result){
+                            return API.department.getAllChildDepartmentsId(params);
+                        }else{
+                            throw {code: -1, msg: '无权限'};
+                        }
+                    })
             }
         })
-        .nodeify(callback);
+
 }
 
-validateApi(agencyGetAllChildDepartmentsId, ["companyId"])
-export function agencyGetAllChildDepartmentsId (params: {companyId: string}){
+/*validateApi(agencyGetAllChildDepartmentsId, ["companyId", "parentId"])
+export function agencyGetAllChildDepartmentsId (params: {companyId: string, parentId: string}){
     var user_id = this.accountId;
-    if(!params.companyId){
-        throw {code:-1, msg:"companyId不能为空"};
-    }
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
             if(result){
@@ -374,4 +506,4 @@ export function agencyGetAllChildDepartmentsId (params: {companyId: string}){
                 throw {code: -1, msg: '无权限'};
             }
         })
-};
+};*/

@@ -12,7 +12,7 @@ var StaffAwardPlan=(function(){
         $("title").html("员工奖励计划");
         $(".left_nav li").removeClass("on").eq(4).addClass("on");
         API.onload(function(){
-            API.staff.statStaffPointsByCompany({})
+            API.staff.statStaffPoints({})
                 .then(function(point){
                     console.info(point);
                     $scope.point = point;

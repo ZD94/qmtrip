@@ -30,7 +30,7 @@
 | msg     | 提示信息 |
 | json数据   | 员工信息|json
 
->. 代理商创建员工 API.staff.agencyCreateStaff(params, callback);
+>. 代理商创建员工 API.staff.createStaff(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -62,7 +62,7 @@
 | code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
 
->. 代理商删除员工 API.staff.agencyDeleteStaff(params, callback);
+>. 代理商删除员工 API.staff.deleteStaff(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -96,7 +96,7 @@
 | msg     | 提示信息 |
 | json数据   | 员工信息|json
 
->. 代理商修改员工信息 API.staff.agencyUpdateStaff(params, callback);
+>. 代理商修改员工信息 API.staff.updateStaff(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -129,7 +129,7 @@
 | msg     | 提示信息 |
 | json数据   | 员工信息|json
 
->. 代理商查询员工信息 API.staff.agencyGetStaff(params,callback);
+>. 代理商查询员工信息 API.staff.getStaff(params,callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -179,7 +179,7 @@
 | total     | 提示信息 |: 总记录数
 | items   | 员工信息|json
 
->. 代理商分页查询员工信息 API.staff.agencyListAndPaginateStaff(params, callback);
+>. 代理商分页查询员工信息 API.staff.listAndPaginateStaff(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -351,7 +351,7 @@
 | commonStaffNum |普通员工数|integer
 | unActiveNum  |未激活人数|integer
 
->. 代理商统计企业员工（管理员 普通员工 未激活员工）数量 API.staff.agencyStatisticStaffsRole(params,callback);
+>. 代理商统计企业员工（管理员 普通员工 未激活员工）数量 API.staff.statisticStaffsRole(params,callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -365,7 +365,7 @@
 | commonStaffNum |普通员工数|integer
 | unActiveNum  |未激活人数|integer
 
->. 统计企业员工积分（总积分和可用积分）数量 API.staff.statStaffPointsByCompany();
+>. 统计企业员工积分（总积分和可用积分）数量 API.staff.statStaffPoints(params);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -388,7 +388,7 @@
 |---------|------|-----|
 |    | 部门数组 | array
 
->. 代理商统计企业员工积分（总积分和可用积分）数量 API.staff.statStaffPointsByAgency();
+>. 代理商统计企业员工积分（总积分和可用积分）数量 API.staff.statStaffPoints();
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------

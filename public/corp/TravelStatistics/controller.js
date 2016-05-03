@@ -144,7 +144,7 @@ var TravelStatistics = (function(){
                     var companyId = staff.companyId;
                     var staffId = staff.id;
                     return Promise.all([
-                            API.staff.statStaffPointsByCompany({}), //企业积分统计，总积分，可用积分。
+                            API.staff.statStaffPoints({}), //企业积分统计，总积分，可用积分。
                             API.staff.getStaffPointsChangeByMonth({})//企业统计员工所有变动记录
                             ])
                             .spread(function(point,statistic){

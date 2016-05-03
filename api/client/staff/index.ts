@@ -28,18 +28,32 @@ import {Staff, Credentials, PointChange} from "./staff.types.ts";
 export function createStaff (params) {
         var self = this;
         var user_id = self.accountId;
-        return API.staff.getStaff({id: user_id, columns: ['companyId']})
-            .then(function(staff){
-                var companyId = staff.companyId;
-                params.companyId = companyId;
-                return API.staff.createStaff(params)
-                    .then(function(data){
-                        return new Staff(data);
-                    });
+        return API.auth.judgeRoleById({id:user_id})
+            .then(function(role){
+                if(role == L.RoleType.STAFF){
+                    return API.staff.getStaff({id: user_id, columns: ['companyId']})
+                        .then(function(staff){
+                            var companyId = staff.companyId;
+                            params.companyId = companyId;
+                            return API.staff.createStaff(params)
+                                .then(function(data){
+                                    return new Staff(data);
+                                });
+                        })
+                }else{
+                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                        .then(function(result){
+                            if(result){
+                                return API.staff.createStaff(params);
+                            }else{
+                                throw {code: -1, msg: '无权限'};
+                            }
+                        })
+                }
             })
     }
 
-export function agencyCreateStaff(params){
+/*export function agencyCreateStaff(params){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
@@ -49,7 +63,7 @@ export function agencyCreateStaff(params){
                 throw {code: -1, msg: '无权限'};
             }
         })
-};
+};*/
 
 /**
  * @method deleteStaff
@@ -61,28 +75,43 @@ export function agencyCreateStaff(params){
  */
 export function deleteStaff(params) {
         var user_id = this.accountId;
-        return API.staff.getStaff({id: user_id})
-            .then(function(staff){
-                if(this.accountId == params.id){
-                    throw {msg: "不可删除自身信息"};
+        return API.auth.judgeRoleById({id:user_id})
+            .then(function(role){
+                if(role == L.RoleType.STAFF){
+                    return API.staff.getStaff({id: user_id})
+                        .then(function(staff){
+                            if(this.accountId == params.id){
+                                throw {msg: "不可删除自身信息"};
+                            }
+                            return [staff, API.staff.getStaff({id:params.id})];
+                        })
+                        .spread(function(staff, target){
+                            if(target.roleId == 0){
+                                throw {msg: "企业创建人不能被删除"};
+                            }
+                            if(staff.roleId == target.roleId){
+                                throw {msg: "不能删除统计用户"};
+                            }
+                            if(staff.companyId != target.companyId){
+                                throw L.ERR.PERMISSION_DENY;
+                            }
+                            return API.staff.deleteStaff(params);
+                        });
+                }else{
+                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                        .then(function(result){
+                            if(result){
+                                return API.staff.deleteStaff(params);
+                            }else{
+                                throw {code: -1, msg: '无权限'};
+                            }
+                        })
                 }
-                return [staff, API.staff.getStaff({id:params.id})];
             })
-            .spread(function(staff, target){
-                if(target.roleId == 0){
-                    throw {msg: "企业创建人不能被删除"};
-                }
-                if(staff.roleId == target.roleId){
-                    throw {msg: "不能删除统计用户"};
-                }
-                if(staff.companyId != target.companyId){
-                    throw L.ERR.PERMISSION_DENY;
-                }
-                return API.staff.deleteStaff(params);
-            });
+
     }
 
-export function agencyDeleteStaff(params){
+/*export function agencyDeleteStaff(params){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
@@ -92,7 +121,7 @@ export function agencyDeleteStaff(params){
                 throw {code: -1, msg: '无权限'};
             }
         })
-};
+};*/
 
 /**
  * @method updateStaff
@@ -104,23 +133,41 @@ export function agencyDeleteStaff(params){
 export function updateStaff(params) {
         var user_id = this.accountId;
         var id = params.id;
-        return API.staff.getStaff({id:user_id})
-            .then(function(data){
-                return API.staff.getStaff({id:id})
-                    .then(function(target){
-                        if(data.companyId != target.companyId){
-                            throw L.ERR.PERMISSION_DENY;
-                        }else{
-                            return API.staff.updateStaff(params)
-                                .then(function(data){
-                                    return new Staff(data);
-                                })
-                        }
-                    })
-            });
+        return API.auth.judgeRoleById({id:user_id})
+            .then(function(role){
+                if(role == L.RoleType.STAFF){
+                    return Q.all([
+                        API.staff.getStaff({id:user_id}),
+                        API.staff.getStaff({id:id})
+                    ])
+                        .spread(function(data, target){
+                            if(data.companyId != target.companyId){
+                                throw L.ERR.PERMISSION_DENY;
+                            }else{
+                                return API.staff.updateStaff(params)
+                                    .then(function(data){
+                                        return new Staff(data);
+                                    })
+                            }
+                        })
+                }else{
+                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                        .then(function(result){
+                            if(result){
+                                return API.staff.updateStaff(params)
+                                    .then(function(data){
+                                        return new Staff(data);
+                                    })
+                            }else{
+                                throw {code: -1, msg: '无权限'};
+                            }
+                        })
+                }
+            })
+
     }
 
-export function agencyUpdateStaff(params){
+/*export function agencyUpdateStaff(params){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
@@ -133,7 +180,7 @@ export function agencyUpdateStaff(params){
                 throw {code: -1, msg: '无权限'};
             }
         })
-};
+};*/
 
 /**
  * @method getStaff
@@ -143,21 +190,40 @@ export function agencyUpdateStaff(params){
  */
 export function getStaff(params) {
         var user_id = this.accountId;
-        return API.staff.getStaff({id: user_id})
-            .then(function(data){
-                return API.staff.getStaff(params)
-                    .then(function(target){
-                        if(data.companyId != target.companyId){
-                            throw L.ERR.PERMISSION_DENY;
-                        }else{
-                            // return {staff: new Staff(target)};
-                            return new Staff(target);
-                        }
-                    })
-            });
+        var id = params.id;
+        return API.auth.judgeRoleById({id:user_id})
+            .then(function(role){
+                if(role == L.RoleType.STAFF){
+                    return Q.all([
+                            API.staff.getStaff({id:user_id}),
+                            API.staff.getStaff({id:id})
+                        ])
+                        .spread(function(data, target){
+                            if(data.companyId != target.companyId){
+                                throw L.ERR.PERMISSION_DENY;
+                            }else{
+                                // return {staff: new Staff(target)};
+                                return new Staff(target);
+                            }
+                        })
+                }else{
+                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                        .then(function(result){
+                            if(result){
+                                return API.staff.getStaff(params)
+                                    .then(function(data){
+                                        return new Staff(data);
+                                    })
+                            }else{
+                                throw {code: -1, msg: '无权限'};
+                            }
+                        })
+                }
+            })
+
     }
 
-export function agencyGetStaff(params){
+/*export function agencyGetStaff(params){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
@@ -170,10 +236,10 @@ export function agencyGetStaff(params){
                 throw {code: -1, msg: '无权限'};
             }
         })
-};
+};*/
 
 //代理商根据id得到员工信息
-export function getStaffByAgency (params){
+/*export function getStaffByAgency (params){
     var staffId = params.id;
     var user_id = this.accountId;
     return Q.all([
@@ -200,7 +266,7 @@ export function getStaffByAgency (params){
                 throw {msg:"无权限"};
             }
         });
-}
+}*/
 
 /**
  * @method getCurrentStaff
@@ -224,16 +290,31 @@ export function getCurrentStaff(){
  */
 export function listAndPaginateStaff (params) {
         var user_id = this.accountId;
-        return API.staff.getStaff({id:user_id})
-            .then(function(data){
-                params.companyId = data.companyId;
-//                var options = {perPage : 20};
-//                params.options = options;
-                return API.staff.listAndPaginateStaff(params);
-            });
+        return API.auth.judgeRoleById({id:user_id})
+            .then(function(role){
+                if(role == L.RoleType.STAFF){
+                    return API.staff.getStaff({id:user_id})
+                        .then(function(data){
+                            params.companyId = data.companyId;
+        //                var options = {perPage : 20};
+        //                params.options = options;
+                            return API.staff.listAndPaginateStaff(params);
+                        });
+                }else{
+                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                        .then(function(result){
+                            if(result){
+                                return API.staff.listAndPaginateStaff(params);
+                            }else{
+                                throw {code: -1, msg: '无权限'};
+                            }
+                        })
+                }
+            })
+
     }
 
-export function agencyListAndPaginateStaff (params){
+/*export function agencyListAndPaginateStaff (params){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
@@ -243,7 +324,7 @@ export function agencyListAndPaginateStaff (params){
                 throw {code: -1, msg: '无权限'};
             }
         })
-};
+};*/
 
 /**
  * @method increaseStaffPoint
@@ -428,19 +509,34 @@ export function downloadExcle(params){
  */
 export function statisticStaffs(params){
     var user_id = this.accountId;
-    return API.staff.getStaff({id: user_id})
-        .then(function(data){
-            if(data){
-                var companyId = data.companyId;
-                params.companyId = companyId;
-                return API.staff.statisticStaffs(params);
+    return API.auth.judgeRoleById({id:user_id})
+        .then(function(role){
+            if(role == L.RoleType.STAFF){
+                return API.staff.getStaff({id: user_id})
+                    .then(function(data){
+                        if(data){
+                            var companyId = data.companyId;
+                            params.companyId = companyId;
+                            return API.staff.statisticStaffs(params);
+                        }else{
+                            throw {msg:"无权限"};
+                        }
+                    });
             }else{
-                throw {msg:"无权限"};
+                return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                    .then(function(result){
+                        if(result){
+                            return API.staff.statisticStaffs(params);
+                        }else{
+                            throw {code: -1, msg: '无权限'};
+                        }
+                    })
             }
-        });
+        })
+
 }
 
-export function agencyStatisticStaffs(params){
+/*export function agencyStatisticStaffs(params){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
@@ -450,7 +546,7 @@ export function agencyStatisticStaffs(params){
                 throw {code: -1, msg: '无权限'};
             }
         })
-};
+};*/
 
 
 /**
@@ -542,19 +638,34 @@ export function getDistinctDepartment(params){
  */
 export function statisticStaffsRole(params){
     var user_id = this.accountId;
-    return API.staff.getStaff({id: user_id, columns: ['companyId']})
-        .then(function(data){
-            if(data){
-                var companyId = data.companyId;
-                params.companyId = companyId;
-                return API.staff.statisticStaffsRole(params);
+    return API.auth.judgeRoleById({id:user_id})
+        .then(function(role){
+            if(role == L.RoleType.STAFF){
+                return API.staff.getStaff({id: user_id, columns: ['companyId']})
+                    .then(function(data){
+                        if(data){
+                            var companyId = data.companyId;
+                            params.companyId = companyId;
+                            return API.staff.statisticStaffsRole(params);
+                        }else{
+                            throw {msg:"无权限"};
+                        }
+                    });
             }else{
-                throw {msg:"无权限"};
+                return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                    .then(function(result){
+                        if(result){
+                            return API.staff.statisticStaffsRole(params);
+                        }else{
+                            throw {msg: '无权限'};
+                        }
+                    })
             }
-        });
+        })
+
 }
 
-export function agencyStatisticStaffsRole(params){
+/*export function agencyStatisticStaffsRole(params){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
         .then(function(result){
@@ -564,18 +675,37 @@ export function agencyStatisticStaffsRole(params){
                 throw {code: -1, msg: '无权限'};
             }
         })
-};
+};*/
 
 
-export function statStaffPointsByCompany(){
+export function statStaffPoints(params){
     var self = this;
-    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
-        .then(function(staff){
-            return API.staff.statStaffPoints({companyId: staff.companyId})
+    var user_id = self.accountId;
+    return API.auth.judgeRoleById({id:user_id})
+        .then(function(role){
+            if(role == L.RoleType.STAFF){
+                return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
+                    .then(function(staff){
+                        return API.staff.statStaffPoints({companyId: staff.companyId})
+                    })
+            }else{
+                var companyId = params.companyId;
+                return Q.all([
+                        API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']}),
+                        API.company.getCompany({companyId: companyId, columns: ['agencyId']})
+                    ])
+                    .spread(function(u, c){
+                        if(u.agencyId != c.agencyId){
+                            throw L.ERR.PERMISSION_DENY;
+                        }
+                        return API.staff.statStaffPoints({companyId: companyId});
+                    })
+            }
         })
+
 }
 
-export function statStaffPointsByAgency (companyId){
+/*export function statStaffPointsByAgency (companyId){
     var self = this;
     if(typeof companyId != 'string'){
         throw {code: 0, msg: '参数格式不正确'};
@@ -590,7 +720,7 @@ export function statStaffPointsByAgency (companyId){
             }
             return API.staff.statStaffPoints({companyId: companyId});
         })
-}
+}*/
 
 /*************************证件信息API begin*************************/
 

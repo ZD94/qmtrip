@@ -159,7 +159,7 @@ describe("api/client/travelPolicy.js", function() {
     //创建差旅标准
     it("#agencyCreateTravelPolicy should be ok", function(done) {
         obj.companyId = companyId;
-        API.client.travelPolicy.agencyCreateTravelPolicy.call(agencySelf, obj, function(err, result) {
+        API.client.travelPolicy.createTravelPolicy.call(agencySelf, obj, function(err, result) {
             assert.equal(err, null);
             id = result.id;
             //console.log(result);
@@ -168,7 +168,7 @@ describe("api/client/travelPolicy.js", function() {
     })
 //查询差旅标准
     it("#agencyGetTravelPolicy should be ok", function(done) {
-        API.client.travelPolicy.agencyGetTravelPolicy.call(agencySelf, {id: id, companyId: companyId}, function(err, result) {
+        API.client.travelPolicy.getTravelPolicy.call(agencySelf, {id: id, companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(result);
             done();
@@ -176,7 +176,7 @@ describe("api/client/travelPolicy.js", function() {
     })
 //查询差旅标准集合
     it("#agencyListAndPaginateTravelPolicy should be ok", function(done) {
-        API.client.travelPolicy.agencyListAndPaginateTravelPolicy.call(agencySelf, {companyId: companyId}, function(err, result) {
+        API.client.travelPolicy.listAndPaginateTravelPolicy.call(agencySelf, {companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(result);
 //                console.log(result.items);//item dataValues里存放的才是记录信息
@@ -185,7 +185,7 @@ describe("api/client/travelPolicy.js", function() {
     })
     //得到所有差旅标准
     it("#agencyGetAllTravelPolicy should be ok", function(done) {
-        API.client.travelPolicy.agencyGetAllTravelPolicy.call(agencySelf, {companyId: companyId}, function(err, ret) {
+        API.client.travelPolicy.getAllTravelPolicy.call(agencySelf, {companyId: companyId}, function(err, ret) {
             assert.equal(err, null);
             assert(ret.length >= 0);
             done();
@@ -195,7 +195,7 @@ describe("api/client/travelPolicy.js", function() {
     it("#agencyUpdateTravelPolicy should be ok", function(done) {
         obj.id = id;
         obj.companyId = companyId;
-        API.client.travelPolicy.agencyUpdateTravelPolicy.call(agencySelf, obj, function(err, result) {
+        API.client.travelPolicy.updateTravelPolicy.call(agencySelf, obj, function(err, result) {
             assert.equal(err, null);
             //console.log(result);
             done();
@@ -203,7 +203,7 @@ describe("api/client/travelPolicy.js", function() {
     })
 //删除差旅标准信息
     it("#agencyDeleteTravelPolicy should be ok", function(done) {
-        API.client.travelPolicy.agencyDeleteTravelPolicy.call(agencySelf, {id: id, companyId: companyId}, function(err, result) {
+        API.client.travelPolicy.deleteTravelPolicy.call(agencySelf, {id: id, companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(result);
             done();

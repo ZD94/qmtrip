@@ -33,7 +33,7 @@ var travelRecord=(function(){
                         var travelList1 = result.items;
                         travelList1.map(function(s){
                             Promise.all([
-                                API.staff.getStaffByAgency({id:s.accountId}),
+                                API.staff.getStaff({id:s.accountId, companyId: s.companyId}),
                                 API.company.getCompanyById(s.companyId)
                             ])
                                 .spread(function(ret1,ret2){
@@ -65,7 +65,7 @@ var travelRecord=(function(){
                         var travelList2 = result.items;
                         travelList2.map(function(s){
                             Promise.all([
-                                API.staff.getStaffByAgency({id:s.accountId}),
+                                API.staff.getStaff({id:s.accountId}),
                                 API.company.getCompanyById(s.companyId)
                             ])
                                 .spread(function(ret1,ret2){
@@ -97,7 +97,7 @@ var travelRecord=(function(){
                         var travelList3 = result.items;
                         travelList3.map(function(s){
                             Promise.all([
-                                API.staff.getStaffByAgency({id:s.accountId}),
+                                API.staff.getStaff({id:s.accountId, companyId: s.companyId}),
                                 API.company.getCompanyById(s.companyId)
                             ])
                                 .spread(function(ret1,ret2){
@@ -334,7 +334,7 @@ var travelRecord=(function(){
                                 TLDAlert(err.msg || err);
                             })
 
-                        API.staff.getStaffByAgency({id:$scope.planDetail.accountId})
+                        API.staff.getStaff({id:$scope.planDetail.accountId, companyId: $scope.planDetail.companyId})
                             .then(function(result){
                                 $scope.travelerName = result.name;
                             })

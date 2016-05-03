@@ -3,12 +3,12 @@ export class Staff {
     name: string; // '员工名称'
     avatar: string;  // '员工头像'
     companyId : string; // '企业ID'
-    status: number; //状态
+    status: STAFF_STATUS; //状态
     totalPoints: number; // '员工总获取的积分'
     balancePoints: number; // '员工剩余积分'
     departmentId: string; // '部门ID'
     travelLevel: string;    // '差旅标准'
-    roleId: number; // '权限'
+    roleId: STAFF_ROLE; // '权限'
     mobile: string; // '手机'
     email: string; // '邮箱'
     sex:number; // '性别'

@@ -28,8 +28,8 @@ module.exports = (function(){
 							// console.info(company.createUser)
 							return Promise.all([
 								API.company.getCompanyFundsAccountByAgency(company.id),
-								API.staff.getStaffByAgency({id: company.createUser}),
-                        		API.staff.statisticStaffsByAgency({companyId:company.id}),
+								API.staff.getStaff({id: company.createUser, companyId: company.id}),
+                        		API.staff.statisticStaffs({companyId:company.id}),
 								API.agencyTripPlan.countTripPlanNum({companyId: company.id})
 								])
 							.spread(function(funds,staff,staffnum,trip){
@@ -105,12 +105,12 @@ module.exports = (function(){
 						console.info(company)
 						$loading.end();
                         Promise.all([
-                        	API.staff.getStaffByAgency({id:staffId}),
+                        	API.staff.getStaff({id:staffId, companyId: companyId}),
                         	API.company.getCompanyFundsAccountByAgency(companyId),
-                        	API.staff.statisticStaffsByAgency({companyId:companyId}),
+                        	API.staff.statisticStaffs({companyId:companyId}),
                         	// API.tripPlan.countTripPlanNum()
                         	API.agencyTripPlan.countTripPlanNum({companyId: companyId}),
-							API.staff.statStaffPointsByAgency(companyId)
+							API.staff.statStaffPoints({companyId: companyId})
                         ])
                         .spread(function(staff,funds,staffnum,trip, points){
                         	$scope.tripnum = trip;
@@ -260,10 +260,10 @@ module.exports = (function(){
 				params.options = options;
 				params.companyId = companyId;
 				Promise.all([
-					API.travelPolicy.agencyGetAllTravelPolicy({where: {companyId:companyId}}),//获取当前所有的差旅标准名称
-					API.staff.agencyListAndPaginateStaff(params),//加载所有的员工记录
-					API.staff.agencyStatisticStaffsRole({companyId:companyId}),//统计企业员工（管理员 普通员工 未激活员工 总数）数量
-					API.department.agencyGetFirstClassDepartments({companyId:companyId})//企业部门
+					API.travelPolicy.getAllTravelPolicy({where: {companyId:companyId}}),//获取当前所有的差旅标准名称
+					API.staff.listAndPaginateStaff(params),//加载所有的员工记录
+					API.staff.statisticStaffsRole({companyId:companyId}),//统计企业员工（管理员 普通员工 未激活员工 总数）数量
+					API.department.getFirstClassDepartments({companyId:companyId})//企业部门
 				])
 					.spread(function(travelPolicies,staffinfo,staffRole, departments){
 						$scope.total = staffinfo.total;
@@ -288,7 +288,7 @@ module.exports = (function(){
 						var tasks = $scope.staffs
 							.map(function($staff){ //通过id拿到差旅标准的名字
 								return Promise.all([
-									API.travelPolicy.agencyGetTravelPolicy({id:$staff.travelLevel,companyId: companyId}),
+									API.travelPolicy.getTravelPolicy({id:$staff.travelLevel,companyId: companyId}),
 									API.auth.getAccountStatus({id:$staff.id})
 								])
 									.spread(function(travelLevel, acc){
@@ -366,7 +366,7 @@ module.exports = (function(){
 				if(department && department!= ""){
 					params.department = department;
 				}
-				return API.staff.agencyListAndPaginateStaff(params)//加载所有的员工记录
+				return API.staff.listAndPaginateStaff(params)//加载所有的员工记录
 					.then(function(staffinfo){
 						console.log(staffinfo);
 						$scope.total = staffinfo.total;
@@ -375,7 +375,7 @@ module.exports = (function(){
 						var tasks = $scope.staffs
 							.map(function($staff){ //通过id拿到差旅标准的名字
 								return Promise.all([
-									API.travelPolicy.agencyGetTravelPolicy({id:$staff.travelLevel,companyId: companyId}),
+									API.travelPolicy.getTravelPolicy({id:$staff.travelLevel,companyId: companyId}),
 									API.auth.getAccountStatus({id:$staff.id})
 								])
 									.spread(function(travelLevel, acc){
@@ -406,7 +406,7 @@ module.exports = (function(){
 				if(department && department!= ""){
 					params.department = department;
 				}
-				return API.staff.agencyListAndPaginateStaff(params)//加载所有的员工记录
+				return API.staff.listAndPaginateStaff(params)//加载所有的员工记录
 					.then(function(staffinfo){
 						console.log(staffinfo);
 						$scope.total = staffinfo.total;
@@ -427,7 +427,7 @@ module.exports = (function(){
 						var tasks = $scope.staffs
 							.map(function($staff){ //通过id拿到差旅标准的名字
 								return Promise.all([
-									API.travelPolicy.agencyGetTravelPolicy({id:$staff.travelLevel,companyId: companyId}),
+									API.travelPolicy.getTravelPolicy({id:$staff.travelLevel,companyId: companyId}),
 									API.auth.getAccountStatus({id:$staff.id})
 								])
 									.spread(function(travelLevel, acc){
@@ -483,7 +483,7 @@ module.exports = (function(){
 					$(".block_tip").hide();
 				}
 				API.onload(function() {//创建员工
-					API.staff.agencyCreateStaff({name:name,mobile:tel,email:mail,companyId:$scope.companyId,department:department,travelLevel:standard,roleId:power})
+					API.staff.createStaff({name:name,mobile:tel,email:mail,companyId:$scope.companyId,department:department,travelLevel:standard,roleId:power})
 						.then(function(staffinfo){
 							$(".add_staff").hide();
 							$(".block_tip").hide();
@@ -518,9 +518,9 @@ module.exports = (function(){
 		$scope.editStaffInfo = function(id,index) {
 			//$("#change"+index).addClass("orange");
 			API.onload(function(){
-				API.staff.agencyGetStaff({id: id,companyId: companyId})
+				API.staff.getStaff({id: id,companyId: companyId})
 					.then(function(staffinfo){
-						$scope.travellevel = staffinfo.staff.travelLevel;
+						$scope.travellevel = staffinfo.travelLevel;
 						$scope.selectkey = $scope.travellevel || "";
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
@@ -544,7 +544,7 @@ module.exports = (function(){
 			var commit = true;
 
 			API.onload(function(){
-				API.staff.agencyUpdateStaff({id: id, name:name,mobile:tel,email:mail,department:department,travelLevel:standard,roleId:power,companyId: companyId})
+				API.staff.updateStaff({id: id, name:name,mobile:tel,email:mail,department:department,travelLevel:standard,roleId:power,companyId: companyId})
 					.then(function(newStaff){
 						$(".add_staff2").hide();
 						//$scope.initstafflist();
@@ -565,7 +565,7 @@ module.exports = (function(){
 		$scope.delStaffInfo = function(id, index) {
 			//console.log(index);
 			API.onload(function(){
-				API.staff.agencyDeleteStaff({id:id,companyId: companyId})
+				API.staff.deleteStaff({id:id,companyId: companyId})
 					.then(function(newStaff){
 						$scope.staffs.splice(index, 1);
 						$scope.initstafflist();
@@ -586,7 +586,7 @@ module.exports = (function(){
 		}
 		$scope.deleteInfo = function () {
 			API.onload(function(){
-				API.staff.agencyDeleteStaff({id:$scope.deleteId,companyId: companyId})
+				API.staff.deleteStaff({id:$scope.deleteId,companyId: companyId})
 					.then(function(newStaff){
 						$(".confirmFixed").hide();
 						$scope.initstafflist();
@@ -700,14 +700,14 @@ module.exports = (function(){
 		$scope.initdepartment = function(){
 			$loading.start();
 			API.onload(function(){
-				API.department.agencyGetFirstClassDepartments({companyId:$scope.companyId})
+				API.department.getFirstClassDepartments({companyId:$scope.companyId})
 					.then(function(defaulDepartment){
 						console.info (defaulDepartment);
 						var defaultname = defaulDepartment;
 						$scope.departmentName = defaultname[0].name;
 						$scope.departmentId = defaultname[0].id;
 						//获取部门列表
-						API.department.agencyGetChildDepartments({companyId:$scope.companyId,parentId:$scope.departmentId})
+						API.department.getChildDepartments({companyId:$scope.companyId,parentId:$scope.departmentId})
 							.then(function(departmentlist){
 								$scope.departmentlist = departmentlist;
 								departmentlist.map(function(s){
@@ -732,7 +732,7 @@ module.exports = (function(){
 		}
 		$scope.updateDepartment = function () {
 			API.onload(function(){
-				API.department.agencyUpdateDepartment({companyId:$scope.companyId,id:$scope.departmentId,name:$(".updatecompany .common_text").val()})
+				API.department.updateDepartment({companyId:$scope.companyId,id:$scope.departmentId,name:$(".updatecompany .common_text").val()})
 					.then(function(result){
 						Myalert("温馨提示","修改成功");
 						$scope.initdepartment();
@@ -751,7 +751,7 @@ module.exports = (function(){
 		}
 		$scope.createDepartment = function () {
 			API.onload(function(){
-				API.department.agencyCreateDepartment({companyId:$scope.companyId,parentId:$scope.departmentId,name:$(".createcompany .common_text").val()})
+				API.department.createDepartment({companyId:$scope.companyId,parentId:$scope.departmentId,name:$(".createcompany .common_text").val()})
 					.then(function(result){
 						Myalert("温馨提示","添加成功");
 						$scope.initdepartment();
@@ -772,7 +772,7 @@ module.exports = (function(){
 		}
 		$scope.updatechildDepartment = function () {
 			API.onload(function(){
-				API.department.agencyUpdateDepartment({companyId:$scope.companyId,id:$scope.childDepartmentId,name:$(".updatechildDepartment .common_text").eq($scope.index).val()})
+				API.department.updateDepartment({companyId:$scope.companyId,id:$scope.childDepartmentId,name:$(".updatechildDepartment .common_text").eq($scope.index).val()})
 					.then(function(result){
 						Myalert("温馨提示","修改成功");
 						$scope.initdepartment();
@@ -792,7 +792,7 @@ module.exports = (function(){
 		}
 		$scope.deleteDepartment = function () {
 			API.onload(function(){
-				API.department.agencyDeleteDepartment({companyId:$scope.companyId,id:$scope.deleteId})
+				API.department.deleteDepartment({companyId:$scope.companyId,id:$scope.deleteId})
 					.then(function(result){
 						$scope.initdepartment();
 						$(".confirmFixed").hide();
@@ -839,7 +839,7 @@ module.exports = (function(){
 				options.perPage = 100;
 				params.options = options;
 				params.companyId = $scope.companyId;
-				API.travelPolicy.agencyListAndPaginateTravelPolicy(params)
+				API.travelPolicy.listAndPaginateTravelPolicy(params)
 					.then(function(result){
 						console.info (result);
 						$scope.PolicyTotal = result.total;
@@ -903,7 +903,7 @@ module.exports = (function(){
 
 
 			API.onload(function(){
-				API.travelPolicy.agencyCreateTravelPolicy({
+				API.travelPolicy.createTravelPolicy({
 					name:$(".create_policy .Cname").val(),
 					planeLevel:$(".create_policy .CplaneLevel").html(),
 					planeDiscount:$(".create_policy .CplaneDiscount").attr('selectValue'),
@@ -936,7 +936,7 @@ module.exports = (function(){
 		}
 		$scope.deletePolicy = function () {
 			API.onload(function(){
-				API.travelPolicy.agencyDeleteTravelPolicy({companyId:$scope.companyId,id:$scope.deleteId})
+				API.travelPolicy.deleteTravelPolicy({companyId:$scope.companyId,id:$scope.deleteId})
 					.then(function(result){
 						$(".confirmFixed").hide();
 						$scope.initPolicyList();
@@ -1063,7 +1063,7 @@ module.exports = (function(){
 
 
 			API.onload(function(){
-				API.travelPolicy.agencyUpdateTravelPolicy({
+				API.travelPolicy.updateTravelPolicy({
 					id:$scope.updateId,
 					name:$(".update_policy .Cname").val(),
 					planeLevel:$(".update_policy .CplaneLevel").html(),

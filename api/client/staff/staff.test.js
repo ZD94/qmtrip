@@ -284,7 +284,7 @@ describe("api/client/staff.js", function() {
         });
 
         it("#statStaffPointsByCompany should be ok", function(done) {
-            API.client.staff.statStaffPointsByCompany.call(ownerSelf, function(err, ret) {
+            API.client.staff.statStaffPoints.call(ownerSelf,{}, function(err, ret) {
                 if(err){
                     throw err;
                 }
@@ -293,7 +293,7 @@ describe("api/client/staff.js", function() {
         })
 
         it("#statStaffPointsByAgency should be ok", function(done) {
-            API.client.staff.statStaffPointsByAgency.call({accountId: agencyUserId}, companyId, function(err, ret) {
+            API.client.staff.statStaffPoints.call({accountId: agencyUserId}, {companyId: companyId}, function(err, ret) {
                 if(err){
                     throw err;
                 }
@@ -354,9 +354,9 @@ describe("api/client/staff.js", function() {
 
     /**************代理商管理企业员工*****************/
     //创建员工
-    it("#agencyCreateStaff should be ok", function(done) {
+    it("#createStaff should be ok", function(done) {
         obj.companyId = companyId;
-        API.client.staff.agencyCreateStaff.call(agencySelf, obj, function(err, result) {
+        API.client.staff.createStaff.call(agencySelf, obj, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
 //                console.log(result);
@@ -368,7 +368,7 @@ describe("api/client/staff.js", function() {
     it("#agencyUpdateStaff should be ok", function(done) {
         updateobj.id = id;
         updateobj.companyId = companyId;
-        API.client.staff.agencyUpdateStaff.call(agencySelf, updateobj, function(err, result) {
+        API.client.staff.updateStaff.call(agencySelf, updateobj, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
             //console.log(result);
@@ -377,7 +377,7 @@ describe("api/client/staff.js", function() {
     })
     //通过id得到员工
     it("#agencyGetStaff should be ok", function(done) {
-        API.client.staff.agencyGetStaff.call(agencySelf, {id:id, companyId: companyId}, function(err, result) {
+        API.client.staff.getStaff.call(agencySelf, {id:id, companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
             //console.log(result);
@@ -386,7 +386,7 @@ describe("api/client/staff.js", function() {
     })
     //查询员工集合
     it("#agencyListAndPaginateStaff should be ok", function(done) {
-        API.client.staff.agencyListAndPaginateStaff.call(agencySelf, {companyId: companyId}, function(err, result) {
+        API.client.staff.listAndPaginateStaff.call(agencySelf, {companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
             //console.log(result);
@@ -396,7 +396,7 @@ describe("api/client/staff.js", function() {
     })
     //查询人数
     it("#agencyStatisticStaffsRole should be ok", function(done) {
-        API.client.staff.agencyStatisticStaffsRole.call(agencySelf, {companyId: companyId}, function(err, result) {
+        API.client.staff.statisticStaffsRole.call(agencySelf, {companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
             done();
@@ -412,7 +412,7 @@ describe("api/client/staff.js", function() {
     })
     //统计在职，离职人，本月入职数
     it("#agencyStatisticStaffs should be ok", function(done) {
-        API.client.staff.agencyStatisticStaffs.call(agencySelf, {companyId: companyId}, function(err, result) {
+        API.client.staff.statisticStaffs.call(agencySelf, {companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
             done();
@@ -420,7 +420,7 @@ describe("api/client/staff.js", function() {
     })
     //删除员工
     it("#agencyDeleteStaff should be ok", function(done) {
-        API.client.staff.agencyDeleteStaff.call(agencySelf, {id: id, companyId: companyId}, function(err, result) {
+        API.client.staff.deleteStaff.call(agencySelf, {id: id, companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
             //console.log(result);

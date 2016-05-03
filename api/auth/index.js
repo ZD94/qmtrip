@@ -982,6 +982,22 @@ function getAccountIdByOpenId(params) {
         })
 }
 
+authServer.judgeRoleById = judgeRoleById;
+judgeRoleById.required_params = ['id'];
+function judgeRoleById(params){
+    return Models.Account.findById(params.id)
+        .then(function(account) {
+            if (!account) {
+                throw L.ERR.ACCOUNT_NOT_EXIST;
+            }
+            if(account.type == 1){
+                return L.RoleType.STAFF;
+            }else{
+                return L.RoleType.AGENCY;
+            }
+        })
+}
+
 /**
  * 微信自动登陆接口
  * @type {wxLogin}

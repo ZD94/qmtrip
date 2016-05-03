@@ -33,7 +33,7 @@ var UsersFirst = (function(){
 							API.staff.statisticStaffs({companyId:company_id}),
 							API.travelPolicy.getLatestTravelPolicy({}),
 							API.tripPlan.statPlanOrderMoneyByCompany({startTime:start,endTime:end}),
-							API.staff.statStaffPointsByCompany({})
+							API.staff.statStaffPoints({})
 						])
 							.spread(function(resutlt,num,travel_level,date,point){
 								$scope.funds = resutlt;
