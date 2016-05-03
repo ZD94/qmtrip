@@ -19,7 +19,7 @@ describe("api/client/tripPlan.js", function() {
         userName: "白菜帮九袋长老",
         name: '白菜帮',
         mobile: "15269866803",
-        description: '计划单测试用代理商'
+        title: '计划单测试用代理商'
     };
 
     var company = {
@@ -28,7 +28,7 @@ describe("api/client/tripPlan.js", function() {
         name: '白菜帮',
         mobile: "15269866803",
         domain: 'jingli.tech',
-        description: '计划单测试用企业'
+        title: '计划单测试用企业'
     }
 
     before(function(done){
@@ -73,7 +73,7 @@ describe("api/client/tripPlan.js", function() {
             .done();
     });
 
-    describe("savePlanOrder", function(){
+    describe("saveTripPlan", function(){
         after(function(done){
             API.tripPlan.deleteTripPlan({orderId: orderId, userId: staffId}, function(err, ret){
                 if(err){
@@ -83,14 +83,14 @@ describe("api/client/tripPlan.js", function() {
             })
         })
 
-        it("#savePlanOrder should be ok", function(done){
+        it("#saveTripPlan should be ok", function(done){
             var tripPlanOrder = {
                 deptCity: '北京',
                 arrivalCity: '上海',
                 deptCityCode: 'BJ123',
                 arrivalCityCode: 'SH123',
                 budget: 1000,
-                description: '发送邮件测试计划单',
+                title: '发送邮件测试计划单',
                 startAt: '2015-12-30 11:12:12',
                 hotel: [{
                     startTime: '2016-01-15 11:11:11',
@@ -103,25 +103,28 @@ describe("api/client/tripPlan.js", function() {
                 }]
             }
             var self = {accountId: staffId};
-            API.client.tripPlan.savePlanOrder.call(self, tripPlanOrder, function(err, ret){
+            API.client.tripPlan.saveTripPlan.call(self, tripPlanOrder, function(err, ret){
                 if(err){
                     throw err;
                 }
                 orderId = ret.id;
+                assert.equal(ret.companyId, companyId);
+                assert.equal(ret.accountId, staffId);
+                assert.equal(ret.orderStatus, 'WAIT_UPLOAD');
                 done();
             })
         });
 
-        it("#savePlanOrder should be error when budget is not number", function(done){
+        it("#saveTripPlan should be error when budget is not number", function(done){
             var tripPlanOrder = {
                 deptCity: '北京',
                 arrivalCity: '上海',
                 deptCityCode: 'BJ123',
                 arrivalCityCode: 'SH123',
                 budget: 1000,
-                description: '发送邮件测试计划单',
+                title: '发送邮件测试计划单',
                 startAt: '2015-12-30 11:12:12',
-                consumeDetails: [{
+                hotel: [{
                     startTime: '2016-01-15 11:11:11',
                     endTime: '2016-01-30 22:11:56',
                     budget: 'gg',
@@ -129,11 +132,10 @@ describe("api/client/tripPlan.js", function() {
                     cityCode: 'SH123',
                     hotelName: '丐帮',
                     invoiceType: 'HOTEL',
-                    type: 0
                 }]
             }
             var self = {accountId: staffId};
-            API.client.tripPlan.savePlanOrder.call(self, tripPlanOrder, function(err, ret){
+            API.client.tripPlan.saveTripPlan.call(self, tripPlanOrder, function(err, ret){
                 assert.equal(err.code, -2);
                 assert.equal(ret, null);
                 done();
@@ -150,22 +152,21 @@ describe("api/client/tripPlan.js", function() {
             deptCityCode: 'BJ123',
             arrivalCityCode: 'SH123',
             budget: 1000,
-            description: '发送邮件测试计划单',
+            title: '发送邮件测试计划单',
             startAt: '2015-12-30 11:12:12',
-            consumeDetails: [{
+            hotel: [{
                 startTime: '2016-12-30 11:11:11',
                 budget: 300,
                 city: '上海市',
                 cityCode: 'SH123',
                 hotelName: '丐帮',
-                invoiceType: 'HOTEL',
-                type: 0
+                invoiceType: 'HOTEL'
             }]
         }
         var newOrderId = "";
         beforeEach(function(done){
 
-            API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder, function(err, ret){
+            API.client.tripPlan.saveTripPlan.call({accountId: staffId}, tripPlanOrder, function(err, ret){
                 if(err){
                     throw err;
                 }
@@ -207,17 +208,16 @@ describe("api/client/tripPlan.js", function() {
             arrivalCityCode: 'SH123',
             budget: 1000,
             startAt: '2015-11-22 11:12:12',
-            description: '我要去出差',
-            consumeDetails: [{
+            title: '我要去出差',
+            hotel: [{
                 startTime: '2016-12-30 11:11:11',
                 budget: 400,
-                invoiceType: 'PLANE',
-                type: 0
+                invoiceType: 'PLANE'
             }]
         }
         before(function (done) {
 
-            API.client.tripPlan.savePlanOrder.call({accountId: staffId}, _tripPlanOrder, function (err, ret) {
+            API.client.tripPlan.saveTripPlan.call({accountId: staffId}, _tripPlanOrder, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -238,7 +238,7 @@ describe("api/client/tripPlan.js", function() {
 
 
         it("checkBudgetExist should be ok", function(done) {
-            _tripPlanOrder.consumeDetails[0].type = 0;
+            _tripPlanOrder.hotel[0].type = 0;
             API.client.tripPlan.checkBudgetExist.call({accountId: staffId}, _tripPlanOrder, function(err, ret) {
                 if(err) {
                     throw err;
@@ -249,7 +249,7 @@ describe("api/client/tripPlan.js", function() {
         });
 
         it("checkBudgetExist result should be false when there's no budget", function(done) {
-            _tripPlanOrder.consumeDetails[0].type = 1;
+            _tripPlanOrder.hotel[0].type = 1;
             API.client.tripPlan.checkBudgetExist.call({accountId: staffId}, _tripPlanOrder, function(err, ret) {
                 if(err) {
                     throw err;

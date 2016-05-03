@@ -154,7 +154,7 @@ describe("api/client/qm_order.js", function() {
     //        .then(function(company){
     //            companyId = company.id;
     //            staffId = company.createUser;
-    //            return API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder);
+    //            return API.client.tripPlan.saveTripPlan.call({accountId: staffId}, tripPlanOrder);
     //        })
     //        .then(function(tripPlan) {
     //            tripPlanId = tripPlan.id;

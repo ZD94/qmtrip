@@ -13,6 +13,64 @@ import _ = require('lodash');
 import {validateApi} from "common/api/helper";
 import {PLAN_STATUS, TripPlan, Project, TripDetails} from './tripPlan.types';
 
+/**
+ * 从参数中获取计划详情数组
+ * @param params
+ * @returns {Object}
+ */
+function getPlanDetails(params: TripPlan): {orderStatus: string, budget: number, tripDetails: Object[]} {
+    let tripDetails = [];
+    let tripDetails_required_fields = ['startTime', 'invoiceType', 'budget'];
+    params.outTraffic.map(function(detail: any) {
+        detail.type = 1;
+        tripDetails.push(detail);
+    });
+
+    params.backTraffic.map(function(detail: any) {
+        detail.type = 2;
+        tripDetails.push(detail);
+    });
+
+    params.hotel.map(function(detail: any) {
+        detail.type = 3;
+        tripDetails.push(detail);
+    });
+
+    let total_budget: number = 0;
+    let isBudget = true;
+
+    let _tripDetails =  tripDetails.map(function(detail) {
+        tripDetails_required_fields.forEach(function(key){
+            if(!_.has(detail, key)){
+                throw {code: '-1', msg: 'tripDetails的属性' + key + '没有指定'};
+            }
+        });
+
+        if(detail.deptCity && !detail.deptCityCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        if(detail.arrivalPlace && !detail.arrivalPlaceCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        if(detail.city && !detail.cityCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        if(!/^-?\d+(\.\d{1,2})?$/.test(detail.budget)) {
+            throw {code: -2, nsg: '预算金额格式不正确'};
+        }
+
+        detail.budget > 0 ? total_budget = total_budget + parseFloat(detail.budget) : isBudget = false;
+
+        return _.pick(detail, API.tripPlan.TripDetailsCols);
+    });
+
+    let orderStatus = isBudget? 'WAIT_UPLOAD' : 'NO_BUDGET'; //是否有预算，设置出差计划状态
+
+    return {orderStatus: orderStatus, budget: total_budget, tripDetails: tripDetails};
+}
 
 /**
  * @method saveTripPlan
@@ -20,21 +78,28 @@ import {PLAN_STATUS, TripPlan, Project, TripDetails} from './tripPlan.types';
  * @param params
  * @returns {Promise<TripPlan>}
  */
-validateApi(saveTripPlan, ['tripDetails', 'arrivalCityCode', 'arrivalCity', 'startAt', 'budget', 'title'], ['deptCityCode', 'deptCity', 'backAt',
-    'isNeedTraffic', 'isNeedHotel', 'remark', 'projectId']);
-export async function saveTripPlan(params: TripPlan) {
+validateApi(saveTripPlan, ['arrivalCityCode', 'arrivalCity', 'startAt', 'budget', 'title'], ['deptCityCode', 'deptCity', 'backAt',
+    'isNeedTraffic', 'isNeedHotel', 'remark', 'projectId', 'outTraffic', 'backTraffic', 'hotel']);
+export async function saveTripPlan(params: TripPlan): Promise<TripPlan> {
     let self = this;
     let accountId = self.accountId;
     let staff = await API.staff.getStaff({id: accountId, columns: ['companyId', 'email', 'name']});
     let email = staff.email;
     let staffName = staff.name;
-    params.accountId = accountId;
-    params.companyId = staff.companyId;
-    params.orderNo = await API.seeds.getSeedNo('tripPlanNo');
-    
-    // let _tripPlan :any = _.pick(params, API.tripPlan.tripPla);
-    
-    let tripPlan = await API.tripPlan.saveTripPlan(params);
+
+    params = new TripPlan(params); //测试
+
+    let _tripPlan :any = _.pick(params, API.tripPlan.TripPlanCols);
+    let {orderStatus, budget, tripDetails} = getPlanDetails(params);
+
+    _tripPlan.tripDetails = tripDetails;
+    _tripPlan.orderStatus = orderStatus;
+    _tripPlan.budget = budget;
+    _tripPlan.orderNo = await API.seeds.getSeedNo('tripPlanNo'); //获取出差计划单号
+    _tripPlan.accountId = accountId;
+    _tripPlan.companyId = staff.companyId;
+
+    let tripPlan = await API.tripPlan.saveTripPlan(_tripPlan);
 
     if(tripPlan.budget <= 0 || tripPlan.orderStatus === PLAN_STATUS.NO_BUDGET) {
         return tripPlan; //没有预算，直接返回计划单
@@ -81,14 +146,6 @@ export async function saveTripPlan(params: TripPlan) {
         return true;
     });
 
-    if(tripPlan.toJSON) {
-        tripPlan = tripPlan.toJSON();
-    }
-
-    console.info(tripPlan);
-
-    tripPlan = new TripPlan(tripPlan);
-    console.info(tripPlan);
     return tripPlan;
 }
 
@@ -510,12 +567,17 @@ export async function statStaffsByCity(params: {statTime: string}) {
  * @param params
  * @returns {Promise<boolean>}
  */
-export async function checkBudgetExist(params) {
+export async function checkBudgetExist(params): Promise<boolean> {
     let self = this;
     let accountId = self.accountId;
     let {companyId} = await API.staff.getStaff({id: accountId, columns: ['companyId']});
     params.accountId = accountId;
     params.companyId = companyId;
+    params.outTraffic = params.outTraffic || [];
+    params.backTraffic = params.backTraffic || [];
+    params.hotel = params.hotel || [];
+    let {tripDetails} = getPlanDetails(params);
+    params.tripDetails = tripDetails;
     return API.tripPlan.checkBudgetExist(params)
 }
 

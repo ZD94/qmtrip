@@ -69,7 +69,7 @@ describe("api/client/agencyTripPlan.js", function() {
             .then(function(company){
                 companyId = company.id;
                 staffId = company.createUser;
-                return API.client.tripPlan.savePlanOrder.call({accountId: staffId}, tripPlanOrder);
+                return API.client.tripPlan.saveTripPlan.call({accountId: staffId}, tripPlanOrder);
             })
             .then(function(ret){
                 assert(ret.hotel.length > 0);
@@ -131,7 +131,7 @@ describe("api/client/agencyTripPlan.js", function() {
         var new_consume_id = '';
 
         before(function(done) {
-            API.client.tripPlan.savePlanOrder.call({accountId: staffId}, _tripPlanOrder)
+            API.client.tripPlan.saveTripPlan.call({accountId: staffId}, _tripPlanOrder)
                 .then(function(trip_plan) {
                     new_trip_plan_id = trip_plan.id;
                     new_consume_id = trip_plan.hotel[0].id;
