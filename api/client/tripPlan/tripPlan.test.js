@@ -85,14 +85,14 @@ describe("api/client/tripPlan.js", function() {
 
         it("#savePlanOrder should be ok", function(done){
             var tripPlanOrder = {
-                startPlace: '北京',
-                destination: '上海',
-                startPlaceCode: 'BJ123',
-                destinationCode: 'SH123',
+                deptCity: '北京',
+                arrivalCity: '上海',
+                deptCityCode: 'BJ123',
+                arrivalCityCode: 'SH123',
                 budget: 1000,
                 description: '发送邮件测试计划单',
                 startAt: '2015-12-30 11:12:12',
-                consumeDetails: [{
+                hotel: [{
                     startTime: '2016-01-15 11:11:11',
                     endTime: '2016-01-30 22:11:56',
                     budget: '300',
@@ -100,7 +100,6 @@ describe("api/client/tripPlan.js", function() {
                     cityCode: 'SH123',
                     hotelName: '丐帮',
                     invoiceType: 'HOTEL',
-                    type: 0
                 }]
             }
             var self = {accountId: staffId};
@@ -109,17 +108,16 @@ describe("api/client/tripPlan.js", function() {
                     throw err;
                 }
                 orderId = ret.id;
-                //assert.equal(ret.status, 0);
                 done();
             })
         });
 
         it("#savePlanOrder should be error when budget is not number", function(done){
             var tripPlanOrder = {
-                startPlace: '北京',
-                destination: '上海',
-                startPlaceCode: 'BJ123',
-                destinationCode: 'SH123',
+                deptCity: '北京',
+                arrivalCity: '上海',
+                deptCityCode: 'BJ123',
+                arrivalCityCode: 'SH123',
                 budget: 1000,
                 description: '发送邮件测试计划单',
                 startAt: '2015-12-30 11:12:12',
@@ -147,10 +145,10 @@ describe("api/client/tripPlan.js", function() {
     describe("deleteTripPlan", function(){
         var consume_id = '';
         var tripPlanOrder = {
-            startPlace: '北京',
-            destination: '上海',
-            startPlaceCode: 'BJ123',
-            destinationCode: 'SH123',
+            deptCity: '北京',
+            arrivalCity: '上海',
+            deptCityCode: 'BJ123',
+            arrivalCityCode: 'SH123',
             budget: 1000,
             description: '发送邮件测试计划单',
             startAt: '2015-12-30 11:12:12',
@@ -203,10 +201,10 @@ describe("api/client/tripPlan.js", function() {
         var newOrderId = "";
         var consumeId = "";
         var _tripPlanOrder = {
-            startPlace: '北京',
-            destination: '上海',
-            startPlaceCode: 'BJ123',
-            destinationCode: 'SH123',
+            deptCity: '北京',
+            arrivalCity: '上海',
+            deptCityCode: 'BJ123',
+            arrivalCityCode: 'SH123',
             budget: 1000,
             startAt: '2015-11-22 11:12:12',
             description: '我要去出差',
@@ -281,17 +279,6 @@ describe("api/client/tripPlan.js", function() {
                 done();
             })
         });
-        //
-        // it("#pageCompleteTripPlans should be error without params", function (done) {
-        //     var self = {accountId: staffId};
-        //     API.client.tripPlan.pageCompleteTripPlans.call(self, function (err, ret) {
-        //         console.info(err);
-        //         console.info(ret);
-        //         assert.equal(err.code, -2);
-        //         assert.equal(ret, null);
-        //         done();
-        //     })
-        // });
 
         it("#pageCompleteTripPlans should be ok", function (done) {
             var self = {accountId: staffId};

@@ -5,10 +5,9 @@
 var moment = require("moment");
 var sequelize = require("common/model").importModel("./models");
 var Models = sequelize.models;
-var PlanOrder = Models.TripPlanOrder;
-var ConsumeDetails = Models.ConsumeDetails;
-var TripOrderLogs = Models.TripOrderLogs;
-var ConsumeDetailsLogs = Models.ConsumeDetailsLogs;
+var TripPlanModel = Models.TripPlan;
+var TripDetailsModel = Models.TripDetails;
+var TripOrderLogsModel = Models.TripPlanLogs;
 var Projects = Models.Projects;
 var uuid = require("node-uuid");
 var L = require("common/language");
@@ -34,28 +33,26 @@ var INVOICE_TYPE = {
     HOTEL: 2
 }
 
-var tripPlan = {}
+var tripPlan = {};
 
-var ConsumeDetailsCols = Object.keys(ConsumeDetails.attributes);
+var TripDetailsCols = Object.keys(TripDetailsModel.attributes);
 
 /**
  * 保存预算单/差旅计划单
  * @param params
- * @returns {*}
+ * @returns {Promise<object>}
  */
 tripPlan.savePlanOrder = savePlanOrder;
-savePlanOrder.required_params = ['consumeDetails', 'accountId', 'companyId', 'destination', 'budget', 'destinationCode', 'description'];
-savePlanOrder.optional_params = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'expenditure', 'expendInfo', 'remark', 'destinationCode', 'startPlaceCode', 'projectId'];
-var consumeDetails_required_fields = ['type', 'startTime', 'invoiceType', 'budget'];
+var tripDetails_required_fields = ['type', 'startTime', 'invoiceType', 'budget'];
 function savePlanOrder(params){
-    var consumeDetails = params.consumeDetails.map(function(detail){
-        consumeDetails_required_fields.forEach(function(key){
+    var tripDetails = params.tripDetails.map(function(detail){
+        tripDetails_required_fields.forEach(function(key){
             if(!_.has(detail, key)){
-                throw {code: '-1', msg: 'consumeDetails的属性' + key + '没有指定'};
+                throw {code: '-1', msg: 'tripDetails的属性' + key + '没有指定'};
             }
-        })
+        });
 
-        if(detail.startPlace && !detail.startPlaceCode) {
+        if(detail.deptCity && !detail.deptCityCode) {
             throw {code: -3, msg: '城市代码不能为空'};
         }
 
@@ -67,13 +64,13 @@ function savePlanOrder(params){
             throw {code: -3, msg: '城市代码不能为空'};
         }
 
-        return _.pick(detail, ConsumeDetailsCols);
+        return _.pick(detail, TripDetailsCols);
     });
 
-    delete params.consumeDetails;
+    delete params.tripDetails;
     var _planOrder = params;
 
-    if(_planOrder.startPlace && !_planOrder.startPlaceCode) {
+    if(_planOrder.deptCity && !_planOrder.deptCityCode) {
         throw {code: -3, msg: '城市代码不能为空'};
     }
 
@@ -90,8 +87,8 @@ function savePlanOrder(params){
             var total_budget = 0;
             var isBudget = true;
 
-            for(var i in consumeDetails) {
-                var obj = consumeDetails[i];
+            for(var i in tripDetails) {
+                var obj = tripDetails[i];
 
                 if(!/^-?\d+(\.\d{1,2})?$/.test(obj.budget)) {
                     throw {code: -2, nsg: '预算金额格式不正确'};
@@ -101,23 +98,23 @@ function savePlanOrder(params){
             }
 
             _planOrder.budget = total_budget;
-            isBudget?_planOrder.orderStatus = 'WAIT_BOOK':_planOrder.orderStatus = 'NO_BUDGET'; //是否有预算，设置出差计划状态
+            isBudget?_planOrder.orderStatus = 'WAIT_UPLOAD':_planOrder.orderStatus = 'NO_BUDGET'; //是否有预算，设置出差计划状态
 
             return sequelize.transaction(function(t){
                 var order = {};
-                return PlanOrder.create(_planOrder, {transaction: t})
+                return TripPlanModel.create(_planOrder, {transaction: t})
                     .then(function(ret){
                         order = ret.toJSON();
                         order.outTraffic = new Array();
                         order.backTraffic = new Array();
                         order.hotel = new Array();
 
-                        return Promise.all(consumeDetails.map(function(detail){
+                        return Promise.all(tripDetails.map(function(detail){
                             detail.orderId = order.id;
                             detail.accountId = order.accountId;
                             detail.orderStatus = _planOrder.orderStatus;
 
-                            return ConsumeDetails.create(detail, {transaction: t})
+                            return TripDetailsModel.create(detail, {transaction: t})
                                 .then(function(ret){
                                     return ret.toJSON();
                                 })
@@ -140,9 +137,9 @@ function savePlanOrder(params){
                             userId: params.accountId,
                             remark: '新增计划单 ' + order.orderNo,
                             createAt: utils.now()
-                        }
+                        };
 
-                        return TripOrderLogs.create(logs, {transaction: t});
+                        return TripOrderLogsModel.create(logs, {transaction: t});
                     })
                     .then(function(){
                         return order;
@@ -170,10 +167,10 @@ function getTripPlanOrder(params){
     }
 
     return Promise.all([
-        PlanOrder.findById(orderId, options),
-        ConsumeDetails.findAll({where: {orderId: orderId, type: -1, status: {$ne: STATUS.DELETE}}}),
-        ConsumeDetails.findAll({where: {orderId: orderId, type: 1, status: {$ne: STATUS.DELETE}}}),
-        ConsumeDetails.findAll({where: {orderId: orderId, type: 0, status: {$ne: STATUS.DELETE}}})
+        TripPlanModel.findById(orderId, options),
+        TripDetailsModel.findAll({where: {orderId: orderId, type: -1, status: {$ne: STATUS.DELETE}}}),
+        TripDetailsModel.findAll({where: {orderId: orderId, type: 1, status: {$ne: STATUS.DELETE}}}),
+        TripDetailsModel.findAll({where: {orderId: orderId, type: 0, status: {$ne: STATUS.DELETE}}})
     ])
         .spread(function(order, outTraffic, backTraffic, hotel){
             if(!order || order.orderStatus == 'DELETE'){
@@ -195,7 +192,7 @@ tripPlan.getConsumeInvoiceImg = function(params) {
         throw {code: -1, msg: "consumeId不能为空"};
     }
 
-    return ConsumeDetails.findById(consumeId)
+    return TripDetailsModel.findById(consumeId)
         .then(function(consumeDetail) {
             return API.attachments.getAttachment({id: consumeDetail.newInvoice})
         })
@@ -219,10 +216,10 @@ function getConsumeDetail(params){
     var options = {};
 
     if(params.columns){
-        options.attributes = _.intersection(params.columns, ConsumeDetailsCols);
+        options.attributes = _.intersection(params.columns, TripDetailsCols);
     }
 
-    return ConsumeDetails.findById(params.consumeId, options)
+    return TripDetailsModel.findById(params.consumeId, options)
         .then(function(detail){
             if(!detail || detail.status == STATUS.DELETE){
                 throw {code: -2, msg: '消费记录不存在'};
@@ -244,7 +241,7 @@ function updateTripPlanOrder(params){
     var optLog = params.optLog;
     var updates = params.updates;
 
-    return PlanOrder.findById(orderId)
+    return TripPlanModel.findById(orderId)
         .then(function(order){
             if(!order || order.status == STATUS.DELETE){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
@@ -260,8 +257,8 @@ function updateTripPlanOrder(params){
             return sequelize.transaction(function(t){
                 updates = utils.now();
                 return Promise.all([
-                    PlanOrder.update(updates, {returning: true, where: {id: orderId}, fields: Object.keys(updates), transaction: t}),
-                    TripOrderLogs.create(logs, {transaction: t})
+                    TripPlanModel.update(updates, {returning: true, where: {id: orderId}, fields: Object.keys(updates), transaction: t}),
+                    TripOrderLogsModel.create(logs, {transaction: t})
                 ]);
             })
         })
@@ -279,12 +276,12 @@ function updateTripPlanOrder(params){
  */
 tripPlan.updateConsumeDetail = updateConsumeDetail;
 updateConsumeDetail.required_params = ['consumeId', 'optLog', 'userId', 'updates'];
-updateConsumeDetail.optional_params = _.keys(ConsumeDetails.attributes);
+updateConsumeDetail.optional_params = _.keys(TripDetailsModel.attributes);
 function updateConsumeDetail(params){
-    var updates = _.pick(params.updates, _.keys(ConsumeDetails.attributes));
+    var updates = _.pick(params.updates, _.keys(TripDetailsModel.attributes));
     var trip_plan_id = '';
 
-    return ConsumeDetails.findById(params.consumeId)
+    return TripDetailsModel.findById(params.consumeId)
         .then(function(record){
             if(!record || record.status == STATUS.DELETE){
                 throw {code: -2, msg: '票据不存在'};
@@ -297,14 +294,14 @@ function updateConsumeDetail(params){
             trip_plan_id = record.orderId;
             updates.updateAt = utils.now();
 
-            return ConsumeDetails.update(updates, {returning: true, where: {id: params.consumeId}, fields: Object.keys(updates)});
+            return TripDetailsModel.update(updates, {returning: true, where: {id: params.consumeId}, fields: Object.keys(updates)});
         })
         .spread(function(result) {
             if(result < 1) {
                 throw {code: -2, msg: '更新出差明细失败失败'};
             }
 
-            return ConsumeDetails.findAll({where: {orderId: trip_plan_id, status: {$ne: STATUS.DELETE}}})
+            return TripDetailsModel.findAll({where: {orderId: trip_plan_id, status: {$ne: STATUS.DELETE}}})
         })
         .then(function(list) {
             var orderStatus = '';
@@ -316,7 +313,7 @@ function updateConsumeDetail(params){
                 orderStatus = t.orderStatus;
             });
 
-            return PlanOrder.update({orderStatus: orderStatus, updateAt: utils.now()}, {returning: true, where: {id: trip_plan_id}})
+            return TripPlanModel.update({orderStatus: orderStatus, updateAt: utils.now()}, {returning: true, where: {id: trip_plan_id}})
         })
         .then(function() {
             return true;
@@ -329,7 +326,7 @@ updateConsumeBudget.optional_params = ['invoiceType'];
 function updateConsumeBudget(params){
     var id = params.id;
 
-    return ConsumeDetails.findById(id)
+    return TripDetailsModel.findById(id)
         .then(function(ret){
             if(!ret ||ret.status == STATUS.DELETE){
                 throw {code: -2, msg: '票据不存在'};
@@ -339,7 +336,7 @@ function updateConsumeBudget(params){
                 throw {code: -3, msg: '该票据已经审核通过，不能修改预算'};
             }
 
-            return [ret.budget, PlanOrder.findById(ret.orderId)];
+            return [ret.budget, TripPlanModel.findById(ret.orderId)];
         })
         .spread(function(o_budget, order){
             if(order.status == STATUS.COMMIT){
@@ -360,7 +357,7 @@ function updateConsumeBudget(params){
             }
 
             var updates = {
-                orderStatus: 'WAIT_BOOK',
+                orderStatus: 'WAIT_UPLOAD',
                 budget: budget,
                 updateAt: utils.now()
             }
@@ -371,13 +368,13 @@ function updateConsumeBudget(params){
             return sequelize.transaction(function(t){
                 return Promise.all([
                     order.id,
-                    ConsumeDetails.update(updates, {where: {id: id}, transaction: t}),
-                    TripOrderLogs.create(logs, {transaction: t})
+                    TripDetailsModel.update(updates, {where: {id: id}, transaction: t}),
+                    TripOrderLogsModel.create(logs, {transaction: t})
                 ])
             })
         })
         .spread(function(orderId){
-            return [orderId, ConsumeDetails.findAll({where: {orderId: orderId, status: {$ne: -2}}})];
+            return [orderId, TripDetailsModel.findAll({where: {orderId: orderId, status: {$ne: -2}}})];
         })
         .spread(function(orderId, list){
             var c_budget = 0;
@@ -389,7 +386,7 @@ function updateConsumeBudget(params){
                 c_budget += parseFloat(budget);
             }
 
-            return PlanOrder.update({status: STATUS.NO_COMMIT, budget: c_budget, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'budget', 'updateAt']})
+            return TripPlanModel.update({status: STATUS.NO_COMMIT, budget: c_budget, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'budget', 'updateAt']})
         })
         .then(function(){
             return true;
@@ -415,7 +412,7 @@ tripPlan.listTripPlanOrder = function(options){
          options.order = [['start_at', 'desc'], ['create_at', 'desc']]; //默认排序，创建时间
     }
 
-    return PlanOrder.findAndCount(options)
+    return TripPlanModel.findAndCount(options)
         .then(function(ret){
             if(!ret || ret.rows .length === 0){
                 return new Paginate(options.offset/options.limit + 1, options.limit, ret.count, []);
@@ -425,9 +422,9 @@ tripPlan.listTripPlanOrder = function(options){
             return Promise.all(orders.map(function(order){
                 var orderId = order.id;
                 return Promise.all([
-                    ConsumeDetails.findAll({where: {orderId: orderId, type: -1, status: {$ne: STATUS.DELETE}}}),
-                    ConsumeDetails.findAll({where: {orderId: orderId, type: 0, status: {$ne: STATUS.DELETE}}}),
-                    ConsumeDetails.findAll({where: {orderId: orderId, type: 1, status: {$ne: STATUS.DELETE}}})
+                    TripDetailsModel.findAll({where: {orderId: orderId, type: -1, status: {$ne: STATUS.DELETE}}}),
+                    TripDetailsModel.findAll({where: {orderId: orderId, type: 0, status: {$ne: STATUS.DELETE}}}),
+                    TripDetailsModel.findAll({where: {orderId: orderId, type: 1, status: {$ne: STATUS.DELETE}}})
                 ])
                     .spread(function(outTraffic, hotel, backTraffic){
                         order.setDataValue("outTraffic", outTraffic);
@@ -446,7 +443,7 @@ tripPlan.listTripPlanOrder = function(options){
 tripPlan.findOrdersByOption = findOrdersByOption;
 findOrdersByOption.required_params = ['where'];
 function findOrdersByOption(options) {
-    return PlanOrder.findAll(options);
+    return TripPlanModel.findAll(options);
 }
 
 /**
@@ -456,7 +453,7 @@ function findOrdersByOption(options) {
  */
 tripPlan.saveConsumeRecord = saveConsumeRecord;
 saveConsumeRecord.required_params = ['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'];
-saveConsumeRecord.optional_params = ConsumeDetailsCols;
+saveConsumeRecord.optional_params = TripDetailsCols;
 function saveConsumeRecord(params){
     var record = params;
     record.isCommit = false;
@@ -464,7 +461,7 @@ function saveConsumeRecord(params){
     var options = {};
     options.fields = Object.keys(record);
 
-    return PlanOrder.findById(params.orderId)
+    return TripPlanModel.findById(params.orderId)
         .then(function(order){
             if(!order || order.status == STATUS.DELETE){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
@@ -507,8 +504,8 @@ function saveConsumeRecord(params){
                 }
 
                 return Promise.all([
-                    ConsumeDetails.create(record, options),
-                    TripOrderLogs.create(logs, {transaction: t}),
+                    TripDetailsModel.create(record, options),
+                    TripOrderLogsModel.create(logs, {transaction: t}),
                     order.save()
                 ])
             })
@@ -528,7 +525,7 @@ deleteTripPlan.required_params = ['userId', 'orderId'];
 function deleteTripPlan(params){
     var orderId = params.orderId;
     var userId = params.userId;
-    return PlanOrder.findById(orderId)
+    return TripPlanModel.findById(orderId)
         .then(function(order){
 
             if(!order || order.status == STATUS.DELETE){
@@ -541,8 +538,8 @@ function deleteTripPlan(params){
 
             return sequelize.transaction(function(t){
                 return Promise.all([
-                    PlanOrder.update({status: STATUS.DELETE, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'updateAt'], transaction: t}),
-                    ConsumeDetails.update({status: STATUS.DELETE, updateAt: utils.now()}, {where: {orderId: orderId}, fields: ['status', 'updateAt'], transaction: t})
+                    TripPlanModel.update({status: STATUS.DELETE, updateAt: utils.now()}, {where: {id: orderId}, fields: ['status', 'updateAt'], transaction: t}),
+                    TripDetailsModel.update({status: STATUS.DELETE, updateAt: utils.now()}, {where: {orderId: orderId}, fields: ['status', 'updateAt'], transaction: t})
                 ])
             })
         })
@@ -562,7 +559,7 @@ function deleteConsumeDetail(params){
     var id = params.id;
     var userId = params.userId;
 
-    return ConsumeDetails.findById(id)
+    return TripDetailsModel.findById(id)
         .then(function(detail){
             if(!detail || detail.status == STATUS.DELETE){
                 throw L.ERR.CONSUME_DETAIL_NOT_EXIST;
@@ -572,7 +569,7 @@ function deleteConsumeDetail(params){
                 throw L.ERR.PERMISSION_DENY;
             }
 
-            return ConsumeDetails.update({status: STATUS.DELETE, updateAt: utils.now()}, {where: {id: id}, fields: ['status', 'updateAt']})
+            return TripDetailsModel.update({status: STATUS.DELETE, updateAt: utils.now()}, {where: {id: id}, fields: ['status', 'updateAt']})
         })
         .then(function(){
             return true;
@@ -592,7 +589,7 @@ uploadInvoice.required_params = ['consumeId', 'picture', 'userId'];
 function uploadInvoice(params){
     var orderId = "";
 
-    return ConsumeDetails.findById(params.consumeId)
+    return TripDetailsModel.findById(params.consumeId)
         .then(function(custome){
             if(!custome || custome.status == STATUS.DELETE){
                 throw L.ERR.NOT_FOUND;
@@ -608,8 +605,8 @@ function uploadInvoice(params){
 
             orderId = custome.orderId;
             return [orderId, custome,
-                PlanOrder.findById(orderId),
-                ConsumeDetails.findAll({where: {orderId: orderId}, attributes: ['id', 'orderStatus', 'status', 'budget', 'isCommit', 'newInvoice']}) //所有的未审核通过的数据
+                TripPlanModel.findById(orderId),
+                TripDetailsModel.findAll({where: {orderId: orderId}, attributes: ['id', 'orderStatus', 'status', 'budget', 'isCommit', 'newInvoice']}) //所有的未审核通过的数据
             ]
         })
         .spread(function(orderId, custome, order, list){
@@ -630,7 +627,7 @@ function uploadInvoice(params){
                 auditRemark: params.auditRemark || ''
             };
 
-            var logs = {consumeId: params.consumeId, userId: params.userId, remark: "上传票据"};
+            var logs = {orderId: orderId, consumeId: params.consumeId, userId: params.userId, remark: "上传票据"};
             var orderLogs = {orderId: custome.orderId, userId: params.userId, remark: '上传票据', createAt: utils.now()};
 
             var order_status = 'WAIT_COMMIT';
@@ -646,10 +643,10 @@ function uploadInvoice(params){
 
             return sequelize.transaction(function(t){
                 return Promise.all([
-                    ConsumeDetails.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
-                    ConsumeDetailsLogs.create(logs,{transaction: t}),
-                    TripOrderLogs.create(orderLogs, {transaction: t}),
-                    PlanOrder.update({orderStatus: order_status, updateAt: utils.now()}, {where: {id: orderId}})
+                    TripDetailsModel.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
+                    TripOrderLogsModel.create(logs,{transaction: t}),
+                    TripOrderLogsModel.create(orderLogs, {transaction: t}),
+                    TripPlanModel.update({orderStatus: order_status, updateAt: utils.now()}, {where: {id: orderId}})
                 ]);
             })
         })
@@ -670,7 +667,7 @@ function getVisitPermission(params){
     var userId = params.userId;
     var consumeId = params.consumeId;
 
-    return ConsumeDetails.findById(consumeId)
+    return TripDetailsModel.findById(consumeId)
         .then(function(consume){
             if(!consume || consume.status == STATUS.DELETE){
                 throw {code: -4, msg: '查询记录不存在'};
@@ -679,7 +676,7 @@ function getVisitPermission(params){
             if(consume.accountId == userId){//允许自己查看
                 return {allow: true, fileId: consume.newInvoice}
             }else{
-                return PlanOrder.findById(consume.orderId)
+                return TripPlanModel.findById(consume.orderId)
                     .then(function(order){
                         if(!order){
                             throw {code: -4, msg: '订单记录不存在'};
@@ -720,7 +717,7 @@ function getVisitPermission(params){
 tripPlan.saveOrderLogs = saveOrderLogs;
 saveOrderLogs.required_params = ['userId', 'orderId', 'remark']
 function saveOrderLogs(logs){
-    return PlanOrder.findById(params.orderId)
+    return TripPlanModel.findById(params.orderId)
         .then(function(order){
             if(!order || order,status == STATUS.DELETE){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
@@ -731,7 +728,7 @@ function saveOrderLogs(logs){
             }
 
             logs.createAt = utils.now();
-            return TripOrderLogs.create(logs);
+            return TripOrderLogsModel.create(logs);
         })
 }
 
@@ -747,7 +744,7 @@ tripPlan.approveInvoice = approveInvoice;
 approveInvoice.required_params = ['status', 'consumeId', 'userId'];
 approveInvoice.optional_params = ['remark', 'expenditure'];
 function approveInvoice(params){
-    return ConsumeDetails.findById(params.consumeId)
+    return TripDetailsModel.findById(params.consumeId)
         .then(function(consume){
             if(!consume || consume.status == STATUS.DELETE)
                 throw L.ERR.NOT_FOUND;
@@ -760,7 +757,7 @@ function approveInvoice(params){
                 throw {code: -3, msg: '该票据已审核通过，不能重复审核'};
             }
 
-            return [PlanOrder.findById(consume.orderId), consume]
+            return [TripPlanModel.findById(consume.orderId), consume]
         })
         .spread(function(order, consume){
             var invoiceJson = consume.invoice;
@@ -798,14 +795,14 @@ function approveInvoice(params){
                     updates.isCommit =false;
                 }
                 return Promise.all([
-                    ConsumeDetails.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
+                    TripDetailsModel.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
                     ConsumeDetailsLogs.create(logs,{transaction: t})
                 ])
                     .spread(function(ret){
                         var status = params.status;
 
                         if(status == STATUS.NO_BUDGET){
-                            return PlanOrder.update({status: STATUS.NO_COMMIT, auditStatus: -1, updateAt: utils.now()},
+                            return TripPlanModel.update({status: STATUS.NO_COMMIT, auditStatus: -1, updateAt: utils.now()},
                                 {where: {id: order.id}, fields: ['auditStatus', 'status', 'updateAt'], transaction: t});
                         }
 
@@ -819,7 +816,7 @@ function approveInvoice(params){
                             updateAt: utils.now()
                         }
 
-                        return ConsumeDetails.findAll({where: {orderId: order.id, status: {$ne: -2}}})
+                        return TripDetailsModel.findAll({where: {orderId: order.id, status: {$ne: -2}}})
                             .then(function(list){
                                 for(var i=0; i<list.length; i++){
                                     if(list[i].status != STATUS.COMMIT && list[i].id != ret[1][0].id){
@@ -838,7 +835,7 @@ function approveInvoice(params){
                                     order_updates.score = parseInt(score/2);
                                 }
 
-                                return PlanOrder.update(order_updates, {where: {id: order.id}, fields: Object.keys(order_updates), transaction: t})
+                                return TripPlanModel.update(order_updates, {where: {id: order.id}, fields: Object.keys(order_updates), transaction: t})
                             })
                     })
             });
@@ -859,7 +856,7 @@ countTripPlanNum.optional_params = ['accountId', 'status'];
 function countTripPlanNum(params){
     var query = params;
     query.status = {$ne: STATUS.DELETE};
-    return PlanOrder.count({where: query});
+    return TripPlanModel.count({where: query});
 }
 
 
@@ -883,7 +880,7 @@ function statBudgetByMonth(params) {
     }while(stTime<enTime);
 
     var sql = 'select count(account_id) as \"staffNum\", sum(budget) as \"planMoney\",sum(expenditure) as expenditure ' +
-        'from tripplan.trip_plan_order where company_id=\'' + params.companyId + '\'';
+        'from tripplan.trip_plan where company_id=\'' + params.companyId + '\'';
 
     if(params.accountId) {
         sql += ' and account_id=\'' + params.accountId + '\'';
@@ -953,7 +950,7 @@ function statPlanOrderMoney(params){
         status: STATUS.COMPLETE,
         auditStatus: 1
     }
-    var query_sql = 'select sum(budget-expenditure) as \"savedMoney\" from tripplan.trip_plan_order where company_id=\''+ params.companyId +'\' and status=2 and audit_status=1';
+    var query_sql = 'select sum(budget-expenditure) as \"savedMoney\" from tripplan.trip_plan where company_id=\''+ params.companyId +'\' and status=2 and audit_status=1';
     query.status = {$gte: STATUS.NO_COMMIT};
     var startAt = {};
 
@@ -982,10 +979,10 @@ function statPlanOrderMoney(params){
     }
 
     return Promise.all([
-        PlanOrder.sum('budget', {where: query}),
-        PlanOrder.sum('budget', {where: query_complete}),
-        PlanOrder.sum('expenditure', {where: query_complete}),
-        PlanOrder.count({where: query_complete}),
+        TripPlanModel.sum('budget', {where: query}),
+        TripPlanModel.sum('budget', {where: query_complete}),
+        TripPlanModel.sum('expenditure', {where: query_complete}),
+        TripPlanModel.count({where: query_complete}),
         sequelize.query(query_sql)
     ])
         .spread(function(n1, n2, n3, n4, n5) {
@@ -1010,7 +1007,7 @@ tripPlan.getProjects = getProjects;
 getProjects.required_params = ['companyId'];
 getProjects.optional_params = ['description'];
 function getProjects(params){
-    return PlanOrder.findAll({where: params, group: ['description'], attributes: ['description']})
+    return TripPlanModel.findAll({where: params, group: ['description'], attributes: ['description']})
 }
 
 /**
@@ -1023,8 +1020,8 @@ commitTripPlanOrder.required_params = ['orderId', 'accountId'];
 function commitTripPlanOrder(params){
     var id = params.orderId;
     return Promise.all([
-        PlanOrder.findById(id),
-        ConsumeDetails.findAll({where:{orderId: id}})
+        TripPlanModel.findById(id),
+        TripDetailsModel.findAll({where:{orderId: id}})
     ])
         .spread(function(order, list){
             if(!order || order.status == STATUS.DELETE){
@@ -1061,8 +1058,8 @@ function commitTripPlanOrder(params){
         })
         .then(function(){
             return Promise.all([
-                PlanOrder.update({status: STATUS.COMMIT, auditStatus: 0, updateAt: utils.now(), isCommit: true, commitTime: utils.now()}, {where: {id: id}, fields: ['status', 'auditStatus', 'updateAt', 'isCommit']}),
-                ConsumeDetails.update({isCommit: true, commitTime: utils.now(), updateAt: utils.now()}, {where: {orderId: id}})
+                TripPlanModel.update({status: STATUS.COMMIT, auditStatus: 0, updateAt: utils.now(), isCommit: true, commitTime: utils.now()}, {where: {id: id}, fields: ['status', 'auditStatus', 'updateAt', 'isCommit']}),
+                TripDetailsModel.update({isCommit: true, commitTime: utils.now(), updateAt: utils.now()}, {where: {orderId: id}})
             ])
         })
         .then(function(){
@@ -1089,7 +1086,7 @@ tripPlan.previewConsumeInvoice = function (params) {
             if (!result.allow) {
                 throw L.ERR.PERMISSION_DENY;
             }
-            return ConsumeDetails.findOne({where: {orderId: orderId, id: consumeId}})
+            return TripDetailsModel.findOne({where: {orderId: orderId, id: consumeId}})
         })
         .then(function(consume) {
             return API.attachments.getAttachment({id: consume.newInvoice});
@@ -1104,8 +1101,8 @@ tripPlan.previewConsumeInvoice = function (params) {
  * @param params
  */
 tripPlan.checkBudgetExist = checkBudgetExist;
-checkBudgetExist.required_params = ['consumeDetails', 'accountId', 'companyId', 'destination', 'destinationCode'];
-checkBudgetExist.optional_params = ['startPlace', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'description', 'destinationCode', 'startPlaceCode'];
+checkBudgetExist.required_params = ['consumeDetails', 'accountId', 'companyId', 'arrivalCity', 'arrivalCityCode'];
+checkBudgetExist.optional_params = ['deptCity', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'description', 'arrivalCityCode', 'deptCityCode'];
 var consumeDetails_required_fields = ['type', 'startTime', 'invoiceType'];
 function checkBudgetExist(params){
     var consumeDetails = params.consumeDetails.map(function(detail){
@@ -1115,7 +1112,7 @@ function checkBudgetExist(params){
             }
         })
 
-        if(detail.startPlace && !detail.startPlaceCode) {
+        if(detail.deptCity && !detail.deptCityCode) {
             throw {code: -3, msg: '城市代码不能为空'};
         }
 
@@ -1127,19 +1124,19 @@ function checkBudgetExist(params){
             throw {code: -3, msg: '城市代码不能为空'};
         }
 
-        return _.pick(detail, ConsumeDetailsCols);
+        return _.pick(detail, TripDetailsCols);
     });
 
     delete params.consumeDetails;
     var _planOrder = params;
 
-    if(_planOrder.startPlace && !_planOrder.startPlaceCode) {
+    if(_planOrder.deptCity && !_planOrder.deptCityCode) {
         throw {code: -3, msg: '城市代码不能为空'};
     }
 
     _planOrder.status = {$ne: STATUS.DELETE};
 
-    return PlanOrder.findAll({where: _planOrder})
+    return TripPlanModel.findAll({where: _planOrder})
         .then(function(order){
             if(order.length <= 0) {
                 return [false];
@@ -1148,7 +1145,7 @@ function checkBudgetExist(params){
             return [true, order[0].id, Promise.all(consumeDetails.map(function(detail) {
                 detail.status = {$ne: STATUS.DELETE};
                 detail.invoiceType = INVOICE_TYPE[detail.invoiceType];
-                return ConsumeDetails.findAll({where: detail})
+                return TripDetailsModel.findAll({where: detail})
             }))]
         })
         .spread(function(ret, order_id, array) {
@@ -1225,7 +1222,7 @@ function getProjectByName(params) {
  * @returns {Promise<TInstance[]>|any}
  */
 tripPlan.listConsumesByPlanId = function(params) {
-    return ConsumeDetails.findAll({where: params.trip_plan_id})
+    return TripDetailsModel.findAll({where: params.trip_plan_id})
 }
 
 /**
@@ -1236,7 +1233,7 @@ tripPlan.saveTripPlanLog = saveTripPlanLog;
 saveTripPlanLog.require_params = ['orderId', 'userId', 'remark'];
 function saveTripPlanLog(params) {
     params.createAt = utils.now();
-    return TripOrderLogs.create(params);
+    return TripOrderLogsModel.create(params);
 }
 
 /**

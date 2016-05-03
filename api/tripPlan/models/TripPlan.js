@@ -3,27 +3,28 @@
  */
 
 var uuid = require("node-uuid");
-var now = require("../../../common/utils").now;
+var now = require("common/utils").now;
 
 module.exports = function (Db, DataType) {
-    return Db.define("TripPlanOrder", {
+    return Db.define("TripPlan", {
         id           : {type: DataType.UUID,            defaultValue: uuid.v1, primaryKey: true},
         orderNo      : {type: DataType.STRING,          field: "order_no"}, //计划/预算单号
+        title        : {type: DataType.STRING,          field: "title"},
         accountId    : {type: DataType.UUID,            field: "account_id"}, //单据所属人
         companyId    : {type: DataType.UUID,            field: "company_id"}, //企业id
         projectId    : {type: DataType.UUID,            field: "project_id"},
         description  : {type: DataType.TEXT }, //预算/计划单描述
-        status       : {type: DataType.INTEGER,         defaultValue: 0,    field: 'status'},
-        isInvoiceUpload    : {type: DataType.BOOLEAN,          defaultValue: false, field: 'is_invoice_upload'}, //票据是否上传
-        isCommit    : {type: DataType.BOOLEAN,          defaultValue: false, field: 'is_commit'}, //票据是否提交
-        startPlace   : {type: DataType.STRING,          field: "start_place"}, //出发地
-        destination  : {type: DataType.STRING,          field: "destination"}, //出差目的地
-        startPlaceCode   : {type: DataType.STRING,      field: "start_place_code"}, //出发地城市代码
-        destinationCode  : {type: DataType.STRING,      field: "destination_code"}, //出差目的地城市代码
-        startAt      : {type: "timestamp without time zone", field: "start_at"}, //出发时间
-        backAt       : {type: "timestamp without time zone", field: "back_at"}, //结束时间
         isNeedTraffic: {type: DataType.BOOLEAN,         field: "is_need_traffic"}, //是否需要交通服务
         isNeedHotel  : {type: DataType.BOOLEAN,         field: "is_need_hotel"}, //是否需要酒店服务
+        isInvoiceUpload    : {type: DataType.BOOLEAN,          defaultValue: false, field: 'is_invoice_upload'}, //票据是否上传
+        isCommit    : {type: DataType.BOOLEAN,          defaultValue: false, field: 'is_commit'}, //票据是否提交
+        status       : {type: DataType.INTEGER,         defaultValue: 0,    field: 'status'},
+        deptCity   : {type: DataType.STRING,          field: "dept_city"}, //出发地
+        arrivalCity  : {type: DataType.STRING,          field: "arrival_city"}, //出差目的地
+        deptCityCode  : {type: DataType.STRING,      field: "dept_city_code"}, //出发地城市代码
+        arrivalCityCode  : {type: DataType.STRING,      field: "arrival_city_code"}, //出差目的地城市代码
+        startAt      : {type: "timestamp without time zone", field: "start_at"}, //出发时间
+        backAt       : {type: "timestamp without time zone", field: "back_at"}, //结束时间
         budget       : {type: DataType.NUMERIC(15, 2) }, //预算
         expenditure   : {type: DataType.NUMERIC(15, 2),  field: "expenditure", defaultValue: 0}, //预定支出
         expendInfo   : {type: DataType.JSONB,           field: "expend_info"}, //支出详情
@@ -32,9 +33,9 @@ module.exports = function (Db, DataType) {
         score        : {type: DataType.INTEGER,         field: 'score', defaultValue: 0}, //获取的积分
         expireAt     : {type: "timestamp without time zone", field: "expire_at"}, //失效时间
         createAt     : {type: "timestamp without time zone", field: "create_at", defaultValue: now}, //创建时间
-        remark       : {type: DataType.STRING }, //备注
         updateAt     : {type: "timestamp without time zone", field: "update_at"},
         commitTime  : {type: "timestamp without time zone", field: "commit_time"},
+        remark       : {type: DataType.STRING }, //备注
         orderStatus: {
             type: DataType.VIRTUAL,
             set: function (val) {
@@ -50,18 +51,18 @@ module.exports = function (Db, DataType) {
                         _status = -1;
                         this.setDataValue('budget', -1); //预算要小于0
                     } break;
-                    ///待预定
-                    case 'WAIT_BOOK': {
-                        _status = 3;
-                        _is_upload = false;
-                        _is_commit = false;
-                    } break;
-                    ///已预定
-                    case 'BOOKED': {
-                        _status = 4;
-                        _is_upload = false;
-                        _is_commit = false;
-                    } break;
+                    // ///待预定
+                    // case 'WAIT_BOOK': {
+                    //     _status = 3;
+                    //     _is_upload = false;
+                    //     _is_commit = false;
+                    // } break;
+                    // ///已预定
+                    // case 'BOOKED': {
+                    //     _status = 4;
+                    //     _is_upload = false;
+                    //     _is_commit = false;
+                    // } break;
                     ///待上传
                     case 'WAIT_UPLOAD': {
                         _status = 0;
@@ -117,8 +118,8 @@ module.exports = function (Db, DataType) {
                     } break;
                     case 1: val = 'WAIT_AUDIT'; break;
                     case 2: val = 'COMPLETE'; break;
-                    case 3: val = 'WAIT_BOOK'; break;
-                    case 4: val = 'BOOKED'; break;
+                    // case 3: val = 'WAIT_BOOK'; break;
+                    // case 4: val = 'BOOKED'; break;
                     default : val = 'NO_BUDGET'; break;
                 }
                 return val;
@@ -139,7 +140,7 @@ module.exports = function (Db, DataType) {
             }
         }
     }, {
-        tableName : "trip_plan_order",
+        tableName : "trip_plan",
         timestamps: false,
         schema    : "tripplan"
     });

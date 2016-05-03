@@ -330,7 +330,7 @@ export function approveInvoice(params){
                     score: _score,
                     url: url,
                     detailUrl: url
-                }
+                };
                 API.mail.sendMailRequest({
                     toEmails: staffEmail,
                     templateName: "qm_notify_invoice_all_pass",

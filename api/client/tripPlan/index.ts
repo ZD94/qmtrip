@@ -11,16 +11,18 @@ let config = require("../../../config");
 import moment = require('moment');
 import _ = require('lodash');
 import {validateApi} from "common/api/helper";
-import {PLAN_STATUS, TripPlan, Project, ConsumeDetails} from './tripPlan.types';
+import {PLAN_STATUS, TripPlan, Project, TripDetails} from './tripPlan.types';
 
 
 /**
- * @method savePlanOrder
+ * @method saveTripPlan
  * 生成出差计划单
  * @param params
  * @returns {Promise<TripPlan>}
  */
-export async function savePlanOrder(params: TripPlan) {
+validateApi(saveTripPlan, ['tripDetails', 'arrivalCityCode', 'arrivalCity', 'startAt', 'budget', 'title'], ['deptCityCode', 'deptCity', 'backAt',
+    'isNeedTraffic', 'isNeedHotel', 'remark', 'projectId']);
+export async function saveTripPlan(params: TripPlan) {
     let self = this;
     let accountId = self.accountId;
     let staff = await API.staff.getStaff({id: accountId, columns: ['companyId', 'email', 'name']});
@@ -28,7 +30,11 @@ export async function savePlanOrder(params: TripPlan) {
     let staffName = staff.name;
     params.accountId = accountId;
     params.companyId = staff.companyId;
-    let tripPlan = await  API.tripPlan.savePlanOrder(params);
+    params.orderNo = await API.seeds.getSeedNo('tripPlanNo');
+    
+    // let _tripPlan :any = _.pick(params, API.tripPlan.tripPla);
+    
+    let tripPlan = await API.tripPlan.saveTripPlan(params);
 
     if(tripPlan.budget <= 0 || tripPlan.orderStatus === PLAN_STATUS.NO_BUDGET) {
         return tripPlan; //没有预算，直接返回计划单
@@ -67,7 +73,7 @@ export async function savePlanOrder(params: TripPlan) {
 
         let vals = {managerName: s.name, username: staffName, email: email, time: moment(tripPlan.createAt).format('YYYY-MM-DD HH:mm:ss'),
             projectName: tripPlan.description, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel,
-            totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url}
+            totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url};
         let log = {userId: accountId, orderId: tripPlan.id, remark: tripPlan.orderNo + '给企业管理员' + s.name + '发送邮件'};
 
         await API.mail.sendMailRequest({toEmails: s.email, templateName: 'qm_notify_new_travelbudget',values: vals});
@@ -75,6 +81,14 @@ export async function savePlanOrder(params: TripPlan) {
         return true;
     });
 
+    if(tripPlan.toJSON) {
+        tripPlan = tripPlan.toJSON();
+    }
+
+    console.info(tripPlan);
+
+    tripPlan = new TripPlan(tripPlan);
+    console.info(tripPlan);
     return tripPlan;
 }
 
@@ -82,7 +96,7 @@ export async function savePlanOrder(params: TripPlan) {
  * @method saveConsumeDetail
  * 保存消费支出明细
  * @param params
- * @returns {Promise<ConsumeDetails>}
+ * @returns {Promise<TripDetails>}
  */
 export function saveConsumeDetail(params) {
     let self = this;

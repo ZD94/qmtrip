@@ -37,10 +37,10 @@ export class TripPlan {
     description: string;
     isInvoiceUpload: boolean;
     isCommit: boolean;
-    startPlace: string;
-    destination: string;
-    startPlaceCode: string;
-    destinationCode: string;
+    deptCity: string;
+    arrivalCity: string;
+    deptCityCode: string;
+    arrivalCityCode: string;
     startAt: Date;
     backAt: Date;
     isNeedTraffic: boolean;
@@ -56,9 +56,9 @@ export class TripPlan {
     updateAt: Date;
     commitTime: Date;
     orderStatus: string;
-    outTraffic: ConsumeDetails[];
-    backTraffic: ConsumeDetails[];
-    hotel: ConsumeDetails[];
+    outTraffic: TripDetails[] = [];
+    backTraffic: TripDetails[] = [];
+    hotel: TripDetails[] = [];
 
     constructor(params) {
         this.id = params.id;
@@ -69,10 +69,10 @@ export class TripPlan {
         this.description = params.description;
         this.isInvoiceUpload = params.isInvoiceUpload;
         this.isCommit = params.isCommit;
-        this.startPlace = params.startPlace;
-        this.startPlaceCode = params.startPlaceCode;
-        this.destination = params.destination;
-        this.destinationCode = params.destinationCode;
+        this.deptCity = params.deptCity;
+        this.deptCityCode = params.deptCityCode;
+        this.arrivalCity = params.arrivalCity;
+        this.arrivalCityCode = params.arrivalCityCode;
         this.startAt = params.startAt;
         this.backAt = params.backAt;
         this.isNeedHotel = params.isNeedHotel;
@@ -81,27 +81,39 @@ export class TripPlan {
         this.expenditure = params.expendInfo;
         this.expendInfo = params.expendInfo;
         this.auditRemark = params.auditRemark;
-        this.score = this.score;
+        this.score = params.score;
         this.expireAt = params.expireAt;
         this.createAt = params.createAt;
         this.remark = params.remark;
         this.updateAt = params.updateAt;
         this.commitTime = params.commitTime;
         this.orderStatus = params.orderStatus;
+        let tirpDetails = params.tirpDetails;
+        if(tirpDetails && tirpDetails.length > 0) {
+            tirpDetails.map(function(d) {
+                if(d.type === '1') {
+                    this.outTraffic.push(new TripDetails(d));
+                }else if (d.type === '2'){
+                    this.backTraffic.push(new TripDetails(d));
+                }else if(d.type === '3') {
+                    this.hotel.push(new TripDetails(d));
+                }
+            })
+        }
     }
 }
 
-export class ConsumeDetails {
+export class TripDetails {
     id: string;
     orderId: string;
     accountId: string;
     type: number;
     status: number;
     isCommit: boolean;
-    startPlace: string;
+    deptCity: string;
     arrivalPlace: string;
     city: string;
-    startPlaceCode: string;
+    deptCityCode: string;
     arrivalPlaceCode: string;
     cityCode: number;
     hotelName: string;
@@ -128,10 +140,10 @@ export class ConsumeDetails {
         this.type = params.type;
         this.status = params.status;
         this.isCommit = params.isCommit;
-        this.startPlace = params.startPlace;
+        this.deptCity = params.deptCity;
         this.arrivalPlace = params.arrivalPlace;
         this.city = params.city;
-        this.startPlaceCode = params.startPlaceCode;
+        this.deptCityCode = params.deptCityCode;
         this.arrivalPlaceCode = params.arrivalPlaceCode;
         this.cityCode = params.cityCode;
         this.hotelName = params.hotelName;

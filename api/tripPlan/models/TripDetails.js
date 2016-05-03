@@ -6,18 +6,18 @@ var uuid = require("node-uuid");
 var now = require("../../../common/utils").now;
 
 module.exports = function (Db, DataType) {
-    return Db.define("ConsumeDetails", {
+    return Db.define("TripDetails", {
         id          : {type: DataType.UUID,             defaultValue: uuid.v1, primaryKey: true},
         orderId     : {type: DataType.UUID,             field: "order_id"},
         accountId   : {type: DataType.UUID,             field: "account_id"}, //单据所属人
         type        : {type: DataType.INTEGER }, //消费类型（交通和酒店）
         status      : {type: DataType.INTEGER,          defaultValue: 0, field: "status"}, //状态
         isCommit    : {type: DataType.BOOLEAN, defaultValue: false, field: 'is_commit'}, //票据是否提交
-        startPlace  : {type: DataType.STRING,           field: "start_place"}, //出发地点
-        arrivalPlace: {type: DataType.STRING,           field: "arrival_place"}, //目的地点
+        deptCity  : {type: DataType.STRING,           field: "dept_city"}, //出发地点
+        arrivalCity: {type: DataType.STRING,           field: "arrival_city"}, //目的地点
+        deptCityCode   : {type: DataType.STRING,      field: "dept_city_code"}, //出发地城市代码
+        arrivalCityCode: {type: DataType.STRING,      field: "arrival_city_code"}, //出差目的地城市代码
         city        : {type: DataType.STRING,           field: "city"},
-        startPlaceCode   : {type: DataType.STRING,      field: "start_place_code"}, //出发地城市代码
-        arrivalPlaceCode  : {type: DataType.STRING,      field: "arrival_place_code"}, //出差目的地城市代码
         cityCode        : {type: DataType.STRING,           field: "city_code"},
         hotelName   : {type: DataType.STRING,           field: "hotel_name"},
         startTime   : {type: "timestamp without time zone", field: "start_time"}, //开始时间
@@ -59,9 +59,9 @@ module.exports = function (Db, DataType) {
         auditRemark : {type: DataType.STRING,            field: 'audit_remark'}, //审核备注
         auditUser   : {type: DataType.UUID,             field: 'audit_user'}, //审核人
         createAt    : {type: "timestamp without time zone", field: "create_at", defaultValue: now}, //创建时间
-        remark      : {type: DataType.STRING }, //备注
         updateAt    : {type: "timestamp without time zone", field: "update_at"},
         commitTime  : {type: "timestamp without time zone", field: "commit_time"},
+        remark      : {type: DataType.STRING }, //备注
         orderStatus: {
             type: DataType.VIRTUAL,
             set: function (val) {
@@ -73,16 +73,6 @@ module.exports = function (Db, DataType) {
                     ///待出预算状态
                     case 'NO_BUDGET': {
                         _status = 0;
-                        _is_commit = false;
-                    } break;
-                    ///待预定
-                    case 'WAIT_BOOK': {
-                        _status = 3;
-                        _is_commit = false;
-                    } break;
-                    ///已预定
-                    case 'BOOKED': {
-                        _status = 4;
                         _is_commit = false;
                     } break;
                     ///待上传状态
@@ -141,8 +131,6 @@ module.exports = function (Db, DataType) {
                         }
                     } break;
                     case 1: val = 'AUDIT_PASS'; break;
-                    case 3: val = 'WAIT_BOOK'; break;
-                    case 4: val = 'BOOKED'; break;
                 }
                 return val;
             }
@@ -160,7 +148,7 @@ module.exports = function (Db, DataType) {
             }
         }
     }, {
-        tableName : "consume_details",
+        tableName : "trip_details",
         timestamps: false,
         schema    : "tripplan"
     });
