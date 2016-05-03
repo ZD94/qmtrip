@@ -37,10 +37,10 @@ export class TripPlan {
     description: string;
     isInvoiceUpload: boolean;
     isCommit: boolean;
-    startPlace: string;
-    destination: string;
-    startPlaceCode: string;
-    destinationCode: string;
+    deptCity: string;
+    arrivalCity: string;
+    deptCityCode: string;
+    arrivalCityCode: string;
     startAt: Date;
     backAt: Date;
     isNeedTraffic: boolean;
@@ -56,9 +56,9 @@ export class TripPlan {
     updateAt: Date;
     commitTime: Date;
     orderStatus: string;
-    outTraffic: ConsumeDetails[];
-    backTraffic: ConsumeDetails[];
-    hotel: ConsumeDetails[];
+    outTraffic: TripDetails[] = [];
+    backTraffic: TripDetails[] = [];
+    hotel: TripDetails[] = [];
 
     constructor(params) {
         this.id = params.id;
@@ -69,10 +69,10 @@ export class TripPlan {
         this.description = params.description;
         this.isInvoiceUpload = params.isInvoiceUpload;
         this.isCommit = params.isCommit;
-        this.startPlace = params.startPlace;
-        this.startPlaceCode = params.startPlaceCode;
-        this.destination = params.destination;
-        this.destinationCode = params.destinationCode;
+        this.deptCity = params.deptCity;
+        this.deptCityCode = params.deptCityCode;
+        this.arrivalCity = params.arrivalCity;
+        this.arrivalCityCode = params.arrivalCityCode;
         this.startAt = params.startAt;
         this.backAt = params.backAt;
         this.isNeedHotel = params.isNeedHotel;
@@ -81,27 +81,46 @@ export class TripPlan {
         this.expenditure = params.expendInfo;
         this.expendInfo = params.expendInfo;
         this.auditRemark = params.auditRemark;
-        this.score = this.score;
+        this.score = params.score;
         this.expireAt = params.expireAt;
         this.createAt = params.createAt;
         this.remark = params.remark;
         this.updateAt = params.updateAt;
         this.commitTime = params.commitTime;
         this.orderStatus = params.orderStatus;
+        this.outTraffic = params.outTraffic ? params.outTraffic.map(function(d){d.type = 1; return new TripDetails(d);}) : [];
+        this.backTraffic = params.backTraffic ? params.backTraffic.map(function(d){d.type = 2; return new TripDetails(d);}) : [];
+        this.hotel = params.hotel ? params.hotel.map(function(d){d.type = 3; return new TripDetails(d);}) : [];
+        let tripDetails = params.tripDetails;
+        if(tripDetails && tripDetails.length > 0) {
+            let hotel = [], outTraffic = [], backTraffic = [];
+            tripDetails.map(function(d) {
+                if(d.type === 1) {
+                    outTraffic.push(new TripDetails(d));
+                }else if (d.type === 2){
+                    backTraffic.push(new TripDetails(d));
+                }else if(d.type === 3) {
+                    hotel.push(new TripDetails(d));
+                }
+            });
+            this.outTraffic = outTraffic;
+            this.backTraffic = backTraffic;
+            this.hotel = hotel;
+        }
     }
 }
 
-export class ConsumeDetails {
+export class TripDetails {
     id: string;
     orderId: string;
     accountId: string;
     type: number;
     status: number;
     isCommit: boolean;
-    startPlace: string;
+    deptCity: string;
     arrivalPlace: string;
     city: string;
-    startPlaceCode: string;
+    deptCityCode: string;
     arrivalPlaceCode: string;
     cityCode: number;
     hotelName: string;
@@ -122,34 +141,39 @@ export class ConsumeDetails {
     orderStatus: string;
     
     constructor(params) {
-        this.id = params.id;
-        this.orderId = params.orderId;
-        this.accountId = params.accountId;
-        this.type = params.type;
-        this.status = params.status;
-        this.isCommit = params.isCommit;
-        this.startPlace = params.startPlace;
-        this.arrivalPlace = params.arrivalPlace;
-        this.city = params.city;
-        this.startPlaceCode = params.startPlaceCode;
-        this.arrivalPlaceCode = params.arrivalPlaceCode;
-        this.cityCode = params.cityCode;
-        this.hotelName = params.hotelName;
-        this.startTime = params.startTime;
-        this.endTime = params.endTime;
-        this.latestArriveTime = params.latestArriveTime;
-        this.budget = params.budget;
-        this.expenditure = params.expenditure;
-        this.invoiceType = params.invoiceType;
-        this.invoiceType = params.invoiceType;
-        this.invoice = params.invoice;
-        this.newInvoice = params.newInvoice;
-        this.auditRemark = params.auditRemark;
-        this.auditUser = params.auditUser;
-        this.createAt = params.createAt;
-        this.remark = params.remark;
-        this.updateAt = params.updateAt;
-        this.commitTime = params.commitTime;
-        this.orderStatus = params.orderStatus;
+        try {
+            this.id = params.id;
+            this.orderId = params.orderId;
+            this.accountId = params.accountId;
+            this.type = params.type;
+            this.status = params.status;
+            this.isCommit = params.isCommit;
+            this.deptCity = params.deptCity;
+            this.arrivalPlace = params.arrivalPlace;
+            this.city = params.city;
+            this.deptCityCode = params.deptCityCode;
+            this.arrivalPlaceCode = params.arrivalPlaceCode;
+            this.cityCode = params.cityCode;
+            this.hotelName = params.hotelName;
+            this.startTime = params.startTime;
+            this.endTime = params.endTime;
+            this.latestArriveTime = params.latestArriveTime;
+            this.budget = params.budget;
+            this.expenditure = params.expenditure;
+            this.invoiceType = params.invoiceType;
+            this.invoiceType = params.invoiceType;
+            this.invoice = params.invoice;
+            this.newInvoice = params.newInvoice;
+            this.auditRemark = params.auditRemark;
+            this.auditUser = params.auditUser;
+            this.createAt = params.createAt;
+            this.remark = params.remark;
+            this.updateAt = params.updateAt;
+            this.commitTime = params.commitTime;
+            this.orderStatus = params.orderStatus;
+        }catch(err) {
+            console.info(err);
+            throw err;
+        }
     }
 }

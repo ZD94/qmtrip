@@ -11,24 +11,95 @@ let config = require("../../../config");
 import moment = require('moment');
 import _ = require('lodash');
 import {validateApi} from "common/api/helper";
-import {PLAN_STATUS, TripPlan, Project, ConsumeDetails} from './tripPlan.types';
-
+import {PLAN_STATUS, TripPlan, Project, TripDetails} from './tripPlan.types';
 
 /**
- * @method savePlanOrder
+ * 从参数中获取计划详情数组
+ * @param params
+ * @returns {Object}
+ */
+function getPlanDetails(params: TripPlan): {orderStatus: string, budget: number, tripDetails: Object[]} {
+    let tripDetails = [];
+    let tripDetails_required_fields = ['startTime', 'invoiceType', 'budget'];
+    params.outTraffic.map(function(detail: any) {
+        detail.type = 1;
+        tripDetails.push(detail);
+    });
+
+    params.backTraffic.map(function(detail: any) {
+        detail.type = 2;
+        tripDetails.push(detail);
+    });
+
+    params.hotel.map(function(detail: any) {
+        detail.type = 3;
+        tripDetails.push(detail);
+    });
+
+    let total_budget: number = 0;
+    let isBudget = true;
+
+    let _tripDetails =  tripDetails.map(function(detail) {
+        tripDetails_required_fields.forEach(function(key){
+            if(!_.has(detail, key)){
+                throw {code: '-1', msg: 'tripDetails的属性' + key + '没有指定'};
+            }
+        });
+
+        if(detail.deptCity && !detail.deptCityCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        if(detail.arrivalPlace && !detail.arrivalPlaceCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        if(detail.city && !detail.cityCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        if(!/^-?\d+(\.\d{1,2})?$/.test(detail.budget)) {
+            throw {code: -2, nsg: '预算金额格式不正确'};
+        }
+
+        detail.budget > 0 ? total_budget = total_budget + parseFloat(detail.budget) : isBudget = false;
+
+        return _.pick(detail, API.tripPlan.TripDetailsCols);
+    });
+
+    let orderStatus = isBudget? 'WAIT_UPLOAD' : 'NO_BUDGET'; //是否有预算，设置出差计划状态
+
+    return {orderStatus: orderStatus, budget: total_budget, tripDetails: tripDetails};
+}
+
+/**
+ * @method saveTripPlan
  * 生成出差计划单
  * @param params
  * @returns {Promise<TripPlan>}
  */
-export async function savePlanOrder(params: TripPlan) {
+validateApi(saveTripPlan, ['arrivalCityCode', 'arrivalCity', 'startAt', 'budget', 'title'], ['deptCityCode', 'deptCity', 'backAt',
+    'isNeedTraffic', 'isNeedHotel', 'remark', 'projectId', 'outTraffic', 'backTraffic', 'hotel']);
+export async function saveTripPlan(params: TripPlan): Promise<TripPlan> {
     let self = this;
     let accountId = self.accountId;
     let staff = await API.staff.getStaff({id: accountId, columns: ['companyId', 'email', 'name']});
     let email = staff.email;
     let staffName = staff.name;
-    params.accountId = accountId;
-    params.companyId = staff.companyId;
-    let tripPlan = await  API.tripPlan.savePlanOrder(params);
+
+    params = new TripPlan(params); //测试
+
+    let _tripPlan :any = _.pick(params, API.tripPlan.TripPlanCols);
+    let {orderStatus, budget, tripDetails} = getPlanDetails(params);
+
+    _tripPlan.tripDetails = tripDetails;
+    _tripPlan.orderStatus = orderStatus;
+    _tripPlan.budget = budget;
+    _tripPlan.orderNo = await API.seeds.getSeedNo('tripPlanNo'); //获取出差计划单号
+    _tripPlan.accountId = accountId;
+    _tripPlan.companyId = staff.companyId;
+
+    let tripPlan = await API.tripPlan.saveTripPlan(_tripPlan);
 
     if(tripPlan.budget <= 0 || tripPlan.orderStatus === PLAN_STATUS.NO_BUDGET) {
         return tripPlan; //没有预算，直接返回计划单
@@ -67,7 +138,7 @@ export async function savePlanOrder(params: TripPlan) {
 
         let vals = {managerName: s.name, username: staffName, email: email, time: moment(tripPlan.createAt).format('YYYY-MM-DD HH:mm:ss'),
             projectName: tripPlan.description, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel,
-            totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url}
+            totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url};
         let log = {userId: accountId, orderId: tripPlan.id, remark: tripPlan.orderNo + '给企业管理员' + s.name + '发送邮件'};
 
         await API.mail.sendMailRequest({toEmails: s.email, templateName: 'qm_notify_new_travelbudget',values: vals});
@@ -82,7 +153,7 @@ export async function savePlanOrder(params: TripPlan) {
  * @method saveConsumeDetail
  * 保存消费支出明细
  * @param params
- * @returns {Promise<ConsumeDetails>}
+ * @returns {Promise<TripDetails>}
  */
 export function saveConsumeDetail(params) {
     let self = this;
@@ -496,12 +567,17 @@ export async function statStaffsByCity(params: {statTime: string}) {
  * @param params
  * @returns {Promise<boolean>}
  */
-export async function checkBudgetExist(params) {
+export async function checkBudgetExist(params): Promise<boolean> {
     let self = this;
     let accountId = self.accountId;
     let {companyId} = await API.staff.getStaff({id: accountId, columns: ['companyId']});
     params.accountId = accountId;
     params.companyId = companyId;
+    params.outTraffic = params.outTraffic || [];
+    params.backTraffic = params.backTraffic || [];
+    params.hotel = params.hotel || [];
+    let {tripDetails} = getPlanDetails(params);
+    params.tripDetails = tripDetails;
     return API.tripPlan.checkBudgetExist(params)
 }
 

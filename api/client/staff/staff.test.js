@@ -249,7 +249,7 @@ describe("api/client/staff.js", function() {
                 }]
             }
 
-            API.client.tripPlan.savePlanOrder.call(ownerSelf, tripPlanOrder)
+            API.client.tripPlan.saveTripPlan.call(ownerSelf, tripPlanOrder)
                 .then(function(ret) {
                     newOrderId = ret.id;
                     consumeId = ret.hotel[0].id;

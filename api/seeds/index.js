@@ -8,7 +8,7 @@ var Q = require("q");
 var Seeds = require("common/model").importModel("./models").models.Seeds;
 var Logger = require('../../common/logger');
 var logger = new Logger("seeds");
-var typeString = ['tripPlanOrderNo', 'qm_order']; //"^tripPlanOrderNo^qm_order^";
+var typeString = ['tripPlanNo', 'qm_order'];
 var seeds = {};
 
 /**

@@ -725,7 +725,7 @@ var businesstravel=(function(){
                     consumeDetails.push(consumeDetails_backTraffic);
                 }
                 order.consumeDetails = consumeDetails;
-                API.tripPlan.savePlanOrder(order)
+                API.tripPlan.saveTripPlan(order)
                     .then(function(result){
                         console.info (result);
                         msgbox.log("已成功生成出差记录");

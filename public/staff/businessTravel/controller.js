@@ -952,7 +952,7 @@ var businessTravel=(function(){
                     consumeDetails.push(consumeDetails_backTraffic);
                 }
                 order.consumeDetails = consumeDetails;
-                API.tripPlan.savePlanOrder(order)
+                API.tripPlan.saveTripPlan(order)
                     .then(function(result){
                         $scope.createTime = result.createAt;
                         $scope.orderId = result.id;
