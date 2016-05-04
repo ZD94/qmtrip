@@ -10,7 +10,7 @@ interface ServiceInterface<T> {
     find(where: any): Promise<T[]>;
 }
 
-export interface RegistryInterface {
+export interface ModelsInterface {
     staff: ServiceInterface<Staff>;
     company: ServiceInterface<Company>
     department: ServiceInterface<Department>;
@@ -34,7 +34,7 @@ class ServiceDelegate<T> implements ServiceInterface<T>{
     }
 }
 
-class RegistryDelegate implements RegistryInterface {
+class ModelsDelegate implements ModelsInterface {
     constructor() {
     }
 
@@ -46,7 +46,7 @@ class RegistryDelegate implements RegistryInterface {
     agency: ServiceDelegate<Agency>
     agencyUser: ServiceDelegate<AgencyUser>;
 
-    init(target: RegistryInterface){
+    init(target: ModelsInterface){
         this.staff = new ServiceDelegate<Staff>(target.staff);
         this.company = new ServiceDelegate<Company>(target.company);
         this.department = new ServiceDelegate<Department>(target.department);
@@ -55,5 +55,5 @@ class RegistryDelegate implements RegistryInterface {
         this.agencyUser = new ServiceDelegate<AgencyUser>(target.agencyUser);
     }
 }
-export var Registry = new RegistryDelegate();
+export var Models = new ModelsDelegate();
 

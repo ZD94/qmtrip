@@ -1,7 +1,7 @@
 
 import ng = require('angular');
 
-import {RegistryInterface, Registry} from 'api/_types/index';
+import {ModelsInterface, Models} from 'api/_types/index';
 import {Staff} from 'api/_types/staff';
 import {Company} from 'api/_types/company';
 import { Department } from '../../api/_types/department';
@@ -187,7 +187,7 @@ class AgencyUserService extends ClientService<AgencyUser>{
 }
 
 @ngService('Models')
-class ClientRegistry implements RegistryInterface {
+class ClientRegistry implements ModelsInterface {
     $injector: ng.auto.IInjectorService;
     $cacheFactory: ng.ICacheFactoryService;
 
@@ -209,7 +209,7 @@ class ClientRegistry implements RegistryInterface {
         this.agency = new AgencyService($cacheFactory);
         this.agencyUser = new AgencyUserService($cacheFactory);
 
-        Registry.init(this);
+        Models.init(this);
     }
 }
 

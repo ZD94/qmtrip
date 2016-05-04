@@ -1,6 +1,6 @@
 'use strict';
 import {Staff} from './staff';
-import {Registry} from './index';
+import {Models} from './index';
 import * as apiCompany from 'api/client/company';
 import { regApiType } from 'common/api/helper';
 
@@ -48,17 +48,9 @@ export class Company {
         this.remark = params.remark ? params.remark : null;
         this.updateAt = params.updateAt ? params.updateAt : null;
     };
-
-
+    
     async getStaffs(): Promise<Staff[]> {
-/*        var company_api: typeof apiCompany = require('api/client/company');
-        return company_api.getStaffs()
-            .map(function(staff: Staff){
-                return staff.id;
-            })
-            .map(function(id: string){
-                return Registry.getStaff(id);
-            });*/
-        return null;
+        var company_api: typeof apiCompany = require('api/client/company');
+        return Models.staff.find({companyId: this.id});
     }
 }

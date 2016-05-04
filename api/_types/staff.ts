@@ -1,4 +1,4 @@
-import { Registry } from 'api/_types';
+import { Models } from 'api/_types';
 import { Company } from 'api/_types/company';
 import { regApiType } from 'common/api/helper';
 import { TravelPolicy } from './travelPolicy';
@@ -74,24 +74,20 @@ export class Staff {
     @Field({type: Types.STRING(20)})
     get mobile(): string { return ''; }
     set mobile(val: string) {}
-    // '差旅标准'
-    @Field({type: Types.UUID})
-    get travelLevel(): string { return null; }
-    set travelLevel(val: string) {}
     // '操作人id'
     @Field({type: Types.UUID})
     get operatorId(): string { return null; }
     set operatorId(val: string) {}
 
-    @ResolveRef({type: Types.UUID}, Registry.company.get)
+    @ResolveRef({type: Types.UUID}, Models.company.get)
     get company(): Company { return null; }
 
-    @ResolveRef({type: Types.UUID}, Registry.department.get)
+    @ResolveRef({type: Types.UUID}, Models.department.get)
     get department(): Department { return null; }
 
     @Reference({type: Types.UUID}, 'travelLevel')
     getTravelPolicy(id?:string): Promise<TravelPolicy> {
-        return Registry.travelPolicy.get(id);
+        return Models.travelPolicy.get(this['travelLevel']);
     }
     
 }
