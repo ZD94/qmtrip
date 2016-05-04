@@ -23,11 +23,23 @@ import {Paginate} from 'common/paginate';
 import {validateApi} from 'common/api/helper';
 import {Staff, Credentials, PointChange, EStaffRole, EStaffStatus} from "api/_types/staff";
 import {AGENCY_ROLE} from "api/_types/agency";
-
+import { ServiceInterface } from 'api/_types/index';
 
 export const staffCols = Object.keys(staffModel.attributes);
 export const papersCols = Object.keys(papersModel.attributes);
 export const pointChangeCols = Object.keys(pointChangeModel.attributes);
+
+export class StaffService implements ServiceInterface<Staff>{
+    async create(obj: Object): Promise<Staff>{
+        return API.staff.createStaff(obj);
+    }
+    async get(id: string): Promise<Staff>{
+        return API.staff.getStaff(id);
+    }
+    async find(where: any): Promise<Staff[]>{
+        return API.staff.find(where);
+    }
+}
 
 /**
  * 创建员工

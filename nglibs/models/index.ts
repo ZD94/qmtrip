@@ -1,12 +1,12 @@
 
 import ng = require('angular');
 
-import {ModelsInterface, Models} from 'api/_types/index';
+import { ServiceInterface, ModelsInterface, Models } from 'api/_types/index';
 import {Staff} from 'api/_types/staff';
 import {Company} from 'api/_types/company';
-import { Department } from '../../api/_types/department';
-import { TravelPolicy } from '../../api/_types/travelPolicy';
-import { Agency, AgencyUser } from '../../api/_types/agency';
+import { Department } from 'api/_types/department';
+import { TravelPolicy } from 'api/_types/travelPolicy';
+import { Agency, AgencyUser } from 'api/_types/agency';
 
 import * as ApiStaff from 'api/client/staff';
 import * as ApiCompany from 'api/client/company';
@@ -36,7 +36,7 @@ interface Resolvable {
     $resolve?: () => Promise<any>;
 }
 
-abstract class ClientService<T extends Resolvable> {
+abstract class ClientService<T extends Resolvable> implements ServiceInterface<T>{
     abstract $create(obj: Object): Promise<T>;
     abstract $get(id: string): Promise<T>;
     abstract $find(where: any): Promise<string[]>;
@@ -187,7 +187,7 @@ class AgencyUserService extends ClientService<AgencyUser>{
 }
 
 @ngService('Models')
-class ClientRegistry implements ModelsInterface {
+class ClientModels implements ModelsInterface {
     $injector: ng.auto.IInjectorService;
     $cacheFactory: ng.ICacheFactoryService;
 

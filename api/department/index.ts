@@ -8,8 +8,21 @@ var departmentModel = sequelize.models.Department;
 var API = require("../../common/api");
 import {Department} from "api/_types/department";
 import {validateApi} from 'common/api/helper';
+import { ServiceInterface } from '../_types/index';
 
 export const departmentCols = Object.keys(departmentModel.attributes);
+
+export class DepartmentService implements ServiceInterface<Department>{
+    async create(obj: Object): Promise<Department>{
+        return API.department.createCompany(obj);
+    }
+    async get(id: string): Promise<Department>{
+        return API.department.getCompany(id);
+    }
+    async find(where: any): Promise<Department[]>{
+        return API.department.find(where);
+    }
+}
 
 /**
  * 创建部门

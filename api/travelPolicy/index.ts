@@ -8,8 +8,22 @@ import {Paginate} from 'common/paginate';
 var API = require("common/api");
 import {validateApi} from 'common/api/helper';
 import types = require("api/_types/travelPolicy");
+import { ServiceInterface } from '../_types/index';
+import { TravelPolicy } from '../_types/travelPolicy';
 
 export const travalPolicyCols = Object.keys(travalPolicyModel.attributes);
+
+export class TravelPolicyService implements ServiceInterface<TravelPolicy>{
+    async create(obj: Object): Promise<TravelPolicy>{
+        return API.travalPolicy.createTravelPolicy(obj);
+    }
+    async get(id: string): Promise<TravelPolicy>{
+        return API.travalPolicy.getTravelPolicy(id);
+    }
+    async find(where: any): Promise<TravelPolicy[]>{
+        return API.travalPolicy.find(where);
+    }
+}
 
 /**
  * 创建差旅标准

@@ -18,6 +18,7 @@ let API = require("common/api");
 
 import {validateApi} from "common/api/helper";
 import {COMPANY_STATUS, Company} from 'api/_types/company';
+import { ServiceInterface } from '../_types/index';
 
 let AGENCY_ROLE = {
     OWNER: 0,
@@ -27,6 +28,19 @@ let AGENCY_ROLE = {
 
 export const companyCols = Object.keys(CompanyModel.attributes);
 export const fundsAccountCols = Object.keys(FundsAccounts.attributes);
+
+
+export class CompanyService implements ServiceInterface<Company>{
+    async create(obj: Object): Promise<Company>{
+        return API.company.createCompany(obj);
+    }
+    async get(id: string): Promise<Company>{
+        return API.company.getCompany(id);
+    }
+    async find(where: any): Promise<Company[]>{
+        return API.company.find(where);
+    }
+}
 
 /**
  * 域名是否已被占用

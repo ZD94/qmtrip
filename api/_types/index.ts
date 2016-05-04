@@ -4,7 +4,7 @@ import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
 import { Agency, AgencyUser } from './agency';
 
-interface ServiceInterface<T> {
+export interface ServiceInterface<T> {
     create(obj: Object): Promise<T>;
     get(id: string): Promise<T>;
     find(where: any): Promise<T[]>;

@@ -15,12 +15,37 @@ import utils = require("common/utils");
 import {validateApi} from 'common/api/helper';
 import {Paginate} from 'common/paginate';
 import {Agency, AgencyUser, AGENCY_STATUS} from "api/_types/agency";
+import { ServiceInterface } from '../_types/index';
 
 let logger = new Logger("agency");
 let agency : any = {};
 
 agency.agencyCols = Object.keys(AgencyModel.attributes);
 agency.agencyUserCols = Object.keys(AgencyUserModel.attributes);
+
+
+export class AgencyService implements ServiceInterface<Agency>{
+    async create(obj: Object): Promise<Agency>{
+        return API.agency.createAgency(obj);
+    }
+    async get(id: string): Promise<Agency>{
+        return API.agency.getAgency(id);
+    }
+    async find(where: any): Promise<Agency[]>{
+        return API.agency.find(where);
+    }
+}
+export class AgencyUserService implements ServiceInterface<AgencyUser>{
+    async create(obj: Object): Promise<AgencyUser>{
+        return API.agency.createAgencyUser(obj);
+    }
+    async get(id: string): Promise<AgencyUser>{
+        return API.agency.getAgencyUser(id);
+    }
+    async find(where: any): Promise<AgencyUser[]>{
+        return API.agency.find(where);
+    }
+}
 
 /**
  * 注册代理商，生成代理商id
