@@ -115,13 +115,11 @@ export function hotBusinessDistricts(params: {cityId: string}) :Promise<Array<Pl
  * @return {Promise} {id: id, name: name}
  */
 export function getCityInfo(params: {cityCode: string}) : Promise<Place> {
-    console.info("begin getCityINfo.....")
     if (!params.cityCode) {
         throw new Error("cityCode require but is " + params.cityCode);
     }
     return API.place.getCityInfo(params)
         .then(function(result: any) {
-            console.info('getCityInfo===>', result);
             return new Place(result);
         })
 }
