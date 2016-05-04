@@ -6,7 +6,7 @@ var co = require("co");
 var sequelize = require("common/model").importModel("./models");
 var departmentModel = sequelize.models.Department;
 var API = require("../../common/api");
-import {Department} from "../client/department/department.types.ts";
+import {Department} from "api/_types/department";
 import {validateApi} from 'common/api/helper';
 
 export const departmentCols = Object.keys(departmentModel.attributes);

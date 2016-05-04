@@ -8,7 +8,7 @@
  */
 var API = require("common/api");
 var L = require("common/language");
-import {Department} from "./department.types.ts";
+import {Department} from "api/_types/department";
 import {validateApi} from 'common/api/helper';
 var sequelize = require("common/model").importModel("../../department/models");
 var departmentModel = sequelize.models.Department;

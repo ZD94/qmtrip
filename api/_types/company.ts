@@ -1,7 +1,8 @@
-/**
- * Created by yumiao on 16-4-27.
- */
 'use strict';
+import {Staff} from './staff';
+import {Registry} from './index';
+import * as apiCompany from 'api/client/company';
+import { regApiType } from 'common/api/helper';
 
 export enum COMPANY_STATUS {
     DELETE = -2,
@@ -9,6 +10,7 @@ export enum COMPANY_STATUS {
     ACTIVE = 1 //激活状态
 }
 
+@regApiType('API.')
 export class Company {
     id: string;
     agencyId: string;
@@ -46,4 +48,17 @@ export class Company {
         this.remark = params.remark ? params.remark : null;
         this.updateAt = params.updateAt ? params.updateAt : null;
     };
+
+
+    async getStaffs(): Promise<Staff[]> {
+/*        var company_api: typeof apiCompany = require('api/client/company');
+        return company_api.getStaffs()
+            .map(function(staff: Staff){
+                return staff.id;
+            })
+            .map(function(id: string){
+                return Registry.getStaff(id);
+            });*/
+        return null;
+    }
 }

@@ -7,7 +7,7 @@ var travalPolicyModel = sequelize.models.TravelPolicy;
 import {Paginate} from 'common/paginate';
 var API = require("common/api");
 import {validateApi} from 'common/api/helper';
-import types = require("../client/travelPolicy/travelPolicy.types");
+import types = require("api/_types/travelPolicy");
 
 export const travalPolicyCols = Object.keys(travalPolicyModel.attributes);
 

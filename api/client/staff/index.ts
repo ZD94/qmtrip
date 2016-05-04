@@ -11,7 +11,7 @@ var Q = require("q");
 var API = require("common/api");
 var auth = require("../auth");
 var L = require("common/language");
-import {Staff, Credentials, PointChange} from "./staff.types.ts";
+import {Staff, Credentials, PointChange} from "api/_types/staff";
 
 /**
  * @class staff 员工信息

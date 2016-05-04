@@ -10,7 +10,7 @@ let logger = new Logger("client/agency");
 
 import _ = require('lodash');
 import {validateApi} from 'common/api/helper';
-import {Agency, AgencyUser, AGENCY_STATUS} from "./agency.types";
+import {Agency, AgencyUser, AGENCY_STATUS} from "api/_types/agency";
 
 
 /**

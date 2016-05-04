@@ -17,7 +17,7 @@ let API = require("common/api");
 // let company = {};
 
 import {validateApi} from "common/api/helper";
-import {COMPANY_STATUS, Company} from '../client/company/company.types';
+import {COMPANY_STATUS, Company} from 'api/_types/company';
 
 let AGENCY_ROLE = {
     OWNER: 0,

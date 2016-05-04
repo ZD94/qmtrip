@@ -14,7 +14,7 @@ import Logger = require('common/logger');
 import utils = require("common/utils");
 import {validateApi} from 'common/api/helper';
 import {Paginate} from 'common/paginate';
-import {Agency, AgencyUser, AGENCY_STATUS} from "../client/agency/agency.types";
+import {Agency, AgencyUser, AGENCY_STATUS} from "api/_types/agency";
 
 let logger = new Logger("agency");
 let agency : any = {};

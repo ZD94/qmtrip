@@ -2,7 +2,7 @@
  * Created by wlh on 15/12/12.
  */
 
-import {HotelBudget, TrafficBudget} from "./budget.types";
+import {HotelBudget, TrafficBudget} from "api/_types/budget";
 /**
  * @module API
  */

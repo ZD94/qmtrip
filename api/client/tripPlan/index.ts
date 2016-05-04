@@ -11,7 +11,7 @@ let config = require("../../../config");
 import moment = require('moment');
 import _ = require('lodash');
 import {validateApi} from "common/api/helper";
-import {PLAN_STATUS, TripPlan, Project, TripDetails} from './tripPlan.types';
+import {PLAN_STATUS, TripPlan, Project, ConsumeDetails} from 'api/_types/tripPlan';
 
 /**
  * 从参数中获取计划详情数组

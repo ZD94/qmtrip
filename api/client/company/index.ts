@@ -5,7 +5,7 @@
 import L = require("common/language");
 import Logger = require('common/logger');
 import {validateApi} from "common/api/helper";
-import {Company, COMPANY_STATUS} from "./company.types";
+import {Company, COMPANY_STATUS} from "api/_types/company";
 
 let API = require('common/api');
 let uuid = require("node-uuid");

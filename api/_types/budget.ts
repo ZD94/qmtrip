@@ -1,7 +1,6 @@
-/**
- * Created by wlh on 16/4/27.
- */
+import { regApiType } from 'common/api/helper';
 
+@regApiType('API.')
 class TrafficBudget{
     from: string
     to: string
@@ -18,6 +17,7 @@ class TrafficBudget{
     }
 }
 
+@regApiType('API.')
 class HotelBudget {
     price: number
     bookUrl: string
