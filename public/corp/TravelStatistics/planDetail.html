@@ -84,9 +84,9 @@
                     <tr ng-if="planDetail.outTraffic.length!=0">
                         <td>
                             <div class="icon web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
-                            <div class="startplace">{{outTraffic.startPlace}}</div>
+                            <div class="startplace">{{outTraffic.deptCity}}</div>
                             <div class="description">{{outTraffic.startTime | date: 'yyyy-MM-dd'}}<span ng-if="outTraffic.latestArriveTime!=undefined && outTraffic.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{outTraffic.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
-                            <div class="endplace">{{outTraffic.arrivalPlace}}</div>
+                            <div class="endplace">{{outTraffic.arrivalCity}}</div>
                         </td>
                         <td width="135" align="center">
                             <span ng-if="outTraffic.budget!='-1'">¥{{outTraffic.budget.toFixed(2)}}</span>
@@ -137,9 +137,9 @@
                     <tr ng-if="planDetail.backTraffic.length!=0">
                         <td>
                             <div class="icon web-icon-font3" style="color: #CF2520;">&#xe90e;</div>
-                            <div class="startplace">{{backTraffic.startPlace}}</div>
+                            <div class="startplace">{{backTraffic.deptCity}}</div>
                             <div class="description">{{backTraffic.startTime | date: 'yyyy-MM-dd'}}<span ng-if="backTraffic.latestArriveTime!=undefined && backTraffic.latestArriveTime!=''">&nbsp;&nbsp;&nbsp;最晚&nbsp;{{backTraffic.latestArriveTime | date: 'yyyy-MM-dd HH:mm'}}&nbsp;到达</span></div>
-                            <div class="endplace">{{backTraffic.arrivalPlace}}</div>
+                            <div class="endplace">{{backTraffic.arrivalCity}}</div>
                         </td>
                         <td width="135" align="center">
                             <span ng-if="backTraffic.budget!='-1'">¥{{backTraffic.budget.toFixed(2)}}</span>

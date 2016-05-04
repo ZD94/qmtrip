@@ -2,9 +2,9 @@
 	<div class="orderdetail">
 		<p><span>{{plan.createAt | date: 'yyyy-MM-dd'}}出差记录</span><em>{{name}}</em></p>
 		<p class="porgramtit">{{plan.description}}</p>
-		<p class="outline" ng-if="plan.outTraffic.length!=0">从{{outTraffic.startPlace}}到{{outTraffic.arrivalPlace}},预算￥{{outTraffic.budget}}</p>
+		<p class="outline" ng-if="plan.outTraffic.length!=0">从{{outTraffic.deptCity}}到{{outTraffic.arrivalCity}},预算￥{{outTraffic.budget}}</p>
 		<p class="address" ng-if="plan.hotel.length!=0">{{hotel.city}},{{hotel.hotelname}},预算￥{{hotel.budget}}</p>
-		<p class="backline" ng-if="plan.backTraffic.length!=0">从{{backTraffic.startPlace}}到{{backTraffic.arrivalPlace}},预算￥{{backTraffic.budget}}</p>
+		<p class="backline" ng-if="plan.backTraffic.length!=0">从{{backTraffic.deptCity}}到{{backTraffic.arrivalCity}},预算￥{{backTraffic.budget}}</p>
 	</div>
 	<div class="maincontent">
 		<div class="messagebox_content">

@@ -46,11 +46,11 @@
                         <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType==='TRAIN'||ITEM.outTraffic[0].orderStatus==='NO_BUDGET'  ">&#xe911;</span><!--火车图标-->
                         <span class="icon web-icon-font3" ng-if="  ITEM.outTraffic[0].invoiceType==='PLANE'&&ITEM.outTraffic[0].orderStatus!=='NO_BUDGET'  ">&#xe90e;</span><!--飞机图标-->
                         <span class="description">
-                            {{ITEM.outTraffic[0].startPlace}}
+                            {{ITEM.outTraffic[0].deptCity}}
                             <span style="vertical-align:top;display:inline-block;background: url(mobile/images/arr.png) no-repeat bottom;background-size: 100%;font-size: 1rem;">
                                 去程
                             </span>
-                            {{ITEM.outTraffic[0].arrivalPlace}}
+                            {{ITEM.outTraffic[0].arrivalCity}}
                         </span>
                     </p>
                     <p class="time">
@@ -76,7 +76,7 @@
                 </div>
                 <div class="buttons" ng-if="  ITEM.outTraffic[0].orderStatus!=='NO_BUDGET'  ">
                     <!--<a class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'outTraffic' )" ng-hide="ITEM.outTraffic[0].invoiceType==='TRAIN'">预订</a>-->
-                    <a href="#/airticket/flightlist?BG={{ITEM.outTraffic[0].budget}}&SCN={{ITEM.outTraffic[0].startPlace}}&SCC={{ITEM.outTraffic[0].startPlaceCode}}&ECN={{ITEM.outTraffic[0].arrivalPlace}}&ECC={{ITEM.outTraffic[0].arrivalPlaceCode}}&ST={{ITEM.outTraffic[0].startTime | date:'yyyy-MM-dd'}}" class="BTN" ng-if="ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'" ng-hide="ITEM.outTraffic[0].invoiceType==='TRAIN'">预订</a>
+                    <a href="#/airticket/flightlist?BG={{ITEM.outTraffic[0].budget}}&SCN={{ITEM.outTraffic[0].deptCity}}&SCC={{ITEM.outTraffic[0].deptCityCode}}&ECN={{ITEM.outTraffic[0].arrivalCity}}&ECC={{ITEM.outTraffic[0].arrivaltCityCode}}&ST={{ITEM.outTraffic[0].startTime | date:'yyyy-MM-dd'}}" class="BTN" ng-if="ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'" ng-hide="ITEM.outTraffic[0].invoiceType==='TRAIN'">预订</a>
                     <div class="BTN" ng-uploader accept="image/*" title="outtraffic_up" done="outtraffic_done"
                          ng-if="ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'">
                         上传票据
@@ -103,11 +103,11 @@
                         <span class="icon web-icon-font3" ng-if="  ITEM.backTraffic[0].invoiceType==='TRAIN'||ITEM.backTraffic[0].orderStatus==='NO_BUDGET'  ">&#xe911;</span><!--火车图标-->
                         <span class="icon web-icon-font3" ng-if="  ITEM.backTraffic[0].invoiceType==='PLANE'&&ITEM.backTraffic[0].orderStatus!=='NO_BUDGET'  ">&#xe90e;</span><!--飞机图标-->
                         <span class="description">
-                            {{ITEM.backTraffic[0].startPlace}}
+                            {{ITEM.backTraffic[0].deptCity}}
                             <span style="vertical-align:top;display:inline-block;background: url(/mobile/images/arr.png) no-repeat bottom;background-size: 100%;font-size: 1rem;">
                                 回程
                             </span>
-                            {{ITEM.backTraffic[0].arrivalPlace}}
+                            {{ITEM.backTraffic[0].arrivalCity}}
                         </span>
                     </p>
                     <p class="time">

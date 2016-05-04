@@ -266,16 +266,16 @@ var TravelStatistics = (function(){
                                 $scope.planlist = ret;
                                 ret.map(function(s){
                                     var desc = s.description;
-                                    var dest =s.destination;
-                                    var startP = s.startPlace;
+                                    var dest =s.arrivalCity;
+                                    var startP = s.deptCity;
                                     if(desc && desc.length>5){
                                         s.description= desc.substr(0,5) + '…';
                                     }
                                     if(dest && dest.length>5){
-                                        s.destination= dest.substr(0,5) + '…';
+                                        s.arrivalCity= dest.substr(0,5) + '…';
                                     }
                                     if(startP && startP.length>5){
-                                        s.startPlace= startP.substr(0,5) + '…';
+                                        s.deptCity= startP.substr(0,5) + '…';
                                     }
                                     if(s.hotel.length>0){
                                         var hotelName = s.hotel[0].hotelName;
@@ -289,23 +289,23 @@ var TravelStatistics = (function(){
                                     }
 
                                     if(s.backTraffic.length>0){
-                                        var startPlace = s.backTraffic[0].startPlace;
-                                        var arrivalPlace = s.backTraffic[0].arrivalPlace;
-                                        if (startPlace && startPlace.length > 5) {
-                                            s.backTraffic[0].startPlace = startPlace.substr(0, 5) + '…';
+                                        var deptCity = s.backTraffic[0].deptCity;
+                                        var arrivalCity = s.backTraffic[0].arrivalCity;
+                                        if (deptCity && deptCity.length > 5) {
+                                            s.backTraffic[0].deptCity = deptCity.substr(0, 5) + '…';
                                         };
-                                        if (arrivalPlace && arrivalPlace.length > 5) {
-                                            s.backTraffic[0].arrivalPlace = arrivalPlace.substr(0, 5) + '…';
+                                        if (arrivalCity && arrivalCity.length > 5) {
+                                            s.backTraffic[0].arrivalCity = arrivalCity.substr(0, 5) + '…';
                                         };
                                     }
                                     if(s.outTraffic.length>0){
-                                        var startPlace = s.outTraffic[0].startPlace;
-                                        var arrivalPlace = s.outTraffic[0].arrivalPlace;
-                                        if (startPlace && startPlace.length > 5) {
-                                            s.outTraffic[0].startPlace = startPlace.substr(0, 5) + '…';
+                                        var deptCity = s.outTraffic[0].deptCity;
+                                        var arrivalCity = s.outTraffic[0].arrivalCity;
+                                        if (deptCity && deptCity.length > 5) {
+                                            s.outTraffic[0].deptCity = deptCity.substr(0, 5) + '…';
                                         };
-                                        if (arrivalPlace && arrivalPlace.length > 5) {
-                                            s.outTraffic[0].arrivalPlace = arrivalPlace.substr(0, 5) + '…';
+                                        if (arrivalCity && arrivalCity.length > 5) {
+                                            s.outTraffic[0].arrivalCity = arrivalCity.substr(0, 5) + '…';
                                         };
                                     }
                                     return s;

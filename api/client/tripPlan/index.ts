@@ -50,7 +50,7 @@ function getPlanDetails(params: TripPlan): {orderStatus: string, budget: number,
             throw {code: -3, msg: '城市代码不能为空'};
         }
 
-        if(detail.arrivalPlace && !detail.arrivalPlaceCode) {
+        if(detail.arrivalCity && !detail.arrivaltCityCode) {
             throw {code: -3, msg: '城市代码不能为空'};
         }
 
@@ -111,7 +111,7 @@ export async function saveTripPlan(params: TripPlan): Promise<TripPlan> {
 
     if(tripPlan.outTraffic.length > 0){
         let g = tripPlan.outTraffic[0];
-        go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.startPlace + ' 到 ' + g.arrivalPlace;
+        go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.deptCity + ' 到 ' + g.arrivalCity;
         if(g.latestArriveTime)
             go += ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达';
         go += ', 动态预算￥' + g.budget;
@@ -119,7 +119,7 @@ export async function saveTripPlan(params: TripPlan): Promise<TripPlan> {
 
     if(tripPlan.backTraffic.length > 0){
         let b = tripPlan.backTraffic[0];
-        back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.startPlace + ' 到 ' + b.arrivalPlace;
+        back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.deptCity + ' 到 ' + b.arrivalCity;
         if(b.latestArriveTime)
             back += ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达';
         back += ', 动态预算￥' + b.budget;
@@ -170,14 +170,25 @@ export function saveConsumeDetail(params) {
 validateApi(getTripPlanById, ['orderId']);
 export async function getTripPlanById(params: {orderId: string}) {
     let self = this;
+    let accountId = self.accountId;
+    let account = await API.auth.getAccount({id: accountId});
+    let accountType = account.type;
     let tripPlan = await API.tripPlan.getTripPlanOrder(params);
-    let staff = await API.staff.getStaff({id: self.accountId, columns: ['companyId']});
 
-    if (tripPlan.companyId != staff.companyId) {
-        throw L.ERR.PERMISSION_DENY;
+    if(accountType === 1) { //企业员工账户
+        let staff = await API.staff.getStaff({id: self.accountId, columns: ['companyId']});
+        if (tripPlan.companyId != staff.companyId) {
+            throw L.ERR.PERMISSION_DENY;
+        }
+    }else{
+        let {agencyId: agencyIdOfCompany} = await API.company.getCompany({companyId: tripPlan.companyId, columns: ['agencyId']});
+        let {agencyId: agencyIdOfUser} = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
+        if(agencyIdOfCompany != agencyIdOfUser) {
+            throw L.ERR.PERMISSION_DENY;
+        }
     }
 
-    return new TripPlan(tripPlan);
+    return tripPlan;
 }
 
 /**
@@ -186,8 +197,8 @@ export async function getTripPlanById(params: {orderId: string}) {
  * @param {object} params
  * @returns {Promise<Paginate>}
  */
-validateApi(pageCompleteTripPlans, [], ['page', 'perPage', 'startTime', 'endTime', 'order', 'startAt', 'backAt', 'startPlace', 
-    'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
+validateApi(pageCompleteTripPlans, [], ['page', 'perPage', 'startTime', 'endTime', 'order', 'startAt', 'backAt', 'deptCity', 
+    'arrivalCity', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
 export async function pageCompleteTripPlans(params) {
     let self = this;
     let accountId = self.accountId;
@@ -202,7 +213,7 @@ export async function pageCompleteTripPlans(params) {
         params.startAt ? params.startAt.$lte = params.endTime:params.startAt = {$lte: params.endTime};
     }
 
-    let query : any = _.pick(params, ['startAt', 'backAt', 'startPlace', 'destination', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
+    let query : any = _.pick(params, ['startAt', 'backAt', 'deptCity', 'arrivalCity', 'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark']);
     query.accountId = accountId;
     query.status = 2;
     query.auditStatus = 1;
@@ -225,7 +236,7 @@ export async function pageCompleteTripPlans(params) {
  * @param params
  * @returns {Promise<Paginate>}
  */
-validateApi(pageTripPlans, [], ['audit', 'startTime', 'endTime', 'startPlace', 'destination',
+validateApi(pageTripPlans, [], ['audit', 'startTime', 'endTime', 'deptCity', 'arrivalCity',
     'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit', 'isHasBudget', 'isUpload',
     'isComplete', 'description', 'page', 'perPage']);
 export async function pageTripPlans(params) {
@@ -298,7 +309,7 @@ function getQueryByParams(params) {
         params.budget = {$lte: 0}; //预算结果小于0
     }
 
-    let query : any = _.pick(params, ['status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination',
+    let query : any = _.pick(params, ['status', 'auditStatus', 'startAt', 'backAt', 'deptCity', 'arrivalCity',
         'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'description', 'remark', 'isCommit']);
 
     return query;
@@ -309,7 +320,7 @@ function getQueryByParams(params) {
  * 获取员工计划单分页列表(企业)
  * @returns {Promise<Paginate>}
  */
-validateApi(pageTripPlansByCompany, [], ['audit', 'startTime', 'endTime', 'startPlace', 'destination',
+validateApi(pageTripPlansByCompany, [], ['audit', 'startTime', 'endTime', 'deptCity', 'arrivalCity',
     'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit', 'isHasBudget', 'isUpload',
     'isComplete', 'description', 'page', 'perPage', 'emailOrName']);
 export function pageTripPlansByCompany(params) {
@@ -552,7 +563,7 @@ export async function statStaffsByCity(params: {statTime: string}) {
     let ret = {};
     for(let i= 0,ii=list.length; i<ii; i++) {
         let order = list[i];
-        let cityCode = order.destinationCode;
+        let cityCode = order.arrivalCityCode;
         if(!ret[cityCode]) {
             ret[cityCode] = new Array();
         }

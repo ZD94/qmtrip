@@ -87,10 +87,10 @@ describe("api/client/qm_order.js", function() {
     //};
     //
     //var tripPlanOrder = {
-    //    startPlace: '北京',
-    //    destination: '上海',
-    //    startPlaceCode: 'BJ123',
-    //    destinationCode: 'SH123',
+    //    deptCity: '北京',
+    //    arrivalCity: '上海',
+    //    deptCityCode: 'BJ123',
+    //    arrivalCityCode: 'SH123',
     //    description: '审核发票用测试',
     //    budget: 1000,
     //    startAt: '2016-04-07',
@@ -98,10 +98,10 @@ describe("api/client/qm_order.js", function() {
     //        type: -1,
     //        startTime: '2016-04-07',
     //        endTime: '2016-04-30',
-    //        startPlace: '北京',
-    //        startPlaceCode: 'BJ123',
-    //        arrivalPlace: '上海',
-    //        arrivalPlaceCode: 'SH123',
+    //        deptCity: '北京',
+    //        deptCityCode: 'BJ123',
+    //        arrivalCity: '上海',
+    //        arrivaltCityCode: 'SH123',
     //        invoiceType: 'PLANE',
     //        budget: 1000,
     //    }]
