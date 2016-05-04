@@ -39,6 +39,12 @@ export class StaffService implements ServiceInterface<Staff>{
     async find(where: any): Promise<Staff[]>{
         return API.staff.find(where);
     }
+    async update(id: string, fields: Object): Promise<any> {
+        return API.staff.update(id, fields);
+    }
+    async destroy(id: string): Promise<any> {
+        return API.staff.delete(id);
+    }
 }
 
 /**

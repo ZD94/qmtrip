@@ -23,6 +23,12 @@ export class TravelPolicyService implements ServiceInterface<TravelPolicy>{
     async find(where: any): Promise<TravelPolicy[]>{
         return API.travalPolicy.find(where);
     }
+    async update(id: string, fields: Object): Promise<any> {
+        return API.travalPolicy.update(id, fields);
+    }
+    async destroy(id: string): Promise<any> {
+        return API.travalPolicy.delete(id);
+    }
 }
 
 /**

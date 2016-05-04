@@ -34,6 +34,12 @@ export class AgencyService implements ServiceInterface<Agency>{
     async find(where: any): Promise<Agency[]>{
         return API.agency.find(where);
     }
+    async update(id: string, fields: Object): Promise<any> {
+        return API.agency.update(id, fields);
+    }
+    async destroy(id: string): Promise<any> {
+        return API.agency.delete(id);
+    }
 }
 export class AgencyUserService implements ServiceInterface<AgencyUser>{
     async create(obj: Object): Promise<AgencyUser>{
@@ -44,6 +50,12 @@ export class AgencyUserService implements ServiceInterface<AgencyUser>{
     }
     async find(where: any): Promise<AgencyUser[]>{
         return API.agency.find(where);
+    }
+    async update(id: string, fields: Object): Promise<any> {
+        return API.agency.updateAgencyUser(id, fields);
+    }
+    async destroy(id: string): Promise<any> {
+        return API.agency.deleteAgencyUser(id);
     }
 }
 

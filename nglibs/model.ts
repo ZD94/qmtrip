@@ -82,3 +82,28 @@ export function Reference(options: any, key?: string){
     };
 }
 
+
+export function Update(updater: (id:string, fields:Object)=>Promise<any>){
+    return function(prototype: any, name: string, desc: PropertyDescriptor) {
+        prototype[name] = async ()=>{
+            var fields = this.$fields;
+            this.$fields = {};
+            try{
+                if(!fields)
+                    return;
+                await updater(this.id, fields);
+            }catch(e){
+                _.defaults(this.$fields, fields);
+                throw e;
+            }
+        }
+    };
+}
+
+export function Destroy(deleter: (id:string)=>Promise<any>){
+    return function(prototype: any, name: string, desc: PropertyDescriptor) {
+        prototype[name] = async ()=>{
+            await deleter(this.id);
+        }
+    };
+}

@@ -40,6 +40,12 @@ export class CompanyService implements ServiceInterface<Company>{
     async find(where: any): Promise<Company[]>{
         return API.company.find(where);
     }
+    async update(id: string, fields: Object): Promise<any> {
+        return API.company.update(id, fields);
+    }
+    async destroy(id: string): Promise<any> {
+        return API.company.delete(id);
+    }
 }
 
 /**

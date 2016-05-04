@@ -4,10 +4,17 @@ import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
 import { Agency, AgencyUser } from './agency';
 
+export interface ModelObject {
+    save(): Promise<void>;
+    destroy(): Promise<any>;
+}
+
 export interface ServiceInterface<T> {
     create(obj: Object): Promise<T>;
     get(id: string): Promise<T>;
     find(where: any): Promise<T[]>;
+    update(id:string, fields: Object): Promise<any>;
+    destroy(id:string): Promise<any>;
 }
 
 export interface ModelsInterface {
@@ -31,6 +38,12 @@ class ServiceDelegate<T> implements ServiceInterface<T>{
     }
     find(where: any): Promise<T[]>{
         return this.target.find(where);
+    }
+    update(id:string, fields: Object): Promise<any> {
+        return this.target.update(id, fields);
+    }
+    destroy(id:string): Promise<any> {
+        return this.target.destroy(id);
     }
 }
 

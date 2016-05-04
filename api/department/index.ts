@@ -22,6 +22,12 @@ export class DepartmentService implements ServiceInterface<Department>{
     async find(where: any): Promise<Department[]>{
         return API.department.find(where);
     }
+    async update(id: string, fields: Object): Promise<any> {
+        return API.department.update(id, fields);
+    }
+    async destroy(id: string): Promise<any> {
+        return API.department.delete(id);
+    }
 }
 
 /**

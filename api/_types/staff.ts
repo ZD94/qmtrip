@@ -1,9 +1,9 @@
-import { Models } from 'api/_types';
+import { Models, ModelObject } from 'api/_types';
 import { Company } from 'api/_types/company';
 import { regApiType } from 'common/api/helper';
 import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
-import { Table, Field, Types, ResolveRef, Reference } from 'common/model';
+import { Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
 import Sequelize = require("sequelize");
 
 export enum EStaffStatus {
@@ -29,7 +29,7 @@ function enumValues(e){
 
 @Table()
 @regApiType('API.')
-export class Staff {
+export class Staff implements ModelObject{
     target: Object;
     constructor(target: Object) {
         this.target = target;
@@ -89,7 +89,11 @@ export class Staff {
     getTravelPolicy(id?:string): Promise<TravelPolicy> {
         return Models.travelPolicy.get(this['travelLevel']);
     }
-    
+
+    @Update(Models.staff.update)
+    save(): Promise<void> { return null; }
+    @Destroy(Models.staff.destroy)
+    destroy(): Promise<void> { return null; }
 }
 
 @regApiType('API.')
