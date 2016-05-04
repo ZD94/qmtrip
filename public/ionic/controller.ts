@@ -3,6 +3,7 @@ var Cookie = require('tiny-cookie');
 
 export async function IndexController($scope,Menu,$ionicPopup, StaffService){
     require('./index.less');
+    Menu.delall();
     var items =[
         {
             icon:'plane',
@@ -18,7 +19,9 @@ export async function IndexController($scope,Menu,$ionicPopup, StaffService){
         },
         {
             icon:'',
-            title:''
+            title:'',
+            link:'',
+            badgenum: 0
         },
         {
             icon:'podium',
@@ -33,10 +36,10 @@ export async function IndexController($scope,Menu,$ionicPopup, StaffService){
             badgenum: 3
         }
     ];
+
     for( var i =0;i<items.length;i++){
         Menu.add(items[i]);
     }
-    console.info(Menu);
     var staff = await StaffService.get(Cookie.get('user_id'));
 
     $scope.alertShow = function () {

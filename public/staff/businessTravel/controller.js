@@ -197,10 +197,10 @@ var businessTravel=(function(){
                     companyId:$scope.companyId,
                     type:1,
                     description:purposename,
-                    startPlace:startplace,
-                    startPlaceCode:startplaceval,
-                    destination:endplace,
-                    destinationCode:endplaceval,
+                    deptCity:startplace,
+                    deptCityCode:startplaceval,
+                    arrivalCity:endplace,
+                    arrivalCityCode:endplaceval,
                     startAt:starttime,
                     isNeedTraffic:tra,
                     isNeedHotel:liv
@@ -213,10 +213,10 @@ var businessTravel=(function(){
                 if(starttime){
                     var consumeDetails_outTraffic = {
                         type:-1,
-                        startPlace:startplace,
-                        startPlaceCode:startplaceval,
-                        arrivalPlace:endplace,
-                        arrivalPlaceCode:endplaceval,
+                        deptCity:startplace,
+                        deptCityCode:startplaceval,
+                        arrivalCity:endplace,
+                        arrivaltCityCode:endplaceval,
                         startTime:starttime,
                         invoiceType: INVOICE_TYPE.PLANE
                     }
@@ -233,10 +233,10 @@ var businessTravel=(function(){
                 if(endtime){
                     var consumeDetails_backTraffic = {
                         type:1,
-                        startPlace:endplace,
-                        startPlaceCode:endplaceval,
-                        arrivalPlace:startplace,
-                        arrivalPlaceCode:startplaceval,
+                        deptCity:endplace,
+                        deptCityCode:endplaceval,
+                        arrivalCity:startplace,
+                        arrivaltCityCode:startplaceval,
                         startTime:endtime,
                         invoiceType: INVOICE_TYPE.PLANE
                     }
@@ -368,8 +368,8 @@ var businessTravel=(function(){
                     companyId:$scope.companyId,
                     type:1,
                     description:purposename,
-                    destination:endplacename,
-                    destinationCode:endplace,
+                    arrivalCity:endplacename,
+                    arrivalCityCode:endplace,
                     isNeedTraffic:tra,
                     isNeedHotel:liv
                 }
@@ -590,10 +590,10 @@ var businessTravel=(function(){
                     companyId:$scope.companyId,
                     type:1,
                     description:purposename,
-                    startPlace:startplace,
-                    startPlaceCode:startplaceval,
-                    destination:endplace,
-                    destinationCode:endplaceval,
+                    deptCity:startplace,
+                    deptCityCode:startplaceval,
+                    arrivalCity:endplace,
+                    arrivalCityCode:endplaceval,
                     startAt:starttime,
                     startTime:livetime,
                     endTime:leavetime,
@@ -625,10 +625,10 @@ var businessTravel=(function(){
                 if(starttime){
                     var consumeDetails_outTraffic = {
                         type:-1,
-                        startPlace:startplace,
-                        startPlaceCode:startplaceval,
-                        arrivalPlace:endplace,
-                        arrivalPlaceCode:endplaceval,
+                        deptCity:startplace,
+                        deptCityCode:startplaceval,
+                        arrivalCity:endplace,
+                        arrivaltCityCode:endplaceval,
                         startTime:starttime,
                         invoiceType: INVOICE_TYPE.PLANE
                     }
@@ -645,10 +645,10 @@ var businessTravel=(function(){
                 if(endtime){
                     var consumeDetails_backTraffic = {
                         type:1,
-                        startPlace:endplace,
-                        startPlaceCode:endplaceval,
-                        arrivalPlace:startplace,
-                        arrivalPlaceCode:startplaceval,
+                        deptCity:endplace,
+                        deptCityCode:endplaceval,
+                        arrivalCity:startplace,
+                        arrivaltCityCode:startplaceval,
                         startTime:endtime,
                         invoiceType: INVOICE_TYPE.PLANE
                     }
@@ -881,10 +881,10 @@ var businessTravel=(function(){
                     companyId:$scope.companyId,
                     type:1,
                     description:$scope.purposename,
-                    startPlace:$scope.startplace,
-                    startPlaceCode:$scope.startplaceval,
-                    destination:$scope.endplace,
-                    destinationCode:$scope.endplaceval,
+                    deptCity:$scope.startplace,
+                    deptCityCode:$scope.startplaceval,
+                    arrivalCity:$scope.endplace,
+                    arrivalCityCode:$scope.endplaceval,
                     startAt:$scope.starttime,
                     budget:Number($scope.totalprice),
                     isNeedTraffic:$scope.tra,
@@ -917,10 +917,10 @@ var businessTravel=(function(){
                 if($scope.starttime){
                     var consumeDetails_outTraffic = {
                         type:-1,
-                        startPlace:$scope.startplace,
-                        startPlaceCode:$scope.startplaceval,
-                        arrivalPlace:$scope.endplace,
-                        arrivalPlaceCode:$scope.endplaceval,
+                        deptCity:$scope.startplace,
+                        deptCityCode:$scope.startplaceval,
+                        arrivalCity:$scope.endplace,
+                        arrivaltCityCode:$scope.endplaceval,
                         startTime:$scope.starttime,
                         budget:Number($scope.goTraffic),
                         invoiceType: INVOICE_TYPE.PLANE
@@ -938,10 +938,10 @@ var businessTravel=(function(){
                 if($scope.endtime){
                     var consumeDetails_backTraffic = {
                         type:1,
-                        startPlace:$scope.endplace,
-                        startPlaceCode:$scope.endplaceval,
-                        arrivalPlace:$scope.startplace,
-                        arrivalPlaceCode:$scope.startplaceval,
+                        deptCity:$scope.endplace,
+                        deptCityCode:$scope.endplaceval,
+                        arrivalCity:$scope.startplace,
+                        arrivaltCityCode:$scope.startplaceval,
                         startTime:$scope.endtime,
                         budget:Number($scope.backTraffic),
                         invoiceType: INVOICE_TYPE.PLANE

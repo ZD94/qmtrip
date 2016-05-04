@@ -243,8 +243,8 @@ var travelPlan=(function(){
                                 type = "train";
                             }
                             API.travelBudget.getBookListUrl({
-                                spval : $scope.outTraffic.startPlace,
-                                epval : $scope.outTraffic.arrivalPlace,
+                                spval : $scope.outTraffic.deptCity,
+                                epval : $scope.outTraffic.arrivalCity,
                                 st : $scope.outTraffic.startTime,
                                 type : type
                             })
@@ -261,8 +261,8 @@ var travelPlan=(function(){
                                 type = "train";
                             }
                             API.travelBudget.getBookListUrl({
-                                spval : $scope.backTraffic.startPlace,
-                                epval : $scope.backTraffic.arrivalPlace,
+                                spval : $scope.backTraffic.deptCity,
+                                epval : $scope.backTraffic.arrivalCity,
                                 st : $scope.backTraffic.startTime,
                                 type : type
                             })

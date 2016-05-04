@@ -33,6 +33,16 @@ class Menu {
         }
         return undefined;
     }
+    delall() :any {
+        var self = this;
+        // var menulen = self.menus.length;
+        // for(var i =0; i<menulen;i++){
+        //     self.menus.splice(i,1);
+        //     console.info(menulen,i);
+        // }
+        self.menus = [];
+        return self.menus;
+    }
     add(item:Menuitem) {
         var self = this;
         self.menus.push(item);

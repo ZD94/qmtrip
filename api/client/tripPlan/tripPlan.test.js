@@ -269,9 +269,18 @@ describe("api/client/tripPlan.js", function() {
             })
         });
 
-        it("#getTripPlanById should be ok", function (done) {
-            var self = {accountId: staffId};
-            API.client.tripPlan.getTripPlanById.call(self, {orderId: newOrderId}, function (err, ret) {
+        it("#getTripPlanById should be ok by staff", function (done) {
+            API.client.tripPlan.getTripPlanById.call({accountId: staffId}, {orderId: newOrderId}, function (err, ret) {
+                if (err) {
+                    throw err;
+                }
+                assert.equal(ret.id, newOrderId);
+                done();
+            })
+        });
+
+        it("#getTripPlanById should be ok by agency", function(done) {
+            API.client.tripPlan.getTripPlanById.call({accountId: agencyUserId}, {orderId: newOrderId}, function(err, ret){
                 if (err) {
                     throw err;
                 }

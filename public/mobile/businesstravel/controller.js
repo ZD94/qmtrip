@@ -653,10 +653,10 @@ var businesstravel=(function(){
                     companyId:$scope.companyId,
                     type:1,
                     description:$scope.purposeName,
-                    startPlace:$scope.startCityName,
-                    startPlaceCode:$scope.startCityCode,
-                    destination:$scope.endCityName,
-                    destinationCode:$scope.endCityCode,
+                    deptCity:$scope.startCityName,
+                    deptCityCode:$scope.startCityCode,
+                    arrivalCity:$scope.endCityName,
+                    arrivalCityCode:$scope.endCityCode,
                     startAt:$scope.startDate,
                     startTime:$scope.startHotelDate,
                     endTime:$scope.endHotelDate,
@@ -691,10 +691,10 @@ var businesstravel=(function(){
                 if($scope.startDate){
                     var consumeDetails_outTraffic = {
                         type:-1,
-                        startPlace:$scope.startCityName,
-                        startPlaceCode:$scope.startCityCode,
-                        arrivalPlace:$scope.endCityName,
-                        arrivalPlaceCode:$scope.endCityCode,
+                        deptCity:$scope.startCityName,
+                        deptCityCode:$scope.startCityCode,
+                        arrivalCity:$scope.endCityName,
+                        arrivaltCityCode:$scope.endCityCode,
                         startTime:$scope.startDate,
                         budget:Number($scope.goTrafficPrice),
                         invoiceType:$scope.goTrafficType
@@ -711,10 +711,10 @@ var businesstravel=(function(){
                 if($scope.endDate){
                     var consumeDetails_backTraffic = {
                         type:1,
-                        startPlace:$scope.endCityName,
-                        startPlaceCode:$scope.endCityCode,
-                        arrivalPlace:$scope.startCityName,
-                        arrivalPlaceCode:$scope.startCityCode,
+                        deptCity:$scope.endCityName,
+                        deptCityCode:$scope.endCityCode,
+                        arrivalCity:$scope.startCityName,
+                        arrivaltCityCode:$scope.startCityCode,
                         startTime:$scope.endDate,
                         budget:Number($scope.backTrafficPrice),
                         invoiceType: $scope.backTrafficType

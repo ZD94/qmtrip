@@ -101,7 +101,7 @@ async function saveTripPlan(params){
 tripPlan.getTripPlanOrder = getTripPlanOrder;
 getTripPlanOrder['required_params'] = ['orderId'];
 getTripPlanOrder['optional_params'] = ['columns'];
-function getTripPlanOrder(params){
+async function getTripPlanOrder(params){
     let orderId = params.orderId;
     let options: any = {};
 
@@ -109,23 +109,18 @@ function getTripPlanOrder(params){
         params.columns.push('status');
         options.attributes = params.columns;
     }
+    
+    let order = await TripPlanModel.findById(orderId, options);
+    let tripDetails = await TripDetailsModel.findAll({where: {orderId: orderId, status: {$ne: STATUS.DELETE}}});
 
-    return Promise.all([
-        TripPlanModel.findById(orderId, options),
-        TripDetailsModel.findAll({where: {orderId: orderId, type: -1, status: {$ne: STATUS.DELETE}}}),
-        TripDetailsModel.findAll({where: {orderId: orderId, type: 1, status: {$ne: STATUS.DELETE}}}),
-        TripDetailsModel.findAll({where: {orderId: orderId, type: 0, status: {$ne: STATUS.DELETE}}})
-    ])
-        .spread(function(order, outTraffic, backTraffic, hotel){
-            if(!order || order.orderStatus == 'DELETE'){
-                throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
-            }
-            order.setDataValue("outTraffic", outTraffic);
-            order.setDataValue("backTraffic", backTraffic);
-            order.setDataValue("hotel", hotel);
+    if(!order || order.orderStatus == 'DELETE'){
+        throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
+    }
+    
+    order = order.toJSON();
+    order.tripDetails = tripDetails;
 
-            return order;
-        })
+    return new TripPlan(order);
 }
 
 

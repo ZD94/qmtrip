@@ -46,8 +46,8 @@
                             <p ng-if="item.isNeedHotel">住宿</p>
                         </td>
                         <td align="center">
-                            <p ng-if="item.isNeedTraffic" style="width: 150px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px;">{{item.startPlace}}<span ng-if="item.backTraffic.length!=0">往返</span><span ng-if="item.backTraffic.length==0">到</span>{{item.destination}}</p>
-                            <p ng-if="item.isNeedHotel" style="width: 150px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px;">{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</p>
+                            <p ng-if="item.isNeedTraffic" style="width: 150px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px;">{{item.deptCity}}<span ng-if="item.backTraffic.length!=0">往返</span><span ng-if="item.backTraffic.length==0">到</span>{{item.arrivalCity}}</p>
+                            <p ng-if="item.isNeedHotel" style="width: 150px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px;">{{item.arrivalCity}}&nbsp;{{item.hotel[0].hotelName}}附近</p>
                         </td>
                         <td align="center">
                             <span ng-if="item.status!='-1'">¥{{item.budget}}</span>
@@ -106,8 +106,8 @@
                             <p ng-if="item.isNeedHotel">住宿</p>
                         </td>
                         <td align="center">
-                            <p ng-if="item.isNeedTraffic" style="width: 150px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px;">{{item.startPlace}}<span ng-if="item.backTraffic.length!=0">往返</span><span ng-if="item.backTraffic.length==0">到</span>{{item.destination}}</p>
-                            <p ng-if="item.isNeedHotel" style="width: 150px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px;">{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</p>
+                            <p ng-if="item.isNeedTraffic" style="width: 150px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px;">{{item.deptCity}}<span ng-if="item.backTraffic.length!=0">往返</span><span ng-if="item.backTraffic.length==0">到</span>{{item.arrivalCity}}</p>
+                            <p ng-if="item.isNeedHotel" style="width: 150px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px;">{{item.arrivalCity}}&nbsp;{{item.hotel[0].hotelName}}附近</p>
                         </td>
                         <td align="center">
                             <span ng-if="item.status!='-1'">¥{{item.budget}}</span>
@@ -166,8 +166,8 @@
                             <p ng-if="item.isNeedHotel">住宿</p>
                         </td>
                         <td align="center">
-                            <p ng-if="item.isNeedTraffic" style="width: 150px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px;">{{item.startPlace}}<span ng-if="item.backTraffic.length!=0">往返</span><span ng-if="item.backTraffic.length==0">到</span>{{item.destination}}</p>
-                            <p ng-if="item.isNeedHotel" style="width: 150px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px;">{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</p>
+                            <p ng-if="item.isNeedTraffic" style="width: 150px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px;">{{item.deptCity}}<span ng-if="item.backTraffic.length!=0">往返</span><span ng-if="item.backTraffic.length==0">到</span>{{item.arrivalCity}}</p>
+                            <p ng-if="item.isNeedHotel" style="width: 150px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px;">{{item.arrivalCity}}&nbsp;{{item.hotel[0].hotelName}}附近</p>
                         </td>
                         <td align="center">
                             <span ng-if="item.status!='-1'">¥{{item.budget}}</span>

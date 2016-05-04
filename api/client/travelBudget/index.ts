@@ -218,11 +218,11 @@ export function getBookUrl(params: {spval: string, epval:string, st: string, et:
             API.place.getCityInfo({cityCode: spval}),
             API.place.getCityInfo({cityCode: epval})
         ])
-        .spread(function(startPlace, endPlace){
+        .spread(function(deptCity, endPlace){
             var scode = "",
                 ecode = "";
-            if(startPlace && startPlace.skyCode){
-                scode = startPlace.skyCode.split("-")[0].toLowerCase();
+            if(deptCity && deptCity.skyCode){
+                scode = deptCity.skyCode.split("-")[0].toLowerCase();
             }
             if(endPlace && endPlace.skyCode){
                 ecode = endPlace.skyCode.split("-")[0].toLowerCase();
@@ -281,11 +281,11 @@ export function getBookListUrl(params: {spval: string, epval: string, st: string
                 API.place.getCityInfo({cityCode: spval}),
                 API.place.getCityInfo({cityCode: epval})
             ])
-            .spread(function(startPlace, endPlace){
+            .spread(function(deptCity, endPlace){
                 var scode = "",
                     ecode = "";
-                if(startPlace && startPlace.skyCode){
-                    scode = startPlace.skyCode.split("-")[0].toLowerCase();
+                if(deptCity && deptCity.skyCode){
+                    scode = deptCity.skyCode.split("-")[0].toLowerCase();
                 }
                 if(endPlace && endPlace.skyCode){
                     ecode = endPlace.skyCode.split("-")[0].toLowerCase();

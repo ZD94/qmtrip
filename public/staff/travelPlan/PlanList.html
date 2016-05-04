@@ -43,8 +43,8 @@
                             <p ng-if="item.isNeedHotel" class="live_icon web-icon-font3">&#xe914;</p>
                         </td>
                         <td align="center" ng-click="enterDetail(item.id)" class="cursorPointer">
-                            <p ng-if="item.isNeedTraffic"><a>{{item.startPlace}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="staff/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.destination}}</a></p>
-                            <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
+                            <p ng-if="item.isNeedTraffic"><a>{{item.deptCity}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="staff/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.arrivalCity}}</a></p>
+                            <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.arrivalCity}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
                         </td>
                         <td align="center">
                             <span ng-if="item.status!='-1'">¥{{item.budget}}</span>
@@ -106,8 +106,8 @@
                             <p ng-if="item.isNeedHotel" class="live_icon web-icon-font3">&#xe914;</p>
                         </td>
                         <td align="center" ng-click="enterDetail(item.id)">
-                            <p ng-if="item.isNeedTraffic"><a>{{item.startPlace}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="staff/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.destination}}</a></p>
-                            <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
+                            <p ng-if="item.isNeedTraffic"><a>{{item.deptCity}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="staff/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.arrivalCity}}</a></p>
+                            <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.arrivalCity}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
                         </td>
                         <td align="center">
                             <span ng-if="item.status!='-1'">¥{{item.budget}}</span>
@@ -168,8 +168,8 @@
                             <p ng-if="item.isNeedHotel" class="live_icon web-icon-font3">&#xe914;</p>
                         </td>
                         <td align="center" ng-click="enterDetail(item.id)">
-                            <p ng-if="item.isNeedTraffic"><a>{{item.startPlace}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="staff/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.destination}}</a></p>
-                            <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
+                            <p ng-if="item.isNeedTraffic"><a>{{item.deptCity}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="staff/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.arrivalCity}}</a></p>
+                            <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.arrivalCity}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
                         </td>
                         <td align="center">
                             <span ng-if="item.status!='-1'">¥{{item.budget}}</span>
@@ -229,8 +229,8 @@
                             <p ng-if="item.isNeedHotel" class="live_icon web-icon-font3">&#xe914;</p>
                         </td>
                         <td align="center" ng-click="enterDetail(item.id)">
-                            <p ng-if="item.isNeedTraffic"><a>{{item.startPlace}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="staff/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.destination}}</a></p>
-                            <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.destination}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
+                            <p ng-if="item.isNeedTraffic"><a>{{item.deptCity}}&nbsp;&nbsp;<img src="staff/images/wangfan_ico.jpg" ng-if="item.backTraffic.length!=0"><img src="staff/images/danchen_ico.jpg" ng-if="item.backTraffic.length==0">&nbsp;&nbsp;{{item.arrivalCity}}</a></p>
+                            <p ng-if="item.isNeedHotel"><span>住宿：</span><a>{{item.arrivalCity}}&nbsp;{{item.hotel[0].hotelName}}附近</a></p>
                         </td>
                         <td width="120" align="center">¥{{item.budget.toFixed(2)}}</td>
                         <td width="120" align="center">¥{{item.expenditure.toFixed(2)}}</td>

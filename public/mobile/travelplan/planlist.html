@@ -26,7 +26,7 @@
                 <div class="item-left w100">
                     <div class="top">
                         <span class="journey">
-                            <span ng-if="item.startPlace">{{item.startPlace}}——</span><span>{{item.destination}}</span>
+                            <span ng-if="item.deptCity">{{item.deptCity}}——</span><span>{{item.arrivalCity}}</span>
                         </span>
                         <span ng-if=" item.outTraffic.length!==0 ">
                             <span class="icon web-icon-font3" ng-if=" item.outTraffic[0].invoiceType==='TRAIN'||item.orderStatus==='NO_BUDGET' ">&#xe911;</span><!--火车图标-->
