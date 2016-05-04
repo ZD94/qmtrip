@@ -4,47 +4,55 @@ import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
 import { Agency, AgencyUser } from './agency';
 
-export interface IRegistry {
-    getStaff(id: string): Promise<Staff>;
-    getCompany(id: string): Promise<Company>;
-    getDepartment(id: string): Promise<Department>;
-    getTravelPolicy(id: string): Promise<TravelPolicy>;
-
-    getAgency(id: string): Promise<Agency>;
-    getAgencyUser(id: string): Promise<AgencyUser>;
+interface ServiceInterface<T> {
+    create(obj: Object): Promise<T>;
+    get(id: string): Promise<T>;
+    find(where: any): Promise<T[]>;
 }
 
-class RegistryDelegate implements IRegistry {
+export interface RegistryInterface {
+    staff: ServiceInterface<Staff>;
+    company: ServiceInterface<Company>
+    department: ServiceInterface<Department>;
+    travelPolicy: ServiceInterface<TravelPolicy>;
+
+    agency: ServiceInterface<Agency>
+    agencyUser: ServiceInterface<AgencyUser>;
+}
+
+class ServiceDelegate<T> implements ServiceInterface<T>{
+    constructor(public target: ServiceInterface<T>){
+    }
+    create(obj: Object): Promise<T>{
+        return this.target.create(obj);
+    }
+    get(id: string): Promise<T>{
+        return this.target.get(id);
+    }
+    find(where: any): Promise<T[]>{
+        return this.target.find(where);
+    }
+}
+
+class RegistryDelegate implements RegistryInterface {
     constructor() {
     }
 
-    private target: IRegistry;
-    setTarget(target: IRegistry) {
-        this.target = target;
-    }
+    staff: ServiceDelegate<Staff>;
+    company: ServiceDelegate<Company>
+    department: ServiceDelegate<Department>;
+    travelPolicy: ServiceDelegate<TravelPolicy>;
 
-    getStaff(id: string): Promise<Staff> {
-        return this.target.getStaff(id);
-    }
+    agency: ServiceDelegate<Agency>
+    agencyUser: ServiceDelegate<AgencyUser>;
 
-    getCompany(id: string): Promise<Company> {
-        return this.target.getCompany(id);
-    }
-
-    getDepartment(id: string): Promise<Department> {
-        return this.target.getDepartment(id);
-    }
-
-    getTravelPolicy(id: string): Promise<TravelPolicy> {
-        return this.target.getTravelPolicy(id);
-    }
-
-    getAgency(id: string): Promise<Agency> {
-        return this.target.getAgency(id);
-    }
-
-    getAgencyUser(id: string): Promise<AgencyUser> {
-        return this.target.getAgencyUser(id);
+    init(target: RegistryInterface){
+        this.staff = new ServiceDelegate<Staff>(target.staff);
+        this.company = new ServiceDelegate<Company>(target.company);
+        this.department = new ServiceDelegate<Department>(target.department);
+        this.travelPolicy = new ServiceDelegate<TravelPolicy>(target.travelPolicy);
+        this.agency = new ServiceDelegate<Agency>(target.agency);
+        this.agencyUser = new ServiceDelegate<AgencyUser>(target.agencyUser);
     }
 }
 export var Registry = new RegistryDelegate();

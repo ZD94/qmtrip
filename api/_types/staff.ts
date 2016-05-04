@@ -83,15 +83,15 @@ export class Staff {
     get operatorId(): string { return null; }
     set operatorId(val: string) {}
 
-    @ResolveRef({type: Types.UUID}, Registry.getCompany)
+    @ResolveRef({type: Types.UUID}, Registry.company.get)
     get company(): Company { return null; }
 
-    @ResolveRef({type: Types.UUID}, Registry.getDepartment)
+    @ResolveRef({type: Types.UUID}, Registry.department.get)
     get department(): Department { return null; }
 
     @Reference({type: Types.UUID}, 'travelLevel')
     getTravelPolicy(id?:string): Promise<TravelPolicy> {
-        return Registry.getTravelPolicy(id);
+        return Registry.travelPolicy.get(id);
     }
     
 }

@@ -19,7 +19,7 @@ import _ = require('lodash');
 import moment = require("moment");
 import {validateApi} from 'common/api/helper';
 import {Paginate} from 'common/paginate';
-import {Project, TripPlan, TripDetails} from "../client/tripPlan/tripPlan.types";
+import {Project, TripPlan, TripDetails} from "api/_types/tripPlan";
 
 let STATUS = {
     DELETE: -2, //删除
