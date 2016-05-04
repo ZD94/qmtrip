@@ -6,8 +6,8 @@
   "main": "server.js",
   "scripts": {
     "test": "NODE_ENV=test mocha --harmony --delay test",
-    "start": "node --harmony server.js dev",
-    "dev": "nodemon --harmony server.js dev"
+    "start": "node --harmony --harmony_destructuring server.js dev",
+    "dev": "nodemon --harmony --harmony_destructuring server.js dev"
   },
   "repository": {
     "type": "git",
