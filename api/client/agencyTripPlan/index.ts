@@ -10,31 +10,6 @@ import _ = require('lodash');
 import {validateApi} from "common/api/helper";
 
 
-/**
- * 获取计划单详情
- * @param orderId
- */
-export function getTripPlanById(params: {orderId: string}){
-    let self = this;
-    let accountId = self.accountId;
-    params['userId'] = accountId;
-
-    return API.tripPlan.getTripPlanOrder(params)
-        .then(function(order){
-            return Promise.all([
-                order,
-                API.company.getCompany({companyId: order.companyId, columns: ['agencyId']}),
-                API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
-            ])
-        })
-        .spread(function(order, company, user){
-            if(company.agencyId != user.agencyId){
-                throw L.ERR.PERMISSION_DENY;
-            }
-            return order;
-        })
-}
-
 export function getConsumeInvoiceImg(params) {
     let consumeId = params.consumeId;
     return API.tripPlan.getConsumeInvoiceImg({
@@ -85,7 +60,7 @@ export function pageTripPlans(params){
     }
 
     let query: any = _.pick(params,
-        ['companyId', 'accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'startPlace', 'destination',
+        ['companyId', 'accountId', 'status', 'auditStatus', 'startAt', 'backAt', 'deptCity', 'arrivalCity',
             'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'remark', 'isCommit']);
 
 
@@ -127,7 +102,6 @@ export function pageTripPlans(params){
             return API.tripPlan.listTripPlanOrder(options);
         })
 }
-
 
 /**
  * 审核票据
@@ -223,7 +197,7 @@ export function approveInvoice(params){
             let go = '无', back = '无', hotel = '无';
             if(order.outTraffic.length > 0){
                 let g = order.outTraffic[0];
-                go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.startPlace + ' 到 ' + g.arrivalPlace;
+                go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.deptCity + ' 到 ' + g.arrivalCity;
 
                 if(g.latestArriveTime){
                     go += ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达';
@@ -238,7 +212,7 @@ export function approveInvoice(params){
 
             if(order.backTraffic.length > 0){
                 let b = order.backTraffic[0];
-                back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.startPlace + ' 到 ' + b.arrivalPlace;
+                back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.deptCity + ' 到 ' + b.arrivalCity;
 
                 if(b.latestArriveTime){
                     back += ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达';
@@ -473,7 +447,7 @@ export function editTripPlanBudget(params){
                         changeBudget = params.budget;
                     }
 
-                    go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.startPlace + ' 到 ' + g.arrivalPlace;
+                    go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.deptCity + ' 到 ' + g.arrivalCity;
 
                     if(g.latestArriveTime){
                         go += ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达';
@@ -489,7 +463,7 @@ export function editTripPlanBudget(params){
                         changeBudget = params.budget;
                     }
 
-                    back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.startPlace + ' 到 ' + b.arrivalPlace;
+                    back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.deptCity + ' 到 ' + b.arrivalCity;
 
                     if(b.latestArriveTime){
                         back += ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达';

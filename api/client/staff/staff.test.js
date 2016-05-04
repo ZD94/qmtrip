@@ -234,11 +234,11 @@ describe("api/client/staff.js", function() {
         var consumeId = "";
         before(function (done) {
             var tripPlanOrder = {
-                startPlace: '北京',
-                destination: '上海',
+                deptCity: '北京',
+                arrivalCity: '上海',
                 description: '员工模块测试',
-                startPlaceCode: 'BJ123',
-                destinationCode: 'SH123',
+                deptCityCode: 'BJ123',
+                arrivalCityCode: 'SH123',
                 budget: 1000,
                 startAt: '2015-12-30 11:12:12',
                 consumeDetails: [{

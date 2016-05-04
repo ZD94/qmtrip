@@ -11,7 +11,7 @@ describe("api/client/agencyTripPlan.js", function() {
         email: "agencyTripPlan.test@tulingdao.com",
         userName: "喵喵",
         name: '喵喵的代理商',
-        description: '代理商计划单测试使用',
+        title: '代理商计划单测试使用',
         mobile: "15269866804",
         remark: '计划单测使用代理商'
     };
@@ -22,18 +22,19 @@ describe("api/client/agencyTripPlan.js", function() {
         name: '喵喵的企业',
         mobile: "15269866804",
         domain: 'tulingdao.com',
-        description: '代理商计划单测试用企业'
+        title: '代理商计划单测试用企业'
     }
 
     var tripPlanOrder = {
-        startPlace: '北京',
-        destination: '上海',
-        startPlaceCode: 'BJ123',
-        destinationCode: 'SH123',
-        description: '审核发票用测试',
+        deptCity: '北京',
+        arrivalCity: '上海',
+        deptCityCode: 'BJ123',
+        arrivalCityCode: 'SH123',
+        title: '审核发票用测试',
+        startAt: '2016-01-07 10:22:00',
         budget: 1000,
         //startAt: '2015-12-30 11:12:12',
-        consumeDetails: [{
+        hotel: [{
             type: 0,
             startTime: '2016-01-07 10:22:00',
             endTime: '2016-01-30 11:12:34',
@@ -109,13 +110,13 @@ describe("api/client/agencyTripPlan.js", function() {
     describe("editTripPlanBudget", function(){
         "use strict";
         var _tripPlanOrder = {
-            startPlace: '北京',
-            destination: '上海',
-            startPlaceCode: 'BJ123',
-            destinationCode: 'SH123',
-            description: '审核发票用测试',
+            deptCity: '北京',
+            arrivalCity: '上海',
+            deptCityCode: 'BJ123',
+            arrivalCityCode: 'SH123',
+            title: '审核发票用测试',
             budget: -1,
-            consumeDetails: [{
+            hotel: [{
                 type: 0,
                 startTime: '2016-01-07 10:22:00',
                 endTime: '2016-01-30 11:12:34',

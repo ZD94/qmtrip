@@ -118,10 +118,10 @@ export class TripDetails {
     status: number;
     isCommit: boolean;
     deptCity: string;
-    arrivalPlace: string;
+    arrivalCity: string;
     city: string;
     deptCityCode: string;
-    arrivalPlaceCode: string;
+    arrivaltCityCode: string;
     cityCode: number;
     hotelName: string;
     startTime: Date;
@@ -149,10 +149,10 @@ export class TripDetails {
             this.status = params.status;
             this.isCommit = params.isCommit;
             this.deptCity = params.deptCity;
-            this.arrivalPlace = params.arrivalPlace;
+            this.arrivalCity = params.arrivalCity;
             this.city = params.city;
             this.deptCityCode = params.deptCityCode;
-            this.arrivalPlaceCode = params.arrivalPlaceCode;
+            this.arrivaltCityCode = params.arrivaltCityCode;
             this.cityCode = params.cityCode;
             this.hotelName = params.hotelName;
             this.startTime = params.startTime;
