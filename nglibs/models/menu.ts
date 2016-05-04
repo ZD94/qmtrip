@@ -35,12 +35,7 @@ class Menu {
     }
     delall() :any {
         var self = this;
-        // var menulen = self.menus.length;
-        // for(var i =0; i<menulen;i++){
-        //     self.menus.splice(i,1);
-        //     console.info(menulen,i);
-        // }
-        self.menus = [];
+        self.menus = []; //清空原有menus
         return self.menus;
     }
     add(item:Menuitem) {
