@@ -11,6 +11,14 @@ export function BudgetController($scope){
 
 }
 
+export function RecordController($scope){
+
+}
+
+export function DistributionController($scope){
+
+}
+
 export function DepartmentController($scope){
 
 }
