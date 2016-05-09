@@ -56,7 +56,7 @@ describe.skip("api/client/travelBudget.js", function() {
             API.travelPolicy.deleteTravelPolicyByTest({name: travelPolicy.name})
         ])
             .spread(function(ret1, ret2, ret3, ret4){
-                return API.agency.registerAgency(agency);
+                return API.agency.createAgency(agency);
             })
             .then(function(ret){
                 agencyId = ret.agency.id;

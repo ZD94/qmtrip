@@ -1,4 +1,8 @@
+import { regApiType } from 'common/api/helper';
+
 var API = require("common/api");
+
+@regApiType('API.')
 export class TravelPolicy {
     id: string;
     name: string;

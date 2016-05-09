@@ -8,7 +8,7 @@
  */
 var API = require("common/api");
 var L = require("common/language");
-import {Department} from "./department.types.ts";
+import {Department} from "api/_types/department";
 import {validateApi} from 'common/api/helper';
 var sequelize = require("common/model").importModel("../../department/models");
 var departmentModel = sequelize.models.Department;
@@ -295,6 +295,35 @@ export function getAllDepartment(params: {companyId?: string}){
                     .then(function(result){
                         if(result){
                             return API.department.getAllDepartment({companyId: params.companyId});
+                        }else{
+                            throw {code: -1, msg: '无权限'};
+                        }
+                    })
+            }
+        })
+
+};
+
+/**
+ * 根据条件得到企业所有部门
+ * @param params
+ * @returns {*|Promise}
+ */
+export function getDepartments(params){
+    var user_id = this.accountId;
+    return API.auth.judgeRoleById({id:user_id})
+        .then(function(role){
+            if(role == L.RoleType.STAFF){
+                return API.staff.getStaff({id: user_id})
+                    .then(function(data){
+                        params.companyId = data.companyId;
+                        return API.department.getDepartments(params);
+                    });
+            }else{
+                return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                    .then(function(result){
+                        if(result){
+                            return API.department.getDepartments({companyId: params.companyId});
                         }else{
                             throw {code: -1, msg: '无权限'};
                         }

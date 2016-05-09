@@ -17,7 +17,8 @@ let API = require("common/api");
 // let company = {};
 
 import {validateApi} from "common/api/helper";
-import {COMPANY_STATUS, Company} from '../client/company/company.types';
+import {COMPANY_STATUS, Company} from 'api/_types/company';
+import { ServiceInterface } from '../_types/index';
 
 let AGENCY_ROLE = {
     OWNER: 0,
@@ -27,6 +28,26 @@ let AGENCY_ROLE = {
 
 export const companyCols = Object.keys(CompanyModel.attributes);
 export const fundsAccountCols = Object.keys(FundsAccounts.attributes);
+
+
+export class CompanyService implements ServiceInterface<Company>{
+    async create(obj: Object): Promise<Company>{
+        return API.company.createCompany(obj);
+    }
+    async get(id: string): Promise<Company>{
+        return API.company.getCompany(id);
+    }
+    async find(where: any): Promise<Company[]>{
+        return API.company.listCompany(where);
+    }
+    async update(id: string, fields: Object): Promise<any> {
+        fields['companyId'] = id;
+        return API.company.updateCompany(fields);
+    }
+    async destroy(id: string): Promise<any> {
+        return API.company.deleteCompany({companyId: id});
+    }
+}
 
 /**
  * 域名是否已被占用
@@ -113,7 +134,7 @@ export function isBlackDomain(params) {
  * @param params
  * @returns {*}
  */
-export async function updateCompany(params : {companyId: string}){
+export async function updateCompany(params){
     let companyId = params.companyId;
     let company = await CompanyModel.findById(companyId, {attributes: ['createUser', 'status']});
     
@@ -216,7 +237,7 @@ export async function checkAgencyCompany(params){
  * @param params
  * @returns {*}
  */
-validateApi(deleteCompany, ['companyId', 'userId']);
+validateApi(deleteCompany, ['companyId'], ['userId']);
 export function deleteCompany(params){
     var companyId = params.companyId;
     var userId = params.userId;

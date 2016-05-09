@@ -1,3 +1,6 @@
+import { regApiType } from 'common/api/helper';
+
+@regApiType('API.')
 export class Department{
     id: string;
     code: string;

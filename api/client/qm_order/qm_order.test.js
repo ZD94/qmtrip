@@ -144,7 +144,7 @@ describe("api/client/qm_order.js", function() {
     //        API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})
     //    ])
     //        .spread(function(){
-    //            return API.agency.registerAgency(agency);
+    //            return API.agency.createAgency(agency);
     //        })
     //        .then(function(ret){
     //            agencyId = ret.agency.id;

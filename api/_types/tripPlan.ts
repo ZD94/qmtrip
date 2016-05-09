@@ -1,7 +1,5 @@
-/**
- * Created by yumiao on 16-4-28.
- */
-'use strict';
+
+import { regApiType } from 'common/api/helper';
 
 export enum PLAN_STATUS {
     DELETE = -2, //删除
@@ -11,6 +9,7 @@ export enum PLAN_STATUS {
     COMPLETE = 2 //审核完，已完成状态
 };
 
+@regApiType('API.')
 export class Project {
     id: string;
     companyId: string;
@@ -28,6 +27,7 @@ export class Project {
     }
 }
 
+@regApiType('API.')
 export class TripPlan {
     id: string;
     orderNo: string;
@@ -110,6 +110,7 @@ export class TripPlan {
     }
 }
 
+@regApiType('API.')
 export class TripDetails {
     id: string;
     orderId: string;

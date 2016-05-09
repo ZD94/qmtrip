@@ -5,12 +5,11 @@
 import L = require("common/language");
 import Logger = require('common/logger');
 import {validateApi} from "common/api/helper";
-import {Company, COMPANY_STATUS} from "./company.types";
+import {Company, COMPANY_STATUS} from "api/_types/company";
 
 let API = require('common/api');
 let uuid = require("node-uuid");
 let logger = new Logger('client/company');
-import {Paginate} from "common/paginate";
 
 /**
  * @class company
@@ -33,8 +32,8 @@ import {Paginate} from "common/paginate";
  * @returns {Promise<Company>}
  */
 validateApi(createCompany, ['mobile', 'name', 'email', 'userName'], ['pwd', 'remark', 'description']);
-export async function createCompany(params: {mobile: string, name: string, email: string, domain: string,
-    userName: string, pwd: string, remark: string, description: string}): Promise<Company>{
+export async function createCompany(params: {mobile: string, name: string, email: string, userName: string, pwd?: string,
+    remark?: string, description?: string}){
     let self = this;
     let accountId = self.accountId;
     let mobile = params.mobile;
@@ -63,7 +62,7 @@ export async function createCompany(params: {mobile: string, name: string, email
  * @param params
  * @returns {Promise<Company>}
  */
-export async function updateCompany(params): Promise<Company>{
+export async function updateCompany(params){
     let self = this;
     let accountId = self.accountId;
     params.userId = accountId;
@@ -80,7 +79,7 @@ export async function updateCompany(params): Promise<Company>{
  * @returns {Promise<Company>}
  */
 validateApi(getCompanyById, ['companyId']);
-export function getCompanyById(params: {companyId: string}): Promise<Company>{
+export function getCompanyById(params: {companyId: string}){
     let self = this;
     params['userId'] = self.accountId;
 
@@ -95,7 +94,7 @@ export function getCompanyById(params: {companyId: string}): Promise<Company>{
  * @param params.perPage 每页记录数目
  * @returns {Promise<Paginate>}
  */
-export async function getCompanyListByAgency(params): Promise<Paginate<string>>{
+export async function getCompanyListByAgency(params){
     let self = this;
     let accountId = self.accountId;
     await API.permit.checkPermission({accountId: accountId, permission: "company.query", type: 2});    //检查权限
@@ -114,7 +113,7 @@ export async function getCompanyListByAgency(params): Promise<Paginate<string>>{
  * @returns {Promise<boolean>}
  */
 validateApi(deleteCompany, ['companyId']);
-export async function deleteCompany(params: {companyId: string}): Promise<boolean>{
+export async function deleteCompany(params: {companyId: string}){
     let self = this;
     let accountId = self.accountId;
     await API.permit.checkPermission({accountId: accountId, permission: "company.delete", type: 2});    //检查权限

@@ -151,7 +151,7 @@
 | msg     | 提示信息 |
 
 
->. 注册代理商(同时会生成代理商创建者用户) API.agency.registerAgency(params)
+>. 注册代理商(同时会生成代理商创建者用户) API.agency.createAgency(params)
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------

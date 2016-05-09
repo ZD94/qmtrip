@@ -6,10 +6,30 @@ var co = require("co");
 var sequelize = require("common/model").importModel("./models");
 var departmentModel = sequelize.models.Department;
 var API = require("../../common/api");
-import {Department} from "../client/department/department.types.ts";
+import {Department} from "api/_types/department";
 import {validateApi} from 'common/api/helper';
+import { ServiceInterface } from '../_types/index';
 
 export const departmentCols = Object.keys(departmentModel.attributes);
+
+export class DepartmentService implements ServiceInterface<Department>{
+    async create(obj: Object): Promise<Department>{
+        return API.department.createDepartment(obj);
+    }
+    async get(id: string): Promise<Department>{
+        return API.department.getDepartment({id: id});
+    }
+    async find(where: any): Promise<Department[]>{
+        return API.department.getDepartments(where);
+    }
+    async update(id: string, fields: Object): Promise<any> {
+        fields[id] = id;
+        return API.department.updateDepartment(fields);
+    }
+    async destroy(id: string): Promise<any> {
+        return API.department.deleteDepartment({id: id});
+    }
+}
 
 /**
  * 创建部门
@@ -156,6 +176,23 @@ validateApi(getDepartment, ["id"])
 export function getDepartment(params: {id: string}){
     var id = params.id;
     return departmentModel.findById(id);
+}
+
+/**
+ * 根据属性查找部门
+ * @param params
+ * @returns {*}
+ */
+export function getDepartments(params){
+    var options : any = {};
+    options.where = _.pick(params, Object.keys(departmentModel.attributes));
+    if(params.$or) {
+        options.where.$or = params.$or;
+    }
+    if(params.columns){
+        options.attributes = params.columns;
+    }
+    return departmentModel.findAll(options);
 }
 
 /**

@@ -3,7 +3,7 @@
  */
 'use strict';
 
-import {AuthCert} from './types';
+import {AuthCert} from 'api/_types/auth';
 const validate = require("common/validate");
 const L = require("common/language");
 const uuid = require('node-uuid');
