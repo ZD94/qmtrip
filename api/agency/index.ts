@@ -26,7 +26,7 @@ agency.agencyUserCols = Object.keys(AgencyUserModel.attributes);
 
 export class AgencyService implements ServiceInterface<Agency>{
     async create(obj: Object): Promise<Agency>{
-        return API.agency.createAgency(obj);
+        return API.agency.create(obj);
     }
     async get(id: string): Promise<Agency>{
         return API.agency.getAgency({agencyId: id});
@@ -62,57 +62,81 @@ export class AgencyUserService implements ServiceInterface<AgencyUser>{
     }
 }
 
+// /**
+//  * 注册代理商，生成代理商id
+//  * @param params
+//  */
+// agency.createAgency = function(params){
+//     let agency = new Agency(params);
+//     let agencyId = uuid.v1() || params.agencyId;
+//     agency.id = agencyId;
+//     let pwd = params.pwd || '123456';
+//     let mobile = params.mobile;
+//     let email = params.email;
+//     let account = {email: email, mobile: mobile, pwd: pwd, type: 2, status: params.status || AGENCY_STATUS.UN_ACTIVE};
+//     let agencyUser  = new AgencyUser({agencyId: agencyId, name: params.userName, mobile: mobile, email: email, 
+//         status: params.status || AGENCY_STATUS.UN_ACTIVE, roleId: 0});
+//
+//     return API.auth.checkAccExist({type: 2, $or: [{mobile: mobile}, {email: email}]})
+//         .then(function(ret){
+//             if(!ret){
+//                 return API.auth.newAccount(account);
+//             }else{
+//                 return ret;
+//             }
+//         })
+//         .then(function(account){
+//             var accountId = account.id;
+//             agency.createUser = accountId;
+//             agencyUser.id = accountId;
+//
+//             return sequelize.transaction(function(t){
+//                 return Promise.all([
+//                     AgencyModel.create(agency, {transaction: t}),
+//                     AgencyUserModel.create(agencyUser, {transaction: t})
+//                 ]);
+//             })
+//         })
+//         .spread(function(agency, agencyUser){
+//             return {agency: agency, agencyUser: agencyUser}
+//         })
+//         .catch(function(err){
+//             logger.error(err);
+//
+//             return AgencyModel.findOne({where: {$or: [{mobile: mobile}, {email: email}], status: {$ne: AGENCY_STATUS.DELETE}}, attributes: ['id']})
+//                 .then(function(agency){
+//                     if(agency){
+//                         throw {code: -4, msg: '手机号或邮箱已经注册'};
+//                     }else{
+//                         throw {code: -3, msg: '注册异常'};
+//                     }
+//                 })
+//         });
+// }
+
 /**
- * 注册代理商，生成代理商id
+ * 创建代理商
  * @param params
+ * @returns {Agency}
  */
-agency.createAgency = function(params){
-    let agency = new Agency(params);
-    let agencyId = uuid.v1() || params.agencyId;
-    agency.id = agencyId;
-    let pwd = params.pwd || '123456';
-    let mobile = params.mobile;
-    let email = params.email;
-    let account = {email: email, mobile: mobile, pwd: pwd, type: 2, status: params.status || AGENCY_STATUS.UN_ACTIVE};
-    let agencyUser  = new AgencyUser({agencyId: agencyId, name: params.userName, mobile: mobile, email: email, 
-        status: params.status || AGENCY_STATUS.UN_ACTIVE, roleId: 0});
-
-    return API.auth.checkAccExist({type: 2, $or: [{mobile: mobile}, {email: email}]})
-        .then(function(ret){
-            if(!ret){
-                return API.auth.newAccount(account);
-            }else{
-                return ret;
-            }
-        })
-        .then(function(account){
-            var accountId = account.id;
-            agency.createUser = accountId;
-            agencyUser.id = accountId;
-
-            return sequelize.transaction(function(t){
-                return Promise.all([
-                    AgencyModel.create(agency, {transaction: t}),
-                    AgencyUserModel.create(agencyUser, {transaction: t})
-                ]);
-            })
-        })
-        .spread(function(agency, agencyUser){
-            return {agency: agency, agencyUser: agencyUser}
-        })
-        .catch(function(err){
-            logger.error(err);
-
-            return AgencyModel.findOne({where: {$or: [{mobile: mobile}, {email: email}], status: {$ne: AGENCY_STATUS.DELETE}}, attributes: ['id']})
-                .then(function(agency){
-                    if(agency){
-                        throw {code: -4, msg: '手机号或邮箱已经注册'};
-                    }else{
-                        throw {code: -3, msg: '注册异常'};
-                    }
-                })
-        });
-}
+agency.create = async function(params: {name: string, email: string, pwd: string, id?: string, mobile?: string, 
+    description?: string, remark?: string, status?: number}): Promise<Agency> {
+    let _agency = await AgencyModel.findOne({where: {email: params.email}});
+    
+    if(_agency) {
+        throw {code: -2, msg: '该邮箱已经注册代理商'};
+    }
+    
+    if(params.mobile) {
+        let agency_mobile = await AgencyModel.findOne({where: {mobile: params.mobile}});
+        if(agency_mobile) {
+            throw {code: -3, msg: '该手机号已经注册代理商'};
+        }
+    }
+    
+    let agency = await AgencyModel.create(params);
+    return new Agency(agency);
+};
 
 agency.createAgency = createAgency;
 validateApi(createAgency, ['name', 'email', 'userName'], ['id', 'mobile', 'pwd', 'description', 'remark', 'status']);
@@ -262,21 +286,17 @@ function deleteAgency(params){
  */
 agency.createAgencyUser = createAgencyUser;
 validateApi(createAgencyUser, ['email', 'mobile', 'agencyId', 'name'], agency.agencyUserCols);
-function createAgencyUser(data){
-    var _agencyUser = data;
-    _agencyUser.id = data.accountId || uuid.v1();
+async function createAgencyUser(params){
+    params.id = params.id ? params.id : uuid.v1();
+    
+    let _agencyUser = await AgencyUserModel.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
 
-    var accData = {email: _agencyUser.email, mobile: _agencyUser.mobile, pwd: "123456", type: 2};//初始密码暂定123456
+    if(_agencyUser) {
+        throw {code: -2, msg: '邮箱或手机号已经注册代理商'};
+    }
 
-    return API.auth.newAccount(accData)
-        .then(function(account){
-            _agencyUser.id = account.id;
-
-            return AgencyUserModel.create(_agencyUser);
-        })
-        .then(function(_agencyUser) {
-            return new AgencyUser(_agencyUser);
-        })
+    let agencyUser = await AgencyUserModel.create(params);
+    return new AgencyUser(agencyUser);
 }
 
 /**
@@ -406,7 +426,7 @@ agency.listAndPaginateAgencyUser = function(params){
         .then(function(result){
             var data = result.rows.map(function(user) {
                 return user.id;
-            })
+            });
             return new Paginate(page, perPage, result.count, data);
         });
 }

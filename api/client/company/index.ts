@@ -32,8 +32,8 @@ let logger = new Logger('client/company');
  * @returns {Promise<Company>}
  */
 validateApi(createCompany, ['mobile', 'name', 'email', 'userName'], ['pwd', 'remark', 'description']);
-export async function createCompany(params: {mobile: string, name: string, email: string, domain: string,
-    userName: string, pwd: string, remark: string, description: string}){
+export async function createCompany(params: {mobile: string, name: string, email: string, userName: string, pwd?: string,
+    remark?: string, description?: string}){
     let self = this;
     let accountId = self.accountId;
     let mobile = params.mobile;

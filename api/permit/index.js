@@ -140,7 +140,7 @@ function getRoleList(roles){
             return {id:id, name:roles[id].name};
         });
 }
-permit.listRoles = function(params, callback) {
+permit.listRoles = function(params) {
     var type = params.type || 1;
     var list;
     switch(type){
@@ -151,9 +151,9 @@ permit.listRoles = function(params, callback) {
             list = getRoleList(agency_roles);
             break;
         default:
-            return callback(L.ERR.NOT_FOUND);
+            throw L.ERR.NOT_FOUND;
     }
-    callback(null, list);
+    return Promise.resolve(list);
 };
 
 /**

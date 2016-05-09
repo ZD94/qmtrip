@@ -103,12 +103,12 @@ class StaffService extends ClientService<Staff>{
     }
     async $update(id: string, fields: Object): Promise<any> {
         var api = await requireAPI<typeof ApiStaff>('staff');
-        fields[id] = id;
+        fields['id'] = id;
         return api.updateStaff(fields);
     }
     async $destroy(id: string): Promise<any> {
         var api = await requireAPI<typeof ApiStaff>('staff');
-        return api.deleteStaff(id);
+        return api.deleteStaff({id: id});
     }
 }
 
@@ -117,7 +117,7 @@ class CompanyService extends ClientService<Company>{
         super($cacheFactory('company'));
     }
 
-    async $create(obj: Object): Promise<Company>{
+    async $create(obj: {mobile: string, name: string, email: string, userName: string, pwd?: string, remark?: string, description?: string}): Promise<Company>{
         var api = await requireAPI<typeof ApiCompany>('company');
         return api.createCompany(obj);
     }
@@ -136,7 +136,7 @@ class CompanyService extends ClientService<Company>{
     }
     async $destroy(id: string): Promise<any> {
         var api = await requireAPI<typeof ApiCompany>('company');
-        return api.deleteCompany({compayId: id});
+        return api.deleteCompany({companyId: id});
     }
 }
 
@@ -201,7 +201,8 @@ class AgencyService extends ClientService<Agency>{
         super($cacheFactory('agency'));
     }
 
-    async $create(obj: Object): Promise<Agency>{
+    async $create(obj: {name: string, email: string, mobile: string, userName: string, description?: string,
+        remark?: string, pwd?: string}): Promise<Agency>{
         var api = await requireAPI<typeof ApiAgency>('agency');
         return api.createAgency(obj);
     }
@@ -241,7 +242,8 @@ class AgencyUserService extends ClientService<AgencyUser>{
         var api = await requireAPI<typeof ApiAgency>('agency');
         return api.listAndPaginateAgencyUser(where);
     }
-    async $update(id: string, fields: Object): Promise<any> {
+    async $update(id: string, fields: {status?: number, name?: string, sex?: string, email?: string,
+        mobile?: string, avatar?: string, roleId?: string}): Promise<any> {
         var api = await requireAPI<typeof ApiAgency>('agency');
         fields['id'] = id;
         return api.updateAgencyUser(fields);
