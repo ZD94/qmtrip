@@ -1,5 +1,6 @@
 
 class Menuitem {
+    id:number;
     icon:string;
     title:string;
     link:string;
@@ -38,9 +39,20 @@ class Menu {
         self.menus = []; //清空原有menus
         return self.menus;
     }
-    add(item:Menuitem) {
+    add(item:Menuitem) :any {
         var self = this;
-        self.menus.push(item);
+        var assist = 0;
+        for(var i =0;i<self.menus.length;i++){
+            if(typeof(self.menus[i-1])!="undefined"){
+                if(item.id == self.menus[i-1].id){
+                    assist =1;
+                    break;
+                }
+            }
+        }
+        if(self.menus.length == 0 || assist == 0){
+            self.menus.push(item);
+        }
         return self.menus;
     }
     set(item:Menuitem) :Menuitem {
