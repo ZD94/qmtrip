@@ -1,4 +1,6 @@
 
+var API = require('api');
+
 import {ngService} from "./index";
 
 class CityInfo {
