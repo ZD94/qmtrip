@@ -9,13 +9,13 @@ var API = require("common/api");
 var L = require("common/language");
 var Q = require("q");
 
-var ROLE_ID = {
+const ROLE_ID = {
     OWNER: 0,
     STAFF: 1,
     ADMIN: 2
 };
 
-var permit = module.exports = {};
+// var permit = module.exports = {};
 
 var roles = {
     staff: {
@@ -58,7 +58,6 @@ function expandRoleInherit(role){
         .forEach(function(parent_id){
             var parent = roles[parent_id];
             if(!parent){
-                logger.error('role %s inherit from %s, which not exists!', id, parent_id);
                 return;
             }
             expandRoleInherit(parent);
@@ -92,13 +91,13 @@ updateRole(agency_roles);
  */
 function getRoleOfAccount(data) {
     var accountId = data.accountId;
-    var s = {};
+    var s: any = {}
     return API.staff.getStaff({id:data.accountId})
         .then(function(staff) {
             s = staff;
             return API.company.getCompany({companyId: staff.companyId});
         })
-        .then(function(company) {
+        .then(function(company: any) {
             if (company.createUser == accountId) {
                 return roles.owner;
             }else if(s.roleId == ROLE_ID.ADMIN){
@@ -117,7 +116,7 @@ function getRoleOfAccount(data) {
  */
 function getRoleOfAgency(params){
     var accountId = params.accountId;
-    var u = {};
+    var u: any = {};
     return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
         .then(function(user){
             u = user;
@@ -140,7 +139,7 @@ function getRoleList(roles){
             return {id:id, name:roles[id].name};
         });
 }
-permit.listRoles = function(params, callback) {
+export function listRoles( params, callback) {
     var type = params.type || 1;
     var list;
     switch(type){
@@ -164,7 +163,7 @@ permit.listRoles = function(params, callback) {
  * @param {String} params.permission 要检查的权限
  * @param {String} params.type 权限所属 1.企业 2.代理商 默认 1.企业
  */
-permit.checkPermission = function(params) {
+export function checkPermission(params) {
     var accountId = params.accountId;
     var permissions = params.permission;
 
@@ -203,3 +202,24 @@ permit.checkPermission = function(params) {
         });
 };
 
+
+//角色名称
+export function requirePermit(permits, type) {
+    return function(target, key, desc) {
+        let self = this;
+        let fn = desc.value;
+        desc.value = function() {
+            let args = arguments;
+            let zone = Zone.current;
+            let session = zone.session;
+            if (!session["accountId"] || !session["tokenId"]) {
+                return Promise.reject(`{"code": 403, "msg":"permit deny!"}`);
+            }
+
+            let accountId = session["accountId"];
+            return checkPermission({accountId: accountId, permissions: permits, type: type})
+                .then(fn.call(self, args));
+        }
+        return desc;
+    }
+}
