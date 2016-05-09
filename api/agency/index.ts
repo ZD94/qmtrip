@@ -16,7 +16,6 @@ import {validateApi} from 'common/api/helper';
 import {Paginate} from 'common/paginate';
 import {Agency, AgencyUser, AGENCY_STATUS} from "api/_types/agency";
 import { ServiceInterface } from '../_types/index';
-import async = Q.async;
 
 let logger = new Logger("agency");
 let agency : any = {};
