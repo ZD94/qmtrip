@@ -115,6 +115,16 @@ describe("api/client/staff.js", function() {
         });
     })
 
+    //根据条件查询员工集合
+    it("#getStaffs should be ok", function(done) {
+        API.client.staff.getStaffs.call(ownerSelf, {name: "123"}, function(err, result) {
+            assert.equal(err, null);
+            //console.log(err);
+            //console.log(result);
+            done();
+        });
+    })
+
 //更新员工信息
     it("#updateStaff should be ok", function(done) {
         updateobj.id = id;

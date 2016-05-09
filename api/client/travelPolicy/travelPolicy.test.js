@@ -119,6 +119,14 @@ describe("api/client/travelPolicy.js", function() {
             done();
         });
     })
+    it("#getTravelPolicies should be ok", function(done) {
+        API.client.travelPolicy.getTravelPolicies.call(self, {name: "456"}, function(err, result) {
+            assert.equal(err, null);
+//            console.log(result);
+//                console.log(result.items);//item dataValues里存放的才是记录信息
+            done();
+        });
+    })
 //更新差旅标准信息
     it("#updateTravelPolicy should be ok", function(done) {
         obj.id = id;

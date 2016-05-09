@@ -214,6 +214,14 @@ describe("api/client/department.js", function() {
 //                console.log(result);
             done();
         });
+
+//根据条件查询部门集合
+    it("#getDepartments should be ok", function(done) {
+        API.client.department.getDepartments.call(self, {parentId: parentId_f}, function(err, result) {
+            assert.equal(err, null);
+//                console.log(result);
+            done();
+        });
     })
 //查询所有子级部门id集合
     it("#getAllChildDepartmentsid should be ok", function(done) {

@@ -31,7 +31,7 @@ import {validateApi} from 'common/api/helper';
  * @param params
  * @returns {*|Promise}
  */
-export function createTravelPolicy (params : types.TravelPolicy) {
+export function createTravelPolicy (params) {
     var user_id = this.accountId;
     return API.auth.judgeRoleById({id:user_id})
         .then(function(role){

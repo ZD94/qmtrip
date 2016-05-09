@@ -151,7 +151,7 @@ class DepartmentService extends ClientService<Department>{
     }
     async $get(id: string): Promise<Department>{
         var api = await requireAPI<typeof ApiDepartment>('department');
-        return api.getDepartment(id);
+        return api.getDepartment({id: id});
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiDepartment>('department');
@@ -160,11 +160,11 @@ class DepartmentService extends ClientService<Department>{
     async $update(id: string, fields: Object): Promise<any> {
         var api = await requireAPI<typeof ApiDepartment>('department');
         fields[id] = id;
-        return api.updateDepartment(id, fields);
+        return api.updateDepartment(fields);
     }
     async $destroy(id: string): Promise<any> {
         var api = await requireAPI<typeof ApiDepartment>('department');
-        return api.deleteDepartment(id);
+        return api.deleteDepartment({id: id});
     }
 }
 
