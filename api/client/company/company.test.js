@@ -32,7 +32,7 @@ describe("api/client/company.js", function() {
         before(function(done) {
             API.agency.deleteAgencyByTest({mobile: agency.mobile, email: agency.email})
                 .then(function(ret){
-                    return API.agency.registerAgency(agency)
+                    return API.agency.createAgency(agency)
                 })
                 .then(function(ret){
                     agencyId = ret.agency.id;

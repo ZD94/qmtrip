@@ -54,7 +54,7 @@ describe("api/client/staff.js", function() {
                 API.staff.deleteAllStaffByTest({email: obj.email, mobile: obj.mobile})
             ])
             .spread(function(ret1, ret2, ret3, ret4, ret5){
-                return API.agency.registerAgency(agency);
+                return API.agency.createAgency(agency);
             })
             .then(function(ret){
                 agencyId = ret.agency.id;

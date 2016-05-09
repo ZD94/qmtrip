@@ -122,19 +122,20 @@ class CompanyService extends ClientService<Company>{
     }
     async $get(id: string): Promise<Company>{
         var api = await requireAPI<typeof ApiCompany>('company');
-        return api.getCompany(id);
+        return api.getCompanyById({companyId: id});
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiCompany>('company');
-        return api.find(where);
+        return api.getCompanyListByAgency(where);
     }
     async $update(id: string, fields: Object): Promise<any> {
         var api = await requireAPI<typeof ApiCompany>('company');
-        return api.update(id, fields);
+        fields['id'] = fields;
+        return api.updateCompany(fields);
     }
     async $destroy(id: string): Promise<any> {
         var api = await requireAPI<typeof ApiCompany>('company');
-        return api.delete(id);
+        return api.deleteCompany({compayId: id});
     }
 }
 
@@ -203,19 +204,20 @@ class AgencyService extends ClientService<Agency>{
     }
     async $get(id: string): Promise<Agency>{
         var api = await requireAPI<typeof ApiAgency>('agency');
-        return api.getAgency(id);
+        return api.getAgencyById({agencyId: id});
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiAgency>('agency');
-        return api.find(where);
+        return api.listAgency(where);
     }
     async $update(id: string, fields: Object): Promise<any> {
         var api = await requireAPI<typeof ApiAgency>('agency');
-        return api.update(id, fields);
+        fields[''] = id;
+        return api.updateAgency(fields);
     }
     async $destroy(id: string): Promise<any> {
         var api = await requireAPI<typeof ApiAgency>('agency');
-        return api.delete(id);
+        return api.deleteAgency({agencyId: id});
     }
 }
 
@@ -230,19 +232,20 @@ class AgencyUserService extends ClientService<AgencyUser>{
     }
     async $get(id: string): Promise<AgencyUser>{
         var api = await requireAPI<typeof ApiAgency>('agency');
-        return api.getAgencyUser(id);
+        return api.getAgencyUser({agencyUserId: id});
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiAgency>('agency');
-        return api.findAgencyUser(where);
+        return api.listAndPaginateAgencyUser(where);
     }
     async $update(id: string, fields: Object): Promise<any> {
         var api = await requireAPI<typeof ApiAgency>('agency');
-        return api.updateAgencyUser(id, fields);
+        fields['id'] = id;
+        return api.updateAgencyUser(fields);
     }
     async $destroy(id: string): Promise<any> {
         var api = await requireAPI<typeof ApiAgency>('agency');
-        return api.deleteAgencyUser(id);
+        return api.deleteAgencyUser({userId: id});
     }
 }
 

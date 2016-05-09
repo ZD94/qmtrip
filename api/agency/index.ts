@@ -29,16 +29,18 @@ export class AgencyService implements ServiceInterface<Agency>{
         return API.agency.createAgency(obj);
     }
     async get(id: string): Promise<Agency>{
-        return API.agency.getAgency(id);
+        return API.agency.getAgency({agencyId: id});
     }
     async find(where: any): Promise<Agency[]>{
-        return API.agency.find(where);
+        return API.agency.listAgency(where);
     }
     async update(id: string, fields: Object): Promise<any> {
-        return API.agency.update(id, fields);
+        fields['agencyId'] = id;
+        return API.agency.updateAgency(fields);
     }
     async destroy(id: string): Promise<any> {
-        return API.agency.delete(id);
+
+        return API.agency.deleteAgency({agencyId: id});
     }
 }
 export class AgencyUserService implements ServiceInterface<AgencyUser>{
@@ -49,13 +51,14 @@ export class AgencyUserService implements ServiceInterface<AgencyUser>{
         return API.agency.getAgencyUser(id);
     }
     async find(where: any): Promise<AgencyUser[]>{
-        return API.agency.find(where);
+        return API.agency.listAndPaginateAgencyUser(where);
     }
     async update(id: string, fields: Object): Promise<any> {
-        return API.agency.updateAgencyUser(id, fields);
+        fields['id'] = id;
+        return API.agency.updateAgencyUser(fields);
     }
     async destroy(id: string): Promise<any> {
-        return API.agency.deleteAgencyUser(id);
+        return API.agency.deleteAgencyUser({id: id});
     }
 }
 
@@ -63,7 +66,7 @@ export class AgencyUserService implements ServiceInterface<AgencyUser>{
  * 注册代理商，生成代理商id
  * @param params
  */
-agency.registerAgency = function(params){
+agency.createAgency = function(params){
     let agency = new Agency(params);
     let agencyId = uuid.v1() || params.agencyId;
     agency.id = agencyId;
@@ -112,7 +115,7 @@ agency.registerAgency = function(params){
 }
 
 agency.createAgency = createAgency;
-validateApi(createAgency, ['id', 'name', 'email', 'userName'], ['mobile', 'pwd', 'description', 'remark', 'status']);
+validateApi(createAgency, ['name', 'email', 'userName'], ['id', 'mobile', 'pwd', 'description', 'remark', 'status']);
 function createAgency(params) {
     var mobile = params.mobile;
     var email = params.email;
@@ -182,10 +185,9 @@ agency.updateAgency = function(_agency){
  * @param agencyId
  * @returns {*}
  */
-agency.getAgency = function(params){
-    if(!params.agencyId){
-        throw {code: -1, msg: '参数 agencyId 不能为空'};
-    }
+agency.getAgency = getAgency;
+validateApi(getAgency, ['agencyId']);
+function getAgency(params){
     var agencyId = params.agencyId;
     return AgencyModel.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updateAt']})
         .then(function(agency){
@@ -212,7 +214,7 @@ agency.listAgency = function(params){
  * @returns {*}
  */
 agency.deleteAgency = deleteAgency;
-validateApi(deleteAgency, ['agencyId', 'userId']);
+validateApi(deleteAgency, ['agencyId'], ['userId']);
 function deleteAgency(params){
     var agencyId = params.agencyId;
     var userId = params.userId;

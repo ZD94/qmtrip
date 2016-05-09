@@ -18,7 +18,7 @@ import {Agency, AgencyUser, AGENCY_STATUS} from "api/_types/agency";
  */
 
 /**
- * @method registerAgency
+ * @method createAgency
  *
  * 注册代理商
  *
@@ -31,8 +31,8 @@ import {Agency, AgencyUser, AGENCY_STATUS} from "api/_types/agency";
  * 填，如果手机号和邮箱在全麦注册过，则密码还是以前的密码
  * @returns {Promise} true||error
  */
-validateApi(registerAgency, ['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd', 'id']);
-export async function registerAgency(params: {name: string, email: string, mobile: string, userName: string, description?: string,
+validateApi(createAgency, ['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd', 'id']);
+export async function createAgency(params: {name: string, email: string, mobile: string, userName: string, description?: string,
     remark?: string, pwd?: string}){
     let email = params.email;
     let mobile = params.mobile;
@@ -147,7 +147,7 @@ export function deleteAgency(params: {agencyId: string}){
  * @param params
  * @returns {Promise<AgencyUser>}
  */
-export async function createAgencyUser(params: Agency) {
+export async function createAgencyUser(params) {
     let self = this;
     let accountId = self.accountId;
     await API.permit.checkPermission({accountId: accountId, permission: "user.add", type: 2});    //检查权限
