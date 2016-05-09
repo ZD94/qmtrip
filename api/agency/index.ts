@@ -427,7 +427,7 @@ agency.listAndPaginateAgencyUser = function(params){
         .then(function(result){
             var data = result.rows.map(function(user) {
                 return user.id;
-            })
+            });
             return new Paginate(page, perPage, result.count, data);
         });
 }

@@ -151,20 +151,20 @@ tripPlan.getConsumeInvoiceImg = function(params) {
 tripPlan.getConsumeDetail = getConsumeDetail;
 getConsumeDetail['required_params'] = ['consumeId'];
 getConsumeDetail['optional_params'] = ['columns'];
-function getConsumeDetail(params){
+async function getConsumeDetail(params){
     let options: any = {};
 
     if(params.columns){
         options.attributes = _.intersection(params.columns, TripDetailsCols);
     }
 
-    return TripDetailsModel.findById(params.consumeId, options)
-        .then(function(detail){
-            if(!detail || detail.status == STATUS.DELETE){
-                throw {code: -2, msg: '消费记录不存在'};
-            }
-            return detail;
-        })
+    let detail = await TripDetailsModel.findById(params.consumeId, options);
+
+    if(!detail || detail.status == STATUS.DELETE){
+        throw {code: -2, msg: '消费记录不存在'};
+    }
+    
+    return new TripDetails(detail);
 }
 
 /**
@@ -1007,8 +1007,8 @@ tripPlan.previewConsumeInvoice = function (params) {
  * @param params
  */
 tripPlan.checkBudgetExist = checkBudgetExist;
-checkBudgetExist['required_params'] = ['tripDetails', 'accountId', 'companyId', 'arrivalCity', 'arrivalCityCode'];
-checkBudgetExist['optional_params'] = ['deptCity', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'description', 'arrivalCityCode', 'deptCityCode'];
+checkBudgetExist['required_params'] = ['tripDetails', 'accountId', 'companyId', 'arrivalCity', 'arrivalCityCode', 'title'];
+checkBudgetExist['optional_params'] = ['deptCity', 'deptCityCode', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'description'];
 let tripDetails_required_fields = ['type', 'startTime', 'invoiceType'];
 async function checkBudgetExist(params){
     let tripDetails = params.tripDetails;
