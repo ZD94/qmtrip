@@ -11,6 +11,7 @@ let logger = new Logger("client/agency");
 import _ = require('lodash');
 import {validateApi} from 'common/api/helper';
 import {Agency, AgencyUser, AGENCY_STATUS} from "./agency.types";
+import {Paginate} from "common/paginate";
 
 
 /**
@@ -31,8 +32,8 @@ import {Agency, AgencyUser, AGENCY_STATUS} from "./agency.types";
  * 填，如果手机号和邮箱在全麦注册过，则密码还是以前的密码
  * @returns {Promise} true||error
  */
-validateApi(registerAgency, ['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd', 'id']);
-export async function registerAgency(params: {name: string, email: string, mobile: string, userName: string, description?: string,
+validateApi(create, ['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd', 'id']);
+export async function create(params: {name: string, email: string, mobile: string, userName: string, description?: string,
     remark?: string, pwd?: string}){
     let email = params.email;
     let mobile = params.mobile;
@@ -53,29 +54,16 @@ export async function registerAgency(params: {name: string, email: string, mobil
 
 }
 
+export async function get(agencyId: string): Promise<Agency>{
+    var self = this;
+    var user = await API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']});
 
-// validateApi(createAgency, ['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd', 'id']);
-// export async function createAgency(params: {name: string, email: string, mobile: string, userName: string, description?: string,
-//     remark?: string, pwd?: string}){
-//     console.info("client createAgency...");
-//     let email = params.email;
-//     let mobile = params.mobile;
-//     let password = params.pwd || "123456";
-//     let ACCOUNT_TYPE : number = 2; //账号类型，2为代理商账号
-//     let account = await API.auth.checkAccExist({type: ACCOUNT_TYPE, $or: [{mobile: mobile}, {email: email}]});
-//
-//     if(!account) {
-//         let _account : any = {email: email, mobile: mobile, pwd: password, type: ACCOUNT_TYPE};
-//         account = await API.auth.newAccount(_account);
-//     }
-//
-//     let _agency = new Agency(params);
-//     _agency.id = account.id;
-//     _agency['userName'] = params.userName;
-//
-//     return API.agency.createAgency(_agency);
-// }
+    if(user.agencyId != agencyId){
+        throw L.ERR.PERMISSION_DENY;
+    }
 
+    return API.agency.getAgency({agencyId: agencyId});
+}
 
 /**
  * @method getAgencyById
@@ -87,7 +75,7 @@ export async function registerAgency(params: {name: string, email: string, mobil
  * @returns {Promise<Agency>}
  */
 validateApi(getAgencyById, ['agencyId']);
-export async function getAgencyById(params: {agencyId: string}){
+export async function getAgencyById(params: {agencyId: string}): Promise<Agency>{
     var self = this;
     var agencyId = params.agencyId;
     var user = await API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']});
@@ -105,7 +93,7 @@ export async function getAgencyById(params: {agencyId: string}){
  * @param params
  * @returns {Promise<string[]>}
  */
-export async function listAgency(){
+export async function find(): Promise<string[]>{
     let self = this;
     let list = await API.agency.listAgency({});
     
@@ -121,8 +109,8 @@ export async function listAgency(){
  * @param params {object}
  * @returns {Promise<Agency>}
  */
-validateApi(updateAgency, ['agencyId'], ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark']);
-export async function updateAgency(params){
+validateApi(update, ['agencyId'], ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark']);
+export async function update(params): Promise<Agency>{
     let self = this;
     params.userId = self.accountId;
     return API.agency.updateAgency(params);
@@ -134,8 +122,8 @@ export async function updateAgency(params){
  * @param params.agencyId 代理商id
  * @returns {Promise<boolean>}
  */
-validateApi(deleteAgency, ['agencyId']);
-export function deleteAgency(params: {agencyId: string}){
+validateApi(destroy, ['agencyId']);
+export function destroy(params: {agencyId: string}): Promise<boolean>{
     let self = this;
     params['userId'] = self.accountId;
 
@@ -147,7 +135,7 @@ export function deleteAgency(params: {agencyId: string}){
  * @param params
  * @returns {Promise<AgencyUser>}
  */
-export async function createAgencyUser(params: Agency) {
+export async function createAgencyUser(params: Agency): Promise<AgencyUser>{
     let self = this;
     let accountId = self.accountId;
     await API.permit.checkPermission({accountId: accountId, permission: "user.add", type: 2});    //检查权限
@@ -165,7 +153,7 @@ export async function createAgencyUser(params: Agency) {
  * @returns {Promise<AgencyUser>}
  */
 validateApi(getAgencyUser, ['agencyUserId']);
-export async function getAgencyUser(params: {agencyUserId: string}){
+export async function getAgencyUser(params: {agencyUserId: string}): Promise<AgencyUser>{
     let self = this;
     let accountId = self.accountId;
     let user = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
@@ -183,7 +171,7 @@ export async function getAgencyUser(params: {agencyUserId: string}){
  * 获取当前代理商用户
  * @returns {Promise<AgencyUser>}
  */
-export function getCurrentAgencyUser(){
+export function getCurrentAgencyUser(): Promise<AgencyUser>{
     let self = this;
     return API.agency.getAgencyUser({id: self.accountId});
 }
@@ -201,7 +189,7 @@ export function getCurrentAgencyUser(){
  */
 validateApi(updateAgencyUser, ['id'], ['status', 'name', 'sex', 'mobile', 'avatar', 'roleId']);
 export async function updateAgencyUser(params: {id: string, status?: number, name?: string, sex?: string, email?: string,
-    mobile?: string, avatar?: string, roleId?: string}) {
+    mobile?: string, avatar?: string, roleId?: string}): Promise<AgencyUser> {
     let self = this;
     let accountId = self.accountId;
 
@@ -226,7 +214,7 @@ export async function updateAgencyUser(params: {id: string, status?: number, nam
  */
 
 validateApi(deleteAgencyUser, ['userId']);
-export async function deleteAgencyUser(params: {userId: string}){
+export async function deleteAgencyUser(params: {userId: string}): Promise<boolean>{
     let self = this;
     let accountId = self.accountId;
     
@@ -248,7 +236,7 @@ export async function deleteAgencyUser(params: {userId: string}){
  * @param params
  * @returns {Promise<Paginate>}
  */
-export async function listAndPaginateAgencyUser(params) {
+export async function listAndPaginateAgencyUser(params): Promise<Paginate<string>>{
     let self = this;
     let user = await API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']});
     params.agencyId = user.agencyId;
