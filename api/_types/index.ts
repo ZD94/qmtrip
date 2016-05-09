@@ -28,7 +28,8 @@ export interface ModelsInterface {
 }
 
 class ServiceDelegate<T> implements ServiceInterface<T>{
-    constructor(public target: ServiceInterface<T>){
+    target: ServiceInterface<T>;
+    constructor(){
     }
     create(obj: Object): Promise<T>{
         return this.target.create(obj);
@@ -45,27 +46,30 @@ class ServiceDelegate<T> implements ServiceInterface<T>{
     destroy(id:string): Promise<any> {
         return this.target.destroy(id);
     }
+    setTarget(target: ServiceInterface<T>) {
+        this.target = target;
+    }
 }
 
 class ModelsDelegate implements ModelsInterface {
     constructor() {
     }
 
-    staff: ServiceDelegate<Staff>;
-    company: ServiceDelegate<Company>
-    department: ServiceDelegate<Department>;
-    travelPolicy: ServiceDelegate<TravelPolicy>;
+    staff: ServiceDelegate<Staff> = new ServiceDelegate<Staff>();
+    company: ServiceDelegate<Company> = new ServiceDelegate<Company>();
+    department: ServiceDelegate<Department> = new ServiceDelegate<Department>();
+    travelPolicy: ServiceDelegate<TravelPolicy> = new ServiceDelegate<TravelPolicy>();
 
-    agency: ServiceDelegate<Agency>
-    agencyUser: ServiceDelegate<AgencyUser>;
+    agency: ServiceDelegate<Agency> = new ServiceDelegate<Agency>();
+    agencyUser: ServiceDelegate<AgencyUser> = new ServiceDelegate<AgencyUser>();
 
     init(target: ModelsInterface){
-        this.staff = new ServiceDelegate<Staff>(target.staff);
-        this.company = new ServiceDelegate<Company>(target.company);
-        this.department = new ServiceDelegate<Department>(target.department);
-        this.travelPolicy = new ServiceDelegate<TravelPolicy>(target.travelPolicy);
-        this.agency = new ServiceDelegate<Agency>(target.agency);
-        this.agencyUser = new ServiceDelegate<AgencyUser>(target.agencyUser);
+        this.staff.setTarget(target.staff);
+        this.company.setTarget(target.company);
+        this.department.setTarget(target.department);
+        this.travelPolicy.setTarget(target.travelPolicy);
+        this.agency.setTarget(target.agency);
+        this.agencyUser.setTarget(target.agencyUser);
     }
 }
 export var Models = new ModelsDelegate();
