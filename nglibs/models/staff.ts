@@ -1,5 +1,5 @@
 
-import {regApiType} from "../../common/api/helper";
+import {regApiType} from "common/api/helper";
 var API = require('api');
 
 import { Company } from 'api/client/company/company.types';
