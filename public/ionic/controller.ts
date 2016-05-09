@@ -3,36 +3,47 @@ var Cookie = require('tiny-cookie');
 
 export async function IndexController($scope,Menu,$ionicPopup, StaffService){
     require('./index.less');
-    Menu.delall();
     var items =[
         {
+            id:1051,
             icon:'plane',
             title:'我要出差',
             link:'trip/create',
             badgenum: 0
         },
         {
-            icon:'flag',
-            title:'我的行程',
-            link:'trip/list',
-            badgenum: 15
-        },
-        {
-            icon:'',
-            title:'',
-            link:'',
-            badgenum: 0
-        },
-        {
+            id:1052,
             icon:'podium',
             title:'审批单',
             link:'trip-approval/pending',
             badgenum: 5
         },
         {
+            id:1053,
+            icon:'flag',
+            title:'我的行程',
+            link:'trip/list',
+            badgenum: 15
+        },
+        {
+            id:1054,
+            icon:'',
+            title:'',
+            link:'',
+            badgenum: 0
+        },
+        {
+            id:1055,
             icon:'paintbrush',
             title:'待我审批',
             link:'trip-approval/list',
+            badgenum: 3
+        },
+        {
+            id:1056,
+            icon:'levels',
+            title:'企业管理',
+            link:'company/management',
             badgenum: 3
         }
     ];
