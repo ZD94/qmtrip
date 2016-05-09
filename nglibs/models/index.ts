@@ -95,19 +95,20 @@ class StaffService extends ClientService<Staff>{
     }
     async $get(id: string): Promise<Staff>{
         var api = await requireAPI<typeof ApiStaff>('staff');
-        return api.getStaff(id);
+        return api.getStaff({id: id});
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiStaff>('staff');
-        return api.find(where);
+        return api.getStaffs(where);
     }
     async $update(id: string, fields: Object): Promise<any> {
         var api = await requireAPI<typeof ApiStaff>('staff');
-        return api.update(id, fields);
+        fields[id] = id;
+        return api.updateStaff(fields);
     }
     async $destroy(id: string): Promise<any> {
         var api = await requireAPI<typeof ApiStaff>('staff');
-        return api.delete(id);
+        return api.deleteStaff(id);
     }
 }
 
@@ -154,15 +155,16 @@ class DepartmentService extends ClientService<Department>{
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiDepartment>('department');
-        return api.find(where);
+        return api.getDepartments(where);
     }
     async $update(id: string, fields: Object): Promise<any> {
         var api = await requireAPI<typeof ApiDepartment>('department');
-        return api.update(id, fields);
+        fields[id] = id;
+        return api.updateDepartment(id, fields);
     }
     async $destroy(id: string): Promise<any> {
         var api = await requireAPI<typeof ApiDepartment>('department');
-        return api.delete(id);
+        return api.deleteDepartment(id);
     }
 }
 
@@ -177,19 +179,20 @@ class TravelPolicyService extends ClientService<TravelPolicy>{
     }
     async $get(id: string): Promise<TravelPolicy>{
         var api = await requireAPI<typeof ApiTravelPolicy>('travelPolicy');
-        return api.getTravelPolicy(id);
+        return api.getTravelPolicy({id: id});
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiTravelPolicy>('travelPolicy');
-        return api.find(where);
+        return api.getTravelPolicies(where);
     }
     async $update(id: string, fields: Object): Promise<any> {
         var api = await requireAPI<typeof ApiTravelPolicy>('travelPolicy');
-        return api.update(id, fields);
+        fields[id] = id;
+        return api.updateTravelPolicy(fields);
     }
     async $destroy(id: string): Promise<any> {
         var api = await requireAPI<typeof ApiTravelPolicy>('travelPolicy');
-        return api.delete(id);
+        return api.deleteTravelPolicy({id: id});
     }
 }
 

@@ -14,19 +14,20 @@ export const departmentCols = Object.keys(departmentModel.attributes);
 
 export class DepartmentService implements ServiceInterface<Department>{
     async create(obj: Object): Promise<Department>{
-        return API.department.createCompany(obj);
+        return API.department.createDepartment(obj);
     }
     async get(id: string): Promise<Department>{
-        return API.department.getCompany(id);
+        return API.department.getDepartment({id: id});
     }
     async find(where: any): Promise<Department[]>{
-        return API.department.find(where);
+        return API.department.getDepartments(where);
     }
     async update(id: string, fields: Object): Promise<any> {
-        return API.department.update(id, fields);
+        fields[id] = id;
+        return API.department.updateDepartment(fields);
     }
     async destroy(id: string): Promise<any> {
-        return API.department.delete(id);
+        return API.department.deleteDepartment({id: id});
     }
 }
 
@@ -175,6 +176,23 @@ validateApi(getDepartment, ["id"])
 export function getDepartment(params: {id: string}){
     var id = params.id;
     return departmentModel.findById(id);
+}
+
+/**
+ * 根据属性查找部门
+ * @param params
+ * @returns {*}
+ */
+export function getDepartments(params){
+    var options : any = {};
+    options.where = _.pick(params, Object.keys(departmentModel.attributes));
+    if(params.$or) {
+        options.where.$or = params.$or;
+    }
+    if(params.columns){
+        options.attributes = params.columns;
+    }
+    return departmentModel.findAll(options);
 }
 
 /**

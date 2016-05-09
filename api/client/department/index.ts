@@ -304,6 +304,35 @@ export function getAllDepartment(params: {companyId?: string}){
 
 };
 
+/**
+ * 根据条件得到企业所有部门
+ * @param params
+ * @returns {*|Promise}
+ */
+export function getDepartments(params){
+    var user_id = this.accountId;
+    return API.auth.judgeRoleById({id:user_id})
+        .then(function(role){
+            if(role == L.RoleType.STAFF){
+                return API.staff.getStaff({id: user_id})
+                    .then(function(data){
+                        params.companyId = data.companyId;
+                        return API.department.getDepartments(params);
+                    });
+            }else{
+                return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                    .then(function(result){
+                        if(result){
+                            return API.department.getDepartments({companyId: params.companyId});
+                        }else{
+                            throw {code: -1, msg: '无权限'};
+                        }
+                    })
+            }
+        })
+
+};
+
 /*validateApi(agencyGetAllDepartment, ["companyId"]);
 export function agencyGetAllDepartment (params: {companyId: string}){
     var user_id = this.accountId;

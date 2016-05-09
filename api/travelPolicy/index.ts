@@ -18,16 +18,17 @@ export class TravelPolicyService implements ServiceInterface<TravelPolicy>{
         return API.travalPolicy.createTravelPolicy(obj);
     }
     async get(id: string): Promise<TravelPolicy>{
-        return API.travalPolicy.getTravelPolicy(id);
+        return API.travalPolicy.getTravelPolicy({id: id});
     }
     async find(where: any): Promise<TravelPolicy[]>{
-        return API.travalPolicy.find(where);
+        return API.travalPolicy.getTravelPolicies(where);
     }
     async update(id: string, fields: Object): Promise<any> {
-        return API.travalPolicy.update(id, fields);
+        fields[id] = id;
+        return API.travalPolicy.updateTravelPolicy(fields);
     }
     async destroy(id: string): Promise<any> {
-        return API.travalPolicy.delete(id);
+        return API.travalPolicy.deleteTravelPolicy({id: id});
     }
 }
 
@@ -134,6 +135,22 @@ export function getAllTravelPolicy(options){
     return travalPolicyModel.findAll(options);
 }
 
+/**
+ * 根据属性查找差旅标准
+ * @param params
+ * @returns {*}
+ */
+export function getTravelPolicies(params){
+    var options : any = {};
+    options.where = _.pick(params, Object.keys(travalPolicyModel.attributes));
+    if(params.$or) {
+        options.where.$or = params.$or;
+    }
+    if(params.columns){
+        options.attributes = params.columns;
+    }
+    return travalPolicyModel.findAll(options);
+}
 
 /**
  * 分页查询差旅标准集合

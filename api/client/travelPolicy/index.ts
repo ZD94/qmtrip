@@ -396,6 +396,50 @@ export function getAllTravelPolicy(params){
 }
 
 /**
+ * 企业得到所有差旅标准
+ * @param params
+ * @returns {*|Promise}
+ */
+export function getTravelPolicies(params){
+    var user_id = this.accountId;
+    var self = this;
+    var companyId = params.companyId;
+    var options: any = {
+        where: _.pick(params, ['name', 'planeLevel', 'planeDiscount', 'trainLevel', 'hotelLevel', 'hotelPrice', 'companyId', 'isChangeLevel', 'createAt'])
+    };
+    if(params.columns){
+        options.attributes = params.columns;
+    }
+    if(params.order){
+        options.order = params.order;
+    }
+    return API.auth.judgeRoleById({id:user_id})
+        .then(function(role){
+            if(role == L.RoleType.STAFF){
+                return API.staff.getStaff({id:user_id})
+                    .then(function(staff){
+                        if(!staff){
+                            throw {code: -1, msg: '无权限'};
+                        }
+                        options.where.companyId = staff.companyId;//只允许查询该企业下的差旅标准
+
+                        return API.travelPolicy.getTravelPolicies(options);
+                    });
+            }else{
+                return API.company.checkAgencyCompany({companyId: companyId, userId: self.accountId})
+                    .then(function(result){
+                        if(result){
+                            return API.travelPolicy.getTravelPolicies(options);
+                        }else{
+                            throw {code: -1, msg: '无权限'};
+                        }
+                    })
+            }
+        })
+
+}
+
+/**
  * 代理商获取企业的差旅标准
  * @param params
  * @returns {*}
