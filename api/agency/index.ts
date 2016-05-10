@@ -14,7 +14,8 @@ import Logger = require('common/logger');
 import utils = require("common/utils");
 import {validateApi} from 'common/api/helper';
 import {Paginate} from 'common/paginate';
-import {Agency, AgencyUser, AGENCY_STATUS} from "../client/agency/agency.types";
+import {Agency, AgencyUser, AGENCY_STATUS} from "api/_types/agency";
+import { ServiceInterface } from '../_types/index';
 
 let logger = new Logger("agency");
 let agency : any = {};
@@ -22,60 +23,123 @@ let agency : any = {};
 agency.agencyCols = Object.keys(AgencyModel.attributes);
 agency.agencyUserCols = Object.keys(AgencyUserModel.attributes);
 
-/**
- * 注册代理商，生成代理商id
- * @param params
- */
-agency.registerAgency = function(params){
-    let agency = new Agency(params);
-    let agencyId = uuid.v1() || params.agencyId;
-    agency.id = agencyId;
-    let pwd = params.pwd || '123456';
-    let mobile = params.mobile;
-    let email = params.email;
-    let account = {email: email, mobile: mobile, pwd: pwd, type: 2, status: params.status || AGENCY_STATUS.UN_ACTIVE};
-    let agencyUser  = new AgencyUser({agencyId: agencyId, name: params.userName, mobile: mobile, email: email, 
-        status: params.status || AGENCY_STATUS.UN_ACTIVE, roleId: 0});
 
-    return API.auth.checkAccExist({type: 2, $or: [{mobile: mobile}, {email: email}]})
-        .then(function(ret){
-            if(!ret){
-                return API.auth.newAccount(account);
-            }else{
-                return ret;
-            }
-        })
-        .then(function(account){
-            var accountId = account.id;
-            agency.createUser = accountId;
-            agencyUser.id = accountId;
+export class AgencyService implements ServiceInterface<Agency>{
+    async create(obj: Object): Promise<Agency>{
+        return API.agency.create(obj);
+    }
+    async get(id: string): Promise<Agency>{
+        return API.agency.getAgency({agencyId: id});
+    }
+    async find(where: any): Promise<Agency[]>{
+        return API.agency.listAgency(where);
+    }
+    async update(id: string, fields: Object): Promise<any> {
+        fields['agencyId'] = id;
+        return API.agency.updateAgency(fields);
+    }
+    async destroy(id: string): Promise<any> {
 
-            return sequelize.transaction(function(t){
-                return Promise.all([
-                    AgencyModel.create(agency, {transaction: t}),
-                    AgencyUserModel.create(agencyUser, {transaction: t})
-                ]);
-            })
-        })
-        .spread(function(agency, agencyUser){
-            return {agency: agency, agencyUser: agencyUser}
-        })
-        .catch(function(err){
-            logger.error(err);
-
-            return AgencyModel.findOne({where: {$or: [{mobile: mobile}, {email: email}], status: {$ne: AGENCY_STATUS.DELETE}}, attributes: ['id']})
-                .then(function(agency){
-                    if(agency){
-                        throw {code: -4, msg: '手机号或邮箱已经注册'};
-                    }else{
-                        throw {code: -3, msg: '注册异常'};
-                    }
-                })
-        });
+        return API.agency.deleteAgency({agencyId: id});
+    }
+}
+export class AgencyUserService implements ServiceInterface<AgencyUser>{
+    async create(obj: Object): Promise<AgencyUser>{
+        return API.agency.createAgencyUser(obj);
+    }
+    async get(id: string): Promise<AgencyUser>{
+        return API.agency.getAgencyUser(id);
+    }
+    async find(where: any): Promise<AgencyUser[]>{
+        return API.agency.listAndPaginateAgencyUser(where);
+    }
+    async update(id: string, fields: Object): Promise<any> {
+        fields['id'] = id;
+        return API.agency.updateAgencyUser(fields);
+    }
+    async destroy(id: string): Promise<any> {
+        return API.agency.deleteAgencyUser({id: id});
+    }
 }
 
+// /**
+//  * 注册代理商，生成代理商id
+//  * @param params
+//  */
+// agency.createAgency = function(params){
+//     let agency = new Agency(params);
+//     let agencyId = uuid.v1() || params.agencyId;
+//     agency.id = agencyId;
+//     let pwd = params.pwd || '123456';
+//     let mobile = params.mobile;
+//     let email = params.email;
+//     let account = {email: email, mobile: mobile, pwd: pwd, type: 2, status: params.status || AGENCY_STATUS.UN_ACTIVE};
+//     let agencyUser  = new AgencyUser({agencyId: agencyId, name: params.userName, mobile: mobile, email: email, 
+//         status: params.status || AGENCY_STATUS.UN_ACTIVE, roleId: 0});
+//
+//     return API.auth.checkAccExist({type: 2, $or: [{mobile: mobile}, {email: email}]})
+//         .then(function(ret){
+//             if(!ret){
+//                 return API.auth.newAccount(account);
+//             }else{
+//                 return ret;
+//             }
+//         })
+//         .then(function(account){
+//             var accountId = account.id;
+//             agency.createUser = accountId;
+//             agencyUser.id = accountId;
+//
+//             return sequelize.transaction(function(t){
+//                 return Promise.all([
+//                     AgencyModel.create(agency, {transaction: t}),
+//                     AgencyUserModel.create(agencyUser, {transaction: t})
+//                 ]);
+//             })
+//         })
+//         .spread(function(agency, agencyUser){
+//             return {agency: agency, agencyUser: agencyUser}
+//         })
+//         .catch(function(err){
+//             logger.error(err);
+//
+//             return AgencyModel.findOne({where: {$or: [{mobile: mobile}, {email: email}], status: {$ne: AGENCY_STATUS.DELETE}}, attributes: ['id']})
+//                 .then(function(agency){
+//                     if(agency){
+//                         throw {code: -4, msg: '手机号或邮箱已经注册'};
+//                     }else{
+//                         throw {code: -3, msg: '注册异常'};
+//                     }
+//                 })
+//         });
+// }
+
+/**
+ * 创建代理商
+ * @param params
+ * @returns {Agency}
+ */
+agency.create = async function(params: {name: string, email: string, pwd: string, id?: string, mobile?: string, 
+    description?: string, remark?: string, status?: number}): Promise<Agency> {
+    let _agency = await AgencyModel.findOne({where: {email: params.email}});
+    
+    if(_agency) {
+        throw {code: -2, msg: '该邮箱已经注册代理商'};
+    }
+    
+    if(params.mobile) {
+        let agency_mobile = await AgencyModel.findOne({where: {mobile: params.mobile}});
+        if(agency_mobile) {
+            throw {code: -3, msg: '该手机号已经注册代理商'};
+        }
+    }
+    
+    let agency = await AgencyModel.create(params);
+    return new Agency(agency);
+};
+
 agency.createAgency = createAgency;
-validateApi(createAgency, ['id', 'name', 'email', 'userName'], ['mobile', 'pwd', 'description', 'remark', 'status']);
+validateApi(createAgency, ['name', 'email', 'userName'], ['id', 'mobile', 'pwd', 'description', 'remark', 'status']);
 function createAgency(params) {
     var mobile = params.mobile;
     var email = params.email;
@@ -145,10 +209,9 @@ agency.updateAgency = function(_agency){
  * @param agencyId
  * @returns {*}
  */
-agency.getAgency = function(params){
-    if(!params.agencyId){
-        throw {code: -1, msg: '参数 agencyId 不能为空'};
-    }
+agency.getAgency = getAgency;
+validateApi(getAgency, ['agencyId']);
+function getAgency(params){
     var agencyId = params.agencyId;
     return AgencyModel.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updateAt']})
         .then(function(agency){
@@ -175,7 +238,7 @@ agency.listAgency = function(params){
  * @returns {*}
  */
 agency.deleteAgency = deleteAgency;
-validateApi(deleteAgency, ['agencyId', 'userId']);
+validateApi(deleteAgency, ['agencyId'], ['userId']);
 function deleteAgency(params){
     var agencyId = params.agencyId;
     var userId = params.userId;
@@ -223,21 +286,17 @@ function deleteAgency(params){
  */
 agency.createAgencyUser = createAgencyUser;
 validateApi(createAgencyUser, ['email', 'mobile', 'agencyId', 'name'], agency.agencyUserCols);
-function createAgencyUser(data){
-    var _agencyUser = data;
-    _agencyUser.id = data.accountId || uuid.v1();
+async function createAgencyUser(params){
+    params.id = params.id ? params.id : uuid.v1();
+    
+    let _agencyUser = await AgencyUserModel.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
 
-    var accData = {email: _agencyUser.email, mobile: _agencyUser.mobile, pwd: "123456", type: 2};//初始密码暂定123456
+    if(_agencyUser) {
+        throw {code: -2, msg: '邮箱或手机号已经注册代理商'};
+    }
 
-    return API.auth.newAccount(accData)
-        .then(function(account){
-            _agencyUser.id = account.id;
-
-            return AgencyUserModel.create(_agencyUser);
-        })
-        .then(function(_agencyUser) {
-            return new AgencyUser(_agencyUser);
-        })
+    let agencyUser = await AgencyUserModel.create(params);
+    return new AgencyUser(agencyUser);
 }
 
 /**
@@ -367,7 +426,7 @@ agency.listAndPaginateAgencyUser = function(params){
         .then(function(result){
             var data = result.rows.map(function(user) {
                 return user.id;
-            })
+            });
             return new Paginate(page, perPage, result.count, data);
         });
 }

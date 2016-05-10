@@ -11,7 +11,7 @@ let config = require("../../../config");
 import moment = require('moment');
 import _ = require('lodash');
 import {validateApi} from "common/api/helper";
-import {PLAN_STATUS, TripPlan, Project, TripDetails} from './tripPlan.types';
+import {PLAN_STATUS, TripPlan, Project, TripDetails} from 'api/_types/tripPlan';
 
 /**
  * 从参数中获取计划详情数组
@@ -615,4 +615,121 @@ export async function getProjectsList(params: {count?: number, project_name?: st
     return list.map(function(p) {
         return p.name;
     })
+}
+
+
+/**
+ * @method editTripPlanBudget
+ * 代理商修改出差计划预算
+ * @returns {Promise<boolean>}
+ */
+validateApi(editTripPlanBudget, ['id', 'budget'], ['remark']);
+export async function editTripPlanBudget(params): Promise<boolean>{
+    let self = this;
+    let accountId = self.accountId;
+    let consumeId = params.id;
+    let {agencyId} = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
+    let {orderId, accountId: staffId} = await API.tripPlan.getConsumeDetail({consumeId: consumeId, columns: ['accountId', 'orderId']});
+    let staff = await API.staff.getStaff({id: staffId, columns: ['companyId', 'name', 'email']});
+    let companyId = staff.companyId, staffName = staff.name, staffEmail = staff.email;
+    let {agencyId: staffAgencyId} = await API.company.getCompany({companyId: companyId, columns: ['agencyId']});
+
+    if(agencyId != staffAgencyId){
+        throw L.ERR.PERMISSION_DENY;
+    }
+
+    let updates: any = {id: consumeId, budget: params.budget};
+
+    if(params.remark){
+        updates.remark = params.remark;
+    }
+
+    updates.invoiceType = 'TRAIN'; //代理商录入预算的，默认出行方式为火车
+    updates.userId = self.accountId;
+
+    let updateResult = await API.tripPlan.updateConsumeBudget(updates);
+    let tripPlan = await API.tripPlan.getTripPlanOrder({orderId: orderId});
+    let staffs = await API.staff.findStaffs({companyId: companyId, roleId: {$ne: 1}, columns: ['id', 'name','email']});
+
+    if(tripPlan.budget <= 0) {
+        return true;
+    }
+
+    let go = '无', back = '无', hotel = '无';
+
+    if(tripPlan.outTraffic.length > 0){
+        let g = tripPlan.outTraffic[0];
+        let changeBudget = g.budget === -1 ? '暂无' : g.budget;
+        go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.deptCity + ' 到 ' + g.arrivalCity;
+
+        if(g.latestArriveTime){
+            go += ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达';
+        }
+
+        go += ', 动态预算￥' + changeBudget;
+    }
+
+    if(tripPlan.backTraffic.length > 0){
+        let b = tripPlan.backTraffic[0];
+        let changeBudget = b.budget === -1 ? '暂无' : b.budget;
+        back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.deptCity + ' 到 ' + b.arrivalCity;
+
+        if(b.latestArriveTime){
+            back += ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达';
+        }
+
+        back += ', 动态预算￥' + changeBudget;
+    }
+
+    if(tripPlan.hotel.length > 0){
+        let h = tripPlan.hotel[0];
+        let changeBudget = h.budget === -1 ? '暂无' : h.budget;
+        hotel = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') +
+            ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + changeBudget;
+    }
+
+    let url = config.host + '/staff.html#/travelPlan/PlanDetail?planId=' + tripPlan.id;
+
+    //给员工发送邮件
+    let values = {
+        subjectTime: moment(tripPlan.startAt).format('YYYY-MM-DD'),
+        username: staffName,
+        time: moment(tripPlan.createAt).format('YYYY-MM-DD HH:mm:ss'),
+        projectName: tripPlan.description,
+        goTrafficBudget: go,
+        backTrafficBudget: back,
+        hotelBudget: hotel,
+        totalBudget: '￥'+tripPlan.budget,
+        url: url,
+        detailUrl: url
+    };
+
+    await API.mail.sendMailRequest({toEmails: staffEmail, templateName: 'qm_notify_agency_budget', values: values});
+
+    let c_url = config.host + '/corp.html#/TravelStatistics/planDetail?orderId=' + tripPlan.id;
+    //给企业管理员发送邮件
+    staffs.map(async function(s){
+        let a = await API.auth.getAccount({id: s.id, type: 1});
+
+        if(a.status == 1) {
+            let vals = {
+                managerName: s.name,
+                username: staffName,
+                email: staffEmail,
+                time: moment(tripPlan.createAt).format('YYYY-MM-DD HH:mm:ss'),
+                projectName: tripPlan.description,
+                goTrafficBudget: go,
+                backTrafficBudget: back,
+                hotelBudget: hotel,
+                totalBudget: '￥'+tripPlan.budget,
+                url: c_url,
+                detailUrl: c_url
+            };
+
+            let toEmail = s.email;
+            await API.mail.sendMailRequest({toEmails: toEmail, templateName: 'qm_notify_new_travelbudget', values: vals});
+        }
+    });
+
+    return true;
 }

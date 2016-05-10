@@ -5,7 +5,7 @@
 import L = require("common/language");
 import Logger = require('common/logger');
 import {validateApi} from "common/api/helper";
-import {Company, COMPANY_STATUS} from "./company.types";
+import {Company, COMPANY_STATUS} from "api/_types/company";
 
 let API = require('common/api');
 let uuid = require("node-uuid");
@@ -32,8 +32,8 @@ let logger = new Logger('client/company');
  * @returns {Promise<Company>}
  */
 validateApi(createCompany, ['mobile', 'name', 'email', 'userName'], ['pwd', 'remark', 'description']);
-export async function createCompany(params: {mobile: string, name: string, email: string, domain: string,
-    userName: string, pwd: string, remark: string, description: string}){
+export async function createCompany(params: {mobile: string, name: string, email: string, userName: string, pwd?: string,
+    remark?: string, description?: string}){
     let self = this;
     let accountId = self.accountId;
     let mobile = params.mobile;

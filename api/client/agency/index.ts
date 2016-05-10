@@ -10,7 +10,7 @@ let logger = new Logger("client/agency");
 
 import _ = require('lodash');
 import {validateApi} from 'common/api/helper';
-import {Agency, AgencyUser, AGENCY_STATUS} from "./agency.types";
+import {Agency, AgencyUser, AGENCY_STATUS} from "api/_types/agency";
 
 
 /**
@@ -18,7 +18,7 @@ import {Agency, AgencyUser, AGENCY_STATUS} from "./agency.types";
  */
 
 /**
- * @method registerAgency
+ * @method createAgency
  *
  * 注册代理商
  *
@@ -31,8 +31,8 @@ import {Agency, AgencyUser, AGENCY_STATUS} from "./agency.types";
  * 填，如果手机号和邮箱在全麦注册过，则密码还是以前的密码
  * @returns {Promise} true||error
  */
-validateApi(registerAgency, ['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd', 'id']);
-export async function registerAgency(params: {name: string, email: string, mobile: string, userName: string, description?: string,
+validateApi(createAgency, ['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd']);
+export async function createAgency(params: {name: string, email: string, mobile: string, userName: string, description?: string,
     remark?: string, pwd?: string}){
     let email = params.email;
     let mobile = params.mobile;
@@ -50,9 +50,38 @@ export async function registerAgency(params: {name: string, email: string, mobil
     _agency['userName'] = params.userName;
 
     return API.agency.createAgency(_agency);
-
 }
 
+/**
+ *
+ * @param params
+ */
+export async function create(params) {
+    let email = params.email;
+    let mobile = params.mobile;
+    let password = params.pwd || "123456";
+    let ACCOUNT_TYPE : number = 2; //账号类型，2为代理商账号
+    let account = await API.auth.checkAccExist({type: ACCOUNT_TYPE, $or: [{mobile: mobile}, {email: email}]});
+
+    if(!account) {
+        let _account : any = {email: email, mobile: mobile, pwd: password, type: ACCOUNT_TYPE};
+        account = await API.auth.newAccount(_account);
+    }
+
+    params.id = account.id;
+    params.creaeUser = account.id;
+    
+    let agency = await API.agency.create(params);
+    let _agencyUser: any = _.pick(params, ['email', 'mobile', 'sex', 'avatar', '']);
+    _agencyUser.id = account.id;
+    _agencyUser.agencyId = agency.id;
+    _agencyUser.roleId = 0;
+    _agencyUser.name = params.userName;
+
+    await API.agency.createAgencyUser(_agencyUser);
+
+    return agency;
+}
 
 // validateApi(createAgency, ['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd', 'id']);
 // export async function createAgency(params: {name: string, email: string, mobile: string, userName: string, description?: string,
@@ -105,7 +134,7 @@ export async function getAgencyById(params: {agencyId: string}){
  * @param params
  * @returns {Promise<string[]>}
  */
-export async function listAgency(){
+export async function listAgency(params){
     let self = this;
     let list = await API.agency.listAgency({});
     
@@ -147,7 +176,7 @@ export function deleteAgency(params: {agencyId: string}){
  * @param params
  * @returns {Promise<AgencyUser>}
  */
-export async function createAgencyUser(params: Agency) {
+export async function createAgencyUser(params) {
     let self = this;
     let accountId = self.accountId;
     await API.permit.checkPermission({accountId: accountId, permission: "user.add", type: 2});    //检查权限
@@ -200,8 +229,7 @@ export function getCurrentAgencyUser(){
  * @returns {Promise<AgencyUser>}
  */
 validateApi(updateAgencyUser, ['id'], ['status', 'name', 'sex', 'mobile', 'avatar', 'roleId']);
-export async function updateAgencyUser(params: {id: string, status?: number, name?: string, sex?: string, email?: string,
-    mobile?: string, avatar?: string, roleId?: string}) {
+export async function updateAgencyUser(params) {
     let self = this;
     let accountId = self.accountId;
 

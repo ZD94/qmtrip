@@ -49,7 +49,7 @@ describe("api/client/travelPolicy.js", function() {
                 API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})
             ])
             .spread(function(ret1, ret2, ret3){
-                return API.agency.registerAgency(agency);
+                return API.agency.createAgency(agency);
             })
             .then(function(ret){
                 agencyId = ret.agency.id;
@@ -113,6 +113,14 @@ describe("api/client/travelPolicy.js", function() {
     })
     it("#getAllTravelPolicy should be ok", function(done) {
         API.client.travelPolicy.getAllTravelPolicy.call(self, {companyId: companyId}, function(err, result) {
+            assert.equal(err, null);
+//            console.log(result);
+//                console.log(result.items);//item dataValues里存放的才是记录信息
+            done();
+        });
+    })
+    it("#getTravelPolicies should be ok", function(done) {
+        API.client.travelPolicy.getTravelPolicies.call(self, {name: "456"}, function(err, result) {
             assert.equal(err, null);
 //            console.log(result);
 //                console.log(result.items);//item dataValues里存放的才是记录信息

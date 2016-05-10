@@ -6,6 +6,8 @@
 require('app-module-path').addPath(__dirname);
 require('common/typescript');
 
+require('common/zone');
+
 //服务器启动性能日志
 //var perf = require('common/perf');
 //perf.init('init');
@@ -60,9 +62,7 @@ server.on('init.api', function(API){
                 if (!res) {
                     return false;
                 }
-                self.accountId = params.accountid;
-                self.tokenId = params.tokenid;
-                return true;
+                return {userid: params.accountid, tokenid: params.tokenid};
             });
     });
 });

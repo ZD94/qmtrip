@@ -1,7 +1,6 @@
-/**
- * Created by wlh on 16/4/26.
- */
+import { regApiType } from 'common/api/helper';
 
+@regApiType('API.')
 class AuthCert {
     timestamp: string
     token_id: string

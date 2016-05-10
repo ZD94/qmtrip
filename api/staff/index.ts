@@ -21,13 +21,32 @@ import L = require("common/language");
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {validateApi} from 'common/api/helper';
-import {Staff, Credentials, PointChange, STAFF_ROLE, STAFF_STATUS} from "../client/staff/staff.types.ts";
-import {AGENCY_ROLE} from "../client/agency/agency.types.ts";
-
+import {Staff, Credentials, PointChange, EStaffRole, EStaffStatus} from "api/_types/staff";
+import {AGENCY_ROLE} from "api/_types/agency";
+import { ServiceInterface } from 'api/_types/index';
 
 export const staffCols = Object.keys(staffModel.attributes);
 export const papersCols = Object.keys(papersModel.attributes);
 export const pointChangeCols = Object.keys(pointChangeModel.attributes);
+
+export class StaffService implements ServiceInterface<Staff>{
+    async create(obj: Object): Promise<Staff>{
+        return API.staff.createStaff(obj);
+    }
+    async get(id: string): Promise<Staff>{
+        return API.staff.getStaff({id: id});
+    }
+    async find(where: any): Promise<Staff[]>{
+        return API.staff.getStaffs(where);
+    }
+    async update(id: string, fields: Object): Promise<any> {
+        fields[id] = id;
+        return API.staff.updateStaff(fields);
+    }
+    async destroy(id: string): Promise<any> {
+        return API.staff.deleteStaff({id: id});
+    }
+}
 
 /**
  * 创建员工
@@ -87,7 +106,7 @@ export function deleteStaff(params: {id: string}){
     var id = params.id;
     return API.auth.remove({accountId: id})
         .then(function(){
-            return staffModel.update({status: STAFF_STATUS.DELETE, quitTime: utils.now()}, {where: {id: id}, returning: true})
+            return staffModel.update({status: EStaffStatus.DELETE, quitTime: utils.now()}, {where: {id: id}, returning: true})
         })
         .spread(function(num, rows){
             var staff = rows[0];
@@ -179,7 +198,7 @@ export function updateStaff(data){
                             time: utils.now(),
                             companyName: com.name,
                             department: dept ? dept.name : defaultDept.name,
-                            permission: rows[0].roleId == STAFF_ROLE.ADMIN ? "管理员" : (rows[0].roleId == STAFF_ROLE.OWNER ? "创建者" : "普通员工")
+                            permission: rows[0].roleId == EStaffRole.ADMIN ? "管理员" : (rows[0].roleId == EStaffRole.OWNER ? "创建者" : "普通员工")
                         }
                         return API.mail.sendMailRequest({
                             toEmails: rows[0].email,
@@ -243,7 +262,7 @@ export function findOneStaff(params){
  */
 validateApi(getCountByDepartment, ["departmentId"]);
 export function getCountByDepartment(params: {departmentId: string}){
-    return staffModel.count({where: {departmentId: params.departmentId, status: {$gte: STAFF_STATUS.ON_JOB}}})
+    return staffModel.count({where: {departmentId: params.departmentId, status: {$gte: EStaffStatus.ON_JOB}}})
 }
 
 /**
@@ -251,7 +270,7 @@ export function getCountByDepartment(params: {departmentId: string}){
  * @param params
  * @returns {*}
  */
-export function findStaffs(params){
+export function getStaffs(params){
     var options : any = {};
     options.where = _.pick(params, Object.keys(staffModel.attributes));
     if(params.$or) {
@@ -290,7 +309,7 @@ export function listAndPaginateStaff(params){
     if (!options.order) {
         options.order = [["id", "desc"]]
     }
-    params.status = {$ne: STAFF_STATUS.DELETE};//只查询在职人员
+    params.status = {$ne: EStaffStatus.DELETE};//只查询在职人员
     options.limit = limit;
     options.offset = offset;
     params.status = {$gte: 0};
@@ -831,7 +850,7 @@ export function statisticStaffsRole(params: {companyId: string, departmentId?: s
     if(departmentId){
         where.departmentId = departmentId;
     }
-    where.status = {$ne: STAFF_STATUS.DELETE};
+    where.status = {$ne: EStaffStatus.DELETE};
     var adminNum = 0
     var commonStaffNum = 0;
     var unActiveNum = 0;
@@ -875,7 +894,7 @@ export function statisticStaffsRole(params: {companyId: string, departmentId?: s
 validateApi(getStaffCountByCompany, ['companyId']);
 export function getStaffCountByCompany (params: {companyId: string}){
     var companyId = params.companyId;
-    return staffModel.count({where: {companyId: companyId, status:{$ne: STAFF_STATUS.DELETE}}})
+    return staffModel.count({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}})
         .then(function(all){
             return all || 1;
         });
@@ -890,7 +909,7 @@ validateApi(getDistinctDepartment, ['companyId']);
 export function getDistinctDepartment(params: {companyId: string}){
     var departmentAttr = [];
     var companyId = params.companyId;
-    return staffModel.findAll({where: {companyId: companyId, status:{$ne: STAFF_STATUS.DELETE}}, attributes:[[sequelize.literal('distinct department'),'department']]})
+    return staffModel.findAll({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}, attributes:[[sequelize.literal('distinct department'),'department']]})
         .then(function(departments){
             for(var i=0;i<departments.length;i++){
                 if(departments[i] && departments[i].department){

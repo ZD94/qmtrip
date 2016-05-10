@@ -2,6 +2,7 @@
  * Created by yumiao on 16-4-26.
  */
 'use strict';
+import { regApiType } from 'common/api/helper';
 
 export enum AGENCY_STATUS {
     DELETE = -2, //删除状态
@@ -15,6 +16,7 @@ export enum  AGENCY_ROLE {
     ADMIN = 2
 };
 
+@regApiType('API.')
 export class Agency{
     id: string;
     agencyNo: string;

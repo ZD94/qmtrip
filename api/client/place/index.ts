@@ -9,7 +9,7 @@
 
 var API = require("common/api");
 
-import {Place, AirCompany, Airport} from './types';
+import {Place, AirCompany, Airport} from 'api/_types/place';
 
 export const __public = true;
 

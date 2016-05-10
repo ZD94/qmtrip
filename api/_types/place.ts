@@ -1,7 +1,6 @@
-/**
- * Created by wlh on 16/4/27.
- */
+import { regApiType } from 'common/api/helper';
 
+@regApiType('API.')
 class Place {
     id: string
     name: string
@@ -32,6 +31,7 @@ class Place {
     }
 }
 
+@regApiType('API.')
 class AirCompany {
     id: string
     name: string
@@ -46,6 +46,7 @@ class AirCompany {
     }
 }
 
+@regApiType('API.')
 class Airport {
     id: string
     name: string

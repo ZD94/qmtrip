@@ -38,7 +38,7 @@ describe("api/client/tripPlan.js", function() {
             API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})
         ])
             .spread(function(ret1, ret2, ret3){
-                return API.agency.registerAgency(agency);
+                return API.agency.createAgency(agency);
             })
             .then(function(ret){
                 agencyId = ret.agency.id;
@@ -71,6 +71,79 @@ describe("api/client/tripPlan.js", function() {
                 throw err;
             })
             .done();
+    });
+
+    describe("editTripPlanBudget", function(){
+        var _tripPlanOrder = {
+            deptCity: '北京',
+            arrivalCity: '上海',
+            deptCityCode: 'BJ123',
+            arrivalCityCode: 'SH123',
+            startAt: '2016-01-07 10:22:00',
+            title: '审核发票用测试',
+            budget: -1,
+            hotel: [{
+                type: 0,
+                startTime: '2016-01-07 10:22:00',
+                endTime: '2016-01-30 11:12:34',
+                city: '北京市',
+                cityCode: 'BJ123',
+                hotelName: '丐帮总部',
+                invoiceType: 'HOTEL',
+                budget: -1,
+                newInvoice: '票据详情'
+            }]
+        };
+        var new_trip_plan_id = '';
+        var new_consume_id = '';
+
+        before(function(done) {
+            API.client.tripPlan.saveTripPlan.call({accountId: staffId}, _tripPlanOrder)
+                .then(function(trip_plan) {
+                    new_trip_plan_id = trip_plan.id;
+                    new_consume_id = trip_plan.hotel[0].id;
+                    done();
+                })
+                .catch(function(err) {
+                    throw err;
+                }).done();
+        });
+
+        after(function(done) {
+            API.tripPlan.deleteTripPlan({orderId: new_trip_plan_id, userId: staffId})
+                .then(function(){
+                    done()
+                })
+                .catch(function(err){
+                    throw err;
+                })
+                .done();
+        });
+
+        it("#editTripPlanBudget should be ok", function(done) {
+            var self = {accountId: agencyUserId};
+            API.client.tripPlan.editTripPlanBudget.call(self, {id: new_consume_id, budget: '3333'}, function(err, ret){
+                if (err) {
+                    throw err;
+                }
+                assert.equal(ret, true);
+                done();
+            })
+        });
+
+        it("#editTripPlanBudget should be error if params.budget is null", function(done) {
+            var self = {accountId: agencyUserId};
+            API.client.tripPlan.editTripPlanBudget.call(self, {id: new_consume_id})
+                .then(function(ret) {
+                    assert.equal(ret, null);
+                    done();
+                })
+                .catch(function(err) {
+                    console.info("*******************");
+                    assert.equal(err.code, -1);
+                    done();
+                })
+        });
     });
 
     describe("saveTripPlan", function(){
