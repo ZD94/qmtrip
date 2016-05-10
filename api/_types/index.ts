@@ -74,3 +74,8 @@ class ModelsDelegate implements ModelsInterface {
 }
 export var Models = new ModelsDelegate();
 
+export * from "./company";
+export * from "./staff";
+export * from './travelPolicy';
+export * from './department';
+export * from './agency';

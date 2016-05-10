@@ -1,6 +1,6 @@
 
 var Cookie = require('tiny-cookie');
-var API = require('api');
+var API = require('common/api');
 API.onlogin(function(){
     var backurl = window.location.href;
     backurl = encodeURIComponent(backurl);

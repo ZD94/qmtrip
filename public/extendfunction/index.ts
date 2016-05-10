@@ -1,6 +1,6 @@
 
 var Cookie = require('tiny-cookie');
-var API = require('api');
+var API = require('common/api');
 API.authenticate = function(remote, callback){
     var user_id = Cookie.get('user_id');
     var token_id = Cookie.get('token_id');

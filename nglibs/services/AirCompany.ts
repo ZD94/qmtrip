@@ -1,7 +1,7 @@
 
 import angular = require('angular');
 
-var API = require("api");
+var API = require('common/api');
 API.require("place");
 
 angular

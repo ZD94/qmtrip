@@ -23,10 +23,10 @@ gulplib.bundle_lib('base', {ex: true, ts: false, require:['q', 'bluebird', 'md5'
 
 gulplib.bundle_lib('preload', {ex: true, ts: false, require:['dyload', 'babel-polyfill', 'common/ts_helper', 'common/zone']});
 
-gulplib.bundle_lib('api', {require:['./common/client/api.js:api']});
+gulplib.bundle_lib('api', {require:['./common/client/api.js:common/api']});
 gulplib.bundle_lib('calendar', {require:['lunar-calendar', "calendar"]});
 gulplib.bundle_lib('msgbox', {require:['notie', 'msgbox']});
-gulplib.bundle_lib('nglibs', {require: ['nglibs', 'nglibs:common/models']});
+gulplib.bundle_lib('nglibs', {require: ['nglibs', 'nglibs/model:common/model']});
 gulplib.bundle_lib('ngapp', {require: ['./common/client/ngapp/index.ts:ngapp', 'browserspec']});
 
 gulplib.angular_app('staff');

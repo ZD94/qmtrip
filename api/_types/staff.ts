@@ -4,7 +4,6 @@ import { regApiType } from 'common/api/helper';
 import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
 import { Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
-import Sequelize = require("sequelize");
 
 export enum EStaffStatus {
     ON_JOB = 0,

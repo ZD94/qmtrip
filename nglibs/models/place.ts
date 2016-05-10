@@ -1,5 +1,5 @@
 
-var API = require('api');
+var API = require('common/api');
 
 import {ngService} from "./index";
 

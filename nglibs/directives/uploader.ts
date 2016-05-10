@@ -65,7 +65,7 @@ angular
             return {
                 restrict: 'A',
                 link: function(scope, element, attributes){
-                    var API = require('api');
+                    var API = require('common/api');
                     API.require('wechat');
                     API.onload(function(){
                         API.wechat.getJSDKParams({url:window.location.href, jsApiList:['chooseImage', 'uploadImage'], debug:false})

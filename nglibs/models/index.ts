@@ -1,20 +1,19 @@
 
-import ng = require('angular');
-
-import { ServiceInterface, ModelsInterface, Models } from 'api/_types/index';
-import {Staff} from 'api/_types/staff';
-import {Company} from 'api/_types/company';
-import { Department } from 'api/_types/department';
-import { TravelPolicy } from 'api/_types/travelPolicy';
-import { Agency, AgencyUser } from 'api/_types/agency';
-
 import * as ApiStaff from 'api/client/staff';
 import ApiCompany= require('api/client/company');
 import * as ApiDepartment from 'api/client/department';
 import * as ApiTravelPolicy from 'api/client/travelPolicy';
 import ApiAgency = require('api/client/agency');
 
-const API = require('api');
+import ng = require('angular');
+
+import {
+    ServiceInterface, ModelsInterface, Models,
+    Staff, Company, Department, TravelPolicy,
+    Agency, AgencyUser
+} from 'api/_types';
+
+const API = require('common/api');
 
 async function requireAPI<T>(name) {
     if(!API[name]){
