@@ -1,6 +1,6 @@
 'use strict';
 
-var API = require('api');
+var API = require('common/api');
 var msgbox = require('msgbox');
 
 API.require('auth');

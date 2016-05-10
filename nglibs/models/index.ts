@@ -14,7 +14,7 @@ import * as ApiDepartment from 'api/client/department';
 import * as ApiTravelPolicy from 'api/client/travelPolicy';
 import * as ApiAgency from 'api/client/agency';
 
-const API = require('api');
+const API = require('common/api');
 
 async function requireAPI<T>(name) {
     if(!API[name]){
