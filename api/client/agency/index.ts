@@ -10,15 +10,14 @@ let logger = new Logger("client/agency");
 
 import _ = require('lodash');
 import {requireParams} from 'common/api/helper';
+import {requirePermit} from 'api/_decorator';
+
 import {Agency, AgencyUser, AGENCY_STATUS} from "api/_types/agency";
-import {requirePermit} from '../../permit';
 
 /**
  * @class agency 代理商
  */
-class _AgentService {
-
-
+class ApiAgency {
     /**
      * @method registerAgency
      *
@@ -84,7 +83,7 @@ class _AgentService {
      * @param params
      * @returns {Promise<string[]>}
      */
-    static async listAgency(){
+    static async listAgency(params?: any){
         let self: any = this;
         let list = await API.agency.listAgency({});
         return list.map(function(agency) {
@@ -139,21 +138,6 @@ class _AgentService {
         return API.agency.updateAgency(params);
     }
 
-
-    /* @method listAgency
-     * 查询代理商列表
-     * @param params
-     * @returns {Promise<string[]>}
-     */
-    static async listAgency(params){
-        let self = this;
-        let list = await API.agency.listAgency({});
-        
-        return list.map(function(agency) {
-            return agency.id;
-        })
-    }
-
     /**
      * @method deleteAgency
      * 删除代理商信息
@@ -172,7 +156,7 @@ class _AgentService {
     static async createAgencyUser(params: Agency) {
         let self: any = this;
         let accountId = self.accountId;
-        let user = await API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']});
+        let user =  await API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']});
         let agencyUser = new AgencyUser(params);
         agencyUser.agencyId = user.agencyId;
 
@@ -277,9 +261,14 @@ class _AgentService {
         params.agencyId = user.agencyId;
         return API.agency.listAndPaginateAgencyUser(params);
     }
+
+    static async find(params: any) {
+        let arr: string[] = [];
+        return arr;
+    }
 }
 
-export= _AgentService;
+export {ApiAgency}
 
 
 

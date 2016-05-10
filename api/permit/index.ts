@@ -17,6 +17,16 @@ const ROLE_ID = {
 
 // var permit = module.exports = {};
 
+class Role {
+    name: string
+    permission: string| string[]
+
+    constructor(obj: any) {
+        this.name = obj.name;
+        this.permission = obj.permission;
+    }
+}
+
 var roles = {
     staff: {
         name: '普通员工',
@@ -89,7 +99,7 @@ updateRole(agency_roles);
  * @param {Object} data
  * @param {UUID} data.accountId 账号ID
  */
-function getRoleOfAccount(data) {
+function getRoleOfAccount(data) : Promise<Role>{
     var accountId = data.accountId;
     var s: any = {}
     return API.staff.getStaff({id:data.accountId})
@@ -97,13 +107,13 @@ function getRoleOfAccount(data) {
             s = staff;
             return API.company.getCompany({companyId: staff.companyId});
         })
-        .then(function(company: any) {
+        .then(function(company) {
             if (company.createUser == accountId) {
-                return roles.owner;
+                return new Role(roles.owner);
             }else if(s.roleId == ROLE_ID.ADMIN){
-                return roles.admin;
+                return new Role(roles.admin);
             }else{
-                return roles.staff;
+                return new Role(roles.staff);
             }
         });
 }
@@ -195,31 +205,9 @@ export function checkPermission(params) {
             if(role == undefined)
                 throw L.ERR.NOT_FOUND;
             for(var p of permissions){
-                if(role.permission[p] != true)
+                if(role.permission.indexOf(p) < 0)
                     throw L.ERR.PERMISSION_DENY;
             }
             return true;
         });
 };
-
-
-//角色名称
-export function requirePermit(permits, type) {
-    return function(target, key, desc) {
-        let self = this;
-        let fn = desc.value;
-        desc.value = function() {
-            let args = arguments;
-            let zone = Zone.current;
-            let session = zone.session;
-            if (!session["accountId"] || !session["tokenId"]) {
-                return Promise.reject(`{"code": 403, "msg":"permit deny!"}`);
-            }
-
-            let accountId = session["accountId"];
-            return checkPermission({accountId: accountId, permissions: permits, type: type})
-                .then(fn.call(self, args));
-        }
-        return desc;
-    }
-}

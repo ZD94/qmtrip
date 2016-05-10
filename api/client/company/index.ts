@@ -5,13 +5,13 @@
 import L = require("common/language");
 import Logger = require('common/logger');
 import {requireParams} from "common/api/helper";
+import {requirePermit} from 'api/_decorator';
 import {Company, COMPANY_STATUS} from "api/_types/company";
-import {requirePermit} from "../../permit/index";
 
 let API = require('common/api');
 let uuid = require("node-uuid");
 
-class _CompanyService {
+class ApiCompany {
 
     /**
      * @method createCompany
@@ -30,7 +30,7 @@ class _CompanyService {
      */
     @requireParams(['mobile', 'name', 'email', 'userName'], ['pwd', 'remark', 'description'])
     static async createCompany(params: {mobile: string, name: string, email: string, domain: string,
-        userName: string, pwd: string, remark: string, description: string}) {
+        userName: string, pwd?: string, remark?: string, description?: string}) {
 
         let self:any = this;
         let accountId = self.accountId;
@@ -211,4 +211,4 @@ class _CompanyService {
     }
 }
 
-export= _CompanyService
+export {ApiCompany}
