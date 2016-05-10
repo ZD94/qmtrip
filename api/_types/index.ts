@@ -4,6 +4,12 @@ import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
 import { Agency, AgencyUser } from './agency';
 
+export * from "./company";
+export * from "./staff";
+export * from './travelPolicy';
+export * from './department';
+export * from './agency';
+
 export interface ModelObject {
     save(): Promise<void>;
     destroy(): Promise<any>;

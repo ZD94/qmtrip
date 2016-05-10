@@ -188,7 +188,7 @@ export function updateStaff(params) {
  * 企业根据id得到员工信息
  * @type {*}
  */
-export function getStaff(params) {
+export function getStaff(params): Promise<Staff> {
         var user_id = this.accountId;
         var id = params.id;
         return API.auth.judgeRoleById({id:user_id})
