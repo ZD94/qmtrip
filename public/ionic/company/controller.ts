@@ -27,8 +27,8 @@ export function EditpolicyController($scope){
 
 }
 
-export function StaffsController($scope){
-
+export function StaffsController($scope,Models){
+    console.info(Models.company.getStaffs());
 }
 
 export function StaffdetailController($scope){
