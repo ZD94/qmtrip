@@ -51,23 +51,21 @@ export async function IndexController($scope,Menu,$ionicPopup, Models){
     for( var i =0;i<items.length;i++){
         Menu.add(items[i]);
     }
-    console.info(Models);
     var staff = await Models.staff.get(Cookie.get('user_id'));
-    console.info(staff);
-    staff = staff.target;
-    console.info(staff);
+    var policy = await staff.getTravelPolicy();
     $scope.alertShow = function () {
         var show = $ionicPopup.alert({
             title: '差旅标准',
-            template: staff.name +
+            template: '飞机:' +policy.planeLevel +
             '<br>' +
-            '住宿:三星级' +
+            '火车:' +policy.trainLevel +
+            '<br>' +
+            '住宿:'+policy.hotelLevel +
             '<br>' +
             '补助:5000/天'
         })
     }
-
+    console.info(staff);
     $scope.Menu = Menu;
     $scope.staff = staff;
-    console.info(($scope.staff))
 }

@@ -1,1 +1,0 @@
-alter table agency.agency_user alter column role_id set default 1;

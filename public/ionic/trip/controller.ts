@@ -4,7 +4,7 @@
 "use strict";
 
 export function BudgetController($scope){
-
+    
 }
 
 export function CitySelectorController($scope){
