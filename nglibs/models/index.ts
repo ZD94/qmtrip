@@ -227,7 +227,7 @@ class AgencyService extends ClientService<Agency>{
 
 class AgencyUserService extends ClientService<AgencyUser>{
     constructor($cacheFactory: ng.ICacheFactoryService){
-        super($cacheFactory('staff'));
+        super($cacheFactory('agencyuser'));
     }
 
     async $create(obj: Object): Promise<AgencyUser>{

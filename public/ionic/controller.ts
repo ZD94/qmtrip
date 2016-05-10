@@ -1,7 +1,7 @@
 "use strict";
 var Cookie = require('tiny-cookie');
 
-export async function IndexController($scope,Menu,$ionicPopup, StaffService){
+export async function IndexController($scope,Menu,$ionicPopup, Models){
     require('./index.less');
     var items =[
         {
@@ -51,8 +51,11 @@ export async function IndexController($scope,Menu,$ionicPopup, StaffService){
     for( var i =0;i<items.length;i++){
         Menu.add(items[i]);
     }
-    var staff = await StaffService.get(Cookie.get('user_id'));
-
+    console.info(Models);
+    var staff = await Models.staff.get(Cookie.get('user_id'));
+    console.info(staff);
+    staff = staff.target;
+    console.info(staff);
     $scope.alertShow = function () {
         var show = $ionicPopup.alert({
             title: '差旅标准',
@@ -65,6 +68,6 @@ export async function IndexController($scope,Menu,$ionicPopup, StaffService){
     }
 
     $scope.Menu = Menu;
-    $scope.staff = await StaffService.get(Cookie.get('user_id'));
+    $scope.staff = staff;
     console.info(($scope.staff))
 }
