@@ -1,1 +1,0 @@
-update company.company set agency_id=null where agency_id='00000000-0000-0000-0000-000000000001';
