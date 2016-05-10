@@ -222,23 +222,3 @@ export function getQRCodeUrl(params:{backUrl:string}):Promise<string> {
 export function isEmailUsed(params:{email:string; type:number}):Promise<boolean> {
     return API.auth.isEmailUsed(params);
 }
-
-
-/**
- * 验证代理商权限
- * @param permissions
- * @param fn
- * @returns {Function}
- * @private
- */
-export function checkAgencyPermission(permissions, fn) {
-    return function() {
-        var args = arguments;
-        var self = this;
-        var accountId = self.accountId;
-        return API.permit.checkPermission({accountId: accountId, permission: permissions, type: 2})
-            .then(function() {
-                return fn.apply(self, args);
-            });
-    }
-}

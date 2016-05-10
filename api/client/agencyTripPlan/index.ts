@@ -111,7 +111,6 @@ export function pageTripPlans(params){
  * @param params.userId 用户id
  * @returns {*|*|Promise}
  */
-// agencyTripPlan.approveInvoice = checkAgencyPermission("tripPlan.approveInvoice",
 export function approveInvoice(params){
     let self = this;
     let user_id = self.accountId;
