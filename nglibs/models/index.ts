@@ -9,10 +9,10 @@ import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Agency, AgencyUser } from 'api/_types/agency';
 
 import * as ApiStaff from 'api/client/staff';
-import {ApiCompany} from 'api/client/company';
+import ApiCompany= require('api/client/company');
 import * as ApiDepartment from 'api/client/department';
 import * as ApiTravelPolicy from 'api/client/travelPolicy';
-import {ApiAgency} from 'api/client/agency';
+import ApiAgency = require('api/client/agency');
 
 const API = require('api');
 
