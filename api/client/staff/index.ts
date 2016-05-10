@@ -223,6 +223,36 @@ export function getStaff(params) {
 
     }
 
+/**
+ * @method getStaffs
+ *
+ * 根据查询条件得到员工信息
+ * @type {*}
+ */
+export function getStaffs(params) {
+        var user_id = this.accountId;
+        return API.auth.judgeRoleById({id:user_id})
+            .then(function(role){
+                if(role == L.RoleType.STAFF){
+                    return API.staff.getStaff({id:user_id})
+                        .then(function(sf){
+                            params.companyId = sf.companyId;
+                            return API.staff.getStaffs(params)
+                        })
+                }else{
+                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
+                        .then(function(result){
+                            if(result){
+                                return API.staff.getStaffs(params)
+                            }else{
+                                throw {code: -1, msg: '无权限'};
+                            }
+                        })
+                }
+            })
+
+    }
+
 /*export function agencyGetStaff(params){
     var user_id = this.accountId;
     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})

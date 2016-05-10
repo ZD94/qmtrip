@@ -33,7 +33,7 @@ class _AgentService {
      * 填，如果手机号和邮箱在全麦注册过，则密码还是以前的密码
      * @returns {Promise} true||error
      */
-    @requireParams(['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd', 'id'])
+    @requireParams(['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd'])
     static async registerAgency(params: {name: string, email: string, mobile: string, userName: string, description?: string,
     remark?: string, pwd?: string}){
         let email = params.email;
@@ -87,10 +87,40 @@ class _AgentService {
     static async listAgency(){
         let self: any = this;
         let list = await API.agency.listAgency({});
-
         return list.map(function(agency) {
             return agency.id;
         })
+    }
+    
+    /**
+     *
+     * @param params
+     */
+    static async create(params) {
+        let email = params.email;
+        let mobile = params.mobile;
+        let password = params.pwd || "123456";
+        let ACCOUNT_TYPE : number = 2; //账号类型，2为代理商账号
+        let account = await API.auth.checkAccExist({type: ACCOUNT_TYPE, $or: [{mobile: mobile}, {email: email}]});
+    
+        if(!account) {
+            let _account : any = {email: email, mobile: mobile, pwd: password, type: ACCOUNT_TYPE};
+            account = await API.auth.newAccount(_account);
+        }
+    
+        params.id = account.id;
+        params.creaeUser = account.id;
+        
+        let agency = await API.agency.create(params);
+        let _agencyUser: any = _.pick(params, ['email', 'mobile', 'sex', 'avatar', '']);
+        _agencyUser.id = account.id;
+        _agencyUser.agencyId = agency.id;
+        _agencyUser.roleId = 0;
+        _agencyUser.name = params.userName;
+    
+        await API.agency.createAgencyUser(_agencyUser);
+    
+        return agency;
     }
 
 
@@ -110,7 +140,19 @@ class _AgentService {
     }
 
 
-
+    /* @method listAgency
+     * 查询代理商列表
+     * @param params
+     * @returns {Promise<string[]>}
+     */
+    static async listAgency(params){
+        let self = this;
+        let list = await API.agency.listAgency({});
+        
+        return list.map(function(agency) {
+            return agency.id;
+        })
+    }
 
     /**
      * @method deleteAgency
@@ -125,8 +167,6 @@ class _AgentService {
 
         return API.agency.deleteAgency(params);
     }
-
-
 
     @requirePermit("user.add", 2)
     static async createAgencyUser(params: Agency) {

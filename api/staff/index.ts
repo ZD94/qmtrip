@@ -34,16 +34,17 @@ export class StaffService implements ServiceInterface<Staff>{
         return API.staff.createStaff(obj);
     }
     async get(id: string): Promise<Staff>{
-        return API.staff.getStaff(id);
+        return API.staff.getStaff({id: id});
     }
     async find(where: any): Promise<Staff[]>{
-        return API.staff.find(where);
+        return API.staff.getStaffs(where);
     }
     async update(id: string, fields: Object): Promise<any> {
-        return API.staff.update(id, fields);
+        fields[id] = id;
+        return API.staff.updateStaff(fields);
     }
     async destroy(id: string): Promise<any> {
-        return API.staff.delete(id);
+        return API.staff.deleteStaff({id: id});
     }
 }
 
@@ -269,7 +270,7 @@ export function getCountByDepartment(params: {departmentId: string}){
  * @param params
  * @returns {*}
  */
-export function findStaffs(params){
+export function getStaffs(params){
     var options : any = {};
     options.where = _.pick(params, Object.keys(staffModel.attributes));
     if(params.$or) {

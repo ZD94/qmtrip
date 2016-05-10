@@ -45,7 +45,7 @@ describe("api/client/department.js", function() {
                 API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})
             ])
             .spread(function(ret1, ret2, ret3){
-                return API.agency.registerAgency(agency);
+                return API.agency.createAgency(agency);
             })
             .then(function(ret){
                 agencyUserId = ret.agencyUser.id;
@@ -210,6 +210,14 @@ describe("api/client/department.js", function() {
 //查询所有子级部门集合
     it("#getAllChildDepartments should be ok", function(done) {
         API.client.department.getAllChildDepartments.call(self, {parentId: parentId_f}, function(err, result) {
+            assert.equal(err, null);
+//                console.log(result);
+            done();
+        });
+
+//根据条件查询部门集合
+    it("#getDepartments should be ok", function(done) {
+        API.client.department.getDepartments.call(self, {parentId: parentId_f}, function(err, result) {
             assert.equal(err, null);
 //                console.log(result);
             done();

@@ -54,7 +54,7 @@ describe("api/client/staff.js", function() {
                 API.staff.deleteAllStaffByTest({email: obj.email, mobile: obj.mobile})
             ])
             .spread(function(ret1, ret2, ret3, ret4, ret5){
-                return API.agency.registerAgency(agency);
+                return API.agency.createAgency(agency);
             })
             .then(function(ret){
                 agencyId = ret.agency.id;
@@ -111,6 +111,16 @@ describe("api/client/staff.js", function() {
             //console.log(err);
             //console.log(result);
 //                console.log(result.items);//item dataValues里存放的才是记录信息
+            done();
+        });
+    })
+
+    //根据条件查询员工集合
+    it("#getStaffs should be ok", function(done) {
+        API.client.staff.getStaffs.call(ownerSelf, {name: "123"}, function(err, result) {
+            assert.equal(err, null);
+            //console.log(err);
+            //console.log(result);
             done();
         });
     })

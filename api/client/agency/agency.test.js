@@ -11,7 +11,7 @@ var agencyUserId = '';
 describe("api/client/agency.js", function() {
 
 
-    describe("registerAgency", function() {
+    describe("createAgency", function() {
 
         var agency = {
             email: "agency.test@jingli.tech",
@@ -38,16 +38,16 @@ describe("api/client/agency.js", function() {
             })
         });
 
-        it("#registerAgency should be error with wrong params", function(done) {
-            API.client.agency.registerAgency({}, function(err, ret) {
+        it("#createAgency should be error with wrong params", function(done) {
+            API.client.agency.createAgency({}, function(err, ret) {
                 assert.equal(ret, null);
                 assert.equal(err.code, -1);
                 done();
             });
         });
 
-        it("#registerAgency should be ok with correct params", function(done) {
-            API.client.agency.registerAgency(agency, function(err, ret) {
+        it("#createAgency should be ok with correct params", function(done) {
+            API.client.agency.createAgency(agency, function(err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -90,7 +90,7 @@ describe("api/client/agency.js", function() {
                 API.agency.deleteAgencyByTest({email: 'agencyUser.test@jingli.tech', mobile: agency.mobile})
             ])
                 .spread(function(ret1, ret2){
-                    return API.client.agency.registerAgency(agency)
+                    return API.client.agency.createAgency(agency)
                 })
                 .then(function(ret){
                     assert.equal(ret.agency.status, 0);
@@ -119,7 +119,7 @@ describe("api/client/agency.js", function() {
 
         it("#updateAgency should be ok", function(done) {
             var self = {accountId: agencyUserId};
-            API.client.agency.updateAgency.call(self, {agencyId: agencyId, status: '1', remark: '代理商更新测试', wrongParams: 'wrongParams'}, function(err, ret) {
+            API.client.agency.update.call(self, {agencyId: agencyId, status: '1', remark: '代理商更新测试', wrongParams: 'wrongParams'}, function(err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -222,7 +222,7 @@ describe("api/client/agency.js", function() {
 
 
         it("deleteAgency should be ok", function (done) {
-            API.client.agency.deleteAgency.call({accountId: agencyUserId}, {agencyId: agencyId}, function (err, ret) {
+            API.client.agency.destroy.call({accountId: agencyUserId}, {agencyId: agencyId}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -251,7 +251,7 @@ describe("api/client/agency.js", function() {
                 API.agency.deleteAgencyByTest({email: 'agencyUser.test@jingli.tech', mobile: agency.mobile})
             ])
                 .spread(function(ret1, ret2){
-                    return API.client.agency.registerAgency(agency)
+                    return API.client.agency.createAgency(agency)
                 })
                 .then(function(ret){
                     assert.equal(ret.agency.status, 0);

@@ -38,13 +38,14 @@ export class CompanyService implements ServiceInterface<Company>{
         return API.company.getCompany(id);
     }
     async find(where: any): Promise<Company[]>{
-        return API.company.find(where);
+        return API.company.listCompany(where);
     }
     async update(id: string, fields: Object): Promise<any> {
-        return API.company.update(id, fields);
+        fields['companyId'] = id;
+        return API.company.updateCompany(fields);
     }
     async destroy(id: string): Promise<any> {
-        return API.company.delete(id);
+        return API.company.deleteCompany({companyId: id});
     }
 }
 
@@ -133,7 +134,7 @@ export function isBlackDomain(params) {
  * @param params
  * @returns {*}
  */
-export async function updateCompany(params : {companyId: string}){
+export async function updateCompany(params){
     let companyId = params.companyId;
     let company = await CompanyModel.findById(companyId, {attributes: ['createUser', 'status']});
     
@@ -236,7 +237,7 @@ export async function checkAgencyCompany(params){
  * @param params
  * @returns {*}
  */
-validateApi(deleteCompany, ['companyId', 'userId']);
+validateApi(deleteCompany, ['companyId'], ['userId']);
 export function deleteCompany(params){
     var companyId = params.companyId;
     var userId = params.userId;
