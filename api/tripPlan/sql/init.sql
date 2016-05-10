@@ -345,7 +345,7 @@ CREATE TABLE tripplan.trip_plan_logs
 (
   id uuid primary key,
   order_id uuid,
-  details_id,
+  details_id uuid,
   user_id uuid,
   remark character varying,
   create_at timestamp without time zone

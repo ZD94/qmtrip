@@ -223,27 +223,6 @@ export function isEmailUsed(params:{email:string; type:number}):Promise<boolean>
     return API.auth.isEmailUsed(params);
 }
 
-/**
- * @method checkPermission
- *
- * 权限控制
- *
- * @param fn
- * @param permissions
- * @return {Function}
- * @private
- */
-export function checkPermission(permissions, fn) {
-    return function() {
-        var args = arguments;
-        var self = this;
-        var accountId = self.accountId;
-        return API.permit.checkPermission({accountId: accountId, permission: permissions})
-            .then(function() {
-                return fn.apply(self, args);
-            });
-    }
-}
 
 /**
  * 验证代理商权限
