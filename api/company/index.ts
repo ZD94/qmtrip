@@ -14,10 +14,9 @@ let utils = require("common/utils");
 let Paginate = require("common/paginate").Paginate;
 let C = require("config");
 let API = require("common/api");
-// let company = {};
 
 import {validateApi} from "common/api/helper";
-import {COMPANY_STATUS, Company} from 'api/_types/company';
+import {ECompanyStatus, Company} from 'api/_types/company';
 import { ServiceInterface } from '../_types/index';
 
 let AGENCY_ROLE = {
@@ -87,7 +86,7 @@ export function domainIsExist(params) {
  * @param {String} params.domainName 域名,邮箱后缀
  * @returns {Promise}
  */
-validateApi(createCompany, ['createUser', 'name', 'domainName', 'mobile', 'email', 'agencyId'], ['id', 'description', 'telephone', 'remark'])
+validateApi(createCompany, ['createUser', 'name', 'domainName', 'mobile', 'email', 'agencyId'], ['id', 'description', 'telephone', 'remark']);
 export function createCompany(params){
     let _company = params;
     _company.id = _company.id || uuid.v1();

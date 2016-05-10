@@ -141,7 +141,7 @@ describe("api/client/company.js", function() {
 
             it("#getCompanyListByAgency should be ok", function(done) {
                 var self = {accountId: agencyUserId};
-                API.client.company.getCompanyListByAgency.call(self, function(err, ret){
+                API.client.company.getCompanyListByAgency.call(self, {}, function(err, ret){
                     if (err) {
                         throw err;
                     }

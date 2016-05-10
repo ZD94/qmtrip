@@ -95,6 +95,22 @@ export function createStaff(data){
         })
 }
 
+/**
+ * 创建staff
+ */
+validateApi(create, ['email', 'name', 'companyId'], staffCols);
+export async function create(params) {
+    params.id = params.id ? params.id : uuid.v1();
+
+    let _staff = await staffModel.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
+
+    if(_staff) {
+        throw {code: -2, msg: '邮箱或手机号已经注册'};
+    }
+
+    let staff = await staffModel.create(params);
+    return new Staff(staff);
+}
 
 /**
  * 删除员工

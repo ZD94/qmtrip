@@ -1,15 +1,9 @@
 'use strict';
 import { Models, ModelObject } from 'api/_types';
 import {Staff} from 'api/_types/staff';
-import * as apiCompany from 'api/client/company';
+import {Agency} from 'api/_types/agency';
 import { regApiType } from 'common/api/helper';
 import { Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
-
-export enum COMPANY_STATUS {
-    DELETE = -2,
-    UN_ACTIVE = 0, //未激活状态
-    ACTIVE = 1 //激活状态
-}
 
 export enum ECompanyStatus {
     DELETE = -2,
@@ -18,7 +12,7 @@ export enum ECompanyStatus {
 }
 
 
-@Table()
+@Table('Company', {tableName: "company", timestamps: false, schema: "company"})
 @regApiType('API.')
 export class Company implements ModelObject{
     target: Object;
@@ -91,7 +85,7 @@ export class Company implements ModelObject{
     set remark(val: string) {}
 
     @ResolveRef({type: Types.UUID}, Models.agency.get)
-    get agency(): Company { return null; }
+    get agency(): Agency { return null; }
 
     @Reference({type: Types.UUID}, 'staffs')
     getStaffs(): Promise<Staff[]> {

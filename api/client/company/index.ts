@@ -5,7 +5,7 @@
 import L = require("common/language");
 import Logger = require('common/logger');
 import {validateApi} from "common/api/helper";
-import {Company, COMPANY_STATUS} from "api/_types/company";
+import {Company, ECompanyStatus} from "api/_types/company";
 
 let API = require('common/api');
 let uuid = require("node-uuid");
@@ -41,17 +41,22 @@ export async function createCompany(params: {mobile: string, name: string, email
     let userName = params.userName;
     let pwd = params.pwd || '123456';
 
-    let agencyUser = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
+    let agencyUser = await API.agency.getAgencyUser({id: accountId});
     let account = await API.auth.newAccount({mobile: mobile, email: email, pwd: pwd, type: 1});
 
-    let _company = new Company(params);
-    _company.agencyId = agencyUser.agencyId;
-    _company.createUser = account.id;
-    _company.domainName = params.email.match(/.*\@(.*)/)[1]; //企业域名
+    params['agencyId'] = agencyUser.agencyId;
+    params['createUser'] = account.id;
+    params['domainName'] = params.email.match(/.*\@(.*)/)[1]; //企业域名
 
-    let company = await API.company.createCompany(_company);
-    let staff = await API.staff.createStaff({accountId: account.id, companyId: company.id, email: email, mobile: mobile, name: userName, roleId: 0});
-    let dept = await API.department.createDepartment({name: "我的企业", isDefault: true, companyId: company.id});
+    let company = await API.company.createCompany(params);
+    console.info(new Company(company));
+
+    if(company.domainName && company.domainName != "" && email.indexOf(company.domainName) == -1){
+        throw {code: -6, msg: "邮箱格式不符合要求"};
+    }
+
+    await API.staff.create({id: account.id, companyId: company.id, email: email, mobile: mobile, name: userName, roleId: 0});
+    await API.department.createDepartment({name: "我的企业", isDefault: true, companyId: company.id});
 
     return new Company(company);
 }
