@@ -209,11 +209,12 @@ describe("api/client/department.js", function() {
     })
 //查询所有子级部门集合
     it("#getAllChildDepartments should be ok", function(done) {
-        API.client.department.getAllChildDepartments.call(self, {parentId: parentId_f}, function(err, result) {
+        API.client.department.getAllChildDepartments.call(self, {parentId: parentId_f}, function (err, result) {
             assert.equal(err, null);
 //                console.log(result);
             done();
         });
+    })
 
 //根据条件查询部门集合
     it("#getDepartments should be ok", function(done) {
