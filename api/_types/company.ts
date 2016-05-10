@@ -1,8 +1,9 @@
 'use strict';
-import {Staff} from './staff';
-import {Models} from './index';
+import { Models, ModelObject } from 'api/_types';
+import {Staff} from 'api/_types/staff';
 import * as apiCompany from 'api/client/company';
 import { regApiType } from 'common/api/helper';
+import { Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
 
 export enum COMPANY_STATUS {
     DELETE = -2,
@@ -10,47 +11,95 @@ export enum COMPANY_STATUS {
     ACTIVE = 1 //激活状态
 }
 
-@regApiType('API.')
-export class Company {
-    id: string;
-    agencyId: string;
-    companyNo: number;
-    createUser: string;
-    name: string;
-    domainName: string;
-    description: string;
-    status: number;
-    email: string;
-    telephone: string;
-    mobile: string;
-    staffNum: number;
-    staffScore: number;
-    createAt: Date;
-    remark: string;
-    updateAt: Date;
+export enum ECompanyStatus {
+    DELETE = -2,
+    UN_ACTIVE = 0, //未激活状态
+    ACTIVE = 1 //激活状态
+}
 
-    constructor(params) {
-        this.id = params.id ? params.id : null;
-        this.agencyId = params.agencyId ? params.agencyId : null;
-        this.companyNo = params.companyNo;
-        this.createUser = params.createUser ? params.createUser : null;
-        this.name = params.name ? params.name : null;
-        this.domainName = params.domainName ? params.domainName : null;
-        this.domainName = this.domainName ? this.domainName : params.domain;
-        this.description = params.description ? params.description : null;
-        this.status = params.status ? params.status : 0;
-        this.email = params.email ? params.email : null;
-        this.telephone = params.telephone ? params.telephone : null;
-        this.mobile = params.mobile ? params.mobile : null;
-        this.staffNum = params.staffNum ? params.staffNum : 0;
-        this.staffScore = params.staffScore ? params.staffScore : 0;
-        this.createAt = params.createAt ? params.createAt : null;
-        this.remark = params.remark ? params.remark : null;
-        this.updateAt = params.updateAt ? params.updateAt : null;
-    };
-    
-    async getStaffs(): Promise<Staff[]> {
-        var company_api: typeof apiCompany = require('api/client/company');
-        return Models.staff.find({companyId: this.id});
+
+@Table()
+@regApiType('API.')
+export class Company implements ModelObject{
+    target: Object;
+    constructor(target: Object) {
+        this.target = target;
     }
+
+    @Field({type: Types.UUID})
+    get id(): string { return null; }
+    set id(val: string) {}
+
+    // '代理商id'
+    @Field({type: Types.UUID})
+    get agencyId(): string { return null; }
+    set agencyId(val: string) {}
+
+    // '企业编号'
+    @Field({type: Types.STRING(30)})
+    get companyNo(): string { return ''; }
+    set companyNo(val: string) {}
+
+    // '创建人id'
+    @Field({type: Types.UUID})
+    get createUser(): string { return null; }
+    set createUser(val: string) {}
+
+    // '企业名称'
+    @Field({type: Types.STRING})
+    get name(): string { return ''; }
+    set name(val: string) {}
+
+    // '企业域名'
+    @Field({type: Types.STRING})
+    get domainName(): string { return ''; }
+    set domainName(val: string) {}
+
+    // '企业描述'
+    @Field({type: Types.STRING})
+    get description(): string { return ''; }
+    set description(val: string) {}
+
+    // '企业状态'
+    @Field({type: Types.INTEGER})
+    get status(): ECompanyStatus { return 0; }
+    set status(val: ECompanyStatus) {}
+
+    // '企业邮箱'
+    @Field({type: Types.STRING})
+    get email(): string { return ''; }
+    set email(val: string) {}
+
+    // '创建人手机号'
+    @Field({type: Types.STRING})
+    get mobile(): string { return ''; }
+    set mobile(val: string) {}
+
+    // '员工数目'
+    @Field({type: Types.INTEGER})
+    get staffNum(): number { return 0; }
+    set staffNum(val: number) {}
+
+    // '员工积分'
+    @Field({type: Types.INTEGER})
+    get staffScore(): number { return 0; }
+    set staffScore(val: number) {}
+
+    // '备注'
+    @Field({type: Types.STRING})
+    get remark(): string { return ''; }
+    set remark(val: string) {}
+
+    @ResolveRef({type: Types.UUID}, Models.agency.get)
+    get agency(): Company { return null; }
+
+    @Reference({type: Types.UUID}, 'staffs')
+    getStaffs(): Promise<Staff[]> {
+        return Models.staff.find({});
+    }
+
+    @Update(Models.company.update)
+    save(): Promise<void> { return null; }
+    @Destroy(Models.company.destroy)
+    destroy(): Promise<void> { return null; }
 }
