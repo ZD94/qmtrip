@@ -414,7 +414,7 @@ describe("api/client/staff.js", function() {
     })
     //查询员工总数
     it("#agencyGetStaffCountByCompany should be ok", function(done) {
-        API.client.staff.agencyGetStaffCountByCompany.call(agencySelf, {companyId: companyId}, function(err, result) {
+        API.client.staff.getStaffCountByCompany.call(agencySelf, {companyId: companyId}, function(err, result) {
             assert.equal(err, null);
             //console.log(err);
             done();

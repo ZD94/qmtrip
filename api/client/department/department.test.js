@@ -214,6 +214,7 @@ describe("api/client/department.js", function() {
 //                console.log(result);
             done();
         });
+    })
 
 //根据条件查询部门集合
         it("#getDepartments should be ok", function (done) {
@@ -503,4 +504,3 @@ describe("api/client/department.js", function() {
             });
         })
     })
-})
