@@ -268,7 +268,7 @@ class ApiAgency {
     }
 }
 
-export {ApiAgency}
+export= ApiAgency
 
 
 

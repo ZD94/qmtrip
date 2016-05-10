@@ -1,7 +1,7 @@
 'use strict';
 import {Staff} from './staff';
 import {Models} from './index';
-import * as apiCompany from 'api/client/company';
+import apiCompany = require('api/client/company')
 import { regApiType } from 'common/api/helper';
 
 export enum COMPANY_STATUS {

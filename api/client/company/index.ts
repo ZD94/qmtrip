@@ -42,12 +42,14 @@ class ApiCompany {
         let agencyUser = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
         let account = await API.auth.newAccount({mobile: mobile, email: email, pwd: pwd, type: 1});
 
-        let _company = new Company(params);
+        // let _company = new Company(params);
+        let _company : any = {};
+        _company = params;
         _company.agencyId = agencyUser.agencyId;
         _company.createUser = account.id;
         _company.domainName = params.email.match(/.*\@(.*)/)[1]; //企业域名
 
-        let company = await API.company.createCompany(_company);
+        let company = await API.company.createCompany(params);
         let staff = await API.staff.createStaff({accountId: account.id, companyId: company.id, email: email, mobile: mobile, name: userName, roleId: 0});
         let dept = await API.department.createDepartment({name: "我的企业", isDefault: true, companyId: company.id});
 
@@ -94,6 +96,7 @@ class ApiCompany {
      */
     @requirePermit("company.query", 2)
     static async getCompanyListByAgency(params){
+        console.info(params);
         let self: any = this;
         let accountId = self.accountId;
         let page = params.page;
@@ -211,4 +214,4 @@ class ApiCompany {
     }
 }
 
-export {ApiCompany}
+export= ApiCompany
