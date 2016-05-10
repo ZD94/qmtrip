@@ -19,7 +19,7 @@ import {Agency, AgencyUser, AGENCY_STATUS} from "api/_types/agency";
  */
 class ApiAgency {
     /**
-     * @method registerAgency
+     * @method createAgency
      *
      * 注册代理商
      *
@@ -33,7 +33,7 @@ class ApiAgency {
      * @returns {Promise} true||error
      */
     @requireParams(['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd'])
-    static async registerAgency(params: {name: string, email: string, mobile: string, userName: string, description?: string,
+    static async createAgency(params: {name: string, email: string, mobile: string, userName: string, description?: string,
     remark?: string, pwd?: string}){
         let email = params.email;
         let mobile = params.mobile;

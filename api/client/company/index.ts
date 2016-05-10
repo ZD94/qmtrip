@@ -32,7 +32,6 @@ class ApiCompany {
     static async createCompany(params: {mobile: string, name: string, email: string, domain: string,
         userName: string, pwd?: string, remark?: string, description?: string}) {
 
-        console.info(params);
         let self: any = this;
         let accountId = self.accountId;
         let mobile = params.mobile;
@@ -67,6 +66,8 @@ class ApiCompany {
     @requirePermit("company.edit", 1)
     static async updateCompany(params){
         let self:any = this;
+        // console.info("*******************");
+        // console.info(self);
         let accountId = self.accountId;
         params.userId = accountId;
         let staff = await API.staff.getStaff({id: accountId, columns: ['companyId']});
