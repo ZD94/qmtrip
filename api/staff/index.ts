@@ -67,7 +67,6 @@ export function createStaff(data){
     if (data.mobile && !validate.isMobile(data.mobile)) {
         throw {code: -2, msg: "手机号格式不正确"};
      }
-    data = new Staff(data);
     return API.company.getCompany({companyId: data.companyId, columns: ['name','domainName']})
         .then(function(c){
             if(c.domainName && c.domainName != "" && data.email.indexOf(c.domainName) == -1){

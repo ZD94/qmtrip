@@ -9,13 +9,23 @@ var API = require("common/api");
 var L = require("common/language");
 var Q = require("q");
 
-var ROLE_ID = {
+const ROLE_ID = {
     OWNER: 0,
     STAFF: 1,
     ADMIN: 2
 };
 
-var permit = module.exports = {};
+// var permit = module.exports = {};
+
+class Role {
+    name: string
+    permission: string| string[]
+
+    constructor(obj: any) {
+        this.name = obj.name;
+        this.permission = obj.permission;
+    }
+}
 
 var roles = {
     staff: {
@@ -58,7 +68,6 @@ function expandRoleInherit(role){
         .forEach(function(parent_id){
             var parent = roles[parent_id];
             if(!parent){
-                logger.error('role %s inherit from %s, which not exists!', id, parent_id);
                 return;
             }
             expandRoleInherit(parent);
@@ -90,9 +99,9 @@ updateRole(agency_roles);
  * @param {Object} data
  * @param {UUID} data.accountId 账号ID
  */
-function getRoleOfAccount(data) {
+function getRoleOfAccount(data) : Promise<Role>{
     var accountId = data.accountId;
-    var s = {};
+    var s: any = {}
     return API.staff.getStaff({id:data.accountId})
         .then(function(staff) {
             s = staff;
@@ -100,11 +109,11 @@ function getRoleOfAccount(data) {
         })
         .then(function(company) {
             if (company.createUser == accountId) {
-                return roles.owner;
+                return new Role(roles.owner);
             }else if(s.roleId == ROLE_ID.ADMIN){
-                return roles.admin;
+                return new Role(roles.admin);
             }else{
-                return roles.staff;
+                return new Role(roles.staff);
             }
         });
 }
@@ -117,7 +126,7 @@ function getRoleOfAccount(data) {
  */
 function getRoleOfAgency(params){
     var accountId = params.accountId;
-    var u = {};
+    var u: any = {};
     return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
         .then(function(user){
             u = user;
@@ -140,7 +149,7 @@ function getRoleList(roles){
             return {id:id, name:roles[id].name};
         });
 }
-permit.listRoles = function(params) {
+export function listRoles( params, callback) {
     var type = params.type || 1;
     var list;
     switch(type){
@@ -164,7 +173,7 @@ permit.listRoles = function(params) {
  * @param {String} params.permission 要检查的权限
  * @param {String} params.type 权限所属 1.企业 2.代理商 默认 1.企业
  */
-permit.checkPermission = function(params) {
+export function checkPermission(params) {
     var accountId = params.accountId;
     var permissions = params.permission;
 
@@ -196,10 +205,9 @@ permit.checkPermission = function(params) {
             if(role == undefined)
                 throw L.ERR.NOT_FOUND;
             for(var p of permissions){
-                if(role.permission[p] != true)
+                if(role.permission.indexOf(p) < 0)
                     throw L.ERR.PERMISSION_DENY;
             }
             return true;
         });
 };
-

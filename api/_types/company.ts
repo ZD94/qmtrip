@@ -1,4 +1,5 @@
 'use strict';
+import apiCompany = require('api/client/company')
 import { Models, ModelObject } from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import {Agency} from 'api/_types/agency';
@@ -12,7 +13,7 @@ export enum ECompanyStatus {
 }
 
 
-@Table('Company', {tableName: "company", timestamps: false, schema: "company"})
+@Table('company.Company')
 @regApiType('API.')
 export class Company implements ModelObject{
     target: Object;
@@ -23,11 +24,6 @@ export class Company implements ModelObject{
     @Field({type: Types.UUID})
     get id(): string { return null; }
     set id(val: string) {}
-
-    // '代理商id'
-    @Field({type: Types.UUID})
-    get agencyId(): string { return null; }
-    set agencyId(val: string) {}
 
     // '企业编号'
     @Field({type: Types.STRING(30)})
@@ -84,12 +80,14 @@ export class Company implements ModelObject{
     get remark(): string { return ''; }
     set remark(val: string) {}
 
-    @ResolveRef({type: Types.UUID}, Models.agency.get)
-    get agency(): Agency { return null; }
 
-    @Reference({type: Types.UUID}, 'staffs')
+    @Reference({type: Types.UUID})
+    getAgency(id?:string): Promise<Agency> {
+        return Models.agency.get(id);
+    }
+
     getStaffs(): Promise<Staff[]> {
-        return Models.staff.find({});
+        return Models.staff.find({companyId: this.id});
     }
 
     @Update(Models.company.update)

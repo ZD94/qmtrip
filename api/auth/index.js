@@ -338,10 +338,15 @@ authServer.newAccount = function(data) {
         throw L.ERR.DATA_NOT_EXIST;
     }
 
+    console.info("*********************");
+    console.info(data.email);
+
     if (!data.email) {
         throw L.ERR.EMAIL_EMPTY;
     }
 
+    console.info("*********************");
+    console.info(data.email);
     if (!validate.isEmail(data.email)) {
         throw L.ERR.EMAIL_EMPTY;
     }

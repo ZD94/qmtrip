@@ -21,7 +21,6 @@ describe("api/client/company.js", function() {
     var company = {
         name: '喵喵的企业',
         userName: '喵喵',
-        domain: 'jingli.tech',
         description: '企业API测试用',
         email: 'company.test@jingli.tech',
         mobile: '15269866802'
