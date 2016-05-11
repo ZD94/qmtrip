@@ -39,11 +39,11 @@ describe("api/client/agency.js", function() {
         });
 
         it("#createAgency should be error with wrong params", function(done) {
-            API.client.agency.createAgency({}, function(err, ret) {
-                assert.equal(ret, null);
-                assert.equal(err.code, -1);
-                done();
-            });
+            API.client.agency.createAgency({})
+                .catch(function(err) {
+                    assert.equal(err.code, -1);
+                    done();
+                })
         });
 
         it("#createAgency should be ok with correct params", function(done) {
@@ -52,23 +52,14 @@ describe("api/client/agency.js", function() {
                     throw err;
                 }
                 
-                assert.equal(ret.agency.status, 0);
-                var agencyId = ret.agency.id;
-                var agencyUserId = ret.agencyUser.id;
+                assert.equal(ret.target.status, 0);
+                // var agencyId = ret.agency.id;
+                // var agencyUserId = ret.agencyUser.id;
+                var agencyId = ret.target.id;
+                var agencyUserId = ret.target.createUser;
                 done();
             });
         });
-
-        // it("#createAgencyTest should be ok with correct params", function(done) {
-        //     API.client.agency.createAgency(agency, function(err, ret) {
-        //         if (err) {
-        //             throw err;
-        //         }
-        //
-        //         assert.equal(ret.agency.status, 0);
-        //         done();
-        //     });
-        // });
 
     });
 
@@ -93,9 +84,9 @@ describe("api/client/agency.js", function() {
                     return API.client.agency.createAgency(agency)
                 })
                 .then(function(ret){
-                    assert.equal(ret.agency.status, 0);
-                    agencyId = ret.agency.id;
-                    agencyUserId = ret.agencyUser.id;
+                    assert.equal(ret.target.status, 0);
+                    agencyId = ret.target.id;
+                    agencyUserId = ret.target.createUser;
                     done();
                 })
                 .catch(function(err){
@@ -119,7 +110,7 @@ describe("api/client/agency.js", function() {
 
         it("#updateAgency should be ok", function(done) {
             var self = {accountId: agencyUserId};
-            API.client.agency.update.call(self, {agencyId: agencyId, status: '1', remark: '代理商更新测试', wrongParams: 'wrongParams'}, function(err, ret) {
+            API.client.agency.updateAgency.call(self, {agencyId: agencyId, status: '1', remark: '代理商更新测试', wrongParams: 'wrongParams'}, function(err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -222,7 +213,7 @@ describe("api/client/agency.js", function() {
 
 
         it("deleteAgency should be ok", function (done) {
-            API.client.agency.destroy.call({accountId: agencyUserId}, {agencyId: agencyId}, function (err, ret) {
+            API.client.agency.deleteAgency.call({accountId: agencyUserId}, {agencyId: agencyId}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -254,9 +245,9 @@ describe("api/client/agency.js", function() {
                     return API.client.agency.createAgency(agency)
                 })
                 .then(function(ret){
-                    assert.equal(ret.agency.status, 0);
-                    _agencyId = ret.agency.id;
-                    _agencyUserId = ret.agencyUser.id;
+                    assert.equal(ret.target.status, 0);
+                    _agencyId = ret.target.id;
+                    _agencyUserId = ret.target.createUser;
                 })
                 .then(function(){
                     return  API.client.agency.createAgencyUser.call({accountId: _agencyUserId},

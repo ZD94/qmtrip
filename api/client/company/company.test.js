@@ -151,6 +151,7 @@ describe("api/client/company.js", function() {
 
             it("#updateCompany should be ok", function(done) {
                 var self = {accountId: ownerUserId};
+                // Zone.current.fork();
                 API.client.company.updateCompany.call(self, {companyId: companyId, status: 1, address: '更新企业测试'}, function(err, ret){
                     if(err){
                         throw err;
