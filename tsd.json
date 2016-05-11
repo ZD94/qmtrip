@@ -4,9 +4,5 @@
   "ref": "master",
   "path": "typings",
   "bundle": "typings/tsd.d.ts",
-  "installed": {
-    "core-decorators/core-decorators.d.ts": {
-      "commit": "277fe1f3a350c4d9f39edf83443e3c98f0f95fb8"
-    }
-  }
+  "installed": {}
 }
