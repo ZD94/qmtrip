@@ -83,10 +83,11 @@ export class Staff implements ModelObject{
 
     @ResolveRef({type: Types.UUID}, Models.department.get)
     get department(): Department { return null; }
+    set department(val: Department) {}
 
     @Reference({type: Types.UUID}, 'travelLevel')
     getTravelPolicy(id?:string): Promise<TravelPolicy> {
-        return Models.travelPolicy.get(this['travelLevel']);
+        return Models.travelPolicy.get(id);
     }
 
     @Update(Models.staff.update)
