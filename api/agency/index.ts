@@ -62,57 +62,6 @@ export class AgencyUserService implements ServiceInterface<AgencyUser>{
     }
 }
 
-// /**
-//  * 注册代理商，生成代理商id
-//  * @param params
-//  */
-// agency.createAgency = function(params){
-//     let agency = new Agency(params);
-//     let agencyId = uuid.v1() || params.agencyId;
-//     agency.id = agencyId;
-//     let pwd = params.pwd || '123456';
-//     let mobile = params.mobile;
-//     let email = params.email;
-//     let account = {email: email, mobile: mobile, pwd: pwd, type: 2, status: params.status || EAgencyStatus.UN_ACTIVE};
-//     let agencyUser  = new AgencyUser({agencyId: agencyId, name: params.userName, mobile: mobile, email: email, 
-//         status: params.status || EAgencyStatus.UN_ACTIVE, roleId: 0});
-//
-//     return API.auth.checkAccExist({type: 2, $or: [{mobile: mobile}, {email: email}]})
-//         .then(function(ret){
-//             if(!ret){
-//                 return API.auth.newAccount(account);
-//             }else{
-//                 return ret;
-//             }
-//         })
-//         .then(function(account){
-//             var accountId = account.id;
-//             agency.createUser = accountId;
-//             agencyUser.id = accountId;
-//
-//             return sequelize.transaction(function(t){
-//                 return Promise.all([
-//                     AgencyModel.create(agency, {transaction: t}),
-//                     AgencyUserModel.create(agencyUser, {transaction: t})
-//                 ]);
-//             })
-//         })
-//         .spread(function(agency, agencyUser){
-//             return {agency: agency, agencyUser: agencyUser}
-//         })
-//         .catch(function(err){
-//             logger.error(err);
-//
-//             return AgencyModel.findOne({where: {$or: [{mobile: mobile}, {email: email}], status: {$ne: EAgencyStatus.DELETE}}, attributes: ['id']})
-//                 .then(function(agency){
-//                     if(agency){
-//                         throw {code: -4, msg: '手机号或邮箱已经注册'};
-//                     }else{
-//                         throw {code: -3, msg: '注册异常'};
-//                     }
-//                 })
-//         });
-// }
 
 /**
  * 创建代理商

@@ -52,23 +52,14 @@ describe("api/client/agency.js", function() {
                     throw err;
                 }
                 
-                assert.equal(ret.agency.status, 0);
-                var agencyId = ret.agency.id;
-                var agencyUserId = ret.agencyUser.id;
+                assert.equal(ret.target.status, 0);
+                // var agencyId = ret.agency.id;
+                // var agencyUserId = ret.agencyUser.id;
+                var agencyId = ret.target.id;
+                var agencyUserId = ret.target.createUser;
                 done();
             });
         });
-
-        // it("#createAgencyTest should be ok with correct params", function(done) {
-        //     API.client.agency.createAgency(agency, function(err, ret) {
-        //         if (err) {
-        //             throw err;
-        //         }
-        //
-        //         assert.equal(ret.agency.status, 0);
-        //         done();
-        //     });
-        // });
 
     });
 
@@ -93,9 +84,9 @@ describe("api/client/agency.js", function() {
                     return API.client.agency.createAgency(agency)
                 })
                 .then(function(ret){
-                    assert.equal(ret.agency.status, 0);
-                    agencyId = ret.agency.id;
-                    agencyUserId = ret.agencyUser.id;
+                    assert.equal(ret.target.status, 0);
+                    agencyId = ret.target.id;
+                    agencyUserId = ret.target.createUser;
                     done();
                 })
                 .catch(function(err){
@@ -254,9 +245,9 @@ describe("api/client/agency.js", function() {
                     return API.client.agency.createAgency(agency)
                 })
                 .then(function(ret){
-                    assert.equal(ret.agency.status, 0);
-                    _agencyId = ret.agency.id;
-                    _agencyUserId = ret.agencyUser.id;
+                    assert.equal(ret.target.status, 0);
+                    _agencyId = ret.target.id;
+                    _agencyUserId = ret.target.createUser;
                 })
                 .then(function(){
                     return  API.client.agency.createAgencyUser.call({accountId: _agencyUserId},

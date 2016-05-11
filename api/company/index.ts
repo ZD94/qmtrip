@@ -157,7 +157,7 @@ export async function updateCompany(params){
  * @param companyId
  * @returns {*}
  */
-validateApi(getCompany, ['companyId'], ['columns']);
+validateApi(getCompany, ['companyId']);
 export async function getCompany(params){
     let companyId = params.companyId;
     let company = await CompanyModel.findById(companyId);
@@ -239,7 +239,6 @@ export async function checkAgencyCompany(params){
 validateApi(deleteCompany, ['companyId'], ['userId']);
 export function deleteCompany(params){
     var companyId = params.companyId;
-    var userId = params.userId;
 
     return CompanyModel.findById(companyId, {attributes: ['createUser']})
         .then(function(company){

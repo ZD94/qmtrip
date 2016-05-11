@@ -18,6 +18,27 @@ import {Agency, AgencyUser, EAgencyStatus} from "api/_types/agency";
  * @class agency 代理商
  */
 class ApiAgency {
+
+    // @requireParams(['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd'])
+    // static async createAgency(params: {name: string, email: string, mobile: string, userName: string, description?: string,
+    // remark?: string, pwd?: string}){
+    //     let email = params.email;
+    //     let mobile = params.mobile;
+    //     let password = params.pwd || "123456";
+    //     let ACCOUNT_TYPE : number = 2; //账号类型，2为代理商账号
+    //     let account = await API.auth.checkAccExist({type: ACCOUNT_TYPE, $or: [{mobile: mobile}, {email: email}]});
+    //
+    //     if(!account) {
+    //         let _account : any = {email: email, mobile: mobile, pwd: password, type: ACCOUNT_TYPE};
+    //         account = await API.auth.newAccount(_account);
+    //     }
+    //
+    //     params['id'] = account.id;
+    //
+    //     return API.agency.createAgency(params);
+    //
+    // }
+
     /**
      * @method createAgency
      *
@@ -33,8 +54,7 @@ class ApiAgency {
      * @returns {Promise} true||error
      */
     @requireParams(['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd'])
-    static async createAgency(params: {name: string, email: string, mobile: string, userName: string, description?: string,
-    remark?: string, pwd?: string}){
+    static async createAgency(params) {
         let email = params.email;
         let mobile = params.mobile;
         let password = params.pwd || "123456";
@@ -46,12 +66,20 @@ class ApiAgency {
             account = await API.auth.newAccount(_account);
         }
 
-        params['id'] = account.id;
+        params.id = account.id;
+        params.createUser = account.id;
 
-        return API.agency.createAgency(params);
+        let agency = await API.agency.create(params);
+        let _agencyUser: any = _.pick(params, ['email', 'mobile', 'sex', 'avatar', '']);
+        _agencyUser.id = account.id;
+        _agencyUser.agencyId = agency.id;
+        _agencyUser.roleId = 0;
+        _agencyUser.name = params.userName;
 
+        await API.agency.createAgencyUser(_agencyUser);
+
+        return agency;
     }
-
 
     /**
      * @method getAgencyById
@@ -89,37 +117,6 @@ class ApiAgency {
         })
     }
     
-    /**
-     *
-     * @param params
-     */
-    static async create(params) {
-        let email = params.email;
-        let mobile = params.mobile;
-        let password = params.pwd || "123456";
-        let ACCOUNT_TYPE : number = 2; //账号类型，2为代理商账号
-        let account = await API.auth.checkAccExist({type: ACCOUNT_TYPE, $or: [{mobile: mobile}, {email: email}]});
-    
-        if(!account) {
-            let _account : any = {email: email, mobile: mobile, pwd: password, type: ACCOUNT_TYPE};
-            account = await API.auth.newAccount(_account);
-        }
-    
-        params.id = account.id;
-        params.creaeUser = account.id;
-        
-        let agency = await API.agency.create(params);
-        let _agencyUser: any = _.pick(params, ['email', 'mobile', 'sex', 'avatar', '']);
-        _agencyUser.id = account.id;
-        _agencyUser.agencyId = agency.id;
-        _agencyUser.roleId = 0;
-        _agencyUser.name = params.userName;
-    
-        await API.agency.createAgencyUser(_agencyUser);
-    
-        return agency;
-    }
-
 
     /**
      * @method updateAgency
@@ -149,7 +146,7 @@ class ApiAgency {
         return API.agency.deleteAgency(params);
     }
 
-    @requirePermit("user.add", 2)
+    //@requirePermit("user.add", 2)
     static async createAgencyUser(params: AgencyUser) {
         let self: any = this;
         let accountId = self.accountId;
@@ -205,7 +202,7 @@ class ApiAgency {
      * @returns {Promise<AgencyUser>}
      */
     @requireParams(['id'], ['status', 'name', 'sex', 'mobile', 'avatar', 'roleId'])
-    //@requirePermit("user.edit", 2)
+    @requirePermit("user.edit", 2)
     static async updateAgencyUser(params: {id: string, status?: number, name?: string, sex?: string, email?: string,
     mobile?: string, avatar?: string, roleId?: string}) {
         let self: any = this;
@@ -229,7 +226,7 @@ class ApiAgency {
      * @returns {Promise<boolean>}
      */
     @requireParams(['userId'])
-    //@requirePermit("user.delete", 2)
+    @requirePermit("user.delete", 2)
     static async deleteAgencyUser(params: {userId: string}){
         let self: any = this;
         let accountId = self.accountId;
