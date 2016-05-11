@@ -203,7 +203,7 @@ class AgencyService extends ClientService<Agency>{
     async $create(obj: {name: string, email: string, mobile: string, userName: string, description?: string,
         remark?: string, pwd?: string}): Promise<Agency>{
         var api = await requireAPI<typeof ApiAgency>('agency');
-        return api.create(obj);
+        return api.createAgency(obj);
     }
     async $get(id: string): Promise<Agency>{
         var api = await requireAPI<typeof ApiAgency>('agency');

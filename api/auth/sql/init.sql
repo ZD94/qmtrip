@@ -63,5 +63,3 @@ CREATE TABLE auth.account_openid(
   create_at timestamp without time zone,
   update_at timestamp without time zone
 );
-
-insert into auth.accounts (id, email, pwd, mobile, status, type) values('00000000-0000-0000-0000-000000000001', 'agency.agency@tulingdao.com', 'e10adc3949ba59abbe56e057f20f883e', '12345678900', 1, 2);

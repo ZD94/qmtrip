@@ -1,5 +1,4 @@
 'use strict';
-import apiCompany = require('api/client/company')
 import { Models, ModelObject } from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import {Agency} from 'api/_types/agency';

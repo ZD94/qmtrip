@@ -3,8 +3,11 @@
  */
 'use strict';
 import { regApiType } from 'common/api/helper';
+import { Models, ModelObject } from 'api/_types';
+import {Company} from 'api/_types/company';
+import { Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
 
-export enum AGENCY_STATUS {
+export enum EAgencyStatus {
     DELETE = -2, //删除状态
     UN_ACTIVE = 0, //未激活状态
     ACTIVE = 1 //激活状态
@@ -16,61 +19,112 @@ export enum  AGENCY_ROLE {
     ADMIN = 2
 };
 
+@Table('agency.agency')
 @regApiType('API.')
-export class Agency{
-    id: string;
-    agencyNo: string;
-    createUser: string; //代理商创建人
-    name: string; //代理商名称
-    description: string; //代理商描述
-    status: number; //代理商状态
-    email: string; //代理商邮箱
-    telephone: string; //联系电话
-    mobile: string; //联系手机
-    companyNum: number; //企业数量
-    createAt: Date; //创建时间
-    remark: string; //备注
-    updateAt: Date;
+export class Agency implements ModelObject{
+    target: Object;
+    constructor(target: Object) {
+        this.target = target;
+    }
 
-    constructor(params) {
-        this.id = params.id ? params.id : null;
-        this.agencyNo = params.agencyNo;
-        this.createUser = params.createUser ? params.createUser : null;
-        this.name = params.name ? params.name : null;
-        this.description = params.description ? params.description : null;
-        this.status = params.status ? params.status : AGENCY_STATUS.UN_ACTIVE;
-        this.email = params.email ? params.email : null;
-        this.telephone = params.telephone ? params.telephone : null;
-        this.mobile = params.mobile ? params.mobile : null;
-        this.companyNum = params.companyNum || 0;
-        this.createAt = params.createAt ? params.createAt : null;
-        this.remark = params.remark ? params.remark : null;
-        this.updateAt = params.updateAt ? params.updateAt : null;
-    };
+    @Field({type: Types.UUID})
+    get id(): string { return null; }
+    set id(val: string) {}
+
+    @Field({type: Types.STRING})
+    get agencyNo(): string { return ''; }
+    set agencyNo(val: string) {}
+
+    @Field({type: Types.UUID})
+    get createUser(): string { return null; }
+    set createUser(val: string) {}
+
+    @Field({type: Types.STRING})
+    get name(): string { return ''; }
+    set name(val: string) {}
+
+    @Field({type: Types.STRING})
+    get description(): string { return ''; }
+    set description(val: string) {}
+
+    @Field({type: Types.INTEGER})
+    get status(): EAgencyStatus { return 0; }
+    set status(val: EAgencyStatus) {}
+
+    @Field({type: Types.STRING})
+    get email(): string { return ''; }
+    set email(val: string) {}
+
+    @Field({type: Types.STRING})
+    get mobile(): string { return ''; }
+    set mobile(val: string) {}
+
+    @Field({type: Types.INTEGER})
+    get companyNum(): number { return 0; }
+    set companyNum(val: number) {}
+
+    @Field({type: Types.STRING})
+    get remark(): string { return ''; }
+    set remark(val: string) {}
+
+    getStaffs(): Promise<Company[]> {
+        return Models.company.find({agencyId: this.id});
+    }
+
+    @Update(Models.company.update)
+    save(): Promise<void> { return null; }
+    @Destroy(Models.company.destroy)
+    destroy(): Promise<void> { return null; }
 }
 
-export class AgencyUser {
-    id: string;
-    status: number;
-    name: string; //代理商姓名
-    sex: string; //性别
-    email: string; //邮箱
-    mobile: string; //电话
-    avatar: string; //代理商头像
-    agencyId: string; //公司ID
-    roleId: number; //权限ID
-    createAt: Date; //创建时间
+@Table('agency.agencyUser')
+@regApiType('API.')
+export class AgencyUser implements ModelObject{
+    target: Object;
+    constructor(target: Object) {
+        this.target = target;
+    }
+
+    @Field({type: Types.UUID})
+    get id(): string { return null; }
+    set id(val: string) {}
+
+    @Field({type: Types.UUID})
+    get agencyId(): string { return null; }
+    set agencyId(val: string) {}
+
+    @Field({type: Types.INTEGER})
+    get status(): EAgencyStatus { return 0; }
+    set status(val: EAgencyStatus) {}
+
+
+    @Field({type: Types.STRING})
+    get name(): string { return ''; }
+    set name(val: string) {}
+
+    @Field({type: Types.STRING})
+    get sex(): number { return 0; }
+    set sex(val: number) {}
+
+    @Field({type: Types.STRING})
+    get email(): string { return ''; }
+    set email(val: string) {}
+
+    @Field({type: Types.STRING})
+    get mobile(): string { return ''; }
+    set mobile(val: string) {}
+
+    @Field({type: Types.STRING})
+    get avatar(): string { return ''; }
+    set avatar(val: string) {}
+
+    @Field({type: Types.INTEGER})
+    get roleId(): EAgencyStatus { return 0; }
+    set roleId(val: EAgencyStatus) {}
+
+    @Update(Models.company.update)
+    save(): Promise<void> { return null; }
+    @Destroy(Models.company.destroy)
+    destroy(): Promise<void> { return null; }
     
-    constructor(params) {
-        this.id = params.id ? params.id:  null;
-        this.status = params.status ? params.status : AGENCY_STATUS.UN_ACTIVE;
-        this.name = params.name ? params.name : null;
-        this.sex = params.sex ? params.sex : null;
-        this.email = params.email ? params.email : null;
-        this.mobile = params.mobile ? params.mobile : null;
-        this.avatar = params.avatar ? params.avatar : null;
-        this.agencyId = params.agencyId ? params.agencyId : null;
-        this.createAt = params.createAt ? params.createAt : null;
-        this.roleId = params.roleId;
-    };
 }

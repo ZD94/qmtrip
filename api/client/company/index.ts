@@ -66,8 +66,6 @@ class ApiCompany {
     @requirePermit("company.edit", 1)
     static async updateCompany(params){
         let self:any = this;
-        // console.info("*******************");
-        // console.info(self);
         let accountId = self.accountId;
         params.userId = accountId;
         let staff = await API.staff.getStaff({id: accountId, columns: ['companyId']});
@@ -99,7 +97,6 @@ class ApiCompany {
      */
     @requirePermit("company.query", 2)
     static async getCompanyListByAgency(params){
-        console.info(params);
         let self: any = this;
         let accountId = self.accountId;
         let page = params.page;
@@ -209,7 +206,7 @@ class ApiCompany {
         let agencyUser = await API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']});
         let company = await API.company.getCompany({companyId: companyId, columns: ['agencyId']});
 
-        if(agencyUser.agencyId != company.agencyId) {
+        if(agencyUser.agencyId != company.target.agencyId) {
             throw L.ERR.PERMISSION_DENY;
         }
 

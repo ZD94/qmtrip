@@ -27,22 +27,29 @@ export interface ModelsInterface {
     agencyUser: ServiceInterface<AgencyUser>;
 }
 
+import {autobind} from 'core-decorators';
+
 class ServiceDelegate<T> implements ServiceInterface<T>{
     target: ServiceInterface<T>;
     constructor(){
     }
+    @autobind
     create(obj: Object): Promise<T>{
         return this.target.create(obj);
     }
+    @autobind
     get(id: string): Promise<T>{
         return this.target.get(id);
     }
+    @autobind
     find(where: any): Promise<T[]>{
         return this.target.find(where);
     }
+    @autobind
     update(id:string, fields: Object): Promise<any> {
         return this.target.update(id, fields);
     }
+    @autobind
     destroy(id:string): Promise<any> {
         return this.target.destroy(id);
     }

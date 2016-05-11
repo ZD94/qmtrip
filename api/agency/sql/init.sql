@@ -179,9 +179,3 @@ COMMENT ON COLUMN agency.agency_user.email IS '邮箱';
 --
 -- PostgreSQL database dump complete
 --
-
-
---insert into agency.agency_user (id, role_id, status, name, mobile, email, agency_id) values('00000000-0000-0000-0000-000000000001', 0, 1, '鲸力科技', '12345678900', 'agency.agency@tulingdao.com', '00000000-0000-0000-0000-000000000001');
-
---insert into agency.agency (id, create_user, name, status, email, mobile) values('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '鲸力科技代理商', 1, 'agency.agency@tulingdao.com', '12345678900');
-
