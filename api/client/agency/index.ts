@@ -12,7 +12,7 @@ import _ = require('lodash');
 import {requireParams} from 'common/api/helper';
 import {requirePermit} from 'api/_decorator';
 
-import {Agency, AgencyUser, AGENCY_STATUS} from "api/_types/agency";
+import {Agency, AgencyUser, EAgencyStatus} from "api/_types/agency";
 
 /**
  * @class agency 代理商
@@ -46,11 +46,9 @@ class ApiAgency {
             account = await API.auth.newAccount(_account);
         }
 
-        let _agency = new Agency(params);
-        _agency.id = account.id;
-        _agency['userName'] = params.userName;
+        params['id'] = account.id;
 
-        return API.agency.createAgency(_agency);
+        return API.agency.createAgency(params);
 
     }
 
@@ -130,8 +128,7 @@ class ApiAgency {
      * @param params {object}
      * @returns {Promise<Agency>}
      */
-    @requireParams(['agencyId'], ['name', 'description', 'status', 'address',
-        'email', 'telephone', 'mobile', 'company_num', 'remark'])
+    @requireParams(['agencyId'], ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark'])
     static async updateAgency(params){
         let self: any = this;
         params.userId = self.accountId;
@@ -153,14 +150,13 @@ class ApiAgency {
     }
 
     @requirePermit("user.add", 2)
-    static async createAgencyUser(params: Agency) {
+    static async createAgencyUser(params: AgencyUser) {
         let self: any = this;
         let accountId = self.accountId;
         let user =  await API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']});
-        let agencyUser = new AgencyUser(params);
-        agencyUser.agencyId = user.agencyId;
+        params['agencyId'] = user.agencyId;
 
-        return API.agency.createAgencyUser(agencyUser);
+        return API.agency.createAgencyUser(params);
     }
 
 
@@ -209,7 +205,7 @@ class ApiAgency {
      * @returns {Promise<AgencyUser>}
      */
     @requireParams(['id'], ['status', 'name', 'sex', 'mobile', 'avatar', 'roleId'])
-    @requirePermit("user.edit", 2)
+    //@requirePermit("user.edit", 2)
     static async updateAgencyUser(params: {id: string, status?: number, name?: string, sex?: string, email?: string,
     mobile?: string, avatar?: string, roleId?: string}) {
         let self: any = this;
@@ -233,7 +229,7 @@ class ApiAgency {
      * @returns {Promise<boolean>}
      */
     @requireParams(['userId'])
-    @requirePermit("user.delete", 2)
+    //@requirePermit("user.delete", 2)
     static async deleteAgencyUser(params: {userId: string}){
         let self: any = this;
         let accountId = self.accountId;

@@ -39,11 +39,11 @@ describe("api/client/agency.js", function() {
         });
 
         it("#createAgency should be error with wrong params", function(done) {
-            API.client.agency.createAgency({}, function(err, ret) {
-                assert.equal(ret, null);
-                assert.equal(err.code, -1);
-                done();
-            });
+            API.client.agency.createAgency({})
+                .catch(function(err) {
+                    assert.equal(err.code, -1);
+                    done();
+                })
         });
 
         it("#createAgency should be ok with correct params", function(done) {
@@ -119,7 +119,7 @@ describe("api/client/agency.js", function() {
 
         it("#updateAgency should be ok", function(done) {
             var self = {accountId: agencyUserId};
-            API.client.agency.update.call(self, {agencyId: agencyId, status: '1', remark: '代理商更新测试', wrongParams: 'wrongParams'}, function(err, ret) {
+            API.client.agency.updateAgency.call(self, {agencyId: agencyId, status: '1', remark: '代理商更新测试', wrongParams: 'wrongParams'}, function(err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -222,7 +222,7 @@ describe("api/client/agency.js", function() {
 
 
         it("deleteAgency should be ok", function (done) {
-            API.client.agency.destroy.call({accountId: agencyUserId}, {agencyId: agencyId}, function (err, ret) {
+            API.client.agency.deleteAgency.call({accountId: agencyUserId}, {agencyId: agencyId}, function (err, ret) {
                 if (err) {
                     throw err;
                 }

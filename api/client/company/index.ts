@@ -66,8 +66,8 @@ class ApiCompany {
     @requirePermit("company.edit", 1)
     static async updateCompany(params){
         let self:any = this;
-        // console.info("*******************");
-        // console.info(self);
+        console.info("*******************");
+        console.info(self);
         let accountId = self.accountId;
         params.userId = accountId;
         let staff = await API.staff.getStaff({id: accountId, columns: ['companyId']});
