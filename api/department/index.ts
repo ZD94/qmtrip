@@ -131,7 +131,7 @@ export function getDepartmentStructure(params: {companyId: string}){
 validateApi(deleteDepartment, ["id"]);
 export function deleteDepartment(params){
     var id = params.id;
-    return API.staff.findStaffs({departmentId: id, status: 0})
+    return API.staff.getStaffs({departmentId: id, status: 0})
         .then(function(staffs){
             if(staffs && staffs.length > 0){
                 throw {code: -1, msg: '目前该部门下有'+staffs.length+'位员工 暂不能删除，给这些员工匹配新的部门后再进行操作'};

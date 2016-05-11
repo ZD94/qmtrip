@@ -26,7 +26,7 @@ function enumValues(e){
     return Object.keys(e).map((k)=>e[k]).filter((v)=>(typeof v != 'number'));
 }
 
-@Table()
+@Table("staff.Staff")
 @regApiType('API.')
 export class Staff implements ModelObject{
     target: Object;
@@ -95,23 +95,42 @@ export class Staff implements ModelObject{
     destroy(): Promise<void> { return null; }
 }
 
+@Table("Credentials", {tableName : "papers", schema : "staff"})
 @regApiType('API.')
-export class Credentials {
-    id: string;
-    type: number;
-    idNo: string;
-    birthday: Date;
-    validData: Date;
-    ownerId: string;
-
-    constructor(obj: any) {
-        this.id = obj.id;
-        this.type = obj.type;
-        this.idNo = obj.idNo;
-        this.birthday = obj.birthday;
-        this.validData = obj.validData;
-        this.ownerId = obj.ownerId;
+export class Credentials implements ModelObject{
+    target: Object;
+    constructor(target: Object) {
+        this.target = target;
     }
+
+    @Field({type: Types.UUID})
+    get id(): string { return null; }
+    set id(val: string) {}
+
+    @Field({type: Types.INTEGER, defaultValue: 0})
+    get type(): number {return 0}
+    set type(type: number){}
+
+    @Field({type: Types.STRING(50)})
+    get idNo(): string {return null}
+    set idNo(idNo: string){}
+
+    @Field({type: Types.DATE})
+    get birthday(): Date {return null}
+    set birthday(birthday: Date){}
+
+    @Field({type: Types.DATE})
+    get validData(): Date {return null}
+    set validData(validData: Date){}
+
+    @Field({type: Types.UUID})
+    get ownerId(): string { return null; }
+    set ownerId(val: string) {}
+
+    @Update(Models.staff.update)
+    save(): Promise<void> { return null; }
+    @Destroy(Models.staff.destroy)
+    destroy(): Promise<void> { return null; }
 }
 
 @regApiType('API.')

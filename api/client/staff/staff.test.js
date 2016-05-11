@@ -54,7 +54,7 @@ describe("api/client/staff.js", function() {
                 API.staff.deleteAllStaffByTest({email: obj.email, mobile: obj.mobile})
             ])
             .spread(function(ret1, ret2, ret3, ret4, ret5){
-                return API.agency.createAgency(agency);
+                return API.client.agency.createAgency.call({}, agency);
             })
             .then(function(ret){
                 agencyId = ret.agency.id;
@@ -98,7 +98,7 @@ describe("api/client/staff.js", function() {
         obj.companyId = companyId;
         API.client.staff.createStaff.call(ownerSelf, obj, function(err, result) {
             assert.equal(err, null);
-            //console.log(err);
+            console.log(err);
             // updateobj = result;
             id = result.id;
             done();
@@ -251,7 +251,7 @@ describe("api/client/staff.js", function() {
                 arrivalCityCode: 'SH123',
                 budget: 1000,
                 startAt: '2015-12-30 11:12:12',
-                consumeDetails: [{
+                hotel: [{
                     startTime: '2016-12-30 11:11:11',
                     budget: 500,
                     invoiceType: 'HOTEL',
@@ -276,6 +276,7 @@ describe("api/client/staff.js", function() {
                     done();
                 })
                 .catch(function(err){
+                    console.info(err);
                     throw err;
                 })
                 .done();
@@ -364,7 +365,7 @@ describe("api/client/staff.js", function() {
 
     /**************代理商管理企业员工*****************/
     //创建员工
-    it("#createStaff should be ok", function(done) {
+    it("#agencyCreateStaff should be ok", function(done) {
         obj.companyId = companyId;
         API.client.staff.createStaff.call(agencySelf, obj, function(err, result) {
             assert.equal(err, null);

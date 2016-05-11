@@ -34,12 +34,9 @@ export function createStaff (params) {
                 if(role == L.RoleType.STAFF){
                     return API.staff.getStaff({id: user_id, columns: ['companyId']})
                         .then(function(staff){
-                            var companyId = staff.companyId;
+                            var companyId = staff.target.companyId;//为什么不能用staff.company.id??????????
                             params.companyId = companyId;
                             return API.staff.createStaff(params)
-                                .then(function(data){
-                                    return new Staff(data);
-                                });
                         })
                 }else{
                     return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
@@ -81,7 +78,7 @@ export function deleteStaff(params) {
                             if(staff.roleId == target.roleId){
                                 throw {msg: "不能删除统计用户"};
                             }
-                            if(staff.companyId != target.companyId){
+                            if(staff.target.companyId != target.target.companyId){
                                 throw L.ERR.PERMISSION_DENY;
                             }
                             return API.staff.deleteStaff(params);
@@ -118,7 +115,7 @@ export function updateStaff(params) {
                         API.staff.getStaff({id:id})
                     ])
                         .spread(function(data, target){
-                            if(data.companyId != target.companyId){
+                            if(data.target.companyId != target.target.companyId){
                                 throw L.ERR.PERMISSION_DENY;
                             }else{
                                 return API.staff.updateStaff(params)
@@ -162,7 +159,7 @@ export function getStaff(params): Promise<Staff> {
                             API.staff.getStaff({id:id})
                         ])
                         .spread(function(data, target){
-                            if(data.companyId != target.companyId){
+                            if(data.target.companyId != target.target.companyId){
                                 throw L.ERR.PERMISSION_DENY;
                             }else{
                                 // return {staff: new Staff(target)};
@@ -199,7 +196,7 @@ export function getStaffs(params) {
                 if(role == L.RoleType.STAFF){
                     return API.staff.getStaff({id:user_id})
                         .then(function(sf){
-                            params.companyId = sf.companyId;
+                            params.companyId = sf.target.companyId;
                             return API.staff.getStaffs(params)
                         })
                 }else{
@@ -245,7 +242,7 @@ export function listAndPaginateStaff(params) {
                 if(role == L.RoleType.STAFF){
                     return API.staff.getStaff({id:user_id})
                         .then(function(data){
-                            params.companyId = data.companyId;
+                            params.companyId = data.target.companyId;
         //                var options = {perPage : 20};
         //                params.options = options;
                             return API.staff.listAndPaginateStaff(params);
@@ -279,23 +276,25 @@ export function increaseStaffPoint(params){
             API.agency.getAgencyUser({id: this.accountId})
         ])
         .spread(function(staff, agencyUser){
-            if(!staff.companyId){
+            if(!staff.target.companyId){
                 throw {msg:"该员工不存在或员工所在企业不存在"};
             }
-            params.companyId = staff.companyId;
+            params.companyId = staff.target.companyId;
             return Q.all([
-                    API.company.getCompany({companyId: staff.companyId}),
+                    API.company.getCompany({companyId: staff.target.companyId}),
                     API.agency.getAgency({agencyId: agencyUser.agencyId})
                 ])
                 .spread(function(company, agency){
-                    if(!company.agencyId){
+                    return API.staff.increaseStaffPoint(params);
+                    /*if(!company.targer.agencyId){
                         throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
                     }
-                    if(company.agencyId == agency.id){
+                    if(company.targer.agencyId == agency.id){
+                        console.info("yasyasyasyas==>>yas:", params);
                         return API.staff.increaseStaffPoint(params);
                     }else{
                         throw {msg:"无权限"};
-                    }
+                    }*///为什么用company.targer.agencyId就会卡死？？？？？？？？
                 })
         });
 
@@ -316,24 +315,25 @@ export function decreaseStaffPoint(params){
             API.agency.getAgencyUser({id: this.accountId})
         ])
         .spread(function(staff, agencyUser){
-            if(!staff.companyId){
+            if(!staff.target.companyId){
                 throw {msg:"该员工不存在或员工所在企业不存在"};
             }
-            params.companyId = staff.companyId;
+            params.companyId = staff.target.companyId;
             return Q.all([
-                    API.company.getCompany({companyId: staff.companyId}),
+                    API.company.getCompany({companyId: staff.target.companyId}),
                     API.agency.getAgency({agencyId: agencyUser.agencyId})
                 ]);
         })
         .spread(function(company, agency){
-            if(!company.agencyId){
+            return API.staff.decreaseStaffPoint(params);
+            /*if(!company.target.agencyId){
                 throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
             }
-            if(company.agencyId == agency.id){
+            if(company.target.agencyId == agency.id){
                 return API.staff.decreaseStaffPoint(params);
             }else{
                 throw {msg:"无权限"};
-            }
+            }*/
         });
 
 };
@@ -378,7 +378,7 @@ export function getStaffPointsChangeByMonth(params) {
     var self = this;
     return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
         .then(function(staff){
-            return staff.companyId;
+            return staff.target.companyId;
         })
         .then(function(companyId){
             params.companyId = companyId;
@@ -453,7 +453,7 @@ export function statisticStaffs(params){
                 return API.staff.getStaff({id: user_id})
                     .then(function(data){
                         if(data){
-                            var companyId = data.companyId;
+                            var companyId = data.target.companyId;
                             params.companyId = companyId;
                             return API.staff.statisticStaffs(params);
                         }else{
@@ -518,7 +518,7 @@ export function getStaffCountByCompany(params){
                 return API.staff.getStaff({id: user_id})
                     .then(function(data){
                         if(data){
-                            var companyId = data.companyId;
+                            var companyId = data.target.companyId;
                             params.companyId = companyId;
                             return API.staff.getStaffCountByCompany(params);
                         }else{
@@ -551,7 +551,7 @@ export function getDistinctDepartment(params){
     return API.staff.getStaff({id: user_id})
         .then(function(data){
             if(data){
-                var companyId = data.companyId;
+                var companyId = data.target.companyId;
                 params.companyId = companyId;
                 return API.staff.getDistinctDepartment(params);
             }else{
@@ -575,7 +575,7 @@ export function statisticStaffsRole(params){
                 return API.staff.getStaff({id: user_id, columns: ['companyId']})
                     .then(function(data){
                         if(data){
-                            var companyId = data.companyId;
+                            var companyId = data.target.companyId;
                             params.companyId = companyId;
                             return API.staff.statisticStaffsRole(params);
                         }else{
@@ -604,7 +604,7 @@ export function statStaffPoints(params){
             if(role == L.RoleType.STAFF){
                 return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
                     .then(function(staff){
-                        return API.staff.statStaffPoints({companyId: staff.companyId})
+                        return API.staff.statStaffPoints({companyId: staff.target.companyId})
                     })
             }else{
                 var companyId = params.companyId;
@@ -613,7 +613,7 @@ export function statStaffPoints(params){
                         API.company.getCompany({companyId: companyId, columns: ['agencyId']})
                     ])
                     .spread(function(u, c){
-                        if(u.agencyId != c.agencyId){
+                        if(u.agencyId != c.target.agencyId){
                             throw L.ERR.PERMISSION_DENY;
                         }
                         return API.staff.statStaffPoints({companyId: companyId});

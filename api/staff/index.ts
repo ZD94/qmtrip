@@ -56,7 +56,7 @@ export class StaffService implements ServiceInterface<Staff>{
  */
 var createOptionalParams = staffCols.push("accountId");
 validateApi(createStaff, ["email","name","companyId"], staffCols);
-export function createStaff(data){
+export function createStaff(data): Promise<Staff>{
     var type = data.type;//若type为import则为导入添加
     if(type)
         delete data.type;
@@ -117,7 +117,7 @@ export async function create(params) {
  * @returns {*}
  */
 validateApi(deleteStaff, ["id"]);
-export function deleteStaff(params: {id: string}){
+export function deleteStaff(params: {id: string}): Promise<any>{
     var id = params.id;
     return API.auth.remove({accountId: id})
         .then(function(){
@@ -160,7 +160,7 @@ export function deleteStaff(params: {id: string}){
  * @returns {*}
  */
 validateApi(updateStaff, ["id"], staffCols);
-export function updateStaff(data){
+export function updateStaff(data): Promise<any>{
     var id = data.id;
     var options: any = {};
     options.where = {id: id};
@@ -221,16 +221,16 @@ export function updateStaff(data){
                             values: vals
                         })
                             .then(function(result) {
-                                return rows[0];
+                                return new Staff(rows[0]);
                             });
                     }else if(accobj.status == 0 && send_email){
                         //未激活账户 并且未通过修改邮箱更新账户信息发送激活邮件
                         return API.auth.sendResetPwdEmail({companyName: com.name, email: rows[0].email, type: 1, isFirstSet: true})
                             .then(function() {
-                                return rows[0];
+                                return new Staff(rows[0]);;
                             });
                     }else{
-                        return rows[0];
+                        return new Staff(rows[0]);;
                     }
                 })
         });
@@ -242,7 +242,7 @@ export function updateStaff(data){
  * @returns {*}
  */
 validateApi(getStaff, ["id"], ["columns"]);
-export function getStaff(params: {id: string, columns?: Array<string>}){
+export function getStaff(params: {id: string, columns?: Array<string>}): Promise<Staff>{
     var id = params.id;
     var options: any = {};
     if(params.columns){
@@ -253,7 +253,7 @@ export function getStaff(params: {id: string, columns?: Array<string>}){
             if(!staff){
                 throw {code: -2, msg: '员工不存在'};
             }
-            return staff;
+            return new Staff(staff);
         });
 }
 
@@ -285,7 +285,7 @@ export function getCountByDepartment(params: {departmentId: string}){
  * @param params
  * @returns {*}
  */
-export function getStaffs(params){
+export function getStaffs(params): Promise<Staff[]>{
     var options : any = {};
     options.where = _.pick(params, Object.keys(staffModel.attributes));
     if(params.$or) {
@@ -359,7 +359,7 @@ export function increaseStaffPoint(params) {
         .then(function(obj) {
             var totalPoints = obj.totalPoints + increasePoint;
             var balancePoints = obj.balancePoints + increasePoint;
-            var pointChange: PointChange = new PointChange({staffId: id, status: 1, points: increasePoint, remark: params.remark||"增加积分", operatorId: operatorId, currentPoint: balancePoints});
+            var pointChange: any = {staffId: id, status: 1, points: increasePoint, remark: params.remark||"增加积分", operatorId: operatorId, currentPoint: balancePoints};
             if(params.orderId){
                 pointChange.orderId = params.orderId;
             }
@@ -535,7 +535,7 @@ export function getStaffPointsChange(params){
  * @param params
  * @returns {*}
  */
-export function beforeImportExcel(params){
+/*export function beforeImportExcel(params){
     var userId = params.accountId;
     var fileId = params.fileId;
 //    var obj = nodeXlsx.parse(fileUrl);
@@ -554,7 +554,7 @@ export function beforeImportExcel(params){
     var domainName = "";
     var xlsxObj;
     return API.attachment.getSelfAttachment({fileId: fileId, accountId: userId})
-        .then(function(att){
+        .then(function(att){//为什么加上返回值限制 此处编译会出错？？？？？
             if(att){
                 var content = new Buffer(att.content, 'base64');
                 xlsxObj = nodeXlsx.parse(content);
@@ -733,7 +733,7 @@ export function beforeImportExcel(params){
                     return data;
                 });
         });
-}
+}*/
 
 /**
  * 执行导入员工数据
@@ -753,7 +753,7 @@ export function importExcelAction(params: {addObj: Array<string>}){
                 return createStaff(staffObj)
                     .then(function(ret){
                         if(ret){
-                            item = ret;
+                            // item = ret;//createStaff增加返回值后会报语法错误
                             addObj.push(item);
                         }else{
                             staffObj.reason = "导入失败";
@@ -959,8 +959,8 @@ export function getInvoiceViewer (params: {accountId: string}){
     var id = params.accountId;
     return getStaff({id: id})
         .then(function(obj){
-            if(obj && obj.companyId){
-                return API.company.getCompany({companyId: obj.companyId})
+            if(obj && obj.company.id){
+                return API.company.getCompany({companyId: obj.company.id})
                     .then(function(company){
                         return company;
                     })
