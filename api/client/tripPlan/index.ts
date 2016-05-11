@@ -78,9 +78,7 @@ function getPlanDetails(params: TripPlan): {orderStatus: string, budget: number,
  * @param params
  * @returns {Promise<TripPlan>}
  */
-validateApi(saveTripPlan, ['arrivalCityCode', 'arrivalCity', 'startAt', 'budget', 'title'], ['deptCityCode', 'deptCity', 'backAt',
-    'isNeedTraffic', 'isNeedHotel', 'remark', 'projectId', 'outTraffic', 'backTraffic', 'hotel']);
-export async function saveTripPlan(params: TripPlan): Promise<TripPlan> {
+export async function saveTripPlan(params){
     let self = this;
     let accountId = self.accountId;
     let staff = await API.staff.getStaff({id: accountId, columns: ['companyId', 'email', 'name']});
@@ -97,7 +95,7 @@ export async function saveTripPlan(params: TripPlan): Promise<TripPlan> {
     _tripPlan.budget = budget;
     _tripPlan.orderNo = await API.seeds.getSeedNo('tripPlanNo'); //获取出差计划单号
     _tripPlan.accountId = accountId;
-    _tripPlan.companyId = staff.companyId;
+    _tripPlan.companyId = staff.target.companyId;
 
     let tripPlan = await API.tripPlan.saveTripPlan(_tripPlan);
 
@@ -105,7 +103,7 @@ export async function saveTripPlan(params: TripPlan): Promise<TripPlan> {
         return tripPlan; //没有预算，直接返回计划单
     }
 
-    let staffs = await API.staff.findStaffs({companyId: staff.companyId, roleId: {$ne: 1}, status: {$gte: 0}, columns: ['id', 'name','email']});
+    let staffs = await API.staff.getStaffs({companyId: staff.target.companyId, roleId: {$ne: 1}, status: {$gte: 0}, columns: ['id', 'name','email']});
     let url = config.host + '/corp.html#/TravelStatistics/planDetail?orderId=' + tripPlan.id;
     let go = '无', back = '无', hotel = '无';
 
@@ -371,7 +369,7 @@ export function pageTripPlansByCompany(params) {
             }
 
             return [true, options,
-                API.staff.findStaffs({companyId: companyId,
+                API.staff.getStaffs({companyId: companyId,
                     $or: [{name: {$like: '%' + emailOrName +'%'}}, {email: {$like: '%' + emailOrName +'%'}}],
                     status: {$ne: -2},
                     columns: ['id']
@@ -649,7 +647,7 @@ export async function editTripPlanBudget(params): Promise<boolean>{
 
     let updateResult = await API.tripPlan.updateConsumeBudget(updates);
     let tripPlan = await API.tripPlan.getTripPlanOrder({orderId: orderId});
-    let staffs = await API.staff.findStaffs({companyId: companyId, roleId: {$ne: 1}, columns: ['id', 'name','email']});
+    let staffs = await API.staff.getStaffs({companyId: companyId, roleId: {$ne: 1}, columns: ['id', 'name','email']});
 
     if(tripPlan.budget <= 0) {
         return true;

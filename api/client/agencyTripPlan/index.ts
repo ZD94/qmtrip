@@ -150,25 +150,25 @@ export function approveInvoice(params){
             return API.staff.getStaff({id: staffId, columns: ['companyId', 'name', 'email']})
         })
         .then(function(staff){
-            if(!staff.companyId){
+            if(!staff.target.companyId){
                 throw {msg:"该员工不存在或员工所在企业不存在"};
             }
 
-            companyId = staff.companyId;
+            companyId = staff.target.companyId;
             staffName = staff.name;
             staffEmail = staff.email;
 
             return Promise.all([
-                API.company.getCompany({companyId: staff.companyId, columns: ['agencyId']}),
+                API.company.getCompany({companyId: companyId, columns: ['agencyId']}),
                 API.agency.getAgencyUser({id: user_id, columns: ['agencyId']})
             ])
         })
         .spread(function(company, user){
-            if(!company.agencyId){
+            if(!company.target.agencyId){
                 throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
             }
 
-            if(company.agencyId != user.agencyId){
+            if(company.target.agencyId != user.agencyId){
                 throw L.ERR.PERMISSION_DENY;
             }
 

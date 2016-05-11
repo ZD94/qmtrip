@@ -41,7 +41,7 @@ export function createTravelPolicy (params) {
                         if(data.code){
                             throw {code: -1, msg: '无权限'};
                         }
-                        params.companyId = data.companyId;//只允许添加该企业下的差旅标准
+                        params.companyId = data.company.id;//只允许添加该企业下的差旅标准
                         return API.travelPolicy.createTravelPolicy(params)
                             .then(function(data){
                                 return new types.TravelPolicy(data);
@@ -97,7 +97,7 @@ export function deleteTravelPolicy(params: {id : string, companyId?: string}){
                             throw {code: -1, msg: '无权限'};
                         }
 
-                        return API.travelPolicy.deleteTravelPolicy({companyId: data.companyId, id: params.id});
+                        return API.travelPolicy.deleteTravelPolicy({companyId: data.company.id, id: params.id});
                     });
             }else{
                 return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
@@ -140,7 +140,7 @@ export function updateTravelPolicy(params){
                 if(role == L.RoleType.STAFF){
                     return API.staff.getStaff({id: user_id})
                         .then(function(data){
-                            company_id = data.companyId;
+                            company_id = data.company.id;
                             return API.travelPolicy.getTravelPolicy({id: params.id});
                         })
                         .then(function(tp){
@@ -207,7 +207,7 @@ export function getTravelPolicy(params: {id: string, companyId?: string}){
                                         throw {code: -1, msg: '查询结果不存在'};
                                     }
 
-                                    if(API.travelPolicy.companyId && API.travelPolicy.companyId != data.companyId){
+                                    if(tp.companyId && tp.companyId != data.company.id){
                                         throw {code: -1, msg: '无权限'};
                                     }
                                     return new types.TravelPolicy(tp);
@@ -241,21 +241,18 @@ export function getCurrentStaffTp(){
     var user_id = this.accountId;
     return API.staff.getStaff({id: user_id})
         .then(function(data){
-            if(data.travelLevel){
-                return API.travelPolicy.getTravelPolicy({id:data.travelLevel})
-                    .then(function(tp){
-                        if(!tp){
-                            throw {code: -1, msg: '查询结果不存在'};
-                        }
-                        return new types.TravelPolicy(tp);
-                    });
+            return data.getTravelPolicy()
+        })
+        .then(function(travelPolicy){
+            if(travelPolicy){
+                return  travelPolicy;
             }else{
                 return API.travelPolicy.getTravelPolicy({id:'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a'})
                     .then(function(data){
                         return new types.TravelPolicy(data);
                     });
             }
-        });
+        })
 };
 
 /*export function agencyGetTravelPolicy(params: {companyId: string, id: string}){
@@ -292,7 +289,7 @@ export function listAndPaginateTravelPolicy(params){
                             if(!data){
                                 throw {code: -1, msg: '无权限'};
                             }
-                            params.companyId = data.companyId;//只允许查询该企业下的差旅标准
+                            params.companyId = data.company.id;//只允许查询该企业下的差旅标准
                             return API.travelPolicy.listAndPaginateTravelPolicy(params);
                         });
                 }else{
@@ -333,7 +330,7 @@ export function getLatestTravelPolicy(params){
     return API.staff.getStaff({id: user_id})
         .then(function(data){
             if(data){
-                params.companyId = data.companyId;//只允许查询该企业下的差旅标准
+                params.companyId = data.company.id;//只允许查询该企业下的差旅标准
                 return API.travelPolicy.listAndPaginateTravelPolicy(params)
                     .then(function(result){
                         if(result && result.items && result.items.length>0){
@@ -377,7 +374,7 @@ export function getAllTravelPolicy(params){
                         if(!staff){
                             throw {code: -1, msg: '无权限'};
                         }
-                        options.where.companyId = staff.companyId;//只允许查询该企业下的差旅标准
+                        options.where.companyId = staff.company.id;//只允许查询该企业下的差旅标准
 
                         return API.travelPolicy.getAllTravelPolicy(options);
                     });
@@ -421,7 +418,7 @@ export function getTravelPolicies(params){
                         if(!staff){
                             throw {code: -1, msg: '无权限'};
                         }
-                        options.where.companyId = staff.companyId;//只允许查询该企业下的差旅标准
+                        options.where.companyId = staff.company.id;//只允许查询该企业下的差旅标准
 
                         return API.travelPolicy.getTravelPolicies(options);
                     });
