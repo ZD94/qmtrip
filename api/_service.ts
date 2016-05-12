@@ -1,11 +1,11 @@
 
 import { ServiceInterface, ModelsInterface, Models } from 'api/_types/index';
-import { Staff } from './_types/staff';
+import { Staff, Credential } from './_types/staff';
 import { Company } from './_types/company';
 import { Department } from './_types/department';
 import { TravelPolicy } from './_types/travelPolicy';
 import { Agency, AgencyUser } from './_types/agency';
-import { StaffService } from './staff/index';
+import { StaffService, CredentialService} from './staff/index';
 import { CompanyService } from './company/index';
 import { DepartmentService } from './department/index';
 import { TravelPolicyService } from './travelPolicy/index';
@@ -13,6 +13,7 @@ import { AgencyService, AgencyUserService } from './agency/index';
 
 class ServerModels implements ModelsInterface {
     staff: ServiceInterface<Staff>;
+    credential: ServiceInterface<Credential>;
     company: ServiceInterface<Company>;
     department: ServiceInterface<Department>;
     travelPolicy: ServiceInterface<TravelPolicy>;
@@ -21,6 +22,7 @@ class ServerModels implements ModelsInterface {
 
     constructor() {
         this.staff = new StaffService();
+        this.credential = new CredentialService();
         this.company = new CompanyService();
         this.department = new DepartmentService();
         this.travelPolicy = new TravelPolicyService();

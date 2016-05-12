@@ -1,5 +1,5 @@
 import { Company } from "./company";
-import { Staff } from "./staff";
+import { Staff, Credential } from "./staff";
 import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
 import { Agency, AgencyUser } from './agency';
@@ -19,7 +19,8 @@ export interface ServiceInterface<T> {
 
 export interface ModelsInterface {
     staff: ServiceInterface<Staff>;
-    company: ServiceInterface<Company>
+    credential: ServiceInterface<Credential>;
+    company: ServiceInterface<Company>;
     department: ServiceInterface<Department>;
     travelPolicy: ServiceInterface<TravelPolicy>;
 
@@ -63,6 +64,7 @@ class ModelsDelegate implements ModelsInterface {
     }
 
     staff: ServiceDelegate<Staff> = new ServiceDelegate<Staff>();
+    credential: ServiceDelegate<Credential> = new ServiceDelegate<Credential>();
     company: ServiceDelegate<Company> = new ServiceDelegate<Company>();
     department: ServiceDelegate<Department> = new ServiceDelegate<Department>();
     travelPolicy: ServiceDelegate<TravelPolicy> = new ServiceDelegate<TravelPolicy>();
@@ -72,6 +74,7 @@ class ModelsDelegate implements ModelsInterface {
 
     init(target: ModelsInterface){
         this.staff.setTarget(target.staff);
+        this.credential.setTarget(target.credential);
         this.company.setTarget(target.company);
         this.department.setTarget(target.department);
         this.travelPolicy.setTarget(target.travelPolicy);

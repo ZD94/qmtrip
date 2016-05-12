@@ -11,7 +11,7 @@ var Q = require("q");
 var API = require("common/api");
 var auth = require("../auth");
 var L = require("common/language");
-import {Staff, Credentials, PointChange} from "api/_types/staff";
+import {Staff, Credential, PointChange} from "api/_types/staff";
 import {Paginate} from 'common/paginate';
 
 /**
@@ -626,7 +626,7 @@ export function statStaffPoints(params){
  * @param {Date} params.validData 过期时间（选填）
  * @returns {*|Promise}
  */
-export function createPapers(params): Promise<Credentials>{
+export function createPapers(params): Promise<Credential>{
     params.ownerId = this.accountId;
     return API.staff.createPapers(params)
 };
@@ -660,7 +660,7 @@ export function deletePapers (params){
  * @param {Date} params.validData 过期时间（选填）
  * @returns {*|Promise}
  */
-export function updatePapers (params): Promise<Credentials>{
+export function updatePapers (params): Promise<Credential>{
     var user_id = this.accountId;
     return API.staff.getPapersById({id: params.id})
         .then(function(ma){
@@ -682,7 +682,7 @@ export function updatePapers (params): Promise<Credentials>{
  * @param {Array<String>} params.attributes    查询列（选填）
  * @returns {*|Promise}
  */
-export function getPapersById(params): Promise<Credentials>{
+export function getPapersById(params): Promise<Credential>{
     var id = params.id;
     var user_id = this.accountId;
     return API.staff.getPapersById({id:id})
@@ -710,7 +710,7 @@ export function getPapersById(params): Promise<Credentials>{
  * @param {Array<String>} params.attributes    查询列（选填）
  * @returns {*|Promise}
  */
-export function getOnesPapersByType(params): Promise<Credentials>{
+export function getOnesPapersByType(params): Promise<Credential>{
     var user_id = this.accountId;
     params.ownerId = user_id;
     return API.staff.getOnesPapersByType(params)
@@ -729,8 +729,13 @@ export function getOnesPapersByType(params): Promise<Credentials>{
  *
  * @returns {*|Promise}
  */
-export function getCurrentUserPapers(): Promise<Credentials[]>{
+export function getCurrentUserPapers(){
     var user_id = this.accountId;
+    return API.staff.getPapersByOwner({ownerId: user_id});
+};
+
+export function getOnesPapers(params){
+    var user_id = params.userId;
     return API.staff.getPapersByOwner({ownerId: user_id});
 };
 
