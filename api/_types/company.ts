@@ -85,9 +85,8 @@ export class Company implements ModelObject{
         return Models.agency.get(id);
     }
 
-    @Reference({type: Types.UUID})
-    getStaffs(id?:string): Promise<Staff[]> {
-        return Models.staff.find({companyId: id});
+    getStaffs(): Promise<Staff[]> {
+        return Models.staff.find({companyId: this.id});
     }
     
     // @Reference({type: Types.UUID})
@@ -121,7 +120,7 @@ export class MoneyChanges implements ModelObject {
     get status(): number { return 0; }
     set status(val: number) {}
 
-    @Field({type: Types.DOUBLE})
+    @Field({type: Types.NUMERIC(15, 2)})
     get money(): number { return 0; }
     set money(val: number) {}
 
