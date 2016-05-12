@@ -1,5 +1,5 @@
 
-import * as ApiStaff from 'api/client/staff';
+import ApiStaff = require('api/client/staff');
 import ApiCompany= require('api/client/company');
 import * as ApiDepartment from 'api/client/department';
 import * as ApiTravelPolicy from 'api/client/travelPolicy';
