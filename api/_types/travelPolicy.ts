@@ -54,6 +54,15 @@ export class TravelPolicy implements ModelObject{
     get createAt(): Date {return null}
     set createAt(createAt: Date){}
 
+    @Update(Models.travelPolicy.update)
+    save() : Promise<void> {
+        return null;
+    }
+
+    @Destroy(Models.travelPolicy.destroy)
+    destroy() : Promise<void> {
+        return null;
+    }
     /*getCompanyId() {
         return API.company.getCompany({companyId: this.companyId});
     }*/
