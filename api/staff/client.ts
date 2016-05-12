@@ -1,7 +1,7 @@
 
-import { CachedService, requireAPI } from '../_types/index';
-import { Staff, Credential } from '../_types/staff';
-import * as ApiStaff from 'api/client/staff';
+import { CachedService, requireAPI } from 'api/_types';
+import { Staff, Credential } from 'api/_types/staff';
+import ApiStaff = require('api/client/staff');
 
 export class StaffService extends CachedService<Staff>{
     constructor($cacheFactory: ng.ICacheFactoryService){
@@ -31,7 +31,7 @@ export class StaffService extends CachedService<Staff>{
     }
 }
 
-export class CredentialService extends ClientService<Credential>{
+export class CredentialService extends CachedService<Credential>{
     constructor($cacheFactory: ng.ICacheFactoryService){
         super($cacheFactory('credential'));
     }

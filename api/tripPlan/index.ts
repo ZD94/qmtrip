@@ -36,11 +36,8 @@ let INVOICE_TYPE = {
     HOTEL: 2
 };
 
-let tripPlan: any = {};
-
-let TripDetailsCols = Object.keys(TripDetailsModel.attributes);
-tripPlan.TripDetailsCols = TripDetailsCols;
-tripPlan.TripPlanCols = Object.keys(TripPlanModel.attributes);
+export let TripDetailsCols = Object.keys(TripDetailsModel.attributes);
+export let TripPlanCols = Object.keys(TripPlanModel.attributes);
 
 export class TripPlanService implements ServiceInterface<TripPlan>{
     async create(obj: Object): Promise<TripPlan>{
@@ -85,8 +82,7 @@ export class TripDetailService implements ServiceInterface<TripDetail>{
  * @param params
  * @returns {Promise<TripPlan>}
  */
-tripPlan.saveTripPlan = saveTripPlan;
-async function saveTripPlan(params){
+export async function saveTripPlan(params){
     let tripDetails = params.tripDetails;
     delete params.tripDetails;
     let _planOrder = params;
@@ -137,10 +133,9 @@ async function saveTripPlan(params){
  * @param params
  * @returns {*}
  */
-tripPlan.getTripPlanOrder = getTripPlanOrder;
 getTripPlanOrder['required_params'] = ['orderId'];
 getTripPlanOrder['optional_params'] = ['columns'];
-async function getTripPlanOrder(params){
+export async function getTripPlanOrder(params){
     let orderId = params.orderId;
     let options: any = {};
 
@@ -163,7 +158,7 @@ async function getTripPlanOrder(params){
 }
 
 
-tripPlan.getConsumeInvoiceImg = function(params) {
+export function getConsumeInvoiceImg(params) {
     let consumeId = params.consumeId;
 
     if (!consumeId) {
@@ -187,10 +182,9 @@ tripPlan.getConsumeInvoiceImg = function(params) {
 
 }
 
-tripPlan.getConsumeDetail = getConsumeDetail;
 getConsumeDetail['required_params'] = ['consumeId'];
 getConsumeDetail['optional_params'] = ['columns'];
-async function getConsumeDetail(params){
+export async function getConsumeDetail(params){
     let options: any = {};
 
     if(params.columns){
@@ -211,9 +205,8 @@ async function getConsumeDetail(params){
  * @param params
  * @returns {*}
  */
-tripPlan.updateTripPlanOrder = updateTripPlanOrder;
 updateTripPlanOrder['required_params'] = ['userId', 'orderId', 'optLog', 'updates'];
-function updateTripPlanOrder(params){
+export function updateTripPlanOrder(params){
     let orderId = params.orderId;
     let userId = params.userId;
     let optLog = params.optLog;
@@ -252,10 +245,9 @@ function updateTripPlanOrder(params){
  * 更新消费详情
  * @param params
  */
-tripPlan.updateConsumeDetail = updateConsumeDetail;
 updateConsumeDetail['required_params'] = ['consumeId', 'optLog', 'userId', 'updates'];
 updateConsumeDetail['optional_params'] = _.keys(TripDetailsModel.attributes);
-function updateConsumeDetail(params){
+export function updateConsumeDetail(params){
     let updates: any = _.pick(params.updates, _.keys(TripDetailsModel.attributes));
     let trip_plan_id = '';
 
@@ -298,10 +290,9 @@ function updateConsumeDetail(params){
         })
 }
 
-tripPlan.updateConsumeBudget = updateConsumeBudget;
 updateConsumeBudget['required_params'] = ['id', 'budget', 'userId'];
 updateConsumeBudget['optional_params'] = ['invoiceType'];
-function updateConsumeBudget(params){
+export function updateConsumeBudget(params){
     let id = params.id;
 
     return TripDetailsModel.findById(id)
@@ -377,7 +368,7 @@ function updateConsumeBudget(params){
  * @param params
  * @returns {*}
  */
-tripPlan.listTripPlanOrder = async function(options){
+export async function listTripPlanOrder(options){
     let query = options.where;
     let status = query.status;
     typeof status == 'object'?query.status.$ne = STATUS.DELETE:query.status = status;
@@ -403,9 +394,8 @@ tripPlan.listTripPlanOrder = async function(options){
 }
 
 
-tripPlan.findOrdersByOption = findOrdersByOption;
 findOrdersByOption['required_params'] = ['where'];
-function findOrdersByOption(options) {
+export function findOrdersByOption(options) {
     return TripPlanModel.findAll(options);
 }
 
@@ -414,10 +404,9 @@ function findOrdersByOption(options) {
  * @param params
  * @returns {*}
  */
-tripPlan.saveConsumeRecord = saveConsumeRecord;
 saveConsumeRecord['required_params'] = ['orderId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'];
 // saveConsumeRecord['optional_params'] = TripDetailsCols;
-function saveConsumeRecord(params){
+export function saveConsumeRecord(params){
     let record = params;
     record.isCommit = false;
     record.status = STATUS.NO_COMMIT;
@@ -483,9 +472,8 @@ function saveConsumeRecord(params){
  * @param params
  * @returns {*}
  */
-tripPlan.deleteTripPlan = deleteTripPlan;
 deleteTripPlan['required_params'] = ['userId', 'orderId'];
-function deleteTripPlan(params){
+export function deleteTripPlan(params){
     let orderId = params.orderId;
     let userId = params.userId;
     return TripPlanModel.findById(orderId)
@@ -516,9 +504,8 @@ function deleteTripPlan(params){
  * @param params
  * @returns {*}
  */
-tripPlan.deleteConsumeDetail = deleteConsumeDetail;
 deleteConsumeDetail['required_params'] = ['userId', 'id'];
-function deleteConsumeDetail(params){
+export function deleteConsumeDetail(params){
     let id = params.id;
     let userId = params.userId;
 
@@ -547,9 +534,8 @@ function deleteConsumeDetail(params){
  * @param params.picture 新上传的票据fileId
  * @returns {*}
  */
-tripPlan.uploadInvoice = uploadInvoice;
 uploadInvoice['required_params'] = ['consumeId', 'picture', 'userId'];
-function uploadInvoice(params){
+export function uploadInvoice(params){
     let orderId = "";
 
     return TripDetailsModel.findById(params.consumeId)
@@ -624,9 +610,8 @@ function uploadInvoice(params){
  * @param params
  * @returns {Promise.<Instance>}
  */
-tripPlan.getVisitPermission = getVisitPermission;
 getVisitPermission['required_params'] = ['consumeId', 'userId'];
-async function getVisitPermission(params){
+export async function getVisitPermission(params){
     let userId = params.userId;
     let consumeId = params.consumeId;
     let consume = await TripDetailsModel.findById(consumeId);
@@ -662,9 +647,8 @@ async function getVisitPermission(params){
  * 保存出差计划日志
  * @type {saveOrderLogs}
  */
-tripPlan.saveOrderLogs = saveOrderLogs;
 saveOrderLogs['required_params'] = ['userId', 'orderId', 'remark']
-function saveOrderLogs(logs){
+export function saveOrderLogs(logs){
     return TripPlanModel.findById(logs.orderId)
         .then(function(order){
             if(!order || order.status == STATUS.DELETE){
@@ -688,10 +672,9 @@ function saveOrderLogs(logs){
  * @param params.userId 用户id
  * @returns {*|Promise}
  */
-tripPlan.approveInvoice = approveInvoice;
 approveInvoice['required_params'] = ['status', 'consumeId', 'userId'];
 approveInvoice['optional_params'] = ['remark', 'expenditure'];
-function approveInvoice(params){
+export function approveInvoice(params){
     return TripDetailsModel.findById(params.consumeId)
         .then(function(consume){
             if(!consume || consume.status == STATUS.DELETE)
@@ -798,10 +781,9 @@ function approveInvoice(params){
  *
  * @param params
  */
-tripPlan.countTripPlanNum = countTripPlanNum;
 countTripPlanNum['required_params'] = ['companyId'];
 countTripPlanNum['optional_params'] = ['accountId', 'status'];
-function countTripPlanNum(params){
+export function countTripPlanNum(params){
     let query = params;
     query.status = {$ne: STATUS.DELETE};
     return TripPlanModel.count({where: query});
@@ -812,10 +794,9 @@ function countTripPlanNum(params){
  * 按月份统计预算/计划/完成金额
  * @type {statBudgetByMonth}
  */
-tripPlan.statBudgetByMonth = statBudgetByMonth;
 statBudgetByMonth['required_params'] = ['companyId'];
 statBudgetByMonth['optional_params'] = ['startTime', 'endTime', 'accountId'];
-function statBudgetByMonth(params) {
+export function statBudgetByMonth(params) {
     let stTime = params.startTime||moment().format('YYYY-MM-DD');
     let enTime = params.endTime||moment().format('YYYY-MM-DD');
     let timeArr = [];
@@ -888,10 +869,9 @@ function statBudgetByMonth(params) {
  * 统计计划单的动态预算/计划金额和实际支出
  * @param params
  */
-tripPlan.statPlanOrderMoney = statPlanOrderMoney;
 statPlanOrderMoney['required_params'] = ['companyId'];
 statPlanOrderMoney['optional_params'] = ['startTime', 'endTime', 'accountId'];
-function statPlanOrderMoney(params){
+export function statPlanOrderMoney(params){
     let query = params;
     let query_complete: any = {
         companyId: query.companyId,
@@ -951,10 +931,9 @@ function statPlanOrderMoney(params){
  * @param params
  * @returns {*}
  */
-tripPlan.getProjects = getProjects;
 getProjects['required_params'] = ['companyId'];
 getProjects['optional_params'] = ['description'];
-function getProjects(params){
+export function getProjects(params){
     return TripPlanModel.findAll({where: params, group: ['description'], attributes: ['description']})
 }
 
@@ -963,9 +942,8 @@ function getProjects(params){
  * @param params
  * @returns {*}
  */
-tripPlan.commitTripPlanOrder = commitTripPlanOrder;
 commitTripPlanOrder['required_params'] = ['orderId', 'accountId'];
-function commitTripPlanOrder(params){
+export function commitTripPlanOrder(params){
     let id = params.orderId;
     return Promise.all([
         TripPlanModel.findById(id),
@@ -1022,11 +1000,11 @@ function commitTripPlanOrder(params){
  * @param {UUID} params.consumeId
  * @param {UUID} params.accountId
  */
-tripPlan.previewConsumeInvoice = function (params) {
+export function previewConsumeInvoice (params) {
     let consumeId = params.consumeId;
     let accountId = params.accountId;
 
-    return tripPlan.getVisitPermission({consumeId: consumeId, userId: accountId})
+    return getVisitPermission({consumeId: consumeId, userId: accountId})
         .then(function(result) {
             if (!result.allow) {
                 throw L.ERR.PERMISSION_DENY;
@@ -1045,11 +1023,10 @@ tripPlan.previewConsumeInvoice = function (params) {
  * 判断用户是否已经生成改预算
  * @param params
  */
-tripPlan.checkBudgetExist = checkBudgetExist;
 checkBudgetExist['required_params'] = ['tripDetails', 'accountId', 'companyId', 'arrivalCity', 'arrivalCityCode', 'title'];
 checkBudgetExist['optional_params'] = ['deptCity', 'deptCityCode', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'description'];
 let tripDetails_required_fields = ['type', 'startTime', 'invoiceType'];
-async function checkBudgetExist(params){
+export async function checkBudgetExist(params){
     let tripDetails = params.tripDetails;
     delete params.tripDetails;
     let _planOrder = params;
@@ -1093,10 +1070,9 @@ async function checkBudgetExist(params){
     return result;
 }
 
-tripPlan.getProjectList = getProjectList;
 getProjectList['required_params'] = ['companyId'];
 getProjectList['optional_params'] = ['code', 'name', 'count'];
-function getProjectList(params) {
+export function getProjectList(params) {
     let options: any = {
         where: params,
         attributes: ['name'],
@@ -1111,18 +1087,16 @@ function getProjectList(params) {
     return ProjectModel.findAll(options)
 }
 
-tripPlan.createNewProject = createNewProject;
 createNewProject['required_params'] = ['name', 'createUser', 'company_id'];
 createNewProject['optional_params'] = ['code']
-function createNewProject(params) {
+export function createNewProject(params) {
     params.createAt = utils.now();
     return ProjectModel.create(params);
 }
 
-tripPlan.getProjectByName = getProjectByName;
 getProjectByName['required_params'] = ['userId', 'name'];
 getProjectByName['optional_params'] = ['companyId', 'isCreate']
-function getProjectByName(params) {
+export function getProjectByName(params) {
     return ProjectModel.findOne({where: {name: params.name}})
         .then(function(project){
             if(!project && params.isCreate === true) {
@@ -1151,7 +1125,7 @@ function getProjectByName(params) {
  * @param params
  * @returns {Promise<TInstance[]>|any}
  */
-tripPlan.listConsumesByPlanId = function(params) {
+export function listConsumesByPlanId(params) {
     return TripDetailsModel.findAll({where: params.trip_plan_id})
 }
 
@@ -1159,9 +1133,8 @@ tripPlan.listConsumesByPlanId = function(params) {
  * 保存出差计划改动日志
  * @type {saveTripPlanLog}
  */
-tripPlan.saveTripPlanLog = saveTripPlanLog;
 saveTripPlanLog['required_params'] = ['orderId', 'userId', 'remark'];
-function saveTripPlanLog(params) {
+export function saveTripPlanLog(params) {
     params.createAt = utils.now();
     return TripOrderLogsModel.create(params);
 }
@@ -1178,5 +1151,4 @@ function isObjNull(obj){
     return true;
 }
 
-tripPlan.__initHttpApp = require('./invoice');
-module.exports = tripPlan;
+export var __initHttpApp = require('./invoice');
