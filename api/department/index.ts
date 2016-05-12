@@ -220,17 +220,17 @@ function getAllDepartment(params){
  * @returns {*}
  */
 validateApi(getDefaultDepartment, ["companyId"])
-export function getDefaultDepartment(params){
+export function getDefaultDepartment(params): Promise<Department>{
     params.isDefault = true;
     return departmentModel.findOne({where: params})
     .then(function(department) {
         if (department) {
-            return department;
+            return new Department(department);
         }
 
         return departmentModel.create({name: "我的企业", isDefault: true, companyId: params.companyId})
         .then(function(result) {
-            return result;
+            return new Department(result);
         })
     })
 }

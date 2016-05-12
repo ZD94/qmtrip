@@ -12,7 +12,7 @@ export enum ECompanyStatus {
 }
 
 
-@Table('company.Company')
+@Table('company.')
 @regApiType('API.')
 export class Company implements ModelObject{
     target: Object;

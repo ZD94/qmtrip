@@ -185,6 +185,7 @@ describe("api/client/department.js", function() {
 //查询默认部门
     it("#getDefaultDepartment should be ok", function (done) {
         API.client.department.getDepartment.call(self, {id: null}, function (err, result) {
+            console.info("resultresultresultresult:", result);
             assert.equal(err, null);
             done();
         });
