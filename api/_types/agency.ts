@@ -19,7 +19,7 @@ export enum  AGENCY_ROLE {
     ADMIN = 2
 };
 
-@Table('agency.agency')
+@Table('agency.')
 @regApiType('API.')
 export class Agency implements ModelObject{
     target: Object;
@@ -77,7 +77,7 @@ export class Agency implements ModelObject{
     destroy(): Promise<void> { return null; }
 }
 
-@Table('agency.agencyUser')
+@Table('agency.')
 @regApiType('API.')
 export class AgencyUser implements ModelObject{
     target: Object;

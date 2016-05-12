@@ -4,7 +4,7 @@ import {Staff} from 'api/_types/staff';
 import { Company } from 'api/_types/company';
 import { Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
 
-@Table("travelpolicy.TravelPolicy")
+@Table("travelpolicy.")
 @regApiType('API.')
 export class TravelPolicy implements ModelObject{
     target: Object;
@@ -24,7 +24,7 @@ export class TravelPolicy implements ModelObject{
     get planeLevel(): string {return null}
     set planeLevel(planeLevel: string){}
 
-    @Field({type: Types.NUMBER})
+    @Field({type: Types.FLOAT})
     get planeDiscount(): number{return null}
     set planeDiscount(planeDiscount: number){}
 
@@ -36,21 +36,16 @@ export class TravelPolicy implements ModelObject{
     get hotelLevel(): string {return null}
     set hotelLevel(hotelLevel: string){}
 
-    @Field({type: Types.NUMBER})
+    @Field({type: Types.FLOAT})
     get hotelPrice(): number {return null}
     set hotelPrice(hotelPrice: number){}
-
-    @Field({type: Types.UUID})
-    get companyId(): string {return null}
-    set companyId(companyId: string){}
 
     @Field({type: Types.BOOLEAN})
     get isChangeLevel(): boolean {return null}
     set isChangeLevel(isChangeLevel: boolean){}
 
-    @Field({type: Types.DATE})
-    get createAt(): Date {return null}
-    set createAt(createAt: Date){}
+    @ResolveRef({type: Types.UUID}, Models.company.get)
+    get company(): Company { return null; }
 
     getStaffs(): Promise<Staff[]> {
         return Models.staff.find({travelLevel: this.id});
@@ -60,12 +55,4 @@ export class TravelPolicy implements ModelObject{
     save(): Promise<void> { return null; }
     @Destroy(Models.travelPolicy.destroy)
     destroy(): Promise<void> { return null; }
-
-    /*getCompanyId() {
-        return API.company.getCompany({companyId: this.companyId});
-    }*/
-
-    /*getStaffs() {
-        return API.staff.getStaffsByTp({travelPolicyId: this.id});
-    }*/
 }

@@ -26,7 +26,7 @@ function enumValues(e){
     return Object.keys(e).map((k)=>e[k]).filter((v)=>(typeof v != 'number'));
 }
 
-@Table("staff.Staff")
+@Table("staff.")
 @regApiType('API.')
 export class Staff implements ModelObject{
     target: Object;
