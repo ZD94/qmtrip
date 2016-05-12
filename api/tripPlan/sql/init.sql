@@ -26,7 +26,7 @@ SET default_with_oids = false;
 
 CREATE TABLE trip_plan (
     id uuid primary key,
-    order_no character varying,
+    plan_no character varying,
     account_id uuid not null,
     company_id uuid not null,
     type integer,
@@ -49,8 +49,8 @@ CREATE TABLE trip_plan (
     audit_remark character varying,
     score integer,
     expire_at timestamp without time zone,
-    create_at timestamp without time zone,
-    update_at timestamp without time zone,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
     commit_time timestamp without time zone,
     dept_city_code character varying,
     arrival_city_code character varying
@@ -67,9 +67,9 @@ COMMENT ON TABLE trip_plan IS '差旅记录表';
 --
 -- TOC entry 1012 (class 0 OID 0)
 -- Dependencies: 101
--- Name: COLUMN trip_plan.order_no; Type: COMMENT; Schema: tripplan; Owner: -
+-- Name: COLUMN trip_plan.plan_no; Type: COMMENT; Schema: tripplan; Owner: -
 --
-COMMENT ON COLUMN trip_plan.order_no IS '计划单号/预算单号';
+COMMENT ON COLUMN trip_plan.plan_no IS '计划单号/预算单号';
 
 --
 -- TOC entry 1013 (class 0 OID 0)
@@ -181,7 +181,7 @@ COMMENT ON COLUMN trip_plan.score IS '获取的积分';
 --
 CREATE TABLE trip_details (
     id uuid primary key,
-    order_id uuid not null,
+    trip_plan_id uuid not null,
     account_id uuid not null,
     type integer,
     status integer default 0,
@@ -195,12 +195,13 @@ CREATE TABLE trip_details (
     budget numeric(15,2),
     expenditure numeric(15,2),
     invoice_type integer,
-    invoice jsonb DEFAULT '[]'::jsonb, -- 票据[{times:1, picture:fileId, create_at:时间, status:审核结果, remark: 备注}]
+    invoice jsonb DEFAULT '[]'::jsonb, -- 票据[{times:1, picture:fileId, created_at:时间, status:审核结果, remark: 备注}]
     remark character varying,
     audit_remark character varying,
     audit_user uuid,
-    create_at timestamp without time zone default now(),
-    update_at timestamp without time zone,
+    created_at timestamp without time zone default now(),
+    updated_at timestamp without time zone,
+    deleted_at timestamp without time zone,
     new_invoice character varying, -- 新上传票据
     dept_city_code character varying,
     arrival_city_code character varying,
@@ -344,11 +345,13 @@ COMMENT ON COLUMN trip_details.new_invoice IS '新上传票据';
 CREATE TABLE tripplan.trip_plan_logs
 (
   id uuid primary key,
-  order_id uuid,
-  details_id uuid,
+  trip_plan_id uuid,
+  trip_detail_id uuid,
   user_id uuid,
   remark character varying,
-  create_at timestamp without time zone
+  created_at timestamp without time zone,
+  updated_at timestamp without time zone,
+  deleted_at timestamp without time zone
 );
 
 
@@ -387,9 +390,9 @@ COMMENT ON COLUMN tripplan.trip_plan_logs.remark IS '备注';
 --
 -- TOC entry 1205 (class 0 OID 0)
 -- Dependencies: 120
--- Name: COLUMN trip_plan_logs.create_at; Type: COMMENT; Schema: tripplan; Owner: -
+-- Name: COLUMN trip_plan_logs.created_at; Type: COMMENT; Schema: tripplan; Owner: -
 --
-COMMENT ON COLUMN tripplan.trip_plan_logs.create_at IS '记录时间';
+COMMENT ON COLUMN tripplan.trip_plan_logs.created_at IS '记录时间';
 
 
 CREATE TABLE tripplan.projects(
@@ -398,7 +401,9 @@ CREATE TABLE tripplan.projects(
     code character varying,
     name character varying,
     create_user uuid,
-    create_at timestamp without time zone
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
+    deleted_at timestamp without time zone
 );
 
 COMMENT ON TABLE tripplan.projects IS '项目列表';

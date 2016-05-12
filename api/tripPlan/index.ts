@@ -5,7 +5,7 @@
 let sequelize = require("common/model").importModel("./models");
 let Models = sequelize.models;
 let TripPlanModel = Models.TripPlan;
-let TripDetailsModel = Models.TripDetails;
+let TripDetailsModel = Models.TripDetail;
 let TripOrderLogsModel = Models.TripPlanLogs;
 let ProjectModel = Models.Projects;
 let uuid = require("node-uuid");
@@ -19,7 +19,8 @@ import _ = require('lodash');
 import moment = require("moment");
 import {validateApi} from 'common/api/helper';
 import {Paginate} from 'common/paginate';
-import {Project, TripPlan, TripDetails} from "api/_types/tripPlan";
+import {Project, TripPlan, TripDetail} from "api/_types/tripPlan";
+import { ServiceInterface } from 'api/_types/index';
 
 let STATUS = {
     DELETE: -2, //删除
@@ -40,6 +41,44 @@ let tripPlan: any = {};
 let TripDetailsCols = Object.keys(TripDetailsModel.attributes);
 tripPlan.TripDetailsCols = TripDetailsCols;
 tripPlan.TripPlanCols = Object.keys(TripPlanModel.attributes);
+
+export class TripPlanService implements ServiceInterface<TripPlan>{
+    async create(obj: Object): Promise<TripPlan>{
+        return API.tripPlan.saveTripPlan(obj);
+    }
+    async get(id: string): Promise<TripPlan>{
+        return API.tripPlan.getTripPlanOrder({orderId: id});
+    }
+    async find(where: any): Promise<TripPlan[]>{
+        return API.tripPlan.listTripPlanOrder(where);
+    }
+    async update(id: string, fields: Object): Promise<TripPlan> {
+        fields[id] = id;
+        return API.tripPlan.updateTripPlanOrder(fields);
+    }
+    async destroy(id: string): Promise<any> {
+        return API.tripPlan.deleteTripPlan({orderId: id});
+    }
+}
+
+export class TripDetailService implements ServiceInterface<TripDetail>{
+    async create(obj: Object): Promise<TripDetail>{
+        return API.tripPlan.saveConsumeRecord(obj);
+    }
+    async get(id: string): Promise<TripDetail>{
+        return API.tripPlan.getConsumeDetail({consumeId: id});
+    }
+    async find(where: any): Promise<TripDetail[]>{
+        return API.tripPlan.listTripPlanOrder(where);
+    }
+    async update(id: string, fields: Object): Promise<any> {
+        fields[id] = id;
+        return API.tripPlan.updateTripPlanOrder(fields);
+    }
+    async destroy(id: string): Promise<any> {
+        return API.tripPlan.deleteTripPlan({orderId: id});
+    }
+}
 
 /**
  * 保存预算单/差旅计划单
@@ -164,7 +203,7 @@ async function getConsumeDetail(params){
         throw {code: -2, msg: '消费记录不存在'};
     }
     
-    return new TripDetails(detail);
+    return new TripDetail(detail);
 }
 
 /**

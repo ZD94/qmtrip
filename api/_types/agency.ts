@@ -67,13 +67,17 @@ export class Agency implements ModelObject{
     get remark(): string { return ''; }
     set remark(val: string) {}
 
-    getStaffs(): Promise<Company[]> {
+    getCompanys(): Promise<Company[]> {
         return Models.company.find({agencyId: this.id});
     }
 
-    @Update(Models.company.update)
+    getUsers(): Promise<AgencyUser[]> {
+        return Models.agencyUser.find({agencyId: this.id});
+    }
+
+    @Update(Models.agency.update)
     save(): Promise<void> { return null; }
-    @Destroy(Models.company.destroy)
+    @Destroy(Models.agency.destroy)
     destroy(): Promise<void> { return null; }
 }
 
@@ -102,7 +106,7 @@ export class AgencyUser implements ModelObject{
     get name(): string { return ''; }
     set name(val: string) {}
 
-    @Field({type: Types.STRING})
+    @Field({type: Types.INTEGER})
     get sex(): number { return 0; }
     set sex(val: number) {}
 
@@ -122,9 +126,13 @@ export class AgencyUser implements ModelObject{
     get roleId(): EAgencyStatus { return 0; }
     set roleId(val: EAgencyStatus) {}
 
-    @Update(Models.company.update)
+    @ResolveRef({type: Types.UUID}, Models.agency.get)
+    get agency(): Agency { return null; }
+
+
+    @Update(Models.agencyUser.update)
     save(): Promise<void> { return null; }
-    @Destroy(Models.company.destroy)
+    @Destroy(Models.agencyUser.destroy)
     destroy(): Promise<void> { return null; }
     
 }

@@ -88,6 +88,53 @@ export class Company implements ModelObject{
     getStaffs(): Promise<Staff[]> {
         return Models.staff.find({companyId: this.id});
     }
+    
+    // @Reference({type: Types.UUID})
+    // getMoneyChanges(id?:string): Promise<MoneyChanges[]> {
+    //     return Models..
+    // }
+
+    @Update(Models.company.update)
+    save(): Promise<void> { return null; }
+    @Destroy(Models.company.destroy)
+    destroy(): Promise<void> { return null; }
+}
+
+@Table('company.MoneyChanges')
+@regApiType('API.')
+export class MoneyChanges implements ModelObject {
+    target: Object;
+    constructor(target: Object) {
+        this.target = target;
+    }
+
+    @Field({type: Types.UUID})
+    get id(): string { return null; }
+    set id(val: string) {}
+
+    @Field({type: Types.UUID})
+    get fundsAccountId(): string { return null; }
+    set fundsAccountId(val: string) {}
+
+    @Field({type: Types.INTEGER})
+    get status(): number { return 0; }
+    set status(val: number) {}
+
+    @Field({type: Types.NUMERIC(15, 2)})
+    get money(): number { return 0; }
+    set money(val: number) {}
+
+    @Field({type: Types.INTEGER})
+    get channel(): number { return 0; }
+    set channel(val: number) {}
+
+    @Field({type: Types.UUID})
+    get userId(): string { return null; }
+    set userId(val: string) {}
+
+    @Field({type: Types.STRING})
+    get remark(): string { return ''; }
+    set remark(val: string) {}
 
     @Update(Models.company.update)
     save(): Promise<void> { return null; }

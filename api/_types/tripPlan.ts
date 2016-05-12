@@ -1,180 +1,298 @@
 
+import { Models, ModelObject } from 'api/_types';
 import { regApiType } from 'common/api/helper';
+import { Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
+import {now} from 'common/utils'
+import {Staff} from 'api/_types/staff';
+import {Company} from 'api/_types/company';
 
-export enum PLAN_STATUS {
+export enum EPlanStatus {
     DELETE = -2, //删除
     NO_BUDGET = -1, //没有预算
+    WAIT_UPLOAD = 0, //待上传票据
     NO_COMMIT = 0, //待提交状态
     COMMIT = 1, //已提交待审核状态
     COMPLETE = 2 //审核完，已完成状态
 };
 
-@regApiType('API.')
-export class Project {
-    id: string;
-    companyId: string;
-    code: string;
-    name: string;
-    createUser: string;
-    createAt: string;
-    
-    constructor(params) {
-        this.id = params.id;
-        this.code = params.code;
-        this.companyId = params.companyId;
-        this.createAt = params.createAt;
-        this.createUser = params.createUser;
-    }
+export enum ETripType {
+    OUT_TRIP = 0, //去程
+    BACK_TRIP = 1,
+    HOTEL = 2
 }
 
+@Table('tripPlan.Project')
 @regApiType('API.')
-export class TripPlan {
-    id: string;
-    orderNo: string;
-    accountId: string;
-    companyId: string;
-    projectId: string;
-    description: string;
-    isInvoiceUpload: boolean;
-    isCommit: boolean;
-    deptCity: string;
-    arrivalCity: string;
-    deptCityCode: string;
-    arrivalCityCode: string;
-    startAt: Date;
-    backAt: Date;
-    isNeedTraffic: boolean;
-    isNeedHotel: boolean;
-    budget: number;
-    expenditure: number;
-    expendInfo: any;
-    auditRemark: string;
-    score: number;
-    expireAt: Date;
-    createAt: Date;
-    remark: string;
-    updateAt: Date;
-    commitTime: Date;
-    orderStatus: string;
-    outTraffic: TripDetails[] = [];
-    backTraffic: TripDetails[] = [];
-    hotel: TripDetails[] = [];
-
-    constructor(params) {
-        this.id = params.id;
-        this.orderNo = params.orderNo;
-        this.accountId = params.accountId;
-        this.companyId = params.companyId;
-        this.projectId = params.projectId;
-        this.description = params.description;
-        this.isInvoiceUpload = params.isInvoiceUpload;
-        this.isCommit = params.isCommit;
-        this.deptCity = params.deptCity;
-        this.deptCityCode = params.deptCityCode;
-        this.arrivalCity = params.arrivalCity;
-        this.arrivalCityCode = params.arrivalCityCode;
-        this.startAt = params.startAt;
-        this.backAt = params.backAt;
-        this.isNeedHotel = params.isNeedHotel;
-        this.isNeedTraffic = params.isNeedTraffic;
-        this.budget = params.budget;
-        this.expenditure = params.expendInfo;
-        this.expendInfo = params.expendInfo;
-        this.auditRemark = params.auditRemark;
-        this.score = params.score;
-        this.expireAt = params.expireAt;
-        this.createAt = params.createAt;
-        this.remark = params.remark;
-        this.updateAt = params.updateAt;
-        this.commitTime = params.commitTime;
-        this.orderStatus = params.orderStatus;
-        this.outTraffic = params.outTraffic ? params.outTraffic.map(function(d){d.type = 1; return new TripDetails(d);}) : [];
-        this.backTraffic = params.backTraffic ? params.backTraffic.map(function(d){d.type = 2; return new TripDetails(d);}) : [];
-        this.hotel = params.hotel ? params.hotel.map(function(d){d.type = 3; return new TripDetails(d);}) : [];
-        let tripDetails = params.tripDetails;
-        if(tripDetails && tripDetails.length > 0) {
-            let hotel = [], outTraffic = [], backTraffic = [];
-            tripDetails.map(function(d) {
-                if(d.type === 1) {
-                    outTraffic.push(new TripDetails(d));
-                }else if (d.type === 2){
-                    backTraffic.push(new TripDetails(d));
-                }else if(d.type === 3) {
-                    hotel.push(new TripDetails(d));
-                }
-            });
-            this.outTraffic = outTraffic;
-            this.backTraffic = backTraffic;
-            this.hotel = hotel;
-        }
+export class Project implements ModelObject{
+    target: Object;
+    constructor(target: Object) {
+        this.target = target;
     }
+
+    @Field({type: Types.UUID})
+    get id(): string { return null; }
+    set id(val: string) {}
+
+    @Field({type: Types.UUID})
+    get companyId(): string { return null; }
+    set companyId(val: string) {}
+
+    @Field({type: Types.UUID})
+    get createUser(): string { return null; }
+    set createUser(val: string) {}
+
+    @Field({type: Types.STRING})
+    get code(): string { return ''; }
+    set code(val: string) {}
+
+    @Update(Models.company.update)
+    save(): Promise<void> { return null; }
+    @Destroy(Models.company.destroy)
+    destroy(): Promise<void> { return null; }
 }
 
+@Table('tripplan.TripPlan')
 @regApiType('API.')
-export class TripDetails {
-    id: string;
-    orderId: string;
-    accountId: string;
-    type: number;
-    status: number;
-    isCommit: boolean;
-    deptCity: string;
-    arrivalCity: string;
-    city: string;
-    deptCityCode: string;
-    arrivaltCityCode: string;
-    cityCode: number;
-    hotelName: string;
-    startTime: Date;
-    endTime: Date;
-    latestArriveTime: Date;
-    budget: number;
-    expenditure: number;
-    invoiceType: number;
-    invoice: string;
-    newInvoice: string;
-    auditRemark: string;
-    auditUser: string;
-    createAt: Date;
-    remark: string;
-    updateAt: Date;
-    commitTime: Date;
-    orderStatus: string;
-    
-    constructor(params) {
-        try {
-            this.id = params.id;
-            this.orderId = params.orderId;
-            this.accountId = params.accountId;
-            this.type = params.type;
-            this.status = params.status;
-            this.isCommit = params.isCommit;
-            this.deptCity = params.deptCity;
-            this.arrivalCity = params.arrivalCity;
-            this.city = params.city;
-            this.deptCityCode = params.deptCityCode;
-            this.arrivaltCityCode = params.arrivaltCityCode;
-            this.cityCode = params.cityCode;
-            this.hotelName = params.hotelName;
-            this.startTime = params.startTime;
-            this.endTime = params.endTime;
-            this.latestArriveTime = params.latestArriveTime;
-            this.budget = params.budget;
-            this.expenditure = params.expenditure;
-            this.invoiceType = params.invoiceType;
-            this.invoiceType = params.invoiceType;
-            this.invoice = params.invoice;
-            this.newInvoice = params.newInvoice;
-            this.auditRemark = params.auditRemark;
-            this.auditUser = params.auditUser;
-            this.createAt = params.createAt;
-            this.remark = params.remark;
-            this.updateAt = params.updateAt;
-            this.commitTime = params.commitTime;
-            this.orderStatus = params.orderStatus;
-        }catch(err) {
-            console.info(err);
-            throw err;
-        }
+export class TripPlan implements ModelObject {
+    target: Object;
+    constructor(target: Object) {
+        this.target = target;
     }
+
+    @Field({type: Types.UUID})
+    get id(): string { return null; }
+    set id(val: string) {}
+
+    @Field({type: Types.STRING})
+    get orderNo(): string { return ''; }
+    set orderNo(val: string) {}
+
+    @Field({type: Types.UUID})
+    get companyId(): string { return null; }
+    set companyId(val: string) {}
+
+    @Field({type: Types.UUID})
+    get projectId(): string { return null; }
+    set projectId(val: string) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isInvoiceUpload(): boolean { return false; }
+    set isInvoiceUpload(val: boolean) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isCommit(): boolean { return false; }
+    set isCommit(val: boolean) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isNeedTraffic(): boolean { return false; }
+    set isNeedTraffic(val: boolean) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isNeedHotel(): boolean { return false; }
+    set isNeedHotel(val: boolean) {}
+
+    @Field({type: Types.STRING})
+    get description(): string { return ''; }
+    set description(val: string) {}
+
+    @Field({type: Types.STRING})
+    get deptCity(): string { return ''; }
+    set deptCity(val: string) {}
+
+    @Field({type: Types.STRING})
+    get arrivalCity(): string { return ''; }
+    set arrivalCity(val: string) {}
+
+    @Field({type: Types.STRING})
+    get deptCityCode(): string { return ''; }
+    set deptCityCode(val: string) {}
+
+    @Field({type: Types.STRING})
+    get arrivalCityCode(): string { return ''; }
+    set arrivalCityCode(val: string) {}
+
+    @Field({type: Types.DATE})
+    get startAt(): Date { return null; }
+    set startAt(val: Date) {}
+
+    @Field({type: Types.DATE})
+    get backAt(): Date { return null; }
+    set backAt(val: Date) {}
+
+    @Field({type: Types.DOUBLE})
+    get budget(): number { return 0; }
+    set budget(val: number) {}
+
+    @Field({type: Types.DOUBLE})
+    get expenditure(): number { return 0; }
+    set expenditure(val: number) {}
+
+
+    @Field({type: Types.JSONB})
+    get expendInfo(): Object { return null; }
+    set expendInfo(val: Object) {}
+
+    @Field({type: Types.STRING})
+    get auditRemark(): string { return ''; }
+    set auditRemark(val: string) {}
+
+    @Field({type: Types.INTEGER})
+    get score(): number { return 0; }
+    set score(val: number) {}
+
+    @Field({type: Types.DATE})
+    get expireAt(): Date { return null; }
+    set expireAt(val: Date) {}
+
+    @Field({type: Types.STRING})
+    get remark(): string { return ''; }
+    set remark(val: string) {}
+
+    @Field({type: Types.DATE})
+    get commitTime(): Date { return null; }
+    set commitTime(val: Date) {}
+
+    @Reference({type: Types.UUID}, 'accountId')
+    getStaff(id?:string): Promise<Staff> {
+        return Models.staff.get(id);
+    }
+
+    @Reference({type: Types.UUID})
+    getCompany(id?:string): Promise<Company> {
+        return Models.company.get(id);
+    }
+
+    getOutTrip(id: string): Promise<TripDetail[]> {
+        return Models.tripDetail.find({planId: id, type: ETripType.OUT_TRIP});
+    }
+
+    getBackTrip(id: string): Promise<TripDetail[]> {
+        return Models.tripDetail.find({planId: id, type: ETripType.BACK_TRIP});
+    }
+
+    getHotel(id: string): Promise<TripDetail[]> {
+        return Models.tripDetail.find({planId: id, type: ETripType.HOTEL});
+    }
+
+    @Update(Models.company.update)
+    save(): Promise<void> { return null; }
+    @Destroy(Models.company.destroy)
+    destroy(): Promise<void> { return null; }
+}
+
+@Table('tripplan.')
+@regApiType('API.')
+export class TripDetail implements ModelObject{
+    target: Object;
+    constructor(target: Object) {
+        this.target = target;
+    }
+
+    @Field({type: Types.UUID})
+    get id(): string { return null; }
+    set id(val: string) {}
+
+    @Field({type: Types.UUID})
+    get planId(): string { return null; }
+    set planId(val: string) {}
+
+    @Field({type: Types.UUID})
+    get accountId(): string { return null; }
+    set accountId(val: string) {}
+
+    @Field({type: Types.INTEGER})
+    get type(): ETripType { return 0; }
+    set type(val: ETripType) {}
+
+    @Field({type: Types.INTEGER})
+    get status(): ETripType { return 0; }
+    set status(val: ETripType) {}
+
+    @Field({type: Types.STRING})
+    get deptCity(): string { return ''; }
+    set deptCity(val: string) {}
+
+    @Field({type: Types.STRING})
+    get arrivalCity(): string { return ''; }
+    set arrivalCity(val: string) {}
+
+    @Field({type: Types.STRING})
+    get deptCityCode(): string { return ''; }
+    set deptCityCode(val: string) {}
+
+    @Field({type: Types.STRING})
+    get arrivalCityCode(): string { return ''; }
+    set arrivalCityCode(val: string) {}
+
+    @Field({type: Types.STRING})
+    get city(): string { return ''; }
+    set city(val: string) {}
+
+    @Field({type: Types.STRING})
+    get CityCode(): string { return ''; }
+    set CityCode(val: string) {}
+
+    @Field({type: Types.STRING})
+    get hotelName(): string { return ''; }
+    set hotelName(val: string) {}
+
+    @Field({type: Types.STRING})
+    get invoice(): string { return ''; }
+    set invoice(val: string) {}
+
+    @Field({type: Types.STRING})
+    get newInvoice(): string { return ''; }
+    set newInvoice(val: string) {}
+
+    @Field({type: Types.STRING})
+    get auditRemark(): string { return ''; }
+    set auditRemark(val: string) {}
+
+    @Field({type: Types.UUID})
+    get auditUser(): string { return null; }
+    set auditUser(val: string) {}
+
+    @Field({type: Types.STRING})
+    get remark(): string { return null; }
+    set remark(val: string) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isCommit(): boolean { return false; }
+    set isCommit(val: boolean) {}
+
+    @Field({type: Types.DATE})
+    get startTime(): Date { return null; }
+    set startTime(val: Date) {}
+
+    @Field({type: Types.DATE})
+    get endTime(): Date { return null; }
+    set endTime(val: Date) {}
+
+    @Field({type: Types.DATE})
+    get latestArriveTime(): Date { return null; }
+    set latestArriveTime(val: Date) {}
+
+    @Field({type: Types.DATE})
+    get commitTime(): Date { return null; }
+    set commitTime(val: Date) {}
+
+    @Field({type: Types.DOUBLE})
+    get budget(): number { return 0; }
+    set budget(val: number) {}
+
+    @Field({type: Types.DOUBLE})
+    get expenditure(): number { return 0; }
+    set expenditure(val: number) {}
+
+    @Field({type: Types.INTEGER})
+    get invoiceType(): number { return 0; }
+    set invoiceType(val: number) {}
+
+    @ResolveRef({type: Types.UUID}, Models.tripPlan.get, 'planId')
+    get tripPlan(): TripPlan { return null; }
+
+    @Update(Models.company.update)
+    save(): Promise<void> { return null; }
+    @Destroy(Models.company.destroy)
+    destroy(): Promise<void> { return null; }
 }

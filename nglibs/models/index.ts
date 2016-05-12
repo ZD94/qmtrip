@@ -4,13 +4,19 @@ import ApiCompany= require('api/client/company');
 import * as ApiDepartment from 'api/client/department';
 import * as ApiTravelPolicy from 'api/client/travelPolicy';
 import ApiAgency = require('api/client/agency');
+import ApiTripPlan = require('api/client/tripPlan');
 
 import ng = require('angular');
 
 import {
     ServiceInterface, ModelsInterface, Models,
+<<<<<<< HEAD
     Staff, Credential, Company, Department, TravelPolicy,
     Agency, AgencyUser
+=======
+    Staff, Company, Department, TravelPolicy,
+    Agency, AgencyUser, TripPlan, TripDetail
+>>>>>>> 7dba6f1d1774d8d807ae0f059c7e7b54e1edd42e
 } from 'api/_types';
 
 const API = require('common/api');
@@ -281,6 +287,64 @@ class AgencyUserService extends ClientService<AgencyUser>{
     }
 }
 
+class TripPlanService extends ClientService<TripPlan>{
+    constructor($cacheFactory: ng.ICacheFactoryService){
+        super($cacheFactory('tripPlan'));
+    }
+
+    async $create(obj: any): Promise<TripPlan> {
+        var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
+        return api.saveTripPlan(obj);
+    }
+    
+    async $get(id: string): Promise<TripPlan>{
+        var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
+        return api.getTripPlanById({orderId: id});
+    }
+    async $find(where: any): Promise<string[]>{
+        var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
+        return api.pageTripPlans(where);
+    }
+    async $update(id: string, fields: any): Promise<any> {
+        var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
+        fields['orderId'] = id;
+        return api.updateTripPlanOrder(fields);
+    }
+    async $destroy(id: string): Promise<any> {
+        var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
+        return api.deleteTripPlan({orderId: id});
+    }
+}
+
+class TripDetailService extends ClientService<TripDetail>{
+    constructor($cacheFactory: ng.ICacheFactoryService){
+        super($cacheFactory('tripDetail'));
+    }
+
+    async $create(obj: any): Promise<TripDetail> {
+        var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
+        return api.saveTripPlan(obj);
+    }
+
+    async $get(id: string): Promise<TripDetail>{
+        var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
+        return api.getTripPlanById({orderId: id});
+    }
+    async $find(where: any): Promise<string[]>{
+        var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
+        return api.pageTripPlans(where);
+    }
+    async $update(id: string, fields: any): Promise<any> {
+        var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
+        fields['orderId'] = id;
+        return api.updateTripPlanOrder(fields);
+    }
+    async $destroy(id: string): Promise<any> {
+        var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
+        return api.deleteTripPlan({orderId: id});
+    }
+}
+
 @ngService('Models')
 class ClientModels implements ModelsInterface {
     $injector: ng.auto.IInjectorService;
@@ -293,6 +357,8 @@ class ClientModels implements ModelsInterface {
     travelPolicy: ClientService<TravelPolicy>;
     agency: ClientService<Agency>;
     agencyUser: ClientService<AgencyUser>;
+    tripPlan: ClientService<TripPlan>;
+    tripDetail: ClientService<TripDetail>
 
     constructor($injector, $cacheFactory) {
         this.$injector = $injector;
@@ -305,10 +371,13 @@ class ClientModels implements ModelsInterface {
         this.travelPolicy = new TravelPolicyService($cacheFactory);
         this.agency = new AgencyService($cacheFactory);
         this.agencyUser = new AgencyUserService($cacheFactory);
-
+        this.tripPlan = new TripPlanService($cacheFactory);
+        this.tripDetail = new TripDetailService($cacheFactory);
+        
         Models.init(this);
     }
 }
 
 import './menu';
 import './place';
+// import {TripPlanService, TripDetailService} from "../../api/tripPlan/index";

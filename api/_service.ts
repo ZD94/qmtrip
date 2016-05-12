@@ -6,10 +6,13 @@ import { Department } from './_types/department';
 import { TravelPolicy } from './_types/travelPolicy';
 import { Agency, AgencyUser } from './_types/agency';
 import { StaffService, CredentialService} from './staff/index';
+import { TripPlan, TripDetail } from './_types/tripPlan';
+import { StaffService } from './staff/index';
 import { CompanyService } from './company/index';
 import { DepartmentService } from './department/index';
 import { TravelPolicyService } from './travelPolicy/index';
 import { AgencyService, AgencyUserService } from './agency/index';
+import { TripPlanService, TripDetailService } from './tripPlan/index';
 
 class ServerModels implements ModelsInterface {
     staff: ServiceInterface<Staff>;
@@ -19,6 +22,8 @@ class ServerModels implements ModelsInterface {
     travelPolicy: ServiceInterface<TravelPolicy>;
     agency: ServiceInterface<Agency>;
     agencyUser: ServiceInterface<AgencyUser>;
+    tripPlan: ServiceInterface<TripPlan>;
+    tripDetail: ServiceInterface<TripDetail>;
 
     constructor() {
         this.staff = new StaffService();
@@ -28,6 +33,8 @@ class ServerModels implements ModelsInterface {
         this.travelPolicy = new TravelPolicyService();
         this.agency = new AgencyService();
         this.agencyUser = new AgencyUserService();
+        this.tripPlan = new TripPlanService();
+        this.tripDetail = new TripDetailService();
     }
 }
 

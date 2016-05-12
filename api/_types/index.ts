@@ -3,6 +3,7 @@ import { Staff, Credential } from "./staff";
 import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
 import { Agency, AgencyUser } from './agency';
+import { TripPlan, TripDetail } from './tripPlan';
 
 export interface ModelObject {
     save(): Promise<void>;
@@ -26,6 +27,9 @@ export interface ModelsInterface {
 
     agency: ServiceInterface<Agency>
     agencyUser: ServiceInterface<AgencyUser>;
+
+    tripPlan: ServiceInterface<TripPlan>;
+    tripDetail: ServiceInterface<TripDetail>;
 }
 
 import {autobind} from 'core-decorators';
@@ -72,6 +76,9 @@ class ModelsDelegate implements ModelsInterface {
     agency: ServiceDelegate<Agency> = new ServiceDelegate<Agency>();
     agencyUser: ServiceDelegate<AgencyUser> = new ServiceDelegate<AgencyUser>();
 
+    tripPlan: ServiceDelegate<TripPlan> = new ServiceDelegate<TripPlan>();
+    tripDetail: ServiceDelegate<TripDetail> = new ServiceDelegate<TripDetail>();
+
     init(target: ModelsInterface){
         this.staff.setTarget(target.staff);
         this.credential.setTarget(target.credential);
@@ -80,6 +87,8 @@ class ModelsDelegate implements ModelsInterface {
         this.travelPolicy.setTarget(target.travelPolicy);
         this.agency.setTarget(target.agency);
         this.agencyUser.setTarget(target.agencyUser);
+        this.tripPlan.setTarget(target.tripPlan);
+        this.tripDetail.setTarget(target.tripDetail);
     }
 }
 export var Models = new ModelsDelegate();
@@ -89,3 +98,4 @@ export * from "./staff";
 export * from './travelPolicy';
 export * from './department';
 export * from './agency';
+export * from './tripPlan';
