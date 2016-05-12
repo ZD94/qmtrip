@@ -1,14 +1,12 @@
 import { regApiType } from 'common/api/helper';
 import { Models, ModelObject } from 'api/_types';
+import {Staff} from 'api/_types/staff';
 import { Company } from 'api/_types/company';
 import { Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
-
-var API = require("common/api");
 
 @Table("travelpolicy.TravelPolicy")
 @regApiType('API.')
 export class TravelPolicy implements ModelObject{
-
     target: Object;
     constructor(target: Object) {
         this.target = target;
@@ -53,6 +51,15 @@ export class TravelPolicy implements ModelObject{
     @Field({type: Types.DATE})
     get createAt(): Date {return null}
     set createAt(createAt: Date){}
+
+    getStaffs(): Promise<Staff[]> {
+        return Models.staff.find({travelLevel: this.id});
+    }
+
+    @Update(Models.travelPolicy.update)
+    save(): Promise<void> { return null; }
+    @Destroy(Models.travelPolicy.destroy)
+    destroy(): Promise<void> { return null; }
 
     /*getCompanyId() {
         return API.company.getCompany({companyId: this.companyId});

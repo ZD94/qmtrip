@@ -4,6 +4,7 @@
 'use strict';
 var sequelize = require("common/model").importModel("./models");
 var travalPolicyModel = sequelize.models.TravelPolicy;
+var _ = require('lodash');
 import {Paginate} from 'common/paginate';
 var API = require("common/api");
 import {validateApi} from 'common/api/helper';
@@ -38,8 +39,7 @@ export class TravelPolicyService implements ServiceInterface<TravelPolicy>{
  * @returns {*}
  */
 validateApi(createTravelPolicy, ["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"], travalPolicyCols);
-export function createTravelPolicy(data){
-    console.info("createData=>", data);
+export function createTravelPolicy(data): Promise<TravelPolicy>{
     if (!data.hotelPrice || !/^\d+(.\d{1,2})?$/.test(data.hotelPrice)) {
         data.hotelPrice = null;
     }
@@ -48,7 +48,10 @@ export function createTravelPolicy(data){
             if(result){
                 throw {msg: "该等级名称已存在，请重新设置"};
             }
-            return travalPolicyModel.create(data);
+            return travalPolicyModel.create(data)
+                .then(function(result){
+                    return new TravelPolicy(result);
+                })
         });
 }
 
@@ -58,7 +61,7 @@ export function createTravelPolicy(data){
  * @returns {*}
  */
 validateApi(deleteTravelPolicy, ["id"]);
-export function deleteTravelPolicy(params){
+export function deleteTravelPolicy(params): Promise<any>{
     var id = params.id;
     return API.staff.getStaffs({travelLevel: id, status: 0})
         .then(function(staffs){
@@ -86,7 +89,7 @@ export function deleteTravelPolicyByTest(params){
  * @returns {*}
  */
 validateApi(updateTravelPolicy, ["id"], travalPolicyCols);
-export function updateTravelPolicy(data){
+export function updateTravelPolicy(data): Promise<TravelPolicy>{
     var id = data.id;
     delete data.id;
     var options : any = {};
@@ -97,7 +100,7 @@ export function updateTravelPolicy(data){
     }
     return travalPolicyModel.update(data, options)
         .spread(function(rownum, rows){
-            return rows[0];
+            return new TravelPolicy(rows[0]);
         });
 }
 /**
@@ -107,7 +110,7 @@ export function updateTravelPolicy(data){
  * @returns {*}
  */
 validateApi(getTravelPolicy, ["id"]);
-export function getTravelPolicy(params){
+export function getTravelPolicy(params): Promise<TravelPolicy>{
     var id = params.id;
 
     var isReturnDefault = params.isReturnDefault;
@@ -123,7 +126,10 @@ export function getTravelPolicy(params){
         }
     }
 
-    return travalPolicyModel.findById(id);
+    return travalPolicyModel.findById(id)
+        .then(function(data){
+            return new TravelPolicy(data);
+        })
 }
 
 /**
@@ -140,14 +146,18 @@ export function getAllTravelPolicy(options){
  * @param params
  * @returns {*}
  */
-export function getTravelPolicies(params){
-    var options : any = {};
-    options.where = _.pick(params, Object.keys(travalPolicyModel.attributes));
-    if(params.$or) {
-        options.where.$or = params.$or;
-    }
+export function getTravelPolicies(params): Promise<TravelPolicy[]>{
+    var options: any = {
+        where:  _.pick(params, Object.keys(travalPolicyModel.attributes))
+    };
     if(params.columns){
         options.attributes = params.columns;
+    }
+    if(params.order){
+        options.order = params.order;
+    }
+    if(params.$or) {
+        options.where.$or = params.$or;
     }
     return travalPolicyModel.findAll(options);
 }

@@ -57,15 +57,15 @@ describe("api/client/staff.js", function() {
                 return API.client.agency.createAgency.call({}, agency);
             })
             .then(function(ret){
-                agencyId = ret.agency.id;
-                agencyUserId = ret.agencyUser.id;
+                agencyId = ret.id;
+                agencyUserId = ret.target.createUser;
                 agencySelf = {accountId: agencyUserId};
                 return API.client.company.createCompany.call({accountId: agencyUserId}, company);
             })
             .then(function(company){
                 assert.equal(company.status, 0);
                 companyId = company.id;
-                accountId = company.createUser;
+                accountId = company.target.createUser;
                 ownerSelf = {accountId: accountId};
                 done();
             })

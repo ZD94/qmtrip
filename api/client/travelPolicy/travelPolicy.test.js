@@ -52,15 +52,15 @@ describe("api/client/travelPolicy.js", function() {
                 return API.client.agency.createAgency.call({}, agency);
             })
             .then(function(ret){
-                agencyId = ret.agency.id;
-                agencyUserId = ret.agencyUser.id;
+                agencyId = ret.id;
+                agencyUserId = ret.target.createUser;
                 agencySelf = {accountId: agencyUserId};
                 return API.client.company.createCompany.call({accountId: agencyUserId}, company);
             })
             .then(function(company){
                 assert.equal(company.status, 0);
                 companyId = company.id;
-                accountId = company.createUser;
+                accountId = company.target.createUser;
                 self = {accountId: accountId};
                 done();
             })
@@ -90,7 +90,6 @@ describe("api/client/travelPolicy.js", function() {
         API.client.travelPolicy.createTravelPolicy.call(self, obj, function(err, result) {
             assert.equal(err, null);
             id = result.id;
-            console.info("result=>",result);
             done();
         });
     })
@@ -121,9 +120,8 @@ describe("api/client/travelPolicy.js", function() {
     })
     it("#getTravelPolicies should be ok", function(done) {
         API.client.travelPolicy.getTravelPolicies.call(self, {name: "456"}, function(err, result) {
-            assert.equal(err, null);
-//            console.log(result);
 //                console.log(result.items);//item dataValues里存放的才是记录信息
+            assert.equal(err, null);
             done();
         });
     })
@@ -132,7 +130,6 @@ describe("api/client/travelPolicy.js", function() {
         obj.id = id;
         API.client.travelPolicy.updateTravelPolicy.call(self, obj, function(err, result) {
             assert.equal(err, null);
-            console.info("updateResult=>", result);
             done();
         });
     })
