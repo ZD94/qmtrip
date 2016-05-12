@@ -142,7 +142,7 @@ export function updateStaff(params) : Promise<Staff>{
  * 企业根据id得到员工信息
  * @type {*}
  */
-export function getStaff(params): Promise<Staff> {
+export function getStaff(params): Promise<Staff> {//此处若加上返回值类型导入方法编译会报错 待查？？？？？
         var user_id = this.accountId;
         var id = params.id;
         return API.auth.judgeRoleById({id:user_id})
