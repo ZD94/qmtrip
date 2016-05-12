@@ -3,8 +3,10 @@
  */
 "use strict";
 
-export function ManagementController($scope){
+var Cookie = require('tiny-cookie');
 
+export function ManagementController($scope){
+    console.info("next ..");
 }
 
 export function BudgetController($scope){
@@ -23,18 +25,27 @@ export function DepartmentController($scope){
 
 }
 
-export function EditpolicyController($scope){
-
+export async function EditpolicyController($scope,Models){
+    var staff = await Models.staff.get(Cookie.get('user_id'))
 }
 
-export function StaffsController($scope,Models){
-    console.info(Models.company.getStaffs());
+export async function StaffsController($scope,Models){
+    var staff = await Models.staff.get(Cookie.get('user_id'));
+    var company = await staff.company;
+    console.info(company.getStaffs());
+    // var company = await Models.company.get(staff.companyId);
+    // console.info(company);
+    console.info(staff);
 }
 
 export function StaffdetailController($scope){
 
 }
 
-export function TravelpolicyController($scope){
-
+export async function TravelpolicyController($scope , Models){
+    var staff = await Models.staff.get(Cookie.get('user_id'));
+    var company = await staff.company;
+    console.info(company.name);
+    console.info(company);
+    console.info(company.getStaffs());
 }
