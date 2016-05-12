@@ -5,6 +5,16 @@ import { Department } from './department';
 import { Agency, AgencyUser } from './agency';
 import { TripPlan, TripDetail } from './tripPlan';
 
+var API = require('common/api');
+
+export async function requireAPI<T>(name) {
+    if(!API[name]){
+        API.require(name)
+        await API.onload();
+    }
+    return API[name] as T;
+}
+
 export interface ModelObject {
     save(): Promise<void>;
     destroy(): Promise<any>;
@@ -18,42 +28,86 @@ export interface ServiceInterface<T> {
     destroy(id:string): Promise<any>;
 }
 
-export interface ModelsInterface {
-    staff: ServiceInterface<Staff>;
-    company: ServiceInterface<Company>
-    department: ServiceInterface<Department>;
-    travelPolicy: ServiceInterface<TravelPolicy>;
+interface Resolvable {
+    id: string;
+    $resolve?: () => Promise<any>;
+}
 
-    agency: ServiceInterface<Agency>
-    agencyUser: ServiceInterface<AgencyUser>;
-
-    tripPlan: ServiceInterface<TripPlan>;
-    tripDetail: ServiceInterface<TripDetail>;
+interface CacheInterface {
+    put<T>(key: string, value?: T): T;
+    get<T>(key: string): T;
+    remove(key: string): void;
+    removeAll(): void;
+    destroy(): void;
 }
 
 import {autobind} from 'core-decorators';
 
+@autobind
+export abstract class CachedService<T extends Resolvable> implements ServiceInterface<T>{
+    abstract $create(obj: Object): Promise<T>;
+    abstract $get(id: string): Promise<T>;
+    abstract $find(where: any): Promise<string[]>;
+    abstract $update(id:string, fields: Object): Promise<any>;
+    abstract $destroy(id:string): Promise<any>;
+
+    constructor(private $cache: CacheInterface){}
+    async create(o: Object): Promise<T>{
+        var obj = await this.$create(o);
+        this.$cache.put(obj.id, obj);
+        return obj;
+    }
+    async find(where: any): Promise<T[]>{
+        var ids = await this.$find(where);
+        return await Promise.all(ids.map((id)=>this.get(id)));
+    }
+    async get(id: string): Promise<T>{
+        var self = this;
+        var obj = self.$cache.get<T>(id);
+        if(obj)
+            return obj;
+        var objPromise = getResolved(id);
+        self.$cache.put(id, objPromise);
+        obj = await objPromise;
+        self.$cache.put(id, obj);
+        return obj;
+
+        async function getResolved(id: string): Promise<T>{
+            var obj = await self.$get(id);
+            if(typeof obj.$resolve == 'function') {
+                await obj.$resolve();
+            }
+            return obj;
+        }
+    }
+    async update(id: string, fields: Object): Promise<any> {
+        var obj = this.$cache.get<T>(id);
+        await this.$update(id, fields);
+        _.extend(obj['target'], fields);
+    }
+    async destroy(id: string): Promise<any> {
+        await this.$destroy(id);
+        this.$cache.remove(id);
+    }
+}
+
+@autobind
 class ServiceDelegate<T> implements ServiceInterface<T>{
-    target: ServiceInterface<T>;
+    private target: ServiceInterface<T>;
     constructor(){
     }
-    @autobind
     create(obj: Object): Promise<T>{
         return this.target.create(obj);
     }
-    @autobind
     get(id: string): Promise<T>{
         return this.target.get(id);
     }
-    @autobind
     find(where: any): Promise<T[]>{
         return this.target.find(where);
     }
-    @autobind
     update(id:string, fields: Object): Promise<any> {
         return this.target.update(id, fields);
     }
-    @autobind
     destroy(id:string): Promise<any> {
         return this.target.destroy(id);
     }
@@ -62,33 +116,38 @@ class ServiceDelegate<T> implements ServiceInterface<T>{
     }
 }
 
-class ModelsDelegate implements ModelsInterface {
-    constructor() {
-    }
+export interface ModelsInterface {
+    staff: ServiceInterface<Staff>;
+    company: ServiceInterface<Company>;
+    department: ServiceInterface<Department>;
+    travelPolicy: ServiceInterface<TravelPolicy>;
 
-    staff: ServiceDelegate<Staff> = new ServiceDelegate<Staff>();
-    company: ServiceDelegate<Company> = new ServiceDelegate<Company>();
-    department: ServiceDelegate<Department> = new ServiceDelegate<Department>();
-    travelPolicy: ServiceDelegate<TravelPolicy> = new ServiceDelegate<TravelPolicy>();
+    agency: ServiceInterface<Agency>;
+    agencyUser: ServiceInterface<AgencyUser>;
 
-    agency: ServiceDelegate<Agency> = new ServiceDelegate<Agency>();
-    agencyUser: ServiceDelegate<AgencyUser> = new ServiceDelegate<AgencyUser>();
+    tripPlan: ServiceInterface<TripPlan>;
+    tripDetail: ServiceInterface<TripDetail>;
+}
 
-    tripPlan: ServiceDelegate<TripPlan> = new ServiceDelegate<TripPlan>();
-    tripDetail: ServiceDelegate<TripDetail> = new ServiceDelegate<TripDetail>();
+export var Models: ModelsInterface = {
+    staff: new ServiceDelegate<Staff>(),
+    company: new ServiceDelegate<Company>(),
+    department: new ServiceDelegate<Department>(),
+    travelPolicy: new ServiceDelegate<TravelPolicy>(),
 
-    init(target: ModelsInterface){
-        this.staff.setTarget(target.staff);
-        this.company.setTarget(target.company);
-        this.department.setTarget(target.department);
-        this.travelPolicy.setTarget(target.travelPolicy);
-        this.agency.setTarget(target.agency);
-        this.agencyUser.setTarget(target.agencyUser);
-        this.tripPlan.setTarget(target.tripPlan);
-        this.tripDetail.setTarget(target.tripDetail);
+    agency: new ServiceDelegate<Agency>(),
+    agencyUser: new ServiceDelegate<AgencyUser>(),
+
+    tripPlan: new ServiceDelegate<TripPlan>(),
+    tripDetail: new ServiceDelegate<TripDetail>(),
+};
+
+export function initModels(models: ModelsInterface){
+    for(let k in models){
+        if(Models[k])
+            Models[k].setTarget(models[k]);
     }
 }
-export var Models = new ModelsDelegate();
 
 export * from "./company";
 export * from "./staff";

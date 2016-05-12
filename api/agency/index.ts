@@ -18,11 +18,9 @@ import {Agency, AgencyUser, EAgencyStatus} from "api/_types/agency";
 import { ServiceInterface } from '../_types/index';
 
 let logger = new Logger("agency");
-let agency : any = {};
 
-agency.agencyCols = Object.keys(AgencyModel.attributes);
-agency.agencyUserCols = Object.keys(AgencyUserModel.attributes);
-
+export var agencyCols = Object.keys(AgencyModel.attributes);
+export var agencyUserCols = Object.keys(AgencyUserModel.attributes);
 
 export class AgencyService implements ServiceInterface<Agency>{
     async create(obj: Object): Promise<Agency>{
@@ -68,7 +66,7 @@ export class AgencyUserService implements ServiceInterface<AgencyUser>{
  * @param params
  * @returns {Agency}
  */
-agency.create = async function(params: {name: string, email: string, pwd: string, id?: string, mobile?: string, 
+export async function create(params: {name: string, email: string, pwd: string, id?: string, mobile?: string, 
     description?: string, remark?: string, status?: number}): Promise<Agency> {
     let _agency = await AgencyModel.findOne({where: {email: params.email}});
     
@@ -87,9 +85,8 @@ agency.create = async function(params: {name: string, email: string, pwd: string
     return new Agency(agency);
 };
 
-agency.createAgency = createAgency;
 validateApi(createAgency, ['name', 'email', 'userName'], ['id', 'mobile', 'pwd', 'description', 'remark', 'status']);
-function createAgency(params) {
+export function createAgency(params) {
     var mobile = params.mobile;
     var email = params.email;
     var _agency = _.clone(params);
@@ -127,7 +124,7 @@ function createAgency(params) {
  * @param params
  * @returns {*}
  */
-agency.updateAgency = async function(_agency){
+export async function updateAgency(_agency){
     var agencyId = _agency.agencyId;
     var userId = _agency.userId;
     let agency = await AgencyModel.findById(agencyId, {attributes: ['createUser']});
@@ -155,9 +152,8 @@ agency.updateAgency = async function(_agency){
  * @param agencyId
  * @returns {*}
  */
-agency.getAgency = getAgency;
 validateApi(getAgency, ['agencyId']);
-function getAgency(params){
+export function getAgency(params){
     var agencyId = params.agencyId;
     return AgencyModel.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updateAt']})
         .then(function(agency){
@@ -174,7 +170,7 @@ function getAgency(params){
  * @param params
  * @returns {*}
  */
-agency.listAgency = function(params){
+export function listAgency(params){
     return AgencyModel.findAll({where: {status: {$ne: EAgencyStatus.DELETE}}, attributes: ['id']});
 }
 
@@ -183,9 +179,8 @@ agency.listAgency = function(params){
  * @param params
  * @returns {*}
  */
-agency.deleteAgency = deleteAgency;
 validateApi(deleteAgency, ['agencyId'], ['userId']);
-function deleteAgency(params){
+export function deleteAgency(params){
     var agencyId = params.agencyId;
     var userId = params.userId;
 
@@ -230,9 +225,8 @@ function deleteAgency(params){
  * @param data
  * @returns {*}
  */
-agency.createAgencyUser = createAgencyUser;
-validateApi(createAgencyUser, ['email', 'mobile', 'agencyId', 'name'], agency.agencyUserCols);
-async function createAgencyUser(params){
+validateApi(createAgencyUser, ['email', 'mobile', 'agencyId', 'name'], agencyUserCols);
+export async function createAgencyUser(params){
     params.id = params.id ? params.id : uuid.v1();
     
     let _agencyUser = await AgencyUserModel.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
@@ -250,7 +244,7 @@ async function createAgencyUser(params){
  * @param params
  * @returns {*}
  */
-agency.deleteAgencyUser = function(params){
+export function deleteAgencyUser(params){
     var userId = params.id;
 
     if (!userId) {
@@ -279,9 +273,8 @@ agency.deleteAgencyUser = function(params){
  * @param data
  * @returns {*}
  */
-agency.updateAgencyUser = updateAgencyUser;
 validateApi(updateAgencyUser, ['id'], ['name', 'sex', 'mobile', 'avatar', 'roleId', 'status']);
-function updateAgencyUser(data){
+export function updateAgencyUser(data){
     var id = data.id;
 
     return AgencyUserModel.findById(id, {attributes: ['status']})
@@ -309,8 +302,7 @@ function updateAgencyUser(data){
  * @param params
  * @returns {*}
  */
-agency.getAgencyUser = getAgencyUser;
-async function getAgencyUser(params){
+export async function getAgencyUser(params){
     let id = params.id;
     let options : any = {};
 
@@ -331,9 +323,8 @@ async function getAgencyUser(params){
  * 通过邮箱获取代理商信息
  * @type {agencyByEmail}
  */
-agency.agencyByEmail = agencyByEmail;
 validateApi(agencyByEmail, ['email'])
-function agencyByEmail(params) {
+export function agencyByEmail(params) {
     params.status = {$ne: EAgencyStatus.DELETE};
     return AgencyModel.findOne({where: params})
 }
@@ -343,7 +334,7 @@ function agencyByEmail(params) {
  * @param params 查询条件 params.company_id 企业id
  * @param options options.perPage 每页条数 options.page当前页
  */
-agency.listAndPaginateAgencyUser = function(params){
+export function listAndPaginateAgencyUser(params){
     var options : any = {};
     if(params.options){
         options = params.options;
@@ -382,7 +373,7 @@ agency.listAndPaginateAgencyUser = function(params){
  * @param params
  * @returns {*|Promise}
  */
-agency.getAgencyUsersId = function(params){
+export function getAgencyUsersId(params){
     return AgencyUserModel.findAll({where: params, attributes: ['id']})
         .then(function(result){
             return result;
@@ -393,7 +384,7 @@ agency.getAgencyUsersId = function(params){
  * 测试用例使用删除代理商和用户的操作，不在client里调用
  * @param params
  */
-agency.deleteAgencyByTest = function(params){
+export function deleteAgencyByTest(params){
     var email = params.email;
     var mobile = params.mobile;
     var name = params.name;
@@ -408,7 +399,7 @@ agency.deleteAgencyByTest = function(params){
 }
 
 var isInit = false;
-agency.__initOnce = function() {
+export function __initOnce() {
     logger.info("初始化默认代理商...");
     if(isInit) {
         return;
@@ -475,5 +466,3 @@ agency.__initOnce = function() {
         })
 
 }
-
-module.exports = agency;
