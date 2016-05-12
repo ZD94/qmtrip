@@ -7,7 +7,6 @@ import { TravelPolicy } from './_types/travelPolicy';
 import { Agency, AgencyUser } from './_types/agency';
 import { StaffService, CredentialService} from './staff/index';
 import { TripPlan, TripDetail } from './_types/tripPlan';
-import { StaffService } from './staff/index';
 import { CompanyService } from './company/index';
 import { DepartmentService } from './department/index';
 import { TravelPolicyService } from './travelPolicy/index';

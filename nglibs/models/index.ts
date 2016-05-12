@@ -9,14 +9,9 @@ import ApiTripPlan = require('api/client/tripPlan');
 import ng = require('angular');
 
 import {
-    ServiceInterface, ModelsInterface, Models,
-<<<<<<< HEAD
-    Staff, Credential, Company, Department, TravelPolicy,
-    Agency, AgencyUser
-=======
+    ServiceInterface, ModelsInterface, Models,Credential,
     Staff, Company, Department, TravelPolicy,
     Agency, AgencyUser, TripPlan, TripDetail
->>>>>>> 7dba6f1d1774d8d807ae0f059c7e7b54e1edd42e
 } from 'api/_types';
 
 const API = require('common/api');
