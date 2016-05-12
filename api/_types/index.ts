@@ -1,5 +1,5 @@
 import { Company } from "./company";
-import { Staff } from "./staff";
+import { Staff, Credential } from "./staff";
 import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
 import { Agency, AgencyUser } from './agency';
@@ -118,6 +118,7 @@ class ServiceDelegate<T> implements ServiceInterface<T>{
 
 export interface ModelsInterface {
     staff: ServiceInterface<Staff>;
+    credential: ServiceInterface<Credential>;
     company: ServiceInterface<Company>;
     department: ServiceInterface<Department>;
     travelPolicy: ServiceInterface<TravelPolicy>;
@@ -131,6 +132,7 @@ export interface ModelsInterface {
 
 export var Models: ModelsInterface = {
     staff: new ServiceDelegate<Staff>(),
+    credential: new ServiceDelegate<Credential>(),
     company: new ServiceDelegate<Company>(),
     department: new ServiceDelegate<Department>(),
     travelPolicy: new ServiceDelegate<TravelPolicy>(),

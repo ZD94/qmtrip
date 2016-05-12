@@ -146,7 +146,7 @@ class ApiAgency {
         return API.agency.deleteAgency(params);
     }
 
-    //@requirePermit("user.add", 2)
+    @requirePermit("user.add", 2)
     static async createAgencyUser(params: AgencyUser) {
         let self: any = this;
         let accountId = self.accountId;
