@@ -89,6 +89,7 @@ export class Staff implements ModelObject{
     getTravelPolicy(id?:string): Promise<TravelPolicy> {
         return Models.travelPolicy.get(id);
     }
+    setTravelPolicy(val: TravelPolicy) {}
 
     @Update(Models.staff.update)
     save(): Promise<void> { return null; }

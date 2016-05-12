@@ -421,7 +421,7 @@ agency.__initOnce = function() {
     var user_name = default_agency.user_name;
 
     ///初始化系统默认代理商
-    Promise.all([
+    return Promise.all([
         API.agency.agencyByEmail({email: email}),
         API.auth.checkAccExist({type: 2, $or: [{mobile: mobile}, {email: email}]}),
         API.company.listCompany({agencyId: null})
