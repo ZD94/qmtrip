@@ -242,7 +242,7 @@ export function updateStaff(data): Promise<any>{
  * @returns {*}
  */
 validateApi(getStaff, ["id"], ["columns"]);
-export function getStaff(params: {id: string, columns?: Array<string>}): Promise<Staff>{
+export function getStaff(params: {id: string, columns?: Array<string>}){
     var id = params.id;
     var options: any = {};
     if(params.columns){
@@ -535,7 +535,7 @@ export function getStaffPointsChange(params){
  * @param params
  * @returns {*}
  */
-/*export function beforeImportExcel(params){
+export function beforeImportExcel(params){
     var userId = params.accountId;
     var fileId = params.fileId;
 //    var obj = nodeXlsx.parse(fileUrl);
@@ -733,7 +733,7 @@ export function getStaffPointsChange(params){
                     return data;
                 });
         });
-}*/
+}
 
 /**
  * 执行导入员工数据

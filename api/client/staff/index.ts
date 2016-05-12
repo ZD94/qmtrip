@@ -119,9 +119,6 @@ export function updateStaff(params) : Promise<Staff>{
                                 throw L.ERR.PERMISSION_DENY;
                             }else{
                                 return API.staff.updateStaff(params)
-                                    .then(function(data){
-                                        return new Staff(data);
-                                    })
                             }
                         })
                 }else{
@@ -129,9 +126,6 @@ export function updateStaff(params) : Promise<Staff>{
                         .then(function(result){
                             if(result){
                                 return API.staff.updateStaff(params)
-                                    .then(function(data){
-                                        return new Staff(data);
-                                    })
                             }else{
                                 throw {code: -1, msg: '无权限'};
                             }
@@ -163,7 +157,7 @@ export function getStaff(params): Promise<Staff> {
                                 throw L.ERR.PERMISSION_DENY;
                             }else{
                                 // return {staff: new Staff(target)};
-                                return new Staff(target);
+                                return target;
                             }
                         })
                 }else{
@@ -171,9 +165,6 @@ export function getStaff(params): Promise<Staff> {
                         .then(function(result){
                             if(result){
                                 return API.staff.getStaff(params)
-                                    .then(function(data){
-                                        return new Staff(data);
-                                    })
                             }else{
                                 throw {code: -1, msg: '无权限'};
                             }
@@ -224,9 +215,6 @@ export function getStaffs(params) {
 export function getCurrentStaff(){
     var self = this;
     return API.staff.getStaff({id: self.accountId})
-        .then(function(data){
-            return new Staff(data);
-        });
 }
 
 /**
@@ -641,9 +629,6 @@ export function statStaffPoints(params){
 export function createPapers(params): Promise<Credentials>{
     params.ownerId = this.accountId;
     return API.staff.createPapers(params)
-        .then(function(data){
-            return new Credentials(data);
-        })
 };
 
 
@@ -684,9 +669,6 @@ export function updatePapers (params): Promise<Credentials>{
             }
             params.ownerId = user_id;
             return API.staff.updatePapers(params)
-                .then(function(data){
-                    return new Credentials(data);
-                })
         });
 };
 
@@ -712,7 +694,7 @@ export function getPapersById(params): Promise<Credentials>{
             if(ma.ownerId && ma.ownerId != user_id){
                 throw {code: -1, msg: '无权限'};
             }
-            return new Credentials(ma);
+            return ma;
         });
 };
 
@@ -736,7 +718,7 @@ export function getOnesPapersByType(params): Promise<Credentials>{
             if(!ma){
                 throw {code: -1, msg: '查询结果不存在'};
             }
-            return new Credentials(ma);
+            return ma;
         });
 };
 
