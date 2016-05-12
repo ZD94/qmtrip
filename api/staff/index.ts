@@ -21,7 +21,7 @@ import L = require("common/language");
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {validateApi} from 'common/api/helper';
-import {Staff, Credentials, PointChange, EStaffRole, EStaffStatus} from "api/_types/staff";
+import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_types/staff";
 import {AGENCY_ROLE} from "api/_types/agency";
 import { ServiceInterface } from 'api/_types/index';
 
@@ -45,6 +45,25 @@ export class StaffService implements ServiceInterface<Staff>{
     }
     async destroy(id: string): Promise<any> {
         return API.staff.deleteStaff({id: id});
+    }
+}
+
+export class CredentialService implements ServiceInterface<Credential>{
+    async create(obj: Object): Promise<Credential>{
+        return API.staff.createPapers(obj);
+    }
+    async get(id: string): Promise<Credential>{
+        return API.staff.getPapersById({id: id});
+    }
+    async find(where: any): Promise<Credential[]>{
+        return API.staff.getPapersByOwner(where);
+    }
+    async update(id: string, fields: Object): Promise<any> {
+        fields[id] = id;
+        return API.staff.updatePapers(fields);
+    }
+    async destroy(id: string): Promise<any> {
+        return API.staff.deletePapers({id: id});
     }
 }
 
@@ -1023,7 +1042,7 @@ export function deleteAllStaffByTest(params){
  * @returns {*}
  */
 validateApi(createPapers, ['type', 'idNo', 'ownerId'], ['validData', 'birthday']);
-export function createPapers(params){
+export function createPapers(params): Promise<Credential>{
     //查询该用户该类型证件信息是否已经存在 不存在添加 存在则修改
     return papersModel.findOne({where: {type: params.type, ownerId: params.ownerId}})
     .then(function(result){
@@ -1045,7 +1064,7 @@ export function createPapers(params){
         }*/
     })
         .then(function(data){
-            return new Credentials(data);
+            return new Credential(data);
         })
 }
 
@@ -1055,7 +1074,7 @@ export function createPapers(params){
  * @returns {*}
  */
 validateApi(deletePapers, ['id']);
-export function deletePapers(params: {id: string}){
+export function deletePapers(params: {id: string}): Promise<any>{
     return papersModel.destroy({where: params})
         .then(function(obj){
             return true;
@@ -1068,7 +1087,7 @@ export function deletePapers(params: {id: string}){
  * @returns {*}
  */
 validateApi(updatePapers, ['id'], ['type', 'idNo', 'ownerId', 'validData', 'birthday']);
-export function updatePapers(params){
+export function updatePapers(params): Promise<Credential>{
     var id = params.id;
     delete params.id;
     var options: any = {};
@@ -1076,7 +1095,7 @@ export function updatePapers(params){
     options.returning = true;
     return papersModel.update(params, options)
         .spread(function(rownum, rows){
-            return new Credentials(rows[0]);
+            return new Credential(rows[0]);
         });
 }
 /**
@@ -1085,14 +1104,14 @@ export function updatePapers(params){
  * @returns {*}
  */
 validateApi(getPapersById, ['id'], ['attributes']);
-export function getPapersById(params){
+export function getPapersById(params): Promise<Credential>{
     //return papersModel.findById(params.id);
     var options: any = {};
     options.where = {id: params.id};
     options.attributes = params.attributes? ['*'] :params.attributes;
     return papersModel.findOne(options)
         .then(function(data){
-            return new Credentials(data);
+            return new Credential(data);
         })
 }
 
@@ -1104,11 +1123,14 @@ export function getPapersById(params){
  * @returns {*}
  */
 validateApi(getOnesPapersByType, ['ownerId', 'type'], ['attributes']);
-export function getOnesPapersByType(params){
+export function getOnesPapersByType(params): Promise<Credential>{
     var options:any = {};
     options.where = {ownerId: params.ownerId, type: params.type};
     options.attributes = params.attributes? ['*'] :params.attributes;
-    return papersModel.findOne(options);
+    return papersModel.findOne(options)
+        .then(function(result){
+            return new Credential(result);
+        })
 }
 
 /**
@@ -1117,7 +1139,7 @@ export function getOnesPapersByType(params){
  * @returns {*}
  */
 validateApi(getPapersByOwner, ['ownerId'], ['attributes']);
-export function getPapersByOwner(params){
+export function getPapersByOwner(params): Promise<Credential[]>{
     //return papersModel.findAll({where: {ownerId: params.ownerId}});
     var options: any = {};
     options.where = {ownerId: params.ownerId};

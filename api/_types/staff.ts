@@ -26,7 +26,7 @@ function enumValues(e){
     return Object.keys(e).map((k)=>e[k]).filter((v)=>(typeof v != 'number'));
 }
 
-@Table("staff.Staff")
+@Table("staff.")
 @regApiType('API.')
 export class Staff implements ModelObject{
     target: Object;
@@ -97,9 +97,9 @@ export class Staff implements ModelObject{
     destroy(): Promise<void> { return null; }
 }
 
-@Table("Credentials", {tableName : "papers", schema : "staff"})
+@Table("Credential", {tableName : "papers", schema : "staff"})
 @regApiType('API.')
-export class Credentials implements ModelObject{
+export class Credential implements ModelObject{
     target: Object;
     constructor(target: Object) {
         this.target = target;
@@ -125,9 +125,9 @@ export class Credentials implements ModelObject{
     get validData(): Date {return null}
     set validData(validData: Date){}
 
-    @Field({type: Types.UUID})
-    get ownerId(): string { return null; }
-    set ownerId(val: string) {}
+    @ResolveRef({type: Types.UUID}, Models.staff.get)
+    get owner(): Staff { return null; }
+    set owner(val: Staff) {}
 
     @Update(Models.staff.update)
     save(): Promise<void> { return null; }

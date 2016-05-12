@@ -6,9 +6,9 @@ var uuid = require("node-uuid");
 var now = require("../../../common/utils").now;
 
 module.exports = function (Db, DataType) {
-    return Db.define("TripDetails", {
+    return Db.define("TripDetail", {
         id          : {type: DataType.UUID,             defaultValue: uuid.v1, primaryKey: true},
-        orderId     : {type: DataType.UUID,             field: "order_id"},
+        tripPlanId     : {type: DataType.UUID,             field: "trip_plan_id"},
         accountId   : {type: DataType.UUID,             field: "account_id"}, //单据所属人
         type        : {type: DataType.INTEGER }, //消费类型（交通和酒店）
         status      : {type: DataType.INTEGER,          defaultValue: 0, field: "status"}, //状态
@@ -58,8 +58,9 @@ module.exports = function (Db, DataType) {
         newInvoice  : {type: DataType.STRING,            field: 'new_invoice'}, //新上传票据
         auditRemark : {type: DataType.STRING,            field: 'audit_remark'}, //审核备注
         auditUser   : {type: DataType.UUID,             field: 'audit_user'}, //审核人
-        createAt    : {type: "timestamp without time zone", field: "create_at", defaultValue: now}, //创建时间
-        updateAt    : {type: "timestamp without time zone", field: "update_at"},
+        createdAt    : {type: "timestamp without time zone", field: "created_at", defaultValue: now}, //创建时间
+        updatedAt    : {type: "timestamp without time zone", field: "updated_at"},
+        deletedAt    : {type: "timestamp without time zone", field: "deleted_at"},
         commitTime  : {type: "timestamp without time zone", field: "commit_time"},
         remark      : {type: DataType.STRING }, //备注
         orderStatus: {

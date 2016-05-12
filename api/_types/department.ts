@@ -41,10 +41,9 @@ export class Department implements ModelObject{
         return Models.staff.find({departmentId: this.id});
     }
 
-    @Field({type: Types.UUID})
-    get companyId(): string {return null}
-    set companyId(companyId: string){}
-    
+    @ResolveRef({type: Types.UUID}, Models.company.get)
+    get company(): Company { return null; }
+
     @Field({type: Types.DATE})
     get createAt(): Date {return null}
     set createAt(createAt: Date){}
