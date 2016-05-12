@@ -26,7 +26,7 @@ import {Paginate} from 'common/paginate';
  * @type {*}
  * @return {promise}
  */
-export function createStaff (params) {
+export function createStaff (params): Promise<Staff> {
         var self = this;
         var user_id = self.accountId;
         return API.auth.judgeRoleById({id:user_id})
@@ -59,7 +59,7 @@ export function createStaff (params) {
  * @type {*}
  * @return {promise}
  */
-export function deleteStaff(params) {
+export function deleteStaff(params): Promise<any> {
         var user_id = this.accountId;
         return API.auth.judgeRoleById({id:user_id})
             .then(function(role){
@@ -104,7 +104,7 @@ export function deleteStaff(params) {
  *
  * @type {*}
  */
-export function updateStaff(params) {
+export function updateStaff(params) : Promise<Staff>{
         var user_id = this.accountId;
         var id = params.id;
         return API.auth.judgeRoleById({id:user_id})

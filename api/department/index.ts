@@ -3,6 +3,7 @@
  */
 'use strict';
 var co = require("co");
+var _ = require("lodash");
 var sequelize = require("common/model").importModel("./models");
 var departmentModel = sequelize.models.Department;
 var API = require("../../common/api");
@@ -37,14 +38,17 @@ export class DepartmentService implements ServiceInterface<Department>{
  * @returns {*}
  */
 validateApi(createDepartment,["name","companyId"], departmentCols);
-export function createDepartment(data){
+export function createDepartment(data): Promise<Department>{
 //    data.isDefault = false;//默认部门在企业注册时已经自动生成不允许自己添加
     return departmentModel.findOne({where: {name: data.name, companyId: data.companyId}})
         .then(function(result){
             if(result){
                 throw {msg: "该部门名称已存在，请重新设置"};
             }
-            return departmentModel.create(data);
+            return departmentModel.create(data)
+                .then(function(result){
+                    return new Department(result)
+                })
         });
 }
 
@@ -129,7 +133,7 @@ export function getDepartmentStructure(params: {companyId: string}){
  * @returns {*}
  */
 validateApi(deleteDepartment, ["id"]);
-export function deleteDepartment(params){
+export function deleteDepartment(params): Promise<any>{
     var id = params.id;
     return API.staff.getStaffs({departmentId: id, status: 0})
         .then(function(staffs){
@@ -151,7 +155,7 @@ export function deleteDepartment(params){
  * @returns {*}
  */
 validateApi(updateDepartment, ["id"], departmentCols)
-export function updateDepartment(data){
+export function updateDepartment(data): Promise<Department>{
     var id = data.id;
     if(!id){
         throw {code: -1, msg:"id不能为空"};
@@ -163,7 +167,7 @@ export function updateDepartment(data){
     options.returning = true;
     return departmentModel.update(data, options)
         .spread(function(rownum, rows){
-            return rows[0];
+            return new Department(rows[0]);
         });
 }
 /**
@@ -173,9 +177,12 @@ export function updateDepartment(data){
  * @returns {*}
  */
 validateApi(getDepartment, ["id"])
-export function getDepartment(params: {id: string}){
+export function getDepartment(params: {id: string}): Promise<Department>{
     var id = params.id;
-    return departmentModel.findById(id);
+    return departmentModel.findById(id)
+        .then(function(result){
+            return new Department(result);
+        })
 }
 
 /**

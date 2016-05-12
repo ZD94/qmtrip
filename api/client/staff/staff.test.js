@@ -98,7 +98,6 @@ describe("api/client/staff.js", function() {
         obj.companyId = companyId;
         API.client.staff.createStaff.call(ownerSelf, obj, function(err, result) {
             assert.equal(err, null);
-            console.log(err);
             // updateobj = result;
             id = result.id;
             done();
