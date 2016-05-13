@@ -19,10 +19,6 @@ export function CreateController($scope){
 
 }
 
-export function CreateStep2Controller($scope){
-
-}
-
 export function DetailController($scope){
 
 }
