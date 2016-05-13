@@ -17,7 +17,7 @@ let API = require("common/api");
 
 import {validateApi} from "common/api/helper";
 import {ECompanyStatus, Company, MoneyChange} from 'api/_types/company';
-import { ServiceInterface } from '../_types/index';
+import { ServiceInterface } from 'api/_types';
 
 let AGENCY_ROLE = {
     OWNER: 0,
@@ -154,14 +154,14 @@ export function isBlackDomain(params) {
 export async function updateCompany(params){
     let companyId = params.companyId;
     let company = await CompanyModel.findById(companyId, {attributes: ['createUser', 'status']});
-    
+
     if(!company || company.status == -2){
         throw L.ERR.COMPANY_NOT_EXIST;
     }
 
     delete params.companyId;
     params['updateAt'] = utils.now();
-    
+
     let [rownum, rows] = await CompanyModel.update(params, {returning: true, where: {id: companyId}, fields: Object.keys(params)});
     if(!rownum || rownum == "NaN"){
         throw {code: -2, msg: '更新企业信息失败'};
@@ -236,7 +236,7 @@ export async function checkAgencyCompany(params){
     var companyId = params.companyId;
     var c = await CompanyModel.findById(companyId, {attributes: ['agencyId', 'status']});
     var agency = await API.agency.getAgencyUser({id: userId}, {attributes: ['agencyId', 'status', 'roleId']});
-    
+
     if(!c || c.status == -2){
         throw L.ERR.COMPANY_NOT_EXIST;
     }
@@ -395,7 +395,7 @@ export async function saveMoneyChange(params: {fundsAccountId: string, money: nu
 }
 
 /**
- * 
+ *
  * @param params
  * @returns {Promise<MoneyChange>}
  */

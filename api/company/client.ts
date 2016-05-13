@@ -1,6 +1,6 @@
 
-import { CachedService, requireAPI } from '../_types/index';
-import {Company, MoneyChange} from '../_types/company';
+import { CachedService, requireAPI } from 'api/_types';
+import { Company, MoneyChange } from 'api/_types/company';
 import ApiCompany = require('api/client/company');
 
 export class CompanyService extends CachedService<Company>{

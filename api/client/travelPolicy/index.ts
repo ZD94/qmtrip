@@ -11,7 +11,7 @@ var _ = require('lodash');
 var L = require("common/language");
 import types = require("api/_types/travelPolicy");
 import {validateApi} from 'common/api/helper';
-import { TravelPolicy } from '../../_types/travelPolicy';
+import { TravelPolicy } from 'api/_types/travelPolicy';
 
 
 

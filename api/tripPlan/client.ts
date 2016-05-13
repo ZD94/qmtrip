@@ -1,5 +1,5 @@
-import { CachedService, requireAPI } from '../_types/index';
-import { TripPlan, TripDetail } from '../_types/tripPlan';
+import { CachedService, requireAPI } from 'api/_types';
+import { TripPlan, TripDetail } from 'api/_types/tripPlan';
 import ApiTripPlan = require('api/client/tripPlan');
 
 export class TripPlanService extends CachedService<TripPlan>{

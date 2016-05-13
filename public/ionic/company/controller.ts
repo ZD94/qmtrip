@@ -2,7 +2,7 @@
  * Created by seven on 16/5/9.
  */
 "use strict";
-import {EStaffRole} from "../../../api/_types/staff";
+import {EStaffRole} from "api/_types";
 
 var Cookie = require('tiny-cookie');
 

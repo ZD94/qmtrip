@@ -1,5 +1,5 @@
-import { CachedService, requireAPI } from '../_types/index';
-import { TravelPolicy } from '../_types/travelPolicy';
+import { CachedService, requireAPI } from 'api/_types';
+import { TravelPolicy } from 'api/_types/travelPolicy';
 import * as ApiTravelPolicy from 'api/client/travelPolicy';
 
 export class TravelPolicyService extends CachedService<TravelPolicy>{

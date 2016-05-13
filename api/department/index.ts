@@ -6,10 +6,10 @@ var co = require("co");
 var _ = require("lodash");
 var sequelize = require("common/model").importModel("./models");
 var departmentModel = sequelize.models.Department;
-var API = require("../../common/api");
+var API = require("common/api");
 import {Department} from "api/_types/department";
 import {validateApi} from 'common/api/helper';
-import { ServiceInterface } from '../_types/index';
+import { ServiceInterface } from 'api/_types';
 
 export const departmentCols = Object.keys(departmentModel.attributes);
 

@@ -1,5 +1,5 @@
-import { CachedService, requireAPI } from '../_types/index';
-import { AgencyUser, Agency } from '../_types/agency';
+import { CachedService, requireAPI } from 'api/_types';
+import { AgencyUser, Agency } from 'api/_types/agency';
 import ApiAgency = require('api/client/agency');
 
 export class AgencyService extends CachedService<Agency>{
