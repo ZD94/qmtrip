@@ -43,11 +43,17 @@ interface CacheInterface {
 
 import {autobind} from 'core-decorators';
 
+async function resolveResolvable(obj: Resolvable) {
+    if(typeof obj.$resolve == 'function') {
+        await obj.$resolve();
+    }
+}
+
 @autobind
 export abstract class CachedService<T extends Resolvable> implements ServiceInterface<T>{
     abstract $create(obj: Object): Promise<T>;
     abstract $get(id: string): Promise<T>;
-    abstract $find(where: any): Promise<string[]>;
+    abstract $find(where: any): Promise<string[]|T[]>;
     abstract $update(id:string, fields: Object): Promise<any>;
     abstract $destroy(id:string): Promise<any>;
 
@@ -57,9 +63,32 @@ export abstract class CachedService<T extends Resolvable> implements ServiceInte
         this.$cache.put(obj.id, obj);
         return obj;
     }
+    private findId2Obj(list: string[]): Promise<T[]>{
+        return Promise.all(list.map((id)=>this.get(id)));
+    }
+    private findObj2Cache(list: T[]): Promise<T[]>{
+        var self = this;
+        var newlist = list.map(async function(item){
+            var id = item.id;
+            var cached = self.$cache.get<T>(id);
+            if(cached)
+                return cached;
+            var objPromise = resolveResolvable(item);
+            self.$cache.put(id, objPromise);
+            await objPromise;
+            self.$cache.put(id, item);
+            return item;
+        });
+        return Promise.all(newlist);
+    }
     async find(where: any): Promise<T[]>{
-        var ids = await this.$find(where);
-        return await Promise.all(ids.map((id)=>this.get(id)));
+        var self = this;
+        var list = await this.$find(where);
+        if(list.length == 0)
+            return [];
+        if(typeof list[0] == 'string')
+            return this.findId2Obj(list as string[]);
+        return this.findObj2Cache(list as T[]);
     }
     async get(id: string): Promise<T>{
         var self = this;
@@ -74,9 +103,7 @@ export abstract class CachedService<T extends Resolvable> implements ServiceInte
 
         async function getResolved(id: string): Promise<T>{
             var obj = await self.$get(id);
-            if(typeof obj.$resolve == 'function') {
-                await obj.$resolve();
-            }
+            await resolveResolvable(obj);
             return obj;
         }
     }
