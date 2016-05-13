@@ -23,133 +23,83 @@ enum ACCOUNT_TYPE {
 
 @Table("auth.")
 class Account{
-    
-    @Field({type: Types.UUID})
     @Field({type:Types.UUID})
-    get id() {
-        return null;
-    }
-    set id(id){
-    }
+    get id() { return null; }
+    set id(id){}
 
 
     @Field({type:Types.STRING})
-    get email() {
-        return null;
-    }
-    set email(email){
-    }
+    get email() { return null; }
+    set email(email){}
 
  //邮箱
     @Field({type:Types.STRING})
-    get pwd() {
-        return null;
-    }
-    set pwd(pwd){
-    }
+    get pwd() { return null; }
+    set pwd(pwd){}
 
  //密码
     @Field({type:Types.STRING})
-    get mobile() {
-        return null;
-    }
-    set mobile(mobile){
-    }
+    get mobile() { return null; }
+    set mobile(mobile){}
 
  //手机
     @Field({type:Types.INTEGER})
-    get status() {
-        return null;
-    }
-    set status(status){
-    }
+    get status() { return null; }
+    set status(status){}
 
  //状态
     @Field({type:Types.DATE})
-    get createAt() {
-        return null;
-    }
-    set createAt(createAt){
-    }
+    get createAt() { return null; }
+    set createAt(createAt){}
 
  //创建时间
     @Field({type: Types.DATE})
-    get forbiddenExpireAt() {
-        return null;
-    }
-    set forbiddenExpireAt(forbiddenExpireAt) {
-    }
+    get forbiddenExpireAt() { return null; }
+    set forbiddenExpireAt(forbiddenExpireAt) {}
 
     @Field({type:Types.INTEGER})
-    get loginFailTimes() {
-        return null;
-    }
-    set loginFailTimes(loginFailTimes){
-    }
+    get loginFailTimes() { return null; }
+    set loginFailTimes(loginFailTimes){}
 
  //连续错误次数
     @Field({type:Types.DATE})
-    get lastLoginAt() {
-        return null;
-    }
-    set lastLoginAt(lastLoginAt){
-    }
+    get lastLoginAt() { return null; }
+    set lastLoginAt(lastLoginAt){}
 
  //最近登录时间
     @Field({type:Types.STRING})
-    get lastLoginIp() {
-        return null;
-    }
-    set lastLoginIp(lastLoginIp){
-    }
+    get lastLoginIp() { return null; }
+    set lastLoginIp(lastLoginIp){}
 
  //最近登录Ip
     @Field({type:Types.STRING})
-    get activeToken() {
-        return null;
-    }
-    set activeToken(activeToken){
-    }
+    get activeToken() { return null; }
+    set activeToken(activeToken){}
 
 
     @Field({type:Types.STRING})
-    get pwdToken() {
-        return null;
-    }
-    set pwdToken(pwdToken){
-    }
+    get pwdToken() { return null; }
+    set pwdToken(pwdToken){}
 
 
     @Field({type:Types.STRING})
-    get oldQrcodeToken() {
-        return null;
-    }
-    set oldQrcodeToken(oldQrcodeToken){
-    }
+    get oldQrcodeToken() { return null; }
+    set oldQrcodeToken(oldQrcodeToken){}
 
 
     @Field({type:Types.STRING})
-    get qrcodeToken() {
-        return null;
-    }
-    set qrcodeToken(qrcodeToken){
-    }
+    get qrcodeToken() { return null; }
+    set qrcodeToken(qrcodeToken){}
 
 
     @Field({type:Types.INTEGER})
-    get type() {
-        return null;
-    }
-    set type(type){
-    }
+    get type() { return null; }
+    set type(type){}
 
 
     @Field({type:Types.BOOLEAN})
-    get isFirstLogin() {
-        return null;
-    }
-    set isFirstLogin(isFirstLogin){
-    }
+    get isFirstLogin() { return null; }
+    set isFirstLogin(isFirstLogin){}
 }
 
 export {AuthCert, Account, ACCOUNT_TYPE}
