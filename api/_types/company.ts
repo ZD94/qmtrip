@@ -89,9 +89,8 @@ export class Company implements ModelObject{
         return Models.staff.find({companyId: this.id});
     }
     
-    // @Reference({type: Types.UUID})
     // getMoneyChanges(id?:string): Promise<MoneyChanges[]> {
-    //     return Models..
+    //     return Models.company
     // }
 
     @Update(Models.company.update)

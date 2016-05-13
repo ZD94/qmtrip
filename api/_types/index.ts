@@ -1,4 +1,4 @@
-import { Company } from "./company";
+import {Company, MoneyChange} from "./company";
 import { Staff, Credential } from "./staff";
 import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
@@ -154,7 +154,10 @@ export interface ModelsInterface {
     agencyUser: ServiceInterface<AgencyUser>;
 
     tripPlan: ServiceInterface<TripPlan>;
+    
     tripDetail: ServiceInterface<TripDetail>;
+    
+    moneyChange: ServiceInterface<MoneyChange>;
 }
 
 export var Models: ModelsInterface = {
@@ -169,6 +172,7 @@ export var Models: ModelsInterface = {
 
     tripPlan: new ServiceDelegate<TripPlan>(),
     tripDetail: new ServiceDelegate<TripDetail>(),
+    moneyChange: new ServiceDelegate<MoneyChange>(),
 };
 
 export function initModels(models: ModelsInterface){

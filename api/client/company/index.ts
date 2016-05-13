@@ -4,7 +4,7 @@
 'use strict';
 import L = require("common/language");
 import Logger = require('common/logger');
-import {Company, ECompanyStatus} from "api/_types/company";
+import {Company, ECompanyStatus, MoneyChange} from "api/_types/company";
 import {requireParams} from "common/api/helper";
 import {requirePermit} from 'api/_decorator';
 
@@ -141,7 +141,7 @@ class ApiCompany {
         params['userId'] = self.accountId;
         params['type'] = 1;
         params.remark = params.remark || '充值';
-        return API.company.moneyChange(params);
+        return API.company.changeMoney(params);
     }
 
     /**
@@ -161,7 +161,7 @@ class ApiCompany {
         params['type'] = -2;
         params['remark'] = '冻结账户资金';
 
-        return API.company.moneyChange(params);
+        return API.company.changeMoney(params);
     }
 
     /**
@@ -177,7 +177,7 @@ class ApiCompany {
         params.channel = params.channel || '消费';
         params.remark = params.remark || '账户余额消费';
 
-        return API.company.moneyChange(params);
+        return API.company.changeMoney(params);
     }
 
     /**
@@ -211,6 +211,31 @@ class ApiCompany {
         }
 
         return API.company.getCompanyFundsAccount({companyId: companyId});
+    }
+
+    /**保存资金变动记录
+     * @param params
+     */
+    static saveMoneyChange(params: any): Promise<MoneyChange> {
+        throw L.ERR.PERMISSION_DENY;
+    }
+
+    /**
+     * 获取资金变动记录
+     * @param params
+     * @returns {Promise<MoneyChange>}
+     */
+    static getMoneyChange(params: {id: string}): Promise<MoneyChange> {
+        return API.company.getMoneyChange({id: params.id});
+    }
+
+    /**
+     * 获取资金变动记录列表
+     * @param params
+     * @returns {Promise<string[]>}
+     */
+    static listMoneyChange(params: {fundsAccountId: string}): Promise<string[]> {
+        return API.company.getMoneyChange({fundsAccountId: params.fundsAccountId});
     }
 }
 

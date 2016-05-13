@@ -1,7 +1,7 @@
 
 import { initModels } from 'api/_types';
 import { StaffService, CredentialService } from 'api/staff';
-import { CompanyService } from 'api/company';
+import { CompanyService, MoneyChangeService } from 'api/company';
 import { DepartmentService } from 'api/department';
 import { TravelPolicyService } from 'api/travelPolicy';
 import { AgencyService, AgencyUserService } from 'api/agency';
@@ -17,4 +17,5 @@ initModels({
     agencyUser: new AgencyUserService(),
     tripPlan: new TripPlanService(),
     tripDetail: new TripDetailService(),
+    moneyChange: new MoneyChangeService(),
 });

@@ -1,6 +1,6 @@
 
 import { CachedService, requireAPI } from '../_types/index';
-import { Company } from '../_types/company';
+import {Company, MoneyChange} from '../_types/company';
 import ApiCompany = require('api/client/company');
 
 export class CompanyService extends CachedService<Company>{
@@ -28,5 +28,30 @@ export class CompanyService extends CachedService<Company>{
     async $destroy(id: string): Promise<any> {
         var api = await requireAPI<typeof ApiCompany>('company');
         return api.deleteCompany({companyId: id});
+    }
+}
+
+export class MoneyChangeService extends CachedService<MoneyChange>{
+    constructor($cacheFactory: ng.ICacheFactoryService){
+        super($cacheFactory('moneyChange'));
+    }
+
+    async $create(obj: any): Promise<MoneyChange>{
+        var api = await requireAPI<typeof ApiCompany>('company');
+        return api.saveMoneyChange(obj);
+    }
+    async $get(id: string): Promise<MoneyChange>{
+        var api = await requireAPI<typeof ApiCompany>('company');
+        return api.getMoneyChange({id: id});
+    }
+    async $find(where: any): Promise<string[]>{
+        var api = await requireAPI<typeof ApiCompany>('company');
+        return api.listMoneyChange(where);
+    }
+    async $update(id: string, fields: Object): Promise<any> {
+        throw {code: -2, msg: '不能更新记录'};
+    }
+    async $destroy(id: string): Promise<any> {
+        throw {code: -2, msg: '不能删除记录'};
     }
 }

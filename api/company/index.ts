@@ -6,7 +6,7 @@ let sequelize = require("common/model").importModel("./models");
 let Models = sequelize.models;
 let CompanyModel = Models.Company;
 let FundsAccounts = Models.FundsAccounts;
-let MoneyChanges = Models.MoneyChanges;
+let MoneyChangeModel = Models.MoneyChangeModel;
 let uuid = require("node-uuid");
 let L = require("common/language");
 let _ = require('lodash');
@@ -16,7 +16,7 @@ let C = require("config");
 let API = require("common/api");
 
 import {validateApi} from "common/api/helper";
-import {ECompanyStatus, Company} from 'api/_types/company';
+import {ECompanyStatus, Company, MoneyChange} from 'api/_types/company';
 import { ServiceInterface } from '../_types/index';
 
 let AGENCY_ROLE = {
@@ -45,6 +45,24 @@ export class CompanyService implements ServiceInterface<Company>{
     }
     async destroy(id: string): Promise<any> {
         return API.company.deleteCompany({companyId: id});
+    }
+}
+
+export class MoneyChangeService implements ServiceInterface<MoneyChange>{
+    async create(obj: Object): Promise<MoneyChange>{
+        return API.company.saveMoneyChange(obj);
+    }
+    async get(id: string): Promise<MoneyChange>{
+        return API.company.getMoneyChange(id);
+    }
+    async find(where: any): Promise<MoneyChange[]>{
+        return API.company.findMoneyChange(where);
+    }
+    async update(id: string, fields: Object): Promise<any> {
+        throw {code: -2, msg: '不能更新记录'};
+    }
+    async destroy(id: string): Promise<any> {
+        throw {code: -2, msg: '不能删除记录'};
     }
 }
 
@@ -290,8 +308,8 @@ export function getCompanyFundsAccount(params){
  * @param params.type -2: 冻结账户资金 -1： 账户余额减少 1：账户余额增加 2：解除账户冻结金额
  * @returns {*}
  */
-validateApi(moneyChange, ['money', 'channel', 'userId', 'type', 'companyId', 'remark']);
-export function moneyChange(params){
+validateApi(changeMoney, ['money', 'channel', 'userId', 'type', 'companyId', 'remark']);
+export function changeMoney(params){
     var id = params.companyId;
     return FundsAccounts.findById(id)
         .then(function(funds){
@@ -351,7 +369,7 @@ export function moneyChange(params){
             return sequelize.transaction(function(t){
                 return Promise.all([
                     FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: Object.keys(fundsUpdates), transaction: t}),
-                    MoneyChanges.create(moneyChange, {transaction: t})
+                    MoneyChangeModel.create(moneyChange, {transaction: t})
                 ])
                     .spread(function(update, create){
                         return update;
@@ -364,6 +382,39 @@ export function moneyChange(params){
             }
             return rows[0];
         });
+}
+
+/**
+ * 保存资金变动记录
+ * @param params
+ * @returns {Promise<MoneyChange>}
+ */
+export async function saveMoneyChange(params: {fundsAccountId: string, money: number, channel: number, userId: string, remark: string}): Promise<MoneyChange> {
+    let moneyChange = await MoneyChangeModel.create(params);
+    return new MoneyChange(moneyChange);
+}
+
+/**
+ * 
+ * @param params
+ * @returns {Promise<MoneyChange>}
+ */
+export async function getMoneyChange(params: {id: string}): Promise<MoneyChange> {
+    let moneyChange = await MoneyChangeModel.findById(params.id);
+    return new MoneyChange(moneyChange);
+}
+
+
+/**
+ *
+ * @param params
+ * @returns {Promise<string[]>}
+ */
+export async function listMoneyChange(params: {fundsAccountId: string}): Promise<string[]> {
+    let moneyChange = await MoneyChangeModel.findAll({where: params});
+    return moneyChange.map(function(mc) {
+        return mc.id;
+    })
 }
 
 /**
