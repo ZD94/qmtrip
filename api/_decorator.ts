@@ -34,7 +34,7 @@ export function requirePermit(permits: string| string[], type?: number) {
     }
 }
 
-function filterColumns(keys: string[]) {
+export function filterColumns(keys: string[]) {
     return function (originFunc, self, args) {
         return originFunc.apply(self, args)
             .then(function(result) {
@@ -42,7 +42,7 @@ function filterColumns(keys: string[]) {
                 if (keys.indexOf("*") >= 0) {
                     return result;
                 }
-                
+
                 for(let _key of result) {
                     if (keys.indexOf(_key) < 0) {
                         delete result[_key];
@@ -53,7 +53,13 @@ function filterColumns(keys: string[]) {
     }
 }
 
-function isSelf(idpath: string, func: any) {
+export enum ID_TYPE {
+    ACCOUNT_ID = 1,
+    COMPANY_ID,
+    AGENCY_ID
+}
+
+export function isSelf(idpath: string, func: any) {
     return function(origin, self, args) {
         let id = _.get(args, idpath);
         let session = Zone.current.get("session");
@@ -70,62 +76,100 @@ function isSelf(idpath: string, func: any) {
     }
 }
 
-function isSameCompany(idpath, func) {
+export function isSameCompany(idpath:string, idType: ID_TYPE, func) {
     return function(origin, self, args) {
         let id = _.get(args, idpath);
         let session = Zone.current.get("session");
         let accountId = session["accountId"];
         let resolved = false;
         let result = null;
-
-        //是否同一个公司
-        return Promise.all([
-                API.staff.getStaff(accountId),
-                API.staff.getStaff(id),
-            ])
-            .spread(function(currentStaff, queryStaff) {
-                if (currentStaff["companyId"] == queryStaff["companyId"]) {
-                    resolved = true;
-                    result = func(origin, self, args);
-                }
-
-                return {resolved: resolved, result: result};
-            })
-    }
-}
-
-function isCompanyAgency(idpath, func) {
-    return function(origin, self, args) {
-        let id = _.get(args, idpath);
-        let session = Zone.current.get("session");
-        let accountId = session["accountId"];
-        let resolved = false;
-        let result = null;
-        //是否是代理商
-        //是否代理商关系
-        return Promise.all([
-            API.agency.getAgencyUser({id: accountId}),
-            API.staff.getStaff({id: id})
+        if (idType == ID_TYPE.COMPANY_ID) {
+            return API.staff.getStaff(accountId)
                 .then(function(staff) {
-                    return API.company.getCompany({companyId: staff["companyId"]})
+                    if (staff["companyId"] == id) {
+                        resolved = true;
+                        result = func(origin, self, args);
+                    }
+                    return {resolved: resolved, result: result};
                 })
-        ])
-        .spread(function(agencyUser, company) {
-            if (agencyUser.agencyId == company.agencyId) {
-                resolved = true;
-                result = func(origin, self, args);
-            }
-            return {resolved: resolved, result: result};
-        })
+        }
+
+        if (idType == ID_TYPE.ACCOUNT_ID) {
+            //是否同一个公司
+            return Promise.all([
+                    API.staff.getStaff(accountId),
+                    API.staff.getStaff(id),
+                ])
+                .spread(function(currentStaff, queryStaff) {
+                    if (currentStaff["companyId"] == queryStaff["companyId"]) {
+                        resolved = true;
+                        result = func(origin, self, args);
+                    }
+
+                    return {resolved: resolved, result: result};
+                })
+        }
+        return Promise.resolve({resolved: resolved, result: result});
     }
 }
 
-// interface FilterFunc {
-//     (idpath: string, func: Function): Promise<any>
-// }
+export function isCompanyAgency(idpath: string, idType: ID_TYPE, func) {
+    return function(origin, self, args) {
+        let id = _.get(args, idpath);
+        let session = Zone.current.get("session");
+        let accountId = session["accountId"];
+        let resolved = false;
+        let result = null;
+        //ID是agencyId
+        if (idType == ID_TYPE.AGENCY_ID) {
+            return API.agency.getAgencyUser({id: accountId})
+                .then(function(agencyUser) {
+                    if (agencyUser["agencyId"] == id) {
+                        resolved = true;
+                        result = func(origin, self, args);
+                    }
+                    return {resolved: resolved, result: result};
+                })
+        }
+
+        //ID是companyId
+        if (idType == ID_TYPE.COMPANY_ID) {
+            return Promise.all([
+                API.agency.getAgencyUser({id: accountId}),
+                API.company.getCompany({companyId: id})
+            ])
+                .spread(function(agencyUser, company) {
+                    if (agencyUser.agencyId == company.agencyId) {
+                        resolved = true;
+                        result = func(origin, self, args);
+                    }
+                    return {resolved: resolved, result: result};
+                })
+        }
+
+        if (idType == ID_TYPE.ACCOUNT_ID) {
+            //是否代理商关系
+            return Promise.all([
+                    API.agency.getAgencyUser({id: accountId}),
+                    API.staff.getStaff({id: id})
+                        .then(function(staff) {
+                            return API.company.getCompany({companyId: staff["companyId"]})
+                        })
+                ])
+                .spread(function(agencyUser, company) {
+                    if (agencyUser.agencyId == company.agencyId) {
+                        resolved = true;
+                        result = func(origin, self, args);
+                    }
+                    return {resolved: resolved, result: result};
+                })
+        }
+
+        return Promise.resolve({resolved: resolved, result: result});
+    }
+}
 
 export function judgeRoleHandle(roleList: any[]) {
-
     return async function(target, funcname, desc) {
         let self = this;
         let args = arguments;

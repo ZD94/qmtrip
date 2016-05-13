@@ -143,10 +143,8 @@ class ApiStaff {
      * @type {*}
      */
     static getStaff(params): Promise<Staff> {
-        console.info("params===>", params);
         var user_id = this["accountId"];
         var id = params.id;
-        console.info("user_id, id===>", user_id, id)
         return API.auth.judgeRoleById({id:user_id})
             .then(function(role){
                 if(role == L.RoleType.STAFF){
