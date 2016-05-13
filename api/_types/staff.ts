@@ -1,8 +1,8 @@
 import { Models, ModelObject } from 'api/_types';
 import { Company } from 'api/_types/company';
 import { regApiType } from 'common/api/helper';
-import { TravelPolicy } from './travelPolicy';
-import { Department } from './department';
+import { TravelPolicy } from 'api/_types/travelPolicy';
+import { Department } from 'api/_types/department';
 import { Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
 
 export enum EStaffStatus {
