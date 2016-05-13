@@ -1,7 +1,7 @@
 <ion-view title="部门管理" id="page29">
     <ion-content padding="true" class="has-header">
         <ion-list>
-            <ion-item>销售部
+            <ion-item ng-repeat="department in departments">{{department.name}}
                 <span class="item-note">4人</span>
             </ion-item>
             <ion-item>技术部

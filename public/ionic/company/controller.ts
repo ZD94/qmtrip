@@ -6,35 +6,46 @@ import {EStaffRole} from "api/_types/staff";
 
 var Cookie = require('tiny-cookie');
 
-export function ManagementController($scope){
-    console.info("next ..");
+export async function ManagementController($scope,Models){
+    
 }
 
-export function BudgetController($scope){
-
-}
-
-export function RecordController($scope){
+export async function BudgetController($scope){
 
 }
 
-export function DistributionController($scope){
+export async function RecordController($scope){
 
 }
 
-export function DepartmentController($scope){
+export async function DistributionController($scope){
+
+}
+
+export async function DepartmentController($scope){
 
 }
 
 export async function EditpolicyController($scope, Models, $stateParams, $location){
     var staff = await Models.staff.get(Cookie.get('user_id'));
     var company = await staff.company;
-    $scope.travelPolicy = await Models.travelPolicy($stateParams.policyId);
-    $scope.savePolicy = function(){
+    if($stateParams.policyId){
+        $scope.travelPolicy = await Models.travelPolicy.get($stateParams.policyId);
+    }else{
+        $scope.travelPolicy={
+            companyId:company.id,
+            plane:'不限',
+            planediscount:'不限',
+            train:'不限',
+            hotel:'不限'
+        };
+    }
+    $scope.savePolicy = async function(){
         if($stateParams.policyId){
-            $scope.travelPolicy.save();
+            await $scope.travelPolicy.save();
         }else{
-            $scope.travelPolicy.create();
+            $scope.travelPolicy = await Models.travelPolicy.create($scope.travelPolicy);
+            
         }
         $location.hash = "/company/travelpolicy";
     }
