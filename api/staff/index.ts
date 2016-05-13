@@ -267,6 +267,9 @@ export function getStaff(params: {id: string, columns?: Array<string>}){
     if(params.columns){
         options.attributes = params.columns
     }
+    console.info("*****************");
+    console.info(id);
+    console.info(options);
     return staffModel.findById(id, options)
         .then(function(staff){
             if(!staff){

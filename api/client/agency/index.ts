@@ -90,10 +90,12 @@ class ApiAgency {
      * @param params.agencyId 代理商id
      * @returns {Promise<Agency>}
      */
-    @requireParams(['agencyId'])
-    static async getAgencyById(params: {agencyId: string}){
+    @requireParams(['id'])
+    static async getAgencyById(params: {id: string}){
         var self: any = this;
-        var agencyId = params.agencyId;
+        var agencyId = params.id;
+        console.info("accountId=>", self.accountId);
+        console.info("agencyId=>", self.agencyId);
         var user = await API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']});
 
         if(user.agencyId != agencyId){
@@ -163,12 +165,12 @@ class ApiAgency {
      * @param {string} params.agencyUserId 代理商用户id
      * @returns {Promise<AgencyUser>}
      */
-    @requireParams(['agencyUserId'])
-    static async getAgencyUser(params: {agencyUserId: string}){
+    @requireParams(['id'])
+    static async getAgencyUser(params: {id: string}){
         let self: any = this;
         let accountId = self.accountId;
         let user = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
-        let agencyUser = await API.agency.getAgencyUser({id: params.agencyUserId});
+        let agencyUser = await API.agency.getAgencyUser({id: params.id});
 
         if(user.agencyId != agencyUser.agencyId){
             throw L.ERR.PERMISSION_DENY;
@@ -253,11 +255,6 @@ class ApiAgency {
         let user = await API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']});
         params.agencyId = user.agencyId;
         return API.agency.listAndPaginateAgencyUser(params);
-    }
-
-    static async find(params: any) {
-        let arr: string[] = [];
-        return arr;
     }
 }
 
