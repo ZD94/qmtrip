@@ -129,9 +129,9 @@ export class Credential implements ModelObject{
     get owner(): Staff { return null; }
     set owner(val: Staff) {}
 
-    @Update(Models.staff.update)
+    @Update(Models.credential.update)
     save(): Promise<void> { return null; }
-    @Destroy(Models.staff.destroy)
+    @Destroy(Models.credential.destroy)
     destroy(): Promise<void> { return null; }
 }
 
