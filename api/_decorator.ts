@@ -39,6 +39,15 @@ function filterColumns(keys: string[]) {
         return originFunc.apply(self, args)
             .then(function(result) {
                 //handle filter column
+                if (keys.indexOf("*") >= 0) {
+                    return result;
+                }
+                
+                for(let _key of result) {
+                    if (keys.indexOf(_key) < 0) {
+                        delete result[_key];
+                    }
+                }
                 return result;
             })
     }
