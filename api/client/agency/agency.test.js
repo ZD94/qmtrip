@@ -122,7 +122,7 @@ describe("api/client/agency.js", function() {
 
 
         it("getAgencyById should be ok", function(done) {
-            API.client.agency.getAgencyById.call({accountId: agencyUserId}, {agencyId: agencyId}, function(err, ret) {
+            API.client.agency.getAgencyById.call({accountId: agencyUserId}, {id: agencyId}, function(err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -181,7 +181,7 @@ describe("api/client/agency.js", function() {
 
 
         it("getAgencyUser should be ok", function(done) {
-            API.client.agency.getAgencyUser.call({accountId: agencyUserId}, {agencyUserId: agencyUserId}, function(err, ret) {
+            API.client.agency.getAgencyUser.call({accountId: agencyUserId}, {id: agencyUserId}, function(err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -192,7 +192,7 @@ describe("api/client/agency.js", function() {
 
         it("getAgencyUser should be error whit wrong params", function(done) {
             var uuid = require('node-uuid');
-            API.client.agency.getAgencyUser.call({accountId: agencyUserId}, {agencyUserId: uuid.v1()}, function(err, ret) {
+            API.client.agency.getAgencyUser.call({accountId: agencyUserId}, {id: uuid.v1()}, function(err, ret) {
                 assert.equal(ret, null);
                 assert.equal(err.code, -2);
                 done();

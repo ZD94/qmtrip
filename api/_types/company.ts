@@ -100,9 +100,9 @@ export class Company implements ModelObject{
     destroy(): Promise<void> { return null; }
 }
 
-@Table('company.MoneyChanges')
+@Table('company.MoneyChange')
 @regApiType('API.')
-export class MoneyChanges implements ModelObject {
+export class MoneyChange implements ModelObject {
     target: Object;
     constructor(target: Object) {
         this.target = target;

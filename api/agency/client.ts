@@ -14,7 +14,7 @@ export class AgencyService extends CachedService<Agency>{
     }
     async $get(id: string): Promise<Agency>{
         var api = await requireAPI<typeof ApiAgency>('agency');
-        return api.getAgencyById({agencyId: id});
+        return api.getAgencyById({id: id});
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiAgency>('agency');
@@ -42,11 +42,11 @@ export class AgencyUserService extends CachedService<AgencyUser>{
     }
     async $get(id: string): Promise<AgencyUser>{
         var api = await requireAPI<typeof ApiAgency>('agency');
-        return api.getAgencyUser({agencyUserId: id});
+        return api.getAgencyUser({id: id});
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiAgency>('agency');
-        return api.find(where);
+        return api.listAndPaginateAgencyUser(where);
     }
     async $update(id: string, fields: {id: string, status?: number, name?: string, sex?: string, email?: string,
         mobile?: string, avatar?: string, roleId?: string}): Promise<any> {
