@@ -6,17 +6,11 @@
  * @module API
  */
 
-var API = require("common/api");
-/**
- * @class checkcode 验证码
- * @type {{__public: boolean, getMsgCheckCode: module.exports.getMsgCheckCode, getPicCheckCode: module.exports.getPicCheckCode}}
- */
-var checkcode = {
-    /**
-     * @property __public 是否公共模块
-     * @type {Boolean}
-     */
-    __public: true,
+const API = require("common/api");
+
+class ApiCheckCode {
+    static __public: boolean = true;
+
     /**
      * @method getMsgCheckCode
      *
@@ -38,14 +32,15 @@ var checkcode = {
      *   })
      * ```
      */
-    getMsgCheckCode: function(params) {
+    static getMsgCheckCode(params) {
         var type = 1;
         params.type = type;
         return API.checkcode.getMsgCheckCode(params)
             .then(function(result) {
                 return result;
             });
-    },
+    }
+
     /**
      * @method getPicCheckCode
      *
@@ -65,11 +60,12 @@ var checkcode = {
      *  })
      * ```
      */
-    getPicCheckCode: function(params) {
+    static getPicCheckCode(params) {
         var type = 1;
         params.type = type;
         return API.checkcode.getPicCheckCode(params);
-    },
+    }
+
     /**
      * @method isMatchPicCheckCode
      *
@@ -94,9 +90,10 @@ var checkcode = {
      *  })
      * ```
      */
-    isMatchPicCheckCode: function(params) {
+    static isMatchPicCheckCode(params) {
         return API.checkcode.isMatchPicCheckCode(params);
-    },
+    }
+
     /**
      * @method isMatchMsgCheckCode
      *
@@ -122,9 +119,9 @@ var checkcode = {
      * })
      * ```
      */
-    isMatchMsgCheckCode: function(params) {
+    static isMatchMsgCheckCode(params) {
         return API.checkcode.isMatchMsgCheckCode(params);
     }
-};
+}
 
-module.exports = checkcode;
+export= ApiCheckCode;
