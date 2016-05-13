@@ -2,10 +2,6 @@
  * Created by wlh on 15/12/12.
  */
 "use strict";
-/**
- * @module API
- * @type {API|exports|module.exports}
- */
 
 var API = require("common/api");
 
