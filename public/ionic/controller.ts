@@ -70,10 +70,10 @@ export async function IndexController($scope,Menu,$ionicPopup, Models){
 
     let company = staff.company;
     console.info(company);
-    let agency = await company.getAgency();
-    console.info(agency);
-    // let staffs = await company.getStaffs();
-    // console.info(staffs);
+    // let agency = await company.getAgency();
+    // console.info(agency);
+    let staffs = await company.getStaffs();
+    console.info(staffs);
     $scope.Menu = Menu;
     $scope.staff = staff;
 }
