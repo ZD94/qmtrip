@@ -24,26 +24,29 @@ module.exports = (function(){
 						$scope.total = ret.total;
 						$scope.pages = ret.pages;
 						var companylist = ret.items;
-						var promises = companylist.map(function(company){
-							// console.info(company.createUser)
-							return Promise.all([
-								API.company.getCompanyFundsAccountByAgency(company.id),
-								API.staff.getStaff({id: company.createUser, companyId: company.id}),
-                        		API.staff.statisticStaffs({companyId:company.id}),
-								API.agencyTripPlan.countTripPlanNum({companyId: company.id})
-								])
-							.spread(function(funds,staff,staffnum,trip){
-								company.funds = funds;
-								company.staff = staff;
-								// console.info(staff)
-								company.staffnum = staffnum;
-								company.tirpnum = trip;
-								return company;
-							})
-							.catch(function(err) {
-								return company;
-							});
-
+						var promises = companylist.map(function(companyId){
+							return API.company.getCompanyById({companyId: companyId})
+								.then(function(company) {
+									console.info(company)
+									// console.info(company.createUser)
+									return Promise.all([
+											API.company.getCompanyFundsAccountByAgency(company.id),
+											API.staff.getStaff({id: company.createUser, companyId: company.id}),
+											API.staff.statisticStaffs({companyId:company.id}),
+											API.agencyTripPlan.countTripPlanNum({companyId: company.id})
+										])
+										.spread(function(funds,staff,staffnum,trip){
+											company.funds = funds;
+											company.staff = staff;
+											// console.info(staff)
+											company.staffnum = staffnum;
+											company.tirpnum = trip;
+											return company;
+										})
+										.catch(function(err) {
+											return company;
+										});
+								})
 						});
 						return Promise.all(promises);
 					})
