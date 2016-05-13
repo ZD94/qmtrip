@@ -1,37 +1,20 @@
 <ion-view title="差旅标准" id="page30">
     <ion-content padding="true" class="has-header">
         <a href="#/company/editpolicy" id="page30-button89" class="button button-positive  button-block">新增差旅标准</a>
-        <div class="list card">
-            <div class="item item-divider">员工级&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;12人</div>
+        <div class="list card" ng-repeat="policy in travelPolicys" ng-click="editpolicy(policy.id)">
+            <div class="item item-divider">{{policy.name}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{policy.getStaffs().length}}</div>
             <div class="item item-body">
                 <div id="page30-markdown21" style="color:#000000;">
-                    <p>飞机：7折及以下经济舱</p>
+                    <p>飞机：{{policy.planeLevel}}</p>
                 </div>
                 <div id="page30-markdown22" style="color:#000000;">
-                    <p>火车：二等座/硬卧</p>
+                    <p>火车：{{policy.trainLevel}}</p>
                 </div>
                 <div id="page30-markdown23" style="color:#000000;">
-                    <p>住宿：四星级/高档型且不能超过300元/晚</p>
+                    <p>住宿：{{policy.trainLevel}}</p>
                 </div>
                 <div id="page30-markdown24" style="color:#000000;">
                     <p>补助：100元/天</p>
-                </div>
-            </div>
-        </div>
-        <div class="list card">
-            <div class="item item-divider">经理级&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2人</div>
-            <div class="item item-body">
-                <div id="page30-markdown25" style="color:#000000;">
-                    <p>飞机：8折及以下经济舱</p>
-                </div>
-                <div id="page30-markdown26" style="color:#000000;">
-                    <p>火车：二等座/硬卧</p>
-                </div>
-                <div id="page30-markdown27" style="color:#000000;">
-                    <p>住宿：四星级/高档型且不能超过350元/晚</p>
-                </div>
-                <div id="page30-markdown28" style="color:#000000;">
-                    <p>补助：150元/天</p>
                 </div>
             </div>
         </div>

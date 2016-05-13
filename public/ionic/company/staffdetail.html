@@ -3,31 +3,31 @@
         <form class="list">
             <label class="item item-input">
                 <span class="input-label">姓名</span>
-                <input type="text" placeholder="王鹏(右侧通讯录导入按钮)">
+                <input type="text" placeholder="姓名(右侧通讯录导入按钮)" ng-model="staff.name">
             </label>
             <label class="item item-input">
                 <span class="input-label">邮箱</span>
-                <input type="email" placeholder="peng.wang@jingli.tech">
+                <input type="email" placeholder="peng.wang@jingli.tech" ng-model="staff.email">
             </label>
             <label class="item item-input">
                 <span class="input-label">手机号</span>
-                <input type="tel" placeholder="13810529805">
+                <input type="tel" placeholder="13810529805" ng-model="staff.mobile">
             </label>
             <label class="item item-select">
-                <span class="input-label">部门</span>
-                <select>
-                    <option>产品部</option>
+                <span class="input-label" >部门</span>
+                <select ng-model="staff.department.name">
+                    <option ng-repeat="department in departmentlist" ng-select="staff.department.name == department.name">{{department.name}}</option>
                 </select>
             </label>
             <label class="item item-select">
                 <span class="input-label">差旅标准</span>
-                <select>
-                    <option>经理级</option>
+                <select ng-model="staff.travelLevel">
+                    <option ng-repeat="travelpolicy in travelpolicylist" ng-select="staff.travelLevel == travelpolicy.name">{{travelpolicy.name}}</option>
                 </select>
             </label>
-            <ion-toggle toggle-class="toggle-positive" ng-checked="true">管理员权限</ion-toggle>
+            <ion-toggle toggle-class="toggle-positive" ng-checked="{{role}}">管理员权限</ion-toggle>
         </form>
-        <a href="#/company/staffs" id="page28-button85" class="button button-positive  button-block">保存</a>
+        <a href="#/company/staffs" ng-click="savestaff()" id="page28-button85" class="button button-positive  button-block">保存</a>
         <button id="page28-button86" class="button button-stable  button-block">取消</button>
     </ion-content>
 </ion-view>
