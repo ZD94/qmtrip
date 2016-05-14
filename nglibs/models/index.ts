@@ -9,6 +9,7 @@ import { DepartmentService } from 'api/department/client';
 import { TravelPolicyService } from 'api/travelPolicy/client';
 import { AgencyService, AgencyUserService } from 'api/agency/client';
 import {TripPlanService, TripDetailService, ProjectService} from 'api/tripPlan/client';
+import {PlaceService} from 'api/client/place/client';
 
 const API = require('common/api');
 
@@ -33,6 +34,7 @@ class ClientModels implements ModelsInterface {
     tripDetail: TripDetailService;
     moneyChange: MoneyChangeService;
     project: ProjectService;
+    place: PlaceService;
 
     constructor($cacheFactory: ng.ICacheFactoryService) {
         this.staff = new StaffService($cacheFactory);
@@ -46,7 +48,7 @@ class ClientModels implements ModelsInterface {
         this.tripDetail = new TripDetailService($cacheFactory);
         this.moneyChange = new MoneyChangeService($cacheFactory);
         this.project = new ProjectService($cacheFactory);
-
+        this.place = new PlaceService($cacheFactory);
         initModels(this);
     }
 }

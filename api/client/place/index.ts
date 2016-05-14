@@ -94,7 +94,7 @@ class ApiPlace {
      * @param {String} params.cityId 城市ID
      * @return {Promise} [{id:"ID", name:"Name"}]
      */
-    static hotBusinessDistricts(params: {cityId: string}) :Promise<Array<Place>> {
+    static hotBusinessDistricts(params: {cityId: string, limit?: number}) :Promise<Array<Place>> {
         return API.place.hotBusinessDistricts(params)
             .then(function(places) {
                 var arr: Array<Place> = places.map(function(place) {
