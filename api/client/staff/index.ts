@@ -7,10 +7,10 @@
  * @module API
  */
 
-var Q = require("q");
-var API = require("common/api");
-var auth = require("../auth");
-var L = require("common/language");
+let Q = require("q");
+let API = require("common/api");
+let auth = require("../auth");
+let L = require("common/language");
 import {Staff, Credential, PointChange} from "api/_types/staff";
 
 /**
@@ -26,29 +26,25 @@ class ApiStaff {
      * @type {*}
      * @return {promise}
      */
-    static createStaff (params): Promise<Staff> {
-        var self: any = this;
-        var user_id = self.accountId;
-        return API.auth.judgeRoleById({id:user_id})
-            .then(function(role){
-                if(role == L.RoleType.STAFF){
-                    return API.staff.getStaff({id: user_id, columns: ['companyId']})
-                        .then(function(staff){
-                            var companyId = staff.target.companyId;//为什么不能用staff.company.id??????????
-                            params.companyId = companyId;
-                            return API.staff.createStaff(params)
-                        })
-                }else{
-                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
-                        .then(function(result){
-                            if(result){
-                                return API.staff.createStaff(params);
-                            }else{
-                                throw {code: -1, msg: '无权限'};
-                            }
-                        })
-                }
-            })
+    static async createStaff (params): Promise<Staff> {
+        let self: any = this;
+        let user_id = self.accountId;
+        let role = await API.auth.judgeRoleById({id:user_id});
+
+        if(role == L.RoleType.STAFF){
+
+            let staff = await API.staff.getStaff({id: user_id, columns: ['companyId']});
+            let companyId = staff.companyId;//为什么不能用staff.company.id??????????
+            params.companyId = companyId;
+            return API.staff.createStaff(params)
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
+            if(result){
+                return API.staff.createStaff(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
     }
 
     /**
@@ -59,41 +55,33 @@ class ApiStaff {
      * @type {*}
      * @return {promise}
      */
-    static deleteStaff(params): Promise<any> {
-        var user_id = this["accountId"];
-        return API.auth.judgeRoleById({id:user_id})
-            .then(function(role){
-                if(role == L.RoleType.STAFF){
-                    return API.staff.getStaff({id: user_id})
-                        .then(function(staff){
-                            if(this["accountId"] == params.id){
-                                throw {msg: "不可删除自身信息"};
-                            }
-                            return [staff, API.staff.getStaff({id:params.id})];
-                        })
-                        .spread(function(staff, target){
-                            if(target.roleId == 0){
-                                throw {msg: "企业创建人不能被删除"};
-                            }
-                            if(staff.roleId == target.roleId){
-                                throw {msg: "不能删除统计用户"};
-                            }
-                            if(staff.target.companyId != target.target.companyId){
-                                throw L.ERR.PERMISSION_DENY;
-                            }
-                            return API.staff.deleteStaff(params);
-                        });
-                }else{
-                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
-                        .then(function(result){
-                            if(result){
-                                return API.staff.deleteStaff(params);
-                            }else{
-                                throw {code: -1, msg: '无权限'};
-                            }
-                        })
-                }
-            })
+    static async deleteStaff(params): Promise<any> {
+        let user_id = this["accountId"];
+        let role = await API.auth.judgeRoleById({id:user_id});
+        if(role == L.RoleType.STAFF){
+            let staff = await API.staff.getStaff({id: user_id});
+            if(this["accountId"] == params.id){
+                throw {msg: "不可删除自身信息"};
+            }
+            let target = await API.staff.getStaff({id:params.id});
+            if(target.roleId == 0){
+                throw {msg: "企业创建人不能被删除"};
+            }
+            if(staff.roleId == target.roleId){
+                throw {msg: "不能删除统计用户"};
+            }
+            if(staff.companyId != target.companyId){
+                throw L.ERR.PERMISSION_DENY;
+            }
+            return API.staff.deleteStaff(params);
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
+            if(result){
+                return API.staff.deleteStaff(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
 
     }
 
@@ -104,34 +92,31 @@ class ApiStaff {
      *
      * @type {*}
      */
-    static updateStaff(params) : Promise<Staff>{
-        var user_id = this["accountId"];
-        var id = params.id;
-        return API.auth.judgeRoleById({id:user_id})
-            .then(function(role){
-                if(role == L.RoleType.STAFF){
-                    return Q.all([
-                            API.staff.getStaff({id:user_id}),
-                            API.staff.getStaff({id:id})
-                        ])
-                        .spread(function(data, target){
-                            if(data.target.companyId != target.target.companyId){
-                                throw L.ERR.PERMISSION_DENY;
-                            }else{
-                                return API.staff.updateStaff(params)
-                            }
-                        })
-                }else{
-                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
-                        .then(function(result){
-                            if(result){
-                                return API.staff.updateStaff(params)
-                            }else{
-                                throw {code: -1, msg: '无权限'};
-                            }
-                        })
-                }
-            })
+    static async updateStaff(params) : Promise<Staff>{
+        let user_id = this["accountId"];
+        let id = params.id;
+        let role = await API.auth.judgeRoleById({id:user_id});
+
+        if(role == L.RoleType.STAFF){
+
+            let staff = await API.staff.getStaff({id:user_id});
+            let target = await API.staff.getStaff({id:id});
+
+            if(staff.companyId != target.companyId){
+                throw L.ERR.PERMISSION_DENY;
+            }else{
+                return API.staff.updateStaff(params)
+            }
+
+        }else{
+
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
+            if(result){
+                return API.staff.updateStaff(params)
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
 
     }
 
@@ -142,35 +127,30 @@ class ApiStaff {
      * 企业根据id得到员工信息
      * @type {*}
      */
-    static getStaff(params): Promise<Staff> {
-        var user_id = this["accountId"];
-        var id = params.id;
-        return API.auth.judgeRoleById({id:user_id})
-            .then(function(role){
-                if(role == L.RoleType.STAFF){
-                    return Q.all([
-                            API.staff.getStaff({id:user_id}),
-                            API.staff.getStaff({id:id})
-                        ])
-                        .spread(function(data, target){
-                            if(data.target.companyId != target.target.companyId){
-                                throw L.ERR.PERMISSION_DENY;
-                            }else{
-                                // return {staff: new Staff(target)};
-                                return target;
-                            }
-                        })
-                }else{
-                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
-                        .then(function(result){
-                            if(result){
-                                return API.staff.getStaff(params)
-                            }else{
-                                throw {code: -1, msg: '无权限'};
-                            }
-                        })
-                }
-            })
+    static async getStaff(params): Promise<Staff> {
+        let user_id = this["accountId"];
+        let id = params.id;
+        let role = await API.auth.judgeRoleById({id:user_id});
+
+        if(role == L.RoleType.STAFF){
+
+            let staff = await API.staff.getStaff({id:user_id});
+            let target = await API.staff.getStaff({id:id});
+
+            if(staff.companyId != target.companyId){
+                throw L.ERR.PERMISSION_DENY;
+            }else{
+                // return {staff: new Staff(target)};
+                return target;
+            }
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
+            if(result){
+                return API.staff.getStaff(params)
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
 
     }
 
@@ -180,27 +160,22 @@ class ApiStaff {
      * 根据查询条件得到员工信息
      * @type {*}
      */
-    static getStaffs(params) {
-        var user_id = this["accountId"];
-        return API.auth.judgeRoleById({id:user_id})
-            .then(function(role){
-                if(role == L.RoleType.STAFF){
-                    return API.staff.getStaff({id:user_id})
-                        .then(function(sf){
-                            params.companyId = sf.target.companyId;
-                            return API.staff.getStaffs(params)
-                        })
-                }else{
-                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
-                        .then(function(result){
-                            if(result){
-                                return API.staff.getStaffs(params)
-                            }else{
-                                throw {code: -1, msg: '无权限'};
-                            }
-                        })
-                }
-            })
+    static async getStaffs(params) {
+        let user_id = this["accountId"];
+        let role = await API.auth.judgeRoleById({id:user_id});
+
+        if(role == L.RoleType.STAFF){
+            let sf = await API.staff.getStaff({id:user_id});
+            params.companyId = sf.companyId;
+            return API.staff.getStaffs(params)
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
+            if(result){
+                return API.staff.getStaffs(params)
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
 
     }
 
@@ -212,9 +187,9 @@ class ApiStaff {
      * 得到当前登录员工信息
      * @returns {*}
      */
-    static getCurrentStaff(){
-        var self: any = this;
-        return API.staff.getStaff({id: self.accountId})
+    static async getCurrentStaff(){
+        let self: any = this;
+        return API.staff.getStaff({id: self.accountId});
     }
 
     /**
@@ -223,29 +198,25 @@ class ApiStaff {
      * 企业分页查询员工列表
      * @type {*}
      */
-    static listAndPaginateStaff(params) {
-        var user_id = this["accountId"];
-        return API.auth.judgeRoleById({id:user_id})
-            .then(function(role){
-                if(role == L.RoleType.STAFF){
-                    return API.staff.getStaff({id:user_id})
-                        .then(function(data){
-                            params.companyId = data.target.companyId;
-                            //                var options = {perPage : 20};
-                            //                params.options = options;
-                            return API.staff.listAndPaginateStaff(params);
-                        });
-                }else{
-                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
-                        .then(function(result){
-                            if(result){
-                                return API.staff.listAndPaginateStaff(params);
-                            }else{
-                                throw {code: -1, msg: '无权限'};
-                            }
-                        })
-                }
-            })
+    static async listAndPaginateStaff(params) {
+        let user_id = this["accountId"];
+        let role = await API.auth.judgeRoleById({id:user_id});
+
+        if(role == L.RoleType.STAFF){
+
+            let staff = await API.staff.getStaff({id:user_id})
+            params.companyId = staff.companyId;
+            //                let options = {perPage : 20};
+            //                params.options = options;
+            return API.staff.listAndPaginateStaff(params);
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
+            if(result){
+                return API.staff.listAndPaginateStaff(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
 
     }
 
@@ -255,36 +226,29 @@ class ApiStaff {
      * 增加员工积分
      * @type {*|Function}
      */
-    static increaseStaffPoint(params){
+    static async increaseStaffPoint(params){
         params.accountId = this["accountId"];//当前登录代理商id
-        var user_id = this["accountId"];
-        var staffId = params.id;//加积分的员工id
-        return Q.all([
-                API.staff.getStaff({id: staffId}),
-                API.agency.getAgencyUser({id: this["accountId"]})
-            ])
-            .spread(function(staff, agencyUser){
-                if(!staff.target.companyId){
-                    throw {msg:"该员工不存在或员工所在企业不存在"};
-                }
-                params.companyId = staff.target.companyId;
-                return Q.all([
-                        API.company.getCompany({companyId: staff.target.companyId}),
-                        API.agency.getAgency({agencyId: agencyUser.agencyId})
-                    ])
-                    .spread(function(company, agency){
-                        return API.staff.increaseStaffPoint(params);
-                        /*if(!company.targer.agencyId){
-                         throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
-                         }
-                         if(company.targer.agencyId == agency.id){
-                         console.info("yasyasyasyas==>>yas:", params);
-                         return API.staff.increaseStaffPoint(params);
-                         }else{
-                         throw {msg:"无权限"};
-                         }*///为什么用company.targer.agencyId就会卡死？？？？？？？？
-                    })
-            });
+        let user_id = this["accountId"];
+        let staffId = params.id;//加积分的员工id
+
+        let staff = await API.staff.getStaff({id: staffId});
+        let agencyUser = await API.agency.getAgencyUser({id: this["accountId"]});
+
+        if(!staff.companyId){
+            throw {msg:"该员工不存在或员工所在企业不存在"};
+        }
+        params.companyId = staff.companyId;
+        let company = await API.company.getCompany({companyId: staff.companyId});
+        let agency = API.agency.getAgency({agencyId: agencyUser.agencyId});
+        // return API.staff.increaseStaffPoint(params);
+        if(!company.agencyId){
+            throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
+         }
+         if(company.gencyId == agency.id){
+            return API.staff.increaseStaffPoint(params);
+         }else{
+            throw {msg:"无权限"};
+         }
 
     };
 
@@ -294,36 +258,27 @@ class ApiStaff {
      * 减少员工积分
      * @type {*|Function}
      */
-    static decreaseStaffPoint(params){
+    static async decreaseStaffPoint(params){
         params.accountId = this["accountId"];//当前登录代理商id
-        var user_id = this["accountId"];
-        var staffId = params.id;//加积分的员工id
-        return Q.all([
-                API.staff.getStaff({id: staffId}),
-                API.agency.getAgencyUser({id: this["accountId"]})
-            ])
-            .spread(function(staff, agencyUser){
-                if(!staff.target.companyId){
-                    throw {msg:"该员工不存在或员工所在企业不存在"};
-                }
-                params.companyId = staff.target.companyId;
-                return Q.all([
-                    API.company.getCompany({companyId: staff.target.companyId}),
-                    API.agency.getAgency({agencyId: agencyUser.agencyId})
-                ]);
-            })
-            .spread(function(company, agency){
-                return API.staff.decreaseStaffPoint(params);
-                /*if(!company.target.agencyId){
-                 throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
-                 }
-                 if(company.target.agencyId == agency.id){
-                 return API.staff.decreaseStaffPoint(params);
-                 }else{
-                 throw {msg:"无权限"};
-                 }*/
-            });
-
+        let user_id = this["accountId"];
+        let staffId = params.id;//加积分的员工id
+        let staff = await API.staff.getStaff({id: staffId});
+        let agencyUser = await API.agency.getAgencyUser({id: this["accountId"]});
+        if(!staff.companyId){
+            throw {msg:"该员工不存在或员工所在企业不存在"};
+        }
+        params.companyId = staff.companyId;
+        let company = await API.company.getCompany({companyId: staff.companyId});
+        let agency = await API.agency.getAgency({agencyId: agencyUser.agencyId});
+        // return API.staff.decreaseStaffPoint(params);
+        if(!company.agencyId){
+            throw {msg:"该员工所在企业不存在或员工所在企业没有代理商"};
+         }
+         if(company.agencyId == agency.id){
+            return API.staff.decreaseStaffPoint(params);
+         }else{
+            throw {msg:"无权限"};
+         }
     };
 
 
@@ -335,8 +290,8 @@ class ApiStaff {
      * @param {object} params
      * @return {promise}
      */
-    static listAndPaginatePointChange(params){
-        var user_id = this["accountId"];
+    static async listAndPaginatePointChange(params){
+        let user_id = this["accountId"];
         params.staffId = user_id;
         return API.staff.listAndPaginatePointChange(params);
     }
@@ -349,8 +304,8 @@ class ApiStaff {
      * @param params.endTime  结束时间
      * @returns {promise|*}
      */
-    static getStaffPointsChange(params){
-        var staffId = this["accountId"];
+    static async getStaffPointsChange(params){
+        let staffId = this["accountId"];
         params.staffId = staffId;
         return API.staff.getStaffPointsChange(params);
     }
@@ -362,15 +317,15 @@ class ApiStaff {
      * @param params
      * @returns {*}
      */
-    static getStaffPointsChangeByMonth(params) {
-        var self: any = this;
+    static async getStaffPointsChangeByMonth(params) {
+        let self: any = this;
         return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
             .then(function(staff){
-                return staff.target.companyId;
+                return staff.companyId;
             })
             .then(function(companyId){
                 params.companyId = companyId;
-                var count = params.count;
+                let count = params.count;
                 typeof count == 'number' ? "" : count = 6;
                 params.count = count;
                 return API.staff.getStaffPointsChangeByMonth(params);
@@ -383,7 +338,7 @@ class ApiStaff {
      * @param .departmentId 部门id
      * @returns {*}
      */
-    static getCountByDepartment(params){
+    static async getCountByDepartment(params){
         return API.staff.getCountByDepartment(params);
     }
 
@@ -395,7 +350,7 @@ class ApiStaff {
      * @param {object} params
      * @return {promise}
      */
-    static beforeImportExcel(params){
+    static async beforeImportExcel(params){
         params.accountId = this["accountId"];
         return API.staff.beforeImportExcel(params);
     }
@@ -406,7 +361,7 @@ class ApiStaff {
      * @param params.addObj 导入的数据
      * @returns {*}
      */
-    static importExcelAction(params){
+    static async importExcelAction(params){
         params.accountId = this["accountId"];
         return API.staff.importExcelAction(params);
     }
@@ -417,7 +372,7 @@ class ApiStaff {
      * @param params.objAttr 需要导出的数据
      * @returns {*}
      */
-    static downloadExcle(params){
+    static async downloadExcle(params){
         params.accountId = this["accountId"];
         return API.staff.downloadExcle(params);
     }
@@ -433,32 +388,27 @@ class ApiStaff {
      * @param {String} params.endTime
      * @return {promise} true||error
      */
-    static statisticStaffs(params){
-        var user_id = this["accountId"];
-        return API.auth.judgeRoleById({id:user_id})
-            .then(function(role){
-                if(role == L.RoleType.STAFF){
-                    return API.staff.getStaff({id: user_id})
-                        .then(function(data){
-                            if(data){
-                                var companyId = data.target.companyId;
-                                params.companyId = companyId;
-                                return API.staff.statisticStaffs(params);
-                            }else{
-                                throw {msg:"无权限"};
-                            }
-                        });
-                }else{
-                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
-                        .then(function(result){
-                            if(result){
-                                return API.staff.statisticStaffs(params);
-                            }else{
-                                throw {code: -1, msg: '无权限'};
-                            }
-                        })
-                }
-            })
+    static async statisticStaffs(params){
+        let user_id = this["accountId"];
+        let role = await API.auth.judgeRoleById({id:user_id});
+
+        if(role == L.RoleType.STAFF){
+            let staff= await API.staff.getStaff({id: user_id});
+            if(staff){
+                let companyId = staff.companyId;
+                params.companyId = companyId;
+                return API.staff.statisticStaffs(params);
+            }else{
+                throw {msg:"无权限"};
+            }
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
+            if(result){
+                return API.staff.statisticStaffs(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
 
     }
 
@@ -475,8 +425,8 @@ class ApiStaff {
      * @param {String} params.endTime
      * @return {promise} true||error
      */
-    /*static statisticStaffsByAgency(params){
-     var user_id = this["accountId"];
+    /*static async statisticStaffsByAgency(params){
+     let user_id = this["accountId"];
      if(!params.companyId){
      throw {code: -1, msg: "企业ID不能为空"};
      }
@@ -498,32 +448,27 @@ class ApiStaff {
      * @param {String} params.companyId
      * @returns {*}
      */
-    static getStaffCountByCompany(params){
-        var user_id = this["accountId"];
-        return API.auth.judgeRoleById({id:user_id})
-            .then(function(role){
-                if(role == L.RoleType.STAFF){
-                    return API.staff.getStaff({id: user_id})
-                        .then(function(data){
-                            if(data){
-                                var companyId = data.target.companyId;
-                                params.companyId = companyId;
-                                return API.staff.getStaffCountByCompany(params);
-                            }else{
-                                throw {msg:"无权限"};
-                            }
-                        });
-                }else{
-                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
-                        .then(function(result){
-                            if(result){
-                                return API.staff.getStaffCountByCompany(params);
-                            }else{
-                                throw {code: -1, msg: '无权限'};
-                            }
-                        })
-                }
-            })
+    static async getStaffCountByCompany(params){
+        let user_id = this["accountId"];
+        let role = await API.auth.judgeRoleById({id:user_id});
+
+        if(role == L.RoleType.STAFF){
+            let staff = await API.staff.getStaff({id: user_id});
+            if(staff){
+                let companyId = staff.companyId;
+                params.companyId = companyId;
+                return API.staff.getStaffCountByCompany(params);
+            }else{
+                throw {msg:"无权限"};
+            }
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
+            if(result){
+                return API.staff.getStaffCountByCompany(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
 
     }
 
@@ -534,18 +479,17 @@ class ApiStaff {
      * @param {String} params.companyId
      * @returns {*}
      */
-    static getDistinctDepartment(params){
-        var user_id = this["accountId"];
-        return API.staff.getStaff({id: user_id})
-            .then(function(data){
-                if(data){
-                    var companyId = data.target.companyId;
-                    params.companyId = companyId;
-                    return API.staff.getDistinctDepartment(params);
-                }else{
-                    throw {msg:"无权限"};
-                }
-            });
+    static async getDistinctDepartment(params){
+        let user_id = this["accountId"];
+        let staff = await API.staff.getStaff({id: user_id});
+
+        if(staff){
+            let companyId = staff.companyId;
+            params.companyId = companyId;
+            return API.staff.getDistinctDepartment(params);
+        }else{
+            throw {msg:"无权限"};
+        }
     }
 
     /**
@@ -555,59 +499,48 @@ class ApiStaff {
      * @param {uuid} params.companyId
      * @returns {promise} {adminNum: '管理员人数', commonStaffNum: '普通员工人数', unActiveNum: '未激活人数'};
      */
-    static statisticStaffsRole(params){
-        var user_id = this["accountId"];
-        return API.auth.judgeRoleById({id:user_id})
-            .then(function(role){
-                if(role == L.RoleType.STAFF){
-                    return API.staff.getStaff({id: user_id, columns: ['companyId']})
-                        .then(function(data){
-                            if(data){
-                                var companyId = data.target.companyId;
-                                params.companyId = companyId;
-                                return API.staff.statisticStaffsRole(params);
-                            }else{
-                                throw {msg:"无权限"};
-                            }
-                        });
-                }else{
-                    return API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id})
-                        .then(function(result){
-                            if(result){
-                                return API.staff.statisticStaffsRole(params);
-                            }else{
-                                throw {msg: '无权限'};
-                            }
-                        })
-                }
-            })
+    static async statisticStaffsRole(params){
+        let user_id = this["accountId"];
+        let role = await API.auth.judgeRoleById({id:user_id});
+
+        if(role == L.RoleType.STAFF){
+            let staff = await API.staff.getStaff({id: user_id, columns: ['companyId']});
+            if(staff){
+                let companyId = staff.companyId;
+                params.companyId = companyId;
+                return API.staff.statisticStaffsRole(params);
+            }else{
+                throw {msg:"无权限"};
+            }
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
+            if(result){
+                return API.staff.statisticStaffsRole(params);
+            }else{
+                throw {msg: '无权限'};
+            }
+        }
 
     }
 
-    static statStaffPoints(params){
-        var self: any = this;
-        var user_id = self.accountId;
-        return API.auth.judgeRoleById({id:user_id})
-            .then(function(role){
-                if(role == L.RoleType.STAFF){
-                    return API.staff.getStaff({id: self.accountId, columns: ['companyId']})
-                        .then(function(staff){
-                            return API.staff.statStaffPoints({companyId: staff.target.companyId})
-                        })
-                }else{
-                    var companyId = params.companyId;
-                    return Q.all([
-                            API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']}),
-                            API.company.getCompany({companyId: companyId, columns: ['agencyId']})
-                        ])
-                        .spread(function(u, c){
-                            if(u.agencyId != c.target.agencyId){
-                                throw L.ERR.PERMISSION_DENY;
-                            }
-                            return API.staff.statStaffPoints({companyId: companyId});
-                        })
-                }
-            })
+    static async statStaffPoints(params){
+        let self: any = this;
+        let user_id = self.accountId;
+        let role = await API.auth.judgeRoleById({id:user_id});
+
+        if(role == L.RoleType.STAFF){
+            let staff = await API.staff.getStaff({id: self.accountId, columns: ['companyId']});
+            return API.staff.statStaffPoints({companyId: staff.companyId});
+        }else{
+            let companyId = params.companyId;
+            let u = await API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']});
+            let c = await API.company.getCompany({companyId: companyId, columns: ['agencyId']});
+
+            if(u.agencyId != c.agencyId){
+                throw L.ERR.PERMISSION_DENY;
+            }
+            return API.staff.statStaffPoints({companyId: companyId});
+        }
 
     }
 
@@ -626,7 +559,7 @@ class ApiStaff {
      * @param {Date} params.validData 过期时间（选填）
      * @returns {*|Promise}
      */
-    static createPapers(params): Promise<Credential>{
+    static async createPapers(params): Promise<Credential>{
         params.ownerId = this["accountId"];
         return API.staff.createPapers(params)
     };
@@ -641,7 +574,7 @@ class ApiStaff {
      * @param {uuid} params.id    删除记录id（必填）
      * @returns {*|Promise}
      */
-    static deletePapers (params){
+    static async deletePapers (params){
         params.ownerId = this["accountId"];
         return API.staff.deletePapers(params);
     };
@@ -660,16 +593,14 @@ class ApiStaff {
      * @param {Date} params.validData 过期时间（选填）
      * @returns {*|Promise}
      */
-    static updatePapers (params): Promise<Credential>{
-        var user_id = this["accountId"];
-        return API.staff.getPapersById({id: params.id})
-            .then(function(ma){
-                if(ma.ownerId != user_id){
-                    throw {code: -1, msg: '无权限'};
-                }
-                params.ownerId = user_id;
-                return API.staff.updatePapers(params)
-            });
+    static async updatePapers (params): Promise<Credential>{
+        let user_id = this["accountId"];
+        let ma = await API.staff.getPapersById({id: params.id});
+        if(ma.ownerId != user_id){
+            throw {code: -1, msg: '无权限'};
+        }
+        params.ownerId = user_id;
+        return API.staff.updatePapers(params)
     };
 
     /**
@@ -682,20 +613,18 @@ class ApiStaff {
      * @param {Array<String>} params.attributes    查询列（选填）
      * @returns {*|Promise}
      */
-    static getPapersById(params): Promise<Credential>{
-        var id = params.id;
-        var user_id = this["accountId"];
-        return API.staff.getPapersById({id:id})
-            .then(function(ma){
-                if(!ma){
-                    throw {code: -1, msg: '查询结果不存在'};
-                }
+    static async getPapersById(params): Promise<Credential>{
+        let id = params.id;
+        let user_id = this["accountId"];
+        let ma = await API.staff.getPapersById({id:id});
+        if(!ma){
+            throw {code: -1, msg: '查询结果不存在'};
+        }
 
-                if(ma.ownerId && ma.ownerId != user_id){
-                    throw {code: -1, msg: '无权限'};
-                }
-                return ma;
-            });
+        if(ma.ownerId && ma.ownerId != user_id){
+            throw {code: -1, msg: '无权限'};
+        }
+        return ma;
     };
 
 
@@ -710,16 +639,14 @@ class ApiStaff {
      * @param {Array<String>} params.attributes    查询列（选填）
      * @returns {*|Promise}
      */
-    static getOnesPapersByType(params): Promise<Credential>{
-        var user_id = this["accountId"];
+    static async getOnesPapersByType(params): Promise<Credential>{
+        let user_id = this["accountId"];
         params.ownerId = user_id;
-        return API.staff.getOnesPapersByType(params)
-            .then(function(ma){
-                if(!ma){
-                    throw {code: -1, msg: '查询结果不存在'};
-                }
-                return ma;
-            });
+        let ma = await API.staff.getOnesPapersByType(params);
+        if(!ma){
+            throw {code: -1, msg: '查询结果不存在'};
+        }
+        return ma;
     };
 
     /**
@@ -729,13 +656,13 @@ class ApiStaff {
      *
      * @returns {*|Promise}
      */
-    static getCurrentUserPapers(): Promise<Credential[]>{
-        var user_id = this["accountId"];
+    static async getCurrentUserPapers(): Promise<Credential[]>{
+        let user_id = this["accountId"];
         return API.staff.getPapersByOwner({ownerId: user_id});
     };
 
-    static getOnesPapers(params){
-        var user_id = params.userId;
+    static async getOnesPapers(params){
+        let user_id = params.userId;
         return API.staff.getPapersByOwner({ownerId: user_id});
     };
 

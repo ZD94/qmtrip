@@ -260,17 +260,21 @@ describe("api/client/staff.js", function() {
 
             API.client.tripPlan.saveTripPlan.call(ownerSelf, tripPlanOrder)
                 .then(function(ret) {
+                    console.info("1111111111111111111111111");
                     newOrderId = ret.id;
                     consumeId = ret.hotel[0].id;
                     return API.tripPlan.uploadInvoice({userId: ownerSelf.accountId, consumeId: consumeId, picture: '测试图片'});
                 })
                 .then(function(){
+                    console.info("2222222222222222222222222");
                     return API.tripPlan.commitTripPlanOrder({accountId: ownerSelf.accountId, orderId: newOrderId})
                 })
                 .then(function(ret){
+                    console.info("333333333333333333333");
                     return  API.client.agencyTripPlan.approveInvoice.call({accountId: agencyUserId}, {consumeId: consumeId, status: 1, expenditure: '112', remark: '审核票据测试'})
                 })
                 .then(function(ret){
+                    console.info("=====================retretret", ret);
                     assert.equal(ret, true);
                     done();
                 })

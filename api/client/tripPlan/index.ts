@@ -24,23 +24,29 @@ class ApiTripPlan {
      * @param params
      * @returns {Object}
      */
-    private getPlanDetails(params:any):{orderStatus:string, budget:number, tripDetails:any} {
+    static getPlanDetails(params:any):{orderStatus:string, budget:number, tripDetails:any} {
         let tripDetails:any = [];
         let tripDetails_required_fields = ['startTime', 'invoiceType', 'budget'];
-        params.outTraffic.map(function (detail:any) {
-            detail.type = 1;
-            tripDetails.push(detail);
-        });
+        if(params.outTraffic){
+            params.outTraffic.map(function (detail:any) {
+                detail.type = 1;
+                tripDetails.push(detail);
+            });
+        }
 
-        params.backTraffic.map(function (detail:any) {
-            detail.type = 2;
-            tripDetails.push(detail);
-        });
+        if(params.backTraffic){
+            params.backTraffic.map(function (detail:any) {
+                detail.type = 2;
+                tripDetails.push(detail);
+            });
+        }
 
-        params.hotel.map(function (detail:any) {
-            detail.type = 3;
-            tripDetails.push(detail);
-        });
+        if(params.hotel){
+            params.hotel.map(function (detail:any) {
+                detail.type = 3;
+                tripDetails.push(detail);
+            });
+        }
 
         let total_budget:number = 0;
         let isBudget = true;
@@ -99,13 +105,12 @@ class ApiTripPlan {
         params = new TripPlan(params); //测试
 
         let _tripPlan:any = _.pick(params, API.tripPlan.TripPlanCols);
-        let {orderStatus, budget, tripDetails} = self.getPlanDetails(params);
+        let {orderStatus, budget, tripDetails} = ApiTripPlan.getPlanDetails(params);
 
         _tripPlan.tripDetails = tripDetails;
         _tripPlan.orderStatus = orderStatus;
         _tripPlan.budget = budget;
-        _tripPlan.orderNo = await
-        API.seeds.getSeedNo('tripPlanNo'); //获取出差计划单号
+        _tripPlan.orderNo = await API.seeds.getSeedNo('tripPlanNo'); //获取出差计划单号
         _tripPlan.accountId = accountId;
         _tripPlan.companyId = staff.target.companyId;
 

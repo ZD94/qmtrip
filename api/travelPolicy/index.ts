@@ -137,7 +137,16 @@ export function getTravelPolicy(params): Promise<TravelPolicy>{
  * @param params
  * @returns {*}
  */
-export function getAllTravelPolicy(options){
+export function getAllTravelPolicy(params){
+    let options: any = {
+        where: _.pick(params, ['name', 'planeLevel', 'planeDiscount', 'trainLevel', 'hotelLevel', 'hotelPrice', 'companyId', 'isChangeLevel', 'createAt'])
+    };
+    if(params.columns){
+        options.attributes = params.columns;
+    }
+    if(params.order){
+        options.order = params.order;
+    }
     return travalPolicyModel.findAll(options);
 }
 

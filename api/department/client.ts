@@ -1,7 +1,7 @@
 
 import { CachedService, requireAPI } from 'api/_types';
 import { Department } from 'api/_types/department';
-import * as ApiDepartment from 'api/client/department';
+import ApiDepartment = require('api/client/department');
 
 export class DepartmentService extends CachedService<Department>{
     constructor($cacheFactory: ng.ICacheFactoryService){
