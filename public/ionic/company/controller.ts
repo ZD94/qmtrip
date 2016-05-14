@@ -52,6 +52,7 @@ export async function EditpolicyController($scope, Models, $stateParams, $locati
 }
 
 export async function StaffsController($scope, Models){
+    console.info("ddd...");
     var staff = await Models.staff.get(Cookie.get('user_id'));
     var company = staff.company;
     var staffs = await company.getStaffs();
@@ -63,14 +64,16 @@ export async function StaffsController($scope, Models){
         return obj;
     });
     await Promise.all($scope.staffs.map(async function(obj){
-        obj.travelPolicy = await obj.staff.getTravelPolicy();
+        obj.travelPolicy = await obj.staff.getTravelPolicy()
+        console.info(obj);
+        return obj;
     }));
     $scope.search = function(){
         
     }
     // var company = await Models.company.get(staff.companyId);
     // console.info(company);
-    console.info(staff);
+    console.info(staffs);
 }
 
 export async function StaffdetailController($scope, $stateParams, Models, $location){
