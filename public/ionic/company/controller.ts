@@ -64,8 +64,8 @@ export async function StaffsController($scope, Models){
         return obj;
     });
     await Promise.all($scope.staffs.map(async function(obj){
-        obj.travelPolicy = await obj.staff.getTravelPolicy()
-        console.info(obj);
+        obj.travelPolicy = await obj.staff.getTravelPolicy();
+        console.info("there",obj);
         return obj;
     }));
     $scope.search = function(){
@@ -77,7 +77,12 @@ export async function StaffsController($scope, Models){
 }
 
 export async function StaffdetailController($scope, $stateParams, Models, $location){
-    var staff = await Models.staff.get($stateParams.staffId);
+    let staff;
+    if($stateParams.staffId){
+        staff = await Models.staff.get($stateParams.staffId);
+    }else{
+        staff = {}
+    }
     $scope.staff = staff;
     var role = 'false';
     if(staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN){
