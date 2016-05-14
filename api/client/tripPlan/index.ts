@@ -38,14 +38,13 @@ class ApiTripPlan {
         _tripPlan.budget = budget;
         _tripPlan.planNo = await API.seeds.getSeedNo('tripPlanNo'); //获取出差计划单号
         _tripPlan.accountId = accountId;
-        _tripPlan.companyId = staff.target.companyId;
+        _tripPlan.companyId = staff.companyId;
 
         let tripPlan = await API.tripPlan.saveTripPlan(_tripPlan);
 
         if (tripPlan.budget <= 0 || tripPlan.orderStatus === EPlanStatus.NO_BUDGET) {
             return tripPlan; //没有预算，直接返回计划单
         }
-
         let staffs = await API.staff.getStaffs({companyId: staff.target.companyId, roleId: {$ne: 1}, status: {$gte: 0}, columns: ['id', 'name', 'email']});
         let url = config.host + '/corp.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
         let go = '无', back = '无', hotel = '无';
