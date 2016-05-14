@@ -153,16 +153,15 @@ export async function updateAgency(_agency){
  * @returns {*}
  */
 validateApi(getAgency, ['agencyId']);
-export function getAgency(params){
-    var agencyId = params.agencyId;
-    return AgencyModel.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updateAt']})
-        .then(function(agency){
-            if(!agency || agency.status == EAgencyStatus.DELETE){
-                throw L.ERR.AGENCY_NOT_EXIST;
-            }
+export async function getAgency(params){
+    let agencyId = params.agencyId;
+    let agency = await AgencyModel.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updateAt']});
 
-            return new Agency(agency);
-        })
+    if(!agency || agency.status == EAgencyStatus.DELETE){
+        throw L.ERR.AGENCY_NOT_EXIST;
+    }
+
+    return new Agency(agency);
 }
 
 /**
@@ -180,43 +179,24 @@ export function listAgency(params){
  * @returns {*}
  */
 validateApi(deleteAgency, ['agencyId'], ['userId']);
-export function deleteAgency(params){
-    var agencyId = params.agencyId;
-    var userId = params.userId;
+export async function deleteAgency(params){
+    let agencyId = params.agencyId;
+    let userId = params.userId;
+    let agency = await AgencyModel.findById(agencyId, {attributes: ['createUser', 'status']});
+    let agencyUsers = await AgencyUserModel.findAll({where: {agencyId: agencyId, status: {$ne: EAgencyStatus.DELETE}}, attributes: ['id']});
 
-    return Promise.all([
-        AgencyModel.findById(agencyId, {attributes: ['createUser']}),
-        AgencyUserModel.findAll({where: {agencyId: agencyId, status: {$ne: EAgencyStatus.DELETE}}, attributes: ['id']})
-    ])
-        .spread(function(agency, users: any){
-            if(!agency || agency.status == EAgencyStatus.DELETE){
-                throw L.ERR.AGENCY_NOT_EXIST;
-            }
+    if(!agency || agency.status == EAgencyStatus.DELETE){
+        throw L.ERR.AGENCY_NOT_EXIST;
+    }
 
-            if(agency.createUser != userId){
-                throw L.ERR.PERMISSION_DENY;
-            }
+    await AgencyModel.update({status: EAgencyStatus.DELETE, updateAt: utils.now()}, {where: {id: agencyId}, fields: ['status', 'updateAt']});
+    await AgencyUserModel.update({status: EAgencyStatus.DELETE, updateAt: utils.now()}, {where: {agencyId: agencyId}, fields: ['status', 'updateAt']});
 
-            return users;
-        })
-        .then(function(users: any){
-            return sequelize.transaction(function(t){
-                return Promise.all([
-                    AgencyModel.update({status: EAgencyStatus.DELETE, updateAt: utils.now()},
-                        {where: {id: agencyId}, fields: ['status', 'updateAt'], transaction: t}),
-                    AgencyUserModel.update({status: EAgencyStatus.DELETE, updateAt: utils.now()},
-                        {where: {agencyId: agencyId}, fields: ['status', 'updateAt'], transaction: t})
-                ])
-                    .then(function(){
-                        return users.map(function(user){
-                            return API.auth.remove({accountId: user.id, type: 2})
-                        })
-                    })
-            })
-        })
-        .then(function(){
-            return true;
-        })
+    agencyUsers.map(async function(user){
+        await API.auth.remove({accountId: user.id, type: 2});
+    });
+
+    return true;
 }
 
 

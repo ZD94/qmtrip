@@ -15,7 +15,7 @@ export function CommitedController($scope){
 
 }
 
-export function CreateController($scope){
+export function CreateController($scope, Models){
 
 }
 

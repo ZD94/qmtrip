@@ -250,7 +250,7 @@ describe("api/client/staff.js", function() {
                 arrivalCityCode: 'SH123',
                 budget: 1000,
                 startAt: '2015-12-30 11:12:12',
-                tripDetails: [{
+                hotel: [{
                     startTime: '2016-12-30 11:11:11',
                     budget: 500,
                     invoiceType: 'HOTEL',

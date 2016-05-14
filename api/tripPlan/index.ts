@@ -4,10 +4,6 @@
 "use strict";
 let sequelize = require("common/model").importModel("./models");
 let Models = sequelize.models;
-// let TripPlanModel = Models.TripPlan;
-// let TripDetailsModel = Models.TripDetail;
-// let TripOrderLogsModel = Models.TripPlanLogs;
-// let ProjectModel = Models.Projects;
 let {TripPlan: TripPlanModel, TripDetail: TripDetailsModel, TripPlanLogs: TripOrderLogsModel, Projects: ProjectModel} = Models;
 let uuid = require("node-uuid");
 let L = require("common/language");

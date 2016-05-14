@@ -161,6 +161,7 @@ describe("api/client/agency.js", function() {
                 if (err) {
                     throw err;
                 }
+                console.info(ret);
                 assert.equal(ret.status, 1);
                 assert.equal(ret.roleId, 2);
                 done();
