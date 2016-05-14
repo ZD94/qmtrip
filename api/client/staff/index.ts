@@ -179,6 +179,55 @@ class ApiStaff {
 
     }
 
+    /**
+     * @method getPointChange
+     *
+     * 企业根据id得到积分变动记录
+     * @type {*}
+     */
+    static async getPointChange(params): Promise<PointChange> {
+        let user_id = this["accountId"];
+        let id = params.id;
+        let role = await API.auth.judgeRoleById({id:user_id});
+
+        if(role == L.RoleType.STAFF){
+
+            return API.staff.getPointChange({id:id});
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
+            if(result){
+                return API.staff.getPointChange(params)
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
+
+    }
+
+    /**
+     * @method getPointChanges
+     *
+     * 根据查询条件得到积分变动记录
+     * @type {*}
+     */
+    static async getPointChanges(params) {
+        let user_id = this["accountId"];
+        let role = await API.auth.judgeRoleById({id:user_id});
+
+        if(role == L.RoleType.STAFF){
+
+            return API.staff.getPointChanges(params)
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
+            if(result){
+                return API.staff.getPointChanges(params)
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
+
+    }
+
 
 
     /**
