@@ -27,21 +27,21 @@ class ApiTripPlan {
     static getPlanDetails(params:any):{orderStatus:string, budget:number, tripDetails:any} {
         let tripDetails:any = [];
         let tripDetails_required_fields = ['startTime', 'invoiceType', 'budget'];
-        if(params.outTraffic){
+        if(params.outTraffic && params.outTraffic.length>0){
             params.outTraffic.map(function (detail:any) {
                 detail.type = 1;
                 tripDetails.push(detail);
             });
         }
 
-        if(params.backTraffic){
+        if(params.backTraffic && params.backTraffic.length>0){
             params.backTraffic.map(function (detail:any) {
                 detail.type = 2;
                 tripDetails.push(detail);
             });
         }
 
-        if(params.hotel){
+        if(params.hotel && params.hotel.length>0){
             params.hotel.map(function (detail:any) {
                 detail.type = 3;
                 tripDetails.push(detail);
@@ -112,7 +112,7 @@ class ApiTripPlan {
         _tripPlan.budget = budget;
         _tripPlan.orderNo = await API.seeds.getSeedNo('tripPlanNo'); //获取出差计划单号
         _tripPlan.accountId = accountId;
-        _tripPlan.companyId = staff.target.companyId;
+        _tripPlan.companyId = staff.companyId;
 
         let tripPlan = await
         API.tripPlan.saveTripPlan(_tripPlan);
@@ -123,7 +123,7 @@ class ApiTripPlan {
 
         let staffs = await
         API.staff.getStaffs({
-            companyId: staff.target.companyId,
+            companyId: staff.companyId,
             roleId: {$ne: 1},
             status: {$gte: 0},
             columns: ['id', 'name', 'email']

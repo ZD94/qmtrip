@@ -32,8 +32,8 @@ module.exports = function (Db, DataType) {
         auditRemark  : {type: DataType.STRING,          field: 'audit_remark'}, //审核备注
         score        : {type: DataType.INTEGER,         field: 'score', defaultValue: 0}, //获取的积分
         expireAt     : {type: "timestamp without time zone", field: "expire_at"}, //失效时间
-        createAt     : {type: "timestamp without time zone", field: "create_at", defaultValue: now}, //创建时间
-        updateAt     : {type: "timestamp without time zone", field: "update_at"},
+        createAt     : {type: "timestamp without time zone", field: "created_at", defaultValue: now}, //创建时间
+        updateAt     : {type: "timestamp without time zone", field: "updated_at"},
         commitTime  : {type: "timestamp without time zone", field: "commit_time"},
         remark       : {type: DataType.STRING }, //备注
         orderStatus: {
