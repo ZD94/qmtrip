@@ -1,5 +1,5 @@
 import { CachedService, requireAPI } from 'api/_types';
-import { TripPlan, TripDetail } from 'api/_types/tripPlan';
+import {TripPlan, TripDetail, Project} from 'api/_types/tripPlan';
 import ApiTripPlan = require('api/client/tripPlan');
 
 export class TripPlanService extends CachedService<TripPlan>{
@@ -57,5 +57,32 @@ export class TripDetailService extends CachedService<TripDetail>{
     async $destroy(id: string): Promise<any> {
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
         return api.deleteTripPlan({orderId: id});
+    }
+}
+
+export class ProjectService extends CachedService<Project>{
+    constructor($cacheFactory: ng.ICacheFactoryService){
+        super($cacheFactory('project'));
+    }
+
+    async $create(obj: any): Promise<Project> {
+        var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
+        return api.createNewProject(obj);
+    }
+
+    async $get(id: string): Promise<Project>{
+        var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
+        return api.getProjectById({id: id});
+    }
+    async $find(where: any): Promise<string[]>{
+        var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
+        return api.getProjectsList(where);
+    }
+    async $update(id: string, fields: any): Promise<any> {
+        throw {code: -1, msg: '不能更新项目名称'};
+    }
+    async $destroy(id: string): Promise<any> {
+        var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
+        return api.deleteProject({id: id});
     }
 }

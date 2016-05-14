@@ -400,7 +400,7 @@ export function deleteAgencyByTest(params){
 
 var isInit = false;
 export function __initOnce() {
-    logger.info("初始化默认代理商...");
+    logger.info("init default agency...");
     if(isInit) {
         return;
     }

@@ -4,10 +4,11 @@
 "use strict";
 let sequelize = require("common/model").importModel("./models");
 let Models = sequelize.models;
-let TripPlanModel = Models.TripPlan;
-let TripDetailsModel = Models.TripDetail;
-let TripOrderLogsModel = Models.TripPlanLogs;
-let ProjectModel = Models.Projects;
+// let TripPlanModel = Models.TripPlan;
+// let TripDetailsModel = Models.TripDetail;
+// let TripOrderLogsModel = Models.TripPlanLogs;
+// let ProjectModel = Models.Projects;
+let {TripPlan: TripPlanModel, TripDetail: TripDetailsModel, TripPlanLogs: TripOrderLogsModel, Projects: ProjectModel} = Models;
 let uuid = require("node-uuid");
 let L = require("common/language");
 let Logger = require('common/logger');
@@ -77,6 +78,24 @@ export class TripDetailService implements ServiceInterface<TripDetail>{
     }
 }
 
+export class ProjectService implements ServiceInterface<Project>{
+    async create(obj: Object): Promise<Project>{
+        return API.tripPlan.createNewProject(obj);
+    }
+    async get(id: string): Promise<Project>{
+        return API.tripPlan.getProject({consumeId: id});
+    }
+    async find(where: any): Promise<Project[]>{
+        return API.tripPlan.getProjectList(where);
+    }
+    async update(id: string, fields: Object): Promise<any> {
+        throw {code: -1, msg: '不能更新项目名称'};
+    }
+    async destroy(id: string): Promise<any> {
+        return API.tripPlan.deleteProject({orderId: id});
+    }
+}
+
 /**
  * 保存预算单/差旅计划单
  * @param params
@@ -143,14 +162,14 @@ export async function getTripPlanOrder(params){
         params.columns.push('status');
         options.attributes = params.columns;
     }
-    
+
     let order = await TripPlanModel.findById(orderId, options);
     let tripDetails = await TripDetailsModel.findAll({where: {orderId: orderId, status: {$ne: STATUS.DELETE}}});
 
     if(!order || order.orderStatus == 'DELETE'){
         throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
     }
-    
+
     order = order.toJSON();
     order.tripDetails = tripDetails;
 
@@ -196,7 +215,7 @@ export async function getConsumeDetail(params){
     if(!detail || detail.status == STATUS.DELETE){
         throw {code: -2, msg: '消费记录不存在'};
     }
-    
+
     return new TripDetail(detail);
 }
 
@@ -378,7 +397,7 @@ export async function listTripPlanOrder(options){
     }
 
     if(!options.order) {
-         options.order = [['start_at', 'desc'], ['create_at', 'desc']]; //默认排序，创建时间
+        options.order = [['start_at', 'desc'], ['create_at', 'desc']]; //默认排序，创建时间
     }
 
     let {rows: orders, count} = await TripPlanModel.findAndCount(options);
@@ -726,9 +745,9 @@ export function approveInvoice(params){
                     updates.isCommit =false;
                 }
                 return Promise.all([
-                    TripDetailsModel.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
-                    TripOrderLogsModel.create(logs,{transaction: t})
-                ])
+                        TripDetailsModel.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
+                        TripOrderLogsModel.create(logs,{transaction: t})
+                    ])
                     .spread(function(ret){
                         let status = params.status;
 
@@ -844,9 +863,9 @@ export function statBudgetByMonth(params) {
 
             let _month = month.match(/\d{4}-\d{2}/)[0];
             return Promise.all([
-                sequelize.query(s_sql),
-                sequelize.query(c_sql),
-            ])
+                    sequelize.query(s_sql),
+                    sequelize.query(c_sql),
+                ])
                 .spread(function(all, complete){
                     let a = all[0][0];
                     let c = complete[0][0];
@@ -901,18 +920,18 @@ export function statPlanOrderMoney(params){
 
     query_sql += ' and budget>expenditure;';
 
-    if(!isObjNull(startAt)){
+    if(!_.isNull(startAt)){
         query.startAt = startAt;
         query_complete.startAt = startAt;
     }
 
     return Promise.all([
-        TripPlanModel.sum('budget', {where: query}),
-        TripPlanModel.sum('budget', {where: query_complete}),
-        TripPlanModel.sum('expenditure', {where: query_complete}),
-        TripPlanModel.count({where: query_complete}),
-        sequelize.query(query_sql)
-    ])
+            TripPlanModel.sum('budget', {where: query}),
+            TripPlanModel.sum('budget', {where: query_complete}),
+            TripPlanModel.sum('expenditure', {where: query_complete}),
+            TripPlanModel.count({where: query_complete}),
+            sequelize.query(query_sql)
+        ])
         .spread(function(n1, n2, n3, n4, n5) {
             let savedMoney = n5[0][0].savedMoney || 0;
             return {
@@ -946,9 +965,9 @@ commitTripPlanOrder['required_params'] = ['orderId', 'accountId'];
 export function commitTripPlanOrder(params){
     let id = params.orderId;
     return Promise.all([
-        TripPlanModel.findById(id),
-        TripDetailsModel.findAll({where:{orderId: id}})
-    ])
+            TripPlanModel.findById(id),
+            TripDetailsModel.findAll({where:{orderId: id}})
+        ])
         .spread(function(order, list){
             if(!order || order.status == STATUS.DELETE){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
@@ -1070,6 +1089,27 @@ export async function checkBudgetExist(params){
     return result;
 }
 
+
+/**
+ * 根据出差记录id获取出差详情(包括已删除的)
+ * @param params
+ * @returns {Promise<TInstance[]>|any}
+ */
+export function listConsumesByPlanId(params) {
+    return TripDetailsModel.findAll({where: params.trip_plan_id})
+}
+
+/**
+ * 保存出差计划改动日志
+ * @type {saveTripPlanLog}
+ */
+saveTripPlanLog['required_params'] = ['orderId', 'userId', 'remark'];
+export function saveTripPlanLog(params) {
+    params.createAt = utils.now();
+    return TripOrderLogsModel.create(params);
+}
+
+
 getProjectList['required_params'] = ['companyId'];
 getProjectList['optional_params'] = ['code', 'name', 'count'];
 export function getProjectList(params) {
@@ -1092,6 +1132,23 @@ createNewProject['optional_params'] = ['code']
 export function createNewProject(params) {
     params.createAt = utils.now();
     return ProjectModel.create(params);
+}
+
+export async function getProject(params: {id: string}): Promise<Project> {
+    let project = await ProjectModel.findBuId(params.id);
+    return new Project(project);
+}
+
+export async function deleteProject(params: {id: string}): Promise<boolean> {
+    let project = await ProjectModel.findBuId(params.id);
+
+    if(!project) {
+        throw {code: -2, msg: '没有该项目'};
+    }
+
+    let result = await ProjectModel.destroy({where: {id: params.id}});
+
+    return true;
 }
 
 getProjectByName['required_params'] = ['userId', 'name'];
@@ -1118,37 +1175,6 @@ export function getProjectByName(params) {
             }
             return project;
         })
-}
-
-/**
- * 根据出差记录id获取出差详情(包括已删除的)
- * @param params
- * @returns {Promise<TInstance[]>|any}
- */
-export function listConsumesByPlanId(params) {
-    return TripDetailsModel.findAll({where: params.trip_plan_id})
-}
-
-/**
- * 保存出差计划改动日志
- * @type {saveTripPlanLog}
- */
-saveTripPlanLog['required_params'] = ['orderId', 'userId', 'remark'];
-export function saveTripPlanLog(params) {
-    params.createAt = utils.now();
-    return TripOrderLogsModel.create(params);
-}
-
-/**
- * 判断JSON对象是否为空
- * @param obj
- * @returns {boolean}
- */
-function isObjNull(obj){
-    for (let s in obj){
-        return false;
-    }
-    return true;
 }
 
 export var __initHttpApp = require('./invoice');

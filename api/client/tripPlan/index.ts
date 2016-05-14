@@ -643,6 +643,38 @@ class ApiTripPlan {
     }
 
     /**
+     * @method createNewProject
+     * 创建项目
+     * @param params
+     * @returns {any}
+     */
+    static createNewProject(params) {
+        return API.tripPlan.createNewProject(params);
+    }
+
+    /**
+     * @method getProjectById
+     * 获取项目
+     * @param params
+     * @returns {any}
+     */
+    @requireParams(['id'])
+    static getProjectById(params: {id: string}) {
+        return API.tripPlan.getProject({id: params.id});
+    }
+    
+    /**
+     * @method requireParams
+     * 删除项目
+     * @param params
+     * @returns {any}
+     */
+    @requireParams(['id'])
+    static deleteProject(params: {id: string}) {
+        return API.tripPlan.deleteProject({id: params.id});
+    }
+
+    /**
      * @method getProjectsList
      * 获取项目名称列表
      * @param params

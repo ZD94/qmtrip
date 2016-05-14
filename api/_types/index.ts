@@ -3,7 +3,7 @@ import { Staff, Credential } from "./staff";
 import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
 import { Agency, AgencyUser } from './agency';
-import { TripPlan, TripDetail } from './tripPlan';
+import {TripPlan, TripDetail, Project} from './tripPlan';
 
 var API = require('common/api');
 
@@ -146,7 +146,10 @@ class ServiceDelegate<T> implements ServiceInterface<T>{
 export interface ModelsInterface {
     staff: ServiceInterface<Staff>;
     credential: ServiceInterface<Credential>;
+    
     company: ServiceInterface<Company>;
+    moneyChange: ServiceInterface<MoneyChange>;
+    
     department: ServiceInterface<Department>;
     travelPolicy: ServiceInterface<TravelPolicy>;
 
@@ -154,16 +157,17 @@ export interface ModelsInterface {
     agencyUser: ServiceInterface<AgencyUser>;
 
     tripPlan: ServiceInterface<TripPlan>;
-    
     tripDetail: ServiceInterface<TripDetail>;
-    
-    moneyChange: ServiceInterface<MoneyChange>;
+    project: ServiceInterface<Project>;
 }
 
 export var Models: ModelsInterface = {
     staff: new ServiceDelegate<Staff>(),
     credential: new ServiceDelegate<Credential>(),
+    
     company: new ServiceDelegate<Company>(),
+    moneyChange: new ServiceDelegate<MoneyChange>(),
+    
     department: new ServiceDelegate<Department>(),
     travelPolicy: new ServiceDelegate<TravelPolicy>(),
 
@@ -172,7 +176,7 @@ export var Models: ModelsInterface = {
 
     tripPlan: new ServiceDelegate<TripPlan>(),
     tripDetail: new ServiceDelegate<TripDetail>(),
-    moneyChange: new ServiceDelegate<MoneyChange>(),
+    project: new ServiceDelegate<Project>(),
 };
 
 export function initModels(models: ModelsInterface){
