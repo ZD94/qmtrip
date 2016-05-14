@@ -12,7 +12,7 @@ describe("api/client/tripPlan.js", function() {
     var agencyUserId = "";
     var companyId = "";
     var staffId = "";
-    var orderId = "";
+    var tripPlanId = "";
 
     var agency = {
         email: "tripPlan.test@jingli.tech",
@@ -110,7 +110,7 @@ describe("api/client/tripPlan.js", function() {
         });
 
         after(function(done) {
-            API.tripPlan.deleteTripPlan({orderId: new_trip_plan_id, userId: staffId})
+            API.tripPlan.deleteTripPlan({tripPlanId: new_trip_plan_id, userId: staffId})
                 .then(function(){
                     done()
                 })
@@ -139,7 +139,6 @@ describe("api/client/tripPlan.js", function() {
                     done();
                 })
                 .catch(function(err) {
-                    console.info("*******************");
                     assert.equal(err.code, -1);
                     done();
                 })
@@ -148,7 +147,7 @@ describe("api/client/tripPlan.js", function() {
 
     describe("saveTripPlan", function(){
         after(function(done){
-            API.tripPlan.deleteTripPlan({orderId: orderId, userId: staffId}, function(err, ret){
+            API.tripPlan.deleteTripPlan({tripPlanId: tripPlanId, userId: staffId}, function(err, ret){
                 if(err){
                     throw err;
                 }
@@ -180,10 +179,10 @@ describe("api/client/tripPlan.js", function() {
                 if(err){
                     throw err;
                 }
-                orderId = ret.id;
+                tripPlanId = ret.id;
                 assert.equal(ret.companyId, companyId);
                 assert.equal(ret.accountId, staffId);
-                assert.equal(ret.orderStatus, 'WAIT_UPLOAD');
+                // assert.equal(ret.orderStatus, 'WAIT_UPLOAD');
                 done();
             })
         });
@@ -236,14 +235,14 @@ describe("api/client/tripPlan.js", function() {
                 invoiceType: 'HOTEL'
             }]
         }
-        var newOrderId = "";
+        var newplanId = "";
         beforeEach(function(done){
 
             API.client.tripPlan.saveTripPlan.call({accountId: staffId}, tripPlanOrder, function(err, ret){
                 if(err){
                     throw err;
                 }
-                newOrderId = ret.id;
+                newplanId = ret.id;
                 consume_id = ret.hotel[0].id;
                 done();
             })
@@ -260,7 +259,7 @@ describe("api/client/tripPlan.js", function() {
 
         it("#deleteTripPlan should be ok", function(done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.deleteTripPlan.call(self, {orderId: newOrderId}, function(err, ret){
+            API.client.tripPlan.deleteTripPlan.call(self, {tripPlanId: newplanId}, function(err, ret){
                 if (err) {
                     throw err;
                 }
@@ -272,7 +271,7 @@ describe("api/client/tripPlan.js", function() {
 
 
     describe("options based on tripPlanOrder created", function() {
-        var newOrderId = "";
+        var newplanId = "";
         var consumeId = "";
         var _tripPlanOrder = {
             deptCity: '北京',
@@ -294,14 +293,14 @@ describe("api/client/tripPlan.js", function() {
                 if (err) {
                     throw err;
                 }
-                newOrderId = ret.id;
+                newplanId = ret.id;
                 consumeId = ret.hotel[0].id;
                 done();
             })
         });
 
         after(function (done) {
-            API.tripPlan.deleteTripPlan({orderId: newOrderId, userId: staffId}, function (err, ret) {
+            API.tripPlan.deleteTripPlan({tripPlanId: newplanId, userId: staffId}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -335,7 +334,7 @@ describe("api/client/tripPlan.js", function() {
 
         it("#getTripPlanById should be error when param is not uuid", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.getTripPlanById.call(self, {orderId: "123456"}, function (err, ret) {
+            API.client.tripPlan.getTripPlanById.call(self, {tripPlanId: "123456"}, function (err, ret) {
                 assert(err != null);
                 assert.equal(ret, null);
                 done();
@@ -343,21 +342,21 @@ describe("api/client/tripPlan.js", function() {
         });
 
         it("#getTripPlanById should be ok by staff", function (done) {
-            API.client.tripPlan.getTripPlanById.call({accountId: staffId}, {orderId: newOrderId}, function (err, ret) {
+            API.client.tripPlan.getTripPlanById.call({accountId: staffId}, {tripPlanId: newplanId}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
-                assert.equal(ret.id, newOrderId);
+                assert.equal(ret.id, newplanId);
                 done();
             })
         });
 
         it("#getTripPlanById should be ok by agency", function(done) {
-            API.client.tripPlan.getTripPlanById.call({accountId: agencyUserId}, {orderId: newOrderId}, function(err, ret){
+            API.client.tripPlan.getTripPlanById.call({accountId: agencyUserId}, {tripPlanId: newplanId}, function(err, ret){
                 if (err) {
                     throw err;
                 }
-                assert.equal(ret.id, newOrderId);
+                assert.equal(ret.id, newplanId);
                 done();
             })
         });
@@ -437,7 +436,7 @@ describe("api/client/tripPlan.js", function() {
             it("#saveConsumeDetail should be ok", function (done) {
                 var self = {accountId: staffId};
                 var detail = {
-                    orderId: newOrderId,
+                    tripPlanId: newplanId,
                     type: 0,
                     startTime: '2016-01-10 11:00:00',
                     invoiceType: 'HOTEL',
@@ -499,7 +498,7 @@ describe("api/client/tripPlan.js", function() {
 
             it("#commitTripPlanOrder should be ok", function (done) {
                 var self = {accountId: staffId};
-                API.client.tripPlan.commitTripPlanOrder.call(self, {orderId: newOrderId}, function (err, ret) {
+                API.client.tripPlan.commitTripPlanOrder.call(self, {tripPlanId: newplanId}, function (err, ret) {
                     if (err) {
                         throw err;
                     }

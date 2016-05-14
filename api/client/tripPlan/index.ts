@@ -17,77 +17,6 @@ import {EPlanStatus, TripPlan, Project, TripDetail} from 'api/_types/tripPlan';
  * @class tripPlan 出差计划
  */
 class ApiTripPlan {
-
-
-    /**
-     * 从参数中获取计划详情数组
-     * @param params
-     * @returns {Object}
-     */
-    static getPlanDetails(params:any):{orderStatus:string, budget:number, tripDetails:any} {
-        let tripDetails:any = [];
-        let tripDetails_required_fields = ['startTime', 'invoiceType', 'budget'];
-        if(params.outTraffic){
-            params.outTraffic.map(function (detail:any) {
-                detail.type = 1;
-                tripDetails.push(detail);
-            });
-        }
-
-        if(params.backTraffic){
-            params.backTraffic.map(function (detail:any) {
-                detail.type = 2;
-                tripDetails.push(detail);
-            });
-        }
-
-        if(params.hotel){
-            params.hotel.map(function (detail:any) {
-                detail.type = 3;
-                tripDetails.push(detail);
-            });
-        }
-
-        let total_budget:number = 0;
-        let isBudget = true;
-
-        let _tripDetails = tripDetails.map(function (detail) {
-            tripDetails_required_fields.forEach(function (key) {
-                if (!_.has(detail, key)) {
-                    throw {code: '-1', msg: 'tripDetails的属性' + key + '没有指定'};
-                }
-            });
-
-            if (detail.deptCity && !detail.deptCityCode) {
-                throw {code: -3, msg: '城市代码不能为空'};
-            }
-
-            if (detail.arrivalCity && !detail.arrivaltCityCode) {
-                throw {code: -3, msg: '城市代码不能为空'};
-            }
-
-            if (detail.city && !detail.cityCode) {
-                throw {code: -3, msg: '城市代码不能为空'};
-            }
-
-            if (!/^-?\d+(\.\d{1,2})?$/.test(detail.budget)) {
-                throw {code: -2, nsg: '预算金额格式不正确'};
-            }
-
-            detail.budget > 0 ? total_budget = total_budget + parseFloat(detail.budget) : isBudget = false;
-
-            return _.pick(detail, API.tripPlan.TripDetailsCols);
-        });
-
-        let orderStatus = isBudget ? 'WAIT_UPLOAD' : 'NO_BUDGET'; //是否有预算，设置出差计划状态
-
-        return {orderStatus: orderStatus, budget: total_budget, tripDetails: _tripDetails};
-    }
-
-    static updateTripPlanOrder(params) {
-        return API.tripPlan.updateTripPlanOrder(params);
-    }
-    
     /**
      * @method saveTripPlan
      * 生成出差计划单
@@ -97,41 +26,31 @@ class ApiTripPlan {
     static async saveTripPlan(params) {
         let self: any = this;
         let accountId = self.accountId;
-        let staff = await
-        API.staff.getStaff({id: accountId, columns: ['companyId', 'email', 'name']});
+        let staff = await API.staff.getStaff({id: accountId, columns: ['companyId', 'email', 'name']});
         let email = staff.email;
         let staffName = staff.name;
 
-        params = new TripPlan(params); //测试
-
         let _tripPlan:any = _.pick(params, API.tripPlan.TripPlanCols);
-        let {orderStatus, budget, tripDetails} = ApiTripPlan.getPlanDetails(params);
+        let {orderStatus, budget, tripDetails} = getPlanDetails(params);
 
         _tripPlan.tripDetails = tripDetails;
         _tripPlan.orderStatus = orderStatus;
         _tripPlan.budget = budget;
-        _tripPlan.orderNo = await API.seeds.getSeedNo('tripPlanNo'); //获取出差计划单号
+        _tripPlan.planNo = await API.seeds.getSeedNo('tripPlanNo'); //获取出差计划单号
         _tripPlan.accountId = accountId;
         _tripPlan.companyId = staff.target.companyId;
 
-        let tripPlan = await
-        API.tripPlan.saveTripPlan(_tripPlan);
+        let tripPlan = await API.tripPlan.saveTripPlan(_tripPlan);
 
         if (tripPlan.budget <= 0 || tripPlan.orderStatus === EPlanStatus.NO_BUDGET) {
             return tripPlan; //没有预算，直接返回计划单
         }
 
-        let staffs = await
-        API.staff.getStaffs({
-            companyId: staff.target.companyId,
-            roleId: {$ne: 1},
-            status: {$gte: 0},
-            columns: ['id', 'name', 'email']
-        });
-        let url = config.host + '/corp.html#/TravelStatistics/planDetail?orderId=' + tripPlan.id;
+        let staffs = await API.staff.getStaffs({companyId: staff.target.companyId, roleId: {$ne: 1}, status: {$gte: 0}, columns: ['id', 'name', 'email']});
+        let url = config.host + '/corp.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
         let go = '无', back = '无', hotel = '无';
 
-        if (tripPlan.outTraffic.length > 0) {
+        if (tripPlan.outTrip && tripPlan.outTrip.length > 0) {
             let g = tripPlan.outTraffic[0];
             go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.deptCity + ' 到 ' + g.arrivalCity;
             if (g.latestArriveTime)
@@ -139,7 +58,7 @@ class ApiTripPlan {
             go += ', 动态预算￥' + g.budget;
         }
 
-        if (tripPlan.backTraffic.length > 0) {
+        if (tripPlan.backTrip && tripPlan.backTrip.length > 0) {
             let b = tripPlan.backTraffic[0];
             back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.deptCity + ' 到 ' + b.arrivalCity;
             if (b.latestArriveTime)
@@ -147,43 +66,35 @@ class ApiTripPlan {
             back += ', 动态预算￥' + b.budget;
         }
 
-        if (tripPlan.hotel.length > 0) {
+        if (tripPlan.hotel && tripPlan.hotel.length > 0) {
             let h = tripPlan.hotel[0];
             hotel = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') +
                 ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
         }
 
-        staffs.map(async function (s) {
+        await staffs.map(async function (s) {
             let account = await API.auth.getAccount({id: s.id, type: 1, attributes: ['status']});
             if (account.status != 1)
                 return false;
 
-            let vals = {
-                managerName: s.name,
-                username: staffName,
-                email: email,
-                time: moment(tripPlan.createAt).format('YYYY-MM-DD HH:mm:ss'),
-                projectName: tripPlan.description,
-                goTrafficBudget: go,
-                backTrafficBudget: back,
-                hotelBudget: hotel,
-                totalBudget: '￥' + tripPlan.budget,
-                url: url,
-                detailUrl: url
-            };
-            let log = {userId: accountId, orderId: tripPlan.id, remark: tripPlan.orderNo + '给企业管理员' + s.name + '发送邮件'};
+            let vals = {managerName: s.name, username: staffName, email: email, time: moment(tripPlan.createAt).format('YYYY-MM-DD HH:mm:ss'),
+                projectName: tripPlan.description, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel,
+                totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url};
+            let log = {userId: accountId, tripPlanId: tripPlan.id, remark: tripPlan.planNo + '给企业管理员' + s.name + '发送邮件'};
 
-            await API.mail.sendMailRequest({
-                toEmails: s.email,
-                templateName: 'qm_notify_new_travelbudget',
-                values: vals
-            });
+            await API.mail.sendMailRequest({toEmails: s.email, templateName: 'qm_notify_new_travelbudget', values: vals});
             await API.tripPlan.saveTripPlanLog(log);
             return true;
         });
 
         return tripPlan;
     }
+
+
+    static updateTripPlanOrder(params) {
+        return API.tripPlan.updateTripPlanOrder(params);
+    }
+
 
     /**
      * @method saveConsumeDetail
@@ -200,11 +111,11 @@ class ApiTripPlan {
     /**
      * @method getTripPlanById
      * 获取计划单详情
-     * @param {string} params.orderId
+     * @param {string} params.tripPlanId
      * @returns {Promise<TripPlan>}
      */
-    @requireParams(['orderId'])
-    static async getTripPlanById(params:{orderId:string}) {
+    @requireParams(['id'])
+    static async getTripPlanById(params:{id:string}) {
         let self: any = this;
         let accountId = self.accountId;
         let account = await
@@ -440,11 +351,11 @@ class ApiTripPlan {
     /**
      * @method deleteTripPlan
      * 删除差旅计划单/预算单
-     * @param params.orderId 出差计划id
+     * @param params.tripPlanId 出差计划id
      * @returns {Promise<boolean>}
      */
-    @requireParams(['orderId'])
-    static deleteTripPlan(params:{orderId:string}) {
+    @requireParams(['tripPlanId'])
+    static deleteTripPlan(params:{tripPlanId:string}) {
         let self: any = this;
         params['userId'] = self.accountId;
         return API.tripPlan.deleteTripPlan(params);
@@ -578,11 +489,11 @@ class ApiTripPlan {
 
     /**
      * 用户提交订单(上传完票据后，提交订单后不可修改)
-     * @param orderId
+     * @param tripPlanId
      * @returns {Promise<boolean>}
      */
-    @requireParams(['orderId'])
-    static commitTripPlanOrder(params:{orderId:string}) {
+    @requireParams(['tripPlanId'])
+    static commitTripPlanOrder(params:{tripPlanId:string}) {
         let self: any = this;
         params['accountId'] = self.accountId;
         return API.tripPlan.commitTripPlanOrder(params);
@@ -719,8 +630,8 @@ class ApiTripPlan {
         let consumeId = params.id;
         let {agencyId} = await
         API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
-        let {orderId, accountId: staffId} = await
-        API.tripPlan.getConsumeDetail({consumeId: consumeId, columns: ['accountId', 'orderId']});
+        let {tripPlanId, accountId: staffId} = await
+        API.tripPlan.getConsumeDetail({consumeId: consumeId, columns: ['accountId', 'tripPlanId']});
         let staff = await
         API.staff.getStaff({id: staffId, columns: ['companyId', 'name', 'email']});
         let companyId = staff.companyId, staffName = staff.name, staffEmail = staff.email;
@@ -743,7 +654,7 @@ class ApiTripPlan {
         let updateResult = await
         API.tripPlan.updateConsumeBudget(updates);
         let tripPlan = await
-        API.tripPlan.getTripPlanOrder({orderId: orderId});
+        API.tripPlan.getTripPlanOrder({tripPlanId: tripPlanId});
         let staffs = await
         API.staff.getStaffs({companyId: companyId, roleId: {$ne: 1}, columns: ['id', 'name', 'email']});
 
@@ -784,7 +695,7 @@ class ApiTripPlan {
                 ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + changeBudget;
         }
 
-        let url = config.host + '/staff.html#/travelPlan/PlanDetail?planId=' + tripPlan.id;
+        let url = config.host + '/staff.html#/travelPlan/PlanDetail?tripPlanId=' + tripPlan.id;
 
         //给员工发送邮件
         let values = {
@@ -802,7 +713,7 @@ class ApiTripPlan {
 
         await API.mail.sendMailRequest({toEmails: staffEmail, templateName: 'qm_notify_agency_budget', values: values});
 
-        let c_url = config.host + '/corp.html#/TravelStatistics/planDetail?orderId=' + tripPlan.id;
+        let c_url = config.host + '/corp.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
         //给企业管理员发送邮件
         staffs.map(async function (s) {
             let a = await API.auth.getAccount({id: s.id, type: 1});
@@ -833,6 +744,71 @@ class ApiTripPlan {
 
         return true;
     }
+}
+
+/**
+ * 从参数中获取计划详情数组
+ * @param params
+ * @returns {Object}
+ */
+function getPlanDetails(params:any):{orderStatus:string, budget:number, tripDetails:any} {
+    let tripDetails:any = [];
+    let tripDetails_required_fields = ['startTime', 'invoiceType', 'budget'];
+    if(params.outTraffic){
+        params.outTraffic.map(function (detail:any) {
+            detail.type = 1;
+            tripDetails.push(detail);
+        });
+    }
+
+    if(params.backTraffic){
+        params.backTraffic.map(function (detail:any) {
+            detail.type = 2;
+            tripDetails.push(detail);
+        });
+    }
+
+    if(params.hotel){
+        params.hotel.map(function (detail:any) {
+            detail.type = 3;
+            tripDetails.push(detail);
+        });
+    }
+
+    let total_budget:number = 0;
+    let isBudget = true;
+
+    let _tripDetails = tripDetails.map(function (detail) {
+        tripDetails_required_fields.forEach(function (key) {
+            if (!_.has(detail, key)) {
+                throw {code: '-1', msg: 'tripDetails的属性' + key + '没有指定'};
+            }
+        });
+
+        if (detail.deptCity && !detail.deptCityCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        if (detail.arrivalCity && !detail.arrivaltCityCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        if (detail.city && !detail.cityCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        if (!/^-?\d+(\.\d{1,2})?$/.test(detail.budget)) {
+            throw {code: -2, nsg: '预算金额格式不正确'};
+        }
+
+        detail.budget > 0 ? total_budget = total_budget + parseFloat(detail.budget) : isBudget = false;
+
+        return _.pick(detail, API.tripPlan.TripDetailsCols);
+    });
+
+    let orderStatus = isBudget ? 'WAIT_UPLOAD' : 'NO_BUDGET'; //是否有预算，设置出差计划状态
+
+    return {orderStatus: orderStatus, budget: total_budget, tripDetails: _tripDetails};
 }
 
 export = ApiTripPlan;

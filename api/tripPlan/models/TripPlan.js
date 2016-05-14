@@ -8,7 +8,7 @@ var now = require("common/utils").now;
 module.exports = function (Db, DataType) {
     return Db.define("TripPlan", {
         id           : {type: DataType.UUID,            defaultValue: uuid.v1, primaryKey: true},
-        tripNo      : {type: DataType.STRING,          field: "trip_no"}, //计划/预算单号
+        planNo      : {type: DataType.STRING,          field: "plan_no"}, //计划/预算单号
         title        : {type: DataType.STRING,          field: "title"},
         accountId    : {type: DataType.UUID,            field: "account_id"}, //单据所属人
         companyId    : {type: DataType.UUID,            field: "company_id"}, //企业id
