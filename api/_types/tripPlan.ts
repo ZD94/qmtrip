@@ -64,8 +64,8 @@ export class TripPlan implements ModelObject {
     set id(val: string) {}
 
     @Field({type: Types.STRING})
-    get orderNo(): string { return ''; }
-    set orderNo(val: string) {}
+    get planNo(): string { return ''; }
+    set planNo(val: string) {}
 
     @Field({type: Types.BOOLEAN})
     get isInvoiceUpload(): boolean { return false; }
@@ -82,6 +82,10 @@ export class TripPlan implements ModelObject {
     @Field({type: Types.BOOLEAN})
     get isNeedHotel(): boolean { return false; }
     set isNeedHotel(val: boolean) {}
+
+    @Field({type: Types.STRING})
+    get title(): string { return ''; }
+    set title(val: string) {}
 
     @Field({type: Types.STRING})
     get description(): string { return ''; }
@@ -144,32 +148,14 @@ export class TripPlan implements ModelObject {
     get commitTime(): Date { return null; }
     set commitTime(val: Date) {}
 
+    @ResolveRef({type: Types.UUID}, Models.project.get)
+    get project(): Project { return null; }
+    set project(val: Project) {}
+
     @Reference({type: Types.UUID}, 'accountId')
     getStaff(id?:string): Promise<Staff> {
         return Models.staff.get(id);
     }
-
-    getOutTrip(id: string): Promise<TripDetail[]> {
-        return Models.tripDetail.find({planId: id, type: ETripType.OUT_TRIP});
-    }
-
-    getBackTrip(id: string): Promise<TripDetail[]> {
-        return Models.tripDetail.find({planId: id, type: ETripType.BACK_TRIP});
-    }
-
-    getHotel(id: string): Promise<TripDetail[]> {
-        return Models.tripDetail.find({planId: id, type: ETripType.HOTEL});
-    }
-
-    @Field({type: Types.UUID})
-    get projectId(): string { return null; }
-    set projectId(val: string) {}
-
-    @Reference({type: Types.UUID})
-    getProject(id?:string): Promise<Project> {
-        return Models.project.get(id);
-    }
-    setProject(val: Project) {}
 
     @Reference({type: Types.UUID})
     getCompany(id?:string): Promise<Company> {
@@ -177,6 +163,17 @@ export class TripPlan implements ModelObject {
     }
     setCompany(val: Company) {}
 
+    getOutTrip(id: string): Promise<TripDetail[]> {
+        return Models.tripDetail.find({tripPlanId: id, type: ETripType.OUT_TRIP});
+    }
+
+    getBackTrip(id: string): Promise<TripDetail[]> {
+        return Models.tripDetail.find({tripPlanId: id, type: ETripType.BACK_TRIP});
+    }
+
+    getHotel(id: string): Promise<TripDetail[]> {
+        return Models.tripDetail.find({tripPlanId: id, type: ETripType.HOTEL});
+    }
 
     @Update(Models.company.update)
     save(): Promise<void> { return null; }
@@ -197,8 +194,8 @@ export class TripDetail implements ModelObject{
     set id(val: string) {}
 
     @Field({type: Types.UUID})
-    get planId(): string { return null; }
-    set planId(val: string) {}
+    get tripPlanId(): string { return null; }
+    set tripPlanId(val: string) {}
 
     @Field({type: Types.UUID})
     get accountId(): string { return null; }
@@ -292,7 +289,7 @@ export class TripDetail implements ModelObject{
     get invoiceType(): number { return 0; }
     set invoiceType(val: number) {}
 
-    @ResolveRef({type: Types.UUID}, Models.tripPlan.get, 'planId')
+    @ResolveRef({type: Types.UUID}, Models.tripPlan.get, 'tripPlanId')
     get tripPlan(): TripPlan { return null; }
 
     @Update(Models.company.update)

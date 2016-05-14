@@ -487,11 +487,11 @@ var travelplan = (function () {
         // 此函数在用户点击“查看票据”按钮时被调用。
         $scope.checkInvoice = function (p) {
             if (p === "outTraffic") {
-                window.location.href = "#/travelplan/invoicedetail?planId=" + $scope.ITEM.id + "&status=" + p + "&invoiceId=" + $scope.ITEM.outTraffic[0].newInvoice;
+                window.location.href = "#/travelplan/invoicedetail?tripPlanId=" + $scope.ITEM.id + "&status=" + p + "&invoiceId=" + $scope.ITEM.outTraffic[0].newInvoice;
             } else if (p === "backTraffic") {
-                window.location.href = "#/travelplan/invoicedetail?planId=" + $scope.ITEM.id + "&status=" + p + "&invoiceId=" + $scope.ITEM.backTraffic[0].newInvoice;
+                window.location.href = "#/travelplan/invoicedetail?tripPlanId=" + $scope.ITEM.id + "&status=" + p + "&invoiceId=" + $scope.ITEM.backTraffic[0].newInvoice;
             } else if (p === "hotel") {
-                window.location.href = "#/travelplan/invoicedetail?planId=" + $scope.ITEM.id + "&status=" + p + "&invoiceId=" + $scope.ITEM.hotel[0].newInvoice;
+                window.location.href = "#/travelplan/invoicedetail?tripPlanId=" + $scope.ITEM.id + "&status=" + p + "&invoiceId=" + $scope.ITEM.hotel[0].newInvoice;
             }
             ;
         }
@@ -543,18 +543,18 @@ var travelplan = (function () {
 
         $scope.$root.pageTitle = '票据详情';
 
-        var planId = $stateParams.planId;
-        $scope.planId = planId;
+        var tripPlanId = $stateParams.tripPlanId;
+        $scope.tripPlanId = tripPlanId;
         $scope.status = $stateParams.status;
         $scope.invoiceId = $stateParams.invoiceId;
         API.require("attachment");
 
         $scope.goDetail = function () {
-            window.location.href = "#/travelplan/plandetail?planId=" + planId;
+            window.location.href = "#/travelplan/plandetail?tripPlanId=" + tripPlanId;
         }
         return API.onload()
             .then(function () {
-                return API.tripPlan.getTripPlanById({orderId: planId});
+                return API.tripPlan.getTripPlanById({orderId: tripPlanId});
             })
             .then(function (result) {
                 var InvoiceDetail;

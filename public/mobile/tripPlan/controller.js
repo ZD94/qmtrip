@@ -37,10 +37,10 @@
                     picture: picture
                 }, callback);
         }
- 		var planId = $stateParams.planId;
+ 		var tripPlanId = $stateParams.tripPlanId;
         $scope.initall = function() {
             API.onload(function(){
-                API.tripPlan.getTripPlanById({orderId: planId})
+                API.tripPlan.getTripPlanById({orderId: tripPlanId})
                     .then(function(plan){
                         $scope.plan = plan;
                         $scope.backTraffic = plan.backTraffic[0];
@@ -92,7 +92,7 @@
  		$scope.initall();
 		$scope.push = function () {
             API.onload(function() {
-                API.tripPlan.commitTripPlanOrder(planId)
+                API.tripPlan.commitTripPlanOrder(tripPlanId)
                     .then(function(result){
                         alert ("提交成功");
                         window.location.href = '#/tripPlan/uploadDown';

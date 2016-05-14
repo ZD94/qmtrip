@@ -49,7 +49,7 @@ var point=(function(){
         $scope.initMyPoint();
         //进入详情页
         $scope.enterDetail = function (id) {
-            window.location.href = "#/travelPlan/PlanDetail?planId="+id;
+            window.location.href = "#/travelPlan/PlanDetail?tripPlanId="+id;
         }
         $scope.incomePoint = function(){
             API.onload(function(){

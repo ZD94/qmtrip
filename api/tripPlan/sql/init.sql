@@ -29,18 +29,20 @@ CREATE TABLE trip_plan (
     plan_no character varying,
     account_id uuid not null,
     company_id uuid not null,
-    type integer,
+    title character varying,
+    description text,
+    project_id uuid,
     status integer default 0,
     is_invoice_upload boolean default false,
     is_commit boolean default false,
     dept_city character varying,
+    dept_city_code character varying,
     arrival_city character varying,
-    project_id uuid,
+    arrival_city_code character varying,
     start_at timestamp without time zone,
     back_at timestamp without time zone,
     is_need_traffic boolean default false,
     is_need_hotel boolean default false,
-    description text,
     budget numeric(15,2),
     expenditure numeric(15,2),
     expend_info jsonb,
@@ -51,9 +53,8 @@ CREATE TABLE trip_plan (
     expire_at timestamp without time zone,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    commit_time timestamp without time zone,
-    dept_city_code character varying,
-    arrival_city_code character varying
+    deleted_at timestamp without time zone,
+    commit_time timestamp without time zone
 );
 
 --
@@ -186,7 +187,7 @@ CREATE TABLE trip_details (
     type integer,
     status integer default 0,
     dept_city character varying,
-    arrival_place character varying,
+    arrival_city character varying,
     city character varying,
     hotel_name character varying,
     start_time timestamp without time zone,
@@ -199,15 +200,15 @@ CREATE TABLE trip_details (
     remark character varying,
     audit_remark character varying,
     audit_user uuid,
-    created_at timestamp without time zone default now(),
-    updated_at timestamp without time zone,
-    deleted_at timestamp without time zone,
     new_invoice character varying, -- 新上传票据
     dept_city_code character varying,
     arrival_city_code character varying,
     city_code character varying,
     is_commit boolean default false,
-    commit_time timestamp without time zone
+    commit_time timestamp without time zone,
+    created_at timestamp without time zone default now(),
+    updated_at timestamp without time zone,
+    deleted_at timestamp without time zone
 );
 
 

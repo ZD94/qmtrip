@@ -26,28 +26,36 @@ export async function DepartmentController($scope){
 
 }
 
-export async function EditpolicyController($scope, Models, $stateParams, $location){
+export async function EditpolicyController($scope, Models, $stateParams, $location, $ionicHistory){
     var staff = await Models.staff.get(Cookie.get('user_id'));
     var company = await staff.company;
     if($stateParams.policyId){
+        console.info($stateParams);
         $scope.travelPolicy = await Models.travelPolicy.get($stateParams.policyId);
     }else{
-        $scope.travelPolicy={
+        $scope.travelPolicy= await {
             companyId:company.id,
-            plane:'不限',
-            planediscount:'不限',
-            train:'不限',
-            hotel:'不限'
+            planeLevel:'不限',
+            planeDiscount:'不限',
+            trainLevel:'不限',
+            hotelLevel:'五星级/豪华型'
         };
+        console.info($scope.travelPolicy);
     }
     $scope.savePolicy = async function(){
         if($stateParams.policyId){
+            console.info($scope.travelPolicy);
             await $scope.travelPolicy.save();
         }else{
             $scope.travelPolicy = await Models.travelPolicy.create($scope.travelPolicy);
             
         }
-        $location.hash = "/company/travelpolicy";
+        $ionicHistory.nextViewOptions({
+            historyRoot: true,
+            disableAnimate: true,
+            expire: 300
+        });
+        $ionicHistory.goBack(-1);
     }
 }
 
@@ -71,12 +79,9 @@ export async function StaffsController($scope, Models){
     $scope.search = function(){
         
     }
-    // var company = await Models.company.get(staff.companyId);
-    // console.info(company);
-    console.info(staffs);
 }
 
-export async function StaffdetailController($scope, $stateParams, Models, $location){
+export async function StaffdetailController($scope, $stateParams, Models, $ionicHistory){
     let staff;
     if($stateParams.staffId){
         staff = await Models.staff.get($stateParams.staffId);
@@ -89,20 +94,42 @@ export async function StaffdetailController($scope, $stateParams, Models, $locat
         role = 'true';
     }
     $scope.role = role;
-    var companyId = await staff.company.id;
-    $scope.travelpolicylist = await Models.travelPolicy.get(companyId);
-    $scope.departmentlist = await Models.department.get(companyId);
+    var currentstaff = await Models.staff.get(Cookie.get('user_id'));
+    var company = await currentstaff.company;
+    $scope.travelpolicylist = await company.getTravelPolicies();
+    console.info($scope.travelpolicylist);
+    // $scope.departmentlist = await company.department.get(companyId);
     $scope.savestaff = function(){
-        $scope.staff.save();
-        $location.hash = '/company/staffs';
+        if($scope.role =='true'){
+            $scope.staff.roleId == EStaffRole.ADMIN;
+        }else{
+            $scope.staff.roleId == EStaffRole.COMMON;
+        }
+        if($stateParams.staffId){
+            $scope.staff.save();
+        }else{
+            $scope.staff.companyId = currentstaff.companyId;
+            Models.staff.create($scope.staff);
+        }
+
+        $ionicHistory.nextViewOptions({
+            historyRoot: true,
+            disableAnimate: true,
+            expire: 300
+        })
+        $ionicHistory.goBack(-1);
     }
 }
 
-export async function TravelpolicyController($scope , Models){
+export async function TravelpolicyController($scope , Models, $location){
     var staff = await Models.staff.get(Cookie.get('user_id'));
     var company = await staff.company;
-    $scope.travelPolicys = await company.getTravelPolicy();
+    $scope.travelPolicys = await company.getTravelPolicies();
+    console.info($scope.travelPolicys);
     $scope.editpolicy = async function(id){
         var travelpolicy = await Models.travelPolicy.get(id);
+        $location.path('/company/editpolicy').search({'policyId':id}).replace();
+        console.info(travelpolicy);
+        // window.location.href = '#/company/editpolicy?policyId='+id;
     }
 }

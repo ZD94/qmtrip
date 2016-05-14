@@ -14,7 +14,7 @@ export class TripPlanService extends CachedService<TripPlan>{
 
     async $get(id: string): Promise<TripPlan>{
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
-        return api.getTripPlanById({orderId: id});
+        return api.getTripPlanById({id: id});
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
@@ -22,12 +22,12 @@ export class TripPlanService extends CachedService<TripPlan>{
     }
     async $update(id: string, fields: any): Promise<any> {
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
-        fields['orderId'] = id;
+        fields['id'] = id;
         return api.updateTripPlanOrder(fields);
     }
     async $destroy(id: string): Promise<any> {
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
-        return api.deleteTripPlan({orderId: id});
+        return api.deleteTripPlan({tripPlanId: id});
     }
 }
 
@@ -43,7 +43,7 @@ export class TripDetailService extends CachedService<TripDetail>{
 
     async $get(id: string): Promise<TripDetail>{
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
-        return api.getTripPlanById({orderId: id});
+        return api.getTripPlanById({id: id});
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
@@ -51,12 +51,12 @@ export class TripDetailService extends CachedService<TripDetail>{
     }
     async $update(id: string, fields: any): Promise<any> {
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
-        fields['orderId'] = id;
+        fields['tripPlanId'] = id;
         return api.updateTripPlanOrder(fields);
     }
     async $destroy(id: string): Promise<any> {
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
-        return api.deleteTripPlan({orderId: id});
+        return api.deleteTripPlan({tripPlanId: id});
     }
 }
 
