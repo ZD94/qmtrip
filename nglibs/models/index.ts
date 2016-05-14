@@ -3,7 +3,7 @@
 import ng = require('angular');
 
 import { ModelsInterface, initModels } from 'api/_types';
-import { StaffService, CredentialService } from 'api/staff/client';
+import { StaffService, CredentialService , PointChangeService} from 'api/staff/client';
 import { CompanyService, MoneyChangeService} from 'api/company/client';
 import { DepartmentService } from 'api/department/client';
 import { TravelPolicyService } from 'api/travelPolicy/client';
@@ -22,9 +22,10 @@ export function ngService(name: string) {
 
 @ngService('Models')
 class ClientModels implements ModelsInterface {
-    
+
     staff: StaffService;
     credential: CredentialService;
+    pointChange:PointChangeService;
     company: CompanyService;
     department: DepartmentService;
     travelPolicy: TravelPolicyService;
@@ -39,6 +40,7 @@ class ClientModels implements ModelsInterface {
     constructor($cacheFactory: ng.ICacheFactoryService) {
         this.staff = new StaffService($cacheFactory);
         this.credential = new CredentialService($cacheFactory);
+        this.pointChange =  new PointChangeService($cacheFactory);
         this.company = new CompanyService($cacheFactory);
         this.department = new DepartmentService($cacheFactory);
         this.travelPolicy = new TravelPolicyService($cacheFactory);

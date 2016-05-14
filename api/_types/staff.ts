@@ -1,5 +1,6 @@
 import { Models, ModelObject } from 'api/_types';
 import { Company } from 'api/_types/company';
+import { TripPlan } from 'api/_types/tripPlan';
 import { regApiType } from 'common/api/helper';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Department } from 'api/_types/department';
@@ -135,28 +136,50 @@ export class Credential implements ModelObject{
     destroy(): Promise<void> { return null; }
 }
 
+@Table("staff.PointChange")
 @regApiType('API.')
-export class PointChange {
-    id: string;
-    companyId: string;
-    staffId: string;
-    orderId: string;
-    status: number;
-    points: number;
-    currentPoint: number;
-    remark: string;
-    createAt: Date;
-
-    constructor(obj: any) {
-        this.id = obj.id;
-        this.companyId = obj.companyId;
-        this.staffId = obj.staffId;
-        this.orderId = obj.orderId;
-        this.status = obj.status;
-        this.points = obj.points;
-        this.currentPoint = obj.currentPoint;
-        this.remark = obj.remark;
-        this.createAt = obj.createAt;
+export class PointChange implements ModelObject{
+    target: Object;
+    constructor(target: Object) {
+        this.target = target;
     }
+
+    @Field({type: Types.UUID})
+    get id(): string { return null; }
+    set id(val: string) {}
+
+    @ResolveRef({type: Types.UUID}, Models.staff.get)
+    get staff(): Staff { return null; }
+
+    @Reference({type: Types.UUID})
+    getCompany(id?:string): Promise<Company> {
+        return Models.company.get(id);
+    }
+
+    @Reference({type: Types.UUID}, 'orderId')
+    getTripPlan(id?:string): Promise<TripPlan> {
+        return Models.tripPlan.get(id);
+    }
+
+    @Field({type: Types.INTEGER, defaultValue: 1})
+    get status(): number {return 1}
+    set status(status: number){}
+
+    @Field({type: Types.INTEGER})
+    get points(): number {return null}
+    set points(points: number){}
+
+    @Field({type: Types.INTEGER})
+    get currentPoint(): number {return null}
+    set currentPoint(currentPoint: number){}
+
+    @Field({type: Types.TEXT})
+    get remark(): string {return null}
+    set remark(remark: string){}
+
+    @Update(Models.credential.update)
+    save(): Promise<void> { return null; }
+    @Destroy(Models.credential.destroy)
+    destroy(): Promise<void> { return null; }
 }
 

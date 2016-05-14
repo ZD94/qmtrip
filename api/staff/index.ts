@@ -67,6 +67,24 @@ export class CredentialService implements ServiceInterface<Credential>{
     }
 }
 
+export class PointChangeService implements ServiceInterface<PointChange>{
+    async create(obj: Object): Promise<PointChange>{
+        throw L.ERR.NOP_METHOD;
+    }
+    async get(id: string): Promise<PointChange>{
+        return API.staff.getPointChange({id: id});
+    }
+    async find(where: any): Promise<PointChange[]>{
+        return API.staff.getPointChanges(where);
+    }
+    async update(id: string, fields: Object): Promise<any> {
+        throw L.ERR.NOP_METHOD;
+    }
+    async destroy(id: string): Promise<any> {
+        throw L.ERR.NOP_METHOD;
+}
+}
+
 /**
  * 创建员工
  * @param data
@@ -202,7 +220,7 @@ export function updateStaff(data): Promise<any>{
                                 throw {code: -2, msg: "该账号不允许修改邮箱"};
                             var accData = {email: data.email};
                             return Q.all([
-                                API.auth.updataAccount(id, accData, company.name),
+                                API.auth.updateAccount(id, accData, company.name),
                                 staffModel.update(data, options)
                             ])
                                 .spread(function(updateaccount, updatestaff) {
@@ -412,8 +430,8 @@ export function decreaseStaffPoint(params) {
                 throw {code: -3, msg: "积分不足"};
             }
             var balancePoints = obj.balancePoints - decreasePoint;
-            var pointChange: PointChange = new PointChange({ staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分",
-                operatorId: operatorId, currentPoint: balancePoints, companyId: params.companyId});//此处也应该用model里的属性名封装obj
+            var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分",
+                operatorId: operatorId, currentPoint: balancePoints, companyId: params.companyId};//此处也应该用model里的属性名封装obj
             return sequelize.transaction(function(t) {
                 return Q.all([
                         staffModel.update({balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
@@ -423,6 +441,39 @@ export function decreaseStaffPoint(params) {
         })
         .then(function(){
             return true;
+        });
+}
+
+/**
+ * 根据属性查找积分变动记录
+ * @param params
+ * @returns {*}
+ */
+export function getPointChanges(params): Promise<PointChange[]>{
+    var options : any = {};
+    options.where = _.pick(params, Object.keys(pointChangeModel.attributes));
+    if(params.$or) {
+        options.where.$or = params.$or;
+    }
+    if(params.columns){
+        options.attributes = params.columns;
+    }
+    return staffModel.findAll(options);
+}
+
+validateApi(getPointChange, ["id"], ["columns"]);
+export function getPointChange(params: {id: string, columns?: Array<string>}){
+    var id = params.id;
+    var options: any = {};
+    if(params.columns){
+        options.attributes = params.columns
+    }
+    return pointChangeModel.findById(id, options)
+        .then(function(pc){
+            if(!pc){
+                throw {code: -2, msg: '员工不存在'};
+            }
+            return new PointChange(pc);
         });
 }
 
