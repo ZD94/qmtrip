@@ -4,6 +4,7 @@ import {Staff} from 'api/_types/staff';
 import {Agency} from 'api/_types/agency';
 import { regApiType } from 'common/api/helper';
 import { Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
+import {TravelPolicy} from "api/_types/travelPolicy";
 
 export enum ECompanyStatus {
     DELETE = -2,
@@ -88,7 +89,11 @@ export class Company implements ModelObject{
     getStaffs(): Promise<Staff[]> {
         return Models.staff.find({companyId: this.id});
     }
-    
+
+    getTravelPolicies(): Promise<TravelPolicy[]> {
+        return Models.travelPolicy.find({companyId: this.id})
+    }
+
     getMoneyChanges(companyId?:string): Promise<MoneyChange[]> {
         return Models.moneyChange.find({fundsAccountId: companyId});
     }

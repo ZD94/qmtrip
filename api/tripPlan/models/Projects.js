@@ -12,7 +12,7 @@ module.exports = function (Db, DataType) {
         code   : {type: DataType.STRING,             field: "code"}, //项目代码
         name        : {type: DataType.STRING,      field: 'name' }, //项目名称
         createUser  : {type: DataType.UUID,     field: 'create_user'}, //创建人
-        createAt     : {type: "timestamp without time zone", field: "create_at", defaultValue: now} //创建时间
+        createdAt     : {type: "timestamp without time zone", field: "created_at", defaultValue: now} //创建时间
     }, {
         tableName : "projects",
         timestamps: false,
