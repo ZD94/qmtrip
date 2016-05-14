@@ -76,7 +76,7 @@ class ApiTripPlan {
             if (account.status != 1)
                 return false;
 
-            let vals = {managerName: s.name, username: staffName, email: email, time: moment(tripPlan.createAt).format('YYYY-MM-DD HH:mm:ss'),
+            let vals = {managerName: s.name, username: staffName, email: email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
                 projectName: tripPlan.description, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel,
                 totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url};
             let log = {userId: accountId, tripPlanId: tripPlan.id, remark: tripPlan.planNo + '给企业管理员' + s.name + '发送邮件'};
@@ -110,15 +110,16 @@ class ApiTripPlan {
     /**
      * @method getTripPlanById
      * 获取计划单详情
-     * @param {string} params.tripPlanId
+     * @param {string} params.id
      * @returns {Promise<TripPlan>}
      */
     @requireParams(['id'])
     static async getTripPlanById(params:{id:string}) {
         let self: any = this;
         let accountId = self.accountId;
-        let account = await
-        API.auth.getAccount({id: accountId});
+        // console.info("**********************");
+        // console.info(accountId);
+        let account = await API.auth.getAccount({id: accountId});
         let accountType = account.type;
         let tripPlan = await
         API.tripPlan.getTripPlanOrder(params);
@@ -206,7 +207,7 @@ class ApiTripPlan {
             params.auditStatus = 1;
         }
 
-        let query:any = self.getQueryByParams(params);
+        let query:any = getQueryByParams(params);
         let staff = await
         API.staff.getStaff({id: accountId, columns: ['companyId']});
         query.accountId = accountId;
@@ -218,54 +219,6 @@ class ApiTripPlan {
         }
 
         return API.tripPlan.listTripPlanOrder(options);
-    }
-
-    /**
-     * 未完成          params.isComplete = false;
-     * 待出预算        params.isHasBudget = false;
-     * 待上传票据      params.isUpload = false;
-     * 票据审核中      params.audit = 'P';
-     * 审核未通过      params.audit = 'N';
-     * 已完成          params.isComplete = true'
-     * @param params
-     * @returns {object}
-     */
-    private getQueryByParams(params) {
-        //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
-        if (params.audit) {
-            let audit = params.audit;
-            params.status = 1;
-            if (audit == 'Y') {
-                params.status = 2;
-                params.auditStatus = 1;
-            } else if (audit == "P") {
-                params.status = 1;
-                params.auditStatus = 0;
-            } else if (audit == 'N') {
-                params.status = 0; //待上传状态
-                params.auditStatus = -1;
-            }
-        }
-
-        //判断是否上传
-        if (params.isUpload === true) {
-            params.status = {$gt: 0};
-        } else if (params.isUpload === false) {
-            params.status = 0;
-            params.auditStatus = {$ne: 1}; //审核状态不能是审核通过
-            params.isCommit = false; //未提交
-            params.budget = {$gt: 0}; //预算大于0
-        }
-
-        if (params.isHasBudget === false) {
-            params.status = -1; //状态是未出预算
-            params.budget = {$lte: 0}; //预算结果小于0
-        }
-
-        let query:any = _.pick(params, ['status', 'auditStatus', 'startAt', 'backAt', 'deptCity', 'arrivalCity',
-            'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'description', 'remark', 'isCommit']);
-
-        return query;
     }
 
     /**
@@ -300,7 +253,7 @@ class ApiTripPlan {
             params.startAt ? params.startAt.$lte = params.endTime : params.startAt = {$lte: params.endTime};
         }
 
-        let query:any = self.getQueryByParams(params);
+        let query:any = getQueryByParams(params);
         let status = query.status;
         if (status == undefined) {
             status = query.status = {};
@@ -552,7 +505,7 @@ class ApiTripPlan {
         params.outTraffic = params.outTraffic || [];
         params.backTraffic = params.backTraffic || [];
         params.hotel = params.hotel || [];
-        let {tripDetails} = self.getPlanDetails(params);
+        let {tripDetails} = getPlanDetails(params);
         params.tripDetails = tripDetails;
         return API.tripPlan.checkBudgetExist(params)
     }
@@ -700,7 +653,7 @@ class ApiTripPlan {
         let values = {
             subjectTime: moment(tripPlan.startAt).format('YYYY-MM-DD'),
             username: staffName,
-            time: moment(tripPlan.createAt).format('YYYY-MM-DD HH:mm:ss'),
+            time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
             projectName: tripPlan.description,
             goTrafficBudget: go,
             backTrafficBudget: back,
@@ -722,7 +675,7 @@ class ApiTripPlan {
                     managerName: s.name,
                     username: staffName,
                     email: staffEmail,
-                    time: moment(tripPlan.createAt).format('YYYY-MM-DD HH:mm:ss'),
+                    time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
                     projectName: tripPlan.description,
                     goTrafficBudget: go,
                     backTrafficBudget: back,
@@ -808,6 +761,54 @@ function getPlanDetails(params:any):{orderStatus:string, budget:number, tripDeta
     let orderStatus = isBudget ? 'WAIT_UPLOAD' : 'NO_BUDGET'; //是否有预算，设置出差计划状态
 
     return {orderStatus: orderStatus, budget: total_budget, tripDetails: _tripDetails};
+}
+
+/**
+ * 未完成          params.isComplete = false;
+ * 待出预算        params.isHasBudget = false;
+ * 待上传票据      params.isUpload = false;
+ * 票据审核中      params.audit = 'P';
+ * 审核未通过      params.audit = 'N';
+ * 已完成          params.isComplete = true'
+ * @param params
+ * @returns {object}
+ */
+function getQueryByParams(params) {
+    //判断计划单的审核状态，设定auditStatus参数, 只有上传了票据的计划单这个参数才有效
+    if (params.audit) {
+        let audit = params.audit;
+        params.status = 1;
+        if (audit == 'Y') {
+            params.status = 2;
+            params.auditStatus = 1;
+        } else if (audit == "P") {
+            params.status = 1;
+            params.auditStatus = 0;
+        } else if (audit == 'N') {
+            params.status = 0; //待上传状态
+            params.auditStatus = -1;
+        }
+    }
+
+    //判断是否上传
+    if (params.isUpload === true) {
+        params.status = {$gt: 0};
+    } else if (params.isUpload === false) {
+        params.status = 0;
+        params.auditStatus = {$ne: 1}; //审核状态不能是审核通过
+        params.isCommit = false; //未提交
+        params.budget = {$gt: 0}; //预算大于0
+    }
+
+    if (params.isHasBudget === false) {
+        params.status = -1; //状态是未出预算
+        params.budget = {$lte: 0}; //预算结果小于0
+    }
+
+    let query:any = _.pick(params, ['status', 'auditStatus', 'startAt', 'backAt', 'deptCity', 'arrivalCity',
+        'isNeedTraffic', 'isNeedHotel', 'budget', 'expenditure', 'description', 'remark', 'isCommit']);
+
+    return query;
 }
 
 export = ApiTripPlan;

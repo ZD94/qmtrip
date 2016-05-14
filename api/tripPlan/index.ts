@@ -41,7 +41,8 @@ export class TripPlanService implements ServiceInterface<TripPlan>{
         return API.tripPlan.saveTripPlan(obj);
     }
     async get(id: string): Promise<TripPlan>{
-        return API.tripPlan.getTripPlanOrder({tripPlanId: id});
+        console.info(id);
+        return API.tripPlan.getTripPlanOrder({id: id});
     }
     async find(where: any): Promise<TripPlan[]>{
         return API.tripPlan.listTripPlanOrder(where);
@@ -63,7 +64,7 @@ export class TripDetailService implements ServiceInterface<TripDetail>{
         return API.tripPlan.getConsumeDetail({consumeId: id});
     }
     async find(where: any): Promise<TripDetail[]>{
-        return API.tripPlan.listTripPlanOrder(where);
+        return API.tripPlan.getTripPlanDetails({where: where});
     }
     async update(id: string, fields: Object): Promise<any> {
         fields[id] = id;
@@ -109,7 +110,7 @@ export async function saveTripPlan(params){
     let project = await getProjectByName({companyId: _planOrder.companyId, name: _planOrder.description, userId: _planOrder.accountId, isCreate: true});
     let tripPlanId = uuid.v1();
     _planOrder.id = tripPlanId;
-    _planOrder.createAt = utils.now();
+    _planOrder.createdAt = utils.now();
     _planOrder.projectId = project.id;
 
     let tripPlan = await TripPlanModel.create(_planOrder);
@@ -120,7 +121,7 @@ export async function saveTripPlan(params){
         let tripDetail = await TripDetailsModel.create(detail);
     }));
 
-    let logs = {tripPlanId: tripPlanId, userId: params.accountId, remark: '新增计划单 ' + tripPlan.planNo, createAt: utils.now()};
+    let logs = {tripPlanId: tripPlanId, userId: params.accountId, remark: '新增计划单 ' + tripPlan.planNo, createdAt: utils.now()};
     await TripPlanLogsModel.create(logs);
 
     return new TripPlan(tripPlan);
@@ -132,10 +133,10 @@ export async function saveTripPlan(params){
  * @param params
  * @returns {*}
  */
-getTripPlanOrder['required_params'] = ['tripPlanId'];
+getTripPlanOrder['required_params'] = ['id'];
 getTripPlanOrder['optional_params'] = ['columns'];
 export async function getTripPlanOrder(params){
-    let tripPlanId = params.tripPlanId;
+    let tripPlanId = params.id;
     let options: any = {};
 
     if(params.columns){
@@ -221,7 +222,7 @@ export function updateTripPlanOrder(params){
                 tripPlanId: order.id,
                 userId: userId,
                 remark: optLog,
-                createAt: utils.now()
+                createdAt: utils.now()
             }
 
             return sequelize.transaction(function(t){
@@ -321,7 +322,7 @@ export function updateConsumeBudget(params){
                 tripPlanId: order.id,
                 userId: params.userId,
                 remark: "更新预算",
-                createAt: utils.now()
+                createdAt: utils.now()
             }
 
             let updates: any = {
@@ -377,7 +378,7 @@ export async function listTripPlanOrder(options){
     }
 
     if(!options.order) {
-        options.order = [['start_at', 'desc'], ['create_at', 'desc']]; //默认排序，创建时间
+        options.order = [['start_at', 'desc'], ['created_at', 'desc']]; //默认排序，创建时间
     }
 
     let {rows: orders, count} = await TripPlanModel.findAndCount(options);
@@ -451,7 +452,7 @@ export function saveConsumeRecord(params){
                     tripPlanId: order.id,
                     userId: params.accountId,
                     remark: "增加新的预算",
-                    createAt: utils.now()
+                    createdAt: utils.now()
                 }
 
                 return Promise.all([
@@ -564,7 +565,7 @@ export function uploadInvoice(params){
 
             let invoiceJson = custome.invoice;
             let times = invoiceJson.length ? invoiceJson.length+1 : 1;
-            let currentInvoice = {times:times, picture:params.picture, create_at:moment().format('YYYY-MM-DD HH:mm'), status:STATUS.NO_COMMIT, remark: '', approve_at: ''};
+            let currentInvoice = {times:times, picture:params.picture, created_at:moment().format('YYYY-MM-DD HH:mm'), status:STATUS.NO_COMMIT, remark: '', approve_at: ''};
             invoiceJson.push(currentInvoice);
 
             let updates = {
@@ -576,7 +577,7 @@ export function uploadInvoice(params){
             };
 
             let logs = {tripPlanId: tripPlanId, consumeId: params.consumeId, userId: params.userId, remark: "上传票据"};
-            let orderLogs = {tripPlanId: custome.tripPlanId, userId: params.userId, remark: '上传票据', createAt: utils.now()};
+            let orderLogs = {tripPlanId: custome.tripPlanId, userId: params.userId, remark: '上传票据', createdAt: utils.now()};
 
             let order_status = 'WAIT_COMMIT';
             list.map(function(en) {
@@ -658,7 +659,7 @@ export function saveOrderLogs(logs){
                 throw {code: -2, msg: '该计划单已完成，不能增加日志'};
             }
 
-            logs.createAt = utils.now();
+            logs.createdAt = utils.now();
             return TripPlanLogsModel.create(logs);
         })
 }
@@ -1073,10 +1074,10 @@ export async function checkBudgetExist(params){
 /**
  * 根据出差记录id获取出差详情(包括已删除的)
  * @param params
- * @returns {Promise<TInstance[]>|any}
+ * @returns {Promise<TripDetails>}
  */
-export function listConsumesByPlanId(params) {
-    return TripDetailsModel.findAll({where: params.trip_plan_id})
+export function getTripPlanDetails(params) {
+    return TripDetailsModel.findAll({where: params.tripPlanId})
 }
 
 /**
@@ -1085,7 +1086,7 @@ export function listConsumesByPlanId(params) {
  */
 saveTripPlanLog['required_params'] = ['tripPlanId', 'userId', 'remark'];
 export function saveTripPlanLog(params) {
-    params.createAt = utils.now();
+    params.createdAt = utils.now();
     return TripPlanLogsModel.create(params);
 }
 
@@ -1096,7 +1097,7 @@ export function getProjectList(params) {
     let options: any = {
         where: params,
         attributes: ['name'],
-        order: [['create_at', 'desc']]
+        order: [['created_at', 'desc']]
     };
 
     if(params.count) {
@@ -1110,7 +1111,7 @@ export function getProjectList(params) {
 createNewProject['required_params'] = ['name', 'createUser', 'company_id'];
 createNewProject['optional_params'] = ['code']
 export function createNewProject(params) {
-    params.createAt = utils.now();
+    params.createdAt = utils.now();
     return ProjectModel.create(params);
 }
 
@@ -1142,7 +1143,7 @@ export function getProjectByName(params) {
                     createUser: params.userId,
                     code: '',
                     companyId: params.companyId,
-                    createAt: utils.now()
+                    createdAt: utils.now()
                 }
                 return ProjectModel.create(p)
             }else {

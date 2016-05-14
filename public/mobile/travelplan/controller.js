@@ -554,7 +554,7 @@ var travelplan = (function () {
         }
         return API.onload()
             .then(function () {
-                return API.tripPlan.getTripPlanById({orderId: tripPlanId});
+                return API.tripPlan.getTripPlanById({id: tripPlanId});
             })
             .then(function (result) {
                 var InvoiceDetail;

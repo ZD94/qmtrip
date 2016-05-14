@@ -42,7 +42,7 @@ describe("api/client/tripPlan.js", function() {
             })
             .then(function(ret){
                 agencyId = ret.agency.id;
-                agencyUserId = ret.agencyUser.id;
+                agencyUserId = ret.agency.createUser;
                 return API.client.company.createCompany.call({accountId: agencyUserId}, company);
             })
             .then(function(company){
@@ -101,7 +101,10 @@ describe("api/client/tripPlan.js", function() {
             API.client.tripPlan.saveTripPlan.call({accountId: staffId}, _tripPlanOrder)
                 .then(function(trip_plan) {
                     new_trip_plan_id = trip_plan.id;
-                    new_consume_id = trip_plan.hotel[0].id;
+                    return trip_plan.getHotel();
+                })
+                .then(function(hotels) {
+                    new_consume_id = hotels[0].id;
                     done();
                 })
                 .catch(function(err) {
@@ -236,16 +239,22 @@ describe("api/client/tripPlan.js", function() {
             }]
         }
         var newplanId = "";
-        beforeEach(function(done){
 
-            API.client.tripPlan.saveTripPlan.call({accountId: staffId}, tripPlanOrder, function(err, ret){
-                if(err){
-                    throw err;
-                }
-                newplanId = ret.id;
-                consume_id = ret.hotel[0].id;
-                done();
-            })
+        beforeEach(function(done){
+            API.client.tripPlan.saveTripPlan.call({accountId: staffId}, tripPlanOrder)
+                .then(function(ret) {
+                    newplanId = ret.id;
+                    return ret.getHotel();
+                })
+                .then(function(hotels) {
+                    consume_id = hotels[0].id;
+                    done();
+                })
+                .catch(function(err) {
+                    if(err){
+                        throw err;
+                    }
+                })
         });
 
         it("#updateConsumeDetail should be ok", function (done) {
@@ -289,14 +298,18 @@ describe("api/client/tripPlan.js", function() {
         }
         before(function (done) {
 
-            API.client.tripPlan.saveTripPlan.call({accountId: staffId}, _tripPlanOrder, function (err, ret) {
-                if (err) {
+            API.client.tripPlan.saveTripPlan.call({accountId: staffId}, _tripPlanOrder)
+                .then(function(ret) {
+                    newplanId = ret.id;
+                    return ret.getHotel();
+                })
+                .then(function(hotels) {
+                    consumeId = hotels[0].id;
+                    done();
+                })
+                .catch(function(err) {
                     throw err;
-                }
-                newplanId = ret.id;
-                consumeId = ret.hotel[0].id;
-                done();
-            })
+                })
         });
 
         after(function (done) {
@@ -334,28 +347,25 @@ describe("api/client/tripPlan.js", function() {
 
         it("#getTripPlanById should be error when param is not uuid", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.getTripPlanById.call(self, {tripPlanId: "123456"}, function (err, ret) {
+            API.client.tripPlan.getTripPlanById.call(self, {id: "123456"}, function (err, ret) {
                 assert(err != null);
                 assert.equal(ret, null);
                 done();
             })
         });
-
+        
         it("#getTripPlanById should be ok by staff", function (done) {
-            API.client.tripPlan.getTripPlanById.call({accountId: staffId}, {tripPlanId: newplanId}, function (err, ret) {
-                if (err) {
-                    throw err;
-                }
+            API.client.tripPlan.getTripPlanById.call({accountId: staffId}, {id: newplanId}, function (err, ret) {
+                assert.equal(err, null);
                 assert.equal(ret.id, newplanId);
                 done();
             })
         });
 
         it("#getTripPlanById should be ok by agency", function(done) {
-            API.client.tripPlan.getTripPlanById.call({accountId: agencyUserId}, {tripPlanId: newplanId}, function(err, ret){
-                if (err) {
-                    throw err;
-                }
+            console.info("agencyUserId=>", agencyUserId);
+            API.client.tripPlan.getTripPlanById.call({accountId: agencyUserId}, {id: newplanId}, function(err, ret){
+                assert.equal(err, null);
                 assert.equal(ret.id, newplanId);
                 done();
             })
@@ -364,9 +374,7 @@ describe("api/client/tripPlan.js", function() {
         it("#pageCompleteTripPlans should be ok", function (done) {
             var self = {accountId: staffId};
             API.client.tripPlan.pageCompleteTripPlans.call(self, {page: 1}, function (err, ret) {
-                if (err) {
-                    throw err;
-                }
+                assert.equal(err, null);
                 assert.equal(ret.page, 1);
                 assert.equal(ret.perPage, 10);
                 done();
@@ -376,9 +384,7 @@ describe("api/client/tripPlan.js", function() {
         it("#pageTripPlans should be ok", function (done) {
             var self = {accountId: staffId};
             API.client.tripPlan.pageTripPlans.call(self, {page: 1}, function (err, ret) {
-                if (err) {
-                    throw err;
-                }
+                assert.equal(err, null);
                 assert.equal(ret.page, 1);
                 assert.equal(ret.perPage, 10);
                 done();

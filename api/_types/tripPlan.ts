@@ -21,7 +21,7 @@ export enum ETripType {
     HOTEL = 2
 }
 
-@Table('tripPlan.Project')
+@Table('tripPlan.')
 @regApiType('API.')
 export class Project implements ModelObject{
     target: Object;
@@ -51,7 +51,7 @@ export class Project implements ModelObject{
     destroy(): Promise<void> { return null; }
 }
 
-@Table('tripplan.TripPlan')
+@Table('tripplan.')
 @regApiType('API.')
 export class TripPlan implements ModelObject {
     target: Object;
@@ -164,15 +164,15 @@ export class TripPlan implements ModelObject {
     setCompany(val: Company) {}
 
     getOutTrip(id: string): Promise<TripDetail[]> {
-        return Models.tripDetail.find({tripPlanId: id, type: ETripType.OUT_TRIP});
+        return Models.tripDetail.find({tripPlanId: id||this.id, type: ETripType.OUT_TRIP});
     }
 
     getBackTrip(id: string): Promise<TripDetail[]> {
-        return Models.tripDetail.find({tripPlanId: id, type: ETripType.BACK_TRIP});
+        return Models.tripDetail.find({tripPlanId: id||this.id, type: ETripType.BACK_TRIP});
     }
 
     getHotel(id: string): Promise<TripDetail[]> {
-        return Models.tripDetail.find({tripPlanId: id, type: ETripType.HOTEL});
+        return Models.tripDetail.find({tripPlanId: id||this.id, type: ETripType.HOTEL});
     }
 
     @Update(Models.company.update)
