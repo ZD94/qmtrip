@@ -383,10 +383,10 @@ var TravelStatistics = (function(){
     TravelStatistics.PlanDetailController = function($scope,$stateParams, $location, $loading, $anchorScroll) {
         $("title").html("出差记录");
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
-        var planId = $stateParams.orderId;
+        var tripPlanId = $stateParams.orderId;
         $loading.start();
         API.onload(function(){
-            API.tripPlan.getTripPlanById({orderId: planId})
+            API.tripPlan.getTripPlanById({orderId: tripPlanId})
                 .then(function(result){
                     if(result.description && result.description.length>15){
                         result.description = result.description.substr(0,15);

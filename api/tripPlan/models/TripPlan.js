@@ -8,7 +8,7 @@ var now = require("common/utils").now;
 module.exports = function (Db, DataType) {
     return Db.define("TripPlan", {
         id           : {type: DataType.UUID,            defaultValue: uuid.v1, primaryKey: true},
-        tripNo      : {type: DataType.STRING,          field: "trip_no"}, //计划/预算单号
+        planNo      : {type: DataType.STRING,          field: "plan_no"}, //计划/预算单号
         title        : {type: DataType.STRING,          field: "title"},
         accountId    : {type: DataType.UUID,            field: "account_id"}, //单据所属人
         companyId    : {type: DataType.UUID,            field: "company_id"}, //企业id
@@ -32,8 +32,8 @@ module.exports = function (Db, DataType) {
         auditRemark  : {type: DataType.STRING,          field: 'audit_remark'}, //审核备注
         score        : {type: DataType.INTEGER,         field: 'score', defaultValue: 0}, //获取的积分
         expireAt     : {type: "timestamp without time zone", field: "expire_at"}, //失效时间
-        createAt     : {type: "timestamp without time zone", field: "created_at", defaultValue: now}, //创建时间
-        updateAt     : {type: "timestamp without time zone", field: "updated_at"},
+        createdAt     : {type: "timestamp without time zone", field: "created_at", defaultValue: now}, //创建时间
+        updatedAt     : {type: "timestamp without time zone", field: "updated_at"},
         commitTime  : {type: "timestamp without time zone", field: "commit_time"},
         remark       : {type: DataType.STRING }, //备注
         orderStatus: {

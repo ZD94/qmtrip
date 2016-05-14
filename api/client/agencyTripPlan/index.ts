@@ -240,7 +240,7 @@ export function approveInvoice(params){
             }
 
             orderTime = moment(orderTime).format('YYYY-MM-DD');
-            let url = config.host + '/staff.html#/travelPlan/PlanDetail?planId=' + order.id;
+            let url = config.host + '/staff.html#/travelPlan/PlanDetail?tripPlanId=' + order.id;
 
             //审核完成后给用户发送邮件
             if(params.status == -1){ //审核不通过

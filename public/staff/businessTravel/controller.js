@@ -253,7 +253,7 @@ var businessTravel=(function(){
                             window.location.href = "#/businessTravel/CreateResult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&spval="+startplaceval+"&epval="+endplaceval+"&"+parameter;
                         }
                         if (result != false) {
-                            window.location.href = "#/travelPlan/PlanDetail?planId="+result;
+                            window.location.href = "#/travelPlan/PlanDetail?tripPlanId="+result;
                         }
                     })
                     .catch(function(err){
@@ -397,7 +397,7 @@ var businessTravel=(function(){
                             window.location.href = "#/businessTravel/CreateResult?purposename=" + purposename + "&tra=" + tra + "&liv=" + liv + "&epval=" + endplace + "&lpval=" + liveplace + "&" + parameter;
                         }
                         if (result != false) {
-                            window.location.href = "#/travelPlan/PlanDetail?planId="+result;
+                            window.location.href = "#/travelPlan/PlanDetail?tripPlanId="+result;
                         }
                     })
                     .catch(function(err){
@@ -664,7 +664,7 @@ var businessTravel=(function(){
                             window.location.href = "#/businessTravel/CreateResult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&spval="+startplaceval+"&epval="+endplaceval+"&lpval="+liveplace+"&"+parameter;
                         }
                         if (result != false) {
-                            window.location.href = "#/travelPlan/PlanDetail?planId="+result;
+                            window.location.href = "#/travelPlan/PlanDetail?tripPlanId="+result;
                         }
                     })
                     .catch(function(err){
@@ -983,7 +983,7 @@ var businessTravel=(function(){
         }
         //上传票据
         $scope.upLoad = function () {
-            window.location.href = "#/travelPlan/PlanDetail?planId="+$scope.orderId;
+            window.location.href = "#/travelPlan/PlanDetail?tripPlanId="+$scope.orderId;
         }
     }
 
