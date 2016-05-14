@@ -95,7 +95,7 @@ class ApiAgency {
         var self: any = this;
         var agencyId = params.id;
         console.info("accountId=>", self.accountId);
-        console.info("agencyId=>", self.agencyId);
+        console.info("agencyId=>", agencyId);
         var user = await API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']});
 
         if(user.agencyId != agencyId){

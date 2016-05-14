@@ -67,14 +67,6 @@ export class TripPlan implements ModelObject {
     get orderNo(): string { return ''; }
     set orderNo(val: string) {}
 
-    @Field({type: Types.UUID})
-    get companyId(): string { return null; }
-    set companyId(val: string) {}
-
-    @Field({type: Types.UUID})
-    get projectId(): string { return null; }
-    set projectId(val: string) {}
-
     @Field({type: Types.BOOLEAN})
     get isInvoiceUpload(): boolean { return false; }
     set isInvoiceUpload(val: boolean) {}
@@ -157,11 +149,6 @@ export class TripPlan implements ModelObject {
         return Models.staff.get(id);
     }
 
-    @Reference({type: Types.UUID})
-    getCompany(id?:string): Promise<Company> {
-        return Models.company.get(id);
-    }
-
     getOutTrip(id: string): Promise<TripDetail[]> {
         return Models.tripDetail.find({planId: id, type: ETripType.OUT_TRIP});
     }
@@ -173,6 +160,23 @@ export class TripPlan implements ModelObject {
     getHotel(id: string): Promise<TripDetail[]> {
         return Models.tripDetail.find({planId: id, type: ETripType.HOTEL});
     }
+
+    @Field({type: Types.UUID})
+    get projectId(): string { return null; }
+    set projectId(val: string) {}
+
+    @Reference({type: Types.UUID})
+    getProject(id?:string): Promise<Project> {
+        return Models.project.get(id);
+    }
+    setProject(val: Project) {}
+
+    @Reference({type: Types.UUID})
+    getCompany(id?:string): Promise<Company> {
+        return Models.company.get(id);
+    }
+    setCompany(val: Company) {}
+
 
     @Update(Models.company.update)
     save(): Promise<void> { return null; }
