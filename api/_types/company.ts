@@ -89,9 +89,9 @@ export class Company implements ModelObject{
         return Models.staff.find({companyId: this.id});
     }
     
-    // getMoneyChanges(id?:string): Promise<MoneyChanges[]> {
-    //     return Models.company
-    // }
+    getMoneyChanges(companyId?:string): Promise<MoneyChange[]> {
+        return Models.moneyChange.find({fundsAccountId: companyId});
+    }
 
     @Update(Models.company.update)
     save(): Promise<void> { return null; }
