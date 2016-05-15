@@ -46,12 +46,12 @@ export class Project implements ModelObject{
     set code(val: string) {}
 
     @Update(Models.company)
-    save(): Promise<void> { return null; }
+    save(): Promise<Project> { return null; }
     @Destroy(Models.company)
     destroy(): Promise<void> { return null; }
 }
 
-@Table('tripplan.')
+@Table('tripPlan.')
 @regApiType('API.')
 export class TripPlan implements ModelObject {
     target: Object;
@@ -176,12 +176,12 @@ export class TripPlan implements ModelObject {
     }
 
     @Update(Models.company)
-    save(): Promise<void> { return null; }
+    save(): Promise<TripPlan> { return null; }
     @Destroy(Models.company)
     destroy(): Promise<void> { return null; }
 }
 
-@Table('tripplan.')
+@Table('tripPlan.')
 @regApiType('API.')
 export class TripDetail implements ModelObject{
     target: Object;
@@ -293,7 +293,7 @@ export class TripDetail implements ModelObject{
     get tripPlan(): TripPlan { return null; }
 
     @Update(Models.company)
-    save(): Promise<void> { return null; }
+    save(): Promise<TripDetail> { return null; }
     @Destroy(Models.company)
     destroy(): Promise<void> { return null; }
 }

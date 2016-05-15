@@ -76,7 +76,7 @@ export class Agency implements ModelObject{
     }
 
     @Update(Models.agency)
-    save(): Promise<void> { return null; }
+    save(): Promise<Agency> { return null; }
     @Destroy(Models.agency)
     destroy(): Promise<void> { return null; }
 }
@@ -131,7 +131,7 @@ export class AgencyUser implements ModelObject{
 
 
     @Update(Models.agencyUser)
-    save(): Promise<void> { return null; }
+    save(): Promise<AgencyUser> { return null; }
     @Destroy(Models.agencyUser)
     destroy(): Promise<void> { return null; }
     

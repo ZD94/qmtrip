@@ -52,7 +52,7 @@ export class TravelPolicy implements ModelObject{
     }
 
     @Update(Models.travelPolicy)
-    save(): Promise<void> { return null; }
+    save(): Promise<TravelPolicy> { return null; }
     @Destroy(Models.travelPolicy)
     destroy(): Promise<void> { return null; }
 }

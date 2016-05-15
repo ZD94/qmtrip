@@ -49,7 +49,7 @@ export class Department implements ModelObject{
     set createAt(createAt: Date){}
 
     @Update(Models.department)
-    save(): Promise<void> { return null; }
+    save(): Promise<Department> { return null; }
     @Destroy(Models.department)
     destroy(): Promise<void> { return null; }
 }

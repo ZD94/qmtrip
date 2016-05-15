@@ -5,6 +5,7 @@ import { regApiType } from 'common/api/helper';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Department } from 'api/_types/department';
 import { ModelObject, Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
+import { Create } from 'common/model';
 
 export enum EStaffStatus {
     ON_JOB = 0,
@@ -34,6 +35,8 @@ export class Staff implements ModelObject{
     constructor(target: Object) {
         this.target = target;
     }
+    @Create()
+    static create(): Staff { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return null; }
@@ -81,6 +84,7 @@ export class Staff implements ModelObject{
 
     @ResolveRef({type: Types.UUID}, Models.company)
     get company(): Company { return null; }
+    set company(val: Company) {}
 
     @ResolveRef({type: Types.UUID}, Models.department)
     get department(): Department { return null; }
@@ -93,7 +97,7 @@ export class Staff implements ModelObject{
     setTravelPolicy(val: TravelPolicy) {}
 
     @Update(Models.staff)
-    save(): Promise<void> { return null; }
+    save(): Promise<Staff> { return null; }
     @Destroy(Models.staff)
     destroy(): Promise<void> { return null; }
 }
@@ -131,7 +135,7 @@ export class Credential implements ModelObject{
     set owner(val: Staff) {}
 
     @Update(Models.credential)
-    save(): Promise<void> { return null; }
+    save(): Promise<Credential> { return null; }
     @Destroy(Models.credential)
     destroy(): Promise<void> { return null; }
 }
@@ -178,7 +182,7 @@ export class PointChange implements ModelObject{
     set remark(remark: string){}
 
     @Update(Models.credential)
-    save(): Promise<void> { return null; }
+    save(): Promise<PointChange> { return null; }
     @Destroy(Models.credential)
     destroy(): Promise<void> { return null; }
 }

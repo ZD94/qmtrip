@@ -8,9 +8,7 @@ var uuid = require("node-uuid");
 var moment = require("moment");
 var crypto = require("crypto");
 var sequelize = require("common/model").importModel("./models");
-var staffModel = sequelize.models.Staff;
-var papersModel = sequelize.models.Papers;
-var pointChangeModel = sequelize.models.PointChange;
+var Models = sequelize.models;
 var config = require('../../config');
 var fs = require('fs');
 var API = require("common/api");
@@ -25,9 +23,9 @@ import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_typ
 import {AGENCY_ROLE} from "api/_types/agency";
 import { ServiceInterface } from 'common/model';
 
-export const staffCols = Object.keys(staffModel.attributes);
-export const papersCols = Object.keys(papersModel.attributes);
-export const pointChangeCols = Object.keys(pointChangeModel.attributes);
+export const staffCols = Object.keys(Models.Staff.attributes);
+export const papersCols = Object.keys(Models.Papers.attributes);
+export const pointChangeCols = Object.keys(Models.PointChange.attributes);
 
 export class StaffService implements ServiceInterface<Staff>{
     async create(obj: Object): Promise<Staff>{
@@ -124,7 +122,7 @@ export function createStaff(data): Promise<Staff>{
             if(!data.departmentId || data.departmentId == ""){
                 data.departmentId = null;
             }
-            return staffModel.create(data)
+            return Models.Staff.create(data)
                 .then(function(result){
                     return new Staff(result);
                 })
@@ -138,13 +136,13 @@ validateApi(create, ['email', 'name', 'companyId'], staffCols);
 export async function create(params) {
     params.id = params.id ? params.id : uuid.v1();
 
-    let _staff = await staffModel.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
+    let _staff = await Models.Staff.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
 
     if(_staff) {
         throw {code: -2, msg: '邮箱或手机号已经注册'};
     }
 
-    let staff = await staffModel.create(params);
+    let staff = await Models.Staff.create(params);
     return new Staff(staff);
 }
 
@@ -158,7 +156,7 @@ export function deleteStaff(params: {id: string}): Promise<any>{
     var id = params.id;
     return API.auth.remove({accountId: id})
         .then(function(){
-            return staffModel.update({status: EStaffStatus.DELETE, quitTime: utils.now()}, {where: {id: id}, returning: true})
+            return Models.Staff.update({status: EStaffStatus.DELETE, quitTime: utils.now()}, {where: {id: id}, returning: true})
         })
         .spread(function(num, rows){
             var staff = rows[0];
@@ -206,7 +204,7 @@ export function updateStaff(data): Promise<any>{
     var accobj: any = {};
     var com: any = {};
     return Q.all([
-        staffModel.findById(id),
+        Models.Staff.findById(id),
         API.auth.getAccount({id:id}),
     ])
         .spread(function(old, acc){
@@ -221,16 +219,16 @@ export function updateStaff(data): Promise<any>{
                             var accData = {email: data.email};
                             return Q.all([
                                 API.auth.updateAccount(id, accData, company.name),
-                                staffModel.update(data, options)
+                                Models.Staff.update(data, options)
                             ])
                                 .spread(function(updateaccount, updatestaff) {
                                     send_email = false;
                                     return updatestaff;
                                 });
                         }
-                        return staffModel.update(data, options);
+                        return Models.Staff.update(data, options);
                     }else{
-                        return staffModel.update(data, options);
+                        return Models.Staff.update(data, options);
                     }
                 })
         })
@@ -285,7 +283,7 @@ export function getStaff(params: {id: string, columns?: Array<string>}){
     if(params.columns){
         options.attributes = params.columns
     }
-    return staffModel.findById(id, options)
+    return Models.Staff.findById(id, options)
         .then(function(staff){
             if(!staff){
                 throw {code: -2, msg: '员工不存在'};
@@ -302,7 +300,7 @@ export function getStaff(params: {id: string, columns?: Array<string>}){
 export function findOneStaff(params){
     var options: any = {};
     options.where = params;
-    return staffModel.findOne(options)
+    return Models.Staff.findOne(options)
         .then(function(data){
             return new Staff(data);
         })
@@ -314,7 +312,7 @@ export function findOneStaff(params){
  */
 validateApi(getCountByDepartment, ["departmentId"]);
 export function getCountByDepartment(params: {departmentId: string}){
-    return staffModel.count({where: {departmentId: params.departmentId, status: {$gte: EStaffStatus.ON_JOB}}})
+    return Models.Staff.count({where: {departmentId: params.departmentId, status: {$gte: EStaffStatus.ON_JOB}}})
 }
 
 /**
@@ -324,14 +322,14 @@ export function getCountByDepartment(params: {departmentId: string}){
  */
 export function getStaffs(params): Promise<Staff[]>{
     var options : any = {};
-    options.where = _.pick(params, Object.keys(staffModel.attributes));
+    options.where = _.pick(params, Object.keys(Models.Staff.attributes));
     if(params.$or) {
         options.where.$or = params.$or;
     }
     if(params.columns){
         options.attributes = params.columns;
     }
-    return staffModel.findAll(options);
+    return Models.Staff.findAll(options);
 }
 
 /**
@@ -374,7 +372,7 @@ export function listAndPaginateStaff(params){
                 delete params.departmentId;
                 options.where = params;
             }
-            return staffModel.findAndCountAll(options)
+            return Models.Staff.findAndCountAll(options)
                 .then(function(result){
                     return new Paginate(page, perPage, result.count, result.rows);
                 });
@@ -392,7 +390,7 @@ export function increaseStaffPoint(params) {
     var id = params.id;
     var operatorId = params.accountId;
     var increasePoint = params.increasePoint;
-    return staffModel.findById(id)
+    return Models.Staff.findById(id)
         .then(function(obj) {
             var totalPoints = obj.totalPoints + increasePoint;
             var balancePoints = obj.balancePoints + increasePoint;
@@ -403,8 +401,8 @@ export function increaseStaffPoint(params) {
             pointChange.companyId = params.companyId;
             return sequelize.transaction(function(t) {
                 return Q.all([
-                        staffModel.update({totalPoints: totalPoints, balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
-                        pointChangeModel.create(pointChange, {transaction: t})
+                    Models.Staff.update({totalPoints: totalPoints, balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
+                        Models.PointChange.create(pointChange, {transaction: t})
                     ]);
             });
         })
@@ -424,7 +422,7 @@ export function decreaseStaffPoint(params) {
     var id = params.id;
     var decreasePoint = params.decreasePoint;
     var operatorId = params.accountId;
-    return staffModel.findById(id)
+    return Models.Staff.findById(id)
         .then(function(obj) {
             if(obj.balancePoints < decreasePoint){
                 throw {code: -3, msg: "积分不足"};
@@ -434,8 +432,8 @@ export function decreaseStaffPoint(params) {
                 operatorId: operatorId, currentPoint: balancePoints, companyId: params.companyId};//此处也应该用model里的属性名封装obj
             return sequelize.transaction(function(t) {
                 return Q.all([
-                        staffModel.update({balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
-                        pointChangeModel.create(pointChange, {transaction: t})
+                    Models.Staff.update({balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
+                        Models.PointChange.create(pointChange, {transaction: t})
                     ]);
             });
         })
@@ -451,14 +449,14 @@ export function decreaseStaffPoint(params) {
  */
 export function getPointChanges(params): Promise<PointChange[]>{
     var options : any = {};
-    options.where = _.pick(params, Object.keys(pointChangeModel.attributes));
+    options.where = _.pick(params, Object.keys(Models.PointChange.attributes));
     if(params.$or) {
         options.where.$or = params.$or;
     }
     if(params.columns){
         options.attributes = params.columns;
     }
-    return staffModel.findAll(options);
+    return Models.Staff.findAll(options);
 }
 
 validateApi(getPointChange, ["id"], ["columns"]);
@@ -468,7 +466,7 @@ export function getPointChange(params: {id: string, columns?: Array<string>}){
     if(params.columns){
         options.attributes = params.columns
     }
-    return pointChangeModel.findById(id, options)
+    return Models.PointChange.findById(id, options)
         .then(function(pc){
             if(!pc){
                 throw {code: -2, msg: '员工不存在'};
@@ -508,7 +506,7 @@ export function listAndPaginatePointChange(params){
     options.limit = limit;
     options.offset = offset;
     options.where = params;
-    return pointChangeModel.findAndCountAll(options)
+    return Models.PointChange.findAndCountAll(options)
         .then(function(result){
             return new Paginate(page, perPage, result.count, result.rows);
         });
@@ -545,10 +543,10 @@ export function  getStaffPointsChangeByMonth (params) {
         q3.createAt = {$lte: end_time};
         q4.createAt = {$lte: end_time};
         return Q.all([
-            pointChangeModel.sum('points', {where: q1}),
-            pointChangeModel.sum('points', {where: q2}),
-            pointChangeModel.sum('points', {where: q3}),
-            pointChangeModel.sum('points', {where: q4})
+            Models.PointChange.sum('points', {where: q1}),
+            Models.PointChange.sum('points', {where: q2}),
+            Models.PointChange.sum('points', {where: q3}),
+            Models.PointChange.sum('points', {where: q4})
         ])
             .spread(function(a, b, c, d){
                 a = a || 0;
@@ -584,7 +582,7 @@ export function getStaffPointsChange(params){
     var changeDate = [];
     var changePoint = [];
     options.where = {staffId: staffId, createAt: {$gte: startTime, $lte: endTime}};
-    return pointChangeModel.findAll(options)
+    return Models.PointChange.findAll(options)
         .then(function(result){
             if(result && result.length > 0){
                 for(var i=0;i<result.length;i++){
@@ -882,7 +880,7 @@ export function downloadExcle (params){
  */
 validateApi(isStaffInCompany, ['staffId','companyId']);
 export function isStaffInCompany (params:{staffId: string, companyId:string}){
-    return staffModel.findById(params.staffId, {attributes: ['companyId']})
+    return Models.Staff.findById(params.staffId, {attributes: ['companyId']})
         .then(function(staff){
             if(!staff){
                 throw {code: 1, msg: '没有找到该员工'};
@@ -905,9 +903,9 @@ export function statisticStaffs(params){
     var start = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
     var end = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
     return Q.all([
-        staffModel.count({where: {companyId: companyId, status: {$gte: 0}}}),
-        staffModel.count({where: {companyId: companyId, createAt: {$gte: start, $lte: end}}}),
-        staffModel.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: {$lt: 0} }})
+        Models.Staff.count({where: {companyId: companyId, status: {$gte: 0}}}),
+        Models.Staff.count({where: {companyId: companyId, createAt: {$gte: start, $lte: end}}}),
+        Models.Staff.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: {$lt: 0} }})
     ])
         .spread(function(all, inNum, outNum){
             var sta = {
@@ -946,7 +944,7 @@ export function statisticStaffsRole(params: {companyId: string, departmentId?: s
                 where.$or = [{departmentId: params.departmentId},["department_id is null"]];
                 delete where.departmentId;
             }
-            return staffModel.findAll({where: where})
+            return Models.Staff.findAll({where: where})
                 .then(function(staffs){
                     if(staffs && staffs.length>0){
                         totalCount = staffs.length;
@@ -979,7 +977,7 @@ export function statisticStaffsRole(params: {companyId: string, departmentId?: s
 validateApi(getStaffCountByCompany, ['companyId']);
 export function getStaffCountByCompany (params: {companyId: string}){
     var companyId = params.companyId;
-    return staffModel.count({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}})
+    return Models.Staff.count({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}})
         .then(function(all){
             return all || 1;
         });
@@ -994,7 +992,7 @@ validateApi(getDistinctDepartment, ['companyId']);
 export function getDistinctDepartment(params: {companyId: string}){
     var departmentAttr = [];
     var companyId = params.companyId;
-    return staffModel.findAll({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}, attributes:[[sequelize.literal('distinct department'),'department']]})
+    return Models.Staff.findAll({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}, attributes:[[sequelize.literal('distinct department'),'department']]})
         .then(function(departments){
             for(var i=0;i<departments.length;i++){
                 if(departments[i] && departments[i].department){
@@ -1012,7 +1010,7 @@ export function getDistinctDepartment(params: {companyId: string}){
  */
 validateApi(deleteAllStaffs, ['company']);
 export function deleteAllStaffs(params: {company: string}){
-    return staffModel.destroy({where: {companyId: params.company}})
+    return Models.Staff.destroy({where: {companyId: params.company}})
         .then(function(){
             return true;
         })
@@ -1060,8 +1058,8 @@ validateApi(statStaffPoints, ['companyId']);
 export function statStaffPoints(params: {accountId: string}){
     var query = params;
     return Q.all([
-        staffModel.sum('total_points', {where: query}),
-        staffModel.sum('balance_points', {where: query})
+        Models.Staff.sum('total_points', {where: query}),
+        Models.Staff.sum('balance_points', {where: query})
     ])
         .spread(function(all, balance){
             return {
@@ -1077,7 +1075,7 @@ export function deleteAllStaffByTest(params){
     var email = params.email;
     return Q.all([
         API.auth.remove({email: email, mobile: mobile, type: 1}),
-        staffModel.destroy({where: {$or: [{companyId: companyId}, {mobile: mobile}, {email: email}]}})
+        Models.Staff.destroy({where: {$or: [{companyId: companyId}, {mobile: mobile}, {email: email}]}})
     ])
         .spread(function(){
             return true;
@@ -1095,10 +1093,10 @@ export function deleteAllStaffByTest(params){
 validateApi(createPapers, ['type', 'idNo', 'ownerId'], ['validData', 'birthday']);
 export function createPapers(params): Promise<Credential>{
     //查询该用户该类型证件信息是否已经存在 不存在添加 存在则修改
-    return papersModel.findOne({where: {type: params.type, ownerId: params.ownerId}})
+    return Models.Papers.findOne({where: {type: params.type, ownerId: params.ownerId}})
     .then(function(result){
         if(!result) {
-            return papersModel.create(params);
+            return Models.Papers.create(params);
         }
         return result.update(params);
         /*if(result){
@@ -1106,12 +1104,12 @@ export function createPapers(params): Promise<Credential>{
             /!*var options = {};
             options.where = {type: params.type, ownerId: params.ownerId};
             options.returning = true;
-            return papersModel.update(params, options)
+            return Models.Papers.update(params, options)
                 .spread(function(rownum, rows){
                     return rows[0];
                 })*!/;
         }else{
-            return papersModel.create(params);
+            return Models.Papers.create(params);
         }*/
     })
         .then(function(data){
@@ -1126,7 +1124,7 @@ export function createPapers(params): Promise<Credential>{
  */
 validateApi(deletePapers, ['id']);
 export function deletePapers(params: {id: string}): Promise<any>{
-    return papersModel.destroy({where: params})
+    return Models.Papers.destroy({where: params})
         .then(function(obj){
             return true;
         });
@@ -1144,7 +1142,7 @@ export function updatePapers(params): Promise<Credential>{
     var options: any = {};
     options.where = {id: id};
     options.returning = true;
-    return papersModel.update(params, options)
+    return Models.Papers.update(params, options)
         .spread(function(rownum, rows){
             return new Credential(rows[0]);
         });
@@ -1156,11 +1154,11 @@ export function updatePapers(params): Promise<Credential>{
  */
 validateApi(getPapersById, ['id'], ['attributes']);
 export function getPapersById(params): Promise<Credential>{
-    //return papersModel.findById(params.id);
+    //return Models.Papers.findById(params.id);
     var options: any = {};
     options.where = {id: params.id};
     options.attributes = params.attributes? ['*'] :params.attributes;
-    return papersModel.findOne(options)
+    return Models.Papers.findOne(options)
         .then(function(data){
             return new Credential(data);
         })
@@ -1178,7 +1176,7 @@ export function getOnesPapersByType(params): Promise<Credential>{
     var options:any = {};
     options.where = {ownerId: params.ownerId, type: params.type};
     options.attributes = params.attributes? ['*'] :params.attributes;
-    return papersModel.findOne(options)
+    return Models.Papers.findOne(options)
         .then(function(result){
             return new Credential(result);
         })
@@ -1191,11 +1189,11 @@ export function getOnesPapersByType(params): Promise<Credential>{
  */
 validateApi(getPapersByOwner, ['ownerId'], ['attributes']);
 export function getPapersByOwner(params): Promise<Credential[]>{
-    //return papersModel.findAll({where: {ownerId: params.ownerId}});
+    //return Models.Papers.findAll({where: {ownerId: params.ownerId}});
     var options: any = {};
     options.where = {ownerId: params.ownerId};
     options.attributes = params.attributes? ['*'] :params.attributes;
-    return papersModel.findAll(options);
+    return Models.Papers.findAll(options);
 }
 
 /***********************证件信息end***********************/

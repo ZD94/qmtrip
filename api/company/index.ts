@@ -4,9 +4,6 @@
 
 let sequelize = require("common/model").importModel("./models");
 let Models = sequelize.models;
-let CompanyModel = Models.Company;
-let FundsAccounts = Models.FundsAccounts;
-let MoneyChangeModel = Models.MoneyChangeModel;
 let uuid = require("node-uuid");
 let L = require("common/language");
 let _ = require('lodash');
@@ -25,8 +22,8 @@ let AGENCY_ROLE = {
     ADMIN: 2
 };
 
-export const companyCols = Object.keys(CompanyModel.attributes);
-export const fundsAccountCols = Object.keys(FundsAccounts.attributes);
+export const companyCols = Object.keys(Models.Company.attributes);
+export const fundsAccountCols = Object.keys(Models.FundsAccounts.attributes);
 
 
 export class CompanyService implements ServiceInterface<Company>{
@@ -85,7 +82,7 @@ export function domainIsExist(params) {
         })
     }
 
-    return Models.CompanyModel.findOne({where: {domainName: domain}})
+    return Models.Company.findOne({where: {domainName: domain}})
         .then(function(company) {
             if (company) {
                 return true;
@@ -112,13 +109,14 @@ export function createCompany(params){
 
     return sequelize.transaction(function(t){
         return Promise.all([
-            CompanyModel.create(_company, {transaction: t}),
-            FundsAccounts.create(funds, {transaction: t})
+            Models.Company.create(_company, {transaction: t}),
+            Models.FundsAccounts.create(funds, {transaction: t})
         ])
     })
         .spread(function(c, f){
-            c = c.toJSON();
-            return _.assign(c, {balance: f.balance, staffReward: f.staffReward});
+            return new Company(c);
+            //c = c.toJSON();
+            //return _.assign(c, {balance: f.balance, staffReward: f.staffReward});
         });
 }
 
@@ -153,7 +151,7 @@ export function isBlackDomain(params) {
  */
 export async function updateCompany(params){
     let companyId = params.companyId;
-    let company = await CompanyModel.findById(companyId, {attributes: ['createUser', 'status']});
+    let company = await Models.Company.findById(companyId, {attributes: ['createUser', 'status']});
 
     if(!company || company.status == -2){
         throw L.ERR.COMPANY_NOT_EXIST;
@@ -162,7 +160,7 @@ export async function updateCompany(params){
     delete params.companyId;
     params['updateAt'] = utils.now();
 
-    let [rownum, rows] = await CompanyModel.update(params, {returning: true, where: {id: companyId}, fields: Object.keys(params)});
+    let [rownum, rows] = await Models.Company.update(params, {returning: true, where: {id: companyId}, fields: Object.keys(params)});
     if(!rownum || rownum == "NaN"){
         throw {code: -2, msg: '更新企业信息失败'};
     }
@@ -178,7 +176,7 @@ export async function updateCompany(params){
 validateApi(getCompany, ['companyId']);
 export async function getCompany(params){
     let companyId = params.companyId;
-    let company = await CompanyModel.findById(companyId);
+    let company = await Models.Company.findById(companyId);
 
     if(!company || company.status == -2){
         throw L.ERR.COMPANY_NOT_EXIST;
@@ -206,7 +204,7 @@ export function listCompany(params){
         delete query.columns;
     }
 
-    return CompanyModel.findAll(options);
+    return Models.Company.findAll(options);
 }
 
 /**
@@ -217,7 +215,7 @@ export function listCompany(params){
 export async function pageCompany(options){
     options.where.status = {$ne: -2};
     options.order = [['create_at', 'desc']];
-    let ret = await CompanyModel.findAndCount(options);
+    let ret = await Models.Company.findAndCount(options);
     var items = ret.rows.map(function(c) {
         return c.id;
     });
@@ -234,7 +232,7 @@ validateApi(checkAgencyCompany, ['companyId','userId']);
 export async function checkAgencyCompany(params){
     var userId = params.userId;
     var companyId = params.companyId;
-    var c = await CompanyModel.findById(companyId, {attributes: ['agencyId', 'status']});
+    var c = await Models.Company.findById(companyId, {attributes: ['agencyId', 'status']});
     var agency = await API.agency.getAgencyUser({id: userId}, {attributes: ['agencyId', 'status', 'roleId']});
 
     if(!c || c.status == -2){
@@ -258,7 +256,7 @@ validateApi(deleteCompany, ['companyId'], ['userId']);
 export function deleteCompany(params){
     var companyId = params.companyId;
 
-    return CompanyModel.findById(companyId, {attributes: ['createUser']})
+    return Models.Company.findById(companyId, {attributes: ['createUser']})
         .then(function(company){
             if(!company || company.status == -2){
                 throw L.ERR.COMPANY_NOT_EXIST;
@@ -271,8 +269,8 @@ export function deleteCompany(params){
         .then(function(){
             return sequelize.transaction(function(t){
                 return Promise.all([
-                    CompanyModel.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt'], transaction: t}),
-                    FundsAccounts.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt'], transaction: t})
+                    Models.Company.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt'], transaction: t}),
+                    Models.FundsAccounts.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt'], transaction: t})
                 ])
             })
         })
@@ -290,7 +288,7 @@ validateApi(getCompanyFundsAccount, ['companyId']);
 export function getCompanyFundsAccount(params){
     var companyId = params.companyId;
 
-    return FundsAccounts.findById(companyId, {
+    return Models.FundsAccounts.findById(companyId, {
         attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createAt', 'updateAt']
     })
         .then(function(funds){
@@ -311,7 +309,7 @@ export function getCompanyFundsAccount(params){
 validateApi(changeMoney, ['money', 'channel', 'userId', 'type', 'companyId', 'remark']);
 export function changeMoney(params){
     var id = params.companyId;
-    return FundsAccounts.findById(id)
+    return Models.FundsAccounts.findById(id)
         .then(function(funds){
             if(!funds || funds.status == -2){
                 throw {code: -2, msg: '企业资金账户不存在'};
@@ -368,8 +366,8 @@ export function changeMoney(params){
 
             return sequelize.transaction(function(t){
                 return Promise.all([
-                    FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: Object.keys(fundsUpdates), transaction: t}),
-                    MoneyChangeModel.create(moneyChange, {transaction: t})
+                    Models.FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: Object.keys(fundsUpdates), transaction: t}),
+                    Models.MoneyChangeModel.create(moneyChange, {transaction: t})
                 ])
                     .spread(function(update, create){
                         return update;
@@ -390,7 +388,7 @@ export function changeMoney(params){
  * @returns {Promise<MoneyChange>}
  */
 export async function saveMoneyChange(params: {fundsAccountId: string, money: number, channel: number, userId: string, remark: string}): Promise<MoneyChange> {
-    let moneyChange = await MoneyChangeModel.create(params);
+    let moneyChange = await Models.MoneyChangeModel.create(params);
     return new MoneyChange(moneyChange);
 }
 
@@ -400,7 +398,7 @@ export async function saveMoneyChange(params: {fundsAccountId: string, money: nu
  * @returns {Promise<MoneyChange>}
  */
 export async function getMoneyChange(params: {id: string}): Promise<MoneyChange> {
-    let moneyChange = await MoneyChangeModel.findById(params.id);
+    let moneyChange = await Models.MoneyChangeModel.findById(params.id);
     return new MoneyChange(moneyChange);
 }
 
@@ -411,7 +409,7 @@ export async function getMoneyChange(params: {id: string}): Promise<MoneyChange>
  * @returns {Promise<string[]>}
  */
 export async function listMoneyChange(params: {fundsAccountId: string}): Promise<string[]> {
-    let moneyChange = await MoneyChangeModel.findAll({where: params});
+    let moneyChange = await Models.MoneyChangeModel.findAll({where: params});
     return moneyChange.map(function(mc) {
         return mc.id;
     })
@@ -425,16 +423,16 @@ export async function listMoneyChange(params: {fundsAccountId: string}): Promise
 export function deleteCompanyByTest(params){
     var mobile = params.mobile;
     var email = params.email;
-    return CompanyModel.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
+    return Models.Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
         .then(function(companys){
             return companys.map(function(c){
                 var id = c.id;
 
-                return FundsAccounts.destroy({where: {id: id}});
+                return Models.FundsAccounts.destroy({where: {id: id}});
             })
         })
         .then(function(){
-            return CompanyModel.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
+            return Models.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
         })
         .then(function(){
             return true;

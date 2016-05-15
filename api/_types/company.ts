@@ -5,13 +5,13 @@ import {Agency} from 'api/_types/agency';
 import { regApiType } from 'common/api/helper';
 import { ModelObject, Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
 import {TravelPolicy} from "api/_types/travelPolicy";
+import { Create } from 'common/model.client';
 
 export enum ECompanyStatus {
     DELETE = -2,
     UN_ACTIVE = 0, //未激活状态
     ACTIVE = 1 //激活状态
 }
-
 
 @Table('company.')
 @regApiType('API.')
@@ -20,6 +20,8 @@ export class Company implements ModelObject{
     constructor(target: Object) {
         this.target = target;
     }
+    @Create()
+    static create(): Company { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return null; }
@@ -99,7 +101,7 @@ export class Company implements ModelObject{
     }
 
     @Update(Models.company)
-    save(): Promise<void> { return null; }
+    save(): Promise<Company> { return null; }
     @Destroy(Models.company)
     destroy(): Promise<void> { return null; }
 }
@@ -141,7 +143,7 @@ export class MoneyChange implements ModelObject {
     set remark(val: string) {}
 
     @Update(Models.company)
-    save(): Promise<void> { return null; }
+    save(): Promise<MoneyChange> { return null; }
     @Destroy(Models.company)
     destroy(): Promise<void> { return null; }
 }
