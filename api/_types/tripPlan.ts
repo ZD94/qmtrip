@@ -148,7 +148,7 @@ export class TripPlan implements ModelObject {
     get commitTime(): Date { return null; }
     set commitTime(val: Date) {}
 
-    @ResolveRef({type: Types.UUID}, Models.project.get)
+    @ResolveRef({type: Types.UUID}, Models.project)
     get project(): Project { return null; }
     set project(val: Project) {}
 
@@ -289,7 +289,7 @@ export class TripDetail implements ModelObject{
     get invoiceType(): number { return 0; }
     set invoiceType(val: number) {}
 
-    @ResolveRef({type: Types.UUID}, Models.tripPlan.get, 'tripPlanId')
+    @ResolveRef({type: Types.UUID}, Models.tripPlan)
     get tripPlan(): TripPlan { return null; }
 
     @Update(Models.company)

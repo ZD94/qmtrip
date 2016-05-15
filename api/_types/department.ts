@@ -41,7 +41,7 @@ export class Department implements ModelObject{
         return Models.staff.find({departmentId: this.id});
     }
 
-    @ResolveRef({type: Types.UUID}, Models.company.get)
+    @ResolveRef({type: Types.UUID}, Models.company)
     get company(): Company { return null; }
 
     @Field({type: Types.DATE})

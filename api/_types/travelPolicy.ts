@@ -44,7 +44,7 @@ export class TravelPolicy implements ModelObject{
     get isChangeLevel(): boolean {return null}
     set isChangeLevel(isChangeLevel: boolean){}
 
-    @ResolveRef({type: Types.UUID}, Models.company.get)
+    @ResolveRef({type: Types.UUID}, Models.company)
     get company(): Company { return null; }
 
     getStaffs(): Promise<Staff[]> {

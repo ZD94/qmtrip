@@ -126,7 +126,7 @@ export class AgencyUser implements ModelObject{
     get roleId(): EAgencyStatus { return 0; }
     set roleId(val: EAgencyStatus) {}
 
-    @ResolveRef({type: Types.UUID}, Models.agency.get)
+    @ResolveRef({type: Types.UUID}, Models.agency)
     get agency(): Agency { return null; }
 
 

@@ -79,10 +79,10 @@ export class Staff implements ModelObject{
     get operatorId(): string { return null; }
     set operatorId(val: string) {}
 
-    @ResolveRef({type: Types.UUID}, Models.company.get)
+    @ResolveRef({type: Types.UUID}, Models.company)
     get company(): Company { return null; }
 
-    @ResolveRef({type: Types.UUID}, Models.department.get)
+    @ResolveRef({type: Types.UUID}, Models.department)
     get department(): Department { return null; }
     set department(val: Department) {}
 
@@ -126,7 +126,7 @@ export class Credential implements ModelObject{
     get validData(): Date {return null}
     set validData(validData: Date){}
 
-    @ResolveRef({type: Types.UUID}, Models.staff.get)
+    @ResolveRef({type: Types.UUID}, Models.staff)
     get owner(): Staff { return null; }
     set owner(val: Staff) {}
 
@@ -148,7 +148,7 @@ export class PointChange implements ModelObject{
     get id(): string { return null; }
     set id(val: string) {}
 
-    @ResolveRef({type: Types.UUID}, Models.staff.get)
+    @ResolveRef({type: Types.UUID}, Models.staff)
     get staff(): Staff { return null; }
 
     @Reference({type: Types.UUID})
