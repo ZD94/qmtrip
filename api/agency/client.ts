@@ -1,4 +1,4 @@
-import { CachedService, requireAPI } from 'api/_types';
+import { CachedService, requireAPI } from 'common/model';
 import { AgencyUser, Agency } from 'api/_types/agency';
 import ApiAgency = require('api/client/agency');
 

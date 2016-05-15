@@ -2,7 +2,7 @@
  * Created by wlh on 16/5/14.
  */
 
-import { CachedService, requireAPI } from 'api/_types';
+import { CachedService, requireAPI } from 'common/model';
 import {Place} from 'api/_types/place'
 
 import ApiPlace = require("./index")

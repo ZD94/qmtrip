@@ -1,5 +1,5 @@
 
-import { CachedService, requireAPI } from 'api/_types';
+import { CachedService, requireAPI } from 'common/model';
 import { Department } from 'api/_types/department';
 import ApiDepartment = require('api/client/department');
 

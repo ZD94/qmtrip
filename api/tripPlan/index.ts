@@ -17,7 +17,7 @@ import moment = require("moment");
 import {validateApi} from 'common/api/helper';
 import {Paginate} from 'common/paginate';
 import {Project, TripPlan, TripDetail} from "api/_types/tripPlan";
-import { ServiceInterface } from 'api/_types/index';
+import { ServiceInterface } from 'common/model';
 
 let STATUS = {
     DELETE: -2, //删除

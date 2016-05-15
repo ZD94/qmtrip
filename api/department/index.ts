@@ -9,7 +9,7 @@ var departmentModel = sequelize.models.Department;
 var API = require("common/api");
 import {Department} from "api/_types/department";
 import {validateApi} from 'common/api/helper';
-import { ServiceInterface } from 'api/_types';
+import { ServiceInterface } from 'common/model';
 
 export const departmentCols = Object.keys(departmentModel.attributes);
 

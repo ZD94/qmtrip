@@ -9,7 +9,7 @@ import {Paginate} from 'common/paginate';
 var API = require("common/api");
 import {validateApi} from 'common/api/helper';
 import types = require("api/_types/travelPolicy");
-import { ServiceInterface } from 'api/_types';
+import { ServiceInterface } from 'common/model';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 
 export const travalPolicyCols = Object.keys(travalPolicyModel.attributes);

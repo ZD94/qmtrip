@@ -1,5 +1,5 @@
 
-import { CachedService, requireAPI } from 'api/_types';
+import { CachedService, requireAPI } from 'common/model';
 import { Staff, Credential, PointChange } from 'api/_types/staff';
 import ApiStaff = require('api/client/staff');
 import L = require("common/language");

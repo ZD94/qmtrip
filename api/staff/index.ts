@@ -23,7 +23,7 @@ import {Paginate} from 'common/paginate';
 import {validateApi} from 'common/api/helper';
 import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_types/staff";
 import {AGENCY_ROLE} from "api/_types/agency";
-import { ServiceInterface } from 'api/_types/index';
+import { ServiceInterface } from 'common/model';
 
 export const staffCols = Object.keys(staffModel.attributes);
 export const papersCols = Object.keys(papersModel.attributes);

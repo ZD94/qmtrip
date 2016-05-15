@@ -1,4 +1,4 @@
-import { CachedService, requireAPI } from 'api/_types';
+import { CachedService, requireAPI } from 'common/model';
 import {TripPlan, TripDetail, Project} from 'api/_types/tripPlan';
 import ApiTripPlan = require('api/client/tripPlan');
 

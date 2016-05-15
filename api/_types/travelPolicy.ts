@@ -1,8 +1,8 @@
 import { regApiType } from 'common/api/helper';
-import { Models, ModelObject } from 'api/_types';
+import { Models } from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import { Company } from 'api/_types/company';
-import { Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
+import { ModelObject, Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
 
 @Table("travelpolicy.")
 @regApiType('API.')
@@ -51,8 +51,8 @@ export class TravelPolicy implements ModelObject{
         return Models.staff.find({travelLevel: this.id});
     }
 
-    @Update(Models.travelPolicy.update)
+    @Update(Models.travelPolicy)
     save(): Promise<void> { return null; }
-    @Destroy(Models.travelPolicy.destroy)
+    @Destroy(Models.travelPolicy)
     destroy(): Promise<void> { return null; }
 }

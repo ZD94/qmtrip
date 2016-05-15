@@ -15,7 +15,7 @@ import utils = require("common/utils");
 import {validateApi} from 'common/api/helper';
 import {Paginate} from 'common/paginate';
 import {Agency, AgencyUser, EAgencyStatus} from "api/_types/agency";
-import { ServiceInterface } from 'api/_types';
+import { ServiceInterface } from 'common/model';
 
 let logger = new Logger("agency");
 

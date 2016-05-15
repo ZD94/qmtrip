@@ -1,9 +1,9 @@
 'use strict';
-import { Models, ModelObject } from 'api/_types';
+import { Models } from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import {Agency} from 'api/_types/agency';
 import { regApiType } from 'common/api/helper';
-import { Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
+import { ModelObject, Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
 import {TravelPolicy} from "api/_types/travelPolicy";
 
 export enum ECompanyStatus {
@@ -98,9 +98,9 @@ export class Company implements ModelObject{
         return Models.moneyChange.find({fundsAccountId: companyId});
     }
 
-    @Update(Models.company.update)
+    @Update(Models.company)
     save(): Promise<void> { return null; }
-    @Destroy(Models.company.destroy)
+    @Destroy(Models.company)
     destroy(): Promise<void> { return null; }
 }
 
@@ -140,8 +140,8 @@ export class MoneyChange implements ModelObject {
     get remark(): string { return ''; }
     set remark(val: string) {}
 
-    @Update(Models.company.update)
+    @Update(Models.company)
     save(): Promise<void> { return null; }
-    @Destroy(Models.company.destroy)
+    @Destroy(Models.company)
     destroy(): Promise<void> { return null; }
 }

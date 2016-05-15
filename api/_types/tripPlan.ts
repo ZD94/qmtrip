@@ -1,7 +1,7 @@
 
-import { Models, ModelObject } from 'api/_types';
+import { Models } from 'api/_types';
 import { regApiType } from 'common/api/helper';
-import { Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
+import { ModelObject, Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
 import {now} from 'common/utils'
 import {Staff} from 'api/_types/staff';
 import {Company} from 'api/_types/company';
@@ -45,9 +45,9 @@ export class Project implements ModelObject{
     get code(): string { return ''; }
     set code(val: string) {}
 
-    @Update(Models.company.update)
+    @Update(Models.company)
     save(): Promise<void> { return null; }
-    @Destroy(Models.company.destroy)
+    @Destroy(Models.company)
     destroy(): Promise<void> { return null; }
 }
 
@@ -175,9 +175,9 @@ export class TripPlan implements ModelObject {
         return Models.tripDetail.find({tripPlanId: id||this.id, type: ETripType.HOTEL});
     }
 
-    @Update(Models.company.update)
+    @Update(Models.company)
     save(): Promise<void> { return null; }
-    @Destroy(Models.company.destroy)
+    @Destroy(Models.company)
     destroy(): Promise<void> { return null; }
 }
 
@@ -292,8 +292,8 @@ export class TripDetail implements ModelObject{
     @ResolveRef({type: Types.UUID}, Models.tripPlan.get, 'tripPlanId')
     get tripPlan(): TripPlan { return null; }
 
-    @Update(Models.company.update)
+    @Update(Models.company)
     save(): Promise<void> { return null; }
-    @Destroy(Models.company.destroy)
+    @Destroy(Models.company)
     destroy(): Promise<void> { return null; }
 }

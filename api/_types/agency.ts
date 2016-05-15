@@ -3,9 +3,9 @@
  */
 'use strict';
 import { regApiType } from 'common/api/helper';
-import { Models, ModelObject } from 'api/_types';
+import { Models } from 'api/_types';
 import {Company} from 'api/_types/company';
-import { Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
+import { ModelObject, Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
 
 export enum EAgencyStatus {
     DELETE = -2, //删除状态
@@ -75,9 +75,9 @@ export class Agency implements ModelObject{
         return Models.agencyUser.find({agencyId: this.id});
     }
 
-    @Update(Models.agency.update)
+    @Update(Models.agency)
     save(): Promise<void> { return null; }
-    @Destroy(Models.agency.destroy)
+    @Destroy(Models.agency)
     destroy(): Promise<void> { return null; }
 }
 
@@ -130,9 +130,9 @@ export class AgencyUser implements ModelObject{
     get agency(): Agency { return null; }
 
 
-    @Update(Models.agencyUser.update)
+    @Update(Models.agencyUser)
     save(): Promise<void> { return null; }
-    @Destroy(Models.agencyUser.destroy)
+    @Destroy(Models.agencyUser)
     destroy(): Promise<void> { return null; }
     
 }

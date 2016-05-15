@@ -17,7 +17,7 @@ let API = require("common/api");
 
 import {validateApi} from "common/api/helper";
 import {ECompanyStatus, Company, MoneyChange} from 'api/_types/company';
-import { ServiceInterface } from 'api/_types';
+import { ServiceInterface } from 'common/model';
 
 let AGENCY_ROLE = {
     OWNER: 0,

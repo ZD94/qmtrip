@@ -1,5 +1,5 @@
 
-import { CachedService, requireAPI } from 'api/_types';
+import { CachedService, requireAPI } from 'common/model';
 import { Company, MoneyChange } from 'api/_types/company';
 import ApiCompany = require('api/client/company');
 
