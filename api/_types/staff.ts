@@ -4,7 +4,7 @@ import { TripPlan } from 'api/_types/tripPlan';
 import { regApiType } from 'common/api/helper';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Department } from 'api/_types/department';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
+import { ModelObject, Table, Field, Types, ResolveRef, Reference } from 'common/model';
 import { Create } from 'common/model';
 
 export enum EStaffStatus {
@@ -28,12 +28,11 @@ function enumValues(e){
     return Object.keys(e).map((k)=>e[k]).filter((v)=>(typeof v != 'number'));
 }
 
-@Table("staff.")
+@Table(Models.staff, "staff.")
 @regApiType('API.')
-export class Staff implements ModelObject{
-    target: Object;
+export class Staff extends ModelObject{
     constructor(target: Object) {
-        this.target = target;
+        super(target);
     }
     @Create()
     static create(): Staff { return null; }
@@ -95,20 +94,16 @@ export class Staff implements ModelObject{
         return Models.travelPolicy.get(id);
     }
     setTravelPolicy(val: TravelPolicy) {}
-
-    @Update(Models.staff)
-    save(): Promise<Staff> { return null; }
-    @Destroy(Models.staff)
-    destroy(): Promise<void> { return null; }
 }
 
-@Table("Credential", {tableName : "papers", schema : "staff"})
+@Table(Models.credential, "Credential", {tableName : "papers", schema : "staff"})
 @regApiType('API.')
-export class Credential implements ModelObject{
-    target: Object;
+export class Credential extends ModelObject{
     constructor(target: Object) {
-        this.target = target;
+        super(target);
     }
+    @Create()
+    static create(): Credential { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return null; }
@@ -133,20 +128,16 @@ export class Credential implements ModelObject{
     @ResolveRef({type: Types.UUID}, Models.staff)
     get owner(): Staff { return null; }
     set owner(val: Staff) {}
-
-    @Update(Models.credential)
-    save(): Promise<Credential> { return null; }
-    @Destroy(Models.credential)
-    destroy(): Promise<void> { return null; }
 }
 
-@Table("staff.PointChange")
+@Table(Models.pointChange, "staff.PointChange")
 @regApiType('API.')
-export class PointChange implements ModelObject{
-    target: Object;
+export class PointChange extends ModelObject{
     constructor(target: Object) {
-        this.target = target;
+        super(target);
     }
+    @Create()
+    static create(): PointChange { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return null; }
@@ -181,9 +172,5 @@ export class PointChange implements ModelObject{
     get remark(): string {return null}
     set remark(remark: string){}
 
-    @Update(Models.credential)
-    save(): Promise<PointChange> { return null; }
-    @Destroy(Models.credential)
-    destroy(): Promise<void> { return null; }
 }
 

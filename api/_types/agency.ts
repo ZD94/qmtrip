@@ -5,7 +5,8 @@
 import { regApiType } from 'common/api/helper';
 import { Models } from 'api/_types';
 import {Company} from 'api/_types/company';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
+import { ModelObject, Table, Field, Types, ResolveRef, Reference } from 'common/model';
+import { Create } from 'common/model.client';
 
 export enum EAgencyStatus {
     DELETE = -2, //删除状态
@@ -19,13 +20,14 @@ export enum  AGENCY_ROLE {
     ADMIN = 2
 };
 
-@Table('agency.')
+@Table(Models.agency, 'agency.')
 @regApiType('API.')
-export class Agency implements ModelObject{
-    target: Object;
+export class Agency extends ModelObject{
     constructor(target: Object) {
-        this.target = target;
+        super(target);
     }
+    @Create()
+    static create(): Agency { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return null; }
@@ -74,20 +76,16 @@ export class Agency implements ModelObject{
     getUsers(): Promise<AgencyUser[]> {
         return Models.agencyUser.find({agencyId: this.id});
     }
-
-    @Update(Models.agency)
-    save(): Promise<Agency> { return null; }
-    @Destroy(Models.agency)
-    destroy(): Promise<void> { return null; }
 }
 
-@Table('agency.')
+@Table(Models.agencyUser, 'agency.')
 @regApiType('API.')
-export class AgencyUser implements ModelObject{
-    target: Object;
+export class AgencyUser extends ModelObject{
     constructor(target: Object) {
-        this.target = target;
+        super(target);
     }
+    @Create()
+    static create(): AgencyUser { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return null; }
@@ -128,11 +126,5 @@ export class AgencyUser implements ModelObject{
 
     @ResolveRef({type: Types.UUID}, Models.agency)
     get agency(): Agency { return null; }
-
-
-    @Update(Models.agencyUser)
-    save(): Promise<AgencyUser> { return null; }
-    @Destroy(Models.agencyUser)
-    destroy(): Promise<void> { return null; }
     
 }

@@ -1,10 +1,11 @@
 
 import { Models } from 'api/_types';
 import { regApiType } from 'common/api/helper';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
+import { ModelObject, Table, Field, Types, ResolveRef, Reference } from 'common/model';
 import {now} from 'common/utils'
 import {Staff} from 'api/_types/staff';
 import {Company} from 'api/_types/company';
+import { Create } from 'common/model.client';
 
 export enum EPlanStatus {
     DELETE = -2, //删除
@@ -21,13 +22,14 @@ export enum ETripType {
     HOTEL = 2
 }
 
-@Table('tripPlan.')
+@Table(Models.project, 'tripPlan.')
 @regApiType('API.')
-export class Project implements ModelObject{
-    target: Object;
+export class Project extends ModelObject{
     constructor(target: Object) {
-        this.target = target;
+        super(target);
     }
+    @Create()
+    static create(): Project { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return null; }
@@ -45,19 +47,16 @@ export class Project implements ModelObject{
     get code(): string { return ''; }
     set code(val: string) {}
 
-    @Update(Models.company)
-    save(): Promise<Project> { return null; }
-    @Destroy(Models.company)
-    destroy(): Promise<void> { return null; }
 }
 
-@Table('tripPlan.')
+@Table(Models.tripPlan, 'tripPlan.')
 @regApiType('API.')
-export class TripPlan implements ModelObject {
-    target: Object;
+export class TripPlan extends ModelObject {
     constructor(target: Object) {
-        this.target = target;
+        super(target);
     }
+    @Create()
+    static create(): TripPlan { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return null; }
@@ -174,20 +173,16 @@ export class TripPlan implements ModelObject {
     getHotel(id: string): Promise<TripDetail[]> {
         return Models.tripDetail.find({tripPlanId: id||this.id, type: ETripType.HOTEL});
     }
-
-    @Update(Models.company)
-    save(): Promise<TripPlan> { return null; }
-    @Destroy(Models.company)
-    destroy(): Promise<void> { return null; }
 }
 
-@Table('tripPlan.')
+@Table(Models.tripDetail, 'tripPlan.')
 @regApiType('API.')
-export class TripDetail implements ModelObject{
-    target: Object;
+export class TripDetail extends ModelObject{
     constructor(target: Object) {
-        this.target = target;
+        super(target);
     }
+    @Create()
+    static create(): TripDetail { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return null; }
@@ -292,8 +287,4 @@ export class TripDetail implements ModelObject{
     @ResolveRef({type: Types.UUID}, Models.tripPlan)
     get tripPlan(): TripPlan { return null; }
 
-    @Update(Models.company)
-    save(): Promise<TripDetail> { return null; }
-    @Destroy(Models.company)
-    destroy(): Promise<void> { return null; }
 }

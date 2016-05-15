@@ -6,6 +6,7 @@ import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
 import { Agency, AgencyUser } from './agency';
 import {TripPlan, TripDetail, Project} from './tripPlan';
+import { Account } from './auth';
 
 var API = require('common/api');
 
@@ -26,6 +27,8 @@ export interface ModelsInterface {
     tripPlan: ServiceInterface<TripPlan>;
     tripDetail: ServiceInterface<TripDetail>;
     project: ServiceInterface<Project>;
+
+    account: ServiceInterface<Account>;
 }
 
 export var Models: ModelsInterface = {
@@ -45,6 +48,8 @@ export var Models: ModelsInterface = {
     tripPlan: new ServiceDelegate<TripPlan>(),
     tripDetail: new ServiceDelegate<TripDetail>(),
     project: new ServiceDelegate<Project>(),
+
+    account: new ServiceDelegate<Account>(),
 };
 
 export function initModels(models: ModelsInterface){

@@ -3,7 +3,7 @@ import { Models } from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import {Agency} from 'api/_types/agency';
 import { regApiType } from 'common/api/helper';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
+import { ModelObject, Table, Field, Types, ResolveRef, Reference } from 'common/model';
 import {TravelPolicy} from "api/_types/travelPolicy";
 import { Create } from 'common/model.client';
 
@@ -13,12 +13,11 @@ export enum ECompanyStatus {
     ACTIVE = 1 //激活状态
 }
 
-@Table('company.')
+@Table(Models.company, 'company.')
 @regApiType('API.')
-export class Company implements ModelObject{
-    target: Object;
+export class Company extends ModelObject{
     constructor(target: Object) {
-        this.target = target;
+        super(target);
     }
     @Create()
     static create(): Company { return null; }
@@ -99,20 +98,16 @@ export class Company implements ModelObject{
     getMoneyChanges(companyId?:string): Promise<MoneyChange[]> {
         return Models.moneyChange.find({fundsAccountId: companyId});
     }
-
-    @Update(Models.company)
-    save(): Promise<Company> { return null; }
-    @Destroy(Models.company)
-    destroy(): Promise<void> { return null; }
 }
 
-@Table('company.MoneyChange')
+@Table(Models.moneyChange, 'company.MoneyChange')
 @regApiType('API.')
-export class MoneyChange implements ModelObject {
-    target: Object;
+export class MoneyChange extends ModelObject {
     constructor(target: Object) {
-        this.target = target;
+        super(target);
     }
+    @Create()
+    static create(): MoneyChange { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return null; }
@@ -141,9 +136,4 @@ export class MoneyChange implements ModelObject {
     @Field({type: Types.STRING})
     get remark(): string { return ''; }
     set remark(val: string) {}
-
-    @Update(Models.company)
-    save(): Promise<MoneyChange> { return null; }
-    @Destroy(Models.company)
-    destroy(): Promise<void> { return null; }
 }

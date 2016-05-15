@@ -2,15 +2,17 @@ import { regApiType } from 'common/api/helper';
 import { Models } from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import { Company } from 'api/_types/company';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference, Update, Destroy } from 'common/model';
+import { ModelObject, Table, Field, Types, ResolveRef, Reference } from 'common/model';
+import { Create } from 'common/model.client';
 
-@Table("department.Department")
+@Table(Models.department, "department")
 @regApiType('API.')
-export class Department implements ModelObject{
-    target: Object;
+export class Department extends ModelObject{
     constructor(target: Object) {
-        this.target = target;
+        super(target);
     }
+    @Create()
+    static create(): Department { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return null; }
@@ -43,9 +45,4 @@ export class Department implements ModelObject{
 
     @ResolveRef({type: Types.UUID}, Models.company)
     get company(): Company { return null; }
-
-    @Update(Models.department)
-    save(): Promise<Department> { return null; }
-    @Destroy(Models.department)
-    destroy(): Promise<void> { return null; }
 }

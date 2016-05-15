@@ -19,5 +19,6 @@ initModels({
     tripPlan: new TripPlanService(),
     tripDetail: new TripDetailService(),
     moneyChange: new MoneyChangeService(),
-    project:  new ProjectService(),
+    project: new ProjectService(),
+    account: null,
 });
