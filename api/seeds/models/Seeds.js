@@ -9,8 +9,8 @@ module.exports = function (Db, DataType) {
     return Db.define("Seeds", {
         type : {type: DataType.STRING(50),  primaryKey: true},
         minNo: {type: DataType.BIGINT,      field: "min_no", defaultValue: 0},
-        maxNo: {type: DataType.UUID,        field: "max_no", defaultValue: 100000},
-        nowNo: {type: DataType.STRING(100), field: "now_no", defaultValue: 0}
+        maxNo: {type: DataType.BIGINT,      field: "max_no", defaultValue: 100000},
+        nowNo: {type: DataType.BIGINT,      field: "now_no", defaultValue: 0}
     }, {
         tableName : "seeds",
         timestamps: false,
