@@ -52,7 +52,7 @@ var ERROR = {
 qm_order.create_qm_order = function(order) {
     var _qm_order : any = _.pick(order, QM_ORDER_COLS);
     _qm_order.status = STATUS.WAIT_PAY;
-    _qm_order.create_at = now();
+    _qm_order.created_at = now();
     _qm_order.expire_at = moment().add(30, 'minutes').format('YYYY-MM-DD HH:mm:ss'); //订单30分钟内未支付失效
     _qm_order.id = order.id || uuid.v1();
 
@@ -60,7 +60,7 @@ qm_order.create_qm_order = function(order) {
         return Promise.all([
             QmOrderModel.create(_qm_order, {transaction: t}),
             OrderLogsModel.create({order_id: _qm_order.id, user_id: _qm_order.staff_id, type: 0, remark: '创建订单' + _qm_order.order_no,
-                create_at: now()}, {transaction: t})
+                created_at: now()}, {transaction: t})
         ])
     })
         .spread(function(_order) {
@@ -160,9 +160,9 @@ qm_order.delete_qm_order = function(params) {
 
             return sequelize.transaction(function(t) {
                 return Promise.all([
-                    QmOrderModel.update({status: STATUS.DELETE, update_at: now()}, {where: {id: order_id}, transaction: t}),
+                    QmOrderModel.update({status: STATUS.DELETE, updated_at: now()}, {where: {id: order_id}, transaction: t}),
                     OrderLogsModel.create({order_id: order_id, user_id: user_id, type: 0, remark: '删除订单' + order.order_no,
-                        create_at: now()}, {transaction: t})
+                        created_at: now()}, {transaction: t})
                 ])
             })
         })
@@ -205,7 +205,7 @@ qm_order.book_and_pay_ticket = function(params) {
                 end_time: segment.arrival_time,
                 ticket_info: segment,
                 status: STATUS.WAIT_TICKET, //待出票状态
-                update_at: utils.now(),
+                updated_at: utils.now(),
                 pay_time: utils.now() //支付时间
             };
 

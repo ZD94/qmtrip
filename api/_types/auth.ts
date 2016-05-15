@@ -47,11 +47,6 @@ class Account{
     get status() { return null; }
     set status(status){}
 
- //状态
-    @Field({type:Types.DATE})
-    get createAt() { return null; }
-    set createAt(createAt){}
-
  //创建时间
     @Field({type: Types.DATE})
     get forbiddenExpireAt() { return null; }

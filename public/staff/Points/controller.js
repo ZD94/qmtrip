@@ -32,7 +32,7 @@ var point=(function(){
                                     var orderId = c.orderId;
                                     API.tripPlan.getTripPlanById({id: orderId})
                                         .then(function(order){
-                                            c.orderCreateAt = moment(order.createAt).format('YYYY-MM-DD');
+                                            c.orderCreateAt = moment(order.createdAt).format('YYYY-MM-DD');
                                         })
                                     
                                 })
@@ -62,7 +62,7 @@ var point=(function(){
                                     var orderId = c.orderId;
                                     API.tripPlan.getTripPlanById({id: orderId})
                                         .then(function(order){
-                                            c.orderCreateAt = moment(order.createAt).format('YYYY-MM-DD');
+                                            c.orderCreateAt = moment(order.createdAt).format('YYYY-MM-DD');
                                         })
                                 })
                                 $scope.incomerecord = record.items;
@@ -86,7 +86,7 @@ var point=(function(){
                                     var orderId = c.orderId;
                                     API.tripPlan.getTripPlanById({id: orderId})
                                         .then(function(order){
-                                            c.orderCreateAt = moment(order.createAt).format('YYYY-MM-DD');
+                                            c.orderCreateAt = moment(order.createdAt).format('YYYY-MM-DD');
                                         })
                                     
                                 })

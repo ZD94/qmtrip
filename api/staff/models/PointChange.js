@@ -15,7 +15,7 @@ module.exports = function (Db, DataType) {
         points  : {type: DataType.INTEGER }, //积分数量
         currentPoint  : {type: DataType.INTEGER, field: "current_point" }, //积分数量
         remark  : {type: DataType.TEXT }, //备注
-        createAt: {type: "timestamp",       defaultValue: now, field: "create_at"} //创建时间
+        createdAt: {type: "timestamp",       defaultValue: now, field: "created_at"} //创建时间
     }, {
         tableName : "point_changes",
         timestamps: false,

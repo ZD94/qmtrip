@@ -12,7 +12,7 @@ module.exports = function (Db, DataType) {
         status        : {type: DataType.INTEGER },
         money         : {type: DataType.NUMERIC(15, 2) },
         channel       : {type: DataType.STRING },
-        createAt      : {type: "timestamp without time zone", field: "create_at", defaultValue: now},
+        createdAt      : {type: "timestamp without time zone", field: "created_at", defaultValue: now},
         userId        : {type: DataType.UUID,           field: "user_id"},
         remark        : {type: DataType.STRING }
     }, {

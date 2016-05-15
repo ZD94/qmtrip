@@ -12,7 +12,7 @@ module.exports = function(Db, DataType) {
         user_id: {type: DataType.UUID,                   field: "user_id"},
         type: {type: DataType.INTEGER,                  field: "type",      defaultValue: 0},
         remark: {type: DataType.STRING(1000),           field: "remark"},
-        create_at: {type: "timestamp without time zone", field: "create_at"}
+        created_at: {type: "timestamp without time zone", field: "created_at"}
     }, {
         tableName : "order_logs",
         timestamps: false,

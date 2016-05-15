@@ -62,7 +62,7 @@ export function getDepartmentStructure(params: {companyId: string}){
     var noParentDep = [];
     var childOrderId = [];
     var finalResult = [];
-    return departmentModel.findAll({where: {companyId: params.companyId}, order: [["create_at", "desc"]]})
+    return departmentModel.findAll({where: {companyId: params.companyId}, order: [["created_at", "desc"]]})
         .then(function(result){
             //封装allDepartmentMap组装元素结构
             for(var d=0;d< result.length;d++){
@@ -244,7 +244,7 @@ validateApi(getAllDepartment, ["companyId"]);
 export function getAllDepartment(params: {companyId: string}){
     var options: any = {};
     options.where = params;
-    options.order = [["create_at", "desc"]];
+    options.order = [["created_at", "desc"]];
     return departmentModel.findAll(options);
 }
 
@@ -259,7 +259,7 @@ export function getFirstClassDepartments(params){
     var options: any = {};
     params.parentId = null;
     options.where = params;
-    options.order = [["create_at", "desc"]];
+    options.order = [["created_at", "desc"]];
     return departmentModel.findAll(options);
 }
 
@@ -272,7 +272,7 @@ validateApi(getChildDepartments, ["parentId"]);
 export function getChildDepartments(params: {parentId: string}){
     var options: any = {};
     options.where = params;
-    options.order = [["create_at", "desc"]];
+    options.order = [["created_at", "desc"]];
     return departmentModel.findAll(options);
 }
 

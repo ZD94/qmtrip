@@ -14,7 +14,7 @@ module.exports = function(Db, DataType) {
         avatar:     { type: DataType.TEXT       }, //代理商头像
         agencyId:  { type: DataType.UUID,      field: "agency_id" }, //公司ID
         roleId:     { type: DataType.INTEGER,   field: "role_id" }, //权限ID
-        createAt:   { type: DataType.NOW,       field: "create_at", defaultValue: now } //创建时间
+        createdAt:   { type: DataType.NOW,       field: "created_at", defaultValue: now } //创建时间
     },{
         tableName: "agency_user",
         timestamps: false,

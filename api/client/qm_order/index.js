@@ -87,10 +87,10 @@ qm_order.create_qm_order = (params) => {
  * refund_money: 退款金额 <br>
  * refund_reason: 退款原因 <br>
  * remark: 备注 <br>
- * create_at: 创建时间 <br>
+ * created_at: 创建时间 <br>
  * expire_at: 失效时间 <br>
  * pay_time: 支付时间 <br>
- * update_at: 更新时间 <br>
+ * updated_at: 更新时间 <br>
  * status: 订单状态 <br>
  * }
  */

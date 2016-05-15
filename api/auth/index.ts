@@ -911,7 +911,7 @@ class ApiAuth {
         if(params.accountId == undefined) {
             throw {code: -1, msg: 'accountId不能为空'};
         }
-        params.createAt = utils.now();
+        params.createdAt = utils.now();
 
         return AccountOpenid.findById(params.openId)
             .then(function(ap) {

@@ -789,7 +789,7 @@ module.exports = (function(){
 			$loading.start();
 			API.onload(function(){
 				var params = {};
-				var options = {order: [["create_at", "asc"]]};
+				var options = {order: [["created_at", "asc"]]};
 				options.perPage = 100;
 				params.options = options;
 				params.companyId = $scope.companyId;

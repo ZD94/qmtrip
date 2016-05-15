@@ -19,7 +19,7 @@
                     <span ng-if="InvoiceDetail.status==0">【待审核】</span>
                     <span ng-if="InvoiceDetail.status==1">【审核通过】</span>
                 </p>
-                <span>{{InvoiceDetail.invoice[InvoiceDetail.invoice.length-1].create_at}}上传</span>
+                <span>{{InvoiceDetail.invoice[InvoiceDetail.invoice.length-1].created_at}}上传</span>
                 <input type="button" value="返回" class="common_btn2" ng-click="goDetail()">
             </div>
             <div class="mainbox_bottom">

@@ -954,7 +954,7 @@ var businessTravel=(function(){
                 order.consumeDetails = consumeDetails;
                 API.tripPlan.saveTripPlan(order)
                     .then(function(result){
-                        $scope.createTime = result.createAt;
+                        $scope.createTime = result.createdAt;
                         $scope.orderId = result.id;
                         $(".bottom1").hide();
                         $(".bottom2").show();

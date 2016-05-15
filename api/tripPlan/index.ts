@@ -262,7 +262,7 @@ export function updateConsumeDetail(params){
             }
 
             trip_plan_id = record.tripPlanId;
-            updates.updateAt = utils.now();
+            updates.updatedAt = utils.now();
 
             return TripDetailsModel.update(updates, {returning: true, where: {id: params.consumeId}, fields: Object.keys(updates)});
         })
@@ -283,7 +283,7 @@ export function updateConsumeDetail(params){
                 orderStatus = t.orderStatus;
             });
 
-            return TripPlanModel.update({orderStatus: orderStatus, updateAt: utils.now()}, {returning: true, where: {id: trip_plan_id}})
+            return TripPlanModel.update({orderStatus: orderStatus, updatedAt: utils.now()}, {returning: true, where: {id: trip_plan_id}})
         })
         .then(function() {
             return true;
@@ -328,7 +328,7 @@ export function updateConsumeBudget(params){
             let updates: any = {
                 orderStatus: 'WAIT_UPLOAD',
                 budget: budget,
-                updateAt: utils.now()
+                updatedAt: utils.now()
             }
 
             if(params.invoiceType) {
@@ -355,7 +355,7 @@ export function updateConsumeBudget(params){
                 c_budget += parseFloat(budget);
             }
 
-            return TripPlanModel.update({status: STATUS.NO_COMMIT, budget: c_budget, updateAt: utils.now()}, {where: {id: tripPlanId}, fields: ['status', 'budget', 'updateAt']})
+            return TripPlanModel.update({status: STATUS.NO_COMMIT, budget: c_budget, updatedAt: utils.now()}, {where: {id: tripPlanId}, fields: ['status', 'budget', 'updatedAt']})
         })
         .then(function(){
             return true;
@@ -441,7 +441,7 @@ export function saveConsumeRecord(params){
                 order.status = STATUS.NO_COMMIT;
             }
 
-            order.updateAt = utils.now();
+            order.updatedAt = utils.now();
             return [record, order];
         })
         .spread(function(record, order){
@@ -489,8 +489,8 @@ export function deleteTripPlan(params){
 
             return sequelize.transaction(function(t){
                 return Promise.all([
-                    TripPlanModel.update({status: STATUS.DELETE, updateAt: utils.now()}, {where: {id: tripPlanId}, fields: ['status', 'updateAt'], transaction: t}),
-                    TripDetailsModel.update({status: STATUS.DELETE, updateAt: utils.now()}, {where: {tripPlanId: tripPlanId}, fields: ['status', 'updateAt'], transaction: t})
+                    TripPlanModel.update({status: STATUS.DELETE, updatedAt: utils.now()}, {where: {id: tripPlanId}, fields: ['status', 'updatedAt'], transaction: t}),
+                    TripDetailsModel.update({status: STATUS.DELETE, updatedAt: utils.now()}, {where: {tripPlanId: tripPlanId}, fields: ['status', 'updatedAt'], transaction: t})
                 ])
             })
         })
@@ -519,7 +519,7 @@ export function deleteConsumeDetail(params){
                 throw L.ERR.PERMISSION_DENY;
             }
 
-            return TripDetailsModel.update({status: STATUS.DELETE, updateAt: utils.now()}, {where: {id: id}, fields: ['status', 'updateAt']})
+            return TripDetailsModel.update({status: STATUS.DELETE, updatedAt: utils.now()}, {where: {id: id}, fields: ['status', 'updatedAt']})
         })
         .then(function(){
             return true;
@@ -571,7 +571,7 @@ export function uploadInvoice(params){
             let updates = {
                 newInvoice: params.picture,
                 invoice: JSON.stringify(invoiceJson),
-                updateAt: moment().format("YYYY-MM-DD HH:mm:ss"),
+                updatedAt: moment().format("YYYY-MM-DD HH:mm:ss"),
                 status: STATUS.NO_COMMIT,
                 auditRemark: params.auditRemark || ''
             };
@@ -595,7 +595,7 @@ export function uploadInvoice(params){
                     TripDetailsModel.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
                     TripPlanLogsModel.create(logs,{transaction: t}),
                     TripPlanLogsModel.create(orderLogs, {transaction: t}),
-                    TripPlanModel.update({orderStatus: order_status, updateAt: utils.now()}, {where: {id: tripPlanId}})
+                    TripPlanModel.update({orderStatus: order_status, updatedAt: utils.now()}, {where: {id: tripPlanId}})
                 ]);
             })
         })
@@ -709,7 +709,7 @@ export function approveInvoice(params){
 
             let updates: any = {
                 invoice: JSON.stringify(invoiceJson),
-                updateAt: utils.now(),
+                updatedAt: utils.now(),
                 status: params.status,
                 auditUser: params.userId,
                 expenditure: params.expenditure
@@ -733,8 +733,8 @@ export function approveInvoice(params){
                         let status = params.status;
 
                         if(status == STATUS.NO_BUDGET){
-                            return TripPlanModel.update({status: STATUS.NO_COMMIT, auditStatus: -1, updateAt: utils.now()},
-                                {where: {id: order.id}, fields: ['auditStatus', 'status', 'updateAt'], transaction: t});
+                            return TripPlanModel.update({status: STATUS.NO_COMMIT, auditStatus: -1, updatedAt: utils.now()},
+                                {where: {id: order.id}, fields: ['auditStatus', 'status', 'updatedAt'], transaction: t});
                         }
 
                         if(!params.expenditure)
@@ -744,7 +744,7 @@ export function approveInvoice(params){
                         let expenditure = (parseFloat(params.expenditure) + parseFloat(ex_expenditure)).toFixed(2);
                         let order_updates: any = {
                             expenditure: expenditure,
-                            updateAt: utils.now()
+                            updatedAt: utils.now()
                         }
 
                         return TripDetailsModel.findAll({where: {tripPlanId: order.id, status: {$ne: -2}}})
@@ -984,8 +984,8 @@ export function commitTripPlanOrder(params){
         })
         .then(function(){
             return Promise.all([
-                TripPlanModel.update({status: STATUS.COMMIT, auditStatus: 0, updateAt: utils.now(), isCommit: true, commitTime: utils.now()}, {where: {id: id}, fields: ['status', 'auditStatus', 'updateAt', 'isCommit']}),
-                TripDetailsModel.update({isCommit: true, commitTime: utils.now(), updateAt: utils.now()}, {where: {tripPlanId: id}})
+                TripPlanModel.update({status: STATUS.COMMIT, auditStatus: 0, updatedAt: utils.now(), isCommit: true, commitTime: utils.now()}, {where: {id: id}, fields: ['status', 'auditStatus', 'updatedAt', 'isCommit']}),
+                TripDetailsModel.update({isCommit: true, commitTime: utils.now(), updatedAt: utils.now()}, {where: {tripPlanId: id}})
             ])
         })
         .then(function(){

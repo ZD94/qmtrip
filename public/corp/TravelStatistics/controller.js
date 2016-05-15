@@ -115,8 +115,8 @@ var TravelStatistics = (function(){
                         var x = budget[2];
                         console.info(budget)
                         var current = moment().startOf('month');
-                        var createAt = moment(company.createAt).startOf('month');
-                        for(var cur = current;!cur.isBefore(createAt);cur.subtract(1, 'month')){
+                        var createdAt = moment(company.createdAt).startOf('month');
+                        for(var cur = current;!cur.isBefore(createdAt);cur.subtract(1, 'month')){
                             var _item = {cur_cn: cur.format('YYYY年MM月'), cur_en: cur.format('YYYY-MM')}
                             date_array.push(_item);
                         }

@@ -10,7 +10,7 @@ module.exports = function(Db, DataType) {
         id: { type: DataType.UUID, primaryKey: true, defaultValue: uuid.v1 },
         accountId: { type: DataType.UUID, field: "account_id"  },
         token: { type: DataType.STRING(50)   },
-        createAt: { type: "timestamp", field: "create_at", defaultValue: utils.now },
+        createdAt: { type: "timestamp", field: "created_at", defaultValue: utils.now },
         refreshAt: { type: "timestamp", field: "refresh_at", defaultValue: utils.now },
         expireAt: { field: "expire_at", type: "timestamp"  }
     }, {

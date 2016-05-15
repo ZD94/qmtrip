@@ -46,17 +46,17 @@ module.exports = function(Db, DataType) {
         refund_money: { type: DataType.NUMERIC(15, 2),     field: "refund_money"},
         refund_reason: { type: DataType.STRING,      field: "refund_reason"},
         remark: { type: DataType.STRING,     field: "remark"},
-        create_at: {
+        created_at: {
             type: "timestamp without time zone",
-            field: "create_at",
+            field: "created_at",
             get: function() {
-                var _create_at = this.getDataValue('create_at');
+                var _create_at = this.getDataValue('created_at');
                 return moment(_create_at).format('YYYY-MM-DD HH:mm:ss');
             }
         },
         expire_at: { type: "timestamp without time zone",    field: "expire_at"},
         pay_time: { type: "timestamp without time zone",     field: "pay_time"},
-        update_at: {type: "timestamp without time zone",     field: "update_at"},
+        updated_at: {type: "timestamp without time zone",     field: "updated_at"},
         status: {
             type: DataType.INTEGER,
             field: 'status',

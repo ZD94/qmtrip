@@ -105,7 +105,7 @@ validateApi(createCompany, ['createUser', 'name', 'domainName', 'mobile', 'email
 export function createCompany(params){
     let _company = params;
     _company.id = _company.id || uuid.v1();
-    let funds = { id: _company.id, createAt: utils.now()};
+    let funds = { id: _company.id, createdAt: utils.now()};
 
     return sequelize.transaction(function(t){
         return Promise.all([
@@ -158,7 +158,7 @@ export async function updateCompany(params){
     }
 
     delete params.companyId;
-    params['updateAt'] = utils.now();
+    params['updatedAt'] = utils.now();
 
     let [rownum, rows] = await Models.Company.update(params, {returning: true, where: {id: companyId}, fields: Object.keys(params)});
     if(!rownum || rownum == "NaN"){
@@ -196,7 +196,7 @@ export function listCompany(params){
     var agencyId = query.agencyId;
     var options : any = {
         where: {agencyId: agencyId, status: {$ne: -2}},
-        order: [['create_at', 'desc']]
+        order: [['created_at', 'desc']]
     };
 
     if(query.columns){
@@ -214,7 +214,7 @@ export function listCompany(params){
  */
 export async function pageCompany(options){
     options.where.status = {$ne: -2};
-    options.order = [['create_at', 'desc']];
+    options.order = [['created_at', 'desc']];
     let ret = await Models.Company.findAndCount(options);
     var items = ret.rows.map(function(c) {
         return c.id;
@@ -269,8 +269,8 @@ export function deleteCompany(params){
         .then(function(){
             return sequelize.transaction(function(t){
                 return Promise.all([
-                    Models.Company.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt'], transaction: t}),
-                    Models.FundsAccounts.update({status: -2, updateAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updateAt'], transaction: t})
+                    Models.Company.update({status: -2, updatedAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updatedAt'], transaction: t}),
+                    Models.FundsAccounts.update({status: -2, updatedAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updatedAt'], transaction: t})
                 ])
             })
         })
@@ -289,7 +289,7 @@ export function getCompanyFundsAccount(params){
     var companyId = params.companyId;
 
     return Models.FundsAccounts.findById(companyId, {
-        attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createAt', 'updateAt']
+        attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createdAt', 'updatedAt']
     })
         .then(function(funds){
             if(!funds || funds.status == -2){
@@ -320,7 +320,7 @@ export function changeMoney(params){
             var userId = params.userId;
             var type = params.type;
             var fundsUpdates : any = {
-                updateAt: utils.now()
+                updatedAt: utils.now()
             };
 
             var moneyChange = {

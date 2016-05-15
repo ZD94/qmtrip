@@ -115,7 +115,7 @@ mailingAddress.listAndPaginateMailingAddress = function(params){
     limit = perPage;
     offset = (page - 1) * perPage;
     if (!options.order) {
-        options.order = [["create_at", "desc"]]
+        options.order = [["created_at", "desc"]]
     }
     queryOptions.limit = limit;
     queryOptions.offset = offset;

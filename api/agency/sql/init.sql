@@ -35,8 +35,8 @@ CREATE TABLE agency (
     telephone character varying(15),
     mobile character varying(11),
     company_num integer default 0,
-    create_at timestamp without time zone default now(),
-    update_at timestamp without time zone,
+    created_at timestamp without time zone default now(),
+    updated_at timestamp without time zone,
     remark character varying
 );
 
@@ -138,7 +138,7 @@ create table agency.agency_user (
     avatar text,
     agency_id uuid,
     role_id integer DEFAULT 1, -- 权限
-    create_at timestamp without time zone DEFAULT now() -- 创建时间
+    created_at timestamp without time zone DEFAULT now() -- 创建时间
 );
 
 

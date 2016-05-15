@@ -11,7 +11,7 @@ module.exports = function(Db, DataType) {
     }, {
         tableName: "owners",
         schema: "attachment",
-        updatedAt: "updateAt",
-        createdAt: "createAt"
+        updatedAt: "updatedAt",
+        createdAt: "createdAt"
     })
 }

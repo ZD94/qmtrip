@@ -501,7 +501,7 @@ export function listAndPaginatePointChange(params){
     limit = perPage;
     offset = (page - 1) * perPage;
     if (!options.order) {
-        options.order = [["create_at", "desc"]]
+        options.order = [["created_at", "desc"]]
     }
     options.limit = limit;
     options.offset = offset;
@@ -538,10 +538,10 @@ export function  getStaffPointsChangeByMonth (params) {
     return Q.all(dateArr.map(function(month){
         var start_time = moment(month + '-01').format('YYYY-MM-DD HH:mm:ss');
         var end_time = moment(month + '-01').endOf('month').format("YYYY-MM-DD")+" 23:59:59";
-        q1.createAt = {$gte: start_time, $lte: end_time};
-        q2.createAt = {$gte: start_time, $lte: end_time};
-        q3.createAt = {$lte: end_time};
-        q4.createAt = {$lte: end_time};
+        q1.createdAt = {$gte: start_time, $lte: end_time};
+        q2.createdAt = {$gte: start_time, $lte: end_time};
+        q3.createdAt = {$lte: end_time};
+        q4.createdAt = {$lte: end_time};
         return Q.all([
             Models.PointChange.sum('points', {where: q1}),
             Models.PointChange.sum('points', {where: q2}),
@@ -581,14 +581,14 @@ export function getStaffPointsChange(params){
     var options: any = {};
     var changeDate = [];
     var changePoint = [];
-    options.where = {staffId: staffId, createAt: {$gte: startTime, $lte: endTime}};
+    options.where = {staffId: staffId, createdAt: {$gte: startTime, $lte: endTime}};
     return Models.PointChange.findAll(options)
         .then(function(result){
             if(result && result.length > 0){
                 for(var i=0;i<result.length;i++){
                     result[i] = result[i].toJSON();
                     changePoint.push(result[i].currentPoint);
-                    changeDate.push(moment(result[i].createAt).format("YYYY-MM-DD HH:mm:ss"));
+                    changeDate.push(moment(result[i].createdAt).format("YYYY-MM-DD HH:mm:ss"));
                     changeNum = changeNum + (result[i].points * result[i].status)
                 }
             }
@@ -904,7 +904,7 @@ export function statisticStaffs(params){
     var end = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
     return Q.all([
         Models.Staff.count({where: {companyId: companyId, status: {$gte: 0}}}),
-        Models.Staff.count({where: {companyId: companyId, createAt: {$gte: start, $lte: end}}}),
+        Models.Staff.count({where: {companyId: companyId, createdAt: {$gte: start, $lte: end}}}),
         Models.Staff.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: {$lt: 0} }})
     ])
         .spread(function(all, inNum, outNum){
@@ -913,7 +913,7 @@ export function statisticStaffs(params){
                 inNum: inNum || 0,
                 outNum: outNum || 0
             }
-            return API.company.updateCompany({companyId: companyId, staffNum: all, updateAt: utils.now()})
+            return API.company.updateCompany({companyId: companyId, staffNum: all, updatedAt: utils.now()})
                 .then(function(){
                     return sta;
                 })

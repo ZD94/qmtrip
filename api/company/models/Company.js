@@ -21,9 +21,9 @@ module.exports = function (Db, DataType) {
         mobile     : {type: DataType.STRING(11) }, //联系手机
         staffNum   : {type: DataType.INTEGER,       field: "staff_num"},
         staffScore : {type: DataType.INTEGER,       field: "staff_score"},
-        createAt   : {type: "timestamp without time zone", field: "create_at", defaultValue: now}, //创建时间
+        createdAt   : {type: "timestamp without time zone", field: "created_at", defaultValue: now}, //创建时间
         remark     : {type: DataType.STRING }, //备注
-        updateAt   : {type: "timestamp without time zone", field: "update_at"}
+        updatedAt   : {type: "timestamp without time zone", field: "updated_at"}
     }, {
         tableName : "company",
         timestamps: false,

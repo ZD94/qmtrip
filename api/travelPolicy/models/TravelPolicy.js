@@ -16,7 +16,7 @@ module.exports = function (Db, DataType) {
         hotelPrice   : {type: DataType.FLOAT,       field: "hotel_price"}, //酒店价格
         companyId    : {type: DataType.UUID,        field: "company_id"}, //公司ID
         isChangeLevel: {type: DataType.BOOLEAN,     field: "is_change_level", defaultValue: false}, //公司ID
-        createAt     : {type: "timestamp",          field: "create_at", defaultValue: now} //创建时间
+        createdAt     : {type: "timestamp",          field: "created_at", defaultValue: now} //创建时间
     }, {
         tableName : "travel_policy",
         timestamps: false,

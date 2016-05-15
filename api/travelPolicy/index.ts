@@ -139,7 +139,7 @@ export function getTravelPolicy(params): Promise<TravelPolicy>{
  */
 export function getAllTravelPolicy(params){
     let options: any = {
-        where: _.pick(params, ['name', 'planeLevel', 'planeDiscount', 'trainLevel', 'hotelLevel', 'hotelPrice', 'companyId', 'isChangeLevel', 'createAt'])
+        where: _.pick(params, ['name', 'planeLevel', 'planeDiscount', 'trainLevel', 'hotelLevel', 'hotelPrice', 'companyId', 'isChangeLevel', 'createdAt'])
     };
     if(params.columns){
         options.attributes = params.columns;
@@ -196,7 +196,7 @@ export function listAndPaginateTravelPolicy(params){
     limit = perPage;
     offset = (page - 1) * perPage;
     if (!options.order) {
-        options.order = [["create_at", "desc"]]
+        options.order = [["created_at", "desc"]]
     }
     options.limit = limit;
     options.offset = offset;

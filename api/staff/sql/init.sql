@@ -14,7 +14,7 @@ create table staff.staffs (
     email character varying(50), -- 邮箱
     sex integer DEFAULT 1, -- 性别
     department character varying(50), -- 部门
-    create_at timestamp without time zone DEFAULT now(), -- 创建时间
+    created_at timestamp without time zone DEFAULT now(), -- 创建时间
     quit_time timestamp without time zone,
     operator_id uuid
 );
@@ -32,7 +32,7 @@ COMMENT ON COLUMN staff.staffs.mobile IS '手机';
 COMMENT ON COLUMN staff.staffs.email IS '邮箱';
 COMMENT ON COLUMN staff.staffs.sex IS '性别';
 COMMENT ON COLUMN staff.staffs.department IS '部门';
-COMMENT ON COLUMN staff.staffs.create_at IS '创建时间';
+COMMENT ON COLUMN staff.staffs.created_at IS '创建时间';
 COMMENT ON COLUMN staff.staffs.operator_id IS '操作人id';
 
 create table staff.point_changes (
@@ -43,7 +43,7 @@ create table staff.point_changes (
     status integer default 1,
     points integer not null,
     current_point integer,
-    create_at timestamp default now(),
+    created_at timestamp default now(),
     remark text
 );
 
@@ -58,6 +58,6 @@ CREATE TABLE staff.papers(
       birthday timestamp without time zone, -- 生日
       valid_data timestamp without time zone, -- 有效期
       owner_id uuid, -- 用户id
-      create_at timestamp without time zone DEFAULT now(), -- 创建时间
-      update_at timestamp without time zone DEFAULT now() -- 更新时间
+      created_at timestamp without time zone DEFAULT now(), -- 创建时间
+      updated_at timestamp without time zone DEFAULT now() -- 更新时间
 )

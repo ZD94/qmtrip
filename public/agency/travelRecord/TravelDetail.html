@@ -7,7 +7,7 @@
             <div class="title_top">
                 <table width="100%">
                     <tr>
-                        <td width="220" height="40" align="left">生成时间：{{planDetail.createAt | date: 'yyyy-MM-dd HH:mm'}}</td>
+                        <td width="220" height="40" align="left">生成时间：{{planDetail.createdAt | date: 'yyyy-MM-dd HH:mm'}}</td>
                         <td height="40" align="center">{{travelerName}}于
                             <span ng-if="planDetail.startAt">{{planDetail.startAt | date: 'yyyy月MM月dd日'}}</span>
                             <span ng-if="!planDetail.startAt">{{planDetail.hotel[0].startTime | date: 'yyyy月MM月dd日'}}</span>
@@ -171,7 +171,7 @@
                     <tr style="border-bottom: 1px #E5E5E5 solid">
                         <td>
                             <div ng-repeat="item in outTraffic.invoice">
-                                <p>{{item.create_at}}　第{{item.times}}次上传</p>
+                                <p>{{item.created_at}}　第{{item.times}}次上传</p>
                                 <p ng-if="item.status!=0">{{item.approve_at}}　<span ng-if="item.status=='-1'">审核未通过　　理由：{{item.remark}}　　操作人：{{outTraffic.auditName.name}}</span><span ng-if="item.status==1">审核通过</span></p>
                             </div>
                         </td>
@@ -200,7 +200,7 @@
                     <tr style="border-bottom: 1px #E5E5E5 solid">
                         <td>
                             <div ng-repeat="item in hotel.invoice">
-                                <p>{{item.create_at}}　第{{item.times}}次上传</p>
+                                <p>{{item.created_at}}　第{{item.times}}次上传</p>
                                 <p ng-if="item.status!=0">{{item.approve_at}}　<span ng-if="item.status=='-1'">审核未通过　　理由：{{item.remark}}　　操作人：{{hotel.auditName.name}}</span><span ng-if="item.status==1">审核通过</span></p>
                             </div>
                         </td>
@@ -229,7 +229,7 @@
                     <tr style="border-bottom: 1px #E5E5E5 solid">
                         <td>
                             <div ng-repeat="item in backTraffic.invoice">
-                                <p>{{item.create_at}}　第{{item.times}}次上传</p>
+                                <p>{{item.created_at}}　第{{item.times}}次上传</p>
                                 <p ng-if="item.status!=0">{{item.approve_at}}　<span ng-if="item.status=='-1'">审核未通过　　理由：{{item.remark}}　　操作人：{{backTraffic.auditName.name}}</span><span ng-if="item.status==1">审核通过</span></p>
                             </div>
                         </td>

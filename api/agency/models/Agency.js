@@ -17,9 +17,9 @@ module.exports = function(Db, DataType) {
         telephone  : {type: DataType.STRING(15) }, //联系电话
         mobile     : {type: DataType.STRING(11) }, //联系手机
         companyNum : {type: "timestamp without time zone", field: "company_num", defaultValue: 0}, //企业数量
-        createAt   : {type: "timestamp without time zone", field: "create_at", defaultValue: now}, //创建时间
+        createdAt   : {type: "timestamp without time zone", field: "created_at", defaultValue: now}, //创建时间
         remark     : {type: DataType.STRING }, //备注
-        updateAt   : {type: "timestamp without time zone", field: "update_at"}
+        updatedAt   : {type: "timestamp without time zone", field: "updated_at"}
     }, {
         tableName: "agency",
         timestamps: false,

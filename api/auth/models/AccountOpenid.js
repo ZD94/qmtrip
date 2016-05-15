@@ -9,8 +9,8 @@ module.exports = function (Db, DataType) {
     return Db.define("AccountOpenid", {
         openId              : {type: DataType.STRING,   field: 'open_id',  primaryKey: true},
         accountId            : {type: DataType.UUID, field: 'account_id'},
-        createAt             : {type: 'timestamp without time zone',    field: "create_at",        defaultValue: now},
-        updateAt     : {type: 'timestamp without time zone',        field: "update_at"}
+        createdAt             : {type: 'timestamp without time zone',    field: "created_at",        defaultValue: now},
+        updatedAt     : {type: 'timestamp without time zone',        field: "updated_at"}
     }, {
         tableName : "account_openid",
         timestamps: false,

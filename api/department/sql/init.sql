@@ -6,7 +6,7 @@ create table department.department (
     is_default boolean default false,
 	parent_id uuid,
 	company_id uuid,
-    create_at timestamp without time zone DEFAULT now()
+    created_at timestamp without time zone DEFAULT now()
 );
 
 COMMENT ON TABLE department.department

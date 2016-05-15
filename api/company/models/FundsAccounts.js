@@ -14,9 +14,9 @@ module.exports = function (Db, DataType) {
         consume    : {type: DataType.NUMERIC(15, 2),                field: "consume",   defaultValue: 0},
         frozen     : {type: DataType.NUMERIC(15, 2),                field: "frozen",   defaultValue: 0},
         staffReward: {type: DataType.NUMERIC(15, 2),                field: "staff_reward", defaultValue: 0},
-        createAt   : {type: "timestamp without time zone",          field: "create_at", defaultValue: now},
+        createdAt  : {type: "timestamp without time zone",          field: "created_at", defaultValue: now},
         isSetPwd   : {type: DataType.BOOLEAN,                       field: "is_set_pwd", defaultValue: false},
-        updateAt   : {type: "timestamp without time zone",          field: "update_at"},
+        updatedAt  : {type: "timestamp without time zone",          field: "updated_at"},
         balance    : {
             type: DataType.VIRTUAL,
             get: function () {

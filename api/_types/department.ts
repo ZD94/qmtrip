@@ -44,10 +44,6 @@ export class Department implements ModelObject{
     @ResolveRef({type: Types.UUID}, Models.company)
     get company(): Company { return null; }
 
-    @Field({type: Types.DATE})
-    get createAt(): Date {return null}
-    set createAt(createAt: Date){}
-
     @Update(Models.department)
     save(): Promise<Department> { return null; }
     @Destroy(Models.department)

@@ -56,10 +56,10 @@ CREATE TABLE qm_order.qm_order (
     refund_money NUMERIC(15, 2),
     refund_reason VARCHAR,
     remark VARCHAR,
-    create_at timestamp without time zone,
+    created_at timestamp without time zone,
     expire_at timestamp without time zone,
     pay_time timestamp without time zone,
-    update_at timestamp without time zone
+    updated_at timestamp without time zone
 );
 
 COMMENT ON COLUMN qm_order.trip_plan_id IS '出差计划id';
@@ -91,5 +91,5 @@ CREATE TABLE qm_order.order_logs (
     user_id uuid NOT NULL, --操作人id
     type INTEGER, --操作类型 0:订单状态改变 1:其他
     remark VARCHAR, --操作备注
-    create_at timestamp without time zone --创建时间
+    created_at timestamp without time zone --创建时间
 );

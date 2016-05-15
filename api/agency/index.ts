@@ -137,7 +137,7 @@ export async function updateAgency(_agency){
         throw L.ERR.PERMISSION_DENY;
     }
 
-    _agency.updateAt = utils.now();
+    _agency.updatedAt = utils.now();
     let [rows, agencies] = await AgencyModel.update(_agency, {returning: true, where: {id: agencyId}, fields: Object.keys(_agency)});
 
     if(!rows || rows == "NaN"){
@@ -155,7 +155,7 @@ export async function updateAgency(_agency){
 validateApi(getAgency, ['agencyId']);
 export async function getAgency(params){
     let agencyId = params.agencyId;
-    let agency = await AgencyModel.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updateAt']});
+    let agency = await AgencyModel.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createdAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updatedAt']});
 
     if(!agency || agency.status == EAgencyStatus.DELETE){
         throw L.ERR.AGENCY_NOT_EXIST;
@@ -189,8 +189,8 @@ export async function deleteAgency(params){
         throw L.ERR.AGENCY_NOT_EXIST;
     }
 
-    await AgencyModel.update({status: EAgencyStatus.DELETE, updateAt: utils.now()}, {where: {id: agencyId}, fields: ['status', 'updateAt']});
-    await AgencyUserModel.update({status: EAgencyStatus.DELETE, updateAt: utils.now()}, {where: {agencyId: agencyId}, fields: ['status', 'updateAt']});
+    await AgencyModel.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {where: {id: agencyId}, fields: ['status', 'updatedAt']});
+    await AgencyUserModel.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {where: {agencyId: agencyId}, fields: ['status', 'updatedAt']});
 
     agencyUsers.map(async function(user){
         await API.auth.remove({accountId: user.id, type: 2});
@@ -334,7 +334,7 @@ export function listAndPaginateAgencyUser(params){
     limit = perPage;
     offset = (page - 1) * perPage;
     if (!options.order) {
-        options.order = [["create_at", "desc"]]
+        options.order = [["created_at", "desc"]]
     }
     options.limit = limit;
     options.offset = offset;

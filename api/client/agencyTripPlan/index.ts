@@ -96,7 +96,7 @@ export function pageTripPlans(params){
             if(params.order) {
                 options.order = [params.order];
             }else {
-                options.order = [['commit_time', 'asc'], ['create_at', 'asc']];
+                options.order = [['commit_time', 'asc'], ['created_at', 'asc']];
             }
 
             return API.tripPlan.listTripPlanOrder(options);

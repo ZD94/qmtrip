@@ -19,7 +19,7 @@ module.exports = function (Db, DataType) {
         roleId       : {type: DataType.INTEGER,     field: "role_id"}, //权限ID
         email        : {type: DataType.STRING(50) }, //邮箱
         mobile       : {type: DataType.STRING(20) }, //电话
-        createAt     : {type: "timestamp",          field: "create_at", defaultValue: now}, //创建时间
+        createdAt     : {type: "timestamp",          field: "created_at", defaultValue: now}, //创建时间
         quitTime     : {type: "timestamp without time zone",          field: "quit_time"} //离职时间
     }, {
         tableName : "staffs",
