@@ -9,6 +9,13 @@ angular.module('nglibs', [
     'angularFileUpload'
 ]);
 
+export function ngService(name: string) {
+    return function(constructor: Function) {
+        angular.module('nglibs')
+            .service(name, constructor);
+    };
+}
+
 import './services';
 import './directives';
 import './filters';

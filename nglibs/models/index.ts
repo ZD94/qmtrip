@@ -8,17 +8,11 @@ import { CompanyService, MoneyChangeService} from 'api/company/client';
 import { DepartmentService } from 'api/department/client';
 import { TravelPolicyService } from 'api/travelPolicy/client';
 import { AgencyService, AgencyUserService } from 'api/agency/client';
-import {TripPlanService, TripDetailService, ProjectService} from 'api/tripPlan/client';
-import {PlaceService} from 'api/client/place/client';
+import { TripPlanService, TripDetailService, ProjectService } from 'api/tripPlan/client';
+import { PlaceService } from 'api/client/place/client';
+import { ngService } from '../index';
 
 const API = require('common/api');
-
-export function ngService(name: string) {
-    return function(constructor: Function) {
-        angular.module('nglibs')
-            .service(name, constructor);
-    };
-}
 
 @ngService('Models')
 class ClientModels implements ModelsInterface {

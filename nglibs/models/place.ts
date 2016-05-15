@@ -1,7 +1,7 @@
 
 var API = require('common/api');
 
-import {ngService} from "./index";
+import {ngService} from "../index";
 
 class CityInfo {
     id: string;
