@@ -65,3 +65,4 @@ export * from './travelPolicy';
 export * from './department';
 export * from './agency';
 export * from './tripPlan';
+export * from './auth';

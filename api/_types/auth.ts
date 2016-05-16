@@ -1,6 +1,6 @@
 import { regApiType } from 'common/api/helper';
-import {Table, Field, Types} from 'common/model'
-import { Models } from './index';
+import {Table, Field, Types, ModelObject} from 'common/model'
+import { Models} from './index';
 
 @regApiType('API.')
 class AuthCert {
@@ -23,7 +23,7 @@ enum ACCOUNT_TYPE {
 }
 
 @Table(Models.account, "auth.")
-class Account{
+class Account extends ModelObject{
     @Field({type:Types.UUID})
     get id() { return null; }
     set id(id){}
