@@ -7,7 +7,7 @@ var nodeXlsx = require("node-xlsx");
 var uuid = require("node-uuid");
 var moment = require("moment");
 var crypto = require("crypto");
-var sequelize = require("common/model").importModel("./models");
+var sequelize = require("common/model").DB;
 var Models = sequelize.models;
 var config = require('../../config');
 var fs = require('fs');
@@ -23,9 +23,9 @@ import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_typ
 import {AGENCY_ROLE} from "api/_types/agency";
 import { ServiceInterface } from 'common/model';
 
-let staffCols = Object.keys(Models.Staff.attributes);
-let papersCols = Object.keys(Models.Papers.attributes);
-let pointChangeCols = Object.keys(Models.PointChange.attributes);
+const staffCols = Staff['$fieldnames'];
+const papersCols = Credential['$fieldnames'];
+const pointChangeCols = PointChange['$fieldnames'];
 
  class StaffService implements ServiceInterface<Staff>{
     async create(obj: Object): Promise<Staff>{

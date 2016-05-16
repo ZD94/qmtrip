@@ -1,11 +1,13 @@
 
 import { initModels } from 'api/_types';
+
 import StaffModule = require('api/staff');
-import { CompanyService, MoneyChangeService } from 'api/company';
 import DepartmentModule = require ('api/department');
 import TravelPolicyModule = require('api/travelPolicy');
-import { AgencyService, AgencyUserService } from 'api/agency';
-import {TripPlanService, TripDetailService, ProjectService} from 'api/tripPlan';
+
+let { AgencyService, AgencyUserService } = require('api/agency');
+let { CompanyService, MoneyChangeService } = require('api/company');
+let { TripPlanService, TripDetailService, ProjectService } = require('api/tripPlan');
 
 initModels({
     staff: new StaffModule.StaffService(),
