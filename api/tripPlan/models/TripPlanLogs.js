@@ -16,6 +16,6 @@ module.exports = function (Db, DataType) {
     }, {
         tableName : "trip_plan_logs",
         timestamps: false,
-        schema    : "tripplan"
+        schema    : "trip_plan"
     });
 };

@@ -117,24 +117,18 @@ class ApiTripPlan {
     static async getTripPlanById(params:{id:string}) {
         let self: any = this;
         let accountId = self.accountId;
-        // console.info("**********************");
-        // console.info(accountId);
         let account = await API.auth.getAccount({id: accountId});
         let accountType = account.type;
-        let tripPlan = await
-        API.tripPlan.getTripPlanOrder(params);
+        let tripPlan = await API.tripPlan.getTripPlanOrder(params);
 
         if (accountType === 1) { //企业员工账户
-            let staff = await
-            API.staff.getStaff({id: self.accountId, columns: ['companyId']});
+            let staff = await API.staff.getStaff({id: self.accountId, columns: ['companyId']});
             if (tripPlan.companyId != staff.companyId) {
                 throw L.ERR.PERMISSION_DENY;
             }
         } else {
-            let {agencyId: agencyIdOfCompany} = await
-            API.company.getCompany({companyId: tripPlan.companyId, columns: ['agencyId']});
-            let {agencyId: agencyIdOfUser} = await
-            API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
+            let {agencyId: agencyIdOfCompany} = await API.company.getCompany({companyId: tripPlan.companyId, columns: ['agencyId']});
+            let {agencyId: agencyIdOfUser} = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
             if (agencyIdOfCompany != agencyIdOfUser) {
                 throw L.ERR.PERMISSION_DENY;
             }
@@ -170,8 +164,7 @@ class ApiTripPlan {
         query.status = 2;
         query.auditStatus = 1;
 
-        let staff = await
-        API.staff.getStaff({id: accountId, columns: ['companyId']});
+        let staff = await API.staff.getStaff({id: accountId, columns: ['companyId']});
         query.companyId = staff.companyId;
         let options:any = {where: query, limit: perPage, offset: perPage * (page - 1)};
 
@@ -208,8 +201,7 @@ class ApiTripPlan {
         }
 
         let query:any = getQueryByParams(params);
-        let staff = await
-        API.staff.getStaff({id: accountId, columns: ['companyId']});
+        let staff = await API.staff.getStaff({id: accountId, columns: ['companyId']});
         query.accountId = accountId;
         query.companyId = staff.companyId;
         let options:any = {where: query, limit: perPage, offset: perPage * (page - 1)};
@@ -350,8 +342,7 @@ class ApiTripPlan {
     static async countTripPlanNum(params) {
         let self: any = this;
         let accountId = self.accountId;
-        let {companyId} = await
-        API.staff.getStaff({id: accountId});
+        let {companyId} = await API.staff.getStaff({id: accountId});
         params.companyId = companyId;
         return API.tripPlan.countTripPlanNum(params);
     }
@@ -364,17 +355,13 @@ class ApiTripPlan {
      */
     static async statBudgetByGroup(params:{startTime:string, endTime:string}) {
         let self: any = this;
-        let {companyId} = await
-        API.staff.getStaff({id: self.accountId, columns: ['companyId']});
+        let {companyId} = await API.staff.getStaff({id: self.accountId, columns: ['companyId']});
         let params_S = {startTime: params.startTime, endTime: params.endTime, companyId: companyId, index: 0};
         let params_Z = {startTime: params.startTime, endTime: params.endTime, companyId: companyId, index: 1};
         let params_X = {startTime: params.startTime, endTime: params.endTime, companyId: companyId, index: 2};
-        let S = await
-        API.tripPlan.statBudgetByGroup(params_S);
-        let Z = await
-        API.tripPlan.statBudgetByGroup(params_Z);
-        let X = await
-        API.tripPlan.statBudgetByGroup(params_X);
+        let S = await API.tripPlan.statBudgetByGroup(params_S);
+        let Z = await API.tripPlan.statBudgetByGroup(params_Z);
+        let X = await API.tripPlan.statBudgetByGroup(params_X);
 
         let ret = {};
         for (let name in S) {
@@ -405,8 +392,7 @@ class ApiTripPlan {
      */
     static async statBudgetByMonth(params) {
         let self: any = this;
-        let {companyId} = await
-        API.staff.getStaff({id: self.accountId, columns: ['companyId']});
+        let {companyId} = await API.staff.getStaff({id: self.accountId, columns: ['companyId']});
         params.companyId = companyId;
         return API.tripPlan.statBudgetByMonth(params)
     }
@@ -418,8 +404,7 @@ class ApiTripPlan {
      */
     static async statPlanOrderMoneyByCompany(params:{startTime?:string, endTime?:string}) {
         let self: any = this;
-        let {companyId} = await
-        API.staff.getStaff({id: self.accountId, columns: ['companyId']});
+        let {companyId} = await API.staff.getStaff({id: self.accountId, columns: ['companyId']});
         params['companyId'] = companyId;
         return API.tripPlan.statPlanOrderMoney(params);
     }
@@ -432,8 +417,7 @@ class ApiTripPlan {
     @requireParams(['startTime', 'endTime'])
     static async statPlanOrderMoney(params:{startTime?:string, endTime?:string}) {
         let self: any = this;
-        let {companyId, id : accountId} = await
-        API.staff.getStaff({id: self.accountId, columns: ['id', 'companyId']});
+        let {companyId, id : accountId} = await API.staff.getStaff({id: self.accountId, columns: ['id', 'companyId']});
         params['companyId'] = companyId;
         params['accountId'] = accountId;
         return API.tripPlan.statPlanOrderMoney(params);
@@ -472,10 +456,8 @@ class ApiTripPlan {
         let date = params.statTime;
         let query:any = {status: {$ne: -2}, startAt: {$lte: date}, backAt: {$gte: date}};
 
-        let {companyId} = await
-        API.staff.getStaff({id: self.accountId, columns: ['companyId']});
-        let list = await
-        API.tripPlan.findOrdersByOption({where: query, order: ['ddd', 'dd']});
+        let {companyId} = await API.staff.getStaff({id: self.accountId, columns: ['companyId']});
+        let list = await API.tripPlan.findOrdersByOption({where: query, order: ['ddd', 'dd']});
 
         let ret = {};
         for (let i = 0, ii = list.length; i < ii; i++) {
@@ -498,8 +480,7 @@ class ApiTripPlan {
     static async checkBudgetExist(params):Promise<boolean> {
         let self: any = this;
         let accountId = self.accountId;
-        let {companyId} = await
-        API.staff.getStaff({id: accountId, columns: ['companyId']});
+        let {companyId} = await API.staff.getStaff({id: accountId, columns: ['companyId']});
         params.accountId = accountId;
         params.companyId = companyId;
         params.outTraffic = params.outTraffic || [];
@@ -530,7 +511,7 @@ class ApiTripPlan {
     static getProjectById(params: {id: string}) {
         return API.tripPlan.getProject({id: params.id});
     }
-    
+
     /**
      * @method requireParams
      * 删除项目
@@ -558,11 +539,9 @@ class ApiTripPlan {
             delete params.project_name;
         }
 
-        let {companyId} = await
-        API.staff.getStaff({id: self.accountId, columns: ['companyId']});
+        let {companyId} = await API.staff.getStaff({id: self.accountId, columns: ['companyId']});
         params['companyId'] = companyId;
-        let list = await
-        API.tripPlan.getProjectList(params);
+        let list = await API.tripPlan.getProjectList(params);
 
         return list.map(function (p) {
             return p.name;
@@ -580,15 +559,18 @@ class ApiTripPlan {
         let self: any = this;
         let accountId = self.accountId;
         let consumeId = params.id;
-        let {agencyId} = await
-        API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
-        let {tripPlanId, accountId: staffId} = await
-        API.tripPlan.getConsumeDetail({consumeId: consumeId, columns: ['accountId', 'tripPlanId']});
-        let staff = await
-        API.staff.getStaff({id: staffId, columns: ['companyId', 'name', 'email']});
+        console.info("step 1...");
+        let {agencyId} = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
+        console.info("step 2...");
+        let {tripPlanId, accountId: staffId} = await API.tripPlan.getConsumeDetail({consumeId: consumeId, columns: ['accountId', 'tripPlanId']});
+        console.info("step 3...");
+        console.info(staffId);
+        let staff = await API.staff.getStaff({id: staffId, columns: ['companyId', 'name', 'email']});
+        console.info("step 4...");
+        console.info(staff);
         let companyId = staff.companyId, staffName = staff.name, staffEmail = staff.email;
-        let {agencyId: staffAgencyId} = await
-        API.company.getCompany({companyId: companyId, columns: ['agencyId']});
+        let {agencyId: staffAgencyId} = await API.company.getCompany({companyId: companyId, columns: ['agencyId']});
+        console.info("step 5...");
 
         if (agencyId != staffAgencyId) {
             throw L.ERR.PERMISSION_DENY;
@@ -603,12 +585,9 @@ class ApiTripPlan {
         updates.invoiceType = 'TRAIN'; //代理商录入预算的，默认出行方式为火车
         updates.userId = self.accountId;
 
-        let updateResult = await
-        API.tripPlan.updateConsumeBudget(updates);
-        let tripPlan = await
-        API.tripPlan.getTripPlanOrder({tripPlanId: tripPlanId});
-        let staffs = await
-        API.staff.getStaffs({companyId: companyId, roleId: {$ne: 1}, columns: ['id', 'name', 'email']});
+        let updateResult = await API.tripPlan.updateConsumeBudget(updates);
+        let tripPlan = await API.tripPlan.getTripPlanOrder({tripPlanId: tripPlanId});
+        let staffs = await API.staff.getStaffs({companyId: companyId, roleId: {$ne: 1}, columns: ['id', 'name', 'email']});
 
         if (tripPlan.budget <= 0) {
             return true;
@@ -755,7 +734,7 @@ function getPlanDetails(params:any):{orderStatus:string, budget:number, tripDeta
 
         detail.budget > 0 ? total_budget = total_budget + parseFloat(detail.budget) : isBudget = false;
 
-        return _.pick(detail, API.tripPlan.TripDetailsCols);
+        return _.pick(detail, API.tripPlan.TripDetailCols);
     });
 
     let orderStatus = isBudget ? 'WAIT_UPLOAD' : 'NO_BUDGET'; //是否有预算，设置出差计划状态

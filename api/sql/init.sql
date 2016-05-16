@@ -1,8 +1,10 @@
 --schema=public
 
-drop table IF EXISTS place.cities;
-drop table IF EXISTS place.airports;
-drop table IF EXISTS place.stations;
-drop table IF EXISTS place.updatelog;
-drop table IF EXISTS place."businessDistricts";
-drop schema IF EXISTS place;
+create schema IF NOT EXISTS agency;
+create schema IF NOT EXISTS auth;
+create schema IF NOT EXISTS company;
+create schema IF NOT EXISTS department;
+create schema IF NOT EXISTS staff;
+create schema IF NOT EXISTS travel_policy;
+create schema IF NOT EXISTS trip_plan;
+
