@@ -5,7 +5,7 @@ import { Company } from 'api/_types/company';
 import { ModelObject, Table, Field, Types, ResolveRef, Reference } from 'common/model';
 import { Create } from 'common/model.client';
 
-@Table(Models.department, "department")
+@Table(Models.department, "department.")
 @regApiType('API.')
 export class Department extends ModelObject{
     constructor(target: Object) {
