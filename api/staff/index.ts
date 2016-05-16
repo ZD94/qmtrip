@@ -23,9 +23,9 @@ import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_typ
 import {AGENCY_ROLE} from "api/_types/agency";
 import { ServiceInterface } from 'common/model';
 
-export const staffCols = Object.keys(Models.Staff.attributes);
-export const papersCols = Object.keys(Models.Papers.attributes);
-export const pointChangeCols = Object.keys(Models.PointChange.attributes);
+const staffCols = Object.keys(Models.Staff.attributes);
+const papersCols = Object.keys(Models.Papers.attributes);
+const pointChangeCols = Object.keys(Models.PointChange.attributes);
 
  class StaffService implements ServiceInterface<Staff>{
     async create(obj: Object): Promise<Staff>{

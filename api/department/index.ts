@@ -11,7 +11,7 @@ import {Department} from "api/_types/department";
 import {validateApi, requireParams} from 'common/api/helper';
 import { ServiceInterface } from 'common/model';
 
-export const departmentCols = Object.keys(departmentModel.attributes);
+const departmentCols = Object.keys(departmentModel.attributes);
 
 class DepartmentService implements ServiceInterface<Department>{
     async create(obj: Object): Promise<Department>{
