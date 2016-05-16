@@ -7,7 +7,7 @@ var nodeXlsx = require("node-xlsx");
 var uuid = require("node-uuid");
 var moment = require("moment");
 var crypto = require("crypto");
-var sequelize = require("common/model").importModel("./models");
+var sequelize = require("common/model").DB;
 var Models = sequelize.models;
 var config = require('../../config');
 var fs = require('fs');
@@ -23,9 +23,9 @@ import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_typ
 import {AGENCY_ROLE} from "api/_types/agency";
 import { ServiceInterface } from 'common/model';
 
-export const staffCols = Object.keys(Models.Staff.attributes);
-export const papersCols = Object.keys(Models.Papers.attributes);
-export const pointChangeCols = Object.keys(Models.PointChange.attributes);
+export const staffCols = Staff['$fieldnames'];
+export const papersCols = Credential['$fieldnames'];
+export const pointChangeCols = PointChange['$fieldnames'];
 
 export class StaffService implements ServiceInterface<Staff>{
     async create(obj: Object): Promise<Staff>{
@@ -89,7 +89,6 @@ export class PointChangeService implements ServiceInterface<PointChange>{
  * @param data.accountId 已经有登录账号
  * @returns {*}
  */
-var createOptionalParams = staffCols.push("accountId");
 validateApi(createStaff, ["email","name","companyId"], staffCols);
 export function createStaff(data): Promise<Staff>{
     var type = data.type;//若type为import则为导入添加
@@ -1093,10 +1092,10 @@ export function deleteAllStaffByTest(params){
 validateApi(createPapers, ['type', 'idNo', 'ownerId'], ['validData', 'birthday']);
 export function createPapers(params): Promise<Credential>{
     //查询该用户该类型证件信息是否已经存在 不存在添加 存在则修改
-    return Models.Papers.findOne({where: {type: params.type, ownerId: params.ownerId}})
+    return Models.Credential.findOne({where: {type: params.type, ownerId: params.ownerId}})
     .then(function(result){
         if(!result) {
-            return Models.Papers.create(params);
+            return Models.Credential.create(params);
         }
         return result.update(params);
         /*if(result){
@@ -1104,12 +1103,12 @@ export function createPapers(params): Promise<Credential>{
             /!*var options = {};
             options.where = {type: params.type, ownerId: params.ownerId};
             options.returning = true;
-            return Models.Papers.update(params, options)
+            return Models.Credential.update(params, options)
                 .spread(function(rownum, rows){
                     return rows[0];
                 })*!/;
         }else{
-            return Models.Papers.create(params);
+            return Models.Credential.create(params);
         }*/
     })
         .then(function(data){
@@ -1124,7 +1123,7 @@ export function createPapers(params): Promise<Credential>{
  */
 validateApi(deletePapers, ['id']);
 export function deletePapers(params: {id: string}): Promise<any>{
-    return Models.Papers.destroy({where: params})
+    return Models.Credential.destroy({where: params})
         .then(function(obj){
             return true;
         });
@@ -1142,7 +1141,7 @@ export function updatePapers(params): Promise<Credential>{
     var options: any = {};
     options.where = {id: id};
     options.returning = true;
-    return Models.Papers.update(params, options)
+    return Models.Credential.update(params, options)
         .spread(function(rownum, rows){
             return new Credential(rows[0]);
         });
@@ -1154,11 +1153,11 @@ export function updatePapers(params): Promise<Credential>{
  */
 validateApi(getPapersById, ['id'], ['attributes']);
 export function getPapersById(params): Promise<Credential>{
-    //return Models.Papers.findById(params.id);
+    //return Models.Credential.findById(params.id);
     var options: any = {};
     options.where = {id: params.id};
     options.attributes = params.attributes? ['*'] :params.attributes;
-    return Models.Papers.findOne(options)
+    return Models.Credential.findOne(options)
         .then(function(data){
             return new Credential(data);
         })
@@ -1176,7 +1175,7 @@ export function getOnesPapersByType(params): Promise<Credential>{
     var options:any = {};
     options.where = {ownerId: params.ownerId, type: params.type};
     options.attributes = params.attributes? ['*'] :params.attributes;
-    return Models.Papers.findOne(options)
+    return Models.Credential.findOne(options)
         .then(function(result){
             return new Credential(result);
         })
@@ -1189,11 +1188,11 @@ export function getOnesPapersByType(params): Promise<Credential>{
  */
 validateApi(getPapersByOwner, ['ownerId'], ['attributes']);
 export function getPapersByOwner(params): Promise<Credential[]>{
-    //return Models.Papers.findAll({where: {ownerId: params.ownerId}});
+    //return Models.Credential.findAll({where: {ownerId: params.ownerId}});
     var options: any = {};
     options.where = {ownerId: params.ownerId};
     options.attributes = params.attributes? ['*'] :params.attributes;
-    return Models.Papers.findAll(options);
+    return Models.Credential.findAll(options);
 }
 
 /***********************证件信息end***********************/

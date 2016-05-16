@@ -4,14 +4,14 @@
 'use strict';
 var co = require("co");
 var _ = require("lodash");
-var sequelize = require("common/model").importModel("./models");
+var sequelize = require("common/model").DB;
 var departmentModel = sequelize.models.Department;
 var API = require("common/api");
 import {Department} from "api/_types/department";
 import {validateApi} from 'common/api/helper';
 import { ServiceInterface } from 'common/model';
 
-export const departmentCols = Object.keys(departmentModel.attributes);
+export const departmentCols = Department['$fieldnames'];
 
 export class DepartmentService implements ServiceInterface<Department>{
     async create(obj: Object): Promise<Department>{

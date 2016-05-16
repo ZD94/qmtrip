@@ -4,7 +4,6 @@
 "use strict";
 let sequelize = require("common/model").importModel("./models");
 let Models = sequelize.models;
-let {TripPlan: TripPlanModel, TripDetail: TripDetailsModel, TripPlanLogs: TripPlanLogsModel, Projects: ProjectModel} = Models;
 let uuid = require("node-uuid");
 let L = require("common/language");
 let Logger = require('common/logger');
@@ -33,8 +32,8 @@ let INVOICE_TYPE = {
     HOTEL: 2
 };
 
-export let TripDetailsCols = Object.keys(TripDetailsModel.attributes);
-export let TripPlanCols = Object.keys(TripPlanModel.attributes);
+export let TripDetailCols = TripDetail['$fieldnames'];
+export let TripPlanCols = TripPlan['$fieldnames'];
 
 export class TripPlanService implements ServiceInterface<TripPlan>{
     async create(obj: Object): Promise<TripPlan>{
@@ -113,16 +112,16 @@ export async function saveTripPlan(params){
     _planOrder.createdAt = utils.now();
     _planOrder.projectId = project.id;
 
-    let tripPlan = await TripPlanModel.create(_planOrder);
+    let tripPlan = await Models.TripPlan.create(_planOrder);
     await Promise.all(tripDetails.map(async function(detail) {
         detail.tripPlanId = tripPlanId;
         detail.accountId = tripPlan.accountId;
         detail.orderStatus = _planOrder.orderStatus;
-        let tripDetail = await TripDetailsModel.create(detail);
+        let tripDetail = await Models.TripDetail.create(detail);
     }));
 
     let logs = {tripPlanId: tripPlanId, userId: params.accountId, remark: '新增计划单 ' + tripPlan.planNo, createdAt: utils.now()};
-    await TripPlanLogsModel.create(logs);
+    await Models.TripPlanLogs.create(logs);
 
     return new TripPlan(tripPlan);
 }
@@ -144,8 +143,8 @@ export async function getTripPlanOrder(params){
         options.attributes = params.columns;
     }
 
-    let order = await TripPlanModel.findById(tripPlanId, options);
-    let tripDetails = await TripDetailsModel.findAll({where: {tripPlanId: tripPlanId, status: {$ne: STATUS.DELETE}}});
+    let order = await Models.TripPlan.findById(tripPlanId, options);
+    let tripDetails = await Models.TripDetail.findAll({where: {tripPlanId: tripPlanId, status: {$ne: STATUS.DELETE}}});
 
     if(!order || order.orderStatus == 'DELETE'){
         throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
@@ -165,7 +164,7 @@ export function getConsumeInvoiceImg(params) {
         throw {code: -1, msg: "consumeId不能为空"};
     }
 
-    return TripDetailsModel.findById(consumeId)
+    return Models.TripDetail.findById(consumeId)
         .then(function(consumeDetail) {
             return API.attachments.getAttachment({id: consumeDetail.newInvoice})
         })
@@ -188,10 +187,10 @@ export async function getConsumeDetail(params){
     let options: any = {};
 
     if(params.columns){
-        options.attributes = _.intersection(params.columns, TripDetailsCols);
+        options.attributes = _.intersection(params.columns, TripDetailCols);
     }
 
-    let detail = await TripDetailsModel.findById(params.consumeId, options);
+    let detail = await Models.TripDetail.findById(params.consumeId, options);
 
     if(!detail || detail.status == STATUS.DELETE){
         throw {code: -2, msg: '消费记录不存在'};
@@ -212,7 +211,7 @@ export function updateTripPlanOrder(params){
     let optLog = params.optLog;
     let updates = params.updates;
 
-    return TripPlanModel.findById(tripPlanId)
+    return Models.TripPlan.findById(tripPlanId)
         .then(function(order){
             if(!order || order.status == STATUS.DELETE){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
@@ -228,8 +227,8 @@ export function updateTripPlanOrder(params){
             return sequelize.transaction(function(t){
                 updates = utils.now();
                 return Promise.all([
-                    TripPlanModel.update(updates, {returning: true, where: {id: tripPlanId}, fields: Object.keys(updates), transaction: t}),
-                    TripPlanLogsModel.create(logs, {transaction: t})
+                    Models.TripPlan.update(updates, {returning: true, where: {id: tripPlanId}, fields: Object.keys(updates), transaction: t}),
+                    Models.TripPlanLogs.create(logs, {transaction: t})
                 ]);
             })
         })
@@ -246,12 +245,12 @@ export function updateTripPlanOrder(params){
  * @param params
  */
 updateConsumeDetail['required_params'] = ['consumeId', 'optLog', 'userId', 'updates'];
-updateConsumeDetail['optional_params'] = _.keys(TripDetailsModel.attributes);
+updateConsumeDetail['optional_params'] = TripDetailCols;
 export function updateConsumeDetail(params){
-    let updates: any = _.pick(params.updates, _.keys(TripDetailsModel.attributes));
+    let updates: any = _.pick(params.updates, _.keys(Models.TripDetail.attributes));
     let trip_plan_id = '';
 
-    return TripDetailsModel.findById(params.consumeId)
+    return Models.TripDetail.findById(params.consumeId)
         .then(function(record){
             if(!record || record.status == STATUS.DELETE){
                 throw {code: -2, msg: '票据不存在'};
@@ -264,14 +263,14 @@ export function updateConsumeDetail(params){
             trip_plan_id = record.tripPlanId;
             updates.updatedAt = utils.now();
 
-            return TripDetailsModel.update(updates, {returning: true, where: {id: params.consumeId}, fields: Object.keys(updates)});
+            return Models.TripDetail.update(updates, {returning: true, where: {id: params.consumeId}, fields: Object.keys(updates)});
         })
         .spread(function(result) {
             if(result < 1) {
                 throw {code: -2, msg: '更新出差明细失败失败'};
             }
 
-            return TripDetailsModel.findAll({where: {tripPlanId: trip_plan_id, status: {$ne: STATUS.DELETE}}})
+            return Models.TripDetail.findAll({where: {tripPlanId: trip_plan_id, status: {$ne: STATUS.DELETE}}})
         })
         .then(function(list) {
             let orderStatus = '';
@@ -283,7 +282,7 @@ export function updateConsumeDetail(params){
                 orderStatus = t.orderStatus;
             });
 
-            return TripPlanModel.update({orderStatus: orderStatus, updatedAt: utils.now()}, {returning: true, where: {id: trip_plan_id}})
+            return Models.TripPlan.update({orderStatus: orderStatus, updatedAt: utils.now()}, {returning: true, where: {id: trip_plan_id}})
         })
         .then(function() {
             return true;
@@ -295,7 +294,7 @@ updateConsumeBudget['optional_params'] = ['invoiceType'];
 export function updateConsumeBudget(params){
     let id = params.id;
 
-    return TripDetailsModel.findById(id)
+    return Models.TripDetail.findById(id)
         .then(function(ret){
             if(!ret ||ret.status == STATUS.DELETE){
                 throw {code: -2, msg: '票据不存在'};
@@ -305,7 +304,7 @@ export function updateConsumeBudget(params){
                 throw {code: -3, msg: '该票据已经审核通过，不能修改预算'};
             }
 
-            return [ret.budget, TripPlanModel.findById(ret.tripPlanId)];
+            return [ret.budget, Models.TripPlan.findById(ret.tripPlanId)];
         })
         .spread(function(o_budget, order){
             if(order.status == STATUS.COMMIT){
@@ -337,13 +336,13 @@ export function updateConsumeBudget(params){
             return sequelize.transaction(function(t){
                 return Promise.all([
                     order.id,
-                    TripDetailsModel.update(updates, {where: {id: id}, transaction: t}),
-                    TripPlanLogsModel.create(logs, {transaction: t})
+                    Models.TripDetail.update(updates, {where: {id: id}, transaction: t}),
+                    Models.TripPlanLogs.create(logs, {transaction: t})
                 ])
             })
         })
         .spread(function(tripPlanId){
-            return [tripPlanId, TripDetailsModel.findAll({where: {tripPlanId: tripPlanId, status: {$ne: -2}}})];
+            return [tripPlanId, Models.TripDetail.findAll({where: {tripPlanId: tripPlanId, status: {$ne: -2}}})];
         })
         .spread(function(tripPlanId, list){
             let c_budget = 0;
@@ -355,7 +354,7 @@ export function updateConsumeBudget(params){
                 c_budget += parseFloat(budget);
             }
 
-            return TripPlanModel.update({status: STATUS.NO_COMMIT, budget: c_budget, updatedAt: utils.now()}, {where: {id: tripPlanId}, fields: ['status', 'budget', 'updatedAt']})
+            return Models.TripPlan.update({status: STATUS.NO_COMMIT, budget: c_budget, updatedAt: utils.now()}, {where: {id: tripPlanId}, fields: ['status', 'budget', 'updatedAt']})
         })
         .then(function(){
             return true;
@@ -381,7 +380,7 @@ export async function listTripPlanOrder(options){
         options.order = [['start_at', 'desc'], ['created_at', 'desc']]; //默认排序，创建时间
     }
 
-    let {rows: orders, count} = await TripPlanModel.findAndCount(options);
+    let {rows: orders, count} = await Models.TripPlan.findAndCount(options);
     if(!orders || orders.length === 0){
         return new Paginate(options.offset/options.limit + 1, options.limit, count, []);
     }
@@ -396,7 +395,7 @@ export async function listTripPlanOrder(options){
 
 findOrdersByOption['required_params'] = ['where'];
 export function findOrdersByOption(options) {
-    return TripPlanModel.findAll(options);
+    return Models.TripPlan.findAll(options);
 }
 
 /**
@@ -405,7 +404,7 @@ export function findOrdersByOption(options) {
  * @returns {*}
  */
 saveConsumeRecord['required_params'] = ['tripPlanId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'];
-// saveConsumeRecord['optional_params'] = TripDetailsCols;
+// saveConsumeRecord['optional_params'] = TripDetailCols;
 export function saveConsumeRecord(params){
     let record = params;
     record.isCommit = false;
@@ -413,7 +412,7 @@ export function saveConsumeRecord(params){
     let options: any = {};
     options.fields = Object.keys(record);
 
-    return TripPlanModel.findById(params.tripPlanId)
+    return Models.TripPlan.findById(params.tripPlanId)
         .then(function(order){
             if(!order || order.status == STATUS.DELETE){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
@@ -456,8 +455,8 @@ export function saveConsumeRecord(params){
                 }
 
                 return Promise.all([
-                    TripDetailsModel.create(record, options),
-                    TripPlanLogsModel.create(logs, {transaction: t}),
+                    Models.TripDetail.create(record, options),
+                    Models.TripPlanLogs.create(logs, {transaction: t}),
                     order.save()
                 ])
             })
@@ -476,7 +475,7 @@ deleteTripPlan['required_params'] = ['userId', 'tripPlanId'];
 export function deleteTripPlan(params){
     let tripPlanId = params.tripPlanId;
     let userId = params.userId;
-    return TripPlanModel.findById(tripPlanId)
+    return Models.TripPlan.findById(tripPlanId)
         .then(function(order){
 
             if(!order || order.status == STATUS.DELETE){
@@ -489,8 +488,8 @@ export function deleteTripPlan(params){
 
             return sequelize.transaction(function(t){
                 return Promise.all([
-                    TripPlanModel.update({status: STATUS.DELETE, updatedAt: utils.now()}, {where: {id: tripPlanId}, fields: ['status', 'updatedAt'], transaction: t}),
-                    TripDetailsModel.update({status: STATUS.DELETE, updatedAt: utils.now()}, {where: {tripPlanId: tripPlanId}, fields: ['status', 'updatedAt'], transaction: t})
+                    Models.TripPlan.update({status: STATUS.DELETE, updatedAt: utils.now()}, {where: {id: tripPlanId}, fields: ['status', 'updatedAt'], transaction: t}),
+                    Models.TripDetail.update({status: STATUS.DELETE, updatedAt: utils.now()}, {where: {tripPlanId: tripPlanId}, fields: ['status', 'updatedAt'], transaction: t})
                 ])
             })
         })
@@ -509,7 +508,7 @@ export function deleteConsumeDetail(params){
     let id = params.id;
     let userId = params.userId;
 
-    return TripDetailsModel.findById(id)
+    return Models.TripDetail.findById(id)
         .then(function(detail){
             if(!detail || detail.status == STATUS.DELETE){
                 throw L.ERR.CONSUME_DETAIL_NOT_EXIST;
@@ -519,7 +518,7 @@ export function deleteConsumeDetail(params){
                 throw L.ERR.PERMISSION_DENY;
             }
 
-            return TripDetailsModel.update({status: STATUS.DELETE, updatedAt: utils.now()}, {where: {id: id}, fields: ['status', 'updatedAt']})
+            return Models.TripDetail.update({status: STATUS.DELETE, updatedAt: utils.now()}, {where: {id: id}, fields: ['status', 'updatedAt']})
         })
         .then(function(){
             return true;
@@ -538,7 +537,7 @@ uploadInvoice['required_params'] = ['consumeId', 'picture', 'userId'];
 export function uploadInvoice(params){
     let tripPlanId = "";
 
-    return TripDetailsModel.findById(params.consumeId)
+    return Models.TripDetail.findById(params.consumeId)
         .then(function(custome){
             if(!custome || custome.status == STATUS.DELETE){
                 throw L.ERR.NOT_FOUND;
@@ -554,8 +553,8 @@ export function uploadInvoice(params){
 
             tripPlanId = custome.tripPlanId;
             return [tripPlanId, custome,
-                TripPlanModel.findById(tripPlanId),
-                TripDetailsModel.findAll({where: {tripPlanId: tripPlanId}, attributes: ['id', 'orderStatus', 'status', 'budget', 'isCommit', 'newInvoice']}) //所有的未审核通过的数据
+                Models.TripPlan.findById(tripPlanId),
+                Models.TripDetail.findAll({where: {tripPlanId: tripPlanId}, attributes: ['id', 'orderStatus', 'status', 'budget', 'isCommit', 'newInvoice']}) //所有的未审核通过的数据
             ]
         })
         .spread(function(tripPlanId, custome, order, list){
@@ -592,10 +591,10 @@ export function uploadInvoice(params){
 
             return sequelize.transaction(function(t){
                 return Promise.all([
-                    TripDetailsModel.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
-                    TripPlanLogsModel.create(logs,{transaction: t}),
-                    TripPlanLogsModel.create(orderLogs, {transaction: t}),
-                    TripPlanModel.update({orderStatus: order_status, updatedAt: utils.now()}, {where: {id: tripPlanId}})
+                    Models.TripDetail.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
+                    Models.TripPlanLogs.create(logs,{transaction: t}),
+                    Models.TripPlanLogs.create(orderLogs, {transaction: t}),
+                    Models.TripPlan.update({orderStatus: order_status, updatedAt: utils.now()}, {where: {id: tripPlanId}})
                 ]);
             })
         })
@@ -614,7 +613,7 @@ getVisitPermission['required_params'] = ['consumeId', 'userId'];
 export async function getVisitPermission(params){
     let userId = params.userId;
     let consumeId = params.consumeId;
-    let consume = await TripDetailsModel.findById(consumeId);
+    let consume = await Models.TripDetail.findById(consumeId);
     if(!consume || consume.status == STATUS.DELETE){
         throw {code: -4, msg: '查询记录不存在'};
     }
@@ -623,7 +622,7 @@ export async function getVisitPermission(params){
         return {allow: true, fileId: consume.newInvoice};
     }
 
-    let order = await TripPlanModel.findById(consume.tripPlanId);
+    let order = await Models.TripPlan.findById(consume.tripPlanId);
     if(!order || order.orderStatus == 'DELETE'){
         throw {code: -4, msg: '订单记录不存在'};
     }
@@ -649,7 +648,7 @@ export async function getVisitPermission(params){
  */
 saveOrderLogs['required_params'] = ['userId', 'tripPlanId', 'remark']
 export function saveOrderLogs(logs){
-    return TripPlanModel.findById(logs.tripPlanId)
+    return Models.TripPlan.findById(logs.tripPlanId)
         .then(function(order){
             if(!order || order.status == STATUS.DELETE){
                 throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
@@ -660,7 +659,7 @@ export function saveOrderLogs(logs){
             }
 
             logs.createdAt = utils.now();
-            return TripPlanLogsModel.create(logs);
+            return Models.TripPlanLogs.create(logs);
         })
 }
 
@@ -675,7 +674,7 @@ export function saveOrderLogs(logs){
 approveInvoice['required_params'] = ['status', 'consumeId', 'userId'];
 approveInvoice['optional_params'] = ['remark', 'expenditure'];
 export function approveInvoice(params){
-    return TripDetailsModel.findById(params.consumeId)
+    return Models.TripDetail.findById(params.consumeId)
         .then(function(consume){
             if(!consume || consume.status == STATUS.DELETE)
                 throw L.ERR.NOT_FOUND;
@@ -688,7 +687,7 @@ export function approveInvoice(params){
                 throw {code: -3, msg: '该票据已审核通过，不能重复审核'};
             }
 
-            return [TripPlanModel.findById(consume.tripPlanId), consume]
+            return [Models.TripPlan.findById(consume.tripPlanId), consume]
         })
         .spread(function(order, consume){
             let invoiceJson = consume.invoice;
@@ -726,14 +725,14 @@ export function approveInvoice(params){
                     updates.isCommit =false;
                 }
                 return Promise.all([
-                        TripDetailsModel.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
-                        TripPlanLogsModel.create(logs,{transaction: t})
+                        Models.TripDetail.update(updates, {returning: true, where: {id: params.consumeId}, transaction: t}),
+                        Models.TripPlanLogs.create(logs,{transaction: t})
                     ])
                     .spread(function(ret){
                         let status = params.status;
 
                         if(status == STATUS.NO_BUDGET){
-                            return TripPlanModel.update({status: STATUS.NO_COMMIT, auditStatus: -1, updatedAt: utils.now()},
+                            return Models.TripPlan.update({status: STATUS.NO_COMMIT, auditStatus: -1, updatedAt: utils.now()},
                                 {where: {id: order.id}, fields: ['auditStatus', 'status', 'updatedAt'], transaction: t});
                         }
 
@@ -747,7 +746,7 @@ export function approveInvoice(params){
                             updatedAt: utils.now()
                         }
 
-                        return TripDetailsModel.findAll({where: {tripPlanId: order.id, status: {$ne: -2}}})
+                        return Models.TripDetail.findAll({where: {tripPlanId: order.id, status: {$ne: -2}}})
                             .then(function(list){
                                 for(let i=0; i<list.length; i++){
                                     if(list[i].status != STATUS.COMMIT && list[i].id != ret[1][0].id){
@@ -766,7 +765,7 @@ export function approveInvoice(params){
                                     order_updates.score = Math.floor(score/2);
                                 }
 
-                                return TripPlanModel.update(order_updates, {where: {id: order.id}, fields: Object.keys(order_updates), transaction: t})
+                                return Models.TripPlan.update(order_updates, {where: {id: order.id}, fields: Object.keys(order_updates), transaction: t})
                             })
                     })
             });
@@ -786,7 +785,7 @@ countTripPlanNum['optional_params'] = ['accountId', 'status'];
 export function countTripPlanNum(params){
     let query = params;
     query.status = {$ne: STATUS.DELETE};
-    return TripPlanModel.count({where: query});
+    return Models.TripPlan.count({where: query});
 }
 
 
@@ -907,10 +906,10 @@ export function statPlanOrderMoney(params){
     }
 
     return Promise.all([
-            TripPlanModel.sum('budget', {where: query}),
-            TripPlanModel.sum('budget', {where: query_complete}),
-            TripPlanModel.sum('expenditure', {where: query_complete}),
-            TripPlanModel.count({where: query_complete}),
+            Models.TripPlan.sum('budget', {where: query}),
+            Models.TripPlan.sum('budget', {where: query_complete}),
+            Models.TripPlan.sum('expenditure', {where: query_complete}),
+            Models.TripPlan.count({where: query_complete}),
             sequelize.query(query_sql)
         ])
         .spread(function(n1, n2, n3, n4, n5) {
@@ -934,7 +933,7 @@ export function statPlanOrderMoney(params){
 getProjects['required_params'] = ['companyId'];
 getProjects['optional_params'] = ['description'];
 export function getProjects(params){
-    return TripPlanModel.findAll({where: params, group: ['description'], attributes: ['description']})
+    return Models.TripPlan.findAll({where: params, group: ['description'], attributes: ['description']})
 }
 
 /**
@@ -946,8 +945,8 @@ commitTripPlanOrder['required_params'] = ['tripPlanId', 'accountId'];
 export function commitTripPlanOrder(params){
     let id = params.tripPlanId;
     return Promise.all([
-            TripPlanModel.findById(id),
-            TripDetailsModel.findAll({where:{tripPlanId: id}})
+            Models.TripPlan.findById(id),
+            Models.TripDetail.findAll({where:{tripPlanId: id}})
         ])
         .spread(function(order, list){
             if(!order || order.status == STATUS.DELETE){
@@ -984,8 +983,8 @@ export function commitTripPlanOrder(params){
         })
         .then(function(){
             return Promise.all([
-                TripPlanModel.update({status: STATUS.COMMIT, auditStatus: 0, updatedAt: utils.now(), isCommit: true, commitTime: utils.now()}, {where: {id: id}, fields: ['status', 'auditStatus', 'updatedAt', 'isCommit']}),
-                TripDetailsModel.update({isCommit: true, commitTime: utils.now(), updatedAt: utils.now()}, {where: {tripPlanId: id}})
+                Models.TripPlan.update({status: STATUS.COMMIT, auditStatus: 0, updatedAt: utils.now(), isCommit: true, commitTime: utils.now()}, {where: {id: id}, fields: ['status', 'auditStatus', 'updatedAt', 'isCommit']}),
+                Models.TripDetail.update({isCommit: true, commitTime: utils.now(), updatedAt: utils.now()}, {where: {tripPlanId: id}})
             ])
         })
         .then(function(){
@@ -1009,7 +1008,7 @@ export function previewConsumeInvoice (params) {
             if (!result.allow) {
                 throw L.ERR.PERMISSION_DENY;
             }
-            return TripDetailsModel.findById(consumeId)
+            return Models.TripDetail.findById(consumeId)
         })
         .then(function(consume) {
             return API.attachments.getAttachment({id: consume.newInvoice});
@@ -1037,7 +1036,7 @@ export async function checkBudgetExist(params){
 
     _planOrder.status = {$ne: STATUS.DELETE};
 
-    let orders = await TripPlanModel.findAll({where: _planOrder});
+    let orders = await Models.TripPlan.findAll({where: _planOrder});
     if(orders.length <= 0) {
         return false;
     }
@@ -1046,7 +1045,7 @@ export async function checkBudgetExist(params){
     await Promise.all(tripDetails.map(async function(detail) {
         detail.status = {$ne: STATUS.DELETE};
         detail.invoiceType = INVOICE_TYPE[detail.invoiceType];
-        let plan_details =  await TripDetailsModel.findAll({where: detail});
+        let plan_details =  await Models.TripDetail.findAll({where: detail});
         plan_details.map(function(d) {
             details.push(d);
         });
@@ -1077,7 +1076,7 @@ export async function checkBudgetExist(params){
  * @returns {Promise<TripDetails>}
  */
 export function getTripPlanDetails(params) {
-    return TripDetailsModel.findAll({where: params.tripPlanId})
+    return Models.TripDetail.findAll({where: params.tripPlanId})
 }
 
 /**
@@ -1087,7 +1086,7 @@ export function getTripPlanDetails(params) {
 saveTripPlanLog['required_params'] = ['tripPlanId', 'userId', 'remark'];
 export function saveTripPlanLog(params) {
     params.createdAt = utils.now();
-    return TripPlanLogsModel.create(params);
+    return Models.TripPlanLogs.create(params);
 }
 
 
@@ -1105,29 +1104,29 @@ export function getProjectList(params) {
         delete params.count;
     }
 
-    return ProjectModel.findAll(options)
+    return Models.Project.findAll(options)
 }
 
 createNewProject['required_params'] = ['name', 'createUser', 'company_id'];
 createNewProject['optional_params'] = ['code']
 export function createNewProject(params) {
     params.createdAt = utils.now();
-    return ProjectModel.create(params);
+    return Models.Project.create(params);
 }
 
 export async function getProject(params: {id: string}): Promise<Project> {
-    let project = await ProjectModel.findBuId(params.id);
+    let project = await Models.Project.findBuId(params.id);
     return new Project(project);
 }
 
 export async function deleteProject(params: {id: string}): Promise<boolean> {
-    let project = await ProjectModel.findBuId(params.id);
+    let project = await Models.Project.findBuId(params.id);
 
     if(!project) {
         throw {code: -2, msg: '没有该项目'};
     }
 
-    let result = await ProjectModel.destroy({where: {id: params.id}});
+    let result = await Models.Project.destroy({where: {id: params.id}});
 
     return true;
 }
@@ -1135,7 +1134,7 @@ export async function deleteProject(params: {id: string}): Promise<boolean> {
 getProjectByName['required_params'] = ['userId', 'name'];
 getProjectByName['optional_params'] = ['companyId', 'isCreate']
 export function getProjectByName(params) {
-    return ProjectModel.findOne({where: {name: params.name}})
+    return Models.Project.findOne({where: {name: params.name}})
         .then(function(project){
             if(!project && params.isCreate === true) {
                 let p = {
@@ -1145,7 +1144,7 @@ export function getProjectByName(params) {
                     companyId: params.companyId,
                     createdAt: utils.now()
                 }
-                return ProjectModel.create(p)
+                return Models.Project.create(p)
             }else {
                 return project;
             }

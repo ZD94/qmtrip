@@ -2,10 +2,8 @@
  * Created by yumiao on 15-12-9.
  */
 "use strict";
-let sequelize = require("common/model").importModel("./models");
+let sequelize = require("common/model").DB;
 let Models = sequelize.models;
-let AgencyModel = Models.Agency;
-let AgencyUserModel = Models.AgencyUser;
 let API = require("common/api");
 let uuid = require("node-uuid");
 import _ = require('lodash');
@@ -19,8 +17,8 @@ import { ServiceInterface } from 'common/model';
 
 let logger = new Logger("agency");
 
-var agencyCols = Object.keys(AgencyModel.attributes);
-var agencyUserCols = Object.keys(AgencyUserModel.attributes);
+var agencyCols = Agency['$fieldnames'];
+var agencyUserCols = AgencyUser['$fieldnames'];
 
 class AgencyService implements ServiceInterface<Agency> {
     async create(obj: Object): Promise<Agency> {
@@ -81,20 +79,20 @@ class AgencyModule {
      */
     static async create(params: {name: string, email: string, pwd: string, id?: string, mobile?: string,
         description?: string, remark?: string, status?: number}): Promise<Agency> {
-        let _agency = await AgencyModel.findOne({where: {email: params.email}});
+        let _agency = await Models.Agency.findOne({where: {email: params.email}});
 
         if(_agency) {
             throw {code: -2, msg: '该邮箱已经注册代理商'};
         }
 
         if(params.mobile) {
-            let agency_mobile = await AgencyModel.findOne({where: {mobile: params.mobile}});
+            let agency_mobile = await Models.Agency.findOne({where: {mobile: params.mobile}});
             if(agency_mobile) {
                 throw {code: -3, msg: '该手机号已经注册代理商'};
             }
         }
 
-        let agency = await AgencyModel.create(params);
+        let agency = await Models.Agency.create(params);
         return new Agency(agency);
     };
 
@@ -113,8 +111,8 @@ class AgencyModule {
 
         return sequelize.transaction(function(t) {
             return Promise.all([
-                AgencyModel.create(_agency, {transaction: t}),
-                AgencyUserModel.create(_agencyUser, {transaction: t})
+                Models.Agency.create(_agency, {transaction: t}),
+                Models.AgencyUser.create(_agencyUser, {transaction: t})
             ]);
         })
             .spread(function(agency, agencyUser) {
@@ -123,7 +121,7 @@ class AgencyModule {
             .catch(function(err) {
                 logger.error(err);
 
-                return AgencyModel.findOne({
+                return Models.Agency.findOne({
                     where: {
                         $or: [{mobile: mobile}, {email: email}],
                         status: {$ne: EAgencyStatus.DELETE}
@@ -147,7 +145,7 @@ class AgencyModule {
     static async updateAgency(_agency) {
         var agencyId = _agency.agencyId;
         var userId = _agency.userId;
-        let agency = await AgencyModel.findById(agencyId, {attributes: ['createUser']});
+        let agency = await Models.Agency.findById(agencyId, {attributes: ['createUser']});
 
         if(!agency || agency.status == EAgencyStatus.DELETE) {
             throw L.ERR.AGENCY_NOT_EXIST;
@@ -158,7 +156,7 @@ class AgencyModule {
         }
 
         _agency.updatedAt = utils.now();
-        let [rows, agencies] = await AgencyModel.update(_agency, {
+        let [rows, agencies] = await Models.Agency.update(_agency, {
             returning: true,
             where: {id: agencyId},
             fields: Object.keys(_agency)
@@ -179,7 +177,7 @@ class AgencyModule {
     @requireParams(['agencyId'])
     static async getAgency(params) {
         let agencyId = params.agencyId;
-        let agency = await AgencyModel.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createdAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updatedAt']});
+        let agency = await Models.Agency.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createdAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updatedAt']});
 
         if(!agency || agency.status == EAgencyStatus.DELETE) {
             throw L.ERR.AGENCY_NOT_EXIST;
@@ -194,7 +192,7 @@ class AgencyModule {
      * @returns {*}
      */
     static listAgency(params) {
-        return AgencyModel.findAll({where: {status: {$ne: EAgencyStatus.DELETE}}, attributes: ['id']});
+        return Models.Agency.findAll({where: {status: {$ne: EAgencyStatus.DELETE}}, attributes: ['id']});
     }
 
     /**
@@ -206,8 +204,8 @@ class AgencyModule {
     static async deleteAgency(params) {
         let agencyId = params.agencyId;
         let userId = params.userId;
-        let agency = await AgencyModel.findById(agencyId, {attributes: ['createUser', 'status']});
-        let agencyUsers = await AgencyUserModel.findAll({
+        let agency = await Models.Agency.findById(agencyId, {attributes: ['createUser', 'status']});
+        let agencyUsers = await Models.AgencyUser.findAll({
             where: {
                 agencyId: agencyId,
                 status: {$ne: EAgencyStatus.DELETE}
@@ -218,11 +216,11 @@ class AgencyModule {
             throw L.ERR.AGENCY_NOT_EXIST;
         }
 
-        await AgencyModel.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {
+        await Models.Agency.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {
             where: {id: agencyId},
             fields: ['status', 'updatedAt']
         });
-        await AgencyUserModel.update({
+        await Models.AgencyUser.update({
             status: EAgencyStatus.DELETE,
             updatedAt: utils.now()
         }, {where: {agencyId: agencyId}, fields: ['status', 'updatedAt']});
@@ -244,13 +242,13 @@ class AgencyModule {
     static async createAgencyUser(params) {
         params.id = params.id ? params.id : uuid.v1();
 
-        let _agencyUser = await AgencyUserModel.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
+        let _agencyUser = await Models.AgencyUser.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
 
         if(_agencyUser) {
             throw {code: -2, msg: '邮箱或手机号已经注册代理商'};
         }
 
-        let agencyUser = await AgencyUserModel.create(params);
+        let agencyUser = await Models.AgencyUser.create(params);
         return new AgencyUser(agencyUser);
     }
 
@@ -266,7 +264,7 @@ class AgencyModule {
             throw {code: -1, msg: "id不能为空"};
         }
 
-        return AgencyUserModel.findById(userId, {attributes: ['status', 'id']})
+        return Models.AgencyUser.findById(userId, {attributes: ['status', 'id']})
             .then(function(user) {
                 if(!user || user.status == EAgencyStatus.DELETE) {
                     throw {code: -2, msg: '用户不存在'};
@@ -274,7 +272,7 @@ class AgencyModule {
 
                 return Promise.all([
                     API.auth.remove({accountId: userId}),
-                    AgencyUserModel.update({status: EAgencyStatus.DELETE}, {where: {id: userId}, fields: ['status']})
+                    Models.AgencyUser.update({status: EAgencyStatus.DELETE}, {where: {id: userId}, fields: ['status']})
                 ])
             })
             .then(function() {
@@ -292,7 +290,7 @@ class AgencyModule {
     static updateAgencyUser(data) {
         var id = data.id;
 
-        return AgencyUserModel.findById(id, {attributes: ['status']})
+        return Models.AgencyUser.findById(id, {attributes: ['status']})
             .then(function(user) {
                 if(!user || user.status == EAgencyStatus.DELETE) {
                     throw L.ERR.NOT_FOUND;
@@ -302,7 +300,7 @@ class AgencyModule {
                 options.where = {id: id};
                 options.returning = true;
 
-                return AgencyUserModel.update(data, options);
+                return Models.AgencyUser.update(data, options);
             })
             .spread(function(rows, users) {
                 if(rows != 1) {
@@ -325,7 +323,7 @@ class AgencyModule {
             options.attributes = params.columns;
         }
 
-        let agencyUser = await AgencyUserModel.findById(id, options);
+        let agencyUser = await Models.AgencyUser.findById(id, options);
 
         if(!agencyUser || agencyUser.status === EAgencyStatus.DELETE) {
             throw {code: -2, msg: '用户不存在'};
@@ -341,7 +339,7 @@ class AgencyModule {
     @requireParams(['email'])
     static agencyByEmail(params) {
         params.status = {$ne: EAgencyStatus.DELETE};
-        return AgencyModel.findOne({where: params})
+        return Models.Agency.findOne({where: params})
     }
 
     /**
@@ -374,7 +372,7 @@ class AgencyModule {
         options.limit = limit;
         options.offset = offset;
         options.where = params;
-        return AgencyUserModel.findAndCountAll(options)
+        return Models.AgencyUser.findAndCountAll(options)
             .then(function(result) {
                 var data = result.rows.map(function(user) {
                     return user.id;
@@ -389,7 +387,7 @@ class AgencyModule {
      * @returns {*|Promise}
      */
     static getAgencyUsersId(params) {
-        return AgencyUserModel.findAll({where: params, attributes: ['id']})
+        return Models.AgencyUser.findAll({where: params, attributes: ['id']})
             .then(function(result) {
                 return result;
             });
@@ -405,8 +403,8 @@ class AgencyModule {
         var name = params.name;
         return Promise.all([
             API.auth.remove({email: email, mobile: mobile, type: 2}),
-            AgencyModel.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}}),
-            AgencyUserModel.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}})
+            Models.Agency.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}}),
+            Models.AgencyUser.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}})
         ])
             .then(function() {
                 return true;

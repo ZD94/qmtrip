@@ -2,7 +2,7 @@
  * Created by wyl on 15-12-12.
  */
 'use strict';
-var sequelize = require("common/model").importModel("./models");
+var sequelize = require("common/model").DB;
 var travalPolicyModel = sequelize.models.TravelPolicy;
 var _ = require('lodash');
 import {Paginate} from 'common/paginate';
@@ -12,7 +12,7 @@ import types = require("api/_types/travelPolicy");
 import { ServiceInterface } from 'common/model';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 
-export const travalPolicyCols = Object.keys(travalPolicyModel.attributes);
+export const travalPolicyCols = TravelPolicy['$fieldnames'];
 
 export class TravelPolicyService implements ServiceInterface<TravelPolicy>{
     async create(obj: Object): Promise<TravelPolicy>{

@@ -22,7 +22,7 @@ let AGENCY_ROLE = {
     ADMIN: 2
 };
 
-export const companyCols = Object.keys(Models.Company.attributes);
+export const companyCols = Company['$fieldnames'];
 export const fundsAccountCols = Object.keys(Models.FundsAccounts.attributes);
 
 

@@ -1,1 +1,0 @@
-alter table auth.accounts drop CONSTRAINT IF EXISTS accounts_email_key;
