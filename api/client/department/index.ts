@@ -9,6 +9,7 @@
 let API = require("common/api");
 let L = require("common/language");
 import {Department} from "api/_types/department";
+
 /**
  * @class department 部门
  */

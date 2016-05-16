@@ -7,7 +7,8 @@ var Models = sequelize.models;
 var _ = require('lodash');
 import {Paginate} from 'common/paginate';
 var API = require("common/api");
-import {validateApi, requireParams} from 'common/api/helper';
+let L = require("common/language");
+import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import types = require("api/_types/travelPolicy");
 import { ServiceInterface } from 'common/model';
 import { TravelPolicy } from 'api/_types/travelPolicy';
@@ -16,7 +17,7 @@ const travalPolicyCols = TravelPolicy['$fieldnames'];
 
 class TravelPolicyService implements ServiceInterface<TravelPolicy>{
     async create(obj: Object): Promise<TravelPolicy>{
-        return API.travalPolicy.createTravelPolicy(obj);
+        return API.travalPolicy.create(obj);
     }
     async get(id: string): Promise<TravelPolicy>{
         return API.travalPolicy.getTravelPolicy({id: id});
@@ -42,7 +43,7 @@ class TravelPolicyModule{
      * @returns {*}
      */
     @requireParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"], travalPolicyCols)
-    static createTravelPolicy(data): Promise<TravelPolicy>{
+    static create(data): Promise<TravelPolicy>{
         if (!data.hotelPrice || !/^\d+(.\d{1,2})?$/.test(data.hotelPrice)) {
             data.hotelPrice = null;
         }
@@ -57,6 +58,37 @@ class TravelPolicyModule{
                     })
             });
     }
+
+    @clientExport
+    static async createTravelPolicy (params) : Promise<TravelPolicy>{
+        let self: any = this;
+        let user_id = self.accountId;
+        let role = await API.auth.judgeRoleById({id:user_id});
+
+        if(role == L.RoleType.STAFF){
+
+            let staff = await API.staff.getStaff({id: user_id});
+
+            if(staff.code){
+                throw {code: -1, msg: '无权限'};
+            }
+
+            params.companyId = staff.companyId;//只允许添加该企业下的差旅标准
+            return this.create(params);
+
+        }else{
+
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
+
+            if(result){
+                return this.create(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+
+        }
+    }
+
 
     /**
      * 删除差旅标准
