@@ -12,7 +12,7 @@ import types = require("api/_types/travelPolicy");
 import { ServiceInterface } from 'common/model';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 
-export const travalPolicyCols = Object.keys(travalPolicyModel.attributes);
+let travalPolicyCols = Object.keys(travalPolicyModel.attributes);
 
 class TravelPolicyService implements ServiceInterface<TravelPolicy>{
     async create(obj: Object): Promise<TravelPolicy>{
