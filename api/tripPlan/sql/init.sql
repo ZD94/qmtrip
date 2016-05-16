@@ -6,6 +6,7 @@ CREATE TABLE trip_plan.trip_plan_logs
   trip_plan_id uuid,
   trip_detail_id uuid,
   user_id uuid,
+  order_id uuid,
   remark character varying,
   created_at timestamp without time zone,
   updated_at timestamp without time zone,
