@@ -16,7 +16,7 @@ import {ECompanyStatus, Company, MoneyChange} from 'api/_types/company';
 import { ServiceInterface } from 'common/model';
 
 let AGENCY_ROLE = {OWNER: 0, COMMON: 1, ADMIN: 2};
-let companyCols = Object.keys(Models.Company.attributes);
+let companyCols = Company['$fieldnames'];
 let fundsAccountCols = Object.keys(Models.FundsAccounts.attributes);
 
 

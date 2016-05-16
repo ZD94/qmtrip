@@ -2,8 +2,8 @@
  * Created by wyl on 15-12-12.
  */
 'use strict';
-var sequelize = require("common/model").importModel("./models");
-var travalPolicyModel = sequelize.models.TravelPolicy;
+var sequelize = require("common/model").DB;
+var Models = sequelize.models;
 var _ = require('lodash');
 import {Paginate} from 'common/paginate';
 var API = require("common/api");
@@ -12,7 +12,7 @@ import types = require("api/_types/travelPolicy");
 import { ServiceInterface } from 'common/model';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 
-const travalPolicyCols = Object.keys(travalPolicyModel.attributes);
+const travalPolicyCols = TravelPolicy['$fieldnames'];
 
 class TravelPolicyService implements ServiceInterface<TravelPolicy>{
     async create(obj: Object): Promise<TravelPolicy>{
@@ -46,12 +46,12 @@ class TravelPolicyModule{
         if (!data.hotelPrice || !/^\d+(.\d{1,2})?$/.test(data.hotelPrice)) {
             data.hotelPrice = null;
         }
-        return travalPolicyModel.findOne({where: {name: data.name, companyId: data.companyId}})
+        return Models.TravelPolicy.findOne({where: {name: data.name, companyId: data.companyId}})
             .then(function(result){
                 if(result){
                     throw {msg: "该等级名称已存在，请重新设置"};
                 }
-                return travalPolicyModel.create(data)
+                return Models.TravelPolicy.create(data)
                     .then(function(result){
                         return new TravelPolicy(result);
                     })
@@ -71,7 +71,7 @@ class TravelPolicyModule{
                 if(staffs && staffs.length > 0){
                     throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准 暂不能删除，给这些员工匹配新的差旅标准后再进行操作'};
                 }
-                return travalPolicyModel.destroy({where: params});
+                return Models.TravelPolicy.destroy({where: params});
             })
             .then(function(obj){
                 return true;
@@ -79,7 +79,7 @@ class TravelPolicyModule{
     }
 
     static deleteTravelPolicyByTest(params){
-        return travalPolicyModel.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
+        return Models.TravelPolicy.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
             .then(function(){
                 return true;
             })
@@ -101,7 +101,7 @@ class TravelPolicyModule{
         if (!data.hotelPrice || !/^\d+(.\d{1,2})?$/.test(data.hotelPrice)) {
             data.hotelPrice = null;
         }
-        return travalPolicyModel.update(data, options)
+        return Models.TravelPolicy.update(data, options)
             .spread(function(rownum, rows){
                 return new TravelPolicy(rows[0]);
             });
@@ -123,13 +123,13 @@ class TravelPolicyModule{
 
         if(!id){
             if (isReturnDefault) {
-                return travalPolicyModel.findById('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a');
+                return Models.TravelPolicy.findById('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a');
             } else {
                 throw {code: -1, msg: "id不能为空"};
             }
         }
 
-        return travalPolicyModel.findById(id)
+        return Models.TravelPolicy.findById(id)
             .then(function(data){
                 return new TravelPolicy(data);
             })
@@ -150,7 +150,7 @@ class TravelPolicyModule{
         if(params.order){
             options.order = params.order;
         }
-        return travalPolicyModel.findAll(options);
+        return Models.TravelPolicy.findAll(options);
     }
 
     /**
@@ -160,7 +160,7 @@ class TravelPolicyModule{
      */
     static getTravelPolicies(params): Promise<TravelPolicy[]>{
         var options: any = {
-            where:  _.pick(params, Object.keys(travalPolicyModel.attributes))
+            where:  _.pick(params, Object.keys(Models.TravelPolicy.attributes))
         };
         if(params.columns){
             options.attributes = params.columns;
@@ -171,7 +171,7 @@ class TravelPolicyModule{
         if(params.$or) {
             options.where.$or = params.$or;
         }
-        return travalPolicyModel.findAll(options);
+        return Models.TravelPolicy.findAll(options);
     }
 
     /**
@@ -204,7 +204,7 @@ class TravelPolicyModule{
         options.limit = limit;
         options.offset = offset;
         options.where = params;
-        return travalPolicyModel.findAndCountAll(options)
+        return Models.TravelPolicy.findAndCountAll(options)
             .then(function(result){
                 return new Paginate(page, perPage, result.count, result.rows);
             });
