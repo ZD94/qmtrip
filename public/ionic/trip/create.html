@@ -3,45 +3,47 @@
         <form class="list">
             <label class="item item-input">
                 <span class="input-label">出差日期</span>
-                <input type="date" placeholder="">
+                <input type="date" placeholder="" ng-model="tripdef.beginDate">
             </label>
             <label class="item item-input">
-                <span class="input-label">目的地</span>
-                <input type="text" placeholder="武汉">
+                <span class="input-label">结束日期</span>
+                <input type="date" placeholder="" ng-model="tripdef.endDate">
+            </label>
+            <label class="item item-input">
+                <span class="input-label">出差地点</span>
+                <input type="text" placeholder="武汉" ng-model="tripdef.place">
             </label>
             <label class="item item-select">
                 <span class="input-label">出差事由</span>
-                <select>
+                <select ng-model="tripdef.reason">
                     <option>武汉项目</option>
                     <option>南京项目</option>
                     <option>上海项目</option>
                     <option>添加新项目</option>
                 </select>
             </label>
-            <div class="spacer" style="width: 300px; height: 24px;"></div>
-            <label class="item item-input">
-                <span class="input-label">回程日期</span>
-                <input type="date" placeholder="选填">
-            </label>
-            <ion-toggle toggle-class="toggle-positive" ng-checked="true">交通</ion-toggle>
-            <label class="item item-input">
-                <span class="input-label">出发地</span>
-                <input type="text" placeholder="北京">
-            </label>
             <div class="spacer" style="width: 300px; height: 9px;"></div>
-            <ion-toggle toggle-class="toggle-positive" ng-checked="true">住宿</ion-toggle>
-            <div class="button-bar">
-                <button id="page6-button34" class="button button-light button-small button-block">-</button>
-                <button id="page6-button35" class="button button-stable  button-block">3</button>
-                <button id="page6-button36" class="button button-light button-small button-block">+</button>
+            <ion-toggle toggle-class="toggle-positive" ng-model="tripdef.traffic">交通</ion-toggle>
+            <div ng-if="tripdef.traffic">
+                <label class="item item-input" ng-if="tripdef.traffic">
+                    <span class="input-label">出发地</span>
+                    <input type="text" placeholder="北京" ng-model="tripdef.fromPlace">
+                </label>
+                <ion-toggle toggle-class="toggle-positive" ng-model="tripdef.round">返程</ion-toggle>
             </div>
-            <div id="page6-markdown2" style="color:#FFFFFF;">
-                <p>此处日期与回程日期联动</p>
+            <div class="spacer" style="width: 300px; height: 9px;"></div>
+            <ion-toggle toggle-class="toggle-positive" ng-model="tripdef.hotel">住宿</ion-toggle>
+            <div ng-if="tripdef.hotel">
+                <div class="button-bar">
+                    <button id="page6-button34" class="button button-light button-small button-block" ng-click="decTripDuration()">-</button>
+                    <button id="page6-button35" class="button button-stable button-block">{{calcTripDuration()}}</button>
+                    <button id="page6-button36" class="button button-light button-small button-block" ng-click="incTripDuration()">+</button>
+                </div>
+                <label class="item item-input">
+                    <span class="input-label">地标</span>
+                    <input type="text" placeholder="选填" ng-model="tripdef.hotelPlace">
+                </label>
             </div>
-            <label class="item item-input">
-                <span class="input-label">地标</span>
-                <input type="text" placeholder="选填">
-            </label>
             <div>
                 <a href="#/trip/budget" id="page1-button26" class="button button-positive  button-block">下一步</a>
             </div>
