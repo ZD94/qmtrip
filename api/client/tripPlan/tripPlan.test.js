@@ -38,11 +38,12 @@ describe("api/client/tripPlan.js", function() {
             API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})
         ])
             .spread(function(ret1, ret2, ret3){
-                return API.agency.createAgency(agency);
+                return API.client.agency.createAgency(agency);
             })
             .then(function(ret){
-                agencyId = ret.agency.id;
-                agencyUserId = ret.agency.createUser;
+                ret = ret.target;
+                agencyId = ret.id;
+                agencyUserId = ret.createUser;
                 return API.client.company.createCompany.call({accountId: agencyUserId}, company);
             })
             .then(function(company){
@@ -353,7 +354,7 @@ describe("api/client/tripPlan.js", function() {
                 done();
             })
         });
-        
+
         it("#getTripPlanById should be ok by staff", function (done) {
             API.client.tripPlan.getTripPlanById.call({accountId: staffId}, {id: newplanId}, function (err, ret) {
                 assert.equal(err, null);
@@ -363,12 +364,15 @@ describe("api/client/tripPlan.js", function() {
         });
 
         it("#getTripPlanById should be ok by agency", function(done) {
-            console.info("agencyUserId=>", agencyUserId);
-            API.client.tripPlan.getTripPlanById.call({accountId: agencyUserId}, {id: newplanId}, function(err, ret){
-                assert.equal(err, null);
-                assert.equal(ret.id, newplanId);
-                done();
-            })
+            API.client.tripPlan.getTripPlanById.call({accountId: agencyUserId}, {id: newplanId})
+                .then(function (ret) {
+                    assert.equal(ret.id, newplanId);
+                    done();
+                })
+                .catch(function (err) {
+                    console.info(err);
+                    assert.equal(err, null);
+                });
         });
 
         it("#pageCompleteTripPlans should be ok", function (done) {
