@@ -460,7 +460,7 @@ class AgencyModule {
             })
             .catch(function (err) {
                 logger.error("初始化系统默认代理商失败...");
-                logger.error(err);
+                logger.error(err.stack);
             })
 
     }
