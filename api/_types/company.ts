@@ -100,7 +100,7 @@ export class Company extends ModelObject{
     }
 }
 
-@Table(Models.moneyChange, 'company.MoneyChange')
+@Table(Models.moneyChange, 'company.')
 @regApiType('API.')
 export class MoneyChange extends ModelObject {
     constructor(target: Object) {

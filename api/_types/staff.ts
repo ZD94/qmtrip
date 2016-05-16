@@ -96,7 +96,7 @@ export class Staff extends ModelObject{
     setTravelPolicy(val: TravelPolicy) {}
 }
 
-@Table(Models.credential, "Credential", {tableName : "papers", schema : "staff"})
+@Table(Models.credential, "staff.")
 @regApiType('API.')
 export class Credential extends ModelObject{
     constructor(target: Object) {
@@ -130,7 +130,7 @@ export class Credential extends ModelObject{
     set owner(val: Staff) {}
 }
 
-@Table(Models.pointChange, "staff.PointChange")
+@Table(Models.pointChange, "staff.")
 @regApiType('API.')
 export class PointChange extends ModelObject{
     constructor(target: Object) {

@@ -1096,10 +1096,10 @@ class StaffModule{
     @requireParams(['type', 'idNo', 'ownerId'], ['validData', 'birthday'])
     static createPapers(params): Promise<Credential>{
         //查询该用户该类型证件信息是否已经存在 不存在添加 存在则修改
-        return Models.Papers.findOne({where: {type: params.type, ownerId: params.ownerId}})
+        return Models.Credential.findOne({where: {type: params.type, ownerId: params.ownerId}})
             .then(function(result){
                 if(!result) {
-                    return Models.Papers.create(params);
+                    return Models.Credential.create(params);
                 }
                 return result.update(params);
                 /*if(result){
@@ -1107,12 +1107,12 @@ class StaffModule{
                  /!*var options = {};
                  options.where = {type: params.type, ownerId: params.ownerId};
                  options.returning = true;
-                 return Models.Papers.update(params, options)
+                 return Models.Credential.update(params, options)
                  .spread(function(rownum, rows){
                  return rows[0];
                  })*!/;
                  }else{
-                 return Models.Papers.create(params);
+                 return Models.Credential.create(params);
                  }*/
             })
             .then(function(data){
@@ -1127,7 +1127,7 @@ class StaffModule{
      */
     @requireParams(['id'])
     static deletePapers(params: {id: string}): Promise<any>{
-        return Models.Papers.destroy({where: params})
+        return Models.Credential.destroy({where: params})
             .then(function(obj){
                 return true;
             });
@@ -1145,7 +1145,7 @@ class StaffModule{
         var options: any = {};
         options.where = {id: id};
         options.returning = true;
-        return Models.Papers.update(params, options)
+        return Models.Credential.update(params, options)
             .spread(function(rownum, rows){
                 return new Credential(rows[0]);
             });
@@ -1157,11 +1157,11 @@ class StaffModule{
      */
     @requireParams(['id'], ['attributes'])
     static getPapersById(params): Promise<Credential>{
-        //return Models.Papers.findById(params.id);
+        //return Models.Credential.findById(params.id);
         var options: any = {};
         options.where = {id: params.id};
         options.attributes = params.attributes? ['*'] :params.attributes;
-        return Models.Papers.findOne(options)
+        return Models.Credential.findOne(options)
             .then(function(data){
                 return new Credential(data);
             })
@@ -1179,7 +1179,7 @@ class StaffModule{
         var options:any = {};
         options.where = {ownerId: params.ownerId, type: params.type};
         options.attributes = params.attributes? ['*'] :params.attributes;
-        return Models.Papers.findOne(options)
+        return Models.Credential.findOne(options)
             .then(function(result){
                 return new Credential(result);
             })
@@ -1192,11 +1192,11 @@ class StaffModule{
      */
     @requireParams(['ownerId'], ['attributes'])
     static getPapersByOwner(params): Promise<any[]>{
-        //return Models.Papers.findAll({where: {ownerId: params.ownerId}});
+        //return Models.Credential.findAll({where: {ownerId: params.ownerId}});
         var options: any = {};
         options.where = {ownerId: params.ownerId};
         options.attributes = params.attributes? ['*'] :params.attributes;
-        return Models.Papers.findAll(options);
+        return Models.Credential.findAll(options);
     }
 
     /***********************证件信息end***********************/
