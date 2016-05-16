@@ -10,10 +10,11 @@ import _ = require('lodash');
 import L = require("common/language");
 import Logger = require('common/logger');
 import utils = require("common/utils");
-import {requireParams} from 'common/api/helper';
+import {requireParams, clientExport} from 'common/api/helper';
 import {Paginate} from 'common/paginate';
-import {Agency, AgencyUser, EAgencyStatus} from "api/_types/agency";
+import {Agency, AgencyUser, EAgencyStatus, AgencyError} from "api/_types/agency";
 import { ServiceInterface } from 'common/model';
+import {requirePermit} from "../_decorator";
 let logger = new Logger("agency");
 
 class AgencyService implements ServiceInterface<Agency>{
@@ -63,12 +64,12 @@ class AgencyModule {
     static AgencyUserService = AgencyUserService;
 
     /**
+     * @method createAgency
      * 创建代理商
      * @param params
-     * @returns {Agency}
+     * @returns {Promise<Agency>}
      */
-    static async create(params:{name:string, email:string, pwd:string, id?:string, mobile?:string,
-        description?:string, remark?:string, status?:number}):Promise<Agency> {
+    static async createAgency(params:{name:string, email:string, pwd:string, id?:string, mobile?:string,description?:string, remark?:string, status?:number}):Promise<Agency> {
         let _agency = await Models.Agency.findOne({where: {email: params.email}});
 
         if (_agency) {
@@ -83,74 +84,107 @@ class AgencyModule {
         }
 
         let agency = await Models.Agency.create(params);
+
         return new Agency(agency);
     };
 
-    @requireParams(['name', 'email', 'userName'], ['id', 'mobile', 'pwd', 'description', 'remark', 'status'])
-    static createAgency(params) {
-        var mobile = params.mobile;
-        var email = params.email;
-        var _agency = _.clone(params);
-        _agency.id = params.id || uuid.v1();
-        _agency.createUser = _agency.id;
-        var userName = params.userName;
-        var _agencyUser = {
-            id: _agency.id, agencyId: _agency.id, name: userName, mobile: params.mobile, email: params.email,
-            status: params.status || EAgencyStatus.UN_ACTIVE, roleId: 0
-        };
 
-        return sequelize.transaction(function (t) {
-            return Promise.all([
-                Models.Agency.create(_agency, {transaction: t}),
-                Models.AgencyUser.create(_agencyUser, {transaction: t})
-            ]);
-        })
-            .spread(function (agency, agencyUser) {
-                return {agency: agency, agencyUser: agencyUser}
-            })
-            .catch(function (err) {
-                logger.error(err);
+    /**
+     * @method registerAgency
+     *
+     * 注册代理商
+     *
+     * @param {Object} params 参数
+     * @param {string} params.name 代理商名称 必填
+     * @param {string} params.userName 用户姓名 必填
+     * @param {string} params.mobile 手机号 必填
+     * @param {string} params.email 邮箱 必填
+     * @param {string} params.pwd 密码 选
+     * 填，如果手机号和邮箱在全麦注册过，则密码还是以前的密码
+     * @returns {Promise<Agency>}
+     */
+    @clientExport
+    @requireParams(['name', 'email', 'mobile', 'userName'], ['description', 'remark', 'pwd'])
+    static async registerAgency(params):Promise<Agency> {
+        let email = params.email;
+        let mobile = params.mobile;
+        let password = params.pwd || "123456";
+        let ACCOUNT_TYPE : number = 2; //账号类型，2为代理商账号
+        let account = await API.auth.checkAccExist({type: ACCOUNT_TYPE, $or: [{mobile: mobile}, {email: email}]});
 
-                return Models.Agency.findOne({
-                    where: {
-                        $or: [{mobile: mobile}, {email: email}],
-                        status: {$ne: EAgencyStatus.DELETE}
-                    }, attributes: ['id']
-                })
-                    .then(function (agency) {
-                        if (agency) {
-                            throw {code: -4, msg: '手机号或邮箱已经注册'};
-                        } else {
-                            throw {code: -3, msg: '注册异常'};
-                        }
-                    })
-            });
+        if(!account) {
+            let _account : any = {email: email, mobile: mobile, pwd: password, type: ACCOUNT_TYPE};
+            account = await API.auth.newAccount(_account);
+        }
+
+        params.id = account.id;
+        params.createUser = account.id;
+
+        let agency = await Models.agency.create(params);
+        let _agencyUser: any = _.pick(params, ['email', 'mobile', 'sex', 'avatar']);
+        _agencyUser.id = account.id;
+        _agencyUser.agencyId = agency.id;
+        _agencyUser.roleId = 0;
+        _agencyUser.name = params.userName;
+
+        await Models.agency.createAgencyUser(_agencyUser);
+
+        return new Agency(agency);
     }
 
     /**
+     * @method getAgencyById
+     *
+     * 获取代理商信息
+     *
+     * @param {object} params
+     * @param params.agencyId 代理商id
+     * @returns {Promise<Agency>}
+     */
+    @clientExport
+    @requireParams(['id'])
+    static async getAgencyById(params: {id: string}): Promise<Agency>{
+        let {accountId} = Zone.current.get('session');
+        var agencyId = params.id;
+        var user = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
+
+        if(user.agencyId != agencyId){
+            throw L.ERR.PERMISSION_DENY;
+        }
+
+        let agency = await Models.agency.findById({id: agencyId});
+
+        if (!agency || agency.status == EAgencyStatus.DELETE) {
+            throw L.ERR.AGENCY_NOT_EXIST;
+        }
+
+        return new Agency(agency);
+    }
+
+    /**
+     * @method updateAgency
      * 更新代理商信息
      * @param params
-     * @returns {*}
+     * @returns {Promsie<Agency>}
      */
-    static async updateAgency(_agency) {
-        var agencyId = _agency.agencyId;
-        var userId = _agency.userId;
+    @clientExport
+    @requireParams(['id'], ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark'])
+    static async updateAgency(_agency): Promise<Agency> {
+        let {accountId} = Zone.current.get('session');
+        let agencyId = _agency.id;
         let agency = await Models.Agency.findById(agencyId, {attributes: ['createUser']});
 
         if (!agency || agency.status == EAgencyStatus.DELETE) {
             throw L.ERR.AGENCY_NOT_EXIST;
         }
 
-        if (agency.createUser != userId) {
+        if (agency.createUser != accountId) {
             throw L.ERR.PERMISSION_DENY;
         }
 
         _agency.updatedAt = utils.now();
-        let [rows, agencies] = await Models.Agency.update(_agency, {
-            returning: true,
-            where: {id: agencyId},
-            fields: Object.keys(_agency)
-        });
+
+        let [rows, agencies] = await Models.Agency.update(_agency, {returning: true, where: {id: agencyId}, fields: Object.keys(_agency)});
 
         if (!rows || rows == "NaN") {
             throw {code: -2, msg: '更新代理商信息失败'};
@@ -160,63 +194,48 @@ class AgencyModule {
     }
 
     /**
-     * 获取代理商信息
-     * @param agencyId
-     * @returns {*}
-     */
-    @requireParams(['agencyId'])
-    static async getAgency(params) {
-        let agencyId = params.agencyId;
-        let agency = await Models.Agency.findById(agencyId, {attributes: ['id', 'name', 'agencyNo', 'companyNum', 'createdAt', 'createUser', 'email', 'mobile', 'remark', 'status', 'updatedAt']});
-
-        if (!agency || agency.status == EAgencyStatus.DELETE) {
-            throw L.ERR.AGENCY_NOT_EXIST;
-        }
-
-        return new Agency(agency);
-    }
-
-    /**
-     * 管理员获取代理商列表
+     * @method listAgency
+     * 查询代理商列表
      * @param params
-     * @returns {*}
+     * @returns {Promise<string[]>}
      */
-    static listAgency(params) {
-        return Models.Agency.findAll({where: {status: {$ne: EAgencyStatus.DELETE}}, attributes: ['id']});
+    static async listAgency(params?: any): Promise<string[]>{
+        let agencies = await Models.Agency.findAll({where: {status: {$ne: EAgencyStatus.DELETE}}, attributes: ['id']});
+
+        return agencies.map(function(agency) {
+            return agency.id;
+        })
     }
 
     /**
+     * @method deleteAgency
      * 删除代理商
      * @param params
      * @returns {*}
      */
-    @requireParams(['agencyId'], ['userId'])
-    static async deleteAgency(params) {
-        let agencyId = params.agencyId;
-        let userId = params.userId;
+    @clientExport
+    @requireParams(['id'])
+    static async deleteAgency(params): Promise<boolean> {
+        let {accountId} = Zone.current.get('session');
+        let agencyId = params.id;
+        let selfUser = await Models.agencyUser.findById(accountId, {attributes: ['createUser', 'status']})
         let agency = await Models.Agency.findById(agencyId, {attributes: ['createUser', 'status']});
-        let agencyUsers = await Models.AgencyUser.findAll({
-            where: {
-                agencyId: agencyId,
-                status: {$ne: EAgencyStatus.DELETE}
-            }, attributes: ['id']
-        });
 
         if (!agency || agency.status == EAgencyStatus.DELETE) {
             throw L.ERR.AGENCY_NOT_EXIST;
         }
 
-        await Models.Agency.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {
-            where: {id: agencyId},
-            fields: ['status', 'updatedAt']
-        });
-        await Models.AgencyUser.update({
-            status: EAgencyStatus.DELETE,
-            updatedAt: utils.now()
-        }, {where: {agencyId: agencyId}, fields: ['status', 'updatedAt']});
+        if(selfUser.id != agency.createUser) {
+            throw L.ERR.PERMISSION_DENY;
+        }
 
-        agencyUsers.map(async function (user) {
-            await API.auth.remove({accountId: user.id, type: 2});
+        let agencyUsers = await Models.AgencyUser.findAll({where: {agencyId: agencyId, status: {$ne: EAgencyStatus.DELETE}}, attributes: ['id']});
+
+        await Models.Agency.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {where: {id: agencyId}, fields: ['status', 'updatedAt']});
+        await Models.AgencyUser.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {where: {agencyId: agencyId}, fields: ['status', 'updatedAt']});
+
+        await agencyUsers.map(async function (user) {
+            await Models.Accounts.destroy({where: {id: user.id}});
         });
 
         return true;
@@ -224,15 +243,25 @@ class AgencyModule {
 
 
     /**
-     * 创建代理商
-     * @param data
-     * @returns {*}
+     * @method createAgencyUser
+     * 创建代理商用户
+     * @param params
+     * @returns {Promise<AgencyUser>}
      */
-    @requireParams(['email', 'mobile', 'agencyId', 'name'], agencyUserCols)
-    static async createAgencyUser(params) {
-        params.id = params.id ? params.id : uuid.v1();
+    @clientExport
+    @requirePermit("user.add", 2)
+    @requireParams(['email', 'name'], ['mobile', 'sex', 'avatar', 'roleId'])
+    static async createAgencyUser(params: {email: string, name: string, mobile?: string, sex?: number, avatar?: string, roleId?: number}): Promise<AgencyUser> {
+        let {accountId} = Zone.current.get('session');
+        let curUser = await Models.AgencyUser.findById(accountId, {attributes: ['agencyId']});
+        let agencyId = curUser.agencyId;
+        params['agencyId'] = agencyId;
 
-        let _agencyUser = await Models.AgencyUser.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
+        if(!curUser || curUser.status === EAgencyStatus.DELETE) {
+            throw L.ERR.AGENCY_USRE_NOT_EXIST;
+        }
+
+        let _agencyUser = await Models.AgencyUser.findOne({where: {agencyId: agencyId, $or: [{email: params.email}, {mobile: params.mobile}]}});
 
         if (_agencyUser) {
             throw {code: -2, msg: '邮箱或手机号已经注册代理商'};
@@ -243,93 +272,109 @@ class AgencyModule {
     }
 
     /**
+     * @method updateAgencyUser
+     *
+     * 更新代理商用户
+     * @param {Object} params
+     * @param {string} params.id 需要修改的代理商用户id
+     * @param {number} params.status 代理商用户状态
+     * @param {string} params.name 代理商名称
+     * @param {string} params.mobile 代理商用户手机号
+     * @returns {Promise<AgencyUser>}
+     */
+    @clientExport
+    @requirePermit("user.edit", 2)
+    @requireParams(['id'], ['status', 'name', 'sex', 'mobile', 'avatar', 'roleId'])
+    static async updateAgencyUser(params: {id: string, status?: number, name?: string, sex?: string, email?: string, mobile?: string, avatar?: string, roleId?: string}) {
+        let {accountId} = Zone.current.get('session');
+        let user = await Models.agency.findById({id: accountId, columns: ['agencyId']});
+        let target = await Models.agency.findById({id: params.id, columns: ['agencyId', 'status']});
+
+        if(target.status === EAgencyStatus.DELETE) {
+            throw L.ERR.AGENCY_NOT_EXIST;
+        }
+
+        if(user.agencyId != target.agencyId){
+            throw L.ERR.PERMISSION_DENY;
+        }
+
+        target.status = params.status;
+        target.name = params.name;
+        target.sex = params.sex;
+        target.mobile = params.mobile;
+        target.avatar = params.avatar;
+        target.roleId = params.roleId;
+
+        let result = await target.save();
+
+        return new AgencyUser(target);
+    }
+
+    /**
+     * @method deleteAgencyUser
      * 删除代理商
      * @param params
-     * @returns {*}
+     * @returns {Promise<boolean>}
      */
-    static deleteAgencyUser(params) {
-        var userId = params.id;
+    @clientExport
+    @requirePermit("user.delete", 2)
+    @requireParams(['id'])
+    static async deleteAgencyUser(params: {id: string}): Promise<boolean> {
+        let {accountId} = Zone.current.get('session');
+        let id = params.id;
+        let curUser = await Models.AgencyUser.findById(accountId, {attributes: ['agencyId']});
+        let target = await Models.AgencyUser.findById(params.id);
 
-        if (!userId) {
-            throw {code: -1, msg: "id不能为空"};
+        if(!target || target.status == EAgencyStatus.DELETE) {
+            throw L.ERR.AGENCY_USRE_NOT_EXIST;
         }
 
-        return Models.AgencyUser.findById(userId, {attributes: ['status', 'id']})
-            .then(function (user) {
-                if (!user || user.status == EAgencyStatus.DELETE) {
-                    throw {code: -2, msg: '用户不存在'};
-                }
+        if(target.agencyId != curUser.agencyId) {
+            throw L.ERR.PERMISSION_DENY;
+        }
 
-                return Promise.all([
-                    API.auth.remove({accountId: userId}),
-                    Models.AgencyUser.update({status: EAgencyStatus.DELETE}, {where: {id: userId}, fields: ['status']})
-                ])
-            })
-            .then(function () {
-                return true;
-            })
+        await Models.AgencyUser.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {where: {id: id}, fields: ['status', 'updatedAt']})
+        await Models.Accounts.destroy({where: {id: id}});
+
+        return true;
     }
 
     /**
-     * 更新代理商
-     * @param id
-     * @param data
-     * @returns {*}
-     */
-    @requireParams(['id'], ['name', 'sex', 'mobile', 'avatar', 'roleId', 'status'])
-    static updateAgencyUser(data) {
-        var id = data.id;
-
-        return Models.AgencyUser.findById(id, {attributes: ['status']})
-            .then(function (user) {
-                if (!user || user.status == EAgencyStatus.DELETE) {
-                    throw L.ERR.NOT_FOUND;
-                }
-
-                var options:any = {};
-                options.where = {id: id};
-                options.returning = true;
-
-                return Models.AgencyUser.update(data, options);
-            })
-            .spread(function (rows, users) {
-                if (rows != 1) {
-                    throw {code: -2, msg: '操作失败'};
-                }
-                return new AgencyUser(users[0]);
-            })
-    }
-
-    /**
+     * @method getAgencyUser
      * 获取代理商用户
      * @param params
-     * @returns {*}
+     * @returns {Promise<AgencyUser>}
      */
-    static async getAgencyUser(params) {
-        let id = params.id;
-        let options:any = {};
-
-        if (params.columns) {
-            options.attributes = params.columns;
-        }
-
-        let agencyUser = await Models.AgencyUser.findById(id, options);
+    @clientExport
+    @requirePermit('user.query', 2)
+    @requireParams(['id'])
+    static async getAgencyUser(params: {id: string}): Promise<AgencyUser> {
+        let {accountId} = Zone.current.get('session');
+        let curUser = await Models.AgencyUser.findById(accountId, {attributes: ['agencyId']});
+        let agencyUser = await Models.AgencyUser.findById(params.id);
 
         if (!agencyUser || agencyUser.status === EAgencyStatus.DELETE) {
-            throw {code: -2, msg: '用户不存在'};
+            throw L.ERR.AGENCY_USRE_NOT_EXIST;
+        }
+
+        if(agencyUser.agencyId != curUser.agencyId) {
+            throw L.ERR.PERMISSION_DENY;
         }
 
         return new AgencyUser(agencyUser);
     }
 
     /**
+     * @method agencyByEmail
+     *
      * 通过邮箱获取代理商信息
-     * @type {agencyByEmail}
+     * @param params.email 邮箱
      */
+    @requirePermit('user.query', 2)
     @requireParams(['email'])
-    static agencyByEmail(params) {
-        params.status = {$ne: EAgencyStatus.DELETE};
-        return Models.Agency.findOne({where: params})
+    static async agencyByEmail(params: {email: string}): Promise<Agency> {
+        let agency = await Models.Agency.findOne({where: params});
+        return new Agency(agency)
     }
 
     /**
@@ -372,34 +417,36 @@ class AgencyModule {
     }
 
     /**
+     * @method getAgencyUsers
      * 得到代理商用户 用于获取查看票据的代理商用户id 不需要暴露给客户端
      * @param params
-     * @returns {*|Promise}
+     * @returns {Promise<string[]>}
      */
-    static getAgencyUsersId(params) {
-        return Models.AgencyUser.findAll({where: params, attributes: ['id']})
-            .then(function (result) {
-                return result;
-            });
+    static async getAgencyUsers(params: {agencyId: string}): Promise<string[]> {
+        params['status'] = {$ne: EAgencyStatus.DELETE};
+        let users = await  Models.AgencyUser.findAll({where: params, attributes: ['id']});
+
+        return users.map(function(user) {
+            return user.id;
+        })
     }
 
     /**
      * 测试用例使用删除代理商和用户的操作，不在client里调用
      * @param params
      */
-    static deleteAgencyByTest(params) {
+    static async adeleteAgencyByTest(params) {
         var email = params.email;
         var mobile = params.mobile;
         var name = params.name;
-        return Promise.all([
-            API.auth.remove({email: email, mobile: mobile, type: 2}),
-            Models.Agency.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}}),
-            Models.AgencyUser.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}})
-        ])
-            .then(function () {
-                return true;
-            })
+
+        await API.auth.remove({email: email, mobile: mobile, type: 2});
+        await Models.Agency.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}});
+        await Models.AgencyUser.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}});
+
+        return true;
     }
+
 
     static __initOnce() {
         logger.info("init default agency...");
@@ -420,13 +467,7 @@ class AgencyModule {
                     return [agency, ret, companys];
                 }
 
-                var _account = {
-                    email: email,
-                    mobile: mobile,
-                    pwd: pwd || '123456',
-                    status: 1,
-                    type: 2
-                }
+                var _account = {email: email, mobile: mobile, pwd: pwd || '123456', status: 1, type: 2};
 
                 return [agency, API.auth.newAccount(_account), companys];
             })
@@ -435,16 +476,7 @@ class AgencyModule {
                     return [agency.id, companys];
                 }
 
-                var _agency = {
-                    id: account.id,
-                    name: default_agency.name,
-                    email: email,
-                    mobile: mobile,
-                    pwd: pwd || '123456',
-                    status: 1,
-                    userName: user_name,
-                    remark: '系统默认代理商'
-                }
+                var _agency = {id: account.id, name: default_agency.name, email: email, mobile: mobile, pwd: pwd || '123456', status: 1, userName: user_name, remark: '系统默认代理商'}
 
                 return API.agency.createAgency(_agency)
                     .then(function (ret) {
@@ -453,14 +485,15 @@ class AgencyModule {
             })
             .spread(function (agencyId, companys) {
                 API.agency.__defaultAgencyId = agencyId;
+                console.info("#################");
 
                 return companys.map(function (c) {
                     return API.company.updateCompany({companyId: c.id, agencyId: agencyId})
                 })
             })
             .catch(function (err) {
-                logger.error("初始化系统默认代理商失败...");
-                logger.error(err.stack);
+                // logger.error("初始化系统默认代理商失败...");
+                // logger.error(err.stack);
             })
 
     }

@@ -14,11 +14,17 @@ export enum EAgencyStatus {
     ACTIVE = 1 //激活状态
 }
 
+export const AgencyError = {
+    AGENCY_NOT_FOUND: {code: -11, msg: '没有该代理商'}
+}
+
 export enum  AGENCY_ROLE {
     OWNER = 0,
     COMMON = 1,
     ADMIN = 2
 };
+
+
 
 @Table(Models.agency, 'agency.')
 @regApiType('API.')
