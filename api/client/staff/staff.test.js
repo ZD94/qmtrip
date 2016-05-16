@@ -260,9 +260,12 @@ describe("api/client/staff.js", function() {
 
             API.client.tripPlan.saveTripPlan.call(ownerSelf, tripPlanOrder)
                 .then(function(ret) {
-                    console.info("1111111111111111111111111");
+                    console.info("1111111111111111111111111", ret);
                     newOrderId = ret.id;
-                    consumeId = ret.hotel[0].id;
+                    return ret.getHotel();
+                })
+                .then(function(hotel){
+                    consumeId = hotel[0].id;
                     return API.tripPlan.uploadInvoice({userId: ownerSelf.accountId, consumeId: consumeId, picture: '测试图片'});
                 })
                 .then(function(){
