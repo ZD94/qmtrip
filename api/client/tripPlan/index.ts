@@ -559,11 +559,18 @@ class ApiTripPlan {
         let self: any = this;
         let accountId = self.accountId;
         let consumeId = params.id;
+        console.info("step 1...");
         let {agencyId} = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
+        console.info("step 2...");
         let {tripPlanId, accountId: staffId} = await API.tripPlan.getConsumeDetail({consumeId: consumeId, columns: ['accountId', 'tripPlanId']});
+        console.info("step 3...");
+        console.info(staffId);
         let staff = await API.staff.getStaff({id: staffId, columns: ['companyId', 'name', 'email']});
+        console.info("step 4...");
+        console.info(staff);
         let companyId = staff.companyId, staffName = staff.name, staffEmail = staff.email;
         let {agencyId: staffAgencyId} = await API.company.getCompany({companyId: companyId, columns: ['agencyId']});
+        console.info("step 5...");
 
         if (agencyId != staffAgencyId) {
             throw L.ERR.PERMISSION_DENY;
@@ -727,7 +734,7 @@ function getPlanDetails(params:any):{orderStatus:string, budget:number, tripDeta
 
         detail.budget > 0 ? total_budget = total_budget + parseFloat(detail.budget) : isBudget = false;
 
-        return _.pick(detail, API.tripPlan.TripDetailsCols);
+        return _.pick(detail, API.tripPlan.TripDetailCols);
     });
 
     let orderStatus = isBudget ? 'WAIT_UPLOAD' : 'NO_BUDGET'; //是否有预算，设置出差计划状态

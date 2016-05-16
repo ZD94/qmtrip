@@ -710,7 +710,7 @@ class ApiStaff {
         return API.staff.getPapersByOwner({ownerId: user_id});
     };
 
-    static async getOnesPapers(params){
+    static async getOnesPapers(params): Promise<any[]>{
         let user_id = params.userId;
         return API.staff.getPapersByOwner({ownerId: user_id});
     };
