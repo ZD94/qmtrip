@@ -10,9 +10,8 @@ let API = require("common/api");
 let L = require("common/language");
 import {Department} from "api/_types/department";
 import {validateApi} from 'common/api/helper';
-let sequelize = require("common/model").importModel("../../department/models");
-let departmentModel = sequelize.models.Department;
-let departmentCols = Object.keys(departmentModel.attributes);
+let sequelize = require("common/model").DB;
+let departmentCols = Department['$fieldnames'];
 /**
  * @class department 部门
  */
