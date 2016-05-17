@@ -203,6 +203,18 @@ export var condition = {
 
             return my && other && my["agencyId"] == other["agencyId"];
         }
+    },
+    isCompanyAgency: function(idpath: string) {
+        return async function (fn ,self, args) {
+            let id = _.get(args, idpath);
+            let accountId = _getAccountId();
+            let [agency, company] = await Promise.all([
+                API.agency.getAgencyUser({id: accountId}),
+                API.company.getCompany({id: id})
+            ]);
+
+            return agency && company && agency.id == company["agencyId"];
+        }
     }
 }
 
