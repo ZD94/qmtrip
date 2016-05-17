@@ -24,6 +24,7 @@ import { ServiceInterface } from 'common/model';
 let TripDetailCols = TripDetail['$fieldnames'];
 let TripPlanCols = TripPlan['$fieldnames'];
 
+/*
 class TripPlanService implements ServiceInterface<TripPlan>{
     async create(obj: Object): Promise<TripPlan>{
         return API.tripPlan.saveTripPlan(obj);
@@ -80,11 +81,12 @@ class ProjectService implements ServiceInterface<Project>{
         return API.tripPlan.deleteProject({tripPlanId: id});
     }
 }
+*/
 
 class TripPlanModule {
-    static TripPlanService = TripPlanService;
-    static TripDetailService = TripDetailService;
-    static ProjectService = ProjectService;
+    //static TripPlanService = TripPlanService;
+    //static TripDetailService = TripDetailService;
+    //static ProjectService = ProjectService;
 
     static TripPlanCols = TripPlanCols;
     static TripDetailCols = TripDetailCols;

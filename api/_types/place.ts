@@ -29,6 +29,21 @@ class Place {
         this.didaCode = obj.didaCode;
         this.parentId = obj.parentId;
     }
+
+/*
+    static async hotCities(where: {limit: number}) : Promise<string[]|Place[]> {
+        let api = await requireAPI<typeof ApiPlace>("place");
+        let limit = where.limit || 20;
+        return api.hotCities({limit: limit});
+    }
+
+    static async hotBusinessDistricts(where: {limit: number, cityId: string}): Promise<string[]|Place[]> {
+        let api = await requireAPI<typeof ApiPlace>("place");
+        let limit = where.limit;
+        let cityId = where.cityId;
+        return api.hotBusinessDistricts({limit: limit, cityId: cityId});
+    }
+*/
 }
 
 @regApiType('API.')

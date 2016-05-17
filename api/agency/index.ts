@@ -17,6 +17,7 @@ import { ServiceInterface } from 'common/model';
 import {requirePermit} from "../_decorator";
 let logger = new Logger("agency");
 
+/*
 class AgencyService implements ServiceInterface<Agency>{
     async create(obj: Object): Promise<Agency>{
         return API.agency.create(obj);
@@ -55,13 +56,14 @@ class AgencyUserService implements ServiceInterface<AgencyUser>{
         return API.agency.deleteAgencyUser({id: id});
     }
 }
+*/
 
 let agencyCols = Agency['$fieldnames'];
 let agencyUserCols = AgencyUser['$fieldnames'];
 
 class AgencyModule {
-    static AgencyService = AgencyService;
-    static AgencyUserService = AgencyUserService;
+    //static AgencyService = AgencyService;
+    //static AgencyUserService = AgencyUserService;
 
     /**
      * @method createAgency

@@ -13,6 +13,7 @@ import { ServiceInterface } from 'common/model';
 
 const departmentCols = Department['$fieldnames'];
 
+/*
 class DepartmentService implements ServiceInterface<Department>{
     async create(obj: Object): Promise<Department>{
         return API.department.createDepartment(obj);
@@ -31,10 +32,11 @@ class DepartmentService implements ServiceInterface<Department>{
         return API.department.deleteDepartment({id: id});
     }
 }
+*/
 
 class DepartmentModule{
 
-    static DepartmentService = DepartmentService;
+    //static DepartmentService = DepartmentService;
     /**
      * 创建部门
      * @param data

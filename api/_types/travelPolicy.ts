@@ -2,8 +2,8 @@ import { regApiType } from 'common/api/helper';
 import { Models } from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import { Company } from 'api/_types/company';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference } from 'common/model';
-import { Create } from 'common/model.client';
+import { ModelObject, Table, Field, Types, ResolveRef, Reference, Values } from 'common/model';
+import { Create } from 'common/model';
 
 @Table(Models.travelPolicy, "travelPolicy.")
 @regApiType('API.')
@@ -15,7 +15,7 @@ export class TravelPolicy extends ModelObject{
     static create(): TravelPolicy { return null; }
 
     @Field({type: Types.UUID})
-    get id(): string { return null; }
+    get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
 
     @Field({type: Types.STRING(50)})

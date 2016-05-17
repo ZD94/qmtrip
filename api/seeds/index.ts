@@ -11,6 +11,7 @@ let Logger = require('common/logger');
 let logger = new Logger("seeds");
 let typeString = ['TripPlanNo', 'qm_order'];
 
+/*
 class SeedService implements ServiceInterface<Seed>{
     async create(obj: Object): Promise<Seed>{
         throw 'seeds error';
@@ -28,9 +29,10 @@ class SeedService implements ServiceInterface<Seed>{
         throw 'seeds error';
     }
 }
+*/
 
 class SeedModule {
-    static SeedService = SeedService;
+    //static SeedService = SeedService;
 
     /**
      * 获取团队信息

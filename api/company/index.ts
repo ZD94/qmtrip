@@ -21,7 +21,7 @@ let AGENCY_ROLE = {OWNER: 0, COMMON: 1, ADMIN: 2};
 let companyCols = Company['$fieldnames'];
 // let fundsAccountCols = Object.keys(Models.FundsAccounts.attributes);
 
-
+/*
 class CompanyService implements ServiceInterface<Company>{
     async create(obj: Object): Promise<Company>{
         return API.company.createCompany(obj);
@@ -58,11 +58,11 @@ class MoneyChangeService implements ServiceInterface<MoneyChange>{
         throw {code: -2, msg: '不能删除记录'};
     }
 }
-
+*/
 
 class CompanyModule {
-    static CompanyService = CompanyService;
-    static MoneyChangeService = MoneyChangeService;
+    //static CompanyService = CompanyService;
+    //static MoneyChangeService = MoneyChangeService;
 
     /**
      * 域名是否已被占用

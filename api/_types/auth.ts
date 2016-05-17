@@ -1,5 +1,5 @@
 import { regApiType } from 'common/api/helper';
-import {Table, Field, Types, ModelObject} from 'common/model'
+import { Table, Field, Types, ModelObject, Values } from 'common/model'
 import { Models} from './index';
 
 @regApiType('API.')

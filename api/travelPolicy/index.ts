@@ -15,6 +15,7 @@ import { TravelPolicy } from 'api/_types/travelPolicy';
 
 const travalPolicyCols = TravelPolicy['$fieldnames'];
 
+/*
 class TravelPolicyService implements ServiceInterface<TravelPolicy>{
     async create(obj: Object): Promise<TravelPolicy>{
         return API.travalPolicy.create(obj);
@@ -33,10 +34,11 @@ class TravelPolicyService implements ServiceInterface<TravelPolicy>{
         return API.travalPolicy.deleteTravelPolicy({id: id});
     }
 }
+*/
 
 class TravelPolicyModule{
 
-    static TravelPolicyService = TravelPolicyService;
+    //static TravelPolicyService = TravelPolicyService;
     /**
      * 创建差旅标准
      * @param data

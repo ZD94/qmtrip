@@ -27,6 +27,7 @@ const staffCols = Staff['$fieldnames'];
 const papersCols = Credential['$fieldnames'];
 const pointChangeCols = PointChange['$fieldnames'];
 
+/*
  class StaffService implements ServiceInterface<Staff>{
     async create(obj: Object): Promise<Staff>{
         return API.staff.createStaff(obj);
@@ -82,11 +83,12 @@ const pointChangeCols = PointChange['$fieldnames'];
         throw L.ERR.NOP_METHOD;
 }
 }
+*/
 
 class StaffModule{
-    static StaffService = StaffService;
-    static CredentialService = CredentialService;
-    static PointChangeService = PointChangeService;
+    //static StaffService = StaffService;
+    //static CredentialService = CredentialService;
+    //static PointChangeService = PointChangeService;
     /**
      * 创建员工
      * @param data

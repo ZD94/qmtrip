@@ -1,11 +1,11 @@
 
 import { Models } from 'api/_types';
 import { regApiType } from 'common/api/helper';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference } from 'common/model';
+import { ModelObject, Table, Field, Types, ResolveRef, Reference, Values } from 'common/model';
 import {now} from 'common/utils'
 import {Staff} from 'api/_types/staff';
 import {Company} from 'api/_types/company';
-import { Create } from 'common/model.client';
+import { Create } from 'common/model';
 
 export enum EPlanStatus {
     DELETE = -2, //删除
@@ -38,7 +38,7 @@ export class Project extends ModelObject{
     static create(): Project { return null; }
 
     @Field({type: Types.UUID})
-    get id(): string { return null; }
+    get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
 
     @Field({type: Types.UUID})
@@ -65,7 +65,7 @@ export class TripPlan extends ModelObject {
     static create(): TripPlan { return null; }
 
     @Field({type: Types.UUID})
-    get id(): string { return null; }
+    get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
 
     @Field({type: Types.STRING})
@@ -191,7 +191,7 @@ export class TripDetail extends ModelObject{
     static create(): TripDetail { return null; }
 
     @Field({type: Types.UUID})
-    get id(): string { return null; }
+    get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
 
     @Field({type: Types.UUID})

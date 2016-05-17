@@ -1,11 +1,12 @@
 'use strict';
+
 import { Models } from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import {Agency} from 'api/_types/agency';
 import { regApiType } from 'common/api/helper';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference } from 'common/model';
+import { ModelObject, Table, Field, Types, ResolveRef, Reference, Values } from 'common/model';
 import {TravelPolicy} from "api/_types/travelPolicy";
-import { Create } from 'common/model.client';
+import { Create } from 'common/model';
 
 export enum ECompanyStatus {
     DELETE = -2,
@@ -23,12 +24,12 @@ export class Company extends ModelObject{
     static create(): Company { return null; }
 
     @Field({type: Types.UUID})
-    get id(): string { return null; }
+    get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
 
     // '企业编号'
     @Field({type: Types.STRING(30)})
-    get companyNo(): string { return ''; }
+    get companyNo(): string { return null; }
     set companyNo(val: string) {}
 
     // '创建人id'
@@ -38,12 +39,12 @@ export class Company extends ModelObject{
 
     // '企业名称'
     @Field({type: Types.STRING})
-    get name(): string { return ''; }
+    get name(): string { return null; }
     set name(val: string) {}
 
     // '企业域名'
     @Field({type: Types.STRING})
-    get domainName(): string { return ''; }
+    get domainName(): string { return null; }
     set domainName(val: string) {}
 
     // '企业描述'
@@ -58,12 +59,12 @@ export class Company extends ModelObject{
 
     // '企业邮箱'
     @Field({type: Types.STRING})
-    get email(): string { return ''; }
+    get email(): string { return null; }
     set email(val: string) {}
 
     // '创建人手机号'
     @Field({type: Types.STRING})
-    get mobile(): string { return ''; }
+    get mobile(): string { return null; }
     set mobile(val: string) {}
 
     // '员工数目'
@@ -82,7 +83,7 @@ export class Company extends ModelObject{
     set remark(val: string) {}
 
     @Field({type: Types.STRING})
-    get paymentPwd(): string { return ''; }
+    get paymentPwd(): string { return null; }
     set paymentPwd(val: string) {}
 
     @Field({type: Types.NUMERIC(15, 2)})
@@ -133,7 +134,7 @@ export class MoneyChange extends ModelObject {
     static create(): MoneyChange { return null; }
 
     @Field({type: Types.UUID})
-    get id(): string { return null; }
+    get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
 
     @Field({type: Types.UUID})
