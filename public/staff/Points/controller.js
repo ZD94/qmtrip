@@ -30,7 +30,7 @@ var point=(function(){
                                 $scope.changes = changes;
                                 record.items.map(function(c){
                                     var orderId = c.orderId;
-                                    API.tripPlan.getTripPlanById({id: orderId})
+                                    API.tripPlan.getTripPlan({id: orderId})
                                         .then(function(order){
                                             c.orderCreateAt = moment(order.createdAt).format('YYYY-MM-DD');
                                         })
@@ -60,7 +60,7 @@ var point=(function(){
                             .then(function(record){
                                 record.items.map(function(c){
                                     var orderId = c.orderId;
-                                    API.tripPlan.getTripPlanById({id: orderId})
+                                    API.tripPlan.getTripPlan({id: orderId})
                                         .then(function(order){
                                             c.orderCreateAt = moment(order.createdAt).format('YYYY-MM-DD');
                                         })
@@ -84,7 +84,7 @@ var point=(function(){
                             .then(function(record){
                                 record.items.map(function(c){
                                     var orderId = c.orderId;
-                                    API.tripPlan.getTripPlanById({id: orderId})
+                                    API.tripPlan.getTripPlan({id: orderId})
                                         .then(function(order){
                                             c.orderCreateAt = moment(order.createdAt).format('YYYY-MM-DD');
                                         })

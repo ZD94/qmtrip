@@ -7,8 +7,7 @@ import { Department } from './department';
 import { Agency, AgencyUser } from './agency';
 import {TripPlan, TripDetail, Project} from './tripPlan';
 import { Account } from './auth';
-
-var API = require('common/api');
+import {Seed} from "./seed";
 
 export interface ModelsInterface {
     staff: ServiceInterface<Staff>;
@@ -24,6 +23,7 @@ export interface ModelsInterface {
     agency: ServiceInterface<Agency>;
     agencyUser: ServiceInterface<AgencyUser>;
 
+    seed: ServiceInterface<Seed>;
     tripPlan: ServiceInterface<TripPlan>;
     tripDetail: ServiceInterface<TripDetail>;
     project: ServiceInterface<Project>;
@@ -45,6 +45,7 @@ export var Models: ModelsInterface = {
     agency: new ServiceDelegate<Agency>(),
     agencyUser: new ServiceDelegate<AgencyUser>(),
 
+    seed: new ServiceDelegate<Seed>(),
     tripPlan: new ServiceDelegate<TripPlan>(),
     tripDetail: new ServiceDelegate<TripDetail>(),
     project: new ServiceDelegate<Project>(),
@@ -66,3 +67,4 @@ export * from './department';
 export * from './agency';
 export * from './tripPlan';
 export * from './auth';
+export * from './seed';

@@ -145,8 +145,8 @@ class AgencyModule {
     @requireParams(['id'])
     static async getAgencyById(params: {id: string}): Promise<Agency>{
         let {accountId} = Zone.current.get('session');
-        var agencyId = params.id;
-        var user = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
+        let agencyId = params.id;
+        let user = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
 
         if(user.agencyId != agencyId){
             throw L.ERR.PERMISSION_DENY;
@@ -383,12 +383,12 @@ class AgencyModule {
      */
     @clientExport
     static listAndPaginateAgencyUser(params) {
-        var options:any = {};
+        let options:any = {};
         if (params.options) {
             options = params.options;
             delete params.options;
         }
-        var page, perPage, limit, offset;
+        let page, perPage, limit, offset;
         if (options.page && /^\d+$/.test(options.page)) {
             page = options.page;
         } else {
@@ -409,7 +409,7 @@ class AgencyModule {
         options.where = params;
         return Models.AgencyUser.findAndCountAll(options)
             .then(function (result) {
-                var data = result.rows.map(function (user) {
+                let data = result.rows.map(function (user) {
                     return user.id;
                 });
                 return new Paginate(page, perPage, result.count, data);
@@ -437,9 +437,9 @@ class AgencyModule {
      * @param params
      */
     static async deleteAgencyByTest(params) {
-        var email = params.email;
-        var mobile = params.mobile;
-        var name = params.name;
+        let email = params.email;
+        let mobile = params.mobile;
+        let name = params.name;
 
         await API.auth.remove({email: email, mobile: mobile, type: 2});
         await Models.Agency.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}});
@@ -449,53 +449,39 @@ class AgencyModule {
     }
 
 
-    static __initOnce() {
+    static async __initOnce() {
         logger.info("init default agency...");
-        var default_agency = require('config/config').default_agency;
-        var email = default_agency.email;
-        var mobile = default_agency.mobile;
-        var pwd = default_agency.pwd;
-        var user_name = default_agency.user_name;
+        let default_agency = require('config/config').default_agency;
+        let email = default_agency.email;
+        let mobile = default_agency.mobile;
+        let pwd = default_agency.pwd;
+        let user_name = default_agency.user_name;
 
-        ///初始化系统默认代理商
-        return Promise.all([
-            API.agency.agencyByEmail({email: email}),
-            API.auth.checkAccExist({type: 2, $or: [{mobile: mobile}, {email: email}]}),
-            API.company.listCompany({agencyId: null})
-        ])
-            .spread(function (agency, ret, companys) {
-                if (agency || ret) {
-                    return [agency, ret, companys];
-                }
+        try {
+            let agency = await API.agency.agencyByEmail({email: email});
 
-                var _account = {email: email, mobile: mobile, pwd: pwd || '123456', status: 1, type: 2};
+            if(!agency || agency.status == EAgencyStatus.DELETE) {
+                let _agency = {name: default_agency.name, email: email, mobile: mobile, pwd: pwd || '123456', status: 1, userName: user_name, remark: '系统默认代理商'}
+                agency = await API.agency.registerAgency(_agency)
+            }
 
-                return [agency, API.auth.newAccount(_account), companys];
-            })
-            .spread(function (agency, account, companys) {
-                if (agency) {
-                    return [agency.id, companys];
-                }
+            let agencyId = agency.id;
+            API.agency.__defaultAgencyId = agencyId;
+            let companies = await API.company.listCompany({agencyId: null});
 
-                var _agency = {id: account.id, name: default_agency.name, email: email, mobile: mobile, pwd: pwd || '123456', status: 1, userName: user_name, remark: '系统默认代理商'}
-
-                return API.agency.createAgency(_agency)
-                    .then(function (ret) {
-                        return [ret.agency.id, companys];
-                    })
-            })
-            .spread(function (agencyId, companys) {
-                API.agency.__defaultAgencyId = agencyId;
-
-                return companys.map(function (c) {
-                    return API.company.updateCompany({companyId: c.id, agencyId: agencyId})
-                })
-            })
-            .catch(function (err) {
-                logger.error("初始化系统默认代理商失败...");
-                logger.error(err.stack);
-            })
-
+            if(companies && companies.length > 0) {
+                await Promise.all(companies.map(async function(c) {
+                    await Zone.current.fork({name: 'updateCompany', properties: {session: {accountId: agencyId}}});
+                    let session = Zone.current.get('session');
+                    logger.warn("agencyId=>", agencyId);
+                    logger.warn("session=>", session);
+                    return await API.company.updateCompany({id: c.id, agencyId: agencyId});
+                }));
+            }
+        }catch(err) {
+            logger.error("初始化系统默认代理商失败...");
+            logger.error(err.stack);
+        }
     }
 }
 

@@ -22,6 +22,12 @@ export enum ETripType {
     HOTEL = 2
 }
 
+export enum EInvoiceType {
+    TRAIN = 0,
+    PLANE = 1,
+    HOTEL = 2
+};
+
 @Table(Models.project, 'tripPlan.')
 @regApiType('API.')
 export class Project extends ModelObject{
@@ -162,15 +168,15 @@ export class TripPlan extends ModelObject {
     }
     setCompany(val: Company) {}
 
-    getOutTrip(id: string): Promise<TripDetail[]> {
+    getOutTrip(id?: string): Promise<TripDetail[]> {
         return Models.tripDetail.find({tripPlanId: id||this.id, type: ETripType.OUT_TRIP});
     }
 
-    getBackTrip(id: string): Promise<TripDetail[]> {
+    getBackTrip(id?: string): Promise<TripDetail[]> {
         return Models.tripDetail.find({tripPlanId: id||this.id, type: ETripType.BACK_TRIP});
     }
 
-    getHotel(id: string): Promise<TripDetail[]> {
+    getHotel(id?: string): Promise<TripDetail[]> {
         return Models.tripDetail.find({tripPlanId: id||this.id, type: ETripType.HOTEL});
     }
 }
