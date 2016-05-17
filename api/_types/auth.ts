@@ -33,22 +33,22 @@ class Account extends ModelObject{
     get email() { return null; }
     set email(email){}
 
- //邮箱
+    //邮箱
     @Field({type:Types.STRING})
     get pwd() { return null; }
     set pwd(pwd){}
 
- //密码
+    //密码
     @Field({type:Types.STRING})
     get mobile() { return null; }
     set mobile(mobile){}
 
- //手机
+    //手机
     @Field({type:Types.INTEGER})
     get status() { return null; }
     set status(status){}
 
- //创建时间
+    //创建时间
     @Field({type: Types.DATE})
     get forbiddenExpireAt() { return null; }
     set forbiddenExpireAt(forbiddenExpireAt) {}
@@ -57,17 +57,17 @@ class Account extends ModelObject{
     get loginFailTimes() { return null; }
     set loginFailTimes(loginFailTimes){}
 
- //连续错误次数
+    //连续错误次数
     @Field({type:Types.DATE})
     get lastLoginAt() { return null; }
     set lastLoginAt(lastLoginAt){}
 
- //最近登录时间
+    //最近登录时间
     @Field({type:Types.STRING})
     get lastLoginIp() { return null; }
     set lastLoginIp(lastLoginIp){}
 
- //最近登录Ip
+    //最近登录Ip
     @Field({type:Types.STRING})
     get activeToken() { return null; }
     set activeToken(activeToken){}
