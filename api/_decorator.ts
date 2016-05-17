@@ -111,17 +111,17 @@ export function switchDecorator(checkFnList: CheckInterface[]) {
 export function isMySelf(idpath: string) {
     return async function (fn, self, args) {
         let id = _.get(args, idpath);
-        let session = Zone.current.get("session");
-        return session && session["account"] == id
+        let accountId = _getAccountId();
+        return id && accountId && id == accountId;
     }
 }
 
 export function isMyCompany(idpath: string) {
     return async function(fn, self, args) {
         let id = _.get(args, idpath);
-        let session = Zone.current.get("session");
+        let accountId = _getAccountId();
 
-        let staff = await API.staff.getStaff({id: session["account_id"]});
+        let staff = await API.staff.getStaff({id: accountId});
         return staff && staff["companyId"] == id;
     }
 }
@@ -136,6 +136,39 @@ export function isMyCompanyAgency(idpath: string) {
             return false;
         }
         let company = await API.company.getCompany({id: staff["companyId"]})
-        return company && company.agency == id;
+        return company && company["agencyId"] == id;
     }
+}
+
+export function isSameCompany(idpath:string) {
+    return async function(fn, self, args) {
+        let id = _.get(args, idpath);
+        let accountId = _getAccountId();
+
+        let [my, other] = await Promise.all([
+            API.staff.getStaff({id: accountId}),
+            API.staff.getStaff({id: id})
+        ]);
+
+        return my && other && my["companyId"] == other["companyId"];
+    }
+}
+
+export function isSameAgency(idpath: string) {
+    return async function(fn, self, args) {
+        let id = _.get(args, idpath);
+        let accountId = _getAccountId();
+
+        let [my, other] = await Promise.all([
+            API.agency.getAgencyUser({id: accountId}),
+            API.agency.getAgencyUser({id: id})
+        ])
+
+        return my && other && my["agencyId"] == other["agencyId"];
+    }
+}
+
+function _getAccountId() {
+    let session = Zone.current.get("session");
+    return session["accountId"];
 }
