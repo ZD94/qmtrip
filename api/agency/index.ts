@@ -15,6 +15,7 @@ import {Paginate} from 'common/paginate';
 import {Agency, AgencyUser, EAgencyStatus, AgencyError} from "api/_types/agency";
 import { ServiceInterface } from 'common/model';
 import {requirePermit} from "../_decorator";
+import async = Q.async;
 let logger = new Logger("agency");
 
 /*
@@ -471,18 +472,18 @@ class AgencyModule {
             API.agency.__defaultAgencyId = agencyId;
             let companies = await API.company.listCompany({agencyId: null});
 
-            if(companies && companies.length > 0) {
-                await Promise.all(companies.map(async function(c) {
-                    await Zone.current.fork({name: 'updateCompany', properties: {session: {accountId: agencyId}}});
-                    let session = Zone.current.get('session');
-                    logger.warn("agencyId=>", agencyId);
-                    logger.warn("session=>", session);
-                    return await API.company.updateCompany({id: c.id, agencyId: agencyId});
-                }));
+            if(!companies || companies.length <= 0) {
+                return;
             }
+
+            await Promise.all(companies.map(async function(c) {
+                let myZome = Zone.current.fork({name: 'updateCompany', properties: {session: {accountId: agencyId}}});
+                return myZome.run(API.company.updateCompany.bind(this, {id: c, agencyId: agencyId}));
+
+            }));
         }catch(err) {
             logger.error("初始化系统默认代理商失败...");
-            logger.error(err.stack);
+            logger.error(err);
         }
     }
 }
