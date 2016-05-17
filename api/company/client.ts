@@ -1,7 +1,7 @@
 
 import { CachedService, requireAPI } from 'common/model';
 import { Company, MoneyChange } from 'api/_types/company';
-import ApiCompany = require('api/client/company');
+import ApiCompany = require('api/company');
 
 export class CompanyService extends CachedService<Company>{
     constructor($cacheFactory: ng.ICacheFactoryService){
@@ -14,11 +14,11 @@ export class CompanyService extends CachedService<Company>{
     }
     async $get(id: string): Promise<Company>{
         var api = await requireAPI<typeof ApiCompany>('company');
-        return api.getCompanyById({companyId: id});
+        return api.getCompany({id: id});
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiCompany>('company');
-        return api.getCompanyListByAgency(where);
+        return api.listCompany(where);
     }
     async $update(id: string, fields: Object): Promise<any> {
         var api = await requireAPI<typeof ApiCompany>('company');
