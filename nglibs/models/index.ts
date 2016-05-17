@@ -31,6 +31,7 @@ class ClientModels implements ModelsInterface {
     project: ProjectService;
     place: PlaceService;
     account: any;
+    seed: any;
 
     constructor($cacheFactory: ng.ICacheFactoryService) {
         this.staff = new StaffService($cacheFactory);
@@ -47,6 +48,7 @@ class ClientModels implements ModelsInterface {
         this.project = new ProjectService($cacheFactory);
         this.place = new PlaceService($cacheFactory);
         this.account = null;
+        this.seed = null;
         initModels(this);
     }
 }

@@ -19,7 +19,6 @@ import {EAgencyStatus} from "../_types/agency";
 
 let AGENCY_ROLE = {OWNER: 0, COMMON: 1, ADMIN: 2};
 let companyCols = Company['$fieldnames'];
-console.info(companyCols);
 // let fundsAccountCols = Object.keys(Models.FundsAccounts.attributes);
 
 

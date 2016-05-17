@@ -12,7 +12,8 @@ module.exports = function(Db, DataType) {
         token: { type: DataType.STRING(50)   },
         createdAt: { type: "timestamp", field: "created_at", defaultValue: utils.now },
         refreshAt: { type: "timestamp", field: "refresh_at", defaultValue: utils.now },
-        expireAt: { field: "expire_at", type: "timestamp"  }
+        expireAt: { field: "expire_at", type: "timestamp"  },
+        os: { field: "os", type: DataType.UUID  }
     }, {
         tableName: "tokens",
         schema: "auth",

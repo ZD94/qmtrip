@@ -11,28 +11,17 @@ let utils = require('common/utils');
 let API = require('common/api');
 let logger = new Logger("company");
 let validate = require("common/validate");
+let config = require("../../config");
 import _ = require('lodash');
 import moment = require("moment");
-import {requireParams} from 'common/api/helper';
+import {requireParams, clientExport} from 'common/api/helper';
 import {Paginate} from 'common/paginate';
-import {Project, TripPlan, TripDetail} from "api/_types/tripPlan";
+import {Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType} from "api/_types/tripPlan";
 import { ServiceInterface } from 'common/model';
 
-let STATUS = {
-    DELETE: -2, //删除
-    NO_BUDGET: -1, //没有预算
-    NO_COMMIT: 0, //待提交状态
-    COMMIT: 1, //已提交待审核状态
-    COMPLETE: 2 //审核完，已完成状态
-};
 
-let INVOICE_TYPE = {
-    TRAIN: 0,
-    PLANE: 1,
-    HOTEL: 2
-};
 
-let TripDetailCols = TripDetail['$fieldnames'];;
+let TripDetailCols = TripDetail['$fieldnames'];
 let TripPlanCols = TripPlan['$fieldnames'];
 
 class TripPlanService implements ServiceInterface<TripPlan>{
@@ -41,10 +30,10 @@ class TripPlanService implements ServiceInterface<TripPlan>{
     }
     async get(id: string): Promise<TripPlan>{
         console.info(id);
-        return API.tripPlan.getTripPlanOrder({id: id});
+        return API.tripPlan.getTripPlan({id: id});
     }
     async find(where: any): Promise<TripPlan[]>{
-        return API.tripPlan.listTripPlanOrder(where);
+        return API.tripPlan.listTripPlans(where);
     }
     async update(id: string, fields: Object): Promise<TripPlan> {
         fields[id] = id;
@@ -57,10 +46,10 @@ class TripPlanService implements ServiceInterface<TripPlan>{
 
 class TripDetailService implements ServiceInterface<TripDetail>{
     async create(obj: Object): Promise<TripDetail>{
-        return API.tripPlan.saveConsumeRecord(obj);
+        return API.tripPlan.saveTripDetail(obj);
     }
     async get(id: string): Promise<TripDetail>{
-        return API.tripPlan.getConsumeDetail({consumeId: id});
+        return API.tripPlan.getTripDetail({consumeId: id});
     }
     async find(where: any): Promise<TripDetail[]>{
         return API.tripPlan.getTripPlanDetails({where: where});
@@ -101,47 +90,95 @@ class TripPlanModule {
     static TripDetailCols = TripDetailCols;
 
     /**
-     * 保存预算单/差旅计划单
+     * @method saveTripPlan
+     * 生成出差计划单
      * @param params
      * @returns {Promise<TripPlan>}
      */
+    @clientExport
+    @requireParams(['deptCity', 'arrivalCity', ''], [])
     static async saveTripPlan(params) {
-        let tripDetails = params.tripDetails;
-        delete params.tripDetails;
-        let _planOrder = params;
-
-        if (_planOrder.deptCity && !_planOrder.deptCityCode) {
-            throw {code: -3, msg: '城市代码不能为空'};
-        }
-
-        let project = await getProjectByName({
-            companyId: _planOrder.companyId,
-            name: _planOrder.description,
-            userId: _planOrder.accountId,
-            isCreate: true
-        });
+        let {accountId} = Zone.current.get('session');
+        let staff = await API.staff.getStaff({id: accountId, columns: ['companyId', 'email', 'name']});
+        let email = staff.email;
+        let staffName = staff.name;
+        let _tripPlan:any = _.pick(params, API.tripPlan.TripPlanCols);
+        let {orderStatus, budget, tripDetails} = getPlanDetails(params);
         let tripPlanId = uuid.v1();
-        _planOrder.id = tripPlanId;
-        _planOrder.createdAt = utils.now();
-        _planOrder.projectId = project.id;
+        let project = await getProjectByName({companyId: _tripPlan.companyId, name: _tripPlan.description, userId: _tripPlan.accountId, isCreate: true});
+        
+        _tripPlan.tripDetails = tripDetails;
+        _tripPlan.orderStatus = orderStatus;
+        _tripPlan.budget = budget;
+        _tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo'); //获取出差计划单号
+        _tripPlan.accountId = accountId;
+        _tripPlan.companyId = staff.companyId;
+        _tripPlan.id = tripPlanId;
+        _tripPlan.createdAt = utils.now();
+        _tripPlan.projectId = project.id;
 
-        let tripPlan = await Models.TripPlan.create(_planOrder);
+        console.info("**********************");
+        console.info(_tripPlan.planNo);
+        
+        let tripPlan = new TripPlan(await Models.TripPlan.create(_tripPlan));
         await Promise.all(tripDetails.map(async function (detail) {
             detail.tripPlanId = tripPlanId;
-            detail.accountId = tripPlan.accountId;
-            detail.orderStatus = _planOrder.orderStatus;
+            detail.accountId = accountId;
+            detail.orderStatus = _tripPlan.orderStatus;
             let tripDetail = await Models.TripDetail.create(detail);
         }));
 
-        let logs = {
-            tripPlanId: tripPlanId,
-            userId: params.accountId,
-            remark: '新增计划单 ' + tripPlan.planNo,
-            createdAt: utils.now()
-        };
+        let logs = {tripPlanId: tripPlanId, userId: params.accountId, remark: '新增计划单 ' + tripPlan.planNo, createdAt: utils.now()};
         await Models.TripPlanLogs.create(logs);
 
-        return new TripPlan(tripPlan);
+        if (tripPlan.budget <= 0 || tripPlan['orderStatus'] === EPlanStatus.NO_BUDGET) {
+            return tripPlan; //没有预算，直接返回计划单
+        }
+        let staffs = await API.staff.getStaffs({companyId: staff.target.companyId, roleId: {$ne: 1}, status: {$gte: 0}, columns: ['id', 'name', 'email']});
+        let url = config.host + '/corp.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
+        let go = '无', back = '无', hotelStr = '无';
+
+        let outTrip = await tripPlan.getOutTrip();
+        if (outTrip && outTrip.length > 0) {
+            let g = outTrip[0];
+            go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.deptCity + ' 到 ' + g.arrivalCity;
+            if (g.latestArriveTime)
+                go += ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达';
+            go += ', 动态预算￥' + g.budget;
+        }
+
+        let backTrip = await tripPlan.getBackTrip();
+        if (backTrip && backTrip.length > 0) {
+            let b = backTrip[0];
+            back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.deptCity + ' 到 ' + b.arrivalCity;
+            if (b.latestArriveTime)
+                back += ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达';
+            back += ', 动态预算￥' + b.budget;
+        }
+
+        let hotel = await tripPlan.getHotel();
+        if (hotel && hotel.length > 0) {
+            let h = hotel[0];
+            hotelStr = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') +
+                ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
+        }
+
+        await Promise.all(staffs.map(async function (s) {
+            let account = await API.auth.getAccount({id: s.id, type: 1, attributes: ['status']});
+            if (account.status != 1)
+                return false;
+
+            let vals = {managerName: s.name, username: staffName, email: email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+                projectName: tripPlan.description, goTrafficBudget: go, backTripBudget: back, hotelBudget: hotelStr,
+                totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url};
+            let log = {userId: accountId, tripPlanId: tripPlan.id, remark: tripPlan.planNo + '给企业管理员' + s.name + '发送邮件'};
+
+            await API.mail.sendMailRequest({toEmails: s.email, templateName: 'qm_notify_new_travelbudget', values: vals});
+            await API.tripPlan.saveTripPlanLog(log);
+            return true;
+        }));
+
+        return tripPlan;
     }
 
 
@@ -152,7 +189,7 @@ class TripPlanModule {
      */
     @requireParams(['id'], ['columns'])
 
-    static async getTripPlanOrder(params) {
+    static async getTripPlan(params) {
         let tripPlanId = params.id;
         let options:any = {};
 
@@ -165,7 +202,7 @@ class TripPlanModule {
         let tripDetails = await Models.TripDetail.findAll({
             where: {
                 tripPlanId: tripPlanId,
-                status: {$ne: STATUS.DELETE}
+                status: {$ne: EPlanStatus.DELETE}
             }
         });
 
@@ -206,7 +243,7 @@ class TripPlanModule {
 
     @requireParams(['consumeId'], ['columns'])
 
-    static async getConsumeDetail(params) {
+    static async getTripDetail(params) {
         let options:any = {};
 
         if (params.columns) {
@@ -215,7 +252,7 @@ class TripPlanModule {
 
         let detail = await Models.TripDetail.findById(params.consumeId, options);
 
-        if (!detail || detail.status == STATUS.DELETE) {
+        if (!detail || detail.status == EPlanStatus.DELETE) {
             throw {code: -2, msg: '消费记录不存在'};
         }
 
@@ -237,7 +274,7 @@ class TripPlanModule {
 
         return Models.TripPlan.findById(tripPlanId)
             .then(function (order) {
-                if (!order || order.status == STATUS.DELETE) {
+                if (!order || order.status == EPlanStatus.DELETE) {
                     throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
                 }
 
@@ -281,7 +318,7 @@ class TripPlanModule {
 
         return Models.TripDetail.findById(params.consumeId)
             .then(function (record) {
-                if (!record || record.status == STATUS.DELETE) {
+                if (!record || record.status == EPlanStatus.DELETE) {
                     throw {code: -2, msg: '票据不存在'};
                 }
 
@@ -303,7 +340,7 @@ class TripPlanModule {
                     throw {code: -2, msg: '更新出差明细失败失败'};
                 }
 
-                return Models.TripDetail.findAll({where: {tripPlanId: trip_plan_id, status: {$ne: STATUS.DELETE}}})
+                return Models.TripDetail.findAll({where: {tripPlanId: trip_plan_id, status: {$ne: EPlanStatus.DELETE}}})
             })
             .then(function (list) {
                 let orderStatus = '';
@@ -332,7 +369,7 @@ class TripPlanModule {
 
         return Models.TripDetail.findById(id)
             .then(function (ret) {
-                if (!ret || ret.status == STATUS.DELETE) {
+                if (!ret || ret.status == EPlanStatus.DELETE) {
                     throw {code: -2, msg: '票据不存在'};
                 }
 
@@ -343,7 +380,7 @@ class TripPlanModule {
                 return [ret.budget, Models.TripPlan.findById(ret.tripPlanId)];
             })
             .spread(function (o_budget, order) {
-                if (order.status == STATUS.COMMIT) {
+                if (order.status == EPlanStatus.COMMIT) {
                     throw {code: -4, msg: '该次出差计划已经提交，不能修改预算'};
                 }
 
@@ -391,7 +428,7 @@ class TripPlanModule {
                 }
 
                 return Models.TripPlan.update({
-                    status: STATUS.NO_COMMIT,
+                    status: EPlanStatus.NO_COMMIT,
                     budget: c_budget,
                     updatedAt: utils.now()
                 }, {where: {id: tripPlanId}, fields: ['status', 'budget', 'updatedAt']})
@@ -407,29 +444,28 @@ class TripPlanModule {
      * @param params
      * @returns {*}
      */
-    static async listTripPlanOrder(options) {
+    static async listTripPlans(options) {
         let query = options.where;
         let status = query.status;
-        typeof status == 'object' ? query.status.$ne = STATUS.DELETE : query.status = status;
+        typeof status == 'object' ? query.status.$ne = EPlanStatus.DELETE : query.status = status;
 
-        if (!query.status && query.status != STATUS.NO_COMMIT) {
-            query.status = {$ne: STATUS.DELETE};
+        if (!query.status && query.status != EPlanStatus.NO_COMMIT) {
+            query.status = {$ne: EPlanStatus.DELETE};
         }
 
         if (!options.order) {
             options.order = [['start_at', 'desc'], ['created_at', 'desc']]; //默认排序，创建时间
         }
 
-        let {rows: orders, count} = await Models.TripPlan.findAndCount(options);
-        if (!orders || orders.length === 0) {
-            return new Paginate(options.offset / options.limit + 1, options.limit, count, []);
+        let {rows: tripPlans, count} = await Models.TripPlan.findAndCount(options);
+        
+        if (!tripPlans || tripPlans.length === 0) {
+            return [];
         }
 
-        let list = orders.map(function (order) {
-            return order.id;
+        return tripPlans.map(function (plan) {
+            return plan.id;
         });
-
-        return new Paginate(options.offset / options.limit + 1, options.limit, count, list);
     }
 
 
@@ -445,17 +481,17 @@ class TripPlanModule {
      * @returns {*}
      */
     @requireParams(['tripPlanId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'])
-// saveConsumeRecord['optional_params'] = TripDetailCols;
-    static saveConsumeRecord(params) {
+// saveTripDetail['optional_params'] = TripDetailCols;
+    static saveTripDetail(params) {
         let record = params;
         record.isCommit = false;
-        record.status = STATUS.NO_COMMIT;
+        record.status = EPlanStatus.NO_COMMIT;
         let options:any = {};
         options.fields = Object.keys(record);
 
         return Models.TripPlan.findById(params.tripPlanId)
             .then(function (order) {
-                if (!order || order.status == STATUS.DELETE) {
+                if (!order || order.status == EPlanStatus.DELETE) {
                     throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
                 }
 
@@ -463,7 +499,7 @@ class TripPlanModule {
                     L.ERR.PERMISSION_DENY;
                 }
 
-                if (order.status == STATUS.COMMIT) {
+                if (order.status == EPlanStatus.COMMIT) {
                     throw {code: -3, msg: '该订单已提交，不能添加消费单据'};
                 }
 
@@ -477,8 +513,8 @@ class TripPlanModule {
                 }
 
 
-                if (order.status > STATUS.NO_COMMIT) {
-                    order.status = STATUS.NO_COMMIT;
+                if (order.status > EPlanStatus.NO_COMMIT) {
+                    order.status = EPlanStatus.NO_COMMIT;
                 }
 
                 order.updatedAt = utils.now();
@@ -520,7 +556,7 @@ class TripPlanModule {
         return Models.TripPlan.findById(tripPlanId)
             .then(function (order) {
 
-                if (!order || order.status == STATUS.DELETE) {
+                if (!order || order.status == EPlanStatus.DELETE) {
                     throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST
                 }
 
@@ -530,13 +566,13 @@ class TripPlanModule {
 
                 return sequelize.transaction(function (t) {
                     return Promise.all([
-                        Models.TripPlan.update({status: STATUS.DELETE, updatedAt: utils.now()}, {
+                        Models.TripPlan.update({status: EPlanStatus.DELETE, updatedAt: utils.now()}, {
                             where: {id: tripPlanId},
                             fields: ['status', 'updatedAt'],
                             transaction: t
                         }),
                         Models.TripDetail.update({
-                            status: STATUS.DELETE,
+                            status: EPlanStatus.DELETE,
                             updatedAt: utils.now()
                         }, {where: {tripPlanId: tripPlanId}, fields: ['status', 'updatedAt'], transaction: t})
                     ])
@@ -560,7 +596,7 @@ class TripPlanModule {
 
         return Models.TripDetail.findById(id)
             .then(function (detail) {
-                if (!detail || detail.status == STATUS.DELETE) {
+                if (!detail || detail.status == EPlanStatus.DELETE) {
                     throw L.ERR.CONSUME_DETAIL_NOT_EXIST;
                 }
 
@@ -568,7 +604,7 @@ class TripPlanModule {
                     throw L.ERR.PERMISSION_DENY;
                 }
 
-                return Models.TripDetail.update({status: STATUS.DELETE, updatedAt: utils.now()}, {
+                return Models.TripDetail.update({status: EPlanStatus.DELETE, updatedAt: utils.now()}, {
                     where: {id: id},
                     fields: ['status', 'updatedAt']
                 })
@@ -593,7 +629,7 @@ class TripPlanModule {
 
         return Models.TripDetail.findById(params.consumeId)
             .then(function (custome) {
-                if (!custome || custome.status == STATUS.DELETE) {
+                if (!custome || custome.status == EPlanStatus.DELETE) {
                     throw L.ERR.NOT_FOUND;
                 }
 
@@ -615,7 +651,7 @@ class TripPlanModule {
                 ]
             })
             .spread(function (tripPlanId, custome, order, list) {
-                if (order.status == STATUS.NO_BUDGET) {
+                if (order.status == EPlanStatus.NO_BUDGET) {
                     throw {code: -2, msg: '还没有录入出差预算'};
                 }
 
@@ -625,7 +661,7 @@ class TripPlanModule {
                     times: times,
                     picture: params.picture,
                     created_at: moment().format('YYYY-MM-DD HH:mm'),
-                    status: STATUS.NO_COMMIT,
+                    status: EPlanStatus.NO_COMMIT,
                     remark: '',
                     approve_at: ''
                 };
@@ -635,7 +671,7 @@ class TripPlanModule {
                     newInvoice: params.picture,
                     invoice: JSON.stringify(invoiceJson),
                     updatedAt: moment().format("YYYY-MM-DD HH:mm:ss"),
-                    status: STATUS.NO_COMMIT,
+                    status: EPlanStatus.NO_COMMIT,
                     auditRemark: params.auditRemark || ''
                 };
 
@@ -691,7 +727,7 @@ class TripPlanModule {
         let userId = params.userId;
         let consumeId = params.consumeId;
         let consume = await Models.TripDetail.findById(consumeId);
-        if (!consume || consume.status == STATUS.DELETE) {
+        if (!consume || consume.status == EPlanStatus.DELETE) {
             throw {code: -4, msg: '查询记录不存在'};
         }
 
@@ -728,11 +764,11 @@ class TripPlanModule {
     static saveOrderLogs(logs) {
         return Models.TripPlan.findById(logs.tripPlanId)
             .then(function (order) {
-                if (!order || order.status == STATUS.DELETE) {
+                if (!order || order.status == EPlanStatus.DELETE) {
                     throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
                 }
 
-                if (order.status == STATUS.COMPLETE) {
+                if (order.status == EPlanStatus.COMPLETE) {
                     throw {code: -2, msg: '该计划单已完成，不能增加日志'};
                 }
 
@@ -754,14 +790,14 @@ class TripPlanModule {
     static approveInvoice(params) {
         return Models.TripDetail.findById(params.consumeId)
             .then(function (consume) {
-                if (!consume || consume.status == STATUS.DELETE)
+                if (!consume || consume.status == EPlanStatus.DELETE)
                     throw L.ERR.NOT_FOUND;
 
                 if (!consume.newInvoice) {
                     throw {code: -2, msg: '没有上传票据'};
                 }
 
-                if (consume.status == STATUS.COMMIT) {
+                if (consume.status == EPlanStatus.COMMIT) {
                     throw {code: -3, msg: '该票据已审核通过，不能重复审核'};
                 }
 
@@ -770,11 +806,11 @@ class TripPlanModule {
             .spread(function (order, consume) {
                 let invoiceJson = consume.invoice;
 
-                if (!order || order.status == STATUS.DELETE) {
+                if (!order || order.status == EPlanStatus.DELETE) {
                     throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
                 }
 
-                if (order.status === STATUS.NO_COMMIT && order.auditStatus == 0) {
+                if (order.status === EPlanStatus.NO_COMMIT && order.auditStatus == 0) {
                     throw {code: -3, msg: '该订单未提交，不能审核'};
                 }
 
@@ -804,7 +840,7 @@ class TripPlanModule {
                 };
 
                 return sequelize.transaction(function (t) {
-                    if (updates.status == STATUS.NO_BUDGET) {
+                    if (updates.status == EPlanStatus.NO_BUDGET) {
                         updates.isCommit = false;
                     }
                     return Promise.all([
@@ -818,9 +854,9 @@ class TripPlanModule {
                         .spread(function (ret) {
                             let status = params.status;
 
-                            if (status == STATUS.NO_BUDGET) {
+                            if (status == EPlanStatus.NO_BUDGET) {
                                 return Models.TripPlan.update({
-                                        status: STATUS.NO_COMMIT,
+                                        status: EPlanStatus.NO_COMMIT,
                                         auditStatus: -1,
                                         updatedAt: utils.now()
                                     },
@@ -844,7 +880,7 @@ class TripPlanModule {
                             return Models.TripDetail.findAll({where: {tripPlanId: order.id, status: {$ne: -2}}})
                                 .then(function (list) {
                                     for (let i = 0; i < list.length; i++) {
-                                        if (list[i].status != STATUS.COMMIT && list[i].id != ret[1][0].id) {
+                                        if (list[i].status != EPlanStatus.COMMIT && list[i].id != ret[1][0].id) {
                                             return false;
                                         }
                                     }
@@ -855,7 +891,7 @@ class TripPlanModule {
                                     if (isAllAudit) {
                                         let score:number = 0;
                                         score = (order.budget - order_updates.expenditure) > 0 ? order.budget - order_updates.expenditure : 0;
-                                        order_updates.status = STATUS.COMPLETE;
+                                        order_updates.status = EPlanStatus.COMPLETE;
                                         order_updates.auditStatus = 1;
                                         order_updates.score = Math.floor(score / 2);
                                     }
@@ -883,7 +919,7 @@ class TripPlanModule {
 
     static countTripPlanNum(params) {
         let query = params;
-        query.status = {$ne: STATUS.DELETE};
+        query.status = {$ne: EPlanStatus.DELETE};
         return Models.TripPlan.count({where: query});
     }
 
@@ -973,11 +1009,11 @@ class TripPlanModule {
         let query = params;
         let query_complete:any = {
             companyId: query.companyId,
-            status: STATUS.COMPLETE,
+            status: EPlanStatus.COMPLETE,
             auditStatus: 1
         }
         let query_sql = 'select sum(budget-expenditure) as \"savedMoney\" from tripplan.trip_plan where company_id=\'' + params.companyId + '\' and status=2 and audit_status=1';
-        query.status = {$gte: STATUS.NO_COMMIT};
+        query.status = {$gte: EPlanStatus.NO_COMMIT};
         let startAt:any = {};
 
         if (params.startTime) {
@@ -1049,7 +1085,7 @@ class TripPlanModule {
             Models.TripDetail.findAll({where: {tripPlanId: id}})
         ])
             .spread(function (order, list) {
-                if (!order || order.status == STATUS.DELETE) {
+                if (!order || order.status == EPlanStatus.DELETE) {
                     throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
                 }
 
@@ -1057,15 +1093,15 @@ class TripPlanModule {
                     throw L.ERR.PERMISSION_DENY;
                 }
 
-                if (order.status == STATUS.NO_BUDGET) {
+                if (order.status == EPlanStatus.NO_BUDGET) {
                     throw {code: -3, msg: '计划单还没有预算，不能提交'};
                 }
 
-                if (order.status == STATUS.COMMIT) {
+                if (order.status == EPlanStatus.COMMIT) {
                     throw {code: -4, msg: '该计划单已提交，不能重复提交'};
                 }
 
-                if (order.status > STATUS.COMMIT || order.auditStatus == 1) {
+                if (order.status > EPlanStatus.COMMIT || order.auditStatus == 1) {
                     throw {code: -5, msg: '该计划单已经审核通过，不能提交'};
                 }
 
@@ -1076,7 +1112,7 @@ class TripPlanModule {
                 for (let i = 0; i < list.length; i++) {
                     let s = list[i];
 
-                    if ((s.status === STATUS.NO_COMMIT && !s.newInvoice) || s.status == STATUS.NO_BUDGET) {
+                    if ((s.status === EPlanStatus.NO_COMMIT && !s.newInvoice) || s.status == EPlanStatus.NO_BUDGET) {
                         throw {code: -7, msg: '票据没有上传完'};
                     }
                 }
@@ -1084,7 +1120,7 @@ class TripPlanModule {
             .then(function () {
                 return Promise.all([
                     Models.TripPlan.update({
-                        status: STATUS.COMMIT,
+                        status: EPlanStatus.COMMIT,
                         auditStatus: 0,
                         updatedAt: utils.now(),
                         isCommit: true,
@@ -1144,7 +1180,7 @@ class TripPlanModule {
             throw {code: -3, msg: '城市代码不能为空'};
         }
 
-        _planOrder.status = {$ne: STATUS.DELETE};
+        _planOrder.status = {$ne: EPlanStatus.DELETE};
 
         let orders = await Models.TripPlan.findAll({where: _planOrder});
         if (orders.length <= 0) {
@@ -1153,8 +1189,8 @@ class TripPlanModule {
 
         let details = [];
         await Promise.all(tripDetails.map(async function (detail) {
-            detail.status = {$ne: STATUS.DELETE};
-            detail.invoiceType = INVOICE_TYPE[detail.invoiceType];
+            detail.status = {$ne: EPlanStatus.DELETE};
+            detail.invoiceType = EInvoiceType[detail.invoiceType];
             let plan_details = await Models.TripDetail.findAll({where: detail});
             plan_details.map(function (d) {
                 details.push(d);
@@ -1204,11 +1240,7 @@ class TripPlanModule {
     @requireParams(['companyId'], ['code', 'name', 'count'])
 
     static getProjectList(params) {
-        let options:any = {
-            where: params,
-            attributes: ['name'],
-            order: [['created_at', 'desc']]
-        };
+        let options:any = {where: params, attributes: ['name'], order: [['created_at', 'desc']]};
 
         if (params.count) {
             options.limit = params.count;
@@ -1225,7 +1257,7 @@ class TripPlanModule {
         return Models.Project.create(params);
     }
 
-    static async getProject(params:{id:string}):Promise<Project> {
+    static async getProjectById(params:{id:string}):Promise<Project> {
         let project = await Models.Project.findBuId(params.id);
         return new Project(project);
     }
@@ -1269,5 +1301,71 @@ function getProjectByName(params) {
             return project;
         })
 }
+
+/**
+ * 从参数中获取计划详情数组
+ * @param params
+ * @returns {Object}
+ */
+function getPlanDetails(params:any):{orderStatus:string, budget:number, tripDetails:any} {
+    let tripDetails:any = [];
+    let tripDetails_required_fields = ['startTime', 'invoiceType', 'budget'];
+    if(params.outTrip){
+        params.outTrip.map(function (detail:any) {
+            detail.type = 1;
+            tripDetails.push(detail);
+        });
+    }
+
+    if(params.backTrip){
+        params.backTrip.map(function (detail:any) {
+            detail.type = 2;
+            tripDetails.push(detail);
+        });
+    }
+
+    if(params.hotel){
+        params.hotel.map(function (detail:any) {
+            detail.type = 3;
+            tripDetails.push(detail);
+        });
+    }
+
+    let total_budget:number = 0;
+    let isBudget = true;
+
+    let _tripDetails = tripDetails.map(function (detail) {
+        tripDetails_required_fields.forEach(function (key) {
+            if (!_.has(detail, key)) {
+                throw {code: '-1', msg: 'tripDetails的属性' + key + '没有指定'};
+            }
+        });
+
+        if (detail.deptCity && !detail.deptCityCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        if (detail.arrivalCity && !detail.arrivaltCityCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        if (detail.city && !detail.cityCode) {
+            throw {code: -3, msg: '城市代码不能为空'};
+        }
+
+        if (!/^-?\d+(\.\d{1,2})?$/.test(detail.budget)) {
+            throw {code: -2, nsg: '预算金额格式不正确'};
+        }
+
+        detail.budget > 0 ? total_budget = total_budget + parseFloat(detail.budget) : isBudget = false;
+
+        return _.pick(detail, API.tripPlan.TripDetailCols);
+    });
+
+    let orderStatus = isBudget ? 'WAIT_UPLOAD' : 'NO_BUDGET'; //是否有预算，设置出差计划状态
+
+    return {orderStatus: orderStatus, budget: total_budget, tripDetails: _tripDetails};
+}
+
 
 export = TripPlanModule;
