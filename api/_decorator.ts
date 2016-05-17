@@ -172,6 +172,15 @@ export function isMyCompanyAgency(idpath: string) {
     }
 }
 
+export function isMyAgency(idpath: string) {
+    return async function(fn, self, args) {
+        let id = _.get(args, idpath);
+        let accountId = _getAccountId();
+        let agencyUser = await API.agency.getAgencyUser({id: accountId});
+        return id && agencyUser && agencyUser["agencyId"] == id;
+    }
+}
+
 export function isSameCompany(idpath:string) {
     return async function(fn, self, args) {
         let id = _.get(args, idpath);
