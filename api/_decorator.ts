@@ -32,15 +32,26 @@ export function requirePermit(permits: string| string[], type?: number) {
     }
 }
 
-interface CheckInterface {
+export interface CheckInterface {
     if: (fn: Function, self: any, args: any) => Promise<boolean>,
-    then: (target: Function, string: any, desc: any) => Promise<any>    //then函数直接是decorator函数
+    then?: (target: Function, string: any, desc: any) => Promise<any>    //then函数直接是decorator函数
 }
 
+//
+// function _getTestAccountId() {
+//     return 1;
+// }
+//
+// function _testDecorator(idpath: string) {
+//     return function(fn: Function, self: any, args: any) {
+//         let id = _.get(args, idpath);
+//         return Promise.resolve(id == _getTestAccountId());
+//     }
+// }
+//
 // class Test2 {
-//     @judgeRoleHandle([
-//         {"if": isMySelf("0.id"), "then": filterResultColumn(["id", "username"])} as CheckInterface,
-//         {"if": isMyCompany("0.id"), "then": filterResultColumn(["password"])} as CheckInterface,
+//     @conditionDecorator([
+//         {"if": _testDecorator("0.id"), "then": filterResultColumn(["id", "username"])} as CheckInterface,
 //     ])
 //     static myTest(params) {
 //         let result = {
@@ -51,11 +62,30 @@ interface CheckInterface {
 //         };
 //         return Promise.resolve(result);
 //     }
+//
+//     @conditionDecorator([
+//         {"if": _testDecorator("0.id")}
+//     ])
+//     static myTest2(params) {
+//         let result = {
+//             username: "username",
+//             password: "password"
+//         }
+//         return Promise.resolve(result);
+//     }
 // }
 //
-// Test2.myTest({"id": "2"})
+// Test2.myTest({"id": "1"})
 //     .then(function(result) {
 //         console.info("函数最终返回值是:", result);
+//     })
+//     .catch(function(err) {
+//         console.info(err);
+//     })
+//
+// Test2.myTest2({"id": "1"})
+//     .then(function(result) {
+//         console.info("MyTest2最终返回值是:", result);
 //     })
 //     .catch(function(err) {
 //         console.info(err);
@@ -81,7 +111,7 @@ export function filterResultColumn(columns: string[]) {
     }
 }
 
-export function switchDecorator(checkFnList: CheckInterface[]) {
+export function conditionDecorator(checkFnList: CheckInterface[]) {
     return function (target, key, desc) {
         let fn = desc.value;
         desc.value = async function(...args) {
@@ -90,52 +120,105 @@ export function switchDecorator(checkFnList: CheckInterface[]) {
             let thenFn;
             for(let checkFn of checkFnList) {
                 let ret = await checkFn.if(fn, self, args);
+                //如果返回true,执行then函数
                 if (!!ret) {
                     thenFn = checkFn.then;
-                    break;
+                    if (!thenFn) {
+                        //如果then不存在,直接处理原函数
+                        return fn.apply(self, args);
+                    }
+
+                    //判断完if后,将desc还原为原来的函数,否则将引起死循环
+                    desc.value = fn;
+                    //self作用于也要一并传过去
+                    return thenFn(target, key, desc).value.apply(self, args)
                 }
             }
-            if(!thenFn) {
-                throw new Error("PERMISSION DENY!");
-            }
-            //判断完if后,将desc还原为原来的函数,否则将引起死循环
-            desc.value = fn;
-            //self作用于也要一并传过去
-            return thenFn(target, key, desc).value.apply(self, args)
+            throw L.ERR.PERMISSION_DENY;
         }
-
         return desc;
     }
 }
 
-export function isMySelf(idpath: string) {
-    return async function (fn, self, args) {
-        let id = _.get(args, idpath);
-        let session = Zone.current.get("session");
-        return session && session["account"] == id
-    }
-}
-
-export function isMyCompany(idpath: string) {
-    return async function(fn, self, args) {
-        let id = _.get(args, idpath);
-        let session = Zone.current.get("session");
-
-        let staff = await API.staff.getStaff({id: session["account_id"]});
-        return staff && staff["companyId"] == id;
-    }
-}
-
-export function isMyCompanyAgency(idpath: string) {
-    return async function(fn, self, args) {
-        let id = _.get(args, idpath);
-        let session = Zone.current.get("session");
-
-        let staff = await API.staff.getStaff({id: session["account_id"]});
-        if (!staff || !staff["companyId"]) {
-            return false;
+export var condition = {
+    isMySelf: function (idpath: string) {
+        return async function (fn, self, args) {
+            let id = _.get(args, idpath);
+            let accountId = _getAccountId();
+            return id && accountId && id == accountId;
         }
-        let company = await API.company.getCompany({id: staff["companyId"]})
-        return company && company.agency == id;
+    },
+    isMyCompany: function (idpath: string) {
+        return async function(fn, self, args) {
+            let id = _.get(args, idpath);
+            let accountId = _getAccountId();
+
+            let staff = await API.staff.getStaff({id: accountId});
+            return staff && staff["companyId"] == id;
+        }
+    },
+    isMyCompanyAgency: function (idpath: string) {
+        return async function(fn, self, args) {
+            let id = _.get(args, idpath);
+            let session = Zone.current.get("session");
+
+            let staff = await API.staff.getStaff({id: session["account_id"]});
+            if (!staff || !staff["companyId"]) {
+                return false;
+            }
+            let company = await API.company.getCompany({id: staff["companyId"]})
+            return company && company["agencyId"] == id;
+        }
+    },
+    isMyAgency: function (idpath: string) {
+        return async function(fn, self, args) {
+            let id = _.get(args, idpath);
+            let accountId = _getAccountId();
+            let agencyUser = await API.agency.getAgencyUser({id: accountId});
+            return id && agencyUser && agencyUser["agencyId"] == id;
+        }
+    },
+    isSameCompany: function (idpath:string) {
+        return async function(fn, self, args) {
+            let id = _.get(args, idpath);
+            let accountId = _getAccountId();
+
+            let [my, other] = await Promise.all([
+                API.staff.getStaff({id: accountId}),
+                API.staff.getStaff({id: id})
+            ]);
+
+            return my && other && my["companyId"] == other["companyId"];
+        }
+    },
+    isSameAgency: function (idpath: string) {
+        return async function(fn, self, args) {
+            let id = _.get(args, idpath);
+            let accountId = _getAccountId();
+
+            let [my, other] = await Promise.all([
+                API.agency.getAgencyUser({id: accountId}),
+                API.agency.getAgencyUser({id: id})
+            ])
+
+            return my && other && my["agencyId"] == other["agencyId"];
+        }
+    },
+    isCompanyAgency: function(idpath: string) {
+        return async function (fn ,self, args) {
+            let id = _.get(args, idpath);
+            let accountId = _getAccountId();
+            let [agency, company] = await Promise.all([
+                API.agency.getAgencyUser({id: accountId}),
+                API.company.getCompany({id: id})
+            ]);
+
+            return agency && company && agency.id == company["agencyId"];
+        }
     }
+}
+
+function _getAccountId() {
+    let session = Zone.current.get("session");
+    return session["accountId"];
 }

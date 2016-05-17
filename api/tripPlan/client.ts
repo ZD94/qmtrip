@@ -1,6 +1,6 @@
 import { CachedService, requireAPI } from 'common/model';
 import {TripPlan, TripDetail, Project} from 'api/_types/tripPlan';
-import ApiTripPlan = require('api/client/tripPlan');
+import ApiTripPlan = require('api/tripPlan');
 
 export class TripPlanService extends CachedService<TripPlan>{
     constructor($cacheFactory: ng.ICacheFactoryService){
@@ -14,11 +14,11 @@ export class TripPlanService extends CachedService<TripPlan>{
 
     async $get(id: string): Promise<TripPlan>{
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
-        return api.getTripPlanById({id: id});
+        return api.getTripPlan({id: id});
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
-        return api.pageTripPlans(where);
+        return api.listTripPlans(where);
     }
     async $update(id: string, fields: any): Promise<any> {
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
@@ -38,16 +38,16 @@ export class TripDetailService extends CachedService<TripDetail>{
 
     async $create(obj: any): Promise<TripDetail> {
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
-        return api.saveTripPlan(obj);
+        return api.saveTripDetail(obj);
     }
 
     async $get(id: string): Promise<TripDetail>{
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
-        return api.getTripPlanById({id: id});
+        return api.getTripDetail({id: id});
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
-        return api.pageTripPlans(where);
+        return api.getTripPlanDetails(where);
     }
     async $update(id: string, fields: any): Promise<any> {
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
@@ -76,7 +76,7 @@ export class ProjectService extends CachedService<Project>{
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiTripPlan>('tripPlan');
-        return api.getProjectsList(where);
+        return api.getProjectList(where);
     }
     async $update(id: string, fields: any): Promise<any> {
         throw {code: -1, msg: '不能更新项目名称'};

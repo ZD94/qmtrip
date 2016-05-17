@@ -23,4 +23,5 @@ initModels({
     moneyChange: new MoneyChangeService(),
     project: new ProjectService(),
     account: null,
+    seed: null,
 });

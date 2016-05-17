@@ -99,7 +99,7 @@ export function pageTripPlans(params){
                 options.order = [['commit_time', 'asc'], ['created_at', 'asc']];
             }
 
-            return API.tripPlan.listTripPlanOrder(options);
+            return API.tripPlan.listTripPlans(options);
         })
 }
 
@@ -126,7 +126,7 @@ export function approveInvoice(params){
     let expenditure = '0';
     let _startTime = "";
 
-    return API.tripPlan.getConsumeDetail({consumeId: consumeId, columns: ['accountId', 'orderId', 'type', 'startTime']})
+    return API.tripPlan.getTripDetail({consumeId: consumeId, columns: ['accountId', 'orderId', 'type', 'startTime']})
         .then(function(consumeDetail){
             if(!consumeDetail.accountId){
                 throw {code: -6, msg: '消费记录异常'};

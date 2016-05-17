@@ -194,7 +194,7 @@ function book_ticket(params) {
     var cabin_id = params.cabin_id;
 
     return Promise.all([
-        API.tripPlan.getConsumeDetail({consumeId: params.consume_id}),
+        API.tripPlan.getTripDetail({consumeId: params.consume_id}),
         cache.read(flight_no),
         cache.read(cabin_id)
     ])

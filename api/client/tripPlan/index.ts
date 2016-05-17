@@ -17,77 +17,7 @@ import {EPlanStatus, TripPlan, Project, TripDetail} from 'api/_types/tripPlan';
  * @class tripPlan 出差计划
  */
 class ApiTripPlan {
-    /**
-     * @method saveTripPlan
-     * 生成出差计划单
-     * @param params
-     * @returns {Promise<TripPlan>}
-     */
-    static async saveTripPlan(params) {
-        let self: any = this;
-        let accountId = self.accountId;
-        let staff = await API.staff.getStaff({id: accountId, columns: ['companyId', 'email', 'name']});
-        let email = staff.email;
-        let staffName = staff.name;
-
-        let _tripPlan:any = _.pick(params, API.tripPlan.TripPlanCols);
-        let {orderStatus, budget, tripDetails} = getPlanDetails(params);
-
-        _tripPlan.tripDetails = tripDetails;
-        _tripPlan.orderStatus = orderStatus;
-        _tripPlan.budget = budget;
-        _tripPlan.planNo = await API.seeds.getSeedNo('tripPlanNo'); //获取出差计划单号
-        _tripPlan.accountId = accountId;
-        _tripPlan.companyId = staff.companyId;
-
-        let tripPlan = await API.tripPlan.saveTripPlan(_tripPlan);
-
-        if (tripPlan.budget <= 0 || tripPlan.orderStatus === EPlanStatus.NO_BUDGET) {
-            return tripPlan; //没有预算，直接返回计划单
-        }
-        let staffs = await API.staff.getStaffs({companyId: staff.target.companyId, roleId: {$ne: 1}, status: {$gte: 0}, columns: ['id', 'name', 'email']});
-        let url = config.host + '/corp.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
-        let go = '无', back = '无', hotel = '无';
-
-        if (tripPlan.outTrip && tripPlan.outTrip.length > 0) {
-            let g = tripPlan.outTraffic[0];
-            go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.deptCity + ' 到 ' + g.arrivalCity;
-            if (g.latestArriveTime)
-                go += ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达';
-            go += ', 动态预算￥' + g.budget;
-        }
-
-        if (tripPlan.backTrip && tripPlan.backTrip.length > 0) {
-            let b = tripPlan.backTraffic[0];
-            back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.deptCity + ' 到 ' + b.arrivalCity;
-            if (b.latestArriveTime)
-                back += ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达';
-            back += ', 动态预算￥' + b.budget;
-        }
-
-        if (tripPlan.hotel && tripPlan.hotel.length > 0) {
-            let h = tripPlan.hotel[0];
-            hotel = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') +
-                ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
-        }
-
-        await staffs.map(async function (s) {
-            let account = await API.auth.getAccount({id: s.id, type: 1, attributes: ['status']});
-            if (account.status != 1)
-                return false;
-
-            let vals = {managerName: s.name, username: staffName, email: email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-                projectName: tripPlan.description, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel,
-                totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url};
-            let log = {userId: accountId, tripPlanId: tripPlan.id, remark: tripPlan.planNo + '给企业管理员' + s.name + '发送邮件'};
-
-            await API.mail.sendMailRequest({toEmails: s.email, templateName: 'qm_notify_new_travelbudget', values: vals});
-            await API.tripPlan.saveTripPlanLog(log);
-            return true;
-        });
-
-        return tripPlan;
-    }
+    
 
 
     static updateTripPlanOrder(params) {
@@ -104,17 +34,17 @@ class ApiTripPlan {
     static saveConsumeDetail(params) {
         let self: any = this;
         params.accountId = self.accountId;
-        return API.tripPlan.saveConsumeRecord(params);
+        return API.tripPlan.saveTripDetail(params);
     }
 
     /**
-     * @method getTripPlanById
+     * @method getTripPlan
      * 获取计划单详情
      * @param {string} params.id
      * @returns {Promise<TripPlan>}
      */
     @requireParams(['id'])
-    static async getTripPlanById(params:{id:string}) {
+    static async getTripPlan(params:{id:string}) {
         let self: any = this;
         let accountId = self.accountId;
         let account = await API.auth.getAccount({id: accountId});
@@ -172,7 +102,7 @@ class ApiTripPlan {
             options.order = [params.order];
         }
 
-        return API.tripPlan.listTripPlanOrder(options);
+        return API.tripPlan.listTripPlans(options);
     }
 
 
@@ -210,7 +140,7 @@ class ApiTripPlan {
             options.order = [params.order];
         }
 
-        return API.tripPlan.listTripPlanOrder(options);
+        return API.tripPlan.listTripPlans(options);
     }
 
     /**
@@ -287,7 +217,7 @@ class ApiTripPlan {
                     return {page: 1, perPage: 20, items: []};
                 }
 
-                return API.tripPlan.listTripPlanOrder(options);
+                return API.tripPlan.listTripPlans(options);
             })
     }
 
@@ -562,7 +492,7 @@ class ApiTripPlan {
         console.info("step 1...");
         let {agencyId} = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
         console.info("step 2...");
-        let {tripPlanId, accountId: staffId} = await API.tripPlan.getConsumeDetail({consumeId: consumeId, columns: ['accountId', 'tripPlanId']});
+        let {tripPlanId, accountId: staffId} = await API.tripPlan.getTripDetail({consumeId: consumeId, columns: ['accountId', 'tripPlanId']});
         console.info("step 3...");
         console.info(staffId);
         let staff = await API.staff.getStaff({id: staffId, columns: ['companyId', 'name', 'email']});

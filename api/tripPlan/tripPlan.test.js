@@ -346,25 +346,25 @@ describe("api/client/tripPlan.js", function() {
         });
 
 
-        it("#getTripPlanById should be error when param is not uuid", function (done) {
+        it("#getTripPlan should be error when param is not uuid", function (done) {
             var self = {accountId: staffId};
-            API.client.tripPlan.getTripPlanById.call(self, {id: "123456"}, function (err, ret) {
+            API.client.tripPlan.getTripPlan.call(self, {id: "123456"}, function (err, ret) {
                 assert(err != null);
                 assert.equal(ret, null);
                 done();
             })
         });
 
-        it("#getTripPlanById should be ok by staff", function (done) {
-            API.client.tripPlan.getTripPlanById.call({accountId: staffId}, {id: newplanId}, function (err, ret) {
+        it("#getTripPlan should be ok by staff", function (done) {
+            API.client.tripPlan.getTripPlan.call({accountId: staffId}, {id: newplanId}, function (err, ret) {
                 assert.equal(err, null);
                 assert.equal(ret.id, newplanId);
                 done();
             })
         });
 
-        it("#getTripPlanById should be ok by agency", function(done) {
-            API.client.tripPlan.getTripPlanById.call({accountId: agencyUserId}, {id: newplanId})
+        it("#getTripPlan should be ok by agency", function(done) {
+            API.client.tripPlan.getTripPlan.call({accountId: agencyUserId}, {id: newplanId})
                 .then(function (ret) {
                     assert.equal(ret.id, newplanId);
                     done();
