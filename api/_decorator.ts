@@ -34,7 +34,7 @@ export function requirePermit(permits: string| string[], type?: number) {
 
 interface CheckInterface {
     if: (fn: Function, self: any, args: any) => Promise<boolean>,
-    then: (target: Function, string: any, desc: any) => Promise<any>
+    then: (target: Function, string: any, desc: any) => Promise<any>    //then函数直接是decorator函数
 }
 
 // class Test2 {
