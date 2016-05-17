@@ -81,7 +81,7 @@ export function filterResultColumn(columns: string[]) {
     }
 }
 
-export function switchDecorator(checkFnList: CheckInterface[]) {
+export function chooseDecorator(checkFnList: CheckInterface[]) {
     return function (target, key, desc) {
         let fn = desc.value;
         desc.value = async function(...args) {
