@@ -34,13 +34,24 @@ export function requirePermit(permits: string| string[], type?: number) {
 
 interface CheckInterface {
     if: (fn: Function, self: any, args: any) => Promise<boolean>,
-    then: (target: Function, string: any, desc: any) => Promise<any>    //then函数直接是decorator函数
+    then?: (target: Function, string: any, desc: any) => Promise<any>    //then函数直接是decorator函数
 }
 
+//
+// function _getTestAccountId() {
+//     return 1;
+// }
+//
+// function _testDecorator(idpath: string) {
+//     return function(fn: Function, self: any, args: any) {
+//         let id = _.get(args, idpath);
+//         return Promise.resolve(id == _getTestAccountId());
+//     }
+// }
+//
 // class Test2 {
-//     @judgeRoleHandle([
-//         {"if": isMySelf("0.id"), "then": filterResultColumn(["id", "username"])} as CheckInterface,
-//         {"if": isMyCompany("0.id"), "then": filterResultColumn(["password"])} as CheckInterface,
+//     @chooseDecorator([
+//         {"if": _testDecorator("0.id"), "then": filterResultColumn(["id", "username"])} as CheckInterface,
 //     ])
 //     static myTest(params) {
 //         let result = {
@@ -51,11 +62,30 @@ interface CheckInterface {
 //         };
 //         return Promise.resolve(result);
 //     }
+//
+//     @chooseDecorator([
+//         {"if": _testDecorator("0.id")}
+//     ])
+//     static myTest2(params) {
+//         let result = {
+//             username: "username",
+//             password: "password"
+//         }
+//         return Promise.resolve(result);
+//     }
 // }
 //
-// Test2.myTest({"id": "2"})
+// Test2.myTest({"id": "1"})
 //     .then(function(result) {
 //         console.info("函数最终返回值是:", result);
+//     })
+//     .catch(function(err) {
+//         console.info(err);
+//     })
+//
+// Test2.myTest2({"id": "1"})
+//     .then(function(result) {
+//         console.info("MyTest2最终返回值是:", result);
 //     })
 //     .catch(function(err) {
 //         console.info(err);
@@ -90,20 +120,22 @@ export function chooseDecorator(checkFnList: CheckInterface[]) {
             let thenFn;
             for(let checkFn of checkFnList) {
                 let ret = await checkFn.if(fn, self, args);
+                //如果返回true,执行then函数
                 if (!!ret) {
                     thenFn = checkFn.then;
-                    break;
+                    if (!thenFn) {
+                        //如果then不存在,直接处理原函数
+                        return fn.apply(self, args);
+                    }
+
+                    //判断完if后,将desc还原为原来的函数,否则将引起死循环
+                    desc.value = fn;
+                    //self作用于也要一并传过去
+                    return thenFn(target, key, desc).value.apply(self, args)
                 }
             }
-            if(!thenFn) {
-                throw new Error("PERMISSION DENY!");
-            }
-            //判断完if后,将desc还原为原来的函数,否则将引起死循环
-            desc.value = fn;
-            //self作用于也要一并传过去
-            return thenFn(target, key, desc).value.apply(self, args)
+            throw L.ERR.PERMISSION_DENY;
         }
-
         return desc;
     }
 }
