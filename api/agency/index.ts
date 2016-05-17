@@ -370,7 +370,6 @@ class AgencyModule {
      * 通过邮箱获取代理商信息
      * @param params.email 邮箱
      */
-    @requirePermit('user.query', 2)
     @requireParams(['email'])
     static async agencyByEmail(params: {email: string}): Promise<Agency> {
         let agency = await Models.Agency.findOne({where: params});
@@ -485,15 +484,14 @@ class AgencyModule {
             })
             .spread(function (agencyId, companys) {
                 API.agency.__defaultAgencyId = agencyId;
-                console.info("#################");
 
                 return companys.map(function (c) {
                     return API.company.updateCompany({companyId: c.id, agencyId: agencyId})
                 })
             })
             .catch(function (err) {
-                // logger.error("初始化系统默认代理商失败...");
-                // logger.error(err.stack);
+                logger.error("初始化系统默认代理商失败...");
+                logger.error(err.stack);
             })
 
     }
