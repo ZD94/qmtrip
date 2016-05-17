@@ -1,20 +1,18 @@
 /**
- * Created by wlh on 16/5/10.
+ * Created by wlh on 16/5/16.
  */
-
 const API = require("common/api");
 const _ = require("lodash");
+const L = require("common/language");
 
 export function requirePermit(permits: string| string[], type?: number) {
     return function (target, key, desc) {
-        let errMsg = `{"code": 403, "msg":"permit deny!"}`
-        let self = this;
         let fn = desc.value;
-        desc.value = function () {
-            let args = arguments;
+        desc.value = function (...args) {
+            let self = this;
             let session = Zone.current.get("session");
             if (!session["accountId"] || !session["tokenId"]) {
-                return Promise.reject(errMsg);
+                return Promise.reject(L.ERR.PERMISSION_DENIED);
             }
 
             let accountId = session["accountId"];
@@ -25,7 +23,7 @@ export function requirePermit(permits: string| string[], type?: number) {
             return API.permit.checkPermission({accountId: accountId, permissions: permits, type: type})
                 .then(function(ret) {
                     if (!ret) {
-                        throw new Error(errMsg);
+                        throw L.ERR.PERMISSION_DENIED
                     }
                     return fn.apply(self, args)
                 });
@@ -34,152 +32,110 @@ export function requirePermit(permits: string| string[], type?: number) {
     }
 }
 
-export function filterColumns(keys: string[]) {
-    return function (originFunc, self, args) {
-        return originFunc.apply(self, args)
-            .then(function(result) {
-                //handle filter column
-                if (keys.indexOf("*") >= 0) {
+interface CheckInterface {
+    if: (fn: Function, self: any, args: any) => Promise<boolean>,
+    then: (target: Function, string: any, desc: any) => Promise<any>
+}
+
+// class Test2 {
+//     @judgeRoleHandle([
+//         {"if": isMySelf("0.id"), "then": filterResultColumn(["id", "username"])} as CheckInterface,
+//         {"if": isMyCompany("0.id"), "then": filterResultColumn(["password"])} as CheckInterface,
+//     ])
+//     static myTest(params) {
+//         let result = {
+//             id: "1",
+//             username: "王大拿",
+//             password: "time9818",
+//             sex: '男'
+//         };
+//         return Promise.resolve(result);
+//     }
+// }
+//
+// Test2.myTest({"id": "2"})
+//     .then(function(result) {
+//         console.info("函数最终返回值是:", result);
+//     })
+//     .catch(function(err) {
+//         console.info(err);
+//     })
+
+//筛选返回结果
+export function filterResultColumn(columns: string[]) {
+    return function (target, key, desc) {
+        let fn = desc.value;
+        desc.value = function(...args) {
+            let self = this;
+            return fn.apply(self, args)
+                .then(function(result) {
+                    for(let k in result) {
+                        if (columns.indexOf(k) < 0) {
+                            delete result[k];
+                        }
+                    }
                     return result;
+                })
+        }
+        return desc;
+    }
+}
+
+export function switchDecorator(checkFnList: CheckInterface[]) {
+    return function (target, key, desc) {
+        let fn = desc.value;
+        desc.value = async function(...args) {
+            //在这里才能拿到参数
+            let self = this;
+            let thenFn;
+            for(let checkFn of checkFnList) {
+                let ret = await checkFn.if(fn, self, args);
+                if (!!ret) {
+                    thenFn = checkFn.then;
+                    break;
                 }
-
-                for(let _key of result) {
-                    if (keys.indexOf(_key) < 0) {
-                        delete result[_key];
-                    }
-                }
-                return result;
-            })
-    }
-}
-
-export enum ID_TYPE {
-    ACCOUNT_ID = 1,
-    COMPANY_ID,
-    AGENCY_ID
-}
-
-export function isSelf(idpath: string, func: any) {
-    return function(origin, self, args) {
-        let id = _.get(args, idpath);
-        let session = Zone.current.get("session");
-        let resolved = false;
-        let result = null;
-        if (session["accountId"] == id) {
-            resolved = true;
-        }
-
-        if (resolved) {
-            result = func(origin, self, args);
-        }
-        return {resolved: resolved, result: result};
-    }
-}
-
-export function isSameCompany(idpath:string, idType: ID_TYPE, func) {
-    return function(origin, self, args) {
-        let id = _.get(args, idpath);
-        let session = Zone.current.get("session");
-        let accountId = session["accountId"];
-        let resolved = false;
-        let result = null;
-        if (idType == ID_TYPE.COMPANY_ID) {
-            return API.staff.getStaff(accountId)
-                .then(function(staff) {
-                    if (staff["companyId"] == id) {
-                        resolved = true;
-                        result = func(origin, self, args);
-                    }
-                    return {resolved: resolved, result: result};
-                })
-        }
-
-        if (idType == ID_TYPE.ACCOUNT_ID) {
-            //是否同一个公司
-            return Promise.all([
-                    API.staff.getStaff(accountId),
-                    API.staff.getStaff(id),
-                ])
-                .spread(function(currentStaff, queryStaff) {
-                    if (currentStaff["companyId"] == queryStaff["companyId"]) {
-                        resolved = true;
-                        result = func(origin, self, args);
-                    }
-
-                    return {resolved: resolved, result: result};
-                })
-        }
-        return Promise.resolve({resolved: resolved, result: result});
-    }
-}
-
-export function isCompanyAgency(idpath: string, idType: ID_TYPE, func) {
-    return function(origin, self, args) {
-        let id = _.get(args, idpath);
-        let session = Zone.current.get("session");
-        let accountId = session["accountId"];
-        let resolved = false;
-        let result = null;
-        //ID是agencyId
-        if (idType == ID_TYPE.AGENCY_ID) {
-            return API.agency.getAgencyUser({id: accountId})
-                .then(function(agencyUser) {
-                    if (agencyUser["agencyId"] == id) {
-                        resolved = true;
-                        result = func(origin, self, args);
-                    }
-                    return {resolved: resolved, result: result};
-                })
-        }
-
-        //ID是companyId
-        if (idType == ID_TYPE.COMPANY_ID) {
-            return Promise.all([
-                API.agency.getAgencyUser({id: accountId}),
-                API.company.getCompany({companyId: id})
-            ])
-                .spread(function(agencyUser, company) {
-                    if (agencyUser.agencyId == company.agencyId) {
-                        resolved = true;
-                        result = func(origin, self, args);
-                    }
-                    return {resolved: resolved, result: result};
-                })
-        }
-
-        if (idType == ID_TYPE.ACCOUNT_ID) {
-            //是否代理商关系
-            return Promise.all([
-                    API.agency.getAgencyUser({id: accountId}),
-                    API.staff.getStaff({id: id})
-                        .then(function(staff) {
-                            return API.company.getCompany({companyId: staff["companyId"]})
-                        })
-                ])
-                .spread(function(agencyUser, company) {
-                    if (agencyUser.agencyId == company.agencyId) {
-                        resolved = true;
-                        result = func(origin, self, args);
-                    }
-                    return {resolved: resolved, result: result};
-                })
-        }
-
-        return Promise.resolve({resolved: resolved, result: result});
-    }
-}
-
-export function judgeRoleHandle(roleList: any[]) {
-    return async function(target, funcname, desc) {
-        let self = this;
-        let args = arguments;
-
-        for(let roleCheck of roleList) {
-            let {resolved, result} = await roleCheck(target[funcname], self, args);
-            if (resolved) {
-                return result;
             }
+            if(!thenFn) {
+                throw new Error("PERMISSION DENY!");
+            }
+            //判断完if后,将desc还原为原来的函数,否则将引起死循环
+            desc.value = fn;
+            //self作用于也要一并传过去
+            return thenFn(target, key, desc).value.apply(self, args)
         }
-        throw new Error(`{"code": 403, "msg": "Permit Deny!"}`);
+
+        return desc;
+    }
+}
+
+export function isMySelf(idpath: string) {
+    return async function (fn, self, args) {
+        let id = _.get(args, idpath);
+        let session = Zone.current.get("session");
+        return session && session["account"] == id
+    }
+}
+
+export function isMyCompany(idpath: string) {
+    return async function(fn, self, args) {
+        let id = _.get(args, idpath);
+        let session = Zone.current.get("session");
+
+        let staff = await API.staff.getStaff({id: session["account_id"]});
+        return staff && staff["companyId"] == id;
+    }
+}
+
+export function isMyCompanyAgency(idpath: string) {
+    return async function(fn, self, args) {
+        let id = _.get(args, idpath);
+        let session = Zone.current.get("session");
+
+        let staff = await API.staff.getStaff({id: session["account_id"]});
+        if (!staff || !staff["companyId"]) {
+            return false;
+        }
+        let company = await API.company.getCompany({id: staff["companyId"]})
+        return company && company.agency == id;
     }
 }
