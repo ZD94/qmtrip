@@ -370,7 +370,6 @@ class AgencyModule {
      * 通过邮箱获取代理商信息
      * @param params.email 邮箱
      */
-    @requirePermit('user.query', 2)
     @requireParams(['email'])
     static async agencyByEmail(params: {email: string}): Promise<Agency> {
         let agency = await Models.Agency.findOne({where: params});
@@ -382,6 +381,7 @@ class AgencyModule {
      * @param params 查询条件 params.company_id 企业id
      * @param options options.perPage 每页条数 options.page当前页
      */
+    @clientExport
     static listAndPaginateAgencyUser(params) {
         var options:any = {};
         if (params.options) {
@@ -422,6 +422,7 @@ class AgencyModule {
      * @param params
      * @returns {Promise<string[]>}
      */
+    @clientExport
     static async getAgencyUsers(params: {agencyId: string}): Promise<string[]> {
         params['status'] = {$ne: EAgencyStatus.DELETE};
         let users = await  Models.AgencyUser.findAll({where: params, attributes: ['id']});
@@ -435,7 +436,7 @@ class AgencyModule {
      * 测试用例使用删除代理商和用户的操作，不在client里调用
      * @param params
      */
-    static async adeleteAgencyByTest(params) {
+    static async deleteAgencyByTest(params) {
         var email = params.email;
         var mobile = params.mobile;
         var name = params.name;
@@ -485,15 +486,14 @@ class AgencyModule {
             })
             .spread(function (agencyId, companys) {
                 API.agency.__defaultAgencyId = agencyId;
-                console.info("#################");
 
                 return companys.map(function (c) {
                     return API.company.updateCompany({companyId: c.id, agencyId: agencyId})
                 })
             })
             .catch(function (err) {
-                // logger.error("初始化系统默认代理商失败...");
-                // logger.error(err.stack);
+                logger.error("初始化系统默认代理商失败...");
+                logger.error(err.stack);
             })
 
     }

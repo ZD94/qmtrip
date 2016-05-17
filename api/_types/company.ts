@@ -81,6 +81,29 @@ export class Company extends ModelObject{
     get remark(): string { return ''; }
     set remark(val: string) {}
 
+    @Field({type: Types.STRING})
+    get paymentPwd(): string { return ''; }
+    set paymentPwd(val: string) {}
+
+    @Field({type: Types.NUMERIC(15, 2)})
+    get income(): number { return 0; }
+    set income(val: number) {}
+
+    @Field({type: Types.NUMERIC(15, 2)})
+    get consume(): number { return 0; }
+    set consume(val: number) {}
+
+    @Field({type: Types.NUMERIC(15, 2)})
+    get frozen(): number { return 0; }
+    set frozen(val: number) {}
+
+    @Field({type: Types.NUMERIC(15, 2)})
+    get staffReward(): number { return 0; }
+    set staffReward(val: number) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isSetPwd(): boolean { return false; }
+    set isSetPwd(val: boolean) {}
 
     @Reference({type: Types.UUID})
     getAgency(id?:string): Promise<Agency> {
@@ -114,8 +137,8 @@ export class MoneyChange extends ModelObject {
     set id(val: string) {}
 
     @Field({type: Types.UUID})
-    get fundsAccountId(): string { return null; }
-    set fundsAccountId(val: string) {}
+    get companyId(): string { return null; }
+    set companyId(val: string) {}
 
     @Field({type: Types.INTEGER})
     get status(): number { return 0; }

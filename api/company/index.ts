@@ -1,3 +1,4 @@
+import {requirePermit} from "../_decorator";
 /**
  * Created by yumiao on 15-12-9.
  */
@@ -11,13 +12,15 @@ let Paginate = require("common/paginate").Paginate;
 let C = require("config");
 let API = require("common/api");
 
-import {requireParams} from "common/api/helper";
+import {requireParams, clientExport} from "common/api/helper";
 import {ECompanyStatus, Company, MoneyChange} from 'api/_types/company';
 import { ServiceInterface } from 'common/model';
+import {EAgencyStatus} from "../_types/agency";
 
 let AGENCY_ROLE = {OWNER: 0, COMMON: 1, ADMIN: 2};
 let companyCols = Company['$fieldnames'];
-let fundsAccountCols = Object.keys(Models.FundsAccounts.attributes);
+console.info(companyCols);
+// let fundsAccountCols = Object.keys(Models.FundsAccounts.attributes);
 
 
 class CompanyService implements ServiceInterface<Company>{
@@ -93,33 +96,6 @@ class CompanyModule {
 
 
     /**
-     * 创建企业
-     * @param {Object} params
-     * @param {UUID} params.createUser 创建人
-     * @param {String} params.name 企业名称
-     * @param {String} params.domainName 域名,邮箱后缀
-     * @returns {Promise}
-     */
-    @requireParams(['createUser', 'name', 'domainName', 'mobile', 'email', 'agencyId'], ['id', 'description', 'telephone', 'remark'])
-    static createCompany(params){
-        let _company = params;
-        _company.id = _company.id || uuid.v1();
-        let funds = { id: _company.id, createdAt: utils.now()};
-
-        return sequelize.transaction(function(t){
-            return Promise.all([
-                Models.Company.create(_company, {transaction: t}),
-                Models.FundsAccounts.create(funds, {transaction: t})
-            ])
-        })
-            .spread(function(c, f){
-                return new Company(c);
-                //c = c.toJSON();
-                //return _.assign(c, {balance: f.balance, staffReward: f.staffReward});
-            });
-    }
-
-    /**
      * 是否在域名黑名单中
      *
      * @param {Object} params 参数
@@ -143,13 +119,92 @@ class CompanyModule {
             })
     }
 
+
+    /**
+     * 创建企业
+     * @param {Object} params
+     * @param {UUID} params.createUser 创建人
+     * @param {String} params.name 企业名称
+     * @param {String} params.domainName 域名,邮箱后缀
+     * @returns {Promise<Company>}
+     */
+    @requireParams(['createUser', 'name', 'domainName', 'mobile', 'email', 'agencyId'], ['id', 'description', 'telephone', 'remark'])
+    static async createCompany(params): Promise<Company>{
+        let c = await Models.Company.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
+
+        if (c) {
+            throw {code: -2, msg: '邮箱或手机号已注册企业'};
+        }
+
+        let _company = params;
+        _company.id = _company.id || uuid.v1();
+        let comp = await Models.Company.create(_company);
+        return new Company(comp);
+    }
+
+    /**
+     * @method createCompany
+     *
+     * 代理商创建企业
+     *
+     * @param params
+     * @param params.mobile 手机号
+     * @param params.name 企业名字
+     * @param params.email 企业邮箱
+     * @param params.userName 企业创建人姓名
+     * @param params.pwd 登陆密码
+     * @param params.remark 备注
+     * @param params.description 企业描述
+     * @returns {Promise<Company>}
+     */
+    @clientExport
+    @requirePermit('company.add', 2)
+    @requireParams(['mobile', 'name', 'email', 'userName'], ['pwd', 'remark', 'description'])
+    static async registerCompany(params: {mobile: string, name: string, email: string, domain: string,
+        userName: string, pwd?: string, remark?: string, description?: string}): Promise<Company>{
+        let {accountId} = Zone.current.get('session');
+        let mobile = params.mobile;
+        let email = params.email;
+        let userName = params.userName;
+        let pwd = params.pwd || '123456';
+        let agencyUser = await Models.agency.findById(accountId);
+
+        if(!agencyUser || agencyUser.status == EAgencyStatus.DELETE) {
+            throw L.ERR.AGENCY_NOT_EXIST;
+        }
+
+        let account = await API.auth.newAccount({mobile: mobile, email: email, pwd: pwd, type: 1});
+
+        params['agencyId'] = agencyUser.agencyId;
+        params['createUser'] = account.id;
+        params['domainName'] = params.email.match(/.*\@(.*)/)[1]; //企业域名
+        delete params.userName;
+
+        let company = await API.company.createCompany(params);
+
+        if(company.domainName && company.domainName != "" && email.indexOf(company.domainName) == -1){
+            throw {code: -6, msg: "邮箱格式不符合要求"};
+        }
+
+        await Models.staff.create({id: account.id, companyId: company.id, email: email, mobile: mobile, name: userName, roleId: 0});
+        await Models.department.create({name: "我的企业", isDefault: true, companyId: company.id});
+
+        return new Company(company);
+    }
+
+
     /**
      * 更新企业信息
      * @param params
-     * @returns {*}
+     * @returns {Promise<Company>}
      */
-    static async updateCompany(params){
-        let companyId = params.companyId;
+    @clientExport
+    @requirePermit('company.edit', 1)
+    @requireParams(['id'], ['name', 'description', 'mobile', 'remark', 'status'])
+    static async updateCompany(params): Promise<Company>{
+        let {accountId} = Zone.current.get('session');
+        let companyId = params.id;
+
         let company = await Models.Company.findById(companyId, {attributes: ['createUser', 'status']});
 
         if(!company || company.status == -2){
@@ -172,10 +227,10 @@ class CompanyModule {
      * @param companyId
      * @returns {*}
      */
-    @requireParams(['companyId'])
-    static async getCompany(params){
-        let companyId = params.companyId;
-        let company = await Models.Company.findById(companyId);
+    @clientExport
+    @requireParams(['id'])
+    static async getCompany(params: {id: string}): Promise<Company>{
+        let company = await Models.Company.findById(params.id);
 
         if(!company || company.status == -2){
             throw L.ERR.COMPANY_NOT_EXIST;
@@ -189,8 +244,9 @@ class CompanyModule {
      * @param params
      * @returns {*}
      */
-    @requireParams(['agencyId'], ['columns'])
-    static listCompany(params){
+    @clientExport
+    @requireParams(['agencyId'], ['status'])
+    static async listCompany(params): Promise<string[]>{
         var query = params;
         var agencyId = query.agencyId;
         var options : any = {
@@ -198,12 +254,11 @@ class CompanyModule {
             order: [['created_at', 'desc']]
         };
 
-        if(query.columns){
-            options.attributes =  query.columns;
-            delete query.columns;
-        }
+        let companies = await Models.Company.findAll(options);
 
-        return Models.Company.findAll(options);
+        return companies.map(function(c) {
+            return c.id;
+        })
     }
 
     /**
@@ -211,6 +266,7 @@ class CompanyModule {
      * @param options
      * @returns {*}
      */
+    @clientExport
     static async pageCompany(options){
         options.where.status = {$ne: -2};
         options.order = [['created_at', 'desc']];
@@ -251,53 +307,28 @@ class CompanyModule {
      * @param params
      * @returns {*}
      */
-    @requireParams(['companyId'], ['userId'])
-    static deleteCompany(params){
-        var companyId = params.companyId;
+    @clientExport
+    @requirePermit('company.delete', 2)
+    @requireParams(['id'])
+    static async deleteCompany(params){
+        var companyId = params.id;
+        let company = await Models.Company.findById(companyId);
 
-        return Models.Company.findById(companyId, {attributes: ['createUser']})
-            .then(function(company){
-                if(!company || company.status == -2){
-                    throw L.ERR.COMPANY_NOT_EXIST;
-                }
+        if(!company || company.status == ECompanyStatus.DELETE){
+            throw L.ERR.COMPANY_NOT_EXIST;
+        }
 
-                // if(company.createUser != userId){
-                //     throw L.ERR.PERMISSION_DENY;
-                // }
-            })
-            .then(function(){
-                return sequelize.transaction(function(t){
-                    return Promise.all([
-                        Models.Company.update({status: -2, updatedAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updatedAt'], transaction: t}),
-                        Models.FundsAccounts.update({status: -2, updatedAt: utils.now()}, {where: {id: companyId}, fields: ['status', 'updatedAt'], transaction: t})
-                    ])
-                })
-            })
-            .then(function(){
-                return true;
-            });
+        let staffs = await Models.Staff.findAll({where: {companyId: companyId}});
+
+        await Models.Company.update({status: ECompanyStatus.DELETE, updatedAt: utils.now()}, {where: {id: companyId}});
+        await Models.Staff.destroy({where: {companyId: companyId}});
+        await staffs.map(async function(staff) {
+            return await Models.Account.destroy({where: {id: staff.id}});
+        });
+
+        return true;
     }
 
-    /**
-     * 获取企业资金账户信息
-     * @param params
-     * @returns {*}
-     */
-    @requireParams(['companyId'])
-    static getCompanyFundsAccount(params){
-        var companyId = params.companyId;
-
-        return Models.FundsAccounts.findById(companyId, {
-            attributes: ['id', 'balance', 'income', 'consume', 'frozen', 'isSetPwd','staffReward', 'status', 'createdAt', 'updatedAt']
-        })
-            .then(function(funds){
-                if(!funds || funds.status == -2){
-                    throw {code: -4, msg: '企业资金账户不存在'};
-                }
-
-                return funds.toJSON();
-            });
-    }
 
     /**
      * 企业资金账户金额变动
@@ -396,6 +427,7 @@ class CompanyModule {
      * @param params
      * @returns {Promise<MoneyChange>}
      */
+    @clientExport
     static async getMoneyChange(params: {id: string}): Promise<MoneyChange> {
         let moneyChange = await Models.MoneyChangeModel.findById(params.id);
         return new MoneyChange(moneyChange);
@@ -407,12 +439,73 @@ class CompanyModule {
      * @param params
      * @returns {Promise<string[]>}
      */
-    static async listMoneyChange(params: {fundsAccountId: string}): Promise<string[]> {
+    @clientExport
+    static async listMoneyChange(params: {companyId: string}): Promise<string[]> {
+        let {accountId} = Zone.current.get('session');
+        let staff = await Models.Staff.findById(accountId);
+        params.companyId = staff.companyId;
         let moneyChange = await Models.MoneyChangeModel.findAll({where: params});
         return moneyChange.map(function(mc) {
             return mc.id;
         })
     }
+
+
+    /**
+     * @method fundsCharge
+     * 企业资金账户充值
+     * @param params
+     * @param params.channel 充值渠道
+     * @param params.money 充值金额
+     * @param params.companyId 充值企业id
+     * @param params.remark 备注 可选
+     * @returns {Promise}
+     */
+    @requireParams(['channel', 'money', 'companyId'], ['remark'])
+    static fundsCharge(params: {channel: string, money: number, companyId: string, remark?: string}){
+        let self: any = this;
+        params['userId'] = self.accountId;
+        params['type'] = 1;
+        params.remark = params.remark || '充值';
+        return API.company.changeMoney(params);
+    }
+
+    /**
+     * @method frozenMoney
+     * 冻结账户资金
+     * @param params
+     * @param params.channel 充值渠道
+     * @param params.money 充值金额
+     * @param params.companyId 充值企业id
+     * @returns {Promise}
+     */
+    @requireParams(['money', 'companyId'], ['channel'])
+    static frozenMoney(params : {channel?: string, money: number, companyId: string}){
+        let self: any = this;
+        params.channel = params.channel || '冻结';
+        params['userId'] = self.accountId;
+        params['type'] = -2;
+        params['remark'] = '冻结账户资金';
+
+        return API.company.changeMoney(params);
+    }
+
+    /**
+     * @method consumeMoney
+     * 消费企业账户余额
+     * @param params
+     * @returns {Promise}
+     */
+    static consumeMoney(params){
+        let self: any = this;
+        params.userId = self.accountId;
+        params.type = -1;
+        params.channel = params.channel || '消费';
+        params.remark = params.remark || '账户余额消费';
+
+        return API.company.changeMoney(params);
+    }
+
 
     /**
      * 测试用例删除企业，不在client调用

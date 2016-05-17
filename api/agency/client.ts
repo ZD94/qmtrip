@@ -1,14 +1,13 @@
 import { CachedService, requireAPI } from 'common/model';
 import { AgencyUser, Agency } from 'api/_types/agency';
-import ApiAgency = require('api/client/agency');
+import ApiAgency = require('api/agency');
 
 export class AgencyService extends CachedService<Agency>{
     constructor($cacheFactory: ng.ICacheFactoryService){
         super($cacheFactory('agency'));
     }
 
-    async $create(obj: {name: string, email: string, mobile: string, userName: string, description?: string,
-        remark?: string, pwd?: string}): Promise<Agency>{
+    async $create(obj: {name:string, email:string, pwd:string, id?:string, mobile?:string,description?:string, remark?:string, status?:number}): Promise<Agency>{
         var api = await requireAPI<typeof ApiAgency>('agency');
         return api.createAgency(obj);
     }
@@ -56,6 +55,6 @@ export class AgencyUserService extends CachedService<AgencyUser>{
     }
     async $destroy(id: string): Promise<any> {
         var api = await requireAPI<typeof ApiAgency>('agency');
-        return api.deleteAgencyUser({userId: id});
+        return api.deleteAgencyUser({id: id});
     }
 }
