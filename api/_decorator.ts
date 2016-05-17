@@ -4,6 +4,7 @@
 const API = require("common/api");
 const _ = require("lodash");
 const L = require("common/language");
+const Models = require("api/_types").Models;
 
 export function requirePermit(permits: string| string[], type?: number) {
     return function (target, key, desc) {
@@ -153,28 +154,24 @@ export var condition = {
             let id = _.get(args, idpath);
             let accountId = _getAccountId();
 
-            let staff = await API.staff.getStaff({id: accountId});
-            return staff && staff["companyId"] == id;
+            let staff = await Models.staff.get(accountId);
+            return staff && staff.company.id == id;
         }
     },
     isMyCompanyAgency: function (idpath: string) {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
-            let session = Zone.current.get("session");
+            let accountId = _getAccountId();
 
-            let staff = await API.staff.getStaff({id: session["account_id"]});
-            if (!staff || !staff["companyId"]) {
-                return false;
-            }
-            let company = await API.company.getCompany({id: staff["companyId"]})
-            return company && company["agencyId"] == id;
+            let staff = await Models.staff.get(accountId);
+            return staff && staff.company && staff.company["agencyId"] == id;
         }
     },
     isMyAgency: function (idpath: string) {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
             let accountId = _getAccountId();
-            let agencyUser = await API.agency.getAgencyUser({id: accountId});
+            let agencyUser = await Models.agencyUser.get(accountId);
             return id && agencyUser && agencyUser["agencyId"] == id;
         }
     },
@@ -184,8 +181,8 @@ export var condition = {
             let accountId = _getAccountId();
 
             let [my, other] = await Promise.all([
-                API.staff.getStaff({id: accountId}),
-                API.staff.getStaff({id: id})
+                Models.staff.get(accountId),
+                Models.staff.get(id)
             ]);
 
             return my && other && my["companyId"] == other["companyId"];
@@ -197,8 +194,8 @@ export var condition = {
             let accountId = _getAccountId();
 
             let [my, other] = await Promise.all([
-                API.agency.getAgencyUser({id: accountId}),
-                API.agency.getAgencyUser({id: id})
+                Models.agency.get(accountId),
+                Models.agency.get(id)
             ])
 
             return my && other && my["agencyId"] == other["agencyId"];
@@ -209,8 +206,8 @@ export var condition = {
             let id = _.get(args, idpath);
             let accountId = _getAccountId();
             let [agency, company] = await Promise.all([
-                API.agency.getAgencyUser({id: accountId}),
-                API.company.getCompany({id: id})
+                Models.agencyUser.get(accountId),
+                Models.company.get(id)
             ]);
 
             return agency && company && agency.id == company["agencyId"];

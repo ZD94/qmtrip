@@ -9,11 +9,11 @@ var API = require('common/api');
 API.onlogin(function(){
     var backUrl = window.location.href;
     backUrl = encodeURIComponent(backUrl);
-    if(browserspec.is_wechat && /^qmtrip\.com\.cn$/.test(window.location.host)) {
-        window.location.href = "/auth/wx-login?redirect_url=" + backUrl;
-    }else {
+    // if(browserspec.is_wechat && /^qmtrip\.com\.cn$/.test(window.location.host)) {
+    //     window.location.href = "/auth/wx-login?redirect_url=" + backUrl;
+    // }else {
         window.location.href = "#/login/?backurl="+backUrl;
-    }
+    // }
 })
 API.authenticate = function(remote, callback){
     var user_id = Cookie.get('user_id');
