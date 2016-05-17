@@ -32,7 +32,7 @@ export function requirePermit(permits: string| string[], type?: number) {
     }
 }
 
-interface CheckInterface {
+export interface CheckInterface {
     if: (fn: Function, self: any, args: any) => Promise<boolean>,
     then?: (target: Function, string: any, desc: any) => Promise<any>    //then函数直接是decorator函数
 }
@@ -140,72 +140,69 @@ export function conditionDecorator(checkFnList: CheckInterface[]) {
     }
 }
 
-export function isMySelf(idpath: string) {
-    return async function (fn, self, args) {
-        let id = _.get(args, idpath);
-        let accountId = _getAccountId();
-        return id && accountId && id == accountId;
-    }
-}
-
-export function isMyCompany(idpath: string) {
-    return async function(fn, self, args) {
-        let id = _.get(args, idpath);
-        let accountId = _getAccountId();
-
-        let staff = await API.staff.getStaff({id: accountId});
-        return staff && staff["companyId"] == id;
-    }
-}
-
-export function isMyCompanyAgency(idpath: string) {
-    return async function(fn, self, args) {
-        let id = _.get(args, idpath);
-        let session = Zone.current.get("session");
-
-        let staff = await API.staff.getStaff({id: session["account_id"]});
-        if (!staff || !staff["companyId"]) {
-            return false;
+export var condition = {
+    isMySelf: function (idpath: string) {
+        return async function (fn, self, args) {
+            let id = _.get(args, idpath);
+            let accountId = _getAccountId();
+            return id && accountId && id == accountId;
         }
-        let company = await API.company.getCompany({id: staff["companyId"]})
-        return company && company["agencyId"] == id;
-    }
-}
+    },
+    isMyCompany: function (idpath: string) {
+        return async function(fn, self, args) {
+            let id = _.get(args, idpath);
+            let accountId = _getAccountId();
 
-export function isMyAgency(idpath: string) {
-    return async function(fn, self, args) {
-        let id = _.get(args, idpath);
-        let accountId = _getAccountId();
-        let agencyUser = await API.agency.getAgencyUser({id: accountId});
-        return id && agencyUser && agencyUser["agencyId"] == id;
-    }
-}
+            let staff = await API.staff.getStaff({id: accountId});
+            return staff && staff["companyId"] == id;
+        }
+    },
+    isMyCompanyAgency: function (idpath: string) {
+        return async function(fn, self, args) {
+            let id = _.get(args, idpath);
+            let session = Zone.current.get("session");
 
-export function isSameCompany(idpath:string) {
-    return async function(fn, self, args) {
-        let id = _.get(args, idpath);
-        let accountId = _getAccountId();
+            let staff = await API.staff.getStaff({id: session["account_id"]});
+            if (!staff || !staff["companyId"]) {
+                return false;
+            }
+            let company = await API.company.getCompany({id: staff["companyId"]})
+            return company && company["agencyId"] == id;
+        }
+    },
+    isMyAgency: function (idpath: string) {
+        return async function(fn, self, args) {
+            let id = _.get(args, idpath);
+            let accountId = _getAccountId();
+            let agencyUser = await API.agency.getAgencyUser({id: accountId});
+            return id && agencyUser && agencyUser["agencyId"] == id;
+        }
+    },
+    isSameCompany: function (idpath:string) {
+        return async function(fn, self, args) {
+            let id = _.get(args, idpath);
+            let accountId = _getAccountId();
 
-        let [my, other] = await Promise.all([
-            API.staff.getStaff({id: accountId}),
-            API.staff.getStaff({id: id})
-        ]);
+            let [my, other] = await Promise.all([
+                API.staff.getStaff({id: accountId}),
+                API.staff.getStaff({id: id})
+            ]);
 
-        return my && other && my["companyId"] == other["companyId"];
-    }
-}
+            return my && other && my["companyId"] == other["companyId"];
+        }
+    },
+    isSameAgency: function (idpath: string) {
+        return async function(fn, self, args) {
+            let id = _.get(args, idpath);
+            let accountId = _getAccountId();
 
-export function isSameAgency(idpath: string) {
-    return async function(fn, self, args) {
-        let id = _.get(args, idpath);
-        let accountId = _getAccountId();
+            let [my, other] = await Promise.all([
+                API.agency.getAgencyUser({id: accountId}),
+                API.agency.getAgencyUser({id: id})
+            ])
 
-        let [my, other] = await Promise.all([
-            API.agency.getAgencyUser({id: accountId}),
-            API.agency.getAgencyUser({id: id})
-        ])
-
-        return my && other && my["agencyId"] == other["agencyId"];
+            return my && other && my["agencyId"] == other["agencyId"];
+        }
     }
 }
 
