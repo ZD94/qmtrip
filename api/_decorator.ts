@@ -50,7 +50,7 @@ interface CheckInterface {
 // }
 //
 // class Test2 {
-//     @chooseDecorator([
+//     @conditionDecorator([
 //         {"if": _testDecorator("0.id"), "then": filterResultColumn(["id", "username"])} as CheckInterface,
 //     ])
 //     static myTest(params) {
@@ -63,7 +63,7 @@ interface CheckInterface {
 //         return Promise.resolve(result);
 //     }
 //
-//     @chooseDecorator([
+//     @conditionDecorator([
 //         {"if": _testDecorator("0.id")}
 //     ])
 //     static myTest2(params) {
@@ -111,7 +111,7 @@ export function filterResultColumn(columns: string[]) {
     }
 }
 
-export function chooseDecorator(checkFnList: CheckInterface[]) {
+export function conditionDecorator(checkFnList: CheckInterface[]) {
     return function (target, key, desc) {
         let fn = desc.value;
         desc.value = async function(...args) {
