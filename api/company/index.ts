@@ -2,8 +2,8 @@ import {requirePermit} from "../_decorator";
 /**
  * Created by yumiao on 15-12-9.
  */
-let sequelize = require("common/model").importModel("./models");
-let Models = sequelize.models;
+var sequelize = require("common/model").DB;
+var Models = sequelize.models;
 let uuid = require("node-uuid");
 let L = require("common/language");
 let _ = require('lodash');
@@ -11,6 +11,8 @@ let utils = require("common/utils");
 let Paginate = require("common/paginate").Paginate;
 let C = require("config");
 let API = require("common/api");
+let Logger = require('common/logger');
+let logger = new Logger('company');
 
 import {requireParams, clientExport} from "common/api/helper";
 import {ECompanyStatus, Company, MoneyChange} from 'api/_types/company';
@@ -198,22 +200,21 @@ class CompanyModule {
      * @returns {Promise<Company>}
      */
     @clientExport
-    @requirePermit('company.edit', 1)
-    @requireParams(['id'], ['name', 'description', 'mobile', 'remark', 'status'])
+    // @requirePermit('company.edit', 2)
+    @requireParams(['id'], ['agencyId', 'name', 'description', 'mobile', 'remark', 'status'])
     static async updateCompany(params): Promise<Company>{
         let {accountId} = Zone.current.get('session');
         let companyId = params.id;
-
         let company = await Models.Company.findById(companyId, {attributes: ['createUser', 'status']});
 
         if(!company || company.status == -2){
             throw L.ERR.COMPANY_NOT_EXIST;
         }
 
-        delete params.companyId;
         params['updatedAt'] = utils.now();
 
         let [rownum, rows] = await Models.Company.update(params, {returning: true, where: {id: companyId}, fields: Object.keys(params)});
+
         if(!rownum || rownum == "NaN"){
             throw {code: -2, msg: '更新企业信息失败'};
         }

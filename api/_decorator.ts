@@ -26,7 +26,11 @@ export function requirePermit(permits: string| string[], type?: number) {
                         throw L.ERR.PERMISSION_DENIED
                     }
                     return fn.apply(self, args)
-                });
+                })
+                .catch(function(err) {
+                    console.info("requirePermit error...");
+                    console.error(err);
+                })
         }
         return desc;
     }
