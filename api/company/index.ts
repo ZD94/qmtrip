@@ -3,7 +3,7 @@ import {requirePermit, conditionDecorator, condition} from "../_decorator";
  * Created by yumiao on 15-12-9.
  */
 var sequelize = require("common/model").DB;
-var Models = sequelize.models;
+var DBM = sequelize.models;
 let uuid = require("node-uuid");
 let L = require("common/language");
 let _ = require('lodash');
@@ -21,7 +21,7 @@ import {EAgencyStatus} from "../_types/agency";
 
 let AGENCY_ROLE = {OWNER: 0, COMMON: 1, ADMIN: 2};
 let companyCols = Company['$fieldnames'];
-// let fundsAccountCols = Object.keys(Models.FundsAccounts.attributes);
+// let fundsAccountCols = Object.keys(DBM.FundsAccounts.attributes);
 
 class CompanyModule {
     /**
@@ -43,7 +43,7 @@ class CompanyModule {
             })
         }
 
-        return Models.Company.findOne({where: {domainName: domain}})
+        return DBM.Company.findOne({where: {domainName: domain}})
             .then(function(company) {
                 if (company) {
                     return true;
@@ -69,7 +69,7 @@ class CompanyModule {
         }
         domain = domain.toLowerCase();
 
-        return Models.BlackDomain.findOne({where: {domain: domain}})
+        return DBM.BlackDomain.findOne({where: {domain: domain}})
             .then(function(result) {
                 if (result) {
                     return true;
@@ -89,7 +89,7 @@ class CompanyModule {
      */
     @requireParams(['createUser', 'name', 'domainName', 'mobile', 'email', 'agencyId'], ['id', 'description', 'telephone', 'remark'])
     static async createCompany(params): Promise<Company>{
-        let c = await Models.Company.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
+        let c = await DBM.Company.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
 
         if (c) {
             throw {code: -2, msg: '邮箱或手机号已注册企业'};
@@ -97,7 +97,7 @@ class CompanyModule {
 
         let _company = params;
         _company.id = _company.id || uuid.v1();
-        let comp = await Models.Company.create(_company);
+        let comp = await DBM.Company.create(_company);
         return new Company(comp);
     }
 
@@ -126,7 +126,7 @@ class CompanyModule {
         let email = params.email;
         let userName = params.userName;
         let pwd = params.pwd || '123456';
-        let agencyUser = await Models.agency.findById(accountId);
+        let agencyUser = await DBM.agency.findById(accountId);
 
         if(!agencyUser || agencyUser.status == EAgencyStatus.DELETE) {
             throw L.ERR.AGENCY_NOT_EXIST;
@@ -145,8 +145,8 @@ class CompanyModule {
             throw {code: -6, msg: "邮箱格式不符合要求"};
         }
 
-        await Models.staff.create({id: account.id, companyId: company.id, email: email, mobile: mobile, name: userName, roleId: 0});
-        await Models.department.create({name: "我的企业", isDefault: true, companyId: company.id});
+        await DBM.staff.create({id: account.id, companyId: company.id, email: email, mobile: mobile, name: userName, roleId: 0});
+        await DBM.department.create({name: "我的企业", isDefault: true, companyId: company.id});
 
         return new Company(company);
     }
@@ -163,7 +163,7 @@ class CompanyModule {
     static async updateCompany(params): Promise<Company>{
         let {accountId} = Zone.current.get('session');
         let companyId = params.id;
-        let company = await Models.Company.findById(companyId, {attributes: ['createUser', 'status']});
+        let company = await DBM.Company.findById(companyId, {attributes: ['createUser', 'status']});
 
         if(!company || company.status == -2){
             throw L.ERR.COMPANY_NOT_EXIST;
@@ -171,7 +171,7 @@ class CompanyModule {
 
         params['updatedAt'] = utils.now();
 
-        let [rownum, rows] = await Models.Company.update(params, {returning: true, where: {id: companyId}, fields: Object.keys(params)});
+        let [rownum, rows] = await DBM.Company.update(params, {returning: true, where: {id: companyId}, fields: Object.keys(params)});
 
         if(!rownum || rownum == "NaN"){
             throw {code: -2, msg: '更新企业信息失败'};
@@ -193,7 +193,7 @@ class CompanyModule {
         {if: condition.isCompanyAgency("0.id")}
     ])
     static async getCompany(params: {id: string}): Promise<Company>{
-        let company = await Models.Company.findById(params.id);
+        let company = await DBM.Company.findById(params.id);
 
         if(!company || company.status == -2){
             throw L.ERR.COMPANY_NOT_EXIST;
@@ -217,7 +217,7 @@ class CompanyModule {
             order: [['created_at', 'desc']]
         };
 
-        let companies = await Models.Company.findAll(options);
+        let companies = await DBM.Company.findAll(options);
 
         return companies.map(function(c) {
             return c.id;
@@ -233,7 +233,7 @@ class CompanyModule {
     static async pageCompany(options){
         options.where.status = {$ne: -2};
         options.order = [['created_at', 'desc']];
-        let ret = await Models.Company.findAndCount(options);
+        let ret = await DBM.Company.findAndCount(options);
         var items = ret.rows.map(function(c) {
             return c.id;
         });
@@ -250,7 +250,7 @@ class CompanyModule {
     static async checkAgencyCompany(params){
         var userId = params.userId;
         var companyId = params.companyId;
-        var c = await Models.Company.findById(companyId, {attributes: ['agencyId', 'status']});
+        var c = await DBM.Company.findById(companyId, {attributes: ['agencyId', 'status']});
         var agency = await API.agency.getAgencyUser({id: userId}, {attributes: ['agencyId', 'status', 'roleId']});
 
         if(!c || c.status == -2){
@@ -275,18 +275,18 @@ class CompanyModule {
     @requireParams(['id'])
     static async deleteCompany(params){
         var companyId = params.id;
-        let company = await Models.Company.findById(companyId);
+        let company = await DBM.Company.findById(companyId);
 
         if(!company || company.status == ECompanyStatus.DELETE){
             throw L.ERR.COMPANY_NOT_EXIST;
         }
 
-        let staffs = await Models.Staff.findAll({where: {companyId: companyId}});
+        let staffs = await DBM.Staff.findAll({where: {companyId: companyId}});
 
-        await Models.Company.update({status: ECompanyStatus.DELETE, updatedAt: utils.now()}, {where: {id: companyId}});
-        await Models.Staff.destroy({where: {companyId: companyId}});
+        await DBM.Company.update({status: ECompanyStatus.DELETE, updatedAt: utils.now()}, {where: {id: companyId}});
+        await DBM.Staff.destroy({where: {companyId: companyId}});
         await staffs.map(async function(staff) {
-            return await Models.Account.destroy({where: {id: staff.id}});
+            return await DBM.Account.destroy({where: {id: staff.id}});
         });
 
         return true;
@@ -302,7 +302,7 @@ class CompanyModule {
     @requireParams(['money', 'channel', 'userId', 'type', 'companyId', 'remark'])
     static changeMoney(params){
         var id = params.companyId;
-        return Models.FundsAccounts.findById(id)
+        return DBM.FundsAccounts.findById(id)
             .then(function(funds){
                 if(!funds || funds.status == -2){
                     throw {code: -2, msg: '企业资金账户不存在'};
@@ -359,8 +359,8 @@ class CompanyModule {
 
                 return sequelize.transaction(function(t){
                     return Promise.all([
-                        Models.FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: Object.keys(fundsUpdates), transaction: t}),
-                        Models.MoneyChangeModel.create(moneyChange, {transaction: t})
+                        DBM.FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: Object.keys(fundsUpdates), transaction: t}),
+                        DBM.MoneyChangeModel.create(moneyChange, {transaction: t})
                     ])
                         .spread(function(update, create){
                             return update;
@@ -381,7 +381,7 @@ class CompanyModule {
      * @returns {Promise<MoneyChange>}
      */
     static async saveMoneyChange(params: {fundsAccountId: string, money: number, channel: number, userId: string, remark: string}): Promise<MoneyChange> {
-        let moneyChange = await Models.MoneyChangeModel.create(params);
+        let moneyChange = await DBM.MoneyChangeModel.create(params);
         return new MoneyChange(moneyChange);
     }
 
@@ -392,7 +392,7 @@ class CompanyModule {
      */
     @clientExport
     static async getMoneyChange(params: {id: string}): Promise<MoneyChange> {
-        let moneyChange = await Models.MoneyChangeModel.findById(params.id);
+        let moneyChange = await DBM.MoneyChangeModel.findById(params.id);
         return new MoneyChange(moneyChange);
     }
 
@@ -405,9 +405,9 @@ class CompanyModule {
     @clientExport
     static async listMoneyChange(params: {companyId: string}): Promise<string[]> {
         let {accountId} = Zone.current.get('session');
-        let staff = await Models.Staff.findById(accountId);
+        let staff = await DBM.Staff.findById(accountId);
         params.companyId = staff.companyId;
-        let moneyChange = await Models.MoneyChangeModel.findAll({where: params});
+        let moneyChange = await DBM.MoneyChangeModel.findAll({where: params});
         return moneyChange.map(function(mc) {
             return mc.id;
         })
@@ -478,16 +478,16 @@ class CompanyModule {
     static deleteCompanyByTest(params){
         var mobile = params.mobile;
         var email = params.email;
-        return Models.Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
+        return DBM.Company.findAll({where: {$or: [{mobile: mobile}, {email: email}]}})
             .then(function(companys){
                 return companys.map(function(c){
                     var id = c.id;
 
-                    return Models.FundsAccounts.destroy({where: {id: id}});
+                    return DBM.FundsAccounts.destroy({where: {id: id}});
                 })
             })
             .then(function(){
-                return Models.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
+                return DBM.Company.destroy({where: {$or: [{mobile: mobile}, {email: email}]}});
             })
             .then(function(){
                 return true;

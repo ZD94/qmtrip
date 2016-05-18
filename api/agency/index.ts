@@ -3,7 +3,7 @@
  */
 "use strict";
 let sequelize = require("common/model").DB;
-let Models = sequelize.models;
+let DBM = sequelize.models;
 let API = require("common/api");
 let uuid = require("node-uuid");
 import _ = require('lodash');
@@ -29,20 +29,20 @@ class AgencyModule {
      * @returns {Promise<Agency>}
      */
     static async createAgency(params:{name:string, email:string, pwd:string, id?:string, mobile?:string,description?:string, remark?:string, status?:number}):Promise<Agency> {
-        let _agency = await Models.Agency.findOne({where: {email: params.email}});
+        let _agency = await DBM.Agency.findOne({where: {email: params.email}});
 
         if (_agency) {
             throw {code: -2, msg: '该邮箱已经注册代理商'};
         }
 
         if (params.mobile) {
-            let agency_mobile = await Models.Agency.findOne({where: {mobile: params.mobile}});
+            let agency_mobile = await DBM.Agency.findOne({where: {mobile: params.mobile}});
             if (agency_mobile) {
                 throw {code: -3, msg: '该手机号已经注册代理商'};
             }
         }
 
-        let agency = await Models.Agency.create(params);
+        let agency = await DBM.Agency.create(params);
 
         return new Agency(agency);
     };
@@ -79,14 +79,14 @@ class AgencyModule {
         params.id = account.id;
         params.createUser = account.id;
 
-        let agency = await Models.agency.create(params);
+        let agency = await DBM.agency.create(params);
         let _agencyUser: any = _.pick(params, ['email', 'mobile', 'sex', 'avatar']);
         _agencyUser.id = account.id;
         _agencyUser.agencyId = agency.id;
         _agencyUser.roleId = 0;
         _agencyUser.name = params.userName;
 
-        await Models.agency.createAgencyUser(_agencyUser);
+        await DBM.agency.createAgencyUser(_agencyUser);
 
         return new Agency(agency);
     }
@@ -111,7 +111,7 @@ class AgencyModule {
             throw L.ERR.PERMISSION_DENY;
         }
 
-        let agency = await Models.agency.findById({id: agencyId});
+        let agency = await DBM.agency.findById({id: agencyId});
 
         if (!agency || agency.status == EAgencyStatus.DELETE) {
             throw L.ERR.AGENCY_NOT_EXIST;
@@ -131,7 +131,7 @@ class AgencyModule {
     static async updateAgency(_agency): Promise<Agency> {
         let {accountId} = Zone.current.get('session');
         let agencyId = _agency.id;
-        let agency = await Models.Agency.findById(agencyId, {attributes: ['createUser']});
+        let agency = await DBM.Agency.findById(agencyId, {attributes: ['createUser']});
 
         if (!agency || agency.status == EAgencyStatus.DELETE) {
             throw L.ERR.AGENCY_NOT_EXIST;
@@ -143,7 +143,7 @@ class AgencyModule {
 
         _agency.updatedAt = utils.now();
 
-        let [rows, agencies] = await Models.Agency.update(_agency, {returning: true, where: {id: agencyId}, fields: Object.keys(_agency)});
+        let [rows, agencies] = await DBM.Agency.update(_agency, {returning: true, where: {id: agencyId}, fields: Object.keys(_agency)});
 
         if (!rows || rows == "NaN") {
             throw {code: -2, msg: '更新代理商信息失败'};
@@ -159,7 +159,7 @@ class AgencyModule {
      * @returns {Promise<string[]>}
      */
     static async listAgency(params?: any): Promise<string[]>{
-        let agencies = await Models.Agency.findAll({where: {status: {$ne: EAgencyStatus.DELETE}}, attributes: ['id']});
+        let agencies = await DBM.Agency.findAll({where: {status: {$ne: EAgencyStatus.DELETE}}, attributes: ['id']});
 
         return agencies.map(function(agency) {
             return agency.id;
@@ -177,8 +177,8 @@ class AgencyModule {
     static async deleteAgency(params): Promise<boolean> {
         let {accountId} = Zone.current.get('session');
         let agencyId = params.id;
-        let selfUser = await Models.agencyUser.findById(accountId, {attributes: ['createUser', 'status']})
-        let agency = await Models.Agency.findById(agencyId, {attributes: ['createUser', 'status']});
+        let selfUser = await DBM.agencyUser.findById(accountId, {attributes: ['createUser', 'status']})
+        let agency = await DBM.Agency.findById(agencyId, {attributes: ['createUser', 'status']});
 
         if (!agency || agency.status == EAgencyStatus.DELETE) {
             throw L.ERR.AGENCY_NOT_EXIST;
@@ -188,13 +188,13 @@ class AgencyModule {
             throw L.ERR.PERMISSION_DENY;
         }
 
-        let agencyUsers = await Models.AgencyUser.findAll({where: {agencyId: agencyId, status: {$ne: EAgencyStatus.DELETE}}, attributes: ['id']});
+        let agencyUsers = await DBM.AgencyUser.findAll({where: {agencyId: agencyId, status: {$ne: EAgencyStatus.DELETE}}, attributes: ['id']});
 
-        await Models.Agency.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {where: {id: agencyId}, fields: ['status', 'updatedAt']});
-        await Models.AgencyUser.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {where: {agencyId: agencyId}, fields: ['status', 'updatedAt']});
+        await DBM.Agency.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {where: {id: agencyId}, fields: ['status', 'updatedAt']});
+        await DBM.AgencyUser.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {where: {agencyId: agencyId}, fields: ['status', 'updatedAt']});
 
         await agencyUsers.map(async function (user) {
-            await Models.Accounts.destroy({where: {id: user.id}});
+            await DBM.Accounts.destroy({where: {id: user.id}});
         });
 
         return true;
@@ -212,7 +212,7 @@ class AgencyModule {
     @requireParams(['email', 'name'], ['mobile', 'sex', 'avatar', 'roleId'])
     static async createAgencyUser(params: {email: string, name: string, mobile?: string, sex?: number, avatar?: string, roleId?: number}): Promise<AgencyUser> {
         let {accountId} = Zone.current.get('session');
-        let curUser = await Models.AgencyUser.findById(accountId, {attributes: ['agencyId']});
+        let curUser = await DBM.AgencyUser.findById(accountId, {attributes: ['agencyId']});
         let agencyId = curUser.agencyId;
         params['agencyId'] = agencyId;
 
@@ -220,13 +220,13 @@ class AgencyModule {
             throw L.ERR.AGENCY_USRE_NOT_EXIST;
         }
 
-        let _agencyUser = await Models.AgencyUser.findOne({where: {agencyId: agencyId, $or: [{email: params.email}, {mobile: params.mobile}]}});
+        let _agencyUser = await DBM.AgencyUser.findOne({where: {agencyId: agencyId, $or: [{email: params.email}, {mobile: params.mobile}]}});
 
         if (_agencyUser) {
             throw {code: -2, msg: '邮箱或手机号已经注册代理商'};
         }
 
-        let agencyUser = await Models.AgencyUser.create(params);
+        let agencyUser = await DBM.AgencyUser.create(params);
         return new AgencyUser(agencyUser);
     }
 
@@ -246,8 +246,8 @@ class AgencyModule {
     @requireParams(['id'], ['status', 'name', 'sex', 'mobile', 'avatar', 'roleId'])
     static async updateAgencyUser(params: {id: string, status?: number, name?: string, sex?: string, email?: string, mobile?: string, avatar?: string, roleId?: string}) {
         let {accountId} = Zone.current.get('session');
-        let user = await Models.agency.findById({id: accountId, columns: ['agencyId']});
-        let target = await Models.agency.findById({id: params.id, columns: ['agencyId', 'status']});
+        let user = await DBM.agency.findById({id: accountId, columns: ['agencyId']});
+        let target = await DBM.agency.findById({id: params.id, columns: ['agencyId', 'status']});
 
         if(target.status === EAgencyStatus.DELETE) {
             throw L.ERR.AGENCY_NOT_EXIST;
@@ -281,8 +281,8 @@ class AgencyModule {
     static async deleteAgencyUser(params: {id: string}): Promise<boolean> {
         let {accountId} = Zone.current.get('session');
         let id = params.id;
-        let curUser = await Models.AgencyUser.findById(accountId, {attributes: ['agencyId']});
-        let target = await Models.AgencyUser.findById(params.id);
+        let curUser = await DBM.AgencyUser.findById(accountId, {attributes: ['agencyId']});
+        let target = await DBM.AgencyUser.findById(params.id);
 
         if(!target || target.status == EAgencyStatus.DELETE) {
             throw L.ERR.AGENCY_USRE_NOT_EXIST;
@@ -292,8 +292,8 @@ class AgencyModule {
             throw L.ERR.PERMISSION_DENY;
         }
 
-        await Models.AgencyUser.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {where: {id: id}, fields: ['status', 'updatedAt']})
-        await Models.Accounts.destroy({where: {id: id}});
+        await DBM.AgencyUser.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {where: {id: id}, fields: ['status', 'updatedAt']})
+        await DBM.Accounts.destroy({where: {id: id}});
 
         return true;
     }
@@ -309,8 +309,8 @@ class AgencyModule {
     @requireParams(['id'])
     static async getAgencyUser(params: {id: string}): Promise<AgencyUser> {
         let {accountId} = Zone.current.get('session');
-        let curUser = await Models.AgencyUser.findById(accountId, {attributes: ['agencyId']});
-        let agencyUser = await Models.AgencyUser.findById(params.id);
+        let curUser = await DBM.AgencyUser.findById(accountId, {attributes: ['agencyId']});
+        let agencyUser = await DBM.AgencyUser.findById(params.id);
 
         if (!agencyUser || agencyUser.status === EAgencyStatus.DELETE) {
             throw L.ERR.AGENCY_USRE_NOT_EXIST;
@@ -331,7 +331,7 @@ class AgencyModule {
      */
     @requireParams(['email'])
     static async agencyByEmail(params: {email: string}): Promise<Agency> {
-        let agency = await Models.Agency.findOne({where: params});
+        let agency = await DBM.Agency.findOne({where: params});
         return new Agency(agency)
     }
 
@@ -366,7 +366,7 @@ class AgencyModule {
         options.limit = limit;
         options.offset = offset;
         options.where = params;
-        return Models.AgencyUser.findAndCountAll(options)
+        return DBM.AgencyUser.findAndCountAll(options)
             .then(function (result) {
                 let data = result.rows.map(function (user) {
                     return user.id;
@@ -384,7 +384,7 @@ class AgencyModule {
     @clientExport
     static async getAgencyUsers(params: {agencyId: string}): Promise<string[]> {
         params['status'] = {$ne: EAgencyStatus.DELETE};
-        let users = await  Models.AgencyUser.findAll({where: params, attributes: ['id']});
+        let users = await  DBM.AgencyUser.findAll({where: params, attributes: ['id']});
 
         return users.map(function(user) {
             return user.id;
@@ -401,8 +401,8 @@ class AgencyModule {
         let name = params.name;
 
         await API.auth.remove({email: email, mobile: mobile, type: 2});
-        await Models.Agency.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}});
-        await Models.AgencyUser.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}});
+        await DBM.Agency.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}});
+        await DBM.AgencyUser.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}});
 
         return true;
     }
