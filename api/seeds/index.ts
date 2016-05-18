@@ -11,29 +11,7 @@ let Logger = require('common/logger');
 let logger = new Logger("seeds");
 let typeString = ['TripPlanNo', 'qm_order'];
 
-/*
-class SeedService implements ServiceInterface<Seed>{
-    async create(obj: Object): Promise<Seed>{
-        throw 'seeds error';
-    }
-    async get(id: string): Promise<Seed>{
-        throw 'seeds error';
-    }
-    async find(where: any): Promise<Seed[]>{
-        throw 'seeds error';
-    }
-    async update(id: string, fields: Object): Promise<Seed> {
-        throw 'seeds error';
-    }
-    async destroy(id: string): Promise<any> {
-        throw 'seeds error';
-    }
-}
-*/
-
 class SeedModule {
-    //static SeedService = SeedService;
-
     /**
      * 获取团队信息
      * @param params
