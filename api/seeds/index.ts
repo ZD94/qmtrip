@@ -9,7 +9,7 @@ let moment = require("moment");
 let Models = require("common/model").DB.models;
 let Logger = require('common/logger');
 let logger = new Logger("seeds");
-let typeString = ['TripPlanNo', 'qm_order'];
+let typeString = ['TripPlanNo', 'AgencyNo', 'CompanyNo'];
 
 /*
 class SeedService implements ServiceInterface<Seed>{
@@ -59,7 +59,8 @@ class SeedModule {
         let seeds = await Models.Seed.findOne({where: {type: type}});
 
         if (!seeds) {
-            return Models.Seed.create({type: type, minNo: minNo, maxNo: maxNo, nowNo: minNo})
+            let en = await Models.Seed.create({type: type, minNo: minNo, maxNo: maxNo, nowNo: minNo});
+            return en.nowNo;
         }
 
         let nowNo = 0;

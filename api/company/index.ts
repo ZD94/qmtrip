@@ -1,4 +1,3 @@
-import {requirePermit} from "../_decorator";
 /**
  * Created by yumiao on 15-12-9.
  */
@@ -14,6 +13,7 @@ let API = require("common/api");
 let Logger = require('common/logger');
 let logger = new Logger('company');
 
+import {requirePermit} from "../_decorator";
 import {requireParams, clientExport} from "common/api/helper";
 import {ECompanyStatus, Company, MoneyChange} from 'api/_types/company';
 import { ServiceInterface } from 'common/model';
