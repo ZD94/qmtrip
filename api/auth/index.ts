@@ -6,7 +6,7 @@ import {requireParams} from "../../common/api/helper";
 
 var Q = require("q");
 var sequelize = require("common/model").importModel("./models");
-var Models = sequelize.models;
+var DBM = sequelize.models;
 var uuid = require("node-uuid");
 var L = require("../../common/language");
 var validate = require("../../common/validate");
@@ -19,7 +19,7 @@ var API = require("../../common/api");
 var utils = require("common/utils");
 var Logger = require("common/logger");
 var logger = new Logger('');
-var AccountOpenid = Models.AccountOpenid;
+var AccountOpenid = DBM.AccountOpenid;
 
 
 var ACCOUNT_STATUS = {
@@ -51,7 +51,7 @@ class ApiAuth {
      * @return {Promise}
      * @public
      */
-    static activeByEmail (data) {
+    static activeByEmail (data: {sign: string, accountId: string, timestamp: number}) {
 
         var sign = data.sign;
         var accountId = data.accountId;
@@ -59,11 +59,11 @@ class ApiAuth {
         var nowTime = Date.now();
 
         //失效了
-        if (!timestamp || nowTime - timestamp > 0) {
+        if (timestamp<0 || nowTime - timestamp > 0) {
             throw L.ERR.ACTIVE_URL_INVALID;
         }
 
-        return Models.Account.findOne({where: {id: accountId}})
+        return DBM.Account.findOne({where: {id: accountId}})
             .then(function(account) {
                 if (!account) {
                     throw L.ERR.ACTIVE_URL_INVALID;
@@ -78,7 +78,7 @@ class ApiAuth {
                     throw L.ERR.ACTIVE_URL_INVALID;
                 }
 
-                return Models.Account.update({status: ACCOUNT_STATUS.ACTIVE, activeToken: null}, {where: {id: account.id}});
+                return DBM.Account.update({status: ACCOUNT_STATUS.ACTIVE, activeToken: null}, {where: {id: account.id}});
             })
             .then(function() {
                 return true;
@@ -96,7 +96,7 @@ class ApiAuth {
      * @param {String} params.accountId 账户ID
      * @return {Promise}
      */
-    static checkResetPwdUrlValid (params) {
+    static checkResetPwdUrlValid (params: {sign: string, timestamp: number, accountId: string}) {
 
         var accountId = params.accountId;
         var sign = params.sign;
@@ -112,11 +112,11 @@ class ApiAuth {
                     throw L.ERR.SIGN_ERROR;
                 }
 
-                if (!timestamp || timestamp < Date.now()) {
+                if (!Boolean(timestamp) || timestamp < Date.now()) {
                     throw L.ERR.TIMESTAMP_TIMEOUT;
                 }
 
-                return Models.Account.findById(accountId)
+                return DBM.Account.findById(accountId)
                     .then(function(account) {
                         if (!account) {
                             throw L.ERR.ACCOUNT_NOT_EXIST;
@@ -142,7 +142,7 @@ class ApiAuth {
      * @param {String} params.companyName 公司名称
      * @returns {Promise} true|error
      */
-    static sendResetPwdEmail (params) {
+    static sendResetPwdEmail (params: {email: string, type?: Number, isFirstSet?: boolean, companyName?: string}) {
 
         var email = params.email;
         var isFirstSet = params.isFirstSet;
@@ -157,7 +157,7 @@ class ApiAuth {
                 return email;
             })
             .then(function(email) {
-                return Models.Account.findOne({where: {email: email, type: type}})
+                return DBM.Account.findOne({where: {email: email, type: type}})
                     .then(function(account) {
                         if (!account) {
                             throw L.ERR.ACCOUNT_NOT_EXIST;
@@ -168,7 +168,7 @@ class ApiAuth {
             .then(function(account) {
                 //生成设置密码token
                 var pwdToken = getRndStr(6);
-                return Models.Account.update({pwdToken: pwdToken}, {where: {id: account.id}, returning: true})
+                return DBM.Account.update({pwdToken: pwdToken}, {where: {id: account.id}, returning: true})
             })
             .spread(function(affect, rows) {
                 var account = rows[0];
@@ -226,7 +226,7 @@ class ApiAuth {
      * @param {String} params.pwd 新密码
      * @return {Promise} true|error
      */
-    static resetPwdByEmail (params) {
+    static resetPwdByEmail (params: {accountId: string, sign: string, timestamp: number, pwd: string}) {
 
         var accountId = params.accountId;
         var sign = params.sign;
@@ -235,7 +235,7 @@ class ApiAuth {
 
         return Q()
             .then(function() {
-                if (!timestamp || timestamp < Date.now()) {
+                if (!Boolean(timestamp) || timestamp < Date.now()) {
                     throw L.ERR.TIMESTAMP_TIMEOUT;
                 }
 
@@ -251,7 +251,7 @@ class ApiAuth {
                     throw L.ERR.PWD_EMPTY;
                 }
 
-                return Models.Account.findById(accountId)
+                return DBM.Account.findById(accountId)
             })
             .then(function(account) {
                 var _sign = makeActiveSign(account.pwdToken, accountId, timestamp);
@@ -264,7 +264,7 @@ class ApiAuth {
                 if (account.status == ACCOUNT_STATUS.NOT_ACTIVE && !account.pwd) {
                     status = ACCOUNT_STATUS.ACTIVE;
                 }
-                return Models.Account.update({pwd: pwd, pwdToken: null, status: status}, {where:{id: accountId}});
+                return DBM.Account.update({pwd: pwd, pwdToken: null, status: status}, {where:{id: accountId}});
             })
             .then(function() {
                 return true;
@@ -280,10 +280,10 @@ class ApiAuth {
      * @param {UUID} data.accountId 账号ID
      * @return {Promise}
      */
-    static active (data) {
+    static active (data: {accountId: string}) {
 
         var accountId = data.accountId;
-        return Models.Account.findOne({where: {id: accountId}})
+        return DBM.Account.findOne({where: {id: accountId}})
             .then(function(account) {
                 if (!account) {
                     throw L.ERR.ACCOUNT_NOT_EXIST;
@@ -310,7 +310,7 @@ class ApiAuth {
      * @return {Promise}
      * @public
      */
-    static remove (data) {
+    static remove (data: {accountId: string, email: string, mobile?: string, type?: Number}) {
 
         var accountId = data.accountId;
         var email = data.email;
@@ -320,7 +320,7 @@ class ApiAuth {
         if(!accountId){
             where.type = type;
         }
-        return Models.Account.destroy({where: where})
+        return DBM.Account.destroy({where: where})
             .then(function() {
                 return true;
             });
@@ -342,7 +342,7 @@ class ApiAuth {
      * @return {Promise} {accountId: 账号ID, email: "邮箱", status: "状态"}
      * @public
      */
-    static newAccount (data) {
+    static newAccount (data: {email: string, mobile?: string, pwd?: string, type?: Number, status?: Number, companyName?: string, id?: string}) {
 
         if (!data) {
             throw L.ERR.DATA_NOT_EXIST;
@@ -374,8 +374,8 @@ class ApiAuth {
 
         //查询邮箱是否已经注册
         return Q.all([
-                Models.Account.findOne({where: {email: data.email, type: type}}),
-                Models.Account.findOne({where: {mobile: mobile, type: type}})
+                DBM.Account.findOne({where: {email: data.email, type: type}}),
+                DBM.Account.findOne({where: {mobile: mobile, type: type}})
             ])
             .spread(function(account1, account2) {
                 if (account1) {
@@ -390,7 +390,7 @@ class ApiAuth {
             .then(function() {
                 var status = data.status? data.status: ACCOUNT_STATUS.NOT_ACTIVE;
                 var id = data.id?data.id:uuid.v1();
-                return Models.Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status, type: type});
+                return DBM.Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status, type: type});
             })
             .then(function(account) {
                 if (!account.pwd) {
@@ -424,7 +424,7 @@ class ApiAuth {
      * @return {Promise} {code:0, msg: "ok", data: {user_id: "账号ID", token_sign: "签名", token_id: "TOKEN_ID", timestamp:"时间戳"}
      * @public
      */
-    static login (data) {
+    static login (data: {email?: string, pwd: string, type?: Number, mobile?: string}) {
 
         if (!data) {
             throw L.ERR.DATA_NOT_EXIST;
@@ -441,7 +441,7 @@ class ApiAuth {
 
         var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
         var email = data.email.toLowerCase();
-        return Models.Account.findOne({where: {email: email, type: type}})
+        return DBM.Account.findOne({where: {email: email, type: type}})
             .then(function (loginAccount) {
                 var pwd = md5(data.pwd);
                 if (!loginAccount) {
@@ -499,10 +499,11 @@ class ApiAuth {
      * @param {String} params.tokenSign
      * @return {Promise} {code:0, msg: "Ok"}
      */
-    static authentication (params) {
+    static authentication (params: {userId?: string, user_id?: string, tokenId?: string,
+        token_id?: string, timestamp: number, tokenSign?: string, token_sign?: string}) {
 
         if ((!params.userId && !params.user_id) || (!params.tokenId && !params.token_id)
-            || !params.timestamp || (!params.tokenSign && !params.token_sign)) {
+            || !Boolean(params.timestamp) || (!params.tokenSign && !params.token_sign)) {
             return Promise.resolve(false);
         }
         var userId = params.userId || params.user_id;
@@ -510,7 +511,7 @@ class ApiAuth {
         var timestamp = params.timestamp;
         var tokenSign = params.tokenSign || params.token_sign;
 
-        return Models.Token.findOne({where: {id: tokenId, accountId: userId}})
+        return DBM.Token.findOne({where: {id: tokenId, accountId: userId}})
             .then(function(m) {
                 if (!m) {
                     return false;
@@ -537,7 +538,7 @@ class ApiAuth {
      * @param {String} data.pwd 登录密码
      * @return {Promise} true||error;
      */
-    static bindMobile (data) {
+    static bindMobile (data: {accountId: string, mobile: string, code: string, pwd: string}) {
 
         throw L.ERR.NOT_IMPLEMENTED;
     };
@@ -547,7 +548,7 @@ class ApiAuth {
      * @param id
      * @returns {*}
      */
-    static getAccount (params) {
+    static getAccount (params: {id: string, attributes?: string[], type?: Number}) {
 
         var id = params.id;
         var attributes = params.attributes;
@@ -561,7 +562,7 @@ class ApiAuth {
         }
         if(attributes)
             options.attributes = attributes;
-        return Models.Account.findOne(options);
+        return DBM.Account.findOne(options);
     }
 
     /**
@@ -571,7 +572,7 @@ class ApiAuth {
      * @param companyName
      * @returns {*}
      */
-    static updateAccount(id, data, companyName){
+    static updateAccount(id: string, data: any, companyName?: string){
         if(!id){
             throw {code: -1, msg: "id不能为空"};
         }
@@ -582,10 +583,10 @@ class ApiAuth {
         options.where = {id: id};
         options.returning = true;
         var old_email;
-        return Models.Account.findOne(options)
+        return DBM.Account.findOne(options)
             .then(function(oldAcc){
                 old_email = oldAcc.email;
-                return Models.Account.update(data, options);
+                return DBM.Account.update(data, options);
             })
             .spread(function(rownum, rows){
                 if(!rownum)
@@ -605,11 +606,11 @@ class ApiAuth {
      * @param params
      * @returns {*}
      */
-    static findOneAcc (params) {
+    static findOneAcc (params: any) {
 
         var options: any = {};
         options.where = params;
-        return Models.Account.findOne(options)
+        return DBM.Account.findOne(options)
             .then(function(obj){
                 if(!obj)
                     throw L.ERR.NOT_FOUND;
@@ -622,11 +623,11 @@ class ApiAuth {
      * @param params
      * @returns {*}
      */
-    static checkAccExist (params) {
+    static checkAccExist (params: any) {
 
         var options: any = {};
         options.where = params;
-        return Models.Account.findOne(options);
+        return DBM.Account.findOne(options);
     };
 
 
@@ -640,7 +641,7 @@ class ApiAuth {
      * @param {String} params.email 要发送的邮件
      * @return {Promise} true||error
      */
-    static sendActiveEmail (params) {
+    static sendActiveEmail (params: {email: string}) {
 
         var email = params.email;
         if (!email) {
@@ -651,7 +652,7 @@ class ApiAuth {
             throw L.ERR.EMAIL_FORMAT_INVALID;
         }
 
-        return Models.Account.findOne({where: {email: email}})
+        return DBM.Account.findOne({where: {email: email}})
             .then(function(account) {
                 if (!account) {
                     throw L.ERR.EMAIL_NOT_REGISTRY;
@@ -670,12 +671,12 @@ class ApiAuth {
      * @param {UUID} params.tokenId
      * @return {Promise}
      */
-    static logout (params) {
+    static logout (params: {accountId: string, tokenId: string}) {
 
         var accountId = params.accountId;
         var tokenId = params.tokenId;
         if (accountId && tokenId) {
-            return Models.Token.destroy({where: {accountId: accountId, id: tokenId}})
+            return DBM.Token.destroy({where: {accountId: accountId, id: tokenId}})
                 .then(function() {
                     return true;
                 })
@@ -694,7 +695,7 @@ class ApiAuth {
      * @param {String} params.newPwd 新密码
      * @return {Promise}
      */
-    static resetPwdByOldPwd (params) {
+    static resetPwdByOldPwd (params: {oldPwd: string, newPwd: string, accountId: string}) {
 
         var oldPwd = params.oldPwd;
         var newPwd = params.newPwd;
@@ -712,7 +713,7 @@ class ApiAuth {
             throw {code: -1, msg: "新旧密码不能一致"};
         }
 
-        return Models.Account.findById(accountId)
+        return DBM.Account.findById(accountId)
             .then(function(account) {
                 if (!account) {
                     throw L.ERR.ACCOUNT_NOT_EXIST;
@@ -724,7 +725,7 @@ class ApiAuth {
                 }
                 newPwd = newPwd.replace(/\s/g, "");
                 pwd = utils.md5(newPwd);
-                return Models.Account.update({pwd: pwd}, {where: {id: account.id}});
+                return DBM.Account.update({pwd: pwd}, {where: {id: account.id}});
             })
             .then(function() {
                 return true;
@@ -740,7 +741,7 @@ class ApiAuth {
      * @param {String} params.timestamp 失效时间戳
      * @return {Promise}
      */
-    static qrCodeLogin (params) {
+    static qrCodeLogin (params: {accountId: string, sign: string, timestamp: number, backUrl?: string}) {
 
         var accountId = params.accountId;
         var sign = params.sign;
@@ -760,7 +761,7 @@ class ApiAuth {
                     throw L.ERR.SIGN_ERROR;
                 }
 
-                if (!timestamp) {
+                if (!Boolean(timestamp)) {
                     throw L.ERR.TIMESTAMP_TIMEOUT;
                 }
 
@@ -768,7 +769,7 @@ class ApiAuth {
                     throw L.ERR.TIMESTAMP_TIMEOUT;
                 }
 
-                return Models.Account.findById(accountId)
+                return DBM.Account.findById(accountId)
             })
             .then(function(account) {
                 if (!account) {
@@ -818,7 +819,7 @@ class ApiAuth {
      * @param {String} params.accountId 账号ID
      * @param {String} params.backUrl
      */
-    static getQRCodeUrl (params) {
+    static getQRCodeUrl (params: {accountId: string, backUrl: string}) {
 
         var accountId = params.accountId;
         var backUrl = params.backUrl;
@@ -841,7 +842,7 @@ class ApiAuth {
             })
             .then(function(shortUrl) {
                 backUrl = encodeURIComponent(shortUrl);
-                return Models.Account.findById(accountId)
+                return DBM.Account.findById(accountId)
             })
             .then(function(account) {
                 if (!account) {
@@ -874,11 +875,7 @@ class ApiAuth {
      * @param {Integer} [params.type] 1.企业  2.代理商 默认 1
      * @reutnr {Promise} true 使用 false未使用
      */
-    static isEmailUsed (params) {
-
-        if (!params) {
-            params = {};
-        }
+    static isEmailUsed (params: {email: string, type?: Number}) {
         var email = params.email;
         var type = params.type;
 
@@ -892,7 +889,7 @@ class ApiAuth {
                     type = 1;
                 }
 
-                return Models.Account.findOne({where: {email: email, type: type}})
+                return DBM.Account.findOne({where: {email: email, type: type}})
             })
             .then(function(account) {
                 if (account) {
@@ -907,19 +904,21 @@ class ApiAuth {
      * @type {saveOrUpdateOpenId}
      */
     @requireParams(['accountId', 'openId'], [])
-    static saveOrUpdateOpenId(params) {
+    static saveOrUpdateOpenId(params: {accountId: string, openId: string}) {
         if(params.accountId == undefined) {
             throw {code: -1, msg: 'accountId不能为空'};
         }
-        params.createdAt = utils.now();
+        let _params: any;
+        _params = params;
+        _params.createdAt = utils.now();
 
-        return AccountOpenid.findById(params.openId)
+        return AccountOpenid.findById(_params.openId)
             .then(function(ap) {
                 if(ap) {
                     return ap;
                 }
 
-                return AccountOpenid.create(params);
+                return AccountOpenid.create(_params);
             })
     }
 
@@ -928,7 +927,7 @@ class ApiAuth {
      * @type {getAccountIdByOpenId}
      */
     @requireParams(["openId"])
-    static getAccountIdByOpenId(params) {
+    static getAccountIdByOpenId(params: {openId: string}) {
         return AccountOpenid.findById(params.openId)
             .then(function(ret) {
                 if(ret) {
@@ -940,8 +939,8 @@ class ApiAuth {
     }
 
     @requireParams(["id"])
-    static judgeRoleById(params){
-        return Models.Account.findById(params.id)
+    static judgeRoleById(params: {id: string}){
+        return DBM.Account.findById(params.id)
             .then(function(account) {
                 if (!account) {
                     throw L.ERR.ACCOUNT_NOT_EXIST;
@@ -954,7 +953,7 @@ class ApiAuth {
             })
     }
 
-    static __initHttpApp (app) {
+    static __initHttpApp (app: any) {
 
         //二维码自动登录
         app.all("/auth/qrcode-login", function(req, res, next) {
@@ -1084,7 +1083,7 @@ function makeActiveSign(activeToken, accountId, timestamp) {
 }
 
 function _sendActiveEmail(accountId) {
-    return Models.Account.findOne({where: {id: accountId}})
+    return DBM.Account.findOne({where: {id: accountId}})
         .then(function(account) {
             //生成激活码
             var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
@@ -1096,7 +1095,7 @@ function _sendActiveEmail(accountId) {
             return API.mail.sendMailRequest({toEmails: account.email, templateName: "qm_active_email", values: vals})
                 .then(function() {
                     account.activeToken = activeToken;
-                    return Models.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
+                    return DBM.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
                 })
         })
 }
@@ -1108,7 +1107,7 @@ function makeAuthenticateSign(accountId, os?: string) {
         os = 'web';
     }
 
-    return Models.Token.findOne({where:{accountId: accountId, os: os}})
+    return DBM.Token.findOne({where:{accountId: accountId, os: os}})
         .then(function(m) {
             var refreshAt = moment().format("YYYY-MM-DD HH:mm:ss");
             var expireAt = moment().add(2, "hours").format("YYYY-MM-DD HH:mm:ss");
@@ -1117,7 +1116,7 @@ function makeAuthenticateSign(accountId, os?: string) {
                 m.expireAt = expireAt;
                 return m.save();
             } else {
-                m = Models.Token.build({id: uuid.v1(), accountId: accountId, token: getRndStr(10), refreshAt: refreshAt, expireAt: expireAt});
+                m = DBM.Token.build({id: uuid.v1(), accountId: accountId, token: getRndStr(10), refreshAt: refreshAt, expireAt: expireAt});
                 return m.save();
             }
         })

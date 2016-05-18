@@ -101,26 +101,39 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
         staff.company = company;
     }
     $scope.staff = staff;
-    var role = 'false';
+    var role={id:false};
+    // role.id = 'false';
+    console.info(role);
     if(staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN){
-        role = 'true';
+        role.id = true;
     }
+    console.info(staff.roleId);
+    console.info(role);
     $scope.role = role;
 
     $scope.travelpolicylist = await company.getTravelPolicies();
     console.info($scope.travelpolicylist);
     // $scope.departmentlist = await company.department.get(companyId);
     $scope.savestaff = function(){
-        if($scope.role =='true'){
-            $scope.staff.roleId == EStaffRole.ADMIN;
+        if($scope.role.id ==true){
+            $scope.staff.roleId = EStaffRole.ADMIN;
         }else{
-            $scope.staff.roleId == EStaffRole.COMMON;
+            $scope.staff.roleId = EStaffRole.COMMON;
         }
+        console.info($scope.staff);
         $scope.staff.save();
 
         $ionicHistory.goBack(-1);
     }
-
+    $scope.showrole = function(){
+        if($scope.role.id ==true){
+            $scope.staff.roleId = EStaffRole.ADMIN;
+        }else{
+            $scope.staff.roleId = EStaffRole.COMMON;
+        }
+        console.info($scope.role);
+        console.info($scope.staff);
+    }
 }
 
 export async function TravelpolicyController($scope , Models, $location){

@@ -20,6 +20,8 @@ const API = require('common/api');
 
 function resolverAPIModule(modname: string){
     return function(){
+        if(API[modname])
+            return Promise.resolve();
         API.require(modname);
         return API.onload();
     }
@@ -73,14 +75,18 @@ var Services = {
     },
 };
 
+function throwNotImplemented(){
+    throw L.ERR.NOT_IMPLEMENTED;
+}
+
 function createService<T extends Resolvable>(options: any, cacheFactory: ng.ICacheFactoryService){
     options.cache = cacheFactory(options.type.name);
     options.resolve = resolverAPIModule(options.modname);
-    options.funcGet = options.funcs[0] || function(){ throw L.ERR.NOT_IMPLEMENTED; };
-    options.funcFind = options.funcs[1] || function(){ throw L.ERR.NOT_IMPLEMENTED; };
-    options.funcCreate = options.funcs[2] || function(){ throw L.ERR.NOT_IMPLEMENTED; };
-    options.funcUpdate = options.funcs[3] || function(){ throw L.ERR.NOT_IMPLEMENTED; };
-    options.funcDelete = options.funcs[4] || function(){ throw L.ERR.NOT_IMPLEMENTED; };
+    options.funcGet    = options.funcs[0] || throwNotImplemented;
+    options.funcFind   = options.funcs[1] || throwNotImplemented;
+    options.funcCreate = options.funcs[2] || throwNotImplemented;
+    options.funcUpdate = options.funcs[3] || throwNotImplemented;
+    options.funcDelete = options.funcs[4] || throwNotImplemented;
     return new RemoteService<T>(options)
 }
 

@@ -13,11 +13,11 @@ var API = require('common/api');
 import _ = require('lodash');
 import moment = require('moment');
 
-var Models = sequelize.models;
+var DBM = sequelize.models;
 var logger = new Logger('qm_order');
 var Paginate = paginate.Paginate;
-var QmOrderModel = Models.QmOrder;
-var OrderLogsModel = Models.OrderLogs;
+var QmOrderModel = DBM.QmOrder;
+var OrderLogsModel = DBM.OrderLogs;
 var now = utils.now;
 var qm_order : any = {};
 
