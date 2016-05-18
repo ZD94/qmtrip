@@ -334,7 +334,10 @@ class StaffModule{
         if(params.columns){
             options.attributes = params.columns;
         }
-        return Models.Staff.findAll(options);
+        return Models.Staff.findAll(options)
+            .map(function(s){
+                return new Staff(s);
+            });
     }
 
     /**
