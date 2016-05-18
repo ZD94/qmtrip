@@ -230,13 +230,13 @@ export var condition = {
 
             let my, other;
             try {
-                my = await Models.agency.get(accountId);
+                let user = await Models.agencyUser.get(accountId);
+                my = await Models.agency.get(user.agencyId);
             } catch(err) {}
 
             try {
-                other = await Models.agncy.get(id);
-            } catch(err) {
-            }
+                other = await Models.agency.get(id);
+            } catch(err) {}
 
             return my && my.target && other && other.target && my["agencyId"] == other["agencyId"];
         }

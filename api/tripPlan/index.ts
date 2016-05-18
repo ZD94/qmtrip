@@ -35,7 +35,7 @@ class TripPlanModule {
      * @returns {Promise<TripPlan>}
      */
     @clientExport
-    @requireParams(['deptCity', 'arrivalCity', ''], [])
+    @requireParams(['deptCity', 'arrivalCity', ''])
     static async saveTripPlan(params) {
         let {accountId} = Zone.current.get('session');
         let staff = await API.staff.getStaff({id: accountId, columns: ['companyId', 'email', 'name']});
