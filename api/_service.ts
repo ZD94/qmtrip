@@ -15,16 +15,12 @@ import { Agency, AgencyUser } from './_types/agency';
 import {TripPlan, TripDetail, Project, TripPlanLog} from './_types/tripPlan';
 import { Account,Token } from './_types/auth';
 import { Seed } from './_types/seed';
+import { CachedService, CacheInterface, Resolvable } from '../common/model/service';
+import { createCache } from './_cache';
 
-interface ServiceObject{
-    target?: any;
-    $fields?: any;
-    $resolved?: any;
-}
-
-class SequelizeService<T extends ServiceObject> extends ServiceAbstract<T>{
-    constructor(TClass:any){
-        super(TClass);
+class SequelizeService<T extends Resolvable> extends CachedService<T>{
+    constructor(cache: CacheInterface, TClass:any){
+        super(cache, TClass);
     }
 
     create(obj: Object): T {
@@ -33,11 +29,11 @@ class SequelizeService<T extends ServiceObject> extends ServiceAbstract<T>{
         ret['$fields'] = {'!':'!'};
         return ret;
     }
-    async get(id: string): Promise<T>{
+    async $get(id: string): Promise<T>{
         var target = await this.TClass.$sqlmodel.findById(id);
         return new this.TClass(target);
     }
-    async find(where: any): Promise<T[]>{
+    async $find(where: any): Promise<T[]>{
         var [rows, count] = await this.TClass.$sqlmodel.findAndCount(where);
         var objs = rows.map((row)=>new this.TClass(row));
         return objs;
@@ -59,8 +55,9 @@ class SequelizeService<T extends ServiceObject> extends ServiceAbstract<T>{
         return obj.target.destroy();
     }
 }
-function createServerService<T>(TClass: any){
-    return new SequelizeService<T>(TClass);
+function createServerService<T extends Resolvable>(TClass: any){
+    var cache = createCache(TClass.name);
+    return new SequelizeService<T>(cache, TClass);
 }
 
 initModels({
