@@ -35,6 +35,9 @@ cache.init({redis_conf: config.redis.url, prefix: 'times:cache'});
 var model = require('common/model');
 model.init(config.postgres.url);
 
+var API = require('common/api');
+API.setDebug(config.debug);
+
 var Server = require('common/server');
 var server = new Server(config.appName, config.pid_file);
 
