@@ -39,7 +39,7 @@ export class Agency extends ModelObject{
     get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
 
-    @Field({type: Types.STRING})
+    @Field({type: Types.STRING(10)})
     get agencyNo(): string { return ''; }
     set agencyNo(val: string) {}
 
@@ -47,11 +47,11 @@ export class Agency extends ModelObject{
     get createUser(): string { return null; }
     set createUser(val: string) {}
 
-    @Field({type: Types.STRING})
+    @Field({type: Types.STRING(100)})
     get name(): string { return ''; }
     set name(val: string) {}
 
-    @Field({type: Types.STRING})
+    @Field({type: Types.TEXT})
     get description(): string { return ''; }
     set description(val: string) {}
 
@@ -59,11 +59,11 @@ export class Agency extends ModelObject{
     get status(): EAgencyStatus { return 0; }
     set status(val: EAgencyStatus) {}
 
-    @Field({type: Types.STRING})
+    @Field({type: Types.STRING(30)})
     get email(): string { return ''; }
     set email(val: string) {}
 
-    @Field({type: Types.STRING})
+    @Field({type: Types.STRING(15)})
     get mobile(): string { return ''; }
     set mobile(val: string) {}
 

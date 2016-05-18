@@ -1,3 +1,4 @@
+///<reference path="../_decorator.ts"/>
 /**
  * Created by yumiao on 15-12-9.
  */
@@ -13,9 +14,7 @@ import utils = require("common/utils");
 import {requireParams, clientExport} from 'common/api/helper';
 import {Paginate} from 'common/paginate';
 import {Agency, AgencyUser, EAgencyStatus, AgencyError} from "api/_types/agency";
-import { ServiceInterface } from 'common/model';
-import {requirePermit} from "../_decorator";
-import async = Q.async;
+import {requirePermit, conditionDecorator, condition} from "../_decorator";
 let logger = new Logger("agency");
 
 let agencyCols = Agency['$fieldnames'];
@@ -75,9 +74,10 @@ class AgencyModule {
             let _account : any = {email: email, mobile: mobile, pwd: password, type: ACCOUNT_TYPE};
             account = await API.auth.newAccount(_account);
         }
-
+        params.status = EAgencyStatus.ACTIVE;
         params.id = account.id;
         params.createUser = account.id;
+        params.agencyNo = await API.seeds.getSeedNo('AgencyNo', {formatDate: 'YY', minNo: 100, maxNo: 999});
 
         let agency = await DBM.agency.create(params);
         let _agencyUser: any = _.pick(params, ['email', 'mobile', 'sex', 'avatar']);
@@ -85,6 +85,7 @@ class AgencyModule {
         _agencyUser.agencyId = agency.id;
         _agencyUser.roleId = 0;
         _agencyUser.name = params.userName;
+        _agencyUser.status = EAgencyStatus.ACTIVE;
 
         await DBM.agency.createAgencyUser(_agencyUser);
 
@@ -101,19 +102,14 @@ class AgencyModule {
      * @returns {Promise<Agency>}
      */
     @clientExport
+    @requirePermit('user.query', 2)
+    @conditionDecorator([{if: condition.isSameAgency('0.id')}])
     @requireParams(['id'])
     static async getAgencyById(params: {id: string}): Promise<Agency>{
-        let {accountId} = Zone.current.get('session');
-        let agencyId = params.id;
-        let user = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
+        let session = Zone.current.get("session");
+        let agency = await DBM.agency.findById({id: params.id});
 
-        if(user.agencyId != agencyId){
-            throw L.ERR.PERMISSION_DENY;
-        }
-
-        let agency = await DBM.agency.findById({id: agencyId});
-
-        if (!agency || agency.status == EAgencyStatus.DELETE) {
+        if (!agency) {
             throw L.ERR.AGENCY_NOT_EXIST;
         }
 
@@ -122,27 +118,24 @@ class AgencyModule {
 
     /**
      * @method updateAgency
+     *
      * 更新代理商信息
      * @param params
      * @returns {Promsie<Agency>}
      */
     @clientExport
-    @requireParams(['id'], ['name', 'description', 'status', 'address', 'email', 'telephone', 'mobile', 'company_num', 'remark'])
+    @conditionDecorator([{if: condition.isMyAgency('0.id')}])
+    @requirePermit('user.edit', 2)
+    @requireParams(['id'], ['name', 'description', 'status', 'email', 'mobile', 'remark'])
     static async updateAgency(_agency): Promise<Agency> {
-        let {accountId} = Zone.current.get('session');
         let agencyId = _agency.id;
         let agency = await DBM.Agency.findById(agencyId, {attributes: ['createUser']});
 
-        if (!agency || agency.status == EAgencyStatus.DELETE) {
+        if (!agency) {
             throw L.ERR.AGENCY_NOT_EXIST;
         }
 
-        if (agency.createUser != accountId) {
-            throw L.ERR.PERMISSION_DENY;
-        }
-
         _agency.updatedAt = utils.now();
-
         let [rows, agencies] = await DBM.Agency.update(_agency, {returning: true, where: {id: agencyId}, fields: Object.keys(_agency)});
 
         if (!rows || rows == "NaN") {
@@ -174,7 +167,7 @@ class AgencyModule {
      */
     @clientExport
     @requireParams(['id'])
-    static async deleteAgency(params): Promise<boolean> {
+    static async deleteAgency(params: {id: string}): Promise<boolean> {
         let {accountId} = Zone.current.get('session');
         let agencyId = params.id;
         let selfUser = await DBM.agencyUser.findById(accountId, {attributes: ['createUser', 'status']})
@@ -208,7 +201,7 @@ class AgencyModule {
      * @returns {Promise<AgencyUser>}
      */
     @clientExport
-    @requirePermit("user.add", 2)
+    @requirePermit('user.add', 2)
     @requireParams(['email', 'name'], ['mobile', 'sex', 'avatar', 'roleId'])
     static async createAgencyUser(params: {email: string, name: string, mobile?: string, sex?: number, avatar?: string, roleId?: number}): Promise<AgencyUser> {
         let {accountId} = Zone.current.get('session');
@@ -227,6 +220,7 @@ class AgencyModule {
         }
 
         let agencyUser = await DBM.AgencyUser.create(params);
+        
         return new AgencyUser(agencyUser);
     }
 
@@ -242,7 +236,7 @@ class AgencyModule {
      * @returns {Promise<AgencyUser>}
      */
     @clientExport
-    @requirePermit("user.edit", 2)
+    @requirePermit('user.edit', 2)
     @requireParams(['id'], ['status', 'name', 'sex', 'mobile', 'avatar', 'roleId'])
     static async updateAgencyUser(params: {id: string, status?: number, name?: string, sex?: string, email?: string, mobile?: string, avatar?: string, roleId?: string}) {
         let {accountId} = Zone.current.get('session');
@@ -419,7 +413,7 @@ class AgencyModule {
         try {
             let agency = await API.agency.agencyByEmail({email: email});
 
-            if(!agency || agency.status == EAgencyStatus.DELETE) {
+            if(!agency || !agency.target || agency.status == EAgencyStatus.DELETE) {
                 let _agency = {name: default_agency.name, email: email, mobile: mobile, pwd: pwd || '123456', status: 1, userName: user_name, remark: '系统默认代理商'}
                 agency = await API.agency.registerAgency(_agency)
             }
@@ -433,13 +427,13 @@ class AgencyModule {
             }
 
             await Promise.all(companies.map(async function(c) {
-                let myZome = Zone.current.fork({name: 'updateCompany', properties: {session: {accountId: agencyId}}});
+                let myZome = Zone.current.fork({name: 'updateCompany', properties: {session: {accountId: agencyId, tokenId: 'tokenId'}}});
                 return myZome.run(API.company.updateCompany.bind(this, {id: c, agencyId: agencyId}));
 
             }));
         }catch(err) {
             logger.error("初始化系统默认代理商失败...");
-            logger.error(err);
+            logger.error(err.stack);
         }
     }
 }

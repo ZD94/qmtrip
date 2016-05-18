@@ -9,7 +9,7 @@ let moment = require("moment");
 let DBM = require("common/model").DB.models;
 let Logger = require('common/logger');
 let logger = new Logger("seeds");
-let typeString = ['TripPlanNo', 'qm_order'];
+let typeString = ['TripPlanNo', 'AgencyNo', 'CompanyNo'];
 
 class SeedModule {
     /**
@@ -37,7 +37,8 @@ class SeedModule {
         let seeds = await DBM.Seed.findOne({where: {type: type}});
 
         if (!seeds) {
-            return DBM.Seed.create({type: type, minNo: minNo, maxNo: maxNo, nowNo: minNo})
+            let en = await DBM.Seed.create({type: type, minNo: minNo, maxNo: maxNo, nowNo: minNo});
+            return en.nowNo;
         }
 
         let nowNo = 0;

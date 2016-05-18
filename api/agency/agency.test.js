@@ -7,19 +7,12 @@ var API = require("common/api");
 
 var agencyId = '';
 var agencyUserId = '';
+var zone = Zone.current.fork({name: 'api/agency', properties: {session: {accountId: agencyUserId}}});
+zone.run(describe.bind(this, "api/agency", function() {
 
-describe("api/client/agency.js", function() {
+    describe("registerAgency", function() {
+        var agency = {email: "agency.test@jingli.tech", userName: "喵喵", name: '喵喵的代理商', description: '代理商API测试用', mobile: "15269866801"};
 
-
-    describe("createAgency", function() {
-
-        var agency = {
-            email: "agency.test@jingli.tech",
-            userName: "喵喵",
-            name: '喵喵的代理商',
-            description: '代理商API测试用',
-            mobile: "15269866801"
-        };
         before(function(done){
             API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}, function (err, ret) {
                 if (err) {
@@ -38,55 +31,44 @@ describe("api/client/agency.js", function() {
             })
         });
 
-        it("#createAgency should be error with wrong params", function(done) {
-            API.client.agency.createAgency({})
-                .catch(function(err) {
-                    assert.equal(err.code, -1);
-                    done();
-                })
+        it("#registerAgency should be error with wrong params", function(done) {
+            API.agency.registerAgency({}, function(err, ret) {
+                assert.equal(err.code, -1);
+                done();
+            })
         });
 
-        it("#createAgency should be ok with correct params", function(done) {
-            API.client.agency.createAgency(agency, function(err, ret) {
-                if (err) {
-                    throw err;
-                }
-                
-                assert.equal(ret.target.status, 0);
-                // var agencyId = ret.agency.id;
-                // var agencyUserId = ret.agencyUser.id;
+        it("#registerAgency should be ok with correct params", function(done) {
+            API.agency.registerAgency(agency, function(err, ret) {
+                assert.equal(err, null);
+                assert.equal(ret.target.status, 1);
                 var agencyId = ret.target.id;
                 var agencyUserId = ret.target.createUser;
                 done();
             });
         });
 
+
     });
 
-
-    describe("agency and agencyUser options", function() {
+    describe("options baesd on agency created", function() {
         var agencyId = "";
         var agencyUserId = "";
+        var agency = {email: "agency.test@jingli.tech", userName: "喵喵", name: '喵喵的代理商', description: '代理商API测试用', mobile: "15269866811"};
 
-        var agency = {
-            email: "agency.test@jingli.tech",
-            userName: "喵喵",
-            name: '喵喵的代理商',
-            description: '代理商API测试用',
-            mobile: "15269866811"
-        };
         before(function(done){
             Promise.all([
                 API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
                 API.agency.deleteAgencyByTest({email: 'agencyUser.test@jingli.tech', mobile: agency.mobile})
             ])
                 .spread(function(ret1, ret2){
-                    return API.client.agency.createAgency(agency)
+                    return API.agency.registerAgency(agency)
                 })
                 .then(function(ret){
-                    assert.equal(ret.target.status, 0);
+                    assert.equal(ret.target.status, 1);
                     agencyId = ret.target.id;
                     agencyUserId = ret.target.createUser;
+                    zone = Zone.current.fork({name: 'api/agency', properties: {session: {accountId: agencyUserId, tokenId: "tokenId"}}});
                     done();
                 })
                 .catch(function(err){
@@ -108,122 +90,106 @@ describe("api/client/agency.js", function() {
                 })
         });
 
-        it("#updateAgency should be ok", function(done) {
-            var self = {accountId: agencyUserId};
-            API.client.agency.updateAgency.call(self, {agencyId: agencyId, status: '1', remark: '代理商更新测试', wrongParams: 'wrongParams'}, function(err, ret) {
-                if (err) {
-                    throw err;
-                }
-                
-                assert.equal(ret.status, 1);
-                done();
+        describe('after agency created', function() {
+            it("getAgencyById should be ok", function(done) {
+                zone.run(API.agency.getAgencyById.bind(this, {id: agencyId}, function(err, ret) {
+                    assert.equal(err, null);
+                    assert.equal(ret.target.id, agencyId);
+                    done();
+                }));
+            });
+
+            it("#updateAgency should be ok", function(done) {
+                var self = {accountId: agencyUserId};
+                zone.run(API.agency.updateAgency.bind(this, {id: agencyId, status: '0', remark: '代理商更新测试', wrongParams: 'wrongParams'}, function(err, ret) {
+                    assert.equal(err, null);
+                    assert.equal(ret.target.status, 0);
+                    done();
+                }));
+            });
+
+            it("#listAgency should be ok", function(done) {
+                zone.run(API.agency.listAgency.bind(this, {}, function(err, ret) {
+                    assert.equal(err, null);
+                    assert(ret.length >= 0);
+                    done();
+                }));
+            });
+
+            it("createAgencyUser should be ok", function(done) {
+                zone.run(API.agency.createAgencyUser.bind(this, {name: '测试代理商用户', email: "agencyUser.test@jingli.tech", mobile: '12345678777', agencyId: agencyId}, function(err, ret) {
+                    assert.equal(err, null);
+                    assert.equal(ret.status, 0);
+                    done();
+                }));
+            });
+
+
+            it("updateAgencyUser should be ok", function(done) {
+                zone.run(API.agency.updateAgencyUser.bind(this, {status: 1, roleId: 2, id: agencyUserId}, function(err, ret) {
+                    assert.equal(err, null);
+                    assert.equal(ret.status, 1);
+                    assert.equal(ret.roleId, 2);
+                    done();
+                }));
             })
-        });
 
 
-        it("getAgencyById should be ok", function(done) {
-            API.client.agency.getAgencyById.call({accountId: agencyUserId}, {id: agencyId}, function(err, ret) {
-                if (err) {
-                    throw err;
-                }
-
-                assert.equal(ret.id, agencyId);
-                done();
-            })
-        });
-
-        it("#listAgency should be ok", function(done) {
-            API.client.agency.listAgency.call({accountId: agencyUserId}, {}, function(err, ret) {
-                if (err) {
-                    throw err;
-                }
-
-                done();
-            })
-        })
-
-
-        it("createAgencyUser should be ok", function(done) {
-            API.client.agency.createAgencyUser.call({accountId: agencyUserId},
-                {name: '测试代理商用户', email: "agencyUser.test@jingli.tech", mobile: '12345678777', agencyId: agencyId},
-                function(err, ret) {
+            it("getCurrentAgencyUser should be ok", function(done) {
+                API.agency.getCurrentAgencyUser( function(err, ret) {
                     if (err) {
                         throw err;
                     }
-                    assert.equal(ret.status, 0);
+                    assert.equal(ret.id, agencyUserId);
                     done();
+                })
+            });
+
+
+
+            it("getAgencyUser should be ok", function(done) {
+                API.agency.getAgencyUser( {id: agencyUserId}, function(err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+                    assert.equal(ret.id, agencyUserId);
+                    done();
+                })
+            });
+
+            it("getAgencyUser should be error whit wrong params", function(done) {
+                var uuid = require('node-uuid');
+                API.agency.getAgencyUser( {id: uuid.v1()}, function(err, ret) {
+                    assert.equal(ret, null);
+                    assert.equal(err.code, -2);
+                    done();
+                })
+            });
+
+
+            it("API.agency.listAndPaginateAgencyUser", function(done) {
+                API.agency.listAndPaginateAgencyUser( {}, function(err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    assert(ret.items.length >= 0);
+                    done();
+                })
+            });
+
+
+            it("deleteAgency should be ok", function (done) {
+                API.agency.deleteAgency( {agencyId: agencyId}, function (err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+                    done();
+                })
             });
         })
-
-
-        it("updateAgencyUser should be ok", function(done) {
-            API.client.agency.updateAgencyUser.call({accountId: agencyUserId}, {status: 1, roleId: 2, id: agencyUserId}, function(err, ret) {
-                if (err) {
-                    throw err;
-                }
-                console.info(ret);
-                assert.equal(ret.status, 1);
-                assert.equal(ret.roleId, 2);
-                done();
-            });
-        })
-
-
-        it("getCurrentAgencyUser should be ok", function(done) {
-            API.client.agency.getCurrentAgencyUser.call({accountId: agencyUserId}, function(err, ret) {
-                if (err) {
-                    throw err;
-                }
-                assert.equal(ret.id, agencyUserId);
-                done();
-            })
-        });
-
-
-
-        it("getAgencyUser should be ok", function(done) {
-            API.client.agency.getAgencyUser.call({accountId: agencyUserId}, {id: agencyUserId}, function(err, ret) {
-                if (err) {
-                    throw err;
-                }
-                assert.equal(ret.id, agencyUserId);
-                done();
-            })
-        });
-
-        it("getAgencyUser should be error whit wrong params", function(done) {
-            var uuid = require('node-uuid');
-            API.client.agency.getAgencyUser.call({accountId: agencyUserId}, {id: uuid.v1()}, function(err, ret) {
-                assert.equal(ret, null);
-                assert.equal(err.code, -2);
-                done();
-            })
-        });
-
-
-        it("API.agency.listAndPaginateAgencyUser", function(done) {
-            API.client.agency.listAndPaginateAgencyUser.call({accountId: agencyUserId}, {}, function(err, ret) {
-                if (err) {
-                    throw err;
-                }
-
-                assert(ret.items.length >= 0);
-                done();
-            })
-        });
-
-
-        it("deleteAgency should be ok", function (done) {
-            API.client.agency.deleteAgency.call({accountId: agencyUserId}, {agencyId: agencyId}, function (err, ret) {
-                if (err) {
-                    throw err;
-                }
-                done();
-            })
-        });
 
     });
-
 
     describe("deleteAgencyUser", function(){
         var _newAgencyUser = "";
@@ -243,7 +209,7 @@ describe("api/client/agency.js", function() {
                 API.agency.deleteAgencyByTest({email: 'agencyUser.test@jingli.tech', mobile: agency.mobile})
             ])
                 .spread(function(ret1, ret2){
-                    return API.client.agency.createAgency(agency)
+                    return API.agency.registerAgency(agency)
                 })
                 .then(function(ret){
                     assert.equal(ret.target.status, 0);
@@ -251,7 +217,7 @@ describe("api/client/agency.js", function() {
                     _agencyUserId = ret.target.createUser;
                 })
                 .then(function(){
-                    return  API.client.agency.createAgencyUser.call({accountId: _agencyUserId},
+                    return  API.agency.createAgencyUser(
                         {name: '测试代理商用户', email: "agencyUser.test@jingli.tech", mobile: '12345678777', agencyId: _agencyId})
                 })
                 .then(function(ret){
@@ -280,7 +246,7 @@ describe("api/client/agency.js", function() {
         });
 
         it("deleteAgencyUser should be ok", function(done) {
-            API.client.agency.deleteAgencyUser.call({accountId: _agencyUserId}, {userId: _newAgencyUser}, function (err, ret) {
+            API.agency.deleteAgencyUser( {userId: _newAgencyUser}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -290,4 +256,4 @@ describe("api/client/agency.js", function() {
     })
 
 
-})
+}))
