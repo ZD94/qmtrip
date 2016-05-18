@@ -24,68 +24,7 @@ import { ServiceInterface } from 'common/model';
 let TripDetailCols = TripDetail['$fieldnames'];
 let TripPlanCols = TripPlan['$fieldnames'];
 
-class TripPlanService implements ServiceInterface<TripPlan>{
-    async create(obj: Object): Promise<TripPlan>{
-        return API.tripPlan.saveTripPlan(obj);
-    }
-    async get(id: string): Promise<TripPlan>{
-        console.info(id);
-        return API.tripPlan.getTripPlan({id: id});
-    }
-    async find(where: any): Promise<TripPlan[]>{
-        return API.tripPlan.listTripPlans(where);
-    }
-    async update(id: string, fields: Object): Promise<TripPlan> {
-        fields[id] = id;
-        return API.tripPlan.updateTripPlanOrder(fields);
-    }
-    async destroy(id: string): Promise<any> {
-        return API.tripPlan.deleteTripPlan({tripPlanId: id});
-    }
-}
-
-class TripDetailService implements ServiceInterface<TripDetail>{
-    async create(obj: Object): Promise<TripDetail>{
-        return API.tripPlan.saveTripDetail(obj);
-    }
-    async get(id: string): Promise<TripDetail>{
-        return API.tripPlan.getTripDetail({consumeId: id});
-    }
-    async find(where: any): Promise<TripDetail[]>{
-        return API.tripPlan.getTripPlanDetails({where: where});
-    }
-    async update(id: string, fields: Object): Promise<any> {
-        fields[id] = id;
-        return API.tripPlan.updateTripPlanOrder(fields);
-    }
-    async destroy(id: string): Promise<any> {
-        return API.tripPlan.deleteTripPlan({tripPlanId: id});
-    }
-}
-
-class ProjectService implements ServiceInterface<Project>{
-    async create(obj: Object): Promise<Project>{
-        return API.tripPlan.createNewProject(obj);
-    }
-    async get(id: string): Promise<Project>{
-        return API.tripPlan.getProject({consumeId: id});
-    }
-    async find(where: any): Promise<Project[]>{
-        return API.tripPlan.getProjectList(where);
-    }
-    async update(id: string, fields: Object): Promise<any> {
-        throw {code: -1, msg: '不能更新项目名称'};
-    }
-    async destroy(id: string): Promise<any> {
-        return API.tripPlan.deleteProject({tripPlanId: id});
-    }
-}
-
 class TripPlanModule {
-    static TripPlanService = TripPlanService;
-    static TripDetailService = TripDetailService;
-    static ProjectService = ProjectService;
-
     static TripPlanCols = TripPlanCols;
     static TripDetailCols = TripDetailCols;
 

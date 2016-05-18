@@ -4,7 +4,7 @@ import { TripPlan } from 'api/_types/tripPlan';
 import { regApiType } from 'common/api/helper';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Department } from 'api/_types/department';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference } from 'common/model';
+import { ModelObject, Table, Field, Types, ResolveRef, Reference, Values } from 'common/model';
 import { Create } from 'common/model';
 
 export enum EStaffStatus {
@@ -38,7 +38,7 @@ export class Staff extends ModelObject{
     static create(): Staff { return null; }
 
     @Field({type: Types.UUID})
-    get id(): string { return null; }
+    get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
     // '员工名称'
     @Field({type: Types.STRING(50)})
@@ -106,7 +106,7 @@ export class Credential extends ModelObject{
     static create(): Credential { return null; }
 
     @Field({type: Types.UUID})
-    get id(): string { return null; }
+    get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
 
     @Field({type: Types.INTEGER, defaultValue: 0})
@@ -140,7 +140,7 @@ export class PointChange extends ModelObject{
     static create(): PointChange { return null; }
 
     @Field({type: Types.UUID})
-    get id(): string { return null; }
+    get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
 
     @ResolveRef({type: Types.UUID}, Models.staff)

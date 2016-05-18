@@ -27,7 +27,11 @@ export function requirePermit(permits: string| string[], type?: number) {
                         throw L.ERR.PERMISSION_DENIED
                     }
                     return fn.apply(self, args)
-                });
+                })
+                .catch(function(err) {
+                    console.info("requirePermit error...");
+                    console.error(err);
+                })
         }
         return desc;
     }
@@ -107,6 +111,21 @@ export function filterResultColumn(columns: string[]) {
                     }
                     return result;
                 })
+        }
+        return desc;
+    }
+}
+
+//追加函数参数
+export function addFuncParams(params) {
+    return function(target, key, desc) {
+        let fn = desc.value;
+        desc.value = function(...args) {
+            let self = this;
+            for(let key of params) {
+                args[0][key] = params[key];
+            }
+            return fn.apply(self, args);
         }
         return desc;
     }

@@ -2,8 +2,8 @@ import {requirePermit} from "../_decorator";
 /**
  * Created by yumiao on 15-12-9.
  */
-let sequelize = require("common/model").importModel("./models");
-let Models = sequelize.models;
+var sequelize = require("common/model").DB;
+var Models = sequelize.models;
 let uuid = require("node-uuid");
 let L = require("common/language");
 let _ = require('lodash');
@@ -11,6 +11,8 @@ let utils = require("common/utils");
 let Paginate = require("common/paginate").Paginate;
 let C = require("config");
 let API = require("common/api");
+let Logger = require('common/logger');
+let logger = new Logger('company');
 
 import {requireParams, clientExport} from "common/api/helper";
 import {ECompanyStatus, Company, MoneyChange} from 'api/_types/company';
@@ -21,49 +23,7 @@ let AGENCY_ROLE = {OWNER: 0, COMMON: 1, ADMIN: 2};
 let companyCols = Company['$fieldnames'];
 // let fundsAccountCols = Object.keys(Models.FundsAccounts.attributes);
 
-
-class CompanyService implements ServiceInterface<Company>{
-    async create(obj: Object): Promise<Company>{
-        return API.company.createCompany(obj);
-    }
-    async get(id: string): Promise<Company>{
-        return API.company.getCompany(id);
-    }
-    async find(where: any): Promise<Company[]>{
-        return API.company.listCompany(where);
-    }
-    async update(id: string, fields: Object): Promise<any> {
-        fields['companyId'] = id;
-        return API.company.updateCompany(fields);
-    }
-    async destroy(id: string): Promise<any> {
-        return API.company.deleteCompany({companyId: id});
-    }
-}
-
-class MoneyChangeService implements ServiceInterface<MoneyChange>{
-    async create(obj: Object): Promise<MoneyChange>{
-        return API.company.saveMoneyChange(obj);
-    }
-    async get(id: string): Promise<MoneyChange>{
-        return API.company.getMoneyChange(id);
-    }
-    async find(where: any): Promise<MoneyChange[]>{
-        return API.company.findMoneyChange(where);
-    }
-    async update(id: string, fields: Object): Promise<any> {
-        throw {code: -2, msg: '不能更新记录'};
-    }
-    async destroy(id: string): Promise<any> {
-        throw {code: -2, msg: '不能删除记录'};
-    }
-}
-
-
 class CompanyModule {
-    static CompanyService = CompanyService;
-    static MoneyChangeService = MoneyChangeService;
-
     /**
      * 域名是否已被占用
      *
@@ -198,22 +158,21 @@ class CompanyModule {
      * @returns {Promise<Company>}
      */
     @clientExport
-    @requirePermit('company.edit', 1)
-    @requireParams(['id'], ['name', 'description', 'mobile', 'remark', 'status'])
+    // @requirePermit('company.edit', 2)
+    @requireParams(['id'], ['agencyId', 'name', 'description', 'mobile', 'remark', 'status'])
     static async updateCompany(params): Promise<Company>{
         let {accountId} = Zone.current.get('session');
         let companyId = params.id;
-
         let company = await Models.Company.findById(companyId, {attributes: ['createUser', 'status']});
 
         if(!company || company.status == -2){
             throw L.ERR.COMPANY_NOT_EXIST;
         }
 
-        delete params.companyId;
         params['updatedAt'] = utils.now();
 
         let [rownum, rows] = await Models.Company.update(params, {returning: true, where: {id: companyId}, fields: Object.keys(params)});
+
         if(!rownum || rownum == "NaN"){
             throw {code: -2, msg: '更新企业信息失败'};
         }

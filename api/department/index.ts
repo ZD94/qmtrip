@@ -13,28 +13,7 @@ import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import { ServiceInterface } from 'common/model';
 
 const departmentCols = Department['$fieldnames'];
-
-class DepartmentService implements ServiceInterface<Department>{
-    async create(obj: Object): Promise<Department>{
-        return API.department.create(obj);
-    }
-    async get(id: string): Promise<Department>{
-        return API.department.get({id: id});
-    }
-    async find(where: any): Promise<Department[]>{
-        return API.department.getDepartments(where);
-    }
-    async update(fields: Object): Promise<any> {
-        return API.department.update(fields);
-    }
-    async destroy(id: string): Promise<any> {
-        return API.department.delete({id: id});
-    }
-}
-
 class DepartmentModule{
-
-    static DepartmentService = DepartmentService;
     /**
      * 创建部门
      * @param data

@@ -5,8 +5,8 @@
 import { regApiType } from 'common/api/helper';
 import { Models } from 'api/_types';
 import {Company} from 'api/_types/company';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference } from 'common/model';
-import { Create } from 'common/model.client';
+import { ModelObject, Table, Field, Types, ResolveRef, Reference, Values } from 'common/model';
+import { Create } from 'common/model';
 
 export enum EAgencyStatus {
     DELETE = -2, //删除状态
@@ -36,7 +36,7 @@ export class Agency extends ModelObject{
     static create(): Agency { return null; }
 
     @Field({type: Types.UUID})
-    get id(): string { return null; }
+    get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
 
     @Field({type: Types.STRING})
@@ -94,7 +94,7 @@ export class AgencyUser extends ModelObject{
     static create(): AgencyUser { return null; }
 
     @Field({type: Types.UUID})
-    get id(): string { return null; }
+    get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
 
     @Field({type: Types.UUID})
