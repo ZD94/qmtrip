@@ -11,7 +11,7 @@ import { Company, MoneyChange } from 'api/_types/company';
 import { Department } from 'api/_types/department';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Agency, AgencyUser } from 'api/_types/agency';
-import { TripPlan, TripDetail, Project } from 'api/_types/tripPlan';
+import {TripPlan, TripDetail, Project, TripPlanLog} from 'api/_types/tripPlan';
 import { Place } from 'api/_types/place';
 import { Account } from 'api/_types/auth';
 import { Seed } from 'api/_types/seed';
@@ -56,10 +56,13 @@ var Services = {
         funcs: ['getAgencyUser', 'listAndPaginateAgencyUser', 'createAgencyUser', 'updateAgencyUser', 'deleteAgencyUser']
     },
     tripPlan: { type: TripPlan, modname: 'tripPlan',
-        funcs: ['getTripPlan', 'listTripPlans', 'saveTripPlan', 'updateTripPlanOrder', 'deleteTripPlan']
+        funcs: ['getTripPlan', 'listTripPlans', 'saveTripPlan', 'updateTripPlan', 'deleteTripPlan']
     },
     tripDetail: { type: TripDetail, modname: 'tripPlan',
-        funcs: ['getTripDetail', 'getTripPlanDetails', 'saveTripDetail', 'updateTripPlanOrder', 'deleteTripPlan']
+        funcs: ['getTripDetail', 'getTripPlanDetails', 'saveTripDetail', 'updateTripDetail', 'deleteTripDetail']
+    },
+    tripPlanLog: { type: TripPlanLog, modname: 'tripPlan',
+        funcs: ['getTripPlanLog', 'getTripPlanLogs', 'saveTripPlanLog', 'updateTripPlanLog', 'deleteTripPlanLog']
     },
     project: { type: Project, modname: 'tripPlan',
         funcs: ['getProjectById', 'getProjectList', 'createNewProject', null, 'deleteProject']
@@ -103,12 +106,13 @@ class ClientModels implements ModelsInterface {
     agencyUser: RemoteService<AgencyUser>;
     tripPlan: RemoteService<TripPlan>;
     tripDetail: RemoteService<TripDetail>;
+    tripPlanLog: RemoteService<TripPlanLog>;
     moneyChange: RemoteService<MoneyChange>;
     project: RemoteService<Project>;
     place: RemoteService<Place>;
     account: RemoteService<Account>;
     seed: RemoteService<Seed>;
-    
+
     constructor($cacheFactory: ng.ICacheFactoryService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
         this.credential = createService<Credential>(Services.credential, $cacheFactory);
@@ -120,6 +124,7 @@ class ClientModels implements ModelsInterface {
         this.agencyUser = createService<AgencyUser>(Services.agencyUser, $cacheFactory);
         this.tripPlan = createService<TripPlan>(Services.tripPlan, $cacheFactory);
         this.tripDetail = createService<TripDetail>(Services.tripDetail, $cacheFactory);
+        this.tripPlanLog = createService<TripPlanLog>(Services.tripPlanLog, $cacheFactory);
         this.moneyChange = createService<MoneyChange>(Services.moneyChange, $cacheFactory);
         this.project = createService<Project>(Services.project, $cacheFactory);
         this.place = createService<Place>(Services.place, $cacheFactory);

@@ -5,7 +5,7 @@ import { Staff, Credential, PointChange } from "./staff";
 import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
 import { Agency, AgencyUser } from './agency';
-import {TripPlan, TripDetail, Project} from './tripPlan';
+import {TripPlan, TripDetail, Project, TripPlanLog} from './tripPlan';
 import { Account } from './auth';
 import {Seed} from "./seed";
 
@@ -26,6 +26,7 @@ export interface ModelsInterface {
     seed: ServiceInterface<Seed>;
     tripPlan: ServiceInterface<TripPlan>;
     tripDetail: ServiceInterface<TripDetail>;
+    tripPlanLog: ServiceInterface<TripPlanLog>;
     project: ServiceInterface<Project>;
 
     account: ServiceInterface<Account>;
@@ -48,6 +49,7 @@ export var Models: ModelsInterface = {
     seed: new ServiceDelegate<Seed>(),
     tripPlan: new ServiceDelegate<TripPlan>(),
     tripDetail: new ServiceDelegate<TripDetail>(),
+    tripPlanLog: new ServiceDelegate<TripPlanLog>(),
     project: new ServiceDelegate<Project>(),
 
     account: new ServiceDelegate<Account>(),
