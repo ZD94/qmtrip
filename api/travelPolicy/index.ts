@@ -12,6 +12,7 @@ import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import types = require("api/_types/travelPolicy");
 import { ServiceInterface } from 'common/model';
 import { TravelPolicy } from 'api/_types/travelPolicy';
+import { Models } from 'api/_types';
 
 const travalPolicyCols = TravelPolicy['$fieldnames'];
 
@@ -43,13 +44,13 @@ class TravelPolicyModule{
 
         if(role == L.RoleType.STAFF){
 
-            let staff = await API.staff.getStaff({id: accountId});
+            let staff = await Models.staff.get(accountId);
 
-            if(staff.code){
+            if(!staff){
                 throw {code: -1, msg: '无权限'};
             }
 
-            params.companyId = staff.companyId;//只允许添加该企业下的差旅标准
+            params.companyId = staff["companyId"];//只允许添加该企业下的差旅标准
             return this.create(params);
 
         }else{
@@ -89,12 +90,12 @@ class TravelPolicyModule{
 
         if(role == L.RoleType.STAFF){
 
-            let staff = await API.staff.getStaff({id: accountId});
+            let staff = await Models.staff.get(accountId);
 
             if(!staff){
                 throw {code: -1, msg: '无权限'};
             }
-            return this.delete({companyId: staff.companyId, id: params.id});
+            return this.delete({companyId: staff["companyId"], id: params.id});
 
         }else{
 
@@ -145,8 +146,8 @@ class TravelPolicyModule{
 
         if(role == L.RoleType.STAFF){
 
-            let staff = await API.staff.getStaff({id: accountId});
-            company_id = staff.companyId;
+            let staff = await Models.staff.get(accountId);
+            company_id = staff["companyId"];
 
             let tp = await API.travelPolicy.getTravelPolicy({id: params.id});
             if(tp.companyId != company_id){
@@ -203,14 +204,14 @@ class TravelPolicyModule{
         let role = await API.auth.judgeRoleById({id:accountId});
 
         if(role == L.RoleType.STAFF){
-            let staff = await API.staff.getStaff({id: accountId});
-            let tp = await this.get({id:id});
+            let staff = await Models.staff.get(accountId);
+            let tp = await Models.travelPolicy.get(id);
 
             if(!tp){
                 throw {code: -1, msg: '查询结果不存在'};
             }
 
-            if(tp['companyId'] && tp['companyId'] != staff.companyId){
+            if(tp['companyId'] && tp['companyId'] != staff["companyId"]){
                 throw {code: -1, msg: '无权限'};
             }
 
@@ -218,7 +219,7 @@ class TravelPolicyModule{
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
-                return this.get({id:id});
+                return Models.travelPolicy.get(id);
             }else{
                 throw {code: -1, msg: '无权限'};
             }
@@ -260,11 +261,11 @@ class TravelPolicyModule{
 
         let role = await API.auth.judgeRoleById({id:accountId});
         if(role == L.RoleType.STAFF){
-            let staff = await API.staff.getStaff({id:accountId});
+            let staff = await Models.staff.get(accountId);
             if(!staff){
                 throw {code: -1, msg: '无权限'};
             }
-            params.companyId = staff.companyId;//只允许查询该企业下的差旅标准
+            params.companyId = staff["companyId"];//只允许查询该企业下的差旅标准
             return  DBM.TravelPolicy.findAll(options);
 
         }else{
@@ -320,12 +321,12 @@ class TravelPolicyModule{
 
         if(role == L.RoleType.STAFF){
 
-            let staff = await API.staff.getStaff({id:accountId});
+            let staff = await Models.staff.get(accountId);
             if(!staff){
                 throw {code: -1, msg: '无权限'};
             }
 
-            params.companyId = staff.companyId;//只允许查询该企业下的差旅标准
+            params.companyId = staff["companyId"];//只允许查询该企业下的差旅标准
             let travelPolicies = await DBM.TravelPolicy.findAll(options);
             return travelPolicies.map(function(t){
                 return t.id;
@@ -386,12 +387,12 @@ class TravelPolicyModule{
         let role = await API.auth.judgeRoleById({id:accountId});
         if(role == L.RoleType.STAFF){
 
-            let staff = await API.staff.getStaff({id: accountId});
+            let staff = await Models.staff.get(accountId);
 
             if(!staff){
                 throw {code: -1, msg: '无权限'};
             }
-            params.companyId = staff.companyId;//只允许查询该企业下的差旅标准
+            params.companyId = staff["companyId"];//只允许查询该企业下的差旅标准
             return this.paginateTravelPolicy(params);
 
         }else{

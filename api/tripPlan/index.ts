@@ -2,7 +2,7 @@
  * Created by yumiao on 15-12-10.
  */
 "use strict";
-let sequelize = require("common/model").importModel("./models");
+let sequelize = require("common/model").DB;
 let DBM = sequelize.models;
 let uuid = require("node-uuid");
 let L = require("common/language");
@@ -16,7 +16,7 @@ import _ = require('lodash');
 import moment = require("moment");
 import {requireParams, clientExport} from 'common/api/helper';
 import {Paginate} from 'common/paginate';
-import {Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType} from "api/_types/tripPlan";
+import {Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog} from "api/_types/tripPlan";
 import { ServiceInterface } from 'common/model';
 
 
@@ -1164,20 +1164,8 @@ class TripPlanModule {
         return DBM.TripDetail.findAll({where: params.tripPlanId})
     }
 
-    /**
-     * 保存出差计划改动日志
-     * @type {saveTripPlanLog}
-     */
-    @requireParams(['tripPlanId', 'userId', 'remark'])
-
-    static saveTripPlanLog(params) {
-        params.createdAt = utils.now();
-        return DBM.TripPlanLogs.create(params);
-    }
-
 
     @requireParams(['companyId'], ['code', 'name', 'count'])
-
     static getProjectList(params) {
         let options:any = {where: params, attributes: ['name'], order: [['created_at', 'desc']]};
 
@@ -1211,6 +1199,46 @@ class TripPlanModule {
         let result = await DBM.Project.destroy({where: {id: params.id}});
 
         return true;
+    }
+
+
+    /**
+     * @method saveTripPlanLog
+     * 保存出差计划改动日志
+     * @type {saveTripPlanLog}
+     */
+    @requireParams(['tripPlanId', 'remark'], ['tripDetailId'])
+    static saveTripPlanLog(params): Promise<TripPlanLog> {
+        let {account: userId} = Zone.current.get('session');
+        params.createdAt = utils.now();
+        params.updatedAt = utils.now();
+        return DBM.TripPlanLog.create(params);
+    }
+
+    /**
+     * @method getTripPlanLog
+     * @param params
+     * @returns {any}
+     */
+    @requireParams(['id'])
+    static getTripPlanLog(params: {id: string}): Promise<TripPlanLog> {
+        return DBM.TripPlanLog.findById(params.id);
+    }
+
+    /**
+     * @method updateTripPlanLog
+     * @param param
+     */
+    static updateTripPlanLog(param): Promise<TripPlanLog> {
+        throw {code: -1, msg: '不能更新日志'};
+    }
+
+    @requireParams(['tripPlanId'], ['tripDetailId'])
+    static async getTripPlanLogs(params) {
+        let logs = DBM.findAll({where: params});
+        return logs.map(function(log) {
+            return log.id;
+        })
     }
 
 
