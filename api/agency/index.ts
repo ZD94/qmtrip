@@ -78,17 +78,17 @@ class AgencyModule {
         params.id = account.id;
         params.createUser = account.id;
         params.agencyNo = await API.seeds.getSeedNo('AgencyNo', {formatDate: 'YY', minNo: 100, maxNo: 999});
-
-        let agency = await DBM.agency.create(params);
+        
+        let agency = await DBM.Agency.create(params);
         let _agencyUser: any = _.pick(params, ['email', 'mobile', 'sex', 'avatar']);
         _agencyUser.id = account.id;
         _agencyUser.agencyId = agency.id;
         _agencyUser.roleId = 0;
         _agencyUser.name = params.userName;
         _agencyUser.status = EAgencyStatus.ACTIVE;
-
-        await DBM.agency.createAgencyUser(_agencyUser);
-
+        
+        await DBM.AgencyUser.create(_agencyUser);
+        
         return new Agency(agency);
     }
 

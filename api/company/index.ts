@@ -116,7 +116,6 @@ class CompanyModule {
      * @returns {Promise<Company>}
      */
     @clientExport
-    @requirePermit('company.add', 2)
     @requireParams(['mobile', 'name', 'email', 'userName'], ['pwd', 'remark', 'description'])
     static async registerCompany(params: {mobile: string, name: string, email: string, domain: string,
         userName: string, pwd?: string, remark?: string, description?: string}): Promise<Company>{
@@ -125,7 +124,8 @@ class CompanyModule {
         let email = params.email;
         let userName = params.userName;
         let pwd = params.pwd || '123456';
-        let agencyUser = await DBM.agency.findById(accountId);
+
+    let agencyUser = await DBM.Agency.findById(accountId);
 
         if(!agencyUser || agencyUser.status == EAgencyStatus.DELETE) {
             throw L.ERR.AGENCY_NOT_EXIST;
@@ -144,8 +144,8 @@ class CompanyModule {
             throw {code: -6, msg: "邮箱格式不符合要求"};
         }
 
-        await DBM.staff.create({id: account.id, companyId: company.id, email: email, mobile: mobile, name: userName, roleId: 0});
-        await DBM.department.create({name: "我的企业", isDefault: true, companyId: company.id});
+        await DBM.Staff.create({id: account.id, companyId: company.id, email: email, mobile: mobile, name: userName, roleId: 0});
+        await DBM.Department.create({name: "我的企业", isDefault: true, companyId: company.id});
 
         return new Company(company);
     }
@@ -482,7 +482,7 @@ class CompanyModule {
                 return companys.map(function(c){
                     var id = c.id;
 
-                    return DBM.FundsAccounts.destroy({where: {id: id}});
+                    return true;
                 })
             })
             .then(function(){

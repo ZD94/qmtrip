@@ -31,10 +31,8 @@ class TravelPolicyModule{
         if(result){
             throw {msg: "该等级名称已存在，请重新设置"};
         }
-        return DBM.TravelPolicy.create(data)
-            .then(function(result){
-                return new TravelPolicy(result);
-            })
+        let returnData =  DBM.TravelPolicy.create(data)
+        return new TravelPolicy(returnData);
     }
 
     @clientExport
@@ -51,14 +49,24 @@ class TravelPolicyModule{
             }
 
             params.companyId = staff["companyId"];//只允许添加该企业下的差旅标准
-            return this.create(params);
+            let result = await DBM.TravelPolicy.findOne({where: {name: params.name, companyId: params.companyId}});
+            if(result){
+                throw {msg: "该等级名称已存在，请重新设置"};
+            }
+            let returnData =  DBM.TravelPolicy.create(params)
+            return new TravelPolicy(returnData);
 
         }else{
 
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
+            let hasPermission = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
 
-            if(result){
-                return this.create(params);
+            if(hasPermission){
+                let result = await DBM.TravelPolicy.findOne({where: {name: params.name, companyId: params.companyId}});
+                if(result){
+                    throw {msg: "该等级名称已存在，请重新设置"};
+                }
+                let returnData =  DBM.TravelPolicy.create(params)
+                return new TravelPolicy(returnData);
             }else{
                 throw {code: -1, msg: '无权限'};
             }
