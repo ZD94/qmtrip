@@ -3,7 +3,7 @@
  */
 'use strict';
 var sequelize = require("common/model").DB;
-var Models = sequelize.models;
+var DBM = sequelize.models;
 var _ = require('lodash');
 import {Paginate} from 'common/paginate';
 var API = require("common/api");
@@ -27,12 +27,12 @@ class TravelPolicyModule{
         if (!data.hotelPrice || !/^\d+(.\d{1,2})?$/.test(data.hotelPrice)) {
             data.hotelPrice = null;
         }
-        return Models.TravelPolicy.findOne({where: {name: data.name, companyId: data.companyId}})
+        return DBM.TravelPolicy.findOne({where: {name: data.name, companyId: data.companyId}})
             .then(function(result){
                 if(result){
                     throw {msg: "该等级名称已存在，请重新设置"};
                 }
-                return Models.TravelPolicy.create(data)
+                return DBM.TravelPolicy.create(data)
                     .then(function(result){
                         return new TravelPolicy(result);
                     })
@@ -83,7 +83,7 @@ class TravelPolicyModule{
                 if(staffs && staffs.length > 0){
                     throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准 暂不能删除，给这些员工匹配新的差旅标准后再进行操作'};
                 }
-                return Models.TravelPolicy.destroy({where: params});
+                return DBM.TravelPolicy.destroy({where: params});
             })
             .then(function(obj){
                 return true;
@@ -91,7 +91,7 @@ class TravelPolicyModule{
     }
 
     static deleteTravelPolicyByTest(params){
-        return Models.TravelPolicy.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
+        return DBM.TravelPolicy.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
             .then(function(){
                 return true;
             })
@@ -113,7 +113,7 @@ class TravelPolicyModule{
         if (!data.hotelPrice || !/^\d+(.\d{1,2})?$/.test(data.hotelPrice)) {
             data.hotelPrice = null;
         }
-        return Models.TravelPolicy.update(data, options)
+        return DBM.TravelPolicy.update(data, options)
             .spread(function(rownum, rows){
                 return new TravelPolicy(rows[0]);
             });
@@ -135,13 +135,13 @@ class TravelPolicyModule{
 
         if(!id){
             if (isReturnDefault) {
-                return Models.TravelPolicy.findById('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a');
+                return DBM.TravelPolicy.findById('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a');
             } else {
                 throw {code: -1, msg: "id不能为空"};
             }
         }
 
-        return Models.TravelPolicy.findById(id)
+        return DBM.TravelPolicy.findById(id)
             .then(function(data){
                 return new TravelPolicy(data);
             })
@@ -162,7 +162,7 @@ class TravelPolicyModule{
         if(params.order){
             options.order = params.order;
         }
-        return Models.TravelPolicy.findAll(options);
+        return DBM.TravelPolicy.findAll(options);
     }
 
     /**
@@ -172,7 +172,7 @@ class TravelPolicyModule{
      */
     static getTravelPolicies(params): Promise<TravelPolicy[]>{
         var options: any = {
-            where:  _.pick(params, Object.keys(Models.TravelPolicy.attributes))
+            where:  _.pick(params, Object.keys(DBM.TravelPolicy.attributes))
         };
         if(params.columns){
             options.attributes = params.columns;
@@ -183,7 +183,7 @@ class TravelPolicyModule{
         if(params.$or) {
             options.where.$or = params.$or;
         }
-        return Models.TravelPolicy.findAll(options);
+        return DBM.TravelPolicy.findAll(options);
     }
 
     /**
@@ -216,7 +216,7 @@ class TravelPolicyModule{
         options.limit = limit;
         options.offset = offset;
         options.where = params;
-        return Models.TravelPolicy.findAndCountAll(options)
+        return DBM.TravelPolicy.findAndCountAll(options)
             .then(function(result){
                 return new Paginate(page, perPage, result.count, result.rows);
             });

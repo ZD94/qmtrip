@@ -5,7 +5,7 @@
 var co = require("co");
 var _ = require("lodash");
 var sequelize = require("common/model").DB;
-let Models = sequelize.models;
+let DBM = sequelize.models;
 var API = require("common/api");
 import {Department} from "api/_types/department";
 import {validateApi, requireParams} from 'common/api/helper';
@@ -22,12 +22,12 @@ class DepartmentModule{
     @requireParams(["name","companyId"], departmentCols)
     static createDepartment(data): Promise<Department>{
 //    data.isDefault = false;//默认部门在企业注册时已经自动生成不允许自己添加
-        return Models.Department.findOne({where: {name: data.name, companyId: data.companyId}})
+        return DBM.Department.findOne({where: {name: data.name, companyId: data.companyId}})
             .then(function(result){
                 if(result){
                     throw {msg: "该部门名称已存在，请重新设置"};
                 }
-                return Models.Department.create(data)
+                return DBM.Department.create(data)
                     .then(function(result){
                         return new Department(result)
                     })
@@ -44,7 +44,7 @@ class DepartmentModule{
         var noParentDep = [];
         var childOrderId = [];
         var finalResult = [];
-        return Models.Department.findAll({where: {companyId: params.companyId}, order: [["created_at", "desc"]]})
+        return DBM.Department.findAll({where: {companyId: params.companyId}, order: [["created_at", "desc"]]})
             .then(function(result){
                 //封装allDepartmentMap组装元素结构
                 for(var d=0;d< result.length;d++){
@@ -122,7 +122,7 @@ class DepartmentModule{
                 if(staffs && staffs.length > 0){
                     throw {code: -1, msg: '目前该部门下有'+staffs.length+'位员工 暂不能删除，给这些员工匹配新的部门后再进行操作'};
                 }
-                return Models.Department.destroy({where: params});
+                return DBM.Department.destroy({where: params});
             })
             .then(function(obj){
                 return true;
@@ -147,7 +147,7 @@ class DepartmentModule{
         var options: any = {};
         options.where = {id: id};
         options.returning = true;
-        return Models.Department.update(data, options)
+        return DBM.Department.update(data, options)
             .spread(function(rownum, rows){
                 return new Department(rows[0]);
             });
@@ -161,7 +161,7 @@ class DepartmentModule{
     @requireParams(["id"])
     static getDepartment(params: {id: string}): Promise<Department>{
         var id = params.id;
-        return Models.Department.findById(id)
+        return DBM.Department.findById(id)
             .then(function(result){
                 return new Department(result);
             })
@@ -174,14 +174,14 @@ class DepartmentModule{
      */
     static getDepartments(params){
         var options : any = {};
-        options.where = _.pick(params, Object.keys(Models.Department.attributes));
+        options.where = _.pick(params, Object.keys(DBM.Department.attributes));
         if(params.$or) {
             options.where.$or = params.$or;
         }
         if(params.columns){
             options.attributes = params.columns;
         }
-        return Models.Department.findAll(options);
+        return DBM.Department.findAll(options);
     }
 
     /**
@@ -193,7 +193,7 @@ class DepartmentModule{
     /*department.getAllDepartment = getAllDepartment;
      getAllDepartment.required_params = ["companyId"];
      function getAllDepartment(params){
-     return Models.Department.findAll({where: params});
+     return DBM.Department.findAll({where: params});
      }*/
 
     /**
@@ -204,13 +204,13 @@ class DepartmentModule{
     @requireParams(["companyId"])
     static getDefaultDepartment(params): Promise<Department>{
         params.isDefault = true;
-        return Models.Department.findOne({where: params})
+        return DBM.Department.findOne({where: params})
             .then(function(department) {
                 if (department) {
                     return new Department(department);
                 }
 
-                return Models.Department.create({name: "我的企业", isDefault: true, companyId: params.companyId})
+                return DBM.Department.create({name: "我的企业", isDefault: true, companyId: params.companyId})
                     .then(function(result) {
                         return new Department(result);
                     })
@@ -227,7 +227,7 @@ class DepartmentModule{
         var options: any = {};
         options.where = params;
         options.order = [["created_at", "desc"]];
-        return Models.Department.findAll(options);
+        return DBM.Department.findAll(options);
     }
 
 
@@ -242,7 +242,7 @@ class DepartmentModule{
         params.parentId = null;
         options.where = params;
         options.order = [["created_at", "desc"]];
-        return Models.Department.findAll(options);
+        return DBM.Department.findAll(options);
     }
 
     /**
@@ -255,7 +255,7 @@ class DepartmentModule{
         var options: any = {};
         options.where = params;
         options.order = [["created_at", "desc"]];
-        return Models.Department.findAll(options);
+        return DBM.Department.findAll(options);
     }
 
     /**
@@ -297,7 +297,7 @@ class DepartmentModule{
     }
 
     static deleteDepartmentByTest(params){
-        return Models.Department.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
+        return DBM.Department.destroy({where: {$or: [{name: params.name}, {companyId: params.companyId}]}})
             .then(function(){
                 return true;
             })
@@ -312,7 +312,7 @@ export = DepartmentModule;
     function _children(parentId) {
         co(function *() {
             var arr = [];
-            var children = yield Models.Department.findAll({parentId: parentId});
+            var children = yield DBM.Department.findAll({parentId: parentId});
 
             if (children.length) {
                 for(var child of children) {

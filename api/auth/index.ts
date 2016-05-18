@@ -6,7 +6,7 @@ import {requireParams} from "../../common/api/helper";
 
 var Q = require("q");
 var sequelize = require("common/model").importModel("./models");
-var Models = sequelize.models;
+var DBM = sequelize.models;
 var uuid = require("node-uuid");
 var L = require("../../common/language");
 var validate = require("../../common/validate");
@@ -19,7 +19,7 @@ var API = require("../../common/api");
 var utils = require("common/utils");
 var Logger = require("common/logger");
 var logger = new Logger('');
-var AccountOpenid = Models.AccountOpenid;
+var AccountOpenid = DBM.AccountOpenid;
 
 
 var ACCOUNT_STATUS = {
@@ -63,7 +63,7 @@ class ApiAuth {
             throw L.ERR.ACTIVE_URL_INVALID;
         }
 
-        return Models.Account.findOne({where: {id: accountId}})
+        return DBM.Account.findOne({where: {id: accountId}})
             .then(function(account) {
                 if (!account) {
                     throw L.ERR.ACTIVE_URL_INVALID;
@@ -78,7 +78,7 @@ class ApiAuth {
                     throw L.ERR.ACTIVE_URL_INVALID;
                 }
 
-                return Models.Account.update({status: ACCOUNT_STATUS.ACTIVE, activeToken: null}, {where: {id: account.id}});
+                return DBM.Account.update({status: ACCOUNT_STATUS.ACTIVE, activeToken: null}, {where: {id: account.id}});
             })
             .then(function() {
                 return true;
@@ -116,7 +116,7 @@ class ApiAuth {
                     throw L.ERR.TIMESTAMP_TIMEOUT;
                 }
 
-                return Models.Account.findById(accountId)
+                return DBM.Account.findById(accountId)
                     .then(function(account) {
                         if (!account) {
                             throw L.ERR.ACCOUNT_NOT_EXIST;
@@ -157,7 +157,7 @@ class ApiAuth {
                 return email;
             })
             .then(function(email) {
-                return Models.Account.findOne({where: {email: email, type: type}})
+                return DBM.Account.findOne({where: {email: email, type: type}})
                     .then(function(account) {
                         if (!account) {
                             throw L.ERR.ACCOUNT_NOT_EXIST;
@@ -168,7 +168,7 @@ class ApiAuth {
             .then(function(account) {
                 //生成设置密码token
                 var pwdToken = getRndStr(6);
-                return Models.Account.update({pwdToken: pwdToken}, {where: {id: account.id}, returning: true})
+                return DBM.Account.update({pwdToken: pwdToken}, {where: {id: account.id}, returning: true})
             })
             .spread(function(affect, rows) {
                 var account = rows[0];
@@ -251,7 +251,7 @@ class ApiAuth {
                     throw L.ERR.PWD_EMPTY;
                 }
 
-                return Models.Account.findById(accountId)
+                return DBM.Account.findById(accountId)
             })
             .then(function(account) {
                 var _sign = makeActiveSign(account.pwdToken, accountId, timestamp);
@@ -264,7 +264,7 @@ class ApiAuth {
                 if (account.status == ACCOUNT_STATUS.NOT_ACTIVE && !account.pwd) {
                     status = ACCOUNT_STATUS.ACTIVE;
                 }
-                return Models.Account.update({pwd: pwd, pwdToken: null, status: status}, {where:{id: accountId}});
+                return DBM.Account.update({pwd: pwd, pwdToken: null, status: status}, {where:{id: accountId}});
             })
             .then(function() {
                 return true;
@@ -283,7 +283,7 @@ class ApiAuth {
     static active (data) {
 
         var accountId = data.accountId;
-        return Models.Account.findOne({where: {id: accountId}})
+        return DBM.Account.findOne({where: {id: accountId}})
             .then(function(account) {
                 if (!account) {
                     throw L.ERR.ACCOUNT_NOT_EXIST;
@@ -320,7 +320,7 @@ class ApiAuth {
         if(!accountId){
             where.type = type;
         }
-        return Models.Account.destroy({where: where})
+        return DBM.Account.destroy({where: where})
             .then(function() {
                 return true;
             });
@@ -374,8 +374,8 @@ class ApiAuth {
 
         //查询邮箱是否已经注册
         return Q.all([
-                Models.Account.findOne({where: {email: data.email, type: type}}),
-                Models.Account.findOne({where: {mobile: mobile, type: type}})
+                DBM.Account.findOne({where: {email: data.email, type: type}}),
+                DBM.Account.findOne({where: {mobile: mobile, type: type}})
             ])
             .spread(function(account1, account2) {
                 if (account1) {
@@ -390,7 +390,7 @@ class ApiAuth {
             .then(function() {
                 var status = data.status? data.status: ACCOUNT_STATUS.NOT_ACTIVE;
                 var id = data.id?data.id:uuid.v1();
-                return Models.Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status, type: type});
+                return DBM.Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status, type: type});
             })
             .then(function(account) {
                 if (!account.pwd) {
@@ -441,7 +441,7 @@ class ApiAuth {
 
         var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
         var email = data.email.toLowerCase();
-        return Models.Account.findOne({where: {email: email, type: type}})
+        return DBM.Account.findOne({where: {email: email, type: type}})
             .then(function (loginAccount) {
                 var pwd = md5(data.pwd);
                 if (!loginAccount) {
@@ -510,7 +510,7 @@ class ApiAuth {
         var timestamp = params.timestamp;
         var tokenSign = params.tokenSign || params.token_sign;
 
-        return Models.Token.findOne({where: {id: tokenId, accountId: userId}})
+        return DBM.Token.findOne({where: {id: tokenId, accountId: userId}})
             .then(function(m) {
                 if (!m) {
                     return false;
@@ -561,7 +561,7 @@ class ApiAuth {
         }
         if(attributes)
             options.attributes = attributes;
-        return Models.Account.findOne(options);
+        return DBM.Account.findOne(options);
     }
 
     /**
@@ -582,10 +582,10 @@ class ApiAuth {
         options.where = {id: id};
         options.returning = true;
         var old_email;
-        return Models.Account.findOne(options)
+        return DBM.Account.findOne(options)
             .then(function(oldAcc){
                 old_email = oldAcc.email;
-                return Models.Account.update(data, options);
+                return DBM.Account.update(data, options);
             })
             .spread(function(rownum, rows){
                 if(!rownum)
@@ -609,7 +609,7 @@ class ApiAuth {
 
         var options: any = {};
         options.where = params;
-        return Models.Account.findOne(options)
+        return DBM.Account.findOne(options)
             .then(function(obj){
                 if(!obj)
                     throw L.ERR.NOT_FOUND;
@@ -626,7 +626,7 @@ class ApiAuth {
 
         var options: any = {};
         options.where = params;
-        return Models.Account.findOne(options);
+        return DBM.Account.findOne(options);
     };
 
 
@@ -651,7 +651,7 @@ class ApiAuth {
             throw L.ERR.EMAIL_FORMAT_INVALID;
         }
 
-        return Models.Account.findOne({where: {email: email}})
+        return DBM.Account.findOne({where: {email: email}})
             .then(function(account) {
                 if (!account) {
                     throw L.ERR.EMAIL_NOT_REGISTRY;
@@ -675,7 +675,7 @@ class ApiAuth {
         var accountId = params.accountId;
         var tokenId = params.tokenId;
         if (accountId && tokenId) {
-            return Models.Token.destroy({where: {accountId: accountId, id: tokenId}})
+            return DBM.Token.destroy({where: {accountId: accountId, id: tokenId}})
                 .then(function() {
                     return true;
                 })
@@ -712,7 +712,7 @@ class ApiAuth {
             throw {code: -1, msg: "新旧密码不能一致"};
         }
 
-        return Models.Account.findById(accountId)
+        return DBM.Account.findById(accountId)
             .then(function(account) {
                 if (!account) {
                     throw L.ERR.ACCOUNT_NOT_EXIST;
@@ -724,7 +724,7 @@ class ApiAuth {
                 }
                 newPwd = newPwd.replace(/\s/g, "");
                 pwd = utils.md5(newPwd);
-                return Models.Account.update({pwd: pwd}, {where: {id: account.id}});
+                return DBM.Account.update({pwd: pwd}, {where: {id: account.id}});
             })
             .then(function() {
                 return true;
@@ -768,7 +768,7 @@ class ApiAuth {
                     throw L.ERR.TIMESTAMP_TIMEOUT;
                 }
 
-                return Models.Account.findById(accountId)
+                return DBM.Account.findById(accountId)
             })
             .then(function(account) {
                 if (!account) {
@@ -841,7 +841,7 @@ class ApiAuth {
             })
             .then(function(shortUrl) {
                 backUrl = encodeURIComponent(shortUrl);
-                return Models.Account.findById(accountId)
+                return DBM.Account.findById(accountId)
             })
             .then(function(account) {
                 if (!account) {
@@ -892,7 +892,7 @@ class ApiAuth {
                     type = 1;
                 }
 
-                return Models.Account.findOne({where: {email: email, type: type}})
+                return DBM.Account.findOne({where: {email: email, type: type}})
             })
             .then(function(account) {
                 if (account) {
@@ -941,7 +941,7 @@ class ApiAuth {
 
     @requireParams(["id"])
     static judgeRoleById(params){
-        return Models.Account.findById(params.id)
+        return DBM.Account.findById(params.id)
             .then(function(account) {
                 if (!account) {
                     throw L.ERR.ACCOUNT_NOT_EXIST;
@@ -1084,7 +1084,7 @@ function makeActiveSign(activeToken, accountId, timestamp) {
 }
 
 function _sendActiveEmail(accountId) {
-    return Models.Account.findOne({where: {id: accountId}})
+    return DBM.Account.findOne({where: {id: accountId}})
         .then(function(account) {
             //生成激活码
             var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
@@ -1096,7 +1096,7 @@ function _sendActiveEmail(accountId) {
             return API.mail.sendMailRequest({toEmails: account.email, templateName: "qm_active_email", values: vals})
                 .then(function() {
                     account.activeToken = activeToken;
-                    return Models.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
+                    return DBM.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
                 })
         })
 }
@@ -1108,7 +1108,7 @@ function makeAuthenticateSign(accountId, os?: string) {
         os = 'web';
     }
 
-    return Models.Token.findOne({where:{accountId: accountId, os: os}})
+    return DBM.Token.findOne({where:{accountId: accountId, os: os}})
         .then(function(m) {
             var refreshAt = moment().format("YYYY-MM-DD HH:mm:ss");
             var expireAt = moment().add(2, "hours").format("YYYY-MM-DD HH:mm:ss");
@@ -1117,7 +1117,7 @@ function makeAuthenticateSign(accountId, os?: string) {
                 m.expireAt = expireAt;
                 return m.save();
             } else {
-                m = Models.Token.build({id: uuid.v1(), accountId: accountId, token: getRndStr(10), refreshAt: refreshAt, expireAt: expireAt});
+                m = DBM.Token.build({id: uuid.v1(), accountId: accountId, token: getRndStr(10), refreshAt: refreshAt, expireAt: expireAt});
                 return m.save();
             }
         })

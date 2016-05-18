@@ -8,7 +8,7 @@ var uuid = require("node-uuid");
 var moment = require("moment");
 var crypto = require("crypto");
 var sequelize = require("common/model").DB;
-var Models = sequelize.models;
+var DBM = sequelize.models;
 var config = require('../../config');
 var fs = require('fs');
 var API = require("common/api");
@@ -66,7 +66,7 @@ class StaffModule{
                 if(!data.departmentId || data.departmentId == ""){
                     data.departmentId = null;
                 }
-                return Models.Staff.create(data)
+                return DBM.Staff.create(data)
                     .then(function(result){
                         return new Staff(result);
                     })
@@ -78,17 +78,17 @@ class StaffModule{
      */
     @requireParams(['email', 'name', 'companyId'], staffCols)
     static async create(params) {
-    params.id = params.id ? params.id : uuid.v1();
+        params.id = params.id ? params.id : uuid.v1();
 
-    let _staff = await Models.Staff.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
+        let _staff = await DBM.Staff.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
 
-    if(_staff) {
-        throw {code: -2, msg: '邮箱或手机号已经注册'};
+        if(_staff) {
+            throw {code: -2, msg: '邮箱或手机号已经注册'};
+        }
+
+        let staff = await DBM.Staff.create(params);
+        return new Staff(staff);
     }
-
-    let staff = await Models.Staff.create(params);
-    return new Staff(staff);
-}
 
     /**
      * 删除员工
@@ -100,7 +100,7 @@ class StaffModule{
         var id = params.id;
         return API.auth.remove({accountId: id})
             .then(function(){
-                return Models.Staff.update({status: EStaffStatus.DELETE, quitTime: utils.now()}, {where: {id: id}, returning: true})
+                return DBM.Staff.update({status: EStaffStatus.DELETE, quitTime: utils.now()}, {where: {id: id}, returning: true})
             })
             .spread(function(num, rows){
                 var staff = rows[0];
@@ -148,7 +148,7 @@ class StaffModule{
         var accobj: any = {};
         var com: any = {};
         return Q.all([
-                Models.Staff.findById(id),
+                DBM.Staff.findById(id),
                 API.auth.getAccount({id:id}),
             ])
             .spread(function(old, acc){
@@ -163,16 +163,16 @@ class StaffModule{
                                 var accData = {email: data.email};
                                 return Q.all([
                                         API.auth.updateAccount(id, accData, company.name),
-                                        Models.Staff.update(data, options)
+                                        DBM.Staff.update(data, options)
                                     ])
                                     .spread(function(updateaccount, updatestaff) {
                                         send_email = false;
                                         return updatestaff;
                                     });
                             }
-                            return Models.Staff.update(data, options);
+                            return DBM.Staff.update(data, options);
                         }else{
-                            return Models.Staff.update(data, options);
+                            return DBM.Staff.update(data, options);
                         }
                     })
             })
@@ -227,7 +227,7 @@ class StaffModule{
         if(params.columns){
             options.attributes = params.columns
         }
-        return Models.Staff.findById(id, options)
+        return DBM.Staff.findById(id, options)
             .then(function(staff){
                 if(!staff){
                     throw {code: -2, msg: '员工不存在'};
@@ -244,7 +244,7 @@ class StaffModule{
     static findOneStaff(params){
         var options: any = {};
         options.where = params;
-        return Models.Staff.findOne(options)
+        return DBM.Staff.findOne(options)
             .then(function(data){
                 return new Staff(data);
             })
@@ -256,7 +256,7 @@ class StaffModule{
      */
     @requireParams(["departmentId"])
     static getCountByDepartment(params: {departmentId: string}){
-        return Models.Staff.count({where: {departmentId: params.departmentId, status: {$gte: EStaffStatus.ON_JOB}}})
+        return DBM.Staff.count({where: {departmentId: params.departmentId, status: {$gte: EStaffStatus.ON_JOB}}})
     }
 
     /**
@@ -266,14 +266,14 @@ class StaffModule{
      */
     static getStaffs(params): Promise<Staff[]>{
         var options : any = {};
-        options.where = _.pick(params, Object.keys(Models.Staff.attributes));
+        options.where = _.pick(params, Object.keys(DBM.Staff.attributes));
         if(params.$or) {
             options.where.$or = params.$or;
         }
         if(params.columns){
             options.attributes = params.columns;
         }
-        return Models.Staff.findAll(options)
+        return DBM.Staff.findAll(options)
             .map(function(s){
                 return new Staff(s);
             });
@@ -319,7 +319,7 @@ class StaffModule{
                     delete params.departmentId;
                     options.where = params;
                 }
-                return Models.Staff.findAndCountAll(options)
+                return DBM.Staff.findAndCountAll(options)
                     .then(function(result){
                         return new Paginate(page, perPage, result.count, result.rows);
                     });
@@ -337,7 +337,7 @@ class StaffModule{
         var id = params.id;
         var operatorId = params.accountId;
         var increasePoint = params.increasePoint;
-        return Models.Staff.findById(id)
+        return DBM.Staff.findById(id)
             .then(function(obj) {
                 var totalPoints = obj.totalPoints + increasePoint;
                 var balancePoints = obj.balancePoints + increasePoint;
@@ -348,8 +348,8 @@ class StaffModule{
                 pointChange.companyId = params.companyId;
                 return sequelize.transaction(function(t) {
                     return Q.all([
-                        Models.Staff.update({totalPoints: totalPoints, balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
-                        Models.PointChange.create(pointChange, {transaction: t})
+                        DBM.Staff.update({totalPoints: totalPoints, balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
+                        DBM.PointChange.create(pointChange, {transaction: t})
                     ]);
                 });
             })
@@ -369,7 +369,7 @@ class StaffModule{
         var id = params.id;
         var decreasePoint = params.decreasePoint;
         var operatorId = params.accountId;
-        return Models.Staff.findById(id)
+        return DBM.Staff.findById(id)
             .then(function(obj) {
                 if(obj.balancePoints < decreasePoint){
                     throw {code: -3, msg: "积分不足"};
@@ -379,8 +379,8 @@ class StaffModule{
                     operatorId: operatorId, currentPoint: balancePoints, companyId: params.companyId};//此处也应该用model里的属性名封装obj
                 return sequelize.transaction(function(t) {
                     return Q.all([
-                        Models.Staff.update({balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
-                        Models.PointChange.create(pointChange, {transaction: t})
+                        DBM.Staff.update({balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
+                        DBM.PointChange.create(pointChange, {transaction: t})
                     ]);
                 });
             })
@@ -396,14 +396,14 @@ class StaffModule{
      */
     static getPointChanges(params): Promise<PointChange[]>{
         var options : any = {};
-        options.where = _.pick(params, Object.keys(Models.PointChange.attributes));
+        options.where = _.pick(params, Object.keys(DBM.PointChange.attributes));
         if(params.$or) {
             options.where.$or = params.$or;
         }
         if(params.columns){
             options.attributes = params.columns;
         }
-        return Models.Staff.findAll(options);
+        return DBM.Staff.findAll(options);
     }
 
     @requireParams(["id"], ["columns"])
@@ -413,7 +413,7 @@ class StaffModule{
         if(params.columns){
             options.attributes = params.columns
         }
-        return Models.PointChange.findById(id, options)
+        return DBM.PointChange.findById(id, options)
             .then(function(pc){
                 if(!pc){
                     throw {code: -2, msg: '员工不存在'};
@@ -453,7 +453,7 @@ class StaffModule{
         options.limit = limit;
         options.offset = offset;
         options.where = params;
-        return Models.PointChange.findAndCountAll(options)
+        return DBM.PointChange.findAndCountAll(options)
             .then(function(result){
                 return new Paginate(page, perPage, result.count, result.rows);
             });
@@ -490,10 +490,10 @@ class StaffModule{
             q3.createdAt = {$lte: end_time};
             q4.createdAt = {$lte: end_time};
             return Q.all([
-                    Models.PointChange.sum('points', {where: q1}),
-                    Models.PointChange.sum('points', {where: q2}),
-                    Models.PointChange.sum('points', {where: q3}),
-                    Models.PointChange.sum('points', {where: q4})
+                    DBM.PointChange.sum('points', {where: q1}),
+                    DBM.PointChange.sum('points', {where: q2}),
+                    DBM.PointChange.sum('points', {where: q3}),
+                    DBM.PointChange.sum('points', {where: q4})
                 ])
                 .spread(function(a, b, c, d){
                     a = a || 0;
@@ -529,7 +529,7 @@ class StaffModule{
         var changeDate = [];
         var changePoint = [];
         options.where = {staffId: staffId, createdAt: {$gte: startTime, $lte: endTime}};
-        return Models.PointChange.findAll(options)
+        return DBM.PointChange.findAll(options)
             .then(function(result){
                 if(result && result.length > 0){
                     for(var i=0;i<result.length;i++){
@@ -827,7 +827,7 @@ class StaffModule{
      */
     @requireParams(['staffId','companyId'])
     static isStaffInCompany (params:{staffId: string, companyId:string}){
-        return Models.Staff.findById(params.staffId, {attributes: ['companyId']})
+        return DBM.Staff.findById(params.staffId, {attributes: ['companyId']})
             .then(function(staff){
                 if(!staff){
                     throw {code: 1, msg: '没有找到该员工'};
@@ -850,9 +850,9 @@ class StaffModule{
         var start = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
         var end = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
         return Q.all([
-                Models.Staff.count({where: {companyId: companyId, status: {$gte: 0}}}),
-                Models.Staff.count({where: {companyId: companyId, createdAt: {$gte: start, $lte: end}}}),
-                Models.Staff.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: {$lt: 0} }})
+                DBM.Staff.count({where: {companyId: companyId, status: {$gte: 0}}}),
+                DBM.Staff.count({where: {companyId: companyId, createdAt: {$gte: start, $lte: end}}}),
+                DBM.Staff.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: {$lt: 0} }})
             ])
             .spread(function(all, inNum, outNum){
                 var sta = {
@@ -891,7 +891,7 @@ class StaffModule{
                     where.$or = [{departmentId: params.departmentId},["department_id is null"]];
                     delete where.departmentId;
                 }
-                return Models.Staff.findAll({where: where})
+                return DBM.Staff.findAll({where: where})
                     .then(function(staffs){
                         if(staffs && staffs.length>0){
                             totalCount = staffs.length;
@@ -924,7 +924,7 @@ class StaffModule{
     @requireParams(['companyId'])
     static getStaffCountByCompany (params: {companyId: string}){
         var companyId = params.companyId;
-        return Models.Staff.count({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}})
+        return DBM.Staff.count({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}})
             .then(function(all){
                 return all || 1;
             });
@@ -939,7 +939,7 @@ class StaffModule{
     static getDistinctDepartment(params: {companyId: string}){
         var departmentAttr = [];
         var companyId = params.companyId;
-        return Models.Staff.findAll({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}, attributes:[[sequelize.literal('distinct department'),'department']]})
+        return DBM.Staff.findAll({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}, attributes:[[sequelize.literal('distinct department'),'department']]})
             .then(function(departments){
                 for(var i=0;i<departments.length;i++){
                     if(departments[i] && departments[i].department){
@@ -957,7 +957,7 @@ class StaffModule{
      */
     @requireParams(['company'])
     static deleteAllStaffs(params: {company: string}){
-        return Models.Staff.destroy({where: {companyId: params.company}})
+        return DBM.Staff.destroy({where: {companyId: params.company}})
             .then(function(){
                 return true;
             })
@@ -1005,8 +1005,8 @@ class StaffModule{
     static statStaffPoints(params: {accountId: string}){
         var query = params;
         return Q.all([
-                Models.Staff.sum('total_points', {where: query}),
-                Models.Staff.sum('balance_points', {where: query})
+                DBM.Staff.sum('total_points', {where: query}),
+                DBM.Staff.sum('balance_points', {where: query})
             ])
             .spread(function(all, balance){
                 return {
@@ -1022,7 +1022,7 @@ class StaffModule{
         var email = params.email;
         return Q.all([
                 API.auth.remove({email: email, mobile: mobile, type: 1}),
-                Models.Staff.destroy({where: {$or: [{companyId: companyId}, {mobile: mobile}, {email: email}]}})
+                DBM.Staff.destroy({where: {$or: [{companyId: companyId}, {mobile: mobile}, {email: email}]}})
             ])
             .spread(function(){
                 return true;
@@ -1040,10 +1040,10 @@ class StaffModule{
     @requireParams(['type', 'idNo', 'ownerId'], ['validData', 'birthday'])
     static createPapers(params): Promise<Credential>{
         //查询该用户该类型证件信息是否已经存在 不存在添加 存在则修改
-        return Models.Credential.findOne({where: {type: params.type, ownerId: params.ownerId}})
+        return DBM.Credential.findOne({where: {type: params.type, ownerId: params.ownerId}})
             .then(function(result){
                 if(!result) {
-                    return Models.Credential.create(params);
+                    return DBM.Credential.create(params);
                 }
                 return result.update(params);
                 /*if(result){
@@ -1051,12 +1051,12 @@ class StaffModule{
                  /!*var options = {};
                  options.where = {type: params.type, ownerId: params.ownerId};
                  options.returning = true;
-                 return Models.Credential.update(params, options)
+                 return DBM.Credential.update(params, options)
                  .spread(function(rownum, rows){
                  return rows[0];
                  })*!/;
                  }else{
-                 return Models.Credential.create(params);
+                 return DBM.Credential.create(params);
                  }*/
             })
             .then(function(data){
@@ -1071,7 +1071,7 @@ class StaffModule{
      */
     @requireParams(['id'])
     static deletePapers(params: {id: string}): Promise<any>{
-        return Models.Credential.destroy({where: params})
+        return DBM.Credential.destroy({where: params})
             .then(function(obj){
                 return true;
             });
@@ -1089,7 +1089,7 @@ class StaffModule{
         var options: any = {};
         options.where = {id: id};
         options.returning = true;
-        return Models.Credential.update(params, options)
+        return DBM.Credential.update(params, options)
             .spread(function(rownum, rows){
                 return new Credential(rows[0]);
             });
@@ -1101,11 +1101,11 @@ class StaffModule{
      */
     @requireParams(['id'], ['attributes'])
     static getPapersById(params): Promise<Credential>{
-        //return Models.Credential.findById(params.id);
+        //return DBM.Credential.findById(params.id);
         var options: any = {};
         options.where = {id: params.id};
         options.attributes = params.attributes? ['*'] :params.attributes;
-        return Models.Credential.findOne(options)
+        return DBM.Credential.findOne(options)
             .then(function(data){
                 return new Credential(data);
             })
@@ -1123,7 +1123,7 @@ class StaffModule{
         var options:any = {};
         options.where = {ownerId: params.ownerId, type: params.type};
         options.attributes = params.attributes? ['*'] :params.attributes;
-        return Models.Credential.findOne(options)
+        return DBM.Credential.findOne(options)
             .then(function(result){
                 return new Credential(result);
             })
@@ -1136,11 +1136,11 @@ class StaffModule{
      */
     @requireParams(['ownerId'], ['attributes'])
     static getPapersByOwner(params): Promise<any[]>{
-        //return Models.Credential.findAll({where: {ownerId: params.ownerId}});
+        //return DBM.Credential.findAll({where: {ownerId: params.ownerId}});
         var options: any = {};
         options.where = {ownerId: params.ownerId};
         options.attributes = params.attributes? ['*'] :params.attributes;
-        return Models.Credential.findAll(options);
+        return DBM.Credential.findAll(options);
     }
 
     /***********************证件信息end***********************/

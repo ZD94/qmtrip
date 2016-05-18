@@ -6,7 +6,7 @@ import {Model} from "sequelize";
  */
 
 let moment = require("moment");
-let Models = require("common/model").DB.models;
+let DBM = require("common/model").DB.models;
 let Logger = require('common/logger');
 let logger = new Logger("seeds");
 let typeString = ['TripPlanNo', 'qm_order'];
@@ -34,10 +34,10 @@ class SeedModule {
             throw {code: -1, msg: '编号类型不在配置中'};
         }
 
-        let seeds = await Models.Seed.findOne({where: {type: type}});
+        let seeds = await DBM.Seed.findOne({where: {type: type}});
 
         if (!seeds) {
-            return Models.Seed.create({type: type, minNo: minNo, maxNo: maxNo, nowNo: minNo})
+            return DBM.Seed.create({type: type, minNo: minNo, maxNo: maxNo, nowNo: minNo})
         }
 
         let nowNo = 0;
@@ -48,7 +48,7 @@ class SeedModule {
             nowNo = parseInt(seeds.nowNo) + 1;
         }
 
-        let [affect, rows] = await Models.Seed.update({nowNo: nowNo}, {returning: true, where: {type: type}})
+        let [affect, rows] = await DBM.Seed.update({nowNo: nowNo}, {returning: true, where: {type: type}})
         return rows[0].nowNo;
     }
 
