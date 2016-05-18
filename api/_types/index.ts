@@ -1,12 +1,12 @@
-import { ServiceInterface, ServiceDelegate } from 'common/model.client';
+import { ServiceInterface, ServiceDelegate } from 'common/model';
 
 import { Company, MoneyChange } from "./company";
 import { Staff, Credential, PointChange } from "./staff";
 import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
 import { Agency, AgencyUser } from './agency';
-import {TripPlan, TripDetail, Project} from './tripPlan';
-import { Account } from './auth';
+import {TripPlan, TripDetail, Project, TripPlanLog} from './tripPlan';
+import { Account, Token } from './auth';
 import {Seed} from "./seed";
 
 export interface ModelsInterface {
@@ -26,9 +26,11 @@ export interface ModelsInterface {
     seed: ServiceInterface<Seed>;
     tripPlan: ServiceInterface<TripPlan>;
     tripDetail: ServiceInterface<TripDetail>;
+    tripPlanLog: ServiceInterface<TripPlanLog>;
     project: ServiceInterface<Project>;
 
     account: ServiceInterface<Account>;
+    token: ServiceInterface<Token>;
 }
 
 export var Models: ModelsInterface = {
@@ -48,9 +50,11 @@ export var Models: ModelsInterface = {
     seed: new ServiceDelegate<Seed>(),
     tripPlan: new ServiceDelegate<TripPlan>(),
     tripDetail: new ServiceDelegate<TripDetail>(),
+    tripPlanLog: new ServiceDelegate<TripPlanLog>(),
     project: new ServiceDelegate<Project>(),
 
     account: new ServiceDelegate<Account>(),
+    token: new ServiceDelegate<Token>(),
 };
 
 export function initModels(models: ModelsInterface){

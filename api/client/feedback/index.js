@@ -7,7 +7,6 @@
  * @module API
  */
 var API = require("common/api");
-var auth = require("../auth");
 /**
  * @class feedback 意见反馈
  */
