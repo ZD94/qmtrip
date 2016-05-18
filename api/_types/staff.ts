@@ -4,8 +4,10 @@ import { TripPlan } from 'api/_types/tripPlan';
 import { regApiType } from 'common/api/helper';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Department } from 'api/_types/department';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference, Values } from 'common/model';
-import { Create } from 'common/model';
+import { ModelObject, Types, Values } from 'common/model';
+import { Table, Create, Field, ResolveRef, Reference } from 'common/model';
+import { Account } from './auth';
+import { TableExtends } from 'common/model.client';
 
 export enum EStaffStatus {
     ON_JOB = 0,
@@ -28,15 +30,16 @@ function enumValues(e){
     return Object.keys(e).map((k)=>e[k]).filter((v)=>(typeof v != 'number'));
 }
 
-@Table(Models.staff, "staff.")
 @regApiType('API.')
-export class Staff extends ModelObject{
+@TableExtends(Account, 'account')
+@Table(Models.staff, "staff.")
+export class Staff extends ModelObject implements Account {
     constructor(target: Object) {
         super(target);
     }
     @Create()
     static create(): Staff { return null; }
-
+    
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
@@ -66,7 +69,7 @@ export class Staff extends ModelObject{
     set balancePoints(val: number) {}
     // '权限'
     @Field({type: Types.INTEGER})
-    get roleId(): EStaffRole { return null; }
+    get roleId(): EStaffRole { return EStaffRole.COMMON; }
     set roleId(val: EStaffRole) {}
     // '邮箱'
     @Field({type: Types.STRING(50)})
@@ -94,6 +97,20 @@ export class Staff extends ModelObject{
         return Models.travelPolicy.get(id);
     }
     setTravelPolicy(val: TravelPolicy) {}
+    
+
+    //Account properties:
+    pwd: string;
+    forbiddenExpireAt: Date;
+    loginFailTimes: number;
+    lastLoginAt: Date;
+    lastLoginIp: string;
+    activeToken: string;
+    pwdToken: string;
+    oldQrcodeToken: string;
+    qrcodeToken: string;
+    type: number;
+    isFirstLogin: boolean;
 }
 
 @Table(Models.credential, "staff.")

@@ -1,6 +1,7 @@
 import { regApiType } from 'common/api/helper';
 import { Table, Field, Types, ModelObject, Values } from 'common/model'
 import { Models} from './index';
+import { Create } from 'common/model';
 
 @regApiType('API.')
 class AuthCert {
@@ -24,78 +25,78 @@ enum ACCOUNT_TYPE {
 
 @Table(Models.account, "auth.")
 class Account extends ModelObject{
+    constructor(target: Object) {
+        super(target);
+    }
+    @Create()
+    static create(): Account { return null; }
+
     @Field({type:Types.UUID})
     get id() { return null; }
     set id(id){}
 
-
     @Field({type:Types.STRING})
-    get email() { return null; }
-    set email(email){}
+    get email(): string { return null; }
+    set email(email: string){}
 
     //邮箱
     @Field({type:Types.STRING})
-    get pwd() { return null; }
-    set pwd(pwd){}
+    get pwd(): string { return null; }
+    set pwd(pwd: string){}
 
     //密码
     @Field({type:Types.STRING})
-    get mobile() { return null; }
-    set mobile(mobile){}
+    get mobile(): string { return null; }
+    set mobile(mobile: string){}
 
     //手机
     @Field({type:Types.INTEGER})
-    get status() { return null; }
-    set status(status){}
+    get status(): number { return null; }
+    set status(status: number){}
 
     //创建时间
     @Field({type: Types.DATE})
-    get forbiddenExpireAt() { return null; }
-    set forbiddenExpireAt(forbiddenExpireAt) {}
-
-    @Field({type:Types.INTEGER})
-    get loginFailTimes() { return null; }
-    set loginFailTimes(loginFailTimes){}
+    get forbiddenExpireAt(): Date  { return null; }
+    set forbiddenExpireAt(forbiddenExpireAt: Date ) {}
 
     //连续错误次数
-    @Field({type:Types.DATE})
-    get lastLoginAt() { return null; }
-    set lastLoginAt(lastLoginAt){}
+    @Field({type:Types.INTEGER})
+    get loginFailTimes(): number { return null; }
+    set loginFailTimes(loginFailTimes: number){}
 
     //最近登录时间
-    @Field({type:Types.STRING})
-    get lastLoginIp() { return null; }
-    set lastLoginIp(lastLoginIp){}
+    @Field({type:Types.DATE})
+    get lastLoginAt(): Date { return null; }
+    set lastLoginAt(lastLoginAt: Date ){}
 
     //最近登录Ip
     @Field({type:Types.STRING})
-    get activeToken() { return null; }
-    set activeToken(activeToken){}
-
-
-    @Field({type:Types.STRING})
-    get pwdToken() { return null; }
-    set pwdToken(pwdToken){}
-
+    get lastLoginIp(): string { return ''; }
+    set lastLoginIp(lastLoginIp: string){}
 
     @Field({type:Types.STRING})
-    get oldQrcodeToken() { return null; }
-    set oldQrcodeToken(oldQrcodeToken){}
-
+    get activeToken(): string { return null; }
+    set activeToken(activeToken: string){}
 
     @Field({type:Types.STRING})
-    get qrcodeToken() { return null; }
-    set qrcodeToken(qrcodeToken){}
+    get pwdToken(): string { return null; }
+    set pwdToken(pwdToken: string){}
 
+    @Field({type:Types.STRING})
+    get oldQrcodeToken(): string { return null; }
+    set oldQrcodeToken(oldQrcodeToken: string){}
+
+    @Field({type:Types.STRING})
+    get qrcodeToken(): string { return null; }
+    set qrcodeToken(qrcodeToken: string){}
 
     @Field({type:Types.INTEGER})
-    get type() { return null; }
-    set type(type){}
-
+    get type(): number { return null; }
+    set type(type: number){}
 
     @Field({type:Types.BOOLEAN})
-    get isFirstLogin() { return null; }
-    set isFirstLogin(isFirstLogin){}
+    get isFirstLogin(): boolean { return true; }
+    set isFirstLogin(isFirstLogin: boolean){}
 }
 
 

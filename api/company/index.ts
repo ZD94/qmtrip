@@ -1,4 +1,3 @@
-import {requirePermit, conditionDecorator, condition} from "../_decorator";
 /**
  * Created by yumiao on 15-12-9.
  */
@@ -16,8 +15,8 @@ let logger = new Logger('company');
 
 import {requireParams, clientExport} from "common/api/helper";
 import {ECompanyStatus, Company, MoneyChange} from 'api/_types/company';
-import { ServiceInterface } from 'common/model';
 import {EAgencyStatus} from "../_types/agency";
+import {requirePermit, conditionDecorator, condition} from "../_decorator";
 
 let AGENCY_ROLE = {OWNER: 0, COMMON: 1, ADMIN: 2};
 let companyCols = Company['$fieldnames'];
