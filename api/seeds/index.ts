@@ -1,4 +1,4 @@
-import {ServiceInterface} from "../../common/model.client";
+import {ServiceInterface} from "common/model";
 import {Seed} from "../_types/seed";
 import {Model} from "sequelize";
 /**

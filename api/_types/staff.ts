@@ -5,9 +5,8 @@ import { regApiType } from 'common/api/helper';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Department } from 'api/_types/department';
 import { ModelObject, Types, Values } from 'common/model';
-import { Table, Create, Field, ResolveRef, Reference } from 'common/model';
+import { Table, TableExtends, Create, Field, ResolveRef, Reference } from 'common/model';
 import { Account } from './auth';
-import { TableExtends } from 'common/model.client';
 
 export enum EStaffStatus {
     ON_JOB = 0,

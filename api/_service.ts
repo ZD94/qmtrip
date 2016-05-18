@@ -6,14 +6,14 @@ import { initModels } from 'api/_types';
 import StaffModule = require('api/staff');
 import DepartmentModule = require ('api/department');
 import TravelPolicyModule = require('api/travelPolicy');
-import { ServiceInterface, ServiceAbstract } from '../common/model.client';
+import { ServiceInterface, ServiceAbstract } from 'common/model';
 import { Staff, Credential, PointChange } from 'api/_types/staff';
 import { Company, MoneyChange } from './_types/company';
 import { Department } from './_types/department';
 import { TravelPolicy } from './_types/travelPolicy';
 import { Agency, AgencyUser } from './_types/agency';
 import {TripPlan, TripDetail, Project, TripPlanLog} from './_types/tripPlan';
-import { Account } from './_types/auth';
+import { Account,Token } from './_types/auth';
 import { Seed } from './_types/seed';
 
 interface ServiceObject{
@@ -79,4 +79,5 @@ initModels({
     project: createServerService<Project>(Project),
     account: createServerService<Account>(Account),
     seed: createServerService<Seed>(Seed),
+    token: createServerService<Token>(Token),
 });

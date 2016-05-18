@@ -8,7 +8,7 @@ import {Company} from 'api/_types/company';
 import { ModelObject, Table, Field, Types, ResolveRef, Reference, Values } from 'common/model';
 import { Create } from 'common/model';
 import { Account } from './auth';
-import {TableExtends} from "../../common/model.client";
+import {TableExtends} from "common/model/common";
 
 export enum EAgencyStatus {
     DELETE = -2, //删除状态
