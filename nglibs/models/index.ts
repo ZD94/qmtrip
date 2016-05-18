@@ -28,7 +28,10 @@ function resolverAPIModule(modname: string){
 }
 
 function DummyGet(){
-    return {};
+    return {
+        save: function(){ return Promise.resolve(this); },
+        destroy: function(){ Promise.resolve(); },
+    };
 }
 
 var Services = {
