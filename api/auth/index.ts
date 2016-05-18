@@ -3,7 +3,7 @@
  */
 "use strict";
 import {requireParams} from "../../common/api/helper";
-
+import { Models} from "api/_types";
 var Q = require("q");
 var sequelize = require("common/model").importModel("./models");
 var DBM = sequelize.models;
@@ -63,7 +63,7 @@ class ApiAuth {
             throw L.ERR.ACTIVE_URL_INVALID;
         }
 
-        return DBM.Account.findOne({where: {id: accountId}})
+        return Models.account.get(accountId)
             .then(function(account) {
                 if (!account) {
                     throw L.ERR.ACTIVE_URL_INVALID;
@@ -78,7 +78,9 @@ class ApiAuth {
                     throw L.ERR.ACTIVE_URL_INVALID;
                 }
 
-                return DBM.Account.update({status: ACCOUNT_STATUS.ACTIVE, activeToken: null}, {where: {id: account.id}});
+                account.status = ACCOUNT_STATUS.ACTIVE;
+                account.activeToken = null;
+                return account.save();
             })
             .then(function() {
                 return true;
@@ -116,7 +118,7 @@ class ApiAuth {
                     throw L.ERR.TIMESTAMP_TIMEOUT;
                 }
 
-                return DBM.Account.findById(accountId)
+                return Models.account.get(accountId)
                     .then(function(account) {
                         if (!account) {
                             throw L.ERR.ACCOUNT_NOT_EXIST;
@@ -126,7 +128,6 @@ class ApiAuth {
                         if (sysSign.toLowerCase() != sign.toLowerCase()) {
                             throw L.ERR.SIGN_ERROR;
                         }
-
                         return true;
                     })
             });
@@ -143,7 +144,6 @@ class ApiAuth {
      * @returns {Promise} true|error
      */
     static sendResetPwdEmail (params: {email: string, type?: Number, isFirstSet?: boolean, companyName?: string}) {
-
         var email = params.email;
         var isFirstSet = params.isFirstSet;
         var type = params.type || 1;
@@ -500,7 +500,7 @@ class ApiAuth {
      * @return {Promise} {code:0, msg: "Ok"}
      */
     static authentication (params: {userId?: string, user_id?: string, tokenId?: string,
-        token_id?: string, timestamp: number, tokenSign?: string, token_sign?: string}) {
+        token_id?: string, timestamp: number, tokenSign?: string, token_sign?: string}) : Promise<boolean> {
 
         if ((!params.userId && !params.user_id) || (!params.tokenId && !params.token_id)
             || !Boolean(params.timestamp) || (!params.tokenSign && !params.token_sign)) {
@@ -511,7 +511,7 @@ class ApiAuth {
         var timestamp = params.timestamp;
         var tokenSign = params.tokenSign || params.token_sign;
 
-        return DBM.Token.findOne({where: {id: tokenId, accountId: userId}})
+        return Models.token.get(tokenId)
             .then(function(m) {
                 if (!m) {
                     return false;
