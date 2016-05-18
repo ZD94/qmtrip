@@ -6,7 +6,7 @@ import { initModels } from 'api/_types';
 import StaffModule = require('api/staff');
 import DepartmentModule = require ('api/department');
 import TravelPolicyModule = require('api/travelPolicy');
-import { ServiceInterface, ServiceAbstract } from '../common/model.client';
+import { ServiceInterface, ServiceAbstract } from 'common/model';
 import { Staff, Credential, PointChange } from 'api/_types/staff';
 import { Company, MoneyChange } from './_types/company';
 import { Department } from './_types/department';

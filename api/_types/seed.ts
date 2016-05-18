@@ -3,8 +3,7 @@
  */
 'use strict';
 import { regApiType } from 'common/api/helper';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference } from 'common/model';
-import { Create } from 'common/model.client';
+import { ModelObject, Table, Create, Field, Types, ResolveRef, Reference } from 'common/model';
 import { Models } from 'api/_types';
 
 @Table(Models.seed, 'seeds.')
