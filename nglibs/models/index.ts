@@ -13,7 +13,7 @@ import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Agency, AgencyUser } from 'api/_types/agency';
 import { TripPlan, TripDetail, Project } from 'api/_types/tripPlan';
 import { Place } from 'api/_types/place';
-import { Account } from 'api/_types/auth';
+import { Account, Token } from 'api/_types/auth';
 import { Seed } from 'api/_types/seed';
 
 const API = require('common/api');
@@ -73,6 +73,7 @@ var Services = {
     seed: { type: Seed, modname: 'seeds',
         funcs: []
     },
+    token: { type: Token, modname: 'token', funcs: []}
 };
 
 function throwNotImplemented(){
@@ -108,6 +109,7 @@ class ClientModels implements ModelsInterface {
     place: RemoteService<Place>;
     account: RemoteService<Account>;
     seed: RemoteService<Seed>;
+    token: RemoteService<Token>;
     
     constructor($cacheFactory: ng.ICacheFactoryService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
@@ -124,6 +126,7 @@ class ClientModels implements ModelsInterface {
         this.project = createService<Project>(Services.project, $cacheFactory);
         this.place = createService<Place>(Services.place, $cacheFactory);
         this.account = createService<Account>(Services.account, $cacheFactory);
+        this.token = createService<Token>(Services.token, $cacheFactory);
         this.seed = createService<Seed>(Services.seed, $cacheFactory);
         initModels(this);
     }
