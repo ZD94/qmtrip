@@ -1,3 +1,4 @@
+let uuid = require("node-uuid");
 import { regApiType } from 'common/api/helper';
 import { Models } from 'api/_types';
 import {Staff} from 'api/_types/staff';
