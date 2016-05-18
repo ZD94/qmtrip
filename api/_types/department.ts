@@ -15,13 +15,8 @@ export class Department extends ModelObject{
     @Create()
     static create(): Department { return null; }
 
-<<<<<<< HEAD
-    @Field({type: Types.UUID, defaultValue: uuid['v1']})
-    get id(): string { return null; }
-=======
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
->>>>>>> fb858964842e4ef205e05379413d16cfd041a1e7
     set id(val: string) {}
 
     @Field({type: Types.STRING(50)})

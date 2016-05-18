@@ -458,26 +458,6 @@ class StaffModule{
         return Models.Staff.count({where: {departmentId: params.departmentId, status: {$gte: EStaffStatus.ON_JOB}}})
     }
 
-    /**
-     * 根据属性查找员工
-     * @param params
-     * @returns {*}
-     */
-    static getStaffs(params): Promise<Staff[]>{
-        var options : any = {};
-        options.where = _.pick(params, Object.keys(Models.Staff.attributes));
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
-        if(params.columns){
-            options.attributes = params.columns;
-        }
-        return Models.Staff.findAll(options)
-            .map(function(s){
-                return new Staff(s);
-            });
-    }
->>>>>>> fb858964842e4ef205e05379413d16cfd041a1e7
 
     /**
      * 分页查询员工集合
