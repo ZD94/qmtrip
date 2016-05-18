@@ -182,8 +182,9 @@ class CompanyModule {
 
     /**
      * 获取企业信息
-     * @param companyId
-     * @returns {*}
+     * @param {Object} params
+     * @param {String} params.id 企业ID
+     * @returns {Promise<Company>}
      */
     @clientExport
     @requireParams(['id'])
