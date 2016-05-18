@@ -16,6 +16,7 @@
     "httptype": "short",
     "mods": {
       "sequelize": { "prefix": "${{appName}}_sql_", "console": true },
+      "sqlinit": { "prefix": "${{appName}}_sql_", "console": false },
       "http": { "console": false }
     }
   },
