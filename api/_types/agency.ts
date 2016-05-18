@@ -7,6 +7,8 @@ import { Models } from 'api/_types';
 import {Company} from 'api/_types/company';
 import { ModelObject, Table, Field, Types, ResolveRef, Reference, Values } from 'common/model';
 import { Create } from 'common/model';
+import { Account } from './auth';
+import {TableExtends} from "common/model/common";
 
 export enum EAgencyStatus {
     DELETE = -2, //删除状态
@@ -84,6 +86,7 @@ export class Agency extends ModelObject{
     }
 }
 
+@TableExtends(Account, 'account')
 @Table(Models.agencyUser, 'agency.')
 @regApiType('API.')
 export class AgencyUser extends ModelObject{
@@ -132,5 +135,17 @@ export class AgencyUser extends ModelObject{
 
     @ResolveRef({type: Types.UUID}, Models.agency)
     get agency(): Agency { return null; }
-    
+
+    //Account properties:
+    pwd: string;
+    forbiddenExpireAt: Date;
+    loginFailTimes: number;
+    lastLoginAt: Date;
+    lastLoginIp: string;
+    activeToken: string;
+    pwdToken: string;
+    oldQrcodeToken: string;
+    qrcodeToken: string;
+    type: number;
+    isFirstLogin: boolean;
 }

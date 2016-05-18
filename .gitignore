@@ -18,3 +18,4 @@ controller.all.js
 /public/font/font-awesome-*
 
 !public/font/css/icomoon.css
+npm-debug.log

@@ -78,8 +78,7 @@ class AgencyModule {
         params.id = account.id;
         params.createUser = account.id;
         params.agencyNo = await API.seeds.getSeedNo('AgencyNo', {formatDate: 'YY', minNo: 100, maxNo: 999});
-
-        let agency = await DBM.agency.create(params);
+        let agency = await DBM.Agency.create(params);
         let _agencyUser: any = _.pick(params, ['email', 'mobile', 'sex', 'avatar']);
         _agencyUser.id = account.id;
         _agencyUser.agencyId = agency.id;
@@ -87,8 +86,8 @@ class AgencyModule {
         _agencyUser.name = params.userName;
         _agencyUser.status = EAgencyStatus.ACTIVE;
 
-        await DBM.agency.createAgencyUser(_agencyUser);
-
+        await DBM.AgencyUser.create(_agencyUser);
+        
         return new Agency(agency);
     }
 
@@ -106,8 +105,7 @@ class AgencyModule {
     @conditionDecorator([{if: condition.isSameAgency('0.id')}])
     @requireParams(['id'])
     static async getAgencyById(params: {id: string}): Promise<Agency>{
-        let session = Zone.current.get("session");
-        let agency = await DBM.agency.findById({id: params.id});
+        let agency = await DBM.Agency.findById(params.id);
 
         if (!agency) {
             throw L.ERR.AGENCY_NOT_EXIST;
@@ -166,28 +164,25 @@ class AgencyModule {
      * @returns {*}
      */
     @clientExport
+    @requirePermit('user.delete', 2)
+    @conditionDecorator([{if: condition.isMyAgency('0.id')}])
     @requireParams(['id'])
     static async deleteAgency(params: {id: string}): Promise<boolean> {
         let {accountId} = Zone.current.get('session');
         let agencyId = params.id;
-        let selfUser = await DBM.agencyUser.findById(accountId, {attributes: ['createUser', 'status']})
-        let agency = await DBM.Agency.findById(agencyId, {attributes: ['createUser', 'status']});
+        let agency = await DBM.Agency.findById(agencyId);
 
-        if (!agency || agency.status == EAgencyStatus.DELETE) {
+        if (!agency) {
             throw L.ERR.AGENCY_NOT_EXIST;
-        }
-
-        if(selfUser.id != agency.createUser) {
-            throw L.ERR.PERMISSION_DENY;
         }
 
         let agencyUsers = await DBM.AgencyUser.findAll({where: {agencyId: agencyId, status: {$ne: EAgencyStatus.DELETE}}, attributes: ['id']});
 
-        await DBM.Agency.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {where: {id: agencyId}, fields: ['status', 'updatedAt']});
-        await DBM.AgencyUser.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {where: {agencyId: agencyId}, fields: ['status', 'updatedAt']});
+        await DBM.Agency.destroy({where: {id: agencyId}});
+        await DBM.AgencyUser.destroy({where: {agencyId: agencyId}});
 
         await agencyUsers.map(async function (user) {
-            await DBM.Accounts.destroy({where: {id: user.id}});
+            await DBM.Account.destroy({where: {id: user.id}});
         });
 
         return true;
@@ -237,18 +232,13 @@ class AgencyModule {
      */
     @clientExport
     @requirePermit('user.edit', 2)
+    @conditionDecorator([{if: condition.isMyAgency('0.id')}])
     @requireParams(['id'], ['status', 'name', 'sex', 'mobile', 'avatar', 'roleId'])
     static async updateAgencyUser(params: {id: string, status?: number, name?: string, sex?: string, email?: string, mobile?: string, avatar?: string, roleId?: string}) {
-        let {accountId} = Zone.current.get('session');
-        let user = await DBM.agency.findById({id: accountId, columns: ['agencyId']});
-        let target = await DBM.agency.findById({id: params.id, columns: ['agencyId', 'status']});
+        let target = await DBM.AgencyUser.findById(params.id);
 
-        if(target.status === EAgencyStatus.DELETE) {
+        if(!target) {
             throw L.ERR.AGENCY_NOT_EXIST;
-        }
-
-        if(user.agencyId != target.agencyId){
-            throw L.ERR.PERMISSION_DENY;
         }
 
         target.status = params.status;
@@ -260,7 +250,7 @@ class AgencyModule {
 
         let result = await target.save();
 
-        return new AgencyUser(target);
+        return new AgencyUser(result);
     }
 
     /**
@@ -306,7 +296,7 @@ class AgencyModule {
         let curUser = await DBM.AgencyUser.findById(accountId, {attributes: ['agencyId']});
         let agencyUser = await DBM.AgencyUser.findById(params.id);
 
-        if (!agencyUser || agencyUser.status === EAgencyStatus.DELETE) {
+        if (!agencyUser) {
             throw L.ERR.AGENCY_USRE_NOT_EXIST;
         }
 

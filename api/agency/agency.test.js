@@ -135,35 +135,23 @@ zone.run(describe.bind(this, "api/agency", function() {
             })
 
 
-            it("getCurrentAgencyUser should be ok", function(done) {
-                API.agency.getCurrentAgencyUser( function(err, ret) {
-                    if (err) {
-                        throw err;
-                    }
-                    assert.equal(ret.id, agencyUserId);
-                    done();
-                })
-            });
-
-
 
             it("getAgencyUser should be ok", function(done) {
-                API.agency.getAgencyUser( {id: agencyUserId}, function(err, ret) {
-                    if (err) {
-                        throw err;
-                    }
+                zone.run(API.agency.getAgencyUser.bind(this, {id: agencyUserId}, function(err, ret) {
+                    assert.equal(err, null);
                     assert.equal(ret.id, agencyUserId);
                     done();
-                })
+                }))
             });
 
             it("getAgencyUser should be error whit wrong params", function(done) {
                 var uuid = require('node-uuid');
-                API.agency.getAgencyUser( {id: uuid.v1()}, function(err, ret) {
+                zone.run(API.agency.getAgencyUser.bind(this, {id: uuid.v1()}, function(err, ret) {
                     assert.equal(ret, null);
-                    assert.equal(err.code, -2);
+                    console.info('err=>', err);
+                    assert.equal(err.code, -141);
                     done();
-                })
+                }))
             });
 
 
@@ -173,19 +161,17 @@ zone.run(describe.bind(this, "api/agency", function() {
                         throw err;
                     }
 
-                    assert(ret.items.length >= 0);
                     done();
                 })
             });
 
 
             it("deleteAgency should be ok", function (done) {
-                API.agency.deleteAgency( {agencyId: agencyId}, function (err, ret) {
-                    if (err) {
-                        throw err;
-                    }
+                zone.run(API.agency.deleteAgency.bind(this, {id: agencyId}, function (err, ret) {
+                    assert.equal(err, null);
+                    assert.equal(ret, true);
                     done();
-                })
+                }))
             });
         })
 
