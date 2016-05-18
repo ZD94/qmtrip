@@ -2,8 +2,9 @@
  * @module auth
  */
 "use strict";
-import {requireParams} from "../../common/api/helper";
+import {requireParams, clientExport} from "../../common/api/helper";
 import { Models} from "api/_types";
+import {AuthCert, Token, Account} from "api/_types/auth"
 var Q = require("q");
 var sequelize = require("common/model").importModel("./models");
 var DBM = sequelize.models;
@@ -51,7 +52,8 @@ class ApiAuth {
      * @return {Promise}
      * @public
      */
-    static activeByEmail (data: {sign: string, accountId: string, timestamp: number}) {
+    @clientExport
+    static activeByEmail (data: {sign: string, accountId: string, timestamp: number}) : Promise<boolean> {
 
         var sign = data.sign;
         var accountId = data.accountId;
@@ -64,11 +66,7 @@ class ApiAuth {
         }
 
         return Models.account.get(accountId)
-            .then(function(account) {
-                if (!account) {
-                    throw L.ERR.ACTIVE_URL_INVALID;
-                }
-
+            .then(function(account: any) {
                 if (account.status == ACCOUNT_STATUS.ACTIVE) {
                     return true;
                 }
@@ -98,6 +96,7 @@ class ApiAuth {
      * @param {String} params.accountId 账户ID
      * @return {Promise}
      */
+    @clientExport
     static checkResetPwdUrlValid (params: {sign: string, timestamp: number, accountId: string}) {
 
         var accountId = params.accountId;
@@ -143,7 +142,8 @@ class ApiAuth {
      * @param {String} params.companyName 公司名称
      * @returns {Promise} true|error
      */
-    static sendResetPwdEmail (params: {email: string, type?: Number, isFirstSet?: boolean, companyName?: string}) {
+    @clientExport
+    static sendResetPwdEmail (params: {email: string, type?: Number, isFirstSet?: boolean, companyName?: string}) : Promise<boolean> {
         var email = params.email;
         var isFirstSet = params.isFirstSet;
         var type = params.type || 1;
@@ -215,6 +215,42 @@ class ApiAuth {
             });
     }
 
+    // async sendResetPwdEmail(params:{email:string; type:number; code:string; ticket:string}):Promise<boolean> {
+    //     let code = params.code;
+    //     let ticket = params.ticket;
+    //     let email = params.email;
+    //     return Promise.resolve(true)
+    //         .then(function() {
+    //             if (!code) {
+    //                 throw L.ERR.CODE_EMPTY;
+    //             }
+    //
+    //             if (!ticket) {
+    //                 throw L.ERR.CODE_ERROR;
+    //             }
+    //
+    //             return API.checkcode.validatePicCheckCode({code: code, ticket: ticket});
+    //         })
+    //         .then(function(){
+    //             let data:any = {
+    //                 email: email,
+    //                 isFirstSet: false
+    //             };
+    //             return  API.auth.sendResetPwdEmail(data);
+    //         });
+    // }
+
+    static sendActivateEmail(params:{email:string; companyName?:string}):Promise<boolean> {
+        let email = params.email;
+        let companyName = params.companyName;
+        let data:any = {
+            email: email,
+            companyName: companyName,
+            isFirstSet: true
+        };
+        return  ApiAuth.sendResetPwdEmail(data);
+    }
+
     /**
      * @method resetPwdByEmail
      * 找回密码
@@ -226,6 +262,7 @@ class ApiAuth {
      * @param {String} params.pwd 新密码
      * @return {Promise} true|error
      */
+    @clientExport
     static resetPwdByEmail (params: {accountId: string, sign: string, timestamp: number, pwd: string}) {
 
         var accountId = params.accountId;
@@ -269,6 +306,12 @@ class ApiAuth {
             .then(function() {
                 return true;
             });
+    }
+
+    @clientExport
+    static getAccountStatus(params:{}):Promise<number> {
+        let args:any = {attributes: ["status"]};
+        return ApiAuth.getAccount(args);
     }
 
     /**
@@ -424,7 +467,8 @@ class ApiAuth {
      * @return {Promise} {code:0, msg: "ok", data: {user_id: "账号ID", token_sign: "签名", token_id: "TOKEN_ID", timestamp:"时间戳"}
      * @public
      */
-    static login (data: {email?: string, pwd: string, type?: Number, mobile?: string}) {
+    @clientExport
+    static login (data: {email?: string, pwd: string, type?: Number, mobile?: string}) :Promise<AuthCert>{
 
         if (!data) {
             throw L.ERR.DATA_NOT_EXIST;
@@ -481,11 +525,121 @@ class ApiAuth {
                     });
             })
             .then(function(ret) {
-                //console.info('返回结果:', ret);
-                return ret;
+                return new AuthCert(ret);
             })
 
     }
+
+    async checkBlackDomain (params:{domain:string}):Promise<boolean> {
+        return Promise.resolve(false);
+        // var domain = params.domain;
+        // return Promise.all([
+        //     API.company.isBlackDomain({domain: domain}),
+        //     API.company.domainIsExist({domain: domain})
+        // ])
+        //     .spread(function(isBlackDomain, isExist) {
+        //         if (isBlackDomain) {
+        //             throw L.ERR.EMAIL_IS_PUBLIC;
+        //         }
+        //
+        //         if (isExist) {
+        //             throw L.ERR.DOMAIN_HAS_EXIST;
+        //         }
+        //
+        //         return false;
+        //     })
+        //     .then(function(result: boolean) {
+        //         return result;
+        //     })
+    }
+
+    // async registryCompany (params:{companyName: string, name: string, email: string, mobile: string, pwd: string,
+    //     msgCode: string, msgTicket: string, picCode: string, picTicket:string, agencyId?: string}):Promise<boolean> {
+    //     //先创建登录账号
+    //     // if (!params) {
+    //     //     params = {};
+    //     // }
+    //     var companyName = params.companyName;
+    //     var name = params.name;
+    //     var email = params.email;
+    //     var mobile = params.mobile;
+    //     var msgCode = params.msgCode;
+    //     var msgTicket = params.msgTicket;
+    //     var picCode = params.picCode;
+    //     var picTicket = params.picTicket;
+    //     var pwd = params.pwd;
+    //
+    //     if (!picCode || !picTicket) {
+    //         throw {code: -1, msg: "验证码错误"};
+    //     }
+    //
+    //     if (!msgCode || !msgTicket) {
+    //         throw {code: -1, msg: "短信验证码错误"};
+    //     }
+    //
+    //     if (!mobile || !validate.isMobile(mobile)) {
+    //         throw L.ERR.MOBILE_FORMAT_ERROR;
+    //     }
+    //
+    //     if (!name) {
+    //         throw {code: -1, msg: "联系人姓名为空"};
+    //     }
+    //
+    //     if (!companyName) {
+    //         throw {code: -1, msg: "公司名称为空"};
+    //     }
+    //
+    //     if (!pwd) {
+    //         throw {code: -1, msg: "密码不能为空"};
+    //     }
+    //     var companyId = uuid.v1();
+    //     var domain = email.split(/@/)[1];
+    //
+    //     return Promise.resolve(true)
+    //         .then(function() {
+    //             if (picCode == 'test' && picTicket == 'test' && msgCode == 'test' && msgTicket == 'test') {
+    //                 return true;
+    //             }
+    //
+    //             return API.checkcode.validatePicCheckCode({code: picCode, ticket: picTicket});
+    //         })
+    //         .then(function() {
+    //             if (picCode == 'test' && picTicket == 'test' && msgCode == 'test' && msgTicket == 'test') {
+    //                 return true;
+    //             }
+    //
+    //             return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+    //         })
+    //         .then(function(){
+    //             return API.client.auth.checkBlackDomain({domain: domain});
+    //         })
+    //         .then(function() {
+    //             var status = 0;
+    //             if (process.env["NODE_ENV"] == 'test') {
+    //                 status = 1;
+    //             }
+    //             return API.auth.newAccount({mobile: mobile, email: email, pwd: pwd, status: status});
+    //         })
+    //         .then(function(account) {
+    //             var agencyId = params.agencyId;
+    //             if(!agencyId){
+    //                 agencyId = API.agency.__defaultAgencyId;
+    //             }
+    //             return API.company.createCompany({id: companyId, agencyId: agencyId, createUser: account.id, name: companyName, domainName: domain,
+    //                 mobile:mobile, email: email})
+    //                 .then(function(){
+    //                     return Q.all([
+    //                         API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
+    //                             mobile: mobile, name: name, roleId: 0}),
+    //                         API.department.createDepartment({name: "我的企业", isDefault: true, companyId: companyId})
+    //                     ])
+    //                 });
+    //         })
+    //         .then(function() {
+    //             return true;
+    //         });
+    // }
+
 
     /**
      * @method authenticate
@@ -641,6 +795,7 @@ class ApiAuth {
      * @param {String} params.email 要发送的邮件
      * @return {Promise} true||error
      */
+    @clientExport
     static sendActiveEmail (params: {email: string}) {
 
         var email = params.email;
@@ -671,17 +826,17 @@ class ApiAuth {
      * @param {UUID} params.tokenId
      * @return {Promise}
      */
-    static logout (params: {accountId: string, tokenId: string}) {
-
-        var accountId = params.accountId;
-        var tokenId = params.tokenId;
+    static logout (params: {}) : Promise<boolean> {
+        let session = Zone.current.get("session");
+        var accountId = session["accountId"];
+        var tokenId = session["tokenId"];
         if (accountId && tokenId) {
             return DBM.Token.destroy({where: {accountId: accountId, id: tokenId}})
                 .then(function() {
                     return true;
                 })
         }
-        return Q(true);
+        return Promise.resolve(true);
     };
 
 
@@ -695,11 +850,12 @@ class ApiAuth {
      * @param {String} params.newPwd 新密码
      * @return {Promise}
      */
-    static resetPwdByOldPwd (params: {oldPwd: string, newPwd: string, accountId: string}) {
-
-        var oldPwd = params.oldPwd;
-        var newPwd = params.newPwd;
-        var accountId = params.accountId;
+    @clientExport
+    static resetPwdByOldPwd (params: {oldPwd: string, newPwd: string}) : Promise<boolean>{
+        let session = Zone.current.get("session");
+        let oldPwd = params.oldPwd;
+        let newPwd = params.newPwd;
+        let accountId = session["accountId"];
 
         if (!accountId) {
             throw L.ERR.NEED_LOGIN;
@@ -819,22 +975,20 @@ class ApiAuth {
      * @param {String} params.accountId 账号ID
      * @param {String} params.backUrl
      */
-    static getQRCodeUrl (params: {accountId: string, backUrl: string}) {
+    @clientExport
+    static getQRCodeUrl (params: {backUrl: string}) : Promise<string> {
 
-        var accountId = params.accountId;
+        let session = Zone.current.get("session");
+        var accountId = session["accountId"];
         var backUrl = params.backUrl;
 
-        return Q()
+        return Promise.resolve()
             .then(function(){
-                if (!params) {
-                    throw L.ERR.DATA_FORMAT_ERROR;
-                }
-
-                if (!accountId) {
+                if (!Boolean(accountId)) {
                     throw L.ERR.ACCOUNT_NOT_EXIST;
                 }
 
-                if (!backUrl) {
+                if (!Boolean(backUrl)) {
                     throw {code: -1, msg: "跳转链接不存在"};
                 }
 
@@ -875,7 +1029,8 @@ class ApiAuth {
      * @param {Integer} [params.type] 1.企业  2.代理商 默认 1
      * @reutnr {Promise} true 使用 false未使用
      */
-    static isEmailUsed (params: {email: string, type?: Number}) {
+    @clientExport
+    static isEmailUsed (params: {email: string, type?: Number}) :Promise<boolean> {
         var email = params.email;
         var type = params.type;
 
