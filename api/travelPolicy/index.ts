@@ -22,20 +22,18 @@ class TravelPolicyModule{
      * @returns {*}
      */
     @requireParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"], travalPolicyCols)
-    static create(data): Promise<TravelPolicy>{
+    static async create(data): Promise<TravelPolicy>{
         if (!data.hotelPrice || !/^\d+(.\d{1,2})?$/.test(data.hotelPrice)) {
             data.hotelPrice = null;
         }
-        return DBM.TravelPolicy.findOne({where: {name: data.name, companyId: data.companyId}})
+        let result = await DBM.TravelPolicy.findOne({where: {name: data.name, companyId: data.companyId}});
+        if(result){
+            throw {msg: "该等级名称已存在，请重新设置"};
+        }
+        return DBM.TravelPolicy.create(data)
             .then(function(result){
-                if(result){
-                    throw {msg: "该等级名称已存在，请重新设置"};
-                }
-                return DBM.TravelPolicy.create(data)
-                    .then(function(result){
-                        return new TravelPolicy(result);
-                    })
-            });
+                return new TravelPolicy(result);
+            })
     }
 
     @clientExport
@@ -74,18 +72,14 @@ class TravelPolicyModule{
      * @returns {*}
      */
     @requireParams(["id"])
-    static delete(params): Promise<any>{
+    static async delete(params): Promise<any>{
         var id = params.id;
-        return API.staff.getStaffs({travelLevel: id, status: 0})
-            .then(function(staffs){
-                if(staffs && staffs.length > 0){
-                    throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准 暂不能删除，给这些员工匹配新的差旅标准后再进行操作'};
-                }
-                return DBM.TravelPolicy.destroy({where: params});
-            })
-            .then(function(obj){
-                return true;
-            });
+        let staffs = await API.staff.getStaffs({travelLevel: id, status: 0});
+        if(staffs && staffs.length > 0){
+            throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准 暂不能删除，给这些员工匹配新的差旅标准后再进行操作'};
+        }
+        let obj = await DBM.TravelPolicy.destroy({where: params});
+        return true;
     }
 
     @clientExport
@@ -180,7 +174,7 @@ class TravelPolicyModule{
      * @returns {*}
      */
     @requireParams(["id"])
-    static get(params): Promise<TravelPolicy>{
+    static async get(params): Promise<TravelPolicy>{
         var id = params.id;
 
         var isReturnDefault = params.isReturnDefault;
@@ -190,19 +184,16 @@ class TravelPolicyModule{
 
         if(!id){
             if (isReturnDefault) {
-                return DBM.TravelPolicy.findById('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a')
-                    .then(function(data){
-                        return new TravelPolicy(data);
-                    })
+                let data = await DBM.TravelPolicy.findById('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a');
+                return new TravelPolicy(data);
+
             } else {
                 throw {code: -1, msg: "id不能为空"};
             }
         }
 
-        return DBM.TravelPolicy.findById(id)
-            .then(function(data){
-                return new TravelPolicy(data);
-            })
+        let result = await DBM.TravelPolicy.findById(id);
+        return new TravelPolicy(result);
     }
 
     @clientExport
@@ -335,12 +326,17 @@ class TravelPolicyModule{
             }
 
             params.companyId = staff.companyId;//只允许查询该企业下的差旅标准
-            return DBM.TravelPolicy.findAll(options);
-
+            let travelPolicies = await DBM.TravelPolicy.findAll(options);
+            return travelPolicies.map(function(t){
+                return t.id;
+            })
         }else{
             let result = await API.company.checkAgencyCompany({companyId: companyId, userId: accountId});
             if(result){
-                return DBM.TravelPolicy.findAll(options);
+                let travelPolicies = await DBM.TravelPolicy.findAll(options);
+                return travelPolicies.map(function(t){
+                    return t.id;
+                })
             }else{
                 throw {code: -1, msg: '无权限'};
             }

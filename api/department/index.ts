@@ -20,18 +20,14 @@ class DepartmentModule{
      * @returns {*}
      */
     @requireParams(["name","companyId"], departmentCols)
-    static create(data): Promise<Department>{
+    static async create(data): Promise<Department>{
 //    data.isDefault = false;//默认部门在企业注册时已经自动生成不允许自己添加
-        return DBM.Department.findOne({where: {name: data.name, companyId: data.companyId}})
-            .then(function(result){
-                if(result){
-                    throw {msg: "该部门名称已存在，请重新设置"};
-                }
-                return DBM.Department.create(data)
-                    .then(function(result){
-                        return new Department(result)
-                    })
-            });
+        let result = await DBM.Department.findOne({where: {name: data.name, companyId: data.companyId}});
+        if(result){
+            throw {msg: "该部门名称已存在，请重新设置"};
+        }
+        let obj = await DBM.Department.create(data);
+        return new Department(obj);
     }
 
     @clientExport
@@ -67,18 +63,14 @@ class DepartmentModule{
      * @returns {*}
      */
     @requireParams(["id"])
-    static delete(params): Promise<any>{
+    static async delete(params): Promise<any>{
         var id = params.id;
-        return API.staff.getStaffs({departmentId: id, status: 0})
-            .then(function(staffs){
-                if(staffs && staffs.length > 0){
-                    throw {code: -1, msg: '目前该部门下有'+staffs.length+'位员工 暂不能删除，给这些员工匹配新的部门后再进行操作'};
-                }
-                return DBM.Department.destroy({where: params});
-            })
-            .then(function(obj){
-                return true;
-            });
+        let staffs = await API.staff.getStaffs({departmentId: id, status: 0});
+        if(staffs && staffs.length > 0){
+            throw {code: -1, msg: '目前该部门下有'+staffs.length+'位员工 暂不能删除，给这些员工匹配新的部门后再进行操作'};
+        }
+        let obj = await DBM.Department.destroy({where: params});
+        return true;
     }
 
     @clientExport
@@ -108,7 +100,7 @@ class DepartmentModule{
      * @returns {*}
      */
     @requireParams(["id"], departmentCols)
-    static update(data): Promise<Department>{
+    static async update(data): Promise<Department>{
         var id = data.id;
         if(!id){
             throw {code: -1, msg:"id不能为空"};
@@ -118,10 +110,8 @@ class DepartmentModule{
         var options: any = {};
         options.where = {id: id};
         options.returning = true;
-        return DBM.Department.update(data, options)
-            .spread(function(rownum, rows){
-                return new Department(rows[0]);
-            });
+        let { rownum, rows } = await DBM.Department.update(data, options);
+        return new Department(rows[0]);
     }
 
     @clientExport
@@ -160,12 +150,10 @@ class DepartmentModule{
      * @returns {*}
      */
     @requireParams(["id"])
-    static get(params: {id: string}): Promise<Department>{
+    static async get(params: {id: string}): Promise<Department>{
         var id = params.id;
-        return DBM.Department.findById(id)
-            .then(function(result){
-                return new Department(result);
-            })
+        let result =  DBM.Department.findById(id)
+        return new Department(result);
     }
 
     @clientExport
@@ -238,13 +226,19 @@ class DepartmentModule{
 
             let staff = await API.staff.getStaff({id: accountId});
             params.companyId = staff.companyId;
-            return DBM.Department.findAll(options);
+            let departments = await DBM.Department.findAll(options);
+            return departments.map(function(d) {
+                return d.id;
+            })
 
         }else{
 
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
-                return DBM.Department.findAll(options);
+                let departments = await DBM.Department.findAll(options);
+                return departments.map(function(d) {
+                    return d.id;
+                })
             }else{
                 throw {code: -1, msg: '无权限'};
             }
@@ -270,19 +264,15 @@ class DepartmentModule{
      * @returns {*}
      */
     @requireParams(["companyId"])
-    static getDefaultDepartment(params): Promise<Department>{
+    static async getDefaultDepartment(params): Promise<Department>{
         params.isDefault = true;
-        return DBM.Department.findOne({where: params})
-            .then(function(department) {
-                if (department) {
-                    return new Department(department);
-                }
+        let department = await DBM.Department.findOne({where: params});
+        if (department) {
+            return new Department(department);
+        }
 
-                return DBM.Department.create({name: "我的企业", isDefault: true, companyId: params.companyId})
-                    .then(function(result) {
-                        return new Department(result);
-                    })
-            })
+        let result = await DBM.Department.create({name: "我的企业", isDefault: true, companyId: params.companyId});
+        return new Department(result);
     }
 
     /**
