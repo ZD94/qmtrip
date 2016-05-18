@@ -43,7 +43,7 @@ class StaffModule{
             delete data.type;
         var accountId = data.accountId;
         if (!data) {
-            throw L.ERR.DATA_NOT_EXIST;
+            throw L.ERR.DATA_NOT_EXIST();
         }
         if (data.mobile && !validate.isMobile(data.mobile)) {
             throw {code: -2, msg: "手机号格式不正确"};
@@ -128,7 +128,7 @@ class StaffModule{
             .spread(function(num, rows){
                 var staff = rows[0];
                 if (!staff) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST;
+                    throw L.ERR.ACCOUNT_NOT_EXIST();
                 }
 
                 return API.company.getCompany({companyId:staff.companyId})
@@ -171,7 +171,7 @@ class StaffModule{
                 throw {msg: "不能删除统计用户"};
             }
             if(staff["companyId"]!= target["companyId"]){
-                throw L.ERR.PERMISSION_DENY;
+                throw L.ERR.PERMISSION_DENY();
             }
             return this.delete(params);
         }else{
@@ -280,7 +280,7 @@ class StaffModule{
             let target = await Models.staff.get(id);
 
             if(staff["companyId"] != target["companyId"] ){
-                throw L.ERR.PERMISSION_DENY;
+                throw L.ERR.PERMISSION_DENY();
             }else{
                 return this.update(params)
             }
@@ -331,7 +331,7 @@ class StaffModule{
             let target = await Models.staff.get(id);
 
             if(staff["companyId"]  != target["companyId"] ){
-                throw L.ERR.PERMISSION_DENY;
+                throw L.ERR.PERMISSION_DENY();
             }else{
                 // return {staff: new Staff(target)};
                 return target;
@@ -344,7 +344,6 @@ class StaffModule{
                 throw {code: -1, msg: '无权限'};
             }
         }
-
     }
 
 
@@ -1326,7 +1325,7 @@ class StaffModule{
             let c = await API.company.getCompany({companyId: companyId, columns: ['agencyId']});
 
             if(u.agencyId != c.agencyId){
-                throw L.ERR.PERMISSION_DENY;
+                throw L.ERR.PERMISSION_DENY();
             }
             return this.statStaffByPoints({companyId: companyId});
         }

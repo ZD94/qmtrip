@@ -160,7 +160,7 @@ export function listRoles( params, callback) {
             list = getRoleList(agency_roles);
             break;
         default:
-            throw L.ERR.NOT_FOUND;
+            throw L.ERR.NOT_FOUND();
     }
     return Promise.resolve(list);
 };
@@ -191,10 +191,10 @@ export function checkPermission(params) {
         return getRoleOfAgency({accountId: accountId})
             .then(function(role){
                 if(role == undefined)
-                    throw L.ERR.NOT_FOUND;
+                    throw L.ERR.NOT_FOUND();
                 for(var p of permissions){
                     if(role.permission[p] != true)
-                        throw L.ERR.PERMISSION_DENY;
+                        throw L.ERR.PERMISSION_DENY();
                 }
                 return true;
             });
@@ -203,10 +203,10 @@ export function checkPermission(params) {
     return getRoleOfAccount({accountId: accountId})
         .then(function(role){
             if(role == undefined)
-                throw L.ERR.NOT_FOUND;
+                throw L.ERR.NOT_FOUND();
             for(var p of permissions){
                 if(role.permission.indexOf(p) < 0)
-                    throw L.ERR.PERMISSION_DENY;
+                    throw L.ERR.PERMISSION_DENY();
             }
             return true;
         });

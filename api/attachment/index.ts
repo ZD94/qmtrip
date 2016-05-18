@@ -50,7 +50,7 @@ class ApiAttachment {
         return Owner.findOne({where: {fileId: fileId, accountId: accountId}})
             .then(function(owner) {
                 if (!owner) {
-                    throw L.ERR.PERMISSION_DENY;
+                    throw L.ERR.PERMISSION_DENY();
                 }
                 return API.attachments.getAttachment({id: fileId});
             })

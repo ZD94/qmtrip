@@ -51,19 +51,19 @@ export function getTravelPolicyBudget(params: {originPlace: string, destinationP
     var inLatestArriveTime = params.inLatestArriveTime;
     var self = this;
     if (!outboundDate || !validate.isDate(outboundDate)) {
-        throw L.ERR.OUTBOUND_DATE_FORMAT_ERROR;
+        throw L.ERR.OUTBOUND_DATE_FORMAT_ERROR();
     }
 
     if (isRoundTrip && (!inboundDate || !validate.isDate(inboundDate))) {
-        throw L.ERR.INBOUND_DATE_FORMAT_ERROR;
+        throw L.ERR.INBOUND_DATE_FORMAT_ERROR();
     }
 
     if (!originPlace) {
-        throw L.ERR.CITY_NOT_EXIST;
+        throw L.ERR.CITY_NOT_EXIST();
     }
 
     if (!destinationPlace) {
-        throw L.ERR.CITY_NOT_EXIST;
+        throw L.ERR.CITY_NOT_EXIST();
     }
 
     if (!checkInDate) {
@@ -127,15 +127,15 @@ export function getHotelBudget(params: {accountId: string, cityId: string, busin
     var checkOutDate = params.checkOutDate;
 
     if (!cityId) {
-        throw L.ERR.CITY_NOT_EXIST;
+        throw L.ERR.CITY_NOT_EXIST();
     }
 
     if (!checkInDate || !validate.isDate(checkInDate)) {
-        throw L.ERR.CHECK_IN_DATE_FORMAT_ERROR;
+        throw L.ERR.CHECK_IN_DATE_FORMAT_ERROR();
     }
 
     if (!checkOutDate || !validate.isDate(checkOutDate)) {
-        throw L.ERR.CHECK_OUT_DATE_FORMAT_ERROR;
+        throw L.ERR.CHECK_OUT_DATE_FORMAT_ERROR();
     }
 
     if (new Date(checkOutDate) < new Date(checkInDate)) {
@@ -148,14 +148,14 @@ export function getHotelBudget(params: {accountId: string, cityId: string, busin
     return API.staff.getStaff({id: accountId})
         .then(function(staff) {
             if (!staff || !staff.travelLevel) {
-                throw L.ERR.TRAVEL_POLICY_NOT_EXIST;
+                throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
             }
             //查询员工差旅标准
             return API.travelPolicy.getTravelPolicy({id: staff.travelLevel})
         })
         .then(function(travelPolicy) {
             if (!travelPolicy) {
-                throw L.ERR.TRAVEL_POLICY_NOT_EXIST;
+                throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
             }
             policy = travelPolicy;
             hotelStar = 3;
@@ -349,7 +349,7 @@ export function getTrafficBudget(params: {originPlace: string, destinationPlace:
     var accountId = self.accountId;
 
     if (!params) {
-        throw new Error(L.ERR.DATA_FORMAT_ERROR);
+        throw new Error(L.ERR.DATA_FORMAT_ERROR());
     }
 
     if (!params.destinationPlace) {
@@ -372,14 +372,14 @@ export function getTrafficBudget(params: {originPlace: string, destinationPlace:
     return API.staff.getStaff({id: accountId})
         .then(function(staff) {
             if (!staff || !staff.travelLevel) {
-                throw L.ERR.TRAVEL_POLICY_NOT_EXIST;
+                throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
             }
             //查询员工差旅标准
             return API.travelPolicy.getTravelPolicy({id: staff.travelLevel})
         })
         .then(function(travelPolicy) {
             if (!travelPolicy) {
-                throw L.ERR.TRAVEL_POLICY_NOT_EXIST;
+                throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
             }
 
             return travelPolicy;

@@ -128,7 +128,7 @@ class CompanyModule {
     let agencyUser = await DBM.Agency.findById(accountId);
 
         if(!agencyUser || agencyUser.status == EAgencyStatus.DELETE) {
-            throw L.ERR.AGENCY_NOT_EXIST;
+            throw L.ERR.AGENCY_NOT_EXIST();
         }
 
         let account = await API.auth.newAccount({mobile: mobile, email: email, pwd: pwd, type: 1});
@@ -165,7 +165,7 @@ class CompanyModule {
         let company = await DBM.Company.findById(companyId, {attributes: ['createUser', 'status']});
 
         if(!company || company.status == -2){
-            throw L.ERR.COMPANY_NOT_EXIST;
+            throw L.ERR.COMPANY_NOT_EXIST();
         }
 
         params['updatedAt'] = utils.now();
@@ -195,7 +195,7 @@ class CompanyModule {
         let company = await DBM.Company.findById(params.id);
 
         if(!company || company.status == -2){
-            throw L.ERR.COMPANY_NOT_EXIST;
+            throw L.ERR.COMPANY_NOT_EXIST();
         }
 
         return new Company(company);
@@ -253,11 +253,11 @@ class CompanyModule {
         var agency = await API.agency.getAgencyUser({id: userId}, {attributes: ['agencyId', 'status', 'roleId']});
 
         if(!c || c.status == -2){
-            throw L.ERR.COMPANY_NOT_EXIST;
+            throw L.ERR.COMPANY_NOT_EXIST();
         }
 
         if(c.agencyId != agency.agencyId || agency.roleId != AGENCY_ROLE.OWNER && agency.roleId != AGENCY_ROLE.ADMIN) {
-            throw L.ERR.PERMISSION_DENY;
+            throw L.ERR.PERMISSION_DENY();
         }
 
         return true;
@@ -277,7 +277,7 @@ class CompanyModule {
         let company = await DBM.Company.findById(companyId);
 
         if(!company || company.status == ECompanyStatus.DELETE){
-            throw L.ERR.COMPANY_NOT_EXIST;
+            throw L.ERR.COMPANY_NOT_EXIST();
         }
 
         let staffs = await DBM.Staff.findAll({where: {companyId: companyId}});
@@ -338,7 +338,7 @@ class CompanyModule {
                     fundsUpdates.consume = parseFloat(consume) + money;
                     var balance : number = balance - money; //账户余额
                     if(balance < 0){
-                        throw L.ERR.BALANCE_NOT_ENOUGH; //账户余额不足
+                        throw L.ERR.BALANCE_NOT_ENOUGH(); //账户余额不足
                     }
                 }else if(type == 2){
                     if(parseFloat(frozen) < money){
@@ -350,10 +350,10 @@ class CompanyModule {
                     fundsUpdates.frozen = parseFloat(frozen) + money;
                     balance = balance - money; //账户余额
                     if(balance < 0){
-                        throw L.ERR.BALANCE_NOT_ENOUGH; //账户余额不足
+                        throw L.ERR.BALANCE_NOT_ENOUGH(); //账户余额不足
                     }
                 }else{
-                    throw L.ERR.MONEY_STATUS_ERROR;
+                    throw L.ERR.MONEY_STATUS_ERROR();
                 }
 
                 return sequelize.transaction(function(t){

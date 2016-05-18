@@ -78,7 +78,7 @@ export function pageTripPlans(params){
 
             if(query.companyId){
                 if(companyIdList.indexOf(query.companyId) == -1)
-                    throw L.ERR.PERMISSION_DENY;
+                    throw L.ERR.PERMISSION_DENY();
             } else {
                 query.companyId = {$in: companyIdList};
             }
@@ -169,7 +169,7 @@ export function approveInvoice(params){
             }
 
             if(company.target.agencyId != user.agencyId){
-                throw L.ERR.PERMISSION_DENY;
+                throw L.ERR.PERMISSION_DENY();
             }
 
             return API.tripPlan.approveInvoice(params);
@@ -343,7 +343,7 @@ export function countTripPlanNum(params){
     ])
         .spread(function(user, company){
             if(user.agencyId != company.agencyId){
-                throw L.ERR.PERMISSION_DENY;
+                throw L.ERR.PERMISSION_DENY();
             }
         })
         .then(function(){
@@ -369,7 +369,7 @@ export function statPlanOrderMoneyByAgency (params) {
     ])
         .spread(function(u, c){
             if(u.agencyId != c.agencyId){
-                throw L.ERR.PERMISSION_DENY;
+                throw L.ERR.PERMISSION_DENY();
             }
             params.companyId = companyId;
             return API.tripPlan.statPlanOrderMoney(params);

@@ -84,7 +84,7 @@ var Services = {
 };
 
 function throwNotImplemented(){
-    throw L.ERR.NOT_IMPLEMENTED;
+    throw L.ERR.NOT_IMPLEMENTED();
 }
 
 function createService<T extends Resolvable>(options: any, cacheFactory: ng.ICacheFactoryService){

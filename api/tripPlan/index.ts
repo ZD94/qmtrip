@@ -146,7 +146,7 @@ class TripPlanModule {
         });
 
         if (!order || order.orderStatus == 'DELETE') {
-            throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
+            throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST();
         }
 
         order = order.toJSON();
@@ -169,7 +169,7 @@ class TripPlanModule {
             })
             .then(function (attachment) {
                 if (!attachment) {
-                    throw L.ERR.NOT_FOUND;
+                    throw L.ERR.NOT_FOUND();
                 }
 
                 return 'data:image/jpg;base64,' + attachment.content;
@@ -214,7 +214,7 @@ class TripPlanModule {
         return DBM.TripPlan.findById(tripPlanId)
             .then(function (order) {
                 if (!order || order.status == EPlanStatus.DELETE) {
-                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
+                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST();
                 }
 
                 let logs = {
@@ -431,11 +431,11 @@ class TripPlanModule {
         return DBM.TripPlan.findById(params.tripPlanId)
             .then(function (order) {
                 if (!order || order.status == EPlanStatus.DELETE) {
-                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
+                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST();
                 }
 
                 if (order.accountId != params.accountId) {
-                    L.ERR.PERMISSION_DENY;
+                    L.ERR.PERMISSION_DENY();
                 }
 
                 if (order.status == EPlanStatus.COMMIT) {
@@ -496,11 +496,11 @@ class TripPlanModule {
             .then(function (order) {
 
                 if (!order || order.status == EPlanStatus.DELETE) {
-                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST
+                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST()
                 }
 
                 if (order.accountId != userId) { //权限不足
-                    throw L.ERR.PERMISSION_DENY;
+                    throw L.ERR.PERMISSION_DENY();
                 }
 
                 return sequelize.transaction(function (t) {
@@ -536,11 +536,11 @@ class TripPlanModule {
         return DBM.TripDetail.findById(id)
             .then(function (detail) {
                 if (!detail || detail.status == EPlanStatus.DELETE) {
-                    throw L.ERR.CONSUME_DETAIL_NOT_EXIST;
+                    throw L.ERR.CONSUME_DETAIL_NOT_EXIST();
                 }
 
                 if (detail.accountId != userId) {
-                    throw L.ERR.PERMISSION_DENY;
+                    throw L.ERR.PERMISSION_DENY();
                 }
 
                 return DBM.TripDetail.update({status: EPlanStatus.DELETE, updatedAt: utils.now()}, {
@@ -569,11 +569,11 @@ class TripPlanModule {
         return DBM.TripDetail.findById(params.consumeId)
             .then(function (custome) {
                 if (!custome || custome.status == EPlanStatus.DELETE) {
-                    throw L.ERR.NOT_FOUND;
+                    throw L.ERR.NOT_FOUND();
                 }
 
                 if (custome.accountId != params.userId) {
-                    throw L.ERR.PERMISSION_DENY;
+                    throw L.ERR.PERMISSION_DENY();
                 }
 
                 if (custome.orderStatus === 'AUDIT_PASS') {
@@ -704,7 +704,7 @@ class TripPlanModule {
         return DBM.TripPlan.findById(logs.tripPlanId)
             .then(function (order) {
                 if (!order || order.status == EPlanStatus.DELETE) {
-                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
+                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST();
                 }
 
                 if (order.status == EPlanStatus.COMPLETE) {
@@ -730,7 +730,7 @@ class TripPlanModule {
         return DBM.TripDetail.findById(params.consumeId)
             .then(function (consume) {
                 if (!consume || consume.status == EPlanStatus.DELETE)
-                    throw L.ERR.NOT_FOUND;
+                    throw L.ERR.NOT_FOUND();
 
                 if (!consume.newInvoice) {
                     throw {code: -2, msg: '没有上传票据'};
@@ -746,7 +746,7 @@ class TripPlanModule {
                 let invoiceJson = consume.invoice;
 
                 if (!order || order.status == EPlanStatus.DELETE) {
-                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
+                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST();
                 }
 
                 if (order.status === EPlanStatus.NO_COMMIT && order.auditStatus == 0) {
@@ -1025,11 +1025,11 @@ class TripPlanModule {
         ])
             .spread(function (order, list) {
                 if (!order || order.status == EPlanStatus.DELETE) {
-                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST;
+                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST();
                 }
 
                 if (order.accountId != params.accountId) {
-                    throw L.ERR.PERMISSION_DENY;
+                    throw L.ERR.PERMISSION_DENY();
                 }
 
                 if (order.status == EPlanStatus.NO_BUDGET) {
@@ -1091,7 +1091,7 @@ class TripPlanModule {
         return TripPlanModule.getVisitPermission({consumeId: consumeId, userId: accountId})
             .then(function (result) {
                 if (!result.allow) {
-                    throw L.ERR.PERMISSION_DENY;
+                    throw L.ERR.PERMISSION_DENY();
                 }
                 return DBM.TripDetail.findById(consumeId)
             })

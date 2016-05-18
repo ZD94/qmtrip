@@ -20,7 +20,7 @@ export function requirePermit(permits: string| string[], type?: number) {
             }
 
             if (!ret) {
-                throw L.ERR.PERMISSION_DENIED
+                throw L.ERR.PERMISSION_DENIED()
             }
             return fn.apply(self, args)
         }
@@ -145,7 +145,7 @@ export function conditionDecorator(checkFnList: CheckInterface[]) {
                     return thenFn(target, key, desc).value.apply(self, args)
                 }
             }
-            throw L.ERR.PERMISSION_DENY;
+            throw L.ERR.PERMISSION_DENY();
         }
         return desc;
     }

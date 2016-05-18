@@ -54,13 +54,13 @@ class ApiTripPlan {
         if (accountType === 1) { //企业员工账户
             let staff = await API.staff.getStaff({id: self.accountId, columns: ['companyId']});
             if (tripPlan.companyId != staff.companyId) {
-                throw L.ERR.PERMISSION_DENY;
+                throw L.ERR.PERMISSION_DENY();
             }
         } else {
             let {agencyId: agencyIdOfCompany} = await API.company.getCompany({companyId: tripPlan.companyId, columns: ['agencyId']});
             let {agencyId: agencyIdOfUser} = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
             if (agencyIdOfCompany != agencyIdOfUser) {
-                throw L.ERR.PERMISSION_DENY;
+                throw L.ERR.PERMISSION_DENY();
             }
         }
 
@@ -503,7 +503,7 @@ class ApiTripPlan {
         console.info("step 5...");
 
         if (agencyId != staffAgencyId) {
-            throw L.ERR.PERMISSION_DENY;
+            throw L.ERR.PERMISSION_DENY();
         }
 
         let updates:any = {id: consumeId, budget: params.budget};

@@ -62,7 +62,7 @@ class ApiAuth {
 
         //失效了
         if (timestamp<0 || nowTime - timestamp > 0) {
-            throw L.ERR.ACTIVE_URL_INVALID;
+            throw L.ERR.ACTIVE_URL_INVALID();
         }
 
         return Models.account.get(accountId)
@@ -73,7 +73,7 @@ class ApiAuth {
 
                 var needSign = makeActiveSign(account.activeToken, accountId, timestamp)
                 if (sign.toLowerCase() != needSign.toLowerCase()) {
-                    throw L.ERR.ACTIVE_URL_INVALID;
+                    throw L.ERR.ACTIVE_URL_INVALID();
                 }
 
                 account.status = ACCOUNT_STATUS.ACTIVE;
@@ -106,26 +106,26 @@ class ApiAuth {
         return Q()
             .then(function() {
                 if (!accountId) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST;
+                    throw L.ERR.ACCOUNT_NOT_EXIST();
                 }
 
                 if (!sign) {
-                    throw L.ERR.SIGN_ERROR;
+                    throw L.ERR.SIGN_ERROR();
                 }
 
                 if (!Boolean(timestamp) || timestamp < Date.now()) {
-                    throw L.ERR.TIMESTAMP_TIMEOUT;
+                    throw L.ERR.TIMESTAMP_TIMEOUT();
                 }
 
                 return Models.account.get(accountId)
                     .then(function(account) {
                         if (!account) {
-                            throw L.ERR.ACCOUNT_NOT_EXIST;
+                            throw L.ERR.ACCOUNT_NOT_EXIST();
                         }
 
                         var sysSign = makeActiveSign(account.pwdToken, account.id, timestamp);
                         if (sysSign.toLowerCase() != sign.toLowerCase()) {
-                            throw L.ERR.SIGN_ERROR;
+                            throw L.ERR.SIGN_ERROR();
                         }
                         return true;
                     })
@@ -152,7 +152,7 @@ class ApiAuth {
         return Q()
             .then(function() {
                 if (!email) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST;
+                    throw L.ERR.ACCOUNT_NOT_EXIST();
                 }
                 return email;
             })
@@ -160,7 +160,7 @@ class ApiAuth {
                 return DBM.Account.findOne({where: {email: email, type: type}})
                     .then(function(account) {
                         if (!account) {
-                            throw L.ERR.ACCOUNT_NOT_EXIST;
+                            throw L.ERR.ACCOUNT_NOT_EXIST();
                         }
                         return account;
                     })
@@ -222,11 +222,11 @@ class ApiAuth {
     //     return Promise.resolve(true)
     //         .then(function() {
     //             if (!code) {
-    //                 throw L.ERR.CODE_EMPTY;
+    //                 throw L.ERR.CODE_EMPTY();
     //             }
     //
     //             if (!ticket) {
-    //                 throw L.ERR.CODE_ERROR;
+    //                 throw L.ERR.CODE_ERROR();
     //             }
     //
     //             return API.checkcode.validatePicCheckCode({code: code, ticket: ticket});
@@ -273,19 +273,19 @@ class ApiAuth {
         return Q()
             .then(function() {
                 if (!Boolean(timestamp) || timestamp < Date.now()) {
-                    throw L.ERR.TIMESTAMP_TIMEOUT;
+                    throw L.ERR.TIMESTAMP_TIMEOUT();
                 }
 
                 if (!accountId) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST;
+                    throw L.ERR.ACCOUNT_NOT_EXIST();
                 }
 
                 if (!sign) {
-                    throw L.ERR.SIGN_ERROR;
+                    throw L.ERR.SIGN_ERROR();
                 }
 
                 if (!pwd) {
-                    throw L.ERR.PWD_EMPTY;
+                    throw L.ERR.PWD_EMPTY();
                 }
 
                 return DBM.Account.findById(accountId)
@@ -293,7 +293,7 @@ class ApiAuth {
             .then(function(account) {
                 var _sign = makeActiveSign(account.pwdToken, accountId, timestamp);
                 if (_sign.toLowerCase() != sign.toLowerCase()) {
-                    throw L.ERR.SIGN_ERROR;
+                    throw L.ERR.SIGN_ERROR();
                 }
                 pwd = utils.md5(pwd);
                 //如果从来没有设置过密码,将账号类型设为激活
@@ -329,7 +329,7 @@ class ApiAuth {
         return DBM.Account.findOne({where: {id: accountId}})
             .then(function(account) {
                 if (!account) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST;
+                    throw L.ERR.ACCOUNT_NOT_EXIST();
                 }
 
                 account.status = 1;
@@ -388,29 +388,29 @@ class ApiAuth {
     static newAccount (data: {email: string, mobile?: string, pwd?: string, type?: Number, status?: Number, companyName?: string, id?: string}) {
 
         if (!data) {
-            throw L.ERR.DATA_NOT_EXIST;
+            throw L.ERR.DATA_NOT_EXIST();
         }
 
         if (!data.email) {
-            throw L.ERR.EMAIL_EMPTY;
+            throw L.ERR.EMAIL_EMPTY();
         }
 
         if (!validate.isEmail(data.email)) {
-            throw L.ERR.EMAIL_EMPTY;
+            throw L.ERR.EMAIL_EMPTY();
         }
 
         if (data.pwd) {
             var pwd = data.pwd;
             var password = data.pwd.toString();
             pwd = md5(password);
-            //throw L.ERR.PASSWORD_EMPTY;
+            //throw L.ERR.PASSWORD_EMPTY();
         }
 
 
         var mobile = data.mobile;
         var companyName = data.companyName || '';
         if (mobile && !validate.isMobile(mobile)) {
-            throw L.ERR.MOBILE_FORMAT_ERROR;
+            throw L.ERR.MOBILE_FORMAT_ERROR();
         }
 
         var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
@@ -422,11 +422,11 @@ class ApiAuth {
             ])
             .spread(function(account1, account2) {
                 if (account1) {
-                    throw L.ERR.EMAIL_HAS_REGISTRY;
+                    throw L.ERR.EMAIL_HAS_REGISTRY();
                 }
 
                 if (account2 && account2.mobile && account2.mobile != "") {
-                    throw L.ERR.MOBILE_HAS_REGISTRY;
+                    throw L.ERR.MOBILE_HAS_REGISTRY();
                 }
                 return true;
             })
@@ -471,16 +471,16 @@ class ApiAuth {
     static login (data: {email?: string, pwd: string, type?: Number, mobile?: string}) :Promise<AuthCert>{
 
         if (!data) {
-            throw L.ERR.DATA_NOT_EXIST;
+            throw L.ERR.DATA_NOT_EXIST();
         }
         if (!data.email && !data.mobile) {
-            throw L.ERR.EMAIL_EMPTY;
+            throw L.ERR.EMAIL_EMPTY();
         }
         if (!validate.isEmail((data.email))) {
-            throw L.ERR.EMAIL_EMPTY;
+            throw L.ERR.EMAIL_EMPTY();
         }
         if (!data.pwd) {
-            throw L.ERR.PWD_EMPTY;
+            throw L.ERR.PWD_EMPTY();
         }
 
         var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
@@ -489,23 +489,23 @@ class ApiAuth {
             .then(function (loginAccount) {
                 var pwd = md5(data.pwd);
                 if (!loginAccount) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST
+                    throw L.ERR.ACCOUNT_NOT_EXIST()
                 }
 
                 if (!loginAccount.pwd && loginAccount.status == ACCOUNT_STATUS.NOT_ACTIVE) {
-                    throw L.ERR.ACCOUNT_NOT_ACTIVE;
+                    throw L.ERR.ACCOUNT_NOT_ACTIVE();
                 }
 
                 if (loginAccount.pwd != pwd) {
-                    throw L.ERR.PASSWORD_NOT_MATCH
+                    throw L.ERR.PASSWORD_NOT_MATCH()
                 }
 
                 if (loginAccount.status == ACCOUNT_STATUS.NOT_ACTIVE) {
-                    throw L.ERR.ACCOUNT_NOT_ACTIVE;
+                    throw L.ERR.ACCOUNT_NOT_ACTIVE();
                 }
 
                 if (loginAccount.status != 1) {
-                    throw L.ERR.ACCOUNT_FORBIDDEN;
+                    throw L.ERR.ACCOUNT_FORBIDDEN();
                 }
 
                 return makeAuthenticateSign(loginAccount.id)
@@ -539,11 +539,11 @@ class ApiAuth {
         // ])
         //     .spread(function(isBlackDomain, isExist) {
         //         if (isBlackDomain) {
-        //             throw L.ERR.EMAIL_IS_PUBLIC;
+        //             throw L.ERR.EMAIL_IS_PUBLIC();
         //         }
         //
         //         if (isExist) {
-        //             throw L.ERR.DOMAIN_HAS_EXIST;
+        //             throw L.ERR.DOMAIN_HAS_EXIST();
         //         }
         //
         //         return false;
@@ -578,7 +578,7 @@ class ApiAuth {
     //     }
     //
     //     if (!mobile || !validate.isMobile(mobile)) {
-    //         throw L.ERR.MOBILE_FORMAT_ERROR;
+    //         throw L.ERR.MOBILE_FORMAT_ERROR();
     //     }
     //
     //     if (!name) {
@@ -694,7 +694,7 @@ class ApiAuth {
      */
     static bindMobile (data: {accountId: string, mobile: string, code: string, pwd: string}) {
 
-        throw L.ERR.NOT_IMPLEMENTED;
+        throw L.ERR.NOT_IMPLEMENTED();
     };
 
     /**
@@ -744,7 +744,7 @@ class ApiAuth {
             })
             .spread(function(rownum, rows){
                 if(!rownum)
-                    throw L.ERR.NOT_FOUND;
+                    throw L.ERR.NOT_FOUND();
                 if(old_email == rows[0].email){
                     return rows[0];
                 }
@@ -767,7 +767,7 @@ class ApiAuth {
         return DBM.Account.findOne(options)
             .then(function(obj){
                 if(!obj)
-                    throw L.ERR.NOT_FOUND;
+                    throw L.ERR.NOT_FOUND();
                 return obj;
             });
     }
@@ -800,17 +800,17 @@ class ApiAuth {
 
         var email = params.email;
         if (!email) {
-            throw L.ERR.EMAIL_EMPTY;
+            throw L.ERR.EMAIL_EMPTY();
         }
 
         if (!validate.isEmail(email)) {
-            throw L.ERR.EMAIL_FORMAT_INVALID;
+            throw L.ERR.EMAIL_FORMAT_INVALID();
         }
 
         return DBM.Account.findOne({where: {email: email}})
             .then(function(account) {
                 if (!account) {
-                    throw L.ERR.EMAIL_NOT_REGISTRY;
+                    throw L.ERR.EMAIL_NOT_REGISTRY();
                 }
                 return _sendActiveEmail(account.id);
             })
@@ -858,11 +858,11 @@ class ApiAuth {
         let accountId = session["accountId"];
 
         if (!accountId) {
-            throw L.ERR.NEED_LOGIN;
+            throw L.ERR.NEED_LOGIN();
         }
 
         if (!oldPwd || !newPwd) {
-            throw L.ERR.PWD_EMPTY;
+            throw L.ERR.PWD_EMPTY();
         }
 
         if (oldPwd == newPwd) {
@@ -872,12 +872,12 @@ class ApiAuth {
         return DBM.Account.findById(accountId)
             .then(function(account) {
                 if (!account) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST;
+                    throw L.ERR.ACCOUNT_NOT_EXIST();
                 }
 
                 var pwd = utils.md5(oldPwd);
                 if (account.pwd != pwd) {
-                    throw L.ERR.PWD_ERROR;
+                    throw L.ERR.PWD_ERROR();
                 }
                 newPwd = newPwd.replace(/\s/g, "");
                 pwd = utils.md5(newPwd);
@@ -906,34 +906,34 @@ class ApiAuth {
         return Q()
             .then(function() {
                 if (!params) {
-                    throw L.ERR.DATA_FORMAT_ERROR;
+                    throw L.ERR.DATA_FORMAT_ERROR();
                 }
 
                 if (!accountId) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST;
+                    throw L.ERR.ACCOUNT_NOT_EXIST();
                 }
 
                 if (!sign) {
-                    throw L.ERR.SIGN_ERROR;
+                    throw L.ERR.SIGN_ERROR();
                 }
 
                 if (!Boolean(timestamp)) {
-                    throw L.ERR.TIMESTAMP_TIMEOUT;
+                    throw L.ERR.TIMESTAMP_TIMEOUT();
                 }
 
                 if (timestamp < Date.now()) {
-                    throw L.ERR.TIMESTAMP_TIMEOUT;
+                    throw L.ERR.TIMESTAMP_TIMEOUT();
                 }
 
                 return DBM.Account.findById(accountId)
             })
             .then(function(account) {
                 if (!account) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST;
+                    throw L.ERR.ACCOUNT_NOT_EXIST();
                 }
 
                 if (!account.qrcodeToken) {
-                    throw L.ERR.SIGN_ERROR;
+                    throw L.ERR.SIGN_ERROR();
                 }
 
                 var data = {
@@ -961,7 +961,7 @@ class ApiAuth {
                 }
 
                 if (!signCmpResult) {
-                    throw L.ERR.SIGN_ERROR;
+                    throw L.ERR.SIGN_ERROR();
                 }
 
                 return makeAuthenticateSign(account.id);
@@ -985,7 +985,7 @@ class ApiAuth {
         return Promise.resolve()
             .then(function(){
                 if (!Boolean(accountId)) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST;
+                    throw L.ERR.ACCOUNT_NOT_EXIST();
                 }
 
                 if (!Boolean(backUrl)) {
@@ -1000,7 +1000,7 @@ class ApiAuth {
             })
             .then(function(account) {
                 if (!account) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST;
+                    throw L.ERR.ACCOUNT_NOT_EXIST();
                 }
 
                 var qrcodeToken = getRndStr(8);
@@ -1037,7 +1037,7 @@ class ApiAuth {
         return Q()
             .then(function() {
                 if (!validate.isEmail(email)) {
-                    throw L.ERR.EMAIL_FORMAT_INVALID;
+                    throw L.ERR.EMAIL_FORMAT_INVALID();
                 }
 
                 if (type !== 1 && type !== 2) {
@@ -1098,7 +1098,7 @@ class ApiAuth {
         return DBM.Account.findById(params.id)
             .then(function(account) {
                 if (!account) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST;
+                    throw L.ERR.ACCOUNT_NOT_EXIST();
                 }
                 if(account.type == 1){
                     return L.RoleType.STAFF;
