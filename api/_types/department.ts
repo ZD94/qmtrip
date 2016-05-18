@@ -1,3 +1,4 @@
+let uuid = require("node-uuid");
 import { regApiType } from 'common/api/helper';
 import { Models } from 'api/_types';
 import {Staff} from 'api/_types/staff';
@@ -14,7 +15,7 @@ export class Department extends ModelObject{
     @Create()
     static create(): Department { return null; }
 
-    @Field({type: Types.UUID})
+    @Field({type: Types.UUID, defaultValue: uuid['v1']})
     get id(): string { return null; }
     set id(val: string) {}
 

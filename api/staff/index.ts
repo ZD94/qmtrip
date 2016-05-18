@@ -18,10 +18,11 @@ import _ = require('lodash');
 import L = require("common/language");
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
-import {validateApi, requireParams} from 'common/api/helper';
+import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_types/staff";
 import {AGENCY_ROLE} from "api/_types/agency";
 import { ServiceInterface } from 'common/model';
+import promise = require("../../common/test/api/promise/index");
 
 const staffCols = Staff['$fieldnames'];
 const papersCols = Credential['$fieldnames'];
@@ -132,6 +133,27 @@ class StaffModule{
             })
     }
 
+    @clientExport
+    static async clientCreateStaff (params): Promise<Staff> {
+        let {accountId} = Zone.current.get("session");
+        let role = await API.auth.judgeRoleById({id:accountId});
+
+        if(role == L.RoleType.STAFF){
+
+            let staff = await this.getStaff({id: accountId, columns: ['companyId']});
+            let companyId = staff.companyId;
+            params.companyId = companyId;
+            return this.createStaff(params)
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
+            if(result){
+                return this.createStaff(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
+    }
+
     /**
      * 创建staff
      */
@@ -190,6 +212,36 @@ class StaffModule{
             })
     }
 
+    @clientExport
+    static async clientDeleteStaff(params): Promise<any> {
+        let {accountId} = Zone.current.get("session");
+        let role = await API.auth.judgeRoleById({id:accountId});
+        if(role == L.RoleType.STAFF){
+            let staff = await this.getStaff({id: accountId});
+            if(this["accountId"] == params.id){
+                throw {msg: "不可删除自身信息"};
+            }
+            let target = await this.getStaff({id:params.id});
+            if(target.roleId == 0){
+                throw {msg: "企业创建人不能被删除"};
+            }
+            if(staff.roleId == target.roleId){
+                throw {msg: "不能删除统计用户"};
+            }
+            if(staff.companyId != target.companyId){
+                throw L.ERR.PERMISSION_DENY;
+            }
+            return this.deleteStaff(params);
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
+            if(result){
+                return this.deleteStaff(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
+
+    }
 
     /**
      * 更新员工
@@ -273,6 +325,36 @@ class StaffModule{
                     })
             });
     }
+
+    @clientExport
+    static async clientUpdateStaff(params) : Promise<Staff>{
+        let { accountId } = Zone.current.get("session");
+        let id = params.id;
+        let role = await API.auth.judgeRoleById({id:accountId});
+
+        if(role == L.RoleType.STAFF){
+
+            let staff = await this.getStaff({id:accountId});
+            let target = await this.getStaff({id:id});
+
+            if(staff.companyId != target.companyId){
+                throw L.ERR.PERMISSION_DENY;
+            }else{
+                return this.updateStaff(params)
+            }
+
+        }else{
+
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
+            if(result){
+                return this.updateStaff(params)
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
+
+    }
+
     /**
      * 根据id查询员工
      * @param id
@@ -295,6 +377,122 @@ class StaffModule{
             });
     }
 
+    @clientExport
+    static async clientGetStaff(params): Promise<Staff> {
+        let { accountId } = Zone.current.get("session");
+        let id = params.id;
+        let role = await API.auth.judgeRoleById({id:accountId});
+
+        if(role == L.RoleType.STAFF){
+
+            let staff = await this.getStaff({id:accountId});
+            let target = await this.getStaff({id:id});
+
+            if(staff.companyId != target.companyId){
+                throw L.ERR.PERMISSION_DENY;
+            }else{
+                // return {staff: new Staff(target)};
+                return target;
+            }
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
+            if(result){
+                return this.getStaff(params)
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
+
+    }
+
+
+    /**
+     * 根据属性查找员工id
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    static async getStaffsId(params){
+        let { accountId } = Zone.current.get("session");
+        var options : any = {};
+        options.where = _.pick(params, Object.keys(Models.Staff.attributes));
+        if(params.$or) {
+            options.where.$or = params.$or;
+        }
+        if(params.columns){
+            options.attributes = params.columns;
+        }
+        let role = await API.auth.judgeRoleById({id:accountId});
+
+        if(role == L.RoleType.STAFF){
+            let sf = await this.getStaff({id:accountId});
+            params.companyId = sf.companyId;
+            let staffs = await Models.Staff.findAll(options);
+            return staffs.map(function(s) {
+                return s.id;
+            })
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
+            if(result){
+                let staffs = await Models.Staff.findAll(options);
+                return staffs.map(function(s) {
+                    return s.id;
+                })
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
+
+    }
+
+    /**
+     * 根据属性查找员工对象
+     * @param params
+     * @returns {*}
+     */
+    /*@clientExport
+    @conditionDecorator([
+        {"if": "staff", "then": "params.companyId; _getStaff(params)"},
+        {"if": "agency"}
+    ])
+    static async getStaffs(params): promise<Staff[]> {
+        return _getStaff(params);
+    }*/
+
+    @clientExport
+    static async getStaffs(params): Promise<Staff[]>{
+        let { accountId } = Zone.current.get("session");
+        var options : any = {};
+        options.where = _.pick(params, Object.keys(Models.Staff.attributes));
+        if(params.$or) {
+            options.where.$or = params.$or;
+        }
+        if(params.columns){
+            options.attributes = params.columns;
+        }
+        let role = await API.auth.judgeRoleById({id:accountId});
+
+        if(role == L.RoleType.STAFF){
+            let sf = await this.getStaff({id:accountId});
+            params.companyId = sf.companyId;
+            let staffs = await Models.Staff.findAll(options);
+            return staffs.map(function(s) {
+                return new Staff(s);
+            })
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
+            if(result){
+                let staffs = await Models.Staff.findAll(options);
+                return staffs.map(function(s) {
+                    return new Staff(s);
+                })
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
+
+    }
+
     /**
      * 根据属性查找一个员工
      * @param params
@@ -313,34 +511,19 @@ class StaffModule{
      * 根据部门id查询部门下员工数
      * @type {getCountByDepartment}
      */
+    @clientExport
     @requireParams(["departmentId"])
     static getCountByDepartment(params: {departmentId: string}){
         return Models.Staff.count({where: {departmentId: params.departmentId, status: {$gte: EStaffStatus.ON_JOB}}})
     }
 
-    /**
-     * 根据属性查找员工
-     * @param params
-     * @returns {*}
-     */
-    static getStaffs(params): Promise<Staff[]>{
-        var options : any = {};
-        options.where = _.pick(params, Object.keys(Models.Staff.attributes));
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
-        if(params.columns){
-            options.attributes = params.columns;
-        }
-        return Models.Staff.findAll(options);
-    }
 
     /**
      * 分页查询员工集合
      * @param params 查询条件 params.company_id 企业id
      * @param options options.perPage 每页条数 options.page当前页
      */
-    static listAndPaginateStaff(params){
+    static paginateStaff(params){
         var options: any = {};
         if(params.options){
             options = params.options;
@@ -380,6 +563,29 @@ class StaffModule{
                         return new Paginate(page, perPage, result.count, result.rows);
                     });
             })
+    }
+
+    @clientExport
+    static async listAndPaginateStaff(params) {
+        let { accountId } = Zone.current.get("session");
+        let role = await API.auth.judgeRoleById({id:accountId});
+
+        if(role == L.RoleType.STAFF){
+
+            let staff = await this.getStaff({id:accountId})
+            params.companyId = staff.companyId;
+            //                let options = {perPage : 20};
+            //                params.options = options;
+            return this.paginateStaff(params);
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
+            if(result){
+                return this.paginateStaff(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
+
     }
 
     /**
@@ -445,12 +651,46 @@ class StaffModule{
             });
     }
 
+
+    /**
+     * 根据id得到积分变动记录
+     * @param params
+     * @returns {Promise<TInstance>}
+     */
+    @clientExport
+    @requireParams(["id"], ["columns"])
+    static async getPointChange(params): Promise<PointChange> {
+        let { accountId } = Zone.current.get("session");
+        let id = params.id;
+        var options: any = {};
+        if(params.columns){
+            options.attributes = params.columns
+        }
+        let role = await API.auth.judgeRoleById({id:accountId});
+
+        if(role == L.RoleType.STAFF){
+
+            return Models.PointChange.findById(id, options);
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
+            if(result){
+                return Models.PointChange.findById(id, options);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
+
+    }
+
+
     /**
      * 根据属性查找积分变动记录
      * @param params
      * @returns {*}
      */
-    static getPointChanges(params): Promise<PointChange[]>{
+    @clientExport
+    static async getPointChanges(params) {
+        let { accountId } = Zone.current.get("session");
         var options : any = {};
         options.where = _.pick(params, Object.keys(Models.PointChange.attributes));
         if(params.$or) {
@@ -459,23 +699,20 @@ class StaffModule{
         if(params.columns){
             options.attributes = params.columns;
         }
-        return Models.Staff.findAll(options);
-    }
+        let role = await API.auth.judgeRoleById({id:accountId});
 
-    @requireParams(["id"], ["columns"])
-    static getPointChange(params: {id: string, columns?: Array<string>}){
-        var id = params.id;
-        var options: any = {};
-        if(params.columns){
-            options.attributes = params.columns
+        if(role == L.RoleType.STAFF){
+
+            return Models.PointChange.findAll(options);
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
+            if(result){
+                return Models.PointChange.findAll(options);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
         }
-        return Models.PointChange.findById(id, options)
-            .then(function(pc){
-                if(!pc){
-                    throw {code: -2, msg: '员工不存在'};
-                }
-                return new PointChange(pc);
-            });
+
     }
 
     /**
@@ -483,7 +720,10 @@ class StaffModule{
      * @param params 查询条件 params.staff_id 员工id
      * @param options options.perPage 每页条数 options.page当前页
      */
+    @clientExport
     static listAndPaginatePointChange(params){
+        let { accountId } = Zone.current.get("session");
+        params.staffId = accountId;
         var options: any = {};
         if(params.options){
             options = params.options;
@@ -520,7 +760,7 @@ class StaffModule{
      * @param options
      * @returns {*}
      */
-    static  getStaffPointsChangeByMonth (params) {
+    static  staffPointsChangeByMonth (params) {
         var q1: any  = _.pick(params, ['companyId', 'staffId']);
         var q2: any   = _.pick(params, ['companyId', 'staffId']);
         var q3: any  = _.pick(params, ['companyId', 'staffId']);
@@ -568,6 +808,29 @@ class StaffModule{
     }
 
     /**
+     * @method getStaffPointsChangeByMonth
+     * 获取企业或员工月度积分变动统计(增加、消费、积分余额)
+     * @param params.staffId //可选参数，如果不写则查询当前企业所有员工的积分统计
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    static async getStaffPointsChangeByMonth(params) {
+        let { accountId } = Zone.current.get("session");
+        return API.staff.getStaff({id: accountId, columns: ['companyId']})
+            .then(function(staff){
+                return staff.companyId;
+            })
+            .then(function(companyId){
+                params.companyId = companyId;
+                let count = params.count;
+                typeof count == 'number' ? "" : count = 6;
+                params.count = count;
+                return this.staffPointsChangeByMonth(params);
+            })
+    }
+
+    /**
      * 获取某个时间段员工的积分变动
      * @param params
      * @param params.staffId  员工id
@@ -575,8 +838,11 @@ class StaffModule{
      * @param params.endTime  结束时间
      * @returns {*|Promise}
      */
+    @clientExport
     @requireParams(['staffId'], ["startTime", "endTime"])
     static getStaffPointsChange(params){
+        let { accountId } = Zone.current.get("session");
+        params.staffId = accountId;
         var staffId = params.staffId;
         var startTime = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
         var endTime = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
@@ -606,8 +872,10 @@ class StaffModule{
      * @param params
      * @returns {*}
      */
+    @clientExport
     static beforeImportExcel(params){
-        var userId = params.accountId;
+        let { accountId } = Zone.current.get("session");
+        var userId = accountId;
         var fileId = params.fileId;
 //    var obj = nodeXlsx.parse(fileUrl);
         var travalPolicies: any = {};
@@ -811,8 +1079,10 @@ class StaffModule{
      * @param params
      * @returns {*}
      */
+    @clientExport
     @requireParams(['addObj'])
     static importExcelAction(params: {addObj: Array<string>}){
+        let { accountId } = Zone.current.get("session");
         var data = params.addObj;
         var noAddObj = [];
         var addObj = [];
@@ -855,6 +1125,8 @@ class StaffModule{
      */
     @requireParams(['accountId', 'objAttr'])
     static downloadExcle (params){
+        let { accountId } = Zone.current.get("sessiom");
+        params.accountId = accountId;
         fs.exists(config.upload.tmpDir, function (exists) {
             if(!exists){
                 fs.mkdir(config.upload.tmpDir);
@@ -901,7 +1173,7 @@ class StaffModule{
      * @returns {*}
      */
     @requireParams(['companyId'], ['startTime', 'endTime'])
-    static statisticStaffs(params){
+    static statisticStaffsByTime(params){
         var companyId = params.companyId;
         var start = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
         var end = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
@@ -922,13 +1194,40 @@ class StaffModule{
                     })
             });
     }
+
+    @clientExport
+    static async statisticStaffs(params){
+        let { accountId } = Zone.current.get("session");
+        let user_id = accountId;
+        let role = await API.auth.judgeRoleById({id:user_id});
+
+        if(role == L.RoleType.STAFF){
+            let staff= await this.getStaff({id: user_id});
+            if(staff){
+                let companyId = staff.companyId;
+                params.companyId = companyId;
+                return this.statisticStaffsByTime(params);
+            }else{
+                throw {msg:"无权限"};
+            }
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
+            if(result){
+                return this.statisticStaffsByTime(params);
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
+
+    }
+
     /**
      * 得到企业管理员 普通员工 未激活人数
      * @param params
      * @returns {*}
      */
     @requireParams(['companyId'], ["departmentId"])
-    static statisticStaffsRole(params: {companyId: string, departmentId?: string}){
+    static statisticStaffsByRole(params: {companyId: string, departmentId?: string}){
         var where: any = {};
         var companyId = params.companyId;
         var departmentId = params.departmentId;
@@ -973,38 +1272,76 @@ class StaffModule{
     }
 
     /**
+     * @method API.staff.statisticStaffsRole
+     * 统计企业管理员 普通员工 未激活人数
+     * @param params
+     * @param {uuid} params.companyId
+     * @returns {promise} {adminNum: '管理员人数', commonStaffNum: '普通员工人数', unActiveNum: '未激活人数'};
+     */
+    @clientExport
+    static async statisticStaffsRole(params){
+        let { accountId } = Zone.current.get("session");
+        let user_id = accountId;
+        let role = await API.auth.judgeRoleById({id:user_id});
+
+        if(role == L.RoleType.STAFF){
+            let staff = await API.staff.getStaff({id: user_id, columns: ['companyId']});
+            if(staff){
+                let companyId = staff.companyId;
+                params.companyId = companyId;
+                return this.statisticStaffsByRole(params);
+            }else{
+                throw {msg:"无权限"};
+            }
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
+            if(result){
+                return this.statisticStaffsByRole(params);
+            }else{
+                throw {msg: '无权限'};
+            }
+        }
+
+    }
+
+    /**
      * 统计企业内的员工总数
      * @param params
      * @returns {*}
      */
+    @clientExport
     @requireParams(['companyId'])
-    static getStaffCountByCompany (params: {companyId: string}){
-        var companyId = params.companyId;
-        return Models.Staff.count({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}})
-            .then(function(all){
-                return all || 1;
-            });
+    static async getStaffCountByCompany(params: {companyId: string}){
+        let { accountId } = Zone.current.get("session");
+        let user_id = accountId;
+        let companyId = params.companyId;
+        let role = await API.auth.judgeRoleById({id:user_id});
+
+        if(role == L.RoleType.STAFF){
+            let staff = await API.staff.getStaff({id: user_id});
+            if(staff){
+                companyId = staff.companyId;
+                return Models.Staff.count({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}})
+                    .then(function(all){
+                        return all || 1;
+                    });
+            }else{
+                throw {msg:"无权限"};
+            }
+        }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
+            if(result){
+                return Models.Staff.count({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}})
+                    .then(function(all){
+                        return all || 1;
+                    });
+            }else{
+                throw {code: -1, msg: '无权限'};
+            }
+        }
+
     }
 
-    /**
-     * 查询企业部门(可能现在没用了)
-     * @param params
-     * @returns {*}
-     */
-    @requireParams(['companyId'])
-    static getDistinctDepartment(params: {companyId: string}){
-        var departmentAttr = [];
-        var companyId = params.companyId;
-        return Models.Staff.findAll({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}, attributes:[[sequelize.literal('distinct department'),'department']]})
-            .then(function(departments){
-                for(var i=0;i<departments.length;i++){
-                    if(departments[i] && departments[i].department){
-                        departmentAttr.push(departments[i].department);
-                    }
-                }
-                return departmentAttr;
-            });
-    }
 
     /**
      * 删除企业的所有员工
@@ -1058,7 +1395,7 @@ class StaffModule{
      * @param params
      */
     @requireParams(['companyId'])
-    static statStaffPoints(params: {accountId: string}){
+    static statStaffByPoints(params: {companyId: string}){
         var query = params;
         return Q.all([
                 Models.Staff.sum('total_points', {where: query}),
@@ -1070,6 +1407,27 @@ class StaffModule{
                     balancePoints: balance || 0
                 }
             })
+    }
+
+    @clientExport
+    static async statStaffPoints(params){
+        let { accountId } = Zone.current.get("session");
+        let role = await API.auth.judgeRoleById({id:accountId});
+
+        if(role == L.RoleType.STAFF){
+            let staff = await this.getStaff({id: accountId, columns: ['companyId']});
+            return this.statStaffByPoints({companyId: staff.companyId});
+        }else{
+            let companyId = params.companyId;
+            let u = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
+            let c = await API.company.getCompany({companyId: companyId, columns: ['agencyId']});
+
+            if(u.agencyId != c.agencyId){
+                throw L.ERR.PERMISSION_DENY;
+            }
+            return this.statStaffByPoints({companyId: companyId});
+        }
+
     }
 
     static deleteAllStaffByTest(params){
@@ -1093,8 +1451,11 @@ class StaffModule{
      * @param params
      * @returns {*}
      */
+    @clientExport
     @requireParams(['type', 'idNo', 'ownerId'], ['validData', 'birthday'])
     static createPapers(params): Promise<Credential>{
+        let { accountId } = Zone.current.get("session");
+        params.ownerId = accountId;
         //查询该用户该类型证件信息是否已经存在 不存在添加 存在则修改
         return Models.Credential.findOne({where: {type: params.type, ownerId: params.ownerId}})
             .then(function(result){
@@ -1102,18 +1463,6 @@ class StaffModule{
                     return Models.Credential.create(params);
                 }
                 return result.update(params);
-                /*if(result){
-                 return result.update(params);
-                 /!*var options = {};
-                 options.where = {type: params.type, ownerId: params.ownerId};
-                 options.returning = true;
-                 return Models.Credential.update(params, options)
-                 .spread(function(rownum, rows){
-                 return rows[0];
-                 })*!/;
-                 }else{
-                 return Models.Credential.create(params);
-                 }*/
             })
             .then(function(data){
                 return new Credential(data);
@@ -1125,8 +1474,11 @@ class StaffModule{
      * @param params
      * @returns {*}
      */
+    @clientExport
     @requireParams(['id'])
-    static deletePapers(params: {id: string}): Promise<any>{
+    static deletePapers(params): Promise<any>{
+        let { accountId } = Zone.current.get("session")
+        params.ownerId = accountId;
         return Models.Credential.destroy({where: params})
             .then(function(obj){
                 return true;
@@ -1138,8 +1490,16 @@ class StaffModule{
      * @param params
      * @returns {*}
      */
+    @clientExport
     @requireParams(['id'], ['type', 'idNo', 'ownerId', 'validData', 'birthday'])
-    static updatePapers(params): Promise<Credential>{
+    static async updatePapers(params): Promise<Credential>{
+        let { accountId } = Zone.current.get("session");
+        let ma = await this.getPapersById({id: params.id});
+        if(ma["ownerId"] != accountId){
+            throw {code: -1, msg: '无权限'};
+        }
+        params.ownerId = accountId;
+
         var id = params.id;
         delete params.id;
         var options: any = {};
@@ -1155,11 +1515,12 @@ class StaffModule{
      * @param {String} params.id
      * @returns {*}
      */
+    @clientExport
     @requireParams(['id'], ['attributes'])
     static getPapersById(params): Promise<Credential>{
-        //return Models.Credential.findById(params.id);
+        let { accountId } = Zone.current.get("session");
         var options: any = {};
-        options.where = {id: params.id};
+        options.where = {id: params.id, ownerId: accountId};
         options.attributes = params.attributes? ['*'] :params.attributes;
         return Models.Credential.findOne(options)
             .then(function(data){
@@ -1174,8 +1535,11 @@ class StaffModule{
      * @param {integer} params.type
      * @returns {*}
      */
+    @clientExport
     @requireParams(['ownerId', 'type'], ['attributes'])
     static getOnesPapersByType(params): Promise<Credential>{
+        let { accountId } = Zone.current.get("session");
+        params.ownerId = accountId;
         var options:any = {};
         options.where = {ownerId: params.ownerId, type: params.type};
         options.attributes = params.attributes? ['*'] :params.attributes;
@@ -1190,11 +1554,12 @@ class StaffModule{
      * @param params
      * @returns {*}
      */
+    @clientExport
     @requireParams(['ownerId'], ['attributes'])
     static getPapersByOwner(params): Promise<any[]>{
-        //return Models.Credential.findAll({where: {ownerId: params.ownerId}});
+        let { accountId } = Zone.current.get("session");
         var options: any = {};
-        options.where = {ownerId: params.ownerId};
+        options.where = {ownerId: accountId};
         options.attributes = params.attributes? ['*'] :params.attributes;
         return Models.Credential.findAll(options);
     }

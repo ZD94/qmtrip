@@ -1,6 +1,6 @@
 import { CachedService, requireAPI } from 'common/model';
 import { TravelPolicy } from 'api/_types/travelPolicy';
-import ApiTravelPolicy = require('api/client/travelPolicy')
+import ApiTravelPolicy = require('api/travelPolicy')
 export class TravelPolicyService extends CachedService<TravelPolicy>{
     constructor($cacheFactory: ng.ICacheFactoryService){
         super($cacheFactory('travelPolicy'));

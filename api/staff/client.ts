@@ -1,7 +1,7 @@
 
 import { CachedService, requireAPI } from 'common/model';
 import { Staff, Credential, PointChange } from 'api/_types/staff';
-import ApiStaff = require('api/client/staff');
+import ApiStaff = require('api/staff');
 import L = require("common/language");
 
 export class StaffService extends CachedService<Staff>{
@@ -19,7 +19,7 @@ export class StaffService extends CachedService<Staff>{
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiStaff>('staff');
-        return api.getStaffs(where);
+        return api.getStaffsId(where);
     }
     async $update(id: string, fields: Object): Promise<any> {
         var api = await requireAPI<typeof ApiStaff>('staff');
@@ -47,7 +47,7 @@ export class CredentialService extends CachedService<Credential>{
     }
     async $find(where: any): Promise<string[]>{
         var api = await requireAPI<typeof ApiStaff>('staff');
-        return api.getOnesPapers(where);
+        return api.getPapersByOwner(where);
     }
     async $update(id: string, fields: Object): Promise<any> {
         var api = await requireAPI<typeof ApiStaff>('staff');
