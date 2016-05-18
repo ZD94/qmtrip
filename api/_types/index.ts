@@ -1,4 +1,4 @@
-import { ServiceInterface, ServiceDelegate } from 'common/model.client';
+import { ServiceInterface, ServiceDelegate } from 'common/model';
 
 import { Company, MoneyChange } from "./company";
 import { Staff, Credential, PointChange } from "./staff";
