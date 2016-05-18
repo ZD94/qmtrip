@@ -54,20 +54,24 @@ export async function IndexController($scope,Menu,$ionicPopup, Models){
     var staff = await Models.staff.get(Cookie.get('user_id'));
     var policy = await staff.getTravelPolicy();
     $scope.alertShow = function () {
-        var show = $ionicPopup.alert({
-            title: '差旅标准',
-            template: '飞机:' +policy.planeLevel +
-            '<br>' +
-            '火车:' +policy.trainLevel +
-            '<br>' +
-            '住宿:'+policy.hotelLevel +
-            '<br>' +
-            '补助:5000/天'
-        })
-    }
-    console.info(staff);
-    console.info(policy);
-
+        if(policy){   //判断是否设置差旅标准
+            var show = $ionicPopup.alert({
+                title: '差旅标准',
+                template: '飞机:' +policy.planeLevel +
+                '<br>' +
+                '火车:' +policy.trainLevel +
+                '<br>' +
+                '住宿:'+policy.hotelLevel +
+                '<br>' +
+                '补助:5000/天'
+            })
+        }else{
+            var show = $ionicPopup.alert({   //定义show的原因是避免页面加载就执行
+                title:'提示',
+                template:'暂未设置差旅标准,请设置后查看'
+            })
+        }
+    };
     let company = staff.company;
     // console.info(company);
     // let agency = await company.getAgency();
