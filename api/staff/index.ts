@@ -282,14 +282,14 @@ class StaffModule{
             if(staff["companyId"] != target["companyId"] ){
                 throw L.ERR.PERMISSION_DENY();
             }else{
-                return this.update(params)
+                return StaffModule.update(params)
             }
 
         }else{
 
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
-                return this.update(params)
+                return StaffModule.update(params)
             }else{
                 throw {code: -1, msg: '无权限'};
             }
