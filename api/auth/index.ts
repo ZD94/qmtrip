@@ -51,7 +51,7 @@ class ApiAuth {
      * @return {Promise}
      * @public
      */
-    static activeByEmail (data) {
+    static activeByEmail (data: {sign: string, accountId: string, timestamp: number}) {
 
         var sign = data.sign;
         var accountId = data.accountId;
@@ -59,7 +59,7 @@ class ApiAuth {
         var nowTime = Date.now();
 
         //失效了
-        if (!timestamp || nowTime - timestamp > 0) {
+        if (timestamp<0 || nowTime - timestamp > 0) {
             throw L.ERR.ACTIVE_URL_INVALID;
         }
 
@@ -96,7 +96,7 @@ class ApiAuth {
      * @param {String} params.accountId 账户ID
      * @return {Promise}
      */
-    static checkResetPwdUrlValid (params) {
+    static checkResetPwdUrlValid (params: {sign: string, timestamp: number, accountId: string}) {
 
         var accountId = params.accountId;
         var sign = params.sign;
@@ -112,7 +112,7 @@ class ApiAuth {
                     throw L.ERR.SIGN_ERROR;
                 }
 
-                if (!timestamp || timestamp < Date.now()) {
+                if (!Boolean(timestamp) || timestamp < Date.now()) {
                     throw L.ERR.TIMESTAMP_TIMEOUT;
                 }
 
@@ -142,7 +142,7 @@ class ApiAuth {
      * @param {String} params.companyName 公司名称
      * @returns {Promise} true|error
      */
-    static sendResetPwdEmail (params) {
+    static sendResetPwdEmail (params: {email: string, type?: Number, isFirstSet?: boolean, companyName?: string}) {
 
         var email = params.email;
         var isFirstSet = params.isFirstSet;
@@ -226,7 +226,7 @@ class ApiAuth {
      * @param {String} params.pwd 新密码
      * @return {Promise} true|error
      */
-    static resetPwdByEmail (params) {
+    static resetPwdByEmail (params: {accountId: string, sign: string, timestamp: number, pwd: string}) {
 
         var accountId = params.accountId;
         var sign = params.sign;
@@ -235,7 +235,7 @@ class ApiAuth {
 
         return Q()
             .then(function() {
-                if (!timestamp || timestamp < Date.now()) {
+                if (!Boolean(timestamp) || timestamp < Date.now()) {
                     throw L.ERR.TIMESTAMP_TIMEOUT;
                 }
 
@@ -280,7 +280,7 @@ class ApiAuth {
      * @param {UUID} data.accountId 账号ID
      * @return {Promise}
      */
-    static active (data) {
+    static active (data: {accountId: string}) {
 
         var accountId = data.accountId;
         return DBM.Account.findOne({where: {id: accountId}})
@@ -310,7 +310,7 @@ class ApiAuth {
      * @return {Promise}
      * @public
      */
-    static remove (data) {
+    static remove (data: {accountId: string, email: string, mobile?: string, type?: Number}) {
 
         var accountId = data.accountId;
         var email = data.email;
@@ -342,7 +342,7 @@ class ApiAuth {
      * @return {Promise} {accountId: 账号ID, email: "邮箱", status: "状态"}
      * @public
      */
-    static newAccount (data) {
+    static newAccount (data: {email: string, mobile?: string, pwd?: string, type?: Number, status?: Number, companyName?: string, id?: string}) {
 
         if (!data) {
             throw L.ERR.DATA_NOT_EXIST;
@@ -424,7 +424,7 @@ class ApiAuth {
      * @return {Promise} {code:0, msg: "ok", data: {user_id: "账号ID", token_sign: "签名", token_id: "TOKEN_ID", timestamp:"时间戳"}
      * @public
      */
-    static login (data) {
+    static login (data: {email?: string, pwd: string, type?: Number, mobile?: string}) {
 
         if (!data) {
             throw L.ERR.DATA_NOT_EXIST;
@@ -499,10 +499,11 @@ class ApiAuth {
      * @param {String} params.tokenSign
      * @return {Promise} {code:0, msg: "Ok"}
      */
-    static authentication (params) {
+    static authentication (params: {userId?: string, user_id?: string, tokenId?: string,
+        token_id?: string, timestamp: number, tokenSign?: string, token_sign?: string}) {
 
         if ((!params.userId && !params.user_id) || (!params.tokenId && !params.token_id)
-            || !params.timestamp || (!params.tokenSign && !params.token_sign)) {
+            || !Boolean(params.timestamp) || (!params.tokenSign && !params.token_sign)) {
             return Promise.resolve(false);
         }
         var userId = params.userId || params.user_id;
@@ -537,7 +538,7 @@ class ApiAuth {
      * @param {String} data.pwd 登录密码
      * @return {Promise} true||error;
      */
-    static bindMobile (data) {
+    static bindMobile (data: {accountId: string, mobile: string, code: string, pwd: string}) {
 
         throw L.ERR.NOT_IMPLEMENTED;
     };
@@ -547,7 +548,7 @@ class ApiAuth {
      * @param id
      * @returns {*}
      */
-    static getAccount (params) {
+    static getAccount (params: {id: string, attributes?: string[], type?: Number}) {
 
         var id = params.id;
         var attributes = params.attributes;
@@ -571,7 +572,7 @@ class ApiAuth {
      * @param companyName
      * @returns {*}
      */
-    static updateAccount(id, data, companyName){
+    static updateAccount(id: string, data: any, companyName?: string){
         if(!id){
             throw {code: -1, msg: "id不能为空"};
         }
@@ -605,7 +606,7 @@ class ApiAuth {
      * @param params
      * @returns {*}
      */
-    static findOneAcc (params) {
+    static findOneAcc (params: any) {
 
         var options: any = {};
         options.where = params;
@@ -622,7 +623,7 @@ class ApiAuth {
      * @param params
      * @returns {*}
      */
-    static checkAccExist (params) {
+    static checkAccExist (params: any) {
 
         var options: any = {};
         options.where = params;
@@ -640,7 +641,7 @@ class ApiAuth {
      * @param {String} params.email 要发送的邮件
      * @return {Promise} true||error
      */
-    static sendActiveEmail (params) {
+    static sendActiveEmail (params: {email: string}) {
 
         var email = params.email;
         if (!email) {
@@ -670,7 +671,7 @@ class ApiAuth {
      * @param {UUID} params.tokenId
      * @return {Promise}
      */
-    static logout (params) {
+    static logout (params: {accountId: string, tokenId: string}) {
 
         var accountId = params.accountId;
         var tokenId = params.tokenId;
@@ -694,7 +695,7 @@ class ApiAuth {
      * @param {String} params.newPwd 新密码
      * @return {Promise}
      */
-    static resetPwdByOldPwd (params) {
+    static resetPwdByOldPwd (params: {oldPwd: string, newPwd: string, accountId: string}) {
 
         var oldPwd = params.oldPwd;
         var newPwd = params.newPwd;
@@ -740,7 +741,7 @@ class ApiAuth {
      * @param {String} params.timestamp 失效时间戳
      * @return {Promise}
      */
-    static qrCodeLogin (params) {
+    static qrCodeLogin (params: {accountId: string, sign: string, timestamp: number, backUrl?: string}) {
 
         var accountId = params.accountId;
         var sign = params.sign;
@@ -760,7 +761,7 @@ class ApiAuth {
                     throw L.ERR.SIGN_ERROR;
                 }
 
-                if (!timestamp) {
+                if (!Boolean(timestamp)) {
                     throw L.ERR.TIMESTAMP_TIMEOUT;
                 }
 
@@ -818,7 +819,7 @@ class ApiAuth {
      * @param {String} params.accountId 账号ID
      * @param {String} params.backUrl
      */
-    static getQRCodeUrl (params) {
+    static getQRCodeUrl (params: {accountId: string, backUrl: string}) {
 
         var accountId = params.accountId;
         var backUrl = params.backUrl;
@@ -874,11 +875,7 @@ class ApiAuth {
      * @param {Integer} [params.type] 1.企业  2.代理商 默认 1
      * @reutnr {Promise} true 使用 false未使用
      */
-    static isEmailUsed (params) {
-
-        if (!params) {
-            params = {};
-        }
+    static isEmailUsed (params: {email: string, type?: Number}) {
         var email = params.email;
         var type = params.type;
 
@@ -907,19 +904,21 @@ class ApiAuth {
      * @type {saveOrUpdateOpenId}
      */
     @requireParams(['accountId', 'openId'], [])
-    static saveOrUpdateOpenId(params) {
+    static saveOrUpdateOpenId(params: {accountId: string, openId: string}) {
         if(params.accountId == undefined) {
             throw {code: -1, msg: 'accountId不能为空'};
         }
-        params.createdAt = utils.now();
+        let _params: any;
+        _params = params;
+        _params.createdAt = utils.now();
 
-        return AccountOpenid.findById(params.openId)
+        return AccountOpenid.findById(_params.openId)
             .then(function(ap) {
                 if(ap) {
                     return ap;
                 }
 
-                return AccountOpenid.create(params);
+                return AccountOpenid.create(_params);
             })
     }
 
@@ -928,7 +927,7 @@ class ApiAuth {
      * @type {getAccountIdByOpenId}
      */
     @requireParams(["openId"])
-    static getAccountIdByOpenId(params) {
+    static getAccountIdByOpenId(params: {openId: string}) {
         return AccountOpenid.findById(params.openId)
             .then(function(ret) {
                 if(ret) {
@@ -940,7 +939,7 @@ class ApiAuth {
     }
 
     @requireParams(["id"])
-    static judgeRoleById(params){
+    static judgeRoleById(params: {id: string}){
         return DBM.Account.findById(params.id)
             .then(function(account) {
                 if (!account) {
@@ -954,7 +953,7 @@ class ApiAuth {
             })
     }
 
-    static __initHttpApp (app) {
+    static __initHttpApp (app: any) {
 
         //二维码自动登录
         app.all("/auth/qrcode-login", function(req, res, next) {
