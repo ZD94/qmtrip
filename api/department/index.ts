@@ -13,30 +13,7 @@ import { ServiceInterface } from 'common/model';
 
 const departmentCols = Department['$fieldnames'];
 
-/*
-class DepartmentService implements ServiceInterface<Department>{
-    async create(obj: Object): Promise<Department>{
-        return API.department.createDepartment(obj);
-    }
-    async get(id: string): Promise<Department>{
-        return API.department.getDepartment({id: id});
-    }
-    async find(where: any): Promise<Department[]>{
-        return API.department.getDepartments(where);
-    }
-    async update(id: string, fields: Object): Promise<any> {
-        fields[id] = id;
-        return API.department.updateDepartment(fields);
-    }
-    async destroy(id: string): Promise<any> {
-        return API.department.deleteDepartment({id: id});
-    }
-}
-*/
-
 class DepartmentModule{
-
-    //static DepartmentService = DepartmentService;
     /**
      * 创建部门
      * @param data

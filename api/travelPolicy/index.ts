@@ -15,30 +15,8 @@ import { TravelPolicy } from 'api/_types/travelPolicy';
 
 const travalPolicyCols = TravelPolicy['$fieldnames'];
 
-/*
-class TravelPolicyService implements ServiceInterface<TravelPolicy>{
-    async create(obj: Object): Promise<TravelPolicy>{
-        return API.travalPolicy.create(obj);
-    }
-    async get(id: string): Promise<TravelPolicy>{
-        return API.travalPolicy.getTravelPolicy({id: id});
-    }
-    async find(where: any): Promise<TravelPolicy[]>{
-        return API.travalPolicy.getTravelPolicies(where);
-    }
-    async update(id: string, fields: Object): Promise<any> {
-        fields[id] = id;
-        return API.travalPolicy.updateTravelPolicy(fields);
-    }
-    async destroy(id: string): Promise<any> {
-        return API.travalPolicy.deleteTravelPolicy({id: id});
-    }
-}
-*/
 
 class TravelPolicyModule{
-
-    //static TravelPolicyService = TravelPolicyService;
     /**
      * 创建差旅标准
      * @param data

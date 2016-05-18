@@ -27,68 +27,7 @@ const staffCols = Staff['$fieldnames'];
 const papersCols = Credential['$fieldnames'];
 const pointChangeCols = PointChange['$fieldnames'];
 
-/*
- class StaffService implements ServiceInterface<Staff>{
-    async create(obj: Object): Promise<Staff>{
-        return API.staff.createStaff(obj);
-    }
-    async get(id: string): Promise<Staff>{
-        return API.staff.getStaff({id: id});
-    }
-    async find(where: any): Promise<Staff[]>{
-        return API.staff.getStaffs(where);
-    }
-    async update(id: string, fields: Object): Promise<any> {
-        fields[id] = id;
-        return API.staff.updateStaff(fields);
-    }
-    async destroy(id: string): Promise<any> {
-        return API.staff.deleteStaff({id: id});
-    }
-}
-
- class CredentialService implements ServiceInterface<Credential>{
-    async create(obj: Object): Promise<Credential>{
-        return API.staff.createPapers(obj);
-    }
-    async get(id: string): Promise<Credential>{
-        return API.staff.getPapersById({id: id});
-    }
-    async find(where: any): Promise<Credential[]>{
-        return API.staff.getPapersByOwner(where);
-    }
-    async update(id: string, fields: Object): Promise<any> {
-        fields[id] = id;
-        return API.staff.updatePapers(fields);
-    }
-    async destroy(id: string): Promise<any> {
-        return API.staff.deletePapers({id: id});
-    }
-}
-
- class PointChangeService implements ServiceInterface<PointChange>{
-    async create(obj: Object): Promise<PointChange>{
-        throw L.ERR.NOP_METHOD;
-    }
-    async get(id: string): Promise<PointChange>{
-        return API.staff.getPointChange({id: id});
-    }
-    async find(where: any): Promise<PointChange[]>{
-        return API.staff.getPointChanges(where);
-    }
-    async update(id: string, fields: Object): Promise<any> {
-        throw L.ERR.NOP_METHOD;
-    }
-    async destroy(id: string): Promise<any> {
-        throw L.ERR.NOP_METHOD;
-}
-}
-*/
-
 class StaffModule{
-    //static StaffService = StaffService;
-    //static CredentialService = CredentialService;
-    //static PointChangeService = PointChangeService;
     /**
      * 创建员工
      * @param data

@@ -23,49 +23,7 @@ let AGENCY_ROLE = {OWNER: 0, COMMON: 1, ADMIN: 2};
 let companyCols = Company['$fieldnames'];
 // let fundsAccountCols = Object.keys(Models.FundsAccounts.attributes);
 
-/*
-class CompanyService implements ServiceInterface<Company>{
-    async create(obj: Object): Promise<Company>{
-        return API.company.createCompany(obj);
-    }
-    async get(id: string): Promise<Company>{
-        return API.company.getCompany(id);
-    }
-    async find(where: any): Promise<Company[]>{
-        return API.company.listCompany(where);
-    }
-    async update(id: string, fields: Object): Promise<any> {
-        fields['companyId'] = id;
-        return API.company.updateCompany(fields);
-    }
-    async destroy(id: string): Promise<any> {
-        return API.company.deleteCompany({companyId: id});
-    }
-}
-
-class MoneyChangeService implements ServiceInterface<MoneyChange>{
-    async create(obj: Object): Promise<MoneyChange>{
-        return API.company.saveMoneyChange(obj);
-    }
-    async get(id: string): Promise<MoneyChange>{
-        return API.company.getMoneyChange(id);
-    }
-    async find(where: any): Promise<MoneyChange[]>{
-        return API.company.findMoneyChange(where);
-    }
-    async update(id: string, fields: Object): Promise<any> {
-        throw {code: -2, msg: '不能更新记录'};
-    }
-    async destroy(id: string): Promise<any> {
-        throw {code: -2, msg: '不能删除记录'};
-    }
-}
-*/
-
 class CompanyModule {
-    //static CompanyService = CompanyService;
-    //static MoneyChangeService = MoneyChangeService;
-
     /**
      * 域名是否已被占用
      *

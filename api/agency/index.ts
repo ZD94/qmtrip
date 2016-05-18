@@ -18,54 +18,10 @@ import {requirePermit} from "../_decorator";
 import async = Q.async;
 let logger = new Logger("agency");
 
-/*
-class AgencyService implements ServiceInterface<Agency>{
-    async create(obj: Object): Promise<Agency>{
-        return API.agency.create(obj);
-    }
-    async get(id: string): Promise<Agency>{
-        return API.agency.getAgency({agencyId: id});
-    }
-    async find(where: any): Promise<Agency[]>{
-        return API.agency.listAgency(where);
-    }
-    async update(id: string, fields: Object): Promise<any> {
-        fields['agencyId'] = id;
-        return API.agency.updateAgency(fields);
-    }
-    async destroy(id: string): Promise<any> {
-
-        return API.agency.deleteAgency({agencyId: id});
-    }
-}
-
-class AgencyUserService implements ServiceInterface<AgencyUser>{
-    async create(obj: Object): Promise<AgencyUser>{
-        return API.agency.createAgencyUser(obj);
-    }
-    async get(id: string): Promise<AgencyUser>{
-        return API.agency.getAgencyUser(id);
-    }
-    async find(where: any): Promise<AgencyUser[]>{
-        return API.agency.listAndPaginateAgencyUser(where);
-    }
-    async update(id: string, fields: Object): Promise<any> {
-        fields['id'] = id;
-        return API.agency.updateAgencyUser(fields);
-    }
-    async destroy(id: string): Promise<any> {
-        return API.agency.deleteAgencyUser({id: id});
-    }
-}
-*/
-
 let agencyCols = Agency['$fieldnames'];
 let agencyUserCols = AgencyUser['$fieldnames'];
 
 class AgencyModule {
-    //static AgencyService = AgencyService;
-    //static AgencyUserService = AgencyUserService;
-
     /**
      * @method createAgency
      * 创建代理商
