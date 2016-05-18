@@ -1,4 +1,4 @@
-import {requirePermit} from "../_decorator";
+import {requirePermit, conditionDecorator, condition} from "../_decorator";
 /**
  * Created by yumiao on 15-12-9.
  */
@@ -229,6 +229,10 @@ class CompanyModule {
      */
     @clientExport
     @requireParams(['id'])
+    @conditionDecorator([
+        {if: condition.isMyCompany("0.id")},
+        {if: condition.isCompanyAgency("0.id")}
+    ])
     static async getCompany(params: {id: string}): Promise<Company>{
         let company = await Models.Company.findById(params.id);
 

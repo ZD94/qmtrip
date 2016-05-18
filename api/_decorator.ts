@@ -9,29 +9,20 @@ const Models = require("api/_types").Models;
 export function requirePermit(permits: string| string[], type?: number) {
     return function (target, key, desc) {
         let fn = desc.value;
-        desc.value = function (...args) {
+        desc.value = async function (...args) {
             let self = this;
-            let session = Zone.current.get("session");
-            if (!session["accountId"] || !session["tokenId"]) {
-                return Promise.reject(L.ERR.PERMISSION_DENIED);
+            let accountId = _getAccountId();
+            self.accountId = accountId;
+            let ret;
+            try {
+                ret = await API.permit.checkPermission({accountId: accountId, permissions: permits, type: type});
+            } catch(err) {
             }
 
-            let accountId = session["accountId"];
-            if (!self) {
-                self = {};
+            if (!ret) {
+                throw L.ERR.PERMISSION_DENIED
             }
-            self.accountId = accountId;
-            return API.permit.checkPermission({accountId: accountId, permissions: permits, type: type})
-                .then(function(ret) {
-                    if (!ret) {
-                        throw L.ERR.PERMISSION_DENIED
-                    }
-                    return fn.apply(self, args)
-                })
-                .catch(function(err) {
-                    console.info("requirePermit error...");
-                    console.error(err);
-                })
+            return fn.apply(self, args)
         }
         return desc;
     }
@@ -173,38 +164,63 @@ export var condition = {
             let id = _.get(args, idpath);
             let accountId = _getAccountId();
 
-            let staff = await Models.staff.get(accountId);
-            return staff && staff.company.id == id;
+            let staff, company;
+            try {
+                staff = await Models.staff.get(accountId);
+            } catch(err) {
+            }
+
+            try {
+                company = await Models.company.get(staff["companyId"]);
+            } catch(err) {
+            }
+            return staff && staff.target && company && company.target && company.id == id;
         }
     },
     isMyCompanyAgency: function (idpath: string) {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
             let accountId = _getAccountId();
-
-            let staff = await Models.staff.get(accountId);
-            return staff && staff.company && staff.company["agencyId"] == id;
+            let staff;
+            let company;
+            try {
+                staff = await Models.staff.get(accountId);
+            } catch(err) {
+            }
+            try {
+                company = await Models.company.get(staff["companyId"]);
+            } catch(err) {
+            }
+            return staff && staff.target && company && company.target && company["agencyId"] == id;
         }
     },
     isMyAgency: function (idpath: string) {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
             let accountId = _getAccountId();
-            let agencyUser = await Models.agencyUser.get(accountId);
-            return id && agencyUser && agencyUser["agencyId"] == id;
+            let agencyUser
+            try {
+                agencyUser = await Models.agencyUser.get(accountId);
+            } catch(err) {}
+            return id && agencyUser && agencyUser.target && agencyUser["agencyId"] == id;
         }
     },
     isSameCompany: function (idpath:string) {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
             let accountId = _getAccountId();
+            let my, other;
+            try {
+                my = await Models.staff.get(accountId);
+            } catch(err) {
+            }
 
-            let [my, other] = await Promise.all([
-                Models.staff.get(accountId),
-                Models.staff.get(id)
-            ]);
+            try {
+                other = await Models.staff.get(id);
+            } catch(err) {
+            }
 
-            return my && other && my["companyId"] == other["companyId"];
+            return my && my.target && other && other.target && my["companyId"] == other["companyId"];
         }
     },
     isSameAgency: function (idpath: string) {
@@ -212,24 +228,36 @@ export var condition = {
             let id = _.get(args, idpath);
             let accountId = _getAccountId();
 
-            let [my, other] = await Promise.all([
-                Models.agency.get(accountId),
-                Models.agency.get(id)
-            ])
+            let my, other;
+            try {
+                my = await Models.agency.get(accountId);
+            } catch(err) {}
 
-            return my && other && my["agencyId"] == other["agencyId"];
+            try {
+                other = await Models.agncy.get(id);
+            } catch(err) {
+            }
+
+            return my && my.target && other && other.target && my["agencyId"] == other["agencyId"];
         }
     },
     isCompanyAgency: function(idpath: string) {
         return async function (fn ,self, args) {
             let id = _.get(args, idpath);
             let accountId = _getAccountId();
-            let [agency, company] = await Promise.all([
-                Models.agencyUser.get(accountId),
-                Models.company.get(id)
-            ]);
-
-            return agency && company && agency.id == company["agencyId"];
+            let agency;
+            let company;
+            try{
+                agency = await Models.agencyUser.get(accountId);
+            } catch(err) {
+                agency = null;
+            }
+            try{
+                company = await Models.company.get(id);
+            } catch(err) {
+                company = null;
+            }
+            return agency && agency.target && company && company.target && agency.id == company["agencyId"];
         }
     }
 }
