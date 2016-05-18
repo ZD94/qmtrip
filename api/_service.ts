@@ -29,7 +29,8 @@ class SequelizeService<T extends ServiceObject> extends ServiceAbstract<T>{
 
     create(obj: Object): T {
         var ret = super.create(obj);
-        ret.target = this.TClass.$sqlmodel.build({});
+        ret.target = this.TClass.$sqlmodel.build(ret['$fields']);
+        ret['$fields'] = {'!':'!'};
         return ret;
     }
     async get(id: string): Promise<T>{
@@ -51,32 +52,6 @@ class SequelizeService<T extends ServiceObject> extends ServiceAbstract<T>{
             for(let k in previous) {
                 obj.target.set(k, previous[k]);
             }
-            throw e;
-        }
-    }
-
-    async update(obj: T): Promise<T> {
-        var fields = obj.$fields;
-        obj.$fields = {};
-        if(!fields)
-            return obj;
-        try {
-            await obj.target.update(fields);
-            return obj;
-        } catch(e) {
-            //出错后,需要将之前设置的fields恢复成之前的样子
-            var previous = obj.target.previous();
-            for(let k in previous) {
-                obj.target.set(k, previous[k]);
-            }
-            //updater调用过程中可能有新更改,需要合并
-            _.defaults(obj.$fields, fields);
-            //删除$fields中和target中一样的
-            Object.keys(obj.$fields)
-                .forEach((k)=> {
-                    if(obj.target[k] === obj.$fields[k])
-                        delete obj.$fields[k];
-                });
             throw e;
         }
     }

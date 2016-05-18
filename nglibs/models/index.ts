@@ -27,6 +27,10 @@ function resolverAPIModule(modname: string){
     }
 }
 
+function DummyGet(){
+    return {};
+}
+
 var Services = {
     staff: { type: Staff, modname: 'staff',
         funcs: ['getStaff', 'getStaffs', 'createStaff', 'updateStaff', 'deleteStaff']
@@ -71,7 +75,7 @@ var Services = {
         funcs: ['getCityInfo', 'queryPlace']
     },
     account: { type: Account, modname: 'auth',
-        funcs: []
+        funcs: [DummyGet]
     },
     seed: { type: Seed, modname: 'seeds',
         funcs: []
