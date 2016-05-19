@@ -58,7 +58,7 @@ class SeedModule {
             options = {};
         }
         let formatDate = options.formatDate || "YYMMDDHHmmss";
-        return this.getSingleSeedCode(type, options)
+        return SeedModule.getSingleSeedCode(type, options)
             .then(function(seeds){
                 let now = moment().format(formatDate);
                 return now + seeds;

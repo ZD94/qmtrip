@@ -489,18 +489,11 @@ class ApiTripPlan {
         let self: any = this;
         let accountId = self.accountId;
         let consumeId = params.id;
-        console.info("step 1...");
         let {agencyId} = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
-        console.info("step 2...");
         let {tripPlanId, accountId: staffId} = await API.tripPlan.getTripDetail({consumeId: consumeId, columns: ['accountId', 'tripPlanId']});
-        console.info("step 3...");
-        console.info(staffId);
         let staff = await API.staff.getStaff({id: staffId, columns: ['companyId', 'name', 'email']});
-        console.info("step 4...");
-        console.info(staff);
         let companyId = staff.companyId, staffName = staff.name, staffEmail = staff.email;
         let {agencyId: staffAgencyId} = await API.company.getCompany({id: companyId, columns: ['agencyId']});
-        console.info("step 5...");
 
         if (agencyId != staffAgencyId) {
             throw L.ERR.PERMISSION_DENY();
