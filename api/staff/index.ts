@@ -2,7 +2,6 @@
  * Created by wyl on 15-12-9.
  */
 'use strict';
-var Q = require("q");
 var nodeXlsx = require("node-xlsx");
 var uuid = require("node-uuid");
 var moment = require("moment");
@@ -200,7 +199,7 @@ class StaffModule{
         var send_email = true;
         var accobj: any = {};
         var com: any = {};
-        return Q.all([
+        return Promise.all([
                 DBM.Staff.findById(id),
                 API.auth.getAccount({id:id}),
             ])
@@ -214,7 +213,7 @@ class StaffModule{
                                 if(acc.status != 0)
                                     throw {code: -2, msg: "该账号不允许修改邮箱"};
                                 var accData = {email: data.email};
-                                return Q.all([
+                                return Promise.all([
                                         API.auth.updateAccount(id, accData, company.name),
                                         DBM.Staff.update(data, options)
                                     ])
@@ -230,7 +229,7 @@ class StaffModule{
                     })
             })
             .spread(function(rownum, rows){
-                return Q.all([
+                return Promise.all([
                         API.travelPolicy.getTravelPolicy({id: rows[0].travelLevel}),
                         API.department.getDepartment({id: rows[0].departmentId}),
                         API.department.getDefaultDepartment({companyId: rows[0].companyId})
@@ -511,7 +510,7 @@ class StaffModule{
                 }
                 pointChange.companyId = params.companyId;
                 return sequelize.transaction(function(t) {
-                    return Q.all([
+                    return Promise.all([
                         DBM.Staff.update({totalPoints: totalPoints, balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
                         DBM.PointChange.create(pointChange, {transaction: t})
                     ]);
@@ -542,7 +541,7 @@ class StaffModule{
                 var pointChange = { staffId: id, status: -1, points: decreasePoint, remark: params.remark||"减积分",
                     operatorId: operatorId, currentPoint: balancePoints, companyId: params.companyId};//此处也应该用model里的属性名封装obj
                 return sequelize.transaction(function(t) {
-                    return Q.all([
+                    return Promise.all([
                         DBM.Staff.update({balancePoints: balancePoints}, {where: {id: id}, returning: true, transaction: t}),
                         DBM.PointChange.create(pointChange, {transaction: t})
                     ]);
@@ -680,14 +679,14 @@ class StaffModule{
             dateArr.push(month);
         }
 
-        return Q.all(dateArr.map(function(month){
+        return Promise.all(dateArr.map(function(month){
             var start_time = moment(month + '-01').format('YYYY-MM-DD HH:mm:ss');
             var end_time = moment(month + '-01').endOf('month').format("YYYY-MM-DD")+" 23:59:59";
             q1.createdAt = {$gte: start_time, $lte: end_time};
             q2.createdAt = {$gte: start_time, $lte: end_time};
             q3.createdAt = {$lte: end_time};
             q4.createdAt = {$lte: end_time};
-            return Q.all([
+            return Promise.all([
                     DBM.PointChange.sum('points', {where: q1}),
                     DBM.PointChange.sum('points', {where: q2}),
                     DBM.PointChange.sum('points', {where: q3}),
@@ -810,7 +809,7 @@ class StaffModule{
             })
             .then(function(sf){
                 companyId = sf["companyId"];
-                return Q.all([
+                return Promise.all([
                     API.travelPolicy.getAllTravelPolicy({where: {companyId: companyId}}),
                     API.department.getAllDepartment({companyId: companyId}),//得到部门
                     API.company.getCompany({companyId: companyId})
@@ -830,7 +829,7 @@ class StaffModule{
             })
             .spread(function(travalps, departments){
                 var data = xlsxObj[0].data;
-                return Q.all(data.map(function(item, index){
+                return Promise.all(data.map(function(item, index){
                     var s = data[index];
                     s[1] = s[1] ? s[1]+"" : "";
 //                    var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
@@ -899,7 +898,7 @@ class StaffModule{
                             downloadNoAddObj.push(s);
                             return;
                         }
-                        return Q.all([
+                        return Promise.all([
                                 API.auth.checkAccExist({email: s[2], type: 1}),
                                 API.auth.checkAccExist({mobile: s[1], type: 1})
                             ])
@@ -988,7 +987,7 @@ class StaffModule{
         var data = params.addObj;
         var noAddObj = [];
         var addObj = [];
-        return Q.all(data.map(function(item, index){
+        return Promise.all(data.map(function(item, index){
             var s: any = data[index];
 //                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, roleId: s.roleId, companyId: s.companyId};//company_id默认为当前登录人的company_id
             var staffObj: any = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,departmentId: s.departmentId,travelLevel: s.travelLevel, companyId: s.companyId, type:"import"};//company_id默认为当前登录人的company_id
@@ -1079,7 +1078,7 @@ class StaffModule{
         var companyId = params.companyId;
         var start = params.startTime || moment().startOf('month').format("YYYY-MM-DD HH:mm:ss");
         var end = params.endTime || moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
-        return Q.all([
+        return Promise.all([
                 DBM.Staff.count({where: {companyId: companyId, status: {$gte: 0}}}),
                 DBM.Staff.count({where: {companyId: companyId, createdAt: {$gte: start, $lte: end}}}),
                 DBM.Staff.count({where: {companyId: companyId, quitTime: {$gte: start, $lte: end}, status: {$lt: 0} }})
@@ -1152,7 +1151,7 @@ class StaffModule{
                     .then(function(staffs){
                         if(staffs && staffs.length>0){
                             totalCount = staffs.length;
-                            return Q.all(staffs.map(function(s){
+                            return Promise.all(staffs.map(function(s){
                                 if(s.roleId == 2 || s.roleId == 0){
                                     adminNum++;
                                 }else if(s.roleId == 1){
@@ -1299,7 +1298,7 @@ class StaffModule{
     @requireParams(['companyId'])
     static statStaffByPoints(params: {companyId: string}){
         var query = params;
-        return Q.all([
+        return Promise.all([
                 DBM.Staff.sum('total_points', {where: query}),
                 DBM.Staff.sum('balance_points', {where: query})
             ])
@@ -1336,7 +1335,7 @@ class StaffModule{
         var companyId = params.companyId;
         var mobile = params.mobile;
         var email = params.email;
-        return Q.all([
+        return Promise.all([
                 API.auth.remove({email: email, mobile: mobile, type: 1}),
                 DBM.Staff.destroy({where: {$or: [{companyId: companyId}, {mobile: mobile}, {email: email}]}})
             ])

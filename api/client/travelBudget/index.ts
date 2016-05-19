@@ -9,7 +9,6 @@ import {HotelBudget, TrafficBudget} from "api/_types/budget";
 
 const API = require("common/api");
 const validate = require("common/validate");
-const Q = require("q");
 const L = require("common/language");
 const moment = require('moment');
 
@@ -214,7 +213,7 @@ export function getBookUrl(params: {spval: string, epval:string, st: string, et:
     if(!st || st == "" ){
         throw {code:-1, msg:"出发时间不能为空"};
     }
-    return Q.all([
+    return Promise.all([
             API.place.getCityInfo({cityCode: spval}),
             API.place.getCityInfo({cityCode: epval})
         ])
@@ -277,7 +276,7 @@ export function getBookListUrl(params: {spval: string, epval: string, st: string
             throw {code:-1, msg:"出发时间不能为空"};
         }
         st = moment(st).format('YYYY-MM-DD');
-        return Q.all([
+        return Promise.all([
                 API.place.getCityInfo({cityCode: spval}),
                 API.place.getCityInfo({cityCode: epval})
             ])
@@ -403,7 +402,7 @@ export function getTrafficBudget(params: {originPlace: string, destinationPlace:
             }
 
             if (params.isRoundTrip) {
-                return Q.all([
+                return Promise.all([
                         API.travelbudget.getTrafficBudget({
                             originPlace: params.originPlace,
                             destinationPlace: params.destinationPlace,
