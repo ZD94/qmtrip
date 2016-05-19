@@ -85,6 +85,6 @@ export function DetailController($scope){
 
 }
 
-export function ListController($scope){
-
+export async function ListController($scope , Models){
+    var staff = await Models.staff.get(Cookie.get('user_id'));
 }
