@@ -1101,9 +1101,9 @@ class ApiAuth {
                     throw L.ERR.ACCOUNT_NOT_EXIST();
                 }
                 if(account.type == 1){
-                    return L.RoleType.STAFF;
+                    return EAccountType.STAFF;
                 }else{
-                    return L.RoleType.AGENCY;
+                    return EAccountType.AGENCY;
                 }
             })
     }
