@@ -146,11 +146,11 @@ export function getHotelBudget(params: {accountId: string, cityId: string, busin
     //查询员工信息
     return API.staff.getStaff({id: accountId})
         .then(function(staff) {
-            if (!staff || !staff.travelLevel) {
+            if (!staff || !staff.travelPolicyId) {
                 throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
             }
             //查询员工差旅标准
-            return API.travelPolicy.getTravelPolicy({id: staff.travelLevel})
+            return API.travelPolicy.getTravelPolicy({id: staff.travelPolicyId})
         })
         .then(function(travelPolicy) {
             if (!travelPolicy) {
@@ -370,11 +370,11 @@ export function getTrafficBudget(params: {originPlace: string, destinationPlace:
     //查询员工信息
     return API.staff.getStaff({id: accountId})
         .then(function(staff) {
-            if (!staff || !staff.travelLevel) {
+            if (!staff || !staff.travelPolicyId) {
                 throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
             }
             //查询员工差旅标准
-            return API.travelPolicy.getTravelPolicy({id: staff.travelLevel})
+            return API.travelPolicy.getTravelPolicy({id: staff.travelPolicyId})
         })
         .then(function(travelPolicy) {
             if (!travelPolicy) {

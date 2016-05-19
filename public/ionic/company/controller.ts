@@ -81,12 +81,12 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
 
     $scope.travelpolicylist = await company.getTravelPolicies();
     console.info($scope.travelpolicylist);
-    console.info($scope.staff.travelLevel);
+    console.info($scope.staff.travelPolicyId);
     // $scope.departmentlist = await company.department.get(companyId);
     $scope.savestaff = function(){
         let _staff = $scope.staff;
-        if (_staff.travelLevel && _staff.travelLevel.id) {
-            _staff.travelLevel = _staff.travelLevel.id;
+        if (_staff.travelPolicyId && _staff.travelPolicyId.id) {
+            _staff.travelPolicyId = _staff.travelPolicyId.id;
         }
 
         if(_staff.role  && _staff.role.id ==true){
@@ -105,7 +105,7 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
         }
         console.info($scope.role);
         console.info($scope.staff);
-        console.info($scope.staff.travelLevel);
+        console.info($scope.staff.travelPolicyId);
         // $ionicHistory.goBack(-1);
     }
 }

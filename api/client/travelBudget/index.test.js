@@ -70,10 +70,10 @@ describe.skip("api/client/travelBudget.js", function() {
             })
             .then(function(ret){
                 travelPolicyId = ret.id;
-                return API.staff.updateStaff({id: staffId, travelLevel: travelPolicyId});
+                return API.staff.updateStaff({id: staffId, travelPolicyId: travelPolicyId});
             })
             .then(function(ret){
-                assert.equal(ret.travelLevel, travelPolicyId);
+                assert.equal(ret.travelPolicyId, travelPolicyId);
                 done();
             })
             .catch(function(err){

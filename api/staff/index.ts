@@ -61,8 +61,8 @@ class StaffModule{
             })
             .then(function(account){
                 console.info(account)
-                if(!data.travelLevel || data.travelLevel == ""){
-                    data.travelLevel = null;
+                if(!data.travelPolicyId || data.travelPolicyId == ""){
+                    data.travelPolicyId = null;
                 }
                 if(!data.departmentId || data.departmentId == ""){
                     data.departmentId = null;
@@ -240,7 +240,7 @@ class StaffModule{
             })
             .spread(function(rownum, rows){
                 return Promise.all([
-                        API.travelPolicy.getTravelPolicy({id: rows[0].travelLevel}),
+                        API.travelPolicy.getTravelPolicy({id: rows[0].travelPolicyId}),
                         API.department.getDepartment({id: rows[0].departmentId}),
                         API.department.getDefaultDepartment({companyId: rows[0].companyId})
                     ])
@@ -842,9 +842,9 @@ class StaffModule{
                 return Promise.all(data.map(function(item, index){
                     var s = data[index];
                     s[1] = s[1] ? s[1]+"" : "";
-//                    var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
-//                var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
-                    var staffObj: any = {name: s[0]||'', mobile: s[1], email: s[2]||'', departmentId: departments[s[3]] || null, department: s[3]||'',travelLevel: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
+//                    var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelPolicyId: travalps[s[4]]||'',travelLevelName: s[4]||'', roleId: s[5]||'', companyId: companyId};//company_id默认为当前登录人的company_id
+//                var staffObj = {name: s[0]||'', mobile: s[1], email: s[2]||'', department: s[3]||'',travelPolicyId: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
+                    var staffObj: any = {name: s[0]||'', mobile: s[1], email: s[2]||'', departmentId: departments[s[3]] || null, department: s[3]||'',travelPolicyId: travalps[s[4]]||'',travelLevelName: s[4]||'', companyId: companyId};//company_id默认为当前登录人的company_id
                     item = staffObj;
                     if(index>0 && index<201){//不取等于0的过滤抬头标题栏
                         if(_.trim(staffObj.name) == ""){
@@ -894,7 +894,7 @@ class StaffModule{
                             return;
                         }
                         emailAttr.push(s[2]);
-                        if(s[4] && _.trim(s[4]) != "" && staffObj.travelLevel == ""){
+                        if(s[4] && _.trim(s[4]) != "" && staffObj.travelPolicyId == ""){
                             staffObj.reason = "差旅标准不符合要求";
                             s[6] = "差旅标准不符合要求";
                             noAddObj.push(staffObj);
@@ -999,8 +999,8 @@ class StaffModule{
         var addObj = [];
         return Promise.all(data.map(function(item, index){
             var s: any = data[index];
-//                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelLevel: s.travelLevel, roleId: s.roleId, companyId: s.companyId};//company_id默认为当前登录人的company_id
-            var staffObj: any = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,departmentId: s.departmentId,travelLevel: s.travelLevel, companyId: s.companyId, type:"import"};//company_id默认为当前登录人的company_id
+//                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelPolicyId: s.travelPolicyId, roleId: s.roleId, companyId: s.companyId};//company_id默认为当前登录人的company_id
+            var staffObj: any = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,departmentId: s.departmentId,travelPolicyId: s.travelPolicyId, companyId: s.companyId, type:"import"};//company_id默认为当前登录人的company_id
             if(index>=0 && index<200){
                 return StaffModule.create(staffObj)
                     .then(function(ret){

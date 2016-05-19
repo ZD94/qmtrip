@@ -86,7 +86,7 @@ class TravelPolicyModule{
         let {accountId} = Zone.current.get("session");
 
         var id = params.id;
-        let staffs = await API.staff.getStaffs({travelLevel: id, status: 0});
+        let staffs = await API.staff.getStaffs({travelPolicyId: id, status: 0});
         if(staffs && staffs.length > 0){
             throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准 暂不能删除，给这些员工匹配新的差旅标准后再进行操作'};
         }

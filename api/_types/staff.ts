@@ -93,7 +93,7 @@ export class Staff extends ModelObject implements Account {
     get department(): Department { return null; }
     set department(val: Department) {}
 
-    @Reference({type: Types.UUID}, 'travelLevel')
+    @Reference({type: Types.UUID})
     getTravelPolicy(id?:string): Promise<TravelPolicy> {
         return Models.travelPolicy.get(id);
     }

@@ -21,7 +21,7 @@
             </label>
             <label class="item item-select">
                 <span class="input-label">差旅标准</span>
-                <select ng-model="staff.travelLevel" ng-options="policy as policy.name for policy in travelpolicylist">
+                <select ng-model="staff.travelPolicyId" ng-options="policy as policy.name for policy in travelpolicylist track by policy.id">
                 </select>
             </label>
             <ion-toggle toggle-class="toggle-positive" ng-checked="role.id" ng-model="role.id">管理员权限</ion-toggle>
