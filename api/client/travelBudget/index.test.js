@@ -5,7 +5,6 @@
 var assert = require("assert");
 var moment = require("moment");
 var API = require("common/api");
-var Q = require("q");
 
 //var pg_promise = require('pg-promise');
 //var pgp = pg_promise({ promiseLib: Q});
@@ -49,7 +48,7 @@ describe.skip("api/client/travelBudget.js", function() {
     }
 
     before(function(done){
-        Q.all([
+        Promise.all([
             API.agency.deleteAgencyByTest({email: agency.email}),
             API.company.deleteCompanyByTest({email: company.email}),
             API.staff.deleteAllStaffByTest({email: company.email}),
@@ -86,7 +85,7 @@ describe.skip("api/client/travelBudget.js", function() {
 
 
     after(function(done) {
-        Q.all([
+        Promise.all([
             API.agency.deleteAgencyByTest({email: agency.email}),
             API.company.deleteCompanyByTest({email: company.email}),
             API.staff.deleteAllStaffByTest({email: company.email}),

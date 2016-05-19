@@ -7,7 +7,6 @@
 
 var API = require("common/api");
 var L = require("common/language");
-var Q = require("q");
 
 const ROLE_ID = {
     OWNER: 0,
@@ -189,7 +188,7 @@ export function checkPermission(params) {
     var permissions = params.permission;
 
     if (!permissions || !permissions.length) {
-        return Q(true);
+        return Promise.resolve(true);
     }
 
     if (typeof permissions == 'string') {

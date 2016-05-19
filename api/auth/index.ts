@@ -627,7 +627,7 @@ class ApiAuth {
     //             return API.company.createCompany({id: companyId, agencyId: agencyId, createUser: account.id, name: companyName, domainName: domain,
     //                 mobile:mobile, email: email})
     //                 .then(function(){
-    //                     return Q.all([
+    //                     return Promise.all([
     //                         API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
     //                             mobile: mobile, name: name, roleId: 0}),
     //                         API.department.createDepartment({name: "我的企业", isDefault: true, companyId: companyId})

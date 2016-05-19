@@ -8,7 +8,6 @@
 var service = {};
 var API = require("common/api");
 var utils = require("common/utils");
-var Q = require("q");
 
 /**
  * @method getJSDKParams
@@ -35,7 +34,7 @@ service.getJSDKParams = function(params) {
 service.mediaId2key = function(params) {
     var self = this;
     var mediaId = params.mediaId;
-    return Q()
+    return Promise.resolve()
     .then(function() {
         if (!mediaId) {
             throw {code: -1, msg: "缺少mediaId"}
