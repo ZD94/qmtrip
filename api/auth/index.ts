@@ -10,18 +10,14 @@ import validator = require('validator');
 var sequelize = require("common/model").importModel("./models");
 var DBM = sequelize.models;
 var uuid = require("node-uuid");
-var L = require("../../common/language");
-var md5 = require("../../common/utils").md5;
-var getRndStr = require("../../common/utils").getRndStr;
-var C = require("../../config");
+var L = require("common/language");
+var C = require("config");
 var QRCODE_LOGIN_URL = '/auth/qrcode-login';
 var moment = require("moment");
 var API = require("../../common/api");
 var utils = require("common/utils");
 var Logger = require("common/logger");
-var logger = new Logger('');
-var AccountOpenid = DBM.AccountOpenid;
-
+var logger = new Logger('auth');
 
 var ACCOUNT_STATUS = {
     ACTIVE: 1,
@@ -167,7 +163,7 @@ class ApiAuth {
             })
             .then(function(account) {
                 //生成设置密码token
-                var pwdToken = getRndStr(6);
+                var pwdToken = utils.getRndStr(6);
                 return DBM.Account.update({pwdToken: pwdToken}, {where: {id: account.id}, returning: true})
             })
             .spread(function(affect, rows) {
@@ -402,7 +398,7 @@ class ApiAuth {
         if (data.pwd) {
             var pwd = data.pwd;
             var password = data.pwd.toString();
-            pwd = md5(password);
+            pwd = utils.md5(password);
             //throw L.ERR.PASSWORD_EMPTY();
         }
 
@@ -487,7 +483,7 @@ class ApiAuth {
         var email = data.email.toLowerCase();
         return DBM.Account.findOne({where: {email: email, type: type}})
             .then(function (loginAccount) {
-                var pwd = md5(data.pwd);
+                var pwd = utils.md5(data.pwd);
                 if (!loginAccount) {
                     throw L.ERR.ACCOUNT_NOT_EXIST()
                 }
@@ -1003,7 +999,7 @@ class ApiAuth {
                     throw L.ERR.ACCOUNT_NOT_EXIST();
                 }
 
-                var qrcodeToken = getRndStr(8);
+                var qrcodeToken = utils.getRndStr(8);
                 account.oldQrcodeToken = account.qrcodeToken;
                 account.qrcodeToken = qrcodeToken;
 
@@ -1067,13 +1063,13 @@ class ApiAuth {
         _params = params;
         _params.createdAt = utils.now();
 
-        return AccountOpenid.findById(_params.openId)
+        return DBM.AccountOpenid.findById(_params.openId)
             .then(function(ap) {
                 if(ap) {
                     return ap;
                 }
 
-                return AccountOpenid.create(_params);
+                return DBM.AccountOpenid.create(_params);
             })
     }
 
@@ -1083,7 +1079,7 @@ class ApiAuth {
      */
     @requireParams(["openId"])
     static getAccountIdByOpenId(params: {openId: string}) {
-        return AccountOpenid.findById(params.openId)
+        return DBM.AccountOpenid.findById(params.openId)
             .then(function(ret) {
                 if(ret) {
                     return ret.accountId;
@@ -1218,23 +1214,23 @@ function combineData(obj) {
 //加密对象
 function cryptoData(obj) {
     if (typeof obj == 'string') {
-        return md5(obj);
+        return utils.md5(obj);
     }
 
     var strs = combineData(obj);
-    return md5(strs);
+    return utils.md5(strs);
 }
 
 
 function getTokenSign(accountId, tokenId, token, timestamp) {
     var originStr = accountId+tokenId+token+timestamp;
-    return md5(originStr);
+    return utils.md5(originStr);
 }
 
 //生成激活链接参数
 function makeActiveSign(activeToken, accountId, timestamp) {
     var originStr = activeToken + accountId + timestamp;
-    return md5(originStr);
+    return utils.md5(originStr);
 }
 
 function _sendActiveEmail(accountId) {
@@ -1242,7 +1238,7 @@ function _sendActiveEmail(accountId) {
         .then(function(account) {
             //生成激活码
             var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
-            var activeToken = getRndStr(6);
+            var activeToken = utils.getRndStr(6);
             var sign = makeActiveSign(activeToken, account.id, expireAt);
             var url = C.host + "/staff.html#/auth/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
             //发送激活邮件
@@ -1271,7 +1267,7 @@ function makeAuthenticateSign(accountId, os?: string) {
                 m.expireAt = expireAt;
                 return m.save();
             } else {
-                m = DBM.Token.build({id: uuid.v1(), accountId: accountId, token: getRndStr(10), refreshAt: refreshAt, expireAt: expireAt});
+                m = DBM.Token.build({id: uuid.v1(), accountId: accountId, token: utils.getRndStr(10), refreshAt: refreshAt, expireAt: expireAt});
                 return m.save();
             }
         })
