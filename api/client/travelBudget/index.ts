@@ -217,7 +217,7 @@ export function getBookUrl(params: {spval: string, epval:string, st: string, et:
             API.place.getCityInfo({cityCode: spval}),
             API.place.getCityInfo({cityCode: epval})
         ])
-        .spread(function(deptCity, endPlace){
+        .spread<string>(function(deptCity, endPlace){
             var scode = "",
                 ecode = "";
             if(deptCity && deptCity.skyCode){
@@ -280,7 +280,7 @@ export function getBookListUrl(params: {spval: string, epval: string, st: string
                 API.place.getCityInfo({cityCode: spval}),
                 API.place.getCityInfo({cityCode: epval})
             ])
-            .spread(function(deptCity, endPlace){
+            .spread<string>(function(deptCity, endPlace){
                 var scode = "",
                     ecode = "";
                 if(deptCity && deptCity.skyCode){
