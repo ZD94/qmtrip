@@ -8,6 +8,23 @@
 
 const API = require("common/api");
 
+interface MsgCheckCode {
+    ticket: string
+    code?: string
+    type?: number
+    mobile: string
+}
+
+interface PicCheckCode {
+    ticket: string
+    code?: string
+    type?: number
+    width?: number
+    height?: number
+    quality?: number
+    captcha?: string
+}
+
 class ApiCheckCode {
     static __public: boolean = true;
 
@@ -32,12 +49,12 @@ class ApiCheckCode {
      *   })
      * ```
      */
-    static getMsgCheckCode(params) {
+    static getMsgCheckCode(params: MsgCheckCode) : Promise<MsgCheckCode> {
         var type = 1;
         params.type = type;
         return API.checkcode.getMsgCheckCode(params)
             .then(function(result) {
-                return result;
+                return result as MsgCheckCode
             });
     }
 
@@ -60,10 +77,13 @@ class ApiCheckCode {
      *  })
      * ```
      */
-    static getPicCheckCode(params) {
+    static getPicCheckCode(params: PicCheckCode) : Promise<PicCheckCode> {
         var type = 1;
         params.type = type;
-        return API.checkcode.getPicCheckCode(params);
+        return API.checkcode.getPicCheckCode(params)
+            .then(function(result) {
+                return result as PicCheckCode;
+            })
     }
 
     /**
@@ -90,8 +110,11 @@ class ApiCheckCode {
      *  })
      * ```
      */
-    static isMatchPicCheckCode(params) {
-        return API.checkcode.isMatchPicCheckCode(params);
+    static isMatchPicCheckCode(params: PicCheckCode) :Promise<boolean> {
+        return API.checkcode.isMatchPicCheckCode(params)
+            .then(function(result) {
+                return Boolean(result);
+            })
     }
 
     /**
@@ -119,8 +142,11 @@ class ApiCheckCode {
      * })
      * ```
      */
-    static isMatchMsgCheckCode(params) {
-        return API.checkcode.isMatchMsgCheckCode(params);
+    static isMatchMsgCheckCode(params: MsgCheckCode) : Promise<boolean> {
+        return API.checkcode.isMatchMsgCheckCode(params)
+            .then(function(result) {
+                return Boolean(result);
+            })
     }
 }
 
