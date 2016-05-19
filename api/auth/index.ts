@@ -185,7 +185,7 @@ class ApiAuth {
                         return account;
                     })
             })
-            .then(function(account) {
+            .then(function(account: any) {
                 var timeStr = utils.now();
                 var oneDay = 24 * 60 * 60 * 1000
                 var timestamp = Date.now() + 2 * oneDay;  //失效时间2天
