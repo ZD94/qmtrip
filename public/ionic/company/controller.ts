@@ -48,7 +48,6 @@ export async function StaffsController($scope, Models){
     console.info(staffs);
     await Promise.all($scope.staffs.map(async function(obj){
         obj.travelPolicy = await obj.staff.getTravelPolicy();
-        console.info("there",obj);
         return obj;
     }));
     $scope.search = function(){
@@ -82,6 +81,7 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
 
     $scope.travelpolicylist = await company.getTravelPolicies();
     console.info($scope.travelpolicylist);
+    console.info($scope.staff.travelLevel);
     // $scope.departmentlist = await company.department.get(companyId);
     $scope.savestaff = function(){
         if($scope.role.id ==true){
@@ -102,7 +102,8 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
         }
         console.info($scope.role);
         console.info($scope.staff);
-        $ionicHistory.goBack(-1);
+        console.info($scope.staff.travelLevel);
+        // $ionicHistory.goBack(-1);
     }
 }
 
