@@ -163,11 +163,11 @@ class StaffModule{
         let {accountId} = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
         if(role == L.RoleType.STAFF){
-            let staff = await Models.staff.get(accountId);
+            let staff = await DBM.Staff.findById(accountId);
             if(accountId == params.id){
                 throw {msg: "不可删除自身信息"};
             }
-            let target = await Models.staff.get(params.id);
+            let target = await DBM.Staff.findById(params.id);
             if(target.roleId == 0){
                 throw {msg: "企业创建人不能被删除"};
             }
@@ -224,7 +224,7 @@ class StaffModule{
                                     ])
                                     .spread(function(updateaccount, updatestaff) {
                                         send_email = false;
-                                        return updatestaff;
+                                        return [1, updatestaff];
                                     });
                             }
                             return DBM.Staff.update(data, options);
@@ -277,11 +277,10 @@ class StaffModule{
         let { accountId } = Zone.current.get("session");
         let id = params.id;
         let role = await API.auth.judgeRoleById({id:accountId});
-
         if(role == L.RoleType.STAFF){
 
-            let staff = await Models.staff.get(accountId);
-            let target = await Models.staff.get(id);
+            let staff = await DBM.Staff.findById(accountId);
+            let target = await DBM.Staff.findById(id);//此处连续两次用Models.staff.get会报comanyId找不到的问题
 
             if(staff["companyId"] != target["companyId"] ){
                 throw L.ERR.PERMISSION_DENY();
@@ -331,8 +330,8 @@ class StaffModule{
 
         if(role == L.RoleType.STAFF){
 
-            let staff = await Models.staff.get(accountId);
-            let target = await Models.staff.get(id);
+            let staff = await DBM.Staff.findById(accountId);
+            let target = await DBM.Staff.findById(id);
 
             if(staff["companyId"]  != target["companyId"] ){
                 throw L.ERR.PERMISSION_DENY();
@@ -343,7 +342,8 @@ class StaffModule{
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
-                return Models.staff.get(id);
+                let instance = await DBM.Staff.findById(id);
+                return new Staff(instance);
             }else{
                 throw {code: -1, msg: '无权限'};
             }
@@ -379,7 +379,7 @@ class StaffModule{
         let role = await API.auth.judgeRoleById({id:accountId});
 
         if(role == L.RoleType.STAFF){
-            let sf = await Models.staff.get(accountId);
+            let sf = await DBM.Staff.findById(accountId);
             params.companyId = sf["companyId"];
             let staffs = await DBM.Staff.findAll(options);
             return staffs.map(function(s) {
@@ -478,7 +478,7 @@ class StaffModule{
 
         if(role == L.RoleType.STAFF){
 
-            let staff = await Models.staff.get(accountId)
+            let staff = await DBM.Staff.findById(accountId)
             params.companyId = staff["companyId"];
             //                let options = {perPage : 20};
             //                params.options = options;
@@ -723,7 +723,7 @@ class StaffModule{
     @clientExport
     static async getStaffPointsChangeByMonth(params) {
         let { accountId } = Zone.current.get("session");
-        return Models.staff.get(accountId)
+        return DBM.Staff.findById(accountId)
             .then(function(staff){
                 return staff["companyId"];
             })
@@ -1108,7 +1108,7 @@ class StaffModule{
         let role = await API.auth.judgeRoleById({id:user_id});
 
         if(role == L.RoleType.STAFF){
-            let staff= await Models.staff.get(user_id);
+            let staff= await DBM.Staff.findById(user_id);
             if(staff){
                 let companyId = staff["companyId"];
                 params.companyId = companyId;
@@ -1191,7 +1191,7 @@ class StaffModule{
         let role = await API.auth.judgeRoleById({id:user_id});
 
         if(role == L.RoleType.STAFF){
-            let staff = await Models.staff.get(user_id);
+            let staff = await DBM.Staff.findById(user_id);
             if(staff){
                 let companyId = staff["companyId"];
                 params.companyId = companyId;
@@ -1224,7 +1224,7 @@ class StaffModule{
         let role = await API.auth.judgeRoleById({id:user_id});
 
         if(role == L.RoleType.STAFF){
-            let staff = await Models.staff.get(user_id);
+            let staff = await DBM.Staff.findById(user_id);
             if(staff){
                 companyId = staff["companyId"];
                 return DBM.Staff.count({where: {companyId: companyId, status:{$ne: EStaffStatus.DELETE}}})
@@ -1271,7 +1271,7 @@ class StaffModule{
     static getInvoiceViewer (params: {accountId: string}){
         var viewerId = [];
         var id = params.accountId;
-        return Models.staff.get(id)
+        return DBM.Staff.findById(id)
             .then(function(obj){
                 if(obj && obj.company.id){
                     return API.company.getCompany({id: obj.company.id})
@@ -1321,7 +1321,7 @@ class StaffModule{
         let role = await API.auth.judgeRoleById({id:accountId});
 
         if(role == L.RoleType.STAFF){
-            let staff = await Models.staff.get(accountId);
+            let staff = await DBM.Staff.findById(accountId);
             return StaffModule.statStaffByPoints({companyId: staff["companyId"]});
         }else{
             let companyId = params.companyId;
