@@ -12,7 +12,7 @@ export class TravelPolicy extends ModelObject{
         super(target);
     }
     @Create()
-    static create(): TravelPolicy { return null; }
+    static create(obj?: Object): TravelPolicy { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }

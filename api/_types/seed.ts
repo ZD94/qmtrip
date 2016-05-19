@@ -13,7 +13,7 @@ export class Seed extends ModelObject{
         super(target);
     }
     @Create()
-    static create(): Seed { return null; }
+    static create(obj?: Object): Seed { return null; }
 
     @Field({type: Types.STRING})
     get type(): string { return ''; }

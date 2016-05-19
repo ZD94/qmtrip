@@ -29,7 +29,7 @@ class Account extends ModelObject{
         super(target);
     }
     @Create()
-    static create(): Account { return null; }
+    static create(obj?: Object): Account { return null; }
 
     @Field({type:Types.UUID})
     get id() { return null; }

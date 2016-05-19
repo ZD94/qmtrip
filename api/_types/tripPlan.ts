@@ -35,7 +35,7 @@ export class Project extends ModelObject{
         super(target);
     }
     @Create()
-    static create(): Project { return null; }
+    static create(obj?: Object): Project { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
@@ -62,7 +62,7 @@ export class TripPlan extends ModelObject {
         super(target);
     }
     @Create()
-    static create(): TripPlan { return null; }
+    static create(obj?: Object): TripPlan { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
@@ -188,7 +188,7 @@ export class TripDetail extends ModelObject{
         super(target);
     }
     @Create()
-    static create(): TripDetail { return null; }
+    static create(obj?: Object): TripDetail { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
@@ -302,7 +302,7 @@ export class TripPlanLog extends ModelObject{
         super(target);
     }
     @Create()
-    static create(): TripPlanLog { return null; }
+    static create(obj?: Object): TripPlanLog { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }

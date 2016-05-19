@@ -13,7 +13,7 @@ export class Department extends ModelObject{
         super(target);
     }
     @Create()
-    static create(): Department { return null; }
+    static create(obj?: Object): Department { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }

@@ -33,7 +33,7 @@ export class Staff extends ModelObject implements Account {
         super(target);
     }
     @Create()
-    static create(): Staff { return null; }
+    static create(obj?: Object): Staff { return null; }
 
     static async getCurrent(): Promise<Staff> {
         let session = getSession();
@@ -126,7 +126,7 @@ export class Credential extends ModelObject{
         super(target);
     }
     @Create()
-    static create(): Credential { return null; }
+    static create(obj?: Object): Credential { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
@@ -160,7 +160,7 @@ export class PointChange extends ModelObject{
         super(target);
     }
     @Create()
-    static create(): PointChange { return null; }
+    static create(obj?: Object): PointChange { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }

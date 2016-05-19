@@ -35,7 +35,7 @@ export class Agency extends ModelObject{
         super(target);
     }
     @Create()
-    static create(): Agency { return null; }
+    static create(obj?: Object): Agency { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
@@ -86,15 +86,15 @@ export class Agency extends ModelObject{
     }
 }
 
+@regApiType('API.')
 @TableExtends(Account, 'account')
 @Table(Models.agencyUser, 'agency.')
-@regApiType('API.')
 export class AgencyUser extends ModelObject{
     constructor(target: Object) {
         super(target);
     }
     @Create()
-    static create(): AgencyUser { return null; }
+    static create(obj?: Object): AgencyUser { return null; }
 
     static async getCurrent(): Promise<AgencyUser> {
         let session = getSession();
