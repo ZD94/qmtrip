@@ -159,7 +159,7 @@ export function approveInvoice(params){
             staffEmail = staff.email;
 
             return Promise.all([
-                API.company.getCompany({companyId: companyId, columns: ['agencyId']}),
+                API.company.getCompany({id: companyId, columns: ['agencyId']}),
                 API.agency.getAgencyUser({id: user_id, columns: ['agencyId']})
             ])
         })
@@ -339,7 +339,7 @@ export function countTripPlanNum(params){
 
     return Promise.all([
         API.agency.getAgencyUser({id: accountId, columns: ['id', 'agencyId']}),
-        API.company.getCompany({companyId: companyId, columns: ['agencyId']})
+        API.company.getCompany({id: companyId, columns: ['agencyId']})
     ])
         .spread(function(user, company){
             if(user.agencyId != company.agencyId){
@@ -365,7 +365,7 @@ export function statPlanOrderMoneyByAgency (params) {
 
     return Promise.all([
         API.agency.getAgencyUser({id: self.accountId, columns: ['agencyId']}),
-        API.company.getCompany({companyId: companyId, columns: ['agencyId']})
+        API.company.getCompany({id: companyId, columns: ['agencyId']})
     ])
         .spread(function(u, c){
             if(u.agencyId != c.agencyId){

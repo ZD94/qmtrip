@@ -47,7 +47,7 @@ class StaffModule{
         if (data.mobile && !validate.isMobile(data.mobile)) {
             throw {code: -2, msg: "手机号格式不正确"};
         }
-        return API.company.getCompany({companyId: data.companyId, columns: ['name','domainName']})
+        return API.company.getCompany({id: data.companyId, columns: ['name','domainName']})
             .then(function(c){
                 if(c.domainName && c.domainName != "" && data.email.indexOf(c.domainName) == -1){
                     throw {code: -6, msg: "邮箱格式不符合要求"};
@@ -130,7 +130,7 @@ class StaffModule{
                     throw L.ERR.ACCOUNT_NOT_EXIST();
                 }
 
-                return API.company.getCompany({companyId:staff.companyId})
+                return API.company.getCompany({id:staff.companyId})
                     .then(function(company){
                         var vals = {
                             name: staff.name || "",
@@ -812,7 +812,7 @@ class StaffModule{
                 return Promise.all([
                     API.travelPolicy.getAllTravelPolicy({where: {companyId: companyId}}),
                     API.department.getAllDepartment({companyId: companyId}),//得到部门
-                    API.company.getCompany({companyId: companyId})
+                    API.company.getCompany({id: companyId})
                 ])
             })
             .spread(function(results,depts, com){
@@ -1269,7 +1269,7 @@ class StaffModule{
         return Models.staff.get(id)
             .then(function(obj){
                 if(obj && obj.company.id){
-                    return API.company.getCompany({companyId: obj.company.id})
+                    return API.company.getCompany({id: obj.company.id})
                         .then(function(company){
                             return company;
                         })
@@ -1321,7 +1321,7 @@ class StaffModule{
         }else{
             let companyId = params.companyId;
             let u = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
-            let c = await API.company.getCompany({companyId: companyId, columns: ['agencyId']});
+            let c = await API.company.getCompany({id: companyId, columns: ['agencyId']});
 
             if(u.agencyId != c.agencyId){
                 throw L.ERR.PERMISSION_DENY();

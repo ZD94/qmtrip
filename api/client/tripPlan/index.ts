@@ -57,7 +57,7 @@ class ApiTripPlan {
                 throw L.ERR.PERMISSION_DENY();
             }
         } else {
-            let {agencyId: agencyIdOfCompany} = await API.company.getCompany({companyId: tripPlan.companyId, columns: ['agencyId']});
+            let {agencyId: agencyIdOfCompany} = await API.company.getCompany({id: tripPlan.companyId, columns: ['agencyId']});
             let {agencyId: agencyIdOfUser} = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
             if (agencyIdOfCompany != agencyIdOfUser) {
                 throw L.ERR.PERMISSION_DENY();
@@ -499,7 +499,7 @@ class ApiTripPlan {
         console.info("step 4...");
         console.info(staff);
         let companyId = staff.companyId, staffName = staff.name, staffEmail = staff.email;
-        let {agencyId: staffAgencyId} = await API.company.getCompany({companyId: companyId, columns: ['agencyId']});
+        let {agencyId: staffAgencyId} = await API.company.getCompany({id: companyId, columns: ['agencyId']});
         console.info("step 5...");
 
         if (agencyId != staffAgencyId) {
