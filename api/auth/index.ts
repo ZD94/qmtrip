@@ -5,7 +5,6 @@
 import {requireParams, clientExport} from "../../common/api/helper";
 import { Models} from "api/_types";
 import {AuthCert, Token, Account} from "api/_types/auth"
-var Q = require("q");
 var sequelize = require("common/model").importModel("./models");
 var DBM = sequelize.models;
 var uuid = require("node-uuid");
@@ -103,7 +102,7 @@ class ApiAuth {
         var sign = params.sign;
         var timestamp = params.timestamp;
 
-        return Q()
+        return Promise.resolve()
             .then(function() {
                 if (!accountId) {
                     throw L.ERR.ACCOUNT_NOT_EXIST();
@@ -149,7 +148,7 @@ class ApiAuth {
         var type = params.type || 1;
         var companyName = params.companyName || '';
 
-        return Q()
+        return Promise.resolve()
             .then(function() {
                 if (!email) {
                     throw L.ERR.ACCOUNT_NOT_EXIST();
@@ -186,7 +185,7 @@ class ApiAuth {
                         return account;
                     })
             })
-            .then(function(account) {
+            .then(function(account: any) {
                 var timeStr = utils.now();
                 var oneDay = 24 * 60 * 60 * 1000
                 var timestamp = Date.now() + 2 * oneDay;  //失效时间2天
@@ -270,7 +269,7 @@ class ApiAuth {
         var timestamp = params.timestamp;
         var pwd = params.pwd;
 
-        return Q()
+        return Promise.resolve()
             .then(function() {
                 if (!Boolean(timestamp) || timestamp < Date.now()) {
                     throw L.ERR.TIMESTAMP_TIMEOUT();
@@ -416,7 +415,7 @@ class ApiAuth {
         var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
 
         //查询邮箱是否已经注册
-        return Q.all([
+        return Promise.all([
                 DBM.Account.findOne({where: {email: data.email, type: type}}),
                 DBM.Account.findOne({where: {mobile: mobile, type: type}})
             ])
@@ -903,7 +902,7 @@ class ApiAuth {
         var sign = params.sign;
         var timestamp = params.timestamp;
         //var backUrl = params.backUrl;   //登录后返回地址
-        return Q()
+        return Promise.resolve()
             .then(function() {
                 if (!params) {
                     throw L.ERR.DATA_FORMAT_ERROR();
@@ -1034,7 +1033,7 @@ class ApiAuth {
         var email = params.email;
         var type = params.type;
 
-        return Q()
+        return Promise.resolve()
             .then(function() {
                 if (!validate.isEmail(email)) {
                     throw L.ERR.EMAIL_FORMAT_INVALID();
