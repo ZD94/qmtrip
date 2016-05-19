@@ -25,24 +25,28 @@ function TripDefineFromJson(obj: any): TripDefine{
 }
 
 export function CreateController($scope, $storage){
-    var tripdef = TripDefineFromJson($storage.local.get('tripdef'));
+    let tripdef: any = {};
+    tripdef = TripDefineFromJson($storage.local.get('tripdef'));
     var today = moment();
     if(today.diff(tripdef.beginDate) > 0){
         tripdef.beginDate = today.startOf('day').hour(9).toDate();
+    } else {
+        tripdef.beginDate = today.toDate();
     }
     if(moment(tripdef.beginDate).diff(tripdef.endDate) >= 0){
         tripdef.endDate = moment(tripdef.beginDate).startOf('day').hour(18).toDate();
+    } else {
+        tripdef.endDate = today.add(1, 'days').toDate();
     }
     $storage.local.set('tripdef', tripdef);
     $scope.tripdef = tripdef;
     $scope.$watch('tripdef', function(){
-        console.log($scope.tripdef);
         $storage.local.set('tripdef', $scope.tripdef);
     }, true)
 
     
     $scope.calcTripDuration = function(){
-        return moment(tripdef.endDate).diff(tripdef.beginDate, 'days');
+        return moment(tripdef.endDate).diff(tripdef.beginDate, 'days') || 1;
     }
     $scope.incTripDuration = function(){
         tripdef.endDate = moment(tripdef.endDate).add(1, 'days').toDate();;
@@ -55,17 +59,42 @@ export function CreateController($scope, $storage){
             $scope.$applyAsync();
         }
     }
+
+    $scope.nextStep = async function() {
+        API.require("travelBudget");
+        await API.onload();
+
+        let tripdef = $scope.tripdef;
+        console.info(tripdef);
+        API.travelBudget.getTrafficBudget({
+            originPlace:tripdef.startCityCode || tripdef.fromPlace,
+            destinationPlace:tripdef.endCityCode || tripdef.place,
+            outboundDate:tripdef.startDate,
+            inboundDate:tripdef.endDate,
+            outLatestArriveTime:tripdef.startTimeLate,
+            inLatestArriveTime:tripdef.endTimeLate,
+            isRoundTrip:tripdef.endDate
+        })
+            .then(function(result) {
+                window.location.href = "#/trip/budget";
+            })
+            .catch(function(err) {
+                alert(err.msg || err);
+            })
+    }
 }
 
-export function BudgetController($scope, $storage){
+export async function BudgetController($scope, $storage){
     var tripdef = TripDefineFromJson($storage.local.get('tripdef'));
     $scope.tripdef = tripdef;
 
+    API.require("travelBudget");
+    await API.onload();
 
     API.travelBudget.getTrafficBudget({
         originPlace:$scope.startCityCode,
         destinationPlace:$scope.endCityCode,
-        outboundDate:$scope.startDate,
+        outboundDate:$scope.beginDate,
         inboundDate:$scope.endDate,
         outLatestArriveTime:$scope.startTimeLate,
         inLatestArriveTime:$scope.endTimeLate,
