@@ -19,7 +19,7 @@ import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_types/staff";
-import {AGENCY_ROLE} from "api/_types/agency";
+import { AGENCY_ROLE, AgencyUser } from "api/_types/agency";
 import { ServiceInterface } from 'common/model';
 import { Models, EAccountType } from 'api/_types';
 import promise = require("../../common/test/api/promise/index");
@@ -76,23 +76,28 @@ class StaffModule{
 
     @clientExport
     static async createStaff (params): Promise<Staff> {
-        let {accountId} = Zone.current.get("session");
-        let role = await API.auth.judgeRoleById({id:accountId});
-
-        if(role == L.RoleType.STAFF){
-
-            let staff = await Models.staff.get(accountId);
-            let companyId = staff["companyId"];
-            params.companyId = companyId;
-            return this.create(params)
-        }else{
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-            if(result){
-                return this.create(params);
-            }else{
-                throw {code: -1, msg: '无权限'};
-            }
+        var staff = await Staff.getCurrent();
+        if(staff){
+            var newstaff = Staff.create(params);
+            newstaff.company = staff.company;
+            return newstaff.save();
         }
+        var user = AgencyUser.getCurrent();
+        if(user){
+            if(!params.companyId){
+                throw L.ERR.INVALID_ARGUMENT('companyId');
+            }
+            var company = await Models.company.get(params.companyId);
+            if(!company){
+                throw L.ERR.INVALID_ARGUMENT('companyId');
+            }
+            if(company['agencyId'] != user['agencyId']){
+                throw L.ERR.PERMISSION_DENY();
+            }
+            var newstaff = Staff.create(params);
+            return newstaff.save();
+        }
+        throw L.ERR.PERMISSION_DENY();
     }
 
     /**
