@@ -65,11 +65,10 @@ export function CreateController($scope, $storage){
         await API.onload();
 
         let tripdef = $scope.tripdef;
-        console.info(tripdef);
         API.travelBudget.getTrafficBudget({
             originPlace:tripdef.startCityCode || tripdef.fromPlace,
             destinationPlace:tripdef.endCityCode || tripdef.place,
-            outboundDate:tripdef.startDate,
+            outboundDate:tripdef.beginDate,
             inboundDate:tripdef.endDate,
             outLatestArriveTime:tripdef.startTimeLate,
             inLatestArriveTime:tripdef.endTimeLate,
@@ -88,7 +87,16 @@ export async function BudgetController($scope, $storage){
     var tripdef = TripDefineFromJson($storage.local.get('tripdef'));
     $scope.tripdef = tripdef;
 
-    API.require("travelBudget");
+    /**
+     *  * @param {String} params.originPlace 出发地
+     * @param {String} params.destinationPlace 目的地
+     * @param {String} params.outboundDate 出发时间 YYYY-MM-DD
+     * @param {String} params.inboundDate 返回时间(可选) YYYY-MM-DD
+     * @param {String} params.outLatestArriveTime 最晚到达时间 HH:mm
+     * @param {String} params.inLatestArriveTime 返程最晚到达时间 HH:mm
+     * @param {Boolean} params.isRoundTrip 是否往返 [如果为true,inboundDate必须存在]
+     */
+    API.require("travelBudget")
     await API.onload();
 
     API.travelBudget.getTrafficBudget({
