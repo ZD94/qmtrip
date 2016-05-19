@@ -197,13 +197,12 @@ class AgencyModule {
     static async createAgencyUser(params: {email: string, name: string, mobile?: string, sex?: number, avatar?: string, roleId?: number}): Promise<AgencyUser> {
         let {accountId} = Zone.current.get('session');
         let curUser = await AgencyUser.getCurrent();
-        let agencyId = curUser.agencyId;
 
         if(!curUser || curUser.status === EAgencyStatus.DELETE) {
             throw L.ERR.AGENCY_USRE_NOT_EXIST();
         }
 
-        let _agencyUser = await Models.agencyUser.find({agencyId: agencyId, $or: [{email: params.email}, {mobile: params.mobile}]});
+        let _agencyUser = await Models.agencyUser.find({agencyId: curUser.agency.id, $or: [{email: params.email}, {mobile: params.mobile}]});
 
         if (_agencyUser.length > 0) {
             throw {code: -2, msg: '邮箱或手机号已经注册代理商'};
@@ -229,7 +228,7 @@ class AgencyModule {
     @requirePermit('user.edit', 2)
     @conditionDecorator([{if: condition.isMyAgency('0.id')}])
     @requireParams(['id'], ['status', 'name', 'sex', 'mobile', 'avatar', 'roleId'])
-    static async updateAgencyUser(params: {id: string, status?: number, name?: string, sex?: EGender, email?: string, mobile?: string, avatar?: string, roleId?: string}) {
+    static async updateAgencyUser(params: {id: string, status?: number, name?: string, sex?: EGender, email?: string, mobile?: string, avatar?: string, roleId?: number}) {
         let target = await Models.agencyUser.get(params.id);
 
         if(!target) {
