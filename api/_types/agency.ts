@@ -3,7 +3,7 @@
  */
 'use strict';
 import { regApiType } from 'common/api/helper';
-import { Models, EGender } from 'api/_types';
+import { Models, EGender, EAccountType } from 'api/_types';
 import {Company} from 'api/_types/company';
 import { ModelObject, Table, TableExtends, Field, Types, ResolveRef, Reference, Values } from 'common/model';
 import { getSession } from 'common/model';
@@ -35,7 +35,7 @@ export class Agency extends ModelObject{
         super(target);
     }
     @Create()
-    static create(): Agency { return null; }
+    static create(obj?: Object): Agency { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
@@ -86,21 +86,24 @@ export class Agency extends ModelObject{
     }
 }
 
+@regApiType('API.')
 @TableExtends(Account, 'account')
 @Table(Models.agencyUser, 'agency.')
-@regApiType('API.')
 export class AgencyUser extends ModelObject{
     constructor(target: Object) {
         super(target);
     }
     @Create()
-    static create(): AgencyUser { return null; }
+    static create(obj?: Object): AgencyUser { return null; }
 
     static async getCurrent(): Promise<AgencyUser> {
         let session = getSession();
         if(session.currentAgencyUser)
             return session.currentAgencyUser;
         if(!session.accountId)
+            return null;
+        var account = await Models.account.get(session.accountId);
+        if(!account || account.type != EAccountType.AGENCY)
             return null;
         var agencyUser = await Models.agencyUser.get(session.accountId);
         session.currentAgencyUser = agencyUser;
@@ -124,14 +127,6 @@ export class AgencyUser extends ModelObject{
     set sex(val: EGender) {}
 
     @Field({type: Types.STRING})
-    get email(): string { return ''; }
-    set email(val: string) {}
-
-    @Field({type: Types.STRING})
-    get mobile(): string { return ''; }
-    set mobile(val: string) {}
-
-    @Field({type: Types.STRING})
     get avatar(): string { return ''; }
     set avatar(val: string) {}
 
@@ -144,6 +139,8 @@ export class AgencyUser extends ModelObject{
     set agency(val: Agency) {}
 
     //Account properties:
+    email: string;
+    mobile: string;
     pwd: string;
     forbiddenExpireAt: Date;
     loginFailTimes: number;
@@ -153,6 +150,6 @@ export class AgencyUser extends ModelObject{
     pwdToken: string;
     oldQrcodeToken: string;
     qrcodeToken: string;
-    type: number;
+    type: EAccountType;
     isFirstLogin: boolean;
 }

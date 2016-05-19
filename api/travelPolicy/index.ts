@@ -12,7 +12,7 @@ import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import types = require("api/_types/travelPolicy");
 import { ServiceInterface } from 'common/model';
 import { TravelPolicy } from 'api/_types/travelPolicy';
-import { Models } from 'api/_types';
+import { Models, EAccountType } from 'api/_types';
 
 const travalPolicyCols = TravelPolicy['$fieldnames'];
 
@@ -40,7 +40,7 @@ class TravelPolicyModule{
         let {accountId} = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             let staff = await Models.staff.get(accountId);
 
@@ -93,7 +93,7 @@ class TravelPolicyModule{
 
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             let staff = await Models.staff.get(accountId);
 
@@ -146,7 +146,7 @@ class TravelPolicyModule{
         let company_id;
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             let staff = await Models.staff.get(accountId);
             company_id = staff["companyId"];
@@ -190,7 +190,7 @@ class TravelPolicyModule{
 
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let staff = await Models.staff.get(accountId);
             let tp = await Models.travelPolicy.get(id);
 
@@ -247,7 +247,7 @@ class TravelPolicyModule{
         }
 
         let role = await API.auth.judgeRoleById({id:accountId});
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let staff = await Models.staff.get(accountId);
             if(!staff){
                 throw {code: -1, msg: '无权限'};
@@ -306,7 +306,7 @@ class TravelPolicyModule{
             options.where.$or = params.$or;
         }
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             let staff = await Models.staff.get(accountId);
             if(!staff){
@@ -372,7 +372,7 @@ class TravelPolicyModule{
         options.where = params;
 
         let role = await API.auth.judgeRoleById({id:accountId});
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             let staff = await Models.staff.get(accountId);
 

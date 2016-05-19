@@ -19,9 +19,9 @@ import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_types/staff";
-import {AGENCY_ROLE} from "api/_types/agency";
+import { AGENCY_ROLE, AgencyUser } from "api/_types/agency";
 import { ServiceInterface } from 'common/model';
-import { Models } from 'api/_types';
+import { Models, EAccountType } from 'api/_types';
 import promise = require("../../common/test/api/promise/index");
 
 const staffCols = Staff['$fieldnames'];
@@ -60,39 +60,49 @@ class StaffModule{
                 return API.auth.newAccount(accData)
             })
             .then(function(account){
-                data.id = account.id;
+                console.info(account)
                 if(!data.travelLevel || data.travelLevel == ""){
                     data.travelLevel = null;
                 }
                 if(!data.departmentId || data.departmentId == ""){
                     data.departmentId = null;
                 }
-                return DBM.Staff.create(data)
-                    .then(function(result){
-                        return new Staff(result);
+                data.id = account.id;
+                let staff = DBM.Staff.build(data)
+                staff.id = account.id;
+                console.info("staff.id, account.id ===>", staff.id, account.id);
+                console.info(staff);
+                return staff.save()
+                    .then(function(staff) {
+                        return new Staff(staff);
                     })
             })
     }
 
     @clientExport
     static async createStaff (params): Promise<Staff> {
-        let {accountId} = Zone.current.get("session");
-        let role = await API.auth.judgeRoleById({id:accountId});
-
-        if(role == L.RoleType.STAFF){
-
-            let staff = await Models.staff.get(accountId);
-            let companyId = staff["companyId"];
-            params.companyId = companyId;
-            return StaffModule.create(params)
-        }else{
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-            if(result){
-                return StaffModule.create(params);
-            }else{
-                throw {code: -1, msg: '无权限'};
-            }
+        var staff = await Staff.getCurrent();
+        if(staff){
+            var newstaff = Staff.create(params);
+            newstaff.company = staff.company;
+            return newstaff.save();
         }
+        var user = AgencyUser.getCurrent();
+        if(user){
+            if(!params.companyId){
+                throw L.ERR.INVALID_ARGUMENT('companyId');
+            }
+            var company = await Models.company.get(params.companyId);
+            if(!company){
+                throw L.ERR.INVALID_ARGUMENT('companyId');
+            }
+            if(company['agencyId'] != user['agencyId']){
+                throw L.ERR.PERMISSION_DENY();
+            }
+            var newstaff = Staff.create(params);
+            return newstaff.save();
+        }
+        throw L.ERR.PERMISSION_DENY();
     }
 
     /**
@@ -157,12 +167,12 @@ class StaffModule{
     static async deleteStaff(params): Promise<any> {
         let {accountId} = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let staff = await Models.staff.get(accountId);
-            if(accountId == params.id){
+            if(this["accountId"] == params.id){
                 throw {msg: "不可删除自身信息"};
             }
-            let target = await Models.staff.get(params.id);
+            let target = await DBM.Staff.findById(params.id);
             if(target.roleId == 0){
                 throw {msg: "企业创建人不能被删除"};
             }
@@ -219,7 +229,7 @@ class StaffModule{
                                     ])
                                     .spread(function(updateaccount, updatestaff) {
                                         send_email = false;
-                                        return updatestaff;
+                                        return [1, updatestaff];
                                     });
                             }
                             return DBM.Staff.update(data, options);
@@ -273,7 +283,7 @@ class StaffModule{
         let id = params.id;
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             let staff = await Models.staff.get(accountId);
             let target = await Models.staff.get(id);
@@ -293,7 +303,6 @@ class StaffModule{
                 throw {code: -1, msg: '无权限'};
             }
         }
-
     }
 
     /**
@@ -324,7 +333,7 @@ class StaffModule{
         let id = params.id;
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             let staff = await Models.staff.get(accountId);
             let target = await Models.staff.get(id);
@@ -338,7 +347,8 @@ class StaffModule{
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
-                return Models.staff.get(id);
+                let instance = await DBM.Staff.findById(id);
+                return new Staff(instance);
             }else{
                 throw {code: -1, msg: '无权限'};
             }
@@ -373,7 +383,7 @@ class StaffModule{
         }
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let sf = await Models.staff.get(accountId);
             params.companyId = sf["companyId"];
             let staffs = await DBM.Staff.findAll(options);
@@ -471,7 +481,7 @@ class StaffModule{
         let { accountId } = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             let staff = await Models.staff.get(accountId)
             params.companyId = staff["companyId"];
@@ -569,7 +579,7 @@ class StaffModule{
         }
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             return DBM.PointChange.findById(id, options);
         }else{
@@ -602,7 +612,7 @@ class StaffModule{
         }
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             return DBM.PointChange.findAll(options);
         }else{
@@ -718,7 +728,7 @@ class StaffModule{
     @clientExport
     static async getStaffPointsChangeByMonth(params) {
         let { accountId } = Zone.current.get("session");
-        return Models.staff.get(accountId)
+        return DBM.Staff.findById(accountId)
             .then(function(staff){
                 return staff["companyId"];
             })
@@ -1102,7 +1112,7 @@ class StaffModule{
         let user_id = accountId;
         let role = await API.auth.judgeRoleById({id:user_id});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let staff= await Models.staff.get(user_id);
             if(staff){
                 let companyId = staff["companyId"];
@@ -1185,7 +1195,7 @@ class StaffModule{
         let user_id = accountId;
         let role = await API.auth.judgeRoleById({id:user_id});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let staff = await Models.staff.get(user_id);
             if(staff){
                 let companyId = staff["companyId"];
@@ -1218,7 +1228,7 @@ class StaffModule{
         let companyId = params.companyId;
         let role = await API.auth.judgeRoleById({id:user_id});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let staff = await Models.staff.get(user_id);
             if(staff){
                 companyId = staff["companyId"];
@@ -1266,7 +1276,7 @@ class StaffModule{
     static getInvoiceViewer (params: {accountId: string}){
         var viewerId = [];
         var id = params.accountId;
-        return Models.staff.get(id)
+        return DBM.Staff.findById(id)
             .then(function(obj){
                 if(obj && obj.company.id){
                     return API.company.getCompany({id: obj.company.id})
@@ -1315,9 +1325,9 @@ class StaffModule{
         let { accountId } = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let staff = await Models.staff.get(accountId);
-            return StaffModule.statStaffByPoints({companyId: staff["companyId"]});
+            return this.statStaffByPoints({companyId: staff["companyId"]});
         }else{
             let companyId = params.companyId;
             let u = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
