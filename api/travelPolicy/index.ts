@@ -53,7 +53,7 @@ class TravelPolicyModule{
             if(result){
                 throw {msg: "该等级名称已存在，请重新设置"};
             }
-            let returnData =  DBM.TravelPolicy.create(params)
+            let returnData =  await DBM.TravelPolicy.create(params);
             return new TravelPolicy(returnData);
 
         }else{
@@ -80,20 +80,17 @@ class TravelPolicyModule{
      * @param params
      * @returns {*}
      */
-    @requireParams(["id"])
-    static async delete(params): Promise<any>{
+    @clientExport
+    @requireParams(["id"], ["companyId"])
+    static async deleteTravelPolicy(params: {id : string, companyId?: string}) : Promise<any>{
+        let {accountId} = Zone.current.get("session");
+
         var id = params.id;
         let staffs = await API.staff.getStaffs({travelLevel: id, status: 0});
         if(staffs && staffs.length > 0){
             throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准 暂不能删除，给这些员工匹配新的差旅标准后再进行操作'};
         }
-        let obj = await DBM.TravelPolicy.destroy({where: params});
-        return true;
-    }
 
-    @clientExport
-    static async deleteTravelPolicy(params: {id : string, companyId?: string}) : Promise<any>{
-        let {accountId} = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
 
         if(role == L.RoleType.STAFF){
@@ -103,14 +100,17 @@ class TravelPolicyModule{
             if(!staff){
                 throw {code: -1, msg: '无权限'};
             }
-            return this.delete({companyId: staff["companyId"], id: params.id});
+
+            let obj = await DBM.TravelPolicy.destroy({where: {companyId: staff["companyId"], id: id}});
+            return true;
 
         }else{
 
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
 
             if(result){
-                return this.delete(params);
+                let obj = await DBM.TravelPolicy.destroy({where: params});
+                return true;
             }else{
                 throw {code: -1, msg: '无权限'};
             }
@@ -130,25 +130,19 @@ class TravelPolicyModule{
      * @param data
      * @returns {*}
      */
+    @clientExport
     @requireParams(["id"], travalPolicyCols)
-    static update(data): Promise<TravelPolicy>{
-        var id = data.id;
-        delete data.id;
+    static async updateTravelPolicy(params) : Promise<TravelPolicy>{
+        let {accountId} = Zone.current.get("session");
+
+        var id = params.id;
+        delete params.id;
         var options : any = {};
         options.where = {id: id};
         options.returning = true;
-        if (!data.hotelPrice || !/^\d+(.\d{1,2})?$/.test(data.hotelPrice)) {
-            data.hotelPrice = null;
+        if (!params.hotelPrice || !/^\d+(.\d{1,2})?$/.test(params.hotelPrice)) {
+            params.hotelPrice = null;
         }
-        return DBM.TravelPolicy.update(data, options)
-            .spread(function(rownum, rows){
-                return new TravelPolicy(rows[0]);
-            });
-    }
-
-    @clientExport
-    static async updateTravelPolicy(params) : Promise<TravelPolicy>{
-        let {accountId} = Zone.current.get("session");
         let company_id;
         let role = await API.auth.judgeRoleById({id:accountId});
 
@@ -157,19 +151,21 @@ class TravelPolicyModule{
             let staff = await Models.staff.get(accountId);
             company_id = staff["companyId"];
 
-            let tp = await API.travelPolicy.getTravelPolicy({id: params.id});
+            let tp = await API.travelPolicy.getTravelPolicy({id: id});
             if(tp.companyId != company_id){
                 throw {code: -1, msg: '无权限'};
             }
 
-            params.companyId = company_id;//只允许删除该企业下的差旅标准
-            return this.update(params);
+            options.where.companyId = company_id;//只允许删除该企业下的差旅标准
+            let [rownum, rows]  = await DBM.TravelPolicy.update(params, options);
+            return new TravelPolicy(rows[0]);
 
         }else{
 
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
-                return this.update(params);
+                let { rownum, rows } = await DBM.TravelPolicy.update(params, options);
+                return new TravelPolicy(rows[0]);
             }else{
                 throw {code: -1, msg: '无权限'};
             }
@@ -182,33 +178,16 @@ class TravelPolicyModule{
      * @param {Boolean} params.isReturnDefault 如果不存在返回默认 default true,
      * @returns {*}
      */
-    @requireParams(["id"])
-    static async get(params): Promise<TravelPolicy>{
-        var id = params.id;
-
-        var isReturnDefault = params.isReturnDefault;
-        if (isReturnDefault !== false) {
-            isReturnDefault = true;
-        }
-
-        if(!id){
-            if (isReturnDefault) {
-                let data = await DBM.TravelPolicy.findById('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a');
-                return new TravelPolicy(data);
-
-            } else {
-                throw {code: -1, msg: "id不能为空"};
-            }
-        }
-
-        let result = await DBM.TravelPolicy.findById(id);
-        return new TravelPolicy(result);
-    }
-
     @clientExport
     static async getTravelPolicy(params: {id: string, companyId?: string}) : Promise<TravelPolicy>{
         let id = params.id;
-        let {accountId} = Zone.current.get("session");
+        let { accountId } = Zone.current.get("session");
+
+        if(!id){
+            let data = await DBM.TravelPolicy.findById('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a');
+            return new TravelPolicy(data);
+        }
+
         let role = await API.auth.judgeRoleById({id:accountId});
 
         if(role == L.RoleType.STAFF){
@@ -334,7 +313,7 @@ class TravelPolicyModule{
                 throw {code: -1, msg: '无权限'};
             }
 
-            params.companyId = staff["companyId"];//只允许查询该企业下的差旅标准
+            options.where.companyId = staff["companyId"];//只允许查询该企业下的差旅标准
             let travelPolicies = await DBM.TravelPolicy.findAll(options);
             return travelPolicies.map(function(t){
                 return t.id;
@@ -359,6 +338,14 @@ class TravelPolicyModule{
      * @param options options.perPage 每页条数 options.page当前页
      */
     static paginateTravelPolicy(params){
+
+
+    }
+
+    @clientExport
+    static async listAndPaginateTravelPolicy(params){
+        let {accountId} = Zone.current.get("session");
+
         var options: any = {};
         if(params.options){
             options = params.options;
@@ -383,15 +370,7 @@ class TravelPolicyModule{
         options.limit = limit;
         options.offset = offset;
         options.where = params;
-        return DBM.TravelPolicy.findAndCountAll(options)
-            .then(function(result){
-                return new Paginate(page, perPage, result.count, result.rows);
-            });
-    }
 
-    @clientExport
-    static async listAndPaginateTravelPolicy(params){
-        let {accountId} = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
         if(role == L.RoleType.STAFF){
 
@@ -401,14 +380,20 @@ class TravelPolicyModule{
                 throw {code: -1, msg: '无权限'};
             }
             params.companyId = staff["companyId"];//只允许查询该企业下的差旅标准
-            return this.paginateTravelPolicy(params);
+            return DBM.TravelPolicy.findAndCountAll(options)
+                .then(function(result){
+                    return new Paginate(page, perPage, result.count, result.rows);
+                });
 
         }else{
 
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
 
             if(result){
-                return this.paginateTravelPolicy(params);
+                return DBM.TravelPolicy.findAndCountAll(options)
+                    .then(function(result){
+                        return new Paginate(page, perPage, result.count, result.rows);
+                    });
             }else{
                 throw {code: -1, msg: '无权限'};
             }

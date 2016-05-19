@@ -110,7 +110,7 @@ class DepartmentModule{
         var options: any = {};
         options.where = {id: id};
         options.returning = true;
-        let { rownum, rows } = await DBM.Department.update(data, options);
+        let [rownum, rows] = await DBM.Department.update(data, options);
         return new Department(rows[0]);
     }
 
