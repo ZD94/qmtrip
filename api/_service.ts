@@ -40,7 +40,8 @@ class SequelizeService<T extends Resolvable> extends CachedService<T>{
     }
     async $update(obj: T, fields: Object): Promise<Object>{
         try{
-            await obj.target.update(fields);
+            obj.target.set(fields);
+            await obj.target.save({returning:true});
             return obj.target;
         } catch(e) {
             //出错后,需要将之前设置的fields恢复成之前的样子
