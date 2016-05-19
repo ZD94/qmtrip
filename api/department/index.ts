@@ -44,14 +44,14 @@ class DepartmentModule{
             }
 
             params.companyId = staff.companyId;//只允许添加该企业下的部门
-            return this.create(params)
+            return DepartmentModule.create(params)
 
         }else{
 
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
 
             if(result){
-                return this.create(params)
+                return DepartmentModule.create(params)
             }else{
                 throw {code: -1, msg: '无权限'};
             }
@@ -80,13 +80,13 @@ class DepartmentModule{
         let role = await API.auth.judgeRoleById({id:accountId});
 
         if(role == EAccountType.STAFF){
-            return this.delete(params);
+            return DepartmentModule.delete(params);
         }else{
 
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             // delete params.companyId;
             if(result){
-                return this.delete(params);
+                return DepartmentModule.delete(params);
             }else{
                 throw {code: -1, msg: '无权限'};
             }
@@ -131,12 +131,12 @@ class DepartmentModule{
                 throw {code: -1, msg: '无权限'};
             }
             params.companyId = company_id;
-            return this.update(params)
+            return DepartmentModule.update(params)
 
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
-                return this.update(params);
+                return DepartmentModule.update(params);
             }else{
                 throw {code: -1, msg: '无权限'};
             }
@@ -169,10 +169,10 @@ class DepartmentModule{
             let companyId = staff.companyId;
 
             if(!id){
-                return this.getDefaultDepartment({companyId:companyId});
+                return DepartmentModule.getDefaultDepartment({companyId:companyId});
             }
 
-            let tp = await this.get({id:id});
+            let tp = await DepartmentModule.get({id:id});
             if(!tp){
                 throw {code: -1, msg: '查询结果不存在'};
             }
@@ -424,14 +424,14 @@ class DepartmentModule{
             let staff = await API.staff.getStaff({id: accountId});
             if(staff){
                 params.companyId = staff.companyId;//只允许查询该企业下的部门
-                return this.getAllChildren(params);
+                return DepartmentModule.getAllChildren(params);
             }else{
                 throw {code: -1, msg: '无权限'};
             }
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
-                return this.getAllChildren(params);
+                return DepartmentModule.getAllChildren(params);
             }else{
                 throw {code: -1, msg: '无权限'};
             }
