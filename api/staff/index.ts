@@ -505,6 +505,7 @@ class StaffModule{
      * @param options
      * @returns {*}
      */
+    @clientExport
     @requireParams(['id', 'companyId', 'accountId', 'increasePoint'], ["orderId", "remark"])
     static increaseStaffPoint(params) {
         var id = params.id;
@@ -537,6 +538,7 @@ class StaffModule{
      * @param options
      * @returns {*}
      */
+    @clientExport
     @requireParams(['id', 'decreasePoint'], ["accountId", "companyId", "remark"])
     static decreaseStaffPoint(params) {
         var id = params.id;
@@ -1099,7 +1101,7 @@ class StaffModule{
                     inNum: inNum || 0,
                     outNum: outNum || 0
                 }
-                return API.company.updateCompany({companyId: companyId, staffNum: all, updatedAt: utils.now()})
+                return API.company.updateCompany({companyId: companyId, staffNum: all})
                     .then(function(){
                         return sta;
                     })
@@ -1327,7 +1329,7 @@ class StaffModule{
 
         if(role == EAccountType.STAFF){
             let staff = await Models.staff.get(accountId);
-            return this.statStaffByPoints({companyId: staff["companyId"]});
+            return StaffModule.statStaffByPoints({companyId: staff["companyId"]});
         }else{
             let companyId = params.companyId;
             let u = await API.agency.getAgencyUser({id: accountId, columns: ['agencyId']});
