@@ -108,7 +108,7 @@ class AgencyModule {
         let agency = await DBM.Agency.findById(params.id);
 
         if (!agency) {
-            throw L.ERR.AGENCY_NOT_EXIST();
+            throw L.ERR.AGENCY_NOT_EXIST;
         }
 
         return new Agency(agency);
@@ -130,7 +130,7 @@ class AgencyModule {
         let agency = await DBM.Agency.findById(agencyId, {attributes: ['createUser']});
 
         if (!agency) {
-            throw L.ERR.AGENCY_NOT_EXIST();
+            throw L.ERR.AGENCY_NOT_EXIST;
         }
 
         _agency.updatedAt = utils.now();
@@ -150,7 +150,7 @@ class AgencyModule {
      * @returns {Promise<string[]>}
      */
     static async listAgency(params?: any): Promise<string[]>{
-        let agencies = await DBM.Agency.findAll({where: {status: {$ne: EAgencyStatus.DELETE}}, attributes: ['id']});
+        let agencies = await DBM.Agency.findAll({attributes: ['id']});
 
         return agencies.map(function(agency) {
             return agency.id;
@@ -173,10 +173,10 @@ class AgencyModule {
         let agency = await DBM.Agency.findById(agencyId);
 
         if (!agency) {
-            throw L.ERR.AGENCY_NOT_EXIST();
+            throw L.ERR.AGENCY_NOT_EXIST;
         }
 
-        let agencyUsers = await DBM.AgencyUser.findAll({where: {agencyId: agencyId, status: {$ne: EAgencyStatus.DELETE}}, attributes: ['id']});
+        let agencyUsers = await DBM.AgencyUser.findAll({where: {agencyId: agencyId}, attributes: ['id']});
 
         await DBM.Agency.destroy({where: {id: agencyId}});
         await DBM.AgencyUser.destroy({where: {agencyId: agencyId}});
@@ -202,11 +202,12 @@ class AgencyModule {
         let {accountId} = Zone.current.get('session');
         let curUser = await DBM.AgencyUser.findById(accountId, {attributes: ['agencyId']});
         let agencyId = curUser.agencyId;
-        params['agencyId'] = agencyId;
 
-        if(!curUser || curUser.status === EAgencyStatus.DELETE) {
-            throw L.ERR.AGENCY_USRE_NOT_EXIST();
+        if(!curUser) {
+            throw L.ERR.AGENCY_USER_NOT_EXIST;
         }
+
+        params['agencyId'] = agencyId;
 
         let _agencyUser = await DBM.AgencyUser.findOne({where: {agencyId: agencyId, $or: [{email: params.email}, {mobile: params.mobile}]}});
 
@@ -238,7 +239,7 @@ class AgencyModule {
         let target = await DBM.AgencyUser.findById(params.id);
 
         if(!target) {
-            throw L.ERR.AGENCY_NOT_EXIST();
+            throw L.ERR.AGENCY_NOT_EXIST;
         }
 
         target.status = params.status;
@@ -268,16 +269,16 @@ class AgencyModule {
         let curUser = await DBM.AgencyUser.findById(accountId, {attributes: ['agencyId']});
         let target = await DBM.AgencyUser.findById(params.id);
 
-        if(!target || target.status == EAgencyStatus.DELETE) {
-            throw L.ERR.AGENCY_USRE_NOT_EXIST();
+        if(!target) {
+            throw L.ERR.AGENCY_USER_NOT_EXIST;
         }
 
         if(target.agencyId != curUser.agencyId) {
-            throw L.ERR.PERMISSION_DENY();
+            throw L.ERR.PERMISSION_DENY;
         }
 
-        await DBM.AgencyUser.update({status: EAgencyStatus.DELETE, updatedAt: utils.now()}, {where: {id: id}, fields: ['status', 'updatedAt']})
-        await DBM.Accounts.destroy({where: {id: id}});
+        await DBM.AgencyUser.destroy({where: {id: id}})
+        await DBM.Account.destroy({where: {id: id}});
 
         return true;
     }
@@ -297,11 +298,11 @@ class AgencyModule {
         let agencyUser = await DBM.AgencyUser.findById(params.id);
 
         if (!agencyUser) {
-            throw L.ERR.AGENCY_USRE_NOT_EXIST();
+            throw L.ERR.AGENCY_USER_NOT_EXIST;
         }
 
         if(agencyUser.agencyId != curUser.agencyId) {
-            throw L.ERR.PERMISSION_DENY();
+            throw L.ERR.PERMISSION_DENY;
         }
 
         return new AgencyUser(agencyUser);
@@ -325,38 +326,12 @@ class AgencyModule {
      * @param options options.perPage 每页条数 options.page当前页
      */
     @clientExport
-    static listAndPaginateAgencyUser(params) {
-        let options:any = {};
-        if (params.options) {
-            options = params.options;
-            delete params.options;
-        }
-        let page, perPage, limit, offset;
-        if (options.page && /^\d+$/.test(options.page)) {
-            page = options.page;
-        } else {
-            page = 1;
-        }
-        if (options.perPage && /^\d+$/.test(options.perPage)) {
-            perPage = options.perPage;
-        } else {
-            perPage = 6;
-        }
-        limit = perPage;
-        offset = (page - 1) * perPage;
-        if (!options.order) {
-            options.order = [["created_at", "desc"]]
-        }
-        options.limit = limit;
-        options.offset = offset;
-        options.where = params;
-        return DBM.AgencyUser.findAndCountAll(options)
-            .then(function (result) {
-                let data = result.rows.map(function (user) {
-                    return user.id;
-                });
-                return new Paginate(page, perPage, result.count, data);
-            });
+    static async listAgencyUser(params) {
+        let agencies = await DBM.Agency.findAll({where: params, attributes: ['id']});
+
+        return agencies.map(function(agency) {
+            return agency.id;
+        })
     }
 
     /**
@@ -367,7 +342,6 @@ class AgencyModule {
      */
     @clientExport
     static async getAgencyUsers(params: {agencyId: string}): Promise<string[]> {
-        params['status'] = {$ne: EAgencyStatus.DELETE};
         let users = await  DBM.AgencyUser.findAll({where: params, attributes: ['id']});
 
         return users.map(function(user) {
@@ -403,7 +377,7 @@ class AgencyModule {
         try {
             let agency = await API.agency.agencyByEmail({email: email});
 
-            if(!agency || !agency.target || agency.status == EAgencyStatus.DELETE) {
+            if(!agency || !agency.target) {
                 let _agency = {name: default_agency.name, email: email, mobile: mobile, pwd: pwd || '123456', status: 1, userName: user_name, remark: '系统默认代理商'}
                 agency = await API.agency.registerAgency(_agency)
             }
