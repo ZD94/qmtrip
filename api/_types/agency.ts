@@ -3,7 +3,7 @@
  */
 'use strict';
 import { regApiType } from 'common/api/helper';
-import { Models, EGender } from 'api/_types';
+import { Models, EGender, EAccountType } from 'api/_types';
 import {Company} from 'api/_types/company';
 import { ModelObject, Table, TableExtends, Field, Types, ResolveRef, Reference, Values } from 'common/model';
 import { getSession } from 'common/model';
@@ -102,6 +102,9 @@ export class AgencyUser extends ModelObject{
             return session.currentAgencyUser;
         if(!session.accountId)
             return null;
+        var account = await Models.account.get(session.accountId);
+        if(!account || account.type != EAccountType.AGENCY)
+            return null;
         var agencyUser = await Models.agencyUser.get(session.accountId);
         session.currentAgencyUser = agencyUser;
         return agencyUser;
@@ -153,6 +156,6 @@ export class AgencyUser extends ModelObject{
     pwdToken: string;
     oldQrcodeToken: string;
     qrcodeToken: string;
-    type: number;
+    type: EAccountType;
     isFirstLogin: boolean;
 }

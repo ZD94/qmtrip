@@ -1,4 +1,4 @@
-import { Models, EGender } from 'api/_types';
+import { Models, EGender, EAccountType } from 'api/_types';
 import { Company } from 'api/_types/company';
 import { TripPlan } from 'api/_types/tripPlan';
 import { regApiType } from 'common/api/helper';
@@ -40,6 +40,9 @@ export class Staff extends ModelObject implements Account {
         if(session.currentStaff)
             return session.currentStaff;
         if(!session.accountId)
+            return null;
+        var account = await Models.account.get(session.accountId);
+        if(!account || account.type != EAccountType.STAFF)
             return null;
         var staff = await Models.staff.get(session.accountId);
         session.currentStaff = staff;
@@ -115,7 +118,7 @@ export class Staff extends ModelObject implements Account {
     pwdToken: string;
     oldQrcodeToken: string;
     qrcodeToken: string;
-    type: number;
+    type: EAccountType;
     isFirstLogin: boolean;
 }
 

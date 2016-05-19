@@ -3,7 +3,7 @@
  */
 "use strict";
 import {requireParams, clientExport} from "../../common/api/helper";
-import { Models} from "api/_types";
+import { Models, EAccountType } from "api/_types";
 import {AuthCert, Token, Account} from "api/_types/auth"
 var sequelize = require("common/model").importModel("./models");
 var DBM = sequelize.models;

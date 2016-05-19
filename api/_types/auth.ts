@@ -1,6 +1,6 @@
 import { regApiType } from 'common/api/helper';
 import { Table, Field, Types, ModelObject, Values } from 'common/model'
-import { Models} from './index';
+import { Models, EAccountType } from './index';
 import { Create } from 'common/model';
 
 @regApiType('API.')
@@ -16,11 +16,6 @@ class AuthCert {
         this.user_id = obj.user_id;
         this.token_sign = obj.token_sign;
     }
-}
-
-enum ACCOUNT_TYPE {
-    COMMON_STAFF = 1,
-    AGENT_STAFF = 2
 }
 
 @Table(Models.account, "auth.")
@@ -91,8 +86,8 @@ class Account extends ModelObject{
     set qrcodeToken(qrcodeToken: string){}
 
     @Field({type:Types.INTEGER})
-    get type(): number { return null; }
-    set type(type: number){}
+    get type(): EAccountType { return EAccountType.STAFF; }
+    set type(type: EAccountType){}
 
     @Field({type:Types.BOOLEAN})
     get isFirstLogin(): boolean { return true; }
@@ -127,4 +122,4 @@ class Token extends ModelObject{
     set os(os: string) {}
 }
 
-export {AuthCert, Account, Token, ACCOUNT_TYPE}
+export {AuthCert, Account, Token}

@@ -21,7 +21,7 @@ import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_types/staff";
 import {AGENCY_ROLE} from "api/_types/agency";
 import { ServiceInterface } from 'common/model';
-import { Models } from 'api/_types';
+import { Models, EAccountType } from 'api/_types';
 import promise = require("../../common/test/api/promise/index");
 
 const staffCols = Staff['$fieldnames'];
@@ -157,7 +157,7 @@ class StaffModule{
     static async deleteStaff(params): Promise<any> {
         let {accountId} = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let staff = await Models.staff.get(accountId);
             if(this["accountId"] == params.id){
                 throw {msg: "不可删除自身信息"};
@@ -273,7 +273,7 @@ class StaffModule{
         let id = params.id;
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             let staff = await Models.staff.get(accountId);
             let target = await Models.staff.get(id);
@@ -293,7 +293,6 @@ class StaffModule{
                 throw {code: -1, msg: '无权限'};
             }
         }
-
     }
 
     /**
@@ -324,7 +323,7 @@ class StaffModule{
         let id = params.id;
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             let staff = await Models.staff.get(accountId);
             let target = await Models.staff.get(id);
@@ -373,7 +372,7 @@ class StaffModule{
         }
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let sf = await Models.staff.get(accountId);
             params.companyId = sf["companyId"];
             let staffs = await DBM.Staff.findAll(options);
@@ -471,7 +470,7 @@ class StaffModule{
         let { accountId } = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             let staff = await Models.staff.get(accountId)
             params.companyId = staff["companyId"];
@@ -569,7 +568,7 @@ class StaffModule{
         }
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             return DBM.PointChange.findById(id, options);
         }else{
@@ -602,7 +601,7 @@ class StaffModule{
         }
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             return DBM.PointChange.findAll(options);
         }else{
@@ -1102,7 +1101,7 @@ class StaffModule{
         let user_id = accountId;
         let role = await API.auth.judgeRoleById({id:user_id});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let staff= await Models.staff.get(user_id);
             if(staff){
                 let companyId = staff["companyId"];
@@ -1185,7 +1184,7 @@ class StaffModule{
         let user_id = accountId;
         let role = await API.auth.judgeRoleById({id:user_id});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let staff = await Models.staff.get(user_id);
             if(staff){
                 let companyId = staff["companyId"];
@@ -1218,7 +1217,7 @@ class StaffModule{
         let companyId = params.companyId;
         let role = await API.auth.judgeRoleById({id:user_id});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let staff = await Models.staff.get(user_id);
             if(staff){
                 companyId = staff["companyId"];
@@ -1315,7 +1314,7 @@ class StaffModule{
         let { accountId } = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let staff = await Models.staff.get(accountId);
             return this.statStaffByPoints({companyId: staff["companyId"]});
         }else{
