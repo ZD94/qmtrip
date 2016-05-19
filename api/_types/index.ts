@@ -15,6 +15,10 @@ export enum EGender {
     FEMALE
 };
 
+export enum EAccountType {
+    STAFF = 1,
+    AGENCY
+};
 
 export interface ModelsInterface {
     staff: ServiceInterface<Staff>;

@@ -1,4 +1,4 @@
-import { Models, EGender } from 'api/_types';
+import { Models, EGender, EAccountType } from 'api/_types';
 import { Company } from 'api/_types/company';
 import { TripPlan } from 'api/_types/tripPlan';
 import { regApiType } from 'common/api/helper';
@@ -33,13 +33,16 @@ export class Staff extends ModelObject implements Account {
         super(target);
     }
     @Create()
-    static create(): Staff { return null; }
+    static create(obj?: Object): Staff { return null; }
 
     static async getCurrent(): Promise<Staff> {
         let session = getSession();
         if(session.currentStaff)
             return session.currentStaff;
         if(!session.accountId)
+            return null;
+        var account = await Models.account.get(session.accountId);
+        if(!account || account.type != EAccountType.STAFF)
             return null;
         var staff = await Models.staff.get(session.accountId);
         session.currentStaff = staff;
@@ -77,14 +80,6 @@ export class Staff extends ModelObject implements Account {
     @Field({type: Types.INTEGER})
     get roleId(): EStaffRole { return EStaffRole.COMMON; }
     set roleId(val: EStaffRole) {}
-    // '邮箱'
-    @Field({type: Types.STRING(50)})
-    get email(): string { return ''; }
-    set email(val: string) {}
-    // '手机'
-    @Field({type: Types.STRING(20)})
-    get mobile(): string { return ''; }
-    set mobile(val: string) {}
     // '操作人id'
     @Field({type: Types.UUID})
     get operatorId(): string { return null; }
@@ -103,9 +98,10 @@ export class Staff extends ModelObject implements Account {
         return Models.travelPolicy.get(id);
     }
     setTravelPolicy(val: TravelPolicy) {}
-
-
+    
     //Account properties:
+    email: string;
+    mobile: string;
     pwd: string;
     forbiddenExpireAt: Date;
     loginFailTimes: number;
@@ -115,7 +111,7 @@ export class Staff extends ModelObject implements Account {
     pwdToken: string;
     oldQrcodeToken: string;
     qrcodeToken: string;
-    type: number;
+    type: EAccountType;
     isFirstLogin: boolean;
 }
 
@@ -126,7 +122,7 @@ export class Credential extends ModelObject{
         super(target);
     }
     @Create()
-    static create(): Credential { return null; }
+    static create(obj?: Object): Credential { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
@@ -160,7 +156,7 @@ export class PointChange extends ModelObject{
         super(target);
     }
     @Create()
-    static create(): PointChange { return null; }
+    static create(obj?: Object): PointChange { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }

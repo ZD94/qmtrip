@@ -21,7 +21,7 @@ export class Company extends ModelObject{
         super(target);
     }
     @Create()
-    static create(): Company { return null; }
+    static create(obj?: Object): Company { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
@@ -131,7 +131,7 @@ export class MoneyChange extends ModelObject {
         super(target);
     }
     @Create()
-    static create(): MoneyChange { return null; }
+    static create(obj?: Object): MoneyChange { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }

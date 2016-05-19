@@ -11,6 +11,7 @@ let L = require("common/language");
 import {Department} from "api/_types/department";
 import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import { ServiceInterface } from 'common/model';
+import { EAccountType } from '../_types/index';
 
 const departmentCols = Department['$fieldnames'];
 class DepartmentModule{
@@ -35,7 +36,7 @@ class DepartmentModule{
         let { accountId } = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             let staff = await API.staff.getStaff({id: accountId});
             if(staff.code){
@@ -78,7 +79,7 @@ class DepartmentModule{
         let { accountId } = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             return DepartmentModule.delete(params);
         }else{
 
@@ -120,7 +121,7 @@ class DepartmentModule{
         let company_id;
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             let staff = await API.staff.getStaff({id: accountId});
             company_id = staff.companyId;
@@ -162,7 +163,7 @@ class DepartmentModule{
         let { accountId } = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             let staff = await API.staff.getStaff({id: accountId});
             let companyId = staff.companyId;
@@ -222,7 +223,7 @@ class DepartmentModule{
         }
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             let staff = await API.staff.getStaff({id: accountId});
             params.companyId = staff.companyId;
@@ -296,7 +297,7 @@ class DepartmentModule{
         options.order = [["created_at", "desc"]];
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let staff = await API.staff.getStaff({id: accountId});
             params.companyId = staff.companyId;
             options.where = params;
@@ -334,7 +335,7 @@ class DepartmentModule{
         let role = await API.auth.judgeRoleById({id:accountId});
         let options: any = {};
         options.order = [["created_at", "desc"]];
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
 
             let staff = await API.staff.getStaff({id: accountId});
             if(staff){
@@ -379,7 +380,7 @@ class DepartmentModule{
         options.order = [["created_at", "desc"]];
         let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let staff = await API.staff.getStaff({id: accountId});
 
             if(staff){
@@ -419,7 +420,7 @@ class DepartmentModule{
     static async getAllChildDepartments(params: {companyId?: string, parentId: string}){
         let { accountId } = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
-        if(role == L.RoleType.STAFF){
+        if(role == EAccountType.STAFF){
             let staff = await API.staff.getStaff({id: accountId});
             if(staff){
                 params.companyId = staff.companyId;//只允许查询该企业下的部门
