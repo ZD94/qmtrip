@@ -36,6 +36,7 @@ var ACCOUNT_TYPE = {
  */
 class ApiAuth {
 
+    static __public: boolean = true;
     /**
      * @method activeByEmail 通过邮箱激活账号
      *
