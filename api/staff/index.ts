@@ -60,16 +60,21 @@ class StaffModule{
                 return API.auth.newAccount(accData)
             })
             .then(function(account){
-                data.id = account.id;
+                console.info(account)
                 if(!data.travelLevel || data.travelLevel == ""){
                     data.travelLevel = null;
                 }
                 if(!data.departmentId || data.departmentId == ""){
                     data.departmentId = null;
                 }
-                return DBM.Staff.create(data)
-                    .then(function(result){
-                        return new Staff(result);
+                data.id = account.id;
+                let staff = DBM.Staff.build(data)
+                staff.id = account.id;
+                console.info("staff.id, account.id ===>", staff.id, account.id);
+                console.info(staff);
+                return staff.save()
+                    .then(function(staff) {
+                        return new Staff(staff);
                     })
             })
     }

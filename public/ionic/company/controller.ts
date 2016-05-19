@@ -81,17 +81,19 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
     $scope.role = role;
 
     $scope.travelpolicylist = await company.getTravelPolicies();
-    console.info($scope.travelpolicylist);
     // $scope.departmentlist = await company.department.get(companyId);
     $scope.savestaff = function(){
-        if($scope.role.id ==true){
-            $scope.staff.roleId = EStaffRole.ADMIN;
-        }else{
-            $scope.staff.roleId = EStaffRole.COMMON;
+        let _staff = $scope.staff;
+        if (_staff.travelLevel && _staff.travelLevel.id) {
+            _staff.travelLevel = _staff.travelLevel.id;
         }
-        console.info($scope.staff);
-        $scope.staff.save();
 
+        if(_staff.role  && _staff.role.id ==true){
+            _staff.roleId = EStaffRole.ADMIN;
+        }else{
+            _staff.roleId = EStaffRole.COMMON;
+        }
+        _staff.save();
         $ionicHistory.goBack(-1);
     }
     $scope.showrole = function(){
