@@ -127,14 +127,6 @@ export class AgencyUser extends ModelObject{
     set sex(val: EGender) {}
 
     @Field({type: Types.STRING})
-    get email(): string { return ''; }
-    set email(val: string) {}
-
-    @Field({type: Types.STRING})
-    get mobile(): string { return ''; }
-    set mobile(val: string) {}
-
-    @Field({type: Types.STRING})
     get avatar(): string { return ''; }
     set avatar(val: string) {}
 
@@ -147,6 +139,8 @@ export class AgencyUser extends ModelObject{
     set agency(val: Agency) {}
 
     //Account properties:
+    email: string;
+    mobile: string;
     pwd: string;
     forbiddenExpireAt: Date;
     loginFailTimes: number;

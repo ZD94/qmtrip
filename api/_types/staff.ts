@@ -80,14 +80,6 @@ export class Staff extends ModelObject implements Account {
     @Field({type: Types.INTEGER})
     get roleId(): EStaffRole { return EStaffRole.COMMON; }
     set roleId(val: EStaffRole) {}
-    // '邮箱'
-    @Field({type: Types.STRING(50)})
-    get email(): string { return ''; }
-    set email(val: string) {}
-    // '手机'
-    @Field({type: Types.STRING(20)})
-    get mobile(): string { return ''; }
-    set mobile(val: string) {}
     // '操作人id'
     @Field({type: Types.UUID})
     get operatorId(): string { return null; }
@@ -107,8 +99,9 @@ export class Staff extends ModelObject implements Account {
     }
     setTravelPolicy(val: TravelPolicy) {}
     
-
     //Account properties:
+    email: string;
+    mobile: string;
     pwd: string;
     forbiddenExpireAt: Date;
     loginFailTimes: number;
