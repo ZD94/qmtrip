@@ -60,7 +60,7 @@ var Services = {
         funcs: ['getAgencyById', 'listAgency', 'createAgency', 'updateAgency', 'deleteAgency']
     },
     agencyUser: { type: AgencyUser, modname: 'agency',
-        funcs: ['getAgencyUser', 'listAndPaginateAgencyUser', 'createAgencyUser', 'updateAgencyUser', 'deleteAgencyUser']
+        funcs: ['getAgencyUser', 'listAgencyUser', 'createAgencyUser', 'updateAgencyUser', 'deleteAgencyUser']
     },
     tripPlan: { type: TripPlan, modname: 'tripPlan',
         funcs: ['getTripPlan', 'listTripPlans', 'saveTripPlan', 'updateTripPlan', 'deleteTripPlan']

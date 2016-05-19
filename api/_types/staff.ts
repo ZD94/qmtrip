@@ -103,7 +103,7 @@ export class Staff extends ModelObject implements Account {
         return Models.travelPolicy.get(id);
     }
     setTravelPolicy(val: TravelPolicy) {}
-    
+
 
     //Account properties:
     pwd: string;
