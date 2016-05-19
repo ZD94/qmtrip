@@ -4,7 +4,6 @@
 var API = require('common/api');
 
 var assert = require("assert");
-var Q = require("q");
 
 describe("api/client/travelPolicy.js", function() {
 
@@ -43,7 +42,7 @@ describe("api/client/travelPolicy.js", function() {
 
     //创建差旅标准
     before(function(done) {
-        Q.all([
+        Promise.all([
                 API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
                 API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
                 API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})
@@ -74,7 +73,7 @@ describe("api/client/travelPolicy.js", function() {
     });
 
     after(function(done) {
-        Q.all([
+        Promise.all([
                 API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
                 API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
                 API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})
