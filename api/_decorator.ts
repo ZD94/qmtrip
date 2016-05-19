@@ -1,3 +1,6 @@
+import { getSession } from '../common/model/index';
+import { Staff } from './_types/staff';
+import { AgencyUser } from './_types/agency';
 /**
  * Created by wlh on 16/5/16.
  */
@@ -162,107 +165,51 @@ export var condition = {
     isMyCompany: function (idpath: string) {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
-            let accountId = _getAccountId();
-
-            let staff, company;
-            try {
-                staff = await Models.staff.get(accountId);
-            } catch(err) {
-            }
-
-            try {
-                company = await Models.company.get(staff["companyId"]);
-            } catch(err) {
-            }
-            return staff && staff.target && company && company.target && company.id == id;
+            let staff = await Staff.getCurrent();
+            return id && staff && staff.company && staff.company.id == id;
         }
     },
     isMyCompanyAgency: function (idpath: string) {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
-            let accountId = _getAccountId();
-            let staff;
-            let company;
-            try {
-                staff = await Models.staff.get(accountId);
-            } catch(err) {
-            }
-            try {
-                company = await Models.company.get(staff["companyId"]);
-            } catch(err) {
-            }
-            return staff && staff.target && company && company.target && company["agencyId"] == id;
+            let staff = await Staff.getCurrent();
+            return id && staff && staff.company && staff.company["agencyId"] == id;
         }
     },
     isMyAgency: function (idpath: string) {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
-            let accountId = _getAccountId();
-            let agencyUser
-            try {
-                agencyUser = await Models.agencyUser.get(accountId);
-            } catch(err) {}
-            return id && agencyUser && agencyUser.target && agencyUser["agencyId"] == id;
+            let agencyUser = await AgencyUser.getCurrent();
+            return id && agencyUser && agencyUser["agencyId"] == id;
         }
     },
     isSameCompany: function (idpath:string) {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
-            let accountId = _getAccountId();
-            let my, other;
-            try {
-                my = await Models.staff.get(accountId);
-            } catch(err) {
-            }
-
-            try {
-                other = await Models.staff.get(id);
-            } catch(err) {
-            }
-
-            return my && my.target && other && other.target && my["companyId"] == other["companyId"];
+            let staff = await Staff.getCurrent();
+            let other = await Models.staff.get(id);
+            return id && staff && other && staff["companyId"] == other["companyId"];
         }
     },
     isSameAgency: function (idpath: string) {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
-            let accountId = _getAccountId();
-
-            let my, other;
-            try {
-                let user = await Models.agencyUser.get(accountId);
-                my = await Models.agency.get(user.agencyId);
-            } catch(err) {}
-
-            try {
-                other = await Models.agency.get(id);
-            } catch(err) {}
-
-            return my && my.target && other && other.target && my["agencyId"] == other["agencyId"];
+            let user = await AgencyUser.getCurrent();
+            let other = await Models.agency.get(id);
+            return id && user && other && user["agencyId"] == other["agencyId"];
         }
     },
     isCompanyAgency: function(idpath: string) {
         return async function (fn ,self, args) {
             let id = _.get(args, idpath);
-            let accountId = _getAccountId();
-            let agency;
-            let company;
-            try{
-                agency = await Models.agencyUser.get(accountId);
-            } catch(err) {
-                agency = null;
-            }
-            try{
-                company = await Models.company.get(id);
-            } catch(err) {
-                company = null;
-            }
-            return agency && agency.target && company && company.target && agency.id == company["agencyId"];
+            let user = await AgencyUser.getCurrent();
+            let company = await Models.company.get(id);
+            return id && user && company && user["agencyId"] == company["agencyId"];
         }
     }
 }
 
 function _getAccountId() {
-    let session = Zone.current.get("session");
+    let session = getSession();
     return session["accountId"];
 }

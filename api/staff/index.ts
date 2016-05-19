@@ -206,7 +206,7 @@ class StaffModule{
             ])
             .spread(function(old, acc){
                 accobj = acc;
-                return API.company.getCompany({companyId: old.companyId})
+                return API.company.getCompany({id: old.companyId})
                     .then(function(company){
                         com = company;
                         if(data.email){
