@@ -8,7 +8,11 @@ import {TravelPolicy} from "api/_types/travelPolicy";
 var Cookie = require('tiny-cookie');
 
 export async function ManagementController($scope,Models){
-    
+    var staff = await Models.staff.get(Cookie.get('user_id'));
+    var company = await staff.company;
+    $scope.staffsnum = await company.getStaffs().length;
+    // $scope.departmentsnum = await company.getDepartments().length;
+    $scope.policiesnum = await company.getTravelPolicies().length;
 }
 
 export async function BudgetController($scope){
@@ -28,37 +32,6 @@ export async function DepartmentController($scope, Models, $ionicPopup){
     var company = await staff.company;
     var departments = company.getDepartments();
     $scope.departments = departments;
-}
-
-export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory){
-    //使下一个面变为根目录可呼出menu
-    $ionicHistory.nextViewOptions({
-        historyRoot: true,
-        disableAnimate: true,
-        expire: 300
-    });
-
-    var staff = await Models.staff.get(Cookie.get('user_id'));
-    var company = staff.company;
-    var travelPolicy;
-    if($stateParams.policyId){
-        console.info($stateParams);
-        travelPolicy = await Models.travelPolicy.get($stateParams.policyId);
-    }else{
-        travelPolicy = TravelPolicy.create();
-        travelPolicy.companyId = company.id;
-        travelPolicy.planeLevel = '不限';
-        travelPolicy.planeDiscount = '不限';
-        travelPolicy.trainLevel = '不限';
-        travelPolicy.hotelLevel = '五星级/豪华型';
-        console.info(travelPolicy);
-    }
-    $scope.travelPolicy = travelPolicy;
-    $scope.savePolicy = async function(){
-        console.info($scope.travelPolicy);
-        $scope.travelPolicy.save();
-        $ionicHistory.goBack(-1);
-    }
 }
 
 export async function StaffsController($scope, Models){
@@ -102,13 +75,9 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
     }
     $scope.staff = staff;
     var role={id:false};
-    // role.id = 'false';
-    console.info(role);
     if(staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN){
         role.id = true;
     }
-    console.info(staff.roleId);
-    console.info(role);
     $scope.role = role;
 
     $scope.travelpolicylist = await company.getTravelPolicies();
@@ -133,17 +102,58 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
         }
         console.info($scope.role);
         console.info($scope.staff);
+        $ionicHistory.goBack(-1);
     }
 }
 
 export async function TravelpolicyController($scope , Models, $location){
     var staff = await Models.staff.get(Cookie.get('user_id'));
     var company = await staff.company;
-    $scope.travelPolicys = await company.getTravelPolicies();
-    console.info($scope.travelPolicys);
+    var travelPolicies = await company.getTravelPolicies();
+    $scope.travelPolicies = travelPolicies.map(function (policy) {
+        var obj = {policy:policy,usernum:''};
+        return obj;
+    })
+    await Promise.all($scope.travelPolicies.map(async function(obj){
+        var result = await obj.policy.getStaffs();
+        obj.usernum = result.length;
+        return obj;
+    }))
+    console.info($scope.travelPolicies);
     $scope.editpolicy = async function(id){
         var travelpolicy = await Models.travelPolicy.get(id);
         $location.path('/company/editpolicy').search({'policyId':id}).replace();
         console.info(travelpolicy);
+    }
+}
+
+export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory){
+    //使下一个面变为根目录可呼出menu
+    $ionicHistory.nextViewOptions({
+        historyRoot: true,
+        disableAnimate: true,
+        expire: 300
+    });
+
+    var staff = await Models.staff.get(Cookie.get('user_id'));
+    var company = staff.company;
+    var travelPolicy;
+    if($stateParams.policyId){
+        console.info($stateParams);
+        travelPolicy = await Models.travelPolicy.get($stateParams.policyId);
+    }else{
+        travelPolicy = TravelPolicy.create();
+        travelPolicy.companyId = company.id;
+        travelPolicy.planeLevel = '不限';
+        travelPolicy.planeDiscount = '不限';
+        travelPolicy.trainLevel = '不限';
+        travelPolicy.hotelLevel = '五星级/豪华型';
+        console.info(travelPolicy);
+    }
+    $scope.travelPolicy = travelPolicy;
+    $scope.savePolicy = async function(){
+        console.info($scope.travelPolicy);
+        $scope.travelPolicy.save();
+        $ionicHistory.goBack(-1);
     }
 }

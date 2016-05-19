@@ -1,4 +1,4 @@
-import { Models } from 'api/_types';
+import { Models, EGender } from 'api/_types';
 import { Company } from 'api/_types/company';
 import { TripPlan } from 'api/_types/tripPlan';
 import { regApiType } from 'common/api/helper';
@@ -7,6 +7,7 @@ import { Department } from 'api/_types/department';
 import { ModelObject, Types, Values } from 'common/model';
 import { Table, TableExtends, Create, Field, ResolveRef, Reference } from 'common/model';
 import { Account } from './auth';
+import { getSession } from 'common/model';
 
 export enum EStaffStatus {
     ON_JOB = 0,
@@ -19,11 +20,6 @@ export enum EStaffRole {
     ADMIN = 2,
     FINANCE = 3
 }
-
-export enum EGender {
-    MALE = 1,
-    FEMALE
-};
 
 function enumValues(e){
     return Object.keys(e).map((k)=>e[k]).filter((v)=>(typeof v != 'number'));
@@ -38,7 +34,18 @@ export class Staff extends ModelObject implements Account {
     }
     @Create()
     static create(): Staff { return null; }
-    
+
+    static async getCurrent(): Promise<Staff> {
+        let session = getSession();
+        if(session.currentStaff)
+            return session.currentStaff;
+        if(!session.accountId)
+            return null;
+        var staff = await Models.staff.get(session.accountId);
+        session.currentStaff = staff;
+        return staff;
+    }
+
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
@@ -47,7 +54,7 @@ export class Staff extends ModelObject implements Account {
     get name(): string { return null; }
     set name(val: string) {}
     // '性别'
-    @Field({type: Types.INTEGER, defaultValue: EGender.MALE})
+    @Field({type: Types.INTEGER})
     get sex(): EGender { return EGender.MALE; }
     set sex(val: EGender) {}
     // '员工头像'
@@ -96,7 +103,7 @@ export class Staff extends ModelObject implements Account {
         return Models.travelPolicy.get(id);
     }
     setTravelPolicy(val: TravelPolicy) {}
-    
+
 
     //Account properties:
     pwd: string;

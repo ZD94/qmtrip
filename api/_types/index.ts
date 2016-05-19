@@ -9,6 +9,13 @@ import {TripPlan, TripDetail, Project, TripPlanLog} from './tripPlan';
 import { Account, Token } from './auth';
 import {Seed} from "./seed";
 
+
+export enum EGender {
+    MALE = 1,
+    FEMALE
+};
+
+
 export interface ModelsInterface {
     staff: ServiceInterface<Staff>;
     credential: ServiceInterface<Credential>;

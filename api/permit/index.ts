@@ -7,7 +7,6 @@
 
 var API = require("common/api");
 var L = require("common/language");
-var Q = require("q");
 
 const ROLE_ID = {
     OWNER: 0,
@@ -40,7 +39,12 @@ var roles = {
     admin: {
         name: '管理员',
         inherit: ['staff', 'finance'],
-        permission: ['user.query', 'user.add', 'user.delete', 'user.edit', 'company.query', 'company.edit', 'user.role','department.add','department.delete','department.update','department.query', 'travelPolicy.add', 'travelPolicy.delete', 'travelPolicy.update', 'travelPolicy.query']
+        permission: [
+            'user.query', 'user.add', 'user.delete', 'user.edit', 'user.role',
+            'company.query', 'company.edit',
+            'department.add','department.delete','department.update','department.query',
+            'travelPolicy.add', 'travelPolicy.delete', 'travelPolicy.update', 'travelPolicy.query'
+        ]
     },
     owner: {
         name: '创建人',
@@ -57,7 +61,13 @@ var agency_roles = {
     admin: {
         name: '管理员',
         inherit: ['staff'],
-        permission: ['company.query', 'company.add', 'company.delete', 'company.edit','department.add','department.delete','department.update','department.query', 'user.add', 'user.query', 'user.delete', 'user.edit', "staff.increaseStaffPoint", "staff.decreaseStaffPoint", "tripPlan.approveInvoice"]
+        permission: [
+            'company.query', 'company.add', 'company.delete', 'company.edit',
+            'department.add','department.delete','department.update','department.query',
+            'user.add', 'user.query', 'user.delete', 'user.edit',
+            "staff.increaseStaffPoint", "staff.decreaseStaffPoint",
+            "tripPlan.approveInvoice"
+        ]
     }
 };
 
@@ -105,7 +115,7 @@ function getRoleOfAccount(data) : Promise<Role>{
     return API.staff.getStaff({id:data.accountId})
         .then(function(staff) {
             s = staff;
-            return API.company.getCompany({companyId: staff.companyId});
+            return API.company.getCompany({id: staff.companyId});
         })
         .then(function(company) {
             if (company.createUser == accountId) {
@@ -178,7 +188,7 @@ export function checkPermission(params) {
     var permissions = params.permission;
 
     if (!permissions || !permissions.length) {
-        return Q(true);
+        return Promise.resolve(true);
     }
 
     if (typeof permissions == 'string') {
