@@ -2,6 +2,8 @@
  * Created by seven on 16/4/25.
  */
 "use strict";
+import {Model} from "sequelize";
+import {Cookie} from "request";
 
 export function ApprovedController($scope){
 
@@ -11,8 +13,8 @@ export function DetailController($scope){
 
 }
 
-export function ListController($scope){
-
+export async function ListController($scope, Models){
+    
 }
 
 export function PendingController($scope){

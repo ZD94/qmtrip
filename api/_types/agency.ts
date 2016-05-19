@@ -3,12 +3,12 @@
  */
 'use strict';
 import { regApiType } from 'common/api/helper';
-import { Models } from 'api/_types';
+import { Models, EGender } from 'api/_types';
 import {Company} from 'api/_types/company';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference, Values } from 'common/model';
+import { ModelObject, Table, TableExtends, Field, Types, ResolveRef, Reference, Values } from 'common/model';
+import { getSession } from 'common/model';
 import { Create } from 'common/model';
 import { Account } from './auth';
-import {TableExtends} from "common/model/common";
 
 export enum EAgencyStatus {
     DELETE = -2, //删除状态
@@ -96,26 +96,32 @@ export class AgencyUser extends ModelObject{
     @Create()
     static create(): AgencyUser { return null; }
 
+    static async getCurrent(): Promise<AgencyUser> {
+        let session = getSession();
+        if(session.currentAgencyUser)
+            return session.currentAgencyUser;
+        if(!session.accountId)
+            return null;
+        var agencyUser = await Models.agencyUser.get(session.accountId);
+        session.currentAgencyUser = agencyUser;
+        return agencyUser;
+    }
+    
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
 
-    @Field({type: Types.UUID})
-    get agencyId(): string { return null; }
-    set agencyId(val: string) {}
-
     @Field({type: Types.INTEGER})
     get status(): EAgencyStatus { return 0; }
     set status(val: EAgencyStatus) {}
-
 
     @Field({type: Types.STRING})
     get name(): string { return ''; }
     set name(val: string) {}
 
     @Field({type: Types.INTEGER})
-    get sex(): number { return 0; }
-    set sex(val: number) {}
+    get sex(): EGender { return EGender.MALE; }
+    set sex(val: EGender) {}
 
     @Field({type: Types.STRING})
     get email(): string { return ''; }
@@ -135,6 +141,7 @@ export class AgencyUser extends ModelObject{
 
     @ResolveRef({type: Types.UUID}, Models.agency)
     get agency(): Agency { return null; }
+    set agency(val: Agency) {}
 
     //Account properties:
     pwd: string;

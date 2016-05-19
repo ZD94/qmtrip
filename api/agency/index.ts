@@ -15,6 +15,7 @@ import {requireParams, clientExport} from 'common/api/helper';
 import {Paginate} from 'common/paginate';
 import {Agency, AgencyUser, EAgencyStatus, AgencyError} from "api/_types/agency";
 import {requirePermit, conditionDecorator, condition} from "../_decorator";
+import { Models, EGender } from '../_types/index';
 let logger = new Logger("agency");
 
 let agencyCols = Agency['$fieldnames'];
@@ -168,23 +169,22 @@ class AgencyModule {
     @conditionDecorator([{if: condition.isMyAgency('0.id')}])
     @requireParams(['id'])
     static async deleteAgency(params: {id: string}): Promise<boolean> {
-        let {accountId} = Zone.current.get('session');
-        let agencyId = params.id;
-        let agency = await DBM.Agency.findById(agencyId);
+        let agency = await Models.agency.get(params.id);
 
         if (!agency) {
             throw L.ERR.AGENCY_NOT_EXIST;
         }
 
-        let agencyUsers = await DBM.AgencyUser.findAll({where: {agencyId: agencyId}, attributes: ['id']});
-
-        await DBM.Agency.destroy({where: {id: agencyId}});
-        await DBM.AgencyUser.destroy({where: {agencyId: agencyId}});
+        // let agencyUsers = await DBM.AgencyUser.findAll({where: {agencyId: agencyId}, attributes: ['id']});
+        // await DBM.Agency.destroy({where: {id: agencyId}});
+        // await DBM.AgencyUser.destroy({where: {agencyId: agencyId}});
+        
+        let agencyUsers = await Models.agencyUser.find({agencyId: agency.id, status: {$ne: EAgencyStatus.DELETE}});
 
         await agencyUsers.map(async function (user) {
-            await DBM.Account.destroy({where: {id: user.id}});
+            await user.destroy();
         });
-
+        await agency.destroy();
         return true;
     }
 
@@ -199,25 +199,32 @@ class AgencyModule {
     @requirePermit('user.add', 2)
     @requireParams(['email', 'name'], ['mobile', 'sex', 'avatar', 'roleId'])
     static async createAgencyUser(params: {email: string, name: string, mobile?: string, sex?: number, avatar?: string, roleId?: number}): Promise<AgencyUser> {
-        let {accountId} = Zone.current.get('session');
-        let curUser = await DBM.AgencyUser.findById(accountId, {attributes: ['agencyId']});
-        let agencyId = curUser.agencyId;
+        console.info("createAgencyUser start...");
+        let curUser = await AgencyUser.getCurrent();
+        console.info("step 1...");
 
         if(!curUser) {
             throw L.ERR.AGENCY_USER_NOT_EXIST;
         }
 
+        let agencyId = curUser.agency.id;
         params['agencyId'] = agencyId;
 
-        let _agencyUser = await DBM.AgencyUser.findOne({where: {agencyId: agencyId, $or: [{email: params.email}, {mobile: params.mobile}]}});
+        console.info(Models.agencyUser.find);
 
-        if (_agencyUser) {
+        // let _agencyUser = await Models.agencyUser.find({agencyId: agencyId, $or: [{email: params.email}, {mobile: params.mobile}]});
+
+        let _agencyUser = await DBM.AgencyUser.findAll({where: {agencyId: agencyId, $or: [{email: params.email}, {mobile: params.mobile}]}});
+
+        if (_agencyUser.length > 0) {
             throw {code: -2, msg: '邮箱或手机号已经注册代理商'};
         }
 
-        let agencyUser = await DBM.AgencyUser.create(params);
-        
-        return new AgencyUser(agencyUser);
+        console.info('step 2...');
+        let user = await Models.agencyUser.create(params);
+        user.agency = curUser.agency;
+        console.info(user);
+        return user.save();
     }
 
     /**
@@ -235,8 +242,8 @@ class AgencyModule {
     @requirePermit('user.edit', 2)
     @conditionDecorator([{if: condition.isMyAgency('0.id')}])
     @requireParams(['id'], ['status', 'name', 'sex', 'mobile', 'avatar', 'roleId'])
-    static async updateAgencyUser(params: {id: string, status?: number, name?: string, sex?: string, email?: string, mobile?: string, avatar?: string, roleId?: string}) {
-        let target = await DBM.AgencyUser.findById(params.id);
+    static async updateAgencyUser(params: {id: string, status?: number, name?: string, sex?: EGender, email?: string, mobile?: string, avatar?: string, roleId?: number}) {
+        let target = await Models.agencyUser.get(params.id);
 
         if(!target) {
             throw L.ERR.AGENCY_NOT_EXIST;
