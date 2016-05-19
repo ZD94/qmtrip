@@ -115,7 +115,7 @@ function getRoleOfAccount(data) : Promise<Role>{
     return API.staff.getStaff({id:data.accountId})
         .then(function(staff) {
             s = staff;
-            return API.company.getCompany({companyId: staff.companyId});
+            return API.company.getCompany({id: staff.companyId});
         })
         .then(function(company) {
             if (company.createUser == accountId) {

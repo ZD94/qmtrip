@@ -679,7 +679,7 @@ class TripPlanModule {
             throw {code: -4, msg: '订单记录不存在'};
         }
 
-        let company = await API.company.getCompany({companyId: order.companyId});
+        let company = await API.company.getCompany({id: order.companyId});
         if (!company) {
             throw {code: -5, msg: "企业不存在"}
         }

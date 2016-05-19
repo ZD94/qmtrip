@@ -80,7 +80,7 @@
 |---------|------|-----|
 | json数据   | 代理商用户信息|json
 
->. 分页查询代理商用户信息 API.agency.listAndPaginateAgencyUser(params);
+>. 分页查询代理商用户信息 API.agency.listAgencyUser(params);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
