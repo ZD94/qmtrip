@@ -5,11 +5,12 @@
 import {requireParams, clientExport} from "../../common/api/helper";
 import { Models, EAccountType } from "api/_types";
 import {AuthCert, Token, Account} from "api/_types/auth"
+import validator = require('validator');
+
 var sequelize = require("common/model").importModel("./models");
 var DBM = sequelize.models;
 var uuid = require("node-uuid");
 var L = require("../../common/language");
-var validate = require("../../common/validate");
 var md5 = require("../../common/utils").md5;
 var getRndStr = require("../../common/utils").getRndStr;
 var C = require("../../config");
@@ -394,7 +395,7 @@ class ApiAuth {
             throw L.ERR.EMAIL_EMPTY();
         }
 
-        if (!validate.isEmail(data.email)) {
+        if (!validator.isEmail(data.email)) {
             throw L.ERR.EMAIL_EMPTY();
         }
 
@@ -408,7 +409,7 @@ class ApiAuth {
 
         var mobile = data.mobile;
         var companyName = data.companyName || '';
-        if (mobile && !validate.isMobile(mobile)) {
+        if (mobile && !validator.isMobilePhone(mobile, 'zh-CN')) {
             throw L.ERR.MOBILE_FORMAT_ERROR();
         }
 
@@ -475,7 +476,7 @@ class ApiAuth {
         if (!data.email && !data.mobile) {
             throw L.ERR.EMAIL_EMPTY();
         }
-        if (!validate.isEmail((data.email))) {
+        if (!validator.isEmail((data.email))) {
             throw L.ERR.EMAIL_EMPTY();
         }
         if (!data.pwd) {
@@ -802,7 +803,7 @@ class ApiAuth {
             throw L.ERR.EMAIL_EMPTY();
         }
 
-        if (!validate.isEmail(email)) {
+        if (!validator.isEmail(email)) {
             throw L.ERR.EMAIL_FORMAT_INVALID();
         }
 
@@ -1035,7 +1036,7 @@ class ApiAuth {
 
         return Promise.resolve()
             .then(function() {
-                if (!validate.isEmail(email)) {
+                if (!validator.isEmail(email)) {
                     throw L.ERR.EMAIL_FORMAT_INVALID();
                 }
 

@@ -2,6 +2,8 @@ import { regApiType } from 'common/api/helper';
 import { Table, Field, Types, ModelObject, Values } from 'common/model'
 import { Models, EAccountType } from './index';
 import { Create } from 'common/model';
+import validator = require("validator");
+import * as L from 'common/language';
 
 @regApiType('API.')
 class AuthCert {
@@ -92,6 +94,15 @@ class Account extends ModelObject{
     @Field({type:Types.BOOLEAN})
     get isFirstLogin(): boolean { return true; }
     set isFirstLogin(isFirstLogin: boolean){}
+
+    validate() {
+        if(validator.isMobilePhone(this.mobile, 'zh-CN')){
+            throw L.ERR.INVALID_FORMAT('mobile');
+        }
+        if(validator.isEmail(this.email)){
+            throw L.ERR.INVALID_FORMAT('email');
+        }
+    }
 }
 
 
