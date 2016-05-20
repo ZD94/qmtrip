@@ -23,6 +23,7 @@ describe("api/client/travelPolicy.js", function() {
         trainLevel: "硬卧",
         hotelLevel: "三星级",
         hotelPrice: "300",
+        subsidy: "300",
         companyId: companyId
     }
     var company = {
@@ -47,7 +48,7 @@ describe("api/client/travelPolicy.js", function() {
         Promise.all([
                 API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
                 API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
-                API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})
+                API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile, name: company.name})
             ])
             .spread(function(ret1, ret2, ret3){
                 return API.client.agency.registerAgency(agency);
@@ -78,7 +79,7 @@ describe("api/client/travelPolicy.js", function() {
         Promise.all([
                 API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
                 API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
-                API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})
+                API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile, name: company.name})
             ])
             .spread(function(ret1, ret2, ret3){
                 done();
@@ -131,6 +132,7 @@ describe("api/client/travelPolicy.js", function() {
 //更新差旅标准信息
     it("#updateTravelPolicy should be ok", function(done) {
         obj.id = id;
+        obj.name = "修改过的";
         zoneSelf.run(API.client.travelPolicy.updateTravelPolicy.bind(this, obj, function(err, result) {
             assert.equal(err, null);
             done();
