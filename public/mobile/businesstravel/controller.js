@@ -523,8 +523,8 @@ var businesstravel=(function(){
                     API.travelBudget.getTrafficBudget({
                         originPlace:$scope.startCityCode,
                         destinationPlace:$scope.endCityCode,
-                        outboundDate:$scope.startDate,
-                        inboundDate:$scope.endDate,
+                        leaveDate:$scope.startDate,
+                        goBackDate:$scope.endDate,
                         outLatestArriveTime:$scope.startTimeLate,
                         inLatestArriveTime:$scope.endTimeLate,
                         isRoundTrip:$scope.endDate
@@ -597,8 +597,8 @@ var businesstravel=(function(){
                     API.travelBudget.getTravelPolicyBudget({
                         originPlace:$scope.startCityCode,
                         destinationPlace:$scope.endCityCode,
-                        outboundDate:$scope.startDate,
-                        inboundDate:$scope.endDate,
+                        leaveDate:$scope.startDate,
+                        goBackDate:$scope.endDate,
                         outLatestArriveTime:$scope.startTimeLate,
                         inLatestArriveTime:$scope.endTimeLate,
                         cityId:$scope.hotelCityCode,

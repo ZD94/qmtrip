@@ -31,14 +31,15 @@ class ApiTravelBudget {
     * @param {String} params.originPlace 出发地
     * @param {String} params.destinationPlace 目的地
     * @param {String} params.leaveDate 出发时间 YYYY-MM-DD
-    * @param {String} params.gobackDate 返回时间(可选) YYYY-MM-DD
-    * @param {String} [params.goBackTime] 返程最晚时间
+    * @param {String} [params.latestArriveTime] 最晚到达时间
     * @param {String} [params.leaveTime] 出发最晚到达时间 HH:mm
+    * @param {String} [params.goBackDate] 返回时间(可选) YYYY-MM-DD
+    * @param {String} [params.goBackTime] 返程最晚时间
     * @param {String} [params.checkInDate] 如果不传=leaveDate 入住时间
     * @param {String} [params.checkOutDate] 如果不传=goBackDate 离开时间
     * @param {String} [params.businessDistrict] 商圈ID
     * @param {Boolean} [params.isNeedHotel] 是否需要酒店
-    * @param {Boolean} [params.isRoundTrip] 是否往返 [如果为true,gobackDate必须存在]
+    * @param {Boolean} [params.isRoundTrip] 是否往返 [如果为true,goBackDate必须存在]
     * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
     */
     static async getTravelPolicyBudget(params: {originPlace: string, destinationPlace: string,

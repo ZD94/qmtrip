@@ -15,7 +15,7 @@ var CITY = {
     ShangHai: "CT_289"
 };
 
-describe.skip("api/client/travelBudget.js", function() {
+describe("api/client/travelBudget.js", function() {
     var agencyId = "";
     var agencyUserId = "";
     var companyId = "";
@@ -100,25 +100,29 @@ describe.skip("api/client/travelBudget.js", function() {
             .done();
     });
 
-    var outboundDate = moment().add("1", "months").format("YYYY-MM-DD");
-    var inboundDate = moment().add("1", "months").add("2", "days").format("YYYY-MM-DD");
+    function handleError(err) {
+        throw err;
+    }
+
+    var leaveDate = moment().add("1", "months").format("YYYY-MM-DD");
+    var goBackDate = moment().add("1", "months").add("2", "days").format("YYYY-MM-DD");
 
     it("#getHotelBudget should be ok", function(done) {
         this.timeout(60 * 1000);
-        API.client.travelBudget.getHotelBudget.call({accountId: staffId}, {cityId: "CT_131", checkInDate: outboundDate, checkOutDate: inboundDate}, function(err, result) {
-            if (err) {
-                throw err;
-            }
+        API.client.travelBudget.getHotelBudget.call({accountId: staffId}, {cityId: "CT_131", checkInDate: leaveDate, checkOutDate: goBackDate})
+            .then(function(result) {
+            console.info("getHotelBudget result is ====>", result)
             var price = result.price ? true: false;
             assert.equal(price, true);
             done();
         })
+        .catch(handleError)
     })
 
     it("#getTravelPolicyBudget should be ok", function(done) {
         this.timeout(60 * 1000);
         API.client.travelBudget.getTravelPolicyBudget.call({accountId: staffId}, {originPlace: "CT_131", destinationPlace: "CT_289",
-            outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
+            leaveDate: leaveDate, goBackDate: goBackDate}, function(err, result) {
             if (err) {
                 throw err;
             }
@@ -142,7 +146,7 @@ describe.skip("api/client/travelBudget.js", function() {
     it("#getTravelPlicyBudget should be ok with isRoundTrip=true", function(done) {
         this.timeout(60 * 1000);
         API.client.travelBudget.getTravelPolicyBudget.call({accountId: staffId}, {originPlace: CITY.BeiJing, destinationPlace: CITY.ShangHai,
-            outboundDate: outboundDate, inboundDate: inboundDate, isRoundTrip: true}, function(err, result) {
+            leaveDate: leaveDate, goBackDate: goBackDate, isRoundTrip: true}, function(err, result) {
             if (err) {
                 throw err;
             }
@@ -154,9 +158,6 @@ describe.skip("api/client/travelBudget.js", function() {
                     throw err;
                 }
             }
-            console.info("=========>")
-            console.info(result);
-            console.info(result.price);
             var ret = result.price > 0 ?true: false;
             assert.equal(ret, true);
             done();
@@ -165,7 +166,7 @@ describe.skip("api/client/travelBudget.js", function() {
 
     it("#getTravelPolicyBudget should throw error without air information", function(done) {
         this.timeout(60 * 1000);
-        API.client.travelBudget.getTravelPolicyBudget.call({accountId: staffId}, {originPlace: "abcd", destinationPlace: "CT_289", outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
+        API.client.travelBudget.getTravelPolicyBudget.call({accountId: staffId}, {originPlace: "abcd", destinationPlace: "CT_289", leaveDate: leaveDate, goBackDate: goBackDate}, function(err, result) {
             if (err) {
                 done();
             }  else {
@@ -178,7 +179,7 @@ describe.skip("api/client/travelBudget.js", function() {
     it("#getTraiffic should be ok", function(done) {
         this.timeout(60 * 1000);
         API.client.travelBudget.getTrafficBudget.call({accountId: staffId}, {originPlace: "CT_131", destinationPlace: "CT_289",
-            outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
+            leaveDate: leaveDate, goBackDate: goBackDate}, function(err, result) {
             if (err) {
                 throw err;
             }
@@ -191,7 +192,7 @@ describe.skip("api/client/travelBudget.js", function() {
     it("#getTraiffic should be ok with originPlace=北京 destinationPlace=上海", function(done) {
         this.timeout(60 * 1000);
         API.client.travelBudget.getTrafficBudget.call({accountId: staffId}, {originPlace: "北京市", destinationPlace: "上海市",
-            outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
+            leaveDate: leaveDate, goBackDate: goBackDate}, function(err, result) {
             if (err) {
                 throw err;
             }
@@ -204,7 +205,7 @@ describe.skip("api/client/travelBudget.js", function() {
     it("#getTraiffic goTraffic should be object", function(done) {
         this.timeout(60 * 1000);
         API.client.travelBudget.getTrafficBudget.call({accountId: staffId}, {originPlace: "CT_131", destinationPlace: "CT_289",
-            outboundDate: outboundDate, inboundDate: inboundDate}, function(err, result) {
+            leaveDate: leaveDate, goBackDate: goBackDate}, function(err, result) {
             assert.equal(err, null);
             assert.equal(result.price ? true: false, true);
             assert.equal(typeof result.goTraffic == 'object', true);
