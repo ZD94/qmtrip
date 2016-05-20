@@ -20,6 +20,7 @@ class AuthCert {
     }
 }
 
+@regApiType('API.')
 @Table(Models.account, "auth.")
 class Account extends ModelObject{
     constructor(target: Object) {
