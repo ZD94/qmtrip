@@ -138,18 +138,37 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         disableAnimate: true,
         expire: 300
     });
-
+    var discounts = $scope.discounts = [
+        {
+            value:0,
+            text:'不限'
+        },
+        {
+            value:9,
+            text:'9折及以下'
+        },{
+            value:8,
+            text:'8折及以下'
+        },{
+            value:7,
+            text:'7折及以下'
+        },{
+            value:6,
+            text:'6折及以下'
+        }
+    ]
     var staff = await Models.staff.get(Cookie.get('user_id'));
     var company = staff.company;
     var travelPolicy;
     if($stateParams.policyId){
         console.info($stateParams);
-        travelPolicy = await Models.travelPolicy.get($stateParams.policyId);
+        travelPolicy = await Models.travelPolicy.get($stateParams.policyId)
+        console.info(travelPolicy);
     }else{
         travelPolicy = TravelPolicy.create();
         travelPolicy.companyId = company.id;
         travelPolicy.planeLevel = '不限';
-        travelPolicy.planeDiscount = '不限';
+        travelPolicy.planeDiscount = 0;
         travelPolicy.trainLevel = '不限';
         travelPolicy.hotelLevel = '五星级/豪华型';
         console.info(travelPolicy);
@@ -159,5 +178,9 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         console.info($scope.travelPolicy);
         $scope.travelPolicy.save();
         $ionicHistory.goBack(-1);
+    }
+    $scope.consoles = function(obj){
+        console.info("aaaaaaa");
+        console.info(obj);
     }
 }

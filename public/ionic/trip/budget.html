@@ -16,17 +16,17 @@
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <ion-list>
             <ion-item class="item-divider">交通&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2039元</ion-item>
-            <ion-item>05-23
-                <br>北京-武汉
+            <ion-item>{{tripdef.beginDate | date: 'yyyy-MM-dd'}}
+                <br>{{tripdef.fromPlace}}-{{tripdef.place}}
                 <br>1039元</ion-item>
-            <ion-item>05-28
-                <br>武汉-北京
+            <ion-item>{{tripdef.endDate}}
+                <br>{{tripdef.place}}-{{tripdef.fromPlace}}
                 <br>1000元</ion-item>
             <ion-item class="item-divider">住宿&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1000元</ion-item>
-            <ion-item>05-23至05-28
-                <br>武汉 武汉科技大学附近
+            <ion-item>{{tripdef.beginDate}}至{{tripdef.endDate}}
+                <br>{{tripdef.place}}&nbsp;{{tripdef.hotelPlace}}
                 <br>1039元</ion-item>
-            <ion-item class="item-divider">其他补助(共4天)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1000元</ion-item>
+            <ion-item class="item-divider">其他补助(共{{during}}天)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{policy.subsidy * during}}</ion-item>
         </ion-list>
         <div class="button-bar"></div>
         <div class="button-bar"></div>
