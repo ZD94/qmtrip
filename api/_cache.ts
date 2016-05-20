@@ -13,10 +13,8 @@ export class WeakCache {
             return value;
         }
         var ref = weak(value, ()=>{
-            console.log(this.id, 'weak ref', key, 'gc');
             var ref2 = this.cache.get(key);
             if(ref === ref2){
-                console.log(this.id, 'remove ref', key);
                 this.remove(key);
             }
         })
