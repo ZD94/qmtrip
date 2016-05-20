@@ -699,13 +699,12 @@ class ApiAuth {
      * @param id
      * @returns {*}
      */
+    @clientExport
+    @requireParams(["id"], ["attributes", "type"])
     static getAccount (params: {id: string, attributes?: string[], type?: Number}) {
 
         var id = params.id;
         var attributes = params.attributes;
-        if(!id){
-            throw {code: -1, msg: "id不能为空"};
-        }
         var options: any = {};
         options.where = {id: id};
         if(params.type){
@@ -713,7 +712,10 @@ class ApiAuth {
         }
         if(attributes)
             options.attributes = attributes;
-        return DBM.Account.findOne(options);
+        return DBM.Account.findOne(options)
+            .then(function(data){
+                return new Account(data);
+            })
     }
 
     /**
