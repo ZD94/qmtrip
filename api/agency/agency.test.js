@@ -4,11 +4,8 @@
 "use strict";
 var assert = require("assert");
 var API = require("common/api");
-
 var getSession = require('common/model').getSession;
 
-var agencyId = '';
-var agencyUserId = '';
 describe("api/agency", function() {
 
     describe("registerAgency", function() {
@@ -45,8 +42,6 @@ describe("api/agency", function() {
             API.agency.registerAgency(agency, function(err, ret) {
                 assert.equal(err, null);
                 assert.equal(ret.target.status, 1);
-                var agencyId = ret.target.id;
-                var agencyUserId = ret.target.createUser;
                 done();
             });
         });
@@ -157,12 +152,9 @@ describe("api/agency", function() {
             });
 
 
-            it("listAgencyUser", function(done) {
-                API.agency.listAgencyUser( {}, function(err, ret) {
-                    if (err) {
-                        throw err;
-                    }
-
+            it("listAgencyUser should be ok", function(done) {
+                API.agency.listAgencyUser({}, function(err, ret) {
+                    assert.equal(err, null);
                     done();
                 })
             });

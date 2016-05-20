@@ -3,9 +3,9 @@
  */
 var assert = require("assert");
 var API = require("common/api");
-var agencyZone = Zone.current.fork({name: 'api/company', properties: {session: {accountId: 'accountId', tokenId: 'tokenId'}}});
-var staffZone = Zone.current.fork({name: 'api/company', properties: {session: {accountId: 'accountId', tokenId: 'tokenId'}}});
-agencyZone.run(describe.bind(this, "api/company", function() {
+var getSession = require('common/model').getSession;
+
+describe("api/company", function() {
     var agencyId = "";
     var companyId = "";
     var staffId = "";
@@ -21,10 +21,13 @@ agencyZone.run(describe.bind(this, "api/company", function() {
                     return API.agency.registerAgency(agency)
                 })
                 .then(function(ret){
+                    console.info(ret);
                     var agency = ret.target;
                     agencyId = agency.id;
                     agencyUserId = agency.createUser;
-                    agencyZone = Zone.current.fork({name: 'api/company', properties: {session: {accountId: agencyUserId, tokenId: 'tokenId'}}});
+                    var session = getSession();
+                    session.accountId = agencyUserId;
+                    session.tokenId = 'tokenId';
                     done();
                 })
                 .catch(function(err){
@@ -59,6 +62,9 @@ agencyZone.run(describe.bind(this, "api/company", function() {
             })
 
             after(function(done){
+                console.info("**********************");
+                console.info('companyId=>', companyId);
+                console.info('staffId=>', staffId);
                 Promise.all([
                     API.company.deleteCompanyByTest({mobile: company.mobile}),
                     API.staff.deleteAllStaffByTest({companyId: companyId, mobile: company.mobile, email: company.email})
@@ -73,9 +79,12 @@ agencyZone.run(describe.bind(this, "api/company", function() {
             })
 
             it("#registerCompany should be ok", function(done) {
-                var self = {accountId: agencyUserId};
-                API.company.registerCompany(company, function(err, company){
+                console.info('agencyUserId=>', agencyUserId);
+                API.company.registerCompany(company, function(err, ret){
                     assert.equal(err, null);
+                    var company = ret.target;
+                    console.info("#######################");
+                    console.info(company);
                     companyId = company.id;
                     staffId = company.createUser;
                     done();
@@ -96,13 +105,12 @@ agencyZone.run(describe.bind(this, "api/company", function() {
                     .spread(function(ret1, ret2){
                         assert.equal(ret1, true);
                         assert.equal(ret2, true);
-                        return API.company.registerCompany.bind(this, company);
+                        return API.company.registerCompany(company);
                     })
                     .then(function(company){
                         assert.equal(company.status, 0);
                         companyId = company.id;
                         staffId = company.createUser;
-                        staffZone = Zone.current.fork({name: 'api/company', properties: {session: {accountId: staffId, tokenId: 'tokenId'}}});
                         done();
                     })
                     .done();
@@ -138,7 +146,7 @@ agencyZone.run(describe.bind(this, "api/company", function() {
 
             it("#updateCompany should be ok", function(done) {
                 var self = {accountId: staffId};
-                API.company.updateCompany.bind(this, {id: companyId, status: 1, address: '更新企业测试'}, function(err, ret){
+                API.company.updateCompany({id: companyId, status: 1, address: '更新企业测试'}, function(err, ret){
                     assert.equal(err, null);
                     assert.equal(ret.status, 1);
                     done();
@@ -219,4 +227,4 @@ agencyZone.run(describe.bind(this, "api/company", function() {
 
     });
 
-}));
+})
