@@ -196,7 +196,7 @@ export var condition = {
             let id = _.get(args, idpath);
             let user = await AgencyUser.getCurrent();
             let other = await Models.agency.get(id);
-            return id && user && other && user["agencyId"] == other["agencyId"];
+            return id && user && other && user["agencyId"] == other.id;
         }
     },
     isCompanyAgency: function(idpath: string) {

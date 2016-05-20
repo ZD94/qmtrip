@@ -119,31 +119,39 @@ class CompanyModule {
     @requireParams(['mobile', 'name', 'email', 'userName'], ['pwd', 'remark', 'description'])
     static async registerCompany(params: {mobile: string, name: string, email: string, domain: string,
         userName: string, pwd?: string, remark?: string, description?: string}): Promise<Company>{
-        let {accountId} = Zone.current.get('session');
+        let session = Zone.current.get('session');
         let mobile = params.mobile;
         let email = params.email;
         let userName = params.userName;
         let pwd = params.pwd || '123456';
+        let agencyId = API.agency.__defaultAgencyId;
+        params['domainName'] = params.email.match(/.*\@(.*)/)[1]; //企业域名
+        let domain = params['domainName'];
 
-    let agencyUser = await DBM.Agency.findById(accountId);
+        if(domain && domain != "" && email.indexOf(domain) == -1){
+            throw {code: -6, msg: "邮箱格式不符合要求"};
+        }
 
-        if(!agencyUser || agencyUser.status == EAgencyStatus.DELETE) {
-            throw L.ERR.AGENCY_NOT_EXIST();
+
+        if(session) {
+            let agencyUser = await DBM.Agency.findById(session.accountId);
+
+            if(!agencyUser || agencyUser.status == EAgencyStatus.DELETE) {
+                throw L.ERR.AGENCY_NOT_EXIST();
+            }
+
+            agencyId = agencyUser.agencyId;
         }
 
         let account = await API.auth.newAccount({mobile: mobile, email: email, pwd: pwd, type: 1});
 
-        params['agencyId'] = agencyUser.agencyId;
+        params['id'] = uuid.v1();
+        params['agencyId'] = agencyId;
         params['createUser'] = account.id;
-        params['domainName'] = params.email.match(/.*\@(.*)/)[1]; //企业域名
+        params['companyNo'] = await API.seeds.getSeedNo('CompanyNo', {formatDate: 'YY', minNo: 100, maxNo: 999});
         delete params.userName;
 
-        let company = await API.company.createCompany(params);
-
-        if(company.domainName && company.domainName != "" && email.indexOf(company.domainName) == -1){
-            throw {code: -6, msg: "邮箱格式不符合要求"};
-        }
-
+        let company = await DBM.Company.create(params);
         await DBM.Staff.create({id: account.id, companyId: company.id, email: email, mobile: mobile, name: userName, roleId: 0});
         await DBM.Department.create({name: "我的企业", isDefault: true, companyId: company.id});
 
@@ -157,7 +165,7 @@ class CompanyModule {
      * @returns {Promise<Company>}
      */
     @clientExport
-    // @requirePermit('company.edit', 2)
+    @requirePermit('company.edit', 2)
     @requireParams(['id'], ['agencyId', 'name', 'description', 'mobile', 'remark', 'status'])
     static async updateCompany(params): Promise<Company>{
         let {accountId} = Zone.current.get('session');
