@@ -78,7 +78,7 @@ var Services = {
         funcs: ['getCityInfo', 'queryPlace']
     },
     account: { type: Account, modname: 'auth',
-        funcs: [DummyGet]
+        funcs: ['getAccount']
     },
     seed: { type: Seed, modname: 'seeds',
         funcs: []

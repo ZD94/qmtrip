@@ -35,16 +35,16 @@ const moment = require('moment');
  * @param {Boolean} [params.isRoundTrip] 是否往返 [如果为true,inboundDate必须存在]
  * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
  */
-export function getTravelPolicyBudget(params: {originPlace: string, destinationPlace: string, outboundDate: string, inboundDate: string, 
-    inLatestArriveTime?: string, outLatestArriveTime?: string, checkInDate?: string, checkOutDate?: string, 
+export function getTravelPolicyBudget(params: {originPlace: string, destinationPlace: string, outboundDate: Date| string, inboundDate: Date| string,
+    inLatestArriveTime?: string, outLatestArriveTime?: string, checkInDate?: Date| string, checkOutDate?: Date|string,
     businessDistrict?: string, isRoundTrip: boolean}) :Promise<any> {
     var outboundDate = params.outboundDate; //离开时间
     var inboundDate = params.inboundDate;   //出发时间
     var isRoundTrip = params.isRoundTrip || false;  //是否往返
     var originPlace = params.originPlace;
     var destinationPlace = params.destinationPlace;
-    var checkInDate = params.checkInDate;
-    var checkOutDate = params.checkOutDate;
+    var checkInDate = /\d{4}-\d{2}-\d{2}/.test(params.checkInDate as string)? moment(params.checkInDate).format("yyyy-MM-dd") : params.checkInDate;
+    var checkOutDate = /\d{4}-\d{2}-\d{2}/.test(params.checkOutDate as string) ? moment(params.checkOutDate).format("yyyy-MM-dd") : params.checkOutDate;
     var businessDistrict = params.businessDistrict;
     var outLatestArriveTime = params.outLatestArriveTime;
     var inLatestArriveTime = params.inLatestArriveTime;
@@ -400,14 +400,22 @@ export function getTrafficBudget(params: {originPlace: string, destinationPlace:
                 trainCabinClass = travelPolicy.trainLevel;
                 trainCabinClass = trainCabinClass.replace(/\//g, ",");
             }
+            let outboundDate = params.outboundDate
+            if (outboundDate && !validate.isDate(outboundDate)) {
+                outboundDate = moment(outboundDate).format("YYYY-MM-DD");
+            }
+            let inboundDate = params.inboundDate;
+            if (inboundDate && !validate.isDate(inboundDate)) {
+                inboundDate = moment(inboundDate).format("YYYY-MM-DD");
+            }
 
             if (params.isRoundTrip) {
                 return Promise.all([
                         API.travelbudget.getTrafficBudget({
                             originPlace: params.originPlace,
                             destinationPlace: params.destinationPlace,
-                            outboundDate: params.outboundDate,
-                            inboundDate: params.inboundDate,
+                            outboundDate: outboundDate,
+                            inboundDate: inboundDate,
                             latestArriveTime: params.outLatestArriveTime,
                             cabinClass: cabinClass,
                             trainCabinClass: trainCabinClass
@@ -415,7 +423,7 @@ export function getTrafficBudget(params: {originPlace: string, destinationPlace:
                         API.travelbudget.getTrafficBudget({
                             originPlace: params.destinationPlace,
                             destinationPlace: params.originPlace,
-                            outboundDate: params.inboundDate,
+                            outboundDate: outboundDate,
                             latestArriveTime: params.inLatestArriveTime,
                             cabinClass: cabinClass,
                             trainCabinClass: trainCabinClass

@@ -3,39 +3,28 @@
  */
 var assert = require("assert");
 var API = require("common/api");
-
-describe("api/client/company.js", function() {
+var agencyZone = Zone.current.fork({name: 'api/company', properties: {session: {accountId: 'accountId', tokenId: 'tokenId'}}});
+var staffZone = Zone.current.fork({name: 'api/company', properties: {session: {accountId: 'accountId', tokenId: 'tokenId'}}});
+agencyZone.run(describe.bind(this, "api/company", function() {
     var agencyId = "";
     var companyId = "";
-    var ownerUserId = "";
+    var staffId = "";
     var agencyUserId = "";
-
-    var agency = {
-        email: "company.test@jingli.tech",
-        userName: "喵喵",
-        name: '喵喵的代理商',
-        mobile: "15269866802",
-        description: '企业API测试用'
-    };
-
-    var company = {
-        name: '喵喵的企业',
-        userName: '喵喵',
-        description: '企业API测试用',
-        email: 'company.test@jingli.tech',
-        mobile: '15269866802'
-    }
+    var agency = {email: "company.test@jingli.tech", userName: "喵喵", name: '喵喵的代理商', mobile: "15269866802", description: '企业API测试用'};
+    var company = {name: '喵喵的企业', userName: '喵喵', description: '企业API测试用', email: 'company.test@jingli.tech', mobile: '15269866802'}
 
     describe("company options by agency", function() {
 
         before(function(done) {
             API.agency.deleteAgencyByTest({mobile: agency.mobile, email: agency.email})
                 .then(function(ret){
-                    return API.agency.createAgency(agency)
+                    return API.agency.registerAgency(agency)
                 })
                 .then(function(ret){
-                    agencyId = ret.agency.id;
-                    agencyUserId = ret.agencyUser.id;
+                    var agency = ret.target;
+                    agencyId = agency.id;
+                    agencyUserId = agency.createUser;
+                    agencyZone = Zone.current.fork({name: 'api/company', properties: {session: {accountId: agencyUserId, tokenId: 'tokenId'}}});
                     done();
                 })
                 .catch(function(err){
@@ -52,7 +41,7 @@ describe("api/client/company.js", function() {
             })
         });
 
-        describe("createCompany", function(){
+        describe("registerCompany", function(){
             before(function(done){
                 Promise.all([
                     API.company.deleteCompanyByTest({mobile: company.mobile, email: company.email}),
@@ -83,19 +72,16 @@ describe("api/client/company.js", function() {
                     .done();
             })
 
-            it("#createCompany should be ok", function(done) {
+            it("#registerCompany should be ok", function(done) {
                 var self = {accountId: agencyUserId};
-                API.client.company.createCompany.call(self, company, function(err, company){
-                    if (err) {
-                        throw err;
-                    }
-
+                API.company.registerCompany(company, function(err, company){
+                    assert.equal(err, null);
                     companyId = company.id;
-                    ownerUserId = company.createUser;
+                    staffId = company.createUser;
                     done();
                 })
             });
-        })
+        });
 
 
         describe("company options based on company created", function(){
@@ -110,12 +96,13 @@ describe("api/client/company.js", function() {
                     .spread(function(ret1, ret2){
                         assert.equal(ret1, true);
                         assert.equal(ret2, true);
-                        return API.client.company.createCompany.call({accountId: agencyUserId}, company)
+                        return agencyZone.run(API.company.registerCompany.bind(this, company));
                     })
                     .then(function(company){
                         assert.equal(company.status, 0);
                         companyId = company.id;
-                        ownerUserId = company.createUser;
+                        staffId = company.createUser;
+                        staffZone = Zone.current.fork({name: 'api/company', properties: {session: {accountId: staffId, tokenId: 'tokenId'}}});
                         done();
                     })
                     .done();
@@ -140,7 +127,7 @@ describe("api/client/company.js", function() {
 
             it("#getCompanyListByAgency should be ok", function(done) {
                 var self = {accountId: agencyUserId};
-                API.client.company.getCompanyListByAgency.call(self, {}, function(err, ret){
+                API.company.getCompanyListByAgency({}, function(err, ret){
                     if (err) {
                         throw err;
                     }
@@ -150,65 +137,30 @@ describe("api/client/company.js", function() {
             });
 
             it("#updateCompany should be ok", function(done) {
-                var self = {accountId: ownerUserId};
+                var self = {accountId: staffId};
                 // Zone.current.fork();
-                API.client.company.updateCompany.call(self, {companyId: companyId, status: 1, address: '更新企业测试'}, function(err, ret){
-                    if(err){
-                        throw err;
-                    }
+                agencyZone.run(API.company.updateCompany.bind(this, {id: companyId, status: 1, address: '更新企业测试'}, function(err, ret){
+                    assert.equal(err, null);
                     assert.equal(ret.status, 1);
-
                     done();
-                })
+                }))
             });
 
 
             it("#getCompanyById should be ok", function(done) {
-                var self = {accountId: ownerUserId};
-                API.client.company.getCompanyById.call(self, {companyId: companyId}, function(err, ret){
-                    if(err){
-                        throw err;
-                    }
+                var self = {accountId: staffId};
+                API.company.getCompany({id: companyId}, function(err, ret){
+                    assert.equal(err, null);
                     assert.equal(ret.id, companyId);
                     done();
                 })
             });
 
-
-            it("#getCompanyFundsAccount should be ok", function(done) {
-                API.client.company.getCompanyFundsAccount.call({accountId: ownerUserId}, function(err, ret){
-                    if(err){
-                        throw err;
-                    }
-                    assert.equal(ret.id, companyId);
-                    done();
-                })
-            });
-
-
-            it("#getCompanyFundsAccountByAgency should be ok", function(done) {
-                API.client.company.getCompanyFundsAccountByAgency.call({accountId: agencyUserId}, {companyId: companyId}, function(err, ret){
-                    if(err){
-                        throw err;
-                    }
-                    assert.equal(ret.id, companyId);
-                    done();
-                })
-            });
-
-
-            it("#getCompanyFundsAccountByAgency should be error with wrong user", function(done) {
-                API.client.company.getCompanyFundsAccountByAgency.call({accountId: ownerUserId}, {companyId: companyId}, function(err, ret){
-                    assert.equal(err.code, -2);
-                    assert.equal(ret, null);
-                    done();
-                })
-            });
 
 
             it("#fundsCharge should be ok", function(done) {
                 var self = {accountId: agencyUserId};
-                API.client.company.fundsCharge.call(self, {channel: '企业账户充值API测试', money: 1000, companyId: companyId}, function(err, ret){
+                API.company.fundsCharge({channel: '企业账户充值API测试', money: 1000, companyId: companyId}, function(err, ret){
                     if(err){
                         throw err;
                     }
@@ -220,7 +172,7 @@ describe("api/client/company.js", function() {
 
             it("#fundsCharge should be error with wrong params", function(done) {
                 var self = {accountId: agencyUserId};
-                API.client.company.fundsCharge.call(self, {channel: '企业账户充值API测试', money: -1000, companyId: companyId}, function(err, ret){
+                API.company.fundsCharge({channel: '企业账户充值API测试', money: -1000, companyId: companyId}, function(err, ret){
                     assert.equal(err.code, -5); //充值金额不正确
                     assert.equal(ret, null);
                     done();
@@ -229,8 +181,8 @@ describe("api/client/company.js", function() {
 
 
             it("#frozenMoney should be ok", function(done) {
-                var self = {accountId: ownerUserId};
-                API.client.company.frozenMoney.call(self, {channel: '企业账户冻结资金API测试', money: 100, companyId: companyId}, function(err, ret){
+                var self = {accountId: staffId};
+                API.company.frozenMoney({channel: '企业账户冻结资金API测试', money: 100, companyId: companyId}, function(err, ret){
                     if(err){
                         throw err;
                     }
@@ -242,8 +194,8 @@ describe("api/client/company.js", function() {
 
 
             it("#consumeMoney should be ok", function(done) {
-                var self = {accountId: ownerUserId};
-                API.client.company.consumeMoney.call(self, {channel: '企业账户消费API测试', money: 100.01, companyId: companyId}, function(err, ret){
+                var self = {accountId: staffId};
+                API.company.consumeMoney({channel: '企业账户消费API测试', money: 100.01, companyId: companyId}, function(err, ret){
                     if(err){
                         throw err;
                     }
@@ -255,7 +207,7 @@ describe("api/client/company.js", function() {
 
             it("#deleteCompany should be ok", function(done) {
                 var self = {accountId: agencyUserId};
-                API.client.company.deleteCompany.call(self, {companyId: companyId}, function(err, ret){
+                API.company.deleteCompany({companyId: companyId}, function(err, ret){
                     if(err){
                         throw err;
                     }
@@ -268,4 +220,4 @@ describe("api/client/company.js", function() {
 
     });
 
-})
+}));
