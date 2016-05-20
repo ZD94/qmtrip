@@ -37,13 +37,15 @@ var API = require('common/api');
 var model = require('common/model');
 model.init(config.postgres.url);
 
-zone.run(function(){
-    return API.init(path.join(__dirname, '../api'), config.api)
-        .then(API.loadTests.bind(API))
-        .then(run)
-        .catch(function(e){
-            logger.error(e.stack?e.stack:e);
-            console.error(e.stack?e.stack:e);
-            process.exit();
-        });
-})
+zone.forkStackTrace()
+    .fork({name: 'test', properties:{}})
+    .run(function(){
+        return API.init(path.join(__dirname, '../api'), config.api)
+            .then(API.loadTests.bind(API))
+            .then(run)
+            .catch(function(e){
+                logger.error(e.stack?e.stack:e);
+                console.error(e.stack?e.stack:e);
+                process.exit();
+            });
+    });

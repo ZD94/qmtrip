@@ -5,10 +5,11 @@
 var assert = require("assert");
 var API = require("common/api");
 
+var getSession = require('common/model').getSession;
+
 var agencyId = '';
 var agencyUserId = '';
-var zone = Zone.current.fork({name: 'api/agency', properties: {session: {accountId: agencyUserId}}});
-zone.run(describe.bind(this, "api/agency", function() {
+describe("api/agency", function() {
 
     describe("registerAgency", function() {
         var agency = {email: "agency.test@jingli.tech", userName: "喵喵", name: '喵喵的代理商', description: '代理商API测试用', mobile: "15269866801"};
@@ -70,7 +71,9 @@ zone.run(describe.bind(this, "api/agency", function() {
                     assert.equal(ret.target.status, 1);
                     agencyId = ret.target.id;
                     agencyUserId = ret.target.createUser;
-                    zone = Zone.current.fork({name: 'api/agency', properties: {session: {accountId: agencyUserId, tokenId: "tokenId"}}});
+                    var session = getSession();
+                    session.accountId = agencyUserId;
+                    session.tokenId = tokenId;
                     done();
                 })
                 .catch(function(err){
@@ -192,7 +195,8 @@ zone.run(describe.bind(this, "api/agency", function() {
                         assert.equal(ret.target.email, agency.email);
                         newAgencyId = ret.target.id;
                         var newAgencyUserId = ret.target.createUser;
-                        zone = Zone.current.fork({name: 'api/agency', properties: {session: {accountId: newAgencyUserId}}});
+                        var session = getSession();
+                        session.accountId = newAgencyUserId;
                         done();
                     });
                 });
@@ -213,4 +217,4 @@ zone.run(describe.bind(this, "api/agency", function() {
 
 
 
-}));
+});
