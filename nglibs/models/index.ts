@@ -142,6 +142,12 @@ class ClientModels implements ModelsInterface {
         this.seed = createService<Seed>(Services.seed, $cacheFactory);
         initModels(this);
     }
+
+    async $resolve() : Promise<this> {
+        API.require('staff');
+        await API.onload();
+        return this;
+    }
 }
 
 import './menu';
