@@ -128,39 +128,33 @@ class StaffModule{
      * @returns {*}
      */
     @requireParams(["id"])
-    static delete(params: {id: string}): Promise<any>{
+    static async delete(params: {id: string}): Promise<any>{
         var id = params.id;
-        return API.auth.remove({accountId: id})
-            .then(function(){
-                return DBM.Staff.update({status: EStaffStatus.DELETE, quitTime: utils.now()}, {where: {id: id}, returning: true})
+        let acc = await API.auth.getAccount({id:id});
+        await  API.auth.remove({accountId: id});
+        let [ num, rows ] = await DBM.Staff.update({status: EStaffStatus.DELETE, quitTime: utils.now()}, {where: {id: id}, returning: true});
+        var staff = rows[0];
+        if (!staff) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        let company = await API.company.getCompany({id:staff.companyId});
+        var vals = {
+            name: staff.name || "",
+            time: utils.now(),
+            companyName: company.name
+        }
+        return API.mail.sendMailRequest({
+                toEmails: acc.email,
+                templateName: "qm_notify_remove_staff",
+                values: vals
             })
-            .spread(function(num, rows){
-                var staff = rows[0];
-                if (!staff) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST();
+            .then(function() {
+                if(num != 1){
+                    throw {code: -2, msg: '删除失败'};
                 }
-
-                return API.company.getCompany({id:staff.companyId})
-                    .then(function(company){
-                        var vals = {
-                            name: staff.name || "",
-                            time: utils.now(),
-                            companyName: company.name
-                        }
-                        return API.mail.sendMailRequest({
-                                toEmails: rows[0].email,
-                                templateName: "qm_notify_remove_staff",
-                                values: vals
-                            })
-                            .then(function() {
-                                if(num != 1){
-                                    throw {code: -2, msg: '删除失败'};
-                                }
-                                return true;
-                            });
-                    })
-
-            })
+                return true;
+            });
     }
 
     @clientExport
@@ -210,7 +204,7 @@ class StaffModule{
         var accobj: any = {};
         var com: any = {};
         return Promise.all([
-                DBM.Staff.findById(id),
+                Models.staff.get(id),
                 API.auth.getAccount({id:id}),
             ])
             .spread(function(old, acc){
@@ -218,18 +212,20 @@ class StaffModule{
                 return API.company.getCompany({id: old.companyId})
                     .then(function(company){
                         com = company;
-                        if(data.email){
-                            if(old.email != data.email){
-                                if(acc.status != 0)
+                        if(data.email || data.mobile){
+                            if(acc.email != data.email || acc.mobile != data.mobile ){
+                                if(acc.status != 0 && acc.email != data.email)
                                     throw {code: -2, msg: "该账号不允许修改邮箱"};
-                                var accData = {email: data.email};
+                                var accData = {email: data.email || acc.email, mobile: data.mobile || acc.mobile};
                                 return Promise.all([
                                         API.auth.updateAccount(id, accData, company.name),
                                         DBM.Staff.update(data, options)
                                     ])
                                     .spread(function(updateaccount, updatestaff) {
+                                        accobj.email = data.email || acc.email;
+                                        accobj.mobile = data.mobile || acc.mobile;
                                         send_email = false;
-                                        return [1, updatestaff];
+                                        return updatestaff;
                                     });
                             }
                             return DBM.Staff.update(data, options);
@@ -249,7 +245,7 @@ class StaffModule{
                             //已激活账户
                             var vals = {
                                 username: rows[0].name,
-                                mobile: rows[0].mobile,
+                                mobile: accobj.mobile,
                                 travelPolicy: tp.name,
                                 time: utils.now(),
                                 companyName: com.name,
@@ -257,7 +253,7 @@ class StaffModule{
                                 permission: rows[0].roleId == EStaffRole.ADMIN ? "管理员" : (rows[0].roleId == EStaffRole.OWNER ? "创建者" : "普通员工")
                             }
                             return API.mail.sendMailRequest({
-                                    toEmails: rows[0].email,
+                                    toEmails: accobj.email,
                                     templateName: "staff_update_email",
                                     values: vals
                                 })
@@ -266,7 +262,7 @@ class StaffModule{
                                 });
                         }else if(accobj.status == 0 && send_email){
                             //未激活账户 并且未通过修改邮箱更新账户信息发送激活邮件
-                            return API.auth.sendResetPwdEmail({companyName: com.name, email: rows[0].email, type: 1, isFirstSet: true})
+                            return API.auth.sendResetPwdEmail({companyName: com.name, email: accobj.email, type: 1, isFirstSet: true})
                                 .then(function() {
                                     return new Staff(rows[0]);;
                                 });
@@ -1347,9 +1343,12 @@ class StaffModule{
         var companyId = params.companyId;
         var mobile = params.mobile;
         var email = params.email;
+        delete params.mobile;
+        delete params.email;
+
         return Promise.all([
                 API.auth.remove({email: email, mobile: mobile, type: 1}),
-                DBM.Staff.destroy({where: {$or: [{companyId: companyId}, {mobile: mobile}, {email: email}]}})
+                DBM.Staff.destroy({where: params})
             ])
             .spread(function(){
                 return true;

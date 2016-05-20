@@ -6,7 +6,7 @@
 require('app-module-path').addPath(__dirname);
 require('common/typescript');
 
-require('common/zone');
+var zone = require('common/zone');
 
 //服务器启动性能日志
 //var perf = require('common/perf');
@@ -20,7 +20,7 @@ var config = require("./config");
 
 Promise.config({ warnings: false });
 if(config.debug) {
-    Promise.config({ longStackTraces: true });
+    Promise.config({ longStackTraces: false });
 }
 
 var path = require('path');
@@ -91,5 +91,7 @@ server.on('init.http', function(server){
     }
 });
 
-server.start();
+zone.run(function(){
+    server.start();
+});
 

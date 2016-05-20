@@ -49,11 +49,11 @@ describe("api/client/staff.js", function() {
     //创建员工
     before(function(done) {
         Q.all([
-                API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
-                API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
-                API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile}),
-                API.staff.deleteAllStaffByTest({email: updateobj.email, mobile: updateobj.mobile}),
-                API.staff.deleteAllStaffByTest({email: obj.email, mobile: obj.mobile})
+                API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile, name: agency.name}),
+                API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile, name: company.name}),
+                API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile, name: company.name}),
+                API.staff.deleteAllStaffByTest({email: updateobj.email, mobile: updateobj.mobile, name: updateobj.name}),
+                API.staff.deleteAllStaffByTest({email: obj.email, mobile: obj.mobile, name: obj.name})
             ])
             .spread(function(ret1, ret2, ret3, ret4, ret5){
                 return API.client.agency.registerAgency(agency);
@@ -86,11 +86,11 @@ describe("api/client/staff.js", function() {
 
     after(function(done) {
         Q.all([
-                API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
-                API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
-                API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile}),
-                API.staff.deleteAllStaffByTest({email: updateobj.email, mobile: updateobj.mobile}),
-                API.staff.deleteAllStaffByTest({email: obj.email, mobile: obj.mobile})
+                API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile, name: agency.name}),
+                API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile, name: company.name}),
+                API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile, name: company.name}),
+                API.staff.deleteAllStaffByTest({email: updateobj.email, mobile: updateobj.mobile, name: updateobj.name}),
+                API.staff.deleteAllStaffByTest({email: obj.email, mobile: obj.mobile, name: obj.name})
             ])
             .spread(function(ret1, ret2, ret3, ret4, ret5){
                 done();
@@ -115,9 +115,9 @@ describe("api/client/staff.js", function() {
     it("#listAndPaginateStaff should be ok", function(done) {
         zoneSelf.run(API.client.staff.listAndPaginateStaff.bind(this, {}, function(err, result) {
             assert.equal(err, null);
-            //console.log(err);
-            //console.log(result);
-//                console.log(result.items);//item dataValues里存放的才是记录信息
+            if(err != null){
+                console.log(err);
+            }
             done();
         }));
     })
@@ -126,8 +126,9 @@ describe("api/client/staff.js", function() {
     it("#getStaffs should be ok", function(done) {
         zoneSelf.run(API.client.staff.getStaffs.bind(this, {name: "123"}, function(err, result) {
             assert.equal(err, null);
-            //console.log(err);
-            //console.log(result);
+            if(err != null){
+                console.log(err);
+            }
             done();
         }));
     })
@@ -137,7 +138,9 @@ describe("api/client/staff.js", function() {
         updateobj.id = id;
         zoneSelf.run(API.client.staff.updateStaff.bind(this, updateobj, function(err, result) {
             assert.equal(err, null);
-            //console.log(err);
+            if(err != null){
+                console.log(err);
+            }
             done();
         }));
     })
@@ -145,8 +148,9 @@ describe("api/client/staff.js", function() {
     it("#getStaff should be ok", function(done) {
         zoneSelf.run(API.client.staff.getStaff.bind(this, {id:id}, function(err, result) {
             assert.equal(err, null);
-            //console.log(err);
-            //console.log(result);
+            if(err != null){
+                console.log(err);
+            }
             done();
         }));
     })
@@ -230,8 +234,9 @@ describe("api/client/staff.js", function() {
     it("#deleteStaff should be ok", function(done) {
         zoneSelf.run(API.client.staff.deleteStaff.bind(this, {id: id}, function(err, result) {
             assert.equal(err, null);
-            //console.log(err);
-            //console.log(result);
+            if(err != null){
+                console.log(err);
+            }
             done();
         }));
     })
