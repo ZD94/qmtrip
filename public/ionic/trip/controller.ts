@@ -1,6 +1,9 @@
 "use strict";
 
 import moment = require('moment');
+import {Cookie} from "request";
+var API = require("common/api");
+var Cookie = require('tiny-cookie');
 
 var defaultTrip = {
     beginDate: moment().startOf('day').hour(9).toDate(),
@@ -49,7 +52,7 @@ export function CreateController($scope, $storage){
         return moment(tripdef.endDate).diff(tripdef.beginDate, 'days') || 1;
     }
     $scope.incTripDuration = function(){
-        tripdef.endDate = moment(tripdef.endDate).add(1, 'days').toDate();;
+        tripdef.endDate = moment(tripdef.endDate).add(1, 'days').toDate();
         $scope.$applyAsync();
     }
     $scope.decTripDuration = function(){
@@ -84,8 +87,11 @@ export function CreateController($scope, $storage){
     }
 }
 
-export async function BudgetController($scope, $storage){
+export async function BudgetController($scope, $storage, Models){
     var tripdef = TripDefineFromJson($storage.local.get('tripdef'));
+    var staff = Models.staff.get(Cookie.get("user_id"));
+    $scope.policy = staff.getTravelPolicy();
+    $scope.during = moment(tripdef.endDate).diff(tripdef.beginDate, 'days') || 1;
     $scope.tripdef = tripdef;
 
 }
