@@ -219,7 +219,7 @@ class ApiTravelBudget {
      * @return {Promise} {price: "1000"}
      */
     static async getTrafficBudget(params: {originPlace: string, destinationPlace: string,
-        leaveDate: string, leaveTime: string}) : Promise<TravelBudgeItem> {
+        leaveDate: Date | string, leaveTime: string}) : Promise<TravelBudgeItem> {
 
         let {originPlace, destinationPlace, leaveDate, leaveTime} = params;
         let self: any = this;
@@ -267,7 +267,6 @@ class ApiTravelBudget {
             trainCabinClass = policy.trainLevel;
             trainCabinClass = trainCabinClass.replace(/\//g, ",");
         }
-        let leaveDate = params.leaveDate
         if (leaveDate && !validate.isDate(leaveDate)) {
             leaveDate = moment(leaveDate).format("YYYY-MM-DD");
         }
