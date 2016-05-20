@@ -5,14 +5,16 @@
 import {EStaffRole, Staff} from "api/_types/staff";
 import {TravelPolicy} from "api/_types/travelPolicy";
 
-var Cookie = require('tiny-cookie');
-
 export async function ManagementController($scope,Models){
-    var staff = await Models.staff.get(Cookie.get('user_id'));
-    var company = await staff.company;
-    $scope.staffsnum = await company.getStaffs().length;
+    var staff = await Staff.getCurrent();
+    var company = staff.company;
+    var [staffs, policies] = await Promise.all([
+        company.getStaffs(),
+        company.getTravelPolicies()
+    ]);
+    $scope.staffsnum = staffs.length;
     // $scope.departmentsnum = await company.getDepartments().length;
-    $scope.policiesnum = await company.getTravelPolicies().length;
+    $scope.policiesnum = policies.length;
 }
 
 export async function BudgetController($scope){
@@ -28,14 +30,14 @@ export async function DistributionController($scope){
 }
 
 export async function DepartmentController($scope, Models, $ionicPopup){
-    var staff = await Models.staff.get(Cookie.get('user_id'));
+    var staff = await Staff.getCurrent();
     var company = await staff.company;
     var departments = company.getDepartments();
     $scope.departments = departments;
 }
 
 export async function StaffsController($scope, Models){
-    var staff = await Models.staff.get(Cookie.get('user_id'));
+    var staff = await Staff.getCurrent();
     var company = staff.company;
     var staffs = await company.getStaffs();
     $scope.staffs = staffs.map(function(staff){
@@ -64,7 +66,7 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
     });
 
     let staff;
-    var currentstaff = await Models.staff.get(Cookie.get('user_id'));
+    var currentstaff = await Staff.getCurrent();
     var company = currentstaff.company;
     if($stateParams.staffId){
         staff = await Models.staff.get($stateParams.staffId);
@@ -111,7 +113,7 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
 }
 
 export async function TravelpolicyController($scope , Models, $location){
-    var staff = await Models.staff.get(Cookie.get('user_id'));
+    var staff = await Staff.getCurrent();
     var company = await staff.company;
     var travelPolicies = await company.getTravelPolicies();
     $scope.travelPolicies = travelPolicies.map(function (policy) {
@@ -157,7 +159,7 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
             text:'6折及以下'
         }
     ]
-    var staff = await Models.staff.get(Cookie.get('user_id'));
+    var staff = await Staff.getCurrent();
     var company = staff.company;
     var travelPolicy;
     if($stateParams.policyId){

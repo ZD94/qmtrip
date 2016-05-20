@@ -1,6 +1,8 @@
 "use strict";
 var Cookie = require('tiny-cookie');
 var msgbox = require('msgbox');
+var API = require('common/api');
+
 API.require('auth');
 
 export function IndexController($scope,$stateParams) {

@@ -4,6 +4,8 @@ import moment = require('moment');
 import {Cookie} from "request";
 var API = require("common/api");
 var Cookie = require('tiny-cookie');
+import { Staff } from 'api/_types/staff';
+
 
 var defaultTrip = {
     beginDate: moment().startOf('day').hour(9).toDate(),
@@ -109,5 +111,5 @@ export function DetailController($scope){
 }
 
 export async function ListController($scope , Models){
-    var staff = await Models.staff.get(Cookie.get('user_id'));
+    var staff = await Staff.getCurrent();
 }
