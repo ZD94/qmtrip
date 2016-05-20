@@ -199,9 +199,7 @@ class AgencyModule {
     @requirePermit('user.add', 2)
     @requireParams(['email', 'name'], ['mobile', 'sex', 'avatar', 'roleId'])
     static async createAgencyUser(params: {email: string, name: string, mobile?: string, sex?: number, avatar?: string, roleId?: number}): Promise<AgencyUser> {
-        console.info("createAgencyUser start...");
         let curUser = await AgencyUser.getCurrent();
-        console.info("step 1...");
 
         if(!curUser) {
             throw L.ERR.AGENCY_USER_NOT_EXIST;
@@ -210,20 +208,20 @@ class AgencyModule {
         let agencyId = curUser.agency.id;
         params['agencyId'] = agencyId;
 
-        console.info(Models.agencyUser.find);
+        try {
+            let _agencyUser = await Models.agencyUser.find({agencyId: agencyId, $or: [{email: params.email}, {mobile: params.mobile}]});
+            if (_agencyUser.length > 0) {
+                throw {code: -2, msg: '邮箱或手机号已经注册代理商'};
+            }
 
-        // let _agencyUser = await Models.agencyUser.find({agencyId: agencyId, $or: [{email: params.email}, {mobile: params.mobile}]});
-
-        let _agencyUser = await DBM.AgencyUser.findAll({where: {agencyId: agencyId, $or: [{email: params.email}, {mobile: params.mobile}]}});
-
-        if (_agencyUser.length > 0) {
-            throw {code: -2, msg: '邮箱或手机号已经注册代理商'};
+        }catch (err) {
+            console.info(err.stack);
+            throw err;
         }
 
-        console.info('step 2...');
+
         let user = await Models.agencyUser.create(params);
         user.agency = curUser.agency;
-        console.info(user);
         return user.save();
     }
 
