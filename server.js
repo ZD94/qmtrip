@@ -6,6 +6,11 @@
 require('app-module-path').addPath(__dirname);
 require('common/typescript');
 
+process.on('unhandledRejection', (reason, p) => {
+    throw reason;
+});
+
+Error.stackTraceLimit = 40;
 var zone = require('common/zone');
 
 //服务器启动性能日志
