@@ -123,6 +123,7 @@
     "md5": "^2.0.0",
     "notie": "^2.1.0",
     "scssify": "^1.0.0",
+    "source-map-support": "^0.4.0",
     "stringify": "^5.1.0",
     "swiper": "^3.3.1",
     "through2": "^2.0.1",
