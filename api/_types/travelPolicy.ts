@@ -41,6 +41,10 @@ export class TravelPolicy extends ModelObject{
     @Field({type: Types.FLOAT})
     get hotelPrice(): number {return null}
     set hotelPrice(hotelPrice: number){}
+    
+    @Field({type: Types.FLOAT})
+    get subsidy(): number {return null}
+    set subsidy(subsidy: number){}
 
     @Field({type: Types.BOOLEAN})
     get isChangeLevel(): boolean {return null}
