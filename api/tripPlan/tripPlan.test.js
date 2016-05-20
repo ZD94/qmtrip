@@ -258,8 +258,8 @@ describe("api/client/tripPlan.js", function() {
                 })
         });
 
-        it("#updateConsumeDetail should be ok", function (done) {
-            API.tripPlan.updateConsumeDetail({consumeId: consume_id, optLog: '测试updateConsumeDetail', userId: staffId, updates: {orderStatus: 'BOOKED'}}, function (err, ret) {
+        it("#updateTripDetail should be ok", function (done) {
+            API.tripPlan.updateTripDetail({consumeId: consume_id, optLog: '测试updateTripDetail', userId: staffId, updates: {orderStatus: 'BOOKED'}}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
@@ -431,7 +431,7 @@ describe("api/client/tripPlan.js", function() {
             })
         });
 
-        describe("#saveConsumeDetail", function(){
+        describe("#saveTripDetail", function(){
             var newDetailId = "";
             after(function(done){
                 API.client.tripPlan.uploadInvoice.call({accountId: staffId}, {consumeId: newDetailId, picture: '测试上传图片'}, function (err, ret) {
@@ -443,7 +443,7 @@ describe("api/client/tripPlan.js", function() {
                 })
             })
 
-            it("#saveConsumeDetail should be ok", function (done) {
+            it("#saveTripDetail should be ok", function (done) {
                 var self = {accountId: staffId};
                 var detail = {
                     tripPlanId: newplanId,
@@ -452,7 +452,7 @@ describe("api/client/tripPlan.js", function() {
                     invoiceType: 'HOTEL',
                     budget: 350
                 }
-                API.client.tripPlan.saveConsumeDetail.call(self, detail, function (err, ret) {
+                API.client.tripPlan.saveTripDetail.call(self, detail, function (err, ret) {
                     if (err) {
                         throw err;
                     }
