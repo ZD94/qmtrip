@@ -49,7 +49,7 @@
 | msg     | 错误消息 |
 
 
->. 保存差旅计划单消费明细 API.tripPlan.saveConsumeDetail(params, callback);
+>. 保存差旅计划单消费明细 API.tripPlan.saveTripDetail(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -184,7 +184,7 @@
 | msg     | 错误消息 |
 
 
->. 删除差旅支出 API.tripPlan.deleteConsumeDetail(detailId, callback);
+>. 删除差旅支出 API.tripPlan.deleteTripDetail(detailId, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------

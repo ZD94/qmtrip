@@ -20,7 +20,6 @@ import {Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog} f
 import { ServiceInterface } from 'common/model';
 
 
-
 let TripDetailCols = TripDetail['$fieldnames'];
 let TripPlanCols = TripPlan['$fieldnames'];
 
@@ -53,12 +52,8 @@ class TripPlanModule {
         _tripPlan.accountId = accountId;
         _tripPlan.companyId = staff.companyId;
         _tripPlan.id = tripPlanId;
-        _tripPlan.createdAt = utils.now();
         _tripPlan.projectId = project.id;
 
-        console.info("**********************");
-        console.info(_tripPlan.planNo);
-        
         let tripPlan = new TripPlan(await DBM.TripPlan.create(_tripPlan));
         await Promise.all(tripDetails.map(async function (detail) {
             detail.tripPlanId = tripPlanId;
@@ -127,7 +122,6 @@ class TripPlanModule {
      * @returns {*}
      */
     @requireParams(['id'], ['columns'])
-
     static async getTripPlan(params) {
         let tripPlanId = params.id;
         let options:any = {};
@@ -156,32 +150,7 @@ class TripPlanModule {
     }
 
 
-    static getConsumeInvoiceImg(params) {
-        let consumeId = params.consumeId;
-
-        if (!consumeId) {
-            throw {code: -1, msg: "consumeId不能为空"};
-        }
-
-        return DBM.TripDetail.findById(consumeId)
-            .then(function (consumeDetail) {
-                return API.attachments.getAttachment({id: consumeDetail.newInvoice})
-            })
-            .then(function (attachment) {
-                if (!attachment) {
-                    throw L.ERR.NOT_FOUND();
-                }
-
-                return 'data:image/jpg;base64,' + attachment.content;
-            })
-            .then(function (result) {
-                return result;
-            })
-
-    }
-
     @requireParams(['consumeId'], ['columns'])
-
     static async getTripDetail(params) {
         let options:any = {};
 
@@ -204,8 +173,7 @@ class TripPlanModule {
      * @returns {*}
      */
     @requireParams(['userId', 'tripPlanId', 'optLog', 'updates'])
-
-    static updateTripPlanOrder(params) {
+    static updateTripPlan(params) {
         let tripPlanId = params.tripPlanId;
         let userId = params.userId;
         let optLog = params.optLog;
@@ -251,7 +219,7 @@ class TripPlanModule {
      */
     @requireParams(['consumeId', 'optLog', 'userId', 'updates'], TripDetail['$fieldnames'])
 
-    static updateConsumeDetail(params) {
+    static updateTripDetail(params) {
         let updates:any = _.pick(params.updates, TripDetail['$fieldnames']);
         let trip_plan_id = '';
 
@@ -301,9 +269,34 @@ class TripPlanModule {
             })
     }
 
+
+    static getConsumeInvoiceImg(params) {
+        let consumeId = params.consumeId;
+
+        if (!consumeId) {
+            throw {code: -1, msg: "consumeId不能为空"};
+        }
+
+        return DBM.TripDetail.findById(consumeId)
+            .then(function (consumeDetail) {
+                return API.attachments.getAttachment({id: consumeDetail.newInvoice})
+            })
+            .then(function (attachment) {
+                if (!attachment) {
+                    throw L.ERR.NOT_FOUND();
+                }
+
+                return 'data:image/jpg;base64,' + attachment.content;
+            })
+            .then(function (result) {
+                return result;
+            })
+
+    }
+
     @requireParams(['id', 'budget', 'userId'], ['invoiceType'])
 
-    static updateConsumeBudget(params) {
+    static updateTripDetailBudget(params) {
         let id = params.id;
 
         return DBM.TripDetail.findById(id)
@@ -488,7 +481,6 @@ class TripPlanModule {
      * @returns {*}
      */
     @requireParams(['userId', 'tripPlanId'])
-
     static deleteTripPlan(params) {
         let tripPlanId = params.tripPlanId;
         let userId = params.userId;
@@ -510,10 +502,7 @@ class TripPlanModule {
                             fields: ['status', 'updatedAt'],
                             transaction: t
                         }),
-                        DBM.TripDetail.update({
-                            status: EPlanStatus.DELETE,
-                            updatedAt: utils.now()
-                        }, {where: {tripPlanId: tripPlanId}, fields: ['status', 'updatedAt'], transaction: t})
+                        DBM.TripDetail.update({status: EPlanStatus.DELETE, updatedAt: utils.now()}, {where: {tripPlanId: tripPlanId}, fields: ['status', 'updatedAt'], transaction: t})
                     ])
                 })
             })
@@ -529,7 +518,7 @@ class TripPlanModule {
      */
     @requireParams(['userId', 'id'])
 
-    static deleteConsumeDetail(params) {
+    static deleteTripDetail(params) {
         let id = params.id;
         let userId = params.userId;
 
@@ -943,7 +932,6 @@ class TripPlanModule {
      * @param params
      */
     @requireParams(['companyId'], ['startTime', 'endTime', 'accountId'])
-
     static statPlanOrderMoney(params) {
         let query = params;
         let query_complete:any = {
@@ -1005,7 +993,6 @@ class TripPlanModule {
      * @returns {*}
      */
     @requireParams(['companyId'], ['description'])
-
     static getProjects(params) {
         return DBM.TripPlan.findAll({where: params, group: ['description'], attributes: ['description']})
     }
@@ -1016,7 +1003,6 @@ class TripPlanModule {
      * @returns {*}
      */
     @requireParams(['tripPlanId', 'accountId'])
-
     static commitTripPlanOrder(params) {
         let id = params.tripPlanId;
         return Promise.all([
