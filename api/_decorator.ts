@@ -13,9 +13,7 @@ export function requirePermit(permits: string| string[], type?: number) {
     return function (target, key, desc) {
         let fn = desc.value;
         desc.value = async function (...args) {
-            let self = this;
             let accountId = _getAccountId();
-            self.accountId = accountId;
             let ret;
             try {
                 ret = await API.permit.checkPermission({accountId: accountId, permissions: permits, type: type});
@@ -25,7 +23,7 @@ export function requirePermit(permits: string| string[], type?: number) {
             if (!ret) {
                 throw L.ERR.PERMISSION_DENIED()
             }
-            return fn.apply(self, args)
+            return fn.apply(this, args)
         }
         return desc;
     }

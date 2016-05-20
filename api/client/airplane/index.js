@@ -262,7 +262,7 @@ function book_ticket(params) {
         })
         .then(function(order) {
             //更新出差记录详情
-            return [order, API.tripPlan.updateConsumeDetail({consumeId: consume_id, userId: account_id, optLog: '通过鲸力差旅管家预定', updates: {orderStatus: 'BOOKED'}})];
+            return [order, API.tripPlan.updateTripDetail({consumeId: consume_id, userId: account_id, optLog: '通过鲸力差旅管家预定', updates: {orderStatus: 'BOOKED'}})];
         })
         .spread(function(order, result) {
             if(!result) {

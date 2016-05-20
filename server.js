@@ -91,7 +91,7 @@ server.on('init.http', function(server){
     }
 });
 
-zone.run(function(){
+zone.forkStackTrace().run(function(){
     server.start();
 });
 

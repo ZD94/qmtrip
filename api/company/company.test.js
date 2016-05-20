@@ -96,7 +96,7 @@ agencyZone.run(describe.bind(this, "api/company", function() {
                     .spread(function(ret1, ret2){
                         assert.equal(ret1, true);
                         assert.equal(ret2, true);
-                        return agencyZone.run(API.company.registerCompany.bind(this, company));
+                        return API.company.registerCompany.bind(this, company);
                     })
                     .then(function(company){
                         assert.equal(company.status, 0);
@@ -138,12 +138,11 @@ agencyZone.run(describe.bind(this, "api/company", function() {
 
             it("#updateCompany should be ok", function(done) {
                 var self = {accountId: staffId};
-                // Zone.current.fork();
-                agencyZone.run(API.company.updateCompany.bind(this, {id: companyId, status: 1, address: '更新企业测试'}, function(err, ret){
+                API.company.updateCompany.bind(this, {id: companyId, status: 1, address: '更新企业测试'}, function(err, ret){
                     assert.equal(err, null);
                     assert.equal(ret.status, 1);
                     done();
-                }))
+                })
             });
 
 
