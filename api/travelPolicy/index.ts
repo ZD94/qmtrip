@@ -9,6 +9,7 @@ import {Paginate} from 'common/paginate';
 var API = require("common/api");
 let L = require("common/language");
 import {validateApi, requireParams, clientExport} from 'common/api/helper';
+import {requirePermit, conditionDecorator, condition} from "../_decorator";
 import types = require("api/_types/travelPolicy");
 import { ServiceInterface } from 'common/model';
 import { TravelPolicy } from 'api/_types/travelPolicy';
@@ -22,7 +23,7 @@ class TravelPolicyModule{
      * @param data
      * @returns {*}
      */
-    @requireParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"], travalPolicyCols)
+    /*@requireParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"], travalPolicyCols)
     static async create(data): Promise<TravelPolicy>{
         if (!data.hotelPrice || !/^\d+(.\d{1,2})?$/.test(data.hotelPrice)) {
             data.hotelPrice = null;
@@ -33,9 +34,10 @@ class TravelPolicyModule{
         }
         let returnData =  DBM.TravelPolicy.create(data)
         return new TravelPolicy(returnData);
-    }
+    }*/
 
     @clientExport
+    @requireParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"], travalPolicyCols)
     static async createTravelPolicy (params) : Promise<TravelPolicy>{
         let {accountId} = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
@@ -147,7 +149,6 @@ class TravelPolicyModule{
         let role = await API.auth.judgeRoleById({id:accountId});
 
         if(role == EAccountType.STAFF){
-
             let staff = await Models.staff.get(accountId);
             company_id = staff["companyId"];
 
@@ -155,8 +156,8 @@ class TravelPolicyModule{
             if(tp.companyId != company_id){
                 throw {code: -1, msg: '无权限'};
             }
-
-            options.where.companyId = company_id;//只允许删除该企业下的差旅标准
+            params.companyId = company_id;
+            options.where.companyId = company_id;//只允许修改该企业下的差旅标准
             let [rownum, rows]  = await DBM.TravelPolicy.update(params, options);
             return new TravelPolicy(rows[0]);
 
@@ -164,7 +165,7 @@ class TravelPolicyModule{
 
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
-                let { rownum, rows } = await DBM.TravelPolicy.update(params, options);
+                let [ rownum, rows ] = await DBM.TravelPolicy.update(params, options);
                 return new TravelPolicy(rows[0]);
             }else{
                 throw {code: -1, msg: '无权限'};
@@ -179,6 +180,7 @@ class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
+    @requireParams(["id"], ["companyId"])
     static async getTravelPolicy(params: {id: string, companyId?: string}) : Promise<TravelPolicy>{
         let id = params.id;
         let { accountId } = Zone.current.get("session");
