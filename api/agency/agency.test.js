@@ -94,65 +94,63 @@ zone.run(describe.bind(this, "api/agency", function() {
 
         describe('after agency created', function() {
             it("getAgencyById should be ok", function(done) {
-                zone.run(API.agency.getAgencyById.bind(this, {id: agencyId}, function(err, ret) {
+                API.agency.getAgencyById.bind(this, {id: agencyId}, function(err, ret) {
                     assert.equal(err, null);
                     assert.equal(ret.target.id, agencyId);
                     done();
-                }));
+                });
             });
 
             it("#updateAgency should be ok", function(done) {
                 var self = {accountId: agencyUserId};
-                zone.run(API.agency.updateAgency.bind(this, {id: agencyId, status: '0', remark: '代理商更新测试', wrongParams: 'wrongParams'}, function(err, ret) {
+                API.agency.updateAgency.bind(this, {id: agencyId, status: '0', remark: '代理商更新测试', wrongParams: 'wrongParams'}, function(err, ret) {
                     assert.equal(err, null);
                     assert.equal(ret.target.status, 0);
                     done();
-                }));
+                });
             });
 
             it("#listAgency should be ok", function(done) {
-                zone.run(API.agency.listAgency.bind(this, {}, function(err, ret) {
+                API.agency.listAgency.bind(this, {}, function(err, ret) {
                     assert.equal(err, null);
                     assert(ret.length >= 0);
                     done();
-                }));
+                });
             });
 
             it("createAgencyUser should be ok", function(done) {
-                zone.run(API.agency.createAgencyUser.bind(this, {name: '测试代理商用户', email: "agencyUser.test@jingli.tech", mobile: '12345678777', agencyId: agencyId}, function(err, ret) {
+                API.agency.createAgencyUser.bind(this, {name: '测试代理商用户', email: "agencyUser.test@jingli.tech", mobile: '12345678777', agencyId: agencyId}, function(err, ret) {
                     assert.equal(err, null);
                     assert.equal(ret.status, 0);
                     done();
-                }));
+                });
             });
 
 
             it("updateAgencyUser should be ok", function(done) {
-                zone.run(API.agency.updateAgencyUser.bind(this, {status: 1, roleId: 2, id: agencyUserId}, function(err, ret) {
+                API.agency.updateAgencyUser.bind(this, {status: 1, roleId: 2, id: agencyUserId}, function(err, ret) {
                     assert.equal(err, null);
                     assert.equal(ret.status, 1);
                     assert.equal(ret.roleId, 2);
                     done();
-                }));
+                });
             })
 
-
-
             it("getAgencyUser should be ok", function(done) {
-                zone.run(API.agency.getAgencyUser.bind(this, {id: agencyUserId}, function(err, ret) {
+                API.agency.getAgencyUser.bind(this, {id: agencyUserId}, function(err, ret) {
                     assert.equal(err, null);
                     assert.equal(ret.id, agencyUserId);
                     done();
-                }))
+                })
             });
 
             it("getAgencyUser should be error whit wrong params", function(done) {
                 var uuid = require('uuid');
-                zone.run(API.agency.getAgencyUser.bind(this, {id: uuid.v1()}, function(err, ret) {
+                API.agency.getAgencyUser.bind(this, {id: uuid.v1()}, function(err, ret) {
                     assert.equal(ret, null);
                     assert.equal(err.code, -141);
                     done();
-                }))
+                })
             });
 
 
@@ -170,19 +168,19 @@ zone.run(describe.bind(this, "api/agency", function() {
             describe('deleteAgencyUser', function() {
                 var newUserId = '';
                 before(function(done) {
-                    zone.run(API.agency.createAgencyUser.bind(this, {email: 'deleteAgencyUser.test@jingli.tech', name: '测试代理商用户'}, function(err, ret) {
+                    API.agency.createAgencyUser.bind(this, {email: 'deleteAgencyUser.test@jingli.tech', name: '测试代理商用户'}, function(err, ret) {
                         assert.equal(err, null);
                         newUserId = ret.target.id;
                         done();
-                    }));
+                    });
                 });
 
                 it("deleteAgencyUser should be ok", function(done) {
-                    zone.run(API.agency.deleteAgencyUser.bind(this, {id: agencyUserId}, function (err, ret) {
+                    API.agency.deleteAgencyUser.bind(this, {id: agencyUserId}, function (err, ret) {
                         assert.equal(err, null);
                         assert.equal(ret, true);
                         done();
-                    }));
+                    });
                 });
             });
 
@@ -190,21 +188,21 @@ zone.run(describe.bind(this, "api/agency", function() {
                 var newAgencyId;
                 before(function(done) {
                     var agency = {email: "agency.delete@jingli.tech", userName: "喵喵", name: '喵喵的代理商', description: '代理商API测试用', mobile: '15269866821'};
-                    zone.run(API.agency.registerAgency.bind(this, agency, function(err, ret) {
+                    API.agency.registerAgency.bind(this, agency, function(err, ret) {
                         assert.equal(ret.target.email, agency.email);
                         newAgencyId = ret.target.id;
                         var newAgencyUserId = ret.target.createUser;
                         zone = Zone.current.fork({name: 'api/agency', properties: {session: {accountId: newAgencyUserId}}});
                         done();
-                    }));
+                    });
                 });
 
                 it("deleteAgency should be ok", function (done) {
-                    zone.run(API.agency.deleteAgency.bind(this, {id: newAgencyId}, function (err, ret) {
+                    API.agency.deleteAgency.bind(this, {id: newAgencyId}, function (err, ret) {
                         assert.equal(err, null);
                         assert.equal(ret, true);
                         done();
-                    }))
+                    })
                 });
             })
 
