@@ -46,11 +46,18 @@ describe("api/client/travelPolicy.js", function() {
         //创建差旅标准
         before(function(done) {
             Promise.all([
+                    API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
                     API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
                     API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile, name: company.name})
                 ])
-                .spread(function(ret1, ret2){
-                    return API.company.registerCompany(company);
+                .spread(function(ret1, ret2, ret3){
+                    return API.client.agency.createAgency(agency);
+                })
+                .spread(function(ret){
+                    ret = ret.target;
+                    agencyId = ret.id;
+                    agencyUserId = ret.createUser;
+                    return API.client.company.createCompany.call({accountId: agencyUserId}, company);
                 })
                 .then(function(company){
                     assert.equal(company.status, 0);
