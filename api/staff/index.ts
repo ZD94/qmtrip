@@ -334,7 +334,7 @@ class StaffModule{
             let staff = await Models.staff.get(accountId);
             let target = await Models.staff.get(id);
 
-            if(staff["companyId"]  != target["companyId"] ){
+            if(!staff || staff["companyId"] != target["companyId"] ){
                 throw L.ERR.PERMISSION_DENY();
             }else{
                 // return {staff: new Staff(target)};

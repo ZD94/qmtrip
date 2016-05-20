@@ -31,6 +31,8 @@ class SequelizeService<T extends Resolvable> extends CachedService<T>{
     }
     async $get(id: string): Promise<T>{
         var target = await this.TClass.$sqlmodel.findById(id);
+        if(!target)
+            return undefined;
         return new this.TClass(target);
     }
     async $find(where: any): Promise<T[]>{
