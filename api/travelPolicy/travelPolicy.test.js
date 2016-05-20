@@ -49,7 +49,13 @@ describe("api/client/travelPolicy.js", function() {
                     API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
                     API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile, name: company.name})
                 ])
-                .spread(function(ret1, ret2){
+                .spread(function(ret1, ret2) {
+                    return API.agency.createAgency(agency);
+                })
+                .then(function(ret){
+                    agencyId = ret.createUser;
+                    var session = getSession();
+                    session.accountId = agencyId;
                     return API.company.registerCompany(company);
                 })
                 .then(function(company){
@@ -58,13 +64,8 @@ describe("api/client/travelPolicy.js", function() {
                     accountId = company.createUser;
                     var session = getSession();
                     session.accountId = accountId;
-                    done();
                 })
-                .catch(function(err){
-                    console.info(err);
-                    throw err;
-                })
-                .done();
+                .nodeify(done);
         });
 
         after(function(done) {
@@ -72,56 +73,33 @@ describe("api/client/travelPolicy.js", function() {
                     API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
                     API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile, name: company.name})
                 ])
-                .spread(function(ret1, ret2){
-                    done();
-                })
-                .catch(function(err){
-                    throw err;
-                })
-                .done()
+                .nodeify(done);
         });
         it("#createTravelPolicy should be ok", function(done) {
             API.travelPolicy.createTravelPolicy(obj, function(err, result) {
-
-                assert.equal(err, null);
                 id = result.id;
-                done();
+                done(err);
             });
         })
         //查询差旅标准
         it("#getTravelPolicyaaa should be ok", function(done) {
-            API.travelPolicy.getTravelPolicy({id: id}, function(err, result) {
-                assert.equal(err, null);
-                done();
-            });
+            API.travelPolicy.getTravelPolicy({id: id}, done);
         })
         //查询差旅标准集合
         it("#listAndPaginateTravelPolicy should be ok", function(done) {
-            API.travelPolicy.listAndPaginateTravelPolicy({companyId: companyId}, function(err, result) {
-                assert.equal(err, null);
-                done();
-            });
+            API.travelPolicy.listAndPaginateTravelPolicy({companyId: companyId}, done);
         })
         it("#getAllTravelPolicy should be ok", function(done) {
-            API.travelPolicy.getAllTravelPolicy({companyId: companyId}, function(err, result) {
-                assert.equal(err, null);
-                done();
-            });
+            API.travelPolicy.getAllTravelPolicy({companyId: companyId}, done);
         })
         it("#getTravelPolicies should be ok", function(done) {
-            API.travelPolicy.getTravelPolicies({name: "456"}, function(err, result) {
-                assert.equal(err, null);
-                done();
-            });
+            API.travelPolicy.getTravelPolicies({name: "456"}, done);
         })
         //更新差旅标准信息
         it("#updateTravelPolicy should be ok", function(done) {
             obj.id = id;
             obj.name = "修改过的";
-            API.travelPolicy.updateTravelPolicy(obj, function(err, result) {
-                assert.equal(err, null);
-                done();
-            });
+            API.travelPolicy.updateTravelPolicy(obj, done);
         })
         //删除差旅标准信息
         it("#deleteTravelPolicy should be ok", function(done) {
@@ -145,69 +123,48 @@ describe("api/client/travelPolicy.js", function() {
                     var session = getSession();
                     session.accountId = agencyUserId;
                 })
-                .catch(function(err){
-                    console.info(err);
-                    throw err;
-                })
-                .done();
+                .nodeify(done);
         });
 
         after(function(done) {
-            API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}, function (err, ret) {
-                if (err) {
-                    console.info("33333333", err);
-                    done(err);
-                    return;
-                }
-            })
+            API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}, done)
         });
 
         //创建差旅标准
         it("#agencyCreateTravelPolicy should be ok", function(done) {
             obj.companyId = companyId;
             API.travelPolicy.createTravelPolicy(obj, function(err, result) {
-                assert.equal(err, null);
                 id = result.id;
-                done();
+                done(err);
             });
         })
         //查询差旅标准
         it("#agencyGetTravelPolicy should be ok", function(done) {
-            API.travelPolicy.getTravelPolicy({id: id, companyId: companyId}, function(err, result) {
-                assert.equal(err, null);
-                done();
-            });
+            API.travelPolicy.getTravelPolicy({id: id, companyId: companyId}, done);
         })
         //查询差旅标准集合
         it("#agencyListAndPaginateTravelPolicy should be ok", function(done) {
-            API.travelPolicy.listAndPaginateTravelPolicy({companyId: companyId}, function(err, result) {
-                assert.equal(err, null);
-                done();
-            });
+            API.travelPolicy.listAndPaginateTravelPolicy({companyId: companyId}, done);
         })
         //得到所有差旅标准
         it("#agencyGetAllTravelPolicy should be ok", function(done) {
-            API.travelPolicy.getAllTravelPolicy({companyId: companyId}, function(err, ret) {
-                assert.equal(err, null);
-                assert(ret.length >= 0);
-                done();
-            });
+            API.travelPolicy.getAllTravelPolicy({companyId: companyId})
+                .tap(function(ret) {
+                    assert(ret.length >= 0);
+                })
+                .nodeify(done);
         })
         //更新差旅标准信息
         it("#agencyUpdateTravelPolicy should be ok", function(done) {
             obj.id = id;
             obj.companyId = companyId;
-            API.travelPolicy.updateTravelPolicy(obj, function(err, result) {
-                assert.equal(err, null);
-                done();
-            });
+            API.travelPolicy.updateTravelPolicy(obj)
+                .nodeify(done);
         })
         //删除差旅标准信息
         it("#agencyDeleteTravelPolicy should be ok", function(done) {
-            API.travelPolicy.deleteTravelPolicy({id: id, companyId: companyId}, function(err, result) {
-                assert.equal(err, null);
-                done();
-            });
+            API.travelPolicy.deleteTravelPolicy({id: id, companyId: companyId})
+                .nodeify(done);
         })
         /********代理商代企业管理差旅标准api********/
     })
