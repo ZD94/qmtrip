@@ -8,6 +8,8 @@ const API = require("common/api");
 const validate = require("common/validate");
 const L = require("common/language");
 const moment = require('moment');
+const cache = require("common/cache");
+const utils = require("common/utils");
 
 const defaultPrice = {
     "5": 500,
@@ -18,7 +20,8 @@ const defaultPrice = {
 
 interface TravelBudgeItem {
     price: number;
-    type: string;
+    type?: string;
+    itemType?: string;
 }
 
 interface BudgetOptions{
@@ -36,7 +39,16 @@ interface BudgetOptions{
 }
 
 class ApiTravelBudget {
-    
+
+    @clientExport
+    static getBudgetInfo(params: {id: string}) {
+        let self: any = this;
+        let accountId = self.accountId;
+
+        let key = `budgets:${accountId}:${params.id}`;
+        return cache.read(key);
+    }
+
     /**
     * @method getTravelPolicyBudget
     *
@@ -58,7 +70,7 @@ class ApiTravelBudget {
     * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
     */
     @clientExport
-    static async getTravelPolicyBudget(params: BudgetOptions) :Promise<Array<TravelBudgeItem>> {
+    static async getTravelPolicyBudget(params: BudgetOptions) :Promise<string> {
 
         let self: any = this;
 
@@ -112,7 +124,7 @@ class ApiTravelBudget {
             leaveDate: leaveDate,
             leaveTime: leaveTime
         });
-        budget.type = 'goTraffic'
+        budget.itemType = 'goTraffic'
         budgets.push(budget);
 
         if (isRoundTrip) {
@@ -122,7 +134,7 @@ class ApiTravelBudget {
                 leaveDate: goBackDate,
                 leaveTime: goBackTime
             });
-            budget.type = 'backTraffic';
+            budget.itemType = 'backTraffic';
             budgets.push(budget);
         }
 
@@ -133,11 +145,14 @@ class ApiTravelBudget {
                 checkInDate: checkInDate,
                 checkOutDate: checkOutDate
             });
-            budget.type = 'hotel';
+            budget.itemType = 'hotel';
             budgets.push(budget);
         }
 
-        return budgets;
+        let _id = Date.now() + utils.getRndStr(6);
+        let key = `budgets:${self.accountId}:${_id}`;
+        await cache.write(key, JSON.stringify(budgets))
+        return _id;
     }
 
     /**
