@@ -1,7 +1,6 @@
 "use strict";
 
 import moment = require('moment');
-import {Cookie} from "request";
 var API = require("common/api");
 var Cookie = require('tiny-cookie');
 import { Staff } from 'api/_types/staff';
