@@ -3,6 +3,7 @@
  */
 
 import {HotelBudget, TrafficBudget} from "api/_types/budget";
+import { clientExport } from '../../common/api/helper';
 const API = require("common/api");
 const validate = require("common/validate");
 const L = require("common/language");
@@ -20,8 +21,22 @@ interface TravelBudgeItem {
     type: string;
 }
 
-class ApiTravelBudget {
+interface BudgetOptions{
+    originPlace: string,
+    destinationPlace: string,
+    leaveDate: Date| string,
+    goBackDate?: Date| string,
+    isNeedHotel: boolean,
+    goBackTime?: string,
+    leaveTime?: string,
+    checkInDate?: Date| string,
+    checkOutDate?: Date|string,
+    businessDistrict?: string,
+    isRoundTrip: boolean
+}
 
+class ApiTravelBudget {
+    
     /**
     * @method getTravelPolicyBudget
     *
@@ -42,10 +57,8 @@ class ApiTravelBudget {
     * @param {Boolean} [params.isRoundTrip] 是否往返 [如果为true,goBackDate必须存在]
     * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
     */
-    static async getTravelPolicyBudget(params: {originPlace: string, destinationPlace: string,
-        leaveDate: Date| string, goBackDate?: Date| string, isNeedHotel: boolean,
-        goBackTime?: string, leaveTime?: string, checkInDate?: Date| string, checkOutDate?: Date|string,
-        businessDistrict?: string, isRoundTrip: boolean}) :Promise<Array<TravelBudgeItem>> {
+    @clientExport
+    static async getTravelPolicyBudget(params: BudgetOptions) :Promise<Array<TravelBudgeItem>> {
 
         let self: any = this;
 
@@ -140,6 +153,7 @@ class ApiTravelBudget {
      * @param {String} params.checkOutDate 离开时间
      * @return {Promise} {prize: 1000, hotel: "酒店名称"}
      */
+    @clientExport
     static async getHotelBudget(params: {cityId: string, businessDistrict: string,
         checkInDate: string, checkOutDate: string}) :Promise<TravelBudgeItem> {
 
@@ -219,6 +233,7 @@ class ApiTravelBudget {
      * @param {String} params.leaveTime 最晚到达时间 HH:mm
      * @return {Promise} {price: "1000"}
      */
+    @clientExport
     static async getTrafficBudget(params: {originPlace: string, destinationPlace: string,
         leaveDate: Date | string, leaveTime: string}) : Promise<TravelBudgeItem> {
 

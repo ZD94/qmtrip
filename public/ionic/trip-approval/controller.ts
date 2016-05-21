@@ -3,7 +3,6 @@
  */
 "use strict";
 import {Model} from "sequelize";
-import {Cookie} from "request";
 
 export function ApprovedController($scope){
 

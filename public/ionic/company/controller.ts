@@ -31,15 +31,13 @@ export async function DistributionController($scope){
 
 export async function DepartmentController($scope, Models, $ionicPopup){
     var staff = await Staff.getCurrent();
-    var company = await staff.company;
-    var departments = company.getDepartments();
+    var departments = await staff.company.getDepartments();
     $scope.departments = departments;
 }
 
 export async function StaffsController($scope, Models){
     var staff = await Staff.getCurrent();
-    var company = staff.company;
-    var staffs = await company.getStaffs();
+    var staffs = await staff.company.getStaffs();
     $scope.staffs = staffs.map(function(staff){
         var obj = {staff:staff,role:""};
         if(obj.staff.roleId == EStaffRole.OWNER ){
@@ -141,44 +139,30 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         expire: 300
     });
     var discounts = $scope.discounts = [
-        {
-            value:0,
-            text:'不限'
-        },
-        {
-            value:9,
-            text:'9折及以下'
-        },{
-            value:8,
-            text:'8折及以下'
-        },{
-            value:7,
-            text:'7折及以下'
-        },{
-            value:6,
-            text:'6折及以下'
-        }
+        { value:0, text:'不限' },
+        { value:9, text:'9折及以下' },
+        { value:8, text:'8折及以下' },
+        { value:7, text:'7折及以下' },
+        { value:6, text:'6折及以下' }
     ]
     var staff = await Staff.getCurrent();
-    var company = staff.company;
     var travelPolicy;
     if($stateParams.policyId){
         console.info($stateParams);
         travelPolicy = await Models.travelPolicy.get($stateParams.policyId)
-        console.info(travelPolicy);
     }else{
         travelPolicy = TravelPolicy.create();
-        travelPolicy.companyId = company.id;
+        travelPolicy.companyId = staff.company.id;
         travelPolicy.planeLevel = '不限';
         travelPolicy.planeDiscount = 0;
         travelPolicy.trainLevel = '不限';
         travelPolicy.hotelLevel = '五星级/豪华型';
-        console.info(travelPolicy);
     }
+    console.info(travelPolicy);
     $scope.travelPolicy = travelPolicy;
     $scope.savePolicy = async function(){
         console.info($scope.travelPolicy);
-        $scope.travelPolicy.save();
+        await $scope.travelPolicy.save();
         $ionicHistory.goBack(-1);
     }
     $scope.consoles = function(obj){
