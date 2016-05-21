@@ -7,6 +7,7 @@ import { regApiType } from 'common/api/helper';
 import { ModelObject, Table, Field, Types, ResolveRef, Reference, Values } from 'common/model';
 import {TravelPolicy} from "api/_types/travelPolicy";
 import { Create } from 'common/model';
+import { Department } from './department';
 
 export enum ECompanyStatus {
     DELETE = -2,
@@ -113,6 +114,10 @@ export class Company extends ModelObject{
 
     getStaffs(): Promise<Staff[]> {
         return Models.staff.find({companyId: this.id});
+    }
+    
+    getDepartments(): Promise<Department[]> {
+        return Models.department.find({companyId: this.id});
     }
 
     getTravelPolicies(): Promise<TravelPolicy[]> {

@@ -29,12 +29,14 @@ class SequelizeService<T extends Resolvable> extends CachedService<T>{
         ret['$fields'] = {'!':'!'};
         return ret;
     }
-    async $get(id: string): Promise<T>{
-        var target = await this.TClass.$sqlmodel.findById(id);
+    async $get(id: string, options?: Object): Promise<T>{
+        var target = await this.TClass.$sqlmodel.findById(id, options);
+        if(!target)
+            return undefined;
         return new this.TClass(target);
     }
     async $find(where: any): Promise<T[]>{
-        var [rows, count] = await this.TClass.$sqlmodel.findAndCount(where);
+        var {rows, count} = await this.TClass.$sqlmodel.findAndCount(where);
         var objs = rows.map((row)=>new this.TClass(row));
         return objs;
     }
@@ -52,8 +54,8 @@ class SequelizeService<T extends Resolvable> extends CachedService<T>{
             throw e;
         }
     }
-    $destroy(obj: T): Promise<any> {
-        return obj.target.destroy();
+    $destroy(obj: T, options?: Object): Promise<any> {
+        return obj.target.destroy(options);
     }
 }
 function createServerService<T extends Resolvable>(TClass: any){

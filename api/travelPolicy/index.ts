@@ -23,19 +23,6 @@ class TravelPolicyModule{
      * @param data
      * @returns {*}
      */
-    /*@requireParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"], travalPolicyCols)
-    static async create(data): Promise<TravelPolicy>{
-        if (!data.hotelPrice || !/^\d+(.\d{1,2})?$/.test(data.hotelPrice)) {
-            data.hotelPrice = null;
-        }
-        let result = await DBM.TravelPolicy.findOne({where: {name: data.name, companyId: data.companyId}});
-        if(result){
-            throw {msg: "该等级名称已存在，请重新设置"};
-        }
-        let returnData =  DBM.TravelPolicy.create(data)
-        return new TravelPolicy(returnData);
-    }*/
-
     @clientExport
     @requireParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"], travalPolicyCols)
     static async createTravelPolicy (params) : Promise<TravelPolicy>{
@@ -220,20 +207,8 @@ class TravelPolicyModule{
      * @param params
      * @returns {*}
      */
-    /*static getAllTravelPolicy(params){
-        let options: any = {
-            where: _.pick(params, ['name', 'planeLevel', 'planeDiscount', 'trainLevel', 'hotelLevel', 'hotelPrice', 'companyId', 'isChangeLevel', 'createdAt'])
-        };
-        if(params.columns){
-            options.attributes = params.columns;
-        }
-        if(params.order){
-            options.order = params.order;
-        }
-        return DBM.TravelPolicy.findAll(options);
-    }*/
-
     @clientExport
+    @requireParams(["companyId"],['columns','name', 'planeLevel', 'planeDiscount', 'trainLevel', 'hotelLevel', 'hotelPrice', 'companyId', 'isChangeLevel', 'createdAt'])
     static async getAllTravelPolicy(params){
         let {accountId} = Zone.current.get("session");
         let companyId = params.companyId;
@@ -255,6 +230,7 @@ class TravelPolicyModule{
                 throw {code: -1, msg: '无权限'};
             }
             params.companyId = staff["companyId"];//只允许查询该企业下的差旅标准
+            options.where.companyId = staff["companyId"];
             return  DBM.TravelPolicy.findAll(options);
 
         }else{
@@ -273,23 +249,8 @@ class TravelPolicyModule{
      * @param params
      * @returns {*}
      */
-    /*static getTravelPolicies(params): Promise<TravelPolicy[]>{
-        var options: any = {
-            where:  _.pick(params, Object.keys(DBM.TravelPolicy.attributes))
-        };
-        if(params.columns){
-            options.attributes = params.columns;
-        }
-        if(params.order){
-            options.order = params.order;
-        }
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
-        return DBM.TravelPolicy.findAll(options);
-    }*/
-
     @clientExport
+    @requireParams(["companyId"],['columns','name', 'planeLevel', 'planeDiscount', 'trainLevel', 'hotelLevel', 'hotelPrice', 'companyId', 'isChangeLevel', 'createdAt'])
     static async getTravelPolicies(params){
         let {accountId} = Zone.current.get("session");
         let companyId = params.companyId;
@@ -339,11 +300,6 @@ class TravelPolicyModule{
      * @param params 查询条件 params.company_id 企业id
      * @param options options.perPage 每页条数 options.page当前页
      */
-    static paginateTravelPolicy(params){
-
-
-    }
-
     @clientExport
     static async listAndPaginateTravelPolicy(params){
         let {accountId} = Zone.current.get("session");

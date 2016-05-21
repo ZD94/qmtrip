@@ -2,8 +2,8 @@
     <ion-content padding="true" class="has-header">
         <form class="list">
             <label class="item item-input">
-                <span class="input-label">标准名称</span>
-                <input type="text" placeholder="经理级" ng-model="travelPolicy.name">
+                <span class="input-label" ng-click="consoles(travelPolicy)">标准名称</span>
+                <input type="text" placeholder="经理级" ng-model="travelPolicy.name" ng-focus="consoles(travelPolicy)">
             </label>
             <label class="item item-select">
                 <span class="input-label">飞机仓位</span>
@@ -14,13 +14,8 @@
                 </select>
             </label>
             <label class="item item-select">
-                <span class="input-label">飞机折扣</span>
-                <select ng-model="travelPolicy.planeDiscount">
-                    <option>不限</option>
-                    <option>9折及以下</option>
-                    <option>8折及以下</option>
-                    <option>7折及以下</option>
-                    <option>6折及以下</option>
+                <span class="input-label" ng-click="consoles(travelPolicy)">飞机折扣</span>
+                <select ng-model="travelPolicy.planeDiscount" ng-options="discount.value as discount.text for discount in discounts">
                 </select>
             </label>
             <div class="spacer" style="width: 300px; height: 18px;"></div>
@@ -49,7 +44,7 @@
             <div class="spacer" style="width: 300px; height: 18px;"></div>
             <label class="item item-input">
                 <span class="input-label">补助</span>
-                <input type="text" placeholder="元/天">
+                <input type="text" placeholder="元/天" ng-model="travelPolicy.subsidy">
             </label>
         </form>
         <a id="page31-button90" class="button button-positive button-block" ng-click="savePolicy()">保存</a>

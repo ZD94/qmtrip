@@ -1,5 +1,5 @@
 "use strict";
-var Cookie = require('tiny-cookie');
+import { Staff } from 'api/_types/staff';
 
 export async function IndexController($scope,Menu,$ionicPopup, Models){
     require('./index.less');
@@ -51,7 +51,7 @@ export async function IndexController($scope,Menu,$ionicPopup, Models){
     for( var i =0;i<items.length;i++){
         Menu.add(items[i]);
     }
-    var staff = await Models.staff.get(Cookie.get('user_id'));
+    var staff = await Staff.getCurrent();
     var policy = await staff.getTravelPolicy();
     $scope.alertShow = function () {
         if(policy){   //判断是否设置差旅标准

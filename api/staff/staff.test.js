@@ -5,155 +5,168 @@ var API = require('common/api');
 var Q = require("q");
 var assert = require("assert");
 
+var getSession = require('common/model').getSession;
+
+
+var id = "";
+var companyId = "";
+var accountId = "";
+var agencyId = "";
+var agencyUserId = "";
+var obj = {
+    email: "xiaoyu123.wang@tulingdao.com",
+    name: "wyll",
+    mobile: "18345433986"
+}
+
+var updateobj = {
+    email: "wxy123@tulingdao.com",
+    name: "wyll",
+    mobile: "18345433986"
+}
+
+var company = {
+    name: 'staffTest的企业',
+    userName: 'staffTest企业',
+    domain: 'tulingdao.com',
+    description: '企业API测试用',
+    mobile:  '15269866812',
+    email: 'cp.teststaff@tulingdao.com'
+}
+
+var agency = {
+    email: "ag.teststaff@tulingdao.com",
+    userName: "staffTest代理商",
+    name: 'staffTest的代理商',
+    mobile: "15269866802",
+    description: '企业API测试用'
+};
+
 describe("api/client/staff.js", function() {
 
-    var id = "";
-    var companyId = "";
-    var accountId = "";
-    var agencyId = "";
-    var agencyUserId = "";
-    var ownerSelf = {};
-    var agencySelf = {};
-    var zoneAgency = Zone.current.fork({name: 'api/staff', properties: {session: {accountId: agencyUserId}}});
-    var zoneSelf = Zone.current.fork({name: 'api/staff', properties: {session: {accountId: accountId}}});
-    var obj = {
-        email: "xiaoyu123.wang@tulingdao.com",
-        name: "wyll",
-        mobile: "18345433986"
-    }
+    describe("staff_handel", function() {
+        before(function(done) {
+            Q.all([
+                    API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile, name: agency.name}),
+                    API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile, name: company.name}),
+                    API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile, name: company.name}),
+                    API.staff.deleteAllStaffByTest({email: updateobj.email, mobile: updateobj.mobile, name: updateobj.name}),
+                    API.staff.deleteAllStaffByTest({email: obj.email, mobile: obj.mobile, name: obj.name})
+                ])
+                .spread(function(ret1, ret2, ret3, ret4, ret5){
+                    return API.client.agency.registerAgency(agency);
+                })
+                .then(function(ret){
 
-    var updateobj = {
-        email: "wxy123@tulingdao.com",
-        name: "wyll",
-        mobile: "18345433986"
-    }
+                    agencyId = ret.id;
+                    agencyUserId = ret.createUser;
+                    var session = getSession();
+                    session.accountId = agencyUserId;
+                    return API.client.company.registerCompany(company);
 
-    var company = {
-        name: 'staffTest的企业',
-        userName: 'staffTest企业',
-        domain: 'tulingdao.com',
-        description: '企业API测试用',
-        mobile:  '15269866812',
-        email: 'cp.teststaff@tulingdao.com'
-    }
+                })
+                .then(function(company){
 
-    var agency = {
-        email: "ag.teststaff@tulingdao.com",
-        userName: "staffTest代理商",
-        name: 'staffTest的代理商',
-        mobile: "15269866802",
-        description: '企业API测试用'
-    };
+                    assert.equal(company.status, 0);
+                    companyId = company.id;
+                    accountId = company.createUser;
+                    session.accountId = accountId;
+                    done();
 
+                })
+                .catch(function(err){
+                    console.info(err);
+                    throw err;
+                })
+                .done();
+        });
 
-    //创建员工
-    before(function(done) {
-        Q.all([
-                API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile, name: agency.name}),
-                API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile, name: company.name}),
-                API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile, name: company.name}),
-                API.staff.deleteAllStaffByTest({email: updateobj.email, mobile: updateobj.mobile, name: updateobj.name}),
-                API.staff.deleteAllStaffByTest({email: obj.email, mobile: obj.mobile, name: obj.name})
-            ])
-            .spread(function(ret1, ret2, ret3, ret4, ret5){
-                return API.client.agency.registerAgency(agency);
-            })
-            .then(function(ret){
+        after(function(done) {
+            Q.all([
+                    API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile, name: agency.name}),
+                    API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile, name: company.name}),
+                    API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile, name: company.name}),
+                    API.staff.deleteAllStaffByTest({email: updateobj.email, mobile: updateobj.mobile, name: updateobj.name}),
+                    API.staff.deleteAllStaffByTest({email: obj.email, mobile: obj.mobile, name: obj.name})
+                ])
+                .spread(function(ret1, ret2, ret3, ret4, ret5){
+                    done();
+                })
+                .catch(function(err){
+                    console.info(err);
+                    throw err;
+                })
+                .done();
+        });
 
-                agencyId = ret.id;
-                agencyUserId = ret.createUser;
-                agencySelf = {accountId: agencyUserId};
-                zoneAgency = Zone.current.fork({name: 'api/staff', properties: {session: {accountId: agencyUserId, tokenId: "tokenId"}}});
-                return zoneAgency.run(API.client.company.registerCompany.bind(this,company));
-
-            })
-            .then(function(company){
-
-                assert.equal(company.status, 0);
-                companyId = company.id;
-                accountId = company.createUser;
-                self = {accountId: accountId};
-                zoneSelf = Zone.current.fork({name: 'api/staff', properties: {session: {accountId: accountId, tokenId: "tokenId"}}});
+        //创建员工
+        it("#createStaff should be ok", function(done) {
+            obj.companyId = companyId;
+            API.client.staff.createStaff(obj, function(err, result) {
+                assert.equal(err, null);
+                // updateobj = result;
+                console.info("resultresult:", result);
+                id = result.id;
                 done();
-
-            })
-            .catch(function(err){
-                console.info(err);
-                throw err;
-            })
-            .done();
-    });
-
-    after(function(done) {
-        Q.all([
-                API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile, name: agency.name}),
-                API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile, name: company.name}),
-                API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile, name: company.name}),
-                API.staff.deleteAllStaffByTest({email: updateobj.email, mobile: updateobj.mobile, name: updateobj.name}),
-                API.staff.deleteAllStaffByTest({email: obj.email, mobile: obj.mobile, name: obj.name})
-            ])
-            .spread(function(ret1, ret2, ret3, ret4, ret5){
+            });
+        })
+        //查询员工集合
+        it("#listAndPaginateStaff should be ok", function(done) {
+            API.client.staff.listAndPaginateStaff({}, function(err, result) {
+                assert.equal(err, null);
+                if(err != null){
+                    console.log(err);
+                }
                 done();
-            })
-            .catch(function(err){
-                console.info(err);
-                throw err;
-            })
-            .done();
-    });
+            });
+        })
 
-    it("#createStaff should be ok", function(done) {
-        obj.companyId = companyId;
-        zoneSelf.run(API.client.staff.createStaff.bind(this, obj, function(err, result) {
-            assert.equal(err, null);
-            // updateobj = result;
-            id = result.id;
-            done();
-        }));
-    })
-//查询员工集合
-    it("#listAndPaginateStaff should be ok", function(done) {
-        zoneSelf.run(API.client.staff.listAndPaginateStaff.bind(this, {}, function(err, result) {
-            assert.equal(err, null);
-            if(err != null){
-                console.log(err);
-            }
-            done();
-        }));
+        //根据条件查询员工集合
+        it("#getStaffs should be ok", function(done) {
+            API.client.staff.getStaffs({name: "123"}, function(err, result) {
+                assert.equal(err, null);
+                if(err != null){
+                    console.log(err);
+                }
+                done();
+            });
+        })
+
+        //更新员工信息
+        it("#updateStaff should be ok", function(done) {
+            updateobj.id = id;
+            API.client.staff.updateStaff(updateobj, function(err, result) {
+                assert.equal(err, null);
+                if(err != null){
+                    console.log(err);
+                }
+                done();
+            });
+        })
+        //通过id得到员工
+        it("#getStaff should be ok", function(done) {
+            API.client.staff.getStaff({id:id}, function(err, result) {
+                assert.equal(err, null);
+                if(err != null){
+                    console.log(err);
+                }
+                done();
+            });
+        })
+
+        //删除员工信息
+        it("#deleteStaff should be ok", function(done) {
+            API.client.staff.deleteStaff({id: id}, function(err, result) {
+                assert.equal(err, null);
+                if(err != null){
+                    console.log(err);
+                }
+                done();
+            });
+        })
+
     })
 
-    //根据条件查询员工集合
-    it("#getStaffs should be ok", function(done) {
-        zoneSelf.run(API.client.staff.getStaffs.bind(this, {name: "123"}, function(err, result) {
-            assert.equal(err, null);
-            if(err != null){
-                console.log(err);
-            }
-            done();
-        }));
-    })
-
-//更新员工信息
-    it("#updateStaff should be ok", function(done) {
-        updateobj.id = id;
-        zoneSelf.run(API.client.staff.updateStaff.bind(this, updateobj, function(err, result) {
-            assert.equal(err, null);
-            if(err != null){
-                console.log(err);
-            }
-            done();
-        }));
-    })
-//通过id得到员工
-    it("#getStaff should be ok", function(done) {
-        zoneSelf.run(API.client.staff.getStaff.bind(this, {id:id}, function(err, result) {
-            assert.equal(err, null);
-            if(err != null){
-                console.log(err);
-            }
-            done();
-        }));
-    })
 //加积分
     /*it("#increaseStaffPoint should be ok", function(done) {
         API.client.staff.increaseStaffPoint.call(agencySelf, {id: accountId, increasePoint: 2000, remark: "test差旅省钱加积分"}, function(err, result) {
@@ -230,16 +243,7 @@ describe("api/client/staff.js", function() {
         });
     })*/
 
-//删除员工信息
-    it("#deleteStaff should be ok", function(done) {
-        zoneSelf.run(API.client.staff.deleteStaff.bind(this, {id: id}, function(err, result) {
-            assert.equal(err, null);
-            if(err != null){
-                console.log(err);
-            }
-            done();
-        }));
-    })
+
 
 
     /*describe("statStaffPointsByCompany", function(){

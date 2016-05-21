@@ -38,7 +38,7 @@ var model = require('common/model');
 model.init(config.postgres.url);
 
 zone.forkStackTrace()
-    .fork({name: 'test', properties:{}})
+    .fork({name: 'test', properties: {session: {}}})
     .run(function(){
         return API.init(path.join(__dirname, '../api'), config.api)
             .then(API.loadTests.bind(API))

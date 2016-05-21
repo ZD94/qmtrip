@@ -1,4 +1,5 @@
 
+import { getSession } from 'common/model';
 require('ionic');
 
 var browserspec = require('browserspec');
@@ -21,7 +22,18 @@ API.authenticate = function(remote, callback){
     var token_sign = Cookie.get('token_sign');
     var timestamp = Cookie.get("timestamp");
     remote.authenticate({ accountid: user_id, tokenid: token_id, timestamp: timestamp, tokensign: token_sign },
-            callback);
+            function(err, handle){
+                if(!err){
+                    var session = getSession();
+                    session.accountId = user_id;
+                    session.token = {
+                        id: token_id,
+                        sign: token_sign,
+                        timestamp: timestamp
+                    };
+                }
+                callback(err, handle);
+            });
 };
 
 require('nglibs');
