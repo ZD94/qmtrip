@@ -11,7 +11,7 @@ let L = require("common/language");
 import {Department} from "api/_types/department";
 import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import { ServiceInterface } from 'common/model';
-import { EAccountType } from '../_types/index';
+import { Models, EAccountType } from '../_types/index';
 
 const departmentCols = Department['$fieldnames'];
 class DepartmentModule{
@@ -27,6 +27,7 @@ class DepartmentModule{
         if(result){
             throw {msg: "该部门名称已存在，请重新设置"};
         }
+
         let obj = await DBM.Department.create(data);
         return new Department(obj);
     }
@@ -35,15 +36,13 @@ class DepartmentModule{
     static async createDepartment (params): Promise<Department>{
         let { accountId } = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
-
         if(role == EAccountType.STAFF){
-
-            let staff = await API.staff.getStaff({id: accountId});
-            if(staff.code){
-                throw {code: -1, msg: '无权限'};
+            let staff = await Models.staff.get(accountId);
+            if(!staff){
+                throw L.ERR.PERMISSION_DENY();
             }
 
-            params.companyId = staff.companyId;//只允许添加该企业下的部门
+            params.companyId = staff["companyId"];//只允许添加该企业下的部门
             return DepartmentModule.create(params)
 
         }else{
@@ -53,7 +52,7 @@ class DepartmentModule{
             if(result){
                 return DepartmentModule.create(params)
             }else{
-                throw {code: -1, msg: '无权限'};
+                throw L.ERR.PERMISSION_DENY();
             }
         }
     }
@@ -88,7 +87,7 @@ class DepartmentModule{
             if(result){
                 return DepartmentModule.delete(params);
             }else{
-                throw {code: -1, msg: '无权限'};
+                throw L.ERR.PERMISSION_DENY();
             }
         }
     }
@@ -123,12 +122,12 @@ class DepartmentModule{
 
         if(role == EAccountType.STAFF){
 
-            let staff = await API.staff.getStaff({id: accountId});
-            company_id = staff.companyId;
+            let staff = await Models.staff.get(accountId);
+            company_id = staff["companyId"];
             let tp = await API.department.getDepartment({id: params.id});
 
             if(tp.companyId != company_id){
-                throw {code: -1, msg: '无权限'};
+                throw L.ERR.PERMISSION_DENY();
             }
             params.companyId = company_id;
             return DepartmentModule.update(params)
@@ -138,7 +137,7 @@ class DepartmentModule{
             if(result){
                 return DepartmentModule.update(params);
             }else{
-                throw {code: -1, msg: '无权限'};
+                throw L.ERR.PERMISSION_DENY();
             }
         }
 
@@ -153,7 +152,7 @@ class DepartmentModule{
     @requireParams(["id"])
     static async get(params: {id: string}): Promise<Department>{
         var id = params.id;
-        let result =  DBM.Department.findById(id)
+        let result =  await DBM.Department.findById(id)
         return new Department(result);
     }
 
@@ -162,12 +161,9 @@ class DepartmentModule{
         let id = params.id;
         let { accountId } = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
-
         if(role == EAccountType.STAFF){
-
-            let staff = await API.staff.getStaff({id: accountId});
-            let companyId = staff.companyId;
-
+            let staff = await Models.staff.get(accountId);
+            let companyId = staff["companyId"];
             if(!id){
                 return DepartmentModule.getDefaultDepartment({companyId:companyId});
             }
@@ -177,7 +173,7 @@ class DepartmentModule{
                 throw {code: -1, msg: '查询结果不存在'};
             }
             if(tp['companyId'] != companyId){
-                throw {code: -1, msg: '无权限'};
+                throw L.ERR.PERMISSION_DENY();
             }
             return tp;
 
@@ -186,7 +182,7 @@ class DepartmentModule{
             if(result){
                 return API.department.getDepartment({id:id});
             }else{
-                throw {code: -1, msg: '无权限'};
+                throw L.ERR.PERMISSION_DENY();
             }
         }
 
@@ -225,8 +221,8 @@ class DepartmentModule{
 
         if(role == EAccountType.STAFF){
 
-            let staff = await API.staff.getStaff({id: accountId});
-            params.companyId = staff.companyId;
+            let staff = await Models.staff.get(accountId);
+            params.companyId = staff["companyId"];
             let departments = await DBM.Department.findAll(options);
             return departments.map(function(d) {
                 return d.id;
@@ -298,8 +294,8 @@ class DepartmentModule{
         let role = await API.auth.judgeRoleById({id:accountId});
 
         if(role == EAccountType.STAFF){
-            let staff = await API.staff.getStaff({id: accountId});
-            params.companyId = staff.companyId;
+            let staff = await Models.staff.get(accountId);
+            params.companyId = staff["companyId"];
             options.where = params;
             return DBM.Department.findAll(options);
         }else{
@@ -337,10 +333,10 @@ class DepartmentModule{
         options.order = [["created_at", "desc"]];
         if(role == EAccountType.STAFF){
 
-            let staff = await API.staff.getStaff({id: accountId});
+            let staff = await Models.staff.get(accountId);
             if(staff){
                 params['parentId'] = null;
-                params.companyId = staff.companyId;//只允许查询该企业下的部门
+                params.companyId = staff["companyId"];//只允许查询该企业下的部门
                 options.where = params;
                 return DBM.Department.findAll(options);
             }else{
@@ -381,10 +377,10 @@ class DepartmentModule{
         let role = await API.auth.judgeRoleById({id:accountId});
 
         if(role == EAccountType.STAFF){
-            let staff = await API.staff.getStaff({id: accountId});
+            let staff = await Models.staff.get(accountId);
 
             if(staff){
-                params.companyId = staff.companyId;//只允许查询该企业下的部门
+                params.companyId = staff["companyId"];//只允许查询该企业下的部门
                 return DBM.Department.findAll(options);
             }else{
                 throw {code: -1, msg: '无权限'};
@@ -407,8 +403,8 @@ class DepartmentModule{
     @requireParams(["parentId"])
     static getAllChildren(params: {parentId: string}){
         var sql = "with RECURSIVE cte as " +
-            "( select a.id,a.name,a.parent_id from department.department a where id='"+params.parentId+"' " +
-            "union all select k.id,k.name,k.parent_id  from department.department k inner join cte c on c.id = k.parent_id) " +
+            "( select a.id,a.name,a.parent_id from department.departments a where id='"+params.parentId+"' " +
+            "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id) " +
             "select * from cte";
         return sequelize.query(sql)
             .spread(function(children, row){
@@ -421,9 +417,9 @@ class DepartmentModule{
         let { accountId } = Zone.current.get("session");
         let role = await API.auth.judgeRoleById({id:accountId});
         if(role == EAccountType.STAFF){
-            let staff = await API.staff.getStaff({id: accountId});
+            let staff = await Models.staff.get(accountId);
             if(staff){
-                params.companyId = staff.companyId;//只允许查询该企业下的部门
+                params.companyId = staff["companyId"];//只允许查询该企业下的部门
                 return DepartmentModule.getAllChildren(params);
             }else{
                 throw {code: -1, msg: '无权限'};
@@ -448,8 +444,8 @@ class DepartmentModule{
     static getAllChildDepartmentsId(params: {parentId: string}){
         var ids = [];
         var sql = "with RECURSIVE cte as " +
-            "( select a.id,a.name,a.parent_id from department.department a where id='"+params.parentId+"' " +
-            "union all select k.id,k.name,k.parent_id  from department.department k inner join cte c on c.id = k.parent_id) " +
+            "( select a.id,a.name,a.parent_id from department.departments a where id='"+params.parentId+"' " +
+            "union all select k.id,k.name,k.parent_id  from department.departments k inner join cte c on c.id = k.parent_id) " +
             "select * from cte";
         return sequelize.query(sql)
             .spread(function(children, row){

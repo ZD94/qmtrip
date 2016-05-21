@@ -54,7 +54,7 @@ class TravelPolicyModule{
                 if(result){
                     throw {msg: "该等级名称已存在，请重新设置"};
                 }
-                let returnData =  DBM.TravelPolicy.create(params)
+                let returnData = await DBM.TravelPolicy.create(params);
                 return new TravelPolicy(returnData);
             }else{
                 throw {code: -1, msg: '无权限'};
@@ -71,14 +71,14 @@ class TravelPolicyModule{
      */
     @clientExport
     @requireParams(["id"], ["companyId"])
-    static async deleteTravelPolicy(params: {id : string, companyId?: string}) : Promise<any>{
+    static async deleteTravelPolicy(params) : Promise<any>{
         let {accountId} = Zone.current.get("session");
 
         var id = params.id;
-        let staffs = await API.staff.getStaffs({travelPolicyId: id, status: 0});
+        /*let staffs = await API.staff.getStaffs({travelPolicyId: id, status: 0});
         if(staffs && staffs.length > 0){
             throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准 暂不能删除，给这些员工匹配新的差旅标准后再进行操作'};
-        }
+        }*/
 
         let role = await API.auth.judgeRoleById({id:accountId});
 
