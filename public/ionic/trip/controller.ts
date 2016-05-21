@@ -29,8 +29,7 @@ function TripDefineFromJson(obj: any): TripDefine{
 }
 
 export function CreateController($scope, $storage){
-    let tripdef: any = {};
-    tripdef = TripDefineFromJson($storage.local.get('tripdef'));
+    let tripdef = TripDefineFromJson($storage.local.get('tripdef'));
     var today = moment();
     if(today.diff(tripdef.beginDate) > 0){
         tripdef.beginDate = today.startOf('day').hour(9).toDate();
@@ -48,7 +47,6 @@ export function CreateController($scope, $storage){
         $storage.local.set('tripdef', $scope.tripdef);
     }, true)
 
-    
     $scope.calcTripDuration = function(){
         return moment(tripdef.endDate).diff(tripdef.beginDate, 'days') || 1;
     }
@@ -70,17 +68,17 @@ export function CreateController($scope, $storage){
 
         let tripdef = $scope.tripdef;
         API.travelBudget.getTravelPolicyBudget({
-            originPlace:tripdef.startCityCode || tripdef.fromPlace,
-            destinationPlace:tripdef.endCityCode || tripdef.place,
-            leaveDate:tripdef.beginDate,
-            goBackDate:tripdef.endDate,
-            leaveTime:tripdef.startTimeLate,
-            goBackTime:tripdef.endTimeLate,
-            isRoundTrip:false
+            originPlace: tripdef.fromPlace,
+            destinationPlace: tripdef.place,
+            leaveDate: moment(tripdef.beginDate).format('YYYY-MM-DD'),
+            goBackDate: moment(tripdef.endDate).format('YYYY-MM-DD'),
+            leaveTime: moment(tripdef.beginDate).format('HH:mm'),
+            goBackTime: moment(tripdef.endDate).format('HH:mm'),
+            isRoundTrip: tripdef.round
         })
             .then(function(result) {
                 console.info(result);
-                window.location.href = "#/trip/budget";
+                //window.location.href = "#/trip/budget";
             })
             .catch(function(err) {
                 alert(err.msg || err);
@@ -94,6 +92,17 @@ export async function BudgetController($scope, $storage, Models){
     $scope.policy = staff.getTravelPolicy();
     $scope.during = moment(tripdef.endDate).diff(tripdef.beginDate, 'days') || 1;
     $scope.tripdef = tripdef;
+
+    var budget = await API.travelBudget.getTravelPolicyBudget({
+        originPlace: tripdef.fromPlace,
+        destinationPlace: tripdef.place,
+        leaveDate: moment(tripdef.beginDate).format('YYYY-MM-DD'),
+        goBackDate: moment(tripdef.endDate).format('YYYY-MM-DD'),
+        leaveTime: moment(tripdef.beginDate).format('HH:mm'),
+        goBackTime: moment(tripdef.endDate).format('HH:mm'),
+        isRoundTrip: false
+    })
+    console.log(budget);
 
 }
 
