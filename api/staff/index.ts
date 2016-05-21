@@ -357,15 +357,6 @@ class StaffModule{
      * @param params
      * @returns {*}
      */
-    /*@clientExport
-    @conditionDecorator([
-        {"if": "staff", "then": "params.companyId; _getStaff(params)"},
-        {"if": "agency"}
-    ])
-    static async getStaffs(params): promise<Staff[]> {
-        return _getStaff(params);
-    }*/
-
     @clientExport
     static async getStaffs(params){
         let { accountId } = Zone.current.get("session");

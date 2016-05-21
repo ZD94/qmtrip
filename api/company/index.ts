@@ -264,7 +264,7 @@ class CompanyModule {
             throw L.ERR.COMPANY_NOT_EXIST();
         }
 
-        if(c.agencyId != agency.agencyId || agency.roleId != AGENCY_ROLE.OWNER && agency.roleId != AGENCY_ROLE.ADMIN) {
+        if(c.agencyId != agency.agencyId || (agency.roleId != AGENCY_ROLE.OWNER && agency.roleId != AGENCY_ROLE.ADMIN)) {
             throw L.ERR.PERMISSION_DENY();
         }
 
