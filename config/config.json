@@ -1,6 +1,7 @@
 {
   "appName": "qmtrip",
   "debug": false,
+  "ts_node": true,
 
   "hostname": "my.jingli.tech",
   "cluster": false,
@@ -46,6 +47,10 @@
         "modules": "*"
       }
     ]
+  },
+  "api_test": {
+    "postgres": "${{postgres.url_test}}",
+    "remotes": []
   },
   "default_agency": {
     "name": "系统默认代理商",

@@ -3,8 +3,6 @@
  */
 "use strict";
 
-require('./common/typescript');
-
 var path = require('path');
 var gulp = require('gulp');
 var gulplib = require('./common/gulplib');

@@ -7,7 +7,7 @@ process.env.NODE_PATH = '.:'+process.env.NODE_PATH;
 
 require('app-module-path').addPath(path.normalize(path.join(__dirname, '..')));
 var zone = require('common/zone');
-require('common/typescript');
+require('common/typescript').install();
 
 global.Promise = require('bluebird');
 Promise.config({ longStackTraces: false });
@@ -35,12 +35,18 @@ var logger = new Logger('test');
 var API = require('common/api');
 
 var model = require('common/model');
-model.init(config.postgres.url);
+model.init(config.postgres.url_test);
 
 zone.forkStackTrace()
     .fork({name: 'test', properties: {session: {}}})
     .run(function(){
-        return API.init(path.join(__dirname, '../api'), config.api)
+        Promise.resolve()
+            .then(function(){
+                //return API.initSql(path.join(__dirname, '../api'), config.api_test)
+            })
+            .then(function(){
+                return API.init(path.join(__dirname, '../api'), config.api_test)
+            })
             .then(API.loadTests.bind(API))
             .then(run)
             .catch(function(e){
