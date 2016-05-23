@@ -54,8 +54,11 @@ angular
         return {
             restrict: 'A',
             scope: {
-                getOptionsLoader: '&ngSelector',
-                value: '=ngModel'
+                value: '=ngModel',
+                title: '@ngSelectorTitle',
+                placeholder: '@ngSelectorPlaceholder',
+                getOptionsLoader: '&ngSelectorQuery',
+
             },
             controller: function($scope, $element, $ionicModal) {
                 $element.focus(async function() {
