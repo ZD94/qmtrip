@@ -100,6 +100,10 @@ export class TripPlan extends ModelObject {
     get description(): string { return ''; }
     set description(val: string) {}
 
+    @Field({type: Types.INTEGER})
+    get status(): ETripType { return 0; }
+    set status(val: ETripType) {}
+
     @Field({type: Types.STRING})
     get deptCity(): string { return ''; }
     set deptCity(val: string) {}
@@ -131,7 +135,6 @@ export class TripPlan extends ModelObject {
     @Field({type: Types.DOUBLE})
     get expenditure(): number { return 0; }
     set expenditure(val: number) {}
-
 
     @Field({type: Types.JSONB})
     get expendInfo(): Object { return null; }

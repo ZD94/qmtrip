@@ -45,7 +45,7 @@ var Services = {
         funcs: ['getPointChange', 'getPointChanges']
     },
     company: { type: Company, modname: 'company',
-        funcs: ['getCompany', 'listCompany', 'createCompany', 'updateCompany', 'deleteCompany']
+        funcs: ['getCompany', 'listCompany', 'registerCompany', 'updateCompany', 'deleteCompany']
     },
     moneyChange: { type: MoneyChange, modname: 'company',
         funcs: ['getMoneyChange', 'listMoneyChange', 'saveMoneyChange']
