@@ -1246,11 +1246,12 @@ function _sendActiveEmail(accountId) {
             var url = C.host + "/staff.html#/auth/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
             //发送激活邮件
             var vals = {name: account.email, username: account.email, url: url};
-            return API.mail.sendMailRequest({toEmails: account.email, templateName: "qm_active_email", values: vals})
-                .then(function() {
-                    account.activeToken = activeToken;
-                    return DBM.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
-                })
+            return true;
+            // return API.mail.sendMailRequest({toEmails: account.email, templateName: "qm_active_email", values: vals})
+            //     .then(function() {
+            //         account.activeToken = activeToken;
+            //         return DBM.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
+            //     })
         })
 }
 

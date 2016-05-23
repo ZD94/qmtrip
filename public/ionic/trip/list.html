@@ -5,45 +5,18 @@
                 icon="ion-loading-c"
                 on-infinite="loadMoreData()">
         </ion-infinite-scroll>
-        <div class="list card">
-            <div class="item item-divider">2016-05-23 至 2016-05-28</div>
+        <div class="list card" ng-repeat="trip in tripPlans" ng-click="enterdetail(trip.id)">
+            <div class="item item-divider">{{trip.startAt | date: 'yyyy-MM-dd'}} 至 {{trip.backAt | date: 'yyyy-MM-dd'}}</div>
             <div class="item item-body">
                 <ion-list>
-                    <ion-item>北京 到 武汉 武汉科技大学附近
-                        <br>出差事由：武汉极地海洋公园项目启动会</ion-item>
+                    <ion-item>{{trip.deptCity}} 到 {{trip.arrivalCity}} {{}}
+                        <br>出差事由：{{trip.project.name}}</ion-item>
                 </ion-list>
             </div>
-            <div class="item item-divider">待传票据&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3059元</div>
-        </div>
-        <div class="list card">
-            <div class="item item-divider">2016-05-23 至 2016-05-28</div>
-            <div class="item item-body">
-                <ion-list>
-                    <ion-item>北京 到 武汉 武汉科技大学附近
-                        <br>出差事由：武汉极地海洋公园项目启动会</ion-item>
-                </ion-list>
+            <div class="item item-divider">{{trip.status}}
+                <span class="item-note" ng-if="trip.budget != -1">{{trip.budget}}元</span>
+                <span class="item-note" ng-if="trip.budget == -1">待出预算</span>
             </div>
-            <div class="item item-divider">审核中&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3059元</div>
-        </div>
-        <div class="list card">
-            <div class="item item-divider">2016-05-23 至 2016-05-28</div>
-            <div class="item item-body">
-                <ion-list>
-                    <ion-item>北京 到 武汉 武汉科技大学附近
-                        <br>出差事由：武汉极地海洋公园项目启动会</ion-item>
-                </ion-list>
-            </div>
-            <div class="item item-divider">审核未通过&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3059元</div>
-        </div>
-        <div class="list card">
-            <div class="item item-divider">2016-05-23 至 2016-05-28</div>
-            <div class="item item-body">
-                <ion-list>
-                    <ion-item>北京 到 武汉 武汉科技大学附近
-                        <br>出差事由：武汉极地海洋公园项目启动会</ion-item>
-                </ion-list>
-            </div>
-            <div class="item item-divider">已完成&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3059元</div>
         </div>
         <div id="page13-markdown3" style="color:#000000;">
             <p>没有更多记录</p>

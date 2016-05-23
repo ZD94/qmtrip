@@ -8,25 +8,26 @@ import {Company} from 'api/_types/company';
 import { Create } from 'common/model';
 
 export enum EPlanStatus {
-    DELETE = -2, //删除
+    AUDIT_NOT_PASS = -2,
     NO_BUDGET = -1, //没有预算
     WAIT_UPLOAD = 0, //待上传票据
-    NO_COMMIT = 0, //待提交状态
-    COMMIT = 1, //已提交待审核状态
-    COMPLETE = 2 //审核完，已完成状态
-};
+    WAIT_COMMIT = 1, //待提交状态
+    AUDITING = 2, //已提交待审核状态
+    COMPLETE = 3 //审核完，已完成状态
+}
 
 export enum ETripType {
     OUT_TRIP = 0, //去程
     BACK_TRIP = 1,
-    HOTEL = 2
+    HOTEL = 2,
+    OTHER = 3,
 }
 
 export enum EInvoiceType {
     TRAIN = 0,
     PLANE = 1,
     HOTEL = 2
-};
+}
 
 @Table(Models.project, 'tripPlan.')
 @regApiType('API.')
@@ -52,6 +53,10 @@ export class Project extends ModelObject{
     @Field({type: Types.STRING})
     get code(): string { return ''; }
     set code(val: string) {}
+
+    @Field({type: Types.STRING})
+    get name(): string { return ''; }
+    set name(val: string) {}
 
 }
 
@@ -96,6 +101,10 @@ export class TripPlan extends ModelObject {
     get description(): string { return ''; }
     set description(val: string) {}
 
+    @Field({type: Types.INTEGER})
+    get status(): EPlanStatus { return 0; }
+    set status(val: EPlanStatus) {}
+
     @Field({type: Types.STRING})
     get deptCity(): string { return ''; }
     set deptCity(val: string) {}
@@ -127,7 +136,6 @@ export class TripPlan extends ModelObject {
     @Field({type: Types.DOUBLE})
     get expenditure(): number { return 0; }
     set expenditure(val: number) {}
-
 
     @Field({type: Types.JSONB})
     get expendInfo(): Object { return null; }
@@ -207,8 +215,8 @@ export class TripDetail extends ModelObject{
     set type(val: ETripType) {}
 
     @Field({type: Types.INTEGER})
-    get status(): ETripType { return 0; }
-    set status(val: ETripType) {}
+    get status(): EPlanStatus { return 0; }
+    set status(val: EPlanStatus) {}
 
     @Field({type: Types.STRING})
     get deptCity(): string { return ''; }

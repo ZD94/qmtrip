@@ -71,7 +71,6 @@ class ApiTravelBudget {
     */
     @clientExport
     static async getTravelPolicyBudget(params: BudgetOptions) :Promise<string> {
-
         let self: any = this;
 
         let {leaveDate, goBackDate, isRoundTrip, originPlace, destinationPlace, checkInDate,
@@ -87,7 +86,7 @@ class ApiTravelBudget {
                 checkInDate = leaveDate;
             }
             if (!Boolean(checkOutDate)) {
-                checkOutDate = checkOutDate;
+                checkOutDate = goBackDate;
             }
             if (!validate.isDate(checkInDate)) {
                 checkInDate = moment(checkInDate).format(momentDateFormat);
@@ -148,10 +147,13 @@ class ApiTravelBudget {
             budget.itemType = 'hotel';
             budgets.push(budget);
         }
-
+        let obj: any = {};
+        obj.budgets = budgets;
+        obj.query = params;
+        obj.createAt = Date.now();
         let _id = Date.now() + utils.getRndStr(6);
         let key = `budgets:${self.accountId}:${_id}`;
-        await cache.write(key, JSON.stringify(budgets))
+        await cache.write(key, JSON.stringify(obj))
         return _id;
     }
 

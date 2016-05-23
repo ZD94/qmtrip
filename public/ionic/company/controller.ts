@@ -4,16 +4,18 @@
 "use strict";
 import {EStaffRole, Staff} from "api/_types/staff";
 import {TravelPolicy} from "api/_types/travelPolicy";
+import {Department} from "api/_types/department";
 
 export async function ManagementController($scope,Models){
     var staff = await Staff.getCurrent();
     var company = staff.company;
-    var [staffs, policies] = await Promise.all([
+    var [staffs, policies,departments] = await Promise.all([
         company.getStaffs(),
-        company.getTravelPolicies()
+        company.getTravelPolicies(),
+        company.getDepartments()
     ]);
     $scope.staffsnum = staffs.length;
-    // $scope.departmentsnum = await company.getDepartments().length;
+    $scope.departmentsnum = departments.length;
     $scope.policiesnum = policies.length;
 }
 
@@ -31,8 +33,45 @@ export async function DistributionController($scope){
 
 export async function DepartmentController($scope, Models, $ionicPopup){
     var staff = await Staff.getCurrent();
-    var departments = await staff.company.getDepartments();
-    $scope.departments = departments;
+    var initdepartment = async function(){
+        var departments = await staff.company.getDepartments();
+        $scope.departments = departments.map(function(department){
+            var depart = {department:department,staffnum:0};
+            return depart;
+        });
+        await Promise.all($scope.departments.map(async function(depart){
+            console.info(depart);
+            var result = await depart.department.getStaffs();
+            depart.staffnum = result.length;
+            return depart;
+        }));
+    };
+    initdepartment();
+    var newdepartment = $scope.newdepartment = Department.create();
+    $scope.newdepart = function(){
+        var nshow = $ionicPopup.show({
+            template: '<input type="text" ng-model="newdepartment.name">',
+            title:'创建部门',
+            scope:$scope,
+            buttons:[
+                {
+                    text:'取消'
+                },
+                {
+                    text: '保存',
+                    type:'button-positive',
+                    onTap:function(e){
+                        if(!$scope.newdepartment.name){
+                            e.preventDefault();
+                        }else{
+                            $scope.newdepartment.save();
+                            initdepartment();
+                        }
+                    }
+                }
+            ]
+        })
+    }
 }
 
 export async function StaffsController($scope, Models){
