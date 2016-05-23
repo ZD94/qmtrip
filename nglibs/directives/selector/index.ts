@@ -52,11 +52,7 @@ angular
     .module('nglibs')
     .directive('ngSelector', function() {
         return {
-            //priority: 1001,
             restrict: 'A',
-            //template: '<input type="text" placeholder="武汉" ng-model="trip.place" ng-focus="selectPlace()">',
-            replace: false,
-            //transclude: 'element',
             scope: {
                 getOptionsLoader: '&ngSelector',
                 value: '=ngModel'
@@ -66,7 +62,8 @@ angular
                     var value = await showSelectorModal($scope, $ionicModal, $scope.value, $scope.getOptionsLoader())
                     if(value == undefined)
                         return;
-                    $scope.ngModel = value;
+                    console.log(value);
+                    $scope.value = value;
                 })
             }
         }
