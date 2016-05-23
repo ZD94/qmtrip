@@ -1177,7 +1177,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['tripPlanId'], ['type'])
-    async static getTripDetails(params): Promise<string[]> {
+    static async getTripDetails(params): Promise<string[]> {
         let options: any = {where: {tripPlanId: params.tripPlanId}}
 
         if(params.type) {
