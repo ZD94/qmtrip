@@ -33,7 +33,7 @@ angular
                         alias: name,
                         autoUpload: false
                     }
-
+            
                     var uploader = new FileUploader(cnf);
                     uploader.onAfterAddingFile = function(file) {
                         onAfterAddingFile(file, function() {
@@ -43,6 +43,7 @@ angular
                     };
 
                     uploader.onCompleteItem = function (file, response, status, headers) {
+                        
                         file.done(response);
                         $loading.end();
                         $("#upload").remove();
