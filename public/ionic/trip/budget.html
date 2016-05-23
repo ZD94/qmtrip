@@ -1,43 +1,61 @@
 <ion-view title="预算结果页" id="page16">
     <ion-content padding="true" class="has-header">
         <div id="page16-markdown4" style="color:#000000;text-align:right;">
-            <p>2016-04-28 15:40:10</p>
+            <p>{{trip.createAt| date: 'yyyy-MM-dd HH:mm:ss'}}</p>
         </div>
         <ion-list>
             <ion-item>
-                出差事由<span class="item-note">{{tripdef.reason}}</span>
+                出差事由<span class="item-note">{{trip.reason}}</span>
             </ion-item>
         </ion-list>
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <ion-list>
-            <ion-item>2016-05-23 至 2016-05-28
-                <br>总预算：3039元</ion-item>
+            <ion-item>{{trip.beginDate| date: 'yyyy-MM-dd'}} 至 {{trip.endDate | date: 'yyyy-MM-dd'}}
+                <br>总预算：{{totalPrice}}元</ion-item>
         </ion-list>
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <ion-list>
-            <ion-item class="item-divider">交通&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2039元</ion-item>
-            <ion-item>{{tripdef.beginDate | date: 'yyyy-MM-dd'}}
-                <br>{{tripdef.fromPlace}}-{{tripdef.place}}
-                <br>1039元</ion-item>
-            <ion-item>{{tripdef.endDate}}
-                <br>{{tripdef.place}}-{{tripdef.fromPlace}}
-                <br>1000元</ion-item>
-            <ion-item class="item-divider">住宿&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1000元</ion-item>
-            <ion-item>{{tripdef.beginDate}}至{{tripdef.endDate}}
-                <br>{{tripdef.place}}&nbsp;{{tripdef.hotelPlace}}
-                <br>1039元</ion-item>
-            <ion-item class="item-divider">其他补助(共{{during}}天)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{policy.subsidy * during}}</ion-item>
+            <div ng-repeat="budget in budgets">
+                <ion-item class="item-divider">
+                    <span ng-if='budget.itemType == "goTraffic"'>去程交通</span>
+                    <span ng-if='budget.itemType == "backTraffic"'>回程交通</span>
+                    <span ng-if='budget.itemType == "hotel"'>住宿</span>
+                    <span ng-if='budget.itemType == "other" '>补助</span>
+                    <span style="margin-left: 120px;">{{budget.price}}</span>元</ion-item>
+                <ion-item>
+                    {{trip.beginDate | date: 'yyyy-MM-dd'}}
+                    <br>
+                    {{trip.fromPlace}}
+                        &nbsp;
+                        <i ng-if='budget.type == "air"' class="icon ion-plane"></i>
+                        <i ng-if='budget.type == "train"' class="icon ion-train"></i>
+                        <i ng-if='budget.type == "hotel"' class="icon ion-home"></i>
+                        <i ng-if='budget.type == "other"'>-</i>
+                        &nbsp;
+                    {{trip.place}}
+                    <br>{{budget.price}}元
+                </ion-item>
+            </div>
+
+            <!--<ion-item>{{trip.endDate}}-->
+                <!--<br>{{trip.place}}-{{trip.fromPlace}}-->
+                <!--<br>1000元</ion-item>-->
+            <!--<ion-item class="item-divider">住宿&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1000元</ion-item>-->
+            <!--<ion-item>{{trip.beginDate}}至{{trip.endDate}}-->
+                <!--<br>{{trip.place}}&nbsp;{{trip.hotelPlace}}-->
+                <!--<br>1039元</ion-item>-->
+            <!--<ion-item class="item-divider">其他补助(共{{duringDays}}天)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{policy.subsidy * during}}</ion-item>-->
         </ion-list>
         <div class="button-bar"></div>
         <div class="button-bar"></div>
         <div class="spacer" style="width: 300px; height: 26px;"></div>
-        <form class="list">
-            <label class="item item-input">
-                <span class="input-label">审批人</span>
-                <input type="text" placeholder="李晓辰">
-            </label>
-        </form>
-        <a href="#/trip/commited" id="page16-button56" class="button button-positive  button-block">提交审批</a>
+        <!--<form class="list">-->
+            <!--<label class="item item-input">-->
+                <!--<span class="input-label">审批人</span>-->
+                <!--<input type="text" placeholder="李晓辰">-->
+            <!--</label>-->
+        <!--</form>-->
+        <a href="#/trip/commited" id="page16-button56" class="button button-positive  button-block">提交预算</a>
         <a href="#/trip/create" id="page16-button58" class="button button-light  button-block button-outline">取消</a>
     </ion-content>
 </ion-view>

@@ -23,6 +23,7 @@
   },
   "postgres":{
     "url": "postgres://postgres:root@localhost:5432/qmtrip",
+    "url_test": "postgres://postgres:root@localhost:5432/qmtrip",
     "debug": true
   },
   "redis":{
@@ -50,7 +51,12 @@
   },
   "api_test": {
     "postgres": "${{postgres.url_test}}",
-    "remotes": []
+    "remotes": [
+      {
+        "connect": {"host":"${{hosts.main.addr}}", "port":"${{hosts.main.port}}"},
+        "modules": "*"
+      }
+    ]
   },
   "default_agency": {
     "name": "系统默认代理商",
