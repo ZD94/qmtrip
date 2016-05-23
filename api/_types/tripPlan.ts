@@ -247,9 +247,9 @@ export class TripDetail extends ModelObject{
     get hotelName(): string { return ''; }
     set hotelName(val: string) {}
 
-    @Field({type: Types.STRING})
-    get invoice(): string { return ''; }
-    set invoice(val: string) {}
+    @Field({type: Types.JSONB})
+    get invoice(): any { return []; }
+    set invoice(val: any) {}
 
     @Field({type: Types.STRING})
     get newInvoice(): string { return ''; }
