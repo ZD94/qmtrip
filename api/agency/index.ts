@@ -388,7 +388,8 @@ class AgencyModule {
             }
 
             let agencyId = agency.id;
-            API.agency.__defaultAgencyId = agencyId;
+            // API.agency.__defaultAgencyId = agencyId;
+            Agency.__defaultAgencyId = agencyId;
             let companies = await API.company.listCompany({agencyId: null});
 
             if(!companies || companies.length <= 0) {

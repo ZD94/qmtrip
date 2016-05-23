@@ -34,6 +34,8 @@ export class Agency extends ModelObject{
     constructor(target: Object) {
         super(target);
     }
+    static __defaultAgencyId;
+    
     @Create()
     static create(obj?: Object): Agency { return null; }
 

@@ -1,3 +1,4 @@
+import {Models} from "../_types/index";
 /**
  * Created by yumiao on 15-12-9.
  */
@@ -15,8 +16,11 @@ let logger = new Logger('company');
 
 import {requireParams, clientExport} from "common/api/helper";
 import {ECompanyStatus, Company, MoneyChange} from 'api/_types/company';
-import {EAgencyStatus} from "../_types/agency";
+import {EAgencyStatus, Agency} from "../_types/agency";
 import {requirePermit, conditionDecorator, condition} from "../_decorator";
+import {Staff, EStaffRole} from "../_types/staff";
+import {Department} from "../_types/department";
+import {md5} from "../../common/utils";
 
 let AGENCY_ROLE = {OWNER: 0, COMMON: 1, ADMIN: 2};
 let companyCols = Company['$fieldnames'];
@@ -120,42 +124,38 @@ class CompanyModule {
     static async registerCompany(params: {mobile: string, name: string, email: string, domain: string,
         userName: string, pwd?: string, remark?: string, description?: string}): Promise<Company>{
         let session = Zone.current.get('session');
-        let mobile = params.mobile;
-        let email = params.email;
-        let userName = params.userName;
         let pwd = params.pwd || '123456';
-        let agencyId = API.agency.__defaultAgencyId;
-        params['domainName'] = params.email.match(/.*\@(.*)/)[1]; //企业域名
-        let domain = params['domainName'];
+        let agencyId = Agency.__defaultAgencyId;
+        let domain = params.email.match(/.*\@(.*)/)[1]; //企业域名
 
-        if(domain && domain != "" && email.indexOf(domain) == -1){
+        if(domain && domain != "" && params.email.indexOf(domain) == -1){
             throw {code: -6, msg: "邮箱格式不符合要求"};
         }
 
+        params['domainName'] = domain;
 
         if(session) {
-            let agencyUser = await DBM.Agency.findById(session.accountId);
+            let agencyUser = await Models.agencyUser.get(session.accountId);
 
-            if(!agencyUser || agencyUser.status == EAgencyStatus.DELETE) {
+            if(!agencyUser) {
                 throw L.ERR.AGENCY_NOT_EXIST();
             }
 
-            agencyId = agencyUser.agencyId;
+            agencyId = agencyUser.agency.id;
         }
 
-        let account = await API.auth.newAccount({mobile: mobile, email: email, pwd: pwd, type: 1});
+        let staff = Staff.create({email: params.email, name: params.userName, mobile: params.mobile, roleId: EStaffRole.OWNER, pwd: md5(pwd)});
+        let company = Company.create(params);
+        let department = Department.create({name: "我的企业", isDefault: true});
 
-        params['id'] = uuid.v1();
-        params['agencyId'] = agencyId;
-        params['createUser'] = account.id;
-        params['companyNo'] = await API.seeds.getSeedNo('CompanyNo', {formatDate: 'YY', minNo: 100, maxNo: 999});
-        delete params.userName;
+        department.company = company;
+        staff.company = company;
+        company.createUser = staff.id;
+        company['agencyId'] = agencyId;
 
-        let company = await DBM.Company.create(params);
-        await DBM.Staff.create({id: account.id, companyId: company.id, email: email, mobile: mobile, name: userName, roleId: 0});
-        await DBM.Department.create({name: "我的企业", isDefault: true, companyId: company.id});
+        await Promise.all([staff.save(), company.save(), department.save()]);
 
-        return new Company(company);
+        return company;
     }
 
 

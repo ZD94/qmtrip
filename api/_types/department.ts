@@ -45,4 +45,5 @@ export class Department extends ModelObject{
 
     @ResolveRef({type: Types.UUID}, Models.company)
     get company(): Company { return null; }
+    set company(val: Company) {} 
 }
