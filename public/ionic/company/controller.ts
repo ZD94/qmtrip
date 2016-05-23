@@ -4,21 +4,23 @@
 "use strict";
 import {EStaffRole, Staff} from "api/_types/staff";
 import {TravelPolicy} from "api/_types/travelPolicy";
+import promise = require("../../../common/test/api/promise/index");
 
 export async function ManagementController($scope,Models){
     var staff = await Staff.getCurrent();
     var company = staff.company;
-    var [staffs, policies] = await Promise.all([
+    var [staffs, policies,departments] = await Promise.all([
         company.getStaffs(),
-        company.getTravelPolicies()
+        company.getTravelPolicies(),
+        company.getDepartments()
     ]);
     $scope.staffsnum = staffs.length;
-    // $scope.departmentsnum = await company.getDepartments().length;
+    $scope.departmentsnum = departments.length;
     $scope.policiesnum = policies.length;
 }
 
 export async function BudgetController($scope){
-    
+
 }
 
 export async function RecordController($scope){
@@ -31,7 +33,15 @@ export async function DistributionController($scope){
 
 export async function DepartmentController($scope, Models, $ionicPopup){
     var staff = await Staff.getCurrent();
-    var departments = await staff.company.getDepartments();
+    var departments = $scope.departments = await staff.company.getDepartments();
+    $scope.departments.map(function(department){
+        var depart = {department:department,staffnum:0}
+    });
+    await Promise.all($scope.departments.map(async function(department){
+        var result = await department.department.getStaffs();
+        department.staffnum = result.length;
+        return department;
+    })) 
     $scope.departments = departments;
 }
 
