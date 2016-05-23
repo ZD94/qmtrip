@@ -6,6 +6,7 @@ import {now} from 'common/utils'
 import {Staff} from 'api/_types/staff';
 import {Company} from 'api/_types/company';
 import { Create } from 'common/model';
+declare var API: any;
 
 export enum EPlanStatus {
     AUDIT_NOT_PASS = -2,
@@ -302,6 +303,9 @@ export class TripDetail extends ModelObject{
     @ResolveRef({type: Types.UUID}, Models.tripPlan)
     get tripPlan(): TripPlan { return null; }
 
+    uploadInvoice(pictureFileId: string): Promise<boolean> {
+        return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: pictureFileId});
+    }
 }
 
 @Table(Models.tripPlanLog, 'tripPlan.')
