@@ -222,5 +222,18 @@ export var condition = {
             let tripPlan = await Models.tripPlan.get(id);
             return id && staff && tripPlan && staff.id == tripPlan.accountId;
         }
+    },
+    canGetTripPlan: function (idpath: string) {
+        return async function (fn, self, args) {
+            let id = _.get(args, idpath);
+            let session = Zone.current.get('session');
+            
+            if(!session) {
+                throw L.ERR.PERMISSION_DENIED();
+            }
+            
+            let account = await Models.account.get(session.accountId);
+            let tripPlan = await Models.tripPlan.get(id);
+        }
     }
 }

@@ -50,7 +50,9 @@ gulplib.dist(function(){
     copy = [
         'README.md',
         'package.json',
-        'server.js'
+        'server.js',
+        'tsd.json',
+        'tsconfig.json',
     ];
     copy.forEach(function(fname){
         dist_all.push(gulp.src(fname).pipe(gulp.dest('dist')));
