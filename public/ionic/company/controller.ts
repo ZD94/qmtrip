@@ -18,7 +18,7 @@ export async function ManagementController($scope,Models){
 }
 
 export async function BudgetController($scope){
-
+    
 }
 
 export async function RecordController($scope){
