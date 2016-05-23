@@ -19,7 +19,7 @@ import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_types/staff";
-import { AGENCY_ROLE, AgencyUser } from "api/_types/agency";
+import { EAgencyUserRole, AgencyUser } from "api/_types/agency";
 import { ServiceInterface } from 'common/model';
 import { Models, EAccountType } from 'api/_types';
 import promise = require("../../common/test/api/promise/index");
@@ -1274,7 +1274,7 @@ class StaffModule{
                         })
                         .then(function(company){
                             if(company && company.agencyId){
-                                return API.agency.getAgencyUsersId({agencyId: company.agencyId, roleId: [AGENCY_ROLE.OWNER, AGENCY_ROLE.ADMIN]})
+                                return API.agency.getAgencyUsersId({agencyId: company.agencyId, roleId: [EAgencyUserRole.OWNER, EAgencyUserRole.ADMIN]})
                                     .then(function(ids){
                                         for(var i=0;i<ids.length;i++){
                                             viewerId.push(ids[i].id);

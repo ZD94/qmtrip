@@ -56,6 +56,7 @@ describe("api/agency", function() {
         });
     });
 
+
     describe("options baesd on agencyDefault created", function() {
         var agencyId = "";
         var agencyUserId = "";
@@ -104,7 +105,7 @@ describe("api/agency", function() {
             });
 
             it("createAgencyUser should be ok", function(done) {
-                API.agency.createAgencyUser({name: '测试代理商用户', email: "agencyUser.test@jingli.tech", mobile: '12345678901', agencyId: agencyId})
+                API.agency.createAgencyUser({name: '测试代理商用户', email: "createAgencyUser.test@jingli.tech", agencyId: agencyId})
                     .then(function(ret){
                         assert.equal(ret.status, 0);
                     })
@@ -114,11 +115,11 @@ describe("api/agency", function() {
 
             it("updateAgencyUser should be ok", function(done) {
                 API.agency.updateAgencyUser({status: 1, roleId: 2, id: agencyUserId}, function(err, ret) {
-                    assert.equal(ret.status, 1);
-                    assert.equal(ret.roleId, 2);
+                    assert.equal(ret.target.status, 1);
+                    assert.equal(ret.target.roleId, 2);
                     done(err);
                 });
-            })
+            });
 
             it("getAgencyUser should be ok", function(done) {
                 API.agency.getAgencyUser({id: agencyUserId}, function(err, ret) {
@@ -130,14 +131,19 @@ describe("api/agency", function() {
             it("getAgencyUser should be error whit wrong params", function(done) {
                 var uuid = require('uuid');
                 API.agency.getAgencyUser({id: uuid.v1()}, function(err, ret) {
+                    assert(err != null);
                     assert.equal(err.code, -141);
-                    done(err);
+                    done();
                 })
             });
 
 
             it("listAgencyUser should be ok", function(done) {
-                API.agency.listAgencyUser({}, done)
+                API.agency.listAgencyUser({}, function(err, ret) {
+                    assert.equal(err, null);
+                    assert(ret.length >= 0);
+                    done(err);
+                })
             });
 
 
@@ -151,35 +157,51 @@ describe("api/agency", function() {
                 });
 
                 it("deleteAgencyUser should be ok", function(done) {
-                    API.agency.deleteAgencyUser({id: agencyUserId}, function (err, ret) {
+                    API.agency.deleteAgencyUser({id: newUserId}, function (err, ret) {
                         assert.equal(ret, true);
-                        done(err);
-                    });
-                });
-            });
-
-            describe('deleteAgency', function() {
-                var newAgencyId;
-                before(function(done) {
-                    var agency = {email: "agencyDelete.test@jingli.tech", userName: "喵喵", name: '喵喵的代理商', description: '代理商API测试用', mobile: '15269866821'};
-                    API.agency.registerAgency(agency, function(err, ret) {
-                        assert.equal(ret.target.email, agency.email);
-                        newAgencyId = ret.target.id;
-                        var newAgencyUserId = ret.target.createUser;
-                        var session = getSession();
-                        session.accountId = newAgencyUserId;
                         done(err);
                     });
                 });
 
                 it("deleteAgency should be ok", function (done) {
-                    API.agency.deleteAgency({id: newAgencyId}, function (err, ret) {
+                    API.agency.deleteAgency({id: agencyId}, function (err, ret) {
+                        assert.equal(err, null);
                         assert.equal(ret, true);
                         done(err);
                     })
                 });
-            })
+            });
 
+
+            // describe('deleteAgency', function() {
+            //     var newAgencyId;
+            //     var newAgencyUserId;
+            //     before(function(done) {
+            //         var agency = {email: "agencyDelete.test@jingli.tech", userName: "喵喵", name: '喵喵的代理商', description: '代理商API测试用', mobile: '15269866821'};
+            //         API.agency.registerAgency(agency, function(err, ret) {
+            //             assert.equal(ret.target.email, agency.email);
+            //             newAgencyId = ret.target.id;
+            //             newAgencyUserId = ret.target.createUser;
+            //             var session = getSession();
+            //             session.accountId = newAgencyUserId;
+            //             session.tokenId = 'tokenId';
+            //             done(err);
+            //         });
+            //     });
+            //
+            //     after(function(done){
+            //         deleteAgencyByTest()
+            //             .nodeify(done);
+            //     });
+            //
+            //     it("deleteAgency should be ok", function (done) {
+            //         API.agency.deleteAgency({id: newAgencyId}, function (err, ret) {
+            //             assert.equal(err, null);
+            //             assert.equal(ret, true);
+            //             done(err);
+            //         })
+            //     });
+            // })
 
         })
 

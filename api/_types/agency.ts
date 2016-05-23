@@ -20,11 +20,11 @@ export const AgencyError = {
     AGENCY_NOT_FOUND: {code: -11, msg: '没有该代理商'}
 }
 
-export enum  AGENCY_ROLE {
+export enum  EAgencyUserRole {
     OWNER = 0,
     COMMON = 1,
     ADMIN = 2
-};
+}
 
 
 
