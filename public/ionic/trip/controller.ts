@@ -142,8 +142,8 @@ export function DetailController($scope){
 
 export async function ListController($scope , Models){
     var staff = await Staff.getCurrent();
-    console.info(Models);
-    var list = await Models.tripPlan.find({});
+    $scope.tripPlans = await Models.tripPlan.find({});
+    console.info($scope.tripPlans);
     $scope.enterdetail = function(tripid){
         window.location.href = "#/trip/listdetail?tripid="+tripid;
     }
