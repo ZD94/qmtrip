@@ -51,13 +51,13 @@ class TripPlanModule {
         let email = staff.email;
         let staffName = staff.name;
         let _tripPlan:any = _.pick(params, TripPlanCols);
-        let totalPrice = 0;
+        let totalPrice:number = 0;
         for(let budget of params.budgets) {
             if (budget.price < 0) {
                 totalPrice = -1;
                 break;
             }
-            totalPrice += budget.price;
+            totalPrice += (budget.price as number);
         }
 
         let tripPlanId = uuid.v1();
