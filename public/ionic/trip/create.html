@@ -11,23 +11,34 @@
             </label>
             <label class="item item-input">
                 <span class="input-label">出差地点</span>
-                <input type="text" placeholder="武汉" ng-model="trip.place" ng-selector="queryPlaces">
+                <input type="text" placeholder="北京" ng-model="trip.place"
+                       ng-selector
+                       ng-selector-title="出差地点选择"
+                       ng-selector-placeholder="请输入城市名或首字母缩写"
+                       ng-selector-query="queryPlaces"
+                >
             </label>
-            <label class="item item-select">
+            <label class="item item-input">
                 <span class="input-label">出差事由</span>
-                <select ng-model="trip.reason">
-                    <option>武汉项目</option>
-                    <option>南京项目</option>
-                    <option>上海项目</option>
-                    <option>添加新项目</option>
-                </select>
+                <input type="text" placeholder="上海项目" ng-model="trip.reason"
+                       ng-selector
+                       ng-selector-title="项目选择"
+                       ng-selector-placeholder="请选择或输入项目"
+                       ng-selector-query="queryProjects"
+                       ng-selector-create="createProject"
+                >
             </label>
             <div class="spacer" style="width: 300px; height: 9px;"></div>
             <ion-toggle toggle-class="toggle-positive" ng-model="trip.traffic">交通</ion-toggle>
             <div ng-if="trip.traffic">
                 <label class="item item-input" ng-if="trip.traffic">
                     <span class="input-label">出发地</span>
-                    <input type="text" placeholder="北京" ng-model="trip.fromPlace" ng-selector="queryPlaces">
+                    <input type="text" placeholder="上海" ng-model="trip.fromPlace"
+                           ng-selector
+                           ng-selector-title="出发地选择"
+                           ng-selector-placeholder="请输入城市名或首字母缩写"
+                           ng-selector-query="queryPlaces"
+                    >
                 </label>
                 <ion-toggle toggle-class="toggle-positive" ng-model="trip.round">返程</ion-toggle>
             </div>

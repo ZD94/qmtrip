@@ -72,10 +72,12 @@ export function CreateController($scope, $storage){
         return places.map((place)=>place.name);
     }
 
-    $scope.queryProject = async function(keyword){
+    $scope.queryProjects = async function(keyword){
         var staff = await Staff.getCurrent();
         var projects = await Models.project.find({where:{companyId: staff.company.id}});
         return projects.map((project)=>project.name);
+    }
+    $scope.createProject = async function(name){
     }
 
     $scope.nextStep = async function() {
