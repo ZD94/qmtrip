@@ -335,7 +335,7 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
 
     $scope.approveTripPlan = async function() {
         console.info("click me....")
-        let ret = await tripPlan.commitTripPlanOrder({orderId: id});
+        let ret = await API.tripPlan.commitTripPlan({id: id});
         alert('提交成功')
         window.location.href="#/trip/list"
     }
