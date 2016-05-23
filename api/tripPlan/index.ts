@@ -188,22 +188,16 @@ class TripPlanModule {
             return plan.id;
         });
     }
-
-    @requireParams(['tripDetailId'], ['columns'])
-    static async getTripDetail(params) {
-        let options:any = {};
-
-        if (params.columns) {
-            options.attributes = _.intersection(params.columns, TripDetailCols);
-        }
-
-        let detail = await DBM.TripDetail.findById(params.tripDetailId, options);
+    @clientExport
+    @requireParams(['id'])
+    static async getTripDetail(params): Promise<TripDetail> {
+        let detail = await Models.tripDetail.get(params.id);
 
         if (!detail) {
             throw {code: -2, msg: '消费记录不存在'};
         }
 
-        return new TripDetail(detail);
+        return detail;
     }
 
     /**
