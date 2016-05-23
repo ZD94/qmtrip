@@ -90,6 +90,8 @@ export function CreateController($scope, $storage){
 }
 
 export async function BudgetController($scope, $storage, Models, $stateParams){
+    API.require("tripPlan");
+    await API.onload();
 
     var id = $stateParams.id;
     API.require("travelBudget");
@@ -126,24 +128,79 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
         budgets.push(otherBudget);
     }
     $scope.budgets = budgets;
+
+    API.require("tripPlan");
+    await API.onload();
+
+    $scope.saveTripPlan = function() {
+        let params = {
+            deptCity: trip.fromPlace,
+            arrivalCity: trip.place,
+            startAt: trip.beginDate,
+            backAt: trip.endDate,
+            title: trip.reason,
+            remark: trip.reason,
+            budgets: budgets,
+        }
+        API.tripPlan.saveTripPlan(params)
+        .then(function(planTrip) {
+            window.location.href = '#/trip/committed?id='+planTrip.id;
+        })
+        .catch(function(err) {
+            alert(err.msg || err);
+        })
+    }
 }
 
 export function CitySelectorController($scope){
 
 }
 
-export function CommitedController($scope){
+export async function CommittedController($scope, $stateParams, Models){
+    let id = $stateParams.id;
 
+    let tripPlan = await Models.tripPlan.get(id);
+    $scope.tripPlan = tripPlan.target;
+
+    $scope.goToDetail = function() {
+        window.location.href = '#/trip/detail?id='+id;
+    }
 }
 
-export function DetailController($scope){
+export async function DetailController($scope, $stateParams, Models){
+    let id = $stateParams.id;
+    let tripPlan = await Models.tripPlan.get(id);
+    API.require("tripPlan");
+    await API.onload();
+    let budgets: any[] = await Models.tripDetail.find({tripPlanId: id});
+    budgets = budgets.map(function(budget) {
+        let itemType = 'other';
+        if (budget.type == 0) {
+            itemType = 'goTraffic'
+        }
+        if (budget.type == 1) {
+            itemType = 'backTraffic';
+        }
+        if (budget.type == 2) {
+            itemType = 'hotel';
+        }
+        let type = 'air';
+        if (budget.invoiceType == 0) {
+            type = 'train';
+        }
+        if (budget.invoiceType == 2) {
+            type = 'hotel';
+        }
+        return {id: budget.id, price: budget.budget, itemType: itemType, type: type}
+    })
 
+    $scope.trip = tripPlan.target;
+    $scope.budgets = budgets;
 }
 
 export async function ListController($scope , Models){
     var staff = await Staff.getCurrent();
-    console.info(Models);
-    var list = await Models.tripPlan.find({});
+    $scope.tripPlans = await Models.tripPlan.find({});
     $scope.enterdetail = function(tripid){
         window.location.href = "#/trip/listdetail?tripid="+tripid;
     }

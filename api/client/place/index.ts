@@ -29,10 +29,17 @@ class ApiPlace {
      * ```
      */
     static queryPlace(params: {keyword: string}):Promise<Array<Place>> {
-        if (!params.keyword) {
-            throw {code: -1, msg: "地点名称不能为空"};
+        let _params: any = params;
+        if (!_params) {
+            _params = {};
         }
-        return API.place.queryCity(params)
+
+        let keyword = _params.keyword;
+        if (!Boolean(keyword)) {
+            return ApiPlace.hotCities({limit: 20})
+        }
+
+        return API.place.queryCity(_params)
             .then(function(places) {
                 let arr: Array<Place> = places.map(function(place) {
                     return new Place(place)
@@ -78,10 +85,6 @@ class ApiPlace {
                     return new Place(place);
                 })
                 return arr;
-            })
-            .catch(function(err) {
-                console.info(err)
-                throw err;
             })
     }
 

@@ -2,17 +2,17 @@
     <ion-content padding="true" class="has-header">
         <form class="list">
             <label class="item item-input">
-                <span class="input-label">出差单已提交李晓辰进行审批！</span>
+                <span class="input-label">出差单已提交!</span>
             </label>
         </form>
         <form class="list">
             <label class="item item-input">
-                <span class="input-label">总预算：3049元</span>
+                <span class="input-label">总预算：{{tripPlan.budget}}元</span>
             </label>
         </form>
         <div id="page10-markdown5" style="color:#000000;">
             <p>当前预算仅为参考，请以最终审批预算为准！</p>
         </div>
-        <button id="page10-button57" class="button button-positive  button-block">查看预算单</button>
+        <button ng-click="goToDetail()" id="page10-button57" class="button button-positive  button-block">查看预算单</button>
     </ion-content>
 </ion-view>
