@@ -4,7 +4,7 @@
 "use strict";
 import {EStaffRole, Staff} from "api/_types/staff";
 import {TravelPolicy} from "api/_types/travelPolicy";
-import promise = require("../../../common/test/api/promise/index");
+import {Department} from "api/_types/department";
 
 export async function ManagementController($scope,Models){
     var staff = await Staff.getCurrent();
@@ -33,16 +33,45 @@ export async function DistributionController($scope){
 
 export async function DepartmentController($scope, Models, $ionicPopup){
     var staff = await Staff.getCurrent();
-    var departments = $scope.departments = await staff.company.getDepartments();
-    $scope.departments.map(function(department){
-        var depart = {department:department,staffnum:0}
-    });
-    await Promise.all($scope.departments.map(async function(department){
-        var result = await department.department.getStaffs();
-        department.staffnum = result.length;
-        return department;
-    })) 
-    $scope.departments = departments;
+    var initdepartment = async function(){
+        var departments = await staff.company.getDepartments();
+        $scope.departments = departments.map(function(department){
+            var depart = {department:department,staffnum:0};
+            return depart;
+        });
+        await Promise.all($scope.departments.map(async function(depart){
+            console.info(depart);
+            var result = await depart.department.getStaffs();
+            depart.staffnum = result.length;
+            return depart;
+        }));
+    };
+    initdepartment();
+    var newdepartment = $scope.newdepartment = Department.create();
+    $scope.newdepart = function(){
+        var nshow = $ionicPopup.show({
+            template: '<input type="text" ng-model="newdepartment.name">',
+            title:'创建部门',
+            scope:$scope,
+            buttons:[
+                {
+                    text:'取消'
+                },
+                {
+                    text: '保存',
+                    type:'button-positive',
+                    onTap:function(e){
+                        if(!$scope.newdepartment.name){
+                            e.preventDefault();
+                        }else{
+                            $scope.newdepartment.save();
+                            initdepartment();
+                        }
+                    }
+                }
+            ]
+        })
+    }
 }
 
 export async function StaffsController($scope, Models){
