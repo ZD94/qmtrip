@@ -7,7 +7,7 @@ var API = require("common/api");
 import assert = require("assert");
 import {Models} from 'api/_types';
 import {getSession} from 'common/model';
-import {EInvoiceType} from 'api/_types/tripPlan'
+import {EInvoiceType, ETripType} from 'api/_types/tripPlan'
 
 var agencyId = "";
 var agencyUserId = "";
@@ -45,6 +45,8 @@ describe("api/tripPlan", function() {
                 company = company.target;
                 companyId = company.id;
                 staffId = company.createUser;
+
+                console.info('staffId=>', staffId);
                 var session = getSession();
                 session.accountId = staffId;
                 session.tokenId = 'tokenId';
@@ -214,12 +216,12 @@ describe("api/tripPlan", function() {
             arrivalCity: '上海',
             deptCityCode: 'BJ123',
             arrivalCityCode: 'SH123',
-            budgets: [1000],
             title: '发送邮件测试计划单',
             startAt: '2015-12-30 11:12:12',
-            hotel: [{
+            budgets: [{
                 startTime: '2016-12-30 11:11:11',
                 budget: 300,
+                type: ETripType.HOTEL,
                 city: '上海市',
                 cityCode: 'SH123',
                 hotelName: '丐帮',
@@ -227,9 +229,9 @@ describe("api/tripPlan", function() {
             }]
         }
 
-        beforeEach(function(done){
-
-            API.tripPlan.saveTripPlan( tripPlanOrder)
+        before(function(done){
+            var session = getSession();
+            API.tripPlan.saveTripPlan(tripPlanOrder)
                 .then(function(ret) {
                     planId = ret.id;
                     return ret.getHotel();
@@ -240,6 +242,7 @@ describe("api/tripPlan", function() {
                 })
                 .catch(function(err) {
                     if(err){
+                        console.info(err);
                         throw err;
                     }
                 })
@@ -247,7 +250,7 @@ describe("api/tripPlan", function() {
 
 
         it("#uploadInvoiceNew should be ok", function (done) {
-            API.tripPlan.uploadInvoiceNew( {tripDetailId: detailId, pictureFileId: '测试上传图片'}, function (err, ret) {
+            API.tripPlan.uploadInvoice( {tripDetailId: detailId, pictureFileId: '测试上传图片'}, function (err, ret) {
                 console.info(err);
                 console.info(ret);
                 done();

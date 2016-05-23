@@ -5,6 +5,7 @@ var API = require("common/api");
 var Cookie = require('tiny-cookie');
 import { Staff } from 'api/_types/staff';
 import { Models } from 'api/_types';
+import {TripDetail} from "api/_types/tripPlan";
 
 
 var defaultTrip = {
@@ -241,7 +242,7 @@ export async function ListdetailController($scope , Models, $stateParams){
         if (budget.invoiceType == 2) {
             type = 'hotel';
         }
-        return {id: budget.id, price: budget.budget, itemType: itemType, type: type}
+        return new TripDetail({id: budget.id, price: budget.budget, itemType: itemType, type: type});
     })
     $scope.budgets = budgets;
     console.info($scope.budgets);
