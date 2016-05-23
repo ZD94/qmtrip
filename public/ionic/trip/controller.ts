@@ -76,33 +76,40 @@ export function CreateController($scope, $storage){
             goBackTime: moment(tripdef.endDate).format('HH:mm'),
             isRoundTrip: tripdef.round
         })
-            .then(function(result) {
-                console.info(result);
-                //window.location.href = "#/trip/budget";
-            })
-            .catch(function(err) {
-                alert(err.msg || err);
-            })
+        .then(function(result) {
+            window.location.href = "#/trip/budget?id="+result;
+        })
+        .catch(function(err) {
+            alert(err.msg || err);
+        })
     }
 }
 
-export async function BudgetController($scope, $storage, Models){
-    var tripdef = TripDefineFromJson($storage.local.get('tripdef'));
-    var staff = Models.staff.get(Cookie.get("user_id"));
-    $scope.policy = staff.getTravelPolicy();
-    $scope.during = moment(tripdef.endDate).diff(tripdef.beginDate, 'days') || 1;
-    $scope.tripdef = tripdef;
+export async function BudgetController($scope, $storage, Models, $stateParams){
 
-    var budget = await API.travelBudget.getTravelPolicyBudget({
-        originPlace: tripdef.fromPlace,
-        destinationPlace: tripdef.place,
-        leaveDate: moment(tripdef.beginDate).format('YYYY-MM-DD'),
-        goBackDate: moment(tripdef.endDate).format('YYYY-MM-DD'),
-        leaveTime: moment(tripdef.beginDate).format('HH:mm'),
-        goBackTime: moment(tripdef.endDate).format('HH:mm'),
-        isRoundTrip: false
-    })
-    console.log(budget);
+    var id = $stateParams.id;
+    console.info(id);
+    API.require("travelBudget");
+    await API.onload();
+    var budget = await API.travelBudget.getBudgetInfo({id: id});
+    console.info(budget);
+    //
+    // var tripdef = TripDefineFromJson($storage.local.get('tripdef'));
+    // var staff = Models.staff.get(Cookie.get("user_id"));
+    // $scope.policy = staff.getTravelPolicy();
+    // $scope.during = moment(tripdef.endDate).diff(tripdef.beginDate, 'days') || 1;
+    // $scope.tripdef = tripdef;
+    //
+    // var budget = await API.travelBudget.getTravelPolicyBudget({
+    //     originPlace: tripdef.fromPlace,
+    //     destinationPlace: tripdef.place,
+    //     leaveDate: moment(tripdef.beginDate).format('YYYY-MM-DD'),
+    //     goBackDate: moment(tripdef.endDate).format('YYYY-MM-DD'),
+    //     leaveTime: moment(tripdef.beginDate).format('HH:mm'),
+    //     goBackTime: moment(tripdef.endDate).format('HH:mm'),
+    //     isRoundTrip: false
+    // })
+    // console.log(budget);
 
 }
 
