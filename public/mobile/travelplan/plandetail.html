@@ -78,7 +78,7 @@
                     <!--<a class="BTN" ng-if="  ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'  " ng-click="book( 'outTraffic' )" ng-hide="ITEM.outTraffic[0].invoiceType==='TRAIN'">预订</a>-->
                     <a href="#/airticket/flightlist?BG={{ITEM.outTraffic[0].budget}}&SCN={{ITEM.outTraffic[0].deptCity}}&SCC={{ITEM.outTraffic[0].deptCityCode}}&ECN={{ITEM.outTraffic[0].arrivalCity}}&ECC={{ITEM.outTraffic[0].arrivaltCityCode}}&ST={{ITEM.outTraffic[0].startTime | date:'yyyy-MM-dd'}}" class="BTN" ng-if="ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'" ng-hide="ITEM.outTraffic[0].invoiceType==='TRAIN'">预订</a>
                     <div class="BTN" ng-uploader accept="image/*" title="outtraffic_up" done="outtraffic_done"
-                         ng-if="ITEM.outTraffic[0].orderStatus==='WAIT_UPLOAD'">
+                         >
                         上传票据
                     </div>
                     <div class="BTN" ng-uploader accept="image/*" title="outtraffic_up" done="outtraffic_done"

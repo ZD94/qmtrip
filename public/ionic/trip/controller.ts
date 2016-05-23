@@ -4,7 +4,7 @@ import moment = require('moment');
 var API = require("common/api");
 var Cookie = require('tiny-cookie');
 import { Staff } from 'api/_types/staff';
-import { Models } from '../../../api/_types/index';
+import { Models } from 'api/_types';
 
 
 var defaultTrip = {
@@ -207,11 +207,42 @@ export async function DetailController($scope, $stateParams, Models){
 export async function ListController($scope , Models){
     var staff = await Staff.getCurrent();
     $scope.tripPlans = await Models.tripPlan.find({});
+    console.info($scope.tripPlans);
     $scope.enterdetail = function(tripid){
         window.location.href = "#/trip/listdetail?tripid="+tripid;
     }
 }
 
-export async function ListdetailController($scope , Models){
+export async function ListdetailController($scope , Models, $stateParams){
+    require('./listdetail.less');
     var staff = await Staff.getCurrent();
+    let id = $stateParams.tripid;
+    let tripPlan = await Models.tripPlan.get(id);
+    // let out = await Models.tripPlan.getOutTrip();
+    console.info(tripPlan);
+    console.info(id);
+    $scope.tripDetail = tripPlan;
+    let budgets: any[] = await Models.tripDetail.find({tripPlanId: id});
+    budgets = budgets.map(function(budget) {
+        let itemType = 'other';
+        if (budget.type == 0) {
+            itemType = 'goTraffic'
+        }
+        if (budget.type == 1) {
+            itemType = 'backTraffic';
+        }
+        if (budget.type == 2) {
+            itemType = 'hotel';
+        }
+        let type = 'air';
+        if (budget.invoiceType == 0) {
+            type = 'train';
+        }
+        if (budget.invoiceType == 2) {
+            type = 'hotel';
+        }
+        return {id: budget.id, price: budget.budget, itemType: itemType, type: type}
+    })
+    $scope.budgets = budgets;
+    console.info($scope.budgets);
 }

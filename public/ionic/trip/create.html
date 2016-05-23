@@ -27,7 +27,7 @@
             <div ng-if="trip.traffic">
                 <label class="item item-input" ng-if="trip.traffic">
                     <span class="input-label">出发地</span>
-                    <input type="text" placeholder="北京" ng-model="trip.fromPlace">
+                    <input type="text" placeholder="北京" ng-model="trip.fromPlace" ng-selector="queryPlaces">
                 </label>
                 <ion-toggle toggle-class="toggle-positive" ng-model="trip.round">返程</ion-toggle>
             </div>
