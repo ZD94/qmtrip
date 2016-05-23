@@ -504,7 +504,7 @@ var travelplan = (function () {
                         if (btn != 'ok')
                             return;
                         API.onload(function () {
-                            API.tripPlan.commitTripPlanOrder($scope.ITEM.id)
+                            API.tripPlan.commitTripPlan($scope.ITEM.id)
                                 .then(function (result) {
                                     $scope.getData($stateParams.orderId);
 

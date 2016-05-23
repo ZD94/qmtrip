@@ -437,9 +437,9 @@ describe("options based on tripPlanOrder created", function() {
             })
         });
 
-        it("#commitTripPlanOrder should be ok", function (done) {
+        it("#commitTripPlan should be ok", function (done) {
             var self = {accountId: staffId};
-            API.tripPlan.commitTripPlanOrder({tripPlanId: newplanId}, function (err, ret) {
+            API.tripPlan.commitTripPlan({tripPlanId: newplanId}, function (err, ret) {
                 if (err) {
                     throw err;
                 }
