@@ -214,7 +214,7 @@ export async function ListController($scope , Models){
     }
 }
 
-export async function ListdetailController($scope , Models, $stateParams){
+export async function ListdetailController($scope , Models, $stateParams ,FileUploader ,$state){
     require('./listdetail.less');
     var staff = await Staff.getCurrent();
     let id = $stateParams.tripid;
@@ -242,8 +242,48 @@ export async function ListdetailController($scope , Models, $stateParams){
         if (budget.invoiceType == 2) {
             type = 'hotel';
         }
-        return new TripDetail({id: budget.id, price: budget.budget, itemType: itemType, type: type});
+        // return new TripDetail({id: budget.id, price: budget.budget, itemType: itemType, type: type});
+        return {id: budget.id, price: budget.budget, itemType: itemType, type: type ,status:budget.status,title:'上传票据',done:function (response) {
+            var fileId = response.fileId;
+            console.info(budget.uploadInvoice);
+
+            // API.tripPlan.uploadInvoice({pictureFileId: fileId})
+            //     .then(function(ret){
+            //         console.info(ret);
+            //     })
+            //     .catch(function (err) {
+            //         console.info(err);
+            //     })
+            uploadInvoice(budget.id, fileId, function (err, result) {
+                    if (err) {
+                        // TLDAlert(err.msg || err);
+                        alert(err);
+                        return;
+                    }
+                    // $scope.getData($stateParams.orderId)
+                    // msgbox.log("票据上传成功");
+                $state.reload();
+                });
+            // uploadInvoice(budget.id, fileId, function (err, result) {
+            //     if (err) {
+            //         // TLDAlert(err.msg || err);
+            //         alert(err);
+            //         return;
+            //     }
+            //     $scope.getData($stateParams.orderId)
+            //     // msgbox.log("票据上传成功");
+            // });
+        }};
     })
     $scope.budgets = budgets;
     console.info($scope.budgets);
+    API.require('tripPlan');
+    await API.onload();
+    function uploadInvoice(consumeId, picture, callback) {
+        API.tripPlan.uploadInvoice({
+            tripDetailId: consumeId,
+            pictureFileId: picture
+        }, callback);
+    }
+    $scope.backtraffic_up = '&#xe90e;<em>回程</em><strong>交通票据</strong>';
 }

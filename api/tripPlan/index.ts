@@ -556,9 +556,9 @@ class TripPlanModule {
             throw L.ERR.NOT_FOUND();
         }
 
-        if (tripDetail.accountId != accountId) {
-            throw L.ERR.PERMISSION_DENY();
-        }
+        // if (tripDetail.accountId != accountId) {
+        //     throw L.ERR.PERMISSION_DENY();
+        // }
 
         if (tripDetail.status === EPlanStatus.COMPLETE || tripDetail.status === EPlanStatus.AUDITING) {
             throw {code: -3, msg: '审核中或已审核通过的票据不能上传!'};
@@ -566,8 +566,11 @@ class TripPlanModule {
 
         let tripPlan = tripDetail.tripPlan;
 
-        let invoiceJson: any[] = tripDetail.invoice;
+        let invoiceJson: any = tripDetail.invoice || [];
         let times = invoiceJson.length ? invoiceJson.length + 1 : 1;
+        if(typeof invoiceJson =='string') {
+            invoiceJson = JSON.parse(invoiceJson);
+        }
         invoiceJson.push({times: times, pictureFileId: params.pictureFileId, created_at: utils.now(), status: EPlanStatus.WAIT_COMMIT, remark: '', approve_at: ''});
 
         tripDetail.newInvoice = params.pictureFileId;
