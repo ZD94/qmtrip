@@ -57,7 +57,7 @@ var Services = {
         funcs: ['getTravelPolicy', 'getTravelPolicies', 'createTravelPolicy', 'updateTravelPolicy', 'deleteTravelPolicy']
     },
     agency: { type: Agency, modname: 'agency',
-        funcs: ['getAgencyById', 'listAgency', 'createAgency', 'updateAgency', 'deleteAgency']
+        funcs: ['getAgencyById', 'listAgency', 'registerAgency', 'updateAgency', 'deleteAgency']
     },
     agencyUser: { type: AgencyUser, modname: 'agency',
         funcs: ['getAgencyUser', 'listAgencyUser', 'createAgencyUser', 'updateAgencyUser', 'deleteAgencyUser']

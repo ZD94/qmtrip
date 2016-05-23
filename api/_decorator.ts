@@ -176,7 +176,7 @@ export var condition = {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
             let agencyUser = await AgencyUser.getCurrent();
-            return id && agencyUser && agencyUser["agencyId"] == id;
+            return id && agencyUser && agencyUser.agency.id == id;
         }
     },
     isStaffsAgency: function (idpath: string) {
@@ -200,8 +200,11 @@ export var condition = {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
             let user = await AgencyUser.getCurrent();
-            let other = await Models.agency.get(id);
-            return id && user && other && user["agencyId"] == other.id;
+            let other = await Models.agencyUser.get(id);
+            if(!other) {
+                throw L.ERR.AGENCY_USER_NOT_EXIST();
+            }
+            return id && user && other && user["agencyId"] == other.agencyId;
         }
     },
     isCompanyAgency: function(idpath: string) {

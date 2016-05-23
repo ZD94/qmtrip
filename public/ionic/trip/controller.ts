@@ -178,8 +178,6 @@ export async function CommittedController($scope, $stateParams, Models){
 export async function DetailController($scope, $stateParams, Models){
     let id = $stateParams.id;
     let tripPlan = await Models.tripPlan.get(id);
-    API.require("tripPlan");
-    await API.onload();
     let budgets: any[] = await Models.tripDetail.find({tripPlanId: id});
     budgets = budgets.map(function(budget) {
         let itemType = 'other';
