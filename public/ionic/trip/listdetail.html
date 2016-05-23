@@ -3,6 +3,11 @@
         <div id="page20-markdown7" style="color:#000000;text-align:right;">
             <p>{{tripDetail.createdAt | date: 'yyyy-MM-dd HH:mm'}}</p>
         </div>
+        <!--<input type="file" value="test" class="button botton-positive">-->
+        <!--<input nv-file-select="" uploader="uploader" type="file" style="width:100%;height:100%;position:absolute;left:0;top:0;" accept="image/*" options="{title:outtraffic_up,done:budget.done}">-->
+        <div class="uploadbtns botton-positive" ng-uploader accept="image/*" title="outtraffic_up" done="budget.done">
+            上传票据
+        </div>
         <ion-list>
             <ion-item>出差事由<span style="float: right;">{{tripDetail.title}}</span></ion-item>
         </ion-list>
@@ -42,16 +47,16 @@
                     {{tripDetail.arrivalCity}}
                     <br>{{budget.price}}元
                 </ion-item>
-                <div class="item item-divider uploadbtns">
-                    <div class="button botton-positive" ng-uploader accept="image/*" title="outtraffic_up" done="outtraffic_done">
+                <div class="item item-divider">
+                    <div class="botton-positive" ng-uploader accept="image/*" title="budget.title" done="budget.done">
                         上传票据
                     </div>
-                    <div class="" ng-uploader accept="image/*" title="outtraffic_up" done="outtraffic_done"
-                         ng-if="
-                        ITEM.outTraffic[0].orderStatus==='WAIT_COMMIT'||
-                        ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS'">
-                        重新上传
-                    </div>
+                    <!--<div class="" ng-uploader accept="image/*" title="outtraffic_up" done="outtraffic_done"-->
+                         <!--ng-if="-->
+                        <!--ITEM.outTraffic[0].orderStatus==='WAIT_COMMIT'||-->
+                        <!--ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS'">-->
+                        <!--重新上传-->
+                    <!--</div>-->
                     <a class="" ng-if="
                         ITEM.outTraffic[0].orderStatus==='WAIT_COMMIT'||
                         ITEM.outTraffic[0].orderStatus==='WAIT_AUDIT'||
