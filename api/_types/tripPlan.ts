@@ -19,13 +19,15 @@ export enum EPlanStatus {
 export enum ETripType {
     OUT_TRIP = 0, //去程
     BACK_TRIP = 1,
-    HOTEL = 2
+    HOTEL = 2,
+    OTHER = 3,
 }
 
 export enum EInvoiceType {
     TRAIN = 0,
     PLANE = 1,
-    HOTEL = 2
+    HOTEL = 2,
+    OTHER = 3,
 }
 
 @Table(Models.project, 'tripPlan.')
@@ -100,6 +102,10 @@ export class TripPlan extends ModelObject {
     get description(): string { return ''; }
     set description(val: string) {}
 
+    @Field({type: Types.INTEGER})
+    get status(): EPlanStatus { return 0; }
+    set status(val: EPlanStatus) {}
+
     @Field({type: Types.STRING})
     get deptCity(): string { return ''; }
     set deptCity(val: string) {}
@@ -131,7 +137,6 @@ export class TripPlan extends ModelObject {
     @Field({type: Types.DOUBLE})
     get expenditure(): number { return 0; }
     set expenditure(val: number) {}
-
 
     @Field({type: Types.JSONB})
     get expendInfo(): Object { return null; }
@@ -211,8 +216,8 @@ export class TripDetail extends ModelObject{
     set type(val: ETripType) {}
 
     @Field({type: Types.INTEGER})
-    get status(): ETripType { return 0; }
-    set status(val: ETripType) {}
+    get status(): EPlanStatus { return 0; }
+    set status(val: EPlanStatus) {}
 
     @Field({type: Types.STRING})
     get deptCity(): string { return ''; }

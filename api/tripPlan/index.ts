@@ -22,6 +22,13 @@ import {Models} from "../_types/index";
 let TripDetailCols = TripDetail['$fieldnames'];
 let TripPlanCols = TripPlan['$fieldnames'];
 
+class IBudgetItem {
+    price: number
+    itemType: string
+    type: string
+    hotel: string
+}
+
 class TripPlanModule {
     static TripPlanCols = TripPlanCols;
     static TripDetailCols = TripDetailCols;
@@ -33,24 +40,30 @@ class TripPlanModule {
      * @returns {Promise<TripPlan>}
      */
     @clientExport
-    @requireParams(['deptCity', 'arrivalCity', 'startAt', 'title', 'budget'], ['backAt', 'remark', 'description', 'outTrip', 'backTrip', 'hotel'])
-    static async saveTripPlan(params: {deptCity: string, arrivalCity: string, startAt: string, title: string, budget: number,
-        backAt?: string, remark?: string, description?: string, outTrip?: any, backTrip?: any, hotel?: any}) {
-        console.info("PARMAS===>", params);
+    @requireParams(['deptCity', 'arrivalCity', 'startAt', 'title', 'budgets'], ['backAt', 'remark', 'description'])
+    static async saveTripPlan(params: {deptCity: string, arrivalCity: string, startAt: string, title: string, budgets: IBudgetItem[],
+        backAt?: string, remark?: string, description?: string}) {
+        
         let {accountId} = Zone.current.get('session');
-        console.info("***************");
-        console.info(accountId);
         let staff = await Models.staff.get(accountId);
         let email = staff.email;
         let staffName = staff.name;
         let _tripPlan:any = _.pick(params, TripPlanCols);
-        let {orderStatus, budget, tripDetails} = getPlanDetails(params);
+        let totalPrice = 0;
+        for(let budget of params.budgets) {
+            if (budget.price < 0) {
+                totalPrice = -1;
+                break;
+            }
+            totalPrice += budget.price
+        }
+
         let tripPlanId = uuid.v1();
         let project = await getProjectByName({companyId: staff.company.id, name: _tripPlan.title, userId: accountId, isCreate: true});
 
         _tripPlan.id = tripPlanId;
-        _tripPlan.budget = budget;
-        _tripPlan.status = orderStatus;
+        _tripPlan.budget = totalPrice
+        _tripPlan.status = 0;
         _tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo'); //获取出差计划单号
         _tripPlan.accountId = accountId;
         _tripPlan.companyId = staff.company.id;
@@ -58,12 +71,42 @@ class TripPlanModule {
 
         let tripPlan = new TripPlan(await DBM.TripPlan.create(_tripPlan));
 
-        await Promise.all(tripDetails.map(async function (detail) {
-            detail.tripPlanId = tripPlanId;
-            detail.accountId = accountId;
-            detail.status = orderStatus;
-            detail.budget = Number(detail.budget);
-            let tripDetail = await DBM.TripDetail.create(detail);
+        await Promise.all(params.budgets.map(async function (detail) {
+            let _detail: any = JSON.parse(JSON.stringify(detail));
+            switch(detail.itemType) {
+                case 'goTraffic': 
+                    _detail.type = ETripType.OUT_TRIP;
+                    break;
+                case 'backTraffic':
+                    _detail.type = ETripType.BACK_TRIP;
+                    break;
+                case 'hotel':
+                    _detail.type = ETripType.HOTEL;
+                    _detail.hotelName = detail.hotel;
+                    break;
+                default:
+                    _detail.type = ETripType.OTHER;
+            }
+
+            switch(detail.type) {
+                case 'train':
+                    _detail.invoiceType = EInvoiceType.TRAIN;
+                    break;
+                case 'hotel':
+                    _detail.invoiceType = EInvoiceType.HOTEL;
+                    break;
+                case 'air':
+                    _detail.invoiceType = EInvoiceType.PLANE;
+                    break;
+                default:
+                    _detail.invoiceType = EInvoiceType.OTHER;
+            }
+            _detail.tripPlanId = tripPlanId;
+            _detail.accountId = accountId;
+            _detail.status = 0;
+            _detail.budget = Number(_detail.price);
+            console.info(_detail);
+            let tripDetail = await DBM.TripDetail.create(_detail);
         }));
 
         let logs = {tripPlanId: tripPlanId, userId: accountId, remark: '新增计划单 ' + tripPlan.planNo, createdAt: utils.now()};
@@ -127,29 +170,24 @@ class TripPlanModule {
      * @returns {*}
      */
     @clientExport
-    @requireParams(['id'], ['columns'])
-    static async getTripPlan(params) {
-        let tripPlanId = params.id;
-        let options:any = {};
-
-        if (params.columns) {
-            params.columns.push('status');
-            options.attributes = params.columns;
-        }
-
-        let order = await DBM.TripPlan.findById(tripPlanId, options);
-        let tripDetails = await DBM.TripDetail.findAll({where: {tripPlanId: tripPlanId}});
-
-        if (!order || order.status == 'DELETE') {
-            throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST();
-        }
-
-        order = order.toJSON();
-        order.tripDetails = tripDetails;
-
-        return new TripPlan(order);
+    @requireParams(['id'])
+    static async getTripPlan(params: {id: string}): Promise<TripPlan> {
+        return await Models.tripPlan.get(params.id);
     }
 
+
+    /**
+     * 获取差旅计划单/预算单列表
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    static async listTripPlans(params): Promise<string[]> {
+        let tripPlans = await Models.tripPlan.find(params);
+        return tripPlans.map(function (plan) {
+            return plan.id;
+        });
+    }
 
     @requireParams(['consumeId'], ['columns'])
     static async getTripDetail(params) {
@@ -219,7 +257,6 @@ class TripPlanModule {
      * @param params
      */
     @requireParams(['consumeId', 'optLog', 'userId', 'updates'], TripDetail['$fieldnames'])
-
     static updateTripDetail(params) {
         let updates:any = _.pick(params.updates, TripDetail['$fieldnames']);
         let trip_plan_id = '';
@@ -371,19 +408,6 @@ class TripPlanModule {
             })
     }
 
-
-    /**
-     * 获取差旅计划单/预算单列表
-     * @param params
-     * @returns {*}
-     */
-    @clientExport
-    static async listTripPlans(params): Promise<string[]> {
-        let tripPlans = await Models.tripPlan.find(params);
-        return tripPlans.map(function (plan) {
-            return plan.id;
-        });
-    }
 
 
     @requireParams(['where'])
@@ -840,7 +864,6 @@ class TripPlanModule {
      * @type {statBudgetByMonth}
      */
     @requireParams(['companyId'], ['startTime', 'endTime', 'accountId'])
-
     static statBudgetByMonth(params) {
         let stTime = params.startTime || moment().format('YYYY-MM-DD');
         let enTime = params.endTime || moment().format('YYYY-MM-DD');
@@ -1127,45 +1150,39 @@ class TripPlanModule {
      * @param params
      * @returns {Promise<TripDetails>}
      */
+    @clientExport
     static getTripPlanDetails(params) {
-        return DBM.TripDetail.findAll({where: params.tripPlanId})
+        return DBM.TripDetail.findAll({where: {tripPlanId: params.tripPlanId}})
     }
 
 
+    @clientExport
+    @requireParams(['name', 'createUser', 'company_id'], ['code'])
+    static createNewProject(params) {
+        return Project.create(params).save();
+    }
+
+    @requireParams(['id'])
+    @clientExport
+    static async getProjectById(params:{id:string}):Promise<Project> {
+        return await Models.project.get(params.id);
+    }
+
+    @clientExport
     @requireParams(['companyId'], ['code', 'name', 'count'])
     static getProjectList(params) {
         let options:any = {where: params, attributes: ['name'], order: [['created_at', 'desc']]};
-
-        if (params.count) {
-            options.limit = params.count;
-            delete params.count;
-        }
-
-        return DBM.Project.findAll(options)
-    }
-
-    @requireParams(['name', 'createUser', 'company_id'], ['code'])
-
-    static createNewProject(params) {
-        params.createdAt = utils.now();
-        return DBM.Project.create(params);
-    }
-
-    static async getProjectById(params:{id:string}):Promise<Project> {
-        let project = await DBM.Project.findBuId(params.id);
-        return new Project(project);
+        return Models.project.find(options);
     }
 
     static async deleteProject(params:{id:string}):Promise<boolean> {
-        let project = await DBM.Project.findBuId(params.id);
+        let project = await Models.project.get(params.id);
 
         if (!project) {
-            throw {code: -2, msg: '没有该项目'};
+            throw L.ERR.NOT_FOUND();
         }
 
-        let result = await DBM.Project.destroy({where: {id: params.id}});
-
-        return true;
+        return await project.destroy();
     }
 
 
@@ -1210,6 +1227,7 @@ class TripPlanModule {
 
 
     static __initHttpApp = require('./invoice');
+
 }
 
 async function getProjectByName(params) {
@@ -1225,6 +1243,8 @@ async function getProjectByName(params) {
 
     return new Project(project);
 }
+
+
 
 /**
  * 从参数中获取计划详情数组

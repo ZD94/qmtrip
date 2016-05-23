@@ -23,6 +23,7 @@ import { AGENCY_ROLE, AgencyUser } from "api/_types/agency";
 import { ServiceInterface } from 'common/model';
 import { Models, EAccountType } from 'api/_types';
 import promise = require("../../common/test/api/promise/index");
+import {conditionDecorator, condition} from "../_decorator";
 
 const staffCols = Staff['$fieldnames'];
 const papersCols = Credential['$fieldnames'];
@@ -70,8 +71,6 @@ class StaffModule{
                 data.id = account.id;
                 let staff = DBM.Staff.build(data)
                 staff.id = account.id;
-                console.info("staff.id, account.id ===>", staff.id, account.id);
-                console.info(staff);
                 return staff.save()
                     .then(function(staff) {
                         return new Staff(staff);
@@ -80,19 +79,22 @@ class StaffModule{
     }
 
     @clientExport
+    @requireParams(["email","name","companyId"], staffCols)
     static async createStaff (params): Promise<Staff> {
         var staff = await Staff.getCurrent();
         if(staff){
             var newstaff = Staff.create(params);
             newstaff.company = staff.company;
-            return newstaff.save();
+            let result = await newstaff.save();
+            return result;
         }
-        var user = AgencyUser.getCurrent();
+        var user = await AgencyUser.getCurrent();
         if(user){
             if(!params.companyId){
                 throw L.ERR.INVALID_ARGUMENT('companyId');
             }
             var company = await Models.company.get(params.companyId);
+
             if(!company){
                 throw L.ERR.INVALID_ARGUMENT('companyId');
             }
@@ -100,91 +102,52 @@ class StaffModule{
                 throw L.ERR.PERMISSION_DENY();
             }
             var newstaff = Staff.create(params);
-            return newstaff.save();
+
+            let result = await newstaff.save();
+
+            return result;
         }
         throw L.ERR.PERMISSION_DENY();
     }
 
-    /**
-     * 创建staff
-     */
-    /*@requireParams(['email', 'name', 'companyId'], staffCols)
-    static async create(params) {
-    params.id = params.id ? params.id : uuid.v1();
-
-    let _staff = await DBM.Staff.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
-
-    if(_staff) {
-        throw {code: -2, msg: '邮箱或手机号已经注册'};
-    }
-
-    let staff = await DBM.Staff.create(params);
-    return new Staff(staff);
-}*/
-
-    /**
-     * 删除员工
-     * @param params
-     * @returns {*}
-     */
+    @clientExport
     @requireParams(["id"])
-    static async delete(params: {id: string}): Promise<any>{
-        var id = params.id;
-        let acc = await API.auth.getAccount({id:id});
-        await  API.auth.remove({accountId: id});
-        let [ num, rows ] = await DBM.Staff.update({status: EStaffStatus.DELETE, quitTime: utils.now()}, {where: {id: id}, returning: true});
-        var staff = rows[0];
-        if (!staff) {
-            throw L.ERR.ACCOUNT_NOT_EXIST();
-        }
+    @conditionDecorator([
+        {if: condition.isSameCompany("0.id")},
+        {if: condition.isStaffsAgency("0.id")}
+    ])
+    static async deleteStaff(params): Promise<any> {
+        let deleteStaff = await Models.staff.get(params.id);
+        let staff = await Staff.getCurrent();
+        if(staff){
+            if(staff["id"] == params.id){
+                throw {msg: "不可删除自身信息"};
+            }
 
-        let company = await API.company.getCompany({id:staff.companyId});
+            if(deleteStaff["roleId"] == EStaffRole.OWNER){
+                throw {msg: "企业创建人不能被删除"};
+            }
+            if(staff["roleId"] == deleteStaff["roleId"]){
+                throw {msg: "不能删除同级用户"};
+            }
+        }
+        await deleteStaff.destroy();
+
+        let company = await Models.company.get(deleteStaff["companyId"]);
         var vals = {
-            name: staff.name || "",
+            name: deleteStaff.name || "",
             time: utils.now(),
             companyName: company.name
         }
-        return API.mail.sendMailRequest({
-                toEmails: acc.email,
-                templateName: "qm_notify_remove_staff",
-                values: vals
-            })
-            .then(function() {
-                if(num != 1){
-                    throw {code: -2, msg: '删除失败'};
-                }
+         /*return API.mail.sendMailRequest({
+                 toEmails: acc.email,
+                 templateName: "qm_notify_remove_staff",
+                 values: vals
+             })
+             .then(function() {
                 return true;
-            });
-    }
-
-    @clientExport
-    static async deleteStaff(params): Promise<any> {
-        let {accountId} = Zone.current.get("session");
-        let role = await API.auth.judgeRoleById({id:accountId});
-        if(role == EAccountType.STAFF){
-            let staff = await Models.staff.get(accountId);
-            if(this["accountId"] == params.id){
-                throw {msg: "不可删除自身信息"};
-            }
-            let target = await DBM.Staff.findById(params.id);
-            if(target.roleId == 0){
-                throw {msg: "企业创建人不能被删除"};
-            }
-            if(staff.roleId == target.roleId){
-                throw {msg: "不能删除统计用户"};
-            }
-            if(staff["companyId"]!= target["companyId"]){
-                throw L.ERR.PERMISSION_DENY();
-            }
-            return StaffModule.delete(params);
-        }else{
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-            if(result){
-                return StaffModule.delete(params);
-            }else{
-                throw {code: -1, msg: '无权限'};
-            }
-        }
+         });*/
+        return true;
 
     }
 
@@ -274,30 +237,52 @@ class StaffModule{
     }
 
     @clientExport
+    @conditionDecorator([
+        {if: condition.isSameCompany("0.id")},
+        {if: condition.isStaffsAgency("0.id")}
+    ])
     static async updateStaff(params) : Promise<Staff>{
-        let { accountId } = Zone.current.get("session");
-        let id = params.id;
-        let role = await API.auth.judgeRoleById({id:accountId});
+        let updateStaff = await Models.staff.get(params.id);
+        let staff = await Staff.getCurrent();
+        if(params.email && updateStaff["status"] != 0 && updateStaff.email != params.email){
+            throw {code: -2, msg: "该账号不允许修改邮箱"};
+        }
+        for(var key in params){
+            updateStaff[key] = params[key];
+        }
+        if(staff){
+            updateStaff.company = staff.company;
+        }
+        await updateStaff.save();
 
-        if(role == EAccountType.STAFF){
+        let tp = await Models.travelPolicy.get(updateStaff["travelPolicyId"]);
+        let defaultDept = await API.department.getDefaultDepartment({companyId: updateStaff["companyId"]});
 
-            let staff = await Models.staff.get(accountId);
-            let target = await Models.staff.get(id);
-
-            if(staff["companyId"] != target["companyId"] ){
-                throw L.ERR.PERMISSION_DENY();
-            }else{
-                return StaffModule.update(params)
+        if(updateStaff["status"] != 0){
+            //已激活账户
+            let vals  = {
+                username: updateStaff.name,
+                mobile: updateStaff.mobile,
+                travelPolicy: tp.name,
+                time: utils.now(),
+                companyName: updateStaff.company.name,
+                department: updateStaff.department ? updateStaff.department.name : defaultDept.name,
+                permission: updateStaff.roleId == EStaffRole.ADMIN ? "管理员" : (updateStaff.roleId == EStaffRole.OWNER ? "创建者" : "普通员工")
             }
-
-        }else{
-
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-            if(result){
-                return StaffModule.update(params)
-            }else{
-                throw {code: -1, msg: '无权限'};
-            }
+            return API.mail.sendMailRequest({
+                    toEmails: updateStaff.email,
+                    templateName: "staff_update_email",
+                    values: vals
+                })
+                .then(function(result) {
+                    return updateStaff;
+                });
+        }else if(updateStaff.status == 0){
+            //未激活账户 并且未通过修改邮箱更新账户信息发送激活邮件
+            return API.auth.sendResetPwdEmail({companyName: updateStaff.company.name, email: updateStaff.email, type: 1, isFirstSet: true})
+                .then(function() {
+                    return updateStaff;
+                });
         }
     }
 
@@ -307,6 +292,7 @@ class StaffModule{
      * @param data
      * @returns {*}
      */
+
     @requireParams(["id"], ["columns"])
     static get(params: {id: string, columns?: Array<string>}){
         var id = params.id;
@@ -324,31 +310,16 @@ class StaffModule{
     }
 
     @clientExport
+    @requireParams(["id"])
+    @conditionDecorator([
+        {if: condition.isSameCompany("0.id")},
+        {if: condition.isStaffsAgency("0.id")}
+    ])
     static async getStaff(params){
-        let { accountId } = Zone.current.get("session");
+
         let id = params.id;
-        let role = await API.auth.judgeRoleById({id:accountId});
-
-        if(role == EAccountType.STAFF){
-
-            let staff = await Models.staff.get(accountId);
-            let target = await Models.staff.get(id);
-
-            if(!staff || staff["companyId"] != target["companyId"] ){
-                throw L.ERR.PERMISSION_DENY();
-            }else{
-                // return {staff: new Staff(target)};
-                return target;
-            }
-        }else{
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-            if(result){
-                let instance = await DBM.Staff.findById(id);
-                return new Staff(instance);
-            }else{
-                throw {code: -1, msg: '无权限'};
-            }
-        }
+        let getObj = await Models.staff.get(id);
+        return getObj;
     }
 
 
@@ -359,6 +330,8 @@ class StaffModule{
      */
     @clientExport
     static async getStaffs(params){
+        let staff = await Staff.getCurrent();
+
         let { accountId } = Zone.current.get("session");
         var options : any = {};
         options.where = _.pick(params, Object.keys(DBM.Staff.attributes));
@@ -368,19 +341,20 @@ class StaffModule{
         if(params.columns){
             options.attributes = params.columns;
         }
-        let role = await API.auth.judgeRoleById({id:accountId});
+        if(params.order){
+            options.order = params.order || "createdAt desc";
+        }
 
-        if(role == EAccountType.STAFF){
-            let sf = await Models.staff.get(accountId);
-            params.companyId = sf["companyId"];
-            let staffs = await DBM.Staff.findAll(options);
+        if(staff){
+            params.companyId = staff["companyId"];
+            let staffs = await Models.staff.find(options);
             return staffs.map(function(s) {
                 return s.id;
             })
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
-                let staffs = await DBM.Staff.findAll(options);
+                let staffs = await Models.staff.find(options);
                 return staffs.map(function(s) {
                     return s.id;
                 })

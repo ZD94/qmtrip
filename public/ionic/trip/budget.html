@@ -1,4 +1,4 @@
-<ion-view title="预算结果页" id="page16">
+<ion-view title="预算结果" id="page16">
     <ion-content padding="true" class="has-header">
         <div id="page16-markdown4" style="color:#000000;text-align:right;">
             <p>{{trip.createAt| date: 'yyyy-MM-dd HH:mm:ss'}}</p>
@@ -23,7 +23,15 @@
                     <span ng-if='budget.itemType == "other" '>补助</span>
                     <span style="margin-left: 120px;">{{budget.price}}</span>元</ion-item>
                 <ion-item>
-                    {{trip.beginDate | date: 'yyyy-MM-dd'}}
+                    <span ng-if='budget.itemType == "goTraffic"'>{{trip.beginDate | date: 'yyyy-MM-dd'}}</span>
+                    <span ng-if='budget.itemType == "backTraffic"'>{{trip.endDate | date: 'yyyy-MM-dd'}}</span>
+                    <span ng-if='budget.itemType == "hotel"'>
+                        {{trip.beginDate | date: 'yyyy-MM-dd'}}至{{trip.endDate | date: 'yyyy-MM-dd'}}
+                    </span>
+                    <span ng-if='budget.itemType == "other"'>
+                        {{trip.beginDate | date: 'yyyy-MM-dd'}}至{{trip.endDate | date: 'yyyy-MM-dd'}}
+                    </span>
+
                     <br>
                     {{trip.fromPlace}}
                         &nbsp;
@@ -55,7 +63,7 @@
                 <!--<input type="text" placeholder="李晓辰">-->
             <!--</label>-->
         <!--</form>-->
-        <a href="#/trip/commited" id="page16-button56" class="button button-positive  button-block">提交预算</a>
+        <a ng-click="saveTripPlan()" id="page16-button56" class="button button-positive  button-block">提交预算</a>
         <a href="#/trip/create" id="page16-button58" class="button button-light  button-block button-outline">取消</a>
     </ion-content>
 </ion-view>

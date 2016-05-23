@@ -45,7 +45,7 @@ var Services = {
         funcs: ['getPointChange', 'getPointChanges']
     },
     company: { type: Company, modname: 'company',
-        funcs: ['getCompany', 'listCompany', 'createCompany', 'updateCompany', 'deleteCompany']
+        funcs: ['getCompany', 'listCompany', 'registerCompany', 'updateCompany', 'deleteCompany']
     },
     moneyChange: { type: MoneyChange, modname: 'company',
         funcs: ['getMoneyChange', 'listMoneyChange', 'saveMoneyChange']
@@ -72,7 +72,7 @@ var Services = {
         funcs: ['getTripPlanLog', 'getTripPlanLogs', 'saveTripPlanLog', 'updateTripPlanLog', 'deleteTripPlanLog']
     },
     project: { type: Project, modname: 'tripPlan',
-        funcs: ['getProjectById', 'getProjectList', 'createNewProject', null, 'deleteProject']
+        funcs: ['getProjectById', 'getProjectList', 'createNewProject']
     },
     place: { type: Place, modname: 'place',
         funcs: ['getCityInfo', 'queryPlace']
