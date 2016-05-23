@@ -12,11 +12,6 @@ var getRndStr = require('common/utils').getRndStr;
 var logger = new Logger('airplane');
 var cache = require("common/cache");
 
-cache.init({
-    redis_conf: "redis://localhost",
-    prefix: 'airticket'
-});
-
 var MAILING_PRICE = 15;
 var ERROR = {
     FLIGHT_EXPIRED: {code: 100, msg: '机票信息已经失效,请刷新后重试!'},

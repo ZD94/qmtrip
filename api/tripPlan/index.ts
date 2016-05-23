@@ -34,7 +34,9 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['deptCity', 'arrivalCity', 'startAt', 'title', 'budget'], ['backAt', 'remark', 'description', 'outTrip', 'backTrip', 'hotel'])
-    static async saveTripPlan(params) {
+    static async saveTripPlan(params: {deptCity: string, arrivalCity: string, startAt: string, title: string, budget: number,
+        backAt?: string, remark?: string, description?: string, outTrip?: any, backTrip?: any, hotel?: any}) {
+        console.info("PARMAS===>", params);
         let {accountId} = Zone.current.get('session');
         console.info("***************");
         console.info(accountId);
@@ -124,6 +126,7 @@ class TripPlanModule {
      * @param params
      * @returns {*}
      */
+    @clientExport
     @requireParams(['id'], ['columns'])
     static async getTripPlan(params) {
         let tripPlanId = params.id;
