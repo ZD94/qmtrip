@@ -1,11 +1,13 @@
-<ion-view title="城市选择" id="page14">
+<ion-modal-view title="城市选择">
     <ion-content padding="true" class="has-header">
         <form class="list">
             <label class="item item-input">
                 <i class="icon ion-search placeholder-icon"></i>
                 <input ng-model="form.keyword" type="search" placeholder="请输入城市名或首字母缩写">
             </label>
-            <ion-radio ng-repeat="place in places track by place.id">{{place.name}}</ion-radio>
+            <ion-radio ng-repeat="option in options" ng-model="form.selected" ng-value="option" ng-click="confirmModal()">
+                {{option}}
+            </ion-radio>
         </form>
     </ion-content>
-</ion-view>
+</ion-modal-view>

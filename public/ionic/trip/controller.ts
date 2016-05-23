@@ -4,6 +4,7 @@ import moment = require('moment');
 var API = require("common/api");
 var Cookie = require('tiny-cookie');
 import { Staff } from 'api/_types/staff';
+import { Models } from '../../../api/_types/index';
 
 
 var defaultTrip = {
@@ -65,9 +66,15 @@ export function CreateController($scope, $storage){
         }
     }
 
-    $scope.selectPlace = function(){
-        window.location.href = "#/trip/city-selector";
+    $scope.queryPlaces = async function(keyword){
+        var places = await API.place.queryPlace({keyword: keyword});
+        return places.map((place)=>place.name);
+    }
 
+    $scope.queryProject = async function(keyword){
+        var staff = await Staff.getCurrent();
+        var projects = await Models.project.find({where:{companyId: staff.company.id}});
+        return projects.map((project)=>project.name);
     }
 
     $scope.nextStep = async function() {
@@ -155,20 +162,6 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
             alert(err.msg || err);
         })
     }
-}
-
-export async function CitySelectorController($scope){
-    $scope.places = [];
-    var form: any = $scope.form = {};
-    form.keyword = '';
-    $scope.loadPlaces = async function(){
-        var places = await API.place.queryPlace({keyword: form.keyword});
-        $scope.places = places;
-    }
-    $scope.$watch('form.keyword', function(){
-        $scope.loadPlaces();
-    })
-    await $scope.loadPlaces();
 }
 
 export async function CommittedController($scope, $stateParams, Models){
