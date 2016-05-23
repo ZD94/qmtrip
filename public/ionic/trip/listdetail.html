@@ -3,11 +3,6 @@
         <div id="page20-markdown7" style="color:#000000;text-align:right;">
             <p>{{tripDetail.createdAt | date: 'yyyy-MM-dd HH:mm'}}</p>
         </div>
-        <!--<input type="file" value="test" class="button botton-positive">-->
-        <!--<input nv-file-select="" uploader="uploader" type="file" style="width:100%;height:100%;position:absolute;left:0;top:0;" accept="image/*" options="{title:outtraffic_up,done:budget.done}">-->
-        <div class="uploadbtns botton-positive" ng-uploader accept="image/*" title="outtraffic_up" done="budget.done">
-            上传票据
-        </div>
         <ion-list>
             <ion-item>出差事由<span style="float: right;">{{tripDetail.title}}</span></ion-item>
         </ion-list>
@@ -19,56 +14,156 @@
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <div class="button-bar"></div>
         <ion-list>
-            <div ng-repeat="budget in budgets">
+            <div>
                 <ion-item class="item-divider">
-                    <span ng-if='budget.itemType == "goTraffic"'>去程交通</span>
-                    <span ng-if='budget.itemType == "backTraffic"'>回程交通</span>
-                    <span ng-if='budget.itemType == "hotel"'>住宿</span>
-                    <span ng-if='budget.itemType == "other" '>其他补助</span>
-                    <span style="margin-left: 120px;">{{budget.price}}</span>元
+                    <span>去程交通</span>
+                    <span style="margin-left: 120px;">{{goTraffic.price}}</span>元
                 </ion-item>
                 <ion-item>
-                    <span ng-if='budget.itemType == "goTraffic"'>{{tripDetail.startAt | date: 'yyyy-MM-dd'}}</span>
-                    <span ng-if='budget.itemType == "backTraffic"'>{{tripDetail.backAt | date: 'yyyy-MM-dd'}}</span>
-                    <span ng-if='budget.itemType == "hotel"'>
-                        {{tripDetail.startAt | date: 'yyyy-MM-dd'}}至{{tripDetail.backAt | date: 'yyyy-MM-dd'}}
-                    </span>
-                    <span ng-if='budget.itemType == "other"'>
-                        {{tripDetail.startAt | date: 'yyyy-MM-dd'}}至{{tripDetail.backAt | date: 'yyyy-MM-dd'}}
-                    </span>
+                    <span>{{tripDetail.startAt | date: 'yyyy-MM-dd'}}</span>
                     <br>
                     {{tripDetail.deptCity}}
                     &nbsp;
-                    <i ng-if='budget.type == "air"' class="icon ion-plane"></i>
-                    <i ng-if='budget.type == "train"' class="icon ion-android-train"></i>
-                    <i ng-if='budget.type == "hotel"' class="icon ion-home"></i>
-                    <i ng-if='budget.type == "other"'>-</i>
+                    <i ng-if='goTraffic.type == "air"' class="icon ion-plane"></i>
+                    <i ng-if='goTraffic.type == "train"' class="icon ion-android-train"></i>
+                    <i ng-if='goTraffic.type == "hotel"' class="icon ion-home"></i>
+                    <i ng-if='goTraffic.type == "other"'>-</i>
                     &nbsp;
                     {{tripDetail.arrivalCity}}
-                    <br>{{budget.price}}元
+                    <br>{{goTraffic.price}}元
                 </ion-item>
                 <div class="item item-divider">
-                    <div class="botton-positive" ng-uploader accept="image/*" title="budget.title" done="budget.done">
+                    <div ng-if="!goTrafficStatus" class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="budget.title" done="goTraffic.done">
                         上传票据
                     </div>
-                    <!--<div class="" ng-uploader accept="image/*" title="outtraffic_up" done="outtraffic_done"-->
-                         <!--ng-if="-->
-                        <!--ITEM.outTraffic[0].orderStatus==='WAIT_COMMIT'||-->
-                        <!--ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS'">-->
-                        <!--重新上传-->
-                    <!--</div>-->
-                    <a class="" ng-if="
-                        ITEM.outTraffic[0].orderStatus==='WAIT_COMMIT'||
-                        ITEM.outTraffic[0].orderStatus==='WAIT_AUDIT'||
-                        ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS'||
-                        ITEM.outTraffic[0].orderStatus==='AUDIT_PASS'  " ng-click="checkInvoice( 'outTraffic' )">查看票据</a>
-                    <span>{{tripDetail.status}}</span>
+                    <!--<a ng-if="goTrafficStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>-->
+                    <span class="item-note">{{statustext[goTraffic.status]}}</span>
                 </div>
             </div>
-
+            <div>
+                <ion-item class="item-divider">
+                    <span>去程交通</span>
+                    <span style="margin-left: 120px;">{{backTraffic.price}}</span>元
+                </ion-item>
+                <ion-item>
+                    <span>{{tripDetail.startAt | date: 'yyyy-MM-dd'}}</span>
+                    <br>
+                    {{tripDetail.deptCity}}
+                    &nbsp;
+                    <i ng-if='backTraffic.type == "air"' class="icon ion-plane"></i>
+                    <i ng-if='backTraffic.type == "train"' class="icon ion-android-train"></i>
+                    <i ng-if='backTraffic.type == "hotel"' class="icon ion-home"></i>
+                    <i ng-if='backTraffic.type == "other"'>-</i>
+                    &nbsp;
+                    {{tripDetail.arrivalCity}}
+                    <br>{{backTraffic.price}}元
+                </ion-item>
+                <div class="item item-divider">
+                    <div ng-if="!backTrafficStatus" class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="budget.title" done="backTraffic.done">
+                        上传票据
+                    </div>
+                    <!--<a ng-if="backTrafficStatus" class="" ng-click="checkInvoice( 'backTraffic' )">查看票据</a>-->
+                    <span class="item-note">{{statustext[backTraffic.status]}}</span>
+                </div>
+            </div>
+            <div>
+                <ion-item class="item-divider">
+                    <span>去程交通</span>
+                    <span style="margin-left: 120px;">{{hotel.price}}</span>元
+                </ion-item>
+                <ion-item>
+                    <span ng-if='hotel.itemType == "goTraffic"'>{{tripDetail.startAt | date: 'yyyy-MM-dd'}}</span>
+                    <br>
+                    {{tripDetail.deptCity}}
+                    &nbsp;
+                    <i ng-if='hotel.type == "air"' class="icon ion-plane"></i>
+                    <i ng-if='hotel.type == "train"' class="icon ion-android-train"></i>
+                    <i ng-if='hotel.type == "hotel"' class="icon ion-home"></i>
+                    <i ng-if='hotel.type == "other"'>-</i>
+                    &nbsp;
+                    {{tripDetail.arrivalCity}}
+                    <br>{{hotel.price}}元
+                </ion-item>
+                <div class="item item-divider">
+                    <div ng-if="!hotelStatus" class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="hotel.title" done="hotel.done">
+                        上传票据
+                    </div>
+                    <!--<a ng-if="hotelStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>-->
+                    <span class="item-note">{{statustext[hotel.status]}}</span>
+                </div>
+            </div>
+            <div ng-if='other'>
+                <ion-item class="item-divider">
+                    <span>去程交通</span>
+                    <span style="margin-left: 120px;">{{other.price}}</span>元
+                </ion-item>
+                <ion-item>
+                    <span>{{tripDetail.startAt | date: 'yyyy-MM-dd'}}</span>
+                    <br>
+                    {{tripDetail.deptCity}}
+                    &nbsp;
+                    <i ng-if='other.type == "air"' class="icon ion-plane"></i>
+                    <i ng-if='other.type == "train"' class="icon ion-android-train"></i>
+                    <i ng-if='other.type == "hotel"' class="icon ion-home"></i>
+                    <i ng-if='other.type == "other"'>-</i>
+                    &nbsp;
+                    {{tripDetail.arrivalCity}}
+                    <br>{{other.price}}元
+                </ion-item>
+                <div class="item item-divider">
+                    <div ng-if="!otherStatus" class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="other.title" done="other.done">
+                        上传票据
+                    </div>
+                    <!--<a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>-->
+                    <span class="item-note">{{statustext[other.status]}}</span>
+                </div>
+            </div>
         </ion-list>
+        <!--<ion-list>-->
+            <!--<div ng-repeat="budget in budgets">-->
+                <!--<ion-item class="item-divider">-->
+                    <!--<span ng-if='budget.itemType == "goTraffic"'>去程交通</span>-->
+                    <!--<span ng-if='budget.itemType == "backTraffic"'>回程交通</span>-->
+                    <!--<span ng-if='budget.itemType == "hotel"'>住宿</span>-->
+                    <!--<span ng-if='budget.itemType == "other" '>其他补助</span>-->
+                    <!--<span style="margin-left: 120px;">{{budget.price}}</span>元-->
+                <!--</ion-item>-->
+                <!--<ion-item>-->
+                    <!--<span ng-if='budget.itemType == "goTraffic"'>{{tripDetail.startAt | date: 'yyyy-MM-dd'}}</span>-->
+                    <!--<span ng-if='budget.itemType == "backTraffic"'>{{tripDetail.backAt | date: 'yyyy-MM-dd'}}</span>-->
+                    <!--<span ng-if='budget.itemType == "hotel"'>-->
+                        <!--{{tripDetail.startAt | date: 'yyyy-MM-dd'}}至{{tripDetail.backAt | date: 'yyyy-MM-dd'}}-->
+                    <!--</span>-->
+                    <!--<span ng-if='budget.itemType == "other"'>-->
+                        <!--{{tripDetail.startAt | date: 'yyyy-MM-dd'}}至{{tripDetail.backAt | date: 'yyyy-MM-dd'}}-->
+                    <!--</span>-->
+                    <!--<br>-->
+                    <!--{{tripDetail.deptCity}}-->
+                    <!--&nbsp;-->
+                    <!--<i ng-if='budget.type == "air"' class="icon ion-plane"></i>-->
+                    <!--<i ng-if='budget.type == "train"' class="icon ion-android-train"></i>-->
+                    <!--<i ng-if='budget.type == "hotel"' class="icon ion-home"></i>-->
+                    <!--<i ng-if='budget.type == "other"'>-</i>-->
+                    <!--&nbsp;-->
+                    <!--{{tripDetail.arrivalCity}}-->
+                    <!--<br>{{budget.price}}元-->
+                <!--</ion-item>-->
+                <!--<div class="item item-divider">-->
+                    <!--{{budget.title}}-->
+                    <!--<div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="budget.title" done="budget.done">-->
+                        <!--我是谁-->
+                    <!--</div>-->
+                    <!--<a class="" ng-if="-->
+                        <!--ITEM.outTraffic[0].orderStatus==='WAIT_COMMIT'||-->
+                        <!--ITEM.outTraffic[0].orderStatus==='WAIT_AUDIT'||-->
+                        <!--ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS'||-->
+                        <!--ITEM.outTraffic[0].orderStatus==='AUDIT_PASS'  " ng-click="checkInvoice( 'outTraffic' )">查看票据</a>-->
+                    <!--<span class="item-note">{{tripDetail.status}}</span>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</ion-list>-->
         <div class="button-bar"></div>
         <div class="button-bar"></div>
-        <a href="#/trip/list" id="page20-button60" class="button button-stable  button-block">提交审核</a>
+        <a ng-click="approveTripPlan()" id="page20-button60" class="button button-stable  button-block">提交审核</a>
     </ion-content>
 </ion-view>
