@@ -4,6 +4,7 @@
  *  权限模块
  */
 "use strict";
+import { EAccountType, Models } from '../_types/index';
 
 var API = require("common/api");
 var L = require("common/language");
@@ -109,23 +110,16 @@ updateRole(agency_roles);
  * @param {Object} data
  * @param {UUID} data.accountId 账号ID
  */
-function getRoleOfAccount(data) : Promise<Role>{
+async function getRoleOfAccount(data) : Promise<Role>{
     var accountId = data.accountId;
     var s: any = {}
-    return API.staff.getStaff({id:data.accountId})
-        .then(function(staff) {
-            s = staff;
-            return API.company.getCompany({id: staff.companyId});
-        })
-        .then(function(company) {
-            if (company.createUser == accountId) {
-                return new Role(roles.owner);
-            }else if(s.roleId == ROLE_ID.ADMIN){
-                return new Role(roles.admin);
-            }else{
-                return new Role(roles.staff);
-            }
-        });
+    var staff = await Models.staff.get(accountId);
+    if (staff.company.createUser == accountId) {
+        return new Role(roles.owner);
+    }else if(s.roleId == ROLE_ID.ADMIN){
+        return new Role(roles.admin);
+    }
+    return new Role(roles.staff);
 }
 
 /**
@@ -134,23 +128,16 @@ function getRoleOfAccount(data) : Promise<Role>{
  * @param {Object}    params
  * @param {uuid}      params.accountId
  */
-function getRoleOfAgency(params){
+async function getRoleOfAgency(params){
     var accountId = params.accountId;
     var u: any = {};
-    return API.agency.getAgencyUser({id: accountId, columns: ['agencyId']})
-        .then(function(user){
-            u = user;
-            return API.agency.getAgency({agencyId: u.agencyId, userId: accountId})
-        })
-        .then(function(agency){
-            if(agency.createUser == accountId){
-                return agency_roles.admin;
-            }else if(u.roleId == ROLE_ID.ADMIN){
-                return agency_roles.admin;
-            }else{
-                return agency_roles.staff;
-            }
-        })
+    var user = await Models.agencyUser.get(accountId);
+    if(user.agency.createUser == accountId){
+        return agency_roles.admin;
+    }else if(u.roleId == ROLE_ID.ADMIN){
+        return agency_roles.admin;
+    }
+    return agency_roles.staff;
 }
 
 function getRoleList(roles){
@@ -183,41 +170,31 @@ export function listRoles( params, callback) {
  * @param {String} params.permission 要检查的权限
  * @param {String} params.type 权限所属 1.企业 2.代理商 默认 1.企业
  */
-export function checkPermission(params) {
+export async function checkPermission(params): Promise<boolean> {
     var accountId = params.accountId;
     var permissions = params.permission;
 
     if (!permissions || !permissions.length) {
-        return Promise.resolve(true);
+        return true;
     }
 
     if (typeof permissions == 'string') {
         permissions = [permissions];
     }
-    var type = params.type || 1;
+    var type = params.type || EAccountType.STAFF;
     //如果要验证代理商权限,直接返回True
     //todo 实现代理商权限认证
-    if (type == 2) {
-        return getRoleOfAgency({accountId: accountId})
-            .then(function(role){
-                if(role == undefined)
-                    throw L.ERR.NOT_FOUND();
-                for(var p of permissions){
-                    if(role.permission[p] != true)
-                        throw L.ERR.PERMISSION_DENY();
-                }
-                return true;
-            });
+    var role;
+    if (type == EAccountType.AGENCY) {
+        role = await getRoleOfAgency({accountId: accountId});
+    } else {
+        role = await getRoleOfAccount({accountId: accountId});
     }
-
-    return getRoleOfAccount({accountId: accountId})
-        .then(function(role){
-            if(role == undefined)
-                throw L.ERR.NOT_FOUND();
-            for(var p of permissions){
-                if(role.permission.indexOf(p) < 0)
-                    throw L.ERR.PERMISSION_DENY();
-            }
-            return true;
-        });
+    if(role == undefined)
+        throw L.ERR.NOT_FOUND();
+    for(var p of permissions){
+        if(role.permission[p] != true)
+            throw L.ERR.PERMISSION_DENY();
+    }
+    return true;
 };

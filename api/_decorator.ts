@@ -13,16 +13,14 @@ export function requirePermit(permits: string| string[], type?: number) {
     return function (target, key, desc) {
         let fn = desc.value;
         desc.value = async function (...args) {
-            let accountId = _getAccountId();
-            let ret;
-            try {
-                ret = await API.permit.checkPermission({accountId: accountId, permissions: permits, type: type});
-            } catch(err) {
-            }
+            let context = Zone.current.get('context');
+            let session = getSession();
+            let account = Models.account.get(session.accountId);
+            if(!account)
+                throw L.ERR.PERMISSION_DENIED();
 
-            if (!ret) {
-                throw L.ERR.PERMISSION_DENIED()
-            }
+            await API.permit.checkPermission({accountId: session.accountId, permissions: permits, type: account.type});
+
             return fn.apply(this, args)
         }
         return desc;
@@ -155,9 +153,9 @@ export function conditionDecorator(checkFnList: CheckInterface[]) {
 export var condition = {
     isMySelf: function (idpath: string) {
         return async function (fn, self, args) {
+            let session = getSession();
             let id = _.get(args, idpath);
-            let accountId = _getAccountId();
-            return id && accountId && id == accountId;
+            return id && session.accountId && id == session.accountId;
         }
     },
     isMyCompany: function (idpath: string) {
@@ -205,9 +203,4 @@ export var condition = {
             return id && user && company && user["agencyId"] == company["agencyId"];
         }
     }
-}
-
-function _getAccountId() {
-    let session = getSession();
-    return session["accountId"];
 }
