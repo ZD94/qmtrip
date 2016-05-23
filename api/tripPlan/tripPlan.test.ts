@@ -8,6 +8,7 @@ import assert = require("assert");
 import {Models} from 'api/_types';
 import {getSession} from 'common/model';
 import {EInvoiceType, ETripType} from 'api/_types/tripPlan'
+import async = Q.async;
 
 var agencyId = "";
 var agencyUserId = "";
@@ -15,34 +16,42 @@ var companyId = "";
 var staffId = "";
 var tripPlanId = "";
 var tripDetailId = '';
+let tripPlanIds = [];
 
 describe("api/tripPlan", function() {
+    var agencyDefault = {email: "tripPlanAgency.test@jingli.tech", userName: "白菜帮九袋长老", name: '白菜帮', mobile: "15269866803", title: '计划单测试用代理商'};
+    var companyDefault = {email: "tripPlanCompany.test@jingli.tech", userName: "白菜帮九袋长老", name: '白菜帮', mobile: "15269866803", title: '计划单测试用企业'};
 
+    async function deleteTripPlanByTest() {
+        let companies = await Models.company.find({where: {email: {$like: '%.test@jingli.tech'}}, paranoid: false});
+        console.info(companies);
+        await Promise.all(companies.map(async function (c) {
+            let staffs = await Models.staff.find({where: {companyId: c.id}, paranoid: false});
+            await Promise.all(staffs.map(async function (s) {
+                let plans = await Models.tripPlan.find({where: {accountId: s.id}, paranoid: false});
+                await Promise.all(plans.map(p=>p.destroy({force: true})));
+                await s.destroy({force: true});
+            }));
+            let a = await c.getAgency();
+            await Promise.all([a.destroy({force: true}), c.destroy({force: true})]);
+        }));
+    }
 
-
-    var agency = {email: "tripPlan.test@jingli.tech", userName: "白菜帮九袋长老", name: '白菜帮', mobile: "15269866803", title: '计划单测试用代理商'};
-    var company = {email: "tripPlan.test@jingli.tech", userName: "白菜帮九袋长老", name: '白菜帮', mobile: "15269866803", domain: 'jingli.tech', title: '计划单测试用企业'};
 
     before(function(done){
-        Promise.all([
-            API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
-            API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
-            API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})
-        ])
-            .spread(function(ret1, ret2, ret3){
-                return API.client.agency.registerAgency(agency);
+        deleteTripPlanByTest()
+            .then(function(){
+                return API.agency.registerAgency(agencyDefault);
             })
-            .then(function(ret: any){
-                ret = ret.target;
-                agencyId = ret.id;
-                agencyUserId = ret.createUser;
+            .then(function(agency){
+                agencyId = agency.id;
+                agencyUserId = agency.createUser;
                 var session = getSession();
                 session.accountId = agencyUserId;
                 session.tokenId = 'tokenId';
-                return API.company.registerCompany( company);
+                return API.company.registerCompany(companyDefault);
             })
             .then(function(company){
-                company = company.target;
                 companyId = company.id;
                 staffId = company.createUser;
 
@@ -50,29 +59,13 @@ describe("api/tripPlan", function() {
                 var session = getSession();
                 session.accountId = staffId;
                 session.tokenId = 'tokenId';
-                done();
             })
-            .catch(function(err){
-                console.error(err);
-                throw err;
-            })
-            .done();
-    })
-
+            .nodeify(done);
+    });
 
     after(function(done) {
-        Promise.all([
-            API.agency.deleteAgencyByTest({email: agency.email}),
-            API.company.deleteCompanyByTest({email: company.email}),
-            API.staff.deleteAllStaffByTest({email: company.email})
-        ])
-            .spread(function(ret1, ret2, ret3){
-                done()
-            })
-            .catch(function(err){
-                throw err;
-            })
-            .done();
+        deleteTripPlanByTest()
+            .nodeify(done);
     });
 
     describe("editTripPlanBudget", function(){
@@ -151,15 +144,6 @@ describe("api/tripPlan", function() {
     });
 
     describe("saveTripPlan", function(){
-        after(function(done){
-            API.tripPlan.deleteTripPlan({tripPlanId: tripPlanId, userId: staffId}, function(err, ret){
-                if(err){
-                    throw err;
-                }
-                done();
-            })
-        })
-
         it("#saveTripPlan should be ok", function(done){
             var tripPlanOrder = {
                 deptCity: '北京',

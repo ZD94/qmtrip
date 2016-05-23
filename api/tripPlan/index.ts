@@ -550,6 +550,9 @@ class TripPlanModule {
         let tripPlan = tripDetail.tripPlan;
 
         let invoiceJson: any[] = tripDetail.invoice;
+        if(typeof invoiceJson == 'string') {
+            invoiceJson = JSON.parse(invoiceJson);
+        }
         let times = invoiceJson.length ? invoiceJson.length + 1 : 1;
         invoiceJson.push({times: times, pictureFileId: params.pictureFileId, created_at: utils.now(), status: EPlanStatus.WAIT_COMMIT, remark: '', approve_at: ''});
 
