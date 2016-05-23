@@ -283,7 +283,6 @@ class StaffModule{
                 .then(function() {
                     return updateStaff;
                 });
-            return updateStaff;
         }
     }
 
