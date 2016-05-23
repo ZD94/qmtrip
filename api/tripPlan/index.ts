@@ -192,6 +192,7 @@ class TripPlanModule {
     }
 
     @requireParams(['tripDetailId'], ['columns'])
+    @clientExport
     static async getTripDetail(params) {
         let options:any = {};
 
