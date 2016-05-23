@@ -134,7 +134,7 @@ describe("api/staff.js", function() {
     })
 
 
-    /*describe("agency/staffHandel", function() {
+    describe("agency/staffHandel", function() {
         before(function(done) {
             Q.all([
                     API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile, name: agency.name}),
@@ -207,7 +207,6 @@ describe("api/staff.js", function() {
         it("#AgencyUpdateStaff should be ok", function(done) {
             updateobj.id = id;
             updateobj.companyId = companyId;
-            console.info("updateobj:",updateobj);
             API.staff.updateStaff(updateobj, done);
         })
         //通过id得到员工
@@ -220,6 +219,6 @@ describe("api/staff.js", function() {
             API.staff.deleteStaff({id: id, companyId: companyId}, done);
         })
 
-    })*/
+    })
 
 })
