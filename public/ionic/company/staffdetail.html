@@ -21,10 +21,10 @@
             </label>
             <label class="item item-select">
                 <span class="input-label">差旅标准</span>
-                <select ng-model="staff.travelPolicyId" ng-options="policy as policy.name for policy in travelpolicylist track by policy.id">
+                <select ng-model="staff.travelPolicyId" ng-options="policy.id as policy.name for policy in travelpolicylist">
                 </select>
             </label>
-            <ion-toggle toggle-class="toggle-positive" ng-checked="role.id" ng-model="role.id">管理员权限</ion-toggle>
+            <ion-toggle toggle-class="toggle-positive" ng-checked="role.id" ng-model="role.id" ng-if="staff.roleId != '0'">管理员权限</ion-toggle>
         </form>
         <a ng-click="savestaff()" id="page28-button85" class="button button-positive  button-block">保存</a>
         <button id="page28-button86" class="button button-stable  button-block" ng-click="showrole()">取消</button>
