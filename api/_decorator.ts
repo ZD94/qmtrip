@@ -234,6 +234,7 @@ export var condition = {
             
             let account = await Models.account.get(session.accountId);
             let tripPlan = await Models.tripPlan.get(id);
+            
         }
     }
 }
