@@ -65,6 +65,11 @@ export function CreateController($scope, $storage){
         }
     }
 
+    $scope.selectPlace = function(){
+        window.location.href = "#/trip/city-selector";
+
+    }
+
     $scope.nextStep = async function() {
         API.require("travelBudget");
         await API.onload();
@@ -128,8 +133,18 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
     $scope.budgets = budgets;
 }
 
-export function CitySelectorController($scope){
-
+export async function CitySelectorController($scope){
+    $scope.places = [];
+    var form: any = $scope.form = {};
+    form.keyword = '';
+    $scope.loadPlaces = async function(){
+        var places = await API.place.queryPlace({keyword: form.keyword});
+        $scope.places = places;
+    }
+    $scope.$watch('form.keyword', function(){
+        $scope.loadPlaces();
+    })
+    await $scope.loadPlaces();
 }
 
 export function CommitedController($scope){
