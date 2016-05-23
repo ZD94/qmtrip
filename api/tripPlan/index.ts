@@ -72,7 +72,7 @@ class TripPlanModule {
         let tripPlan = new TripPlan(await DBM.TripPlan.create(_tripPlan));
 
         await Promise.all(params.budgets.map(async function (detail) {
-            let _detail: any = detail;
+            let _detail: any = JSON.parse(JSON.stringify(detail));
             switch(detail.itemType) {
                 case 'goTraffic': 
                     _detail.type = ETripType.OUT_TRIP;
@@ -98,11 +98,14 @@ class TripPlanModule {
                 case 'air':
                     _detail.invoiceType = EInvoiceType.PLANE;
                     break;
+                default:
+                    _detail.invoiceType = EInvoiceType.OTHER;
             }
             _detail.tripPlanId = tripPlanId;
             _detail.accountId = accountId;
             _detail.status = 0;
             _detail.budget = Number(_detail.price);
+            console.info(_detail);
             let tripDetail = await DBM.TripDetail.create(_detail);
         }));
 
@@ -1149,7 +1152,7 @@ class TripPlanModule {
      */
     @clientExport
     static getTripPlanDetails(params) {
-        return DBM.TripDetail.findAll({where: params.tripPlanId})
+        return DBM.TripDetail.findAll({where: {tripPlanId: params.tripPlanId}})
     }
 
 

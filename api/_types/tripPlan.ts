@@ -26,7 +26,8 @@ export enum ETripType {
 export enum EInvoiceType {
     TRAIN = 0,
     PLANE = 1,
-    HOTEL = 2
+    HOTEL = 2,
+    OTHER = 3,
 }
 
 @Table(Models.project, 'tripPlan.')
