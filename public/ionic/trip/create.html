@@ -3,19 +3,19 @@
         <form class="list">
             <label class="item item-input">
                 <span class="input-label">出差日期</span>
-                <input type="date" placeholder="" ng-model="tripdef.beginDate">
+                <input type="date" placeholder="" ng-model="trip.beginDate">
             </label>
             <label class="item item-input">
                 <span class="input-label">结束日期</span>
-                <input type="date" placeholder="" ng-model="tripdef.endDate">
+                <input type="date" placeholder="" ng-model="trip.endDate">
             </label>
             <label class="item item-input">
                 <span class="input-label">出差地点</span>
-                <input type="text" placeholder="武汉" ng-model="tripdef.place">
+                <input type="text" placeholder="武汉" ng-model="trip.place">
             </label>
             <label class="item item-select">
                 <span class="input-label">出差事由</span>
-                <select ng-model="tripdef.reason">
+                <select ng-model="trip.reason">
                     <option>武汉项目</option>
                     <option>南京项目</option>
                     <option>上海项目</option>
@@ -23,17 +23,17 @@
                 </select>
             </label>
             <div class="spacer" style="width: 300px; height: 9px;"></div>
-            <ion-toggle toggle-class="toggle-positive" ng-model="tripdef.traffic">交通</ion-toggle>
-            <div ng-if="tripdef.traffic">
-                <label class="item item-input" ng-if="tripdef.traffic">
+            <ion-toggle toggle-class="toggle-positive" ng-model="trip.traffic">交通</ion-toggle>
+            <div ng-if="trip.traffic">
+                <label class="item item-input" ng-if="trip.traffic">
                     <span class="input-label">出发地</span>
-                    <input type="text" placeholder="北京" ng-model="tripdef.fromPlace">
+                    <input type="text" placeholder="北京" ng-model="trip.fromPlace">
                 </label>
-                <ion-toggle toggle-class="toggle-positive" ng-model="tripdef.round">返程</ion-toggle>
+                <ion-toggle toggle-class="toggle-positive" ng-model="trip.round">返程</ion-toggle>
             </div>
             <div class="spacer" style="width: 300px; height: 9px;"></div>
-            <ion-toggle toggle-class="toggle-positive" ng-model="tripdef.hotel">住宿</ion-toggle>
-            <div ng-if="tripdef.hotel">
+            <ion-toggle toggle-class="toggle-positive" ng-model="trip.hotel">住宿</ion-toggle>
+            <div ng-if="trip.hotel">
                 <div class="button-bar">
                     <button id="page6-button34" class="button button-light button-small button-block" ng-click="decTripDuration()">-</button>
                     <button id="page6-button35" class="button button-stable button-block">{{calcTripDuration()}}</button>
@@ -41,7 +41,7 @@
                 </div>
                 <label class="item item-input">
                     <span class="input-label">地标</span>
-                    <input type="text" placeholder="选填" ng-model="tripdef.hotelPlace">
+                    <input type="text" placeholder="选填" ng-model="trip.hotelPlace">
                 </label>
             </div>
             <div>
