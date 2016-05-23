@@ -36,6 +36,8 @@ class TripPlanModule {
     @requireParams(['deptCity', 'arrivalCity', 'startAt', 'title', 'budget'], ['backAt', 'remark', 'description', 'outTrip', 'backTrip', 'hotel'])
     static async saveTripPlan(params) {
         let {accountId} = Zone.current.get('session');
+        console.info("***************");
+        console.info(accountId);
         let staff = await Models.staff.get(accountId);
         let email = staff.email;
         let staffName = staff.name;
@@ -372,19 +374,9 @@ class TripPlanModule {
      * @param params
      * @returns {*}
      */
-    static async listTripPlans(options) {
-        let query = options.where;
-
-        if (!options.order) {
-            options.order = [['start_at', 'desc'], ['created_at', 'desc']]; //默认排序，创建时间
-        }
-
-        let {rows: tripPlans, count} = await DBM.TripPlan.findAndCount(options);
-        
-        if (!tripPlans || tripPlans.length === 0) {
-            return [];
-        }
-
+    @clientExport
+    static async listTripPlans(params): Promise<string[]> {
+        let tripPlans = await Models.tripPlan.find(params);
         return tripPlans.map(function (plan) {
             return plan.id;
         });
@@ -392,7 +384,6 @@ class TripPlanModule {
 
 
     @requireParams(['where'])
-
     static findOrdersByOption(options) {
         return DBM.TripPlan.findAll(options);
     }

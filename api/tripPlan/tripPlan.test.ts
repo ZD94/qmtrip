@@ -187,7 +187,19 @@ describe("api/tripPlan", function() {
                     assert.equal(err, null);
                 })
                 .nodeify(done);
-        })
+        });
+
+        it("#listTripPlans should be ok", function (done) {
+            API.tripPlan.listTripPlans({})
+                .then(function(ret) {
+                    console.info(ret);
+                    tripPlanId = ret[0];
+                })
+                .catch(function(err) {
+                    assert.equal(err, null);
+                })
+                .nodeify(done)
+        });
     });
 
     // it("#saveTripPlan should be error when budget is not number", function(done){
@@ -282,6 +294,9 @@ describe("deleteTripPlan", function(){
 describe("options based on tripPlanOrder created", function() {
     var newplanId = "";
     var consumeId = "";
+    var session = getSession();
+    session.accountId = staffId;
+    session.tokenId = 'tokenId';
     var _tripPlanOrder = {
         deptCity: '北京',
         arrivalCity: '上海',
@@ -374,15 +389,7 @@ describe("options based on tripPlanOrder created", function() {
             });
     });
 
-    it("#pageCompleteTripPlans should be ok", function (done) {
-        var self = {accountId: staffId};
-        API.tripPlan.pageCompleteTripPlans({page: 1}, function (err, ret) {
-            assert.equal(err, null);
-            assert.equal(ret.page, 1);
-            assert.equal(ret.perPage, 10);
-            done();
-        })
-    });
+
 
     it("#pageTripPlans should be ok", function (done) {
         var self = {accountId: staffId};
