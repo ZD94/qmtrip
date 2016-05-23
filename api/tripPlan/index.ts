@@ -190,6 +190,7 @@ class TripPlanModule {
     }
 
     @requireParams(['tripDetailId'], ['columns'])
+    @clientExport
     static async getTripDetail(params) {
         let options:any = {};
 
@@ -203,7 +204,7 @@ class TripPlanModule {
             throw {code: -2, msg: '消费记录不存在'};
         }
 
-        return new TripDetail(detail);
+        return detail;
     }
 
     /**
