@@ -348,8 +348,7 @@ class AgencyModule {
             let myZome = Zone.current.fork({name: 'updateCompany', properties: {session: {accountId: agencyId, tokenId: 'tokenId'}}});
 
             Agency.__defaultAgencyId = agencyId;
-            logger.warn(Agency.__defaultAgencyId);
-            // let companies = await API.company.listCompany({agencyId: null});
+            
             let companies = await API.company.getCompanyNoAgency();
 
             if(!companies || companies.length <= 0) {

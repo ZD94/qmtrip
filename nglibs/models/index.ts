@@ -66,7 +66,7 @@ var Services = {
         funcs: ['getTripPlan', 'listTripPlans', 'saveTripPlan', 'updateTripPlan', 'deleteTripPlan']
     },
     tripDetail: { type: TripDetail, modname: 'tripPlan',
-        funcs: ['getTripDetail', 'getTripPlanDetails', 'saveTripDetail', 'updateTripDetail', 'deleteTripDetail']
+        funcs: ['getTripDetail', 'getTripDetails', 'saveTripDetail', 'updateTripDetail', 'deleteTripDetail']
     },
     tripPlanLog: { type: TripPlanLog, modname: 'tripPlan',
         funcs: ['getTripPlanLog', 'getTripPlanLogs', 'saveTripPlanLog', 'updateTripPlanLog', 'deleteTripPlanLog']
