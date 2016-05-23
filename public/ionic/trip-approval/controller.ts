@@ -2,7 +2,6 @@
  * Created by seven on 16/4/25.
  */
 "use strict";
-import {Model} from "sequelize";
 
 export function ApprovedController($scope){
 

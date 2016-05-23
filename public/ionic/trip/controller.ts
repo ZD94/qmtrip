@@ -4,7 +4,7 @@ import moment = require('moment');
 var API = require("common/api");
 var Cookie = require('tiny-cookie');
 import { Staff } from 'api/_types/staff';
-import { Models } from '../../../api/_types/index';
+import { Models } from 'api/_types';
 
 
 var defaultTrip = {
