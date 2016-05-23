@@ -4,7 +4,7 @@ import angular = require('angular');
 
 declare var API: any;
 
-async function showSelectorModal($scope, $ionicModal, selected, optionsLoader) {
+async function showSelectorModal($scope, $ionicModal, selected) {
     var template = require('./selector.html');
     $scope.modal = $ionicModal.fromTemplate(template, {
         scope: $scope,
@@ -17,6 +17,9 @@ async function showSelectorModal($scope, $ionicModal, selected, optionsLoader) {
     });
     $scope.$on('modal.removed', function() {
     });
+
+    var optionsLoader = $scope.getOptionsLoader();
+    var optionsCreator = $scope.getOptionsCreator();
 
     var form: any = $scope.form = {};
     form.keyword = selected;
@@ -32,6 +35,16 @@ async function showSelectorModal($scope, $ionicModal, selected, optionsLoader) {
     })
     $scope.options = [];
     $scope.optionLoader();
+
+    $scope.showCreate = function(){
+        if(optionsCreator == undefined)
+            return false;
+        if(form.keyword.length == 0)
+            return false;
+        if($scope.options.indexOf(form.keyword) >= 0)
+            return false;
+        return true;
+    }
     
     return new Promise(function(resolve, reject) {
         $scope.confirmModal = function() {
@@ -58,11 +71,11 @@ angular
                 title: '@ngSelectorTitle',
                 placeholder: '@ngSelectorPlaceholder',
                 getOptionsLoader: '&ngSelectorQuery',
-
+                getOptionsCreator: '&ngSelectorCreate',
             },
             controller: function($scope, $element, $ionicModal) {
                 $element.focus(async function() {
-                    var value = await showSelectorModal($scope, $ionicModal, $scope.value, $scope.getOptionsLoader())
+                    var value = await showSelectorModal($scope, $ionicModal, $scope.value)
                     if(value == undefined)
                         return;
                     console.log(value);

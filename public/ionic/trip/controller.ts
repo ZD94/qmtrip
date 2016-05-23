@@ -76,6 +76,8 @@ export function CreateController($scope, $storage){
         var projects = await Models.project.find({where:{companyId: staff.company.id}});
         return projects.map((project)=>project.name);
     }
+    $scope.createProject = async function(name){
+    }
 
     $scope.nextStep = async function() {
         API.require("travelBudget");
