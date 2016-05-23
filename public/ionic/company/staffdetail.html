@@ -15,8 +15,7 @@
             </label>
             <label class="item item-select">
                 <span class="input-label" >部门</span>
-                <select ng-model="staff.department.name">
-                    <option ng-repeat="department in departmentlist" ng-select="staff.department.name == department.name">{{department.name}}</option>
+                <select ng-model="staff.department" ng-options="department as department.name for department in departmentlist">
                 </select>
             </label>
             <label class="item item-select">
