@@ -90,6 +90,8 @@ export function CreateController($scope, $storage){
 }
 
 export async function BudgetController($scope, $storage, Models, $stateParams){
+    API.require("tripPlan");
+    await API.onload();
 
     var id = $stateParams.id;
     API.require("travelBudget");
@@ -126,18 +128,82 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
         budgets.push(otherBudget);
     }
     $scope.budgets = budgets;
+
+    API.require("tripPlan");
+    await API.onload();
+
+    $scope.saveTripPlan = function() {
+        let params = {
+            deptCity: trip.fromPlace,
+            arrivalCity: trip.place,
+            startAt: trip.beginDate,
+            backAt: trip.endDate,
+            title: trip.reason,
+            remark: trip.reason,
+            budgets: budgets,
+        }
+        API.tripPlan.saveTripPlan(params)
+        .then(function(planTrip) {
+            window.location.href = '#/trip/committed?id='+planTrip.id;
+        })
+        .catch(function(err) {
+            alert(err.msg || err);
+        })
+    }
 }
 
 export function CitySelectorController($scope){
 
 }
 
-export function CommitedController($scope){
+export async function CommittedController($scope, $stateParams, Models){
+    let id = $stateParams.id;
 
+    API.require("tripPlan");
+    await API.onload();
+
+    let tripPlan = await API.tripPlan.getTripPlan({id: id});
+    //
+    // console.info(Models.tripPlan);
+    // let tripPlan = await Models.tripPlan.get(id);
+    $scope.tripPlan = tripPlan;
+
+    $scope.goToDetail = function() {
+        window.location.href = '#/trip/detail?id='+id;
+    }
 }
 
-export function DetailController($scope){
+export async function DetailController($scope, $stateParams, Models){
+    let id = $stateParams.id;
+    API.require("tripPlan");
+    await API.onload();
 
+    let tripPlan = await Models.tripPlan.get(id)
+    // let tripPlan = await API.tripPlan.getTripPlan({id: id});
+    let budgets: any[] = [];
+    for(let detail of tripPlan.target.tripDetails) {
+        let itemType = 'other';
+        if (detail.type == 0) {
+            itemType = 'goTraffic'
+        }
+        if (detail.type == 1) {
+            itemType = 'backTraffic';
+        }
+        if (detail.type == 2) {
+            itemType = 'hotel';
+        }
+        let type = 'air';
+        if (detail.invoiceType == 0) {
+            type = 'train';
+        }
+        if (detail.invoiceType == 2) {
+            type = 'hotel';
+        }
+
+        budgets.push({id: detail.id, price: detail.budget, itemType: itemType, type: type});
+    }
+    $scope.trip = tripPlan.target;
+    $scope.budgets = budgets;
 }
 
 export async function ListController($scope , Models){
