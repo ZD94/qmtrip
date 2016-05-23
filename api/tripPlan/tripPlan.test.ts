@@ -14,6 +14,7 @@ var agencyUserId = "";
 var companyId = "";
 var staffId = "";
 var tripPlanId = "";
+var tripDetailId = '';
 
 describe("api/tripPlan", function() {
 
@@ -181,6 +182,7 @@ describe("api/tripPlan", function() {
                     assert.equal(ret.companyId, companyId);
                     assert.equal(ret.accountId, staffId);
                     tripPlanId = ret.id;
+                    tripDetailId = ret.hotel[0].id;
                 })
                 .catch(function(err) {
                     console.info(err.stack);
@@ -200,94 +202,79 @@ describe("api/tripPlan", function() {
                 })
                 .nodeify(done)
         });
+
+
     });
 
-    // it("#saveTripPlan should be error when budget is not number", function(done){
-    //     var tripPlanOrder = {
-    //         deptCity: '北京',
-    //         arrivalCity: '上海',
-    //         deptCityCode: 'BJ123',
-    //         arrivalCityCode: 'SH123',
-    //         budget: 1000,
-    //         title: '发送邮件测试计划单',
-    //         startAt: '2015-12-30 11:12:12',
-    //         hotel: [{
-    //             startTime: '2016-01-15 11:11:11',
-    //             endTime: '2016-01-30 22:11:56',
-    //             budget: 'gg',
-    //             city: '上海市',
-    //             cityCode: 'SH123',
-    //             hotelName: '丐帮',
-    //             invoiceType: EInvoiceType.HOTEL,
-    //         }]
-    //     }
-    //     var self = {accountId: staffId};
-    //     API.tripPlan.saveTripPlan(tripPlanOrder, function(err, ret){
-    //         assert.equal(err.code, -2);
-    //         assert.equal(ret, null);
-    //         done();
-    //     })
-    // });
-})
+    describe("deleteTripPlan", function(){
+        var planId = '';
+        var detailId = '';
+        var tripPlanOrder = {
+            deptCity: '北京',
+            arrivalCity: '上海',
+            deptCityCode: 'BJ123',
+            arrivalCityCode: 'SH123',
+            budgets: [1000],
+            title: '发送邮件测试计划单',
+            startAt: '2015-12-30 11:12:12',
+            hotel: [{
+                startTime: '2016-12-30 11:11:11',
+                budget: 300,
+                city: '上海市',
+                cityCode: 'SH123',
+                hotelName: '丐帮',
+                invoiceType: EInvoiceType.HOTEL
+            }]
+        }
+
+        beforeEach(function(done){
+
+            API.tripPlan.saveTripPlan( tripPlanOrder)
+                .then(function(ret) {
+                    planId = ret.id;
+                    return ret.getHotel();
+                })
+                .then(function(hotels) {
+                    detailId = hotels[0].id;
+                    done();
+                })
+                .catch(function(err) {
+                    if(err){
+                        throw err;
+                    }
+                })
+        });
 
 
-describe("deleteTripPlan", function(){
-    var consume_id = '';
-    var tripPlanOrder = {
-        deptCity: '北京',
-        arrivalCity: '上海',
-        deptCityCode: 'BJ123',
-        arrivalCityCode: 'SH123',
-        budget: 1000,
-        title: '发送邮件测试计划单',
-        startAt: '2015-12-30 11:12:12',
-        hotel: [{
-            startTime: '2016-12-30 11:11:11',
-            budget: 300,
-            city: '上海市',
-            cityCode: 'SH123',
-            hotelName: '丐帮',
-            invoiceType: EInvoiceType.HOTEL
-        }]
-    }
-    var newplanId = "";
-
-    beforeEach(function(done){
-        API.tripPlan.saveTripPlan( tripPlanOrder)
-            .then(function(ret) {
-                newplanId = ret.id;
-                return ret.getHotel();
-            })
-            .then(function(hotels) {
-                consume_id = hotels[0].id;
+        it("#uploadInvoiceNew should be ok", function (done) {
+            API.tripPlan.uploadInvoiceNew( {tripDetailId: detailId, pictureFileId: '测试上传图片'}, function (err, ret) {
+                console.info(err);
+                console.info(ret);
                 done();
             })
-            .catch(function(err) {
-                if(err){
+        });
+
+
+        it("#updateTripDetail should be ok", function (done) {
+            API.tripPlan.updateTripDetail({consumeId: detailId, optLog: '测试updateTripDetail', userId: staffId, updates: {orderStatus: 'BOOKED'}}, function (err, ret) {
+                if (err) {
                     throw err;
                 }
+                done();
             })
-    });
+        });
 
-    it("#updateTripDetail should be ok", function (done) {
-        API.tripPlan.updateTripDetail({consumeId: consume_id, optLog: '测试updateTripDetail', userId: staffId, updates: {orderStatus: 'BOOKED'}}, function (err, ret) {
-            if (err) {
-                throw err;
-            }
-            done();
-        })
-    });
+        it("#deleteTripPlan should be ok", function(done) {
+            var self = {accountId: staffId};
+            API.tripPlan.deleteTripPlan({tripPlanId: planId}, function(err, ret){
+                if (err) {
+                    throw err;
+                }
+                done();
+            })
+        });
 
-    it("#deleteTripPlan should be ok", function(done) {
-        var self = {accountId: staffId};
-        API.tripPlan.deleteTripPlan({tripPlanId: newplanId}, function(err, ret){
-            if (err) {
-                throw err;
-            }
-            done();
-        })
-    });
-
+    })
 })
 
 

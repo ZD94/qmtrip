@@ -57,7 +57,7 @@ var Services = {
         funcs: ['getTravelPolicy', 'getTravelPolicies', 'createTravelPolicy', 'updateTravelPolicy', 'deleteTravelPolicy']
     },
     agency: { type: Agency, modname: 'agency',
-        funcs: ['getAgencyById', 'listAgency', 'createAgency', 'updateAgency', 'deleteAgency']
+        funcs: ['getAgencyById', 'listAgency', 'registerAgency', 'updateAgency', 'deleteAgency']
     },
     agencyUser: { type: AgencyUser, modname: 'agency',
         funcs: ['getAgencyUser', 'listAgencyUser', 'createAgencyUser', 'updateAgencyUser', 'deleteAgencyUser']
@@ -66,7 +66,7 @@ var Services = {
         funcs: ['getTripPlan', 'listTripPlans', 'saveTripPlan', 'updateTripPlan', 'deleteTripPlan']
     },
     tripDetail: { type: TripDetail, modname: 'tripPlan',
-        funcs: ['getTripDetail', 'getTripPlanDetails', 'saveTripDetail', 'updateTripDetail', 'deleteTripDetail']
+        funcs: ['getTripDetail', 'getTripDetails', 'saveTripDetail', 'updateTripDetail', 'deleteTripDetail']
     },
     tripPlanLog: { type: TripPlanLog, modname: 'tripPlan',
         funcs: ['getTripPlanLog', 'getTripPlanLogs', 'saveTripPlanLog', 'updateTripPlanLog', 'deleteTripPlanLog']

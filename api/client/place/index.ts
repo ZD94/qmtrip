@@ -29,12 +29,17 @@ class ApiPlace {
      * ```
      */
     static queryPlace(params: {keyword: string}):Promise<Array<Place>> {
-        let keyword = params.keyword;
+        let _params: any = params;
+        if (!_params) {
+            _params = {};
+        }
+
+        let keyword = _params.keyword;
         if (!Boolean(keyword)) {
             return ApiPlace.hotCities({limit: 20})
         }
 
-        return API.place.queryCity(params)
+        return API.place.queryCity(_params)
             .then(function(places) {
                 let arr: Array<Place> = places.map(function(place) {
                     return new Place(place)

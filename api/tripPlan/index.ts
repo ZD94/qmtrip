@@ -17,6 +17,7 @@ import moment = require("moment");
 import {requireParams, clientExport} from 'common/api/helper';
 import {Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, ETripType} from "api/_types/tripPlan";
 import {Models} from "../_types/index";
+import {getSession} from "common/model/client";
 
 
 let TripDetailCols = TripDetail['$fieldnames'];
@@ -43,8 +44,9 @@ class TripPlanModule {
     @requireParams(['deptCity', 'arrivalCity', 'startAt', 'title', 'budgets'], ['backAt', 'remark', 'description'])
     static async saveTripPlan(params: {deptCity: string, arrivalCity: string, startAt: string, title: string, budgets: IBudgetItem[],
         backAt?: string, remark?: string, description?: string}) {
-        
         let {accountId} = Zone.current.get('session');
+        console.info("##########################");
+        console.info('accountId=>', accountId);
         let staff = await Models.staff.get(accountId);
         let email = staff.email;
         let staffName = staff.name;
@@ -55,7 +57,7 @@ class TripPlanModule {
                 totalPrice = -1;
                 break;
             }
-            totalPrice += budget.price
+            totalPrice += budget.price;
         }
 
         let tripPlanId = uuid.v1();
@@ -189,7 +191,7 @@ class TripPlanModule {
         });
     }
 
-    @requireParams(['consumeId'], ['columns'])
+    @requireParams(['tripDetailId'], ['columns'])
     static async getTripDetail(params) {
         let options:any = {};
 
@@ -197,7 +199,7 @@ class TripPlanModule {
             options.attributes = _.intersection(params.columns, TripDetailCols);
         }
 
-        let detail = await DBM.TripDetail.findById(params.consumeId, options);
+        let detail = await DBM.TripDetail.findById(params.tripDetailId, options);
 
         if (!detail) {
             throw {code: -2, msg: '消费记录不存在'};
@@ -256,12 +258,12 @@ class TripPlanModule {
      * 更新消费详情
      * @param params
      */
-    @requireParams(['consumeId', 'optLog', 'userId', 'updates'], TripDetail['$fieldnames'])
+    @requireParams(['tripDetailId', 'optLog', 'userId', 'updates'], TripDetail['$fieldnames'])
     static updateTripDetail(params) {
         let updates:any = _.pick(params.updates, TripDetail['$fieldnames']);
         let trip_plan_id = '';
 
-        return DBM.TripDetail.findById(params.consumeId)
+        return DBM.TripDetail.findById(params.tripDetailId)
             .then(function (record) {
                 if (!record) {
                     throw {code: -2, msg: '票据不存在'};
@@ -276,7 +278,7 @@ class TripPlanModule {
 
                 return DBM.TripDetail.update(updates, {
                     returning: true,
-                    where: {id: params.consumeId},
+                    where: {id: params.tripDetailId},
                     fields: Object.keys(updates)
                 });
             })
@@ -309,13 +311,13 @@ class TripPlanModule {
 
 
     static getConsumeInvoiceImg(params) {
-        let consumeId = params.consumeId;
+        let tripDetailId = params.tripDetailId;
 
-        if (!consumeId) {
+        if (!tripDetailId) {
             throw {code: -1, msg: "consumeId不能为空"};
         }
 
-        return DBM.TripDetail.findById(consumeId)
+        return DBM.TripDetail.findById(tripDetailId)
             .then(function (consumeDetail) {
                 return API.attachments.getAttachment({id: consumeDetail.newInvoice})
             })
@@ -554,16 +556,15 @@ class TripPlanModule {
      * 上传票据
      * @param params
      * @param params.userId 用户id
-     * @param params.consumeId 消费详情id
+     * @param params.tripDetailId 消费详情id
      * @param params.picture 新上传的票据fileId
      * @returns {*}
      */
-    @requireParams(['consumeId', 'picture', 'userId'])
-
+    @requireParams(['tripDetailId', 'picture', 'userId'])
     static uploadInvoice(params) {
         let tripPlanId = "";
 
-        return DBM.TripDetail.findById(params.consumeId)
+        return DBM.TripDetail.findById(params.tripDetailId)
             .then(function (custome) {
                 if (!custome) {
                     throw L.ERR.NOT_FOUND();
@@ -593,39 +594,21 @@ class TripPlanModule {
 
                 let invoiceJson = custome.invoice;
                 let times = invoiceJson.length ? invoiceJson.length + 1 : 1;
-                let currentInvoice = {
-                    times: times,
-                    picture: params.picture,
-                    created_at: moment().format('YYYY-MM-DD HH:mm'),
-                    status: EPlanStatus.WAIT_COMMIT,
-                    remark: '',
-                    approve_at: ''
-                };
+                let currentInvoice = {times: times, picture: params.picture, created_at: moment().format('YYYY-MM-DD HH:mm'), status: EPlanStatus.WAIT_COMMIT, remark: '', approve_at: ''};
                 invoiceJson.push(currentInvoice);
 
-                let updates = {
-                    newInvoice: params.picture,
-                    invoice: JSON.stringify(invoiceJson),
-                    updatedAt: moment().format("YYYY-MM-DD HH:mm:ss"),
-                    status: EPlanStatus.WAIT_COMMIT,
-                    auditRemark: params.auditRemark || ''
-                };
+                let updates = {newInvoice: params.picture, invoice: JSON.stringify(invoiceJson), updatedAt: moment().format("YYYY-MM-DD HH:mm:ss"), status: EPlanStatus.WAIT_COMMIT, auditRemark: params.auditRemark || ''};
 
-                let logs = {tripPlanId: tripPlanId, consumeId: params.consumeId, userId: params.userId, remark: "上传票据"};
-                let orderLogs = {
-                    tripPlanId: custome.tripPlanId,
-                    userId: params.userId,
-                    remark: '上传票据',
-                    createdAt: utils.now()
-                };
+                let logs = {tripPlanId: tripPlanId, tripDetailId: params.tripDetailId, userId: params.userId, remark: "上传票据"};
+                let orderLogs = {tripPlanId: custome.tripPlanId, userId: params.userId, remark: '上传票据', createdAt: utils.now()};
 
                 let order_status = 'WAIT_COMMIT';
                 list.map(function (en) {
-                    if (en.status == 'AUDIT_NOT_PASS' && en.id != params.consumeId) {
+                    if (en.status == 'AUDIT_NOT_PASS' && en.id != params.tripDetailId) {
                         order_status = 'AUDIT_NOT_PASS';
                     }
 
-                    if (en.status == 'WAIT_UPLOAD' && en.id != params.consumeId) {
+                    if (en.status == 'WAIT_UPLOAD' && en.id != params.tripDetailId) {
                         order_status = 'WAIT_UPLOAD';
                     }
                 })
@@ -634,7 +617,7 @@ class TripPlanModule {
                     return Promise.all([
                         DBM.TripDetail.update(updates, {
                             returning: true,
-                            where: {id: params.consumeId},
+                            where: {id: params.tripDetailId},
                             transaction: t
                         }),
                         DBM.TripPlanLogs.create(logs, {transaction: t}),
@@ -651,18 +634,60 @@ class TripPlanModule {
             })
     }
 
+    @clientExport
+    @requireParams(['tripDetailId', 'pictureFileId'])
+    static async uploadInvoiceNew(params: {tripDetailId: string, pictureFileId: string}): Promise<boolean> {
+        console.info("********************");
+        console.info("params", params);
+        let {accountId} = getSession();
+
+        let tripDetail = await Models.tripDetail.get(params.tripDetailId);
+
+        if (!tripDetail) {
+            throw L.ERR.NOT_FOUND();
+        }
+
+        if (tripDetail.accountId != accountId) {
+            throw L.ERR.PERMISSION_DENY();
+        }
+
+        if (tripDetail.status === EPlanStatus.COMPLETE || tripDetail.status === EPlanStatus.AUDITING) {
+            throw {code: -3, msg: '审核中或已审核通过的票据不能上传!'};
+        }
+
+        let tripPlan = tripDetail.tripPlan;
+
+        let invoiceJson = tripDetail.invoice;
+        let times = invoiceJson.length ? invoiceJson.length + 1 : 1;
+        invoiceJson.push({times: times, pictureFileId: params.pictureFileId, created_at: utils.now(), status: EPlanStatus.WAIT_COMMIT, remark: '', approve_at: ''});
+
+        tripDetail.newInvoice = params.pictureFileId;
+        tripDetail.invoice = JSON.stringify(invoiceJson);
+        tripDetail.status = EPlanStatus.WAIT_COMMIT;
+
+        var details = await Models.tripDetail.find({where: {tripPlanId: tripPlan.id, status: EPlanStatus.WAIT_UPLOAD, id: {$ne: tripDetail.id}}});
+
+        if(details || details.length == 0) {
+            tripPlan.status = EPlanStatus.WAIT_COMMIT;
+        }
+
+        await Promise.all([tripPlan.save(), tripDetail.save()]);
+
+        return true;
+    }
+
 
     /**
      * 判断某用户是否有访问该消费记录票据权限
      * @param params
      * @returns {Promise.<Instance>}
      */
-    @requireParams(['consumeId', 'userId'])
+    @requireParams(['tripDetailId', 'userId'])
 
     static async getVisitPermission(params) {
         let userId = params.userId;
-        let consumeId = params.consumeId;
-        let consume = await DBM.TripDetail.findById(consumeId);
+        let tripDetailId = params.tripDetailId;
+        let consume = await DBM.TripDetail.findById(tripDetailId);
         if (!consume) {
             throw {code: -4, msg: '查询记录不存在'};
         }
@@ -717,14 +742,14 @@ class TripPlanModule {
      * 审核票据
      * @param params
      * @param params.status审核结果状态
-     * @param params。consumeId 审核消费单id
+     * @param params。tripDetailId 审核消费单id
      * @param params.userId 用户id
      * @returns {*|Promise}
      */
-    @requireParams(['status', 'consumeId', 'userId'], ['remark', 'expenditure'])
+    @requireParams(['status', 'tripDetailId', 'userId'], ['remark', 'expenditure'])
 
     static approveInvoice(params) {
-        return DBM.TripDetail.findById(params.consumeId)
+        return DBM.TripDetail.findById(params.tripDetailId)
             .then(function (consume) {
                 if (!consume )
                     throw L.ERR.NOT_FOUND();
@@ -769,7 +794,7 @@ class TripPlanModule {
                 }
 
                 let logs = {
-                    consumeId: params.consumeId,
+                    tripDetailId: params.tripDetailId,
                     userId: params.userId,
                     status: params.status,
                     remark: "审核票据-" + params.remark
@@ -782,7 +807,7 @@ class TripPlanModule {
                     return Promise.all([
                         DBM.TripDetail.update(updates, {
                             returning: true,
-                            where: {id: params.consumeId},
+                            where: {id: params.tripDetailId},
                             transaction: t
                         }),
                         DBM.TripPlanLogs.create(logs, {transaction: t})
@@ -1073,19 +1098,19 @@ class TripPlanModule {
      * @method previewConsumeInvoice 预览发票图片
      *
      * @param {Object} params
-     * @param {UUID} params.consumeId
+     * @param {UUID} params.tripDetailId
      * @param {UUID} params.accountId
      */
     static previewConsumeInvoice(params) {
-        let consumeId = params.consumeId;
+        let tripDetailId = params.tripDetailId;
         let accountId = params.accountId;
 
-        return TripPlanModule.getVisitPermission({consumeId: consumeId, userId: accountId})
+        return TripPlanModule.getVisitPermission({tripDetailId: tripDetailId, userId: accountId})
             .then(function (result) {
                 if (!result.allow) {
                     throw L.ERR.PERMISSION_DENY();
                 }
-                return DBM.TripDetail.findById(consumeId)
+                return DBM.TripDetail.findById(tripDetailId)
             })
             .then(function (consume) {
                 return API.attachments.getAttachment({id: consume.newInvoice});
@@ -1151,8 +1176,18 @@ class TripPlanModule {
      * @returns {Promise<TripDetails>}
      */
     @clientExport
-    static getTripPlanDetails(params) {
-        return DBM.TripDetail.findAll({where: {tripPlanId: params.tripPlanId}})
+    @requireParams(['tripPlanId'], ['type'])
+    static async getTripDetails(params): Promise<string[]> {
+        let options: any = {where: {tripPlanId: params.tripPlanId}}
+
+        if(params.type) {
+            options.where['type'] = params.type;
+        }
+
+        let details = await Models.tripDetail.find(options);
+        return details.map(function(d) {
+            return d.id;
+        })
     }
 
 

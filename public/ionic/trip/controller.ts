@@ -4,6 +4,7 @@ import moment = require('moment');
 var API = require("common/api");
 var Cookie = require('tiny-cookie');
 import { Staff } from 'api/_types/staff';
+import { Models } from '../../../api/_types/index';
 
 
 var defaultTrip = {
@@ -63,6 +64,17 @@ export function CreateController($scope, $storage){
             trip.endDate = newDate;
             $scope.$applyAsync();
         }
+    }
+
+    $scope.queryPlaces = async function(keyword){
+        var places = await API.place.queryPlace({keyword: keyword});
+        return places.map((place)=>place.name);
+    }
+
+    $scope.queryProject = async function(keyword){
+        var staff = await Staff.getCurrent();
+        var projects = await Models.project.find({where:{companyId: staff.company.id}});
+        return projects.map((project)=>project.name);
     }
 
     $scope.nextStep = async function() {
@@ -152,10 +164,6 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
     }
 }
 
-export function CitySelectorController($scope){
-
-}
-
 export async function CommittedController($scope, $stateParams, Models){
     let id = $stateParams.id;
 
@@ -170,8 +178,6 @@ export async function CommittedController($scope, $stateParams, Models){
 export async function DetailController($scope, $stateParams, Models){
     let id = $stateParams.id;
     let tripPlan = await Models.tripPlan.get(id);
-    API.require("tripPlan");
-    await API.onload();
     let budgets: any[] = await Models.tripDetail.find({tripPlanId: id});
     budgets = budgets.map(function(budget) {
         let itemType = 'other';

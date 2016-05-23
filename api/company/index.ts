@@ -229,6 +229,10 @@ class CompanyModule {
             return c.id;
         })
     }
+    
+    static async getCompanyNoAgency() {
+        let agencies = await Models.company.find({where: {agencyId: null}});
+    }
 
     /**
      * 删除企业
