@@ -36,10 +36,7 @@ class TripPlanModule {
     @requireParams(['deptCity', 'arrivalCity', 'startAt', 'title', 'budget'], ['backAt', 'remark', 'description', 'outTrip', 'backTrip', 'hotel'])
     static async saveTripPlan(params: {deptCity: string, arrivalCity: string, startAt: string, title: string, budget: number,
         backAt?: string, remark?: string, description?: string, outTrip?: any, backTrip?: any, hotel?: any}) {
-        console.info("PARMAS===>", params);
         let {accountId} = Zone.current.get('session');
-        console.info("***************");
-        console.info(accountId);
         let staff = await Models.staff.get(accountId);
         let email = staff.email;
         let staffName = staff.name;
@@ -129,7 +126,6 @@ class TripPlanModule {
     @clientExport
     @requireParams(['id'])
     static async getTripPlan(params: {id: string}): Promise<TripPlan> {
-        let tripPlanId = params.id;
         return await Models.tripPlan.get(params.id);
     }
 

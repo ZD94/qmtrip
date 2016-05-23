@@ -21,7 +21,6 @@ describe("api/company", function() {
                     return API.agency.registerAgency(agency)
                 })
                 .then(function(ret){
-                    console.info(ret);
                     var agency = ret.target;
                     agencyId = agency.id;
                     agencyUserId = agency.createUser;
@@ -62,9 +61,6 @@ describe("api/company", function() {
             })
 
             after(function(done){
-                console.info("**********************");
-                console.info('companyId=>', companyId);
-                console.info('staffId=>', staffId);
                 Promise.all([
                     API.company.deleteCompanyByTest({mobile: company.mobile}),
                     API.staff.deleteAllStaffByTest({companyId: companyId, mobile: company.mobile, email: company.email})
@@ -79,12 +75,9 @@ describe("api/company", function() {
             })
 
             it("#registerCompany should be ok", function(done) {
-                console.info('agencyUserId=>', agencyUserId);
                 API.company.registerCompany(company, function(err, ret){
                     assert.equal(err, null);
                     var company = ret.target;
-                    console.info("#######################");
-                    console.info(company);
                     companyId = company.id;
                     staffId = company.createUser;
                     done();
