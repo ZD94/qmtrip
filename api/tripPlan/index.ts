@@ -932,17 +932,6 @@ class TripPlanModule {
             })
     }
 
-
-    /**
-     * 获取项目名称列表
-     * @param params
-     * @returns {*}
-     */
-    @requireParams(['companyId'], ['description'])
-    static getProjects(params) {
-        return DBM.TripPlan.findAll({where: params, group: ['description'], attributes: ['description']})
-    }
-
     /**
      * 提交计划单
      * @param params
@@ -1119,10 +1108,11 @@ class TripPlanModule {
     }
 
     @clientExport
-    @requireParams(['companyId'], ['code', 'name', 'count'])
-    static getProjectList(params) {
-        let options:any = {where: params, attributes: ['name'], order: [['created_at', 'desc']]};
-        return Models.project.find(options);
+    static async getProjectList(options) {
+        let projects = await Models.project.find(options);
+        return projects.map(function(p) {
+            return p.id;
+        })
     }
 
     static async deleteProject(params:{id:string}):Promise<boolean> {
