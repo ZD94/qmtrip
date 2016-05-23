@@ -101,8 +101,8 @@ export class TripPlan extends ModelObject {
     set description(val: string) {}
 
     @Field({type: Types.INTEGER})
-    get status(): ETripType { return 0; }
-    set status(val: ETripType) {}
+    get status(): EPlanStatus { return 0; }
+    set status(val: EPlanStatus) {}
 
     @Field({type: Types.STRING})
     get deptCity(): string { return ''; }
@@ -214,8 +214,8 @@ export class TripDetail extends ModelObject{
     set type(val: ETripType) {}
 
     @Field({type: Types.INTEGER})
-    get status(): ETripType { return 0; }
-    set status(val: ETripType) {}
+    get status(): EPlanStatus { return 0; }
+    set status(val: EPlanStatus) {}
 
     @Field({type: Types.STRING})
     get deptCity(): string { return ''; }
