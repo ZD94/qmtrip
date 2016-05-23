@@ -80,7 +80,6 @@ class ApiPlace {
     static hotCities(params: {limit?: number}) :Promise<Array<Place>> {
         return API.place.queryHotCity(params)
             .then(function(places) {
-                console.info(places)
                 let arr:Array<Place> = places.map(function(place) {
                     return new Place(place);
                 })
