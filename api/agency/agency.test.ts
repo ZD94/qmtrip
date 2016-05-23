@@ -13,7 +13,7 @@ describe("api/agency", function() {
     async function deleteAgencyByTest(){
         let agencies = await Models.agency.find({
             where: {
-                $or: [{email: {$like: '$.test@jingli.tech'}}, {mobile: agencyDefault.mobile}, {name: agencyDefault.name}]
+                $or: [{email: {$like: '%.test@jingli.tech'}}, {mobile: agencyDefault.mobile}, {name: agencyDefault.name}]
             },
             paranoid:false
         });

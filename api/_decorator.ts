@@ -218,7 +218,9 @@ export var condition = {
     isMyTripPlan: function(idpath: string) {
         return async function (fn, self, args) {
             let id = _.get(args, idpath);
-            let user = await Staff.getCurrent();
+            let staff = await Staff.getCurrent();
+            let tripPlan = await Models.tripPlan.get(id);
+            return id && staff && tripPlan && staff.id == tripPlan.accountId;
         }
     }
 }

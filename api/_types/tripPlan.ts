@@ -189,6 +189,10 @@ export class TripPlan extends ModelObject {
     getHotel(id?: string): Promise<TripDetail[]> {
         return Models.tripDetail.find({tripPlanId: id||this.id, type: ETripType.HOTEL});
     }
+    
+    getTripDetails(): Promise<TripDetail[]> {
+        return Models.tripDetail.find({tripPlanId: this.id});
+    }
 }
 
 @Table(Models.tripDetail, 'tripPlan.')
