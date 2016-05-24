@@ -1,5 +1,6 @@
 
 import './storage';
+import './loading';
 
 import './AirCompany';
 import './Airport';
