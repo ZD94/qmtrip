@@ -19,6 +19,7 @@ import {Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, E
 import {Models} from "../_types/index";
 import {Staff} from "../_types/staff";
 import {conditionDecorator, condition} from "../_decorator";
+import async = Q.async;
 
 
 let TripDetailCols = TripDetail['$fieldnames'];
@@ -920,65 +921,20 @@ class TripPlanModule {
      * @param params
      * @returns {*}
      */
-    @requireParams(['tripPlanId', 'accountId'])
-    static commitTripPlanOrder(params) {
-        let id = params.tripPlanId;
-        return Promise.all([
-            DBM.TripPlan.findById(id),
-            DBM.TripDetail.findAll({where: {tripPlanId: id}})
-        ])
-            .spread(function (order, list) {
-                if (!order) {
-                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST();
-                }
+    @clientExport
+    @requireParams(['id'])
+    static async commitTripPlan(params): Promise<boolean> {
+        let tripPlan = await Models.tripPlan.get(params.id);
+        let tripDetails = await tripPlan.getTripDetails();
 
-                if (order.accountId != params.accountId) {
-                    throw L.ERR.PERMISSION_DENY();
-                }
+        await Promise.all(tripDetails.map(async function(detail) {
+            detail.status = EPlanStatus.AUDITING;
+            await detail.save();
+        }));
 
-                if (order.status == EPlanStatus.NO_BUDGET) {
-                    throw {code: -3, msg: '计划单还没有预算，不能提交'};
-                }
-
-                if (order.status == EPlanStatus.AUDITING) {
-                    throw {code: -4, msg: '该计划单已提交，不能重复提交'};
-                }
-
-                if (order.status > EPlanStatus.AUDITING || order.auditStatus == 1) {
-                    throw {code: -5, msg: '该计划单已经审核通过，不能提交'};
-                }
-
-                if (list.length <= 0) {
-                    throw {code: -6, msg: '该计划单没有票据提交'};
-                }
-
-                for (let i = 0; i < list.length; i++) {
-                    let s = list[i];
-
-                    if ((s.status === EPlanStatus.WAIT_COMMIT && !s.newInvoice) || s.status == EPlanStatus.NO_BUDGET) {
-                        throw {code: -7, msg: '票据没有上传完'};
-                    }
-                }
-            })
-            .then(function () {
-                return Promise.all([
-                    DBM.TripPlan.update({
-                        status: EPlanStatus.AUDITING,
-                        auditStatus: 0,
-                        updatedAt: utils.now(),
-                        isCommit: true,
-                        commitTime: utils.now()
-                    }, {where: {id: id}, fields: ['status', 'auditStatus', 'updatedAt', 'isCommit']}),
-                    DBM.TripDetail.update({
-                        isCommit: true,
-                        commitTime: utils.now(),
-                        updatedAt: utils.now()
-                    }, {where: {tripPlanId: id}})
-                ])
-            })
-            .then(function () {
-                return true;
-            })
+        tripPlan.status = EPlanStatus.AUDITING;
+        await tripPlan.save();
+        return true;
     }
 
     /**

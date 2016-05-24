@@ -364,7 +364,7 @@ var travelPlan=(function(){
         $scope.initplandetail();
         $scope.submit = function () {
             API.onload(function() {
-                API.tripPlan.commitTripPlanOrder(tripPlanId)
+                API.tripPlan.commitTripPlan(tripPlanId)
                     .then(function(result){
                         location.reload();
                         alert ("提交成功");

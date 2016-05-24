@@ -5,7 +5,9 @@ var API = require("common/api");
 var Cookie = require('tiny-cookie');
 import { Staff } from 'api/_types/staff';
 import { Models } from 'api/_types';
-import {TripDetail} from "api/_types/tripPlan";
+import {
+    TripDetail, EPlanStatus
+} from "api/_types/tripPlan";
 
 
 var defaultTrip = {
@@ -209,7 +211,16 @@ export async function DetailController($scope, $stateParams, Models){
 
 export async function ListController($scope , Models){
     var staff = await Staff.getCurrent();
+    let statusTxt = {};
+    statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
+    statusTxt[EPlanStatus.NO_BUDGET] = "没有预算";
+    statusTxt[EPlanStatus.WAIT_UPLOAD] = "待上传票据";
+    statusTxt[EPlanStatus.WAIT_COMMIT] = "待提交状态";
+    statusTxt[EPlanStatus.AUDITING] = "已提交待审核状态";
+    statusTxt[EPlanStatus.COMPLETE] = "审核完，已完成状态";
+    $scope.statustext = statusTxt;
     $scope.tripPlans = await Models.tripPlan.find({});
+    console.info(statusTxt);
     console.info($scope.tripPlans);
     $scope.enterdetail = function(tripid){
         window.location.href = "#/trip/listdetail?tripid="+tripid;
@@ -221,21 +232,38 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
     var staff = await Staff.getCurrent();
     let id = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(id);
-    // let out = await Models.tripPlan.getOutTrip();
-    console.info(tripPlan);
-    console.info(id);
     $scope.tripDetail = tripPlan;
     let budgets: any[] = await Models.tripDetail.find({tripPlanId: id});
-    budgets = budgets.map(function(budget) {
+    let hotel;
+    let goTraffic;
+    let backTraffic;
+    let other;
+    $scope.hotelStatus = false;
+    $scope.goTrafficStatus = false;
+    $scope.backTrafficStatus = false;
+    $scope.otherStatus = false;
+    let statusTxt = {};
+    statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
+    statusTxt[EPlanStatus.NO_BUDGET] = "没有预算";
+    statusTxt[EPlanStatus.WAIT_UPLOAD] = "待上传票据";
+    statusTxt[EPlanStatus.WAIT_COMMIT] = "待提交状态";
+    statusTxt[EPlanStatus.AUDITING] = "已提交待审核状态";
+    statusTxt[EPlanStatus.COMPLETE] = "审核完，已完成状态";
+    $scope.statustext = statusTxt;
+    budgets.map(function(budget) {
         let itemType = 'other';
+        let title = '补助'
         if (budget.type == 0) {
             itemType = 'goTraffic'
+            title = '去程交通'
         }
         if (budget.type == 1) {
             itemType = 'backTraffic';
+            title = '回城交通'
         }
         if (budget.type == 2) {
             itemType = 'hotel';
+            title = '住宿'
         }
         let type = 'air';
         if (budget.invoiceType == 0) {
@@ -244,41 +272,66 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
         if (budget.invoiceType == 2) {
             type = 'hotel';
         }
-        // return new TripDetail({id: budget.id, price: budget.budget, itemType: itemType, type: type});
-        return {id: budget.id, price: budget.budget, itemType: itemType, type: type ,status:budget.status,title:'上传票据',done:function (response) {
-            var fileId = response.fileId;
-            console.info(budget.uploadInvoice);
-
-            // API.tripPlan.uploadInvoice({pictureFileId: fileId})
-            //     .then(function(ret){
-            //         console.info(ret);
-            //     })
-            //     .catch(function (err) {
-            //         console.info(err);
-            //     })
-            uploadInvoice(budget.id, fileId, function (err, result) {
+        if (itemType == 'goTraffic') {
+            $scope.goTrafficStatus = Boolean(budget.status);
+            goTraffic = {id: budget.id, price: budget.budget, itemType: itemType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
+                var fileId = response.fileId;
+                uploadInvoice(budget.id, fileId, function (err, result) {
                     if (err) {
-                        // TLDAlert(err.msg || err);
                         alert(err);
                         return;
                     }
-                    // $scope.getData($stateParams.orderId)
-                    // msgbox.log("票据上传成功");
-                $state.reload();
+                    $scope.goTrafficStatus = true;
+                    $scope.$apply();
+                    // $state.reload();
                 });
-            // uploadInvoice(budget.id, fileId, function (err, result) {
-            //     if (err) {
-            //         // TLDAlert(err.msg || err);
-            //         alert(err);
-            //         return;
-            //     }
-            //     $scope.getData($stateParams.orderId)
-            //     // msgbox.log("票据上传成功");
-            // });
-        }};
-    })
+            }};
+        } else if (itemType == 'backTraffic') {
+            $scope.backTrafficStatus = Boolean(budget.status);
+            backTraffic = {id: budget.id, price: budget.budget, itemType: itemType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
+                var fileId = response.fileId;
+                uploadInvoice(budget.id, fileId, function (err, result) {
+                    if (err) {
+                        alert(err);
+                        return;
+                    }
+                    $scope.backTrafficStatus = true;
+                    $scope.$apply();
+                });
+            }};
+        } else if (itemType == 'hotel') {
+            $scope.hotelStatus = Boolean(budget.status);
+            hotel = {id: budget.id, price: budget.budget, itemType: itemType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
+                var fileId = response.fileId;
+                uploadInvoice(budget.id, fileId, function (err, result) {
+                    if (err) {
+                        alert(err);
+                        return;
+                    }
+                    $scope.hotelStatus = true;
+                    $scope.$apply();
+                });
+            }};
+        } else {
+            $scope.otherStatus = Boolean(budget.status);
+            other = {id: budget.id, price: budget.budget, itemType: itemType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
+                var fileId = response.fileId;
+                uploadInvoice(budget.id, fileId, function (err, result) {
+                    if (err) {
+                        alert(err);
+                        return;
+                    }
+                    $scope.otherStatus = true;
+                    $scope.$apply();
+                });
+            }};
+        }
+    });
+    $scope.goTraffic = goTraffic;
+    $scope.hotel = hotel;
+    $scope.backTraffic = backTraffic;
+    $scope.other = other;
     $scope.budgets = budgets;
-    console.info($scope.budgets);
     API.require('tripPlan');
     await API.onload();
     function uploadInvoice(consumeId, picture, callback) {
@@ -288,4 +341,11 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
         }, callback);
     }
     $scope.backtraffic_up = '&#xe90e;<em>回程</em><strong>交通票据</strong>';
+
+    $scope.approveTripPlan = async function() {
+        console.info("click me....")
+        let ret = await API.tripPlan.commitTripPlan({id: id});
+        alert('提交成功')
+        window.location.href="#/trip/list"
+    }
 }

@@ -186,8 +186,8 @@ export class TripPlan extends ModelObject {
         return Models.tripDetail.find({tripPlanId: id||this.id, type: ETripType.BACK_TRIP});
     }
 
-    getHotel(id?: string): Promise<TripDetail[]> {
-        return Models.tripDetail.find({tripPlanId: id||this.id, type: ETripType.HOTEL});
+    getHotel(): Promise<TripDetail[]> {
+        return Models.tripDetail.find({tripPlanId: this.id, type: ETripType.HOTEL});
     }
     
     getTripDetails(): Promise<TripDetail[]> {
