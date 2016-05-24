@@ -4,7 +4,7 @@ import ng = require('angular');
 import L = require('common/language');
 
 import { ModelsInterface, initModels } from 'api/_types';
-import { RemoteService, ModelObject, Resolvable } from 'common/model';
+import { RemoteService, ModelObjInterface } from 'common/model';
 import { ngService } from '../index';
 import { Staff, Credential, PointChange } from 'api/_types/staff';
 import { Company, MoneyChange } from 'api/_types/company';
@@ -90,7 +90,7 @@ function throwNotImplemented(){
     throw L.ERR.NOT_IMPLEMENTED();
 }
 
-function createService<T extends Resolvable>(options: any, cacheFactory: ng.ICacheFactoryService){
+function createService<T extends ModelObjInterface>(options: any, cacheFactory: ng.ICacheFactoryService){
     options.cache = cacheFactory(options.type.name);
     options.resolve = resolverAPIModule(options.modname);
     options.funcGet    = options.funcs[0] || throwNotImplemented;
@@ -117,7 +117,7 @@ class ClientModels implements ModelsInterface {
     tripPlanLog: RemoteService<TripPlanLog>;
     moneyChange: RemoteService<MoneyChange>;
     project: RemoteService<Project>;
-    place: RemoteService<Place>;
+    //place: RemoteService<Place>;
     account: RemoteService<Account>;
     seed: RemoteService<Seed>;
     token: RemoteService<Token>;
@@ -136,7 +136,7 @@ class ClientModels implements ModelsInterface {
         this.tripPlanLog = createService<TripPlanLog>(Services.tripPlanLog, $cacheFactory);
         this.moneyChange = createService<MoneyChange>(Services.moneyChange, $cacheFactory);
         this.project = createService<Project>(Services.project, $cacheFactory);
-        this.place = createService<Place>(Services.place, $cacheFactory);
+        //this.place = createService<Place>(Services.place, $cacheFactory);
         this.account = createService<Account>(Services.account, $cacheFactory);
         this.token = createService<Token>(Services.token, $cacheFactory);
         this.seed = createService<Seed>(Services.seed, $cacheFactory);

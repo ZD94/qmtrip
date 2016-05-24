@@ -15,29 +15,29 @@ import { Agency, AgencyUser } from './_types/agency';
 import {TripPlan, TripDetail, Project, TripPlanLog} from './_types/tripPlan';
 import { Account,Token } from './_types/auth';
 import { Seed } from './_types/seed';
-import { CachedService, CacheInterface, Resolvable } from '../common/model/service';
+import { CachedService, CacheInterface, ModelObjInterface } from 'common/model/service';
 import { createCache } from './_cache';
+import sequelize = require('sequelize');
 
-class SequelizeService<T extends Resolvable> extends CachedService<T>{
+class SequelizeService<T extends ModelObjInterface> extends CachedService<T>{
     constructor(cache: CacheInterface, TClass:any){
         super(cache, TClass);
     }
 
-    create(obj: Object): T {
-        var ret = super.create(obj);
-        ret.target = this.TClass.$sqlmodel.build(ret['$fields']);
-        ret['$fields'] = {'!':'!'};
-        return ret;
+    $create(obj: T): T {
+        obj.target = this.$class.$sqlmodel.build(obj['$fields']);
+        obj['$fields'] = {'!':'!'};
+        return obj;
     }
     async $get(id: string, options?: Object): Promise<T>{
-        var target = await this.TClass.$sqlmodel.findById(id, options);
+        var target = await this.$class.$sqlmodel.findById(id, options);
         if(!target)
             return undefined;
-        return new this.TClass(target);
+        return new this.$class(target);
     }
     async $find(where: any): Promise<T[]>{
-        var {rows, count} = await this.TClass.$sqlmodel.findAndCount(where);
-        var objs = rows.map((row)=>new this.TClass(row));
+        var {rows, count} = await this.$class.$sqlmodel.findAndCount(where);
+        var objs = rows.map((row)=>new this.$class(row));
         return objs;
     }
     async $update(obj: T, fields: Object): Promise<Object>{
@@ -58,7 +58,7 @@ class SequelizeService<T extends Resolvable> extends CachedService<T>{
         return obj.target.destroy(options);
     }
 }
-function createServerService<T extends Resolvable>(TClass: any){
+function createServerService<T extends ModelObjInterface>(TClass: any){
     var cache = createCache(TClass.name);
     return new SequelizeService<T>(cache, TClass);
 }
