@@ -56,7 +56,7 @@ class TripPlanModule {
                 totalPrice = -1;
                 break;
             }
-            totalPrice += (budget.price as number);
+            totalPrice += Number(budget.price);
         }
 
         let tripPlanId = uuid.v1();
