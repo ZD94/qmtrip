@@ -241,7 +241,7 @@
 |ret  |Array
 
 
->. 企业员工提交计划单 API.tripPlan.commitTripPlanOrder(orderId, callback);
+>. 企业员工提交计划单 API.tripPlan.commitTripPlan(orderId, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------

@@ -92,7 +92,7 @@
  		$scope.initall();
 		$scope.push = function () {
             API.onload(function() {
-                API.tripPlan.commitTripPlanOrder(tripPlanId)
+                API.tripPlan.commitTripPlan(tripPlanId)
                     .then(function(result){
                         alert ("提交成功");
                         window.location.href = '#/tripPlan/uploadDown';

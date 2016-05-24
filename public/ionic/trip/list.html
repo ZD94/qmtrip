@@ -13,9 +13,9 @@
                         <br>出差事由：{{trip.project.name}}</ion-item>
                 </ion-list>
             </div>
-            <div class="item item-divider">{{trip.status}}
-                <span class="item-note" ng-if="trip.budget != -1">{{trip.budget}}元</span>
-                <span class="item-note" ng-if="trip.budget == -1">待出预算</span>
+            <div class="item item-divider">{{statustext[trip.status]}}
+                <span class="item-note" ng-if="trip.budget != -1 && trip.budget != null">{{trip.budget}}元</span>
+                <span class="item-note" ng-if="trip.budget == -1 || trip.budget == null">待出预算</span>
             </div>
         </div>
         <div id="page13-markdown3" style="color:#000000;">
