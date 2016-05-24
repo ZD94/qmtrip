@@ -13,7 +13,7 @@
                         <br>出差事由：{{trip.project.name}}</ion-item>
                 </ion-list>
             </div>
-            <div class="item item-divider">{{trip.status}}
+            <div class="item item-divider">{{statustext[trip.status]}}
                 <span class="item-note" ng-if="trip.budget != -1">{{trip.budget}}元</span>
                 <span class="item-note" ng-if="trip.budget == -1">待出预算</span>
             </div>

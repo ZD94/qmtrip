@@ -211,7 +211,16 @@ export async function DetailController($scope, $stateParams, Models){
 
 export async function ListController($scope , Models){
     var staff = await Staff.getCurrent();
+    let statusTxt = {};
+    statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
+    statusTxt[EPlanStatus.NO_BUDGET] = "没有预算";
+    statusTxt[EPlanStatus.WAIT_UPLOAD] = "待上传票据";
+    statusTxt[EPlanStatus.WAIT_COMMIT] = "待提交状态";
+    statusTxt[EPlanStatus.AUDITING] = "已提交待审核状态";
+    statusTxt[EPlanStatus.COMPLETE] = "审核完，已完成状态";
+    $scope.statustext = statusTxt;
     $scope.tripPlans = await Models.tripPlan.find({});
+    console.info(statusTxt);
     console.info($scope.tripPlans);
     $scope.enterdetail = function(tripid){
         window.location.href = "#/trip/listdetail?tripid="+tripid;
