@@ -131,12 +131,14 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
         }
     }
     for(let budget of budgets) {
-        if (budget.price <= 0) {
+        let price = Number(budget.price);
+        if (price <= 0) {
             totalPrice = -1;
             break;
         }
-        totalPrice += budget.price;
+        totalPrice += price
     }
+
     $scope.totalPrice = totalPrice;
     let duringDays = moment(trip.endDate).diff(moment(trip.beginDate), 'days');
     $scope.duringDays = duringDays;
