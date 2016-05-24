@@ -1,4 +1,5 @@
 
+import './history';
 import './airinfo';
 import './wheelpicker';
 import './erasable';
