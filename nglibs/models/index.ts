@@ -4,7 +4,7 @@ import ng = require('angular');
 import L = require('common/language');
 
 import { ModelsInterface, initModels } from 'api/_types';
-import { RemoteService, ModelObjInterface } from 'common/model';
+import { ModelRemote, ModelObjInterface } from 'common/model';
 import { ngService } from '../index';
 import { Staff, Credential, PointChange } from 'api/_types/staff';
 import { Company, MoneyChange } from 'api/_types/company';
@@ -98,29 +98,29 @@ function createService<T extends ModelObjInterface>(options: any, cacheFactory: 
     options.funcCreate = options.funcs[2] || throwNotImplemented;
     options.funcUpdate = options.funcs[3] || throwNotImplemented;
     options.funcDelete = options.funcs[4] || throwNotImplemented;
-    return new RemoteService<T>(options)
+    return new ModelRemote<T>(options)
 }
 
 @ngService('Models')
 class ClientModels implements ModelsInterface {
 
-    staff: RemoteService<Staff>;
-    credential: RemoteService<Credential>;
-    pointChange:RemoteService<PointChange>;
-    company: RemoteService<Company>;
-    department: RemoteService<Department>;
-    travelPolicy: RemoteService<TravelPolicy>;
-    agency: RemoteService<Agency>;
-    agencyUser: RemoteService<AgencyUser>;
-    tripPlan: RemoteService<TripPlan>;
-    tripDetail: RemoteService<TripDetail>;
-    tripPlanLog: RemoteService<TripPlanLog>;
-    moneyChange: RemoteService<MoneyChange>;
-    project: RemoteService<Project>;
-    //place: RemoteService<Place>;
-    account: RemoteService<Account>;
-    seed: RemoteService<Seed>;
-    token: RemoteService<Token>;
+    staff: ModelRemote<Staff>;
+    credential: ModelRemote<Credential>;
+    pointChange:ModelRemote<PointChange>;
+    company: ModelRemote<Company>;
+    department: ModelRemote<Department>;
+    travelPolicy: ModelRemote<TravelPolicy>;
+    agency: ModelRemote<Agency>;
+    agencyUser: ModelRemote<AgencyUser>;
+    tripPlan: ModelRemote<TripPlan>;
+    tripDetail: ModelRemote<TripDetail>;
+    tripPlanLog: ModelRemote<TripPlanLog>;
+    moneyChange: ModelRemote<MoneyChange>;
+    project: ModelRemote<Project>;
+    //place: ModelRemote<Place>;
+    account: ModelRemote<Account>;
+    seed: ModelRemote<Seed>;
+    token: ModelRemote<Token>;
 
     constructor($cacheFactory: ng.ICacheFactoryService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
