@@ -92,13 +92,6 @@ export async function StaffsController($scope, Models) {
 }
 
 export async function StaffdetailController($scope, $stateParams, Models, $ionicHistory) {
-    //使下一个面变为根目录可呼出menu
-    $ionicHistory.nextViewOptions({
-        historyRoot: true,
-        disableAnimate: true,
-        expire: 300
-    });
-
     let staff;
     var currentstaff = await Staff.getCurrent();
     var company = currentstaff.company;
