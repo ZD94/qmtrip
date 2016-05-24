@@ -78,6 +78,7 @@ describe("api/travelPolicy.js", function() {
                 .nodeify(done);
         });
         it("#createTravelPolicy should be ok", function(done) {
+            obj.companyId = companyId;
             API.travelPolicy.createTravelPolicy(obj, function(err, result) {
                 id = result.id;
                 done(err);
@@ -111,8 +112,8 @@ describe("api/travelPolicy.js", function() {
     });
 
 
-    /*describe("travelPolicy/agencyHandel", function() {
-        /!********代理商代企业管理差旅标准api********!/
+    describe("travelPolicy/agencyHandel", function() {
+        /********代理商代企业管理差旅标准api********/
 
         before(function(done) {
             Promise.all([
@@ -188,7 +189,7 @@ describe("api/travelPolicy.js", function() {
             API.travelPolicy.deleteTravelPolicy({id: id, companyId: companyId})
                 .nodeify(done);
         })
-        /!********代理商代企业管理差旅标准api********!/
-    })*/
+        /********代理商代企业管理差旅标准api********/
+    })
 
 })
