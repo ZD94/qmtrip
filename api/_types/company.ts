@@ -4,10 +4,11 @@ import { Models } from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import {Agency} from 'api/_types/agency';
 import { regApiType } from 'common/api/helper';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference, Values } from 'common/model';
 import {TravelPolicy} from "api/_types/travelPolicy";
-import { Create } from 'common/model';
+import { Types, Values } from 'common/model';
 import { Department } from './department';
+import { Table, Create, Field, Reference } from 'common/model/common';
+import { ModelObject } from 'common/model/object';
 
 export enum ECompanyStatus {
     DELETE = -2,
@@ -16,7 +17,6 @@ export enum ECompanyStatus {
 }
 
 @Table(Models.company, 'company.')
-@regApiType('API.')
 export class Company extends ModelObject{
     constructor(target: Object) {
         super(target);
@@ -130,7 +130,6 @@ export class Company extends ModelObject{
 }
 
 @Table(Models.moneyChange, 'company.')
-@regApiType('API.')
 export class MoneyChange extends ModelObject {
     constructor(target: Object) {
         super(target);

@@ -1,11 +1,10 @@
 
 import { Models } from 'api/_types';
-import { regApiType } from 'common/api/helper';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference, Values } from 'common/model';
-import {now} from 'common/utils'
 import {Staff} from 'api/_types/staff';
 import {Company} from 'api/_types/company';
-import { Create } from 'common/model';
+import { Types, Values } from 'common/model';
+import { Table, Create, Field, ResolveRef, Reference } from 'common/model/common';
+import { ModelObject } from 'common/model/object';
 declare var API: any;
 
 export enum EPlanStatus {
@@ -32,7 +31,6 @@ export enum EInvoiceType {
 }
 
 @Table(Models.project, 'tripPlan.')
-@regApiType('API.')
 export class Project extends ModelObject{
     constructor(target: Object) {
         super(target);
@@ -63,7 +61,6 @@ export class Project extends ModelObject{
 }
 
 @Table(Models.tripPlan, 'tripPlan.')
-@regApiType('API.')
 export class TripPlan extends ModelObject {
     constructor(target: Object) {
         super(target);
@@ -196,7 +193,6 @@ export class TripPlan extends ModelObject {
 }
 
 @Table(Models.tripDetail, 'tripPlan.')
-@regApiType('API.')
 export class TripDetail extends ModelObject{
     constructor(target: Object) {
         super(target);
@@ -313,7 +309,6 @@ export class TripDetail extends ModelObject{
 }
 
 @Table(Models.tripPlanLog, 'tripPlan.')
-@regApiType('API.')
 export class TripPlanLog extends ModelObject{
     constructor(target: Object) {
         super(target);

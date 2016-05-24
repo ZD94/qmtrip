@@ -20,7 +20,6 @@ import {Paginate} from 'common/paginate';
 import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_types/staff";
 import { EAgencyUserRole, AgencyUser } from "api/_types/agency";
-import { ModelInterface } from 'common/model';
 import { Models, EAccountType } from 'api/_types';
 import promise = require("../../common/test/api/promise/index");
 import {conditionDecorator, condition} from "../_decorator";

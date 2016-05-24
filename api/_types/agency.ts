@@ -5,10 +5,10 @@
 import { regApiType } from 'common/api/helper';
 import { Models, EGender, EAccountType } from 'api/_types';
 import {Company} from 'api/_types/company';
-import { ModelObject, Table, TableExtends, Field, Types, ResolveRef, Reference, Values } from 'common/model';
-import { getSession } from 'common/model';
-import { Create } from 'common/model';
+import { getSession, Types, Values } from 'common/model';
 import { Account } from './auth';
+import { Table, TableExtends, Create, Field, ResolveRef } from 'common/model/common';
+import { ModelObject } from 'common/model/object';
 
 export enum EAgencyStatus {
     DELETE = -2, //删除状态
@@ -29,7 +29,6 @@ export enum  EAgencyUserRole {
 
 
 @Table(Models.agency, 'agency.')
-@regApiType('API.')
 export class Agency extends ModelObject{
     constructor(target: Object) {
         super(target);
@@ -88,7 +87,6 @@ export class Agency extends ModelObject{
     }
 }
 
-@regApiType('API.')
 @TableExtends(Account, 'account')
 @Table(Models.agencyUser, 'agency.')
 export class AgencyUser extends ModelObject{

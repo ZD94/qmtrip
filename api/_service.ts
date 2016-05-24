@@ -6,7 +6,6 @@ import { initModels } from 'api/_types';
 import StaffModule = require('api/staff');
 import DepartmentModule = require ('api/department');
 import TravelPolicyModule = require('api/travelPolicy');
-import { ModelInterface, ModelAbstract } from 'common/model';
 import { Staff, Credential, PointChange } from 'api/_types/staff';
 import { Company, MoneyChange } from './_types/company';
 import { Department } from './_types/department';
@@ -15,9 +14,10 @@ import { Agency, AgencyUser } from './_types/agency';
 import {TripPlan, TripDetail, Project, TripPlanLog} from './_types/tripPlan';
 import { Account,Token } from './_types/auth';
 import { Seed } from './_types/seed';
-import { ModelCached, CacheInterface, ModelObjInterface } from 'common/model/service';
 import { createCache } from './_cache';
 import sequelize = require('sequelize');
+import { ModelObjInterface } from 'common/model/interface';
+import { ModelCached, CacheInterface } from 'common/model/cached';
 
 class ModelSequelize<T extends ModelObjInterface> extends ModelCached<T>{
     constructor(cache: CacheInterface, TClass:any){

@@ -1,4 +1,3 @@
-import { ModelInterface, ModelDelegate } from 'common/model';
 
 import { Company, MoneyChange } from "./company";
 import { Staff, Credential, PointChange } from "./staff";
@@ -8,6 +7,8 @@ import { Agency, AgencyUser } from './agency';
 import {TripPlan, TripDetail, Project, TripPlanLog} from './tripPlan';
 import { Account, Token } from './auth';
 import {Seed} from "./seed";
+import { ModelInterface } from 'common/model/interface';
+import { ModelDelegate } from 'common/model/delegate';
 
 
 export enum EGender {

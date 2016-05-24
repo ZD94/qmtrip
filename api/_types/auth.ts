@@ -1,9 +1,10 @@
 import { regApiType } from 'common/api/helper';
-import { Table, Field, Types, ModelObject, Values } from 'common/model'
 import { Models, EAccountType } from './index';
-import { Create } from 'common/model';
+import { Types } from 'common/model';
 import validator = require("validator");
 import * as L from 'common/language';
+import { Table, Create, Field } from 'common/model/common';
+import { ModelObject } from 'common/model/object';
 
 @regApiType('API.')
 class AuthCert {
@@ -20,7 +21,6 @@ class AuthCert {
     }
 }
 
-@regApiType('API.')
 @Table(Models.account, "auth.")
 class Account extends ModelObject{
     constructor(target: Object) {

@@ -4,7 +4,8 @@ import ng = require('angular');
 import L = require('common/language');
 
 import { ModelsInterface, initModels } from 'api/_types';
-import { ModelRemote, ModelObjInterface } from 'common/model';
+import { ModelObjInterface } from 'common/model/interface';
+import { ModelRemote } from 'common/model/remote';
 import { ngService } from '../index';
 import { Staff, Credential, PointChange } from 'api/_types/staff';
 import { Company, MoneyChange } from 'api/_types/company';

@@ -3,11 +3,12 @@
  */
 'use strict';
 import { regApiType } from 'common/api/helper';
-import { ModelObject, Table, Create, Field, Types, ResolveRef, Reference } from 'common/model';
 import { Models } from 'api/_types';
+import { Table, Create, Field } from 'common/model/common';
+import { ModelObject } from 'common/model/object';
+import { Types } from 'common/model';
 
 @Table(Models.seed, 'seeds.')
-@regApiType('API.')
 export class Seed extends ModelObject{
     constructor(target: Object) {
         super(target);
