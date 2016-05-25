@@ -314,7 +314,7 @@ class StaffModule{
         {if: condition.isSameCompany("0.id")},
         {if: condition.isStaffsAgency("0.id")}
     ])
-    static async getStaff(params){
+    static async getStaff(params: {id: string}){
 
         let id = params.id;
         let getObj = await Models.staff.get(id);

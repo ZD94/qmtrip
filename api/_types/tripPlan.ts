@@ -297,11 +297,12 @@ export class TripDetail extends ModelObject{
     set expenditure(val: number) {}
 
     @Field({type: Types.INTEGER})
-    get invoiceType(): number { return 0; }
-    set invoiceType(val: number) {}
+    get invoiceType(): EInvoiceType { return 0; }
+    set invoiceType(val: EInvoiceType) {}
 
     @ResolveRef({type: Types.UUID}, Models.tripPlan)
     get tripPlan(): TripPlan { return null; }
+    set tripPlan(val: TripPlan) {}
 
     uploadInvoice(pictureFileId: string): Promise<boolean> {
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: pictureFileId});

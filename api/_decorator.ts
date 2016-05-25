@@ -184,7 +184,7 @@ export var condition = {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
             let staff = await Models.staff.get(id);
-            let company = await Models.company.get(staff["companyId"]);
+            let company = staff.company;
             let agencyUser = await AgencyUser.getCurrent();
             return staff && company && agencyUser && agencyUser["agencyId"] == company["agencyId"];
         }
@@ -238,7 +238,7 @@ export var condition = {
             let acc_type = account.type;
             
             if(acc_type == EAccountType.STAFF) {
-                let staff = Models.staff.get(account.id);
+                let staff = await Models.staff.get(account.id);
                 return staff.roleId == EStaffRole.ADMIN || staff.roleId == EStaffRole.OWNER || tripPlan.accountId == account.id;
             }else if(acc_type == EAccountType.AGENCY) {
                 let user = await AgencyUser.getCurrent();

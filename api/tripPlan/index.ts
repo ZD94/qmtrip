@@ -6,10 +6,10 @@ let sequelize = require("common/model").DB;
 let DBM = sequelize.models;
 let uuid = require("node-uuid");
 let L = require("common/language");
-let Logger = require('common/logger');
 let utils = require('common/utils');
 let API = require('common/api');
-let logger = new Logger("company");
+let Logger = require('common/logger');
+let logger = new Logger("tripPlan");
 let validate = require("common/validate");
 let config = require("../../config");
 import _ = require('lodash');
@@ -19,7 +19,6 @@ import {Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, E
 import {Models} from "../_types/index";
 import {Staff} from "../_types/staff";
 import {conditionDecorator, condition} from "../_decorator";
-import async = Q.async;
 
 
 let TripDetailCols = TripDetail['$fieldnames'];
@@ -27,7 +26,7 @@ let TripPlanCols = TripPlan['$fieldnames'];
 
 class IBudgetItem {
     price: number
-    itemType: string
+    tripType: string
     type: string
     hotel: string
 }
@@ -35,6 +34,83 @@ class IBudgetItem {
 class TripPlanModule {
     static TripPlanCols = TripPlanCols;
     static TripDetailCols = TripDetailCols;
+
+    @clientExport
+    static async caculateTravelBudget(){
+        let ret = await API.travelBudget.getTravelPolicyBudget({
+            leaveDate: '2016-06-01',
+            goBackDate: '2016-06-10',
+            isRoundTrip: true,
+            originPlace: '北京',
+            destinationPlace: '上海',
+            checkInDate: '2016-06-01',
+            checkOutDate: '2016-06-10',
+            leaveTime: '10:00',
+            goBackTime: '10:00',
+            isNeedHotel: false
+        });
+
+        return ret;
+    }
+
+    @clientExport
+    @requireParams(['budgetId', 'title'], ['description', 'remark'])
+    static async saveTripPlanNew(params): Promise<TripPlan> {
+        let staff = await Staff.getCurrent();
+        let {budgets, query} = await API.travelBudget.getBudgetInfo({id: params.budgetId});
+        let project = await getProjectByName({companyId: staff.company.id, name: params.title, userId: staff.id, isCreate: true});
+
+        let tripPlan = Models.tripPlan.create(params);
+        tripPlan['accountId'] = staff.id;
+        tripPlan['companyId'] = staff.company.id;
+        tripPlan.project = project;
+        tripPlan.startAt = query.leaveDate;
+        tripPlan.backAt = query.goBackDate;
+        tripPlan.deptCity = query.originPlace;
+        tripPlan.arrivalCity = query.destinationPlace;
+        tripPlan.isNeedHotel = query.isNeedHotel;
+        tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo');
+
+        let tripDetails: TripDetail[] = budgets.map(function (budget) {
+            let tripType = budget.tripType;
+            let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: Number(budget.price)});
+            detail.accountId = staff.id;
+            detail.isCommit = false;
+            detail.status = EPlanStatus.WAIT_UPLOAD;
+            detail.tripPlan = tripPlan;
+
+            switch(tripType) {
+                case ETripType.OUT_TRIP:
+                    detail.deptCity = query.originPlace;
+                    detail.arrivalCity = query.destinationPlace;
+                    detail.startTime = query.leaveDate;
+                    detail.endTime = query.goBackDate;
+                    break;
+                case ETripType.BACK_TRIP:
+                    detail.deptCity = query.destinationPlace;
+                    detail.arrivalCity = query.originPlace;
+                    detail.startTime = query.goBackDate;
+                    detail.endTime = query.leaveDate;
+                    break;
+                case ETripType.HOTEL:
+                    detail.city = query.destinationPlace;
+                    detail.hotelName = query.businessDistrict;
+                    detail.startTime = query.checkInDate;
+                    detail.endTime = query.checkOutDate;
+                    break;
+                default:
+                    detail.startTime = query.leaveDate;
+                    detail.endTime = query.goBackDate;
+                    break;
+            }
+            return detail;
+        });
+
+        await tripPlan.save();
+        await Promise.all(tripDetails.map((d)=>d.save()));
+
+        return tripPlan;
+    }
 
     /**
      * @method saveTripPlan
@@ -74,20 +150,6 @@ class TripPlanModule {
 
         await Promise.all(params.budgets.map(async function (detail) {
             let _detail: any = JSON.parse(JSON.stringify(detail));
-            switch(detail.itemType) {
-                case 'goTraffic':
-                    _detail.type = ETripType.OUT_TRIP;
-                    break;
-                case 'backTraffic':
-                    _detail.type = ETripType.BACK_TRIP;
-                    break;
-                case 'hotel':
-                    _detail.type = ETripType.HOTEL;
-                    _detail.hotelName = detail.hotel;
-                    break;
-                default:
-                    _detail.type = ETripType.OTHER;
-            }
 
             switch(detail.type) {
                 case 'train':
@@ -102,6 +164,7 @@ class TripPlanModule {
                 default:
                     _detail.invoiceType = EInvoiceType.OTHER;
             }
+
             _detail.tripPlanId = tripPlanId;
             _detail.accountId = accountId;
             _detail.status = 0;
@@ -1085,17 +1148,15 @@ class TripPlanModule {
 }
 
 async function getProjectByName(params) {
-    let projects = await Models.project.find({name: params.name});
+    let projects = await Models.project.find({where: {name: params.name}});
     let project;
 
     if(projects && projects.length > 0) {
-        project = projects[0];
+        return projects[0]
     }else if(params.isCreate === true){
         let p = {name: params.name, createUser: params.userId, code: '', companyId: params.companyId, createdAt: utils.now()};
-        project = await DBM.Project.create(p);
+        return Models.project.create(p).save();
     }
-
-    return new Project(project);
 }
 
 

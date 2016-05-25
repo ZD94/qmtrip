@@ -69,7 +69,7 @@ describe("api/tripPlan", function() {
             })
             .nodeify(done);
     });
-
+    
     after(function(done) {
         deleteTripPlanByTest()
             .nodeify(done);
@@ -104,6 +104,22 @@ describe("api/tripPlan", function() {
                 })
                 .catch(function(err) {
                     console.info(err.stack);
+                    assert.equal(err, null);
+                })
+                .nodeify(done);
+        });
+
+        it("#saveTripPlanNew should be ok", function(done){
+            let budgetId = 'cache:budgets:ed4e1520-2234-11e6-89a0-43b37ebb0409:1464152140092HPupGh';
+            API.tripPlan.saveTripPlanNew({budgetId: '1464166365279CHeoy5', title: '新增出差计划测试'})
+                .then(function(ret) {
+                    console.info("saveTripPlan success...");
+                    // console.info(ret);
+                    // assert.equal(ret.companyId, companyId);
+                    // assert.equal(ret.accountId, staffId);
+                })
+                .catch(function(err) {
+                    console.info(err);
                     assert.equal(err, null);
                 })
                 .nodeify(done);
