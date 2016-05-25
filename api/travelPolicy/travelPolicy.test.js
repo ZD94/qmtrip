@@ -78,6 +78,7 @@ describe("api/travelPolicy.js", function() {
                 .nodeify(done);
         });
         it("#createTravelPolicy should be ok", function(done) {
+            obj.companyId = companyId;
             API.travelPolicy.createTravelPolicy(obj, function(err, result) {
                 id = result.id;
                 done(err);
@@ -111,8 +112,17 @@ describe("api/travelPolicy.js", function() {
     });
 
 
-    /*describe("travelPolicy/agencyHandel", function() {
-        /!********代理商代企业管理差旅标准api********!/
+    describe("travelPolicy/agencyHandel", function() {
+        var objTwo= {
+            name: "四级标准",
+            planeLevel: "经济舱" ,
+            planeDiscount: "7.5",
+            trainLevel: "硬卧",
+            hotelLevel: "三星级",
+            hotelPrice: "300",
+            subsidy: "300"
+        }
+        /********代理商代企业管理差旅标准api********/
 
         before(function(done) {
             Promise.all([
@@ -148,9 +158,9 @@ describe("api/travelPolicy.js", function() {
 
         //创建差旅标准
         it("#agencyCreateTravelPolicy should be ok", function(done) {
-            obj.companyId = companyId;
-            obj.name = "agencyCreateTravelPolicy";
-            API.travelPolicy.createTravelPolicy(obj, function(err, result) {
+            objTwo.companyId = companyId;
+            objTwo.name = "agencyCreateTravelPolicy";
+            API.travelPolicy.createTravelPolicy(objTwo, function(err, result) {
                 id = result.id;
                 done(err);
             });
@@ -177,10 +187,10 @@ describe("api/travelPolicy.js", function() {
 
         //更新差旅标准信息
         it("#agencyUpdateTravelPolicy should be ok", function(done) {
-            obj.id = id;
-            obj.name = "修改过的456";
-            obj.companyId = companyId;
-            API.travelPolicy.updateTravelPolicy(obj)
+            objTwo.id = id;
+            objTwo.name = "修改过的456";
+            objTwo.companyId = companyId;
+            API.travelPolicy.updateTravelPolicy(objTwo)
                 .nodeify(done);
         })
         //删除差旅标准信息
@@ -188,7 +198,7 @@ describe("api/travelPolicy.js", function() {
             API.travelPolicy.deleteTravelPolicy({id: id, companyId: companyId})
                 .nodeify(done);
         })
-        /!********代理商代企业管理差旅标准api********!/
-    })*/
+        /********代理商代企业管理差旅标准api********/
+    })
 
 })

@@ -222,7 +222,13 @@ export async function ListController($scope , Models){
     statusTxt[EPlanStatus.AUDITING] = "已提交待审核状态";
     statusTxt[EPlanStatus.COMPLETE] = "审核完，已完成状态";
     $scope.statustext = statusTxt;
-    $scope.tripPlans = await Models.tripPlan.find({});
+    var tripPlans = await Models.tripPlan.find({});
+    tripPlans.map(function(trip){
+        trip.startAt = moment(trip.startAt).toDate();
+        trip.backAt = moment(trip.backAt).toDate();
+        return trip;
+    });
+    $scope.tripPlans = tripPlans;
     console.info(statusTxt);
     console.info($scope.tripPlans);
     $scope.enterdetail = function(tripid){
@@ -236,6 +242,11 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
     let id = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(id);
     $scope.tripDetail = tripPlan;
+    console.info(tripPlan);
+    $scope.createdAt = moment(tripPlan.createAt).toDate();
+    $scope.startAt = moment(tripPlan.startAt).toDate();
+    $scope.backAt = moment(tripPlan.backAt).toDate();
+    $scope.creatat = moment(tripPlan.createAt).toDate();
     let budgets: any[] = await Models.tripDetail.find({tripPlanId: id});
     let hotel;
     let goTraffic;

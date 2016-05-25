@@ -1,5 +1,5 @@
 import { getSession } from '../common/model/index';
-import {Staff, EStaffRole} from './_types/staff';
+import { Staff, EStaffRole } from './_types/staff';
 import { AgencyUser } from './_types/agency';
 import {EAccountType} from "./_types/index";
 /**
@@ -208,12 +208,41 @@ export var condition = {
             return id && user && other && user["agencyId"] == other.agencyId;
         }
     },
+    isTravelPolicyAdminOrOwner: function(idpath: string) {
+        return async function (fn ,self, args) {
+            let id = _.get(args, idpath);
+            let staff = await Staff.getCurrent();
+            let tp = await Models.travelPolicy.get(id);
+            return id && staff && tp && tp["companyId"] == staff["companyId"] && (staff["roleId"] == EStaffRole.ADMIN || staff["roleId"] == EStaffRole.OWNER);
+        }
+    },
+    isTravelPolicyAgency: function(idpath: string) {
+        return async function (fn ,self, args) {
+            let id = _.get(args, idpath);
+            let user = await AgencyUser.getCurrent();
+            let tp = await Models.travelPolicy.get(id);
+            let company = await Models.company.get(tp["companyId"]);//此处为什么不能用tp.company
+            return id && user && company && user["agencyId"] == company["agencyId"];
+        }
+    },
     isCompanyAgency: function(idpath: string) {
         return async function (fn ,self, args) {
             let id = _.get(args, idpath);
             let user = await AgencyUser.getCurrent();
             let company = await Models.company.get(id);
             return id && user && company && user["agencyId"] == company["agencyId"];
+        }
+    },
+    isCompanyAdminOrOwner: function(idpath: string) {
+        return async function (fn ,self, args) {
+            let companyId = _.get(args, idpath);
+            let staff = await Staff.getCurrent();
+            if(companyId){
+                let company = await Models.company.get(companyId);
+                return companyId && staff && company && staff["companyId"] == company["id"] && (staff["roleId"] == EStaffRole.ADMIN || staff["roleId"] == EStaffRole.OWNER);
+            }else{
+                return staff && staff.company && (staff["roleId"] == EStaffRole.ADMIN || staff["roleId"] == EStaffRole.OWNER);
+            }
         }
     },
     isMyTripPlan: function(idpath: string) {
