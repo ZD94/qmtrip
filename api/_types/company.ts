@@ -124,9 +124,8 @@ export class Company extends ModelObject{
         return Models.travelPolicy.find({companyId: this.id})
     }
 
-    getTripPlans(params): Promise<TripPlan[]> {
-        params.companyId = this.id;
-        return Models.tripPlan.find(params);
+    getTripPlans(): Promise<TripPlan[]> {
+        return Models.tripPlan.find({companyId: this.id});
     }
 
     getMoneyChanges(companyId?:string): Promise<MoneyChange[]> {

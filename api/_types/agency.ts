@@ -87,17 +87,10 @@ export class Agency extends ModelObject{
         return Models.agencyUser.find({agencyId: this.id});
     }
 
-    async getTripPlans(params): Promise<TripPlan[]> {
-        let corps = [];
-
-        if(params.companyId) {
-            corps.push(params.copanyId);
-        }else {
-            corps = await API.company.listCompany();
-        }
-
-        params.companyId = corps;
-        return Models.tripPlan.find(params);
+    async getTripPlans(): Promise<TripPlan[]> {
+        let companies = await this.getCompanys();
+        let compIds = companies.map((o)=>o.id);
+        return Models.tripPlan.find({companyId: {$in: compIds}});
     }
 }
 

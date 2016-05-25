@@ -223,7 +223,7 @@ export async function ListController($scope , Models){
     statusTxt[EPlanStatus.COMPLETE] = "审核完，已完成状态";
     $scope.statustext = statusTxt;
     // var tripPlans = await Models.tripPlan.find({});
-    let tripPlans = await staff.getTripPlans({});
+    let tripPlans = await staff.getTripPlans();
     tripPlans.map(function(trip){
         trip.startAt = moment(trip.startAt).toDate();
         trip.backAt = moment(trip.backAt).toDate();
