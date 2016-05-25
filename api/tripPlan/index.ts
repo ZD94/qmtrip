@@ -170,6 +170,7 @@ class TripPlanModule {
      * @returns {*}
      */
     @clientExport
+    @conditionDecorator([{if: condition.canGetTripPlan('0.id')}])
     @requireParams(['id'])
     static async getTripPlan(params: {id: string}): Promise<TripPlan> {
         return await Models.tripPlan.get(params.id);
@@ -181,45 +182,21 @@ class TripPlanModule {
      * @returns {*}
      */
     @clientExport
-    @requireParams(['id', 'tripPlanId', 'optLog', 'updates'])
-    static updateTripPlan(params): Promise<TripPlan> {
-        let tripPlanId = params.tripPlanId;
-        let userId = params.userId;
-        let optLog = params.optLog;
-        let updates = params.updates;
+    @requireParams(['id'], ['isNeedTraffic', 'isNeedHotel', 'title', 'description', 'status', 'deptCity', 'deptCityCode',
+        'arrivalCity', 'arrivalCityCode', 'startAt', 'backAt', 'remark'])
+    @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
+    static async updateTripPlan(params): Promise<TripPlan> {
+        let tripPlan = await Models.tripPlan.get(params.id);
 
-        return DBM.TripPlan.findById(tripPlanId)
-            .then(function (order) {
-                if (!order) {
-                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST();
-                }
+        if(!tripPlan) {
+            throw L.ERR.TRIP_PLAN_NOT_EXIST();
+        }
 
-                let logs = {
-                    tripPlanId: order.id,
-                    userId: userId,
-                    remark: optLog,
-                    createdAt: utils.now()
-                }
+        for(let key in params) {
+            tripPlan[key] = params[key];
+        }
 
-                return sequelize.transaction(function (t) {
-                    updates = utils.now();
-                    return Promise.all([
-                        DBM.TripPlan.update(updates, {
-                            returning: true,
-                            where: {id: tripPlanId},
-                            fields: Object.keys(updates),
-                            transaction: t
-                        }),
-                        DBM.TripPlanLogs.create(logs, {transaction: t})
-                    ]);
-                })
-            })
-            .spread(function (update) {
-                return update;
-            })
-            .spread(function (rownum, rows) {
-                return rows[0];
-            });
+        return tripPlan.save();
     }
 
     /**
@@ -252,13 +229,31 @@ class TripPlanModule {
 
         let tripDetails = await tripPlan.getTripDetails();
 
-        let process = [tripPlan.destroy()];
-        tripDetails.map(function (detail) {
-            process.push(detail.destroy());
-        });
+        await tripPlan.destroy();
+        await Promise.all(tripDetails.map((detail)=> detail.destroy()));
 
-        await Promise.all(process);
+        return true;
+    }
 
+    /**
+     * 提交计划单
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(['id'])
+    @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
+    static async commitTripPlan(params): Promise<boolean> {
+        let tripPlan = await Models.tripPlan.get(params.id);
+        let tripDetails = await tripPlan.getTripDetails();
+
+        await Promise.all(tripDetails.map(async function(detail) {
+            detail.status = EPlanStatus.AUDITING;
+            await detail.save();
+        }));
+
+        tripPlan.status = EPlanStatus.AUDITING;
+        await tripPlan.save();
         return true;
     }
 
@@ -267,7 +262,7 @@ class TripPlanModule {
      * @param params
      * @returns {*}
      */
-    @requireParams(['tripPlanId', 'accountId', 'type', 'startTime', 'invoiceType', 'budget'])
+    @requireParams(['tripPlanId', 'type', 'startTime', 'invoiceType', 'budget'])
     static saveTripDetail(params) {
         let record = params;
         record.isCommit = false;
@@ -278,7 +273,7 @@ class TripPlanModule {
         return DBM.TripPlan.findById(params.tripPlanId)
             .then(function (order) {
                 if (!order) {
-                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST();
+                    throw L.ERR.TRIP_PLAN_NOT_EXIST();
                 }
 
                 if (order.accountId != params.accountId) {
@@ -625,7 +620,7 @@ class TripPlanModule {
         return DBM.TripPlan.findById(logs.tripPlanId)
             .then(function (order) {
                 if (!order) {
-                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST();
+                    throw L.ERR.TRIP_PLAN_NOT_EXIST();
                 }
 
                 if (order.status == EPlanStatus.COMPLETE) {
@@ -667,7 +662,7 @@ class TripPlanModule {
                 let invoiceJson = consume.invoice;
 
                 if (!order) {
-                    throw L.ERR.TRIP_PLAN_ORDER_NOT_EXIST();
+                    throw L.ERR.TRIP_PLAN_NOT_EXIST();
                 }
 
                 if (order.status === EPlanStatus.WAIT_COMMIT && order.auditStatus == 0) {
@@ -916,26 +911,6 @@ class TripPlanModule {
             })
     }
 
-    /**
-     * 提交计划单
-     * @param params
-     * @returns {*}
-     */
-    @clientExport
-    @requireParams(['id'])
-    static async commitTripPlan(params): Promise<boolean> {
-        let tripPlan = await Models.tripPlan.get(params.id);
-        let tripDetails = await tripPlan.getTripDetails();
-
-        await Promise.all(tripDetails.map(async function(detail) {
-            detail.status = EPlanStatus.AUDITING;
-            await detail.save();
-        }));
-
-        tripPlan.status = EPlanStatus.AUDITING;
-        await tripPlan.save();
-        return true;
-    }
 
     /**
      * @method previewConsumeInvoice 预览发票图片
