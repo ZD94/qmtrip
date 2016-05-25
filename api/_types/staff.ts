@@ -98,6 +98,11 @@ export class Staff extends ModelObject implements Account {
         return Models.travelPolicy.get(id);
     }
     setTravelPolicy(val: TravelPolicy) {}
+
+    getTripPlans(params): Promise<TripPlan[]> {
+        params.accountId = this.id;
+        return Models.tripPlan.find(params);
+    }
     
     //Account properties:
     email: string;
