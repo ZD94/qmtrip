@@ -18,7 +18,7 @@ export enum EGender {
 
 export enum EAccountType {
     STAFF = 1,
-    AGENCY
+    AGENCY = 2
 };
 
 export interface ModelsInterface {
