@@ -44,7 +44,7 @@ class ApiTravelBudget {
     @clientExport
     static getBudgetInfo(params: {id: string}) {
         let {accountId} = Zone.current.get('session');
-        accountId = '0c1651e0-2256-11e6-9086-5525a1429285'; //test
+        // accountId = '0c1651e0-2256-11e6-9086-5525a1429285'; //test
         let key = `budgets:${accountId}:${params.id}`;
 
         return cache.read(key);
@@ -273,7 +273,7 @@ class ApiTravelBudget {
 
         //查询员工信息
         let staff = await API.staff.getStaff({id: accountId});
-        staff.travelPolicyId = "dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a";
+        // staff.travelPolicyId = "dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a";
 
         if (!staff || !staff.travelPolicyId) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
