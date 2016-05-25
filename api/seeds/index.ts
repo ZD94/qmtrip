@@ -1,6 +1,3 @@
-import {ServiceInterface} from "common/model";
-import {Seed} from "../_types/seed";
-import {Model} from "sequelize";
 /**
  * Created by yumiao on 15-12-11.
  */

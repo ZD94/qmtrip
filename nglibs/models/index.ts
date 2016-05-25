@@ -4,7 +4,8 @@ import ng = require('angular');
 import L = require('common/language');
 
 import { ModelsInterface, initModels } from 'api/_types';
-import { RemoteService, ModelObject, Resolvable } from 'common/model';
+import { ModelObjInterface } from 'common/model/interface';
+import { ModelRemote } from 'common/model/remote';
 import { ngService } from '../index';
 import { Staff, Credential, PointChange } from 'api/_types/staff';
 import { Company, MoneyChange } from 'api/_types/company';
@@ -90,7 +91,7 @@ function throwNotImplemented(){
     throw L.ERR.NOT_IMPLEMENTED();
 }
 
-function createService<T extends Resolvable>(options: any, cacheFactory: ng.ICacheFactoryService){
+function createService<T extends ModelObjInterface>(options: any, cacheFactory: ng.ICacheFactoryService){
     options.cache = cacheFactory(options.type.name);
     options.resolve = resolverAPIModule(options.modname);
     options.funcGet    = options.funcs[0] || throwNotImplemented;
@@ -98,29 +99,29 @@ function createService<T extends Resolvable>(options: any, cacheFactory: ng.ICac
     options.funcCreate = options.funcs[2] || throwNotImplemented;
     options.funcUpdate = options.funcs[3] || throwNotImplemented;
     options.funcDelete = options.funcs[4] || throwNotImplemented;
-    return new RemoteService<T>(options)
+    return new ModelRemote<T>(options)
 }
 
 @ngService('Models')
 class ClientModels implements ModelsInterface {
 
-    staff: RemoteService<Staff>;
-    credential: RemoteService<Credential>;
-    pointChange:RemoteService<PointChange>;
-    company: RemoteService<Company>;
-    department: RemoteService<Department>;
-    travelPolicy: RemoteService<TravelPolicy>;
-    agency: RemoteService<Agency>;
-    agencyUser: RemoteService<AgencyUser>;
-    tripPlan: RemoteService<TripPlan>;
-    tripDetail: RemoteService<TripDetail>;
-    tripPlanLog: RemoteService<TripPlanLog>;
-    moneyChange: RemoteService<MoneyChange>;
-    project: RemoteService<Project>;
-    place: RemoteService<Place>;
-    account: RemoteService<Account>;
-    seed: RemoteService<Seed>;
-    token: RemoteService<Token>;
+    staff: ModelRemote<Staff>;
+    credential: ModelRemote<Credential>;
+    pointChange:ModelRemote<PointChange>;
+    company: ModelRemote<Company>;
+    department: ModelRemote<Department>;
+    travelPolicy: ModelRemote<TravelPolicy>;
+    agency: ModelRemote<Agency>;
+    agencyUser: ModelRemote<AgencyUser>;
+    tripPlan: ModelRemote<TripPlan>;
+    tripDetail: ModelRemote<TripDetail>;
+    tripPlanLog: ModelRemote<TripPlanLog>;
+    moneyChange: ModelRemote<MoneyChange>;
+    project: ModelRemote<Project>;
+    //place: ModelRemote<Place>;
+    account: ModelRemote<Account>;
+    seed: ModelRemote<Seed>;
+    token: ModelRemote<Token>;
 
     constructor($cacheFactory: ng.ICacheFactoryService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
@@ -136,7 +137,7 @@ class ClientModels implements ModelsInterface {
         this.tripPlanLog = createService<TripPlanLog>(Services.tripPlanLog, $cacheFactory);
         this.moneyChange = createService<MoneyChange>(Services.moneyChange, $cacheFactory);
         this.project = createService<Project>(Services.project, $cacheFactory);
-        this.place = createService<Place>(Services.place, $cacheFactory);
+        //this.place = createService<Place>(Services.place, $cacheFactory);
         this.account = createService<Account>(Services.account, $cacheFactory);
         this.token = createService<Token>(Services.token, $cacheFactory);
         this.seed = createService<Seed>(Services.seed, $cacheFactory);

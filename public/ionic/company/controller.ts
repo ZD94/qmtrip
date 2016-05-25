@@ -31,7 +31,7 @@ export async function DistributionController($scope) {
 
 }
 
-export async function DepartmentController($scope, Models, $ionicPopup ,$route) {
+export async function DepartmentController($scope, Models, $ionicPopup) {
     var staff = await Staff.getCurrent();
     var departments = await staff.company.getDepartments();
     $scope.departments = departments.map(function (department) {
@@ -62,7 +62,7 @@ export async function DepartmentController($scope, Models, $ionicPopup ,$route) 
                             e.preventDefault();
                         } else {
                             $scope.newdepartment.save();
-                            $route.reload();
+                            // $route.reload();
                         }
                     }
                 }
@@ -162,12 +162,6 @@ export async function TravelpolicyController($scope, Models, $location) {
 }
 
 export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory) {
-    //使下一个面变为根目录可呼出menu
-    $ionicHistory.nextViewOptions({
-        historyRoot: true,
-        disableAnimate: true,
-        expire: 300
-    });
     var discounts = $scope.discounts = [
         {value: 0, text: '不限'},
         {value: 9, text: '9折及以下'},

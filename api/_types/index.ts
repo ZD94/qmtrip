@@ -1,4 +1,3 @@
-import { ServiceInterface, ServiceDelegate } from 'common/model';
 
 import { Company, MoneyChange } from "./company";
 import { Staff, Credential, PointChange } from "./staff";
@@ -8,6 +7,8 @@ import { Agency, AgencyUser } from './agency';
 import {TripPlan, TripDetail, Project, TripPlanLog} from './tripPlan';
 import { Account, Token } from './auth';
 import {Seed} from "./seed";
+import { ModelInterface } from 'common/model/interface';
+import { ModelDelegate } from 'common/model/delegate';
 
 
 export enum EGender {
@@ -21,51 +22,51 @@ export enum EAccountType {
 };
 
 export interface ModelsInterface {
-    staff: ServiceInterface<Staff>;
-    credential: ServiceInterface<Credential>;
-    pointChange: ServiceInterface<PointChange>;
+    staff: ModelInterface<Staff>;
+    credential: ModelInterface<Credential>;
+    pointChange: ModelInterface<PointChange>;
     
-    company: ServiceInterface<Company>;
-    moneyChange: ServiceInterface<MoneyChange>;
+    company: ModelInterface<Company>;
+    moneyChange: ModelInterface<MoneyChange>;
     
-    department: ServiceInterface<Department>;
-    travelPolicy: ServiceInterface<TravelPolicy>;
+    department: ModelInterface<Department>;
+    travelPolicy: ModelInterface<TravelPolicy>;
 
-    agency: ServiceInterface<Agency>;
-    agencyUser: ServiceInterface<AgencyUser>;
+    agency: ModelInterface<Agency>;
+    agencyUser: ModelInterface<AgencyUser>;
 
-    seed: ServiceInterface<Seed>;
-    tripPlan: ServiceInterface<TripPlan>;
-    tripDetail: ServiceInterface<TripDetail>;
-    tripPlanLog: ServiceInterface<TripPlanLog>;
-    project: ServiceInterface<Project>;
+    seed: ModelInterface<Seed>;
+    tripPlan: ModelInterface<TripPlan>;
+    tripDetail: ModelInterface<TripDetail>;
+    tripPlanLog: ModelInterface<TripPlanLog>;
+    project: ModelInterface<Project>;
 
-    account: ServiceInterface<Account>;
-    token: ServiceInterface<Token>;
+    account: ModelInterface<Account>;
+    token: ModelInterface<Token>;
 }
 
 export var Models: ModelsInterface = {
-    staff: new ServiceDelegate<Staff>(),
-    credential: new ServiceDelegate<Credential>(),
-    pointChange: new ServiceDelegate<PointChange>(),
+    staff: new ModelDelegate<Staff>(),
+    credential: new ModelDelegate<Credential>(),
+    pointChange: new ModelDelegate<PointChange>(),
     
-    company: new ServiceDelegate<Company>(),
-    moneyChange: new ServiceDelegate<MoneyChange>(),
+    company: new ModelDelegate<Company>(),
+    moneyChange: new ModelDelegate<MoneyChange>(),
     
-    department: new ServiceDelegate<Department>(),
-    travelPolicy: new ServiceDelegate<TravelPolicy>(),
+    department: new ModelDelegate<Department>(),
+    travelPolicy: new ModelDelegate<TravelPolicy>(),
 
-    agency: new ServiceDelegate<Agency>(),
-    agencyUser: new ServiceDelegate<AgencyUser>(),
+    agency: new ModelDelegate<Agency>(),
+    agencyUser: new ModelDelegate<AgencyUser>(),
 
-    seed: new ServiceDelegate<Seed>(),
-    tripPlan: new ServiceDelegate<TripPlan>(),
-    tripDetail: new ServiceDelegate<TripDetail>(),
-    tripPlanLog: new ServiceDelegate<TripPlanLog>(),
-    project: new ServiceDelegate<Project>(),
+    seed: new ModelDelegate<Seed>(),
+    tripPlan: new ModelDelegate<TripPlan>(),
+    tripDetail: new ModelDelegate<TripDetail>(),
+    tripPlanLog: new ModelDelegate<TripPlanLog>(),
+    project: new ModelDelegate<Project>(),
 
-    account: new ServiceDelegate<Account>(),
-    token: new ServiceDelegate<Token>(),
+    account: new ModelDelegate<Account>(),
+    token: new ModelDelegate<Token>(),
 };
 
 export function initModels(models: ModelsInterface){

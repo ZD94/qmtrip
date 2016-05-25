@@ -2,11 +2,11 @@ import { regApiType } from 'common/api/helper';
 import { Models } from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import { Company } from 'api/_types/company';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference, Values } from 'common/model';
-import { Create } from 'common/model';
+import { Table, Create, Field, Reference, ResolveRef } from 'common/model/common';
+import { ModelObject } from 'common/model/object';
+import { Types, Values } from 'common/model';
 
 @Table(Models.department, "department.")
-@regApiType('API.')
 export class Department extends ModelObject{
     constructor(target: Object) {
         super(target);

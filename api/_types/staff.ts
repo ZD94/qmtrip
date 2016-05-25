@@ -4,10 +4,11 @@ import { TripPlan } from 'api/_types/tripPlan';
 import { regApiType } from 'common/api/helper';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Department } from 'api/_types/department';
-import { ModelObject, Types, Values } from 'common/model';
-import { Table, TableExtends, Create, Field, ResolveRef, Reference } from 'common/model';
+import { Types, Values } from 'common/model';
 import { Account } from './auth';
 import { getSession } from 'common/model';
+import { TableExtends, Table, Create, Field, ResolveRef, Reference } from 'common/model/common';
+import { ModelObject } from 'common/model/object';
 
 export enum EStaffStatus {
     ON_JOB = 0,
@@ -25,7 +26,6 @@ function enumValues(e){
     return Object.keys(e).map((k)=>e[k]).filter((v)=>(typeof v != 'number'));
 }
 
-@regApiType('API.')
 @TableExtends(Account, 'account')
 @Table(Models.staff, "staff.")
 export class Staff extends ModelObject implements Account {
@@ -116,7 +116,6 @@ export class Staff extends ModelObject implements Account {
 }
 
 @Table(Models.credential, "staff.")
-@regApiType('API.')
 export class Credential extends ModelObject{
     constructor(target: Object) {
         super(target);
@@ -150,7 +149,6 @@ export class Credential extends ModelObject{
 }
 
 @Table(Models.pointChange, "staff.")
-@regApiType('API.')
 export class PointChange extends ModelObject{
     constructor(target: Object) {
         super(target);

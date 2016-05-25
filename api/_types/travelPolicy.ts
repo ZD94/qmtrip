@@ -2,11 +2,11 @@ import { regApiType } from 'common/api/helper';
 import { Models } from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import { Company } from 'api/_types/company';
-import { ModelObject, Table, Field, Types, ResolveRef, Reference, Values } from 'common/model';
-import { Create } from 'common/model';
+import { Types, Values } from 'common/model';
+import { Table, Create, Field, ResolveRef } from 'common/model/common';
+import { ModelObject } from 'common/model/object';
 
 @Table(Models.travelPolicy, "travelPolicy.")
-@regApiType('API.')
 export class TravelPolicy extends ModelObject{
     constructor(target: Object) {
         super(target);

@@ -12,7 +12,6 @@ import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import {requirePermit, conditionDecorator, condition} from "../_decorator";
 import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_types/staff";
 import types = require("api/_types/travelPolicy");
-import { ServiceInterface } from 'common/model';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Models, EAccountType } from 'api/_types';
 

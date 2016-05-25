@@ -10,7 +10,6 @@ let API = require("common/api");
 let L = require("common/language");
 import {Department} from "api/_types/department";
 import {validateApi, requireParams, clientExport} from 'common/api/helper';
-import { ServiceInterface } from 'common/model';
 import { Models, EAccountType } from '../_types/index';
 
 const departmentCols = Department['$fieldnames'];

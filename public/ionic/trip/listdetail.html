@@ -14,7 +14,7 @@
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <div class="button-bar"></div>
         <ion-list>
-            <div>
+            <div style="margin-bottom: 10px">
                 <ion-item class="item-divider">
                     <span>去程交通</span>
                     <span style="margin-left: 120px;">{{goTraffic.price}}</span>元
@@ -40,7 +40,7 @@
                     <span class="item-note">{{statustext[goTraffic.status]}}</span>
                 </div>
             </div>
-            <div>
+            <div style="margin-bottom: 10px">
                 <ion-item class="item-divider">
                     <span>去程交通</span>
                     <span style="margin-left: 120px;">{{backTraffic.price}}</span>元
@@ -66,7 +66,7 @@
                     <span class="item-note">{{statustext[backTraffic.status]}}</span>
                 </div>
             </div>
-            <div>
+            <div style="margin-bottom: 10px">
                 <ion-item class="item-divider">
                     <span>去程交通</span>
                     <span style="margin-left: 120px;">{{hotel.price}}</span>元
@@ -164,6 +164,6 @@
         <!--</ion-list>-->
         <div class="button-bar"></div>
         <div class="button-bar"></div>
-        <a ng-click="approveTripPlan()" id="page20-button60" class="button button-stable  button-block">提交审核</a>
+        <a ng-click="approveTripPlan()" id="page20-button60" class="button button-stable  button-block" no-back>提交审核</a>
     </ion-content>
 </ion-view>

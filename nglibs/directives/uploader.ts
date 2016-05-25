@@ -126,7 +126,7 @@ function onAfterAddingFile(file, uploadedCbFn){
     data.push('<div class="upload_sure">');
     data.push('<div class="img_tit"><span class="web-icon-font3">'+file.title+'</span></div>');
     data.push('<div class="preview_img"></div>');
-    data.push('<div class="img_button"><div class="reupload">取消</div><div class="uploadall">确定</div></div>');
+    data.push('<div class="img_button"><div class="reupload" no-back>取消</div><div class="uploadall" no-back>确定</div></div>');
     data.push('</div>');
     var html = data.join('');
     var fileupload = document.getElementById('upload');
