@@ -3,10 +3,10 @@
 import { Models } from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import {Agency} from 'api/_types/agency';
-import { regApiType } from 'common/api/helper';
 import {TravelPolicy} from "api/_types/travelPolicy";
 import { Types, Values } from 'common/model';
 import { Department } from './department';
+import { TripPlan } from "api/_types/tripPlan";
 import { Table, Create, Field, Reference } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 
@@ -122,6 +122,11 @@ export class Company extends ModelObject{
 
     getTravelPolicies(): Promise<TravelPolicy[]> {
         return Models.travelPolicy.find({companyId: this.id})
+    }
+
+    getTripPlans(params): Promise<TripPlan[]> {
+        params.companyId = this.id;
+        return Models.tripPlan.find(params);
     }
 
     getMoneyChanges(companyId?:string): Promise<MoneyChange[]> {
