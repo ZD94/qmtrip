@@ -4,6 +4,7 @@
 
 import {HotelBudget, TrafficBudget} from "api/_types/budget";
 import { clientExport } from '../../common/api/helper';
+import {ETripType, EInvoiceType} from "../_types/tripPlan";
 const API = require("common/api");
 const validate = require("common/validate");
 const L = require("common/language");
@@ -20,8 +21,8 @@ const defaultPrice = {
 
 interface TravelBudgeItem {
     price: number;
-    type?: string;
-    itemType?: string;
+    type?: EInvoiceType;
+    tripType?: ETripType;
 }
 
 interface BudgetOptions{
@@ -42,10 +43,10 @@ class ApiTravelBudget {
 
     @clientExport
     static getBudgetInfo(params: {id: string}) {
-        let self: any = this;
-        let accountId = self.accountId;
-
+        let {accountId} = Zone.current.get('session');
+        accountId = '0c1651e0-2256-11e6-9086-5525a1429285'; //test
         let key = `budgets:${accountId}:${params.id}`;
+
         return cache.read(key);
     }
 
@@ -72,6 +73,7 @@ class ApiTravelBudget {
     @clientExport
     static async getTravelPolicyBudget(params: BudgetOptions) :Promise<string> {
         let self: any = this;
+        let {accountId} = Zone.current.get('session');
 
         let {leaveDate, goBackDate, isRoundTrip, originPlace, destinationPlace, checkInDate,
             checkOutDate, businessDistrict, leaveTime, goBackTime, isNeedHotel} = params;
@@ -123,7 +125,7 @@ class ApiTravelBudget {
             leaveDate: leaveDate,
             leaveTime: leaveTime
         });
-        budget.itemType = 'goTraffic'
+        budget.tripType = ETripType.OUT_TRIP;
         budgets.push(budget);
 
         if (isRoundTrip) {
@@ -133,7 +135,7 @@ class ApiTravelBudget {
                 leaveDate: goBackDate,
                 leaveTime: goBackTime
             });
-            budget.itemType = 'backTraffic';
+            budget.tripType = ETripType.BACK_TRIP;
             budgets.push(budget);
         }
 
@@ -144,7 +146,7 @@ class ApiTravelBudget {
                 checkInDate: checkInDate,
                 checkOutDate: checkOutDate
             });
-            budget.itemType = 'hotel';
+            budget.tripType = ETripType.HOTEL;
             budgets.push(budget);
         }
         let obj: any = {};
@@ -152,7 +154,7 @@ class ApiTravelBudget {
         obj.query = params;
         obj.createAt = Date.now();
         let _id = Date.now() + utils.getRndStr(6);
-        let key = `budgets:${self.accountId}:${_id}`;
+        let key = `budgets:${accountId}:${_id}`;
         await cache.write(key, JSON.stringify(obj))
         return _id;
     }
@@ -232,9 +234,9 @@ class ApiTravelBudget {
         if (!budget.price || budget.price < 0) {
             days = days<= 0 ? 1 :days;
             if (policy.hotelPrice) {
-                budget = {price: policy.hotelPrice * days, type: 'hotel'} as TravelBudgeItem;
+                budget = {price: policy.hotelPrice * days, type: EInvoiceType.HOTEL} as TravelBudgeItem;
             } else {
-                budget = {price: defaultPrice[hotelStar] * days, type: 'hotel'} as TravelBudgeItem;
+                budget = {price: defaultPrice[hotelStar] * days, type: EInvoiceType.HOTEL} as TravelBudgeItem;
             }
         }
         return budget;
@@ -255,8 +257,7 @@ class ApiTravelBudget {
         leaveDate: Date | string, leaveTime: string}) : Promise<TravelBudgeItem> {
 
         let {originPlace, destinationPlace, leaveDate, leaveTime} = params;
-        let self: any = this;
-        let accountId = self.accountId;
+        let {accountId} = Zone.current.get('session');
 
         if (!destinationPlace) {
             throw new Error(JSON.stringify({code: -1, msg: "目的地城市信息不存在"}));
@@ -272,6 +273,7 @@ class ApiTravelBudget {
 
         //查询员工信息
         let staff = await API.staff.getStaff({id: accountId});
+        staff.travelPolicyId = "dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a";
 
         if (!staff || !staff.travelPolicyId) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();

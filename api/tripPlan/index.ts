@@ -6,10 +6,10 @@ let sequelize = require("common/model").DB;
 let DBM = sequelize.models;
 let uuid = require("node-uuid");
 let L = require("common/language");
-let Logger = require('common/logger');
 let utils = require('common/utils');
 let API = require('common/api');
-let logger = new Logger("company");
+let Logger = require('common/logger');
+let logger = new Logger("tripPlan");
 let validate = require("common/validate");
 let config = require("../../config");
 import _ = require('lodash');
@@ -19,7 +19,6 @@ import {Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, E
 import {Models} from "../_types/index";
 import {Staff} from "../_types/staff";
 import {conditionDecorator, condition} from "../_decorator";
-import async = Q.async;
 
 
 let TripDetailCols = TripDetail['$fieldnames'];
@@ -27,7 +26,7 @@ let TripPlanCols = TripPlan['$fieldnames'];
 
 class IBudgetItem {
     price: number
-    itemType: string
+    tripType: string
     type: string
     hotel: string
 }
@@ -36,132 +35,196 @@ class TripPlanModule {
     static TripPlanCols = TripPlanCols;
     static TripDetailCols = TripDetailCols;
 
-    /**
-     * @method saveTripPlan
-     * 生成出差计划单
-     * @param params
-     * @returns {Promise<TripPlan>}
-     */
+    // static async caculateTravelBudget(){
+    //     let ret = await API.travelBudget.getTravelPolicyBudget({
+    //         leaveDate: '2016-06-01',
+    //         goBackDate: '2016-06-10',
+    //         isRoundTrip: true,
+    //         originPlace: '北京',
+    //         destinationPlace: '上海',
+    //         checkInDate: '2016-06-01',
+    //         checkOutDate: '2016-06-10',
+    //         leaveTime: '10:00',
+    //         goBackTime: '10:00',
+    //         isNeedHotel: false
+    //     });
+    //
+    //     return ret;
+    // }
+
     @clientExport
-    @requireParams(['deptCity', 'arrivalCity', 'startAt', 'title', 'budgets'], ['backAt', 'remark', 'description'])
-    static async saveTripPlan(params: {deptCity: string, arrivalCity: string, startAt: string, title: string, budgets: IBudgetItem[],backAt?: string, remark?: string, description?: string}): Promise<TripPlan> {
-        let {accountId} = Zone.current.get('session');
-        let staff = await Models.staff.get(accountId);
-        let email = staff.email;
-        let staffName = staff.name;
-        let _tripPlan:any = _.pick(params, TripPlanCols);
-        let totalPrice:number = 0;
-        for(let budget of params.budgets) {
-            if (budget.price < 0) {
-                totalPrice = -1;
-                break;
-            }
-            totalPrice += Number(budget.price);
-        }
+    @requireParams(['budgetId', 'title'], ['description', 'remark'])
+    static async saveTripPlan(params): Promise<TripPlan> {
+        let staff = await Staff.getCurrent();
+        let {budgets, query} = await API.travelBudget.getBudgetInfo({id: params.budgetId});
+        let project = await getProjectByName({companyId: staff.company.id, name: params.title, userId: staff.id, isCreate: true});
 
-        let tripPlanId = uuid.v1();
-        let project = await getProjectByName({companyId: staff.company.id, name: _tripPlan.title, userId: accountId, isCreate: true});
+        let tripPlan = Models.tripPlan.create(params);
+        tripPlan['accountId'] = staff.id;
+        tripPlan['companyId'] = staff.company.id;
+        tripPlan.project = project;
+        tripPlan.startAt = query.leaveDate;
+        tripPlan.backAt = query.goBackDate;
+        tripPlan.deptCity = query.originPlace;
+        tripPlan.arrivalCity = query.destinationPlace;
+        tripPlan.isNeedHotel = query.isNeedHotel;
+        tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo');
 
-        _tripPlan.id = tripPlanId;
-        _tripPlan.budget = totalPrice
-        _tripPlan.status = 0;
-        _tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo'); //获取出差计划单号
-        _tripPlan.accountId = accountId;
-        _tripPlan.companyId = staff.company.id;
-        _tripPlan.projectId = project.id;
+        let tripDetails: TripDetail[] = budgets.map(function (budget) {
+            let tripType = budget.tripType;
+            let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: Number(budget.price)});
+            detail.accountId = staff.id;
+            detail.isCommit = false;
+            detail.status = EPlanStatus.WAIT_UPLOAD;
+            detail.tripPlan = tripPlan;
 
-        let tripPlan = new TripPlan(await DBM.TripPlan.create(_tripPlan));
-
-        await Promise.all(params.budgets.map(async function (detail) {
-            let _detail: any = JSON.parse(JSON.stringify(detail));
-            switch(detail.itemType) {
-                case 'goTraffic':
-                    _detail.type = ETripType.OUT_TRIP;
+            switch(tripType) {
+                case ETripType.OUT_TRIP:
+                    detail.deptCity = query.originPlace;
+                    detail.arrivalCity = query.destinationPlace;
+                    detail.startTime = query.leaveDate;
+                    detail.endTime = query.goBackDate;
                     break;
-                case 'backTraffic':
-                    _detail.type = ETripType.BACK_TRIP;
+                case ETripType.BACK_TRIP:
+                    detail.deptCity = query.destinationPlace;
+                    detail.arrivalCity = query.originPlace;
+                    detail.startTime = query.goBackDate;
+                    detail.endTime = query.leaveDate;
                     break;
-                case 'hotel':
-                    _detail.type = ETripType.HOTEL;
-                    _detail.hotelName = detail.hotel;
-                    break;
-                default:
-                    _detail.type = ETripType.OTHER;
-            }
-
-            switch(detail.type) {
-                case 'train':
-                    _detail.invoiceType = EInvoiceType.TRAIN;
-                    break;
-                case 'hotel':
-                    _detail.invoiceType = EInvoiceType.HOTEL;
-                    break;
-                case 'air':
-                    _detail.invoiceType = EInvoiceType.PLANE;
+                case ETripType.HOTEL:
+                    detail.city = query.destinationPlace;
+                    detail.hotelName = query.businessDistrict;
+                    detail.startTime = query.checkInDate;
+                    detail.endTime = query.checkOutDate;
                     break;
                 default:
-                    _detail.invoiceType = EInvoiceType.OTHER;
+                    detail.startTime = query.leaveDate;
+                    detail.endTime = query.goBackDate;
+                    break;
             }
-            _detail.tripPlanId = tripPlanId;
-            _detail.accountId = accountId;
-            _detail.status = 0;
-            _detail.budget = Number(_detail.price);
-            let tripDetail = await DBM.TripDetail.create(_detail);
-        }));
+            return detail;
+        });
 
-        let logs = {tripPlanId: tripPlanId, userId: accountId, remark: '新增计划单 ' + tripPlan.planNo, createdAt: utils.now()};
-        await DBM.TripPlanLog.create(logs);
-
-        if (tripPlan.budget <= 0 || tripPlan['status'] === EPlanStatus.NO_BUDGET) {
-            return tripPlan; //没有预算，直接返回计划单
-        }
-
-        let staffs = await Models.staff.find({companyId: staff.company.id, roleId: {$ne: 1}, status: {$gte: 0}});
-        let url = config.host + '/corp.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
-        let go = '无', back = '无', hotelStr = '无';
-
-        let outTrip = await tripPlan.getOutTrip();
-        if (outTrip && outTrip.length > 0) {
-            let g = outTrip[0];
-            go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.deptCity + ' 到 ' + g.arrivalCity;
-            if (g.latestArriveTime)
-                go += ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达';
-            go += ', 动态预算￥' + g.budget;
-        }
-
-        let backTrip = await tripPlan.getBackTrip();
-        if (backTrip && backTrip.length > 0) {
-            let b = backTrip[0];
-            back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.deptCity + ' 到 ' + b.arrivalCity;
-            if (b.latestArriveTime)
-                back += ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达';
-            back += ', 动态预算￥' + b.budget;
-        }
-
-        let hotel = await tripPlan.getHotel();
-        if (hotel && hotel.length > 0) {
-            let h = hotel[0];
-            hotelStr = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') +
-                ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
-        }
-
-        await Promise.all(staffs.map(async function (s) {
-            let account = await API.auth.getAccount({id: s.id, type: 1, attributes: ['status']});
-            if (account.status != 1)
-                return false;
-
-            let vals = {managerName: s.name, username: staffName, email: email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-                projectName: tripPlan.description, goTrafficBudget: go, backTripBudget: back, hotelBudget: hotelStr,
-                totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url};
-            let log = {userId: accountId, tripPlanId: tripPlan.id, remark: tripPlan.planNo + '给企业管理员' + s.name + '发送邮件'};
-
-            // await API.mail.sendMailRequest({toEmails: s.email, templateName: 'qm_notify_new_travelbudget', values: vals});
-            await API.tripPlan.saveTripPlanLog(log);
-            return true;
-        }));
+        await tripPlan.save();
+        await Promise.all(tripDetails.map((d)=>d.save()));
 
         return tripPlan;
     }
+    //
+    // /**
+    
+    //  * @method saveTripPlan
+    //  * 生成出差计划单
+    //  * @param params
+    //  * @returns {Promise<TripPlan>}
+    //  */
+    // @clientExport
+    // @requireParams(['deptCity', 'arrivalCity', 'startAt', 'title', 'budgets'], ['backAt', 'remark', 'description'])
+    // static async saveTripPlan(params: {deptCity: string, arrivalCity: string, startAt: string, title: string, budgets: IBudgetItem[],backAt?: string, remark?: string, description?: string}): Promise<TripPlan> {
+    //     let {accountId} = Zone.current.get('session');
+    //     let staff = await Models.staff.get(accountId);
+    //     let email = staff.email;
+    //     let staffName = staff.name;
+    //     let _tripPlan:any = _.pick(params, TripPlanCols);
+    //     let totalPrice:number = 0;
+    //     for(let budget of params.budgets) {
+    //         if (budget.price < 0) {
+    //             totalPrice = -1;
+    //             break;
+    //         }
+    //         totalPrice += Number(budget.price);
+    //     }
+    //
+    //     let tripPlanId = uuid.v1();
+    //     let project = await getProjectByName({companyId: staff.company.id, name: _tripPlan.title, userId: accountId, isCreate: true});
+    //
+    //     _tripPlan.id = tripPlanId;
+    //     _tripPlan.budget = totalPrice
+    //     _tripPlan.status = 0;
+    //     _tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo'); //获取出差计划单号
+    //     _tripPlan.accountId = accountId;
+    //     _tripPlan.companyId = staff.company.id;
+    //     _tripPlan.projectId = project.id;
+    //
+    //     let tripPlan = new TripPlan(await DBM.TripPlan.create(_tripPlan));
+    //
+    //     await Promise.all(params.budgets.map(async function (detail) {
+    //         let _detail: any = JSON.parse(JSON.stringify(detail));
+    //
+    //         switch(detail.type) {
+    //             case 'train':
+    //                 _detail.invoiceType = EInvoiceType.TRAIN;
+    //                 break;
+    //             case 'hotel':
+    //                 _detail.invoiceType = EInvoiceType.HOTEL;
+    //                 break;
+    //             case 'air':
+    //                 _detail.invoiceType = EInvoiceType.PLANE;
+    //                 break;
+    //             default:
+    //                 _detail.invoiceType = EInvoiceType.OTHER;
+    //         }
+    //
+    //         _detail.tripPlanId = tripPlanId;
+    //         _detail.accountId = accountId;
+    //         _detail.status = 0;
+    //         _detail.budget = Number(_detail.price);
+    //         let tripDetail = await DBM.TripDetail.create(_detail);
+    //     }));
+    //
+    //     let logs = {tripPlanId: tripPlanId, userId: accountId, remark: '新增计划单 ' + tripPlan.planNo, createdAt: utils.now()};
+    //     await DBM.TripPlanLog.create(logs);
+    //
+    //     if (tripPlan.budget <= 0 || tripPlan['status'] === EPlanStatus.NO_BUDGET) {
+    //         return tripPlan; //没有预算，直接返回计划单
+    //     }
+    //
+    //     let staffs = await Models.staff.find({companyId: staff.company.id, roleId: {$ne: 1}, status: {$gte: 0}});
+    //     let url = config.host + '/corp.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
+    //     let go = '无', back = '无', hotelStr = '无';
+    //
+    //     let outTrip = await tripPlan.getOutTrip();
+    //     if (outTrip && outTrip.length > 0) {
+    //         let g = outTrip[0];
+    //         go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.deptCity + ' 到 ' + g.arrivalCity;
+    //         if (g.latestArriveTime)
+    //             go += ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达';
+    //         go += ', 动态预算￥' + g.budget;
+    //     }
+    //
+    //     let backTrip = await tripPlan.getBackTrip();
+    //     if (backTrip && backTrip.length > 0) {
+    //         let b = backTrip[0];
+    //         back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.deptCity + ' 到 ' + b.arrivalCity;
+    //         if (b.latestArriveTime)
+    //             back += ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达';
+    //         back += ', 动态预算￥' + b.budget;
+    //     }
+    //
+    //     let hotel = await tripPlan.getHotel();
+    //     if (hotel && hotel.length > 0) {
+    //         let h = hotel[0];
+    //         hotelStr = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') +
+    //             ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
+    //     }
+    //
+    //     await Promise.all(staffs.map(async function (s) {
+    //         let account = await API.auth.getAccount({id: s.id, type: 1, attributes: ['status']});
+    //         if (account.status != 1)
+    //             return false;
+    //
+    //         let vals = {managerName: s.name, username: staffName, email: email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+    //             projectName: tripPlan.description, goTrafficBudget: go, backTripBudget: back, hotelBudget: hotelStr,
+    //             totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url};
+    //         let log = {userId: accountId, tripPlanId: tripPlan.id, remark: tripPlan.planNo + '给企业管理员' + s.name + '发送邮件'};
+    //
+    //         // await API.mail.sendMailRequest({toEmails: s.email, templateName: 'qm_notify_new_travelbudget', values: vals});
+    //         await API.tripPlan.saveTripPlanLog(log);
+    //         return true;
+    //     }));
+    //
+    //     return tripPlan;
+    // }
 
 
     /**
@@ -1085,17 +1148,15 @@ class TripPlanModule {
 }
 
 async function getProjectByName(params) {
-    let projects = await Models.project.find({name: params.name});
+    let projects = await Models.project.find({where: {name: params.name}});
     let project;
 
     if(projects && projects.length > 0) {
-        project = projects[0];
+        return projects[0]
     }else if(params.isCreate === true){
         let p = {name: params.name, createUser: params.userId, code: '', companyId: params.companyId, createdAt: utils.now()};
-        project = await DBM.Project.create(p);
+        return Models.project.create(p).save();
     }
-
-    return new Project(project);
 }
 
 

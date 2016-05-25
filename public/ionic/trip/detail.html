@@ -16,18 +16,18 @@
         <ion-list>
             <div ng-repeat="budget in budgets">
                 <ion-item class="item-divider">
-                    <span ng-if='budget.itemType == "goTraffic"'>去程交通</span>
-                    <span ng-if='budget.itemType == "backTraffic"'>回程交通</span>
-                    <span ng-if='budget.itemType == "hotel"'>住宿</span>
-                    <span ng-if='budget.itemType == "other" '>其他补助</span>
+                    <span ng-if='budget.tripType == "goTraffic"'>去程交通</span>
+                    <span ng-if='budget.tripType == "backTraffic"'>回程交通</span>
+                    <span ng-if='budget.tripType == "hotel"'>住宿</span>
+                    <span ng-if='budget.tripType == "other" '>其他补助</span>
                     <span style="margin-left: 120px;">{{budget.price}}</span>元</ion-item>
                 <ion-item>
-                    <span ng-if='budget.itemType == "goTraffic"'>{{trip.startAt | date: 'yyyy-MM-dd'}}</span>
-                    <span ng-if='budget.itemType == "backTraffic"'>{{trip.backAt | date: 'yyyy-MM-dd'}}</span>
-                    <span ng-if='budget.itemType == "hotel"'>
+                    <span ng-if='budget.tripType == "goTraffic"'>{{trip.startAt | date: 'yyyy-MM-dd'}}</span>
+                    <span ng-if='budget.tripType == "backTraffic"'>{{trip.backAt | date: 'yyyy-MM-dd'}}</span>
+                    <span ng-if='budget.tripType == "hotel"'>
                         {{trip.startAt | date: 'yyyy-MM-dd'}}至{{trip.backAt | date: 'yyyy-MM-dd'}}
                     </span>
-                    <span ng-if='budget.itemType == "other"'>
+                    <span ng-if='budget.tripType == "other"'>
                         {{trip.startAt | date: 'yyyy-MM-dd'}}至{{trip.backAt | date: 'yyyy-MM-dd'}}
                     </span>
                     <br>
