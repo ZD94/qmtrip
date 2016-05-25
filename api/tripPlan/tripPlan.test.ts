@@ -35,7 +35,7 @@ describe("api/tripPlan", function() {
                     let plans = await Models.tripPlan.find({where: {accountId: s.id}, paranoid: false});
                     await Promise.all(plans.map(async function(p){
                         let tripDetails = await Models.tripDetail.find({where: {tripPlanId: p.id}, paranoid: false});
-                        await tripDetails.map(t=>t.destroy({force: true}));
+                        await Promise.all(tripDetails.map((t)=>t.destroy({force: true})));
                         await p.destroy({force: true});
                     }));
                     await s.destroy({force: true});
@@ -45,7 +45,6 @@ describe("api/tripPlan", function() {
             await a.destroy({force: true});
         }));
     }
-
 
     before(function(done){
         deleteTripPlanByTest()
@@ -64,7 +63,6 @@ describe("api/tripPlan", function() {
                 companyId = company.id;
                 staffId = company.createUser;
 
-                console.info('staffId=>', staffId);
                 var session = getSession();
                 session.accountId = staffId;
                 session.tokenId = 'tokenId';
@@ -77,80 +75,6 @@ describe("api/tripPlan", function() {
             .nodeify(done);
     });
 
-    // describe("editTripPlanBudget", function(){
-    //     var _tripPlanOrder = {
-    //         deptCity: '北京',
-    //         arrivalCity: '上海',
-    //         deptCityCode: 'BJ123',
-    //         arrivalCityCode: 'SH123',
-    //         startAt: '2016-01-07 10:22:00',
-    //         title: '审核发票用测试',
-    //         budget: -1,
-    //         hotel: [{
-    //             type: 0,
-    //             startTime: '2016-01-07 10:22:00',
-    //             endTime: '2016-01-30 11:12:34',
-    //             city: '北京市',
-    //             cityCode: 'BJ123',
-    //             hotelName: '丐帮总部',
-    //             invoiceType: EInvoiceType.HOTEL,
-    //             budget: -1,
-    //             newInvoice: '票据详情'
-    //         }]
-    //     };
-    //     var new_trip_plan_id = '';
-    //     var new_consume_id = '';
-    //
-    //     before(function(done) {
-    //         API.tripPlan.saveTripPlan( _tripPlanOrder)
-    //             .then(function(trip_plan) {
-    //                 new_trip_plan_id = trip_plan.id;
-    //                 return trip_plan.getHotel();
-    //             })
-    //             .then(function(hotels) {
-    //                 new_consume_id = hotels[0].id;
-    //                 done();
-    //             })
-    //             .catch(function(err) {
-    //                 throw err;
-    //             }).done();
-    //     });
-    //
-    //     after(function(done) {
-    //         API.tripPlan.deleteTripPlan({tripPlanId: new_trip_plan_id, userId: staffId})
-    //             .then(function(){
-    //                 done()
-    //             })
-    //             .catch(function(err){
-    //                 throw err;
-    //             })
-    //             .done();
-    //     });
-    //
-    //     it("#editTripPlanBudget should be ok", function(done) {
-    //         var self = {accountId: agencyUserId};
-    //         API.tripPlan.editTripPlanBudget({id: new_consume_id, budget: '3333'}, function(err, ret){
-    //             if (err) {
-    //                 throw err;
-    //             }
-    //             assert.equal(ret, true);
-    //             done();
-    //         })
-    //     });
-    //
-    //     it("#editTripPlanBudget should be error if params.budget is null", function(done) {
-    //         var self = {accountId: agencyUserId};
-    //         API.tripPlan.editTripPlanBudget({id: new_consume_id})
-    //             .then(function(ret) {
-    //                 assert.equal(ret, null);
-    //                 done();
-    //             })
-    //             .catch(function(err) {
-    //                 assert.equal(err.code, -1);
-    //                 done();
-    //             })
-    //     });
-    // });
 
     var tripPlanOrder = {
         deptCity: '北京',
@@ -170,11 +94,9 @@ describe("api/tripPlan", function() {
             invoiceType: EInvoiceType.HOTEL,
         }]
     }
-
     describe("saveTripPlan", function(){
 
         it("#saveTripPlan should be ok", function(done){
-
             API.tripPlan.saveTripPlan(tripPlanOrder)
                 .then(function(ret) {
                     assert.equal(ret.companyId, companyId);
@@ -200,7 +122,6 @@ describe("api/tripPlan", function() {
         });
 
         it("#getTripPlan should be error when param is not uuid", function (done) {
-            var self = {accountId: staffId};
             API.tripPlan.getTripPlan({id: "123456"}, function (err, ret) {
                 assert(err != null);
                 assert.equal(ret, null);
@@ -209,6 +130,8 @@ describe("api/tripPlan", function() {
         });
 
         it("#getTripPlan should be ok by staff", function (done) {
+            let session = getSession();
+            session.accountId = staffId;
             API.tripPlan.getTripPlan( {id: tripPlanId}, function (err, ret) {
                 assert.equal(err, null);
                 assert.equal(ret.id, tripPlanId);
@@ -217,6 +140,8 @@ describe("api/tripPlan", function() {
         });
 
         it("#getTripPlan should be ok by agency", function(done) {
+            let session = getSession();
+            session.accountId = agencyUserId;
             API.tripPlan.getTripPlan( {id: tripPlanId})
                 .then(function (ret) {
                     assert.equal(ret.id, tripPlanId);
@@ -226,6 +151,37 @@ describe("api/tripPlan", function() {
                     console.info(err);
                     assert.equal(err, null);
                 });
+        });
+
+        it("#updateTripPlan should be ok", function (done) {
+            let session = getSession();
+            session.accountId = staffId;
+            API.tripPlan.updateTripPlan({id: tripPlanId, description: 'test'}, function (err, ret) {
+                assert.equal(err, null);
+                assert.equal(ret.id, tripPlanId);
+                assert.equal(ret.description, 'test');
+                done();
+            })
+        });
+
+        it("#listTripPlans should be ok", function (done) {
+            let session = getSession();
+            session.accountId = staffId;
+            API.tripPlan.listTripPlans({}, function (err, ret) {
+                assert.equal(err, null);
+                assert.equal(ret, true);
+                done();
+            })
+        });
+
+        it("#deleteTripPlan should be ok", function (done) {
+            let session = getSession();
+            session.accountId = staffId;
+            API.tripPlan.deleteTripPlan({id: tripPlanId}, function (err, ret) {
+                assert.equal(err, null);
+                assert.equal(ret, true);
+                done();
+            })
         });
     })
 
@@ -277,90 +233,6 @@ describe("options based on tripPlanOrder created", function() {
         })
     })
 
-    it("#listTripPlans should be ok", function (done) {
-        API.tripPlan.listTripPlans({})
-            .then(function(ret) {
-                console.info(ret);
-                tripPlanId = ret[0];
-            })
-            .catch(function(err) {
-                assert.equal(err, null);
-            })
-            .nodeify(done)
-    });
-
-    it("checkBudgetExist should be ok", function(done) {
-        _tripPlanOrder.hotel[0]['type'] = 0;
-        API.tripPlan.checkBudgetExist( _tripPlanOrder, function(err, ret) {
-            if(err) {
-                throw err;
-            }
-            assert.equal(typeof ret, 'string');
-            done();
-        })
-    });
-
-    it("checkBudgetExist result should be false when there's no budget", function(done) {
-        _tripPlanOrder.hotel[0]['type'] = 1;
-        API.tripPlan.checkBudgetExist( _tripPlanOrder, function(err, ret) {
-            if(err) {
-                throw err;
-            }
-            assert.equal(ret, false);
-            done();
-        })
-    });
-
-
-
-
-
-
-    it("#pageTripPlans should be ok", function (done) {
-        var self = {accountId: staffId};
-        API.tripPlan.pageTripPlans({page: 1}, function (err, ret) {
-            assert.equal(err, null);
-            assert.equal(ret.page, 1);
-            assert.equal(ret.perPage, 10);
-            done();
-        })
-    });
-
-
-    it("#pageTripPlans should be ok", function (done) {
-        var self = {accountId: staffId};
-        API.tripPlan.pageTripPlans({page: 1, audit: 'P'}, function (err, ret) {
-            if (err) {
-                throw err;
-            }
-            assert.equal(ret.page, 1);
-            assert.equal(ret.perPage, 10);
-            done();
-        })
-    });
-
-    it("#pageTripPlansByCompany should be ok", function (done) {
-        var self = {accountId: staffId};
-        API.tripPlan.pageTripPlansByCompany({page: 1, audit: 'P', emailOrName: '白菜帮'}, function (err, ret) {
-            if (err) {
-                throw err;
-            }
-            assert.equal(ret.page, 1);
-            done();
-        })
-    });
-
-
-    it("#countTripPlanNum should be ok", function (done) {
-        var self = {accountId: staffId};
-        API.tripPlan.countTripPlanNum({companyId: companyId}, function (err, ret) {
-            if (err) {
-                throw err;
-            }
-            assert(ret >= 0);
-            done();
-        })
-    });
 
     describe("#saveTripDetail", function(){
         var newDetailId = "";

@@ -1,6 +1,7 @@
 import { getSession } from '../common/model/index';
 import { Staff, EStaffRole } from './_types/staff';
 import { AgencyUser } from './_types/agency';
+import {EAccountType} from "./_types/index";
 /**
  * Created by wlh on 16/5/16.
  */
@@ -263,7 +264,19 @@ export var condition = {
             
             let account = await Models.account.get(session.accountId);
             let tripPlan = await Models.tripPlan.get(id);
+            let acc_type = account.type;
             
+            if(acc_type == EAccountType.STAFF) {
+                let staff = Models.staff.get(account.id);
+                return staff.roleId == EStaffRole.ADMIN || staff.roleId == EStaffRole.OWNER || tripPlan.accountId == account.id;
+            }else if(acc_type == EAccountType.AGENCY) {
+                let user = await AgencyUser.getCurrent();
+                let company = await tripPlan.getCompany();
+                let agency = await company.getAgency();
+                return agency.id == user.agency.id;
+            }else {
+                return false;
+            }
         }
     }
 }

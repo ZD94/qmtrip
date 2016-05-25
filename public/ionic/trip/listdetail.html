@@ -1,14 +1,14 @@
 <ion-view title="行程详情页" id="page20">
     <ion-content padding="true" class="has-header">
         <div id="page20-markdown7" style="color:#000000;text-align:right;">
-            <p>{{tripDetail.createdAt | date: 'yyyy-MM-dd HH:mm'}}</p>
+            <p>{{createdAt | date: 'yyyy-MM-dd HH:mm'}}</p>
         </div>
         <ion-list>
             <ion-item>出差事由<span style="float: right;">{{tripDetail.title}}</span></ion-item>
         </ion-list>
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <ion-list>
-            <ion-item>{{tripDetail.startAt | date: 'yyyy-MM-dd HH:mm'}} 至 {{tripDetail.backAt | date: 'yyyy-MM-dd HH:mm'}}
+            <ion-item>{{startAt | date: 'yyyy-MM-dd HH:mm'}} 至 {{backAt | date: 'yyyy-MM-dd HH:mm'}}
                 <br>总预算：{{tripDetail.budget}}元</ion-item>
         </ion-list>
         <div class="spacer" style="width: 285px; height: 17px;"></div>
@@ -20,7 +20,7 @@
                     <span style="margin-left: 120px;">{{goTraffic.price}}</span>元
                 </ion-item>
                 <ion-item>
-                    <span>{{tripDetail.startAt | date: 'yyyy-MM-dd'}}</span>
+                    <span>{{startAt | date: 'yyyy-MM-dd'}}</span>
                     <br>
                     {{tripDetail.deptCity}}
                     &nbsp;
@@ -42,11 +42,11 @@
             </div>
             <div style="margin-bottom: 10px">
                 <ion-item class="item-divider">
-                    <span>去程交通</span>
+                    <span>回程交通</span>
                     <span style="margin-left: 120px;">{{backTraffic.price}}</span>元
                 </ion-item>
                 <ion-item>
-                    <span>{{tripDetail.startAt | date: 'yyyy-MM-dd'}}</span>
+                    <span>{{startAt | date: 'yyyy-MM-dd'}}</span>
                     <br>
                     {{tripDetail.deptCity}}
                     &nbsp;
@@ -68,11 +68,11 @@
             </div>
             <div style="margin-bottom: 10px">
                 <ion-item class="item-divider">
-                    <span>去程交通</span>
+                    <span>住宿</span>
                     <span style="margin-left: 120px;">{{hotel.price}}</span>元
                 </ion-item>
                 <ion-item>
-                    <span ng-if='hotel.itemType == "goTraffic"'>{{tripDetail.startAt | date: 'yyyy-MM-dd'}}</span>
+                    <span ng-if='hotel.itemType == "hotel"'>{{startAt | date: 'yyyy-MM-dd'}}</span>
                     <br>
                     {{tripDetail.deptCity}}
                     &nbsp;
@@ -98,7 +98,7 @@
                     <span style="margin-left: 120px;">{{other.price}}</span>元
                 </ion-item>
                 <ion-item>
-                    <span>{{tripDetail.startAt | date: 'yyyy-MM-dd'}}</span>
+                    <span>{{startAt | date: 'yyyy-MM-dd'}}</span>
                     <br>
                     {{tripDetail.deptCity}}
                     &nbsp;
