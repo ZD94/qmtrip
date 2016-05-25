@@ -109,9 +109,9 @@ describe("api/tripPlan", function() {
                 .nodeify(done);
         });
 
-        it("#saveTripPlanNew should be ok", function(done){
+        it("#saveTripPlan should be ok", function(done){
             let budgetId = 'cache:budgets:ed4e1520-2234-11e6-89a0-43b37ebb0409:1464152140092HPupGh';
-            API.tripPlan.saveTripPlanNew({budgetId: '1464166365279CHeoy5', title: '新增出差计划测试'})
+            API.tripPlan.saveTripPlan({budgetId: '1464166365279CHeoy5', title: '新增出差计划测试'})
                 .then(function(ret) {
                     console.info("saveTripPlan success...");
                     // console.info(ret);
