@@ -16,9 +16,9 @@ var defaultTrip = {
     place: '',
     reason: '',
 
-    traffic: true,
+    traffic: false,
     fromPlace: '',
-    round: true,
+    round: false,
 
     hotel: false,
     hotelPlace: undefined
@@ -245,7 +245,6 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
     $scope.createdAt = moment(tripPlan.createAt).toDate();
     $scope.startAt = moment(tripPlan.startAt).toDate();
     $scope.backAt = moment(tripPlan.backAt).toDate();
-    $scope.creatat = moment(tripPlan.createAt).toDate();
     let budgets: any[] = await Models.tripDetail.find({tripPlanId: id});
     let hotel;
     let goTraffic;
