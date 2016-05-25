@@ -1,10 +1,9 @@
 /**
  * Created by wlh on 15/12/12.
  */
-
-import {HotelBudget, TrafficBudget} from "api/_types/budget";
 import { clientExport } from '../../common/api/helper';
 import {ETripType, EInvoiceType} from "../_types/tripPlan";
+import {Staff} from "../_types/staff";
 const API = require("common/api");
 const validate = require("common/validate");
 const L = require("common/language");
@@ -196,12 +195,13 @@ class ApiTravelBudget {
             throw {code: -1, msg: "离开日期大于入住日期"};
         }
 
-        let staff = await API.staff.getStaff({id: accountId});
+        // let staff = await API.staff.getStaff({id: accountId});
+        var staff = await Staff.getCurrent();
         if (!staff || !staff["travelPolicyId"]) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
         //查询员工差旅标准
-        let policy = await API.travelPolicy.getTravelPolicy({id: staff["travelPolicyId"]})
+        let policy = await staff.getTravelPolicy();
         let hotelStar: number = 3;
         if (!policy) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
@@ -272,15 +272,15 @@ class ApiTravelBudget {
         }
 
         //查询员工信息
-        let staff = await API.staff.getStaff({id: accountId});
         // staff.travelPolicyId = "dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a";
+        let staff = await Staff.getCurrent();
 
-        if (!staff || !staff.travelPolicyId) {
+        if (!staff || !staff['travelPolicyId']) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
 
         //查询员工差旅标准
-        let policy = await API.travelPolicy.getTravelPolicy({id: staff.travelPolicyId});
+        let policy = await staff.getTravelPolicy();
 
         if (!policy) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();

@@ -56,7 +56,8 @@ class TripPlanModule {
     @requireParams(['budgetId', 'title'], ['description', 'remark'])
     static async saveTripPlan(params): Promise<TripPlan> {
         let staff = await Staff.getCurrent();
-        let {budgets, query} = await API.travelBudget.getBudgetInfo({id: params.budgetId});
+        let budgetInfo = await API.travelBudget.getBudgetInfo({id: params.budgetId});
+        let {budgets, query} = budgetInfo;
         let project = await getProjectByName({companyId: staff.company.id, name: params.title, userId: staff.id, isCreate: true});
 
         let tripPlan = Models.tripPlan.create(params);
