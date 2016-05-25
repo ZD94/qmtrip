@@ -31,15 +31,11 @@ class TravelPolicyModule{
     ])
     static async createTravelPolicy (params) : Promise<TravelPolicy>{
 
-        console.info("travelPolicy/agencyHandel", params);
-
         let result = await Models.travelPolicy.find({where: {name: params.name, companyId: params.companyId}});
-        console.info("resultresult:", result);
         if(result && result.length>0){
             throw {msg: "该等级名称已存在，请重新设置"};
         }
         var travelp = TravelPolicy.create(params);
-        console.info("travelptravelp:", travelp);
         return travelp.save();
     }
 
@@ -57,7 +53,7 @@ class TravelPolicyModule{
     ])
     static async deleteTravelPolicy(params) : Promise<any>{
 
-        let staffs = await API.staff.getStaffs({travelPolicyId: id, status: 0});
+        let staffs = await Models.staff.find({where: {travelPolicyId: id, status: 0}});
         if(staffs && staffs.length > 0){
             throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准 暂不能删除，给这些员工匹配新的差旅标准后再进行操作'};
         }
@@ -70,7 +66,7 @@ class TravelPolicyModule{
             throw L.ERR.PERMISSION_DENY();
         }
 
-        tp_delete.destroy();
+        await tp_delete.destroy();
         return true;
     }
 
@@ -130,11 +126,6 @@ class TravelPolicyModule{
         let id = params.id;
         var staff = await Staff.getCurrent();
         var tp = await Models.travelPolicy.get(id);
-
-
-        if(staff && tp['companyId'] != staff["companyId"]){
-            throw L.ERR.PERMISSION_DENY();
-        }
 
         return tp;
     };

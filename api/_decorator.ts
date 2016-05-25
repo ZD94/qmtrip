@@ -220,7 +220,7 @@ export var condition = {
             let id = _.get(args, idpath);
             let user = await AgencyUser.getCurrent();
             let tp = await Models.travelPolicy.get(id);
-            let company = tp.company;
+            let company = await Models.company.get(tp["companyId"]);//此处为什么不能用tp.company
             return id && user && company && user["agencyId"] == company["agencyId"];
         }
     },
