@@ -198,9 +198,6 @@ export class TripPlan extends ModelObject {
         return Models.tripDetail.find(params);
     }
 
-    auditPlanInvoice(params: {id: string, auditResult: EAuditStaus}): Promise<boolean> {
-        return API.tripPlan.auditPlanInvoice(params);
-    }
 }
 
 @Table(Models.tripDetail, 'tripPlan.')
@@ -317,6 +314,11 @@ export class TripDetail extends ModelObject{
 
     uploadInvoice(pictureFileId: string): Promise<boolean> {
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: pictureFileId});
+    }
+
+    auditPlanInvoice(params: {auditResult: EAuditStaus}): Promise<boolean> {
+        params['id'] = this.id;
+        return API.tripPlan.auditPlanInvoice(params);
     }
 }
 

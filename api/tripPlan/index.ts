@@ -274,12 +274,16 @@ class TripPlanModule {
         let tripPlan = await Models.tripPlan.get(params.id);
         let tripDetails = await tripPlan.getTripDetails({});
 
-        await Promise.all(tripDetails.map(async function(detail) {
-            detail.status = EPlanStatus.AUDITING;
-            await detail.save();
-        }));
+        if(tripDetails && tripDetails.length > 0) {
+            await Promise.all(tripDetails.map(async function(detail) {
+                detail.status = EPlanStatus.AUDITING;
+                detail.isCommit = true;
+                await detail.save();
+            }));
+        }
 
         tripPlan.status = EPlanStatus.AUDITING;
+        tripPlan.isCommit = true;
         await tripPlan.save();
         return true;
     }
