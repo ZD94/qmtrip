@@ -295,7 +295,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['id', 'auditResult'])
-    static async auditPlanInvoice(params: {id: string, auditResult: EAuditStaus}): Promise<boolean> {
+    static async approvePlanInvoice(params: {id: string, auditResult: EAuditStaus}): Promise<boolean> {
         let tripDetail = await Models.tripDetail.get(params.id);
         
         if(!tripDetail) {
@@ -333,73 +333,16 @@ class TripPlanModule {
      */
     @requireParams(['tripPlanId', 'type', 'startTime', 'invoiceType', 'budget'])
     static saveTripDetail(params): Promise<TripDetail> {
-        let record = params;
-        record.isCommit = false;
-        record.status = EPlanStatus.WAIT_COMMIT;
-        let options:any = {};
-        options.fields = Object.keys(record);
-
-        return DBM.TripPlan.findById(params.tripPlanId)
-            .then(function (order) {
-                if (!order) {
-                    throw L.ERR.TRIP_PLAN_NOT_EXIST();
-                }
-
-                if (order.accountId != params.accountId) {
-                    L.ERR.PERMISSION_DENY();
-                }
-
-                if (order.status == EPlanStatus.AUDITING) {
-                    throw {code: -3, msg: '该订单已提交，不能添加消费单据'};
-                }
-
-                if (order.status == 'COMPLETE') {
-                    throw {code: -4, msg: '该计划单已审核，不能添加消费单据'};
-                }
-
-                let budget = params.budget || 0;
-                if (budget > 0) {
-                    order.increment(['budget'], {by: parseFloat(budget)});
-                }
-
-
-                if (order.status > EPlanStatus.WAIT_COMMIT) {
-                    order.status = EPlanStatus.WAIT_COMMIT;
-                }
-
-                order.updatedAt = utils.now();
-                return [record, order];
-            })
-            .spread(function (record, order) {
-                return sequelize.transaction(function (t) {
-                    options.transaction = t;
-
-                    let logs = {
-                        tripPlanId: order.id,
-                        userId: params.accountId,
-                        remark: "增加新的预算",
-                        createdAt: utils.now()
-                    }
-
-                    return Promise.all([
-                        DBM.TripDetail.create(record, options),
-                        DBM.TripPlanLogs.create(logs, {transaction: t}),
-                        order.save()
-                    ])
-                })
-            })
-            .spread(function (r) {
-                return r;
-            })
+        return Models.tripDetail.create(params).save();
     }
 
     @clientExport
     @requireParams(['id'])
-    static async getTripDetail(params): Promise<TripDetail> {
+    static async getTripDetail(params: {id: string}): Promise<TripDetail> {
         let detail = await Models.tripDetail.get(params.id);
 
         if (!detail) {
-            throw {code: -2, msg: '消费记录不存在'};
+            throw L.ERR.TRIP_DETAIL_FOUND();
         }
 
         return detail;
@@ -409,155 +352,36 @@ class TripPlanModule {
      * 更新消费详情
      * @param params
      */
-    @requireParams(['tripDetailId', 'optLog', 'userId', 'updates'], TripDetail['$fieldnames'])
-    static updateTripDetail(params): Promise<TripDetail> {
-        let updates:any = _.pick(params.updates, TripDetail['$fieldnames']);
-        let trip_plan_id = '';
+    @clientExport
+    @requireParams(['id'], TripDetail['$fieldnames'])
+    static async updateTripDetail(params): Promise<TripDetail> {
+        let tripDetail =  await Models.tripDetail.get(params.id);
 
-        return DBM.TripDetail.findById(params.tripDetailId)
-            .then(function (record) {
-                if (!record) {
-                    throw {code: -2, msg: '票据不存在'};
-                }
-
-                if (record.status == 1) {
-                    throw {code: -3, msg: '该票据已经审核通过，不能修改'};
-                }
-
-                trip_plan_id = record.tripPlanId;
-                updates.updatedAt = utils.now();
-
-                return DBM.TripDetail.update(updates, {
-                    returning: true,
-                    where: {id: params.tripDetailId},
-                    fields: Object.keys(updates)
-                });
-            })
-            .spread(function (result) {
-                if (result < 1) {
-                    throw {code: -2, msg: '更新出差明细失败失败'};
-                }
-
-                return DBM.TripDetail.findAll({where: {tripPlanId: trip_plan_id}})
-            })
-            .then(function (list) {
-                let status = '';
-                list.map(function (t) {
-                    if (status != '' && status != t.status) {
-                        return true;
-                    }
-
-                    status = t.status;
-                });
-
-                return DBM.TripPlan.update({status: status, updatedAt: utils.now()}, {
-                    returning: true,
-                    where: {id: trip_plan_id}
-                })
-            })
-            .then(function () {
-                return true;
-            })
-    }
-
-
-    static getConsumeInvoiceImg(params) {
-        let tripDetailId = params.tripDetailId;
-
-        if (!tripDetailId) {
-            throw {code: -1, msg: "consumeId不能为空"};
+        if(!tripDetail) {
+            throw L.ERR.TRIP_DETAIL_FOUND();
         }
 
-        return DBM.TripDetail.findById(tripDetailId)
-            .then(function (consumeDetail) {
-                return API.attachments.getAttachment({id: consumeDetail.newInvoice})
-            })
-            .then(function (attachment) {
-                if (!attachment) {
-                    throw L.ERR.NOT_FOUND();
-                }
+        for(let key in params) {
+            tripDetail[key] = params[key];
+        }
 
-                return 'data:image/jpg;base64,' + attachment.content;
-            })
-            .then(function (result) {
-                return result;
-            })
-
+        return tripDetail.save();
     }
 
-    @requireParams(['id', 'budget', 'userId'], ['invoiceType'])
-    static updateTripDetailBudget(params) {
-        let id = params.id;
+    /**
+     * 根据出差记录id获取出差详情(包括已删除的)
+     * @param params
+     * @returns {Promise<string[]>}
+     */
+    @clientExport
+    @requireParams(['tripPlanId'], ['type', 'status', 'id'])
+    static async getTripDetails(params): Promise<string[]> {
+        let options: any = {where: params}
+        let details = await Models.tripDetail.find(options);
 
-        return DBM.TripDetail.findById(id)
-            .then(function (ret) {
-                if (!ret) {
-                    throw {code: -2, msg: '票据不存在'};
-                }
-
-                if (ret.status == 1) {
-                    throw {code: -3, msg: '该票据已经审核通过，不能修改预算'};
-                }
-
-                return [ret.budget, DBM.TripPlan.findById(ret.tripPlanId)];
-            })
-            .spread(function (o_budget, order) {
-                if (order.status == EPlanStatus.AUDITING) {
-                    throw {code: -4, msg: '该次出差计划已经提交，不能修改预算'};
-                }
-
-                if (order.status !== 'NO_BUDGET') {
-                    throw {code: -5, msg: '修改预算失败，请检查出差记录状态'};
-                }
-
-                let budget = params.budget;
-
-                let logs = {
-                    tripPlanId: order.id,
-                    userId: params.userId,
-                    remark: "更新预算",
-                    createdAt: utils.now()
-                }
-
-                let updates:any = {
-                    status: 'WAIT_UPLOAD',
-                    budget: budget,
-                    updatedAt: utils.now()
-                }
-
-                if (params.invoiceType) {
-                    updates.invoiceType = params.invoiceType;
-                }
-                return sequelize.transaction(function (t) {
-                    return Promise.all([
-                        order.id,
-                        DBM.TripDetail.update(updates, {where: {id: id}, transaction: t}),
-                        DBM.TripPlanLogs.create(logs, {transaction: t})
-                    ])
-                })
-            })
-            .spread(function (tripPlanId) {
-                return [tripPlanId, DBM.TripDetail.findAll({where: {tripPlanId: tripPlanId, status: {$ne: -2}}})];
-            })
-            .spread(function (tripPlanId, list) {
-                let c_budget = 0;
-                for (let i = 0; i < list.length; i++) {
-                    let budget = list[i].budget;
-                    if (budget < 0) {
-                        return true;
-                    }
-                    c_budget += parseFloat(budget);
-                }
-
-                return DBM.TripPlan.update({
-                    status: EPlanStatus.WAIT_COMMIT,
-                    budget: c_budget,
-                    updatedAt: utils.now()
-                }, {where: {id: tripPlanId}, fields: ['status', 'budget', 'updatedAt']})
-            })
-            .then(function () {
-                return true;
-            })
+        return details.map(function(d) {
+            return d.id;
+        })
     }
 
 
@@ -566,29 +390,17 @@ class TripPlanModule {
      * @param params
      * @returns {*}
      */
-    @requireParams(['userId', 'id'])
-    static deleteTripDetail(params): Promise<boolean> {
-        let id = params.id;
-        let userId = params.userId;
+    @clientExport
+    @requireParams(['id'])
+    static async deleteTripDetail(params: {id: string}): Promise<boolean> {
+        let tripDetail = await Models.tripDetail.get(params.id);
 
-        return DBM.TripDetail.findById(id)
-            .then(function (detail) {
-                if (!detail ) {
-                    throw L.ERR.CONSUME_DETAIL_NOT_EXIST();
-                }
+        if (!tripDetail) {
+            throw L.ERR.TRIP_DETAIL_FOUND();
+        }
 
-                if (detail.accountId != userId) {
-                    throw L.ERR.PERMISSION_DENY();
-                }
-
-                return DBM.TripDetail.update({ updatedAt: utils.now()}, {
-                    where: {id: id},
-                    fields: ['status', 'updatedAt']
-                })
-            })
-            .then(function () {
-                return true;
-            })
+        await tripDetail.destroy();
+        return true;
     }
 
 
@@ -638,200 +450,6 @@ class TripPlanModule {
         return true;
     }
 
-
-    /**
-     * 判断某用户是否有访问该消费记录票据权限
-     * @param params
-     * @returns {Promise.<Instance>}
-     */
-    @requireParams(['tripDetailId', 'userId'])
-
-    static async getVisitPermission(params) {
-        let userId = params.userId;
-        let tripDetailId = params.tripDetailId;
-        let consume = await DBM.TripDetail.findById(tripDetailId);
-        if (!consume) {
-            throw {code: -4, msg: '查询记录不存在'};
-        }
-
-        if (consume.accountId == userId) {//允许自己查看
-            return {allow: true, fileId: consume.newInvoice};
-        }
-
-        let order = await DBM.TripPlan.findById(consume.tripPlanId);
-        if (!order || order.status == 'DELETE') {
-            throw {code: -4, msg: '订单记录不存在'};
-        }
-
-        let company = await API.company.getCompany({id: order.companyId});
-        if (!company) {
-            throw {code: -5, msg: "企业不存在"}
-        }
-
-        let agencyId = company.agencyId;
-        let agencyUser = await API.agency.getAgencyUser({id: userId});
-
-        if (agencyUser && agencyUser.roleId != 1 && agencyUser.agencyId == agencyId) {//允许代理商创建人管理员访问
-            return {allow: true, fileId: consume.newInvoice};
-        } else {
-            return {allow: false};
-        }
-    }
-
-    /**
-     * 保存出差计划日志
-     * @type {saveOrderLogs}
-     */
-    @requireParams(['userId', 'tripPlanId', 'remark'])
-
-    static saveOrderLogs(logs) {
-        return DBM.TripPlan.findById(logs.tripPlanId)
-            .then(function (order) {
-                if (!order) {
-                    throw L.ERR.TRIP_PLAN_NOT_EXIST();
-                }
-
-                if (order.status == EPlanStatus.COMPLETE) {
-                    throw {code: -2, msg: '该计划单已完成，不能增加日志'};
-                }
-
-                logs.createdAt = utils.now();
-                return DBM.TripPlanLogs.create(logs);
-            })
-    }
-
-    /**
-     * 审核票据
-     * @param params
-     * @param params.status审核结果状态
-     * @param params。tripDetailId 审核消费单id
-     * @param params.userId 用户id
-     * @returns {*|Promise}
-     */
-    @requireParams(['status', 'tripDetailId', 'userId'], ['remark', 'expenditure'])
-
-    static approveInvoice(params) {
-        return DBM.TripDetail.findById(params.tripDetailId)
-            .then(function (consume) {
-                if (!consume )
-                    throw L.ERR.NOT_FOUND();
-
-                if (!consume.newInvoice) {
-                    throw {code: -2, msg: '没有上传票据'};
-                }
-
-                if (consume.status == EPlanStatus.AUDITING) {
-                    throw {code: -3, msg: '该票据已审核通过，不能重复审核'};
-                }
-
-                return [DBM.TripPlan.findById(consume.tripPlanId), consume]
-            })
-            .spread(function (order, consume) {
-                let invoiceJson = consume.invoice;
-
-                if (!order) {
-                    throw L.ERR.TRIP_PLAN_NOT_EXIST();
-                }
-
-                if (order.status === EPlanStatus.WAIT_COMMIT && order.auditStatus == 0) {
-                    throw {code: -3, msg: '该订单未提交，不能审核'};
-                }
-
-                if (invoiceJson && invoiceJson.length > 0) {
-                    invoiceJson[invoiceJson.length - 1].status = params.status;
-                    invoiceJson[invoiceJson.length - 1].remark = params.remark;
-                    invoiceJson[invoiceJson.length - 1].approve_at = utils.now();
-                }
-
-                let updates:any = {
-                    invoice: JSON.stringify(invoiceJson),
-                    updatedAt: utils.now(),
-                    status: params.status,
-                    auditUser: params.userId,
-                    expenditure: params.expenditure
-                };
-
-                if (params.remark) {
-                    updates.auditRemark = params.remark;
-                }
-
-                let logs = {
-                    tripDetailId: params.tripDetailId,
-                    userId: params.userId,
-                    status: params.status,
-                    remark: "审核票据-" + params.remark
-                };
-
-                return sequelize.transaction(function (t) {
-                    if (updates.status == EPlanStatus.NO_BUDGET) {
-                        updates.isCommit = false;
-                    }
-                    return Promise.all([
-                        DBM.TripDetail.update(updates, {
-                            returning: true,
-                            where: {id: params.tripDetailId},
-                            transaction: t
-                        }),
-                        DBM.TripPlanLogs.create(logs, {transaction: t})
-                    ])
-                        .spread(function (ret) {
-                            let status = params.status;
-
-                            if (status == EPlanStatus.NO_BUDGET) {
-                                return DBM.TripPlan.update({
-                                        status: EPlanStatus.WAIT_COMMIT,
-                                        auditStatus: -1,
-                                        updatedAt: utils.now()
-                                    },
-                                    {
-                                        where: {id: order.id},
-                                        fields: ['auditStatus', 'status', 'updatedAt'],
-                                        transaction: t
-                                    });
-                            }
-
-                            if (!params.expenditure)
-                                throw {code: -4, msg: '支出金额不能为空'};
-
-                            let ex_expenditure = order.expenditure || 0;
-                            let expenditure = (parseFloat(params.expenditure) + parseFloat(ex_expenditure)).toFixed(2);
-                            let order_updates:any = {
-                                expenditure: expenditure,
-                                updatedAt: utils.now()
-                            }
-
-                            return DBM.TripDetail.findAll({where: {tripPlanId: order.id, status: {$ne: -2}}})
-                                .then(function (list) {
-                                    for (let i = 0; i < list.length; i++) {
-                                        if (list[i].status != EPlanStatus.AUDITING && list[i].id != ret[1][0].id) {
-                                            return false;
-                                        }
-                                    }
-
-                                    return true;
-                                })
-                                .then(function (isAllAudit) {
-                                    if (isAllAudit) {
-                                        let score:number = 0;
-                                        score = (order.budget - order_updates.expenditure) > 0 ? order.budget - order_updates.expenditure : 0;
-                                        order_updates.status = EPlanStatus.COMPLETE;
-                                        order_updates.auditStatus = 1;
-                                        order_updates.score = Math.floor(score / 2);
-                                    }
-
-                                    return DBM.TripPlan.update(order_updates, {
-                                        where: {id: order.id},
-                                        fields: Object.keys(order_updates),
-                                        transaction: t
-                                    })
-                                })
-                        })
-                });
-            })
-            .then(function () {
-                return true;
-            })
-    }
 
     /**
      * 统计计划单数量
@@ -987,89 +605,18 @@ class TripPlanModule {
      * @param {UUID} params.tripDetailId
      * @param {UUID} params.accountId
      */
-    static previewConsumeInvoice(params) {
-        let tripDetailId = params.tripDetailId;
-        let accountId = params.accountId;
-
-        return TripPlanModule.getVisitPermission({tripDetailId: tripDetailId, userId: accountId})
-            .then(function (result) {
-                if (!result.allow) {
-                    throw L.ERR.PERMISSION_DENY();
-                }
-                return DBM.TripDetail.findById(tripDetailId)
-            })
-            .then(function (consume) {
-                return API.attachments.getAttachment({id: consume.newInvoice});
-            })
-            .then(function (attachment) {
-                return "data:image/jpg;base64," + attachment.content;
-            })
-    }
-
-    /**
-     * 判断用户是否已经生成改预算
-     * @param params
-     */
-    @requireParams(['tripDetails', 'accountId', 'companyId', 'arrivalCity', 'arrivalCityCode', 'title'], ['deptCity',
-        'deptCityCode', 'startAt', 'backAt', 'isNeedTraffic', 'isNeedHotel', 'description'])
-    static async checkBudgetExist(params) {
-        // let tripDetails_required_fields = ['type', 'startTime', 'invoiceType'];
-        let tripDetails = params.tripDetails;
-        delete params.tripDetails;
-        let _planOrder = params;
-
-        if (_planOrder.deptCity && !_planOrder.deptCityCode) {
-            throw {code: -3, msg: '城市代码不能为空'};
-        }
-
-
-        let orders = await DBM.TripPlan.findAll({where: _planOrder});
-        if (orders.length <= 0) {
-            return false;
-        }
-
-        let details = [];
-        await Promise.all(tripDetails.map(async function (detail) {
-            detail.invoiceType = EInvoiceType[detail.invoiceType];
-            let plan_details = await DBM.TripDetail.findAll({where: detail});
-            plan_details.map(function (d) {
-                details.push(d);
-            });
-        }));
-
-        if (!details || details.length <= 0) {
-            return false;
-        }
-
-        let result:boolean|string = false;
-
-        details.map(function (detail:any) {
-            let tripPlanId = detail.tripPlanId;
-            orders.map(function (order) {
-                if (order.id === tripPlanId) {
-                    result = tripPlanId;
-                }
-            });
-        });
-
-        return result;
-    }
-
-
-    /**
-     * 根据出差记录id获取出差详情(包括已删除的)
-     * @param params
-     * @returns {Promise<string[]>}
-     */
     @clientExport
-    @requireParams(['tripPlanId'], ['type', 'status', 'id'])
-    static async getTripDetails(params): Promise<string[]> {
-        let options: any = {where: params}
-        let details = await Models.tripDetail.find(options);
+    @requireParams(['tripDetailId'])
+    static async previewInvoice(params: {tripDetailId: string}) {
+        let tripDetail = await Models.tripDetail.get(params.tripDetailId);
 
-        return details.map(function(d) {
-            return d.id;
-        })
+        if(!tripDetail) {
+            throw L.ERR.TRIP_DETAIL_FOUND();
+        }
+
+        let attachment = await API.attachments.getAttachment({id: tripDetail.newInvoice});
+
+        return "data:image/jpg;base64," + attachment.content;
     }
 
 
@@ -1207,55 +754,6 @@ class TripPlanModule {
 
         let logs = {tripPlanId: tripPlanId, userId: accountId, remark: '新增计划单 ' + tripPlan.planNo, createdAt: utils.now()};
         await DBM.TripPlanLog.create(logs);
-
-        if (tripPlan.budget <= 0 || tripPlan['status'] === EPlanStatus.NO_BUDGET) {
-            return tripPlan; //没有预算，直接返回计划单
-        }
-
-        /***********************发送邮件***********************/
-        let staffs = await Models.staff.find({companyId: staff.company.id, roleId: {$ne: 1}, status: {$gte: 0}});
-        let url = config.host + '/corp.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
-        let go = '无', back = '无', hotelStr = '无';
-
-        let outTrip = await tripPlan.getOutTrip();
-        if (outTrip && outTrip.length > 0) {
-            let g = outTrip[0];
-            go = moment(g.startTime).format('YYYY-MM-DD') + ', ' + g.deptCity + ' 到 ' + g.arrivalCity;
-            if (g.latestArriveTime)
-                go += ', 最晚' + moment(g.latestArriveTime).format('HH:mm') + '到达';
-            go += ', 动态预算￥' + g.budget;
-        }
-
-        let backTrip = await tripPlan.getBackTrip();
-        if (backTrip && backTrip.length > 0) {
-            let b = backTrip[0];
-            back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.deptCity + ' 到 ' + b.arrivalCity;
-            if (b.latestArriveTime)
-                back += ', 最晚' + moment(b.latestArriveTime).format('HH:mm') + '到达';
-            back += ', 动态预算￥' + b.budget;
-        }
-
-        let hotel = await tripPlan.getHotel();
-        if (hotel && hotel.length > 0) {
-            let h = hotel[0];
-            hotelStr = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') +
-                ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
-        }
-
-        await Promise.all(staffs.map(async function (s) {
-            let account = await API.auth.getAccount({id: s.id, type: 1, attributes: ['status']});
-            if (account.status != 1)
-                return false;
-
-            let vals = {managerName: s.name, username: staffName, email: email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-                projectName: tripPlan.description, goTrafficBudget: go, backTripBudget: back, hotelBudget: hotelStr,
-                totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url};
-            let log = {userId: accountId, tripPlanId: tripPlan.id, remark: tripPlan.planNo + '给企业管理员' + s.name + '发送邮件'};
-
-            // await API.mail.sendMailRequest({toEmails: s.email, templateName: 'qm_notify_new_travelbudget', values: vals});
-            await API.tripPlan.saveTripPlanLog(log);
-            return true;
-        }));
 
         return tripPlan;
     }
