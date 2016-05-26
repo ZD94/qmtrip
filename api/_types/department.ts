@@ -27,7 +27,7 @@ export class Department extends ModelObject{
     set name(name: string){}
 
     @Field({type: Types.BOOLEAN})
-    get isDefault(): boolean {return null}
+    get isDefault(): boolean {return false}
     set isDefault(isDefault: boolean){}
 
     @Reference({type: Types.UUID})
