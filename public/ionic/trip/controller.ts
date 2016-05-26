@@ -1,3 +1,4 @@
+///<reference path="../../../api/_types/tripPlan.ts"/>
 "use strict";
 
 import moment = require('moment');
@@ -6,7 +7,7 @@ var Cookie = require('tiny-cookie');
 import { Staff } from 'api/_types/staff';
 import { Models } from 'api/_types';
 import {
-    TripDetail, EPlanStatus
+    TripDetail, EPlanStatus, ETripType, EInvoiceType
 } from "api/_types/tripPlan";
 
 
@@ -16,9 +17,9 @@ var defaultTrip = {
     place: '',
     reason: '',
 
-    traffic: true,
+    traffic: false,
     fromPlace: '',
-    round: true,
+    round: false,
 
     hotel: false,
     hotelPlace: undefined
@@ -95,9 +96,10 @@ export function CreateController($scope, $storage){
             leaveTime: moment(trip.beginDate).format('HH:mm'),
             goBackTime: moment(trip.endDate).format('HH:mm'),
             isRoundTrip: trip.round,
-            isNeedHotel: true,
+            isNeedHotel: trip.hotel
         })
         .then(function(result) {
+            console.info("getTravelPolicyBudget success...");
             window.location.href = "#/trip/budget?id="+result;
         })
         .catch(function(err) {
@@ -121,11 +123,11 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
     trip.createAt = new Date(result.createAt);
     $scope.trip = trip;
     //补助,现在是0,后续可能会直接加入到预算中
-    let otherBudget = {price: 0, type: 'other', itemType: 'other'};
+    let otherBudget = {price: 0, type: 'other', tripType: 'other'};
     let isHasOther = false;
     let totalPrice: number = 0;
     for(let budget of budgets) {
-        if (budget.itemType == 'other') {
+        if (budget.tripType == 'other') {
             isHasOther = true;
             break;
         }
@@ -147,7 +149,10 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
         budgets.push(otherBudget);
     }
     $scope.budgets = budgets;
-
+    $scope.EInvoiceType = EInvoiceType;
+    $scope.ETripType = ETripType;
+    console.info(budgets);
+    console.info(EInvoiceType);
     API.require("tripPlan");
     await API.onload();
 
@@ -161,7 +166,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
             remark: trip.reason,
             budgets: budgets,
         }
-        API.tripPlan.saveTripPlan(params)
+        API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason})
         .then(function(planTrip) {
             window.location.href = '#/trip/committed?id='+planTrip.id;
         })
@@ -186,16 +191,19 @@ export async function DetailController($scope, $stateParams, Models){
     let id = $stateParams.id;
     let tripPlan = await Models.tripPlan.get(id);
     let budgets: any[] = await Models.tripDetail.find({tripPlanId: id});
+    $scope.createdAt = moment(tripPlan.createAt).toDate();
+    $scope.startAt = moment(tripPlan.startAt).toDate();
+    $scope.backAt = moment(tripPlan.backAt).toDate();
     budgets = budgets.map(function(budget) {
-        let itemType = 'other';
+        let tripType = 'other';
         if (budget.type == 0) {
-            itemType = 'goTraffic'
+            tripType = 'goTraffic'
         }
         if (budget.type == 1) {
-            itemType = 'backTraffic';
+            tripType = 'backTraffic';
         }
         if (budget.type == 2) {
-            itemType = 'hotel';
+            tripType = 'hotel';
         }
         let type = 'air';
         if (budget.invoiceType == 0) {
@@ -204,7 +212,7 @@ export async function DetailController($scope, $stateParams, Models){
         if (budget.invoiceType == 2) {
             type = 'hotel';
         }
-        return {id: budget.id, price: budget.budget, itemType: itemType, type: type}
+        return {id: budget.id, price: budget.budget, tripType: tripType, type: type}
     })
 
     $scope.trip = tripPlan.target;
@@ -221,7 +229,8 @@ export async function ListController($scope , Models){
     statusTxt[EPlanStatus.AUDITING] = "已提交待审核状态";
     statusTxt[EPlanStatus.COMPLETE] = "审核完，已完成状态";
     $scope.statustext = statusTxt;
-    var tripPlans = await Models.tripPlan.find({});
+    // var tripPlans = await Models.tripPlan.find({});
+    let tripPlans = await staff.getTripPlans();
     tripPlans.map(function(trip){
         trip.startAt = moment(trip.startAt).toDate();
         trip.backAt = moment(trip.backAt).toDate();
@@ -245,7 +254,6 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
     $scope.createdAt = moment(tripPlan.createAt).toDate();
     $scope.startAt = moment(tripPlan.startAt).toDate();
     $scope.backAt = moment(tripPlan.backAt).toDate();
-    $scope.creatat = moment(tripPlan.createAt).toDate();
     let budgets: any[] = await Models.tripDetail.find({tripPlanId: id});
     let hotel;
     let goTraffic;
@@ -263,31 +271,33 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
     statusTxt[EPlanStatus.AUDITING] = "已提交待审核状态";
     statusTxt[EPlanStatus.COMPLETE] = "审核完，已完成状态";
     $scope.statustext = statusTxt;
+    $scope.EInvoiceType = EInvoiceType;
+    console.info(EInvoiceType);
     budgets.map(function(budget) {
-        let itemType = 'other';
+        let tripType: ETripType = ETripType.OTHER;
         let title = '补助'
         if (budget.type == 0) {
-            itemType = 'goTraffic'
+            tripType = ETripType.OUT_TRIP;
             title = '去程交通'
         }
         if (budget.type == 1) {
-            itemType = 'backTraffic';
-            title = '回程交通'
+            tripType = ETripType.BACK_TRIP;
+            title = '回城交通'
         }
         if (budget.type == 2) {
-            itemType = 'hotel';
+            tripType = ETripType.HOTEL;
             title = '住宿'
         }
-        let type = 'air';
+        let type = EInvoiceType.PLANE;
         if (budget.invoiceType == 0) {
-            type = 'train';
+            type = EInvoiceType.TRAIN;
         }
         if (budget.invoiceType == 2) {
-            type = 'hotel';
+            type = EInvoiceType.HOTEL;
         }
-        if (itemType == 'goTraffic') {
+        if (tripType == ETripType.OUT_TRIP) {
             $scope.goTrafficStatus = Boolean(budget.status);
-            goTraffic = {id: budget.id, price: budget.budget, itemType: itemType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
+            goTraffic = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
                 var fileId = response.fileId;
                 uploadInvoice(budget.id, fileId, function (err, result) {
                     if (err) {
@@ -299,9 +309,9 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
                     // $state.reload();
                 });
             }};
-        } else if (itemType == 'backTraffic') {
+        } else if (tripType == ETripType.BACK_TRIP) {
             $scope.backTrafficStatus = Boolean(budget.status);
-            backTraffic = {id: budget.id, price: budget.budget, itemType: itemType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
+            backTraffic = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
                 var fileId = response.fileId;
                 uploadInvoice(budget.id, fileId, function (err, result) {
                     if (err) {
@@ -312,9 +322,9 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
                     $scope.$apply();
                 });
             }};
-        } else if (itemType == 'hotel') {
+        } else if (tripType == ETripType.HOTEL) {
             $scope.hotelStatus = Boolean(budget.status);
-            hotel = {id: budget.id, price: budget.budget, itemType: itemType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
+            hotel = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
                 var fileId = response.fileId;
                 uploadInvoice(budget.id, fileId, function (err, result) {
                     if (err) {
@@ -327,7 +337,7 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
             }};
         } else {
             $scope.otherStatus = Boolean(budget.status);
-            other = {id: budget.id, price: budget.budget, itemType: itemType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
+            other = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
                 var fileId = response.fileId;
                 uploadInvoice(budget.id, fileId, function (err, result) {
                     if (err) {
@@ -345,6 +355,7 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
     $scope.backTraffic = backTraffic;
     $scope.other = other;
     $scope.budgets = budgets;
+    console.info($scope.goTraffic);
     API.require('tripPlan');
     await API.onload();
     function uploadInvoice(consumeId, picture, callback) {

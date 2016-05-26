@@ -214,10 +214,7 @@ class CompanyModule {
     @requireParams([], ['status'])
     static async listCompany(params): Promise<string[]>{
         let agencyUser = await AgencyUser.getCurrent();
-        var options : any = {
-            where: {agencyId: agencyUser.agency.id},
-            order: [['created_at', 'desc']]
-        };
+        var options : any = {where: {agencyId: agencyUser.agency.id}, order: [['created_at', 'desc']]};
 
         for(let key in params) {
             options.where[key] = params[key];
@@ -227,7 +224,7 @@ class CompanyModule {
 
         return companies.map(function(c) {
             return c.id;
-        })
+        });
     }
     
     static async getCompanyNoAgency() {
