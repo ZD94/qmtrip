@@ -91,11 +91,15 @@ class DepartmentModule{
     static async updateDepartment(params): Promise<Department>{
         var staff = await Staff.getCurrent();
         let dept = await Models.department.get(params.id);
-
+        for(let key in params){
+            console.info("keykeykey:", key);
+            dept[key] = params[key];
+        }
         if(staff){
             var company = await Models.company.get(staff["companyId"]);
             dept.company = company;
         }
+        console.info("deptdeptdept:===>>>", dept);
         return dept.save();
     }
 

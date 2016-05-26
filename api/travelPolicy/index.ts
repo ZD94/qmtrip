@@ -98,6 +98,9 @@ class TravelPolicyModule{
         var staff = await Staff.getCurrent();
 
         var tp = await Models.travelPolicy.get(id);
+        for(var key in params){
+            tp[key] = params[key];
+        }
         if(staff){
             tp["companyId"] = staff["companyId"];
             // tp.company = staff.company;
