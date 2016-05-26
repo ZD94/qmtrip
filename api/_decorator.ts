@@ -225,6 +225,23 @@ export var condition = {
             return id && user && company && user["agencyId"] == company["agencyId"];
         }
     },
+    isDepartmentAdminOrOwner: function(idpath: string) {
+        return async function (fn ,self, args) {
+            let id = _.get(args, idpath);
+            let staff = await Staff.getCurrent();
+            let dept = await Models.department.get(id);
+            return id && staff && dept && dept["companyId"] == staff["companyId"] && (staff["roleId"] == EStaffRole.ADMIN || staff["roleId"] == EStaffRole.OWNER);
+        }
+    },
+    isDepartmentAgency: function(idpath: string) {
+        return async function (fn ,self, args) {
+            let id = _.get(args, idpath);
+            let user = await AgencyUser.getCurrent();
+            let dept = await Models.department.get(id);
+            let company = await Models.company.get(dept["companyId"]);
+            return id && user && company && user["agencyId"] == company["agencyId"];
+        }
+    },
     isCompanyAgency: function(idpath: string) {
         return async function (fn ,self, args) {
             let id = _.get(args, idpath);

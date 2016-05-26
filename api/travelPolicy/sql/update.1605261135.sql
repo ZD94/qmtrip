@@ -1,0 +1,1 @@
+alter table travel_policy.travel_policies alter column subsidy set default 0;

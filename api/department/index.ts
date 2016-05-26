@@ -11,6 +11,8 @@ let L = require("common/language");
 import {Department} from "api/_types/department";
 import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import { Models, EAccountType } from '../_types/index';
+import {Staff} from "api/_types/staff";
+import {requirePermit, conditionDecorator, condition} from "../_decorator";
 
 const departmentCols = Department['$fieldnames'];
 class DepartmentModule{
@@ -19,41 +21,29 @@ class DepartmentModule{
      * @param data
      * @returns {*}
      */
+    @clientExport
     @requireParams(["name","companyId"], departmentCols)
-    static async create(data): Promise<Department>{
-//    data.isDefault = false;//默认部门在企业注册时已经自动生成不允许自己添加
-        let result = await DBM.Department.findOne({where: {name: data.name, companyId: data.companyId}});
-        if(result){
+    @conditionDecorator([
+        {if: condition.isCompanyAdminOrOwner("0.companyId")},
+        {if: condition.isCompanyAgency("0.companyId")}
+    ])
+    static async createDepartment (params): Promise<Department>{
+
+        let result = await Models.department.find({where: {name: params.name, companyId: params.companyId}});
+
+        if(result && result.length>0){
             throw {msg: "该部门名称已存在，请重新设置"};
         }
 
-        let obj = await DBM.Department.create(data);
-        return new Department(obj);
-    }
+        var staff = await Staff.getCurrent();
 
-    @clientExport
-    static async createDepartment (params): Promise<Department>{
-        let { accountId } = Zone.current.get("session");
-        let role = await API.auth.judgeRoleById({id:accountId});
-        if(role == EAccountType.STAFF){
-            let staff = await Models.staff.get(accountId);
-            if(!staff){
-                throw L.ERR.PERMISSION_DENY();
-            }
+        var department = Department.create(params);
 
-            params.companyId = staff["companyId"];//只允许添加该企业下的部门
-            return DepartmentModule.create(params)
-
-        }else{
-
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-
-            if(result){
-                return DepartmentModule.create(params)
-            }else{
-                throw L.ERR.PERMISSION_DENY();
-            }
+        if(staff){
+            var company = await Models.company.get(staff["companyId"]);
+            department.company = company;
         }
+        return department.save();
     }
 
     /**
@@ -61,34 +51,28 @@ class DepartmentModule{
      * @param params
      * @returns {*}
      */
+    @clientExport
     @requireParams(["id"])
-    static async delete(params): Promise<any>{
-        var id = params.id;
-        let staffs = await API.staff.getStaffs({departmentId: id, status: 0});
+    @conditionDecorator([
+        {if: condition.isDepartmentAdminOrOwner("0.id")},
+        {if: condition.isDepartmentAgency("0.id")}
+    ])
+    static async deleteDepartment(params): Promise<any>{
+
+        let staffs = await Models.staff.find({where: {departmentId: params.id, status: 0}});
         if(staffs && staffs.length > 0){
             throw {code: -1, msg: '目前该部门下有'+staffs.length+'位员工 暂不能删除，给这些员工匹配新的部门后再进行操作'};
         }
-        let obj = await DBM.Department.destroy({where: params});
-        return true;
-    }
 
-    @clientExport
-    static async deleteDepartment(params): Promise<any>{
-        let { accountId } = Zone.current.get("session");
-        let role = await API.auth.judgeRoleById({id:accountId});
+        var staff = await Staff.getCurrent();
+        var department = await Models.department.get(params.id);
 
-        if(role == EAccountType.STAFF){
-            return DepartmentModule.delete(params);
-        }else{
-
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-            // delete params.companyId;
-            if(result){
-                return DepartmentModule.delete(params);
-            }else{
-                throw L.ERR.PERMISSION_DENY();
-            }
+        if(staff && department["companyId"] != staff["companyId"]){
+            throw L.ERR.PERMISSION_DENY();
         }
+
+        await department.destroy();
+        return true;
     }
 
 
@@ -98,48 +82,21 @@ class DepartmentModule{
      * @param data
      * @returns {*}
      */
-    @requireParams(["id"], departmentCols)
-    static async update(data): Promise<Department>{
-        var id = data.id;
-        if(!id){
-            throw {code: -1, msg:"id不能为空"};
-        }
-        delete data.id;
-        //    data.isDefault = false;//默认部门在企业注册时已经自动生成不允许自己添加
-        var options: any = {};
-        options.where = {id: id};
-        options.returning = true;
-        let [rownum, rows] = await DBM.Department.update(data, options);
-        return new Department(rows[0]);
-    }
-
     @clientExport
+    @requireParams(["id"], departmentCols)
+    @conditionDecorator([
+        {if: condition.isDepartmentAdminOrOwner("0.id")},
+        {if: condition.isDepartmentAgency("0.id")}
+    ])
     static async updateDepartment(params): Promise<Department>{
-        let { accountId } = Zone.current.get("session");
-        let company_id;
-        let role = await API.auth.judgeRoleById({id:accountId});
+        var staff = await Staff.getCurrent();
+        let dept = await Models.department.get(params.id);
 
-        if(role == EAccountType.STAFF){
-
-            let staff = await Models.staff.get(accountId);
-            company_id = staff["companyId"];
-            let tp = await API.department.getDepartment({id: params.id});
-
-            if(tp.companyId != company_id){
-                throw L.ERR.PERMISSION_DENY();
-            }
-            params.companyId = company_id;
-            return DepartmentModule.update(params)
-
-        }else{
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-            if(result){
-                return DepartmentModule.update(params);
-            }else{
-                throw L.ERR.PERMISSION_DENY();
-            }
+        if(staff){
+            var company = await Models.company.get(staff["companyId"]);
+            dept.company = company;
         }
-
+        return dept.save();
     }
 
     /**
@@ -148,65 +105,55 @@ class DepartmentModule{
      * @param params
      * @returns {*}
      */
-    @requireParams(["id"])
-    static async get(params: {id: string}): Promise<Department>{
-        var id = params.id;
-        let result =  await DBM.Department.findById(id)
-        return new Department(result);
-    }
-
     @clientExport
+    @requireParams(["id"])
+    @conditionDecorator([
+        {if: condition.isDepartmentAdminOrOwner("0.id")},
+        {if: condition.isDepartmentAgency("0.id")}
+    ])
     static async getDepartment(params: {id?: string, companyId?: string}): Promise<Department>{
         let id = params.id;
-        let { accountId } = Zone.current.get("session");
-        let role = await API.auth.judgeRoleById({id:accountId});
-        if(role == EAccountType.STAFF){
-            let staff = await Models.staff.get(accountId);
-            let companyId = staff["companyId"];
-            if(!id){
-                return DepartmentModule.getDefaultDepartment({companyId:companyId});
-            }
-
-            let tp = await DepartmentModule.get({id:id});
-            if(!tp){
-                throw {code: -1, msg: '查询结果不存在'};
-            }
-            if(tp['companyId'] != companyId){
-                throw L.ERR.PERMISSION_DENY();
-            }
-            return tp;
-
-        }else{
-            let  result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-            if(result){
-                return API.department.getDepartment({id:id});
-            }else{
-                throw L.ERR.PERMISSION_DENY();
-            }
-        }
-
+        let dept = await Models.department.get(id);
+        return dept;
     };
 
     /**
-     * 根据属性查找部门
+     * 查询企业默认部门
      * @param params
      * @returns {*}
      */
-    /*static getDepartments(params){
-     var options : any = {};
-     options.where = _.pick(params, Object.keys(DBM.Department.attributes));
-     if(params.$or) {
-     options.where.$or = params.$or;
-     }
-     if(params.columns){
-     options.attributes = params.columns;
-     }
-     return DBM.Department.findAll(options);
-     }*/
-
     @clientExport
+    @requireParams(["companyId"])
+    @conditionDecorator([
+        {if: condition.isCompanyAdminOrOwner("0.companyId")},
+        {if: condition.isCompanyAgency("0.companyId")}
+    ])
+    static async getDefaultDepartment(params): Promise<Department>{
+        params.isDefault = true;
+        let department = await Models.department.find({where: params});
+        if (department) {
+            return department[0];
+        }
+
+        let dept = Department.create({name: "我的企业", isDefault: true, companyId: params.companyId})
+        let result = await dept.save();
+        return result;
+    }
+
+
+    /**
+     * 根据属性查找部门id
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["companyId"],departmentCols)
+    @conditionDecorator([
+        {if: condition.isCompanyAdminOrOwner("0.companyId")},
+        {if: condition.isCompanyAgency("0.companyId")}
+    ])
     static async getDepartments(params){
-        let { accountId } = Zone.current.get("session");
+        var staff = await Staff.getCurrent();
 
         var options : any = {};
         options.where = _.pick(params, Object.keys(DBM.Department.attributes));
@@ -216,96 +163,43 @@ class DepartmentModule{
         if(params.columns){
             options.attributes = params.columns;
         }
-        let role = await API.auth.judgeRoleById({id:accountId});
+        options.order = params.order || [["created_at", "desc"]];
 
-        if(role == EAccountType.STAFF){
-
-            let staff = await Models.staff.get(accountId);
+        if(staff){
             params.companyId = staff["companyId"];
-            let departments = await DBM.Department.findAll(options);
-            return departments.map(function(d) {
-                return d.id;
-            })
-
-        }else{
-
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-            if(result){
-                let departments = await DBM.Department.findAll(options);
-                return departments.map(function(d) {
-                    return d.id;
-                })
-            }else{
-                throw {code: -1, msg: '无权限'};
-            }
         }
+        let departments = await Models.department.find(options);
+        return departments.map(function(d) {
+            return d.id;
+        })
     }
 
 
-    /**
-     * 根据companyId查询企业所有部门
-     * @param params
-     * @param params.companyId
-     * @returns {*}
-     */
-    /*department.getAllDepartment = getAllDepartment;
-     getAllDepartment.required_params = ["companyId"];
-     function getAllDepartment(params){
-     return DBM.Department.findAll({where: params});
-     }*/
-
-    /**
-     * 查询企业默认部门
-     * @param params
-     * @returns {*}
-     */
-    @requireParams(["companyId"])
-    static async getDefaultDepartment(params): Promise<Department>{
-        params.isDefault = true;
-        let department = await DBM.Department.findOne({where: params});
-        if (department) {
-            return new Department(department);
-        }
-
-        let result = await DBM.Department.create({name: "我的企业", isDefault: true, companyId: params.companyId});
-        return new Department(result);
-    }
 
     /**
      * 得到全部部门
      * @param params
      * @returns {*}
      */
-    /*@requireParams(["companyId"])
-    static getAllDepartment(params: {companyId: string}){
-        var options: any = {};
-        options.where = params;
-        options.order = [["created_at", "desc"]];
-        return DBM.Department.findAll(options);
-    }*/
-
     @clientExport
+    @requireParams(["companyId"],departmentCols)
+    @conditionDecorator([
+        {if: condition.isCompanyAdminOrOwner("0.companyId")},
+        {if: condition.isCompanyAgency("0.companyId")}
+    ])
     static async getAllDepartment(params: {companyId?: string}){
-        let { accountId } = Zone.current.get("session");
+        var staff = await Staff.getCurrent();
         var options: any = {};
         options.where = params;
         options.order = [["created_at", "desc"]];
-        let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == EAccountType.STAFF){
-            let staff = await Models.staff.get(accountId);
+        if(staff){
             params.companyId = staff["companyId"];
             options.where = params;
-            return DBM.Department.findAll(options);
-        }else{
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-            if(result){
-                return DBM.Department.findAll(options);
-            }else{
-                throw {code: -1, msg: '无权限'};
-            }
         }
 
+        let departments = await Models.department.find(options);
+        return departments;
     };
 
 
@@ -314,42 +208,23 @@ class DepartmentModule{
      * @param params
      * @returns {*}
      */
-    /*@requireParams(["companyId"])
-    static getFirstClassDepartments(params){
-        var options: any = {};
-        params.parentId = null;
-        options.where = params;
-        options.order = [["created_at", "desc"]];
-        return DBM.Department.findAll(options);
-    }*/
-
     @clientExport
     @requireParams(["companyId"])
-    static async getFirstClassDepartments(params: {companyId?: string}){
-        let { accountId } = Zone.current.get("session");
-        let role = await API.auth.judgeRoleById({id:accountId});
+    @conditionDecorator([
+        {if: condition.isCompanyAdminOrOwner("0.companyId")},
+        {if: condition.isCompanyAgency("0.companyId")}
+    ])
+    static async getFirstClassDepartments(params: {companyId: string}){
+        var staff = await Staff.getCurrent();
         let options: any = {};
+        params['parentId'] = null;
+        options.where = params;
         options.order = [["created_at", "desc"]];
-        if(role == EAccountType.STAFF){
-
-            let staff = await Models.staff.get(accountId);
-            if(staff){
-                params['parentId'] = null;
-                params.companyId = staff["companyId"];//只允许查询该企业下的部门
-                options.where = params;
-                return DBM.Department.findAll(options);
-            }else{
-                throw {code: -1, msg: '无权限'};
-            }
-        }else{
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-            if(result){
-                options.where = params;
-                return DBM.Department.findAll(options);
-            }else{
-                throw {code: -1, msg: '无权限'};
-            }
+        if(staff){
+            options.where.companyId = staff["companyId"];//只允许查询该企业下的部门
         }
+
+        return Models.department.find(options);
 
     }
 
@@ -358,40 +233,24 @@ class DepartmentModule{
      * @param params
      * @returns {*}
      */
-    /*@requireParams(["parentId"])
-    static getChildDepartments(params: {parentId: string}){
-        var options: any = {};
-        options.where = params;
-        options.order = [["created_at", "desc"]];
-        return DBM.Department.findAll(options);
-    }*/
-
     @clientExport
     @requireParams(["parentId"], ["companyId"])
-    static async getChildDepartments(params: {companyId?: string, parentId: string}){
-        let { accountId } = Zone.current.get("session");
+    @conditionDecorator([
+        {if: condition.isDepartmentAdminOrOwner("0.parentId")},
+        {if: condition.isDepartmentAgency("0.parentId")}
+    ])
+    static async getChildDepartments(params: {parentId: string, companyId?: string}){
+        var staff = await Staff.getCurrent();
         var options: any = {};
         options.where = params;
         options.order = [["created_at", "desc"]];
-        let role = await API.auth.judgeRoleById({id:accountId});
 
-        if(role == EAccountType.STAFF){
-            let staff = await Models.staff.get(accountId);
+        if(staff){
 
-            if(staff){
-                params.companyId = staff["companyId"];//只允许查询该企业下的部门
-                return DBM.Department.findAll(options);
-            }else{
-                throw {code: -1, msg: '无权限'};
-            }
-        }else{
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-            if(result){
-                return DBM.Department.findAll(options);
-            }else{
-                throw {code: -1, msg: '无权限'};
-            }
+            params.companyId = staff["companyId"];//只允许查询该企业下的部门
         }
+
+        return Models.department.find(options);
     }
 
     /**
@@ -400,6 +259,10 @@ class DepartmentModule{
      * @returns {*}
      */
     @requireParams(["parentId"])
+    @conditionDecorator([
+        {if: condition.isDepartmentAdminOrOwner("0.parentId")},
+        {if: condition.isDepartmentAgency("0.parentId")}
+    ])
     static getAllChildren(params: {parentId: string}){
         var sql = "with RECURSIVE cte as " +
             "( select a.id,a.name,a.parent_id from department.departments a where id='"+params.parentId+"' " +
@@ -411,26 +274,18 @@ class DepartmentModule{
             })
     }
 
-    @clientExport
+    @requireParams(["parentId"])
+    @conditionDecorator([
+        {if: condition.isDepartmentAdminOrOwner("0.parentId")},
+        {if: condition.isDepartmentAgency("0.parentId")}
+    ])
     static async getAllChildDepartments(params: {companyId?: string, parentId: string}){
-        let { accountId } = Zone.current.get("session");
-        let role = await API.auth.judgeRoleById({id:accountId});
-        if(role == EAccountType.STAFF){
-            let staff = await Models.staff.get(accountId);
-            if(staff){
-                params.companyId = staff["companyId"];//只允许查询该企业下的部门
-                return DepartmentModule.getAllChildren(params);
-            }else{
-                throw {code: -1, msg: '无权限'};
-            }
-        }else{
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-            if(result){
-                return DepartmentModule.getAllChildren(params);
-            }else{
-                throw {code: -1, msg: '无权限'};
-            }
+        var staff = await Staff.getCurrent();
+        if(staff){
+            params.companyId = staff["companyId"];//只允许查询该企业下的部门
         }
+
+        return DepartmentModule.getAllChildren(params);
 
     }
 
@@ -440,6 +295,10 @@ class DepartmentModule{
      * @returns {*}
      */
     @requireParams(["parentId"])
+    @conditionDecorator([
+        {if: condition.isDepartmentAdminOrOwner("0.parentId")},
+        {if: condition.isDepartmentAgency("0.parentId")}
+    ])
     static getAllChildDepartmentsId(params: {parentId: string}){
         var ids = [];
         var sql = "with RECURSIVE cte as " +
@@ -467,6 +326,10 @@ class DepartmentModule{
      * @type {getDepartmentStructure}
      */
     @requireParams(["companyId"])
+    @conditionDecorator([
+        {if: condition.isCompanyAdminOrOwner("0.companyId")},
+        {if: condition.isCompanyAgency("0.companyId")}
+    ])
     static getDepartmentStructure(params: {companyId: string}){
         var allDepartmentMap = {};
         var noParentDep = [];
