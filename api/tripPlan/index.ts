@@ -15,7 +15,10 @@ let config = require("../../config");
 import _ = require('lodash');
 import moment = require("moment");
 import {requireParams, clientExport} from 'common/api/helper';
-import {Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, ETripType} from "api/_types/tripPlan";
+import {
+    Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, ETripType,
+    EAuditStaus
+} from "api/_types/tripPlan";
 import {Models} from "../_types/index";
 import {Staff, EStaffRole, EStaffStatus} from "../_types/staff";
 import {conditionDecorator, condition} from "../_decorator";
@@ -251,7 +254,7 @@ class TripPlanModule {
             throw L.ERR.NOT_FOUND();
         }
 
-        let tripDetails = await tripPlan.getTripDetails();
+        let tripDetails = await tripPlan.getTripDetails({});
 
         await tripPlan.destroy();
         await Promise.all(tripDetails.map((detail)=> detail.destroy()));
@@ -269,7 +272,7 @@ class TripPlanModule {
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
     static async commitTripPlan(params): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
-        let tripDetails = await tripPlan.getTripDetails();
+        let tripDetails = await tripPlan.getTripDetails({});
 
         await Promise.all(tripDetails.map(async function(detail) {
             detail.status = EPlanStatus.AUDITING;
@@ -282,12 +285,50 @@ class TripPlanModule {
     }
 
     /**
+     * 审核出差票据
+     * 
+     * @param params
+     */
+    @clientExport
+    @requireParams(['id', 'auditResult'])
+    static async auditPlanInvoice(params: {id: string, auditResult: EAuditStaus}): Promise<boolean> {
+        let tripDetail = await Models.tripDetail.get(params.id);
+        
+        if(!tripDetail) {
+            throw L.ERR.TRIP_DETAIL_FOUND();
+        }
+        
+        if(tripDetail.status != EPlanStatus.AUDITING) {
+            throw L.ERR.TRIP_PLAN_STATUS_ERR();
+        }
+
+        let audit = params.auditResult;
+        let tripPlan = tripDetail.tripPlan;
+
+        if(audit == EAuditStaus.PASS) {
+            tripDetail.status = EPlanStatus.COMPLETE;
+            let details = await tripPlan.getTripDetails({id: {$ne: tripDetail.id, status: [EPlanStatus.AUDITING, EPlanStatus.AUDIT_NOT_PASS]}}); //获取所有未经过审核的票据
+
+            if(!details || details.length == 0 ) {
+                tripPlan.status = EPlanStatus.COMPLETE;
+            }
+        }else if(audit == EAuditStaus.NOT_PASS) {
+            tripDetail.status = EPlanStatus.AUDIT_NOT_PASS;
+            tripPlan.status = EPlanStatus.AUDIT_NOT_PASS;
+        }
+
+        await Promise.all([tripPlan.save(), tripDetail.save()]);
+
+        return true;
+    }
+
+    /**
      * 保存消费记录详情
      * @param params
      * @returns {*}
      */
     @requireParams(['tripPlanId', 'type', 'startTime', 'invoiceType', 'budget'])
-    static saveTripDetail(params) {
+    static saveTripDetail(params): Promise<TripDetail> {
         let record = params;
         record.isCommit = false;
         record.status = EPlanStatus.WAIT_COMMIT;
@@ -365,7 +406,7 @@ class TripPlanModule {
      * @param params
      */
     @requireParams(['tripDetailId', 'optLog', 'userId', 'updates'], TripDetail['$fieldnames'])
-    static updateTripDetail(params) {
+    static updateTripDetail(params): Promise<TripDetail> {
         let updates:any = _.pick(params.updates, TripDetail['$fieldnames']);
         let trip_plan_id = '';
 
@@ -522,8 +563,7 @@ class TripPlanModule {
      * @returns {*}
      */
     @requireParams(['userId', 'id'])
-
-    static deleteTripDetail(params) {
+    static deleteTripDetail(params): Promise<boolean> {
         let id = params.id;
         let userId = params.userId;
 
@@ -1015,18 +1055,14 @@ class TripPlanModule {
     /**
      * 根据出差记录id获取出差详情(包括已删除的)
      * @param params
-     * @returns {Promise<TripDetails>}
+     * @returns {Promise<string[]>}
      */
     @clientExport
-    @requireParams(['tripPlanId'], ['type'])
+    @requireParams(['tripPlanId'], ['type', 'status', 'id'])
     static async getTripDetails(params): Promise<string[]> {
-        let options: any = {where: {tripPlanId: params.tripPlanId}}
-
-        if(params.type) {
-            options.where.type = params.type;
-        }
-
+        let options: any = {where: params}
         let details = await Models.tripDetail.find(options);
+
         return details.map(function(d) {
             return d.id;
         })
