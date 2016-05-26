@@ -59,10 +59,10 @@ angular
     .module('nglibs')
     .service('$loading', LoadingService)
     .run(function($rootScope: IRootScopeService, $loading: LoadingService){
-        $rootScope.$on("$locationChangeStart", function (event: any, newurl: string, oldurl: string) {
+        $rootScope.$on("$stateChangeStart", function (event: any, newurl: string, oldurl: string) {
             //console.log('$locationChangeStart', event, newurl, oldurl);
-            if(isHashChange(newurl, oldurl))
-                return;
+            // if(isHashChange(newurl, oldurl))
+            //     return;
             $loading.reset();
             $loading.start();
         });

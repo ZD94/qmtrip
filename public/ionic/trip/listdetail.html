@@ -66,14 +66,14 @@
                     <span class="item-note">{{statustext[backTraffic.status]}}</span>
                 </div>
             </div>
-            <div style="margin-bottom: 10px">
+            <div style="margin-bottom: 10px" ng-if="hotel">
                 <ion-item class="item-divider">
                     <span>住宿</span>
                     <span style="margin-left: 120px;">{{hotel.price}}</span>元
                 </ion-item>
                 <ion-item>
-                    <span ng-if='hotel.tripType == ETripType.OUT_TRIP>{{tripDetail.startAt | date: 'yyyy-MM-dd'}}</span>
-                    <span ng-if='hotel.tripType == ETripType.HOTEL>{{startAt | date: 'yyyy-MM-dd'}}</span>
+                    <span>{{startAt.toDateString() | date: 'yyyy-MM-dd'}}</span>
+                    <span>{{startAt | date: 'yyyy-MM-dd'}}</span>
                     <br>
                     {{tripDetail.deptCity}}
                     &nbsp;

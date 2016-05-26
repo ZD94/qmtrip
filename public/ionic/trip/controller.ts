@@ -96,7 +96,7 @@ export function CreateController($scope, $storage){
             leaveTime: moment(trip.beginDate).format('HH:mm'),
             goBackTime: moment(trip.endDate).format('HH:mm'),
             isRoundTrip: trip.round,
-            isNeedHotel: true,
+            isNeedHotel: trip.hotel
         })
         .then(function(result) {
             window.location.href = "#/trip/budget?id="+result;
@@ -148,7 +148,10 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
         budgets.push(otherBudget);
     }
     $scope.budgets = budgets;
-
+    $scope.EInvoiceType = EInvoiceType;
+    $scope.ETripType = ETripType;
+    console.info(budgets);
+    console.info(EInvoiceType);
     API.require("tripPlan");
     await API.onload();
 
@@ -162,7 +165,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
             remark: trip.reason,
             budgets: budgets,
         }
-        API.tripPlan.saveTripPlan(params)
+        API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason})
         .then(function(planTrip) {
             window.location.href = '#/trip/committed?id='+planTrip.id;
         })
@@ -187,6 +190,9 @@ export async function DetailController($scope, $stateParams, Models){
     let id = $stateParams.id;
     let tripPlan = await Models.tripPlan.get(id);
     let budgets: any[] = await Models.tripDetail.find({tripPlanId: id});
+    $scope.createdAt = moment(tripPlan.createAt).toDate();
+    $scope.startAt = moment(tripPlan.startAt).toDate();
+    $scope.backAt = moment(tripPlan.backAt).toDate();
     budgets = budgets.map(function(budget) {
         let tripType = 'other';
         if (budget.type == 0) {
@@ -263,6 +269,8 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
     statusTxt[EPlanStatus.AUDITING] = "已提交待审核状态";
     statusTxt[EPlanStatus.COMPLETE] = "审核完，已完成状态";
     $scope.statustext = statusTxt;
+    $scope.EInvoiceType = EInvoiceType;
+    console.info(EInvoiceType);
     budgets.map(function(budget) {
         let tripType: ETripType = ETripType.OTHER;
         let title = '补助'
@@ -345,6 +353,7 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
     $scope.backTraffic = backTraffic;
     $scope.other = other;
     $scope.budgets = budgets;
+    console.info($scope.goTraffic);
     API.require('tripPlan');
     await API.onload();
     function uploadInvoice(consumeId, picture, callback) {

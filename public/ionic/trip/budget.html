@@ -17,15 +17,15 @@
         <ion-list>
             <div ng-repeat="budget in budgets">
                 <ion-item class="item-divider">
-                    <span ng-if='budget.tripType == "goTraffic"'>去程交通</span>
-                    <span ng-if='budget.tripType == "backTraffic"'>回程交通</span>
-                    <span ng-if='budget.tripType == "hotel"'>住宿</span>
-                    <span ng-if='budget.tripType == "other" '>补助</span>
+                    <span ng-if='budget.tripType == ETripType.OUT_TRIP'>去程交通</span>
+                    <span ng-if='budget.tripType == ETripType.BACK_TRIP'>回程交通</span>
+                    <span ng-if='budget.tripType == ETripType.HOTEL'>住宿</span>
+                    <span ng-if='budget.tripType == "other"'>补助</span>
                     <span style="margin-left: 120px;">{{budget.price}}</span>元</ion-item>
                 <ion-item>
-                    <span ng-if='budget.tripType == "goTraffic"'>{{trip.beginDate | date: 'yyyy-MM-dd'}}</span>
-                    <span ng-if='budget.tripType == "backTraffic"'>{{trip.endDate | date: 'yyyy-MM-dd'}}</span>
-                    <span ng-if='budget.tripType == "hotel"'>
+                    <span ng-if='budget.tripType == ETripType.OUT_TRIP'>{{trip.beginDate | date: 'yyyy-MM-dd'}}</span>
+                    <span ng-if='budget.tripType == ETripType.BACK_TRIP'>{{trip.endDate | date: 'yyyy-MM-dd'}}</span>
+                    <span ng-if='budget.tripType == ETripType.HOTEL'>
                         {{trip.beginDate | date: 'yyyy-MM-dd'}}至{{trip.endDate | date: 'yyyy-MM-dd'}}
                     </span>
                     <span ng-if='budget.tripType == "other"'>
@@ -35,9 +35,9 @@
                     <br>
                     {{trip.fromPlace}}
                         &nbsp;
-                        <i ng-if='budget.type == "air"' class="icon ion-plane"></i>
-                        <i ng-if='budget.type == "train"' class="icon ion-train"></i>
-                        <i ng-if='budget.type == "hotel"' class="icon ion-home"></i>
+                        <i ng-if='budget.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                        <i ng-if='budget.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                        <i ng-if='budget.type == EInvoiceType.HOTEL' class="icon ion-home"></i>
                         <i ng-if='budget.type == "other"'>-</i>
                         &nbsp;
                     {{trip.place}}
