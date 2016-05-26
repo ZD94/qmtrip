@@ -57,10 +57,19 @@ class TripPlanModule {
     static async saveTripPlan(params): Promise<TripPlan> {
         let staff = await Staff.getCurrent();
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: params.budgetId});
+
+        console.info("**************************");
+        console.info(params);
+
+        if(!budgetInfo) {
+            throw L.ERR.TRAVEL_BUDGET_NOT_FOUND();
+        }
+
         let {budgets, query} = budgetInfo;
         let project = await getProjectByName({companyId: staff.company.id, name: params.title, userId: staff.id, isCreate: true});
         let totleBudget = 0;
         let tripPlan = Models.tripPlan.create(params);
+
         tripPlan['accountId'] = staff.id;
         tripPlan['companyId'] = staff.company.id;
         tripPlan.project = project;

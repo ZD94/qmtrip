@@ -99,6 +99,7 @@ export function CreateController($scope, $storage){
             isNeedHotel: trip.hotel
         })
         .then(function(result) {
+            console.info("getTravelPolicyBudget success...");
             window.location.href = "#/trip/budget?id="+result;
         })
         .catch(function(err) {
