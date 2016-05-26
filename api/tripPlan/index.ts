@@ -20,6 +20,7 @@ import {Models} from "../_types/index";
 import {Staff} from "../_types/staff";
 import {conditionDecorator, condition} from "../_decorator";
 import async = Q.async;
+import {FindResult} from "common/model/interface";
 
 
 let TripDetailCols = TripDetail['$fieldnames'];
@@ -205,11 +206,11 @@ class TripPlanModule {
      * @returns {*}
      */
     @clientExport
-    static async listTripPlans(params): Promise<string[]> {
-        let tripPlans = await Models.tripPlan.find(params);
-        return tripPlans.map(function (plan) {
+    static async listTripPlans(params): Promise<FindResult> {
+        let paginate = await Models.tripPlan.find(params);
+        return {ids: paginate.map(function (plan) {
             return plan.id;
-        });
+        }), count: paginate["total"]}
     }
 
     /**
