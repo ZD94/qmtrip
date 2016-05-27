@@ -22,6 +22,7 @@ let logger = new Logger("agency");
 let agencyCols = Agency['$fieldnames'];
 let agencyUserCols = AgencyUser['$fieldnames'];
 
+
 class AgencyModule {
     /**
      * @method createAgency
@@ -156,9 +157,6 @@ class AgencyModule {
             throw L.ERR.AGENCY_NOT_EXIST();
         }
 
-        let agencyUsers = await Models.agencyUser.find({agencyId: agency.id});
-
-        await Promise.all(agencyUsers.map((user) => user.destroy()));
         await agency.destroy();
 
         return true;
