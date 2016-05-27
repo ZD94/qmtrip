@@ -122,6 +122,29 @@ export function addFuncParams(params) {
     }
 }
 
+/**
+ * 判断不为空
+ * @param params
+ * @constructor
+ */
+export function modelNotNull(modname: string, keyName?: string) {
+    return function(target, key, desc) {
+        let fn = desc.value;
+        desc.value = async function(...args) {
+            let self = this;
+            keyName = keyName || 'id';
+            let entity = await Models[modname].get(args[0][keyName]);
+            
+            if(!entity) {
+                throw L.ERR.NOT_FOUND();
+            }
+
+            return fn.apply(self, args);
+        }
+        return desc;
+    }
+}
+
 export function conditionDecorator(checkFnList: CheckInterface[]) {
     return function (target, key, desc) {
         let fn = desc.value;

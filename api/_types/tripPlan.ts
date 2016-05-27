@@ -30,6 +30,12 @@ export enum EInvoiceType {
     OTHER = 3,
 }
 
+export enum  EAuditStaus {
+    NOT_PASS = -1,
+    AUDITING = 0,
+    PASS = 1
+}
+
 @Table(Models.project, 'tripPlan.')
 export class Project extends ModelObject{
     constructor(target: Object) {
@@ -187,9 +193,11 @@ export class TripPlan extends ModelObject {
         return Models.tripDetail.find({tripPlanId: this.id, type: ETripType.HOTEL});
     }
     
-    getTripDetails(): Promise<TripDetail[]> {
-        return Models.tripDetail.find({tripPlanId: this.id});
+    getTripDetails(params): Promise<TripDetail[]> {
+        params.tripPlanId = this.id;
+        return Models.tripDetail.find(params);
     }
+
 }
 
 @Table(Models.tripDetail, 'tripPlan.')
@@ -306,6 +314,11 @@ export class TripDetail extends ModelObject{
 
     uploadInvoice(pictureFileId: string): Promise<boolean> {
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: pictureFileId});
+    }
+
+    approvePlanInvoice(params: {auditResult: EAuditStaus}): Promise<boolean> {
+        params['id'] = this.id;
+        return API.tripPlan.approvePlanInvoice(params);
     }
 }
 

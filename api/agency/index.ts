@@ -14,7 +14,7 @@ import utils = require("common/utils");
 import {requireParams, clientExport} from 'common/api/helper';
 import {getSession} from 'common/model';
 import {Agency, AgencyUser, EAgencyStatus, AgencyError, EAgencyUserRole} from "api/_types/agency";
-import {requirePermit, conditionDecorator, condition} from "../_decorator";
+import {requirePermit, conditionDecorator, condition, modelNotNull} from "../_decorator";
 import { Models, EGender } from '../_types/index';
 import {md5} from "../../common/utils";
 let logger = new Logger("agency");
@@ -29,7 +29,8 @@ class AgencyModule {
      * @param params
      * @returns {Promise<Agency>}
      */
-    static async createAgency(params:{name:string, email:string, pwd:string, id?:string, mobile?:string,description?:string, remark?:string, status?:number}):Promise<Agency> {
+    static async createAgency(params:{name:string, email:string, pwd:string, id?:string, mobile?:string,description?:string,
+        remark?:string, status?:number}):Promise<Agency> {
         let _agency = await DBM.Agency.findOne({where: {email: params.email}});
 
         if (_agency) {
@@ -93,17 +94,12 @@ class AgencyModule {
      * @returns {Promise<Agency>}
      */
     @clientExport
-    @requirePermit('user.query', 2)
-    @conditionDecorator([{if: condition.isMyAgency('0.id')}])
     @requireParams(['id'])
-    static async getAgencyById(params: {id: string}): Promise<Agency>{
-        let agency = await Models.agency.get(params.id);
-
-        if (!agency) {
-            throw L.ERR.AGENCY_NOT_EXIST;
-        }
-
-        return agency;
+    @requirePermit('user.query', 2)
+    @modelNotNull('agency')
+    @conditionDecorator([{if: condition.isMyAgency('0.id')}])
+    static getAgencyById(params: {id: string}): Promise<Agency>{
+        return Models.agency.get(params.id);
     }
 
     /**
@@ -121,7 +117,7 @@ class AgencyModule {
         let agency = await Models.agency.get(params.id);
 
         if (!agency) {
-            throw L.ERR.AGENCY_NOT_EXIST;
+            throw L.ERR.AGENCY_NOT_EXIST();
         }
 
         for(let key in params) {
@@ -137,12 +133,10 @@ class AgencyModule {
      * @param params
      * @returns {Promise<string[]>}
      */
+    @clientExport
     static async listAgency(params?: any): Promise<string[]>{
         let agencies = await Models.agency.find({attributes: ['id']});
-
-        return agencies.map(function(agency) {
-            return agency.id;
-        })
+        return agencies.map((a) => a.id);
     }
 
     /**
@@ -159,16 +153,12 @@ class AgencyModule {
         let agency = await Models.agency.get(params.id);
 
         if (!agency) {
-            throw L.ERR.AGENCY_NOT_EXIST;
+            throw L.ERR.AGENCY_NOT_EXIST();
         }
 
-        console.info('agencyId==>', agency.id);
         let agencyUsers = await Models.agencyUser.find({agencyId: agency.id});
 
-        await agencyUsers.map(async function (user) {
-            await user.destroy();
-        });
-
+        await Promise.all(agencyUsers.map((user) => user.destroy()));
         await agency.destroy();
 
         return true;
@@ -188,7 +178,7 @@ class AgencyModule {
         let curUser = await AgencyUser.getCurrent();
 
         if(!curUser) {
-            throw L.ERR.AGENCY_USER_NOT_EXIST;
+            throw L.ERR.AGENCY_USER_NOT_EXIST();
         }
 
         let user = await Models.agencyUser.create(params);
@@ -205,15 +195,10 @@ class AgencyModule {
     @clientExport
     @requireParams(['id'])
     @requirePermit('user.query', 2)
+    @modelNotNull('agencyUser')
     @conditionDecorator([{if: condition.isSameAgency('0.id')}])
-    static async getAgencyUser(params: {id: string}): Promise<AgencyUser> {
-        let agencyUser = await Models.agencyUser.get(params.id);
-
-        if (!agencyUser) {
-            throw L.ERR.AGENCY_USER_NOT_EXIST();
-        }
-
-        return agencyUser;
+    static getAgencyUser(params: {id: string}): Promise<AgencyUser> {
+        return Models.agencyUser.get(params.id);
     }
 
     /**
@@ -236,16 +221,14 @@ class AgencyModule {
         let target = await Models.agencyUser.get(params.id);
 
         if(!target) {
-            throw L.ERR.AGENCY_NOT_EXIST;
+            throw L.ERR.AGENCY_NOT_EXIST();
         }
 
         for(let key in params) {
             target[key] = params[key];
         }
-        
-        let result =  await target.save();
 
-        return result;
+        return await target.save();;
     }
 
     /**
@@ -262,11 +245,10 @@ class AgencyModule {
         let target = await Models.agencyUser.get(params.id);
 
         if(!target) {
-            throw L.ERR.AGENCY_USER_NOT_EXIST;
+            throw L.ERR.AGENCY_USER_NOT_EXIST();
         }
 
-        let result = await target.destroy();
-
+        await target.destroy();
         return true;
     }
 
@@ -288,28 +270,13 @@ class AgencyModule {
      * @param options options.perPage 每页条数 options.page当前页
      */
     @clientExport
-    static async listAgencyUser(params) {
-        let agencies = await DBM.Agency.findAll({where: params, attributes: ['id']});
-
-        return agencies.map(function(agency) {
-            return agency.id;
-        })
+    static async listAgencyUser(params): Promise<string[]> {
+        let curUser = await AgencyUser.getCurrent();
+        params.agencyId = curUser['agencyId'];
+        let users = await Models.agencyUser.find(params);
+        return users.map((user) => user.id);
     }
 
-    /**
-     * @method getAgencyUsers
-     * 得到代理商用户 用于获取查看票据的代理商用户id 不需要暴露给客户端
-     * @param params
-     * @returns {Promise<string[]>}
-     */
-    @clientExport
-    static async getAgencyUsers(params: {agencyId: string}): Promise<string[]> {
-        let users = await  DBM.AgencyUser.findAll({where: params, attributes: ['id']});
-
-        return users.map(function(user) {
-            return user.id;
-        })
-    }
 
     /**
      * 测试用例使用删除代理商和用户的操作，不在client里调用
