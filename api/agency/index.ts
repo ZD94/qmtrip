@@ -16,7 +16,7 @@ import {getSession} from 'common/model';
 import {Agency, AgencyUser, EAgencyStatus, AgencyError, EAgencyUserRole} from "api/_types/agency";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "../_decorator";
 import { Models, EGender } from '../_types/index';
-import {md5} from "../../common/utils";
+import {md5} from "common/utils";
 let logger = new Logger("agency");
 
 let agencyCols = Agency['$fieldnames'];
@@ -31,22 +31,13 @@ class AgencyModule {
      */
     static async createAgency(params:{name:string, email:string, pwd:string, id?:string, mobile?:string,description?:string,
         remark?:string, status?:number}):Promise<Agency> {
-        let _agency = await DBM.Agency.findOne({where: {email: params.email}});
+        let _agency = await Models.agency.find({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
 
-        if (_agency) {
-            throw {code: -2, msg: '该邮箱已经注册代理商'};
+        if (_agency && _agency.length > 0) {
+            throw {code: -2, msg: '邮箱或手机号已经注册代理商'};
         }
 
-        if (params.mobile) {
-            let agency_mobile = await DBM.Agency.findOne({where: {mobile: params.mobile}});
-            if (agency_mobile) {
-                throw {code: -3, msg: '该手机号已经注册代理商'};
-            }
-        }
-
-        let agency = await DBM.Agency.create(params);
-
-        return new Agency(agency);
+        return Models.agency.create(params).save();
     };
 
 
@@ -110,15 +101,12 @@ class AgencyModule {
      * @returns {Promsie<Agency>}
      */
     @clientExport
+    @requireParams(['id'], ['name', 'description', 'status', 'email', 'mobile', 'remark'])
     @conditionDecorator([{if: condition.isMyAgency('0.id')}])
     @requirePermit('user.edit', 2)
-    @requireParams(['id'], ['name', 'description', 'status', 'email', 'mobile', 'remark'])
+    @modelNotNull('agency')
     static async updateAgency(params): Promise<Agency> {
         let agency = await Models.agency.get(params.id);
-
-        if (!agency) {
-            throw L.ERR.AGENCY_NOT_EXIST();
-        }
 
         for(let key in params) {
             agency[key] = params[key];
@@ -146,21 +134,15 @@ class AgencyModule {
      * @returns {*}
      */
     @clientExport
+    @requireParams(['id'])
     @requirePermit('user.delete', 2)
     @conditionDecorator([{if: condition.isMyAgency('0.id')}])
-    @requireParams(['id'])
+    @modelNotNull('agency')
     static async deleteAgency(params: {id: string}): Promise<boolean> {
         let agency = await Models.agency.get(params.id);
-
-        if (!agency) {
-            throw L.ERR.AGENCY_NOT_EXIST();
-        }
-
         let agencyUsers = await Models.agencyUser.find({agencyId: agency.id});
-
         await Promise.all(agencyUsers.map((user) => user.destroy()));
         await agency.destroy();
-
         return true;
     }
 
@@ -216,18 +198,13 @@ class AgencyModule {
     @requirePermit('user.edit', 2)
     @conditionDecorator([{if: condition.isSameAgency('0.id')}])
     @requireParams(['id'], ['status', 'name', 'sex', 'mobile', 'avatar', 'roleId'])
+    @modelNotNull('agencyUser')
     static async updateAgencyUser(params: {id: string, status?: number, name?: string, sex?: EGender, email?: string,
         mobile?: string, avatar?: string, roleId?: number}): Promise<AgencyUser> {
         let target = await Models.agencyUser.get(params.id);
-
-        if(!target) {
-            throw L.ERR.AGENCY_NOT_EXIST();
-        }
-
         for(let key in params) {
             target[key] = params[key];
         }
-
         return await target.save();;
     }
 
@@ -238,16 +215,12 @@ class AgencyModule {
      * @returns {Promise<boolean>}
      */
     @clientExport
+    @requireParams(['id'])
     @requirePermit("user.delete", 2)
     @conditionDecorator([{if: condition.isSameAgency('0.id')}])
-    @requireParams(['id'])
+    @modelNotNull('agencyUser')
     static async deleteAgencyUser(params: {id: string}): Promise<boolean> {
         let target = await Models.agencyUser.get(params.id);
-
-        if(!target) {
-            throw L.ERR.AGENCY_USER_NOT_EXIST();
-        }
-
         await target.destroy();
         return true;
     }
@@ -260,8 +233,8 @@ class AgencyModule {
      */
     @requireParams(['email'])
     static async agencyByEmail(params: {email: string}): Promise<Agency> {
-        let agency = await DBM.Agency.findOne({where: params});
-        return new Agency(agency)
+        let agencies = await Models.agency.find({where: params});
+        return agencies[0];
     }
 
     /**
@@ -272,7 +245,7 @@ class AgencyModule {
     @clientExport
     static async listAgencyUser(params): Promise<string[]> {
         let curUser = await AgencyUser.getCurrent();
-        params.agencyId = curUser['agencyId'];
+        params.agencyId = curUser.agency.id;
         let users = await Models.agencyUser.find(params);
         return users.map((user) => user.id);
     }
