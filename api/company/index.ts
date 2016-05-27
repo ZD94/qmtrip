@@ -8,7 +8,6 @@ let uuid = require("node-uuid");
 let L = require("common/language");
 let _ = require('lodash');
 let utils = require("common/utils");
-let Paginate = require("common/paginate").Paginate;
 let C = require("config");
 let API = require("common/api");
 let Logger = require('common/logger');

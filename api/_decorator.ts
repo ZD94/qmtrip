@@ -2,7 +2,6 @@ import { getSession } from '../common/model/index';
 import { Staff, EStaffRole } from './_types/staff';
 import { AgencyUser } from './_types/agency';
 import {EAccountType} from "./_types/index";
-import async = Q.async;
 /**
  * Created by wlh on 16/5/16.
  */
