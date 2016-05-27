@@ -209,20 +209,14 @@ class TripPlanModule {
      * @returns {*}
      */
     @clientExport
-    @requireParams(['id'], ['isNeedTraffic', 'isNeedHotel', 'title', 'description', 'status', 'deptCity', 'deptCityCode',
-        'arrivalCity', 'arrivalCityCode', 'startAt', 'backAt', 'remark'])
+    @requireParams(['id'], ['isNeedTraffic', 'isNeedHotel', 'title', 'description', 'status', 'deptCity', 'deptCityCode', 'arrivalCity', 'arrivalCityCode', 'startAt', 'backAt', 'remark'])
+    @modelNotNull('tripPlan')
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
     static async updateTripPlan(params): Promise<TripPlan> {
         let tripPlan = await Models.tripPlan.get(params.id);
-
-        if(!tripPlan) {
-            throw L.ERR.TRIP_PLAN_NOT_EXIST();
-        }
-
         for(let key in params) {
             tripPlan[key] = params[key];
         }
-
         return tripPlan.save();
     }
 
@@ -244,19 +238,13 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['id'])
+    @modelNotNull('tripPlan')
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
     static async deleteTripPlan(params): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
-
-        if (!tripPlan) {
-            throw L.ERR.NOT_FOUND();
-        }
-
         let tripDetails = await tripPlan.getTripDetails({});
-
         await tripPlan.destroy();
         await Promise.all(tripDetails.map((detail)=> detail.destroy()));
-
         return true;
     }
 
@@ -267,8 +255,9 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['id'])
+    @modelNotNull('tripPlan')
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
-    static async commitTripPlan(params): Promise<boolean> {
+    static async commitTripPlan(params: {id: string}): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
         let tripDetails = await tripPlan.getTripDetails({});
 
@@ -293,12 +282,9 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['id', 'auditResult'])
+    @modelNotNull('tripDetail')
     static async approvePlanInvoice(params: {id: string, auditResult: EAuditStaus}): Promise<boolean> {
         let tripDetail = await Models.tripDetail.get(params.id);
-
-        if(!tripDetail) {
-            throw L.ERR.TRIP_DETAIL_FOUND();
-        }
 
         if(tripDetail.status != EPlanStatus.AUDITING) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR();
@@ -348,12 +334,9 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['id'], TripDetail['$fieldnames'])
+    @modelNotNull('tripDetail')
     static async updateTripDetail(params): Promise<TripDetail> {
         let tripDetail =  await Models.tripDetail.get(params.id);
-
-        if(!tripDetail) {
-            throw L.ERR.TRIP_DETAIL_FOUND();
-        }
 
         for(let key in params) {
             tripDetail[key] = params[key];
@@ -383,13 +366,9 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['id'])
+    @modelNotNull('tripDetail')
     static async deleteTripDetail(params: {id: string}): Promise<boolean> {
         let tripDetail = await Models.tripDetail.get(params.id);
-
-        if (!tripDetail) {
-            throw L.ERR.TRIP_DETAIL_FOUND();
-        }
-
         await tripDetail.destroy();
         return true;
     }
@@ -397,14 +376,11 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['tripDetailId', 'pictureFileId'])
+    @modelNotNull('tripDetail', 'tripDetailId')
     static async uploadInvoice(params: {tripDetailId: string, pictureFileId: string}): Promise<boolean> {
         let staff = await Staff.getCurrent();
         let accountId = staff.id;
         let tripDetail = await Models.tripDetail.get(params.tripDetailId);
-
-        if (!tripDetail) {
-            throw L.ERR.TRIP_DETAIL_FOUND();
-        }
 
         if (tripDetail.status === EPlanStatus.COMPLETE || tripDetail.status === EPlanStatus.AUDITING) {
             throw {code: -3, msg: '审核中或已审核通过的票据不能上传!'};
@@ -547,13 +523,10 @@ class TripPlanModule {
         return projects.map((p) => p.id);
     }
 
+    @requireParams(['id'])
+    @modelNotNull('project')
     static async deleteProject(params:{id:string}):Promise<boolean> {
         let project = await Models.project.get(params.id);
-
-        if (!project) {
-            throw L.ERR.NOT_FOUND();
-        }
-
         return await project.destroy();
     }
 
