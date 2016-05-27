@@ -2,6 +2,7 @@ import { getSession } from '../common/model/index';
 import { Staff, EStaffRole } from './_types/staff';
 import { AgencyUser } from './_types/agency';
 import {EAccountType} from "./_types/index";
+import async = Q.async;
 /**
  * Created by wlh on 16/5/16.
  */
@@ -116,6 +117,29 @@ export function addFuncParams(params) {
             for(let key of params) {
                 args[0][key] = params[key];
             }
+            return fn.apply(self, args);
+        }
+        return desc;
+    }
+}
+
+/**
+ * 判断不为空
+ * @param params
+ * @constructor
+ */
+export function modelNotNull(modname: string, keyName?: string) {
+    return function(target, key, desc) {
+        let fn = desc.value;
+        desc.value = async function(...args) {
+            let self = this;
+            keyName = keyName || 'id';
+            let entity = await Models[modname].get(args[0][keyName]);
+            
+            if(!entity) {
+                throw L.ERR.NOT_FOUND();
+            }
+
             return fn.apply(self, args);
         }
         return desc;

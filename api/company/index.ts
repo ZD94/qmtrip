@@ -17,7 +17,7 @@ let logger = new Logger('company');
 import {requireParams, clientExport} from "common/api/helper";
 import {ECompanyStatus, Company, MoneyChange} from 'api/_types/company';
 import {EAgencyStatus, Agency, AgencyUser} from "../_types/agency";
-import {requirePermit, conditionDecorator, condition} from "../_decorator";
+import {requirePermit, conditionDecorator, condition, modelNotNull} from "../_decorator";
 import {Staff, EStaffRole} from "../_types/staff";
 import {Department} from "../_types/department";
 import {md5} from "common/utils";
@@ -188,18 +188,13 @@ class CompanyModule {
      */
     @clientExport
     @requireParams(['id'])
+    @modelNotNull('company')
     @conditionDecorator([
         {if: condition.isMyCompany("0.id")},
         {if: condition.isCompanyAgency("0.id")}
     ])
-    static async getCompany(params: {id: string}): Promise<Company>{
-        let company = await Models.company.get(params.id);
-
-        if(!company){
-            throw L.ERR.COMPANY_NOT_EXIST();
-        }
-
-        return company;
+    static getCompany(params: {id: string}): Promise<Company>{
+        return Models.company.get(params.id);
     }
 
     /**
@@ -375,14 +370,9 @@ class CompanyModule {
      */
     @clientExport
     @requireParams(['id'])
-    static async getMoneyChange(params: {id: string}): Promise<MoneyChange> {
-        let mc = Models.moneyChange.get(params.id);
-
-        if(!mc) {
-            throw L.ERR.NOT_FOUND();
-        }
-
-        return mc;
+    @modelNotNull('moneyChange')
+    static getMoneyChange(params: {id: string}): Promise<MoneyChange> {
+        return Models.moneyChange.get(params.id);
     }
 
 

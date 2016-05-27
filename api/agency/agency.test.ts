@@ -132,7 +132,7 @@ describe("api/agency", function() {
                 var uuid = require('uuid');
                 API.agency.getAgencyUser({id: uuid.v1()}, function(err, ret) {
                     assert(err != null);
-                    assert.equal(err.code, -141);
+                    assert.equal(err.code, 404);
                     done();
                 })
             });

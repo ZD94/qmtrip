@@ -21,8 +21,7 @@ import {
 } from "api/_types/tripPlan";
 import {Models} from "../_types/index";
 import {Staff, EStaffRole, EStaffStatus} from "../_types/staff";
-import {conditionDecorator, condition} from "../_decorator";
-
+import {conditionDecorator, condition, modelNotNull} from "../_decorator";
 
 let TripDetailCols = TripDetail['$fieldnames'];
 let TripPlanCols = TripPlan['$fieldnames'];
@@ -197,10 +196,11 @@ class TripPlanModule {
      * @returns {*}
      */
     @clientExport
-    @conditionDecorator([{if: condition.canGetTripPlan('0.id')}])
     @requireParams(['id'])
-    static async getTripPlan(params: {id: string}): Promise<TripPlan> {
-        return await Models.tripPlan.get(params.id);
+    @modelNotNull('tripPlan')
+    @conditionDecorator([{if: condition.canGetTripPlan('0.id')}])
+    static getTripPlan(params: {id: string}): Promise<TripPlan> {
+        return Models.tripPlan.get(params.id);
     }
 
     /**
@@ -288,18 +288,18 @@ class TripPlanModule {
 
     /**
      * 审核出差票据
-     * 
+     *
      * @param params
      */
     @clientExport
     @requireParams(['id', 'auditResult'])
     static async approvePlanInvoice(params: {id: string, auditResult: EAuditStaus}): Promise<boolean> {
         let tripDetail = await Models.tripDetail.get(params.id);
-        
+
         if(!tripDetail) {
             throw L.ERR.TRIP_DETAIL_FOUND();
         }
-        
+
         if(tripDetail.status != EPlanStatus.AUDITING) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR();
         }
@@ -337,14 +337,9 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['id'])
-    static async getTripDetail(params: {id: string}): Promise<TripDetail> {
-        let detail = await Models.tripDetail.get(params.id);
-
-        if (!detail) {
-            throw L.ERR.TRIP_DETAIL_FOUND();
-        }
-
-        return detail;
+    @modelNotNull('tripDetail')
+    static getTripDetail(params: {id: string}): Promise<TripDetail> {
+        return Models.tripDetail.get(params.id);
     }
 
     /**
@@ -451,7 +446,6 @@ class TripPlanModule {
         return DBM.TripPlan.count({where: query});
     }
 
-
     /**
      * 统计计划单的动态预算/计划金额和实际支出
      * @param params
@@ -542,8 +536,9 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['id'])
-    static async getProjectById(params:{id:string}):Promise<Project> {
-        return await Models.project.get(params.id);
+    @modelNotNull('project')
+    static getProjectById(params:{id:string}):Promise<Project> {
+        return Models.project.get(params.id);
     }
 
     @clientExport
@@ -582,6 +577,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['id'])
+    @modelNotNull('tripPlanLog')
     static getTripPlanLog(params: {id: string}): Promise<TripPlanLog> {
         return Models.tripPlanLog.get(params.id);
     }

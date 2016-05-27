@@ -14,7 +14,7 @@ import utils = require("common/utils");
 import {requireParams, clientExport} from 'common/api/helper';
 import {getSession} from 'common/model';
 import {Agency, AgencyUser, EAgencyStatus, AgencyError, EAgencyUserRole} from "api/_types/agency";
-import {requirePermit, conditionDecorator, condition} from "../_decorator";
+import {requirePermit, conditionDecorator, condition, modelNotNull} from "../_decorator";
 import { Models, EGender } from '../_types/index';
 import {md5} from "../../common/utils";
 let logger = new Logger("agency");
@@ -94,17 +94,12 @@ class AgencyModule {
      * @returns {Promise<Agency>}
      */
     @clientExport
-    @requirePermit('user.query', 2)
-    @conditionDecorator([{if: condition.isMyAgency('0.id')}])
     @requireParams(['id'])
-    static async getAgencyById(params: {id: string}): Promise<Agency>{
-        let agency = await Models.agency.get(params.id);
-
-        if (!agency) {
-            throw L.ERR.AGENCY_NOT_EXIST();
-        }
-
-        return agency;
+    @requirePermit('user.query', 2)
+    @modelNotNull('agency')
+    @conditionDecorator([{if: condition.isMyAgency('0.id')}])
+    static getAgencyById(params: {id: string}): Promise<Agency>{
+        return Models.agency.get(params.id);
     }
 
     /**
@@ -200,15 +195,10 @@ class AgencyModule {
     @clientExport
     @requireParams(['id'])
     @requirePermit('user.query', 2)
+    @modelNotNull('agencyUser')
     @conditionDecorator([{if: condition.isSameAgency('0.id')}])
-    static async getAgencyUser(params: {id: string}): Promise<AgencyUser> {
-        let agencyUser = await Models.agencyUser.get(params.id);
-
-        if (!agencyUser) {
-            throw L.ERR.AGENCY_USER_NOT_EXIST();
-        }
-
-        return agencyUser;
+    static getAgencyUser(params: {id: string}): Promise<AgencyUser> {
+        return Models.agencyUser.get(params.id);
     }
 
     /**
