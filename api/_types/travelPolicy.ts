@@ -54,6 +54,6 @@ export class TravelPolicy extends ModelObject{
     get company(): Company { return null; }
 
     getStaffs(): Promise<Staff[]> {
-        return Models.staff.find({travelPolicyId: this.id});
+        return Models.staff.find({companyId: this.company.id, travelPolicyId: this.id});
     }
 }
