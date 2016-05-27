@@ -90,10 +90,6 @@ class TravelPolicyModule{
         {if: condition.isTravelPolicyAgency("0.id")}
     ])
     static async updateTravelPolicy(params) : Promise<TravelPolicy>{
-
-        if (!params.hotelPrice || !/^\d+(.\d{1,2})?$/.test(params.hotelPrice)) {
-            params.hotelPrice = null;
-        }
         var id = params.id;
         var staff = await Staff.getCurrent();
 
