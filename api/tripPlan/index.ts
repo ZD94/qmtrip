@@ -145,7 +145,7 @@ class TripPlanModule {
     static async sendTripPlanEmails(tripPlan: TripPlan, userId: string) {
         let url = config.host + '/corp.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
         let user = await Models.staff.get(userId);
-        let admins = await Models.staff.find({companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER, EStaffRole.ADMIN], status: EStaffStatus.ON_JOB}); //获取激活状态的管理员
+        let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER, EStaffRole.ADMIN], status: EStaffStatus.ON_JOB}}); //获取激活状态的管理员
         let go = '无', back = '无', hotelStr = '无';
 
         let outTrip = await tripPlan.getOutTrip();
@@ -229,7 +229,7 @@ class TripPlanModule {
      */
     @clientExport
     static async listTripPlans(params: any): Promise<FindResult> {
-        let paginate = await Models.tripPlan.find({where: params});
+        let paginate = await Models.tripPlan.find(params);
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
     }
 
@@ -352,9 +352,12 @@ class TripPlanModule {
      * @param params
      * @returns {Promise<string[]>}
      */
-    @clientExport
     @requireParams(['tripPlanId'], ['type', 'status', 'id'])
+    @clientExport
     static async getTripDetails(params): Promise<FindResult> {
+        // let {offset, limit} = params;
+        // delete params.offset;
+        // delete params.limit;
         let details = await Models.tripDetail.find({ where: params});
         let ids = details.map(function (d) {
             return d.id;
@@ -520,7 +523,7 @@ class TripPlanModule {
 
     @clientExport
     static async getProjectList(options): Promise<FindResult> {
-        let projects = await Models.project.find(options);
+        let projects = await Models.project.find({where: options});
         return {ids: projects.map((p)=> {return p.id}), count: projects['total']};
     }
 
