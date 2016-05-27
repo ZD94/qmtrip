@@ -232,11 +232,9 @@ class TripPlanModule {
      * @returns {*}
      */
     @clientExport
-    static async listTripPlans(params): Promise<string[]> {
+    static async listTripPlans(params: any): Promise<string[]> {
         let tripPlans = await Models.tripPlan.find({where: params});
-        return tripPlans.map(function (plan) {
-            return plan.id;
-        });
+        return tripPlans.map((t) => t.id);
     }
 
     /**
@@ -331,6 +329,7 @@ class TripPlanModule {
      * @param params
      * @returns {*}
      */
+    @clientExport
     @requireParams(['tripPlanId', 'type', 'startTime', 'invoiceType', 'budget'])
     static saveTripDetail(params): Promise<TripDetail> {
         return Models.tripDetail.create(params).save();
@@ -378,10 +377,7 @@ class TripPlanModule {
     static async getTripDetails(params): Promise<string[]> {
         let options: any = {where: params}
         let details = await Models.tripDetail.find(options);
-
-        return details.map(function(d) {
-            return d.id;
-        })
+        return details.map((d) => d.id);
     }
 
 
@@ -412,29 +408,22 @@ class TripPlanModule {
         let tripDetail = await Models.tripDetail.get(params.tripDetailId);
 
         if (!tripDetail) {
-            throw L.ERR.NOT_FOUND();
+            throw L.ERR.TRIP_DETAIL_FOUND();
         }
-
-        // if (tripDetail.accountId != accountId) {
-        //     throw L.ERR.PERMISSION_DENY();
-        // }
 
         if (tripDetail.status === EPlanStatus.COMPLETE || tripDetail.status === EPlanStatus.AUDITING) {
             throw {code: -3, msg: '审核中或已审核通过的票据不能上传!'};
         }
 
         let tripPlan = tripDetail.tripPlan;
-
-
         let invoiceJson: any = tripDetail.invoice || [];
-
         let times = invoiceJson.length ? invoiceJson.length + 1 : 1;
 
         if(typeof invoiceJson =='string') {
             invoiceJson = JSON.parse(invoiceJson);
         }
-        invoiceJson.push({times: times, pictureFileId: params.pictureFileId, created_at: utils.now(), status: EPlanStatus.WAIT_COMMIT, remark: '', approve_at: ''});
 
+        invoiceJson.push({times: times, pictureFileId: params.pictureFileId, created_at: utils.now(), status: EPlanStatus.WAIT_COMMIT, remark: '', approve_at: ''});
         tripDetail.newInvoice = params.pictureFileId;
         tripDetail.invoice = JSON.stringify(invoiceJson);
         tripDetail.status = EPlanStatus.WAIT_COMMIT;
@@ -457,86 +446,11 @@ class TripPlanModule {
      * @param params
      */
     @requireParams(['companyId'], ['accountId', 'status'])
-
     static countTripPlanNum(params) {
         let query = params;
         return DBM.TripPlan.count({where: query});
     }
 
-
-    /**
-     * 按月份统计预算/计划/完成金额
-     * @type {statBudgetByMonth}
-     */
-    @requireParams(['companyId'], ['startTime', 'endTime', 'accountId'])
-    static statBudgetByMonth(params) {
-        let stTime = params.startTime || moment().format('YYYY-MM-DD');
-        let enTime = params.endTime || moment().format('YYYY-MM-DD');
-        let timeArr = [];
-        do {
-            let t = moment(stTime).format('YYYY-MM-');
-            timeArr.push(t + '0\\d');
-            timeArr.push(t + '1\\d');
-            timeArr.push(t + '2\\d');
-            stTime = moment(stTime).add(1, 'months').format('YYYY-MM-DD');
-        } while (stTime < enTime);
-
-        let sql = 'select count(account_id) as \"staffNum\", sum(budget) as \"planMoney\",sum(expenditure) as expenditure ' +
-            'from tripplan.trip_plan where company_id=\'' + params.companyId + '\'';
-
-        if (params.accountId) {
-            sql += ' and account_id=\'' + params.accountId + '\'';
-        }
-
-        let complete_sql = sql + ' and status=2 and to_char(start_at, \'YYYY-MM-DD\') ~ \'';
-
-
-        sql += ' and status > -1 and to_char(start_at, \'YYYY-MM-DD\') ~ \'';
-
-        return Promise.all(
-            timeArr.map(function (month) {
-                let s_sql = sql; // + month + '\\d\';';
-                let c_sql = complete_sql; // + month + '\\d\';';
-                let index = month.match(/\d{4}-\d{2}-(\d).*/)[1];
-                let remark = '';
-
-                if (index === '0') {
-                    remark = '上旬';
-                    s_sql = sql + month + '\';';
-                    c_sql = complete_sql + month + '\';';
-                } else if (index === '1') {
-                    remark = '中旬';
-                    s_sql = sql + month + '\';';
-                    c_sql = complete_sql + month + '\';';
-                } else if (index === '2' || index === '3') {
-                    remark = '下旬';
-                    let str = month.substr(0, month.length - 3);
-                    s_sql = sql + str + '(2|3)\\d\';';
-                    c_sql = complete_sql + str + '(2|3)\\d\';';
-                }
-
-                let _month = month.match(/\d{4}-\d{2}/)[0];
-                return Promise.all([
-                    sequelize.query(s_sql),
-                    sequelize.query(c_sql),
-                ])
-                    .spread(function (all, complete) {
-                        let a = all[0][0];
-                        let c = complete[0][0];
-                        let stat = {
-                            month: _month,
-                            qmBudget: a.planMoney | 0,
-                            planMoney: c.planMoney | 0,
-                            expenditure: c.expenditure | 0,
-                            staffNum: c.staffNum,
-                            remark: remark
-                        };
-
-                        return stat;
-                    })
-            })
-        )
-    }
 
     /**
      * 统计计划单的动态预算/计划金额和实际支出
@@ -635,9 +549,7 @@ class TripPlanModule {
     @clientExport
     static async getProjectList(options): Promise<string[]> {
         let projects = await Models.project.find(options);
-        return projects.map(function(p) {
-            return p.id;
-        })
+        return projects.map((p) => p.id);
     }
 
     static async deleteProject(params:{id:string}):Promise<boolean> {
@@ -657,11 +569,10 @@ class TripPlanModule {
      * @type {saveTripPlanLog}
      */
     @requireParams(['tripPlanId', 'remark'], ['tripDetailId'])
-    static saveTripPlanLog(params): Promise<TripPlanLog> {
-        let {account: userId} = Zone.current.get('session');
-        params.createdAt = utils.now();
-        params.updatedAt = utils.now();
-        return DBM.TripPlanLog.create(params);
+    static async saveTripPlanLog(params): Promise<TripPlanLog> {
+        let staff = await Staff.getCurrent();
+        params.userId = staff.id;
+        return TripPlanLog.create(params).save();
     }
 
     /**
@@ -669,9 +580,10 @@ class TripPlanModule {
      * @param params
      * @returns {any}
      */
+    @clientExport
     @requireParams(['id'])
     static getTripPlanLog(params: {id: string}): Promise<TripPlanLog> {
-        return DBM.TripPlanLog.findById(params.id);
+        return Models.tripPlanLog.get(params.id);
     }
 
     /**
@@ -682,12 +594,11 @@ class TripPlanModule {
         throw {code: -1, msg: '不能更新日志'};
     }
 
+    @clientExport
     @requireParams(['tripPlanId'], ['tripDetailId'])
     static async getTripPlanLogs(params) {
-        let logs = DBM.findAll({where: params});
-        return logs.map(function(log) {
-            return log.id;
-        })
+        let logs = await Models.tripPlanLog.find({where: params});
+        return logs.map((log) => log.id);
     }
 
     /**

@@ -92,16 +92,13 @@ class CompanyModule {
      */
     @requireParams(['createUser', 'name', 'domainName', 'mobile', 'email', 'agencyId'], ['id', 'description', 'telephone', 'remark'])
     static async createCompany(params): Promise<Company>{
-        let c = await DBM.Company.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
+        let c = await Models.company.find({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
 
         if (c) {
             throw {code: -2, msg: '邮箱或手机号已注册企业'};
         }
 
-        let _company = params;
-        _company.id = _company.id || uuid.v1();
-        let comp = await DBM.Company.create(_company);
-        return new Company(comp);
+        return Models.company.create(params).save();
     }
 
     /**
@@ -222,13 +219,12 @@ class CompanyModule {
 
         let companies = await Models.company.find(options);
 
-        return companies.map(function(c) {
-            return c.id;
-        });
+        return companies.map((c) => c.id);
     }
     
     static async getCompanyNoAgency() {
         let agencies = await Models.company.find({where: {agencyId: null}});
+        return agencies;
     }
 
     /**
@@ -239,21 +235,18 @@ class CompanyModule {
     @clientExport
     @requirePermit('company.delete', 2)
     @requireParams(['id'])
-    static async deleteCompany(params){
-        var companyId = params.id;
-        let company = await DBM.Company.findById(companyId);
+    static async deleteCompany(params): Promise<boolean>{
+        let companyId = params.id;
+        let company = await Models.company.get(companyId);
 
-        if(!company || company.status == ECompanyStatus.DELETE){
+        if(!company){
             throw L.ERR.COMPANY_NOT_EXIST();
         }
 
-        let staffs = await DBM.Staff.findAll({where: {companyId: companyId}});
+        let staffs = await Models.staff.find({where: {companyId: companyId}});
 
-        await DBM.Company.update({status: ECompanyStatus.DELETE, updatedAt: utils.now()}, {where: {id: companyId}});
-        await DBM.Staff.destroy({where: {companyId: companyId}});
-        await staffs.map(async function(staff) {
-            return await DBM.Account.destroy({where: {id: staff.id}});
-        });
+        await company.destroy();
+        await Promise.all(staffs.map((staff) => staff.destroy()));
 
         return true;
     }
@@ -308,7 +301,7 @@ class CompanyModule {
                 };
 
                 var moneyChange = {
-                    fundsAccountId: id,
+                    companyId: id,
                     status: type,
                     money: money,
                     channel: params.channel,
@@ -371,9 +364,8 @@ class CompanyModule {
      * @param params
      * @returns {Promise<MoneyChange>}
      */
-    static async saveMoneyChange(params: {fundsAccountId: string, money: number, channel: number, userId: string, remark: string}): Promise<MoneyChange> {
-        let moneyChange = await DBM.MoneyChangeModel.create(params);
-        return new MoneyChange(moneyChange);
+    static async saveMoneyChange(params: {companyId: string, money: number, channel: number, userId: string, remark: string}): Promise<MoneyChange> {
+        return Models.moneyChange.create(params).save();
     }
 
     /**
@@ -382,9 +374,15 @@ class CompanyModule {
      * @returns {Promise<MoneyChange>}
      */
     @clientExport
+    @requireParams(['id'])
     static async getMoneyChange(params: {id: string}): Promise<MoneyChange> {
-        let moneyChange = await DBM.MoneyChangeModel.findById(params.id);
-        return new MoneyChange(moneyChange);
+        let mc = Models.moneyChange.get(params.id);
+
+        if(!mc) {
+            throw L.ERR.NOT_FOUND();
+        }
+
+        return mc;
     }
 
 
@@ -394,14 +392,12 @@ class CompanyModule {
      * @returns {Promise<string[]>}
      */
     @clientExport
-    static async listMoneyChange(params: {companyId: string}): Promise<string[]> {
-        let {accountId} = Zone.current.get('session');
-        let staff = await DBM.Staff.findById(accountId);
-        params.companyId = staff.companyId;
-        let moneyChange = await DBM.MoneyChangeModel.findAll({where: params});
-        return moneyChange.map(function(mc) {
-            return mc.id;
-        })
+    static async listMoneyChange(params: any): Promise<string[]> {
+        let staff = await Staff.getCurrent();
+        params['companyId'] = staff.company.id;
+        let changes = await Models.moneyChange.find({where: params});
+
+        return changes.map((c) => c.id);
     }
 
 

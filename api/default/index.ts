@@ -9,8 +9,7 @@ class defaultModule {
     @clientExport
     static async remoteGet<T>(params: {id: string, modname: string}): Promise<T> {
         let modname = params.modname.replace(/^[A-Z]/, (s)=>s.toLowerCase());
-        let ret = await Models[modname].get(params.id);
-        return ret;
+        return await Models[modname].get(params.id);
     }
 
     @clientExport
