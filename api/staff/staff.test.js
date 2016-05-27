@@ -108,12 +108,12 @@ describe("api/staff.js", function() {
         })
         //查询员工集合
         it("#listAndPaginateStaff should be ok", function(done) {
-            API.staff.listAndPaginateStaff({}, done);
+            API.staff.listAndPaginateStaff({companyId: companyId}, done);
         })
 
         //根据条件查询员工集合
         it("#getStaffs should be ok", function(done) {
-            API.staff.getStaffs({name: "123"}, done);
+            API.staff.getStaffs({companyId: companyId}, done);
         })
 
         //更新员工信息
@@ -187,6 +187,9 @@ describe("api/staff.js", function() {
 
         //创建员工
         it("#AgencyCreateStaff should be ok", function(done) {
+            if(obj.id){
+                delete obj.id;
+            }
             obj.companyId = companyId;
             API.staff.createStaff(obj, function(err, result) {
                 id = result.id;

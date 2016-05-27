@@ -42,8 +42,8 @@ export class TravelPolicy extends ModelObject{
     get hotelPrice(): number {return null}
     set hotelPrice(hotelPrice: number){}
     
-    @Field({type: Types.FLOAT})
-    get subsidy(): number {return null}
+    @Field({type: Types.NUMERIC(15, 2)})
+    get subsidy(): number {return 0}
     set subsidy(subsidy: number){}
 
     @Field({type: Types.BOOLEAN})

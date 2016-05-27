@@ -122,6 +122,29 @@ export function addFuncParams(params) {
     }
 }
 
+/**
+ * 判断不为空
+ * @param params
+ * @constructor
+ */
+export function modelNotNull(modname: string, keyName?: string) {
+    return function(target, key, desc) {
+        let fn = desc.value;
+        desc.value = async function(...args) {
+            let self = this;
+            keyName = keyName || 'id';
+            let entity = await Models[modname].get(args[0][keyName]);
+            
+            if(!entity) {
+                throw L.ERR.NOT_FOUND();
+            }
+
+            return fn.apply(self, args);
+        }
+        return desc;
+    }
+}
+
 export function conditionDecorator(checkFnList: CheckInterface[]) {
     return function (target, key, desc) {
         let fn = desc.value;
@@ -184,6 +207,7 @@ export var condition = {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
             let staff = await Models.staff.get(id);
+            // let company = staff.company;
             let company = await Models.company.get(staff["companyId"]);
             let agencyUser = await AgencyUser.getCurrent();
             return staff && company && agencyUser && agencyUser["agencyId"] == company["agencyId"];
@@ -222,6 +246,23 @@ export var condition = {
             let user = await AgencyUser.getCurrent();
             let tp = await Models.travelPolicy.get(id);
             let company = await Models.company.get(tp["companyId"]);//此处为什么不能用tp.company
+            return id && user && company && user["agencyId"] == company["agencyId"];
+        }
+    },
+    isDepartmentAdminOrOwner: function(idpath: string) {
+        return async function (fn ,self, args) {
+            let id = _.get(args, idpath);
+            let staff = await Staff.getCurrent();
+            let dept = await Models.department.get(id);
+            return id && staff && dept && dept["companyId"] == staff["companyId"] && (staff["roleId"] == EStaffRole.ADMIN || staff["roleId"] == EStaffRole.OWNER);
+        }
+    },
+    isDepartmentAgency: function(idpath: string) {
+        return async function (fn ,self, args) {
+            let id = _.get(args, idpath);
+            let user = await AgencyUser.getCurrent();
+            let dept = await Models.department.get(id);
+            let company = await Models.company.get(dept["companyId"]);
             return id && user && company && user["agencyId"] == company["agencyId"];
         }
     },

@@ -16,7 +16,7 @@ export async function ListController($scope, Models){
 }
 
 export function PendingController($scope){
-
+    console.info('PendingController...');
 }
 
 export function RejectReasonController($scope){

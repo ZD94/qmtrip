@@ -9,6 +9,7 @@ import { getSession, Types, Values } from 'common/model';
 import { Account } from './auth';
 import { Table, TableExtends, Create, Field, ResolveRef } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
+import { TripPlan } from "api/_types/tripPlan";
 
 export enum EAgencyStatus {
     DELETE = -2, //删除状态
@@ -37,6 +38,14 @@ export class Agency extends ModelObject{
     
     @Create()
     static create(obj?: Object): Agency { return null; }
+
+    async destroy(options?: Object): Promise<any> {
+        if(this.isLocal){
+            let agencyUsers = await Models.agencyUser.find({agencyId: this.id});
+            await Promise.all(agencyUsers.map((user) => user.destroy(options))); 
+        }
+        super.destroy(options);
+    }
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
@@ -84,6 +93,12 @@ export class Agency extends ModelObject{
 
     getUsers(): Promise<AgencyUser[]> {
         return Models.agencyUser.find({agencyId: this.id});
+    }
+
+    async getTripPlans(): Promise<TripPlan[]> {
+        let companies = await this.getCompanys();
+        let compIds = companies.map((o)=>o.id);
+        return Models.tripPlan.find({companyId: {$in: compIds}});
     }
 }
 

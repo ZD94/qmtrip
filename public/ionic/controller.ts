@@ -63,7 +63,7 @@ export async function IndexController($scope,Menu,$ionicPopup, Models){
                 '<br>' +
                 '住宿:'+policy.hotelLevel +
                 '<br>' +
-                '补助:5000/天'
+                '补助:'+policy.subsidy +'/天'
             })
         }else{
             var show = $ionicPopup.alert({   //定义show的原因是避免页面加载就执行

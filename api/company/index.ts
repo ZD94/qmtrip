@@ -8,7 +8,6 @@ let uuid = require("node-uuid");
 let L = require("common/language");
 let _ = require('lodash');
 let utils = require("common/utils");
-let Paginate = require("common/paginate").Paginate;
 let C = require("config");
 let API = require("common/api");
 let Logger = require('common/logger');
@@ -17,7 +16,7 @@ let logger = new Logger('company');
 import {requireParams, clientExport} from "common/api/helper";
 import {ECompanyStatus, Company, MoneyChange} from 'api/_types/company';
 import {EAgencyStatus, Agency, AgencyUser} from "../_types/agency";
-import {requirePermit, conditionDecorator, condition} from "../_decorator";
+import {requirePermit, conditionDecorator, condition, modelNotNull} from "../_decorator";
 import {Staff, EStaffRole} from "../_types/staff";
 import {Department} from "../_types/department";
 import {md5} from "common/utils";
@@ -25,64 +24,8 @@ import {FindResult} from "common/model/interface";
 
 let AGENCY_ROLE = {OWNER: 0, COMMON: 1, ADMIN: 2};
 let companyCols = Company['$fieldnames'];
-// let fundsAccountCols = Object.keys(DBM.FundsAccounts.attributes);
 
 class CompanyModule {
-    /**
-     * 域名是否已被占用
-     *
-     * @param {Object} params
-     * @param {String} params.domain 域名
-     * @return {Promise} true|false
-     */
-    static domainIsExist(params) {
-        var domain = params.domain;
-        if (!domain) {
-            throw {code: -1, msg: "domain not exist!"};
-        }
-
-        if (C.is_allow_domain_repeat) {
-            return new Promise(function(resolve) {
-                resolve(false);
-            })
-        }
-
-        return DBM.Company.findOne({where: {domainName: domain}})
-            .then(function(company) {
-                if (company) {
-                    return true;
-                } else {
-                    return false;
-                }
-            })
-    }
-
-
-    /**
-     * 是否在域名黑名单中
-     *
-     * @param {Object} params 参数
-     * @param {String} params.domain 域名
-     * @return {Promise}
-     */
-    static isBlackDomain(params) {
-        var domain = params.domain;
-
-        if (!domain) {
-            throw {code: -1, msg: "域名不存在或不合法"};
-        }
-        domain = domain.toLowerCase();
-
-        return DBM.BlackDomain.findOne({where: {domain: domain}})
-            .then(function(result) {
-                if (result) {
-                    return true;
-                }
-                return false;
-            })
-    }
-
-
     /**
      * 创建企业
      * @param {Object} params
@@ -93,16 +36,13 @@ class CompanyModule {
      */
     @requireParams(['createUser', 'name', 'domainName', 'mobile', 'email', 'agencyId'], ['id', 'description', 'telephone', 'remark'])
     static async createCompany(params): Promise<Company>{
-        let c = await DBM.Company.findOne({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
+        let c = await Models.company.find({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
 
-        if (c) {
+        if (c && c.length > 0) {
             throw {code: -2, msg: '邮箱或手机号已注册企业'};
         }
 
-        let _company = params;
-        _company.id = _company.id || uuid.v1();
-        let comp = await DBM.Company.create(_company);
-        return new Company(comp);
+        return Models.company.create(params).save();
     }
 
     /**
@@ -192,18 +132,13 @@ class CompanyModule {
      */
     @clientExport
     @requireParams(['id'])
+    @modelNotNull('company')
     @conditionDecorator([
         {if: condition.isMyCompany("0.id")},
         {if: condition.isCompanyAgency("0.id")}
     ])
-    static async getCompany(params: {id: string}): Promise<Company>{
-        let company = await Models.company.get(params.id);
-
-        if(!company){
-            throw L.ERR.COMPANY_NOT_EXIST();
-        }
-
-        return company;
+    static getCompany(params: {id: string}): Promise<Company>{
+        return Models.company.get(params.id);
     }
 
     /**
@@ -215,10 +150,7 @@ class CompanyModule {
     @requireParams([], ['status'])
     static async listCompany(params): Promise<FindResult>{
         let agencyUser = await AgencyUser.getCurrent();
-        var options : any = {
-            where: {agencyId: agencyUser.agency.id},
-            order: [['created_at', 'desc']]
-        };
+        var options : any = {where: {agencyId: agencyUser.agency.id}, order: [['created_at', 'desc']]};
 
         for(let key in params) {
             options.where[key] = params[key];
@@ -232,6 +164,7 @@ class CompanyModule {
     
     static async getCompanyNoAgency() {
         let agencies = await Models.company.find({where: {agencyId: null}});
+        return agencies;
     }
 
     /**
@@ -242,22 +175,13 @@ class CompanyModule {
     @clientExport
     @requirePermit('company.delete', 2)
     @requireParams(['id'])
-    static async deleteCompany(params){
-        var companyId = params.id;
-        let company = await DBM.Company.findById(companyId);
-
-        if(!company || company.status == ECompanyStatus.DELETE){
-            throw L.ERR.COMPANY_NOT_EXIST();
-        }
-
-        let staffs = await DBM.Staff.findAll({where: {companyId: companyId}});
-
-        await DBM.Company.update({status: ECompanyStatus.DELETE, updatedAt: utils.now()}, {where: {id: companyId}});
-        await DBM.Staff.destroy({where: {companyId: companyId}});
-        await staffs.map(async function(staff) {
-            return await DBM.Account.destroy({where: {id: staff.id}});
-        });
-
+    @modelNotNull('company')
+    static async deleteCompany(params: {id: string}): Promise<boolean>{
+        let companyId = params.id;
+        let company = await Models.company.get(companyId);
+        let staffs = await Models.staff.find({where: {companyId: companyId}});
+        await company.destroy();
+        await Promise.all(staffs.map((staff) => staff.destroy()));
         return true;
     }
 
@@ -288,95 +212,12 @@ class CompanyModule {
 
 
     /**
-     * 企业资金账户金额变动
-     * @param params
-     * @param params.type -2: 冻结账户资金 -1： 账户余额减少 1：账户余额增加 2：解除账户冻结金额
-     * @returns {*}
-     */
-    @requireParams(['money', 'channel', 'userId', 'type', 'companyId', 'remark'])
-    static changeMoney(params){
-        var id = params.companyId;
-        return DBM.FundsAccounts.findById(id)
-            .then(function(funds){
-                if(!funds || funds.status == -2){
-                    throw {code: -2, msg: '企业资金账户不存在'};
-                }
-
-                var id = funds.id;
-                var money : number = params.money;
-                var userId = params.userId;
-                var type = params.type;
-                var fundsUpdates : any = {
-                    updatedAt: utils.now()
-                };
-
-                var moneyChange = {
-                    fundsAccountId: id,
-                    status: type,
-                    money: money,
-                    channel: params.channel,
-                    userId: userId,
-                    remark: params.remark
-                }
-
-                var income = funds.income;
-                var frozen = funds.frozen;
-
-                if(type == 1){
-                    if(money <= 0){
-                        throw {code: -5, msg: '充值金额不正确'};
-                    }
-                    fundsUpdates.income = income + money;
-                }else if(type == -1){
-                    var consume = funds.consume;
-                    var balance : number = funds.balance;
-                    fundsUpdates.consume = parseFloat(consume) + money;
-                    var balance : number = balance - money; //账户余额
-                    if(balance < 0){
-                        throw L.ERR.BALANCE_NOT_ENOUGH(); //账户余额不足
-                    }
-                }else if(type == 2){
-                    if(parseFloat(frozen) < money){
-                        throw {code: -4, msg: '账户冻结金额不能小于解除冻结的金额'};
-                    }
-                    fundsUpdates.frozen = parseFloat(frozen) - money;
-                }else if(type == -2){
-                    var balance : number = funds.balance;
-                    fundsUpdates.frozen = parseFloat(frozen) + money;
-                    balance = balance - money; //账户余额
-                    if(balance < 0){
-                        throw L.ERR.BALANCE_NOT_ENOUGH(); //账户余额不足
-                    }
-                }else{
-                    throw L.ERR.MONEY_STATUS_ERROR();
-                }
-
-                return sequelize.transaction(function(t){
-                    return Promise.all([
-                        DBM.FundsAccounts.update(fundsUpdates, {returning: true, where: {id: id}, fields: Object.keys(fundsUpdates), transaction: t}),
-                        DBM.MoneyChangeModel.create(moneyChange, {transaction: t})
-                    ])
-                        .spread(function(update, create){
-                            return update;
-                        })
-                })
-            })
-            .spread(function(rownum, rows){
-                if(rownum != 1){
-                    throw {code: -3, msg: '充值失败'};
-                }
-                return rows[0];
-            });
-    }
-
-    /**
      * 保存资金变动记录
      * @param params
      * @returns {Promise<MoneyChange>}
      */
-    static async saveMoneyChange(params: {fundsAccountId: string, money: number, channel: number, userId: string, remark: string}): Promise<MoneyChange> {
-        let moneyChange = await DBM.MoneyChangeModel.create(params);
-        return new MoneyChange(moneyChange);
+    static async saveMoneyChange(params: {companyId: string, money: number, channel: number, userId: string, remark: string}): Promise<MoneyChange> {
+        return Models.moneyChange.create(params).save();
     }
 
     /**
@@ -385,9 +226,10 @@ class CompanyModule {
      * @returns {Promise<MoneyChange>}
      */
     @clientExport
-    static async getMoneyChange(params: {id: string}): Promise<MoneyChange> {
-        let moneyChange = await DBM.MoneyChangeModel.findById(params.id);
-        return new MoneyChange(moneyChange);
+    @requireParams(['id'])
+    @modelNotNull('moneyChange')
+    static getMoneyChange(params: {id: string}): Promise<MoneyChange> {
+        return Models.moneyChange.get(params.id);
     }
 
 
@@ -397,14 +239,12 @@ class CompanyModule {
      * @returns {Promise<string[]>}
      */
     @clientExport
-    static async listMoneyChange(params: {companyId: string}): Promise<string[]> {
-        let {accountId} = Zone.current.get('session');
-        let staff = await DBM.Staff.findById(accountId);
-        params.companyId = staff.companyId;
-        let moneyChange = await DBM.MoneyChangeModel.findAll({where: params});
-        return moneyChange.map(function(mc) {
-            return mc.id;
-        })
+    static async listMoneyChange(params: any): Promise<string[]> {
+        let staff = await Staff.getCurrent();
+        params['companyId'] = staff.company.id;
+        let changes = await Models.moneyChange.find({where: params});
+
+        return changes.map((c) => c.id);
     }
 
 
@@ -463,6 +303,47 @@ class CompanyModule {
         return API.company.changeMoney(params);
     }
 
+
+    /**
+     * 域名是否已被占用
+     *
+     * @param {Object} params
+     * @param {String} params.domain 域名
+     * @return {Promise} true|false
+     */
+    @requireParams(['domain'])
+    static async domainIsExist(params) {
+        if (C.is_allow_domain_repeat) {
+            return false;
+        }
+
+        let domain = params.domain;
+        let company = await Models.company.find({where: {domainName: domain}});
+
+        if(company && company.length > 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /**
+     * 是否在域名黑名单中
+     *
+     * @param {Object} params 参数
+     * @param {String} params.domain 域名
+     * @return {Promise}
+     */
+    @requireParams(['domain'])
+    static async isBlackDomain(params: {domain: string}) {
+        var domain = params.domain.toLowerCase();
+        let black = await DBM.BlackDomain.findAll({where: params});
+        if(black && black.length > 0) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * 测试用例删除企业，不在client调用

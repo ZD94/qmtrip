@@ -1,14 +1,14 @@
 <ion-view title="行程详情页" id="page20">
     <ion-content padding="true" class="has-header">
         <div id="page20-markdown7" style="color:#000000;text-align:right;">
-            <p>{{trip.createdAt | date: 'yyyy-MM-dd HH:mm'}}</p>
+            <p>{{createdAt | date: 'yyyy-MM-dd HH:mm'}}</p>
         </div>
         <ion-list>
             <ion-item>出差事由<span style="float: right;">{{trip.title}}</span></ion-item>
         </ion-list>
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <ion-list>
-            <ion-item>{{trip.startAt | date: 'yyyy-MM-dd HH:mm'}} 至 {{trip.backAt | date: 'yyyy-MM-dd HH:mm'}}
+            <ion-item>{{startAt | date: 'yyyy-MM-dd HH:mm'}} 至 {{backAt | date: 'yyyy-MM-dd HH:mm'}}
                 <br>总预算：{{trip.budget}}元</ion-item>
         </ion-list>
         <div class="spacer" style="width: 285px; height: 17px;"></div>
@@ -16,19 +16,19 @@
         <ion-list>
             <div ng-repeat="budget in budgets">
                 <ion-item class="item-divider">
-                    <span ng-if='budget.itemType == "goTraffic"'>去程交通</span>
-                    <span ng-if='budget.itemType == "backTraffic"'>回程交通</span>
-                    <span ng-if='budget.itemType == "hotel"'>住宿</span>
-                    <span ng-if='budget.itemType == "other" '>其他补助</span>
+                    <span ng-if='budget.tripType == "goTraffic"'>去程交通</span>
+                    <span ng-if='budget.tripType == "backTraffic"'>回程交通</span>
+                    <span ng-if='budget.tripType == "hotel"'>住宿</span>
+                    <span ng-if='budget.tripType == "other" '>其他补助</span>
                     <span style="margin-left: 120px;">{{budget.price}}</span>元</ion-item>
                 <ion-item>
-                    <span ng-if='budget.itemType == "goTraffic"'>{{trip.startAt | date: 'yyyy-MM-dd'}}</span>
-                    <span ng-if='budget.itemType == "backTraffic"'>{{trip.backAt | date: 'yyyy-MM-dd'}}</span>
-                    <span ng-if='budget.itemType == "hotel"'>
-                        {{trip.startAt | date: 'yyyy-MM-dd'}}至{{trip.backAt | date: 'yyyy-MM-dd'}}
+                    <span ng-if='budget.tripType == "goTraffic"'>{{startAt | date: 'yyyy-MM-dd'}}</span>
+                    <span ng-if='budget.tripType == "backTraffic"'>{{backAt | date: 'yyyy-MM-dd'}}</span>
+                    <span ng-if='budget.tripType == "hotel"'>
+                        {{startAt | date: 'yyyy-MM-dd'}}至{{backAt | date: 'yyyy-MM-dd'}}
                     </span>
-                    <span ng-if='budget.itemType == "other"'>
-                        {{trip.startAt | date: 'yyyy-MM-dd'}}至{{trip.backAt | date: 'yyyy-MM-dd'}}
+                    <span ng-if='budget.tripType == "other"'>
+                        {{startAt | date: 'yyyy-MM-dd'}}至{{backAt | date: 'yyyy-MM-dd'}}
                     </span>
                     <br>
                     {{trip.deptCity}}
@@ -46,6 +46,6 @@
         </ion-list>
         <div class="button-bar"></div>
         <div class="button-bar"></div>
-        <a href="#/trip/list" id="page20-button60" class="button button-stable  button-block">返回列表页面</a>
+        <a href="#/trip/list" id="page20-button60" class="button button-stable  button-block" no-back>返回列表页面</a>
     </ion-content>
 </ion-view>

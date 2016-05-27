@@ -315,7 +315,7 @@ class StaffModule{
         {if: condition.isSameCompany("0.id")},
         {if: condition.isStaffsAgency("0.id")}
     ])
-    static async getStaff(params){
+    static async getStaff(params: {id: string}){
 
         let id = params.id;
         let getObj = await Models.staff.get(id);
@@ -329,7 +329,12 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    static async getStaffs(params) : Promise<FindResult> {
+    @requireParams(["companyId"], ["name","status","roleId","departmentId","travelPolicyId","columns","order","$or"])
+    @conditionDecorator([
+        {if: condition.isCompanyAdminOrOwner("0.companyId")},
+        {if: condition.isCompanyAgency("0.companyId")}
+    ])
+    static async getStaffs(params) :Promise<FindResult>{
         let staff = await Staff.getCurrent();
 
         let { accountId } = Zone.current.get("session");
@@ -349,7 +354,6 @@ class StaffModule{
         if(staff){
             isHasPermit = true;
             options.companyId = staff["companyId"];
-
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
@@ -358,7 +362,6 @@ class StaffModule{
                 throw {code: -1, msg: '无权限'};
             }
         }
-
         let paginate = await Models.staff.find(options);
         return {ids: paginate.map((s)=> {return s.id;}), count: paginate['total']};
     }
@@ -393,7 +396,13 @@ class StaffModule{
      * @param params 查询条件 params.company_id 企业id
      * @param options options.perPage 每页条数 options.page当前页
      */
-    static paginateStaff(params){
+    @clientExport
+    @requireParams(["companyId"], ["name","status","roleId","departmentId","travelPolicyId","columns","order","$or", "options"])
+    @conditionDecorator([
+        {if: condition.isCompanyAdminOrOwner("0.companyId")},
+        {if: condition.isCompanyAgency("0.companyId")}
+    ])
+    static async listAndPaginateStaff(params) {
         var options: any = {};
         if(params.options){
             options = params.options;
@@ -418,7 +427,6 @@ class StaffModule{
         params.status = {$ne: EStaffStatus.DELETE};//只查询在职人员
         options.limit = limit;
         options.offset = offset;
-        params.status = {$gte: 0};
         options.where = params;
         return API.department.getDefaultDepartment({companyId: params.companyId})
             .then(function(defaultDept){
@@ -433,28 +441,6 @@ class StaffModule{
                         return new Paginate(page, perPage, result.count, result.rows);
                     });
             })
-    }
-
-    @clientExport
-    static async listAndPaginateStaff(params) {
-        let { accountId } = Zone.current.get("session");
-        let role = await API.auth.judgeRoleById({id:accountId});
-
-        if(role == EAccountType.STAFF){
-
-            let staff = await Models.staff.get(accountId)
-            params.companyId = staff["companyId"];
-            //                let options = {perPage : 20};
-            //                params.options = options;
-            return StaffModule.paginateStaff(params);
-        }else{
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-            if(result){
-                return StaffModule.paginateStaff(params);
-            }else{
-                throw {code: -1, msg: '无权限'};
-            }
-        }
 
     }
 
@@ -532,25 +518,14 @@ class StaffModule{
     @clientExport
     @requireParams(["id"], ["columns"])
     static async getPointChange(params): Promise<PointChange> {
-        let { accountId } = Zone.current.get("session");
+        let staff = await Staff.getCurrent();
         let id = params.id;
-        var options: any = {};
-        if(params.columns){
-            options.attributes = params.columns
-        }
-        let role = await API.auth.judgeRoleById({id:accountId});
+        let log = await Models.pointChange.get(id);
 
-        if(role == EAccountType.STAFF){
-
-            return DBM.PointChange.findById(id, options);
-        }else{
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-            if(result){
-                return DBM.PointChange.findById(id, options);
-            }else{
-                throw {code: -1, msg: '无权限'};
-            }
+        if(staff && staff.id != log["staffId"]){
+            throw L.ERR.PERMISSION_DENY();
         }
+        return log;
 
     }
 
@@ -561,7 +536,12 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    static async getPointChanges(params) : Promise<FindResult>{
+    @requireParams(["staffId"], ["companyId","orderId","status"])
+    @conditionDecorator([
+        {if: condition.isSameCompany("0.staffId")},
+        {if: condition.isStaffsAgency("0.staffId")}
+    ])
+    static async getPointChanges(params) :Promise<FindResult>{
         let { accountId } = Zone.current.get("session");
         var options : any = {};
         options.where = _.pick(params, Object.keys(DBM.PointChange.attributes));
@@ -598,9 +578,12 @@ class StaffModule{
      * @param options options.perPage 每页条数 options.page当前页
      */
     @clientExport
+    @requireParams(["staffId"], ["companyId","orderId","status"])
+    @conditionDecorator([
+        {if: condition.isSameCompany("0.staffId")},
+        {if: condition.isStaffsAgency("0.staffId")}
+    ])
     static listAndPaginatePointChange(params){
-        let { accountId } = Zone.current.get("session");
-        params.staffId = accountId;
         var options: any = {};
         if(params.options){
             options = params.options;
