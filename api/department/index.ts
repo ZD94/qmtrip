@@ -165,12 +165,6 @@ class DepartmentModule{
         }
         options.order = params.order || [["created_at", "desc"]];
 
-        let role = await API.auth.judgeRoleById({id:accountId});
-        let isHasPermit = false;
-
-        if (!isHasPermit) {
-            throw L.ERR.PERMISSION_DENIED;
-        }
         let {count, rows} = await DBM.Department.findAndCount(options);
         return {ids: rows.map((row)=> { return row.id}), count: count};
     }

@@ -40,7 +40,7 @@ export class Department extends ModelObject{
     }
 
     getStaffs(): Promise<Staff[]> {
-        return Models.staff.find({departmentId: this.id});
+        return Models.staff.find({companyId: this.company.id, departmentId: this.id});
     }
 
     @ResolveRef({type: Types.UUID}, Models.company)
