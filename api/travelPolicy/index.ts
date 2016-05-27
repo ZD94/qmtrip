@@ -14,6 +14,7 @@ import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_typ
 import types = require("api/_types/travelPolicy");
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Models, EAccountType } from 'api/_types';
+import {FindResult} from "common/model/interface";
 
 const travalPolicyCols = TravelPolicy['$fieldnames'];
 
@@ -175,7 +176,7 @@ class TravelPolicyModule{
         {if: condition.isCompanyAdminOrOwner("0.companyId")},
         {if: condition.isCompanyAgency("0.companyId")}
     ])
-    static async getTravelPolicies(params): Promise<string[]>{
+    static async getTravelPolicies(params): Promise<FindResult>{
         var staff = await Staff.getCurrent();
         let companyId = params.companyId;
 
@@ -196,11 +197,11 @@ class TravelPolicyModule{
             options.where.companyId = staff["companyId"];//只允许查询该企业下的差旅标准
         }
 
-        let travelPolicies = await Models.travelPolicy.find(options);
-        return travelPolicies.map(function(t){
+        let paginate = await Models.travelPolicy.find(options);
+        let ids =  paginate.map(function(t){
             return t.id;
         })
-
+        return {ids: ids, count: paginate['total']};
     }
 
     /**

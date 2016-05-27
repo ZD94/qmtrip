@@ -6,6 +6,7 @@
 var API = require("common/api");
 
 import {Place, AirCompany, Airport} from 'api/_types/place';
+import {FindResult} from "common/model/interface";
 
 class ApiPlace {
     static __public = true;
@@ -28,24 +29,21 @@ class ApiPlace {
      * });
      * ```
      */
-    static queryPlace(params: {keyword: string}):Promise<Array<Place>> {
+    static async queryPlace(params: {keyword: string}):Promise<FindResult> {
         let _params: any = params;
         if (!_params) {
             _params = {};
         }
 
         let keyword = _params.keyword;
+        let cities;
         if (!Boolean(keyword)) {
-            return ApiPlace.hotCities({limit: 20})
+            cities = ApiPlace.hotCities({limit: 20})
+        } else {
+            cities = await API.place.queryCity(_params)
         }
 
-        return API.place.queryCity(_params)
-            .then(function(places) {
-                let arr: Array<Place> = places.map(function(place) {
-                    return new Place(place)
-                })
-                return arr;
-            })
+        return {ids: cities.map((city) => {return city.id}), count: cities.length};
     }
 
     /**

@@ -23,6 +23,7 @@ import { EAgencyUserRole, AgencyUser } from "api/_types/agency";
 import { Models, EAccountType } from 'api/_types';
 import promise = require("../../common/test/api/promise/index");
 import {conditionDecorator, condition} from "../_decorator";
+import {FindResult} from "common/model/interface";
 
 const staffCols = Staff['$fieldnames'];
 const papersCols = Credential['$fieldnames'];
@@ -562,7 +563,7 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    static async getPointChanges(params) {
+    static async getPointChanges(params) : Promise<FindResult>{
         let { accountId } = Zone.current.get("session");
         var options : any = {};
         options.where = _.pick(params, Object.keys(DBM.PointChange.attributes));
@@ -574,18 +575,23 @@ class StaffModule{
         }
         let role = await API.auth.judgeRoleById({id:accountId});
 
+        let rows, count, ret;
         if(role == EAccountType.STAFF){
-
-            return DBM.PointChange.findAll(options);
-        }else{
+            ret = DBM.PointChange.findAndCount(options);
+        } else {
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
-                return DBM.PointChange.findAll(options);
-            }else{
-                throw {code: -1, msg: '无权限'};
+                ret = DBM.PointChange.findAndCount(options);
+            } else {
+                throw L.ERR.PERMISSION_DENY;
             }
         }
-
+        rows = ret[0]
+        count = ret[1];
+        let ids = rows.map(function(row) {
+            return row.id;
+        });
+        return {ids: ids, count: count};
     }
 
     /**

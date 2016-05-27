@@ -208,9 +208,7 @@ class TripPlanModule {
     @clientExport
     static async listTripPlans(params): Promise<FindResult> {
         let paginate = await Models.tripPlan.find(params);
-        return {ids: paginate.map(function (plan) {
-            return plan.id;
-        }), count: paginate["total"]}
+        return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
     }
 
     /**
@@ -996,7 +994,7 @@ class TripPlanModule {
      */
     @clientExport
     @requireParams(['tripPlanId'], ['type'])
-    static async getTripDetails(params): Promise<string[]> {
+    static async getTripDetails(params): Promise<FindResult> {
         let options: any = {where: {tripPlanId: params.tripPlanId}}
 
         if(params.type) {
@@ -1004,9 +1002,10 @@ class TripPlanModule {
         }
 
         let details = await Models.tripDetail.find(options);
-        return details.map(function(d) {
+        let ids = details.map(function(d) {
             return d.id;
         })
+        return {ids: ids, count: details['total']};
     }
 
 
@@ -1023,11 +1022,9 @@ class TripPlanModule {
     }
 
     @clientExport
-    static async getProjectList(options): Promise<string[]> {
+    static async getProjectList(options): Promise<FindResult> {
         let projects = await Models.project.find(options);
-        return projects.map(function(p) {
-            return p.id;
-        })
+        return {ids: projects.map((p)=> {return p.id}), count: projects['total']};
     }
 
     static async deleteProject(params:{id:string}):Promise<boolean> {
@@ -1074,12 +1071,9 @@ class TripPlanModule {
 
     @requireParams(['tripPlanId'], ['tripDetailId'])
     static async getTripPlanLogs(params) {
-        let logs = DBM.findAll({where: params});
-        return logs.map(function(log) {
-            return log.id;
-        })
+        let {count, rows} = DBM.TripPlanLog.findAndCount({where: params});
+        return {ids: rows.map((row)=> {return row.id}), count: count};
     }
-
 
     static __initHttpApp = require('./invoice');
 

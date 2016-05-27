@@ -17,6 +17,7 @@ import {Agency, AgencyUser, EAgencyStatus, AgencyError, EAgencyUserRole} from "a
 import {requirePermit, conditionDecorator, condition} from "../_decorator";
 import { Models, EGender } from '../_types/index';
 import {md5} from "../../common/utils";
+import {FindResult} from "../../common/model/interface";
 let logger = new Logger("agency");
 
 let agencyCols = Agency['$fieldnames'];
@@ -137,12 +138,13 @@ class AgencyModule {
      * @param params
      * @returns {Promise<string[]>}
      */
-    static async listAgency(params?: any): Promise<string[]>{
+    static async listAgency(params?: any): Promise<FindResult>{
         let agencies = await Models.agency.find({attributes: ['id']});
 
-        return agencies.map(function(agency) {
+        let ids =  agencies.map(function(agency) {
             return agency.id;
         })
+        return {ids: ids, count: agencies['total']}
     }
 
     /**
@@ -288,12 +290,12 @@ class AgencyModule {
      * @param options options.perPage 每页条数 options.page当前页
      */
     @clientExport
-    static async listAgencyUser(params) {
-        let agencies = await DBM.Agency.findAll({where: params, attributes: ['id']});
-
-        return agencies.map(function(agency) {
+    static async listAgencyUser(params) :Promise<FindResult> {
+        let agencyUsers = await DBM.AgencyUser.findAll({where: params, attributes: ['id']});
+        let ids =  agencyUsers.map(function(agency) {
             return agency.id;
         })
+        return {ids: ids, count: agencyUsers['total']};
     }
 
     /**

@@ -21,6 +21,7 @@ import {requirePermit, conditionDecorator, condition} from "../_decorator";
 import {Staff, EStaffRole} from "../_types/staff";
 import {Department} from "../_types/department";
 import {md5} from "common/utils";
+import {FindResult} from "common/model/interface";
 
 let AGENCY_ROLE = {OWNER: 0, COMMON: 1, ADMIN: 2};
 let companyCols = Company['$fieldnames'];
@@ -212,7 +213,7 @@ class CompanyModule {
      */
     @clientExport
     @requireParams([], ['status'])
-    static async listCompany(params): Promise<string[]>{
+    static async listCompany(params): Promise<FindResult>{
         let agencyUser = await AgencyUser.getCurrent();
         var options : any = {
             where: {agencyId: agencyUser.agency.id},
@@ -222,12 +223,11 @@ class CompanyModule {
         for(let key in params) {
             options.where[key] = params[key];
         }
-
         let companies = await Models.company.find(options);
-
-        return companies.map(function(c) {
+        let ids = companies.map(function(c) {
             return c.id;
         })
+        return {ids: ids, count: companies['total']};
     }
     
     static async getCompanyNoAgency() {

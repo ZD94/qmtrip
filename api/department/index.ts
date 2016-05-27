@@ -11,6 +11,7 @@ let L = require("common/language");
 import {Department} from "api/_types/department";
 import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import { Models, EAccountType } from '../_types/index';
+import {FindResult} from "common/model/interface";
 
 const departmentCols = Department['$fieldnames'];
 class DepartmentModule{
@@ -187,25 +188,8 @@ class DepartmentModule{
 
     };
 
-    /**
-     * 根据属性查找部门
-     * @param params
-     * @returns {*}
-     */
-    /*static getDepartments(params){
-     var options : any = {};
-     options.where = _.pick(params, Object.keys(DBM.Department.attributes));
-     if(params.$or) {
-     options.where.$or = params.$or;
-     }
-     if(params.columns){
-     options.attributes = params.columns;
-     }
-     return DBM.Department.findAll(options);
-     }*/
-
     @clientExport
-    static async getDepartments(params){
+    static async getDepartments(params) : Promise<FindResult>{
         let { accountId } = Zone.current.get("session");
 
         var options : any = {};
@@ -217,28 +201,23 @@ class DepartmentModule{
             options.attributes = params.columns;
         }
         let role = await API.auth.judgeRoleById({id:accountId});
+        let isHasPermit = false;
 
         if(role == EAccountType.STAFF){
-
+            isHasPermit = true;
             let staff = await Models.staff.get(accountId);
-            params.companyId = staff["companyId"];
-            let departments = await DBM.Department.findAll(options);
-            return departments.map(function(d) {
-                return d.id;
-            })
-
+            options.companyId = staff["companyId"];
         }else{
-
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
-                let departments = await DBM.Department.findAll(options);
-                return departments.map(function(d) {
-                    return d.id;
-                })
-            }else{
-                throw {code: -1, msg: '无权限'};
+                isHasPermit = true;
             }
         }
+        if (!isHasPermit) {
+            throw L.ERR.PERMISSION_DENIED;
+        }
+        let {count, rows} = await DBM.Department.findAndCount(options);
+        return {ids: rows.map((row)=> { return row.id}), count: count};
     }
 
 
