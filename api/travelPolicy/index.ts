@@ -97,10 +97,6 @@ class TravelPolicyModule{
         for(var key in params){
             tp[key] = params[key];
         }
-        if(staff){
-            tp["companyId"] = staff["companyId"];
-            // tp.company = staff.company;
-        }
         return tp.save();
     }
 
@@ -208,9 +204,12 @@ class TravelPolicyModule{
      * @param options options.perPage 每页条数 options.page当前页
      */
     @clientExport
+    @requireParams(["companyId"],['columns','name', 'planeLevel', 'planeDiscount', 'trainLevel', 'hotelLevel', 'hotelPrice', 'companyId', 'isChangeLevel', 'createdAt'])
+    @conditionDecorator([
+        {if: condition.isCompanyAdminOrOwner("0.companyId")},
+        {if: condition.isCompanyAgency("0.companyId")}
+    ])
     static async listAndPaginateTravelPolicy(params){
-        let {accountId} = Zone.current.get("session");
-
         var options: any = {};
         if(params.options){
             options = params.options;
@@ -236,34 +235,10 @@ class TravelPolicyModule{
         options.offset = offset;
         options.where = params;
 
-        let role = await API.auth.judgeRoleById({id:accountId});
-        if(role == EAccountType.STAFF){
-
-            let staff = await Models.staff.get(accountId);
-
-            if(!staff){
-                throw {code: -1, msg: '无权限'};
-            }
-            params.companyId = staff["companyId"];//只允许查询该企业下的差旅标准
-            return DBM.TravelPolicy.findAndCountAll(options)
-                .then(function(result){
-                    return new Paginate(page, perPage, result.count, result.rows);
-                });
-
-        }else{
-
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-
-            if(result){
-                return DBM.TravelPolicy.findAndCountAll(options)
-                    .then(function(result){
-                        return new Paginate(page, perPage, result.count, result.rows);
-                    });
-            }else{
-                throw {code: -1, msg: '无权限'};
-            }
-
-        }
+        return DBM.TravelPolicy.findAndCountAll(options)
+            .then(function(result){
+                return new Paginate(page, perPage, result.count, result.rows);
+            });
 
     }
 }
