@@ -329,7 +329,7 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    static async getStaffs(params){
+    static async getStaffs(params) : FindResult{
         let staff = await Staff.getCurrent();
 
         let { accountId } = Zone.current.get("session");
@@ -345,24 +345,22 @@ class StaffModule{
             options.order = params.order || "createdAt desc";
         }
 
+        let isHasPermit = false;
         if(staff){
-            params.companyId = staff["companyId"];
-            let staffs = await Models.staff.find(options);
-            return staffs.map(function(s) {
-                return s.id;
-            })
+            isHasPermit = true;
+            options.companyId = staff["companyId"];
+
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
             if(result){
-                let staffs = await Models.staff.find(options);
-                return staffs.map(function(s) {
-                    return s.id;
-                })
+                isHasPermit = true;
             }else{
                 throw {code: -1, msg: '无权限'};
             }
         }
 
+        let paginate = await Models.staff.find(options);
+        return {ids: staffs.map((s)=> {return s.id;}), count: paginate['total']};
     }
 
     /**

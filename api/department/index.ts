@@ -65,9 +65,9 @@ class DepartmentModule{
     @requireParams(["id"])
     static async delete(params): Promise<any>{
         var id = params.id;
-        let staffs = await API.staff.getStaffs({departmentId: id, status: 0});
-        if(staffs && staffs.length > 0){
-            throw {code: -1, msg: '目前该部门下有'+staffs.length+'位员工 暂不能删除，给这些员工匹配新的部门后再进行操作'};
+        let {ids, count} = await API.staff.getStaffs({departmentId: id, status: 0});
+        if(count > 0){
+            throw {code: -1, msg: '目前该部门下有'+count+'位员工 暂不能删除，给这些员工匹配新的部门后再进行操作'};
         }
         let obj = await DBM.Department.destroy({where: params});
         return true;
