@@ -146,8 +146,6 @@ class AgencyModule {
     @modelNotNull('agency')
     static async deleteAgency(params: {id: string}): Promise<boolean> {
         let agency = await Models.agency.get(params.id);
-        let agencyUsers = await Models.agencyUser.find({agencyId: agency.id});
-        await Promise.all(agencyUsers.map((user) => user.destroy()));
         await agency.destroy();
         return true;
     }

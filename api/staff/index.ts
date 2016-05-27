@@ -250,9 +250,6 @@ class StaffModule{
         for(var key in params){
             updateStaff[key] = params[key];
         }
-        if(staff){
-            updateStaff.company = staff.company;
-        }
         await updateStaff.save();
 
         let tp = await Models.travelPolicy.get(updateStaff["travelPolicyId"]);
