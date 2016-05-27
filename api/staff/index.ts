@@ -329,7 +329,7 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    static async getStaffs(params) : FindResult{
+    static async getStaffs(params) : Promise<FindResult> {
         let staff = await Staff.getCurrent();
 
         let { accountId } = Zone.current.get("session");
@@ -360,7 +360,7 @@ class StaffModule{
         }
 
         let paginate = await Models.staff.find(options);
-        return {ids: staffs.map((s)=> {return s.id;}), count: paginate['total']};
+        return {ids: paginate.map((s)=> {return s.id;}), count: paginate['total']};
     }
 
     /**
