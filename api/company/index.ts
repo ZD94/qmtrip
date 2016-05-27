@@ -108,13 +108,10 @@ class CompanyModule {
     @clientExport
     @requirePermit('company.edit', 2)
     @requireParams(['id'], ['agencyId', 'name', 'description', 'mobile', 'remark', 'status'])
+    @modelNotNull('company')
     static async updateCompany(params): Promise<Company>{
         let companyId = params.id;
         let company = await Models.company.get(companyId);
-
-        if(!company){
-            throw L.ERR.COMPANY_NOT_EXIST();
-        }
 
         for(let key in params) {
             company[key] = params[key];
@@ -177,9 +174,7 @@ class CompanyModule {
     static async deleteCompany(params: {id: string}): Promise<boolean>{
         let companyId = params.id;
         let company = await Models.company.get(companyId);
-        let staffs = await Models.staff.find({where: {companyId: companyId}});
         await company.destroy();
-        await Promise.all(staffs.map((staff) => staff.destroy()));
         return true;
     }
 

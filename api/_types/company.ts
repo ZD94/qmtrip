@@ -24,6 +24,14 @@ export class Company extends ModelObject{
     @Create()
     static create(obj?: Object): Company { return null; }
 
+    async destroy(options?: Object): Promise<any> {
+        if(this.isLocal){
+            let staffs = await Models.staff.find({companyId: this.id});
+            await Promise.all(staffs.map((staff) => staff.destroy(options)));
+        }
+        super.destroy(options);
+    }
+
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
