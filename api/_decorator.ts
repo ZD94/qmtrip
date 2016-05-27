@@ -184,7 +184,8 @@ export var condition = {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
             let staff = await Models.staff.get(id);
-            let company = staff.company;
+            // let company = staff.company;
+            let company = await Models.company.get(staff["companyId"]);
             let agencyUser = await AgencyUser.getCurrent();
             return staff && company && agencyUser && agencyUser["agencyId"] == company["agencyId"];
         }

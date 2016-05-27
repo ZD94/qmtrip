@@ -25,12 +25,13 @@ var company = {
 }
 
 var agency = {
-    email: "department.agency.test@tulingdao.com",
-    userName: "departmentTest代理商User",
-    name: 'departmentTest的代理商',
+    email: "dp.agtest@tulingdao.com",
+    userName: "dp代理商User",
+    name: 'dp的代理商',
     mobile: "15269866777",
     description: '企业API测试用'
 };
+
 
 describe("api/department.js", function() {
 

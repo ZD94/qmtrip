@@ -322,7 +322,7 @@ class AgencyModule {
 
         await API.auth.remove({email: email, mobile: mobile, type: 2});
         await DBM.Agency.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}});
-        await DBM.AgencyUser.destroy({where: {$or: [{email: email}, {mobile: mobile}, {name: name}]}});
+        await DBM.AgencyUser.destroy({where: {name: name}});
 
         return true;
     }
