@@ -52,7 +52,11 @@
                 </div>
                 <label class="item item-input">
                     <span class="input-label">地标</span>
-                    <input type="text" placeholder="选填" ng-model="trip.hotelPlace">
+                    <input type="text" placeholder="选填" ng-model="trip.hotelPlace"
+                           ng-selector
+                           ng-selector-title="地标选择"
+                           ng-selector-placeholder='请输入地标名称或首字母'
+                           ng-selector-query="queryHotelPlace">
                 </label>
             </div>
             <div>

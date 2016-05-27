@@ -75,9 +75,9 @@ var Services = {
     project: { type: Project, modname: 'tripPlan',
         funcs: ['getProjectById', 'getProjectList', 'createProject']
     },
-    place: { type: Place, modname: 'place',
-        funcs: ['getCityInfo', 'queryPlace']
-    },
+    // place: { type: Place, modname: 'place',
+    //     funcs: ['getCityInfo', 'queryPlace']
+    // },
     account: { type: Account, modname: 'auth',
         funcs: ['getAccount']
     },

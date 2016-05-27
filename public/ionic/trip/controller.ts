@@ -74,6 +74,16 @@ export function CreateController($scope, $storage){
         return places.map((place)=>place.name);
     }
 
+    $scope.queryHotelPlace = async function(keyword) {
+        let city = $scope.trip.place;
+        if (keyword && city) {
+            let cityInfo = await API.place.getCityInfo({cityCode: city});
+            var hotelPlaces = await API.place.queryBusinessDistrict({keyword: keyword, code: cityInfo.id})
+            return hotelPlaces.map((p)=> p.name);
+        }
+        return [];
+    }
+
     $scope.queryProjects = async function(keyword){
         var staff = await Staff.getCurrent();
         var projects = await Models.project.find({where:{companyId: staff.company.id}});

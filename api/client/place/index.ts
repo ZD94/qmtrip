@@ -38,12 +38,11 @@ class ApiPlace {
         let keyword = _params.keyword;
         let cities;
         if (!Boolean(keyword)) {
-            cities = ApiPlace.hotCities({limit: 20})
+            cities = await ApiPlace.hotCities({limit: 20})
         } else {
             cities = await API.place.queryCity(_params)
         }
-
-        return {ids: cities.map((city) => {return city.id}), count: cities.length};
+        return cities;
     }
 
     /**
