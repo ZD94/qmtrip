@@ -94,10 +94,6 @@ class DepartmentModule{
         for(let key in params){
             dept[key] = params[key];
         }
-        if(staff){
-            var company = await Models.company.get(staff["companyId"]);
-            dept.company = company;
-        }
         return dept.save();
     }
 
