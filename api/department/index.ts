@@ -161,7 +161,7 @@ class DepartmentModule{
         if(params.columns){
             options.attributes = params.columns;
         }
-        options.order = params.order || [["created_at", "desc"]];
+        options.order = params.order || "created_at desc";
 
         if(staff){
             params.companyId = staff["companyId"];
@@ -189,7 +189,7 @@ class DepartmentModule{
         var staff = await Staff.getCurrent();
         var options: any = {};
         options.where = params;
-        options.order = [["created_at", "desc"]];
+        options.order = "created_at desc";
 
         if(staff){
             params.companyId = staff["companyId"];
