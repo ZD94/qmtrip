@@ -180,8 +180,9 @@ class StaffModule{
                                 if(acc.status != 0 && acc.email != data.email)
                                     throw {code: -2, msg: "该账号不允许修改邮箱"};
                                 var accData = {email: data.email || acc.email, mobile: data.mobile || acc.mobile};
+                                accData[id] = id;
                                 return Promise.all([
-                                        API.auth.updateAccount(id, accData, company.name),
+                                        API.auth.updateAccount(accData),
                                         DBM.Staff.update(data, options)
                                     ])
                                     .spread(function(updateaccount, updatestaff) {
