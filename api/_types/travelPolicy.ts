@@ -1,5 +1,5 @@
 import { regApiType } from 'common/api/helper';
-import { Models } from 'api/_types';
+import {Models, isBrowser} from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import { Company } from 'api/_types/company';
 import { Types, Values } from 'common/model';
@@ -54,6 +54,12 @@ export class TravelPolicy extends ModelObject{
     get company(): Company { return null; }
 
     getStaffs(): Promise<Staff[]> {
-        return Models.staff.find({companyId: this.company.id, travelPolicyId: this.id});
+        let query;
+        if (isBrowser()) {
+            query = {companyId: this.company.id, travelPolicyId: this.id}
+        } else {
+            query = {where: {companyId: this.company.id, travelPolicyId: this.id}}
+        }
+        return Models.staff.find(query);
     }
 }

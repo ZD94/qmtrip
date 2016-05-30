@@ -1,5 +1,5 @@
 
-import { Models } from 'api/_types';
+import {Models, isBrowser} from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import {Company} from 'api/_types/company';
 import { Types, Values } from 'common/model';
@@ -182,20 +182,44 @@ export class TripPlan extends ModelObject {
     setCompany(val: Company) {}
 
     getOutTrip(id?: string): Promise<TripDetail[]> {
-        return Models.tripDetail.find({tripPlanId: id||this.id, type: ETripType.OUT_TRIP});
+        let query;
+        if (isBrowser()) {
+            query = {tripPlanId: id||this.id, type: ETripType.OUT_TRIP};
+        } else {
+            query = {where: {tripPlanId: id||this.id, type: ETripType.OUT_TRIP}};
+        }
+        return Models.tripDetail.find(query);
     }
 
     getBackTrip(id?: string): Promise<TripDetail[]> {
-        return Models.tripDetail.find({tripPlanId: id||this.id, type: ETripType.BACK_TRIP});
+        let query;
+        if (isBrowser()) {
+            query = {tripPlanId: id||this.id, type: ETripType.BACK_TRIP}
+        } else {
+            query = {where: {tripPlanId: id||this.id, type: ETripType.BACK_TRIP}};
+        }
+        return Models.tripDetail.find(query);
     }
 
     getHotel(): Promise<TripDetail[]> {
-        return Models.tripDetail.find({tripPlanId: this.id, type: ETripType.HOTEL});
+        let query;
+        if (isBrowser()) {
+            query = {tripPlanId: this.id, type: ETripType.HOTEL};
+        } else {
+            query = { where: {tripPlanId: this.id, type: ETripType.HOTEL}};
+        }
+        return Models.tripDetail.find(query);
     }
     
     getTripDetails(params): Promise<TripDetail[]> {
+        let query;
         params.tripPlanId = this.id;
-        return Models.tripDetail.find(params);
+        if (isBrowser()) {
+            query = params;
+        } else {
+            query = {where: params}
+        }
+        return Models.tripDetail.find(query);
     }
 
 }

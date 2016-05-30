@@ -5,7 +5,7 @@
                 icon="ion-loading-c"
                 on-infinite="loadMoreData()">
         </ion-infinite-scroll>
-        <div class="list card" ng-repeat="trip in tripPlans" ng-click="enterdetail(trip.id)">
+        <div class="list card" ng-repeat="trip in tripPlans track by trip.id" ng-click="enterdetail(trip.id)">
             <div class="item item-divider">{{trip.startAt | date: 'yyyy-MM-dd'}} 至 {{trip.backAt | date: 'yyyy-MM-dd'}}</div>
             <div class="item item-body">
                 <ion-list>
@@ -19,7 +19,12 @@
             </div>
         </div>
         <div id="page13-markdown3" style="color:#000000;">
-            <p>没有更多记录</p>
+            <div ng-if="isHasNextPage">
+                <button ng-click="nextPage()">加载更多</button>
+            </div>
+            <div ng-if="!isHasNextPage">
+                <button>没有更多记录了</button>
+            </div>
         </div>
     </ion-content>
 </ion-view>

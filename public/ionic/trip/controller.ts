@@ -239,18 +239,33 @@ export async function ListController($scope , Models){
     statusTxt[EPlanStatus.AUDITING] = "已提交待审核状态";
     statusTxt[EPlanStatus.COMPLETE] = "审核完，已完成状态";
     $scope.statustext = statusTxt;
-    // var tripPlans = await Models.tripPlan.find({});
-    let tripPlans = await staff.getTripPlans();
-    tripPlans.map(function(trip){
-        trip.startAt = moment(trip.startAt).toDate();
-        trip.backAt = moment(trip.backAt).toDate();
-        return trip;
-    });
-    $scope.tripPlans = tripPlans;
-    console.info(statusTxt);
-    console.info($scope.tripPlans);
+    $scope.isHasNextPage = true;
+    $scope.tripPlans = [];
+    let pager = await staff.getTripPlans();
+    loadTripPlan(pager);
+
+    $scope.pager = pager;
+    $scope.nextPage = async function() {
+        try {
+            pager = await $scope.pager['nextPage']();
+        } catch(err) {
+            $scope.isHasNextPage = false;
+            return;
+        }
+        $scope.pager = pager;
+        loadTripPlan(pager);
+    }
+
     $scope.enterdetail = function(tripid){
         window.location.href = "#/trip/listdetail?tripid="+tripid;
+    }
+
+    function loadTripPlan(pager) {
+        pager.forEach(function(trip){
+            trip.startAt = moment(trip.startAt).toDate();
+            trip.backAt = moment(trip.backAt).toDate();
+            $scope.tripPlans.push(trip);
+        });
     }
 }
 

@@ -1,4 +1,4 @@
-import { Models, EGender, EAccountType } from 'api/_types';
+import {Models, EGender, EAccountType, isBrowser} from 'api/_types';
 import { Company } from 'api/_types/company';
 import { TripPlan } from 'api/_types/tripPlan';
 import { regApiType } from 'common/api/helper';
@@ -9,6 +9,7 @@ import { Account } from './auth';
 import { getSession } from 'common/model';
 import { TableExtends, Table, Create, Field, ResolveRef, Reference } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
+import {Pager} from "common/model/cached";
 
 export enum EStaffStatus {
     ON_JOB = 0,
@@ -99,8 +100,14 @@ export class Staff extends ModelObject implements Account {
     }
     setTravelPolicy(val: TravelPolicy) {}
 
-    getTripPlans(): Promise<TripPlan[]> {
-        return Models.tripPlan.find({accountId: this.id});
+    getTripPlans(): Promise<TripPlan[]| Pager<TripPlan>> {
+        let query;
+        if (isBrowser()) {
+            query = {accountId: this.id};
+        } else {
+            query = {where: {accountId: this.id}}
+        }
+        return Models.tripPlan.find(query);
     }
     
     //Account properties:

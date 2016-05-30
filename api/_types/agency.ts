@@ -3,7 +3,7 @@
  */
 'use strict';
 import { regApiType } from 'common/api/helper';
-import { Models, EGender, EAccountType } from 'api/_types';
+import { isBrowser, Models, EGender, EAccountType } from 'api/_types';
 import {Company} from 'api/_types/company';
 import { getSession, Types, Values } from 'common/model';
 import { Account } from './auth';
@@ -88,17 +88,35 @@ export class Agency extends ModelObject{
     set remark(val: string) {}
 
     getCompanys(): Promise<Company[]> {
-        return Models.company.find({agencyId: this.id});
+        let query;
+        if (isBrowser()) {
+            query = {agencyId: this.id};
+        } else {
+            query = {where: {agencyId: this.id}}
+        }
+        return Models.company.find(query);
     }
 
     getUsers(): Promise<AgencyUser[]> {
-        return Models.agencyUser.find({agencyId: this.id});
+        let query;
+        if (isBrowser()) {
+            query =  {agencyId: this.id};
+        } else {
+            query = { where: {agencyId: this.id}};
+        }
+        return Models.agencyUser.find(query);
     }
 
     async getTripPlans(): Promise<TripPlan[]> {
         let companies = await this.getCompanys();
         let compIds = companies.map((o)=>o.id);
-        return Models.tripPlan.find({companyId: {$in: compIds}});
+        let query;
+        if (isBrowser()) {
+            query = {companyId: {$in: compIds}};
+        } else {
+            query = {where: {companyId: {$in: compIds}}}
+        }
+        return Models.tripPlan.find(query);
     }
 }
 
