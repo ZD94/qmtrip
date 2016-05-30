@@ -140,7 +140,7 @@ export function CreateController($scope, $storage, $ionicLoading){
     }
 }
 
-export async function BudgetController($scope, $storage, Models, $stateParams){
+export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading){
     API.require("tripPlan");
     await API.onload();
 
@@ -171,12 +171,12 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
     $scope.budgets = budgets;
     $scope.EInvoiceType = EInvoiceType;
     $scope.ETripType = ETripType;
-    console.info(budgets);
-    console.info(EInvoiceType);
     API.require("tripPlan");
     await API.onload();
 
-    $scope.saveTripPlan = function() {
+
+
+    $scope.saveTripPlan = async function() {
         let params = {
             deptCity: trip.fromPlace,
             arrivalCity: trip.place,
@@ -186,13 +186,19 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
             remark: trip.reason,
             budgets: budgets,
         }
-        API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason})
-        .then(function(planTrip) {
+        await $ionicLoading.show({
+            template: "保存中...",
+            hideOnStateChange: true
+        });
+
+        try {
+            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason})
             window.location.href = '#/trip/committed?id='+planTrip.id;
-        })
-        .catch(function(err) {
+        } catch(err) {
             alert(err.msg || err);
-        })
+        } finally {
+            $ionicLoading.hide();
+        }
     }
 }
 

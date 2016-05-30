@@ -40,7 +40,7 @@ var Services = {
         funcs: ['getStaff', 'getStaffs', 'createStaff', 'updateStaff', 'deleteStaff']
     },
     credential: { type: Credential, modname: 'staff',
-        funcs: ['getPapersById', 'getOnesPapers', 'createPapers', 'updatePapers', 'deletePapers']
+        funcs: ['getPapersById', null, 'createPapers', 'updatePapers', 'deletePapers']
     },
     pointChange: { type: PointChange, modname: 'staff',
         funcs: ['getPointChange', 'getPointChanges']
