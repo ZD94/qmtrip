@@ -79,9 +79,25 @@ class StaffModule{
     }
 
     @clientExport
-    @requireParams(["email","name","companyId"], staffCols)
+    @requireParams(["name","companyId"], staffCols)
     static async createStaff (params): Promise<Staff> {
         var staff = await Staff.getCurrent();
+        params.isDefault = true;
+        //设置员工默认部门
+        if(!params.departmentId){
+            let dafaultDept = await Models.department.find({where: {companyId: params.companyId, isDefault: true}});
+            if(dafaultDept && dafaultDept.length>0){
+                params.departmentId = dafaultDept[0].id;
+            }
+        }
+        //设置员工默认差旅标准
+        if(!params.travelPolicyId){
+            /*let dafaultTp = await Models.travelPolicy.get('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a');
+            if(dafaultTp){
+                params.travelPolicyId = dafaultTp.id;
+            }*/
+            params.travelPolicyId = 'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a';
+        }
         if(staff){
             var newstaff = Staff.create(params);
             newstaff.company = staff.company;
