@@ -69,7 +69,7 @@ export class Company extends ModelObject{
 
     // '企业状态'
     @Field({type: Types.INTEGER})
-    get status(): ECompanyStatus { return 0; }
+    get status(): ECompanyStatus { return ECompanyStatus.UN_ACTIVE; }
     set status(val: ECompanyStatus) {}
 
     // '企业邮箱'
