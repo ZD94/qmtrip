@@ -326,40 +326,25 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["companyId"], ["name","status","roleId","departmentId","travelPolicyId","columns","order","$or"])
+    @requireParams(["where.companyId"], ["where.name","where.status","where.roleId","where.departmentId",
+        "where.travelPolicyId", "attributes","order", "where.$or"])
     @conditionDecorator([
-        {if: condition.isCompanyAdminOrOwner("0.companyId")},
-        {if: condition.isCompanyAgency("0.companyId")}
+        {if: condition.isCompanyAdminOrOwner("where.companyId")},
+        {if: condition.isCompanyAgency("where.companyId")}
     ])
-    static async getStaffs(params) :Promise<FindResult>{
+    static async getStaffs(params: {where: any, order?: any, attributes?: any}) :Promise<FindResult>{
         let staff = await Staff.getCurrent();
 
         let { accountId } = Zone.current.get("session");
-        var options : any = {};
-        options.where = _.pick(params, Object.keys(DBM.Staff.attributes));
-        if(params.$or) {
-            options.where.$or = params.$or;
-        }
-        if(params.columns){
-            options.attributes = params.columns;
-        }
-        if(params.order){
-            options.order = params.order || "createdAt desc";
-        }
-
-        let isHasPermit = false;
         if(staff){
-            isHasPermit = true;
-            options.companyId = staff["companyId"];
+            params.where.companyId = staff["companyId"];
         }else{
-            let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: accountId});
-            if(result){
-                isHasPermit = true;
-            }else{
+            let result = await API.company.checkAgencyCompany({companyId: params.where.companyId,userId: accountId});
+            if(!result){
                 throw {code: -1, msg: '无权限'};
             }
         }
-        let paginate = await Models.staff.find(options);
+        let paginate = await Models.staff.find(params);
         return {ids: paginate.map((s)=> {return s.id;}), count: paginate['total']};
     }
 
@@ -533,20 +518,20 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["staffId"], ["companyId","orderId","status"])
+    @requireParams(["where.staffId"], ["where.companyId","where.orderId", "where.status", "attributes"])
     @conditionDecorator([
-        {if: condition.isSameCompany("0.staffId")},
-        {if: condition.isStaffsAgency("0.staffId")}
+        {if: condition.isSameCompany("where.staffId")},
+        {if: condition.isStaffsAgency("where.staffId")}
     ])
     static async getPointChanges(params) :Promise<FindResult>{
         let { accountId } = Zone.current.get("session");
         var options : any = {};
-        options.where = _.pick(params, Object.keys(DBM.PointChange.attributes));
+        options.where = _.pick(params.where, Object.keys(DBM.PointChange.attributes));
         if(params.$or) {
             options.where.$or = params.$or;
         }
-        if(params.columns){
-            options.attributes = params.columns;
+        if(params.attributes){
+            options.attributes = params.attributes;
         }
         let role = await API.auth.judgeRoleById({id:accountId});
 
@@ -1396,13 +1381,14 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(['ownerId', 'type'], ['attributes'])
-    static getOnesPapersByType(params): Promise<Credential>{
+    @requireParams(['type'], ['attributes'])
+    static getOnesPapersByType(params: {where: {type: any}, attributes?: string[]}): Promise<Credential>{
         let { accountId } = Zone.current.get("session");
-        params.ownerId = accountId;
-        var options:any = {};
-        options.where = {ownerId: params.ownerId, type: params.type};
-        options.attributes = params.attributes? ['*'] :params.attributes;
+        let options: any = params;
+        options.where.ownerId = accountId;
+        if (!options.attributes) {
+            options.attributes = ['*'];
+        }
         return DBM.Credential.findOne(options)
             .then(function(result){
                 return new Credential(result);

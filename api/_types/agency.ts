@@ -84,34 +84,19 @@ export class Agency extends ModelObject{
     set remark(val: string) {}
 
     getCompanys(): Promise<Company[]> {
-        let query;
-        if (isBrowser()) {
-            query = {agencyId: this.id};
-        } else {
-            query = {where: {agencyId: this.id}}
-        }
+        let query = {where: {agencyId: this.id}}
         return Models.company.find(query);
     }
 
     getUsers(): Promise<AgencyUser[]> {
-        let query;
-        if (isBrowser()) {
-            query =  {agencyId: this.id};
-        } else {
-            query = { where: {agencyId: this.id}};
-        }
+        let query = { where: {agencyId: this.id}};
         return Models.agencyUser.find(query);
     }
 
     async getTripPlans(): Promise<TripPlan[]> {
         let companies = await this.getCompanys();
         let compIds = companies.map((o)=>o.id);
-        let query;
-        if (isBrowser()) {
-            query = {companyId: {$in: compIds}};
-        } else {
-            query = {where: {companyId: {$in: compIds}}}
-        }
+        let query = {where: {companyId: {$in: compIds}}}
         return Models.tripPlan.find(query);
     }
 }

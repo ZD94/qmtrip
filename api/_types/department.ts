@@ -36,22 +36,12 @@ export class Department extends ModelObject{
     }
 
     getChildUnit(): Promise<Department[]> {
-        let query;
-        if (isBrowser()) {
-            query = {parentId: this.id}
-        } else {
-            query = {where: {parentId: this.id}}
-        }
+        let query  = {where: {parentId: this.id}}
         return Models.department.find(query);
     }
 
     getStaffs(): Promise<Staff[]> {
-        let query;
-        if (isBrowser()) {
-            query = {companyId: this.company.id, departmentId: this.id}
-        } else {
-            query = {where: {companyId: this.company.id, departmentId: this.id}}
-        }
+        let query  = {where: {companyId: this.company.id, departmentId: this.id}}
         return Models.staff.find(query);
     }
 

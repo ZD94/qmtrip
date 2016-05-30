@@ -54,12 +54,7 @@ export class TravelPolicy extends ModelObject{
     get company(): Company { return null; }
 
     getStaffs(): Promise<Staff[]> {
-        let query;
-        if (isBrowser()) {
-            query = {companyId: this.company.id, travelPolicyId: this.id}
-        } else {
-            query = {where: {companyId: this.company.id, travelPolicyId: this.id}}
-        }
+        let query = {where: {companyId: this.company.id, travelPolicyId: this.id}}
         return Models.staff.find(query);
     }
 }
