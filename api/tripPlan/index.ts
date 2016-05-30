@@ -74,7 +74,9 @@ class TripPlanModule {
         tripPlan.arrivalCity = query.destinationPlace;
         tripPlan.isNeedHotel = query.isNeedHotel;
         tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo');
-
+        if (!tripPlan.auditUser) {
+            tripPlan.auditUser = null;
+        }
         let tripDetails: TripDetail[] = budgets.map(function (budget) {
             let tripType = budget.tripType;
             let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: Number(budget.price)});

@@ -33,7 +33,7 @@ function TripDefineFromJson(obj: any): TripDefine{
     return obj as TripDefine;
 }
 
-export function CreateController($scope, $storage){
+export function CreateController($scope, $storage, $ionicLoading){
     let trip;
     try {
         trip= TripDefineFromJson($storage.local.get('trip'));
@@ -109,13 +109,34 @@ export function CreateController($scope, $storage){
             isRoundTrip: trip.round,
             isNeedHotel: trip.hotel
         }
-        API.travelBudget.getTravelPolicyBudget(params)
-        .then(function(result) {
-            window.location.href = "#/trip/budget?id="+result;
-        })
-        .catch(function(err) {
+        let front = ['国航', '南航', '东航', '深航', '携程', '12306官网'];
+        await $ionicLoading.show({
+            template: '预算计算中...',
+            hideOnStateChange: true,
+        });
+        let idx = 0;
+
+        let timer = setInterval(async function() {
+            let template = '正在搜索' + front[idx++]+'...'
+            if (idx >= front.length) {
+                idx = 0;
+            }
+            await $ionicLoading.show({
+                template: template,
+                hideOnStateChange: true,
+            });
+        }, 800);
+
+        try {
+            let budget = await API.travelBudget.getTravelPolicyBudget(params);
+            clearTimeout(timer);
+            await $ionicLoading.hide()
+            window.location.href = "#/trip/budget?id="+budget;
+        } catch(err) {
+            clearTimeout(timer);
+            await $ionicLoading.hide()
             alert(err.msg || err);
-        })
+        }
     }
 }
 
