@@ -31,10 +31,12 @@ export enum EInvoiceType {
     OTHER = 3,
 }
 
-export enum  EAuditStaus {
-    NOT_PASS = -1,
-    AUDITING = 0,
-    PASS = 1
+export enum  EAuditStatus {
+    INVOICE_NOT_PASS = -2, //票据未审核通过
+    NOT_PASS = -1, //审批未通过
+    AUDITING = 0, //审批中
+    PASS = 1, //审批通过，待审核
+    INVOICE_PASS = 2, //票据审核通过
 }
 
 @Table(Models.project, 'tripPlan.')
@@ -147,6 +149,14 @@ export class TripPlan extends ModelObject {
     get expendInfo(): Object { return null; }
     set expendInfo(val: Object) {}
 
+    @Field({type: Types.INTEGER})
+    get auditStatus(): EAuditStatus { return EAuditStatus.AUDITING; }
+    set auditStatus(val: EAuditStatus) {}
+
+    @Field({type: Types.STRING})
+    get auditUser(): string { return ''; }
+    set auditUser(val: string) {}
+    
     @Field({type: Types.STRING})
     get auditRemark(): string { return ''; }
     set auditRemark(val: string) {}
@@ -223,6 +233,14 @@ export class TripPlan extends ModelObject {
         return Models.tripDetail.find(query);
     }
 
+    auditTripPlan(params): Promise<boolean> {
+        params.id = this.id;
+        return API.tripPlan.auditTripPlan(params);
+    }
+
+    commitTripPlan(): Promise<boolean> {
+        return API.tripPlan.commitTripPlan({id: this.id});
+    }
 }
 
 @Table(Models.tripDetail, 'tripPlan.')
@@ -341,7 +359,7 @@ export class TripDetail extends ModelObject{
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: pictureFileId});
     }
 
-    approvePlanInvoice(params: {auditResult: EAuditStaus}): Promise<boolean> {
+    approvePlanInvoice(params: {auditResult: EAuditStatus}): Promise<boolean> {
         params['id'] = this.id;
         return API.tripPlan.approvePlanInvoice(params);
     }
