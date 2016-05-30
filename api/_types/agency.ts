@@ -3,7 +3,7 @@
  */
 'use strict';
 import { regApiType } from 'common/api/helper';
-import { Models, EGender, EAccountType } from 'api/_types';
+import { isBrowser, Models, EGender, EAccountType } from 'api/_types';
 import {Company} from 'api/_types/company';
 import { getSession, Types, Values } from 'common/model';
 import { Account } from './auth';
@@ -15,10 +15,6 @@ export enum EAgencyStatus {
     DELETE = -2, //删除状态
     UN_ACTIVE = 0, //未激活状态
     ACTIVE = 1 //激活状态
-}
-
-export const AgencyError = {
-    AGENCY_NOT_FOUND: {code: -11, msg: '没有该代理商'}
 }
 
 export enum  EAgencyUserRole {
@@ -68,7 +64,7 @@ export class Agency extends ModelObject{
     set description(val: string) {}
 
     @Field({type: Types.INTEGER})
-    get status(): EAgencyStatus { return 0; }
+    get status(): EAgencyStatus { return EAgencyStatus.UN_ACTIVE; }
     set status(val: EAgencyStatus) {}
 
     @Field({type: Types.STRING(30)})
@@ -88,17 +84,30 @@ export class Agency extends ModelObject{
     set remark(val: string) {}
 
     getCompanys(): Promise<Company[]> {
-        return Models.company.find({agencyId: this.id});
+        let query;
+        if (isBrowser()) {
+            query = {agencyId: this.id};
+        } else {
+            query = {where: {agencyId: this.id}}
+        }
+        return Models.company.find(query);
     }
 
-    getUsers(): Promise<AgencyUser[]> {
-        return Models.agencyUser.find({agencyId: this.id});
+    getUsers(options): Promise<AgencyUser[]> {
+        return Models.agencyUser.find(options);
     }
 
-    async getTripPlans(): Promise<TripPlan[]> {
-        let companies = await this.getCompanys();
-        let compIds = companies.map((o)=>o.id);
-        return Models.tripPlan.find({companyId: {$in: compIds}});
+    async getTripPlans(options): Promise<TripPlan[]> {
+        if(!options.where) {
+            options.where = {}
+        }
+        if(!options.where.companyId) {
+            let companies = await this.getCompanys();
+            let compIds = companies.map((o)=>o.id);
+            options.where.companyId = {$in: compIds};
+        }
+        
+        return Models.tripPlan.find(options);
     }
 }
 
@@ -130,7 +139,7 @@ export class AgencyUser extends ModelObject{
     set id(val: string) {}
 
     @Field({type: Types.INTEGER})
-    get status(): EAgencyStatus { return 0; }
+    get status(): EAgencyStatus { return EAgencyStatus.UN_ACTIVE; }
     set status(val: EAgencyStatus) {}
 
     @Field({type: Types.STRING})
@@ -146,8 +155,8 @@ export class AgencyUser extends ModelObject{
     set avatar(val: string) {}
 
     @Field({type: Types.INTEGER})
-    get roleId(): EAgencyStatus { return 0; }
-    set roleId(val: EAgencyStatus) {}
+    get roleId(): EAgencyUserRole { return EAgencyUserRole.COMMON; }
+    set roleId(val: EAgencyUserRole) {}
 
     @ResolveRef({type: Types.UUID}, Models.agency)
     get agency(): Agency { return null; }

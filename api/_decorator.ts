@@ -134,7 +134,7 @@ export function modelNotNull(modname: string, keyName?: string) {
             let self = this;
             keyName = keyName || 'id';
             let entity = await Models[modname].get(args[0][keyName]);
-            
+
             if(!entity) {
                 throw L.ERR.NOT_FOUND();
             }

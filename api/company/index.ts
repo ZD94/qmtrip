@@ -1,4 +1,3 @@
-import {Models} from "../_types/index";
 /**
  * Created by yumiao on 15-12-9.
  */
@@ -14,16 +13,14 @@ let Logger = require('common/logger');
 let logger = new Logger('company');
 
 import {requireParams, clientExport} from "common/api/helper";
-import {ECompanyStatus, Company, MoneyChange} from 'api/_types/company';
-import {EAgencyStatus, Agency, AgencyUser} from "../_types/agency";
-import {requirePermit, conditionDecorator, condition, modelNotNull} from "../_decorator";
-import {Staff, EStaffRole} from "../_types/staff";
-import {Department} from "../_types/department";
+import {Models} from "api/_types/index";
+import {Company, MoneyChange} from 'api/_types/company';
+import {Staff, EStaffRole} from "api/_types/staff";
+import {Agency, AgencyUser, EAgencyUserRole} from "api/_types/agency";
+import {Department} from "api/_types/department";
+import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import {md5} from "common/utils";
 import {FindResult} from "common/model/interface";
-
-let AGENCY_ROLE = {OWNER: 0, COMMON: 1, ADMIN: 2};
-let companyCols = Company['$fieldnames'];
 
 class CompanyModule {
     /**
@@ -36,13 +33,13 @@ class CompanyModule {
      */
     @requireParams(['createUser', 'name', 'domainName', 'mobile', 'email', 'agencyId'], ['id', 'description', 'telephone', 'remark'])
     static async createCompany(params): Promise<Company>{
-        let c = await Models.company.find({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
+        let results = await Models.company.find({where: {$or: [{email: params.email}, {mobile: params.mobile}]}});
 
-        if (c && c.length > 0) {
+        if (results && results.length > 0) {
             throw {code: -2, msg: '邮箱或手机号已注册企业'};
         }
 
-        return Models.company.create(params).save();
+        return Company.create(params).save();
     }
 
     /**
@@ -144,7 +141,7 @@ class CompanyModule {
      * @returns {Promise<string[]>}
      */
     @clientExport
-    @requireParams([], ['status'])
+    @requireParams([], ['where.status'])
     static async listCompany(params): Promise<FindResult>{
         let agencyUser = await AgencyUser.getCurrent();
         var options : any = {where: {agencyId: agencyUser.agency.id}, order: [['created_at', 'desc']]};
@@ -189,16 +186,14 @@ class CompanyModule {
      */
     @requireParams(['companyId','userId'])
     static async checkAgencyCompany(params){
-        var userId = params.userId;
-        var companyId = params.companyId;
-        var c = await DBM.Company.findById(companyId, {attributes: ['agencyId', 'status']});
-        var agency = await API.agency.getAgencyUser({id: userId}, {attributes: ['agencyId', 'status', 'roleId']});
+        var c = await Models.company.get(params.companyId);
+        var user = await Models.agencyUser.get(params.userId);
 
         if(!c || c.status == -2){
             throw L.ERR.COMPANY_NOT_EXIST();
         }
 
-        if(c.agencyId != agency.agencyId || (agency.roleId != AGENCY_ROLE.OWNER && agency.roleId != AGENCY_ROLE.ADMIN)) {
+        if(c['agencyId'] != user.agency.id || (user.roleId != EAgencyUserRole.OWNER && user.roleId != EAgencyUserRole.ADMIN)) {
             throw L.ERR.PERMISSION_DENY();
         }
 
@@ -212,7 +207,7 @@ class CompanyModule {
      * @returns {Promise<MoneyChange>}
      */
     static async saveMoneyChange(params: {companyId: string, money: number, channel: number, userId: string, remark: string}): Promise<MoneyChange> {
-        return Models.moneyChange.create(params).save();
+        return MoneyChange.create(params).save();
     }
 
     /**

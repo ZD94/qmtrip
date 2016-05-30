@@ -1,5 +1,5 @@
 import { regApiType } from 'common/api/helper';
-import { Models } from 'api/_types';
+import {Models, isBrowser} from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import { Company } from 'api/_types/company';
 import { Table, Create, Field, Reference, ResolveRef } from 'common/model/common';
@@ -36,11 +36,23 @@ export class Department extends ModelObject{
     }
 
     getChildUnit(): Promise<Department[]> {
-        return Models.department.find({parentId: this.id});
+        let query;
+        if (isBrowser()) {
+            query = {parentId: this.id}
+        } else {
+            query = {where: {parentId: this.id}}
+        }
+        return Models.department.find(query);
     }
 
     getStaffs(): Promise<Staff[]> {
-        return Models.staff.find({companyId: this.company.id, departmentId: this.id});
+        let query;
+        if (isBrowser()) {
+            query = {companyId: this.company.id, departmentId: this.id}
+        } else {
+            query = {where: {companyId: this.company.id, departmentId: this.id}}
+        }
+        return Models.staff.find(query);
     }
 
     @ResolveRef({type: Types.UUID}, Models.company)

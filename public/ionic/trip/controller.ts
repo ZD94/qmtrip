@@ -33,7 +33,7 @@ function TripDefineFromJson(obj: any): TripDefine{
     return obj as TripDefine;
 }
 
-export function CreateController($scope, $storage){
+export function CreateController($scope, $storage, $ionicLoading){
     let trip;
     try {
         trip= TripDefineFromJson($storage.local.get('trip'));
@@ -98,23 +98,45 @@ export function CreateController($scope, $storage){
         await API.onload();
 
         let trip = $scope.trip;
-        API.travelBudget.getTravelPolicyBudget({
+        let params = {
             originPlace: trip.fromPlace,
             destinationPlace: trip.place,
             leaveDate: moment(trip.beginDate).format('YYYY-MM-DD'),
             goBackDate: moment(trip.endDate).format('YYYY-MM-DD'),
             leaveTime: moment(trip.beginDate).format('HH:mm'),
             goBackTime: moment(trip.endDate).format('HH:mm'),
+            isNeedTraffic: trip.traffic,
             isRoundTrip: trip.round,
             isNeedHotel: trip.hotel
-        })
-        .then(function(result) {
-            console.info("getTravelPolicyBudget success...");
-            window.location.href = "#/trip/budget?id="+result;
-        })
-        .catch(function(err) {
+        }
+        let front = ['国航', '南航', '东航', '深航', '携程', '12306官网'];
+        await $ionicLoading.show({
+            template: '预算计算中...',
+            hideOnStateChange: true,
+        });
+        let idx = 0;
+
+        let timer = setInterval(async function() {
+            let template = '正在搜索' + front[idx++]+'...'
+            if (idx >= front.length) {
+                idx = 0;
+            }
+            await $ionicLoading.show({
+                template: template,
+                hideOnStateChange: true,
+            });
+        }, 800);
+
+        try {
+            let budget = await API.travelBudget.getTravelPolicyBudget(params);
+            clearTimeout(timer);
+            await $ionicLoading.hide()
+            window.location.href = "#/trip/budget?id="+budget;
+        } catch(err) {
+            clearTimeout(timer);
+            await $ionicLoading.hide()
             alert(err.msg || err);
-        })
+        }
     }
 }
 
@@ -133,15 +155,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
     trip.createAt = new Date(result.createAt);
     $scope.trip = trip;
     //补助,现在是0,后续可能会直接加入到预算中
-    let otherBudget = {price: 0, type: 'other', tripType: 'other'};
-    let isHasOther = false;
     let totalPrice: number = 0;
-    for(let budget of budgets) {
-        if (budget.tripType == 'other') {
-            isHasOther = true;
-            break;
-        }
-    }
     for(let budget of budgets) {
         let price = Number(budget.price);
         if (price <= 0) {
@@ -154,10 +168,6 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
     $scope.totalPrice = totalPrice;
     let duringDays = moment(trip.endDate).diff(moment(trip.beginDate), 'days');
     $scope.duringDays = duringDays;
-
-    if (!isHasOther) {
-        budgets.push(otherBudget);
-    }
     $scope.budgets = budgets;
     $scope.EInvoiceType = EInvoiceType;
     $scope.ETripType = ETripType;
@@ -239,18 +249,33 @@ export async function ListController($scope , Models){
     statusTxt[EPlanStatus.AUDITING] = "已提交待审核状态";
     statusTxt[EPlanStatus.COMPLETE] = "审核完，已完成状态";
     $scope.statustext = statusTxt;
-    // var tripPlans = await Models.tripPlan.find({});
-    let tripPlans = await staff.getTripPlans();
-    tripPlans.map(function(trip){
-        trip.startAt = moment(trip.startAt).toDate();
-        trip.backAt = moment(trip.backAt).toDate();
-        return trip;
-    });
-    $scope.tripPlans = tripPlans;
-    console.info(statusTxt);
-    console.info($scope.tripPlans);
+    $scope.isHasNextPage = true;
+    $scope.tripPlans = [];
+    let pager = await staff.getTripPlans({});
+    loadTripPlan(pager);
+
+    $scope.pager = pager;
+    $scope.nextPage = async function() {
+        try {
+            pager = await $scope.pager['nextPage']();
+        } catch(err) {
+            $scope.isHasNextPage = false;
+            return;
+        }
+        $scope.pager = pager;
+        loadTripPlan(pager);
+    }
+
     $scope.enterdetail = function(tripid){
         window.location.href = "#/trip/listdetail?tripid="+tripid;
+    }
+
+    function loadTripPlan(pager) {
+        pager.forEach(function(trip){
+            trip.startAt = moment(trip.startAt).toDate();
+            trip.backAt = moment(trip.backAt).toDate();
+            $scope.tripPlans.push(trip);
+        });
     }
 }
 

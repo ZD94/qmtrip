@@ -1,6 +1,6 @@
 'use strict';
 
-import { Models } from 'api/_types';
+import { isBrowser, Models } from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import {Agency} from 'api/_types/agency';
 import {TravelPolicy} from "api/_types/travelPolicy";
@@ -26,7 +26,13 @@ export class Company extends ModelObject{
 
     async destroy(options?: Object): Promise<any> {
         if(this.isLocal){
-            let staffs = await Models.staff.find({companyId: this.id});
+            let query;
+            if (isBrowser()) {
+                query = {companyId: this.id};
+            } else {
+                query = { where: {companyId: this.id}}
+            }
+            let staffs = await Models.staff.find(query);
             await Promise.all(staffs.map((staff) => staff.destroy(options)));
         }
         super.destroy(options);
@@ -63,7 +69,7 @@ export class Company extends ModelObject{
 
     // '企业状态'
     @Field({type: Types.INTEGER})
-    get status(): ECompanyStatus { return 0; }
+    get status(): ECompanyStatus { return ECompanyStatus.UN_ACTIVE; }
     set status(val: ECompanyStatus) {}
 
     // '企业邮箱'
@@ -121,23 +127,45 @@ export class Company extends ModelObject{
     }
 
     getStaffs(): Promise<Staff[]> {
-        return Models.staff.find({companyId: this.id});
+        let query;
+        if (isBrowser()) {
+            query = {companyId: this.id};
+        } else {
+            query = {where: {companyId: this.id} }
+        }
+        return Models.staff.find(query);
     }
     
     getDepartments(): Promise<Department[]> {
-        return Models.department.find({companyId: this.id});
+        let query;
+        if (isBrowser()) {
+            query =  {companyId: this.id};
+        } else {
+            query = { where: {companyId: this.id}}
+        }
+        return Models.department.find(query);
     }
 
     getTravelPolicies(): Promise<TravelPolicy[]> {
-        return Models.travelPolicy.find({companyId: this.id})
+        let query;
+        if (isBrowser()) {
+            query = {companyId: this.id}
+        } else {
+            query = { where: {companyId: this.id}}
+        }
+        return Models.travelPolicy.find(query);
     }
 
-    getTripPlans(): Promise<TripPlan[]> {
-        return Models.tripPlan.find({companyId: this.id});
+    getTripPlans(options): Promise<TripPlan[]> {
+        if(!options.where) {
+            options.where = {};
+        }
+        options.where.companyId = this.id;
+        return Models.tripPlan.find(options);
     }
 
     getMoneyChanges(companyId?:string): Promise<MoneyChange[]> {
-        return Models.moneyChange.find({fundsAccountId: companyId});
+        return Models.moneyChange.find({where: {companyId: this.id}});
     }
 }
 

@@ -12,12 +12,11 @@ import L = require("common/language");
 import Logger = require('common/logger');
 import utils = require("common/utils");
 import {requireParams, clientExport} from 'common/api/helper';
-import {getSession} from 'common/model';
-import {Agency, AgencyUser, EAgencyStatus, AgencyError, EAgencyUserRole} from "api/_types/agency";
+import {Agency, AgencyUser, EAgencyStatus, EAgencyUserRole} from "api/_types/agency";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "../_decorator";
 import { Models, EGender } from '../_types/index';
 import {md5} from "common/utils";
-import {FindResult} from "../../common/model/interface";
+import {FindResult} from "common/model/interface";
 let logger = new Logger("agency");
 
 let agencyCols = Agency['$fieldnames'];
@@ -66,7 +65,8 @@ class AgencyModule {
         let ACCOUNT_TYPE : number = 2; //账号类型，2为代理商账号
 
         let agency = Agency.create(params);
-        let agencyUser = AgencyUser.create({name: params.userName, pwd: md5(password), status: EAgencyStatus.ACTIVE, roleId: EAgencyUserRole.OWNER, type: ACCOUNT_TYPE, email: email, mobile: mobile});
+        let agencyUser = AgencyUser.create({name: params.userName, pwd: md5(password), status: EAgencyStatus.ACTIVE,
+            roleId: EAgencyUserRole.OWNER, type: ACCOUNT_TYPE, email: email, mobile: mobile});
 
         agency.status = EAgencyStatus.ACTIVE;
         agency.createUser = agencyUser.id;
@@ -124,12 +124,13 @@ class AgencyModule {
      * @returns {Promise<string[]>}
      */
     @clientExport
-    static async listAgency(params?: any): Promise<FindResult>{
-        let agencies = await Models.agency.find({attributes: ['id']});
+    static async listAgency(): Promise<FindResult>{
+        let agencies = await Models.agency.find({});
 
         let ids =  agencies.map(function(agency) {
             return agency.id;
-        })
+        });
+
         return {ids: ids, count: agencies['total']}
     }
 
@@ -247,10 +248,13 @@ class AgencyModule {
      * @param options options.perPage 每页条数 options.page当前页
      */
     @clientExport
-    static async listAgencyUser(params) :Promise<FindResult> {
+    static async listAgencyUser(options) :Promise<FindResult> {
         let curUser = await AgencyUser.getCurrent();
-        params.agencyId = curUser.agency.id;
-        let agencyUsers = await DBM.AgencyUser.findAll({where: params, attributes: ['id']});
+        if(!options.where) {
+            options.where = {}
+        }
+        options.where.agencyId = curUser.agency.id;
+        let agencyUsers = await Models.agencyUser.find(options);
         let ids =  agencyUsers.map(function(agency) {
             return agency.id;
         })

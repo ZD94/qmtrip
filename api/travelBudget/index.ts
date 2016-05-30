@@ -1,7 +1,8 @@
 /**
  * Created by wlh on 15/12/12.
  */
-import { clientExport } from '../../common/api/helper';
+import { clientExport } from 'common/api/helper';
+import {Models } from 'api/_types'
 import {ETripType, EInvoiceType} from "../_types/tripPlan";
 import {Staff} from "../_types/staff";
 const API = require("common/api");
@@ -35,7 +36,8 @@ interface BudgetOptions{
     checkInDate?: Date| string,
     checkOutDate?: Date|string,
     businessDistrict?: string,
-    isRoundTrip: boolean
+    isRoundTrip: boolean,
+    isNeedTraffic: boolean
 }
 
 class ApiTravelBudget {
@@ -67,17 +69,24 @@ class ApiTravelBudget {
     * @param {String} [params.businessDistrict] 商圈ID
     * @param {Boolean} [params.isNeedHotel] 是否需要酒店
     * @param {Boolean} [params.isRoundTrip] 是否往返 [如果为true,goBackDate必须存在]
+    * @param {Boolean} [params.isNeedTraffic] 是否需要交通
     * @return {Promise} {traffic: "2000", hotel: "1500", "price": "3500"}
     */
     @clientExport
     static async getTravelPolicyBudget(params: BudgetOptions) :Promise<string> {
-        let self: any = this;
         let {accountId} = Zone.current.get('session');
-
+        let staff = await Models.staff.get(accountId);
+        let travelPolicy = await Models.travelPolicy.get(staff['travelPolicyId']);
+        let self: any = this;
         let {leaveDate, goBackDate, isRoundTrip, originPlace, destinationPlace, checkInDate,
-            checkOutDate, businessDistrict, leaveTime, goBackTime, isNeedHotel} = params;
+            checkOutDate, businessDistrict, leaveTime, goBackTime, isNeedHotel, isNeedTraffic} = params;
+
         if (!Boolean(leaveDate)) {
             throw L.ERR.LEAVE_DATE_FORMAT_ERROR();
+        }
+
+        if (!isNeedTraffic && !isNeedHotel) {
+            throw new Error("住宿和交通不能同时不需要");
         }
 
         let momentDateFormat = "YYYY-MM-DD";
@@ -103,13 +112,15 @@ class ApiTravelBudget {
                 goBackDate = moment(goBackDate).format(momentDateFormat);
             }
         }
+
         //去程参数
-        if (!leaveDate) {
+        if (isNeedTraffic && !leaveDate) {
             throw L.ERR.LEAVE_DATE_FORMAT_ERROR();
         } else if (!validate.isDate(leaveDate as string)){
             leaveDate = moment(leaveDate).format(momentDateFormat);
         }
-        if (!originPlace) {
+
+        if (isNeedTraffic && !originPlace) {
             throw L.ERR.CITY_NOT_EXIST();
         }
         if (!destinationPlace) {
@@ -117,18 +128,21 @@ class ApiTravelBudget {
         }
 
         let budgets = [];
-        //去程预算
-        let budget = await ApiTravelBudget.getTrafficBudget.call(self, {
-            originPlace: originPlace,
-            destinationPlace: destinationPlace,
-            leaveDate: leaveDate,
-            leaveTime: leaveTime
-        });
-        budget.tripType = ETripType.OUT_TRIP;
-        budgets.push(budget);
 
-        if (isRoundTrip) {
-            budget = await ApiTravelBudget.getTrafficBudget.call(self, {
+        if (isNeedTraffic) {
+            //去程预算
+            let budget = await ApiTravelBudget.getTrafficBudget.call(self, {
+                originPlace: originPlace,
+                destinationPlace: destinationPlace,
+                leaveDate: leaveDate,
+                leaveTime: leaveTime
+            });
+            budget.tripType = ETripType.OUT_TRIP;
+            budgets.push(budget);
+        }
+
+        if (isNeedTraffic && isRoundTrip) {
+            let budget = await ApiTravelBudget.getTrafficBudget.call(self, {
                 originPlace: destinationPlace,
                 destinationPlace: originPlace,
                 leaveDate: goBackDate,
@@ -139,7 +153,7 @@ class ApiTravelBudget {
         }
 
         if (isNeedHotel) {
-            budget = await ApiTravelBudget.getHotelBudget.call(self, {
+            let budget = await ApiTravelBudget.getHotelBudget.call(self, {
                 cityId: destinationPlace,
                 businessDistrict: businessDistrict,
                 checkInDate: checkInDate,
@@ -148,6 +162,15 @@ class ApiTravelBudget {
             budget.tripType = ETripType.HOTEL;
             budgets.push(budget);
         }
+
+
+        if (Boolean(travelPolicy['subsidy']) && travelPolicy['subsidy'] > 0) {
+            let budget: any = {};
+            budget.tripType = ETripType.SUBSIDY;
+            budget.price = travelPolicy['subsidy'];
+            budgets.push(budget);
+        }
+
         let obj: any = {};
         obj.budgets = budgets;
         obj.query = params;
