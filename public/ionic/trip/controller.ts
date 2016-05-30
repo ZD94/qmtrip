@@ -98,18 +98,19 @@ export function CreateController($scope, $storage){
         await API.onload();
 
         let trip = $scope.trip;
-        API.travelBudget.getTravelPolicyBudget({
+        let params = {
             originPlace: trip.fromPlace,
             destinationPlace: trip.place,
             leaveDate: moment(trip.beginDate).format('YYYY-MM-DD'),
             goBackDate: moment(trip.endDate).format('YYYY-MM-DD'),
             leaveTime: moment(trip.beginDate).format('HH:mm'),
             goBackTime: moment(trip.endDate).format('HH:mm'),
+            isNeedTraffic: trip.traffic,
             isRoundTrip: trip.round,
             isNeedHotel: trip.hotel
-        })
+        }
+        API.travelBudget.getTravelPolicyBudget(params)
         .then(function(result) {
-            console.info("getTravelPolicyBudget success...");
             window.location.href = "#/trip/budget?id="+result;
         })
         .catch(function(err) {
@@ -133,15 +134,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
     trip.createAt = new Date(result.createAt);
     $scope.trip = trip;
     //补助,现在是0,后续可能会直接加入到预算中
-    let otherBudget = {price: 0, type: 'other', tripType: 'other'};
-    let isHasOther = false;
     let totalPrice: number = 0;
-    for(let budget of budgets) {
-        if (budget.tripType == 'other') {
-            isHasOther = true;
-            break;
-        }
-    }
     for(let budget of budgets) {
         let price = Number(budget.price);
         if (price <= 0) {
@@ -154,10 +147,6 @@ export async function BudgetController($scope, $storage, Models, $stateParams){
     $scope.totalPrice = totalPrice;
     let duringDays = moment(trip.endDate).diff(moment(trip.beginDate), 'days');
     $scope.duringDays = duringDays;
-
-    if (!isHasOther) {
-        budgets.push(otherBudget);
-    }
     $scope.budgets = budgets;
     $scope.EInvoiceType = EInvoiceType;
     $scope.ETripType = ETripType;

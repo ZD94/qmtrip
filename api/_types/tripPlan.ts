@@ -20,7 +20,8 @@ export enum ETripType {
     OUT_TRIP = 0, //去程
     BACK_TRIP = 1,
     HOTEL = 2,
-    OTHER = 3,
+    SUBSIDY = 3,
+    OTHER = 4,
 }
 
 export enum EInvoiceType {
