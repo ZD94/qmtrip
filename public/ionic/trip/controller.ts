@@ -230,7 +230,7 @@ export async function ListController($scope , Models){
     $scope.statustext = statusTxt;
     $scope.isHasNextPage = true;
     $scope.tripPlans = [];
-    let pager = await staff.getTripPlans();
+    let pager = await staff.getTripPlans({});
     loadTripPlan(pager);
 
     $scope.pager = pager;

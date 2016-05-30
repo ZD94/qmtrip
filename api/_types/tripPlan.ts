@@ -193,44 +193,23 @@ export class TripPlan extends ModelObject {
     setCompany(val: Company) {}
 
     getOutTrip(id?: string): Promise<TripDetail[]> {
-        let query;
-        if (isBrowser()) {
-            query = {tripPlanId: id||this.id, type: ETripType.OUT_TRIP};
-        } else {
-            query = {where: {tripPlanId: id||this.id, type: ETripType.OUT_TRIP}};
-        }
-        return Models.tripDetail.find(query);
+        return Models.tripDetail.find({where: {tripPlanId: id||this.id, type: ETripType.OUT_TRIP}});
     }
 
     getBackTrip(id?: string): Promise<TripDetail[]> {
-        let query;
-        if (isBrowser()) {
-            query = {tripPlanId: id||this.id, type: ETripType.BACK_TRIP}
-        } else {
-            query = {where: {tripPlanId: id||this.id, type: ETripType.BACK_TRIP}};
-        }
-        return Models.tripDetail.find(query);
+        return Models.tripDetail.find({where: {tripPlanId: id||this.id, type: ETripType.BACK_TRIP}});
     }
 
     getHotel(): Promise<TripDetail[]> {
-        let query;
-        if (isBrowser()) {
-            query = {tripPlanId: this.id, type: ETripType.HOTEL};
-        } else {
-            query = { where: {tripPlanId: this.id, type: ETripType.HOTEL}};
-        }
-        return Models.tripDetail.find(query);
+        return Models.tripDetail.find({ where: {tripPlanId: this.id, type: ETripType.HOTEL}});
     }
     
-    getTripDetails(params): Promise<TripDetail[]> {
-        let query;
-        params.tripPlanId = this.id;
-        if (isBrowser()) {
-            query = params;
-        } else {
-            query = {where: params}
+    getTripDetails(options: {where: any, limit?: number}): Promise<TripDetail[]> {
+        if(!options.where) {
+            options.where = {}
         }
-        return Models.tripDetail.find(query);
+        options.where.tripPlanId = this.id;
+        return Models.tripDetail.find(options);
     }
 
     auditTripPlan(params): Promise<boolean> {

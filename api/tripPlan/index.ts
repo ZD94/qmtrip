@@ -222,8 +222,8 @@ class TripPlanModule {
      * @returns {*}
      */
     @clientExport
-    static async listTripPlans(params: any): Promise<FindResult> {
-        let paginate = await Models.tripPlan.find(params);
+    static async listTripPlans(options: any): Promise<FindResult> {
+        let paginate = await Models.tripPlan.find(options);
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
     }
 
@@ -238,7 +238,7 @@ class TripPlanModule {
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
     static async deleteTripPlan(params): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
-        let tripDetails = await tripPlan.getTripDetails({});
+        let tripDetails = await tripPlan.getTripDetails({where: {}});
         await tripPlan.destroy();
         await Promise.all(tripDetails.map((detail)=> detail.destroy()));
         return true;
@@ -284,10 +284,10 @@ class TripPlanModule {
      * @param params
      * @returns {Promise<string[]>}
      */
-    @requireParams(['tripPlanId'], ['type', 'status', 'id'])
+    @requireParams(['where.tripPlanId'], ['where.type', 'where.status', 'where.id'])
     @clientExport
-    static async getTripDetails(params): Promise<FindResult> {
-        let details = await Models.tripDetail.find({ where: params});
+    static async getTripDetails(options: {where: any, offset?: number, limit?: number}): Promise<FindResult> {
+        let details = await Models.tripDetail.find(options);
         let ids = details.map(function (d) {
             return d.id;
         });
@@ -352,7 +352,7 @@ class TripPlanModule {
         tripDetail.budget = params.budget;
         tripDetail.status = EPlanStatus.WAIT_UPLOAD;
         await tripDetail.save();
-        let details = await tripPlan.getTripDetails({});
+        let details = await tripPlan.getTripDetails({where: {}});
         let budget = 0;
 
         for(let i=0; i< details.length; i++) {
@@ -419,7 +419,7 @@ class TripPlanModule {
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
     static async commitTripPlan(params: {id: string}): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
-        let tripDetails = await tripPlan.getTripDetails({});
+        let tripDetails = await tripPlan.getTripDetails({where: {}});
 
         if(tripDetails && tripDetails.length > 0) {
             await Promise.all(tripDetails.map(async function(detail) {
@@ -455,7 +455,7 @@ class TripPlanModule {
 
         if(audit == EAuditStatus.INVOICE_PASS) {
             tripDetail.status = EPlanStatus.COMPLETE;
-            let details = await tripPlan.getTripDetails({id: {$ne: tripDetail.id, status: [EPlanStatus.AUDITING, EPlanStatus.AUDIT_NOT_PASS]}}); //获取所有未经过审核的票据
+            let details = await tripPlan.getTripDetails({where: {id: {$ne: tripDetail.id, status: [EPlanStatus.AUDITING, EPlanStatus.AUDIT_NOT_PASS]}}}); //获取所有未经过审核的票据
 
             if(!details || details.length == 0 ) {
                 tripPlan.status = EPlanStatus.COMPLETE;
@@ -580,7 +580,7 @@ class TripPlanModule {
 
     @clientExport
     static async getProjectList(options): Promise<FindResult> {
-        let projects = await Models.project.find({where: options});
+        let projects = await Models.project.find(options);
         return {ids: projects.map((p)=> {return p.id}), count: projects['total']};
     }
 
@@ -626,9 +626,9 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['tripPlanId'], ['tripDetailId'])
-    static async getTripPlanLogs(params) {
-        let {count, rows} = DBM.TripPlanLog.findAndCount({where: params});
-        return {ids: rows.map((row)=> {return row.id}), count: count};
+    static async getTripPlanLogs(options): Promise<FindResult> {
+        let paginate = await Models.tripPlan.find(options);
+        return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
     }
 
     /**
