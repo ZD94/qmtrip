@@ -17,10 +17,6 @@ export enum EAgencyStatus {
     ACTIVE = 1 //激活状态
 }
 
-export const AgencyError = {
-    AGENCY_NOT_FOUND: {code: -11, msg: '没有该代理商'}
-}
-
 export enum  EAgencyUserRole {
     OWNER = 0,
     COMMON = 1,
@@ -68,7 +64,7 @@ export class Agency extends ModelObject{
     set description(val: string) {}
 
     @Field({type: Types.INTEGER})
-    get status(): EAgencyStatus { return 0; }
+    get status(): EAgencyStatus { return EAgencyStatus.UN_ACTIVE; }
     set status(val: EAgencyStatus) {}
 
     @Field({type: Types.STRING(30)})
@@ -148,7 +144,7 @@ export class AgencyUser extends ModelObject{
     set id(val: string) {}
 
     @Field({type: Types.INTEGER})
-    get status(): EAgencyStatus { return 0; }
+    get status(): EAgencyStatus { return EAgencyStatus.UN_ACTIVE; }
     set status(val: EAgencyStatus) {}
 
     @Field({type: Types.STRING})
@@ -164,8 +160,8 @@ export class AgencyUser extends ModelObject{
     set avatar(val: string) {}
 
     @Field({type: Types.INTEGER})
-    get roleId(): EAgencyStatus { return 0; }
-    set roleId(val: EAgencyStatus) {}
+    get roleId(): EAgencyUserRole { return EAgencyUserRole.COMMON; }
+    set roleId(val: EAgencyUserRole) {}
 
     @ResolveRef({type: Types.UUID}, Models.agency)
     get agency(): Agency { return null; }

@@ -10,35 +10,21 @@ let utils = require('common/utils');
 let API = require('common/api');
 let Logger = require('common/logger');
 let logger = new Logger("tripPlan");
-let validate = require("common/validate");
 let config = require("../../config");
 import _ = require('lodash');
 import moment = require("moment");
 import {requireParams, clientExport} from 'common/api/helper';
-import {
-    Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, ETripType,
-    EAuditStaus
-} from "api/_types/tripPlan";
-import {Models} from "../_types/index";
-import async = Q.async;
+import {Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, ETripType, EAuditStaus } from "api/_types/tripPlan";
+import {Models} from "api/_types/index";
 import {FindResult} from "common/model/interface";
-import {Staff, EStaffRole, EStaffStatus} from "../_types/staff";
-import {conditionDecorator, condition, modelNotNull} from "../_decorator";
+import {Staff, EStaffRole, EStaffStatus} from "api/_types/staff";
+import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
+import {AgencyUser} from "../_types/agency";
 
 let TripDetailCols = TripDetail['$fieldnames'];
 let TripPlanCols = TripPlan['$fieldnames'];
 
-class IBudgetItem {
-    price: number
-    tripType: string
-    type: string
-    hotel: string
-}
-
 class TripPlanModule {
-    static TripPlanCols = TripPlanCols;
-    static TripDetailCols = TripDetailCols;
-
     // static async caculateTravelBudget(){
     //     let ret = await API.travelBudget.getTravelPolicyBudget({
     //         leaveDate: '2016-06-01',
@@ -56,6 +42,14 @@ class TripPlanModule {
     //     return ret;
     // }
 
+    /**
+     * @param params.budgetId 预算id
+     * @param params.title 项目名称
+     * @param params.description 出差事由
+     * @param params.remark 备注
+     * @param params
+     * @returns {TripPlan}
+     */
     @clientExport
     @requireParams(['budgetId', 'title'], ['description', 'remark'])
     static async saveTripPlan(params): Promise<TripPlan> {
@@ -69,7 +63,7 @@ class TripPlanModule {
         let {budgets, query} = budgetInfo;
         let project = await getProjectByName({companyId: staff.company.id, name: params.title, userId: staff.id, isCreate: true});
         let totalBudget = 0;
-        let tripPlan = Models.tripPlan.create(params);
+        let tripPlan = TripPlan.create(params);
 
         tripPlan['accountId'] = staff.id;
         tripPlan['companyId'] = staff.company.id;
@@ -379,6 +373,35 @@ class TripPlanModule {
         return true;
     }
 
+    @clientExport
+    @requireParams(['id', 'budget'])
+    @modelNotNull('tripDetail')
+    static async editTripDetailBudget(params: {id: string, budget: number}) {
+        let user = AgencyUser.getCurrent(); //代理商用户才能修改预算
+        let tripDetail = await Models.tripDetail.get(params.id);
+        let tripPlan = tripDetail.tripPlan;
+        tripDetail.budget = params.budget;
+        tripDetail.status = EPlanStatus.WAIT_UPLOAD;
+        await tripDetail.save();
+        let details = await tripPlan.getTripDetails({});
+        let budget = 0;
+
+        for(let i=0; i< details.length; i++) {
+            let detail = details[i];
+            if(detail.budget <= 0) {
+                budget = -1;
+                break;
+            }
+            budget = budget + detail.budget;
+        }
+
+        if(budget > 0 ) {
+            tripPlan.status = EPlanStatus.WAIT_UPLOAD;
+        }
+        tripPlan.budget = budget;
+        await tripPlan.save();
+        return true;
+    }
 
     @clientExport
     @requireParams(['tripDetailId', 'pictureFileId'])
@@ -584,7 +607,7 @@ class TripPlanModule {
     @clientExport
     @requireParams(['deptCity', 'arrivalCity', 'startAt', 'title', 'budgets'], ['backAt', 'remark', 'description'])
     static async saveTripPlanByTest(params: {deptCity: string, arrivalCity: string, startAt: string, title: string,
-        budgets: IBudgetItem[],backAt?: string, remark?: string, description?: string}): Promise<TripPlan> {
+        budgets: any[],backAt?: string, remark?: string, description?: string}): Promise<TripPlan> {
         let {accountId} = Zone.current.get('session');
         let staff = await Models.staff.get(accountId);
         let email = staff.email;
@@ -648,7 +671,6 @@ class TripPlanModule {
 
 async function getProjectByName(params) {
     let projects = await Models.project.find({where: {name: params.name}});
-    let project;
 
     if(projects && projects.length > 0) {
         return projects[0]
