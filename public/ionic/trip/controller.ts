@@ -275,8 +275,8 @@ export async function ListController($scope , Models){
 
     function loadTripPlan(pager) {
         pager.forEach(function(trip){
-            trip.startAt = moment(trip.startAt).toDate();
-            trip.backAt = moment(trip.backAt).toDate();
+            trip.startAt = moment(trip.startAt.value).toDate();
+            trip.backAt = moment(trip.backAt.value).toDate();
             $scope.tripPlans.push(trip);
         });
     }
