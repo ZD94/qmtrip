@@ -124,12 +124,12 @@ class AgencyModule {
      * @returns {Promise<string[]>}
      */
     @clientExport
-    static async listAgency(params?: any): Promise<FindResult>{
-        let agencies = await Models.agency.find({attributes: ['id']});
+    static async listAgency(): Promise<FindResult>{
+        let agencies = await Models.agency.find({});
 
         let ids =  agencies.map(function(agency) {
             return agency.id;
-        })
+        });
 
         return {ids: ids, count: agencies['total']}
     }
@@ -248,10 +248,13 @@ class AgencyModule {
      * @param options options.perPage 每页条数 options.page当前页
      */
     @clientExport
-    static async listAgencyUser(params) :Promise<FindResult> {
+    static async listAgencyUser(options) :Promise<FindResult> {
         let curUser = await AgencyUser.getCurrent();
-        params.agencyId = curUser.agency.id;
-        let agencyUsers = await Models.agencyUser.find({where: params, attributes: ['id']});
+        if(!options.where) {
+            options.where = {}
+        }
+        options.where.agencyId = curUser.agency.id;
+        let agencyUsers = await Models.agencyUser.find(options);
         let ids =  agencyUsers.map(function(agency) {
             return agency.id;
         })

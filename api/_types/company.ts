@@ -156,24 +156,16 @@ export class Company extends ModelObject{
         return Models.travelPolicy.find(query);
     }
 
-    getTripPlans(): Promise<TripPlan[]> {
-        let query;
-        if (isBrowser()) {
-            query = {companyId: this.id}
-        } else {
-            query = { where: {companyId: this.id}}
+    getTripPlans(options): Promise<TripPlan[]> {
+        if(!options.where) {
+            options.where = {};
         }
-        return Models.tripPlan.find(query);
+        options.where.companyId = this.id;
+        return Models.tripPlan.find(options);
     }
 
     getMoneyChanges(companyId?:string): Promise<MoneyChange[]> {
-        let query ;
-        if (isBrowser()) {
-            query = {fundsAccountId: companyId};
-        } else {
-            query = { where: {fundsAccountId: companyId}}
-        }
-        return Models.moneyChange.find(query);
+        return Models.moneyChange.find({where: {companyId: this.id}});
     }
 }
 
