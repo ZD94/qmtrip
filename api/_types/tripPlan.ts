@@ -192,32 +192,44 @@ export class TripPlan extends ModelObject {
     }
     setCompany(val: Company) {}
 
-    getOutTrip(id?: string): Promise<TripDetail[]> {
-        return Models.tripDetail.find({where: {tripPlanId: id||this.id, type: ETripType.OUT_TRIP}});
+    getOutTrip(): Promise<TripDetail[]> {
+        return Models.tripDetail.find({where: {tripPlanId: this.id, type: ETripType.OUT_TRIP}});
     }
 
-    getBackTrip(id?: string): Promise<TripDetail[]> {
-        return Models.tripDetail.find({where: {tripPlanId: id||this.id, type: ETripType.BACK_TRIP}});
+    getBackTrip(): Promise<TripDetail[]> {
+        return Models.tripDetail.find({where: {tripPlanId: this.id, type: ETripType.BACK_TRIP}});
     }
 
     getHotel(): Promise<TripDetail[]> {
         return Models.tripDetail.find({ where: {tripPlanId: this.id, type: ETripType.HOTEL}});
     }
     
-    getTripDetails(options: {where: any, limit?: number}): Promise<TripDetail[]> {
+    getTripDetails(options: {where?: any, limit?: number}): Promise<TripDetail[]> {
+        if(!options) {
+            options = {where: {}};
+        }
         if(!options.where) {
-            options.where = {}
+            options.where = {};
         }
         options.where.tripPlanId = this.id;
         return Models.tripDetail.find(options);
     }
 
-    auditTripPlan(params): Promise<boolean> {
-        params.id = this.id;
+    /**
+     * 审批人审批出差计划
+     * @param params
+     * @returns {Promise<boolean>}
+     */
+    audit(params: {auditResult: EAuditStatus, auditRemark?: string}): Promise<boolean> {
+        params['id'] = this.id;
         return API.tripPlan.auditTripPlan(params);
     }
 
-    commitTripPlan(): Promise<boolean> {
+    /**
+     * 提交出差计划
+     * @returns {Promise<boolean>}
+     */
+    commit(): Promise<boolean> {
         return API.tripPlan.commitTripPlan({id: this.id});
     }
 }

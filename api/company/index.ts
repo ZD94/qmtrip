@@ -227,10 +227,13 @@ class CompanyModule {
      * @returns {Promise<string[]>}
      */
     @clientExport
-    static async listMoneyChange(params: any): Promise<FindResult> {
+    static async listMoneyChange(options): Promise<FindResult> {
         let staff = await Staff.getCurrent();
-        params['companyId'] = staff.company.id;
-        let changes = await Models.moneyChange.find({where: params});
+        if(!options.where) {
+            options.where = {}
+        }
+        options.where.companyId = staff.company.id;
+        let changes = await Models.moneyChange.find(options);
         let ids =  changes.map((c) => c.id);
         return {ids: ids, count: changes['total']};
     }

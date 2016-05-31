@@ -51,7 +51,7 @@ class TripPlanModule {
      * @returns {TripPlan}
      */
     @clientExport
-    @requireParams(['budgetId', 'title'], ['description', 'remark'])
+    @requireParams(['budgetId', 'title', 'auditUser'], ['description', 'remark'])
     static async saveTripPlan(params): Promise<TripPlan> {
         let staff = await Staff.getCurrent();
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: params.budgetId});
@@ -102,9 +102,16 @@ class TripPlanModule {
                     detail.city = query.destinationPlace;
                     detail.hotelName = query.businessDistrict;
                     detail.startTime = query.checkInDate || query.leaveDate;
-                    detail.endTime = query.checkOutDate || query.leaveDate;
+                    detail.endTime = query.checkOutDate || query.goBackDate;
+                    break;
+                case ETripType.SUBSIDY:
+                    detail.deptCity = query.originPlace;
+                    detail.arrivalCity = query.destinationPlace;
+                    detail.startTime = query.leaveDate || query.checkInDate;
+                    detail.endTime = query.goBackDate || query.checkOutDate;
                     break;
                 default:
+                    detail.type = ETripType.OTHER;
                     detail.startTime = query.leaveDate;
                     detail.endTime = query.goBackDate;
                     break;
@@ -382,11 +389,18 @@ class TripPlanModule {
         let accountId = staff.id;
         let tripDetail = await Models.tripDetail.get(params.tripDetailId);
 
-        if (tripDetail.status === EPlanStatus.COMPLETE || tripDetail.status === EPlanStatus.AUDITING) {
-            throw {code: -3, msg: '审核中或已审核通过的票据不能上传!'};
+        if (tripDetail.status != EPlanStatus.WAIT_UPLOAD) {
+            throw {code: -3, msg: '该出差计划不能上传票据，请检查出差计划状态'};
         }
 
         let tripPlan = tripDetail.tripPlan;
+
+        if(tripPlan.auditStatus == EAuditStatus.AUDITING || tripPlan.auditStatus == EAuditStatus.NOT_PASS) {
+            throw {code: -4, msg: '该出差计划正在审批中或没有审批通过，不能上传票据'};
+        }else if(tripPlan.auditStatus == EAuditStatus.INVOICE_PASS) {
+            throw {code: -5, msg: '该出差计划已经审核完成，不能上传'};
+        }
+
         let invoiceJson: any = tripDetail.invoice || [];
         let times = invoiceJson.length ? invoiceJson.length + 1 : 1;
 
@@ -581,6 +595,7 @@ class TripPlanModule {
     }
 
     @clientExport
+    @requireParams(['where.companyId'], [''])
     static async getProjectList(options): Promise<FindResult> {
         let projects = await Models.project.find(options);
         return {ids: projects.map((p)=> {return p.id}), count: projects['total']};
@@ -627,7 +642,7 @@ class TripPlanModule {
     }
 
     @clientExport
-    @requireParams(['tripPlanId'], ['tripDetailId'])
+    @requireParams(['where.tripPlanId'], ['where.tripDetailId'])
     static async getTripPlanLogs(options): Promise<FindResult> {
         let paginate = await Models.tripPlan.find(options);
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}

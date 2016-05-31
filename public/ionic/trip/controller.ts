@@ -302,7 +302,7 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
     $scope.createdAt = moment(tripPlan.createAt).toDate();
     $scope.startAt = moment(tripPlan.startAt).toDate();
     $scope.backAt = moment(tripPlan.backAt).toDate();
-    let budgets: any[] = await Models.tripDetail.find({tripPlanId: id});
+    let budgets: any[] = await tripPlan.getTripDetails();
     let hotel;
     let goTraffic;
     let backTraffic;
