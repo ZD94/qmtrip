@@ -142,17 +142,15 @@ class CompanyModule {
      */
     @clientExport
     @requireParams([], ['where.status'])
-    static async listCompany(params): Promise<FindResult>{
+    static async listCompany(options): Promise<FindResult>{
         let agencyUser = await AgencyUser.getCurrent();
-        var options : any = {where: {agencyId: agencyUser.agency.id}, order: [['created_at', 'desc']]};
-
-        for(let key in params) {
-            options.where[key] = params[key];
+        options.order = options.order || [['created_at', 'desc']];
+        if(!options.where) {
+            options.where = {};
         }
+        options.where.agencyId = agencyUser.agency.id;
         let companies = await Models.company.find(options);
-        let ids = companies.map(function(c) {
-            return c.id;
-        })
+        let ids = companies.map((c) => c.id);
         return {ids: ids, count: companies['total']};
     }
     
@@ -229,12 +227,12 @@ class CompanyModule {
      * @returns {Promise<string[]>}
      */
     @clientExport
-    static async listMoneyChange(params: any): Promise<string[]> {
+    static async listMoneyChange(params: any): Promise<FindResult> {
         let staff = await Staff.getCurrent();
         params['companyId'] = staff.company.id;
         let changes = await Models.moneyChange.find({where: params});
-
-        return changes.map((c) => c.id);
+        let ids =  changes.map((c) => c.id);
+        return {ids: ids, count: changes['total']};
     }
 
 

@@ -126,11 +126,7 @@ class AgencyModule {
     @clientExport
     static async listAgency(): Promise<FindResult>{
         let agencies = await Models.agency.find({});
-
-        let ids =  agencies.map(function(agency) {
-            return agency.id;
-        });
-
+        let ids =  agencies.map((agency) => agency.id);
         return {ids: ids, count: agencies['total']}
     }
 
@@ -255,9 +251,7 @@ class AgencyModule {
         }
         options.where.agencyId = curUser.agency.id;
         let agencyUsers = await Models.agencyUser.find(options);
-        let ids =  agencyUsers.map(function(agency) {
-            return agency.id;
-        })
+        let ids =  agencyUsers.map((user) => user.id);
         return {ids: ids, count: agencyUsers['total']};
     }
 
