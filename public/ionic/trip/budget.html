@@ -38,6 +38,7 @@
                         <i ng-if='budget.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
                         <i ng-if='budget.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
                         <i ng-if='budget.type == EInvoiceType.HOTEL' class="icon ion-home"></i>
+                        <i ng-if='budget.type != (EInvoiceType.PLANE&&EInvoiceType.TRAIN&&EInvoiceType.HOTEL)'>-</i>
                         &nbsp;
                     {{trip.place}}
                     <br>{{budget.price}}元

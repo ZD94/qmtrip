@@ -14,7 +14,7 @@
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <div class="button-bar"></div>
         <ion-list>
-            <div style="margin-bottom: 10px">
+            <div style="margin-bottom: 10px" ng-if="goTraffic">
                 <ion-item class="item-divider">
                     <span>去程交通</span>
                     <span style="margin-left: 120px;">{{goTraffic.price}}</span>元
@@ -24,42 +24,42 @@
                     <br>
                     {{tripDetail.deptCity}}
                     &nbsp;
-                    <i ng-if='goTraffic.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
-                    <i ng-if='goTraffic.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
-                    <i ng-if='goTraffic.type == EInvoiceType.HOTEL' class="icon ion-home"></i>
-                    <i ng-if='goTraffic.type == EInvoiceType.OTHER'>-</i>
+                    <i ng-if='goTraffic.invoiceType == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                    <i ng-if='goTraffic.invoiceType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                    <i ng-if='goTraffic.invoiceType == EInvoiceType.HOTEL' class="icon ion-home"></i>
+                    <i ng-if='goTraffic.invoiceType == EInvoiceType.OTHER'>-</i>
                     &nbsp;
                     {{tripDetail.arrivalCity}}
                     <br>{{goTraffic.price}}元
                 </ion-item>
                 <div class="item item-divider">
-                    <div ng-if="!goTrafficStatus" class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="budget.title" done="goTraffic.done">
+                    <div ng-if="!goTrafficStatus" class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="goTraffic.title" done="goTraffic.done">
                         上传票据
                     </div>
                     <!--<a ng-if="goTrafficStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>-->
                     <span class="item-note">{{statustext[goTraffic.status]}}</span>
                 </div>
             </div>
-            <div style="margin-bottom: 10px">
+            <div style="margin-bottom: 10px" ng-if="backTraffic">
                 <ion-item class="item-divider">
                     <span>回程交通</span>
                     <span style="margin-left: 120px;">{{backTraffic.price}}</span>元
                 </ion-item>
                 <ion-item>
-                    <span>{{startAt | date: 'yyyy-MM-dd'}}</span>
+                    <span>{{backAt | date: 'yyyy-MM-dd'}}</span>
                     <br>
                     {{tripDetail.deptCity}}
                     &nbsp;
-                    <i ng-if='backTraffic.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
-                    <i ng-if='backTraffic.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
-                    <i ng-if='backTraffic.type == EInvoiceType.HOTEL' class="icon ion-home"></i>
-                    <i ng-if='backTraffic.type == EInvoiceType.OTHER'>-</i>
+                    <i ng-if='backTraffic.invoiceType == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                    <i ng-if='backTraffic.invoiceType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                    <i ng-if='backTraffic.invoiceType == EInvoiceType.HOTEL' class="icon ion-home"></i>
+                    <i ng-if='backTraffic.invoiceType == EInvoiceType.OTHER'>-</i>
                     &nbsp;
                     {{tripDetail.arrivalCity}}
                     <br>{{backTraffic.price}}元
                 </ion-item>
                 <div class="item item-divider">
-                    <div ng-if="!backTrafficStatus" class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="budget.title" done="backTraffic.done">
+                    <div ng-if="!backTrafficStatus" class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="backTraffic.title" done="backTraffic.done">
                         上传票据
                     </div>
                     <!--<a ng-if="backTrafficStatus" class="" ng-click="checkInvoice( 'backTraffic' )">查看票据</a>-->
@@ -72,15 +72,15 @@
                     <span style="margin-left: 120px;">{{hotel.price}}</span>元
                 </ion-item>
                 <ion-item>
-                    <span>{{startAt.toDateString() | date: 'yyyy-MM-dd'}}</span>
                     <span>{{startAt | date: 'yyyy-MM-dd'}}</span>
+                    <span>{{backAt | date: 'yyyy-MM-dd'}}</span>
                     <br>
                     {{tripDetail.deptCity}}
                     &nbsp;
-                    <i ng-if='hotel.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
-                    <i ng-if='hotel.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
-                    <i ng-if='hotel.type == EInvoiceType.HOTEL' class="icon ion-home"></i>
-                    <i ng-if='hotel.type == EInvoiceType.OTHER'>-</i>
+                    <i ng-if='hotel.invoiceType == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                    <i ng-if='hotel.invoiceType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                    <i ng-if='hotel.invoiceType == EInvoiceType.HOTEL' class="icon ion-home"></i>
+                    <i ng-if='hotel.invoiceType == EInvoiceType.OTHER'>-</i>
                     &nbsp;
                     {{tripDetail.arrivalCity}}
                     <br>{{hotel.price}}元
@@ -95,18 +95,19 @@
             </div>
             <div ng-if='other'>
                 <ion-item class="item-divider">
-                    <span>去程交通</span>
+                    <span>补助</span>
                     <span style="margin-left: 120px;">{{other.price}}</span>元
                 </ion-item>
                 <ion-item>
                     <span>{{startAt | date: 'yyyy-MM-dd'}}</span>
+                    <span>{{backAt | date: 'yyyy-MM-dd'}}</span>
                     <br>
                     {{tripDetail.deptCity}}
                     &nbsp;
-                    <i ng-if='other.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
-                    <i ng-if='other.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
-                    <i ng-if='other.type == EInvoiceType.HOTEL' class="icon ion-home"></i>
-                    <i ng-if='other.type == EInvoiceType.OTHER'>-</i>
+                    <i ng-if='other.invoiceType == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                    <i ng-if='other.invoiceType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                    <i ng-if='other.invoiceType == EInvoiceType.HOTEL' class="icon ion-home"></i>
+                    <i ng-if='other.invoiceType == EInvoiceType.OTHER'>-</i>
                     &nbsp;
                     {{tripDetail.arrivalCity}}
                     <br>{{other.price}}元

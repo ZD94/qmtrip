@@ -33,17 +33,21 @@ export async function DistributionController($scope) {
 
 export async function DepartmentController($scope, Models, $ionicPopup) {
     var staff = await Staff.getCurrent();
-    var departments = await staff.company.getDepartments();
-    $scope.departments = departments.map(function (department) {
-        var depart = {department: department, staffnum: 0};
-        return depart;
-    });
-    await Promise.all($scope.departments.map(async function (depart) {
-        console.info(depart);
-        var result = await depart.department.getStaffs();
-        depart.staffnum = result.length;
-        return depart;
-    }));
+    async function loadDepartment(){
+        var getdepartment = await staff.company.getDepartments();
+        var departments = getdepartment.map(function (department) {
+            var depart = {department: department, staffnum: 0};
+            return depart;
+        });
+        await Promise.all(departments.map(async function (depart) {
+            console.info(depart);
+            var result = await depart.department.getStaffs();
+            depart.staffnum = result.length;
+            return depart;
+        }));
+        return departments;
+    }
+    $scope.departments = await loadDepartment();
     var newdepartment = $scope.newdepartment = Department.create();
     $scope.newdepart = function () {
         var nshow = $ionicPopup.show({
@@ -57,11 +61,12 @@ export async function DepartmentController($scope, Models, $ionicPopup) {
                 {
                     text: '保存',
                     type: 'button-positive',
-                    onTap: function (e) {
+                    onTap: async function (e) {
                         if (!$scope.newdepartment.name) {
                             e.preventDefault();
                         } else {
-                            $scope.newdepartment.save();
+                            await $scope.newdepartment.save();
+                            $scope.departments = await loadDepartment();
                             // $route.reload();
                         }
                     }
@@ -118,7 +123,7 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
         if (_staff.travelPolicyId && _staff.travelPolicyId.id) {
             _staff.travelPolicyId = _staff.travelPolicyId.id;
         }
-        console.info(role, $scope.role);
+        console.info(_staff);
         if ($scope.role && $scope.role.id == true) {
             _staff.roleId = EStaffRole.ADMIN;
         } else {
@@ -157,7 +162,6 @@ export async function TravelpolicyController($scope, Models, $location) {
     $scope.editpolicy = async function (id) {
         var travelpolicy = await Models.travelPolicy.get(id);
         $location.path('/company/editpolicy').search({'policyId': id}).replace();
-        console.info(travelpolicy);
     }
 }
 
@@ -190,7 +194,6 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         $ionicHistory.goBack(-1);
     }
     $scope.consoles = function (obj) {
-        console.info("aaaaaaa");
         console.info(obj);
     }
 }
