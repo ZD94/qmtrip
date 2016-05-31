@@ -267,7 +267,7 @@ export async function ListController($scope , Models){
     }
 }
 
-export async function ListdetailController($scope , Models, $stateParams ,FileUploader ,$state){
+export async function ListDetailController($scope , Models, $stateParams ,FileUploader ,$state){
     require('./listdetail.less');
     var staff = await Staff.getCurrent();
     let id = $stateParams.tripid;
@@ -283,7 +283,7 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
     let backTraffic;
     let other;
     $scope.hotelStatus = false;
-    $scope.goTrafficStatus = false;|
+    $scope.goTrafficStatus = false;
     $scope.backTrafficStatus = false;
     $scope.otherStatus = false;
     let statusTxt = {};
