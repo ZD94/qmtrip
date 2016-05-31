@@ -435,6 +435,11 @@ class TripPlanModule {
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
     static async commitTripPlan(params: {id: string}): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
+
+        if(tripPlan.status != EPlanStatus.WAIT_COMMIT) {
+            throw {code: -2, msg: "该出差计划不能提交，请检查状态"};
+        }
+
         let tripDetails = await tripPlan.getTripDetails({where: {}});
 
         if(tripDetails && tripDetails.length > 0) {
