@@ -255,7 +255,7 @@ export async function ListController($scope , Models){
     }
 
     $scope.enterdetail = function(tripid){
-        window.location.href = "#/trip/listdetail?tripid="+tripid;
+        window.location.href = "#/trip/list-detail?tripid="+tripid;
     }
 
     function loadTripPlan(pager) {
@@ -273,7 +273,6 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
     let id = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(id);
     $scope.tripDetail = tripPlan;
-    console.info(tripPlan);
     $scope.createdAt = moment(tripPlan.createAt).toDate();
     $scope.startAt = moment(tripPlan.startAt).toDate();
     $scope.backAt = moment(tripPlan.backAt).toDate();
