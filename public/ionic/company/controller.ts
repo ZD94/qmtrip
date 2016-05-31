@@ -39,7 +39,6 @@ export async function DepartmentController($scope, Models, $ionicPopup) {
         return depart;
     });
     await Promise.all($scope.departments.map(async function (depart) {
-        console.info(depart);
         var result = await depart.department.getStaffs();
         depart.staffnum = result.length;
         return depart;

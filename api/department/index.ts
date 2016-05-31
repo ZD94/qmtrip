@@ -147,22 +147,22 @@ class DepartmentModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["companyId"],departmentCols)
+    @requireParams(["where.companyId"], departmentCols.map((v) => 'where.'+ v))
     @conditionDecorator([
-        {if: condition.isCompanyAdminOrOwner("0.companyId")},
-        {if: condition.isCompanyAgency("0.companyId")}
+        {if: condition.isCompanyAdminOrOwner("where.companyId")},
+        {if: condition.isCompanyAgency("where.companyId")}
     ])
     static async getDepartments(params) :Promise<FindResult>{
         let { accountId } = Zone.current.get("session");
         var staff = await Staff.getCurrent();
 
         var options : any = {};
-        options.where = _.pick(params, Object.keys(DBM.Department.attributes));
+        options.where = _.pick(params.where, Object.keys(DBM.Department.attributes));
         if(params.$or) {
-            options.where.$or = params.$or;
+            options.where.$or = params.where.$or;
         }
         if(options.columns){
-            options.attributes = params.columns;
+            options.attributes = params.attributes;
         }
         options.order = params.order || "created_at desc";
 

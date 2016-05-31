@@ -166,10 +166,11 @@ class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["companyId"],['columns','name', 'planeLevel', 'planeDiscount', 'trainLevel', 'hotelLevel', 'hotelPrice', 'companyId', 'isChangeLevel', 'createdAt'])
+    @requireParams(["where.companyId"],['attributes','where.name', 'where.planeLevel', 'where.planeDiscount',
+        'where.trainLevel', 'where.hotelLevel', 'where.hotelPrice', 'where.companyId', 'where.isChangeLevel', 'where.createdAt'])
     @conditionDecorator([
-        {if: condition.isCompanyAdminOrOwner("0.companyId")},
-        {if: condition.isCompanyAgency("0.companyId")}
+        {if: condition.isCompanyAdminOrOwner("where.companyId")},
+        {if: condition.isCompanyAgency("where.companyId")}
     ])
     static async getTravelPolicies(params): Promise<FindResult>{
         var staff = await Staff.getCurrent();

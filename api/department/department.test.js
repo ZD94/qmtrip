@@ -111,7 +111,7 @@ describe("api/department.js", function() {
 
 //根据条件查询部门集合
         it("#getDepartments should be ok", function (done) {
-            API.department.getDepartments({companyId: companyId}, done);
+            API.department.getDepartments({ where: {companyId: companyId}}, done);
         })
 
 //更新部门信息
@@ -205,7 +205,7 @@ describe("api/department.js", function() {
 
 //根据条件查询部门集合
         it("#agencyGetDepartments should be ok", function (done) {
-            API.department.getDepartments({companyId: companyId}, done);
+            API.department.getDepartments({ whre: {companyId: companyId}}, done);
         })
 
 //更新部门信息

@@ -113,7 +113,7 @@ describe("api/staff.js", function() {
 
         //根据条件查询员工集合
         it("#getStaffs should be ok", function(done) {
-            API.staff.getStaffs({companyId: companyId}, done);
+            API.staff.getStaffs({where: {companyId: companyId}}, done);
         })
 
         //更新员工信息
@@ -203,7 +203,7 @@ describe("api/staff.js", function() {
 
         //根据条件查询员工集合
         it("#AgencyGetStaffs should be ok", function(done) {
-            API.staff.getStaffs({name: "123", companyId: companyId}, done);
+            API.staff.getStaffs({ where: {name: "123", companyId: companyId}}, done);
         })
 
         //更新员工信息
