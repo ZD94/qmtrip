@@ -1,52 +1,26 @@
 <ion-view title="待我审批" id="page3">
     <ion-content padding="true" class="has-header">
-        <div class="list card">
-            <div class="item item-divider">2016-05-23 至 2016-05-28</div>
+        <div class="list card" ng-repeat="trip in tripPlans track by trip.id">
+            <div class="item item-divider">{{trip.startAt.value | date: 'yyyy-MM-dd'}} 至 {{trip.backAt.value | date: 'yyyy-MM-dd'}}</div>
             <div class="item item-body">
                 <ion-list>
                     <ion-item class="item-thumbnail-left">
                         <img>
-                        <h2>王鹏 13810529805</h2>
+                        <h2>{{trip.account.name}} {{trip.account.mobile}}</h2>
                         <p></p>
                     </ion-item>
-                    <ion-item>北京 到 武汉 武汉科技大学附近
-                        <br>出差事由：武汉极地海洋公园项目启动会</ion-item>
+                    <ion-item>{{trip.deptCity}} 到 {{trip.arrivalCity}}
+                        <br>出差事由：{{trip.title}}</ion-item>
                 </ion-list>
             </div>
-            <div class="item item-divider">待审批&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3059元</div>
-        </div>
-        <div class="list card">
-            <div class="item item-divider">2016-05-23 至 2016-05-28</div>
-            <div class="item item-body">
-                <ion-list>
-                    <ion-item class="item-thumbnail-left">
-                        <img>
-                        <h2>王鹏 13810529805</h2>
-                        <p></p>
-                    </ion-item>
-                    <ion-item>北京 到 武汉 武汉科技大学附近
-                        <br>出差事由：武汉极地海洋公园项目启动会</ion-item>
-                </ion-list>
+            <div class="item item-divider">
+                待审批
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                {{trip.budget}}元
             </div>
-            <div class="item item-divider">已拒绝&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3059元</div>
         </div>
-        <div class="list card">
-            <div class="item item-divider">2016-05-23 至 2016-05-28</div>
-            <div class="item item-body">
-                <ion-list>
-                    <ion-item class="item-thumbnail-left">
-                        <img>
-                        <h2>王鹏 13810529805</h2>
-                        <p></p>
-                    </ion-item>
-                    <ion-item>北京 到 武汉 武汉科技大学附近
-                        <br>出差事由：武汉极地海洋公园项目启动会</ion-item>
-                </ion-list>
-            </div>
-            <div class="item item-divider">审批通过&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3059元</div>
-        </div>
-        <div id="page3-markdown6" style="color:#000000;">
-            <p>没有更多记录了</p>
-        </div>
+        <!--<div id="page3-markdown6" style="color:#000000;">-->
+            <!--<p>没有更多记录了</p>-->
+        <!--</div>-->
     </ion-content>
 </ion-view>

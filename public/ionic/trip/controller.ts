@@ -192,7 +192,8 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         });
 
         try {
-            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason})
+            let staff = await Staff.getCurrent();
+            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason, auditUser: staff.id})
             window.location.href = '#/trip/committed?id='+planTrip.id;
         } catch(err) {
             alert(err.msg || err);
@@ -260,8 +261,8 @@ export async function ListController($scope , Models){
 
     function loadTripPlan(pager) {
         pager.forEach(function(trip){
-            trip.startAt = moment(trip.startAt).toDate();
-            trip.backAt = moment(trip.backAt).toDate();
+            trip.startAt = moment(trip.startAt.value).toDate();
+            trip.backAt = moment(trip.backAt.value).toDate();
             $scope.tripPlans.push(trip);
         });
     }
