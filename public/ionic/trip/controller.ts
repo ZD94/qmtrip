@@ -216,40 +216,15 @@ export async function CommittedController($scope, $stateParams, Models){
 export async function DetailController($scope, $stateParams, Models){
     let id = $stateParams.id;
     let tripPlan = await Models.tripPlan.get(id);
-    let budgets: any[] = await Models.tripDetail.find({tripPlanId: id});
+    let budgets: any[] = await Models.tripDetail.find({where: {tripPlanId: id}});
     $scope.createdAt = moment(tripPlan.createAt).toDate();
     $scope.startAt = moment(tripPlan.startAt).toDate();
     $scope.backAt = moment(tripPlan.backAt).toDate();
-    // budgets = budgets.map(function(budget) {
-    //     let tripType = 'other';
-    //     if (budget.type == 0) {
-    //         tripType = 'goTraffic'
-    //     }
-    //     if (budget.type == 1) {
-    //         tripType = 'backTraffic';
-    //     }
-    //     if (budget.type == 2) {
-    //         tripType = 'hotel';
-    //     }
-    //     let type = 'air';
-    //     if (budget.invoiceType == 0) {
-    //         type = 'train';
-    //     }
-    //     if (budget.invoiceType == 2) {
-    //         type = 'hotel';
-    //     }
-    //     if (budget.invoiceType == 3) {
-    //         type = 'other';
-    //     }
-    //     return {id: budget.id, price: budget.budget, tripType: tripType, type: type}
-    // })
 
     $scope.trip = tripPlan.target;
     $scope.budgets = budgets;
     $scope.EInvoiceType = EInvoiceType;
     $scope.ETripType = ETripType;
-    console.info(budgets);
-    console.info(ETripType);
 }
 
 export async function ListController($scope , Models){
