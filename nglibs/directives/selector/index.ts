@@ -39,7 +39,7 @@ async function showSelectorModal($scope, $ionicModal, selected) {
     $scope.showCreate = function(){
         if(optionsCreator == undefined)
             return false;
-        if(form.keyword.length == 0)
+        if(!form.keyword || form.keyword.length == 0)
             return false;
         if($scope.options.indexOf(form.keyword) >= 0)
             return false;
@@ -49,7 +49,14 @@ async function showSelectorModal($scope, $ionicModal, selected) {
     return new Promise(function(resolve, reject) {
         $scope.confirmModal = function() {
             $scope.modal.hide();
-            resolve($scope.form.selected);
+            let result;
+            $scope.options.forEach((v) => {
+                if (v.value == $scope.form.selected) {
+                    result = v;
+                    return;
+                }
+            })
+            resolve(result);
         }
         $scope.cancelModal = function() {
             $scope.modal.hide();
@@ -72,14 +79,17 @@ angular
                 placeholder: '@ngSelectorPlaceholder',
                 getOptionsLoader: '&ngSelectorQuery',
                 getOptionsCreator: '&ngSelectorCreate',
+                done: '=ngSelectorDone'
             },
-            controller: function($scope, $element, $ionicModal) {
+            controller: function($scope, $element, $ionicModal, $attrs) {
                 $element.focus(async function() {
-                    var value = await showSelectorModal($scope, $ionicModal, $scope.value)
+                    var value: any = await showSelectorModal($scope, $ionicModal, $scope.value)
                     if(value == undefined)
                         return;
-                    console.log(value);
-                    $scope.value = value;
+                    if ($scope.done && typeof $scope.done == 'function') {
+                        $scope.value = value.name;
+                        return $scope.done(value);
+                    }
                 })
             }
         }

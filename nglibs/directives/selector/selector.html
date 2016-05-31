@@ -8,8 +8,8 @@
             <ion-radio ng-model="form.selected" ng-value="form.keyword" ng-click="confirmModal()" ng-if="showCreate()">
                 新项目: {{form.keyword}}
             </ion-radio>
-            <ion-radio ng-repeat="option in options track by $index" ng-model="form.selected" ng-value="option" ng-click="confirmModal()">
-                {{option}}
+            <ion-radio ng-repeat="option in options track by $index" ng-model="form.selected" ng-value="option.value ? option.value : option" ng-click="confirmModal()">
+                {{option.name ? option.name : option}}
             </ion-radio>
         </form>
     </ion-content>

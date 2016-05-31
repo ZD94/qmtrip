@@ -72,7 +72,7 @@ export function CreateController($scope, $storage, $ionicLoading){
 
     $scope.queryPlaces = async function(keyword){
         var places = await API.place.queryPlace({keyword: keyword});
-        return places.map((place)=>place.name);
+        return places.map((place)=> {return {name: place.name, value: place.id} });
     }
 
     $scope.queryHotelPlace = async function(keyword) {
@@ -80,15 +80,15 @@ export function CreateController($scope, $storage, $ionicLoading){
         if (keyword && city) {
             let cityInfo = await API.place.getCityInfo({cityCode: city});
             var hotelPlaces = await API.place.queryBusinessDistrict({keyword: keyword, code: cityInfo.id})
-            return hotelPlaces.map((p)=> p.name);
+            return hotelPlaces.map((p)=> { return { name: p.name, value: p.id} });
         }
         return [];
     }
-
+    
     $scope.queryProjects = async function(keyword){
         var staff = await Staff.getCurrent();
         var projects = await Models.project.find({where:{companyId: staff.company.id}});
-        return projects.map((project)=>project.name);
+        return projects.map((project)=>{ return {name: project.name, value: project.id}} );
     }
     $scope.createProject = async function(name){
     }
@@ -138,6 +138,20 @@ export function CreateController($scope, $storage, $ionicLoading){
             alert(err.msg || err);
         }
     }
+
+    $scope.choosePlace = function(val) {
+        $scope.trip.place = val.value;
+    }
+    $scope.chooseFromPlace = function(val) {
+        $scope.trip.fromPlace = val.value;
+    }
+    $scope.chooseHotelPlace = function(val) {
+        $scope.trip.hotelPlace = val.value;
+    }
+    $scope.chooseReason = function(val) {
+        $scope.trip.reason = val.name;
+        console.info($scope.trip.reason);
+    }
 }
 
 export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading){
@@ -174,25 +188,26 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     API.require("tripPlan");
     await API.onload();
 
-
+    //选择审核人
+    $scope.queryStaffs = async function(keyword) {
+        let staff = await Staff.getCurrent();
+        let staffs = await staff.company.getStaffs();
+        return staffs.map((p) =>{ return  {name: p.name, value: p.id}} );
+    }
+    //选择完成后的回调
+    $scope.chooseAuditUser = function(value) {
+        console.info("调用回调", value);
+        trip.auditUser = value.value;
+    }
 
     $scope.saveTripPlan = async function() {
-        let params = {
-            deptCity: trip.fromPlace,
-            arrivalCity: trip.place,
-            startAt: trip.beginDate,
-            backAt: trip.endDate,
-            title: trip.reason,
-            remark: trip.reason,
-            budgets: budgets,
-        }
         await $ionicLoading.show({
             template: "保存中...",
             hideOnStateChange: true
         });
 
         try {
-            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason})
+            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason, auditUser: trip.auditUser})
             window.location.href = '#/trip/committed?id='+planTrip.id;
         } catch(err) {
             alert(err.msg || err);
