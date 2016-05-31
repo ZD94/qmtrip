@@ -141,7 +141,7 @@ class CompanyModule {
      * @returns {Promise<string[]>}
      */
     @clientExport
-    @requireParams([], ['status'])
+    @requireParams([], ['where.status'])
     static async listCompany(params): Promise<FindResult>{
         let agencyUser = await AgencyUser.getCurrent();
         var options : any = {where: {agencyId: agencyUser.agency.id}, order: [['created_at', 'desc']]};

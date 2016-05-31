@@ -100,9 +100,12 @@ export class Staff extends ModelObject implements Account {
     }
     setTravelPolicy(val: TravelPolicy) {}
 
-    getTripPlans(): Promise<TripPlan[]| Pager<TripPlan>> {
-        let query = {where: {accountId: this.id}}
-        return Models.tripPlan.find(query);
+    getTripPlans(options: {where?: any, limit?: number}): Promise<TripPlan[]| Pager<TripPlan>> {
+        if(!options.where) {
+            options.where = {}
+        }
+        options.where.accountId = this.id;
+        return Models.tripPlan.find(options);
     }
     
     //Account properties:
