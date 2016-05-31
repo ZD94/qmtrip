@@ -101,6 +101,9 @@ export class Staff extends ModelObject implements Account {
     setTravelPolicy(val: TravelPolicy) {}
 
     getTripPlans(options: {where?: any, limit?: number}): Promise<TripPlan[]| Pager<TripPlan>> {
+        if (!options) {
+            options = {};
+        }
         if(!options.where) {
             options.where = {}
         }

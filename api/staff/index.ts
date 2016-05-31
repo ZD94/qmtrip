@@ -353,6 +353,10 @@ class StaffModule{
         let staff = await Staff.getCurrent();
 
         let { accountId } = Zone.current.get("session");
+        if (!params.where) {
+            params.where = {};
+        }
+
         if(staff){
             params.where.companyId = staff["companyId"];
         }else{
