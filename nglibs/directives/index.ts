@@ -1,4 +1,4 @@
-
+import './focus';
 import './history';
 import './airinfo';
 import './wheelpicker';
@@ -7,4 +7,3 @@ import './select';
 import './selector';
 import './icon';
 import './uploader';
-

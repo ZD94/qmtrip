@@ -8,7 +8,8 @@ async function showSelectorModal($scope, $ionicModal, selected) {
     var template = require('./selector.html');
     $scope.modal = $ionicModal.fromTemplate(template, {
         scope: $scope,
-        animation: 'slide-in-up'
+        animation: 'slide-in-up',
+        focusFirstInput: true
     });
     $scope.$on('$destroy', function() {
         $scope.modal.remove();
