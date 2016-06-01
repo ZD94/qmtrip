@@ -124,7 +124,8 @@ export function CreateController($scope, $storage, $ionicLoading){
         let timer = setInterval(async function() {
             let template = '正在搜索' + front[idx++]+'...'
             if (idx >= front.length) {
-                idx = 0;
+                clearInterval(idx);
+                return;
             }
             await $ionicLoading.show({
                 template: template,
@@ -172,6 +173,10 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     trip.beginDate = result.query.leaveDate;
     trip.endDate  = result.query.goBackDate;
     trip.createAt = new Date(result.createAt);
+    let originPlace = await API.place.getCityInfo({cityCode: result.query.originPlace});
+    trip.originPlaceName = originPlace.name;
+    let destination = await API.place.getCityInfo({cityCode: result.query.destinationPlace});
+    trip.destinationPlaceName = destination.name;
     $scope.trip = trip;
     //补助,现在是0,后续可能会直接加入到预算中
     let totalPrice: number = 0;
