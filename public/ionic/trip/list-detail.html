@@ -123,12 +123,12 @@
         </ion-list>
         <div class="button-bar"></div>
         <div class="button-bar"></div>
-        <div ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS|| tripDetail.status == EPlanStatus.WAIT_APPROVE">
+        <div ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS|| tripDetail.status == EPlanStatus.WAIT_COMMIT">
             <a ng-click="approveTripPlan()" id="page20-button60" class="button button-positive  button-block" no-back>提交审核</a>
         </div>
 
-        <div ng-if="tripDetail.status != EPlanStatus.APPROVE_NOT_PASS && tripDetail.status != EPlanStatus.WAIT_APPROVE">
-            <span class="button button-stable button-block" no-back>{{statustext[tripDetailId['status']]}}</span>
+        <div ng-if="tripDetail.status != EPlanStatus.APPROVE_NOT_PASS && tripDetail.status != EPlanStatus.WAIT_COMMIT">
+            <span class="button button-stable button-block" no-back>{{statustext[tripDetailId['status']] || '审核中'}}</span>
         </div>
     </ion-content>
 </ion-view>
