@@ -9,7 +9,7 @@
                 新项目: {{form.keyword}}
             </ion-radio>
             <ion-radio ng-repeat="option in options track by $index" ng-model="form.selected" ng-value="option" ng-click="confirmModal()">
-                {{option}}
+                {{option.name ? option.name : option}}
             </ion-radio>
         </form>
     </ion-content>

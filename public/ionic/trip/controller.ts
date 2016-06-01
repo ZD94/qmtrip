@@ -72,25 +72,30 @@ export function CreateController($scope, $storage, $ionicLoading){
 
     $scope.queryPlaces = async function(keyword){
         var places = await API.place.queryPlace({keyword: keyword});
-        return places.map((place)=>place.name);
+        return places.map((place)=> {return {name: place.name, value: place.id} });
     }
 
     $scope.queryHotelPlace = async function(keyword) {
         let city = $scope.trip.place;
-        if (keyword && city) {
-            let cityInfo = await API.place.getCityInfo({cityCode: city});
-            var hotelPlaces = await API.place.queryBusinessDistrict({keyword: keyword, code: cityInfo.id})
-            return hotelPlaces.map((p)=> p.name);
+        if (city) {
+            let cityId: any = city;
+            if (!/^CT_\d+$/.test(city)) {
+                city = await API.place.getCityInfo({cityCode: city});
+                cityId = city.id;
+            }
+            var hotelPlaces = await API.place.queryBusinessDistrict({keyword: keyword, code: cityId})
+            return hotelPlaces.map((p)=> { return { name: p.name, value: p.id} });
         }
         return [];
     }
-
+    
     $scope.queryProjects = async function(keyword){
         var staff = await Staff.getCurrent();
         var projects = await Models.project.find({where:{companyId: staff.company.id}});
-        return projects.map((project)=>project.name);
+        return projects.map((project)=>{ return {name: project.name, value: project.id}} );
     }
     $scope.createProject = async function(name){
+        console.info("function createProject...");
     }
 
     $scope.nextStep = async function() {
@@ -119,7 +124,7 @@ export function CreateController($scope, $storage, $ionicLoading){
         let timer = setInterval(async function() {
             let template = '正在搜索' + front[idx++]+'...'
             if (idx >= front.length) {
-                idx = 0;
+                clearInterval(timer);
             }
             await $ionicLoading.show({
                 template: template,
@@ -129,14 +134,28 @@ export function CreateController($scope, $storage, $ionicLoading){
 
         try {
             let budget = await API.travelBudget.getTravelPolicyBudget(params);
-            clearTimeout(timer);
             await $ionicLoading.hide()
+            clearInterval(timer);
             window.location.href = "#/trip/budget?id="+budget;
         } catch(err) {
             clearTimeout(timer);
             await $ionicLoading.hide()
             alert(err.msg || err);
         }
+    }
+
+    $scope.choosePlace = function(val) {
+        $scope.trip.place = val.value;
+    }
+    $scope.chooseFromPlace = function(val) {
+        $scope.trip.fromPlace = val.value;
+    }
+    $scope.chooseHotelPlace = function(val) {
+        $scope.trip.hotelPlace = val.value;
+    }
+    $scope.chooseReason = function(val) {
+        $scope.trip.reason = val.name ? val.name: val;
+        console.info($scope.trip.reason);
     }
 }
 
@@ -153,6 +172,10 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     trip.beginDate = result.query.leaveDate;
     trip.endDate  = result.query.goBackDate;
     trip.createAt = new Date(result.createAt);
+    let originPlace = await API.place.getCityInfo({cityCode: result.query.originPlace});
+    trip.originPlaceName = originPlace.name;
+    let destination = await API.place.getCityInfo({cityCode: result.query.destinationPlace});
+    trip.destinationPlaceName = destination.name;
     $scope.trip = trip;
     //补助,现在是0,后续可能会直接加入到预算中
     let totalPrice: number = 0;
@@ -174,25 +197,26 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     API.require("tripPlan");
     await API.onload();
 
-
+    //选择审核人
+    $scope.queryStaffs = async function(keyword) {
+        let staff = await Staff.getCurrent();
+        let staffs = await staff.company.getStaffs();
+        return staffs.map((p) =>{ return  {name: p.name, value: p.id}} );
+    }
+    //选择完成后的回调
+    $scope.chooseAuditUser = function(value) {
+        console.info("调用回调", value);
+        trip.auditUser = value.value;
+    }
 
     $scope.saveTripPlan = async function() {
-        let params = {
-            deptCity: trip.fromPlace,
-            arrivalCity: trip.place,
-            startAt: trip.beginDate,
-            backAt: trip.endDate,
-            title: trip.reason,
-            remark: trip.reason,
-            budgets: budgets,
-        }
         await $ionicLoading.show({
             template: "保存中...",
             hideOnStateChange: true
         });
 
         try {
-            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason})
+            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason, auditUser: trip.auditUser})
             window.location.href = '#/trip/committed?id='+planTrip.id;
         } catch(err) {
             alert(err.msg || err);
@@ -255,29 +279,28 @@ export async function ListController($scope , Models){
     }
 
     $scope.enterdetail = function(tripid){
-        window.location.href = "#/trip/listdetail?tripid="+tripid;
+        window.location.href = "#/trip/list-detail?tripid="+tripid;
     }
 
     function loadTripPlan(pager) {
         pager.forEach(function(trip){
-            trip.startAt = moment(trip.startAt).toDate();
-            trip.backAt = moment(trip.backAt).toDate();
+            trip.startAt = moment(trip.startAt.value).toDate();
+            trip.backAt = moment(trip.backAt.value).toDate();
             $scope.tripPlans.push(trip);
         });
     }
 }
 
-export async function ListdetailController($scope , Models, $stateParams ,FileUploader ,$state){
+export async function ListDetailController($scope , Models, $stateParams ,FileUploader ,$state){
     require('./listdetail.less');
     var staff = await Staff.getCurrent();
     let id = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(id);
     $scope.tripDetail = tripPlan;
-    console.info(tripPlan);
     $scope.createdAt = moment(tripPlan.createAt).toDate();
     $scope.startAt = moment(tripPlan.startAt).toDate();
     $scope.backAt = moment(tripPlan.backAt).toDate();
-    let budgets: any[] = await Models.tripDetail.find({where: {tripPlanId: id}});
+    let budgets: any[] = await tripPlan.getTripDetails();
     let hotel;
     let goTraffic;
     let backTraffic;
@@ -295,7 +318,7 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
     statusTxt[EPlanStatus.COMPLETE] = "审核完，已完成状态";
     $scope.statustext = statusTxt;
     $scope.EInvoiceType = EInvoiceType;
-    console.info(EInvoiceType);
+    $scope.EPlanStatus = EPlanStatus;
     budgets.map(function(budget) {
         let tripType: ETripType = ETripType.OTHER;
         let title = '补助'
@@ -390,9 +413,12 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
     $scope.backtraffic_up = '&#xe90e;<em>回程</em><strong>交通票据</strong>';
 
     $scope.approveTripPlan = async function() {
-        console.info("click me....")
-        let ret = await API.tripPlan.commitTripPlan({id: id});
-        alert('提交成功')
-        window.location.href="#/trip/list"
+        try {
+            await API.tripPlan.commitTripPlan({id: id});
+            alert('提交成功')
+            window.location.href="#/trip/list"
+        }catch(e) {
+            alert(e.msg || e);
+        }
     }
 }

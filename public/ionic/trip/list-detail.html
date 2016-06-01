@@ -121,51 +121,14 @@
                 </div>
             </div>
         </ion-list>
-        <!--<ion-list>-->
-            <!--<div ng-repeat="budget in budgets">-->
-                <!--<ion-item class="item-divider">-->
-                    <!--<span ng-if='budget.tripType == "goTraffic"'>去程交通</span>-->
-                    <!--<span ng-if='budget.tripType == "backTraffic"'>回程交通</span>-->
-                    <!--<span ng-if='budget.tripType == "hotel"'>住宿</span>-->
-                    <!--<span ng-if='budget.tripType == "other" '>其他补助</span>-->
-                    <!--<span style="margin-left: 120px;">{{budget.price}}</span>元-->
-                <!--</ion-item>-->
-                <!--<ion-item>-->
-                    <!--<span ng-if='budget.tripType == "goTraffic"'>{{tripDetail.startAt | date: 'yyyy-MM-dd'}}</span>-->
-                    <!--<span ng-if='budget.tripType == "backTraffic"'>{{tripDetail.backAt | date: 'yyyy-MM-dd'}}</span>-->
-                    <!--<span ng-if='budget.tripType == "hotel"'>-->
-                        <!--{{tripDetail.startAt | date: 'yyyy-MM-dd'}}至{{tripDetail.backAt | date: 'yyyy-MM-dd'}}-->
-                    <!--</span>-->
-                    <!--<span ng-if='budget.tripType == "other"'>-->
-                        <!--{{tripDetail.startAt | date: 'yyyy-MM-dd'}}至{{tripDetail.backAt | date: 'yyyy-MM-dd'}}-->
-                    <!--</span>-->
-                    <!--<br>-->
-                    <!--{{tripDetail.deptCity}}-->
-                    <!--&nbsp;-->
-                    <!--<i ng-if='budget.type == "air"' class="icon ion-plane"></i>-->
-                    <!--<i ng-if='budget.type == "train"' class="icon ion-android-train"></i>-->
-                    <!--<i ng-if='budget.type == "hotel"' class="icon ion-home"></i>-->
-                    <!--<i ng-if='budget.type == "other"'>-</i>-->
-                    <!--&nbsp;-->
-                    <!--{{tripDetail.arrivalCity}}-->
-                    <!--<br>{{budget.price}}元-->
-                <!--</ion-item>-->
-                <!--<div class="item item-divider">-->
-                    <!--{{budget.title}}-->
-                    <!--<div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="budget.title" done="budget.done">-->
-                        <!--我是谁-->
-                    <!--</div>-->
-                    <!--<a class="" ng-if="-->
-                        <!--ITEM.outTraffic[0].orderStatus==='WAIT_COMMIT'||-->
-                        <!--ITEM.outTraffic[0].orderStatus==='WAIT_AUDIT'||-->
-                        <!--ITEM.outTraffic[0].orderStatus==='AUDIT_NOT_PASS'||-->
-                        <!--ITEM.outTraffic[0].orderStatus==='AUDIT_PASS'  " ng-click="checkInvoice( 'outTraffic' )">查看票据</a>-->
-                    <!--<span class="item-note">{{tripDetail.status}}</span>-->
-                <!--</div>-->
-            <!--</div>-->
-        <!--</ion-list>-->
         <div class="button-bar"></div>
         <div class="button-bar"></div>
-        <a ng-click="approveTripPlan()" id="page20-button60" class="button button-stable  button-block" no-back>提交审核</a>
+        <div ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS|| tripDetail.status == EPlanStatus.WAIT_COMMIT">
+            <a ng-click="approveTripPlan()" id="page20-button60" class="button button-positive  button-block" no-back>提交审核</a>
+        </div>
+
+        <div ng-if="tripDetail.status != EPlanStatus.APPROVE_NOT_PASS && tripDetail.status != EPlanStatus.WAIT_COMMIT">
+            <span class="button button-stable button-block" no-back>{{statustext[tripDetailId['status']] || '预算审批中'}}</span>
+        </div>
     </ion-content>
 </ion-view>

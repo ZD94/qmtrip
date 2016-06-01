@@ -8,7 +8,8 @@ async function showSelectorModal($scope, $ionicModal, selected) {
     var template = require('./selector.html');
     $scope.modal = $ionicModal.fromTemplate(template, {
         scope: $scope,
-        animation: 'slide-in-up'
+        animation: 'slide-in-up',
+        focusFirstInput: true
     });
     $scope.$on('$destroy', function() {
         $scope.modal.remove();
@@ -23,7 +24,8 @@ async function showSelectorModal($scope, $ionicModal, selected) {
 
     var form: any = $scope.form = {};
     form.keyword = selected;
-    form.selected = selected;
+    form.selected = '';
+
     $scope.optionLoader = async function(){
         $scope.options = await optionsLoader(form.keyword);
     }
@@ -34,15 +36,30 @@ async function showSelectorModal($scope, $ionicModal, selected) {
         $scope.optionLoader();
     })
     $scope.options = [];
-    $scope.optionLoader();
+    await $scope.optionLoader();
+    //需要等待加载完数据后
+    $scope.options.map(function(v) {
+        if (v.name == selected) {
+            form.selected = v;
+            return;
+        }
+    });
 
     $scope.showCreate = function(){
         if(optionsCreator == undefined)
             return false;
-        if(form.keyword.length == 0)
+        if(!form.keyword || form.keyword.length == 0)
             return false;
-        if($scope.options.indexOf(form.keyword) >= 0)
-            return false;
+
+        let isMatch = false;
+        $scope.options.forEach(function(v) {
+            if (v == form.keyword || v.name == form.keyword) {
+                isMatch = true;
+                return;
+            }
+        });
+
+        if(isMatch) return false;
         return true;
     }
     
@@ -72,14 +89,23 @@ angular
                 placeholder: '@ngSelectorPlaceholder',
                 getOptionsLoader: '&ngSelectorQuery',
                 getOptionsCreator: '&ngSelectorCreate',
+                done: '=ngSelectorDone'
             },
             controller: function($scope, $element, $ionicModal) {
                 $element.focus(async function() {
-                    var value = await showSelectorModal($scope, $ionicModal, $scope.value)
+                    var value: any = await showSelectorModal($scope, $ionicModal, $scope.value)
                     if(value == undefined)
                         return;
-                    console.log(value);
-                    $scope.value = value;
+
+                    if (!value.name) {
+                        $scope.value = value;
+                    } else {
+                        $scope.value = value.name;
+                    }
+
+                    if ($scope.done && typeof $scope.done == 'function') {
+                        return $scope.done(value);
+                    }
                 })
             }
         }

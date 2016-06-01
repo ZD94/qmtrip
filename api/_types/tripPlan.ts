@@ -1,19 +1,21 @@
 
-import {Models, isBrowser} from 'api/_types';
-import {Staff} from 'api/_types/staff';
-import {Company} from 'api/_types/company';
+import { Models, isBrowser} from 'api/_types';
+import { Staff} from 'api/_types/staff';
+import { Company} from 'api/_types/company';
 import { Types, Values } from 'common/model';
 import { Table, Create, Field, ResolveRef, Reference } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 declare var API: any;
 
 export enum EPlanStatus {
-    AUDIT_NOT_PASS = -2,
+    AUDIT_NOT_PASS = -3, //票据未审核通过
+    APPROVE_NOT_PASS = -2, //审批未通过
     NO_BUDGET = -1, //没有预算
-    WAIT_UPLOAD = 0, //待上传票据
-    WAIT_COMMIT = 1, //待提交状态
-    AUDITING = 2, //已提交待审核状态
-    COMPLETE = 3 //审核完，已完成状态
+    WAIT_APPROVE = 0, //待审批状态
+    WAIT_UPLOAD = 1, //待上传票据
+    WAIT_COMMIT = 2, //待提交状态
+    AUDITING = 3, //已提交待审核状态
+    COMPLETE = 4 //审核完，已完成状态
 }
 
 export enum ETripType {
@@ -181,10 +183,14 @@ export class TripPlan extends ModelObject {
     get project(): Project { return null; }
     set project(val: Project) {}
 
-    @Reference({type: Types.UUID}, 'accountId')
-    getStaff(id?:string): Promise<Staff> {
-        return Models.staff.get(id);
-    }
+    // @Reference({type: Types.UUID}, 'accountId')
+    // getStaff(id?:string): Promise<Staff> {
+    //     return Models.staff.get(id);
+    // }
+
+    @ResolveRef({type: Types.UUID}, Models.staff)
+    get account(): Staff { return null; }
+    set account(val: Staff) {}
 
     @Reference({type: Types.UUID})
     getCompany(id?:string): Promise<Company> {
@@ -192,32 +198,44 @@ export class TripPlan extends ModelObject {
     }
     setCompany(val: Company) {}
 
-    getOutTrip(id?: string): Promise<TripDetail[]> {
-        return Models.tripDetail.find({where: {tripPlanId: id||this.id, type: ETripType.OUT_TRIP}});
+    getOutTrip(): Promise<TripDetail[]> {
+        return Models.tripDetail.find({where: {tripPlanId: this.id, type: ETripType.OUT_TRIP}});
     }
 
-    getBackTrip(id?: string): Promise<TripDetail[]> {
-        return Models.tripDetail.find({where: {tripPlanId: id||this.id, type: ETripType.BACK_TRIP}});
+    getBackTrip(): Promise<TripDetail[]> {
+        return Models.tripDetail.find({where: {tripPlanId: this.id, type: ETripType.BACK_TRIP}});
     }
 
     getHotel(): Promise<TripDetail[]> {
         return Models.tripDetail.find({ where: {tripPlanId: this.id, type: ETripType.HOTEL}});
     }
     
-    getTripDetails(options: {where: any, limit?: number}): Promise<TripDetail[]> {
+    getTripDetails(options: {where?: any, limit?: number}): Promise<TripDetail[]> {
+        if(!options) {
+            options = {where: {}};
+        }
         if(!options.where) {
-            options.where = {}
+            options.where = {};
         }
         options.where.tripPlanId = this.id;
         return Models.tripDetail.find(options);
     }
 
-    auditTripPlan(params): Promise<boolean> {
-        params.id = this.id;
-        return API.tripPlan.auditTripPlan(params);
+    /**
+     * 审批人审批出差计划
+     * @param params
+     * @returns {Promise<boolean>}
+     */
+    approve(params: {auditResult: EAuditStatus, auditRemark?: string}): Promise<boolean> {
+        params['id'] = this.id;
+        return API.tripPlan.approveTripPlan(params);
     }
 
-    commitTripPlan(): Promise<boolean> {
+    /**
+     * 提交出差计划
+     * @returns {Promise<boolean>}
+     */
+    commit(): Promise<boolean> {
         return API.tripPlan.commitTripPlan({id: this.id});
     }
 }
@@ -271,8 +289,8 @@ export class TripDetail extends ModelObject{
     set city(val: string) {}
 
     @Field({type: Types.STRING})
-    get CityCode(): string { return ''; }
-    set CityCode(val: string) {}
+    get cityCode(): string { return ''; }
+    set cityCode(val: string) {}
 
     @Field({type: Types.STRING})
     get hotelName(): string { return ''; }
@@ -338,9 +356,9 @@ export class TripDetail extends ModelObject{
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: pictureFileId});
     }
 
-    approvePlanInvoice(params: {auditResult: EAuditStatus}): Promise<boolean> {
+    auditPlanInvoice(params: {auditResult: EAuditStatus}): Promise<boolean> {
         params['id'] = this.id;
-        return API.tripPlan.approvePlanInvoice(params);
+        return API.tripPlan.auditPlanInvoice(params);
     }
 }
 

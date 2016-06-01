@@ -102,12 +102,23 @@ export class Staff extends ModelObject implements Account {
 
     getTripPlans(options: {where?: any, limit?: number}): Promise<TripPlan[]| Pager<TripPlan>> {
         if (!options) {
-            options = {};
+            options = {where: {}};
         }
         if(!options.where) {
             options.where = {}
         }
         options.where.accountId = this.id;
+        return Models.tripPlan.find(options);
+    }
+    
+    getWaitApproveTripPlans(options: {where?: any, limit?: number}): Promise<TripPlan[]| Pager<TripPlan>> {
+        if (!options) {
+            options = {where: {}};
+        }
+        if(!options.where) {
+            options.where = {}
+        }
+        options.where.auditUser = this.id;
         return Models.tripPlan.find(options);
     }
     

@@ -45,9 +45,7 @@ class ApiTravelBudget {
     @clientExport
     static getBudgetInfo(params: {id: string}) {
         let {accountId} = Zone.current.get('session');
-        // accountId = '0c1651e0-2256-11e6-9086-5525a1429285'; //test
         let key = `budgets:${accountId}:${params.id}`;
-
         return cache.read(key);
     }
 
@@ -163,11 +161,11 @@ class ApiTravelBudget {
             budgets.push(budget);
         }
 
-
+        let days = moment(goBackDate).diff(moment(leaveDate), 'days')
         if (Boolean(travelPolicy['subsidy']) && travelPolicy['subsidy'] > 0) {
             let budget: any = {};
             budget.tripType = ETripType.SUBSIDY;
-            budget.price = travelPolicy['subsidy'];
+            budget.price = travelPolicy['subsidy'] * days;
             budgets.push(budget);
         }
 

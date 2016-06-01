@@ -10,7 +10,7 @@
         </ion-list>
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <ion-list>
-            <ion-item>{{trip.beginDate| date: 'yyyy-MM-dd'}} 至 {{trip.endDate | date: 'yyyy-MM-dd'}}
+            <ion-item>{{trip.beginDate| date: 'MM/dd'}} 至 {{trip.endDate | date: 'MM/dd'}}
                 <br>总预算：{{totalPrice}}元</ion-item>
         </ion-list>
         <div class="spacer" style="width: 285px; height: 17px;"></div>
@@ -21,49 +21,70 @@
                     <span ng-if='budget.tripType == ETripType.BACK_TRIP'>回程交通</span>
                     <span ng-if='budget.tripType == ETripType.HOTEL'>住宿</span>
                     <span ng-if='budget.tripType == ETripType.SUBSIDY'>补助</span>
-                    <span style="margin-left: 120px;">{{budget.price}}</span>元</ion-item>
-                <ion-item>
-                    <span ng-if='budget.tripType == ETripType.OUT_TRIP'>{{trip.beginDate | date: 'yyyy-MM-dd'}}</span>
-                    <span ng-if='budget.tripType == ETripType.BACK_TRIP'>{{trip.endDate | date: 'yyyy-MM-dd'}}</span>
-                    <span ng-if='budget.tripType == ETripType.HOTEL'>
-                        {{trip.beginDate | date: 'yyyy-MM-dd'}}至{{trip.endDate | date: 'yyyy-MM-dd'}}
-                    </span>
-                    <span ng-if='budget.tripType == ETripType.SUBSIDY'>
-                        {{trip.beginDate | date: 'yyyy-MM-dd'}}至{{trip.endDate | date: 'yyyy-MM-dd'}}
-                    </span>
+                    <span style="margin-left: 120px;">{{budget.price}}</span>元
+                </ion-item>
 
-                    <br>
-                    {{trip.fromPlace}}
-                        &nbsp;
-                        <i ng-if='budget.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
-                        <i ng-if='budget.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
-                        <i ng-if='budget.type == EInvoiceType.HOTEL' class="icon ion-home"></i>
-                        <i ng-if='budget.type != (EInvoiceType.PLANE&&EInvoiceType.TRAIN&&EInvoiceType.HOTEL)'>-</i>
-                        &nbsp;
-                    {{trip.place}}
+                <ion-item ng-if="budget.tripType == ETripType.BACK_TRIP">
+                    <span>{{trip.endDate | date: 'MM/dd'}}</span>
+                    {{trip.destinationPlaceName}}
+                    &nbsp;
+                    <i ng-if='budget.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                    <i ng-if='budget.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                    <i ng-if='budget.type == EInvoiceType.HOTEL' class="icon ion-home"></i>
+                    <i ng-if='budget.type != (EInvoiceType.PLANE&&EInvoiceType.TRAIN&&EInvoiceType.HOTEL)'>-</i>
+                    &nbsp;
+                    {{trip.originPlaceName}}
+                    <br/>{{budget.price}}元
+                </ion-item>
+
+                <ion-item ng-if="budget.tripType == ETripType.HOTEL">
+                    <span>{{trip.beginDate | date: 'MM/dd'}}至{{trip.endDate | date: 'MM/dd'}} 共{{duringDays}}天</span>
+                    <br/>
+                    &nbsp;
+                    <i class="icon ion-home"></i>
+                    &nbsp;
+                    {{trip.destinationPlaceName}}
                     <br>{{budget.price}}元
                 </ion-item>
-            </div>
 
-            <!--<ion-item>{{trip.endDate}}-->
-                <!--<br>{{trip.place}}-{{trip.fromPlace}}-->
-                <!--<br>1000元</ion-item>-->
-            <!--<ion-item class="item-divider">住宿&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1000元</ion-item>-->
-            <!--<ion-item>{{trip.beginDate}}至{{trip.endDate}}-->
-                <!--<br>{{trip.place}}&nbsp;{{trip.hotelPlace}}-->
-                <!--<br>1039元</ion-item>-->
-            <!--<ion-item class="item-divider">其他补助(共{{duringDays}}天)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{policy.subsidy * during}}</ion-item>-->
+                <ion-item ng-if="budget.tripType == ETripType.SUBSIDY">
+                    <span>{{trip.beginDate | date: 'MM/dd'}}至{{trip.endDate | date: 'MM/dd'}} 共{{duringDays}}天</span>
+                    <br/>
+                    {{trip.originPlaceName}}
+                    &nbsp;
+                    <i class="icon ion-heart"></i>
+                    &nbsp;
+                    {{trip.destinationPlaceName}}
+                    <br/>
+                    {{budget.price}}元
+                </ion-item>
+
+                <ion-item ng-if="budget.tripType == ETripType.OUT_TRIP">
+                    <span>{{trip.beginDate | date: 'MM/dd'}}</span>
+                    {{trip.originPlaceName}}
+                    &nbsp;
+                    <i ng-if='budget.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                    <i ng-if='budget.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                    &nbsp;
+                    {{trip.destinationPlaceName}}
+                    <br/>{{budget.price}}元
+                </ion-item>
+            </div>
         </ion-list>
         <div class="button-bar"></div>
         <div class="button-bar"></div>
         <div class="spacer" style="width: 300px; height: 26px;"></div>
-        <!--<form class="list">-->
-            <!--<label class="item item-input">-->
-                <!--<span class="input-label">审批人</span>-->
-                <!--<input type="text" placeholder="李晓辰">-->
-            <!--</label>-->
-        <!--</form>-->
-        <a ng-click="saveTripPlan()" id="page16-button56" class="button button-positive  button-block">提交预算</a>
+        <form class="list">
+        <label class="item item-input">
+            <span class="input-label">选择审核人</span>
+            <input type="text" placeholder="审核人" ng-model="trip.auditUserName" ng-selector-done="chooseAuditUser"
+                   ng-selector
+                   ng-selector-title="全部员工"
+                   ng-selector-placeholder="请选择审核人"
+                   ng-selector-query="queryStaffs" />
+            </label>
+        </form>
+        <a ng-click="saveTripPlan()" id="page16-button56" class="button button-positive  button-block">预算提交审核</a>
         <a href="#/trip/create" id="page16-button58" class="button button-light  button-block button-outline">取消</a>
     </ion-content>
 </ion-view>
