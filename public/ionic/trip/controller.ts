@@ -283,7 +283,7 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
     let backTraffic;
     let other;
     $scope.hotelStatus = false;
-    $scope.goTrafficStatus = false;|
+    $scope.goTrafficStatus = false;
     $scope.backTrafficStatus = false;
     $scope.otherStatus = false;
     let statusTxt = {};

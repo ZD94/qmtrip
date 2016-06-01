@@ -5,6 +5,7 @@
 import {requireParams, clientExport} from "../../common/api/helper";
 import { Models, EAccountType } from "api/_types";
 import {AuthCert, Token, Account} from "api/_types/auth"
+import {Staff} from "api/_types/staff";
 import validator = require('validator');
 
 var sequelize = require("common/model").importModel("./models");
@@ -18,6 +19,8 @@ var API = require("../../common/api");
 var utils = require("common/utils");
 var Logger = require("common/logger");
 var logger = new Logger('auth');
+
+var accountCols = Account['$fieldnames'];
 
 var ACCOUNT_STATUS = {
     ACTIVE: 1,
@@ -306,9 +309,9 @@ class ApiAuth {
     }
 
     @clientExport
-    static getAccountStatus(params:{}):Promise<number> {
+    static getAccountStatus(params:{}):Promise<any> {
         let args:any = {attributes: ["status"]};
-        return ApiAuth.getAccount(args);
+        return Models.account.find(args);
     }
 
     /**
@@ -382,7 +385,10 @@ class ApiAuth {
      * @return {Promise} {accountId: 账号ID, email: "邮箱", status: "状态"}
      * @public
      */
-    static newAccount (data: {email: string, mobile?: string, pwd?: string, type?: Number, status?: Number, companyName?: string, id?: string}) {
+    @clientExport
+    static async newAccount (data: {email: string, mobile?: string, pwd?: string, type?: Number, status?: Number, companyName?: string, id?: string}) {
+        console.info("newAccountnewAccount=====================");
+        console.info(data);
 
         if (!data) {
             throw L.ERR.DATA_NOT_EXIST();
@@ -406,49 +412,46 @@ class ApiAuth {
 
         var mobile = data.mobile;
         var companyName = data.companyName || '';
-        if (mobile && !validator.isMobilePhone(mobile, 'zh-CN')) {
-            throw L.ERR.MOBILE_FORMAT_ERROR();
+        /*if (mobile && !validator.isMobilePhone(mobile, 'zh-CN')) {
+            throw L.MSG.MOBILE_FORMAT_ERROR;
+        }*/
+        var staff = await Staff.getCurrent();
+        if(data.email && staff && staff.company["domainName"] && data.email.indexOf(staff.company["domainName"]) == -1){
+            throw L.ERR.INVALID_ARGUMENT('email');
         }
 
         var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
-
         //查询邮箱是否已经注册
-        return Promise.all([
-                DBM.Account.findOne({where: {email: data.email, type: type}}),
-                DBM.Account.findOne({where: {mobile: mobile, type: type}})
-            ])
-            .spread(function(account1, account2) {
-                if (account1) {
-                    throw L.ERR.EMAIL_HAS_REGISTRY();
-                }
+        var account1 = await DBM.Account.findOne({where: {email: data.email, type: type}});
+        var account2 = await DBM.Account.findOne({where: {mobile: mobile, type: type}});
+        if (account1 && account1.length>0) {
+            throw L.ERR.EMAIL_HAS_REGISTRY();
+        }
 
-                if (account2 && account2.mobile && account2.mobile != "") {
-                    throw L.ERR.MOBILE_HAS_REGISTRY();
-                }
-                return true;
-            })
-            .then(function() {
-                var status = data.status? data.status: ACCOUNT_STATUS.NOT_ACTIVE;
-                var id = data.id?data.id:uuid.v1();
-                return DBM.Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status, type: type});
-            })
-            .then(function(account) {
-                if (!account.pwd) {
-                    return ApiAuth.sendResetPwdEmail({email: account.email, type: 1, isFirstSet: true, companyName: companyName})
-                        .then(function() {
-                            return account;
-                        })
-                }
+        if (account2 && account2.length>0 && account2.mobile && account2.mobile != "") {
+            throw L.ERR.MOBILE_HAS_REGISTRY();
+        }
 
-                if (account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
-                    return _sendActiveEmail(account.id)
-                        .then(function(){
-                            return account;
-                        })
-                }
+        var status = data.status? data.status: ACCOUNT_STATUS.NOT_ACTIVE;
+        var id = data.id?data.id:uuid.v1();
+        var accountObj = Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status, type: type});
+        var account = await accountObj.save();
 
-                return account;
-            });
+        if (!account.pwd) {
+            return ApiAuth.sendResetPwdEmail({email: account.email, type: 1, isFirstSet: true, companyName: companyName})
+                .then(function() {
+                    return account;
+                })
+        }
+
+        if (account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
+            return _sendActiveEmail(account.id)
+                .then(function(){
+                    return account;
+                })
+        }
+
+        return account;
     }
 
     /**
@@ -695,27 +698,33 @@ class ApiAuth {
     };
 
     /**
+     * 创建Account
+     * @param params
+     * @returns {Promise<Account>}
+     */
+    /*@clientExport
+    @requireParams(["email"], accountCols)
+    static async createAccount (params) : Promise<Account>{
+
+        let result = await Models.account.find({where: {email: params.email}});
+        if(result && result.length>0){
+            throw {msg: "邮箱重复"};
+        }
+        var acc = Account.create(params);
+        return acc.save();
+    }*/
+
+    /**
      * 由id查询账户信息
      * @param id
      * @returns {*}
      */
     @clientExport
-    @requireParams(["id"], ["attributes", "type"])
-    static getAccount (params: {id: string, attributes?: string[], type?: Number}) {
-
+    @requireParams(["id"])
+    static async getAccount (params) {
         var id = params.id;
-        var attributes = params.attributes;
-        var options: any = {};
-        options.where = {id: id};
-        if(params.type){
-            options.where.type = params.type;
-        }
-        if(attributes)
-            options.attributes = attributes;
-        return DBM.Account.findOne(options)
-            .then(function(data){
-                return new Account(data);
-            })
+        var acc = await Models.account.get(id);
+        return acc;
     }
 
     /**
@@ -725,33 +734,52 @@ class ApiAuth {
      * @param companyName
      * @returns {*}
      */
-    static updateAccount(id: string, data: any, companyName?: string){
-        if(!id){
-            throw {code: -1, msg: "id不能为空"};
-        }
-        if (!companyName) {
-            companyName = '';
-        }
-        var options: any = {};
-        options.where = {id: id};
-        options.returning = true;
+    @clientExport
+    @requireParams(["id"], accountCols)
+    static async updateAccount(params){
+        console.info("updateAccountupdateAccount=====================");
+        var id = params.id;
         var old_email;
-        return DBM.Account.findOne(options)
-            .then(function(oldAcc){
-                old_email = oldAcc.email;
-                return DBM.Account.update(data, options);
-            })
-            .spread(function(rownum, rows){
-                if(!rownum)
-                    throw L.ERR.NOT_FOUND();
-                if(old_email == rows[0].email){
-                    return rows[0];
-                }
-                return ApiAuth.sendResetPwdEmail({companyName: companyName, email: rows[0].email, type: 1, isFirstSet: true})
-                    .then(function() {
-                        return rows[0];
-                    });
+        var accobj = await Models.account.get(id);
+        var staff = await Staff.getCurrent();
+        if(params.email && staff && staff.company["domainName"] && params.email.indexOf(staff.company["domainName"]) == -1){
+            throw L.ERR.INVALID_ARGUMENT('email');
+        }
+
+        if(params.email && accobj["status"] != 0 && accobj.email != params.email){
+            // throw {code: -2, msg: "该账号不允许修改邮箱"};
+            throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
+        }
+
+
+        for(var key in params){
+            accobj[key] = params[key];
+        }
+        var newAcc = await accobj.save();
+        if(accobj.email == newAcc.email){
+            return newAcc;
+        }
+
+        var staff = await Models.staff.get(id);
+        var companyName = (staff && staff.company) ? staff.company.name : "";
+        return ApiAuth.sendResetPwdEmail({companyName: companyName, email: newAcc.email, type: 1, isFirstSet: true})
+            .then(function() {
+                return newAcc;
             });
+    }
+
+    /**
+     * 删除Account
+     * @param params
+     * @returns {boolean}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async deleteAccount(params): Promise<any> {
+        let deleteAcc = await Models.account.get(params.id);
+        await deleteAcc.destroy();
+        return true;
+
     }
 
     /**
