@@ -283,7 +283,7 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
     let backTraffic;
     let other;
     $scope.hotelStatus = false;
-    $scope.goTrafficStatus = false;|
+    $scope.goTrafficStatus = false;
     $scope.backTrafficStatus = false;
     $scope.otherStatus = false;
     let statusTxt = {};
@@ -294,10 +294,11 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
     statusTxt[EPlanStatus.AUDITING] = "已提交待审核状态";
     statusTxt[EPlanStatus.COMPLETE] = "审核完，已完成状态";
     $scope.statustext = statusTxt;
+    $scope.EPlanStatus = EPlanStatus;
     $scope.EInvoiceType = EInvoiceType;
     console.info(EInvoiceType);
     budgets.map(function(budget) {
-        let tripType: ETripType = ETripType.OTHER;
+        let tripType: ETripType = ETripType.SUBSIDY;
         let title = '补助'
         if (budget.type == 0) {
             tripType = ETripType.OUT_TRIP;
@@ -379,6 +380,7 @@ export async function ListdetailController($scope , Models, $stateParams ,FileUp
     $scope.other = other;
     $scope.budgets = budgets;
     console.info($scope.goTraffic);
+    console.info($scope.other);
     API.require('tripPlan');
     await API.onload();
     function uploadInvoice(consumeId, picture, callback) {

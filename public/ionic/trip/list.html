@@ -3,7 +3,7 @@
         <ion-infinite-scroll
                 ng-if="moreDataCanBeLoaded()"
                 icon="ion-loading-c"
-                on-infinite="loadMoreData()">
+                on-infinite="nextPage()">
         </ion-infinite-scroll>
         <div class="list card" ng-repeat="trip in tripPlans track by trip.id" ng-click="enterdetail(trip.id)">
             <div class="item item-divider">{{trip.startAt | date: 'yyyy-MM-dd'}} 至 {{trip.backAt | date: 'yyyy-MM-dd'}}</div>
