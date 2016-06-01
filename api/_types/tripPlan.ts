@@ -228,7 +228,7 @@ export class TripPlan extends ModelObject {
      */
     approve(params: {auditResult: EAuditStatus, auditRemark?: string}): Promise<boolean> {
         params['id'] = this.id;
-        return API.tripPlan.auditTripPlan(params);
+        return API.tripPlan.approveTripPlan(params);
     }
 
     /**
@@ -358,7 +358,7 @@ export class TripDetail extends ModelObject{
 
     auditPlanInvoice(params: {auditResult: EAuditStatus}): Promise<boolean> {
         params['id'] = this.id;
-        return API.tripPlan.approvePlanInvoice(params);
+        return API.tripPlan.auditPlanInvoice(params);
     }
 }
 
