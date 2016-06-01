@@ -77,7 +77,7 @@ export function CreateController($scope, $storage, $ionicLoading){
 
     $scope.queryHotelPlace = async function(keyword) {
         let city = $scope.trip.place;
-        if (keyword && city) {
+        if (city) {
             let cityInfo = await API.place.getCityInfo({cityCode: city});
             var hotelPlaces = await API.place.queryBusinessDistrict({keyword: keyword, code: cityInfo.id})
             return hotelPlaces.map((p)=> { return { name: p.name, value: p.id} });
