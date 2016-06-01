@@ -45,9 +45,7 @@ class ApiTravelBudget {
     @clientExport
     static getBudgetInfo(params: {id: string}) {
         let {accountId} = Zone.current.get('session');
-        // accountId = '0c1651e0-2256-11e6-9086-5525a1429285'; //test
         let key = `budgets:${accountId}:${params.id}`;
-
         return cache.read(key);
     }
 
