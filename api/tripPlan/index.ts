@@ -74,26 +74,33 @@ class TripPlanModule {
 
             switch(tripType) {
                 case ETripType.OUT_TRIP:
-                    detail.deptCity = query.originPlace;
-                    detail.arrivalCity = query.destinationPlace;
+                    detail.deptCityCode = query.originPlace;
+                    detail.arrivalCityCode = query.destinationPlace;
+                    detail.deptCity = tripPlan.deptCity;
+                    detail.arrivalCity = tripPlan.arrivalCity;
                     detail.startTime = query.leaveDate;
                     detail.endTime = query.goBackDate;
                     break;
                 case ETripType.BACK_TRIP:
-                    detail.deptCity = query.destinationPlace;
-                    detail.arrivalCity = query.originPlace;
+                    detail.deptCityCode = query.destinationPlace;
+                    detail.arrivalCityCode = query.originPlace;
+                    detail.deptCity = tripPlan.arrivalCity;
+                    detail.arrivalCity = tripPlan.deptCity;
                     detail.startTime = query.goBackDate;
                     detail.endTime = query.leaveDate;
                     break;
                 case ETripType.HOTEL:
-                    detail.city = query.destinationPlace;
+                    detail.cityCode = query.destinationPlace;
+                    detail.city = tripPlan.arrivalCity;
                     detail.hotelName = query.businessDistrict;
                     detail.startTime = query.checkInDate || query.leaveDate;
                     detail.endTime = query.checkOutDate || query.goBackDate;
                     break;
                 case ETripType.SUBSIDY:
-                    detail.deptCity = query.originPlace;
-                    detail.arrivalCity = query.destinationPlace;
+                    detail.deptCityCode = query.originPlace;
+                    detail.arrivalCityCode = query.destinationPlace;
+                    detail.deptCity = tripPlan.deptCity;
+                    detail.arrivalCity = tripPlan.arrivalCity;
                     detail.startTime = query.leaveDate || query.checkInDate;
                     detail.endTime = query.goBackDate || query.checkOutDate;
                     break;
@@ -160,7 +167,11 @@ class TripPlanModule {
         if (hotel && hotel.length > 0) {
             let h = hotel[0];
             hotelStr = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') +
-                ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
+                ', ' + h.city + ',';
+            if(h.hotelName) {
+                hotelStr += h.hotelName + ',';
+            }
+            hotelStr += '动态预算￥' + h.budget;
         }
 
         await Promise.all(admins.map(async function(s) {
