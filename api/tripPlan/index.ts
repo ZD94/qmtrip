@@ -328,7 +328,7 @@ class TripPlanModule {
      * @returns {boolean}
      */
     @clientExport
-    @requireParams(['id', 'auditResult', 'auditRemark'])
+    @requireParams(['id', 'auditResult'], ['auditRemark'])
     @modelNotNull('tripPlan')
     static async approveTripPlan(params: {id: string, auditResult: EAuditStatus, auditRemark?: string}): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
@@ -438,7 +438,7 @@ class TripPlanModule {
     static async commitTripPlan(params: {id: string}): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
 
-        if(tripPlan.status != EPlanStatus.WAIT_APPROVE) {
+        if(tripPlan.status != EPlanStatus.WAIT_COMMIT) {
             throw {code: -2, msg: "该出差计划不能提交，请检查状态"};
         }
         
@@ -482,10 +482,12 @@ class TripPlanModule {
 
             if(!details || details.length == 0 ) {
                 tripPlan.status = EPlanStatus.COMPLETE;
+                tripPlan.auditStatus = EAuditStatus.INVOICE_PASS;
             }
         }else if(audit == EAuditStatus.INVOICE_NOT_PASS) {
             tripDetail.status = EPlanStatus.AUDIT_NOT_PASS;
             tripPlan.status = EPlanStatus.AUDIT_NOT_PASS;
+            tripPlan.auditStatus = EAuditStatus.INVOICE_NOT_PASS;
         }
         else {
             throw L.ERR.PERMISSION_DENIED(); //代理商只能审核票据权限
