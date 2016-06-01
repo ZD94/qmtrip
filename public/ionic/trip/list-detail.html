@@ -128,7 +128,7 @@
         </div>
 
         <div ng-if="tripDetail.status != EPlanStatus.APPROVE_NOT_PASS && tripDetail.status != EPlanStatus.WAIT_COMMIT">
-            <span class="button button-stable button-block" no-back>{{statustext[tripDetailId['status']] || '审核中'}}</span>
+            <span class="button button-stable button-block" no-back>{{statustext[tripDetailId['status']] || '预算审批中'}}</span>
         </div>
     </ion-content>
 </ion-view>
