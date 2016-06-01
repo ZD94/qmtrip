@@ -95,6 +95,7 @@ export function CreateController($scope, $storage, $ionicLoading){
         return projects.map((project)=>{ return {name: project.name, value: project.id}} );
     }
     $scope.createProject = async function(name){
+        console.info("function createProject...");
     }
 
     $scope.nextStep = async function() {
