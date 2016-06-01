@@ -291,7 +291,7 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
     var staff = await Staff.getCurrent();
     let id = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(id);
-    tripPlan.approve({auditResult: EAuditStatus.PASS})
+    tripPlan.approve({auditResult: EAuditStatus.PASS,auditRemark:'1'})
     $scope.tripDetail = tripPlan;
     $scope.createdAt = moment(tripPlan.createAt).toDate();
     $scope.startAt = moment(tripPlan.startAt).toDate();
