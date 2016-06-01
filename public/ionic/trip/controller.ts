@@ -78,8 +78,12 @@ export function CreateController($scope, $storage, $ionicLoading){
     $scope.queryHotelPlace = async function(keyword) {
         let city = $scope.trip.place;
         if (city) {
-            let cityInfo = await API.place.getCityInfo({cityCode: city});
-            var hotelPlaces = await API.place.queryBusinessDistrict({keyword: keyword, code: cityInfo.id})
+            let cityId: any = city;
+            if (!/^CT_\d+$/.test(city)) {
+                city = await API.place.getCityInfo({cityCode: city});
+                cityId = city.id;
+            }
+            var hotelPlaces = await API.place.queryBusinessDistrict({keyword: keyword, code: cityId})
             return hotelPlaces.map((p)=> { return { name: p.name, value: p.id} });
         }
         return [];
