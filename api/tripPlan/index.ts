@@ -70,8 +70,12 @@ class TripPlanModule {
         tripPlan.project = project;
         tripPlan.startAt = query.leaveDate;
         tripPlan.backAt = query.goBackDate;
-        tripPlan.deptCity = query.originPlace;
-        tripPlan.arrivalCity = query.destinationPlace;
+        tripPlan.deptCityCode = query.originPlace;
+        let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace});
+        tripPlan.deptCity = deptInfo.name;
+        tripPlan.arrivalCityCode = query.destinationPlace;
+        let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace});
+        tripPlan.arrivalCity = arrivalInfo.name;
         tripPlan.isNeedHotel = query.isNeedHotel;
         tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo');
         if (!tripPlan.auditUser) {
@@ -232,7 +236,7 @@ class TripPlanModule {
      */
     @clientExport
     static async listTripPlans(options: any): Promise<FindResult> {
-        options.order = options.order || 'start_at desc';
+        options.order = options.order || [['start_at', 'desc'], ['created_at', 'desc']];
         let paginate = await Models.tripPlan.find(options);
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
     }
@@ -433,8 +437,8 @@ class TripPlanModule {
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
     static async commitTripPlan(params: {id: string}): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
-        
-        if(tripPlan.status != EPlanStatus.WAIT_COMMIT) {
+
+        if(tripPlan.status != EPlanStatus.WAIT_APPROVE) {
             throw {code: -2, msg: "该出差计划不能提交，请检查状态"};
         }
         

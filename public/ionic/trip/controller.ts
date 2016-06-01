@@ -315,7 +315,7 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
     $scope.statustext = statusTxt;
     $scope.EPlanStatus = EPlanStatus;
     $scope.EInvoiceType = EInvoiceType;
-    console.info(EInvoiceType);
+    $scope.EPlanStatus = EPlanStatus;
     budgets.map(function(budget) {
         let tripType: ETripType = ETripType.SUBSIDY;
         let title = '补助'
@@ -411,13 +411,12 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
     $scope.backtraffic_up = '&#xe90e;<em>回程</em><strong>交通票据</strong>';
 
     $scope.approveTripPlan = async function() {
-        console.info("click me....");
         try {
             await API.tripPlan.commitTripPlan({id: id});
             alert('提交成功')
             window.location.href="#/trip/list"
         }catch(e) {
-            alert(e);
+            alert(e.msg || e);
         }
     }
 }
