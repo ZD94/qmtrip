@@ -124,9 +124,11 @@ export function CreateController($scope, $storage, $ionicLoading){
         let timer = setInterval(async function() {
             let template = '正在搜索' + front[idx++]+'...'
             if (idx >= front.length) {
-                clearInterval(idx);
-                return;
+                if (timer) {
+                    clearInterval(timer);
+                }
             }
+
             await $ionicLoading.show({
                 template: template,
                 hideOnStateChange: true,
@@ -135,13 +137,18 @@ export function CreateController($scope, $storage, $ionicLoading){
 
         try {
             let budget = await API.travelBudget.getTravelPolicyBudget(params);
-            clearTimeout(timer);
             await $ionicLoading.hide()
             window.location.href = "#/trip/budget?id="+budget;
         } catch(err) {
-            clearTimeout(timer);
+            if (timer) {
+                clearTimeout(timer);
+            }
             await $ionicLoading.hide()
             alert(err.msg || err);
+        } finally {
+            if (timer) {
+                clearInterval(timer);
+            }
         }
     }
 
@@ -155,7 +162,7 @@ export function CreateController($scope, $storage, $ionicLoading){
         $scope.trip.hotelPlace = val.value;
     }
     $scope.chooseReason = function(val) {
-        $scope.trip.reason = val.name;
+        $scope.trip.reason = val.name ? val.name: val;
         console.info($scope.trip.reason);
     }
 }
