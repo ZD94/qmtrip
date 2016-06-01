@@ -124,11 +124,8 @@ export function CreateController($scope, $storage, $ionicLoading){
         let timer = setInterval(async function() {
             let template = '正在搜索' + front[idx++]+'...'
             if (idx >= front.length) {
-                if (timer) {
-                    clearInterval(timer);
-                }
+                clearInterval(timer);
             }
-
             await $ionicLoading.show({
                 template: template,
                 hideOnStateChange: true,
@@ -138,17 +135,12 @@ export function CreateController($scope, $storage, $ionicLoading){
         try {
             let budget = await API.travelBudget.getTravelPolicyBudget(params);
             await $ionicLoading.hide()
+            clearInterval(timer);
             window.location.href = "#/trip/budget?id="+budget;
         } catch(err) {
-            if (timer) {
-                clearTimeout(timer);
-            }
+            clearTimeout(timer);
             await $ionicLoading.hide()
             alert(err.msg || err);
-        } finally {
-            if (timer) {
-                clearInterval(timer);
-            }
         }
     }
 
