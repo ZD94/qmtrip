@@ -51,7 +51,7 @@ class TripPlanModule {
      * @returns {TripPlan}
      */
     @clientExport
-    @requireParams(['budgetId', 'title'], ['description', 'remark'])
+    @requireParams(['budgetId', 'title', 'auditUser'], ['description', 'remark'])
     static async saveTripPlan(params): Promise<TripPlan> {
         let staff = await Staff.getCurrent();
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: params.budgetId});
@@ -102,9 +102,16 @@ class TripPlanModule {
                     detail.city = query.destinationPlace;
                     detail.hotelName = query.businessDistrict;
                     detail.startTime = query.checkInDate || query.leaveDate;
-                    detail.endTime = query.checkOutDate || query.leaveDate;
+                    detail.endTime = query.checkOutDate || query.goBackDate;
+                    break;
+                case ETripType.SUBSIDY:
+                    detail.deptCity = query.originPlace;
+                    detail.arrivalCity = query.destinationPlace;
+                    detail.startTime = query.leaveDate || query.checkInDate;
+                    detail.endTime = query.goBackDate || query.checkOutDate;
                     break;
                 default:
+                    detail.type = ETripType.OTHER;
                     detail.startTime = query.leaveDate;
                     detail.endTime = query.goBackDate;
                     break;
@@ -225,6 +232,7 @@ class TripPlanModule {
      */
     @clientExport
     static async listTripPlans(options: any): Promise<FindResult> {
+        options.order = options.order || 'start_at desc';
         let paginate = await Models.tripPlan.find(options);
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
     }
@@ -318,19 +326,18 @@ class TripPlanModule {
     @clientExport
     @requireParams(['id', 'auditResult', 'auditRemark'])
     @modelNotNull('tripPlan')
-    static async auditTripPlan(params: {id: string, auditResult: EAuditStatus, auditRemark?: string}): Promise<boolean> {
+    static async approveTripPlan(params: {id: string, auditResult: EAuditStatus, auditRemark?: string}): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
         let auditResult = params.auditResult;
+        let staff = await Staff.getCurrent();
 
         if(auditResult != EAuditStatus.PASS && auditResult != EAuditStatus.NOT_PASS) {
             throw L.ERR.PERMISSION_DENIED(); //只能审批待审批的出差记录
         }
 
-        if(tripPlan.auditStatus != EAuditStatus.AUDITING || tripPlan.status != EPlanStatus.WAIT_UPLOAD) {
+        if(tripPlan.status != EPlanStatus.WAIT_APPROVE) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR(); //只能审批待审批的出差记录
         }
-
-        let staff = await Staff.getCurrent();
 
         if(tripPlan.auditUser != staff.id) {
             throw L.ERR.PERMISSION_DENIED();
@@ -382,11 +389,16 @@ class TripPlanModule {
         let accountId = staff.id;
         let tripDetail = await Models.tripDetail.get(params.tripDetailId);
 
-        if (tripDetail.status === EPlanStatus.COMPLETE || tripDetail.status === EPlanStatus.AUDITING) {
-            throw {code: -3, msg: '审核中或已审核通过的票据不能上传!'};
+        if (tripDetail.status != EPlanStatus.WAIT_UPLOAD) {
+            throw {code: -3, msg: '该出差计划不能上传票据，请检查出差计划状态'};
         }
 
         let tripPlan = tripDetail.tripPlan;
+
+        if(tripPlan.status != EPlanStatus.WAIT_UPLOAD) {
+            throw {code: -3, msg: '该出差计划不能上传票据，请检查出差计划状态'};
+        }
+
         let invoiceJson: any = tripDetail.invoice || [];
         let times = invoiceJson.length ? invoiceJson.length + 1 : 1;
 
@@ -421,6 +433,11 @@ class TripPlanModule {
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
     static async commitTripPlan(params: {id: string}): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
+        
+        if(tripPlan.status != EPlanStatus.WAIT_COMMIT) {
+            throw {code: -2, msg: "该出差计划不能提交，请检查状态"};
+        }
+        
         let tripDetails = await tripPlan.getTripDetails({where: {}});
 
         if(tripDetails && tripDetails.length > 0) {
@@ -445,7 +462,7 @@ class TripPlanModule {
     @clientExport
     @requireParams(['id', 'auditResult'])
     @modelNotNull('tripDetail')
-    static async approvePlanInvoice(params: {id: string, auditResult: EAuditStatus}): Promise<boolean> {
+    static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus}): Promise<boolean> {
         let tripDetail = await Models.tripDetail.get(params.id);
 
         if(tripDetail.status != EPlanStatus.AUDITING) {
@@ -581,6 +598,7 @@ class TripPlanModule {
     }
 
     @clientExport
+    @requireParams(['where.companyId'], [''])
     static async getProjectList(options): Promise<FindResult> {
         let projects = await Models.project.find(options);
         return {ids: projects.map((p)=> {return p.id}), count: projects['total']};
@@ -627,7 +645,7 @@ class TripPlanModule {
     }
 
     @clientExport
-    @requireParams(['tripPlanId'], ['tripDetailId'])
+    @requireParams(['where.tripPlanId'], ['where.tripDetailId'])
     static async getTripPlanLogs(options): Promise<FindResult> {
         let paginate = await Models.tripPlan.find(options);
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}

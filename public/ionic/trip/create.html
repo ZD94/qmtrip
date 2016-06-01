@@ -11,21 +11,23 @@
             </label>
             <label class="item item-input">
                 <span class="input-label">出差地点</span>
-                <input type="text" placeholder="北京" ng-model="trip.place"
+                <input type="text" placeholder="北京" ng-model="trip.placeName"
                        ng-selector
                        ng-selector-title="出差地点选择"
                        ng-selector-placeholder="请输入城市名或首字母缩写"
                        ng-selector-query="queryPlaces"
-                >
+                       ng-selector-done = "choosePlace"
+                />
             </label>
             <label class="item item-input">
                 <span class="input-label">出差事由</span>
-                <input type="text" placeholder="上海项目" ng-model="trip.reason"
+                <input type="text" placeholder="上海项目" ng-model="trip.reasonName"
                        ng-selector
                        ng-selector-title="项目选择"
                        ng-selector-placeholder="请选择或输入项目"
                        ng-selector-query="queryProjects"
                        ng-selector-create="createProject"
+                       ng-selector-done="chooseReason"
                 >
             </label>
             <div class="spacer" style="width: 300px; height: 9px;"></div>
@@ -33,11 +35,12 @@
             <div ng-if="trip.traffic">
                 <label class="item item-input" ng-if="trip.traffic">
                     <span class="input-label">出发地</span>
-                    <input type="text" placeholder="上海" ng-model="trip.fromPlace"
+                    <input type="text" placeholder="上海" ng-model="trip.fromPlaceName"
                            ng-selector
                            ng-selector-title="出发地选择"
                            ng-selector-placeholder="请输入城市名或首字母缩写"
                            ng-selector-query="queryPlaces"
+                           ng-selector-done = 'chooseFromPlace'
                     >
                 </label>
                 <ion-toggle toggle-class="toggle-positive" ng-model="trip.round">返程</ion-toggle>
@@ -52,11 +55,13 @@
                 </div>
                 <label class="item item-input">
                     <span class="input-label">地标</span>
-                    <input type="text" placeholder="选填" ng-model="trip.hotelPlace"
+                    <input type="text" placeholder="选填" ng-model="trip.hotelPlaceName"
                            ng-selector
                            ng-selector-title="地标选择"
                            ng-selector-placeholder='请输入地标名称或首字母'
-                           ng-selector-query="queryHotelPlace">
+                           ng-selector-query="queryHotelPlace"
+                           ng-selector-done = 'chooseHotelPlace'
+                    >
                 </label>
             </div>
             <div>
