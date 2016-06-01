@@ -79,7 +79,7 @@ angular
                 title: '@ngSelectorTitle',
                 placeholder: '@ngSelectorPlaceholder',
                 getOptionsLoader: '&ngSelectorQuery',
-                getOptionsCreator: '&ngSelectorCreate',
+                getOptionsCreator: '=ngSelectorCreate',
                 done: '=ngSelectorDone'
             },
             controller: function($scope, $element, $ionicModal, $attrs) {
