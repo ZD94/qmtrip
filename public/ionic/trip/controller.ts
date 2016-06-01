@@ -7,7 +7,7 @@ var Cookie = require('tiny-cookie');
 import { Staff } from 'api/_types/staff';
 import { Models } from 'api/_types';
 import {
-    TripDetail, EPlanStatus, ETripType, EInvoiceType
+    TripDetail, EPlanStatus, ETripType, EInvoiceType, EAuditStatus
 } from "api/_types/tripPlan";
 
 
@@ -291,6 +291,7 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
     var staff = await Staff.getCurrent();
     let id = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(id);
+    tripPlan.approve({auditResult: EAuditStatus.PASS})
     $scope.tripDetail = tripPlan;
     $scope.createdAt = moment(tripPlan.createAt).toDate();
     $scope.startAt = moment(tripPlan.startAt).toDate();
