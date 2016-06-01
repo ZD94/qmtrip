@@ -25,23 +25,6 @@ let TripDetailCols = TripDetail['$fieldnames'];
 let TripPlanCols = TripPlan['$fieldnames'];
 
 class TripPlanModule {
-    // static async caculateTravelBudget(){
-    //     let ret = await API.travelBudget.getTravelPolicyBudget({
-    //         leaveDate: '2016-06-01',
-    //         goBackDate: '2016-06-10',
-    //         isRoundTrip: true,
-    //         originPlace: '北京',
-    //         destinationPlace: '上海',
-    //         checkInDate: '2016-06-01',
-    //         checkOutDate: '2016-06-10',
-    //         leaveTime: '10:00',
-    //         goBackTime: '10:00',
-    //         isNeedHotel: false
-    //     });
-    //
-    //     return ret;
-    // }
-
     /**
      * @param params.budgetId 预算id
      * @param params.title 项目名称
