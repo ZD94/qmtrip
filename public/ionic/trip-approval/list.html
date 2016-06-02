@@ -28,6 +28,7 @@
                 {{trip.budget}}元
             </div>
         </div>
+        <div style="text-align: center;" ng-if="hasNextPage"><i class="icon ion-arrow-up-a"></i>上拉加载更多</div>
         <div style="text-align: center;" ng-if="!hasNextPage">没有更多记录了</div>
         <ion-infinite-scroll on-infinite="loadMore('{{filter}}')" ng-if="hasNextPage"></ion-infinite-scroll>
     </ion-content>
