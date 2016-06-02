@@ -1,7 +1,7 @@
 "use strict";
 import { Staff } from 'api/_types/staff';
 
-export async function IndexController($scope,Menu,$ionicPopup, Models){
+export async function IndexController($scope, Menu, $ionicPopup, Models){
     require('./index.less');
     var items =[
         {
@@ -9,42 +9,47 @@ export async function IndexController($scope,Menu,$ionicPopup, Models){
             icon:'plane',
             title:'我要出差',
             link:'trip/create',
-            badgenum: 0
+            badgeNum: 0,
+            name: "tripPlan"
         },
         {
             id:1052,
             icon:'podium',
             title:'审批单',
             link:'trip-approval/pending',
-            badgenum: 5
+            badgeNum: 0,
+            name: "waitApprove"
         },
         {
             id:1053,
             icon:'flag',
             title:'我的行程',
             link:'trip/list',
-            badgenum: 15
+            badgeNum: 0,
+            name: "allTripPlans"
         },
         {
             id:1054,
             icon:'',
             title:'',
             link:'',
-            badgenum: 0
+            badgeNum: 0
         },
         {
             id:1055,
             icon:'paintbrush',
-            title:'待我审批',
+            title:'出差请示',
             link:'trip-approval/list',
-            badgenum: 3
+            badgeNum: 0,
+            name: "needApprove"
         },
         {
             id:1056,
             icon:'levels',
             title:'企业管理',
             link:'company/management',
-            badgenum: 3
+            badgeNum: 0,
+            name: "companyManager"
         }
     ];
 
@@ -72,12 +77,8 @@ export async function IndexController($scope,Menu,$ionicPopup, Models){
             })
         }
     };
+    
     let company = staff.company;
-    // console.info(company);
-    // let agency = await company.getAgency();
-    // console.info(agency);
-    // let staffs = await company.getStaffs();
-    // console.info(staffs);
     $scope.Menu = Menu;
     $scope.staff = staff;
 }
