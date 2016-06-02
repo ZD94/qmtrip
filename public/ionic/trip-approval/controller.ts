@@ -13,7 +13,7 @@ export async function ApprovedController($scope, Models, $stateParams){
 }
 
 export async function DetailController($scope, Models, $stateParams){
-    require('./detail.less')
+    require('./detail.less');
     let tripId = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(tripId);
     if(tripPlan.status != EPlanStatus.WAIT_APPROVE) {
@@ -71,7 +71,7 @@ export async function ListController($scope, Models){
 
 export async function PendingController($scope){
     let staff = await Staff.getCurrent();
-    let tripPlans = await staff.getTripPlans({where: {auditStatus: EAuditStatus.AUDITING}}); //获取待审批出差计划列表
+    let tripPlans = await staff.getTripPlans({where: {status: [EPlanStatus.WAIT_APPROVE, EPlanStatus.APPROVE_NOT_PASS]}}); //获取待审批出差计划列表
     $scope.tripPlans = tripPlans;
 
     $scope.enterDetail = function(tripid){
