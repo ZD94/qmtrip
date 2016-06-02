@@ -5,22 +5,23 @@
             <div class="item item-body">
                 <ion-list>
                     <ion-item class="item-thumbnail-left">
-                        <img>
+                        <img/>
                         <h2>{{trip.account.name}} {{trip.account.mobile}}</h2>
                         <p></p>
                     </ion-item>
-                    <ion-item>{{trip.deptCity}} 到 {{trip.arrivalCity}}
-                        <br>出差事由：{{trip.title}}</ion-item>
+                    <ion-item><i class="icon ion-plane"></i> &nbsp;&nbsp;{{trip.deptCity}} 到 {{trip.arrivalCity}}
+                        <br><i class="icon ion-star"></i> &nbsp;&nbsp;出差事由：{{trip.title}}</ion-item>
                 </ion-list>
             </div>
             <div class="item item-divider">
-                待审批
+                <span ng-if="trip.status == 0">待审批</span>
+                <span ng-if="trip.status == 2">审批通过</span>
+                <span ng-if="trip.status == -1">审批失败</span>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 {{trip.budget}}元
             </div>
         </div>
-        <!--<div id="page3-markdown6" style="color:#000000;">-->
-            <!--<p>没有更多记录了</p>-->
-        <!--</div>-->
+        <div style="text-align: center;" ng-if="!hasNextPage">没有更多记录了</div>
+        <ion-infinite-scroll on-infinite="loadMore()" ng-if="hasNextPage"></ion-infinite-scroll>
     </ion-content>
 </ion-view>

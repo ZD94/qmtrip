@@ -63,6 +63,17 @@ export async function ListController($scope, Models){
     let staff = await Staff.getCurrent();
     let tripPlans = await staff.getWaitApproveTripPlans({}); //获取待审批出差计划列表
     $scope.tripPlans = tripPlans;
+    $scope.hasNextPage = true;
+
+    $scope.loadMore = function() {
+        try {
+            $scope.tripPlans = $scope.tripPlans.nextPage();
+            $scope.hasNextPage = true;
+        } catch(err) {
+            $scope.tripPlans = [];
+            $scope.hasNextPage = false;
+        }
+    }
 
     $scope.enterDetail = function(tripid){
         window.location.href = "#/trip-approval/detail?tripid="+tripid;
