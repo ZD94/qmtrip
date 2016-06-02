@@ -61,16 +61,20 @@ export async function DetailController($scope, Models, $stateParams){
 
 export async function ListController($scope, Models){
     let staff = await Staff.getCurrent();
-    let tripPlans = await staff.getWaitApproveTripPlans({}); //获取待审批出差计划列表
-    $scope.tripPlans = tripPlans;
+    let Pager = await staff.getWaitApproveTripPlans({}); //获取待审批出差计划列表
+    $scope.Pager = Pager;
+    $scope.tripPlans = Pager;
     $scope.hasNextPage = true;
 
     $scope.loadMore = function() {
         try {
-            $scope.tripPlans = $scope.tripPlans.nextPage();
+            Pager = $scope.Pager.nextPage();
+            Pager.forEach(function(v) {
+                $scope.trionPlans.push(v);
+            });
+            $scope.Pager = Pager;
             $scope.hasNextPage = true;
         } catch(err) {
-            $scope.tripPlans = [];
             $scope.hasNextPage = false;
         }
     }
