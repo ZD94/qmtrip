@@ -36,7 +36,7 @@ class StaffModule{
      * @param data.accountId 已经有登录账号
      * @returns {*}
      */
-    @requireParams(["email","name","companyId"], staffCols)//此处staffCols应该加上accountId ？
+    @requireParams(["name"], staffCols)//此处staffCols应该加上accountId ？
     static create(data): Promise<Staff>{
         var type = data.type;//若type为import则为导入添加
         if(type)
@@ -79,10 +79,9 @@ class StaffModule{
     }
 
     @clientExport
-    @requireParams(["name","companyId"], staffCols)
+    @requireParams(["name"], staffCols)
     static async createStaff (params): Promise<Staff> {
         var staff = await Staff.getCurrent();
-        params.isDefault = true;
         //设置员工默认部门
         if(!params.departmentId){
             let dafaultDept = await Models.department.find({where: {companyId: params.companyId, isDefault: true}});
@@ -173,97 +172,17 @@ class StaffModule{
      * @param data
      * @returns {*}
      */
-    @requireParams(["id"], staffCols)
-    static update(data): Promise<any>{
-        var id = data.id;
-        var options: any = {};
-        options.where = {id: id};
-        options.returning = true;
-        var send_email = true;
-        var accobj: any = {};
-        var com: any = {};
-        return Promise.all([
-                Models.staff.get(id),
-                API.auth.getAccount({id:id}),
-            ])
-            .spread(function(old, acc){
-                accobj = acc;
-                return API.company.getCompany({id: old.companyId})
-                    .then(function(company){
-                        com = company;
-                        if(data.email || data.mobile){
-                            if(acc.email != data.email || acc.mobile != data.mobile ){
-                                if(acc.status != 0 && acc.email != data.email)
-                                    throw {code: -2, msg: "该账号不允许修改邮箱"};
-                                var accData = {email: data.email || acc.email, mobile: data.mobile || acc.mobile};
-                                accData[id] = id;
-                                return Promise.all([
-                                        API.auth.updateAccount(accData),
-                                        DBM.Staff.update(data, options)
-                                    ])
-                                    .spread(function(updateaccount, updatestaff) {
-                                        accobj.email = data.email || acc.email;
-                                        accobj.mobile = data.mobile || acc.mobile;
-                                        send_email = false;
-                                        return updatestaff;
-                                    });
-                            }
-                            return DBM.Staff.update(data, options);
-                        }else{
-                            return DBM.Staff.update(data, options);
-                        }
-                    })
-            })
-            .spread(function(rownum, rows){
-                return Promise.all([
-                        API.travelPolicy.getTravelPolicy({id: rows[0].travelPolicyId}),
-                        API.department.getDepartment({id: rows[0].departmentId}),
-                        API.department.getDefaultDepartment({companyId: rows[0].companyId})
-                    ])
-                    .spread(function(tp, dept, defaultDept){
-                        if(accobj.status != 0 && send_email){
-                            //已激活账户
-                            var vals = {
-                                username: rows[0].name,
-                                mobile: accobj.mobile,
-                                travelPolicy: tp.name,
-                                time: utils.now(),
-                                companyName: com.name,
-                                department: dept ? dept.name : defaultDept.name,
-                                permission: rows[0].roleId == EStaffRole.ADMIN ? "管理员" : (rows[0].roleId == EStaffRole.OWNER ? "创建者" : "普通员工")
-                            }
-                            return API.mail.sendMailRequest({
-                                    toEmails: accobj.email,
-                                    templateName: "staff_update_email",
-                                    values: vals
-                                })
-                                .then(function(result) {
-                                    return new Staff(rows[0]);
-                                });
-                        }else if(accobj.status == 0 && send_email){
-                            //未激活账户 并且未通过修改邮箱更新账户信息发送激活邮件
-                            return API.auth.sendResetPwdEmail({companyName: com.name, email: accobj.email, type: 1, isFirstSet: true})
-                                .then(function() {
-                                    return new Staff(rows[0]);;
-                                });
-                        }else{
-                            return new Staff(rows[0]);;
-                        }
-                    })
-            });
-    }
-
     @clientExport
+    @requireParams(["id"], staffCols)
     @conditionDecorator([
         {if: condition.isSameCompany("0.id")},
         {if: condition.isStaffsAgency("0.id")}
     ])
     static async updateStaff(params) : Promise<Staff>{
+
         let updateStaff = await Models.staff.get(params.id);
         let staff = await Staff.getCurrent();
-        if(params.email && updateStaff["status"] != 0 && updateStaff.email != params.email){
-            throw {code: -2, msg: "该账号不允许修改邮箱"};
-        }
+
         for(var key in params){
             updateStaff[key] = params[key];
         }

@@ -74,26 +74,33 @@ class TripPlanModule {
 
             switch(tripType) {
                 case ETripType.OUT_TRIP:
-                    detail.deptCity = query.originPlace;
-                    detail.arrivalCity = query.destinationPlace;
+                    detail.deptCityCode = query.originPlace;
+                    detail.arrivalCityCode = query.destinationPlace;
+                    detail.deptCity = tripPlan.deptCity;
+                    detail.arrivalCity = tripPlan.arrivalCity;
                     detail.startTime = query.leaveDate;
                     detail.endTime = query.goBackDate;
                     break;
                 case ETripType.BACK_TRIP:
-                    detail.deptCity = query.destinationPlace;
-                    detail.arrivalCity = query.originPlace;
+                    detail.deptCityCode = query.destinationPlace;
+                    detail.arrivalCityCode = query.originPlace;
+                    detail.deptCity = tripPlan.arrivalCity;
+                    detail.arrivalCity = tripPlan.deptCity;
                     detail.startTime = query.goBackDate;
                     detail.endTime = query.leaveDate;
                     break;
                 case ETripType.HOTEL:
-                    detail.city = query.destinationPlace;
+                    detail.cityCode = query.destinationPlace;
+                    detail.city = tripPlan.arrivalCity;
                     detail.hotelName = query.businessDistrict;
                     detail.startTime = query.checkInDate || query.leaveDate;
                     detail.endTime = query.checkOutDate || query.goBackDate;
                     break;
                 case ETripType.SUBSIDY:
-                    detail.deptCity = query.originPlace;
-                    detail.arrivalCity = query.destinationPlace;
+                    detail.deptCityCode = query.originPlace;
+                    detail.arrivalCityCode = query.destinationPlace;
+                    detail.deptCity = tripPlan.deptCity;
+                    detail.arrivalCity = tripPlan.arrivalCity;
                     detail.startTime = query.leaveDate || query.checkInDate;
                     detail.endTime = query.goBackDate || query.checkOutDate;
                     break;
@@ -114,7 +121,7 @@ class TripPlanModule {
         });
 
         tripPlan.budget = totalBudget;
-        let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: '创建出差计划' + tripPlan.planNo});
+        let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: '创建出差计划'});
 
         await Promise.all([tripPlan.save(), tripPlanLog.save()]);
         await Promise.all(tripDetails.map((d)=>d.save()));
@@ -135,7 +142,7 @@ class TripPlanModule {
     static async sendTripPlanEmails(tripPlan: TripPlan, userId: string) {
         let url = config.host + '/corp.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
         let user = await Models.staff.get(userId);
-        let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER, EStaffRole.ADMIN], status: EStaffStatus.ON_JOB}}); //获取激活状态的管理员
+        let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER, EStaffRole.ADMIN], status: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
         let go = '无', back = '无', hotelStr = '无';
 
         let outTrip = await tripPlan.getOutTrip();
@@ -160,22 +167,24 @@ class TripPlanModule {
         if (hotel && hotel.length > 0) {
             let h = hotel[0];
             hotelStr = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') +
-                ', ' + h.city + ' ' + h.hotelName + ',动态预算￥' + h.budget;
+                ', ' + h.city + ',';
+            if(h.hotelName) {
+                hotelStr += h.hotelName + ',';
+            }
+            hotelStr += '动态预算￥' + h.budget;
         }
 
         await Promise.all(admins.map(async function(s) {
             let vals = {managerName: s.name, username: user.name, email: user.email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-                projectName: tripPlan.title, goTrafficBudget: go, backTripBudget: back, hotelBudget: hotelStr,
+                projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotelStr,
                 totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url};
 
-            let log = {userId: user.id, tripPlanId: tripPlan.id, remark: tripPlan.planNo + '给企业管理员' + s.name + '发送邮件'};
+            let log = {userId: user.id, tripPlanId: tripPlan.id, remark: '给企业管理员' + s.name + '发送邮件'};
 
-            // await Promise.all([
-            //     API.mail.sendMailRequest({toEmails: s.email, templateName: 'qm_notify_new_travelbudget', values: vals}),
-            //     Models.tripPlanLog.create(log).save()
-            // ])
-
-            await Models.tripPlanLog.create(log).save();
+            await Promise.all([
+                API.mail.sendMailRequest({toEmails: s.email, templateName: 'qm_notify_new_travelbudget', values: vals}),
+                TripPlanLog.create(log).save()
+            ])
         }));
 
         return true;
