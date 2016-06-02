@@ -1,10 +1,6 @@
 <ion-view title="我的行程" id="page13">
     <ion-content padding="true" class="has-header">
-        <ion-infinite-scroll
-                ng-if="moreDataCanBeLoaded()"
-                icon="ion-loading-c"
-                on-infinite="nextPage()">
-        </ion-infinite-scroll>
+
         <div class="list card" ng-repeat="trip in tripPlans track by trip.id" ng-click="enterdetail(trip.id)">
             <div class="item item-divider">{{trip.startAt | date: 'yyyy-MM-dd'}} 至 {{trip.backAt | date: 'yyyy-MM-dd'}}</div>
             <div class="item item-body">
@@ -17,14 +13,11 @@
                 <span class="item-note" ng-if="trip.budget != -1 && trip.budget != null">{{trip.budget}}元</span>
                 <span class="item-note" ng-if="trip.budget == -1 || trip.budget == null">待出预算</span>
             </div>
+
         </div>
         <div id="page13-markdown3" style="color:#000000;">
-            <div ng-if="isHasNextPage">
-                <button ng-click="nextPage()">加载更多</button>
-            </div>
-            <div ng-if="!isHasNextPage">
-                <button>没有更多记录了</button>
-            </div>
+            <div ng-if="!vm.isHasNextPage" style="text-align: center;">没有更多记录了</div>
         </div>
+        <ion-infinite-scroll ng-if="vm.isHasNextPage" on-infinite="vm.nextPage()"></ion-infinite-scroll>
     </ion-content>
 </ion-view>

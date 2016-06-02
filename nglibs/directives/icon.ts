@@ -13,7 +13,7 @@ angular
             controller: iconController
         };
     })
-    .directive("icon",function(){
+    .directive("jl-icon",function(){
         return {
             template: '<div style="display: inline-block;text-align: center;"><i class="{{symfont}}{{symname}}">{{symcode}}</i></div>',
             replace: true,
@@ -95,19 +95,19 @@ var fonts = {
 
 function iconController($scope){
     var symfont = 'customs';
-    var symname = $scope.name;
+    var symname = $scope.name || '';
     
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    if( /^qm\./.test($scope.name) ){
+    if( /^qm\./.test(symname) ){
 
         $scope.symfont = '';
-        $scope.symname = $scope.name.replace( /^qm\./,'icon-' );
+        $scope.symname = symname.replace( /^qm\./,'icon-' );
 
         return;
     };
-    if( /^icon-/.test($scope.name) ){
+    if( /^icon-/.test(symname) ){
         $scope.symfont = '';
-        $scope.symname = $scope.name;
+        $scope.symname = symname;
         return;
     };
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
