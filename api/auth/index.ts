@@ -386,6 +386,7 @@ class ApiAuth {
      * @public
      */
     @clientExport
+    @requireParams(["email"], accountCols)
     static async newAccount (data: {email: string, mobile?: string, pwd?: string, type?: Number, status?: Number, companyName?: string, id?: string}) {
         if (!data) {
             throw L.ERR.DATA_NOT_EXIST();

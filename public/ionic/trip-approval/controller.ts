@@ -11,6 +11,7 @@ export function ApprovedController($scope){
 }
 
 export function DetailController($scope){
+    require('./detail.less')
 
 }
 
@@ -20,7 +21,7 @@ export async function ListController($scope, Models){
     $scope.tripPlans = tripPlans;
 
     $scope.enterDetail = function(tripid){
-        window.location.href = "#/trip/list-detail?tripid="+tripid;
+        window.location.href = "#/trip-approval/detail?tripid="+tripid;
     }
 }
 

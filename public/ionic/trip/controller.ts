@@ -7,7 +7,7 @@ var Cookie = require('tiny-cookie');
 import { Staff } from 'api/_types/staff';
 import { Models } from 'api/_types';
 import {
-    TripDetail, EPlanStatus, ETripType, EInvoiceType
+    TripDetail, EPlanStatus, ETripType, EInvoiceType, EAuditStatus
 } from "api/_types/tripPlan";
 
 
@@ -263,20 +263,26 @@ export async function ListController($scope , Models){
     $scope.statustext = statusTxt;
     $scope.isHasNextPage = true;
     $scope.tripPlans = [];
-    let pager = await staff.getTripPlans({});
+    let pager = await staff.getTripPlans({where: {status: {$in: [EPlanStatus.WAIT_UPLOAD, EPlanStatus.WAIT_COMMIT, EPlanStatus.AUDIT_NOT_PASS,EPlanStatus.COMPLETE,EPlanStatus.NO_BUDGET,EPlanStatus.AUDITING]}}});
     loadTripPlan(pager);
 
     $scope.pager = pager;
-    $scope.nextPage = async function() {
-        try {
-            pager = await $scope.pager['nextPage']();
-        } catch(err) {
-            $scope.isHasNextPage = false;
-            return;
+    var vm = {
+        isHasNextPage:true,
+        nextPage : async function() {
+            try {
+                pager = await $scope.pager['nextPage']();
+            } catch(err) {
+                this.isHasNextPage = false;
+                return;
+            }
+            $scope.pager = pager;
+            loadTripPlan(pager);
+            $scope.$broadcast('scroll.infiniteScrollComplete');
         }
-        $scope.pager = pager;
-        loadTripPlan(pager);
     }
+
+    $scope.vm = vm;
 
     $scope.enterdetail = function(tripid){
         window.location.href = "#/trip/list-detail?tripid="+tripid;
@@ -296,6 +302,7 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
     var staff = await Staff.getCurrent();
     let id = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(id);
+    tripPlan.approve({auditResult: EAuditStatus.PASS,auditRemark:'1'})
     $scope.tripDetail = tripPlan;
     $scope.createdAt = moment(tripPlan.createAt).toDate();
     $scope.startAt = moment(tripPlan.startAt).toDate();
@@ -317,10 +324,11 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
     statusTxt[EPlanStatus.AUDITING] = "已提交待审核状态";
     statusTxt[EPlanStatus.COMPLETE] = "审核完，已完成状态";
     $scope.statustext = statusTxt;
+    $scope.EPlanStatus = EPlanStatus;
     $scope.EInvoiceType = EInvoiceType;
     $scope.EPlanStatus = EPlanStatus;
     budgets.map(function(budget) {
-        let tripType: ETripType = ETripType.OTHER;
+        let tripType: ETripType = ETripType.SUBSIDY;
         let title = '补助'
         if (budget.type == 0) {
             tripType = ETripType.OUT_TRIP;
@@ -402,6 +410,7 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
     $scope.other = other;
     $scope.budgets = budgets;
     console.info($scope.goTraffic);
+    console.info($scope.other);
     API.require('tripPlan');
     await API.onload();
     function uploadInvoice(consumeId, picture, callback) {
