@@ -328,7 +328,7 @@ class TripPlanModule {
         let staff = await Staff.getCurrent();
 
         if(auditResult != EAuditStatus.PASS && auditResult != EAuditStatus.NOT_PASS) {
-            throw L.ERR.PERMISSION_DENIED(); //只能审批待审批的出差记录
+            throw L.ERR.PERMISSION_DENY(); //只能审批待审批的出差记录
         }
 
         if(tripPlan.status != EPlanStatus.WAIT_APPROVE) {
@@ -336,7 +336,7 @@ class TripPlanModule {
         }
 
         if(tripPlan.auditUser != staff.id) {
-            throw L.ERR.PERMISSION_DENIED();
+            throw L.ERR.PERMISSION_DENY();
         }
 
         tripPlan.auditStatus = params.auditResult;
