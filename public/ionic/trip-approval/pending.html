@@ -9,7 +9,8 @@
                 </ion-list>
             </div>
             <div class="item item-divider">
-                <span>待审批</span>
+                <span ng-if="trip.status == EPlanStatus.WAIT_APPROVE">待审批</span>
+                <span ng-if="trip.status == EPlanStatus.APPROVE_NOT_PASS">审批未通过</span>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <span>{{trip.budget}}元</span>
             </div>

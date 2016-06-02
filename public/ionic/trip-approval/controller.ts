@@ -73,7 +73,8 @@ export async function PendingController($scope){
     let staff = await Staff.getCurrent();
     let tripPlans = await staff.getTripPlans({where: {status: [EPlanStatus.WAIT_APPROVE, EPlanStatus.APPROVE_NOT_PASS]}}); //获取待审批出差计划列表
     $scope.tripPlans = tripPlans;
-
+    $scope.EPlanStatus = EPlanStatus;
+    
     $scope.enterDetail = function(tripid){
         window.location.href = "#/trip/list-detail?tripid="+tripid;
     }
