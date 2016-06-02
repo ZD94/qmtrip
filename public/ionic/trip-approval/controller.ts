@@ -17,6 +17,10 @@ export async function DetailController($scope, Models, $stateParams){
     let tripId = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(tripId);
     $scope.tripPlan = tripPlan;
+    console.info(tripPlan);
+    let staff = await Models.staff.get(tripPlan.accountId);
+    $scope.staff = staff;
+    console.info(staff);
     let tripDetails = await tripPlan.getTripDetails();
     let traffic = [], hotel = [];
     let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
@@ -55,19 +59,64 @@ export async function DetailController($scope, Models, $stateParams){
     }
 }
 
-export async function ListController($scope, Models){
+export async function ListController($scope, Models, $stateParams, $ionicLoading){
     let staff = await Staff.getCurrent();
-    let tripPlans = await staff.getWaitApproveTripPlans({}); //获取待审批出差计划列表
-    $scope.tripPlans = tripPlans;
+    const ONE_PAGE_LIMIT = 10;
+    let Pager;
+    $scope.filter = 'WAIT_APPROVE';
+    $scope.tripPlans = [];
+    $scope.changeTo = async function(filter) {
+        $scope.tripPlans = [];
+        if (['WAIT_APPROVE', 'ALL', 'APPROVE_PASS', 'APPROVE_FAIL'].indexOf(filter) >= 0) {
+            $scope.filter = filter;
+        }
+        let status: string|number = 'ALL';
+        switch(filter) {
+            case 'WAIT_APPROVE':
+                status = EPlanStatus.WAIT_APPROVE;
+                break;
+            case 'APPROVE_PASS':
+                status = EPlanStatus.WAIT_UPLOAD;
+                break;
+            case 'APPROVE_FAIL':
+                status = EPlanStatus.APPROVE_NOT_PASS;
+                break;
+        }
+        let where: any = {};
+        if (status != 'ALL') {
+            where.status = status;
+        }
+        Pager = await staff.getWaitApproveTripPlans({ where: where, limit: ONE_PAGE_LIMIT}); //获取待审批出差计划列表
+        $scope.Pager = Pager;
+        Pager.forEach(function(v) {
+            $scope.tripPlans.push(v);
+        })
+        //首次加载判断
+        if (!Pager.length) {
+            $scope.hasNextPage = false;
+        } else {
+            $scope.hasNextPage = true;
+        }
+    }
+    $scope.changeTo($scope.filter);
     $scope.hasNextPage = true;
-
-    $scope.loadMore = function() {
+    $scope.loadMore = async function() {
+        if (!$scope.Pager) {
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+            return;
+        }
         try {
-            $scope.tripPlans = $scope.tripPlans.nextPage();
+            Pager = await $scope.Pager.nextPage();
+            Pager.forEach(function(v) {
+                $scope.tripPlans.push(v);
+            });
+            $scope.Pager = Pager;
             $scope.hasNextPage = true;
         } catch(err) {
-            $scope.tripPlans = [];
+            console.info(err);
             $scope.hasNextPage = false;
+        } finally {
+            $scope.$broadcast('scroll.infiniteScrollComplete');
         }
     }
 
