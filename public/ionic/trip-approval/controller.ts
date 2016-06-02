@@ -21,6 +21,10 @@ export async function DetailController($scope, Models, $stateParams){
         return;
     }
     $scope.tripPlan = tripPlan;
+    console.info(tripPlan);
+    let staff = await Models.staff.get(tripPlan.accountId);
+    $scope.staff = staff;
+    console.info(staff);
     let tripDetails = await tripPlan.getTripDetails();
     let traffic = [], hotel = [];
     let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
@@ -70,7 +74,7 @@ export async function ListController($scope, Models){
             $scope.tripPlans = $scope.tripPlans.nextPage();
             $scope.hasNextPage = true;
         } catch(err) {
-            $scope.tripPlans = [];
+            // $scope.tripPlans = [];
             $scope.hasNextPage = false;
         }
     }
