@@ -119,7 +119,6 @@ export class Staff extends ModelObject implements Account {
             options.where = {}
         }
         options.where.auditUser = this.id;
-        options.where.status = EPlanStatus.WAIT_APPROVE;
         return Models.tripPlan.find(options);
     }
     
