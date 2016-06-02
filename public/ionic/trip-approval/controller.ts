@@ -59,23 +59,58 @@ export async function DetailController($scope, Models, $stateParams){
     }
 }
 
-export async function ListController($scope, Models){
+export async function ListController($scope, Models, $stateParams, $ionicLoading){
     let staff = await Staff.getCurrent();
-    let Pager = await staff.getWaitApproveTripPlans({}); //获取待审批出差计划列表
-    $scope.Pager = Pager;
-    $scope.tripPlans = Pager;
+    let Pager;
+    $scope.filter = 'WAIT_APPROVE';
+    $scope.tripPlans = [];
+    $scope.changeTo = async function(filter) {
+        $scope.tripPlans = [];
+        if (['WAIT_APPROVE', 'ALL', 'APPROVE_PASS', 'APPROVE_FAIL'].indexOf(filter) >= 0) {
+            $scope.filter = filter;
+        }
+        let status: string|number = 'ALL';
+        switch(filter) {
+            case 'WAIT_APPROVE':
+                status = EPlanStatus.WAIT_APPROVE;
+                break;
+            case 'APPROVE_PASS':
+                status = EPlanStatus.WAIT_UPLOAD;
+                break;
+            case 'APPROVE_FAIL':
+                status = EPlanStatus.APPROVE_NOT_PASS;
+                break;
+        }
+        let where: any = {};
+        if (status != 'ALL') {
+            where.status = status;
+        }
+        Pager = await staff.getWaitApproveTripPlans({ where: where, limit: 10}); //获取待审批出差计划列表
+        $scope.Pager = Pager;
+        Pager.forEach(function(v) {
+            $scope.tripPlans.push(v);
+        })
+        $scope.hasNextPage = true;
+    }
+    $scope.changeTo($scope.filter);
     $scope.hasNextPage = true;
-
-    $scope.loadMore = function() {
+    $scope.loadMore = async function() {
+        if (!$scope.Pager) {
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+            return;
+        }
         try {
-            Pager = $scope.Pager.nextPage();
+            Pager = await $scope.Pager.nextPage();
             Pager.forEach(function(v) {
-                $scope.trionPlans.push(v);
+                $scope.tripPlans.push(v);
             });
             $scope.Pager = Pager;
             $scope.hasNextPage = true;
         } catch(err) {
+            console.info(err);
             $scope.hasNextPage = false;
+        } finally {
+            $scope.$broadcast('scroll.infiniteScrollComplete');
         }
     }
 

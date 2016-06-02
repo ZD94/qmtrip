@@ -1,5 +1,12 @@
-<ion-view title="待我审批" id="page3">
+<ion-view title="出差请示" id="page3">
     <ion-content padding="true" class="has-header">
+        <div class="button-bar">
+            <a ng-click="changeTo('ALL')" class="button button-small" ng-class="filter == 'ALL' ? 'active': ''">全部</a>
+            <a ng-click="changeTo('WAIT_APPROVE')" class="button button-small" ng-class="filter == 'WAIT_APPROVE' ? 'active': ''">待我审批</a>
+            <a ng-click="changeTo('APPROVE_PASS')" class="button button-small" ng-class="filter == 'APPROVE_PASS' ? 'active': ''">审批通过</a>
+            <a ng-click="changeTo('APPROVE_FAIL')" class="button button-small" ng-class="filter == 'APPROVE_FAIL' ? 'active': ''">审批失败</a>
+        </div>
+
         <div class="list card" ng-repeat="trip in tripPlans track by trip.id" ng-click="enterDetail(trip.id)">
             <div class="item item-divider">{{trip.startAt.value | date: 'yyyy-MM-dd'}} 至 {{trip.backAt.value | date: 'yyyy-MM-dd'}}</div>
             <div class="item item-body">
@@ -22,6 +29,6 @@
             </div>
         </div>
         <div style="text-align: center;" ng-if="!hasNextPage">没有更多记录了</div>
-        <ion-infinite-scroll on-infinite="loadMore()" ng-if="hasNextPage"></ion-infinite-scroll>
+        <ion-infinite-scroll on-infinite="loadMore('{{filter}}')" ng-if="hasNextPage"></ion-infinite-scroll>
     </ion-content>
 </ion-view>
