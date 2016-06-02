@@ -12,7 +12,7 @@ export function IndexController($scope,$stateParams) {
     };
     $scope.check_passed = ($scope.form.email.length > 0 && $scope.form.pwd.length > 5);
     $scope.$watchGroup(['form.email', 'form.pwd'], function(){
-        $scope.check_passed = ($scope.form.email.length > 0 && $scope.form.pwd.length > 5);
+        $scope.check_passed = $scope.form.email && $scope.form.pwd && ($scope.form.email.length > 0 && $scope.form.pwd.length > 5);
         //$scope.check_changed = true;
     })
 

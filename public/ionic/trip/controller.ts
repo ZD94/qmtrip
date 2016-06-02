@@ -242,8 +242,8 @@ export async function DetailController($scope, $stateParams, Models){
     let tripPlan = await Models.tripPlan.get(id);
     let budgets: any[] = await Models.tripDetail.find({where: {tripPlanId: id}});
     $scope.createdAt = moment(tripPlan.createAt).toDate();
-    $scope.startAt = moment(tripPlan.startAt).toDate();
-    $scope.backAt = moment(tripPlan.backAt).toDate();
+    $scope.startAt = moment(tripPlan.startAt.value).toDate();
+    $scope.backAt = moment(tripPlan.backAt.value).toDate();
 
     $scope.trip = tripPlan.target;
     $scope.budgets = budgets;
@@ -302,7 +302,6 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
     var staff = await Staff.getCurrent();
     let id = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(id);
-    tripPlan.approve({auditResult: EAuditStatus.PASS,auditRemark:'1'})
     $scope.tripDetail = tripPlan;
     $scope.createdAt = moment(tripPlan.createAt).toDate();
     $scope.startAt = moment(tripPlan.startAt).toDate();
