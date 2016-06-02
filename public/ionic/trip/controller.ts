@@ -264,20 +264,26 @@ export async function ListController($scope , Models){
     $scope.statustext = statusTxt;
     $scope.isHasNextPage = true;
     $scope.tripPlans = [];
-    let pager = await staff.getTripPlans({});
+    let pager = await staff.getTripPlans({where: {status: {$in: [EPlanStatus.WAIT_UPLOAD, EPlanStatus.WAIT_COMMIT, EPlanStatus.AUDIT_NOT_PASS,EPlanStatus.COMPLETE,EPlanStatus.NO_BUDGET,EPlanStatus.AUDITING]}}});
     loadTripPlan(pager);
 
     $scope.pager = pager;
-    $scope.nextPage = async function() {
-        try {
-            pager = await $scope.pager['nextPage']();
-        } catch(err) {
-            $scope.isHasNextPage = false;
-            return;
+    var vm = {
+        isHasNextPage:true,
+        nextPage : async function() {
+            try {
+                pager = await $scope.pager['nextPage']();
+            } catch(err) {
+                this.isHasNextPage = false;
+                return;
+            }
+            $scope.pager = pager;
+            loadTripPlan(pager);
+            $scope.$broadcast('scroll.infiniteScrollComplete');
         }
-        $scope.pager = pager;
-        loadTripPlan(pager);
     }
+
+    $scope.vm = vm;
 
     $scope.enterdetail = function(tripid){
         window.location.href = "#/trip/list-detail?tripid="+tripid;
