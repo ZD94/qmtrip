@@ -65,6 +65,7 @@ export async function DetailController($scope, Models, $stateParams){
 
 export async function ListController($scope, Models, $stateParams, $ionicLoading){
     let staff = await Staff.getCurrent();
+    const ONE_PAGE_LIMIT = 10;
     let Pager;
     $scope.filter = 'WAIT_APPROVE';
     $scope.tripPlans = [];
@@ -89,12 +90,17 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
         if (status != 'ALL') {
             where.status = status;
         }
-        Pager = await staff.getWaitApproveTripPlans({ where: where, limit: 10}); //获取待审批出差计划列表
+        Pager = await staff.getWaitApproveTripPlans({ where: where, limit: ONE_PAGE_LIMIT}); //获取待审批出差计划列表
         $scope.Pager = Pager;
         Pager.forEach(function(v) {
             $scope.tripPlans.push(v);
         })
-        $scope.hasNextPage = true;
+        //首次加载判断
+        if (!Pager.length) {
+            $scope.hasNextPage = false;
+        } else {
+            $scope.hasNextPage = true;
+        }
     }
     $scope.changeTo($scope.filter);
     $scope.hasNextPage = true;
