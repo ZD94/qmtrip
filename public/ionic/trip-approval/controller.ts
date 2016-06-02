@@ -16,10 +16,6 @@ export async function DetailController($scope, Models, $stateParams){
     require('./detail.less');
     let tripId = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(tripId);
-    if(tripPlan.status != EPlanStatus.WAIT_APPROVE) {
-        alert('不是待审批出差计划');
-        return;
-    }
     $scope.tripPlan = tripPlan;
     let tripDetails = await tripPlan.getTripDetails();
     let traffic = [], hotel = [];
