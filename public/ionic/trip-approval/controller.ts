@@ -2,11 +2,9 @@
  * Created by seven on 16/4/25.
  */
 "use strict";
-import {TripDetail, EPlanStatus, ETripType, EInvoiceType, EAuditStatus} from "api/_types/tripPlan";
+import {EPlanStatus, ETripType, EAuditStatus} from "api/_types/tripPlan";
 import {Staff} from "api/_types/staff";
 import moment = require('moment');
-import async = Q.async;
-
 
 export async function ApprovedController($scope, Models, $stateParams){
     let staffId = $stateParams.staffId;
