@@ -107,6 +107,7 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
         staff = Staff.create();
         staff.company = company;
     }
+    $scope.staffId = $stateParams.staffId;
     $scope.staff = staff;
     var role = {id: false};
     if (staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN) {

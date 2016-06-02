@@ -1,10 +1,10 @@
 <ion-view title="行程详情页" id="page20">
-    <ion-content padding="true" class="has-header">
+    <ion-content padding="true" class="has-header" style="background: url(ionic/images/backgroud.png) center no-repeat;background-size:cover;">
         <div id="page20-markdown7" style="color:#000000;text-align:right;">
-            <p>{{createdAt | date: 'yyyy-MM-dd HH:mm'}}</p>
+            <p style="color: #fff;">{{createdAt | date: 'yyyy-MM-dd HH:mm'}}</p>
         </div>
         <ion-list>
-            <ion-item>出差事由<span style="float: right;">{{tripDetail.title}}</span></ion-item>
+            <ion-item class="opactic">出差事由<span style="float: right;">{{tripDetail.title}}</span></ion-item>
         </ion-list>
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <ion-list>

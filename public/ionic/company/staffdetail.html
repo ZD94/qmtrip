@@ -7,7 +7,7 @@
             </label>
             <label class="item item-input">
                 <span class="input-label">邮箱</span>
-                <input type="email" placeholder="" ng-model="staff.email" readonly="readonly">
+                <input type="email" placeholder="" ng-model="staff.email" ng-disabled="!!staffId">
             </label>
             <label class="item item-input">
                 <span class="input-label">手机号</span>
