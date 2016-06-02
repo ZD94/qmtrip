@@ -1,6 +1,6 @@
 import {Models, EGender, EAccountType, isBrowser} from 'api/_types';
 import { Company } from 'api/_types/company';
-import { TripPlan } from 'api/_types/tripPlan';
+import {TripPlan, EPlanStatus} from 'api/_types/tripPlan';
 import { regApiType } from 'common/api/helper';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Department } from 'api/_types/department';
@@ -119,6 +119,7 @@ export class Staff extends ModelObject implements Account {
             options.where = {}
         }
         options.where.auditUser = this.id;
+        options.where.status = EPlanStatus.WAIT_APPROVE;
         return Models.tripPlan.find(options);
     }
     

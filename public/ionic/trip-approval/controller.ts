@@ -2,17 +2,63 @@
  * Created by seven on 16/4/25.
  */
 "use strict";
-import { Models } from 'api/_types';
 import {TripDetail, EPlanStatus, ETripType, EInvoiceType, EAuditStatus} from "api/_types/tripPlan";
 import {Staff} from "api/_types/staff";
+import moment = require('moment');
+import async = Q.async;
 
-export function ApprovedController($scope){
 
+export async function ApprovedController($scope, Models, $stateParams){
+    let staffId = $stateParams.staffId;
+    let staff = await Models.staff.get(staffId);
+    $scope.staffName = staff.name;
 }
 
-export function DetailController($scope){
+export async function DetailController($scope, Models, $stateParams){
     require('./detail.less')
+    let tripId = $stateParams.tripid;
+    let tripPlan = await Models.tripPlan.get(tripId);
+    if(tripPlan.status != EPlanStatus.WAIT_APPROVE) {
+        alert('不是待审批出差计划');
+        return;
+    }
+    $scope.tripPlan = tripPlan;
+    let tripDetails = await tripPlan.getTripDetails();
+    let traffic = [], hotel = [];
+    let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
+    tripDetails.map(function(detail) {
+        switch (detail.type) {
+            case ETripType.OUT_TRIP:
+            case ETripType.BACK_TRIP:
+                traffic.push(detail);
+                trafficBudget += detail.budget;
+                break;
+            case ETripType.HOTEL:
+                hotel.push(detail);
+                hotelBudget += detail.budget;
+                break;
+            default: subsidyBudget += detail.budget; break;
+        }
+    });
+    let subsidyDays:number = moment(tripPlan.backAt.value).diff(moment(tripPlan.startAt.value), 'days');
+    $scope.traffic = traffic;
+    $scope.hotel = hotel;
+    $scope.trafficBudget = trafficBudget;
+    $scope.hotelBudget = hotelBudget;
+    $scope.subsidyBudget = subsidyBudget;
+    $scope.subsidyDays = subsidyDays;
+    $scope.approveResult = EAuditStatus;
 
+    $scope.approve = async function(result: EAuditStatus) {
+        try{
+            await tripPlan.approve({auditResult: result});
+            if(result == EAuditStatus.PASS) {
+                window.location.href = "#/trip-approval/approved?staffId="+tripPlan.account.id;
+            }
+        }catch (e) {
+            alert(e);
+        }
+    }
 }
 
 export async function ListController($scope, Models){

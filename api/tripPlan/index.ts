@@ -80,6 +80,7 @@ class TripPlanModule {
                     detail.arrivalCity = tripPlan.arrivalCity;
                     detail.startTime = query.leaveDate;
                     detail.endTime = query.goBackDate;
+                    tripPlan.isNeedTraffic = true;
                     break;
                 case ETripType.BACK_TRIP:
                     detail.deptCityCode = query.destinationPlace;
@@ -88,6 +89,7 @@ class TripPlanModule {
                     detail.arrivalCity = tripPlan.deptCity;
                     detail.startTime = query.goBackDate;
                     detail.endTime = query.leaveDate;
+                    tripPlan.isNeedTraffic = true;
                     break;
                 case ETripType.HOTEL:
                     detail.cityCode = query.destinationPlace;
@@ -95,6 +97,7 @@ class TripPlanModule {
                     detail.hotelName = query.businessDistrict;
                     detail.startTime = query.checkInDate || query.leaveDate;
                     detail.endTime = query.checkOutDate || query.goBackDate;
+                    tripPlan.isNeedHotel = true;
                     break;
                 case ETripType.SUBSIDY:
                     detail.deptCityCode = query.originPlace;
@@ -339,10 +342,18 @@ class TripPlanModule {
             throw L.ERR.PERMISSION_DENY();
         }
 
-        tripPlan.auditStatus = params.auditResult;
+        tripPlan.auditStatus = auditResult;
+
         if(params.auditRemark) {
             tripPlan.auditRemark = params.auditRemark;
         }
+
+        if(auditResult == EAuditStatus.PASS) {
+            tripPlan.status = EPlanStatus.WAIT_UPLOAD;
+        }else if(auditResult == EAuditStatus.NOT_PASS) {
+            tripPlan.status = EPlanStatus.APPROVE_NOT_PASS;
+        }
+
         await tripPlan.save();
         return true;
     }
