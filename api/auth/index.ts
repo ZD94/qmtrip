@@ -388,9 +388,6 @@ class ApiAuth {
     @clientExport
     @requireParams(["email"], accountCols)
     static async newAccount (data: {email: string, mobile?: string, pwd?: string, type?: Number, status?: Number, companyName?: string, id?: string}) {
-        console.info("newAccountnewAccount=====================");
-        console.info(data);
-
         if (!data) {
             throw L.ERR.DATA_NOT_EXIST();
         }
@@ -738,7 +735,6 @@ class ApiAuth {
     @clientExport
     @requireParams(["id"], accountCols)
     static async updateAccount(params){
-        console.info("updateAccountupdateAccount=====================");
         var id = params.id;
         var old_email;
         var accobj = await Models.account.get(id);

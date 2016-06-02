@@ -114,13 +114,9 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
         role.id = true;
     }
     $scope.role = role;
-    console.info(role);
-    console.info(staff.roleId);
-
     $scope.travelpolicylist = await company.getTravelPolicies();
     $scope.departmentlist = await company.getDepartments();
-    console.info($scope.departmentlist);
-    $scope.savestaff = function () {
+    $scope.savestaff = async function () {
         let _staff = $scope.staff;
         if (_staff.travelPolicyId && _staff.travelPolicyId.id) {
             _staff.travelPolicyId = _staff.travelPolicyId.id;
@@ -131,7 +127,7 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
         } else {
             _staff.roleId = EStaffRole.COMMON;
         }
-        _staff.save();
+        _staff = await _staff.save();
         $ionicHistory.goBack(-1);
     }
     $scope.showrole = function () {
@@ -188,10 +184,8 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         travelPolicy.trainLevel = '不限';
         travelPolicy.hotelLevel = '五星级/豪华型';
     }
-    console.info(travelPolicy);
     $scope.travelPolicy = travelPolicy;
     $scope.savePolicy = async function () {
-        console.info($scope.travelPolicy);
         await $scope.travelPolicy.save();
         $ionicHistory.goBack(-1);
     }

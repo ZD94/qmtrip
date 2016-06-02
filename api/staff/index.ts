@@ -98,10 +98,9 @@ class StaffModule{
             params.travelPolicyId = 'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a';
         }
         if(staff){
-            var newstaff = Staff.create(params);
-            newstaff.company = staff.company;
-            let result = await newstaff.save();
-            return result;
+            params.companyId = staff.company.id;
+            let newstaff = await DBM.Staff.create(params);
+            return newstaff;
         }
         var user = await AgencyUser.getCurrent();
         if(user){
