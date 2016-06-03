@@ -25,5 +25,15 @@
         <div style="margin: 0px; line-height: 250px; border: 1px solid rgb(238, 238, 238); border-radius: 3px; text-align: center; background-color: rgb(255, 255, 255);">
             <i class="icon ion-image" style="font-size: 64px; color: rgb(136, 136, 136); vertical-align: middle;"></i>
         </div>
+
+        <ion-item>
+            <div class="item-divider">&nbsp;员工节省排行</div>
+            <ion-list>
+                <ion-item ng-repeat="v in staffSaves" style="font-size: 0.8em;">
+                    <div style="display: block; position: absolute; width: 30px; height: 30px; text-align: center; line-height: 30px; border-radius: 50%; color: white; background:#2495da;">{{v.name| limitTo: -1}}</div>
+                    <span style="padding-left: 50px;">{{v.name}}</span><span style="float: right;">{{v.save}}元</span>
+                </ion-item>
+            </ion-list>
+        </ion-item>
     </ion-content>
 </ion-view>

@@ -735,6 +735,34 @@ class TripPlanModule {
         return tripPlan;
     }
 
+    @clientExport
+    static async tripPlanSaveRank(params: {limit?: number|string}) {
+        let {accountId} = Zone.current.get('session');
+        let staff = await Models.staff.get(accountId);
+        let companyId = staff.company.id;
+        let limit = params.limit || 5;
+        if (!limit || !/^\d+$/.test(limit as string) || limit > 100) {
+            limit = 5;
+        }
+        let sql = `select account_id, sum(budget) - sum(expenditure) as save from trip_plan.trip_plans where status = 4 AND company_id = '${companyId}'
+        group by account_id
+        order by save asc limit ${limit}`;
+
+        let ranks = await sequelize.query(sql)
+            .then(function(result) {
+                return result[0];
+            });
+
+        ranks = await Promise.all(ranks.map((v: any) => {
+            return Models.staff.get(v.account_id)
+                .then(function(staff) {
+                    return {name: staff.name, save: v.save};
+                })
+        }))
+
+        return ranks;
+    }
+
     static __initHttpApp = require('./invoice');
 
 }

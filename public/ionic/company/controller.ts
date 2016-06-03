@@ -24,7 +24,10 @@ export async function ManagementController($scope, Models) {
 }
 
 export async function BudgetController($scope) {
-
+    $scope.staffSaves = [];
+    API.require("tripPlan");
+    await API.onload();
+    $scope.staffSaves = await API.tripPlan.tripPlanSaveRank({limit: 3});
 }
 
 export async function RecordController($scope, Models) {
