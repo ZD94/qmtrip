@@ -59,6 +59,7 @@ export async function DetailController($scope, Models, $stateParams){
 }
 
 export async function ListController($scope, Models, $stateParams, $ionicLoading){
+    require('./detail.less');
     let staff = await Staff.getCurrent();
     const ONE_PAGE_LIMIT = 10;
     let Pager;
