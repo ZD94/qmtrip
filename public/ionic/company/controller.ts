@@ -24,7 +24,17 @@ export async function ManagementController($scope, Models) {
 }
 
 export async function BudgetController($scope) {
+    $scope.staffSaves = [];
+    API.require("tripPlan");
+    await API.onload();
+    $scope.staffSaves = await API.tripPlan.tripPlanSaveRank({limit: 3});
 
+    let staff = await Staff.getCurrent();
+    let company = staff.company;
+    let statistic = await company.statisticTripPlanOfMonth({month: '2016-06'});
+    statistic.month = statistic.month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月');
+    // console.info(statistic);
+    $scope.statistic = statistic;
 }
 
 export async function RecordController($scope, Models) {

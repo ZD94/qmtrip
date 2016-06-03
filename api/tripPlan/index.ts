@@ -510,77 +510,6 @@ class TripPlanModule {
 
 
     /**
-     * 统计计划单数量
-     *
-     * @param params
-     */
-    @requireParams(['companyId'], ['accountId', 'status'])
-    static countTripPlanNum(params) {
-        let query = params;
-        return DBM.TripPlan.count({where: query});
-    }
-
-    /**
-     * 统计计划单的动态预算/计划金额和实际支出
-     * @param params
-     */
-    @requireParams(['companyId'], ['startTime', 'endTime', 'accountId'])
-    static statPlanOrderMoney(params) {
-        let query = params;
-        let query_complete:any = {
-            companyId: query.companyId,
-            status: EPlanStatus.COMPLETE,
-            auditStatus: 1
-        }
-        let query_sql = 'select sum(budget-expenditure) as \"savedMoney\" from tripplan.trip_plan where company_id=\'' + params.companyId + '\' and status=2 and audit_status=1';
-        query.status = {$gte: EPlanStatus.WAIT_COMMIT};
-        let startAt:any = {};
-
-        if (params.startTime) {
-            startAt.$gte = params.startTime;
-            query_sql += ' and start_at >=\'' + params.startTime + '\'';
-            delete params.startTime;
-        }
-
-        if (params.endTime) {
-            startAt.$lte = params.endTime;
-            query_sql += ' and start_at <=\'' + params.endTime + '\'';
-            delete params.endTime;
-        }
-
-        if (params.accountId) {
-            query_complete.accountId = params.accountId;
-            query_sql += ' and account_id=\'' + params.accountId + '\'';
-        }
-
-        query_sql += ' and budget>expenditure;';
-
-        if (!_.isNull(startAt)) {
-            query.startAt = startAt;
-            query_complete.startAt = startAt;
-        }
-
-        return Promise.all([
-            DBM.TripPlan.sum('budget', {where: query}),
-            DBM.TripPlan.sum('budget', {where: query_complete}),
-            DBM.TripPlan.sum('expenditure', {where: query_complete}),
-            DBM.TripPlan.count({where: query_complete}),
-            sequelize.query(query_sql)
-        ])
-            .spread(function (n1, n2, n3, n4, n5) {
-                let savedMoney = n5[0][0].savedMoney || 0;
-                return {
-                    qmBudget: n1 || 0,
-                    planMoney: n2 || 0,
-                    expenditure: n3 || 0,
-                    savedMoney: savedMoney,
-                    NumOfStaff: n4 || 0
-                }
-            })
-    }
-
-
-    /**
      * @method previewConsumeInvoice 预览发票图片
      *
      * @param {Object} params
@@ -667,8 +596,101 @@ class TripPlanModule {
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
     }
 
-    /**
 
+    /********************************************统计相关API***********************************************/
+
+    @clientExport
+    @requireParams(['companyId', 'month'])
+    static async statisticTripPlanOfMonth(params: {companyId: string, month: string}) {
+        let staff = await Staff.getCurrent();
+        let companyId = staff.company.id;
+        let month = params.month;
+        let startTime = month + '-01';
+        let endTime = moment(startTime).add(1, 'months').format('YYYY-MM-DD');
+
+        let where_sql = 'from trip_plan.trip_plans where company_id=\''
+            + companyId + '\' and status!=(' + EPlanStatus.APPROVE_NOT_PASS + ') and status!=' + EPlanStatus.WAIT_APPROVE + ' and start_at>=\''
+            + startTime + '\' and start_at<\'' + endTime + '\'';
+
+        let staff_num_sql = 'select count(1) as \"staffNum\" from (select distinct account_id ' + where_sql + ') as Project;';
+        let project_num_sql = 'select count(1) as \"projectNum\" from (select distinct project_id ' + where_sql + ') as Project;';
+        let budget_sql = 'select sum(budget) as \"dynamicBudget\" ' + where_sql;
+
+        let staff_num_sql_ret = await sequelize.query(staff_num_sql);
+        let project_num_sql_ret = await sequelize.query(project_num_sql);
+        let budget_sql_ret = await sequelize.query(budget_sql);
+        // console.info("************************");
+        // console.info(staff_num_sql_ret);
+        // console.info(project_num_sql_ret);
+        // console.info(budget_sql_ret);
+        return {
+            month: month,
+            staffNum: staff_num_sql_ret[0][0].staffNum,
+            projectNum: project_num_sql_ret[0][0].projectNum,
+            dynamicBudget: budget_sql_ret[0][0].dynamicBudget
+        };
+    }
+
+    /**
+     * 统计计划单的动态预算/计划金额和实际支出
+     * @param params
+     */
+    @requireParams(['companyId'], ['startTime', 'endTime', 'accountId'])
+    static statPlanOrderMoney(params) {
+        let query = params;
+        let query_complete:any = {
+            companyId: query.companyId,
+            status: EPlanStatus.COMPLETE,
+            auditStatus: 1
+        }
+        let query_sql = 'select sum(budget-expenditure) as \"savedMoney\" from tripplan.trip_plan where company_id=\'' + params.companyId + '\' and status=2 and audit_status=1';
+        query.status = {$gte: EPlanStatus.WAIT_COMMIT};
+        let startAt:any = {};
+
+        if (params.startTime) {
+            startAt.$gte = params.startTime;
+            query_sql += ' and start_at >=\'' + params.startTime + '\'';
+            delete params.startTime;
+        }
+
+        if (params.endTime) {
+            startAt.$lte = params.endTime;
+            query_sql += ' and start_at <=\'' + params.endTime + '\'';
+            delete params.endTime;
+        }
+
+        if (params.accountId) {
+            query_complete.accountId = params.accountId;
+            query_sql += ' and account_id=\'' + params.accountId + '\'';
+        }
+
+        query_sql += ' and budget>expenditure;';
+
+        if (!_.isNull(startAt)) {
+            query.startAt = startAt;
+            query_complete.startAt = startAt;
+        }
+
+        return Promise.all([
+            DBM.TripPlan.sum('budget', {where: query}),
+            DBM.TripPlan.sum('budget', {where: query_complete}),
+            DBM.TripPlan.sum('expenditure', {where: query_complete}),
+            DBM.TripPlan.count({where: query_complete}),
+            sequelize.query(query_sql)
+        ])
+            .spread(function (n1, n2, n3, n4, n5) {
+                let savedMoney = n5[0][0].savedMoney || 0;
+                return {
+                    qmBudget: n1 || 0,
+                    planMoney: n2 || 0,
+                    expenditure: n3 || 0,
+                    savedMoney: savedMoney,
+                    NumOfStaff: n4 || 0
+                }
+            })
+    }
+
+    /**
      * @method saveTripPlan
      * 生成出差计划单
      * @param params
@@ -733,6 +755,34 @@ class TripPlanModule {
         await DBM.TripPlanLog.create(logs);
 
         return tripPlan;
+    }
+
+    @clientExport
+    static async tripPlanSaveRank(params: {limit?: number|string}) {
+        let {accountId} = Zone.current.get('session');
+        let staff = await Models.staff.get(accountId);
+        let companyId = staff.company.id;
+        let limit = params.limit || 5;
+        if (!limit || !/^\d+$/.test(limit as string) || limit > 100) {
+            limit = 5;
+        }
+        let sql = `select account_id, sum(budget) - sum(expenditure) as save from trip_plan.trip_plans where status = 4 AND company_id = '${companyId}'
+        group by account_id
+        order by save asc limit ${limit}`;
+
+        let ranks = await sequelize.query(sql)
+            .then(function(result) {
+                return result[0];
+            });
+
+        ranks = await Promise.all(ranks.map((v: any) => {
+            return Models.staff.get(v.account_id)
+                .then(function(staff) {
+                    return {name: staff.name, save: v.save};
+                })
+        }))
+
+        return ranks;
     }
 
     static __initHttpApp = require('./invoice');
