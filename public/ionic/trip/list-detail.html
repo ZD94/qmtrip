@@ -6,22 +6,17 @@
         <ion-list class="jl_projectinfo">
             <ion-item class="project_tit">{{tripDetail.title}}</ion-item>
             <ion-item class="project_cont">
-                <p>2016-05-23 至 2016-05-28</p>
-                <p style="text-align: center">总预算:3039元</p>
+                <p>{{tripDetail.startAt.value | date: 'yyyy-MM-dd'}} 至 {{tripDetail.backAt.value | date: 'yyyy-MM-dd'}}</p>
+                <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{tripDetail.budget}}</span>元</p>
             </ion-item>
-        </ion-list>
-        <div class="spacer" style="width: 285px; height: 17px;"></div>
-        <ion-list>
-            <ion-item>{{startAt | date: 'yyyy-MM-dd HH:mm'}} 至 {{backAt | date: 'yyyy-MM-dd HH:mm'}}
-                <br>总预算：{{tripDetail.budget}}元</ion-item>
         </ion-list>
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <div class="button-bar"></div>
         <ion-list>
-            <div style="margin-bottom: 10px" ng-if="goTraffic">
+            <div ng-if="goTraffic">
                 <ion-item class="item-divider">
-                    <span>去程交通</span>
-                    <span style="margin-left: 120px;">{{goTraffic.price}}</span>元
+                    <span>交通</span>
+                    <span style="margin-left: 120px;">{{goTraffic.price + backTraffic.price}}</span>元
                 </ion-item>
                 <ion-item>
                     <span>{{startAt | date: 'yyyy-MM-dd'}}</span>
@@ -36,19 +31,19 @@
                     {{tripDetail.arrivalCity}}
                     <br>{{goTraffic.price}}元
                     <div class="item-note" ng-if="goTraffic.status == EPlanStatus.WAIT_UPLOAD">
-                        <div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="other.title" done="other.done">
+                        <div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="goTraffic.title" done="goTraffic.done">
                             上传票据
                         </div>
                         <!--<a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>-->
                     </div>
                     <div class="item-note" ng-if="goTraffic.status == EPlanStatus.WAIT_COMMIT">
-                        <div ng-if="!otherStatus" class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="other.title" done="other.done">
+                        <div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="goTraffic.title" done="goTraffic.done">
                             重新上传
                         </div>
-                        <a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>
+                        <a class="" ng-click="checkInvoice(goTraffic.id)">查看票据</a>
                     </div>
                     <div class="item-note" ng-if="goTraffic.status == EPlanStatus.AUDITING">
-                        <a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>
+                        <a class="" ng-click="checkInvoice(goTraffic.id)">查看票据</a>
                     </div>
                     <div class="item-note" ng-if="goTraffic.status == EPlanStatus.WAIT_APPROVE">
                         待审批
@@ -57,49 +52,45 @@
                         审批未通过
                     </div>
                     <div class="item-note" ng-if="goTraffic.status == EPlanStatus.COMPLETE">
-                        <a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>
+                        <a class="" ng-click="checkInvoice(goTraffic.id)">查看票据</a>
                     </div>
                     <div class="item-note" ng-if="goTraffic.status == EPlanStatus.AUDIT_NOT_PASS">
-                        <div ng-if="!otherStatus" class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="other.title" done="other.done">
+                        <div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="goTraffic.title" done="goTraffic.done">
                             重新上传
                         </div>
                     </div>
                     <div class="item-note" ng-if="goTraffic.status == EPlanStatus.NO_BUDGET">
-                        <a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>
+                        <a class="" ng-click="checkInvoice(goTraffic.id)">查看票据</a>
                     </div>
                 </ion-item>
             </div>
-            <div style="margin-bottom: 10px" ng-if="backTraffic">
-                <ion-item class="item-divider">
-                    <span>回程交通</span>
-                    <span style="margin-left: 120px;">{{backTraffic.price}}</span>元
-                </ion-item>
+            <div ng-if="backTraffic">
                 <ion-item>
                     <span>{{backAt | date: 'yyyy-MM-dd'}}</span>
                     <br>
                     {{tripDetail.deptCity}}
                     &nbsp;
-                    <i ng-if='backTraffic.tripType == EInvoiceType.PLANE' class="icon ion-plane">1</i>
-                    <i ng-if='backTraffic.tripType == EInvoiceType.TRAIN' class="icon ion-android-train">0</i>
-                    <i ng-if='backTraffic.tripType == EInvoiceType.HOTEL' class="icon ion-home">2</i>
+                    <i ng-if='backTraffic.tripType == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                    <i ng-if='backTraffic.tripType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                    <i ng-if='backTraffic.tripType == EInvoiceType.HOTEL' class="icon ion-home"></i>
                     <i ng-if='backTraffic.tripType == EInvoiceType.OTHER'>-</i>
                     &nbsp;
                     {{tripDetail.arrivalCity}}
                     <br>{{backTraffic.price}}元
                     <div class="item-note" ng-if="backTraffic.status == EPlanStatus.WAIT_UPLOAD">
-                        <div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="other.title" done="other.done">
+                        <div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="backTraffic.title" done="backTraffic.done">
                             上传票据
                         </div>
                         <!--<a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>-->
                     </div>
                     <div class="item-note" ng-if="backTraffic.status == EPlanStatus.WAIT_COMMIT">
-                        <div ng-if="!otherStatus" class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="other.title" done="other.done">
+                        <div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="backTraffic.title" done="backTraffic.done">
                             重新上传
                         </div>
-                        <a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>
+                        <a class="" ng-click="checkInvoice(backTraffic.id)">查看票据</a>
                     </div>
                     <div class="item-note" ng-if="backTraffic.status == EPlanStatus.AUDITING">
-                        <a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>
+                        <a class="" ng-click="checkInvoice(backTraffic.id)">查看票据</a>
                     </div>
                     <div class="item-note" ng-if="backTraffic.status == EPlanStatus.WAIT_APPROVE">
                         待审批
@@ -108,19 +99,19 @@
                         审批未通过
                     </div>
                     <div class="item-note" ng-if="backTraffic.status == EPlanStatus.COMPLETE">
-                        <a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>
+                        <a class="" ng-click="checkInvoice(backTraffic.id)">查看票据</a>
                     </div>
                     <div class="item-note" ng-if="backTraffic.status == EPlanStatus.AUDIT_NOT_PASS">
-                        <div ng-if="!otherStatus" class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="other.title" done="other.done">
+                        <div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="backTraffic.title" done="backTraffic.done">
                             重新上传
                         </div>
                     </div>
                     <div class="item-note" ng-if="backTraffic.status == EPlanStatus.NO_BUDGET">
-                        <a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>
+                        <a class="" ng-click="checkInvoice(backTraffic.id)">查看票据</a>
                     </div>
                 </ion-item>
             </div>
-            <div style="margin-bottom: 10px" ng-if="hotel">
+            <div ng-if="hotel">
                 <ion-item class="item-divider">
                     <span>住宿</span>
                     <span style="margin-left: 120px;">{{hotel.price}}</span>元
@@ -139,19 +130,19 @@
                     {{tripDetail.arrivalCity}}
                     <br>{{hotel.price}}元
                     <div class="item-note" ng-if="hotel.status == EPlanStatus.WAIT_UPLOAD">
-                        <div ng-if="!otherStatus" class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="other.title" done="other.done">
+                        <div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="hotel.title" done="hotel.done">
                             上传票据
                         </div>
                         <!--<a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>-->
                     </div>
                     <div class="item-note" ng-if="hotel.status == EPlanStatus.WAIT_COMMIT">
-                        <div ng-if="!otherStatus" class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="other.title" done="other.done">
+                        <div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="hotel.title" done="hotel.done">
                             重新上传
                         </div>
-                        <a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>
+                        <a class="" ng-click="checkInvoice(hotel.id)">查看票据</a>
                     </div>
                     <div class="item-note" ng-if="hotel.status == EPlanStatus.AUDITING">
-                        <a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>
+                        <a class="" ng-click="checkInvoice(hotel.id)">查看票据</a>
                     </div>
                     <div class="item-note" ng-if="hotel.status == EPlanStatus.WAIT_APPROVE">
                         待审批
@@ -160,15 +151,15 @@
                         审批未通过
                     </div>
                     <div class="item-note" ng-if="hotel.status == EPlanStatus.COMPLETE">
-                        <a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>
+                        <a class="" ng-click="checkInvoice(hotel.id)">查看票据</a>
                     </div>
                     <div class="item-note" ng-if="hotel.status == EPlanStatus.AUDIT_NOT_PASS">
-                        <div ng-if="!otherStatus" class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="other.title" done="other.done">
+                        <div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="hotel.title" done="hotel.done">
                             重新上传
                         </div>
                     </div>
                     <div class="item-note" ng-if="hotel.status == EPlanStatus.NO_BUDGET">
-                        <a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>
+                        <a class="" ng-click="checkInvoice(hotel.id)">查看票据</a>
                     </div>
                 </ion-item>
             </div>

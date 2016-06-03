@@ -237,8 +237,12 @@ export async function CommittedController($scope, $stateParams, Models){
     }
 }
 
-export async function DetailController($scope, $stateParams, Models){
+export async function DetailController($scope, $stateParams, Models, $location){
     let id = $stateParams.id;
+    if (!id) {
+        $location.path("/");
+        return;
+    }
     let tripPlan = await Models.tripPlan.get(id);
     let budgets: any[] = await Models.tripDetail.find({where: {tripPlanId: id}});
     $scope.createdAt = moment(tripPlan.createAt).toDate();
@@ -297,13 +301,18 @@ export async function ListController($scope , Models){
     }
 }
 
-export async function ListDetailController($scope , Models, $stateParams ,FileUploader ,$state){
+
+export async function ListDetailController($location, $scope , Models, $stateParams ){
+    let id = $stateParams.tripid;
+    if (!id) {
+        $location.path("/");
+        return;
+    }
     require('./listdetail.less');
     var staff = await Staff.getCurrent();
-    let id = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(id);
     $scope.tripDetail = tripPlan;
-    $scope.createdAt = moment(tripPlan.createAt).toDate();
+    $scope.createdAt = moment(tripPlan.createdAt.value).toDate();
     $scope.startAt = moment(tripPlan.startAt).toDate();
     $scope.backAt = moment(tripPlan.backAt).toDate();
     let budgets: any[] = await tripPlan.getTripDetails();
@@ -352,55 +361,43 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
             $scope.goTrafficStatus = Boolean(budget.status);
             goTraffic = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
                 var fileId = response.fileId;
-                uploadInvoice(budget.id, fileId, function (err, result) {
+                uploadInvoice(budget, fileId,async function (err, result) {
                     if (err) {
                         alert(err);
                         return;
                     }
-                    $scope.goTrafficStatus = true;
-                    $scope.$apply();
-                    // $state.reload();
+                    var newdetail = await Models.tripDetail.get(budget.id);
+                    $scope.goTraffic.status = newdetail.status;
                 });
             }};
         } else if (tripType == ETripType.BACK_TRIP) {
             $scope.backTrafficStatus = Boolean(budget.status);
             backTraffic = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
                 var fileId = response.fileId;
-                uploadInvoice(budget.id, fileId, function (err, result) {
+                uploadInvoice(budget, fileId,async function (err, result) {
                     if (err) {
                         alert(err);
                         return;
                     }
-                    $scope.backTrafficStatus = true;
-                    $scope.$apply();
+                    var newdetail = await Models.tripDetail.get(budget.id);
+                    $scope.backTraffic.status = newdetail.status;
                 });
             }};
         } else if (tripType == ETripType.HOTEL) {
-            $scope.hotelStatus = Boolean(budget.status);
             hotel = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
                 var fileId = response.fileId;
-                uploadInvoice(budget.id, fileId, function (err, result) {
+                uploadInvoice(budget, fileId,async function (err, result) {
                     if (err) {
                         alert(err);
                         return;
                     }
-                    $scope.hotelStatus = true;
-                    $scope.$apply();
+                    var newdetail = await Models.tripDetail.get(budget.id);
+                    $scope.hotel.status = newdetail.status;
                 });
             }};
         } else {
             $scope.otherStatus = Boolean(budget.status);
-            other = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
-                var fileId = response.fileId;
-                uploadInvoice(budget.id, fileId, function (err, result) {
-                    if (err) {
-                        alert(err);
-                        return;
-                    }
-                    $scope.otherStatus = true;
-                    $scope.$apply();
-                });
-            }};
+            other = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status};
         }
     });
     $scope.goTraffic = goTraffic;
@@ -409,16 +406,15 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
     $scope.other = other;
     $scope.budgets = budgets;
     console.info($scope.goTraffic);
-    console.info($scope.other);
+    console.info($scope.hotel);
+    console.info(EPlanStatus)
     API.require('tripPlan');
     await API.onload();
-    function uploadInvoice(consumeId, picture, callback) {
-        API.tripPlan.uploadInvoice({
-            tripDetailId: consumeId,
+    function uploadInvoice(tripDetail, picture, callback) {
+        tripDetail.uploadInvoice({
             pictureFileId: picture
-        }, callback);
+        },callback)
     }
-    $scope.backtraffic_up = '&#xe90e;<em>回程</em><strong>交通票据</strong>';
 
     $scope.approveTripPlan = async function() {
         try {
@@ -429,4 +425,14 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
             alert(e.msg || e);
         }
     }
+    
+    $scope.checkInvoice = function(detailId){
+        console.info(detailId);
+        window.location.href="#/trip/invoice-detail?detailId="+detailId;
+    }
+}
+
+export async function InvoiceDetailController($scope , Models, $stateParams){
+    var invoice = await Models.tripDetail.get($stateParams.detailId);
+    console.info(invoice);
 }

@@ -59,6 +59,7 @@ export async function DetailController($scope, Models, $stateParams){
 }
 
 export async function ListController($scope, Models, $stateParams, $ionicLoading){
+    require('./detail.less');
     let staff = await Staff.getCurrent();
     const ONE_PAGE_LIMIT = 10;
     let Pager;
@@ -70,13 +71,13 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
         if (['WAIT_APPROVE', 'ALL', 'APPROVE_PASS', 'APPROVE_FAIL'].indexOf(filter) >= 0) {
             $scope.filter = filter;
         }
-        let status: string|number = 'ALL';
+        let status: string|number|Object = 'ALL';
         switch(filter) {
             case 'WAIT_APPROVE':
                 status = EPlanStatus.WAIT_APPROVE;
                 break;
             case 'APPROVE_PASS':
-                status = EPlanStatus.WAIT_UPLOAD;
+                status = [EPlanStatus.WAIT_UPLOAD, EPlanStatus.AUDITING, EPlanStatus.COMPLETE, EPlanStatus.WAIT_COMMIT, EPlanStatus.AUDIT_NOT_PASS];
                 break;
             case 'APPROVE_FAIL':
                 status = EPlanStatus.APPROVE_NOT_PASS;
@@ -126,13 +127,42 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
 }
 
 export async function PendingController($scope){
+    const PAGE_SIZE = 10;
     let staff = await Staff.getCurrent();
-    let tripPlans = await staff.getTripPlans({where: {status: [EPlanStatus.WAIT_APPROVE, EPlanStatus.APPROVE_NOT_PASS]}}); //获取待审批出差计划列表
-    $scope.tripPlans = tripPlans;
+    let Pager = await staff.getTripPlans({where: {status: [EPlanStatus.WAIT_APPROVE, EPlanStatus.APPROVE_NOT_PASS]}, limit: PAGE_SIZE}); //获取待审批出差计划列表
+    $scope.tripPlans = [];
+
+    Pager.forEach((v) => {
+        $scope.tripPlans.push(v);
+    })
+    $scope.Pager = Pager;
     $scope.EPlanStatus = EPlanStatus;
     
     $scope.enterDetail = function(tripid){
         window.location.href = "#/trip/list-detail?tripid="+tripid;
+    }
+
+    if (!Pager || !Pager.length) {
+        $scope.hasNextPage = false;
+    } else {
+        $scope.hasNextPage = true;
+    }
+    $scope.loadMore = async function() {
+        if (!$scope.Pager) {
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+            return;
+        }
+        try {
+            $scope.Pager = await $scope.Pager.nextPage();
+            $scope.Pager.map(function(v) {
+                $scope.tripPlans.push(v);
+            })
+            $scope.hasNextPage = true;
+        } catch (err) {
+            $scope.hasNextPage = false;
+        } finally {
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+        }
     }
 }
 
