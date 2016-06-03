@@ -6,21 +6,36 @@
             <a href="#/company/distribution" id="page24-button75" class="button button-stable  button-block">员工分布</a>
         </div>
         <div class="spacer" style="width: 300px; height: 30px;"></div>
+        <label class="item item-select">
+            <span class="input-label">当前统计</span>
+            <select>
+                <option>本月</option>
+                <option>{{statistic.month}}</option>
+                <option>2016年3月</option>
+            </select>
+        </label>
         <form class="list">
             <div class="list card">
-                <div class="item item-divider">本月支出</div>
                 <div class="item item-body">
-                    <h1 id="page24-heading1" style="color:#000000;text-align:center;">20399元</h1>
+                    <ion-list>
+                        <ion-item class="item-avatar">
+                            <h2>出差人数</h2>
+                            <p>{{statistic.staffNum}}人次</p>
+                        </ion-item>
+                        <ion-item class="item-avatar">
+                            <h2>运行项目</h2>
+                            <p>{{statistic.projectNum}}个</p>
+                        </ion-item>
+                    </ion-list>
                 </div>
             </div>
-            <label class="item item-select">
-                <span class="input-label">请选择月份</span>
-                <select>
-                    <option>本月</option>
-                    <option>2016年4月</option>
-                    <option>2016年3月</option>
-                </select>
-            </label>
+        </form>
+
+        <form class="list">
+            <div class="list card">
+                <div>动态预算&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{statistic.dynamicBudget}}</div>
+            </div>
+
         </form>
         <div style="margin: 0px; line-height: 250px; border: 1px solid rgb(238, 238, 238); border-radius: 3px; text-align: center; background-color: rgb(255, 255, 255);">
             <i class="icon ion-image" style="font-size: 64px; color: rgb(136, 136, 136); vertical-align: middle;"></i>
