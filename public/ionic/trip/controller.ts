@@ -237,8 +237,12 @@ export async function CommittedController($scope, $stateParams, Models){
     }
 }
 
-export async function DetailController($scope, $stateParams, Models){
+export async function DetailController($scope, $stateParams, Models, $location){
     let id = $stateParams.id;
+    if (!id) {
+        $location.path("/");
+        return;
+    }
     let tripPlan = await Models.tripPlan.get(id);
     let budgets: any[] = await Models.tripDetail.find({where: {tripPlanId: id}});
     $scope.createdAt = moment(tripPlan.createAt).toDate();
@@ -297,10 +301,15 @@ export async function ListController($scope , Models){
     }
 }
 
-export async function ListDetailController($scope , Models, $stateParams ,FileUploader ,$state){
+export async function ListDetailController($location, $scope , Models, $stateParams ,FileUploader ,$state){
+    let id = $stateParams.tripid;
+    if (!id) {
+        $location.path("/");
+        return;
+    }
+
     require('./listdetail.less');
     var staff = await Staff.getCurrent();
-    let id = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(id);
     $scope.tripDetail = tripPlan;
     $scope.createdAt = moment(tripPlan.createdAt.value).toDate();
