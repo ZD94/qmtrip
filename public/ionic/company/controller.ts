@@ -34,7 +34,7 @@ export async function DistributionController($scope, Models) {
     $scope.isShowMap = false;
     let date = new Date().valueOf();
     let staffTrips = await Models.tripPlan.find({where: {startAt: {$lte: date}, backAt: {$gte: date}, status: EPlanStatus.WAIT_UPLOAD},
-        attributes: ["title", "account_id", "arrival_city_code"]});
+        attributes: ["title", "account_id", "arrival_city_code"] , order: ["arrival_city_code"]});
 
     API.require("place")
     await API.onload();
