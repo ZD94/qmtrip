@@ -35,11 +35,12 @@ API.authenticate = function(remote, callback){
                 callback(err, handle);
             });
 };
-
+let ngBaiduMap = require('angular-baidu-map').ngBaiduMap;
 require('nglibs');
 var ngapp = require('ngapp');
 ngapp.depend('ionic');
 ngapp.depend('nglibs');
+ngapp.depend(ngBaiduMap);
 ngapp.root('ionic', '/trip/create');
 ngapp.useRoutePolicy(ngapp.RoutePolicy.None);
 ngapp.routeAddSingle('login');
