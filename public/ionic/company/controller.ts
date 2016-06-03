@@ -35,6 +35,9 @@ export async function BudgetController($scope) {
     statistic.month = statistic.month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月');
     // console.info(statistic);
     $scope.statistic = statistic;
+
+    $scope.labels = ["Download Sales", "In-Store Sales", "Mail-Order Sales"];
+    $scope.data = [300, 500, 100];
 }
 
 export async function RecordController($scope, Models) {

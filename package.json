@@ -75,6 +75,7 @@
     "angular-animate": "^1.5.5",
     "angular-async-filter": "^1.0.1",
     "angular-bluebird-promises": "^1.0.1",
+    "angular-chart.js": "^0.10.2",
     "angular-cookies": "^1.5.5",
     "angular-file-upload": "^2.2.0",
     "angular-paging": "^2.2.1",
