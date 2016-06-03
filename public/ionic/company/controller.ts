@@ -3,8 +3,11 @@
  */
 "use strict";
 import {EStaffRole, Staff} from "api/_types/staff";
+import {EPlanStatus} from 'api/_types/tripPlan';
 import {TravelPolicy} from "api/_types/travelPolicy";
 import {Department} from "api/_types/department";
+const moment = require("moment");
+const API = require("common/api");
 
 export async function ManagementController($scope, Models) {
     var staff = await Staff.getCurrent();
@@ -27,8 +30,50 @@ export async function RecordController($scope) {
 
 }
 
-export async function DistributionController($scope) {
+export async function DistributionController($scope, Models) {
+    $scope.isShowMap = false;
+    let date = new Date().valueOf();
+    let staffTrips = await Models.tripPlan.find({where: {startAt: {$lte: date}, backAt: {$gte: date}, status: EPlanStatus.WAIT_UPLOAD},
+        attributes: ["title", "account_id", "arrival_city_code"]});
 
+    API.require("place")
+    await API.onload();
+
+    staffTrips = await Promise.all(staffTrips.map(async (v) => {
+        let city = await API.place.getCityInfo({cityCode: v.arrivalCityCode});
+        let staff = await Models.staff.get(v.accountId);
+        return {name: staff.name, mobile: staff.mobile, reason: v.title, longitude: city.longitude, latitude: city.latitude, cityName: city.name};
+    }));
+
+    let markerWidth = 30;
+    let markerHeight = 35;
+    let markers = staffTrips.map((v) => {
+        return { title: v.name, content: v.reason, longitude: v.longitude, latitude: v.latitude, height: markerHeight, width: markerWidth}
+    });
+
+    $scope.loadMap = function(map) {
+    }
+
+    $scope.offlineOpts = {}
+    $scope.staffTrips = staffTrips;
+
+    let longitude = 116.404;
+    let latitude = 39.915;
+    if (markers && markers.length) {
+        longitude = markers[0].longitude;
+        latitude = markers[0].latitude;
+    }
+    $scope.mapOptions = {
+        center: {
+            longitude: longitude,
+            latitude: latitude
+        },
+        zoom: 5,
+        city: 'BeiJing',
+        enableMessage: false,
+        markers: markers
+    }
+    $scope.isShowMap = true;
 }
 
 export async function DepartmentController($scope, Models, $ionicPopup) {
