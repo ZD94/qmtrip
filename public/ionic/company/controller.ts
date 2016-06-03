@@ -63,15 +63,17 @@ export async function RecordController($scope, Models) {
 export async function DistributionController($scope, Models) {
     $scope.isShowMap = false;
     let date = new Date().valueOf();
-    let staffTrips = await Models.tripPlan.find({where: {startAt: {$lte: date}, backAt: {$gte: date}, status: EPlanStatus.WAIT_UPLOAD},
+    let staff = await Staff.getCurrent();
+    let company = staff.company;
+    let staffTrips: any = await company.getTripPlans({where: {startAt: {$lte: date}, backAt: {$gte: date}, status: EPlanStatus.WAIT_UPLOAD},
         attributes: ["title", "account_id", "arrival_city_code"] , order: ["arrival_city_code"]});
 
-    API.require("place")
+    API.require("place");
     await API.onload();
 
     staffTrips = await Promise.all(staffTrips.map(async (v) => {
         let city = await API.place.getCityInfo({cityCode: v.arrivalCityCode});
-        let staff = await Models.staff.get(v.accountId);
+        let staff = v.account;
         return {name: staff.name, mobile: staff.mobile, reason: v.title, longitude: city.longitude, latitude: city.latitude, cityName: city.name};
     }));
 

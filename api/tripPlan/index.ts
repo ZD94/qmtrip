@@ -402,13 +402,13 @@ class TripPlanModule {
         let staff = await Staff.getCurrent();
         let tripDetail = await Models.tripDetail.get(params.tripDetailId);
 
-        if (tripDetail.status != EPlanStatus.WAIT_UPLOAD && tripDetail.status != EPlanStatus.AUDITING) {
+        if (tripDetail.status != EPlanStatus.WAIT_UPLOAD && tripDetail.status != EPlanStatus.WAIT_COMMIT) {
             throw {code: -3, msg: '该出差计划不能上传票据，请检查出差计划状态'};
         }
 
         let tripPlan = tripDetail.tripPlan;
 
-        if(tripPlan.status != EPlanStatus.WAIT_UPLOAD) {
+        if(tripPlan.status != EPlanStatus.WAIT_UPLOAD && tripDetail.status != EPlanStatus.WAIT_COMMIT) {
             throw {code: -3, msg: '该出差计划不能上传票据，请检查出差计划状态'};
         }
 
