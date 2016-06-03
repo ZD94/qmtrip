@@ -313,8 +313,8 @@ export async function ListDetailController($location, $scope , Models, $statePar
     let tripPlan = await Models.tripPlan.get(id);
     $scope.tripDetail = tripPlan;
     $scope.createdAt = moment(tripPlan.createdAt.value).toDate();
-    $scope.startAt = moment(tripPlan.startAt).toDate();
-    $scope.backAt = moment(tripPlan.backAt).toDate();
+    $scope.startAt = moment(tripPlan.startAt.value).toDate();
+    $scope.backAt = moment(tripPlan.backAt.value).toDate();
     let budgets: any[] = await tripPlan.getTripDetails();
     let hotel;
     let goTraffic;
@@ -405,9 +405,6 @@ export async function ListDetailController($location, $scope , Models, $statePar
     $scope.backTraffic = backTraffic;
     $scope.other = other;
     $scope.budgets = budgets;
-    console.info($scope.goTraffic);
-    console.info($scope.hotel);
-    console.info(EPlanStatus)
     API.require('tripPlan');
     await API.onload();
     function uploadInvoice(tripDetail, picture, callback) {

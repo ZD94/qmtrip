@@ -6,7 +6,7 @@
         <ion-list class="jl_projectinfo">
             <ion-item class="project_tit">{{tripDetail.title}}</ion-item>
             <ion-item class="project_cont">
-                <p>{{startAt | date: 'yyyy-MM-dd'}} 至 {{backAt | date: 'yyyy-MM-dd'}}</p>
+                <p ng-if="startAt">{{startAt | date: 'yyyy-MM-dd'}} 至 {{backAt | date: 'yyyy-MM-dd'}}</p>
                 <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{tripDetail.budget}}</span>元</p>
             </ion-item>
         </ion-list>
