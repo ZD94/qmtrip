@@ -6,7 +6,7 @@
             </div>
             <label class="item item-input">
                 <i class="icon ion-search placeholder-icon"></i>
-                <input type="search" placeholder="请输入员工姓名" ng-model="searchstaff" ng-click="search($event)">
+                <input type="search" placeholder="请输入员工姓名" ng-model="option.name" ng-change="search()">
             </label>
         </form>
         <ion-list>

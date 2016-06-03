@@ -177,7 +177,22 @@ export async function StaffsController($scope, Models) {
         obj.travelPolicy = await obj.staff.getTravelPolicy();
         return obj;
     }));
-    $scope.search = function () {
+    $scope.option = {name: ''};
+    $scope.search = async function () {
+
+        var staffs = await Models.staff.find({where: {companyId: staff.company.id, name: {$like: '%'+ $scope.option.name +'%'}}});
+        $scope.staffs = staffs.map(function (staff) {
+            var obj = {staff: staff, role: ""};
+            if (obj.staff.roleId == EStaffRole.OWNER) {
+                obj.role = '创建者';
+            }
+            return obj;
+        });
+        await Promise.all($scope.staffs.map(async function (obj) {
+            obj.travelPolicy = await obj.staff.getTravelPolicy();
+            return obj;
+        }));
+        
 
     }
 }
