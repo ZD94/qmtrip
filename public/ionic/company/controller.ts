@@ -209,9 +209,6 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
         } else {
             $scope.staff.roleId = EStaffRole.COMMON;
         }
-        // console.info($scope.role);
-        // console.info($scope.staff);
-        // console.info($scope.staff.travelPolicyId);
         $ionicHistory.goBack(-1);
     }
 }

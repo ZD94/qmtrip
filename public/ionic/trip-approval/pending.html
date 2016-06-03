@@ -4,8 +4,9 @@
             <div class="item item-divider">{{trip.startAt.value | date: 'yyyy-MM-dd'}} 至 {{trip.backAt.value | date: 'yyyy-MM-dd'}}</div>
             <div class="item item-body">
                 <ion-list>
-                    <ion-item>{{trip.deptCity}} 到 {{trip.arrivalCity}}
-                        <br>出差事由：{{trip.title}}</ion-item>
+                    <ion-item><i class="icon ion-plane"></i> &nbsp;&nbsp;{{trip.deptCity}} 到 {{trip.arrivalCity}}
+                        <br><i class="icon ion-briefcase"></i>&nbsp;&nbsp;出差事由：{{trip.title}}
+                    </ion-item>
                 </ion-list>
             </div>
             <div class="item item-divider">
