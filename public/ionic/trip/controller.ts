@@ -313,8 +313,8 @@ export async function ListDetailController($location, $scope , Models, $statePar
     let tripPlan = await Models.tripPlan.get(id);
     $scope.tripDetail = tripPlan;
     $scope.createdAt = moment(tripPlan.createdAt.value).toDate();
-    $scope.startAt = moment(tripPlan.startAt).toDate();
-    $scope.backAt = moment(tripPlan.backAt).toDate();
+    $scope.startAt = moment(tripPlan.startAt.value).toDate();
+    $scope.backAt = moment(tripPlan.backAt.value).toDate();
     let budgets: any[] = await tripPlan.getTripDetails();
     let hotel;
     let goTraffic;
@@ -367,7 +367,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
                         return;
                     }
                     var newdetail = await Models.tripDetail.get(budget.id);
-                    $scope.goTraffic.status = newdetail.status;
+                    $scope.goTraffic = newdetail;
                 });
             }};
         } else if (tripType == ETripType.BACK_TRIP) {
@@ -380,7 +380,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
                         return;
                     }
                     var newdetail = await Models.tripDetail.get(budget.id);
-                    $scope.backTraffic.status = newdetail.status;
+                    $scope.backTraffic = newdetail;
                 });
             }};
         } else if (tripType == ETripType.HOTEL) {
@@ -392,7 +392,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
                         return;
                     }
                     var newdetail = await Models.tripDetail.get(budget.id);
-                    $scope.hotel.status = newdetail.status;
+                    $scope.hotel = newdetail;
                 });
             }};
         } else {
@@ -405,15 +405,16 @@ export async function ListDetailController($location, $scope , Models, $statePar
     $scope.backTraffic = backTraffic;
     $scope.other = other;
     $scope.budgets = budgets;
-    console.info($scope.goTraffic);
-    console.info($scope.hotel);
-    console.info(EPlanStatus)
     API.require('tripPlan');
     await API.onload();
     function uploadInvoice(tripDetail, picture, callback) {
         tripDetail.uploadInvoice({
             pictureFileId: picture
-        },callback)
+        })
+        .then(function(ret) {
+            callback(null, ret);
+        })
+        .catch(callback)
     }
 
     $scope.approveTripPlan = async function() {
@@ -441,4 +442,39 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
     await API.onload();
     var invoiceImg = await API.attachment.previewSelfImg({fileId: invoice.newInvoice});
     $scope.invoiceImg = invoiceImg;
+
+    let statusTxt = {};
+    statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
+    statusTxt[EPlanStatus.WAIT_UPLOAD] = "待上传票据";
+    statusTxt[EPlanStatus.WAIT_COMMIT] = "待提交";
+    statusTxt[EPlanStatus.AUDITING] = "已提交待审核";
+    statusTxt[EPlanStatus.COMPLETE] = "已完成";
+    $scope.statustext = statusTxt;
+    let title;
+    if (invoice.type == ETripType.OUT_TRIP) {
+        title = '去程交通';
+    }
+    if (invoice.type == ETripType.BACK_TRIP) {
+        title = '回城交通';
+    }
+    if (invoice.type == ETripType.HOTEL) {
+        title = '住宿';
+    }
+    var invoicefuc = {title:'上传'+title + '发票',done:function(response){
+        var fileId = response.fileId;
+        uploadInvoice(invoice, fileId,async function (err, result) {
+            if (err) {
+                alert(err);
+                return;
+            }
+            var newdetail = await Models.tripDetail.get($stateParams.detailId);
+            $scope.invoice = newdetail;
+        });
+    }}
+
+    function uploadInvoice(tripDetail, picture, callback) {
+        tripDetail.uploadInvoice({
+            pictureFileId: picture
+        },callback)
+    }
 }

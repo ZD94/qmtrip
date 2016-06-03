@@ -9,6 +9,7 @@ import { Department } from './department';
 import { TripPlan } from "api/_types/tripPlan";
 import { Table, Create, Field, Reference } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
+declare var API: any;
 
 export enum ECompanyStatus {
     DELETE = -2,
@@ -148,6 +149,15 @@ export class Company extends ModelObject{
 
     getMoneyChanges(companyId?:string): Promise<MoneyChange[]> {
         return Models.moneyChange.find({where: {companyId: this.id}});
+    }
+
+    async statisticTripPlanOfMonth(params: {month: string}): Promise<any> {
+        params['companyId'] = this.id;
+        API.require('tripPlan');
+        await API.onload();
+        console.info("statisticTripPlanOfMonth", API.tripPlan);
+        console.info(API);
+        return API.tripPlan.statisticTripPlanOfMonth(params);
     }
 }
 

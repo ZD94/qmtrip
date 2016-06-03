@@ -1,12 +1,18 @@
 <ion-view title="票据详情页" id="page20">
     <ion-content padding="true" class="has-header">
         <div class="list card">
-            <div class="item item-avatar">
-                <i ng-if='invoice.tripType == EInvoiceType.PLANE' class="icon ion-plane"></i>
-                <i ng-if='invoice.tripType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
-                <i ng-if='invoice.tripType == EInvoiceType.HOTEL' class="icon ion-home"></i>
-                <h2>Pretty Hate Machine</h2>
-                <p>Nine Inch Nails</p>
+            <div class="item ">
+                <div style="float: left;;height: 30px;width: 30px;">
+                    <i ng-if='invoice.invoiceType == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                    <i ng-if='invoice.invoiceType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                    <i ng-if='invoice.invoiceType == EInvoiceType.HOTEL' class="icon ion-home"></i>
+                </div>
+                <div style="float: left;">
+                    <b>{{invoice.deptCity}}</b>-
+                    <b>{{invoice.arrivalCity}}</b><br/>
+                    <span>{{invoice.createdAt.value | date: 'yyyy-MM-dd'}}</span>
+                </div>
+                <span class="item-note">{{statustext[invoice.status]}}</span>
             </div>
 
             <div class="item item-image">
@@ -17,6 +23,6 @@
         </div>
     </ion-content>
     <div class="bar bar-footer bar-positive">
-        <div class="button button-full button-positive" style="margin-top: 0;width: 100%;font-size: 20px;">重新上传</div>
+        <div class="button button-full button-positive" style="margin-top: 0;width: 100%;font-size: 20px;" ng-uploader accept="image/*" title="invoicefuc.title" done="invoicefuc.done">重新上传</div>
     </div>
 </ion-view>
