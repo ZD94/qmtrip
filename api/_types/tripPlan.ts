@@ -352,8 +352,8 @@ export class TripDetail extends ModelObject{
     get tripPlan(): TripPlan { return null; }
     set tripPlan(val: TripPlan) {}
 
-    uploadInvoice(pictureFileId: string): Promise<boolean> {
-        return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: pictureFileId});
+    uploadInvoice(params: {pictureFileId: string}): Promise<boolean> {
+        return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
     }
 
     auditPlanInvoice(params: {auditResult: EAuditStatus}): Promise<boolean> {

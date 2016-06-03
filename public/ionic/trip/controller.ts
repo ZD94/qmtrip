@@ -404,8 +404,7 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
     console.info(EPlanStatus)
     API.require('tripPlan');
     await API.onload();
-    function uploadInvoice(obj,picture, callback) {
-        var tripDetail = obj;
+    function uploadInvoice(tripDetail, picture, callback) {
         tripDetail.uploadInvoice({
             pictureFileId: picture
         },callback)

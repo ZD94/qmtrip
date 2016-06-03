@@ -403,9 +403,9 @@ class TripPlanModule {
         let accountId = staff.id;
         let tripDetail = await Models.tripDetail.get(params.tripDetailId);
 
-        // if (tripDetail.status != EPlanStatus.WAIT_UPLOAD) {
-        //     throw {code: -3, msg: '该出差计划不能上传票据，请检查出差计划状态'};
-        // }
+        if (tripDetail.status != EPlanStatus.WAIT_UPLOAD) {
+            throw {code: -3, msg: '该出差计划不能上传票据，请检查出差计划状态'};
+        }
 
         let tripPlan = tripDetail.tripPlan;
 
@@ -425,7 +425,8 @@ class TripPlanModule {
         tripDetail.invoice = JSON.stringify(invoiceJson);
         tripDetail.status = EPlanStatus.WAIT_COMMIT;
 
-        var details = await Models.tripDetail.find({where: {tripPlanId: tripPlan.id, status: EPlanStatus.WAIT_UPLOAD, id: {$ne: tripDetail.id}}});
+        var details = await Models.tripDetail.find({where: {tripPlanId: tripPlan.id, status: EPlanStatus.WAIT_UPLOAD,
+            id: {$ne: tripDetail.id}, type: [ETripType.BACK_TRIP, ETripType.HOTEL, ETripType.OUT_TRIP]}});
 
         if(!details || details.length == 0) {
             tripPlan.status = EPlanStatus.WAIT_COMMIT;
