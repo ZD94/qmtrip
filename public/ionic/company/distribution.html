@@ -11,7 +11,7 @@
         </div>
 
         <ion-list>
-            <ion-item ng-repeat="v in staffTrips" style="font-size: 0.8em;">
+            <ion-item ng-repeat="v in staffTrips" style="font-size: 0.8em;" ng-click="moveTo('{{v.longitude}}', '{{v.latitude}}')">
                 {{$index+1}}.{{v.name}} - {{v.reason}}<span style="float: right;"><i class="icon ion-flag" style="font-size: 0.5em; color: red;"></i>{{v.cityName}}</span>
             </ion-item>
         </ion-list>

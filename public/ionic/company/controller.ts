@@ -71,7 +71,9 @@ export async function DistributionController($scope, Models) {
         return { title: v.name, content: v.reason, longitude: v.longitude, latitude: v.latitude, height: markerHeight, width: markerWidth}
     });
 
+    $scope.map = null;
     $scope.loadMap = function(map) {
+        $scope.map = map;
     }
 
     $scope.offlineOpts = {}
@@ -94,6 +96,12 @@ export async function DistributionController($scope, Models) {
         markers: markers
     }
     $scope.isShowMap = true;
+
+    $scope.moveTo = function(long, lat) {
+        if ($scope.map) {
+            $scope.map.centerAndZoom(new window['BMap'].Point(long, lat), 5);
+        }
+    }
 }
 
 export async function DepartmentController($scope, Models, $ionicPopup) {
