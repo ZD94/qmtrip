@@ -1,5 +1,6 @@
 "use strict";
 import { Staff } from 'api/_types/staff';
+import async = Q.async;
 
 export async function IndexController($scope, Menu, $ionicPopup, Models){
     require('./index.less');
@@ -58,7 +59,11 @@ export async function IndexController($scope, Menu, $ionicPopup, Models){
     }
     var staff = await Staff.getCurrent();
     var policy = await staff.getTravelPolicy();
-    $scope.alertShow = function () {
+    $scope.alertShow = async function (staffId?: string) {
+        if(staffId && staff.id != staffId) {
+            staff = await Models.staff.get(staffId);
+            policy = await staff.getTravelPolicy();
+        }
         if(policy){   //判断是否设置差旅标准
             var show = $ionicPopup.alert({
                 title: '差旅标准',

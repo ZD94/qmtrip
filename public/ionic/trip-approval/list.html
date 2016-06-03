@@ -21,9 +21,9 @@
                 </ion-list>
             </div>
             <div class="item item-divider">
-                <span ng-if="trip.status == 0">待审批</span>
-                <span ng-if="trip.status == 2">审批通过</span>
-                <span ng-if="trip.status == -1">审批失败</span>
+                <span ng-if="trip.status == EPlanStatus.WAIT_APPROVE">待审批</span>
+                <span ng-if="trip.status != EPlanStatus.APPROVE_NOT_PASS && trip.status != EPlanStatus.WAIT_APPROVE">审批通过</span>
+                <span ng-if="trip.status == EPlanStatus.APPROVE_NOT_PASS">审批失败</span>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 {{trip.budget}}元
             </div>
