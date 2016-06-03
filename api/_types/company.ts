@@ -121,9 +121,11 @@ export class Company extends ModelObject{
         return Models.agency.get(id);
     }
 
-    getStaffs(): Promise<Staff[]> {
-        let query = {where: {companyId: this.id} }
-        return Models.staff.find(query);
+    getStaffs(options?: any): Promise<Staff[]> {
+        if(!options) {options = {where: {}}};
+        if(!options.where) {options.where = {}};
+        options.where.companyId = this.id;
+        return Models.staff.find(options);
     }
     
     getDepartments(): Promise<Department[]> {
@@ -137,10 +139,9 @@ export class Company extends ModelObject{
     }
 
 
-    getTripPlans(options): Promise<TripPlan[]> {
-        if(!options.where) {
-            options.where = {};
-        }
+    getTripPlans(options?: any): Promise<TripPlan[]> {
+        if(!options) {options = {where: {}}};
+        if(!options.where) {options.where = {};}
         options.where.companyId = this.id;
         return Models.tripPlan.find(options);
     }

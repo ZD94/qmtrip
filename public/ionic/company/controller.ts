@@ -8,6 +8,7 @@ import {TravelPolicy} from "api/_types/travelPolicy";
 import {Department} from "api/_types/department";
 const moment = require("moment");
 const API = require("common/api");
+import _ = require('lodash');
 
 export async function ManagementController($scope, Models) {
     var staff = await Staff.getCurrent();
@@ -26,8 +27,27 @@ export async function BudgetController($scope) {
 
 }
 
-export async function RecordController($scope) {
+export async function RecordController($scope, Models) {
+    let staff = await Staff.getCurrent();
+    let company = staff.company;
+    let tripPlans = await company.getTripPlans();
+    $scope.tripPlans = tripPlans;
+    $scope.EPlanStatus = EPlanStatus;
+    $scope.staffName = '';
 
+    $scope.enterDetail = function(tripid){
+        window.location.href = "#/trip-approval/detail?tripid="+tripid;
+    };
+
+    $scope.searchTripPlans = async function(staffName) {
+        if(!staffName) {
+            $scope.tripPlans = await company.getTripPlans();
+            return;
+        }
+        let staffs = await company.getStaffs({where: {name: {$like: '%' + staffName + '%'}}});
+        let ids = staffs.map((s) => s.id);
+        $scope.tripPlans = await company.getTripPlans({where: {accountId: ids}});
+    };
 }
 
 export async function DistributionController($scope, Models) {

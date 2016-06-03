@@ -16,14 +16,16 @@
                         <h2>{{trip.account.name}} {{trip.account.mobile}}</h2>
                         <p></p>
                     </ion-item>
-                    <ion-item><i class="icon ion-plane"></i> &nbsp;&nbsp;{{trip.deptCity}} 到 {{trip.arrivalCity}}
-                        <br><i class="icon ion-star"></i> &nbsp;&nbsp;出差事由：{{trip.title}}</ion-item>
+                    <ion-item>
+                        <i class="icon ion-plane"></i> &nbsp;&nbsp;{{trip.deptCity}} 到 {{trip.arrivalCity}}<br>
+                        <i class="icon ion-star"></i> &nbsp;&nbsp;出差事由：{{trip.title}}
+                    </ion-item>
                 </ion-list>
             </div>
             <div class="item item-divider">
-                <span ng-if="trip.status == 0">待审批</span>
-                <span ng-if="trip.status == 2">审批通过</span>
-                <span ng-if="trip.status == -1">审批失败</span>
+                <span ng-if="trip.status == EPlanStatus.WAIT_APPROVE">待审批</span>
+                <span ng-if="trip.status != EPlanStatus.APPROVE_NOT_PASS && trip.status != EPlanStatus.WAIT_APPROVE">审批通过</span>
+                <span ng-if="trip.status == EPlanStatus.APPROVE_NOT_PASS">审批失败</span>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 {{trip.budget}}元
             </div>

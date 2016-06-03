@@ -17,10 +17,8 @@ export async function DetailController($scope, Models, $stateParams){
     let tripId = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(tripId);
     $scope.tripPlan = tripPlan;
-    console.info(tripPlan);
     let staff = await Models.staff.get(tripPlan.accountId);
     $scope.staff = staff;
-    console.info(staff);
     let tripDetails = await tripPlan.getTripDetails();
     let traffic = [], hotel = [];
     let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
@@ -46,6 +44,7 @@ export async function DetailController($scope, Models, $stateParams){
     $scope.subsidyBudget = subsidyBudget;
     $scope.subsidyDays = subsidyDays;
     $scope.approveResult = EAuditStatus;
+    $scope.EPlanStatus = EPlanStatus;
 
     $scope.approve = async function(result: EAuditStatus) {
         try{
@@ -64,19 +63,20 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
     const ONE_PAGE_LIMIT = 10;
     let Pager;
     $scope.filter = 'WAIT_APPROVE';
+    $scope.EPlanStatus = EPlanStatus;
     $scope.tripPlans = [];
     $scope.changeTo = async function(filter) {
         $scope.tripPlans = [];
         if (['WAIT_APPROVE', 'ALL', 'APPROVE_PASS', 'APPROVE_FAIL'].indexOf(filter) >= 0) {
             $scope.filter = filter;
         }
-        let status: string|number = 'ALL';
+        let status: string|number|Object = 'ALL';
         switch(filter) {
             case 'WAIT_APPROVE':
                 status = EPlanStatus.WAIT_APPROVE;
                 break;
             case 'APPROVE_PASS':
-                status = EPlanStatus.WAIT_UPLOAD;
+                status = [EPlanStatus.WAIT_UPLOAD, EPlanStatus.AUDITING, EPlanStatus.COMPLETE, EPlanStatus.WAIT_COMMIT, EPlanStatus.AUDIT_NOT_PASS];
                 break;
             case 'APPROVE_FAIL':
                 status = EPlanStatus.APPROVE_NOT_PASS;

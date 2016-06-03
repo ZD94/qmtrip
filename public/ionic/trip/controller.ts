@@ -302,6 +302,7 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
     var staff = await Staff.getCurrent();
     let id = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(id);
+    console.info(tripPlan);
     $scope.tripDetail = tripPlan;
     $scope.createdAt = moment(tripPlan.createAt).toDate();
     $scope.startAt = moment(tripPlan.startAt).toDate();
@@ -352,7 +353,7 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
             $scope.goTrafficStatus = Boolean(budget.status);
             goTraffic = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
                 var fileId = response.fileId;
-                uploadInvoice(budget.id, fileId, function (err, result) {
+                uploadInvoice(budget, fileId, function (err, result) {
                     if (err) {
                         alert(err);
                         return;
@@ -366,7 +367,7 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
             $scope.backTrafficStatus = Boolean(budget.status);
             backTraffic = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
                 var fileId = response.fileId;
-                uploadInvoice(budget.id, fileId, function (err, result) {
+                uploadInvoice(budget, fileId, function (err, result) {
                     if (err) {
                         alert(err);
                         return;
@@ -379,28 +380,18 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
             $scope.hotelStatus = Boolean(budget.status);
             hotel = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
                 var fileId = response.fileId;
-                uploadInvoice(budget.id, fileId, function (err, result) {
+                uploadInvoice(budget, fileId,async function (err, result) {
                     if (err) {
                         alert(err);
                         return;
                     }
-                    $scope.hotelStatus = true;
-                    $scope.$apply();
+                    var newhotel = await Models.tripDetail.get(budget.id);
+                    hotel.status = newhotel.status;
+
                 });
             }};
         } else {
             $scope.otherStatus = Boolean(budget.status);
-            other = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
-                var fileId = response.fileId;
-                uploadInvoice(budget.id, fileId, function (err, result) {
-                    if (err) {
-                        alert(err);
-                        return;
-                    }
-                    $scope.otherStatus = true;
-                    $scope.$apply();
-                });
-            }};
         }
     });
     $scope.goTraffic = goTraffic;
@@ -409,16 +400,15 @@ export async function ListDetailController($scope , Models, $stateParams ,FileUp
     $scope.other = other;
     $scope.budgets = budgets;
     console.info($scope.goTraffic);
-    console.info($scope.other);
+    console.info($scope.hotel);
+    console.info(EPlanStatus)
     API.require('tripPlan');
     await API.onload();
-    function uploadInvoice(consumeId, picture, callback) {
-        API.tripPlan.uploadInvoice({
-            tripDetailId: consumeId,
+    function uploadInvoice(tripDetail, picture, callback) {
+        tripDetail.uploadInvoice({
             pictureFileId: picture
-        }, callback);
+        },callback)
     }
-    $scope.backtraffic_up = '&#xe90e;<em>回程</em><strong>交通票据</strong>';
 
     $scope.approveTripPlan = async function() {
         try {

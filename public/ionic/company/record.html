@@ -5,43 +5,44 @@
             <button id="page25-button77" class="button button-positive  button-block">出差记录</button>
             <a href="#/company/distribution" id="page25-button78" class="button button-stable  button-block">员工分布</a>
         </div>
+
         <div class="spacer" style="width: 300px; height: 30px;"></div>
+
         <form class="list">
             <label class="item item-input">
                 <i class="icon ion-search placeholder-icon"></i>
-                <input type="search" placeholder="请输入员工姓名">
+                <input ng-change="searchTripPlans(staffName)" type="search" placeholder="请输入员工姓名" ng-model="staffName">
             </label>
         </form>
-        <div class="list card">
-            <div class="item item-divider">2016-06-23至2016-06-30</div>
+
+        <div class="list card" ng-repeat="trip in tripPlans track by trip.id" ng-click="enterDetail(trip.id)">
+            <div class="item item-divider">{{trip.startAt.value | date: 'yyyy-MM-dd'}} 至 {{trip.backAt.value | date: 'yyyy-MM-dd'}}</div>
             <div class="item item-body">
                 <ion-list>
                     <ion-item class="item-avatar">
-                        <h2>王鹏</h2>
-                        <p style="white-space:normal;">13810529805</p>
+                        <h2>{{trip.account.name}}</h2>
+                        <p>{{trip.account.mobile}}</p>
+                    </ion-item>
+                    <ion-item>
+                        <i class="icon ion-plane"></i> &nbsp;&nbsp;{{trip.deptCity}} 到 {{trip.arrivalCity}}<br>
+                        <i class="icon ion-star"></i> &nbsp;&nbsp;出差事由：{{trip.title}}
                     </ion-item>
                 </ion-list>
-                <div id="page25-markdown14" style="color:#000000;">
-                    <p>此卡片内容与待我审批列表页（出差请示）内容及样式相同，从此卡片点击进入详情页，详情页内容与待我审批详情相同，但没有底部操作按钮。</p>
-                </div>
             </div>
-            <div class="item item-divider">待审批&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3059元</div>
-        </div>
-        <div class="list card">
-            <div class="item item-divider">2016-06-23至2016-06-30</div>
-            <div class="item item-body">
-                <ion-list>
-                    <ion-item class="item-avatar">
-                        <h2>王鹏</h2>
-                        <p>13810529805</p>
-                    </ion-item>
-                </ion-list>
-                <div id="page25-markdown20" style="color:#000000;">
-                    <p>此卡片内容与待我审批列表页（出差请示）内容及样式相同，从此卡片点击进入详情页，详情页内容与待我审批详情相同，但没有底部操作按钮。</p>
-                </div>
+            <div class="item item-divider">
+                <span ng-if="trip.status == EPlanStatus.AUDIT_NOT_PASS">票据审核未通过</span>
+                <span ng-if="trip.status == EPlanStatus.APPROVE_NOT_PASS">审批未通过</span>
+                <span ng-if="trip.status == EPlanStatus.NO_BUDGET">待出预算</span>
+                <span ng-if="trip.status == EPlanStatus.WAIT_APPROVE">待审批</span>
+                <span ng-if="trip.status == EPlanStatus.WAIT_UPLOAD">待上传票据</span>
+                <span ng-if="trip.status == EPlanStatus.WAIT_COMMIT">待提交</span>
+                <span ng-if="trip.status == EPlanStatus.AUDITING">票据审核中</span>
+                <span ng-if="trip.status == EPlanStatus.COMPLETE">已完成</span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>{{trip.budget}}元</span>
             </div>
-            <div class="item item-divider">待审批&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3059元</div>
         </div>
+
         <div id="page25-markdown17" style="color:#000000;text-align:center;">
             <p>没有更多内容了</p>
         </div>
