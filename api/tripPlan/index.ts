@@ -620,17 +620,20 @@ class TripPlanModule {
         let project_num_sql = 'select count(1) as \"projectNum\" from (select distinct project_id ' + where_sql + ') as Project;';
         let budget_sql = 'select sum(budget) as \"dynamicBudget\" ' + where_sql;
         let saved_sql = 'select sum(budget-expenditure) as \"savedMoney\" ' + complete_sql;
+        let expenditure_sql = 'select sum(expenditure) as expenditure ' + complete_sql;
 
         let staff_num_sql_ret = await sequelize.query(staff_num_sql);
         let project_num_sql_ret = await sequelize.query(project_num_sql);
         let budget_sql_ret = await sequelize.query(budget_sql);
         let saved_sql_ret = await sequelize.query(saved_sql);
+        let expenditure_sql_ret = await sequelize.query(saved_sql);
         return {
             month: month,
             staffNum: staff_num_sql_ret[0][0].staffNum || 0,
             projectNum: project_num_sql_ret[0][0].projectNum || 0,
             dynamicBudget: budget_sql_ret[0][0].dynamicBudget || 0,
-            savedMoney: saved_sql_ret[0][0].saved_sql_ret || 0
+            savedMoney: saved_sql_ret[0][0].saved_sql_ret || 0,
+            expenditure: expenditure_sql_ret[0][0].expenditure
         };
     }
 
