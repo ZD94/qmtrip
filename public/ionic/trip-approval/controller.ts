@@ -17,10 +17,8 @@ export async function DetailController($scope, Models, $stateParams){
     let tripId = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(tripId);
     $scope.tripPlan = tripPlan;
-    console.info(tripPlan);
     let staff = await Models.staff.get(tripPlan.accountId);
     $scope.staff = staff;
-    console.info(staff);
     let tripDetails = await tripPlan.getTripDetails();
     let traffic = [], hotel = [];
     let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
@@ -46,6 +44,7 @@ export async function DetailController($scope, Models, $stateParams){
     $scope.subsidyBudget = subsidyBudget;
     $scope.subsidyDays = subsidyDays;
     $scope.approveResult = EAuditStatus;
+    $scope.EPlanStatus = EPlanStatus;
 
     $scope.approve = async function(result: EAuditStatus) {
         try{
@@ -64,6 +63,7 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
     const ONE_PAGE_LIMIT = 10;
     let Pager;
     $scope.filter = 'WAIT_APPROVE';
+    $scope.EPlanStatus = EPlanStatus;
     $scope.tripPlans = [];
     $scope.changeTo = async function(filter) {
         $scope.tripPlans = [];
