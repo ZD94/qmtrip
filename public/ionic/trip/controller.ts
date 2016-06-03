@@ -437,8 +437,8 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
     console.info(invoice);
     $scope.invoice = invoice;
     $scope.EInvoiceType;
-    await API.onload();
     API.require('attachment');
+    await API.onload();
     var invoiceImg = await API.attachment.previewSelfImg({fileId: invoice.newInvoice});
     $scope.invoiceImg = invoiceImg;
 }
