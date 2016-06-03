@@ -54,7 +54,7 @@ export class TravelPolicy extends ModelObject{
     get company(): Company { return null; }
 
     getStaffs(): Promise<Staff[]> {
-        let query = {where: {companyId: this.company.id, travelPolicyId: this.id}}
+        let query = {where: {travelPolicyId: this.id}}
         return Models.staff.find(query);
     }
 }
