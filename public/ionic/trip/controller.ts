@@ -435,9 +435,8 @@ export async function ListDetailController($location, $scope , Models, $statePar
 
 export async function InvoiceDetailController($scope , Models, $stateParams){
     var invoice = await Models.tripDetail.get($stateParams.detailId);
-    console.info(invoice);
     $scope.invoice = invoice;
-    $scope.EInvoiceType;
+    $scope.EInvoiceType = EInvoiceType;
     API.require('attachment');
     await API.onload();
     var invoiceImg = await API.attachment.previewSelfImg({fileId: invoice.newInvoice});
@@ -450,6 +449,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
     statusTxt[EPlanStatus.AUDITING] = "已提交待审核";
     statusTxt[EPlanStatus.COMPLETE] = "已完成";
     $scope.statustext = statusTxt;
+    $scope.EPlanStatus = EPlanStatus;
     let title;
     if (invoice.type == ETripType.OUT_TRIP) {
         title = '去程交通';
@@ -476,5 +476,10 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
         tripDetail.uploadInvoice({
             pictureFileId: picture
         },callback)
+    }
+
+    $scope.backtodetail = function(){
+        var tripPlan = invoice.tripPlan;
+        window.location.href = "#/trip/list-detail?tripid="+tripPlan.id;
     }
 }

@@ -155,8 +155,6 @@ export class Company extends ModelObject{
         params['companyId'] = this.id;
         API.require('tripPlan');
         await API.onload();
-        console.info("statisticTripPlanOfMonth", API.tripPlan);
-        console.info(API);
         return API.tripPlan.statisticTripPlanOfMonth(params);
     }
 }
