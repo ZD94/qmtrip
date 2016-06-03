@@ -348,12 +348,19 @@ class TripPlanModule {
             tripPlan.auditRemark = params.auditRemark;
         }
 
+        let tripDetails = await tripPlan.getTripDetails({});
+
         if(auditResult == EAuditStatus.PASS) {
             tripPlan.status = EPlanStatus.WAIT_UPLOAD;
         }else if(auditResult == EAuditStatus.NOT_PASS) {
             tripPlan.status = EPlanStatus.APPROVE_NOT_PASS;
         }
 
+        tripDetails.map(function(detail) {
+            detail.status = tripPlan.status;
+        });
+
+        await Promise.all(tripDetails.map((d) => d.save()));
         await tripPlan.save();
         return true;
     }
@@ -396,9 +403,9 @@ class TripPlanModule {
         let accountId = staff.id;
         let tripDetail = await Models.tripDetail.get(params.tripDetailId);
 
-        if (tripDetail.status != EPlanStatus.WAIT_UPLOAD) {
-            throw {code: -3, msg: '该出差计划不能上传票据，请检查出差计划状态'};
-        }
+        // if (tripDetail.status != EPlanStatus.WAIT_UPLOAD) {
+        //     throw {code: -3, msg: '该出差计划不能上传票据，请检查出差计划状态'};
+        // }
 
         let tripPlan = tripDetail.tripPlan;
 
@@ -420,7 +427,7 @@ class TripPlanModule {
 
         var details = await Models.tripDetail.find({where: {tripPlanId: tripPlan.id, status: EPlanStatus.WAIT_UPLOAD, id: {$ne: tripDetail.id}}});
 
-        if(details || details.length == 0) {
+        if(!details || details.length == 0) {
             tripPlan.status = EPlanStatus.WAIT_COMMIT;
         }
 
