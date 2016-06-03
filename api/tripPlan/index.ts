@@ -400,10 +400,9 @@ class TripPlanModule {
     @modelNotNull('tripDetail', 'tripDetailId')
     static async uploadInvoice(params: {tripDetailId: string, pictureFileId: string}): Promise<boolean> {
         let staff = await Staff.getCurrent();
-        let accountId = staff.id;
         let tripDetail = await Models.tripDetail.get(params.tripDetailId);
 
-        if (tripDetail.status != EPlanStatus.WAIT_UPLOAD) {
+        if (tripDetail.status != EPlanStatus.WAIT_UPLOAD && tripDetail.status != EPlanStatus.AUDITING) {
             throw {code: -3, msg: '该出差计划不能上传票据，请检查出差计划状态'};
         }
 
@@ -454,17 +453,17 @@ class TripPlanModule {
         }
         
         let tripDetails = await tripPlan.getTripDetails({where: {}});
-
-        if(tripDetails && tripDetails.length > 0) {
-            await Promise.all(tripDetails.map(async function(detail) {
-                detail.status = EPlanStatus.AUDITING;
-                detail.isCommit = true;
-                await detail.save();
-            }));
-        }
-
         tripPlan.status = EPlanStatus.AUDITING;
         tripPlan.isCommit = true;
+
+        if(tripDetails && tripDetails.length > 0) {
+            tripDetails.map(function (detail) {
+                detail.status = EPlanStatus.AUDITING;
+                detail.isCommit = true;
+            })
+        }
+
+        await Promise.all(tripDetails.map((detail) => detail.save()));
         await tripPlan.save();
         return true;
     }

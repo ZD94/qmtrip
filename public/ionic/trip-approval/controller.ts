@@ -70,13 +70,13 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
         if (['WAIT_APPROVE', 'ALL', 'APPROVE_PASS', 'APPROVE_FAIL'].indexOf(filter) >= 0) {
             $scope.filter = filter;
         }
-        let status: string|number = 'ALL';
+        let status: string|number|Object = 'ALL';
         switch(filter) {
             case 'WAIT_APPROVE':
                 status = EPlanStatus.WAIT_APPROVE;
                 break;
             case 'APPROVE_PASS':
-                status = EPlanStatus.WAIT_UPLOAD;
+                status = [EPlanStatus.WAIT_UPLOAD, EPlanStatus.AUDITING, EPlanStatus.COMPLETE, EPlanStatus.WAIT_COMMIT, EPlanStatus.AUDIT_NOT_PASS];
                 break;
             case 'APPROVE_FAIL':
                 status = EPlanStatus.APPROVE_NOT_PASS;
