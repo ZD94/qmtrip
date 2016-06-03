@@ -2,21 +2,19 @@
     <ion-content padding="true" class="has-header">
         <div class="list card">
             <div class="item item-avatar">
-                <img src="avatar.jpg">
+                <i ng-if='invoice.tripType == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                <i ng-if='invoice.tripType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                <i ng-if='invoice.tripType == EInvoiceType.HOTEL' class="icon ion-home"></i>
                 <h2>Pretty Hate Machine</h2>
                 <p>Nine Inch Nails</p>
             </div>
 
             <div class="item item-image">
-                <img src="cover.jpg">
+                <img src="{{invoiceImg}}">
             </div>
 
 
         </div>
-        <div class="bar bar-footer">
-            <button class="button button-full button-positive">重新上传</button>
-        </div>
-
     </ion-content>
     <div class="bar bar-footer bar-positive">
         <div class="button button-full button-positive" style="margin-top: 0;width: 100%;font-size: 20px;">重新上传</div>

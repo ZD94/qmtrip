@@ -435,4 +435,10 @@ export async function ListDetailController($location, $scope , Models, $statePar
 export async function InvoiceDetailController($scope , Models, $stateParams){
     var invoice = await Models.tripDetail.get($stateParams.detailId);
     console.info(invoice);
+    $scope.invoice = invoice;
+    $scope.EInvoiceType;
+    await API.onload();
+    API.require('attachment');
+    var invoiceImg = await API.attachment.previewSelfImg({fileId: invoice.newInvoice});
+    $scope.invoiceImg = invoiceImg;
 }
