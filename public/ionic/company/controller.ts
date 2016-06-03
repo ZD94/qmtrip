@@ -158,7 +158,7 @@ export async function DepartmentController($scope, Models, $ionicPopup) {
     }
     $scope.departments = await loadDepartment();
     var newdepartment = $scope.newdepartment = Department.create();
-    newdepartment["companyId"] = staff.company.id;
+    newdepartment["company"] = staff.company;
     $scope.newdepart = function () {
         var nshow = $ionicPopup.show({
             template: '<input type="text" ng-model="newdepartment.name">',
