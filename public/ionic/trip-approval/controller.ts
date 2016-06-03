@@ -126,13 +126,42 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
 }
 
 export async function PendingController($scope){
+    const PAGE_SIZE = 10;
     let staff = await Staff.getCurrent();
-    let tripPlans = await staff.getTripPlans({where: {status: [EPlanStatus.WAIT_APPROVE, EPlanStatus.APPROVE_NOT_PASS]}}); //获取待审批出差计划列表
-    $scope.tripPlans = tripPlans;
+    let Pager = await staff.getTripPlans({where: {status: [EPlanStatus.WAIT_APPROVE, EPlanStatus.APPROVE_NOT_PASS]}, limit: PAGE_SIZE}); //获取待审批出差计划列表
+    $scope.tripPlans = [];
+
+    Pager.forEach((v) => {
+        $scope.tripPlans.push(v);
+    })
+    $scope.Pager = Pager;
     $scope.EPlanStatus = EPlanStatus;
     
     $scope.enterDetail = function(tripid){
         window.location.href = "#/trip/list-detail?tripid="+tripid;
+    }
+
+    if (!Pager || !Pager.length) {
+        $scope.hasNextPage = false;
+    } else {
+        $scope.hasNextPage = true;
+    }
+    $scope.loadMore = async function() {
+        if (!$scope.Pager) {
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+            return;
+        }
+        try {
+            $scope.Pager = await $scope.Pager.nextPage();
+            $scope.Pager.map(function(v) {
+                $scope.tripPlans.push(v);
+            })
+            $scope.hasNextPage = true;
+        } catch (err) {
+            $scope.hasNextPage = false;
+        } finally {
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+        }
     }
 }
 
