@@ -158,7 +158,7 @@ export async function TravelpolicyController($scope, Models, $location) {
     }))
     console.info($scope.travelPolicies);
     $scope.editpolicy = async function (id) {
-        var travelpolicy = await Models.travelPolicy.get(id);
+        // var travelpolicy = await Models.travelPolicy.get(id);
         $location.path('/company/editpolicy').search({'policyId': id}).replace();
     }
 }

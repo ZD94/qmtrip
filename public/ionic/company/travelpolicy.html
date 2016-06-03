@@ -2,7 +2,7 @@
     <ion-content padding="true" class="has-header">
         <a href="#/company/editpolicy" id="page30-button89" class="button button-positive  button-block">新增差旅标准</a>
         <div class="list card" ng-repeat="policy in travelPolicies" ng-click="editpolicy(policy.policy.id)">
-            <div class="item item-divider">{{policy.policy.name}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;共{{policy.usernum}}人</div>
+            <div class="item item-divider">{{policy.policy.name}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;共{{policy.usernum || 0}}人</div>
             <div class="item item-body">
                 <div id="page30-markdown21" style="color:#000000;">
                     <p>飞机：{{policy.policy.planeLevel}}</p>
