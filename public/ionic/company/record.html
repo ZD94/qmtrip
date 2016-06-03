@@ -20,8 +20,14 @@
             <div class="item item-body">
                 <ion-list>
                     <ion-item class="item-avatar">
-                        <h2>{{trip.account.name}}</h2>
-                        <p>{{trip.account.mobile}}</p>
+                        <div class="staff_portrait" style="position: absolute; top: 5px; left: 20px; font-size: 20px;
+                            width: 60px; line-height: 60px; text-align: center; font-weight: bold;
+                            border-radius: 50%; color: white; background:#2495da;">{{trip.account.name| limitTo: -2}}
+                        </div>
+                        <div style="margin-left: 2em; margin-top: -1em;">
+                            <h2>{{trip.account.name}}</h2>
+                            <p>{{trip.account.mobile}}</p>
+                        </div>
                     </ion-item>
                     <ion-item>
                         <i class="icon ion-plane"></i> &nbsp;&nbsp;{{trip.deptCity}} 到 {{trip.arrivalCity}}<br>
