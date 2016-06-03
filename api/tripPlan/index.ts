@@ -633,7 +633,7 @@ class TripPlanModule {
             projectNum: project_num_sql_ret[0][0].projectNum || 0,
             dynamicBudget: budget_sql_ret[0][0].dynamicBudget || 0,
             savedMoney: saved_sql_ret[0][0].saved_sql_ret || 0,
-            expenditure: expenditure_sql_ret[0][0].expenditure
+            expenditure: expenditure_sql_ret[0][0].expenditure || 0
         };
     }
 

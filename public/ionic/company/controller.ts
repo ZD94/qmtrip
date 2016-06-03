@@ -48,8 +48,8 @@ export async function BudgetController($scope) {
     $scope.statistic = statistic;
     console.info(statistic)
 
-    $scope.labels = ["Download Sales", "In-Store Sales", "Mail-Order Sales"];
-    $scope.data = [300, 500, 100];
+    $scope.labels = ["本月节省", "本月支出"];
+    $scope.data = [statistic.savedMoney || 0, statistic.expenditure || 1];
 
     await monthChange(monthNow);
 
