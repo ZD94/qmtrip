@@ -11,11 +11,7 @@
         </canvas>
         <label class="item item-select">
             <span class="input-label">当前统计</span>
-            <select>
-                <option>本月</option>
-                <option>{{statistic.month}}</option>
-                <option>2016年3月</option>
-            </select>
+            <select ng-change="monthChange(queryMonth)" id="monthSelect" ng-model="queryMonth" ng-options="item.value as item.name for item in months"></select>
         </label>
         <form class="list">
             <div class="list card">
@@ -37,7 +33,7 @@
         <form class="list">
             <div class="list card">
                 <div>动态预算&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{statistic.dynamicBudget}}</div>
-                <div>费用节省&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{statistic.dynamicBudget}}</div>
+                <div>费用节省&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{statistic.savedMoney}}</div>
             </div>
 
         </form>

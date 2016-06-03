@@ -24,20 +24,41 @@ export async function ManagementController($scope, Models) {
 }
 
 export async function BudgetController($scope) {
+    let months = [];
+    let monthNow = moment().format('YYYY-MM');
+    months.push({value: monthNow, name: '本月'});
+    $scope.queryMonth = monthNow;
+
+    for(let i=1; i<6; i++) {
+        let month = moment(monthNow).subtract(i, 'months').format('YYYY-MM');
+        months.push({value: month, name: month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月')});
+    }
+
+    $scope.months = months;
+
     $scope.staffSaves = [];
     API.require("tripPlan");
     await API.onload();
-    $scope.staffSaves = await API.tripPlan.tripPlanSaveRank({limit: 3});
 
+    $scope.staffSaves = await API.tripPlan.tripPlanSaveRank({limit: 3});
     let staff = await Staff.getCurrent();
     let company = staff.company;
     let statistic = await company.statisticTripPlanOfMonth({month: '2016-06'});
     statistic.month = statistic.month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月');
-    // console.info(statistic);
     $scope.statistic = statistic;
+    console.info(statistic)
 
     $scope.labels = ["Download Sales", "In-Store Sales", "Mail-Order Sales"];
     $scope.data = [300, 500, 100];
+
+    await monthChange(monthNow);
+
+    async function monthChange(queryMonth) {
+        let statistic = await company.statisticTripPlanOfMonth({month: queryMonth});
+        statistic.month = statistic.month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月');
+        $scope.statistic = statistic;
+    }
+    $scope.monthChange = monthChange;
 }
 
 export async function RecordController($scope, Models) {
@@ -180,7 +201,22 @@ export async function StaffsController($scope, Models) {
         obj.travelPolicy = await obj.staff.getTravelPolicy();
         return obj;
     }));
-    $scope.search = function () {
+    $scope.option = {name: ''};
+    $scope.search = async function () {
+
+        var staffs = await Models.staff.find({where: {companyId: staff.company.id, name: {$like: '%'+ $scope.option.name +'%'}}});
+        $scope.staffs = staffs.map(function (staff) {
+            var obj = {staff: staff, role: ""};
+            if (obj.staff.roleId == EStaffRole.OWNER) {
+                obj.role = '创建者';
+            }
+            return obj;
+        });
+        await Promise.all($scope.staffs.map(async function (obj) {
+            obj.travelPolicy = await obj.staff.getTravelPolicy();
+            return obj;
+        }));
+        
 
     }
 }

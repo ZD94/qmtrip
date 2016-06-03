@@ -612,22 +612,28 @@ class TripPlanModule {
             + companyId + '\' and status!=(' + EPlanStatus.APPROVE_NOT_PASS + ') and status!=' + EPlanStatus.WAIT_APPROVE + ' and start_at>=\''
             + startTime + '\' and start_at<\'' + endTime + '\'';
 
+        let complete_sql = 'from trip_plan.trip_plans where company_id=\''
+            + companyId + '\' and status=' + EPlanStatus.COMPLETE + ' and start_at>=\''
+            + startTime + '\' and start_at<\'' + endTime + '\'';
+
         let staff_num_sql = 'select count(1) as \"staffNum\" from (select distinct account_id ' + where_sql + ') as Project;';
         let project_num_sql = 'select count(1) as \"projectNum\" from (select distinct project_id ' + where_sql + ') as Project;';
         let budget_sql = 'select sum(budget) as \"dynamicBudget\" ' + where_sql;
+        let saved_sql = 'select sum(budget-expenditure) as \"savedMoney\" ' + complete_sql;
+        let expenditure_sql = 'select sum(expenditure) as expenditure ' + complete_sql;
 
         let staff_num_sql_ret = await sequelize.query(staff_num_sql);
         let project_num_sql_ret = await sequelize.query(project_num_sql);
         let budget_sql_ret = await sequelize.query(budget_sql);
-        // console.info("************************");
-        // console.info(staff_num_sql_ret);
-        // console.info(project_num_sql_ret);
-        // console.info(budget_sql_ret);
+        let saved_sql_ret = await sequelize.query(saved_sql);
+        let expenditure_sql_ret = await sequelize.query(saved_sql);
         return {
             month: month,
-            staffNum: staff_num_sql_ret[0][0].staffNum,
-            projectNum: project_num_sql_ret[0][0].projectNum,
-            dynamicBudget: budget_sql_ret[0][0].dynamicBudget
+            staffNum: staff_num_sql_ret[0][0].staffNum || 0,
+            projectNum: project_num_sql_ret[0][0].projectNum || 0,
+            dynamicBudget: budget_sql_ret[0][0].dynamicBudget || 0,
+            savedMoney: saved_sql_ret[0][0].saved_sql_ret || 0,
+            expenditure: expenditure_sql_ret[0][0].expenditure
         };
     }
 
@@ -759,8 +765,7 @@ class TripPlanModule {
 
     @clientExport
     static async tripPlanSaveRank(params: {limit?: number|string}) {
-        let {accountId} = Zone.current.get('session');
-        let staff = await Models.staff.get(accountId);
+        let staff = await Staff.getCurrent();
         let companyId = staff.company.id;
         let limit = params.limit || 5;
         if (!limit || !/^\d+$/.test(limit as string) || limit > 100) {
@@ -798,73 +803,6 @@ async function getProjectByName(params) {
         let p = {name: params.name, createUser: params.userId, code: '', companyId: params.companyId, createdAt: utils.now()};
         return Models.project.create(p).save();
     }
-}
-
-
-
-/**
- * 从参数中获取计划详情数组
- * @param params
- * @returns {Object}
- */
-function getPlanDetails(params:any):{orderStatus:EPlanStatus, budget:number, tripDetails:any} {
-    let tripDetails:any = [];
-    let tripDetails_required_fields = ['startTime', 'invoiceType', 'budget'];
-    if(params.outTrip){
-        params.outTrip.map(function (detail:any) {
-            detail.type = 1;
-            tripDetails.push(detail);
-        });
-    }
-
-    if(params.backTrip){
-        params.backTrip.map(function (detail:any) {
-            detail.type = 2;
-            tripDetails.push(detail);
-        });
-    }
-
-    if(params.hotel){
-        params.hotel.map(function (detail:any) {
-            detail.type = 3;
-            tripDetails.push(detail);
-        });
-    }
-
-    let total_budget:number = 0;
-    let isBudget = true;
-
-    let _tripDetails = tripDetails.map(function (detail) {
-        tripDetails_required_fields.forEach(function (key) {
-            if (!_.has(detail, key)) {
-                throw {code: '-1', msg: 'tripDetails的属性' + key + '没有指定'};
-            }
-        });
-
-        if (detail.deptCity && !detail.deptCityCode) {
-            throw {code: -3, msg: '城市代码不能为空'};
-        }
-
-        if (detail.arrivalCity && !detail.arrivaltCityCode) {
-            throw {code: -3, msg: '城市代码不能为空'};
-        }
-
-        if (detail.city && !detail.cityCode) {
-            throw {code: -3, msg: '城市代码不能为空'};
-        }
-
-        if (!/^-?\d+(\.\d{1,2})?$/.test(detail.budget)) {
-            throw {code: -2, nsg: '预算金额格式不正确'};
-        }
-
-        detail.budget > 0 ? total_budget = total_budget + parseFloat(detail.budget) : isBudget = false;
-
-        return _.pick(detail, API.tripPlan.TripDetailCols);
-    });
-
-    let orderStatus = isBudget ? EPlanStatus.WAIT_UPLOAD : EPlanStatus.NO_BUDGET; //是否有预算，设置出差计划状态
-
-    return {orderStatus: orderStatus, budget: total_budget, tripDetails: _tripDetails};
 }
 
 
