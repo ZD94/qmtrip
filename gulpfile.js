@@ -61,7 +61,7 @@ gulplib.dist(function(){
     });
     copy = [
         'config',
-        'public',
+        'www',
         'typings'
     ];
     copy.forEach(function(fname){
@@ -90,7 +90,7 @@ gulp.task('eslint.server', function () {
     var files = [
         '**/*.js',
         '!node_modules/**',
-        '!public/**',
+        '!www/**',
         '!common/client/**',
         '!**/*.test.js',
         '!test/**',
@@ -153,7 +153,7 @@ gulp.task('eslint.mocha', function () {
 });
 gulp.task('eslint.browser', function () {
     var files = [
-        'public/**/controller.js'
+        'www/**/controller.js'
     ];
     var options = {
         "extends": "eslint:recommended",
