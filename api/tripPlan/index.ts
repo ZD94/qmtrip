@@ -596,7 +596,6 @@ class TripPlanModule {
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
     }
 
-
     /********************************************统计相关API***********************************************/
 
     @clientExport
@@ -626,7 +625,7 @@ class TripPlanModule {
         let project_num_sql_ret = await sequelize.query(project_num_sql);
         let budget_sql_ret = await sequelize.query(budget_sql);
         let saved_sql_ret = await sequelize.query(saved_sql);
-        let expenditure_sql_ret = await sequelize.query(saved_sql);
+        let expenditure_sql_ret = await sequelize.query(expenditure_sql);
         return {
             month: month,
             staffNum: staff_num_sql_ret[0][0].staffNum || 0,

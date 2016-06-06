@@ -153,8 +153,12 @@ export class Company extends ModelObject{
 
     async statisticTripPlanOfMonth(params: {month: string}): Promise<any> {
         params['companyId'] = this.id;
-        API.require('tripPlan');
-        await API.onload();
+        
+        if(!this.isLocal){
+            API.require('tripPlan');
+            await API.onload();
+        }
+        
         return API.tripPlan.statisticTripPlanOfMonth(params);
     }
 }
