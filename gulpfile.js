@@ -40,9 +40,9 @@ gulplib.angular_app('ionic');
 gulplib.dist(function(){
     var filter = require('gulp-filter');
     var dist_all = [
-        gulp.src(['public/**/*'])
+        gulp.src([gulplib.public_dir + '/**/*'])
             .pipe(filter(['**', '!**/controller.js', '!**/*.less', '!**/*.map']))
-            .pipe(gulp.dest('dist/public')),
+            .pipe(gulp.dest('dist/'+gulplib.public_dir)),
         gulp.src('api/**/*')
             .pipe(gulp.dest('dist/api')),
         gulp.src('common/**/*')
