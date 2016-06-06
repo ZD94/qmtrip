@@ -7,6 +7,8 @@ var path = require('path');
 var gulp = require('gulp');
 var gulplib = require('./common/gulplib');
 
+gulplib.public_dir = 'www';
+
 gulplib.bundle_lib('browserify', {ex: true, ts: false, require:[
     'lessify', 'buffer', 'querystring', 'string_decoder', 'http', 'https', 'url',
     'util', 'events', 'stream', 'zlib']});
@@ -28,19 +30,19 @@ gulplib.bundle_lib('msgbox', {require:['notie', 'msgbox']});
 gulplib.bundle_lib('nglibs', {require: ['nglibs', 'api/_types', 'api/_types/*', 'common/model/client:common/model']});
 gulplib.bundle_lib('ngapp', {require: ['./common/client/ngapp/index.ts:ngapp', 'browserspec']});
 
-gulplib.angular_app('staff');
-gulplib.angular_app('corp');
-gulplib.angular_app('extendfunction');
-gulplib.angular_app('agency');
-gulplib.angular_app('mobile');
+//gulplib.angular_app('staff');
+//gulplib.angular_app('corp');
+//gulplib.angular_app('extendfunction');
+//gulplib.angular_app('agency');
+//gulplib.angular_app('mobile');
 gulplib.angular_app('ionic');
 
 gulplib.dist(function(){
     var filter = require('gulp-filter');
     var dist_all = [
-        gulp.src(['public/**/*'])
+        gulp.src([gulplib.public_dir + '/**/*'])
             .pipe(filter(['**', '!**/controller.js', '!**/*.less', '!**/*.map']))
-            .pipe(gulp.dest('dist/public')),
+            .pipe(gulp.dest('dist/'+gulplib.public_dir)),
         gulp.src('api/**/*')
             .pipe(gulp.dest('dist/api')),
         gulp.src('common/**/*')

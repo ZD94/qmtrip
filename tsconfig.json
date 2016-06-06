@@ -18,9 +18,10 @@
     "emitDecoratorMetadata": true
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "public",
+    "ionic"
   ],
   "excludeNotUsing": [
-    "public"
   ]
 }

@@ -5,30 +5,30 @@
             <a href="#/company/record" id="page24-button74" class="button button-stable  button-block">出差记录</a>
             <a href="#/company/distribution" id="page24-button75" class="button button-stable  button-block">员工分布</a>
         </div>
-        <div class="spacer" style="width: 300px; height: 30px;"></div>
-        <canvas id="doughnut" class="chart chart-doughnut"
-                chart-data="data" chart-labels="labels" height="100">
-        </canvas>
         <label class="item item-select">
             <span class="input-label">当前统计</span>
             <select ng-change="monthChange(queryMonth)" id="monthSelect" ng-model="queryMonth" ng-options="item.value as item.name for item in months"></select>
         </label>
-        <form class="list">
-            <div class="list card">
-                <div class="item item-body">
-                    <ion-list>
-                        <ion-item class="item-avatar">
-                            <h2>出差人数</h2>
-                            <p>{{statistic.staffNum}}人次</p>
-                        </ion-item>
-                        <ion-item class="item-avatar">
-                            <h2>运行项目</h2>
-                            <p>{{statistic.projectNum}}个</p>
-                        </ion-item>
-                    </ion-list>
-                </div>
+        <div class="spacer" style="width: 300px; height: 30px;"></div>
+        <div class="row">
+            <div class="col col-50">
+                <canvas id="doughnut" class="chart chart-doughnut"
+                        chart-data="data" chart-labels="labels" width="170">
+                </canvas>
             </div>
-        </form>
+            <div class="col col-50">
+                <ion-list>
+                    <ion-item>
+                        <h2>出差人数</h2>
+                        <p>{{statistic.staffNum}}人次</p>
+                    </ion-item>
+                    <ion-item >
+                        <h2>运行项目</h2>
+                        <p>{{statistic.projectNum}}个</p>
+                    </ion-item>
+                </ion-list>
+            </div>
+        </div>
 
         <form class="list">
             <div class="list card">
@@ -41,14 +41,12 @@
             <!--<i class="icon ion-image" style="font-size: 64px; color: rgb(136, 136, 136); vertical-align: middle;"></i>-->
         <!--</div>-->
 
-        <ion-item>
-            <div class="item-divider">&nbsp;员工节省排行</div>
-            <ion-list>
-                <ion-item ng-repeat="v in staffSaves" style="font-size: 0.8em;">
-                    <div style="display: block; position: absolute; width: 30px; height: 30px; text-align: center; line-height: 30px; border-radius: 50%; color: white; background:#2495da;">{{v.name| limitTo: -1}}</div>
-                    <span style="padding-left: 50px;">{{v.name}}</span><span style="float: right;">{{v.save}}元</span>
-                </ion-item>
-            </ion-list>
-        </ion-item>
+        <div class="item-divider">&nbsp;员工节省排行</div>
+        <ion-list>
+            <ion-item ng-repeat="v in staffSaves" style="font-size: 0.8em;">
+                <div style="display: block; position: absolute; width: 30px; height: 30px; text-align: center; line-height: 30px; border-radius: 50%; color: white; background:#2495da;">{{v.name| limitTo: -1}}</div>
+                <span style="padding-left: 50px;">{{v.name}}</span><span style="float: right;">{{v.save}}元</span>
+            </ion-item>
+        </ion-list>
     </ion-content>
 </ion-view>
