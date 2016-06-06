@@ -20,3 +20,4 @@ controller.all.js
 !public/font/css/icomoon.css
 npm-debug.log
 tools
+www/script/libs
