@@ -19,9 +19,9 @@
   },
   "exclude": [
     "node_modules",
+    "public",
     "ionic"
   ],
   "excludeNotUsing": [
-    "public"
   ]
 }
