@@ -307,15 +307,18 @@ class ApiTravelBudget {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
 
-        let cabinClass = '';
-        if (policy.planeLevel == '经济舱') {
-            cabinClass = 'Economy';
-        } else if (policy.planeLevel == '高端经济舱') {
-            cabinClass = 'PremiumEconomy'
-        } else if (policy.planeLevel == '商务舱') {
-            cabinClass = 'Business';
-        } else if (policy.planeLevel == '头等舱') {
-            cabinClass = 'First';
+        let cabinClass: string[] = [];
+        if (policy.planeLevel.indexOf('经济舱') >= 0 ) {
+            cabinClass.push('Economy');
+        }
+        if (policy.planeLevel.indexOf('高端经济舱') >= 0 ) {
+            cabinClass.push('PremiumEconomy');
+        }
+        if (policy.planeLevel.indexOf('公务舱') >= 0) {
+            cabinClass.push('Business');
+        }
+        if (policy.planeLevel.indexOf('头等舱') >= 0) {
+            cabinClass.push('First');
         }
 
         let trainCabinClass = '二等座,硬卧';
