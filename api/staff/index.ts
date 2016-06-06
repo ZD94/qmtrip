@@ -153,14 +153,12 @@ class StaffModule{
             time: utils.now(),
             companyName: company.name
         }
-         /*return API.mail.sendMailRequest({
-                 toEmails: acc.email,
-                 templateName: "qm_notify_remove_staff",
-                 values: vals
-             })
-             .then(function() {
-                return true;
-         });*/
+
+        await API.mail.sendMailRequest({
+            toEmails: deleteStaff.email,
+            templateName: "qm_notify_remove_staff",
+            values: vals
+        })
         return true;
 
     }
@@ -190,7 +188,18 @@ class StaffModule{
         let tp = await Models.travelPolicy.get(updateStaff["travelPolicyId"]);
         let defaultDept = await API.department.getDefaultDepartment({companyId: updateStaff["companyId"]});
 
-        if(updateStaff["status"] != 0){
+        if(params.email){
+            if(updateStaff.status == 0){
+                //未激活账户 并且未通过修改邮箱更新账户信息发送激活邮件
+                return API.auth.sendResetPwdEmail({companyName: updateStaff.company.name, email: updateStaff.email, type: 1, isFirstSet: true})
+                    .then(function() {
+                        return updateStaff;
+                    });
+            }else{
+                //已激活账号邮箱不允许修改
+                throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
+            }
+        }else {
             //已激活账户
             let vals  = {
                 username: updateStaff.name,
@@ -202,17 +211,11 @@ class StaffModule{
                 permission: updateStaff.roleId == EStaffRole.ADMIN ? "管理员" : (updateStaff.roleId == EStaffRole.OWNER ? "创建者" : "普通员工")
             }
             return API.mail.sendMailRequest({
-                    toEmails: updateStaff.email,
-                    templateName: "staff_update_email",
-                    values: vals
-                })
+                toEmails: updateStaff.email,
+                templateName: "staff_update_email",
+                values: vals
+            })
                 .then(function(result) {
-                    return updateStaff;
-                });
-        }else if(updateStaff.status == 0){
-            //未激活账户 并且未通过修改邮箱更新账户信息发送激活邮件
-            return API.auth.sendResetPwdEmail({companyName: updateStaff.company.name, email: updateStaff.email, type: 1, isFirstSet: true})
-                .then(function() {
                     return updateStaff;
                 });
         }
