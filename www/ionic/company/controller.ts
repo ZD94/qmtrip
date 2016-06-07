@@ -47,8 +47,9 @@ export async function BudgetController($scope) {
     statistic.month = statistic.month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月');
     $scope.statistic = statistic;
 
-    $scope.labels = ["本月节省", "本月支出"];
-    $scope.data = [statistic.savedMoney || 0, statistic.expenditure || 1];
+    $scope.saveMoneyChart = {};
+    $scope.saveMoneyChart.labels = ["本月节省", "本月支出"];
+    $scope.saveMoneyChart.data = [statistic.savedMoney || 0, statistic.expenditure || 1]
 
     await monthChange(monthNow);
 
