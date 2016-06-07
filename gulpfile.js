@@ -41,7 +41,7 @@ gulplib.dist(function(){
     var filter = require('gulp-filter');
     var dist_all = [
         gulp.src([gulplib.public_dir + '/**/*'])
-            .pipe(filter(['**', '!**/controller.js', '!**/*.less', '!**/*.map']))
+            .pipe(filter(['**', '!**/controller.[jt]s', '!**/*.less', '!**/*.scss', '!**/*.map']))
             .pipe(gulp.dest('dist/'+gulplib.public_dir)),
         gulp.src('api/**/*')
             .pipe(gulp.dest('dist/api')),
@@ -71,6 +71,46 @@ gulplib.dist(function(){
 });
 
 gulplib.final('qmtrip');
+
+gulp.task('ionic.www', /*['default'],*/ function(){
+    var filter = require('gulp-filter');
+    return gulp.src([gulplib.public_dir + '/**/*'])
+        .pipe(filter(['**', '!**/controller.[jt]s', '!**/*.less', '!**/*.scss', '!**/*.map', '!config.json']))
+        .pipe(gulp.dest('ionic/www'));
+});
+
+gulp.task('ionic.config', function(){
+    return gulp.src(['ionic/config.json'])
+        .pipe(gulp.dest('ionic/www'));
+});
+
+gulp.task('ionic.dist', ['ionic.www', 'ionic.config']);
+
+gulp.task('ionic.ios', ['ionic.dist'], function(done){
+    var exec = require('child_process').exec;
+    process.chdir('ionic');
+    var child = exec('ionic emulate ios --target="iPhone-6s, 9.3"', function(err){
+        if(err){
+            console.error(err);
+        }
+        done();
+    });
+    child.stdout.pipe(process.stdout);
+    child.stderr.pipe(process.stderr);
+});
+
+gulp.task('ionic.android', ['ionic.dist'], function(done){
+    var exec = require('child_process').exec;
+    process.chdir('ionic');
+    var child = exec('ionic emulate android', function(err){
+        if(err){
+            console.error(err);
+        }
+        done();
+    });
+    child.stdout.pipe(process.stdout);
+    child.stderr.pipe(process.stderr);
+});
 
 function eslintformater(results, config){
     var rules = config ? (config.rules || {}) : {};

@@ -1,4 +1,5 @@
 
+import * as L from 'common/language';
 import { getSession } from 'common/model';
 require('ionic');
 
@@ -17,19 +18,25 @@ API.onlogin(function(){
     // }
 })
 API.authenticate = function(remote, callback){
-    var user_id = Cookie.get('user_id');
-    var token_id = Cookie.get('token_id');
-    var token_sign = Cookie.get('token_sign');
-    var timestamp = Cookie.get("timestamp");
-    remote.authenticate({ accountid: user_id, tokenid: token_id, timestamp: timestamp, tokensign: token_sign },
+    var datastr = localStorage.getItem('auth_data');
+    if(!datastr){
+        return callback(L.ERR.NEED_LOGIN, remote);
+    }
+    var data;
+    try{
+        data = JSON.parse(datastr);
+    }catch(e){
+        return callback(e, remote);
+    }
+    remote.authenticate({ accountid: data.user_id, tokenid: data.token_id, timestamp: data.timestamp, tokensign: data.token_sign },
             function(err, handle){
                 if(!err){
                     var session = getSession();
-                    session.accountId = user_id;
+                    session.accountId = data.user_id;
                     session.token = {
-                        id: token_id,
-                        sign: token_sign,
-                        timestamp: timestamp
+                        id: data.token_id,
+                        sign: data.token_sign,
+                        timestamp: data.timestamp
                     };
                 }
                 callback(err, handle);
