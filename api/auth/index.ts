@@ -1269,7 +1269,6 @@ function makeActiveSign(activeToken, accountId, timestamp) {
 function _sendActiveEmail(accountId) {
     return Models.account.get(accountId)
         .then(function(account) {
-            console.info("进来发邮件吧qq");
             //生成激活码
             var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
             var activeToken = utils.getRndStr(6);
@@ -1278,10 +1277,8 @@ function _sendActiveEmail(accountId) {
             //发送激活邮件
             var vals = {name: account.email, username: account.email, url: url};
             // return true;
-            console.info("到这来发邮件喽！！！");
             return API.mail.sendMailRequest({toEmails: account.email, templateName: "qm_active_email", values: vals})
                 .then(function(aa) {
-                    console.info("qqqqqqqqqqqqqq", aa);
                     account.activeToken = activeToken;
                     return DBM.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
                 })
