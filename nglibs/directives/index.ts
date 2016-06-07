@@ -7,3 +7,4 @@ import './select';
 import './selector';
 import './icon';
 import './uploader';
+import './progressBar';
