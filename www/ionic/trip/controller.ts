@@ -114,33 +114,43 @@ export function CreateController($scope, $storage, $ionicLoading){
             isRoundTrip: trip.round,
             isNeedHotel: trip.hotel
         }
-        let front = ['国航', '南航', '东航', '深航', '携程', '12306官网'];
+        let front = ['正在验证出行参数', '正在匹配差旅政策', '正在搜索全网数据', '动态预算即将完成'];
         await $ionicLoading.show({
             template: '预算计算中...',
             hideOnStateChange: true,
         });
         let idx = 0;
-
+        let isShowDone = false;
+        let budget;
         let timer = setInterval(async function() {
-            let template = '正在搜索' + front[idx++]+'...'
+            let template = front[idx++]+'...'
             if (idx >= front.length) {
                 clearInterval(timer);
+                isShowDone = true;
+                if (budget) {
+                    cb();
+                }
             }
             await $ionicLoading.show({
                 template: template,
                 hideOnStateChange: true,
             });
-        }, 800);
+        }, 1000);
 
         try {
-            let budget = await API.travelBudget.getTravelPolicyBudget(params);
-            await $ionicLoading.hide()
-            clearInterval(timer);
-            window.location.href = "#/trip/budget?id="+budget;
+            budget = await API.travelBudget.getTravelPolicyBudget(params);
+            if (isShowDone) {
+                cb();
+            }
         } catch(err) {
-            clearTimeout(timer);
+            clearInterval(timer);
             await $ionicLoading.hide()
             alert(err.msg || err);
+        }
+
+        function cb() {
+            $ionicLoading.hide()
+            window.location.href = "#/trip/budget?id="+budget;
         }
     }
 
