@@ -116,6 +116,7 @@ class TravelPolicyModule{
     @requireParams(["id"], ["companyId"])
     @conditionDecorator([
         {if: condition.isTravelPolicyAdminOrOwner("0.id")},
+        {if: condition.isSelfTravelPolicy("0.id")},
         {if: condition.isTravelPolicyAgency("0.id")}
     ])
     static async getTravelPolicy(params: {id: string, companyId?: string}) : Promise<TravelPolicy>{

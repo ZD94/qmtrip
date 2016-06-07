@@ -4,6 +4,7 @@
             <ion-item ng-repeat="department in departments">
                 {{department.department.name}}
                 <span class="item-note">{{department.staffnum}}人</span>
+                <!--<span class="item-note" ng-click="deleteDept(department.department, $index)">X</span>span-->
             </ion-item>
         </ion-list>
         <button id="page29-button87" class="button button-positive  button-block" ng-click="newdepart()">增加部门</button>
