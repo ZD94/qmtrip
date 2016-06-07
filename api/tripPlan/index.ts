@@ -631,6 +631,7 @@ class TripPlanModule {
         let budget_sql_ret = await sequelize.query(budget_sql);
         let saved_sql_ret = await sequelize.query(saved_sql);
         let expenditure_sql_ret = await sequelize.query(expenditure_sql);
+
         return {
             month: month,
             staffNum: Number(staff_num_sql_ret[0][0].staffNum || 0),
@@ -639,65 +640,6 @@ class TripPlanModule {
             savedMoney: saved_sql_ret[0][0].savedMoney || 0,
             expenditure: expenditure_sql_ret[0][0].expenditure || 0
         };
-    }
-
-    /**
-     * 统计计划单的动态预算/计划金额和实际支出
-     * @param params
-     */
-    @requireParams(['companyId'], ['startTime', 'endTime', 'accountId'])
-    static statPlanOrderMoney(params) {
-        let query = params;
-        let query_complete:any = {
-            companyId: query.companyId,
-            status: EPlanStatus.COMPLETE,
-            auditStatus: 1
-        }
-        let query_sql = 'select sum(budget-expenditure) as \"savedMoney\" from tripplan.trip_plan where company_id=\'' + params.companyId + '\' and status=2 and audit_status=1';
-        query.status = {$gte: EPlanStatus.WAIT_COMMIT};
-        let startAt:any = {};
-
-        if (params.startTime) {
-            startAt.$gte = params.startTime;
-            query_sql += ' and start_at >=\'' + params.startTime + '\'';
-            delete params.startTime;
-        }
-
-        if (params.endTime) {
-            startAt.$lte = params.endTime;
-            query_sql += ' and start_at <=\'' + params.endTime + '\'';
-            delete params.endTime;
-        }
-
-        if (params.accountId) {
-            query_complete.accountId = params.accountId;
-            query_sql += ' and account_id=\'' + params.accountId + '\'';
-        }
-
-        query_sql += ' and budget>expenditure;';
-
-        if (!_.isNull(startAt)) {
-            query.startAt = startAt;
-            query_complete.startAt = startAt;
-        }
-
-        return Promise.all([
-            DBM.TripPlan.sum('budget', {where: query}),
-            DBM.TripPlan.sum('budget', {where: query_complete}),
-            DBM.TripPlan.sum('expenditure', {where: query_complete}),
-            DBM.TripPlan.count({where: query_complete}),
-            sequelize.query(query_sql)
-        ])
-            .spread(function (n1, n2, n3, n4, n5) {
-                let savedMoney = n5[0][0].savedMoney || 0;
-                return {
-                    qmBudget: n1 || 0,
-                    planMoney: n2 || 0,
-                    expenditure: n3 || 0,
-                    savedMoney: savedMoney,
-                    NumOfStaff: n4 || 0
-                }
-            })
     }
 
     /**

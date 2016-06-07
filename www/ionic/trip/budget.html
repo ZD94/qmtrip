@@ -72,12 +72,6 @@
 
                 <ion-item ng-if="budget.tripType == ETripType.OUT_TRIP">
                     <span>{{trip.beginDate | date: 'MM/dd'}}</span>
-                    {{trip.originPlaceName}}
-                    &nbsp;
-                    <i ng-if='budget.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
-                    <i ng-if='budget.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
-                    &nbsp;
-                    {{trip.destinationPlaceName}}
                     <br/>{{budget.price}}元
                 </ion-item>
             </div>
