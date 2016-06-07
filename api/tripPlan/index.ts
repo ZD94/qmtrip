@@ -367,10 +367,15 @@ class TripPlanModule {
 
     @clientExport
     @requireParams(['id', 'budget'])
+    @conditionDecorator([{if: condition.isAgencyTripDetail('0.id')}])
     @modelNotNull('tripDetail')
     static async editTripDetailBudget(params: {id: string, budget: number}) {
-        let user = AgencyUser.getCurrent(); //代理商用户才能修改预算
         let tripDetail = await Models.tripDetail.get(params.id);
+
+        if(tripDetail.status != EPlanStatus.NO_BUDGET) {
+            throw {code: -2, msg: '该出差计划不能修改预算'};
+        }
+
         let tripPlan = tripDetail.tripPlan;
         tripDetail.budget = params.budget;
         tripDetail.status = EPlanStatus.WAIT_UPLOAD;
@@ -628,10 +633,10 @@ class TripPlanModule {
         let expenditure_sql_ret = await sequelize.query(expenditure_sql);
         return {
             month: month,
-            staffNum: staff_num_sql_ret[0][0].staffNum || 0,
-            projectNum: project_num_sql_ret[0][0].projectNum || 0,
+            staffNum: Number(staff_num_sql_ret[0][0].staffNum || 0),
+            projectNum: Number(project_num_sql_ret[0][0].projectNum || 0),
             dynamicBudget: budget_sql_ret[0][0].dynamicBudget || 0,
-            savedMoney: saved_sql_ret[0][0].saved_sql_ret || 0,
+            savedMoney: saved_sql_ret[0][0].savedMoney || 0,
             expenditure: expenditure_sql_ret[0][0].expenditure || 0
         };
     }
@@ -705,11 +710,7 @@ class TripPlanModule {
     @requireParams(['deptCity', 'arrivalCity', 'startAt', 'title', 'budgets'], ['backAt', 'remark', 'description'])
     static async saveTripPlanByTest(params: {deptCity: string, arrivalCity: string, startAt: string, title: string,
         budgets: any[],backAt?: string, remark?: string, description?: string}): Promise<TripPlan> {
-        let {accountId} = Zone.current.get('session');
-        let staff = await Models.staff.get(accountId);
-        let email = staff.email;
-        let staffName = staff.name;
-        let _tripPlan:any = _.pick(params, TripPlanCols);
+        let staff = await Staff.getCurrent();
         let totalPrice:number = 0;
         for(let budget of params.budgets) {
             if (budget.price < 0) {
@@ -719,45 +720,27 @@ class TripPlanModule {
             totalPrice += Number(budget.price);
         }
 
-        let tripPlanId = uuid.v1();
-        let project = await getProjectByName({companyId: staff.company.id, name: _tripPlan.title, userId: accountId, isCreate: true});
+        let project = await getProjectByName({companyId: staff.company.id, name: params.title, userId: staff.id, isCreate: true});
 
-        _tripPlan.id = tripPlanId;
-        _tripPlan.budget = totalPrice
-        _tripPlan.status = 0;
-        _tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo'); //获取出差计划单号
-        _tripPlan.accountId = accountId;
-        _tripPlan.companyId = staff.company.id;
-        _tripPlan.projectId = project.id;
-
-        let tripPlan = new TripPlan(await DBM.TripPlan.create(_tripPlan));
+        let tripPlan = TripPlan.create(params);
+        tripPlan.budget = totalPrice;
+        tripPlan.status = 0;
+        tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo'); //获取出差计划单号
+        tripPlan.account = staff;
+        tripPlan.auditUser = staff.id;
+        tripPlan['companyId'] = staff.company.id;
+        tripPlan['projectId'] = project.id;
 
         await Promise.all(params.budgets.map(async function (detail) {
-            let _detail: any = JSON.parse(JSON.stringify(detail));
-
-            switch(detail.type) {
-                case 'train':
-                    _detail.invoiceType = EInvoiceType.TRAIN;
-                    break;
-                case 'hotel':
-                    _detail.invoiceType = EInvoiceType.HOTEL;
-                    break;
-                case 'air':
-                    _detail.invoiceType = EInvoiceType.PLANE;
-                    break;
-                default:
-                    _detail.invoiceType = EInvoiceType.OTHER;
-            }
-
-            _detail.tripPlanId = tripPlanId;
-            _detail.accountId = accountId;
+            let _detail = TripDetail.create(detail);
+            _detail.tripPlan = tripPlan;
+            _detail.accountId = staff.id;
             _detail.status = 0;
-            _detail.budget = Number(_detail.price);
-            let tripDetail = await DBM.TripDetail.create(_detail);
+            await _detail.save();
         }));
 
-        let logs = {tripPlanId: tripPlanId, userId: accountId, remark: '新增计划单 ' + tripPlan.planNo, createdAt: utils.now()};
-        await DBM.TripPlanLog.create(logs);
+        let logs = {tripPlanId: tripPlan.id, userId: staff.id, remark: '新增计划单 ' + tripPlan.planNo, createdAt: utils.now()};
+        await Promise.all([tripPlan.save(), TripPlanLog.create(logs).save()]);
 
         return tripPlan;
     }

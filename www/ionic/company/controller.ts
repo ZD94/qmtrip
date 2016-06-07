@@ -46,7 +46,6 @@ export async function BudgetController($scope) {
     let statistic = await company.statisticTripPlanOfMonth({month: '2016-06'});
     statistic.month = statistic.month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月');
     $scope.statistic = statistic;
-    console.info(statistic)
 
     $scope.labels = ["本月节省", "本月支出"];
     $scope.data = [statistic.savedMoney || 0, statistic.expenditure || 1];
@@ -59,6 +58,19 @@ export async function BudgetController($scope) {
         $scope.statistic = statistic;
     }
     $scope.monthChange = monthChange;
+    $scope.option1 = {
+        all: statistic.dynamicBudget,
+        cover: statistic.dynamicBudget,
+        title: statistic.dynamicBudget + '元'
+    };
+    $scope.isShow1 = true;
+
+    $scope.option2 = {
+        all: statistic.dynamicBudget,
+        cover: statistic.savedMoney,
+        title: statistic.savedMoney + '元'
+    }
+    $scope.isShow2 = true;
 }
 
 export async function RecordController($scope, Models) {

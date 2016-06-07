@@ -62,6 +62,7 @@ describe("api/tripPlan", function() {
             .then(function(company){
                 companyId = company.id;
                 staffId = company.createUser;
+                // staffId = 'd2a653f0-2251-11e6-b1f2-f5e5142d3f50';
 
                 var session = getSession();
                 session.accountId = staffId;
@@ -91,13 +92,14 @@ describe("api/tripPlan", function() {
             city: '上海市',
             cityCode: 'SH123',
             hotelName: '丐帮',
+            type: ETripType.HOTEL,
             invoiceType: EInvoiceType.HOTEL,
         }]
     }
     describe("saveTripPlan", function(){
         it("#saveTripPlan should be ok", function(done){
-            let budgetId = 'cache:budgets:ed4e1520-2234-11e6-89a0-43b37ebb0409:1464152140092HPupGh';
-            API.tripPlan.saveTripPlan({budgetId: '1464166365279CHeoy5', title: '新增出差计划测试'})
+            let budgetId = 'cache:budgets:ed4e1520-2234-11e6-89a0-43b37ebb0409:1464756130662p4xkW3';
+            API.tripPlan.saveTripPlan({budgetId: '146416455072613g0yw', title: '新增出差计划测试'})
                 .then(function(ret) {
                     console.info("saveTripPlan success...");
                     // console.info(ret);
@@ -170,6 +172,16 @@ describe("api/tripPlan", function() {
             let session = getSession();
             session.accountId = staffId;
             API.tripPlan.listTripPlans({}, function (err, ret) {
+                assert.equal(err, null);
+                assert(ret.length >= 0);
+                done();
+            })
+        });
+
+        it("#editTripDetailBudget should be ok", function (done) {
+            let session = getSession();
+            session.accountId = agencyUserId;
+            API.tripPlan.editTripDetailBudget({id: tripDetailId}, function (err, ret) {
                 assert.equal(err, null);
                 assert(ret.length >= 0);
                 done();

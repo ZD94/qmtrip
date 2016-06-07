@@ -312,6 +312,46 @@ export var condition = {
             return id && staff && tripPlan && staff.id == tripPlan.accountId;
         }
     },
+    isAgencyTripPlan: function(idpath: string) {
+        return async function (fn, self, args) {
+            let id = _.get(args, idpath);
+            let user = await AgencyUser.getCurrent();
+            let tripPlan = await Models.tripPlan.get(id);
+
+            if(!user) {
+                throw L.ERR.AGENCY_USER_NOT_EXIST();
+            }
+
+            if(!tripPlan) {
+                throw L.ERR.TRIP_PLAN_NOT_EXIST();
+            }
+
+            let company = await tripPlan.getCompany();
+
+            return id && user && tripPlan && user.agency.id == company['agencyId'];
+        }
+    },
+    isAgencyTripDetail: function(idpath: string) {
+        return async function (fn, self, args) {
+            let id = _.get(args, idpath);
+            let user = await AgencyUser.getCurrent();
+            let tripDetail = await Models.tripDetail.get(id);
+
+            if(!tripDetail) {
+                throw L.ERR.TRIP_PLAN_NOT_EXIST();
+            }
+
+            let tripPlan = tripDetail.tripPlan;
+
+            if(!user) {
+                throw L.ERR.AGENCY_USER_NOT_EXIST();
+            }
+
+            let company = await tripPlan.getCompany();
+
+            return id && user && tripPlan && user.agency.id == company['agencyId'];
+        }
+    },
     canGetTripPlan: function (idpath: string) {
         return async function (fn, self, args) {
             let id = _.get(args, idpath);
