@@ -30,15 +30,6 @@
                     <span ng-if='budget.type == ETripType.SUBSIDY'>
                         {{startAt | date: 'yyyy-MM-dd'}}至{{backAt | date: 'yyyy-MM-dd'}}
                     </span>
-                    <br>
-                    {{trip.deptCity}}
-                    &nbsp;
-                    <i ng-if='budget.invoiceType == EInvoiceType.PLANE' class="icon ion-plane"></i>
-                    <i ng-if='budget.invoiceType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
-                    <i ng-if='budget.invoiceType == EInvoiceType.HOTEL' class="icon ion-home"></i>
-                    <i ng-if='budget.invoiceType == EInvoiceType.OTHER'>-</i>
-                    &nbsp;
-                    {{trip.arrivalCity}}
                     <br>{{budget.budget}}元
                 </ion-item>
             </div>
