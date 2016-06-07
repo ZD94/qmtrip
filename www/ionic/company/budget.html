@@ -29,10 +29,16 @@
                 </ion-list>
             </div>
         </div>
+        <!--<div statistical-bar options="{all:100,current:20,color:blue}">-->
+            <!--<span>动态预算</span>-->
+            <!--<div style="background: red;height: 10px;width: 60%;display: inline-block"><div style="background: blue;height: 10px;width: 100%"></div></div>1234567元-->
+        <!--</div>-->
+        <div statistical-bar options="options">动态预算</div>
 
         <form class="list">
             <div class="list card">
-                <div>动态预算&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{statistic.dynamicBudget}}</div>
+                <!--<div>动态预算&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{statistic.dynamicBudget}}</div>-->
+                <div statistical-bar options="option1">动态预算</div>
                 <div>费用节省&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{statistic.savedMoney}}</div>
             </div>
 

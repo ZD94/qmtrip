@@ -24,6 +24,21 @@ export async function ManagementController($scope, Models) {
 }
 
 export async function BudgetController($scope) {
+    $scope.option1 = {
+        all:0,
+        current:0,
+        color:'blue'
+    };
+    $scope.option2 = {
+        all:100,
+        current:20,
+        color:'red'
+    };
+    $scope.option3 = {
+        all:100,
+        current:20,
+        color:'green'
+    };
     let months = [];
     let monthNow = moment().format('YYYY-MM');
     months.push({value: monthNow, name: '本月'});
@@ -59,6 +74,11 @@ export async function BudgetController($scope) {
         $scope.statistic = statistic;
     }
     $scope.monthChange = monthChange;
+    console.info($scope.statistic);
+    $scope.option1.all = $scope.statistic.dynamicBudget;
+    $scope.option1.current = $scope.statistic.dynamicBudget;
+
+    console.info($scope.option1)
 }
 
 export async function RecordController($scope, Models) {
