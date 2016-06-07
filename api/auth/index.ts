@@ -405,6 +405,8 @@ class ApiAuth {
             var password = data.pwd.toString();
             pwd = utils.md5(password);
             //throw L.ERR.PASSWORD_EMPTY();
+        }else{
+            pwd = utils.md5("123456");
         }
 
 
@@ -435,21 +437,24 @@ class ApiAuth {
         var accountObj = Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status, type: type});
         var account = await accountObj.save();
 
-        if (!account.pwd) {
+        /*if (!account.pwd) {
             return ApiAuth.sendResetPwdEmail({email: account.email, type: 1, isFirstSet: true, companyName: companyName})
                 .then(function() {
                     return account;
                 })
-        }
+        }*/
 
-        if (account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
+        /*if (account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
             return _sendActiveEmail(account.id)
                 .then(function(){
                     return account;
                 })
-        }
+        }*/
 
-        return account;
+        return _sendActiveEmail(account.id)
+            .then(function(){
+                return account;
+            })
     }
 
     /**
@@ -1262,8 +1267,9 @@ function makeActiveSign(activeToken, accountId, timestamp) {
 }
 
 function _sendActiveEmail(accountId) {
-    return DBM.Account.findOne({where: {id: accountId}})
+    return Models.account.get(accountId)
         .then(function(account) {
+            console.info("进来发邮件吧qq");
             //生成激活码
             var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
             var activeToken = utils.getRndStr(6);
@@ -1271,12 +1277,14 @@ function _sendActiveEmail(accountId) {
             var url = C.host + "/staff.html#/auth/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
             //发送激活邮件
             var vals = {name: account.email, username: account.email, url: url};
-            return true;
-            // return API.mail.sendMailRequest({toEmails: account.email, templateName: "qm_active_email", values: vals})
-            //     .then(function() {
-            //         account.activeToken = activeToken;
-            //         return DBM.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
-            //     })
+            // return true;
+            console.info("到这来发邮件喽！！！");
+            return API.mail.sendMailRequest({toEmails: account.email, templateName: "qm_active_email", values: vals})
+                .then(function(aa) {
+                    console.info("qqqqqqqqqqqqqq", aa);
+                    account.activeToken = activeToken;
+                    return DBM.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
+                })
         })
 }
 
