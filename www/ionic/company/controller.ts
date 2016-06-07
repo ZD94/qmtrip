@@ -156,7 +156,7 @@ export async function DistributionController($scope, Models) {
 export async function DepartmentController($scope, Models, $ionicPopup) {
     var staff = await Staff.getCurrent();
     async function loadDepartment(){
-        var getdepartment = await staff.company.getDepartments();
+        var getdepartment = await Models.department.find({where: {companyId: staff.company.id}});
         var departments = getdepartment.map(function (department) {
             var depart = {department: department, staffnum: 0};
             return depart;
@@ -173,6 +173,8 @@ export async function DepartmentController($scope, Models, $ionicPopup) {
     var newdepartment = $scope.newdepartment = Department.create();
     newdepartment["company"] = staff.company;
     $scope.newdepart = function () {
+        $scope.newdepartment = Department.create();
+        $scope.newdepartment.company = staff.company;
         var nshow = $ionicPopup.show({
             template: '<input type="text" ng-model="newdepartment.name">',
             title: '创建部门',
@@ -196,6 +198,12 @@ export async function DepartmentController($scope, Models, $ionicPopup) {
                 }
             ]
         })
+    }
+    
+    $scope.deleteDept = async function (dept, index) {
+        await dept.destroy();
+        $scope.departments.splice(index, 1);
+        // $scope.departments = await loadDepartment();
     }
 }
 
@@ -258,7 +266,6 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
         if (_staff.travelPolicyId && _staff.travelPolicyId.id) {
             _staff.travelPolicyId = _staff.travelPolicyId.id;
         }
-        console.info(_staff);
         if ($scope.role && $scope.role.id == true) {
             _staff.roleId = EStaffRole.ADMIN;
         } else {

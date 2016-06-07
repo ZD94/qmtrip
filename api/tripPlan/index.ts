@@ -371,6 +371,11 @@ class TripPlanModule {
     @modelNotNull('tripDetail')
     static async editTripDetailBudget(params: {id: string, budget: number}) {
         let tripDetail = await Models.tripDetail.get(params.id);
+
+        if(tripDetail.status != EPlanStatus.NO_BUDGET) {
+            throw {code: -2, msg: '该出差计划不能修改预算'};
+        }
+
         let tripPlan = tripDetail.tripPlan;
         tripDetail.budget = params.budget;
         tripDetail.status = EPlanStatus.WAIT_UPLOAD;
@@ -628,8 +633,8 @@ class TripPlanModule {
         let expenditure_sql_ret = await sequelize.query(expenditure_sql);
         return {
             month: month,
-            staffNum: staff_num_sql_ret[0][0].staffNum || 0,
-            projectNum: project_num_sql_ret[0][0].projectNum || 0,
+            staffNum: Number(staff_num_sql_ret[0][0].staffNum || 0),
+            projectNum: Number(project_num_sql_ret[0][0].projectNum || 0),
             dynamicBudget: budget_sql_ret[0][0].dynamicBudget || 0,
             savedMoney: saved_sql_ret[0][0].savedMoney || 0,
             expenditure: expenditure_sql_ret[0][0].expenditure || 0
