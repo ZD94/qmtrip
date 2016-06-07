@@ -8,7 +8,7 @@
 angular
     .module('nglibs')
     .directive('progressBar', function() {
-        require('./statistical.less');
+        require('./progress-bar.less');
         return {
             restrict:'AE',
             replace:true,
@@ -17,9 +17,9 @@ angular
                 all : '@',
                 cover: '@',
                 color: '@',
-                title: '@'
+                title: '@?'
             },
-            template: '<div class="jl_statis"><span ng-transclude></span> <div class="statis"><div class="statisBar" style="border-radius: 5px; background: {{color}}; width: {{coverPercent}};"></div></div>&nbsp;&nbsp;{{title}}</div>',
+            template: '<div class="progressBar"><span ng-transclude></span> <div class="bar-bg"><div class="cover" style="border-radius: 5px; background: {{color}}; width: {{coverPercent}};"></div></div>&nbsp;&nbsp;{{title}}</div>',
             controller: function ($scope) {
                 let all = $scope.all || 1;
                 let cover = $scope.cover;
@@ -29,12 +29,15 @@ angular
                 }
 
                 $scope.$watch('all', function(newValue, oldValue) {
+                    if (newValue == oldValue) return;
                     $scope.coverPercent = (($scope.cover / (newValue || 1)) * 100) + '%';
                 });
 
                 $scope.$watch('cover', function(newValue, oldValue) {
+                    if (newValue == oldValue) return;
                     $scope.coverPercent = ((newValue / ($scope.all|| 1) ) * 100) + '%';
                 })
+
             }
         }
     })
