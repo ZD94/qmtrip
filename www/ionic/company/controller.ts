@@ -24,21 +24,6 @@ export async function ManagementController($scope, Models) {
 }
 
 export async function BudgetController($scope) {
-    $scope.option1 = {
-        all:0,
-        current:0,
-        color:'blue'
-    };
-    $scope.option2 = {
-        all:100,
-        current:20,
-        color:'red'
-    };
-    $scope.option3 = {
-        all:100,
-        current:20,
-        color:'green'
-    };
     let months = [];
     let monthNow = moment().format('YYYY-MM');
     months.push({value: monthNow, name: '本月'});
@@ -61,7 +46,6 @@ export async function BudgetController($scope) {
     let statistic = await company.statisticTripPlanOfMonth({month: '2016-06'});
     statistic.month = statistic.month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月');
     $scope.statistic = statistic;
-    console.info(statistic)
 
     $scope.labels = ["本月节省", "本月支出"];
     $scope.data = [statistic.savedMoney || 0, statistic.expenditure || 1];
@@ -74,11 +58,19 @@ export async function BudgetController($scope) {
         $scope.statistic = statistic;
     }
     $scope.monthChange = monthChange;
-    console.info($scope.statistic);
-    $scope.option1.all = $scope.statistic.dynamicBudget;
-    $scope.option1.current = $scope.statistic.dynamicBudget;
+    $scope.option1 = {
+        all: statistic.dynamicBudget,
+        cover: statistic.dynamicBudget,
+        title: statistic.dynamicBudget + '元'
+    };
+    $scope.isShow1 = true;
 
-    console.info($scope.option1)
+    $scope.option2 = {
+        all: statistic.dynamicBudget,
+        cover: statistic.savedMoney,
+        title: statistic.savedMoney + '元'
+    }
+    $scope.isShow2 = true;
 }
 
 export async function RecordController($scope, Models) {
