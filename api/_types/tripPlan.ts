@@ -352,6 +352,11 @@ export class TripDetail extends ModelObject{
     get tripPlan(): TripPlan { return null; }
     set tripPlan(val: TripPlan) {}
 
+    editBudget(params: {budget: number}): Promise<boolean> {
+        //    f3ac3f50-2c70-11e6-bb82-8dd809b99199
+        return API.tripPlan.editTripDetailBudget({id: this.id, budget: params.budget});
+    }
+
     uploadInvoice(params: {pictureFileId: string}): Promise<boolean> {
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
     }
