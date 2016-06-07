@@ -244,6 +244,13 @@ export var condition = {
             }
         }
     },
+    isSelfTravelPolicy: function (idpath:string) {
+        return async function(fn, self, args) {
+            let id = _.get(args, idpath);
+            let staff = await Staff.getCurrent();
+            return id && staff && (staff["travelPolicyId"] == id || !staff["travelPolicyId"]);
+        }
+    },
     isTravelPolicyAgency: function(idpath: string) {
         return async function (fn ,self, args) {
             let id = _.get(args, idpath);
@@ -259,6 +266,13 @@ export var condition = {
             let staff = await Staff.getCurrent();
             let dept = await Models.department.get(id);
             return id && staff && dept && dept["companyId"] == staff["companyId"] && (staff["roleId"] == EStaffRole.ADMIN || staff["roleId"] == EStaffRole.OWNER);
+        }
+    },
+    isSelfDepartment: function (idpath:string) {
+        return async function(fn, self, args) {
+            let id = _.get(args, idpath);
+            let staff = await Staff.getCurrent();
+            return id && staff && (staff["departmentId"] == id || !staff["departmentId"]);
         }
     },
     isDepartmentAgency: function(idpath: string) {

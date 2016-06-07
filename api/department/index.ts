@@ -58,7 +58,7 @@ class DepartmentModule{
         {if: condition.isDepartmentAdminOrOwner("0.id")},
         {if: condition.isDepartmentAgency("0.id")}
     ])
-    static async delete(params): Promise<any>{
+    static async deleteDepartment(params): Promise<any>{
         var id = params.id;
         var department = await Models.department.get(params.id);
         let {ids, count} = await API.staff.getStaffs({where : {companyId: department.company.id, departmentId: id, status: 0}});
@@ -109,6 +109,7 @@ class DepartmentModule{
     @requireParams(["id"])
     @conditionDecorator([
         {if: condition.isDepartmentAdminOrOwner("0.id")},
+        {if: condition.isSelfDepartment("0.id")},
         {if: condition.isDepartmentAgency("0.id")}
     ])
     static async getDepartment(params: {id?: string, companyId?: string}): Promise<Department>{
@@ -126,6 +127,7 @@ class DepartmentModule{
     @requireParams(["companyId"])
     @conditionDecorator([
         {if: condition.isCompanyAdminOrOwner("0.companyId")},
+        {if: condition.isSelfDepartment("0.id")},
         {if: condition.isCompanyAgency("0.companyId")}
     ])
     static async getDefaultDepartment(params): Promise<Department>{
@@ -158,6 +160,7 @@ class DepartmentModule{
 
         var options : any = {};
         options.where = _.pick(params.where, Object.keys(DBM.Department.attributes));
+        // options.where.deletedAt = { $eq: null };
         if(params.$or) {
             options.where.$or = params.where.$or;
         }
