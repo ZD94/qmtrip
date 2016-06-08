@@ -1,6 +1,6 @@
 "use strict";
 import {Staff, EStaffRole} from 'api/_types/staff';
-import async = Q.async;
+console.info(EStaffRole)
 
 export async function IndexController($scope, Menu, $ionicPopup, Models){
     require('./index.less');
@@ -36,9 +36,6 @@ export async function IndexController($scope, Menu, $ionicPopup, Models){
 
     ];
 
-    for( var i =0;i<items.length;i++){
-        Menu.add(items[i]);
-    }
     var staff = await Staff.getCurrent();
     if(staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN){
         items.push({
@@ -69,6 +66,9 @@ export async function IndexController($scope, Menu, $ionicPopup, Models){
                 link:'company/travelpolicy',
                 badgeNum: 0
             })
+    }
+    for( var i =0;i<items.length;i++){
+        Menu.add(items[i]);
     }
     var policy = await staff.getTravelPolicy();
     $scope.alertShow = async function (staffId?: string) {
