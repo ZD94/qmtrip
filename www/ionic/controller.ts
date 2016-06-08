@@ -2,7 +2,7 @@
 import {Staff, EStaffRole} from 'api/_types/staff';
 import async = Q.async;
 
-export async function IndexController($scope, Menu, $ionicPopup, Models){
+export async function IndexController($scope, Menu, $ionicPopup, Models ,$storage){
     require('./index.less');
     var items =[
         {
@@ -98,4 +98,8 @@ export async function IndexController($scope, Menu, $ionicPopup, Models){
     let company = staff.company;
     $scope.Menu = Menu;
     $scope.staff = staff;
+    $scope.logout = function(){
+        $storage.local.remove('auth_data');
+        window.location.href = '#login/'
+    }
 }
