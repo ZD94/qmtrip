@@ -1,6 +1,7 @@
 "use strict";
 import {Staff, EStaffRole} from 'api/_types/staff';
-console.info(EStaffRole)
+console.info(EStaffRole);
+var API = require('common/api');
 
 export async function IndexController($scope, Menu, $ionicPopup, Models ,$storage){
     require('./index.less');
@@ -98,8 +99,11 @@ export async function IndexController($scope, Menu, $ionicPopup, Models ,$storag
     let company = staff.company;
     $scope.Menu = Menu;
     $scope.staff = staff;
-    $scope.logout = function(){
+    $scope.logout = async function(){
+        await API.onload();
         $storage.local.remove('auth_data');
-        window.location.href = '#login/'
+        API.reload_all_modules();
+        window.location.href = '#login/';
+        window.location.reload();
     }
 }
