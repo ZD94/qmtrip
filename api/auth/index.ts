@@ -201,11 +201,11 @@ class ApiAuth {
                 };
 
                 if (isFirstSet) {
-                    vals.url = C.host + "/staff.html#/auth/first-set-pwd?" + url;
+                    vals.url = C.host + "/ionic.html#/login/first-set-pwd?" + url;
                     templateName = 'qm_first_set_pwd_email';
                     return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
                 } else {
-                    vals.url = C.host + "/staff.html#/auth/reset-pwd?" + url;
+                    vals.url = C.host + "/ionic.html#/login/reset-pwd?" + url;
                     templateName = 'qm_reset_pwd_email';
                     return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
                 }
@@ -405,8 +405,6 @@ class ApiAuth {
             var password = data.pwd.toString();
             pwd = utils.md5(password);
             //throw L.ERR.PASSWORD_EMPTY();
-        }else{
-            pwd = utils.md5("123456");
         }
 
 
@@ -437,24 +435,19 @@ class ApiAuth {
         var accountObj = Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status, type: type});
         var account = await accountObj.save();
 
-        /*if (!account.pwd) {
+        if (!account.pwd) {
             return ApiAuth.sendResetPwdEmail({email: account.email, type: 1, isFirstSet: true, companyName: companyName})
                 .then(function() {
                     return account;
                 })
-        }*/
+        }
 
-        /*if (account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
+        if (account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
             return _sendActiveEmail(account.id)
                 .then(function(){
                     return account;
                 })
-        }*/
-
-        return _sendActiveEmail(account.id)
-            .then(function(){
-                return account;
-            })
+        }
     }
 
     /**
@@ -1273,7 +1266,7 @@ function _sendActiveEmail(accountId) {
             var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
             var activeToken = utils.getRndStr(6);
             var sign = makeActiveSign(activeToken, account.id, expireAt);
-            var url = C.host + "/staff.html#/auth/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
+            var url = C.host + "/ionic.html#/login/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
             //发送激活邮件
             var vals = {name: account.email, username: account.email, url: url};
             // return true;
