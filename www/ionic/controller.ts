@@ -3,8 +3,20 @@ import {Staff, EStaffRole} from 'api/_types/staff';
 console.info(EStaffRole);
 var API = require('common/api');
 
-export async function IndexController($scope, Menu, $ionicPopup, Models ,$storage){
+export async function IndexController($scope, Menu, $ionicPopup, Models, $storage, $window, $location, $ionicHistory){
     require('./index.less');
+    $scope.ionicGoBack = function(){
+        let viewHistory = $ionicHistory.viewHistory();
+        let backView = viewHistory.backView;
+        if(!backView){
+            $window.history.go(-1);
+        }else if(backView.url) {
+            //$location.replace();
+            $location.url(backView.url);
+        } else {
+            backView.go();
+        }
+    }
     var items =[
         {
             id:1051,
@@ -43,7 +55,7 @@ export async function IndexController($scope, Menu, $ionicPopup, Models ,$storag
                 id:1056,
                 icon:'stats-bars',
                 title:'预算统计',
-                link:'company/management',
+                link:'company/budget',
                 badgeNum: 0
             },
             {

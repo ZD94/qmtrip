@@ -31,7 +31,8 @@
                     {{tripDetail.arrivalCity}}
                     <br>{{goTraffic.price}}元
                     <div class="item-note" ng-if="goTraffic.status == EPlanStatus.WAIT_UPLOAD">
-                        <div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="goTraffic.title" done="goTraffic.done">
+                        <div class="uploadbtns button-small botton-outline button-positive" ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD || tripDetail.status == EPlanStatus.AUDIT_NOT_PASS"
+                             ng-uploader accept="image/*" title="goTraffic.title" done="goTraffic.done">
                             上传票据
                         </div>
                         <!--<a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>-->
@@ -78,7 +79,9 @@
                     {{tripDetail.arrivalCity}}
                     <br>{{backTraffic.price}}元
                     <div class="item-note" ng-if="backTraffic.status == EPlanStatus.WAIT_UPLOAD">
-                        <div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="backTraffic.title" done="backTraffic.done">
+                        <div class="uploadbtns button-small botton-outline button-positive"
+                             ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD || tripDetail.status == EPlanStatus.AUDIT_NOT_PASS"
+                             ng-uploader accept="image/*" title="backTraffic.title" done="backTraffic.done">
                             上传票据
                         </div>
                         <!--<a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>-->
@@ -130,7 +133,9 @@
                     {{tripDetail.arrivalCity}}
                     <br>{{hotel.price}}元
                     <div class="item-note" ng-if="hotel.status == EPlanStatus.WAIT_UPLOAD">
-                        <div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="hotel.title" done="hotel.done">
+                        <div class="uploadbtns button-small botton-outline button-positive"
+                             ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD || tripDetail.status == EPlanStatus.AUDIT_NOT_PASS"
+                             ng-uploader accept="image/*" title="hotel.title" done="hotel.done">
                             上传票据
                         </div>
                         <!--<a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>-->

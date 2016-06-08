@@ -21,3 +21,24 @@ $ionicons-font-path: "../fonts" !default;
 // Include all of Ionic
 @import "../../../common/client/ionic/scss/ionic";
 
+.platform-wechat{
+  .nav-bar-block{
+    right: auto;
+    .bar{
+      padding: 0;
+      button{
+        &.button{
+          background-color: rgba($stable, 0.3);
+        }
+      }
+    }
+    .title {
+      display: none;
+    }
+  }
+  ion-side-menu-content{
+    .has-header{
+      top: 0;
+    }
+  }
+}

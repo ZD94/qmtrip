@@ -52,10 +52,8 @@
             </ion-item>
         </ion-list>
         <div class="button-bar" ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE">
-            <!--<a href="#/trip-approval/reject-reason" id="page7-button41" class="button button-assertive  button-block">拒绝</a>-->
-            <a ng-click="approve(approveResult.NOT_PASS)" id="page7-button41" class="button button-assertive  button-block">拒绝</a>
-            <a ng-click="approve(approveResult.PASS)" id="page7-button43" class="button button-positive  button-block">同意</a>
-            <!--<a href="#/trip-approval/approved" id="page7-button43" class="button button-positive  button-block">同意</a>-->
+            <a ng-click="showReasonDialog()" id="page7-button41" class="button button-assertive  button-block">拒绝</a>
+            <a ng-click="showAlterDialog()" id="page7-button43" class="button button-positive  button-block">同意</a>
         </div>
         <div class="button-bar"></div>
     </ion-content>

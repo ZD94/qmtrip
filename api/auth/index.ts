@@ -203,11 +203,11 @@ class ApiAuth {
                 };
 
                 if (isFirstSet) {
-                    vals.url = C.host + "/staff.html#/auth/first-set-pwd?" + url;
+                    vals.url = C.host + "/ionic.html#/login/first-set-pwd?" + url;
                     templateName = 'qm_first_set_pwd_email';
                     return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
                 } else {
-                    vals.url = C.host + "/staff.html#/auth/reset-pwd?" + url;
+                    vals.url = C.host + "/ionic.html#/login/reset-pwd?" + url;
                     templateName = 'qm_reset_pwd_email';
                     return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
                 }
@@ -452,7 +452,6 @@ class ApiAuth {
                     return account;
                 })
         }
-
     }
 
     /**
@@ -1298,7 +1297,7 @@ function _sendActiveEmail(accountId) {
             var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
             var activeToken = utils.getRndStr(6);
             var sign = makeActiveSign(activeToken, account.id, expireAt);
-            var url = C.host + "/staff.html#/auth/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
+            var url = C.host + "/ionic.html#/login/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
             //发送激活邮件
             var vals = {name: account.email, username: account.email, url: url};
             // return true;

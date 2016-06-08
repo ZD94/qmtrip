@@ -183,11 +183,6 @@ export class TripPlan extends ModelObject {
     get project(): Project { return null; }
     set project(val: Project) {}
 
-    // @Reference({type: Types.UUID}, 'accountId')
-    // getStaff(id?:string): Promise<Staff> {
-    //     return Models.staff.get(id);
-    // }
-
     @ResolveRef({type: Types.UUID}, Models.staff)
     get account(): Staff { return null; }
     set account(val: Staff) {}
