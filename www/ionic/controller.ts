@@ -43,7 +43,7 @@ export async function IndexController($scope, Menu, $ionicPopup, Models ,$storag
                 id:1056,
                 icon:'stats-bars',
                 title:'预算统计',
-                link:'company/management',
+                link:'company/budget',
                 badgeNum: 0
             },
             {
