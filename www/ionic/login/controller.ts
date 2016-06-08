@@ -45,7 +45,7 @@ export function IndexController($scope,$stateParams, $storage) {
     }
 }
 
-export async function FirstSetPwdController ($scope, $stateParams, $location) {
+export async function FirstSetPwdController ($scope, $stateParams) {
     let accountId = $stateParams.accountId;
     let sign = $stateParams.sign;
     let timestamp = $stateParams.timestamp;
@@ -60,7 +60,6 @@ export async function FirstSetPwdController ($scope, $stateParams, $location) {
     $scope.setPwd = function() {
         let newPwd = $scope.form.newPwd
         let confirmPwd = $scope.form.confirmPwd
-        console.info(newPwd, confirmPwd)
         if (newPwd && confirmPwd) {
             newPwd = trim(newPwd)
             confirmPwd = trim(confirmPwd);
