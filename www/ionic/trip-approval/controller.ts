@@ -12,7 +12,7 @@ export async function ApprovedController($scope, Models, $stateParams){
     $scope.staffName = staff.name;
 }
 
-export async function DetailController($scope, Models, $stateParams){
+export async function DetailController($scope, Models, $stateParams, $ionicPopup){
     require('./detail.less');
     let tripId = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(tripId);
@@ -46,9 +46,9 @@ export async function DetailController($scope, Models, $stateParams){
     $scope.approveResult = EAuditStatus;
     $scope.EPlanStatus = EPlanStatus;
 
-    $scope.approve = async function(result: EAuditStatus) {
+    async function approve(result: EAuditStatus, auditRemark?: string) {
         try{
-            await tripPlan.approve({auditResult: result});
+            await tripPlan.approve({auditResult: result, auditRemark: auditRemark});
             if(result == EAuditStatus.PASS) {
                 window.location.href = "#/trip-approval/approved?staffId="+tripPlan.account.id;
             }
@@ -56,6 +56,45 @@ export async function DetailController($scope, Models, $stateParams){
             alert(e);
         }
     }
+
+    $scope.showReasonDialog = function () {
+        $scope.reject = {reason: ''};
+        $ionicPopup.show({
+            template: '<input type="text" ng-model="reject.reason">',
+            title: '填写拒绝原因',
+            scope: $scope,
+            buttons: [{
+                text: '取消'
+            },{
+                text: '确认',
+                type: 'button-positive',
+                onTap: async function (e) {
+                    if (!$scope.reject.reason) {
+                        e.preventDefault();
+                    } else {
+                        approve(EAuditStatus.NOT_PASS, $scope.reject.reason);
+                    }
+                }
+            }]
+        })
+    };
+
+    $scope.showAlterDialog = function () {
+        $scope.reject = {reason: ''};
+        $ionicPopup.show({
+            title: '确认同意',
+            scope: $scope,
+            buttons: [{
+                text: '取消'
+            },{
+                text: '确认',
+                type: 'button-positive',
+                onTap: async function (e) {
+                    approve(EAuditStatus.PASS);
+                }
+            }]
+        })
+    };
 }
 
 export async function ListController($scope, Models, $stateParams, $ionicLoading){

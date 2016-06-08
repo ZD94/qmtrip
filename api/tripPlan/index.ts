@@ -343,25 +343,31 @@ class TripPlanModule {
         }
 
         tripPlan.auditStatus = auditResult;
+        let log = TripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id})
 
         if(params.auditRemark) {
             tripPlan.auditRemark = params.auditRemark;
         }
 
-        let tripDetails = await tripPlan.getTripDetails({});
-
         if(auditResult == EAuditStatus.PASS) {
+            log.remark = '审批通过，审批人：' + staff.name;
             tripPlan.status = EPlanStatus.WAIT_UPLOAD;
         }else if(auditResult == EAuditStatus.NOT_PASS) {
+            if(!params.auditRemark) {
+                throw {code: -2, msg: '拒绝原因不能为空'};
+            }
+            log.remark = '审批未通过，原因：' + params.auditRemark + '，审批人：' + staff.name;
             tripPlan.status = EPlanStatus.APPROVE_NOT_PASS;
         }
+
+        let tripDetails = await tripPlan.getTripDetails({});
 
         tripDetails.map(function(detail) {
             detail.status = tripPlan.status;
         });
 
         await Promise.all(tripDetails.map((d) => d.save()));
-        await tripPlan.save();
+        await Promise.all([tripPlan.save(), log.save()])
         return true;
     }
 
@@ -601,6 +607,7 @@ class TripPlanModule {
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
     }
 
+    //
     /********************************************统计相关API***********************************************/
 
     @clientExport
