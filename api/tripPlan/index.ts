@@ -34,9 +34,15 @@ class TripPlanModule {
      * @returns {TripPlan}
      */
     @clientExport
-    @requireParams(['budgetId', 'title', 'auditUser'], ['description', 'remark'])
+    @requireParams(['budgetId', 'title'], ['description', 'remark', 'auditUser'])
     static async saveTripPlan(params): Promise<TripPlan> {
         let staff = await Staff.getCurrent();
+        let company = staff.company;
+
+        if(company.isApproveOpen && !params.auditUser) { //企业开启审核功能后，审核人不能为空
+            throw {code: -3, msg: '审核人不能为空'};
+        }
+
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: params.budgetId});
 
         if(!budgetInfo) {
@@ -44,7 +50,7 @@ class TripPlanModule {
         }
 
         let {budgets, query} = budgetInfo;
-        let project = await getProjectByName({companyId: staff.company.id, name: params.title, userId: staff.id, isCreate: true});
+        let project = await getProjectByName({companyId: company.id, name: params.title, userId: staff.id, isCreate: true});
         let totalBudget = 0;
         let tripPlan = TripPlan.create(params);
 
@@ -53,7 +59,7 @@ class TripPlanModule {
         }
 
         tripPlan['accountId'] = staff.id;
-        tripPlan['companyId'] = staff.company.id;
+        tripPlan['companyId'] = company.id;
         tripPlan.project = project;
         tripPlan.startAt = query.leaveDate;
         tripPlan.backAt = query.goBackDate;
@@ -191,7 +197,7 @@ class TripPlanModule {
     static async sendTripPlanEmails(tripPlan: TripPlan, userId: string) {
         let url = config.host + '/ionic.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
         let user = await Models.staff.get(userId);
-        let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER, EStaffRole.ADMIN], status: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
+        let company = user.company;
         let {go, back, hotel} = await TripPlanModule.getPlanEmailDetails(tripPlan);
 
         //给员工发送邮件
@@ -201,28 +207,30 @@ class TripPlanModule {
             totalBudget: '￥' + tripPlan.budget, url: self_url, detailUrl: self_url};
         await API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_self_traveludget', values: self_values});
 
-        //给审核人发审核邮件
-        let approveUser = await Models.staff.get(tripPlan.auditUser);
-        let approve_url = config.host + '/ionic.html#/trip-approval/detail?tripid=' + tripPlan.id;
-        let approve_values = {managerName: approveUser.name, username: user.name, email: user.email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-            projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel,
-            totalBudget: '￥' + tripPlan.budget, url: approve_url, detailUrl: approve_url};
-        await API.mail.sendMailRequest({toEmails: approveUser.email, templateName: 'qm_notify_new_travelbudget', values: approve_values});
+        if(company.isApproveOpen) {
+            //给审核人发审核邮件
+            let approveUser = await Models.staff.get(tripPlan.auditUser);
+            let approve_url = config.host + '/ionic.html#/trip-approval/detail?tripid=' + tripPlan.id;
+            let approve_values = {managerName: approveUser.name, username: user.name, email: user.email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+                projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel,
+                totalBudget: '￥' + tripPlan.budget, url: approve_url, detailUrl: approve_url};
+            await API.mail.sendMailRequest({toEmails: approveUser.email, templateName: 'qm_notify_new_travelbudget', values: approve_values});
+        }else {
+            let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER, EStaffRole.ADMIN], status: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
+            //给所有的管理员发送邮件
+            await Promise.all(admins.map(async function(s) {
+                let vals = {managerName: s.name, username: user.name, email: user.email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+                    projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel,
+                    totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url};
 
-        //给所有的管理员发送邮件
-        // await Promise.all(admins.map(async function(s) {
-        //     let vals = {managerName: s.name, username: user.name, email: user.email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-        //         projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel,
-        //         totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url};
-        //
-        //     let log = {userId: user.id, tripPlanId: tripPlan.id, remark: '给企业管理员' + s.name + '发送邮件'};
-        //
-        //     await Promise.all([
-        //         API.mail.sendMailRequest({toEmails: s.email, templateName: 'qm_notify_new_travelbudget', values: vals}),
-        //         TripPlanLog.create(log).save()
-        //     ])
-        // }));
+                let log = {userId: user.id, tripPlanId: tripPlan.id, remark: '给企业管理员' + s.name + '发送邮件'};
 
+                await Promise.all([
+                    API.mail.sendMailRequest({toEmails: s.email, templateName: 'qm_notify_new_travelbudget', values: vals}),
+                    TripPlanLog.create(log).save()
+                ])
+            }));
+        }
         return true;
     }
 

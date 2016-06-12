@@ -1,0 +1,1 @@
+ALTER TABLE company.companies ADD COLUMN is_approve_open boolean DEFAULT true;
