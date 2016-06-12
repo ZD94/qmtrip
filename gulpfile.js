@@ -89,27 +89,41 @@ gulp.task('ionic.dist', ['ionic.www', 'ionic.config']);
 gulp.task('ionic.ios', ['ionic.dist'], function(done){
     var exec = require('child_process').exec;
     process.chdir('ionic');
-    var child = exec('ionic emulate ios --target="iPhone-6s, 9.3"', function(err){
+    var child_res = exec('ionic resources', function(err){
         if(err){
             console.error(err);
         }
-        done();
+        var child_emu = exec('ionic emulate ios --target="iPhone-6s, 9.3"', function(err){
+            if(err){
+                console.error(err);
+            }
+            done();
+        });
+        child_emu.stdout.pipe(process.stdout);
+        child_emu.stderr.pipe(process.stderr);
     });
-    child.stdout.pipe(process.stdout);
-    child.stderr.pipe(process.stderr);
+    child_res.stdout.pipe(process.stdout);
+    child_res.stderr.pipe(process.stderr);
 });
 
 gulp.task('ionic.android', ['ionic.dist'], function(done){
     var exec = require('child_process').exec;
     process.chdir('ionic');
-    var child = exec('ionic emulate android', function(err){
+    var child_res = exec('ionic resources', function(err){
         if(err){
             console.error(err);
         }
-        done();
+        var child_emu = exec('ionic emulate android', function(err){
+            if(err){
+                console.error(err);
+            }
+            done();
+        });
+        child_emu.stdout.pipe(process.stdout);
+        child_emu.stderr.pipe(process.stderr);
     });
-    child.stdout.pipe(process.stdout);
-    child.stderr.pipe(process.stderr);
+    child_res.stdout.pipe(process.stdout);
+    child_res.stderr.pipe(process.stderr);
 });
 
 function eslintformater(results, config){

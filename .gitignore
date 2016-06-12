@@ -23,3 +23,5 @@ controller.all.js
 !public/font/css/icomoon.css
 npm-debug.log
 tools
+ionic/resources/android
+ionic/resources/ios
