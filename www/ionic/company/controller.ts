@@ -8,6 +8,8 @@ import {TravelPolicy} from "api/_types/travelPolicy";
 import {Department} from "api/_types/department";
 const moment = require("moment");
 const API = require("common/api");
+var validate = require("common/validate");
+var L = require("common/language");
 import _ = require('lodash');
 
 export async function ManagementController($scope, Models) {
@@ -217,7 +219,6 @@ export async function StaffsController($scope, Models) {
         }
         return obj;
     });
-    console.info(staffs);
     await Promise.all($scope.staffs.map(async function (obj) {
         obj.travelPolicy = await obj.staff.getTravelPolicy();
         return obj;
@@ -242,7 +243,7 @@ export async function StaffsController($scope, Models) {
     }
 }
 
-export async function StaffdetailController($scope, $stateParams, Models, $ionicHistory) {
+export async function StaffdetailController($scope, $stateParams, Models, $ionicHistory, $ionicPopup) {
     let staff;
     var currentstaff = await Staff.getCurrent();
     var company = currentstaff.company;
@@ -271,7 +272,40 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
         } else {
             _staff.roleId = EStaffRole.COMMON;
         }
-        _staff = await _staff.save();
+        try{
+            if (!_staff.email) {
+                throw L.ERR.EMAIL_EMPTY();
+            }
+
+            if (!validate.isEmail(_staff.email)) {
+                throw L.ERR.INVALID_FORMAT('email');
+            }
+            if(company.domainName && company.domainName != "" && _staff.email.indexOf(company.domainName) == -1){
+                throw L.ERR.INVALID_ARGUMENT('email');
+            }
+
+            if (_staff.mobile && !validate.isMobile(_staff.mobile)) {
+                throw L.ERR.INVALID_FORMAT('mobile');
+            }
+            //查询邮箱是否已经注册
+            var account1 = await Models.account.find({where: {email: _staff.email, type: 1}});
+            if (account1 && account1.length>0) {
+                throw L.ERR.EMAIL_HAS_REGISTRY();
+            }
+
+            if(_staff.mobile){
+                var account2 = await Models.account.find({where: {mobile: _staff.mobile, type: 1}});
+                if (account2 && account2.length>0 && account2.mobile && account2.mobile != "") {
+                    throw L.ERR.MOBILE_HAS_REGISTRY();
+                }
+            }
+            _staff = await _staff.save();
+        }catch (err){
+            var show = $ionicPopup.alert({
+                 title: '提示',
+                 template: err.msg
+             })
+        }
         $ionicHistory.goBack(-1);
     }
     $scope.showrole = function () {

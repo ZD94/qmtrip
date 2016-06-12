@@ -7,6 +7,7 @@ import { Models, EAccountType } from "api/_types";
 import {AuthCert, Token, Account} from "api/_types/auth"
 import {Staff} from "api/_types/staff";
 import validator = require('validator');
+import _ = require('lodash');
 
 var sequelize = require("common/model").importModel("./models");
 var DBM = sequelize.models;
@@ -19,6 +20,7 @@ var API = require("../../common/api");
 var utils = require("common/utils");
 var Logger = require("common/logger");
 var logger = new Logger('auth');
+
 
 var accountCols = Account['$fieldnames'];
 
@@ -397,8 +399,12 @@ class ApiAuth {
         }
 
         if (!validator.isEmail(data.email)) {
-            throw L.ERR.EMAIL_EMPTY();
+            throw L.ERR.INVALID_FORMAT('email');
         }
+
+        if (data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
+            throw L.MSG.MOBILE_FORMAT_ERROR;
+         }
 
         if (data.pwd) {
             var pwd = data.pwd;
@@ -410,9 +416,7 @@ class ApiAuth {
 
         var mobile = data.mobile;
         var companyName = data.companyName || '';
-        /*if (mobile && !validator.isMobilePhone(mobile, 'zh-CN')) {
-            throw L.MSG.MOBILE_FORMAT_ERROR;
-        }*/
+
         var staff = await Staff.getCurrent();
         if(data.email && staff && staff.company["domainName"] && data.email.indexOf(staff.company["domainName"]) == -1){
             throw L.ERR.INVALID_ARGUMENT('email');
@@ -420,13 +424,13 @@ class ApiAuth {
 
         var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
         //查询邮箱是否已经注册
-        var account1 = await DBM.Account.findOne({where: {email: data.email, type: type}});
-        var account2 = await DBM.Account.findOne({where: {mobile: mobile, type: type}});
+        var account1 = await Models.account.find({where: {email: data.email, type: type}});
+        var account2 = await Models.account.find({where: {mobile: mobile, type: type}});
         if (account1 && account1.length>0) {
             throw L.ERR.EMAIL_HAS_REGISTRY();
         }
 
-        if (account2 && account2.length>0 && account2.mobile && account2.mobile != "") {
+        if (account2 && account2.length>0 && account2["mobile"] && account2["mobile"] != "") {
             throw L.ERR.MOBILE_HAS_REGISTRY();
         }
 
@@ -721,6 +725,33 @@ class ApiAuth {
         var id = params.id;
         var acc = await Models.account.get(id);
         return acc;
+    }
+
+    /**
+     * 由id查询账户信息
+     * @param id
+     * @returns {*}
+     */
+    @clientExport
+    static async getAccounts (params) {
+        var options: any = {
+            where:  _.pick(params, Object.keys(DBM.Account.attributes))
+        };
+        if(params.columns){
+            options.attributes = params.columns;
+        }
+        if(params.order){
+            options.order = params.order || "createdAt desc";
+        }
+        if(params.$or) {
+            options.where.$or = params.$or;
+        }
+
+        let paginate = await Models.account.find(options);
+        let ids =  paginate.map(function(t){
+            return t.id;
+        })
+        return {ids: ids, count: paginate['total']};
     }
 
     /**

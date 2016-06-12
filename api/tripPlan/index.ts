@@ -11,15 +11,15 @@ let API = require('common/api');
 let Logger = require('common/logger');
 let logger = new Logger("tripPlan");
 let config = require("../../config");
+let moment = require("moment");
 import _ = require('lodash');
-import moment = require("moment");
 import {requireParams, clientExport} from 'common/api/helper';
 import {Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, ETripType, EAuditStatus } from "api/_types/tripPlan";
 import {Models} from "api/_types/index";
 import {FindResult} from "common/model/interface";
 import {Staff, EStaffRole, EStaffStatus} from "api/_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
-import {AgencyUser} from "../_types/agency";
+import {getSession} from "common/model/index";
 
 let TripDetailCols = TripDetail['$fieldnames'];
 let TripPlanCols = TripPlan['$fieldnames'];
@@ -34,9 +34,15 @@ class TripPlanModule {
      * @returns {TripPlan}
      */
     @clientExport
-    @requireParams(['budgetId', 'title', 'auditUser'], ['description', 'remark'])
+    @requireParams(['budgetId', 'title'], ['description', 'remark', 'auditUser'])
     static async saveTripPlan(params): Promise<TripPlan> {
         let staff = await Staff.getCurrent();
+        let company = staff.company;
+
+        if(company.isApproveOpen && !params.auditUser) { //企业开启审核功能后，审核人不能为空
+            throw {code: -3, msg: '审核人不能为空'};
+        }
+
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: params.budgetId});
 
         if(!budgetInfo) {
@@ -44,22 +50,28 @@ class TripPlanModule {
         }
 
         let {budgets, query} = budgetInfo;
-        let project = await getProjectByName({companyId: staff.company.id, name: params.title, userId: staff.id, isCreate: true});
+        let project = await getProjectByName({companyId: company.id, name: params.title, userId: staff.id, isCreate: true});
         let totalBudget = 0;
         let tripPlan = TripPlan.create(params);
 
+        if(tripPlan.auditUser == staff.id) {
+            throw {code: -2, msg: '审核人不能是自己'};
+        }
+
         tripPlan['accountId'] = staff.id;
-        tripPlan['companyId'] = staff.company.id;
+        tripPlan['companyId'] = company.id;
         tripPlan.project = project;
         tripPlan.startAt = query.leaveDate;
         tripPlan.backAt = query.goBackDate;
         tripPlan.deptCityCode = query.originPlace;
+        tripPlan.query = JSON.stringify(query);
         let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace});
         tripPlan.deptCity = deptInfo.name;
         tripPlan.arrivalCityCode = query.destinationPlace;
         let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace});
         tripPlan.arrivalCity = arrivalInfo.name;
         tripPlan.isNeedHotel = query.isNeedHotel;
+        tripPlan.isRoundTrip = query.isRoundTrip;
         tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo');
         if (!tripPlan.auditUser) {
             tripPlan.auditUser = null;
@@ -137,15 +149,11 @@ class TripPlanModule {
     }
 
     /**
-     * 发送邮件
+     * 获取出差计划中发送邮件的模板数据详情
      * @param tripPlan
-     * @param userId
-     * @returns {Promise<boolean>}
+     * @returns {{go: string, back: string, hotel: string}}
      */
-    static async sendTripPlanEmails(tripPlan: TripPlan, userId: string) {
-        let url = config.host + '/corp.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
-        let user = await Models.staff.get(userId);
-        let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER, EStaffRole.ADMIN], status: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
+    static async getPlanEmailDetails(tripPlan: TripPlan): Promise<{go: string, back: string, hotel: string}> {
         let go = '无', back = '无', hotelStr = '无';
 
         let outTrip = await tripPlan.getOutTrip();
@@ -177,19 +185,52 @@ class TripPlanModule {
             hotelStr += '动态预算￥' + h.budget;
         }
 
-        await Promise.all(admins.map(async function(s) {
-            let vals = {managerName: s.name, username: user.name, email: user.email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-                projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotelStr,
-                totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url};
+        return {go: go, back: back, hotel: hotelStr};
+    }
 
-            let log = {userId: user.id, tripPlanId: tripPlan.id, remark: '给企业管理员' + s.name + '发送邮件'};
+    /**
+     * 发送邮件
+     * @param tripPlan
+     * @param userId
+     * @returns {Promise<boolean>}
+     */
+    static async sendTripPlanEmails(tripPlan: TripPlan, userId: string) {
+        let url = config.host + '/ionic.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
+        let user = await Models.staff.get(userId);
+        let company = user.company;
+        let {go, back, hotel} = await TripPlanModule.getPlanEmailDetails(tripPlan);
 
-            await Promise.all([
-                API.mail.sendMailRequest({toEmails: s.email, templateName: 'qm_notify_new_travelbudget', values: vals}),
-                TripPlanLog.create(log).save()
-            ])
-        }));
+        //给员工发送邮件
+        let self_url = config.host + '/ionic.html#/trip/list-detail?tripid=' + tripPlan.id;
+        let self_values = {staffName: user.name, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+            projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel,
+            totalBudget: '￥' + tripPlan.budget, url: self_url, detailUrl: self_url};
+        await API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_self_traveludget', values: self_values});
 
+        if(company.isApproveOpen) {
+            //给审核人发审核邮件
+            let approveUser = await Models.staff.get(tripPlan.auditUser);
+            let approve_url = config.host + '/ionic.html#/trip-approval/detail?tripid=' + tripPlan.id;
+            let approve_values = {managerName: approveUser.name, username: user.name, email: user.email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+                projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel,
+                totalBudget: '￥' + tripPlan.budget, url: approve_url, detailUrl: approve_url};
+            await API.mail.sendMailRequest({toEmails: approveUser.email, templateName: 'qm_notify_new_travelbudget', values: approve_values});
+        }else {
+            let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER, EStaffRole.ADMIN], status: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
+            //给所有的管理员发送邮件
+            await Promise.all(admins.map(async function(s) {
+                let vals = {managerName: s.name, username: user.name, email: user.email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+                    projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel,
+                    totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url};
+
+                let log = {userId: user.id, tripPlanId: tripPlan.id, remark: '给企业管理员' + s.name + '发送邮件'};
+
+                await Promise.all([
+                    API.mail.sendMailRequest({toEmails: s.email, templateName: 'qm_notify_new_travelbudget', values: vals}),
+                    TripPlanLog.create(log).save()
+                ])
+            }));
+        }
         return true;
     }
 
@@ -343,25 +384,48 @@ class TripPlanModule {
         }
 
         tripPlan.auditStatus = auditResult;
+        let log = TripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id})
 
         if(params.auditRemark) {
             tripPlan.auditRemark = params.auditRemark;
         }
 
-        let tripDetails = await tripPlan.getTripDetails({});
+        //发送审核结果邮件
+        let self_url = config.host + '/ionic.html#/trip/list-detail?tripid=' + tripPlan.id;
+        let user = tripPlan.account;
+
+        if(!user) {
+            user = await Models.staff.get(tripPlan['accountId']);
+        }
+
+        let {go, back, hotel} = await TripPlanModule.getPlanEmailDetails(tripPlan);
+        let self_values = {username: user.name, planNo: tripPlan.planNo, approveTime: utils.now(), approveUser: staff.name,
+            projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel,
+            totalBudget: '￥' + tripPlan.budget, url: self_url, detailUrl: self_url};
+
 
         if(auditResult == EAuditStatus.PASS) {
+            log.remark = '审批通过，审批人：' + staff.name;
             tripPlan.status = EPlanStatus.WAIT_UPLOAD;
+            API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_approve_pass', values: self_values});
         }else if(auditResult == EAuditStatus.NOT_PASS) {
+            if(!params.auditRemark) {
+                throw {code: -2, msg: '拒绝原因不能为空'};
+            }
+            log.remark = '审批未通过，原因：' + params.auditRemark + '，审批人：' + staff.name;
             tripPlan.status = EPlanStatus.APPROVE_NOT_PASS;
+            self_values['reason'] = params.auditRemark;
+            API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_approve_not_pass', values: self_values});
         }
+
+        let tripDetails = await tripPlan.getTripDetails({});
 
         tripDetails.map(function(detail) {
             detail.status = tripPlan.status;
         });
 
         await Promise.all(tripDetails.map((d) => d.save()));
-        await tripPlan.save();
+        await Promise.all([tripPlan.save(), log.save()]);
         return true;
     }
 
@@ -601,6 +665,7 @@ class TripPlanModule {
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
     }
 
+    //
     /********************************************统计相关API***********************************************/
 
     @clientExport
@@ -712,6 +777,64 @@ class TripPlanModule {
         }))
 
         return ranks;
+    }
+
+    @clientExport
+    @requireParams(["tripPlanId"])
+    static async makeFinalBudget(params: {tripPlanId: string}) {
+        let accountId = getSession()["accountId"];
+        let tripPlanId = params.tripPlanId;
+        if (!accountId) {
+            throw L.ERR.PERMISSION_DENY();
+        }
+
+        if (!tripPlanId) {
+            throw L.ERR.PERMISSION_DENY();
+        }
+
+        let tripPlan = await Models.tripPlan.get(tripPlanId)
+        if (tripPlan.auditUser != accountId) {
+            throw L.ERR.PERMISSION_DENY();
+        }
+
+        //取出查询参数,重新计算预算
+        let isRoundTrip = true;
+        let query = tripPlan.query;
+        if (!query) {
+            let {deptCityCode, arrivalCityCode, startAt, backAt, isNeedTraffic, isNeedHotel} = tripPlan;
+            query = {
+                originPlace: deptCityCode,
+                destinationPlace: arrivalCityCode,
+                leaveDate: moment(startAt['value']).format("YYYY-MM-DD"),
+                goBackDate: moment(backAt['value']).format("YYYY-MM-DD"),
+                isNeedTraffic: isNeedTraffic,
+                isNeedHotel: isNeedHotel,
+                isRoundTrip: isRoundTrip
+            }
+        }
+
+        if (typeof query == 'string') {
+            query = JSON.parse(query);
+        }
+        let budgetId = await API.client.travelBudget.getTravelPolicyBudget(query);
+        let budgetResult = await API.client.travelBudget.getBudgetInfo({id: budgetId})
+        let budgets = budgetResult.budgets;
+
+        //计算总预算
+        let totalBudget: number = 0;
+        budgets.forEach((item) => {
+            if (Number(item.price) <= 0) {
+                totalBudget = -1
+                return;
+            }
+            totalBudget += Number(item.price);
+        })
+        tripPlan.originalBudget = tripPlan.budget;
+        tripPlan.budget = totalBudget;
+        tripPlan.isFinalBudget = true;
+        tripPlan.finalBudgetCreateAt = budgetResult.createAt;
+        await tripPlan.save()
+        return true;
     }
 
     static __initHttpApp = require('./invoice');

@@ -15,11 +15,11 @@
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <ion-list>
             <ion-item class="item-thumbnail-left opactic">
-                <div class="staff_portrait" ng-click="alertShow(staff.id)">{{staff.name.substring(staff.name.length-2,staff.name.length)}}</div>
+                <div class="staff_portrait" ng-click="showTravelPolicy(staff.id)">{{staff.name.substring(staff.name.length-2,staff.name.length)}}</div>
                 <span class="op_mult">{{staff.name}}&nbsp;&nbsp;{{staff.mobile}}</span>
                 <br>{{staff.email}}
                 <p align="right" style="margin-top: 5px">
-                    <a class="button button-small button-outline" ng-click="alertShow(staff.id)" style="border: 1px solid #fff;color: #fff;">差旅标准</a>
+                    <a class="button button-small button-outline" ng-click="showTravelPolicy(staff.id)" style="border: 1px solid #fff;color: #fff;">差旅标准</a>
                     <a class="button button-small" href="tel:{{staff.mobile}}">打电话</a>
                 </p>
             </ion-item>
@@ -52,10 +52,8 @@
             </ion-item>
         </ion-list>
         <div class="button-bar" ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE">
-            <!--<a href="#/trip-approval/reject-reason" id="page7-button41" class="button button-assertive  button-block">拒绝</a>-->
-            <a ng-click="approve(approveResult.NOT_PASS)" id="page7-button41" class="button button-assertive  button-block">拒绝</a>
-            <a ng-click="approve(approveResult.PASS)" id="page7-button43" class="button button-positive  button-block">同意</a>
-            <!--<a href="#/trip-approval/approved" id="page7-button43" class="button button-positive  button-block">同意</a>-->
+            <a ng-click="showReasonDialog()" id="page7-button41" class="button button-assertive  button-block">拒绝</a>
+            <a ng-click="showAlterDialog()" id="page7-button43" class="button button-positive  button-block">同意</a>
         </div>
         <div class="button-bar"></div>
     </ion-content>

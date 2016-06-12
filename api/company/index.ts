@@ -3,7 +3,6 @@
  */
 var sequelize = require("common/model").DB;
 var DBM = sequelize.models;
-let uuid = require("node-uuid");
 let L = require("common/language");
 let _ = require('lodash');
 let utils = require("common/utils");
@@ -70,8 +69,6 @@ class CompanyModule {
             throw {code: -6, msg: "邮箱格式不符合要求"};
         }
 
-        params['domainName'] = domain;
-
         if(session) {
             let agencyUser = await Models.agencyUser.get(session.accountId);
 
@@ -84,6 +81,7 @@ class CompanyModule {
 
         let staff = Staff.create({email: params.email, name: params.userName, mobile: params.mobile, roleId: EStaffRole.OWNER, pwd: md5(pwd)});
         let company = Company.create(params);
+        company.domainName = domain;
         let department = Department.create({name: "我的企业", isDefault: true});
 
         department.company = company;
@@ -310,12 +308,7 @@ class CompanyModule {
 
         let domain = params.domain;
         let company = await Models.company.find({where: {domainName: domain}});
-
-        if(company && company.length > 0) {
-            return false;
-        }
-
-        return true;
+        return company && company.length > 0;
     }
 
 
@@ -329,10 +322,10 @@ class CompanyModule {
     @requireParams(['domain'])
     static async isBlackDomain(params: {domain: string}) {
         var domain = params.domain.toLowerCase();
-        let black = await DBM.BlackDomain.findAll({where: params});
-        if(black && black.length > 0) {
-            return true;
-        }
+        // let black = await DBM.BlackDomain.findAll({where: params});
+        // if(black && black.length > 0) {
+        //     return true;
+        // }
         return false;
     }
 

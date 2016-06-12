@@ -117,6 +117,10 @@ export class Company extends ModelObject{
     get isSetPwd(): boolean { return false; }
     set isSetPwd(val: boolean) {}
 
+    @Field({type: Types.BOOLEAN})
+    get isApproveOpen(): boolean { return true; }
+    set isApproveOpen(val: boolean) {}
+
     @Reference({type: Types.UUID})
     getAgency(id?:string): Promise<Agency> {
         return Models.agency.get(id);

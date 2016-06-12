@@ -5,6 +5,7 @@
 import {EPlanStatus, ETripType, EAuditStatus} from "api/_types/tripPlan";
 import {Staff} from "api/_types/staff";
 import moment = require('moment');
+const API = require("common/api")
 
 export async function ApprovedController($scope, Models, $stateParams){
     let staffId = $stateParams.staffId;
@@ -12,10 +13,21 @@ export async function ApprovedController($scope, Models, $stateParams){
     $scope.staffName = staff.name;
 }
 
-export async function DetailController($scope, Models, $stateParams){
+export async function DetailController($scope, Models, $stateParams, $ionicPopup, $ionicLoading){
     require('./detail.less');
     let tripId = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(tripId);
+    if (!tripPlan.isFinalBudget && tripPlan.status == EPlanStatus.WAIT_APPROVE) {
+        await $ionicLoading.show({
+            template: '预算重新计算中...'
+        });
+        //计算最终预算
+        API.require("tripPlan");
+        await API.onload();
+        await API.tripPlan.makeFinalBudget({tripPlanId: tripId});
+        await $ionicLoading.hide();
+    }
+
     $scope.tripPlan = tripPlan;
     let staff = await Models.staff.get(tripPlan.accountId);
     $scope.staff = staff;
@@ -46,9 +58,9 @@ export async function DetailController($scope, Models, $stateParams){
     $scope.approveResult = EAuditStatus;
     $scope.EPlanStatus = EPlanStatus;
 
-    $scope.approve = async function(result: EAuditStatus) {
+    async function approve(result: EAuditStatus, auditRemark?: string) {
         try{
-            await tripPlan.approve({auditResult: result});
+            await tripPlan.approve({auditResult: result, auditRemark: auditRemark});
             if(result == EAuditStatus.PASS) {
                 window.location.href = "#/trip-approval/approved?staffId="+tripPlan.account.id;
             }
@@ -56,6 +68,45 @@ export async function DetailController($scope, Models, $stateParams){
             alert(e);
         }
     }
+
+    $scope.showReasonDialog = function () {
+        $scope.reject = {reason: ''};
+        $ionicPopup.show({
+            template: '<input type="text" ng-model="reject.reason">',
+            title: '填写拒绝原因',
+            scope: $scope,
+            buttons: [{
+                text: '取消'
+            },{
+                text: '确认',
+                type: 'button-positive',
+                onTap: async function (e) {
+                    if (!$scope.reject.reason) {
+                        e.preventDefault();
+                    } else {
+                        approve(EAuditStatus.NOT_PASS, $scope.reject.reason);
+                    }
+                }
+            }]
+        })
+    };
+
+    $scope.showAlterDialog = function () {
+        $scope.reject = {reason: ''};
+        $ionicPopup.show({
+            title: '确认同意',
+            scope: $scope,
+            buttons: [{
+                text: '取消'
+            },{
+                text: '确认',
+                type: 'button-positive',
+                onTap: async function (e) {
+                    approve(EAuditStatus.PASS);
+                }
+            }]
+        })
+    };
 }
 
 export async function ListController($scope, Models, $stateParams, $ionicLoading){

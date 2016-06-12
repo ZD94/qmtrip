@@ -210,7 +210,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     //选择审核人
     $scope.queryStaffs = async function(keyword) {
         let staff = await Staff.getCurrent();
-        let staffs = await staff.company.getStaffs();
+        let staffs = await staff.company.getStaffs({where: {id: {$ne: staff.id}}});
         return staffs.map((p) =>{ return  {name: p.name, value: p.id}} );
     }
     //选择完成后的回调

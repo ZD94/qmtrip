@@ -15,8 +15,8 @@
         <ion-content padding="false" class="side-menu-left has-header">
             <ion-list class="menulist">
                 <ion-item class="item-thumbnail-left">
-                    <div class="menu-portrait" ng-click="alertShow()">{{staff.name.substring(staff.name.length-2,staff.name.length)}}</div>
-                    <h2>{{staff.name}}<i class="button button-small button-stable" ng-click="alertShow()">差旅标准</i></h2>
+                    <div class="menu-portrait" ng-click="showTravelPolicy()">{{staff.name.substring(staff.name.length-2,staff.name.length)}}</div>
+                    <h2>{{staff.name}}<i class="button button-small button-stable" ng-click="showTravelPolicy()">差旅标准</i></h2>
                     <p>{{staff.mobile || '暂未填写手机号'}}
                         <br>积分：{{staff.totalPoints || 0}}
                     </p>
