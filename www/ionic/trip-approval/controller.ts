@@ -17,7 +17,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     require('./detail.less');
     let tripId = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(tripId);
-    if (!tripPlan.isFinalBudget) {
+    if (!tripPlan.isFinalBudget && tripPlan.status == EPlanStatus.WAIT_APPROVE) {
         await $ionicLoading.show({
             template: '预算重新计算中...'
         });
