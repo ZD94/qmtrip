@@ -84,7 +84,7 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
         Menu.add(items[i]);
     }
     var policy = await staff.getTravelPolicy();
-    $scope.alertShow = async function (staffId?: string) {
+    $scope.showTravelPolicy = async function (staffId?: string) {
         if(staffId && staff.id != staffId) {
             staff = await Models.staff.get(staffId);
             policy = await staff.getTravelPolicy();
