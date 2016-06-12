@@ -17,16 +17,6 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     require('./detail.less');
     let tripId = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(tripId);
-    if (!tripPlan.isFinalBudget && tripPlan.status == EPlanStatus.WAIT_APPROVE) {
-        await $ionicLoading.show({
-            template: '预算重新计算中...'
-        });
-        //计算最终预算
-        API.require("tripPlan");
-        await API.onload();
-        await API.tripPlan.makeFinalBudget({tripPlanId: tripId});
-        await $ionicLoading.hide();
-    }
 
     $scope.tripPlan = tripPlan;
     let staff = await Models.staff.get(tripPlan.accountId);
@@ -34,21 +24,71 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     let tripDetails = await tripPlan.getTripDetails();
     let traffic = [], hotel = [];
     let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
-    tripDetails.map(function(detail) {
-        switch (detail.type) {
-            case ETripType.OUT_TRIP:
-            case ETripType.BACK_TRIP:
-                traffic.push(detail);
-                trafficBudget += detail.budget;
-                break;
-            case ETripType.HOTEL:
-                hotel.push(detail);
-                hotelBudget += detail.budget;
-                break;
-            default: subsidyBudget += detail.budget; break;
-        }
-    });
     let subsidyDays:number = moment(tripPlan.backAt.value).diff(moment(tripPlan.startAt.value), 'days');
+    let totalBudget: number = 0;
+    let budgetId;
+    if (tripPlan.status == EPlanStatus.WAIT_APPROVE && tripPlan.query) {
+        await $ionicLoading.show({
+            template: '预算重新计算中...'
+        });
+        //计算最终预算
+        API.require("travelBudget");
+        await API.onload();
+        let query = tripPlan.query;
+        if (typeof query == 'string') {
+            query = JSON.parse(tripPlan.query);
+        }
+
+        budgetId = await API.travelBudget.getTravelPolicyBudget(query);
+        let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId});
+        let budgets = budgetInfo.budgets;
+        budgets.forEach((v) => {
+            switch(v.type) {
+                case ETripType.OUT_TRIP:
+                case ETripType.BACK_TRIP:
+                    traffic.push({budget: v.price, deptCity: v.originPlace, arrivalCity: v.destinationPlace,
+                        startTime: {value: new Date(v.departDateTime).valueOf()}, endTime: {value: new Date(v.arrivalDateTime).valueOf()}});
+                    trafficBudget += Number(v.price);
+                    break;
+                case ETripType.HOTEL:
+                    hotel.push({budget: v.price, city: tripPlan.arrivalCity, startTime: tripPlan.startAt, endTime: tripPlan.backAt});
+                    hotelBudget += Number(v.price);
+                    break;
+                default:
+                    subsidyBudget += Number(v.price);
+                    break;
+
+            }
+        });
+        totalBudget = 0;
+        budgets.forEach((v) => {
+            if (v.price <= 0) {
+                totalBudget = -1;
+                return;
+            }
+            
+            totalBudget += Number(v.price);
+        })
+        await $ionicLoading.hide();
+    } else {
+        totalBudget = tripPlan.budget as number;
+        tripDetails.forEach(function(detail) {
+            switch (detail.type) {
+                case ETripType.OUT_TRIP:
+                case ETripType.BACK_TRIP:
+                    traffic.push(detail);
+                    trafficBudget += detail.budget;
+                    break;
+                case ETripType.HOTEL:
+                    hotel.push(detail);
+                    hotelBudget += detail.budget;
+                    break;
+                default: subsidyBudget += detail.budget; break;
+            }
+        });
+    }
+
+    $scope.totalBudget = totalBudget;
     $scope.traffic = traffic;
     $scope.hotel = hotel;
     $scope.trafficBudget = trafficBudget;
@@ -60,7 +100,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
 
     async function approve(result: EAuditStatus, auditRemark?: string) {
         try{
-            await tripPlan.approve({auditResult: result, auditRemark: auditRemark});
+            await tripPlan.approve({auditResult: result, auditRemark: auditRemark, budgetId: budgetId});
             if(result == EAuditStatus.PASS) {
                 window.location.href = "#/trip-approval/approved?staffId="+tripPlan.account.id;
             }
