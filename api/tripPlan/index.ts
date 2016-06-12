@@ -388,11 +388,11 @@ class TripPlanModule {
 
         if (auditResult == EAuditStatus.PASS) {
             if (!budgetId) {
-                throw new Error(`{code: -1, msg: '预算信息已失效请重新生成'}`);
+                throw new Error(`预算信息已失效请重新生成`);
             }
             let budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId});
             if (!budgetInfo) {
-                throw new Error(`{code: -1, msg: '预算信息已失效请重新生成'}`);
+                throw new Error(`预算信息已失效请重新生成`);
             }
             let finalBudget = 0;
             budgetInfo.budgets.forEach((v) => {
