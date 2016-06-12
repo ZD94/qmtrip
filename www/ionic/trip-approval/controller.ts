@@ -5,6 +5,7 @@
 import {EPlanStatus, ETripType, EAuditStatus} from "api/_types/tripPlan";
 import {Staff} from "api/_types/staff";
 import moment = require('moment');
+const API = require("common/api")
 
 export async function ApprovedController($scope, Models, $stateParams){
     let staffId = $stateParams.staffId;
@@ -12,10 +13,21 @@ export async function ApprovedController($scope, Models, $stateParams){
     $scope.staffName = staff.name;
 }
 
-export async function DetailController($scope, Models, $stateParams, $ionicPopup){
+export async function DetailController($scope, Models, $stateParams, $ionicPopup, $ionicLoading){
     require('./detail.less');
     let tripId = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(tripId);
+    if (!tripPlan.isFinalBudget) {
+        await $ionicLoading.show({
+            template: '预算重新计算中...'
+        });
+        //计算最终预算
+        API.require("tripPlan");
+        await API.onload();
+        await API.tripPlan.makeFinalBudget({tripPlanId: tripId});
+        await $ionicLoading.hide();
+    }
+
     $scope.tripPlan = tripPlan;
     let staff = await Models.staff.get(tripPlan.accountId);
     $scope.staff = staff;

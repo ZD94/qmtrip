@@ -11,15 +11,15 @@ let API = require('common/api');
 let Logger = require('common/logger');
 let logger = new Logger("tripPlan");
 let config = require("../../config");
+let moment = require("moment");
 import _ = require('lodash');
-import moment = require("moment");
 import {requireParams, clientExport} from 'common/api/helper';
 import {Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, ETripType, EAuditStatus } from "api/_types/tripPlan";
 import {Models} from "api/_types/index";
 import {FindResult} from "common/model/interface";
 import {Staff, EStaffRole, EStaffStatus} from "api/_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
-import {AgencyUser} from "../_types/agency";
+import {getSession} from "common/model/index";
 
 let TripDetailCols = TripDetail['$fieldnames'];
 let TripPlanCols = TripPlan['$fieldnames'];
@@ -58,12 +58,14 @@ class TripPlanModule {
         tripPlan.startAt = query.leaveDate;
         tripPlan.backAt = query.goBackDate;
         tripPlan.deptCityCode = query.originPlace;
+        tripPlan.query = JSON.stringify(query);
         let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace});
         tripPlan.deptCity = deptInfo.name;
         tripPlan.arrivalCityCode = query.destinationPlace;
         let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace});
         tripPlan.arrivalCity = arrivalInfo.name;
         tripPlan.isNeedHotel = query.isNeedHotel;
+        tripPlan.isRoundTrip = query.isRoundTrip;
         tripPlan.planNo = await API.seeds.getSeedNo('TripPlanNo');
         if (!tripPlan.auditUser) {
             tripPlan.auditUser = null;
@@ -767,6 +769,64 @@ class TripPlanModule {
         }))
 
         return ranks;
+    }
+
+    @clientExport
+    @requireParams(["tripPlanId"])
+    static async makeFinalBudget(params: {tripPlanId: string}) {
+        let accountId = getSession()["accountId"];
+        let tripPlanId = params.tripPlanId;
+        if (!accountId) {
+            throw L.ERR.PERMISSION_DENY();
+        }
+
+        if (!tripPlanId) {
+            throw L.ERR.PERMISSION_DENY();
+        }
+
+        let tripPlan = await Models.tripPlan.get(tripPlanId)
+        if (tripPlan.auditUser != accountId) {
+            throw L.ERR.PERMISSION_DENY();
+        }
+
+        //取出查询参数,重新计算预算
+        let isRoundTrip = true;
+        let query = tripPlan.query;
+        if (!query) {
+            let {deptCityCode, arrivalCityCode, startAt, backAt, isNeedTraffic, isNeedHotel} = tripPlan;
+            query = {
+                originPlace: deptCityCode,
+                destinationPlace: arrivalCityCode,
+                leaveDate: moment(startAt['value']).format("YYYY-MM-DD"),
+                goBackDate: moment(backAt['value']).format("YYYY-MM-DD"),
+                isNeedTraffic: isNeedTraffic,
+                isNeedHotel: isNeedHotel,
+                isRoundTrip: isRoundTrip
+            }
+        }
+
+        if (typeof query == 'string') {
+            query = JSON.parse(query);
+        }
+        let budgetId = await API.client.travelBudget.getTravelPolicyBudget(query);
+        let budgetResult = await API.client.travelBudget.getBudgetInfo({id: budgetId})
+        let budgets = budgetResult.budgets;
+
+        //计算总预算
+        let totalBudget: number = 0;
+        budgets.forEach((item) => {
+            if (Number(item.price) <= 0) {
+                totalBudget = -1
+                return;
+            }
+            totalBudget += Number(item.price);
+        })
+        tripPlan.originalBudget = tripPlan.budget;
+        tripPlan.budget = totalBudget;
+        tripPlan.isFinalBudget = true;
+        tripPlan.finalBudgetCreateAt = budgetResult.createAt;
+        await tripPlan.save()
+        return true;
     }
 
     static __initHttpApp = require('./invoice');

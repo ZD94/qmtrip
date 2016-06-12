@@ -100,8 +100,16 @@ export class TripPlan extends ModelObject {
     set isNeedTraffic(val: boolean) {}
 
     @Field({type: Types.BOOLEAN})
+    get isRoundTrip() :boolean { return true; }
+    set isRoundTrip(bool: boolean) {}
+
+    @Field({type: Types.BOOLEAN})
     get isNeedHotel(): boolean { return false; }
     set isNeedHotel(val: boolean) {}
+
+    @Field({ type: Types.JSONB})
+    get query() : any { return null};
+    set query(obj: any) {}
 
     @Field({type: Types.STRING})
     get title(): string { return ''; }
@@ -178,6 +186,18 @@ export class TripPlan extends ModelObject {
     @Field({type: Types.DATE})
     get commitTime(): Date { return null; }
     set commitTime(val: Date) {}
+
+    @Field({type: Types.DOUBLE})
+    get originalBudget() : Number { return 0};
+    set originalBudget(v: Number) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isFinalBudget(): Boolean { return false; }
+    set isFinalBudget(bool: Boolean) {}
+
+    @Field({type: Types.DATE})
+    get finalBudgetCreateAt() : Date { return null;}
+    set finalBudgetCreateAt(d: Date) {};
 
     @ResolveRef({type: Types.UUID}, Models.project)
     get project(): Project { return null; }

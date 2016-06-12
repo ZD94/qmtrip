@@ -1,0 +1,1 @@
+alter table trip_plan.trip_plans add is_round_trip boolean default true;

@@ -1,0 +1,1 @@
+alter table trip_plan.trip_plans add original_budget double precision;
