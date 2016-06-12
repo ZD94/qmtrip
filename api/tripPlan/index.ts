@@ -366,12 +366,13 @@ class TripPlanModule {
      * @returns {boolean}
      */
     @clientExport
-    @requireParams(['id', 'auditResult'], ['auditRemark'])
+    @requireParams(['id', 'auditResult'], ['auditRemark', "budgetId"])
     @modelNotNull('tripPlan')
-    static async approveTripPlan(params: {id: string, auditResult: EAuditStatus, auditRemark?: string}): Promise<boolean> {
+    static async approveTripPlan(params: {id: string, auditResult: EAuditStatus, auditRemark?: string, budgetId?: string}): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
         let auditResult = params.auditResult;
         let staff = await Staff.getCurrent();
+        let budgetId = params.budgetId
 
         if(auditResult != EAuditStatus.PASS && auditResult != EAuditStatus.NOT_PASS) {
             throw L.ERR.PERMISSION_DENY(); //只能审批待审批的出差记录
@@ -385,9 +386,86 @@ class TripPlanModule {
             throw L.ERR.PERMISSION_DENY();
         }
 
+        if (auditResult == EAuditStatus.PASS) {
+            if (!budgetId) {
+                throw new Error(`预算信息已失效请重新生成`);
+            }
+            let budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId});
+            if (!budgetInfo) {
+                throw new Error(`预算信息已失效请重新生成`);
+            }
+            let finalBudget = 0;
+            budgetInfo.budgets.forEach((v) => {
+                if (v.price <= 0) {
+                    finalBudget = -1;
+                    return;
+                }
+                finalBudget += Number(v.price);
+            });
+            tripPlan.finalBudgetCreateAt = budgetInfo.createAt;
+            tripPlan.originalBudget = tripPlan.budget;
+            tripPlan.budget = finalBudget;
+            tripPlan.isFinalBudget = true;
+            let budgets = budgetInfo.budgets;
+            let query = budgetInfo.query;
+
+            let oldDetails = await tripPlan.getTripDetails({where: {}});
+            oldDetails.map(async (v) => {
+                await Models.tripDetail.destroy(v);
+            })
+
+            //更新详情信息
+            budgets.forEach(async (budget) => {
+                let tripType = budget.tripType;
+                let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: Number(budget.price)});
+                detail.accountId = staff.id;
+                detail.isCommit = false;
+                detail.status = EPlanStatus.WAIT_UPLOAD;
+                detail.tripPlan = tripPlan;
+                switch(tripType) {
+                    case ETripType.OUT_TRIP:
+                        detail.deptCityCode = query.originPlace;
+                        detail.arrivalCityCode = query.destinationPlace;
+                        detail.deptCity = tripPlan.deptCity;
+                        detail.arrivalCity = tripPlan.arrivalCity;
+                        detail.startTime = query.leaveDate;
+                        detail.endTime = query.goBackDate;
+                        break;
+                    case ETripType.BACK_TRIP:
+                        detail.deptCityCode = query.destinationPlace;
+                        detail.arrivalCityCode = query.originPlace;
+                        detail.deptCity = tripPlan.arrivalCity;
+                        detail.arrivalCity = tripPlan.deptCity;
+                        detail.startTime = query.goBackDate;
+                        detail.endTime = query.leaveDate;
+                        break;
+                    case ETripType.HOTEL:
+                        detail.cityCode = query.destinationPlace;
+                        detail.city = tripPlan.arrivalCity;
+                        detail.hotelName = query.businessDistrict;
+                        detail.startTime = query.checkInDate || query.leaveDate;
+                        detail.endTime = query.checkOutDate || query.goBackDate;
+                        break;
+                    case ETripType.SUBSIDY:
+                        detail.deptCityCode = query.originPlace;
+                        detail.arrivalCityCode = query.destinationPlace;
+                        detail.deptCity = tripPlan.deptCity;
+                        detail.arrivalCity = tripPlan.arrivalCity;
+                        detail.startTime = query.leaveDate || query.checkInDate;
+                        detail.endTime = query.goBackDate || query.checkOutDate;
+                        break;
+                    default:
+                        detail.type = ETripType.OTHER;
+                        detail.startTime = query.leaveDate;
+                        detail.endTime = query.goBackDate;
+                        break;
+                }
+                await detail.save();
+            });
+        }
+
         tripPlan.auditStatus = auditResult;
         let log = TripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id})
-
         if(params.auditRemark) {
             tripPlan.auditRemark = params.auditRemark;
         }
