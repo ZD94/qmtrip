@@ -50,6 +50,7 @@ class ApiTravelBudget {
             accountId = Zone.current.get('session')["accountId"];
         }
         let key = `budgets:${accountId}:${params.id}`;
+        console.info("getBudgetInfo", key);
         return cache.read(key);
     }
 
@@ -179,6 +180,7 @@ class ApiTravelBudget {
                     resolve(true);
                 })
         })
+
         let obj: any = {};
         obj.budgets = budgets;
         obj.query = params;
@@ -205,7 +207,6 @@ class ApiTravelBudget {
     @clientExport
     static async getHotelBudget(params: {cityId: string, businessDistrict: string,
         checkInDate: string, checkOutDate: string}) :Promise<TravelBudgeItem> {
-
         let {cityId, businessDistrict, checkInDate, checkOutDate} = params;
 
         if (!Boolean(cityId)) {
