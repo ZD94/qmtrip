@@ -265,11 +265,11 @@ class StaffModule{
      */
     @clientExport
     @requireParams(["where.companyId"], ["where.name","where.status","where.roleId","where.departmentId",
-        "where.travelPolicyId", "attributes","order", "where.$or"])
+        "where.travelPolicyId", "attributes","order", "where.$or", "where.id"])
     @conditionDecorator([
-        {if: condition.isCompanyAdminOrOwner("where.companyId")},
-        {if: condition.isStaffSameCompany("where.companyId")},
-        {if: condition.isCompanyAgency("where.companyId")}
+        {if: condition.isCompanyAdminOrOwner("0.where.companyId")},
+        {if: condition.isCompanyStaff("0.where.companyId")},
+        {if: condition.isCompanyAgency("0.where.companyId")}
     ])
     static async getStaffs(params: {where: any, order?: any, attributes?: any}) :Promise<FindResult>{
         let staff = await Staff.getCurrent();
