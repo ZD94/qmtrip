@@ -23,10 +23,10 @@
                     <br>
                     {{tripDetail.deptCity}}
                     &nbsp;
-                    <i ng-if='goTraffic.tripType == EInvoiceType.PLANE' class="icon ion-plane"></i>
-                    <i ng-if='goTraffic.tripType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
-                    <i ng-if='goTraffic.tripType == EInvoiceType.HOTEL' class="icon ion-home"></i>
-                    <i ng-if='goTraffic.tripType == EInvoiceType.OTHER'>-</i>
+                    <i ng-if='goTraffic.invoiceType == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                    <i ng-if='goTraffic.invoiceType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                    <i ng-if='goTraffic.invoiceType == EInvoiceType.HOTEL' class="icon ion-home"></i>
+                    <i ng-if='goTraffic.invoiceType == EInvoiceType.OTHER'>-</i>
                     &nbsp;
                     {{tripDetail.arrivalCity}}
                     <br>{{goTraffic.price}}元

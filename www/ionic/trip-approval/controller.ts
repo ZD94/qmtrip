@@ -43,16 +43,31 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         budgetId = await API.travelBudget.getTravelPolicyBudget(query);
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: tripPlan.accountId});
         let budgets = budgetInfo.budgets;
+        let outTraffic,backTraffic,hotelDetail;
+        tripDetails.map((detail) => {
+            switch (detail.type) {
+                case ETripType.OUT_TRIP: outTraffic = detail; break;
+                case ETripType.BACK_TRIP: backTraffic = detail; break;
+                case ETripType.HOTEL: hotelDetail = detail; break;
+                default: break;
+            }
+        });
         budgets.forEach((v) => {
             switch(v.type) {
                 case ETripType.OUT_TRIP:
                 case ETripType.BACK_TRIP:
-                    traffic.push({budget: v.price, deptCity: v.originPlace, arrivalCity: v.destinationPlace,
-                        startTime: {value: new Date(v.departDateTime).valueOf()}, endTime: {value: new Date(v.arrivalDateTime).valueOf()}});
+                    if(v.tripType == 0) {
+                        outTraffic.budget = v.price;
+                        traffic.push(outTraffic);
+                    }else if(v.tripType == 1) {
+                        backTraffic.budget = v.price;
+                        traffic.push(backTraffic);
+                    }
                     trafficBudget += Number(v.price);
                     break;
                 case ETripType.HOTEL:
-                    hotel.push({budget: v.price, city: tripPlan.arrivalCity, startTime: tripPlan.startAt, endTime: tripPlan.backAt});
+                    hotelDetail.budget = v.price;
+                    hotel.push(hotelDetail);
                     hotelBudget += Number(v.price);
                     break;
                 default:

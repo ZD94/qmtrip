@@ -1,6 +1,5 @@
 "use strict";
 import {Staff, EStaffRole} from 'api/_types/staff';
-console.info(EStaffRole);
 var API = require('common/api');
 
 export async function IndexController($scope, Menu, $ionicPopup, Models, $storage, $window, $location, $ionicHistory){

@@ -369,7 +369,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
         }
         if (tripType == ETripType.OUT_TRIP) {
             $scope.goTrafficStatus = Boolean(budget.status);
-            goTraffic = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
+            goTraffic = {id: budget.id, price: budget.budget, invoiceType: budget.invoiceType, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
                 var fileId = response.fileId;
                 uploadInvoice(budget, fileId,async function (err, result) {
                     if (err) {
