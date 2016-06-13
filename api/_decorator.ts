@@ -251,6 +251,14 @@ export var condition = {
             return id && staff && (staff["travelPolicyId"] == id || !staff["travelPolicyId"]);
         }
     },
+    isTravelPolicyCompany: function (idpath:string) {
+        return async function(fn, self, args) {
+            let id = _.get(args, idpath);
+            let tp = await Models.travelPolicy.get(id);
+            let staff = await Staff.getCurrent();
+            return tp && staff && staff["companyId"] == tp["companyId"];
+        }
+    },
     isTravelPolicyAgency: function(idpath: string) {
         return async function (fn ,self, args) {
             let id = _.get(args, idpath);
