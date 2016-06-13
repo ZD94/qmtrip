@@ -300,6 +300,13 @@ export var condition = {
             return id && user && company && user["agencyId"] == company["agencyId"];
         }
     },
+    isStaffSameCompany: function(idpath: string) {
+        return async function (fn ,self, args) {
+            let id = _.get(args, idpath);
+            let user = await AgencyUser.getCurrent();
+            return id && user && user["companyId"] == id;
+        }
+    },
     isCompanyAdminOrOwner: function(idpath: string) {
         return async function (fn ,self, args) {
             let companyId = _.get(args, idpath);

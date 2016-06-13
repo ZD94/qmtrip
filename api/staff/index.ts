@@ -268,6 +268,7 @@ class StaffModule{
         "where.travelPolicyId", "attributes","order", "where.$or"])
     @conditionDecorator([
         {if: condition.isCompanyAdminOrOwner("where.companyId")},
+        {if: condition.isStaffSameCompany("where.companyId")},
         {if: condition.isCompanyAgency("where.companyId")}
     ])
     static async getStaffs(params: {where: any, order?: any, attributes?: any}) :Promise<FindResult>{
