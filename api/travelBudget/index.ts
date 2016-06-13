@@ -47,6 +47,7 @@ class ApiTravelBudget {
     static getBudgetInfo(params: {id: string}) {
         let {accountId} = Zone.current.get('session');
         let key = `budgets:${accountId}:${params.id}`;
+        console.info("getBudgetInfo", key);
         return cache.read(key);
     }
 
@@ -77,7 +78,7 @@ class ApiTravelBudget {
         let staffId = params.staffId || accountId;
         let staff = await Models.staff.get(staffId);
         let travelPolicy = await staff.getTravelPolicy();
-        let self: any = this;
+        // let self: any = this;
         let {leaveDate, goBackDate, isRoundTrip, originPlace, destinationPlace, checkInDate,
             checkOutDate, businessDistrict, leaveTime, goBackTime, isNeedHotel, isNeedTraffic} = params;
 
@@ -131,7 +132,7 @@ class ApiTravelBudget {
 
         if (isNeedTraffic) {
             //去程预算
-            let budget = await ApiTravelBudget.getTrafficBudget.call(self, {
+            let budget = await ApiTravelBudget.getTrafficBudget.call({accountId: staffId}, {
                 originPlace: originPlace,
                 destinationPlace: destinationPlace,
                 leaveDate: leaveDate,
@@ -142,7 +143,7 @@ class ApiTravelBudget {
         }
 
         if (isNeedTraffic && isRoundTrip) {
-            let budget = await ApiTravelBudget.getTrafficBudget.call(self, {
+            let budget = await ApiTravelBudget.getTrafficBudget.call({accountId: staffId}, {
                 originPlace: destinationPlace,
                 destinationPlace: originPlace,
                 leaveDate: goBackDate,
@@ -153,7 +154,7 @@ class ApiTravelBudget {
         }
 
         if (isNeedHotel) {
-            let budget = await ApiTravelBudget.getHotelBudget.call(self, {
+            let budget = await ApiTravelBudget.getHotelBudget.call({accountId: staffId}, {
                 cityId: destinationPlace,
                 businessDistrict: businessDistrict,
                 checkInDate: checkInDate,
@@ -177,6 +178,7 @@ class ApiTravelBudget {
         obj.createAt = Date.now();
         let _id = Date.now() + utils.getRndStr(6);
         let key = `budgets:${accountId}:${_id}`;
+        console.info("key", key);
         await cache.write(key, JSON.stringify(obj))
         return _id;
     }
@@ -197,9 +199,6 @@ class ApiTravelBudget {
     @clientExport
     static async getHotelBudget(params: {cityId: string, businessDistrict: string,
         checkInDate: string, checkOutDate: string}) :Promise<TravelBudgeItem> {
-
-        let self: any = this;
-        let accountId = self.accountId;
         let {cityId, businessDistrict, checkInDate, checkOutDate} = params;
 
         if (!Boolean(cityId)) {
@@ -280,7 +279,6 @@ class ApiTravelBudget {
         leaveDate: Date | string, leaveTime: string}) : Promise<TravelBudgeItem> {
 
         let {originPlace, destinationPlace, leaveDate, leaveTime} = params;
-        let {accountId} = Zone.current.get('session');
 
         if (!destinationPlace) {
             throw new Error(JSON.stringify({code: -1, msg: "目的地城市信息不存在"}));
