@@ -692,7 +692,7 @@ class TripPlanModule {
     }
 
     @clientExport
-    @requireParams(['where.companyId'], [''])
+    @requireParams(['where.companyId'], ['where.name'])
     static async getProjectList(options): Promise<FindResult> {
         let projects = await Models.project.find(options);
         return {ids: projects.map((p)=> {return p.id}), count: projects['total']};
