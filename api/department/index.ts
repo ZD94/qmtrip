@@ -108,7 +108,7 @@ class DepartmentModule{
     @clientExport
     @requireParams(["id"])
     @conditionDecorator([
-        {if: condition.isDepartmentAdminOrOwner("0.id")},
+        {if: condition.isDepartmentCompany("0.id")},
         {if: condition.isSelfDepartment("0.id")},
         {if: condition.isDepartmentAgency("0.id")}
     ])
