@@ -44,8 +44,11 @@ interface BudgetOptions{
 class ApiTravelBudget {
 
     @clientExport
-    static getBudgetInfo(params: {id: string}) {
-        let {accountId} = Zone.current.get('session');
+    static getBudgetInfo(params: {id: string, accountId? : string}) {
+        let accountId = params.accountId;
+        if (!accountId) {
+            accountId = Zone.current.get('session')["accountId"];
+        }
         let key = `budgets:${accountId}:${params.id}`;
         return cache.read(key);
     }
@@ -77,7 +80,6 @@ class ApiTravelBudget {
         let staffId = params.staffId || accountId;
         let staff = await Models.staff.get(staffId);
         let travelPolicy = await staff.getTravelPolicy();
-        let self: any = this;
         let {leaveDate, goBackDate, isRoundTrip, originPlace, destinationPlace, checkInDate,
             checkOutDate, businessDistrict, leaveTime, goBackTime, isNeedHotel, isNeedTraffic} = params;
 
@@ -129,54 +131,60 @@ class ApiTravelBudget {
 
         let budgets = [];
 
-        if (isNeedTraffic) {
-            //去程预算
-            let budget = await ApiTravelBudget.getTrafficBudget.call(self, {
-                originPlace: originPlace,
-                destinationPlace: destinationPlace,
-                leaveDate: leaveDate,
-                leaveTime: leaveTime
-            });
-            budget.tripType = ETripType.OUT_TRIP;
-            budgets.push(budget);
-        }
+        await new Promise(function(resolve, reject) {
+            let session = {accountId: staffId}
+            Zone.current.fork({name: "getTravelPolicy", properties: { session: session}})
+                .run(async function() {
+                    if (isNeedTraffic) {
+                        //去程预算
+                        let budget = await ApiTravelBudget.getTrafficBudget({
+                            originPlace: originPlace,
+                            destinationPlace: destinationPlace,
+                            leaveDate: leaveDate,
+                            leaveTime: leaveTime
+                        });
+                        budget.tripType = ETripType.OUT_TRIP;
+                        budgets.push(budget);
+                    }
 
-        if (isNeedTraffic && isRoundTrip) {
-            let budget = await ApiTravelBudget.getTrafficBudget.call(self, {
-                originPlace: destinationPlace,
-                destinationPlace: originPlace,
-                leaveDate: goBackDate,
-                leaveTime: goBackTime
-            });
-            budget.tripType = ETripType.BACK_TRIP;
-            budgets.push(budget);
-        }
+                    if (isNeedTraffic && isRoundTrip) {
+                        let budget = await ApiTravelBudget.getTrafficBudget({
+                            originPlace: destinationPlace,
+                            destinationPlace: originPlace,
+                            leaveDate: goBackDate,
+                            leaveTime: goBackTime
+                        });
+                        budget.tripType = ETripType.BACK_TRIP;
+                        budgets.push(budget);
+                    }
 
-        if (isNeedHotel) {
-            let budget = await ApiTravelBudget.getHotelBudget.call(self, {
-                cityId: destinationPlace,
-                businessDistrict: businessDistrict,
-                checkInDate: checkInDate,
-                checkOutDate: checkOutDate
-            });
-            budget.tripType = ETripType.HOTEL;
-            budgets.push(budget);
-        }
+                    if (isNeedHotel) {
+                        let budget = await ApiTravelBudget.getHotelBudget({
+                            cityId: destinationPlace,
+                            businessDistrict: businessDistrict,
+                            checkInDate: checkInDate as string,
+                            checkOutDate: checkOutDate as string
+                        });
+                        budget.tripType = ETripType.HOTEL;
+                        budgets.push(budget);
+                    }
 
-        let days = moment(goBackDate).diff(moment(leaveDate), 'days') || 1;
-        if (Boolean(travelPolicy['subsidy']) && travelPolicy['subsidy'] > 0) {
-            let budget: any = {};
-            budget.tripType = ETripType.SUBSIDY;
-            budget.price = travelPolicy['subsidy'] * days;
-            budgets.push(budget);
-        }
-
+                    let days = moment(goBackDate).diff(moment(leaveDate), 'days') || 1;
+                    if (Boolean(travelPolicy['subsidy']) && travelPolicy['subsidy'] > 0) {
+                        let budget: any = {};
+                        budget.tripType = ETripType.SUBSIDY;
+                        budget.price = travelPolicy['subsidy'] * days;
+                        budgets.push(budget);
+                    }
+                    resolve(true);
+                })
+        })
         let obj: any = {};
         obj.budgets = budgets;
         obj.query = params;
         obj.createAt = Date.now();
         let _id = Date.now() + utils.getRndStr(6);
-        let key = `budgets:${accountId}:${_id}`;
+        let key = `budgets:${staffId}:${_id}`;
         await cache.write(key, JSON.stringify(obj))
         return _id;
     }
@@ -198,8 +206,6 @@ class ApiTravelBudget {
     static async getHotelBudget(params: {cityId: string, businessDistrict: string,
         checkInDate: string, checkOutDate: string}) :Promise<TravelBudgeItem> {
 
-        let self: any = this;
-        let accountId = self.accountId;
         let {cityId, businessDistrict, checkInDate, checkOutDate} = params;
 
         if (!Boolean(cityId)) {
@@ -280,7 +286,6 @@ class ApiTravelBudget {
         leaveDate: Date | string, leaveTime: string}) : Promise<TravelBudgeItem> {
 
         let {originPlace, destinationPlace, leaveDate, leaveTime} = params;
-        let {accountId} = Zone.current.get('session');
 
         if (!destinationPlace) {
             throw new Error(JSON.stringify({code: -1, msg: "目的地城市信息不存在"}));
@@ -345,132 +350,5 @@ class ApiTravelBudget {
         return budget;
     }
 }
-
-//
-// export function getBookUrl(params: {spval: string, epval:string, st: string, et: string}) :Promise<string> {
-//     let spval = params.spval,
-//         epval = params.epval,
-//         st = params.st,
-//         et = params.et,
-//         url = "";
-//     if(!st || st == "" ){
-//         throw {code:-1, msg:"出发时间不能为空"};
-//     }
-//     return Promise.all([
-//             API.place.getCityInfo({cityCode: spval}),
-//             API.place.getCityInfo({cityCode: epval})
-//         ])
-//         .spread<string>(function(deptCity, endPlace){
-//             let scode = "",
-//                 ecode = "";
-//             if(deptCity && deptCity.skyCode){
-//                 scode = deptCity.skyCode.split("-")[0].toLowerCase();
-//             }
-//             if(endPlace && endPlace.skyCode){
-//                 ecode = endPlace.skyCode.split("-")[0].toLowerCase();
-//             }
-//             if(et && et != ""){
-//                 url = "http://www.tianxun.com/round-"+ scode +"-"+ ecode +".html?depdate="+st+"&rtndate="+et+"&cabin=Economy";
-//             }else{
-//                 url = "http://www.tianxun.com/oneway-"+ scode +"-"+ ecode +".html?depdate="+st+"&cabin=Economy";
-//             }
-//             return url;
-//         })
-// }
-
-
-//
-// /**
-//  *@method getBookListUrl
-//  * 得到飞机 火车 酒店预订列表链接
-//  * @param params
-//  * @param params.spval  出发城市id或出发地名称
-//  * @param params.epval  目的地城市id或目的地名称
-//  * @param params.st      出发时间
-//  * @param params.hotelCity   订酒店城市
-//  * @param params.hotelAddress  酒店所在商圈
-//  * @param params.type 类型 air (飞机) train（火车） hotel（酒店）
-//  * @param params.from 设备 computer (电脑) mobile（手机）
-//  * @param params.hotelSt 住宿开始时间
-//  * @param params.hotelEt 住宿结束时间
-//  * @returns {*}
-//  */
-// export function getBookListUrl(params: {spval: string, epval: string, st: string, hotelCity: string,
-//     hotelAddress: string, type: string, from: string, hotelSt: string, hotelEt: string}) :Promise<string> {
-//     let spval = params.spval,
-//         epval = params.epval,
-//         st = params.st,
-//         hotelCity = params.hotelCity,
-//         hotelAddress = params.hotelAddress,
-//         type = params.type,
-//         from = params.from,
-//         hotelSt = params.hotelSt,
-//         hotelEt = params.hotelEt,
-//         url = "";
-//     if(!type || type == "" ){
-//         throw {code:-1, msg:"类型不能为空"};
-//     }
-//     if(type == "air"){
-//         if(!spval || spval == "" ){
-//             throw {code:-1, msg:"出发城市不能为空"};
-//         }
-//         if(!epval || epval == "" ){
-//             throw {code:-1, msg:"目的地不能为空"};
-//         }
-//         if(!st || st == "" ){
-//             throw {code:-1, msg:"出发时间不能为空"};
-//         }
-//         st = moment(st).format('YYYY-MM-DD');
-//         return Promise.all([
-//                 API.place.getCityInfo({cityCode: spval}),
-//                 API.place.getCityInfo({cityCode: epval})
-//             ])
-//             .spread<string>(function(deptCity, endPlace){
-//                 let scode = "",
-//                     ecode = "";
-//                 if(deptCity && deptCity.skyCode){
-//                     scode = deptCity.skyCode.split("-")[0].toLowerCase();
-//                 }
-//                 if(endPlace && endPlace.skyCode){
-//                     ecode = endPlace.skyCode.split("-")[0].toLowerCase();
-//                 }
-//                 if(!scode) {
-//                     throw {code: -6, msg: '您选择的出发地没有机场'};
-//                 }
-//
-//                 if(!ecode) {
-//                     throw {code: -6, msg: '您选择的目的地没有机场'};
-//                 }
-//                 url = "http://www.tianxun.com/oneway-"+ scode +"-"+ ecode +".html?depdate="+st+"&cabin=Economy";
-//                 return url;
-//             })
-//     }else if(type == "train"){
-//         url = "https://kyfw.12306.cn/otn/leftTicket/init";
-//         return Promise.resolve(url);
-//     }else if(type == "hotel"){
-//         if(!hotelCity || hotelCity == "" ){
-//             throw {code:-1, msg:"目的地不能为空"};
-//         }
-//         return API.place.getCityInfo({cityCode: hotelCity})
-//             .then(function(result){
-//                 if(result){
-//                     hotelSt = moment(hotelSt).format('YYYY-MM-DD');
-//                     hotelEt = moment(hotelEt).format('YYYY-MM-DD');
-//                     if(from == "computer"){
-//                         if(!hotelAddress || hotelAddress == "" ){
-//                             url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/";
-//                         }else{
-//                             url = "http://hotel.tianxun.com/domestic/"+result.pinyin+"/key_"+hotelAddress;
-//                         }
-//                     }else{
-//                         url = "http://m.tianxun.com/hotel/domestic/"+result.pinyin+"/?hotelDate1="+hotelSt+"&hotelDate2="+hotelEt;
-//                     }
-//                 }else{
-//                     url = "http://hotel.tianxun.com/?_ga=1.18929464.1095670645.1456827902";
-//                 }
-//                 return url;
-//             })
-//     }
-// }
 
 export= ApiTravelBudget;

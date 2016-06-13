@@ -39,9 +39,9 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             query = JSON.parse(tripPlan.query);
         }
 
-        query.staffId = staff.id;
+        query.staffId = tripPlan.accountId;
         budgetId = await API.travelBudget.getTravelPolicyBudget(query);
-        let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId});
+        let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: tripPlan.accountId});
         let budgets = budgetInfo.budgets;
         budgets.forEach((v) => {
             switch(v.type) {
