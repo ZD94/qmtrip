@@ -50,7 +50,6 @@ class ApiTravelBudget {
             accountId = Zone.current.get('session')["accountId"];
         }
         let key = `budgets:${accountId}:${params.id}`;
-        console.info("getBudgetInfo", key);
         return cache.read(key);
     }
 

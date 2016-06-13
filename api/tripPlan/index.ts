@@ -390,7 +390,7 @@ class TripPlanModule {
             if (!budgetId) {
                 throw new Error(`预算信息已失效请重新生成`);
             }
-            let budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId});
+            let budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripPlan["accountId"]});
             if (!budgetInfo) {
                 throw new Error(`预算信息已失效请重新生成`);
             }
