@@ -325,7 +325,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
     $scope.createdAt = moment(tripPlan.createdAt.value).toDate();
     $scope.startAt = moment(tripPlan.startAt.value).toDate();
     $scope.backAt = moment(tripPlan.backAt.value).toDate();
-    let budgets: any[] = await tripPlan.getTripDetails();
+    let budgets: TripDetail[] = await tripPlan.getTripDetails();
     let hotel;
     let goTraffic;
     let backTraffic;
@@ -346,7 +346,8 @@ export async function ListDetailController($location, $scope , Models, $statePar
     $scope.EInvoiceType = EInvoiceType;
     $scope.EPlanStatus = EPlanStatus;
     budgets.map(function(budget) {
-        let tripType: ETripType = ETripType.SUBSIDY;
+        // let tripType: ETripType = ETripType.SUBSIDY;
+        let tripType = budget.type;
         let title = '补助'
         if (budget.type == 0) {
             tripType = ETripType.OUT_TRIP;
@@ -367,47 +368,55 @@ export async function ListDetailController($location, $scope , Models, $statePar
         if (budget.invoiceType == 2) {
             type = EInvoiceType.HOTEL;
         }
+
         if (tripType == ETripType.OUT_TRIP) {
             $scope.goTrafficStatus = Boolean(budget.status);
-            goTraffic = {id: budget.id, price: budget.budget, invoiceType: budget.invoiceType, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
+            goTraffic = budget;
+            goTraffic['title'] = '上传'+title + '发票';
+            goTraffic['done'] = function (response) {
                 var fileId = response.fileId;
-                uploadInvoice(budget, fileId,async function (err, result) {
+                uploadInvoice(budget, fileId, async function (err, result) {
                     if (err) {
                         alert(err);
                         return;
                     }
-                    var newdetail = await Models.tripDetail.get(budget.id);
-                    $scope.goTraffic = newdetail;
+                    $scope.goTraffic = budget;
                 });
-            }};
+            }
+
         } else if (tripType == ETripType.BACK_TRIP) {
             $scope.backTrafficStatus = Boolean(budget.status);
-            backTraffic = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
+            backTraffic = budget;
+            backTraffic['title'] = '上传'+title + '发票';
+            backTraffic['done'] = function (response) {
                 var fileId = response.fileId;
                 uploadInvoice(budget, fileId,async function (err, result) {
                     if (err) {
                         alert(err);
                         return;
                     }
-                    var newdetail = await Models.tripDetail.get(budget.id);
-                    $scope.backTraffic = newdetail;
+                    // var newdetail = await Models.tripDetail.get(budget.id);
+                    $scope.backTraffic = budget;
                 });
-            }};
+            }
         } else if (tripType == ETripType.HOTEL) {
-            hotel = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status,title:'上传'+title + '发票',done:function (response) {
+            hotel = budget;
+            hotel['title'] = '上传'+title + '发票';
+            hotel['done'] = function (response) {
                 var fileId = response.fileId;
                 uploadInvoice(budget, fileId,async function (err, result) {
                     if (err) {
                         alert(err);
                         return;
                     }
-                    var newdetail = await Models.tripDetail.get(budget.id);
-                    $scope.hotel = newdetail;
+                    // var newdetail = await Models.tripDetail.get(budget.id);
+                    $scope.hotel = budget;
                 });
-            }};
+            }
         } else {
             $scope.otherStatus = Boolean(budget.status);
-            other = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status};
+            other = budget;
+            // other = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status};
         }
     });
     $scope.goTraffic = goTraffic;
