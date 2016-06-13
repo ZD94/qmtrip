@@ -42,7 +42,7 @@
         <ion-list>
             <ion-item ng-repeat="v in staffSaves" style="font-size: 0.8em;">
                 <div style="display: block; position: absolute; width: 30px; height: 30px; text-align: center; line-height: 30px; border-radius: 50%; color: white; background:#2495da;">{{v.name| limitTo: -1}}</div>
-                <span style="padding-left: 50px;">{{v.name}}</span><span style="float: right;">{{v.save}}元</span>
+                <span style="padding-left: 50px;">{{v.name}}</span><span style="float: right;">{{v.save| currency: ''}}元</span>
             </ion-item>
         </ion-list>
     </ion-content>

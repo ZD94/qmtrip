@@ -13,7 +13,7 @@
                 <span ng-if="trip.status == EPlanStatus.WAIT_APPROVE">待审批</span>
                 <span ng-if="trip.status == EPlanStatus.APPROVE_NOT_PASS">审批未通过</span>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <span>{{trip.budget}}元</span>
+                <span>{{trip.budget | currency: ''}}元</span>
             </div>
         </div>
         <div ng-if="hasNextPage" style="text-align:center;"><i class="icon ion-arrow-up-a"></i>&nbsp;上拉加载更多</div>

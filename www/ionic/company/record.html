@@ -45,7 +45,7 @@
                 <span ng-if="trip.status == EPlanStatus.AUDITING">票据审核中</span>
                 <span ng-if="trip.status == EPlanStatus.COMPLETE">已完成</span>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <span>{{trip.budget}}元</span>
+                <span>{{trip.budget | currency: ''}}元</span>
             </div>
         </div>
 
