@@ -10,7 +10,7 @@
                 </ion-list>
             </div>
             <div class="item item-divider">{{statustext[trip.status]}}
-                <span class="item-note" ng-if="trip.budget != -1 && trip.budget != null">{{trip.budget}}元</span>
+                <span class="item-note" ng-if="trip.budget != -1 && trip.budget != null">{{trip.budget| currency : ''}}元</span>
                 <span class="item-note" ng-if="trip.budget == -1 || trip.budget == null">待出预算</span>
             </div>
 

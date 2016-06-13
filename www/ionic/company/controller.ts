@@ -247,6 +247,7 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
     let staff;
     var currentstaff = await Staff.getCurrent();
     var company = currentstaff.company;
+    let staffId = $stateParams.staffId
     if ($stateParams.staffId) {
         staff = await Models.staff.get($stateParams.staffId);
     } else {
@@ -287,16 +288,19 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
             if (_staff.mobile && !validate.isMobile(_staff.mobile)) {
                 throw L.ERR.INVALID_FORMAT('mobile');
             }
-            //查询邮箱是否已经注册
-            var account1 = await Models.account.find({where: {email: _staff.email, type: 1}});
-            if (account1 && account1.length>0) {
-                throw L.ERR.EMAIL_HAS_REGISTRY();
-            }
+            //如果是更新,再去判断
+            if (!staffId) {
+                //查询邮箱是否已经注册
+                var account1 = await Models.account.find({where: {email: _staff.email, type: 1}});
+                if (account1 && account1.length>0) {
+                    throw L.ERR.EMAIL_HAS_REGISTRY();
+                }
 
-            if(_staff.mobile){
-                var account2 = await Models.account.find({where: {mobile: _staff.mobile, type: 1}});
-                if (account2 && account2.length>0 && account2.mobile && account2.mobile != "") {
-                    throw L.ERR.MOBILE_HAS_REGISTRY();
+                if(_staff.mobile){
+                    var account2 = await Models.account.find({where: {mobile: _staff.mobile, type: 1}});
+                    if (account2 && account2.length>0 && account2.mobile && account2.mobile != "") {
+                        throw L.ERR.MOBILE_HAS_REGISTRY();
+                    }
                 }
             }
             _staff = await _staff.save();

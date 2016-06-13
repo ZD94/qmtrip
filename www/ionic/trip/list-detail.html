@@ -7,7 +7,7 @@
             <ion-item class="project_tit">{{tripDetail.title}}</ion-item>
             <ion-item class="project_cont">
                 <p ng-if="startAt">{{startAt | date: 'yyyy-MM-dd'}} 至 {{backAt | date: 'yyyy-MM-dd'}}</p>
-                <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{tripDetail.budget}}</span>元</p>
+                <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{tripDetail.budget | currency : ''}}</span>元</p>
             </ion-item>
         </ion-list>
         <div class="spacer" style="width: 285px; height: 17px;"></div>
@@ -16,7 +16,7 @@
             <div ng-if="goTraffic">
                 <ion-item class="item-divider">
                     <span>交通</span>
-                    <span style="margin-left: 120px;">{{goTraffic.price + backTraffic.price}}</span>元
+                    <span style="margin-left: 120px;">{{goTraffic.price + backTraffic.price | currency: ''}}</span>元
                 </ion-item>
                 <ion-item>
                     <span>{{startAt | date: 'yyyy-MM-dd'}}</span>
@@ -117,7 +117,7 @@
             <div ng-if="hotel">
                 <ion-item class="item-divider">
                     <span>住宿</span>
-                    <span style="margin-left: 120px;">{{hotel.price}}</span>元
+                    <span style="margin-left: 120px;">{{hotel.price | currency: ''}}</span>元
                 </ion-item>
                 <ion-item>
                     <span>{{startAt | date: 'yyyy-MM-dd'}}</span>
@@ -171,7 +171,7 @@
             <div ng-if='other'>
                 <ion-item class="item-divider">
                     <span>补助</span>
-                    <span style="margin-left: 120px;">{{other.price}}</span>元
+                    <span style="margin-left: 120px;">{{other.price | currency: ''}}</span>元
                 </ion-item>
                 <ion-item class="">
                     <span>{{startAt | date: 'yyyy-MM-dd'}}</span>至
@@ -185,15 +185,8 @@
                     <i ng-if='other.tripType == EInvoiceType.OTHER'>-</i>
                     &nbsp;
                     {{tripDetail.arrivalCity}}
-                    <br>{{other.price}}元
+                    <br>{{other.price | currency: ''}}元
                 </ion-item>
-                <!--<div class="item item-divider">-->
-                    <!--<div ng-if="!otherStatus" class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="other.title" done="other.done">-->
-                        <!--上传票据-->
-                    <!--</div>-->
-                    <!--&lt;!&ndash;<a ng-if="otherStatus" class="" ng-click="checkInvoice( 'outTraffic' )">查看票据</a>&ndash;&gt;-->
-                    <!--<span class="item-note">{{statustext[other.status]}}</span>-->
-                <!--</div>-->
             </div>
         </ion-list>
         <div class="button-bar"></div>

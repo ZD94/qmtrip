@@ -9,7 +9,7 @@
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <ion-list>
             <ion-item>{{startAt | date: 'yyyy-MM-dd HH:mm'}} 至 {{backAt | date: 'yyyy-MM-dd HH:mm'}}
-                <br>总预算：{{trip.budget}}元</ion-item>
+                <br>总预算：{{trip.budget | currency: ''}}元</ion-item>
         </ion-list>
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <div class="button-bar"></div>
@@ -20,7 +20,7 @@
                     <span ng-if='budget.type == ETripType.BACK_TRIP'>回程交通</span>
                     <span ng-if='budget.type == ETripType.HOTEL'>住宿</span>
                     <span ng-if='budget.type == ETripType.SUBSIDY'>其他补助</span>
-                    <span style="margin-left: 120px;">{{budget.budget}}</span>元</ion-item>
+                    <span style="margin-left: 120px;">{{budget.budget| currency: ''}}</span>元</ion-item>
                 <ion-item>
                     <span ng-if='budget.type == ETripType.OUT_TRIP'>{{startAt | date: 'yyyy-MM-dd'}}</span>
                     <span ng-if='budget.type == ETripType.BACK_TRIP'>{{backAt | date: 'yyyy-MM-dd'}}</span>
@@ -30,7 +30,7 @@
                     <span ng-if='budget.type == ETripType.SUBSIDY'>
                         {{startAt | date: 'yyyy-MM-dd'}}至{{backAt | date: 'yyyy-MM-dd'}}
                     </span>
-                    <br>{{budget.budget}}元
+                    <br>{{budget.budget | currency: ''}}元
                 </ion-item>
             </div>
 
