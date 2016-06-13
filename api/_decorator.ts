@@ -367,7 +367,7 @@ export var condition = {
             
             if(acc_type == EAccountType.STAFF) {
                 let staff = await Models.staff.get(account.id);
-                return staff.roleId == EStaffRole.ADMIN || staff.roleId == EStaffRole.OWNER || tripPlan.accountId == account.id;
+                return staff.roleId == EStaffRole.ADMIN || staff.roleId == EStaffRole.OWNER || tripPlan.accountId == account.id || tripPlan.auditUser == account.id;
             }else if(acc_type == EAccountType.AGENCY) {
                 let user = await AgencyUser.getCurrent();
                 let company = await tripPlan.getCompany();
