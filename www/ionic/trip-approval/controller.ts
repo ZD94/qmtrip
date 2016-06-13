@@ -19,7 +19,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     let tripPlan = await Models.tripPlan.get(tripId);
 
     $scope.tripPlan = tripPlan;
-    let staff = await Models.staff.get(tripPlan.accountId);
+    let staff = tripPlan.account; //await Models.staff.get(tripPlan.accountId);
     $scope.staff = staff;
     let tripDetails = await tripPlan.getTripDetails();
     let traffic = [], hotel = [];
@@ -39,6 +39,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             query = JSON.parse(tripPlan.query);
         }
 
+        query.staffId = staff.id;
         budgetId = await API.travelBudget.getTravelPolicyBudget(query);
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId});
         let budgets = budgetInfo.budgets;

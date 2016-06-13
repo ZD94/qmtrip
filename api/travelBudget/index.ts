@@ -28,16 +28,17 @@ interface TravelBudgeItem {
 interface BudgetOptions{
     originPlace: string,
     destinationPlace: string,
-    leaveDate: Date| string,
-    goBackDate?: Date| string,
     isNeedHotel: boolean,
+    leaveDate: Date| string,
+    isRoundTrip: boolean,
+    isNeedTraffic: boolean,
+    goBackDate?: Date| string,
     goBackTime?: string,
     leaveTime?: string,
     checkInDate?: Date| string,
     checkOutDate?: Date|string,
     businessDistrict?: string,
-    isRoundTrip: boolean,
-    isNeedTraffic: boolean
+    staffId?: string
 }
 
 class ApiTravelBudget {
@@ -73,8 +74,9 @@ class ApiTravelBudget {
     @clientExport
     static async getTravelPolicyBudget(params: BudgetOptions) :Promise<string> {
         let {accountId} = Zone.current.get('session');
-        let staff = await Models.staff.get(accountId);
-        let travelPolicy = await Models.travelPolicy.get(staff['travelPolicyId']);
+        let staffId = params.staffId || accountId;
+        let staff = await Models.staff.get(staffId);
+        let travelPolicy = await staff.getTravelPolicy();
         let self: any = this;
         let {leaveDate, goBackDate, isRoundTrip, originPlace, destinationPlace, checkInDate,
             checkOutDate, businessDistrict, leaveTime, goBackTime, isNeedHotel, isNeedTraffic} = params;
