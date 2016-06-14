@@ -20,6 +20,7 @@ import {FindResult} from "common/model/interface";
 import {Staff, EStaffRole, EStaffStatus} from "api/_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import {getSession} from "common/model/index";
+import {isMobile} from "common/validate";
 
 let TripDetailCols = TripDetail['$fieldnames'];
 let TripPlanCols = TripPlan['$fieldnames'];
@@ -212,7 +213,7 @@ class TripPlanModule {
         let self_values = {staffName: user.name, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
             projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel, otherBudget: others,
             totalBudget: '￥' + tripPlan.budget, url: self_url, detailUrl: self_url};
-        await API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_self_traveludget', values: self_values});
+        API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_self_traveludget', values: self_values});
 
         if(company.isApproveOpen) {
             //给审核人发审核邮件
@@ -221,7 +222,13 @@ class TripPlanModule {
             let approve_values = {managerName: approveUser.name, username: user.name, email: user.email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
                 projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel, otherBudget: others,
                 totalBudget: '￥' + tripPlan.budget, url: approve_url, detailUrl: approve_url};
-            await API.mail.sendMailRequest({toEmails: approveUser.email, templateName: 'qm_notify_new_travelbudget', values: approve_values});
+            API.mail.sendMailRequest({toEmails: approveUser.email, templateName: 'qm_notify_new_travelbudget', values: approve_values});
+            //发送短信提醒
+            if(approveUser.mobile && isMobile(approveUser.mobile)) {
+                let msg_url = await API.shorturl.long2short({longurl: approve_url, shortType: 'md5'});
+                API.sms.sendMsgSubmit({template: 'travelBudgetApply', mobile: approveUser.mobile,
+                    values: {name: user.name, time: moment(tripPlan.startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
+            }
         }else {
             let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER, EStaffRole.ADMIN], status: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
             //给所有的管理员发送邮件
@@ -483,11 +490,16 @@ class TripPlanModule {
             projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel, otherBudget: others,
             totalBudget: '￥' + tripPlan.budget, url: self_url, detailUrl: self_url};
 
-
+        let msg_url = await API.shorturl.long2short({longurl: self_url, shortType: 'md5'});
         if(auditResult == EAuditStatus.PASS) {
             log.remark = '审批通过，审批人：' + staff.name;
             tripPlan.status = EPlanStatus.WAIT_UPLOAD;
             API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_approve_pass', values: self_values});
+            //发送短信提醒
+            if(user.mobile && isMobile(user.mobile)) {
+                API.sms.sendMsgSubmit({template: 'travelBudgetApproved', mobile: user.mobile,
+                    values: {time: moment(tripPlan.startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
+            }
         }else if(auditResult == EAuditStatus.NOT_PASS) {
             if(!params.auditRemark) {
                 throw {code: -2, msg: '拒绝原因不能为空'};
@@ -496,6 +508,11 @@ class TripPlanModule {
             tripPlan.status = EPlanStatus.APPROVE_NOT_PASS;
             self_values['reason'] = params.auditRemark;
             API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_approve_not_pass', values: self_values});
+            //发送短信提醒
+            if(user.mobile && isMobile(user.mobile)) {
+                API.sms.sendMsgSubmit({template: 'travelBudgetApproveFailed', mobile: user.mobile,
+                    values: {time: moment(tripPlan.startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
+            }
         }
 
         let tripDetails = await tripPlan.getTripDetails({});

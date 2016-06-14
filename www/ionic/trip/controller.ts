@@ -346,33 +346,11 @@ export async function ListDetailController($location, $scope , Models, $statePar
     $scope.EInvoiceType = EInvoiceType;
     $scope.EPlanStatus = EPlanStatus;
     budgets.map(function(budget) {
-        // let tripType: ETripType = ETripType.SUBSIDY;
         let tripType = budget.type;
-        let title = '补助'
-        if (budget.type == 0) {
-            tripType = ETripType.OUT_TRIP;
-            title = '去程交通'
-        }
-        if (budget.type == 1) {
-            tripType = ETripType.BACK_TRIP;
-            title = '回城交通'
-        }
-        if (budget.type == 2) {
-            tripType = ETripType.HOTEL;
-            title = '住宿'
-        }
-        let type = EInvoiceType.PLANE;
-        if (budget.invoiceType == 0) {
-            type = EInvoiceType.TRAIN;
-        }
-        if (budget.invoiceType == 2) {
-            type = EInvoiceType.HOTEL;
-        }
-
         if (tripType == ETripType.OUT_TRIP) {
             $scope.goTrafficStatus = Boolean(budget.status);
             goTraffic = budget;
-            goTraffic['title'] = '上传'+title + '发票';
+            goTraffic['title'] = '上传去程交通发票';
             goTraffic['done'] = function (response) {
                 var fileId = response.fileId;
                 uploadInvoice(budget, fileId, async function (err, result) {
@@ -387,7 +365,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
         } else if (tripType == ETripType.BACK_TRIP) {
             $scope.backTrafficStatus = Boolean(budget.status);
             backTraffic = budget;
-            backTraffic['title'] = '上传'+title + '发票';
+            backTraffic['title'] = '上传回城交通发票';
             backTraffic['done'] = function (response) {
                 var fileId = response.fileId;
                 uploadInvoice(budget, fileId,async function (err, result) {
@@ -401,7 +379,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
             }
         } else if (tripType == ETripType.HOTEL) {
             hotel = budget;
-            hotel['title'] = '上传'+title + '发票';
+            hotel['title'] = '上传住宿发票';
             hotel['done'] = function (response) {
                 var fileId = response.fileId;
                 uploadInvoice(budget, fileId,async function (err, result) {
