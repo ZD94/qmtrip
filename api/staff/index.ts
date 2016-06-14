@@ -278,6 +278,7 @@ class StaffModule{
         if (!params.where) {
             params.where = {};
         }
+        params.order = params.order || [['createdAt', 'desc']];
 
         if(staff){
             params.where.companyId = staff["companyId"];

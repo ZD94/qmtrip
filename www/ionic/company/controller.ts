@@ -298,19 +298,21 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
 
                 if(_staff.mobile){
                     var account2 = await Models.account.find({where: {mobile: _staff.mobile, type: 1}});
+                    console.info(account2);
                     if (account2 && account2.length>0 && account2.mobile && account2.mobile != "") {
                         throw L.ERR.MOBILE_HAS_REGISTRY();
                     }
                 }
             }
             _staff = await _staff.save();
+            $ionicHistory.goBack(-1);
         }catch (err){
             var show = $ionicPopup.alert({
                  title: '提示',
                  template: err.msg
              })
         }
-        $ionicHistory.goBack(-1);
+
     }
     $scope.showrole = function () {
         if ($scope.role.id == true) {

@@ -425,13 +425,15 @@ class ApiAuth {
         var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
         //查询邮箱是否已经注册
         var account1 = await Models.account.find({where: {email: data.email, type: type}});
-        var account2 = await Models.account.find({where: {mobile: mobile, type: type}});
         if (account1 && account1.length>0) {
             throw L.ERR.EMAIL_HAS_REGISTRY();
         }
 
-        if (account2 && account2.length>0 && account2["mobile"] && account2["mobile"] != "") {
-            throw L.ERR.MOBILE_HAS_REGISTRY();
+        if(data.mobile){
+            var account2 = await Models.account.find({where: {mobile: mobile, type: type}});
+            if (account2 && account2.length>0 && account2["mobile"] && account2["mobile"] != "") {
+                throw L.ERR.MOBILE_HAS_REGISTRY();
+            }
         }
 
         var status = data.status? data.status: ACCOUNT_STATUS.NOT_ACTIVE;
@@ -733,12 +735,15 @@ class ApiAuth {
      * @returns {*}
      */
     @clientExport
-    static async getAccounts (params) {
+    static async getAccounts (params: {where: any, order?: any, attributes?: any, $or?: any}) {
+        if (!params.where) {
+            params.where = {};
+        }
         var options: any = {
-            where:  _.pick(params, Object.keys(DBM.Account.attributes))
+            where:  params.where
         };
-        if(params.columns){
-            options.attributes = params.columns;
+        if(params.attributes){
+            options.attributes = params.attributes;
         }
         if(params.order){
             options.order = params.order || "createdAt desc";
