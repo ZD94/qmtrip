@@ -359,6 +359,10 @@ export async function ListDetailController($location, $scope , Models, $statePar
             goTraffic = budget;
             goTraffic['title'] = '上传去程交通发票';
             goTraffic['done'] = function (response) {
+                if (!response.fileId) {
+                    alert(response.msg);
+                    return;
+                }
                 var fileId = response.fileId;
                 uploadInvoice(budget, fileId, async function (err, result) {
                     if (err) {
@@ -374,6 +378,10 @@ export async function ListDetailController($location, $scope , Models, $statePar
             backTraffic = budget;
             backTraffic['title'] = '上传回城交通发票';
             backTraffic['done'] = function (response) {
+                if (!response.fileId) {
+                    alert(response.msg);
+                    return;
+                }
                 var fileId = response.fileId;
                 uploadInvoice(budget, fileId,async function (err, result) {
                     if (err) {
@@ -388,6 +396,10 @@ export async function ListDetailController($location, $scope , Models, $statePar
             hotel = budget;
             hotel['title'] = '上传住宿发票';
             hotel['done'] = function (response) {
+                if (!response.fileId) {
+                    alert(response.msg);
+                    return;
+                }
                 var fileId = response.fileId;
                 uploadInvoice(budget, fileId,async function (err, result) {
                     if (err) {

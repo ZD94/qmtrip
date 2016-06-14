@@ -31,10 +31,11 @@ export function IndexController($scope,$stateParams, $storage) {
             await API.onload();
             var data = await API.auth.login($scope.form);
             $storage.local.set('auth_data', data);
-            //Cookie.set("user_id", data.user_id, {expires: 30});
-            //Cookie.set("token_sign", data.token_sign, {expires: 30});
-            //Cookie.set("timestamp", data.timestamp, {expires: 30});
-            //Cookie.set("token_id", data.token_id, {expires: 30});
+            //服务器端无法读取storage
+            Cookie.set("user_id", data.user_id, {expires: 30});
+            Cookie.set("token_sign", data.token_sign, {expires: 30});
+            Cookie.set("timestamp", data.timestamp, {expires: 30});
+            Cookie.set("token_id", data.token_id, {expires: 30});
             API.reload_all_modules();
             window.location.href = backUrl;
         } catch (err) {
