@@ -1034,10 +1034,10 @@ class ApiAuth {
      * @param {String} params.backUrl
      */
     @clientExport
-    static getQRCodeUrl (params: {backUrl: string}) : Promise<string> {
+    static getQRCodeUrl (params: {backUrl: string, accountId?: string}) : Promise<string> {
 
         let session = Zone.current.get("session");
-        var accountId = session["accountId"];
+        var accountId = params.accountId || session["accountId"];
         var backUrl = params.backUrl;
 
         return Promise.resolve()
