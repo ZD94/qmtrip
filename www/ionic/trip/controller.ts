@@ -55,6 +55,13 @@ export function CreateController($scope, $storage, $ionicLoading){
         $storage.local.set('trip', $scope.trip);
     }, true)
 
+    $scope.$watch('trip.placeName', function($newVal, $oldVal) {
+        if ($newVal != $oldVal) {
+            $scope.trip.hotelPlaceName = ''
+            $scope.trip.hotelPlace = '';
+        }
+    });
+
     $scope.calcTripDuration = function(){
         return moment(trip.endDate).diff(trip.beginDate, 'days') || 1;
     }
