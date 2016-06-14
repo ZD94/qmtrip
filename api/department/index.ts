@@ -167,7 +167,7 @@ class DepartmentModule{
         if(options.columns){
             options.attributes = params.attributes;
         }
-        options.order = params.order || "created_at desc";
+        options.order = params.order || [['createdAt', 'desc']];
 
         let {count, rows} = await DBM.Department.findAndCount(options);
         return {ids: rows.map((row)=> { return row.id}), count: count};
