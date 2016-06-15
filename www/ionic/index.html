@@ -28,16 +28,18 @@
                     </a>
                     <div class="spacer" style="height: 24px;" ng-if="menu.title == ''"></div>
                 </div>
-                <div class="button-bar bar-footer">
-                    <button id="menu-button22" class="button button-light  button-block icon ion-android-notifications">
-                        通知
-                        <span class="badge" style="color:red;font-size: 30px;" ng-if="Menu.notie == true">·</span>
-                    </button>
-                    <a href="#login/" menu-close="" id="menu-button24" class="button button-light  button-block icon ion-android-exit" ng-click="logout()">
-                        退出
-                    </a>
-                </div>
+
             </ion-list>
+
         </ion-content>
+        <div class="button-bar bar-footer">
+            <button id="menu-button22" class="button button-light  button-block icon ion-android-notifications">
+                通知
+                <span class="badge" style="color:red;font-size: 30px;" ng-if="Menu.notie == true">·</span>
+            </button>
+            <a href="#login/" menu-close="" id="menu-button24" class="button button-light  button-block icon ion-android-exit" ng-click="logout()">
+                退出
+            </a>
+        </div>
     </ion-side-menu>
 </ion-side-menus>

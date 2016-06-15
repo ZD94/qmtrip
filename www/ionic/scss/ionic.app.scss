@@ -28,7 +28,9 @@ $ionicons-font-path: "../fonts" !default;
       padding: 0;
       button{
         &.button{
-          background-color: rgba($stable, 0.3);
+          background-color: rgba($stable, 0.4);
+          padding-left: 5px;
+          padding-right: 5px;
         }
       }
     }
@@ -41,4 +43,22 @@ $ionicons-font-path: "../fonts" !default;
       top: 0;
     }
   }
+}
+
+
+@media (max-width: 320px){
+  ion-side-menu{
+    .side-menu-left{
+      .menulist{
+        .button.button-block{
+          margin: 0;
+        }
+      }
+    }
+  }
+  //适配iPhone5的menu高度
+}
+.button-bar.bar-footer{
+  position: absolute;
+  bottom: 18px;
 }
