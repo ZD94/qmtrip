@@ -191,8 +191,9 @@
         </ion-list>
         <div class="button-bar"></div>
         <div class="button-bar"></div>
-        <div ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS|| tripDetail.status == EPlanStatus.WAIT_COMMIT">
-            <a ng-click="approveTripPlan()" id="page20-button60" class="button button-positive  button-block" no-back>提交审核</a>
+        <div>
+            <a ng-if="tripDetail.status == EPlanStatus.WAIT_COMMIT" ng-click="approveTripPlan()" id="page20-button60" class="button button-positive  button-block" no-back>提交审核</a>
+            <a ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS" ng-click="createTripPlan()" id="page20-button61" class="button button-positive  button-block" no-back>再次生成</a>
         </div>
 
         <div ng-if="tripDetail.status != EPlanStatus.APPROVE_NOT_PASS && tripDetail.status != EPlanStatus.WAIT_COMMIT">
