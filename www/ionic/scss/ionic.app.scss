@@ -61,4 +61,5 @@ $ionicons-font-path: "../fonts" !default;
 .button-bar.bar-footer{
   position: absolute;
   bottom: 18px;
+  z-index: 11;
 }
