@@ -1073,6 +1073,7 @@ class ApiAuth {
                 var sign = cryptoData(data);
                 var urlParams = {accountId: account.id, timestamp: timestamp, sign: sign, backUrl: backUrl};
                 urlParams = combineData(urlParams);
+                console.info(C.host + QRCODE_LOGIN_URL +"?"+urlParams);
                 return C.host + QRCODE_LOGIN_URL +"?"+urlParams;
             })
     }
@@ -1170,6 +1171,7 @@ class ApiAuth {
 
         //二维码自动登录
         app.all("/auth/qrcode-login", function(req, res, next) {
+            var storageseturl = C.host + "/ionic.html#/login/storageset";
             var accountId = req.query.accountId;
             var timestamp = req.query.timestamp;
             var sign = req.query.sign;
@@ -1181,7 +1183,7 @@ class ApiAuth {
                     res.cookie("user_id", result.user_id);
                     res.cookie("timestamp", result.timestamp);
                     res.cookie("token_sign", result.token_sign);
-                    res.redirect(backUrl);
+                    res.redirect(storageseturl+"?token_id="+result.token_id+"&user_id="+result.user_id+"&timestamp="+result.timestamp+"&token_sign="+result.token_sign+"&back_url="+backUrl);
                 })
                 .catch(function(err) {
                     console.info(err);
