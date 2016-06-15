@@ -319,7 +319,7 @@ export async function ListController($scope , Models){
 }
 
 
-export async function ListDetailController($location, $scope , Models, $stateParams ){
+export async function ListDetailController($location, $scope , Models, $stateParams, $storage ){
     let id = $stateParams.tripid;
     if (!id) {
         $location.path("/");
@@ -441,7 +441,40 @@ export async function ListDetailController($location, $scope , Models, $statePar
         }catch(e) {
             alert(e.msg || e);
         }
-    }
+    };
+
+    $scope.createTripPlan = async function() {
+        let tripPlan = $scope.tripDetail;
+        let tripDetails = $scope.budgets;
+        let trip: any = {
+            beginDate: moment(tripPlan.startAt).toDate(),
+            endDate: moment(tripPlan.backAt).toDate(),
+            place: tripPlan.arrivalCityCode,
+            placeName: tripPlan.arrivalCity,
+            reasonName: tripPlan.title
+        };
+        tripDetails.map((detail) => {
+            switch (detail.type) {
+                case ETripType.OUT_TRIP:
+                    trip.traffic = true;
+                    trip.fromPlace = tripPlan.deptCityCode;
+                    trip.fromPlaceName = tripPlan.deptCity;
+                    break;
+                case ETripType.BACK_TRIP:
+                    trip.traffic = true;
+                    trip.fromPlace = tripPlan.deptCityCode;
+                    trip.fromPlaceName = tripPlan.deptCity;
+                    trip.round = true;
+                    break;
+                case ETripType.HOTEL:
+                    trip.hotel = true;
+                    trip.hotelPlace = detail.cityCode;
+                    trip.hotelPlaceName = detail.city;
+            }
+        });
+        await $storage.local.set('trip', trip);
+        window.location.href="#/trip/create";
+    };
     
     $scope.checkInvoice = function(detailId){
         console.info(detailId);
