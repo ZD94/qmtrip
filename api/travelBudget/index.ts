@@ -328,6 +328,10 @@ class ApiTravelBudget {
             cabinClass.push('First');
         }
 
+        if (policy.planeLevel.indexOf('不限') >= 0) {
+            cabinClass = ['Economy', 'PremiumEconomy', 'Business', 'First']
+        }
+
         let trainCabinClass = '二等座,硬卧';
         if (policy.trainLevel) {
             trainCabinClass = policy.trainLevel;
