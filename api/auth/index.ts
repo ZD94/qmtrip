@@ -403,7 +403,7 @@ class ApiAuth {
         }
 
         if (data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
-            throw L.MSG.MOBILE_FORMAT_ERROR;
+            throw L.ERR.MOBILE_NOT_CORRECT();
          }
 
         if (data.pwd) {
@@ -431,7 +431,7 @@ class ApiAuth {
 
         if(data.mobile){
             var account2 = await Models.account.find({where: {mobile: mobile, type: type}});
-            if (account2 && account2.length>0 && account2["mobile"] && account2["mobile"] != "") {
+            if (account2 && account2.length>0) {
                 throw L.ERR.MOBILE_HAS_REGISTRY();
             }
         }

@@ -6,11 +6,13 @@ import {EStaffRole, Staff} from "api/_types/staff";
 import {EPlanStatus} from 'api/_types/tripPlan';
 import {TravelPolicy} from "api/_types/travelPolicy";
 import {Department} from "api/_types/department";
+import validator = require('validator');
+import _ = require('lodash');
 const moment = require("moment");
 const API = require("common/api");
-var validate = require("common/validate");
 var L = require("common/language");
-import _ = require('lodash');
+var msgbox = require('msgbox');
+
 
 export async function ManagementController($scope, Models) {
     var staff = await Staff.getCurrent();
@@ -278,15 +280,15 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
                 throw L.ERR.EMAIL_EMPTY();
             }
 
-            if (!validate.isEmail(_staff.email)) {
-                throw L.ERR.INVALID_FORMAT('email');
+            if (!validator.isEmail(_staff.email)) {
+                throw L.ERR.EMAIL_FORMAT_INVALID();
             }
             if(company.domainName && company.domainName != "" && _staff.email.indexOf(company.domainName) == -1){
                 throw L.ERR.INVALID_ARGUMENT('email');
             }
 
-            if (_staff.mobile && !validate.isMobile(_staff.mobile)) {
-                throw L.ERR.INVALID_FORMAT('mobile');
+            if (_staff.mobile && !validator.isMobilePhone(_staff.mobile, 'zh-CN')) {
+                throw L.ERR.MOBILE_NOT_CORRECT();
             }
             //如果是更新,再去判断
             if (!staffId) {
@@ -307,10 +309,11 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
             _staff = await _staff.save();
             $ionicHistory.goBack(-1);
         }catch (err){
-            var show = $ionicPopup.alert({
+            /*var show = $ionicPopup.alert({
                  title: '提示',
                  template: err.msg
-             })
+             })*/
+            msgbox.log(err.msg);
         }
 
     }
