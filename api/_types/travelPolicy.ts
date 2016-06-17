@@ -20,7 +20,7 @@ export var  MHotelLevel  = {
     5: "国际五星",
     4: "高端商务",
     3: "精品连锁",
-    2: "经济连锁"
+    2: "快捷连锁"
 }
 export enum EHotelLevel {
     FIVE_STAR = 5,

@@ -68,10 +68,10 @@ export function IndexController($scope,$stateParams, $storage) {
     }
 
     //test begin========================
-    $scope.initscan = function(){
+    /*$scope.initscan = function(){
         var backUrl = "http://"+window.location.host+"/ionic.html#/trip/create";
         API.onload(function() {
-            API.auth.getQRCodeUrl({backUrl: backUrl, accountId: "c3d5f7c0-32e8-11e6-9af9-0710d114e84c"})
+            API.auth.getQRCodeUrl({backUrl: backUrl, accountId: "c3d5f7c0-32e8-11e6-9af9-0710d114e84c", email: "yali.wang@jingli.tech"})
                 .then(function(content) {
                     console.info(content);
                     // new QRCode(document.getElementById("qrcode"), content);
@@ -148,7 +148,7 @@ export function IndexController($scope,$stateParams, $storage) {
         $(".scan_fixed #qrcode").find("img").remove();
         $("#qrcode").find("canvas").remove();
         $(".scan_fixed").hide();
-    }
+    }*/
     //test end========================
 }
 
