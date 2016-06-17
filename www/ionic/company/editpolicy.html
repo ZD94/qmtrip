@@ -8,39 +8,38 @@
             <label class="item item-select">
                 <span class="input-label">飞机仓位</span>
                 <select ng-model="travelPolicy.planeLevel">
-                    <option>经济舱</option>
-                    <option>公务舱/头等舱</option>
-                    <option>不限</option>
+                    <option value="1" ng-selected="travelPolicy.planeLevel == 1">公务舱/头等舱</option>
+                    <option value="2"  ng-selected="travelPolicy.planeLevel == 2">经济舱</option>
                 </select>
             </label>
-            <label class="item item-select">
+            <!--<label class="item item-select">
                 <span class="input-label" ng-click="consoles(travelPolicy)">飞机折扣</span>
                 <select ng-model="travelPolicy.planeDiscount" ng-options="discount.value as discount.text for discount in discounts">
                 </select>
-            </label>
+            </label>-->
             <div class="spacer" style="width: 300px; height: 18px;"></div>
             <label class="item item-select">
                 <span class="input-label">火车</span>
                 <select ng-model="travelPolicy.trainLevel">
-                    <option>不限</option>
-                    <option>商务座</option>
-                    <option>一等座/软卧</option>
-                    <option>二等座/硬卧</option>
+                    <option value="1" ng-selected="travelPolicy.trainLevel == 1">商务座/高级软卧</option>
+                    <option value="2" ng-selected="travelPolicy.trainLevel == 2">一等座/软卧</option>
+                    <option value="3" ng-selected="travelPolicy.trainLevel == 3">二等座/硬卧</option>
                 </select>
             </label>
             <div class="spacer" style="width: 300px; height: 18px;"></div>
             <label class="item item-select">
                 <span class="input-label">酒店星级</span>
                 <select ng-model="travelPolicy.hotelLevel">
-                    <option>五星级/豪华型</option>
-                    <option>四星级/高档型</option>
-                    <option>三星级/舒适型</option>
+                    <option value="5" ng-selected="travelPolicy.hotelLevel == 5">国际五星</option>
+                    <option value="4" ng-selected="travelPolicy.hotelLevel == 4">高端商务</option>
+                    <option value="3" ng-selected="travelPolicy.hotelLevel == 3">精品连锁</option>
+                    <option value="2" ng-selected="travelPolicy.hotelLevel == 2">经济连锁</option>
                 </select>
             </label>
-            <label class="item item-input">
+            <!--<label class="item item-input">
                 <span class="input-label">每日标准</span>
                 <input type="text" placeholder="元/晚" ng-model="travelPolicy.hotelPrice">
-            </label>
+            </label>-->
             <div class="spacer" style="width: 300px; height: 18px;"></div>
             <label class="item item-input">
                 <span class="input-label">补助</span>

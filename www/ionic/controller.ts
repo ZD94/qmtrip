@@ -1,5 +1,6 @@
 "use strict";
 import {Staff, EStaffRole} from 'api/_types/staff';
+import {MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 var API = require('common/api');
 
 export async function IndexController($scope, Menu, $ionicPopup, Models, $storage, $window, $location, $ionicHistory){
@@ -91,11 +92,11 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
         if(policy){   //判断是否设置差旅标准
             var show = $ionicPopup.alert({
                 title: '差旅标准',
-                template: '飞机:' +policy.planeLevel +
+                template: '飞机:' +MPlaneLevel[policy.planeLevel] +
                 '<br>' +
-                '火车:' +policy.trainLevel +
+                '火车:' +MTrainLevel[policy.trainLevel] +
                 '<br>' +
-                '住宿:'+policy.hotelLevel +
+                '住宿:'+MHotelLevel[policy.hotelLevel] +
                 '<br>' +
                 '补助:'+policy.subsidy +'/天'
             })

@@ -4,7 +4,7 @@
 "use strict";
 import {EStaffRole, Staff} from "api/_types/staff";
 import {EPlanStatus} from 'api/_types/tripPlan';
-import {TravelPolicy} from "api/_types/travelPolicy";
+import {TravelPolicy, MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 import {Department} from "api/_types/department";
 import validator = require('validator');
 import _ = require('lodash');
@@ -332,6 +332,10 @@ export async function TravelpolicyController($scope, Models, $location) {
     var company = await staff.company;
     var travelPolicies = await company.getTravelPolicies();
     $scope.travelPolicies = travelPolicies.map(function (policy) {
+        policy["hotelLevelName"] = MHotelLevel[policy.hotelLevel];
+        policy["planeLevelName"] = MPlaneLevel[policy.planeLevel];
+        policy["trainLevelName"] = MTrainLevel[policy.trainLevel];
+
         var obj = {policy: policy, usernum: ''};
         return obj;
     })
@@ -348,13 +352,12 @@ export async function TravelpolicyController($scope, Models, $location) {
 }
 
 export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory) {
-    var discounts = $scope.discounts = [
-        {value: 0, text: '不限'},
+    /*var discounts = $scope.discounts = [
         {value: 9, text: '9折及以下'},
         {value: 8, text: '8折及以下'},
         {value: 7, text: '7折及以下'},
         {value: 6, text: '6折及以下'}
-    ]
+    ]*/
     var staff = await Staff.getCurrent();
     var travelPolicy;
     if ($stateParams.policyId) {
@@ -363,11 +366,12 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
     } else {
         travelPolicy = TravelPolicy.create();
         travelPolicy.companyId = staff.company.id;
-        travelPolicy.planeLevel = '不限';
-        travelPolicy.planeDiscount = 0;
-        travelPolicy.trainLevel = '不限';
-        travelPolicy.hotelLevel = '五星级/豪华型';
+        travelPolicy.planeLevel = "2";
+        travelPolicy.trainLevel = "3";
+        travelPolicy.hotelLevel = "2";
     }
+    console.info(travelPolicy);
+    console.info("travelPolicytravelPolicytravelPolicy");
     $scope.travelPolicy = travelPolicy;
     $scope.savePolicy = async function () {
         await $scope.travelPolicy.save();

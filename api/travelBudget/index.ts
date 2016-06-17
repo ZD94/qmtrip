@@ -4,6 +4,7 @@
 import { clientExport } from 'common/api/helper';
 import {Models } from 'api/_types'
 import {ETripType, EInvoiceType} from "../_types/tripPlan";
+import {EHotelLevel, EPlaneLevel, ETrainLevel, MHotelLevel, MPlaneLevel, MTrainLevel} from "../_types/travelPolicy";
 import {Staff} from "../_types/staff";
 const API = require("common/api");
 const validate = require("common/validate");
@@ -235,7 +236,10 @@ class ApiTravelBudget {
         if (!policy) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
-        if (/二星级/g.test(policy.hotelLevel)) {
+        if(policy.hotelLevel){
+            hotelStar = policy.hotelLevel;
+        }
+        /*if (/二星级/g.test(policy.hotelLevel)) {
             hotelStar = 2;
         }
 
@@ -248,7 +252,7 @@ class ApiTravelBudget {
         }
         if (/五星级/g.test(policy.hotelLevel)) {
             hotelStar = 5;
-        }
+        }*/
         let data = {
             maxMoney: policy.hotelPrice,
             hotelStar: hotelStar,
@@ -315,26 +319,22 @@ class ApiTravelBudget {
         }
 
         let cabinClass: string[] = [];
-        if (policy.planeLevel.indexOf('经济舱') >= 0 ) {
+        if (policy.planeLevel == EPlaneLevel.ECONOMY ) {
             cabinClass.push('Economy');
         }
-        if (policy.planeLevel.indexOf('高端经济舱') >= 0 ) {
+        // if (policy.planeLevel.indexOf('高端经济舱') >= 0 ) {
+        //     cabinClass.push('PremiumEconomy');
+        // }
+        if (policy.planeLevel == EPlaneLevel.BUSINESS_FIRST) {
             cabinClass.push('PremiumEconomy');
-        }
-        if (policy.planeLevel.indexOf('公务舱') >= 0) {
             cabinClass.push('Business');
-        }
-        if (policy.planeLevel.indexOf('头等舱') >= 0) {
             cabinClass.push('First');
         }
 
-        if (policy.planeLevel.indexOf('不限') >= 0) {
-            cabinClass = ['Economy', 'PremiumEconomy', 'Business', 'First']
-        }
 
-        let trainCabinClass = '二等座,硬卧';
+        let trainCabinClass = MTrainLevel[ETrainLevel.SECOND_CLASS].replace(/\//g, ",");
         if (policy.trainLevel) {
-            trainCabinClass = policy.trainLevel;
+            trainCabinClass = MTrainLevel[policy.trainLevel];
             trainCabinClass = trainCabinClass.replace(/\//g, ",");
         }
         if (leaveDate && !validate.isDate(leaveDate)) {

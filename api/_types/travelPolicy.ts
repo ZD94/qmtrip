@@ -6,6 +6,37 @@ import { Types, Values } from 'common/model';
 import { Table, Create, Field, ResolveRef } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 
+export var  MTrainLevel  = {
+    1: "商务座/高级软卧",
+    2: "一等座/软卧",
+    3: "二等座/硬卧"
+}
+export enum ETrainLevel {
+    BUSINESS = 1,
+    FIRST_CLASS = 2,
+    SECOND_CLASS = 3
+}
+export var  MHotelLevel  = {
+    5: "国际五星",
+    4: "高端商务",
+    3: "精品连锁",
+    2: "经济连锁"
+}
+export enum EHotelLevel {
+    FIVE_STAR = 5,
+    FOUR_STAR = 4,
+    THREE_STAR = 3,
+    TWO_STAR = 2
+}
+export var  MPlaneLevel  = {
+    1: "公务舱/头等舱",
+    2: "经济舱",
+}
+export enum EPlaneLevel {
+    BUSINESS_FIRST = 1,
+    ECONOMY = 2
+}
+
 @Table(Models.travelPolicy, "travelPolicy.")
 export class TravelPolicy extends ModelObject{
     constructor(target: Object) {
@@ -22,21 +53,21 @@ export class TravelPolicy extends ModelObject{
     get name(): string {return null}
     set name(name: string){}
 
-    @Field({type: Types.STRING(50)})
-    get planeLevel(): string {return null}
-    set planeLevel(planeLevel: string){}
+    @Field({type: Types.INTEGER})
+    get planeLevel(): EPlaneLevel {return null}
+    set planeLevel(val: EPlaneLevel){}
 
     @Field({type: Types.FLOAT})
     get planeDiscount(): number{return null}
     set planeDiscount(planeDiscount: number){}
 
-    @Field({type: Types.STRING(50)})
-    get trainLevel(): string {return null}
-    set trainLevel(trainLevel: string){}
+    @Field({type: Types.INTEGER})
+    get trainLevel(): ETrainLevel {return null}
+    set trainLevel(val: ETrainLevel){}
 
-    @Field({type: Types.STRING(50)})
-    get hotelLevel(): string {return null}
-    set hotelLevel(hotelLevel: string){}
+    @Field({type: Types.INTEGER})
+    get hotelLevel(): EHotelLevel {return null}
+    set hotelLevel(val: EHotelLevel){}
 
     @Field({type: Types.FLOAT})
     get hotelPrice(): number {return null}
