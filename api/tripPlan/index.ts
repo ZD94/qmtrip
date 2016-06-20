@@ -232,6 +232,7 @@ class TripPlanModule {
                 }
             }else {
                 let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER, EStaffRole.ADMIN], status: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
+                
                 //给所有的管理员发送邮件
                 await Promise.all(admins.map(async function(s) {
                     let vals = {managerName: s.name, username: user.name, email: user.email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
