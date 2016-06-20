@@ -384,7 +384,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
         } else if (tripType == ETripType.BACK_TRIP) {
             $scope.backTrafficStatus = Boolean(budget.status);
             backTraffic = budget;
-            backTraffic['title'] = '上传回城交通发票';
+            backTraffic['title'] = '上传回程交通发票';
             backTraffic['done'] = function (response) {
                 if (!response.fileId) {
                     alert(response.msg);
@@ -511,7 +511,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
         title = '去程交通';
     }
     if (invoice.type == ETripType.BACK_TRIP) {
-        title = '回城交通';
+        title = '回程交通';
     }
     if (invoice.type == ETripType.HOTEL) {
         title = '住宿';
