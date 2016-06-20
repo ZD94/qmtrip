@@ -2,7 +2,9 @@
     <ion-content padding="true" class="has-header" style="background: url(ionic/images/backgroud.png) center no-repeat;background-size:cover;">
         <form class="list">
             <label class="item item-input opactic">
-                <span class="input-label op_single">等待审批</span>
+                <span ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE" class="input-label op_single">等待审批</span>
+                <span ng-if="tripPlan.status != EPlanStatus.WAIT_APPROVE && tripPlan.status != EPlanStatus.APPROVE_NOT_PASS" class="input-label op_single">审批通过</span>
+                <span ng-if="tripPlan.status == EPlanStatus.APPROVE_NOT_PASS" class="input-label op_single">审批未通过</span>
             </label>
         </form>
         <ion-list class="jl_projectinfo">
