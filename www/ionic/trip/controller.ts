@@ -324,8 +324,6 @@ export async function ListController($scope , Models){
 
     function loadTripPlan(pager) {
         pager.forEach(function(trip){
-            trip.startAt = moment(trip.startAt.value).toDate();
-            trip.backAt = moment(trip.backAt.value).toDate();
             $scope.tripPlans.push(trip);
         });
     }
@@ -342,9 +340,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
     var staff = await Staff.getCurrent();
     let tripPlan = await Models.tripPlan.get(id);
     $scope.tripDetail = tripPlan;
-    $scope.createdAt = moment(tripPlan.createdAt.value).toDate();
-    $scope.startAt = moment(tripPlan.startAt.value).toDate();
-    $scope.backAt = moment(tripPlan.backAt.value).toDate();
+
     let budgets: TripDetail[] = await tripPlan.getTripDetails();
     let hotel;
     let goTraffic;
