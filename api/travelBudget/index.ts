@@ -239,20 +239,7 @@ class ApiTravelBudget {
         if(policy.hotelLevel){
             hotelStar = policy.hotelLevel;
         }
-        /*if (/二星级/g.test(policy.hotelLevel)) {
-            hotelStar = 2;
-        }
 
-        if (/三星级/g.test(policy.hotelLevel)) {
-            hotelStar = 3;
-        }
-
-        if (/四星级/g.test(policy.hotelLevel)) {
-            hotelStar = 4;
-        }
-        if (/五星级/g.test(policy.hotelLevel)) {
-            hotelStar = 5;
-        }*/
         let data = {
             maxMoney: policy.hotelPrice,
             hotelStar: hotelStar,

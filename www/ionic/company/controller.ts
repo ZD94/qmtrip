@@ -352,16 +352,9 @@ export async function TravelpolicyController($scope, Models, $location) {
 }
 
 export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory) {
-    /*var discounts = $scope.discounts = [
-        {value: 9, text: '9折及以下'},
-        {value: 8, text: '8折及以下'},
-        {value: 7, text: '7折及以下'},
-        {value: 6, text: '6折及以下'}
-    ]*/
     var staff = await Staff.getCurrent();
     var travelPolicy;
     if ($stateParams.policyId) {
-        console.info($stateParams);
         travelPolicy = await Models.travelPolicy.get($stateParams.policyId)
     } else {
         travelPolicy = TravelPolicy.create();
@@ -370,8 +363,6 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         travelPolicy.trainLevel = "3";
         travelPolicy.hotelLevel = "2";
     }
-    console.info(travelPolicy);
-    console.info("travelPolicytravelPolicytravelPolicy");
     $scope.travelPolicy = travelPolicy;
     $scope.savePolicy = async function () {
         await $scope.travelPolicy.save();
