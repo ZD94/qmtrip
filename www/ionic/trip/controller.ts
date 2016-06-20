@@ -486,7 +486,6 @@ export async function ListDetailController($location, $scope , Models, $statePar
     };
     
     $scope.checkInvoice = function(detailId){
-        console.info(detailId);
         window.location.href="#/trip/invoice-detail?detailId="+detailId;
     }
 }
