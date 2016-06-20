@@ -370,8 +370,6 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         travelPolicy.trainLevel = "3";
         travelPolicy.hotelLevel = "2";
     }
-    console.info(travelPolicy);
-    console.info("travelPolicytravelPolicytravelPolicy");
     $scope.travelPolicy = travelPolicy;
     $scope.savePolicy = async function () {
         await $scope.travelPolicy.save();

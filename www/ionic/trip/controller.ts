@@ -33,13 +33,21 @@ function TripDefineFromJson(obj: any): TripDefine{
     return obj as TripDefine;
 }
 
-export function CreateController($scope, $storage, $ionicLoading){
+export async function CreateController($scope, $storage, $ionicLoading){
+    API.require('tripPlan');
+    await API.onload();
+
     let trip;
     try {
         trip= TripDefineFromJson($storage.local.get('trip'));
     } catch(err) {
         trip = {};
     }
+    //定位当前ip位置
+    var position = await API.tripPlan.getIpPosition({});
+    trip.fromPlace = position.id;
+    trip.fromPlaceName = position.name;
+
     var today = moment();
     if (!trip.beginDate || (new Date(trip.beginDate) < new Date())) {
         trip.beginDate = today.startOf('day').hour(9).toDate();

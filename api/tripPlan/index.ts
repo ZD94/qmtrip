@@ -6,7 +6,7 @@ let sequelize = require("common/model").DB;
 let DBM = sequelize.models;
 let uuid = require("node-uuid");
 let L = require("common/language");
-let utils = require('common/utils');
+import utils = require("common/utils");
 let API = require('common/api');
 let Logger = require('common/logger');
 let logger = new Logger("tripPlan");
@@ -945,6 +945,19 @@ class TripPlanModule {
         await tripPlan.save()
         return true;
     }
+
+    @clientExport
+    static async getIpPosition(params){
+        var stream = Zone.current.get("stream");
+        //select * from place.cities where '辽宁省大连市' like concat(concat('%',name), '%') and type = 2
+        //select * from place.cities where '辽宁省大连市' ~ name and type = 2
+        var position = utils.searchIpAddress(stream.remoteAddress);
+        // var position = utils.searchIpAddress("202.103.102.10");
+        var result = await API.place.getCityIifoByIpPosition(position);
+
+        return result;
+    }
+
 
     static __initHttpApp = require('./invoice');
 
