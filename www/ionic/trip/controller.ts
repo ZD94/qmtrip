@@ -50,7 +50,6 @@ export async function CreateController($scope, $storage, $ionicLoading){
         trip.fromPlace = position.id;
         trip.fromPlaceName = position.name;
     } catch(err) {
-        msgbox.log(err.msg);
     }
 
     var today = moment();

@@ -959,7 +959,7 @@ class TripPlanModule {
         }catch(e){
             throw L.ERR.INVALID_ARGUMENT("IP");
         }
-        var result = await API.place.getCityIifoByIpPosition(position);
+        var result = await API.place.getCityByIpPosition(position);
 
         return result;
     }
