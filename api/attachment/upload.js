@@ -23,6 +23,73 @@ function uploadActionFile(req, res, next) {
     form.keepExtensions = true;
     var filePath = '';//file.tmpFile.path
 
+    function excuteUpload(){
+        form.parse(req, function (err, fields, file) {
+            if(file.tmpFile){
+                filePath = file.tmpFile.path;
+            } else {
+                res.send('{"ret":-1, "errMsg":"文件不存在"}');
+                return;
+                /* for(var key in file){
+                 if( file[key].path && filePath==='' ){
+                 filePath = file[key].path;
+                 }
+                 } */
+            }
+            var fileExt = filePath.substring(filePath.lastIndexOf('.'));
+            if (type && type == 'xls' && ('.xls.xlsx').indexOf(fileExt.toLowerCase()) === -1) {//导入excle
+                fs.exists(filePath, function (exists) {
+                    if(exists){
+                        fs.unlink(filePath);
+                    }
+                });
+                res.send('{"ret":-1, "errMsg":"仅允许上传“xls,xlsx”格式文件"}');
+                return;
+            }
+
+            fs.readFile(filePath, function (err, data) {
+                if (err) {
+                    res.send('{"ret":-1, "errMsg":"'+err.message+'"}');
+                } else {
+                    var file_type = file.tmpFile.type;
+                    var isPublic = false;
+                    if (type && type == 'avatar'){//上传头像
+                        isPublic = true;
+                    }
+
+                    var content = data.toString("base64")
+                    var contentType = file_type;
+                    API.attachments.saveAttachment({
+                        content: content,
+                        contentType: contentType,
+                        isPublic: isPublic
+                    })
+                        .then(function(fileid) {
+                            return API.attachment.bindOwner({
+                                accountId: user_id,
+                                fileId: fileid
+                            })
+                                .then(function(own) {
+                                    return fileid
+                                })
+                        })
+                        .then(function(fileid) {
+                            fs.exists(filePath, function (exists) {
+                                if(exists){
+                                    fs.unlink(filePath);
+                                    console.log("删除临时文件");
+                                }
+                            });
+                            res.send('{"ret":0, "errMsg":"", "fileId":"'+fileid+'"}');
+                        })
+                        .catch(function(err){
+                            console.log(err);
+                        }).done();
+                }
+            });
+        });
+    }
+
     return API.auth.authentication({user_id: user_id, token_id: token_id, token_sign: token_sign, timestamp: timestamp})
         .then(function(result){
             if (!result) {
@@ -32,72 +99,16 @@ function uploadActionFile(req, res, next) {
 
             fs.exists(config.upload.tmpDir, function (exists) {
                 if(!exists){
-                    fs.mkdir(config.upload.tmpDir);
-                }
-                form.parse(req, function (err, fields, file) {
-                    if(file.tmpFile){
-                        filePath = file.tmpFile.path;
-                    } else {
-                        res.send('{"ret":-1, "errMsg":"文件不存在"}');
-                        return;
-                        /* for(var key in file){
-                            if( file[key].path && filePath==='' ){
-                                filePath = file[key].path;
-                            }
-                        } */
-                    }
-                    var fileExt = filePath.substring(filePath.lastIndexOf('.'));
-                    if (type && type == 'xls' && ('.xls.xlsx').indexOf(fileExt.toLowerCase()) === -1) {//导入excle
-                        fs.exists(filePath, function (exists) {
-                            if(exists){
-                                fs.unlink(filePath);
-                            }
-                        });
-                        res.send('{"ret":-1, "errMsg":"仅允许上传“xls,xlsx”格式文件"}');
-                        return;
-                    }
-
-                    fs.readFile(filePath, function (err, data) {
-                        if (err) {
-                            res.send('{"ret":-1, "errMsg":"'+err.message+'"}');
-                        } else {
-                            var file_type = file.tmpFile.type;
-                            var isPublic = false;
-                            if (type && type == 'avatar'){//上传头像
-                                isPublic = true;
-                            }
-
-                            var content = data.toString("base64")
-                            var contentType = file_type;
-                            API.attachments.saveAttachment({
-                                content: content,
-                                contentType: contentType,
-                                isPublic: isPublic
-                            })
-                                .then(function(fileid) {
-                                    return API.attachment.bindOwner({
-                                        accountId: user_id,
-                                        fileId: fileid
-                                    })
-                                        .then(function(own) {
-                                            return fileid
-                                        })
-                                })
-                                .then(function(fileid) {
-                                    fs.exists(filePath, function (exists) {
-                                        if(exists){
-                                            fs.unlink(filePath);
-                                            console.log("删除临时文件");
-                                        }
-                                    });
-                                    res.send('{"ret":0, "errMsg":"", "fileId":"'+fileid+'"}');
-                                })
-                                .catch(function(err){
-                                    console.log(err);
-                                }).done();
+                    fs.mkdir(config.upload.tmpDir, function(err, ret) {
+                        if(err) {
+                            throw err;
                         }
+                        excuteUpload();
                     });
-                });
+                }else{
+                    excuteUpload();
+                }
+
             });
         })
     .catch(function(err) {
