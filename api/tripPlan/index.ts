@@ -6,7 +6,7 @@ let sequelize = require("common/model").DB;
 let DBM = sequelize.models;
 let uuid = require("node-uuid");
 let L = require("common/language");
-let utils = require('common/utils');
+import utils = require("common/utils");
 let API = require('common/api');
 let Logger = require('common/logger');
 let logger = new Logger("tripPlan");
@@ -232,6 +232,7 @@ class TripPlanModule {
                 }
             }else {
                 let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER, EStaffRole.ADMIN], status: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
+                
                 //给所有的管理员发送邮件
                 await Promise.all(admins.map(async function(s) {
                     let vals = {managerName: s.name, username: user.name, email: user.email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
@@ -945,6 +946,24 @@ class TripPlanModule {
         await tripPlan.save()
         return true;
     }
+
+    @clientExport
+    static async getIpPosition(params){
+        var stream = Zone.current.get("stream");
+        //select * from place.cities where '辽宁省大连市' like concat(concat('%',name), '%') and type = 2
+        //select * from place.cities where '辽宁省大连市' ~ name and type = 2
+        var position = "";
+        try{
+            position = utils.searchIpAddress(stream.remoteAddress);
+            // position = utils.searchIpAddress("202.103.102.10");
+        }catch(e){
+            throw L.ERR.INVALID_ARGUMENT("IP");
+        }
+        var result = await API.place.getCityIifoByIpPosition(position);
+
+        return result;
+    }
+
 
     static __initHttpApp = require('./invoice');
 

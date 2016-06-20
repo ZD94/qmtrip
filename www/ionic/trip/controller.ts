@@ -9,6 +9,7 @@ import { Models } from 'api/_types';
 import {
     TripDetail, EPlanStatus, ETripType, EInvoiceType, EAuditStatus
 } from "api/_types/tripPlan";
+var msgbox = require('msgbox');
 
 
 var defaultTrip = {
@@ -33,13 +34,25 @@ function TripDefineFromJson(obj: any): TripDefine{
     return obj as TripDefine;
 }
 
-export function CreateController($scope, $storage, $ionicLoading){
+export async function CreateController($scope, $storage, $ionicLoading){
+    API.require('tripPlan');
+    await API.onload();
+
     let trip;
     try {
         trip= TripDefineFromJson($storage.local.get('trip'));
     } catch(err) {
         trip = {};
     }
+    //定位当前ip位置
+    try {
+        var position = await API.tripPlan.getIpPosition({});
+        trip.fromPlace = position.id;
+        trip.fromPlaceName = position.name;
+    } catch(err) {
+        msgbox.log(err.msg);
+    }
+
     var today = moment();
     if (!trip.beginDate || (new Date(trip.beginDate) < new Date())) {
         trip.beginDate = today.startOf('day').hour(9).toDate();
@@ -311,8 +324,6 @@ export async function ListController($scope , Models){
 
     function loadTripPlan(pager) {
         pager.forEach(function(trip){
-            trip.startAt = moment(trip.startAt.value).toDate();
-            trip.backAt = moment(trip.backAt.value).toDate();
             $scope.tripPlans.push(trip);
         });
     }
@@ -329,9 +340,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
     var staff = await Staff.getCurrent();
     let tripPlan = await Models.tripPlan.get(id);
     $scope.tripDetail = tripPlan;
-    $scope.createdAt = moment(tripPlan.createdAt.value).toDate();
-    $scope.startAt = moment(tripPlan.startAt.value).toDate();
-    $scope.backAt = moment(tripPlan.backAt.value).toDate();
+
     let budgets: TripDetail[] = await tripPlan.getTripDetails();
     let hotel;
     let goTraffic;
@@ -477,7 +486,6 @@ export async function ListDetailController($location, $scope , Models, $statePar
     };
     
     $scope.checkInvoice = function(detailId){
-        console.info(detailId);
         window.location.href="#/trip/invoice-detail?detailId="+detailId;
     }
 }

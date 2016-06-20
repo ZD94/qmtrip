@@ -355,13 +355,13 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
     var staff = await Staff.getCurrent();
     var travelPolicy;
     if ($stateParams.policyId) {
-        travelPolicy = await Models.travelPolicy.get($stateParams.policyId)
+        travelPolicy = await Models.travelPolicy.get($stateParams.policyId);
     } else {
         travelPolicy = TravelPolicy.create();
         travelPolicy.companyId = staff.company.id;
-        travelPolicy.planeLevel = "2";
-        travelPolicy.trainLevel = "3";
-        travelPolicy.hotelLevel = "2";
+        travelPolicy.planeLevel = 2;
+        travelPolicy.trainLevel = 3;
+        travelPolicy.hotelLevel = 2;
     }
     $scope.travelPolicy = travelPolicy;
     $scope.savePolicy = async function () {

@@ -25,7 +25,7 @@ class TravelPolicyModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["name","planeLevel","planeDiscount","trainLevel","hotelLevel","companyId"], travalPolicyCols)
+    @requireParams(["name","planeLevel","trainLevel","hotelLevel","companyId"], travalPolicyCols)
     @conditionDecorator([
         {if: condition.isCompanyAdminOrOwner("0.companyId")},
         {if: condition.isCompanyAgency("0.companyId")}
