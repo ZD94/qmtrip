@@ -951,8 +951,13 @@ class TripPlanModule {
         var stream = Zone.current.get("stream");
         //select * from place.cities where '辽宁省大连市' like concat(concat('%',name), '%') and type = 2
         //select * from place.cities where '辽宁省大连市' ~ name and type = 2
-        var position = utils.searchIpAddress(stream.remoteAddress);
-        // var position = utils.searchIpAddress("202.103.102.10");
+        var position = "";
+        try{
+            position = utils.searchIpAddress(stream.remoteAddress);
+            // position = utils.searchIpAddress("202.103.102.10");
+        }catch(e){
+            throw L.ERR.INVALID_ARGUMENT("IP");
+        }
         var result = await API.place.getCityIifoByIpPosition(position);
 
         return result;

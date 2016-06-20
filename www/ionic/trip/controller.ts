@@ -9,6 +9,7 @@ import { Models } from 'api/_types';
 import {
     TripDetail, EPlanStatus, ETripType, EInvoiceType, EAuditStatus
 } from "api/_types/tripPlan";
+var msgbox = require('msgbox');
 
 
 var defaultTrip = {
@@ -44,9 +45,13 @@ export async function CreateController($scope, $storage, $ionicLoading){
         trip = {};
     }
     //定位当前ip位置
-    var position = await API.tripPlan.getIpPosition({});
-    trip.fromPlace = position.id;
-    trip.fromPlaceName = position.name;
+    try {
+        var position = await API.tripPlan.getIpPosition({});
+        trip.fromPlace = position.id;
+        trip.fromPlaceName = position.name;
+    } catch(err) {
+        msgbox.log(err.msg);
+    }
 
     var today = moment();
     if (!trip.beginDate || (new Date(trip.beginDate) < new Date())) {

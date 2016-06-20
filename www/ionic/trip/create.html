@@ -11,7 +11,7 @@
             </label>
             <label class="item item-input">
                 <span class="input-label">出差地点</span>
-                <input type="text" placeholder="北京" ng-model="trip.placeName"
+                <input type="text" placeholder="出差地点选择" ng-model="trip.placeName"
                        ng-selector
                        ng-selector-title="出差地点选择"
                        ng-selector-placeholder="请输入城市名或首字母缩写"
@@ -21,7 +21,7 @@
             </label>
             <label class="item item-input">
                 <span class="input-label">出差事由</span>
-                <input type="text" placeholder="上海项目" ng-model="trip.reasonName"
+                <input type="text" placeholder="项目选择" ng-model="trip.reasonName"
                        ng-selector
                        ng-selector-title="项目选择"
                        ng-selector-placeholder="请选择或输入项目"
@@ -35,7 +35,7 @@
             <div ng-if="trip.traffic">
                 <label class="item item-input" ng-if="trip.traffic">
                     <span class="input-label">出发地</span>
-                    <input type="text" placeholder="上海" ng-model="trip.fromPlaceName"
+                    <input type="text" placeholder="出发地选择" ng-model="trip.fromPlaceName"
                            ng-selector
                            ng-selector-title="出发地选择"
                            ng-selector-placeholder="请输入城市名或首字母缩写"
