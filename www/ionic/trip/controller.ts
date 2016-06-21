@@ -274,6 +274,7 @@ export async function CommittedController($scope, $stateParams, Models){
 }
 
 export async function DetailController($scope, $stateParams, Models, $location){
+    require('./listdetail.less');
     let id = $stateParams.id;
     if (!id) {
         $location.path("/");
