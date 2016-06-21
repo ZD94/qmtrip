@@ -12,6 +12,7 @@ let Logger = require('common/logger');
 let logger = new Logger("tripPlan");
 let config = require("../../config");
 let moment = require("moment");
+let scheduler = require('common/scheduler');
 import _ = require('lodash');
 import {requireParams, clientExport} from 'common/api/helper';
 import {Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, ETripType, EAuditStatus } from "api/_types/tripPlan";
@@ -82,7 +83,7 @@ class TripPlanModule {
             let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: Number(budget.price)});
             detail.accountId = staff.id;
             detail.isCommit = false;
-            detail.status = EPlanStatus.WAIT_UPLOAD;
+            detail.status = EPlanStatus.WAIT_APPROVE;
             detail.tripPlan = tripPlan;
 
             switch(tripType) {
@@ -137,12 +138,25 @@ class TripPlanModule {
         });
 
         tripPlan.budget = totalBudget;
+        tripPlan.status = totalBudget<0 ? EPlanStatus.NO_BUDGET : EPlanStatus.WAIT_APPROVE;
         let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: '创建出差计划'});
+
+        //如果出差计划是待审批状态，增加自动审批时间
+        if(tripPlan.status == EPlanStatus.WAIT_APPROVE) {
+            if(tripPlan.startAt.valueOf() == moment().format('YYYY-MM-DD')) {
+                tripPlan.autoApproveTime = moment(tripPlan.createdAt).add(1, 'hours').format('YYYY-MM-DD HH:mm:ss');
+                logger.warn(tripPlan.autoApproveTime);
+            }else {
+                //出发前一天18点
+                tripPlan.autoApproveTime = moment(tripPlan.startAt.valueOf()).subtract(6, 'hours').format('YYYY-MM-DD HH:mm:ss');
+                logger.warn(tripPlan.autoApproveTime);
+            }
+        }
 
         await Promise.all([tripPlan.save(), tripPlanLog.save()]);
         await Promise.all(tripDetails.map((d)=>d.save()));
 
-        if (tripPlan.budget > 0 || tripPlan.status === EPlanStatus.WAIT_UPLOAD) {
+        if (tripPlan.budget > 0 || tripPlan.status === EPlanStatus.WAIT_APPROVE) {
             await TripPlanModule.sendTripPlanEmails(tripPlan, staff.id);
         }
 
@@ -226,9 +240,14 @@ class TripPlanModule {
                 API.mail.sendMailRequest({toEmails: approveUser.email, templateName: 'qm_notify_new_travelbudget', values: approve_values});
                 //发送短信提醒
                 if(approveUser.mobile && isMobile(approveUser.mobile)) {
-                    let msg_url = await API.shorturl.long2short({longurl: approve_url, shortType: 'md5'});
-                    API.sms.sendMsgSubmit({template: 'travelBudgetApply', mobile: approveUser.mobile,
-                        values: {name: user.name, time: moment(tripPlan.startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
+                    try{
+                        let msg_url = await API.shorturl.long2short({longurl: approve_url, shortType: 'md5'});
+                        API.sms.sendMsgSubmit({template: 'travelBudgetApply', mobile: approveUser.mobile,
+                            values: {name: user.name, time: moment(tripPlan.startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
+                    }catch (e) {
+                        logger.error('发送短信失败...');
+                        logger.error(e);
+                    }
                 }
             }else {
                 let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER, EStaffRole.ADMIN], status: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
@@ -426,7 +445,7 @@ class TripPlanModule {
             let oldDetails = await tripPlan.getTripDetails({where: {}});
             oldDetails.map(async (v) => {
                 await Models.tripDetail.destroy(v);
-            })
+            });
 
             //更新详情信息
             budgets.forEach(async (budget) => {
@@ -965,8 +984,32 @@ class TripPlanModule {
         return result;
     }
 
-
     static __initHttpApp = require('./invoice');
+
+    static async __initOnce() {
+        try{
+            let taskId = moment().format('YYYYMMDDHHmmss');
+            logger.info('run task ' + taskId);
+            scheduler('*/1 * * * *', taskId, async function() {
+                let tripPlans = await Models.tripPlan.find({where: {autoApproveTime: {$lte: utils.now()}, status: EPlanStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
+                // logger.info("自动审批出差计划...");
+                tripPlans.map(async (p) => {
+                    // logger.warn('auto_approve_time==>', moment(p.autoApproveTime).format('YYYY-MM-DD HH:mm:ss'));
+                    let details = await p.getTripDetails({});
+                    p.status = EPlanStatus.WAIT_UPLOAD;
+                    let tripPlanLog = Models.tripPlanLog.create({tripPlanId: p.id, userId: p.auditUser, remark: '系统自动审批出差计划'});
+                    await Promise.all(details.map((d) => {
+                        d.status = EPlanStatus.WAIT_UPLOAD;
+                        return d.save();
+                    }));
+                    await Promise.all([p.save(), tripPlanLog.save()]);
+                });
+            });
+        }catch (e) {
+            logger.error('自动审批任务启动失败...');
+            logger.error(e);
+        }
+    }
 
 }
 
