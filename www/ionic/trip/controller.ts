@@ -131,7 +131,8 @@ export async function CreateController($scope, $storage, $ionicLoading){
             goBackTime: moment(trip.endDate).format('HH:mm'),
             isNeedTraffic: trip.traffic,
             isRoundTrip: trip.round,
-            isNeedHotel: trip.hotel
+            isNeedHotel: trip.hotel,
+            businessDistrict: trip.hotelPlace
         }
         let front = ['正在验证出行参数', '正在匹配差旅政策', '正在搜索全网数据', '动态预算即将完成'];
         await $ionicLoading.show({
