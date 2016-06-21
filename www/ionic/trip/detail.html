@@ -30,7 +30,7 @@
                     <span ng-if='budget.type == ETripType.SUBSIDY'>
                         {{startAt | date: 'yyyy-MM-dd'}}至{{backAt | date: 'yyyy-MM-dd'}}
                     </span>
-                    <br>{{budget.budget | currency: ''}}元
+                    <br>{{budget.budget == -1 ? '暂无预算' : (budget.budget| currency: '')+'元'}}
                 </ion-item>
             </div>
 

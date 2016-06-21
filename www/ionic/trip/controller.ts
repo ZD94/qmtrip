@@ -35,6 +35,7 @@ function TripDefineFromJson(obj: any): TripDefine{
 }
 
 export async function CreateController($scope, $storage, $ionicLoading){
+    require('./listdetail.less');
     API.require('tripPlan');
     await API.onload();
 
@@ -194,6 +195,7 @@ export async function CreateController($scope, $storage, $ionicLoading){
 }
 
 export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading){
+    require('./listdetail.less');
     API.require("tripPlan");
     await API.onload();
 
