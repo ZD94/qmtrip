@@ -53,7 +53,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             }
         });
         budgets.forEach((v) => {
-            switch(v.type) {
+            switch(v.tripType) {
                 case ETripType.OUT_TRIP:
                 case ETripType.BACK_TRIP:
                     if(v.tripType == 0) {
