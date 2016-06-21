@@ -52,39 +52,45 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
                 default: break;
             }
         });
-        budgets.forEach((v) => {
-            switch(v.type) {
-                case ETripType.OUT_TRIP:
-                case ETripType.BACK_TRIP:
-                    if(v.tripType == 0) {
-                        outTraffic.budget = v.price;
-                        traffic.push(outTraffic);
-                    }else if(v.tripType == 1) {
-                        backTraffic.budget = v.price;
-                        traffic.push(backTraffic);
-                    }
-                    trafficBudget += Number(v.price);
-                    break;
-                case ETripType.HOTEL:
-                    hotelDetail.budget = v.price;
-                    hotel.push(hotelDetail);
-                    hotelBudget += Number(v.price);
-                    break;
-                default:
-                    subsidyBudget += Number(v.price);
-                    break;
 
-            }
-        });
         totalBudget = 0;
         budgets.forEach((v) => {
             if (v.price <= 0) {
                 totalBudget = -1;
                 return;
             }
-            
+
             totalBudget += Number(v.price);
-        })
+        });
+
+        budgets.forEach((v) => {
+            switch(v.tripType) {
+                case ETripType.OUT_TRIP:
+                case ETripType.BACK_TRIP:
+                    if(v.tripType == 0) {
+                        if(Number(totalBudget) > tripPlan.budget)
+                            outTraffic.budget = v.price;
+                        traffic.push(outTraffic);
+                        trafficBudget += Number(outTraffic.budget);
+                    }else if(v.tripType == 1) {
+                        if(Number(totalBudget) > tripPlan.budget)
+                            backTraffic.budget = v.price;
+                        traffic.push(backTraffic);
+                        trafficBudget += Number(backTraffic.budget);
+                    }
+                    break;
+                case ETripType.HOTEL:
+                    if(Number(totalBudget) > tripPlan.budget)
+                        hotelDetail.budget = v.price;
+                    hotel.push(hotelDetail);
+                    hotelBudget += Number(hotelDetail.budget);
+                    break;
+                default:
+                    subsidyBudget += Number(v.price);
+                    break;
+            }
+        });
+
         await $ionicLoading.hide();
     } else {
         totalBudget = tripPlan.budget as number;

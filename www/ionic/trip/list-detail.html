@@ -1,5 +1,5 @@
 <ion-view title="行程详情页" id="page20">
-    <ion-content padding="true" class="has-header" style="background: url(ionic/images/backgroud.png) center no-repeat;background-size:cover;">
+    <ion-content padding="true" class="has-header has-bottom-btn" style="background: url(ionic/images/backgroud.png) center no-repeat;background-size:cover;">
         <div id="page20-markdown7" style="color:#000000;text-align:right;">
             <p style="color: #fff;">{{tripDetail.createdAt.value | date: 'yyyy-MM-dd HH:mm'}}</p>
         </div>
@@ -7,7 +7,7 @@
             <ion-item class="project_tit">{{tripDetail.title}}</ion-item>
             <ion-item class="project_cont">
                 <p ng-if="tripDetail && tripDetail.startAt">{{tripDetail.startAt.value | date: 'yyyy-MM-dd'}} 至 {{tripDetail.backAt.value | date: 'yyyy-MM-dd'}}</p>
-                <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{tripDetail.budget | currency : ''}}</span>元</p>
+                <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{tripDetail.budget == -1 ? '暂无预算' : (tripDetail.budget| currency: '')}}</span>{{tripDetail.budget == -1 ? '' : '元'}}</p>
             </ion-item>
         </ion-list>
         <div class="spacer" style="width: 285px; height: 17px;"></div>
@@ -69,14 +69,14 @@
                 <ion-item>
                     <span>{{backTraffic.startTime.value | date: 'yyyy-MM-dd'}}</span>
                     <br>
-                    {{tripDetail.deptCity}}
+                    {{tripDetail.arrivalCity}}
                     &nbsp;
                     <i ng-if='backTraffic.invoiceType == EInvoiceType.PLANE' class="icon ion-plane"></i>
                     <i ng-if='backTraffic.invoiceType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
                     <i ng-if='backTraffic.invoiceType == EInvoiceType.HOTEL' class="icon ion-home"></i>
                     <i ng-if='backTraffic.invoiceType == EInvoiceType.OTHER'>-</i>
                     &nbsp;
-                    {{tripDetail.arrivalCity}}
+                    {{tripDetail.deptCity}}
                     <br>{{backTraffic.budget}}元
                     <div class="item-note" ng-if="backTraffic.status == EPlanStatus.WAIT_UPLOAD">
                         <div class="uploadbtns button-small botton-outline button-positive"
@@ -182,13 +182,13 @@
         </ion-list>
         <div class="button-bar"></div>
         <div class="button-bar"></div>
-        <div>
-            <a ng-if="tripDetail.status == EPlanStatus.WAIT_COMMIT" ng-click="approveTripPlan()" id="page20-button60" class="button button-positive  button-block" no-back>提交审核</a>
-            <a ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS" ng-click="createTripPlan()" id="page20-button61" class="button button-positive  button-block" no-back>再次生成</a>
-        </div>
 
-        <div ng-if="tripDetail.status != EPlanStatus.APPROVE_NOT_PASS && tripDetail.status != EPlanStatus.WAIT_COMMIT">
-            <span class="button button-stable button-block" no-back>{{statustext[tripDetail['status']] || '预算审批中'}}</span>
-        </div>
     </ion-content>
+    <div class="fixed_bottom">
+        <a ng-if="tripDetail.status == EPlanStatus.WAIT_COMMIT" ng-click="approveTripPlan()" id="page20-button60" class="button button-positive" no-back>提交审核</a>
+        <a ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS" ng-click="createTripPlan()" id="page20-button61" class="button button-positive" no-back>再次生成</a>
+    </div>
+    <div  class="fixed_bottom" ng-if="tripDetail.status != EPlanStatus.APPROVE_NOT_PASS && tripDetail.status != EPlanStatus.WAIT_COMMIT">
+        <span class="button button-stable" no-back>{{statustext[tripDetail['status']] || '预算审批中'}}</span>
+    </div>
 </ion-view>

@@ -35,6 +35,7 @@ function TripDefineFromJson(obj: any): TripDefine{
 }
 
 export async function CreateController($scope, $storage, $ionicLoading){
+    require('./listdetail.less');
     API.require('tripPlan');
     await API.onload();
 
@@ -45,12 +46,13 @@ export async function CreateController($scope, $storage, $ionicLoading){
         trip = {};
     }
     //定位当前ip位置
-    try {
+    /*try {
         var position = await API.tripPlan.getIpPosition({});
         trip.fromPlace = position.id;
         trip.fromPlaceName = position.name;
     } catch(err) {
-    }
+        // msgbox.log(err.msg);
+    }*/
 
     var today = moment();
     if (!trip.beginDate || (new Date(trip.beginDate) < new Date())) {
@@ -110,7 +112,11 @@ export async function CreateController($scope, $storage, $ionicLoading){
     
     $scope.queryProjects = async function(keyword){
         var staff = await Staff.getCurrent();
-        var projects = await Models.project.find({where:{companyId: staff.company.id}});
+        var options = {where:{companyId: staff.company.id}};
+        if(keyword){
+            options.where["name"] = {$like: '%'+keyword+'%'};
+        }
+        var projects = await Models.project.find(options);
         return projects.map((project)=>{ return {name: project.name, value: project.id}} );
     }
     $scope.createProject = async function(name){
@@ -190,6 +196,7 @@ export async function CreateController($scope, $storage, $ionicLoading){
 }
 
 export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading){
+    require('./listdetail.less');
     API.require("tripPlan");
     await API.onload();
 
@@ -268,6 +275,7 @@ export async function CommittedController($scope, $stateParams, Models){
 }
 
 export async function DetailController($scope, $stateParams, Models, $location){
+    require('./listdetail.less');
     let id = $stateParams.id;
     if (!id) {
         $location.path("/");
