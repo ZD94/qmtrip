@@ -45,12 +45,13 @@ export async function CreateController($scope, $storage, $ionicLoading){
         trip = {};
     }
     //定位当前ip位置
-    try {
+    /*try {
         var position = await API.tripPlan.getIpPosition({});
         trip.fromPlace = position.id;
         trip.fromPlaceName = position.name;
     } catch(err) {
-    }
+        // msgbox.log(err.msg);
+    }*/
 
     var today = moment();
     if (!trip.beginDate || (new Date(trip.beginDate) < new Date())) {
