@@ -111,7 +111,11 @@ export async function CreateController($scope, $storage, $ionicLoading){
     
     $scope.queryProjects = async function(keyword){
         var staff = await Staff.getCurrent();
-        var projects = await Models.project.find({where:{companyId: staff.company.id}});
+        var options = {where:{companyId: staff.company.id}};
+        if(keyword){
+            options.where["name"] = {$like: '%'+keyword+'%'};
+        }
+        var projects = await Models.project.find(options);
         return projects.map((project)=>{ return {name: project.name, value: project.id}} );
     }
     $scope.createProject = async function(name){
