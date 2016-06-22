@@ -9,6 +9,7 @@ import { Models } from 'api/_types';
 import {
     TripDetail, EPlanStatus, ETripType, EInvoiceType, EAuditStatus
 } from "api/_types/tripPlan";
+var msgbox = require('msgbox');
 
 
 var defaultTrip = {
@@ -33,13 +34,27 @@ function TripDefineFromJson(obj: any): TripDefine{
     return obj as TripDefine;
 }
 
-export function CreateController($scope, $storage, $ionicLoading){
+export async function CreateController($scope, $storage, $ionicLoading){
+    require('./listdetail.less');
+    API.require('tripPlan');
+    await API.onload();
+
     let trip;
     try {
         trip= TripDefineFromJson($storage.local.get('trip'));
     } catch(err) {
         trip = {};
     }
+
+    //定位当前ip位置
+    /*try {
+        var position = await API.tripPlan.getIpPosition({});
+        trip.fromPlace = position.id;
+        trip.fromPlaceName = position.name;
+    } catch(err) {
+        // msgbox.log(err.msg);
+    }*/
+
     var today = moment();
     if (!trip.beginDate || (new Date(trip.beginDate) < new Date())) {
         trip.beginDate = today.startOf('day').hour(9).toDate();
@@ -98,7 +113,11 @@ export function CreateController($scope, $storage, $ionicLoading){
     
     $scope.queryProjects = async function(keyword){
         var staff = await Staff.getCurrent();
-        var projects = await Models.project.find({where:{companyId: staff.company.id}});
+        var options = {where:{companyId: staff.company.id}};
+        if(keyword){
+            options.where["name"] = {$like: '%'+keyword+'%'};
+        }
+        var projects = await Models.project.find(options);
         return projects.map((project)=>{ return {name: project.name, value: project.id}} );
     }
     $scope.createProject = async function(name){
@@ -119,7 +138,8 @@ export function CreateController($scope, $storage, $ionicLoading){
             goBackTime: moment(trip.endDate).format('HH:mm'),
             isNeedTraffic: trip.traffic,
             isRoundTrip: trip.round,
-            isNeedHotel: trip.hotel
+            isNeedHotel: trip.hotel,
+            businessDistrict: trip.hotelPlace
         }
         let front = ['正在验证出行参数', '正在匹配差旅政策', '正在搜索全网数据', '动态预算即将完成'];
         await $ionicLoading.show({
@@ -177,6 +197,7 @@ export function CreateController($scope, $storage, $ionicLoading){
 }
 
 export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading){
+    require('./listdetail.less');
     API.require("tripPlan");
     await API.onload();
 
@@ -184,6 +205,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     API.require("travelBudget");
     await API.onload();
     let result = await API.travelBudget.getBudgetInfo({id: id});
+    console.info(result);
     let budgets = result.budgets;
     let trip = $storage.local.get("trip");
     trip.beginDate = result.query.leaveDate;
@@ -233,7 +255,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         });
 
         try {
-            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason, auditUser: trip.auditUser})
+            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason||trip.reasonName, auditUser: trip.auditUser})
             window.location.href = '#/trip/committed?id='+planTrip.id;
         } catch(err) {
             alert(err.msg || err);
@@ -255,6 +277,7 @@ export async function CommittedController($scope, $stateParams, Models){
 }
 
 export async function DetailController($scope, $stateParams, Models, $location){
+    require('./listdetail.less');
     let id = $stateParams.id;
     if (!id) {
         $location.path("/");
@@ -311,8 +334,6 @@ export async function ListController($scope , Models){
 
     function loadTripPlan(pager) {
         pager.forEach(function(trip){
-            trip.startAt = moment(trip.startAt.value).toDate();
-            trip.backAt = moment(trip.backAt.value).toDate();
             $scope.tripPlans.push(trip);
         });
     }
@@ -329,9 +350,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
     var staff = await Staff.getCurrent();
     let tripPlan = await Models.tripPlan.get(id);
     $scope.tripDetail = tripPlan;
-    $scope.createdAt = moment(tripPlan.createdAt.value).toDate();
-    $scope.startAt = moment(tripPlan.startAt.value).toDate();
-    $scope.backAt = moment(tripPlan.backAt.value).toDate();
+
     let budgets: TripDetail[] = await tripPlan.getTripDetails();
     let hotel;
     let goTraffic;
@@ -376,7 +395,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
         } else if (tripType == ETripType.BACK_TRIP) {
             $scope.backTrafficStatus = Boolean(budget.status);
             backTraffic = budget;
-            backTraffic['title'] = '上传回城交通发票';
+            backTraffic['title'] = '上传回程交通发票';
             backTraffic['done'] = function (response) {
                 if (!response.fileId) {
                     alert(response.msg);
@@ -447,13 +466,13 @@ export async function ListDetailController($location, $scope , Models, $statePar
         let tripPlan = $scope.tripDetail;
         let tripDetails = $scope.budgets;
         let trip: any = {
-            beginDate: moment(tripPlan.startAt).toDate(),
-            endDate: moment(tripPlan.backAt).toDate(),
+            beginDate: moment(tripPlan.startAt.value).toDate(),
+            endDate: moment(tripPlan.backAt.value).toDate(),
             place: tripPlan.arrivalCityCode,
             placeName: tripPlan.arrivalCity,
             reasonName: tripPlan.title
         };
-        tripDetails.map((detail) => {
+        await Promise.all(tripDetails.map(async (detail) => {
             switch (detail.type) {
                 case ETripType.OUT_TRIP:
                     trip.traffic = true;
@@ -468,16 +487,19 @@ export async function ListDetailController($location, $scope , Models, $statePar
                     break;
                 case ETripType.HOTEL:
                     trip.hotel = true;
-                    trip.hotelPlace = detail.cityCode;
-                    trip.hotelPlaceName = detail.city;
+                    trip.hotelPlace = detail.hotelName || '';
+                    let landMarkInfo = {name: ''};
+                    if(detail.hotelName) {
+                        landMarkInfo = await API.place.getCityInfo({cityCode: detail.hotelName});
+                    }
+                    trip.hotelPlaceName = landMarkInfo.name;
             }
-        });
+        }));
         await $storage.local.set('trip', trip);
         window.location.href="#/trip/create";
     };
     
     $scope.checkInvoice = function(detailId){
-        console.info(detailId);
         window.location.href="#/trip/invoice-detail?detailId="+detailId;
     }
 }
@@ -504,7 +526,7 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
         title = '去程交通';
     }
     if (invoice.type == ETripType.BACK_TRIP) {
-        title = '回城交通';
+        title = '回程交通';
     }
     if (invoice.type == ETripType.HOTEL) {
         title = '住宿';

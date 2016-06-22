@@ -1,16 +1,25 @@
 <ion-view title="行程详情页" id="page20">
-    <ion-content padding="true" class="has-header">
+    <ion-content padding="true" class="has-header has-bottom-btn"  style="background: url(ionic/images/backgroud.png) center no-repeat;background-size:cover;">
         <div id="page20-markdown7" style="color:#000000;text-align:right;">
-            <p>{{createdAt | date: 'yyyy-MM-dd HH:mm'}}</p>
+            <p style="color: #fff;">{{createdAt | date: 'yyyy-MM-dd HH:mm'}}</p>
         </div>
-        <ion-list>
+
+        <ion-list class="jl_projectinfo">
+            <ion-item class="project_tit">{{trip.title}}</ion-item>
+            <ion-item class="project_cont">
+                <p ng-if="startAt">{{startAt | date: 'yyyy-MM-dd'}}至 {{backAt | date: 'yyyy-MM-dd'}}</p>
+                <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{trip.budget == -1 ? '暂无预算' : (trip.budget | currency: '')}}</span>{{trip.budget == -1 ? '' : '元'}}</p>
+            </ion-item>
+        </ion-list>
+
+        <!--<ion-list>
             <ion-item>出差事由<span style="float: right;">{{trip.title}}</span></ion-item>
         </ion-list>
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <ion-list>
             <ion-item>{{startAt | date: 'yyyy-MM-dd HH:mm'}} 至 {{backAt | date: 'yyyy-MM-dd HH:mm'}}
                 <br>总预算：{{trip.budget | currency: ''}}元</ion-item>
-        </ion-list>
+        </ion-list>-->
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <div class="button-bar"></div>
         <ion-list>
@@ -30,13 +39,15 @@
                     <span ng-if='budget.type == ETripType.SUBSIDY'>
                         {{startAt | date: 'yyyy-MM-dd'}}至{{backAt | date: 'yyyy-MM-dd'}}
                     </span>
-                    <br>{{budget.budget | currency: ''}}元
+                    <br>{{budget.budget == -1 ? '暂无预算' : (budget.budget| currency: '')+'元'}}
                 </ion-item>
             </div>
 
         </ion-list>
         <div class="button-bar"></div>
         <div class="button-bar"></div>
-        <a href="#/trip/list" id="page20-button60" class="button button-positive  button-block" no-back>进入行程列表</a>
     </ion-content>
+    <div class="fixed_bottom">
+        <a href="#/trip/list" id="page20-button60" class="button button-positive" no-back>进入行程列表</a>
+    </div>
 </ion-view>

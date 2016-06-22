@@ -1,7 +1,7 @@
 <ion-view title="预算结果" id="page16">
-    <ion-content padding="true" class="has-header">
+    <ion-content padding="true" class="has-header has-bottom-btn" style="background: url(ionic/images/backgroud.png) center no-repeat;background-size:cover;">
         <div id="page16-markdown4" style="color:#000000;text-align:right;">
-            <p>{{trip.createAt| date: 'yyyy-MM-dd HH:mm:ss'}}</p>
+            <p  style="color: #fff;">{{trip.createAt| date: 'yyyy-MM-dd HH:mm:ss'}}</p>
         </div>
         <form class="list">
             <label class="item item-input">
@@ -14,7 +14,15 @@
             </label>
         </form>
 
-        <ion-list>
+        <ion-list class="jl_projectinfo">
+            <ion-item class="project_tit">{{trip.reason || trip.reasonName}}</ion-item>
+            <ion-item class="project_cont">
+                <p ng-if="trip && trip.beginDate">{{trip.beginDate| date: 'yyyy-MM-dd'}} 至 {{trip.endDate | date: 'yyyy-MM-dd'}}</p>
+                <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{totalPrice == -1 ? '暂无预算' : (totalPrice| currency: '')}}</span>{{totalPrice == -1 ? '' : '元'}}</p>
+            </ion-item>
+        </ion-list>
+
+        <!--<ion-list>
             <ion-item>
                 出差事由<span class="item-note">{{trip.reason}}</span>
             </ion-item>
@@ -22,8 +30,8 @@
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <ion-list>
             <ion-item>{{trip.beginDate| date: 'MM/dd'}} 至 {{trip.endDate | date: 'MM/dd'}}
-                <br>总预算：{{totalPrice| currency: ''}}元</ion-item>
-        </ion-list>
+                <br>总预算：{{totalPrice == -1 ? '暂无预算' : (totalPrice| currency: '')+'元'}}</ion-item>
+        </ion-list>-->
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <ion-list>
             <div ng-repeat="budget in budgets">
@@ -50,9 +58,9 @@
                 <ion-item ng-if="budget.tripType == ETripType.HOTEL">
                     <span>{{trip.beginDate | date: 'MM/dd'}}至{{trip.endDate | date: 'MM/dd'}} 共{{duringDays}}天</span>
                     <br/>
-                    &nbsp;
+                   <!-- &nbsp;
                     <i class="icon ion-home"></i>
-                    &nbsp;
+                    &nbsp;-->
                     {{trip.destinationPlaceName}}
                     <br>{{budget.price | currency: ''}}元
                 </ion-item>
@@ -79,7 +87,10 @@
         <div class="button-bar"></div>
         <div class="spacer" style="width: 300px; height: 26px;"></div>
 
-        <a ng-click="saveTripPlan()" id="page16-button56" class="button button-positive  button-block">预算提交审批</a>
-        <a href="#/trip/create" id="page16-button58" class="button button-light  button-block button-outline">取消</a>
+
+        <!--<a href="#/trip/create" id="page16-button58" class="button button-light  button-block button-outline">取消</a>-->
     </ion-content>
+    <div class="fixed_bottom">
+        <a ng-click="saveTripPlan()" id="page16-button56" class="button button-positive">预算提交审批</a>
+    </div>
 </ion-view>

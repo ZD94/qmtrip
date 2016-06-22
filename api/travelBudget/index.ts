@@ -134,9 +134,10 @@ class ApiTravelBudget {
 
         await new Promise(function(resolve, reject) {
             let session = {accountId: staffId}
-            Zone.current.fork({name: "getTravelPolicy", properties: { session: session}})
-                .run(async function() {
-                    if (isNeedTraffic) {
+            Zone.current.fork({name: "getTravelPolicy",properties: { session: session}})
+            .run(async function() {
+                if (isNeedTraffic) {
+                    try {
                         //去程预算
                         let budget = await ApiTravelBudget.getTrafficBudget({
                             originPlace: originPlace,
@@ -146,9 +147,13 @@ class ApiTravelBudget {
                         });
                         budget.tripType = ETripType.OUT_TRIP;
                         budgets.push(budget);
+                    } catch (err) {
+                        reject(err);
                     }
+                }
 
-                    if (isNeedTraffic && isRoundTrip) {
+                if (isNeedTraffic && isRoundTrip) {
+                    try {
                         let budget = await ApiTravelBudget.getTrafficBudget({
                             originPlace: destinationPlace,
                             destinationPlace: originPlace,
@@ -157,9 +162,13 @@ class ApiTravelBudget {
                         });
                         budget.tripType = ETripType.BACK_TRIP;
                         budgets.push(budget);
+                    } catch (err) {
+                        reject(err);
                     }
+                }
 
-                    if (isNeedHotel) {
+                if (isNeedHotel) {
+                    try {
                         let budget = await ApiTravelBudget.getHotelBudget({
                             cityId: destinationPlace,
                             businessDistrict: businessDistrict,
@@ -168,17 +177,20 @@ class ApiTravelBudget {
                         });
                         budget.tripType = ETripType.HOTEL;
                         budgets.push(budget);
+                    } catch (err) {
+                        reject(err)
                     }
+                }
 
-                    let days = moment(goBackDate).diff(moment(leaveDate), 'days') || 1;
-                    if (Boolean(travelPolicy['subsidy']) && travelPolicy['subsidy'] > 0) {
-                        let budget: any = {};
-                        budget.tripType = ETripType.SUBSIDY;
-                        budget.price = travelPolicy['subsidy'] * days;
-                        budgets.push(budget);
-                    }
-                    resolve(true);
-                })
+                let days = moment(goBackDate).diff(moment(leaveDate), 'days') || 1;
+                if (Boolean(travelPolicy['subsidy']) && travelPolicy['subsidy'] > 0) {
+                    let budget: any = {};
+                    budget.tripType = ETripType.SUBSIDY;
+                    budget.price = travelPolicy['subsidy'] * days;
+                    budgets.push(budget);
+                }
+                resolve(true);
+            })
         })
 
         let obj: any = {};
@@ -239,20 +251,7 @@ class ApiTravelBudget {
         if(policy.hotelLevel){
             hotelStar = policy.hotelLevel;
         }
-        /*if (/二星级/g.test(policy.hotelLevel)) {
-            hotelStar = 2;
-        }
 
-        if (/三星级/g.test(policy.hotelLevel)) {
-            hotelStar = 3;
-        }
-
-        if (/四星级/g.test(policy.hotelLevel)) {
-            hotelStar = 4;
-        }
-        if (/五星级/g.test(policy.hotelLevel)) {
-            hotelStar = 5;
-        }*/
         let data = {
             maxMoney: policy.hotelPrice,
             hotelStar: hotelStar,

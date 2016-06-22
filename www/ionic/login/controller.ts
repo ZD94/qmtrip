@@ -5,7 +5,8 @@ var API = require('common/api');
 
 API.require('auth');
 
-export function StoragesetController($scope, $stateParams, $storage) {
+export function StorageSetController($scope, $stateParams, $storage) {
+    console.info("StorageSet...........................");
     let token_id = $stateParams.token_id;
     let user_id = $stateParams.user_id;
     let token_sign = $stateParams.token_sign;
@@ -22,7 +23,7 @@ export function StoragesetController($scope, $stateParams, $storage) {
     Cookie.set("timestamp", data.timestamp, {expires: 30});
     Cookie.set("token_id", data.token_id, {expires: 30});
     API.reload_all_modules();
-
+    console.info("go"+back_url);
     window.location.href = back_url;
 }
 
@@ -66,12 +67,14 @@ export function IndexController($scope,$stateParams, $storage) {
             msgbox.log(err);//显示错误消息
         }
     }
+}
 
-    //test begin========================
+export async function TestController($scope) {
+    console.info("do this...")
     $scope.initscan = function(){
         var backUrl = "http://"+window.location.host+"/ionic.html#/trip/create";
         API.onload(function() {
-            API.auth.getQRCodeUrl({backUrl: backUrl, accountId: "c3d5f7c0-32e8-11e6-9af9-0710d114e84c"})
+            API.auth.getQRCodeUrl({backUrl: backUrl, accountId: "c3d5f7c0-32e8-11e6-9af9-0710d114e84c", email: "yali.wang@jingli.tech"})
                 .then(function(content) {
                     console.info(content);
                     // new QRCode(document.getElementById("qrcode"), content);
@@ -149,7 +152,8 @@ export function IndexController($scope,$stateParams, $storage) {
         $("#qrcode").find("canvas").remove();
         $(".scan_fixed").hide();
     }
-    //test end========================
+
+    $scope.initscan();
 }
 
 export async function FirstSetPwdController ($scope, $stateParams) {

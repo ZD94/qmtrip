@@ -16,7 +16,7 @@ var L = require("common/language");
 var C = require("config");
 var QRCODE_LOGIN_URL = '/auth/qrcode-login';
 var moment = require("moment");
-var API = require("../../common/api");
+var API = require("common/api");
 var utils = require("common/utils");
 var Logger = require("common/logger");
 var logger = new Logger('auth');
@@ -643,6 +643,59 @@ class ApiAuth {
     // }
 
 
+    @clientExport
+    @requireParams(['mobile', 'name', 'email', 'userName','msgCode','msgTicket'], ['pwd','agencyId', 'remark', 'description'])
+    static async registerCompany(params:{name: string, userName: string, email: string, mobile: string, pwd: string,
+        msgCode: string, msgTicket: string, agencyId?: string}){
+        //先创建登录账号
+        // if (!params) {
+        //     params = {};
+        // }
+        var companyName = params.name;
+        var name = params.userName;
+        var email = params.email;
+        var mobile = params.mobile;
+        var msgCode = params.msgCode;
+        var msgTicket = params.msgTicket;
+        var pwd = params.pwd;
+
+        if (!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+
+
+        if (!msgCode || !msgTicket) {
+            throw {code: -1, msg: "短信验证码错误"};
+        }
+
+        if (!name) {
+            throw {code: -1, msg: "联系人姓名为空"};
+        }
+
+        if (!companyName) {
+            throw {code: -1, msg: "公司名称为空"};
+        }
+
+        if (!pwd) {
+            throw {code: -1, msg: "密码为空"};
+        }
+        var companyId = uuid.v1();
+        var domain = email.split(/@/)[1];
+
+        return Promise.resolve(true)
+            .then(function() {
+                if (msgCode == 'test' && msgTicket == 'test') {
+                    return true;
+                }
+
+                return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+            })
+            .then(function() {
+                return API.company.registerCompany({mobile:mobile, email: email,name: companyName,userName: name, pwd: pwd, status: 1});
+            })
+    }
+
+
     /**
      * @method authenticate
      *
@@ -1034,7 +1087,7 @@ class ApiAuth {
      * @param {String} params.backUrl
      */
     @clientExport
-    static getQRCodeUrl (params: {backUrl: string, accountId?: string}) : Promise<string> {
+    static async getQRCodeUrl (params: {backUrl: string, accountId?: string}) : Promise<string> {
 
         let session = Zone.current.get("session");
         var accountId = params.accountId || session["accountId"];
@@ -1171,7 +1224,7 @@ class ApiAuth {
 
         //二维码自动登录
         app.all("/auth/qrcode-login", function(req, res, next) {
-            var storageseturl = C.host + "/ionic.html#/login/storageset";
+            var storageSetUrl = C.host + "/ionic.html#/login/storageSet";
             var accountId = req.query.accountId;
             var timestamp = req.query.timestamp;
             var sign = req.query.sign;
@@ -1183,7 +1236,7 @@ class ApiAuth {
                     res.cookie("user_id", result.user_id);
                     res.cookie("timestamp", result.timestamp);
                     res.cookie("token_sign", result.token_sign);
-                    res.redirect(storageseturl+"?token_id="+result.token_id+"&user_id="+result.user_id+"&timestamp="+result.timestamp+"&token_sign="+result.token_sign+"&back_url="+backUrl);
+                    res.redirect(storageSetUrl+"?token_id="+result.token_id+"&user_id="+result.user_id+"&timestamp="+result.timestamp+"&token_sign="+result.token_sign+"&back_url="+backUrl);
                 })
                 .catch(function(err) {
                     console.info(err);

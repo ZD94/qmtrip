@@ -199,6 +199,10 @@ export class TripPlan extends ModelObject {
     get finalBudgetCreateAt() : Date { return null;}
     set finalBudgetCreateAt(d: Date) {};
 
+    @Field({type: Types.DATE})
+    get autoApproveTime() : Date { return null;}
+    set autoApproveTime(d: Date) {};
+
     @ResolveRef({type: Types.UUID}, Models.project)
     get project(): Project { return null; }
     set project(val: Project) {}
