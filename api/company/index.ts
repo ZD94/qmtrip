@@ -69,14 +69,15 @@ class CompanyModule {
             throw {code: -6, msg: "邮箱格式不符合要求"};
         }
 
-        if(session) {
+        if(session && session.accountId) {
             let agencyUser = await Models.agencyUser.get(session.accountId);
 
-            if(!agencyUser) {
+            /*if(!agencyUser) {
                 throw L.ERR.AGENCY_NOT_EXIST();
+            }*/
+            if(agencyUser) {
+                agencyId = agencyUser.agency.id;
             }
-
-            agencyId = agencyUser.agency.id;
         }
 
         let staff = Staff.create({email: params.email, name: params.userName, mobile: params.mobile, roleId: EStaffRole.OWNER, pwd: md5(pwd)});

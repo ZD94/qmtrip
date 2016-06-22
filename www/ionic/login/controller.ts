@@ -5,7 +5,7 @@ var API = require('common/api');
 
 API.require('auth');
 
-export function StoragesetController($scope, $stateParams, $storage) {
+export function StorageSetController($scope, $stateParams, $storage) {
     let token_id = $stateParams.token_id;
     let user_id = $stateParams.user_id;
     let token_sign = $stateParams.token_sign;

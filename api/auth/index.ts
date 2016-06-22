@@ -660,7 +660,7 @@ class ApiAuth {
         var pwd = params.pwd;
 
         if (!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
-            throw L.ERR.MOBILE_FORMAT_ERROR();
+            throw L.ERR.MOBILE_NOT_CORRECT();
         }
 
 
