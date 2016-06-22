@@ -50,7 +50,7 @@
                         待审批
                     </div>
                     <div class="item-note" ng-if="goTraffic.status == EPlanStatus.APPROVE_NOT_PASS">
-                        审批未通过
+                        审批未通过，原因：{{tripDetail.auditRemark}}
                     </div>
                     <div class="item-note" ng-if="goTraffic.status == EPlanStatus.COMPLETE">
                         <a class="button button-small button-outline" ng-click="checkInvoice(goTraffic.id)">查看票据</a>
@@ -99,7 +99,7 @@
                         待审批
                     </div>
                     <div class="item-note" ng-if="backTraffic.status == EPlanStatus.APPROVE_NOT_PASS">
-                        审批未通过
+                        审批未通过，原因：{{tripDetail.auditRemark}}
                     </div>
                     <div class="item-note" ng-if="backTraffic.status == EPlanStatus.COMPLETE">
                         <a class="button button-small button-outline" ng-click="checkInvoice(backTraffic.id)">查看票据</a>
@@ -153,7 +153,7 @@
                         待审批
                     </div>
                     <div class="item-note" ng-if="hotel.status == EPlanStatus.APPROVE_NOT_PASS">
-                        审批未通过
+                        审批未通过，原因：{{tripDetail.auditRemark}}
                     </div>
                     <div class="item-note" ng-if="hotel.status == EPlanStatus.COMPLETE">
                         <a class="button button-small button-outline" ng-click="checkInvoice(hotel.id)">查看票据</a>
