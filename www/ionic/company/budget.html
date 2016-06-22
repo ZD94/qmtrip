@@ -1,0 +1,49 @@
+<ion-view title="出差统计-本月预算" id="page24">
+    <ion-content padding="true" class="has-header">
+        <div class="button-bar">
+            <button id="page24-button73" class="button button-positive  button-block">本月预算</button>
+            <a href="#/company/record" id="page24-button74" class="button button-stable  button-block">出差记录</a>
+            <a href="#/company/distribution" id="page24-button75" class="button button-stable  button-block">员工分布</a>
+        </div>
+        <label class="item item-select">
+            <span class="input-label">当前统计</span>
+            <select ng-change="monthChange(queryMonth)" id="monthSelect" ng-model="queryMonth" ng-options="item.value as item.name for item in months"></select>
+        </label>
+        <div class="spacer" style="width: 300px; height: 30px;"></div>
+        <div class="row">
+            <div class="col col-50">
+                <canvas id="doughnut" class="chart chart-doughnut"
+                        data="saveMoneyChart.data"
+                        labels="saveMoneyChart.labels"
+                        width="170">
+                </canvas>
+            </div>
+            <div class="col col-50">
+                <ion-list>
+                    <ion-item>
+                        <h2>出差人数</h2>
+                        <p>{{statistic.staffNum}}人次</p>
+                    </ion-item>
+                    <ion-item >
+                        <h2>运行项目</h2>
+                        <p>{{statistic.projectNum}}个</p>
+                    </ion-item>
+                </ion-list>
+            </div>
+        </div>
+
+        <div class="spacer" style="width: 300px; height: 30px;"></div>
+        <!--<progress-bar ng-if="isShow1" title="{{option1.title}}" all="{{option1.all}}" cover="{{option1.cover}}" color="orange">公司预算</progress-bar>-->
+        <progress-bar ng-if="isShow1" title="{{option1.title}}" all="{{option1.all}}" cover="{{option1.cover}}" color="blue">动态预算</progress-bar>
+        <progress-bar ng-if="isShow2" title="{{option2.title}}" all="{{option2.all}}" cover="{{option2.cover}}" color="green">节省费用</progress-bar>
+        <div class="spacer" style="width: 300px; height: 30px;"></div>
+
+        <div class="item-divider">&nbsp;员工节省排行</div>
+        <ion-list>
+            <ion-item ng-repeat="v in staffSaves" style="font-size: 0.8em;">
+                <div style="display: block; position: absolute; width: 30px; height: 30px; text-align: center; line-height: 30px; border-radius: 50%; color: white; background:#2495da;">{{v.name| limitTo: -1}}</div>
+                <span style="padding-left: 50px;">{{v.name}}</span><span style="float: right;">{{v.save| currency: ''}}元</span>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>

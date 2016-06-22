@@ -1,15 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="qmtrip">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
-	<title ng-bind="pageTitle || '全麦商旅'">全麦商旅</title>
+	<title ng-bind="pageTitle || '鲸力差旅管家'">鲸力差旅管家</title>
 
+    <link rel="stylesheet" type="text/css" href="/mobile/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/font/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="/font/css/icomoon.css">
 	<link rel="stylesheet" type="text/css" href="/mobile/css/upload.css">
 	<link rel="stylesheet" type="text/css" href="/mobile/css/businesstravel.css">
 	<link rel="stylesheet" type="text/css" href="/mobile/css/travelplan.css">
 	<link rel="stylesheet" type="text/css" href="/mobile/css/auth.css">
 	<link rel="stylesheet" type="text/css" href="/mobile/css/usercenter.css">
+    <link rel="stylesheet" type="text/css" href="/mobile/css/airticketorder.css">
+    <link rel="stylesheet" type="text/css" href="/mobile/css/airticket.css">
 	<link rel="stylesheet" type="text/css" href="/mobile/css/mobiscroll.css">
 	<script type="text/javascript" src="/script/libs/bundle.jquery.js"></script>
     <script type="text/javascript">
@@ -61,8 +66,10 @@
     <div class="mask_loading" id="loading">
         <div class="loading_m">
         </div>
-        全麦商旅
+        鲸力差旅管家
     </div>
 	<div id="angular-view" ui-view></div>
 </body>
+<script type="text/javascript" src="/script/libs/bundle.preload.js"></script>
+<script type="text/javascript" src="/mobile/controller.all.js"></script>
 </html>

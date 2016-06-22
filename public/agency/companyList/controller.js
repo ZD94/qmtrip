@@ -11,47 +11,48 @@ module.exports = (function(){
 	API.require('department');
 	API.require('travelPolicy');
 	var companyList ={};
-	companyList.CompanyListController = function($scope){
-		loading(true);
+	companyList.CompanyListController = function($scope, $loading){
 		$("title").html("公司列表");
 		//企业管理首页信息
 		$scope.initCompanyList = function(){
 			$(".left_nav li").removeClass("on").eq(1).addClass("on");
-			loading(false);
+			$loading.start();
 			API.onload(function(){
 				API.company.getCompanyListByAgency({page:$scope.page,perPage:20})
 					.then(function(ret){
-						// console.info (ret);
+						console.info (ret);
 						$scope.total = ret.total;
 						$scope.pages = ret.pages;
 						var companylist = ret.items;
-						var promises = companylist.map(function(company){
-							// console.info(company.createUser)
-							return Q.all([
-								API.company.getCompanyFundsAccountByAgency(company.id),
-								API.staff.getStaffByAgency({id: company.createUser}),
-                        		API.staff.statisticStaffsByAgency({companyId:company.id}),
-								API.agencyTripPlan.countTripPlanNum({companyId: company.id})
-								])
-							.spread(function(funds,staff,staffnum,trip){
-								company.funds = funds;
-								company.staff = staff;
-								// console.info(staff)
-								company.staffnum = staffnum;
-								company.tirpnum = trip;
-								return company;
-							})
-							.catch(function(err) {
-								return company;
-							});
-
+						var promises = companylist.map(function(companyId){
+							return API.company.getCompanyById({companyId: companyId})
+								.then(function(company) {
+									console.info(company)
+									// console.info(company.createUser)
+									return Promise.all([
+											API.company.getCompanyFundsAccountByAgency(company.id),
+											API.staff.getStaff({id: company.createUser, companyId: company.id}),
+											API.staff.statisticStaffs({companyId:company.id}),
+											API.agencyTripPlan.countTripPlanNum({companyId: company.id})
+										])
+										.spread(function(funds,staff,staffnum,trip){
+											company.funds = funds;
+											company.staff = staff;
+											// console.info(staff)
+											company.staffnum = staffnum;
+											company.tirpnum = trip;
+											return company;
+										})
+										.catch(function(err) {
+											return company;
+										});
+								})
 						});
-						return Q.all(promises);
+						return Promise.all(promises);
 					})
 					.then(function(companylist){
 						$scope.companylist = companylist;
-						$scope.$apply();
-                        loading(true);
+						$loading.end();
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err);
@@ -89,15 +90,14 @@ module.exports = (function(){
 			window.location.href = "#/companyList/CreateCorp";
 		}
 	}
-	companyList.CompanyDetailController = function($scope,$routeParams){
-		loading(true);
+	companyList.CompanyDetailController = function($scope,$stateParams,$loading){
 		$("title").html("公司详情");
-		var companyId = $routeParams.company;
+		var companyId = $stateParams.company;
 		$scope.companyId = companyId;
 		//企业管理详情页
 		$scope.initCompanyDetail = function(){
 			$(".left_nav li").removeClass("on").eq(1).addClass("on");
-			loading(false);
+			$loading.start();
 			API.onload(function(){
 				API.company.getCompanyById(companyId)
 					.then(function(company){
@@ -106,15 +106,14 @@ module.exports = (function(){
 						var staffId = company.createUser;
 						var companyId = company.id;
 						console.info(company)
-						$scope.$apply();
-                        loading(true);
-                        Q.all([
-                        	API.staff.getStaffByAgency({id:staffId}),
+						$loading.end();
+                        Promise.all([
+                        	API.staff.getStaff({id:staffId, companyId: companyId}),
                         	API.company.getCompanyFundsAccountByAgency(companyId),
-                        	API.staff.statisticStaffsByAgency({companyId:companyId}),
+                        	API.staff.statisticStaffs({companyId:companyId}),
                         	// API.tripPlan.countTripPlanNum()
                         	API.agencyTripPlan.countTripPlanNum({companyId: companyId}),
-							API.staff.statStaffPointsByAgency(companyId)
+							API.staff.statStaffPoints({companyId: companyId})
                         ])
                         .spread(function(staff,funds,staffnum,trip, points){
                         	$scope.tripnum = trip;
@@ -122,7 +121,6 @@ module.exports = (function(){
                         	$scope.funds = funds;
                         	$scope.staffnum = staffnum.all;
 								$scope.points = points;
-                        	$scope.$apply();
                         })
 					})
 					.catch(function(err){
@@ -143,7 +141,6 @@ module.exports = (function(){
 					.then(function(result){
 						console.info(result);
 						$scope.initCompanyDetail();
-						$scope.$apply();
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err);;
@@ -154,13 +151,12 @@ module.exports = (function(){
 
 	//创建公司页面
 	companyList.CreateCorpController = function($scope) {
-		loading(true);
 		$scope.createCorp = function(){
 			var corpname = $("#corpName").val();
 			var name = $("#connectName").val();
 			var email = $("#connectEmail").val();
 			var mobile = $("#connectMobile").val();
-			var reg = /^[\w\.-]+?@([\w\-]+\.){1,2}[a-zA-Z]{2,3}$/;
+			var reg = /^[\w\.\-]+@\w[\w\-\.]+\w$/;
 			var domain = email.split(/@/);
 			var commit = true;
 			if(commit){
@@ -201,60 +197,9 @@ module.exports = (function(){
 		}
 	}
 
-
-
-	//创建公司页面
-	companyList.CreateCorpController = function($scope) {
-		loading(true);
-		$scope.createCorp = function(){
-			var corpname = $("#corpName").val();
-			var name = $("#connectName").val();
-			var email = $("#connectEmail").val();
-			var mobile = $("#connectMobile").val();
-			var reg = /^[\w\.-]+?@([\w\-]+\.){1,2}[a-zA-Z]{2,3}$/;
-			var domain = email.split(/@/);
-			var commit = true;
-			if(commit){
-				if(!corpname){
-					alert("企业名称是必填项！");
-					return false;
-				}else if(!name){
-					alert("联系人姓名是必填项！");
-					return false;
-				}else if(!email){
-					alert("邮箱是必填项！");
-					return false;
-				}else if(!reg.test(email)){
-					alert("邮箱格式不正确！");
-					return false;
-				}else if(!mobile){
-					alert("手机号是必填项！");
-					return false;
-				}else if(!mobile.match(/^[1][0-9]{10}$/)){
-					alert("手机号格式不正确！");
-					return false;
-				}
-				console.info(domain);
-				console.info(domain[1]);
-				API.onload(function(){
-					API.company.createCompany({name:corpname,userName:name,email:email,mobile:mobile,domain:domain[1]})
-						.then(function(company){
-							console.info(company);
-							var id = company.id;
-							window.location.href = "#/companyList/CompanyDetail?company=" + id;
-						})
-						.catch(function(err){
-							TLDAlert(err.msg || err);;
-						}).done()
-				})
-			}
-		}
-	}
-
 	//员工管理页面
-	companyList.StaffListController = function($scope,$routeParams) {
-		loading(true);
-		var companyId = $routeParams.company;
+	companyList.StaffListController = function($scope,$stateParams) {
+		var companyId = $stateParams.company;
 		$scope.companyId = companyId;
 		$(".left_nav li").removeClass("on").eq(1).addClass("on");
 
@@ -268,11 +213,11 @@ module.exports = (function(){
 				options.page = $scope.page;
 				params.options = options;
 				params.companyId = companyId;
-				Q.all([
-					API.travelPolicy.agencyGetAllTravelPolicy({where: {companyId:companyId}}),//获取当前所有的差旅标准名称
-					API.staff.agencyListAndPaginateStaff(params),//加载所有的员工记录
-					API.staff.agencyStatisticStaffsRole({companyId:companyId}),//统计企业员工（管理员 普通员工 未激活员工 总数）数量
-					API.department.agencyGetFirstClassDepartments({companyId:companyId})//企业部门
+				Promise.all([
+					API.travelPolicy.getAllTravelPolicy({where: {companyId:companyId}}),//获取当前所有的差旅标准名称
+					API.staff.listAndPaginateStaff(params),//加载所有的员工记录
+					API.staff.statisticStaffsRole({companyId:companyId}),//统计企业员工（管理员 普通员工 未激活员工 总数）数量
+					API.department.getFirstClassDepartments({companyId:companyId})//企业部门
 				])
 					.spread(function(travelPolicies,staffinfo,staffRole, departments){
 						$scope.total = staffinfo.total;
@@ -296,8 +241,8 @@ module.exports = (function(){
 						//console.info($scope.staff);
 						var tasks = $scope.staffs
 							.map(function($staff){ //通过id拿到差旅标准的名字
-								return Q.all([
-									API.travelPolicy.agencyGetTravelPolicy({id:$staff.travelLevel,companyId: companyId}),
+								return Promise.all([
+									API.travelPolicy.getTravelPolicy({id:$staff.travelLevel,companyId: companyId}),
 									API.auth.getAccountStatus({id:$staff.id})
 								])
 									.spread(function(travelLevel, acc){
@@ -307,7 +252,6 @@ module.exports = (function(){
 											$staff.activeStatus = acc.status;
 											$staff.accStatus = acc.status==0?'未激活':'';
 										}
-										$scope.$apply();
 									})
 							});
 						//统计企业员工（管理员 普通员工 未激活员工）数量
@@ -315,10 +259,7 @@ module.exports = (function(){
 						$scope.manager = staffRole.adminNum;
 						$scope.publicStaff = staffRole.commonStaffNum;
 						$scope.totalCount = staffRole.totalCount;
-						return Q.all(tasks)
-							.then(function(){
-								$scope.$apply();
-							})
+						return Promise.all(tasks);
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
 					})
@@ -379,7 +320,7 @@ module.exports = (function(){
 				if(department && department!= ""){
 					params.department = department;
 				}
-				return API.staff.agencyListAndPaginateStaff(params)//加载所有的员工记录
+				return API.staff.listAndPaginateStaff(params)//加载所有的员工记录
 					.then(function(staffinfo){
 						console.log(staffinfo);
 						$scope.total = staffinfo.total;
@@ -387,8 +328,8 @@ module.exports = (function(){
 						$scope.staffs = staffinfo.items;
 						var tasks = $scope.staffs
 							.map(function($staff){ //通过id拿到差旅标准的名字
-								return Q.all([
-									API.travelPolicy.agencyGetTravelPolicy({id:$staff.travelLevel,companyId: companyId}),
+								return Promise.all([
+									API.travelPolicy.getTravelPolicy({id:$staff.travelLevel,companyId: companyId}),
 									API.auth.getAccountStatus({id:$staff.id})
 								])
 									.spread(function(travelLevel, acc){
@@ -398,13 +339,9 @@ module.exports = (function(){
 											$staff.activeStatus = acc.status;
 											$staff.accStatus = acc.status==0?'未激活':'';
 										}
-										$scope.$apply();
 									})
 							});
-						return Q.all(tasks)
-							.then(function(){
-								$scope.$apply();
-							})
+						return Promise.all(tasks);
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err);;
@@ -423,7 +360,7 @@ module.exports = (function(){
 				if(department && department!= ""){
 					params.department = department;
 				}
-				return API.staff.agencyListAndPaginateStaff(params)//加载所有的员工记录
+				return API.staff.listAndPaginateStaff(params)//加载所有的员工记录
 					.then(function(staffinfo){
 						console.log(staffinfo);
 						$scope.total = staffinfo.total;
@@ -443,8 +380,8 @@ module.exports = (function(){
 						$scope.staffs = staffinfo.items;
 						var tasks = $scope.staffs
 							.map(function($staff){ //通过id拿到差旅标准的名字
-								return Q.all([
-									API.travelPolicy.agencyGetTravelPolicy({id:$staff.travelLevel,companyId: companyId}),
+								return Promise.all([
+									API.travelPolicy.getTravelPolicy({id:$staff.travelLevel,companyId: companyId}),
 									API.auth.getAccountStatus({id:$staff.id})
 								])
 									.spread(function(travelLevel, acc){
@@ -453,13 +390,9 @@ module.exports = (function(){
 											$staff.activeStatus = acc.status;
 											$staff.accStatus = acc.status==0?'未激活':'';
 										}
-										$scope.$apply();
 									})
 							});
-						return Q.all(tasks)
-							.then(function(){
-								$scope.$apply();
-							})
+						return Promise.all(tasks);
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err);;
@@ -504,7 +437,7 @@ module.exports = (function(){
 					$(".block_tip").hide();
 				}
 				API.onload(function() {//创建员工
-					API.staff.agencyCreateStaff({name:name,mobile:tel,email:mail,companyId:$scope.companyId,department:department,travelLevel:standard,roleId:power})
+					API.staff.createStaff({name:name,mobile:tel,email:mail,companyId:$scope.companyId,department:department,travelLevel:standard,roleId:power})
 						.then(function(staffinfo){
 							$(".add_staff").hide();
 							$(".block_tip").hide();
@@ -519,7 +452,6 @@ module.exports = (function(){
 								$("#staffPower").val("");
 							}
 							$scope.initstafflist();
-							$scope.$apply();
 						}).catch(function (err) {
 							console.log(err);
 							if(err.code == -29){
@@ -530,7 +462,6 @@ module.exports = (function(){
 								$scope.block_tip_err = err.msg;
 							}
 							$(".block_tip").show();
-							$scope.$apply();
 						}).done();
 				})
 			}
@@ -541,11 +472,10 @@ module.exports = (function(){
 		$scope.editStaffInfo = function(id,index) {
 			//$("#change"+index).addClass("orange");
 			API.onload(function(){
-				API.staff.agencyGetStaff({id: id,companyId: companyId})
+				API.staff.getStaff({id: id,companyId: companyId})
 					.then(function(staffinfo){
-						$scope.travellevel = staffinfo.staff.travelLevel;
+						$scope.travellevel = staffinfo.travelLevel;
 						$scope.selectkey = $scope.travellevel || "";
-						$scope.$apply();
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
 					}).done();
@@ -568,12 +498,11 @@ module.exports = (function(){
 			var commit = true;
 
 			API.onload(function(){
-				API.staff.agencyUpdateStaff({id: id, name:name,mobile:tel,email:mail,department:department,travelLevel:standard,roleId:power,companyId: companyId})
+				API.staff.updateStaff({id: id, name:name,mobile:tel,email:mail,department:department,travelLevel:standard,roleId:power,companyId: companyId})
 					.then(function(newStaff){
 						$(".add_staff2").hide();
 						//$scope.initstafflist();
 						$scope.initstafflist();
-						$scope.$apply();
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
 					}).done();
@@ -590,10 +519,9 @@ module.exports = (function(){
 		$scope.delStaffInfo = function(id, index) {
 			//console.log(index);
 			API.onload(function(){
-				API.staff.agencyDeleteStaff({id:id,companyId: companyId})
+				API.staff.deleteStaff({id:id,companyId: companyId})
 					.then(function(newStaff){
 						$scope.staffs.splice(index, 1);
-						$scope.$apply();
 						$scope.initstafflist();
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
@@ -612,7 +540,7 @@ module.exports = (function(){
 		}
 		$scope.deleteInfo = function () {
 			API.onload(function(){
-				API.staff.agencyDeleteStaff({id:$scope.deleteId,companyId: companyId})
+				API.staff.deleteStaff({id:$scope.deleteId,companyId: companyId})
 					.then(function(newStaff){
 						$(".confirmFixed").hide();
 						$scope.initstafflist();
@@ -651,26 +579,16 @@ module.exports = (function(){
 			$(".staff_tab_content").hide();
 			$(".staff_tab_import").hide();
 			$(".staff_import_success").hide();
-			var md5key = $("#fileMd5key").val();
+			var fileId = $("#fileId").val();
 			API.onload(function(){
-				//API.staff.getCurrentStaff()//获取当前登录人员的id
-				//	.then(function(staffid){
-				//console.info(staffid);
-				//console.info(staffid.id);
-				//console.info(md5key);
-				API.staff.beforeImportExcel({md5key:md5key, companyId: companyId})
+				API.staff.beforeImportExcel({fileId:fileId, companyId: companyId})
 					.then(function(allData){
-						//console.info(allData);
-						//console.info(allData.noAddObj);
 						$scope.invalid = JSON.parse(allData.noAddObj);
 						$scope.valid = JSON.parse(allData.addObj);
 						$scope.downloadInvalidData = allData.downloadNoAddObj;
 						$scope.downloadValidData = allData.downloadAddObj;
 						$scope.validData = JSON.parse(allData.addObj).length;
 						$scope.invalidData = JSON.parse(allData.noAddObj).length;
-						//$scope.totalData =
-						//return $scope.valid;
-						$scope.$apply();
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err);;
@@ -699,7 +617,6 @@ module.exports = (function(){
 					.then(function(result){
 						var filename = result.fileName;
 						window.open('/download/excle-file/'+filename, "_blank");
-						$scope.$apply();
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
 					})
@@ -721,7 +638,6 @@ module.exports = (function(){
 						$(".staff_tab_valid").hide();
 						$(".staff_tab_content").hide();
 						$(".staff_tab_import").hide();
-						$scope.$apply();
 					}).catch(function(err){
 						TLDAlert(err.msg || err);;
 					}).done();
@@ -731,21 +647,21 @@ module.exports = (function(){
 
 
 	//组织架构页面
-	companyList.DepartmentController = function($scope, $routeParams) {
+	companyList.DepartmentController = function($scope, $stateParams, $loading) {
 		$("title").html("组织架构");
-		loading(false);
 		//初始化
-		$scope.companyId = $routeParams.companyId;
+		$scope.companyId = $stateParams.companyId;
 		$scope.initdepartment = function(){
+			$loading.start();
 			API.onload(function(){
-				API.department.agencyGetFirstClassDepartments({companyId:$scope.companyId})
+				API.department.getFirstClassDepartments({companyId:$scope.companyId})
 					.then(function(defaulDepartment){
 						console.info (defaulDepartment);
 						var defaultname = defaulDepartment;
 						$scope.departmentName = defaultname[0].name;
 						$scope.departmentId = defaultname[0].id;
 						//获取部门列表
-						API.department.agencyGetChildDepartments({companyId:$scope.companyId,parentId:$scope.departmentId})
+						API.department.getChildDepartments({companyId:$scope.companyId,parentId:$scope.departmentId})
 							.then(function(departmentlist){
 								$scope.departmentlist = departmentlist;
 								departmentlist.map(function(s){
@@ -753,12 +669,10 @@ module.exports = (function(){
 										.then(function(num){
 											s.peoplenum = num;
 											console.info ($scope.departmentlist);
-											$scope.$apply();
 										})
 								});
 							})
-						$scope.$apply();
-						loading(true);
+						$loading.end();
 					})
 			})
 		}
@@ -772,7 +686,7 @@ module.exports = (function(){
 		}
 		$scope.updateDepartment = function () {
 			API.onload(function(){
-				API.department.agencyUpdateDepartment({companyId:$scope.companyId,id:$scope.departmentId,name:$(".updatecompany .common_text").val()})
+				API.department.updateDepartment({companyId:$scope.companyId,id:$scope.departmentId,name:$(".updatecompany .common_text").val()})
 					.then(function(result){
 						Myalert("温馨提示","修改成功");
 						$scope.initdepartment();
@@ -791,7 +705,7 @@ module.exports = (function(){
 		}
 		$scope.createDepartment = function () {
 			API.onload(function(){
-				API.department.agencyCreateDepartment({companyId:$scope.companyId,parentId:$scope.departmentId,name:$(".createcompany .common_text").val()})
+				API.department.createDepartment({companyId:$scope.companyId,parentId:$scope.departmentId,name:$(".createcompany .common_text").val()})
 					.then(function(result){
 						Myalert("温馨提示","添加成功");
 						$scope.initdepartment();
@@ -812,7 +726,7 @@ module.exports = (function(){
 		}
 		$scope.updatechildDepartment = function () {
 			API.onload(function(){
-				API.department.agencyUpdateDepartment({companyId:$scope.companyId,id:$scope.childDepartmentId,name:$(".updatechildDepartment .common_text").eq($scope.index).val()})
+				API.department.updateDepartment({companyId:$scope.companyId,id:$scope.childDepartmentId,name:$(".updatechildDepartment .common_text").eq($scope.index).val()})
 					.then(function(result){
 						Myalert("温馨提示","修改成功");
 						$scope.initdepartment();
@@ -832,7 +746,7 @@ module.exports = (function(){
 		}
 		$scope.deleteDepartment = function () {
 			API.onload(function(){
-				API.department.agencyDeleteDepartment({companyId:$scope.companyId,id:$scope.deleteId})
+				API.department.deleteDepartment({companyId:$scope.companyId,id:$scope.deleteId})
 					.then(function(result){
 						$scope.initdepartment();
 						$(".confirmFixed").hide();
@@ -865,21 +779,21 @@ module.exports = (function(){
 	 * @param $scope
 	 * @constructor
 	 */
-	companyList.PolicyListController = function($scope, $routeParams) {
+	companyList.PolicyListController = function($scope, $stateParams, $loading) {
 		$("title").html("差旅标准");
 		Myselect();
-		$scope.companyId = $routeParams.companyId;
+		$scope.companyId = $stateParams.companyId;
 
 		//获取差旅标准列表
 		$scope.initPolicyList = function () {
-			loading(false);
+			$loading.start();
 			API.onload(function(){
 				var params = {};
-				var options = {order: [["create_at", "asc"]]};
+				var options = {order: [["created_at", "asc"]]};
 				options.perPage = 100;
 				params.options = options;
 				params.companyId = $scope.companyId;
-				API.travelPolicy.agencyListAndPaginateTravelPolicy(params)
+				API.travelPolicy.listAndPaginateTravelPolicy(params)
 					.then(function(result){
 						console.info (result);
 						$scope.PolicyTotal = result.total;
@@ -896,8 +810,7 @@ module.exports = (function(){
 								$(".policy_title").addClass('policy_titlefixed');
 							}
 						});
-						loading(true);
-						$scope.$apply();
+						$loading.end();
 					})
 					.catch(function(err){
 						console.info (err);
@@ -944,7 +857,7 @@ module.exports = (function(){
 
 
 			API.onload(function(){
-				API.travelPolicy.agencyCreateTravelPolicy({
+				API.travelPolicy.createTravelPolicy({
 					name:$(".create_policy .Cname").val(),
 					planeLevel:$(".create_policy .CplaneLevel").html(),
 					planeDiscount:$(".create_policy .CplaneDiscount").attr('selectValue'),
@@ -977,7 +890,7 @@ module.exports = (function(){
 		}
 		$scope.deletePolicy = function () {
 			API.onload(function(){
-				API.travelPolicy.agencyDeleteTravelPolicy({companyId:$scope.companyId,id:$scope.deleteId})
+				API.travelPolicy.deleteTravelPolicy({companyId:$scope.companyId,id:$scope.deleteId})
 					.then(function(result){
 						$(".confirmFixed").hide();
 						$scope.initPolicyList();
@@ -1104,7 +1017,7 @@ module.exports = (function(){
 
 
 			API.onload(function(){
-				API.travelPolicy.agencyUpdateTravelPolicy({
+				API.travelPolicy.updateTravelPolicy({
 					id:$scope.updateId,
 					name:$(".update_policy .Cname").val(),
 					planeLevel:$(".update_policy .CplaneLevel").html(),

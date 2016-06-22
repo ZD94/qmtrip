@@ -1,0 +1,72 @@
+<ion-view title="我要出差" id="page1" style="background-color:#E8E7E9;">
+    <ion-content padding="true" style="background: url(ionic/images/backgroud.png) no-repeat center;background-size:cover;" class="has-header">
+        <form class="list">
+            <label class="item item-input">
+                <span class="input-label">出差日期</span>
+                <input type="date" placeholder="" ng-model="trip.beginDate">
+            </label>
+            <label class="item item-input">
+                <span class="input-label">结束日期</span>
+                <input type="date" placeholder="" ng-model="trip.endDate">
+            </label>
+            <label class="item item-input">
+                <span class="input-label">出差地点</span>
+                <input type="text" placeholder="请选择目的地" ng-model="trip.placeName"
+                       ng-selector
+                       ng-selector-title="出差地点选择"
+                       ng-selector-placeholder="请输入城市名或首字母缩写"
+                       ng-selector-query="queryPlaces"
+                       ng-selector-done = "choosePlace"
+                />
+            </label>
+            <label class="item item-input">
+                <span class="input-label">出差事由</span>
+                <input type="text" placeholder="请选择事由" ng-model="trip.reasonName"
+                       ng-selector
+                       ng-selector-title="项目选择"
+                       ng-selector-placeholder="请选择或输入项目"
+                       ng-selector-query="queryProjects"
+                       ng-selector-create="createProject"
+                       ng-selector-done="chooseReason"
+                >
+            </label>
+            <div class="spacer" style="width: 300px; height: 9px;"></div>
+            <ion-toggle toggle-class="toggle-positive" ng-model="trip.traffic">交通</ion-toggle>
+            <div ng-if="trip.traffic">
+                <label class="item item-input" ng-if="trip.traffic">
+                    <span class="input-label">出发地</span>
+                    <input type="text" placeholder="出发地选择" ng-model="trip.fromPlaceName"
+                           ng-selector
+                           ng-selector-title="出发地选择"
+                           ng-selector-placeholder="请输入城市名或首字母缩写"
+                           ng-selector-query="queryPlaces"
+                           ng-selector-done = 'chooseFromPlace'
+                    >
+                </label>
+                <ion-toggle toggle-class="toggle-positive" ng-model="trip.round">返程</ion-toggle>
+            </div>
+            <div class="spacer" style="width: 300px; height: 9px;"></div>
+            <ion-toggle toggle-class="toggle-positive" ng-model="trip.hotel">住宿<span ng-if="trip.hotel">（共{{calcTripDuration()}}天）</span></ion-toggle>
+            <div ng-if="trip.hotel">
+                <!--<div class="button-bar">
+                    &lt;!&ndash;<button id="page6-button34" class="button button-light button-small button-block" ng-click="decTripDuration()">-</button>&ndash;&gt;
+                    <button id="page6-button35" class="button button-stable button-block">共{{calcTripDuration()}}天</button>
+                    &lt;!&ndash;<button id="page6-button36" class="button button-light button-small button-block" ng-click="incTripDuration()">+</button>&ndash;&gt;
+                </div>-->
+                <label class="item item-input" style="margin-top: 10px;">
+                    <span class="input-label">地标</span>
+                    <input type="text" placeholder="请选择地标（选填）" ng-model="trip.hotelPlaceName"
+                           ng-selector
+                           ng-selector-title="地标选择"
+                           ng-selector-placeholder='请输入地标名称或首字母'
+                           ng-selector-query="queryHotelPlace"
+                           ng-selector-done = 'chooseHotelPlace'
+                    >
+                </label>
+            </div>
+            <div>
+                <a id="page1-button26" class="button button-positive  button-block" ng-click="nextStep()">下一步</a>
+            </div>
+        </form>
+    </ion-content>
+</ion-view>

@@ -1,0 +1,20 @@
+<ion-view title="员工管理" id="page27">
+    <ion-content padding="true" class="has-header">
+        <form class="list">
+            <div class="button-bar">
+                <a href="#/company/staffdetail" id="page27-button83" class="button button-positive  button-block">添加员工</a>
+            </div>
+            <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input type="search" placeholder="请输入员工姓名" ng-model="option.name" ng-change="search()">
+            </label>
+        </form>
+        <ion-list>
+            <ion-item class="item-avatar" ng-href="#/company/staffdetail?staffId={{staff.staff.id}}" ng-repeat="staff in staffs">
+                <h2>{{staff.staff.name}}</h2>
+                <p>{{staff.travelPolicy.name}}</p>
+                <i class="icon ion-android-contact icon-accessory" ng-if="staff.role == '创建者'"></i>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>

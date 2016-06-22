@@ -4,6 +4,8 @@
 'use strict';
 var businesstravel=(function(){
 
+    var msgbox = require('msgbox');
+
     API.require("auth");
     API.require("place");
     API.require("staff");
@@ -21,8 +23,6 @@ var businesstravel=(function(){
     businesstravel.IndexController = function($scope) {
         $scope.$root.pageTitle = '我要出差';
         //console.info($scope.$root.pageTitle);
-        loading(true);
-
         if (sessionStorage.isTraffic == undefined) {
             sessionStorage.isTraffic = 'false';
         }
@@ -58,7 +58,6 @@ var businesstravel=(function(){
                     })
                     .spread(function(purposeCode, purposeName) {
                         $scope.purposeName = purposeName;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -104,10 +103,8 @@ var businesstravel=(function(){
      * @param $scope
      * @constructor
      */
-    businesstravel.TrafficController = function($scope) {
+    businesstravel.TrafficController = function($scope, calendar, mobiscroll) {
         $scope.$root.pageTitle = '我要出差';
-        loading(true);
-
         //遍历存储数据为undefined
         for (var i = 0, len = sessionStorage.length; i < len; i++) {
             var key = sessionStorage.key(i);
@@ -158,7 +155,6 @@ var businesstravel=(function(){
                         $scope.startCityName = startCityName;
                         $scope.startCityCode = startCityCode;
                         $('#startCity').attr('code',$scope.startCityCode);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -195,7 +191,6 @@ var businesstravel=(function(){
                         $scope.endCityName = endCityName;
                         $scope.endCityCode = endCityCode;
                         $('#endCity').attr('code',$scope.endCityCode);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -210,7 +205,6 @@ var businesstravel=(function(){
             })
                 .then(function(startDate) {
                     $scope.startDate = startDate;
-                    $scope.$apply();
                 })
                 .catch(function(err) {
                     console.error(err);
@@ -231,7 +225,6 @@ var businesstravel=(function(){
             })
                 .then(function(endDate) {
                     $scope.endDate = endDate;
-                    $scope.$apply();
                 })
                 .catch(function(err) {
                     console.error(err);
@@ -298,10 +291,8 @@ var businesstravel=(function(){
      * @param $scope
      * @constructor
      */
-    businesstravel.HotelController = function($scope) {
+    businesstravel.HotelController = function($scope, calendar) {
         $scope.$root.pageTitle = '动态预算结果';
-        loading(true);
-
         //遍历存储数据为undefined
         for (var i = 0, len = sessionStorage.length; i < len; i++) {
             var key = sessionStorage.key(i);
@@ -368,7 +359,6 @@ var businesstravel=(function(){
                         $scope.hotelCityName = hotelCityName;
                         $scope.hotelCityCode = hotelCityCode;
                         $('#hotelCity').attr('code',$scope.hotelCityCode);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -405,7 +395,6 @@ var businesstravel=(function(){
                         $scope.hotelPlaceName = hotelPlaceName;
                         $scope.hotelPlaceCode = hotelPlaceCode;
                         $('#hotelName').attr('code',$scope.hotelPlaceCode);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -420,7 +409,6 @@ var businesstravel=(function(){
             })
                 .then(function(startHotelDate) {
                     $scope.startHotelDate = startHotelDate;
-                    $scope.$apply();
                 })
                 .catch(function(err) {
                     console.error(err);
@@ -441,7 +429,6 @@ var businesstravel=(function(){
             })
                 .then(function(endHotelDate) {
                     $scope.endHotelDate = endHotelDate;
-                    $scope.$apply();
                 })
                 .catch(function(err) {
                     console.error(err);
@@ -487,10 +474,8 @@ var businesstravel=(function(){
      * @param $scope
      * @constructor
      */
-    businesstravel.CreateresultController = function($scope , $routeParams) {
+    businesstravel.CreateresultController = function($scope , $stateParams) {
         $scope.$root.pageTitle = '动态预算结果';
-        loading(true);
-
         //遍历存储数据为undefined
         for (var i = 0, len = sessionStorage.length; i < len; i++) {
             var key = sessionStorage.key(i);
@@ -533,13 +518,13 @@ var businesstravel=(function(){
         //只选交通
         if ($scope.isTraffic && !$scope.isHotel) {
             API.onload(function() {
-                Q.all([
+                Promise.all([
                     API.staff.getCurrentStaff(),
                     API.travelBudget.getTrafficBudget({
                         originPlace:$scope.startCityCode,
                         destinationPlace:$scope.endCityCode,
-                        outboundDate:$scope.startDate,
-                        inboundDate:$scope.endDate,
+                        leaveDate:$scope.startDate,
+                        goBackDate:$scope.endDate,
                         outLatestArriveTime:$scope.startTimeLate,
                         inLatestArriveTime:$scope.endTimeLate,
                         isRoundTrip:$scope.endDate
@@ -570,8 +555,6 @@ var businesstravel=(function(){
                         if (ret2.backTraffic.type == 'train') {
                             $scope.backTrafficType = 'TRAIN';
                         }
-                        $scope.$apply();
-
                     })
                     .catch(function(err){
                         console.info (err);
@@ -583,7 +566,7 @@ var businesstravel=(function(){
         //只选住宿
         if (!$scope.isTraffic && $scope.isHotel) {
             API.onload(function() {
-                Q.all([
+                Promise.all([
                     API.staff.getCurrentStaff(),
                     API.travelBudget.getHotelBudget({
                         cityId:$scope.hotelCityCode,
@@ -598,7 +581,6 @@ var businesstravel=(function(){
                         $scope.onlyHotel = ret2;
                         $scope.totalPrice = ret2.price;
                         $scope.hotelPrice = ret2.price;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -610,13 +592,13 @@ var businesstravel=(function(){
         //选择交通和住宿
         if ($scope.isTraffic && $scope.isHotel) {
             API.onload(function() {
-                Q.all([
+                Promise.all([
                     API.staff.getCurrentStaff(),
                     API.travelBudget.getTravelPolicyBudget({
                         originPlace:$scope.startCityCode,
                         destinationPlace:$scope.endCityCode,
-                        outboundDate:$scope.startDate,
-                        inboundDate:$scope.endDate,
+                        leaveDate:$scope.startDate,
+                        goBackDate:$scope.endDate,
                         outLatestArriveTime:$scope.startTimeLate,
                         inLatestArriveTime:$scope.endTimeLate,
                         cityId:$scope.hotelCityCode,
@@ -653,7 +635,6 @@ var businesstravel=(function(){
                         if (ret2.backTraffic.type == 'train') {
                             $scope.backTrafficType = 'TRAIN';
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -672,10 +653,10 @@ var businesstravel=(function(){
                     companyId:$scope.companyId,
                     type:1,
                     description:$scope.purposeName,
-                    startPlace:$scope.startCityName,
-                    startPlaceCode:$scope.startCityCode,
-                    destination:$scope.endCityName,
-                    destinationCode:$scope.endCityCode,
+                    deptCity:$scope.startCityName,
+                    deptCityCode:$scope.startCityCode,
+                    arrivalCity:$scope.endCityName,
+                    arrivalCityCode:$scope.endCityCode,
                     startAt:$scope.startDate,
                     startTime:$scope.startHotelDate,
                     endTime:$scope.endHotelDate,
@@ -710,10 +691,10 @@ var businesstravel=(function(){
                 if($scope.startDate){
                     var consumeDetails_outTraffic = {
                         type:-1,
-                        startPlace:$scope.startCityName,
-                        startPlaceCode:$scope.startCityCode,
-                        arrivalPlace:$scope.endCityName,
-                        arrivalPlaceCode:$scope.endCityCode,
+                        deptCity:$scope.startCityName,
+                        deptCityCode:$scope.startCityCode,
+                        arrivalCity:$scope.endCityName,
+                        arrivaltCityCode:$scope.endCityCode,
                         startTime:$scope.startDate,
                         budget:Number($scope.goTrafficPrice),
                         invoiceType:$scope.goTrafficType
@@ -730,10 +711,10 @@ var businesstravel=(function(){
                 if($scope.endDate){
                     var consumeDetails_backTraffic = {
                         type:1,
-                        startPlace:$scope.endCityName,
-                        startPlaceCode:$scope.endCityCode,
-                        arrivalPlace:$scope.startCityName,
-                        arrivalPlaceCode:$scope.startCityCode,
+                        deptCity:$scope.endCityName,
+                        deptCityCode:$scope.endCityCode,
+                        arrivalCity:$scope.startCityName,
+                        arrivaltCityCode:$scope.startCityCode,
                         startTime:$scope.endDate,
                         budget:Number($scope.backTrafficPrice),
                         invoiceType: $scope.backTrafficType
@@ -744,7 +725,7 @@ var businesstravel=(function(){
                     consumeDetails.push(consumeDetails_backTraffic);
                 }
                 order.consumeDetails = consumeDetails;
-                API.tripPlan.savePlanOrder(order)
+                API.tripPlan.saveTripPlan(order)
                     .then(function(result){
                         console.info (result);
                         msgbox.log("已成功生成出差记录");
@@ -775,7 +756,6 @@ var businesstravel=(function(){
      */
     businesstravel.FailController = function($scope) {
         $scope.$root.pageTitle = '错误提示';
-        loading(true);
     }
 
     return businesstravel;

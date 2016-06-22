@@ -3,32 +3,46 @@
  */
 "use strict";
 
+var path = require('path');
 var gulp = require('gulp');
 var gulplib = require('./common/gulplib');
 
-gulplib.bundle_lib('ws', {require:['ws'], exclude:['bufferutil', 'utf-8-validate']});
-gulplib.bundle_lib('api', {require:['q', 'md5', 'moment', 'tiny-cookie', 'shoe', './common/client/api.js:api']});
-gulplib.bundle_lib('calendar', {require:['lunar-calendar', "./common/client/calendar.js:calendar"]});
-gulplib.bundle_lib('jquery', {require:['jquery', 'jquery-ui']});
-gulplib.bundle_lib('msgbox', {require:['notie', './common/client/msgbox.js:msgbox']});
-gulplib.bundle_lib('arale-qrcode', {require:['arale-qrcode']});
-gulplib.bundle_lib('ngapp', './common/client/ngapp.js', {external:['api']});
-gulplib.bundle_lib('bootstrap', {require:["bootstrap"]});
-gulplib.bundle_lib('swiper', {require:['swiper']});
-gulplib.bundle_lib('hidpi-canvas', {require:['hidpi-canvas']});
-gulplib.bundle_lib("exif-orient", {require:["exif-orient"]});
-gulplib.bundle_lib("exif", {require: ["exif-js"]})
-gulplib.angular_app('staff');
-gulplib.angular_app('corp');
-gulplib.angular_app('extendfunction');
-gulplib.angular_app('agency');
-gulplib.angular_app('mobile');
+gulplib.public_dir = 'www';
+
+gulplib.bundle_lib('browserify', {ex: true, ts: false, require:[
+    'lessify', 'buffer', 'querystring', 'string_decoder', 'http', 'https', 'url',
+    'util', 'events', 'stream', 'zlib']});
+gulplib.bundle_lib('ws', {ex: true, ts: false, require:['ws', 'crypto'], exclude:['bufferutil', 'utf-8-validate']});
+gulplib.bundle_lib('jquery', {ex: true, ts: false, require:['jquery', 'jquery-ui']});
+gulplib.bundle_lib('bootstrap', {ex: true, ts: false, require:["bootstrap"]});
+gulplib.bundle_lib('angular', {ex: true, ts: false, require: ['angular', 'common/client/angular']});
+gulplib.bundle_lib('ionic', {ex: true, ts: false, require: ['./common/client/ionic/entry.js:ionic']});
+gulplib.bundle_lib('swiper', {ex: true, ts: false, require:['swiper']});
+gulplib.bundle_lib('img', {ex: true, ts: false, require: ['arale-qrcode', 'hidpi-canvas', 'exif-js', 'exif-orient']})
+gulplib.bundle_lib('base', {ex: true, ts: false, require:['q', 'bluebird', 'md5', 'moment', 'tiny-cookie', 'shoe', 'lodash']})
+gulplib.bundle_lib('sourcemap', {ex: true, ts: false, require:['source-map-support']})
+
+gulplib.bundle_lib('preload', {ex: true, ts: false, require:['dyload', 'buffer', 'babel-polyfill', 'common/ts_helper', 'common/zone']});
+
+gulplib.bundle_lib('api', {require:['common/client/api:common/api', 'common/api/helper', 'common/language']});
+gulplib.bundle_lib('calendar', {require:['lunar-calendar', "calendar"]});
+gulplib.bundle_lib('msgbox', {require:['notie', 'msgbox']});
+gulplib.bundle_lib('nglibs', {require: ['nglibs', 'api/_types', 'api/_types/*', 'common/model/client:common/model']});
+gulplib.bundle_lib('ngapp', {require: ['./common/client/ngapp/index.ts:ngapp', 'browserspec']});
+
+//gulplib.angular_app('staff');
+//gulplib.angular_app('corp');
+//gulplib.angular_app('extendfunction');
+//gulplib.angular_app('agency');
+//gulplib.angular_app('mobile');
+gulplib.angular_app('ionic');
+
 gulplib.dist(function(){
     var filter = require('gulp-filter');
     var dist_all = [
-        gulp.src(['public/**/*'])
-            .pipe(filter(['**', '!**/controller.js', '!**/*.less', '!**/*.map']))
-            .pipe(gulp.dest('dist/public')),
+        gulp.src([gulplib.public_dir + '/**/*'])
+            .pipe(filter(['**', '!**/controller.[jt]s', '!**/*.less', '!**/*.scss', '!**/*.map']))
+            .pipe(gulp.dest('dist/'+gulplib.public_dir)),
         gulp.src('api/**/*')
             .pipe(gulp.dest('dist/api')),
         gulp.src('common/**/*')
@@ -38,14 +52,17 @@ gulplib.dist(function(){
     copy = [
         'README.md',
         'package.json',
-        'server.js'
+        'server.js',
+        'tsd.json',
+        'tsconfig.json',
     ];
     copy.forEach(function(fname){
         dist_all.push(gulp.src(fname).pipe(gulp.dest('dist')));
     });
     copy = [
         'config',
-        'public'
+        'www',
+        'typings'
     ];
     copy.forEach(function(fname){
         dist_all.push(gulp.src(fname+'/**/*').pipe(gulp.dest('dist/'+fname)));
@@ -55,8 +72,60 @@ gulplib.dist(function(){
 
 gulplib.final('qmtrip');
 
-var path = require('path');
-var eslint = require('gulp-eslint');
+gulp.task('ionic.www', /*['default'],*/ function(){
+    var filter = require('gulp-filter');
+    return gulp.src([gulplib.public_dir + '/**/*'])
+        .pipe(filter(['**', '!**/controller.[jt]s', '!**/*.less', '!**/*.scss', '!**/*.map', '!config.json']))
+        .pipe(gulp.dest('ionic/www'));
+});
+
+gulp.task('ionic.config', function(){
+    return gulp.src(['ionic/config.json'])
+        .pipe(gulp.dest('ionic/www'));
+});
+
+gulp.task('ionic.dist', ['ionic.www', 'ionic.config']);
+
+gulp.task('ionic.ios', ['ionic.dist'], function(done){
+    var exec = require('child_process').exec;
+    process.chdir('ionic');
+    var child_res = exec('ionic resources', function(err){
+        if(err){
+            console.error(err);
+        }
+        var child_emu = exec('ionic emulate ios --target="iPhone-6s, 9.3"', function(err){
+            if(err){
+                console.error(err);
+            }
+            done();
+        });
+        child_emu.stdout.pipe(process.stdout);
+        child_emu.stderr.pipe(process.stderr);
+    });
+    child_res.stdout.pipe(process.stdout);
+    child_res.stderr.pipe(process.stderr);
+});
+
+gulp.task('ionic.android', ['ionic.dist'], function(done){
+    var exec = require('child_process').exec;
+    process.chdir('ionic');
+    var child_res = exec('ionic resources', function(err){
+        if(err){
+            console.error(err);
+        }
+        var child_emu = exec('ionic emulate android', function(err){
+            if(err){
+                console.error(err);
+            }
+            done();
+        });
+        child_emu.stdout.pipe(process.stdout);
+        child_emu.stderr.pipe(process.stderr);
+    });
+    child_res.stdout.pipe(process.stdout);
+    child_res.stderr.pipe(process.stderr);
+});
+
 function eslintformater(results, config){
     var rules = config ? (config.rules || {}) : {};
     results.forEach(function (res) {
@@ -75,7 +144,7 @@ gulp.task('eslint.server', function () {
     var files = [
         '**/*.js',
         '!node_modules/**',
-        '!public/**',
+        '!www/**',
         '!common/client/**',
         '!**/*.test.js',
         '!test/**',
@@ -98,6 +167,7 @@ gulp.task('eslint.server', function () {
         },
         "globals": {}
     };
+    var eslint = require('gulp-eslint');
     return gulp.src(files)
         .pipe(eslint(options))
         .pipe(eslint.format(eslintformater))
@@ -129,6 +199,7 @@ gulp.task('eslint.mocha', function () {
             after: function(){}
         }
     };
+    var eslint = require('gulp-eslint');
     return gulp.src(files)
         .pipe(eslint(options))
         .pipe(eslint.format(eslintformater))
@@ -136,7 +207,7 @@ gulp.task('eslint.mocha', function () {
 });
 gulp.task('eslint.browser', function () {
     var files = [
-        'public/**/controller.js'
+        'www/**/controller.js'
     ];
     var options = {
         "extends": "eslint:recommended",
@@ -156,6 +227,7 @@ gulp.task('eslint.browser', function () {
             $: function(){}
         }
     };
+    var eslint = require('gulp-eslint');
     return gulp.src(files)
         .pipe(eslint(options))
         .pipe(eslint.format(eslintformater))

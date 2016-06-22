@@ -1,1 +1,0 @@
-ALTER TABLE attachment.owners RENAME COLUMN key TO file_id;

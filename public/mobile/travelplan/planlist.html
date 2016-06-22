@@ -7,13 +7,13 @@
     <div class="list_tab">
         <div class="line"></div>
         <div class="dropdown">
-            <div class="dropdown-header">状态：{{STATUS}}<i class="icon web-icon-font">&#xf0d7;</i></div>
+            <div class="dropdown-header">状态：{{STATUS}} <i class="fa fa-caret-down"></i></div>
             <ul class="dropdown-menu">
                 <li ng-repeat="status in statuses" ng-click="selectStatus($index)" ng-class="{true:'active'}[(status===STATUS)]">{{status}}</li>
             </ul>
         </div>
         <div class="dropdown">
-            <div class="dropdown-header">排序：{{ORDER}}<i class="icon web-icon-font">&#xf0d7;</i></div>
+            <div class="dropdown-header">排序：{{ORDER}} <i class="fa fa-caret-down"></i></div>
             <ul class="dropdown-menu">
                 <li ng-repeat="order in orders" ng-click="selectOrder($index)" ng-class="{true:'active'}[(order===ORDER)]">{{order}}</li>
             </ul>
@@ -26,13 +26,13 @@
                 <div class="item-left w100">
                     <div class="top">
                         <span class="journey">
-                            <span ng-if="item.startPlace">{{item.startPlace}}——</span><span>{{item.destination}}</span>
+                            <span ng-if="item.deptCity">{{item.deptCity}}——</span><span>{{item.arrivalCity}}</span>
                         </span>
                         <span ng-if=" item.outTraffic.length!==0 ">
                             <span class="icon web-icon-font3" ng-if=" item.outTraffic[0].invoiceType==='TRAIN'||item.orderStatus==='NO_BUDGET' ">&#xe911;</span><!--火车图标-->
                             <span class="icon web-icon-font3" ng-if=" item.outTraffic[0].invoiceType==='PLANE'&&item.orderStatus!=='NO_BUDGET' ">&#xe90e;</span><!--飞机图标-->
                         </span>
-                        <span class="icon web-icon-font3" ng-if=" item.hotel.length===1 ">&#xe914;</span><!--酒店图标-->
+                        <symbol name="hotel" ng-if=" item.hotel.length===1 "/><!--酒店图标-->
                     </div>
                     <div class="bottom">
                         <p>

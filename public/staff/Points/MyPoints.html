@@ -38,7 +38,7 @@
                         <td width="620">状态</td>
                     </tr>
                     <tr ng-repeat="items in record">
-                        <td>{{items.createAt | date: 'yyyy-MM-dd'}}</td>
+                        <td>{{items.createdAt | date: 'yyyy-MM-dd'}}</td>
                         <td ng-if="items.status == 1">+{{items.points}}</td>
                         <td ng-if="items.status == -1" class="reducePoint">-{{items.points}}</td>
                         <td><a href="" ng-if="items.orderCreateAt != null" ng-click="enterDetail(items.orderId)">{{items.orderCreateAt | date: 'yyyy-MM-dd'}}创建的出差计划</a></td>
@@ -55,7 +55,7 @@
                         <td width="620">状态</td>
                     </tr>
                     <tr ng-repeat="items in incomerecord">
-                        <td>{{items.createAt | date: 'yyyy-MM-dd'}}</td>
+                        <td>{{items.createdAt | date: 'yyyy-MM-dd'}}</td>
                         <td ng-if="items.status == 1">+{{items.points}}</td>
                         <td ng-if="items.status == -1" class="reducePoint">-{{items.points}}</td>
                         <td><a href="" ng-if="items.orderCreateAt != null" ng-click="enterDetail(items.orderId)">{{items.orderCreateAt | date: 'yyyy-MM-dd'}}创建的出差计划</a></td>
@@ -72,7 +72,7 @@
                         <td width="620">状态</td>
                     </tr>
                     <tr ng-repeat="items in payrecord">
-                        <td>{{items.createAt | date: 'yyyy-MM-dd'}}</td>
+                        <td>{{items.createdAt | date: 'yyyy-MM-dd'}}</td>
                         <td ng-if="items.status == 1">+{{items.points}}</td>
                         <td ng-if="items.status == -1" class="reducePoint">-{{items.points}}</td>
                         <td><a href="" ng-if="items.orderCreateAt != null" ng-click="enterDetail(items.orderId)">{{items.orderCreateAt | date: 'yyyy-MM-dd'}}创建的出差计划</a></td>

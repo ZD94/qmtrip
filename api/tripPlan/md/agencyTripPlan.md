@@ -11,7 +11,7 @@
 ### Client API列表
 ---
 
->. 代理商获取差旅计划单明细 API.agencyTripPlan.getTripPlanOrderById(params, callback);
+>. 代理商获取差旅计划单明细 API.agencyTripPlan.getTripPlan(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -25,7 +25,7 @@
 
 
 
->. 代理商获取差旅计划单列表 API.tripPlan.pageTripPlanOrder(params, callback);
+>. 代理商获取差旅计划单列表 API.tripPlan.pageTripPlans(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -33,8 +33,8 @@
 | params.page             |需要查询的页数  |integer  |选填，默认为1
 | params.perPage              |每页查询的数据数目     |integer     |选填，默认为10
 | params.companyId         |企业Id    |uuid    |选填，不写则查询管辖所有的企业的计划单
-| params.startPlace        |出发地       |      |
-| params.destination        |目的地      |      |
+| params.deptCity        |出发地       |      |
+| params.arrivalCity        |目的地      |      |
 | params.startAt        |出发时间      |      |
 | params.backAt        |返回时间      |    |
 | params.isNeedTraffic        |是否需要交通服务      |        |

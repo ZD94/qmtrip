@@ -1,4 +1,4 @@
-@import "common.less";
+@import (reference) "common.less";
 .blue { color: @color-theme1!important;}
 .blue_bc { background-color: @color-theme1!important;}
 .user_photo {
@@ -10,9 +10,12 @@
     height: 100%;
   }
 }
+.fr{
+  float: right;
+}
 .corp_mail,.corp_pwd{
   i {
-    color: @color-theme2;
+    color: @second-text-color;
   }
   //input {
   //  margin-left: 0.5rem;
@@ -46,13 +49,13 @@
 .login {
   display: block;
   margin: 2rem auto;
-  color: @color-theme3;
+  color: @color-theme5;
   border-radius: 0.2rem;
 }
 
 .input{
   margin-left: 0.5rem;
-  width: 80%;
+  width: 90%;
   outline: medium;
   color: #4a4a4a!important;
   //font-size: 1.6rem;
@@ -65,4 +68,4 @@
   display: none;
 }
 .input:valid + .clear_input{display: inline;}
-.input:focus + .clear_input{display: inline;}
+//.input:focus + .clear_input{display: inline;}

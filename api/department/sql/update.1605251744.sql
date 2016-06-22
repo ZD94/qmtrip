@@ -1,0 +1,1 @@
+alter table department.departments alter column is_default set default false;

@@ -4,7 +4,14 @@
 'use strict';
 //可以直接require服务器根目录下的模块
 require('app-module-path').addPath(__dirname);
-require('common/typescript');
+require('common/typescript').install();
+
+process.on('unhandledRejection', (reason, p) => {
+    throw reason;
+});
+
+Error.stackTraceLimit = 40;
+var zone = require('common/zone');
 
 //服务器启动性能日志
 //var perf = require('common/perf');
@@ -18,7 +25,7 @@ var config = require("./config");
 
 Promise.config({ warnings: false });
 if(config.debug) {
-    Promise.config({ longStackTraces: true });
+    Promise.config({ longStackTraces: false });
 }
 
 var path = require('path');
@@ -27,8 +34,14 @@ var Logger = require('common/logger');
 Logger.init(config.logger);
 var logger = new Logger('main');
 
+var cache = require("common/cache");
+cache.init({redis_conf: config.redis.url, prefix: 'times:cache'});
+
 var model = require('common/model');
 model.init(config.postgres.url);
+
+var API = require('common/api');
+API.setDebug(config.debug);
 
 var Server = require('common/server');
 var server = new Server(config.appName, config.pid_file);
@@ -40,7 +53,7 @@ server.http_port = config.port;
 if(config.socket_file){
     server.http_port = config.socket_file;
 }
-server.http_root = path.join(__dirname, 'public');
+server.http_root = path.join(__dirname, 'www');
 server.http_favicon = path.join(server.http_root, 'favicon.ico');
 //server.on('init.http_handler', require('./app'));
 
@@ -57,9 +70,7 @@ server.on('init.api', function(API){
                 if (!res) {
                     return false;
                 }
-                self.accountId = params.accountid;
-                self.tokenId = params.tokenid;
-                return true;
+                return {userid: params.accountid, tokenid: params.tokenid};
             });
     });
 });
@@ -85,5 +96,7 @@ server.on('init.http', function(server){
     }
 });
 
-server.start();
+zone.forkStackTrace().run(function(){
+    server.start();
+});
 

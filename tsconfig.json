@@ -1,12 +1,28 @@
 {
+  "compileOnSave": true,
   "compilerOptions": {
     "target": "ES6",
     "module": "commonjs",
     "outDir": "tmp/tsreq",
-    "sourceMap": true
+    "noEmitHelpers": true,
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "noImplicitUseStrict": false,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": ["*", "*/index", "common/client/*", "common/client/*/index"]
+    }
+  },
+  "compilerOptionsNotUsing": {
+    "emitDecoratorMetadata": true
   },
   "exclude": [
     "node_modules",
-    "public"
+    "public",
+    "dist",
+    "ionic"
+  ],
+  "excludeNotUsing": [
   ]
 }

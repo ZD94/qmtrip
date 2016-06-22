@@ -1,5 +1,0 @@
-insert into auth.accounts (id, email, pwd, mobile, status, type) values('00000000-0000-0000-0000-000000000001', 'agency.agency@tulingdao.com', 'e10adc3949ba59abbe56e057f20f883e', '12345678900', 1, 2);
-
-insert into agency.agency_user (id, status, name, mobile, email, agency_id) values('00000000-0000-0000-0000-000000000001', 1, '途灵岛', '12345678900', 'agency.agency@tulingdao.com', '00000000-0000-0000-0000-000000000001');
-
-insert into agency.agency (id, create_user, name, status, email, mobile) values('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '途灵岛代理商', 1, 'agency.agency@tulingdao.com', '12345678900');

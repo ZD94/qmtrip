@@ -1,0 +1,22 @@
+<ion-view title="差旅标准" id="page30">
+    <ion-content padding="true" class="has-header">
+        <a href="#/company/editpolicy" id="page30-button89" class="button button-positive  button-block">新增差旅标准</a>
+        <div class="list card" ng-repeat="policy in travelPolicies" ng-click="editpolicy(policy.policy.id)">
+            <div class="item item-divider">{{policy.policy.name}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;共{{policy.usernum || 0}}人</div>
+            <div class="item item-body">
+                <div id="page30-markdown21" style="color:#000000;">
+                    <p>飞机：{{policy.policy.planeLevelName}}</p>
+                </div>
+                <div id="page30-markdown22" style="color:#000000;">
+                    <p>火车：{{policy.policy.trainLevelName}}</p>
+                </div>
+                <div id="page30-markdown23" style="color:#000000;">
+                    <p>住宿：{{policy.policy.hotelLevelName}}</p>
+                </div>
+                <div id="page30-markdown24" style="color:#000000;">
+                    <p>补助：{{policy.policy.subsidy}}元/天</p>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

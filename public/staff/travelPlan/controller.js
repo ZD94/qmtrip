@@ -17,26 +17,25 @@ var travelPlan=(function(){
      * @param $scope
      * @constructor
      */
-    travelPlan.PlanListController = function($scope) {
+    travelPlan.PlanListController = function($scope, $loading) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(1).find("li").addClass("on");
-        loading(false);
         $("title").html("出差单列表");
         //全部列表
         $scope.initPlanList = function () {
+            $loading.start();
             API.onload(function() {
                 var params = {page:$scope.page1};
                 if ($scope.keyword != '' && $scope.keyword != undefined) {
                     params.remark = {$like: '%'+ $scope.keyword + '%'};
                 }
                 params.perPage = 20; //默认20条/页
-                API.tripPlan.pageTripPlanOrder(params)
+                API.tripPlan.pageTripPlans(params)
                     .then(function(result){
                         $scope.total1 = result.total;
                         $scope.planListitems = result.items;
-                        loading(true);
+                        $loading.end();
                         console.info ($scope.total1);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -47,12 +46,11 @@ var travelPlan=(function(){
         //待出预算列表
         $scope.initPlanList2 = function () {
             API.onload(function() {
-                API.tripPlan.pageTripPlanOrder({isHasBudget: false, page:$scope.page2})
+                API.tripPlan.pageTripPlans({isHasBudget: false, page:$scope.page2})
                     .then(function(result){
                         console.info (result);
                         $scope.total2 = result.total;
                         $scope.planListitems2 = result.items;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -63,11 +61,10 @@ var travelPlan=(function(){
         //待上传票据列表
         $scope.initPlanList3 = function () {
             API.onload(function() {
-                API.tripPlan.pageTripPlanOrder({isUpload: false, page:$scope.page3})
+                API.tripPlan.pageTripPlans({isUpload: false, page:$scope.page3})
                     .then(function(result){
                         $scope.total3 = result.total;
                         $scope.planListitems3 = result.items;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -78,11 +75,10 @@ var travelPlan=(function(){
         //已完成列表
         $scope.initFinishPlanList = function () {
             API.onload(function() {
-                API.tripPlan.pageCompleteTripPlanOrder({page:$scope.page4})
+                API.tripPlan.pageCompleteTripPlans({page:$scope.page4})
                     .then(function(result){
                         $scope.total4 = result.total;
                         $scope.finishPlanListitems = result.items;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -190,16 +186,15 @@ var travelPlan=(function(){
 
         //进入详情页
         $scope.enterDetail = function (id) {
-            window.location.href = "#/travelPlan/PlanDetail?planId="+id;
+            window.location.href = "#/travelPlan/PlanDetail?tripPlanId="+id;
         }
 
         //删除
         $scope.deletePlan = function () {
             API.onload(function() {
-                API.tripPlan.deleteTripPlanOrder({orderId: 'f0f4f8c0-b5e6-11e5-88bb-9f621eb43a70'})
+                API.tripPlan.deleteTripPlan({orderId: 'f0f4f8c0-b5e6-11e5-88bb-9f621eb43a70'})
                     .then(function(result){
                         console.info (result);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -227,15 +222,15 @@ var travelPlan=(function(){
      * @param $scope
      * @constructor
      */
-    travelPlan.PlanDetailController = function($scope, $routeParams) {
+    travelPlan.PlanDetailController = function($scope, $stateParams, $loading) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(1).find("li").addClass("on");
-        loading(false);
         $("title").html("出差单明细");
-        var planId = $routeParams.planId;
+        var tripPlanId = $stateParams.tripPlanId;
         $scope.initplandetail = function(){
+            $loading.start();
             API.onload(function() {
-                API.tripPlan.getTripPlanOrderById({orderId: planId})
+                API.tripPlan.getTripPlan({id: tripPlanId})
                     .then(function(result){
                         console.info(result);
                         $scope.planDetail = result;
@@ -248,14 +243,13 @@ var travelPlan=(function(){
                                 type = "train";
                             }
                             API.travelBudget.getBookListUrl({
-                                spval : $scope.outTraffic.startPlace,
-                                epval : $scope.outTraffic.arrivalPlace,
+                                spval : $scope.outTraffic.deptCity,
+                                epval : $scope.outTraffic.arrivalCity,
                                 st : $scope.outTraffic.startTime,
                                 type : type
                             })
                             .then(function(outTrafficBookListUrl){
                                 $scope.outTrafficBookListUrl = outTrafficBookListUrl;
-                                $scope.$apply();
                             })
                             .catch(function(err){
                                 TLDAlert(err.msg || err);
@@ -267,14 +261,13 @@ var travelPlan=(function(){
                                 type = "train";
                             }
                             API.travelBudget.getBookListUrl({
-                                spval : $scope.backTraffic.startPlace,
-                                epval : $scope.backTraffic.arrivalPlace,
+                                spval : $scope.backTraffic.deptCity,
+                                epval : $scope.backTraffic.arrivalCity,
                                 st : $scope.backTraffic.startTime,
                                 type : type
                             })
                             .then(function(backTrafficBookListUrl){
                                 $scope.backTrafficBookListUrl = backTrafficBookListUrl;
-                                $scope.$apply();
                             })
                             .catch(function(err){
                                 TLDAlert(err.msg || err);
@@ -291,14 +284,12 @@ var travelPlan=(function(){
                             })
                             .then(function(hotelBookListUrl){
                                 $scope.hotelBookListUrl = hotelBookListUrl;
-                                $scope.$apply();
                             })
                             .catch(function(err){
                                 TLDAlert(err.msg || err);
                             })
                         }
-                        loading(true);
-                        $scope.$apply();
+                        $loading.end();
                         $('.warning i').hover(function(){
                             $('.special_warning').hide();
                             $(this).siblings('.special_warning').show();
@@ -373,7 +364,7 @@ var travelPlan=(function(){
         $scope.initplandetail();
         $scope.submit = function () {
             API.onload(function() {
-                API.tripPlan.commitTripPlanOrder(planId)
+                API.tripPlan.commitTripPlan(tripPlanId)
                     .then(function(result){
                         location.reload();
                         alert ("提交成功");
@@ -391,11 +382,11 @@ var travelPlan=(function(){
         }
 
         $scope.goDetail = function (status,invoiceId) {
-            window.location.href = "#/travelPlan/InvoiceDetail?planId="+planId+"&status="+status+"&invoiceId="+invoiceId;
+            window.location.href = "#/travelPlan/InvoiceDetail?tripPlanId="+tripPlanId+"&status="+status+"&invoiceId="+invoiceId;
         }
         
         $scope.initscan = function(){
-            var backUrl = "http://"+window.location.host+"/mobile.html#/travelplan/plandetail?orderId="+planId;
+            var backUrl = "http://"+window.location.host+"/mobile.html#/travelplan/plandetail?orderId="+tripPlanId;
             API.onload(function() {
                 API.auth.getQRCodeUrl({backUrl: backUrl})
                     .then(function(content) {
@@ -487,16 +478,15 @@ var travelPlan=(function(){
      * @param $scope
      * @constructor
      */
-    travelPlan.InvoiceDetailController = function($scope, $routeParams) {
-        loading(true);
+    travelPlan.InvoiceDetailController = function($scope, $stateParams) {
         $("title").html("行程单明细");
-        var planId = $routeParams.planId;
-        $scope.planId = planId;
-        $scope.status = $routeParams.status;
-        $scope.invoiceId = $routeParams.invoiceId;
+        var tripPlanId = $stateParams.tripPlanId;
+        $scope.tripPlanId = tripPlanId;
+        $scope.status = $stateParams.status;
+        $scope.invoiceId = $stateParams.invoiceId;
         API.require("attachment");
         API.onload(function() {
-            API.tripPlan.getTripPlanOrderById({orderId: planId})
+            API.tripPlan.getTripPlan({id: tripPlanId})
             .then(function(result){
                 var InvoiceDetail;
                 $scope.planDetail = result;
@@ -517,7 +507,6 @@ var travelPlan=(function(){
                 return  API.attachment.previewSelfImg({fileId: invoiceDetail.newInvoice})
                 .then(function(invoiceImg) {
                     $scope.invoiceImg = invoiceImg;
-                    $scope.$apply();
                 })
             })
             .catch(function(err){
@@ -525,7 +514,7 @@ var travelPlan=(function(){
             })
         })
         $scope.goDetail = function () {
-            window.location.href = "#/travelPlan/PlanDetail?planId="+planId;
+            window.location.href = "#/travelPlan/PlanDetail?tripPlanId="+tripPlanId;
         }
     }
 

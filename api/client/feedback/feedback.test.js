@@ -4,7 +4,6 @@
 var API = require('common/api');
 
 var assert = require("assert");
-var Q = require("q");
 
 describe("api/client/feedback.js", function() {
 
@@ -35,13 +34,13 @@ describe("api/client/feedback.js", function() {
 
     //创建部门
     before(function(done) {
-        Q.all([
+        Promise.all([
                 API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
                 API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
                 API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})
             ])
             .spread(function(ret1, ret2, ret3){
-                return API.agency.registerAgency(agency);
+                return API.agency.createAgency(agency);
             })
             .then(function(ret){
                 agencyId = ret.agency.id;
@@ -63,7 +62,7 @@ describe("api/client/feedback.js", function() {
     });
 
     after(function(done) {
-        Q.all([
+        Promise.all([
                 API.agency.deleteAgencyByTest({email: agency.email, mobile: agency.mobile}),
                 API.company.deleteCompanyByTest({email: company.email, mobile: company.mobile}),
                 API.staff.deleteAllStaffByTest({email: company.email, mobile: company.mobile})

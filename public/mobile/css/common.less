@@ -1,13 +1,24 @@
-@color-theme1:#3CA5F6;
-@color-theme2:#9B9B9B;
-@color-theme3:#FFFFFF;
-@background-color-default:#FFFFFF;
-@background-color-second:#CCCCCC;
-@default-text-color:#4A4A4A;
-@border-color:#E5E5E5;
+@color-theme1:#3CA5F6;//主题蓝色
+@color-theme2:#355167;//深蓝
+@color-theme3:#F23B3B;//提示红
+@color-theme4:#EB5434;//价格红
+@color-theme5:#FFFFFF;//白色
+@background-color-default:#F3F3F3;//background-grey
+@background-color-second:#FFFFFF;
+@default-text-color:#4A4A4A;//深灰
+@second-text-color:#9B9B9B;//次灰
+@third-text-color:#CCCCCC;//中灰
+@border-color:#E5E5E5;//border-grey
+@font-size-21:2.1rem;
+@font-size-18:1.8rem;
+@font-size-16:1.6rem;
+@font-size-15:1.5rem;
+@font-size-14:1.4rem;
+@font-size-12:1.2rem;
+@font-size-10:1rem;
 
 /*Reset CSS*/
-*{ margin:0; padding:0; border: none; list-style: none; font-size: 1.4rem; font-family:"Arial","微软雅黑", "黑体", "宋体"; box-sizing: border-box;}
+*{ margin:0; padding:0; border: none; list-style: none; font-size: 1.4rem; font-family:"Helvetial","Rotobo", "Pingfang SC", "Noto Sans Han", "HeiTi SC", "Droid Sans Fallback", "Microsoft Yahei"; box-sizing: border-box;}
 a { text-decoration:none; cursor: pointer;}
 table{ border-collapse:collapse; border-spacing:0; }
 ul,ol,li,dl,dt,dd{list-style-type:none; }
@@ -16,7 +27,7 @@ img { display: block;}
 
 
 /*图标字体样式*/
-@font-face {font-family: 'fontawesome'; src: url('../../font/fontawesome-webfont.ttf'); font-weight: normal; font-style: normal;}
+@font-face {font-family: 'fontawesome'; src: url('../../font/fonts/fontawesome-webfont.ttf'); font-weight: normal; font-style: normal;}
 @font-face {font-family: 'qmsl'; src: url('../../font/qmsl.ttf'); font-weight: normal; font-style: normal;}
 @font-face {font-family: 'icomoon'; src:url('../../font/icomoon.eot?b30uyj'); src:url('../../font/icomoon.eot?b30uyj#iefix') format('embedded-opentype'), url('../../font/icomoon.ttf?b30uyj') format('truetype'), url('../../font/icomoon.woff?b30uyj') format('woff'), url('../../font/icomoon.svg?b30uyj#icomoon') format('svg'); font-weight: normal; font-style: normal;}
 .web-icon-font{font-family: 'fontawesome'; font-style: normal;}
@@ -89,7 +100,7 @@ img { display: block;}
   font-size: 1.6rem;
   border: 1px @border-color solid;
   border-radius: 0.2rem;
-  background: @background-color-default;
+  background: @background-color-second;
   padding: 0 1rem;
   display: block;
 }
@@ -98,7 +109,7 @@ img { display: block;}
   height: 4.8rem;
   line-height: 4.8rem;
   text-align: center;
-  color: @color-theme3;
+  color: @color-theme5;
   font-size: 1.8rem;
   background: @color-theme1;
   border: none;
@@ -109,9 +120,9 @@ img { display: block;}
   height: 4.8rem;
   line-height: 4.8rem;
   text-align: center;
-  color: @color-theme3;
+  color: @color-theme5;
   font-size: 1.8rem;
-  background: @background-color-second;
+  background: @third-text-color;
   border: none;
   display: block;
 }
@@ -122,12 +133,84 @@ img { display: block;}
   text-align: center;
   color: @color-theme1;
   font-size: 1.8rem;
-  background: @background-color-default;
+  background: @background-color-second;
   border: none;
   border-top: 1px @border-color solid;
   display: block;
 }
 
+//页面中的button
+.page_btn{//灰色底
+  display: block;
+  margin: 0 2.8rem;
+  height: 4.4rem;
+  line-height: 4.4rem;
+  background-color: @third-text-color;
+  font-size: 1.8rem;
+  color: @background-color-second;
+  text-align: center;
+  border-radius: 0.2rem;
+}
+.page_btn2{//蓝色底
+  display: block;
+  margin: 0 2.8rem;
+  height: 4.4rem;
+  line-height: 4.4rem;
+  background-color: @color-theme1;
+  font-size: 1.8rem;
+  color: @background-color-second;
+  text-align: center;
+  border-radius: 0.2rem;
+}
+.page_btn3{//白色底
+  display: block;
+  margin: 0 2.8rem;
+  height: 4.4rem;
+  line-height: 4.4rem;
+  background-color: @background-color-second;
+  font-size: 1.8rem;
+  color: @color-theme1;
+  text-align: center;
+  border-radius: 0.2rem;
+}
+//small button
+.sm_btn1{//黑字灰框透明底
+  border: 1px solid @border-color;
+  color: @default-text-color;
+  width: 7.4rem;
+  height: 2.6rem;
+  line-height: 2.5rem;
+  font-size: 1.3rem;
+  display: inline-block;
+  text-align: center;
+  border-radius: 2px;
+}
+.sm_btn2{//蓝字蓝框透明底
+  border: 1px solid @color-theme1;
+  color: @color-theme1;
+  width: 7.4rem;
+  height: 2.6rem;
+  line-height: 2.5rem;
+  font-size: 1.3rem;
+  display: inline-block;
+  text-align: center;
+  border-radius: 2px;
+}
+.sm_btn3{//黑字灰框白底
+  border: 1px solid @border-color;
+  color: @default-text-color;
+  background: @background-color-second;
+  width: 7.4rem;
+  height: 2.6rem;
+  line-height: 2.5rem;
+  font-size: 1.3rem;
+  display: inline-block;
+  text-align: center;
+  border-radius: 2px;
+}
+.sm_font{  //价钱小数点后的样式
+  font-style: normal;
+}
 .w10 { width: 10%;}
 .w15 { width: 15%;}
 .w20 { width: 20%;}
@@ -266,7 +349,7 @@ img { display: block;}
 .select_page {
   width: 100%;
   min-height: 100%;
-  background: @color-theme3;
+  background: @background-color-second;
   position: absolute;
   left: 0;
   top: 0;
@@ -305,7 +388,7 @@ img { display: block;}
     height: 4.2rem;
     line-height: 4.2rem;
     font-size: 1.6rem;
-    color: @color-theme3;
+    color: @color-theme5;
     background: @color-theme1;
     padding-left: 3rem;
   }

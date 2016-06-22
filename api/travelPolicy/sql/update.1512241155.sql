@@ -1,1 +1,0 @@
-DROP SCHEMA if exists travelstandard CASCADE;

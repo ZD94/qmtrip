@@ -1,0 +1,23 @@
+<ion-view title="我的行程" id="page13">
+    <ion-content padding="true" class="has-header">
+
+        <div class="list card" ng-repeat="trip in tripPlans track by trip.id" ng-click="enterdetail(trip.id)">
+            <div class="item item-divider">{{trip.startAt.value | date: 'yyyy-MM-dd'}} 至 {{trip.backAt.value | date: 'yyyy-MM-dd'}}</div>
+            <div class="item item-body">
+                <ion-list>
+                    <ion-item>{{trip.deptCity}} 到 {{trip.arrivalCity}} {{}}
+                        <br>出差事由：{{trip.project.name}}</ion-item>
+                </ion-list>
+            </div>
+            <div class="item item-divider">{{statustext[trip.status]}}
+                <span class="item-note" ng-if="trip.budget != -1 && trip.budget != null">{{trip.budget| currency : ''}}元</span>
+                <span class="item-note" ng-if="trip.budget == -1 || trip.budget == null">待出预算</span>
+            </div>
+
+        </div>
+        <div id="page13-markdown3" style="color:#000000;">
+            <div ng-if="!vm.isHasNextPage" style="text-align: center;">没有更多记录了</div>
+        </div>
+        <ion-infinite-scroll ng-if="vm.isHasNextPage" on-infinite="vm.nextPage()"></ion-infinite-scroll>
+    </ion-content>
+</ion-view>

@@ -49,7 +49,7 @@
 | msg     | 错误消息 |
 
 
->. 保存差旅计划单消费明细 API.tripPlan.saveConsumeDetail(params, callback);
+>. 保存差旅计划单消费明细 API.tripPlan.saveTripDetail(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -184,7 +184,7 @@
 | msg     | 错误消息 |
 
 
->. 删除差旅支出 API.tripPlan.deleteConsumeDetail(detailId, callback);
+>. 删除差旅支出 API.tripPlan.deleteTripDetail(detailId, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -204,12 +204,12 @@
 | params                                | 参数             |json              |------
 | params.userId                         |用户id            |uuid                 |必填
 | params.consumeId                         |消费单id            |uuid                 |必填
-| params.picture                         |上传票据图片MD5key            |string                |必填
+| params.picture                         |上传票据图片fileId            |string                |必填
 | callback                              | 回调函数             |function              |支持promise
 
 | 返回参数 | 含义 | 备注 |
 |---------|------|-----|
-| json数据 | 消费单信息 |obj.invoice含义[{times:上传次数, picture:票据md5key, create_at:时间, status:审核状态, remark: 审核备注, approve_at: 审核时间}]
+| json数据 | 消费单信息 |obj.invoice含义[{times:上传次数, picture:票据fileId, created_at:时间, status:审核状态, remark: 审核备注, approve_at: 审核时间}]
 
 
 >. 企业统计计划单预算和支出 API.tripPlan.statPlanOrderMoneyByCompany(callback);
@@ -241,7 +241,7 @@
 |ret  |Array
 
 
->. 企业员工提交计划单 API.tripPlan.commitTripPlanOrder(orderId, callback);
+>. 企业员工提交计划单 API.tripPlan.commitTripPlan(orderId, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------

@@ -3,6 +3,7 @@
  */
 'use strict';
 var point=(function(){
+    var moment = require('moment');
     API.require("staff");
     API.require("tripPlan");
 
@@ -11,7 +12,6 @@ var point=(function(){
     //我的积分页面
     point.MyPointsController = function($scope) {
         // alert(222222);
-        loading(true);
         $scope.initMyPoint = function(){
             API.onload(function(){
                 API.staff.getCurrentStaff()
@@ -21,7 +21,7 @@ var point=(function(){
                         // var points = staff.balancePoints;
                         // points = points.replace(/([0-9])(?=(\d{3})+$)/g,'$1,');
                         // var params = {staffId:staffId,page:$scope.pageAllPoint}
-                        Q.all([
+                        Promise.all([
                             API.staff.listAndPaginatePointChange({staffId:staffId,options: {page:$scope.pageAllPoint}}),
                             API.staff.getStaffPointsChange({staffId:staffId})
                             ])
@@ -30,17 +30,15 @@ var point=(function(){
                                 $scope.changes = changes;
                                 record.items.map(function(c){
                                     var orderId = c.orderId;
-                                    API.tripPlan.getTripPlanOrderById({orderId: orderId})
+                                    API.tripPlan.getTripPlan({id: orderId})
                                         .then(function(order){
-                                            c.orderCreateAt = moment(order.createAt).format('YYYY-MM-DD');
-                                            $scope.$apply();
+                                            c.orderCreateAt = moment(order.createdAt).format('YYYY-MM-DD');
                                         })
                                     
                                 })
                                 // console.info($scope.record);
                                 $scope.record = record.items;
                                 $scope.totalAll = record.total;
-                                $scope.$apply();
                             })
                     })
                     .catch(function (err) {
@@ -51,7 +49,7 @@ var point=(function(){
         $scope.initMyPoint();
         //进入详情页
         $scope.enterDetail = function (id) {
-            window.location.href = "#/travelPlan/PlanDetail?planId="+id;
+            window.location.href = "#/travelPlan/PlanDetail?tripPlanId="+id;
         }
         $scope.incomePoint = function(){
             API.onload(function(){
@@ -62,15 +60,13 @@ var point=(function(){
                             .then(function(record){
                                 record.items.map(function(c){
                                     var orderId = c.orderId;
-                                    API.tripPlan.getTripPlanOrderById({orderId: orderId})
+                                    API.tripPlan.getTripPlan({id: orderId})
                                         .then(function(order){
-                                            c.orderCreateAt = moment(order.createAt).format('YYYY-MM-DD');
-                                            $scope.$apply();
+                                            c.orderCreateAt = moment(order.createdAt).format('YYYY-MM-DD');
                                         })
                                 })
                                 $scope.incomerecord = record.items;
                                 $scope.totalIncome = record.total;
-                                $scope.$apply();
                             })
                     })
                     .catch(function(err){
@@ -88,16 +84,14 @@ var point=(function(){
                             .then(function(record){
                                 record.items.map(function(c){
                                     var orderId = c.orderId;
-                                    API.tripPlan.getTripPlanOrderById({orderId: orderId})
+                                    API.tripPlan.getTripPlan({id: orderId})
                                         .then(function(order){
-                                            c.orderCreateAt = moment(order.createAt).format('YYYY-MM-DD');
-                                            $scope.$apply();
+                                            c.orderCreateAt = moment(order.createdAt).format('YYYY-MM-DD');
                                         })
                                     
                                 })
                                 $scope.payrecord = record.items;
                                 $scope.totalPay = record.total;
-                                $scope.$apply();
                             })
                     })
                     .catch(function(err){
@@ -278,7 +272,6 @@ var point=(function(){
     point.ExchangePointsController = function($scope) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(2).find("li").addClass("on");
-        loading(true);
     }
     return point;
 })();

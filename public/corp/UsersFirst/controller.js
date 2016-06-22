@@ -2,13 +2,14 @@
  * Created by chenhao on 2015/12/18.
  */
 var UsersFirst = (function(){
+	var moment = require('moment');
 	API.require("company");
 	API.require("staff");
 	API.require("travelPolicy");
 	API.require("tripPlan");
 	API.require("department");
 	var UsersFirst ={};
-	UsersFirst.UserMainController = function($scope, $routeParams){
+	UsersFirst.UserMainController = function($scope, $stateParams){
 		$("title").html("差旅管理首页");
 		$(".left_nav li").removeClass("on").eq(0).addClass("on");
 		$scope.funds={};
@@ -27,12 +28,12 @@ var UsersFirst = (function(){
 						var start = moment().startOf('Month').format('YYYY-MM-DD 00:00:00');
 						var end = moment().endOf('Month').format('YYYY-MM-DD 23:59:59');
 						$scope.companyId = company_id;
-						Q.all([
+						Promise.all([
 							API.company.getCompanyFundsAccount(),
 							API.staff.statisticStaffs({companyId:company_id}),
 							API.travelPolicy.getLatestTravelPolicy({}),
 							API.tripPlan.statPlanOrderMoneyByCompany({startTime:start,endTime:end}),
-							API.staff.statStaffPointsByCompany({})
+							API.staff.statStaffPoints({})
 						])
 							.spread(function(resutlt,num,travel_level,date,point){
 								$scope.funds = resutlt;
@@ -50,12 +51,10 @@ var UsersFirst = (function(){
 									$scope.different = "持平 0%"
 								}
 								$scope.initCharts(date.qmBudget,date.planMoney,date.expenditure);
-								$scope.$apply();
 							})
 							.catch(function(err){
 								TLDAlert(err.msg || err)
 							})
-						$scope.$apply();
 					})
 					.catch(function(err){
 						TLDAlert(err.msg || err)
@@ -65,7 +64,7 @@ var UsersFirst = (function(){
 		$scope.initCorpMain();
 
 		API.onload(function(){
-			Q.all([
+			Promise.all([
 				API.travelPolicy.listAndPaginateTravelPolicy({}),
 				API.department.getFirstClassDepartments({companyId:$scope.companyId})
 			])

@@ -7,12 +7,12 @@
     <div class="i_detail i_box">
 		<div ng-if="status == 'outTraffic'" class="i_type">
 			<span class="web-icon-font3">&#xe90e;</span>
-			<!--<div class="i_typedetail">{{InvoiceDetail.startPlace}}去程{{InvoiceDetail.arrivalPlace}}</div>-->
-			<div class="i_typedetail">{{InvoiceDetail.startPlace}}<span class="arr"><em class="out_img">去程</em></span>{{InvoiceDetail.arrivalPlace}}</div>
+			<!--<div class="i_typedetail">{{InvoiceDetail.deptCity}}去程{{InvoiceDetail.arrivalCity}}</div>-->
+			<div class="i_typedetail">{{InvoiceDetail.deptCity}}<span class="arr"><em class="out_img">去程</em></span>{{InvoiceDetail.arrivalCity}}</div>
 		</div>
 		<div ng-if="status == 'backTraffic'" class="i_type">
 			<span class="web-icon-font3">&#xe90e;</span>
-			<div class="i_typedetail">{{InvoiceDetail.startPlace}}<span class="arr"><em class="out_img">回程</em></span>{{InvoiceDetail.arrivalPlace}}</div>
+			<div class="i_typedetail">{{InvoiceDetail.deptCity}}<span class="arr"><em class="out_img">回程</em></span>{{InvoiceDetail.arrivalCity}}</div>
 		</div>
 		<div ng-if="status == 'hotel'" class="i_type">
 		    <span class="web-icon-font3">&#xe914;</span>
@@ -25,7 +25,7 @@
 	</div>
 
 	<div class="i_box">
-		<span class="time_font">上传时间:{{InvoiceDetail.invoice[InvoiceDetail.invoice.length-1].create_at}}</span>
+		<span class="time_font">上传时间:{{InvoiceDetail.invoice[InvoiceDetail.invoice.length-1].created_at}}</span>
 		<!--<p ng-if="InvoiceDetail.isCommit == true" class="i_status">-->
 			<!--<span ng-if="InvoiceDetail.orderStatus=='WAIT_UPLOAD'">待上传</span>-->
 	        <!--<span ng-if="InvoiceDetail.status==0">待审核</span>-->

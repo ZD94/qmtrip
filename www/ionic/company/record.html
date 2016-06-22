@@ -1,0 +1,56 @@
+<ion-view title="出差统计-出差记录" id="page25">
+    <ion-content padding="true" class="has-header">
+        <div class="button-bar">
+            <a href="#/company/budget" id="page25-button76" class="button button-stable  button-block">本月预算</a>
+            <button id="page25-button77" class="button button-positive  button-block">出差记录</button>
+            <a href="#/company/distribution" id="page25-button78" class="button button-stable  button-block">员工分布</a>
+        </div>
+
+        <div class="spacer" style="width: 300px; height: 30px;"></div>
+
+        <form class="list">
+            <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input ng-change="searchTripPlans(staffName)" type="search" placeholder="请输入员工姓名" ng-model="staffName">
+            </label>
+        </form>
+
+        <div class="list card" ng-repeat="trip in tripPlans track by trip.id" ng-click="enterDetail(trip.id)">
+            <div class="item item-divider">{{trip.startAt.value | date: 'yyyy-MM-dd'}} 至 {{trip.backAt.value | date: 'yyyy-MM-dd'}}</div>
+            <div class="item item-body">
+                <ion-list>
+                    <ion-item class="item-avatar">
+                        <div class="staff_portrait" style="position: absolute; top: 5px; left: 20px; font-size: 20px;
+                            width: 60px; line-height: 60px; text-align: center; font-weight: bold;
+                            border-radius: 50%; color: white; background:#2495da;">{{trip.account.name| limitTo: -2}}
+                        </div>
+                        <div style="margin-left: 2em; margin-top: -1em;">
+                            <h2>{{trip.account.name}}</h2>
+                            <p>{{trip.account.mobile}}</p>
+                        </div>
+                    </ion-item>
+                    <ion-item>
+                        <i class="icon ion-plane"></i> &nbsp;&nbsp;{{trip.deptCity}} 到 {{trip.arrivalCity}}<br>
+                        <i class="icon ion-star"></i> &nbsp;&nbsp;出差事由：{{trip.title}}
+                    </ion-item>
+                </ion-list>
+            </div>
+            <div class="item item-divider">
+                <span ng-if="trip.status == EPlanStatus.AUDIT_NOT_PASS">票据审核未通过</span>
+                <span ng-if="trip.status == EPlanStatus.APPROVE_NOT_PASS">审批未通过</span>
+                <span ng-if="trip.status == EPlanStatus.NO_BUDGET">待出预算</span>
+                <span ng-if="trip.status == EPlanStatus.WAIT_APPROVE">待审批</span>
+                <span ng-if="trip.status == EPlanStatus.WAIT_UPLOAD">待上传票据</span>
+                <span ng-if="trip.status == EPlanStatus.WAIT_COMMIT">待提交</span>
+                <span ng-if="trip.status == EPlanStatus.AUDITING">票据审核中</span>
+                <span ng-if="trip.status == EPlanStatus.COMPLETE">已完成</span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>{{trip.budget | currency: ''}}元</span>
+            </div>
+        </div>
+
+        <div id="page25-markdown17" style="color:#000000;text-align:center;">
+            <p>没有更多内容了</p>
+        </div>
+    </ion-content>
+</ion-view>

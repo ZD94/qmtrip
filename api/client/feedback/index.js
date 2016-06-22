@@ -7,7 +7,6 @@
  * @module API
  */
 var API = require("common/api");
-var auth = require("../auth");
 /**
  * @class feedback 意见反馈
  */
@@ -32,7 +31,7 @@ feedback.sendFeedback = function(params){
             if(!params.isAnonymity){
                 params.userName = data.name;
             }
-            return API.company.getCompany({companyId: data.companyId});
+            return API.company.getCompany({id: data.companyId});
 
         })
         .then(function(company){

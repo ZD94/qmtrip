@@ -6,7 +6,7 @@ var auth=(function(){
     var  auth = {};
     var Cookie = require('tiny-cookie');
     //登录页面
-    auth.LoginController = function ($scope, $routeParams) {
+    auth.LoginController = function ($scope, $stateParams) {
         var mail = Cookie.get("email");
         var pwd = Cookie.get("pwd");
         $scope.email = mail;
@@ -17,14 +17,13 @@ var auth=(function(){
         $scope.toForget = function(){
             window.location.href = "#/auth/forgetpwd";
         }
-        var backUrl = $routeParams.backurl || "#";
+        var backUrl = $stateParams.backurl || "#";
         $scope.sendActiveMail = function(){
             var mail = $('#name').val();
             API.onload(function(){
                 API.auth.sendActiveEmail({email:mail})
                     .then(function(){
                         Myalert("温馨提示","发送成功");
-                        $scope.$apply();
                     }).catch(function(err){
                         console.error(err);
                     }).done();
@@ -80,7 +79,6 @@ var auth=(function(){
                                     $scope.err_msg_tip = "该账号还未注册，";
                                     $('.tip_err').children("i").html("&#xf057;");
                                     $('.tip_err').show();
-                                    $scope.$apply();
                                 }
                                 else if(err.msg == '您的账号还未激活'){
                                     $('.tip_err>a').text("");
@@ -88,14 +86,12 @@ var auth=(function(){
                                     $scope.err_msg_tip = "该邮箱暂未激活，";
                                     $('.tip_err').children("i").html("&#xf057;");
                                     $('.tip_err').show();
-                                    $scope.$apply();
                                 }
                                 else{
                                     $scope.err_msg_tip = err.msg;
                                     $('.tip_err').children("i").html("&#xf057;");
                                     $('.tip_err').show();
                                     //console.log(err.msg);
-                                    $scope.$apply();
                                 }
                                 //Myalert("提示信息", err.msg);
                             } else {
@@ -255,8 +251,6 @@ var auth=(function(){
                         console.info(result);
                         //console.info("获取验证码", result);
                             msgTicket = result.ticket;
-                            $scope.$apply();
-
                             var $seconds = $("#seconds");
                             var $timer = $("#timer");
                             var $btn = $(".v_code");
@@ -411,7 +405,6 @@ var auth=(function(){
                                 $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
                                 $("#corpMail").siblings(".err_msg").show();
                                 $(".tip_div").hide();
-                                $scope.$apply();
                                 return false;
                             }
                             if(err.code == -33 || err.code == -29){
@@ -422,7 +415,6 @@ var auth=(function(){
                                 $("#corpMail").siblings(".err_msg").children("i").removeClass("right");
                                 $("#corpMail").siblings(".err_msg").show();
                                 $(".tip_div").hide();
-                                $scope.$apply();
                                 return false;
                             }
 
@@ -457,7 +449,6 @@ var auth=(function(){
                                 $scope.changePicCode();
                                 $('#msgCode').val("");
                                 $('#picCode').val("");
-                                $scope.$apply();
                                 return;
                             }
                             console.error(err);
@@ -473,15 +464,14 @@ var auth=(function(){
     }
 
     //公司注册最后一步注册完成页面
-    auth.CorplaststepController = function ($scope,$routeParams) {
-        $scope.userMail = $routeParams.email;
+    auth.CorplaststepController = function ($scope,$stateParams) {
+        $scope.userMail = $stateParams.email;
 
         $scope.sendAgainActiveMail = function(){
             API.onload(function(){
                 API.auth.sendActiveEmail({email:$scope.userMail})
                     .then(function(){
                         Myalert("温馨提示","发送成功");
-                        $scope.$apply();
                     }).catch(function(err){
                         console.error(err);
                     }).done();
@@ -490,8 +480,8 @@ var auth=(function(){
     }
 
     //忘记密码页
-    auth.ForgetpwdController = function($scope,$routeParams) {
-        var accountId = $routeParams.accountId;
+    auth.ForgetpwdController = function($scope,$stateParams) {
+        var accountId = $stateParams.accountId;
         $scope.toRegister = function () {
             window.location.href = "#/auth/register";
         }
@@ -573,7 +563,6 @@ var auth=(function(){
                                     $scope.changePwdMail = mail;
                                     $(".changeContentTwo").show();
                                     $(".step>ul>li:nth-child(2)").addClass("on").siblings("li").removeClass("on");
-                                    $scope.$apply();
                                 })
                         }
                         else{
@@ -581,7 +570,6 @@ var auth=(function(){
                             $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
                             $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
                             $("#loginMail").siblings(".err_msg").show();
-                            $scope.$apply();
                             return false;
                         }
                     }).catch(function (err) {
@@ -590,7 +578,6 @@ var auth=(function(){
                         $("#loginMail").siblings(".err_msg").children("i").html("&#xf06a;");
                         $("#loginMail").siblings(".err_msg").children("i").removeClass("right");
                         $("#loginMail").siblings(".err_msg").show();
-                        $scope.$apply();
                     }).done();
             })
         }
@@ -614,10 +601,10 @@ var auth=(function(){
     }
 
     //激活页面
-    auth.ActiveController = function($scope, $routeParams) {
-        var sign = $routeParams.sign;
-        var accountId = $routeParams.accountId;
-        var timestamp = $routeParams.timestamp;
+    auth.ActiveController = function($scope, $stateParams) {
+        var sign = $stateParams.sign;
+        var accountId = $stateParams.accountId;
+        var timestamp = $stateParams.timestamp;
 
         $scope.toLogin = function() {
             window.location.href = "#/auth/login";
@@ -647,8 +634,6 @@ var auth=(function(){
                         }, 1000);
                         $scope.activeResult = "恭喜您,账号激活成功!"
                     }
-
-                    $scope.$apply();
                 })
                 .catch(function(err) {
                     TLDAlert(err.msg || err);
@@ -659,7 +644,6 @@ var auth=(function(){
                     } else {
                         $scope.activeResult = '系统错误,请稍后重试';
                     }
-                    $scope.$apply();
                 })
         })
     }
@@ -678,11 +662,11 @@ var auth=(function(){
     }
 
     //员工重新设置密码页
-    auth.ResetPwdController = function($scope, $routeParams){
-        var accountId = $routeParams.accountId;
-        var sign = $routeParams.sign;
-        var timestamp = $routeParams.timestamp;
-        var email = $routeParams.email;
+    auth.ResetPwdController = function($scope, $stateParams){
+        var accountId = $stateParams.accountId;
+        var sign = $stateParams.sign;
+        var timestamp = $stateParams.timestamp;
+        var email = $stateParams.email;
         //console.info(email);
         $scope.isValid = 'checking';
 
@@ -694,12 +678,10 @@ var auth=(function(){
                 } else {
                     $scope.isValid = true;
                 }
-                $scope.$apply();
             })
             .catch(function(err) {
                 console.error(err);
                 $scope.isValid = false;
-                $scope.$apply();
             })
         });
 
@@ -730,7 +712,6 @@ var auth=(function(){
                         //alert("设置密码成功");
                         //console.info(email);
                         window.location.href="#/auth/forgetpwdtip?email=" + email;
-                        $scope.$apply();
                 }).catch(function(err){
                     console.error(err);
                 }).done();
@@ -739,8 +720,8 @@ var auth=(function(){
     }
 
     //员工重新设置密码成功页
-    auth.ForgetpwdtipController = function($scope,$routeParams) {
-        var name = $routeParams.email;
+    auth.ForgetpwdtipController = function($scope,$stateParams) {
+        var name = $stateParams.email;
         //console.info(name);
         $scope.name = name;
 
@@ -754,10 +735,10 @@ var auth=(function(){
     }
 
     //员工设置密码页
-    auth.FirstSetPwdController = function($scope, $routeParams){
-        var accountId = $routeParams.accountId;
-        var sign = $routeParams.sign;
-        var timestamp = $routeParams.timestamp;
+    auth.FirstSetPwdController = function($scope, $stateParams){
+        var accountId = $stateParams.accountId;
+        var sign = $stateParams.sign;
+        var timestamp = $stateParams.timestamp;
         $scope.isValid = 'checking';
 
         API.onload(function() {
@@ -768,12 +749,10 @@ var auth=(function(){
                     } else {
                         $scope.isValid = true;
                     }
-                    $scope.$apply();
                 })
                 .catch(function(err) {
                     console.error(err);
                     $scope.isValid = false;
-                    $scope.$apply();
                 })
         });
 
@@ -803,7 +782,6 @@ var auth=(function(){
                     .then(function(){
                         //alert("设置密码成功");
                         window.location.href="#/auth/staffPwdSuccess";
-                        $scope.$apply();
                     }).catch(function(err){
                     console.error(err);
                 }).done();
@@ -923,14 +901,12 @@ var auth=(function(){
                                         $seconds.text(begin);
                                     }
                                 }, 1000);
-                                $scope.$apply();
                             }).catch(function(err){
                                 console.error(err);
                                 $scope.err_msg1 = err.msg;
                                 $("#oldPwd").siblings(".err_msg").children("i").html("&#xf06a;");
                                 $("#oldPwd").siblings(".err_msg").children("i").removeClass("right");
                                 $("#oldPwd").siblings(".err_msg").show();
-                                $scope.$apply();
                             }).done();
                     })
                 }

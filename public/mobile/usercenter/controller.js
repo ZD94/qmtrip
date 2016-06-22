@@ -9,11 +9,12 @@ module.exports = (function() {
     API.require("travelPolicy");
     var user = {};
 
-    user.IndexController = function($scope) {
+    user.IndexController = function($scope, $loading) {
 
         $scope.$root.pageTitle = '个人中心';
         //console.info($scope.$root.pageTitle);
         $scope.initStaffUser = function(){
+            $loading.start();
             API.onload(function(){
                 API.staff.getCurrentStaff()
                     .then(function(ret){
@@ -31,12 +32,12 @@ module.exports = (function() {
                             $scope.power = "普通员工";
                         }
 
-                        Q.all([
+                        Promise.all([
                             API.tripPlan.statPlanOrderMoney({}),
                             API.travelPolicy.getTravelPolicy({id: travelLevel}),
-                            API.tripPlan.pageTripPlanOrder({isHasBudget: false}),
-                            API.tripPlan.pageTripPlanOrder({isUpload:false}),
-                            API.tripPlan.pageTripPlanOrder({audit:"N"})
+                            API.tripPlan.pageTripPlans({isHasBudget: false}),
+                            API.tripPlan.pageTripPlans({isUpload:false}),
+                            API.tripPlan.pageTripPlans({audit:"N"})
                         ])
                             .spread(function(planMoney,travelPolicy,plan_status_1,plan_status_2,plan_status_3){
                                 console.info(planMoney);
@@ -50,8 +51,6 @@ module.exports = (function() {
                                 $scope.total1 = plan_status_1.total;
                                 $scope.total2 = plan_status_2.total;
                                 $scope.total3 = plan_status_3.total;
-                                $scope.$apply();
-
                                 function judge(id){
                                     var num = $('#'+id).text();
                                     if(num == 0){
@@ -59,11 +58,11 @@ module.exports = (function() {
                                     }else if(num >0 && num<=9){
                                         $('#'+id).show();
                                     }else if (num > 9 && num <100){
-                                        $('#'+id).css({'font-size':'1rem','line-height': '1.5rem'});
+                                        $('#'+id).addClass('number');
                                         $('#'+id).show();
                                     }else if (num > 99){
-                                        $('#'+id).css({'font-size':'1rem','width':'2rem'});
-                                        $('#'+id).html('99+');
+                                        $('#'+id).addClass('number2');
+                                        $('#'+id).html('+99');
                                         $('#'+id).show();
                                     }
                                 }
@@ -74,8 +73,7 @@ module.exports = (function() {
                             .catch(function(err){
                                 TLDAlert(err.msg || err)
                             })
-                        $scope.$apply();
-                        loading(true);
+                        $loading.end();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err)
@@ -112,12 +110,10 @@ module.exports = (function() {
 
     user.TravelpolicyController = function($scope) {
         $scope.$root.pageTitle = '差旅标准';
-        loading(true);
         API.onload(function(){
             API.travelPolicy.getCurrentStaffTp()
                 .then(function(travelPolicy){
                     $scope.travelpolicy = travelPolicy;
-                    $scope.$apply();
                 })
                 .catch(function(err){
                     console.info(err || err.msg);

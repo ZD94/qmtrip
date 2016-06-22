@@ -80,7 +80,7 @@
 |---------|------|-----|
 | json数据   | 代理商用户信息|json
 
->. 分页查询代理商用户信息 API.agency.listAndPaginateAgencyUser(params);
+>. 分页查询代理商用户信息 API.agency.listAgencyUser(params);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -151,7 +151,7 @@
 | msg     | 提示信息 |
 
 
->. 注册代理商(同时会生成代理商创建者用户) API.agency.registerAgency(params)
+>. 注册代理商(同时会生成代理商创建者用户) API.agency.createAgency(params)
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------

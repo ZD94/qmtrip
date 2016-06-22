@@ -15,7 +15,7 @@
 		<p><span>联系人姓名：</span>{{staff.name}}</p>
 		<p><span>联系人电话：</span>{{staff.mobile}}</p>
 		<p><span>联系人邮箱：</span>{{staff.email}}</p>
-		<p><span>注册时间：</span>{{company.createAt | date:"yyyy-MM-dd HH:mm:ss"}}</p>
+		<p><span>注册时间：</span>{{company.createdAt | date:"yyyy-MM-dd HH:mm:ss"}}</p>
 		<p><span>公司账户余额：</span>{{funds.balance}}元 <a ng-click="alertPop()">充值</a></p>
 		<p><span>当前员工数：</span>{{staffnum}}</p>
 		<p><span>当前员工积分：</span>{{points.balancePoints}}</p>

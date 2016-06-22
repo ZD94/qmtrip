@@ -4,6 +4,7 @@
 'use strict';
 
 var TravelStatistics = (function(){
+    var moment = require('moment');
 
     API.require('tripPlan');
     API.require("staff");
@@ -31,7 +32,7 @@ var TravelStatistics = (function(){
             var startAT = $($event.target).attr("data-zrep");
             $scope.startAT = moment(startAT).startOf('month').format('YYYY-MM-DD');
             $scope.endAT = moment(startAT).endOf('month').format('YYYY-MM-DD 23:59:59');
-            Q.all([API.tripPlan.statBudgetByMonth({startTime:$scope.startAT, endTime:$scope.endAT}),
+            Promise.all([API.tripPlan.statBudgetByMonth({startTime:$scope.startAT, endTime:$scope.endAT}),
                 API.tripPlan.statPlanOrderMoneyByCompany({startTime: $scope.startAT || monthStart, endTime: $scope.endAT || monthEnd})
                 ])
                 .spread(function(budget,stat){
@@ -54,7 +55,6 @@ var TravelStatistics = (function(){
             $scope.s_month = moment(s.month).startOf('month').format('YYYY年MM月');
             $scope.z_month = moment(z.month).startOf('month').format('YYYY年MM月');
             $scope.x_month = moment(x.month).startOf('month').format('YYYY年MM月');
-            $scope.$apply();
             var planConsume = [];
             planConsume.push(s.planMoney);
             planConsume.push(z.planMoney);
@@ -103,7 +103,7 @@ var TravelStatistics = (function(){
                 API.staff.getCurrentStaff()
                     .then(function(staff){
                         console.info($scope.startAT,$scope.endAT)
-                        return Q.all([
+                        return Promise.all([
                             API.company.getCompanyById(staff.companyId),
                             API.tripPlan.statPlanOrderMoneyByCompany({startTime: monthStart, endTime: monthEnd}),
                             API.tripPlan.statBudgetByMonth({startTime:$scope.startAT || monthStart, endTime:$scope.endAT || monthEnd})
@@ -115,15 +115,14 @@ var TravelStatistics = (function(){
                         var x = budget[2];
                         console.info(budget)
                         var current = moment().startOf('month');
-                        var createAt = moment(company.createAt).startOf('month');
-                        for(var cur = current;!cur.isBefore(createAt);cur.subtract(1, 'month')){
+                        var createdAt = moment(company.createdAt).startOf('month');
+                        for(var cur = current;!cur.isBefore(createdAt);cur.subtract(1, 'month')){
                             var _item = {cur_cn: cur.format('YYYY年MM月'), cur_en: cur.format('YYYY-MM')}
                             date_array.push(_item);
                         }
                         $scope.items=date_array;
                         chartload(s,z,x);
                         $scope.stat = stat;
-                        $scope.$apply();
                         Myselect ();
                     })
                     .catch(function(err){
@@ -144,8 +143,8 @@ var TravelStatistics = (function(){
                 .then(function(staff){
                     var companyId = staff.companyId;
                     var staffId = staff.id;
-                    return Q.all([
-                            API.staff.statStaffPointsByCompany({}), //企业积分统计，总积分，可用积分。
+                    return Promise.all([
+                            API.staff.statStaffPoints({}), //企业积分统计，总积分，可用积分。
                             API.staff.getStaffPointsChangeByMonth({})//企业统计员工所有变动记录
                             ])
                             .spread(function(point,statistic){
@@ -203,7 +202,6 @@ var TravelStatistics = (function(){
                                 $scope.allPoints = point.totalPoints;
                                 $scope.remianPoints = point.balancePoints;
                                 $scope.points = statistic;
-                                $scope.$apply();
                             })
                             .catch(function(err) {
                                 TLDAlert(err.msg || err);
@@ -242,7 +240,7 @@ var TravelStatistics = (function(){
                     params.endTime = $scope.end_time;
                 }
                 console.info(params);
-                API.tripPlan.pageTripPlanOrderByCompany(params)
+                API.tripPlan.pageTripPlansByCompany(params)
                     .then(function(list){
                         $scope.planlist = list.items;
                         if($scope.planlist.length == 0){
@@ -263,21 +261,21 @@ var TravelStatistics = (function(){
                                 })
                         })
 
-                        Q.all(planlist)
+                        Promise.all(planlist)
                             .then(function(ret){
                                 $scope.planlist = ret;
                                 ret.map(function(s){
                                     var desc = s.description;
-                                    var dest =s.destination;
-                                    var startP = s.startPlace;
+                                    var dest =s.arrivalCity;
+                                    var startP = s.deptCity;
                                     if(desc && desc.length>5){
                                         s.description= desc.substr(0,5) + '…';
                                     }
                                     if(dest && dest.length>5){
-                                        s.destination= dest.substr(0,5) + '…';
+                                        s.arrivalCity= dest.substr(0,5) + '…';
                                     }
                                     if(startP && startP.length>5){
-                                        s.startPlace= startP.substr(0,5) + '…';
+                                        s.deptCity= startP.substr(0,5) + '…';
                                     }
                                     if(s.hotel.length>0){
                                         var hotelName = s.hotel[0].hotelName;
@@ -291,28 +289,27 @@ var TravelStatistics = (function(){
                                     }
 
                                     if(s.backTraffic.length>0){
-                                        var startPlace = s.backTraffic[0].startPlace;
-                                        var arrivalPlace = s.backTraffic[0].arrivalPlace;
-                                        if (startPlace && startPlace.length > 5) {
-                                            s.backTraffic[0].startPlace = startPlace.substr(0, 5) + '…';
+                                        var deptCity = s.backTraffic[0].deptCity;
+                                        var arrivalCity = s.backTraffic[0].arrivalCity;
+                                        if (deptCity && deptCity.length > 5) {
+                                            s.backTraffic[0].deptCity = deptCity.substr(0, 5) + '…';
                                         };
-                                        if (arrivalPlace && arrivalPlace.length > 5) {
-                                            s.backTraffic[0].arrivalPlace = arrivalPlace.substr(0, 5) + '…';
+                                        if (arrivalCity && arrivalCity.length > 5) {
+                                            s.backTraffic[0].arrivalCity = arrivalCity.substr(0, 5) + '…';
                                         };
                                     }
                                     if(s.outTraffic.length>0){
-                                        var startPlace = s.outTraffic[0].startPlace;
-                                        var arrivalPlace = s.outTraffic[0].arrivalPlace;
-                                        if (startPlace && startPlace.length > 5) {
-                                            s.outTraffic[0].startPlace = startPlace.substr(0, 5) + '…';
+                                        var deptCity = s.outTraffic[0].deptCity;
+                                        var arrivalCity = s.outTraffic[0].arrivalCity;
+                                        if (deptCity && deptCity.length > 5) {
+                                            s.outTraffic[0].deptCity = deptCity.substr(0, 5) + '…';
                                         };
-                                        if (arrivalPlace && arrivalPlace.length > 5) {
-                                            s.outTraffic[0].arrivalPlace = arrivalPlace.substr(0, 5) + '…';
+                                        if (arrivalCity && arrivalCity.length > 5) {
+                                            s.outTraffic[0].arrivalCity = arrivalCity.substr(0, 5) + '…';
                                         };
                                     }
                                     return s;
                                 })
-                                $scope.$apply();
                             })
                             .catch(function(err){
                                 TLDAlert(err.msg || err)
@@ -361,7 +358,6 @@ var TravelStatistics = (function(){
                             $(".PurposeNamelist").show();
                         }
                         console.info (result);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.log(err);
@@ -384,12 +380,13 @@ var TravelStatistics = (function(){
         }
     }
     // 出差记录详情页
-    TravelStatistics.PlanDetailController = function($scope,$routeParams, $location, $anchorScroll) {
+    TravelStatistics.PlanDetailController = function($scope,$stateParams, $location, $loading, $anchorScroll) {
         $("title").html("出差记录");
         $(".left_nav li").removeClass("on").eq(1).addClass("on");
-        var planId = $routeParams.orderId;
+        var tripPlanId = $stateParams.orderId;
+        $loading.start();
         API.onload(function(){
-            API.tripPlan.getTripPlanOrderById({orderId: planId})
+            API.tripPlan.getTripPlan({id: tripPlanId})
                 .then(function(result){
                     if(result.description && result.description.length>15){
                         result.description = result.description.substr(0,15);
@@ -427,7 +424,7 @@ var TravelStatistics = (function(){
                                     return outTraffics;
                                 })
                         }else{
-                            return Q.all([
+                            return Promise.all([
                                 API.agency.getAgencyUserByCompany({agencyUserId: outTraffic.auditUser}),
                                 API.tripPlan.getConsumeInvoiceImg({consumeId: outTraffic.id})
                             ])
@@ -447,7 +444,7 @@ var TravelStatistics = (function(){
                                     return backTraffic;
                                 })
                         }else{
-                            return Q.all([
+                            return Promise.all([
                                 API.agency.getAgencyUserByCompany({agencyUserId: backTraffic.auditUser}),
                                 API.tripPlan.getConsumeInvoiceImg({consumeId: backTraffic.id})
                             ])
@@ -468,7 +465,7 @@ var TravelStatistics = (function(){
                                 })
                         }else{
                             console.info(hotel.auditUser)
-                            return Q.all([
+                            return Promise.all([
                                 API.agency.getAgencyUserByCompany({agencyUserId: hotel.auditUser}),
                                 API.tripPlan.getConsumeInvoiceImg({consumeId: hotel.id})
                             ])
@@ -481,28 +478,25 @@ var TravelStatistics = (function(){
                         }
                         
                     });
-                    Q.all(hotels)
+                    Promise.all(hotels)
                     .then(function(hotels) {
                         $scope.hotels = hotels;
-                        $scope.$apply();
                     })
                     .catch(function(err) {
                         TLDAlert(err.msg || err);
                     })
 
-                    Q.all(outTraffics)
+                    Promise.all(outTraffics)
                     .then(function(outTraffics) {
                         $scope.outTraffics = outTraffics;
-                        $scope.$apply();
                     })
                     .catch(function(err) {
                         TLDAlert(err.msg || err);
                     })
 
-                    Q.all(backTraffics)
+                    Promise.all(backTraffics)
                     .then(function(backTraffics) {
                         $scope.backTraffics = backTraffics;
-                        $scope.$apply();
                     })
                     .catch(function(err) {
                         TLDAlert(err.msg || err);
@@ -512,24 +506,21 @@ var TravelStatistics = (function(){
                         .then(function(result){
                             $scope.travelerName = result.staff.name;
                             var travelLevel = result.staff.travelLevel;
-                            $scope.$apply();
                             return API.travelPolicy.getTravelPolicy({id: travelLevel});
                         })
                         .then(function(travelpolicy){
                             $scope.travelpolicy = travelpolicy;
-                            $scope.$apply();
                         })
                         .catch(function(err){
                             console.info(err);
                         })
-                    loading(true);
+                    $loading.end();
                     $(".title_top .standard").hover(function(){
                         $(this).siblings(".standard_detail").show();
                     },function(){
                         $(".standard_detail").hide();
                     })
                     console.info(result)
-                    $scope.$apply();
                 })
                 .catch(function(err){
                     TLDAlert(err.msg || err);
@@ -537,22 +528,16 @@ var TravelStatistics = (function(){
                 })
         })
         $scope.outTraffichref = function () {
-            loading(true);
             $location.hash('outTraffic');
             $anchorScroll();
-
         }
         $scope.hotelhref = function () {
-            loading(true);
             $location.hash('hotel');
             $anchorScroll();
-
         }
         $scope.backTraffichref = function () {
-            loading(true);
             $location.hash('backTraffic');
             $anchorScroll();
-
         }
         // //分页
         // $scope.pagination = function () {

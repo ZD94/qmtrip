@@ -8,7 +8,6 @@
 var service = {};
 var API = require("common/api");
 var utils = require("common/utils");
-var Q = require("q");
 
 /**
  * @method getJSDKParams
@@ -30,16 +29,12 @@ service.getJSDKParams = function(params) {
  *
  * @param {Object} params
  * @param {String} params.mediaId
- * @return {Promise} 图像md5后的key
+ * @return {Promise} 附件fileId
  */
 service.mediaId2key = function(params) {
-    var accountId = this.accountId;
+    var self = this;
     var mediaId = params.mediaId;
-    var type = params.type;
-    var md5key;
-    var buffers;
-    console.info('获取到的参数====>', params);
-    return Q()
+    return Promise.resolve()
     .then(function() {
         if (!mediaId) {
             throw {code: -1, msg: "缺少mediaId"}
@@ -49,35 +44,13 @@ service.mediaId2key = function(params) {
         return API.wechat.downloadMedia({mediaId: mediaId})
     })
     .then(function(content) {
-        buffers = new Buffer(content, 'base64');
-        md5key = utils.md5(buffers);
-        return API.attachment.getAttachment({md5key: md5key, userId: accountId})
+        return API.attachments.saveAttachment({contentType: "image/png", content: content, isPublic: false});
     })
-    .then(function(attachement) {
-        if (attachement && attachement.id) {
-            return attachement;
-        }
-
-        return Q()
+    .then(function(fileId) {
+        return API.attachment.bindOwner({fileId: fileId, accountId: self.accountId})
         .then(function() {
-            if (type && type == 'invoice') {
-                return API.staff.getInvoiceViewer({accountId: accountId})
-                    .then(function(viewUsers) {
-                        var hasId = viewUsers;
-                        hasId.push(accountId);
-                        return hasId;
-                    })
-            } else {
-                return [accountId];
-            }
-        })
-        .then(function(hasId) {
-            hasId = JSON.stringify(hasId);
-            return API.attachment.createAttachment({md5key: md5key, content: buffers, hasId: hasId, userId: accountId})
-        })
-    })
-    .then(function(attachement) {
-        return attachement.md5key;
+            return fileId;
+        });
     })
 }
 

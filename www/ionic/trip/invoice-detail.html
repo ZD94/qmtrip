@@ -1,0 +1,29 @@
+<ion-view title="票据详情页" id="page20">
+    <ion-content padding="true" class="has-header">
+        <div class="list card">
+            <div class="item ">
+                <div style="float: left;;height: 30px;width: 30px;">
+                    <i ng-if='invoice.invoiceType == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                    <i ng-if='invoice.invoiceType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                    <i ng-if='invoice.invoiceType == EInvoiceType.HOTEL' class="icon ion-home"></i>
+                </div>
+                <div style="float: left;">
+                    <b>{{invoice.deptCity}}</b>-
+                    <b>{{invoice.arrivalCity}}</b><br/>
+                    <span>{{invoice.createdAt.value | date: 'yyyy-MM-dd'}}</span>
+                </div>
+                <span class="item-note">{{statustext[invoice.status]}}</span>
+            </div>
+
+            <div class="item item-image">
+                <img src="{{invoiceImg}}">
+            </div>
+        </div>
+    </ion-content>
+    <div class="bar bar-footer bar-positive" ng-if="invoice.status == EPlanStatus.WAIT_COMMIT || invoice.status == EPlanStatus.AUDIT_NOT_PASS">
+        <div class="button button-full button-positive" style="margin-top: 0;width: 100%;font-size: 20px;" ng-uploader accept="image/*" title="invoicefuc.title" done="invoicefuc.done">重新上传</div>
+    </div>
+    <div class="bar bar-footer bar-positive" ng-if="invoice.status == EPlanStatus.AUDITING || invoice.status == EPlanStatus.COMPLETE">
+        <div class="button button-full button-positive" style="margin-top: 0;width: 100%;font-size: 20px;" ng-click="backtodetail()">返回详情</div>
+    </div>
+</ion-view>

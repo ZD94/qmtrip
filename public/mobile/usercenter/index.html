@@ -1,8 +1,3 @@
-<style>
-    body,html{
-        background-color: #f3f3f3;
-    }
-</style>
 <div class="user_center_top">
     <div class="name_point">
         <div class="name_left">
@@ -51,6 +46,12 @@
             </p>
             <p>待出预算</p>
         </div>
+        <div ng-click="go_book()">
+            <p>
+                <i><img src="/mobile/images/staff_money.png"><span id="total4">{{total4}}</span></i>
+            </p>
+            <p>待预订</p>
+        </div>
         <div ng-click="go_invoice()">
             <p>
                 <i><img src="/mobile/images/staff_invoice.png" style="width: 2rem;"><span id="total2">{{total2}}</span></i>
@@ -64,6 +65,38 @@
             <p>审核未通过</p>
         </div>
         <p style="display: block;clear: both;"></p>
+    </div>
+</div>
+<div class="book_order">
+    <div>
+        <span>
+            <i class="web-icon-font">&#xf072;</i>
+            机票订单
+        </span>
+        <span>
+            1笔未支付
+            <i class="web-icon-font">&#xf054;</i>
+        </span>
+    </div>
+    <div>
+        <span>
+            <i class="web-icon-font">&#xf072;</i>
+            酒店订单
+        </span>
+        <span>
+            1笔未支付
+            <i class="web-icon-font">&#xf054;</i>
+        </span>
+    </div>
+    <div>
+        <span>
+            <i class="web-icon-font">&#xf072;</i>
+            火车票订单
+        </span>
+        <span>
+            1笔未支付
+            <i class="web-icon-font">&#xf054;</i>
+        </span>
     </div>
 </div>
 <div class="plan_standard">

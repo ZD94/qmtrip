@@ -26,7 +26,6 @@ var businessTravel=(function(){
     businessTravel.IndexController = function($scope) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
-        loading(true);
         $("title").html("我要出差");
         Myselect();
 
@@ -39,7 +38,6 @@ var businessTravel=(function(){
                             $(".PurposeNamelist").show();
                         }
                         console.info (result);
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.log(err);
@@ -90,15 +88,14 @@ var businessTravel=(function(){
      * @param $scope
      * @constructor
      */
-    businessTravel.TrafficStepController = function($scope, $routeParams) {
+    businessTravel.TrafficStepController = function($scope, $stateParams) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
-        loading(true);
         $("title").html("我要出差");
         Myselect();
-        var purposename = $routeParams.purposename;
-        var tra = $routeParams.tra;
-        var liv = $routeParams.liv;
+        var purposename = $stateParams.purposename;
+        var tra = $stateParams.tra;
+        var liv = $stateParams.liv;
         //出发城市获取
         $scope.startplace = function () {
             API.onload(function() {
@@ -108,7 +105,6 @@ var businessTravel=(function(){
                         if ($scope.startplaceitems.length) {
                             $(".placelist1").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         $(".placelist1").hide();
@@ -134,7 +130,6 @@ var businessTravel=(function(){
                         if ($scope.endplaceitems.length) {
                             $(".placelist2").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.log(err);
@@ -202,10 +197,10 @@ var businessTravel=(function(){
                     companyId:$scope.companyId,
                     type:1,
                     description:purposename,
-                    startPlace:startplace,
-                    startPlaceCode:startplaceval,
-                    destination:endplace,
-                    destinationCode:endplaceval,
+                    deptCity:startplace,
+                    deptCityCode:startplaceval,
+                    arrivalCity:endplace,
+                    arrivalCityCode:endplaceval,
                     startAt:starttime,
                     isNeedTraffic:tra,
                     isNeedHotel:liv
@@ -218,10 +213,10 @@ var businessTravel=(function(){
                 if(starttime){
                     var consumeDetails_outTraffic = {
                         type:-1,
-                        startPlace:startplace,
-                        startPlaceCode:startplaceval,
-                        arrivalPlace:endplace,
-                        arrivalPlaceCode:endplaceval,
+                        deptCity:startplace,
+                        deptCityCode:startplaceval,
+                        arrivalCity:endplace,
+                        arrivaltCityCode:endplaceval,
                         startTime:starttime,
                         invoiceType: INVOICE_TYPE.PLANE
                     }
@@ -238,10 +233,10 @@ var businessTravel=(function(){
                 if(endtime){
                     var consumeDetails_backTraffic = {
                         type:1,
-                        startPlace:endplace,
-                        startPlaceCode:endplaceval,
-                        arrivalPlace:startplace,
-                        arrivalPlaceCode:startplaceval,
+                        deptCity:endplace,
+                        deptCityCode:endplaceval,
+                        arrivalCity:startplace,
+                        arrivaltCityCode:startplaceval,
                         startTime:endtime,
                         invoiceType: INVOICE_TYPE.PLANE
                     }
@@ -258,7 +253,7 @@ var businessTravel=(function(){
                             window.location.href = "#/businessTravel/CreateResult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&spval="+startplaceval+"&epval="+endplaceval+"&"+parameter;
                         }
                         if (result != false) {
-                            window.location.href = "#/travelPlan/PlanDetail?planId="+result;
+                            window.location.href = "#/travelPlan/PlanDetail?tripPlanId="+result;
                         }
                     })
                     .catch(function(err){
@@ -281,15 +276,14 @@ var businessTravel=(function(){
      * @param $scope
      * @constructor
      */
-    businessTravel.LiveStepController = function($scope, $routeParams) {
+    businessTravel.LiveStepController = function($scope, $stateParams) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
-        loading(true);
         $("title").html("我要出差");
         Myselect();
-        var purposename = $routeParams.purposename;
-        var tra = $routeParams.tra;
-        var liv = $routeParams.liv;
+        var purposename = $stateParams.purposename;
+        var tra = $stateParams.tra;
+        var liv = $stateParams.liv;
         //目的地城市获取
         $scope.endplace = function () {
             API.onload(function() {
@@ -299,7 +293,6 @@ var businessTravel=(function(){
                         if ($scope.endplaceitems.length) {
                             $(".placelist1").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -327,7 +320,6 @@ var businessTravel=(function(){
                         if (!$scope.liveplaceitems.length) {
                             $(".placelist2").hide();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -376,8 +368,8 @@ var businessTravel=(function(){
                     companyId:$scope.companyId,
                     type:1,
                     description:purposename,
-                    destination:endplacename,
-                    destinationCode:endplace,
+                    arrivalCity:endplacename,
+                    arrivalCityCode:endplace,
                     isNeedTraffic:tra,
                     isNeedHotel:liv
                 }
@@ -405,7 +397,7 @@ var businessTravel=(function(){
                             window.location.href = "#/businessTravel/CreateResult?purposename=" + purposename + "&tra=" + tra + "&liv=" + liv + "&epval=" + endplace + "&lpval=" + liveplace + "&" + parameter;
                         }
                         if (result != false) {
-                            window.location.href = "#/travelPlan/PlanDetail?planId="+result;
+                            window.location.href = "#/travelPlan/PlanDetail?tripPlanId="+result;
                         }
                     })
                     .catch(function(err){
@@ -429,15 +421,14 @@ var businessTravel=(function(){
      * @param $scope
      * @constructor
      */
-    businessTravel.TrafficLiveController = function($scope, $routeParams) {
+    businessTravel.TrafficLiveController = function($scope, $stateParams) {
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
-        loading(true);
         $("title").html("我要出差");
         Myselect();
-        var purposename = $routeParams.purposename;
-        var tra = $routeParams.tra;
-        var liv = $routeParams.liv;
+        var purposename = $stateParams.purposename;
+        var tra = $stateParams.tra;
+        var liv = $stateParams.liv;
         //出发城市获取
         $scope.startplace = function () {
             API.onload(function() {
@@ -447,7 +438,6 @@ var businessTravel=(function(){
                         if ($scope.startplaceitems.length) {
                             $(".placelist1").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -472,7 +462,6 @@ var businessTravel=(function(){
                         if ($scope.endplaceitems.length) {
                             $(".placelist2").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         console.info (err);
@@ -498,7 +487,6 @@ var businessTravel=(function(){
                         if ($scope.liveplaceitems.length) {
                             $(".placelist2").show();
                         }
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -602,10 +590,10 @@ var businessTravel=(function(){
                     companyId:$scope.companyId,
                     type:1,
                     description:purposename,
-                    startPlace:startplace,
-                    startPlaceCode:startplaceval,
-                    destination:endplace,
-                    destinationCode:endplaceval,
+                    deptCity:startplace,
+                    deptCityCode:startplaceval,
+                    arrivalCity:endplace,
+                    arrivalCityCode:endplaceval,
                     startAt:starttime,
                     startTime:livetime,
                     endTime:leavetime,
@@ -637,10 +625,10 @@ var businessTravel=(function(){
                 if(starttime){
                     var consumeDetails_outTraffic = {
                         type:-1,
-                        startPlace:startplace,
-                        startPlaceCode:startplaceval,
-                        arrivalPlace:endplace,
-                        arrivalPlaceCode:endplaceval,
+                        deptCity:startplace,
+                        deptCityCode:startplaceval,
+                        arrivalCity:endplace,
+                        arrivaltCityCode:endplaceval,
                         startTime:starttime,
                         invoiceType: INVOICE_TYPE.PLANE
                     }
@@ -657,10 +645,10 @@ var businessTravel=(function(){
                 if(endtime){
                     var consumeDetails_backTraffic = {
                         type:1,
-                        startPlace:endplace,
-                        startPlaceCode:endplaceval,
-                        arrivalPlace:startplace,
-                        arrivalPlaceCode:startplaceval,
+                        deptCity:endplace,
+                        deptCityCode:endplaceval,
+                        arrivalCity:startplace,
+                        arrivaltCityCode:startplaceval,
                         startTime:endtime,
                         invoiceType: INVOICE_TYPE.PLANE
                     }
@@ -676,7 +664,7 @@ var businessTravel=(function(){
                             window.location.href = "#/businessTravel/CreateResult?purposename="+purposename+"&tra="+tra+"&liv="+liv+"&spval="+startplaceval+"&epval="+endplaceval+"&lpval="+liveplace+"&"+parameter;
                         }
                         if (result != false) {
-                            window.location.href = "#/travelPlan/PlanDetail?planId="+result;
+                            window.location.href = "#/travelPlan/PlanDetail?tripPlanId="+result;
                         }
                     })
                     .catch(function(err){
@@ -704,52 +692,50 @@ var businessTravel=(function(){
      * @param $scope
      * @constructor
      */
-    businessTravel.CreateResultController = function($scope, $routeParams, $filter) {
-        var spval = $routeParams.spval,
-            epval = $routeParams.epval,
-            st = $routeParams.st,
-            et = $routeParams.et;
+    businessTravel.CreateResultController = function($scope, $stateParams, $filter) {
+        var spval = $stateParams.spval,
+            epval = $stateParams.epval,
+            st = $stateParams.st,
+            et = $stateParams.et;
         $(".staff_menu_t ul li").removeClass("on");
         $(".staff_menu_t ul a").eq(3).find("li").addClass("on");
-        loading(false);
-        loading(true);
         $("title").html("我要出差");
-        var tra = $routeParams.tra;
-        var liv = $routeParams.liv;
-        $scope.purposename = $routeParams.purposename;//出差目的
-        $scope.tra = $routeParams.tra;//是否交通
-        $scope.liv = $routeParams.liv;//是否住宿
+        var tra = $stateParams.tra;
+        var liv = $stateParams.liv;
+        $scope.purposename = $stateParams.purposename;//出差目的
+        $scope.tra = $stateParams.tra;//是否交通
+        $scope.liv = $stateParams.liv;//是否住宿
         $scope.nowtime = new Date();
         //只选交通
         if (tra==1&&liv==0) {
-            $scope.startplace = $routeParams.sp;//出发城市
-            //$scope.startplaceval = $routeParams.spval;//出发城市代码
-            if ($routeParams.spval=="") {
-                $scope.startplaceval = $routeParams.sp;
+            $scope.startplace = $stateParams.sp;//出发城市
+            //$scope.startplaceval = $stateParams.spval;//出发城市代码
+            if ($stateParams.spval=="") {
+                $scope.startplaceval = $stateParams.sp;
             }
-            else if ($routeParams.spval!="") {
-                $scope.startplaceval = $routeParams.spval;
+            else if ($stateParams.spval!="") {
+                $scope.startplaceval = $stateParams.spval;
             }
-            $scope.endplace = $routeParams.ep;//目的地城市
-            //$scope.endplaceval = $routeParams.epval;//目的地城市代码
-            if ($routeParams.epval=="") {
-                $scope.endplaceval = $routeParams.ep;
+            $scope.endplace = $stateParams.ep;//目的地城市
+            //$scope.endplaceval = $stateParams.epval;//目的地城市代码
+            if ($stateParams.epval=="") {
+                $scope.endplaceval = $stateParams.ep;
             }
-            else if ($routeParams.epval!="") {
-                $scope.endplaceval = $routeParams.epval;
+            else if ($stateParams.epval!="") {
+                $scope.endplaceval = $stateParams.epval;
             }
-            $scope.starttime = $routeParams.st;//出发日期
-            $scope.starttimelate = $routeParams.stl;//出发最晚到达时间
-            $scope.endtime = $routeParams.et;//返回日期
-            $scope.endtimelate = $routeParams.etl;//返回最晚到达时间
+            $scope.starttime = $stateParams.st;//出发日期
+            $scope.starttimelate = $stateParams.stl;//出发最晚到达时间
+            $scope.endtime = $stateParams.et;//返回日期
+            $scope.endtimelate = $stateParams.etl;//返回最晚到达时间
             API.onload(function() {
-                Q.all([
+                Promise.all([
                     API.staff.getCurrentStaff(),
                     API.travelBudget.getTrafficBudget({
                         originPlace:$scope.startplaceval,
                         destinationPlace:$scope.endplaceval,
-                        outboundDate:$scope.starttime,
-                        inboundDate:$scope.endtime,
+                        leaveDate:$scope.starttime,
+                        goBackDate:$scope.endtime,
                         outLatestArriveTime:$scope.starttimelate,
                         inLatestArriveTime:$scope.endtimelate,
                         isRoundTrip:$scope.endtime
@@ -773,7 +759,6 @@ var businessTravel=(function(){
                         $scope.totalprice = ret2.price;
                         $scope.goTraffic = ret2.goTraffic.price;
                         $scope.backTraffic = ret2.backTraffic.price;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -784,14 +769,14 @@ var businessTravel=(function(){
         }
         //只选住宿
         if (tra==0&&liv==1) {
-            $scope.endplace = $routeParams.ep;//目的地城市
-            $scope.endplaceval = $routeParams.epval;//目的地城市代码
-            $scope.liveplace = $routeParams.lp;//住宿位置
-            $scope.livetime = $routeParams.livet;//入住时间
-            $scope.leavetime = $routeParams.leavet;//离店时间
-            $scope.businessDistrict = $routeParams.lpval;   //商圈
+            $scope.endplace = $stateParams.ep;//目的地城市
+            $scope.endplaceval = $stateParams.epval;//目的地城市代码
+            $scope.liveplace = $stateParams.lp;//住宿位置
+            $scope.livetime = $stateParams.livet;//入住时间
+            $scope.leavetime = $stateParams.leavet;//离店时间
+            $scope.businessDistrict = $stateParams.lpval;   //商圈
             API.onload(function() {
-                Q.all([
+                Promise.all([
                     API.staff.getCurrentStaff(),
                     API.travelBudget.getHotelBudget({
                         cityId:$scope.endplaceval,
@@ -808,7 +793,6 @@ var businessTravel=(function(){
                         $(".createresult,.tianxun").show();
                         $scope.totalprice = ret2.price;
                         $scope.liveprice = $scope.onlylive.price;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -820,38 +804,38 @@ var businessTravel=(function(){
         }
         //交通+住宿
         if (tra==1&&liv==1) {
-            $scope.startplace = $routeParams.sp;//出发城市
-            //$scope.startplaceval = $routeParams.spval;//出发城市代码
-            if ($routeParams.spval=="") {
-                $scope.startplaceval = $routeParams.sp;
+            $scope.startplace = $stateParams.sp;//出发城市
+            //$scope.startplaceval = $stateParams.spval;//出发城市代码
+            if ($stateParams.spval=="") {
+                $scope.startplaceval = $stateParams.sp;
             }
-            else if ($routeParams.spval!="") {
-                $scope.startplaceval = $routeParams.spval;
+            else if ($stateParams.spval!="") {
+                $scope.startplaceval = $stateParams.spval;
             }
-            $scope.endplace = $routeParams.ep;//目的地城市
-            //$scope.endplaceval = $routeParams.epval;//目的地城市代码
-            if ($routeParams.epval=="") {
-                $scope.endplaceval = $routeParams.ep;
+            $scope.endplace = $stateParams.ep;//目的地城市
+            //$scope.endplaceval = $stateParams.epval;//目的地城市代码
+            if ($stateParams.epval=="") {
+                $scope.endplaceval = $stateParams.ep;
             }
-            else if ($routeParams.epval!="") {
-                $scope.endplaceval = $routeParams.epval;
+            else if ($stateParams.epval!="") {
+                $scope.endplaceval = $stateParams.epval;
             }
-            $scope.starttime = $routeParams.st;//出发日期
-            $scope.starttimelate = $routeParams.stl;//出发最晚到达时间
-            $scope.endtime = $routeParams.et;//返回日期
-            $scope.endtimelate = $routeParams.etl;//返回最晚到达时间
-            $scope.liveplace = $routeParams.lp;//住宿位置
-            $scope.livetime = $routeParams.livet;//入住时间
-            $scope.leavetime = $routeParams.leavet;//离店时间
-            $scope.businessDistrict = $routeParams.lpval;   //商圈
+            $scope.starttime = $stateParams.st;//出发日期
+            $scope.starttimelate = $stateParams.stl;//出发最晚到达时间
+            $scope.endtime = $stateParams.et;//返回日期
+            $scope.endtimelate = $stateParams.etl;//返回最晚到达时间
+            $scope.liveplace = $stateParams.lp;//住宿位置
+            $scope.livetime = $stateParams.livet;//入住时间
+            $scope.leavetime = $stateParams.leavet;//离店时间
+            $scope.businessDistrict = $stateParams.lpval;   //商圈
             API.onload(function() {
-                Q.all([
+                Promise.all([
                     API.staff.getCurrentStaff(),
                     API.travelBudget.getTravelPolicyBudget({
                         originPlace:$scope.startplaceval,
                         destinationPlace:$scope.endplaceval,
-                        outboundDate:$scope.starttime,
-                        inboundDate:$scope.endtime,
+                        leaveDate:$scope.starttime,
+                        goBackDate:$scope.endtime,
                         outLatestArriveTime:$scope.starttimelate,
                         inLatestArriveTime:$scope.endtimelate,
                         businessDistrict:$scope.businessDistrict,
@@ -880,7 +864,6 @@ var businessTravel=(function(){
                         $scope.liveprice = $scope.trafficlive.hotel;
                         $scope.goTraffic = ret2.goTraffic.price;
                         $scope.backTraffic = ret2.backTraffic.price;
-                        $scope.$apply();
                     })
                     .catch(function(err){
                         TLDAlert(err.msg || err);
@@ -898,10 +881,10 @@ var businessTravel=(function(){
                     companyId:$scope.companyId,
                     type:1,
                     description:$scope.purposename,
-                    startPlace:$scope.startplace,
-                    startPlaceCode:$scope.startplaceval,
-                    destination:$scope.endplace,
-                    destinationCode:$scope.endplaceval,
+                    deptCity:$scope.startplace,
+                    deptCityCode:$scope.startplaceval,
+                    arrivalCity:$scope.endplace,
+                    arrivalCityCode:$scope.endplaceval,
                     startAt:$scope.starttime,
                     budget:Number($scope.totalprice),
                     isNeedTraffic:$scope.tra,
@@ -934,10 +917,10 @@ var businessTravel=(function(){
                 if($scope.starttime){
                     var consumeDetails_outTraffic = {
                         type:-1,
-                        startPlace:$scope.startplace,
-                        startPlaceCode:$scope.startplaceval,
-                        arrivalPlace:$scope.endplace,
-                        arrivalPlaceCode:$scope.endplaceval,
+                        deptCity:$scope.startplace,
+                        deptCityCode:$scope.startplaceval,
+                        arrivalCity:$scope.endplace,
+                        arrivaltCityCode:$scope.endplaceval,
                         startTime:$scope.starttime,
                         budget:Number($scope.goTraffic),
                         invoiceType: INVOICE_TYPE.PLANE
@@ -955,10 +938,10 @@ var businessTravel=(function(){
                 if($scope.endtime){
                     var consumeDetails_backTraffic = {
                         type:1,
-                        startPlace:$scope.endplace,
-                        startPlaceCode:$scope.endplaceval,
-                        arrivalPlace:$scope.startplace,
-                        arrivalPlaceCode:$scope.startplaceval,
+                        deptCity:$scope.endplace,
+                        deptCityCode:$scope.endplaceval,
+                        arrivalCity:$scope.startplace,
+                        arrivaltCityCode:$scope.startplaceval,
                         startTime:$scope.endtime,
                         budget:Number($scope.backTraffic),
                         invoiceType: INVOICE_TYPE.PLANE
@@ -969,9 +952,9 @@ var businessTravel=(function(){
                     consumeDetails.push(consumeDetails_backTraffic);
                 }
                 order.consumeDetails = consumeDetails;
-                API.tripPlan.savePlanOrder(order)
+                API.tripPlan.saveTripPlan(order)
                     .then(function(result){
-                        $scope.createTime = result.createAt;
+                        $scope.createTime = result.createdAt;
                         $scope.orderId = result.id;
                         $(".bottom1").hide();
                         $(".bottom2").show();
@@ -1000,7 +983,7 @@ var businessTravel=(function(){
         }
         //上传票据
         $scope.upLoad = function () {
-            window.location.href = "#/travelPlan/PlanDetail?planId="+$scope.orderId;
+            window.location.href = "#/travelPlan/PlanDetail?tripPlanId="+$scope.orderId;
         }
     }
 

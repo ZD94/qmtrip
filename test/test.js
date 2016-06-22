@@ -6,11 +6,18 @@ var path = require('path');
 process.env.NODE_PATH = '.:'+process.env.NODE_PATH;
 
 require('app-module-path').addPath(path.normalize(path.join(__dirname, '..')));
-require('common/typescript');
+var zone = require('common/zone');
+require('common/typescript').install();
 
 global.Promise = require('bluebird');
-Promise.config({ longStackTraces: true });
+Promise.config({ longStackTraces: false });
 Promise.promisifyAll(require('fs'));
+
+process.on('unhandledRejection', (reason, p) => {
+    throw reason;
+});
+
+require('./mocha-zone')(global);
 
 var config = require("../config");
 
@@ -28,14 +35,23 @@ var logger = new Logger('test');
 var API = require('common/api');
 
 var model = require('common/model');
-model.init(config.postgres.url);
+model.init(config.postgres.url_test);
 
-
-API.init(path.join(__dirname, '../api'), config.api)
-    .then(API.loadTests.bind(API))
-    .then(run)
-    .catch(function(e){
-        logger.error(e.stack?e.stack:e);
-        console.error(e.stack?e.stack:e);
-        process.exit();
+zone.forkStackTrace()
+    .fork({name: 'test', properties: {session: {}}})
+    .run(function(){
+        Promise.resolve()
+            .then(function(){
+                //return API.initSql(path.join(__dirname, '../api'), config.api_test)
+            })
+            .then(function(){
+                return API.init(path.join(__dirname, '../api'), config.api_test)
+            })
+            .then(API.loadTests.bind(API))
+            .then(run)
+            .catch(function(e){
+                logger.error(e.stack?e.stack:e);
+                console.error(e.stack?e.stack:e);
+                process.exit();
+            });
     });

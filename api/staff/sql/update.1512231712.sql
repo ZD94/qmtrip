@@ -1,1 +1,0 @@
-alter table staff.staffs alter column role_id set default 1;

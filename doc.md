@@ -40,8 +40,8 @@
      * @param {Object} params 参数
      * @param {String} params.originPlace 出发地
      * @param {String} params.destinationPlace 目的地
-     * @param {String} params.outboundDate 出发时间
-     * @param {String} params.inboundDate 返回时间(可选)
+     * @param {String} params.leaveDate 出发时间
+     * @param {String} params.goBackDate 返回时间(可选)
      * @param {Callback} callback
      * @return {Promise} {"price": "合理预算值"}
      */

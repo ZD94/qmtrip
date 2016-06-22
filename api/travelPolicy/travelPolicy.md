@@ -30,7 +30,7 @@
 | msg     | 提示信息 |
 | json数据   | 差旅标准信息|
 
->. 代理商创建差旅标准 API.travelPolicy.agencyCreateTravelPolicy(params, callback);
+>. 代理商创建差旅标准 API.travelPolicy.createTravelPolicy(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------
@@ -62,7 +62,7 @@
 | code     | 返回代码0正确 其他错误 |
 | msg     | 提示信息 |
 
->. 代理商删除差旅标准 API.travelPolicy.agencyDeleteTravelPolicy(params, callback);
+>. 代理商删除差旅标准 API.travelPolicy.deleteTravelPolicy(params, callback);
 
 | 参数                                    | 含义               |类型                  | 备注
 |------                                 |------               |-----                |------

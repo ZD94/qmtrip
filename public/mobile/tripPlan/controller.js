@@ -8,122 +8,12 @@
  	API.require("wechat");
  	var tripPlan ={};
 
- 	tripPlan.UploadImgController = function($scope, $routeParams, FileUploader){
+ 	tripPlan.UploadImgController = function($scope, $stateParams, FileUploader){
         function isWeixin() {
             var reg  = /micromessenger/i;
             return reg.test(window.navigator.userAgent);
         }
 
-        $scope.isInWeixin = false;
-        //if (isWeixin()) {
-        //    //如果在微信中,调用微信jsdk
-        //    $scope.isInWeixin = true;
-        //    var url = window.location.href;
-        //    var debug = true;
-        //    var jsApiList = [
-        //        "chooseImage",
-        //        "uploadImage",
-        //        "downloadImage"
-        //    ];
-        //
-        //    API.onload(function() {
-        //        API.wechat.getJSDKParams({
-        //                url: url,
-        //                debug: debug,
-        //                jsApiList: jsApiList
-        //            })
-        //            .then(function(config) {
-        //                wx.config(config);
-        //            })
-        //            .catch(function(err) {
-        //                alert("系统错误,请稍后重试");
-        //            });
-        //    })
-        //
-        //    $scope.TrafficUploader = new FileUploader();    //不初始化报错
-        //    $scope.HotelUploader = new FileUploader();
-        //    $scope.BackTrafficUploader = new FileUploader();
-        //
-        //    $scope.uploadInvoice = function(id) {
-        //        wx.ready(function() {
-        //            wx.chooseImage({
-        //                count: 1,
-        //                success: function (res) {
-        //                    var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
-        //                    //上传
-        //                    wx.uploadImage({
-        //                        localId: localIds[0],
-        //                        success: function(res) {
-        //                            var serverId = res.serverId;
-        //                            API.wechat.mediaId2key({
-        //                                mediaId: serverId
-        //                            })
-        //                            .then(function(key) {
-        //                                uploadInvoice(id, key);
-        //                            })
-        //                            .catch(function(err) {
-        //                                console.info(err);
-        //                                alert("系统错误,请稍后重试");
-        //                            })
-        //                        }
-        //                    })
-        //                }
-        //            })
-        //        });
-        //    }
-        //
-        //
-        //} else {
-            // var uploadConf = {
-            //     url: "/upload/ajax-upload-file?type=invoice",
-            //     alias: "tmpFile",
-            //     autoUpload: false
-            // };
-
-         //$scope.winWidth = $(window).width();
-         //var uploader = $scope.uploader = new FileUploader(uploadConf);
-         //uploader.filters.push({
-         //    name: 'customFilter',
-         //    fn: function(item, options) {
-         //        return this.queue.length < 10;
-         //    }
-         //});
-         //uploader.onAfterAddingFile = function(file) {
-         //    preview(file);
-         //    console.info(file);
-         //
-         //}
-         //uploader.onCompleteItem = function(fileItem, response, status, headers) {
-         //    var consumeId;
-         //    if(fileItem.traffictype == '去程'){
-         //        consumeId = $scope.outTraffic.id;
-         //    }
-         //    if(fileItem.traffictype == ''){
-         //        consumeId = $scope.hotel.id;
-         //    }
-         //    if(fileItem.traffictype == '回程'){
-         //        consumeId = $scope.backTraffic.id;
-         //    }
-         //    var md5key = response.md5key;
-         //    uploadInvoice(consumeId, md5key, function(err, result){
-         //        if (err ) {
-         //            TLDAlert(err.msg || err);
-         //            return;
-         //        }
-         //        $scope.initall();
-         //    });
-         //
-         //    $scope.close_pre();
-         //};
-         //function preview(file) {
-         //    $scope.invoicetype = file.invoicetype;
-         //    $scope.traffictype = file.traffictype;
-         //    $(".upload_sure").show();
-         //}
-         //$scope.close_pre = function() {
-         //    $(".upload_sure").hide();
-         //    $(".ngthumb").hide();
-         //}
         $scope.winWidth = $(window).width();
         $scope.uploader = init_uploader(FileUploader);
         $scope.backtraffic_up = function(cb){
@@ -132,8 +22,8 @@
             cb(type1, type2);
         }
         $scope.backtraffic_done = function(response){
-            var md5key = response.md5key;
-            uploadInvoice($scope.backTraffic.id, md5key, function(err, result){
+            var fileId = response.fileId;
+            uploadInvoice($scope.backTraffic.id, fileId, function(err, result){
                     if (err ) {
                         TLDAlert(err.msg || err);
                         return;
@@ -147,11 +37,10 @@
                     picture: picture
                 }, callback);
         }
- 		loading(true);
- 		var planId = $routeParams.planId;
+ 		var tripPlanId = $stateParams.tripPlanId;
         $scope.initall = function() {
             API.onload(function(){
-                API.tripPlan.getTripPlanOrderById({orderId: planId})
+                API.tripPlan.getTripPlan({id: tripPlanId})
                     .then(function(plan){
                         $scope.plan = plan;
                         $scope.backTraffic = plan.backTraffic[0];
@@ -193,11 +82,9 @@
                                 $scope.backClass = "ready";
                             }
                         }
-                        // $scope.$apply();
                         API.staff.getCurrentStaff()
                             .then(function(staff){
                                 $scope.name = staff.name;
-                                $scope.$apply();
                             })
                     })
             })
@@ -205,7 +92,7 @@
  		$scope.initall();
 		$scope.push = function () {
             API.onload(function() {
-                API.tripPlan.commitTripPlanOrder(planId)
+                API.tripPlan.commitTripPlan(tripPlanId)
                     .then(function(result){
                         alert ("提交成功");
                         window.location.href = '#/tripPlan/uploadDown';
@@ -218,7 +105,6 @@
         
  	}
     tripPlan.UploadDownController = function($scope){
-        loading(true);
     }
  	return tripPlan;
  })();
