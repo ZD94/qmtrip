@@ -1,7 +1,7 @@
 <ion-view title="预算结果" id="page16">
     <ion-content padding="true" class="has-header" style="background: url(ionic/images/backgroud.png) center no-repeat;background-size:cover;">
         <div id="page16-markdown4" style="color:#000000;text-align:right;">
-            <p>{{trip.createAt| date: 'yyyy-MM-dd HH:mm:ss'}}</p>
+            <p  style="color: #fff;">{{trip.createAt| date: 'yyyy-MM-dd HH:mm:ss'}}</p>
         </div>
         <form class="list">
             <label class="item item-input">
@@ -17,7 +17,7 @@
         <ion-list class="jl_projectinfo">
             <ion-item class="project_tit">{{trip.reason}}</ion-item>
             <ion-item class="project_cont">
-                <p ng-if="trip && trip.beginDate">{{trip.beginDate| date: 'MM/dd'}} 至 {{trip.endDate | date: 'MM/dd'}}</p>
+                <p ng-if="trip && trip.beginDate">{{trip.beginDate| date: 'yyyy-MM-dd'}} 至 {{trip.endDate | date: 'yyyy-MM-dd'}}</p>
                 <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{totalPrice == -1 ? '暂无预算' : (totalPrice| currency: '')}}</span>{{totalPrice == -1 ? '' : '元'}}</p>
             </ion-item>
         </ion-list>
