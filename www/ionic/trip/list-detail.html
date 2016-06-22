@@ -3,6 +3,12 @@
         <div id="page20-markdown7" style="color:#000000;text-align:right;">
             <p style="color: #fff;">{{tripDetail.createdAt.value | date: 'yyyy-MM-dd HH:mm'}}</p>
         </div>
+
+        <ion-list ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS">
+            <label class="item item-input opactic">
+                <span class="input-label op_single">审批未通过，备注：{{tripDetail.auditRemark}}</span>
+            </label>
+        </ion-list>
         <ion-list class="jl_projectinfo">
             <ion-item class="project_tit">{{tripDetail.title}}</ion-item>
             <ion-item class="project_cont">
@@ -49,9 +55,9 @@
                     <div class="item-note" ng-if="goTraffic.status == EPlanStatus.WAIT_APPROVE">
                         待审批
                     </div>
-                    <div class="item-note" ng-if="goTraffic.status == EPlanStatus.APPROVE_NOT_PASS">
-                        审批未通过，原因：{{tripDetail.auditRemark}}
-                    </div>
+                    <!--<div class="item-note" ng-if="goTraffic.status == EPlanStatus.APPROVE_NOT_PASS">-->
+                        <!--审批未通过-->
+                    <!--</div>-->
                     <div class="item-note" ng-if="goTraffic.status == EPlanStatus.COMPLETE">
                         <a class="button button-small button-outline" ng-click="checkInvoice(goTraffic.id)">查看票据</a>
                     </div>
@@ -98,9 +104,9 @@
                     <div class="item-note" ng-if="backTraffic.status == EPlanStatus.WAIT_APPROVE">
                         待审批
                     </div>
-                    <div class="item-note" ng-if="backTraffic.status == EPlanStatus.APPROVE_NOT_PASS">
-                        审批未通过，原因：{{tripDetail.auditRemark}}
-                    </div>
+                    <!--<div class="item-note" ng-if="backTraffic.status == EPlanStatus.APPROVE_NOT_PASS">-->
+                        <!--审批未通过-->
+                    <!--</div>-->
                     <div class="item-note" ng-if="backTraffic.status == EPlanStatus.COMPLETE">
                         <a class="button button-small button-outline" ng-click="checkInvoice(backTraffic.id)">查看票据</a>
                     </div>
@@ -152,9 +158,9 @@
                     <div class="item-note" ng-if="hotel.status == EPlanStatus.WAIT_APPROVE">
                         待审批
                     </div>
-                    <div class="item-note" ng-if="hotel.status == EPlanStatus.APPROVE_NOT_PASS">
-                        审批未通过，原因：{{tripDetail.auditRemark}}
-                    </div>
+                    <!--<div class="item-note" ng-if="hotel.status == EPlanStatus.APPROVE_NOT_PASS">-->
+                        <!--审批未通过-->
+                    <!--</div>-->
                     <div class="item-note" ng-if="hotel.status == EPlanStatus.COMPLETE">
                         <a class="button button-small button-outline" ng-click="checkInvoice(hotel.id)">查看票据</a>
                     </div>
