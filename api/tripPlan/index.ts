@@ -148,8 +148,14 @@ class TripPlanModule {
                 logger.warn(tripPlan.autoApproveTime);
             }else {
                 //出发前一天18点
-                tripPlan.autoApproveTime = moment(tripPlan.startAt.valueOf()).subtract(6, 'hours').format('YYYY-MM-DD HH:mm:ss');
-                logger.warn(tripPlan.autoApproveTime);
+                let autoApproveTime = moment(tripPlan.startAt.valueOf()).subtract(6, 'hours').format('YYYY-MM-DD HH:mm:ss');
+
+                //当天18点以后申请的出差计划，一个小时后自动审批
+                if(moment(autoApproveTime).diff(moment) <= 0) {
+                    autoApproveTime = moment(tripPlan.createdAt).add(1, 'hours').format('YYYY-MM-DD HH:mm:ss');
+                }
+
+                tripPlan.autoApproveTime = autoApproveTime;
             }
         }
 
