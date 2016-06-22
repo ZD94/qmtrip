@@ -280,6 +280,10 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
                 throw L.ERR.EMAIL_EMPTY();
             }
 
+            if (!_staff.mobile) {
+                throw L.ERR.MOBILE_EMPTY();
+            }
+
             if (!validator.isEmail(_staff.email)) {
                 throw L.ERR.EMAIL_FORMAT_INVALID();
             }

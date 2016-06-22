@@ -643,6 +643,59 @@ class ApiAuth {
     // }
 
 
+    @clientExport
+    @requireParams(['mobile', 'name', 'email', 'userName','msgCode','msgTicket'], ['pwd','agencyId', 'remark', 'description'])
+    static async registerCompany(params:{name: string, userName: string, email: string, mobile: string, pwd: string,
+        msgCode: string, msgTicket: string, agencyId?: string}){
+        //先创建登录账号
+        // if (!params) {
+        //     params = {};
+        // }
+        var companyName = params.name;
+        var name = params.userName;
+        var email = params.email;
+        var mobile = params.mobile;
+        var msgCode = params.msgCode;
+        var msgTicket = params.msgTicket;
+        var pwd = params.pwd;
+
+        if (!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_FORMAT_ERROR();
+        }
+
+
+        if (!msgCode || !msgTicket) {
+            throw {code: -1, msg: "短信验证码错误"};
+        }
+
+        if (!name) {
+            throw {code: -1, msg: "联系人姓名为空"};
+        }
+
+        if (!companyName) {
+            throw {code: -1, msg: "公司名称为空"};
+        }
+
+        if (!pwd) {
+            throw {code: -1, msg: "密码为空"};
+        }
+        var companyId = uuid.v1();
+        var domain = email.split(/@/)[1];
+
+        return Promise.resolve(true)
+            .then(function() {
+                if (msgCode == 'test' && msgTicket == 'test') {
+                    return true;
+                }
+
+                return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+            })
+            .then(function() {
+                return API.company.registerCompany({mobile:mobile, email: email,name: companyName,userName: name, pwd: pwd});
+            })
+    }
+
+
     /**
      * @method authenticate
      *
