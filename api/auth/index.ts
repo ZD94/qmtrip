@@ -691,7 +691,7 @@ class ApiAuth {
                 return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
             })
             .then(function() {
-                return API.company.registerCompany({mobile:mobile, email: email,name: companyName,userName: name, pwd: pwd});
+                return API.company.registerCompany({mobile:mobile, email: email,name: companyName,userName: name, pwd: pwd, status: 1});
             })
     }
 
@@ -1224,7 +1224,7 @@ class ApiAuth {
 
         //二维码自动登录
         app.all("/auth/qrcode-login", function(req, res, next) {
-            var storageseturl = C.host + "/ionic.html#/login/storageset";
+            var storageSetUrl = C.host + "/ionic.html#/login/storageSet";
             var accountId = req.query.accountId;
             var timestamp = req.query.timestamp;
             var sign = req.query.sign;
@@ -1236,7 +1236,7 @@ class ApiAuth {
                     res.cookie("user_id", result.user_id);
                     res.cookie("timestamp", result.timestamp);
                     res.cookie("token_sign", result.token_sign);
-                    res.redirect(storageseturl+"?token_id="+result.token_id+"&user_id="+result.user_id+"&timestamp="+result.timestamp+"&token_sign="+result.token_sign+"&back_url="+backUrl);
+                    res.redirect(storageSetUrl+"?token_id="+result.token_id+"&user_id="+result.user_id+"&timestamp="+result.timestamp+"&token_sign="+result.token_sign+"&back_url="+backUrl);
                 })
                 .catch(function(err) {
                     console.info(err);
