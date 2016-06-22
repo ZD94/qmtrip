@@ -1034,21 +1034,11 @@ class ApiAuth {
      * @param {String} params.backUrl
      */
     @clientExport
-    static async getQRCodeUrl (params: {backUrl: string, accountId?: string, email?: string}) : Promise<string> {
+    static async getQRCodeUrl (params: {backUrl: string, accountId?: string}) : Promise<string> {
 
         let session = Zone.current.get("session");
         var accountId = params.accountId || session["accountId"];
         var backUrl = params.backUrl;
-        var email = params.email;
-
-        if(email){
-            let accounts = await Models.account.find({where: {email: email}});
-            if(accounts && accounts.length>0){
-                accountId = accounts[0].id;
-            }else{
-                throw L.ERR.ACCOUNT_NOT_EXIST();
-            }
-        }
 
         return Promise.resolve()
             .then(function(){

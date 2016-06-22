@@ -58,9 +58,9 @@
                 <ion-item ng-if="budget.tripType == ETripType.HOTEL">
                     <span>{{trip.beginDate | date: 'MM/dd'}}至{{trip.endDate | date: 'MM/dd'}} 共{{duringDays}}天</span>
                     <br/>
-                    &nbsp;
+                   <!-- &nbsp;
                     <i class="icon ion-home"></i>
-                    &nbsp;
+                    &nbsp;-->
                     {{trip.destinationPlaceName}}
                     <br>{{budget.price | currency: ''}}元
                 </ion-item>
