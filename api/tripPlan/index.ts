@@ -78,7 +78,7 @@ class TripPlanModule {
         if (!tripPlan.auditUser) {
             tripPlan.auditUser = null;
         }
-        let tripDetails: TripDetail[] = budgets.map(function (budget) {
+        let tripDetails: any = await Promise.all(budgets.map(async function (budget) {
             let tripType = budget.tripType;
             let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: Number(budget.price)});
             detail.accountId = staff.id;
@@ -106,9 +106,10 @@ class TripPlanModule {
                     tripPlan.isNeedTraffic = true;
                     break;
                 case ETripType.HOTEL:
+                    let landMarkInfo = await API.place.getCityInfo({cityCode: query.businessDistrict});
                     detail.cityCode = query.destinationPlace;
                     detail.city = tripPlan.arrivalCity;
-                    detail.hotelName = query.businessDistrict;
+                    detail.hotelName = landMarkInfo.name || '';
                     detail.startTime = query.checkInDate || query.leaveDate;
                     detail.endTime = query.checkOutDate || query.goBackDate;
                     tripPlan.isNeedHotel = true;
@@ -135,7 +136,7 @@ class TripPlanModule {
             }
 
             return detail;
-        });
+        }));
 
         tripPlan.budget = totalBudget;
         tripPlan.status = totalBudget<0 ? EPlanStatus.NO_BUDGET : EPlanStatus.WAIT_APPROVE;
@@ -151,7 +152,7 @@ class TripPlanModule {
                 let autoApproveTime = moment(tripPlan.startAt.valueOf()).subtract(6, 'hours').format('YYYY-MM-DD HH:mm:ss');
 
                 //当天18点以后申请的出差计划，一个小时后自动审批
-                if(moment(autoApproveTime).diff(moment) <= 0) {
+                if(moment(autoApproveTime).diff(moment()) <= 0) {
                     autoApproveTime = moment(tripPlan.createdAt).add(1, 'hours').format('YYYY-MM-DD HH:mm:ss');
                 }
 
@@ -160,7 +161,7 @@ class TripPlanModule {
         }
 
         await Promise.all([tripPlan.save(), tripPlanLog.save()]);
-        await Promise.all(tripDetails.map((d)=>d.save()));
+        await Promise.all(tripDetails.map((d) => d.save()));
 
         if (tripPlan.budget > 0 || tripPlan.status === EPlanStatus.WAIT_APPROVE) {
             await TripPlanModule.sendTripPlanEmails(tripPlan, staff.id);
@@ -1003,12 +1004,17 @@ class TripPlanModule {
                     // logger.warn('auto_approve_time==>', moment(p.autoApproveTime).format('YYYY-MM-DD HH:mm:ss'));
                     let details = await p.getTripDetails({});
                     p.status = EPlanStatus.WAIT_UPLOAD;
-                    let tripPlanLog = Models.tripPlanLog.create({tripPlanId: p.id, userId: p.auditUser, remark: '系统自动审批出差计划'});
+
+                    if(p.auditUser && /^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}$/.test(p.auditUser)) {
+                        let tripPlanLog = Models.tripPlanLog.create({tripPlanId: p.id, userId: p.auditUser, remark: '系统自动审批出差计划'});
+                        await tripPlanLog.save();
+                    }
+
                     await Promise.all(details.map((d) => {
                         d.status = EPlanStatus.WAIT_UPLOAD;
                         return d.save();
                     }));
-                    await Promise.all([p.save(), tripPlanLog.save()]);
+                    await p.save();
                 });
             });
         }catch (e) {
