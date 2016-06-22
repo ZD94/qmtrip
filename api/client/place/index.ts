@@ -116,14 +116,9 @@ class ApiPlace {
         }
         return API.place.getCityInfo(params)
             .then(function(result: any) {
-                console.info("*******************************");
                 if(!result) {
                     return null;
                 }
-                if(result.toJSON) {
-                    result = result.toJSON();
-                }
-                console.info(result);
                 return new Place(result);
             })
     }

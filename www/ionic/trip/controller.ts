@@ -489,8 +489,6 @@ export async function ListDetailController($location, $scope , Models, $statePar
                     trip.hotel = true;
                     trip.hotelPlace = detail.hotelName || '';
                     let landMarkInfo = {name: ''};
-                    console.info("**************");
-                    console.info(detail.hotelName);
                     if(detail.hotelName) {
                         landMarkInfo = await API.place.getCityInfo({cityCode: detail.hotelName});
                     }
