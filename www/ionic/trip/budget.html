@@ -1,5 +1,5 @@
 <ion-view title="预算结果" id="page16">
-    <ion-content padding="true" class="has-header" style="background: url(ionic/images/backgroud.png) center no-repeat;background-size:cover;">
+    <ion-content padding="true" class="has-header has-bottom-btn" style="background: url(ionic/images/backgroud.png) center no-repeat;background-size:cover;">
         <div id="page16-markdown4" style="color:#000000;text-align:right;">
             <p  style="color: #fff;">{{trip.createAt| date: 'yyyy-MM-dd HH:mm:ss'}}</p>
         </div>
@@ -87,7 +87,10 @@
         <div class="button-bar"></div>
         <div class="spacer" style="width: 300px; height: 26px;"></div>
 
-        <a ng-click="saveTripPlan()" id="page16-button56" class="button button-positive  button-block">预算提交审批</a>
-        <a href="#/trip/create" id="page16-button58" class="button button-light  button-block button-outline">取消</a>
+
+        <!--<a href="#/trip/create" id="page16-button58" class="button button-light  button-block button-outline">取消</a>-->
     </ion-content>
+    <div class="fixed_bottom">
+        <a ng-click="saveTripPlan()" id="page16-button56" class="button button-positive">预算提交审批</a>
+    </div>
 </ion-view>
