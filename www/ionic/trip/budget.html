@@ -15,7 +15,7 @@
         </form>
 
         <ion-list class="jl_projectinfo">
-            <ion-item class="project_tit">{{trip.reason}}</ion-item>
+            <ion-item class="project_tit">{{trip.reason || trip.reasonName}}</ion-item>
             <ion-item class="project_cont">
                 <p ng-if="trip && trip.beginDate">{{trip.beginDate| date: 'yyyy-MM-dd'}} 至 {{trip.endDate | date: 'yyyy-MM-dd'}}</p>
                 <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{totalPrice == -1 ? '暂无预算' : (totalPrice| currency: '')}}</span>{{totalPrice == -1 ? '' : '元'}}</p>

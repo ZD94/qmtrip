@@ -45,6 +45,7 @@ export async function CreateController($scope, $storage, $ionicLoading){
     } catch(err) {
         trip = {};
     }
+
     //定位当前ip位置
     /*try {
         var position = await API.tripPlan.getIpPosition({});
@@ -204,6 +205,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     API.require("travelBudget");
     await API.onload();
     let result = await API.travelBudget.getBudgetInfo({id: id});
+    console.info(result);
     let budgets = result.budgets;
     let trip = $storage.local.get("trip");
     trip.beginDate = result.query.leaveDate;
@@ -253,7 +255,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         });
 
         try {
-            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason, auditUser: trip.auditUser})
+            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason||trip.reasonName, auditUser: trip.auditUser})
             window.location.href = '#/trip/committed?id='+planTrip.id;
         } catch(err) {
             alert(err.msg || err);
@@ -464,13 +466,13 @@ export async function ListDetailController($location, $scope , Models, $statePar
         let tripPlan = $scope.tripDetail;
         let tripDetails = $scope.budgets;
         let trip: any = {
-            beginDate: moment(tripPlan.startAt).toDate(),
-            endDate: moment(tripPlan.backAt).toDate(),
+            beginDate: moment(tripPlan.startAt.value).toDate(),
+            endDate: moment(tripPlan.backAt.value).toDate(),
             place: tripPlan.arrivalCityCode,
             placeName: tripPlan.arrivalCity,
             reasonName: tripPlan.title
         };
-        tripDetails.map((detail) => {
+        await Promise.all(tripDetails.map(async (detail) => {
             switch (detail.type) {
                 case ETripType.OUT_TRIP:
                     trip.traffic = true;
@@ -485,10 +487,16 @@ export async function ListDetailController($location, $scope , Models, $statePar
                     break;
                 case ETripType.HOTEL:
                     trip.hotel = true;
-                    trip.hotelPlace = detail.cityCode;
-                    trip.hotelPlaceName = detail.city;
+                    trip.hotelPlace = detail.hotelName || '';
+                    let landMarkInfo = {name: ''};
+                    console.info("**************");
+                    console.info(detail.hotelName);
+                    if(detail.hotelName) {
+                        landMarkInfo = await API.place.getCityInfo({cityCode: detail.hotelName});
+                    }
+                    trip.hotelPlaceName = landMarkInfo.name;
             }
-        });
+        }));
         await $storage.local.set('trip', trip);
         window.location.href="#/trip/create";
     };

@@ -78,7 +78,7 @@ class TripPlanModule {
         if (!tripPlan.auditUser) {
             tripPlan.auditUser = null;
         }
-        let tripDetails: any = await Promise.all(budgets.map(async function (budget) {
+        let tripDetails: TripDetail[] = budgets.map(function (budget) {
             let tripType = budget.tripType;
             let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: Number(budget.price)});
             detail.accountId = staff.id;
@@ -106,10 +106,10 @@ class TripPlanModule {
                     tripPlan.isNeedTraffic = true;
                     break;
                 case ETripType.HOTEL:
-                    let landMarkInfo = await API.place.getCityInfo({cityCode: query.businessDistrict});
+                    // let landMarkInfo = await API.place.getCityInfo({cityCode: query.businessDistrict});
                     detail.cityCode = query.destinationPlace;
                     detail.city = tripPlan.arrivalCity;
-                    detail.hotelName = landMarkInfo.name || '';
+                    detail.hotelName = query.businessDistrict; //landMarkInfo.name || '';
                     detail.startTime = query.checkInDate || query.leaveDate;
                     detail.endTime = query.checkOutDate || query.goBackDate;
                     tripPlan.isNeedHotel = true;
@@ -136,7 +136,7 @@ class TripPlanModule {
             }
 
             return detail;
-        }));
+        });
 
         tripPlan.budget = totalBudget;
         tripPlan.status = totalBudget<0 ? EPlanStatus.NO_BUDGET : EPlanStatus.WAIT_APPROVE;
@@ -202,7 +202,8 @@ class TripPlanModule {
             hotelStr = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') +
                 ', ' + h.city + ',';
             if(h.hotelName) {
-                hotelStr += h.hotelName + ',';
+                let landMarkInfo = await API.place.getCityInfo({cityCode: h.hotelName});
+                hotelStr += landMarkInfo.name + ',';
             }
             hotelStr += '动态预算￥' + h.budget;
         }
