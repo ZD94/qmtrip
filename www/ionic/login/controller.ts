@@ -6,6 +6,7 @@ var API = require('common/api');
 API.require('auth');
 
 export function StorageSetController($scope, $stateParams, $storage) {
+    console.info("StorageSet...........................");
     let token_id = $stateParams.token_id;
     let user_id = $stateParams.user_id;
     let token_sign = $stateParams.token_sign;
@@ -22,7 +23,7 @@ export function StorageSetController($scope, $stateParams, $storage) {
     Cookie.set("timestamp", data.timestamp, {expires: 30});
     Cookie.set("token_id", data.token_id, {expires: 30});
     API.reload_all_modules();
-
+    console.info("go"+back_url);
     window.location.href = back_url;
 }
 

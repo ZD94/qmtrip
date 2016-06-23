@@ -57,9 +57,9 @@ class CompanyModule {
      * @returns {Promise<Company>}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'email', 'userName'], ['pwd', 'remark', 'description'])
+    @requireParams(['mobile', 'name', 'email', 'userName'], ['pwd', 'status', 'remark', 'description'])
     static async registerCompany(params: {mobile: string, name: string, email: string, domain: string,
-        userName: string, pwd?: string, remark?: string, description?: string}): Promise<Company>{
+        userName: string, pwd?: string, status?: number, remark?: string, description?: string}): Promise<Company>{
         let session = Zone.current.get('session');
         let pwd = params.pwd || '123456';
         let agencyId = Agency.__defaultAgencyId;
@@ -80,7 +80,7 @@ class CompanyModule {
             }
         }
 
-        let staff = Staff.create({email: params.email, name: params.userName, mobile: params.mobile, roleId: EStaffRole.OWNER, pwd: md5(pwd)});
+        let staff = Staff.create({email: params.email, name: params.userName, mobile: params.mobile, roleId: EStaffRole.OWNER, pwd: md5(pwd), status: params.status});
         let company = Company.create(params);
         company.domainName = domain;
         let department = Department.create({name: "我的企业", isDefault: true});

@@ -46,6 +46,7 @@ export async function CreateController($scope, $storage, $ionicLoading){
         trip = {};
     }
 
+
     //定位当前ip位置
     /*try {
         var position = await API.tripPlan.getIpPosition({});
@@ -55,14 +56,23 @@ export async function CreateController($scope, $storage, $ionicLoading){
         // msgbox.log(err.msg);
     }*/
 
-    var today = moment();
-    if (!trip.beginDate || (new Date(trip.beginDate) < new Date())) {
-        trip.beginDate = today.startOf('day').hour(9).toDate();
+    if(!trip.regenerate) {
+        trip = {
+            beginDate: moment().toDate(),
+            endDate: moment().add(3, 'days').toDate()
+        };
+        await $storage.local.set('trip', trip);
+    }else {
+        var today = moment();
+        if (!trip.beginDate || (new Date(trip.beginDate) < new Date())) {
+            trip.beginDate = today.startOf('day').hour(9).toDate();
+        }
+
+        if (!trip.endDate || (new Date(trip.beginDate)) >= new Date(trip.endDate)) {
+            trip.endDate = moment(trip.beginDate).add(3, 'days').toDate();
+        }
     }
 
-    if (!trip.endDate || (new Date(trip.beginDate)) >= new Date(trip.endDate)) {
-        trip.endDate = moment(trip.beginDate).add(1, 'days').toDate();
-    }
 
     $storage.local.set('trip', trip);
     $scope.trip = trip;
@@ -466,6 +476,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
         let tripPlan = $scope.tripDetail;
         let tripDetails = $scope.budgets;
         let trip: any = {
+            regenerate: true,
             beginDate: moment(tripPlan.startAt.value).toDate(),
             endDate: moment(tripPlan.backAt.value).toDate(),
             place: tripPlan.arrivalCityCode,
