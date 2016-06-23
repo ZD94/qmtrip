@@ -249,11 +249,20 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
     let staff;
     var currentstaff = await Staff.getCurrent();
     var company = currentstaff.company;
-    let staffId = $stateParams.staffId
+    let staffId = $stateParams.staffId;
+    $scope.travelpolicylist = await company.getTravelPolicies();
+    $scope.departmentlist = await company.getDepartments();
     if ($stateParams.staffId) {
         staff = await Models.staff.get($stateParams.staffId);
     } else {
         staff = Staff.create();
+        staff.company = company;
+        if($scope.travelpolicylist && $scope.travelpolicylist.length>0){
+            staff.travelPolicyId = $scope.travelpolicylist[0].id;
+        }
+        if($scope.departmentlist && $scope.departmentlist.length>0){
+            staff.department = $scope.departmentlist[0];
+        }
         staff.company = company;
     }
     $scope.staffId = $stateParams.staffId;
@@ -263,8 +272,7 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
         role.id = true;
     }
     $scope.role = role;
-    $scope.travelpolicylist = await company.getTravelPolicies();
-    $scope.departmentlist = await company.getDepartments();
+
     $scope.savestaff = async function () {
         let _staff = $scope.staff;
         if (_staff.travelPolicyId && _staff.travelPolicyId.id) {
@@ -288,7 +296,7 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
                 throw L.ERR.EMAIL_FORMAT_INVALID();
             }
             if(company.domainName && company.domainName != "" && _staff.email.indexOf(company.domainName) == -1){
-                throw L.ERR.INVALID_ARGUMENT('email');
+                throw L.ERR.EMAIL_FORMAT_INVALID();
             }
 
             if (_staff.mobile && !validator.isMobilePhone(_staff.mobile, 'zh-CN')) {
