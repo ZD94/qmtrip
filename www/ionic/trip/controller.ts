@@ -39,6 +39,10 @@ export async function CreateController($scope, $storage, $ionicLoading){
     API.require('tripPlan');
     await API.onload();
 
+    let minStDate = moment().format('YYYY-MM-DD');
+    $scope.minStDate = minStDate;
+    $scope.minEndDate = minStDate;
+
     let trip;
     try {
         trip= TripDefineFromJson($storage.local.get('trip'));
@@ -71,41 +75,43 @@ export async function CreateController($scope, $storage, $ionicLoading){
         if (!trip.endDate || (new Date(trip.beginDate)) >= new Date(trip.endDate)) {
             trip.endDate = moment(trip.beginDate).add(3, 'days').toDate();
         }
+        trip.regenerate = false;
     }
 
+    $scope.oldBeginDate = trip.beginDate;
 
     $storage.local.set('trip', trip);
     $scope.trip = trip;
     $scope.$watch('trip', function(){
         $storage.local.set('trip', $scope.trip);
-    }, true)
+    }, true);
 
     $scope.$watch('trip.placeName', function($newVal, $oldVal) {
         if ($newVal != $oldVal) {
-            $scope.trip.hotelPlaceName = ''
+            $scope.trip.hotelPlaceName = '';
             $scope.trip.hotelPlace = '';
         }
     });
 
     $scope.calcTripDuration = function(){
         return moment(trip.endDate).diff(trip.beginDate, 'days') || 1;
-    }
+    };
     $scope.incTripDuration = function(){
         trip.endDate = moment(trip.endDate).add(1, 'days').toDate();
         $scope.$applyAsync();
-    }
+    };
     $scope.decTripDuration = function(){
         var newDate = moment(trip.endDate).subtract(1, 'days').toDate();
         if(newDate > trip.beginDate){
             trip.endDate = newDate;
             $scope.$applyAsync();
         }
-    }
+    };
 
     $scope.queryPlaces = async function(keyword){
         var places = await API.place.queryPlace({keyword: keyword});
         return places.map((place)=> {return {name: place.name, value: place.id} });
-    }
+    };
 
     $scope.queryHotelPlace = async function(keyword) {
         let city = $scope.trip.place;
@@ -119,7 +125,7 @@ export async function CreateController($scope, $storage, $ionicLoading){
             return hotelPlaces.map((p)=> { return { name: p.name, value: p.id} });
         }
         return [];
-    }
+    };
     
     $scope.queryProjects = async function(keyword){
         var staff = await Staff.getCurrent();
@@ -129,10 +135,10 @@ export async function CreateController($scope, $storage, $ionicLoading){
         }
         var projects = await Models.project.find(options);
         return projects.map((project)=>{ return {name: project.name, value: project.id}} );
-    }
+    };
     $scope.createProject = async function(name){
         console.info("function createProject...");
-    }
+    };
 
     $scope.nextStep = async function() {
         API.require("travelBudget");
@@ -203,6 +209,21 @@ export async function CreateController($scope, $storage, $ionicLoading){
     $scope.chooseReason = function(val) {
         $scope.trip.reason = val.name ? val.name: val;
         console.info($scope.trip.reason);
+    }
+
+    $scope.checkDate = function() {
+        let beginDate = trip.beginDate;
+        let endDate = trip.endDate;
+
+        if(moment(endDate).diff(moment(beginDate)) < 0) {
+            alert('出发日期不能晚于结束日期');
+            $scope.trip.beginDate = $scope.oldBeginDate;
+            return;
+        }
+
+        $scope.oldBeginDate = beginDate;
+
+        $scope.minEndDate = moment(beginDate).format('YYYY-MM-DD');
     }
 }
 
