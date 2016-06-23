@@ -1111,10 +1111,10 @@ class ApiAuth {
      * @param {String} params.backUrl
      */
     @clientExport
-    static async getQRCodeUrl (params: {backUrl: string, accountId?: string}) : Promise<string> {
+    static async getQRCodeUrl (params: {backUrl: string}) : Promise<string> {
 
         let session = Zone.current.get("session");
-        var accountId = params.accountId || session["accountId"];
+        var accountId = session["accountId"];
         var backUrl = params.backUrl;
 
         return Promise.resolve()
