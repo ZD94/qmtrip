@@ -695,6 +695,30 @@ class ApiAuth {
             })
     }
 
+    /**
+     * 成为伙伴申请
+     * @param params
+     */
+    @clientExport
+    @requireParams(['type', 'companyName','userName','mobile', 'email', 'qq'])
+    static async sendPartnerEmail(params){
+        var email = "peng.wang@jingli.tech";
+
+        var vals = {
+            type: params.type,
+            companyName: params.companyName,
+            userName: params.userName,
+            mobile: params.mobile,
+            email: params.email,
+            qq: params.qq
+        }
+        await API.mail.sendMailRequest({
+            toEmails: email,
+            templateName: "qm_www_tobe_partner",
+            values: vals
+        })
+    }
+
 
     /**
      * @method authenticate
