@@ -46,6 +46,21 @@ $ionicons-font-path: "../fonts" !default;
 //}
 
 
+ion-side-menu{
+  .side-menu-left{
+    .menulist{
+      .list{
+        div{
+          &:last-child{
+            margin-bottom: 50px;
+          }
+        }
+      }
+    }
+  }
+}
+
+
 @media (max-width: 320px){
   ion-side-menu{
     .side-menu-left{
