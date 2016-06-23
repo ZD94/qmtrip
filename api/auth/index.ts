@@ -1131,7 +1131,7 @@ class ApiAuth {
             })
             .then(function(shortUrl) {
                 backUrl = encodeURIComponent(shortUrl);
-                return DBM.Account.findById(accountId)
+                return Models.account.get(accountId)
             })
             .then(function(account) {
                 if (!account) {
