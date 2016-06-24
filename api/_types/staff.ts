@@ -68,8 +68,8 @@ export class Staff extends ModelObject implements Account {
     set avatar(val: string) {}
     //状态
     @Field({type: Types.INTEGER})
-    get status(): EStaffStatus { return 0; }
-    set status(val: EStaffStatus) {}
+    get staffStatus(): EStaffStatus { return EStaffStatus.ON_JOB; }
+    set staffStatus(val: EStaffStatus) {}
     // '员工总获取的积分'
     @Field({type: Types.INTEGER})
     get totalPoints(): number { return 0; }
@@ -129,6 +129,7 @@ export class Staff extends ModelObject implements Account {
     pwd: string;
     forbiddenExpireAt: Date;
     loginFailTimes: number;
+    status: number;
     lastLoginAt: Date;
     lastLoginIp: string;
     activeToken: string;

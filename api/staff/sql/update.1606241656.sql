@@ -1,0 +1,1 @@
+alter table staff.staffs alter COLUMN staff_status set default 1;

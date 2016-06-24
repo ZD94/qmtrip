@@ -38,7 +38,6 @@ angular
                     uploader.onAfterAddingFile = function(file) {
                         onAfterAddingFile(file, function() {
                             $loading.start();
-                            console.info("after adding")
                             uploader.uploadAll();
                         });
                     };
