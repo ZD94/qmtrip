@@ -43,7 +43,6 @@ angular
                     };
 
                     uploader.onCompleteItem = function (file, response, status, headers) {
-                        
                         file.done(response);
                         $loading.end();
                         $("#upload").remove();

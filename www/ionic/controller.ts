@@ -78,6 +78,13 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
                 title:'差旅标准',
                 link:'company/travelpolicy',
                 badgeNum: 0
+            },
+            {
+                id:1060,
+                icon:'',
+                title:'',
+                link:'',
+                badgeNum: 0
             })
     }
     for( var i =0;i<items.length;i++){

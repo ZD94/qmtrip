@@ -52,14 +52,16 @@ ion-side-menu{
       .list{
         div{
           &:last-child{
-            margin-bottom: 100px;
+            margin-bottom: 50px;
           }
         }
       }
     }
   }
 }
-
+.loading-container{
+  z-index: 1003;
+}
 
 @media (max-width: 320px){
   ion-side-menu{

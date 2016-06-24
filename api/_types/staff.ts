@@ -12,7 +12,8 @@ import { ModelObject } from 'common/model/object';
 import {Pager} from "common/model/cached";
 
 export enum EStaffStatus {
-    ON_JOB = 0,
+    FORBIDDEN = 0,
+    ON_JOB = 1,
     QUIT_JOB = -1,
     DELETE = -2
 }

@@ -180,16 +180,26 @@ class StaffModule{
         let updateStaff = await Models.staff.get(params.id);
         let staff = await Staff.getCurrent();
 
+        //仅剩一个管理员是不允许修改权限
+        if(updateStaff.roleId == EStaffRole.ADMIN && params.roleId == EStaffRole.COMMON){
+            var admins = await Models.staff.find({where: {companyId: updateStaff.company.id, roleId: EStaffRole.ADMIN, id:{$ne: updateStaff.id}}});
+            if(!admins || admins.length == 0){
+                throw {code: -1, msg: "该企业仅剩一位管理员，不能取消身份"};
+            }
+        }
+
         for(var key in params){
             updateStaff[key] = params[key];
         }
-        await updateStaff.save();
 
         let tp = await Models.travelPolicy.get(updateStaff["travelPolicyId"]);
         let defaultDept = await API.department.getDefaultDepartment({companyId: updateStaff["companyId"]});
 
         if(params.email){
+            //修改邮箱
             if(updateStaff.status == 0){
+                //未激活账户修改邮箱
+                await updateStaff.save();
                 //未激活账户 并且未通过修改邮箱更新账户信息发送激活邮件
                 return API.auth.sendResetPwdEmail({companyName: updateStaff.company.name, email: updateStaff.email, type: 1, isFirstSet: true})
                     .then(function() {
@@ -200,7 +210,8 @@ class StaffModule{
                 throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
             }
         }else {
-            //已激活账户
+            //不修改邮箱
+            await updateStaff.save();
             let vals  = {
                 username: updateStaff.name,
                 mobile: updateStaff.mobile,

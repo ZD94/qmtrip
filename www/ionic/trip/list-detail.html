@@ -22,7 +22,7 @@
             <div ng-if="goTraffic">
                 <ion-item class="item-divider">
                     <span>交通</span>
-                    <span style="margin-left: 120px;">{{goTraffic.budget + backTraffic.budget | currency: ''}}</span>元
+                    <span style="margin-left: 120px;">{{(goTraffic.budget + backTraffic.budget) == -1 ? '暂无预算' : ((goTraffic.budget + backTraffic.budget)| currency: '')}}</span>{{(goTraffic.budget + backTraffic.budget) == -1 ? '' : '元'}}
                 </ion-item>
                 <ion-item>
                     <span>{{goTraffic.startTime.value | date: 'yyyy-MM-dd'}}</span>
@@ -35,7 +35,7 @@
                     <i ng-if='goTraffic.invoiceType == EInvoiceType.OTHER'>-</i>
                     &nbsp;
                     {{tripDetail.arrivalCity}}
-                    <br>{{goTraffic.budget}}元
+                    <br>{{goTraffic.budget == -1 ? '暂无预算' : (goTraffic.budget| currency: '')+'元'}}
                     <div class="item-note" ng-if="goTraffic.status == EPlanStatus.WAIT_UPLOAD">
                         <div class="uploadbtns button-small botton-outline button-positive" ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD || tripDetail.status == EPlanStatus.AUDIT_NOT_PASS"
                              ng-uploader accept="image/*" title="goTraffic.title" done="goTraffic.done">
@@ -83,7 +83,7 @@
                     <i ng-if='backTraffic.invoiceType == EInvoiceType.OTHER'>-</i>
                     &nbsp;
                     {{tripDetail.deptCity}}
-                    <br>{{backTraffic.budget}}元
+                    <br>{{backTraffic.budget == -1 ? '暂无预算' : (backTraffic.budget| currency: '')+'元'}}
                     <div class="item-note" ng-if="backTraffic.status == EPlanStatus.WAIT_UPLOAD">
                         <div class="uploadbtns button-small botton-outline button-positive"
                              ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD || tripDetail.status == EPlanStatus.AUDIT_NOT_PASS"
@@ -123,7 +123,7 @@
             <div ng-if="hotel">
                 <ion-item class="item-divider">
                     <span>住宿</span>
-                    <span style="margin-left: 120px;">{{hotel.budget | currency: ''}}</span>元
+                    <span style="margin-left: 120px;">{{hotel.budget == -1 ? '暂无预算' : (hotel.budget| currency: '')}}</span>{{hotel.budget == -1 ? '' : '元'}}
                 </ion-item>
                 <ion-item>
                     <span>{{hotel.startTime.value | date: 'yyyy-MM-dd'}}</span> 至
@@ -137,7 +137,7 @@
                     <i ng-if='hotel.invoiceType == EInvoiceType.OTHER'>-</i>
                     &nbsp;-->
                     {{tripDetail.arrivalCity}}
-                    <br>{{hotel.budget}}元
+                    <br>{{hotel.budget == -1 ? '暂无预算' : (hotel.budget| currency: '')+'元'}}
                     <div class="item-note" ng-if="hotel.status == EPlanStatus.WAIT_UPLOAD">
                         <div class="uploadbtns button-small botton-outline button-positive"
                              ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD || tripDetail.status == EPlanStatus.AUDIT_NOT_PASS"
@@ -177,12 +177,12 @@
             <div ng-if='other'>
                 <ion-item class="item-divider">
                     <span>补助</span>
-                    <span style="margin-left: 120px;">{{other.budget | currency: ''}}</span>元
+                    <span style="margin-left: 120px;">{{other.budget == -1 ? '暂无预算' : (other.budget| currency: '')}}</span>{{other.budget == -1 ? '' : '元'}}
                 </ion-item>
                 <ion-item class="">
                     <span>{{tripDetail.startAt.value | date: 'yyyy-MM-dd'}}</span> 至
                     <span>{{tripDetail.backAt.value | date: 'yyyy-MM-dd'}}</span>
-                    <br>{{other.budget | currency: ''}}元
+                    <br>{{other.budget == -1 ? '暂无预算' : (other.budget| currency: '')+ '元'}}
                 </ion-item>
             </div>
         </ion-list>
