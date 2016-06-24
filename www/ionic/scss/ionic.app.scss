@@ -59,7 +59,9 @@ ion-side-menu{
     }
   }
 }
-
+.loading-container{
+  z-index: 1003;
+}
 
 @media (max-width: 320px){
   ion-side-menu{
