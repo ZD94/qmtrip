@@ -1,1 +1,0 @@
-alter table staff.staffs RENAME COLUMN status to staff_status;
