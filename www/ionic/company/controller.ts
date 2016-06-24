@@ -418,16 +418,19 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
                  title: '提示',
                  template: err.msg
              })*/
+            if(err.code == -1){
+                $scope.staff.roleId = EStaffRole.ADMIN;
+            }
             msgbox.log(err.msg);
         }
 
     }
     $scope.showrole = function () {
-        if ($scope.role.id == true) {
+        /*if ($scope.role.id == true) {
             $scope.staff.roleId = EStaffRole.ADMIN;
         } else {
             $scope.staff.roleId = EStaffRole.COMMON;
-        }
+        }*/
         $ionicHistory.goBack(-1);
     }
 }
