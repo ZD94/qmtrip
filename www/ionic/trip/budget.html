@@ -40,7 +40,7 @@
                     <span ng-if='budget.tripType == ETripType.BACK_TRIP'>回程交通</span>
                     <span ng-if='budget.tripType == ETripType.HOTEL'>住宿</span>
                     <span ng-if='budget.tripType == ETripType.SUBSIDY'>补助</span>
-                    <span style="margin-left: 120px;">{{budget.price | currency: ''}}</span>元
+                    <span style="margin-left: 120px;">{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')}}</span>{{budget.price == -1 ? '' : '元'}}
                 </ion-item>
 
                 <ion-item ng-if="budget.tripType == ETripType.BACK_TRIP">
@@ -52,7 +52,7 @@
                     <i ng-if='budget.type == EInvoiceType.HOTEL' class="icon ion-home"></i>
                     &nbsp;
                     {{trip.originPlaceName}}
-                    <br/>{{budget.price | currency: ''}}元
+                    <br/>{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')+'元'}}
                 </ion-item>
 
                 <ion-item ng-if="budget.tripType == ETripType.HOTEL">
@@ -62,13 +62,13 @@
                     <i class="icon ion-home"></i>
                     &nbsp;-->
                     {{trip.destinationPlaceName}}
-                    <br>{{budget.price | currency: ''}}元
+                    <br>{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')+'元'}}
                 </ion-item>
 
                 <ion-item ng-if="budget.tripType == ETripType.SUBSIDY">
                     <span>{{trip.beginDate | date: 'MM/dd'}}至{{trip.endDate | date: 'MM/dd'}} 共{{duringDays}}天</span>
                     <br/>
-                    {{budget.price | currency : ''}}元
+                    {{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')+'元'}}
                 </ion-item>
 
                 <ion-item ng-if="budget.tripType == ETripType.OUT_TRIP">
@@ -79,7 +79,7 @@
                     <i ng-if='budget.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
                     &nbsp;
                     {{trip.destinationPlaceName}}
-                    <br/>{{budget.price | currency: ''}}元
+                    <br/>{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')+'元'}}
                 </ion-item>
             </div>
         </ion-list>
