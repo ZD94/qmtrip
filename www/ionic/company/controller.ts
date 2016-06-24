@@ -166,7 +166,6 @@ export async function DepartmentController($scope, Models, $ionicPopup) {
             return depart;
         });
         await Promise.all(departments.map(async function (depart) {
-            console.info(depart);
             var result = await depart.department.getStaffs();
             depart.staffnum = result.length;
             return depart;
@@ -245,8 +244,9 @@ export async function StaffsController($scope, Models) {
     }
 }
 
-export async function StaffdetailController($scope, $stateParams, Models, $ionicHistory, $ionicPopup) {
+export async function StaffdetailController($scope, $storage, $stateParams, Models, $ionicHistory, $ionicPopup) {
     let staff;
+    let preRole;
     var currentstaff = await Staff.getCurrent();
     var company = currentstaff.company;
     let staffId = $stateParams.staffId;
@@ -254,6 +254,7 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
     $scope.departmentlist = await company.getDepartments();
     if ($stateParams.staffId) {
         staff = await Models.staff.get($stateParams.staffId);
+        preRole = staff.roleId;
     } else {
         staff = Staff.create();
         staff.company = company;
@@ -274,6 +275,7 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
     $scope.role = role;
 
     $scope.savestaff = async function () {
+        var logout = false;
         let _staff = $scope.staff;
         if (_staff.travelPolicyId && _staff.travelPolicyId.id) {
             _staff.travelPolicyId = _staff.travelPolicyId.id;
@@ -302,8 +304,9 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
             if (_staff.mobile && !validator.isMobilePhone(_staff.mobile, 'zh-CN')) {
                 throw L.ERR.MOBILE_NOT_CORRECT();
             }
-            //如果是更新,再去判断
+
             if (!staffId) {
+                //如果不是更新,再去判断
                 //查询邮箱是否已经注册
                 var account1 = await Models.account.find({where: {email: _staff.email, type: 1}});
                 if (account1 && account1.length>0) {
@@ -312,14 +315,48 @@ export async function StaffdetailController($scope, $stateParams, Models, $ionic
 
                 if(_staff.mobile){
                     var account2 = await Models.account.find({where: {mobile: _staff.mobile, type: 1}});
-                    console.info(account2);
-                    if (account2 && account2.length>0 && account2.mobile && account2.mobile != "") {
+                    if (account2 && account2.length>0) {
                         throw L.ERR.MOBILE_HAS_REGISTRY();
                     }
                 }
+            }else{
+                //如果是更新
+                if(_staff.mobile){
+                    var account2 = await Models.account.find({where: {mobile: _staff.mobile, type: 1, id: {$ne: _staff.id}}});
+
+                    if (account2 && account2.length>0) {
+                        throw L.ERR.MOBILE_HAS_REGISTRY();
+                    }
+                }
+                if(preRole == EStaffRole.ADMIN && _staff.roleId == EStaffRole.COMMON){
+                    logout = true;
+                }
             }
+
             _staff = await _staff.save();
-            $ionicHistory.goBack(-1);
+
+            if(logout){
+                //重新登录
+                var nshow = $ionicPopup.show({
+                    title: '修改权限需重新登录',
+                    scope: $scope,
+                    buttons: [
+                        {
+                            text: '确定',
+                            type: 'button-positive',
+                            onTap: async function (e) {
+                                await API.onload();
+                                $storage.local.remove('auth_data');
+                                API.reload_all_modules();
+                                window.location.href = '#login/';
+                                window.location.reload();
+                            }
+                        }
+                    ]
+                })
+            }else{
+                $ionicHistory.goBack(-1);
+            }
         }catch (err){
             /*var show = $ionicPopup.alert({
                  title: '提示',
@@ -356,7 +393,6 @@ export async function TravelpolicyController($scope, Models, $location) {
         obj.usernum = result.length;
         return obj;
     }))
-    console.info($scope.travelPolicies);
     $scope.editpolicy = async function (id) {
         // var travelpolicy = await Models.travelPolicy.get(id);
         $location.path('/company/editpolicy').search({'policyId': id}).replace();

@@ -127,7 +127,7 @@ class DepartmentModule{
     @requireParams(["companyId"])
     @conditionDecorator([
         {if: condition.isCompanyAdminOrOwner("0.companyId")},
-        {if: condition.isSelfDepartment("0.id")},
+        {if: condition.isCompanyStaff("0.companyId")},
         {if: condition.isCompanyAgency("0.companyId")}
     ])
     static async getDefaultDepartment(params): Promise<Department>{

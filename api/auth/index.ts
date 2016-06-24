@@ -663,6 +663,9 @@ class ApiAuth {
             throw L.ERR.MOBILE_NOT_CORRECT();
         }
 
+        if (!email || !validator.isEmail(email)) {
+            throw L.ERR.EMAIL_FORMAT_INVALID();
+        }
 
         if (!msgCode || !msgTicket) {
             throw {code: -1, msg: "短信验证码错误"};
@@ -684,10 +687,6 @@ class ApiAuth {
 
         return Promise.resolve(true)
             .then(function() {
-                if (msgCode == 'test' && msgTicket == 'test') {
-                    return true;
-                }
-
                 return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
             })
             .then(function() {
