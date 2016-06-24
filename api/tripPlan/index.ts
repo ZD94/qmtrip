@@ -997,7 +997,7 @@ class TripPlanModule {
     static _scheduleTask () {
         let taskId = "authApproveTrainPlan"
         logger.info('run task ' + taskId);
-        scheduler('*/1 * * * *', taskId, async function() {
+        scheduler('*/5 * * * *', taskId, async function() {
             let tripPlans = await Models.tripPlan.find({where: {autoApproveTime: {$lte: utils.now()}, status: EPlanStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
             // logger.info("自动审批出差计划...");
             tripPlans.map(async (p) => {
