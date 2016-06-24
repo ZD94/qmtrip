@@ -994,34 +994,29 @@ class TripPlanModule {
 
     static __initHttpApp = require('./invoice');
 
-    static async __initOnce() {
-        try{
-            let taskId = moment().format('YYYYMMDDHHmmss');
-            logger.info('run task ' + taskId);
-            scheduler('*/5 * * * *', taskId, async function() {
-                let tripPlans = await Models.tripPlan.find({where: {autoApproveTime: {$lte: utils.now()}, status: EPlanStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
-                // logger.info("自动审批出差计划...");
-                tripPlans.map(async (p) => {
-                    // logger.warn('auto_approve_time==>', moment(p.autoApproveTime).format('YYYY-MM-DD HH:mm:ss'));
-                    let details = await p.getTripDetails({});
-                    p.status = EPlanStatus.WAIT_UPLOAD;
+    static _scheduleTask () {
+        let taskId = "authApproveTrainPlan"
+        logger.info('run task ' + taskId);
+        scheduler('*/1 * * * *', taskId, async function() {
+            let tripPlans = await Models.tripPlan.find({where: {autoApproveTime: {$lte: utils.now()}, status: EPlanStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
+            // logger.info("自动审批出差计划...");
+            tripPlans.map(async (p) => {
+                // logger.warn('auto_approve_time==>', moment(p.autoApproveTime).format('YYYY-MM-DD HH:mm:ss'));
+                let details = await p.getTripDetails({});
+                p.status = EPlanStatus.WAIT_UPLOAD;
 
-                    if(p.auditUser && /^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}$/.test(p.auditUser)) {
-                        let tripPlanLog = Models.tripPlanLog.create({tripPlanId: p.id, userId: p.auditUser, remark: '系统自动审批出差计划'});
-                        await tripPlanLog.save();
-                    }
+                if(p.auditUser && /^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}$/.test(p.auditUser)) {
+                    let tripPlanLog = Models.tripPlanLog.create({tripPlanId: p.id, userId: p.auditUser, remark: '系统自动审批出差计划'});
+                    await tripPlanLog.save();
+                }
 
-                    await Promise.all(details.map((d) => {
-                        d.status = EPlanStatus.WAIT_UPLOAD;
-                        return d.save();
-                    }));
-                    await p.save();
-                });
+                await Promise.all(details.map((d) => {
+                    d.status = EPlanStatus.WAIT_UPLOAD;
+                    return d.save();
+                }));
+                await p.save();
             });
-        }catch (e) {
-            logger.error('自动审批任务启动失败...');
-            logger.error(e);
-        }
+        });
     }
 
 }
@@ -1037,5 +1032,6 @@ async function getProjectByName(params) {
     }
 }
 
+TripPlanModule._scheduleTask();
 
 export = TripPlanModule;
