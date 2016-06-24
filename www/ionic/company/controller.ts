@@ -2,7 +2,7 @@
  * Created by seven on 16/5/9.
  */
 "use strict";
-import {EStaffRole, Staff} from "api/_types/staff";
+import {EStaffRole, Staff, EStaffStatus} from "api/_types/staff";
 import {EPlanStatus} from 'api/_types/tripPlan';
 import {TravelPolicy, MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 import {Department} from "api/_types/department";
@@ -210,8 +210,9 @@ export async function DepartmentController($scope, Models, $ionicPopup) {
     }
 }
 
-export async function StaffsController($scope, Models) {
+export async function StaffsController($scope, Models, $ionicPopup) {
     var staff = await Staff.getCurrent();
+    $scope.currentStaff = staff;
     var staffs = await staff.company.getStaffs();
     $scope.staffs = staffs.map(function (staff) {
         var obj = {staff: staff, role: ""};
@@ -239,8 +240,61 @@ export async function StaffsController($scope, Models) {
             obj.travelPolicy = await obj.staff.getTravelPolicy();
             return obj;
         }));
-        
+    }
 
+    $scope.delete = async function(id, index) {
+        var delshow = $ionicPopup.show({
+            title: '确定删除该员工吗？',
+            scope: $scope,
+            buttons: [
+                {
+                    text: '取消',
+                },
+                {
+                    text: '确定',
+                    type: 'button-positive',
+                    onTap: async function (e) {
+                        try{
+                            var delStaff = await Models.staff.get(id);
+                            await delStaff.destroy();
+                            $scope.staffs.splice(index, 1);
+                        }catch(err){
+                            console.info(err);
+                            msgbox.log(err.msg);
+                        }
+                    }
+                }
+            ]
+        })
+    }
+
+    $scope.forbidden = async function(id, index) {
+        var forshow = $ionicPopup.show({
+            title: '确定禁用该员工吗？',
+            scope: $scope,
+            buttons: [
+                {
+                    text: '取消',
+                },
+                {
+                    text: '确定',
+                    type: 'button-positive',
+                    onTap: async function (e) {
+                        try{
+                            var forbidStaff = await Models.staff.get(id);
+                            forbidStaff.status = EStaffStatus.FORBIDDEN;
+                            forbidStaff.staffStatus = EStaffStatus.FORBIDDEN;
+                            await forbidStaff.save();
+                            $scope.staffs.splice(index, 1);
+                        }catch(err){
+                            console.info(err);
+                            msgbox.log(err.msg);
+
+                        }
+                    }
+                }
+            ]
+        })
     }
 }
 
