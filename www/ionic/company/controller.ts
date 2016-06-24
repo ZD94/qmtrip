@@ -87,7 +87,7 @@ export async function RecordController($scope, Models) {
     $scope.staffName = '';
 
     $scope.enterDetail = function(tripid){
-        window.location.href = "#/trip-approval/detail?tripid="+tripid;
+        window.location.href = "#/trip/list-detail?tripid="+tripid;
     };
 
     $scope.searchTripPlans = async function(staffName) {

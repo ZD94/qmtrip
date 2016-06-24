@@ -524,7 +524,9 @@ export async function ListDetailController($location, $scope , Models, $statePar
                     if(detail.hotelName) {
                         landMarkInfo = await API.place.getCityInfo({cityCode: detail.hotelName});
                     }
-                    trip.hotelPlaceName = landMarkInfo.name;
+                    if(landMarkInfo && landMarkInfo.name){
+                        trip.hotelPlaceName = landMarkInfo.name;
+                    }
             }
         }));
         await $storage.local.set('trip', trip);
