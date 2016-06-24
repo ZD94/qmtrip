@@ -21,6 +21,13 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.tripPlan = tripPlan;
     let staff = tripPlan.account; //await Models.staff.get(tripPlan.accountId);
     $scope.staff = staff;
+    
+    //判断有无审批权限
+    let isHasPermissionApprove = false;
+    let curStaff = await Staff.getCurrent();
+    if(curStaff.id == tripPlan.auditUser) { isHasPermissionApprove = true;}
+    $scope.isHasPermissionApprove = isHasPermissionApprove;
+    
     let tripDetails = await tripPlan.getTripDetails();
     let traffic = [], hotel = [];
     let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
