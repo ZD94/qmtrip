@@ -60,7 +60,7 @@
     "traverse": "^0.6.6",
     "ts-node": "^0.7.2",
     "typescript": "^1.8.9",
-    "typescript-1.9": "http://download.jingli.tech:8088/typescript-1.9/typescript-1.9.0-dev.20160426.tgz",
+    "typescript-1.9": "http://jingli365.com/download/typescript-1.9.0-dev.20160426.tgz",
     "uuid": "^2.0.2",
     "validator": "^5.2.0",
     "weak": "^1.0.1",
