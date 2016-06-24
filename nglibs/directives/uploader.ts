@@ -38,12 +38,12 @@ angular
                     uploader.onAfterAddingFile = function(file) {
                         onAfterAddingFile(file, function() {
                             $loading.start();
+                            console.info("after adding")
                             uploader.uploadAll();
                         });
                     };
 
                     uploader.onCompleteItem = function (file, response, status, headers) {
-                        
                         file.done(response);
                         $loading.end();
                         $("#upload").remove();
