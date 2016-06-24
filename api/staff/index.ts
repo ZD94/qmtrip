@@ -147,7 +147,7 @@ class StaffModule{
         }
         await deleteStaff.destroy();
 
-        let company = await Models.company.get(deleteStaff["companyId"]);
+        /*let company = await Models.company.get(deleteStaff["companyId"]);
         var vals = {
             name: deleteStaff.name || "",
             time: utils.now(),
@@ -158,7 +158,7 @@ class StaffModule{
             toEmails: deleteStaff.email,
             templateName: "qm_notify_remove_staff",
             values: vals
-        })
+        })*/
         return true;
 
     }
@@ -179,6 +179,10 @@ class StaffModule{
 
         let updateStaff = await Models.staff.get(params.id);
         let staff = await Staff.getCurrent();
+
+        if(staff.id == params.id && params.staffStatus == EStaffStatus.FORBIDDEN){
+            throw {code: -2, msg: "不可禁用自身账号"};
+        }
 
         //仅剩一个管理员是不允许修改权限
         if(updateStaff.roleId == EStaffRole.ADMIN && params.roleId == EStaffRole.COMMON){
@@ -285,6 +289,7 @@ class StaffModule{
     static async getStaffs(params: {where: any, order?: any, attributes?: any}) :Promise<FindResult>{
         let staff = await Staff.getCurrent();
 
+        params.where.staffStatus = {$ne: EStaffStatus.FORBIDDEN}
         let { accountId } = Zone.current.get("session");
         if (!params.where) {
             params.where = {};
