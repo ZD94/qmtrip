@@ -72,7 +72,7 @@ export function IndexController($scope,$stateParams, $storage) {
 export async function TestController($scope) {
     console.info("do this...")
     $scope.initscan = function(){
-        var backUrl = "http://"+window.location.host+"/ionic.html#/trip/create";
+        var backUrl = "http://"+window.location.host+"/index.html#/trip/create";
         API.onload(function() {
             API.auth.getQRCodeUrl({backUrl: backUrl, accountId: "c3d5f7c0-32e8-11e6-9af9-0710d114e84c", email: "yali.wang@jingli.tech"})
                 .then(function(content) {
@@ -181,7 +181,7 @@ export async function FirstSetPwdController ($scope, $stateParams) {
             API.auth.resetPwdByEmail({accountId: accountId, sign: sign, timestamp: timestamp, pwd: newPwd})
                 .then(function () {
                     alert("密码设置成功,请重新登录");
-                    window.location.href = "ionic.html#/login/index";
+                    window.location.href = "index.html#/login/index";
                     return;
                 })
                 .catch(window.alert).done();

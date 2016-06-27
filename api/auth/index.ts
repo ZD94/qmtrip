@@ -203,11 +203,11 @@ class ApiAuth {
                 };
 
                 if (isFirstSet) {
-                    vals.url = C.host + "/ionic.html#/login/first-set-pwd?" + url;
+                    vals.url = C.host + "/index.html#/login/first-set-pwd?" + url;
                     templateName = 'qm_first_set_pwd_email';
                     return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
                 } else {
-                    vals.url = C.host + "/ionic.html#/login/reset-pwd?" + url;
+                    vals.url = C.host + "/index.html#/login/reset-pwd?" + url;
                     templateName = 'qm_reset_pwd_email';
                     return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
                 }
@@ -1247,7 +1247,7 @@ class ApiAuth {
 
         //二维码自动登录
         app.all("/auth/qrcode-login", function(req, res, next) {
-            var storageSetUrl = C.host + "/ionic.html#/login/storageSet";
+            var storageSetUrl = C.host + "/index.html#/login/storageSet";
             var accountId = req.query.accountId;
             var timestamp = req.query.timestamp;
             var sign = req.query.sign;
@@ -1380,7 +1380,7 @@ function _sendActiveEmail(accountId) {
             var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
             var activeToken = utils.getRndStr(6);
             var sign = makeActiveSign(activeToken, account.id, expireAt);
-            var url = C.host + "/ionic.html#/login/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
+            var url = C.host + "/index.html#/login/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
             //发送激活邮件
             var vals = {name: account.email, username: account.email, url: url};
             // return true;
