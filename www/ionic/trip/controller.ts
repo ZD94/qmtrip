@@ -222,7 +222,6 @@ export async function CreateController($scope, $storage, $ionicLoading){
         }
 
         $scope.oldBeginDate = beginDate;
-
         $scope.minEndDate = moment(beginDate).format('YYYY-MM-DD');
     }
 }
