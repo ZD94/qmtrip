@@ -7,7 +7,7 @@
         </form>
         <form class="list">
             <label class="item item-input">
-                <span class="input-label">总预算：{{tripPlan.budget | currency: ''}}元</span>
+                <span class="input-label">总预算：{{tripPlan.budget == -1 ? '暂无预算' : (tripPlan.budget | currency: '')+'元'}}</span>
             </label>
         </form>
         <div id="page10-markdown5" style="color:#000000;">
