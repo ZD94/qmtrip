@@ -226,13 +226,13 @@ class TripPlanModule {
      */
     static async sendTripPlanEmails(tripPlan: TripPlan, userId: string) {
         try{
-            let url = config.host + '/ionic.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
+            let url = config.host + '/index.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
             let user = await Models.staff.get(userId);
             let company = user.company;
             let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
 
             //给员工发送邮件
-            let self_url = config.host + '/ionic.html#/trip/list-detail?tripid=' + tripPlan.id;
+            let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + tripPlan.id;
             let self_values = {staffName: user.name, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
                 projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel, otherBudget: others,
                 totalBudget: '￥' + tripPlan.budget, url: self_url, detailUrl: self_url};
@@ -241,7 +241,7 @@ class TripPlanModule {
             if(company.isApproveOpen) {
                 //给审核人发审核邮件
                 let approveUser = await Models.staff.get(tripPlan.auditUser);
-                let approve_url = config.host + '/ionic.html#/trip-approval/detail?tripid=' + tripPlan.id;
+                let approve_url = config.host + '/index.html#/trip-approval/detail?tripid=' + tripPlan.id;
                 let approve_values = {managerName: approveUser.name, username: user.name, email: user.email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
                     projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel, otherBudget: others,
                     totalBudget: '￥' + tripPlan.budget, url: approve_url, detailUrl: approve_url};
@@ -512,7 +512,7 @@ class TripPlanModule {
         }
 
         //发送审核结果邮件
-        let self_url = config.host + '/ionic.html#/trip/list-detail?tripid=' + tripPlan.id;
+        let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + tripPlan.id;
         let user = tripPlan.account;
 
         if(!user) {
