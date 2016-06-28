@@ -38,7 +38,7 @@ class Account extends ModelObject{
     set email(email: string){}
 
     //邮箱
-    @Field({type:Types.STRING, enumerable: false})
+    @Field({type:Types.STRING})
     get pwd(): string { return null; }
     set pwd(pwd: string){}
 
@@ -58,7 +58,7 @@ class Account extends ModelObject{
     set forbiddenExpireAt(forbiddenExpireAt: Date ) {}
 
     //连续错误次数
-    @Field({type:Types.INTEGER, enumerable: false})
+    @Field({type:Types.INTEGER})
     get loginFailTimes(): number { return null; }
     set loginFailTimes(loginFailTimes: number){}
 
@@ -68,23 +68,23 @@ class Account extends ModelObject{
     set lastLoginAt(lastLoginAt: Date ){}
 
     //最近登录Ip
-    @Field({type:Types.STRING, enumerable: false})
+    @Field({type:Types.STRING})
     get lastLoginIp(): string { return ''; }
     set lastLoginIp(lastLoginIp: string){}
 
-    @Field({type:Types.STRING, enumerable: false})
+    @Field({type:Types.STRING})
     get activeToken(): string { return null; }
     set activeToken(activeToken: string){}
 
-    @Field({type:Types.STRING, enumerable: false})
+    @Field({type:Types.STRING})
     get pwdToken(): string { return null; }
     set pwdToken(pwdToken: string){}
 
-    @Field({type:Types.STRING, enumerable: false})
+    @Field({type:Types.STRING})
     get oldQrcodeToken(): string { return null; }
     set oldQrcodeToken(oldQrcodeToken: string){}
 
-    @Field({type:Types.STRING, enumerable: false})
+    @Field({type:Types.STRING})
     get qrcodeToken(): string { return null; }
     set qrcodeToken(qrcodeToken: string){}
 
