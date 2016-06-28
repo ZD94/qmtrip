@@ -41,7 +41,7 @@ export async function CreateController($scope, $storage, $ionicLoading){
 
     let minStDate = moment().format('YYYY-MM-DD');
     $scope.minStDate = minStDate;
-    $scope.minEndDate = minStDate;
+    $scope.minEndDate = moment().add(3, 'days').format('YYYY-MM-DD');
 
     let trip;
     try {
@@ -62,8 +62,8 @@ export async function CreateController($scope, $storage, $ionicLoading){
 
     if(!trip.regenerate) {
         trip = {
-            beginDate: moment().toDate(),
-            endDate: moment().add(3, 'days').toDate()
+            beginDate: moment(moment().add(3, 'days').format('YYYY-MM-DD')).toDate(),
+            endDate: ''
         };
         await $storage.local.set('trip', trip);
     }else {
@@ -214,8 +214,8 @@ export async function CreateController($scope, $storage, $ionicLoading){
     $scope.checkDate = function() {
         let beginDate = trip.beginDate;
         let endDate = trip.endDate;
-
         if(moment(endDate).diff(moment(beginDate)) < 0) {
+
             alert('出发日期不能晚于结束日期');
             $scope.trip.beginDate = $scope.oldBeginDate;
             return;
