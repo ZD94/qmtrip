@@ -135,14 +135,14 @@ class StaffModule{
         let staff = await Staff.getCurrent();
         if(staff){
             if(staff["id"] == params.id){
-                throw {msg: "不可删除自身信息"};
+                throw {code: -1, msg: "不可删除自身信息"};
             }
 
             if(deleteStaff["roleId"] == EStaffRole.OWNER){
-                throw {msg: "企业创建人不能被删除"};
+                throw {code: -2, msg: "企业创建人不能被删除"};
             }
             if(staff["roleId"] == deleteStaff["roleId"]){
-                throw {msg: "不能删除同级用户"};
+                throw {code: -3, msg: "不能删除同级用户"};
             }
         }
         await deleteStaff.destroy();
@@ -179,6 +179,10 @@ class StaffModule{
 
         let updateStaff = await Models.staff.get(params.id);
         let staff = await Staff.getCurrent();
+
+        if(staff.roleId != EStaffRole.OWNER && updateStaff.roleId == EStaffRole.OWNER){
+            throw L.ERR.PERMISSION_DENY();
+        }
 
         if(staff.id == params.id && params.staffStatus == EStaffStatus.FORBIDDEN){
             throw {code: -2, msg: "不可禁用自身账号"};
@@ -289,7 +293,8 @@ class StaffModule{
     static async getStaffs(params: {where: any, order?: any, attributes?: any}) :Promise<FindResult>{
         let staff = await Staff.getCurrent();
 
-        params.where.staffStatus = {$ne: EStaffStatus.FORBIDDEN}
+        // params.where.staffStatus = {$ne: EStaffStatus.FORBIDDEN}
+        params.where.staffStatus = EStaffStatus.ON_JOB;
         let { accountId } = Zone.current.get("session");
         if (!params.where) {
             params.where = {};
@@ -301,7 +306,7 @@ class StaffModule{
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.where.companyId,userId: accountId});
             if(!result){
-                throw {code: -1, msg: '无权限'};
+                throw L.ERR.PERMISSION_DENY();
             }
         }
         let paginate = await Models.staff.find(params);
@@ -1010,14 +1015,14 @@ class StaffModule{
                 params.companyId = companyId;
                 return StaffModule.statisticStaffsByTime(params);
             }else{
-                throw {msg:"无权限"};
+                throw L.ERR.PERMISSION_DENY();
             }
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
             if(result){
                 return StaffModule.statisticStaffsByTime(params);
             }else{
-                throw {code: -1, msg: '无权限'};
+                throw L.ERR.PERMISSION_DENY();
             }
         }
 
@@ -1093,14 +1098,14 @@ class StaffModule{
                 params.companyId = companyId;
                 return StaffModule.statisticStaffsByRole(params);
             }else{
-                throw {msg:"无权限"};
+                throw L.ERR.PERMISSION_DENY();
             }
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
             if(result){
                 return StaffModule.statisticStaffsByRole(params);
             }else{
-                throw {msg: '无权限'};
+                throw L.ERR.PERMISSION_DENY();
             }
         }
 
@@ -1128,7 +1133,7 @@ class StaffModule{
                         return all || 1;
                     });
             }else{
-                throw {msg:"无权限"};
+                throw L.ERR.PERMISSION_DENY();
             }
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
@@ -1138,7 +1143,7 @@ class StaffModule{
                         return all || 1;
                     });
             }else{
-                throw {code: -1, msg: '无权限'};
+                throw L.ERR.PERMISSION_DENY();
             }
         }
 
@@ -1301,7 +1306,7 @@ class StaffModule{
         let { accountId } = Zone.current.get("session");
         let ma = await StaffModule.getPapersById({id: params.id});
         if(ma["ownerId"] != accountId){
-            throw {code: -1, msg: '无权限'};
+            throw L.ERR.PERMISSION_DENY();
         }
         params.ownerId = accountId;
 
