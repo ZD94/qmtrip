@@ -36,48 +36,6 @@ class StaffModule{
      * @param data.accountId 已经有登录账号
      * @returns {*}
      */
-    @requireParams(["name"], staffCols)//此处staffCols应该加上accountId ？
-    static create(data): Promise<Staff>{
-        var type = data.type;//若type为import则为导入添加
-        if(type)
-            delete data.type;
-        var accountId = data.accountId;
-        if (!data) {
-            throw L.ERR.DATA_NOT_EXIST();
-        }
-        if (data.mobile && !validate.isMobile(data.mobile)) {
-            throw {code: -2, msg: "手机号格式不正确"};
-        }
-        return API.company.getCompany({id: data.companyId, columns: ['name','domainName']})
-            .then(function(c){
-                if(c.domainName && c.domainName != "" && data.email.indexOf(c.domainName) == -1){
-                    throw {code: -6, msg: "邮箱格式不符合要求"};
-                }
-                data.companyName = c.name;
-                if(accountId) {
-                    return {id: accountId};
-                }
-                var accData = {email: data.email, mobile: data.mobile, status: 0, type: 1, companyName: data.companyName}
-                return API.auth.newAccount(accData)
-            })
-            .then(function(account){
-                console.info(account)
-                if(!data.travelPolicyId || data.travelPolicyId == ""){
-                    data.travelPolicyId = null;
-                }
-                if(!data.departmentId || data.departmentId == ""){
-                    data.departmentId = null;
-                }
-                data.id = account.id;
-                let staff = DBM.Staff.build(data)
-                staff.id = account.id;
-                return staff.save()
-                    .then(function(staff) {
-                        return new Staff(staff);
-                    })
-            })
-    }
-
     @clientExport
     @requireParams(["name"], staffCols)
     static async createStaff (params): Promise<Staff> {
@@ -246,23 +204,6 @@ class StaffModule{
      * @param data
      * @returns {*}
      */
-
-    @requireParams(["id"], ["columns"])
-    static get(params: {id: string, columns?: Array<string>}){
-        var id = params.id;
-        var options: any = {};
-        if(params.columns){
-            options.attributes = params.columns
-        }
-        return DBM.Staff.findById(id, options)
-            .then(function(staff){
-                if(!staff){
-                    throw {code: -2, msg: '员工不存在'};
-                }
-                return new Staff(staff);
-            });
-    }
-
     @clientExport
     @requireParams(["id"])
     @conditionDecorator([
@@ -707,7 +648,7 @@ class StaffModule{
                     if(p_companyId){
                         return {companyId: p_companyId};
                     }else{
-                        return StaffModule.get(userId);//此处为什么不能用有返回值类型的方法例如 Models.staff.get
+                        return DBM.Staff.findById(userId);//此处为什么不能用有返回值类型的方法例如 Models.staff.get
                     }
                 }else{
                     throw {code:-1, msg:"附件记录不存在"};
@@ -716,9 +657,9 @@ class StaffModule{
             .then(function(sf){
                 companyId = sf["companyId"];
                 return Promise.all([
-                    API.travelPolicy.getAllTravelPolicy({where: {companyId: companyId}}),
-                    API.department.getAllDepartment({companyId: companyId}),//得到部门
-                    API.company.getCompany({id: companyId})
+                    Models.travelPolicy.find({where: {companyId: companyId}}),
+                    Models.department.find({where: {companyId: companyId}}),//得到部门
+                    Models.company.get(companyId)
                 ])
             })
             .spread(function(results,depts, com){
@@ -898,7 +839,7 @@ class StaffModule{
 //                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelPolicyId: s.travelPolicyId, roleId: s.roleId, companyId: s.companyId};//company_id默认为当前登录人的company_id
             var staffObj: any = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,departmentId: s.departmentId,travelPolicyId: s.travelPolicyId, companyId: s.companyId, type:"import"};//company_id默认为当前登录人的company_id
             if(index>=0 && index<200){
-                return StaffModule.create(staffObj)
+                return StaffModule.createStaff(staffObj)
                     .then(function(ret){
                         if(ret){
                             // item = ret;//createStaff增加返回值后会报语法错误

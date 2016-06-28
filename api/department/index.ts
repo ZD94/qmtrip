@@ -169,8 +169,8 @@ class DepartmentModule{
         }
         options.order = params.order || [['createdAt', 'desc']];
 
-        let {count, rows} = await DBM.Department.findAndCount(options);
-        return {ids: rows.map((row)=> { return row.id}), count: count};
+        let paginate = await Models.department.find(options);
+        return {ids: paginate.map((s)=> {return s.id;}), count: paginate['total']};
     }
 
 
