@@ -29,6 +29,8 @@ const staffCols = Staff['$fieldnames'];
 const papersCols = Credential['$fieldnames'];
 const pointChangeCols = PointChange['$fieldnames'];
 
+const staffAllCols = Staff['$getAllFieldNames']();
+
 class StaffModule{
     /**
      * 创建员工
@@ -37,7 +39,7 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["name"], staffCols)
+    @requireParams(["name"], staffAllCols)
     static async createStaff (params): Promise<Staff> {
         var staff = await Staff.getCurrent();
         //设置员工默认部门
@@ -56,9 +58,10 @@ class StaffModule{
             params.travelPolicyId = 'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a';
         }
         if(staff){
-            params.companyId = staff.company.id;
-            let newstaff = await DBM.Staff.create(params);
-            return newstaff;
+            var newstaff = Staff.create(params);
+            newstaff.company = staff.company;
+            let result = await newstaff.save();
+            return result;
         }
         var user = await AgencyUser.getCurrent();
         if(user){
