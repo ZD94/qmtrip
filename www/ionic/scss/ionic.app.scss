@@ -77,7 +77,24 @@ ion-side-menu{
     text-align: center;
   }
 }
-
+//部门管理,左侧出现删除按钮
+.list-left-editing{
+  .item-left-editable{
+    .item-content{
+      webkit-transform: translate3d(42px, 0, 0);
+      transform: translate3d(42px, 0, 0);
+    }
+  }
+  .button-icon{
+    &.icon{
+      &.ion-minus-circled{
+        &:before{
+          font-size: 24px;
+        }
+      }
+    }
+  }
+}
 @media (max-width: 320px){
   ion-side-menu{
     .side-menu-left{
