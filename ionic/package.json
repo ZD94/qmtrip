@@ -1,7 +1,7 @@
 {
-  "name": "ionic",
+  "name": "小鲸商旅",
   "version": "1.1.1",
-  "description": "ionic: An Ionic project",
+  "description": "小鲸商旅—精打细算的智能差旅管家，机票、酒店、火车票预算管理一站搞定！",
   "dependencies": {
     "gulp": "^3.5.6",
     "gulp-sass": "^2.0.4",
@@ -21,6 +21,16 @@
     "ionic-plugin-keyboard"
   ],
   "cordovaPlatforms": [
-    "ios"
+    "ios",
+    {
+      "platform": "android",
+      "version": "",
+      "locator": "android"
+    },
+    {
+      "platform": "ios",
+      "version": "",
+      "locator": "ios"
+    }
   ]
 }
