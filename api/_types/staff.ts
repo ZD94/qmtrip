@@ -86,6 +86,10 @@ export class Staff extends ModelObject implements Account {
     @Field({type: Types.UUID})
     get operatorId(): string { return null; }
     set operatorId(val: string) {}
+    // '离职时间'
+    @Field({type: Types.DATE})
+    get quitTime(): Date { return null; }
+    set quitTime(val: Date) {}
 
     @ResolveRef({type: Types.UUID}, Models.company)
     get company(): Company { return null; }
