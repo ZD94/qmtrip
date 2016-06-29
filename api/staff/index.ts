@@ -36,48 +36,6 @@ class StaffModule{
      * @param data.accountId 已经有登录账号
      * @returns {*}
      */
-    @requireParams(["name"], staffCols)//此处staffCols应该加上accountId ？
-    static create(data): Promise<Staff>{
-        var type = data.type;//若type为import则为导入添加
-        if(type)
-            delete data.type;
-        var accountId = data.accountId;
-        if (!data) {
-            throw L.ERR.DATA_NOT_EXIST();
-        }
-        if (data.mobile && !validate.isMobile(data.mobile)) {
-            throw {code: -2, msg: "手机号格式不正确"};
-        }
-        return API.company.getCompany({id: data.companyId, columns: ['name','domainName']})
-            .then(function(c){
-                if(c.domainName && c.domainName != "" && data.email.indexOf(c.domainName) == -1){
-                    throw {code: -6, msg: "邮箱格式不符合要求"};
-                }
-                data.companyName = c.name;
-                if(accountId) {
-                    return {id: accountId};
-                }
-                var accData = {email: data.email, mobile: data.mobile, status: 0, type: 1, companyName: data.companyName}
-                return API.auth.newAccount(accData)
-            })
-            .then(function(account){
-                console.info(account)
-                if(!data.travelPolicyId || data.travelPolicyId == ""){
-                    data.travelPolicyId = null;
-                }
-                if(!data.departmentId || data.departmentId == ""){
-                    data.departmentId = null;
-                }
-                data.id = account.id;
-                let staff = DBM.Staff.build(data)
-                staff.id = account.id;
-                return staff.save()
-                    .then(function(staff) {
-                        return new Staff(staff);
-                    })
-            })
-    }
-
     @clientExport
     @requireParams(["name"], staffCols)
     static async createStaff (params): Promise<Staff> {
@@ -135,14 +93,14 @@ class StaffModule{
         let staff = await Staff.getCurrent();
         if(staff){
             if(staff["id"] == params.id){
-                throw {msg: "不可删除自身信息"};
+                throw {code: -1, msg: "不可删除自身信息"};
             }
 
             if(deleteStaff["roleId"] == EStaffRole.OWNER){
-                throw {msg: "企业创建人不能被删除"};
+                throw {code: -2, msg: "企业创建人不能被删除"};
             }
             if(staff["roleId"] == deleteStaff["roleId"]){
-                throw {msg: "不能删除同级用户"};
+                throw {code: -3, msg: "不能删除同级用户"};
             }
         }
         await deleteStaff.destroy();
@@ -179,6 +137,10 @@ class StaffModule{
 
         let updateStaff = await Models.staff.get(params.id);
         let staff = await Staff.getCurrent();
+
+        if(staff.roleId != EStaffRole.OWNER && updateStaff.roleId == EStaffRole.OWNER){
+            throw L.ERR.PERMISSION_DENY();
+        }
 
         if(staff.id == params.id && params.staffStatus == EStaffStatus.FORBIDDEN){
             throw {code: -2, msg: "不可禁用自身账号"};
@@ -242,23 +204,6 @@ class StaffModule{
      * @param data
      * @returns {*}
      */
-
-    @requireParams(["id"], ["columns"])
-    static get(params: {id: string, columns?: Array<string>}){
-        var id = params.id;
-        var options: any = {};
-        if(params.columns){
-            options.attributes = params.columns
-        }
-        return DBM.Staff.findById(id, options)
-            .then(function(staff){
-                if(!staff){
-                    throw {code: -2, msg: '员工不存在'};
-                }
-                return new Staff(staff);
-            });
-    }
-
     @clientExport
     @requireParams(["id"])
     @conditionDecorator([
@@ -289,7 +234,8 @@ class StaffModule{
     static async getStaffs(params: {where: any, order?: any, attributes?: any}) :Promise<FindResult>{
         let staff = await Staff.getCurrent();
 
-        params.where.staffStatus = {$ne: EStaffStatus.FORBIDDEN}
+        // params.where.staffStatus = {$ne: EStaffStatus.FORBIDDEN}
+        params.where.staffStatus = EStaffStatus.ON_JOB;
         let { accountId } = Zone.current.get("session");
         if (!params.where) {
             params.where = {};
@@ -301,7 +247,7 @@ class StaffModule{
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.where.companyId,userId: accountId});
             if(!result){
-                throw {code: -1, msg: '无权限'};
+                throw L.ERR.PERMISSION_DENY();
             }
         }
         let paginate = await Models.staff.find(params);
@@ -702,7 +648,7 @@ class StaffModule{
                     if(p_companyId){
                         return {companyId: p_companyId};
                     }else{
-                        return StaffModule.get(userId);//此处为什么不能用有返回值类型的方法例如 Models.staff.get
+                        return DBM.Staff.findById(userId);//此处为什么不能用有返回值类型的方法例如 Models.staff.get
                     }
                 }else{
                     throw {code:-1, msg:"附件记录不存在"};
@@ -711,9 +657,9 @@ class StaffModule{
             .then(function(sf){
                 companyId = sf["companyId"];
                 return Promise.all([
-                    API.travelPolicy.getAllTravelPolicy({where: {companyId: companyId}}),
-                    API.department.getAllDepartment({companyId: companyId}),//得到部门
-                    API.company.getCompany({id: companyId})
+                    Models.travelPolicy.find({where: {companyId: companyId}}),
+                    Models.department.find({where: {companyId: companyId}}),//得到部门
+                    Models.company.get(companyId)
                 ])
             })
             .spread(function(results,depts, com){
@@ -893,7 +839,7 @@ class StaffModule{
 //                var staffObj = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,travelPolicyId: s.travelPolicyId, roleId: s.roleId, companyId: s.companyId};//company_id默认为当前登录人的company_id
             var staffObj: any = {name: s.name, mobile: s.mobile+"", email: s.email, department: s.department,departmentId: s.departmentId,travelPolicyId: s.travelPolicyId, companyId: s.companyId, type:"import"};//company_id默认为当前登录人的company_id
             if(index>=0 && index<200){
-                return StaffModule.create(staffObj)
+                return StaffModule.createStaff(staffObj)
                     .then(function(ret){
                         if(ret){
                             // item = ret;//createStaff增加返回值后会报语法错误
@@ -1010,14 +956,14 @@ class StaffModule{
                 params.companyId = companyId;
                 return StaffModule.statisticStaffsByTime(params);
             }else{
-                throw {msg:"无权限"};
+                throw L.ERR.PERMISSION_DENY();
             }
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
             if(result){
                 return StaffModule.statisticStaffsByTime(params);
             }else{
-                throw {code: -1, msg: '无权限'};
+                throw L.ERR.PERMISSION_DENY();
             }
         }
 
@@ -1093,14 +1039,14 @@ class StaffModule{
                 params.companyId = companyId;
                 return StaffModule.statisticStaffsByRole(params);
             }else{
-                throw {msg:"无权限"};
+                throw L.ERR.PERMISSION_DENY();
             }
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
             if(result){
                 return StaffModule.statisticStaffsByRole(params);
             }else{
-                throw {msg: '无权限'};
+                throw L.ERR.PERMISSION_DENY();
             }
         }
 
@@ -1128,7 +1074,7 @@ class StaffModule{
                         return all || 1;
                     });
             }else{
-                throw {msg:"无权限"};
+                throw L.ERR.PERMISSION_DENY();
             }
         }else{
             let result = await API.company.checkAgencyCompany({companyId: params.companyId,userId: user_id});
@@ -1138,7 +1084,7 @@ class StaffModule{
                         return all || 1;
                     });
             }else{
-                throw {code: -1, msg: '无权限'};
+                throw L.ERR.PERMISSION_DENY();
             }
         }
 
@@ -1301,7 +1247,7 @@ class StaffModule{
         let { accountId } = Zone.current.get("session");
         let ma = await StaffModule.getPapersById({id: params.id});
         if(ma["ownerId"] != accountId){
-            throw {code: -1, msg: '无权限'};
+            throw L.ERR.PERMISSION_DENY();
         }
         params.ownerId = accountId;
 

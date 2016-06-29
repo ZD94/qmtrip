@@ -159,7 +159,8 @@ export async function DistributionController($scope, Models) {
     }
 }
 
-export async function DepartmentController($scope, Models, $ionicPopup) {
+export async function DepartmentController($scope, Models, $ionicPopup, $ionicListDelegate) {
+    $scope.showDelete = false;
     var staff = await Staff.getCurrent();
     async function loadDepartment(){
         var getdepartment = await Models.department.find({where: {companyId: staff.company.id}});
@@ -194,6 +195,39 @@ export async function DepartmentController($scope, Models, $ionicPopup) {
                     onTap: async function (e) {
                         if (!$scope.newdepartment.name) {
                             e.preventDefault();
+                            msgbox.log("部门名称不能为空");
+                        } else {
+                            try{
+                                await $scope.newdepartment.save();
+                                $scope.departments = await loadDepartment();
+                            }catch(err){
+                                msgbox.log(err.msg);
+                            }
+                            // $route.reload();
+                        }
+                    }
+                }
+            ]
+        })
+    }
+
+    $scope.editDept = function (item) {
+        $scope.newdepartment = item;
+        var nshow = $ionicPopup.show({
+            template: '<input type="text" ng-model="newdepartment.name">',
+            title: '修改部门',
+            scope: $scope,
+            buttons: [
+                {
+                    text: '取消'
+                },
+                {
+                    text: '确定',
+                    type: 'button-positive',
+                    onTap: async function (e) {
+                        if (!$scope.newdepartment.name) {
+                            e.preventDefault();
+                            msgbox.log("部门名称不能为空");
                         } else {
                             await $scope.newdepartment.save();
                             $scope.departments = await loadDepartment();
@@ -205,10 +239,17 @@ export async function DepartmentController($scope, Models, $ionicPopup) {
         })
     }
     
-    $scope.deleteDept = async function (dept, index) {
-        await dept.destroy();
-        $scope.departments.splice(index, 1);
-        // $scope.departments = await loadDepartment();
+    $scope.deleteDept = async function (department, index) {
+        try{
+            var dept = department.department;
+            if(department.staffnum > 0){//why后端delete方法throw出来的异常捕获不了
+                throw {code: -1, msg: '该部门下有'+ department.staffnum +'位员工，暂不能删除'};
+            }
+            await dept.destroy();
+            $scope.departments.splice(index, 1);
+        }catch(err){
+            msgbox.log(err.msg);
+        }
     }
 }
 
@@ -261,7 +302,6 @@ export async function StaffsController($scope, Models, $ionicPopup) {
                             await delStaff.destroy();
                             $scope.staffs.splice(index, 1);
                         }catch(err){
-                            console.info(err);
                             msgbox.log(err.msg);
                         }
                     }
@@ -285,7 +325,7 @@ export async function StaffsController($scope, Models, $ionicPopup) {
                         try{
                             var forbidStaff = await Models.staff.get(id);
                             forbidStaff.status = EStaffStatus.FORBIDDEN;
-                            forbidStaff.staffStatus = EStaffStatus.FORBIDDEN;
+                            forbidStaff.staffStatus = EStaffStatus.FORBIDDEN;//同时修改account和staff两张表会有问题 只会修改一张表
                             await forbidStaff.save();
                             $scope.staffs.splice(index, 1);
                         }catch(err){
@@ -384,7 +424,7 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
                         throw L.ERR.MOBILE_HAS_REGISTRY();
                     }
                 }
-                if(preRole == EStaffRole.ADMIN && _staff.roleId == EStaffRole.COMMON){
+                if(preRole == EStaffRole.ADMIN && _staff.roleId == EStaffRole.COMMON && currentstaff.id == _staff.id){
                     logout = true;
                 }
             }

@@ -801,7 +801,9 @@ class ApiAuth {
     @requireParams(["id"])
     static async getAccount (params) {
         var id = params.id;
-        var acc = await Models.account.get(id);
+        var options: any = {};
+        options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt","loginFailTimes","lastLoginAt","lastLoginIp","activeToken","pwdToken","oldQrcodeToken","qrcodeToken","type","isFirstLogin"];
+        var acc = await Models.account.get(id, options);
         return acc;
     }
 
@@ -820,6 +822,8 @@ class ApiAuth {
         };
         if(params.attributes){
             options.attributes = params.attributes;
+        }else{
+            options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt","loginFailTimes","lastLoginAt","lastLoginIp","activeToken","pwdToken","oldQrcodeToken","qrcodeToken","type","isFirstLogin"];
         }
         if(params.order){
             options.order = params.order || "createdAt desc";

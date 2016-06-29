@@ -12,7 +12,7 @@ import {Department} from "api/_types/department";
 import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import { Models, EAccountType } from '../_types/index';
 import {FindResult} from "common/model/interface";
-import {Staff} from "api/_types/staff";
+import {Staff, EStaffStatus} from "api/_types/staff";
 import {requirePermit, conditionDecorator, condition} from "../_decorator";
 
 const departmentCols = Department['$fieldnames'];
@@ -33,7 +33,7 @@ class DepartmentModule{
         let result = await Models.department.find({where: {name: params.name, companyId: params.companyId}});
 
         if(result && result.length>0){
-            throw {msg: "该部门名称已存在，请重新设置"};
+            throw {code:-1, msg: "该部门名称已存在，请重新设置"};
         }
 
         var staff = await Staff.getCurrent();
@@ -61,9 +61,9 @@ class DepartmentModule{
     static async deleteDepartment(params): Promise<any>{
         var id = params.id;
         var department = await Models.department.get(params.id);
-        let {ids, count} = await API.staff.getStaffs({where : {companyId: department.company.id, departmentId: id, status: 0}});
+        let {ids, count} = await API.staff.getStaffs({where : {companyId: department.company.id, departmentId: id, staffStatus: EStaffStatus.ON_JOB}});
         if(count > 0){
-            throw {code: -1, msg: '目前该部门下有'+count+'位员工 暂不能删除，给这些员工匹配新的部门后再进行操作'};
+            throw {code: -1, msg: '该部门下有'+count+'位员工，暂不能删除'};
         }
 
         var staff = await Staff.getCurrent();
@@ -169,8 +169,8 @@ class DepartmentModule{
         }
         options.order = params.order || [['createdAt', 'desc']];
 
-        let {count, rows} = await DBM.Department.findAndCount(options);
-        return {ids: rows.map((row)=> { return row.id}), count: count};
+        let paginate = await Models.department.find(options);
+        return {ids: paginate.map((s)=> {return s.id;}), count: paginate['total']};
     }
 
 
