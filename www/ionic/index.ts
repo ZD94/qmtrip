@@ -10,13 +10,15 @@ var Cookie = require('tiny-cookie');
 var API = require('common/api');
 API.onlogin(function(){
     var backUrl = window.location.href;
-    backUrl = encodeURIComponent(backUrl);
-    // if(browserspec.is_wechat && /^qmtrip\.com\.cn$/.test(window.location.host)) {
-    //     window.location.href = "/auth/wx-login?redirect_url=" + backUrl;
-    // }else {
-        window.location.href = "#/login/?backurl="+backUrl;
-    // }
-})
+
+    if(/^http\:\/\/.*\/(index.html)?\#\/login\/(index)?\?backurl\=.*/.test(backUrl)) {
+        window.location.reload();
+        return;
+    }
+
+    window.location.href = "#/login/?backurl="+backUrl;
+});
+
 API.authenticate = function(remote, callback){
     var datastr = localStorage.getItem('auth_data');
     if(!datastr){
