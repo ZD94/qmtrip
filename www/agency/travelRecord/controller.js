@@ -68,6 +68,12 @@ var travelRecord=(function(){
       $scope.showInvoicePassDialog = false;
       $scope.curTripDetail = null;
       $scope.expenditure = '';
+      $scope.failReason = '图片不清楚';
+
+      $scope.reasons = ['图片不清楚', '所传单据和出差记录不符']
+      $scope.setFailReason = function(reason) {
+        $scope.failReason = reason;
+      }
 
       $scope.init = function() {
           Models.tripPlan.get(orderId)
@@ -95,7 +101,6 @@ var travelRecord=(function(){
         $scope.init();
 
         //默认不显示审批对话框
-
         $scope.showInvoice = function(tripDetailId) {
           Models.tripDetail.get(tripDetailId)
             .then(function(tripDetail) {
@@ -103,6 +108,7 @@ var travelRecord=(function(){
                 tripDetail.invoice = JSON.parse(tripDetail.invoice);
               }
               $scope.curTripDetail = tripDetail;
+              console.info(tripDetail)
               $scope.curTripDetailInoviceImg = '/consume/invoice/' + tripDetail.id;
               return tripDetail;
             })
@@ -117,7 +123,6 @@ var travelRecord=(function(){
           $scope.showInvoicePassFailDialog = true;
         }
 
-
         //审批通过
         $scope.invoicePassShow = function(tripDetailId) {
           $scope.showInvoicePassFailDialog = false;
@@ -128,8 +133,7 @@ var travelRecord=(function(){
           $scope.showInvoicePassDialog = false;
         }
 
-        $scope.invoicePass = function() {
-          console.info($scope.expenditure)
+        $scope.approvePass = function() {
           if (!$scope.expenditure || !/^\d+(\.\d{1,2})?$/.test($scope.expenditure)) {
             alert("实际花费格式不正确");
             return false;
@@ -143,322 +147,20 @@ var travelRecord=(function(){
           }
         }
 
-        // $scope.initTravelDetail = function () {
-        //     API.onload(function() {
-        //         API.agencyTripPlan.getTripPlan({id: orderId})
-        //             .then(function(result){
-        //                 console.info (result);
-        //                 var outTraffic = result.outTraffic[0];
-        //                 var backTraffic = result.backTraffic[0];
-        //                 var hotel = result.hotel[0];
+        $scope.approveFail = function() {
+          if (confirm('确实要【拒绝】这张票据吗?')) {
+            var now = new Date().valueOf();
+            var times = ($scope.curTripDetail.invoice.length || 0)+ 1;
+            var data = {times: times, approve_at: now, create_at: now, remark: $scope.failReason,
+              status: -1, pictureFeildId: $scope.curTripDetail.newInvoice};
 
-
-        //                 $scope.planDetail = result;
-        //                 $scope.outTraffic = $scope.planDetail.outTraffic[0];
-        //                 $scope.backTraffic = $scope.planDetail.backTraffic[0];
-        //                 $scope.hotel = $scope.planDetail.hotel[0];
-        //                 //console.info("执行到A==>", hotel, backTraffic, outTraffic);
-
-        //                 var outTraffics = $scope.planDetail.outTraffic;
-        //                 var backTraffics = $scope.planDetail.backTraffic;
-        //                 var hotels = $scope.planDetail.hotel;
-
-        //                 if (hotel && hotel.newInvoice) {
-        //                     $scope.hotelInvoiceImg = "/consume/invoice/" + hotel.id;
-        //                 }
-
-        //                 if (backTraffic && backTraffic.newInvoice) {
-        //                     $scope.backTrafficInvoiceImg = "/consume/invoice/" + backTraffic.id;
-        //                 }
-
-        //                 if (outTraffic && outTraffic.newInvoice) {
-        //                     $scope.outTrafficInvoiceImg = "/consume/invoice/" + outTraffic.id;
-        //                 }
-
-        //                 outTraffic = outTraffics.map(function(outTraffic){
-        //                     if(!outTraffic.newInvoice) {
-        //                         return outTraffic;
-        //                     }
-
-        //                     return API.agencyTripPlan.getConsumeInvoiceImg({consumeId: outTraffic.id})
-        //                         .then(function(invoiceImg){
-        //                             outTraffic.invoiceImg = invoiceImg;
-
-        //                             if(!outTraffic.auditUser){
-        //                                 return outTraffic;
-        //                             }
-
-        //                             return API.agency.getAgencyUser(outTraffic.auditUser)
-        //                                 .then(function(auditName) {
-        //                                     outTraffic.auditName = auditName;
-        //                                     return outTraffic
-        //                                 })
-        //                         })
-
-        //                 });
-
-        //                 backTraffics = backTraffics.map(function(backTraffic){
-        //                     if(!backTraffic.newInvoice) {
-        //                         return backTraffic;
-        //                     }
-
-        //                     return API.agencyTripPlan.getConsumeInvoiceImg({consumeId: backTraffic.id})
-        //                         .then(function(invoiceImg){
-        //                             backTraffic.invoiceImg = invoiceImg;
-
-        //                             if(!backTraffic.auditUser){
-        //                                 return backTraffic;
-        //                             }
-
-        //                             return API.agency.getAgencyUser(backTraffic.auditUser)
-        //                                 .then(function(auditName) {
-        //                                     backTraffic.auditName = auditName;
-        //                                     return backTraffic
-        //                                 })
-        //                         })
-
-        //                 });
-
-        //                 hotels = hotels.map(function(hotel){
-        //                     if(!hotel.newInvoice) {
-        //                         return hotel;
-        //                     }
-
-        //                     return API.agencyTripPlan.getConsumeInvoiceImg({consumeId: hotel.id})
-        //                         .then(function(invoiceImg){
-        //                             hotel.invoiceImg = invoiceImg;
-
-        //                             if(!hotel.auditUser){
-        //                                 return hotel;
-        //                             }
-
-        //                             return API.agency.getAgencyUser(hotel.auditUser)
-        //                                 .then(function(auditName) {
-        //                                     hotel.auditName = auditName;
-        //                                     return hotel
-        //                                 })
-        //                         })
-
-        //                 });
-
-        //                 Promise.all(hotels)
-        //                     .then(function(hotels) {
-        //                         $scope.hotels = hotels;
-        //                     })
-        //                     .catch(function(err) {
-        //                         console.info("hotels");
-        //                         console.info(err);
-        //                         TLDAlert(err.msg || err);
-        //                     })
-
-        //                 Promise.all(outTraffics)
-        //                     .then(function(outTraffics) {
-        //                         $scope.outTraffics = outTraffics;
-        //                         console.info(outTraffics);
-        //                     })
-        //                     .catch(function(err) {
-        //                         console.info("outTraffics");
-        //                         console.info(err);
-        //                         TLDAlert(err.msg || err);
-        //                     })
-
-        //                 Promise.all(backTraffics)
-        //                     .then(function(backTraffics) {
-        //                         $scope.backTraffics = backTraffics;
-        //                     })
-        //                     .catch(function(err) {
-        //                         console.info("backTraffics");
-        //                         console.info(err);
-        //                         TLDAlert(err.msg || err);
-        //                     })
-
-        //                 API.staff.getStaff({id:$scope.planDetail.accountId, companyId: $scope.planDetail.companyId})
-        //                     .then(function(result){
-        //                         $scope.travelerName = result.name;
-        //                     })
-        //             })
-        //     })
-        // }
-        // $scope.initTravelDetail();
-
-
-        // $scope.outTraffichref = function () {
-        //     $location.hash('outTraffic');
-        //     $anchorScroll();
-
-        // }
-        // $scope.hotelhref = function () {
-        //     $location.hash('hotel');
-        //     $anchorScroll();
-
-        // }
-        // $scope.backTraffichref = function () {
-        //     $location.hash('backTraffic');
-        //     $anchorScroll();
-        // }
-
-
-        // //审核通过
-        // $scope.invoicePassShow = function (status) {
-        //     if (status=='outTraffic') {
-        //         $scope.consumeId = $scope.outTraffic.id;
-        //     }
-        //     else if (status=='hotel') {
-        //         $scope.consumeId = $scope.hotel.id;
-        //     }
-        //     else if (status=='backTraffic') {
-        //         $scope.consumeId = $scope.backTraffic.id;
-        //     }
-        //     $('.error').empty();
-        //     $(".expenditure").val("");
-        //     $(".invoicePass").show();
-        // }
-        // $scope.invoicePass = function () {
-        //     var moneyReg = /^\d+(.\d{1,2})?$/;
-        //     $scope.expenditure = $(".expenditure").val();
-        //     $('.error').empty();
-        //     if ($scope.expenditure=='') {
-        //         $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>实际支出不能为空");
-        //         return false;
-        //     }
-        //     if (!moneyReg.test($scope.expenditure)) {
-        //         $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>实际支出格式不正确");
-        //         return false;
-        //     }
-        //     API.onload(function() {
-        //         API.agencyTripPlan.approveInvoice({
-        //             userId:$scope.planDetail.accountId,
-        //             consumeId:$scope.consumeId,
-        //             expenditure:$scope.expenditure,
-        //             status:1
-        //         })
-        //             .then(function(result){
-        //                 $(".success").show();
-        //                 $(".success_text").html('票据审核通过，实际支出为¥'+$scope.expenditure);
-        //                 $scope.initTravelDetail();
-        //             })
-        //             .catch(function(err){
-        //                 TLDAlert(err.msg || err);
-        //             })
-        //     })
-        // }
-        // //审核未通过
-        // $scope.invoiceNopassShow = function (status) {
-        //     if (status=='outTraffic') {
-        //         $scope.consumeId = $scope.outTraffic.id;
-        //     }
-        //     else if (status=='hotel') {
-        //         $scope.consumeId = $scope.hotel.id;
-        //     }
-        //     else if (status=='backTraffic') {
-        //         $scope.consumeId = $scope.backTraffic.id;
-        //     }
-        //     $('.error').empty();
-        //     $(".expenditure").val("");
-        //     $(".remark").val("");
-        //     $(".invoiceNoPass").show();
-        // }
-
-
-        // var reason1 = "",
-        //     reason2 = "";
-        // $scope.checkreason1 = function () {
-        //     $(".reason1 i").toggleClass("check");
-        //     reason1 = $(".reason1 .check").next().html();
-        // }
-        // $scope.checkreason2 = function () {
-        //     $(".reason2 i").toggleClass("check");
-        //     reason2 = $(".reason2 .check").next().html();
-        // }
-        // $scope.invoiceNoPass = function () {
-        //     var reasontext = $(".invoiceNoPass .remark").val();
-
-        //     var reason = reason1;
-
-        //     if(reason2 != '' && reason2!= undefined) {
-        //         reason==''?reason = reason2: reason += ','+reason2;
-        //     }
-
-        //     if(reasontext != ''&& reasontext!= undefined) {
-        //         reason==''?reason = reasontext: reason += ','+reasontext;
-        //     }
-
-        //     $scope.remark = reason;
-        //     console.info(reason1,reason2,reasontext);
-        //     $('.error').empty();
-        //     if (reason1 =='' && reason2 == '' && reasontext == '') {
-        //         $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>理由不能为空");
-        //         return false;
-        //     }
-        //     API.onload(function() {
-        //         console.info($scope.remark);
-        //         API.agencyTripPlan.approveInvoice({
-        //             userId:$scope.planDetail.accountId,
-        //             consumeId:$scope.consumeId,
-        //             remark:$scope.remark,
-        //             status:-1
-        //         })
-        //             .then(function(result){
-        //                 $(".invoicePass,.invoiceNoPass").hide();
-        //                 $(".reason1 i,.reason2 i").removeClass("check");
-        //                 reason1 = '';
-        //                 reason2 = '';
-        //                 reasontext = '';
-        //                 $scope.initTravelDetail();
-        //             })
-        //             .catch(function(err){
-        //                 TLDAlert(err.msg || err);
-        //             })
-        //     })
-        // }
-
-
-        // //录入预算
-        // $scope.editBudgetShow = function (id) {
-        //     $scope.editBudgetId = id;
-        //     $('.error').empty();
-        //     $(".budget").val("");
-        //     $(".editBudget").show();
-        // }
-        // $scope.editBudget = function () {
-        //     var budget = $(".editBudget .budget").val();
-        //     var moneyReg = /^\d+(.\d{1,2})?$/;
-        //     $('.error').empty();
-        //     if (budget=='') {
-        //         $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>预算不能为空");
-        //         return false;
-        //     }
-        //     if (!moneyReg.test(budget)) {
-        //         $('.error').html("<span class='web-icon-font' style='font-size: 15px;'>&#xf06a;&nbsp;</span>预算格式不正确");
-        //         return false;
-        //     }
-        //     API.onload(function() {
-        //         API.agencyTripPlan.editTripPlanBudget({
-        //             consumeId:$scope.editBudgetId,
-        //             budget:budget
-        //         })
-        //             .then(function(result){
-        //                 $(".invoicePass,.invoiceNoPass,.editBudget").hide();
-        //                 $scope.initTravelDetail();
-        //             })
-        //             .catch(function(err){
-        //                 TLDAlert(err.msg || err);
-        //             })
-        //     })
-        // }
-
-        // //关闭弹窗
-        // $scope.invoiceColse = function () {
-        //     $(".invoicePass,.invoiceNoPass,.editBudget").hide();
-        //     $(".reason1 i,.reason2 i").removeClass("check");
-        //     reason1 = "";
-        //     reason2 = "";
-        //     $(".remark").val('');
-        // }
+            $scope.curTripDetail.status = -3;
+            $scope.curTripDetail.invoice = JSON.stringify($scope.curTripDetail.invoice.push(data));
+            $scope.curTripDetail.save();
+            $scope.closePassFailDialog();
+          }
+        }
     }
-
-
-
     return travelRecord;
 })();
 

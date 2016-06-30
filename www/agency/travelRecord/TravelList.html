@@ -113,8 +113,8 @@
                             <p ng-if="item.isNeedHotel" style="width: 150px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px;">{{item.arrivalCity}}&nbsp;{{item.hotel[0].hotelName}}附近</p>
                         </td>
                         <td align="center">
-                            <span ng-if="item.status!='-1'">¥{{item.budget}}</span>
-                            <span ng-if="item.status=='-1'">暂无</span>
+                            <span ng-if="item.status != -1">¥{{item.budget}}</span>
+                            <span ng-if="item.status == -1">暂无</span>
                         </td>
                         <td align="center">
                             <span ng-if="item.expenditure!=0">¥{{item.expenditure}}</span>
@@ -131,7 +131,7 @@
                             </span>
                         </td>
                         <td align="center">
-                            <a ng-if="item.status!='-1'" href="#/travelRecord/TravelDetail?orderId={{item.id}}" target="_blank" style=" color: #118FD6;">查看详情</a>
+                            <a ng-if="item.status != -1" href="#/travelRecord/TravelDetail?orderId={{item.id}}" target="_blank" style=" color: #118FD6;">查看详情</a>
                             <a ng-if="item.status=='-1'" href="#/travelRecord/TravelDetail?orderId={{item.id}}" target="_blank" style=" color: #118FD6;">录入预算</a>
                         </td>
                     </tr>
