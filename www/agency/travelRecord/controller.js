@@ -30,7 +30,9 @@ var travelRecord=(function(){
           if (status == 'no_budget') {
             where.status = -1;
           } else if (status == 'wait_approve') {
-            where.status = 0;
+            where.status = 3;
+          } else {
+            where.status = [-3, -1, 3, 4];
           }
           Models.tripPlan.find({where: where})
             .then(function(pager) {
@@ -140,23 +142,14 @@ var travelRecord=(function(){
           }
 
           if (confirm("确实要通过审核吗?")) {
-            $scope.curTripDetail.status = 1;
-            $scope.curTripDetail.expenditure = $scope.expenditure;
-            $scope.curTripDetail.save();
+            $scope.curTripDetail.auditPlanInvoice({auditResult: 2, expenditure: $scope.expenditure});
             $scope.closePassDialog();
           }
         }
 
         $scope.approveFail = function() {
           if (confirm('确实要【拒绝】这张票据吗?')) {
-            var now = new Date().valueOf();
-            var times = ($scope.curTripDetail.invoice.length || 0)+ 1;
-            var data = {times: times, approve_at: now, create_at: now, remark: $scope.failReason,
-              status: -1, pictureFeildId: $scope.curTripDetail.newInvoice};
-
-            $scope.curTripDetail.status = -3;
-            $scope.curTripDetail.invoice = JSON.stringify($scope.curTripDetail.invoice.push(data));
-            $scope.curTripDetail.save();
+            $scope.curTripDetail.auditPlanInvoice({auditResult: -2, reason: $scope.failReason});
             $scope.closePassFailDialog();
           }
         }

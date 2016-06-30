@@ -680,9 +680,10 @@ class TripPlanModule {
      * @param params
      */
     @clientExport
-    @requireParams(['id', 'auditResult'])
+    @requireParams(['id', 'auditResult'], ["reason", "expenditure"])
     @modelNotNull('tripDetail')
-    static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus}): Promise<boolean> {
+    static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string}): Promise<boolean> {
+        let {id, expenditure, reason, auditResult} = params;
         let tripDetail = await Models.tripDetail.get(params.id);
 
         if(tripDetail.status != EPlanStatus.AUDITING) {
@@ -694,23 +695,22 @@ class TripPlanModule {
 
         if(audit == EAuditStatus.INVOICE_PASS) {
             tripDetail.status = EPlanStatus.COMPLETE;
-            let details = await tripPlan.getTripDetails({where: {id: {$ne: tripDetail.id, status: [EPlanStatus.AUDITING, EPlanStatus.AUDIT_NOT_PASS]}}}); //获取所有未经过审核的票据
-
+            tripDetail.expenditure = expenditure;
+            let query = {where: {id: {$ne: tripDetail.id}, status: [EPlanStatus.AUDITING, EPlanStatus.AUDIT_NOT_PASS]}}
+            let details = await tripPlan.getTripDetails(query); //获取所有未经过审核的票据
             if(!details || details.length == 0 ) {
                 tripPlan.status = EPlanStatus.COMPLETE;
                 tripPlan.auditStatus = EAuditStatus.INVOICE_PASS;
             }
-        }else if(audit == EAuditStatus.INVOICE_NOT_PASS) {
+        } else if(audit == EAuditStatus.INVOICE_NOT_PASS) {
+            tripDetail.auditRemark = reason;
             tripDetail.status = EPlanStatus.AUDIT_NOT_PASS;
             tripPlan.status = EPlanStatus.AUDIT_NOT_PASS;
             tripPlan.auditStatus = EAuditStatus.INVOICE_NOT_PASS;
-        }
-        else {
+        } else {
             throw L.ERR.PERMISSION_DENIED(); //代理商只能审核票据权限
         }
-
         await Promise.all([tripPlan.save(), tripDetail.save()]);
-
         return true;
     }
 
