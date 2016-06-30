@@ -1,5 +1,5 @@
 <ion-view title="待审批详情" id="page7">
-    <ion-content padding="true" class="has-header" style="background: url(ionic/images/backgroud.png) center no-repeat;background-size:cover;">
+    <ion-content padding="true" class="has-header">
         <form class="list">
             <label class="item item-input opactic">
                 <span ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE" class="input-label op_single">等待审批</span>
@@ -32,8 +32,7 @@
         <ion-list>
             <ion-item class="item-divider">
                 交通
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {{trafficBudget}}元
+                <span style="float: right">{{trafficBudget}}元</span>
             </ion-item>
             <ion-item ng-repeat="t in traffic track by $index">
                 {{t.startTime.value | date: 'MM-dd'}}
@@ -41,8 +40,8 @@
                 <br>{{t.budget | currency : ''}}元
             </ion-item>
             <ion-item class="item-divider">
-                住宿&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {{hotelBudget}}元
+                住宿
+                <span style="float: right">{{hotelBudget}}元</span>
             </ion-item>
             <ion-item ng-repeat="h in hotel track by h.id">
                 {{h.startTime.value | date: 'MM-dd'}}至{{h.endTime.value | date: 'MM-dd'}}
@@ -51,8 +50,7 @@
             </ion-item>
             <ion-item class="item-divider">
                 其他补助(共{{subsidyDays}}天)
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {{subsidyBudget | currency: ''}}元
+                <span style="float: right">{{subsidyBudget | currency: ''}}元</span>
             </ion-item>
         </ion-list>
         <div class="button-bar" ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE && isHasPermissionApprove">

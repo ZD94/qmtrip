@@ -1,4 +1,3 @@
-///<reference path="../../../api/_types/tripPlan.ts"/>
 "use strict";
 
 import moment = require('moment');

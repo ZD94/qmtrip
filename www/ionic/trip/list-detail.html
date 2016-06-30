@@ -1,5 +1,5 @@
 <ion-view title="行程详情页" id="page20">
-    <ion-content padding="true" class="has-header has-bottom-btn" style="background: url(ionic/images/backgroud.png) center no-repeat;background-size:cover;">
+    <ion-content padding="true" class="has-header has-bottom-btn">
         <div id="page20-markdown7" style="color:#000000;text-align:right;">
             <p style="color: #fff;">{{tripDetail.createdAt.value | date: 'yyyy-MM-dd HH:mm'}}</p>
         </div>
@@ -22,7 +22,7 @@
             <div ng-if="goTraffic">
                 <ion-item class="item-divider">
                     <span>交通</span>
-                    <span style="margin-left: 120px;">{{(goTraffic.budget + backTraffic.budget) == -1 ? '暂无预算' : ((goTraffic.budget + backTraffic.budget)| currency: '')}}</span>{{(goTraffic.budget + backTraffic.budget) == -1 ? '' : '元'}}
+                    <span style="float:right">{{(goTraffic.budget + backTraffic.budget) == -1 ? '暂无预算' : ((goTraffic.budget + backTraffic.budget)| currency: '')}}{{(goTraffic.budget + backTraffic.budget) == -1 ? '' : '元'}}</span>
                 </ion-item>
                 <ion-item>
                     <span>{{goTraffic.startTime.value | date: 'yyyy-MM-dd'}}</span>
@@ -123,7 +123,7 @@
             <div ng-if="hotel">
                 <ion-item class="item-divider">
                     <span>住宿</span>
-                    <span style="margin-left: 120px;">{{hotel.budget == -1 ? '暂无预算' : (hotel.budget| currency: '')}}</span>{{hotel.budget == -1 ? '' : '元'}}
+                    <span style="float:right">{{hotel.budget == -1 ? '暂无预算' : (hotel.budget| currency: '')}}{{hotel.budget == -1 ? '' : '元'}}</span>
                 </ion-item>
                 <ion-item>
                     <span>{{hotel.startTime.value | date: 'yyyy-MM-dd'}}</span> 至
@@ -177,7 +177,7 @@
             <div ng-if='other'>
                 <ion-item class="item-divider">
                     <span>补助</span>
-                    <span style="margin-left: 120px;">{{other.budget == -1 ? '暂无预算' : (other.budget| currency: '')}}</span>{{other.budget == -1 ? '' : '元'}}
+                    <span style="float: right;">{{other.budget == -1 ? '暂无预算' : (other.budget| currency: '')}}{{other.budget == -1 ? '' : '元'}}</span>
                 </ion-item>
                 <ion-item class="">
                     <span>{{tripDetail.startAt.value | date: 'yyyy-MM-dd'}}</span> 至
