@@ -50,7 +50,7 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
     ];
 
     var staff = await Staff.getCurrent();
-    if(staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN){
+    if(staff && staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN){
         items.push({
                 id:1056,
                 icon:'stats-bars',

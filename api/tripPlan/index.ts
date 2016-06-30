@@ -881,6 +881,10 @@ class TripPlanModule {
             _detail.tripPlan = tripPlan;
             _detail.accountId = staff.id;
             _detail.status = 0;
+            if (_detail.type == ETripType.OTHER) {
+                _detail.status = EPlanStatus.COMPLETE;
+                _detail.expenditure = _detail.budget;
+            }
             await _detail.save();
         }));
 
