@@ -39,9 +39,12 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["name"], staffAllCols)
+    @requireParams(["name", "email", "mobile"], staffAllCols)
     static async createStaff (params): Promise<Staff> {
+        //检查邮箱 手机号码是否合法
+        await API.auth.checkEmailAngMobile({email: params.email, mobile: params.mobile});
         var staff = await Staff.getCurrent();
+        var user = await AgencyUser.getCurrent();
         //设置员工默认部门
         if(!params.departmentId){
             let dafaultDept = await Models.department.find({where: {companyId: params.companyId, isDefault: true}});
@@ -51,20 +54,12 @@ class StaffModule{
         }
         //设置员工默认差旅标准
         if(!params.travelPolicyId){
-            /*let dafaultTp = await Models.travelPolicy.get('dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a');
-            if(dafaultTp){
-                params.travelPolicyId = dafaultTp.id;
-            }*/
             params.travelPolicyId = 'dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a';
         }
+        var newstaff = Staff.create(params);
         if(staff){
-            var newstaff = Staff.create(params);
             newstaff.company = staff.company;
-            let result = await newstaff.save();
-            return result;
-        }
-        var user = await AgencyUser.getCurrent();
-        if(user){
+        }else if(user){
             if(!params.companyId){
                 throw L.ERR.INVALID_ARGUMENT('companyId');
             }
@@ -76,13 +71,12 @@ class StaffModule{
             if(company['agencyId'] != user['agencyId']){
                 throw L.ERR.PERMISSION_DENY();
             }
-            var newstaff = Staff.create(params);
-
-            let result = await newstaff.save();
-
-            return result;
+        }else{
+            throw L.ERR.PERMISSION_DENY();
         }
-        throw L.ERR.PERMISSION_DENY();
+        let result = await newstaff.save();
+        await API.auth.sendResetPwdEmail({email: result.email, type: 1, isFirstSet: true, companyName: result.company.name});
+        return result;
     }
 
     @clientExport

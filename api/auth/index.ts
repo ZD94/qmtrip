@@ -389,44 +389,98 @@ class ApiAuth {
      */
     @clientExport
     @requireParams(["email"], accountCols)
-    static async newAccount (data: {email: string, mobile?: string, pwd?: string, type?: Number, status?: Number, companyName?: string, id?: string}) {
-        if (!data) {
-            throw L.ERR.DATA_NOT_EXIST();
-        }
+static async newAccount (data: {email: string, mobile?: string, pwd?: string, type?: Number, status?: Number, companyName?: string, id?: string}) {
+    if (!data) {
+        throw L.ERR.DATA_NOT_EXIST();
+    }
 
-        if (!data.email) {
-            throw L.ERR.EMAIL_EMPTY();
-        }
+    if (!data.email) {
+        throw L.ERR.EMAIL_EMPTY();
+    }
 
-        if (!validator.isEmail(data.email)) {
+    if (!validator.isEmail(data.email)) {
+        throw L.ERR.INVALID_FORMAT('email');
+    }
+
+    if (data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
+        throw L.ERR.MOBILE_NOT_CORRECT();
+    }
+
+    if (data.pwd) {
+        var pwd = data.pwd;
+        var password = data.pwd.toString();
+        pwd = utils.md5(password);
+        //throw L.ERR.PASSWORD_EMPTY();
+    }
+
+
+    var mobile = data.mobile;
+    var companyName = data.companyName || '';
+
+    var staff = await Staff.getCurrent();
+    if(data.email && staff && staff.company["domainName"] && data.email.indexOf(staff.company["domainName"]) == -1){
+        throw L.ERR.INVALID_ARGUMENT('email');
+    }
+
+    var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
+    //查询邮箱是否已经注册
+    var account1 = await Models.account.find({where: {email: data.email, type: type}});
+    if (account1 && account1.length>0) {
+        throw L.ERR.EMAIL_HAS_REGISTRY();
+    }
+
+    if(data.mobile){
+        var account2 = await Models.account.find({where: {mobile: mobile, type: type}});
+        if (account2 && account2.length>0) {
+            throw L.ERR.MOBILE_HAS_REGISTRY();
+        }
+    }
+
+    var status = data.status? data.status: ACCOUNT_STATUS.NOT_ACTIVE;
+    var id = data.id?data.id:uuid.v1();
+    var accountObj = Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status, type: type});
+    var account = await accountObj.save();
+
+    if (!account.pwd) {
+        return ApiAuth.sendResetPwdEmail({email: account.email, type: 1, isFirstSet: true, companyName: companyName})
+            .then(function() {
+                return account;
+            })
+    }
+
+    if (account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
+        return _sendActiveEmail(account.id)
+            .then(function(){
+                return account;
+            })
+    }
+}
+
+    @clientExport
+    static async checkEmailAngMobile (data: {email?: string, mobile?: string}) {
+        if (data.email && !validator.isEmail(data.email)) {
             throw L.ERR.INVALID_FORMAT('email');
         }
 
         if (data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
             throw L.ERR.MOBILE_NOT_CORRECT();
-         }
-
-        if (data.pwd) {
-            var pwd = data.pwd;
-            var password = data.pwd.toString();
-            pwd = utils.md5(password);
-            //throw L.ERR.PASSWORD_EMPTY();
         }
 
 
         var mobile = data.mobile;
-        var companyName = data.companyName || '';
 
         var staff = await Staff.getCurrent();
         if(data.email && staff && staff.company["domainName"] && data.email.indexOf(staff.company["domainName"]) == -1){
             throw L.ERR.INVALID_ARGUMENT('email');
         }
 
-        var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
+        var type = ACCOUNT_TYPE.COMPANY_STAFF;
         //查询邮箱是否已经注册
-        var account1 = await Models.account.find({where: {email: data.email, type: type}});
-        if (account1 && account1.length>0) {
-            throw L.ERR.EMAIL_HAS_REGISTRY();
+        if(data.email){
+            var account1 = await Models.account.find({where: {email: data.email, type: type}});
+            if (account1 && account1.length>0) {
+                throw L.ERR.EMAIL_HAS_REGISTRY();
+            }
         }
 
         if(data.mobile){
@@ -436,24 +490,7 @@ class ApiAuth {
             }
         }
 
-        var status = data.status? data.status: ACCOUNT_STATUS.NOT_ACTIVE;
-        var id = data.id?data.id:uuid.v1();
-        var accountObj = Account.create({id: id, mobile:mobile, email: data.email, pwd: pwd, status: status, type: type});
-        var account = await accountObj.save();
-
-        if (!account.pwd) {
-            return ApiAuth.sendResetPwdEmail({email: account.email, type: 1, isFirstSet: true, companyName: companyName})
-                .then(function() {
-                    return account;
-                })
-        }
-
-        if (account.status == ACCOUNT_STATUS.NOT_ACTIVE) {
-            return _sendActiveEmail(account.id)
-                .then(function(){
-                    return account;
-                })
-        }
+        return true;
     }
 
     /**
@@ -885,12 +922,11 @@ class ApiAuth {
      * @returns {boolean}
      */
     @clientExport
-    @requireParams(["id"])
+    // @requireParams(["id"])
     static async deleteAccount(params): Promise<any> {
-        let deleteAcc = await Models.account.get(params.id);
-        await deleteAcc.destroy();
+        /*let deleteAcc = await Models.account.get(params.id);
+        await deleteAcc.destroy();*/
         return true;
-
     }
 
     /**

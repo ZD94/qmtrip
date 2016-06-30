@@ -49,7 +49,7 @@ class Account extends ModelObject{
 
     //手机
     @Field({type:Types.INTEGER})
-    get status(): number { return null; }
+    get status(): number { return 0; }
     set status(status: number){}
 
     //创建时间

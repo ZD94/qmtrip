@@ -79,7 +79,7 @@ var Services = {
     //     funcs: ['getCityInfo', 'queryPlace']
     // },
     account: { type: Account, modname: 'auth',
-        funcs: ['getAccount', 'getAccounts', 'newAccount', 'updateAccount', 'deleteAccount']
+        funcs: ['getAccount', 'getAccounts', null, 'updateAccount', 'deleteAccount']
     },
     seed: { type: Seed, modname: 'seeds',
         funcs: []
