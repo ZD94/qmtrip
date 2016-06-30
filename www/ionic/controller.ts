@@ -117,7 +117,7 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
     
     let company = staff.company;
     $scope.Menu = Menu;
-    $scope.staff = staff;
+    $scope.currentStaff = staff;
     $scope.logout = async function(){
         await API.onload();
         $storage.local.remove('auth_data');
