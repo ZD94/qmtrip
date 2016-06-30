@@ -622,7 +622,6 @@ dd {
   top: 0;
   left: 0;
   z-index: 99999;
-  display: none;
 }
 .invoicePass .invoicebox {
   width: 398px;
@@ -687,7 +686,6 @@ dd {
   top: 0;
   left: 0;
   z-index: 99999;
-  display: none;
 }
 .invoiceNoPass .invoicebox {
   width: 398px;

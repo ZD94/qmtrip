@@ -64,8 +64,12 @@ var travelRecord=(function(){
     travelRecord.TravelDetailController = function($scope, $stateParams, $location, $anchorScroll, Models) {
         $("title").html("出差单明细");
         var orderId = $stateParams.orderId;
-        $scope.init = function() {
+      $scope.showInvoiceFailDialog = false;
+      $scope.showInvoicePassDialog = false;
+      $scope.curTripDetail = null;
+      $scope.expenditure = '';
 
+      $scope.init = function() {
           Models.tripPlan.get(orderId)
             .then(function(tripPlan) {
               $scope.tripPlan = tripPlan;
@@ -88,8 +92,57 @@ var travelRecord=(function(){
             })
             .catch(TLDAlert).done();
         }
-
         $scope.init();
+
+        //默认不显示审批对话框
+
+        $scope.showInvoice = function(tripDetailId) {
+          Models.tripDetail.get(tripDetailId)
+            .then(function(tripDetail) {
+              if (tripDetail.invoice && typeof tripDetail.invoice == 'string') {
+                tripDetail.invoice = JSON.parse(tripDetail.invoice);
+              }
+              $scope.curTripDetail = tripDetail;
+              $scope.curTripDetailInoviceImg = '/consume/invoice/' + tripDetail.id;
+              return tripDetail;
+            })
+            .catch(TLDAlert).done();
+        }
+
+        $scope.closePassFailDialog = function() {
+          $scope.showInvoicePassFailDialog = false;
+        };
+        $scope.invoiceNopassShow = function(tripDetailId) {
+          $scope.showInvoicePassDialog = false;
+          $scope.showInvoicePassFailDialog = true;
+        }
+
+
+        //审批通过
+        $scope.invoicePassShow = function(tripDetailId) {
+          $scope.showInvoicePassFailDialog = false;
+          $scope.showInvoicePassDialog = true;
+        }
+        //关闭审批通过对话框
+        $scope.closePassDialog = function() {
+          $scope.showInvoicePassDialog = false;
+        }
+
+        $scope.invoicePass = function() {
+          console.info($scope.expenditure)
+          if (!$scope.expenditure || !/^\d+(\.\d{1,2})?$/.test($scope.expenditure)) {
+            alert("实际花费格式不正确");
+            return false;
+          }
+
+          if (confirm("确实要通过审核吗?")) {
+            $scope.curTripDetail.status = 1;
+            $scope.curTripDetail.expenditure = $scope.expenditure;
+            $scope.curTripDetail.save();
+            $scope.closePassDialog();
+          }
+        }
+
         // $scope.initTravelDetail = function () {
         //     API.onload(function() {
         //         API.agencyTripPlan.getTripPlan({id: orderId})

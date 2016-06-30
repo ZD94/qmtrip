@@ -51,26 +51,28 @@
                             <p ng-if="item.isNeedHotel" style="width: 150px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px;">{{item.arrivalCity}}&nbsp;{{item.hotel[0].hotelName}}附近</p>
                         </td>
                         <td align="center">
-                            <span ng-if="item.status!='-1'">¥{{item.budget}}</span>
-                            <span ng-if="item.status=='-1'">暂无</span>
+                            <span ng-if="item.status != -1">¥{{item.budget}}</span>
+                            <span ng-if="item.status == -1">暂无</span>
                         </td>
                         <td align="center">
-                            <span ng-if="item.expenditure!=0">¥{{item.expenditure}}</span>
-                            <span ng-if="item.expenditure==0">暂无</span>
+                            <span ng-if="item.expenditure != 0">¥{{item.expenditure}}</span>
+                            <span ng-if="item.expenditure ==0 ">暂无</span>
                         </td>
                         <td align="center">
                             <span ng-if="item.score!=0">¥{{item.score}}</span>
                             <span ng-if="item.score==0">暂无</span>
                         </td>
                         <td align="center">
-                            <span ng-if="item.status=='-1'">待出预算</span>
-                            <span ng-if="item.status==1">
-                                <span ng-if="item.auditStatus==0">待审核</span>
+                            <span ng-if="item.status== -1">待出预算</span>
+                            <span ng-if="item.status == 1">
+                                <span ng-if="item.status == 3">待审核</span>
                             </span>
+                            <span ng-if="item.status == 4">审核完成</span>
+                            <span ng-if="item.status == 1">待传票据</span>
                         </td>
                         <td align="center">
-                            <a ng-if="item.status!='-1'" href="#/travelRecord/TravelDetail?orderId={{item.id}}" target="_blank" style=" color: #118FD6;">查看详情</a>
-                            <a ng-if="item.status=='-1'" href="#/travelRecord/TravelDetail?orderId={{item.id}}" target="_blank" style=" color: #118FD6;">录入预算</a>
+                            <a ng-if="item.status != -1" href="#/travelRecord/TravelDetail?orderId={{item.id}}" target="_blank" style=" color: #118FD6;">查看详情</a>
+                            <a ng-if="item.status == -1" href="#/travelRecord/TravelDetail?orderId={{item.id}}" target="_blank" style=" color: #118FD6;">录入预算</a>
                         </td>
                     </tr>
                 </table>
