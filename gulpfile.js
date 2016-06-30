@@ -11,7 +11,7 @@ gulplib.public_dir = 'www';
 
 gulplib.bundle_lib('browserify', {ex: true, ts: false, require:[
     'buffer', 'is-buffer', 'querystring', 'string_decoder',
-    'http', 'https', 'url', 'path',
+    'http', 'https', 'url',
     'util', 'inherits', 'process', 'events', 'stream', 'zlib']});
 gulplib.bundle_lib('ws', {ex: true, ts: false, require:['ws', 'crypto'], exclude:['bufferutil', 'utf-8-validate']});
 gulplib.bundle_lib('jquery', {ex: true, ts: false, require:['jquery', 'jquery-ui']});
@@ -23,7 +23,7 @@ gulplib.bundle_lib('img', {ex: true, ts: false, require: ['arale-qrcode', 'hidpi
 gulplib.bundle_lib('base', {ex: true, ts: false, require:['bluebird', 'md5', 'moment', 'tiny-cookie', 'shoe', 'lodash', 'validator', 'lessify', 'cssify']})
 gulplib.bundle_lib('sourcemap', {ex: true, ts: false, require:['source-map-support']})
 
-gulplib.bundle_lib('preload', {ex: true, ts: false, require:['dyload', 'babel-polyfill', 'common/ts_helper', 'common/zone']});
+gulplib.bundle_lib('preload', {ex: true, ts: false, require:['dyload', 'babel-polyfill', 'common/ts_helper', 'common/zone', 'path']});
 
 gulplib.bundle_lib('api', {require:['common/client/api:common/api', 'common/api/helper', 'common/language']});
 gulplib.bundle_lib('calendar', {require:['lunar-calendar', "calendar"]});
