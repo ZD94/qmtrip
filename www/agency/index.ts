@@ -36,9 +36,3 @@ ngapp.useRoutePolicy(ngapp.RoutePolicy.Embed, ['login']);
 var app = ngapp.create('qm.agency');
 
 var dyload = require('dyload');
-dyload('/script/selectbox.js');
-dyload('/script/header.js');
-dyload('/script/jquery.ajaxfileupload.js');
-dyload('/script/jqPaginator.js');
-dyload('/script/messagebox.js');
-        

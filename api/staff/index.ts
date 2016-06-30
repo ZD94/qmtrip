@@ -125,7 +125,7 @@ class StaffModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["id"], staffCols)
+    @requireParams(["id"], staffAllCols)
     @conditionDecorator([
         {if: condition.isSameCompany("0.id")},
         {if: condition.isStaffsAgency("0.id")}
@@ -154,45 +154,27 @@ class StaffModule{
         for(var key in params){
             updateStaff[key] = params[key];
         }
+        updateStaff = await updateStaff.save();
 
         let tp = await Models.travelPolicy.get(updateStaff["travelPolicyId"]);
         let defaultDept = await API.department.getDefaultDepartment({companyId: updateStaff["companyId"]});
 
-        if(params.email){
-            //修改邮箱
-            if(updateStaff.status == 0){
-                //未激活账户修改邮箱
-                await updateStaff.save();
-                //未激活账户 并且未通过修改邮箱更新账户信息发送激活邮件
-                return API.auth.sendResetPwdEmail({companyName: updateStaff.company.name, email: updateStaff.email, type: 1, isFirstSet: true})
-                    .then(function() {
-                        return updateStaff;
-                    });
-            }else{
-                //已激活账号邮箱不允许修改
-                throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
-            }
-        }else {
-            //不修改邮箱
-            await updateStaff.save();
-            let vals  = {
-                username: updateStaff.name,
-                mobile: updateStaff.mobile,
-                travelPolicy: tp.name,
-                time: utils.now(),
-                companyName: updateStaff.company.name,
-                department: updateStaff.department ? updateStaff.department.name : defaultDept.name,
-                permission: updateStaff.roleId == EStaffRole.ADMIN ? "管理员" : (updateStaff.roleId == EStaffRole.OWNER ? "创建者" : "普通员工")
-            }
-            return API.mail.sendMailRequest({
-                toEmails: updateStaff.email,
-                templateName: "staff_update_email",
-                values: vals
-            })
-                .then(function(result) {
-                    return updateStaff;
-                });
+        let vals  = {
+            username: updateStaff.name,
+            mobile: updateStaff.mobile,
+            travelPolicy: tp.name,
+            time: utils.now(),
+            companyName: updateStaff.company.name,
+            department: updateStaff.department ? updateStaff.department.name : defaultDept.name,
+            permission: updateStaff.roleId == EStaffRole.ADMIN ? "管理员" : (updateStaff.roleId == EStaffRole.OWNER ? "创建者" : "普通员工")
         }
+        //修改邮箱重置密码的邮件由updateAccount发出
+        await API.mail.sendMailRequest({
+            toEmails: updateStaff.email,
+            templateName: "staff_update_email",
+            values: vals
+        });
+        return updateStaff;
     }
 
     /**

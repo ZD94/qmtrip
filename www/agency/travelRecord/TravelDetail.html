@@ -102,17 +102,16 @@
                 <span ng-if="curTripDetail.type == 2">住宿</span>
                 票据
                 <span ng-if="curTripDetail.status== -3" style="color: #9B9B9B;">【审核未通过】</span>
-                <span ng-if="curTripDetail.status== 0 " style="color: #DE492A;">【待审核】</span>
-                <span ng-if="curTripDetail.status== 1 " style="color: #9B9B9B;">【审核通过】</span>
+                <span ng-if="curTripDetail.status== 3 " style="color: #DE492A;">【待审核】</span>
+                <span ng-if="curTripDetail.status== 4 " style="color: #9B9B9B;">【审核通过】</span>
             </dt>
             <dd>
                 <table width="100%">
                     <tr style="border-bottom: 1px #E5E5E5 solid">
                         <td>
-                            <div ng-repeat="item in curTripDetail.invoice track by $index">
-                                <p>{{item.created_at}}　第{{item.times}}次上传</p>
-                                <p ng-if="item.status!=0">{{item.approve_at}}　<span ng-if="item.status=='-1'">审核未通过　　理由：{{item.remark}}　　操作人：{{curTripDetail.auditName.name}}</span><span ng-if="item.status==1">审核通过</span></p>
-                            </div>
+                            <p ng-if="curTripDetail.status == -1">
+                                {{curTripDetail.auditRemark}}
+                            </p>
                         </td>
                         <td width="250" valign="bottom">
                             <div ng-if="curTripDetail.status == 3">
