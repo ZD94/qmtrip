@@ -1,0 +1,1 @@
+alter table auth.accounts alter column status set default 0;

@@ -3,7 +3,7 @@ import { Models, EAccountType } from './index';
 import { Types } from 'common/model';
 import validator = require("validator");
 import * as L from 'common/language';
-import { Table, Create, Field } from 'common/model/common';
+import { Table, Create, Field, TableIndex } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 
 @regApiType('API.')
@@ -22,6 +22,8 @@ class AuthCert {
 }
 
 @Table(Models.account, "auth.")
+@TableIndex('email', {unique: true})
+@TableIndex('mobile', {unique: true})
 class Account extends ModelObject{
     constructor(target: Object) {
         super(target);
@@ -49,7 +51,7 @@ class Account extends ModelObject{
 
     //手机
     @Field({type:Types.INTEGER})
-    get status(): number { return null; }
+    get status(): number { return 0; }
     set status(status: number){}
 
     //创建时间
