@@ -239,17 +239,32 @@ export async function DepartmentController($scope, Models, $ionicPopup, $ionicLi
         })
     }
     
-    $scope.deleteDept = async function (department, index) {
-        try{
-            var dept = department.department;
-            if(department.staffnum > 0){//why后端delete方法throw出来的异常捕获不了
-                throw {code: -1, msg: '该部门下有'+ department.staffnum +'位员工，暂不能删除'};
-            }
-            await dept.destroy();
-            $scope.departments.splice(index, 1);
-        }catch(err){
-            msgbox.log(err.msg);
-        }
+    $scope.deleteDept = function (department, index) {
+        var nshow = $ionicPopup.show({
+            title:'确定要删除部门吗?',
+            scope: $scope,
+            buttons:[
+                {
+                    text: '取消'
+                },
+                {
+                    text: '确定',
+                    type: 'button-positive',
+                    onTap: async function () {
+                        try{
+                            var dept = department.department;
+                            if(department.staffnum > 0){//why后端delete方法throw出来的异常捕获不了
+                                throw {code: -1, msg: '该部门下有'+ department.staffnum +'位员工，暂不能删除'};
+                            }
+                            await dept.destroy();
+                            $scope.departments.splice(index, 1);
+                        }catch(err){
+                            msgbox.log(err.msg);
+                        }
+                    }
+                }
+            ]
+        });
     }
 }
 

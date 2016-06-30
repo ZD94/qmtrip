@@ -10,13 +10,13 @@
                 </ion-list>
             </div>
             <div class="item item-divider">{{statustext[trip.status]}}
-                <span class="item-note" ng-if="trip.budget != -1 && trip.budget != null">{{trip.budget| currency : ''}}元</span>
-                <span class="item-note" ng-if="trip.budget == -1 || trip.budget == null">待出预算</span>
+                <span class="spanRight" ng-if="trip.budget != -1 && trip.budget != null">{{trip.budget| currency : ''}}元</span>
+                <span class="spanRight" ng-if="trip.budget == -1 || trip.budget == null">待出预算</span>
             </div>
 
         </div>
-        <div id="page13-markdown3" style="color:#000000;">
-            <div ng-if="!vm.isHasNextPage" style="text-align: center;">没有更多记录了</div>
+        <div id="page13-markdown3">
+            <div ng-if="!vm.isHasNextPage" class="getMoreOrNoMore">没有更多记录了</div>
         </div>
         <ion-infinite-scroll ng-if="vm.isHasNextPage" on-infinite="vm.nextPage()"></ion-infinite-scroll>
     </ion-content>
