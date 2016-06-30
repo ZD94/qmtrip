@@ -1,6 +1,6 @@
 "use strict";
 
-require('./airinfo.less');
+require('./airinfo.scss');
 
 angular
     .module('nglibs')

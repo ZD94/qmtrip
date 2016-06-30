@@ -8,7 +8,7 @@
 angular
     .module('nglibs')
     .directive('progressBar', function() {
-        require('./progress-bar.less');
+        require('./progress-bar.scss');
         return {
             restrict:'AE',
             replace:true,
