@@ -5,7 +5,7 @@ import angular = require('angular');
 angular
     .module('nglibs')
     .directive('ngSelect',function(){
-        require('./select.less');
+        require('./select.scss');
         return {
             priority: 1001,
             restrict: 'A',

@@ -10,7 +10,7 @@ angular
 import './citypicker';
 
 function tldMultiWheelPicker(){
-    require('./style.less');
+    require('./style.scss');
     return {
         restrict: 'EA',
         replace: true,
@@ -25,7 +25,7 @@ function tldMultiWheelPicker(){
 }
 
 function tldWheelPicker() {
-    require('./style.less');
+    require('./style.scss');
     return {
         restrict : 'EA',
         replace: true,

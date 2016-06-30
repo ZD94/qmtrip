@@ -4,7 +4,7 @@ import {MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 var API = require('common/api');
 
 export async function IndexController($scope, Menu, $ionicPopup, Models, $storage, $window, $location, $ionicHistory){
-    require('./index.less');
+    require('./index.scss');
     $scope.ionicGoBack = function(){
         let viewHistory = $ionicHistory.viewHistory();
         let backView = viewHistory.backView;
