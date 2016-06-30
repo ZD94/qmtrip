@@ -27,7 +27,39 @@ export function StorageSetController($scope, $stateParams, $storage) {
     window.location.href = back_url;
 }
 
-export function IndexController($scope,$stateParams, $storage) {
+export async function IndexController($scope, $stateParams, $storage, $location) {
+    var browserspec = require('browserspec');
+    var backUrl = $stateParams.backurl || "#";
+    console.info("**********************************");
+    console.info("backUrl==>>", backUrl);
+    // console.info("absUrl==>>", $location.absUrl());
+    // if(browserspec.is_wechat && backUrl != '#') {
+    //     console.info('this is weChat login...');
+    //     let code = $stateParams.code;
+    //     console.info("code==>", code);
+    //     await API.onload();
+    //
+    //     if(!code) {
+    //         let url = await API.auth.getWeChatLoginUrl({redirectUrl: $location.absUrl()});
+    //         window.location.href = url;
+    //         return;
+    //     }
+    //
+    //     let token = await API.auth.authWeChatLogin({code: code});
+    //
+    //     if(token) {
+    //         $storage.local.set('auth_data', token);
+    //         let auth_data = $storage.local.get('auth_data');
+    //         console.info('auth_data==>', auth_data);
+    //         console.info('success make token...');
+    //         window.location.href = backUrl;
+    //         console.info(backUrl);
+    //         return;
+    //     }
+    // }
+
+    console.info("step 000000000");
+
     $scope.form = {
         email: Cookie.get("email") || '',
         pwd: Cookie.get("pwd") || ''
@@ -46,8 +78,7 @@ export function IndexController($scope,$stateParams, $storage) {
             $scope.focused = '';
         console.log($scope.focused);
     }
-    
-    var backUrl = $stateParams.backurl || "#";
+
     $scope.check_login = async function ():Promise<any> {
         try {
             await API.onload();

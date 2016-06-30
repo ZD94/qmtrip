@@ -5,7 +5,7 @@ import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
 import { Agency, AgencyUser } from './agency';
 import {TripPlan, TripDetail, Project, TripPlanLog} from './tripPlan';
-import { Account, Token } from './auth';
+import {Account, Token, AccountOpenid} from './auth';
 import {Seed} from "./seed";
 import { ModelInterface } from 'common/model/interface';
 import { ModelDelegate } from 'common/model/delegate';
@@ -43,6 +43,7 @@ export interface ModelsInterface {
 
     account: ModelInterface<Account>;
     token: ModelInterface<Token>;
+    accountOpenid: ModelInterface<AccountOpenid>;
 }
 
 export var Models: ModelsInterface = {
@@ -67,6 +68,7 @@ export var Models: ModelsInterface = {
 
     account: new ModelDelegate<Account>(),
     token: new ModelDelegate<Token>(),
+    accountOpenid: new ModelDelegate<AccountOpenid>(),
 };
 
 export function initModels(models: ModelsInterface){

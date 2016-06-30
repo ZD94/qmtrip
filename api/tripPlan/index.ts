@@ -924,7 +924,7 @@ class TripPlanModule {
                 .then(function(staff) {
                     return {name: staff.name, save: v.save};
                 })
-        }))
+        }));
 
         return ranks;
     }
@@ -942,7 +942,7 @@ class TripPlanModule {
             throw L.ERR.PERMISSION_DENY();
         }
 
-        let tripPlan = await Models.tripPlan.get(tripPlanId)
+        let tripPlan = await Models.tripPlan.get(tripPlanId);
         if (tripPlan.auditUser != accountId) {
             throw L.ERR.PERMISSION_DENY();
         }
@@ -967,23 +967,23 @@ class TripPlanModule {
             query = JSON.parse(query);
         }
         let budgetId = await API.client.travelBudget.getTravelPolicyBudget(query);
-        let budgetResult = await API.client.travelBudget.getBudgetInfo({id: budgetId})
+        let budgetResult = await API.client.travelBudget.getBudgetInfo({id: budgetId});
         let budgets = budgetResult.budgets;
 
         //计算总预算
         let totalBudget: number = 0;
         budgets.forEach((item) => {
             if (Number(item.price) <= 0) {
-                totalBudget = -1
+                totalBudget = -1;
                 return;
             }
             totalBudget += Number(item.price);
-        })
+        });
         tripPlan.originalBudget = tripPlan.budget;
         tripPlan.budget = totalBudget;
         tripPlan.isFinalBudget = true;
         tripPlan.finalBudgetCreateAt = budgetResult.createAt;
-        await tripPlan.save()
+        await tripPlan.save();
         return true;
     }
 
@@ -1007,7 +1007,7 @@ class TripPlanModule {
     static __initHttpApp = require('./invoice');
 
     static _scheduleTask () {
-        let taskId = "authApproveTrainPlan"
+        let taskId = "authApproveTrainPlan";
         logger.info('run task ' + taskId);
         scheduler('*/5 * * * *', taskId, async function() {
             let tripPlans = await Models.tripPlan.find({where: {autoApproveTime: {$lte: utils.now()}, status: EPlanStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});

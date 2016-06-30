@@ -14,7 +14,7 @@ import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Agency, AgencyUser } from 'api/_types/agency';
 import {TripPlan, TripDetail, Project, TripPlanLog} from 'api/_types/tripPlan';
 import { Place } from 'api/_types/place';
-import { Account, Token } from 'api/_types/auth';
+import {Account, Token, AccountOpenid} from 'api/_types/auth';
 import { Seed } from 'api/_types/seed';
 
 const API = require('common/api');
@@ -122,6 +122,7 @@ class ClientModels implements ModelsInterface {
     account: ModelRemote<Account>;
     seed: ModelRemote<Seed>;
     token: ModelRemote<Token>;
+    accountOpenid: ModelRemote<AccountOpenid>;
 
     constructor($cacheFactory: ng.ICacheFactoryService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
