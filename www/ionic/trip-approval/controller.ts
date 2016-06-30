@@ -252,7 +252,7 @@ export async function PendingController($scope){
     let Pager = await staff.getTripPlans({where: {status: [EPlanStatus.WAIT_APPROVE, EPlanStatus.APPROVE_NOT_PASS]}, limit: PAGE_SIZE}); //获取待审批出差计划列表
     $scope.tripPlans = [];
 
-    Pager.forEach((v) => {
+    Pager.forEach(function(v) {
         $scope.tripPlans.push(v);
     })
     $scope.Pager = Pager;

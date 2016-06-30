@@ -21,14 +21,13 @@ function agentGetTripplanInvoice(req, res, next){
                 return;
             }
 
-            return API.tripPlan.getVisitPermission({consumeId: consumeId, userId: userId})
+            return API.tripPlan.getTripDetail({id: consumeId})
                 .then(function(data){
-                    if (!data.allow) {
-                        res.send(403);
-                        return;
+                    if (!data) {
+                      res.send(404);
+                      return;
                     }
-
-                    return API.attachments.getAttachment({id: data.fileId})
+                    return API.attachments.getAttachment({id: data.newInvoice})
                         .then(function(attachment) {
                             if (!attachment || !attachment.content) {
                                 res.send(404);

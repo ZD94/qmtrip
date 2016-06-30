@@ -3,7 +3,7 @@ import { Models, isBrowser} from 'api/_types';
 import { Staff} from 'api/_types/staff';
 import { Company} from 'api/_types/company';
 import { Types, Values } from 'common/model';
-import { Table, Create, Field, ResolveRef, Reference } from 'common/model/common';
+import { Table, Create, Field, ResolveRef, Reference, TableIndex } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 declare var API: any;
 
@@ -72,6 +72,7 @@ export class Project extends ModelObject{
 }
 
 @Table(Models.tripPlan, 'tripPlan.')
+@TableIndex('accountId')
 export class TripPlan extends ModelObject {
     constructor(target: Object) {
         super(target);
@@ -380,7 +381,7 @@ export class TripDetail extends ModelObject{
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
     }
 
-    auditPlanInvoice(params: {auditResult: EAuditStatus}): Promise<boolean> {
+    auditPlanInvoice(params: {auditResult: EAuditStatus, reason?: string, expenditure?: number}): Promise<boolean> {
         params['id'] = this.id;
         return API.tripPlan.auditPlanInvoice(params);
     }

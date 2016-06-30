@@ -34,7 +34,7 @@ gulplib.bundle_lib('ngapp', {require: ['./common/client/ngapp/index.ts:ngapp', '
 //gulplib.angular_app('staff');
 //gulplib.angular_app('corp');
 //gulplib.angular_app('extendfunction');
-//gulplib.angular_app('agency');
+gulplib.angular_app('agency');
 //gulplib.angular_app('mobile');
 gulplib.angular_app('ionic');
 

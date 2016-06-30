@@ -44,12 +44,11 @@
                 <span ng-if="trip.status == EPlanStatus.WAIT_COMMIT">待提交</span>
                 <span ng-if="trip.status == EPlanStatus.AUDITING">票据审核中</span>
                 <span ng-if="trip.status == EPlanStatus.COMPLETE">已完成</span>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <span>{{trip.budget | currency: ''}}元</span>
+                <span class="spanRight">{{trip.budget | currency: ''}}元</span>
             </div>
         </div>
 
-        <div id="page25-markdown17" style="color:#000000;text-align:center;">
+        <div id="page25-markdown17 " class="getMoreOrNoMore">
             <p>没有更多内容了</p>
         </div>
     </ion-content>

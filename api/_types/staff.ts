@@ -10,6 +10,7 @@ import { getSession } from 'common/model';
 import { TableExtends, Table, Create, Field, ResolveRef, Reference } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import {Pager} from "common/model/cached";
+import {PaginateInterface} from "../../common/model/interface";
 
 export enum EStaffStatus {
     FORBIDDEN = 0,
@@ -105,7 +106,7 @@ export class Staff extends ModelObject implements Account {
     }
     setTravelPolicy(val: TravelPolicy) {}
 
-    getTripPlans(options: {where?: any, limit?: number}): Promise<TripPlan[]| Pager<TripPlan>> {
+    getTripPlans(options: {where?: any, limit?: number}): Promise<PaginateInterface<TripPlan>> {
         if (!options) {
             options = {where: {}};
         }
@@ -116,7 +117,7 @@ export class Staff extends ModelObject implements Account {
         return Models.tripPlan.find(options);
     }
     
-    getWaitApproveTripPlans(options: {where?: any, limit?: number}): Promise<TripPlan[]| Pager<TripPlan>> {
+    getWaitApproveTripPlans(options: {where?: any, limit?: number}): Promise<PaginateInterface<TripPlan>> {
         if (!options) {
             options = {where: {}};
         }

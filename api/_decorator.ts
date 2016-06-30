@@ -208,9 +208,12 @@ export var condition = {
             let id = _.get(args, idpath);
             let staff = await Models.staff.get(id);
             // let company = staff.company;
-            let company = await Models.company.get(staff["companyId"]);
-            let agencyUser = await AgencyUser.getCurrent();
-            return staff && company && agencyUser && agencyUser["agencyId"] == company["agencyId"];
+            if (staff && staff["companyId"]) {
+                let company = await Models.company.get(staff["companyId"]);
+                let agencyUser = await AgencyUser.getCurrent();
+                return staff && company && agencyUser && agencyUser["agencyId"] == company["agencyId"];
+            }
+            return false;
         }
     },
     isSameCompany: function (idpath:string) {
