@@ -14,7 +14,7 @@ export async function ApprovedController($scope, Models, $stateParams){
 }
 
 export async function DetailController($scope, Models, $stateParams, $ionicPopup, $ionicLoading){
-    require('./detail.less');
+    require('./trip-approval.scss');
     let tripId = $stateParams.tripid;
     let tripPlan = await Models.tripPlan.get(tripId);
 
@@ -179,7 +179,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
 }
 
 export async function ListController($scope, Models, $stateParams, $ionicLoading){
-    require('./detail.less');
+    require('./trip-approval.scss');
     let staff = await Staff.getCurrent();
     const ONE_PAGE_LIMIT = 10;
     let Pager;

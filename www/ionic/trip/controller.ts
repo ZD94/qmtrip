@@ -34,7 +34,7 @@ function TripDefineFromJson(obj: any): TripDefine{
 }
 
 export async function CreateController($scope, $storage, $ionicLoading){
-    require('./listdetail.less');
+    require('./trip.scss');
     API.require('tripPlan');
     await API.onload();
 
@@ -226,7 +226,7 @@ export async function CreateController($scope, $storage, $ionicLoading){
 }
 
 export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading){
-    require('./listdetail.less');
+    require('./trip.scss');
     API.require("tripPlan");
     await API.onload();
 
@@ -306,7 +306,7 @@ export async function CommittedController($scope, $stateParams, Models){
 }
 
 export async function DetailController($scope, $stateParams, Models, $location){
-    require('./listdetail.less');
+    require('./trip.scss');
     let id = $stateParams.id;
     if (!id) {
         $location.path("/");
@@ -375,7 +375,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
         $location.path("/");
         return;
     }
-    require('./listdetail.less');
+    require('./trip.scss');
     var staff = await Staff.getCurrent();
     let tripPlan = await Models.tripPlan.get(id);
     $scope.tripDetail = tripPlan;
