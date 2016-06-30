@@ -80,12 +80,12 @@ class TripPlanModule {
         }
         let tripDetails: TripDetail[] = budgets.map(function (budget) {
             let tripType = budget.tripType;
-            let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: Number(budget.price)});
+            let price = Number(budget.price)
+            let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: price});
             detail.accountId = staff.id;
             detail.isCommit = false;
             detail.status = EPlanStatus.WAIT_APPROVE;
             detail.tripPlan = tripPlan;
-
             switch(tripType) {
                 case ETripType.OUT_TRIP:
                     detail.deptCityCode = query.originPlace;
@@ -121,6 +121,8 @@ class TripPlanModule {
                     detail.arrivalCity = tripPlan.arrivalCity;
                     detail.startTime = query.leaveDate || query.checkInDate;
                     detail.endTime = query.goBackDate || query.checkOutDate;
+                    detail.expenditure = price;
+                    detail.status = EPlanStatus.COMPLETE;
                     break;
                 default:
                     detail.type = ETripType.OTHER;
@@ -457,8 +459,9 @@ class TripPlanModule {
 
             //更新详情信息
             budgets.forEach(async (budget) => {
+                let price = Number(budget.price);
                 let tripType = budget.tripType;
-                let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: Number(budget.price)});
+                let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: price});
                 detail.accountId = staff.id;
                 detail.isCommit = false;
                 detail.status = EPlanStatus.WAIT_UPLOAD;
@@ -494,6 +497,8 @@ class TripPlanModule {
                         detail.arrivalCity = tripPlan.arrivalCity;
                         detail.startTime = query.leaveDate || query.checkInDate;
                         detail.endTime = query.goBackDate || query.checkOutDate;
+                        detail.expenditure = price;
+                        detail.status = EPlanStatus.COMPLETE;
                         break;
                     default:
                         detail.type = ETripType.OTHER;
@@ -558,6 +563,7 @@ class TripPlanModule {
         let tripDetails = await tripPlan.getTripDetails({});
 
         tripDetails.map(function(detail) {
+            if (detail.type == ETripType.SUBSIDY) return;
             detail.status = tripPlan.status;
         });
 
@@ -881,9 +887,11 @@ class TripPlanModule {
             _detail.tripPlan = tripPlan;
             _detail.accountId = staff.id;
             _detail.status = 0;
+            console.info("补助自动计算:", _detail.type, ETripType.OTHER, _detail.type == ETripType.OTHER)
             if (_detail.type == ETripType.OTHER) {
                 _detail.status = EPlanStatus.COMPLETE;
                 _detail.expenditure = _detail.budget;
+                console.info(_detail)
             }
             await _detail.save();
         }));
