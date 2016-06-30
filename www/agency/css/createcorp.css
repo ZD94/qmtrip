@@ -1,0 +1,29 @@
+.createCorp {
+  background: #fff;
+  margin-top: 20px;
+  width: 100%;
+  padding-bottom: 30px;
+}
+.title_list {
+  width: 100%;
+  text-align: left;
+  margin-left: 20px;
+  line-height: 30px;
+  font-size: 14px;
+}
+.title_list span {
+  color: #01bdff;
+}
+.createCorp_content {
+  width: 100%;
+}
+.createCorp_content .tipInfo {
+  width: 100%;
+  text-align: center;
+}
+.createCorp_content .tipInfo i {
+  color: #de492a;
+  margin-right: 10px;
+}
+
+/*# sourceMappingURL=createcorp.css.map */
