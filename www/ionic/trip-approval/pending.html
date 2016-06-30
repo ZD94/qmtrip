@@ -12,12 +12,11 @@
             <div class="item item-divider">
                 <span ng-if="trip.status == EPlanStatus.WAIT_APPROVE">待审批</span>
                 <span ng-if="trip.status == EPlanStatus.APPROVE_NOT_PASS">审批未通过</span>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <span>{{trip.budget | currency: ''}}元</span>
+                <span class="spanRight">{{trip.budget | currency: ''}}元</span>
             </div>
         </div>
-        <div ng-if="hasNextPage" style="text-align:center;"><i class="icon ion-arrow-up-a"></i>&nbsp;上拉加载更多</div>
-        <div ng-if="!hasNextPage" style="text-align:center;">没有更多记录了</div>
+        <div ng-if="hasNextPage" class="getMoreOrNoMore"><i class="icon ion-arrow-up-a"></i>&nbsp;上拉加载更多</div>
+        <div ng-if="!hasNextPage" class="getMoreOrNoMore">没有更多记录了</div>
         <ion-infinite-scroll on-infinite="loadMore()" ng-if="hasNextPage"></ion-infinite-scroll>
     </ion-content>
 </ion-view>

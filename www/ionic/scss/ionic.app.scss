@@ -48,6 +48,14 @@ $ionicons-font-path: "../fonts" !default;
 ion-nav-view ion-view ion-content{
   background: url(../images/backgroud.png) no-repeat center;
   background-size:cover;
+  .spanRight{
+    float: right; //很多价位在右边
+  }
+  .getMoreOrNoMore{
+    text-align: center;
+    margin-top: 20px;
+    color: #fff;
+  }
 }
 
 ion-side-menu{
@@ -55,6 +63,13 @@ ion-side-menu{
     .menulist{
       .list{
         div{
+          .menu-button{
+            &.icon{
+              &:before{
+                width: 28px;
+              }
+            }
+          }
           &:last-child{
             margin-bottom: 50px;
           }

@@ -32,7 +32,7 @@
         <ion-list>
             <ion-item class="item-divider">
                 交通
-                <span style="float: right">{{trafficBudget}}元</span>
+                <span class="spanRight">{{trafficBudget}}元</span>
             </ion-item>
             <ion-item ng-repeat="t in traffic track by $index">
                 {{t.startTime.value | date: 'MM-dd'}}
@@ -41,7 +41,7 @@
             </ion-item>
             <ion-item class="item-divider">
                 住宿
-                <span style="float: right">{{hotelBudget}}元</span>
+                <span class="spanRight">{{hotelBudget}}元</span>
             </ion-item>
             <ion-item ng-repeat="h in hotel track by h.id">
                 {{h.startTime.value | date: 'MM-dd'}}至{{h.endTime.value | date: 'MM-dd'}}
@@ -50,7 +50,11 @@
             </ion-item>
             <ion-item class="item-divider">
                 其他补助(共{{subsidyDays}}天)
-                <span style="float: right">{{subsidyBudget | currency: ''}}元</span>
+                <span class="spanRight">{{subsidyBudget | currency: ''}}元</span>
+            </ion-item>
+            <ion-item>
+                {{tripPlan.startAt.value | date: 'MM-dd'}}至{{tripPlan.backAt.value | date: 'MM-dd'}}
+                <br>{{subsidyBudget | currency : ''}}元
             </ion-item>
         </ion-list>
         <div class="button-bar" ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE && isHasPermissionApprove">
