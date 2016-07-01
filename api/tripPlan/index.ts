@@ -106,7 +106,6 @@ class TripPlanModule {
                     tripPlan.isNeedTraffic = true;
                     break;
                 case ETripType.HOTEL:
-                    // let landMarkInfo = await API.place.getCityInfo({cityCode: query.businessDistrict});
                     detail.cityCode = query.destinationPlace;
                     detail.city = tripPlan.arrivalCity;
                     detail.hotelName = query.businessDistrict; //landMarkInfo.name || '';
@@ -164,11 +163,9 @@ class TripPlanModule {
 
         await Promise.all([tripPlan.save(), tripPlanLog.save()]);
         await Promise.all(tripDetails.map((d) => d.save()));
-
         if (tripPlan.budget > 0 || tripPlan.status === EPlanStatus.WAIT_APPROVE) {
             await TripPlanModule.sendTripPlanEmails(tripPlan, staff.id);
         }
-
         return tripPlan;
     }
 
@@ -703,8 +700,14 @@ class TripPlanModule {
             tripDetail.status = EPlanStatus.COMPLETE;
             tripDetail.expenditure = expenditure;
             let query = {where: {id: {$ne: tripDetail.id}, status: [EPlanStatus.AUDITING, EPlanStatus.AUDIT_NOT_PASS]}}
-            let details = await tripPlan.getTripDetails(query); //获取所有未经过审核的票据
-            if(!details || details.length == 0 ) {
+            let noAuditDetails = await tripPlan.getTripDetails(query); //获取所有未经过审核的票据
+            if(!noAuditDetails || noAuditDetails.length == 0 ) {
+                let details = await tripPlan.getTripDetails({ where: {}});
+                let expenditure = 0;
+                details.forEach( (detail) => {
+                    expenditure += Number(detail.expenditure);
+                });
+                tripPlan.expenditure = expenditure;
                 tripPlan.status = EPlanStatus.COMPLETE;
                 tripPlan.auditStatus = EAuditStatus.INVOICE_PASS;
             }
