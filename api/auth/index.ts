@@ -1262,19 +1262,18 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * 保存openId关联的accountId
      * @type {saveOrUpdateOpenId}
      */
-    @requireParams(['accountId', 'openId'], [])
-    static async saveOrUpdateOpenId(params: {accountId: string, openId: string}) {
-        if(params.accountId == undefined) {
-            throw {code: -1, msg: 'accountId不能为空'};
-        }
-        
-        let list = await Models.accountOpenid.find({where: {openId: params.openId}});
-        
+    @clientExport
+    @requireParams(['openid'], [])
+    static async saveOrUpdateOpenId(params: {openid: string}) {
+        let openid = params.openid;
+        let staff = await Staff.getCurrent();
+        let list = await Models.accountOpenid.find({where: {openId: openid}});
+
         if(list && list.length > 0) {
-            return list[0];
+            await Promise.all(list.map((op) => op.destroy()));
         }
 
-        let obj = AccountOpenid.create(params);
+        let obj = AccountOpenid.create({openId: openid, accountId: staff.id});
         return obj.save();
     }
 
@@ -1309,31 +1308,12 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             })
     }
 
-    @clientExport
-    static async authWechatLogin111(params: {redirectUrl: string}) {
-        logger.warn('authWechatLogin');
-        logger.info(params);
-        let appId = 'wx4c94eb4c01c183f7';
-        let curStaff = await Staff.getCurrent();
-        let openids = await Models.accountOpenid.find({where: {appId: appId, accountId: curStaff.id}});
 
-        if(!openids || openids.length <= 0) {
-            return false;
-        }else {
-            return true
-        }
-    }
-    
     @clientExport
-    static async authWeChatLogin(params: {code: string}):
+    static async authWeChatLogin(params: {openid: string}):
     Promise<{token_id: string, user_id: string, timestamp: string, token_sign: string} | boolean> {
-        logger.warn("authWeChatLogin...");
-        logger.warn(params);
-        let openid = await API.wechat.requestOpenIdByCode({code: params.code}); //获取微信openId;
-        logger.warn('openid==>', openid);
-        let accountId = await ApiAuth.getAccountIdByOpenId({openId: openid});
-        logger.warn('accountId==>', accountId);
-
+        let accountId = await ApiAuth.getAccountIdByOpenId({openId: params.openid});
+        
         if(!accountId) {
             return false;
         }
@@ -1344,12 +1324,8 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     @clientExport
     static async getWeChatLoginUrl(params: {redirectUrl: string}) {
         let redirectUrl = encodeURIComponent(params.redirectUrl);
-        logger.warn('getWeChatLoginUrl...');
-        logger.warn(params.redirectUrl);
-
-        let backUrl = C.host + "/auth/wx-login?back_url=" + redirectUrl;
-        backUrl = "http://aoc.local.tulingdao.com/auth/wx-login?redirect_url=" + redirectUrl; //微信公众号测使用
-
+        let backUrl = C.host + "/auth/wx-login?redirect_url=" + redirectUrl;
+        // backUrl = "http://aoc.local.tulingdao.com/auth/wx-login?redirect_url=" + redirectUrl; //微信公众号测使用
         return API.wechat.getOAuthUrl({backUrl: backUrl});
     }
 
@@ -1380,60 +1356,12 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         //微信自动登录
         app.all("/auth/wx-login", async function(req, res, next) {
             let query = req.query;
+            let openid = await API.wechat.requestOpenIdByCode({code: query.code}); //获取微信openId;
             let redirect_url = query.redirect_url;
-
-            if(redirect_url.indexOf('?') > 0) {
-                redirect_url += '&';
-            }
-
             redirect_url += redirect_url.indexOf('?') > 0 ? '&' : '?';
-            redirect_url += 'code=' + query.code + '&state=' + query.state;
-            logger.error("/auth/wx-login...");
-            logger.error(redirect_url);
+            redirect_url += 'openid=' + openid + '&state=' + query.state;
             res.redirect(redirect_url);
         });
-
-        //微信自动登陆
-        app.all("/auth/get_access_code", async function(req, res, next) {
-            logger.warn('/auth/get_access_code');
-            var query = req.query;
-            var backUrl = req.url.match(/http.+/)[0];
-            let cookies = req.cookies;
-            let token;
-            let openid = await API.wechat.requestOpenIdByCode({code: query.code}); //获取微信openId;
-            let accountId = await API.auth.getAccountIdByOpenId({openId: openid});
-            logger.warn('openId link to accountId==>', accountId);
-            logger.warn('cookies', cookies);
-
-            if(accountId) {
-                logger.warn("login in weChat...");
-                token = await makeAuthenticateSign(accountId, 'weChat');
-            }else if(cookies && cookies.user_id) {
-                logger.warn("第一次在微信登陆,关联openId和accountId...");
-                let curAccountId = cookies.user_id;
-                token = await makeAuthenticateSign(curAccountId);
-                await API.auth.saveOrUpdateOpenId({openId: openid, accountId: curAccountId});
-            }else {
-                var login_back_url = '/auth/wx-login?redirect_url=' + encodeURIComponent('/auth/get_access_code?back_url=' + backUrl);
-                var loginUrl = '/index.html#/login/index?backurl=' + login_back_url;
-                logger.warn("没有登陆，跳转至登陆页面...", loginUrl);
-                res.redirect(loginUrl);
-                return;
-            }
-
-            res.cookie("token_id", token.token_id);
-            res.cookie("user_id", token.user_id);
-            res.cookie("timestamp", token.timestamp);
-            res.cookie("token_sign", token.token_sign);
-
-            var redirectUrl = decodeURIComponent(backUrl);
-            logger.warn("跳转到最后的链接...");
-            logger.warn(redirectUrl);
-            if(!redirectUrl.match(/^http:\/\/.*\?.*/)) {
-                redirectUrl = redirectUrl.replace(/&/, '?');
-            }
-            res.redirect(redirectUrl);
-        })
     }
 
 }

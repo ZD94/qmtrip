@@ -31,7 +31,7 @@ require('nglibs');
 var ngapp = require('ngapp');
 ngapp.depend('ionic');
 ngapp.depend('nglibs');
-ngapp.root('agency', '/companyList/CompanyList');
+ngapp.root('agency', '/travelRecord/TravelList');
 ngapp.useRoutePolicy(ngapp.RoutePolicy.Embed, ['login']);
 var app = ngapp.create('qm.agency');
 

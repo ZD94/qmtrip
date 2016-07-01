@@ -1,22 +1,8 @@
-@import (reference) "common.less";
-@color-theme1:#118FD6;
-@color-theme2:#58b0e2;
-@color-white:#ffffff;
-@color-gray:#ededed;
-@color-footer:#292b2b;
-@color-alert-wrong:#de492a;
-@color-alert-right:#5cca2e;
-@color-text:#4a4a4a;
-@color-border:#d9d9d9;
-@border-radius-2:2px;
-@h30:30px;
-@h20:20px;
-@h14:14px;
-@h12:12px;
-.head{ //Ò³Ãæ¶¥²¿
+@import "var";
+.head{ //Ò³ï¿½æ¶¥ï¿½ï¿½
   width: 100%;
   height: 80px;
-  background-color: @color-theme1;
+  background-color: $color-theme1;
   .logo{
     float: left;
     margin-left: 150px;
@@ -25,8 +11,8 @@
   .to_login{
     float: right;
     margin-right: 150px;
-    font-size: @h14;
-    color: @color-white;
+    font-size: $h14;
+    color: $color-white;
     line-height: 80px;
     span{
       display: block;
@@ -34,20 +20,20 @@
       width: 60px;
       height: 30px;
       text-align: center;
-      line-height: @h30;
-      border-radius: @border-radius-2;
+      line-height: $h30;
+      border-radius: $border-radius-2;
       margin-left: 10px;
       margin-top: 25px;
-      background: @color-theme2;
+      background: $color-theme2;
       cursor:pointer;
     }
   }
 }
-.title{//ÎÄÕÂ±êÌâ
+.title{//ï¿½ï¿½ï¿½Â±ï¿½ï¿½ï¿½
   width: 100%;
   text-align: center;
-  font-size: @h30;
-  color: @color-text;
+  font-size: $h30;
+  color: $color-text;
   padding-top: 30px;
   margin-bottom: 50px;
 }
@@ -62,9 +48,9 @@
   height: 40px;
   margin: 0 auto 20px;
   line-height: 40px;
-  border-radius: @border-radius-2;
-  border:1px solid @color-border;
-  font-size: @h14;
+  border-radius: $border-radius-2;
+  border:1px solid $color-border;
+  font-size: $h14;
   position: relative;
   input{
     width: 90%;
@@ -79,7 +65,7 @@
   height: 40px;
   line-height: 40px;
   text-align: center;
-  background-color: @color-theme1;
+  background-color: $color-theme1;
   margin: 0px auto 20px;
   color: #fff;
   text-decoration: none;
