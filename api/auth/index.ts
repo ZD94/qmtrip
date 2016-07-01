@@ -1239,7 +1239,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         let openid = params.openid;
         let staff = await Staff.getCurrent();
         let list = await Models.accountOpenid.find({where: {openId: openid}});
-        
+
         if(list && list.length > 0) {
             await Promise.all(list.map((op) => op.destroy()));
         }
@@ -1296,7 +1296,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     static async getWeChatLoginUrl(params: {redirectUrl: string}) {
         let redirectUrl = encodeURIComponent(params.redirectUrl);
         let backUrl = C.host + "/auth/wx-login?redirect_url=" + redirectUrl;
-        backUrl = "http://aoc.local.tulingdao.com/auth/wx-login?redirect_url=" + redirectUrl; //微信公众号测使用
+        // backUrl = "http://aoc.local.tulingdao.com/auth/wx-login?redirect_url=" + redirectUrl; //微信公众号测使用
         return API.wechat.getOAuthUrl({backUrl: backUrl});
     }
 
@@ -1333,40 +1333,6 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             redirect_url += 'openid=' + openid + '&state=' + query.state;
             res.redirect(redirect_url);
         });
-
-        //微信自动登陆
-        // app.all("/auth/get_access_code", async function(req, res, next) {
-        //     var query = req.query;
-        //     var backUrl = req.url.match(/http.+/)[0];
-        //     let cookies = req.cookies;
-        //     let token;
-        //     let openid = await API.wechat.requestOpenIdByCode({code: query.code}); //获取微信openId;
-        //     let accountId = await API.auth.getAccountIdByOpenId({openId: openid});
-        //
-        //     if(accountId) {
-        //         token = await makeAuthenticateSign(accountId, 'weChat');
-        //     }else if(cookies && cookies.user_id) {
-        //         let curAccountId = cookies.user_id;
-        //         token = await makeAuthenticateSign(curAccountId);
-        //         await API.auth.saveOrUpdateOpenId({openId: openid, accountId: curAccountId});
-        //     }else {
-        //         var login_back_url = '/auth/wx-login?redirect_url=' + encodeURIComponent('/auth/get_access_code?back_url=' + backUrl);
-        //         var loginUrl = '/index.html#/login/index?backurl=' + login_back_url;
-        //         res.redirect(loginUrl);
-        //         return;
-        //     }
-        //
-        //     res.cookie("token_id", token.token_id);
-        //     res.cookie("user_id", token.user_id);
-        //     res.cookie("timestamp", token.timestamp);
-        //     res.cookie("token_sign", token.token_sign);
-        //
-        //     var redirectUrl = decodeURIComponent(backUrl);
-        //     if(!redirectUrl.match(/^http:\/\/.*\?.*/)) {
-        //         redirectUrl = redirectUrl.replace(/&/, '?');
-        //     }
-        //     res.redirect(redirectUrl);
-        // })
     }
 
 }
