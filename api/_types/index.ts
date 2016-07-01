@@ -78,17 +78,6 @@ export function initModels(models: ModelsInterface){
     }
 }
 
-export function isBrowser() {
-    let isHasWindow = false;
-    try {
-        if (window) {
-            isHasWindow = true;
-        }
-    } catch(err) {
-    }
-    return isHasWindow;
-}
-
 export * from "./company";
 export * from "./staff";
 export * from './travelPolicy';

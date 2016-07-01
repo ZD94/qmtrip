@@ -2,7 +2,6 @@
  * Created by yumiao on 16-5-17.
  */
 'use strict';
-import { regApiType } from 'common/api/helper';
 import { Models } from 'api/_types';
 import { Table, Create, Field } from 'common/model/common';
 import { ModelObject } from 'common/model/object';

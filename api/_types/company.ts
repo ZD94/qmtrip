@@ -1,6 +1,6 @@
 'use strict';
 
-import { isBrowser, Models } from 'api/_types';
+import { Models } from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import {Agency} from 'api/_types/agency';
 import {TravelPolicy} from "api/_types/travelPolicy";

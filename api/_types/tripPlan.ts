@@ -1,5 +1,5 @@
 
-import { Models, isBrowser} from 'api/_types';
+import { Models } from 'api/_types';
 import { Staff} from 'api/_types/staff';
 import { Company} from 'api/_types/company';
 import { Types, Values } from 'common/model';

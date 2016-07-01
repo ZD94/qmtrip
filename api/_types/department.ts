@@ -1,5 +1,4 @@
-import { regApiType } from 'common/api/helper';
-import {Models, isBrowser} from 'api/_types';
+import {Models} from 'api/_types';
 import {Staff} from 'api/_types/staff';
 import { Company } from 'api/_types/company';
 import { Table, Create, Field, Reference, ResolveRef } from 'common/model/common';
