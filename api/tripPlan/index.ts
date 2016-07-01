@@ -667,6 +667,9 @@ class TripPlanModule {
 
         if(tripDetails && tripDetails.length > 0) {
             tripDetails.map(function (detail) {
+                if (detail.type == ETripType.SUBSIDY) {
+                    continue;
+                }
                 detail.status = EPlanStatus.AUDITING;
                 detail.isCommit = true;
             })
