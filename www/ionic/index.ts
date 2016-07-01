@@ -15,7 +15,7 @@ API.onlogin(function(){
         window.location.reload();
         return;
     }
-
+    backUrl = encodeURIComponent(backUrl);
     window.location.href = "#/login/?backurl="+backUrl;
 });
 

@@ -30,35 +30,31 @@ export function StorageSetController($scope, $stateParams, $storage) {
 export async function IndexController($scope, $stateParams, $storage, $location) {
     var browserspec = require('browserspec');
     var backUrl = $stateParams.backurl || "#";
-    console.info("**********************************");
-    console.info("backUrl==>>", backUrl);
-    // console.info("absUrl==>>", $location.absUrl());
-    // if(browserspec.is_wechat && backUrl != '#') {
-    //     console.info('this is weChat login...');
-    //     let code = $stateParams.code;
-    //     console.info("code==>", code);
-    //     await API.onload();
-    //
-    //     if(!code) {
-    //         let url = await API.auth.getWeChatLoginUrl({redirectUrl: $location.absUrl()});
-    //         window.location.href = url;
-    //         return;
-    //     }
-    //
-    //     let token = await API.auth.authWeChatLogin({code: code});
-    //
-    //     if(token) {
-    //         $storage.local.set('auth_data', token);
-    //         let auth_data = $storage.local.get('auth_data');
-    //         console.info('auth_data==>', auth_data);
-    //         console.info('success make token...');
-    //         window.location.href = backUrl;
-    //         console.info(backUrl);
-    //         return;
-    //     }
-    // }
+    let openid = $stateParams.openid;
 
-    console.info("step 000000000");
+    //微信中自动登陆
+    if(browserspec.is_wechat && backUrl != '#') {
+        await API.onload();
+
+        if(!openid) {
+            let url = await API.auth.getWeChatLoginUrl({redirectUrl: $location.absUrl()});
+            window.location.href = url;
+            return;
+        }
+
+        let token = await API.auth.authWeChatLogin({openid: openid});
+
+        if(token) {
+            $storage.local.set('auth_data', token);
+            Cookie.set("user_id", token.user_id, {expires: 30});
+            Cookie.set("token_sign", token.token_sign, {expires: 30});
+            Cookie.set("timestamp", token.timestamp, {expires: 30});
+            Cookie.set("token_id", token.token_id, {expires: 30});
+            await API.reload_all_modules();
+            window.location.href = backUrl;
+            return;
+        }
+    }
 
     $scope.form = {
         email: Cookie.get("email") || '',
@@ -68,7 +64,7 @@ export async function IndexController($scope, $stateParams, $storage, $location)
     $scope.$watchGroup(['form.email', 'form.pwd'], function(){
         $scope.check_passed = $scope.form.email && $scope.form.pwd && ($scope.form.email.length > 0 && $scope.form.pwd.length > 5);
         //$scope.check_changed = true;
-    })
+    });
 
     $scope.focused = '';
     $scope.update_focused = function($event) {
@@ -90,7 +86,15 @@ export async function IndexController($scope, $stateParams, $storage, $location)
             Cookie.set("token_sign", data.token_sign, {expires: 30});
             Cookie.set("timestamp", data.timestamp, {expires: 30});
             Cookie.set("token_id", data.token_id, {expires: 30});
-            API.reload_all_modules();
+            await API.reload_all_modules();
+
+            if(browserspec.is_wechat && openid) {
+                //保存accountId和openId关联
+                API.require('auth');
+                await API.onload();
+                await API.auth.saveOrUpdateOpenId({openid: openid});
+            }
+
             window.location.href = backUrl;
         } catch (err) {
             //console.info(err.msg);
