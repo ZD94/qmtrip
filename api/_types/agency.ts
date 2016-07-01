@@ -2,8 +2,7 @@
  * Created by yumiao on 16-4-26.
  */
 'use strict';
-import { regApiType } from 'common/api/helper';
-import { isBrowser, Models, EGender, EAccountType } from 'api/_types';
+import { Models, EGender, EAccountType } from 'api/_types';
 import {Company} from 'api/_types/company';
 import { getSession, Types, Values } from 'common/model';
 import { Account } from './auth';
@@ -117,6 +116,7 @@ export class AgencyUser extends ModelObject{
     static create(obj?: Object): AgencyUser { return null; }
 
     static async getCurrent(): Promise<AgencyUser> {
+        await AgencyUser['$model'].$resolve();
         let session = getSession();
         if(session.currentAgencyUser)
             return session.currentAgencyUser;

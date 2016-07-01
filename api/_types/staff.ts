@@ -1,7 +1,6 @@
-import {Models, EGender, EAccountType, isBrowser} from 'api/_types';
+import {Models, EGender, EAccountType} from 'api/_types';
 import { Company } from 'api/_types/company';
-import {TripPlan, EPlanStatus} from 'api/_types/tripPlan';
-import { regApiType } from 'common/api/helper';
+import {TripPlan} from 'api/_types/tripPlan';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Department } from 'api/_types/department';
 import { Types, Values } from 'common/model';
@@ -9,7 +8,6 @@ import { Account } from './auth';
 import { getSession } from 'common/model';
 import { TableExtends, Table, Create, Field, ResolveRef, Reference } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
-import {Pager} from "common/model/cached";
 import {PaginateInterface} from "../../common/model/interface";
 
 export enum EStaffStatus {
@@ -39,6 +37,7 @@ export class Staff extends ModelObject implements Account {
     static create(obj?: Object): Staff { return null; }
 
     static async getCurrent(): Promise<Staff> {
+        await Staff['$model'].$resolve();
         let session = getSession();
         if(session.currentStaff)
             return session.currentStaff;
