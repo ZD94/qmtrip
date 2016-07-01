@@ -75,7 +75,8 @@ class StaffModule{
             throw L.ERR.PERMISSION_DENY();
         }
         let result = await newstaff.save();
-        await API.auth.sendResetPwdEmail({email: result.email, type: 1, isFirstSet: true, companyName: result.company.name});
+        await API.auth.sendResetPwdEmail({email: result.email, mobile: result.mobile, type: 1, isFirstSet: true, companyName: result.company.name});
+        // await API.auth.sendResetPwdMsg({email: result.email, mobile: result.mobile, type: 1, isFirstSet: true, companyName: result.company.name});
         return result;
     }
 

@@ -145,77 +145,104 @@ class ApiAuth {
      * @returns {Promise} true|error
      */
     @clientExport
-    static sendResetPwdEmail (params: {email: string, type?: Number, isFirstSet?: boolean, companyName?: string}) : Promise<boolean> {
+    static async sendResetPwdEmail (params: {email: string, type?: Number, isFirstSet?: boolean, companyName?: string}) : Promise<boolean> {
         var email = params.email;
+        var mobile = params.mobile;
         var isFirstSet = params.isFirstSet;
         var type = params.type || 1;
         var companyName = params.companyName || '';
 
-        return Promise.resolve()
-            .then(function() {
-                if (!email) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST();
-                }
-                return email;
-            })
-            .then(function(email) {
-                return DBM.Account.findOne({where: {email: email, type: type}})
-                    .then(function(account) {
-                        if (!account) {
-                            throw L.ERR.ACCOUNT_NOT_EXIST();
-                        }
-                        return account;
-                    })
-            })
-            .then(function(account) {
-                //生成设置密码token
-                var pwdToken = utils.getRndStr(6);
-                return DBM.Account.update({pwdToken: pwdToken}, {where: {id: account.id}, returning: true})
-            })
-            .spread(function(affect, rows) {
-                var account = rows[0];
-                if (account.type != 1) {//如果是普通员工,发送姓名,如果是代理商直接发送邮箱
-                    return account;
-                }
+        if (!email) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
 
-                return API.staff.getStaff({id: account.id})
-                    .catch(function(err) {
-                        return {};
-                    })
-                    .then(function(staff) {
-                        account = account.toJSON();
-                        account.realname = staff.name;
-                        return account;
-                    })
-            })
-            .then(function(account: any) {
-                var timeStr = utils.now();
-                var oneDay = 24 * 60 * 60 * 1000
-                var timestamp = Date.now() + 2 * oneDay;  //失效时间2天
-                var sign = makeActiveSign(account.pwdToken, account.id, timestamp);
-                var url = "accountId="+account.id+"&timestamp="+timestamp+"&sign="+sign+"&email="+account.email;
-                var templateName;
-                var vals: any = {
-                    name: account.realname || account.email,
-                    username: account.email,
-                    time: timeStr,
-                    companyName: companyName
-                };
+        if (!mobile) {
+            throw L.ERR.MOBILE_EMPTY();
+        }
+        var acc = await DBM.Account.findOne({where: {email: email, type: type}});
+        if (!acc) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+        //生成设置密码token
+        var pwdToken = utils.getRndStr(6);
+        var [affect, rows] = await DBM.Account.update({pwdToken: pwdToken}, {where: {id: acc.id}, returning: true});
+        var account = rows[0];
 
-                if (isFirstSet) {
-                    vals.url = C.host + "/index.html#/login/first-set-pwd?" + url;
-                    templateName = 'qm_first_set_pwd_email';
-                    return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
-                } else {
-                    vals.url = C.host + "/index.html#/login/reset-pwd?" + url;
-                    templateName = 'qm_reset_pwd_email';
-                    return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
-                }
-            })
-            .then(function() {
-                return true;
-            });
+        var staff = await Models.staff.get(account.id);
+        account = account.toJSON();
+
+        var timeStr = utils.now();
+        var oneDay = 24 * 60 * 60 * 1000
+        var timestamp = Date.now() + 2 * oneDay;  //失效时间2天
+        var sign = makeActiveSign(account.pwdToken, account.id, timestamp);
+        var url = "accountId="+account.id+"&timestamp="+timestamp+"&sign="+sign+"&email="+account.email;
+        var templateName;
+
+        var vals: any = {
+            name: staff.name || account.mobile,
+            username: account.email,
+            time: timeStr,
+            companyName: companyName
+        };
+
+        if (isFirstSet) {
+            //发邮件
+            vals.url = C.host + "/index.html#/login/first-set-pwd?" + url;
+            templateName = 'qm_first_set_pwd_email';
+            await API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
+
+            //发短信
+            vals.url = await API.shorturl.long2short({longurl: C.host + "/index.html#/login/first-set-pwd?" + url});
+            await API.sms.sendMsgSubmit({template: 'qmFirstSetPwdMsg', mobile: account.mobile, values: vals});
+        } else {
+            vals.url = C.host + "/index.html#/login/reset-pwd?" + url;
+            templateName = 'qm_reset_pwd_email';
+            return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
+        }
+        return true;
     }
+
+   /* @clientExport
+    static async sendResetPwdMsg (params: {mobile: string, type?: Number, isFirstSet?: boolean, companyName?: string}) : Promise<boolean> {
+        var mobile = params.mobile;
+        var isFirstSet = params.isFirstSet;
+        var type = params.type || 1;
+        var companyName = params.companyName || '';
+
+        if (!mobile) {
+            throw L.ERR.MOBILE_EMPTY();
+        }
+        var acc = await DBM.Account.findOne({where: {mobile: mobile, type: type}});
+        if (!acc) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+        //生成设置密码token
+        var pwdToken = utils.getRndStr(6);
+        var [affect, rows] = await DBM.Account.update({pwdToken: pwdToken}, {where: {id: acc.id}, returning: true});
+        var account = rows[0];
+
+        var staff = await Models.staff.get(account.id);
+        account = account.toJSON();
+
+        var timeStr = utils.now();
+        var oneDay = 24 * 60 * 60 * 1000
+        var timestamp = Date.now() + 2 * oneDay;  //失效时间2天
+        var sign = makeActiveSign(account.pwdToken, account.id, timestamp);
+        var url = "accountId="+account.id+"&timestamp="+timestamp+"&sign="+sign+"&email="+account.email;
+        var templateName;
+        var vals: any = {
+            name: staff.name || account.mobile,
+            username: account.email,
+            time: timeStr,
+            companyName: companyName
+        };
+
+        if (isFirstSet) {
+            vals.url = await API.shorturl.long2short({longurl: C.host + "/index.html#/login/first-set-pwd?" + url});
+            await API.sms.sendMsgSubmit({template: 'qmFirstSetPwdMsg', mobile: account.mobile, values: vals});
+        }
+        return true;
+    }*/
 
     // async sendResetPwdEmail(params:{email:string; type:number; code:string; ticket:string}):Promise<boolean> {
     //     let code = params.code;
@@ -309,6 +336,8 @@ class ApiAuth {
                 return true;
             });
     }
+
+
 
     @clientExport
     static getAccountStatus(params:{}):Promise<any> {
