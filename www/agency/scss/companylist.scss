@@ -1,4 +1,4 @@
-@import (reference) "common.less";
+@import "var";
 .companylist{
 	background: #fff;
 	margin-top: 20px;
@@ -133,7 +133,7 @@
 		float: left;
 	  }
 	  a {
-		color: @color-theme1;
+		color: $color-theme1;
 		float: left;
 	  }
 	  span {
@@ -164,7 +164,7 @@
 		  float: left;
 		  a {
 			font-size: 13px;
-			color: @color-theme1;
+			color: $color-theme1;
 		  }
 		}
 		.updatechildDepartment {
@@ -182,12 +182,12 @@
 	font-size: 15px;
 	font-weight: bold;
 	text-align: right;
-	background: @background-color-second;
-	border: 1px @border-color solid;
+	background: $background-color-second;
+	border: 1px $border-color solid;
 	padding: 0 30px;
 	margin: 20px auto 0 auto;
 	a {
-	  color: @color-theme1;
+	  color: $color-theme1;
 	}
   }
   .policy_titlefixed {
@@ -203,8 +203,8 @@
 	li {
 	  width: 453px;
 	  height: 208px;
-	  background: @background-color-second;
-	  border: 1px @border-color solid;
+	  background: $background-color-second;
+	  border: 1px $border-color solid;
 	  padding: 0 20px;
 	  margin: 10px 10px 0 0;
 	  float: left;
@@ -215,11 +215,11 @@
 		line-height: 20px;
 		font-weight: bold;
 		text-align: right;
-		border-left: 4px @color-theme2 solid;
+		border-left: 4px $color-theme2 solid;
 		padding-left: 10px;
 		margin: 10px 0 5px 0;
 		a {
-		  color: @color-theme1;
+		  color: $color-theme1;
 		}
 	  }
 	}
@@ -230,7 +230,7 @@
 	  width: 453px;
 	  height: auto;
 	  box-shadow: 0 0 10px rgba(0, 0, 0, .5);
-	  background: @background-color-second;
+	  background: $background-color-second;
 	  padding: 0 20px 20px 20px;
 	  z-index: 1;
 	  .policy_t {
@@ -239,11 +239,11 @@
 		line-height: 20px;
 		font-weight: bold;
 		text-align: left;
-		border-left: 4px @color-theme2 solid;
+		border-left: 4px $color-theme2 solid;
 		padding-left: 10px;
 		margin: 10px 0 5px 0;
 		a {
-		  color: @color-theme1;
+		  color: $color-theme1;
 		}
 	  }
 	}
@@ -251,7 +251,7 @@
 	  width: 453px;
 	  height: auto;
 	  box-shadow: 0 0 10px rgba(0, 0, 0, .5);
-	  background: @background-color-second;
+	  background: $background-color-second;
 	  padding: 0 20px 20px 20px;
 	  position: absolute;
 	  top: 10px;
@@ -263,11 +263,11 @@
 		line-height: 20px;
 		font-weight: bold;
 		text-align: left;
-		border-left: 4px @color-theme2 solid;
+		border-left: 4px $color-theme2 solid;
 		padding-left: 10px;
 		margin: 10px 0 5px 0;
 		a {
-		  color: @color-theme1;
+		  color: $color-theme1;
 		}
 	  }
 	}
@@ -288,7 +288,7 @@
 	line-height: 14px;
 	text-align: center;
 	background:#ffffff;
-	border: 1px @border-color solid;
+	border: 1px $border-color solid;
 	margin-top: 1px;
 	float: left;
   }
@@ -313,8 +313,8 @@
   .confirmbox {
 	width: 398px;
 	height: auto;
-	border: 1px @border-color solid;
-	background: @background-color-second;
+	border: 1px $border-color solid;
+	background: $background-color-second;
 	margin: -102px 0 0 -200px;
 	position: fixed;
 	top: 50%;
@@ -324,7 +324,7 @@
 	  width: 358px;
 	  height: 35px;
 	  line-height: 35px;
-	  background: @border-color;
+	  background: $border-color;
 	  padding: 0 20px;
 	}
 	.confirmbox_p {
@@ -335,7 +335,7 @@
 	  .deleteFail {
 		width: 100%;
 		height: 160px;
-		background: @background-color-second;
+		background: $background-color-second;
 		position: absolute;
 		top: 0;
 		left: 0;

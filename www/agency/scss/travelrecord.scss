@@ -1,4 +1,4 @@
-@import "common.less";
+@import "var";
 .travel-record {
   width: 100%;
   height: auto;
@@ -15,7 +15,7 @@
         line-height: 40px;
         text-align: center;
         font-size: 15px;
-        border: 1px @background-color-default solid;
+        border: 1px $background-color-default solid;
         border-bottom: none;
         cursor: pointer;
         float: left;
@@ -26,17 +26,17 @@
         line-height: 40px;
         text-align: center;
         font-size: 15px;
-        border: 1px @border-color solid;
+        border: 1px $border-color solid;
         border-radius: 5px 5px 0 0;
-        background: @background-color-second;
+        background: $background-color-second;
         border-bottom: none;
       }
     }
     .mainbox_bottom {
       width: 998px;
       height: auto;
-      border: 1px @border-color solid;
-      background: @background-color-second;
+      border: 1px $border-color solid;
+      background: $background-color-second;
       margin-top: -1px;
       .search {
         width: 958px;
@@ -47,7 +47,7 @@
         width: 100%;
         height: auto;
         tr {
-          border-bottom: 1px @border-color solid;
+          border-bottom: 1px $border-color solid;
           padding: 10px 0;
         }
         th {
@@ -62,7 +62,7 @@
             height: 30px;
             line-height: 30px;
             a {
-              color: @color-theme1;
+              color: $color-theme1;
             }
             .shenhe {
               color: #9F9B9B;
@@ -98,13 +98,13 @@
       height: auto;
       border-radius: 2px;
       box-shadow: 0 3px 10px rgba(0, 0, 0, .3);
-      background: @background-color-second;
+      background: $background-color-second;
       overflow: hidden;
       .title_top {
         width: 960px;
         height: 40px;
         font-size: 15px;
-        color: @btn-text-color;
+        color: $btn-text-color;
         background: #4A4A4A;
         padding: 0 20px;
       }
@@ -116,7 +116,7 @@
         dl {
           width: 158px;
           height: 78px;
-          border: 1px @border-color solid;
+          border: 1px $border-color solid;
           margin: 0 20px;
           float: left;
           position: relative;
@@ -126,7 +126,7 @@
             line-height: 30px;
             text-align: center;
             color: #9B9B9B;
-            background: @background-color-second;
+            background: $background-color-second;
             position: absolute;
             left: 24px;
             top: -20px;
@@ -146,12 +146,12 @@
         line-height: 45px;
         font-size: 15px;
         font-weight: bold;
-        border-bottom: 1px @border-color solid;
-        background: @background-color-default;
+        border-bottom: 1px $border-color solid;
+        background: $background-color-default;
         span {
           width: 4px;
           height: 16px;
-          background: @color-theme2;
+          background: $color-theme2;
           display: inline-block;
           margin: 15px 10px 0 20px;
           float: left;
@@ -203,13 +203,13 @@
             width: 20px;
             height: 20px;
             line-height: 20px;
-            color: @btn-text-color;
+            color: $btn-text-color;
             border-radius: 50%;
             background: #69B754;
             display: inline-block;
           }
           a {
-            color: @color-theme1;
+            color: $color-theme1;
           }
         }
       }
@@ -229,8 +229,8 @@
       dd {
         width: 998px;
         height: auto;
-        border: 1px @border-color solid;
-        background: @background-color-second;
+        border: 1px $border-color solid;
+        background: $background-color-second;
         td {
           padding: 10px 20px;
           p {
@@ -255,8 +255,8 @@
    .invoicebox {
      width: 398px;
      height: auto;
-     border: 1px @border-color solid;
-     background: @background-color-second;
+     border: 1px $border-color solid;
+     background: $background-color-second;
      margin: -102px 0 0 -200px;
      position: fixed;
      top: 50%;
@@ -266,7 +266,7 @@
        width: 358px;
        height: 35px;
        line-height: 35px;
-       background: @border-color;
+       background: $border-color;
        padding: 0 20px;
      }
      .invoicebox_p {
@@ -280,7 +280,7 @@
        .success {
          width: 100%;
          height: 180px;
-         background: @background-color-second;
+         background: $background-color-second;
          position: absolute;
          top: 0;
          left: 0;
@@ -295,7 +295,7 @@
              height: 30px;
              line-height: 30px;
              text-align: center;
-             color: @btn-text-color;
+             color: $btn-text-color;
              border-radius: 50%;
              background: #69B754;
              display: inline-block;
@@ -321,8 +321,8 @@
   .invoicebox {
     width: 398px;
     height: auto;
-    border: 1px @border-color solid;
-    background: @background-color-second;
+    border: 1px $border-color solid;
+    background: $background-color-second;
     margin: -102px 0 0 -200px;
     position: fixed;
     top: 50%;
@@ -332,7 +332,7 @@
       width: 358px;
       height: 35px;
       line-height: 35px;
-      background: @border-color;
+      background: $border-color;
       padding: 0 20px;
     }
     .invoicebox_p {
@@ -353,14 +353,14 @@
           line-height: 12px;
           text-align: center;
           font-size: 8px;
-          color: @btn-text-color;
-          border: 1px @border-color solid;
+          color: $btn-text-color;
+          border: 1px $border-color solid;
           display: inline-block;
           cursor: pointer;
         }
         .check {
-          border: 1px @color-theme1 solid;
-          background: @color-theme1;
+          border: 1px $color-theme1 solid;
+          background: $color-theme1;
         }
         .reason1_text,.reason2_text {
           height: 14px;
@@ -372,7 +372,7 @@
       .success {
         width: 100%;
         height: 180px;
-        background: @background-color-second;
+        background: $background-color-second;
         position: absolute;
         top: 0;
         left: 0;
@@ -387,7 +387,7 @@
             height: 30px;
             line-height: 30px;
             text-align: center;
-            color: @btn-text-color;
+            color: $btn-text-color;
             border-radius: 50%;
             background: #69B754;
             display: inline-block;
@@ -415,8 +415,8 @@
   .editBudgetbox {
     width: 398px;
     height: auto;
-    border: 1px @border-color solid;
-    background: @background-color-second;
+    border: 1px $border-color solid;
+    background: $background-color-second;
     margin: -102px 0 0 -200px;
     position: fixed;
     top: 50%;
@@ -426,7 +426,7 @@
       width: 358px;
       height: 35px;
       line-height: 35px;
-      background: @border-color;
+      background: $border-color;
       padding: 0 20px;
     }
     .editBudgetbox_p {

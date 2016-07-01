@@ -1,23 +1,6 @@
-@import (reference) "common.less";
-@color-theme1:#118FD6;
-@color-theme2:#58b0e2;
-@color-white:#ffffff;
-@color-gray:#ededed;
-@color-footer:#292b2b;
-@color-alert-wrong:#de492a;
-@color-alert-right:#5cca2e;
-@color-text:#4a4a4a;
-@color-border:#d9d9d9;
-@color-border2:#e5e5e5;
-@border-radius-2:2px;
-@h30:30px;
-@h20:20px;
-@h16:16px;
-@h15:15px;
-@h14:14px;
-@h12:12px;
+@import "var";
 .blue{
-  color: @color-theme1;
+  color: $color-theme1;
 }
 .orange{
   color: #f56d23!important;
@@ -35,18 +18,18 @@
     float: left;
     position: relative;
     ul{
-      font-size: @h15;
+      font-size: $h15;
       li{
         width: 140px;
         height: 40px;
         line-height: 40px;
         float: left;
         text-align: center;
-        color: @color-text;
+        color: $color-text;
         &.check1{
           color: #01dbff;
-          background-color: @color-white;
-          border:1px solid @color-border2;
+          background-color: $color-white;
+          border:1px solid $color-border2;
           border-bottom: none;
         }
       }
@@ -57,8 +40,8 @@
     height: auto;
     float: left;
     clear: both;
-    background-color: @color-white;
-    border: 1px solid @color-border2;
+    background-color: $color-white;
+    border: 1px solid $color-border2;
     margin-top: -1px;
     z-index: -1;
     overflow: hidden;
@@ -67,27 +50,27 @@
       padding-left: 20px;
       padding-bottom: 20px;
       line-height: 35px;
-      font-size: @h14;
-      color: @color-text;
+      font-size: $h14;
+      color: $color-text;
       select{
         width: 200px;
         height: 35px;
         line-height: 35px;
-        border-color: @color-border2;
+        border-color: $color-border2;
         padding-left: 5px;
       }
       span{
         padding-left: 30px;
-        color: @color-theme1;
+        color: $color-theme1;
       }
     }
     .staff_function{
       width: 100%;
       height: 36px;
       line-height: 36px;
-      font-size: @h14;
+      font-size: $h14;
       clear: both;
-      color: @color-text;
+      color: $color-text;
       i{
         font-style: normal;
         padding-left: 20px;
@@ -104,12 +87,12 @@
         height: 36px;
         text-align: center;
         text-decoration: none;
-        color: @color-white;
-        background-color: @color-theme1;
+        color: $color-white;
+        background-color: $color-theme1;
         cursor: pointer;
-        border-radius: @border-radius-2;
+        border-radius: $border-radius-2;
         &.onCheck{
-          background-color: @color-white !important;
+          background-color: $color-white !important;
           color: #f56d23 !important;
         }
       }
@@ -117,8 +100,8 @@
     .add_staff{
       width: 960px;
       margin: 10px auto;
-      font-size: @h14;
-      color: @color-text;
+      font-size: $h14;
+      color: $color-text;
       display: none;
       .little_triangle{
         clear: both;
@@ -130,7 +113,7 @@
       }
       .add_staff_block{
         width: 100%;
-        border: 1px solid @color-border2;
+        border: 1px solid $color-border2;
         padding-bottom: 20px;
         ul{
           display: block;
@@ -149,20 +132,20 @@
               width: 188px;
               height: 34px;
               line-height: 34px;
-              border: 1px solid @color-border2;
+              border: 1px solid $color-border2;
               margin-left: 5px;
               padding-left: 10px;
-              border-radius: @border-radius-2;
+              border-radius: $border-radius-2;
             }
             select{
               width: 200px;
               height: 34px;
               line-height: 34px;
-              border: 1px solid @color-border2;
+              border: 1px solid $color-border2;
               padding-left: 5px;
               margin-left: 5px;
               color: #9b9b9b;
-              border-radius: @border-radius-2;
+              border-radius: $border-radius-2;
             }
           }
         }
@@ -173,7 +156,7 @@
           background-color: #fef2dc;
           color: #f5a623;
           border:1px solid #f5a623;
-          font-size: @h14;
+          font-size: $h14;
           margin-top: 10px;
           margin-left: 80px;
           text-align: center;
@@ -191,18 +174,18 @@
             text-align: center;
             height: 36px;
             line-height: 36px;
-            font-size: @h14;
+            font-size: $h14;
             margin-top: 20px;
             margin-right: 20px;
             cursor: pointer;
-            border-radius: @border-radius-2;
+            border-radius: $border-radius-2;
             &:first-child{
-              background-color: @color-theme1;
-              color: @color-white;
+              background-color: $color-theme1;
+              color: $color-white;
             }
             &:last-child{
               background-color: #e5e5e5;
-              color: @color-text;
+              color: $color-text;
             }
           }
         }
@@ -223,7 +206,7 @@
           float: left;
         }
         a {
-          color: @color-theme1;
+          color: $color-theme1;
           float: left;
         }
         span {
@@ -254,7 +237,7 @@
             float: left;
             a {
               font-size: 13px;
-              color: @color-theme1;
+              color: $color-theme1;
             }
           }
           .updatechildDepartment {
@@ -280,8 +263,8 @@
       &:first-child{
         height: 40px;
         line-height: 40px;
-        border: 1px solid @color-border2;
-        background-color: @color-gray;
+        border: 1px solid $color-border2;
+        background-color: $color-gray;
         color: #9b9b9b;
         border-left: none;
         border-right: none;
@@ -324,7 +307,7 @@
     width: 100%;
     height: auto;
     text-align: center;
-    border-bottom: 1px solid @color-border2;
+    border-bottom: 1px solid $color-border2;
     li{
       display: block;
       float: left;
@@ -363,12 +346,12 @@
         //height: 40px;
         color: #9b9b9b;
         span{
-          color: @color-theme1;
+          color: $color-theme1;
           cursor: pointer;
         }
       }
       //&:last-child{
-      //  color: @color-alert-wrong;
+      //  color: $color-alert-wrong;
       //}
     }
   }
@@ -377,8 +360,8 @@
 .add_staff2{
   width: 960px;
   height: auto;
-  font-size: @h14;
-  color: @color-text;
+  font-size: $h14;
+  color: $color-text;
   clear: both;
   margin: 10px auto;
   display: none;
@@ -392,7 +375,7 @@
   }
   .add_staff_block2{
     width: 100%;
-    border: 1px solid @color-border2;
+    border: 1px solid $color-border2;
     padding-bottom: 20px;
     ul{
       display: block;
@@ -412,20 +395,20 @@
           width: 188px;
           height: 34px;
           line-height: 34px;
-          border: 1px solid @color-border2;
+          border: 1px solid $color-border2;
           margin-left: 5px;
           padding-left: 10px;
-          border-radius: @border-radius-2;
+          border-radius: $border-radius-2;
         }
         select{
           width: 200px;
           height: 34px;
           line-height: 34px;
-          border: 1px solid @color-border2;
+          border: 1px solid $color-border2;
           padding-left: 5px;
           margin-left: 5px;
           color: #9b9b9b;
-          border-radius: @border-radius-2;
+          border-radius: $border-radius-2;
         }
       }
     }
@@ -436,7 +419,7 @@
       background-color: #fef2dc;
       color: #f5a623;
       border:1px solid #f5a623;
-      font-size: @h14;
+      font-size: $h14;
       margin-top: 10px;
       margin-left: 80px;
       text-align: center;
@@ -454,18 +437,18 @@
         text-align: center;
         height: 36px;
         line-height: 35px;
-        font-size: @h14;
+        font-size: $h14;
         margin-top: 20px;
         margin-right: 20px;
         cursor: pointer;
-        border-radius: @border-radius-2;
+        border-radius: $border-radius-2;
         &:first-child{
-          background-color: @color-theme1;
-          color: @color-white;
+          background-color: $color-theme1;
+          color: $color-white;
         }
         &:last-child{
           background-color: #e5e5e5;
-          color: @color-text;
+          color: $color-text;
         }
       }
     }
@@ -478,23 +461,23 @@
   height: 700px;
   float: left;
   clear: both;
-  background-color: @color-white;
-  border: 1px solid @color-border2;
+  background-color: $color-white;
+  border: 1px solid $color-border2;
   margin-top: -1px;
   z-index: -1;
   display: none;
   .staff_tab_import_head{
     margin-left: 20px;
     margin-right: 20px;
-    border-bottom: 1px solid @color-border2;
+    border-bottom: 1px solid $color-border2;
     padding-bottom: 20px;
     .staff_import_head{
       width: 100%;
       height: 36px;
       line-height: 36px;
       margin-top: 25px;
-      font-size: @h16;
-      color: @color-text;
+      font-size: $h16;
+      color: $color-text;
       span{
         &:nth-child(2){
           cursor: pointer;
@@ -502,12 +485,12 @@
           display: block;
           width: 58px;
           height: 34px;
-          border: 1px solid @color-border2;
-          border-radius: @border-radius-2;
-          color: @color-theme1;
+          border: 1px solid $color-border2;
+          border-radius: $border-radius-2;
+          color: $color-theme1;
           text-align: center;
           line-height: 34px;
-          font-size: @h14;
+          font-size: $h14;
         }
       }
     }
@@ -518,11 +501,11 @@
     width: 100px;
     height: 36px;
     text-align: center;
-    background: @color-theme1;
-    border: 1px solid @color-border2;
-    border-radius: @border-radius-2;
+    background: $color-theme1;
+    border: 1px solid $color-border2;
+    border-radius: $border-radius-2;
     overflow: hidden;
-    color: @color-white;
+    color: $color-white;
     text-decoration: none;
     text-indent: 0;
     line-height: 36px;
@@ -536,7 +519,7 @@
       right: 0;
       top: 0;
       opacity: 0;
-      border-radius: @border-radius-2;
+      border-radius: $border-radius-2;
       &:hover {
         background: #AADFFD;
         border-color: #78C3F3;
@@ -549,11 +532,11 @@
     width: 398px;
     height: 34px;
     line-height: 34px;
-    border: 1px solid @color-border2;
+    border: 1px solid $color-border2;
     clear: both;
     padding-left: 10px;
     color: #9b9b9b;
-    border-radius: @border-radius-2;
+    border-radius: $border-radius-2;
   }
   .tip_text{
     line-height: 35px;
@@ -564,11 +547,11 @@
     position: relative;
     display: none;
     text-align: center;
-    background: @color-theme1;
-    border: 1px solid @color-border2;
+    background: $color-theme1;
+    border: 1px solid $color-border2;
     border-radius: 2px;
     overflow: hidden;
-    color: @color-white;
+    color: $color-white;
     text-decoration: none;
     text-indent: 0;
     line-height: 35px;
@@ -581,11 +564,11 @@
     padding-top: 30px;
     margin-left: 20px;
     margin-right: 20px;
-    font-size: @h14;
+    font-size: $h14;
     p{
       &:first-child{
-        font-size: @h16;
-        color: @color-text;
+        font-size: $h16;
+        color: $color-text;
         margin-bottom: 20px;
       }
     }
@@ -597,7 +580,7 @@
       width: 715px;
       table-layout: fixed;
       border-collapse:collapse;
-      border: 1px solid @color-border2;
+      border: 1px solid $color-border2;
       margin-left: 35px;
       margin-top: 10px;
       margin-bottom: 10px;
@@ -609,7 +592,7 @@
           color: #9b9b9b;
         }
         td{
-          border: 1px solid @color-border2;
+          border: 1px solid $color-border2;
           &:nth-child(1){
             width: 40px;
             color: #9b9b9b;
@@ -636,7 +619,7 @@
       line-height: 25px;
       padding-left: 35px;
       a{
-        color: @color-theme1;
+        color: $color-theme1;
         text-decoration: none;
         cursor: pointer;
       }
@@ -654,8 +637,8 @@
   height: 700px;
   float: left;
   clear: both;
-  background-color: @color-white;
-  border: 1px solid @color-border2;
+  background-color: $color-white;
+  border: 1px solid $color-border2;
   margin-top: -1px;
   z-index: -1;
   display: none;
@@ -669,8 +652,8 @@
       height: 35px;
       line-height: 35px;
       margin-top: 25px;
-      font-size: @h16;
-      color: @color-text;
+      font-size: $h16;
+      color: $color-text;
       span{
         &:first-child{
           font-weight: bold;
@@ -682,12 +665,12 @@
           display: block;
           width: 58px;
           height: 34px;
-          border: 1px solid @color-border2;
-          border-radius: @border-radius-2;
-          color: @color-theme1;
+          border: 1px solid $color-border2;
+          border-radius: $border-radius-2;
+          color: $color-theme1;
           text-align: center;
           line-height: 33px;
-          font-size: @h14;
+          font-size: $h14;
         }
       }
     }
@@ -701,8 +684,8 @@
   .preview_head_text{
     margin-left: 20px;
     margin-right: 20px;
-    font-size: @h16;
-    color: @color-text;
+    font-size: $h16;
+    color: $color-text;
     line-height: 35px;
     height: 35px;
     overflow: hidden;
@@ -716,8 +699,8 @@
       margin-top: 11px;
     }
     a{
-      color: @color-theme1;
-      font-size: @h14;
+      color: $color-theme1;
+      font-size: $h14;
       text-decoration: none;
       margin-left: 20px;
       span{
@@ -732,12 +715,12 @@
   .preview_require_head{
     width: 100%;
     height: 45px;
-    background-color: @color-gray;
+    background-color: $color-gray;
     line-height: 45px;
     color: #9b9b9b;
-    font-size: @h14;
+    font-size: $h14;
     text-align: center;
-    border: 1px solid @color-border2;
+    border: 1px solid $color-border2;
     border-left: none;
     border-right: none;
     margin-top: 10px;
@@ -768,11 +751,11 @@
   .preview_data{
     width: 100%;
     height: 60px;
-    border-bottom: 1px solid @color-border2;
+    border-bottom: 1px solid $color-border2;
     line-height: 60px;
     text-align: center;
-    font-size: @h14;
-    color: @color-text;
+    font-size: $h14;
+    color: $color-text;
     table-layout: fixed;
     li{
       display: block;
@@ -824,22 +807,22 @@
     span{
       display: block;
       float: left;
-      font-size: @h14;
+      font-size: $h14;
       text-align: center;
       line-height: 36px;
-      border-radius: @border-radius-2;
+      border-radius: $border-radius-2;
       cursor: pointer;
       &:first-child{
         width: 60px;
         height: 36px;
-        background-color: @color-theme1;
-        color: @color-white;
+        background-color: $color-theme1;
+        color: $color-white;
       }
       &:last-child{
         width: 60px;
         height: 36px;
-        background-color: @color-border2;
-        color: @color-text;
+        background-color: $color-border2;
+        color: $color-text;
         margin-left: 20px;
       }
     }
@@ -852,8 +835,8 @@
   height: 700px;
   float: left;
   clear: both;
-  background-color: @color-white;
-  border: 1px solid @color-border2;
+  background-color: $color-white;
+  border: 1px solid $color-border2;
   margin-top: -1px;
   z-index: -1;
   display: none;
@@ -867,8 +850,8 @@
       height: 35px;
       line-height: 35px;
       margin-top: 25px;
-      font-size: @h16;
-      color: @color-text;
+      font-size: $h16;
+      color: $color-text;
       span{
         &:first-child{
           font-weight: bold;
@@ -880,12 +863,12 @@
           display: block;
           width: 120px;
           height: 36px;
-          background-color: @color-theme1;
-          color: @color-white;
+          background-color: $color-theme1;
+          color: $color-white;
           line-height: 36px;
-          font-size: @h14;
+          font-size: $h14;
           text-align: center;
-          border-radius: @border-radius-2;
+          border-radius: $border-radius-2;
           margin-left: 20px;
         }
         &:last-child{
@@ -894,12 +877,12 @@
           display: block;
           width: 58px;
           height: 34px;
-          border: 1px solid @color-border2;
-          border-radius: @border-radius-2;
-          color: @color-theme1;
+          border: 1px solid $color-border2;
+          border-radius: $border-radius-2;
+          color: $color-theme1;
           text-align: center;
           line-height: 34px;
-          font-size: @h14;
+          font-size: $h14;
         }
       }
     }
@@ -909,14 +892,14 @@
     margin-top: 100px;
     text-align: center;
     p{
-      font-size: @h16;
+      font-size: $h16;
       line-height: 35px;
       color: #9b9b9b;
       &:first-child{
-        color: @color-text;
+        color: $color-text;
       }
       a{
-        color: @color-theme1;
+        color: $color-theme1;
       }
     }
   }
