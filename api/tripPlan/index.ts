@@ -239,7 +239,8 @@ class TripPlanModule {
                 //给审核人发审核邮件
                 let approveUser = await Models.staff.get(tripPlan.auditUser);
                 let approve_url = config.host + '/index.html#/trip-approval/detail?tripid=' + tripPlan.id;
-                let approve_values = {managerName: approveUser.name, username: user.name, email: user.email, time: moment(tripPlan.createdAt).format(timeFormat),
+                let approve_values = {managerName: approveUser.name, username: user.name, email: user.email,
+                    time: moment(tripPlan.createdAt).format(timeFormat),
                     projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel, otherBudget: others,
                     totalBudget: '￥' + tripPlan.budget, url: approve_url, detailUrl: approve_url};
                 API.mail.sendMailRequest({toEmails: approveUser.email, templateName: 'qm_notify_new_travelbudget', values: approve_values});
@@ -255,7 +256,8 @@ class TripPlanModule {
                     }
                 }
             } else {
-                let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER, EStaffRole.ADMIN], status: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
+                let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER,
+                    EStaffRole.ADMIN], status: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
                 //给所有的管理员发送邮件
                 await Promise.all(admins.map(async function(s) {
                     let vals = {managerName: s.name, username: user.name, email: user.email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
@@ -293,7 +295,8 @@ class TripPlanModule {
      * @returns {*}
      */
     @clientExport
-    @requireParams(['id'], ['isNeedTraffic', 'isNeedHotel', 'title', 'description', 'status', 'deptCity', 'deptCityCode', 'arrivalCity', 'arrivalCityCode', 'startAt', 'backAt', 'remark'])
+    @requireParams(['id'], ['isNeedTraffic', 'isNeedHotel', 'title', 'description', 'status', 'deptCity',
+        'deptCityCode', 'arrivalCity', 'arrivalCityCode', 'startAt', 'backAt', 'remark'])
     @modelNotNull('tripPlan')
     @conditionDecorator([{if: condition.isMyTripPlan('0.id')}])
     static async updateTripPlan(params): Promise<TripPlan> {
