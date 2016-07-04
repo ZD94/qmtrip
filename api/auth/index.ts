@@ -145,7 +145,7 @@ class ApiAuth {
      * @returns {Promise} true|error
      */
     @clientExport
-    static async sendResetPwdEmail (params: {email: string, type?: Number, isFirstSet?: boolean, companyName?: string}) : Promise<boolean> {
+    static async sendResetPwdEmail (params: {email: string, mobile?: string, type?: Number, isFirstSet?: boolean, companyName?: string}) : Promise<boolean> {
         var email = params.email;
         var mobile = params.mobile;
         var isFirstSet = params.isFirstSet;
