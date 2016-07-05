@@ -55,6 +55,12 @@
     		$(".corp_m_header").css("width",ww-200);
     	}
     	resize();
-    	$()
+    	$("#account").hover(function() {
+			$("#account_menu").css("display", 'block');
+		}, function() {
+			setTimeout(function() {
+				$("#account_menu").css("display", 'none');
+			}, 5 * 1000);
+		})
     })
 </script>
