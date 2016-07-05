@@ -853,7 +853,9 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             accobj[key] = params[key];
         }
         var newAcc = await accobj.save();
-        if(accobj.email == newAcc.email){
+        return newAcc;
+
+        /*if(accobj.email == newAcc.email){
             return newAcc;
         }
 
@@ -862,7 +864,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         return ApiAuth.sendResetPwdEmail({companyName: companyName, email: newAcc.email, type: 1, isFirstSet: true})
             .then(function() {
                 return newAcc;
-            });
+            });*/
     }
 
     /**

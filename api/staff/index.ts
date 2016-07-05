@@ -136,6 +136,28 @@ class StaffModule{
         let updateStaff = await Models.staff.get(params.id);
         let staff = await Staff.getCurrent();
 
+        if(params.email){
+            if(staff && staff.company["domainName"] && params.email.indexOf(staff.company["domainName"]) == -1){
+                throw L.ERR.INVALID_ARGUMENT('email');
+            }
+
+            if(updateStaff.status != 0){
+                throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
+            }
+
+            var account1 = await Models.account.find({where: {email: params.email, type: 1}});
+            if (account1 && account1.length>0) {
+                throw L.ERR.EMAIL_HAS_REGISTRY();
+            }
+        }
+
+        if(params.mobile){
+            var account2 = await Models.account.find({where: {mobile: params.mobile, type: 1}});
+            if (account2 && account2.length>0) {
+                throw L.ERR.MOBILE_HAS_REGISTRY();
+            }
+        }
+
         if(staff.roleId != EStaffRole.OWNER && updateStaff.roleId == EStaffRole.OWNER){
             throw L.ERR.PERMISSION_DENY();
         }
@@ -157,24 +179,31 @@ class StaffModule{
         }
         updateStaff = await updateStaff.save();
 
-        let tp = await Models.travelPolicy.get(updateStaff["travelPolicyId"]);
-        let defaultDept = await API.department.getDefaultDepartment({companyId: updateStaff["companyId"]});
+        if(params.email){
 
-        let vals  = {
-            username: updateStaff.name,
-            mobile: updateStaff.mobile,
-            travelPolicy: tp.name,
-            time: utils.now(),
-            companyName: updateStaff.company.name,
-            department: updateStaff.department ? updateStaff.department.name : defaultDept.name,
-            permission: updateStaff.roleId == EStaffRole.ADMIN ? "管理员" : (updateStaff.roleId == EStaffRole.OWNER ? "创建者" : "普通员工")
+            return API.auth.sendResetPwdEmail({companyName: updateStaff.company.name, email: updateStaff.email, type: 1, isFirstSet: true});
+        }else{
+
+            let tp = await Models.travelPolicy.get(updateStaff["travelPolicyId"]);
+            let defaultDept = await API.department.getDefaultDepartment({companyId: updateStaff["companyId"]});
+
+            let vals  = {
+                username: updateStaff.name,
+                mobile: updateStaff.mobile,
+                travelPolicy: tp.name,
+                time: utils.now(),
+                companyName: updateStaff.company.name,
+                department: updateStaff.department ? updateStaff.department.name : defaultDept.name,
+                permission: updateStaff.roleId == EStaffRole.ADMIN ? "管理员" : (updateStaff.roleId == EStaffRole.OWNER ? "创建者" : "普通员工"),
+                staffStatus: updateStaff.staffStatus == 0 ? "禁用" : "启用"
+            }
+            //修改邮箱重置密码的邮件由updateAccount发出
+            await API.mail.sendMailRequest({
+                toEmails: updateStaff.email,
+                templateName: "staff_update_email",
+                values: vals
+            });
         }
-        //修改邮箱重置密码的邮件由updateAccount发出
-        await API.mail.sendMailRequest({
-            toEmails: updateStaff.email,
-            templateName: "staff_update_email",
-            values: vals
-        });
         return updateStaff;
     }
 
