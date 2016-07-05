@@ -383,7 +383,7 @@ export var condition = {
             let id = _.get(args, idpath);
             let session = Zone.current.get('session');
             
-            if(!session) {
+            if(!session || !session.accountId) {
                 throw L.ERR.PERMISSION_DENIED();
             }
             
@@ -400,7 +400,7 @@ export var condition = {
                 let agency = await company.getAgency();
                 return agency.id == user.agency.id;
             }else {
-                return false;
+                throw L.ERR.PERMISSION_DENIED();
             }
         }
     }

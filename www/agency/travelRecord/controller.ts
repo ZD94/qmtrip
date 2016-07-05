@@ -12,7 +12,7 @@ var msgbox = require('msgbox');
  * @param $scope
  * @constructor
  */
-export async function TravelDetailController($scope, Models, $stateParams){
+export async function TravelListController($scope, Models, $stateParams){
     var status = $stateParams.status;
     $("title").html("出差单列表");
     $scope.status = status || 'all';
@@ -62,7 +62,7 @@ export async function TravelDetailController($scope, Models, $stateParams){
  * @param $scope
  * @constructor
  */
-export async function TravelListController($scope, $stateParams, $location, $anchorScroll, Models){
+export async function TravelDetailController($scope, $stateParams, $location, $anchorScroll, Models){
     $("title").html("出差单明细");
     var orderId = $stateParams.orderId;
     $scope.showInvoiceFailDialog = false;
@@ -83,7 +83,6 @@ export async function TravelListController($scope, $stateParams, $location, $anc
                 //获取出差预算列表
                 return tripPlan.getTripDetails({where: {}})
                     .then(function (tripDetails) {
-                        console.info(tripDetails)
                         //对出差单进行排序,按照类型
                         tripDetails.sort(function (v1, v2) {
                             if (v1.type == 0) return -1;
@@ -111,7 +110,6 @@ export async function TravelListController($scope, $stateParams, $location, $anc
                     tripDetail.invoice = JSON.parse(tripDetail.invoice);
                 }
                 $scope.curTripDetail = tripDetail;
-                console.info(tripDetail)
                 $scope.curTripDetailInoviceImg = '/consume/invoice/' + tripDetail.id;
                 return tripDetail;
             })
