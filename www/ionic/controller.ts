@@ -118,6 +118,13 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
         };
     }
 
+    $scope.showErrorMsg = function (msg) {
+        $ionicPopup.alert({
+            title:'提示',
+            template:msg
+        });
+    };
+
     $scope.Menu = Menu;
     $scope.currentStaff = staff;
     $scope.logout = async function(){

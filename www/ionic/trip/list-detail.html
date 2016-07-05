@@ -129,14 +129,7 @@
                     <span>{{hotel.startTime.value | date: 'yyyy-MM-dd'}}</span> 至
                     <span>{{hotel.endTime.value | date: 'yyyy-MM-dd'}}</span>
                     <br>
-                    <!--{{tripDetail.deptCity}}
-                    &nbsp;
-                    <i ng-if='hotel.invoiceType == EInvoiceType.PLANE' class="icon ion-plane"></i>
-                    <i ng-if='hotel.invoiceType == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
-                    <i ng-if='hotel.invoiceType == EInvoiceType.HOTEL' class="icon ion-home"></i>
-                    <i ng-if='hotel.invoiceType == EInvoiceType.OTHER'>-</i>
-                    &nbsp;-->
-                    {{tripDetail.arrivalCity}}
+                    {{tripDetail.arrivalCity}}&nbsp;{{hotel.hotelName}}
                     <br>{{hotel.budget == -1 ? '暂无预算' : (hotel.budget| currency: '')+'元'}}
                     <div class="item-note" ng-if="hotel.status == EPlanStatus.WAIT_UPLOAD">
                         <div class="uploadbtns button-small botton-outline button-positive"

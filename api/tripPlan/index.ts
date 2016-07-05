@@ -67,8 +67,11 @@ class TripPlanModule {
         tripPlan.backAt = query.goBackDate;
         tripPlan.deptCityCode = query.originPlace;
         tripPlan.query = JSON.stringify(query);
-        let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace});
-        tripPlan.deptCity = deptInfo.name;
+
+        if(query.originPlace) {
+            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace});
+            tripPlan.deptCity = deptInfo.name;
+        }
         tripPlan.arrivalCityCode = query.destinationPlace;
         let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace});
         tripPlan.arrivalCity = arrivalInfo.name;
@@ -78,6 +81,13 @@ class TripPlanModule {
         if (!tripPlan.auditUser) {
             tripPlan.auditUser = null;
         }
+
+        let hotelName = '';
+        if(query.businessDistrict) {
+            let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
+            hotelName = hotelInfo.name;
+        }
+
         let tripDetails: TripDetail[] = budgets.map(function (budget) {
             let tripType = budget.tripType;
             let price = Number(budget.price)
@@ -108,7 +118,8 @@ class TripPlanModule {
                 case ETripType.HOTEL:
                     detail.cityCode = query.destinationPlace;
                     detail.city = tripPlan.arrivalCity;
-                    detail.hotelName = query.businessDistrict; //landMarkInfo.name || '';
+                    detail.hotelCode = query.businessDistrict;
+                    detail.hotelName = hotelName;
                     detail.startTime = query.checkInDate || query.leaveDate;
                     detail.endTime = query.checkOutDate || query.goBackDate;
                     tripPlan.isNeedHotel = true;
@@ -199,8 +210,7 @@ class TripPlanModule {
             hotelStr = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') +
                 ', ' + h.city + ',';
             if(h.hotelName) {
-                let landMarkInfo = await API.place.getCityInfo({cityCode: h.hotelName});
-                hotelStr += landMarkInfo.name + ',';
+                hotelStr += h.hotelName + ',';
             }
             hotelStr += '动态预算￥' + h.budget;
         }
@@ -463,6 +473,13 @@ class TripPlanModule {
                 detail.isCommit = false;
                 detail.status = EPlanStatus.WAIT_UPLOAD;
                 detail.tripPlan = tripPlan;
+
+                let hotelName = '';
+                if(query.businessDistrict) {
+                    let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
+                    hotelName = hotelInfo ? hotelInfo.name : '';
+                }
+
                 switch(tripType) {
                     case ETripType.OUT_TRIP:
                         detail.deptCityCode = query.originPlace;
@@ -483,7 +500,8 @@ class TripPlanModule {
                     case ETripType.HOTEL:
                         detail.cityCode = query.destinationPlace;
                         detail.city = tripPlan.arrivalCity;
-                        detail.hotelName = query.businessDistrict;
+                        detail.hotelCode = query.businessDistrict;
+                        detail.hotelName = hotelName;
                         detail.startTime = query.checkInDate || query.leaveDate;
                         detail.endTime = query.checkOutDate || query.goBackDate;
                         break;
@@ -521,41 +539,35 @@ class TripPlanModule {
             user = await Models.staff.get(tripPlan['accountId']);
         }
 
-        try {
-            let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
-            let self_values = {username: user.name, planNo: tripPlan.planNo, approveTime: utils.now(), approveUser: staff.name,
-                projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel, otherBudget: others,
-                totalBudget: '￥' + tripPlan.budget, url: self_url, detailUrl: self_url};
+        let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
+        let self_values = {username: user.name, planNo: tripPlan.planNo, approveTime: utils.now(), approveUser: staff.name,
+            projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel, otherBudget: others,
+            totalBudget: '￥' + tripPlan.budget, url: self_url, detailUrl: self_url};
 
-            let msg_url = await API.shorturl.long2short({longurl: self_url, shortType: 'md5'});
-            if(auditResult == EAuditStatus.PASS) {
-                log.remark = '审批通过，审批人：' + staff.name;
-                tripPlan.status = EPlanStatus.WAIT_UPLOAD;
-                API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_approve_pass', values: self_values});
-                //发送短信提醒
-                if(user.mobile && isMobile(user.mobile)) {
-                    API.sms.sendMsgSubmit({template: 'travelBudgetApproved', mobile: user.mobile,
-                        values: {time: moment(tripPlan.startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
-                }
-            }else if(auditResult == EAuditStatus.NOT_PASS) {
-                if(!params.auditRemark) {
-                    throw {code: -2, msg: '拒绝原因不能为空'};
-                }
-                log.remark = '审批未通过，原因：' + params.auditRemark + '，审批人：' + staff.name;
-                tripPlan.status = EPlanStatus.APPROVE_NOT_PASS;
-                self_values['reason'] = params.auditRemark;
-                API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_approve_not_pass', values: self_values});
-                //发送短信提醒
-                if(user.mobile && isMobile(user.mobile)) {
-                    API.sms.sendMsgSubmit({template: 'travelBudgetApproveFailed', mobile: user.mobile,
-                        values: {time: moment(tripPlan.startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
-                }
+        let msg_url = await API.shorturl.long2short({longurl: self_url, shortType: 'md5'});
+        if(auditResult == EAuditStatus.PASS) {
+            log.remark = '审批通过，审批人：' + staff.name;
+            tripPlan.status = EPlanStatus.WAIT_UPLOAD;
+            API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_approve_pass', values: self_values});
+            //发送短信提醒
+            if(user.mobile && isMobile(user.mobile)) {
+                API.sms.sendMsgSubmit({template: 'travelBudgetApproved', mobile: user.mobile,
+                    values: {time: moment(tripPlan.startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
             }
-        }catch (e) {
-            logger.error('审批发送邮件或短信失败...');
-            logger.error(e);
+        }else if(auditResult == EAuditStatus.NOT_PASS) {
+            if(!params.auditRemark) {
+                throw {code: -2, msg: '拒绝原因不能为空'};
+            }
+            log.remark = '审批未通过，原因：' + params.auditRemark + '，审批人：' + staff.name;
+            tripPlan.status = EPlanStatus.APPROVE_NOT_PASS;
+            self_values['reason'] = params.auditRemark;
+            API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_approve_not_pass', values: self_values});
+            //发送短信提醒
+            if(user.mobile && isMobile(user.mobile)) {
+                API.sms.sendMsgSubmit({template: 'travelBudgetApproveFailed', mobile: user.mobile,
+                    values: {time: moment(tripPlan.startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
+            }
         }
-
 
         let tripDetails = await tripPlan.getTripDetails({});
 
@@ -566,6 +578,7 @@ class TripPlanModule {
 
         await Promise.all(tripDetails.map((d) => d.save()));
         await Promise.all([tripPlan.save(), log.save()]);
+
         return true;
     }
 
