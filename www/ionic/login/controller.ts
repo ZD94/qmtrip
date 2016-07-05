@@ -31,10 +31,9 @@ export async function IndexController($scope, $stateParams, $storage) {
     var browserspec = require('browserspec');
     var backUrl = $stateParams.backurl || "#";
     let openid = $stateParams.openid;
-    console.info(window.location.href);
 
     //微信中自动登陆
-    if(browserspec.is_wechat) {
+    if(browserspec.is_wechat && /.*jingli365\.com/.test(window.location.host)) {
         await API.onload();
 
         if(!openid) {
