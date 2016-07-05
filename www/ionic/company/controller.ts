@@ -391,10 +391,12 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
         if (_staff.travelPolicyId && _staff.travelPolicyId.id) {
             _staff.travelPolicyId = _staff.travelPolicyId.id;
         }
-        if ($scope.role && $scope.role.id == true) {
-            _staff.roleId = EStaffRole.ADMIN;
-        } else {
-            _staff.roleId = EStaffRole.COMMON;
+        if(_staff.roleId != EStaffRole.OWNER){
+            if ($scope.role && $scope.role.id == true) {
+                _staff.roleId = EStaffRole.ADMIN;
+            } else {
+                _staff.roleId = EStaffRole.COMMON;
+            }
         }
         try{
             if (!_staff.email) {
