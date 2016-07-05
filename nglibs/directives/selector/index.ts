@@ -5,7 +5,7 @@ import angular = require('angular');
 declare var API: any;
 
 async function showSelectorModal($scope, $ionicModal, selected) {
-    var template = require('./selector.html');
+    var template = require('./selector-list.html');
     $scope.modal = $ionicModal.fromTemplate(template, {
         scope: $scope,
         animation: 'slide-in-up',
@@ -19,8 +19,8 @@ async function showSelectorModal($scope, $ionicModal, selected) {
     $scope.$on('modal.removed', function() {
     });
 
-    var optionsLoader = $scope.getOptionsLoader();
-    var optionsCreator = $scope.getOptionsCreator();
+    var optionsLoader = $scope.callbacks.query;
+    var optionsCreator = $scope.callbacks.create;
 
     var form: any = $scope.form = {};
     form.keyword = selected;
@@ -83,16 +83,15 @@ angular
     .directive('ngSelector', function() {
         return {
             restrict: 'A',
+            template: require('./selector.html'),
             scope: {
                 value: '=ngModel',
                 title: '@ngSelectorTitle',
                 placeholder: '@ngSelectorPlaceholder',
-                getOptionsLoader: '&ngSelectorQuery',
-                getOptionsCreator: '&ngSelectorCreate',
-                done: '=ngSelectorDone'
+                callbacks: '=ngSelector'
             },
             controller: function($scope, $element, $ionicModal) {
-                $element.focus(async function() {
+                $scope.showSelectorList = async function() {
                     var value: any = await showSelectorModal($scope, $ionicModal, $scope.value)
                     if(value == undefined)
                         return;
@@ -103,10 +102,10 @@ angular
                         $scope.value = value.name;
                     }
 
-                    if ($scope.done && typeof $scope.done == 'function') {
-                        return $scope.done(value);
+                    if ($scope.callbacks.done && typeof $scope.callbacks.done == 'function') {
+                        return $scope.callbacks.done(value);
                     }
-                })
+                };
             }
         }
     });

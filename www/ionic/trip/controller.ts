@@ -85,13 +85,6 @@ export async function CreateController($scope, $storage, $ionicLoading){
         $storage.local.set('trip', $scope.trip);
     }, true);
 
-    $scope.$watch('trip.placeName', function($newVal, $oldVal) {
-        if ($newVal != $oldVal) {
-            $scope.trip.hotelPlaceName = '';
-            $scope.trip.hotelPlace = '';
-        }
-    });
-
     $scope.calcTripDuration = function(){
         return moment(trip.endDate).diff(trip.beginDate, 'days') || 1;
     };
@@ -107,37 +100,67 @@ export async function CreateController($scope, $storage, $ionicLoading){
         }
     };
 
-    $scope.queryPlaces = async function(keyword){
+
+    $scope.$watch('trip.placeName', function($newVal, $oldVal) {
+        if ($newVal != $oldVal) {
+            $scope.trip.hotelPlaceName = '';
+            $scope.trip.hotelPlace = '';
+        }
+    });
+
+    async function queryPlaces(keyword){
         var places = await API.place.queryPlace({keyword: keyword});
         return places.map((place)=> {return {name: place.name, value: place.id} });
+    }
+    $scope.placeSelector = {
+        query: queryPlaces,
+        done: function(val) {
+            $scope.trip.place = val.value;
+        }
     };
-
-    $scope.queryHotelPlace = async function(keyword) {
-        let city = $scope.trip.place;
-        if (city) {
-            let cityId: any = city;
-            if (!/^CT_\d+$/.test(city)) {
-                city = await API.place.getCityInfo({cityCode: city});
-                cityId = city.id;
+    $scope.fromPlaceSelector = {
+        query: queryPlaces,
+        done: function(val) {
+            $scope.trip.fromPlace = val.value;
+        }
+    };
+    $scope.hotelPlaceSelector = {
+        query: async function(keyword) {
+            let city = $scope.trip.place;
+            if (city) {
+                let cityId: any = city;
+                if (!/^CT_\d+$/.test(city)) {
+                    city = await API.place.getCityInfo({cityCode: city});
+                    cityId = city.id;
+                }
+                var hotelPlaces = await API.place.queryBusinessDistrict({keyword: keyword, code: cityId})
+                return hotelPlaces.map((p)=> { return { name: p.name, value: p.id} });
             }
-            var hotelPlaces = await API.place.queryBusinessDistrict({keyword: keyword, code: cityId})
-            return hotelPlaces.map((p)=> { return { name: p.name, value: p.id} });
+            return [];
+        },
+        done: function(val) {
+            $scope.trip.hotelPlace = val.value;
         }
-        return [];
     };
-    
-    $scope.queryProjects = async function(keyword){
-        var staff = await Staff.getCurrent();
-        var options = {where:{companyId: staff.company.id}};
-        if(keyword){
-            options.where["name"] = {$like: '%'+keyword+'%'};
+    $scope.projectSelector = {
+        query: async function(keyword){
+            var staff = await Staff.getCurrent();
+            var options = {where:{companyId: staff.company.id}};
+            if(keyword){
+                options.where["name"] = {$like: '%'+keyword+'%'};
+            }
+            var projects = await Models.project.find(options);
+            return projects.map((project)=>{ return {name: project.name, value: project.id}} );
+        },
+        create: async function(name){
+            console.info("function createProject...");
+        },
+        done: function(val) {
+            $scope.trip.reason = val.name ? val.name: val;
+            console.info($scope.trip.reason);
         }
-        var projects = await Models.project.find(options);
-        return projects.map((project)=>{ return {name: project.name, value: project.id}} );
-    };
-    $scope.createProject = async function(name){
-        console.info("function createProject...");
-    };
+    }
+
 
     $scope.nextStep = async function() {
         API.require("travelBudget");
@@ -196,20 +219,6 @@ export async function CreateController($scope, $storage, $ionicLoading){
         }
     }
 
-    $scope.choosePlace = function(val) {
-        $scope.trip.place = val.value;
-    }
-    $scope.chooseFromPlace = function(val) {
-        $scope.trip.fromPlace = val.value;
-    }
-    $scope.chooseHotelPlace = function(val) {
-        $scope.trip.hotelPlace = val.value;
-    }
-    $scope.chooseReason = function(val) {
-        $scope.trip.reason = val.name ? val.name: val;
-        console.info($scope.trip.reason);
-    }
-
     $scope.checkDate = function() {
         let beginDate = trip.beginDate;
         let endDate = trip.endDate;
@@ -265,17 +274,17 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     API.require("tripPlan");
     await API.onload();
 
-    //选择审核人
-    $scope.queryStaffs = async function(keyword) {
-        let staff = await Staff.getCurrent();
-        let staffs = await staff.company.getStaffs({where: {id: {$ne: staff.id}}});
-        return staffs.map((p) =>{ return  {name: p.name, value: p.id}} );
-    }
-    //选择完成后的回调
-    $scope.chooseAuditUser = function(value) {
-        console.info("调用回调", value);
-        trip.auditUser = value.value;
-    }
+    $scope.staffSelector = {
+        query: async function(keyword) {
+            let staff = await Staff.getCurrent();
+            let staffs = await staff.company.getStaffs({where: {id: {$ne: staff.id}}});
+            return staffs.map((p) =>{ return  {name: p.name, value: p.id}} );
+        },
+        done: function(value) {
+            console.info("调用回调", value);
+            trip.auditUser = value.value;
+        }
+    };
 
     $scope.saveTripPlan = async function() {
         await $ionicLoading.show({
