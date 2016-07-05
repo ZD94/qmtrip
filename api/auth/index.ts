@@ -528,7 +528,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * 登录
      *
      * @param {Object} data 参数
-     * @param {String} data.email 邮箱 (可选,如果email提供优先使用)
+     * @param {String} data.account 登录账号,邮箱或者手机号
      * @param {String} data.pwd 密码
      * @param {Integer} data.type 1.企业员工 2.代理商员工 默认是企业员工
      * @param {String} data.mobile 手机号(可选,如果email提供则优先使用email)
@@ -536,24 +536,31 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * @public
      */
     @clientExport
-    static login (data: {email?: string, pwd: string, type?: Number, mobile?: string}) :Promise<AuthCert>{
+    static login (data: {account?: string, pwd: string, type?: Number, email?: string}) :Promise<AuthCert>{
 
         if (!data) {
             throw L.ERR.DATA_NOT_EXIST();
         }
-        if (!data.email && !data.mobile) {
-            throw L.ERR.EMAIL_EMPTY();
+        //兼容原有调用方式
+        if (!data.account && data.email) {
+            data.account = data.email;
         }
-        if (!validator.isEmail((data.email))) {
-            throw L.ERR.EMAIL_EMPTY();
+
+        if (!data.account) {
+            throw new Error(`登录账号不能为空`);
         }
+
+        if (!validator.isEmail(data.account) && !validator.isMobilePhone(data.account, 'zh-CN')) {
+            throw new Error(`登录账号格式不正确`);
+        }
+
         if (!data.pwd) {
             throw L.ERR.PWD_EMPTY();
         }
 
         var type = data.type || ACCOUNT_TYPE.COMPANY_STAFF;
-        var email = data.email.toLowerCase();
-        return DBM.Account.findOne({where: {email: email, type: type}})
+        var account = data.account.toLowerCase();
+        return DBM.Account.findOne({where: {$or : [{email: account}, {mobile: account}], type: type}})
             .then(function (loginAccount) {
                 var pwd = utils.md5(data.pwd);
                 if (!loginAccount) {
@@ -620,93 +627,6 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         //         return result;
         //     })
     }
-
-    // async registryCompany (params:{companyName: string, name: string, email: string, mobile: string, pwd: string,
-    //     msgCode: string, msgTicket: string, picCode: string, picTicket:string, agencyId?: string}):Promise<boolean> {
-    //     //先创建登录账号
-    //     // if (!params) {
-    //     //     params = {};
-    //     // }
-    //     var companyName = params.companyName;
-    //     var name = params.name;
-    //     var email = params.email;
-    //     var mobile = params.mobile;
-    //     var msgCode = params.msgCode;
-    //     var msgTicket = params.msgTicket;
-    //     var picCode = params.picCode;
-    //     var picTicket = params.picTicket;
-    //     var pwd = params.pwd;
-    //
-    //     if (!picCode || !picTicket) {
-    //         throw {code: -1, msg: "验证码错误"};
-    //     }
-    //
-    //     if (!msgCode || !msgTicket) {
-    //         throw {code: -1, msg: "短信验证码错误"};
-    //     }
-    //
-    //     if (!mobile || !validate.isMobile(mobile)) {
-    //         throw L.ERR.MOBILE_FORMAT_ERROR();
-    //     }
-    //
-    //     if (!name) {
-    //         throw {code: -1, msg: "联系人姓名为空"};
-    //     }
-    //
-    //     if (!companyName) {
-    //         throw {code: -1, msg: "公司名称为空"};
-    //     }
-    //
-    //     if (!pwd) {
-    //         throw {code: -1, msg: "密码不能为空"};
-    //     }
-    //     var companyId = uuid.v1();
-    //     var domain = email.split(/@/)[1];
-    //
-    //     return Promise.resolve(true)
-    //         .then(function() {
-    //             if (picCode == 'test' && picTicket == 'test' && msgCode == 'test' && msgTicket == 'test') {
-    //                 return true;
-    //             }
-    //
-    //             return API.checkcode.validatePicCheckCode({code: picCode, ticket: picTicket});
-    //         })
-    //         .then(function() {
-    //             if (picCode == 'test' && picTicket == 'test' && msgCode == 'test' && msgTicket == 'test') {
-    //                 return true;
-    //             }
-    //
-    //             return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
-    //         })
-    //         .then(function(){
-    //             return API.client.auth.checkBlackDomain({domain: domain});
-    //         })
-    //         .then(function() {
-    //             var status = 0;
-    //             if (process.env["NODE_ENV"] == 'test') {
-    //                 status = 1;
-    //             }
-    //             return API.auth.newAccount({mobile: mobile, email: email, pwd: pwd, status: status});
-    //         })
-    //         .then(function(account) {
-    //             var agencyId = params.agencyId;
-    //             if(!agencyId){
-    //                 agencyId = API.agency.__defaultAgencyId;
-    //             }
-    //             return API.company.createCompany({id: companyId, agencyId: agencyId, createUser: account.id, name: companyName, domainName: domain,
-    //                 mobile:mobile, email: email})
-    //                 .then(function(){
-    //                     return Promise.all([
-    //                         API.staff.createStaff({accountId: account.id, companyId: companyId, email: email,
-    //                             mobile: mobile, name: name, roleId: 0}),
-    //                         API.department.createDepartment({name: "我的企业", isDefault: true, companyId: companyId})
-    //                     ])
-    //                 });
-    //         })
-    //         .then(function() {
-    //             return true;
-    //         });
-    // }
 
 
     @clientExport
@@ -933,7 +853,9 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             accobj[key] = params[key];
         }
         var newAcc = await accobj.save();
-        if(accobj.email == newAcc.email){
+        return newAcc;
+
+        /*if(accobj.email == newAcc.email){
             return newAcc;
         }
 
@@ -942,7 +864,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         return ApiAuth.sendResetPwdEmail({companyName: companyName, email: newAcc.email, type: 1, isFirstSet: true})
             .then(function() {
                 return newAcc;
-            });
+            });*/
     }
 
     /**
