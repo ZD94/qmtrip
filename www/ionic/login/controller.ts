@@ -6,7 +6,6 @@ var API = require('common/api');
 API.require('auth');
 
 export function StorageSetController($scope, $stateParams, $storage) {
-    console.info("StorageSet...........................");
     let token_id = $stateParams.token_id;
     let user_id = $stateParams.user_id;
     let token_sign = $stateParams.token_sign;
@@ -74,7 +73,6 @@ export async function IndexController($scope, $stateParams, $storage) {
             $scope.focused = $event.target;
         else
             $scope.focused = '';
-        console.log($scope.focused);
     }
 
     $scope.check_login = async function ():Promise<any> {
@@ -96,10 +94,8 @@ export async function IndexController($scope, $stateParams, $storage) {
                 await API.onload();
                 await API.auth.saveOrUpdateOpenId({openid: openid});
             }
-
             window.location.href = backUrl;
         } catch (err) {
-            //console.info(err.msg);
             var str = err.msg;
             msgbox.log(err);//显示错误消息
         }
@@ -107,13 +103,11 @@ export async function IndexController($scope, $stateParams, $storage) {
 }
 
 export async function TestController($scope) {
-    console.info("do this...")
     $scope.initscan = function(){
         var backUrl = "http://"+window.location.host+"/index.html#/trip/create";
         API.onload(function() {
             API.auth.getQRCodeUrl({backUrl: backUrl, accountId: "c3d5f7c0-32e8-11e6-9af9-0710d114e84c", email: "yali.wang@jingli.tech"})
                 .then(function(content) {
-                    console.info(content);
                     // new QRCode(document.getElementById("qrcode"), content);
                     var qrcode = require('arale-qrcode');
                     var browser = navigator.appName;
