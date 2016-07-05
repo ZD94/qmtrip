@@ -411,7 +411,7 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
                 throw L.ERR.EMAIL_FORMAT_INVALID();
             }
             if(company.domainName && company.domainName != "" && _staff.email.indexOf(company.domainName) == -1){
-                throw L.ERR.EMAIL_FORMAT_INVALID();
+                throw L.ERR.EMAIL_SUFFIX_INVALID();
             }
 
             if (_staff.mobile && !validator.isMobilePhone(_staff.mobile, 'zh-CN')) {
