@@ -4,14 +4,14 @@
             <p  style="color: #fff;">{{trip.createAt| date: 'yyyy-MM-dd HH:mm:ss'}}</p>
         </div>
         <form class="list">
-            <label class="item item-input">
+            <div class="item item-input">
                 <span class="input-label">选择审批人</span>
-                <input type="text" placeholder="审批人" required ng-model="trip.auditUserName" ng-selector-done="chooseAuditUser"
-                       ng-selector
-                       ng-selector-title="全部员工"
+                <div ng-model="trip.auditUserName"
+                       ng-selector="staffSelector"
+                       ng-selector-title="选择审批人"
                        ng-selector-placeholder="请选择审批人"
-                       ng-selector-query="queryStaffs" />
-            </label>
+                ></div>
+            </div>
         </form>
 
         <ion-list class="jl_projectinfo">
