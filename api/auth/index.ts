@@ -766,17 +766,11 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * @param params
      * @returns {Promise<Account>}
      */
-    /*@clientExport
-    @requireParams(["email"], accountCols)
+    @clientExport
     static async createAccount (params) : Promise<Account>{
-
-        let result = await Models.account.find({where: {email: params.email}});
-        if(result && result.length>0){
-            throw {msg: "邮箱重复"};
-        }
         var acc = Account.create(params);
-        return acc.save();
-    }*/
+        return acc;
+    }
 
     /**
      * 由id查询账户信息
@@ -853,7 +847,9 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             accobj[key] = params[key];
         }
         var newAcc = await accobj.save();
-        if(accobj.email == newAcc.email){
+        return newAcc;
+
+        /*if(accobj.email == newAcc.email){
             return newAcc;
         }
 
@@ -862,7 +858,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         return ApiAuth.sendResetPwdEmail({companyName: companyName, email: newAcc.email, type: 1, isFirstSet: true})
             .then(function() {
                 return newAcc;
-            });
+            });*/
     }
 
     /**
