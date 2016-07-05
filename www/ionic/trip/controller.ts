@@ -226,13 +226,16 @@ export async function CreateController($scope, $storage, $ionicLoading){
         console.info($scope.trip.reason);
     }
 
-    $scope.checkDate = function() {
+    $scope.checkDate = function(isStartTime?: boolean) {
         let beginDate = trip.beginDate;
         let endDate = trip.endDate;
         if(moment(endDate).diff(moment(beginDate)) < 0) {
-
-            alert('出发日期不能晚于结束日期');
-            $scope.trip.beginDate = $scope.oldBeginDate;
+            if(isStartTime) {
+                $scope.minEndDate = moment(beginDate).format('YYYY-MM-DD');
+            }else {
+                $scope.showErrorMsg('结束日期不能早于结束日期！');
+            }
+            $scope.trip.endDate = beginDate;
             return;
         }
 
