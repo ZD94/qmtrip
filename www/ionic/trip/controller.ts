@@ -62,7 +62,7 @@ export async function CreateController($scope, $storage, $ionicLoading){
     if(!trip.regenerate) {
         trip = {
             beginDate: moment(moment().add(3, 'days').format('YYYY-MM-DD')).toDate(),
-            endDate: ''
+            endDate: moment(moment().add(4, 'days').format('YYYY-MM-DD')).toDate(),
         };
         await $storage.local.set('trip', trip);
     }else {
@@ -144,6 +144,22 @@ export async function CreateController($scope, $storage, $ionicLoading){
         await API.onload();
 
         let trip = $scope.trip;
+
+        if(!trip.place) {
+            $scope.showErrorMsg('请填写出差目的地！');
+            return false;
+        }
+
+        if(!trip.reasonName) {
+            $scope.showErrorMsg('请填写出差事由！');
+            return false;
+        }
+
+        if(!trip.traffic && ! trip.hotel) {
+            $scope.showErrorMsg('请选择交通或者住宿！');
+            return false;
+        }
+
         let params = {
             originPlace: trip.fromPlace,
             destinationPlace: trip.place,
@@ -155,7 +171,7 @@ export async function CreateController($scope, $storage, $ionicLoading){
             isRoundTrip: trip.round,
             isNeedHotel: trip.hotel,
             businessDistrict: trip.hotelPlace
-        }
+        };
         let front = ['正在验证出行参数', '正在匹配差旅政策', '正在搜索全网数据', '动态预算即将完成'];
         await $ionicLoading.show({
             template: '预算计算中...',
@@ -210,13 +226,16 @@ export async function CreateController($scope, $storage, $ionicLoading){
         console.info($scope.trip.reason);
     }
 
-    $scope.checkDate = function() {
+    $scope.checkDate = function(isStartTime?: boolean) {
         let beginDate = trip.beginDate;
         let endDate = trip.endDate;
         if(moment(endDate).diff(moment(beginDate)) < 0) {
-
-            alert('出发日期不能晚于结束日期');
-            $scope.trip.beginDate = $scope.oldBeginDate;
+            if(isStartTime) {
+                $scope.minEndDate = moment(beginDate).format('YYYY-MM-DD');
+            }else {
+                $scope.showErrorMsg('结束日期不能早于结束日期！');
+            }
+            $scope.trip.endDate = beginDate;
             return;
         }
 
@@ -234,15 +253,19 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     API.require("travelBudget");
     await API.onload();
     let result = await API.travelBudget.getBudgetInfo({id: id});
-    console.info(result);
     let budgets = result.budgets;
     let trip = $storage.local.get("trip");
-    trip.beginDate = result.query.leaveDate;
-    trip.endDate  = result.query.goBackDate;
+    let query = result.query;
+    trip.beginDate = query.leaveDate;
+    trip.endDate  = query.goBackDate;
     trip.createAt = new Date(result.createAt);
-    let originPlace = await API.place.getCityInfo({cityCode: result.query.originPlace});
-    trip.originPlaceName = originPlace.name;
-    let destination = await API.place.getCityInfo({cityCode: result.query.destinationPlace});
+
+    if(query.originPlace) {
+        let originPlace = await API.place.getCityInfo({cityCode: query.originPlace});
+        trip.originPlaceName = originPlace.name;
+    }
+
+    let destination = await API.place.getCityInfo({cityCode: query.destinationPlace});
     trip.destinationPlaceName = destination.name;
     $scope.trip = trip;
     //补助,现在是0,后续可能会直接加入到预算中
@@ -278,6 +301,13 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     }
 
     $scope.saveTripPlan = async function() {
+        let trip = $scope.trip;
+
+        if(!trip.auditUserName) {
+            $scope.showErrorMsg('请选择审核人！');
+            return false;
+        }
+
         await $ionicLoading.show({
             template: "保存中...",
             hideOnStateChange: true

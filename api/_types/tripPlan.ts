@@ -313,6 +313,10 @@ export class TripDetail extends ModelObject{
     set cityCode(val: string) {}
 
     @Field({type: Types.STRING})
+    get hotelCode(): string { return ''; }
+    set hotelCode(val: string) {}
+
+    @Field({type: Types.STRING})
     get hotelName(): string { return ''; }
     set hotelName(val: string) {}
 
