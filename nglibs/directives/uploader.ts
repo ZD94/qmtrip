@@ -8,7 +8,7 @@ var $ = require('jquery');
 var dyload = require('dyload');
 
 var use_wxChooseImage = false;
-
+var isFinishInitWx = false;
 function hanleError(err) {
     alert(err.msg || err);
 }
@@ -17,7 +17,7 @@ angular
     .module('nglibs')
     .directive('ngUploader', function ($loading) {
         var browserspec = require('browserspec');
-        if(browserspec.is_wechat && /^(www\.)?qmtrip\.com\.cn$/.test(window.location.host)){
+        if(browserspec.is_wechat){
             use_wxChooseImage = true;
         }
         if(!use_wxChooseImage){
@@ -68,11 +68,19 @@ angular
                     var API = require('common/api');
                     API.require('wechat');
                     API.onload(function(){
-                        API.wechat.getJSDKParams({url:window.location.href, jsApiList:['chooseImage', 'uploadImage'], debug:false})
-                            .then(function(cfg) {
-                                wx.config(cfg);
-                            })
-                            .catch(hanleError);
+                        if (!isFinishInitWx) {
+                            isFinishInitWx = true;
+                            API.wechat.getJSDKParams({url:window.location.href, jsApiList:['chooseImage', 'uploadImage'], debug:false})
+                                .then(function(cfg) {
+                                    alert(JSON.stringify(cfg))
+                                    wx.config(cfg);
+                                })
+                                .catch(function(err) {
+                                    isFinishInitWx = false;
+                                    hanleError(err);
+                                });
+                        }
+                        wx.error(hanleError)
                         wx.ready(function(){
                             bindUpload();
                         });
