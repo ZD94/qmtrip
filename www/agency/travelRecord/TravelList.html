@@ -76,8 +76,12 @@
                     </tr>
                     <tr>
                         <td colspan="10">
-                            &nbsp;&nbsp;<a href="javascript:void();" ng-click="prvePage()" ng-show="hasPrevPage">上一页</a>&nbsp;&nbsp;
+                            &nbsp;&nbsp;
+                            <a href="javascript:void();" ng-click="prvePage()" ng-show="hasPrevPage">上一页</a>
+                            <span ng-hide="hasPrevPage" title="已无数据">上一页</span>
+                            &nbsp;&nbsp;
                             <a ng-click="nextPage()" href="javascript:void();" ng-show="hasNextPage">下一页</a>
+                            <span ng-hide="hasNextPage" title="已无数据">下一页</span>
                         </td>
                     </tr>
                 </table>

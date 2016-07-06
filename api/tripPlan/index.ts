@@ -90,7 +90,7 @@ class TripPlanModule {
 
         let tripDetails: TripDetail[] = budgets.map(function (budget) {
             let tripType = budget.tripType;
-            let price = Number(budget.price)
+            let price = Number(budget.price);
             let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: price});
             detail.accountId = staff.id;
             detail.isCommit = false;
@@ -116,6 +116,7 @@ class TripPlanModule {
                     tripPlan.isNeedTraffic = true;
                     break;
                 case ETripType.HOTEL:
+                    detail.type = ETripType.HOTEL;
                     detail.cityCode = query.destinationPlace;
                     detail.city = tripPlan.arrivalCity;
                     detail.hotelCode = query.businessDistrict;
@@ -125,6 +126,7 @@ class TripPlanModule {
                     tripPlan.isNeedHotel = true;
                     break;
                 case ETripType.SUBSIDY:
+                    detail.type = ETripType.OTHER;
                     detail.deptCityCode = query.originPlace;
                     detail.arrivalCityCode = query.destinationPlace;
                     detail.deptCity = tripPlan.deptCity;
@@ -264,6 +266,19 @@ class TripPlanModule {
                         logger.error('发送短信失败...');
                         logger.error(e);
                     }
+                }
+                //发送微信消息
+                let openId = await API.auth.getOpenIdByAccount({accountId: approveUser.id});
+                if(openId) {
+                    let values = {
+                        approveUser: approveUser.name,
+                        tripPlanNo: tripPlan.planNo,
+                        staffName: user.name,
+                        content: '员工' + user.name + moment(tripPlan.startAt).format('YYYY-MM-DD') + '到' + tripPlan.arrivalCity + '的出差计划已经生成，预算：￥' + tripPlan.budget + '，等待您审核！',
+                        createdAt: moment(tripPlan.startAt).format('YYYY-MM-DD'),
+                        autoApproveTime: moment(tripPlan.autoApproveTime).format('YYYY-MM-DD HH:mm:ss')
+                    };
+                    API.wechat.sendTemplateMessage({templateName: 'WAIT_APPROVE_MESSAGE', openId: openId, url: approve_url, values: values});
                 }
             } else {
                 let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER,
