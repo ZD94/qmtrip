@@ -50,7 +50,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         budgetId = await API.travelBudget.getTravelPolicyBudget(query);
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: tripPlan.accountId});
         let budgets = budgetInfo.budgets;
-        let outTraffic,backTraffic,hotelDetail;
+        let outTraffic: any = {}, backTraffic: any = {}, hotelDetail: any = {};
         tripDetails.map((detail) => {
             switch (detail.type) {
                 case ETripType.OUT_TRIP: outTraffic = detail; break;
