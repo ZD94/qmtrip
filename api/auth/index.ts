@@ -500,7 +500,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
 
         var staff = await Staff.getCurrent();
         if(data.email && staff && staff.company["domainName"] && data.email.indexOf(staff.company["domainName"]) == -1){
-            throw L.ERR.INVALID_ARGUMENT('email');
+            throw L.ERR.EMAIL_SUFFIX_INVALID();
         }
 
         var type = ACCOUNT_TYPE.COMPANY_STAFF;
