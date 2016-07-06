@@ -41,6 +41,13 @@ export enum  EAuditStatus {
     INVOICE_PASS = 2, //票据审核通过
 }
 
+export var  MTxPlaneLevel  = {
+    'Economy': "经济舱",
+    'PremiumEconomy': "优质经济舱",
+    'Business': "公务舱",
+    'First': "头等舱"
+}
+
 @Table(Models.project, 'tripPlan.')
 export class Project extends ModelObject{
     constructor(target: Object) {
