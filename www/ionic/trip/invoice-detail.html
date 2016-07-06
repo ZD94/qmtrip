@@ -16,7 +16,8 @@
             </div>
 
             <div class="item item-image">
-                <img src="{{invoiceImg}}">
+                <img src="/agency/images/jingli_loading.gif" ng-show="showLoading" style="width: 100px; height: 100px;">
+                <img ng-src="{{invoiceImg}}" ng-hide="showLoading" id="previewInvoiceImg">
             </div>
         </div>
     </ion-content>
