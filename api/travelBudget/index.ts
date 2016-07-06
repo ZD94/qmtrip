@@ -271,6 +271,7 @@ class ApiTravelBudget {
                 budget = {price: defaultPrice[hotelStar] * days, type: EInvoiceType.HOTEL} as TravelBudgeItem;
             }
         }
+        budget.type = EInvoiceType.HOTEL;
         return budget;
     }
 

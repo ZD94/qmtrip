@@ -90,7 +90,11 @@ class TripPlanModule {
 
         let tripDetails: TripDetail[] = budgets.map(function (budget) {
             let tripType = budget.tripType;
-            let price = Number(budget.price)
+            let price = Number(budget.price);
+            logger.warn("*********************************");
+            logger.warn("tripType=>", tripType);
+            logger.warn("budget.type=>", budget.type);
+            logger.error(budget);
             let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: price});
             detail.accountId = staff.id;
             detail.isCommit = false;
@@ -116,6 +120,7 @@ class TripPlanModule {
                     tripPlan.isNeedTraffic = true;
                     break;
                 case ETripType.HOTEL:
+                    detail.type = ETripType.HOTEL;
                     detail.cityCode = query.destinationPlace;
                     detail.city = tripPlan.arrivalCity;
                     detail.hotelCode = query.businessDistrict;
@@ -125,6 +130,7 @@ class TripPlanModule {
                     tripPlan.isNeedHotel = true;
                     break;
                 case ETripType.SUBSIDY:
+                    detail.type = ETripType.OTHER;
                     detail.deptCityCode = query.originPlace;
                     detail.arrivalCityCode = query.destinationPlace;
                     detail.deptCity = tripPlan.deptCity;
