@@ -17,7 +17,7 @@ angular
     .module('nglibs')
     .directive('ngUploader', function ($loading) {
         var browserspec = require('browserspec');
-        if(browserspec.is_wechat){
+        if(browserspec.is_wechat && /^(www\.)?jingli365\.com$/.test(window.location.host)){
             use_wxChooseImage = true;
         }
         if(!use_wxChooseImage){
