@@ -32,22 +32,21 @@
         <ion-list>
             <ion-item class="item-divider">
                 交通
-                <span class="spanRight">{{trafficBudget==-1?'暂无预算':trafficBudget+'元'}}</span>
+                <span class="spanRight">{{trafficBudget}}元</span>
             </ion-item>
             <ion-item ng-repeat="t in traffic track by $index">
                 {{t.startTime.value | date: 'MM-dd'}}
                 <br>{{t.deptCity}}-{{t.arrivalCity}}
-                <br>{{t.type == 'train'?'火车：':'飞机：'}}{{MTxPlaneLevel[t.cabinClass]?MTxPlaneLevel[t.cabinClass]:""}}
-                <br>{{t.budget == -1 ? '暂无预算' : (t.budget | currency: '')+'元'}}
+                <br>{{t.budget | currency : ''}}元
             </ion-item>
             <ion-item class="item-divider">
                 住宿
-                <span class="spanRight">{{hotelBudget == -1 ? '暂无预算' : (hotelBudget | currency: '')+'元'}}</span>
+                <span class="spanRight">{{hotelBudget}}元</span>
             </ion-item>
             <ion-item ng-repeat="h in hotel track by h.id">
                 {{h.startTime.value | date: 'MM-dd'}}至{{h.endTime.value | date: 'MM-dd'}}
                 <br>{{h.city}} {{h.hotelName}}
-                <br>{{h.budget == -1 ? '暂无预算' : (h.budget | currency: '')+'元'}}
+                <br>{{h.budget | currency : ''}}元
             </ion-item>
             <ion-item class="item-divider">
                 其他补助(共{{subsidyDays}}天)
@@ -55,13 +54,8 @@
             </ion-item>
             <ion-item>
                 {{tripPlan.startAt.value | date: 'MM-dd'}}至{{tripPlan.backAt.value | date: 'MM-dd'}}
-                <br>{{subsidyBudget == -1 ? '暂无预算' : (subsidyBudget | currency: '')+'元'}}
+                <br>{{subsidyBudget | currency : ''}}元
             </ion-item>
         </ion-list>
-        <div class="button-bar" ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE && isHasPermissionApprove">
-            <a ng-click="showReasonDialog()" id="page7-button41" class="button button-assertive  button-block">拒绝</a>
-            <a ng-click="showAlterDialog()" id="page7-button43" class="button button-positive  button-block">同意</a>
-        </div>
-        <div class="button-bar"></div>
     </ion-content>
 </ion-view>
