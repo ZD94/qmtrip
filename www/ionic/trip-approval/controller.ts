@@ -104,6 +104,9 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         tripDetails.forEach(function(detail) {
             switch (detail.type) {
                 case ETripType.OUT_TRIP:
+                    traffic.push(detail);
+                    trafficBudget += detail.budget;
+                    break;
                 case ETripType.BACK_TRIP:
                     traffic.push(detail);
                     trafficBudget += detail.budget;
