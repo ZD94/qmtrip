@@ -727,7 +727,7 @@ class TripPlanModule {
         let {id, expenditure, reason, auditResult} = params;
         let tripDetail = await Models.tripDetail.get(params.id);
 
-        if(tripDetail.status != EPlanStatus.AUDITING) {
+        if((tripDetail.status != EPlanStatus.AUDITING) || (tripDetail.status != EPlanStatus.AUDIT_NOT_PASS)) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR();
         }
 
