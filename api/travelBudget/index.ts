@@ -288,7 +288,6 @@ class ApiTravelBudget {
     @clientExport
     static async getTrafficBudget(params: {originPlace: string, destinationPlace: string,
         leaveDate: Date | string, leaveTime: string}) : Promise<TravelBudgeItem> {
-
         let {originPlace, destinationPlace, leaveDate, leaveTime} = params;
 
         if (!destinationPlace) {

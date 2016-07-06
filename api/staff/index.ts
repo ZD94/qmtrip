@@ -138,7 +138,7 @@ class StaffModule{
 
         if(params.email){
             if(staff && staff.company["domainName"] && params.email.indexOf(staff.company["domainName"]) == -1){
-                throw L.ERR.INVALID_ARGUMENT('email');
+                throw L.ERR.EMAIL_SUFFIX_INVALID();
             }
 
             if(updateStaff.status != 0){

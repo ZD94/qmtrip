@@ -500,7 +500,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
 
         var staff = await Staff.getCurrent();
         if(data.email && staff && staff.company["domainName"] && data.email.indexOf(staff.company["domainName"]) == -1){
-            throw L.ERR.INVALID_ARGUMENT('email');
+            throw L.ERR.EMAIL_SUFFIX_INVALID();
         }
 
         var type = ACCOUNT_TYPE.COMPANY_STAFF;
@@ -766,17 +766,11 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * @param params
      * @returns {Promise<Account>}
      */
-    /*@clientExport
-    @requireParams(["email"], accountCols)
+    @clientExport
     static async createAccount (params) : Promise<Account>{
-
-        let result = await Models.account.find({where: {email: params.email}});
-        if(result && result.length>0){
-            throw {msg: "邮箱重复"};
-        }
         var acc = Account.create(params);
-        return acc.save();
-    }*/
+        return acc;
+    }
 
     /**
      * 由id查询账户信息

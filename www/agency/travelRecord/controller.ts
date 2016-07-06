@@ -17,6 +17,8 @@ export async function TravelListController($scope, Models, $stateParams){
     $("title").html("出差单列表");
     $scope.status = status || 'all';
     $scope.pager;
+    $scope.hasNextPage = false;
+    $scope.hasPrevPage = false;
     $scope.tripPlans = [];
     $scope.init = function (status) {
         if (status == $scope.status) return;
@@ -34,13 +36,7 @@ export async function TravelListController($scope, Models, $stateParams){
         Models.tripPlan.find({where: where})
             .then(function (pager) {
                 $scope.pager = pager;
-                return Promise.all(pager.map((item)=> {
-                    return item.getCompany()
-                        .then(function (company) {
-                            item.company = company;
-                            return item;
-                        })
-                }));
+                return $scope.wrapPagerData(pager);
             })
             .then(function (tripPlans) {
                 $scope.tripPlans = tripPlans;
@@ -50,8 +46,34 @@ export async function TravelListController($scope, Models, $stateParams){
             }).done();
     }
 
-    $scope.nextPage = function () {
-        $scope.pager = $scope.pager.nextPage();
+    $scope.wrapPagerData = function (pager) {
+        if (pager.curPage < (pager.totalPages-1)) {
+            $scope.hasNextPage = true;
+        }
+        if (pager.curPage > 1) {
+            $scope.hasPrevPage = true;
+        }
+        return Promise.all(pager.map((item)=> {
+            return item.getCompany()
+                .then(function (company) {
+                    item.company = company;
+                    return item;
+                })
+        }));
+    }
+
+    $scope.prevPage = async function() {
+        if ($scope.pager) {
+            $scope.pager = await $scope.pager.nextPage();
+            $scope.trinPlans = $scope.wrapPagerData($scope.pager);
+        }
+    }
+
+    $scope.nextPage = async function () {
+        if ($scope.pager) {
+            $scope.pager = await $scope.pager.prevPage();
+            $scope.trinPlans = $scope.wrapPagerData($scope.pager);
+        }
     }
 
     $scope.init(status);
@@ -101,9 +123,12 @@ export async function TravelDetailController($scope, $stateParams, $location, $a
             }).done();
     }
     $scope.init();
-
+    $scope.showLoading = false;
     //默认不显示审批对话框
-    $scope.showInvoice = function (tripDetailId) {
+    $scope.showInvoice = async function (tripDetailId) {
+        if ($scope.curTripDetail && tripDetailId == $scope.curTripDetail.id) return;
+        $scope.showLoading = true;
+        $scope.curTripDetailInoviceImg = '/agency/images/jingli_loading.gif';
         Models.tripDetail.get(tripDetailId)
             .then(function (tripDetail) {
                 if (tripDetail.invoice && typeof tripDetail.invoice == 'string') {
@@ -115,8 +140,14 @@ export async function TravelDetailController($scope, $stateParams, $location, $a
             })
             .catch(function(err){
                 msgbox.log(err.msg ||err);
-            }).done();
+            });
     }
+
+    angular.element("#invoiceImg").bind("load", function() {
+        $scope.showLoading = false;
+        $scope.$apply();
+    })
+
 
     $scope.closePassFailDialog = function () {
         $scope.showInvoicePassFailDialog = false;

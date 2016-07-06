@@ -391,10 +391,12 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
         if (_staff.travelPolicyId && _staff.travelPolicyId.id) {
             _staff.travelPolicyId = _staff.travelPolicyId.id;
         }
-        if ($scope.role && $scope.role.id == true) {
-            _staff.roleId = EStaffRole.ADMIN;
-        } else {
-            _staff.roleId = EStaffRole.COMMON;
+        if(_staff.roleId != EStaffRole.OWNER){
+            if ($scope.role && $scope.role.id == true) {
+                _staff.roleId = EStaffRole.ADMIN;
+            } else {
+                _staff.roleId = EStaffRole.COMMON;
+            }
         }
         try{
             if (!_staff.email) {
@@ -409,7 +411,7 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
                 throw L.ERR.EMAIL_FORMAT_INVALID();
             }
             if(company.domainName && company.domainName != "" && _staff.email.indexOf(company.domainName) == -1){
-                throw L.ERR.EMAIL_FORMAT_INVALID();
+                throw L.ERR.EMAIL_SUFFIX_INVALID();
             }
 
             if (_staff.mobile && !validator.isMobilePhone(_staff.mobile, 'zh-CN')) {
