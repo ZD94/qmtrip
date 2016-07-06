@@ -80,3 +80,7 @@ app.run(function($ionicPlatform) {
 
 
 var dyload = require('dyload');
+
+if(browserspec.is_wechat) {
+    dyload("http://res.wx.qq.com/open/js/jweixin-1.0.0.js")
+}

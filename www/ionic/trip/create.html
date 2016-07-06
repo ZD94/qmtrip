@@ -16,6 +16,7 @@
                        ng-selector="placeSelector"
                        ng-selector-title="请选择出差地点"
                        ng-selector-placeholder="请输入城市名或首字母缩写"
+                     class="business_chooese"
                 ></div>
             </div>
             <div class="item item-input">
@@ -23,7 +24,7 @@
                 <div ng-model="trip.reasonName"
                        ng-selector="projectSelector"
                        ng-selector-title="请选择出差事由"
-                       ng-selector-placeholder="请选择或输入事由"
+                       ng-selector-placeholder="请选择或输入事由" class="business_chooese"
                 ></div>
             </div>
             <div class="spacer" style="width: 300px; height: 9px;"></div>
@@ -34,7 +35,7 @@
                     <div ng-model="trip.fromPlaceName"
                            ng-selector="fromPlaceSelector"
                            ng-selector-title="出发地选择"
-                           ng-selector-placeholder="请输入城市名或首字母缩写"
+                           ng-selector-placeholder="请输入城市名或首字母缩写" class="business_chooese"
                     ></div>
                 </div>
                 <ion-toggle toggle-class="toggle-positive" ng-model="trip.round">返程</ion-toggle>
@@ -52,7 +53,7 @@
                     <div ng-model="trip.hotelPlaceName"
                            ng-selector="hotelPlaceSelector"
                            ng-selector-title="请选择地标"
-                           ng-selector-placeholder='请输入地标名称或首字母'
+                           ng-selector-placeholder='请输入地标名称或首字母' class="business_chooese"
                     ></div>
                 </div>
             </div>

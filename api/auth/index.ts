@@ -1209,6 +1209,22 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         return obj.accountId;
     }
 
+    /**
+     * 获取数据库中accountId关联的openId
+     * @type {getOpenIdByAccount}
+     */
+    @requireParams(["openId"])
+    static async getOpenIdByAccount(params: {accountId: string}): Promise<string> {
+        let list = await Models.accountOpenid.find({where: {accountId: params.accountId}});
+
+        if(!list || list.length <= 0) {
+            return null;
+        }
+
+        let obj = list[0];
+        return obj.openId;
+    }
+
     @requireParams(["id"])
     static judgeRoleById(params: {id: string}){
         return DBM.Account.findById(params.id)
