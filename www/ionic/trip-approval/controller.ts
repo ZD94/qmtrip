@@ -2,7 +2,7 @@
  * Created by seven on 16/4/25.
  */
 "use strict";
-import {EPlanStatus, ETripType, EAuditStatus, TripDetail} from "api/_types/tripPlan";
+import {EPlanStatus, ETripType, EAuditStatus, MTxPlaneLevel} from "api/_types/tripPlan";
 import {Staff} from "api/_types/staff";
 import moment = require('moment');
 const API = require("common/api")
@@ -75,11 +75,13 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
                 case ETripType.OUT_TRIP:
                 case ETripType.BACK_TRIP:
                     if(v.tripType == 0) {
+                        outTraffic.cabinClass = v.cabinClass;
                         if(Number(totalBudget) > tripPlan.budget)
                             outTraffic.budget = v.price;
                         traffic.push(outTraffic);
                         trafficBudget += Number(outTraffic.budget);
                     }else if(v.tripType == 1) {
+                        backTraffic.cabinClass = v.cabinClass;
                         if(Number(totalBudget) > tripPlan.budget)
                             backTraffic.budget = v.price;
                         traffic.push(backTraffic);
@@ -104,6 +106,9 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         tripDetails.forEach(function(detail) {
             switch (detail.type) {
                 case ETripType.OUT_TRIP:
+                    traffic.push(detail);
+                    trafficBudget += detail.budget;
+                    break;
                 case ETripType.BACK_TRIP:
                     traffic.push(detail);
                     trafficBudget += detail.budget;
@@ -126,6 +131,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.subsidyDays = subsidyDays;
     $scope.approveResult = EAuditStatus;
     $scope.EPlanStatus = EPlanStatus;
+    $scope.MTxPlaneLevel = MTxPlaneLevel;
 
     async function approve(result: EAuditStatus, auditRemark?: string) {
         try{

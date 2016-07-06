@@ -6,7 +6,7 @@ var Cookie = require('tiny-cookie');
 import { Staff } from 'api/_types/staff';
 import { Models } from 'api/_types';
 import {
-    TripDetail, EPlanStatus, ETripType, EInvoiceType, EAuditStatus
+    TripDetail, EPlanStatus, ETripType, EInvoiceType, EAuditStatus, MTxPlaneLevel
 } from "api/_types/tripPlan";
 var msgbox = require('msgbox');
 
@@ -294,6 +294,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     $scope.budgets = budgets;
     $scope.EInvoiceType = EInvoiceType;
     $scope.ETripType = ETripType;
+    $scope.MTxPlaneLevel = MTxPlaneLevel;
     API.require("tripPlan");
     await API.onload();
 
@@ -576,6 +577,14 @@ export async function ListDetailController($location, $scope , Models, $statePar
 }
 
 export async function InvoiceDetailController($scope , Models, $stateParams){
+    //////////////显示票据之前先显示loading图
+    $scope.showLoading = true;
+    angular.element("#previewInvoiceImg").bind("load", function() {
+        $scope.showLoading = false;
+        $scope.$apply();
+    })
+    //END
+
     var invoice = await Models.tripDetail.get($stateParams.detailId);
     $scope.invoice = invoice;
     $scope.EInvoiceType = EInvoiceType;
@@ -624,4 +633,6 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
         var tripPlan = invoice.tripPlan;
         window.location.href = "#/trip/list-detail?tripid="+tripPlan.id;
     }
+
+
 }

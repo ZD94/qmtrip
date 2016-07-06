@@ -9,7 +9,7 @@
                 <div ng-model="trip.auditUserName"
                        ng-selector="staffSelector"
                        ng-selector-title="选择审批人"
-                       ng-selector-placeholder="请选择审批人"
+                       ng-selector-placeholder="请选择审批人" class="business_chooese"
                 ></div>
             </div>
         </form>
@@ -52,6 +52,7 @@
                     <i ng-if='budget.type == EInvoiceType.HOTEL' class="icon ion-home"></i>
                     &nbsp;
                     {{trip.originPlaceName}}
+                    <br/> {{MTxPlaneLevel[budget.cabinClass]?MTxPlaneLevel[budget.cabinClass]:""}}
                     <br/>{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')+'元'}}
                 </ion-item>
 
@@ -79,6 +80,7 @@
                     <i ng-if='budget.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
                     &nbsp;
                     {{trip.destinationPlaceName}}
+                    <br/>  {{MTxPlaneLevel[budget.cabinClass]?MTxPlaneLevel[budget.cabinClass]:""}}
                     <br/>{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')+'元'}}
                 </ion-item>
             </div>
