@@ -123,9 +123,12 @@ export async function TravelDetailController($scope, $stateParams, $location, $a
             }).done();
     }
     $scope.init();
-
+    $scope.showLoading = false;
     //默认不显示审批对话框
-    $scope.showInvoice = function (tripDetailId) {
+    $scope.showInvoice = async function (tripDetailId) {
+        if ($scope.curTripDetail && tripDetailId == $scope.curTripDetail.id) return;
+        $scope.showLoading = true;
+        $scope.curTripDetailInoviceImg = '/agency/images/jingli_loading.gif';
         Models.tripDetail.get(tripDetailId)
             .then(function (tripDetail) {
                 if (tripDetail.invoice && typeof tripDetail.invoice == 'string') {
@@ -137,8 +140,14 @@ export async function TravelDetailController($scope, $stateParams, $location, $a
             })
             .catch(function(err){
                 msgbox.log(err.msg ||err);
-            }).done();
+            });
     }
+
+    angular.element("#invoiceImg").bind("load", function() {
+        $scope.showLoading = false;
+        $scope.$apply();
+    })
+
 
     $scope.closePassFailDialog = function () {
         $scope.showInvoicePassFailDialog = false;

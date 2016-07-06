@@ -95,7 +95,7 @@
             </div>
         </div>
 
-        <dl class="invoice" ng-if="curTripDetail">
+        <dl class="invoice" ng-show="curTripDetail">
             <dt>
                 <span ng-if="curTripDetail.type == 0">去程交通</span>
                 <span ng-if="curTripDetail.type == 1">回程交通</span>
@@ -121,7 +121,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td align="center" colspan="2"><img ng-src="{{curTripDetailInoviceImg || ''}}" alt="去程交通票据"></td>
+                        <td align="center" colspan="2">
+                            <img src="/agency/images/jingli_loading.gif" alt="加载中..." ng-show="showLoading" class="loading"/>
+                            <img ng-src="{{curTripDetailInoviceImg || ''}}" alt="票据" id="invoiceImg" ng-hide="showLoading"></td>
                     </tr>
                 </table>
             </dd>
