@@ -21,7 +21,6 @@ var utils = require("common/utils");
 var Logger = require("common/logger");
 var logger = new Logger('auth');
 
-
 var accountCols = Account['$fieldnames'];
 
 var ACCOUNT_STATUS = {
@@ -945,15 +944,25 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * @param {UUID} params.tokenId
      * @return {Promise}
      */
+    @clientExport
     static logout (params: {}) : Promise<boolean> {
         let session = Zone.current.get("session");
         var accountId = session["accountId"];
         var tokenId = session["tokenId"];
         if (accountId && tokenId) {
-            return DBM.Token.destroy({where: {accountId: accountId, id: tokenId}})
+            return Models.token.get(tokenId)
+                .then(function(token) {
+                    if (token) return token.destroy()
+                    return true;
+                })
                 .then(function() {
                     return true;
                 })
+            // Models.token.destroy()
+            // return DBM.Token.destroy({where: {accountId: accountId, id: tokenId}})
+            //     .then(function() {
+            //         return true;
+            //     })
         }
         return Promise.resolve(true);
     };
