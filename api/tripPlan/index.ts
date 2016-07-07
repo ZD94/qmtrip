@@ -570,14 +570,8 @@ class TripPlanModule {
             API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_approve_pass', values: self_values});
             //发送短信提醒
             if(user.mobile && isMobile(user.mobile)) {
-                let startAt: any = tripPlan.startAt;
-
-                if(startAt.__class == 'Date') {
-                    startAt = startAt.value;
-                }
-
                 API.sms.sendMsgSubmit({template: 'travelBudgetApproved', mobile: user.mobile,
-                    values: {time: moment(startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
+                    values: {time: moment(tripPlan.startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
 
             }
         }else if(auditResult == EAuditStatus.NOT_PASS) {
