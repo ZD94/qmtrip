@@ -483,6 +483,8 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
 
     }
     $scope.showrole = function () {
+        $scope.staff.$fields = {};
+        $scope.staff.$parents.account.$fields = {};
         /*if ($scope.role.id == true) {
             $scope.staff.roleId = EStaffRole.ADMIN;
         } else {
