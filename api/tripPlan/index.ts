@@ -572,10 +572,6 @@ class TripPlanModule {
             if(user.mobile && isMobile(user.mobile)) {
                 let startAt: any = tripPlan.startAt;
 
-                if(startAt.__class == 'Date') {
-                    startAt = startAt.value;
-                }
-
                 API.sms.sendMsgSubmit({template: 'travelBudgetApproved', mobile: user.mobile,
                     values: {time: moment(startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
 

@@ -355,8 +355,8 @@ export async function DetailController($scope, $stateParams, Models, $location){
     let tripPlan = await Models.tripPlan.get(id);
     let budgets: any[] = await Models.tripDetail.find({where: {tripPlanId: id}});
     $scope.createdAt = moment(tripPlan.createAt).toDate();
-    $scope.startAt = moment(tripPlan.startAt.value).toDate();
-    $scope.backAt = moment(tripPlan.backAt.value).toDate();
+    $scope.startAt = moment(tripPlan.startAt).toDate();
+    $scope.backAt = moment(tripPlan.backAt).toDate();
 
     $scope.trip = tripPlan.target;
     $scope.budgets = budgets;
@@ -536,8 +536,8 @@ export async function ListDetailController($location, $scope , Models, $statePar
         let tripDetails = $scope.budgets;
         let trip: any = {
             regenerate: true,
-            beginDate: moment(tripPlan.startAt.value).toDate(),
-            endDate: moment(tripPlan.backAt.value).toDate(),
+            beginDate: moment(tripPlan.startAt).toDate(),
+            endDate: moment(tripPlan.backAt).toDate(),
             place: tripPlan.arrivalCityCode,
             placeName: tripPlan.arrivalCity,
             reasonName: tripPlan.title

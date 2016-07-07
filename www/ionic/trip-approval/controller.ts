@@ -31,7 +31,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     let tripDetails = await tripPlan.getTripDetails();
     let traffic = [], hotel = [];
     let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
-    let subsidyDays:number = moment(tripPlan.backAt.value).diff(moment(tripPlan.startAt.value), 'days');
+    let subsidyDays:number = moment(tripPlan.backAt).diff(moment(tripPlan.startAt), 'days');
     let totalBudget: number = 0;
     let budgetId;
     if (tripPlan.status == EPlanStatus.WAIT_APPROVE && tripPlan.query) {
