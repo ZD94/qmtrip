@@ -85,7 +85,9 @@ class TripPlanModule {
         let hotelName = '';
         if(query.businessDistrict) {
             let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
-            hotelName = hotelInfo.name;
+            if(hotelInfo && hotelInfo.name) {
+                hotelName = hotelInfo.name;
+            }
         }
 
         let tripDetails: TripDetail[] = budgets.map(function (budget) {
