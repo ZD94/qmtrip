@@ -5,6 +5,7 @@
 
 const API = require("common/api");
 var msgbox = require('msgbox');
+var Cookie = require("tiny-cookie");
 
 export async function LoginController($scope, $stateParams){
     var backUrl = $stateParams.backurl || "#";
@@ -21,8 +22,8 @@ export async function LoginController($scope, $stateParams){
                 return false;
             }
 
+            API.require("auth");
             API.onload(function () {
-                console.info(API)
                 API.auth.login({email: name, pwd: pwd, type: 2})
                     .then(function (data) {
                         Cookie.set("agent_id", data.user_id, {expires: 30});

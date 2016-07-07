@@ -85,7 +85,9 @@ class TripPlanModule {
         let hotelName = '';
         if(query.businessDistrict) {
             let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
-            hotelName = hotelInfo.name;
+            if(hotelInfo && hotelInfo.name) {
+                hotelName = hotelInfo.name;
+            }
         }
 
         let tripDetails: TripDetail[] = budgets.map(function (budget) {
@@ -274,7 +276,7 @@ class TripPlanModule {
                         approveUser: approveUser.name,
                         tripPlanNo: tripPlan.planNo,
                         staffName: user.name,
-                        content: '员工' + user.name + moment(tripPlan.startAt).format('YYYY-MM-DD') + '到' + tripPlan.arrivalCity + '的出差计划已经生成，预算：￥' + tripPlan.budget + '，等待您审核！',
+                        content: '员工' + user.name + moment(tripPlan.startAt).format('YYYY-MM-DD') + '到' + tripPlan.arrivalCity + '的出差计划已经发送给您，预算：￥' + tripPlan.budget + '，等待您审核！',
                         createdAt: moment(tripPlan.startAt).format('YYYY-MM-DD'),
                         autoApproveTime: moment(tripPlan.autoApproveTime).format('YYYY-MM-DD HH:mm:ss')
                     };
@@ -437,7 +439,7 @@ class TripPlanModule {
         let tripPlan = await Models.tripPlan.get(params.id);
         let auditResult = params.auditResult;
         let staff = await Staff.getCurrent();
-        let budgetId = params.budgetId
+        let budgetId = params.budgetId;
 
         if(auditResult != EAuditStatus.PASS && auditResult != EAuditStatus.NOT_PASS) {
             throw L.ERR.PERMISSION_DENY(); //只能审批待审批的出差记录
@@ -560,7 +562,9 @@ class TripPlanModule {
             totalBudget: '￥' + tripPlan.budget, url: self_url, detailUrl: self_url};
 
         let msg_url = await API.shorturl.long2short({longurl: self_url, shortType: 'md5'});
+        let approveResult = '';
         if(auditResult == EAuditStatus.PASS) {
+            approveResult = '审核通过';
             log.remark = '审批通过，审批人：' + staff.name;
             tripPlan.status = EPlanStatus.WAIT_UPLOAD;
             API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_approve_pass', values: self_values});
@@ -574,12 +578,14 @@ class TripPlanModule {
 
                 API.sms.sendMsgSubmit({template: 'travelBudgetApproved', mobile: user.mobile,
                     values: {time: moment(startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
+
             }
         }else if(auditResult == EAuditStatus.NOT_PASS) {
             if(!params.auditRemark) {
                 throw {code: -2, msg: '拒绝原因不能为空'};
             }
             log.remark = '审批未通过，原因：' + params.auditRemark + '，审批人：' + staff.name;
+            approveResult = '审批未通过，原因：' + params.auditRemark;
             tripPlan.status = EPlanStatus.APPROVE_NOT_PASS;
             self_values['reason'] = params.auditRemark;
             API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_approve_not_pass', values: self_values});
@@ -588,6 +594,14 @@ class TripPlanModule {
                 API.sms.sendMsgSubmit({template: 'travelBudgetApproveFailed', mobile: user.mobile,
                     values: {time: moment(tripPlan.startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
             }
+        }
+
+        //发送微信消息
+        let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
+        if(openId) {
+            let values = {staffName: user.name, startTime: moment(tripPlan.startAt).format('YYYY-MM-DD'), arrivalCity: tripPlan.arrivalCity, budget: tripPlan.budget,
+                tripPlanNo: tripPlan.planNo, approveResult: approveResult, approveTime: moment(tripPlan.autoApproveTime).format('YYYY-MM-DD HH:mm:ss'), approveUser: staff.name};
+            API.wechat.sendTemplateMessage({templateName: 'APPROVE_RESULT', openId: openId, url: self_url, values: values});
         }
 
         let tripDetails = await tripPlan.getTripDetails({});
@@ -645,13 +659,13 @@ class TripPlanModule {
         let staff = await Staff.getCurrent();
         let tripDetail = await Models.tripDetail.get(params.tripDetailId);
 
-        if (tripDetail.status != EPlanStatus.WAIT_UPLOAD && tripDetail.status != EPlanStatus.WAIT_COMMIT) {
+        if (tripDetail.status != EPlanStatus.WAIT_UPLOAD && tripDetail.status != EPlanStatus.WAIT_COMMIT && tripDetail.status != EPlanStatus.AUDIT_NOT_PASS) {
             throw {code: -3, msg: '该出差计划不能上传票据，请检查出差计划状态'};
         }
 
         let tripPlan = tripDetail.tripPlan;
 
-        if(tripPlan.status != EPlanStatus.WAIT_UPLOAD && tripDetail.status != EPlanStatus.WAIT_COMMIT) {
+        if(tripPlan.status != EPlanStatus.WAIT_UPLOAD && tripDetail.status != EPlanStatus.WAIT_COMMIT && tripDetail.status != EPlanStatus.AUDIT_NOT_PASS) {
             throw {code: -3, msg: '该出差计划不能上传票据，请检查出差计划状态'};
         }
 
@@ -727,7 +741,7 @@ class TripPlanModule {
         let {id, expenditure, reason, auditResult} = params;
         let tripDetail = await Models.tripDetail.get(params.id);
 
-        if(tripDetail.status != EPlanStatus.AUDITING) {
+        if((tripDetail.status != EPlanStatus.AUDITING) && (tripDetail.status != EPlanStatus.AUDIT_NOT_PASS)) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR();
         }
 

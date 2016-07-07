@@ -3,7 +3,7 @@
  */
 "use strict";
 import {EStaffRole, Staff, EStaffStatus} from "api/_types/staff";
-import {EPlanStatus} from 'api/_types/tripPlan';
+import {EPlanStatus, ETripType, EAuditStatus} from 'api/_types/tripPlan';
 import {TravelPolicy, MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 import {Department} from "api/_types/department";
 import validator = require('validator');
@@ -89,7 +89,7 @@ export async function RecordController($scope, Models) {
     $scope.staffName = '';
 
     $scope.enterDetail = function(tripid){
-        window.location.href = "#/trip/list-detail?tripid="+tripid;
+        window.location.href = "#/company/record-detail?tripid="+tripid;
     };
 
     $scope.searchTripPlans = async function(staffName) {
@@ -101,6 +101,58 @@ export async function RecordController($scope, Models) {
         let ids = staffs.map((s) => s.id);
         $scope.tripPlans = await company.getTripPlans({where: {accountId: ids}});
     };
+}
+
+export async function RecordDetailController($scope, Models, $stateParams, $ionicPopup, $ionicLoading){
+    require('./trip-approval.scss');
+    let tripId = $stateParams.tripid;
+    let tripPlan = await Models.tripPlan.get(tripId);
+
+    $scope.tripPlan = tripPlan;
+    let staff = tripPlan.account; //await Models.staff.get(tripPlan.accountId);
+    $scope.staff = staff;
+
+    //判断有无审批权限
+    let isHasPermissionApprove = false;
+    let curStaff = await Staff.getCurrent();
+    if(curStaff.id == tripPlan.auditUser) { isHasPermissionApprove = true;}
+    $scope.isHasPermissionApprove = isHasPermissionApprove;
+
+    let tripDetails = await tripPlan.getTripDetails();
+    let traffic = [], hotel = [];
+    let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
+    let subsidyDays:number = moment(tripPlan.backAt.value).diff(moment(tripPlan.startAt.value), 'days');
+    let totalBudget: number = 0;
+    let budgetId;
+    totalBudget = tripPlan.budget as number;
+    tripDetails.forEach(function(detail) {
+        switch (detail.type) {
+            case ETripType.OUT_TRIP:
+                traffic.push(detail);
+                trafficBudget += detail.budget;
+                break;
+            case ETripType.BACK_TRIP:
+                traffic.push(detail);
+                trafficBudget += detail.budget;
+                break;
+            case ETripType.HOTEL:
+                hotel.push(detail);
+                hotelBudget += detail.budget;
+                break;
+            default: subsidyBudget += detail.budget; break;
+        }
+    })
+
+    $scope.totalBudget = totalBudget;
+    $scope.traffic = traffic;
+    $scope.hotel = hotel;
+    $scope.trafficBudget = trafficBudget;
+    $scope.hotelBudget = hotelBudget;
+    $scope.subsidyBudget = subsidyBudget;
+    $scope.subsidyDays = subsidyDays;
+    $scope.approveResult = EAuditStatus;
+    $scope.EPlanStatus = EPlanStatus;
+
 }
 
 export async function DistributionController($scope, Models) {
