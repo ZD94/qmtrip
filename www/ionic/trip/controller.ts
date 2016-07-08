@@ -33,7 +33,7 @@ function TripDefineFromJson(obj: any): TripDefine{
     return obj as TripDefine;
 }
 
-export async function CreateController($scope, $storage, $ionicLoading){
+export async function CreateController($scope, $storage, $loading){
     require('./trip.scss');
     API.require('tripPlan');
     await API.onload();
@@ -196,15 +196,16 @@ export async function CreateController($scope, $storage, $ionicLoading){
             businessDistrict: trip.hotelPlace
         };
         let front = ['正在验证出行参数', '正在匹配差旅政策', '正在搜索全网数据', '动态预算即将完成'];
-        await $ionicLoading.show({
-            template: '预算计算中...',
-            hideOnStateChange: true,
+        let templatePrefix = '<img src="/ionic/images/jingli_loading.gif"/><br/>'
+        $loading.reset();
+        $loading.start({
+            template: templatePrefix+'预算计算中...'
         });
         let idx = 0;
         let isShowDone = false;
         let budget;
         let timer = setInterval(async function() {
-            let template = front[idx++]+'...'
+            let template = front[idx++]+'...';
             if (idx >= front.length) {
                 clearInterval(timer);
                 isShowDone = true;
@@ -212,9 +213,11 @@ export async function CreateController($scope, $storage, $ionicLoading){
                     cb();
                 }
             }
-            await $ionicLoading.show({
+            template = templatePrefix + template
+            console.info(template);
+            $loading.reset();
+            $loading.start({
                 template: template,
-                hideOnStateChange: true,
             });
         }, 1000);
 
@@ -225,12 +228,12 @@ export async function CreateController($scope, $storage, $ionicLoading){
             }
         } catch(err) {
             clearInterval(timer);
-            await $ionicLoading.hide()
+            $loading.end();
             alert(err.msg || err);
         }
 
         function cb() {
-            $ionicLoading.hide()
+            $loading.end();
             window.location.href = "#/trip/budget?id="+budget;
         }
     }
