@@ -17,9 +17,13 @@ class LoadingService {
         this.level = 0;
     }
 
-    start() {
+    start(options?: any) {
+        if (!options) {
+            options = {};
+        }
+
         if(this.level == 0){
-            var template = require('./loading.html');
+            var template = options.template || require('./loading.html');
             this.$ionicLoading.show({template: template});
             //var wH = $(window).height();
             //$("#loading").show();
