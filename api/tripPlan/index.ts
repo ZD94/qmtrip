@@ -1064,7 +1064,6 @@ class TripPlanModule {
             let tripPlans = await Models.tripPlan.find({where: {autoApproveTime: {$lte: utils.now()}, status: EPlanStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
             // logger.info("自动审批出差计划...");
             tripPlans.map(async (p) => {
-                // logger.warn('auto_approve_time==>', moment(p.autoApproveTime).format('YYYY-MM-DD HH:mm:ss'));
                 let details = await p.getTripDetails({});
                 p.status = EPlanStatus.WAIT_UPLOAD;
 
