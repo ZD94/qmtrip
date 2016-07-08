@@ -9,7 +9,30 @@
                         <br>出差事由：{{trip.project.name}}</ion-item>
                 </ion-list>
             </div>
-            <div class="item item-divider">{{statustext[trip.status]}}
+            <div class="item item-divider" ng-if="trip.status == 4">
+                <span style="display: block; width: 33%; float: left; text-align: center;">
+                    <span style="color: blue;">{{trip.budget | currency: ''}}元</span>
+                    <br/>预算
+                </span>
+                <span style="display: block; width: 33%; float: left; text-align: center;">
+                    <span style="color: orange;">{{trip.expenditure | currency: ''}}元</span>
+                    <br/>
+                    <span style="font-weight: 100">实际</span>
+                </span>
+                <span style="display: block; width: 33%; float: left; text-align: center;">
+                    <span ng-if="trip.budget - trip.expenditure >= 0">
+                        <span style="color: green;">{{trip.budget - trip.expenditure | currency: ''}}元</span>
+                        <br/>
+                        <span style="font-weight: 100">节省</span>
+                    </span>
+                    <span ng-if="trip.budget - trip.expenditure < 0">
+                        <span style="color: green;">{{trip.expenditure - trip.budget| currency: ''}}元</span>
+                        <br/>
+                        <span style="font-weight: 100">超支</span>
+                    </span>
+                </span>
+            </div>
+            <div class="item item-divider" ng-if="trip.status != 4">{{statustext[trip.status]}}
                 <span class="spanRight" ng-if="trip.budget != -1 && trip.budget != null">{{trip.budget| currency : ''}}元</span>
                 <span class="spanRight" ng-if="trip.budget == -1 || trip.budget == null">待出预算</span>
             </div>

@@ -151,3 +151,34 @@ ion-side-menu{
   height: 57px;
   z-index: 11;
 }
+
+//吸底button
+.fixed_bottom{
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  margin: 0;
+  a,a.button.button-block{
+    display: block;
+    clear: both;
+    margin: 0;
+    border-radius: 0px;
+  }
+  span{
+    display: block;
+    clear: both;
+    margin: 0;
+    border-radius: 0px;
+  }
+}
+.has-bottom-btn {
+  .scroll {
+    padding-bottom: 80px;
+  }
+}
+.loading-container {
+  .loading {
+    background-color: white;
+    color: black;
+  }
+}

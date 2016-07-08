@@ -1,5 +1,5 @@
 <ion-view title="待审批详情" id="page7">
-    <ion-content padding="true" class="has-header">
+    <ion-content padding="true" class="has-header has-bottom-btn">
         <form class="list">
             <label class="item item-input opactic">
                 <span ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE" class="input-label op_single">等待审批</span>
@@ -58,10 +58,13 @@
                 <br>{{subsidyBudget == -1 ? '暂无预算' : (subsidyBudget | currency: '')+'元'}}
             </ion-item>
         </ion-list>
-        <div class="button-bar" ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE && isHasPermissionApprove">
-            <a ng-click="showReasonDialog()" id="page7-button41" class="button button-assertive  button-block">拒绝</a>
-            <a ng-click="showAlterDialog()" id="page7-button43" class="button button-positive  button-block">同意</a>
-        </div>
-        <div class="button-bar"></div>
+        <!--<div class="button-bar" ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE && isHasPermissionApprove" style="position: fixed;bottom: 0px;left: 0;">-->
+            <!--<a ng-click="showReasonDialog()" id="page7-button41" class="button button-assertive  button-block">拒绝</a>-->
+            <!--<a ng-click="showAlterDialog()" id="page7-button43" class="button button-positive  button-block">同意</a>-->
+        <!--</div>-->
     </ion-content>
+    <div class="button-bar fixed_bottom" ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE && isHasPermissionApprove">
+        <a ng-click="showReasonDialog()" id="page7-button41" class="button button-assertive  button-block">拒绝</a>
+        <a ng-click="showAlterDialog()" id="page7-button43" class="button button-positive  button-block">同意</a>
+    </div>
 </ion-view>
