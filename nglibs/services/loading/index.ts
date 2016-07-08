@@ -49,7 +49,6 @@ function isHashChange(newurl: string, oldurl: string){
     var oldurlsec = oldurl.split('#');
     if(oldurlsec.length < 3)
         return false;
-    console.log(newurlsec, oldurlsec);
     newurlsec.pop();
     oldurlsec.pop();
     return newurlsec == oldurlsec;
