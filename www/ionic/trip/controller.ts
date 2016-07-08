@@ -435,9 +435,9 @@ export async function ListDetailController($location, $scope , Models, $statePar
     statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
     statusTxt[EPlanStatus.NO_BUDGET] = "没有预算";
     statusTxt[EPlanStatus.WAIT_UPLOAD] = "待上传票据";
-    statusTxt[EPlanStatus.WAIT_COMMIT] = "待提交状态";
-    statusTxt[EPlanStatus.AUDITING] = "已提交待审核状态";
-    statusTxt[EPlanStatus.COMPLETE] = "审核完，已完成状态";
+    statusTxt[EPlanStatus.WAIT_COMMIT] = "待提交";
+    statusTxt[EPlanStatus.AUDITING] = "已提交待审核";
+    statusTxt[EPlanStatus.COMPLETE] = "已完成";
     $scope.statustext = statusTxt;
     $scope.EPlanStatus = EPlanStatus;
     $scope.EInvoiceType = EInvoiceType;
