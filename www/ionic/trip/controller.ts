@@ -344,7 +344,6 @@ export async function CommittedController($scope, $stateParams, Models){
 
     $scope.goToDetail = function() {
         window.location.href = '#/trip/list-detail?tripid='+id;
-        // window.location.href = '#/trip/detail?id='+id;
     }
 }
 
