@@ -17,9 +17,13 @@ class LoadingService {
         this.level = 0;
     }
 
-    start() {
+    start(options?: any) {
+        if (!options) {
+            options = {};
+        }
+
         if(this.level == 0){
-            var template = require('./loading.html');
+            var template = options.template || require('./loading.html');
             this.$ionicLoading.show({template: template});
             //var wH = $(window).height();
             //$("#loading").show();
@@ -49,7 +53,6 @@ function isHashChange(newurl: string, oldurl: string){
     var oldurlsec = oldurl.split('#');
     if(oldurlsec.length < 3)
         return false;
-    console.log(newurlsec, oldurlsec);
     newurlsec.pop();
     oldurlsec.pop();
     return newurlsec == oldurlsec;

@@ -33,7 +33,7 @@ function TripDefineFromJson(obj: any): TripDefine{
     return obj as TripDefine;
 }
 
-export async function CreateController($scope, $storage, $ionicLoading){
+export async function CreateController($scope, $storage, $loading){
     require('./trip.scss');
     API.require('tripPlan');
     await API.onload();
@@ -196,15 +196,16 @@ export async function CreateController($scope, $storage, $ionicLoading){
             businessDistrict: trip.hotelPlace
         };
         let front = ['正在验证出行参数', '正在匹配差旅政策', '正在搜索全网数据', '动态预算即将完成'];
-        await $ionicLoading.show({
-            template: '预算计算中...',
-            hideOnStateChange: true,
+        let templatePrefix = '<img src="/ionic/images/jingli_loading.gif"/><br/>'
+        $loading.reset();
+        $loading.start({
+            template: templatePrefix+'预算计算中...'
         });
         let idx = 0;
         let isShowDone = false;
         let budget;
         let timer = setInterval(async function() {
-            let template = front[idx++]+'...'
+            let template = front[idx++]+'...';
             if (idx >= front.length) {
                 clearInterval(timer);
                 isShowDone = true;
@@ -212,9 +213,10 @@ export async function CreateController($scope, $storage, $ionicLoading){
                     cb();
                 }
             }
-            await $ionicLoading.show({
+            template = templatePrefix + template
+            $loading.reset();
+            $loading.start({
                 template: template,
-                hideOnStateChange: true,
             });
         }, 1000);
 
@@ -225,12 +227,12 @@ export async function CreateController($scope, $storage, $ionicLoading){
             }
         } catch(err) {
             clearInterval(timer);
-            await $ionicLoading.hide()
+            $loading.end();
             alert(err.msg || err);
         }
 
         function cb() {
-            $ionicLoading.hide()
+            $loading.end();
             window.location.href = "#/trip/budget?id="+budget;
         }
     }
@@ -341,7 +343,7 @@ export async function CommittedController($scope, $stateParams, Models){
     $scope.tripPlan = tripPlan.target;
 
     $scope.goToDetail = function() {
-        window.location.href = '#/trip/detail?id='+id;
+        window.location.href = '#/trip/list-detail?tripid='+id;
     }
 }
 
@@ -370,9 +372,9 @@ export async function ListController($scope , Models){
     statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
     statusTxt[EPlanStatus.NO_BUDGET] = "没有预算";
     statusTxt[EPlanStatus.WAIT_UPLOAD] = "待上传票据";
-    statusTxt[EPlanStatus.WAIT_COMMIT] = "待提交状态";
-    statusTxt[EPlanStatus.AUDITING] = "已提交待审核状态";
-    statusTxt[EPlanStatus.COMPLETE] = "审核完，已完成状态";
+    statusTxt[EPlanStatus.WAIT_COMMIT] = "待提交";
+    statusTxt[EPlanStatus.AUDITING] = "已提交待审核";
+    statusTxt[EPlanStatus.COMPLETE] = "已完成";
     $scope.statustext = statusTxt;
     $scope.isHasNextPage = true;
     $scope.tripPlans = [];
@@ -433,9 +435,9 @@ export async function ListDetailController($location, $scope , Models, $statePar
     statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
     statusTxt[EPlanStatus.NO_BUDGET] = "没有预算";
     statusTxt[EPlanStatus.WAIT_UPLOAD] = "待上传票据";
-    statusTxt[EPlanStatus.WAIT_COMMIT] = "待提交状态";
-    statusTxt[EPlanStatus.AUDITING] = "已提交待审核状态";
-    statusTxt[EPlanStatus.COMPLETE] = "审核完，已完成状态";
+    statusTxt[EPlanStatus.WAIT_COMMIT] = "待提交";
+    statusTxt[EPlanStatus.AUDITING] = "已提交待审核";
+    statusTxt[EPlanStatus.COMPLETE] = "已完成";
     $scope.statustext = statusTxt;
     $scope.EPlanStatus = EPlanStatus;
     $scope.EInvoiceType = EInvoiceType;
@@ -557,7 +559,8 @@ export async function ListDetailController($location, $scope , Models, $statePar
                     break;
                 case ETripType.HOTEL:
                     trip.hotel = true;
-                    trip.hotelPlace = detail.hotelName || '';
+                    trip.hotelPlace = detail.hotelCode || '';
+                    trip.hotelPlaceName = detail.hotelName || '';
                     let landMarkInfo = {name: ''};
                     if(detail.hotelName) {
                         landMarkInfo = await API.place.getCityInfo({cityCode: detail.hotelName});

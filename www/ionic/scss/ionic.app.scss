@@ -171,8 +171,14 @@ ion-side-menu{
     border-radius: 0px;
   }
 }
-.has-bottom-btn{
-  .scroll{
+.has-bottom-btn {
+  .scroll {
     padding-bottom: 80px;
+  }
+}
+.loading-container {
+  .loading {
+    background-color: white;
+    color: black;
   }
 }

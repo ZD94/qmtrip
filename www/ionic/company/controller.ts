@@ -323,14 +323,44 @@ export async function DepartmentController($scope, Models, $ionicPopup, $ionicLi
 export async function StaffsController($scope, Models, $ionicPopup) {
     var staff = await Staff.getCurrent();
     $scope.currentStaff = staff;
-    var staffs = await staff.company.getStaffs();
-    $scope.staffs = staffs.map(function (staff) {
+    $scope.staffs = [];
+    var pager = await staff.company.getStaffs();
+    loadStaffs(pager);
+
+    $scope.pager = pager;
+    var vm = {
+        isHasNextPage:true,
+        nextPage : async function() {
+            try {
+                pager = await $scope.pager['nextPage']();
+            } catch(err) {
+                this.isHasNextPage = false;
+                return;
+            }
+            $scope.pager = pager;
+            loadStaffs(pager);
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+        }
+    }
+
+    $scope.vm = vm;
+    
+    function loadStaffs(pager) {
+        pager.forEach(function(staff){
+            var obj = {staff: staff, role: ""};
+            if (obj.staff.roleId == EStaffRole.OWNER) {
+                obj.role = '创建者';
+            }
+            $scope.staffs.push(obj);
+        });
+    }
+    /*$scope.staffs = staffs.map(function (staff) {
         var obj = {staff: staff, role: ""};
         if (obj.staff.roleId == EStaffRole.OWNER) {
             obj.role = '创建者';
         }
         return obj;
-    });
+    });*/
     await Promise.all($scope.staffs.map(async function (obj) {
         obj.travelPolicy = await obj.staff.getTravelPolicy();
         return obj;

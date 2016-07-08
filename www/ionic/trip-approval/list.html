@@ -12,7 +12,7 @@
             <a ng-click="changeTo('ALL')" class="button button-small" ng-class="filter == 'ALL' ? 'active': ''">全部</a>
             <a ng-click="changeTo('WAIT_APPROVE')" class="button button-small" ng-class="filter == 'WAIT_APPROVE' ? 'active': ''">待我审批</a>
             <a ng-click="changeTo('APPROVE_PASS')" class="button button-small" ng-class="filter == 'APPROVE_PASS' ? 'active': ''">审批通过</a>
-            <a ng-click="changeTo('APPROVE_FAIL')" class="button button-small" ng-class="filter == 'APPROVE_FAIL' ? 'active': ''">审批失败</a>
+            <a ng-click="changeTo('APPROVE_FAIL')" class="button button-small" ng-class="filter == 'APPROVE_FAIL' ? 'active': ''">审批驳回</a>
         </div>
 
         <div class="list card" ng-repeat="trip in tripPlans track by trip.id" ng-click="enterDetail(trip.id)">
@@ -20,7 +20,7 @@
             <div class="item item-body">
                 <ion-list>
                     <ion-item class="item-thumbnail-left">
-                        <div class="staff_portrait">{{staff.name | limitTo: -2}}</div>
+                        <div class="staff_portrait">{{trip.account.name | limitTo: -2}}</div>
                         <h2 style="margin-top: 0;">{{trip.account.name}}<br>{{trip.account.mobile}}</h2>
                         <p></p>
                     </ion-item>
@@ -33,7 +33,7 @@
             <div class="item item-divider">
                 <span ng-if="trip.status == EPlanStatus.WAIT_APPROVE">待审批</span>
                 <span ng-if="trip.status != EPlanStatus.APPROVE_NOT_PASS && trip.status != EPlanStatus.WAIT_APPROVE">审批通过</span>
-                <span ng-if="trip.status == EPlanStatus.APPROVE_NOT_PASS">审批失败</span>
+                <span ng-if="trip.status == EPlanStatus.APPROVE_NOT_PASS">审批驳回</span>
                 <span class="spanRight">{{trip.budget | currency: ''}}元</span>
             </div>
         </div>

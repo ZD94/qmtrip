@@ -29,7 +29,7 @@
         </ion-list>
         <div class="spacer" style="width: 285px; height: 17px;"></div>
         <ion-list>
-            <ion-item>{{trip.beginDate| date: 'MM/dd'}} 至 {{trip.endDate | date: 'MM/dd'}}
+            <ion-item>{{trip.beginDate| date: 'MM-dd'}} 至 {{trip.endDate | date: 'MM-dd'}}
                 <br>总预算：{{totalPrice == -1 ? '暂无预算' : (totalPrice| currency: '')+'元'}}</ion-item>
         </ion-list>-->
         <div class="spacer" style="width: 285px; height: 17px;"></div>
@@ -44,7 +44,7 @@
                 </ion-item>
 
                 <ion-item ng-if="budget.tripType == ETripType.BACK_TRIP">
-                    <span>{{trip.endDate | date: 'MM/dd'}}</span>
+                    <span>{{trip.endDate | date: 'MM-dd'}}</span>
                     {{trip.destinationPlaceName}}
                     &nbsp;
                     <i ng-if='budget.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
@@ -57,7 +57,7 @@
                 </ion-item>
 
                 <ion-item ng-if="budget.tripType == ETripType.HOTEL">
-                    <span>{{trip.beginDate | date: 'MM/dd'}}至{{trip.endDate | date: 'MM/dd'}} 共{{duringDays}}天</span>
+                    <span>{{trip.beginDate | date: 'MM-dd'}}至{{trip.endDate | date: 'MM-dd'}} 共{{duringDays}}天</span>
                     <br/>
                    <!-- &nbsp;
                     <i class="icon ion-home"></i>
@@ -67,13 +67,13 @@
                 </ion-item>
 
                 <ion-item ng-if="budget.tripType == ETripType.SUBSIDY">
-                    <span>{{trip.beginDate | date: 'MM/dd'}}至{{trip.endDate | date: 'MM/dd'}} 共{{duringDays}}天</span>
+                    <span>{{trip.beginDate | date: 'MM-dd'}}至{{trip.endDate | date: 'MM-dd'}} 共{{duringDays}}天</span>
                     <br/>
                     {{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')+'元'}}
                 </ion-item>
 
                 <ion-item ng-if="budget.tripType == ETripType.OUT_TRIP">
-                    <span>{{trip.beginDate | date: 'MM/dd'}}</span>
+                    <span>{{trip.beginDate | date: 'MM-dd'}}</span>
                     {{trip.originPlaceName}}
                     &nbsp;
                     <i ng-if='budget.type == EInvoiceType.PLANE' class="icon ion-plane"></i>

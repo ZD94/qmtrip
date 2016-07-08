@@ -564,7 +564,7 @@ class TripPlanModule {
         let msg_url = await API.shorturl.long2short({longurl: self_url, shortType: 'md5'});
         let approveResult = '';
         if(auditResult == EAuditStatus.PASS) {
-            approveResult = '审核通过';
+            approveResult = '审批通过';
             log.remark = '审批通过，审批人：' + staff.name;
             tripPlan.status = EPlanStatus.WAIT_UPLOAD;
             API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_approve_pass', values: self_values});
@@ -963,7 +963,7 @@ class TripPlanModule {
         }
         let sql = `select account_id, sum(budget) - sum(expenditure) as save from trip_plan.trip_plans where status = 4 AND company_id = '${companyId}'
         group by account_id
-        order by save asc limit ${limit}`;
+        order by save desc limit ${limit}`;
 
         let ranks = await sequelize.query(sql)
             .then(function(result) {
@@ -1064,7 +1064,6 @@ class TripPlanModule {
             let tripPlans = await Models.tripPlan.find({where: {autoApproveTime: {$lte: utils.now()}, status: EPlanStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
             // logger.info("自动审批出差计划...");
             tripPlans.map(async (p) => {
-                // logger.warn('auto_approve_time==>', moment(p.autoApproveTime).format('YYYY-MM-DD HH:mm:ss'));
                 let details = await p.getTripDetails({});
                 p.status = EPlanStatus.WAIT_UPLOAD;
 
