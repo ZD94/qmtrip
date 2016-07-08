@@ -214,7 +214,6 @@ export async function CreateController($scope, $storage, $loading){
                 }
             }
             template = templatePrefix + template
-            console.info(template);
             $loading.reset();
             $loading.start({
                 template: template,
