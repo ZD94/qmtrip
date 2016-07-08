@@ -76,12 +76,22 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
                 case ETripType.BACK_TRIP:
                     if(v.tripType == 0) {
                         outTraffic.cabinClass = v.cabinClass;
+                        if(v.trainNo){
+                            outTraffic.trafficType = "train";
+                        }else{
+                            outTraffic.trafficType = "air";
+                        }
                         if(Number(totalBudget) > tripPlan.budget)
                             outTraffic.budget = v.price;
                         traffic.push(outTraffic);
                         trafficBudget += Number(outTraffic.budget);
                     }else if(v.tripType == 1) {
                         backTraffic.cabinClass = v.cabinClass;
+                        if(v.trainNo){
+                            backTraffic.trafficType = "train";
+                        }else{
+                            backTraffic.trafficType = "air";
+                        }
                         if(Number(totalBudget) > tripPlan.budget)
                             backTraffic.budget = v.price;
                         traffic.push(backTraffic);
@@ -133,6 +143,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.EPlanStatus = EPlanStatus;
     $scope.MTxPlaneLevel = MTxPlaneLevel;
 
+
     async function approve(result: EAuditStatus, auditRemark?: string) {
         try{
             await tripPlan.approve({auditResult: result, auditRemark: auditRemark, budgetId: budgetId});
@@ -146,8 +157,23 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
 
     $scope.showReasonDialog = function () {
         $scope.reject = {reason: ''};
+        $scope.reasonItems = ['重新安排时间','计划临时取消','预算不符合要求'];
+        $scope.showReasons = false;
+        $scope.chooseReason = function (item){
+            $scope.reject = {reason: item};
+            $scope.showReasons = false;
+        };
+        $scope.showList = function (){
+            $scope.showReasons = true;
+        };
+        $scope.hideList = function (){
+            $scope.showReasons = false;
+        };
         $ionicPopup.show({
-            template: '<input type="text" ng-model="reject.reason">',
+            template: '<input type="text" ng-model="reject.reason" ng-focus="showList()" ng-keydown="hideList()"  placeholder="请输入或选择拒绝理由" style="border: 1px solid #ccc;padding-left: 10px;">' +
+            '<ion-list ng-if="showReasons"> ' +
+            '<ion-item ng-repeat="item in reasonItems  track by $index" ng-click="chooseReason(item)" style="border: none;line-height: 6px;">{{item}}</ion-item> ' +
+            '</ion-list>',
             title: '填写拒绝原因',
             scope: $scope,
             buttons: [{
