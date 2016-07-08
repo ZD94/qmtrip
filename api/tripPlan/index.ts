@@ -963,7 +963,7 @@ class TripPlanModule {
         }
         let sql = `select account_id, sum(budget) - sum(expenditure) as save from trip_plan.trip_plans where status = 4 AND company_id = '${companyId}'
         group by account_id
-        order by save asc limit ${limit}`;
+        order by save desc limit ${limit}`;
 
         let ranks = await sequelize.query(sql)
             .then(function(result) {
