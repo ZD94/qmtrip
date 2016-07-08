@@ -594,7 +594,7 @@ class TripPlanModule {
         let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
         if(openId) {
             let values = {staffName: user.name, startTime: moment(tripPlan.startAt).format('YYYY-MM-DD'), arrivalCity: tripPlan.arrivalCity, budget: tripPlan.budget,
-                tripPlanNo: tripPlan.planNo, approveResult: approveResult, approveTime: moment(tripPlan.autoApproveTime).format('YYYY-MM-DD HH:mm:ss'), approveUser: staff.name};
+                tripPlanNo: tripPlan.planNo, approveResult: approveResult, approveTime: moment().format('YYYY-MM-DD HH:mm:ss'), approveUser: staff.name};
             API.wechat.sendTemplateMessage({templateName: 'APPROVE_RESULT', openId: openId, url: self_url, values: values});
         }
 
