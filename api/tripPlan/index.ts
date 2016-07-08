@@ -564,7 +564,7 @@ class TripPlanModule {
         let msg_url = await API.shorturl.long2short({longurl: self_url, shortType: 'md5'});
         let approveResult = '';
         if(auditResult == EAuditStatus.PASS) {
-            approveResult = '审核通过';
+            approveResult = '审批通过';
             log.remark = '审批通过，审批人：' + staff.name;
             tripPlan.status = EPlanStatus.WAIT_UPLOAD;
             API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_approve_pass', values: self_values});

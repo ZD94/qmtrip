@@ -36,7 +36,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     let budgetId;
     if (tripPlan.status == EPlanStatus.WAIT_APPROVE && tripPlan.query) {
         await $ionicLoading.show({
-            template: '预算重新计算中...'
+            template: '预算计算中...'
         });
         //计算最终预算
         API.require("travelBudget");

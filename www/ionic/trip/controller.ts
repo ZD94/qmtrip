@@ -557,7 +557,8 @@ export async function ListDetailController($location, $scope , Models, $statePar
                     break;
                 case ETripType.HOTEL:
                     trip.hotel = true;
-                    trip.hotelPlace = detail.hotelName || '';
+                    trip.hotelPlace = detail.hotelCode || '';
+                    trip.hotelPlaceName = detail.hotelName || '';
                     let landMarkInfo = {name: ''};
                     if(detail.hotelName) {
                         landMarkInfo = await API.place.getCityInfo({cityCode: detail.hotelName});
