@@ -1,7 +1,7 @@
 <ion-view title="行程详情页" id="page20">
     <ion-content padding="true" class="has-header has-bottom-btn">
         <div id="page20-markdown7" style="color:#000000;text-align:right;">
-            <p style="color: #fff;">{{tripDetail.createdAt.value | date: 'yyyy-MM-dd HH:mm'}}</p>
+            <p style="color: #fff;">{{tripDetail.createdAt | date: 'yyyy-MM-dd HH:mm'}}</p>
         </div>
 
         <ion-list ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS">
@@ -12,7 +12,7 @@
         <ion-list class="jl_projectinfo">
             <ion-item class="project_tit">{{tripDetail.title}}</ion-item>
             <ion-item class="project_cont">
-                <p ng-if="tripDetail && tripDetail.startAt">{{tripDetail.startAt.value | date: 'yyyy-MM-dd'}} 至 {{tripDetail.backAt.value | date: 'yyyy-MM-dd'}}</p>
+                <p ng-if="tripDetail && tripDetail.startAt">{{tripDetail.startAt | date: 'yyyy-MM-dd'}} 至 {{tripDetail.backAt | date: 'yyyy-MM-dd'}}</p>
                 <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{tripDetail.budget == -1 ? '暂无预算' : (tripDetail.budget| currency: '')}}</span>{{tripDetail.budget == -1 ? '' : '元'}}</p>
             </ion-item>
         </ion-list>
@@ -25,7 +25,7 @@
                     <span class="spanRight">{{(goTraffic.budget + backTraffic.budget) == -1 ? '暂无预算' : ((goTraffic.budget + backTraffic.budget)| currency: '')}}{{(goTraffic.budget + backTraffic.budget) == -1 ? '' : '元'}}</span>
                 </ion-item>
                 <ion-item>
-                    <span>{{goTraffic.startTime.value | date: 'yyyy-MM-dd'}}</span>
+                    <span>{{goTraffic.startTime | date: 'yyyy-MM-dd'}}</span>
                     <br>
                     {{tripDetail.deptCity}}
                     &nbsp;
@@ -73,7 +73,7 @@
             </div>
             <div ng-if="backTraffic">
                 <ion-item>
-                    <span>{{backTraffic.startTime.value | date: 'yyyy-MM-dd'}}</span>
+                    <span>{{backTraffic.startTime | date: 'yyyy-MM-dd'}}</span>
                     <br>
                     {{tripDetail.arrivalCity}}
                     &nbsp;
@@ -126,8 +126,8 @@
                     <span class="spanRight">{{hotel.budget == -1 ? '暂无预算' : (hotel.budget| currency: '')}}{{hotel.budget == -1 ? '' : '元'}}</span>
                 </ion-item>
                 <ion-item>
-                    <span>{{hotel.startTime.value | date: 'yyyy-MM-dd'}}</span> 至
-                    <span>{{hotel.endTime.value | date: 'yyyy-MM-dd'}}</span>
+                    <span>{{hotel.startTime | date: 'yyyy-MM-dd'}}</span> 至
+                    <span>{{hotel.endTime | date: 'yyyy-MM-dd'}}</span>
                     <br>
                     {{tripDetail.arrivalCity}}&nbsp;{{hotel.hotelName}}
                     <br>{{hotel.budget == -1 ? '暂无预算' : (hotel.budget| currency: '')+'元'}}
@@ -173,8 +173,8 @@
                     <span class="spanRight">{{other.budget == -1 ? '暂无预算' : (other.budget| currency: '')}}{{other.budget == -1 ? '' : '元'}}</span>
                 </ion-item>
                 <ion-item class="">
-                    <span>{{tripDetail.startAt.value | date: 'yyyy-MM-dd'}}</span> 至
-                    <span>{{tripDetail.backAt.value | date: 'yyyy-MM-dd'}}</span>
+                    <span>{{tripDetail.startAt | date: 'yyyy-MM-dd'}}</span> 至
+                    <span>{{tripDetail.backAt | date: 'yyyy-MM-dd'}}</span>
                     <br>{{other.budget == -1 ? '暂无预算' : (other.budget| currency: '')+ '元'}}
                 </ion-item>
             </div>

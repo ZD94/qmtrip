@@ -23,7 +23,7 @@
         <ion-list class="jl_projectinfo">
             <ion-item class="project_tit">{{tripPlan.title}}</ion-item>
             <ion-item class="project_cont">
-                <p>{{tripPlan.startAt.value | date: 'yyyy-MM-dd'}} 至 {{tripPlan.backAt.value | date: 'yyyy-MM-dd'}}</p>
+                <p>{{tripPlan.startAt | date: 'yyyy-MM-dd'}} 至 {{tripPlan.backAt | date: 'yyyy-MM-dd'}}</p>
                 <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{totalBudget}}</span>元</p>
             </ion-item>
         </ion-list>
@@ -35,7 +35,7 @@
                 <span class="spanRight">{{trafficBudget}}元</span>
             </ion-item>
             <ion-item ng-repeat="t in traffic track by $index">
-                {{t.startTime.value | date: 'MM-dd'}}
+                {{t.startTime | date: 'MM-dd'}}
                 <br>{{t.deptCity}}-{{t.arrivalCity}}
                 <br>{{t.budget | currency : ''}}元
             </ion-item>
@@ -44,7 +44,7 @@
                 <span class="spanRight">{{hotelBudget}}元</span>
             </ion-item>
             <ion-item ng-repeat="h in hotel track by h.id">
-                {{h.startTime.value | date: 'MM-dd'}}至{{h.endTime.value | date: 'MM-dd'}}
+                {{h.startTime | date: 'MM-dd'}}至{{h.endTime | date: 'MM-dd'}}
                 <br>{{h.city}} {{h.hotelName}}
                 <br>{{h.budget | currency : ''}}元
             </ion-item>
@@ -53,7 +53,7 @@
                 <span class="spanRight">{{subsidyBudget | currency: ''}}元</span>
             </ion-item>
             <ion-item>
-                {{tripPlan.startAt.value | date: 'MM-dd'}}至{{tripPlan.backAt.value | date: 'MM-dd'}}
+                {{tripPlan.startAt | date: 'MM-dd'}}至{{tripPlan.backAt | date: 'MM-dd'}}
                 <br>{{subsidyBudget | currency : ''}}元
             </ion-item>
         </ion-list>

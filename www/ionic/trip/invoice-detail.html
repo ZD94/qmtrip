@@ -10,7 +10,7 @@
                 <div style="float: left;">
                     <b>{{invoice.deptCity}}</b>-
                     <b>{{invoice.arrivalCity}}</b><br/>
-                    <span>{{invoice.createdAt.value | date: 'yyyy-MM-dd'}}</span>
+                    <span>{{invoice.createdAt | date: 'yyyy-MM-dd'}}</span>
                 </div>
                 <span class="item-note">{{statustext[invoice.status]}}</span>
             </div>
