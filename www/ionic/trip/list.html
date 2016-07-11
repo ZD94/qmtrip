@@ -26,7 +26,7 @@
                         <span style="font-weight: 100">节省</span>
                     </span>
                     <span ng-if="trip.budget - trip.expenditure < 0">
-                        <span style="color: green;">{{trip.expenditure - trip.budget| currency: ''}}元</span>
+                        <span style="color: red;">{{trip.expenditure - trip.budget| currency: ''}}元</span>
                         <br/>
                         <span style="font-weight: 100">超支</span>
                     </span>
