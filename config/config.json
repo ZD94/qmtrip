@@ -64,5 +64,10 @@
     "pwd": "123456",
     "mobile": "",
     "user_name": "鲸力代理商"
+  },
+  "message": {
+    "is_send_message": true,
+    "is_send_wechat": true,
+    "is_send_email": true
   }
 }

@@ -21,6 +21,7 @@ var utils = require("common/utils");
 var Logger = require("common/logger");
 var logger = new Logger('auth');
 
+let msgConfig = C.message;
 var accountCols = Account['$fieldnames'];
 
 var ACCOUNT_STATUS = {
@@ -186,14 +187,18 @@ class ApiAuth {
 
         if (isFirstSet) {
             //发邮件
-            vals.url = C.host + "/index.html#/login/first-set-pwd?" + url;
-            templateName = 'qm_first_set_pwd_email';
-            await API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
+            if(msgConfig.is_send_email) {
+                vals.url = C.host + "/index.html#/login/first-set-pwd?" + url;
+                templateName = 'qm_first_set_pwd_email';
+                await API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
+            }
 
             //发短信
-            vals.url = await API.shorturl.long2short({longurl: C.host + "/index.html#/login/first-set-pwd?" + url});
-            await API.sms.sendMsgSubmit({template: 'qmFirstSetPwdMsg', mobile: account.mobile, values: vals});
-        } else {
+            if(msgConfig.is_send_message) {
+                vals.url = await API.shorturl.long2short({longurl: C.host + "/index.html#/login/first-set-pwd?" + url});
+                await API.sms.sendMsgSubmit({template: 'qmFirstSetPwdMsg', mobile: account.mobile, values: vals});
+            }
+        } else if(msgConfig.is_send_email){
             vals.url = C.host + "/index.html#/login/reset-pwd?" + url;
             templateName = 'qm_reset_pwd_email';
             return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
@@ -686,6 +691,10 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     @clientExport
     @requireParams(['type', 'companyName','userName','mobile', 'email', 'qq'])
     static async sendPartnerEmail(params){
+        if(!msgConfig.is_send_email) {
+            return;
+        }
+        
         var email = "peng.wang@jingli.tech";
 
         var vals = {
