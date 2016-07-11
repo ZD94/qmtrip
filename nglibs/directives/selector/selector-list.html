@@ -1,4 +1,8 @@
-<ion-modal-view title="{{title}}">
+<ion-modal-view>
+    <ion-header-bar class="bar-stable">
+        <h1 class="title">{{title}}</h1>
+        <div class="button button-clear" ng-click="modal.hide()">取消</div>
+    </ion-header-bar>
     <ion-content padding="true" class="has-header">
         <form class="list">
             <label class="item item-input">
