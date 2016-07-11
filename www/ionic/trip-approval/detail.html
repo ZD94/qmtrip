@@ -1,70 +1,72 @@
 <ion-view title="待审批详情" id="page7">
-    <ion-content padding="true" class="has-header has-bottom-btn">
-        <form class="list">
-            <label class="item item-input opactic">
-                <span ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE" class="input-label op_single">等待审批</span>
-                <span ng-if="tripPlan.status != EPlanStatus.WAIT_APPROVE && tripPlan.status != EPlanStatus.APPROVE_NOT_PASS" class="input-label op_single">审批通过</span>
-                <span ng-if="tripPlan.status == EPlanStatus.APPROVE_NOT_PASS" class="input-label op_single">审批未通过，备注：{{tripPlan.auditRemark}}</span>
-            </label>
-        </form>
+    <ion-content padding="false" scroll="false" class="has-header has-bottom-btn">
+        <div class="flex_content">
+            <ion-scroll>
+                <form class="list">
+                    <label class="item item-input opactic">
+                        <span ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE" class="input-label op_single">等待审批</span>
+                        <span ng-if="tripPlan.status != EPlanStatus.WAIT_APPROVE && tripPlan.status != EPlanStatus.APPROVE_NOT_PASS" class="input-label op_single">审批通过</span>
+                        <span ng-if="tripPlan.status == EPlanStatus.APPROVE_NOT_PASS" class="input-label op_single">审批未通过，备注：{{tripPlan.auditRemark}}</span>
+                    </label>
+                </form>
 
-        <ion-list>
-            <ion-item class="item-thumbnail-left opactic">
-                <div class="staff_portrait" ng-click="showTravelPolicy(staff.id)">{{staff.name.substring(staff.name.length-2,staff.name.length)}}</div>
-                <span class="op_mult">{{staff.name}}&nbsp;&nbsp;{{staff.mobile}}</span>
-                <br>{{staff.email}}
-                <p align="right" style="margin-top: 5px">
-                    <a class="button button-small button-outline" ng-click="showTravelPolicy(staff.id)" style="border: 1px solid #fff;color: #fff;">差旅标准</a>
-                    <a class="button button-small" href="tel:{{staff.mobile}}">打电话</a>
-                </p>
-            </ion-item>
-        </ion-list>
-        <div class="spacer" style="width: 285px; height: 17px;"></div>
-        <ion-list class="jl_projectinfo">
-            <ion-item class="project_tit">{{tripPlan.title}}</ion-item>
-            <ion-item class="project_cont">
-                <p>{{tripPlan.startAt | date: 'yyyy-MM-dd'}} 至 {{tripPlan.backAt | date: 'yyyy-MM-dd'}}</p>
-                <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{totalBudget}}</span>元</p>
-            </ion-item>
-        </ion-list>
+                <ion-list>
+                    <ion-item class="item-thumbnail-left opactic">
+                        <div class="staff_portrait" ng-click="showTravelPolicy(staff.id)">{{staff.name.substring(staff.name.length-2,staff.name.length)}}</div>
+                        <span class="op_mult">{{staff.name}}&nbsp;&nbsp;{{staff.mobile}}</span>
+                        <br>{{staff.email}}
+                        <p align="right" style="margin-top: 5px">
+                            <a class="button button-small button-outline" ng-click="showTravelPolicy(staff.id)" style="border: 1px solid #fff;color: #fff;">差旅标准</a>
+                            <a class="button button-small" href="tel:{{staff.mobile}}">打电话</a>
+                        </p>
+                    </ion-item>
+                </ion-list>
+                <div class="spacer" style="width: 285px; height: 17px;"></div>
+                <ion-list class="jl_projectinfo">
+                    <ion-item class="project_tit">{{tripPlan.title}}</ion-item>
+                    <ion-item class="project_cont">
+                        <p>{{tripPlan.startAt | date: 'yyyy-MM-dd'}} 至 {{tripPlan.backAt | date: 'yyyy-MM-dd'}}</p>
+                        <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{totalBudget}}</span>元</p>
+                    </ion-item>
+                </ion-list>
 
-        <div class="spacer" style="width: 285px; height: 17px;"></div>
-        <ion-list>
-            <ion-item class="item-divider">
-                交通
-                <span class="spanRight">{{trafficBudget==-1?'暂无预算':trafficBudget+'元'}}</span>
-            </ion-item>
-            <ion-item ng-repeat="t in traffic track by $index">
-                {{t.startTime | date: 'MM-dd'}}
-                <br>{{t.deptCity}}-{{t.arrivalCity}}
-                <br>{{t.type == 'train'?'火车：':'飞机：'}}{{MTxPlaneLevel[t.cabinClass]?MTxPlaneLevel[t.cabinClass]:""}}
-                <br>{{t.budget == -1 ? '暂无预算' : (t.budget | currency: '')+'元'}}
-            </ion-item>
-            <ion-item class="item-divider">
-                住宿
-                <span class="spanRight">{{hotelBudget == -1 ? '暂无预算' : (hotelBudget | currency: '')+'元'}}</span>
-            </ion-item>
-            <ion-item ng-repeat="h in hotel track by h.id">
-                {{h.startTime | date: 'MM-dd'}}至{{h.endTime | date: 'MM-dd'}}
-                <br>{{h.city}} {{h.hotelName}}
-                <br>{{h.budget == -1 ? '暂无预算' : (h.budget | currency: '')+'元'}}
-            </ion-item>
-            <ion-item class="item-divider">
-                其他补助(共{{subsidyDays}}天)
-                <span class="spanRight">{{subsidyBudget | currency: ''}}元</span>
-            </ion-item>
-            <ion-item>
-                {{tripPlan.startAt | date: 'MM-dd'}}至{{tripPlan.backAt | date: 'MM-dd'}}
-                <br>{{subsidyBudget == -1 ? '暂无预算' : (subsidyBudget | currency: '')+'元'}}
-            </ion-item>
-        </ion-list>
-        <!--<div class="button-bar" ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE && isHasPermissionApprove" style="position: fixed;bottom: 0px;left: 0;">-->
-            <!--<a ng-click="showReasonDialog()" id="page7-button41" class="button button-assertive  button-block">拒绝</a>-->
-            <!--<a ng-click="showAlterDialog()" id="page7-button43" class="button button-positive  button-block">同意</a>-->
-        <!--</div>-->
+                <div class="spacer" style="width: 285px; height: 17px;"></div>
+                <ion-list>
+                    <ion-item class="item-divider">
+                        交通
+                        <span class="spanRight">{{trafficBudget==-1?'暂无预算':trafficBudget+'元'}}</span>
+                    </ion-item>
+                    <ion-item ng-repeat="t in traffic track by $index">
+                        {{t.startTime | date: 'MM-dd'}}
+                        <br>{{t.deptCity}}-{{t.arrivalCity}}
+                        <br>{{t.type == 'train'?'火车：':'飞机：'}}{{MTxPlaneLevel[t.cabinClass]?MTxPlaneLevel[t.cabinClass]:""}}
+                        <br>{{t.budget == -1 ? '暂无预算' : (t.budget | currency: '')+'元'}}
+                    </ion-item>
+                    <ion-item class="item-divider">
+                        住宿
+                        <span class="spanRight">{{hotelBudget == -1 ? '暂无预算' : (hotelBudget | currency: '')+'元'}}</span>
+                    </ion-item>
+                    <ion-item ng-repeat="h in hotel track by h.id">
+                        {{h.startTime | date: 'MM-dd'}}至{{h.endTime | date: 'MM-dd'}}
+                        <br>{{h.city}} {{h.hotelName}}
+                        <br>{{h.budget == -1 ? '暂无预算' : (h.budget | currency: '')+'元'}}
+                    </ion-item>
+                    <ion-item class="item-divider">
+                        其他补助(共{{subsidyDays}}天)
+                        <span class="spanRight">{{subsidyBudget | currency: ''}}元</span>
+                    </ion-item>
+                    <ion-item>
+                        {{tripPlan.startAt | date: 'MM-dd'}}至{{tripPlan.backAt | date: 'MM-dd'}}
+                        <br>{{subsidyBudget == -1 ? '暂无预算' : (subsidyBudget | currency: '')+'元'}}
+                    </ion-item>
+                </ion-list>
+            </ion-scroll>
+
+        </div>
+
+        <div class="button-bar flex_footer" ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE && isHasPermissionApprove">
+            <a ng-click="showReasonDialog()" id="page7-button41" class="button button-assertive  button-block">拒绝</a>
+            <a ng-click="showAlterDialog()" id="page7-button43" class="button button-positive  button-block">同意</a>
+        </div>
     </ion-content>
-    <div class="button-bar fixed_bottom" ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE && isHasPermissionApprove">
-        <a ng-click="showReasonDialog()" id="page7-button41" class="button button-assertive  button-block">拒绝</a>
-        <a ng-click="showAlterDialog()" id="page7-button43" class="button button-positive  button-block">同意</a>
-    </div>
 </ion-view>

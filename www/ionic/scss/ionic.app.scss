@@ -172,8 +172,21 @@ ion-side-menu{
   }
 }
 .has-bottom-btn {
-  .scroll {
-    padding-bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  .flex_content{
+    flex: 1;
+    position: relative;
+    ion-scroll{
+      height: 100%;
+      width:100%;
+      position: absolute;
+      padding: 10px;
+
+    }
+    .flex_footer{
+      float: none;;
+    }
   }
 }
 .loading-container {
