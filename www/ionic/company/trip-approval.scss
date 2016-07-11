@@ -58,3 +58,30 @@
     background: rgb(36,149,218);
   }
 }
+
+//预算统计，员工分布样式
+.select-bar {
+  background-color: #fff;
+  color: grey;
+  padding: 5px 10px 5px 2px;
+}
+
+.staff-phone {
+  background-color: #fff;
+  padding-left: 5px;
+  padding-right: 5px;
+
+  .call-phone-button {
+    color: white;
+    background-color: #387ef5;
+    display: initial;
+    padding: 3px 12px;
+    border-top: -5px;
+    font-size: 0.5em;
+    line-height: 0.5em;
+  }
+}
+
+.select-button {
+  border-bottom: 3px solid #387ef5;
+}

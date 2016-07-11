@@ -6,13 +6,29 @@
             <button id="page26-button81" class="button button-positive  button-block">员工分布</button>
         </div>
 
+        <label class="item item-input">
+            <span class="input-label">选择日期</span>
+            <input type="date" placeholder="" id="selectedDate" ng-model="dateObj.selectedDate" ng-change="selectDate()">
+            <!--<div date-picker id="beginDate"></div>-->
+        </label>
+
         <div style="position: relative;">
             <baidu-map options="mapOptions" ak="sFB94QImEEc4ve0uynf8Gt9vvKYcmECw" on-map-loaded="loadMap(map)" style="display: block; width: 100%; height: 300px;" ng-if="isShowMap"></baidu-map>
         </div>
 
+        <div class="select-bar">
+            <span>员工列表</span>
+            <span style="float: right">
+                <span ng-click="showPlace()" id="place-btn" class="select-button">地点</span>
+                <span ng-click="showPhone()" id="phone-btn" style="border-left: 10px;">电话</span>
+            </span>
+        </div>
+
         <ion-list>
             <ion-item ng-repeat="v in staffTrips" style="font-size: 0.8em;" ng-click="moveTo('{{v.longitude}}', '{{v.latitude}}')">
-                {{$index+1}}.{{v.name}} - {{v.reason}}<span style="float: right;"><i class="icon ion-flag" style="font-size: 0.5em; color: red;"></i>{{v.cityName}}</span>
+                <span>{{$index+1}}.{{v.name}} - {{v.reason}}</span>
+                <span class="staff-place" style="float: right;"><i class="icon ion-flag" style="font-size: 0.5em; color: red;"></i>{{v.cityName}}</span>
+                <span class="staff-phone" style="display: none; float: right;"><a class="button call-phone-button" href="tel:{{v.mobile}}">打电话</a></span>
             </ion-item>
         </ion-list>
     </ion-content>
