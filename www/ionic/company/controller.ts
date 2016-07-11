@@ -467,6 +467,8 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
     var currentstaff = await Staff.getCurrent();
     var company = currentstaff.company;
     let staffId = $stateParams.staffId;
+    $scope.currentStaff = currentstaff;
+    $scope.EStaffRole = EStaffRole;
     $scope.travelpolicylist = await company.getTravelPolicies();
     $scope.departmentlist = await company.getDepartments();
     if ($stateParams.staffId) {
@@ -486,22 +488,32 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
     $scope.staffId = $stateParams.staffId;
     $scope.staff = staff;
     var role = {id: false};
-    if (staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN) {
+    if (staff.roleId == EStaffRole.ADMIN) {
         role.id = true;
     }
     $scope.role = role;
 
     $scope.savestaff = async function () {
-        var logout = false;
+        //标识管理员修改自身权限 修改后要重新登陆
+        // var logout = false;
+        //标识企业拥有者修改管理员权限
+        var ownerModifyAdmin = false;
         let _staff = $scope.staff;
         if (_staff.travelPolicyId && _staff.travelPolicyId.id) {
             _staff.travelPolicyId = _staff.travelPolicyId.id;
         }
-        if(_staff.roleId != EStaffRole.OWNER){
-            if ($scope.role && $scope.role.id == true) {
-                _staff.roleId = EStaffRole.ADMIN;
-            } else {
-                _staff.roleId = EStaffRole.COMMON;
+        //管理员添加员工只能添加普通员工
+        if(currentstaff.roleId == EStaffRole.ADMIN){
+            _staff.roleId = EStaffRole.COMMON;
+        }
+
+        if(currentstaff.roleId == EStaffRole.OWNER){
+            if(_staff.roleId != EStaffRole.OWNER){
+                if ($scope.role && $scope.role.id == true) {
+                    _staff.roleId = EStaffRole.ADMIN;
+                } else {
+                    _staff.roleId = EStaffRole.COMMON;
+                }
             }
         }
         try{
@@ -547,14 +559,45 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
                         throw L.ERR.MOBILE_HAS_REGISTRY();
                     }
                 }
-                if(preRole == EStaffRole.ADMIN && _staff.roleId == EStaffRole.COMMON && currentstaff.id == _staff.id){
+                //管理员修改自身权限 修改后要重新登陆
+                /*if(preRole == EStaffRole.ADMIN && _staff.roleId == EStaffRole.COMMON && currentstaff.id == _staff.id){
                     logout = true;
+                }*/
+
+                // 创建人修改管理员权限(二次确认)
+                if(currentstaff.roleId == EStaffRole.OWNER && preRole == EStaffRole.ADMIN && _staff.roleId == EStaffRole.COMMON){
+                    ownerModifyAdmin = true;
+                    var nshow = $ionicPopup.show({
+                        title: '确认要取消TA的管理员身份吗？',
+                        scope: $scope,
+                        buttons: [
+                            {
+                                text: '确定',
+                                type: 'button-positive',
+                                onTap: async function (e) {
+                                    _staff = await _staff.save();
+                                    $ionicHistory.goBack(-1);
+                                }
+                            },
+                            {
+                                text: '取消',
+                                type: 'button-positive',
+                                onTap: async function (e) {
+                                    $scope.role = {id: true};
+                                }
+                    }
+                        ]
+                    })
                 }
             }
 
-            _staff = await _staff.save();
+            if(!ownerModifyAdmin){
+                _staff = await _staff.save();
+                $ionicHistory.goBack(-1);
+            }
 
-            if(logout){
+            //管理员修改自身权限 修改后要重新登陆
+            /*if(logout){
                 //重新登录
                 var nshow = $ionicPopup.show({
                     title: '修改权限需重新登录',
@@ -575,12 +618,8 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
                 })
             }else{
                 $ionicHistory.goBack(-1);
-            }
+            }*/
         }catch (err){
-            /*var show = $ionicPopup.alert({
-                 title: '提示',
-                 template: err.msg
-             })*/
             if(err.code == -1){
                 $scope.staff.roleId = EStaffRole.ADMIN;
             }

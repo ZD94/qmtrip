@@ -37,7 +37,7 @@
             <ion-item ng-repeat="t in traffic track by $index">
                 {{t.startTime | date: 'MM-dd'}}
                 <br>{{t.deptCity}}-{{t.arrivalCity}}
-                <br>{{t.type == 'train'?'火车：':'飞机：'}}{{MTxPlaneLevel[t.cabinClass]?MTxPlaneLevel[t.cabinClass]:""}}
+                <br>{{t.trafficType == 'train'?'火车：'+t.cabinClass :'飞机：'+MTxPlaneLevel[t.cabinClass]}}
                 <br>{{t.budget == -1 ? '暂无预算' : (t.budget | currency: '')+'元'}}
             </ion-item>
             <ion-item class="item-divider">
