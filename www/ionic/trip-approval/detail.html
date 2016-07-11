@@ -64,12 +64,12 @@
                         <br>{{subsidyBudget == -1 ? '暂无预算' : (subsidyBudget | currency: '')+'元'}}
                     </ion-item>
                 </ion-list>
-                <div class="button-bar flex_footer" ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE && isHasPermissionApprove">
-                    <a ng-click="showReasonDialog()" id="page7-button41" class="button button-assertive  button-block">拒绝</a>
-                    <a ng-click="showAlterDialog()" id="page7-button43"
-                       class="button button-positive  button-block">同意</a>
-                </div>
             </ion-scroll>
+        </div>
+        <div class="button-bar flex_footer" ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE && isHasPermissionApprove">
+            <a ng-click="showReasonDialog()" id="page7-button41" class="button button-assertive  button-block">拒绝</a>
+            <a ng-click="showAlterDialog()" id="page7-button43"
+               class="button button-positive  button-block">同意</a>
         </div>
     </ion-content>
 </ion-view>

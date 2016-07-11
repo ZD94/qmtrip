@@ -171,6 +171,8 @@ ion-side-menu{
     border-radius: 0px;
   }
 }
+
+//吸底button flex布局
 .has-bottom-btn {
   display: flex;
   flex-direction: column;
@@ -182,13 +184,19 @@ ion-side-menu{
       width:100%;
       position: absolute;
       padding: 10px;
-
+      margin: 0;
     }
-    .flex_footer{
-      float: none;;
+  }
+  .flex_footer{
+    flex: none;
+    a,a.button.button-block{
+      margin: 0;
+      border-radius: 0;
     }
   }
 }
+
+
 .loading-container {
   .loading {
     background-color: white;
