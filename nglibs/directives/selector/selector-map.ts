@@ -28,6 +28,8 @@ export function modalSelectorMap($compile, $scope, $element, $ionicModal, select
         center: $scope.city,
         //zoom: 12,
         city: $scope.city,
+        scaleCtrl: false,
+        overviewCtrl: false,
         enableMessage: false,
         enableMapClick: false
         //markers: markers
