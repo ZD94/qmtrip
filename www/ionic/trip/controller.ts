@@ -12,8 +12,8 @@ var msgbox = require('msgbox');
 
 
 var defaultTrip = {
-    beginDate: moment().startOf('day').hour(9).toDate(),
-    endDate: moment().startOf('day').hour(21).toDate(),
+    beginDate: moment().add(3, 'days').startOf('day').hour(9).toDate(),
+    endDate: moment().add(4, 'days').startOf('day').hour(21).toDate(),
     place: '',
     placeName: '',
     reason: '',
