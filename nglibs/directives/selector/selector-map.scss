@@ -1,0 +1,15 @@
+
+.fixed-header-footer{
+  display: flex;
+  flex-direction: column;
+  height:100%;
+  .fixed-header{
+    flex: none;
+  }
+  .flex-main{
+    flex: 1;
+  }
+  .fixed-footer{
+    flex: none;
+  }
+}

@@ -13,8 +13,9 @@ var msgbox = require('msgbox');
 
 var defaultTrip = {
     beginDate: moment().startOf('day').hour(9).toDate(),
-    endDate: moment().startOf('day').hour(18).toDate(),
+    endDate: moment().startOf('day').hour(21).toDate(),
     place: '',
+    placeName: '',
     reason: '',
 
     traffic: false,
@@ -60,10 +61,7 @@ export async function CreateController($scope, $storage, $loading){
     }*/
 
     if(!trip.regenerate) {
-        trip = {
-            beginDate: moment(moment().add(3, 'days').format('YYYY-MM-DD')).toDate(),
-            endDate: moment(moment().add(4, 'days').format('YYYY-MM-DD')).toDate(),
-        };
+        trip = defaultTrip;
         await $storage.local.set('trip', trip);
     }else {
         var today = moment();
@@ -99,7 +97,6 @@ export async function CreateController($scope, $storage, $loading){
             $scope.$applyAsync();
         }
     };
-
 
     $scope.$watch('trip.placeName', function($newVal, $oldVal) {
         if ($newVal != $oldVal) {
