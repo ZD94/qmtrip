@@ -136,7 +136,11 @@ export async function CreateController($scope, $storage, $loading){
             return [];
         },
         done: function(val) {
-            $scope.trip.hotelPlace = val.value;
+            if (!val.point || !val.point.lat || !val.point.lng) {
+                $scope.showErrorMsg("获取住宿位置失败");
+                return;
+            }
+            $scope.trip.hotelPlace = val.point.lat + "," + val.point.lng
         }
     };
     $scope.projectSelector = {
@@ -157,7 +161,6 @@ export async function CreateController($scope, $storage, $loading){
             console.info($scope.trip.reason);
         }
     }
-
 
     $scope.nextStep = async function() {
         API.require("travelBudget");

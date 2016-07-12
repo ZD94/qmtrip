@@ -53,12 +53,11 @@ angular
                     if(value == undefined)
                         return;
 
-                    if (!value.name) {
+                    if (!value.title) {
                         $scope.value = value;
                     } else {
-                        $scope.value = value.name;
+                        $scope.value = value.title;
                     }
-
                     if ($scope.callbacks.done && typeof $scope.callbacks.done == 'function') {
                         return $scope.callbacks.done(value);
                     }
