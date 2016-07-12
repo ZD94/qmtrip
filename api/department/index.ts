@@ -160,7 +160,6 @@ class DepartmentModule{
 
         var options : any = {};
         options.where = _.pick(params.where, Object.keys(DBM.Department.attributes));
-        // options.where.deletedAt = { $eq: null };
         if(params.$or) {
             options.where.$or = params.where.$or;
         }
