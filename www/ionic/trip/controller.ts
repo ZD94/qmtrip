@@ -12,8 +12,8 @@ var msgbox = require('msgbox');
 
 
 var defaultTrip = {
-    beginDate: moment().startOf('day').hour(9).toDate(),
-    endDate: moment().startOf('day').hour(21).toDate(),
+    beginDate: moment().add(3, 'days').startOf('day').hour(9).toDate(),
+    endDate: moment().add(4, 'days').startOf('day').hour(21).toDate(),
     place: '',
     placeName: '',
     reason: '',
@@ -180,6 +180,11 @@ export async function CreateController($scope, $storage, $loading){
 
         if(!trip.traffic && ! trip.hotel) {
             $scope.showErrorMsg('请选择交通或者住宿！');
+            return false;
+        }
+
+        if(trip.traffic && !trip.fromPlace) {
+            $scope.showErrorMsg('请选择出发地！');
             return false;
         }
 
