@@ -20,6 +20,7 @@
             <div class="content">
                 <table style="width: 100%">
                     <tr>
+                        <th align="center">序号</th>
                         <th width="140" align="center">公司名称</th>
                         <th width="80" align="center">姓名</th>
                         <th width="90" align="center">出发时间</th>
@@ -33,6 +34,7 @@
                     </tr>
 
                     <tr ng-repeat="item in tripPlans">
+                        <td align="center">{{$index+fromIdx}}</td>
                         <td align="center">
                             <p style="width: 120px; text-align: center; color: #118FD6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px;"><a href="#/companyList/CompanyDetail?company={{item.companyId}}">{{item.company.name}}</a></p>
                         </td>
@@ -75,12 +77,12 @@
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="10">
+                        <td colspan="11">
                             &nbsp;&nbsp;
-                            <a href="javascript:void();" ng-click="prvePage()" ng-show="hasPrevPage">上一页</a>
+                            <a ng-click="prevPage()" ng-show="hasPrevPage">上一页</a>
                             <span ng-hide="hasPrevPage" title="已无数据">上一页</span>
                             &nbsp;&nbsp;
-                            <a ng-click="nextPage()" href="javascript:void();" ng-show="hasNextPage">下一页</a>
+                            <a ng-click="nextPage()" ng-show="hasNextPage">下一页</a>
                             <span ng-hide="hasNextPage" title="已无数据">下一页</span>
                         </td>
                     </tr>

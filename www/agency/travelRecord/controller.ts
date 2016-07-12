@@ -20,6 +20,7 @@ export async function TravelListController($scope, Models, $stateParams){
     $scope.hasNextPage = false;
     $scope.hasPrevPage = false;
     $scope.tripPlans = [];
+    $scope.fromIdx = 1;
     $scope.init = function (status) {
         if (status == $scope.status) return;
         if (status) {
@@ -49,9 +50,13 @@ export async function TravelListController($scope, Models, $stateParams){
     $scope.wrapPagerData = function (pager) {
         if (pager.curPage < (pager.totalPages-1)) {
             $scope.hasNextPage = true;
+        } else {
+            $scope.hasNextPage = false;
         }
-        if (pager.curPage > 1) {
+        if (pager.curPage > 0) {
             $scope.hasPrevPage = true;
+        } else {
+            $scope.hasPrevPage = false;
         }
         return Promise.all(pager.map((item)=> {
             return item.getCompany()
@@ -59,23 +64,24 @@ export async function TravelListController($scope, Models, $stateParams){
                     item.company = company;
                     return item;
                 })
-        }));
+        }))
     }
 
     $scope.prevPage = async function() {
         if ($scope.pager) {
-            $scope.pager = await $scope.pager.nextPage();
-            $scope.trinPlans = $scope.wrapPagerData($scope.pager);
+            $scope.pager = await $scope.pager.prevPage();
+            $scope.tripPlans = await $scope.wrapPagerData($scope.pager);
+            $scope.fromIdx = $scope.fromIdx - $scope.pager.limit;
         }
     }
 
     $scope.nextPage = async function () {
         if ($scope.pager) {
-            $scope.pager = await $scope.pager.prevPage();
-            $scope.trinPlans = $scope.wrapPagerData($scope.pager);
+            $scope.pager = await $scope.pager.nextPage();
+            $scope.tripPlans = await $scope.wrapPagerData($scope.pager);
+            $scope.fromIdx = $scope.fromIdx + $scope.pager.limit;
         }
     }
-
     $scope.init(status);
 }
 

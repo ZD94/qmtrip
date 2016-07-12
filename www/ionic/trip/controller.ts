@@ -12,9 +12,10 @@ var msgbox = require('msgbox');
 
 
 var defaultTrip = {
-    beginDate: moment().startOf('day').hour(9).toDate(),
-    endDate: moment().startOf('day').hour(18).toDate(),
+    beginDate: moment().add(3, 'days').startOf('day').hour(9).toDate(),
+    endDate: moment().add(4, 'days').startOf('day').hour(21).toDate(),
     place: '',
+    placeName: '',
     reason: '',
 
     traffic: false,
@@ -60,10 +61,7 @@ export async function CreateController($scope, $storage, $loading){
     }*/
 
     if(!trip.regenerate) {
-        trip = {
-            beginDate: moment(moment().add(3, 'days').format('YYYY-MM-DD')).toDate(),
-            endDate: moment(moment().add(4, 'days').format('YYYY-MM-DD')).toDate(),
-        };
+        trip = defaultTrip;
         await $storage.local.set('trip', trip);
     }else {
         var today = moment();
@@ -99,7 +97,6 @@ export async function CreateController($scope, $storage, $loading){
             $scope.$applyAsync();
         }
     };
-
 
     $scope.$watch('trip.placeName', function($newVal, $oldVal) {
         if ($newVal != $oldVal) {
@@ -139,7 +136,11 @@ export async function CreateController($scope, $storage, $loading){
             return [];
         },
         done: function(val) {
-            $scope.trip.hotelPlace = val.value;
+            if (!val.point || !val.point.lat || !val.point.lng) {
+                $scope.showErrorMsg("获取住宿位置失败");
+                return;
+            }
+            $scope.trip.hotelPlace = val.point.lat + "," + val.point.lng
         }
     };
     $scope.projectSelector = {
@@ -161,7 +162,6 @@ export async function CreateController($scope, $storage, $loading){
         }
     }
 
-
     $scope.nextStep = async function() {
         API.require("travelBudget");
         await API.onload();
@@ -180,6 +180,11 @@ export async function CreateController($scope, $storage, $loading){
 
         if(!trip.traffic && ! trip.hotel) {
             $scope.showErrorMsg('请选择交通或者住宿！');
+            return false;
+        }
+
+        if(trip.traffic && !trip.fromPlace) {
+            $scope.showErrorMsg('请选择出发地！');
             return false;
         }
 

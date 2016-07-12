@@ -8,3 +8,4 @@ import './selector';
 import './icon';
 import './uploader';
 import './progressBar';
+import './baidu-map';

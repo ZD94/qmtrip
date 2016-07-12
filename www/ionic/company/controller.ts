@@ -161,6 +161,20 @@ export async function DistributionController($scope, Models) {
     API.require("place");
     await API.onload();
 
+    $scope.showPlace = function() {
+        $(".staff-phone").hide();
+        $(".staff-place").show();
+        $("#phone-btn").removeClass('select-button');
+        $("#place-btn").addClass('select-button');
+    };
+
+    $scope.showPhone = function() {
+        $(".staff-place").hide();
+        $(".staff-phone").show();
+        $("#place-btn").removeClass('select-button');
+        $("#phone-btn").addClass('select-button');
+    };
+
     let staff = await Staff.getCurrent();
     let company = staff.company;
 
@@ -210,6 +224,8 @@ export async function DistributionController($scope, Models) {
             markers: markers
         };
         $scope.isShowMap = true;
+
+        $scope.showPlace();
     };
 
     await $scope.selectDate();
@@ -218,20 +234,6 @@ export async function DistributionController($scope, Models) {
         if ($scope.map) {
             $scope.map.centerAndZoom(new window['BMap'].Point(long, lat), 5);
         }
-    };
-
-    $scope.showPlace = function() {
-        $(".staff-phone").hide();
-        $(".staff-place").show();
-        $("#phone-btn").removeClass('select-button');
-        $("#place-btn").addClass('select-button');
-    };
-
-    $scope.showPhone = function() {
-        $(".staff-place").hide();
-        $(".staff-phone").show();
-        $("#place-btn").removeClass('select-button');
-        $("#phone-btn").addClass('select-button');
     };
 }
 
