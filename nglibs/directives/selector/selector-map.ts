@@ -3,7 +3,7 @@ import { loader as loadBaiduMap } from '../baidu-map/baiduScriptLoader';
 declare var BMap;
 declare var BMAP_STATUS_SUCCESS;
 
-export function modalSelectorMap($compile, $scope, $element, $ionicModal, selected){
+export function modalSelectorMap($scope, $ionicModal, selected){
     $scope.showMap = false;
     loadBaiduMap('sFB94QImEEc4ve0uynf8Gt9vvKYcmECw', {retryInterval: 5000}, ()=>{});
     var template = require('./selector-map.html');
