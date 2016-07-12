@@ -200,6 +200,12 @@ export async function CreateController($scope, $storage, $loading){
             isNeedHotel: trip.hotel,
             businessDistrict: trip.hotelPlace
         };
+
+        if(params.originPlace == params.destinationPlace){
+            msgbox.log("出差地点和出发地不能相同");
+            return false;
+        }
+
         let front = ['正在验证出行参数', '正在匹配差旅政策', '正在搜索全网数据', '动态预算即将完成'];
         let templatePrefix = '<img src="/ionic/images/jingli_loading.gif"/><br/>'
         $loading.reset();

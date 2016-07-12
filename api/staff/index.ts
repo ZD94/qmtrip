@@ -145,14 +145,14 @@ class StaffModule{
                 throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
             }
 
-            var account1 = await Models.account.find({where: {email: params.email, type: 1}});
+            var account1 = await Models.account.find({where: {email: params.email, type: 1}, paranoid: false});
             if (account1 && account1.length>0) {
                 throw L.ERR.EMAIL_HAS_REGISTRY();
             }
         }
 
         if(params.mobile){
-            var account2 = await Models.account.find({where: {mobile: params.mobile, type: 1}});
+            var account2 = await Models.account.find({where: {mobile: params.mobile, type: 1}, paranoid: false});
             if (account2 && account2.length>0) {
                 throw L.ERR.MOBILE_HAS_REGISTRY();
             }

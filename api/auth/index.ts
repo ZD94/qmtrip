@@ -445,14 +445,14 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         var type = ACCOUNT_TYPE.COMPANY_STAFF;
         //查询邮箱是否已经注册
         if(data.email){
-            var account1 = await Models.account.find({where: {email: data.email, type: type}});
+            var account1 = await Models.account.find({where: {email: data.email, type: type}, paranoid: false});
             if (account1 && account1.length>0) {
                 throw L.ERR.EMAIL_HAS_REGISTRY();
             }
         }
 
         if(data.mobile){
-            var account2 = await Models.account.find({where: {mobile: mobile, type: type}});
+            var account2 = await Models.account.find({where: {mobile: mobile, type: type}, paranoid: false});
             if (account2 && account2.length>0) {
                 throw L.ERR.MOBILE_HAS_REGISTRY();
             }
@@ -736,7 +736,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * @returns {*}
      */
     @clientExport
-    static async getAccounts (params: {where: any, order?: any, attributes?: any, $or?: any}) {
+    static async getAccounts (params: {where: any, order?: any, attributes?: any, $or?: any, paranoid?: boolean}) {
         if (!params.where) {
             params.where = {};
         }
@@ -755,6 +755,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             options.where.$or = params.$or;
         }
 
+        options.paranoid = params.paranoid;
         let paginate = await Models.account.find(options);
         let ids =  paginate.map(function(t){
             return t.id;
