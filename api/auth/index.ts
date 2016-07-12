@@ -191,7 +191,7 @@ class ApiAuth {
             await API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
 
             //发短信
-            vals.url = await API.shorturl.long2short({longurl: C.host + "/index.html#/login/first-set-pwd?" + url});
+            vals.url = await API.wechat.shorturl({longurl: C.host + "/index.html#/login/first-set-pwd?" + url});
             await API.sms.sendMsgSubmit({template: 'qmFirstSetPwdMsg', mobile: account.mobile, values: vals});
         } else {
             vals.url = C.host + "/index.html#/login/reset-pwd?" + url;
@@ -200,73 +200,6 @@ class ApiAuth {
         }
         return true;
     }
-
-   /* @clientExport
-    static async sendResetPwdMsg (params: {mobile: string, type?: Number, isFirstSet?: boolean, companyName?: string}) : Promise<boolean> {
-        var mobile = params.mobile;
-        var isFirstSet = params.isFirstSet;
-        var type = params.type || 1;
-        var companyName = params.companyName || '';
-
-        if (!mobile) {
-            throw L.ERR.MOBILE_EMPTY();
-        }
-        var acc = await DBM.Account.findOne({where: {mobile: mobile, type: type}});
-        if (!acc) {
-            throw L.ERR.ACCOUNT_NOT_EXIST();
-        }
-        //生成设置密码token
-        var pwdToken = utils.getRndStr(6);
-        var [affect, rows] = await DBM.Account.update({pwdToken: pwdToken}, {where: {id: acc.id}, returning: true});
-        var account = rows[0];
-
-        var staff = await Models.staff.get(account.id);
-        account = account.toJSON();
-
-        var timeStr = utils.now();
-        var oneDay = 24 * 60 * 60 * 1000
-        var timestamp = Date.now() + 2 * oneDay;  //失效时间2天
-        var sign = makeActiveSign(account.pwdToken, account.id, timestamp);
-        var url = "accountId="+account.id+"&timestamp="+timestamp+"&sign="+sign+"&email="+account.email;
-        var templateName;
-        var vals: any = {
-            name: staff.name || account.mobile,
-            username: account.email,
-            time: timeStr,
-            companyName: companyName
-        };
-
-        if (isFirstSet) {
-            vals.url = await API.shorturl.long2short({longurl: C.host + "/index.html#/login/first-set-pwd?" + url});
-            await API.sms.sendMsgSubmit({template: 'qmFirstSetPwdMsg', mobile: account.mobile, values: vals});
-        }
-        return true;
-    }*/
-
-    // async sendResetPwdEmail(params:{email:string; type:number; code:string; ticket:string}):Promise<boolean> {
-    //     let code = params.code;
-    //     let ticket = params.ticket;
-    //     let email = params.email;
-    //     return Promise.resolve(true)
-    //         .then(function() {
-    //             if (!code) {
-    //                 throw L.ERR.CODE_EMPTY();
-    //             }
-    //
-    //             if (!ticket) {
-    //                 throw L.ERR.CODE_ERROR();
-    //             }
-    //
-    //             return API.checkcode.validatePicCheckCode({code: code, ticket: ticket});
-    //         })
-    //         .then(function(){
-    //             let data:any = {
-    //                 email: email,
-    //                 isFirstSet: false
-    //             };
-    //             return  API.auth.sendResetPwdEmail(data);
-    //         });
-    // }
 
     static sendActivateEmail(params:{email:string; companyName?:string}):Promise<boolean> {
         let email = params.email;
@@ -1120,7 +1053,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
                     throw {code: -1, msg: "跳转链接不存在"};
                 }
 
-                return API.shorturl.long2short({longurl: backUrl})
+                return API.wechat.shorturl({longurl: backUrl})
             })
             .then(function(shortUrl) {
                 backUrl = encodeURIComponent(shortUrl);

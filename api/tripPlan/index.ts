@@ -261,7 +261,7 @@ class TripPlanModule {
                 //发送短信提醒
                 if(approveUser.mobile && isMobile(approveUser.mobile)) {
                     try{
-                        let msg_url = await API.shorturl.long2short({longurl: approve_url, shortType: 'md5'});
+                        let msg_url = await API.wechat.shorturl({longurl: approve_url});
                         API.sms.sendMsgSubmit({template: 'travelBudgetApply', mobile: approveUser.mobile,
                             values: {name: user.name, time: moment(tripPlan.startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
                     }catch (e) {
@@ -561,7 +561,7 @@ class TripPlanModule {
             projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel, otherBudget: others,
             totalBudget: '￥' + tripPlan.budget, url: self_url, detailUrl: self_url};
 
-        let msg_url = await API.shorturl.long2short({longurl: self_url, shortType: 'md5'});
+        let msg_url = await API.wechat.shorturl({longurl: self_url});
         let approveResult = '';
         if(auditResult == EAuditStatus.PASS) {
             approveResult = '审批通过';
