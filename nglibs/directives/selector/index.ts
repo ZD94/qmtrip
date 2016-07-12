@@ -47,9 +47,9 @@ angular
                 placeholder: '@ngSelectorPlaceholder',
                 callbacks: '=ngSelectorMap'
             },
-            controller: function($scope, $element, $compile, $ionicModal) {
+            controller: function($scope, $ionicModal) {
                 $scope.showSelectorList = async function() {
-                    var value: any = await modalSelectorMap($compile, $scope, $element, $ionicModal, $scope.value)
+                    var value: any = await modalSelectorMap($scope, $ionicModal, $scope.value)
                     if(value == undefined)
                         return;
 

@@ -2,15 +2,14 @@
     <ion-content padding="false" scroll="false" class="has-header has-bottom-btn">
         <div class="flex_content">
             <ion-scroll>
-                <div id="page20-markdown7" style="color:#000000;text-align:right;">
-                    <p style="color: #fff;">{{tripDetail.createdAt | date: 'yyyy-MM-dd HH:mm'}}</p>
+                <div class="list">
+                    <div class="item opactic" ng-if="tripDetail.status != EPlanStatus.APPROVE_NOT_PASS">
+                        {{statustext[tripDetail['status']] || '预算审批中'}}
+                    </div>
+                    <div class="item opactic" ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS">
+                        审批未通过，备注：{{tripDetail.auditRemark}}
+                    </div>
                 </div>
-
-                <ion-list ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS">
-                    <label class="item item-input opactic">
-                        <span class="input-label op_single">审批未通过，备注：{{tripDetail.auditRemark}}</span>
-                    </label>
-                </ion-list>
                 <ion-list class="jl_projectinfo">
                     <ion-item class="project_tit">{{tripDetail.title}}</ion-item>
                     <ion-item class="project_cont">
@@ -185,11 +184,8 @@
         </div>
         <div class="button-bar flex_footer">
             <a ng-if="tripDetail.status == EPlanStatus.WAIT_COMMIT" ng-click="approveTripPlan()" id="page20-button60" class="button button-positive" no-back>提交审核</a>
+            <a ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD" class="button button-stable" no-back>提交审核</a>
             <a ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS" ng-click="createTripPlan()" id="page20-button61" class="button button-positive" no-back>再次生成</a>
         </div>
-        <div  class="button-bar flex_footer" ng-if="tripDetail.status != EPlanStatus.APPROVE_NOT_PASS && tripDetail.status != EPlanStatus.WAIT_COMMIT">
-            <span class="button button-stable" no-back>{{statustext[tripDetail['status']] || '预算审批中'}}</span>
-        </div>
     </ion-content>
-
 </ion-view>
