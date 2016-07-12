@@ -183,6 +183,11 @@ export async function CreateController($scope, $storage, $loading){
             return false;
         }
 
+        if(trip.traffic && !trip.fromPlace) {
+            $scope.showErrorMsg('请选择出发地！');
+            return false;
+        }
+
         let params = {
             originPlace: trip.fromPlace,
             destinationPlace: trip.place,
