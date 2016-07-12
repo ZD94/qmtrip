@@ -539,21 +539,21 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
             if (!staffId) {
                 //如果不是更新,再去判断
                 //查询邮箱是否已经注册
-                var account1 = await Models.account.find({where: {email: _staff.email, type: 1}});
+                /*var account1 = await Models.account.find({where: {email: _staff.email, type: 1}, paranoid: false});
                 if (account1 && account1.length>0) {
                     throw L.ERR.EMAIL_HAS_REGISTRY();
                 }
 
                 if(_staff.mobile){
-                    var account2 = await Models.account.find({where: {mobile: _staff.mobile, type: 1}});
+                    var account2 = await Models.account.find({where: {mobile: _staff.mobile, type: 1}, paranoid: false});
                     if (account2 && account2.length>0) {
                         throw L.ERR.MOBILE_HAS_REGISTRY();
                     }
-                }
+                }*/
             }else{
                 //如果是更新
                 if(_staff.mobile){
-                    var account2 = await Models.account.find({where: {mobile: _staff.mobile, type: 1, id: {$ne: _staff.id}}});
+                    var account2 = await Models.account.find({where: {mobile: _staff.mobile, type: 1, id: {$ne: _staff.id}}, paranoid: false});
 
                     if (account2 && account2.length>0) {
                         throw L.ERR.MOBILE_HAS_REGISTRY();
@@ -572,20 +572,19 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
                         scope: $scope,
                         buttons: [
                             {
+                                text: '取消',
+                                onTap: async function (e) {
+                                    $scope.role = {id: true};
+                                }
+                            },
+                            {
                                 text: '确定',
                                 type: 'button-positive',
                                 onTap: async function (e) {
                                     _staff = await _staff.save();
                                     $ionicHistory.goBack(-1);
                                 }
-                            },
-                            {
-                                text: '取消',
-                                type: 'button-positive',
-                                onTap: async function (e) {
-                                    $scope.role = {id: true};
-                                }
-                    }
+                            }
                         ]
                     })
                 }
