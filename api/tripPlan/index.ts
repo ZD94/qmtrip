@@ -725,11 +725,13 @@ class TripPlanModule {
 
         if(tripDetails && tripDetails.length > 0) {
             tripDetails.map(function (detail) {
-                detail.isCommit = true;
                 if (detail.type == ETripType.SUBSIDY) {
                     return;
                 }
-                detail.status = EPlanStatus.AUDITING;
+                if (detail.status == EPlanStatus.WAIT_COMMIT) {
+                    detail.isCommit = true;
+                    detail.status = EPlanStatus.AUDITING;
+                }
             })
         }
 
