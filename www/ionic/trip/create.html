@@ -41,7 +41,7 @@
                 <ion-toggle toggle-class="toggle-positive" ng-model="trip.round">返程</ion-toggle>
             </div>
             <div class="spacer" style="width: 300px; height: 9px;"></div>
-            <ion-toggle toggle-class="toggle-positive" ng-model="trip.hotel">住宿<span ng-if="trip.hotel">（共{{calcTripDuration()}}天）</span></ion-toggle>
+            <ion-toggle toggle-class="toggle-positive" ng-disabled="trip.placeName == ''" ng-model="trip.hotel">住宿<span ng-if="trip.hotel">（共{{calcTripDuration()}}天）</span></ion-toggle>
             <div ng-if="trip.hotel">
                 <!--<div class="button-bar">
                     &lt;!&ndash;<button id="page6-button34" class="button button-light button-small button-block" ng-click="decTripDuration()">-</button>&ndash;&gt;
@@ -50,10 +50,11 @@
                 </div>-->
                 <div class="item item-input" style="margin-top: 10px;">
                     <span class="input-label">地标</span>
-                    <div ng-model="trip.hotelPlaceName"
-                           ng-selector="hotelPlaceSelector"
-                           ng-selector-title="请选择地标"
-                           ng-selector-placeholder='请输入地标名称或首字母' class="business_chooese"
+                    <div ng-model="trip.hotelPlaceObj"
+                         ng-selector-map="hotelPlaceSelector"
+                         ng-selector-city="trip.placeName"
+                         ng-selector-title="请选择地标"
+                         ng-selector-placeholder='请输入地标名称或首字母' class="business_chooese"
                     ></div>
                 </div>
             </div>
