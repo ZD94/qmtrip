@@ -478,75 +478,76 @@ class TripPlanModule {
             });
             tripPlan.finalBudgetCreateAt = budgetInfo.createAt;
             tripPlan.originalBudget = tripPlan.budget;
-            tripPlan.budget = finalBudget;
             tripPlan.isFinalBudget = true;
             let budgets = budgetInfo.budgets;
             let query = budgetInfo.query;
 
-            let oldDetails = await tripPlan.getTripDetails({where: {}});
-            oldDetails.map(async (v) => {
-                await Models.tripDetail.destroy(v);
-            });
+            if(finalBudget > tripPlan.budget) {
+                tripPlan.budget = finalBudget;
+                let oldDetails = await tripPlan.getTripDetails({where: {}});
+                oldDetails.map(async (v) => {
+                    await Models.tripDetail.destroy(v);
+                }); //更新详情信息
 
-            //更新详情信息
-            budgets.forEach(async (budget) => {
-                let price = Number(budget.price);
-                let tripType = budget.tripType;
-                let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: price});
-                detail.accountId = staff.id;
-                detail.isCommit = false;
-                detail.status = EPlanStatus.WAIT_UPLOAD;
-                detail.tripPlan = tripPlan;
+                budgets.forEach(async (budget) => {
+                    let price = Number(budget.price);
+                    let tripType = budget.tripType;
+                    let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: price});
+                    detail.accountId = staff.id;
+                    detail.isCommit = false;
+                    detail.status = EPlanStatus.WAIT_UPLOAD;
+                    detail.tripPlan = tripPlan;
 
-                let hotelName = '';
-                if(query.businessDistrict) {
-                    let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
-                    hotelName = hotelInfo ? hotelInfo.name : '';
-                }
+                    let hotelName = '';
+                    if(query.businessDistrict) {
+                        let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
+                        hotelName = hotelInfo ? hotelInfo.name : '';
+                    }
 
-                switch(tripType) {
-                    case ETripType.OUT_TRIP:
-                        detail.deptCityCode = query.originPlace;
-                        detail.arrivalCityCode = query.destinationPlace;
-                        detail.deptCity = tripPlan.deptCity;
-                        detail.arrivalCity = tripPlan.arrivalCity;
-                        detail.startTime = query.leaveDate;
-                        detail.endTime = query.goBackDate;
-                        break;
-                    case ETripType.BACK_TRIP:
-                        detail.deptCityCode = query.destinationPlace;
-                        detail.arrivalCityCode = query.originPlace;
-                        detail.deptCity = tripPlan.arrivalCity;
-                        detail.arrivalCity = tripPlan.deptCity;
-                        detail.startTime = query.goBackDate;
-                        detail.endTime = query.leaveDate;
-                        break;
-                    case ETripType.HOTEL:
-                        detail.cityCode = query.destinationPlace;
-                        detail.city = tripPlan.arrivalCity;
-                        detail.hotelCode = query.businessDistrict;
-                        detail.hotelName = hotelName;
-                        detail.startTime = query.checkInDate || query.leaveDate;
-                        detail.endTime = query.checkOutDate || query.goBackDate;
-                        break;
-                    case ETripType.SUBSIDY:
-                        detail.deptCityCode = query.originPlace;
-                        detail.arrivalCityCode = query.destinationPlace;
-                        detail.deptCity = tripPlan.deptCity;
-                        detail.arrivalCity = tripPlan.arrivalCity;
-                        detail.startTime = query.leaveDate || query.checkInDate;
-                        detail.endTime = query.goBackDate || query.checkOutDate;
-                        detail.expenditure = price;
-                        detail.status = EPlanStatus.COMPLETE;
-                        break;
-                    default:
-                        detail.type = ETripType.OTHER;
-                        detail.startTime = query.leaveDate;
-                        detail.endTime = query.goBackDate;
-                        break;
-                }
-                await detail.save();
-            });
+                    switch(tripType) {
+                        case ETripType.OUT_TRIP:
+                            detail.deptCityCode = query.originPlace;
+                            detail.arrivalCityCode = query.destinationPlace;
+                            detail.deptCity = tripPlan.deptCity;
+                            detail.arrivalCity = tripPlan.arrivalCity;
+                            detail.startTime = query.leaveDate;
+                            detail.endTime = query.goBackDate;
+                            break;
+                        case ETripType.BACK_TRIP:
+                            detail.deptCityCode = query.destinationPlace;
+                            detail.arrivalCityCode = query.originPlace;
+                            detail.deptCity = tripPlan.arrivalCity;
+                            detail.arrivalCity = tripPlan.deptCity;
+                            detail.startTime = query.goBackDate;
+                            detail.endTime = query.leaveDate;
+                            break;
+                        case ETripType.HOTEL:
+                            detail.cityCode = query.destinationPlace;
+                            detail.city = tripPlan.arrivalCity;
+                            detail.hotelCode = query.businessDistrict;
+                            detail.hotelName = hotelName;
+                            detail.startTime = query.checkInDate || query.leaveDate;
+                            detail.endTime = query.checkOutDate || query.goBackDate;
+                            break;
+                        case ETripType.SUBSIDY:
+                            detail.deptCityCode = query.originPlace;
+                            detail.arrivalCityCode = query.destinationPlace;
+                            detail.deptCity = tripPlan.deptCity;
+                            detail.arrivalCity = tripPlan.arrivalCity;
+                            detail.startTime = query.leaveDate || query.checkInDate;
+                            detail.endTime = query.goBackDate || query.checkOutDate;
+                            detail.expenditure = price;
+                            detail.status = EPlanStatus.COMPLETE;
+                            break;
+                        default:
+                            detail.type = ETripType.OTHER;
+                            detail.startTime = query.leaveDate;
+                            detail.endTime = query.goBackDate;
+                            break;
+                    }
+                    await detail.save();
+                });
+            }
         }
 
         tripPlan.auditStatus = auditResult;
