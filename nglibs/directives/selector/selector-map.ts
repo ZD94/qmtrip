@@ -77,9 +77,12 @@ export function modalSelectorMap($scope, $ionicModal, selected){
             //renderOptions: {map: map},
             onSearchComplete: onSearchComplete
         });
-        local.searchInBounds($scope.form.keyword, map.getBounds());
+        //var key = $scope.form.keyword;
+        //console.log('searchNearby', key);
+        local.searchNearby($scope.form.keyword, $scope.city);
         function onSearchComplete(results) {
             // 判断状态是否正确
+            //console.log('onSearchComplete ', key, local.getStatus(), results);
             if(local.getStatus() == BMAP_STATUS_SUCCESS) {
                 var s = [];
                 for(var i = 0; i < results.getCurrentNumPois(); i++) {
@@ -93,6 +96,19 @@ export function modalSelectorMap($scope, $ionicModal, selected){
         }
     });
 
+    $scope.keywordColor = function(title){
+        var keyword = $scope.form.keyword;
+        var regkeyword = new RegExp(keyword,'ig');
+        var colorful = '<span class="color_key">'+ keyword + '</span>';
+        if(title.indexOf(keyword)>=0){
+            var msg = title.replace(regkeyword,colorful);
+            return msg;
+        }
+        else{
+            return title;
+        }
+    };
+
     return new Promise(function(resolve, reject) {
         $scope.confirmModal = function() {
             $scope.modal.hide();
@@ -105,5 +121,4 @@ export function modalSelectorMap($scope, $ionicModal, selected){
         $scope.modal.show();
 
     })
-
 }

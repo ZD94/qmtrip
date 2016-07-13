@@ -422,7 +422,7 @@ export async function ListController($scope , Models){
 }
 
 
-export async function ListDetailController($location, $scope , Models, $stateParams, $storage ){
+export async function ListDetailController($location, $scope , Models, $stateParams, $storage, $ionicPopup){
     let id = $stateParams.tripid;
     if (!id) {
         $location.path("/");
@@ -539,9 +539,28 @@ export async function ListDetailController($location, $scope , Models, $statePar
         .catch(callback)
     }
 
-    $scope.approveTripPlan = async function() {
+    $scope.showAlterDialog = function () {
+        $scope.reject = {reason: ''};
+        $ionicPopup.show({
+            title: '确认提交该出差计划？',
+            scope: $scope,
+            buttons: [{
+                text: '取消'
+            },{
+                text: '确认',
+                type: 'button-positive',
+                onTap: async function (e) {
+                    approveTripPlan();
+                }
+            }]
+        })
+    };
+
+    async function approveTripPlan() {
         try {
+            console.info('before commit...');
             await API.tripPlan.commitTripPlan({id: id});
+            console.info('after commit...');
             alert('提交成功')
             window.location.href="#/trip/list"
         }catch(e) {

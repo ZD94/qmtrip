@@ -478,31 +478,31 @@ class TripPlanModule {
             });
             tripPlan.finalBudgetCreateAt = budgetInfo.createAt;
             tripPlan.originalBudget = tripPlan.budget;
-            tripPlan.budget = finalBudget;
             tripPlan.isFinalBudget = true;
             let budgets = budgetInfo.budgets;
             let query = budgetInfo.query;
 
-            let oldDetails = await tripPlan.getTripDetails({where: {}});
-            oldDetails.map(async (v) => {
-                await Models.tripDetail.destroy(v);
-            });
+            if(finalBudget > tripPlan.budget) {
+                tripPlan.budget = finalBudget;
+                let oldDetails = await tripPlan.getTripDetails({where: {}});
+                oldDetails.map(async (v) => {
+                    await Models.tripDetail.destroy(v);
+                }); //更新详情信息
 
-            //更新详情信息
-            budgets.forEach(async (budget) => {
-                let price = Number(budget.price);
-                let tripType = budget.tripType;
-                let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: price});
-                detail.accountId = staff.id;
-                detail.isCommit = false;
-                detail.status = EPlanStatus.WAIT_UPLOAD;
-                detail.tripPlan = tripPlan;
+                budgets.forEach(async (budget) => {
+                    let price = Number(budget.price);
+                    let tripType = budget.tripType;
+                    let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: price});
+                    detail.accountId = staff.id;
+                    detail.isCommit = false;
+                    detail.status = EPlanStatus.WAIT_UPLOAD;
+                    detail.tripPlan = tripPlan;
 
-                let hotelName = '';
-                if(query.businessDistrict) {
-                    let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
-                    hotelName = hotelInfo ? hotelInfo.name : '';
-                }
+                    let hotelName = '';
+                    if(query.businessDistrict) {
+                        let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
+                        hotelName = hotelInfo ? hotelInfo.name : '';
+                    }
 
                 switch(tripType) {
                     case ETripType.OUT_TRIP:
