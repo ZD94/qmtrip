@@ -596,6 +596,11 @@ export async function ListDetailController($location, $scope , Models, $statePar
 }
 
 export async function InvoiceDetailController($scope , Models, $stateParams){
+    //////绑定上传url
+    let authDataStr = window['getAuthDataStr']();
+    $scope.uploadUrl = '/upload/ajax-upload-file?type=image&'+authDataStr;
+    ///// END
+    
     //////////////显示票据之前先显示loading图
     $scope.showLoading = true;
     angular.element("#previewInvoiceImg").bind("load", function() {
