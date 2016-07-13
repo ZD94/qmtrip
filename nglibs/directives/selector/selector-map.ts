@@ -77,9 +77,12 @@ export function modalSelectorMap($scope, $ionicModal, selected){
             //renderOptions: {map: map},
             onSearchComplete: onSearchComplete
         });
-        local.searchInBounds($scope.form.keyword, map.getBounds());
+        //var key = $scope.form.keyword;
+        //console.log('searchNearby', key);
+        local.searchNearby($scope.form.keyword, $scope.city);
         function onSearchComplete(results) {
             // 判断状态是否正确
+            //console.log('onSearchComplete ', key, local.getStatus(), results);
             if(local.getStatus() == BMAP_STATUS_SUCCESS) {
                 var s = [];
                 for(var i = 0; i < results.getCurrentNumPois(); i++) {
