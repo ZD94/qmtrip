@@ -107,6 +107,7 @@ class TripPlanModule {
                     detail.arrivalCity = tripPlan.arrivalCity;
                     detail.startTime = query.leaveDate;
                     detail.endTime = query.goBackDate;
+                    detail.cabinClass = budget.cabinClass;
                     tripPlan.isNeedTraffic = true;
                     break;
                 case ETripType.BACK_TRIP:
@@ -116,6 +117,7 @@ class TripPlanModule {
                     detail.arrivalCity = tripPlan.deptCity;
                     detail.startTime = query.goBackDate;
                     detail.endTime = query.leaveDate;
+                    detail.cabinClass = budget.cabinClass;
                     tripPlan.isNeedTraffic = true;
                     break;
                 case ETripType.HOTEL:
@@ -512,6 +514,7 @@ class TripPlanModule {
                         detail.arrivalCity = tripPlan.arrivalCity;
                         detail.startTime = query.leaveDate;
                         detail.endTime = query.goBackDate;
+                        detail.cabinClass = budget.cabinClass;
                         break;
                     case ETripType.BACK_TRIP:
                         detail.deptCityCode = query.destinationPlace;
@@ -520,6 +523,7 @@ class TripPlanModule {
                         detail.arrivalCity = tripPlan.deptCity;
                         detail.startTime = query.goBackDate;
                         detail.endTime = query.leaveDate;
+                        detail.cabinClass = budget.cabinClass;
                         break;
                     case ETripType.HOTEL:
                         detail.cityCode = query.destinationPlace;

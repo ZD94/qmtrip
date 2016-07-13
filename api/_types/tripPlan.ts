@@ -378,6 +378,10 @@ export class TripDetail extends ModelObject{
     @Field({type: Types.INTEGER})
     get invoiceType(): EInvoiceType { return 0; }
     set invoiceType(val: EInvoiceType) {}
+    
+    @Field({type: Types.STRING})
+    get cabinClass(): string { return ''; }
+    set cabinClass(val: string) {}
 
     @ResolveRef({type: Types.UUID}, Models.tripPlan)
     get tripPlan(): TripPlan { return null; }
