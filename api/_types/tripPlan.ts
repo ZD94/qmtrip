@@ -23,14 +23,13 @@ export enum ETripType {
     BACK_TRIP = 1,
     HOTEL = 2,
     SUBSIDY = 3,
-    OTHER = 4,
 }
 
 export enum EInvoiceType {
     TRAIN = 0,
     PLANE = 1,
     HOTEL = 2,
-    OTHER = 3,
+    SUBSIDY = 3,
 }
 
 export enum  EAuditStatus {

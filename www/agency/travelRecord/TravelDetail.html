@@ -57,6 +57,8 @@
                             </div>
                         </td>
 
+                        <td ng-if="[0, 1, 2, 3].indexOf(tripDetail.type) < 0" align="center">未知类型</td>
+
                         <td width="135" align="center">
                             <span ng-if="tripDetail.budget != -1">¥{{tripDetail.budget| currency: ''}}</span>
                             <a ng-if="tripDetail.budget == -1" ng-click="editBudgetShow(tripDetail.id)" style="color: #118FD6;">录入预算</a>

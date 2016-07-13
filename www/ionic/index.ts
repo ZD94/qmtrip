@@ -19,8 +19,25 @@ API.onlogin(function(){
     window.location.href = "#/login/?backurl="+backUrl;
 });
 
+function getAuthData() {
+    return localStorage.getItem('auth_data');
+}
+
+window['getAuthDataStr'] = function() {
+    let authData: any = getAuthData();
+    if (typeof authData == 'string') {
+        authData = JSON.parse(authData);
+    }
+    let strs: any = [];
+    for(var k in authData) {
+        strs.push(k+'='+authData[k]);
+    }
+    strs = strs.join("&");
+    return strs;
+}
+
 API.authenticate = function(remote, callback){
-    var datastr = localStorage.getItem('auth_data');
+    var datastr = getAuthData();
     if(!datastr){
         return callback(L.ERR.NEED_LOGIN, remote);
     }

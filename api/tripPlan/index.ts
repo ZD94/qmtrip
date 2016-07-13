@@ -16,7 +16,7 @@ let scheduler = require('common/scheduler');
 import _ = require('lodash');
 import {requireParams, clientExport} from 'common/api/helper';
 import {Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, ETripType, EAuditStatus } from "api/_types/tripPlan";
-import {Models} from "api/_types/index";
+import {Models, EAccountType} from "api/_types/index";
 import {FindResult} from "common/model/interface";
 import {Staff, EStaffRole, EStaffStatus} from "api/_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
@@ -129,7 +129,7 @@ class TripPlanModule {
                     tripPlan.isNeedHotel = true;
                     break;
                 case ETripType.SUBSIDY:
-                    detail.type = ETripType.OTHER;
+                    detail.type = ETripType.SUBSIDY;
                     detail.deptCityCode = query.originPlace;
                     detail.arrivalCityCode = query.destinationPlace;
                     detail.deptCity = tripPlan.deptCity;
@@ -140,7 +140,7 @@ class TripPlanModule {
                     detail.status = EPlanStatus.COMPLETE;
                     break;
                 default:
-                    detail.type = ETripType.OTHER;
+                    detail.type = ETripType.SUBSIDY;
                     detail.startTime = query.leaveDate;
                     detail.endTime = query.goBackDate;
                     break;
@@ -220,11 +220,12 @@ class TripPlanModule {
             hotelStr += '动态预算￥' + h.budget;
         }
 
-        let subsidy = await tripPlan.getTripDetails({where: {type: [ETripType.SUBSIDY, ETripType.OTHER]}});
+        let subsidy = await tripPlan.getTripDetails({where: {type: [ETripType.SUBSIDY]}});
         if(subsidy && subsidy.length > 0) {
             let subsidyBudget = 0;
             subsidy.map((s) => {subsidyBudget += s.budget;});
-            others = moment(subsidy[0].startTime).format('YYYY-MM-DD') + ' 至 ' + moment(subsidy[0].endTime).format('YYYY-MM-DD') + '，动态预算￥' + subsidyBudget;
+            // others = moment(subsidy[0].startTime).format('YYYY-MM-DD') + ' 至 ' + moment(subsidy[0].endTime).format('YYYY-MM-DD') + '￥' + subsidyBudget;
+            others = '￥' + subsidyBudget;
         }
 
         return {go: go, back: back, hotel: hotelStr, others: others};
@@ -282,8 +283,8 @@ class TripPlanModule {
                             approveUser: approveUser.name,
                             tripPlanNo: tripPlan.planNo,
                             staffName: user.name,
-                            content: '员工' + user.name + moment(tripPlan.startAt).format('YYYY-MM-DD') + '到' + tripPlan.arrivalCity + '的出差计划已经发送给您，预算：￥' + tripPlan.budget + '，等待您审核！',
-                            createdAt: moment(tripPlan.startAt).format('YYYY-MM-DD'),
+                            content: '员工' + user.name + moment(tripPlan.startAt).format('YYYY-MM-DD') + '到' + tripPlan.arrivalCity + '的出差计划已经发送给您，预算：￥' + tripPlan.budget + '，等待您审批！',
+                            createdAt: utils.now(),
                             autoApproveTime: moment(tripPlan.autoApproveTime).format('YYYY-MM-DD HH:mm:ss')
                         };
                         API.wechat.sendTemplateMessage({templateName: 'WAIT_APPROVE_MESSAGE', openId: openId, url: approve_url, values: values});
@@ -464,7 +465,10 @@ class TripPlanModule {
             if (!budgetId) {
                 throw new Error(`预算信息已失效请重新生成`);
             }
-            let budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripPlan["accountId"]});
+            let budgetInfo = await API.client.travelBudget.getBudgetInfo({
+                id: budgetId,
+                accountId: tripPlan["accountId"]
+            });
             if (!budgetInfo) {
                 throw new Error(`预算信息已失效请重新生成`);
             }
@@ -482,14 +486,14 @@ class TripPlanModule {
             let budgets = budgetInfo.budgets;
             let query = budgetInfo.query;
 
-            if(finalBudget > tripPlan.budget) {
+            if (finalBudget > tripPlan.budget) {
                 tripPlan.budget = finalBudget;
                 let oldDetails = await tripPlan.getTripDetails({where: {}});
-                oldDetails.map(async (v) => {
+                oldDetails.map(async(v) => {
                     await Models.tripDetail.destroy(v);
                 }); //更新详情信息
 
-                budgets.forEach(async (budget) => {
+                budgets.forEach(async(budget) => {
                     let price = Number(budget.price);
                     let tripType = budget.tripType;
                     let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: price});
@@ -499,12 +503,12 @@ class TripPlanModule {
                     detail.tripPlan = tripPlan;
 
                     let hotelName = '';
-                    if(query.businessDistrict) {
-                        let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
+                    if (query.businessDistrict) {
+                        let hotelInfo = await API.place.getCityInfo({cityCode: query.businessDistrict});
                         hotelName = hotelInfo ? hotelInfo.name : '';
                     }
 
-                    switch(tripType) {
+                    switch (tripType) {
                         case ETripType.OUT_TRIP:
                             detail.deptCityCode = query.originPlace;
                             detail.arrivalCityCode = query.destinationPlace;
@@ -540,7 +544,7 @@ class TripPlanModule {
                             detail.status = EPlanStatus.COMPLETE;
                             break;
                         default:
-                            detail.type = ETripType.OTHER;
+                            detail.type = ETripType.SUBSIDY;
                             detail.startTime = query.leaveDate;
                             detail.endTime = query.goBackDate;
                             break;
@@ -719,7 +723,7 @@ class TripPlanModule {
         if(tripPlan.status != EPlanStatus.WAIT_COMMIT) {
             throw {code: -2, msg: "该出差计划不能提交，请检查状态"};
         }
-        
+
         let tripDetails = await tripPlan.getTripDetails({where: {}});
         tripPlan.status = EPlanStatus.AUDITING;
         tripPlan.isCommit = true;
@@ -738,6 +742,46 @@ class TripPlanModule {
 
         await Promise.all(tripDetails.map((detail) => detail.save()));
         await tripPlan.save();
+
+        let default_agency = config.default_agency;
+        if(default_agency && default_agency.manager_email) {
+            let auditEmail = default_agency.manager_email;
+            let accounts = await Models.account.find({where: {email: auditEmail}});
+
+            if(!accounts || accounts.length <= 0) {
+                return true;
+            }
+
+            let user:any = await Models.agencyUser.get(accounts[0].id);
+            if(!user) {
+                user = await Models.staff.get(accounts[0].id);
+            }
+
+            let company = await tripPlan.getCompany();
+            if(msgConfig.is_send_email) {
+                let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
+                let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
+                let auditValues = {auditUserName: user.name, companyName: company.name, staffName: tripPlan.account.name, projectName: tripPlan.title,
+                    goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel, otherBudget: others, totalBudget: tripPlan.budget, url: auditUrl, detailUrl: auditUrl
+                };
+                API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_invoice_wait_audit', values: auditValues});
+            }
+
+
+            //发送微信消息
+            if(msgConfig.is_send_wechat) {
+                let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
+                if(openId) {
+                    let values = {
+                        approveUser: user.name, tripPlanNo: tripPlan.planNo, staffName: user.name,
+                        content: "企业 " + company.name + " 员工 " +  user.name + moment(tripPlan.startAt).format('YYYY-MM-DD') + '到' + tripPlan.arrivalCity + '的出差计划票据已提交，预算：￥' + tripPlan.budget + '，等待您审核！',
+                        createdAt: utils.now()
+                    };
+                    API.wechat.sendTemplateMessage({templateName: 'WAIT_AUDIT_MESSAGE', openId: openId, url: '', values: values});
+                }
+            }
+        }
+
         return true;
     }
 
@@ -787,6 +831,25 @@ class TripPlanModule {
             throw L.ERR.PERMISSION_DENIED(); //代理商只能审核票据权限
         }
         await Promise.all([tripPlan.save(), tripDetail.save()]);
+
+        //如果出差已经完成,并且有节省反积分,增加员工积分
+        if (tripPlan.status == EPlanStatus.COMPLETE && tripPlan.score > 0) {
+            var staff = await Models.staff.get(tripPlan.account.id);
+            let pc = Models.pointChange.create({
+                currentPoints: staff.balancePoints, status: 1,
+                staff: staff, company: staff.company,
+                points: tripPlan.score, remark: `节省反积分${tripPlan.score}`,
+                orderId: tripPlan.id});
+            await pc.save();
+            try {
+                staff.totalPoints = staff.totalPoints + tripPlan.score;
+                staff.balancePoints = staff.balancePoints + tripPlan.score;
+                await staff.save();
+            } catch(err) {
+                //如果保存出错,删除日志记录
+                await pc.destroy();
+            }
+        }
         return true;
     }
 
@@ -957,8 +1020,7 @@ class TripPlanModule {
             _detail.tripPlan = tripPlan;
             _detail.accountId = staff.id;
             _detail.status = 0;
-            console.info("补助自动计算:", _detail.type, ETripType.OTHER, _detail.type == ETripType.OTHER)
-            if (_detail.type == ETripType.OTHER) {
+            if (_detail.type == ETripType.SUBSIDY) {
                 _detail.status = EPlanStatus.COMPLETE;
                 _detail.expenditure = _detail.budget;
                 console.info(_detail)
@@ -1081,7 +1143,6 @@ class TripPlanModule {
         logger.info('run task ' + taskId);
         scheduler('*/5 * * * *', taskId, async function() {
             let tripPlans = await Models.tripPlan.find({where: {autoApproveTime: {$lte: utils.now()}, status: EPlanStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
-            // logger.info("自动审批出差计划...");
             tripPlans.map(async (p) => {
                 let details = await p.getTripDetails({});
                 p.status = EPlanStatus.WAIT_UPLOAD;

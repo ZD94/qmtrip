@@ -63,7 +63,8 @@
     "email": "agency.agency@jingli.tech",
     "pwd": "123456",
     "mobile": "",
-    "user_name": "鲸力代理商"
+    "user_name": "鲸力代理商",
+    "manager_email": "shuang.cao@jingli.tech"
   },
   "message": {
     "is_send_message": true,
