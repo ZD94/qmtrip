@@ -22,7 +22,7 @@
                     <div>
                         <ion-list>
                             <ion-item ng-repeat="result in results" ng-click="locateResult(result)">
-                                {{result.title}} {{result.address}} {{result.point.lat}} {{result.point.lng}}
+                                <span ng-bind-html="keywordColor(result.title)"></span><p>{{result.address}}</p>
                             </ion-item>
                         </ion-list>
                     </div>
