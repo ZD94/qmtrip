@@ -16,7 +16,7 @@ let scheduler = require('common/scheduler');
 import _ = require('lodash');
 import {requireParams, clientExport} from 'common/api/helper';
 import {Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, ETripType, EAuditStatus } from "api/_types/tripPlan";
-import {Models} from "api/_types/index";
+import {Models, EAccountType} from "api/_types/index";
 import {FindResult} from "common/model/interface";
 import {Staff, EStaffRole, EStaffStatus} from "api/_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
@@ -224,7 +224,8 @@ class TripPlanModule {
         if(subsidy && subsidy.length > 0) {
             let subsidyBudget = 0;
             subsidy.map((s) => {subsidyBudget += s.budget;});
-            others = moment(subsidy[0].startTime).format('YYYY-MM-DD') + ' 至 ' + moment(subsidy[0].endTime).format('YYYY-MM-DD') + '，动态预算￥' + subsidyBudget;
+            // others = moment(subsidy[0].startTime).format('YYYY-MM-DD') + ' 至 ' + moment(subsidy[0].endTime).format('YYYY-MM-DD') + '￥' + subsidyBudget;
+            others = '￥' + subsidyBudget;
         }
 
         return {go: go, back: back, hotel: hotelStr, others: others};
@@ -282,8 +283,8 @@ class TripPlanModule {
                             approveUser: approveUser.name,
                             tripPlanNo: tripPlan.planNo,
                             staffName: user.name,
-                            content: '员工' + user.name + moment(tripPlan.startAt).format('YYYY-MM-DD') + '到' + tripPlan.arrivalCity + '的出差计划已经发送给您，预算：￥' + tripPlan.budget + '，等待您审核！',
-                            createdAt: moment(tripPlan.startAt).format('YYYY-MM-DD'),
+                            content: '员工' + user.name + moment(tripPlan.startAt).format('YYYY-MM-DD') + '到' + tripPlan.arrivalCity + '的出差计划已经发送给您，预算：￥' + tripPlan.budget + '，等待您审批！',
+                            createdAt: utils.now(),
                             autoApproveTime: moment(tripPlan.autoApproveTime).format('YYYY-MM-DD HH:mm:ss')
                         };
                         API.wechat.sendTemplateMessage({templateName: 'WAIT_APPROVE_MESSAGE', openId: openId, url: approve_url, values: values});
@@ -737,6 +738,46 @@ class TripPlanModule {
 
         await Promise.all(tripDetails.map((detail) => detail.save()));
         await tripPlan.save();
+        
+        let default_agency = config.default_agency;
+        if(default_agency && default_agency.manager_email) {
+            let auditEmail = default_agency.manager_email;
+            let accounts = await Models.account.find({where: {email: auditEmail}});
+            
+            if(!accounts || accounts.length <= 0) {
+                return true;
+            }
+
+            let user:any = await Models.agencyUser.get(accounts[0].id);
+            if(!user) {
+                user = await Models.staff.get(accounts[0].id);
+            }
+
+            let company = await tripPlan.getCompany();
+            if(msgConfig.is_send_email) {
+                let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
+                let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
+                let auditValues = {auditUserName: user.name, companyName: company.name, staffName: tripPlan.account.name, projectName: tripPlan.title,
+                    goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel, otherBudget: others, totalBudget: tripPlan.budget, url: auditUrl, detailUrl: auditUrl
+                };
+                API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_invoice_wait_audit', values: auditValues});
+            }
+
+            
+            //发送微信消息
+            if(msgConfig.is_send_wechat) {
+                let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
+                if(openId) {
+                    let values = {
+                        approveUser: user.name, tripPlanNo: tripPlan.planNo, staffName: user.name,
+                        content: "企业 " + company.name + " 员工 " +  user.name + moment(tripPlan.startAt).format('YYYY-MM-DD') + '到' + tripPlan.arrivalCity + '的出差计划票据已提交，预算：￥' + tripPlan.budget + '，等待您审核！',
+                        createdAt: utils.now()
+                    };
+                    API.wechat.sendTemplateMessage({templateName: 'WAIT_AUDIT_MESSAGE', openId: openId, url: '', values: values});
+                }
+            }
+        }
+        
         return true;
     }
 
