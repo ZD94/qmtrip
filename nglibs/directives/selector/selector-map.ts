@@ -93,6 +93,19 @@ export function modalSelectorMap($scope, $ionicModal, selected){
         }
     });
 
+    $scope.keywordColor = function(title){
+        var keyword = $scope.form.keyword;
+        var regkeyword = new RegExp(keyword,'ig');
+        var colorful = '<span class="color_key">'+ keyword + '</span>';
+        if(title.indexOf(keyword)>=0){
+            var msg = title.replace(regkeyword,colorful);
+            return msg;
+        }
+        else{
+            return title;
+        }
+    };
+
     return new Promise(function(resolve, reject) {
         $scope.confirmModal = function() {
             $scope.modal.hide();
@@ -105,5 +118,4 @@ export function modalSelectorMap($scope, $ionicModal, selected){
         $scope.modal.show();
 
     })
-
 }
