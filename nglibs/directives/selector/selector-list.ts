@@ -2,7 +2,7 @@
 declare var API: any;
 
 export async function modalSelectorList($scope, $ionicModal, selected) {
-    var template = require('./selector-list.html');
+    var template = require('./selector-list-dialog.html');
     $scope.modal = $ionicModal.fromTemplate(template, {
         scope: $scope,
         animation: 'slide-in-up',

@@ -100,7 +100,7 @@ export async function CreateController($scope, $storage, $loading){
 
     $scope.$watch('trip.placeName', function($newVal, $oldVal) {
         if ($newVal != $oldVal) {
-            $scope.trip.hotelPlaceName = '';
+            $scope.trip.hotelPlaceObj = undefined;
             $scope.trip.hotelPlace = '';
         }
     });

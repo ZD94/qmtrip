@@ -9,7 +9,7 @@ angular
     .directive('ngSelector', function() {
         return {
             restrict: 'A',
-            template: require('./selector.html'),
+            template: require('./selector-list.html'),
             scope: {
                 value: '=ngModel',
                 title: '@ngSelectorTitle',
@@ -39,7 +39,7 @@ angular
         require('./selector-map.scss');
         return {
             restrict: 'A',
-            template: require('./selector.html'),
+            template: require('./selector-map.html'),
             scope: {
                 value: '=ngModel',
                 title: '@ngSelectorTitle',
@@ -53,11 +53,8 @@ angular
                     if(value == undefined)
                         return;
 
-                    if (!value.title) {
-                        $scope.value = value;
-                    } else {
-                        $scope.value = value.title;
-                    }
+                    $scope.value = value;
+
                     if ($scope.callbacks.done && typeof $scope.callbacks.done == 'function') {
                         return $scope.callbacks.done(value);
                     }

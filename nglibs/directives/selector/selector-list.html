@@ -1,21 +1,4 @@
-<ion-modal-view>
-    <ion-header-bar class="bar-stable">
-        <h1 class="title">{{title}}</h1>
-        <div class="button button-clear" ng-click="modal.hide()">取消</div>
-    </ion-header-bar>
-    <ion-content padding="true" class="has-header">
-        <form class="list">
-            <label class="item item-input">
-                <i class="icon ion-search placeholder-icon"></i>
-                <input ng-model="form.keyword" type="search" placeholder="{{placeholder}}">
-            </label>
-            <ion-radio ng-repeat="option in options track by $index" ng-model="form.selected" ng-value="option" ng-click="confirmModal()">
-                {{option.name ? option.name : option}}
-            </ion-radio>
-
-            <ion-radio class="new-project" ng-model="form.selected" ng-value="form.keyword" ng-click="confirmModal()" ng-if="showCreate()" class="new-project">
-                将【{{form.keyword}}】添加为新项目
-            </ion-radio>
-        </form>
-    </ion-content>
-</ion-modal-view>
+<span ng-click="showSelectorList()">
+    <span >{{value}}</span>
+    <span class="placeholder-div" ng-if="!value || value===''">{{title}}</span>
+</span>
