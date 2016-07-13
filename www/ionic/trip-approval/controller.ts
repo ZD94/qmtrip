@@ -110,6 +110,8 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             }
         });
 
+        totalBudget = Number(totalBudget) > tripPlan.budget ? totalBudget : tripPlan.budget;
+
         await $ionicLoading.hide();
     } else {
         totalBudget = tripPlan.budget as number;
