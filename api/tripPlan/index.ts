@@ -465,7 +465,10 @@ class TripPlanModule {
             if (!budgetId) {
                 throw new Error(`预算信息已失效请重新生成`);
             }
-            let budgetInfo = await API.client.travelBudget.getBudgetInfo({id: budgetId, accountId: tripPlan["accountId"]});
+            let budgetInfo = await API.client.travelBudget.getBudgetInfo({
+                id: budgetId,
+                accountId: tripPlan["accountId"]
+            });
             if (!budgetInfo) {
                 throw new Error(`预算信息已失效请重新生成`);
             }
@@ -483,14 +486,14 @@ class TripPlanModule {
             let budgets = budgetInfo.budgets;
             let query = budgetInfo.query;
 
-            if(finalBudget > tripPlan.budget) {
+            if (finalBudget > tripPlan.budget) {
                 tripPlan.budget = finalBudget;
                 let oldDetails = await tripPlan.getTripDetails({where: {}});
-                oldDetails.map(async (v) => {
+                oldDetails.map(async(v) => {
                     await Models.tripDetail.destroy(v);
                 }); //更新详情信息
 
-                budgets.forEach(async (budget) => {
+                budgets.forEach(async(budget) => {
                     let price = Number(budget.price);
                     let tripType = budget.tripType;
                     let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: price});
@@ -500,54 +503,55 @@ class TripPlanModule {
                     detail.tripPlan = tripPlan;
 
                     let hotelName = '';
-                    if(query.businessDistrict) {
-                        let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
+                    if (query.businessDistrict) {
+                        let hotelInfo = await API.place.getCityInfo({cityCode: query.businessDistrict});
                         hotelName = hotelInfo ? hotelInfo.name : '';
                     }
 
-                switch(tripType) {
-                    case ETripType.OUT_TRIP:
-                        detail.deptCityCode = query.originPlace;
-                        detail.arrivalCityCode = query.destinationPlace;
-                        detail.deptCity = tripPlan.deptCity;
-                        detail.arrivalCity = tripPlan.arrivalCity;
-                        detail.startTime = query.leaveDate;
-                        detail.endTime = query.goBackDate;
-                        break;
-                    case ETripType.BACK_TRIP:
-                        detail.deptCityCode = query.destinationPlace;
-                        detail.arrivalCityCode = query.originPlace;
-                        detail.deptCity = tripPlan.arrivalCity;
-                        detail.arrivalCity = tripPlan.deptCity;
-                        detail.startTime = query.goBackDate;
-                        detail.endTime = query.leaveDate;
-                        break;
-                    case ETripType.HOTEL:
-                        detail.cityCode = query.destinationPlace;
-                        detail.city = tripPlan.arrivalCity;
-                        detail.hotelCode = query.businessDistrict;
-                        detail.hotelName = hotelName;
-                        detail.startTime = query.checkInDate || query.leaveDate;
-                        detail.endTime = query.checkOutDate || query.goBackDate;
-                        break;
-                    case ETripType.SUBSIDY:
-                        detail.deptCityCode = query.originPlace;
-                        detail.arrivalCityCode = query.destinationPlace;
-                        detail.deptCity = tripPlan.deptCity;
-                        detail.arrivalCity = tripPlan.arrivalCity;
-                        detail.startTime = query.leaveDate || query.checkInDate;
-                        detail.endTime = query.goBackDate || query.checkOutDate;
-                        detail.expenditure = price;
-                        detail.status = EPlanStatus.COMPLETE;
-                        break;
-                    default:
-                        detail.type = ETripType.SUBSIDY;
-                        detail.startTime = query.leaveDate;
-                        detail.endTime = query.goBackDate;
-                        break;
-                }
-                await detail.save();
-            });
+                    switch (tripType) {
+                        case ETripType.OUT_TRIP:
+                            detail.deptCityCode = query.originPlace;
+                            detail.arrivalCityCode = query.destinationPlace;
+                            detail.deptCity = tripPlan.deptCity;
+                            detail.arrivalCity = tripPlan.arrivalCity;
+                            detail.startTime = query.leaveDate;
+                            detail.endTime = query.goBackDate;
+                            break;
+                        case ETripType.BACK_TRIP:
+                            detail.deptCityCode = query.destinationPlace;
+                            detail.arrivalCityCode = query.originPlace;
+                            detail.deptCity = tripPlan.arrivalCity;
+                            detail.arrivalCity = tripPlan.deptCity;
+                            detail.startTime = query.goBackDate;
+                            detail.endTime = query.leaveDate;
+                            break;
+                        case ETripType.HOTEL:
+                            detail.cityCode = query.destinationPlace;
+                            detail.city = tripPlan.arrivalCity;
+                            detail.hotelCode = query.businessDistrict;
+                            detail.hotelName = hotelName;
+                            detail.startTime = query.checkInDate || query.leaveDate;
+                            detail.endTime = query.checkOutDate || query.goBackDate;
+                            break;
+                        case ETripType.SUBSIDY:
+                            detail.deptCityCode = query.originPlace;
+                            detail.arrivalCityCode = query.destinationPlace;
+                            detail.deptCity = tripPlan.deptCity;
+                            detail.arrivalCity = tripPlan.arrivalCity;
+                            detail.startTime = query.leaveDate || query.checkInDate;
+                            detail.endTime = query.goBackDate || query.checkOutDate;
+                            detail.expenditure = price;
+                            detail.status = EPlanStatus.COMPLETE;
+                            break;
+                        default:
+                            detail.type = ETripType.SUBSIDY;
+                            detail.startTime = query.leaveDate;
+                            detail.endTime = query.goBackDate;
+                            break;
+                    }
+                    await detail.save();
+                });
+            }
         }
 
         tripPlan.auditStatus = auditResult;
@@ -719,7 +723,7 @@ class TripPlanModule {
         if(tripPlan.status != EPlanStatus.WAIT_COMMIT) {
             throw {code: -2, msg: "该出差计划不能提交，请检查状态"};
         }
-        
+
         let tripDetails = await tripPlan.getTripDetails({where: {}});
         tripPlan.status = EPlanStatus.AUDITING;
         tripPlan.isCommit = true;
@@ -738,12 +742,12 @@ class TripPlanModule {
 
         await Promise.all(tripDetails.map((detail) => detail.save()));
         await tripPlan.save();
-        
+
         let default_agency = config.default_agency;
         if(default_agency && default_agency.manager_email) {
             let auditEmail = default_agency.manager_email;
             let accounts = await Models.account.find({where: {email: auditEmail}});
-            
+
             if(!accounts || accounts.length <= 0) {
                 return true;
             }
@@ -763,7 +767,7 @@ class TripPlanModule {
                 API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_invoice_wait_audit', values: auditValues});
             }
 
-            
+
             //发送微信消息
             if(msgConfig.is_send_wechat) {
                 let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
@@ -777,7 +781,7 @@ class TripPlanModule {
                 }
             }
         }
-        
+
         return true;
     }
 
