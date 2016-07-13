@@ -1,36 +1,4 @@
-<ion-modal-view>
-    <ion-header-bar class="bar-stable">
-        <h1 class="title">{{title}}</h1>
-        <div class="button button-clear" ng-click="modal.hide()">取消</div>
-    </ion-header-bar>
-    <ion-content padding="false" scroll="false" class="has-header">
-        <form class="list fixed-header-footer" style="height: 100%">
-            <label class="item item-input fixed-header">
-                <i class="icon ion-search placeholder-icon"></i>
-                <input ng-model="form.keyword" type="search" placeholder="{{placeholder}}">
-            </label>
-            <div class="flex-main" style="display: block; width: 100%; position: relative;">
-                <div style="position: absolute; width: 100%; height: 100%;">
-                    <baidu-map style="display: block; width: 100%; height: 100%;"
-                               ng-if="showMap"
-                               ak="sFB94QImEEc4ve0uynf8Gt9vvKYcmECw"
-                               options="mapOptions"
-                               on-map-loaded="loadMap(map)"
-                    ></baidu-map>
-                </div>
-                <ion-scroll ng-if="showResults" style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;">
-                    <div>
-                        <ion-list>
-                            <ion-item ng-repeat="result in results" ng-click="locateResult(result)">
-                                {{result.title}} {{result.address}} {{result.point.lat}} {{result.point.lng}}
-                            </ion-item>
-                        </ion-list>
-                    </div>
-                </ion-scroll>
-            </div>
-            <div class="fixed-footer">
-                <a class="button button-positive  button-block" ng-click="confirmModal()">确定</a>
-            </div>
-        </form>
-    </ion-content>
-</ion-modal-view>
+<span ng-click="showSelectorList()">
+    <span >{{value.title}}</span>
+    <span class="placeholder-div" ng-if="!value || value.title===''">{{title}}</span>
+</span>

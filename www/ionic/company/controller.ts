@@ -48,20 +48,17 @@ export async function BudgetController($scope) {
     $scope.staffSaves = await API.tripPlan.tripPlanSaveRank({limit: 3});
     let staff = await Staff.getCurrent();
     let company = staff.company;
-    let statistic = await company.statisticTripPlanOfMonth({month: '2016-06'});
-    statistic.month = statistic.month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月');
-    $scope.statistic = statistic;
 
     $scope.saveMoneyChart = {};
     $scope.saveMoneyChart.labels = ["本月节省", "本月支出"];
-    $scope.saveMoneyChart.data = [statistic.savedMoney || 0, statistic.expenditure || 1]
-
     await monthChange(monthNow);
 
     async function monthChange(queryMonth) {
         let statistic = await company.statisticTripPlanOfMonth({month: queryMonth});
         statistic.month = statistic.month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月');
         $scope.statistic = statistic;
+
+        $scope.saveMoneyChart.data = [statistic.savedMoney || 0, statistic.expenditure || 1];
 
         $scope.option1 = {
             all: statistic.dynamicBudget,
@@ -81,11 +78,9 @@ export async function BudgetController($scope) {
 
 }
 
-export async function RecordController($scope, Models) {
+export async function RecordController($scope) {
     let staff = await Staff.getCurrent();
     let company = staff.company;
-    let tripPlans = await company.getTripPlans();
-    $scope.tripPlans = tripPlans;
     $scope.EPlanStatus = EPlanStatus;
     $scope.staffName = '';
 
@@ -94,14 +89,17 @@ export async function RecordController($scope, Models) {
     };
 
     $scope.searchTripPlans = async function(staffName) {
+        let status = [EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.AUDITING, EPlanStatus.COMPLETE, EPlanStatus.NO_BUDGET, EPlanStatus.WAIT_COMMIT, EPlanStatus.WAIT_UPLOAD];
         if(!staffName) {
-            $scope.tripPlans = await company.getTripPlans();
+            $scope.tripPlans = await company.getTripPlans({where: {status: {$in: status}}});
             return;
         }
         let staffs = await company.getStaffs({where: {name: {$like: '%' + staffName + '%'}}});
         let ids = staffs.map((s) => s.id);
-        $scope.tripPlans = await company.getTripPlans({where: {accountId: ids}});
+        $scope.tripPlans = await company.getTripPlans({where: {accountId: ids, status: {$ne: status}}});
     };
+
+    await $scope.searchTripPlans();
 }
 
 export async function RecordDetailController($scope, Models, $stateParams, $ionicPopup, $ionicLoading){

@@ -100,7 +100,7 @@ export async function CreateController($scope, $storage, $loading){
 
     $scope.$watch('trip.placeName', function($newVal, $oldVal) {
         if ($newVal != $oldVal) {
-            $scope.trip.hotelPlaceName = '';
+            $scope.trip.hotelPlaceObj = undefined;
             $scope.trip.hotelPlace = '';
         }
     });
@@ -422,12 +422,17 @@ export async function ListController($scope , Models){
 }
 
 
-export async function ListDetailController($location, $scope , Models, $stateParams, $storage ){
+export async function ListDetailController($location, $scope , Models, $stateParams, $storage, $ionicPopup){
     let id = $stateParams.tripid;
     if (!id) {
         $location.path("/");
         return;
     }
+    //////绑定上传
+    let authDataStr = window['getAuthDataStr']();
+    $scope.uploadUrl = '/upload/ajax-upload-file?type=image&'+authDataStr;
+    ///// END
+
     require('./trip.scss');
     var staff = await Staff.getCurrent();
     let tripPlan = await Models.tripPlan.get(id);
@@ -461,7 +466,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
             goTraffic['title'] = '上传去程交通发票';
             goTraffic['done'] = function (response) {
                 if (!response.fileId) {
-                    alert(response.msg);
+                    alert(response.errMsg);
                     return;
                 }
                 var fileId = response.fileId;
@@ -480,7 +485,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
             backTraffic['title'] = '上传回程交通发票';
             backTraffic['done'] = function (response) {
                 if (!response.fileId) {
-                    alert(response.msg);
+                    alert(response.errMsg);
                     return;
                 }
                 var fileId = response.fileId;
@@ -498,7 +503,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
             hotel['title'] = '上传住宿发票';
             hotel['done'] = function (response) {
                 if (!response.fileId) {
-                    alert(response.msg);
+                    alert(response.errMsg);
                     return;
                 }
                 var fileId = response.fileId;
@@ -534,9 +539,28 @@ export async function ListDetailController($location, $scope , Models, $statePar
         .catch(callback)
     }
 
-    $scope.approveTripPlan = async function() {
+    $scope.showAlterDialog = function () {
+        $scope.reject = {reason: ''};
+        $ionicPopup.show({
+            title: '确认提交该出差计划？',
+            scope: $scope,
+            buttons: [{
+                text: '取消'
+            },{
+                text: '确认',
+                type: 'button-positive',
+                onTap: async function (e) {
+                    approveTripPlan();
+                }
+            }]
+        })
+    };
+
+    async function approveTripPlan() {
         try {
+            console.info('before commit...');
             await API.tripPlan.commitTripPlan({id: id});
+            console.info('after commit...');
             alert('提交成功')
             window.location.href="#/trip/list"
         }catch(e) {
@@ -591,6 +615,11 @@ export async function ListDetailController($location, $scope , Models, $statePar
 }
 
 export async function InvoiceDetailController($scope , Models, $stateParams){
+    //////绑定上传url
+    let authDataStr = window['getAuthDataStr']();
+    $scope.uploadUrl = '/upload/ajax-upload-file?type=image&'+authDataStr;
+    ///// END
+    
     //////////////显示票据之前先显示loading图
     $scope.showLoading = true;
     angular.element("#previewInvoiceImg").bind("load", function() {
@@ -628,8 +657,10 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
     var invoicefuc = {title:'上传'+title + '发票',done:function(response){
         var fileId = response.fileId;
         uploadInvoice(invoice, fileId,async function (err, result) {
+            console.info(err);
+            console.info(result)
             if (err) {
-                alert(err);
+                alert(err.msg ? err.msg : err);
                 return;
             }
             var newdetail = await Models.tripDetail.get($stateParams.detailId);
@@ -647,6 +678,4 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
         var tripPlan = invoice.tripPlan;
         window.location.href = "#/trip/list-detail?tripid="+tripPlan.id;
     }
-
-
 }

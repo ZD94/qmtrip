@@ -55,7 +55,8 @@ angular
                     input.attr('accept', element.attr('accept'));
                     var title = element.attr('title');
                     var done = element.attr('done');
-                    input.attr('options', '{title:'+title+',done:'+done+'}');
+                    var url = element.attr('url');
+                    input.attr('options', '{title:'+title+',done:'+done+', url:'+url+'}');
                     return function(scope, element, attrs, controller, trans){
                         element.prepend(trans());
                     };

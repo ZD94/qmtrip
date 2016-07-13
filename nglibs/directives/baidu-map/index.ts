@@ -55,14 +55,14 @@ angular
                             $scope['labelStyle'].marginTop = $label.clientHeight / -2 + 'px';
                             $scope['labelStyle'].marginLeft = $label.clientWidth / -2 + 'px';
                             $scope['onMapLoaded']({map});
-                            $scope.$apply();
+                            $scope.$applyAsync();
 
                             //create markers
-                            //var previousMarkers = [];
-                            //redrawMarkers(map, previousMarkers, opts);
-                            //$scope.$watch('options.markers', function(newValue, oldValue) {
-                            //    redrawMarkers(map, previousMarkers, opts);
-                            //}, true);
+                            var previousMarkers = [];
+                            redrawMarkers(map, previousMarkers, opts);
+                            $scope.$watch('options.markers', function(newValue, oldValue) {
+                                redrawMarkers(map, previousMarkers, opts);
+                            }, true);
 
                             //$scope.$watch('options.center', function(newValue, oldValue) {
                             //    opts = $scope['options'];

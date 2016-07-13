@@ -104,6 +104,8 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             }
         });
 
+        totalBudget = Number(totalBudget) > tripPlan.budget ? totalBudget : tripPlan.budget;
+
         await $ionicLoading.hide();
     } else {
         totalBudget = tripPlan.budget as number;
@@ -127,6 +129,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     }
 
     $scope.totalBudget = totalBudget;
+    $scope.tripPlan.budget = totalBudget;
     $scope.traffic = traffic;
     $scope.hotel = hotel;
     $scope.trafficBudget = trafficBudget;
