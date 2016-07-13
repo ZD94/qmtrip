@@ -12,10 +12,10 @@ var API = require("common/api");
 
 function uploadActionFile(req, res, next) {
     req.clearTimeout();
-    var user_id = req.cookies.user_id;
-    var token_id = req.cookies.token_id;
-    var token_sign = req.cookies.token_sign;
-    var timestamp = req.cookies.timestamp;
+    var user_id = req.query.user_id;
+    var token_id = req.query.token_id;
+    var token_sign = req.query.token_sign;
+    var timestamp = req.query.timestamp;
     var type = req.query.type;
     var form = new formidable.IncomingForm();
     form.uploadDir = config.upload.tmpDir;
@@ -180,10 +180,10 @@ function getPublicFile(req, res, next) {
 function getSelfFile(req, res, next){
     req.clearTimeout();
     var fileId = req.params.id;
-    var accountId = req.cookies.user_id;
-    var token_id = req.cookies.token_id;
-    var token_sign = req.cookies.token_sign;
-    var timestamp = req.cookies.timestamp;
+    var accountId = req.query.user_id;
+    var token_id = req.query.token_id;
+    var token_sign = req.query.token_sign;
+    var timestamp = req.query.timestamp;
     if (!fileId) {
         return next(404);
     }

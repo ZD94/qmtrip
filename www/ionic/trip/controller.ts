@@ -428,6 +428,11 @@ export async function ListDetailController($location, $scope , Models, $statePar
         $location.path("/");
         return;
     }
+    //////绑定上传
+    let authDataStr = window['getAuthDataStr']();
+    $scope.uploadUrl = '/upload/ajax-upload-file?type=image&'+authDataStr;
+    ///// END
+
     require('./trip.scss');
     var staff = await Staff.getCurrent();
     let tripPlan = await Models.tripPlan.get(id);
@@ -649,6 +654,4 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
         var tripPlan = invoice.tripPlan;
         window.location.href = "#/trip/list-detail?tripid="+tripPlan.id;
     }
-
-
 }
