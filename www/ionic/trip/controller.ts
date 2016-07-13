@@ -461,7 +461,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
             goTraffic['title'] = '上传去程交通发票';
             goTraffic['done'] = function (response) {
                 if (!response.fileId) {
-                    alert(response.msg);
+                    alert(response.errMsg);
                     return;
                 }
                 var fileId = response.fileId;
@@ -480,7 +480,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
             backTraffic['title'] = '上传回程交通发票';
             backTraffic['done'] = function (response) {
                 if (!response.fileId) {
-                    alert(response.msg);
+                    alert(response.errMsg);
                     return;
                 }
                 var fileId = response.fileId;
@@ -498,7 +498,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
             hotel['title'] = '上传住宿发票';
             hotel['done'] = function (response) {
                 if (!response.fileId) {
-                    alert(response.msg);
+                    alert(response.errMsg);
                     return;
                 }
                 var fileId = response.fileId;
@@ -628,8 +628,10 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
     var invoicefuc = {title:'上传'+title + '发票',done:function(response){
         var fileId = response.fileId;
         uploadInvoice(invoice, fileId,async function (err, result) {
+            console.info(err);
+            console.info(result)
             if (err) {
-                alert(err);
+                alert(err.msg ? err.msg : err);
                 return;
             }
             var newdetail = await Models.tripDetail.get($stateParams.detailId);

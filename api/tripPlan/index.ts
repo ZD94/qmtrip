@@ -129,7 +129,7 @@ class TripPlanModule {
                     tripPlan.isNeedHotel = true;
                     break;
                 case ETripType.SUBSIDY:
-                    detail.type = ETripType.OTHER;
+                    detail.type = ETripType.SUBSIDY;
                     detail.deptCityCode = query.originPlace;
                     detail.arrivalCityCode = query.destinationPlace;
                     detail.deptCity = tripPlan.deptCity;
@@ -140,7 +140,7 @@ class TripPlanModule {
                     detail.status = EPlanStatus.COMPLETE;
                     break;
                 default:
-                    detail.type = ETripType.OTHER;
+                    detail.type = ETripType.SUBSIDY;
                     detail.startTime = query.leaveDate;
                     detail.endTime = query.goBackDate;
                     break;
@@ -220,7 +220,7 @@ class TripPlanModule {
             hotelStr += '动态预算￥' + h.budget;
         }
 
-        let subsidy = await tripPlan.getTripDetails({where: {type: [ETripType.SUBSIDY, ETripType.OTHER]}});
+        let subsidy = await tripPlan.getTripDetails({where: {type: [ETripType.SUBSIDY]}});
         if(subsidy && subsidy.length > 0) {
             let subsidyBudget = 0;
             subsidy.map((s) => {subsidyBudget += s.budget;});
@@ -540,7 +540,7 @@ class TripPlanModule {
                         detail.status = EPlanStatus.COMPLETE;
                         break;
                     default:
-                        detail.type = ETripType.OTHER;
+                        detail.type = ETripType.SUBSIDY;
                         detail.startTime = query.leaveDate;
                         detail.endTime = query.goBackDate;
                         break;
@@ -786,6 +786,25 @@ class TripPlanModule {
             throw L.ERR.PERMISSION_DENIED(); //代理商只能审核票据权限
         }
         await Promise.all([tripPlan.save(), tripDetail.save()]);
+
+        //如果出差已经完成,并且有节省反积分,增加员工积分
+        if (tripPlan.status == EPlanStatus.COMPLETE && tripPlan.score > 0) {
+            var staff = await Models.staff.get(tripPlan.account.id);
+            let pc = Models.pointChange.create({
+                currentPoints: staff.balancePoints, status: 1,
+                staff: staff, company: staff.company,
+                points: tripPlan.score, remark: `节省反积分${tripPlan.score}`,
+                orderId: tripPlan.id});
+            await pc.save();
+            try {
+                staff.totalPoints = staff.totalPoints + tripPlan.score;
+                staff.balancePoints = staff.balancePoints + tripPlan.score;
+                await staff.save();
+            } catch(err) {
+                //如果保存出错,删除日志记录
+                await pc.destroy();
+            }
+        }
         return true;
     }
 
@@ -956,8 +975,7 @@ class TripPlanModule {
             _detail.tripPlan = tripPlan;
             _detail.accountId = staff.id;
             _detail.status = 0;
-            console.info("补助自动计算:", _detail.type, ETripType.OTHER, _detail.type == ETripType.OTHER)
-            if (_detail.type == ETripType.OTHER) {
+            if (_detail.type == ETripType.SUBSIDY) {
                 _detail.status = EPlanStatus.COMPLETE;
                 _detail.expenditure = _detail.budget;
                 console.info(_detail)
@@ -1080,7 +1098,6 @@ class TripPlanModule {
         logger.info('run task ' + taskId);
         scheduler('*/5 * * * *', taskId, async function() {
             let tripPlans = await Models.tripPlan.find({where: {autoApproveTime: {$lte: utils.now()}, status: EPlanStatus.WAIT_APPROVE}, limit: 10, order: 'auto_approve_time'});
-            // logger.info("自动审批出差计划...");
             tripPlans.map(async (p) => {
                 let details = await p.getTripDetails({});
                 p.status = EPlanStatus.WAIT_UPLOAD;
