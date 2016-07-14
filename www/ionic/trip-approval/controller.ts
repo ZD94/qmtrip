@@ -2,7 +2,7 @@
  * Created by seven on 16/4/25.
  */
 "use strict";
-import {EPlanStatus, ETripType, EAuditStatus, MTxPlaneLevel} from "api/_types/tripPlan";
+import {EPlanStatus, ETripType, EAuditStatus, EInvoiceType, MTxPlaneLevel} from "api/_types/tripPlan";
 import {Staff} from "api/_types/staff";
 import moment = require('moment');
 const API = require("common/api")
@@ -75,25 +75,19 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
                 case ETripType.OUT_TRIP:
                 case ETripType.BACK_TRIP:
                     if(v.tripType == 0) {
-                        outTraffic.cabinClass = v.cabinClass;
-                        if(v.trainNo){
-                            outTraffic.trafficType = "train";
-                        }else{
-                            outTraffic.trafficType = "air";
-                        }
-                        if(Number(totalBudget) > tripPlan.budget)
+                        if(Number(totalBudget) > tripPlan.budget){
+                            outTraffic.cabinClass = v.cabinClass;
+                            outTraffic.invoiceType = v.type;
                             outTraffic.budget = v.price;
+                        }
                         traffic.push(outTraffic);
                         trafficBudget += Number(outTraffic.budget);
                     }else if(v.tripType == 1) {
-                        backTraffic.cabinClass = v.cabinClass;
-                        if(v.trainNo){
-                            backTraffic.trafficType = "train";
-                        }else{
-                            backTraffic.trafficType = "air";
-                        }
-                        if(Number(totalBudget) > tripPlan.budget)
+                        if(Number(totalBudget) > tripPlan.budget){
+                            backTraffic.cabinClass = v.cabinClass;
+                            backTraffic.invoiceType = v.type;
                             backTraffic.budget = v.price;
+                        }
                         traffic.push(backTraffic);
                         trafficBudget += Number(backTraffic.budget);
                     }
@@ -144,6 +138,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.subsidyDays = subsidyDays;
     $scope.approveResult = EAuditStatus;
     $scope.EPlanStatus = EPlanStatus;
+    $scope.EInvoiceType = EInvoiceType;
     $scope.MTxPlaneLevel = MTxPlaneLevel;
 
 
