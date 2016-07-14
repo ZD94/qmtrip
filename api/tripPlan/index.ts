@@ -240,13 +240,13 @@ class TripPlanModule {
      * @returns {Promise<boolean>}
      */
     static async sendTripPlanNotice(tripPlan: TripPlan, userId: string) {
-        let url = config.host + '/index.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
         let user = await Models.staff.get(userId);
         let company = user.company;
         let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
         let timeFormat = 'YYYY-MM-DD HH:mm:ss';
         //给员工发送邮件
         let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
+        let openid = await API.auth.getOpenIdByAccount({accountId: userId});
         let values: any = {
             staffName: user.name,
             time: moment(tripPlan.createdAt).format(timeFormat),
@@ -264,7 +264,8 @@ class TripPlanModule {
         API.notify.submitNotify({
             key: 'qm_notify_self_traveludget',
             email: user.email,
-            values: values
+            values: values,
+            openid: openid,
         });
 
         if(company.isApproveOpen) {
@@ -289,6 +290,7 @@ class TripPlanModule {
                 approve_values.staffName = user.name;
                 approve_values.startDate = moment(tripPlan.startAt).format('YYYY.MM.DD');
                 approve_values.endDate = moment(tripPlan.backAt).format('YYYY.MM.DD');
+                approve_values.createdAt = moment(tripPlan.createdAt).format(timeFormat);
                 let travelLine = "";
                 if(!tripPlan.deptCity) {
                     travelLine = tripPlan.arrivalCity;
@@ -301,13 +303,14 @@ class TripPlanModule {
                 approve_values.travelLine = travelLine;
                 approve_values.reason= tripPlan.title;
                 approve_values.budget = tripPlan.budget;
-                approve_values.autoApproveTime = moment(tripPlan.autoApproveTime).format('YYYY-MM-DD HH:mm:ss')
+                approve_values.autoApproveTime = moment(tripPlan.autoApproveTime).format(timeFormat)
             }
             API.notify.submitNotify({
                 key: 'qm_notify_new_travelbudget',
                 email: approveUser.email,
                 values: approve_values,
-                mobile: approveUser.mobile
+                mobile: approveUser.mobile,
+                openid: openId,
             })
         } else if(msgConfig.is_send_email){
             let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER,
