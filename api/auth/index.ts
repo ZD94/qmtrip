@@ -424,8 +424,13 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     }
 }
 
+    /**
+     * 添加员工验证手机号和邮箱
+     * @param data
+     * @returns {boolean}
+     */
     @clientExport
-    static async checkEmailAngMobile (data: {email?: string, mobile?: string}) {
+    static async checkEmailAndMobile (data: {email?: string, mobile?: string}) {
         if (data.email && !validator.isEmail(data.email)) {
             throw L.ERR.INVALID_FORMAT('email');
         }
@@ -453,6 +458,39 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
 
         if(data.mobile){
             var account2 = await Models.account.find({where: {mobile: mobile, type: type}, paranoid: false});
+            if (account2 && account2.length>0) {
+                throw L.ERR.MOBILE_HAS_REGISTRY();
+            }
+        }
+
+        return true;
+    }
+    
+    
+    /**
+     * 注册验证手机号和邮箱
+     * @param data
+     * @returns {boolean}
+     */
+    @clientExport
+    static async registerCheckEmailMobile (data: {email?: string, mobile?: string}) {
+        if (data.email && !validator.isEmail(data.email)) {
+            throw L.ERR.INVALID_FORMAT('email');
+        }
+
+        if (data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+        //查询邮箱是否已经注册
+        if(data.email){
+            var account1 = await Models.account.find({where: {email: data.email}, paranoid: false});
+            if (account1 && account1.length>0) {
+                throw L.ERR.EMAIL_HAS_REGISTRY();
+            }
+        }
+
+        if(data.mobile){
+            var account2 = await Models.account.find({where: {mobile: data.mobile}, paranoid: false});
             if (account2 && account2.length>0) {
                 throw L.ERR.MOBILE_HAS_REGISTRY();
             }
@@ -611,6 +649,9 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         var domain = email.split(/@/)[1];
 
         return Promise.resolve(true)
+            .then(function(){
+                return API.auth.registerCheckEmailMobile({email: email, mobile: mobile});
+            })
             .then(function() {
                 return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
             })

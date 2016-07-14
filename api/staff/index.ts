@@ -42,7 +42,7 @@ class StaffModule{
     @requireParams(["name", "email", "mobile"], staffAllCols)
     static async createStaff (params): Promise<Staff> {
         //检查邮箱 手机号码是否合法
-        await API.auth.checkEmailAngMobile({email: params.email, mobile: params.mobile});
+        await API.auth.checkEmailAndMobile({email: params.email, mobile: params.mobile});
         var staff = await Staff.getCurrent();
         var user = await AgencyUser.getCurrent();
         //设置员工默认部门
