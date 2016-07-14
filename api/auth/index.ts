@@ -184,28 +184,24 @@ class ApiAuth {
             time: timeStr,
             companyName: companyName
         };
-
+        let _mobile;    //如果_mobile存在,将发短信通知
+        let key;
         if (isFirstSet) {
             //发邮件
-            if(msgConfig.is_send_email) {
-                vals.url = C.host + "/index.html#/login/first-set-pwd?" + url;
-                templateName = 'qm_first_set_pwd_email';
-                await API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
-            }
-
-            //发短信
-            if(msgConfig.is_send_message) {
-                vals.url = await API.wechat.shorturl({longurl: C.host + "/index.html#/login/first-set-pwd?" + url});
-                await API.sms.sendMsgSubmit({template: 'qmFirstSetPwdMsg', mobile: account.mobile, values: vals});
-            }
+            vals.url = C.host + "/index.html#/login/first-set-pwd?" + url;
+            key = 'qm_first_set_pwd';
+            _mobile = account.mobile;
+            vals.url = await API.wechat.shorturl({longurl: vals.url});
         } else {
-            if(msgConfig.is_send_email){
-                vals.url = C.host + "/index.html#/login/reset-pwd?" + url;
-                templateName = 'qm_reset_pwd_email';
-                return API.mail.sendMailRequest({toEmails: account.email, templateName: templateName, values: vals});
-            }
+            vals.url = C.host + "/index.html#/login/reset-pwd?" + url;
+            key = 'qm_reset_pwd_email';
         }
-        return true;
+        return API.notify.submitNotify({
+            key: key,
+            values: vals,
+            email: account.email,
+            mobile: _mobile,
+        });
     }
 
     static sendActivateEmail(params:{email:string; companyName?:string}):Promise<boolean> {
@@ -629,9 +625,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         if(!msgConfig.is_send_email) {
             return;
         }
-        
         var email = "peng.wang@jingli.tech";
-
         var vals = {
             type: params.type,
             companyName: params.companyName,
@@ -640,10 +634,10 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             email: params.email,
             qq: params.qq
         }
-        await API.mail.sendMailRequest({
-            toEmails: email,
-            templateName: "qm_www_tobe_partner",
-            values: vals
+        return API.notify.submitNotify({
+            key: 'qm_www_tobe_partner',
+            values: vals,
+            email: email,
         })
     }
 
@@ -1297,14 +1291,22 @@ function _sendActiveEmail(accountId) {
             var activeToken = utils.getRndStr(6);
             var sign = makeActiveSign(activeToken, account.id, expireAt);
             var url = C.host + "/index.html#/login/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
+
             //发送激活邮件
-            var vals = {name: account.email, username: account.email, url: url};
-            // return true;
-            return API.mail.sendMailRequest({toEmails: account.email, templateName: "qm_active_email", values: vals})
-                .then(function(aa) {
-                    account.activeToken = activeToken;
-                    return DBM.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
-                })
+            var vals = {
+                name: account.email,
+                username: account.email,
+                url: url
+            };
+            return API.notify.submitNotify({
+                key: 'qm_active',
+                values: vals,
+                email: account.email,
+            })
+            .then(function(ret) {
+                account.activeToken = activeToken;
+                return DBM.Account.update({activeToken: activeToken}, {where: {id: accountId}, returning: true});
+            })
         })
 }
 

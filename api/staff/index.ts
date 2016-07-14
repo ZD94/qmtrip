@@ -76,7 +76,6 @@ class StaffModule{
         }
         let result = await newstaff.save();
         await API.auth.sendResetPwdEmail({email: result.email, mobile: result.mobile, type: 1, isFirstSet: true, companyName: result.company.name});
-        // await API.auth.sendResetPwdMsg({email: result.email, mobile: result.mobile, type: 1, isFirstSet: true, companyName: result.company.name});
         return result;
     }
 
@@ -102,19 +101,6 @@ class StaffModule{
             }
         }
         await deleteStaff.destroy();
-
-        /*let company = await Models.company.get(deleteStaff["companyId"]);
-        var vals = {
-            name: deleteStaff.name || "",
-            time: utils.now(),
-            companyName: company.name
-        }
-
-        await API.mail.sendMailRequest({
-            toEmails: deleteStaff.email,
-            templateName: "qm_notify_remove_staff",
-            values: vals
-        })*/
         return true;
 
     }
@@ -197,11 +183,12 @@ class StaffModule{
                 permission: updateStaff.roleId == EStaffRole.ADMIN ? "管理员" : (updateStaff.roleId == EStaffRole.OWNER ? "创建者" : "普通员工"),
                 staffStatus: updateStaff.staffStatus == 0 ? "禁用" : "启用"
             }
-            //修改邮箱重置密码的邮件由updateAccount发出
-            await API.mail.sendMailRequest({
-                toEmails: updateStaff.email,
-                templateName: "staff_update_email",
-                values: vals
+
+            //发送通知
+            API.notify.submitNotify({
+                key: 'staff_update',
+                values: vals,
+                email: updateStaff.email
             });
         }
         return updateStaff;

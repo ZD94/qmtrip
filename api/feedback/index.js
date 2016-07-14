@@ -35,17 +35,11 @@ feedback.sendFeedback = function(data){
                 companyName: companyName,
                 username: data.userName || "匿名"
             }
-            return API.mail.sendMailRequest({
-                toEmails: "bd@tulingdao.com",
-                templateName: "qm_feedback_email",
-                values: vals
-            })
-                .then(function() {
-                    return true;
-                })
-                .catch(function(err){
-                    console.log(err);
-                })
+            return API.notify.submitNotify({
+              email: 'bd@tulingdao.com',
+              key: 'qm_feedback',
+              values: vals
+            });
         })
 }
 

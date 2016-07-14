@@ -187,12 +187,10 @@ export function approveInvoice(params){
             if(typeof ret == 'Boolean'){
                 return ret;
             }
-
             let order = ret;
             if(typeof ret.toJSON == 'function'){
                 order = order.toJSON();
             }
-
             let go = '无', back = '无', hotel = '无';
             if(order.outTraffic.length > 0){
                 let g = order.outTraffic[0];
@@ -208,7 +206,6 @@ export function approveInvoice(params){
                     go += ',实际支出￥' + g.expenditure;
                 }
             }
-
             if(order.backTraffic.length > 0){
                 let b = order.backTraffic[0];
                 back = moment(b.startTime).format('YYYY-MM-DD') + ', ' + b.deptCity + ' 到 ' + b.arrivalCity;
@@ -223,7 +220,6 @@ export function approveInvoice(params){
                     back += ',实际支出￥' + b.expenditure;
                 }
             }
-
             if(order.hotel.length > 0){
                 let h = order.hotel[0];
                 hotel = moment(h.startTime).format('YYYY-MM-DD') + ' 至 ' + moment(h.endTime).format('YYYY-MM-DD') +
@@ -233,90 +229,69 @@ export function approveInvoice(params){
                     hotel += ',实际支出￥' + h.expenditure;
                 }
             }
-
             let orderTime = ret.startAt;
             if(!orderTime){
                 orderTime = _startTime
             }
-
             orderTime = moment(orderTime).format('YYYY-MM-DD');
             let url = config.host + '/staff.html#/travelPlan/PlanDetail?tripPlanId=' + order.id;
 
+            let key;
+            let values: any = {
+                username: staffName,
+                email: staffEmail,
+                projectName: ret.description,
+                ticket: invoiceName,
+                goTrafficBudget: go,
+                backTrafficBudget: back,
+                hotelBudget: hotel,
+                totalBudget: '全麦预算￥'+order.budget,
+                url: url,
+                detailUrl: url
+            }
+
             //审核完成后给用户发送邮件
             if(params.status == -1){ //审核不通过
-                let vals: any = {
-                    username: staffName,
-                    email: staffEmail,
-                    ticket: invoiceName,
-                    goTrafficBudget: go,
-                    backTrafficBudget: back,
-                    hotelBudget: hotel,
-                    totalBudget: '全麦预算￥'+order.budget,
-                    url: url,
-                    reason: params.remark,
-                    projectName: ret.description,
-                    detailUrl: url
-                }
-                API.mail.sendMailRequest({
-                    toEmails: staffEmail,
-                    templateName: "qm_notify_invoice_not_pass",
-                    values: vals
-                })
+                key = 'qm_notify_invoice_not_pass';
+                values.reason = params.remark;
             }
 
             if(params.status == 1){
-                let vals = {
-                    username: staffName,
-                    ticket: invoiceName,
-                    consume: expenditure,
-                    projectName:ret.description,
-                    time: orderTime,
-                    goTrafficBudget: go,
-                    backTrafficBudget: back,
-                    hotelBudget: hotel,
-                    totalBudget: '全麦预算￥'+order.budget,
-                    url: url,
-                    detailUrl: url
-                }
-                API.mail.sendMailRequest({
-                    toEmails: staffEmail,
-                    templateName: "qm_notify_invoice_one_pass",
-                    titleValues: [],
-                    values: vals
-                })
+                key = 'qm_notify_invoice_one_pass';
+                values.consume = expenditure
             }
 
             if(ret.status == 2){
+                key = 'qm_notify_invoice_all_pass';
                 let s = order.budget - order.expenditure;
-                if(s <0){s = 0;}
+                if(s <0){
+                    s = 0;
+                }
                 let _score = order.score;
-                if(_score> 0 ){ _score += '积分已发放到您的积分账户'; }
-                let total = '全麦预算￥' + order.budget + ',实际支出￥' + order.expenditure + ',节省￥' + s.toFixed(2);
-                let vals = {
-                    username: staffName,
-                    time: orderTime,
-                    projectName: ret.description,
-                    goTrafficBudget: go,
-                    backTrafficBudget: back,
-                    hotelBudget: hotel,
-                    totalBudget: total,
-                    score: _score,
-                    url: url,
-                    detailUrl: url
-                };
-                API.mail.sendMailRequest({
-                    toEmails: staffEmail,
-                    templateName: "qm_notify_invoice_all_pass",
-                    titleValues: [],
-                    values: vals
-                })
+                if(_score> 0 ){
+                    _score += '积分已发放到您的积分账户';
+                }
+                let total = `全麦预算￥${order.budget},实际支出￥${order.expenditure},节省￥${s.toFixed(2)}`;
+                values.time = orderTime;
+                values.score = _score;
             }
+
 
             if(ret.status != 2 || ret.score == 0){ //status == 2 是审核通过的状态，通过后要给企业用户增加积分操作，积分为0时不需要此操作
                 return true;
             }
-
             return API.staff.increaseStaffPoint({id: staffId, accountId: user_id, increasePoint: ret.score, companyId: companyId})
+                .then(function(ret) {
+                    if (key) {
+                        //发送通知给用户
+                        API.notify.submitNotify({
+                            key: key,
+                            email: staffEmail,
+                            values: values,
+                        });
+                    }
+                    return ret;
+                })
         })
         .then(function(){
             return true;
