@@ -51,6 +51,16 @@ export async function BudgetController($scope) {
 
     $scope.saveMoneyChart = {};
     $scope.saveMoneyChart.labels = ["本月节省", "本月支出"];
+    $scope.saveMoneyChart.options = {
+        //legend: { display: true }, //图例
+        cutoutPercentage: 70
+    }
+    //$scope.saveMoneyChart.colors = ['#33cd5f', '#387ef5'];
+    $scope.saveMoneyChart.dataset = {
+        backgroundColor: ['#33cd5f', '#387ef5'],
+        borderWidth: [1, 1]
+    };
+
     await monthChange(monthNow);
 
     async function monthChange(queryMonth) {
