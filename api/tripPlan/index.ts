@@ -240,76 +240,76 @@ class TripPlanModule {
      * @returns {Promise<boolean>}
      */
     static async sendTripPlanNotice(tripPlan: TripPlan, userId: string) {
-        try{
-            let url = config.host + '/index.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
-            let user = await Models.staff.get(userId);
-            let company = user.company;
-            let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
-            let timeFormat = 'YYYY-MM-DD HH:mm:ss';
-            //给员工发送邮件
-            let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
-            let self_values = {staffName: user.name, time: moment(tripPlan.createdAt).format(timeFormat),
-                projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel, otherBudget: others,
-                totalBudget: '￥' + tripPlan.budget, url: self_url, detailUrl: self_url};
+        let url = config.host + '/index.html#/TravelStatistics/planDetail?tripPlanId=' + tripPlan.id;
+        let user = await Models.staff.get(userId);
+        let company = user.company;
+        let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
+        let timeFormat = 'YYYY-MM-DD HH:mm:ss';
+        //给员工发送邮件
+        let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
+        let values: any = {
+            staffName: user.name,
+            time: moment(tripPlan.createdAt).format(timeFormat),
+            projectName: tripPlan.title,
+            goTrafficBudget: go,
+            backTrafficBudget: back,
+            hotelBudget: hotel,
+            otherBudget: others,
+            totalBudget: '￥' + tripPlan.budget,
+            url: self_url,
+            detailUrl: self_url
+        };
 
-            if(msgConfig.is_send_email) {
-                API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_self_traveludget', values: self_values});
+        //给员工自己发送通知
+        API.notify.submitNotify({
+            key: 'qm_notify_self_traveludget',
+            email: user.email,
+            values: values
+        });
+
+        if(company.isApproveOpen) {
+            //给审核人发审核邮件
+            let approveUser = await Models.staff.get(tripPlan.auditUser);
+            let approve_url = config.host + '/index.html#/trip-approval/detail?tripid=' + tripPlan.id;
+            let approve_values = utils.clone(values);
+            let shortUrl = await API.wechat.shorturl({longurl: approve_url});
+            let openId = await API.auth.getOpenIdByAccount({accountId: approveUser.id});
+            approve_values.managerName = approveUser.name;
+            approve_values.username = user.name;
+            approve_values.email = user.email;
+            approve_values.url = shortUrl;
+            approve_values.detailUrl = shortUrl;
+            approve_values.name = user.name;
+            approve_values.destination = tripPlan.arrivalCity;
+            if (openId) {
+                approve_values.approveUser = approveUser.name;
+                approve_values.tripPlanNo = tripPlan.planNo;
+                approve_values.content = `员工${user.name}${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差计划已经发送给您，预算：￥${tripPlan.budget}，等待您审批！`;
+                approve_values.autoApproveTime = moment(tripPlan.autoApproveTime).format(timeFormat);
             }
-
-            if(company.isApproveOpen) {
-                //给审核人发审核邮件
-                let approveUser = await Models.staff.get(tripPlan.auditUser);
-                let approve_url = config.host + '/index.html#/trip-approval/detail?tripid=' + tripPlan.id;
-                let approve_values = {managerName: approveUser.name, username: user.name, email: user.email,
-                    time: moment(tripPlan.createdAt).format(timeFormat),
-                    projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel, otherBudget: others,
-                    totalBudget: '￥' + tripPlan.budget, url: approve_url, detailUrl: approve_url};
-
-                if(msgConfig.is_send_email) {
-                    API.mail.sendMailRequest({toEmails: approveUser.email, templateName: 'qm_notify_new_travelbudget', values: approve_values});
-                }
-
-                //发送短信提醒
-                if(msgConfig.is_send_message && approveUser.mobile && isMobile(approveUser.mobile)) {
-                      let msg_url = await API.wechat.shorturl({longurl: approve_url});
-                      API.sms.sendMsgSubmit({template: 'travelBudgetApply', mobile: approveUser.mobile,
-                          values: {name: user.name, time: moment(tripPlan.startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
-
-                }
-
-                //发送微信消息
-                if(msgConfig.is_send_wechat) {
-                    let openId = await API.auth.getOpenIdByAccount({accountId: approveUser.id});
-                    if(openId) {
-                        let values = {
-                            approveUser: approveUser.name,
-                            tripPlanNo: tripPlan.planNo,
-                            staffName: user.name,
-                            content: '员工' + user.name + moment(tripPlan.startAt).format('YYYY-MM-DD') + '到' + tripPlan.arrivalCity + '的出差计划已经发送给您，预算：￥' + tripPlan.budget + '，等待您审批！',
-                            createdAt: utils.now(),
-                            autoApproveTime: moment(tripPlan.autoApproveTime).format('YYYY-MM-DD HH:mm:ss')
-                        };
-                        API.wechat.sendTemplateMessage({templateName: 'WAIT_APPROVE_MESSAGE', openId: openId, url: approve_url, values: values});
-                    }
-                }
-            } else if(msgConfig.is_send_email){
-                let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER,
-                    EStaffRole.ADMIN], status: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
-                //给所有的管理员发送邮件
-                await Promise.all(admins.map(async function(s) {
-                    let vals = {managerName: s.name, username: user.name, email: user.email, time: moment(tripPlan.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-                        projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel, otherBudget: others,
-                        totalBudget: '￥' + tripPlan.budget, url: url, detailUrl: url};
-
-                    await API.mail.sendMailRequest({toEmails: s.email, templateName: 'qm_notify_new_travelbudget', values: vals});
-                }));
-            }
-            return true;
-        }catch (e) {
-            logger.error("发送邮件失败");
-            logger.error(e);
+            API.notify.submitNotify({
+                key: 'qm_notify_new_travelbudget',
+                email: approveUser.email,
+                values: approve_values,
+                mobile: approveUser.mobile
+            })
+        } else if(msgConfig.is_send_email){
+            let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER,
+                EStaffRole.ADMIN], status: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
+            //给所有的管理员发送邮件
+            await Promise.all(admins.map(function(s) {
+                let vals: any = utils.clone(values);
+                vals.managerName = s.name;
+                vals.email = user.email;
+                vals.projectName = tripPlan.title;
+                return API.notify.submitNotify({
+                    key: 'qm_notify_new_travelbudget',
+                    email: s.email,
+                    values: vals
+                })
+            }));
         }
-
+        return true;
     }
 
 
@@ -573,66 +573,61 @@ class TripPlanModule {
         }
 
         let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
-        let self_values = {username: user.name, planNo: tripPlan.planNo, approveTime: utils.now(), approveUser: staff.name,
-            projectName: tripPlan.title, goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel, otherBudget: others,
-            totalBudget: '￥' + tripPlan.budget, url: self_url, detailUrl: self_url};
+        self_url = await API.wechat.shorturl({longurl: self_url});
+        let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
 
-        let msg_url = await API.wechat.shorturl({longurl: self_url});
         let approveResult = '';
         if(auditResult == EAuditStatus.PASS) {
             approveResult = '审批通过';
-            log.remark = '审批通过，审批人：' + staff.name;
+            log.remark = `审批通过，审批人：${staff.name}`
             tripPlan.status = EPlanStatus.WAIT_UPLOAD;
-
-            if(msgConfig.is_send_email) {
-                API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_approve_pass', values: self_values});
-            }
-            //发送短信提醒
-            if(msgConfig.is_send_message && user.mobile && isMobile(user.mobile)) {
-                API.sms.sendMsgSubmit({template: 'travelBudgetApproved', mobile: user.mobile,
-                    values: {time: moment(tripPlan.startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
-
-            }
         }else if(auditResult == EAuditStatus.NOT_PASS) {
             if(!params.auditRemark) {
                 throw {code: -2, msg: '拒绝原因不能为空'};
             }
-            log.remark = '审批未通过，原因：' + params.auditRemark + '，审批人：' + staff.name;
-            approveResult = '审批未通过，原因：' + params.auditRemark;
+            log.remark = `审批未通过，原因：${params.auditRemark}，审批人：${staff.name}`;
+            approveResult = `审批未通过，原因：${params.auditRemark}`;
             tripPlan.status = EPlanStatus.APPROVE_NOT_PASS;
-            self_values['reason'] = params.auditRemark;
-
-            if(msgConfig.is_send_email) {
-                API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_approve_not_pass', values: self_values});
-            }
-
-            //发送短信提醒
-            if(msgConfig.is_send_message && user.mobile && isMobile(user.mobile)) {
-                API.sms.sendMsgSubmit({template: 'travelBudgetApproveFailed', mobile: user.mobile,
-                    values: {time: moment(tripPlan.startAt).format('YYYY-MM-DD'), destination: tripPlan.arrivalCity, url: msg_url}});
-            }
-        }
-
-        //发送微信消息
-        if(msgConfig.is_send_wechat) {
-            let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
-            if(openId) {
-                let values = {staffName: user.name, startTime: moment(tripPlan.startAt).format('YYYY-MM-DD'), arrivalCity: tripPlan.arrivalCity, budget: tripPlan.budget,
-                    tripPlanNo: tripPlan.planNo, approveResult: approveResult, approveTime: moment().format('YYYY-MM-DD HH:mm:ss'), approveUser: staff.name};
-                API.wechat.sendTemplateMessage({templateName: 'APPROVE_RESULT', openId: openId, url: self_url, values: values});
-            }
         }
 
         let tripDetails = await tripPlan.getTripDetails({});
-
         tripDetails.map(function(detail) {
             if (detail.type == ETripType.SUBSIDY) return;
             detail.status = tripPlan.status;
         });
-
         await Promise.all(tripDetails.map((d) => d.save()));
         await Promise.all([tripPlan.save(), log.save()]);
 
+        let self_values = {
+            username: user.name,
+            planNo: tripPlan.planNo,
+            approveTime: utils.now(),
+            approveUser: staff.name,
+            projectName: tripPlan.title,
+            goTrafficBudget: go,
+            backTrafficBudget: back,
+            hotelBudget: hotel,
+            otherBudget: others,
+            totalBudget: '￥' + tripPlan.budget,
+            url: self_url,
+            detailUrl: self_url,
+            time: moment(tripPlan.startAt).format('YYYY-MM-DD'),
+            destination: tripPlan.arrivalCity,
+            staffName: user.name,
+            startTime: moment(tripPlan.startAt).format('YYYY-MM-DD'),
+            arrivalCity: tripPlan.arrivalCity,
+            budget: tripPlan.budget,
+            tripPlanNo: tripPlan.planNo,
+            approveResult: approveResult,
+            reason: approveResult,
+        };
+        API.notify.submitNotify({
+            email: user.email,
+            key: 'qm_notify_approve_pass',
+            values: self_values,
+            mobile: user.mobile,
+            openid: openId
+        })
         return true;
     }
 
@@ -762,30 +757,34 @@ class TripPlanModule {
             }
 
             let company = await tripPlan.getCompany();
-            if(msgConfig.is_send_email) {
-                let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
-                let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
-                let auditValues = {auditUserName: user.name, companyName: company.name, staffName: tripPlan.account.name, projectName: tripPlan.title,
-                    goTrafficBudget: go, backTrafficBudget: back, hotelBudget: hotel, otherBudget: others, totalBudget: tripPlan.budget, url: auditUrl, detailUrl: auditUrl
-                };
-                API.mail.sendMailRequest({toEmails: user.email, templateName: 'qm_notify_invoice_wait_audit', values: auditValues});
+            let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
+            let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
+            let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
+            let auditValues = {
+                auditUserName: user.name,
+                companyName: company.name,
+                staffName: tripPlan.account.name,
+                projectName: tripPlan.title,
+                goTrafficBudget: go,
+                backTrafficBudget: back,
+                hotelBudget: hotel,
+                otherBudget: others,
+                totalBudget: tripPlan.budget,
+                url: auditUrl,
+                detailUrl: auditUrl,
+                approveUser: user.name,
+                tripPlanNo: tripPlan.planNo,
+                content: `企业 ${company.name} 员工 ${user.name}${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差计划票据已提交，预算：￥${tripPlan.budget}，等待您审核！`,
+                createdAt: utils.now(),
             }
 
-
-            //发送微信消息
-            if(msgConfig.is_send_wechat) {
-                let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
-                if(openId) {
-                    let values = {
-                        approveUser: user.name, tripPlanNo: tripPlan.planNo, staffName: user.name,
-                        content: "企业 " + company.name + " 员工 " +  user.name + moment(tripPlan.startAt).format('YYYY-MM-DD') + '到' + tripPlan.arrivalCity + '的出差计划票据已提交，预算：￥' + tripPlan.budget + '，等待您审核！',
-                        createdAt: utils.now()
-                    };
-                    API.wechat.sendTemplateMessage({templateName: 'WAIT_AUDIT_MESSAGE', openId: openId, url: '', values: values});
-                }
-            }
+            API.notify.submitNotify({
+                key: 'qm_notify_invoice_wait_audit',
+                values: auditValues,
+                email: user.email,
+                openid: openId,
+            })
         }
-
         return true;
     }
 
