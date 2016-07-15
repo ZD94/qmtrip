@@ -312,7 +312,7 @@ class TripPlanModule {
                 mobile: approveUser.mobile,
                 openid: openId,
             })
-        } else if(msgConfig.is_send_email){
+        } else {
             let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER,
                 EStaffRole.ADMIN], status: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
             //给所有的管理员发送邮件
@@ -596,10 +596,12 @@ class TripPlanModule {
         let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
 
         let approveResult = '';
+        let tplName = '';
         if(auditResult == EAuditStatus.PASS) {
             approveResult = '审批通过';
             log.remark = `审批通过，审批人：${staff.name}`
             tripPlan.status = EPlanStatus.WAIT_UPLOAD;
+            tplName = 'qm_notify_approve_pass';
         }else if(auditResult == EAuditStatus.NOT_PASS) {
             if(!params.auditRemark) {
                 throw {code: -2, msg: '拒绝原因不能为空'};
@@ -607,6 +609,7 @@ class TripPlanModule {
             log.remark = `审批未通过，原因：${params.auditRemark}，审批人：${staff.name}`;
             approveResult = `审批未通过，原因：${params.auditRemark}`;
             tripPlan.status = EPlanStatus.APPROVE_NOT_PASS;
+            tplName = 'qm_notify_approve_not_pass';
         }
 
         let tripDetails = await tripPlan.getTripDetails({});
@@ -639,10 +642,11 @@ class TripPlanModule {
             tripPlanNo: tripPlan.planNo,
             approveResult: approveResult,
             reason: approveResult,
+            emailReason: params.auditRemark
         };
         API.notify.submitNotify({
             email: user.email,
-            key: 'qm_notify_approve_pass',
+            key: tplName,
             values: self_values,
             mobile: user.mobile,
             openid: openId
@@ -831,10 +835,8 @@ class TripPlanModule {
         let audit = params.auditResult;
         let tripPlan = tripDetail.tripPlan;
 
-        let templateValue: any = {invoiceDetail: '无'};
-        let emailValues: any = {projectName: tripPlan.title, totalBudget: '￥' + tripPlan.budget, time: moment(tripPlan.startAt).format('YYYY-MM-DD')};
-        let templateName = '';
-        let emailTemplate = '';
+        let templateValue: any = {invoiceDetail: '无', projectName: tripPlan.title, totalBudget: '￥' + tripPlan.budget, time: moment(tripPlan.startAt).format('YYYY-MM-DD')};
+        let templateName: any = '';
 
         if(audit == EAuditStatus.INVOICE_PASS) {
             tripDetail.status = EPlanStatus.COMPLETE;
@@ -853,23 +855,25 @@ class TripPlanModule {
                 let savedMoney = (tripPlan.budget - tripPlan.expenditure);
                 tripPlan.score = savedMoney > 0 ? parseInt((savedMoney * SAVED2SCORE).toString()) : 0;
             }
-            emailValues.consume = '￥' + (tripDetail.expenditure || 0);
-            templateName = 'INVOICE_AUDIT_PASS';
-            emailTemplate = 'qm_notify_invoice_one_pass';
+            templateValue.consume = '￥' + (tripDetail.expenditure || 0);
+            templateName = 'qm_notify_invoice_one_pass';
+            let detailSavedM = tripDetail.budget - tripDetail.expenditure;
+            detailSavedM = detailSavedM > 0 ? detailSavedM : 0;
+            templateValue.invoiceDetail += '，实际花费：' + tripDetail.expenditure + '元，节省：' + detailSavedM + '元';
         } else if(audit == EAuditStatus.INVOICE_NOT_PASS) {
             tripDetail.auditRemark = reason;
             tripDetail.status = EPlanStatus.AUDIT_NOT_PASS;
             tripPlan.status = EPlanStatus.AUDIT_NOT_PASS;
             tripPlan.auditStatus = EAuditStatus.INVOICE_NOT_PASS;
             templateValue.reason = reason;
-            emailValues.reason = reason;
-            templateName = 'INVOICE_AUDIT_REJECT';
-            emailTemplate = 'qm_notify_invoice_not_pass';
+            templateName = 'qm_notify_invoice_not_pass';
         } else {
             throw L.ERR.PERMISSION_DENIED(); //代理商只能审核票据权限
         }
+        //保存更改记录
         await Promise.all([tripPlan.save(), tripDetail.save()]);
-        
+
+        /*******************************************发送通知消息**********************************************/
         switch (tripDetail.type) {
             case ETripType.OUT_TRIP:
                 templateValue.tripType = '去程';
@@ -893,39 +897,22 @@ class TripPlanModule {
             default: templateValue.tripType = ''; break;
         }
         let staff = await Models.staff.get(tripPlan['accountId']);
-        
-        if(msgConfig.is_send_email) {
-            let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
-            //给员工发送邮件
-            let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
 
-            emailValues.username = staff.name;
-            emailValues.ticket = templateValue.tripType;
-            emailValues.goTrafficBudget = go;
-            emailValues.backTrafficBudget = back;
-            emailValues.hotelBudget = hotel;
-            emailValues.otherBudget = others;
-            emailValues.detailUrl = self_url;
-            emailValues.url = self_url;
+        let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
+        let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
 
-            API.mail.sendMailRequest({toEmails: staff.email, templateName: emailTemplate, values: emailValues});
-        }
+        templateValue.username = staff.name;
+        templateValue.goTrafficBudget = go;
+        templateValue.backTrafficBudget = back;
+        templateValue.hotelBudget = hotel;
+        templateValue.otherBudget = others;
+        templateValue.detailUrl = self_url;
+        templateValue.url = self_url;
+        templateValue.auditUser = '鲸力智享';
+        templateValue.auditTime = utils.now();
 
-        //发送微信消息
-        if(msgConfig.is_send_wechat) {
-            let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
-            if(openId) {
-                if(audit == EAuditStatus.INVOICE_PASS) {
-                    let detailSavedM = tripDetail.budget - tripDetail.expenditure;
-                    detailSavedM = detailSavedM > 0 ? detailSavedM : 0;
-                    templateValue.invoiceDetail += '，实际花费：' + tripDetail.expenditure + '元，节省：' + detailSavedM + '元';
-                }
-                templateValue.auditUser = '鲸力智享';
-                templateValue.auditTime = utils.now();
-                let url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
-                API.wechat.sendTemplateMessage({templateName: templateName, openId: openId, url: url, values: templateValue});
-            }
-        }
+        let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
+        API.notify.submitNotify({key: templateName, values: templateValue, email: staff.email, openid: openId,});
 
         //如果出差已经完成,并且有节省反积分,增加员工积分
         if (tripPlan.status == EPlanStatus.COMPLETE && tripPlan.score > 0) {
