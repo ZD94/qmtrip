@@ -654,11 +654,9 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
     if (invoice.type == ETripType.HOTEL) {
         title = '住宿';
     }
-    var invoicefuc = {title:'上传'+title + '发票',done:function(response){
+    $scope.invoicefuc = {title:'上传'+title + '发票',done:function(response){
         var fileId = response.fileId;
         uploadInvoice(invoice, fileId,async function (err, result) {
-            console.info(err);
-            console.info(result)
             if (err) {
                 alert(err.msg ? err.msg : err);
                 return;
