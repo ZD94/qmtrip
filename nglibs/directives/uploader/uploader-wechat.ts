@@ -14,9 +14,7 @@ function wxChooseImage(option){
 
 function wxUploadImage(option){
     return new Promise(function(resolve, reject){
-        option.success = function(res){
-            resolve(res);
-        };
+        option.success = resolve;
         option.fail = reject;
         wx.uploadImage(option);
     })
