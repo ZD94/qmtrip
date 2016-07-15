@@ -1,0 +1,16 @@
+<ion-modal-view>
+    <ion-header-bar class="bar-stable">
+        <h1 class="title">{{file.title}}</h1>
+        <div class="button button-clear" ng-click="modal.hide()">取消</div>
+    </ion-header-bar>
+    <ion-content padding="false" scroll="false" class="has-header">
+        <form class="flex-c10 list">
+            <ion-scroll>
+                <div class="preview_img"></div>
+            </ion-scroll>
+            <div>
+                <a class="button button-positive button-block" ng-click="confirmModal()">确定</a>
+            </div>
+        </form>
+    </ion-content>
+</ion-modal-view>
