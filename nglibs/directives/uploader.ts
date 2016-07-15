@@ -10,7 +10,7 @@ var dyload = require('dyload');
 var use_wxChooseImage = false;
 var isFinishInitWx = false;
 function hanleError(err) {
-    alert(err.msg || err);
+    alert(err.errmsg || err);
 }
 
 angular
@@ -71,9 +71,10 @@ angular
                     API.onload(function(){
                         if (!isFinishInitWx) {
                             isFinishInitWx = true;
-                            API.wechat.getJSDKParams({url:window.location.href, jsApiList:['chooseImage', 'uploadImage'], debug:false})
+                            //此处url切记使用这种方式,#号后面参数不能携带
+                            var url = window.location.href.split('#')[0];
+                            API.wechat.getJSDKParams({url: url, jsApiList:['chooseImage', 'uploadImage'], debug:false})
                                 .then(function(cfg) {
-                                    alert(JSON.stringify(cfg))
                                     wx.config(cfg);
                                 })
                                 .catch(function(err) {
