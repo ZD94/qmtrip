@@ -901,6 +901,7 @@ class TripPlanModule {
         let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
         let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
 
+        templateValue.ticket = templateValue.tripType;
         templateValue.username = staff.name;
         templateValue.goTrafficBudget = go;
         templateValue.backTrafficBudget = back;
@@ -912,7 +913,12 @@ class TripPlanModule {
         templateValue.auditTime = utils.now();
 
         let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
-        API.notify.submitNotify({key: templateName, values: templateValue, email: staff.email, openid: openId,});
+        API.notify.submitNotify({
+            key: templateName,
+            values: templateValue,
+            email: staff.email,
+            openid: openId,
+        });
 
         //如果出差已经完成,并且有节省反积分,增加员工积分
         if (tripPlan.status == EPlanStatus.COMPLETE && tripPlan.score > 0) {
