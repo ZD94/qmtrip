@@ -57,7 +57,7 @@ export async function BudgetController($scope) {
     }
     //$scope.saveMoneyChart.colors = ['#33cd5f', '#387ef5'];
     $scope.saveMoneyChart.dataset = {
-        backgroundColor: ['#33cd5f', '#387ef5'],
+        backgroundColor: ['#B9C9DB', '#4A90E2'],
         borderWidth: [1, 1]
     };
 

@@ -10,7 +10,7 @@
             <select ng-change="monthChange(queryMonth)" id="monthSelect" ng-model="queryMonth" ng-options="item.value as item.name for item in months"></select>
         </label>
         <div class="spacer" style="width: 300px; height: 30px;"></div>
-        <div class="row">
+        <div class="row withChart">
             <div class="col col-50">
                 <canvas id="doughnut" class="chart chart-doughnut"
                         chart-data="saveMoneyChart.data"
@@ -19,31 +19,44 @@
                         chart-dataset-override="saveMoneyChart.dataset"
                         width="170">
                 </canvas>
+                <div class="chart_info">
+                    <span>节省</span>
+                    <p class="savePercent">{{(statistic.savedMoney/statistic.dynamicBudget*100).toFixed(1)}}%</p>
+                </div>
             </div>
             <div class="col col-50">
                 <ion-list>
                     <ion-item>
-                        <h2>出差人数</h2>
-                        <p>{{statistic.staffNum}}人次</p>
+                        <p>动态预算(元)</p>
+                        <h2>{{statistic.dynamicBudget}}</h2>
                     </ion-item>
                     <ion-item >
-                        <h2>运行项目</h2>
-                        <p>{{statistic.projectNum}}个</p>
+                        <p>费用节省(元)</p>
+                        <h2>{{statistic.savedMoney}}</h2>
                     </ion-item>
+                    <div class="item_divider"></div>
                 </ion-list>
             </div>
         </div>
-
-        <ion-list>
-            <ion-item style="font-size: 0.8em;">
-                <!--<progress-bar ng-if="isShow1" title="{{option1.title}}" all="{{option1.all}}" cover="{{option1.cover}}" color="orange">公司预算</progress-bar>-->
-                <progress-bar ng-if="isShow1" title="{{option1.title}}" all="{{option1.all}}" cover="{{option1.cover}}" color="blue">动态预算</progress-bar>
-                <progress-bar ng-if="isShow2" title="{{option2.title}}" all="{{option2.all}}" cover="{{option2.cover}}" color="green">节省费用</progress-bar>
-            </ion-item>
-        </ion-list>
+        <div class="row project_info">
+            <div class="col col-50">
+                <p>出差人数(人次)</p>
+                <h2>{{statistic.staffNum}}</h2>
+            </div>
+            <div class="col col-50">
+                <p>运行项目(人次)</p>
+                <h2>{{statistic.projectNum}}</h2>
+            </div>
+        </div>
+        <!--<ion-list>-->
+            <!--<ion-item style="font-size: 0.8em;">-->
+                <!--<progress-bar ng-if="isShow1" title="{{option1.title}}" all="{{option1.all}}" cover="{{option1.cover}}" color="blue">动态预算</progress-bar>-->
+                <!--<progress-bar ng-if="isShow2" title="{{option2.title}}" all="{{option2.all}}" cover="{{option2.cover}}" color="green">节省费用</progress-bar>-->
+            <!--</ion-item>-->
+        <!--</ion-list>-->
         <div class="spacer" style="width: 300px; height: 30px;"></div>
 
-        <div class="item-divider">&nbsp;员工节省排行</div>
+        <div class="item-divider" ng-if="staffSaves.length>0">&nbsp;员工节省排行</div>
         <ion-list>
             <ion-item ng-repeat="v in staffSaves" style="font-size: 0.8em;">
                 <div style="display: block; position: absolute; width: 30px; height: 30px; text-align: center; line-height: 30px; border-radius: 50%; color: white; background:#2495da;">{{v.name| limitTo: -1}}</div>
