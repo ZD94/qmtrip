@@ -6,7 +6,7 @@ var API = require('common/api');
 var isFinishInitWx = false;
 
 function hanleError(err) {
-    alert(err.msg || err);
+    //alert(err.msg || err);
 }
 
 export function ngUploaderWechat($loading) {

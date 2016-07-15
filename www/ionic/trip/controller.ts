@@ -224,7 +224,7 @@ export async function CreateController($scope, $storage, $loading){
                     cb();
                 }
             }
-            template = templatePrefix + template
+            // template = templatePrefix + template
             $loading.reset();
             $loading.start({
                 template: template,
@@ -561,8 +561,14 @@ export async function ListDetailController($location, $scope , Models, $statePar
             console.info('before commit...');
             await API.tripPlan.commitTripPlan({id: id});
             console.info('after commit...');
-            alert('提交成功')
-            window.location.href="#/trip/list"
+            var alertPop = $ionicPopup.alert({
+                title:'提示',
+                template:'提交成功'
+            });
+            alertPop.then(function(res){
+                window.location.href="#/trip/list";
+            })
+
         }catch(e) {
             alert(e.msg || e);
         }
