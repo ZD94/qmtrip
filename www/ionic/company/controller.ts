@@ -68,7 +68,7 @@ export async function BudgetController($scope) {
         statistic.month = statistic.month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月');
         $scope.statistic = statistic;
 
-        $scope.saveMoneyChart.data = [statistic.savedMoney || 0, statistic.expenditure || 1];
+        $scope.saveMoneyChart.data = [statistic.savedMoney || 0, statistic.dynamicBudget || 1];
 
         $scope.option1 = {
             all: statistic.dynamicBudget,
