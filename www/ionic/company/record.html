@@ -35,7 +35,30 @@
                     </ion-item>
                 </ion-list>
             </div>
-            <div class="item item-divider">
+            <div class="item item-divider row" ng-if="trip.status == 4">
+                <div class="col">
+                    <span style="color: blue;">{{trip.budget | currency: ''}}元</span>
+                    <br/>预算
+                </div>
+                <div class="col">
+                    <span style="color: orange;">{{trip.expenditure | currency: ''}}元</span>
+                    <br/>
+                    <span style="font-weight: 100">实际</span>
+                </div>
+                <div class="col">
+                    <span ng-if="trip.budget - trip.expenditure >= 0">
+                        <span style="color: green;">{{trip.budget - trip.expenditure | currency: ''}}元</span>
+                        <br/>
+                        <span style="font-weight: 100">节省</span>
+                    </span>
+                    <span ng-if="trip.budget - trip.expenditure < 0">
+                        <span style="color: red;">{{trip.expenditure - trip.budget| currency: ''}}元</span>
+                        <br/>
+                        <span style="font-weight: 100">超支</span>
+                    </span>
+                </div>
+            </div>
+            <div class="item item-divider" ng-if="trip.status != 4">
                 <span ng-if="trip.status == EPlanStatus.AUDIT_NOT_PASS">票据审核未通过</span>
                 <span ng-if="trip.status == EPlanStatus.APPROVE_NOT_PASS">审批未通过</span>
                 <span ng-if="trip.status == EPlanStatus.NO_BUDGET">待出预算</span>

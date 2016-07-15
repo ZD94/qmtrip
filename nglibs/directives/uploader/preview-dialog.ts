@@ -2,7 +2,7 @@
 var dyload = require('dyload');
 
 export function showPreviewDialog($scope, $ionicModal, file, uploadedCbFn){
-
+    require('./preview.scss');
     var template = require('./preview-dialog.html');
     $scope.modal = $ionicModal.fromTemplate(template, {
         scope: $scope,
