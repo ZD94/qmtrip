@@ -790,7 +790,7 @@ class TripPlanModule {
             let auditValues = {
                 auditUserName: user.name,
                 companyName: company.name,
-                staffName: tripPlan.account.name,
+                staffName: staff.name,
                 projectName: tripPlan.title,
                 goTrafficBudget: go,
                 backTrafficBudget: back,
@@ -805,8 +805,14 @@ class TripPlanModule {
                 createdAt: utils.now(),
             }
 
-            API.notify.submitNotify({
+            /*API.notify.submitNotify({
                 key: 'qm_notify_invoice_wait_audit',
+                values: auditValues,
+                email: user.email,
+                openid: openId,
+            })*/
+            API.notify.submitNotify({
+                key: 'qm_notify_agency_budget',
                 values: auditValues,
                 email: user.email,
                 openid: openId,
