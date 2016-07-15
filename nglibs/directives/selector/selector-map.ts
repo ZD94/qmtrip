@@ -10,7 +10,7 @@ export function modalSelectorMap($scope, $ionicModal, selected){
     $scope.modal = $ionicModal.fromTemplate(template, {
         scope: $scope,
         animation: 'slide-in-up',
-        focusFirstInput: true
+        focusFirstInput: false
     });
     $scope.$on('$destroy', function() {
     });

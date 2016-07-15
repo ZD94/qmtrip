@@ -57,7 +57,7 @@ export async function BudgetController($scope) {
     }
     //$scope.saveMoneyChart.colors = ['#33cd5f', '#387ef5'];
     $scope.saveMoneyChart.dataset = {
-        backgroundColor: ['#33cd5f', '#387ef5'],
+        backgroundColor: ['#B9C9DB', '#4A90E2'],
         borderWidth: [1, 1]
     };
 
@@ -512,10 +512,6 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
         if (_staff.travelPolicyId && _staff.travelPolicyId.id) {
             _staff.travelPolicyId = _staff.travelPolicyId.id;
         }
-        //管理员添加员工只能添加普通员工
-        if(currentstaff.roleId == EStaffRole.ADMIN){
-            _staff.roleId = EStaffRole.COMMON;
-        }
 
         if(currentstaff.roleId == EStaffRole.OWNER){
             if(_staff.roleId != EStaffRole.OWNER){
@@ -547,6 +543,10 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
             }
 
             if (!staffId) {
+                //管理员添加员工只能添加普通员工
+                if(currentstaff.roleId == EStaffRole.ADMIN){
+                    _staff.roleId = EStaffRole.COMMON;
+                }
                 //如果不是更新,再去判断
                 //查询邮箱是否已经注册
                 /*var account1 = await Models.account.find({where: {email: _staff.email, type: 1}, paranoid: false});
