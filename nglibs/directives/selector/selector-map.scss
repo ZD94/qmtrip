@@ -17,5 +17,10 @@
   }
   .fixed-footer{
     flex: none;
+    .button{
+      &.button-block{
+        margin: 0;
+      }
+    }
   }
 }
