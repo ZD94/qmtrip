@@ -1,0 +1,9 @@
+.preview_img{
+  canvas, img{
+    width:100%;
+  }
+}
+
+[ng-uploader]:after {
+  display: none;
+}

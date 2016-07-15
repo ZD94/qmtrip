@@ -1,8 +1,7 @@
 
 var dyload = require('dyload');
 
-export function showPreviewDialog($scope, $ionicModal, file, uploadedCbFn){
-    require('./preview.scss');
+export function showPreviewDialog($scope, $ionicModal, file): Promise<any>{
     var template = require('./preview-dialog.html');
     $scope.modal = $ionicModal.fromTemplate(template, {
         scope: $scope,
@@ -33,10 +32,11 @@ export function showPreviewDialog($scope, $ionicModal, file, uploadedCbFn){
 
     return new Promise(function(resolve, reject){
         $scope.cancelModal = function(){
+            resolve();
             $scope.modal.hide();
         }
         $scope.confirmModal = function(){
-            uploadedCbFn();
+            resolve(file);
             $scope.modal.hide();
         }
         $scope.modal.show();

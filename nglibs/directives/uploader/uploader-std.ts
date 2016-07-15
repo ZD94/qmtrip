@@ -21,10 +21,11 @@ export function ngUploaderStd($loading){
                 autoUpload: false
             });
             uploader.onAfterAddingFile = function(file) {
-                showPreviewDialog($scope, $ionicModal, file._file, function() {
-                    $loading.start();
-                    uploader.uploadAll();
-                });
+                showPreviewDialog($scope, $ionicModal, file._file)
+                    .then(function() {
+                        $loading.start();
+                        uploader.uploadAll();
+                    });
             };
 
             uploader.onCompleteItem = function (file, response, status, headers) {

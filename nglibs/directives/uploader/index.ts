@@ -11,6 +11,7 @@ angular
     .directive('ngUploader', ngUploader);
 
 function ngUploader($loading): any {
+    require('./uploader.scss');
     var browserspec = require('browserspec');
     if(browserspec.is_wechat){//} && /^(www\.)?jingli365\.com$/.test(window.location.host)){
         use_wxChooseImage = true;

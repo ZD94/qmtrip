@@ -420,7 +420,7 @@ export async function ListController($scope , Models){
 }
 
 
-export async function ListDetailController($location, $scope , Models, $stateParams, $storage, $ionicPopup){
+export async function ListDetailController($location, $scope , Models, $stateParams, $storage, $ionicPopup, wxApi){
     let id = $stateParams.tripid;
     if (!id) {
         $location.path("/");
