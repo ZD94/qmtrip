@@ -1,21 +1,9 @@
 
-.fixed-header-footer{
-  display: flex;
-  flex-direction: column;
-  height:100%;
-  .fixed-header{
-    flex: none;
-  }
-  .flex-main{
-    flex: 1;
-    .item{
-      padding: 10px 16px;
-      .color_key{
-        color: #3a7eff;
-      }
+.selector-map-dialog{
+  .item{
+    padding: 10px 16px;
+    .color_key{
+      color: #3a7eff;
     }
-  }
-  .fixed-footer{
-    flex: none;
   }
 }

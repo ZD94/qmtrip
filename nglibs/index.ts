@@ -12,7 +12,7 @@ angular.module('nglibs', [
     'angularFileUpload'
 ])
     .run(function(){
-
+        require('./flex.scss');
         var spec = require('browserspec');
         if(spec.is_wechat){
             $('body').addClass('platform-wechat');
