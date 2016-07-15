@@ -6,4 +6,9 @@
       color: #3a7eff;
     }
   }
+  .button{
+    &.button-block{
+      margin: 0;
+    }
+  }
 }

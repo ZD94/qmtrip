@@ -114,6 +114,77 @@ ion-nav-view ion-view ion-content{
       height: 30px;
       margin-top: -15px;
     }
+    &.withChart{
+      background: #fff;
+      padding:5px 0;
+      .col{
+        padding: 0;
+        &:first-child{
+          position: relative;
+          .chart_info{
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left:0;
+            right:0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            span{
+              color: #666;
+            }
+            .savePercent{
+              margin: 10px 0;
+              font-size: 30px;
+              text-align: center;
+            }
+          }
+          @media (max-width:320px) {
+            .chart_info{
+              .savePercent{
+                font-size: 26px;
+              }
+            }
+          }
+        }
+        .list{
+          position: relative;
+          .item{
+            border:0;
+          }
+          .item_divider{
+            border-top:1px solid #ddd;
+            position: absolute;
+            top:50%;
+            left: 20%;
+            width:60%;
+            z-index: 5;
+          }
+        }
+      }
+    }
+    &.project_info{
+      background: #fff;
+      border-top: 1px solid #ddd;
+      .col{
+        h2{
+          margin: 0;
+          font-size: 24px;
+          font-weight: normal;
+        }
+        p{
+          color: #666;
+        }
+        &:first-child{
+          border-right: 1px solid #ddd;
+        }
+      }
+    }
+  }
+  .item{
+    margin: -1px 0;
   }
 }
 
