@@ -790,7 +790,7 @@ class TripPlanModule {
             let auditValues = {
                 auditUserName: user.name,
                 companyName: company.name,
-                staffName: tripPlan.account.name,
+                staffName: staff.name,
                 projectName: tripPlan.title,
                 goTrafficBudget: go,
                 backTrafficBudget: back,
