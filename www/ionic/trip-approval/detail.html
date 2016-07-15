@@ -5,12 +5,12 @@
                 <form class="list">
                     <label class="item item-input opactic">
                        <span ng-if="!tripPlan.status || tripPlan.status == undefined"
-                             class="input-label op_single"></span>
+                             class="input-label op_single">
                             <span ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE"
                                   class="input-label op_single">等待审批</span>
                             <span ng-if="tripPlan.status && tripPlan.status != undefined && tripPlan.status != EPlanStatus.WAIT_APPROVE && tripPlan.status != EPlanStatus.APPROVE_NOT_PASS"
                                   class="input-label op_single">审批通过</span>
-                        <span ng-if="tripPlan.status == EPlanStatus.APPROVE_NOT_PASS" class="input-label op_single">审批未通过，备注：{{tripPlan.auditRemark}}</span>
+                        <span ng-if="tripPlan.status == EPlanStatus.APPROVE_NOT_PASS" class="input-label op_single">审批未通过，备注：{{tripPlan.auditRemark}}</span></span>
                     </label>
                 </form>
                 <ion-list>
@@ -32,7 +32,7 @@
                     <ion-item class="project_tit">{{tripPlan.title}}</ion-item>
                     <ion-item class="project_cont">
                         <p>{{tripPlan.startAt | date: 'yyyy-MM-dd'}} 至 {{tripPlan.backAt | date: 'yyyy-MM-dd'}}</p>
-                        <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{totalBudget}}</span>元
+                        <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{totalBudget == -1 ? '暂无预算' : (totalBudget | currency: '')+'元'}}</span>元
                         </p>
                     </ion-item>
                 </ion-list>
@@ -40,7 +40,7 @@
                 <ion-list>
                     <ion-item class="item-divider">
                         交通
-                        <span class="spanRight">{{trafficBudget==-1?'暂无预算':trafficBudget+'元'}}</span>
+                        <span class="spanRight">{{trafficBudget==-1?'暂无预算':(trafficBudget | currency: '')+'元'}}</span>
                     </ion-item>
                     <ion-item ng-repeat="t in traffic track by $index">
                         {{t.startTime | date: 'MM-dd'}}

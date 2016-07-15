@@ -172,6 +172,7 @@ class StaffModule{
 
             let tp = await Models.travelPolicy.get(updateStaff["travelPolicyId"]);
             let defaultDept = await API.department.getDefaultDepartment({companyId: updateStaff["companyId"]});
+            let upDept = await Models.department.get(updateStaff["departmentId"]);
 
             let vals  = {
                 username: updateStaff.name,
@@ -179,7 +180,7 @@ class StaffModule{
                 travelPolicy: tp.name,
                 time: utils.now(),
                 companyName: updateStaff.company.name,
-                department: updateStaff.department ? updateStaff.department.name : defaultDept.name,
+                department: upDept ? upDept.name : (defaultDept ? defaultDept.name : "我的企业"),
                 permission: updateStaff.roleId == EStaffRole.ADMIN ? "管理员" : (updateStaff.roleId == EStaffRole.OWNER ? "创建者" : "普通员工"),
                 staffStatus: updateStaff.staffStatus == 0 ? "禁用" : "启用"
             }
