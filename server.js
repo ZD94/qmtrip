@@ -6,10 +6,6 @@
 require('app-module-path').addPath(__dirname);
 require('common/typescript').install();
 
-process.on('unhandledRejection', (reason, p) => {
-    throw reason;
-});
-
 Error.stackTraceLimit = 40;
 var zone = require('common/zone');
 
@@ -98,5 +94,11 @@ server.on('init.http', function(server){
 
 zone.forkStackTrace().run(function(){
     server.start();
+});
+
+process.on('unhandledRejection', (reason, p) => {
+    // throw reason;
+    logger.error(p);
+    logger.error("捕获到未处理的错误:", reason.stack)
 });
 
