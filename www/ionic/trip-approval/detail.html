@@ -32,7 +32,7 @@
                     <ion-item class="project_tit">{{tripPlan.title}}</ion-item>
                     <ion-item class="project_cont">
                         <p>{{tripPlan.startAt | date: 'yyyy-MM-dd'}} 至 {{tripPlan.backAt | date: 'yyyy-MM-dd'}}</p>
-                        <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{totalBudget == -1 ? '暂无预算' : (totalBudget | currency: '')+'元'}}</span>元
+                        <p style="text-align: center">总预算:<span style="font-size: 20px;font-weight: bold;">{{totalBudget == -1 ? '暂无预算' : (totalBudget | currency: '')+'元'}}</span>
                         </p>
                     </ion-item>
                 </ion-list>
