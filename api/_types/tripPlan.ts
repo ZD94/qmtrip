@@ -8,6 +8,7 @@ import { ModelObject } from 'common/model/object';
 declare var API: any;
 
 export enum EPlanStatus {
+    CANCEL = -4, //出差计划撤销状态
     AUDIT_NOT_PASS = -3, //票据未审核通过
     APPROVE_NOT_PASS = -2, //审批未通过
     NO_BUDGET = -1, //没有预算
@@ -15,7 +16,7 @@ export enum EPlanStatus {
     WAIT_UPLOAD = 1, //待上传票据
     WAIT_COMMIT = 2, //待提交状态
     AUDITING = 3, //已提交待审核状态
-    COMPLETE = 4 //审核完，已完成状态
+    COMPLETE = 4, //审核完，已完成状态
 }
 
 export enum ETripType {
@@ -75,6 +76,9 @@ export class Project extends ModelObject{
     get name(): string { return ''; }
     set name(val: string) {}
 
+    @Field({type: Types.INTEGER})
+    get weight(): number { return 0; }
+    set weight(val: number) {}
 }
 
 @Table(Models.tripPlan, 'tripPlan.')

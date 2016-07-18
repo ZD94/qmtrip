@@ -128,6 +128,10 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
     $scope.Menu = Menu;
     $scope.currentStaff = staff;
     $scope.logout = async function(){
+        var browserspec = require('browserspec');
+        if(browserspec.is_wechat) {
+            await API.auth.destroyWechatOpenId({});
+        }
         await API.onload();
         $storage.local.remove('auth_data');
         API.reload_all_modules();

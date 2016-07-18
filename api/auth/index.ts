@@ -1246,8 +1246,21 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     static async getWeChatLoginUrl(params: {redirectUrl: string}) {
         let redirectUrl = encodeURIComponent(params.redirectUrl);
         let backUrl = C.host + "/auth/wx-login?redirect_url=" + redirectUrl;
-        // backUrl = "http://aoc.local.tulingdao.com/auth/wx-login?redirect_url=" + redirectUrl; //微信公众号测使用
+        // backUrl = "http://j.jingli365.com/auth/wx-login?redirect_url=" + redirectUrl; //微信公众号测使用
         return API.wechat.getOAuthUrl({backUrl: backUrl});
+    }
+
+    @clientExport
+    static async destroyWechatOpenId(params: {}): Promise<boolean> {
+        let staff = await Staff.getCurrent();
+        let openIds = await Models.accountOpenid.find({where: {accountId: staff.id}});
+        
+        if(!openIds || openIds.length <= 0) {
+            return false;
+        }
+        
+        await Promise.all(openIds.map((openId) => openId.destroy()));
+        return true;
     }
 
     static __initHttpApp (app: any) {

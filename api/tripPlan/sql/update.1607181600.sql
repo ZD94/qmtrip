@@ -1,0 +1,1 @@
+alter table trip_plan.projects add weight integer default 0;
