@@ -1062,7 +1062,7 @@ class TripPlanModule {
         tripPlan.status = EPlanStatus.CANCEL;
         let staff = await Staff.getCurrent();
         let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: `撤销出差计划`});
-        await Promise.all([staff.save(), log.save()]);
+        await Promise.all([tripPlan.save(), log.save()]);
         return true;
     }
 

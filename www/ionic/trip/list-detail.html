@@ -188,10 +188,12 @@
                 </ion-list>
             </ion-scroll>
         </div>
-        <div class="button-bar flex_footer">
+        <div ng-if="tripDetail && tripDetail.status != undefined" class="button-bar flex_footer">
             <a ng-if="tripDetail.status == EPlanStatus.WAIT_COMMIT" ng-click="showAlterDialog()" id="page20-button60" class="button button-positive" no-back>提交审核</a>
             <a ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD" class="button button-stable" no-back>提交审核</a>
-            <a ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS" ng-click="createTripPlan()" id="page20-button61" class="button button-positive" no-back>再次生成</a>
+            <a ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS" ng-click="cancelTripPlan()" id="page20-button61" class="button button-cancel" no-back>撤销</a>
+            <a ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS" ng-click="createTripPlan()" id="page20-button62" class="button button-positive" no-back>再次生成</a>
+            <a ng-if="tripDetail.status == EPlanStatus.WAIT_APPROVE" ng-click="cancelTripPlan()" id="page20-button63" class="button button-cancel" no-back>撤销</a>
         </div>
     </ion-content>
 </ion-view>
