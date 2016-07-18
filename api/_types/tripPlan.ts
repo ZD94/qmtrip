@@ -270,6 +270,10 @@ export class TripPlan extends ModelObject {
         return API.tripPlan.commitTripPlan({id: this.id});
     }
 
+    cancel(): Promise<boolean> {
+        return API.tripPlan.cancelTripPlan({id: this.id});
+    }
+
     /**
      * 获取出差记录日志
      * @returns {Promise<FindResult>}
@@ -284,7 +288,7 @@ export class TripPlan extends ModelObject {
         }
         
         options.where.tripPlanId = this.id;
-        return API.tripPlan.getTripPlanLogs(options);
+        return Models.tripPlanLog.find(options);
     }
 }
 
