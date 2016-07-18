@@ -397,20 +397,24 @@ export async function ListController($scope , Models){
     $scope.statustext = statusTxt;
     $scope.isHasNextPage = true;
     $scope.tripPlans = [];
-    let pager = await staff.getTripPlans({where: {status: {$in: [EPlanStatus.WAIT_UPLOAD, EPlanStatus.WAIT_COMMIT, EPlanStatus.AUDIT_NOT_PASS,EPlanStatus.COMPLETE,EPlanStatus.NO_BUDGET,EPlanStatus.AUDITING]}}});
+    let pager = await staff.getTripPlans({
+        limit: 5,
+        where: {
+            status: {$in: [EPlanStatus.WAIT_UPLOAD, EPlanStatus.WAIT_COMMIT, EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.COMPLETE, EPlanStatus.NO_BUDGET, EPlanStatus.AUDITING]}
+        }
+    });
     loadTripPlan(pager);
-
-    $scope.pager = pager;
     var vm = {
-        isHasNextPage:true,
+        hasNextPage: function() {
+            return pager.totalPages-1 > pager.curPage;
+        },
         nextPage : async function() {
             try {
-                pager = await $scope.pager['nextPage']();
+                pager = await pager.nextPage();
             } catch(err) {
-                this.isHasNextPage = false;
+                alert("获取数据时,发生异常");
                 return;
             }
-            $scope.pager = pager;
             loadTripPlan(pager);
             $scope.$broadcast('scroll.infiniteScrollComplete');
         }
@@ -418,8 +422,9 @@ export async function ListController($scope , Models){
 
     $scope.vm = vm;
 
-    $scope.enterdetail = function(tripid){
-        window.location.href = "#/trip/list-detail?tripid="+tripid;
+    $scope.enterdetail = function(trip){
+        if (!trip) return;
+        window.location.href = "#/trip/list-detail?tripid="+trip.id;
     }
 
     function loadTripPlan(pager) {
