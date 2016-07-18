@@ -5,6 +5,7 @@ import { Company} from 'api/_types/company';
 import { Types, Values } from 'common/model';
 import { Table, Create, Field, ResolveRef, Reference, TableIndex } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
+import {PaginateInterface} from "../../common/model/interface";
 declare var API: any;
 
 export enum EPlanStatus {
@@ -267,6 +268,23 @@ export class TripPlan extends ModelObject {
      */
     commit(): Promise<boolean> {
         return API.tripPlan.commitTripPlan({id: this.id});
+    }
+
+    /**
+     * 获取出差记录日志
+     * @returns {Promise<FindResult>}
+     */
+    getLogs(options): Promise<PaginateInterface<TripPlanLog>> {
+        if(!options) {
+            options = {where: {}};
+        }
+        
+        if(!options.where) {
+            options.where = {};
+        }
+        
+        options.where.tripPlanId = this.id;
+        return API.tripPlan.getTripPlanLogs(options);
     }
 }
 
