@@ -76,6 +76,9 @@ export class Project extends ModelObject{
     get name(): string { return ''; }
     set name(val: string) {}
 
+    @Field({type: Types.INTEGER})
+    get weight(): number { return 0; }
+    set weight(val: number) {}
 }
 
 @Table(Models.tripPlan, 'tripPlan.')

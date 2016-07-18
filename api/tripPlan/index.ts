@@ -61,7 +61,7 @@ class TripPlanModule {
             throw {code: -2, msg: '审核人不能是自己'};
         }
 
-        tripPlan['accountId'] = staff.id;
+        tripPlan.account = staff;
         tripPlan['companyId'] = company.id;
         tripPlan.project = project;
         tripPlan.startAt = query.leaveDate;
@@ -163,7 +163,7 @@ class TripPlanModule {
         //如果出差计划是待审批状态，增加自动审批时间
         if(tripPlan.status == EPlanStatus.WAIT_APPROVE) {
             var days = moment(tripPlan.startAt).diff(moment(), 'days');
-            let format = 'YYYY-MM-DD HH:mm:ss'
+            let format = 'YYYY-MM-DD HH:mm:ss';
             if (days <= 0) {
                 tripPlan.autoApproveTime = moment(tripPlan.createdAt).add(1, 'hours').format(format);
             } else {
@@ -985,7 +985,7 @@ class TripPlanModule {
     @clientExport
     @requireParams(['where.companyId'], ['where.name'])
     static async getProjectList(options): Promise<FindResult> {
-        options.order = options.order || [['created_at', 'desc']];
+        options.order = options.order || [['weight', 'desc'], ['created_at', 'desc']];
         let projects = await Models.project.find(options);
         return {ids: projects.map((p)=> {return p.id}), count: projects['total']};
     }
@@ -1262,7 +1262,10 @@ async function getProjectByName(params) {
     let projects = await Models.project.find({where: {name: params.name}});
 
     if(projects && projects.length > 0) {
-        return projects[0]
+        let project = projects[0];
+        project.weight += 1;
+        await project.save();
+        return project;
     }else if(params.isCreate === true){
         let p = {name: params.name, createUser: params.userId, code: '', companyId: params.companyId, createdAt: utils.now()};
         return Models.project.create(p).save();
