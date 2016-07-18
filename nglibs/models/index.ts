@@ -5,6 +5,7 @@ import L = require('common/language');
 
 import { ModelsInterface, initModels } from 'api/_types';
 import { ModelObjInterface } from 'common/model/interface';
+import { ModelCached } from '../../common/model/cached';
 import { ModelRemote } from 'common/model/remote';
 import { ngService } from '../index';
 import { Staff, Credential, PointChange } from 'api/_types/staff';
@@ -143,8 +144,19 @@ class ClientModels implements ModelsInterface {
         this.token = createService<Token>(Services.token, $cacheFactory);
         this.seed = createService<Seed>(Services.seed, $cacheFactory);
         initModels(this);
+
+        API.on('beforeConnect', this.clearCache.bind(this));
+    }
+
+    clearCache(){
+        for(let k in this){
+            if(this[k] instanceof ModelCached)
+                this[k].clearCache();
+        }
     }
 }
+
+
 
 import './menu';
 import './place';
