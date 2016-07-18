@@ -18,8 +18,8 @@ angular
             transclude: true,
             scope: {
                 data:'=data',
-                showHeader: '@showHeader',
-                showDetailStatus: '@showDetailStatus',
+                showHeader: '@showHeader',  //是否显示提交人信息
+                showDetailStatus: '@showDetailStatus',  //是否显示详细状态,如果为false,则只显示[审批通过,审批未通过,待审批]
                 click: '=click'
             },
             controller: function($scope) {
