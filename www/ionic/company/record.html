@@ -14,63 +14,7 @@
                 <input ng-change="searchTripPlans(staffName)" type="search" placeholder="请输入员工姓名" ng-model="staffName">
             </label>
         </form>
-
-        <div class="list card" ng-repeat="trip in tripPlans track by trip.id" ng-click="enterDetail(trip.id)">
-            <div class="item item-divider">{{trip.startAt | date: 'yyyy-MM-dd'}} 至 {{trip.backAt | date: 'yyyy-MM-dd'}}</div>
-            <div class="item item-body">
-                <ion-list>
-                    <ion-item class="item-avatar">
-                        <div class="staff_portrait" style="position: absolute; top: 5px; left: 20px; font-size: 20px;
-                            width: 60px; line-height: 60px; text-align: center; font-weight: bold;
-                            border-radius: 50%; color: white; background:#2495da;">{{trip.account.name| limitTo: -2}}
-                        </div>
-                        <div style="margin-left: 2em; margin-top: -1em;">
-                            <h2>{{trip.account.name}}</h2>
-                            <p>{{trip.account.mobile}}</p>
-                        </div>
-                    </ion-item>
-                    <ion-item>
-                        <i class="icon ion-plane"></i> &nbsp;&nbsp;{{trip.deptCity}} 到 {{trip.arrivalCity}}<br>
-                        <i class="icon ion-star"></i> &nbsp;&nbsp;出差事由：{{trip.title}}
-                    </ion-item>
-                </ion-list>
-            </div>
-            <div class="item item-divider row" ng-if="trip.status == 4">
-                <div class="col">
-                    <span style="color: blue;">{{trip.budget | currency: ''}}元</span>
-                    <br/>预算
-                </div>
-                <div class="col">
-                    <span style="color: orange;">{{trip.expenditure | currency: ''}}元</span>
-                    <br/>
-                    <span style="font-weight: 100">实际</span>
-                </div>
-                <div class="col">
-                    <span ng-if="trip.budget - trip.expenditure >= 0">
-                        <span style="color: green;">{{trip.budget - trip.expenditure | currency: ''}}元</span>
-                        <br/>
-                        <span style="font-weight: 100">节省</span>
-                    </span>
-                    <span ng-if="trip.budget - trip.expenditure < 0">
-                        <span style="color: red;">{{trip.expenditure - trip.budget| currency: ''}}元</span>
-                        <br/>
-                        <span style="font-weight: 100">超支</span>
-                    </span>
-                </div>
-            </div>
-            <div class="item item-divider" ng-if="trip.status != 4">
-                <span ng-if="trip.status == EPlanStatus.AUDIT_NOT_PASS">票据审核未通过</span>
-                <span ng-if="trip.status == EPlanStatus.APPROVE_NOT_PASS">审批未通过</span>
-                <span ng-if="trip.status == EPlanStatus.NO_BUDGET">待出预算</span>
-                <span ng-if="trip.status == EPlanStatus.WAIT_APPROVE">待审批</span>
-                <span ng-if="trip.status == EPlanStatus.WAIT_UPLOAD">待上传票据</span>
-                <span ng-if="trip.status == EPlanStatus.WAIT_COMMIT">待提交</span>
-                <span ng-if="trip.status == EPlanStatus.AUDITING">票据审核中</span>
-                <span ng-if="trip.status == EPlanStatus.COMPLETE">已完成</span>
-                <span class="spanRight">{{trip.budget | currency: ''}}元</span>
-            </div>
-        </div>
-
+        <trip-plan ng-repeat="trip in tripPlans track by trip.id" show-header="true" data="trip" show-detail-status="true" click="enterDetail" status="{{trip.status}}"></trip-plan>
         <div id="page25-markdown17 " class="getMoreOrNoMore">
             <p>没有更多内容了</p>
         </div>

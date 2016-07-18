@@ -1,12 +1,4 @@
 <ion-view title="出差请示" id="page3">
-    <!--<div class="bar bar-subheader bar-stable">-->
-        <!--<div class="button-bar jl_approvelist">-->
-            <!--<a ng-click="changeTo('ALL')" class="button button-small" ng-class="filter == 'ALL' ? 'active': ''">全部</a>-->
-            <!--<a ng-click="changeTo('WAIT_APPROVE')" class="button button-small" ng-class="filter == 'WAIT_APPROVE' ? 'active': ''">待我审批</a>-->
-            <!--<a ng-click="changeTo('APPROVE_PASS')" class="button button-small" ng-class="filter == 'APPROVE_PASS' ? 'active': ''">审批通过</a>-->
-            <!--<a ng-click="changeTo('APPROVE_FAIL')" class="button button-small" ng-class="filter == 'APPROVE_FAIL' ? 'active': ''">审批失败</a>-->
-        <!--</div>-->
-    <!--</div>-->
     <ion-content padding="true" class="has-header">
         <div class="button-bar jl_approvelist">
             <a ng-click="changeTo('ALL')" class="button button-small" ng-class="filter == 'ALL' ? 'active': ''">全部</a>
@@ -14,31 +6,9 @@
             <a ng-click="changeTo('APPROVE_PASS')" class="button button-small" ng-class="filter == 'APPROVE_PASS' ? 'active': ''">审批通过</a>
             <a ng-click="changeTo('APPROVE_FAIL')" class="button button-small" ng-class="filter == 'APPROVE_FAIL' ? 'active': ''">审批驳回</a>
         </div>
-
-        <div class="list card" ng-repeat="trip in tripPlans track by trip.id" ng-click="enterDetail(trip.id)">
-            <div class="item item-divider">{{trip.startAt | date: 'yyyy-MM-dd'}} 至 {{trip.backAt | date: 'yyyy-MM-dd'}}</div>
-            <div class="item item-body">
-                <ion-list>
-                    <ion-item class="item-thumbnail-left">
-                        <div class="staff_portrait">{{trip.account.name | limitTo: -2}}</div>
-                        <h2 style="margin-top: 0;">{{trip.account.name}}<br>{{trip.account.mobile}}</h2>
-                        <p></p>
-                    </ion-item>
-                    <ion-item>
-                        <i class="icon ion-plane"></i> &nbsp;&nbsp;{{trip.deptCity}} 到 {{trip.arrivalCity}}<br>
-                        <i class="icon ion-star"></i> &nbsp;&nbsp;出差事由：{{trip.title}}
-                    </ion-item>
-                </ion-list>
-            </div>
-            <div class="item item-divider">
-                <span ng-if="trip.status == EPlanStatus.WAIT_APPROVE">待审批</span>
-                <span ng-if="trip.status != EPlanStatus.APPROVE_NOT_PASS && trip.status != EPlanStatus.WAIT_APPROVE">审批通过</span>
-                <span ng-if="trip.status == EPlanStatus.APPROVE_NOT_PASS">审批驳回</span>
-                <span class="spanRight">{{trip.budget | currency: ''}}元</span>
-            </div>
-        </div>
-        <div class="getMoreOrNoMore" ng-if="hasNextPage"><i class="icon ion-arrow-up-a"></i>上拉加载更多</div>
-        <div class="getMoreOrNoMore" ng-if="!hasNextPage">没有更多记录了</div>
-        <ion-infinite-scroll on-infinite="loadMore('{{filter}}')" ng-if="hasNextPage"></ion-infinite-scroll>
+        <trip-plan data="trip" ng-repeat="trip in tripPlans track by trip.id" click="enterDetail" show-header="true"></trip-plan>
+        <div class="getMoreOrNoMore" ng-if="hasNextPage()"><i class="icon ion-arrow-up-a"></i>上拉加载更多</div>
+        <div class="getMoreOrNoMore" ng-if="!hasNextPage()">没有更多记录了</div>
+        <ion-infinite-scroll on-infinite="loadMore('{{filter}}')" ng-if="hasNextPage()"></ion-infinite-scroll>
     </ion-content>
 </ion-view>
