@@ -106,8 +106,18 @@ export async function CreateController($scope, $storage, $loading){
     });
 
     async function queryPlaces(keyword){
+        if (!keyword) {
+            let hotCities = $storage.local.get("hot_cities")
+            if (hotCities) {
+                return hotCities;
+            }
+        }
         var places = await API.place.queryPlace({keyword: keyword});
-        return places.map((place)=> {return {name: place.name, value: place.id} });
+        places = places.map((place)=> {return {name: place.name, value: place.id} });
+        if (!keyword) {
+            $storage.local.set('hot_cities', places);
+        }
+        return places;
     }
     $scope.placeSelector = {
         query: queryPlaces,
