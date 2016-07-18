@@ -97,8 +97,6 @@ zone.forkStackTrace().run(function(){
 });
 
 process.on('unhandledRejection', (reason, p) => {
-    // throw reason;
-    logger.error(p);
-    logger.error("捕获到未处理的错误:", reason.stack)
+    throw reason;
 });
 
