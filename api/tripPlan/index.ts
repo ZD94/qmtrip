@@ -22,6 +22,7 @@ import {Staff, EStaffRole, EStaffStatus} from "api/_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import {getSession} from "common/model/index";
 import {isMobile} from "common/validate";
+import {AgencyUser} from "../_types/agency";
 
 let msgConfig = config.message
 let TripDetailCols = TripDetail['$fieldnames'];
@@ -61,7 +62,7 @@ class TripPlanModule {
             throw {code: -2, msg: '审核人不能是自己'};
         }
 
-        tripPlan['accountId'] = staff.id;
+        tripPlan.account = staff;
         tripPlan['companyId'] = company.id;
         tripPlan.project = project;
         tripPlan.startAt = query.leaveDate;
@@ -163,7 +164,7 @@ class TripPlanModule {
         //如果出差计划是待审批状态，增加自动审批时间
         if(tripPlan.status == EPlanStatus.WAIT_APPROVE) {
             var days = moment(tripPlan.startAt).diff(moment(), 'days');
-            let format = 'YYYY-MM-DD HH:mm:ss'
+            let format = 'YYYY-MM-DD HH:mm:ss';
             if (days <= 0) {
                 tripPlan.autoApproveTime = moment(tripPlan.createdAt).add(1, 'hours').format(format);
             } else {
@@ -725,7 +726,16 @@ class TripPlanModule {
             tripPlan.status = EPlanStatus.WAIT_COMMIT;
         }
 
-        await Promise.all([tripPlan.save(), tripDetail.save()]);
+        let tripType = '';
+        switch (tripDetail.type) {
+            case ETripType.OUT_TRIP: tripType = '去程'; break;
+            case ETripType.BACK_TRIP: tripType = '回程'; break;
+            case ETripType.HOTEL: tripType = '酒店'; break;
+            default: break;
+        }
+        let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, tripDetailId: tripDetail.id, userId: staff.id, remark: `上传${tripType}发票`});
+
+        await Promise.all([tripPlan.save(), tripDetail.save(), log.save()]);
 
         return true;
     }
@@ -762,8 +772,11 @@ class TripPlanModule {
             })
         }
 
+        let staff = await Staff.getCurrent();
+        let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: `提交票据`});
+
         await Promise.all(tripDetails.map((detail) => detail.save()));
-        await tripPlan.save();
+        await Promise.all([tripPlan.save(), log.save()]);
 
         let default_agency = config.default_agency;
         if(default_agency && default_agency.manager_email) {
@@ -787,30 +800,13 @@ class TripPlanModule {
             let auditUrl = `${config.host}/agency.html#/travelRecord/TravelDetail?orderId==${tripPlan.id}`;
             let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
             let openId = await API.auth.getOpenIdByAccount({accountId: user.id});
-            let auditValues = {
-                auditUserName: user.name,
-                companyName: company.name,
-                staffName: staff.name,
-                projectName: tripPlan.title,
-                goTrafficBudget: go,
-                backTrafficBudget: back,
-                hotelBudget: hotel,
-                otherBudget: others,
-                totalBudget: tripPlan.budget,
-                url: auditUrl,
-                detailUrl: auditUrl,
-                approveUser: user.name,
-                tripPlanNo: tripPlan.planNo,
+            let auditValues = {auditUserName: user.name, companyName: company.name, staffName: staff.name, projectName: tripPlan.title, goTrafficBudget: go,
+                backTrafficBudget: back, hotelBudget: hotel, otherBudget: others, totalBudget: tripPlan.budget, url: auditUrl, detailUrl: auditUrl,
+                approveUser: user.name, tripPlanNo: tripPlan.planNo,
                 content: `企业 ${company.name} 员工 ${user.name}${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差计划票据已提交，预算：￥${tripPlan.budget}，等待您审核！`,
                 createdAt: utils.now(),
-            }
+            };
 
-            /*API.notify.submitNotify({
-                key: 'qm_notify_invoice_wait_audit',
-                values: auditValues,
-                email: user.email,
-                openid: openId,
-            })*/
             API.notify.submitNotify({
                 key: 'qm_notify_agency_budget',
                 values: auditValues,
@@ -840,16 +836,20 @@ class TripPlanModule {
 
         let audit = params.auditResult;
         let tripPlan = tripDetail.tripPlan;
-
         let templateValue: any = {invoiceDetail: '无', projectName: tripPlan.title, totalBudget: '￥' + tripPlan.budget, time: moment(tripPlan.startAt).format('YYYY-MM-DD')};
         let templateName: any = '';
+        let isNotify = false;
+        let savedMoney = 0;
+        let logResult = '';
 
         if(audit == EAuditStatus.INVOICE_PASS) {
+            logResult = '通过';
             tripDetail.status = EPlanStatus.COMPLETE;
             tripDetail.expenditure = expenditure;
             let query = {where: {id: {$ne: tripDetail.id}, status: [EPlanStatus.AUDITING, EPlanStatus.AUDIT_NOT_PASS]}}
             let noAuditDetails = await tripPlan.getTripDetails(query); //获取所有未经过审核的票据
             if(!noAuditDetails || noAuditDetails.length == 0 ) {
+                isNotify = true;
                 let details = await tripPlan.getTripDetails({ where: {}});
                 let expenditure = 0;
                 details.forEach( (detail) => {
@@ -858,8 +858,9 @@ class TripPlanModule {
                 tripPlan.expenditure = expenditure;
                 tripPlan.status = EPlanStatus.COMPLETE;
                 tripPlan.auditStatus = EAuditStatus.INVOICE_PASS;
-                let savedMoney = (tripPlan.budget - tripPlan.expenditure);
-                tripPlan.score = savedMoney > 0 ? parseInt((savedMoney * SAVED2SCORE).toString()) : 0;
+                savedMoney = (tripPlan.budget - tripPlan.expenditure);
+                savedMoney = savedMoney > 0 ? savedMoney : 0;
+                tripPlan.score = parseInt((savedMoney * SAVED2SCORE).toString());
             }
             templateValue.consume = '￥' + (tripDetail.expenditure || 0);
             templateName = 'qm_notify_invoice_one_pass';
@@ -867,6 +868,8 @@ class TripPlanModule {
             detailSavedM = detailSavedM > 0 ? detailSavedM : 0;
             templateValue.invoiceDetail += '，实际花费：' + tripDetail.expenditure + '元，节省：' + detailSavedM + '元';
         } else if(audit == EAuditStatus.INVOICE_NOT_PASS) {
+            logResult = '未通过';
+            isNotify = true;
             tripDetail.auditRemark = reason;
             tripDetail.status = EPlanStatus.AUDIT_NOT_PASS;
             tripPlan.status = EPlanStatus.AUDIT_NOT_PASS;
@@ -876,55 +879,59 @@ class TripPlanModule {
         } else {
             throw L.ERR.PERMISSION_DENIED(); //代理商只能审核票据权限
         }
+
+
         //保存更改记录
         await Promise.all([tripPlan.save(), tripDetail.save()]);
 
         /*******************************************发送通知消息**********************************************/
+        let staff = await Models.staff.get(tripPlan['accountId']);
+
         switch (tripDetail.type) {
             case ETripType.OUT_TRIP:
                 templateValue.tripType = '去程';
-                templateValue.invoiceDetail = moment(tripDetail.startTime).format('YYYY-MM-DD') + ' 由' + tripDetail.deptCity + '到' + tripDetail.arrivalCity +
-                    '，去程发票，预算：' + tripDetail.budget + '元';
+                templateValue.invoiceDetail = `${moment(tripDetail.startTime).format('YYYY-MM-DD')} 由 + ${tripDetail.deptCity} 到 ${tripDetail.arrivalCity}， 去程发票， 预算：${tripDetail.budget}元`;
                 break;
             case ETripType.BACK_TRIP:
                 templateValue.tripType = '回程';
-                templateValue.invoiceDetail = moment(tripDetail.startTime).format('YYYY-MM-DD') + ' 由' + tripDetail.deptCity + '到' + tripDetail.arrivalCity +
-                    '，回程发票，预算：' + tripDetail.budget + '元';
+                templateValue.invoiceDetail = `${moment(tripDetail.startTime).format('YYYY-MM-DD')} 由 ${tripDetail.deptCity} 到 ${tripDetail.arrivalCity}， 回程发票， 预算：${tripDetail.budget}元`;
                 break;
             case ETripType.HOTEL:
                 templateValue.tripType = '酒店';
-                templateValue.invoiceDetail = moment(tripDetail.startTime).format('YYYY.MM.DD') + ' - ' + moment(tripDetail.endTime).format('YYYY.MM.DD')
-                    + tripDetail.city;
+                templateValue.invoiceDetail = `${moment(tripDetail.startTime).format('YYYY.MM.DD')} - ${moment(tripDetail.endTime).format('YYYY.MM.DD')}， ${tripDetail.city}`;
                 if(tripDetail.hotelName) {
                     templateValue.invoiceDetail += tripDetail.hotelName;
                 }
-                templateValue.invoiceDetail += '，酒店发票，预算：' + tripDetail.budget + '元';
+                templateValue.invoiceDetail += `，酒店发票，预算：￥{tripDetail.budget}元`;
                 break;
             default: templateValue.tripType = ''; break;
         }
-        let staff = await Models.staff.get(tripPlan['accountId']);
+        if(isNotify) {
+            if(tripPlan.status == EPlanStatus.COMPLETE) {
+                templateValue.invoiceDetail = `${moment(tripPlan.startAt).format('YYYY-MM-DD')}到${tripPlan.arrivalCity}的出差票据，预算：${tripPlan.budget}元，实际花费：${tripPlan.expenditure}元，节省：${savedMoney}元`;
+            }
 
-        let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
-        let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
+            let {go, back, hotel, others} = await TripPlanModule.getPlanEmailDetails(tripPlan);
+            let self_url = `${config.host}/index.html#/trip/list-detail?tripid=${tripPlan.id}`;
 
-        templateValue.ticket = templateValue.tripType;
-        templateValue.username = staff.name;
-        templateValue.goTrafficBudget = go;
-        templateValue.backTrafficBudget = back;
-        templateValue.hotelBudget = hotel;
-        templateValue.otherBudget = others;
-        templateValue.detailUrl = self_url;
-        templateValue.url = self_url;
-        templateValue.auditUser = '鲸力智享';
-        templateValue.auditTime = utils.now();
+            templateValue.ticket = templateValue.tripType;
+            templateValue.username = staff.name;
+            templateValue.goTrafficBudget = go;
+            templateValue.backTrafficBudget = back;
+            templateValue.hotelBudget = hotel;
+            templateValue.otherBudget = others;
+            templateValue.detailUrl = self_url;
+            templateValue.url = self_url;
+            templateValue.auditUser = '鲸力智享';
+            templateValue.auditTime = utils.now();
 
-        let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
-        API.notify.submitNotify({
-            key: templateName,
-            values: templateValue,
-            email: staff.email,
-            openid: openId,
-        });
+            let openId = await API.auth.getOpenIdByAccount({accountId: staff.id});
+            API.notify.submitNotify({key: templateName, values: templateValue, email: staff.email, openid: openId});
+        }
+
+        let user = await AgencyUser.getCurrent();
+        let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, tripDetailId: tripDetail.id, userId: user.id, remark: `${templateValue.tripType}票据审核${logResult}`});
+        log.save();
 
         //如果出差已经完成,并且有节省反积分,增加员工积分
         if (tripPlan.status == EPlanStatus.COMPLETE && tripPlan.score > 0) {
@@ -937,7 +944,8 @@ class TripPlanModule {
             try {
                 staff.totalPoints = staff.totalPoints + tripPlan.score;
                 staff.balancePoints = staff.balancePoints + tripPlan.score;
-                await staff.save();
+                let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: user.id, remark: `增加员工${tripPlan.score}积分`});
+                await Promise.all([staff.save(), log.save()]);
             } catch(err) {
                 //如果保存出错,删除日志记录
                 await pc.destroy();
@@ -983,7 +991,7 @@ class TripPlanModule {
     @clientExport
     @requireParams(['where.companyId'], ['where.name'])
     static async getProjectList(options): Promise<FindResult> {
-        options.order = options.order || [['created_at', 'desc']];
+        options.order = options.order || [['weight', 'desc'], ['created_at', 'desc']];
         let projects = await Models.project.find(options);
         return {ids: projects.map((p)=> {return p.id}), count: projects['total']};
     }
@@ -1031,8 +1039,31 @@ class TripPlanModule {
     @clientExport
     @requireParams(['where.tripPlanId'], ['where.tripDetailId'])
     static async getTripPlanLogs(options): Promise<FindResult> {
-        let paginate = await Models.tripPlan.find(options);
+        let paginate = await Models.tripPlanLog.find(options);
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
+    }
+
+    @clientExport
+    @requireParams(['id'])
+    @modelNotNull('tripPlan')
+    static async cancelTripPlan(params: {id: string}): Promise<boolean> {
+        let tripPlan = await Models.tripPlan.get(params.id);
+        if(tripPlan.status != EPlanStatus.APPROVE_NOT_PASS && tripPlan.status != EPlanStatus.NO_BUDGET && tripPlan.status != EPlanStatus.WAIT_APPROVE) {
+            throw {code: -2, msg: "出差记录状态不正确！"};
+        }
+        
+        let tripDetails = await tripPlan.getTripDetails({});
+        if(tripDetails && tripDetails.length > 0) {
+            await Promise.all(tripDetails.map((d) => {
+                d.status = EPlanStatus.CANCEL;
+                return d.save();
+            }));
+        }
+        tripPlan.status = EPlanStatus.CANCEL;
+        let staff = await Staff.getCurrent();
+        let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: `撤销出差计划`});
+        await Promise.all([staff.save(), log.save()]);
+        return true;
     }
 
     //
@@ -1121,7 +1152,7 @@ class TripPlanModule {
             await _detail.save();
         }));
 
-        let logs = {tripPlanId: tripPlan.id, userId: staff.id, remark: '新增计划单 ' + tripPlan.planNo, createdAt: utils.now()};
+        let logs = {tripPlanId: tripPlan.id, userId: staff.id, remark: '新增出差计划 ' + tripPlan.planNo};
         await Promise.all([tripPlan.save(), TripPlanLog.create(logs).save()]);
 
         return tripPlan;
@@ -1260,7 +1291,10 @@ async function getProjectByName(params) {
     let projects = await Models.project.find({where: {name: params.name}});
 
     if(projects && projects.length > 0) {
-        return projects[0]
+        let project = projects[0];
+        project.weight += 1;
+        await project.save();
+        return project;
     }else if(params.isCreate === true){
         let p = {name: params.name, createUser: params.userId, code: '', companyId: params.companyId, createdAt: utils.now()};
         return Models.project.create(p).save();

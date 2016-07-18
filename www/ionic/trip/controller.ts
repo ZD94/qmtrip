@@ -451,6 +451,9 @@ export async function ListDetailController($location, $scope , Models, $statePar
     let tripPlan = await Models.tripPlan.get(id);
     $scope.tripDetail = tripPlan;
 
+    let logs = await tripPlan.getLogs({});
+    console.info(logs);
+
     let budgets: TripDetail[] = await tripPlan.getTripDetails();
     let hotel;
     let goTraffic;

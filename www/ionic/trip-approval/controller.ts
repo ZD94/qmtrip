@@ -5,6 +5,7 @@
 import {EPlanStatus, ETripType, EAuditStatus, EInvoiceType, MTxPlaneLevel} from "api/_types/tripPlan";
 import {Staff} from "api/_types/staff";
 import moment = require('moment');
+import {HttpArchiveRequest} from "request";
 const API = require("common/api")
 
 export async function ApprovedController($scope, Models, $stateParams){
@@ -275,6 +276,7 @@ export async function PendingController($scope){
     const PAGE_SIZE = 10;
     let staff = await Staff.getCurrent();
     let Pager = await staff.getTripPlans({where: {status: [EPlanStatus.WAIT_APPROVE, EPlanStatus.APPROVE_NOT_PASS]}, limit: PAGE_SIZE}); //获取待审批出差计划列表
+    console.info(Pager);
     $scope.tripPlans = [];
 
     Pager.forEach(function(v) {

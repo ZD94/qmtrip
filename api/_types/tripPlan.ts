@@ -5,9 +5,11 @@ import { Company} from 'api/_types/company';
 import { Types, Values } from 'common/model';
 import { Table, Create, Field, ResolveRef, Reference, TableIndex } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
+import {PaginateInterface} from "../../common/model/interface";
 declare var API: any;
 
 export enum EPlanStatus {
+    CANCEL = -4, //出差计划撤销状态
     AUDIT_NOT_PASS = -3, //票据未审核通过
     APPROVE_NOT_PASS = -2, //审批未通过
     NO_BUDGET = -1, //没有预算
@@ -15,7 +17,7 @@ export enum EPlanStatus {
     WAIT_UPLOAD = 1, //待上传票据
     WAIT_COMMIT = 2, //待提交状态
     AUDITING = 3, //已提交待审核状态
-    COMPLETE = 4 //审核完，已完成状态
+    COMPLETE = 4, //审核完，已完成状态
 }
 
 export enum ETripType {
@@ -75,6 +77,9 @@ export class Project extends ModelObject{
     get name(): string { return ''; }
     set name(val: string) {}
 
+    @Field({type: Types.INTEGER})
+    get weight(): number { return 0; }
+    set weight(val: number) {}
 }
 
 @Table(Models.tripPlan, 'tripPlan.')
@@ -263,6 +268,27 @@ export class TripPlan extends ModelObject {
      */
     commit(): Promise<boolean> {
         return API.tripPlan.commitTripPlan({id: this.id});
+    }
+
+    cancel(): Promise<boolean> {
+        return API.tripPlan.cancelTripPlan({id: this.id});
+    }
+
+    /**
+     * 获取出差记录日志
+     * @returns {Promise<FindResult>}
+     */
+    getLogs(options): Promise<PaginateInterface<TripPlanLog>> {
+        if(!options) {
+            options = {where: {}};
+        }
+        
+        if(!options.where) {
+            options.where = {};
+        }
+        
+        options.where.tripPlanId = this.id;
+        return API.tripPlan.getTripPlanLogs(options);
     }
 }
 
