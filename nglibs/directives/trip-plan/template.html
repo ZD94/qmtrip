@@ -36,14 +36,14 @@
             </span>
         </div>
     </div>
-    <div class="item item-divider" ng-if="!showDetailStatus">
+    <div class="item item-divider" ng-if="trip.status != EPlanStatus.COMPLETE && !showDetailStatus">
         <span ng-if="trip.status == EPlanStatus.WAIT_APPROVE">待审批</span>
         <span ng-if="trip.status != EPlanStatus.APPROVE_NOT_PASS && trip.status != EPlanStatus.WAIT_APPROVE">审批通过</span>
         <span ng-if="trip.status == EPlanStatus.APPROVE_NOT_PASS">审批驳回</span>
         <span class="spanRight">{{trip.budget | currency: ''}}元</span>
     </div>
 
-    <div class="item item-divider" ng-if="showDetailStatus">
+    <div class="item item-divider" ng-if="trip.status != EPlanStatus.COMPLETE && showDetailStatus">
         <span ng-if="trip.status == EPlanStatus.AUDIT_NOT_PASS">票据审核未通过</span>
         <span ng-if="trip.status == EPlanStatus.APPROVE_NOT_PASS">审批未通过</span>
         <span ng-if="trip.status == EPlanStatus.NO_BUDGET">待出预算</span>
