@@ -1043,6 +1043,29 @@ class TripPlanModule {
         return {ids: paginate.map((plan) => {return plan.id;}), count: paginate["total"]}
     }
 
+    @clientExport
+    @requireParams(['id'])
+    @modelNotNull('tripPlan')
+    static async cancelTripPlan(params: {id: string}): Promise<boolean> {
+        let tripPlan = await Models.tripPlan.get(params.id);
+        if(tripPlan.status != EPlanStatus.APPROVE_NOT_PASS && tripPlan.status != EPlanStatus.NO_BUDGET && tripPlan.status != EPlanStatus.WAIT_APPROVE) {
+            throw {code: -2, msg: "出差记录状态不正确！"};
+        }
+        
+        let tripDetails = await tripPlan.getTripDetails({});
+        if(tripDetails && tripDetails.length > 0) {
+            await Promise.all(tripDetails.map((d) => {
+                d.status = EPlanStatus.CANCEL;
+                return d.save();
+            }));
+        }
+        tripPlan.status = EPlanStatus.CANCEL;
+        let staff = await Staff.getCurrent();
+        let log = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: `撤销出差计划`});
+        await Promise.all([staff.save(), log.save()]);
+        return true;
+    }
+
     //
     /********************************************统计相关API***********************************************/
 
