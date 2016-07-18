@@ -106,7 +106,7 @@ export async function RecordController($scope) {
         }
         let staffs = await company.getStaffs({where: {name: {$like: '%' + staffName + '%'}}});
         let ids = staffs.map((s) => s.id);
-        $scope.tripPlans = await company.getTripPlans({where: {accountId: ids, status: {$ne: status}}});
+        $scope.tripPlans = await company.getTripPlans({where: {accountId: ids, status: {$in: status}}});
     };
 
     await $scope.searchTripPlans();
