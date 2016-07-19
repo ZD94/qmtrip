@@ -104,8 +104,41 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
                     break;
             }
         });
-
         totalBudget = Number(totalBudget) > tripPlan.budget ? totalBudget : tripPlan.budget;
+
+        API.require("place");
+        await API.onload();
+        let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
+        let destinationCity;
+        if (query.destinationPlace) {
+            destinationCity = await API.place.getCityInfo({cityCode: query.destinationPlace});
+        }
+        tripDetails = budgets.map( (v) => {
+            let ret: any = {
+                budget: v.price,
+                startTime: query.leaveDate,
+                endTime: query.goBackDate,
+                invoiceType: v.type,
+                status: EPlanStatus.WAIT_APPROVE,
+                type: v.tripType,
+            }
+
+            if (v.tripType == ETripType.OUT_TRIP) {
+                ret.deptCity = originCity.name;
+                ret.arrivalCity = destinationCity.name;
+
+            } else if (v.tripType == ETripType.BACK_TRIP) {
+                ret.deptCity = destinationCity.name;
+                ret.arrivalCity = originCity.name;
+            } else if (v.tripType == ETripType.HOTEL) {
+                ret.city = destinationCity.name;
+
+            } else {
+                ret.title = '补助';
+                ret.showBudget = v.price;
+            }
+            return ret;
+        });
 
         await $ionicLoading.hide();
     } else {
@@ -129,6 +162,25 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         });
     }
 
+    tripDetails.map( (v) => {
+        switch(v.type) {
+            case ETripType.OUT_TRIP:
+                v.title = '交通';
+                v.showBudget = trafficBudget;
+                break;
+            case ETripType.HOTEL:
+                v.title = '住宿';
+                v.showBudget = v.budget;
+                break;
+            default:
+                v.title = '补助';
+                v.showBudget = v.budget;
+                break;
+        }
+        return v;
+    })
+
+    $scope.tripDetails = tripDetails;
     $scope.totalBudget = totalBudget;
     $scope.tripPlan.budget = totalBudget;
     $scope.traffic = traffic;
@@ -276,7 +328,6 @@ export async function PendingController($scope){
     const PAGE_SIZE = 10;
     let staff = await Staff.getCurrent();
     let Pager = await staff.getTripPlans({where: {status: [EPlanStatus.WAIT_APPROVE, EPlanStatus.APPROVE_NOT_PASS, EPlanStatus.CANCEL]}, limit: PAGE_SIZE}); //获取待审批出差计划列表
-    console.info(Pager);
     $scope.tripPlans = [];
 
     Pager.forEach(function(v) {
