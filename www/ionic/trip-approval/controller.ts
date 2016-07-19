@@ -276,7 +276,6 @@ export async function PendingController($scope){
     const PAGE_SIZE = 10;
     let staff = await Staff.getCurrent();
     let Pager = await staff.getTripPlans({where: {status: [EPlanStatus.WAIT_APPROVE, EPlanStatus.APPROVE_NOT_PASS, EPlanStatus.CANCEL]}, limit: PAGE_SIZE}); //获取待审批出差计划列表
-    console.info(Pager);
     $scope.tripPlans = [];
 
     Pager.forEach(function(v) {
