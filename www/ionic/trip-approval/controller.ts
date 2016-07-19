@@ -327,8 +327,7 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
 export async function PendingController($scope){
     const PAGE_SIZE = 10;
     let staff = await Staff.getCurrent();
-    let Pager = await staff.getTripPlans({where: {status: [EPlanStatus.WAIT_APPROVE, EPlanStatus.APPROVE_NOT_PASS]}, limit: PAGE_SIZE}); //获取待审批出差计划列表
-    console.info(Pager);
+    let Pager = await staff.getTripPlans({where: {status: [EPlanStatus.WAIT_APPROVE, EPlanStatus.APPROVE_NOT_PASS, EPlanStatus.CANCEL]}, limit: PAGE_SIZE}); //获取待审批出差计划列表
     $scope.tripPlans = [];
 
     Pager.forEach(function(v) {

@@ -288,7 +288,7 @@ export class TripPlan extends ModelObject {
         }
         
         options.where.tripPlanId = this.id;
-        return API.tripPlan.getTripPlanLogs(options);
+        return Models.tripPlanLog.find(options);
     }
 }
 
