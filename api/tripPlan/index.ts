@@ -1088,7 +1088,7 @@ class TripPlanModule {
 
         let staff_num_sql = 'select count(1) as \"staffNum\" from (select distinct account_id ' + where_sql + ') as Project;';
         let project_num_sql = 'select count(1) as \"projectNum\" from (select distinct project_id ' + where_sql + ') as Project;';
-        let budget_sql = 'select sum(budget) as \"dynamicBudget\" ' + where_sql;
+        let budget_sql = 'select sum(budget) as \"dynamicBudget\" ' + complete_sql;
         let saved_sql = 'select sum(budget-expenditure) as \"savedMoney\" ' + complete_sql;
         let expenditure_sql = 'select sum(expenditure) as expenditure ' + complete_sql;
 
