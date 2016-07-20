@@ -890,7 +890,7 @@ class TripPlanModule {
         switch (tripDetail.type) {
             case ETripType.OUT_TRIP:
                 templateValue.tripType = '去程';
-                templateValue.invoiceDetail = `${moment(tripDetail.startTime).format('YYYY-MM-DD')} 由 + ${tripDetail.deptCity} 到 ${tripDetail.arrivalCity}， 去程发票， 预算：${tripDetail.budget}元`;
+                templateValue.invoiceDetail = `${moment(tripDetail.startTime).format('YYYY-MM-DD')} 由 ${tripDetail.deptCity} 到 ${tripDetail.arrivalCity}， 去程发票， 预算：${tripDetail.budget}元`;
                 break;
             case ETripType.BACK_TRIP:
                 templateValue.tripType = '回程';
