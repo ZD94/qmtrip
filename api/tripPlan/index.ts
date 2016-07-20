@@ -1079,14 +1079,14 @@ class TripPlanModule {
         let endTime = moment(startTime).add(1, 'months').format('YYYY-MM-DD');
 
         let where_sql = 'from trip_plan.trip_plans where company_id=\''
-            + companyId + '\' and status!=(' + EPlanStatus.APPROVE_NOT_PASS + ') and status!=' + EPlanStatus.WAIT_APPROVE + ' and start_at>=\''
+            + companyId + '\' and status!=(' + EPlanStatus.APPROVE_NOT_PASS + ') and status!=' + EPlanStatus.WAIT_APPROVE + '  and status!=' + EPlanStatus.CANCEL + '  and status!=' + EPlanStatus.NO_BUDGET + ' and start_at>=\''
             + startTime + '\' and start_at<\'' + endTime + '\'';
 
         let complete_sql = 'from trip_plan.trip_plans where company_id=\''
             + companyId + '\' and status=' + EPlanStatus.COMPLETE + ' and start_at>=\''
             + startTime + '\' and start_at<\'' + endTime + '\'';
 
-        let staff_num_sql = 'select count(1) as \"staffNum\" from (select distinct account_id ' + where_sql + ') as Project;';
+        let staff_num_sql = 'select count(1) as \"staffNum\" from (select account_id ' + where_sql + ') as Project;';
         let project_num_sql = 'select count(1) as \"projectNum\" from (select distinct project_id ' + where_sql + ') as Project;';
         let budget_sql = 'select sum(budget) as \"dynamicBudget\" ' + complete_sql;
         let saved_sql = 'select sum(budget-expenditure) as \"savedMoney\" ' + complete_sql;
