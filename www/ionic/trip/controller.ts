@@ -172,6 +172,11 @@ export async function CreateController($scope, $storage, $loading){
         }
     }
 
+    $scope.beginDateSelector = {
+        done: function(val) {
+            //$scope.trip.beginDate = val.value;
+        }
+    };
     $scope.nextStep = async function() {
         API.require("travelBudget");
         await API.onload();

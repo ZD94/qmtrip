@@ -1,6 +1,6 @@
 <ion-view title="行程详情页" id="page20">
-    <ion-content padding="false" scroll="false" class="has-header has-bottom-btn">
-        <div class="flex_content">
+    <ion-content padding="false" scroll="false" class="has-header">
+        <div class="flex-c10">
             <ion-scroll>
                 <tp-status-bar status="tripDetail.status" reason="tripDetail.reason"></tp-status-bar>
                 <tp-header trip="tripDetail"></tp-header>
@@ -13,13 +13,13 @@
                     <tp-detail-item item="other" title="补助" budget="{{other.budget > 0 ? other.budget : '暂无预算' | currency: ''}}元" ng-if="other"></tp-detail-item>
                 </ion-list>
             </ion-scroll>
-        </div>
-        <div ng-if="tripDetail && tripDetail.status != undefined" class="button-bar flex_footer">
-            <a ng-if="tripDetail.status == EPlanStatus.WAIT_COMMIT" ng-click="showAlterDialog()" id="page20-button60" class="button button-positive" no-back>提交审核</a>
-            <a ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD" class="button button-stable" no-back>提交审核</a>
-            <a ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS" ng-click="cancelTripPlan()" id="page20-button61" class="button button-cancel" no-back>撤销</a>
-            <a ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS" ng-click="createTripPlan()" id="page20-button62" class="button button-positive" no-back>再次生成</a>
-            <a ng-if="tripDetail.status == EPlanStatus.WAIT_APPROVE" ng-click="cancelTripPlan()" id="page20-button63" class="button button-cancel" no-back>撤销</a>
+            <div ng-if="tripDetail && tripDetail.status != undefined" class="button-bar">
+                <a ng-if="tripDetail.status == EPlanStatus.WAIT_COMMIT" ng-click="showAlterDialog()" id="page20-button60" class="button button-positive" no-back>提交审核</a>
+                <a ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD" class="button button-stable" no-back>提交审核</a>
+                <a ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS" ng-click="cancelTripPlan()" id="page20-button61" class="button button-cancel" no-back>撤销</a>
+                <a ng-if="tripDetail.status == EPlanStatus.APPROVE_NOT_PASS" ng-click="createTripPlan()" id="page20-button62" class="button button-positive" no-back>再次生成</a>
+                <a ng-if="tripDetail.status == EPlanStatus.WAIT_APPROVE" ng-click="cancelTripPlan()" id="page20-button63" class="button button-cancel" no-back>撤销</a>
+            </div>
         </div>
     </ion-content>
 </ion-view>
