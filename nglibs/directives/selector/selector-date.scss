@@ -1,0 +1,118 @@
+$color-border: #000;
+$border: solid 1px $color-border;
+
+$color-text: #000;
+$color-expired: #ccc;
+
+$color-weekend-bg: #cbe6fc;
+$color-today: #000;
+$color-today-bg: #cbe6fc;
+$color-lunar: #fff;
+$color-festival: #fff;
+$color-term: #fff;
+$color-selected: #fff;
+$color-selected-bg: #fff;
+
+$flag-size: 28px;
+$color-work-bg: #01bdff;
+$color-rest-bg: #01bdff;
+
+.ng-selector-date {
+  .week-7col {
+    display: flex;
+    flex-wrap: wrap;
+
+    > * {
+      flex: 14.28%;
+      height: 50px;
+
+      border-right: $border;
+      border-bottom: $border;
+      &:nth-child(-n+7) {
+        border-top: $border;
+      }
+      &:nth-child(7n+1) {
+        border-left: $border;
+        background-color: $color-weekend-bg;
+      }
+      &:nth-child(7n) {
+        background-color: $color-weekend-bg;
+      }
+      &:not(.thismonth) {
+        color: $color-expired;
+      }
+    }
+  }
+  .month_2col{
+    display: flex;
+    flex-wrap: wrap;
+    > * {
+      flex: 50%;
+      &:nth-child(2n) {
+        margin-left: 2px;
+      }
+      &:nth-child(2n+1) {
+        margin-right: 2px;
+      }
+    }
+  }
+}
+
+.ng-selector-date-day {
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  &.expired {
+    color: $color-expired;
+  }
+  &.today {
+    color: $color-today;
+    background-color: $color-today-bg;
+  }
+  &.selected {
+    color: $color-selected;
+    background-color: $color-selected-bg;
+  }
+
+  > .flag {
+    top: 0;
+    left: 0;
+    font-size: 16px;
+    transform: scale(0.5);
+    transform-origin: 0 0;
+
+    > div.backtriangle {
+      position: absolute;
+      border-top: $flag-size solid $color-rest-bg;
+      border-right: $flag-size solid transparent;
+      &.workflag {
+        border-top: $flag-size solid $color-work-bg;
+      }
+    }
+    > div.flagtext {
+      position: absolute;
+      transform: translateY(-3px);
+    }
+  }
+  > .content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    .label {
+      font-size: 60%;
+      &.lunar {
+        color: $color-lunar;
+      }
+      &.festival {
+        color: $color-festival;
+      }
+      &.term {
+        color: $color-term;
+      }
+    }
+  }
+}

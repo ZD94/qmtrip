@@ -1,0 +1,30 @@
+<ion-modal-view>
+    <ion-header-bar class="bar-stable">
+        <h1 class="title">{{title}}</h1>
+        <div class="button button-clear" ng-click="modal.hide()">取消</div>
+    </ion-header-bar>
+    <ion-content padding="true" class="has-header ng-selector-date">
+        <div ng-class="{month_2col:month_2col}">
+            <div class="week-7col"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div>
+            <div class="week-7col" ng-if="month_2col"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div>
+            <div ng-repeat="month in months">
+                <div class="month-title">{{month.year}}年{{month.month}}月</div>
+                <div class="week-7col">
+                    <div ng-repeat="day in month.days"
+                         ng-class="{
+                     expired: day.timestamp<begin||end<day.timestamp,
+                      today: day.timestamp == today,
+                       selected: day.timestamp == selectedDay}"
+                    >
+                        <ng-selector-date-day ng-modal="day" ng-if="month.month == day.month" ng-click="confirmModal(day)">
+                        </ng-selector-date-day>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ion-infinite-scroll
+                ng-if="months.length < 12"
+                on-infinite="loadNextMonth()">
+        </ion-infinite-scroll>
+    </ion-content>
+</ion-modal-view>
