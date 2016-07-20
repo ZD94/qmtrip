@@ -456,3 +456,33 @@ export class TripPlanLog extends ModelObject{
     set remark(val: string) {}
 
 }
+
+@Table(Models.approveOrder, 'tripPlan.')
+export class ApproveOrder extends ModelObject{
+    constructor(target: Object) {
+        super(target);
+    }
+    @Create()
+    static create(obj?: Object): ApproveOrder { return null; }
+
+    @Field({type: Types.UUID})
+    get id(): string { return Values.UUIDV1(); }
+    set id(val: string) {}
+
+    @Field({type: Types.UUID})
+    get tripPlanId(): string { return null; }
+    set tripPlanId(val: string) {}
+
+    @Field({type: Types.UUID})
+    get tripDetailId(): string { return null; }
+    set tripDetailId(val: string) {}
+
+    @Field({type: Types.UUID})
+    get userId(): string { return null; }
+    set userId(val: string) {}
+
+    @Field({type: Types.STRING})
+    get remark(): string { return null; }
+    set remark(val: string) {}
+
+}

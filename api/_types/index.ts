@@ -4,7 +4,7 @@ import { Staff, Credential, PointChange } from "./staff";
 import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
 import { Agency, AgencyUser } from './agency';
-import {TripPlan, TripDetail, Project, TripPlanLog} from './tripPlan';
+import {TripPlan, TripDetail, Project, TripPlanLog, ApproveOrder} from './tripPlan';
 import {Account, Token, AccountOpenid} from './auth';
 import {Seed} from "./seed";
 import { ModelInterface } from 'common/model/interface';
@@ -40,7 +40,8 @@ export interface ModelsInterface {
     tripDetail: ModelInterface<TripDetail>;
     tripPlanLog: ModelInterface<TripPlanLog>;
     project: ModelInterface<Project>;
-
+    approveOrder: ModelInterface<ApproveOrder>;
+    
     account: ModelInterface<Account>;
     token: ModelInterface<Token>;
     accountOpenid: ModelInterface<AccountOpenid>;
@@ -65,6 +66,7 @@ export var Models: ModelsInterface = {
     tripDetail: new ModelDelegate<TripDetail>(),
     tripPlanLog: new ModelDelegate<TripPlanLog>(),
     project: new ModelDelegate<Project>(),
+    approveOrder: new ModelDelegate<ApproveOrder>(),
 
     account: new ModelDelegate<Account>(),
     token: new ModelDelegate<Token>(),
