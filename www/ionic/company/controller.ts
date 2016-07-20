@@ -189,7 +189,6 @@ export async function RecordDetailController($scope, Models, $stateParams, $ioni
     $scope.traffic = traffic;
     $scope.hotel = hotel;
     $scope.subsidys = subsidys;
-    console.info($scope.subsidys)
     $scope.trafficBudget = trafficBudget;
     $scope.hotelBudget = hotelBudget;
     $scope.subsidyBudget = subsidyBudget;
