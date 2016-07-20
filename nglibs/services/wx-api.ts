@@ -48,9 +48,10 @@ class WechatApi{
             .then(()=>{
                 this.$resolved = true;
             })
-            //.catch((e)=>{
-            //    this.$resolve_promise = undefined;
-            //});
+            .catch((e)=>{
+                return null;
+                //this.$promise = undefined;
+            });
         return this.$promise;
     }
 }
