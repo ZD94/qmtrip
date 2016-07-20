@@ -10,6 +10,7 @@
                 </ion-list>
             </div>
             <div class="item item-divider">
+                <span ng-if="trip.status == EPlanStatus.CANCEL">已撤销</span>
                 <span ng-if="trip.status == EPlanStatus.WAIT_APPROVE">待审批</span>
                 <span ng-if="trip.status == EPlanStatus.APPROVE_NOT_PASS">审批未通过</span>
                 <span class="spanRight">{{trip.budget | currency: ''}}元</span>

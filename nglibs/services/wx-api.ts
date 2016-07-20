@@ -13,16 +13,21 @@ angular
     .module('nglibs')
     .factory('wxApi', function(){
         if(!browserspec.is_wechat) {
-            return {};
+            return {
+                $resolve: function(){
+                    return Promise.resolve();
+                }
+            };
         }
         return new WechatApi();
     });
 
 class WechatApi{
-    $resolve_promise: Promise<any>;
+    $promise: Promise<any>;
+    $resolved = false;
     $resolve() : Promise<any> {
-        if(this.$resolve_promise != undefined)
-            return this.$resolve_promise;
+        if(this.$promise != undefined)
+            return this.$promise;
         async function doResolve(){
             API.require('wechat');
             await API.onload();
@@ -39,9 +44,14 @@ class WechatApi{
                 wx.config(cfg);
             });
         }
-        this.$resolve_promise = doResolve()
+        this.$promise = doResolve()
+            .then(()=>{
+                this.$resolved = true;
+            })
             .catch((e)=>{
-                this.$resolve_promise = undefined;
+                return null;
+                //this.$promise = undefined;
             });
+        return this.$promise;
     }
 }

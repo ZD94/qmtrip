@@ -1,9 +1,9 @@
 <ion-view title="预算结果" id="page16">
-    <ion-content padding="false" scroll="false" class="has-header has-bottom-btn">
-        <div class="flex_content">
+    <ion-content padding="false" scroll="false" class="has-header">
+        <div class="flex-c10">
             <ion-scroll>
                 <div id="page16-markdown4" style="color:#000000;text-align:right;">
-                    <p  style="color: #fff;">{{trip.createAt| date: 'yyyy-MM-dd HH:mm:ss'}}</p>
+                    <p style="color: #fff;">{{trip.createAt| date: 'yyyy-MM-dd HH:mm:ss'}}</p>
                 </div>
                 <form class="list">
                     <div class="item item-input">
@@ -82,18 +82,17 @@
                             <i ng-if='budget.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
                             &nbsp;
                             {{trip.destinationPlaceName}}
-                            <br/>  {{MTxPlaneLevel[budget.cabinClass]?MTxPlaneLevel[budget.cabinClass]:""}}
+                            <br/> {{MTxPlaneLevel[budget.cabinClass]?MTxPlaneLevel[budget.cabinClass]:""}}
                             <br/>{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')+'元'}}
                         </ion-item>
                     </div>
                 </ion-list>
             </ion-scroll>
+            <div class="button-bar">
+                <a ng-if="totalPrice>0" ng-click="saveTripPlan()" id="page16-button56" class="button button-positive">预算提交审批</a>
+                <a ng-if="totalPrice <= 0" id="page16-button57" class="button button-">暂无预算无法提交审批</a>
+                <!--<a href="#/trip/create" id="page16-button58" class="button button-light  button-block button-outline">取消</a>-->
+            </div>
         </div>
-        <div class="button-bar flex_footer">
-            <a ng-if="totalPrice>0" ng-click="saveTripPlan()" id="page16-button56" class="button button-positive">预算提交审批</a>
-            <a ng-if="totalPrice <= 0" id="page16-button57" class="button button-">暂无预算无法提交审批</a>
-        </div>
-        <!--<a href="#/trip/create" id="page16-button58" class="button button-light  button-block button-outline">取消</a>-->
     </ion-content>
-
 </ion-view>

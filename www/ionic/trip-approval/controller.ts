@@ -5,6 +5,7 @@
 import {EPlanStatus, ETripType, EAuditStatus, EInvoiceType, MTxPlaneLevel} from "api/_types/tripPlan";
 import {Staff} from "api/_types/staff";
 import moment = require('moment');
+import {HttpArchiveRequest} from "request";
 const API = require("common/api")
 
 export async function ApprovedController($scope, Models, $stateParams){
@@ -103,8 +104,39 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
                     break;
             }
         });
-
         totalBudget = Number(totalBudget) > tripPlan.budget ? totalBudget : tripPlan.budget;
+
+        API.require("place");
+        await API.onload();
+        let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
+        let destinationCity;
+        if (query.destinationPlace) {
+            destinationCity = await API.place.getCityInfo({cityCode: query.destinationPlace});
+        }
+        tripDetails = budgets.map( (v) => {
+            let ret: any = {
+                budget: v.price,
+                startTime: query.leaveDate,
+                endTime: query.goBackDate,
+                invoiceType: v.type,
+                status: EPlanStatus.WAIT_APPROVE,
+                type: v.tripType,
+            }
+
+            if (v.tripType == ETripType.OUT_TRIP) {
+                ret.deptCity = originCity.name;
+                ret.arrivalCity = destinationCity.name;
+            } else if (v.tripType == ETripType.BACK_TRIP) {
+                ret.deptCity = destinationCity.name;
+                ret.arrivalCity = originCity.name;
+            } else if (v.tripType == ETripType.HOTEL) {
+                ret.city = destinationCity.name;
+            } else {
+                ret.title = '补助';
+                ret.showBudget = v.price;
+            }
+            return ret;
+        });
 
         await $ionicLoading.hide();
     } else {
@@ -128,6 +160,29 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         });
     }
 
+    tripDetails.map( (v) => {
+        switch(v.type) {
+            case ETripType.BACK_TRIP:
+                v.title = ""
+                v.showBudget = "";
+                break;
+            case ETripType.OUT_TRIP:
+                v.title = '交通';
+                v.showBudget = trafficBudget;
+                break;
+            case ETripType.HOTEL:
+                v.title = '住宿';
+                v.showBudget = v.budget;
+                break;
+            default:
+                v.title = '补助';
+                v.showBudget = v.budget;
+                break;
+        }
+        return v;
+    })
+
+    $scope.tripDetails = tripDetails;
     $scope.totalBudget = totalBudget;
     $scope.tripPlan.budget = totalBudget;
     $scope.traffic = traffic;
@@ -238,48 +293,43 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
             where.status = status;
         }
         Pager = await staff.getWaitApproveTripPlans({ where: where, limit: ONE_PAGE_LIMIT}); //获取待审批出差计划列表
-        $scope.Pager = Pager;
         Pager.forEach(function(v) {
             $scope.tripPlans.push(v);
         })
-        //首次加载判断
-        if (!Pager.length) {
-            $scope.hasNextPage = false;
-        } else {
-            $scope.hasNextPage = true;
-        }
     }
+    $scope.hasNextPage = function() : Boolean{
+        if (!Pager) return false;
+        return Pager.totalPages - 1 > Pager.curPage;
+    }
+
     $scope.changeTo($scope.filter);
-    $scope.hasNextPage = true;
     $scope.loadMore = async function() {
-        if (!$scope.Pager) {
+        if (!Pager) {
             $scope.$broadcast('scroll.infiniteScrollComplete');
             return;
         }
         try {
-            Pager = await $scope.Pager.nextPage();
+            Pager = await Pager.nextPage();
             Pager.forEach(function(v) {
                 $scope.tripPlans.push(v);
             });
-            $scope.Pager = Pager;
-            $scope.hasNextPage = true;
         } catch(err) {
-            console.info(err);
-            $scope.hasNextPage = false;
+            alert("加载数据发生错误");
         } finally {
             $scope.$broadcast('scroll.infiniteScrollComplete');
         }
     }
 
-    $scope.enterDetail = function(tripid){
-        window.location.href = "#/trip-approval/detail?tripid="+tripid;
+    $scope.enterDetail = function(trip){
+        if (!trip) return;
+        window.location.href = "#/trip-approval/detail?tripid="+trip.id;
     }
 }
 
 export async function PendingController($scope){
     const PAGE_SIZE = 10;
     let staff = await Staff.getCurrent();
-    let Pager = await staff.getTripPlans({where: {status: [EPlanStatus.WAIT_APPROVE, EPlanStatus.APPROVE_NOT_PASS]}, limit: PAGE_SIZE}); //获取待审批出差计划列表
+    let Pager = await staff.getTripPlans({where: {status: [EPlanStatus.WAIT_APPROVE, EPlanStatus.APPROVE_NOT_PASS, EPlanStatus.CANCEL]}, limit: PAGE_SIZE}); //获取待审批出差计划列表
     $scope.tripPlans = [];
 
     Pager.forEach(function(v) {

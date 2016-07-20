@@ -1,45 +1,9 @@
 <ion-view title="我的行程" id="page13">
     <ion-content padding="true" class="has-header">
-        <div class="list card" ng-repeat="trip in tripPlans track by trip.id" ng-click="enterdetail(trip.id)">
-            <div class="item item-divider">{{trip.startAt | date: 'yyyy-MM-dd'}} 至 {{trip.backAt | date: 'yyyy-MM-dd'}}</div>
-            <div class="item item-body">
-                <ion-list>
-                    <ion-item>{{trip.deptCity}} 到 {{trip.arrivalCity}} {{}}
-                        <br>出差事由：{{trip.project.name}}</ion-item>
-                </ion-list>
-            </div>
-            <div class="item item-divider row" ng-if="trip.status == 4">
-                <div class="col">
-                    <span style="color: blue;">{{trip.budget | currency: ''}}元</span>
-                    <br/>预算
-                </div>
-                <div class="col">
-                    <span style="color: orange;">{{trip.expenditure | currency: ''}}元</span>
-                    <br/>
-                    <span style="font-weight: 100">实际</span>
-                </div>
-                <div class="col">
-                    <span ng-if="trip.budget - trip.expenditure >= 0">
-                        <span style="color: green;">{{trip.budget - trip.expenditure | currency: ''}}元</span>
-                        <br/>
-                        <span style="font-weight: 100">节省</span>
-                    </span>
-                    <span ng-if="trip.budget - trip.expenditure < 0">
-                        <span style="color: red;">{{trip.expenditure - trip.budget| currency: ''}}元</span>
-                        <br/>
-                        <span style="font-weight: 100">超支</span>
-                    </span>
-                </div>
-            </div>
-            <div class="item item-divider" ng-if="trip.status != 4">{{statustext[trip.status]}}
-                <span class="spanRight" ng-if="trip.budget != -1 && trip.budget != null">{{trip.budget| currency : ''}}元</span>
-                <span class="spanRight" ng-if="trip.budget == -1 || trip.budget == null">待出预算</span>
-            </div>
-
-        </div>
+        <trip-plan ng-repeat="trip in tripPlans track by trip.id" show-detail-status="true" data="trip" click="enterdetail"></trip-plan>
         <div id="page13-markdown3">
-            <div ng-if="!vm.isHasNextPage" class="getMoreOrNoMore">没有更多记录了</div>
+            <div ng-if="!vm.hasNextPage()" class="getMoreOrNoMore">没有更多记录了</div>
         </div>
-        <ion-infinite-scroll ng-if="vm.isHasNextPage" on-infinite="vm.nextPage()"></ion-infinite-scroll>
+        <ion-infinite-scroll ng-if="vm.hasNextPage()" on-infinite="vm.nextPage()"></ion-infinite-scroll>
     </ion-content>
 </ion-view>

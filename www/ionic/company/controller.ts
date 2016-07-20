@@ -94,19 +94,49 @@ export async function RecordController($scope) {
     $scope.EPlanStatus = EPlanStatus;
     $scope.staffName = '';
 
-    $scope.enterDetail = function(tripid){
-        window.location.href = "#/company/record-detail?tripid="+tripid;
+    $scope.enterDetail = function(trip){
+        if (!trip) return;
+        window.location.href = "#/company/record-detail?tripid="+trip.id;
     };
 
     $scope.searchTripPlans = async function(staffName) {
         let status = [EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.AUDITING, EPlanStatus.COMPLETE, EPlanStatus.NO_BUDGET, EPlanStatus.WAIT_COMMIT, EPlanStatus.WAIT_UPLOAD];
-        if(!staffName) {
-            $scope.tripPlans = await company.getTripPlans({where: {status: {$in: status}}});
-            return;
+        $scope.tripPlans = [];
+
+        var pager = await company.getTripPlans({where: {status: {$in: status}}});
+        if(staffName) {
+            let staffs = await company.getStaffs({where: {name: {$like: '%' + staffName + '%'}}});
+            let ids = staffs.map((s) => s.id);
+            pager = await company.getTripPlans({where: {accountId: ids, status: {$in: status}}});
         }
-        let staffs = await company.getStaffs({where: {name: {$like: '%' + staffName + '%'}}});
-        let ids = staffs.map((s) => s.id);
-        $scope.tripPlans = await company.getTripPlans({where: {accountId: ids, status: {$ne: status}}});
+
+        $scope.pager = pager;
+        loadTripPlans(pager);
+
+        var vm = {
+            isHasNextPage:true,
+            nextPage : async function() {
+                try {
+                    pager = await $scope.pager['nextPage']();
+                } catch(err) {
+                    this.isHasNextPage = false;
+                    return;
+                }
+                $scope.pager = pager;
+                loadTripPlans(pager);
+                $scope.$broadcast('scroll.infiniteScrollComplete');
+            }
+        }
+
+        $scope.vm = vm;
+
+        function loadTripPlans(pager) {
+            pager.forEach(function(obj){
+                $scope.tripPlans.push(obj);
+            });
+        }
+
+
     };
 
     await $scope.searchTripPlans();

@@ -172,6 +172,11 @@ export async function CreateController($scope, $storage, $loading){
         }
     }
 
+    $scope.beginDateSelector = {
+        done: function(val) {
+            //$scope.trip.beginDate = val.value;
+        }
+    };
     $scope.nextStep = async function() {
         API.require("travelBudget");
         await API.onload();
@@ -397,20 +402,24 @@ export async function ListController($scope , Models){
     $scope.statustext = statusTxt;
     $scope.isHasNextPage = true;
     $scope.tripPlans = [];
-    let pager = await staff.getTripPlans({where: {status: {$in: [EPlanStatus.WAIT_UPLOAD, EPlanStatus.WAIT_COMMIT, EPlanStatus.AUDIT_NOT_PASS,EPlanStatus.COMPLETE,EPlanStatus.NO_BUDGET,EPlanStatus.AUDITING]}}});
+    let pager = await staff.getTripPlans({
+        limit: 5,
+        where: {
+            status: {$in: [EPlanStatus.WAIT_UPLOAD, EPlanStatus.WAIT_COMMIT, EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.COMPLETE, EPlanStatus.NO_BUDGET, EPlanStatus.AUDITING]}
+        }
+    });
     loadTripPlan(pager);
-
-    $scope.pager = pager;
     var vm = {
-        isHasNextPage:true,
+        hasNextPage: function() {
+            return pager.totalPages-1 > pager.curPage;
+        },
         nextPage : async function() {
             try {
-                pager = await $scope.pager['nextPage']();
+                pager = await pager.nextPage();
             } catch(err) {
-                this.isHasNextPage = false;
+                alert("获取数据时,发生异常");
                 return;
             }
-            $scope.pager = pager;
             loadTripPlan(pager);
             $scope.$broadcast('scroll.infiniteScrollComplete');
         }
@@ -418,8 +427,9 @@ export async function ListController($scope , Models){
 
     $scope.vm = vm;
 
-    $scope.enterdetail = function(tripid){
-        window.location.href = "#/trip/list-detail?tripid="+tripid;
+    $scope.enterdetail = function(trip){
+        if (!trip) return;
+        window.location.href = "#/trip/list-detail?tripid="+trip.id;
     }
 
     function loadTripPlan(pager) {
@@ -446,6 +456,8 @@ export async function ListDetailController($location, $scope , Models, $statePar
     let tripPlan = await Models.tripPlan.get(id);
     $scope.tripDetail = tripPlan;
 
+    let logs = await tripPlan.getLogs({});
+
     let budgets: TripDetail[] = await tripPlan.getTripDetails();
     let hotel;
     let goTraffic;
@@ -456,6 +468,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
     $scope.backTrafficStatus = false;
     $scope.otherStatus = false;
     let statusTxt = {};
+    statusTxt[EPlanStatus.CANCEL] = "已撤销";
     statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
     statusTxt[EPlanStatus.NO_BUDGET] = "没有预算";
     statusTxt[EPlanStatus.WAIT_UPLOAD] = "待上传票据";
@@ -621,6 +634,25 @@ export async function ListDetailController($location, $scope , Models, $statePar
         }));
         await $storage.local.set('trip', trip);
         window.location.href="#/trip/create";
+    };
+    
+    $scope.cancelTripPlan = function() {
+        console.info("取消出差计划...");
+        $ionicPopup.show({
+            title: '确认撤销该出差计划？',
+            scope: $scope,
+            buttons: [{
+                text: '取消'
+            },{
+                text: '确认',
+                type: 'button-positive',
+                onTap: async function (e) {
+                    let tripPlan = $scope.tripDetail;
+                    await tripPlan.cancel();
+                    $scope.showErrorMsg('撤销成功');
+                }
+            }]
+        })
     };
     
     $scope.checkInvoice = function(detailId){
