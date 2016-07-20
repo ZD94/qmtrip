@@ -158,13 +158,14 @@ export async function RecordDetailController($scope, Models, $stateParams, $ioni
     $scope.isHasPermissionApprove = isHasPermissionApprove;
 
     let tripDetails = await tripPlan.getTripDetails();
-    let traffic = [], hotel = [];
+    let traffic = [], hotel = [], subsidys = [];
     let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
     let subsidyDays:number = moment(tripPlan.backAt).diff(moment(tripPlan.startAt), 'days');
     let totalBudget: number = 0;
     let budgetId;
     totalBudget = tripPlan.budget as number;
     tripDetails.forEach(function(detail) {
+        console.info("tripDetail==>", detail)
         switch (detail.type) {
             case ETripType.OUT_TRIP:
                 traffic.push(detail);
@@ -178,13 +179,16 @@ export async function RecordDetailController($scope, Models, $stateParams, $ioni
                 hotel.push(detail);
                 hotelBudget += detail.budget;
                 break;
-            default: subsidyBudget += detail.budget; break;
+            default:
+                subsidys.push(detail);
+                subsidyBudget += detail.budget; break;
         }
     })
 
     $scope.totalBudget = totalBudget;
     $scope.traffic = traffic;
     $scope.hotel = hotel;
+    $scope.subsidys = subsidys;
     $scope.trafficBudget = trafficBudget;
     $scope.hotelBudget = hotelBudget;
     $scope.subsidyBudget = subsidyBudget;
