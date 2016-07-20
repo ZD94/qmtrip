@@ -9,6 +9,7 @@ import { getSession } from 'common/model';
 import { TableExtends, Table, Create, Field, ResolveRef, Reference } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import {PaginateInterface} from "../../common/model/interface";
+declare var API: any;
 
 export enum EStaffStatus {
     FORBIDDEN = 0,
@@ -125,6 +126,10 @@ export class Staff extends ModelObject implements Account {
         }
         options.where.auditUser = this.id;
         return Models.tripPlan.find(options);
+    }
+
+    getTripPlanSaveByAcc(){
+        return API.tripPlan.tripPlanSaveByAcc();
     }
     
     //Account properties:

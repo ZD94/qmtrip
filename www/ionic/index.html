@@ -18,7 +18,7 @@
                     <div class="menu-portrait" ng-click="showTravelPolicy()">{{currentStaff.name.substring(currentStaff.name.length-2,currentStaff.name.length)}}</div>
                     <h2>{{currentStaff.name}}<i class="button button-small button-stable" ng-click="showTravelPolicy()">差旅标准</i></h2>
                     <p>{{currentStaff.mobile || '暂未填写手机号'}}
-                        <br>积分：{{currentStaff.totalPoints || 0}}
+                        <br>节省：{{tripPlanSaveByAcc || 0}}元
                     </p>
                 </ion-item>
                 <ion-scroll>

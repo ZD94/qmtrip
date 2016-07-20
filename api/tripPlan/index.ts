@@ -1186,6 +1186,22 @@ class TripPlanModule {
     }
 
     @clientExport
+    static async tripPlanSaveByAcc(params: {accountId?: string}) {
+        let staff = await Staff.getCurrent();
+        let accountId = staff.id;
+        let companyId = staff.company.id;
+        let sql = `select sum(budget) - sum(expenditure) as save from trip_plan.trip_plans where status = 4 AND company_id = '${companyId}' AND account_id =  '${accountId}' `;
+
+        let ranks = await sequelize.query(sql)
+            .then(function(result) {
+                return result[0];
+            });
+
+        return ranks[0].save;
+    }
+
+
+    @clientExport
     @requireParams(["tripPlanId"])
     static async makeFinalBudget(params: {tripPlanId: string}) {
         let accountId = getSession()["accountId"];
