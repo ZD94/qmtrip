@@ -75,6 +75,7 @@ angular
                 trip: '='
             },
             controller: function($scope) {
+                $scope.EPlanStatus = EPlanStatus;
             }
         }
     }])

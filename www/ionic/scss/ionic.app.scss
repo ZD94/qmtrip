@@ -264,56 +264,14 @@ ion-side-menu{
     }
   }
 }
-.button-bar.bar-footer{
-  position: absolute;
-  height: 57px;
-  z-index: 11;
-}
 
-//吸底button
-.fixed_bottom{
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  margin: 0;
-  a,a.button.button-block{
-    display: block;
-    clear: both;
-    margin: 0;
-    border-radius: 0px;
-  }
-  span{
-    display: block;
-    clear: both;
-    margin: 0;
-    border-radius: 0px;
-  }
-}
-
-//吸底button flex布局
-.has-bottom-btn {
-  display: flex;
-  flex-direction: column;
-  .flex_content{
-    flex: 1;
-    position: relative;
+ion-content{
+  .flex-c10{
     ion-scroll{
-      height: 100%;
-      width:100%;
-      position: absolute;
       padding: 10px;
-      margin: 0;
-    }
-  }
-  .flex_footer{
-    flex: none;
-    a,a.button.button-block{
-      margin: 0;
-      border-radius: 0;
     }
   }
 }
-
 
 .loading-container {
   .loading {

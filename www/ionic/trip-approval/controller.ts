@@ -126,13 +126,11 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             if (v.tripType == ETripType.OUT_TRIP) {
                 ret.deptCity = originCity.name;
                 ret.arrivalCity = destinationCity.name;
-
             } else if (v.tripType == ETripType.BACK_TRIP) {
                 ret.deptCity = destinationCity.name;
                 ret.arrivalCity = originCity.name;
             } else if (v.tripType == ETripType.HOTEL) {
                 ret.city = destinationCity.name;
-
             } else {
                 ret.title = '补助';
                 ret.showBudget = v.price;
@@ -164,6 +162,10 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
 
     tripDetails.map( (v) => {
         switch(v.type) {
+            case ETripType.BACK_TRIP:
+                v.title = ""
+                v.showBudget = "";
+                break;
             case ETripType.OUT_TRIP:
                 v.title = '交通';
                 v.showBudget = trafficBudget;
