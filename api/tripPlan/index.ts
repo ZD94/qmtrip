@@ -1079,7 +1079,7 @@ class TripPlanModule {
         let endTime = moment(startTime).add(1, 'months').format('YYYY-MM-DD');
 
         let where_sql = 'from trip_plan.trip_plans where company_id=\''
-            + companyId + '\' and status!=(' + EPlanStatus.APPROVE_NOT_PASS + ') and status!=' + EPlanStatus.WAIT_APPROVE + '  and status!=' + EPlanStatus.CANCEL + '  and status!=' + EPlanStatus.NO_BUDGET + ' and start_at>=\''
+            + companyId + '\' and status!=(' + EPlanStatus.APPROVE_NOT_PASS + ') and status!=' + EPlanStatus.WAIT_APPROVE + '  and status!=(' + EPlanStatus.CANCEL + ')  and status!=(' + EPlanStatus.NO_BUDGET + ') and start_at>=\''
             + startTime + '\' and start_at<\'' + endTime + '\'';
 
         let complete_sql = 'from trip_plan.trip_plans where company_id=\''
