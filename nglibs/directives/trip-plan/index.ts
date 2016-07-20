@@ -58,6 +58,7 @@ angular
                 statusTxt[EPlanStatus.AUDITING] = "已提交待审核";
                 statusTxt[EPlanStatus.COMPLETE] = "已完成";
                 statusTxt[EPlanStatus.APPROVE_NOT_PASS] = '审核未通过';
+                statusTxt[EPlanStatus.CANCEL] = "已撤销";
                 $scope.$watch('status', function(newVal, oldVal) {
                     $scope.text = statusTxt[newVal];
                 });
