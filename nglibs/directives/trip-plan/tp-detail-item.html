@@ -30,7 +30,7 @@
         <br>{{item.budget == -1 ? '暂无预算' : (item.budget| currency: '')+'元'}}
 
         <div ng-if="item.type != ETripType.SUBSIDY">
-            <div class="item-note" ng-if="item.status == EPlanStatus.WAIT_UPLOAD || item.status == EPlanStatus.AUDIT_NOT_PASS">
+            <div class="item-note" ng-if="item.status == EPlanStatus.WAIT_UPLOAD">
                 <div class="uploadbtns button-small botton-outline button-positive"
                      ng-uploader accept="image/*" title="item.title" done="item.done" url="uploadUrl"
                      ng-if="showUploader">
@@ -71,6 +71,7 @@
                      url="uploadUrl">
                      重新上传
                 </div>
+                <a class="button button-small button-outline" ng-click="viewInvoice(item.id)" ng-if="showUploader">查看票据</a>
             </div>
 
             <div class="item-note" ng-if="item.status == EPlanStatus.NO_BUDGET">
