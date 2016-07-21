@@ -1,0 +1,6 @@
+<div>
+    {{selected.date | date:'yyyy-MM-dd'}} {{selected.hour}}:{{selected.minute}}
+</div>
+<div class="range">
+    <input type="range" ng-model="selected.time" min="0" max="{{timeMax}}">
+</div>

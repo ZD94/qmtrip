@@ -74,9 +74,9 @@ angular
                 placeholder: '@ngSelectorPlaceholder',
                 options: '=ngSelectorDate'
             },
-            controller: function($scope, $ionicModal) {
+            controller: function($scope, $ionicModal, $ionicPopup) {
                 $scope.showSelectorDlg = async function() {
-                    var confirmed = await modalSelectorDate($scope, $ionicModal)
+                    var confirmed = await modalSelectorDate($scope, $ionicModal, $ionicPopup)
                     if(!confirmed)
                         return;
 

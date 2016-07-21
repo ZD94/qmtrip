@@ -18,6 +18,8 @@ var lunarFest = {
     '除夕':'除夕'
 }
 
+var weekDayNames = ['日', '一', '二', '三', '四', '五', '六'];
+
 function initLunarCalendar(){
     if(LunarCalendar)
         return;
@@ -97,7 +99,17 @@ angular
         }
     });
 
-export function modalSelectorDate($scope, $ionicModal){
+
+function popupSelectorTime($scope, $ionicPopup){
+    return $ionicPopup.confirm({
+        cssClass: 'ng-selector-date-time',
+        scope: $scope,
+        title: '选择时间',
+        template: require('./selector-date-time.html')
+    });
+}
+
+export function modalSelectorDate($scope, $ionicModal, $ionicPopup){
     initLunarCalendar();
     var template = require('./selector-date-dialog.html');
     $scope.modal = $ionicModal.fromTemplate(template, {
@@ -119,37 +131,63 @@ export function modalSelectorDate($scope, $ionicModal){
     $scope.$on('modal.removed', function() {
     });
 
+    $scope.weekDayNames = weekDayNames;
+
+    let timeScale = 10;
+    if($scope.options.timepicker){
+        $scope.timeScale = timeScale;
+        $scope.timeMax = 24*60/timeScale;
+    }
+
     $scope.begin = moment($scope.options.beginDate).startOf('day').valueOf();
     $scope.end = moment($scope.options.endDate).startOf('day').valueOf();
 
     $scope.today = moment().startOf('day').valueOf();
+    $scope.selected = {};
     function parseSelected(){
-        $scope.selectedDay = moment($scope.value).startOf('day').valueOf();
-        $scope.selectedHour = $scope.value.getHours();
-        $scope.selectedMinute = $scope.value.getMinutes();
+        $scope.selected.day = moment($scope.value).startOf('day').valueOf();
+        $scope.selected.hour = $scope.value.getHours();
+        $scope.selected.minute = $scope.value.getMinutes();
+        $scope.selected.time = Math.floor(($scope.selected.hour*60 + $scope.selected.minute)/timeScale);
     }
+    parseSelected();
     $scope.$watch('value', function(n, o){
         if(n == o)
             return;
         parseSelected();
     });
+    $scope.$watch('selected.time', function(n, o){
+        if(n == o)
+            return;
+        $scope.selected.hour = Math.floor($scope.selected.time*timeScale/60);
+        $scope.selected.minute = ($scope.selected.time*timeScale)%60;
+
+    });
 
     $scope.months = [];
 
     let ret = new Promise(function(resolve, reject) {
-        $scope.confirmModal = function(day) {
+        function closeAndResolve(day){
+        }
+        $scope.confirmModal = async function(day) {
             if(day.timestamp<$scope.begin||$scope.end<day.timestamp)
                 return;
-            $scope.modal.hide();
-            let date = moment({
-                year: day.year,
-                month: day.month - 1,
-                day: day.day,
-                hour: $scope.selectedHour,
-                minute: $scope.selectedMinute
-            });
-            $scope.value = date.toDate();
-            resolve(true);
+            if($scope.options.timepicker){
+                $scope.selected.date = moment({year: day.year, month: day.month-1, day: day.day}).toDate();
+                let res = await popupSelectorTime($scope, $ionicPopup);
+                if(!res)
+                    return;
+                $scope.modal.hide();
+                let date = moment({
+                    year: day.year,
+                    month: day.month-1,
+                    day: day.day,
+                    hour: $scope.selected.hour,
+                    minute: $scope.selected.minute
+                });
+                $scope.value = date.toDate();
+                resolve(true);
+            }
         }
         $scope.cancelModal = function() {
             $scope.modal.hide();

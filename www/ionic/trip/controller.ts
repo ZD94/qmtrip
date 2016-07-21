@@ -176,7 +176,8 @@ export async function CreateController($scope, $storage, $loading){
 
     $scope.beginDateSelector = {
         beginDate: new Date(),
-        endDate: moment().add(1, 'year').toDate()
+        endDate: moment().add(1, 'year').toDate(),
+        timepicker: true
     };
     $scope.nextStep = async function() {
         let beginMSecond = Date.now();
