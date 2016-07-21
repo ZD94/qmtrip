@@ -1187,8 +1187,8 @@ class TripPlanModule {
 
     @clientExport
     static async getTripPlanSave(params: {accountId?: string}) {
-        let staff = await Staff.getCurrent();
-        let accountId = staff.id;
+        let staff = await Models.staff.get(params.accountId);
+        let accountId = params.accountId;
         let companyId = staff.company.id;
         let sql = `select sum(budget) - sum(expenditure) as save from trip_plan.trip_plans where status = 4 AND company_id = '${companyId}' AND account_id =  '${accountId}' `;
 

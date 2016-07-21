@@ -133,7 +133,7 @@ export class Staff extends ModelObject implements Account {
             API.require('tripPlan');
             await API.onload();
         }
-        return API.tripPlan.getTripPlanSave();
+        return API.tripPlan.getTripPlanSave({accountId: this.id});
     }
 
     //Account properties:

@@ -184,6 +184,9 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         return v;
     })
 
+    tripDetails.sort((v1, v2) => {
+        return v1.type - v2.type;
+    })
     $scope.tripDetails = tripDetails;
     $scope.totalBudget = totalBudget;
     $scope.tripPlan.budget = totalBudget;
