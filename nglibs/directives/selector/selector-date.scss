@@ -143,5 +143,8 @@ $color-rest-bg: #3CA9D7;
 .ng-selector-date-time{
   .popup{
     width: 90%;
+    .selected-time{
+      text-align: center;
+    }
   }
 }
