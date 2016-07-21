@@ -44,9 +44,9 @@ export enum  EAuditStatus {
 
 export var  MTxPlaneLevel  = {
     'Economy': "经济舱",
-    'PremiumEconomy': "优质经济舱",
+    'PremiumEconomy': "公务舱",
     'Business': "公务舱",
-    'First': "头等舱"
+    'First': "公务舱",
 }
 
 @Table(Models.project, 'tripPlan.')

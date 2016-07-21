@@ -121,12 +121,14 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
                 invoiceType: v.type,
                 status: EPlanStatus.WAIT_APPROVE,
                 type: v.tripType,
+                cabinClass: v.cabinClass,
             }
 
             if (v.tripType == ETripType.OUT_TRIP) {
                 ret.deptCity = originCity.name;
                 ret.arrivalCity = destinationCity.name;
             } else if (v.tripType == ETripType.BACK_TRIP) {
+                ret.startTime = query.goBackDate;
                 ret.deptCity = destinationCity.name;
                 ret.arrivalCity = originCity.name;
             } else if (v.tripType == ETripType.HOTEL) {

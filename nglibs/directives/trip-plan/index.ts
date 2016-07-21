@@ -5,7 +5,7 @@
 'use strict';
 
 import angular = require("angular");
-import {EPlanStatus, EInvoiceType, ETripType} from 'api/_types/tripPlan';
+import {EPlanStatus, EInvoiceType, ETripType, MTxPlaneLevel} from 'api/_types/tripPlan';
 import moment = require("moment");
 require("./trip-plan.scss");
 
@@ -104,6 +104,7 @@ angular
                 $scope.EInvoiceType = EInvoiceType;
                 $scope.EPlanStatus = EPlanStatus;
                 $scope.ETripType = ETripType;
+                $scope.MTxPlaneLevel = MTxPlaneLevel;
                 if ($scope.showUploader == 'false' || !$scope.showUploader) {
                     $scope.showUploader = false;
                 } else {
