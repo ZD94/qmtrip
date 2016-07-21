@@ -24,12 +24,10 @@
                     <tp-detail-item item="item" title="{{item.title}}" budget="{{item.showBudget| currency: ''}}元" ng-repeat="item in tripDetails"></tp-detail-item>
                 </ion-list>
             </ion-scroll>
-            <div>
-                <div class="button-bar" ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE && isHasPermissionApprove">
-                    <a ng-click="showReasonDialog()" id="page7-button41" class="button button-assertive  button-block">拒绝</a>
-                    <a ng-click="showAlterDialog()" id="page7-button43"
-                       class="button button-positive  button-block">同意</a>
-                </div>
+            <div class="button-bar" ng-show="tripPlan.status == EPlanStatus.WAIT_APPROVE && isHasPermissionApprove">
+                <a ng-click="showReasonDialog()" id="page7-button41" class="button button-assertive  button-block">拒绝</a>
+                <a ng-click="showAlterDialog()" id="page7-button43"
+                   class="button button-positive  button-block">同意</a>
             </div>
         </div>
     </ion-content>
