@@ -128,7 +128,11 @@ export class Staff extends ModelObject implements Account {
         return Models.tripPlan.find(options);
     }
 
-    getTripPlanSaveByAcc(){
+    async getTripPlanSaveByAcc(){
+        if (!API.tripPlan) {
+            API.require("tripPlan");
+            await API.onload();
+        }
         return API.tripPlan.tripPlanSaveByAcc();
     }
     
