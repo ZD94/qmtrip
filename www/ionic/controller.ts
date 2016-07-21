@@ -50,7 +50,7 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
     ];
 
     var staff = await Staff.getCurrent();
-    var tripPlanSaveByAcc = await staff.getTripPlanSaveByAcc();
+    var tripPlanSave = await staff.getTripPlanSave();
     if(staff && (staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN)){
         items.push({
                 id:1056,
@@ -128,7 +128,7 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
 
     $scope.Menu = Menu;
     $scope.currentStaff = staff;
-    $scope.tripPlanSaveByAcc = tripPlanSaveByAcc;
+    $scope.tripPlanSave = tripPlanSave;
     $scope.logout = async function(){
         var browserspec = require('browserspec');
         if(browserspec.is_wechat) {

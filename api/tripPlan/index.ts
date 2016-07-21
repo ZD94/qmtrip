@@ -1186,7 +1186,7 @@ class TripPlanModule {
     }
 
     @clientExport
-    static async tripPlanSaveByAcc(params: {accountId?: string}) {
+    static async getTripPlanSave(params: {accountId?: string}) {
         let staff = await Staff.getCurrent();
         let accountId = staff.id;
         let companyId = staff.company.id;
