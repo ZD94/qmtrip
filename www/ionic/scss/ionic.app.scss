@@ -270,9 +270,18 @@ ion-side-menu{
 }
 
 ion-content{
-  .flex-c10{
-    ion-scroll{
+  >.flex-c10{
+    >ion-scroll{
       padding: 10px;
+    }
+    >:last-child{
+      &.button-bar, >.button-bar{
+        >.button {
+          margin-top: 0;
+          margin-bottom: 0;
+          border-radius: 0;
+        }
+      }
     }
   }
 }
