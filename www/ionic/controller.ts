@@ -50,7 +50,10 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
     ];
 
     var staff = await Staff.getCurrent();
-    var tripPlanSave = await staff.getTripPlanSave();
+    var tripPlanSave = 0;
+    if(staff){
+        tripPlanSave = await staff.getTripPlanSave();
+    }
     if(staff && (staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN)){
         items.push({
                 id:1056,
