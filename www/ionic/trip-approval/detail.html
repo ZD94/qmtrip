@@ -1,6 +1,6 @@
 <ion-view title="待审批详情" id="page7">
     <ion-content padding="false" scroll="false" class="has-header">
-        <div class="flex_c10">
+        <div class="flex-c10">
             <ion-scroll>
                 <tp-status-bar status="tripPlan.status" reason="tripPlan.auditRemark"></tp-status-bar>
                 <ion-list>
@@ -24,10 +24,12 @@
                     <tp-detail-item item="item" title="{{item.title}}" budget="{{item.showBudget| currency: ''}}元" ng-repeat="item in tripDetails"></tp-detail-item>
                 </ion-list>
             </ion-scroll>
-            <div class="button-bar flex_footer" ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE && isHasPermissionApprove">
-                <a ng-click="showReasonDialog()" id="page7-button41" class="button button-assertive  button-block">拒绝</a>
-                <a ng-click="showAlterDialog()" id="page7-button43"
-                   class="button button-positive  button-block">同意</a>
+            <div>
+                <div class="button-bar" ng-if="tripPlan.status == EPlanStatus.WAIT_APPROVE && isHasPermissionApprove">
+                    <a ng-click="showReasonDialog()" id="page7-button41" class="button button-assertive  button-block">拒绝</a>
+                    <a ng-click="showAlterDialog()" id="page7-button43"
+                       class="button button-positive  button-block">同意</a>
+                </div>
             </div>
         </div>
     </ion-content>
