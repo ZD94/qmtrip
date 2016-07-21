@@ -4,28 +4,28 @@ import angular = require('angular');
 
 angular
     .module('nglibs')
-    .directive('tldWheelPicker', tldWheelPicker)
-    .directive('tldMultiWheelPicker', tldMultiWheelPicker);
+    .directive('ngWheelPicker', ngWheelPicker)
+    .directive('ngMultiWheelPicker', ngMultiWheelPicker);
 
 import './citypicker';
 
-function tldMultiWheelPicker(){
-    require('./style.scss');
+function ngMultiWheelPicker(){
+    require('./wheelpicker.scss');
     return {
         restrict: 'EA',
         replace: true,
         template: require('./wheelpicker.multi.tpl.html'),
         scope: {
             ngModelArray: '=',
-            wheelOptionsFunc: '<tldWheelOptionsFunc',
-            lineHeight: '@tldWheelLineHeight',
-            wheelLabel: '&tldWheelLabel'
+            wheelOptionsFunc: '<ngWheelOptionsFunc',
+            lineHeight: '@ngWheelLineHeight',
+            wheelLabel: '&ngWheelLabel'
         }
     };
 }
 
-function tldWheelPicker() {
-    require('./style.scss');
+function ngWheelPicker() {
+    require('./wheelpicker.scss');
     return {
         restrict : 'EA',
         replace: true,
@@ -33,9 +33,9 @@ function tldWheelPicker() {
         template: require('./wheelpicker.tpl.html'),
         scope: {
             wheelSelected: '=ngModel',
-            wheelOptions: '=tldWheelOptions',
-            lineHeight: '@tldWheelLineHeight',
-            wheelLabel: '&tldWheelLabel'
+            wheelOptions: '=ngWheelOptions',
+            lineHeight: '@ngWheelLineHeight',
+            wheelLabel: '&ngWheelLabel'
         },
         controller: function($scope, $element){
             let lineHeight = $scope.lineHeight;
