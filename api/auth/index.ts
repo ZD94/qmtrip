@@ -483,6 +483,13 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             if (account1 && account1.total>0) {
                 throw L.ERR.EMAIL_HAS_REGISTRY();
             }
+            let domain = data.email.match(/.*\@(.*)/)[1]; //企业域名
+
+            let companies = await Models.company.find({where: {domain_name: domain}});
+
+            if(companies && (companies.length > 0 || companies.total > 0)) {
+                throw L.ERR.DOMAIN_HAS_EXIST();
+            }
         }
 
         if(data.mobile){
