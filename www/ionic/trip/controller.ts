@@ -543,6 +543,9 @@ export async function ListDetailController($location, $scope , Models, $statePar
             // other = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status};
         }
     });
+    budgets.sort(function(v1, v2) {
+        return v1.type - v2.type;
+    });
     $scope.goTraffic = goTraffic;
     $scope.hotel = hotel;
     $scope.backTraffic = backTraffic;
