@@ -5,7 +5,6 @@
 import {EPlanStatus, ETripType, EAuditStatus, EInvoiceType, MTxPlaneLevel} from "api/_types/tripPlan";
 import {Staff} from "api/_types/staff";
 import moment = require('moment');
-import {HttpArchiveRequest} from "request";
 const API = require("common/api")
 
 export async function ApprovedController($scope, Models, $stateParams){
@@ -51,15 +50,6 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         budgetId = await API.travelBudget.getTravelPolicyBudget(query);
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: tripPlan.accountId});
         let budgets = budgetInfo.budgets;
-        let outTraffic: any = {}, backTraffic: any = {}, hotelDetail: any = {};
-        tripDetails.map((detail) => {
-            switch (detail.type) {
-                case ETripType.OUT_TRIP: outTraffic = detail; break;
-                case ETripType.BACK_TRIP: backTraffic = detail; break;
-                case ETripType.HOTEL: hotelDetail = detail; break;
-                default: break;
-            }
-        });
 
         totalBudget = 0;
         budgets.forEach((v) => {
@@ -67,81 +57,112 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
                 totalBudget = -1;
                 return;
             }
-
             totalBudget += Number(v.price);
         });
 
-        budgets.forEach((v) => {
-            switch(v.tripType) {
-                case ETripType.OUT_TRIP:
-                case ETripType.BACK_TRIP:
-                    if(v.tripType == 0) {
-                        if(Number(totalBudget) > tripPlan.budget){
-                            outTraffic.cabinClass = v.cabinClass;
-                            outTraffic.invoiceType = v.type;
-                            outTraffic.budget = v.price;
-                        }
-                        traffic.push(outTraffic);
-                        trafficBudget += Number(outTraffic.budget);
-                    }else if(v.tripType == 1) {
-                        if(Number(totalBudget) > tripPlan.budget){
-                            backTraffic.cabinClass = v.cabinClass;
-                            backTraffic.invoiceType = v.type;
-                            backTraffic.budget = v.price;
-                        }
-                        traffic.push(backTraffic);
-                        trafficBudget += Number(backTraffic.budget);
-                    }
-                    break;
-                case ETripType.HOTEL:
-                    if(Number(totalBudget) > tripPlan.budget)
-                        hotelDetail.budget = v.price;
-                    hotel.push(hotelDetail);
-                    hotelBudget += Number(hotelDetail.budget);
-                    break;
-                default:
-                    subsidyBudget += Number(v.price);
-                    break;
-            }
-        });
-        totalBudget = Number(totalBudget) > tripPlan.budget ? totalBudget : tripPlan.budget;
+        if (totalBudget > tripPlan.budget) {
+            let outTraffic: any = {}, backTraffic: any = {}, hotelDetail: any = {};
+            tripDetails.map((detail) => {
+                switch (detail.type) {
+                    case ETripType.OUT_TRIP: outTraffic = detail; break;
+                    case ETripType.BACK_TRIP: backTraffic = detail; break;
+                    case ETripType.HOTEL: hotelDetail = detail; break;
+                    default: break;
+                }
+            });
 
-        API.require("place");
-        await API.onload();
-        let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
-        let destinationCity;
-        if (query.destinationPlace) {
-            destinationCity = await API.place.getCityInfo({cityCode: query.destinationPlace});
+            budgets.forEach((v) => {
+                switch(v.tripType) {
+                    case ETripType.OUT_TRIP:
+                    case ETripType.BACK_TRIP:
+                        if(v.tripType == 0) {
+                            if(Number(totalBudget) > tripPlan.budget){
+                                outTraffic.cabinClass = v.cabinClass;
+                                outTraffic.invoiceType = v.type;
+                                outTraffic.budget = v.price;
+                            }
+                            traffic.push(outTraffic);
+                            trafficBudget += Number(outTraffic.budget);
+                        }else if(v.tripType == 1) {
+                            if(Number(totalBudget) > tripPlan.budget){
+                                backTraffic.cabinClass = v.cabinClass;
+                                backTraffic.invoiceType = v.type;
+                                backTraffic.budget = v.price;
+                            }
+                            traffic.push(backTraffic);
+                            trafficBudget += Number(backTraffic.budget);
+                        }
+                        break;
+                    case ETripType.HOTEL:
+                        if(Number(totalBudget) > tripPlan.budget)
+                            hotelDetail.budget = v.price;
+                        hotel.push(hotelDetail);
+                        hotelBudget += Number(hotelDetail.budget);
+                        break;
+                    default:
+                        subsidyBudget += Number(v.price);
+                        break;
+                }
+            });
+            totalBudget = Number(totalBudget) > tripPlan.budget ? totalBudget : tripPlan.budget;
+
+            API.require("place");
+            await API.onload();
+            let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
+            let destinationCity;
+            if (query.destinationPlace) {
+                destinationCity = await API.place.getCityInfo({cityCode: query.destinationPlace});
+            }
+            tripDetails = budgets.map( (v) => {
+                let ret: any = {
+                    budget: v.price,
+                    startTime: query.leaveDate,
+                    endTime: query.goBackDate,
+                    invoiceType: v.type,
+                    status: EPlanStatus.WAIT_APPROVE,
+                    type: v.tripType,
+                    cabinClass: v.cabinClass,
+                }
+
+                if (v.tripType == ETripType.OUT_TRIP) {
+                    ret.deptCity = originCity.name;
+                    ret.arrivalCity = destinationCity.name;
+                } else if (v.tripType == ETripType.BACK_TRIP) {
+                    ret.startTime = query.goBackDate;
+                    ret.deptCity = destinationCity.name;
+                    ret.arrivalCity = originCity.name;
+                } else if (v.tripType == ETripType.HOTEL) {
+                    ret.city = destinationCity.name;
+                } else {
+                    ret.title = '补助';
+                    ret.showBudget = v.price;
+                }
+                return ret;
+            });
+        } else {
+            //如果总预算<=之前预算,采用之前预算
+            totalBudget = tripPlan.budget as number;
+            tripDetails.forEach(function(detail) {
+                switch (detail.type) {
+                    case ETripType.OUT_TRIP:
+                        traffic.push(detail);
+                        trafficBudget += detail.budget;
+                        break;
+                    case ETripType.BACK_TRIP:
+                        traffic.push(detail);
+                        trafficBudget += detail.budget;
+                        break;
+                    case ETripType.HOTEL:
+                        hotel.push(detail);
+                        hotelBudget += detail.budget;
+                        break;
+                    default: subsidyBudget += detail.budget; break;
+                }
+            });
         }
-        tripDetails = budgets.map( (v) => {
-            let ret: any = {
-                budget: v.price,
-                startTime: query.leaveDate,
-                endTime: query.goBackDate,
-                invoiceType: v.type,
-                status: EPlanStatus.WAIT_APPROVE,
-                type: v.tripType,
-                cabinClass: v.cabinClass,
-            }
-
-            if (v.tripType == ETripType.OUT_TRIP) {
-                ret.deptCity = originCity.name;
-                ret.arrivalCity = destinationCity.name;
-            } else if (v.tripType == ETripType.BACK_TRIP) {
-                ret.startTime = query.goBackDate;
-                ret.deptCity = destinationCity.name;
-                ret.arrivalCity = originCity.name;
-            } else if (v.tripType == ETripType.HOTEL) {
-                ret.city = destinationCity.name;
-            } else {
-                ret.title = '补助';
-                ret.showBudget = v.price;
-            }
-            return ret;
-        });
-
         await $ionicLoading.hide();
     } else {
+        //如果不是待审批状态,采用之前预算
         totalBudget = tripPlan.budget as number;
         tripDetails.forEach(function(detail) {
             switch (detail.type) {
