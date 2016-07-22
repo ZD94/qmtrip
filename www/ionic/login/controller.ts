@@ -89,7 +89,7 @@ export async function IndexController($scope, $stateParams, $storage) {
             Cookie.set("token_id", data.token_id, {expires: 30});
             await API.reload_all_modules();
 
-            if(browserspec.is_wechat && openid) {
+            if(browserspec.is_wechat && openid && openid !== 'false') {
                 //保存accountId和openId关联
                 API.require('auth');
                 await API.onload();
