@@ -238,41 +238,36 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
             where.status = status;
         }
         Pager = await staff.getWaitApproveTripPlans({ where: where, limit: ONE_PAGE_LIMIT}); //获取待审批出差计划列表
-        $scope.Pager = Pager;
         Pager.forEach(function(v) {
             $scope.tripPlans.push(v);
         })
-        //首次加载判断
-        if (!Pager.length) {
-            $scope.hasNextPage = false;
-        } else {
-            $scope.hasNextPage = true;
-        }
     }
+    $scope.hasNextPage = function() : Boolean{
+        if (!Pager) return false;
+        return Pager.totalPages - 1 > Pager.curPage;
+    }
+
     $scope.changeTo($scope.filter);
-    $scope.hasNextPage = true;
     $scope.loadMore = async function() {
-        if (!$scope.Pager) {
+        if (!Pager) {
             $scope.$broadcast('scroll.infiniteScrollComplete');
             return;
         }
         try {
-            Pager = await $scope.Pager.nextPage();
+            Pager = await Pager.nextPage();
             Pager.forEach(function(v) {
                 $scope.tripPlans.push(v);
             });
-            $scope.Pager = Pager;
-            $scope.hasNextPage = true;
         } catch(err) {
-            console.info(err);
-            $scope.hasNextPage = false;
+            alert("加载数据发生错误");
         } finally {
             $scope.$broadcast('scroll.infiniteScrollComplete');
         }
     }
 
-    $scope.enterDetail = function(tripid){
-        window.location.href = "#/trip-approval/detail?tripid="+tripid;
+    $scope.enterDetail = function(trip){
+        if (!trip) return;
+        window.location.href = "#/trip-approval/detail?tripid="+trip.id;
     }
 }
 
