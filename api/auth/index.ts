@@ -1290,7 +1290,12 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         //微信自动登录
         app.all("/auth/wx-login", async function(req, res, next) {
             let query = req.query;
-            let openid = await API.wechat.requestOpenIdByCode({code: query.code}); //获取微信openId;
+            let openid = 'false';
+            try {
+                openid = await API.wechat.requestOpenIdByCode({code: query.code}); //获取微信openId;
+            } catch(err) {
+                logger.error(`获取openid失败`);
+            }
             let redirect_url = query.redirect_url;
             redirect_url += redirect_url.indexOf('?') > 0 ? '&' : '?';
             redirect_url += 'openid=' + openid + '&state=' + query.state;

@@ -33,26 +33,27 @@ export async function IndexController($scope, $stateParams, $storage) {
 
     //微信中自动登陆
     if(browserspec.is_wechat && /.*jingli365\.com/.test(window.location.host)) {
-        await API.onload();
-
-        if(!openid) {
-            let url = await API.auth.getWeChatLoginUrl({redirectUrl: window.location.href});
-            window.location.href = url;
-            return;
-        }
-
-        if( backUrl != '#') {
-            let token = await API.auth.authWeChatLogin({openid: openid});
-
-            if(token) {
-                $storage.local.set('auth_data', token);
-                Cookie.set("user_id", token.user_id, {expires: 30});
-                Cookie.set("token_sign", token.token_sign, {expires: 30});
-                Cookie.set("timestamp", token.timestamp, {expires: 30});
-                Cookie.set("token_id", token.token_id, {expires: 30});
-                await API.reload_all_modules();
-                window.location.href = backUrl;
+        if (openid !== 'false' && openid !== false) {
+            await API.onload();
+            if(!openid) {
+                let url = await API.auth.getWeChatLoginUrl({redirectUrl: window.location.href});
+                window.location.href = url;
                 return;
+            }
+
+            if( backUrl != '#') {
+                let token = await API.auth.authWeChatLogin({openid: openid});
+
+                if(token) {
+                    $storage.local.set('auth_data', token);
+                    Cookie.set("user_id", token.user_id, {expires: 30});
+                    Cookie.set("token_sign", token.token_sign, {expires: 30});
+                    Cookie.set("timestamp", token.timestamp, {expires: 30});
+                    Cookie.set("token_id", token.token_id, {expires: 30});
+                    await API.reload_all_modules();
+                    window.location.href = backUrl;
+                    return;
+                }
             }
         }
     }
@@ -88,7 +89,7 @@ export async function IndexController($scope, $stateParams, $storage) {
             Cookie.set("token_id", data.token_id, {expires: 30});
             await API.reload_all_modules();
 
-            if(browserspec.is_wechat && openid) {
+            if(browserspec.is_wechat && openid && openid !== 'false') {
                 //保存accountId和openId关联
                 API.require('auth');
                 await API.onload();
