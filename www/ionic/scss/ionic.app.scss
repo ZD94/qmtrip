@@ -21,6 +21,10 @@ $ionicons-font-path: "../fonts" !default;
 // Include all of Ionic
 @import "../../../common/client/ionic/scss/ionic";
 
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
 .platform-wechat{
   .nav-bar-block{
     right: auto;
@@ -76,7 +80,7 @@ $ionicons-font-path: "../fonts" !default;
 }
 
 ion-nav-view ion-view ion-content{
-  background: url(../images/backgroud.png) no-repeat center;
+  background: url(../images/background.jpg) no-repeat center;
   background-size:cover;
   .spanRight{
     float: right; //很多价位在右边
@@ -264,56 +268,14 @@ ion-side-menu{
     }
   }
 }
-.button-bar.bar-footer{
-  position: absolute;
-  height: 57px;
-  z-index: 11;
-}
 
-//吸底button
-.fixed_bottom{
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  margin: 0;
-  a,a.button.button-block{
-    display: block;
-    clear: both;
-    margin: 0;
-    border-radius: 0px;
-  }
-  span{
-    display: block;
-    clear: both;
-    margin: 0;
-    border-radius: 0px;
-  }
-}
-
-//吸底button flex布局
-.has-bottom-btn {
-  display: flex;
-  flex-direction: column;
-  .flex_content{
-    flex: 1;
-    position: relative;
+ion-content{
+  .flex-c10{
     ion-scroll{
-      height: 100%;
-      width:100%;
-      position: absolute;
       padding: 10px;
-      margin: 0;
-    }
-  }
-  .flex_footer{
-    flex: none;
-    a,a.button.button-block{
-      margin: 0;
-      border-radius: 0;
     }
   }
 }
-
 
 .loading-container {
   .loading {

@@ -5,6 +5,7 @@ import { Company} from 'api/_types/company';
 import { Types, Values } from 'common/model';
 import { Table, Create, Field, ResolveRef, Reference, TableIndex } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
+import {PaginateInterface} from "../../common/model/interface";
 declare var API: any;
 
 export enum EPlanStatus {
@@ -43,9 +44,9 @@ export enum  EAuditStatus {
 
 export var  MTxPlaneLevel  = {
     'Economy': "经济舱",
-    'PremiumEconomy': "优质经济舱",
+    'PremiumEconomy': "公务舱",
     'Business': "公务舱",
-    'First': "头等舱"
+    'First': "公务舱",
 }
 
 @Table(Models.project, 'tripPlan.')
@@ -76,6 +77,9 @@ export class Project extends ModelObject{
     get name(): string { return ''; }
     set name(val: string) {}
 
+    @Field({type: Types.INTEGER})
+    get weight(): number { return 0; }
+    set weight(val: number) {}
 }
 
 @Table(Models.tripPlan, 'tripPlan.')
@@ -264,6 +268,27 @@ export class TripPlan extends ModelObject {
      */
     commit(): Promise<boolean> {
         return API.tripPlan.commitTripPlan({id: this.id});
+    }
+
+    cancel(): Promise<boolean> {
+        return API.tripPlan.cancelTripPlan({id: this.id});
+    }
+
+    /**
+     * 获取出差记录日志
+     * @returns {Promise<FindResult>}
+     */
+    getLogs(options): Promise<PaginateInterface<TripPlanLog>> {
+        if(!options) {
+            options = {where: {}};
+        }
+        
+        if(!options.where) {
+            options.where = {};
+        }
+        
+        options.where.tripPlanId = this.id;
+        return Models.tripPlanLog.find(options);
     }
 }
 

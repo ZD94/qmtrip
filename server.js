@@ -79,9 +79,10 @@ server.on('init.http', function(server){
             var client = redis.createClient(config.redis.url);
             client.subscribe('checkcode:msg');
             client.on("message", function (channel, message) {
-                var msg = JSON.parse(message);
-                stream.write(msg.mobile + " : " + msg.code + " <br>\n");
-                logger.info("client channel " + channel + ": " + msg);
+                stream.write(message+"<br/>");
+                // var msg = JSON.parse(message);
+                // stream.write(msg.mobile + " : " + msg.code + " <br>\n");
+                // logger.info("client channel " + channel + ": " + msg);
             });
             stream.on('close', function(){
                 logger.info('client disconnected.');

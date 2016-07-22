@@ -21,7 +21,7 @@
                 </canvas>
                 <div class="chart_info">
                     <span>节省</span>
-                    <p class="savePercent">{{(statistic.savedMoney/statistic.dynamicBudget*100).toFixed(1)}}%</p>
+                    <p class="savePercent">{{(saveMoneyChart.data[0]/saveMoneyChart.data[1]*100).toFixed(1)}}%</p>
                 </div>
             </div>
             <div class="col col-50">
@@ -44,7 +44,7 @@
                 <h2>{{statistic.staffNum}}</h2>
             </div>
             <div class="col col-50">
-                <p>运行项目(人次)</p>
+                <p>运行项目(个)</p>
                 <h2>{{statistic.projectNum}}</h2>
             </div>
         </div>

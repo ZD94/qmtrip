@@ -101,13 +101,42 @@ export async function RecordController($scope) {
 
     $scope.searchTripPlans = async function(staffName) {
         let status = [EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.AUDITING, EPlanStatus.COMPLETE, EPlanStatus.NO_BUDGET, EPlanStatus.WAIT_COMMIT, EPlanStatus.WAIT_UPLOAD];
-        if(!staffName) {
-            $scope.tripPlans = await company.getTripPlans({where: {status: {$in: status}}});
-            return;
+        $scope.tripPlans = [];
+
+        var pager = await company.getTripPlans({where: {status: {$in: status}}});
+        if(staffName) {
+            let staffs = await company.getStaffs({where: {name: {$like: '%' + staffName + '%'}}});
+            let ids = staffs.map((s) => s.id);
+            pager = await company.getTripPlans({where: {accountId: ids, status: {$in: status}}});
         }
-        let staffs = await company.getStaffs({where: {name: {$like: '%' + staffName + '%'}}});
-        let ids = staffs.map((s) => s.id);
-        $scope.tripPlans = await company.getTripPlans({where: {accountId: ids, status: {$in: status}}});
+
+        $scope.pager = pager;
+        loadTripPlans(pager);
+
+        var vm = {
+            isHasNextPage:true,
+            nextPage : async function() {
+                try {
+                    pager = await $scope.pager['nextPage']();
+                } catch(err) {
+                    this.isHasNextPage = false;
+                    return;
+                }
+                $scope.pager = pager;
+                loadTripPlans(pager);
+                $scope.$broadcast('scroll.infiniteScrollComplete');
+            }
+        }
+
+        $scope.vm = vm;
+
+        function loadTripPlans(pager) {
+            pager.forEach(function(obj){
+                $scope.tripPlans.push(obj);
+            });
+        }
+
+
     };
 
     await $scope.searchTripPlans();
@@ -129,13 +158,14 @@ export async function RecordDetailController($scope, Models, $stateParams, $ioni
     $scope.isHasPermissionApprove = isHasPermissionApprove;
 
     let tripDetails = await tripPlan.getTripDetails();
-    let traffic = [], hotel = [];
+    let traffic = [], hotel = [], subsidys = [];
     let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
     let subsidyDays:number = moment(tripPlan.backAt).diff(moment(tripPlan.startAt), 'days');
     let totalBudget: number = 0;
     let budgetId;
     totalBudget = tripPlan.budget as number;
     tripDetails.forEach(function(detail) {
+        console.info("tripDetail==>", detail)
         switch (detail.type) {
             case ETripType.OUT_TRIP:
                 traffic.push(detail);
@@ -149,13 +179,16 @@ export async function RecordDetailController($scope, Models, $stateParams, $ioni
                 hotel.push(detail);
                 hotelBudget += detail.budget;
                 break;
-            default: subsidyBudget += detail.budget; break;
+            default:
+                subsidys.push(detail);
+                subsidyBudget += detail.budget; break;
         }
     })
 
     $scope.totalBudget = totalBudget;
     $scope.traffic = traffic;
     $scope.hotel = hotel;
+    $scope.subsidys = subsidys;
     $scope.trafficBudget = trafficBudget;
     $scope.hotelBudget = hotelBudget;
     $scope.subsidyBudget = subsidyBudget;
