@@ -8,8 +8,15 @@
                     <i ng-if='invoice.invoiceType == EInvoiceType.HOTEL' class="icon ion-home"></i>
                 </div>
                 <div style="float: left;">
-                    <b>{{invoice.deptCity}}</b>-
-                    <b>{{invoice.arrivalCity}}</b><br/>
+                    <span ng-if="invoice.invoiceType == EInvoiceType.HOTEL">
+                        <b>{{invoice.city}}</b>
+                        <b ng-if="invoice.hotelName"> - {{invoice.hotelName}}</b>
+                    </span>
+                    <span ng-if="invoice.invoiceType != EInvoiceType.HOTEL">
+                        <b>{{invoice.deptCity}}</b>-
+                        <b>{{invoice.arrivalCity}}</b>
+                    </span>
+                    <br/>
                     <span>{{invoice.createdAt | date: 'yyyy-MM-dd'}}</span>
                 </div>
                 <span class="item-note">{{statustext[invoice.status]}}</span>

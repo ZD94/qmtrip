@@ -84,13 +84,14 @@ class TripPlanModule {
             tripPlan.auditUser = null;
         }
 
-        let hotelName = '';
-        if(query.businessDistrict) {
-            let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
-            if(hotelInfo && hotelInfo.name) {
-                hotelName = hotelInfo.name;
-            }
-        }
+        // let hotelName = '';
+        // if(query.businessDistrict) {
+        //     let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
+        //     logger.warn("hotelInfo=>", hotelInfo);
+        //     if(hotelInfo && hotelInfo.name) {
+        //         hotelName = hotelInfo.name;
+        //     }
+        // }
 
         let tripDetails: TripDetail[] = budgets.map(function (budget) {
             let tripType = budget.tripType;
@@ -126,7 +127,7 @@ class TripPlanModule {
                     detail.cityCode = query.destinationPlace;
                     detail.city = tripPlan.arrivalCity;
                     detail.hotelCode = query.businessDistrict;
-                    detail.hotelName = hotelName;
+                    detail.hotelName = query.hotelName;
                     detail.startTime = query.checkInDate || query.leaveDate;
                     detail.endTime = query.checkOutDate || query.goBackDate;
                     tripPlan.isNeedHotel = true;
@@ -524,11 +525,11 @@ class TripPlanModule {
                     detail.status = EPlanStatus.WAIT_UPLOAD;
                     detail.tripPlan = tripPlan;
 
-                    let hotelName = '';
-                    if (query.businessDistrict) {
-                        let hotelInfo = await API.place.getCityInfo({cityCode: query.businessDistrict});
-                        hotelName = hotelInfo ? hotelInfo.name : '';
-                    }
+                    // let hotelName = '';
+                    // if (query.businessDistrict) {
+                    //     let hotelInfo = await API.place.getCityInfo({cityCode: query.businessDistrict});
+                    //     hotelName = hotelInfo ? hotelInfo.name : '';
+                    // }
 
                     switch (tripType) {
                         case ETripType.OUT_TRIP:
@@ -553,7 +554,7 @@ class TripPlanModule {
                             detail.cityCode = query.destinationPlace;
                             detail.city = tripPlan.arrivalCity;
                             detail.hotelCode = query.businessDistrict;
-                            detail.hotelName = hotelName;
+                            detail.hotelName = query.hotelName;
                             detail.startTime = query.checkInDate || query.leaveDate;
                             detail.endTime = query.checkOutDate || query.goBackDate;
                             break;
