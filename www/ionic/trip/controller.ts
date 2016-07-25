@@ -151,6 +151,7 @@ export async function CreateController($scope, $storage, $loading){
                 return;
             }
             $scope.trip.hotelPlace = val.point.lat + "," + val.point.lng
+            $scope.trip.hotelName = val.title;
         }
     };
     $scope.projectSelector = {
@@ -214,7 +215,8 @@ export async function CreateController($scope, $storage, $loading){
             isNeedTraffic: trip.traffic,
             isRoundTrip: trip.round,
             isNeedHotel: trip.hotel,
-            businessDistrict: trip.hotelPlace
+            businessDistrict: trip.hotelPlace,
+            hotelName: trip.hotelName
         };
 
         if(params.originPlace == params.destinationPlace){
@@ -355,6 +357,8 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         });
 
         try {
+            console.info("*****************************");
+            console.info(trip);
             let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason||trip.reasonName, auditUser: trip.auditUser})
             window.location.href = '#/trip/committed?id='+planTrip.id;
         } catch(err) {
