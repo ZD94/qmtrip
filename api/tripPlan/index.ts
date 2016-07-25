@@ -810,7 +810,7 @@ class TripPlanModule {
             API.notify.submitNotify({
                 key: 'qm_notify_agency_budget',
                 values: auditValues,
-                email: user.email,
+                email: default_agency.manager_email,
                 openid: openId,
             })
         }
