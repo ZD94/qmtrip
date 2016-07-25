@@ -178,6 +178,7 @@ export async function CreateController($scope, $storage, $loading){
         }
     };
     $scope.nextStep = async function() {
+        let beginMSecond = Date.now();
         API.require("travelBudget");
         await API.onload();
 
@@ -254,7 +255,11 @@ export async function CreateController($scope, $storage, $loading){
             $loading.end();
             alert(err.msg || err);
         }
-
+        let endMSecond = Date.now();
+        spendMS(beginMSecond, endMSecond);
+        function spendMS(begin, end) {
+            console.info('开始时间:', begin, '结束时间:', end, '耗时:', end - begin);
+        }
         function cb() {
             $loading.end();
             window.location.href = "#/trip/budget?id="+budget;
