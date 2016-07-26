@@ -116,4 +116,20 @@ angular
                 }
             }
         }
-    }])
+    }]).directive('invoiceImgItem', [function($storage) {
+    return  {
+        restrict: 'AE',
+        template: require('./invoice-img-item.html'),
+        scope: {
+            imgurl: '@'
+        },
+        controller: function($scope) {
+            // 显示票据之前先显示loading图
+            $scope.showLoading = false;
+            angular.element("#previewInvoiceImg").bind("load", function() {
+                $scope.showLoading = false;
+                $scope.$apply();
+            })
+        }
+    }
+}])

@@ -679,8 +679,18 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
     $scope.EInvoiceType = EInvoiceType;
     API.require('attachment');
     await API.onload();
-    var invoiceImg = await API.attachment.previewSelfImg({fileId: invoice.newInvoice});
-    $scope.invoiceImg = invoiceImg;
+    // var invoiceImg = await API.attachment.previewSelfImg({fileId: invoice.newInvoice});
+    var latestInvoice = invoice.latestInvoice;
+    var invoiceImgs = [];
+    if(typeof latestInvoice =='string') {
+        latestInvoice = JSON.parse(latestInvoice);
+    }
+
+    await Promise.all(latestInvoice.map(async function(i){
+        var invoiceImg = await API.attachment.previewSelfImg({fileId: i});
+        invoiceImgs.push(invoiceImg);
+    }))
+    $scope.invoiceImgs = invoiceImgs;
 
     let statusTxt = {};
     statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";

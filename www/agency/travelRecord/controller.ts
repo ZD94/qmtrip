@@ -135,13 +135,24 @@ export async function TravelDetailController($scope, $stateParams, $location, $a
         if ($scope.curTripDetail && tripDetailId == $scope.curTripDetail.id) return;
         $scope.showLoading = true;
         $scope.curTripDetailInoviceImg = '/agency/images/jingli_loading.gif';
-        Models.tripDetail.get(tripDetailId)
-            .then(function (tripDetail) {
+        await Models.tripDetail.get(tripDetailId)
+            .then(async function (tripDetail) {
                 if (tripDetail.invoice && typeof tripDetail.invoice == 'string') {
                     tripDetail.invoice = JSON.parse(tripDetail.invoice);
                 }
+                if (tripDetail.latestInvoice && typeof tripDetail.latestInvoice == 'string') {
+                    tripDetail.latestInvoice = JSON.parse(tripDetail.latestInvoice);
+                }
                 $scope.curTripDetail = tripDetail;
-                $scope.curTripDetailInoviceImg = '/consume/invoice/' + tripDetail.id;
+                var imageIds = tripDetail.latestInvoice;
+                var curTripDetailInoviceImgs = [];
+                await Promise.all(imageIds.map(function(invoiceId){
+                    invoiceId =  '/consume/invoice/detail/' + invoiceId;
+                    curTripDetailInoviceImgs.push(invoiceId);
+                    return invoiceId;
+                }))
+                // $scope.curTripDetailInoviceImg = '/consume/invoice/' + tripDetail.id;
+                $scope.curTripDetailInoviceImgs = curTripDetailInoviceImgs;
                 return tripDetail;
             })
             .catch(function(err){

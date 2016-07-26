@@ -15,9 +15,11 @@
                 <span class="item-note">{{statustext[invoice.status]}}</span>
             </div>
 
-            <div class="item item-image">
-                <img src="/ionic/images/loading.gif" ng-show="showLoading" style="width: 100px; height: 100px;">
-                <img ng-src="{{invoiceImg}}" ng-hide="showLoading" id="previewInvoiceImg" style="width: 100%;">
+            <div class="item item-image" ng-repeat="invoiceImg in invoiceImgs track by $index">
+                <!--<img src="/ionic/images/loading.gif" ng-show="showLoading" style="width: 100px; height: 100px;">-->
+                <!--<img ng-src="{{invoiceImg}}" ng-hide="showLoading" id="previewInvoiceImg" style="width: 100%;">-->
+                <!--<img ng-src="{{invoiceImg}}" id="previewInvoiceImg" style="width: 100%;">-->
+                <invoice-img-item imgurl = {{invoiceImg}}></invoice-img-item>
             </div>
         </div>
     </ion-content>
