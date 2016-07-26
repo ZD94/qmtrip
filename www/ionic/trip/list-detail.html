@@ -10,7 +10,7 @@
                     <!--交通条目-->
                     <tp-detail-item ng-repeat="budget in trafficBudgets track by $index"
                                     show-uploader="true"
-                                    tp-title="{{$index == 0? '交通': ''}}"
+                                    title="{{$index == 0? '交通': ''}}"
                                     budget="{{trafficTotalBudget | currency: ''}}元"
                                     item="budget">
                     </tp-detail-item>
@@ -18,14 +18,14 @@
                     <!--住宿条目-->
                     <tp-detail-item ng-repeat="budget in hotelBudgets"
                                     show-uploader="true"
-                                    tp-title="{{$index == 0? '住宿': ''}}"
+                                    title="{{$index == 0? '住宿': ''}}"
                                     budget="{{hotelTotalBudget | currency: ''}}元"
                                     item="budget">
                     </tp-detail-item>
                     <!--补助-->
                     <tp-detail-item ng-repeat="budget in subsidyBudgets"
                                     show-uploader="true"
-                                    tp-title="{{$index == 0? '补助': ''}}"
+                                    title="{{$index == 0? '补助': ''}}"
                                     budget="{{subsidyTotalBudget | currency: ''}}元"
                                     item="budget">
 
