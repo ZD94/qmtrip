@@ -1,7 +1,7 @@
 /**
  * Created by wlh on 16/1/23.
  */
-
+'use strict';
 /**
  * @class wechat
  */
@@ -28,30 +28,45 @@ service.getJSDKParams = function(params) {
  * 使用mediaId换取图像key
  *
  * @param {Object} params
- * @param {String} params.mediaId
+ * @param {Array} params.mediaIds
  * @return {Promise} 附件fileId
  */
 service.mediaId2key = function(params) {
     var self = this;
-    var mediaId = params.mediaId;
+    var mediaIds = params.mediaIds;
     return Promise.resolve()
     .then(function() {
-        if (!mediaId) {
-            throw {code: -1, msg: "缺少mediaId"}
+        if (!mediaIds) {
+            throw {code: -1, msg: "缺少mediaIds"};
         }
     })
     .then(function() {
-        return API.wechat.downloadMedia({mediaId: mediaId})
+        if(Array.isArray(mediaIds) && mediaIds.length > 0){
+            let ps = mediaIds.map(function(id){
+                return oneMediaId2key(id, self.accountId);
+            });
+            return Promise.all(ps)
+                .then(function(fileIds){
+                    return fileIds;
+                })
+        }else{
+            throw {code: -2, msg: "参数mediaIds格式不正确"};
+        }
     })
-    .then(function(content) {
-        return API.attachments.saveAttachment({contentType: "image/png", content: content, isPublic: false});
-    })
-    .then(function(fileId) {
-        return API.attachment.bindOwner({fileId: fileId, accountId: self.accountId})
-        .then(function() {
-            return fileId;
-        });
-    })
+}
+
+function oneMediaId2key(id, accountId){
+    return API.wechat.downloadMedia({mediaId: id})
+        .then(function(content) {
+            return API.attachments.saveAttachment({contentType: "image/png", content: content, isPublic: false});
+        })
+        .then(function(fileId) {
+            return API.attachment.bindOwner({fileId: fileId, accountId: accountId})
+                .then(function() {
+                    return fileId;
+                });
+        })
+
 }
 
 module.exports = service;

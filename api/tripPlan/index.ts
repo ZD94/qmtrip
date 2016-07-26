@@ -694,7 +694,7 @@ class TripPlanModule {
     @clientExport
     @requireParams(['tripDetailId', 'pictureFileId'])
     @modelNotNull('tripDetail', 'tripDetailId')
-    static async uploadInvoice(params: {tripDetailId: string, pictureFileId: string}): Promise<boolean> {
+    static async uploadInvoice(params): Promise<boolean> {
         let staff = await Staff.getCurrent();
         let tripDetail = await Models.tripDetail.get(params.tripDetailId);
 
@@ -715,8 +715,13 @@ class TripPlanModule {
             invoiceJson = JSON.parse(invoiceJson);
         }
 
-        invoiceJson.push({times: times, pictureFileId: params.pictureFileId, created_at: utils.now(), status: EPlanStatus.WAIT_COMMIT, remark: '', approve_at: ''});
-        tripDetail.newInvoice = params.pictureFileId;
+        invoiceJson.push({times: times, pictureFileId: JSON.stringify(params.pictureFileId), created_at: utils.now(), status: EPlanStatus.WAIT_COMMIT, remark: '', approve_at: ''});
+        if(typeof params.pictureFileId =='string') {
+            // tripDetail.newInvoice = params.pictureFileId;
+            tripDetail.latestInvoice = JSON.stringify([params.pictureFileId]);
+        }else{
+            tripDetail.latestInvoice = JSON.stringify(params.pictureFileId);
+        }
         tripDetail.invoice = JSON.stringify(invoiceJson);
         tripDetail.status = EPlanStatus.WAIT_COMMIT;
 

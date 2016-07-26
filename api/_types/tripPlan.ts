@@ -354,7 +354,11 @@ export class TripDetail extends ModelObject{
 
     @Field({type: Types.JSONB})
     get invoice(): any { return []; }
-    set invoice(val: any) {}
+    set invoice(val: any) {} 
+    
+    @Field({type: Types.JSONB})
+    get latestInvoice(): any { return []; }
+    set latestInvoice(val: any) {}
 
     @Field({type: Types.STRING})
     get newInvoice(): string { return ''; }
@@ -417,7 +421,7 @@ export class TripDetail extends ModelObject{
         return API.tripPlan.editTripDetailBudget({id: this.id, budget: params.budget});
     }
 
-    uploadInvoice(params: {pictureFileId: string}): Promise<boolean> {
+    uploadInvoice(params): Promise<boolean> {
         return API.tripPlan.uploadInvoice({tripDetailId: this.id, pictureFileId: params.pictureFileId});
     }
 
