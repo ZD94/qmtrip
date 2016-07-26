@@ -177,7 +177,7 @@ class StaffModule{
             let vals  = {
                 username: updateStaff.name,
                 mobile: updateStaff.mobile,
-                travelPolicy: tp.name,
+                travelPolicy: tp ? tp.name: '',
                 time: utils.now(),
                 companyName: updateStaff.company.name,
                 department: upDept ? upDept.name : (defaultDept ? defaultDept.name : "我的企业"),
