@@ -98,6 +98,9 @@ zone.forkStackTrace().run(function(){
 });
 
 process.on('unhandledRejection', (reason, p) => {
-    throw reason;
+    if (config.debug) {
+        throw reason;
+    }
+    logger.error(reason);
 });
 

@@ -84,13 +84,14 @@ class TripPlanModule {
             tripPlan.auditUser = null;
         }
 
-        let hotelName = '';
-        if(query.businessDistrict) {
-            let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
-            if(hotelInfo && hotelInfo.name) {
-                hotelName = hotelInfo.name;
-            }
-        }
+        // let hotelName = '';
+        // if(query.businessDistrict) {
+        //     let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
+        //     logger.warn("hotelInfo=>", hotelInfo);
+        //     if(hotelInfo && hotelInfo.name) {
+        //         hotelName = hotelInfo.name;
+        //     }
+        // }
 
         let tripDetails: TripDetail[] = budgets.map(function (budget) {
             let tripType = budget.tripType;
@@ -126,7 +127,7 @@ class TripPlanModule {
                     detail.cityCode = query.destinationPlace;
                     detail.city = tripPlan.arrivalCity;
                     detail.hotelCode = query.businessDistrict;
-                    detail.hotelName = hotelName;
+                    detail.hotelName = query.hotelName;
                     detail.startTime = query.checkInDate || query.leaveDate;
                     detail.endTime = query.checkOutDate || query.goBackDate;
                     tripPlan.isNeedHotel = true;
@@ -524,11 +525,11 @@ class TripPlanModule {
                     detail.status = EPlanStatus.WAIT_UPLOAD;
                     detail.tripPlan = tripPlan;
 
-                    let hotelName = '';
-                    if (query.businessDistrict) {
-                        let hotelInfo = await API.place.getCityInfo({cityCode: query.businessDistrict});
-                        hotelName = hotelInfo ? hotelInfo.name : '';
-                    }
+                    // let hotelName = '';
+                    // if (query.businessDistrict) {
+                    //     let hotelInfo = await API.place.getCityInfo({cityCode: query.businessDistrict});
+                    //     hotelName = hotelInfo ? hotelInfo.name : '';
+                    // }
 
                     switch (tripType) {
                         case ETripType.OUT_TRIP:
@@ -553,7 +554,7 @@ class TripPlanModule {
                             detail.cityCode = query.destinationPlace;
                             detail.city = tripPlan.arrivalCity;
                             detail.hotelCode = query.businessDistrict;
-                            detail.hotelName = hotelName;
+                            detail.hotelName = query.hotelName;
                             detail.startTime = query.checkInDate || query.leaveDate;
                             detail.endTime = query.checkOutDate || query.goBackDate;
                             break;
@@ -815,7 +816,7 @@ class TripPlanModule {
             API.notify.submitNotify({
                 key: 'qm_notify_agency_budget',
                 values: auditValues,
-                email: user.email,
+                email: default_agency.manager_email,
                 openid: openId,
             })
         }
@@ -1192,8 +1193,8 @@ class TripPlanModule {
 
     @clientExport
     static async getTripPlanSave(params: {accountId?: string}) {
-        let staff = await Staff.getCurrent();
-        let accountId = staff.id;
+        let staff = await Models.staff.get(params.accountId);
+        let accountId = params.accountId;
         let companyId = staff.company.id;
         let sql = `select sum(budget) - sum(expenditure) as save from trip_plan.trip_plans where status = 4 AND company_id = '${companyId}' AND account_id =  '${accountId}' `;
 

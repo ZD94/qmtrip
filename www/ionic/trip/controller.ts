@@ -151,6 +151,7 @@ export async function CreateController($scope, $storage, $loading){
                 return;
             }
             $scope.trip.hotelPlace = val.point.lat + "," + val.point.lng
+            $scope.trip.hotelName = val.title;
         }
     };
     $scope.projectSelector = {
@@ -178,6 +179,7 @@ export async function CreateController($scope, $storage, $loading){
         }
     };
     $scope.nextStep = async function() {
+        let beginMSecond = Date.now();
         API.require("travelBudget");
         await API.onload();
 
@@ -213,7 +215,8 @@ export async function CreateController($scope, $storage, $loading){
             isNeedTraffic: trip.traffic,
             isRoundTrip: trip.round,
             isNeedHotel: trip.hotel,
-            businessDistrict: trip.hotelPlace
+            businessDistrict: trip.hotelPlace,
+            hotelName: trip.hotelName
         };
 
         if(params.originPlace == params.destinationPlace){
@@ -254,7 +257,11 @@ export async function CreateController($scope, $storage, $loading){
             $loading.end();
             alert(err.msg || err);
         }
-
+        let endMSecond = Date.now();
+        spendMS(beginMSecond, endMSecond);
+        function spendMS(begin, end) {
+            console.info('开始时间:', begin, '结束时间:', end, '耗时:', end - begin);
+        }
         function cb() {
             $loading.end();
             window.location.href = "#/trip/budget?id="+budget;
@@ -350,6 +357,8 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         });
 
         try {
+            console.info("*****************************");
+            console.info(trip);
             let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason||trip.reasonName, auditUser: trip.auditUser})
             window.location.href = '#/trip/committed?id='+planTrip.id;
         } catch(err) {
@@ -542,6 +551,9 @@ export async function ListDetailController($location, $scope , Models, $statePar
             other = budget;
             // other = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status};
         }
+    });
+    budgets.sort(function(v1, v2) {
+        return v1.type - v2.type;
     });
     $scope.goTraffic = goTraffic;
     $scope.hotel = hotel;
