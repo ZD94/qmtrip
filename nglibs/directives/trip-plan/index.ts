@@ -114,6 +114,18 @@ angular
                 $scope.viewInvoice = function(id) {
                     window.location.href="#/trip/invoice-detail?detailId="+id;
                 }
+
+                $scope.item.done = async function(ret) {
+                    API.require('tripPlan');
+                    await API.onload();
+                    try {
+                        await $scope.item.uploadInvoice({
+                            pictureFileId: ret.fileId
+                        })
+                    } catch(err) {
+                        alert(err.msg ? err.msg : err);
+                    }
+                }
             }
         }
     }])

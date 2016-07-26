@@ -414,7 +414,14 @@ export async function ListController($scope , Models){
     let pager = await staff.getTripPlans({
         limit: 5,
         where: {
-            status: {$in: [EPlanStatus.WAIT_UPLOAD, EPlanStatus.WAIT_COMMIT, EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.COMPLETE, EPlanStatus.NO_BUDGET, EPlanStatus.AUDITING]}
+            status: {$in: [
+                EPlanStatus.WAIT_UPLOAD,
+                EPlanStatus.WAIT_COMMIT,
+                EPlanStatus.AUDIT_NOT_PASS,
+                EPlanStatus.COMPLETE,
+                EPlanStatus.NO_BUDGET,
+                EPlanStatus.AUDITING
+            ]}
         }
     });
     loadTripPlan(pager);
@@ -461,116 +468,62 @@ export async function ListDetailController($location, $scope , Models, $statePar
     ///// END
 
     require('./trip.scss');
-    var staff = await Staff.getCurrent();
     let tripPlan = await Models.tripPlan.get(id);
     $scope.tripDetail = tripPlan;
 
-    let logs = await tripPlan.getLogs({});
-
     let budgets: TripDetail[] = await tripPlan.getTripDetails();
-    let hotel;
-    let goTraffic;
-    let backTraffic;
-    let other;
-    $scope.hotelStatus = false;
-    $scope.goTrafficStatus = false;
-    $scope.backTrafficStatus = false;
-    $scope.otherStatus = false;
-    let statusTxt = {};
-    statusTxt[EPlanStatus.CANCEL] = "已撤销";
-    statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
-    statusTxt[EPlanStatus.NO_BUDGET] = "没有预算";
-    statusTxt[EPlanStatus.WAIT_UPLOAD] = "待上传票据";
-    statusTxt[EPlanStatus.WAIT_COMMIT] = "待提交";
-    statusTxt[EPlanStatus.AUDITING] = "已提交待审核";
-    statusTxt[EPlanStatus.COMPLETE] = "已完成";
-    $scope.statustext = statusTxt;
     $scope.EPlanStatus = EPlanStatus;
-    $scope.EInvoiceType = EInvoiceType;
-    $scope.EPlanStatus = EPlanStatus;
-    budgets.map(function(budget) {
-        let tripType = budget.type;
-        if (tripType == ETripType.OUT_TRIP) {
-            $scope.goTrafficStatus = Boolean(budget.status);
-            goTraffic = budget;
-            goTraffic['title'] = '上传去程交通发票';
-            goTraffic['done'] = function (response) {
-                if (!response.fileId) {
-                    alert(response.errMsg);
-                    return;
-                }
-                var fileId = response.fileId;
-                uploadInvoice(budget, fileId, async function (err, result) {
-                    if (err) {
-                        alert(err);
-                        return;
-                    }
-                    $scope.goTraffic = budget;
-                });
-            }
+    // $scope.EInvoiceType = EInvoiceType;
+    // $scope.EPlanStatus = EPlanStatus;
 
-        } else if (tripType == ETripType.BACK_TRIP) {
-            $scope.backTrafficStatus = Boolean(budget.status);
-            backTraffic = budget;
-            backTraffic['title'] = '上传回程交通发票';
-            backTraffic['done'] = function (response) {
-                if (!response.fileId) {
-                    alert(response.errMsg);
-                    return;
-                }
-                var fileId = response.fileId;
-                uploadInvoice(budget, fileId,async function (err, result) {
-                    if (err) {
-                        alert(err);
-                        return;
-                    }
-                    // var newdetail = await Models.tripDetail.get(budget.id);
-                    $scope.backTraffic = budget;
-                });
-            }
-        } else if (tripType == ETripType.HOTEL) {
-            hotel = budget;
-            hotel['title'] = '上传住宿发票';
-            hotel['done'] = function (response) {
-                if (!response.fileId) {
-                    alert(response.errMsg);
-                    return;
-                }
-                var fileId = response.fileId;
-                uploadInvoice(budget, fileId,async function (err, result) {
-                    if (err) {
-                        alert(err);
-                        return;
-                    }
-                    // var newdetail = await Models.tripDetail.get(budget.id);
-                    $scope.hotel = budget;
-                });
-            }
-        } else {
-            $scope.otherStatus = Boolean(budget.status);
-            other = budget;
-            // other = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status};
+    //分类计算
+    let trafficBudgets = [];     //交通
+    let trafficTotalBudget: number = 0;
+    let hotelBudgets = [];      //住宿
+    let hotelTotalBudget: number = 0;
+    let subsidyBudgets = [];    //补助
+    let subsidyTotalBudget: number = 0;
+
+    budgets.forEach( (budget) => {
+        switch(budget.type) {
+            case ETripType.BACK_TRIP:
+            case ETripType.OUT_TRIP:
+                trafficBudgets.push(budget);
+                trafficTotalBudget = countBudget(trafficTotalBudget, budget.budget);
+                break;
+            case ETripType.HOTEL:
+                hotelBudgets.push(budget);
+                hotelTotalBudget = countBudget(hotelTotalBudget, budget.budget);
+                break;
+            case ETripType.SUBSIDY:
+                subsidyBudgets.push(budget);
+                subsidyTotalBudget = countBudget(subsidyTotalBudget, budget.budget);
+                break;
         }
     });
-    budgets.sort(function(v1, v2) {
+
+    function countBudget(originBudget, increment) {
+        if (originBudget == -1) {
+            return originBudget;
+        }
+        if (increment == -1) {
+            return increment;
+        }
+        return originBudget + increment;
+    }
+
+    trafficBudgets.sort((v1, v2) => {
         return v1.type - v2.type;
     });
-    $scope.goTraffic = goTraffic;
-    $scope.hotel = hotel;
-    $scope.backTraffic = backTraffic;
-    $scope.other = other;
-    $scope.budgets = budgets;
-    API.require('tripPlan');
-    await API.onload();
-    function uploadInvoice(tripDetail, picture, callback) {
-        tripDetail.uploadInvoice({
-            pictureFileId: picture
-        })
-        .then(function(ret) {
-            callback(null, ret);
-        })
-        .catch(callback)
-    }
+    hotelBudgets.sort();
+    subsidyBudgets.sort();
+
+    $scope.trafficBudgets = trafficBudgets;
+    $scope.trafficTotalBudget = trafficTotalBudget;
+    $scope.hotelBudgets = hotelBudgets;
+    $scope.hotelTotalBudget = hotelTotalBudget;
+    $scope.subsidyBudgets = subsidyBudgets;
+    $scope.subsidyTotalBudget = subsidyTotalBudget;
 
     $scope.showAlterDialog = function () {
         $scope.reject = {reason: ''};

@@ -7,12 +7,32 @@
                 <div class="spacer" style="width: 285px; height: 17px;"></div>
                 <div class="button-bar"></div>
                 <ion-list>
-                    <tp-detail-item item="goTraffic" title="交通" budget="{{goTraffic.budget + backTraffic.budget | currency: ''}}元" show-uploader="true" ng-if="goTraffic"></tp-detail-item>
-                    <tp-detail-item item="backTraffic" show-uploader="true" ng-if="backTraffic"></tp-detail-item>
-                    <tp-detail-item item="hotel" show-uploader="true" title="住宿" budget="{{hotel.budget| currency: ''}}元" ng-if="hotel"></tp-detail-item>
-                    <tp-detail-item item="other" title="补助" budget="{{other.budget > 0 ? other.budget : '暂无预算' | currency: ''}}元" ng-if="other"></tp-detail-item>
+                    <!--交通条目-->
+                    <tp-detail-item ng-repeat="budget in trafficBudgets track by $index"
+                                    show-uploader="true"
+                                    tp-title="{{$index == 0? '交通': ''}}"
+                                    budget="{{trafficTotalBudget | currency: ''}}元"
+                                    item="budget">
+                    </tp-detail-item>
+
+                    <!--住宿条目-->
+                    <tp-detail-item ng-repeat="budget in hotelBudgets"
+                                    show-uploader="true"
+                                    tp-title="{{$index == 0? '住宿': ''}}"
+                                    budget="{{hotelTotalBudget | currency: ''}}元"
+                                    item="budget">
+                    </tp-detail-item>
+                    <!--补助-->
+                    <tp-detail-item ng-repeat="budget in subsidyBudgets"
+                                    show-uploader="true"
+                                    tp-title="{{$index == 0? '补助': ''}}"
+                                    budget="{{subsidyTotalBudget | currency: ''}}元"
+                                    item="budget">
+
+                    </tp-detail-item>
                 </ion-list>
             </ion-scroll>
+
             <div ng-if="tripDetail && tripDetail.status != undefined" class="button-bar">
                 <a ng-if="tripDetail.status == EPlanStatus.WAIT_COMMIT" ng-click="showAlterDialog()" id="page20-button60" class="button button-positive" no-back>提交审核</a>
                 <a ng-if="tripDetail.status == EPlanStatus.WAIT_UPLOAD" class="button button-stable" no-back>提交审核</a>

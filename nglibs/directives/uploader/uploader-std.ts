@@ -3,7 +3,10 @@ import { showPreviewDialog } from './preview-dialog';
 
 export function stdUploaderController($scope, $ionicModal, $element, $transclude, $loading, FileUploader) {
     $element.css('position', 'relative');
-    $element.append($transclude());
+    $transclude($scope, function(clone) {
+        $element.append(clone);
+    });
+
     var uploader = new FileUploader({
         url: $scope.url || '/upload/ajax-upload-file?type=image',
         alias: $scope.name || 'tmpFile',
