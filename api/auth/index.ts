@@ -1176,7 +1176,10 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      */
     @clientExport
     @requireParams(['openid'], [])
-    static async saveOrUpdateOpenId(params: {openid: string}) {
+    static async saveOrUpdateOpenId(params: {openid: string}): Promise<any> {
+        if(!params) {
+            return true;
+        }
         let openid = params.openid;
         let staff = await Staff.getCurrent();
         let list = await Models.accountOpenid.find({where: {openId: openid}});
