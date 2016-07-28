@@ -73,7 +73,6 @@ class AccordHotelModule{
         {if: condition.isAccordHotelAgency("0.id")}
     ])
     static async updateAccordHotel(params) : Promise<AccordHotel>{
-        console.info("jinflia =========");
         var id = params.id;
         var staff = await Staff.getCurrent();
 
@@ -101,6 +100,31 @@ class AccordHotelModule{
         var ah = await Models.accordHotel.get(id);
 
         return ah;
+    };
+
+    /**
+     * 根据cityCode查询协议酒店
+     * @param obj  params.cityCode, params.companyId
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["cityCode"], ["companyId"])
+    static async getAccordHotelByCityCode(params: {cityCode: string, companyId?: string}) : Promise<AccordHotel>{
+        let cityCode = params.cityCode;
+        var staff = await Staff.getCurrent();
+        var options: any = {
+            where: {cityCode: cityCode}
+        };
+        if(staff){
+            options.where.companyId = staff["companyId"];//只允许查询该企业下的协议酒店
+        }
+        let paginate = await Models.accordHotel.find(options);
+
+        if(paginate && paginate.length>0){
+            return paginate[0];
+        }else{
+            throw {code: -1,msg: "没有符合要求的记录"}
+        }
     };
 
 
