@@ -169,7 +169,6 @@ export async function CreateController($scope, $storage, $loading){
         },
         done: function(val) {
             $scope.trip.reason = val.name ? val.name: val;
-            console.info($scope.trip.reason);
         }
     }
 
@@ -338,7 +337,6 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
             return staffs.map((p) =>{ return  {name: p.name, value: p.id}} );
         },
         done: function(value) {
-            console.info("调用回调", value);
             trip.auditUser = value.value;
         }
     };
@@ -357,8 +355,6 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         });
 
         try {
-            console.info("*****************************");
-            console.info(trip);
             let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason||trip.reasonName, auditUser: trip.auditUser})
             window.location.href = '#/trip/committed?id='+planTrip.id;
         } catch(err) {
@@ -546,9 +542,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
 
     async function approveTripPlan() {
         try {
-            console.info('before commit...');
             await API.tripPlan.commitTripPlan({id: id});
-            console.info('after commit...');
             var alertPop = $ionicPopup.alert({
                 title:'提示',
                 template:'提交成功'
@@ -606,7 +600,6 @@ export async function ListDetailController($location, $scope , Models, $statePar
     };
     
     $scope.cancelTripPlan = function() {
-        console.info("取消出差计划...");
         $ionicPopup.show({
             title: '确认撤销该出差计划？',
             scope: $scope,
