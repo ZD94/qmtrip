@@ -501,6 +501,8 @@ export async function ListDetailController($location, $scope , Models, $statePar
                 break;
         }
     });
+    
+    $scope.budgets = budgets;
 
     function countBudget(originBudget, increment) {
         if (originBudget == -1) {
@@ -571,32 +573,34 @@ export async function ListDetailController($location, $scope , Models, $statePar
             placeName: tripPlan.arrivalCity,
             reasonName: tripPlan.title
         };
-        await Promise.all(tripDetails.map(async (detail) => {
-            switch (detail.type) {
-                case ETripType.OUT_TRIP:
-                    trip.traffic = true;
-                    trip.fromPlace = tripPlan.deptCityCode;
-                    trip.fromPlaceName = tripPlan.deptCity;
-                    break;
-                case ETripType.BACK_TRIP:
-                    trip.traffic = true;
-                    trip.fromPlace = tripPlan.deptCityCode;
-                    trip.fromPlaceName = tripPlan.deptCity;
-                    trip.round = true;
-                    break;
-                case ETripType.HOTEL:
-                    trip.hotel = true;
-                    trip.hotelPlace = detail.hotelCode || '';
-                    trip.hotelPlaceName = detail.hotelName || '';
-                    let landMarkInfo = {name: ''};
-                    if(detail.hotelName) {
-                        landMarkInfo = await API.place.getCityInfo({cityCode: detail.hotelName});
-                    }
-                    if(landMarkInfo && landMarkInfo.name){
-                        trip.hotelPlaceName = landMarkInfo.name;
-                    }
-            }
-        }));
+        if(tripDetails && tripDetails.length > 0) {
+            await Promise.all(tripDetails.map(async (detail) => {
+                switch (detail.type) {
+                    case ETripType.OUT_TRIP:
+                        trip.traffic = true;
+                        trip.fromPlace = tripPlan.deptCityCode;
+                        trip.fromPlaceName = tripPlan.deptCity;
+                        break;
+                    case ETripType.BACK_TRIP:
+                        trip.traffic = true;
+                        trip.fromPlace = tripPlan.deptCityCode;
+                        trip.fromPlaceName = tripPlan.deptCity;
+                        trip.round = true;
+                        break;
+                    case ETripType.HOTEL:
+                        trip.hotel = true;
+                        trip.hotelPlace = detail.hotelCode || '';
+                        trip.hotelPlaceName = detail.hotelName || '';
+                        let landMarkInfo = {name: ''};
+                        if(detail.hotelName) {
+                            landMarkInfo = await API.place.getCityInfo({cityCode: detail.hotelName});
+                        }
+                        if(landMarkInfo && landMarkInfo.name){
+                            trip.hotelPlaceName = landMarkInfo.name;
+                        }
+                }
+            }));
+        }
         await $storage.local.set('trip', trip);
         window.location.href="#/trip/create";
     };
