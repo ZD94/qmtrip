@@ -340,14 +340,15 @@ class ApiTravelBudget {
             leaveDate = moment(leaveDate).format("YYYY-MM-DD");
         }
 
-
+        let companyPolicy = staff.company.budgetPolicy;
         let budget = await API.travelbudget.getTrafficBudget({
                         originPlace: originPlace,
                         destinationPlace: destinationPlace,
                         leaveDate: leaveDate,
                         leaveTime: leaveTime,
                         cabinClass: cabinClass,
-                        trainCabinClass: trainCabinClass
+                        trainCabinClass: trainCabinClass,
+                        policy: companyPolicy
                     }) as TravelBudgeItem;
 
         return budget;

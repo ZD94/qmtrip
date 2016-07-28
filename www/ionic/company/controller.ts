@@ -726,3 +726,12 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         console.info(obj);
     }
 }
+
+
+export async function ProtocolHotelController($scope,Models) {
+
+}
+
+export async function EditProHotelController($scope,Models) {
+
+}
