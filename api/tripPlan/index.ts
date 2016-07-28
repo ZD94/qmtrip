@@ -283,6 +283,7 @@ class TripPlanModule {
             approve_values.detailUrl = shortUrl;
             approve_values.name = user.name;
             approve_values.destination = tripPlan.arrivalCity;
+            approve_values.startDate = moment(tripPlan.startAt).format('YYYY.MM.DD');
             if (openId) {
                 approve_values.approveUser = approveUser.name;
                 approve_values.tripPlanNo = tripPlan.planNo;
