@@ -108,12 +108,12 @@ class AccordHotelModule{
      * @returns {*}
      */
     @clientExport
-    @requireParams(["cityCode"], ["companyId"])
-    static async getAccordHotelByCityCode(params: {cityCode: string, companyId?: string}) : Promise<AccordHotel>{
-        let cityCode = params.cityCode;
+    @requireParams(["cityCode"])
+    static async getAccordHotelByCity(params: {cityId: string}) : Promise<AccordHotel>{
+        let cityId = params.cityId;
         var staff = await Staff.getCurrent();
         var options: any = {
-            where: {cityCode: cityCode}
+            where: {cityCode: cityId}
         };
         if(staff){
             options.where.companyId = staff["companyId"];//只允许查询该企业下的协议酒店
