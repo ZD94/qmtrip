@@ -730,6 +730,7 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
 
 
 export async function AccordhotelController($scope, Models, $location) {
+    require('./accordhotel.scss');
     var staff = await Staff.getCurrent();
     var company = await staff.company;
     var accordHotels = await Models.accordHotel.find({where: {companyId: company.id}});
