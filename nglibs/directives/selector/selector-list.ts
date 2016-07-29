@@ -68,7 +68,6 @@ export async function modalSelectorList($scope, $ionicModal, selected) {
             resolve($scope.form.selected);
         }
         $scope.haveSet = function() {
-            console.info("1111111111111111111111111");
             msgbox.log("该城市已设置协议酒店不能重复设置");
         }
         $scope.cancelModal = function() {

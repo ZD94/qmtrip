@@ -749,8 +749,6 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
         if(accordHotels && accordHotels.length >0){
             accordHotel = accordHotels[0];
         }
-        console.info($stateParams.cityCode);
-        console.info(accordHotel);
     }else{
         accordHotel = AccordHotel.create();
         accordHotel.companyId = staff.company.id;
