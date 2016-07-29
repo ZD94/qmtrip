@@ -247,7 +247,11 @@ class ApiTravelBudget {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
         //查询是否有协议酒店
-        let accordHotel = await API.accordHotel.getAccordHotelByCity({cityId: cityId});
+        let accordHotel;
+        try {
+            accordHotel= await API.accordHotel.getAccordHotelByCity({cityId: cityId});
+        } catch(err) {
+        }
         if (accordHotel) {
             return {price: accordHotel.accordPrice * days, type: EInvoiceType.HOTEL} as TravelBudgeItem;
         }
