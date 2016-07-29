@@ -720,6 +720,16 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
     }
     $scope.travelPolicy = travelPolicy;
     $scope.savePolicy = async function () {
+        if(!$scope.travelPolicy.name){
+            msgbox.log("标准名称不能为空");
+            return false;
+        }
+        var re = /^[0-9]+.?[0-9]*$/;
+        if($scope.travelPolicy.subsidy && !re.test($scope.travelPolicy.subsidy)){
+            msgbox.log("补助必须为数字");
+            return false;
+        }
+        $scope.travelPolicy.company = staff.company;
         await $scope.travelPolicy.save();
         $ionicHistory.goBack(-1);
     }
@@ -788,6 +798,20 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
     }
 
     $scope.saveAccordHotel = async function () {
+        if(!$scope.accordHotel.cityName || !$scope.accordHotel.cityName){
+            msgbox.log("出差地点不能为空");
+            return false;
+        }
+        if(!$scope.accordHotel.accordPrice){
+            msgbox.log("协议价格不能为空");
+            return false;
+        }
+        var re = /^[0-9]+.?[0-9]*$/;
+        if(!re.test($scope.accordHotel.accordPrice)){
+            msgbox.log("协议价格必须为数字");
+            return false;
+        }
+        $scope.accordHotel.company = staff.company;
         await $scope.accordHotel.save();
         $ionicHistory.goBack(-1);
     }
