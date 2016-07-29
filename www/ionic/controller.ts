@@ -84,7 +84,14 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
                 badgeNum: 0
             },
             {
-                id:1060,
+                id: 1060,
+                icon: 'android-list',
+                title: '协议酒店',
+                link: 'company/accordhotel',
+                badgeNum: 0
+            },
+            {
+                id:1061,
                 icon:'',
                 title:'',
                 link:'',

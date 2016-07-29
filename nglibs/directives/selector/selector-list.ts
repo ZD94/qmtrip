@@ -1,5 +1,6 @@
 
 declare var API: any;
+var msgbox = require('msgbox');
 
 export async function modalSelectorList($scope, $ionicModal, selected) {
     var template = require('./selector-list-dialog.html');
@@ -18,6 +19,7 @@ export async function modalSelectorList($scope, $ionicModal, selected) {
 
     var optionsLoader = $scope.callbacks.query;
     var optionsCreator = $scope.callbacks.create;
+
 
     var form: any = $scope.form = {};
     form.keyword = selected;
@@ -64,6 +66,10 @@ export async function modalSelectorList($scope, $ionicModal, selected) {
         $scope.confirmModal = function() {
             $scope.modal.hide();
             resolve($scope.form.selected);
+        }
+        $scope.haveSet = function() {
+            console.info("1111111111111111111111111");
+            msgbox.log("该城市已设置协议酒店不能重复设置");
         }
         $scope.cancelModal = function() {
             $scope.modal.hide();

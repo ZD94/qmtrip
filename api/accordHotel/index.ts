@@ -144,7 +144,8 @@ class AccordHotelModule{
         let companyId = params.companyId;
 
         var options: any = {
-            where:  _.pick(params, Object.keys(DBM.AccordHotel.attributes))
+            // where:  _.pick(params, Object.keys(DBM.AccordHotel.attributes))
+            where: params.where
         };
         if(params.columns){
             options.attributes = params.columns;
@@ -157,7 +158,6 @@ class AccordHotelModule{
         if(staff){
             options.where.companyId = staff["companyId"];//只允许查询该企业下的协议酒店
         }
-
         let paginate = await Models.accordHotel.find(options);
         let ids =  paginate.map(function(t){
             return t.id;
