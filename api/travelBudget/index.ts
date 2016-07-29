@@ -81,6 +81,9 @@ class ApiTravelBudget {
         let staffId = params.staffId || accountId;
         let staff = await Models.staff.get(staffId);
         let travelPolicy = await staff.getTravelPolicy();
+        if (!travelPolicy) {
+            throw new Error(`差旅标准还未设置`);
+        }
         let {leaveDate, goBackDate, isRoundTrip, originPlace, destinationPlace, checkInDate,
             checkOutDate, businessDistrict, leaveTime, goBackTime, isNeedHotel, isNeedTraffic} = params;
 
@@ -248,7 +251,7 @@ class ApiTravelBudget {
         if (accordHotel) {
             return {price: accordHotel.accordPrice * days, type: EInvoiceType.HOTEL} as TravelBudgeItem;
         }
-        
+
         //查询员工差旅标准
         let policy = await staff.getTravelPolicy();
         let hotelStar: number = 3;
