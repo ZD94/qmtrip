@@ -69,7 +69,7 @@ class CompanyModule {
             throw {code: -6, msg: "邮箱格式不符合要求"};
         }
 
-        let companies = await Models.company.find({where: {$or: [{email: params.email}, {mobile: params.mobile}, {domain_name: domain}]}});
+        let companies = await Models.company.find({where: {$or: [{email: params.email}, {mobile: params.mobile}/*, {domain_name: domain}*/]}});
 
         if(companies && companies.length > 0) {
             throw {code: -7, msg: '邮箱或手机号已经注册'};
