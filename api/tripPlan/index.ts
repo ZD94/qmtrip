@@ -317,13 +317,14 @@ class TripPlanModule {
             })
         } else {
             let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER,
-                EStaffRole.ADMIN], status: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
+                EStaffRole.ADMIN], staffStatus: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
             //给所有的管理员发送邮件
             await Promise.all(admins.map(function(s) {
                 let vals: any = utils.clone(values);
                 vals.managerName = s.name;
                 vals.email = user.email;
                 vals.projectName = tripPlan.title;
+                vals.username = s.name;
                 return API.notify.submitNotify({
                     key: 'qm_notify_new_travelbudget',
                     email: s.email,
