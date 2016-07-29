@@ -84,10 +84,10 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
                 badgeNum: 0
             },
             {
-                id:1060,
-                icon:'',
-                title:'',
-                link:'',
+                id: 1060,
+                icon: 'pricetags',
+                title: '协议酒店',
+                link: 'company/accordhotel',
                 badgeNum: 0
             })
     }

@@ -3,6 +3,7 @@ import { Company, MoneyChange } from "./company";
 import { Staff, Credential, PointChange } from "./staff";
 import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
+import { AccordHotel } from './accordHotel';
 import { Agency, AgencyUser } from './agency';
 import {TripPlan, TripDetail, Project, TripPlanLog} from './tripPlan';
 import {Account, Token, AccountOpenid} from './auth';
@@ -31,6 +32,7 @@ export interface ModelsInterface {
     
     department: ModelInterface<Department>;
     travelPolicy: ModelInterface<TravelPolicy>;
+    accordHotel: ModelInterface<AccordHotel>;
 
     agency: ModelInterface<Agency>;
     agencyUser: ModelInterface<AgencyUser>;
@@ -56,6 +58,7 @@ export var Models: ModelsInterface = {
     
     department: new ModelDelegate<Department>(),
     travelPolicy: new ModelDelegate<TravelPolicy>(),
+    accordHotel: new ModelDelegate<AccordHotel>(),
 
     agency: new ModelDelegate<Agency>(),
     agencyUser: new ModelDelegate<AgencyUser>(),
@@ -82,6 +85,7 @@ export * from "./company";
 export * from "./staff";
 export * from './travelPolicy';
 export * from './department';
+export * from './accordHotel';
 export * from './agency';
 export * from './tripPlan';
 export * from './auth';

@@ -6,6 +6,7 @@ import {EStaffRole, Staff, EStaffStatus} from "api/_types/staff";
 import {EPlanStatus, ETripType, EAuditStatus} from 'api/_types/tripPlan';
 import {TravelPolicy, MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 import {Department} from "api/_types/department";
+import {AccordHotel} from "api/_types/accordHotel";
 import validator = require('validator');
 import _ = require('lodash');
 import async = Q.async;
@@ -724,5 +725,94 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
     }
     $scope.consoles = function (obj) {
         console.info(obj);
+    }
+}
+
+
+export async function AccordhotelController($scope, Models, $location) {
+    var staff = await Staff.getCurrent();
+    var company = await staff.company;
+    var accordHotels = await Models.accordHotel.find({where: {companyId: company.id}});
+    $scope.accordHotels = accordHotels;
+    $scope.editaccordhotel = async function (id) {
+        $location.path('/company/editaccordhotel').search({'accordHotelId': id}).replace();
+    }
+}
+
+export async function EditaccordhotelController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup) {
+    var staff = await Staff.getCurrent();
+    var accordHotel;
+    if ($stateParams.accordHotelId) {
+        accordHotel = await Models.accordHotel.get($stateParams.accordHotelId);
+    }else if($stateParams.cityCode) {
+        var accordHotels = await Models.accordHotel.find({where: {companyId: staff.company.id, cityCode: $stateParams.cityCode}});
+        if(accordHotels && accordHotels.length >0){
+            accordHotel = accordHotels[0];
+        }
+    }else{
+        accordHotel = AccordHotel.create();
+        accordHotel.companyId = staff.company.id;
+    }
+    $scope.accordHotel = accordHotel;
+
+    $scope.placeSelector = {
+        query: queryPlaces,
+        done: function(val) {
+            $scope.accordHotel.cityCode = val.value;
+        }
+    };
+
+    async function queryPlaces(keyword){
+        /*if (!keyword) {
+            let hotCities = $storage.local.get("accord_hot_cities")
+            if (hotCities) {
+                return hotCities;
+            }
+        }*/
+        var places = await API.place.queryPlace({keyword: keyword});
+        /*places = places.map((place)=> {
+            return {name: place.name, value: place.id}
+        });*/
+        places = await Promise.all(places.map(async function(place){
+            var ahs = await Models.accordHotel.find({where: {companyId: staff.company.id, cityCode: place.id}});
+            if(ahs && ahs.length>0){
+                return {name: place.name, value: place.id, haveSet: true}
+            }else{
+                return {name: place.name, value: place.id, haveSet: false}
+            }
+        }))
+        /*if (!keyword) {
+            $storage.local.set('accord_hot_cities', places);
+        }*/
+        return places;
+    }
+
+    $scope.saveAccordHotel = async function () {
+        await $scope.accordHotel.save();
+        $ionicHistory.goBack(-1);
+    }
+
+    $scope.deleteAccordHotel = async function (accordHotel, index) {
+        var nshow = $ionicPopup.show({
+            title:'确定要删除该协议酒店吗?',
+            scope: $scope,
+            buttons:[
+                {
+                    text: '取消'
+                },
+                {
+                    text: '确定',
+                    type: 'button-positive',
+                    onTap: async function () {
+                        try{
+                            await accordHotel.destroy();
+                            $ionicHistory.goBack(-1);
+                        }catch(err){
+                            msgbox.log(err.msg);
+                        }
+                    }
+                }
+            ]
+        });
     }
 }

@@ -7,6 +7,7 @@ import { Staff, Credential, PointChange } from 'api/_types/staff';
 import { Company, MoneyChange } from './_types/company';
 import { Department } from './_types/department';
 import { TravelPolicy } from './_types/travelPolicy';
+import { AccordHotel } from './_types/accordHotel';
 import { Agency, AgencyUser } from './_types/agency';
 import {TripPlan, TripDetail, Project, TripPlanLog} from './_types/tripPlan';
 import {Account, Token, AccountOpenid} from './_types/auth';
@@ -20,6 +21,7 @@ initModels({
     company: createServerService<Company>(Company),
     department: createServerService<Department>(Department),
     travelPolicy: createServerService<TravelPolicy>(TravelPolicy),
+    accordHotel: createServerService<AccordHotel>(AccordHotel),
     agency: createServerService<Agency>(Agency),
     agencyUser: createServerService<AgencyUser>(AgencyUser),
     tripPlan: createServerService<TripPlan>(TripPlan),

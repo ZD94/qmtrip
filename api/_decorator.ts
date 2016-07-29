@@ -247,6 +247,14 @@ export var condition = {
             }
         }
     },
+    isAccordHotelAdminOrOwner: function(idpath: string) {
+        return async function (fn ,self, args) {
+            let id = _.get(args, idpath);
+            let staff = await Staff.getCurrent();
+            let ah = await Models.accordHotel.get(id);
+            return id && staff && ah && ah["companyId"] == staff["companyId"] && (staff["roleId"] == EStaffRole.ADMIN || staff["roleId"] == EStaffRole.OWNER);
+        }
+    },
     isSelfTravelPolicy: function (idpath:string) {
         return async function(fn, self, args) {
             let id = _.get(args, idpath);
@@ -268,6 +276,15 @@ export var condition = {
             let user = await AgencyUser.getCurrent();
             let tp = await Models.travelPolicy.get(id);
             let company = await Models.company.get(tp["companyId"]);//此处为什么不能用tp.company
+            return id && user && company && user["agencyId"] == company["agencyId"];
+        }
+    },
+    isAccordHotelAgency: function(idpath: string) {
+        return async function (fn ,self, args) {
+            let id = _.get(args, idpath);
+            let user = await AgencyUser.getCurrent();
+            let ah = await Models.accordHotel.get(id);
+            let company = await Models.company.get(ah["companyId"]);
             return id && user && company && user["agencyId"] == company["agencyId"];
         }
     },
