@@ -229,3 +229,8 @@ function trim(s) {
     s = s.replace(/\s+/g, "");
     return s;
 }
+
+
+export async function ForgetPasswordController($scope) {
+    
+}
