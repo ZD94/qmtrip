@@ -22,8 +22,9 @@ export async function modalSelectorList($scope, $ionicModal, selected) {
 
 
     var form: any = $scope.form = {};
-    form.keyword = selected;
+    form.keyword = ''; //selected;
     form.selected = '';
+    form.newSelected = '';
 
     $scope.optionLoader = async function(){
         $scope.options = await optionsLoader(form.keyword);
@@ -65,7 +66,14 @@ export async function modalSelectorList($scope, $ionicModal, selected) {
     return new Promise(function(resolve, reject) {
         $scope.confirmModal = function() {
             $scope.modal.hide();
-            resolve($scope.form.selected);
+            $scope.keyword = '';
+
+            let form = $scope.form;
+            if($scope.form.newSelected) {
+                $scope.form.selected = $scope.form.newSelected;
+                $scope.form.newSelected = '';
+            }
+            resolve(form.selected);
         }
         $scope.haveSet = function() {
             msgbox.log($scope.noticeMsg);

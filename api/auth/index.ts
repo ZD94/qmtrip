@@ -8,6 +8,7 @@ import {AuthCert, Token, Account, AccountOpenid} from "api/_types/auth"
 import {Staff} from "api/_types/staff";
 import validator = require('validator');
 import _ = require('lodash');
+import { getSession } from '../../common/model/client';
 
 var sequelize = require("common/model").importModel("./models");
 var DBM = sequelize.models;
@@ -1175,12 +1176,11 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * @type {saveOrUpdateOpenId}
      */
     @clientExport
-    @requireParams(['openid'], [])
-    static async saveOrUpdateOpenId(params: {openid: string}): Promise<any> {
-        if(!params) {
-            return true;
-        }
-        let openid = params.openid;
+    static async saveOrUpdateOpenId() {
+        var session = getSession();
+        let openid = session.wxopenid; //获取微信openId;
+        if(!openid)
+            return;
         let staff = await Staff.getCurrent();
         let list = await Models.accountOpenid.find({where: {openId: openid}});
 
@@ -1241,10 +1241,13 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
 
 
     @clientExport
-    static async authWeChatLogin(params: {openid: string}):
+    static async authWeChatLogin(params: {code: string}):
     Promise<{token_id: string, user_id: string, timestamp: string, token_sign: string} | boolean> {
-        let accountId = await ApiAuth.getAccountIdByOpenId({openId: params.openid});
-        
+        let openid = await API.wechat.requestOpenIdByCode({code: params.code}); //获取微信openId;
+        var session = getSession();
+        session.wxopenid = openid;
+        let accountId = await ApiAuth.getAccountIdByOpenId({openId: openid});
+
         if(!accountId) {
             return false;
         }
@@ -1300,15 +1303,9 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         //微信自动登录
         app.all("/auth/wx-login", async function(req, res, next) {
             let query = req.query;
-            let openid = 'false';
-            try {
-                openid = await API.wechat.requestOpenIdByCode({code: query.code}); //获取微信openId;
-            } catch(err) {
-                logger.error(`获取openid失败`);
-            }
             let redirect_url = query.redirect_url;
             redirect_url += redirect_url.indexOf('?') > 0 ? '&' : '?';
-            redirect_url += 'openid=' + openid + '&state=' + query.state;
+            redirect_url += 'wxauthcode=' + query.code + '&wxauthstate=' + query.state;
             res.redirect(redirect_url);
         });
     }

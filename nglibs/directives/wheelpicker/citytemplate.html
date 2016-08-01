@@ -1,4 +1,4 @@
-<div>
+<div class="ng-selector-city">
 <input type="text" class="city" id="city-picker" placeholder="点击选择所属地区" ng-model="choose_city" ng-click="show_city()" readonly>
 <div class="city_style_black_back"></div>
 <div class="city_style">
@@ -6,6 +6,6 @@
         <span ng-click="cancel_city()">取消</span>
         <span ng-click="sure_city()">确定</span>
     </div>
-    <tld-city-picker class="test-picker" ng-model="ngModel" tld-wheel-line-height="36"></tld-city-picker>
+    <ng-city-picker class="test-picker" ng-model="ngModel" ng-wheel-line-height="36"></ng-city-picker>
 </div>
 </div>
