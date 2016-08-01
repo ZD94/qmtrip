@@ -89,6 +89,7 @@ class CompanyModule {
         let staff = Staff.create({email: params.email, name: params.userName, mobile: params.mobile, roleId: EStaffRole.OWNER, pwd: md5(pwd), status: params.status});
         let company = Company.create(params);
         company.domainName = domain;
+        company.isApproveOpen = true;
         let department = Department.create({name: "我的企业", isDefault: true});
 
         department.company = company;

@@ -58,6 +58,10 @@
 }
 
 
+.flex-111{
+  @include flex-row();
+  @include flex-default(1);
+}
 .flex-10{
   @include flex-row();
   @include flex-default(1);
@@ -74,10 +78,9 @@
   @include flex-nth(none);
   @include flex-last(none);
 }
-.flex-col{
+.flex-c111{
   @include flex-col();
   @include flex-default(1);
-  @include flex-last(none);
 }
 .flex-c10{
   @include flex-col();

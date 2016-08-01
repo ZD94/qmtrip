@@ -34,4 +34,5 @@ export class AccordHotel extends ModelObject{
     //所属企业
     @ResolveRef({type: Types.UUID}, Models.company)
     get company(): Company { return null; }
+    set company(val: Company) {}
 }

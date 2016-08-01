@@ -1,0 +1,10 @@
+<div class="ng-selector-date-day">
+    <div ng-if="modal.worktime==1" class="flag"><div class="backtriangle workflag"></div><div class="flagtext">班</div></div>
+    <div ng-if="modal.worktime==2" class="flag"><div class="backtriangle restflag"></div><div class="flagtext">假</div></div>
+    <div class="content">
+        <div class="daynumber">{{modal.day}}</div>
+        <div class="label festival" ng-if="modal.festival">{{modal.festival}}</div>
+        <div class="label term" ng-if="modal.term && !modal.festival">{{modal.term}}</div>
+        <div class="label lunar" ng-if="modal.lunar && !modal.term && !modal.festival">{{modal.lunar}}</div>
+    </div>
+</div>

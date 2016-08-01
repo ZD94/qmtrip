@@ -4,11 +4,11 @@ import {IDirective} from 'angular';
 
 angular
     .module('nglibs')
-    .directive('tldCityPicker', tldCityPicker)
-    .directive('ngCitypicker', ngCityPicker)
+    .directive('ngCityPicker', ngCityPicker)
+    .directive('ngSelectorCity', ngSelectorCity)
 ;
 
-function tldCityPicker(): IDirective {
+function ngCityPicker(): IDirective {
     var rawCitiesData = require('./citiesdata.json');
     var emptyCitis = [];
     return {
@@ -16,7 +16,7 @@ function tldCityPicker(): IDirective {
         template: require('./citypicker.tpl.html'),
         scope: {
             ngModel: '=',
-            lineHeight: '@tldWheelLineHeight',
+            lineHeight: '@ngWheelLineHeight',
         },
         controller: function($scope){
             function findCityByName(citis, name){
@@ -65,7 +65,7 @@ function tldCityPicker(): IDirective {
     };
 }
 
-function ngCityPicker(): IDirective{
+function ngSelectorCity(): IDirective{
     return {
         restrict: 'A',
         template: require('./citytemplate.html'),

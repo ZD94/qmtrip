@@ -9,12 +9,23 @@ import {EPlanStatus, EInvoiceType, ETripType, MTxPlaneLevel} from 'api/_types/tr
 import moment = require("moment");
 require("./trip-plan.scss");
 
+let statusTxt = {};
+statusTxt[EPlanStatus.WAIT_APPROVE] = '等待审批';
+statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
+statusTxt[EPlanStatus.NO_BUDGET] = "没有预算";
+statusTxt[EPlanStatus.WAIT_UPLOAD] = "待上传票据";
+statusTxt[EPlanStatus.WAIT_COMMIT] = "待提交";
+statusTxt[EPlanStatus.AUDITING] = "已提交待审核";
+statusTxt[EPlanStatus.COMPLETE] = "已完成";
+statusTxt[EPlanStatus.APPROVE_NOT_PASS] = '审核未通过';
+statusTxt[EPlanStatus.CANCEL] = "已撤销";
+
 angular
     .module("nglibs")
     .directive("tripPlan", [function() {
         return {
             restrict: 'AE',
-            template: require('./template.html'),
+            template: require('./trip-plan.html'),
             replace: true,
             transclude: false,
             scope: {
@@ -49,16 +60,6 @@ angular
                     $scope.text = $scope.reason ? `审核未通过,备注:${$scope.reason}` : '审核未通过';
                     return;
                 }
-                let statusTxt = {};
-                statusTxt[EPlanStatus.WAIT_APPROVE] = '等待审批';
-                statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
-                statusTxt[EPlanStatus.NO_BUDGET] = "没有预算";
-                statusTxt[EPlanStatus.WAIT_UPLOAD] = "待上传票据";
-                statusTxt[EPlanStatus.WAIT_COMMIT] = "待提交";
-                statusTxt[EPlanStatus.AUDITING] = "已提交待审核";
-                statusTxt[EPlanStatus.COMPLETE] = "已完成";
-                statusTxt[EPlanStatus.APPROVE_NOT_PASS] = '审核未通过';
-                statusTxt[EPlanStatus.CANCEL] = "已撤销";
                 $scope.$watch('status', function(newVal, oldVal) {
                     $scope.text = statusTxt[newVal];
                 });
