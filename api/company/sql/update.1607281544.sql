@@ -1,0 +1,1 @@
+alter table company.companies add budget_policy varchar(50) default 'default';

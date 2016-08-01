@@ -121,6 +121,10 @@ export class Company extends ModelObject{
     get isApproveOpen(): boolean { return true; }
     set isApproveOpen(val: boolean) {}
 
+    @Field({type: Types.STRING(50)})
+    get budgetPolicy(): string { return 'default'; }
+    set budgetPolicy(policy:string){}
+
     @Reference({type: Types.UUID})
     getAgency(id?:string): Promise<Agency> {
         return Models.agency.get(id);

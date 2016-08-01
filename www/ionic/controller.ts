@@ -50,6 +50,10 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
     ];
 
     var staff = await Staff.getCurrent();
+    var tripPlanSave = 0;
+    if(staff){
+        tripPlanSave = await staff.getTripPlanSave();
+    }
     if(staff && (staff.roleId == EStaffRole.OWNER || staff.roleId == EStaffRole.ADMIN)){
         items.push({
                 id:1056,
@@ -80,10 +84,10 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
                 badgeNum: 0
             },
             {
-                id:1060,
-                icon:'',
-                title:'',
-                link:'',
+                id: 1060,
+                icon: 'pricetags',
+                title: '协议酒店',
+                link: 'company/accordhotel',
                 badgeNum: 0
             })
     }
@@ -127,6 +131,7 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
 
     $scope.Menu = Menu;
     $scope.currentStaff = staff;
+    $scope.tripPlanSave = tripPlanSave;
     $scope.logout = async function(){
         var browserspec = require('browserspec');
         if(browserspec.is_wechat) {

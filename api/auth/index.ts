@@ -483,6 +483,13 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             if (account1 && account1.total>0) {
                 throw L.ERR.EMAIL_HAS_REGISTRY();
             }
+            let domain = data.email.match(/.*\@(.*)/)[1]; //企业域名
+
+            let companies = await Models.company.find({where: {domain_name: domain}});
+
+            if(companies && (companies.length > 0 || companies.total > 0)) {
+                throw L.ERR.DOMAIN_HAS_EXIST();
+            }
         }
 
         if(data.mobile){
@@ -1169,7 +1176,10 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      */
     @clientExport
     @requireParams(['openid'], [])
-    static async saveOrUpdateOpenId(params: {openid: string}) {
+    static async saveOrUpdateOpenId(params: {openid: string}): Promise<any> {
+        if(!params) {
+            return true;
+        }
         let openid = params.openid;
         let staff = await Staff.getCurrent();
         let list = await Models.accountOpenid.find({where: {openId: openid}});
@@ -1290,7 +1300,12 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         //微信自动登录
         app.all("/auth/wx-login", async function(req, res, next) {
             let query = req.query;
-            let openid = await API.wechat.requestOpenIdByCode({code: query.code}); //获取微信openId;
+            let openid = 'false';
+            try {
+                openid = await API.wechat.requestOpenIdByCode({code: query.code}); //获取微信openId;
+            } catch(err) {
+                logger.error(`获取openid失败`);
+            }
             let redirect_url = query.redirect_url;
             redirect_url += redirect_url.indexOf('?') > 0 ? '&' : '?';
             redirect_url += 'openid=' + openid + '&state=' + query.state;

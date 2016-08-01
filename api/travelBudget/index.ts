@@ -81,6 +81,9 @@ class ApiTravelBudget {
         let staffId = params.staffId || accountId;
         let staff = await Models.staff.get(staffId);
         let travelPolicy = await staff.getTravelPolicy();
+        if (!travelPolicy) {
+            throw new Error(`差旅标准还未设置`);
+        }
         let {leaveDate, goBackDate, isRoundTrip, originPlace, destinationPlace, checkInDate,
             checkOutDate, businessDistrict, leaveTime, goBackTime, isNeedHotel, isNeedTraffic} = params;
 
@@ -236,12 +239,23 @@ class ApiTravelBudget {
         if (new Date(checkOutDate) < new Date(checkInDate)) {
             throw {code: -1, msg: "离开日期大于入住日期"};
         }
+        let days = moment(checkOutDate).diff(checkInDate, 'days');
 
         // let staff = await API.staff.getStaff({id: accountId});
         var staff = await Staff.getCurrent();
         if (!staff || !staff["travelPolicyId"]) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
+        //查询是否有协议酒店
+        let accordHotel;
+        try {
+            accordHotel= await API.accordHotel.getAccordHotelByCity({cityId: cityId});
+        } catch(err) {
+        }
+        if (accordHotel) {
+            return {price: accordHotel.accordPrice * days, type: EInvoiceType.HOTEL} as TravelBudgeItem;
+        }
+
         //查询员工差旅标准
         let policy = await staff.getTravelPolicy();
         let hotelStar: number = 3;
@@ -262,7 +276,6 @@ class ApiTravelBudget {
         }
 
         let budget = await API.travelbudget.getHotelBudget(data);
-        let days = moment(checkOutDate).diff(checkInDate, 'days');
         if (!budget.price || budget.price < 0) {
             days = days<= 0 ? 1 :days;
             if (policy.hotelPrice) {
@@ -340,14 +353,15 @@ class ApiTravelBudget {
             leaveDate = moment(leaveDate).format("YYYY-MM-DD");
         }
 
-
+        let companyPolicy = staff.company.budgetPolicy;
         let budget = await API.travelbudget.getTrafficBudget({
                         originPlace: originPlace,
                         destinationPlace: destinationPlace,
                         leaveDate: leaveDate,
                         leaveTime: leaveTime,
                         cabinClass: cabinClass,
-                        trainCabinClass: trainCabinClass
+                        trainCabinClass: trainCabinClass,
+                        policy: companyPolicy
                     }) as TravelBudgeItem;
 
         return budget;

@@ -84,13 +84,14 @@ class TripPlanModule {
             tripPlan.auditUser = null;
         }
 
-        let hotelName = '';
-        if(query.businessDistrict) {
-            let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
-            if(hotelInfo && hotelInfo.name) {
-                hotelName = hotelInfo.name;
-            }
-        }
+        // let hotelName = '';
+        // if(query.businessDistrict) {
+        //     let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
+        //     logger.warn("hotelInfo=>", hotelInfo);
+        //     if(hotelInfo && hotelInfo.name) {
+        //         hotelName = hotelInfo.name;
+        //     }
+        // }
 
         let tripDetails: TripDetail[] = budgets.map(function (budget) {
             let tripType = budget.tripType;
@@ -126,7 +127,7 @@ class TripPlanModule {
                     detail.cityCode = query.destinationPlace;
                     detail.city = tripPlan.arrivalCity;
                     detail.hotelCode = query.businessDistrict;
-                    detail.hotelName = hotelName;
+                    detail.hotelName = query.hotelName;
                     detail.startTime = query.checkInDate || query.leaveDate;
                     detail.endTime = query.checkOutDate || query.goBackDate;
                     tripPlan.isNeedHotel = true;
@@ -283,6 +284,7 @@ class TripPlanModule {
             approve_values.detailUrl = shortUrl;
             approve_values.name = user.name;
             approve_values.destination = tripPlan.arrivalCity;
+            approve_values.startDate = moment(tripPlan.startAt).format('YYYY.MM.DD');
             if (openId) {
                 approve_values.approveUser = approveUser.name;
                 approve_values.tripPlanNo = tripPlan.planNo;
@@ -315,13 +317,14 @@ class TripPlanModule {
             })
         } else {
             let admins = await Models.staff.find({ where: {companyId: tripPlan['companyId'], roleId: [EStaffRole.OWNER,
-                EStaffRole.ADMIN], status: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
+                EStaffRole.ADMIN], staffStatus: EStaffStatus.ON_JOB, id: {$ne: userId}}}); //获取激活状态的管理员
             //给所有的管理员发送邮件
             await Promise.all(admins.map(function(s) {
                 let vals: any = utils.clone(values);
                 vals.managerName = s.name;
                 vals.email = user.email;
                 vals.projectName = tripPlan.title;
+                vals.username = s.name;
                 return API.notify.submitNotify({
                     key: 'qm_notify_new_travelbudget',
                     email: s.email,
@@ -524,11 +527,11 @@ class TripPlanModule {
                     detail.status = EPlanStatus.WAIT_UPLOAD;
                     detail.tripPlan = tripPlan;
 
-                    let hotelName = '';
-                    if (query.businessDistrict) {
-                        let hotelInfo = await API.place.getCityInfo({cityCode: query.businessDistrict});
-                        hotelName = hotelInfo ? hotelInfo.name : '';
-                    }
+                    // let hotelName = '';
+                    // if (query.businessDistrict) {
+                    //     let hotelInfo = await API.place.getCityInfo({cityCode: query.businessDistrict});
+                    //     hotelName = hotelInfo ? hotelInfo.name : '';
+                    // }
 
                     switch (tripType) {
                         case ETripType.OUT_TRIP:
@@ -553,7 +556,7 @@ class TripPlanModule {
                             detail.cityCode = query.destinationPlace;
                             detail.city = tripPlan.arrivalCity;
                             detail.hotelCode = query.businessDistrict;
-                            detail.hotelName = hotelName;
+                            detail.hotelName = query.hotelName;
                             detail.startTime = query.checkInDate || query.leaveDate;
                             detail.endTime = query.checkOutDate || query.goBackDate;
                             break;
@@ -693,7 +696,7 @@ class TripPlanModule {
     @clientExport
     @requireParams(['tripDetailId', 'pictureFileId'])
     @modelNotNull('tripDetail', 'tripDetailId')
-    static async uploadInvoice(params: {tripDetailId: string, pictureFileId: string}): Promise<boolean> {
+    static async uploadInvoice(params): Promise<boolean> {
         let staff = await Staff.getCurrent();
         let tripDetail = await Models.tripDetail.get(params.tripDetailId);
 
@@ -714,8 +717,13 @@ class TripPlanModule {
             invoiceJson = JSON.parse(invoiceJson);
         }
 
-        invoiceJson.push({times: times, pictureFileId: params.pictureFileId, created_at: utils.now(), status: EPlanStatus.WAIT_COMMIT, remark: '', approve_at: ''});
-        tripDetail.newInvoice = params.pictureFileId;
+        invoiceJson.push({times: times, pictureFileId: JSON.stringify(params.pictureFileId), created_at: utils.now(), status: EPlanStatus.WAIT_COMMIT, remark: '', approve_at: ''});
+        if(typeof params.pictureFileId =='string') {
+            // tripDetail.newInvoice = params.pictureFileId;
+            tripDetail.latestInvoice = JSON.stringify([params.pictureFileId]);
+        }else{
+            tripDetail.latestInvoice = JSON.stringify(params.pictureFileId);
+        }
         tripDetail.invoice = JSON.stringify(invoiceJson);
         tripDetail.status = EPlanStatus.WAIT_COMMIT;
 
@@ -810,7 +818,7 @@ class TripPlanModule {
             API.notify.submitNotify({
                 key: 'qm_notify_agency_budget',
                 values: auditValues,
-                email: user.email,
+                email: default_agency.manager_email,
                 openid: openId,
             })
         }
@@ -890,7 +898,7 @@ class TripPlanModule {
         switch (tripDetail.type) {
             case ETripType.OUT_TRIP:
                 templateValue.tripType = '去程';
-                templateValue.invoiceDetail = `${moment(tripDetail.startTime).format('YYYY-MM-DD')} 由 + ${tripDetail.deptCity} 到 ${tripDetail.arrivalCity}， 去程发票， 预算：${tripDetail.budget}元`;
+                templateValue.invoiceDetail = `${moment(tripDetail.startTime).format('YYYY-MM-DD')} 由 ${tripDetail.deptCity} 到 ${tripDetail.arrivalCity}， 去程发票， 预算：${tripDetail.budget}元`;
                 break;
             case ETripType.BACK_TRIP:
                 templateValue.tripType = '回程';
@@ -1079,7 +1087,7 @@ class TripPlanModule {
         let endTime = moment(startTime).add(1, 'months').format('YYYY-MM-DD');
 
         let where_sql = 'from trip_plan.trip_plans where company_id=\''
-            + companyId + '\' and status!=(' + EPlanStatus.APPROVE_NOT_PASS + ') and status!=' + EPlanStatus.WAIT_APPROVE + '  and status!=' + EPlanStatus.CANCEL + '  and status!=' + EPlanStatus.NO_BUDGET + ' and start_at>=\''
+            + companyId + '\' and status!=(' + EPlanStatus.APPROVE_NOT_PASS + ') and status!=' + EPlanStatus.WAIT_APPROVE + '  and status!=(' + EPlanStatus.CANCEL + ')  and status!=(' + EPlanStatus.NO_BUDGET + ') and start_at>=\''
             + startTime + '\' and start_at<\'' + endTime + '\'';
 
         let complete_sql = 'from trip_plan.trip_plans where company_id=\''
@@ -1184,6 +1192,22 @@ class TripPlanModule {
 
         return ranks;
     }
+
+    @clientExport
+    static async getTripPlanSave(params: {accountId?: string}) {
+        let staff = await Models.staff.get(params.accountId);
+        let accountId = params.accountId;
+        let companyId = staff.company.id;
+        let sql = `select sum(budget) - sum(expenditure) as save from trip_plan.trip_plans where status = 4 AND company_id = '${companyId}' AND account_id =  '${accountId}' `;
+
+        let ranks = await sequelize.query(sql)
+            .then(function(result) {
+                return result[0];
+            });
+
+        return ranks[0].save;
+    }
+
 
     @clientExport
     @requireParams(["tripPlanId"])

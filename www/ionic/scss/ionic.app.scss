@@ -21,6 +21,10 @@ $ionicons-font-path: "../fonts" !default;
 // Include all of Ionic
 @import "../../../common/client/ionic/scss/ionic";
 
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
 .platform-wechat{
   .nav-bar-block{
     right: auto;
@@ -76,7 +80,7 @@ $ionicons-font-path: "../fonts" !default;
 }
 
 ion-nav-view ion-view ion-content{
-  background: url(../images/backgroud.png) no-repeat center;
+  background: url(../images/background.jpg) no-repeat center;
   background-size:cover;
   .spanRight{
     float: right; //很多价位在右边
@@ -200,9 +204,9 @@ ion-side-menu{
               }
             }
           }
-          &:last-child{
-            margin-bottom: 50px;
-          }
+          //&:last-child{
+          //  margin-bottom: 50px;
+          //}
         }
       }
     }
@@ -266,9 +270,18 @@ ion-side-menu{
 }
 
 ion-content{
-  .flex-c10{
-    ion-scroll{
+  >.flex-c10{
+    >ion-scroll{
       padding: 10px;
+    }
+    >:last-child{
+      &.button-bar, >.button-bar{
+        >.button {
+          margin-top: 0;
+          margin-bottom: 0;
+          border-radius: 0;
+        }
+      }
     }
   }
 }

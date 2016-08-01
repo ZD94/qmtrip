@@ -82,6 +82,7 @@ export class TravelPolicy extends ModelObject{
 
     @ResolveRef({type: Types.UUID}, Models.company)
     get company(): Company { return null; }
+    set company(val: Company) {}
 
     getStaffs(): Promise<Staff[]> {
         let query = {where: {companyId: this.company.id, travelPolicyId: this.id}}

@@ -5,7 +5,7 @@
 'use strict';
 
 import angular = require("angular");
-import {EPlanStatus, EInvoiceType, ETripType} from 'api/_types/tripPlan';
+import {EPlanStatus, EInvoiceType, ETripType, MTxPlaneLevel} from 'api/_types/tripPlan';
 import moment = require("moment");
 require("./trip-plan.scss");
 
@@ -58,6 +58,7 @@ angular
                 statusTxt[EPlanStatus.AUDITING] = "已提交待审核";
                 statusTxt[EPlanStatus.COMPLETE] = "已完成";
                 statusTxt[EPlanStatus.APPROVE_NOT_PASS] = '审核未通过';
+                statusTxt[EPlanStatus.CANCEL] = "已撤销";
                 $scope.$watch('status', function(newVal, oldVal) {
                     $scope.text = statusTxt[newVal];
                 });
@@ -103,6 +104,7 @@ angular
                 $scope.EInvoiceType = EInvoiceType;
                 $scope.EPlanStatus = EPlanStatus;
                 $scope.ETripType = ETripType;
+                $scope.MTxPlaneLevel = MTxPlaneLevel;
                 if ($scope.showUploader == 'false' || !$scope.showUploader) {
                     $scope.showUploader = false;
                 } else {
@@ -112,6 +114,35 @@ angular
                 $scope.viewInvoice = function(id) {
                     window.location.href="#/trip/invoice-detail?detailId="+id;
                 }
+
+                $scope.item.done = async function(ret) {
+                    API.require('tripPlan');
+                    await API.onload();
+                    try {
+                        await $scope.item.uploadInvoice({
+                            pictureFileId: ret.fileId
+                        })
+                    } catch(err) {
+                        alert(err.msg ? err.msg : err);
+                    }
+                }
             }
         }
-    }])
+    }]).directive('invoiceImgItem', [function($storage) {
+    return  {
+        restrict: 'AE',
+        template: require('./invoice-img-item.html'),
+        scope: {
+            imgurl: '@',
+            loadingurl: '@'
+        },
+        controller: function($scope) {
+            // 显示票据之前先显示loading图
+            $scope.showLoading = false;
+            angular.element("#previewInvoiceImg").bind("load", function() {
+                $scope.showLoading = false;
+                $scope.$apply();
+            })
+        }
+    }
+}])

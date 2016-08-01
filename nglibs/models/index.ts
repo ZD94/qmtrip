@@ -12,6 +12,7 @@ import { Staff, Credential, PointChange } from 'api/_types/staff';
 import { Company, MoneyChange } from 'api/_types/company';
 import { Department } from 'api/_types/department';
 import { TravelPolicy } from 'api/_types/travelPolicy';
+import { AccordHotel } from 'api/_types/accordHotel';
 import { Agency, AgencyUser } from 'api/_types/agency';
 import {TripPlan, TripDetail, Project, TripPlanLog, ApproveOrder} from 'api/_types/tripPlan';
 import { Place } from 'api/_types/place';
@@ -57,6 +58,9 @@ var Services = {
     },
     travelPolicy: { type: TravelPolicy, modname: 'travelPolicy',
         funcs: ['getTravelPolicy', 'getTravelPolicies', 'createTravelPolicy', 'updateTravelPolicy', 'deleteTravelPolicy']
+    },
+    accordHotel: { type: AccordHotel, modname: 'accordHotel',
+        funcs: ['getAccordHotel', 'getAccordHotels', 'createAccordHotel', 'updateAccordHotel', 'deleteAccordHotel']
     },
     agency: { type: Agency, modname: 'agency',
         funcs: ['getAgencyById', 'listAgency', 'registerAgency', 'updateAgency', 'deleteAgency']
@@ -112,6 +116,7 @@ class ClientModels implements ModelsInterface {
     company: ModelRemote<Company>;
     department: ModelRemote<Department>;
     travelPolicy: ModelRemote<TravelPolicy>;
+    accordHotel: ModelRemote<AccordHotel>;
     agency: ModelRemote<Agency>;
     agencyUser: ModelRemote<AgencyUser>;
     tripPlan: ModelRemote<TripPlan>;
@@ -133,6 +138,7 @@ class ClientModels implements ModelsInterface {
         this.company = createService<Company>(Services.company, $cacheFactory);
         this.department = createService<Department>(Services.department, $cacheFactory);
         this.travelPolicy = createService<TravelPolicy>(Services.travelPolicy, $cacheFactory);
+        this.accordHotel = createService<AccordHotel>(Services.accordHotel, $cacheFactory);
         this.agency = createService<Agency>(Services.agency, $cacheFactory);
         this.agencyUser = createService<AgencyUser>(Services.agencyUser, $cacheFactory);
         this.tripPlan = createService<TripPlan>(Services.tripPlan, $cacheFactory);

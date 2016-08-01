@@ -1,0 +1,1 @@
+update trip_plan.trip_details set latest_invoice = CONCAT('"[\"',new_invoice,'\"]"')::json where deleted_at is null and new_invoice != '' and latest_invoice = '[]'

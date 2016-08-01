@@ -8,16 +8,25 @@
                     <i ng-if='invoice.invoiceType == EInvoiceType.HOTEL' class="icon ion-home"></i>
                 </div>
                 <div style="float: left;">
-                    <b>{{invoice.deptCity}}</b>-
-                    <b>{{invoice.arrivalCity}}</b><br/>
+                    <span ng-if="invoice.invoiceType == EInvoiceType.HOTEL">
+                        <b>{{invoice.city}}</b>
+                        <b ng-if="invoice.hotelName"> - {{invoice.hotelName}}</b>
+                    </span>
+                    <span ng-if="invoice.invoiceType != EInvoiceType.HOTEL">
+                        <b>{{invoice.deptCity}}</b>-
+                        <b>{{invoice.arrivalCity}}</b>
+                    </span>
+                    <br/>
                     <span>{{invoice.createdAt | date: 'yyyy-MM-dd'}}</span>
                 </div>
                 <span class="item-note">{{statustext[invoice.status]}}</span>
             </div>
 
-            <div class="item item-image">
-                <img src="/ionic/images/loading.gif" ng-show="showLoading" style="width: 100px; height: 100px;">
-                <img ng-src="{{invoiceImg}}" ng-hide="showLoading" id="previewInvoiceImg" style="width: 100%;">
+            <div class="item item-image" ng-repeat="invoiceImg in invoiceImgs track by $index">
+                <!--<img src="/ionic/images/loading.gif" ng-show="showLoading" style="width: 100px; height: 100px;">-->
+                <!--<img ng-src="{{invoiceImg}}" ng-hide="showLoading" id="previewInvoiceImg" style="width: 100%;">-->
+                <!--<img ng-src="{{invoiceImg}}" id="previewInvoiceImg" style="width: 100%;">-->
+                <invoice-img-item imgurl = {{invoiceImg}} loadingurl = "/ionic/images/loading.gif"></invoice-img-item>
             </div>
         </div>
     </ion-content>

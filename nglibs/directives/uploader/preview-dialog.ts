@@ -2,12 +2,13 @@
 var dyload = require('dyload');
 
 export function showPreviewDialog($scope, $ionicModal, file): Promise<any>{
-    var template = require('./preview-dialog.html');
+    /*var template = require('./preview-dialog.html');
     $scope.modal = $ionicModal.fromTemplate(template, {
         scope: $scope,
         animation: 'slide-in-up',
         focusFirstInput: true
-    });
+    });*/
+
     $scope.$on('$destroy', function() {
     });
     $scope.$on('modal.shown', function() {
@@ -21,6 +22,11 @@ export function showPreviewDialog($scope, $ionicModal, file): Promise<any>{
     if (typeof file == 'string') {
         var img = $('<img src="' + file + '"/>');
         insertPreviewElement(img);
+    }if(Array.isArray(file) && file.length > 0){
+        for(var f in file){
+            var img = $('<img src="' + file[f] + '"/>');
+            insertPreviewElement(img);
+        }
     } else {
         previewImage(file)
             .then(function(canvas){
@@ -32,7 +38,7 @@ export function showPreviewDialog($scope, $ionicModal, file): Promise<any>{
 
     return new Promise(function(resolve, reject){
         $scope.cancelModal = function(){
-            resolve();
+            // resolve();
             $scope.modal.hide();
         }
         $scope.confirmModal = function(){

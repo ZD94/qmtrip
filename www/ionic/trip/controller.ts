@@ -151,6 +151,7 @@ export async function CreateController($scope, $storage, $loading){
                 return;
             }
             $scope.trip.hotelPlace = val.point.lat + "," + val.point.lng
+            $scope.trip.hotelName = val.title;
         }
     };
     $scope.projectSelector = {
@@ -168,7 +169,6 @@ export async function CreateController($scope, $storage, $loading){
         },
         done: function(val) {
             $scope.trip.reason = val.name ? val.name: val;
-            console.info($scope.trip.reason);
         }
     }
 
@@ -178,6 +178,7 @@ export async function CreateController($scope, $storage, $loading){
         }
     };
     $scope.nextStep = async function() {
+        let beginMSecond = Date.now();
         API.require("travelBudget");
         await API.onload();
 
@@ -213,7 +214,8 @@ export async function CreateController($scope, $storage, $loading){
             isNeedTraffic: trip.traffic,
             isRoundTrip: trip.round,
             isNeedHotel: trip.hotel,
-            businessDistrict: trip.hotelPlace
+            businessDistrict: trip.hotelPlace,
+            hotelName: trip.hotelName
         };
 
         if(params.originPlace == params.destinationPlace){
@@ -254,7 +256,11 @@ export async function CreateController($scope, $storage, $loading){
             $loading.end();
             alert(err.msg || err);
         }
-
+        let endMSecond = Date.now();
+        spendMS(beginMSecond, endMSecond);
+        function spendMS(begin, end) {
+            console.info('开始时间:', begin, '结束时间:', end, '耗时:', end - begin);
+        }
         function cb() {
             $loading.end();
             window.location.href = "#/trip/budget?id="+budget;
@@ -331,7 +337,6 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
             return staffs.map((p) =>{ return  {name: p.name, value: p.id}} );
         },
         done: function(value) {
-            console.info("调用回调", value);
             trip.auditUser = value.value;
         }
     };
@@ -405,7 +410,14 @@ export async function ListController($scope , Models){
     let pager = await staff.getTripPlans({
         limit: 5,
         where: {
-            status: {$in: [EPlanStatus.WAIT_UPLOAD, EPlanStatus.WAIT_COMMIT, EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.COMPLETE, EPlanStatus.NO_BUDGET, EPlanStatus.AUDITING]}
+            status: {$in: [
+                EPlanStatus.WAIT_UPLOAD,
+                EPlanStatus.WAIT_COMMIT,
+                EPlanStatus.AUDIT_NOT_PASS,
+                EPlanStatus.COMPLETE,
+                EPlanStatus.NO_BUDGET,
+                EPlanStatus.AUDITING
+            ]}
         }
     });
     loadTripPlan(pager);
@@ -452,113 +464,64 @@ export async function ListDetailController($location, $scope , Models, $statePar
     ///// END
 
     require('./trip.scss');
-    var staff = await Staff.getCurrent();
     let tripPlan = await Models.tripPlan.get(id);
     $scope.tripDetail = tripPlan;
 
-    let logs = await tripPlan.getLogs({});
-
     let budgets: TripDetail[] = await tripPlan.getTripDetails();
-    let hotel;
-    let goTraffic;
-    let backTraffic;
-    let other;
-    $scope.hotelStatus = false;
-    $scope.goTrafficStatus = false;
-    $scope.backTrafficStatus = false;
-    $scope.otherStatus = false;
-    let statusTxt = {};
-    statusTxt[EPlanStatus.CANCEL] = "已撤销";
-    statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
-    statusTxt[EPlanStatus.NO_BUDGET] = "没有预算";
-    statusTxt[EPlanStatus.WAIT_UPLOAD] = "待上传票据";
-    statusTxt[EPlanStatus.WAIT_COMMIT] = "待提交";
-    statusTxt[EPlanStatus.AUDITING] = "已提交待审核";
-    statusTxt[EPlanStatus.COMPLETE] = "已完成";
-    $scope.statustext = statusTxt;
     $scope.EPlanStatus = EPlanStatus;
-    $scope.EInvoiceType = EInvoiceType;
-    $scope.EPlanStatus = EPlanStatus;
-    budgets.map(function(budget) {
-        let tripType = budget.type;
-        if (tripType == ETripType.OUT_TRIP) {
-            $scope.goTrafficStatus = Boolean(budget.status);
-            goTraffic = budget;
-            goTraffic['title'] = '上传去程交通发票';
-            goTraffic['done'] = function (response) {
-                if (!response.fileId) {
-                    alert(response.errMsg);
-                    return;
-                }
-                var fileId = response.fileId;
-                uploadInvoice(budget, fileId, async function (err, result) {
-                    if (err) {
-                        alert(err);
-                        return;
-                    }
-                    $scope.goTraffic = budget;
-                });
-            }
+    // $scope.EInvoiceType = EInvoiceType;
+    // $scope.EPlanStatus = EPlanStatus;
 
-        } else if (tripType == ETripType.BACK_TRIP) {
-            $scope.backTrafficStatus = Boolean(budget.status);
-            backTraffic = budget;
-            backTraffic['title'] = '上传回程交通发票';
-            backTraffic['done'] = function (response) {
-                if (!response.fileId) {
-                    alert(response.errMsg);
-                    return;
-                }
-                var fileId = response.fileId;
-                uploadInvoice(budget, fileId,async function (err, result) {
-                    if (err) {
-                        alert(err);
-                        return;
-                    }
-                    // var newdetail = await Models.tripDetail.get(budget.id);
-                    $scope.backTraffic = budget;
-                });
-            }
-        } else if (tripType == ETripType.HOTEL) {
-            hotel = budget;
-            hotel['title'] = '上传住宿发票';
-            hotel['done'] = function (response) {
-                if (!response.fileId) {
-                    alert(response.errMsg);
-                    return;
-                }
-                var fileId = response.fileId;
-                uploadInvoice(budget, fileId,async function (err, result) {
-                    if (err) {
-                        alert(err);
-                        return;
-                    }
-                    // var newdetail = await Models.tripDetail.get(budget.id);
-                    $scope.hotel = budget;
-                });
-            }
-        } else {
-            $scope.otherStatus = Boolean(budget.status);
-            other = budget;
-            // other = {id: budget.id, price: budget.budget, tripType: tripType, type: type ,status:budget.status};
+    //分类计算
+    let trafficBudgets = [];     //交通
+    let trafficTotalBudget: number = 0;
+    let hotelBudgets = [];      //住宿
+    let hotelTotalBudget: number = 0;
+    let subsidyBudgets = [];    //补助
+    let subsidyTotalBudget: number = 0;
+
+    budgets.forEach( (budget) => {
+        switch(budget.type) {
+            case ETripType.BACK_TRIP:
+            case ETripType.OUT_TRIP:
+                trafficBudgets.push(budget);
+                trafficTotalBudget = countBudget(trafficTotalBudget, budget.budget);
+                break;
+            case ETripType.HOTEL:
+                hotelBudgets.push(budget);
+                hotelTotalBudget = countBudget(hotelTotalBudget, budget.budget);
+                break;
+            case ETripType.SUBSIDY:
+                subsidyBudgets.push(budget);
+                subsidyTotalBudget = countBudget(subsidyTotalBudget, budget.budget);
+                break;
         }
     });
-    $scope.goTraffic = goTraffic;
-    $scope.hotel = hotel;
-    $scope.backTraffic = backTraffic;
-    $scope.other = other;
+    
     $scope.budgets = budgets;
-    API.require('tripPlan');
-    await API.onload();
-    function uploadInvoice(tripDetail, picture, callback) {
-        tripDetail.uploadInvoice({
-            pictureFileId: picture
-        })
-        .then(function(ret) {
-            callback(null, ret);
-        })
-        .catch(callback)
+
+    function countBudget(originBudget, increment) {
+        if (originBudget == -1) {
+            return originBudget;
+        }
+        if (increment == -1) {
+            return increment;
+        }
+        return originBudget + increment;
     }
+
+    trafficBudgets.sort((v1, v2) => {
+        return v1.type - v2.type;
+    });
+    hotelBudgets.sort();
+    subsidyBudgets.sort();
+
+    $scope.trafficBudgets = trafficBudgets;
+    $scope.trafficTotalBudget = trafficTotalBudget;
+    $scope.hotelBudgets = hotelBudgets;
+    $scope.hotelTotalBudget = hotelTotalBudget;
+    $scope.subsidyBudgets = subsidyBudgets;
+    $scope.subsidyTotalBudget = subsidyTotalBudget;
 
     $scope.showAlterDialog = function () {
         $scope.reject = {reason: ''};
@@ -579,9 +542,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
 
     async function approveTripPlan() {
         try {
-            console.info('before commit...');
             await API.tripPlan.commitTripPlan({id: id});
-            console.info('after commit...');
             var alertPop = $ionicPopup.alert({
                 title:'提示',
                 template:'提交成功'
@@ -606,38 +567,39 @@ export async function ListDetailController($location, $scope , Models, $statePar
             placeName: tripPlan.arrivalCity,
             reasonName: tripPlan.title
         };
-        await Promise.all(tripDetails.map(async (detail) => {
-            switch (detail.type) {
-                case ETripType.OUT_TRIP:
-                    trip.traffic = true;
-                    trip.fromPlace = tripPlan.deptCityCode;
-                    trip.fromPlaceName = tripPlan.deptCity;
-                    break;
-                case ETripType.BACK_TRIP:
-                    trip.traffic = true;
-                    trip.fromPlace = tripPlan.deptCityCode;
-                    trip.fromPlaceName = tripPlan.deptCity;
-                    trip.round = true;
-                    break;
-                case ETripType.HOTEL:
-                    trip.hotel = true;
-                    trip.hotelPlace = detail.hotelCode || '';
-                    trip.hotelPlaceName = detail.hotelName || '';
-                    let landMarkInfo = {name: ''};
-                    if(detail.hotelName) {
-                        landMarkInfo = await API.place.getCityInfo({cityCode: detail.hotelName});
-                    }
-                    if(landMarkInfo && landMarkInfo.name){
-                        trip.hotelPlaceName = landMarkInfo.name;
-                    }
-            }
-        }));
+        if(tripDetails && tripDetails.length > 0) {
+            await Promise.all(tripDetails.map(async (detail) => {
+                switch (detail.type) {
+                    case ETripType.OUT_TRIP:
+                        trip.traffic = true;
+                        trip.fromPlace = tripPlan.deptCityCode;
+                        trip.fromPlaceName = tripPlan.deptCity;
+                        break;
+                    case ETripType.BACK_TRIP:
+                        trip.traffic = true;
+                        trip.fromPlace = tripPlan.deptCityCode;
+                        trip.fromPlaceName = tripPlan.deptCity;
+                        trip.round = true;
+                        break;
+                    case ETripType.HOTEL:
+                        trip.hotel = true;
+                        trip.hotelPlace = detail.hotelCode || '';
+                        trip.hotelPlaceName = detail.hotelName || '';
+                        let landMarkInfo = {name: ''};
+                        if(detail.hotelName) {
+                            landMarkInfo = await API.place.getCityInfo({cityCode: detail.hotelName});
+                        }
+                        if(landMarkInfo && landMarkInfo.name){
+                            trip.hotelPlaceName = landMarkInfo.name;
+                        }
+                }
+            }));
+        }
         await $storage.local.set('trip', trip);
         window.location.href="#/trip/create";
     };
     
     $scope.cancelTripPlan = function() {
-        console.info("取消出差计划...");
         $ionicPopup.show({
             title: '确认撤销该出差计划？',
             scope: $scope,
@@ -679,8 +641,18 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
     $scope.EInvoiceType = EInvoiceType;
     API.require('attachment');
     await API.onload();
-    var invoiceImg = await API.attachment.previewSelfImg({fileId: invoice.newInvoice});
-    $scope.invoiceImg = invoiceImg;
+    // var invoiceImg = await API.attachment.previewSelfImg({fileId: invoice.newInvoice});
+    var latestInvoice = invoice.latestInvoice;
+    var invoiceImgs = [];
+    if(typeof latestInvoice =='string') {
+        latestInvoice = JSON.parse(latestInvoice);
+    }
+
+    await Promise.all(latestInvoice.map(async function(i){
+        var invoiceImg = await API.attachment.previewSelfImg({fileId: i});
+        invoiceImgs.push(invoiceImg);
+    }))
+    $scope.invoiceImgs = invoiceImgs;
 
     let statusTxt = {};
     statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
