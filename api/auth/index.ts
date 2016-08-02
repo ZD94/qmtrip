@@ -1005,6 +1005,41 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     };
 
     /**
+     * @method resetPwdByOldPwd
+     *
+     * 根据手机号重置密码
+     *
+     * @param {Object} params
+     * @param {String} params.mobile 手机号
+     * @param {String} params.newPwd 新密码
+     * @return {Promise}
+     */
+    @clientExport
+    static async resetPwdByMobile (params: {mobile: string, newPwd: string}) : Promise<any>{
+        let mobile = params.mobile;
+        let newPwd = params.newPwd;
+
+        if (!mobile) {
+            throw L.ERR.MOBILE_EMPTY();
+        }
+        if (!newPwd) {
+            throw L.ERR.PWD_EMPTY();
+        }
+
+        var accounts = await Models.account.find({where: {mobile: mobile}});
+        var account = Account.create();
+        if(accounts && accounts.length > 0){
+            account = accounts[0];
+        }else{
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+        newPwd = newPwd.replace(/\s/g, "");
+        var pwd = utils.md5(newPwd);
+        account.pwd = pwd;
+        return account.save();
+    };
+
+    /**
      * 二维码扫描登录接口
      *
      * @param {Object} params 参数
