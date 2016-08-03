@@ -21,6 +21,12 @@ function wxUploadImage(option){
 }
 
 export function wechatUploaderController($scope, $element, $transclude, $ionicModal, $ionicPopup, $loading) {
+    var template = require('./preview-dialog.html');
+    $scope.modal = $ionicModal.fromTemplate(template, {
+        scope: $scope,
+        animation: 'slide-in-up',
+        focusFirstInput: true
+    });
     $transclude($scope, function(clone) {$element.append(clone);});
     $element.click(function(){
         wxChooseImage({
