@@ -1005,6 +1005,30 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     };
 
     /**
+     * 验证验证码
+     * @param params
+     * @returns {Promise<TResult>|Promise<U>}
+     */
+    @clientExport
+    @requireParams(['mobile', 'msgCode','msgTicket'])
+    static async validateMsgCheckCode(params:{mobile: string, msgCode: string, msgTicket: string}){
+        var mobile = params.mobile;
+        var msgCode = params.msgCode;
+        var msgTicket = params.msgTicket;
+
+        if (!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+
+        if (!msgCode || !msgTicket) {
+            throw {code: -1, msg: "短信验证码错误"};
+        }
+
+        return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+    }
+
+
+    /**
      * @method resetPwdByOldPwd
      *
      * 根据手机号重置密码
