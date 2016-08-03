@@ -2,21 +2,34 @@
 import * as L from 'common/language';
 import { getSession } from 'common/model';
 require('ionic');
+var API = require('common/api');
+API.require('auth');
 
 var browserspec = require('browserspec');
-// browserspec.enum_wechat();
+browserspec.enum_wechat();
 
 var Cookie = require('tiny-cookie');
 var API = require('common/api');
-API.onlogin(function(){
+API.onlogin(async function(){
     var backUrl = window.location.href;
 
     if(/^http\:\/\/.*\/(index.html)?\#\/login\/(index)?\?backurl\=.*/.test(backUrl)) {
+        console.info("login page...");
         window.location.reload();
         return;
     }
-    backUrl = encodeURIComponent(backUrl);
-    window.location.href = "#/login/?backurl="+backUrl;
+
+    if(browserspec.is_wechat && /.*jingli365\.com/.test(window.location.host)){
+        if(!/.*wxauthcode\=\w*\&wxauthstate\=.*/.test(backUrl)) {
+            await API.onload();
+            let url = await API.auth.getWeChatLoginUrl({redirectUrl: backUrl});
+            window.location.href = url;
+            return;
+        }
+    }else {
+        backUrl = encodeURIComponent(backUrl);
+        window.location.href = "#/login/?backurl="+backUrl;
+    }
 });
 
 function getAuthData() {

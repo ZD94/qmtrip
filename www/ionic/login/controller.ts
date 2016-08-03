@@ -16,43 +16,30 @@ export function StorageSetController($scope, $stateParams, $storage) {
         token_sign: token_sign,
         timestamp: timestamp };
     $storage.local.set('auth_data', data);
-//服务器端无法读取storage
+    //服务器端无法读取storage
     Cookie.set("user_id", data.user_id, {expires: 30});
     Cookie.set("token_sign", data.token_sign, {expires: 30});
     Cookie.set("timestamp", data.timestamp, {expires: 30});
     Cookie.set("token_id", data.token_id, {expires: 30});
     API.reload_all_modules();
-    console.info("go"+back_url);
     window.location.href = back_url;
 }
 
-export async function IndexController($scope, $stateParams, $storage, $sce) {
+export async function IndexController($scope, $stateParams, $storage, $sce, $loading) {
+    $loading.start();
     var browserspec = require('browserspec');
     var backUrl = $stateParams.backurl || "#";
     require("./login.scss");
     //微信中自动登陆
-    if(browserspec.is_wechat && /.*jingli365\.com/.test(window.location.host)) {
+    let href = window.location.href;
+    if(browserspec.is_wechat && /.*jingli365\.com/.test(window.location.host) && !$stateParams.wxauthcode && !/.*backurl\=.*/.test(href)) {
         await API.onload();
 
-        if(!$stateParams.wxauthstate) {
-            let url = await API.auth.getWeChatLoginUrl({redirectUrl: window.location.href});
-            window.location.href = url;
-            return;
-        }
-        if($stateParams.wxauthcode) {
-            let token = await API.auth.authWeChatLogin({code: $stateParams.wxauthcode});
-
-            if(token) {
-                $storage.local.set('auth_data', token);
-                Cookie.set("user_id", token.user_id, {expires: 30});
-                Cookie.set("token_sign", token.token_sign, {expires: 30});
-                Cookie.set("timestamp", token.timestamp, {expires: 30});
-                Cookie.set("token_id", token.token_id, {expires: 30});
-                await API.reload_all_modules();
-                window.location.href = backUrl;
-                return;
-            }
-        }
+        let url = await API.auth.getWeChatLoginUrl({redirectUrl: href});
+        window.location.href = url;
+        return;
+    }else{
+        $loading.end();
     }
 
     $scope.form = {

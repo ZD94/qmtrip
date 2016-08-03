@@ -13,6 +13,7 @@ angular
             template: require('./selector-list.html'),
             scope: {
                 value: '=ngModel',
+                noticeMsg: '@ngNoticeMsg',
                 title: '@ngSelectorTitle',
                 placeholder: '@ngSelectorPlaceholder',
                 callbacks: '=ngSelector'

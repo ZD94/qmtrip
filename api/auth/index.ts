@@ -1005,6 +1005,41 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     };
 
     /**
+     * @method resetPwdByOldPwd
+     *
+     * 根据手机号重置密码
+     *
+     * @param {Object} params
+     * @param {String} params.mobile 手机号
+     * @param {String} params.newPwd 新密码
+     * @return {Promise}
+     */
+    @clientExport
+    static async resetPwdByMobile (params: {mobile: string, newPwd: string}) : Promise<any>{
+        let mobile = params.mobile;
+        let newPwd = params.newPwd;
+
+        if (!mobile) {
+            throw L.ERR.MOBILE_EMPTY();
+        }
+        if (!newPwd) {
+            throw L.ERR.PWD_EMPTY();
+        }
+
+        var accounts = await Models.account.find({where: {mobile: mobile}});
+        var account = Account.create();
+        if(accounts && accounts.length > 0){
+            account = accounts[0];
+        }else{
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+        newPwd = newPwd.replace(/\s/g, "");
+        var pwd = utils.md5(newPwd);
+        account.pwd = pwd;
+        return account.save();
+    };
+
+    /**
      * 二维码扫描登录接口
      *
      * @param {Object} params 参数
@@ -1259,7 +1294,8 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     static async getWeChatLoginUrl(params: {redirectUrl: string}) {
         let redirectUrl = encodeURIComponent(params.redirectUrl);
         let backUrl = C.host + "/auth/wx-login?redirect_url=" + redirectUrl;
-        // backUrl = "http://j.jingli365.com/auth/wx-login?redirect_url=" + redirectUrl; //微信公众号测使用
+        // backUrl = "http://t.jingli365.com/auth/wx-login?redirect_url=" + redirectUrl; //微信公众号测使用
+        // backUrl = "http://t.jingli365.com/auth/get-wx-code?redirect_url=" + redirectUrl; //微信公众号测使用
         return API.wechat.getOAuthUrl({backUrl: backUrl});
     }
 
@@ -1308,6 +1344,34 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             redirect_url += 'wxauthcode=' + query.code + '&wxauthstate=' + query.state;
             res.redirect(redirect_url);
         });
+
+        //获取微信code
+        app.all("/auth/get-wx-code", async function(req, res, next) {
+            let query = req.query;
+            let redirect_url = query.redirect_url;
+
+            //如果是登陆页，直接跳转
+            if(/^http\:\/\/\w*\.jingli365\.com\/(index\.html)?\#\/login\/(index)?/.test(redirect_url)){
+                redirect_url += redirect_url.indexOf('?') > 0 ? '&' : '?';
+                redirect_url += 'wxauthcode=' + query.code + '&wxauthstate=' + query.state;
+                res.redirect(redirect_url);
+            }else {
+                redirect_url = encodeURIComponent(redirect_url);
+
+                let tokenSign = await API.auth.authWeChatLogin({code: query.code});
+                let url = `${C.host}/index.html#/login/storageSet`;
+                if(!tokenSign) {
+                    url = `${C.host}/#/login/?backurl=${redirect_url}&wxauthcode=${query.code}&wxauthstate=${query.state}`;
+                    // url = `http://t.jingli365.com/#/login/?backurl=${redirect_url}&wxauthcode=${query.code}&wxauthstate=${query.state}`;
+                }else {
+                    // url = "http://t.jingli365.com/index.html#/login/storageSet";
+                    url += "?token_id=" + tokenSign.token_id + "&user_id=" + tokenSign.user_id + "&timestamp=" + tokenSign.timestamp
+                        + "&token_sign=" + tokenSign.token_sign + "&back_url=" + redirect_url;
+                }
+
+                res.redirect(url);
+            }
+        })
     }
 
 }
