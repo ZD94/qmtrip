@@ -412,6 +412,10 @@ export class TripDetail extends ModelObject{
     get cabinClass(): string { return ''; }
     set cabinClass(val: string) {}
 
+    @Field({type: Types.DOUBLE})
+    get fullPrice(): number { return null; }
+    set fullPrice(val: number) {}
+
     @ResolveRef({type: Types.UUID}, Models.tripPlan)
     get tripPlan(): TripPlan { return null; }
     set tripPlan(val: TripPlan) {}
