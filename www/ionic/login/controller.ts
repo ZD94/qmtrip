@@ -29,7 +29,7 @@ export function StorageSetController($scope, $stateParams, $storage) {
 export async function IndexController($scope, $stateParams, $storage, $sce) {
     var browserspec = require('browserspec');
     var backUrl = $stateParams.backurl || "#";
-
+    require("./login.scss");
     //微信中自动登陆
     if(browserspec.is_wechat && /.*jingli365\.com/.test(window.location.host)) {
         await API.onload();
@@ -227,6 +227,38 @@ function trim(s) {
 }
 
 
-export async function ForgetPasswordController($scope) {
+export async function ForgetPwdController($scope,Models) {
+    require("./forget-pwd.scss");
+    API.require("checkcode");
+    $scope.form = {
+        mobile:'',
+        msgCode:''
+    };
+    var ticket;
+    $scope.sendCode = async function(){
+        await API.onload();
+        API.checkcode.getMsgCheckCode({mobile: $scope.form.mobile})
+            .then(function(result){
+                ticket = result.ticket;
+                console.info(ticket);
+            })
+            .catch(function(err){
+                msgbox.log(err.msg||err)
+            })
+    };
+    $scope.nextStep = async function(){
+        await API.onload();
+        API.checkcode.validateMsgCheckCode({code: $scope.form.msgCode, ticket: ticket, mobile: $scope.form.mobile})
+            .then(function(result){
+                console.info(result);
+            })
+            .catch(function(err){
+                msgbox.log(err.msg||err);
+            })
+        // window.location.href= "index.html#/login/reset-pwd";
+    }
+}
+
+export async function ResetPwdController($scope,Models){
     
 }
