@@ -217,6 +217,7 @@ function trim(s) {
 export async function ForgetPwdController($scope,Models) {
     require("./forget-pwd.scss");
     API.require("checkcode");
+    API.require("auth");
     $scope.form = {
         mobile:'',
         msgCode:''
@@ -235,7 +236,7 @@ export async function ForgetPwdController($scope,Models) {
     };
     $scope.nextStep = async function(){
         await API.onload();
-        API.checkcode.validateMsgCheckCode({code: $scope.form.msgCode, ticket: ticket, mobile: $scope.form.mobile})
+        API.auth.validateMsgCheckCode({code: $scope.form.msgCode, ticket: ticket, mobile: $scope.form.mobile})
             .then(function(result){
                 console.info(result);
             })
