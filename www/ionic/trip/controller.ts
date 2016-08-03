@@ -313,6 +313,14 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     $scope.trip = trip;
     //补助,现在是0,后续可能会直接加入到预算中
     let totalPrice: number = 0;
+    budgets.map(function(budget){
+        if(budget.fullPrice && budget.price > 0 && budget.price < budget.fullPrice){
+            budget.discount = ((budget.price/budget.fullPrice)*100).toFixed(2)+'%';
+        }else if(budget.price > budget.fullPrice){
+            budget.discount = '100%';
+        }
+        return budget;
+    })
     for(let budget of budgets) {
         let price = Number(budget.price);
         if (price <= 0) {

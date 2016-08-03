@@ -1005,6 +1005,65 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     };
 
     /**
+     * 验证验证码
+     * @param params
+     * @returns {Promise<TResult>|Promise<U>}
+     */
+    @clientExport
+    @requireParams(['mobile', 'msgCode','msgTicket'])
+    static async validateMsgCheckCode(params:{mobile: string, msgCode: string, msgTicket: string}){
+        var mobile = params.mobile;
+        var msgCode = params.msgCode;
+        var msgTicket = params.msgTicket;
+
+        if (!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+
+        if (!msgCode || !msgTicket) {
+            throw {code: -1, msg: "短信验证码错误"};
+        }
+
+        return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+    }
+
+
+    /**
+     * @method resetPwdByOldPwd
+     *
+     * 根据手机号重置密码
+     *
+     * @param {Object} params
+     * @param {String} params.mobile 手机号
+     * @param {String} params.newPwd 新密码
+     * @return {Promise}
+     */
+    @clientExport
+    static async resetPwdByMobile (params: {mobile: string, newPwd: string}) : Promise<any>{
+        let mobile = params.mobile;
+        let newPwd = params.newPwd;
+
+        if (!mobile) {
+            throw L.ERR.MOBILE_EMPTY();
+        }
+        if (!newPwd) {
+            throw L.ERR.PWD_EMPTY();
+        }
+
+        var accounts = await Models.account.find({where: {mobile: mobile}});
+        var account = Account.create();
+        if(accounts && accounts.length > 0){
+            account = accounts[0];
+        }else{
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+        newPwd = newPwd.replace(/\s/g, "");
+        var pwd = utils.md5(newPwd);
+        account.pwd = pwd;
+        return account.save();
+    };
+
+    /**
      * 二维码扫描登录接口
      *
      * @param {Object} params 参数
@@ -1260,7 +1319,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         let redirectUrl = encodeURIComponent(params.redirectUrl);
         let backUrl = C.host + "/auth/wx-login?redirect_url=" + redirectUrl;
         // backUrl = "http://t.jingli365.com/auth/wx-login?redirect_url=" + redirectUrl; //微信公众号测使用
-        backUrl = "http://t.jingli365.com/auth/get-wx-code?redirect_url=" + redirectUrl; //微信公众号测使用
+        // backUrl = "http://t.jingli365.com/auth/get-wx-code?redirect_url=" + redirectUrl; //微信公众号测使用
         return API.wechat.getOAuthUrl({backUrl: backUrl});
     }
 
