@@ -20,6 +20,13 @@ export enum EPlanStatus {
     COMPLETE = 4, //审核完，已完成状态
 }
 
+export enum EApproveStatus {
+    NO_BUDGET = -2,
+    REJECT = -1,
+    WAIT_APPROVE = 0,
+    PASS = 1
+}
+
 export enum ETripType {
     OUT_TRIP = 0, //去程
     BACK_TRIP = 1,
@@ -81,6 +88,7 @@ export class Project extends ModelObject{
     get weight(): number { return 0; }
     set weight(val: number) {}
 }
+
 
 @Table(Models.tripPlan, 'tripPlan.')
 @TableIndex('accountId')
@@ -465,32 +473,104 @@ export class TripPlanLog extends ModelObject{
 
 }
 
-@Table(Models.approveOrder, 'tripPlan.')
-export class ApproveOrder extends ModelObject{
+@Table(Models.tripApprove, 'tripPlan.')
+@TableIndex('accountId')
+export class TripApprove extends ModelObject{
     constructor(target: Object) {
         super(target);
     }
     @Create()
-    static create(obj?: Object): ApproveOrder { return null; }
+    static create(obj?: Object): TripApprove { return null; }
 
     @Field({type: Types.UUID})
     get id(): string { return Values.UUIDV1(); }
     set id(val: string) {}
 
     @Field({type: Types.UUID})
-    get tripPlanId(): string { return null; }
-    set tripPlanId(val: string) {}
+    get accountId(): string { return null; }
+    set accountId(val: string) {}
 
-    @Field({type: Types.UUID})
-    get tripDetailId(): string { return null; }
-    set tripDetailId(val: string) {}
+    @Field({type: Types.BOOLEAN})
+    get isNeedTraffic(): boolean { return false; }
+    set isNeedTraffic(val: boolean) {}
 
-    @Field({type: Types.UUID})
-    get userId(): string { return null; }
-    set userId(val: string) {}
+    @Field({type: Types.BOOLEAN})
+    get isRoundTrip() :boolean { return true; }
+    set isRoundTrip(bool: boolean) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isNeedHotel(): boolean { return false; }
+    set isNeedHotel(val: boolean) {}
+
+    @Field({ type: Types.JSONB})
+    get query() : any { return null};
+    set query(obj: any) {}
 
     @Field({type: Types.STRING})
-    get remark(): string { return null; }
-    set remark(val: string) {}
+    get title(): string { return ''; }
+    set title(val: string) {}
+
+    @Field({type: Types.STRING})
+    get description(): string { return ''; }
+    set description(val: string) {}
+
+    @Field({type: Types.INTEGER})
+    get status(): EApproveStatus { return EApproveStatus.WAIT_APPROVE; }
+    set status(val: EApproveStatus) {}
+
+    @Field({type: Types.STRING})
+    get deptCity(): string { return ''; }
+    set deptCity(val: string) {}
+
+    @Field({type: Types.STRING})
+    get arrivalCity(): string { return ''; }
+    set arrivalCity(val: string) {}
+
+    @Field({type: Types.STRING})
+    get deptCityCode(): string { return ''; }
+    set deptCityCode(val: string) {}
+
+    @Field({type: Types.STRING})
+    get arrivalCityCode(): string { return ''; }
+    set arrivalCityCode(val: string) {}
+
+    @Field({type: Types.DATE})
+    get startAt(): Date { return null; }
+    set startAt(val: Date) {}
+
+    @Field({type: Types.DATE})
+    get backAt(): Date { return null; }
+    set backAt(val: Date) {}
+
+    @Field({type: Types.DOUBLE})
+    get totalBudget(): number { return 0; }
+    set totalBudget(val: number) {}
+
+    @Field({type: Types.JSONB})
+    get budgetInfo(): any { return []; }
+    set budgetInfo(val: any) {}
+
+    @Field({type: Types.DATE})
+    get autoApproveTime() : Date { return null;}
+    set autoApproveTime(d: Date) {};
+
+    @ResolveRef({type: Types.UUID}, Models.project)
+    get project(): Project { return null; }
+    set project(val: Project) {}
+
+    @ResolveRef({type: Types.UUID}, Models.staff)
+    get account(): Staff { return null; }
+    set account(val: Staff) {}
+
+    @ResolveRef({type: Types.UUID}, Models.staff)
+    get approveUser(): Staff { return null; }
+    set approveUser(val: Staff) {}
+
+
+    @Reference({type: Types.UUID})
+    getCompany(id?:string): Promise<Company> {
+        return Models.company.get(id);
+    }
+    setCompany(val: Company) {}
 
 }

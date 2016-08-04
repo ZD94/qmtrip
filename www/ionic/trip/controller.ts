@@ -365,7 +365,15 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         });
 
         try {
-            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason||trip.reasonName, auditUser: trip.auditUser})
+            let staff = await Staff.getCurrent();
+            let tripApprove = await API.tripPlan.saveTripApprove({budgetId: id, title: trip.reason||trip.reasonName, approveUserId: trip.auditUser});
+            console.info(tripApprove);
+            let project = tripApprove.project;
+
+            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason||trip.reasonName, auditUser: trip.auditUser});
+            console.info("BudgetController=>", planTrip);
+            let tripPlan = await Models.tripPlan.get(planTrip.id);
+            console.info("BudgetController get", tripPlan);
             window.location.href = '#/trip/committed?id='+planTrip.id;
         } catch(err) {
             alert(err.msg || err);
@@ -379,6 +387,7 @@ export async function CommittedController($scope, $stateParams, Models){
     let id = $stateParams.id;
 
     let tripPlan = await Models.tripPlan.get(id);
+    console.info("CommittedController==>", tripPlan);
     $scope.tripPlan = tripPlan.target;
 
     $scope.goToDetail = function() {

@@ -9,7 +9,7 @@ import { Department } from './_types/department';
 import { TravelPolicy } from './_types/travelPolicy';
 import { AccordHotel } from './_types/accordHotel';
 import { Agency, AgencyUser } from './_types/agency';
-import {TripPlan, TripDetail, Project, TripPlanLog, ApproveOrder} from './_types/tripPlan';
+import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove} from './_types/tripPlan';
 import {Account, Token, AccountOpenid} from './_types/auth';
 import { Seed } from './_types/seed';
 import { createServerService } from 'common/model/sequelize';
@@ -29,7 +29,7 @@ initModels({
     tripPlanLog: createServerService<TripPlanLog>(TripPlanLog),
     moneyChange: createServerService<MoneyChange>(MoneyChange),
     project: createServerService<Project>(Project),
-    approveOrder: createServerService<ApproveOrder>(ApproveOrder),
+    tripApprove: createServerService<TripApprove>(TripApprove),
     account: createServerService<Account>(Account),
     seed: createServerService<Seed>(Seed),
     token: createServerService<Token>(Token),

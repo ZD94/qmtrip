@@ -14,7 +14,7 @@ import { Department } from 'api/_types/department';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { AccordHotel } from 'api/_types/accordHotel';
 import { Agency, AgencyUser } from 'api/_types/agency';
-import {TripPlan, TripDetail, Project, TripPlanLog, ApproveOrder} from 'api/_types/tripPlan';
+import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove} from 'api/_types/tripPlan';
 import { Place } from 'api/_types/place';
 import {Account, Token, AccountOpenid} from 'api/_types/auth';
 import { Seed } from 'api/_types/seed';
@@ -124,7 +124,7 @@ class ClientModels implements ModelsInterface {
     tripPlanLog: ModelRemote<TripPlanLog>;
     moneyChange: ModelRemote<MoneyChange>;
     project: ModelRemote<Project>;
-    approveOrder: ModelRemote<ApproveOrder>;
+    tripApprove: ModelRemote<TripApprove>;
     //place: ModelRemote<Place>;
     account: ModelRemote<Account>;
     seed: ModelRemote<Seed>;

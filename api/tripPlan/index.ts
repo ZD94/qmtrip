@@ -15,7 +15,10 @@ let moment = require("moment");
 let scheduler = require('common/scheduler');
 import _ = require('lodash');
 import {requireParams, clientExport} from 'common/api/helper';
-import {Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, ETripType, EAuditStatus } from "api/_types/tripPlan";
+import {
+    Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, ETripType, EAuditStatus,
+    TripApprove, EApproveStatus
+} from "api/_types/tripPlan";
 import {Models, EAccountType} from "api/_types/index";
 import {FindResult} from "common/model/interface";
 import {Staff, EStaffRole, EStaffStatus} from "api/_types/staff";
@@ -83,15 +86,6 @@ class TripPlanModule {
         if (!tripPlan.auditUser) {
             tripPlan.auditUser = null;
         }
-
-        // let hotelName = '';
-        // if(query.businessDistrict) {
-        //     let hotelInfo =  await API.place.getCityInfo({cityCode: query.businessDistrict});
-        //     logger.warn("hotelInfo=>", hotelInfo);
-        //     if(hotelInfo && hotelInfo.name) {
-        //         hotelName = hotelInfo.name;
-        //     }
-        // }
 
         let tripDetails: TripDetail[] = budgets.map(function (budget) {
             let tripType = budget.tripType;
@@ -1287,6 +1281,94 @@ class TripPlanModule {
 
         return result;
     }
+
+    @clientExport
+    @requireParams(['budgetId', 'title'], ['description', 'remark', 'approveUserId'])
+    static async saveTripApprove(params) {
+        let staff = await Staff.getCurrent();
+        let company = staff.company;
+
+        if(company.isApproveOpen && !params.approveUserId) { //企业开启审核功能后，审核人不能为空
+            throw {code: -3, msg: '审批人不能为空'};
+        }
+
+        let budgetInfo = await API.travelBudget.getBudgetInfo({id: params.budgetId});
+
+        if(!budgetInfo) {
+            throw L.ERR.TRAVEL_BUDGET_NOT_FOUND();
+        }
+
+        let {budgets, query} = budgetInfo;
+        let project = await getProjectByName({companyId: company.id, name: params.title, userId: staff.id, isCreate: true});
+        let totalBudget = 0;
+        let tripApprove =  TripApprove.create(params);
+
+        if(params.approveUserId) {
+            let approveUser = await Models.staff.get(params.approveUserId);
+            if(!approveUser) {
+                throw {code: -3, msg: '审批人不存在'}
+            }
+
+            if(tripApprove.approveUser && tripApprove['approveUser'].id == staff.id) {
+                throw {code: -2, msg: '审批人不能是自己'};
+            }
+
+            tripApprove.approveUser = approveUser;
+        }
+
+        tripApprove.status = EApproveStatus.WAIT_APPROVE;
+        tripApprove.account = staff;
+        tripApprove['companyId'] = company.id;
+        tripApprove.project = project;
+        tripApprove.startAt = query.leaveDate;
+        tripApprove.backAt = query.goBackDate;
+        tripApprove.query = JSON.stringify(query);
+
+        logger.warn("query=>", query);
+
+        let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace}) || {name: null};
+
+        if(query.originPlace) {
+            let deptInfo = await API.place.getCityInfo({cityCode: query.originPlace}) || {name: null};
+            tripApprove.deptCityCode = query.originPlace;
+            tripApprove.deptCity = deptInfo.name;
+        }
+
+        tripApprove.arrivalCityCode = query.destinationPlace;
+        tripApprove.arrivalCity = arrivalInfo.name;
+        tripApprove.isNeedTraffic = query.isNeedTraffic;
+        tripApprove.isNeedHotel = query.isNeedHotel;
+        tripApprove.isRoundTrip = query.isRoundTrip;
+        tripApprove.budgetInfo = budgets;
+        tripApprove.totalBudget = totalBudget; 
+        tripApprove.status = totalBudget<0 ? EApproveStatus.NO_BUDGET : EApproveStatus.WAIT_APPROVE;
+
+        let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, remark: '提交出差审批'});
+
+        //如果出差计划是待审批状态，增加自动审批时间
+        if(tripApprove.status == EApproveStatus.WAIT_APPROVE) {
+            var days = moment(tripApprove.startAt).diff(moment(), 'days');
+            let format = 'YYYY-MM-DD HH:mm:ss';
+            if (days <= 0) {
+                tripApprove.autoApproveTime = moment(tripApprove.createdAt).add(1, 'hours').format(format);
+            } else {
+                //出发前一天18点
+                let autoApproveTime = moment(tripApprove.startAt).subtract(6, 'hours').format(format);
+                //当天18点以后申请的出差计划，一个小时后自动审批
+                if(moment(autoApproveTime).diff(moment()) <= 0) {
+                    autoApproveTime = moment(tripApprove.createdAt).add(1, 'hours').format(format);
+                }
+                tripApprove.autoApproveTime = autoApproveTime;
+            }
+        }
+
+        await tripPlanLog.save();
+        await tripApprove.save();
+        logger.info(tripApprove);
+        return tripApprove;
+    }
+
+
 
     static __initHttpApp = require('./invoice');
 
