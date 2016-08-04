@@ -45,7 +45,7 @@ angular
             scope: {
                 value: '=ngModel',
                 title: '@ngSelectorTitle',
-                city: '<ngSelectPlace',
+                city: '<ngSelectorPlace',
                 placeholder: '@ngSelectorPlaceholder',
                 callbacks: '=ngSelectorMap'
             },
