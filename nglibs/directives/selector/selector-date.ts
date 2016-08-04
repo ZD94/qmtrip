@@ -34,7 +34,18 @@ function initLunarCalendar(){
             "d0609": 2, "d0610": 2, "d0611": 2, "d0612": 1, //端午
             "d0915": 2, "d0916": 2, "d0917": 2, "d0918": 1, //中秋
             "d1001": 2, "d1002": 2, "d1003": 2, "d1004": 2, "d1005": 2, "d1006": 2, "d1007": 2, "d1008": 1, "d1009": 1, //十一
+            //"d1231": 2, //元旦
+        },
+        /*
+        'y2017': {
+            "d0101": 2, "d0102": 2, //元旦
+            "d0127": 2, "d0128": 2, "d0129": 2, "d0130": 2, "d0131": 2, "d0201": 2, "d0202": 2, "d0203": 1, "d0204": 1, //春节
+            "d0401": 1, "d0402": 2, "d0403": 2, "d0404": 2, //清明
+            "d0429": 2, "d0430": 2, "d0501": 2, //五一
+            "d0527": 1, "d0528": 2, "d0529": 2, "d0530": 2, //端午
+            "d1001": 2, "d1002": 2, "d1003": 2, "d1004": 2, "d1005": 2, "d1006": 2, "d1007": 2, "d1008": 1, //十一 中秋
         }
+        */
     })
 }
 
@@ -109,7 +120,8 @@ function popupSelectorTime($scope, $ionicPopup){
     });
 }
 
-export function modalSelectorDate($scope, $ionicModal, $ionicPopup){
+export function modalSelectorDate(scope, $ionicModal, $ionicPopup, options, value){
+    let $scope = scope.$new(true);
     initLunarCalendar();
     var template = require('./selector-date-dialog.html');
     $scope.modal = $ionicModal.fromTemplate(template, {
@@ -134,20 +146,20 @@ export function modalSelectorDate($scope, $ionicModal, $ionicPopup){
     $scope.weekDayNames = weekDayNames;
 
     let timeScale = 10;
-    if($scope.options.timepicker){
+    if(options.timepicker){
         $scope.timeScale = timeScale;
         $scope.timeMax = 24*60/timeScale;
     }
 
-    $scope.begin = moment($scope.options.beginDate).startOf('day').valueOf();
-    $scope.end = moment($scope.options.endDate).startOf('day').valueOf();
+    $scope.begin = moment(options.beginDate).startOf('day').valueOf();
+    $scope.end = moment(options.endDate).startOf('day').valueOf();
 
     $scope.today = moment().startOf('day').valueOf();
     $scope.selected = {};
     function parseSelected(){
-        $scope.selected.day = moment($scope.value).startOf('day').valueOf();
-        $scope.selected.hour = $scope.value.getHours();
-        $scope.selected.minute = $scope.value.getMinutes();
+        $scope.selected.day = moment(value).startOf('day').valueOf();
+        $scope.selected.hour = value.getHours();
+        $scope.selected.minute = value.getMinutes();
         $scope.selected.time = Math.floor(($scope.selected.hour*60 + $scope.selected.minute)/timeScale);
     }
     parseSelected();
@@ -172,7 +184,7 @@ export function modalSelectorDate($scope, $ionicModal, $ionicPopup){
         $scope.confirmModal = async function(day) {
             if(day.timestamp<$scope.begin||$scope.end<day.timestamp)
                 return;
-            if($scope.options.timepicker){
+            if(options.timepicker){
                 $scope.selected.date = moment({year: day.year, month: day.month-1, day: day.day}).toDate();
                 let res = await popupSelectorTime($scope, $ionicPopup);
                 if(!res)
@@ -185,8 +197,7 @@ export function modalSelectorDate($scope, $ionicModal, $ionicPopup){
                     hour: $scope.selected.hour,
                     minute: $scope.selected.minute
                 });
-                $scope.value = date.toDate();
-                resolve(true);
+                resolve(date.toDate());
             }
         }
         $scope.cancelModal = function() {
@@ -206,6 +217,7 @@ export function modalSelectorDate($scope, $ionicModal, $ionicPopup){
         let caldata = getMonth(date.year(), date.month()+1);
         $scope.months.push(caldata);
     }
+    loadNextMonth();
     loadNextMonth();
     function fixMonths(){
         if($scope.month_2col){

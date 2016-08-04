@@ -57,7 +57,7 @@ $color-rest-bg: #3CA9D7;
     display: flex;
     flex-wrap: wrap;
     > * {
-      flex: 50%;
+      flex: 40%;
       &:nth-child(2n) {
         margin-left: 2px;
       }

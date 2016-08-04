@@ -3,7 +3,8 @@ import { loader as loadBaiduMap } from '../baidu-map/baiduScriptLoader';
 declare var BMap;
 declare var BMAP_STATUS_SUCCESS;
 
-export function modalSelectorMap($scope, $ionicModal, selected){
+export function modalSelectorMap(scope, $ionicModal, city, selected){
+    let $scope = scope.$new(true);
     $scope.showMap = false;
     loadBaiduMap('sFB94QImEEc4ve0uynf8Gt9vvKYcmECw', {retryInterval: 5000}, ()=>{});
     var template = require('./selector-map-dialog.html');
@@ -25,9 +26,9 @@ export function modalSelectorMap($scope, $ionicModal, selected){
     });
 
     $scope.mapOptions = {
-        center: $scope.city,
+        center: city,
         //zoom: 12,
-        city: $scope.city,
+        city: city,
         scaleCtrl: false,
         overviewCtrl: false,
         enableMessage: false,

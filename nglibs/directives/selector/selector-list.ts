@@ -2,7 +2,8 @@
 declare var API: any;
 var msgbox = require('msgbox');
 
-export async function modalSelectorList($scope, $ionicModal, selected) {
+export async function modalSelectorList(scope, $ionicModal, callbacks, selected) {
+    let $scope = scope.$new(true);
     var template = require('./selector-list-dialog.html');
     $scope.modal = $ionicModal.fromTemplate(template, {
         scope: $scope,
@@ -17,8 +18,8 @@ export async function modalSelectorList($scope, $ionicModal, selected) {
     $scope.$on('modal.removed', function() {
     });
 
-    var optionsLoader = $scope.callbacks.query;
-    var optionsCreator = $scope.callbacks.create;
+    var optionsLoader = callbacks.query;
+    var optionsCreator = callbacks.create;
 
 
     var form: any = $scope.form = {};
