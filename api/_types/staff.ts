@@ -149,8 +149,11 @@ export class Staff extends ModelObject implements Account {
     pwdToken: string;
     oldQrcodeToken: string;
     qrcodeToken: string;
+    checkcodeToken: string;
     type: EAccountType;
     isFirstLogin: boolean;
+    isValidateMobile: boolean;
+    isValidateEmail: boolean;
 }
 
 @Table(Models.credential, "staff.")

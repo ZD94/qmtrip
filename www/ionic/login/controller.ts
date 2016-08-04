@@ -216,8 +216,8 @@ function trim(s) {
 
 export async function ForgetPwdController($scope,Models) {
     require("./forget-pwd.scss");
-    API.require("checkcode");
     API.require("auth");
+    API.require("checkcode");
     $scope.form = {
         mobile:'',
         msgCode:''
@@ -236,17 +236,58 @@ export async function ForgetPwdController($scope,Models) {
     };
     $scope.nextStep = async function(){
         await API.onload();
-        API.auth.validateMsgCheckCode({code: $scope.form.msgCode, ticket: ticket, mobile: $scope.form.mobile})
+        API.auth.validateMsgCheckCode({msgCode: $scope.form.msgCode, msgTicket: ticket, mobile: $scope.form.mobile})
             .then(function(result){
-                console.info(result);
+                if(result){
+                    window.location.href= "index.html#/login/reset-pwd?accountId="+result.accountId+"&sign="+result.sign+"&timestamp="+result.expireAt;
+                }else{
+                    msgbox.log("验证码错误");
+                }
             })
             .catch(function(err){
                 msgbox.log(err.msg||err);
             })
-        // window.location.href= "index.html#/login/reset-pwd";
+
     }
 }
 
-export async function ResetPwdController($scope,Models){
-    
+export async function ResetPwdController($scope, Models, $stateParams){
+    API.require("auth");
+    await API.onload();
+
+    let accountId = $stateParams.accountId;
+    let sign = $stateParams.sign;
+    let timestamp = $stateParams.timestamp;
+
+    $scope.form = {
+        newPwd: '',
+        confirmPwd: ''
+    }
+
+    $scope.setPwd = function() {
+        let newPwd = $scope.form.newPwd
+        let confirmPwd = $scope.form.confirmPwd
+        newPwd = trim(newPwd)
+        confirmPwd = trim(confirmPwd);
+        if(!newPwd){
+            msgbox.log("新密码不能为空");
+            return;
+        }
+        if(!confirmPwd){
+            msgbox.log("重复密码不能为空");
+            return;
+        }
+        if (newPwd != confirmPwd) {
+            msgbox.log("两次密码不一致");
+            return;
+        }
+        API.auth.resetPwdByMobile({accountId: accountId, sign: sign, timestamp: timestamp, pwd: newPwd})
+            .then(function () {
+                alert("密码设置成功,请重新登录");
+                window.location.href = "index.html#/login/index";
+            })
+            .catch(function(err){
+                msgbox.log(err.msg||err);
+            }).done();
+    }
 }

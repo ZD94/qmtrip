@@ -266,7 +266,7 @@ class ApiAuth {
                 if (account.status == ACCOUNT_STATUS.NOT_ACTIVE && !account.pwd) {
                     status = ACCOUNT_STATUS.ACTIVE;
                 }
-                return DBM.Account.update({pwd: pwd, pwdToken: null, status: status}, {where:{id: accountId}});
+                return DBM.Account.update({pwd: pwd, pwdToken: null, status: status, isValidateEmail: true}, {where:{id: accountId}});
             })
             .then(function() {
                 return true;
@@ -1020,11 +1020,29 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             throw L.ERR.MOBILE_NOT_CORRECT();
         }
 
-        if (!msgCode || !msgTicket) {
-            throw {code: -1, msg: "短信验证码错误"};
+        var accounts = await Models.account.find({where: {mobile: mobile}});
+        var account = Account.create();
+        if(accounts && accounts.length > 0){
+            account = accounts[0];
+        }else{
+            throw L.ERR.ACCOUNT_NOT_EXIST();
         }
 
-        return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+        if (!msgCode || !msgTicket) {
+            throw L.ERR.CODE_ERROR();
+        }
+
+        var result =  await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+        if(result){
+            var checkcodeToken = utils.getRndStr(6);
+            account.checkcodeToken = checkcodeToken;
+            await account.save();
+            var expireAt = Date.now() +20 * 60 * 1000;//失效时间20分钟
+            var sign = makeActiveSign(checkcodeToken, account.id, expireAt);
+            return {accountId: account.id, sign: sign, expireAt: expireAt};
+        }else{
+            throw L.ERR.CODE_ERROR();
+        }
     }
 
 
@@ -1039,29 +1057,40 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      * @return {Promise}
      */
     @clientExport
-    static async resetPwdByMobile (params: {mobile: string, newPwd: string}) : Promise<any>{
-        let mobile = params.mobile;
-        let newPwd = params.newPwd;
+    static async resetPwdByMobile (params: {accountId: string, sign: string, timestamp: number, pwd: string}){
+        var accountId = params.accountId;
+        var sign = params.sign;
+        var timestamp = params.timestamp;
+        var pwd = params.pwd;
 
-        if (!mobile) {
-            throw L.ERR.MOBILE_EMPTY();
+        if (!Boolean(timestamp) || timestamp < Date.now()) {
+            throw L.ERR.TIMESTAMP_TIMEOUT();
         }
-        if (!newPwd) {
+
+        if (!accountId) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        if (!sign) {
+            throw L.ERR.SIGN_ERROR();
+        }
+
+        if (!pwd) {
             throw L.ERR.PWD_EMPTY();
         }
 
-        var accounts = await Models.account.find({where: {mobile: mobile}});
-        var account = Account.create();
-        if(accounts && accounts.length > 0){
-            account = accounts[0];
-        }else{
-            throw L.ERR.ACCOUNT_NOT_EXIST();
+        var account = await Models.account.get(accountId);
+        var _sign = makeActiveSign(account.checkcodeToken, accountId, timestamp);
+        if (_sign.toLowerCase() != sign.toLowerCase()) {
+            throw L.ERR.SIGN_ERROR();
         }
-        newPwd = newPwd.replace(/\s/g, "");
-        var pwd = utils.md5(newPwd);
+        pwd = utils.md5(pwd);
+        account.isValidateMobile = true;
         account.pwd = pwd;
-        return account.save();
+        await account.save();
+        return true;
     };
+
 
     /**
      * 二维码扫描登录接口
@@ -1317,7 +1346,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     @clientExport
     static async getWeChatLoginUrl(params: {redirectUrl: string}) {
         let redirectUrl = encodeURIComponent(params.redirectUrl);
-        let backUrl = C.host + "/auth/wx-login?redirect_url=" + redirectUrl;
+        let backUrl = C.host + "/auth/get-wx-code?redirect_url=" + redirectUrl;
         // backUrl = "http://t.jingli365.com/auth/wx-login?redirect_url=" + redirectUrl; //微信公众号测使用
         // backUrl = "http://t.jingli365.com/auth/get-wx-code?redirect_url=" + redirectUrl; //微信公众号测使用
         return API.wechat.getOAuthUrl({backUrl: backUrl});
