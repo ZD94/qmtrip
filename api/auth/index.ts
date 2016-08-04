@@ -10,7 +10,7 @@ import validator = require('validator');
 import _ = require('lodash');
 import { getSession } from '../../common/model/client';
 
-var sequelize = require("common/model").importModel("./models");
+var sequelize = require("common/model").DB;
 var DBM = sequelize.models;
 var uuid = require("node-uuid");
 var L = require("common/language");
