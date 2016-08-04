@@ -125,6 +125,7 @@
     "load-script": "^1.0.0",
     "md5": "^2.0.0",
     "notie": "^2.1.0",
+    "printf": "^0.2.5",
     "scssify": "^1.0.0",
     "source-map-support": "^0.4.0",
     "stringify": "^5.1.0",

@@ -9,14 +9,7 @@ angular
         return {
             priority: 1001,
             restrict: 'A',
-            template: '<dl class="ng-select"><div ng-transclude></div>'
-                    + '<dt ng-click="show_options()">{{optionmap[optionval]}}</dt>'
-                    + '<div class="dropdown">'
-                    + '<dd ng-repeat="(val, text) in optionmap" checkvalue="{{val}}" ng-click="select_option($event)">'
-                    + '{{text}}'
-                    + '</dd>'
-                    + '</div>'
-                    + '</dl>',
+            template: require('./select.html'),
             replace: true,
             transclude: 'element',
             scope: {

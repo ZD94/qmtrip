@@ -1,6 +1,10 @@
 <ion-view title="登录" id="page17" class="JingliLogin">
     <ion-content padding="true">
         <form class="list">
+            <div class="logo_title">
+                <div class="logo">鲸力商旅</div>
+                <div class="logo_text"></div>
+            </div>
             <div class="spacer" style="height: 40px;"></div>
             <ion-list>
                 <label class="item item-input">
@@ -12,8 +16,8 @@
                     <input type="password" placeholder="请输入密码" ng-model="form.pwd" required ng-required>
                 </label>
             </ion-list>
-            <!--<p align="right"><a href="foget-password.html">忘记密码?</a></p>-->
-            <div class="spacer" style="height: 40px;"></div>
+            <p align="right"></p>
+            <div class="spacer" style="height: 40px;" align="right"><a href="#/login/forget-pwd" class="icon ion-ios-information">忘记密码?</a></div>
             <a id="btn_login" class="button button-stable  button-block" ng-click="check_login()">登录</a>
         </form>
     </ion-content>

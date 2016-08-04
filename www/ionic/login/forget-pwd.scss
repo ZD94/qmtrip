@@ -1,0 +1,10 @@
+.sendCode{
+  .list{
+    .item{
+      &:last-child{
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+    }
+  }
+}

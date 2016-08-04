@@ -69,9 +69,6 @@ export async function CreateController($scope, $storage, $loading){
             trip.beginDate = today.startOf('day').hour(9).toDate();
         }
 
-        if (!trip.endDate || (new Date(trip.beginDate)) >= new Date(trip.endDate)) {
-            trip.endDate = moment(trip.beginDate).add(3, 'days').toDate();
-        }
         trip.regenerate = false;
     }
 
@@ -82,6 +79,11 @@ export async function CreateController($scope, $storage, $loading){
     $scope.$watch('trip', function(){
         $storage.local.set('trip', $scope.trip);
     }, true);
+    $scope.$watch('trip.beginDate', function(n, o){
+        if (!trip.endDate || trip.endDate <= trip.beginDate) {
+            trip.endDate = moment(trip.beginDate).add(3, 'days').toDate();
+        }
+    })
 
     $scope.calcTripDuration = function(){
         return moment(trip.endDate).diff(trip.beginDate, 'days') || 1;
@@ -173,9 +175,9 @@ export async function CreateController($scope, $storage, $loading){
     }
 
     $scope.beginDateSelector = {
-        done: function(val) {
-            //$scope.trip.beginDate = val.value;
-        }
+        beginDate: new Date(),
+        endDate: moment().add(1, 'year').toDate(),
+        timepicker: true
     };
     $scope.nextStep = async function() {
         let beginMSecond = Date.now();
@@ -311,6 +313,14 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     $scope.trip = trip;
     //补助,现在是0,后续可能会直接加入到预算中
     let totalPrice: number = 0;
+    budgets.map(function(budget){
+        if(budget.fullPrice && budget.price > 0 && budget.price < budget.fullPrice){
+            budget.discount = ((budget.price/budget.fullPrice)*100).toFixed(2)+'%';
+        }else if(budget.price > budget.fullPrice){
+            budget.discount = '100%';
+        }
+        return budget;
+    })
     for(let budget of budgets) {
         let price = Number(budget.price);
         if (price <= 0) {

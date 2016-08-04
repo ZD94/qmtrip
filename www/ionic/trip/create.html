@@ -1,11 +1,17 @@
 <ion-view title="我要出差" id="page1" style="background-color:#E8E7E9;">
     <ion-content padding="true" class="has-header">
         <form class="list">
-            <label class="item item-input">
+            <div class="item item-input">
                 <span class="input-label">出差日期</span>
-                <input type="date" placeholder="" min="{{minStDate}}" id="beginDate" ng-model="trip.beginDate" ng-change="checkDate(true)">
+                <!--<input type="date" placeholder="" min="{{minStDate}}" id="beginDate" ng-model="trip.beginDate" ng-change="checkDate(true)">-->
+                <div ng-model="trip.beginDate"
+                     ng-selector-date="beginDateSelector"
+                     ng-selector-title="请选择起始日期"
+                     ng-selector-placeholder='请选择起始日期'
+                     class="business_chooese"
+                ></div>
                 <!--<div date-picker id="beginDate"></div>-->
-            </label>
+            </div>
             <label class="item item-input">
                 <span class="input-label">结束日期</span>
                 <input type="date" min="{{minEndDate}}" placeholder="" id="endDate" ng-model="trip.endDate" ng-change="checkDate()">

@@ -3,6 +3,7 @@
 import angular = require('angular');
 import { modalSelectorList } from './selector-list';
 import { modalSelectorMap } from './selector-map';
+import { modalSelectorDate } from './selector-date';
 
 angular
     .module('nglibs')
@@ -12,12 +13,13 @@ angular
             template: require('./selector-list.html'),
             scope: {
                 value: '=ngModel',
+                noticeMsg: '@ngNoticeMsg',
                 title: '@ngSelectorTitle',
                 placeholder: '@ngSelectorPlaceholder',
                 callbacks: '=ngSelector'
             },
             controller: function($scope, $element, $ionicModal) {
-                $scope.showSelectorList = async function() {
+                $scope.showSelectorDlg = async function() {
                     var value: any = await modalSelectorList($scope, $ionicModal, $scope.value)
                     if(value == undefined)
                         return;
@@ -48,7 +50,7 @@ angular
                 callbacks: '=ngSelectorMap'
             },
             controller: function($scope, $ionicModal) {
-                $scope.showSelectorList = async function() {
+                $scope.showSelectorDlg = async function() {
                     var value: any = await modalSelectorMap($scope, $ionicModal, $scope.value)
                     if(value == undefined)
                         return;
@@ -57,6 +59,30 @@ angular
 
                     if ($scope.callbacks.done && typeof $scope.callbacks.done == 'function') {
                         return $scope.callbacks.done(value);
+                    }
+                };
+            }
+        }
+    })
+    .directive('ngSelectorDate', function() {
+        require('./selector-date.scss');
+        return {
+            restrict: 'A',
+            template: require('./selector-date.html'),
+            scope: {
+                value: '=ngModel',
+                title: '@ngSelectorTitle',
+                placeholder: '@ngSelectorPlaceholder',
+                options: '=ngSelectorDate'
+            },
+            controller: function($scope, $ionicModal, $ionicPopup) {
+                $scope.showSelectorDlg = async function() {
+                    var confirmed = await modalSelectorDate($scope, $ionicModal, $ionicPopup)
+                    if(!confirmed)
+                        return;
+
+                    if ($scope.options.done && typeof $scope.options.done == 'function') {
+                        return $scope.options.done($scope.value);
                     }
                 };
             }
