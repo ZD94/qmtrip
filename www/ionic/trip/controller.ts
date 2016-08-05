@@ -14,12 +14,12 @@ var msgbox = require('msgbox');
 var defaultTrip = {
     beginDate: moment().add(3, 'days').startOf('day').hour(9).toDate(),
     endDate: moment().add(4, 'days').startOf('day').hour(21).toDate(),
-    place: '',
+    place: undefined,
     placeName: '',
     reason: '',
 
     traffic: false,
-    fromPlace: '',
+    fromPlace: undefined,
     round: false,
 
     hotel: false,
@@ -100,7 +100,7 @@ export async function CreateController($scope, $storage, $loading){
         }
     };
 
-    $scope.$watch('trip.placeName', function($newVal, $oldVal) {
+    $scope.$watch('trip.place.name', function($newVal, $oldVal) {
         if ($newVal != $oldVal) {
             $scope.trip.hotelPlaceObj = undefined;
             $scope.trip.hotelPlace = '';
@@ -115,7 +115,6 @@ export async function CreateController($scope, $storage, $loading){
             }
         }
         var places = await API.place.queryPlace({keyword: keyword});
-        places = places.map((place)=> {return {name: place.name, value: place.id} });
         if (!keyword) {
             $storage.local.set('hot_cities', places);
         }
@@ -123,38 +122,11 @@ export async function CreateController($scope, $storage, $loading){
     }
     $scope.placeSelector = {
         query: queryPlaces,
-        done: function(val) {
-            $scope.trip.place = val.value;
-        }
+        display: (item)=>item.name
     };
     $scope.fromPlaceSelector = {
         query: queryPlaces,
-        done: function(val) {
-            $scope.trip.fromPlace = val.value;
-        }
-    };
-    $scope.hotelPlaceSelector = {
-        query: async function(keyword) {
-            let city = $scope.trip.place;
-            if (city) {
-                let cityId: any = city;
-                if (!/^CT_\d+$/.test(city)) {
-                    city = await API.place.getCityInfo({cityCode: city});
-                    cityId = city.id;
-                }
-                var hotelPlaces = await API.place.queryBusinessDistrict({keyword: keyword, code: cityId})
-                return hotelPlaces.map((p)=> { return { name: p.name, value: p.id} });
-            }
-            return [];
-        },
-        done: function(val) {
-            if (!val.point || !val.point.lat || !val.point.lng) {
-                $scope.showErrorMsg("获取住宿位置失败");
-                return;
-            }
-            $scope.trip.hotelPlace = val.point.lat + "," + val.point.lng
-            $scope.trip.hotelName = val.title;
-        }
+        display: (item)=>item.name
     };
     $scope.projectSelector = {
         query: async function(keyword){
@@ -164,15 +136,29 @@ export async function CreateController($scope, $storage, $loading){
                 options.where["name"] = {$like: '%'+keyword+'%'};
             }
             var projects = await Models.project.find(options);
-            return projects.map((project)=>{ return {name: project.name, value: project.id}} );
+            return projects;
         },
+        display: (item)=>item.name,
         create: async function(name){
-            console.info("function createProject...");
+            return {
+                name: name,
+                id: undefined
+            }
         },
         done: function(val) {
             $scope.trip.reason = val.name ? val.name: val;
         }
-    }
+    };
+    $scope.hotelPlaceSelector = {
+        done: function(val) {
+            if (!val.point || !val.point.lat || !val.point.lng) {
+                $scope.showErrorMsg("获取住宿位置失败");
+                return;
+            }
+            $scope.trip.hotelPlace = val.point.lat + "," + val.point.lng
+            $scope.trip.hotelName = val.title;
+        }
+    };
 
     $scope.beginDateSelector = {
         beginDate: new Date(),
@@ -207,8 +193,8 @@ export async function CreateController($scope, $storage, $loading){
         }
 
         let params = {
-            originPlace: trip.fromPlace,
-            destinationPlace: trip.place,
+            originPlace: trip.fromPlace.id,
+            destinationPlace: trip.place.id,
             leaveDate: moment(trip.beginDate).format('YYYY-MM-DD'),
             goBackDate: moment(trip.endDate).format('YYYY-MM-DD'),
             leaveTime: moment(trip.beginDate).format('HH:mm'),
@@ -344,17 +330,15 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         query: async function(keyword) {
             let staff = await Staff.getCurrent();
             let staffs = await staff.company.getStaffs({where: {id: {$ne: staff.id}}});
-            return staffs.map((p) =>{ return  {name: p.name, value: p.id}} );
+            return staffs;
         },
-        done: function(value) {
-            trip.auditUser = value.value;
-        }
+        display: (staff)=>staff.name
     };
 
     $scope.saveTripPlan = async function() {
         let trip = $scope.trip;
 
-        if(!trip.auditUserName) {
+        if(!trip.auditUser) {
             $scope.showErrorMsg('请选择审核人！');
             return false;
         }
@@ -365,7 +349,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         });
 
         try {
-            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason||trip.reasonName, auditUser: trip.auditUser})
+            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason||trip.reasonName, auditUser: trip.auditUser.id})
             window.location.href = '#/trip/committed?id='+planTrip.id;
         } catch(err) {
             alert(err.msg || err);

@@ -121,47 +121,32 @@ function popupSelectorTime($scope, $ionicPopup){
     });
 }
 
-export function modalSelectorDate(scope, $ionicModal, $ionicPopup, options, value){
-    let $scope = scope.$new(true);
+export function modalSelectorDate($scope, $element, $ionicPopup){
     initLunarCalendar();
-    var template = require('./selector-date-dialog.html');
-    $scope.modal = $ionicModal.fromTemplate(template, {
-        scope: $scope,
-        animation: 'slide-in-up',
-        focusFirstInput: true
-    });
-    $scope.$on('$destroy', function() {
-        $scope.modal.remove();
-    });
+
     $scope.month_2col = false;
     $scope.$on('modal.shown', function() {
-        if($($scope.modal.modalEl).width() > 680)
+        if($element.width() > 680)
             $scope.month_2col = true;
         fixMonths();
     });
-    $scope.$on('modal.hidden', function() {
-    });
-    $scope.$on('modal.removed', function() {
-    });
-
     $scope.weekDayNames = weekDayNames;
 
     let timeScale = 10;
-    if(options.timepicker){
+    if($scope.options.timepicker){
         $scope.timeScale = timeScale;
         $scope.timeMax = 24*60/timeScale;
     }
 
-    $scope.options = {};
-    $scope.options.begin = moment(options.beginDate).startOf('day').valueOf();
-    $scope.options.end = moment(options.endDate).startOf('day').valueOf();
+    $scope.options.begin = moment($scope.options.beginDate).startOf('day').valueOf();
+    $scope.options.end = moment($scope.options.endDate).startOf('day').valueOf();
 
     $scope.options.today = moment().startOf('day').valueOf();
     $scope.options.selected = {};
     function parseSelected(){
-        $scope.options.selected.day = moment(value).startOf('day').valueOf();
-        $scope.options.selected.hour = value.getHours();
-        $scope.options.selected.minute = value.getMinutes();
+        $scope.options.selected.day = moment($scope.value).startOf('day').valueOf();
+        $scope.options.selected.hour = $scope.value.getHours();
+        $scope.options.selected.minute = $scope.value.getMinutes();
         $scope.options.selected.time = Math.floor(($scope.options.selected.hour*60 + $scope.options.selected.minute)/timeScale);
     }
     parseSelected();
@@ -170,44 +155,34 @@ export function modalSelectorDate(scope, $ionicModal, $ionicPopup, options, valu
             return;
         parseSelected();
     });
-    $scope.$watch('selected.time', function(n, o){
+    $scope.$watch('options.selected.time', function(n, o){
         if(n == o)
             return;
         $scope.options.selected.hour = Math.floor($scope.options.selected.time*timeScale/60);
-        $scope.options.selected.minute = ($scope.selected.time*timeScale)%60;
+        $scope.options.selected.minute = ($scope.options.selected.time*timeScale)%60;
 
     });
 
     $scope.months = [];
 
-    let ret = new Promise(function(resolve, reject) {
-        function closeAndResolve(day){
-        }
-        $scope.confirmModal = async function(day) {
-            if(day.timestamp<$scope.begin||$scope.end<day.timestamp)
-                return;
-            if(options.timepicker){
+    $scope.confirm = async function(day) {
+        if(day.timestamp<$scope.begin||$scope.end<day.timestamp)
+            return;
+        if($scope.options.timepicker){
                 $scope.options.selected.date = moment({year: day.year, month: day.month-1, day: day.day}).toDate();
-                let res = await popupSelectorTime($scope, $ionicPopup);
-                if(!res)
-                    return;
-                $scope.modal.hide();
-                let date = moment({
-                    year: day.year,
-                    month: day.month-1,
-                    day: day.day,
+            let res = await popupSelectorTime($scope, $ionicPopup);
+            if(!res)
+                return;
+            let date = moment({
+                year: day.year,
+                month: day.month-1,
+                day: day.day,
                     hour: $scope.options.selected.hour,
                     minute: $scope.options.selected.minute
-                });
-                resolve(date.toDate());
-            }
+            });
+            $scope.confirmModal(date.toDate());
         }
-        $scope.cancelModal = function() {
-            $scope.modal.hide();
-            resolve(false);
-        }
-        $scope.modal.show();
-    });
+    }
 
     var date = moment().startOf('month');
     let caldata = getMonth(date.year(), date.month()+1);
@@ -239,12 +214,11 @@ export function modalSelectorDate(scope, $ionicModal, $ionicPopup, options, valu
                 }
             }
         }
+        $scope.$broadcast('scroll.infiniteScrollComplete');
     }
     $scope.loadNextMonth = function(){
         loadNextMonth();
-        loadNextMonth();
         fixMonths();
-        $scope.$broadcast('scroll.infiniteScrollComplete');
+        //$scope.$broadcast('scroll.infiniteScrollComplete');
     }
-    return ret;
 }

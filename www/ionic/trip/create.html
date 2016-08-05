@@ -18,7 +18,7 @@
             </label>
             <div class="item item-input">
                 <span class="input-label">出差地点</span>
-                <div ng-model="trip.placeName"
+                <div ng-model="trip.place"
                        ng-selector="placeSelector"
                        ng-selector-title="请选择出差地点"
                        ng-selector-placeholder="请输入城市名或首字母缩写"
@@ -38,7 +38,7 @@
             <div ng-if="trip.traffic">
                 <div class="item item-input" ng-if="trip.traffic">
                     <span class="input-label">出发地</span>
-                    <div ng-model="trip.fromPlaceName"
+                    <div ng-model="trip.fromPlace"
                            ng-selector="fromPlaceSelector"
                            ng-selector-title="出发地选择"
                            ng-selector-placeholder="请输入城市名或首字母缩写" class="business_chooese"
@@ -47,7 +47,7 @@
                 <ion-toggle toggle-class="toggle-positive" ng-model="trip.round">返程</ion-toggle>
             </div>
             <div class="spacer" style="width: 300px; height: 9px;"></div>
-            <ion-toggle toggle-class="toggle-positive" ng-disabled="trip.placeName == ''" ng-model="trip.hotel">住宿<span ng-if="trip.hotel">（共{{calcTripDuration()}}天）</span></ion-toggle>
+            <ion-toggle toggle-class="toggle-positive" ng-disabled="!trip.place" ng-model="trip.hotel">住宿<span ng-if="trip.hotel">（共{{calcTripDuration()}}天）</span></ion-toggle>
             <div ng-if="trip.hotel">
                 <!--<div class="button-bar">
                     &lt;!&ndash;<button id="page6-button34" class="button button-light button-small button-block" ng-click="decTripDuration()">-</button>&ndash;&gt;
@@ -58,7 +58,7 @@
                     <span class="input-label">地标</span>
                     <div ng-model="trip.hotelPlaceObj"
                          ng-selector-map="hotelPlaceSelector"
-                         ng-selector-place="trip.placeName"
+                         ng-selector-place="trip.place.name"
                          ng-selector-title="请选择地标"
                          ng-selector-placeholder='请输入地标名称' class="business_chooese"
                     ></div>

@@ -766,10 +766,30 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
     }
     $scope.accordHotel = accordHotel;
 
+    var accordHotels = await Models.accordHotel.find({where: {companyId: staff.company.id}});
+
+    $scope.city = accordHotel.cityName?{name: accordHotel.cityName}:undefined;
     $scope.placeSelector = {
         query: queryPlaces,
+        display: (item, forList)=>{
+            if(forList){
+                for(let city of accordHotels){
+                    if(city.cityName == item.name)
+                        return item.name + '<span class="item-note">已设置</span>';
+                }
+            }
+            return item.name;
+        },
+        disable: (item)=>{
+            for(let city of accordHotels){
+                if(city.cityName == item.name)
+                    return true;
+            }
+            return false;
+        },
         done: function(val) {
-            $scope.accordHotel.cityCode = val.value;
+            $scope.accordHotel.cityName = val.name;
+            $scope.accordHotel.cityCode = val.id;
         }
     };
 
@@ -783,7 +803,7 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
         var places = await API.place.queryPlace({keyword: keyword});
         /*places = places.map((place)=> {
             return {name: place.name, value: place.id}
-        });*/
+        });
         places = await Promise.all(places.map(async function(place){
             var ahs = await Models.accordHotel.find({where: {companyId: staff.company.id, cityCode: place.id}});
             if(ahs && ahs.length>0){
@@ -791,7 +811,7 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
             }else{
                 return {name: place.name, value: place.id, haveSet: false}
             }
-        }))
+        }))*/
         /*if (!keyword) {
             $storage.local.set('accord_hot_cities', places);
         }*/

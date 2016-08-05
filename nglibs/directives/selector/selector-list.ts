@@ -2,89 +2,63 @@
 declare var API: any;
 var msgbox = require('msgbox');
 
-export async function modalSelectorList(scope, $ionicModal, callbacks, selected) {
-    let $scope = scope.$new(true);
-    var template = require('./selector-list-dialog.html');
-    $scope.modal = $ionicModal.fromTemplate(template, {
-        scope: $scope,
-        animation: 'slide-in-up',
-        focusFirstInput: true
-    });
-    $scope.$on('$destroy', function() {
-        $scope.modal.remove();
-    });
-    $scope.$on('modal.hidden', function() {
-    });
-    $scope.$on('modal.removed', function() {
-    });
+export async function modalSelectorList($scope) {
+    let form = $scope.form = {
+        keyword: ''
+    };
+    $scope.optionItems = [];
 
-    var optionsLoader = callbacks.query;
-    var optionsCreator = callbacks.create;
+    function displayItem(item){
+        if(item && $scope.options && $scope.options.display){
+            return $scope.options.display(item, true);
+        }
+        return item;
+    };
+    $scope.displayItem = displayItem;
 
-
-    var form: any = $scope.form = {};
-    form.keyword = ''; //selected;
-    form.selected = '';
-    form.newSelected = '';
-
-    $scope.optionLoader = async function(){
-        $scope.options = await optionsLoader(form.keyword);
+    $scope.disableItem = function(item){
+        if(item && $scope.options && $scope.options.disable){
+            return $scope.options.disable(item);
+        }
+        return false;
     }
 
-    $scope.$watch('form.keyword', function(o, n) {
-        if(o === n)
-            return;
-        $scope.optionLoader();
-    })
-    $scope.options = [];
-    await $scope.optionLoader();
-    //需要等待加载完数据后
-    $scope.options.map(function(v) {
-        if (v.name == selected) {
-            form.selected = v;
-            return;
-        }
-    });
-
     $scope.showCreate = function(){
-        if(optionsCreator == undefined)
+        if($scope.options.create == undefined)
             return false;
         if(!form.keyword || form.keyword.length == 0)
             return false;
 
-        let isMatch = false;
-        $scope.options.forEach(function(v) {
-            if (v == form.keyword || v.name == form.keyword) {
-                isMatch = true;
-                return;
-            }
-        });
-
-        if(isMatch) return false;
+        for(let v of $scope.optionItems){
+            if(displayItem(v) == form.keyword)
+                return false;
+        }
         return true;
     }
 
-    return new Promise(function(resolve, reject) {
-        $scope.confirmModal = function() {
-            $scope.modal.hide();
-            $scope.keyword = '';
+    $scope.createItem = async function(keyword){
+        let item = await $scope.options.create(keyword);
+        $scope.confirm(item);
+    };
 
-            let form = $scope.form;
-            if($scope.form.newSelected) {
-                $scope.form.selected = $scope.form.newSelected;
-                $scope.form.newSelected = '';
-            }
-            resolve(form.selected);
-        }
-        $scope.haveSet = function() {
-            msgbox.log($scope.noticeMsg);
-        }
-        $scope.cancelModal = function() {
-            $scope.modal.hide();
-            resolve();
-        }
-        $scope.modal.show();
+    async function reloadOptionItems(){
+        $scope.optionItems = await $scope.options.query(form.keyword);
+    }
+    await reloadOptionItems();
 
+    $scope.$watch('form.keyword', function(o, n) {
+        if(o === n)
+            return;
+        reloadOptionItems();
     })
 
+    $scope.confirm = function(value){
+        if($scope.disableItem(value))
+            return;
+        $scope.confirmModal(value);
+    }
+
+    $scope.haveSet = function() {
+        msgbox.log($scope.options.noticeMsg);
+    }
 }
