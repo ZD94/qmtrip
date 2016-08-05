@@ -1,0 +1,70 @@
+<ion-view title="出差统计-本月预算" id="page24">
+    <ion-content padding="true" class="has-header">
+        <label class="item item-select">
+            <span class="input-label">当前统计</span>
+            <select ng-change="monthChange(queryMonth)" id="monthSelect" ng-model="queryMonth" ng-options="item.value as item.name for item in months"></select>
+        </label>
+
+        <div class="button-bar">
+            <a href="#/company/budget" id="page24-button73" class="button button-stable  button-block">汇总</a>
+            <button id="page24-button74" class="button button-positive  button-block" ng-click="initData('S')">按员工</button>
+            <button id="page24-button75" class="button button-stable  button-block" ng-click="initData('P')">按项目</button>
+            <button id="page24-button76" class="button button-stable  button-block" ng-click="initData('D')">按部门</button>
+        </div>
+
+        <div class="spacer" style="width: 300px; height: 10px;"></div>
+
+        <form class="list">
+            <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input ng-change="searchStatistics()" type="search" placeholder="{{placeholder}}" ng-model="params.keyWord">
+            </label>
+        </form>
+
+        <ion-list show-delete="showDelete">
+            <ion-item class="item stat-label-content" ng-repeat="en in statisticData">
+                <div class="bar-header">{{en.keyInfo.name}}</div>
+                <div class="left-div">
+                    <div>
+                        <label class="label-left">
+                            <p>已完成出差(次)</p>
+                            <h2 class="ng-binding" style="text-align: center;">{{en.completeTripNum || 0}}</h2>
+                        </label>
+                        <label class="label-right">
+                            <p>已支出(次)</p>
+                            <h2 class="ng-binding" style="text-align: center;">{{en.expenditure || 0}}</h2>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="label-left">
+                            <p>还将进行出差(次)</p>
+                            <h2 class="ng-binding" style="text-align: center;">{{en.planTripNum || 0}}</h2>
+                        </label>
+                        <label class="label-right">
+                            <p>计划支出(次)</p>
+                            <h2 class="ng-binding" style="text-align: center;">{{en.planBudget || 0}}</h2>
+                        </label>
+                    </div>
+                </div>
+                <div class="right-div">
+                    <p>实际节省(元)</p>
+                    <h2 class="ng-binding" style="text-align: center;">{{en.savedMoney || 0}}</h2>
+                </div>
+            </ion-item>
+
+            <!--<div class="list" ng-repeat="en in statisticData">-->
+                <!--<ion-item class="item">-->
+                    <!--<p>已完成出差(次)</p>-->
+                    <!--<h2 class="ng-binding">{{en.completeTripNum}}</h2>-->
+                <!--</ion-item>-->
+                <!--<ion-item class="item">-->
+                    <!--<p>实际节省(元)</p>-->
+                    <!--<h2 class="ng-binding">{{en.savedMoney}}</h2>-->
+                <!--</ion-item>-->
+                <!--<div class="item_divider"></div>-->
+            <!--</div>-->
+        </ion-list>
+
+    </ion-content>
+</ion-view>
