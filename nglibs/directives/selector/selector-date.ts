@@ -162,7 +162,7 @@ export function modalSelectorDate(scope, $ionicModal, $ionicPopup, options, valu
         $scope.options.selected.day = moment(value).startOf('day').valueOf();
         $scope.options.selected.hour = value.getHours();
         $scope.options.selected.minute = value.getMinutes();
-        $scope.options.selected.time = Math.floor(($scope.selected.hour*60 + $scope.selected.minute)/timeScale);
+        $scope.options.selected.time = Math.floor(($scope.options.selected.hour*60 + $scope.options.selected.minute)/timeScale);
     }
     parseSelected();
     $scope.$watch('value', function(n, o){
@@ -173,8 +173,8 @@ export function modalSelectorDate(scope, $ionicModal, $ionicPopup, options, valu
     $scope.$watch('selected.time', function(n, o){
         if(n == o)
             return;
-        $scope.selected.hour = Math.floor($scope.selected.time*timeScale/60);
-        $scope.selected.minute = ($scope.selected.time*timeScale)%60;
+        $scope.options.selected.hour = Math.floor($scope.options.selected.time*timeScale/60);
+        $scope.options.selected.minute = ($scope.selected.time*timeScale)%60;
 
     });
 
@@ -219,7 +219,6 @@ export function modalSelectorDate(scope, $ionicModal, $ionicPopup, options, valu
         let caldata = getMonth(date.year(), date.month()+1);
         $scope.months.push(caldata);
     }
-    loadNextMonth();
     loadNextMonth();
     function fixMonths(){
         if($scope.month_2col){
