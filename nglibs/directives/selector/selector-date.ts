@@ -105,7 +105,8 @@ angular
         return {
             template: require('./selector-date-day.html'),
             scope:{
-                modal: '=ngModal'
+                day: '=ngModal',
+                options: '=ngDayOptions',
             }
         }
     });
@@ -137,16 +138,16 @@ export function modalSelectorDate($scope, $element, $ionicPopup){
         $scope.timeMax = 24*60/timeScale;
     }
 
-    $scope.begin = moment($scope.options.beginDate).startOf('day').valueOf();
-    $scope.end = moment($scope.options.endDate).startOf('day').valueOf();
+    $scope.options.begin = moment($scope.options.beginDate).startOf('day').valueOf();
+    $scope.options.end = moment($scope.options.endDate).startOf('day').valueOf();
 
-    $scope.today = moment().startOf('day').valueOf();
-    $scope.selected = {};
+    $scope.options.today = moment().startOf('day').valueOf();
+    $scope.options.selected = {};
     function parseSelected(){
-        $scope.selected.day = moment($scope.value).startOf('day').valueOf();
-        $scope.selected.hour = $scope.value.getHours();
-        $scope.selected.minute = $scope.value.getMinutes();
-        $scope.selected.time = Math.floor(($scope.selected.hour*60 + $scope.selected.minute)/timeScale);
+        $scope.options.selected.day = moment($scope.value).startOf('day').valueOf();
+        $scope.options.selected.hour = $scope.value.getHours();
+        $scope.options.selected.minute = $scope.value.getMinutes();
+        $scope.options.selected.time = Math.floor(($scope.selected.hour*60 + $scope.selected.minute)/timeScale);
     }
     parseSelected();
     $scope.$watch('value', function(n, o){
@@ -157,8 +158,8 @@ export function modalSelectorDate($scope, $element, $ionicPopup){
     $scope.$watch('selected.time', function(n, o){
         if(n == o)
             return;
-        $scope.selected.hour = Math.floor($scope.selected.time*timeScale/60);
-        $scope.selected.minute = ($scope.selected.time*timeScale)%60;
+        $scope.options.selected.hour = Math.floor($scope.options.selected.time*timeScale/60);
+        $scope.options.selected.minute = ($scope.options.selected.time*timeScale)%60;
 
     });
 
@@ -168,7 +169,7 @@ export function modalSelectorDate($scope, $element, $ionicPopup){
         if(day.timestamp<$scope.begin||$scope.end<day.timestamp)
             return;
         if($scope.options.timepicker){
-            $scope.selected.date = moment({year: day.year, month: day.month-1, day: day.day}).toDate();
+                $scope.options.selected.date = moment({year: day.year, month: day.month-1, day: day.day}).toDate();
             let res = await popupSelectorTime($scope, $ionicPopup);
             if(!res)
                 return;
@@ -176,8 +177,8 @@ export function modalSelectorDate($scope, $element, $ionicPopup){
                 year: day.year,
                 month: day.month-1,
                 day: day.day,
-                hour: $scope.selected.hour,
-                minute: $scope.selected.minute
+                    hour: $scope.options.selected.hour,
+                    minute: $scope.options.selected.minute
             });
             $scope.confirmModal(date.toDate());
         }
@@ -193,7 +194,6 @@ export function modalSelectorDate($scope, $element, $ionicPopup){
         let caldata = getMonth(date.year(), date.month()+1);
         $scope.months.push(caldata);
     }
-    loadNextMonth();
     loadNextMonth();
     function fixMonths(){
         if($scope.month_2col){
