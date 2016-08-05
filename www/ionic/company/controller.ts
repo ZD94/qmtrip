@@ -843,5 +843,5 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
 }
 
 export async function StaffInvitedController($scope){
-
+    require("./staff-invited.scss");
 }
