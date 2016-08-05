@@ -70,6 +70,9 @@ class ApiAuth {
 
         return Models.account.get(accountId)
             .then(function(account: any) {
+                if(!account){
+                    throw L.ERR.ACCOUNT_NOT_EXIST();
+                }
                 if (account.status == ACCOUNT_STATUS.ACTIVE) {
                     return true;
                 }
@@ -81,6 +84,7 @@ class ApiAuth {
 
                 account.status = ACCOUNT_STATUS.ACTIVE;
                 account.activeToken = null;
+                account.isValidateEmail = true;
                 return account.save();
             })
             .then(function() {
@@ -560,6 +564,14 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
                     throw L.ERR.ACCOUNT_NOT_ACTIVE();
                 }
 
+                if (loginAccount.mobile == account && !loginAccount.isValidateMobile) {
+                    throw L.ERR.NO_VALIDATE_MOBILE();
+                }
+
+                if (loginAccount.email == account && !loginAccount.isValidateEmail) {
+                    throw L.ERR.NO_VALIDATE_EMAIL();
+                }
+
                 if (loginAccount.status != 1) {
                     throw L.ERR.ACCOUNT_FORBIDDEN();
                 }
@@ -609,6 +621,29 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         //     })
     }
 
+    /**
+     * 重新发送激活链接
+     * @param params
+     * @returns {boolean}
+     */
+    @clientExport
+    static async reSendActiveLink (params:{account:string}):Promise<boolean> {
+        var mobileOrEmail = params.account;
+        var accounts = await Models.account.find({where : {$or : [{email: mobileOrEmail}, {mobile: mobileOrEmail}]}});
+        var account = Account.create();
+        if(accounts && accounts.length>0){
+            account = accounts[0];
+            //发送qm_first_set_pwd
+            var staff = await Models.staff.get(account.id);
+            await API.auth.sendResetPwdEmail({email: account.email, mobile: account.mobile, type: 1, isFirstSet: true, companyName: staff.company.name});
+            //发送qm_active
+            await _sendActiveEmail(account.id);
+        }else{
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        return true;
+    }
 
     @clientExport
     @requireParams(['mobile', 'name', 'email', 'userName','msgCode','msgTicket'], ['pwd','agencyId', 'remark', 'description'])
@@ -1466,15 +1501,17 @@ function makeActiveSign(activeToken, accountId, timestamp) {
     return utils.md5(originStr);
 }
 
-function _sendActiveEmail(accountId) {
+async function _sendActiveEmail(accountId) {
     return Models.account.get(accountId)
-        .then(function(account) {
+        .then(async function(account) {
             //生成激活码
             var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
             var activeToken = utils.getRndStr(6);
             var sign = makeActiveSign(activeToken, account.id, expireAt);
             var url = C.host + "/index.html#/login/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
-
+            url = await API.wechat.shorturl({longurl: url});
+            console.info(url);
+            console.info("url------------==============");
             //发送激活邮件
             var vals = {
                 name: account.email,

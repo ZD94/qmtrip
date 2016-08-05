@@ -81,7 +81,25 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
             window.location.href = backUrl;
         } catch (err) {
             var str = err.msg;
-            msgbox.log(err);//显示错误消息
+            if(err.code == -28 && err.msg == "您的账号还未激活"){
+                $scope.unactivated = true;
+                // $scope.$apply();
+            }else{
+                msgbox.log(err.msg || err);//显示错误消息
+            }
+        }
+    }
+
+    $scope.reSendActiveLink = async function(){
+        try{
+            await API.onload();
+            var data = await API.auth.reSendActiveLink({account: $scope.form.account});
+            if(data){
+                msgbox.log("发送成功");
+            }
+
+        }catch(err){
+            msgbox.log(err.msg || err);
         }
     }
 }
@@ -289,5 +307,28 @@ export async function ResetPwdController($scope, Models, $stateParams){
             .catch(function(err){
                 msgbox.log(err.msg||err);
             }).done();
+    }
+
+}
+
+export async function ActiveController ($scope, $stateParams) {
+    let accountId = $stateParams.accountId;
+    let sign = $stateParams.sign;
+    let timestamp = $stateParams.timestamp;
+    API.require("auth");
+    await API.onload();
+
+    API.auth.activeByEmail({accountId: accountId, sign: sign, timestamp: timestamp})
+        .then(function (result) {
+            if(result){
+                // alert("激活成功,请重新登录");
+                // window.location.href = "index.html#/login/index";
+            }
+            return;
+        })
+        .catch(window.alert).done();
+
+    $scope.goLogin = function(){
+        window.location.href = "index.html#/login/index";
     }
 }
