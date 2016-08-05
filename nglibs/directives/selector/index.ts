@@ -38,7 +38,7 @@ class ngSelectorDialog {
                 modal.hide();
             }
             modal.show();
-            this.$injector.invoke(controller, this, {$scope, $element: modal.$el});
+            this.$injector.invoke(controller, this, {$scope, $element: modal.$el.find('ion-modal-view')});
         });
     }
 

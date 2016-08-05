@@ -147,7 +147,7 @@ export function modalSelectorDate($scope, $element, $ionicPopup){
         $scope.options.selected.day = moment($scope.value).startOf('day').valueOf();
         $scope.options.selected.hour = $scope.value.getHours();
         $scope.options.selected.minute = $scope.value.getMinutes();
-        $scope.options.selected.time = Math.floor(($scope.selected.hour*60 + $scope.selected.minute)/timeScale);
+        $scope.options.selected.time = Math.floor(($scope.options.selected.hour*60 + $scope.options.selected.minute)/timeScale);
     }
     parseSelected();
     $scope.$watch('value', function(n, o){
@@ -155,7 +155,7 @@ export function modalSelectorDate($scope, $element, $ionicPopup){
             return;
         parseSelected();
     });
-    $scope.$watch('selected.time', function(n, o){
+    $scope.$watch('options.selected.time', function(n, o){
         if(n == o)
             return;
         $scope.options.selected.hour = Math.floor($scope.options.selected.time*timeScale/60);
@@ -214,11 +214,11 @@ export function modalSelectorDate($scope, $element, $ionicPopup){
                 }
             }
         }
+        $scope.$broadcast('scroll.infiniteScrollComplete');
     }
     $scope.loadNextMonth = function(){
         loadNextMonth();
-        loadNextMonth();
         fixMonths();
-        $scope.$broadcast('scroll.infiniteScrollComplete');
+        //$scope.$broadcast('scroll.infiniteScrollComplete');
     }
 }
