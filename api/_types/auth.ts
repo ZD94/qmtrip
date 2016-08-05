@@ -90,6 +90,10 @@ class Account extends ModelObject{
     get qrcodeToken(): string { return null; }
     set qrcodeToken(qrcodeToken: string){}
 
+    @Field({type:Types.STRING})
+    get checkcodeToken(): string { return null; }
+    set checkcodeToken(checkcodeToken: string){}
+
     @Field({type:Types.INTEGER})
     get type(): EAccountType { return EAccountType.STAFF; }
     set type(type: EAccountType){}
@@ -97,6 +101,14 @@ class Account extends ModelObject{
     @Field({type:Types.BOOLEAN})
     get isFirstLogin(): boolean { return true; }
     set isFirstLogin(isFirstLogin: boolean){}
+
+    @Field({type:Types.BOOLEAN})
+    get isValidateMobile(): boolean { return false; }
+    set isValidateMobile(isValidateMobile: boolean){}
+
+    @Field({type:Types.BOOLEAN})
+    get isValidateEmail(): boolean { return false; }
+    set isValidateEmail(isValidateEmail: boolean){}
 
     validate() {
         if(validator.isMobilePhone(this.mobile, 'zh-CN')){
