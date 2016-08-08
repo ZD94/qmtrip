@@ -1,8 +1,21 @@
 .invied_link{
-  &:nth-child(1){
-    height: 224px;
-  }
-  &:last-child{
-    display: flex;
+  > *{
+    &:nth-child(1){
+      height: 224px;
+      .create_link{
+        height:100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .button{
+          width: 70%;
+          border-radius: 30px;
+        }
+      }
+    }
+    &:last-child{
+      display: flex;
+      text-align: center;
+    }
   }
 }
