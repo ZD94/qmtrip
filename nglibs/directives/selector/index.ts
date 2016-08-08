@@ -76,17 +76,17 @@ class ngSelectorDialog {
 angular
     .module('nglibs')
     .service('ngSelectorDialog', ngSelectorDialog)
-    .directive('ngSelector', function() {
-        require('./selector-list.scss');
+    .directive('ngSelectorList', function() {
+        require('./selector.scss');
         return {
-            restrict: 'A',
+            restrict: 'E',
             template: require('./selector-list.html'),
             scope: {
                 value: '=ngModel',
-                noticeMsg: '@ngNoticeMsg',
-                title: '@ngSelectorTitle',
-                placeholder: '@ngSelectorPlaceholder',
-                options: '=ngSelector'
+                noticeMsg: '@dlgNoticeMsg',
+                title: '@dlgTitle',
+                placeholder: '@dlgPlaceholder',
+                options: '=dlgOptions'
             },
             controller: function($scope, $element, ngSelectorDialog) {
                 $scope.displayItem = function(item){
@@ -112,16 +112,16 @@ angular
         }
     })
     .directive('ngSelectorMap', function() {
-        require('./selector-map.scss');
+        require('./selector.scss');
         return {
-            restrict: 'A',
+            restrict: 'E',
             template: require('./selector-map.html'),
             scope: {
                 value: '=ngModel',
-                title: '@ngSelectorTitle',
+                title: '@dlgTitle',
                 city: '<ngSelectorPlace',
-                placeholder: '@ngSelectorPlaceholder',
-                callbacks: '=ngSelectorMap'
+                placeholder: '@dlgPlaceholder',
+                callbacks: '=dlgOptions'
             },
             controller: function($scope, ngSelectorDialog) {
                 $scope.showSelectorDlg = async function() {
@@ -139,15 +139,15 @@ angular
         }
     })
     .directive('ngSelectorDate', function() {
-        require('./selector-date.scss');
+        require('./selector.scss');
         return {
-            restrict: 'A',
+            restrict: 'E',
             template: require('./selector-date.html'),
             scope: {
                 value: '=ngModel',
-                title: '@ngSelectorTitle',
-                placeholder: '@ngSelectorPlaceholder',
-                options: '=ngSelectorDate'
+                title: '@dlgTitle',
+                placeholder: '@dlgPlaceholder',
+                options: '=dlgOptions'
             },
             controller: function($scope, ngSelectorDialog) {
                 $scope.showSelectorDlg = async function() {
