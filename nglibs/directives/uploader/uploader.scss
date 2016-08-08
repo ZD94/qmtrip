@@ -4,6 +4,11 @@
   }
 }
 
+.preview_btn{
+  border-radius: 0;
+  margin-bottom: 0!important;
+}
+
 [ng-uploader]:after {
   display: none;
 }
