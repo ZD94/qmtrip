@@ -92,6 +92,7 @@ export async function BudgetStatisticsController($scope, $stateParams, Models) {
         let optionFun = isAdd ? 'add' : 'subtract';
         let queryMonth = moment( $scope.monthSelection.month)[optionFun](1, 'month');
         let monthSelection = {
+            type: $scope.monthSelection.type,
             month: queryMonth.format('YYYY-MM'),
             startTime: queryMonth.startOf('month').format(formatStr),
             endTime: queryMonth.endOf('month').format(formatStr),
