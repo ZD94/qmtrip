@@ -1,11 +1,12 @@
 "use strict";
 
 import angular = require('angular');
-import { modalSelectorList } from './selector-list';
-import { modalSelectorMap } from './selector-map';
-import { modalSelectorDate } from './selector-date';
+import { modalSelectorList } from './list';
+import { modalSelectorMap } from './map';
+import { modalSelectorDate } from './date';
+import { modalSelectorDatespan } from './date';
 
-class ngSelectorDialog {
+class ngSelector {
     constructor(private $ionicModal, private $ionicPopup, private $injector) {
 
     }
@@ -46,7 +47,7 @@ class ngSelectorDialog {
         return this.createDialog({
             parent: $scope,
             scope: {options, value},
-            template: require('./selector-list-dialog.html'),
+            template: require('./list/dialog.html'),
             controller: modalSelectorList
         });
         //return modalSelectorList($scope, this.$ionicModal, callbacks, value);
@@ -56,7 +57,7 @@ class ngSelectorDialog {
         return this.createDialog({
             parent: $scope,
             scope: {city, value},
-            template: require('./selector-map-dialog.html'),
+            template: require('./map/dialog.html'),
             controller: modalSelectorMap
         });
         //return modalSelectorMap($scope, this.$ionicModal, city, value);
@@ -66,8 +67,18 @@ class ngSelectorDialog {
         return this.createDialog({
             parent: $scope,
             scope: {options, value},
-            template: require('./selector-date-dialog.html'),
+            template: require('./date/dialog.html'),
             controller: modalSelectorDate
+        });
+        //return modalSelectorDate($scope, this.$ionicModal, this.$ionicPopup, options, value);
+    }
+
+    datespan($scope, options, value) {
+        return this.createDialog({
+            parent: $scope,
+            scope: {options, value},
+            template: require('./datespan/dialog.html'),
+            controller: modalSelectorDatespan
         });
         //return modalSelectorDate($scope, this.$ionicModal, this.$ionicPopup, options, value);
     }
@@ -75,12 +86,12 @@ class ngSelectorDialog {
 
 angular
     .module('nglibs')
-    .service('ngSelectorDialog', ngSelectorDialog)
+    .service('ngSelector', ngSelector)
     .directive('ngSelectorList', function() {
         require('./selector.scss');
         return {
             restrict: 'E',
-            template: require('./selector-list.html'),
+            template: require('./list/element.html'),
             scope: {
                 value: '=ngModel',
                 noticeMsg: '@dlgNoticeMsg',
@@ -88,9 +99,9 @@ angular
                 placeholder: '@dlgPlaceholder',
                 options: '=dlgOptions'
             },
-            controller: function($scope, $element, ngSelectorDialog) {
-                $scope.displayItem = function(item){
-                    if(item && $scope.options && $scope.options.display){
+            controller: function($scope, $element, ngSelector) {
+                $scope.displayItem = function(item) {
+                    if(item && $scope.options && $scope.options.display) {
                         return $scope.options.display(item, false);
                     }
                     return item;
@@ -99,7 +110,7 @@ angular
                     $scope.options.title = $scope.title;
                     $scope.options.placeholder = $scope.placeholder;
                     $scope.options.noticeMsg = $scope.noticeMsg;
-                    var value: any = await ngSelectorDialog.list($scope, $scope.options, $scope.value)
+                    var value: any = await ngSelector.list($scope, $scope.options, $scope.value)
                     if(value == undefined)
                         return;
                     $scope.value = value;
@@ -115,7 +126,7 @@ angular
         require('./selector.scss');
         return {
             restrict: 'E',
-            template: require('./selector-map.html'),
+            template: require('./map/element.html'),
             scope: {
                 value: '=ngModel',
                 title: '@dlgTitle',
@@ -123,9 +134,9 @@ angular
                 placeholder: '@dlgPlaceholder',
                 callbacks: '=dlgOptions'
             },
-            controller: function($scope, ngSelectorDialog) {
+            controller: function($scope, ngSelector) {
                 $scope.showSelectorDlg = async function() {
-                    var value: any = await ngSelectorDialog.map($scope, $scope.city, $scope.value)
+                    var value: any = await ngSelector.map($scope, $scope.city, $scope.value)
                     if(value == undefined)
                         return;
 
@@ -142,16 +153,16 @@ angular
         require('./selector.scss');
         return {
             restrict: 'E',
-            template: require('./selector-date.html'),
+            template: require('./date/element.html'),
             scope: {
                 value: '=ngModel',
                 title: '@dlgTitle',
                 placeholder: '@dlgPlaceholder',
                 options: '=dlgOptions'
             },
-            controller: function($scope, ngSelectorDialog) {
+            controller: function($scope, ngSelector) {
                 $scope.showSelectorDlg = async function() {
-                    var confirmed = await ngSelectorDialog.date($scope, $scope.options, $scope.value)
+                    var confirmed = await ngSelector.date($scope, $scope.options, $scope.value)
                     if(!confirmed)
                         return;
                     $scope.value = confirmed;

@@ -1,11 +1,4 @@
-<div class="ng-selector-date-day"
-     ng-class="{
-        expired: day.timestamp<options.begin||options.end<day.timestamp,
-        today: day.timestamp == options.today,
-        selected: day.timestamp == options.selected.day
-     }"
->
-
+<div class="ng-selector-date-day" ng-class="{today:today, expired:expired, selected:selected, begin:begin, end:end, span:span}">
     <div class="content">
         <div class="daynumber">{{day.day}}
             <div ng-if="day.worktime==1" class="flag workflag">班</div>
@@ -15,4 +8,7 @@
         <div class="label term" ng-if="day.term && !day.festival">{{day.term}}</div>
         <div class="label lunar" ng-if="day.lunar && !day.term && !day.festival">{{day.lunar}}</div>
     </div>
+    <div class="span begin" ng-if="begin"></div>
+    <div class="span" ng-if="span"></div>
+    <div class="span end" ng-if="end"></div>
 </div>

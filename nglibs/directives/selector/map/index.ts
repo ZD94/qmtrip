@@ -1,5 +1,5 @@
 
-import { loader as loadBaiduMap } from '../baidu-map/baiduScriptLoader';
+import { loader as loadBaiduMap } from '../../baidu-map/baiduScriptLoader';
 declare var BMap;
 declare var BMAP_STATUS_SUCCESS;
 
