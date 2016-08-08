@@ -1,9 +1,15 @@
 <ion-view title="出差统计-本月预算" id="page24">
     <ion-content padding="true" class="has-header">
-        <label class="item item-select">
-            <span class="input-label">当前统计</span>
-            <select ng-change="monthChange(queryMonth)" id="monthSelect" ng-model="queryMonth" ng-options="item.value as item.name for item in months"></select>
-        </label>
+        <div class="item item-input">
+            <i class="icon ion-plane" ng-click="monthChange()"></i>
+            <span class="input-label">{{monthSelection.showStr}}</span>
+            <i class="icon ion-plane" ng-click="monthChange(true)"></i>
+        </div>
+
+        <!--<label class="item item-select">-->
+            <!--<span class="input-label">当前统计</span>-->
+            <!--<select ng-change="monthChange(queryMonth)" id="monthSelect" ng-model="queryMonth" ng-options="item.value as item.name for item in months"></select>-->
+        <!--</label>-->
 
         <div class="button-bar">
             <button id="page24-button73" class="button button-positive  button-block">汇总</button>
@@ -68,7 +74,7 @@
                 </canvas>
                 <div class="chart_info">
                     <span>节省</span>
-                    <p class="savePercent">{{(saveMoneyChart.data[0]/saveMoneyChart.data[1]*100).toFixed(1)}}%</p>
+                    <p class="savePercent">{{(statistic.savedMoney/(statistic.completeBudget || 1)*100).toFixed(1)}}%</p>
                 </div>
             </div>
             <div class="col col-50">
@@ -77,7 +83,6 @@
                         <p>员工节省(元)</p>
                         <h2>{{statistic.savedMoney}}</h2>
                     </ion-item>
-                    <!--<div class="item_divider"></div>-->
                 </ion-list>
             </div>
         </div>

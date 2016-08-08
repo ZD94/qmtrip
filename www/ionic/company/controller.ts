@@ -30,129 +30,119 @@ export async function ManagementController($scope, Models) {
 
 export async function BudgetController($scope) {
     require('./statistics.scss');
-    let months = [];
-    let monthNow = moment().format('YYYY-MM');
-    months.push({value: monthNow, name: '本月'});
-    $scope.queryMonth = monthNow;
-
-    for(let i=1; i<6; i++) {
-        let month = moment(monthNow).subtract(i, 'months').format('YYYY-MM');
-        months.push({value: month, name: month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月')});
-    }
-
-    $scope.months = months;
-
-    $scope.staffSaves = [];
     API.require("tripPlan");
     await API.onload();
+    let formatStr = 'YYYY-MM-DD HH:mm:ss';
+    
+    let monthSelection = {
+        month: moment().format('YYYY-MM'),
+        startTime: moment().startOf('month').format(formatStr),
+        endTime: moment().endOf('month').format(formatStr),
+        showStr: `${moment().startOf('month').format('YYYY.MM.DD')}-${moment().endOf('month').format('YYYY.MM.DD')}`
+    };
+    $scope.monthSelection = monthSelection;
 
-    $scope.staffSaves = await API.tripPlan.tripPlanSaveRank({limit: 3});
-    let staff = await Staff.getCurrent();
-    let company = staff.company;
-
-    $scope.saveMoneyChart = {};
-    $scope.saveMoneyChart.labels = ["本月节省", "本月支出"];
-    $scope.saveMoneyChart.options = {
-        //legend: { display: true }, //图例
-        cutoutPercentage: 70
-    }
-    //$scope.saveMoneyChart.colors = ['#33cd5f', '#387ef5'];
-    $scope.saveMoneyChart.dataset = {
-        backgroundColor: ['#B9C9DB', '#4A90E2'],
-        borderWidth: [1, 1]
+    $scope.monthChange = async function(isAdd?: boolean) {
+        let optionFun = isAdd ? 'add' : 'subtract';
+        let queryMonth = moment( $scope.monthSelection.month)[optionFun](1, 'month');
+        let monthSelection = {
+            month: queryMonth.format('YYYY-MM'),
+            startTime: queryMonth.startOf('month').format(formatStr),
+            endTime: queryMonth.endOf('month').format(formatStr),
+            showStr: `${queryMonth.startOf('month').format('YYYY.MM.DD')}-${queryMonth.endOf('month').format('YYYY.MM.DD')}`
+        };
+        $scope.monthSelection = monthSelection;
+        await searchData();
     };
 
-    await monthChange(monthNow);
+    // $scope.staffSaves = [];
+    // $scope.staffSaves = await API.tripPlan.tripPlanSaveRank({limit: 3});
+    $scope.saveMoneyChart = {};
+    $scope.saveMoneyChart.labels = ["本月节省", "本月支出"];
+    $scope.saveMoneyChart.options = {cutoutPercentage: 70};
+    $scope.saveMoneyChart.dataset = {backgroundColor: ['#4A90E2', '#B9C9DB'], borderWidth: [1, 1]};
 
-    async function monthChange(queryMonth) {
-        let statistic = await company.statisticTripPlanOfMonth({month: queryMonth});
-        statistic.month = statistic.month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月');
+    await searchData();
+
+    async function searchData() {
+        let month = $scope.monthSelection;
+        let statistic = await API.tripPlan.statisticTripBudget({startTime: month.startTime, endTime: month.endTime});
         $scope.statistic = statistic;
-
-        $scope.saveMoneyChart.data = [statistic.savedMoney || 0, statistic.dynamicBudget || 1];
-
-        $scope.option1 = {
-            all: statistic.dynamicBudget,
-            cover: statistic.dynamicBudget,
-            title: statistic.dynamicBudget + '元'
-        };
-        $scope.isShow1 = true;
-
-        $scope.option2 = {
-            all: statistic.dynamicBudget,
-            cover: statistic.savedMoney,
-            title: statistic.savedMoney + '元'
-        };
-        $scope.isShow2 = true;
+        $scope.saveMoneyChart.data = [statistic.savedMoney || 0, statistic.expenditure || 1];
     }
-    $scope.monthChange = monthChange;
-
-    API.require('tripPlan');
-    await API.onload();
-    let ret = await API.tripPlan.statisticTripBudget({startTime: '2016-07-01 00:00:00', endTime: '2016-08-15 00:00:00'});
-    console.info(ret);
-    $scope.statistic = ret;
 }
 
 export async function BudgetStatisticsController($scope, $stateParams, Models) {
     require('./statistics.scss');
-    let months = [];
-    let monthNow = moment().format('YYYY-MM');
-    months.push({value: monthNow, name: '本月'});
-    $scope.queryMonth = monthNow;
-
-    for(let i=1; i<6; i++) {
-        let month = moment(monthNow).subtract(i, 'months').format('YYYY-MM');
-        months.push({value: month, name: month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月')});
-    }
-
-    $scope.type = $stateParams.type;
-    $scope.months = months;
-    $scope.params = {
-        // keyWord: '曹爽',
-        startTime: '2016-07-01 00:00:00',
-        endTime: '2016-08-03 23:59:59'
+    API.require('tripPlan');
+    await API.onload();
+    let type = $stateParams.type;
+    
+    let formatStr = 'YYYY-MM-DD HH:mm:ss';
+    let monthSelection = {
+        type: type,
+        month: moment().format('YYYY-MM'),
+        startTime: moment().startOf('month').format(formatStr),
+        endTime: moment().endOf('month').format(formatStr),
+        showStr: `${moment().startOf('month').format('YYYY.MM.DD')}-${moment().endOf('month').format('YYYY.MM.DD')}`
+    };
+    $scope.monthSelection = monthSelection;
+    
+    $scope.monthChange = async function(isAdd?: boolean) {
+        let optionFun = isAdd ? 'add' : 'subtract';
+        let queryMonth = moment( $scope.monthSelection.month)[optionFun](1, 'month');
+        let monthSelection = {
+            month: queryMonth.format('YYYY-MM'),
+            startTime: queryMonth.startOf('month').format(formatStr),
+            endTime: queryMonth.endOf('month').format(formatStr),
+            showStr: `${queryMonth.startOf('month').format('YYYY.MM.DD')}-${queryMonth.endOf('month').format('YYYY.MM.DD')}`
+        };
+        $scope.monthSelection = monthSelection;
+        await initData();
     };
 
-    $scope.initData = async function(type) {
-        $scope.type = type;
-        let placeholder;
+    await searchStatistics(type);
+
+    async function searchStatistics(type) {
         let modelName = '';
+        let placeholder;
+        let isSActive = false, isPActive = false, isDActive = false;
+
         switch (type) {
-            case 'S': 
-                placeholder='请输入员工姓名';
-                modelName = 'staff';
+            case 'S':
+                placeholder='请输入员工姓名';modelName = 'staff';
+                isSActive = true; isPActive = isDActive = false;
                 break;
-            case 'P': 
-                placeholder='请输入项目名称';
-                modelName = 'project';
+            case 'P':
+                placeholder='请输入项目名称';modelName = 'project';
+                isPActive = true; isSActive = isDActive = false;
                 break;
-            case 'D': 
-                placeholder='请输入部门名称';
-                modelName = 'department';
+            case 'D':
+                placeholder='请输入部门名称';modelName = 'department';
+                isDActive = true; isSActive = isPActive = false;
                 break;
             default: break;
         }
+
+        $scope.isSActive = isSActive;
+        $scope.isPActive = isPActive;
+        $scope.isDActive = isDActive;
+        $scope.modelName = modelName;
         $scope.placeholder = placeholder;
-        
-        API.require('tripPlan');
-        await API.onload();
-        let params = $scope.params;
-        params.type = type;
-        let ret = await API.tripPlan.statisticBudgetsInfo(params);
+        $scope.monthSelection.type = type;
+        await initData();
+    }
+
+    async function initData() {
+        let ret = await API.tripPlan.statisticBudgetsInfo($scope.monthSelection);
         ret = await Promise.all(ret.map(async (s) => {
-            s.keyInfo = await Models[modelName].get(s.typeKey);
+            s.keyInfo = await Models[$scope.modelName].get(s.typeKey);
             return s;
         }));
-        console.info(ret);
         $scope.statisticData = ret;
-    };
-
-    $scope.initData($scope.type);
-
-    $scope.searchStatistics = function() {
-        $scope.initData($scope.type);
     }
+
+    $scope.searchStatistics = searchStatistics;
 }
 
 export async function RecordController($scope) {
