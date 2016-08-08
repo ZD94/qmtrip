@@ -119,7 +119,7 @@ angular
             scope: {
                 value: '=ngModel',
                 title: '@dlgTitle',
-                city: '<ngSelectorPlace',
+                city: '<dlgPlace',
                 placeholder: '@dlgPlaceholder',
                 callbacks: '=dlgOptions'
             },

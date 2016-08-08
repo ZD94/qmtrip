@@ -1,0 +1,42 @@
+
+@import "../../../common/client/ionic/scss/variables";
+
+ng-selector-list,
+ng-selector-map,
+ng-selector-date {
+  height: $line-height-computed + $font-size-base;
+  line-height: $line-height-computed + $font-size-base;
+  font-size: $font-size-base;
+  flex: 1 220px;
+  width: 100%;
+  padding-right: 44px;
+  span {
+    display: block;
+    &.placeholder-div {
+      color: $input-color-placeholder;
+    }
+  }
+}
+
+.ng-selector-list{
+  .new-item{
+    color: $calm;
+  }
+}
+
+.selector-map-dialog{
+  .item{
+    padding: 10px 16px;
+    .color_key{
+      color: $positive;
+    }
+  }
+  .button{
+    &.button-block{
+      margin: 0;
+      border-radius: 0;
+    }
+  }
+}
+
+@import "./selector-date";
