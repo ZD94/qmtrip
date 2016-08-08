@@ -152,12 +152,41 @@ export async function RecordController($scope) {
     $scope.EPlanStatus = EPlanStatus;
     $scope.staffName = '';
 
+    let formatStr = 'YYYY-MM-DD HH:mm:ss';
+    let monthSelection = {
+        staffName: '',
+        month: moment().format('YYYY-MM'),
+        startTime: moment().startOf('month').format(formatStr),
+        endTime: moment().endOf('month').format(formatStr),
+        showStr: `${moment().startOf('month').format('YYYY.MM.DD')}-${moment().endOf('month').format('YYYY.MM.DD')}`
+    };
+    $scope.monthSelection = monthSelection;
+
+    $scope.monthChange = async function(isAdd?: boolean) {
+        let optionFun = isAdd ? 'add' : 'subtract';
+        let queryMonth = moment( $scope.monthSelection.month)[optionFun](1, 'month');
+        let monthSelection = {
+            staffName: $scope.monthSelection.staffName,
+            month: queryMonth.format('YYYY-MM'),
+            startTime: queryMonth.startOf('month').format(formatStr),
+            endTime: queryMonth.endOf('month').format(formatStr),
+            showStr: `${queryMonth.startOf('month').format('YYYY.MM.DD')}-${queryMonth.endOf('month').format('YYYY.MM.DD')}`
+        };
+        $scope.monthSelection = monthSelection;
+    };
+
     $scope.enterDetail = function(trip){
         if (!trip) return;
         window.location.href = "#/company/record-detail?tripid="+trip.id;
     };
 
-    $scope.searchTripPlans = async function(staffName) {
+    $scope.searchTripPlans = searchTripPlans;
+    
+    async function searchTripPlans(oldVal, newVal) {
+        let staffName = $scope.staffName;
+        console.info("oldVal=>", oldVal);
+        console.info("newVal==>", newVal);
+        console.info("$scope.staffName", $scope.staffName);
         let status = [EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.AUDITING, EPlanStatus.COMPLETE, EPlanStatus.NO_BUDGET, EPlanStatus.WAIT_COMMIT, EPlanStatus.WAIT_UPLOAD];
         $scope.tripPlans = [];
 
@@ -194,10 +223,11 @@ export async function RecordController($scope) {
             });
         }
 
-
     };
 
-    await $scope.searchTripPlans();
+    $scope.$watch("monthSelection.staffName", searchTripPlans);
+
+    // await $scope.searchTripPlans();
 }
 
 export async function RecordDetailController($scope, Models, $stateParams, $ionicPopup, $ionicLoading){

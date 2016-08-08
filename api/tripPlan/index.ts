@@ -838,7 +838,7 @@ class TripPlanModule {
     @requireParams(['id', 'auditResult'], ["reason", "expenditure"])
     @modelNotNull('tripDetail')
     static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string}): Promise<boolean> {
-        const SAVED2SCORE = 0.5;
+        const SAVED2SCORE = config.score_ratio;
         let {id, expenditure, reason, auditResult} = params;
         let tripDetail = await Models.tripDetail.get(params.id);
 

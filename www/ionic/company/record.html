@@ -1,22 +1,18 @@
 <ion-view title="出差统计-出差记录" id="page25">
     <ion-content padding="true" class="has-header">
-        <!--<div class="button-bar">-->
-            <!--<a href="#/company/budget" id="page25-button76" class="button button-stable  button-block">本月预算</a>-->
-            <!--<button id="page25-button77" class="button button-positive  button-block">出差记录</button>-->
-            <!--<a href="#/company/distribution" id="page25-button78" class="button button-stable  button-block">员工分布</a>-->
-        <!--</div>-->
-
-        <!--<div class="spacer" style="width: 300px; height: 30px;"></div>-->
+        <div class="item item-input">
+            <i class="icon ion-plane" ng-click="monthChange()"></i>
+            <span class="input-label">{{monthSelection.showStr}}</span>
+            <i class="icon ion-plane" ng-click="monthChange(true)"></i>
+        </div>
 
         <form class="list">
             <label class="item item-input">
                 <i class="icon ion-search placeholder-icon"></i>
-                <input ng-change="searchTripPlans(staffName)" type="search" placeholder="请输入员工姓名" ng-model="staffName">
+                <input type="search" placeholder="请输入员工姓名" ng-model="monthSelection.staffName">
             </label>
         </form>
         <trip-plan ng-repeat="trip in tripPlans track by trip.id" show-header="true" data="trip" show-detail-status="true" click="enterDetail" status="{{trip.status}}"></trip-plan>
-        <!--<div id="page25-markdown17 " class="getMoreOrNoMore">
-            <p>没有更多内容了</p>
         </div>-->
         <div id="page13-markdown3">
             <div ng-if="!vm.isHasNextPage" class="getMoreOrNoMore">没有更多记录了</div>

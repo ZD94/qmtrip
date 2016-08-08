@@ -50,16 +50,6 @@ export async function CreateController($scope, $storage, $loading){
         trip = {};
     }
 
-
-    //定位当前ip位置
-    /*try {
-        var position = await API.tripPlan.getIpPosition({});
-        trip.fromPlace = position.id;
-        trip.fromPlaceName = position.name;
-    } catch(err) {
-        // msgbox.log(err.msg);
-    }*/
-
     if(!trip.regenerate) {
         trip = defaultTrip;
         await $storage.local.set('trip', trip);
@@ -172,7 +162,7 @@ export async function CreateController($scope, $storage, $loading){
 
         let trip = $scope.trip;
 
-        if(!trip.place) {
+        if(!trip.place || !trip.place.value) {
             $scope.showErrorMsg('请填写出差目的地！');
             return false;
         }
@@ -187,14 +177,14 @@ export async function CreateController($scope, $storage, $loading){
             return false;
         }
 
-        if(trip.traffic && !trip.fromPlace) {
+        if(trip.traffic && (!trip.fromPlace || !trip.fromPlace.value)) {
             $scope.showErrorMsg('请选择出发地！');
             return false;
         }
 
         let params = {
-            originPlace: trip.fromPlace.id,
-            destinationPlace: trip.place.id,
+            originPlace: trip.fromPlace.value,
+            destinationPlace: trip.place.value,
             leaveDate: moment(trip.beginDate).format('YYYY-MM-DD'),
             goBackDate: moment(trip.endDate).format('YYYY-MM-DD'),
             leaveTime: moment(trip.beginDate).format('HH:mm'),
@@ -557,8 +547,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
             regenerate: true,
             beginDate: moment(tripPlan.startAt).toDate(),
             endDate: moment(tripPlan.backAt).toDate(),
-            place: tripPlan.arrivalCityCode,
-            placeName: tripPlan.arrivalCity,
+            place: {value: tripPlan.arrivalCityCode, name: tripPlan.arrivalCity},
             reasonName: tripPlan.title
         };
         if(tripDetails && tripDetails.length > 0) {
@@ -566,13 +555,11 @@ export async function ListDetailController($location, $scope , Models, $statePar
                 switch (detail.type) {
                     case ETripType.OUT_TRIP:
                         trip.traffic = true;
-                        trip.fromPlace = tripPlan.deptCityCode;
-                        trip.fromPlaceName = tripPlan.deptCity;
+                        trip.fromPlace = {value: tripPlan.deptCityCode, name: tripPlan.deptCity};
                         break;
                     case ETripType.BACK_TRIP:
                         trip.traffic = true;
-                        trip.fromPlace = tripPlan.deptCityCode;
-                        trip.fromPlaceName = tripPlan.deptCity;
+                        trip.fromPlace = {value: tripPlan.deptCityCode, name: tripPlan.deptCity};
                         trip.round = true;
                         break;
                     case ETripType.HOTEL:
