@@ -5,20 +5,71 @@ import { modalSelectorList } from './selector-list';
 import { modalSelectorMap } from './selector-map';
 import { modalSelectorDate } from './selector-date';
 
-
-class ngSelectorDialog{
-    constructor(private $ionicModal, private $ionicPopup){
+class ngSelectorDialog {
+    constructor(private $ionicModal, private $ionicPopup, private $injector) {
 
     }
 
-    list($scope, callbacks, value){
-        return modalSelectorList($scope, this.$ionicModal, callbacks, value);
+    createDialog({scope, parent, template, controller}) {
+        return new Promise((resolve, reject) => {
+            let modal = this.$ionicModal.fromTemplate(template, {
+                scope: parent,
+                animation: 'slide-in-up',
+                focusFirstInput: false
+            });
+            let $scope = modal.scope;
+            for(let k in scope) {
+                $scope[k] = scope[k];
+            }
+            $scope.modal = modal;
+            let result;
+            //$scope.$on('$destroy', function() {
+            //});
+            parent.$on('modal.hidden', function() {
+                modal.remove();
+                resolve(result);
+            });
+            parent.$on('modal.removed', function() {
+                $scope.$destroy();
+            });
+
+            $scope.confirmModal = function(value) {
+                result = value;
+                modal.hide();
+            }
+            modal.show();
+            this.$injector.invoke(controller, this, {$scope, $element: modal.$el.find('ion-modal-view')});
+        });
     }
-    map($scope, city, value){
-        return modalSelectorMap($scope, this.$ionicModal, city, value);
+
+    list($scope, options, value) {
+        return this.createDialog({
+            parent: $scope,
+            scope: {options, value},
+            template: require('./selector-list-dialog.html'),
+            controller: modalSelectorList
+        });
+        //return modalSelectorList($scope, this.$ionicModal, callbacks, value);
     }
-    date($scope, options, value){
-        return modalSelectorDate($scope, this.$ionicModal, this.$ionicPopup, options, value);
+
+    map($scope, city, value) {
+        return this.createDialog({
+            parent: $scope,
+            scope: {city, value},
+            template: require('./selector-map-dialog.html'),
+            controller: modalSelectorMap
+        });
+        //return modalSelectorMap($scope, this.$ionicModal, city, value);
+    }
+
+    date($scope, options, value) {
+        return this.createDialog({
+            parent: $scope,
+            scope: {options, value},
+            template: require('./selector-date-dialog.html'),
+            controller: modalSelectorDate
+        });
+        //return modalSelectorDate($scope, this.$ionicModal, this.$ionicPopup, options, value);
     }
 }
 
@@ -26,6 +77,7 @@ angular
     .module('nglibs')
     .service('ngSelectorDialog', ngSelectorDialog)
     .directive('ngSelector', function() {
+        require('./selector-list.scss');
         return {
             restrict: 'A',
             template: require('./selector-list.html'),
@@ -34,22 +86,26 @@ angular
                 noticeMsg: '@ngNoticeMsg',
                 title: '@ngSelectorTitle',
                 placeholder: '@ngSelectorPlaceholder',
-                callbacks: '=ngSelector'
+                options: '=ngSelector'
             },
             controller: function($scope, $element, ngSelectorDialog) {
+                $scope.displayItem = function(item){
+                    if(item && $scope.options && $scope.options.display){
+                        return $scope.options.display(item, false);
+                    }
+                    return item;
+                };
                 $scope.showSelectorDlg = async function() {
-                    var value: any = await ngSelectorDialog.list($scope, $scope.callbacks, $scope.value)
+                    $scope.options.title = $scope.title;
+                    $scope.options.placeholder = $scope.placeholder;
+                    $scope.options.noticeMsg = $scope.noticeMsg;
+                    var value: any = await ngSelectorDialog.list($scope, $scope.options, $scope.value)
                     if(value == undefined)
                         return;
+                    $scope.value = value;
 
-                    if (!value.name) {
-                        $scope.value = value;
-                    } else {
-                        $scope.value = value.name;
-                    }
-
-                    if ($scope.callbacks.done && typeof $scope.callbacks.done == 'function') {
-                        return $scope.callbacks.done(value);
+                    if($scope.options.done && typeof $scope.options.done == 'function') {
+                        return $scope.options.done(value);
                     }
                 };
             }
@@ -75,7 +131,7 @@ angular
 
                     $scope.value = value;
 
-                    if ($scope.callbacks.done && typeof $scope.callbacks.done == 'function') {
+                    if($scope.callbacks.done && typeof $scope.callbacks.done == 'function') {
                         return $scope.callbacks.done(value);
                     }
                 };
@@ -99,7 +155,7 @@ angular
                     if(!confirmed)
                         return;
                     $scope.value = confirmed;
-                    if ($scope.options.done && typeof $scope.options.done == 'function') {
+                    if($scope.options.done && typeof $scope.options.done == 'function') {
                         return $scope.options.done($scope.value);
                     }
                 };

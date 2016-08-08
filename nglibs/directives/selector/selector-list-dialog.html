@@ -1,26 +1,34 @@
 <ion-modal-view>
     <ion-header-bar class="bar-stable">
-        <h1 class="title">{{title}}</h1>
+        <h1 class="title">{{options.title}}</h1>
         <div class="button button-clear" ng-click="modal.hide()">取消</div>
     </ion-header-bar>
-    <ion-content padding="true" class="has-header">
-        <form class="list">
+    <ion-content padding="false" scroll="false" class="has-header ng-selector-list">
+        <form class="list flex-c01">
             <label class="item item-input">
                 <i class="icon ion-search placeholder-icon"></i>
-                <input ng-model="form.keyword" type="search" placeholder="{{placeholder}}">
+                <input ng-model="form.keyword" type="search" placeholder="{{options.placeholder}}">
             </label>
+            <ion-scroll>
+                <ion-list>
+                    <ion-item ng-if="value && form.keyword == ''" ng-click="confirm(value)" class="item-icon-right item-stable">
+                        已选择：<span ng-bind-html="displayItem(value)"></span>
+                        <i class="icon ion-checkmark"></i>
+                    </ion-item>
+                    <ion-item
+                            ng-repeat="option in optionItems"
+                            ng-if="displayItem(option) != displayItem(value)"
+                            ng-click="confirm(option)"
+                            ng-class="{'item-stable':disableItem(option)}"
+                    >
+                        <span ng-bind-html="displayItem(option)"></span>
+                    </ion-item>
 
-            <ion-radio ng-if="form.selected && form.keyword == ''" ng-model="form.selected" ng-value="form.selected" ng-click="confirmModal()">
-                已选择：{{form.selected.name ? form.selected.name : form.selected}}<span ng-if="form.haveSet" style="color:red; float: right;">已设置</span>
-            </ion-radio>
-
-            <ion-radio ng-repeat="option in options track by $index" ng-model="form.newSelected" ng-value="option" ng-click="confirmModal() ">
-                {{option.name ? option.name : option}}<span  ng-if="option.haveSet" style="color:red; float: right;">已设置</span>
-            </ion-radio>
-
-            <ion-radio class="new-project" ng-model="form.selected" ng-value="form.keyword" ng-click="confirmModal()" ng-if="showCreate()" class="new-project">
-                将【{{form.keyword}}】添加为新项目
-            </ion-radio>
+                    <ion-item class="new-item" ng-click="createItem(form.keyword)" ng-if="showCreate()">
+                        新建【{{form.keyword}}】
+                    </ion-item>
+                </ion-list>
+            </ion-scroll>
         </form>
     </ion-content>
 </ion-modal-view>

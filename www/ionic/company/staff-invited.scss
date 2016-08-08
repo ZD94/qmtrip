@@ -1,0 +1,8 @@
+.invied_link{
+  &:nth-child(1){
+    height: 224px;
+  }
+  &:last-child{
+    display: flex;
+  }
+}

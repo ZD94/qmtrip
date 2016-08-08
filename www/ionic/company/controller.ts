@@ -9,7 +9,6 @@ import {Department} from "api/_types/department";
 import {AccordHotel} from "api/_types/accordHotel";
 import validator = require('validator');
 import _ = require('lodash');
-import async = Q.async;
 const moment = require("moment");
 const API = require("common/api");
 var L = require("common/language");
@@ -30,6 +29,7 @@ export async function ManagementController($scope, Models) {
 }
 
 export async function BudgetController($scope) {
+    require('./statistics.scss');
     let months = [];
     let monthNow = moment().format('YYYY-MM');
     months.push({value: monthNow, name: '本月'});
@@ -87,6 +87,72 @@ export async function BudgetController($scope) {
     }
     $scope.monthChange = monthChange;
 
+    API.require('tripPlan');
+    await API.onload();
+    let ret = await API.tripPlan.statisticTripBudget({startTime: '2016-07-01 00:00:00', endTime: '2016-08-15 00:00:00'});
+    console.info(ret);
+    $scope.statistic = ret;
+}
+
+export async function BudgetStatisticsController($scope, $stateParams, Models) {
+    require('./statistics.scss');
+    let months = [];
+    let monthNow = moment().format('YYYY-MM');
+    months.push({value: monthNow, name: '本月'});
+    $scope.queryMonth = monthNow;
+
+    for(let i=1; i<6; i++) {
+        let month = moment(monthNow).subtract(i, 'months').format('YYYY-MM');
+        months.push({value: month, name: month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月')});
+    }
+
+    $scope.type = $stateParams.type;
+    $scope.months = months;
+    $scope.params = {
+        // keyWord: '曹爽',
+        startTime: '2016-07-01 00:00:00',
+        endTime: '2016-08-03 23:59:59'
+    };
+
+    $scope.initData = async function(type) {
+        $scope.type = type;
+        let placeholder;
+        let modelName = '';
+        switch (type) {
+            case 'S': 
+                placeholder='请输入员工姓名';
+                modelName = 'staff';
+                break;
+            case 'P': 
+                placeholder='请输入项目名称';
+                modelName = 'project';
+                break;
+            case 'D': 
+                placeholder='请输入部门名称';
+                modelName = 'department';
+                break;
+            default: break;
+        }
+        $scope.placeholder = placeholder;
+        
+        API.require('tripPlan');
+        await API.onload();
+        let params = $scope.params;
+        params.type = type;
+        let ret = await API.tripPlan.statisticBudgetsInfo(params);
+        ret = await Promise.all(ret.map(async (s) => {
+            s.keyInfo = await Models[modelName].get(s.typeKey);
+            return s;
+        }));
+        console.info(ret);
+        $scope.statisticData = ret;
+    };
+
+    $scope.initData($scope.type);
+
+    $scope.searchStatistics = function() {
+        $scope.initData($scope.type);
+    }
 }
 
 export async function RecordController($scope) {
@@ -766,10 +832,30 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
     }
     $scope.accordHotel = accordHotel;
 
+    var accordHotels = await Models.accordHotel.find({where: {companyId: staff.company.id}});
+
+    $scope.city = accordHotel.cityName?{name: accordHotel.cityName}:undefined;
     $scope.placeSelector = {
         query: queryPlaces,
+        display: (item, forList)=>{
+            if(forList){
+                for(let city of accordHotels){
+                    if(city.cityName == item.name)
+                        return item.name + '<span class="item-note">已设置</span>';
+                }
+            }
+            return item.name;
+        },
+        disable: (item)=>{
+            for(let city of accordHotels){
+                if(city.cityName == item.name)
+                    return true;
+            }
+            return false;
+        },
         done: function(val) {
-            $scope.accordHotel.cityCode = val.value;
+            $scope.accordHotel.cityName = val.name;
+            $scope.accordHotel.cityCode = val.id;
         }
     };
 
@@ -783,7 +869,7 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
         var places = await API.place.queryPlace({keyword: keyword});
         /*places = places.map((place)=> {
             return {name: place.name, value: place.id}
-        });*/
+        });
         places = await Promise.all(places.map(async function(place){
             var ahs = await Models.accordHotel.find({where: {companyId: staff.company.id, cityCode: place.id}});
             if(ahs && ahs.length>0){
@@ -791,7 +877,7 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
             }else{
                 return {name: place.name, value: place.id, haveSet: false}
             }
-        }))
+        }))*/
         /*if (!keyword) {
             $storage.local.set('accord_hot_cities', places);
         }*/
@@ -840,4 +926,8 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
             ]
         });
     }
+}
+
+export async function StaffInvitedController($scope){
+    require("./staff-invited.scss");
 }
