@@ -2,6 +2,7 @@
 import './storage';
 import './loading';
 import './wx-api';
+import './modal-dlg';
 
 import './AirCompany';
 import './Airport';

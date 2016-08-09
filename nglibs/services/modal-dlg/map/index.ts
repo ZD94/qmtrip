@@ -1,9 +1,9 @@
 
-import { loader as loadBaiduMap } from '../../baidu-map/baiduScriptLoader';
+import { loader as loadBaiduMap } from '../../../directives/baidu-map/baiduScriptLoader';
 declare var BMap;
 declare var BMAP_STATUS_SUCCESS;
 
-export function modalSelectorMap($scope){
+export function selectMapPointController($scope){
     $scope.showMap = false;
     loadBaiduMap('sFB94QImEEc4ve0uynf8Gt9vvKYcmECw', {retryInterval: 5000}, ()=>{});
     $scope.$on('modal.shown', function() {
@@ -12,9 +12,9 @@ export function modalSelectorMap($scope){
     });
 
     $scope.mapOptions = {
-        center: $scope.city,
+        center: $scope.options.city,
         //zoom: 12,
-        city: $scope.city,
+        city: $scope.options.city,
         scaleCtrl: false,
         overviewCtrl: false,
         enableMessage: false,

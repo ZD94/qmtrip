@@ -17,26 +17,3 @@ ng-selector-date {
     }
   }
 }
-
-.ng-selector-list{
-  .new-item{
-    color: $calm;
-  }
-}
-
-.selector-map-dialog{
-  .item{
-    padding: 10px 16px;
-    .color_key{
-      color: $positive;
-    }
-  }
-  .button{
-    &.button-block{
-      margin: 0;
-      border-radius: 0;
-    }
-  }
-}
-
-@import "./date/selector-date";

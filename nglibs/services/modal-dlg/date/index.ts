@@ -147,12 +147,13 @@ function selectorDateDayController($scope){
 }
 
 function popupSelectorTime($scope, $ionicPopup) {
-    return $ionicPopup.confirm({
-        cssClass: 'ng-selector-date-time',
+    var ret = $ionicPopup.confirm({
+        cssClass: 'ng-modal-select-time-range',
         scope: $scope,
         title: '选择时间',
         template: require('./time-range.html')
     });
+    return ret;
 }
 
 interface DateSelect {
@@ -177,7 +178,7 @@ function parseDateSelect(date: Date, timeScale: number): DateSelect{
     };
 }
 
-function selectDateController($scope, $element, value){
+function calendarController($scope, $element, value){
     initLunarCalendar();
 
     loadMonths($scope, $element);
@@ -200,13 +201,13 @@ function selectDateController($scope, $element, value){
         updateSelectedDate($scope.selected, timeScale);
     });
 
-    let options:any = $scope.dayOptions = {};
-    options.valid = $scope.valid;
-    options.today = moment().startOf('day').valueOf();
+    $scope.dayOptions = {};
+    $scope.dayOptions.valid = $scope.valid;
+    $scope.dayOptions.today = moment().startOf('day').valueOf();
 }
 
-export function modalSelectorDate($scope, $element, $ionicPopup) {
-    selectDateController($scope, $element, $scope.value);
+export function selectDateController($scope, $element, $ionicPopup) {
+    calendarController($scope, $element, $scope.value);
 
     $scope.confirm = async function(day) {
         if(day.timestamp < $scope.valid.begin || $scope.valid.end < day.timestamp)
@@ -227,10 +228,10 @@ export function modalSelectorDate($scope, $element, $ionicPopup) {
     });
 }
 
-export function modalSelectorDatespan($scope, $element, $ionicPopup) {
-    selectDateController($scope, $element, $scope.value.begin);
+export function selectDateSpanController($scope, $element, $ionicPopup) {
+    calendarController($scope, $element, $scope.value.begin);
 
-    $scope.value2 = {
+    $scope.result = {
         begin: $scope.selected,
         end: parseDateSelect($scope.value.end, $scope.timeScale)
     };
@@ -253,26 +254,26 @@ export function modalSelectorDatespan($scope, $element, $ionicPopup) {
         }
         if(!beginSelected){
             beginSelected = true;
-            $scope.valid.begin = $scope.value2.begin.day;
-            $scope.selected = $scope.value2.end;
+            $scope.valid.begin = $scope.result.begin.day;
+            $scope.selected = $scope.result.end;
 
-            if($scope.value2.end.date > $scope.value2.begin.date)
+            if($scope.result.end.date > $scope.result.begin.date)
                 return;
-            $scope.value2.end.day = moment($scope.value2.begin.date).add(1, 'day').startOf('day').valueOf();
-            updateSelectedDate($scope.value2.end, $scope.timeScale);
+            $scope.result.end.day = moment($scope.result.begin.date).add(1, 'day').startOf('day').valueOf();
+            updateSelectedDate($scope.result.end, $scope.timeScale);
             return;
         }
         $scope.confirmModal({
-            begin: $scope.value2.begin.date,
-            end: $scope.value2.end.date
+            begin: $scope.result.begin.date,
+            end: $scope.result.end.date
         });
     }
 
-    $scope.$watch('value2.begin.day', function(n, o) {
-        $scope.dayOptions.begin = $scope.value2.begin.day;
+    $scope.$watch('result.begin.day', function(n, o) {
+        $scope.dayOptions.begin = $scope.result.begin.day;
     });
-    $scope.$watch('value2.end.day', function(n, o) {
-        $scope.dayOptions.end = $scope.value2.end.day;
+    $scope.$watch('result.end.day', function(n, o) {
+        $scope.dayOptions.end = $scope.result.end.day;
     });
     $scope.$watch('selected.day', function(n, o) {
         $scope.dayOptions.selected = $scope.selected.day;
