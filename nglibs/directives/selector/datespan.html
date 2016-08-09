@@ -1,4 +1,2 @@
-<span ng-click="showSelectorDlg()">
-    <span >{{value|date:'yyyy-MM-dd HH:mm'}}</span>
-    <span class="placeholder-div" ng-if="!value || value===''">{{title}}</span>
-</span>
+<fake-input value="{{value|date:'yyyy-MM-dd HH:mm'}}" placeholder="{{title}}" ng-click="showSelectorDlg()">
+</fake-input>

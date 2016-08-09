@@ -5,7 +5,6 @@ import angular = require('angular');
 angular
     .module('nglibs')
     .directive('ngSelectorList', function() {
-        require('./selector.scss');
         return {
             restrict: 'E',
             template: require('./list.html'),
@@ -40,7 +39,6 @@ angular
         }
     })
     .directive('ngSelectorMap', function() {
-        require('./selector.scss');
         return {
             restrict: 'E',
             template: require('./map.html'),
@@ -68,18 +66,17 @@ angular
         }
     })
     .directive('ngSelectorDate', function() {
-        require('./selector.scss');
         return {
             restrict: 'E',
             template: require('./date.html'),
             scope: {
                 value: '=ngModel',
                 title: '@dlgTitle',
-                placeholder: '@dlgPlaceholder',
                 options: '=dlgOptions'
             },
             controller: function($scope, ngModalDlg) {
                 $scope.showSelectorDlg = async function() {
+                    $scope.options.title = $scope.title;
                     var confirmed = await ngModalDlg.selectDate($scope, $scope.options, $scope.value)
                     if(!confirmed)
                         return;

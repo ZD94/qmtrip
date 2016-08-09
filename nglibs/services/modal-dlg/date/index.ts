@@ -236,7 +236,7 @@ export function selectDateSpanController($scope, $element, $ionicPopup) {
         end: parseDateSelect($scope.value.end, $scope.timeScale)
     };
 
-    let beginSelected = false;
+    $scope.beginSelected = false;
     $scope.confirm = async function(day) {
         if(day.timestamp < $scope.valid.begin || $scope.valid.end < day.timestamp)
             return;
@@ -252,8 +252,8 @@ export function selectDateSpanController($scope, $element, $ionicPopup) {
                 return;
             }
         }
-        if(!beginSelected){
-            beginSelected = true;
+        if(!$scope.beginSelected){
+            $scope.beginSelected = true;
             $scope.valid.begin = $scope.result.begin.day;
             $scope.selected = $scope.result.end;
 

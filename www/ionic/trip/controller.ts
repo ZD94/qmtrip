@@ -34,7 +34,7 @@ function TripDefineFromJson(obj: any): TripDefine{
     return obj as TripDefine;
 }
 
-export async function CreateController($scope, $storage, $loading){
+export async function CreateController($scope, $storage, $loading, ngModalDlg){
     require('./trip.scss');
     API.require('tripPlan');
     await API.onload();
@@ -150,8 +150,26 @@ export async function CreateController($scope, $storage, $loading){
         }
     };
 
-    $scope.beginDateSelector = {
-        beginDate: new Date(),
+    $scope.selectDatespan = async function(){
+        let value = {
+            begin: $scope.trip.beginDate,
+            end: $scope.trip.endDate
+        }
+        value = await ngModalDlg.selectDateSpan($scope, {
+            beginDate: new Date(),
+            endDate: moment().add(1, 'year').toDate(),
+            timepicker: true,
+            title: '选择开始时间',
+            titleEnd: '选择结束时间'
+        }, value);
+        if(value){
+            $scope.trip.beginDate = value.begin;
+            $scope.trip.endDate = value.end;
+        }
+    }
+
+    $scope.endDateSelector = {
+        beginDate: $scope.trip.beginDate,
         endDate: moment().add(1, 'year').toDate(),
         timepicker: true
     };
@@ -162,7 +180,7 @@ export async function CreateController($scope, $storage, $loading){
 
         let trip = $scope.trip;
 
-        if(!trip.place || !trip.place.value) {
+        if(!trip.place || !trip.place.id) {
             $scope.showErrorMsg('请填写出差目的地！');
             return false;
         }
@@ -177,14 +195,14 @@ export async function CreateController($scope, $storage, $loading){
             return false;
         }
 
-        if(trip.traffic && (!trip.fromPlace || !trip.fromPlace.value)) {
+        if(trip.traffic && (!trip.fromPlace || !trip.fromPlace.id)) {
             $scope.showErrorMsg('请选择出发地！');
             return false;
         }
 
         let params = {
-            originPlace: trip.fromPlace.value,
-            destinationPlace: trip.place.value,
+            originPlace: trip.fromPlace.id,
+            destinationPlace: trip.place.id,
             leaveDate: moment(trip.beginDate).format('YYYY-MM-DD'),
             goBackDate: moment(trip.endDate).format('YYYY-MM-DD'),
             leaveTime: moment(trip.beginDate).format('HH:mm'),
