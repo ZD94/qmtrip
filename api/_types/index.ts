@@ -1,6 +1,6 @@
 
 import { Company, MoneyChange } from "./company";
-import { Staff, Credential, PointChange } from "./staff";
+import { Staff, Credential, PointChange, InvitedLink } from "./staff";
 import { TravelPolicy } from './travelPolicy';
 import { Department } from './department';
 import { AccordHotel } from './accordHotel';
@@ -26,7 +26,8 @@ export interface ModelsInterface {
     staff: ModelInterface<Staff>;
     credential: ModelInterface<Credential>;
     pointChange: ModelInterface<PointChange>;
-    
+    invitedLink: ModelInterface<InvitedLink>;
+
     company: ModelInterface<Company>;
     moneyChange: ModelInterface<MoneyChange>;
     
@@ -53,7 +54,8 @@ export var Models: ModelsInterface = {
     staff: new ModelDelegate<Staff>(),
     credential: new ModelDelegate<Credential>(),
     pointChange: new ModelDelegate<PointChange>(),
-    
+    invitedLink: new ModelDelegate<InvitedLink>(),
+
     company: new ModelDelegate<Company>(),
     moneyChange: new ModelDelegate<MoneyChange>(),
     

@@ -8,11 +8,13 @@
                 <form class="list">
                     <div class="item item-input">
                         <span class="input-label">选择审批人</span>
-                        <div ng-model="trip.auditUserName"
-                             ng-selector="staffSelector"
-                             ng-selector-title="选择审批人"
-                             ng-selector-placeholder="请选择审批人" class="business_chooese"
-                        ></div>
+                        <ng-selector-list
+                                ng-model="trip.auditUser"
+                                dlg-options="staffSelector"
+                                dlg-title="选择审批人"
+                                dlg-placeholder="请选择审批人"
+                                class="fake-input"
+                        ></ng-selector-list>
                     </div>
                 </form>
 

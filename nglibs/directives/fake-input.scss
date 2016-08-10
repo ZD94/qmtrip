@@ -1,0 +1,20 @@
+@import "../../common/client/ionic/scss/variables";
+
+.item-input > fake-input,
+.item-input > .fake-input {
+  flex: 1 220px;
+  width: 100%;
+  height: $line-height-computed + $font-size-base;
+  padding-right: 44px;
+  font-size: $font-size-base;
+  line-height: $line-height-computed + $font-size-base;
+}
+
+fake-input {
+  span {
+    display: block;
+    &.placeholder-div {
+      color: $input-color-placeholder;
+    }
+  }
+}

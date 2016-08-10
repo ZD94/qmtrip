@@ -832,7 +832,7 @@ class TripPlanModule {
     @requireParams(['id', 'auditResult'], ["reason", "expenditure"])
     @modelNotNull('tripDetail')
     static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string}): Promise<boolean> {
-        const SAVED2SCORE = 0.5;
+        const SAVED2SCORE = config.score_ratio;
         let {id, expenditure, reason, auditResult} = params;
         let tripDetail = await Models.tripDetail.get(params.id);
 
@@ -1114,6 +1114,153 @@ class TripPlanModule {
         };
     }
 
+
+    @clientExport
+    @requireParams([], ['startTime', 'endTime', 'isStaff'])
+    static async statisticTripBudget(params: {startTime?: string, endTime?: string, isStaff?: boolean}) {
+        let staff = await Staff.getCurrent();
+        let companyId = staff.company.id;
+
+        let selectSql = `select count(id) as "tripNum", sum(budget) as budget, sum(expenditure) as expenditure, sum(budget-expenditure) as "savedMoney" from`;
+        let completeSql = `trip_plan.trip_plans where deleted_at is null and company_id='${companyId}'`;
+
+        if(params.startTime)
+            completeSql += ` and start_at>='${params.startTime}'`;
+        if(params.endTime)
+            completeSql += ` and start_at<='${params.endTime}'`;
+        if(params.isStaff)
+            completeSql += ` and account_id='${staff.id}'`;
+
+        let planSql = `${completeSql}  and status in (${EPlanStatus.WAIT_UPLOAD}, ${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDITING}, ${EPlanStatus.AUDIT_NOT_PASS})`;
+        completeSql += ` and status=${EPlanStatus.COMPLETE}`;
+
+        let complete = `${selectSql} ${completeSql};`;
+        let plan = `${selectSql} ${planSql};`;
+
+        let completeInfo = await sequelize.query(complete);
+        let planInfo = await sequelize.query(plan);
+
+        let ret = {
+            planTripNum: 0,
+            completeTripNum: 0,
+            planBudget: 0,
+            completeBudget: 0,
+            expenditure: 0,
+            savedMoney: 0
+        };
+
+        if(completeInfo && completeInfo.length > 0 && completeInfo[0].length > 0) {
+            let c = completeInfo[0][0];
+            ret.completeTripNum = Number(c.tripNum);
+            ret.completeBudget = Number(c.budget);
+            ret.expenditure = Number(c.expenditure);
+            ret.savedMoney = Number(c.savedMoney);
+        }
+
+        if(planInfo && planInfo.length > 0 && planInfo[0].length > 0) {
+            let p = planInfo[0][0];
+            ret.planTripNum = Number(p.tripNum);
+            ret.planBudget = Number(p.budget);
+        }
+        return ret;
+    }
+
+    /**
+     * 按员工、项目、部门分类统计预算信息
+     * @param params
+     * @returns {{}}
+     */
+    @clientExport
+    @requireParams(['startTime', 'endTime', 'type'], ['keyWord'])
+    static async statisticBudgetsInfo(params: {startTime: string, endTime: string, type: string, keyWord?: string}) {
+        let staff = await Staff.getCurrent();
+        let company =staff.company;
+        let completeSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status=${EPlanStatus.COMPLETE} and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+        let planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+
+        let type = params.type;
+        let selectKey = '', modelName = '';
+        if(type == 'S' || type == 'P'){ //按员工统计
+            selectKey = type == 'S' ? 'account_id' : 'project_id';
+            modelName = type == 'S' ? 'staff' : 'project';
+            if(params.keyWord) {
+                let objs = await Models[modelName].find({where: {name: {$like: `%${params.keyWord}%`}}});
+                let selectStr = '';
+                objs.map((s) => {
+                    if(s && s.id) {
+                        selectStr+= selectStr ? `,'${s.id}'` : `'${s.id}'`;
+                    }
+                });
+                if(! selectStr || selectStr == ''){selectStr = `'${uuid.v1()}'`; }
+                completeSql += ` and ${selectKey} in (${selectStr})`;
+                planSql += ` and ${selectKey} in (${selectStr})`;
+            }
+            completeSql += ` group by ${selectKey};`;
+            planSql += ` group by ${selectKey};`;
+        }
+
+        let selectSql = `select ${selectKey}, count(1) as "tripNum", sum(budget) as budget, sum(expenditure) as expenditure, sum(budget-expenditure) as "savedMoney"`;
+        let complete =  `${selectSql} ${completeSql}`;
+        let plan = `${selectSql} ${planSql}`;
+
+        if(type == 'D') {
+            selectKey = 'departmentId';
+            completeSql = `from department.departments as d, staff.staffs as s, trip_plan.trip_plans as p where d.deleted_at is null and s.deleted_at is null and p.deleted_at is null and p.company_id='${company.id}' and d.id=s.department_id and p.account_id=s.id and p.start_at>'${params.startTime}' and p.start_at<'${params.endTime}'`;
+            planSql = `${completeSql} and p.status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING})`;
+            completeSql += ` and p.status=${EPlanStatus.COMPLETE}`;
+            if(params.keyWord) {
+                let depts = await Models.department.find({where: {name: {$like: `%${params.keyWord}%`}}});
+                let deptStr = '';
+                depts.map((s) => {
+                    if(s && s.id) {
+                        deptStr+= deptStr ? `,'${s.id}'` : `'${s.id}'`;
+                    }
+                });
+                if(! deptStr || deptStr == ''){deptStr = `'${uuid.v1()}'`; }
+                completeSql += ` and d.id in (${deptStr})`;
+                planSql += ` and d.id in (${deptStr})`;
+            }
+
+            selectSql = `select d.id as "departmentId", count(p.id) as "tripNum",sum(p.budget) as budget, sum(p.expenditure) as expenditure, sum(p.budget-p.expenditure) as "savedMoney"`;
+            complete = `${selectSql} ${completeSql} group by d.id;`;
+            plan = `${selectSql} ${planSql} group by d.id;`;
+        }
+
+        let completeInfo = await sequelize.query(complete);
+        let planInfo = await sequelize.query(plan);
+
+        let result = {};
+        if(completeInfo && completeInfo.length > 0 && completeInfo[0].length > 0) {
+            completeInfo[0].map((ret) => {
+                result[ret[selectKey]] = {
+                    typeKey: ret[selectKey],
+                    completeTripNum: Number(ret.tripNum),
+                    completeBudget: Number(ret.budget),
+                    expenditure: Number(ret.expenditure),
+                    savedMoney: Number(ret.savedMoney)
+                };
+            });
+        }
+
+        if(planInfo && planInfo.length > 0 && planInfo[0].length > 0) {
+            planInfo[0].map((ret) => {
+                let key = ret[selectKey];
+                if(!result[key]){
+                    result[key] = {};
+                }
+                result[key].typeKey = ret[selectKey];
+                result[key].planTripNum = Number(ret.tripNum);
+                result[key].planBudget = Number(ret.budget);
+                if(!result[key].expenditure) {
+                    result[key].expenditure = 0;
+                }
+            });
+        }
+
+        result = _.orderBy(_.values(result), ['expenditure'], ['desc']);
+        return result;
+    }
+
     /**
      * @method saveTripPlan
      * 生成出差计划单
@@ -1165,16 +1312,23 @@ class TripPlanModule {
     }
 
     @clientExport
-    static async tripPlanSaveRank(params: {limit?: number|string}) {
+    @requireParams([], ['limit', 'staffId', 'startTime', 'endTime'])
+    static async tripPlanSaveRank(params: {limit?: number|string, staffId?: string, startTime?: string, endTime?: string}) {
         let staff = await Staff.getCurrent();
         let companyId = staff.company.id;
-        let limit = params.limit || 5;
+        let limit = params.limit || 10;
         if (!limit || !/^\d+$/.test(limit as string) || limit > 100) {
-            limit = 5;
+            limit = 10;
         }
-        let sql = `select account_id, sum(budget) - sum(expenditure) as save from trip_plan.trip_plans where status = 4 AND company_id = '${companyId}'
-        group by account_id
-        order by save desc limit ${limit}`;
+        let sql = `select account_id, sum(budget) - sum(expenditure) as save from trip_plan.trip_plans 
+        where deleted_at is null and status = ${EPlanStatus.COMPLETE} AND company_id = '${companyId}'`;
+        if(params.staffId)
+            sql += ` and account_id = '${params.staffId}'`;
+        if(params.startTime)
+            sql += ` and start_at > '${params.startTime}'`;
+        if(params.endTime)
+            sql += ` and start_at < '${params.endTime}'`;
+        sql += `group by account_id order by save desc limit ${limit};`;
 
         let ranks = await sequelize.query(sql)
             .then(function(result) {

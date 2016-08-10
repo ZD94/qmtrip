@@ -9,7 +9,10 @@ import { getSession } from 'common/model';
 import { TableExtends, Table, Create, Field, ResolveRef, Reference } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import {PaginateInterface} from "../../common/model/interface";
+
+
 declare var API: any;
+
 
 export enum EStaffStatus {
     FORBIDDEN = 0,
@@ -136,6 +139,12 @@ export class Staff extends ModelObject implements Account {
         return API.tripPlan.getTripPlanSave({accountId: this.id});
     }
 
+    /*async createInvitedLink(){
+        var invitedLink = InvitedLink.create();
+        invitedLink = await invitedLink.save();
+        return {GoInvitedLink:GoInvitedLink + "?staffId = "+invitedLink.staff.id, invitedLink: invitedLink};
+    }*/
+
     //Account properties:
     email: string;
     mobile: string;
@@ -149,8 +158,11 @@ export class Staff extends ModelObject implements Account {
     pwdToken: string;
     oldQrcodeToken: string;
     qrcodeToken: string;
+    checkcodeToken: string;
     type: EAccountType;
     isFirstLogin: boolean;
+    isValidateMobile: boolean;
+    isValidateEmail: boolean;
 }
 
 @Table(Models.credential, "staff.")
@@ -226,6 +238,40 @@ export class PointChange extends ModelObject{
     @Field({type: Types.TEXT})
     get remark(): string {return null}
     set remark(remark: string){}
+
+}
+
+@Table(Models.invitedLink, "staff.")
+export class InvitedLink extends ModelObject{
+    constructor(target: Object) {
+        super(target);
+    }
+    @Create()
+    static create(obj?: Object): InvitedLink { return null; }
+
+    @Field({type: Types.UUID})
+    get id(): string { return Values.UUIDV1(); }
+    set id(val: string) {}
+
+    @ResolveRef({type: Types.UUID}, Models.staff)
+    get staff(): Staff { return null; }
+    set staff(val: Staff) {}
+
+    @Field({type: Types.DATE})
+    get expiresTime(): Date { return null; }
+    set expiresTime(val: Date) {}
+
+    @Field({type: Types.INTEGER, defaultValue: 1})
+    get status(): number {return 1}
+    set status(status: number){}
+
+    @Field({type: Types.STRING})
+    get goInvitedLink(): string { return ''; }
+    set goInvitedLink(val: string) {}
+
+    @Field({type:Types.STRING})
+    get linkToken(): string { return null; }
+    set linkToken(linkToken: string){}
 
 }
 

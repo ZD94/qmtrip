@@ -14,12 +14,12 @@ var msgbox = require('msgbox');
 var defaultTrip = {
     beginDate: moment().add(3, 'days').startOf('day').hour(9).toDate(),
     endDate: moment().add(4, 'days').startOf('day').hour(21).toDate(),
-    place: '',
+    place: undefined,
     placeName: '',
     reason: '',
 
     traffic: false,
-    fromPlace: '',
+    fromPlace: undefined,
     round: false,
 
     hotel: false,
@@ -34,7 +34,7 @@ function TripDefineFromJson(obj: any): TripDefine{
     return obj as TripDefine;
 }
 
-export async function CreateController($scope, $storage, $loading){
+export async function CreateController($scope, $storage, $loading, ngModalDlg){
     require('./trip.scss');
     API.require('tripPlan');
     await API.onload();
@@ -49,16 +49,6 @@ export async function CreateController($scope, $storage, $loading){
     } catch(err) {
         trip = {};
     }
-
-
-    //定位当前ip位置
-    /*try {
-        var position = await API.tripPlan.getIpPosition({});
-        trip.fromPlace = position.id;
-        trip.fromPlaceName = position.name;
-    } catch(err) {
-        // msgbox.log(err.msg);
-    }*/
 
     if(!trip.regenerate) {
         trip = defaultTrip;
@@ -100,7 +90,7 @@ export async function CreateController($scope, $storage, $loading){
         }
     };
 
-    $scope.$watch('trip.placeName', function($newVal, $oldVal) {
+    $scope.$watch('trip.place.name', function($newVal, $oldVal) {
         if ($newVal != $oldVal) {
             $scope.trip.hotelPlaceObj = undefined;
             $scope.trip.hotelPlace = '';
@@ -115,7 +105,6 @@ export async function CreateController($scope, $storage, $loading){
             }
         }
         var places = await API.place.queryPlace({keyword: keyword});
-        places = places.map((place)=> {return {name: place.name, value: place.id} });
         if (!keyword) {
             $storage.local.set('hot_cities', places);
         }
@@ -123,38 +112,11 @@ export async function CreateController($scope, $storage, $loading){
     }
     $scope.placeSelector = {
         query: queryPlaces,
-        done: function(val) {
-            $scope.trip.place = val.value;
-        }
+        display: (item)=>item.name
     };
     $scope.fromPlaceSelector = {
         query: queryPlaces,
-        done: function(val) {
-            $scope.trip.fromPlace = val.value;
-        }
-    };
-    $scope.hotelPlaceSelector = {
-        query: async function(keyword) {
-            let city = $scope.trip.place;
-            if (city) {
-                let cityId: any = city;
-                if (!/^CT_\d+$/.test(city)) {
-                    city = await API.place.getCityInfo({cityCode: city});
-                    cityId = city.id;
-                }
-                var hotelPlaces = await API.place.queryBusinessDistrict({keyword: keyword, code: cityId})
-                return hotelPlaces.map((p)=> { return { name: p.name, value: p.id} });
-            }
-            return [];
-        },
-        done: function(val) {
-            if (!val.point || !val.point.lat || !val.point.lng) {
-                $scope.showErrorMsg("获取住宿位置失败");
-                return;
-            }
-            $scope.trip.hotelPlace = val.point.lat + "," + val.point.lng
-            $scope.trip.hotelName = val.title;
-        }
+        display: (item)=>item.name
     };
     $scope.projectSelector = {
         query: async function(keyword){
@@ -164,18 +126,50 @@ export async function CreateController($scope, $storage, $loading){
                 options.where["name"] = {$like: '%'+keyword+'%'};
             }
             var projects = await Models.project.find(options);
-            return projects.map((project)=>{ return {name: project.name, value: project.id}} );
+            return projects;
         },
+        display: (item)=>item.name,
         create: async function(name){
-            console.info("function createProject...");
+            return {
+                name: name,
+                id: undefined
+            }
         },
         done: function(val) {
             $scope.trip.reason = val.name ? val.name: val;
         }
+    };
+    $scope.hotelPlaceSelector = {
+        done: function(val) {
+            if (!val.point || !val.point.lat || !val.point.lng) {
+                $scope.showErrorMsg("获取住宿位置失败");
+                return;
+            }
+            $scope.trip.hotelPlace = val.point.lat + "," + val.point.lng
+            $scope.trip.hotelName = val.title;
+        }
+    };
+
+    $scope.selectDatespan = async function(){
+        let value = {
+            begin: $scope.trip.beginDate,
+            end: $scope.trip.endDate
+        }
+        value = await ngModalDlg.selectDateSpan($scope, {
+            beginDate: new Date(),
+            endDate: moment().add(1, 'year').toDate(),
+            timepicker: true,
+            title: '选择开始时间',
+            titleEnd: '选择结束时间'
+        }, value);
+        if(value){
+            $scope.trip.beginDate = value.begin;
+            $scope.trip.endDate = value.end;
+        }
     }
 
-    $scope.beginDateSelector = {
-        beginDate: new Date(),
+    $scope.endDateSelector = {
+        beginDate: $scope.trip.beginDate,
         endDate: moment().add(1, 'year').toDate(),
         timepicker: true
     };
@@ -186,7 +180,7 @@ export async function CreateController($scope, $storage, $loading){
 
         let trip = $scope.trip;
 
-        if(!trip.place) {
+        if(!trip.place || !trip.place.id) {
             $scope.showErrorMsg('请填写出差目的地！');
             return false;
         }
@@ -201,14 +195,14 @@ export async function CreateController($scope, $storage, $loading){
             return false;
         }
 
-        if(trip.traffic && !trip.fromPlace) {
+        if(trip.traffic && (!trip.fromPlace || !trip.fromPlace.id)) {
             $scope.showErrorMsg('请选择出发地！');
             return false;
         }
 
         let params = {
-            originPlace: trip.fromPlace,
-            destinationPlace: trip.place,
+            originPlace: trip.fromPlace.id,
+            destinationPlace: trip.place.id,
             leaveDate: moment(trip.beginDate).format('YYYY-MM-DD'),
             goBackDate: moment(trip.endDate).format('YYYY-MM-DD'),
             leaveTime: moment(trip.beginDate).format('HH:mm'),
@@ -344,17 +338,15 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         query: async function(keyword) {
             let staff = await Staff.getCurrent();
             let staffs = await staff.company.getStaffs({where: {id: {$ne: staff.id}}});
-            return staffs.map((p) =>{ return  {name: p.name, value: p.id}} );
+            return staffs;
         },
-        done: function(value) {
-            trip.auditUser = value.value;
-        }
+        display: (staff)=>staff.name
     };
 
     $scope.saveTripPlan = async function() {
         let trip = $scope.trip;
 
-        if(!trip.auditUserName) {
+        if(!trip.auditUser) {
             $scope.showErrorMsg('请选择审核人！');
             return false;
         }
@@ -368,12 +360,8 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
             let staff = await Staff.getCurrent();
             let tripApprove = await API.tripPlan.saveTripApprove({budgetId: id, title: trip.reason||trip.reasonName, approveUserId: trip.auditUser});
             console.info(tripApprove);
-            let project = tripApprove.project;
 
-            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason||trip.reasonName, auditUser: trip.auditUser});
-            console.info("BudgetController=>", planTrip);
-            let tripPlan = await Models.tripPlan.get(planTrip.id);
-            console.info("BudgetController get", tripPlan);
+            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason||trip.reasonName, auditUser: trip.auditUser.id})
             window.location.href = '#/trip/committed?id='+planTrip.id;
         } catch(err) {
             alert(err.msg || err);
@@ -582,8 +570,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
             regenerate: true,
             beginDate: moment(tripPlan.startAt).toDate(),
             endDate: moment(tripPlan.backAt).toDate(),
-            place: tripPlan.arrivalCityCode,
-            placeName: tripPlan.arrivalCity,
+            place: {value: tripPlan.arrivalCityCode, name: tripPlan.arrivalCity},
             reasonName: tripPlan.title
         };
         if(tripDetails && tripDetails.length > 0) {
@@ -591,13 +578,11 @@ export async function ListDetailController($location, $scope , Models, $statePar
                 switch (detail.type) {
                     case ETripType.OUT_TRIP:
                         trip.traffic = true;
-                        trip.fromPlace = tripPlan.deptCityCode;
-                        trip.fromPlaceName = tripPlan.deptCity;
+                        trip.fromPlace = {value: tripPlan.deptCityCode, name: tripPlan.deptCity};
                         break;
                     case ETripType.BACK_TRIP:
                         trip.traffic = true;
-                        trip.fromPlace = tripPlan.deptCityCode;
-                        trip.fromPlaceName = tripPlan.deptCity;
+                        trip.fromPlace = {value: tripPlan.deptCityCode, name: tripPlan.deptCity};
                         trip.round = true;
                         break;
                     case ETripType.HOTEL:

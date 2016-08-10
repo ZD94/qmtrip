@@ -1,87 +1,87 @@
 "use strict";
 
 import angular = require('angular');
-import { modalSelectorList } from './selector-list';
-import { modalSelectorMap } from './selector-map';
-import { modalSelectorDate } from './selector-date';
 
 angular
     .module('nglibs')
-    .directive('ngSelector', function() {
+    .directive('ngSelectorList', function() {
         return {
-            restrict: 'A',
-            template: require('./selector-list.html'),
+            restrict: 'E',
+            template: require('./list.html'),
             scope: {
                 value: '=ngModel',
-                noticeMsg: '@ngNoticeMsg',
-                title: '@ngSelectorTitle',
-                placeholder: '@ngSelectorPlaceholder',
-                callbacks: '=ngSelector'
+                noticeMsg: '@dlgNoticeMsg',
+                title: '@dlgTitle',
+                placeholder: '@dlgPlaceholder',
+                options: '=dlgOptions'
             },
-            controller: function($scope, $element, $ionicModal) {
+            controller: function($scope, $element, ngModalDlg) {
+                $scope.displayItem = function(item) {
+                    if(item && $scope.options && $scope.options.display) {
+                        return $scope.options.display(item, false);
+                    }
+                    return item;
+                };
                 $scope.showSelectorDlg = async function() {
-                    var value: any = await modalSelectorList($scope, $ionicModal, $scope.value)
+                    $scope.options.title = $scope.title;
+                    $scope.options.placeholder = $scope.placeholder;
+                    $scope.options.noticeMsg = $scope.noticeMsg;
+                    var value: any = await ngModalDlg.selectFromList($scope, $scope.options, $scope.value)
                     if(value == undefined)
                         return;
+                    $scope.value = value;
 
-                    if (!value.name) {
-                        $scope.value = value;
-                    } else {
-                        $scope.value = value.name;
-                    }
-
-                    if ($scope.callbacks.done && typeof $scope.callbacks.done == 'function') {
-                        return $scope.callbacks.done(value);
+                    if($scope.options.done && typeof $scope.options.done == 'function') {
+                        return $scope.options.done(value);
                     }
                 };
             }
         }
     })
     .directive('ngSelectorMap', function() {
-        require('./selector-map.scss');
         return {
-            restrict: 'A',
-            template: require('./selector-map.html'),
+            restrict: 'E',
+            template: require('./map.html'),
             scope: {
                 value: '=ngModel',
-                title: '@ngSelectorTitle',
-                city: '<ngSelectorCity',
-                placeholder: '@ngSelectorPlaceholder',
-                callbacks: '=ngSelectorMap'
+                title: '@dlgTitle',
+                placeholder: '@dlgPlaceholder',
+                city: '<dlgPlace',
+                options: '=dlgOptions'
             },
-            controller: function($scope, $ionicModal) {
+            controller: function($scope, ngModalDlg) {
+                $scope.options.city = $scope.city;
                 $scope.showSelectorDlg = async function() {
-                    var value: any = await modalSelectorMap($scope, $ionicModal, $scope.value)
+                    var value: any = await ngModalDlg.selectMapPoint($scope, $scope.options, $scope.value)
                     if(value == undefined)
                         return;
 
                     $scope.value = value;
 
-                    if ($scope.callbacks.done && typeof $scope.callbacks.done == 'function') {
-                        return $scope.callbacks.done(value);
+                    if($scope.options.done && typeof $scope.options.done == 'function') {
+                        return $scope.options.done(value);
                     }
                 };
             }
         }
     })
     .directive('ngSelectorDate', function() {
-        require('./selector-date.scss');
         return {
-            restrict: 'A',
-            template: require('./selector-date.html'),
+            restrict: 'E',
+            template: require('./date.html'),
             scope: {
                 value: '=ngModel',
-                title: '@ngSelectorTitle',
-                placeholder: '@ngSelectorPlaceholder',
-                options: '=ngSelectorDate'
+                title: '@dlgTitle',
+                options: '=dlgOptions'
             },
-            controller: function($scope, $ionicModal, $ionicPopup) {
+            controller: function($scope, ngModalDlg) {
                 $scope.showSelectorDlg = async function() {
-                    var confirmed = await modalSelectorDate($scope, $ionicModal, $ionicPopup)
+                    $scope.options.title = $scope.title;
+                    var confirmed = await ngModalDlg.selectDate($scope, $scope.options, $scope.value)
                     if(!confirmed)
                         return;
-
-                    if ($scope.options.done && typeof $scope.options.done == 'function') {
+                    $scope.value = confirmed;
+                    if($scope.options.done && typeof $scope.options.done == 'function') {
                         return $scope.options.done($scope.value);
                     }
                 };

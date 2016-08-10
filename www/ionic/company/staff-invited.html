@@ -1,0 +1,19 @@
+<ion-view title="员工邀请" id="page28">
+    <ion-content padding="true" class="has-header">
+        <span ng-if="invitedLink" style="color: #ffffff;">将下方链接发送给同事即可邀请同事加入</span>
+        <div class="invied_link card">
+            <div class="item">
+                <div class="create_link">
+                    <a class="button button-large button-calm" ng-click="createLink()" ng-if="!invitedLink">生成链接</a>
+                    <div ng-if="invitedLink" style="white-space:normal;overflow:auto;word-break:break-all; ">{{invitedLink.goInvitedLink}}</div>
+                    <a class="button button-large button-calm" ng-click="stopLink(invitedLink)" ng-if="invitedLink">停用</a>
+                </div>
+            </div>
+            <div class="item flex-111">
+                <div>复制链接</div>
+                <div>发送短信</div>
+                <div>发送微信</div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

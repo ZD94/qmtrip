@@ -1,33 +1,20 @@
 
-import { loader as loadBaiduMap } from '../baidu-map/baiduScriptLoader';
+import { loader as loadBaiduMap } from '../../../directives/baidu-map/baiduScriptLoader';
 declare var BMap;
 declare var BMAP_STATUS_SUCCESS;
 
-export function modalSelectorMap($scope, $ionicModal, selected){
+export function selectMapPointController($scope){
     $scope.showMap = false;
     loadBaiduMap('sFB94QImEEc4ve0uynf8Gt9vvKYcmECw', {retryInterval: 5000}, ()=>{});
-    var template = require('./selector-map-dialog.html');
-    $scope.modal = $ionicModal.fromTemplate(template, {
-        scope: $scope,
-        animation: 'slide-in-up',
-        focusFirstInput: false
-    });
-    $scope.$on('$destroy', function() {
-    });
     $scope.$on('modal.shown', function() {
         $scope.showMap = true;
         $scope.$apply();
     });
-    $scope.$on('modal.hidden', function() {
-        $scope.modal.remove();
-    });
-    $scope.$on('modal.removed', function() {
-    });
 
     $scope.mapOptions = {
-        center: $scope.city,
+        center: $scope.options.city,
         //zoom: 12,
-        city: $scope.city,
+        city: $scope.options.city,
         scaleCtrl: false,
         overviewCtrl: false,
         enableMessage: false,
@@ -54,7 +41,7 @@ export function modalSelectorMap($scope, $ionicModal, selected){
     }
 
     var form = $scope.form = {
-        selected: selected,
+        selected: $scope.value,
         keyword: ''
     };
     $scope.showResults = false;
@@ -109,16 +96,4 @@ export function modalSelectorMap($scope, $ionicModal, selected){
         }
     };
 
-    return new Promise(function(resolve, reject) {
-        $scope.confirmModal = function() {
-            $scope.modal.hide();
-            resolve($scope.form.selected);
-        }
-        $scope.cancelModal = function() {
-            $scope.modal.hide();
-            resolve();
-        }
-        $scope.modal.show();
-
-    })
 }

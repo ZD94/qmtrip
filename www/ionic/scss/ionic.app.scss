@@ -20,7 +20,7 @@ $ionicons-font-path: "../fonts" !default;
 
 // Include all of Ionic
 @import "../../../common/client/ionic/scss/ionic";
-
+@import '../../font/css/font-awesome.css';
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
@@ -89,18 +89,6 @@ ion-nav-view ion-view ion-content{
     text-align: center;
     margin-top: 20px;
     color: #fff;
-  }
-  .business_chooese{
-    height: 35px;
-    line-height: 35px;
-    width: 60%;
-    span{
-      display: block;
-      font-size: 14px;
-      &.placeholder-div{
-        color: #d5d5d5;
-      }
-    }
   }
   .row {
     position: relative;

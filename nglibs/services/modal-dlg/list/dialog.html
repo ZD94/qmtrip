@@ -1,0 +1,34 @@
+<ion-modal-view>
+    <ion-header-bar class="bar-stable">
+        <h1 class="title">{{options.title}}</h1>
+        <div class="button button-clear" ng-click="modal.hide()">取消</div>
+    </ion-header-bar>
+    <ion-content padding="false" scroll="false" class="has-header ng-modal-select-list">
+        <form class="list flex-c01">
+            <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input ng-model="form.keyword" type="search" placeholder="{{options.placeholder}}">
+            </label>
+            <ion-scroll>
+                <ion-list>
+                    <ion-item ng-if="value && form.keyword == ''" ng-click="confirm(value)" class="item-icon-right item-stable">
+                        已选择：<span ng-bind-html="displayItem(value)"></span>
+                        <i class="icon ion-checkmark"></i>
+                    </ion-item>
+                    <ion-item
+                            ng-repeat="option in optionItems"
+                            ng-if="displayItem(option) != displayItem(value)"
+                            ng-click="confirm(option)"
+                            ng-class="{'item-stable':disableItem(option)}"
+                    >
+                        <span ng-bind-html="displayItem(option)"></span>
+                    </ion-item>
+
+                    <ion-item class="new-item" ng-click="createItem(form.keyword)" ng-if="showCreate()">
+                        新建【{{form.keyword}}】
+                    </ion-item>
+                </ion-list>
+            </ion-scroll>
+        </form>
+    </ion-content>
+</ion-modal-view>

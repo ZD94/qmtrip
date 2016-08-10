@@ -1,0 +1,55 @@
+.stat-label-content{
+  position: relative;
+  padding-top: 10px;
+  height: 160px;
+  .bar-header{
+    height: 30px;
+    line-height: 30px;
+  }
+  .left-div{
+    float: left;
+    position: absolute;
+    width: 65%;
+    height: 100px;
+    bottom: 10px;
+    .label-top-left{
+      float: left;
+      padding: 5px 1px;
+      padding-left: 0.5em;
+    }
+    .label-bottom-left{
+      float: left;
+      padding: 5px 1px;
+    }
+    .label-top-right{
+      float: right;
+      padding: 5px 16px 5px 0px;
+      padding-right: 0.5em;
+    }
+    .label-right{
+      float: right;
+      padding: 5px 1px;
+    }
+  }
+  .right-div{
+    float: right;
+    position: absolute;
+    right: 10px;
+    bottom: 40px;
+  }
+}
+
+.link-div{
+  a:link {
+    text-decoration: none;
+  }
+  a:visited {
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: none;
+  }
+  a:active {
+    text-decoration: none;
+  }
+}
