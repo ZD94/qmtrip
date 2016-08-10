@@ -838,7 +838,7 @@ class TripPlanModule {
     @requireParams(['id', 'auditResult'], ["reason", "expenditure"])
     @modelNotNull('tripDetail')
     static async auditPlanInvoice(params: {id: string, auditResult: EAuditStatus, expenditure?: number, reason?: string}): Promise<boolean> {
-        const SAVED2SCORE = 0.5;
+        const SAVED2SCORE = config.score_ratio;
         let {id, expenditure, reason, auditResult} = params;
         let tripDetail = await Models.tripDetail.get(params.id);
 
@@ -1135,12 +1135,8 @@ class TripPlanModule {
         let complete = `${selectSql} ${completeSql};`;
         let plan = `${selectSql} ${planSql};`;
 
-        logger.error("complete=>", complete);
-        logger.error("plan=>", plan);
         let completeInfo = await sequelize.query(complete);
         let planInfo = await sequelize.query(plan);
-        
-        logger.info(completeInfo);
 
         let ret = {
             planTripNum: 0,
@@ -1177,8 +1173,8 @@ class TripPlanModule {
     static async statisticBudgetsInfo(params: {startTime: string, endTime: string, type: string, keyWord?: string}) {
         let staff = await Staff.getCurrent();
         let company =staff.company;
-        let completeSql = `from trip_plan.trip_plans where company_id='${company.id}' and status=${EPlanStatus.COMPLETE} and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
-        let planSql = `from trip_plan.trip_plans where company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+        let completeSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status=${EPlanStatus.COMPLETE} and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+        let planSql = `from trip_plan.trip_plans where deleted_at is null and company_id='${company.id}' and status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING}) and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
 
         let type = params.type;
         let selectKey = '', modelName = '';
@@ -1207,7 +1203,7 @@ class TripPlanModule {
 
         if(type == 'D') {
             selectKey = 'departmentId';
-            completeSql = `from department.departments as d, staff.staffs as s, trip_plan.trip_plans as p where p.company_id='${company.id}' and d.id=s.department_id and p.account_id=s.id and p.start_at>'${params.startTime}' and p.start_at<'${params.endTime}'`;
+            completeSql = `from department.departments as d, staff.staffs as s, trip_plan.trip_plans as p where d.deleted_at is null and s.deleted_at is null and p.deleted_at is null and p.company_id='${company.id}' and d.id=s.department_id and p.account_id=s.id and p.start_at>'${params.startTime}' and p.start_at<'${params.endTime}'`;
             planSql = `${completeSql} and p.status in (${EPlanStatus.WAIT_UPLOAD},${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDIT_NOT_PASS}, ${EPlanStatus.AUDITING})`;
             completeSql += ` and p.status=${EPlanStatus.COMPLETE}`;
             if(params.keyWord) {
@@ -1316,16 +1312,23 @@ class TripPlanModule {
     }
 
     @clientExport
-    static async tripPlanSaveRank(params: {limit?: number|string}) {
+    @requireParams([], ['limit', 'staffId', 'startTime', 'endTime'])
+    static async tripPlanSaveRank(params: {limit?: number|string, staffId?: string, startTime?: string, endTime?: string}) {
         let staff = await Staff.getCurrent();
         let companyId = staff.company.id;
-        let limit = params.limit || 5;
+        let limit = params.limit || 10;
         if (!limit || !/^\d+$/.test(limit as string) || limit > 100) {
-            limit = 5;
+            limit = 10;
         }
-        let sql = `select account_id, sum(budget) - sum(expenditure) as save from trip_plan.trip_plans where status = 4 AND company_id = '${companyId}'
-        group by account_id
-        order by save desc limit ${limit}`;
+        let sql = `select account_id, sum(budget) - sum(expenditure) as save from trip_plan.trip_plans 
+        where deleted_at is null and status = ${EPlanStatus.COMPLETE} AND company_id = '${companyId}'`;
+        if(params.staffId)
+            sql += ` and account_id = '${params.staffId}'`;
+        if(params.startTime)
+            sql += ` and start_at > '${params.startTime}'`;
+        if(params.endTime)
+            sql += ` and start_at < '${params.endTime}'`;
+        sql += `group by account_id order by save desc limit ${limit};`;
 
         let ranks = await sequelize.query(sql)
             .then(function(result) {

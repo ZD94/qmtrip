@@ -1,6 +1,0 @@
-<div class="selected-time">
-    {{options.selected.date | date:'yyyy-MM-dd'}} {{options.selected.hour|printf:'%02d'}}:{{options.selected.minute|printf:'%02d'}}
-</div>
-<div class="range">
-    <input type="range" ng-model="options.selected.time" ng-min="0" ng-max="{{timeMax-1}}">
-</div>

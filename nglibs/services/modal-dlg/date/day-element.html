@@ -1,11 +1,4 @@
-<div class="ng-selector-date-day"
-     ng-class="{
-        expired: day.timestamp<options.begin||options.end<day.timestamp,
-        today: day.timestamp == options.today,
-        selected: day.timestamp == options.selected.day
-     }"
->
-
+<div class="ng-modal-select-date-day-element" ng-class="{today:today, expired:expired, selected:selected, begin:begin, end:end, span:span}">
     <div class="content">
         <div class="daynumber">{{day.day}}
             <div ng-if="day.worktime==1" class="flag workflag">班</div>

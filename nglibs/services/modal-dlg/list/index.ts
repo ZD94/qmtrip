@@ -2,7 +2,7 @@
 declare var API: any;
 var msgbox = require('msgbox');
 
-export async function modalSelectorList($scope) {
+export async function selectFromListController($scope) {
     let form = $scope.form = {
         keyword: ''
     };

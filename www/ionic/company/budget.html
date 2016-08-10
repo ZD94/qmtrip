@@ -1,9 +1,15 @@
 <ion-view title="出差统计-本月预算" id="page24">
     <ion-content padding="true" class="has-header">
-        <label class="item item-select">
-            <span class="input-label">当前统计</span>
-            <select ng-change="monthChange(queryMonth)" id="monthSelect" ng-model="queryMonth" ng-options="item.value as item.name for item in months"></select>
-        </label>
+        <div class="item item-input">
+            <i class="icon ion-plane" ng-click="monthChange()"></i>
+            <span class="input-label">{{monthSelection.showStr}}</span>
+            <i class="icon ion-plane" ng-click="monthChange(true)"></i>
+        </div>
+
+        <!--<label class="item item-select">-->
+            <!--<span class="input-label">当前统计</span>-->
+            <!--<select ng-change="monthChange(queryMonth)" id="monthSelect" ng-model="queryMonth" ng-options="item.value as item.name for item in months"></select>-->
+        <!--</label>-->
 
         <div class="button-bar">
             <button id="page24-button73" class="button button-positive  button-block">汇总</button>
@@ -68,7 +74,7 @@
                 </canvas>
                 <div class="chart_info">
                     <span>节省</span>
-                    <p class="savePercent">{{(saveMoneyChart.data[0]/saveMoneyChart.data[1]*100).toFixed(1)}}%</p>
+                    <p class="savePercent">{{(statistic.savedMoney/(statistic.completeBudget || 1)*100).toFixed(1)}}%</p>
                 </div>
             </div>
             <div class="col col-50">
@@ -77,35 +83,14 @@
                         <p>员工节省(元)</p>
                         <h2>{{statistic.savedMoney}}</h2>
                     </ion-item>
-                    <!--<div class="item_divider"></div>-->
                 </ion-list>
             </div>
         </div>
 
-        <!--<div class="spacer" style="width: 300px; height: 10px;"></div>-->
-        <!--<div class="row project_info">-->
-            <!--<div class="col col-50">-->
-                <!--<p>出差人数(人次)</p>-->
-                <!--<h2>{{statistic.staffNum}}</h2>-->
-            <!--</div>-->
-            <!--<div class="col col-50">-->
-                <!--<p>运行项目(个)</p>-->
-                <!--<h2>{{statistic.projectNum}}</h2>-->
-            <!--</div>-->
-        <!--</div>-->
-
         <div class="spacer" style="width: 300px; height: 10px;"></div>
         <div class="link-div">
-            <a href="#/company/record"><div class="row item item-body" style="float:left;">员工节省排行</div></a>
+            <a href="#/company/staffSavedRank"><div class="row item item-body" style="float:left;">员工节省排行</div></a>
         </div>
-
-        <div class="spacer" style="width: 300px; height: 10px;"></div>
-        <!--<div class="item-divider" ng-if="staffSaves.length>0">&nbsp;员工节省排行</div>-->
-        <!--<ion-list>-->
-            <!--<ion-item ng-repeat="v in staffSaves" style="font-size: 0.8em;">-->
-                <!--<div style="display: block; position: absolute; width: 30px; height: 30px; text-align: center; line-height: 30px; border-radius: 50%; color: white; background:#2495da;">{{v.name| limitTo: -1}}</div>-->
-                <!--<span style="padding-left: 50px;">{{v.name}}</span><span style="float: right;">{{v.save| currency: ''}}元</span>-->
-            <!--</ion-item>-->
-        <!--</ion-list>-->
+        <div class="spacer" style="width: 300px; height: 30px;"></div>
     </ion-content>
 </ion-view>
