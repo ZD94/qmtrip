@@ -1453,7 +1453,7 @@ class TripPlanModule {
                 let details = await p.getTripDetails({});
                 p.status = EPlanStatus.WAIT_UPLOAD;
 
-                if(p.auditUser && /^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}$/.test(p.auditUser)) {
+                if(p.auditUser && /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(p.auditUser)) {
                     let tripPlanLog = Models.tripPlanLog.create({tripPlanId: p.id, userId: p.auditUser, remark: '系统自动审批出差计划'});
                     await tripPlanLog.save();
                 }
