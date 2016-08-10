@@ -55,8 +55,6 @@ export async function BudgetController($scope) {
         await searchData();
     };
 
-    // $scope.staffSaves = [];
-    // $scope.staffSaves = await API.tripPlan.tripPlanSaveRank({limit: 3});
     $scope.saveMoneyChart = {};
     $scope.saveMoneyChart.labels = ["本月节省", "本月支出"];
     $scope.saveMoneyChart.options = {cutoutPercentage: 70};
@@ -934,4 +932,31 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
 
 export async function StaffInvitedController($scope){
     require("./staff-invited.scss");
+}
+
+export async function StaffSavedRankController($scope) {
+    API.require('tripPlan');
+    await API.onload();
+    $scope.isMonth = true;
+    $scope.isYear = false;
+    $scope.isAll = false;
+    $scope.staffSaves = [];
+    $scope.searchStaffSaves = searchStaffSaves;
+
+    async function searchStaffSaves(type: string) {
+        let formatStr = 'YYYY-MM-DD HH:mm:ss';
+        let options: any = {limit: 10};
+        $scope.isMonth = $scope.isYear = $scope.isAll = false;
+        $scope[type] = true;
+        
+        if(!$scope.isAll) {
+            let typeStr = $scope.isMonth ? 'month' : 'year';
+            options.startTime = moment().startOf(typeStr).format(formatStr);
+            options.endTime = moment().endOf(typeStr).format(formatStr);
+        }
+
+        $scope.staffSaves = await API.tripPlan.tripPlanSaveRank(options);
+    }
+
+    searchStaffSaves('isMonth');
 }

@@ -1312,16 +1312,23 @@ class TripPlanModule {
     }
 
     @clientExport
-    static async tripPlanSaveRank(params: {limit?: number|string}) {
+    @requireParams([], ['limit', 'staffId', 'startTime', 'endTime'])
+    static async tripPlanSaveRank(params: {limit?: number|string, staffId?: string, startTime?: string, endTime?: string}) {
         let staff = await Staff.getCurrent();
         let companyId = staff.company.id;
-        let limit = params.limit || 5;
+        let limit = params.limit || 10;
         if (!limit || !/^\d+$/.test(limit as string) || limit > 100) {
-            limit = 5;
+            limit = 10;
         }
-        let sql = `select account_id, sum(budget) - sum(expenditure) as save from trip_plan.trip_plans where status = 4 AND company_id = '${companyId}'
-        group by account_id
-        order by save desc limit ${limit}`;
+        let sql = `select account_id, sum(budget) - sum(expenditure) as save from trip_plan.trip_plans 
+        where deleted_at is null and status = ${EPlanStatus.COMPLETE} AND company_id = '${companyId}'`;
+        if(params.staffId)
+            sql += ` and account_id = '${params.staffId}'`;
+        if(params.startTime)
+            sql += ` and start_at > '${params.startTime}'`;
+        if(params.endTime)
+            sql += ` and start_at < '${params.endTime}'`;
+        sql += `group by account_id order by save desc limit ${limit};`;
 
         let ranks = await sequelize.query(sql)
             .then(function(result) {
