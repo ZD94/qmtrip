@@ -2,6 +2,7 @@
 var Cookie = require('tiny-cookie');
 var msgbox = require('msgbox');
 var API = require('common/api');
+import validator = require('validator');
 
 API.require('auth');
 
@@ -331,4 +332,134 @@ export async function ActiveController ($scope, $stateParams) {
     $scope.goLogin = function(){
         window.location.href = "index.html#/login/index";
     }
+}
+
+export async function InvitedStaffOneController ($scope, $stateParams){
+    require("./login.scss");
+    let linkId = $stateParams.linkId;
+    let sign = $stateParams.sign;
+    let timestamp = $stateParams.timestamp;
+    API.require("auth");
+    await API.onload();
+
+    API.auth.checkInvitedLink({linkId: linkId, sign: sign, timestamp: timestamp})
+        .then(async function (result) {
+            if(result){
+                $scope.inviter = result.inviter;
+                $scope.comoany = result.company;
+            }else{
+                msgbox.log("激活链接已经失效");
+                window.location.href = "index.html#/login/invalid-link";
+            }
+        })
+        .catch(function(err){
+            msgbox.log(err.msg||err);
+            window.location.href = "index.html#/login/invalid-link";
+        }).done();
+
+    $scope.goRegister = function(){
+        window.location.href = "index.html#/login/invited-staff-two?companyId="+$scope.comoany.id+"&linkId="+linkId+"&sign="+sign+"&timestamp="+timestamp;
+    }
+}
+
+export async function InvitedStaffTwoController ($scope, $stateParams){
+    let companyId = $stateParams.companyId;
+    let linkId = $stateParams.linkId;
+    let sign = $stateParams.sign;
+    let timestamp = $stateParams.timestamp;
+    API.require("checkcode");
+    API.require("auth");
+    await API.onload();
+    require("./login.scss");
+    $scope.form = {
+        mobile:'',
+        msgCode:'',
+        pwd:'',
+        name:'',
+        companyId: companyId
+    };
+
+    API.auth.checkInvitedLink({linkId: linkId, sign: sign, timestamp: timestamp})
+        .then(async function (result) {
+            if(result){
+                if(result.company.id != companyId){
+                    msgbox.log("无效链接");
+                    window.location.href = "index.html#/login/invalid-link";
+                }
+                $scope.inviter = result.inviter;
+                $scope.comoany = result.company;
+            }else{
+                msgbox.log("激活链接已经失效");
+                window.location.href = "index.html#/login/invalid-link";
+            }
+        })
+        .catch(function(err){
+            msgbox.log(err.msg||err);
+            window.location.href = "index.html#/login/invalid-link";
+        }).done();
+
+    $scope.sendCode = function(){
+        if (!$scope.form.mobile) {
+            msgbox.log("手机号不能为空");
+            return;
+        }
+        API.auth.registerCheckEmailMobile({mobile: $scope.form.mobile})
+            .then(async function(){
+                return API.checkcode.getMsgCheckCode({mobile: $scope.form.mobile})
+                    .then(function(result){
+                        $scope.form.msgTicket =  result.ticket;
+                        console.info( result.ticket);
+                    })
+            })
+            .catch(function(err){
+                msgbox.log(err.msg||err);
+            })
+
+    };
+
+    $scope.next = async function(){
+        if (!$scope.form.mobile) {
+            msgbox.log("手机号不能为空");
+            return;
+        }
+        if ($scope.form.mobile && !validator.isMobilePhone($scope.form.mobile, 'zh-CN')) {
+            msgbox.log("手机号格式不正确");
+            return;
+        }
+        if (!$scope.form.msgCode) {
+            msgbox.log("验证码不能为空");
+            return;
+        }
+        if (!$scope.form.pwd) {
+            msgbox.log("密码不能为空");
+            return;
+        }
+        if (!$scope.form.name) {
+            msgbox.log("姓名不能为空");
+            return;
+        }
+
+        API.auth.invitedStaffRegister($scope.form)
+            .then(function (result) {
+                console.info(result);
+                window.location.href = "index.html#/login/invited-staff-three?company="+result.name;
+            })
+            .catch(function(err){
+                msgbox.log(err.msg||err);
+            }).done();
+
+    }
+}
+
+export async function InvitedStaffThreeController ($scope, $stateParams){
+    require("./login.scss");
+    let company = $stateParams.company;
+    $scope.companyName = company;
+    $scope.goLogin = function(){
+        window.location.href = "index.html#/login/index";
+    }
+}
+
+export async function InvalidLinkController ($scope, $stateParams){
+    require("./login.scss");
 }

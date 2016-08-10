@@ -2,7 +2,7 @@
  * Created by seven on 16/5/9.
  */
 "use strict";
-import {EStaffRole, Staff, EStaffStatus} from "api/_types/staff";
+import {EStaffRole, Staff, EStaffStatus, InvitedLink} from "api/_types/staff";
 import {EPlanStatus, ETripType, EAuditStatus} from 'api/_types/tripPlan';
 import {TravelPolicy, MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 import {Department} from "api/_types/department";
@@ -928,6 +928,24 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
     }
 }
 
-export async function StaffInvitedController($scope){
+export async function StaffInvitedController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup){
     require("./staff-invited.scss");
+
+    var staff = await Staff.getCurrent();
+    var now = moment().format('YYYY-MM-DD HH:mm:ss');
+    var invitedLinks = await Models.invitedLink.find({where: {staffId: staff.id, status: 1, expiresTime: {$gt: now}}});
+    if(invitedLinks && invitedLinks.length > 0){
+        $scope.invitedLink = invitedLinks[0];
+    }
+    $scope.createLink = async function (){
+        var invitedLink = InvitedLink.create();
+        invitedLink = await invitedLink.save();
+        $scope.invitedLink = invitedLink;
+    }
+    $scope.stopLink = function(invitedLink){
+        invitedLink.status = 0;
+        invitedLink.save();
+        $scope.invitedLink = null;
+    }
+    console.info($scope.invitedLink);
 }

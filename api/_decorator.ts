@@ -320,6 +320,14 @@ export var condition = {
             return id && user && company && user["agencyId"] == company["agencyId"];
         }
     },
+    isSelfLink: function (idpath:string) {
+        return async function(fn, self, args) {
+            let id = _.get(args, idpath);
+            let staff = await Staff.getCurrent();
+            let link = await Models.invitedLink.get(id);
+            return link && staff && (link["staffId"] == staff.id);
+        }
+    },
     isCompanyAgency: function(idpath: string) {
         return async function (fn ,self, args) {
             let id = _.get(args, idpath);
