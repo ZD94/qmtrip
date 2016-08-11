@@ -15,7 +15,7 @@
         <ion-content padding="false" scroll="false" class="side-menu-left has-header">
             <div class="flex-c010">
                 <ion-item class="item-thumbnail-left">
-                    <div class="menu-portrait" ng-click="showTravelPolicy()">{{currentStaff.name.substring(currentStaff.name.length-2,currentStaff.name.length)}}</div>
+                    <a href="#/staff/index" class="menu-button" menu-close><div class="menu-portrait">{{currentStaff.name.substring(currentStaff.name.length-2,currentStaff.name.length)}}</div></a>
                     <h2>{{currentStaff.name}}<i class="button button-small button-stable" ng-click="showTravelPolicy()">差旅标准</i></h2>
                     <p>{{currentStaff.mobile || '暂未填写手机号'}}
                         <br>节省：{{tripPlanSave || 0}}元
