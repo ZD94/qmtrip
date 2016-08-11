@@ -533,7 +533,7 @@ export async function InvitedStaffTwoController ($scope, $stateParams){
             msgbox.log("手机号不能为空");
             return;
         }
-        API.auth.registerCheckEmailMobile({mobile: $scope.form.mobile})
+        API.auth.checkEmailAndMobile({mobile: $scope.form.mobile})
             .then(async function(){
                 return API.checkcode.getMsgCheckCode({mobile: $scope.form.mobile})
                     .then(function(result){
