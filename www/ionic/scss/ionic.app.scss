@@ -24,7 +24,9 @@ $ionicons-font-path: "../fonts" !default;
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
-
+a{
+  text-decoration: none;
+}
 .platform-wechat{
   .nav-bar-block{
     right: auto;
