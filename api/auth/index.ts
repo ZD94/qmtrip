@@ -74,6 +74,9 @@ class ApiAuth {
             var checkcodeToken = utils.getRndStr(6);
             account.checkcodeToken = checkcodeToken;
             account.isValidateMobile = true;
+            if(account.status == ACCOUNT_STATUS.NOT_ACTIVE){
+                account.status = ACCOUNT_STATUS.ACTIVE;
+            }
             await account.save();
             var expireAt = Date.now() +20 * 60 * 1000;//失效时间20分钟
             var sign = makeActiveSign(checkcodeToken, account.id, expireAt);
@@ -171,7 +174,9 @@ class ApiAuth {
             throw L.ERR.SIGN_ERROR();
         }
         account.pwd = utils.md5(pwd);
-        account.status = ACCOUNT_STATUS.ACTIVE;
+        if(account.status == ACCOUNT_STATUS.NOT_ACTIVE){
+            account.status = ACCOUNT_STATUS.ACTIVE;
+        }
         account.isValidateEmail = true;
         account.pwdToken = null;
         await account.save();
@@ -236,7 +241,9 @@ class ApiAuth {
             throw L.ERR.ACTIVE_URL_INVALID();
         }
 
-        account.status = ACCOUNT_STATUS.ACTIVE;
+        if(account.status == ACCOUNT_STATUS.NOT_ACTIVE){
+            account.status = ACCOUNT_STATUS.ACTIVE;
+        }
         account.activeToken = null;
         account.isValidateEmail = true;
         account = await account.save()
@@ -274,7 +281,9 @@ class ApiAuth {
         var ckeckMsgCode = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
 
         if(ckeckMsgCode){
-            account.status = ACCOUNT_STATUS.ACTIVE;
+            if(account.status == ACCOUNT_STATUS.NOT_ACTIVE){
+                account.status = ACCOUNT_STATUS.ACTIVE;
+            }
             account.isValidateMobile = true;
             account = await account.save()
         }else{
