@@ -1,6 +1,7 @@
+///<reference path="tripPlan.ts"/>
 import {Models, EGender, EAccountType} from 'api/_types';
 import { Company } from 'api/_types/company';
-import {TripPlan} from 'api/_types/tripPlan';
+import {TripPlan, TripApprove} from 'api/_types/tripPlan';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Department } from 'api/_types/department';
 import { Types, Values } from 'common/model';
@@ -119,16 +120,19 @@ export class Staff extends ModelObject implements Account {
         options.where.accountId = this.id;
         return Models.tripPlan.find(options);
     }
+
+    getTripApproves(options: {where?: any, limit?: number}): Promise<PaginateInterface<TripApprove>> {
+        if (!options) options = {where: {}};
+        if(!options.where) options.where = {};
+        options.where.accountId = this.id;
+        return Models.tripApprove.find(options);
+    }
     
-    getWaitApproveTripPlans(options: {where?: any, limit?: number}): Promise<PaginateInterface<TripPlan>> {
-        if (!options) {
-            options = {where: {}};
-        }
-        if(!options.where) {
-            options.where = {}
-        }
-        options.where.auditUser = this.id;
-        return Models.tripPlan.find(options);
+    getTripApprovesByApproverUser(options: {where?: any, limit?: number}): Promise<PaginateInterface<TripApprove>> {
+        if (!options) options = {where: {}};
+        if(!options.where) options.where = {};
+        options.where.approveUserId = this.id;
+        return Models.tripApprove.find(options);
     }
 
     async getTripPlanSave(){

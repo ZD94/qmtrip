@@ -883,7 +883,7 @@ class TripPlanModule {
             templateValue.reason = reason;
             templateName = 'qm_notify_invoice_not_pass';
         } else {
-            throw L.ERR.PERMISSION_DENIED(); //代理商只能审核票据权限
+            throw L.ERR.PERMISSION_DENY(); //代理商只能审核票据权限
         }
 
 
@@ -1441,9 +1441,10 @@ class TripPlanModule {
     static async saveTripApprove(params) {
         let staff = await Staff.getCurrent();
         let company = staff.company;
+        logger.warn(params);
 
         if(company.isApproveOpen && !params.approveUserId) { //企业开启审核功能后，审核人不能为空
-            throw {code: -3, msg: '审批人不能为空'};
+            throw {code: -2, msg: '审批人不能为空'};
         }
 
         let budgetInfo = await API.travelBudget.getBudgetInfo({id: params.budgetId});
@@ -1453,20 +1454,17 @@ class TripPlanModule {
         }
 
         let {budgets, query} = budgetInfo;
-        let project = await getProjectByName({companyId: company.id, name: params.title, userId: staff.id, isCreate: true});
         let totalBudget = 0;
+        budgets.map((b) => {totalBudget += Number(b.price);});
+        let project = await getProjectByName({companyId: company.id, name: params.title, userId: staff.id, isCreate: true});
         let tripApprove =  TripApprove.create(params);
 
         if(params.approveUserId) {
             let approveUser = await Models.staff.get(params.approveUserId);
-            if(!approveUser) {
+            if(!approveUser)
                 throw {code: -3, msg: '审批人不存在'}
-            }
-
-            if(tripApprove.approveUser && tripApprove['approveUser'].id == staff.id) {
-                throw {code: -2, msg: '审批人不能是自己'};
-            }
-
+            if(tripApprove.approveUser && tripApprove['approveUser'].id == staff.id)
+                throw {code: -4, msg: '审批人不能是自己'};
             tripApprove.approveUser = approveUser;
         }
 
@@ -1478,7 +1476,7 @@ class TripPlanModule {
         tripApprove.backAt = query.goBackDate;
         tripApprove.query = JSON.stringify(query);
 
-        logger.warn("query=>", query);
+        logger.warn("budgets=>", budgets);
 
         let arrivalInfo = await API.place.getCityInfo({cityCode: query.destinationPlace}) || {name: null};
 
@@ -1494,8 +1492,8 @@ class TripPlanModule {
         tripApprove.isNeedHotel = query.isNeedHotel;
         tripApprove.isRoundTrip = query.isRoundTrip;
         tripApprove.budgetInfo = budgets;
-        tripApprove.totalBudget = totalBudget; 
-        tripApprove.status = totalBudget<0 ? EApproveStatus.NO_BUDGET : EApproveStatus.WAIT_APPROVE;
+        tripApprove.budget = totalBudget;
+        tripApprove.status = totalBudget <0 ? EApproveStatus.NO_BUDGET : EApproveStatus.WAIT_APPROVE;
 
         let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, remark: '提交出差审批'});
 
@@ -1518,12 +1516,44 @@ class TripPlanModule {
 
         await tripPlanLog.save();
         await tripApprove.save();
-        logger.info(tripApprove);
         return tripApprove;
     }
+    
+    @clientExport
+    @requireParams(['id'])
+    static async getTripApprove(params: {id: string}): Promise<TripApprove> {
+        let staff = await Staff.getCurrent();
+        let staffId = staff.id;
+        let approve = await Models.tripApprove.get(params.id);
+        if(approve.account.id != staffId && approve.approveUser.id != staffId)
+            throw L.ERR.PERMISSION_DENY();
+        return approve;
+    }
+    
+    @clientExport
+    static updateTripApprove(params): Promise<TripApprove> {
+        return Models.tripApprove.update(params);
+    }
+    
+    @clientExport
+    static async getTripApproves(options: any): Promise<FindResult> {
+        let staff = await Staff.getCurrent();
+        if(!options.where) options.where = {};
+        options.order = options.order || [['start_at', 'desc'], ['created_at', 'desc']];
+        let paginate = await Models.tripApprove.find(options);
+        return {ids: paginate.map((approve) => {return approve.id;}), count: paginate["total"]}
+    }
 
-
-
+    @clientExport
+    @requireParams(['id'])
+    @modelNotNull('tripApprove')
+    static async deleteTripApprove(params: {id: string}): Promise<boolean> {
+        let tripApprove = await Models.tripApprove.get(params.id);
+        await tripApprove.destroy();
+        return true;
+    }
+    
+    
     static __initHttpApp = require('./invoice');
 
     static _scheduleTask () {

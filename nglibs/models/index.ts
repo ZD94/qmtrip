@@ -71,6 +71,9 @@ var Services = {
     agencyUser: { type: AgencyUser, modname: 'agency',
         funcs: ['getAgencyUser', 'listAgencyUser', 'createAgencyUser', 'updateAgencyUser', 'deleteAgencyUser']
     },
+    tripApprove: { type: TripApprove, modname: 'tripPlan',
+        funcs: ['getTripApprove', 'getTripApproves', 'saveTripApprove', 'updateTripApprove', 'deleteTripApprove']
+    },
     tripPlan: { type: TripPlan, modname: 'tripPlan',
         funcs: ['getTripPlan', 'listTripPlans', 'saveTripPlan', 'updateTripPlan', 'deleteTripPlan']
     },
@@ -151,7 +154,7 @@ class ClientModels implements ModelsInterface {
         this.tripPlanLog = createService<TripPlanLog>(Services.tripPlanLog, $cacheFactory);
         this.moneyChange = createService<MoneyChange>(Services.moneyChange, $cacheFactory);
         this.project = createService<Project>(Services.project, $cacheFactory);
-        //this.place = createService<Place>(Services.place, $cacheFactory);
+        this.tripApprove = createService<TripApprove>(Services.tripApprove, $cacheFactory);
         this.account = createService<Account>(Services.account, $cacheFactory);
         this.token = createService<Token>(Services.token, $cacheFactory);
         this.seed = createService<Seed>(Services.seed, $cacheFactory);

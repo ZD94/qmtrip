@@ -2,10 +2,16 @@
  * Created by seven on 16/4/25.
  */
 "use strict";
-import {EPlanStatus, ETripType, EAuditStatus, EInvoiceType, MTxPlaneLevel} from "api/_types/tripPlan";
+import {ETripType, EAuditStatus, EInvoiceType, MTxPlaneLevel, EApproveStatus} from "api/_types/tripPlan";
 import {Staff} from "api/_types/staff";
 import moment = require('moment');
 const API = require("common/api")
+let APPROVE_TEXT: any = {};
+APPROVE_TEXT[EApproveStatus.CANCEL] = '已撤销';
+APPROVE_TEXT[EApproveStatus.NO_BUDGET] = '没有预算';
+APPROVE_TEXT[EApproveStatus.PASS] = '审批通过';
+APPROVE_TEXT[EApproveStatus.REJECT] = '审批驳回';
+APPROVE_TEXT[EApproveStatus.WAIT_APPROVE] = '等待审批';
 
 export async function ApprovedController($scope, Models, $stateParams){
     let staffId = $stateParams.staffId;
@@ -15,219 +21,97 @@ export async function ApprovedController($scope, Models, $stateParams){
 
 export async function DetailController($scope, Models, $stateParams, $ionicPopup, $ionicLoading){
     require('./trip-approval.scss');
-    let tripId = $stateParams.tripid;
-    let tripPlan = await Models.tripPlan.get(tripId);
+    let approveId = $stateParams.approveId;
+    let tripApprove = await Models.tripApprove.get(approveId);
+    $scope.staff = tripApprove.account;
+    $scope.APPROVE_TEXT = APPROVE_TEXT;
 
-    $scope.tripPlan = tripPlan;
-    let staff = tripPlan.account; //await Models.staff.get(tripPlan.accountId);
-    $scope.staff = staff;
-    
     //判断有无审批权限
     let isHasPermissionApprove = false;
     let curStaff = await Staff.getCurrent();
-    if(curStaff.id == tripPlan.auditUser) { isHasPermissionApprove = true;}
+    if(tripApprove.approveUser && curStaff.id == tripApprove.approveUser.id) { isHasPermissionApprove = true;}
     $scope.isHasPermissionApprove = isHasPermissionApprove;
-    
-    let tripDetails = await tripPlan.getTripDetails();
-    let traffic = [], hotel = [];
-    let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
-    let subsidyDays:number = moment(tripPlan.backAt).diff(moment(tripPlan.startAt), 'days');
     let totalBudget: number = 0;
-    let budgetId;
-    if (tripPlan.status == EPlanStatus.WAIT_APPROVE && tripPlan.query) {
-        await $ionicLoading.show({
-            template: '预算计算中...'
-        });
-        //计算最终预算
-        API.require("travelBudget");
-        await API.onload();
-        let query = tripPlan.query;
-        if (typeof query == 'string') {
-            query = JSON.parse(tripPlan.query);
-        }
 
-        query.staffId = tripPlan.accountId;
-        budgetId = await API.travelBudget.getTravelPolicyBudget(query);
-        let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: tripPlan.accountId});
-        let budgets = budgetInfo.budgets;
+    // if (tripApprove.status == EApproveStatus.WAIT_APPROVE && tripApprove.query && isHasPermissionApprove) {
+    //     await $ionicLoading.show({template: '预算计算中...'});
+    //     //计算最终预算
+    //     API.require("travelBudget");
+    //     await API.onload();
+    //     let query = tripApprove.query;
+    //
+    //     if (typeof query == 'string')
+    //         query = JSON.parse(tripApprove.query);
+    //
+    //     query.staffId = tripApprove.account.id;
+    //     let budgetId = await API.travelBudget.getTravelPolicyBudget(query);
+    //     $scope.budgetId = budgetId;
+    //     let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.accountId});
+    //     let budgets = budgetInfo.budgets;
+    //
+    //     totalBudget = 0;
+    //     budgets.forEach((v) => {
+    //         if (v.price <= 0) {
+    //             totalBudget = -1;
+    //             return;
+    //         }
+    //         totalBudget += Number(v.price);
+    //     });
+    //
+    //     if (totalBudget > tripApprove.budget) {
+    //         tripApprove.budget = totalBudget;
+    //         tripApprove.budgetInfo = budgets;
+    //     }
+    // }
 
-        totalBudget = 0;
-        budgets.forEach((v) => {
-            if (v.price <= 0) {
-                totalBudget = -1;
-                return;
-            }
-            totalBudget += Number(v.price);
-        });
-
-        if (totalBudget > tripPlan.budget) {
-            let outTraffic: any = {}, backTraffic: any = {}, hotelDetail: any = {};
-            tripDetails.map((detail) => {
-                switch (detail.type) {
-                    case ETripType.OUT_TRIP: outTraffic = detail; break;
-                    case ETripType.BACK_TRIP: backTraffic = detail; break;
-                    case ETripType.HOTEL: hotelDetail = detail; break;
-                    default: break;
-                }
-            });
-
-            budgets.forEach((v) => {
-                switch(v.tripType) {
-                    case ETripType.OUT_TRIP:
-                    case ETripType.BACK_TRIP:
-                        if(v.tripType == 0) {
-                            if(Number(totalBudget) > tripPlan.budget){
-                                outTraffic.cabinClass = v.cabinClass;
-                                outTraffic.invoiceType = v.type;
-                                outTraffic.budget = v.price;
-                            }
-                            traffic.push(outTraffic);
-                            trafficBudget += Number(outTraffic.budget);
-                        }else if(v.tripType == 1) {
-                            if(Number(totalBudget) > tripPlan.budget){
-                                backTraffic.cabinClass = v.cabinClass;
-                                backTraffic.invoiceType = v.type;
-                                backTraffic.budget = v.price;
-                            }
-                            traffic.push(backTraffic);
-                            trafficBudget += Number(backTraffic.budget);
-                        }
-                        break;
-                    case ETripType.HOTEL:
-                        if(Number(totalBudget) > tripPlan.budget)
-                            hotelDetail.budget = v.price;
-                        hotel.push(hotelDetail);
-                        hotelBudget += Number(hotelDetail.budget);
-                        break;
-                    default:
-                        subsidyBudget += Number(v.price);
-                        break;
-                }
-            });
-            totalBudget = Number(totalBudget) > tripPlan.budget ? totalBudget : tripPlan.budget;
-
-            API.require("place");
-            await API.onload();
-            let originCity = await API.place.getCityInfo({cityCode: query.originPlace});
-            let destinationCity;
-            if (query.destinationPlace) {
-                destinationCity = await API.place.getCityInfo({cityCode: query.destinationPlace});
-            }
-            tripDetails = budgets.map( (v) => {
-                let ret: any = {
-                    budget: v.price,
-                    startTime: query.leaveDate,
-                    endTime: query.goBackDate,
-                    invoiceType: v.type,
-                    status: EPlanStatus.WAIT_APPROVE,
-                    type: v.tripType,
-                    cabinClass: v.cabinClass,
-                }
-
-                if (v.tripType == ETripType.OUT_TRIP) {
-                    ret.deptCity = originCity.name;
-                    ret.arrivalCity = destinationCity.name;
-                } else if (v.tripType == ETripType.BACK_TRIP) {
-                    ret.startTime = query.goBackDate;
-                    ret.deptCity = destinationCity.name;
-                    ret.arrivalCity = originCity.name;
-                } else if (v.tripType == ETripType.HOTEL) {
-                    ret.city = destinationCity.name;
-                } else {
-                    ret.title = '补助';
-                    ret.showBudget = v.price;
-                }
-                return ret;
-            });
-        } else {
-            //如果总预算<=之前预算,采用之前预算
-            totalBudget = tripPlan.budget as number;
-            tripDetails.forEach(function(detail) {
-                switch (detail.type) {
-                    case ETripType.OUT_TRIP:
-                        traffic.push(detail);
-                        trafficBudget += detail.budget;
-                        break;
-                    case ETripType.BACK_TRIP:
-                        traffic.push(detail);
-                        trafficBudget += detail.budget;
-                        break;
-                    case ETripType.HOTEL:
-                        hotel.push(detail);
-                        hotelBudget += detail.budget;
-                        break;
-                    default: subsidyBudget += detail.budget; break;
-                }
-            });
-        }
-        await $ionicLoading.hide();
-    } else {
-        //如果不是待审批状态,采用之前预算
-        totalBudget = tripPlan.budget as number;
-        tripDetails.forEach(function(detail) {
-            switch (detail.type) {
-                case ETripType.OUT_TRIP:
-                    traffic.push(detail);
-                    trafficBudget += detail.budget;
-                    break;
-                case ETripType.BACK_TRIP:
-                    traffic.push(detail);
-                    trafficBudget += detail.budget;
-                    break;
-                case ETripType.HOTEL:
-                    hotel.push(detail);
-                    hotelBudget += detail.budget;
-                    break;
-                default: subsidyBudget += detail.budget; break;
-            }
-        });
-    }
-
-    tripDetails.map( (v) => {
-        switch(v.type) {
-            case ETripType.BACK_TRIP:
-                v.title = ""
-                v.showBudget = "";
-                break;
+    let traffic = [], hotel = [], subsidy = [];
+    let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
+    let subsidyDays:number = moment(tripApprove.backAt).diff(moment(tripApprove.startAt), 'days');
+    tripApprove.budgetInfo.map((budget) => {
+        budget.startTime = tripApprove.startAt;
+        budget.endTime = tripApprove.backAt;
+        switch (budget.tripType) {
             case ETripType.OUT_TRIP:
-                v.title = '交通';
-                v.showBudget = trafficBudget;
+                budget.deptCity = tripApprove.deptCity;
+                budget.arrivalCity = tripApprove.arrivalCity;
+                traffic.push(budget);
+                trafficBudget += Number(budget.price);
+                break;
+            case ETripType.BACK_TRIP:
+                budget.deptCity = tripApprove.arrivalCity;
+                budget.arrivalCity = tripApprove.deptCity;
+                budget.startTime = tripApprove.backAt;
+                budget.endTime = tripApprove.startAt;
+                traffic.push(budget);
+                trafficBudget += Number(budget.price);
                 break;
             case ETripType.HOTEL:
-                v.title = '住宿';
-                v.showBudget = v.budget;
+                budget.city = tripApprove.arrivalCity;
+                hotel.push(budget);
+                hotelBudget += Number(budget.price);
                 break;
-            default:
-                v.title = '补助';
-                v.showBudget = v.budget;
-                break;
+            case ETripType.SUBSIDY: subsidy.push(budget); subsidyBudget += Number(budget.price); break;
         }
-        return v;
-    })
+    });
 
-    tripDetails.sort((v1, v2) => {
-        return v1.type - v2.type;
-    })
-    $scope.tripDetails = tripDetails;
-    $scope.totalBudget = totalBudget;
-    $scope.tripPlan.budget = totalBudget;
+    $scope.tripApprove = tripApprove;
     $scope.traffic = traffic;
     $scope.hotel = hotel;
+    $scope.subsidy = subsidy;
     $scope.trafficBudget = trafficBudget;
     $scope.hotelBudget = hotelBudget;
     $scope.subsidyBudget = subsidyBudget;
     $scope.subsidyDays = subsidyDays;
-    $scope.approveResult = EAuditStatus;
-    $scope.EPlanStatus = EPlanStatus;
     $scope.EInvoiceType = EInvoiceType;
+    $scope.EApproveStatus = EApproveStatus;
     $scope.MTxPlaneLevel = MTxPlaneLevel;
 
 
     async function approve(result: EAuditStatus, auditRemark?: string) {
         try{
-            await tripPlan.approve({auditResult: result, auditRemark: auditRemark, budgetId: budgetId});
+            await tripApprove.approve({auditResult: result, auditRemark: auditRemark, budgetId: $scope.budgetId});
             if(result == EAuditStatus.PASS) {
-                window.location.href = "#/trip-approval/approved?staffId="+tripPlan.account.id;
+                window.location.href = "#/trip-approval/approved?staffId="+tripApprove.account.id;
             }
         }catch (e) {
             alert(e);
@@ -295,40 +179,36 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
     const ONE_PAGE_LIMIT = 10;
     let Pager;
     $scope.filter = 'WAIT_APPROVE';
-    $scope.EPlanStatus = EPlanStatus;
-    $scope.tripPlans = [];
+    $scope.EApproveStatus = EApproveStatus;
+    $scope.tripApproves = [];
+    $scope.APPROVE_TEXT = APPROVE_TEXT;
+    
     $scope.changeTo = async function(filter) {
-        $scope.tripPlans = [];
+        $scope.tripApproves = [];
         if (['WAIT_APPROVE', 'ALL', 'APPROVE_PASS', 'APPROVE_FAIL'].indexOf(filter) >= 0) {
             $scope.filter = filter;
         }
         let status: string|number|Object = 'ALL';
         switch(filter) {
-            case 'WAIT_APPROVE':
-                status = EPlanStatus.WAIT_APPROVE;
-                break;
-            case 'APPROVE_PASS':
-                status = [EPlanStatus.WAIT_UPLOAD, EPlanStatus.AUDITING, EPlanStatus.COMPLETE, EPlanStatus.WAIT_COMMIT, EPlanStatus.AUDIT_NOT_PASS];
-                break;
-            case 'APPROVE_FAIL':
-                status = EPlanStatus.APPROVE_NOT_PASS;
-                break;
+            case 'WAIT_APPROVE': status = EApproveStatus.WAIT_APPROVE; break;
+            case 'APPROVE_PASS': status = EApproveStatus.PASS; break;
+            case 'APPROVE_FAIL': status = EApproveStatus.REJECT; break;
         }
         let where: any = {};
-        if (status != 'ALL') {
-            where.status = status;
-        }
-        Pager = await staff.getWaitApproveTripPlans({ where: where, limit: ONE_PAGE_LIMIT}); //获取待审批出差计划列表
+        if (status != 'ALL') where.status = status;
+        Pager = await staff.getTripApprovesByApproverUser({ where: where, limit: ONE_PAGE_LIMIT}); //获取待审批出差计划列表
         Pager.forEach(function(v) {
-            $scope.tripPlans.push(v);
+            $scope.tripApproves.push(v);
         })
-    }
+    };
+
     $scope.hasNextPage = function() : Boolean{
         if (!Pager) return false;
         return Pager.totalPages - 1 > Pager.curPage;
-    }
+    };
 
-    $scope.changeTo($scope.filter);
+    await $scope.changeTo($scope.filter);
+    
     $scope.loadMore = async function() {
         if (!Pager) {
             $scope.$broadcast('scroll.infiniteScrollComplete');
@@ -337,42 +217,37 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
         try {
             Pager = await Pager.nextPage();
             Pager.forEach(function(v) {
-                $scope.tripPlans.push(v);
+                $scope.tripApproves.push(v);
             });
         } catch(err) {
             alert("加载数据发生错误");
         } finally {
             $scope.$broadcast('scroll.infiniteScrollComplete');
         }
-    }
+    };
 
-    $scope.enterDetail = function(trip){
-        if (!trip) return;
-        window.location.href = "#/trip-approval/detail?tripid="+trip.id;
+    $scope.enterDetail = function(approveId){
+        if (!approveId) return;
+        window.location.href = `#/trip-approval/detail?approveId=${approveId}`;
     }
 }
 
 export async function PendingController($scope){
     const PAGE_SIZE = 10;
     let staff = await Staff.getCurrent();
-    let Pager = await staff.getTripPlans({where: {status: [EPlanStatus.WAIT_APPROVE, EPlanStatus.APPROVE_NOT_PASS, EPlanStatus.CANCEL]}, limit: PAGE_SIZE}); //获取待审批出差计划列表
-    $scope.tripPlans = [];
-
-    Pager.forEach(function(v) {
-        $scope.tripPlans.push(v);
-    })
+    let tripApproves = [];
+    let Pager = await staff.getTripApproves({where: {status: [EApproveStatus.CANCEL, EApproveStatus.PASS, EApproveStatus.REJECT, EApproveStatus.WAIT_APPROVE]}, limit: PAGE_SIZE})
+    $scope.hasNextPage = (!Pager || !Pager.length) ? false : true;
+    Pager.forEach((a) => {tripApproves.push(a);});
+    $scope.tripApproves = tripApproves;
     $scope.Pager = Pager;
-    $scope.EPlanStatus = EPlanStatus;
-    
-    $scope.enterDetail = function(tripid){
-        window.location.href = "#/trip/list-detail?tripid="+tripid;
-    }
+    $scope.EApproveStatus = EApproveStatus;
+    console.info($scope.tripApproves);
 
-    if (!Pager || !Pager.length) {
-        $scope.hasNextPage = false;
-    } else {
-        $scope.hasNextPage = true;
-    }
+    $scope.enterDetail = function(approveId){
+        window.location.href = `#/trip-approval/detail?approveId=${approveId}`;
+    };
+
     $scope.loadMore = async function() {
         if (!$scope.Pager) {
             $scope.$broadcast('scroll.infiniteScrollComplete');
@@ -381,8 +256,8 @@ export async function PendingController($scope){
         try {
             $scope.Pager = await $scope.Pager.nextPage();
             $scope.Pager.map(function(v) {
-                $scope.tripPlans.push(v);
-            })
+                $scope.tripApproves.push(v);
+            });
             $scope.hasNextPage = true;
         } catch (err) {
             $scope.hasNextPage = false;

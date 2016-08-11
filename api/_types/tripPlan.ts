@@ -21,10 +21,11 @@ export enum EPlanStatus {
 }
 
 export enum EApproveStatus {
-    NO_BUDGET = -2,
-    REJECT = -1,
-    WAIT_APPROVE = 0,
-    PASS = 1
+    CANCEL = -3, //撤销状态
+    NO_BUDGET = -2, //没有预算
+    REJECT = -1, //审批驳回
+    WAIT_APPROVE = 0, //待审批
+    PASS = 1 //审批通过
 }
 
 export enum ETripType {
@@ -543,8 +544,8 @@ export class TripApprove extends ModelObject{
     set backAt(val: Date) {}
 
     @Field({type: Types.DOUBLE})
-    get totalBudget(): number { return 0; }
-    set totalBudget(val: number) {}
+    get budget(): number { return 0; }
+    set budget(val: number) {}
 
     @Field({type: Types.JSONB})
     get budgetInfo(): any { return []; }
