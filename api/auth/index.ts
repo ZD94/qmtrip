@@ -4,8 +4,8 @@
 "use strict";
 import {requireParams, clientExport} from "../../common/api/helper";
 import { Models, EAccountType } from "api/_types";
-import {AuthCert, Token, Account, AccountOpenid} from "api/_types/auth"
-import {Staff} from "api/_types/staff";
+import {AuthCert, Token, Account, AccountOpenid, ACCOUNT_STATUS} from "api/_types/auth";
+import {Staff, EInvitedLinkStatus} from "api/_types/staff";
 import validator = require('validator');
 import _ = require('lodash');
 import { getSession } from '../../common/model/client';
@@ -25,15 +25,8 @@ var logger = new Logger('auth');
 let msgConfig = C.message;
 var accountCols = Account['$fieldnames'];
 
-var ACCOUNT_STATUS = {
-    ACTIVE: 1,
-    NOT_ACTIVE: 0,
-    FORBIDDEN: -1
-};
-var INVITED_LINK_STATUS = {
-    ACTIVE: 1,
-    FORBIDDEN: 0
-};
+
+
 
 var ACCOUNT_TYPE = {
     COMPANY_STAFF: 1,
@@ -314,7 +307,7 @@ class ApiAuth {
         if(!il){
             throw L.ERR.INVITED_URL_INVALID();
         }
-        if (il.status !== INVITED_LINK_STATUS.ACTIVE) {
+        if (il.status !== EInvitedLinkStatus.ACTIVE) {
             throw L.ERR.INVITED_URL_FORBIDDEN();
         }
 
@@ -807,13 +800,13 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
                 }
 
                 //第四步查看账号是否激活
-                if (!loginAccount.pwd && loginAccount.status == ACCOUNT_STATUS.NOT_ACTIVE) {
+                /*if (!loginAccount.pwd && loginAccount.status == ACCOUNT_STATUS.NOT_ACTIVE) {
                     throw L.ERR.ACCOUNT_NOT_ACTIVE();
                 }
 
                 if (loginAccount.status == ACCOUNT_STATUS.NOT_ACTIVE) {
                     throw L.ERR.ACCOUNT_NOT_ACTIVE();
-                }
+                }*/
 
                 //第五步查看账号是否禁用
                 if (loginAccount.status == ACCOUNT_STATUS.FORBIDDEN) {
