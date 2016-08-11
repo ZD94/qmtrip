@@ -3,6 +3,7 @@
  */
 "use strict";
 
+var fs = require('fs');
 var path = require('path');
 var gulp = require('gulp');
 var gulplib = require('./common/gulplib');
@@ -13,6 +14,7 @@ gulplib.bundle_lib('browserify', {ex: true, ts: false, require:[
         'buffer', 'is-buffer', 'querystring', 'string_decoder',
         'http', 'https', 'url',
     'util', 'inherits', 'process', 'events', 'stream', 'zlib']});
+gulplib.bundle_lib('update', 'cordova-app-loader/bootstrap.js', {ex: true, ts: false, require: ['cordova-app-loader', 'cordova-promise-fs']});
 gulplib.bundle_lib('ws', {ex: true, ts: false, require: ['ws', 'crypto'], exclude: ['bufferutil', 'utf-8-validate']});
 gulplib.bundle_lib('jquery', {ex: true, ts: false, require: ['jquery']});
 gulplib.bundle_lib('bootstrap', {ex: true, ts: false, require: ["bootstrap"]});
@@ -20,10 +22,10 @@ gulplib.bundle_lib('angular', {ex: true, ts: false, require: ['angular', 'common
 gulplib.bundle_lib('ionic', {ex: true, ts: false, require: ['./common/client/ionic/entry.js:ionic']});
 gulplib.bundle_lib('swiper', {ex: true, ts: false, require: ['swiper']});
 gulplib.bundle_lib('img', {ex: true, ts: false, require: ['arale-qrcode', 'hidpi-canvas', 'exif-js', 'exif-orient']})
-gulplib.bundle_lib('base', {ex: true, ts: false, require:['bluebird', 'md5', 'moment', 'tiny-cookie', 'shoe', 'lodash', 'validator', 'scssify', 'cssify']})
+gulplib.bundle_lib('base', {ex: true, ts: false, require:['md5', 'moment', 'tiny-cookie', 'shoe', 'lodash', 'validator', 'scssify', 'cssify']})
 gulplib.bundle_lib('sourcemap', {ex: true, ts: false, require: ['source-map-support']})
 
-gulplib.bundle_lib('preload', {ex: true, ts: false, require:['dyload', 'babel-polyfill', 'common/ts_helper', 'common/zone', 'path']});
+gulplib.bundle_lib('preload', {ex: true, ts: false, require:['dyload', 'babel-polyfill', 'bluebird', 'common/ts_helper', 'common/zone', 'path']});
 
 gulplib.bundle_lib('api', {require: ['common/client/api:common/api', 'common/api/helper', 'common/language']});
 gulplib.bundle_lib('calendar', {require: ['lunar-calendar', "calendar"]});
@@ -73,19 +75,60 @@ gulplib.dist(function () {
 
 gulplib.final('qmtrip');
 
-gulp.task('ionic.www', /*['default'],*/ function(){
+function ionic_files() {
     var filter = require('gulp-filter');
-    return gulp.src([gulplib.public_dir + '/**/*'])
-        .pipe(filter(['**', '!**/controller.[jt]s', '!**/*.less', '!**/*.scss', '!**/*.map', '!config.json']))
+    return gulp
+        .src([
+            gulplib.public_dir + '/index.html',
+            gulplib.public_dir + '/script/app.js',
+            gulplib.public_dir + '/script/libs/*',
+            gulplib.public_dir + '/ionic/**/*'
+        ], {
+            base: gulplib.public_dir
+        })
+        .pipe(filter([
+            '**',
+            '!**/controller.[jt]s',
+            '!**/*.ts',
+            '!**/*.less',
+            '!**/*.scss',
+            '!**/*.map',
+            '!**/bundle.+(bootstrap|sourcemap|swiper|ws).js',
+        ]));
+}
+
+gulp.task('manifest', [/*'default'*/], function () {
+    var json = fs.readFileSync('ionic/config.json');
+    var config = JSON.parse(json);
+    var calManifest = require('gulp-cordova-app-loader-manifest');
+    var options = {
+        load: [],
+        root: config.update
+    }
+    return ionic_files()
+        .pipe(calManifest(options))
+        .pipe(gulp.dest('www'));
+});
+
+gulp.task('ionic.www.clean', function () {
+    var del = require('del');
+    return del('ionic/www');
+});
+gulp.task('ionic.www', ['manifest', 'ionic.www.clean'], function () {
+    var filter = require('gulp-filter');
+    return ionic_files()
+        .pipe(gulp.dest('ionic/www'));
+});
+gulp.task('ionic.config', ['ionic.www'], function () {
+    return gulp
+        .src([
+            'www/manifest.json',
+            'ionic/config.json'
+        ])
         .pipe(gulp.dest('ionic/www'));
 });
 
-gulp.task('ionic.config', function(){
-    return gulp.src(['ionic/config.json'])
-        .pipe(gulp.dest('ionic/www'));
-});
-
-gulp.task('ionic.dist', ['ionic.www', 'ionic.config']);
+gulp.task('ionic.dist', ['ionic.config']);
 
 gulp.task('ionic.ios', ['ionic.dist'], function (done) {
     var exec = require('child_process').exec;
