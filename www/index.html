@@ -9,8 +9,15 @@
     <script src="cordova.js"></script>
 </head>
 <body animation="slide-left-right-ios7">
-<div class="mask_loading" id="loading">
-    <div class="loading_m">
+<div class="none-angular">
+    <div class="message" style="text-align: center;">
+        加载中
+    </div>
+    <div class="update-app">
+        <div class="progress">
+            <div class="progress-bar" style="width: 0%;">
+            </div>
+        </div>
     </div>
 </div>
 <div>
@@ -22,5 +29,6 @@
 </div>
 </body>
 <script type="text/javascript" src="script/libs/bundle.preload.js"></script>
-<script type="text/javascript" src="ionic/controller.all.js"></script>
+<script type="text/javascript" src="script/libs/bundle.jquery.js"></script>
+<script type="text/javascript" src="script/app.js"></script>
 </html>

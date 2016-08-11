@@ -15,13 +15,15 @@
     }
   },
   "compilerOptionsNotUsing": {
+    "declaration": true,
     "emitDecoratorMetadata": true
   },
   "exclude": [
     "node_modules",
     "public",
     "dist",
-    "ionic"
+    "ionic",
+    "tmp"
   ],
   "excludeNotUsing": [
   ]

@@ -3,6 +3,7 @@
  */
 "use strict";
 
+var fs = require('fs');
 var path = require('path');
 var gulp = require('gulp');
 var gulplib = require('./common/gulplib');
@@ -10,24 +11,25 @@ var gulplib = require('./common/gulplib');
 gulplib.public_dir = 'www';
 
 gulplib.bundle_lib('browserify', {ex: true, ts: false, require:[
-    'buffer', 'is-buffer', 'querystring', 'string_decoder',
-    'http', 'https', 'url',
+        'buffer', 'is-buffer', 'querystring', 'string_decoder',
+        'http', 'https', 'url',
     'util', 'inherits', 'process', 'events', 'stream', 'zlib']});
-gulplib.bundle_lib('ws', {ex: true, ts: false, require:['ws', 'crypto'], exclude:['bufferutil', 'utf-8-validate']});
-gulplib.bundle_lib('jquery', {ex: true, ts: false, require:['jquery', 'jquery-ui']});
-gulplib.bundle_lib('bootstrap', {ex: true, ts: false, require:["bootstrap"]});
+gulplib.bundle_lib('update', 'cordova-app-loader/bootstrap.js', {ex: true, ts: false, require: ['cordova-app-loader', 'cordova-promise-fs']});
+gulplib.bundle_lib('ws', {ex: true, ts: false, require: ['ws', 'crypto'], exclude: ['bufferutil', 'utf-8-validate']});
+gulplib.bundle_lib('jquery', {ex: true, ts: false, require: ['jquery']});
+gulplib.bundle_lib('bootstrap', {ex: true, ts: false, require: ["bootstrap"]});
 gulplib.bundle_lib('angular', {ex: true, ts: false, require: ['angular', 'common/client/angular']});
 gulplib.bundle_lib('ionic', {ex: true, ts: false, require: ['./common/client/ionic/entry.js:ionic']});
-gulplib.bundle_lib('swiper', {ex: true, ts: false, require:['swiper']});
+gulplib.bundle_lib('swiper', {ex: true, ts: false, require: ['swiper']});
 gulplib.bundle_lib('img', {ex: true, ts: false, require: ['arale-qrcode', 'hidpi-canvas', 'exif-js', 'exif-orient']})
-gulplib.bundle_lib('base', {ex: true, ts: false, require:['bluebird', 'md5', 'moment', 'tiny-cookie', 'shoe', 'lodash', 'validator', 'scssify', 'cssify']})
-gulplib.bundle_lib('sourcemap', {ex: true, ts: false, require:['source-map-support']})
+gulplib.bundle_lib('base', {ex: true, ts: false, require:['md5', 'moment', 'tiny-cookie', 'shoe', 'lodash', 'validator', 'scssify', 'cssify']})
+gulplib.bundle_lib('sourcemap', {ex: true, ts: false, require: ['source-map-support']})
 
-gulplib.bundle_lib('preload', {ex: true, ts: false, require:['dyload', 'babel-polyfill', 'common/ts_helper', 'common/zone', 'path']});
+gulplib.bundle_lib('preload', {ex: true, ts: false, require:['dyload', 'babel-polyfill', 'bluebird', 'common/ts_helper', 'common/zone', 'path']});
 
-gulplib.bundle_lib('api', {require:['common/client/api:common/api', 'common/api/helper', 'common/language']});
-gulplib.bundle_lib('calendar', {require:['lunar-calendar', "calendar"]});
-gulplib.bundle_lib('msgbox', {require:['notie', 'msgbox']});
+gulplib.bundle_lib('api', {require: ['common/client/api:common/api', 'common/api/helper', 'common/language']});
+gulplib.bundle_lib('calendar', {require: ['lunar-calendar', "calendar"]});
+gulplib.bundle_lib('msgbox', {require: ['notie', 'msgbox']});
 gulplib.bundle_lib('nglibs', {require: ['nglibs', 'api/_types', 'api/_types/*', 'common/model/client:common/model']});
 gulplib.bundle_lib('ngapp', {require: ['./common/client/ngapp/index.ts:ngapp', 'browserspec']});
 
@@ -38,12 +40,12 @@ gulplib.angular_app('agency');
 //gulplib.angular_app('mobile');
 gulplib.angular_app('ionic');
 
-gulplib.dist(function(){
+gulplib.dist(function () {
     var filter = require('gulp-filter');
     var dist_all = [
         gulp.src([gulplib.public_dir + '/**/*'])
             .pipe(filter(['**', '!**/controller.[jt]s', '!**/*.less', '!**/*.scss', '!**/*.map']))
-            .pipe(gulp.dest('dist/'+gulplib.public_dir)),
+            .pipe(gulp.dest('dist/' + gulplib.public_dir)),
         gulp.src('api/**/*')
             .pipe(gulp.dest('dist/api')),
         gulp.src('common/**/*')
@@ -57,7 +59,7 @@ gulplib.dist(function(){
         'tsd.json',
         'tsconfig.json',
     ];
-    copy.forEach(function(fname){
+    copy.forEach(function (fname) {
         dist_all.push(gulp.src(fname).pipe(gulp.dest('dist')));
     });
     copy = [
@@ -65,37 +67,78 @@ gulplib.dist(function(){
         'www',
         'typings'
     ];
-    copy.forEach(function(fname){
-        dist_all.push(gulp.src(fname+'/**/*').pipe(gulp.dest('dist/'+fname)));
+    copy.forEach(function (fname) {
+        dist_all.push(gulp.src(fname + '/**/*').pipe(gulp.dest('dist/' + fname)));
     });
     return dist_all;
 });
 
 gulplib.final('qmtrip');
 
-gulp.task('ionic.www', /*['default'],*/ function(){
+function ionic_files() {
     var filter = require('gulp-filter');
-    return gulp.src([gulplib.public_dir + '/**/*'])
-        .pipe(filter(['**', '!**/controller.[jt]s', '!**/*.less', '!**/*.scss', '!**/*.map', '!config.json']))
+    return gulp
+        .src([
+            gulplib.public_dir + '/index.html',
+            gulplib.public_dir + '/script/app.js',
+            gulplib.public_dir + '/script/libs/*',
+            gulplib.public_dir + '/ionic/**/*'
+        ], {
+            base: gulplib.public_dir
+        })
+        .pipe(filter([
+            '**',
+            '!**/controller.[jt]s',
+            '!**/*.ts',
+            '!**/*.less',
+            '!**/*.scss',
+            '!**/*.map',
+            '!**/bundle.+(bootstrap|sourcemap|swiper|ws).js',
+        ]));
+}
+
+gulp.task('manifest', [/*'default'*/], function () {
+    var json = fs.readFileSync('ionic/config.json');
+    var config = JSON.parse(json);
+    var calManifest = require('gulp-cordova-app-loader-manifest');
+    var options = {
+        load: [],
+        root: config.update
+    }
+    return ionic_files()
+        .pipe(calManifest(options))
+        .pipe(gulp.dest('www'));
+});
+
+gulp.task('ionic.www.clean', function () {
+    var del = require('del');
+    return del('ionic/www');
+});
+gulp.task('ionic.www', ['manifest', 'ionic.www.clean'], function () {
+    var filter = require('gulp-filter');
+    return ionic_files()
+        .pipe(gulp.dest('ionic/www'));
+});
+gulp.task('ionic.config', ['ionic.www'], function () {
+    return gulp
+        .src([
+            'www/manifest.json',
+            'ionic/config.json'
+        ])
         .pipe(gulp.dest('ionic/www'));
 });
 
-gulp.task('ionic.config', function(){
-    return gulp.src(['ionic/config.json'])
-        .pipe(gulp.dest('ionic/www'));
-});
+gulp.task('ionic.dist', ['ionic.config']);
 
-gulp.task('ionic.dist', ['ionic.www', 'ionic.config']);
-
-gulp.task('ionic.ios', ['ionic.dist'], function(done){
+gulp.task('ionic.ios', ['ionic.dist'], function (done) {
     var exec = require('child_process').exec;
     process.chdir('ionic');
-    var child_res = exec('ionic resources', function(err){
-        if(err){
+    var child_res = exec('ionic resources', function (err) {
+        if (err) {
             console.error(err);
         }
-        var child_emu = exec('ionic emulate ios --target="iPhone-6s, 9.3"', function(err){
-            if(err){
+        var child_emu = exec('ionic emulate ios --target="iPhone-6s, 9.3"', function (err) {
+            if (err) {
                 console.error(err);
             }
             done();
@@ -107,15 +150,15 @@ gulp.task('ionic.ios', ['ionic.dist'], function(done){
     child_res.stderr.pipe(process.stderr);
 });
 
-gulp.task('ionic.android', ['ionic.dist'], function(done){
+gulp.task('ionic.android', ['ionic.dist'], function (done) {
     var exec = require('child_process').exec;
     process.chdir('ionic');
-    var child_res = exec('ionic resources', function(err){
-        if(err){
+    var child_res = exec('ionic resources', function (err) {
+        if (err) {
             console.error(err);
         }
-        var child_emu = exec('ionic emulate android', function(err){
-            if(err){
+        var child_emu = exec('ionic emulate android', function (err) {
+            if (err) {
                 console.error(err);
             }
             done();
@@ -127,13 +170,13 @@ gulp.task('ionic.android', ['ionic.dist'], function(done){
     child_res.stderr.pipe(process.stderr);
 });
 
-function eslintformater(results, config){
+function eslintformater(results, config) {
     var rules = config ? (config.rules || {}) : {};
     results.forEach(function (res) {
         var file = path.resolve(res.filePath);
         res.messages.forEach(function (msg) {
             var msgtype = 'WARN';
-            if(msg.fatal || rules[msg.ruleId] === 2)
+            if (msg.fatal || rules[msg.ruleId] === 2)
                 msgtype = 'ERROR'
             var message = msg.message ? msg.message : '<undefined message>';
             console.error("%s: %s [%s]", msgtype, message, msg.ruleId);
@@ -160,7 +203,7 @@ gulp.task('eslint.server', function () {
             "linebreak-style": [2, "unix"],
             "semi": [0, "always"],
             "no-console": 0,
-            "no-unused-vars": [2, { "args": "none" }]
+            "no-unused-vars": [2, {"args": "none"}]
         },
         "env": {
             "es6": true,
@@ -187,7 +230,7 @@ gulp.task('eslint.mocha', function () {
             "quotes": [0, "single"],
             "linebreak-style": [2, "unix"],
             "semi": [2, "always"],
-            "no-unused-vars": [2, { "args": "none" }]
+            "no-unused-vars": [2, {"args": "none"}]
         },
         "env": {
             "es6": true,
@@ -217,7 +260,7 @@ gulp.task('eslint.browser', function () {
             "quotes": [0, "single"],
             "linebreak-style": [2, "unix"],
             "semi": [2, "always"],
-            "no-unused-vars": [2, { "args": "none" }]
+            "no-unused-vars": [2, {"args": "none"}]
         },
         "env": {
             "es6": false,
