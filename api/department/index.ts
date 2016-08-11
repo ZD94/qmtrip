@@ -11,7 +11,7 @@ let L = require("common/language");
 import {Department} from "api/_types/department";
 import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import { Models, EAccountType } from '../_types/index';
-import {FindResult} from "common/model/interface";
+import { FindResult, PaginateInterface } from "common/model/interface";
 import {Staff, EStaffStatus} from "api/_types/staff";
 import {requirePermit, conditionDecorator, condition} from "../_decorator";
 
@@ -185,7 +185,7 @@ class DepartmentModule{
         {if: condition.isCompanyAdminOrOwner("0.companyId")},
         {if: condition.isCompanyAgency("0.companyId")}
     ])
-    static async getAllDepartment(params: {companyId?: string}){
+    static async getAllDepartment(params: {companyId?: string}): Promise<PaginateInterface<Department> >{
         var staff = await Staff.getCurrent();
         var options: any = {};
         options.where = params;
@@ -212,7 +212,7 @@ class DepartmentModule{
         {if: condition.isCompanyAdminOrOwner("0.companyId")},
         {if: condition.isCompanyAgency("0.companyId")}
     ])
-    static async getFirstClassDepartments(params: {companyId: string}){
+    static async getFirstClassDepartments(params: {companyId: string}): Promise<PaginateInterface<Department> >{
         var staff = await Staff.getCurrent();
         let options: any = {};
         params['parentId'] = null;
@@ -237,7 +237,7 @@ class DepartmentModule{
         {if: condition.isDepartmentAdminOrOwner("0.parentId")},
         {if: condition.isDepartmentAgency("0.parentId")}
     ])
-    static async getChildDepartments(params: {parentId: string, companyId?: string}){
+    static async getChildDepartments(params: {parentId: string, companyId?: string}): Promise<PaginateInterface<Department> >{
         var staff = await Staff.getCurrent();
         var options: any = {};
         options.where = params;

@@ -14,7 +14,7 @@ import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_typ
 import types = require("api/_types/travelPolicy");
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { Models, EAccountType } from 'api/_types';
-import {FindResult} from "common/model/interface";
+import { FindResult, PaginateInterface } from "common/model/interface";
 
 const travalPolicyCols = TravelPolicy['$fieldnames'];
 
@@ -139,7 +139,7 @@ class TravelPolicyModule{
         {if: condition.isCompanyAdminOrOwner("0.companyId")},
         {if: condition.isCompanyAgency("0.companyId")}
     ])
-    static async getAllTravelPolicy(params){
+    static async getAllTravelPolicy(params): Promise<PaginateInterface<TravelPolicy> >{
 
         var staff = await Staff.getCurrent();
         let companyId = params.companyId;
