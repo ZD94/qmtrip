@@ -13,7 +13,7 @@
             <button ng-class="{true: 'button-positive', false: 'button-stable'}[isDActive]" class="button button-block" ng-click="searchStatistics('D')">按部门</button>
         </div>
 
-        <div class="spacer" style="width: 300px; height: 10px;"></div>
+        <!--<div class="spacer" style="width: 300px; height: 10px;"></div>-->
 
         <form class="list">
             <label class="item item-input">
@@ -22,28 +22,28 @@
             </label>
         </form>
 
-        <ion-list show-delete="showDelete">
+        <ion-list>
             <ion-item class="item stat-label-content" ng-repeat="en in statisticData">
                 <div class="bar-header">{{en.keyInfo.name}}</div>
                 <div class="left-div">
                     <div>
-                        <label class="label-left">
-                            <p>已完成出差(次)</p>
+                        <label class="label-top-left">
+                            <p>已完成出差({{showManTimes}})</p>
                             <h2 class="ng-binding" style="text-align: center;">{{en.completeTripNum || 0}}</h2>
                         </label>
-                        <label class="label-right">
-                            <p>已支出(次)</p>
+                        <label class="label-top-right">
+                            <p>已支出(元)</p>
                             <h2 class="ng-binding" style="text-align: center;">{{en.expenditure || 0}}</h2>
                         </label>
                     </div>
 
                     <div>
-                        <label class="label-left">
-                            <p>还将进行出差(次)</p>
+                        <label class="label-bottom-left">
+                            <p>还将进行出差({{showManTimes}})</p>
                             <h2 class="ng-binding" style="text-align: center;">{{en.planTripNum || 0}}</h2>
                         </label>
                         <label class="label-right">
-                            <p>计划支出(次)</p>
+                            <p>计划支出(元)</p>
                             <h2 class="ng-binding" style="text-align: center;">{{en.planBudget || 0}}</h2>
                         </label>
                     </div>
@@ -53,18 +53,6 @@
                     <h2 class="ng-binding" style="text-align: center;">{{en.savedMoney || 0}}</h2>
                 </div>
             </ion-item>
-
-            <!--<div class="list" ng-repeat="en in statisticData">-->
-                <!--<ion-item class="item">-->
-                    <!--<p>已完成出差(次)</p>-->
-                    <!--<h2 class="ng-binding">{{en.completeTripNum}}</h2>-->
-                <!--</ion-item>-->
-                <!--<ion-item class="item">-->
-                    <!--<p>实际节省(元)</p>-->
-                    <!--<h2 class="ng-binding">{{en.savedMoney}}</h2>-->
-                <!--</ion-item>-->
-                <!--<div class="item_divider"></div>-->
-            <!--</div>-->
         </ion-list>
 
     </ion-content>

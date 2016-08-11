@@ -21,22 +21,22 @@
         </div>
 
         <ion-list show-delete="showDelete">
-            <ion-item class="item stat-label-content">
-                <div class="left-div">
+            <ion-item class="item">
+                <div style="float:left; padding-left: 0.5em;">
                     <p>总计划支出(元)</p>
                     <h2 class="ng-binding" style="text-align: center;">{{(statistic.expenditure || 0) + (statistic.planBudget || 0)}}</h2>
                 </div>
-                <div class="right-div">
+                <div style="float: right; padding-right: 1em">
                     <p>实际已支出(元)</p>
                     <h2 class="ng-binding" style="text-align: center;">{{statistic.expenditure || 0}}</h2>
                 </div>
             </ion-item>
-            <ion-item class="item stat-label-content">
-                <div class="left-div">
+            <ion-item class="item">
+                <div style="float: left">
                     <p>计划出差人数(次)</p>
                     <h2 class="ng-binding" style="text-align: center;">{{(statistic.completeTripNum || 0) + (statistic.planTripNum || 0)}}</h2>
                 </div>
-                <div class="right-div">
+                <div style="float: right">
                     <p>已完成出差人数(次)</p>
                     <h2 class="ng-binding" style="text-align: center;">{{statistic.completeTripNum || 0}}</h2>
                 </div>
@@ -52,12 +52,12 @@
 
         <div class="spacer" style="width: 300px; height: 10px;"></div>
         <ion-list show-delete="showDelete">
-            <ion-item class="item stat-label-content">
-                <div class="left-div">
+            <ion-item class="item">
+                <div style="float: left; padding-left: 2em;">
                     <p>动态预算(元)</p>
                     <h2 class="ng-binding" style="text-align: center;">{{statistic.completeBudget}}</h2>
                 </div>
-                <div class="right-div">
+                <div style="float:right; padding-right: 2em;">
                     <p>实际支出(元)</p>
                     <h2 class="ng-binding" style="text-align: center;">{{statistic.expenditure || 0}}</h2>
                 </div>
@@ -77,7 +77,7 @@
                     <p class="savePercent">{{(statistic.savedMoney/(statistic.completeBudget || 1)*100).toFixed(1)}}%</p>
                 </div>
             </div>
-            <div class="col col-50">
+            <div class="col col-50" style="padding-top: 35px;">
                 <ion-list>
                     <ion-item >
                         <p>员工节省(元)</p>
@@ -87,30 +87,10 @@
             </div>
         </div>
 
-        <!--<div class="spacer" style="width: 300px; height: 10px;"></div>-->
-        <!--<div class="row project_info">-->
-            <!--<div class="col col-50">-->
-                <!--<p>出差人数(人次)</p>-->
-                <!--<h2>{{statistic.staffNum}}</h2>-->
-            <!--</div>-->
-            <!--<div class="col col-50">-->
-                <!--<p>运行项目(个)</p>-->
-                <!--<h2>{{statistic.projectNum}}</h2>-->
-            <!--</div>-->
-        <!--</div>-->
-
         <div class="spacer" style="width: 300px; height: 10px;"></div>
         <div class="link-div">
-            <a href="#/company/record"><div class="row item item-body" style="float:left;">员工节省排行</div></a>
+            <a href="#/company/staffSavedRank"><div class="row item item-body" style="float:left;">员工节省排行</div></a>
         </div>
-
-        <div class="spacer" style="width: 300px; height: 10px;"></div>
-        <!--<div class="item-divider" ng-if="staffSaves.length>0">&nbsp;员工节省排行</div>-->
-        <!--<ion-list>-->
-            <!--<ion-item ng-repeat="v in staffSaves" style="font-size: 0.8em;">-->
-                <!--<div style="display: block; position: absolute; width: 30px; height: 30px; text-align: center; line-height: 30px; border-radius: 50%; color: white; background:#2495da;">{{v.name| limitTo: -1}}</div>-->
-                <!--<span style="padding-left: 50px;">{{v.name}}</span><span style="float: right;">{{v.save| currency: ''}}元</span>-->
-            <!--</ion-item>-->
-        <!--</ion-list>-->
+        <div class="spacer" style="width: 300px; height: 30px;"></div>
     </ion-content>
 </ion-view>

@@ -1122,13 +1122,21 @@ class TripPlanModule {
 
 
     @clientExport
-    @requireParams(['startTime', 'endTime'])
-    static async statisticTripBudget(params) {
+    @requireParams([], ['startTime', 'endTime', 'isStaff'])
+    static async statisticTripBudget(params: {startTime?: string, endTime?: string, isStaff?: boolean}) {
         let staff = await Staff.getCurrent();
         let companyId = staff.company.id;
 
         let selectSql = `select count(id) as "tripNum", sum(budget) as budget, sum(expenditure) as expenditure, sum(budget-expenditure) as "savedMoney" from`;
-        let completeSql = `trip_plan.trip_plans where deleted_at is null and company_id='${companyId}' and start_at>'${params.startTime}' and start_at<'${params.endTime}'`;
+        let completeSql = `trip_plan.trip_plans where deleted_at is null and company_id='${companyId}'`;
+
+        if(params.startTime)
+            completeSql += ` and start_at>='${params.startTime}'`;
+        if(params.endTime)
+            completeSql += ` and start_at<='${params.endTime}'`;
+        if(params.isStaff)
+            completeSql += ` and account_id='${staff.id}'`;
+
         let planSql = `${completeSql}  and status in (${EPlanStatus.WAIT_UPLOAD}, ${EPlanStatus.WAIT_COMMIT}, ${EPlanStatus.AUDITING}, ${EPlanStatus.AUDIT_NOT_PASS})`;
         completeSql += ` and status=${EPlanStatus.COMPLETE}`;
 
@@ -1224,8 +1232,6 @@ class TripPlanModule {
             plan = `${selectSql} ${planSql} group by d.id;`;
         }
 
-        // logger.error("complete=>", complete);
-        // logger.error("plan=>", plan);
         let completeInfo = await sequelize.query(complete);
         let planInfo = await sequelize.query(plan);
 
@@ -1312,16 +1318,23 @@ class TripPlanModule {
     }
 
     @clientExport
-    static async tripPlanSaveRank(params: {limit?: number|string}) {
+    @requireParams([], ['limit', 'staffId', 'startTime', 'endTime'])
+    static async tripPlanSaveRank(params: {limit?: number|string, staffId?: string, startTime?: string, endTime?: string}) {
         let staff = await Staff.getCurrent();
         let companyId = staff.company.id;
-        let limit = params.limit || 5;
+        let limit = params.limit || 10;
         if (!limit || !/^\d+$/.test(limit as string) || limit > 100) {
-            limit = 5;
+            limit = 10;
         }
-        let sql = `select account_id, sum(budget) - sum(expenditure) as save from trip_plan.trip_plans where status = 4 AND company_id = '${companyId}'
-        group by account_id
-        order by save desc limit ${limit}`;
+        let sql = `select account_id, sum(budget) - sum(expenditure) as save from trip_plan.trip_plans 
+        where deleted_at is null and status = ${EPlanStatus.COMPLETE} AND company_id = '${companyId}'`;
+        if(params.staffId)
+            sql += ` and account_id = '${params.staffId}'`;
+        if(params.startTime)
+            sql += ` and start_at > '${params.startTime}'`;
+        if(params.endTime)
+            sql += ` and start_at < '${params.endTime}'`;
+        sql += `group by account_id order by save desc limit ${limit};`;
 
         let ranks = await sequelize.query(sql)
             .then(function(result) {
@@ -1440,7 +1453,7 @@ class TripPlanModule {
                 let details = await p.getTripDetails({});
                 p.status = EPlanStatus.WAIT_UPLOAD;
 
-                if(p.auditUser && /^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}$/.test(p.auditUser)) {
+                if(p.auditUser && /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(p.auditUser)) {
                     let tripPlanLog = Models.tripPlanLog.create({tripPlanId: p.id, userId: p.auditUser, remark: '系统自动审批出差计划'});
                     await tripPlanLog.save();
                 }

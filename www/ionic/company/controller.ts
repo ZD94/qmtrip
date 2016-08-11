@@ -2,7 +2,7 @@
  * Created by seven on 16/5/9.
  */
 "use strict";
-import {EStaffRole, Staff, EStaffStatus} from "api/_types/staff";
+import {EStaffRole, Staff, EStaffStatus, InvitedLink} from "api/_types/staff";
 import {EPlanStatus, ETripType, EAuditStatus} from 'api/_types/tripPlan';
 import {TravelPolicy, MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 import {Department} from "api/_types/department";
@@ -55,8 +55,6 @@ export async function BudgetController($scope) {
         await searchData();
     };
 
-    // $scope.staffSaves = [];
-    // $scope.staffSaves = await API.tripPlan.tripPlanSaveRank({limit: 3});
     $scope.saveMoneyChart = {};
     $scope.saveMoneyChart.labels = ["本月节省", "本月支出"];
     $scope.saveMoneyChart.options = {cutoutPercentage: 70};
@@ -87,7 +85,7 @@ export async function BudgetStatisticsController($scope, $stateParams, Models) {
         showStr: `${moment().startOf('month').format('YYYY.MM.DD')}-${moment().endOf('month').format('YYYY.MM.DD')}`
     };
     $scope.monthSelection = monthSelection;
-    
+
     $scope.monthChange = async function(isAdd?: boolean) {
         let optionFun = isAdd ? 'add' : 'subtract';
         let queryMonth = moment( $scope.monthSelection.month)[optionFun](1, 'month');
@@ -113,14 +111,17 @@ export async function BudgetStatisticsController($scope, $stateParams, Models) {
             case 'S':
                 placeholder='请输入员工姓名';modelName = 'staff';
                 isSActive = true; isPActive = isDActive = false;
+                $scope.showManTimes = '次';
                 break;
             case 'P':
                 placeholder='请输入项目名称';modelName = 'project';
                 isPActive = true; isSActive = isDActive = false;
+                $scope.showManTimes = '人次';
                 break;
             case 'D':
                 placeholder='请输入部门名称';modelName = 'department';
                 isDActive = true; isSActive = isPActive = false;
+                $scope.showManTimes = '人次';
                 break;
             default: break;
         }
@@ -932,6 +933,51 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
     }
 }
 
-export async function StaffInvitedController($scope){
+export async function StaffInvitedController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup){
     require("./staff-invited.scss");
+
+    var staff = await Staff.getCurrent();
+    var now = moment().format('YYYY-MM-DD HH:mm:ss');
+    var invitedLinks = await Models.invitedLink.find({where: {staffId: staff.id, status: 1, expiresTime: {$gt: now}}});
+    if(invitedLinks && invitedLinks.length > 0){
+        $scope.invitedLink = invitedLinks[0];
+    }
+    $scope.createLink = async function (){
+        var invitedLink = InvitedLink.create();
+        invitedLink = await invitedLink.save();
+        $scope.invitedLink = invitedLink;
+    }
+    $scope.stopLink = function(invitedLink){
+        invitedLink.status = 0;
+        invitedLink.save();
+        $scope.invitedLink = null;
+    }
+    console.info($scope.invitedLink);
+}
+
+export async function StaffSavedRankController($scope) {
+    API.require('tripPlan');
+    await API.onload();
+    $scope.isMonth = true;
+    $scope.isYear = false;
+    $scope.isAll = false;
+    $scope.staffSaves = [];
+    $scope.searchStaffSaves = searchStaffSaves;
+
+    async function searchStaffSaves(type: string) {
+        let formatStr = 'YYYY-MM-DD HH:mm:ss';
+        let options: any = {limit: 10};
+        $scope.isMonth = $scope.isYear = $scope.isAll = false;
+        $scope[type] = true;
+        
+        if(!$scope.isAll) {
+            let typeStr = $scope.isMonth ? 'month' : 'year';
+            options.startTime = moment().startOf(typeStr).format(formatStr);
+            options.endTime = moment().endOf(typeStr).format(formatStr);
+        }
+
+        $scope.staffSaves = await API.tripPlan.tripPlanSaveRank(options);
+    }
+
+    searchStaffSaves('isMonth');
 }
