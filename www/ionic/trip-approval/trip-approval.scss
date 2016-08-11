@@ -58,3 +58,14 @@
     background: rgb(36,149,218);
   }
 }
+
+//适配iPhone5的menu高度
+@media (max-width: 320px){
+  .button-bar{
+    &.jl_approvelist{
+      .button{
+        padding: 2px 4px 1px;
+      }
+    }
+  }
+}

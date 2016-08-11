@@ -64,7 +64,7 @@
             </ion-item>
         </ion-list>
         <div class="row withChart">
-            <div class="col col-50">
+            <div class="col col-50 doughnut-text">
                 <canvas id="doughnut" class="chart chart-doughnut"
                         chart-data="saveMoneyChart.data"
                         chart-labels="saveMoneyChart.labels"
@@ -72,18 +72,14 @@
                         chart-dataset-override="saveMoneyChart.dataset"
                         width="170">
                 </canvas>
-                <div class="chart_info">
+                <div class="text-in-doughnut">
                     <span>节省</span>
                     <p class="savePercent">{{(statistic.savedMoney/(statistic.completeBudget || 1)*100).toFixed(1)}}%</p>
                 </div>
             </div>
-            <div class="col col-50" style="padding-top: 35px;">
-                <ion-list>
-                    <ion-item >
-                        <p>员工节省(元)</p>
-                        <h2>{{statistic.savedMoney}}</h2>
-                    </ion-item>
-                </ion-list>
+            <div class="col col-50 right-of-doughnut">
+                <p>员工节省(元)</p>
+                <h2>{{statistic.savedMoney}}</h2>
             </div>
         </div>
 

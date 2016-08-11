@@ -1,6 +1,6 @@
 <ion-view title="登录" id="page17" class="JingliLogin">
     <ion-content padding="true">
-        <form class="list">
+        <form class="list" ng-submit="check_login()">
             <div class="logo_title">
                 <div class="logo">鲸力商旅</div>
                 <div class="logo_text"></div>
@@ -13,13 +13,13 @@
                 </label>
                 <label class="item item-input">
                     <span class="input-label">密　码</span>
-                    <input type="password" placeholder="请输入密码" ng-model="form.pwd" required ng-required>
+                    <input type="password" placeholder="请输入密码" ng-model="form.pwd" ng-enter="check_login()" required ng-required>
                 </label>
             </ion-list>
             <p align="right"></p>
             <div class="spacer" style="height: 40px;" align="right"><a href="#/login/forget-pwd" class="icon ion-ios-information">忘记密码?</a></div>
             <div class="spacer" style="height: 40px" align="left" ng-if="unactivated"><a href="" ng-click="reSendActiveLink()" style="color: red;">您的账号尚未激活 点击发送激活链接</a></div>
-            <a id="btn_login" class="button button-stable  button-block" ng-click="check_login()">登录</a>
+            <input type="submit" value="登录" class="button button-stable  button-block">
         </form>
     </ion-content>
 </ion-view>
