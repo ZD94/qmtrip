@@ -26,7 +26,7 @@ export function StorageSetController($scope, $stateParams, $storage) {
     window.location.href = back_url;
 }
 
-export async function IndexController($scope, $stateParams, $storage, $sce, $loading) {
+export async function IndexController($scope, $stateParams, $storage, $sce, $loading, $ionicPopup) {
     $loading.start();
     var browserspec = require('browserspec');
     var backUrl = $stateParams.backurl || "#";
@@ -84,11 +84,124 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
             var str = err.msg;
             if(err.code == -28 && err.msg == "您的账号还未激活"){
                 $scope.unactivated = true;
-                // $scope.$apply();
+            }else if(err.code == -37 && err.msg == "您的手机号还未验证"){
+                showMobilePopup();
+            }else if(err.code == -38 && err.msg == "您的邮箱还未验证"){
+                showEmailPopup();
             }else{
                 msgbox.log(err.msg || err);//显示错误消息
             }
         }
+
+        function showEmailPopup(){
+            var nshow = $ionicPopup.show({
+                template: '<span>您的邮箱还未激活，请激活后再进行登录</span><br><span>邮箱：'+$scope.form.account+'</span>',
+                scope: $scope,
+                buttons: [
+                    {
+                        text: '返回用手机登录'
+                    },
+                    {
+                        text: '获取激活邮件',
+                        type: 'button-positive',
+                        onTap: async function (e) {
+                            if (!$scope.form.account) {
+                                e.preventDefault();
+                                msgbox.log("用户名不能为空");
+                            } else {
+                                try{
+                                    var data = await API.auth.reSendActiveLink({account: $scope.form.account});
+                                    if(data){
+                                        showSendEmailSuccess();
+                                    }
+                                }catch(err){
+                                    msgbox.log(err.msg);
+                                }
+                            }
+                        }
+                    }
+                ]
+            })
+        }
+
+        function showSendEmailSuccess(){
+            var nshow = $ionicPopup.show({
+                template: '<span>邮箱：'+$scope.form.account+'</span><br><span>激活邮件发送成功！</span><br><span>请点击邮件中的链接完成激活，即可点击下方立即登陆按钮进入系统，链接有效期24个小时</span>',
+                scope: $scope,
+                buttons: [
+                    {
+                        text: '立即登陆',
+                        type: 'button-positive',
+                        onTap: async function (e) {
+                            $scope.check_login();
+                        }
+                    }
+                ]
+            })
+        }
+
+        function showMobilePopup(){
+            var nshow = $ionicPopup.show({
+                template: '<span>您的手机尚未激活，请获取验证码激活</span><br><span>手机号：'+$scope.form.account+'</span>' +
+                '<div class="item item-input"> <input type="text" placeholder="请输入验证码" ng-model="form.msgCode"> ' +
+                '<a class="button button-positive" ng-click="sendCode()">发送验证码</a> </div>',
+                scope: $scope,
+                buttons: [
+                    {
+                        text: '返回用邮箱登录'
+                    },
+                    {
+                        text: '立即激活',
+                        type: 'button-positive',
+                        onTap: async function (e) {
+                            if (!$scope.form.msgCode) {
+                                e.preventDefault();
+                                msgbox.log("验证码不能为空");
+                            } else {
+                                try{
+                                    var data = await API.auth.activeByMobile({mobile: $scope.form.account, msgCode: $scope.form.msgCode, msgTicket: $scope.ticket});
+                                    if(data.isValidateMobile){
+                                        showCheckMobileSuccess();
+                                    }
+                                }catch(err){
+                                    msgbox.log(err.msg);
+                                }
+                            }
+                        }
+                    }
+                ]
+            })
+        }
+
+        function showCheckMobileSuccess(){
+            var nshow = $ionicPopup.show({
+                template: '<span>手机号：'+$scope.form.account+'</span><br><span>激活成功！</span>',
+                scope: $scope,
+                buttons: [
+                    {
+                        text: '立即登陆',
+                        type: 'button-positive',
+                        onTap: async function (e) {
+                            $scope.check_login();
+                        }
+                    }
+                ]
+            })
+        }
+
+        $scope.sendCode = async function(){
+            API.require("checkcode");
+            await API.onload();
+            API.checkcode.getMsgCheckCode({mobile: $scope.form.account})
+                .then(function(result){
+                    $scope.ticket = result.ticket;
+                    console.info($scope.ticket);
+                })
+                .catch(function(err){
+                    msgbox.log(err.msg||err)
+                })
+        };
+
     }
 
     $scope.reSendActiveLink = async function(){
@@ -316,18 +429,35 @@ export async function ActiveController ($scope, $stateParams) {
     let accountId = $stateParams.accountId;
     let sign = $stateParams.sign;
     let timestamp = $stateParams.timestamp;
-    API.require("auth");
+    let email = $stateParams.email;//链接失效时重新发送激活邮件使用
     await API.onload();
+    $scope.invalidLink = false;
 
-    API.auth.activeByEmail({accountId: accountId, sign: sign, timestamp: timestamp})
+    await API.auth.activeByEmail({accountId: accountId, sign: sign, timestamp: timestamp})
         .then(function (result) {
             if(result){
-                // alert("激活成功,请重新登录");
-                // window.location.href = "index.html#/login/index";
+                $scope.account = result;
             }
-            return;
         })
-        .catch(window.alert).done();
+        .catch(function(err){
+            if(err.code == -27 && err.msg == "激活链接已经失效"){
+                $scope.invalidLink = true;
+                $scope.email = email;
+            }else{
+                msgbox.log(err.msg||err);
+            }
+        }).done();
+
+    $scope.reSendActiveLink = async function(){
+        try{
+            var data = await API.auth.reSendActiveLink({account: email});
+            if(data){
+                msgbox.log("发送成功");
+            }
+        }catch(err){
+            msgbox.log(err.msg || err);
+        }
+    }
 
     $scope.goLogin = function(){
         window.location.href = "index.html#/login/index";
