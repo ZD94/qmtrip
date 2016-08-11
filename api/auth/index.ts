@@ -47,8 +47,170 @@ var ACCOUNT_TYPE = {
 class ApiAuth {
 
     static __public: boolean = true;
+
     /**
-     * @method activeByEmail 通过邮箱激活账号
+     * 验证验证码(通过手机重置密码第一步)
+     * @param params
+     * @returns {{accountId: null, sign: any, expireAt: number}}//为下一步重置密码生成验证凭证
+     */
+    @clientExport
+    @requireParams(['mobile', 'msgCode','msgTicket'])
+    static async validateMsgCheckCode(params:{mobile: string, msgCode: string, msgTicket: string}){
+        var mobile = params.mobile;
+        var msgCode = params.msgCode;
+        var msgTicket = params.msgTicket;
+
+        if (!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+
+        var accounts = await Models.account.find({where: {mobile: mobile}});
+        var account = Account.create();
+        if(accounts && accounts.length > 0){
+            account = accounts[0];
+        }else{
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        if (!msgCode || !msgTicket) {
+            throw L.ERR.CODE_ERROR();
+        }
+
+        var result =  await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+        if(result){
+            var checkcodeToken = utils.getRndStr(6);
+            account.checkcodeToken = checkcodeToken;
+            account.isValidateMobile = true;
+            await account.save();
+            var expireAt = Date.now() +20 * 60 * 1000;//失效时间20分钟
+            var sign = makeActiveSign(checkcodeToken, account.id, expireAt);
+            return {accountId: account.id, sign: sign, expireAt: expireAt};
+        }else{
+            throw L.ERR.CODE_ERROR();
+        }
+    }
+
+    /**
+     * @method resetPwdByMobile
+     *
+     * 根据手机号重置密码（根据手机号重置密码第二步）
+     *
+     * @param {Object} params
+     * @param {String} params.mobile 手机号
+     * @param {String} params.newPwd 新密码
+     * @return {Promise}
+     */
+    @clientExport
+    static async resetPwdByMobile (params: {accountId: string, sign: string, timestamp: number, pwd: string}){
+        var accountId = params.accountId;
+        var sign = params.sign;
+        var timestamp = params.timestamp;
+        var pwd = params.pwd;
+
+        if (!Boolean(timestamp) || timestamp < Date.now()) {
+            throw L.ERR.TIMESTAMP_TIMEOUT();
+        }
+
+        if (!accountId) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        if (!sign) {
+            throw L.ERR.SIGN_ERROR();
+        }
+
+        if (!pwd) {
+            throw L.ERR.PWD_EMPTY();
+        }
+
+        var account = await Models.account.get(accountId);
+        var _sign = makeActiveSign(account.checkcodeToken, accountId, timestamp);
+        if (_sign.toLowerCase() != sign.toLowerCase()) {
+            throw L.ERR.SIGN_ERROR();
+        }
+        pwd = utils.md5(pwd);
+        account.isValidateMobile = true;
+        account.pwd = pwd;
+        await account.save();
+        return true;
+    };
+
+
+    /**
+     * @method resetPwdByEmail（可用于通过邮箱重置密码）【待用】
+     * 找回密码
+     *
+     * @param {Object} params
+     * @param {UUID} params.accountId 账号ID
+     * @param {String} params.sign 签名
+     * @param {String} params.timestamp 时间戳
+     * @param {String} params.pwd 新密码
+     * @return {Promise} true|error
+     */
+    @clientExport
+    static async resetPwdByEmail (params: {accountId: string, sign: string, timestamp: number, pwd: string}) {
+
+        var accountId = params.accountId;
+        var sign = params.sign;
+        var timestamp = params.timestamp;
+        var pwd = params.pwd;
+
+        if (!Boolean(timestamp) || timestamp < Date.now()) {
+            throw L.ERR.TIMESTAMP_TIMEOUT();
+        }
+
+        if (!accountId) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        if (!sign) {
+            throw L.ERR.SIGN_ERROR();
+        }
+
+        if (!pwd) {
+            throw L.ERR.PWD_EMPTY();
+        }
+
+        var account = await Models.account.get(accountId);
+
+        var _sign = makeActiveSign(account.pwdToken, accountId, timestamp);
+        if (_sign.toLowerCase() != sign.toLowerCase()) {
+            throw L.ERR.SIGN_ERROR();
+        }
+        account.pwd = utils.md5(pwd);
+        account.status = ACCOUNT_STATUS.ACTIVE;
+        account.isValidateEmail = true;
+        account.pwdToken = null;
+        await account.save();
+        return true;
+    }
+
+    /**
+     * 重新发送激活链接邮件
+     * @param params
+     * @returns {boolean}
+     */
+    @clientExport
+    static async reSendActiveLink (params:{account:string}):Promise<boolean> {
+        var mobileOrEmail = params.account;
+        var accounts = await Models.account.find({where : {$or : [{email: mobileOrEmail}, {mobile: mobileOrEmail}]}});
+        var account = Account.create();
+        if(accounts && accounts.length>0){
+            account = accounts[0];
+            //发送qm_first_set_pwd
+            // var staff = await Models.staff.get(account.id);
+            // await API.auth.sendResetPwdEmail({email: account.email, mobile: account.mobile, type: 1, isFirstSet: true, companyName: staff.company.name});
+            //发送qm_active
+            await _sendActiveEmail(account.id);
+        }else{
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        return true;
+    }
+
+    /**
+     * @method activeByEmail 通过邮箱链接激活账号
      *
      * 通过邮箱激活账号
      *
@@ -60,8 +222,7 @@ class ApiAuth {
      * @public
      */
     @clientExport
-    static activeByEmail (data: {sign: string, accountId: string, timestamp: number}) : Promise<boolean> {
-
+    static async activeByEmail (data: {sign: string, accountId: string, timestamp: number}) : Promise<any> {
         var sign = data.sign;
         var accountId = data.accountId;
         var timestamp = data.timestamp;
@@ -72,28 +233,61 @@ class ApiAuth {
             throw L.ERR.ACTIVE_URL_INVALID();
         }
 
-        return Models.account.get(accountId)
-            .then(function(account: any) {
-                if(!account){
-                    throw L.ERR.ACCOUNT_NOT_EXIST();
-                }
-                if (account.status == ACCOUNT_STATUS.ACTIVE) {
-                    return true;
-                }
+        var account = await Models.account.get(accountId);
+        if(!account){
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
 
-                var needSign = makeActiveSign(account.activeToken, accountId, timestamp)
-                if (sign.toLowerCase() != needSign.toLowerCase()) {
-                    throw L.ERR.ACTIVE_URL_INVALID();
-                }
+        var needSign = makeActiveSign(account.activeToken, accountId, timestamp)
+        if (sign.toLowerCase() != needSign.toLowerCase()) {
+            throw L.ERR.ACTIVE_URL_INVALID();
+        }
 
-                account.status = ACCOUNT_STATUS.ACTIVE;
-                account.activeToken = null;
-                account.isValidateEmail = true;
-                return account.save();
-            })
-            .then(function() {
-                return true;
-            });
+        account.status = ACCOUNT_STATUS.ACTIVE;
+        account.activeToken = null;
+        account.isValidateEmail = true;
+        account = await account.save()
+        return account;
+    }
+
+    /**
+     * 验证手机验证码激活账号
+     * @param data
+     * @returns {Account}
+     */
+    @clientExport
+    @requireParams(['mobile','msgCode','msgTicket'])
+    static async activeByMobile (data: {mobile: string, msgCode: string, msgTicket: number}) : Promise<any> {
+        var mobile = data.mobile;
+        var msgCode = data.msgCode;
+        var msgTicket = data.msgTicket;
+
+        if (!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+
+        if (!msgCode || !msgTicket) {
+            throw {code: -1, msg: "短信验证码错误"};
+        }
+        var accounts = await Models.account.find({where : {mobile: mobile}});
+        var account = Account.create();
+        if(accounts && accounts.length>0){
+            account = accounts[0];
+        }
+        if(!account){
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        var ckeckMsgCode = await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+
+        if(ckeckMsgCode){
+            account.status = ACCOUNT_STATUS.ACTIVE;
+            account.isValidateMobile = true;
+            account = await account.save()
+        }else{
+            throw {code: -1, msg: "短信验证码错误"};
+        }
+        return account;
     }
 
     /**
@@ -133,6 +327,11 @@ class ApiAuth {
         return {inviter: inviter, company: company};
     }
 
+    /**
+     * 被邀请人通过邀请链接注册员工信息
+     * @param data
+     * @returns {Company}
+     */
     @clientExport
     @requireParams(['mobile', 'name', 'companyId','msgCode','msgTicket', 'pwd'])
     static async invitedStaffRegister (data) : Promise<any> {
@@ -162,6 +361,115 @@ class ApiAuth {
         }
         return staff.company;
     }
+
+
+    /**
+     * 添加员工验证手机号和邮箱
+     * @param data
+     * @returns {boolean}
+     */
+    @clientExport
+    static async checkEmailAndMobile (data: {email?: string, mobile?: string}) {
+        if (data.email && !validator.isEmail(data.email)) {
+            throw L.ERR.INVALID_FORMAT('email');
+        }
+
+        if (data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+
+
+        var mobile = data.mobile;
+
+        var staff = await Staff.getCurrent();
+
+        var type = ACCOUNT_TYPE.COMPANY_STAFF;
+        //查询邮箱是否已经注册
+        if(data.email){
+            var account1 = await Models.account.find({where: {email: data.email, type: type}, paranoid: false});
+            if (account1 && account1.length>0) {
+                throw L.ERR.EMAIL_HAS_REGISTRY();
+            }
+            /*if(staff){
+                if(data.email && staff && staff.company["domainName"] && data.email.indexOf(staff.company["domainName"]) == -1){
+                    throw L.ERR.EMAIL_SUFFIX_INVALID();
+                }
+            }else{
+                let domain = data.email.match(/.*\@(.*)/)[1]; //企业域名
+
+                let companies = await Models.company.find({where: {domain_name: domain}});
+
+                if(companies && (companies.length > 0 || companies.total > 0)) {
+                    throw L.ERR.DOMAIN_HAS_EXIST();
+                }
+            }*/
+        }
+
+        if(data.mobile){
+            var account2 = await Models.account.find({where: {mobile: mobile, type: type}, paranoid: false});
+            if (account2 && account2.length>0) {
+                throw L.ERR.MOBILE_HAS_REGISTRY();
+            }
+        }
+
+        return true;
+    }
+
+
+    /**
+     * 企业注册【待用】
+     * @param params
+     * @returns {Promise<TResult>|Promise<U>}
+     */
+    @clientExport
+    @requireParams(['mobile', 'name', 'email', 'userName','msgCode','msgTicket'], ['pwd','agencyId', 'remark', 'description'])
+    static async registerCompany(params:{name: string, userName: string, email: string, mobile: string, pwd: string,
+        msgCode: string, msgTicket: string, agencyId?: string}){
+        var companyName = params.name;
+        var name = params.userName;
+        var email = params.email;
+        var mobile = params.mobile;
+        var msgCode = params.msgCode;
+        var msgTicket = params.msgTicket;
+        var pwd = params.pwd;
+
+        if (!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+
+        if (!email || !validator.isEmail(email)) {
+            throw L.ERR.EMAIL_FORMAT_INVALID();
+        }
+
+        if (!msgCode || !msgTicket) {
+            throw {code: -1, msg: "短信验证码错误"};
+        }
+
+        if (!name) {
+            throw {code: -1, msg: "联系人姓名为空"};
+        }
+
+        if (!companyName) {
+            throw {code: -1, msg: "公司名称为空"};
+        }
+
+        if (!pwd) {
+            throw {code: -1, msg: "密码为空"};
+        }
+
+        return Promise.resolve(true)
+            .then(function(){
+                return API.auth.checkEmailAndMobile({email: email, mobile: mobile});
+            })
+            .then(function() {
+                return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+            })
+            .then(function() {
+                return API.company.registerCompany({mobile:mobile, email: email,name: companyName,userName: name, pwd: pwd, status: 1});
+            })
+    }
+
+
 
     /**
      * @method checkResetPwdUrlValid
@@ -290,64 +598,6 @@ class ApiAuth {
         };
         return  ApiAuth.sendResetPwdEmail(data);
     }
-
-    /**
-     * @method resetPwdByEmail
-     * 找回密码
-     *
-     * @param {Object} params
-     * @param {UUID} params.accountId 账号ID
-     * @param {String} params.sign 签名
-     * @param {String} params.timestamp 时间戳
-     * @param {String} params.pwd 新密码
-     * @return {Promise} true|error
-     */
-    @clientExport
-    static resetPwdByEmail (params: {accountId: string, sign: string, timestamp: number, pwd: string}) {
-
-        var accountId = params.accountId;
-        var sign = params.sign;
-        var timestamp = params.timestamp;
-        var pwd = params.pwd;
-
-        return Promise.resolve()
-            .then(function() {
-                if (!Boolean(timestamp) || timestamp < Date.now()) {
-                    throw L.ERR.TIMESTAMP_TIMEOUT();
-                }
-
-                if (!accountId) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST();
-                }
-
-                if (!sign) {
-                    throw L.ERR.SIGN_ERROR();
-                }
-
-                if (!pwd) {
-                    throw L.ERR.PWD_EMPTY();
-                }
-
-                return DBM.Account.findById(accountId)
-            })
-            .then(function(account) {
-                var _sign = makeActiveSign(account.pwdToken, accountId, timestamp);
-                if (_sign.toLowerCase() != sign.toLowerCase()) {
-                    throw L.ERR.SIGN_ERROR();
-                }
-                pwd = utils.md5(pwd);
-                //如果从来没有设置过密码,将账号类型设为激活
-                var status = account.status;
-                if (account.status == ACCOUNT_STATUS.NOT_ACTIVE && !account.pwd) {
-                    status = ACCOUNT_STATUS.ACTIVE;
-                }
-                return DBM.Account.update({pwd: pwd, pwdToken: null, status: status, isValidateEmail: true}, {where:{id: accountId}});
-            })
-            .then(function() {
-                return true;
-            });
-    }
-
 
 
     @clientExport
@@ -496,87 +746,8 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     }
 }
 
-    /**
-     * 添加员工验证手机号和邮箱
-     * @param data
-     * @returns {boolean}
-     */
-    @clientExport
-    static async checkEmailAndMobile (data: {email?: string, mobile?: string}) {
-        if (data.email && !validator.isEmail(data.email)) {
-            throw L.ERR.INVALID_FORMAT('email');
-        }
-
-        if (data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
-            throw L.ERR.MOBILE_NOT_CORRECT();
-        }
 
 
-        var mobile = data.mobile;
-
-        var staff = await Staff.getCurrent();
-        if(data.email && staff && staff.company["domainName"] && data.email.indexOf(staff.company["domainName"]) == -1){
-            throw L.ERR.EMAIL_SUFFIX_INVALID();
-        }
-
-        var type = ACCOUNT_TYPE.COMPANY_STAFF;
-        //查询邮箱是否已经注册
-        if(data.email){
-            var account1 = await Models.account.find({where: {email: data.email, type: type}, paranoid: false});
-            if (account1 && account1.length>0) {
-                throw L.ERR.EMAIL_HAS_REGISTRY();
-            }
-        }
-
-        if(data.mobile){
-            var account2 = await Models.account.find({where: {mobile: mobile, type: type}, paranoid: false});
-            if (account2 && account2.length>0) {
-                throw L.ERR.MOBILE_HAS_REGISTRY();
-            }
-        }
-
-        return true;
-    }
-    
-    
-    /**
-     * 注册验证手机号和邮箱
-     * @param data
-     * @returns {boolean}
-     */
-    @clientExport
-    static async registerCheckEmailMobile (data: {email?: string, mobile?: string}) {
-        if (data.email && !validator.isEmail(data.email)) {
-            throw L.ERR.INVALID_FORMAT('email');
-        }
-
-        if (data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
-            throw L.ERR.MOBILE_NOT_CORRECT();
-        }
-        //查询邮箱是否已经注册
-        if(data.email){
-            var account1 = await Models.account.find({where: {email: data.email}, paranoid: false});
-            if (account1 && account1.total>0) {
-                throw L.ERR.EMAIL_HAS_REGISTRY();
-            }
-            let domain = data.email.match(/.*\@(.*)/)[1]; //企业域名
-
-            let companies = await Models.company.find({where: {domain_name: domain}});
-
-            if(companies && (companies.length > 0 || companies.total > 0)) {
-                throw L.ERR.DOMAIN_HAS_EXIST();
-            }
-        }
-
-        if(data.mobile){
-            var account2 = await Models.account.find({where: {mobile: data.mobile}, paranoid: false});
-            if (account2 && account2.total>0) {
-                throw L.ERR.MOBILE_HAS_REGISTRY();
-            }
-        }
-
-        return true;
-    }
 
     /**
      * @method login
@@ -619,31 +790,33 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         return DBM.Account.findOne({where: {$or : [{email: account}, {mobile: account}], type: type}})
             .then(function (loginAccount) {
                 var pwd = utils.md5(data.pwd);
+                //第一步验证账号是否存在
                 if (!loginAccount) {
                     throw L.ERR.ACCOUNT_NOT_EXIST()
                 }
-
-                if (!loginAccount.pwd && loginAccount.status == ACCOUNT_STATUS.NOT_ACTIVE) {
-                    throw L.ERR.ACCOUNT_NOT_ACTIVE();
+                //第二步验证密码是否正确
+                if (loginAccount.pwd && loginAccount.pwd != pwd) {
+                    throw L.ERR.PASSWORD_NOT_MATCH()
+                }
+                //第三步查看是邮箱登录或手机号登录 查看有限干活手机号是否已验证
+                if (loginAccount.mobile == account && !loginAccount.isValidateMobile) {
+                    throw L.ERR.NO_VALIDATE_MOBILE();
+                }
+                if (loginAccount.email == account && !loginAccount.isValidateEmail) {
+                    throw L.ERR.NO_VALIDATE_EMAIL();
                 }
 
-                if (loginAccount.pwd != pwd) {
-                    throw L.ERR.PASSWORD_NOT_MATCH()
+                //第四步查看账号是否激活
+                if (!loginAccount.pwd && loginAccount.status == ACCOUNT_STATUS.NOT_ACTIVE) {
+                    throw L.ERR.ACCOUNT_NOT_ACTIVE();
                 }
 
                 if (loginAccount.status == ACCOUNT_STATUS.NOT_ACTIVE) {
                     throw L.ERR.ACCOUNT_NOT_ACTIVE();
                 }
 
-                if (loginAccount.mobile == account && !loginAccount.isValidateMobile) {
-                    throw L.ERR.NO_VALIDATE_MOBILE();
-                }
-
-                if (loginAccount.email == account && !loginAccount.isValidateEmail) {
-                    throw L.ERR.NO_VALIDATE_EMAIL();
-                }
-
-                if (loginAccount.status != 1) {
+                //第五步查看账号是否禁用
+                if (loginAccount.status == ACCOUNT_STATUS.FORBIDDEN) {
                     throw L.ERR.ACCOUNT_FORBIDDEN();
                 }
 
@@ -692,83 +865,6 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         //     })
     }
 
-    /**
-     * 重新发送激活链接
-     * @param params
-     * @returns {boolean}
-     */
-    @clientExport
-    static async reSendActiveLink (params:{account:string}):Promise<boolean> {
-        var mobileOrEmail = params.account;
-        var accounts = await Models.account.find({where : {$or : [{email: mobileOrEmail}, {mobile: mobileOrEmail}]}});
-        var account = Account.create();
-        if(accounts && accounts.length>0){
-            account = accounts[0];
-            //发送qm_first_set_pwd
-            var staff = await Models.staff.get(account.id);
-            await API.auth.sendResetPwdEmail({email: account.email, mobile: account.mobile, type: 1, isFirstSet: true, companyName: staff.company.name});
-            //发送qm_active
-            await _sendActiveEmail(account.id);
-        }else{
-            throw L.ERR.ACCOUNT_NOT_EXIST();
-        }
-
-        return true;
-    }
-
-    @clientExport
-    @requireParams(['mobile', 'name', 'email', 'userName','msgCode','msgTicket'], ['pwd','agencyId', 'remark', 'description'])
-    static async registerCompany(params:{name: string, userName: string, email: string, mobile: string, pwd: string,
-        msgCode: string, msgTicket: string, agencyId?: string}){
-        //先创建登录账号
-        // if (!params) {
-        //     params = {};
-        // }
-        var companyName = params.name;
-        var name = params.userName;
-        var email = params.email;
-        var mobile = params.mobile;
-        var msgCode = params.msgCode;
-        var msgTicket = params.msgTicket;
-        var pwd = params.pwd;
-
-        if (!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
-            throw L.ERR.MOBILE_NOT_CORRECT();
-        }
-
-        if (!email || !validator.isEmail(email)) {
-            throw L.ERR.EMAIL_FORMAT_INVALID();
-        }
-
-        if (!msgCode || !msgTicket) {
-            throw {code: -1, msg: "短信验证码错误"};
-        }
-
-        if (!name) {
-            throw {code: -1, msg: "联系人姓名为空"};
-        }
-
-        if (!companyName) {
-            throw {code: -1, msg: "公司名称为空"};
-        }
-
-        if (!pwd) {
-            throw {code: -1, msg: "密码为空"};
-        }
-        var companyId = uuid.v1();
-        var domain = email.split(/@/)[1];
-
-        return Promise.resolve(true)
-            .then(function(){
-                return API.auth.registerCheckEmailMobile({email: email, mobile: mobile});
-            })
-            .then(function() {
-                return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
-            })
-            .then(function() {
-                return API.company.registerCompany({mobile:mobile, email: email,name: companyName,userName: name, pwd: pwd, status: 1});
-            })
-    }
 
     /**
      * 成为伙伴申请
@@ -1108,93 +1204,6 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             .then(function() {
                 return true;
             });
-    };
-
-    /**
-     * 验证验证码
-     * @param params
-     * @returns {Promise<TResult>|Promise<U>}
-     */
-    @clientExport
-    @requireParams(['mobile', 'msgCode','msgTicket'])
-    static async validateMsgCheckCode(params:{mobile: string, msgCode: string, msgTicket: string}){
-        var mobile = params.mobile;
-        var msgCode = params.msgCode;
-        var msgTicket = params.msgTicket;
-
-        if (!mobile || !validator.isMobilePhone(mobile, 'zh-CN')) {
-            throw L.ERR.MOBILE_NOT_CORRECT();
-        }
-
-        var accounts = await Models.account.find({where: {mobile: mobile}});
-        var account = Account.create();
-        if(accounts && accounts.length > 0){
-            account = accounts[0];
-        }else{
-            throw L.ERR.ACCOUNT_NOT_EXIST();
-        }
-
-        if (!msgCode || !msgTicket) {
-            throw L.ERR.CODE_ERROR();
-        }
-
-        var result =  await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
-        if(result){
-            var checkcodeToken = utils.getRndStr(6);
-            account.checkcodeToken = checkcodeToken;
-            await account.save();
-            var expireAt = Date.now() +20 * 60 * 1000;//失效时间20分钟
-            var sign = makeActiveSign(checkcodeToken, account.id, expireAt);
-            return {accountId: account.id, sign: sign, expireAt: expireAt};
-        }else{
-            throw L.ERR.CODE_ERROR();
-        }
-    }
-
-
-    /**
-     * @method resetPwdByOldPwd
-     *
-     * 根据手机号重置密码
-     *
-     * @param {Object} params
-     * @param {String} params.mobile 手机号
-     * @param {String} params.newPwd 新密码
-     * @return {Promise}
-     */
-    @clientExport
-    static async resetPwdByMobile (params: {accountId: string, sign: string, timestamp: number, pwd: string}){
-        var accountId = params.accountId;
-        var sign = params.sign;
-        var timestamp = params.timestamp;
-        var pwd = params.pwd;
-
-        if (!Boolean(timestamp) || timestamp < Date.now()) {
-            throw L.ERR.TIMESTAMP_TIMEOUT();
-        }
-
-        if (!accountId) {
-            throw L.ERR.ACCOUNT_NOT_EXIST();
-        }
-
-        if (!sign) {
-            throw L.ERR.SIGN_ERROR();
-        }
-
-        if (!pwd) {
-            throw L.ERR.PWD_EMPTY();
-        }
-
-        var account = await Models.account.get(accountId);
-        var _sign = makeActiveSign(account.checkcodeToken, accountId, timestamp);
-        if (_sign.toLowerCase() != sign.toLowerCase()) {
-            throw L.ERR.SIGN_ERROR();
-        }
-        pwd = utils.md5(pwd);
-        account.isValidateMobile = true;
-        account.pwd = pwd;
-        await account.save();
-        return true;
     };
 
 
@@ -1585,10 +1594,8 @@ async function _sendActiveEmail(accountId) {
             var expireAt = Date.now() + 24 * 60 * 60 * 1000;//失效时间一天
             var activeToken = utils.getRndStr(6);
             var sign = makeActiveSign(activeToken, account.id, expireAt);
-            var url = C.host + "/index.html#/login/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt;
+            var url = C.host + "/index.html#/login/active?accountId="+account.id+"&sign="+sign+"&timestamp="+expireAt+"&email="+account.email;
             url = await API.wechat.shorturl({longurl: url});
-            console.info(url);
-            console.info("url------------==============");
             //发送激活邮件
             var vals = {
                 name: account.email,

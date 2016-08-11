@@ -1,6 +1,18 @@
-<ion-view title="激活账号" id="page17" class="JingliLogin">
+<ion-view title="激活邮箱" id="page17" class="JingliLogin">
     <ion-content padding="true">
-        <div style="color:#fff">激活成功！</div>
-        <div><a href="" ng-click="goLogin()" style="color: red;">点击此处登陆</a></div>
+        <div ng-if="!invalidLink">
+            <div style="color:#fff">激活成功！</div>
+            <div style="color:#fff">邮箱：{{account.email}}</div>
+            <div style="color:#fff">您可以返回进行登录了</div>
+            <a  class="button button-stable  button-block" ng-click="goLogin()">返回登录</a>
+        </div>
+
+        <div ng-if="invalidLink">
+            <div style="color:#fff">激活链接已失效！</div>
+            <div style="color:#fff">邮箱：{{email}}</div>
+            <div style="color:#fff">您的激活链接已失效请重新获取激活链接</div>
+            <a  class="button button-stable  button-block" ng-click="reSendActiveLink()">获取激活邮件</a>
+            <a  class="button button-stable  button-block" ng-click="goLogin()">手机登录</a>
+        </div>
     </ion-content>
 </ion-view>

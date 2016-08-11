@@ -1321,7 +1321,7 @@ class StaffModule{
         var staff = await Staff.getCurrent();
         var invitedLink = InvitedLink.create();
         invitedLink.staff = staff;
-        invitedLink.expiresTime = moment().add(24, 'd');
+        invitedLink.expiresTime = moment().add(24, 'h');
         var linkToken = utils.getRndStr(6);
         invitedLink.linkToken = linkToken;
         var timeStr = utils.now();
