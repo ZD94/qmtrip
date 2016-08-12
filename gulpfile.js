@@ -14,7 +14,7 @@ gulplib.bundle_lib('browserify', {ex: true, ts: false, require:[
         'buffer', 'is-buffer', 'querystring', 'string_decoder',
         'http', 'https', 'url',
     'util', 'inherits', 'process', 'events', 'stream', 'zlib']});
-gulplib.bundle_lib('update', 'cordova-app-loader/bootstrap.js', {ex: true, ts: false, require: ['cordova-app-loader', 'cordova-promise-fs']});
+gulplib.bundle_lib('update', 'cordova-app-loader/bootstrap.js', {ex: true, ts: false, require: ['cordova-app-loader', 'cordova-promise-fs', 'common/client/updater']});
 gulplib.bundle_lib('ws', {ex: true, ts: false, require: ['ws', 'crypto'], exclude: ['bufferutil', 'utf-8-validate']});
 gulplib.bundle_lib('jquery', {ex: true, ts: false, require: ['jquery']});
 gulplib.bundle_lib('bootstrap', {ex: true, ts: false, require: ["bootstrap"]});
@@ -81,7 +81,7 @@ function ionic_files() {
     return gulp
         .src([
             gulplib.public_dir + '/index.html',
-            gulplib.public_dir + '/script/app.js',
+            gulplib.public_dir + '/script/update.js',
             gulplib.public_dir + '/script/libs/*',
             gulplib.public_dir + '/ionic/**/*',
             gulplib.public_dir + '/fonts/+(ionic|fontawesome)/*.woff',
@@ -124,6 +124,7 @@ gulp.task('ionic.www', ['manifest', 'ionic.www.clean'], function () {
 gulp.task('ionic.config', ['ionic.www'], function () {
     return gulp
         .src([
+            gulplib.public_dir + '/update.html',
             gulplib.public_dir + '/manifest.json',
             'ionic/config.json'
         ])

@@ -7,7 +7,7 @@
   <author email="service@jingli365.com" href="http://www.jingli365.com/">
     小鲸商旅
   </author>
-  <content src="index.html"/>
+  <content src="update.html"/>
   <access origin="*"/>
   <preference name="webviewbounce" value="false"/>
   <preference name="UIWebViewBounce" value="false"/>

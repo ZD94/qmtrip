@@ -10,12 +10,27 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
     <link rel="stylesheet" type="text/css" href="fonts/font-awesome.css">
     <link rel="stylesheet" type="text/css" href="ionic/scss/ionic.app.css">
-    <script src="cordova.js"></script>
+    <script type="text/javascript">
+        (function () {
+            var app = document.URL.indexOf('http://') === -1 && document.URL.indexOf('https://') === -1;
+            if (!app)
+                return;
+            var src = 'file:///android_asset/www/cordova.js';
+            if(/ios|iphone|ipod|ipad/i.test(navigator.userAgent)){
+                src = 'cdvfile://localhost/bundle/www/cordova.js';
+            }
+            var head = document.getElementsByTagName('head')[0]
+            var script = document.createElement('script')
+            script.type = 'text/javascript'
+            script.src = src
+            head.appendChild(script)
+        })()
+    </script>
 </head>
-<body animation="slide-left-right-ios7">
+<body>
 <ion-nav-bar class="bar-stable">
 </ion-nav-bar>
-<ion-nav-view>
+<ion-nav-view animation="slide-left-right-ios7">
     <div class="initial-loading">
         <div class="backdrop visible backdrop-loading active"></div>
         <div class="loading-container visible active">
@@ -29,5 +44,5 @@
 </body>
 <script type="text/javascript" src="script/libs/bundle.preload.js"></script>
 <script type="text/javascript" src="script/libs/bundle.jquery.js"></script>
-<script type="text/javascript" src="script/app.js"></script>
+<script type="text/javascript" src="ionic/controller.all.js"></script>
 </html>
