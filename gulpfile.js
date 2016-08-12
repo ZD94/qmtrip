@@ -40,6 +40,8 @@ gulplib.angular_app('agency');
 //gulplib.angular_app('mobile');
 gulplib.angular_app('ionic');
 
+gulplib.post_default('manifest', genManifest);
+
 gulplib.dist(function () {
     var filter = require('gulp-filter');
     var dist_all = [
@@ -64,7 +66,6 @@ gulplib.dist(function () {
     });
     copy = [
         'config',
-        'www',
         'typings'
     ];
     copy.forEach(function (fname) {
@@ -96,19 +97,18 @@ function ionic_files() {
             '!**/bundle.+(bootstrap|sourcemap|swiper|ws).js',
         ]));
 }
-
-gulp.task('manifest', [/*'default'*/], function () {
-    var json = fs.readFileSync('ionic/config.json');
-    var config = JSON.parse(json);
+var through2 = require('through2');
+function genManifest() {
     var calManifest = require('gulp-cordova-app-loader-manifest');
-    var options = {
-        load: [],
-        root: config.update
-    }
+    var watcher = gulplib.getWatch('manifest.nodep');
     return ionic_files()
-        .pipe(calManifest(options))
+        .pipe(through2.obj(function (file, enc, cb) {
+            watcher.add(file.path);
+            cb(null, file);
+        }))
+        .pipe(calManifest({load: []}))
         .pipe(gulp.dest('www'));
-});
+}
 
 gulp.task('ionic.www.clean', function () {
     var del = require('del');
