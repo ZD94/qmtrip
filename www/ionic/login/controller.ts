@@ -111,7 +111,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
                                 msgbox.log("用户名不能为空");
                             } else {
                                 try{
-                                    var data = await API.auth.reSendActiveLink({account: $scope.form.account});
+                                    var data = await API.auth.reSendActiveLink({email: $scope.form.account});
                                     if(data){
                                         showSendEmailSuccess();
                                     }
@@ -209,7 +209,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
     /*$scope.reSendActiveLink = async function(){
         try{
             await API.onload();
-            var data = await API.auth.reSendActiveLink({account: $scope.form.account});
+            var data = await API.auth.reSendActiveLink({email: $scope.form.account});
             if(data){
                 msgbox.log("发送成功");
             }
@@ -452,7 +452,7 @@ export async function ActiveController ($scope, $stateParams) {
 
     $scope.reSendActiveLink = async function(){
         try{
-            var data = await API.auth.reSendActiveLink({account: email});
+            var data = await API.auth.reSendActiveLink({email: email});
             if(data){
                 msgbox.log("发送成功");
             }

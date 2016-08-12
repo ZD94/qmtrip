@@ -9,6 +9,7 @@ import { getSession } from 'common/model';
 import { TableExtends, Table, Create, Field, ResolveRef, Reference } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import {PaginateInterface} from "../../common/model/interface";
+import utils = require("common/utils");
 
 
 declare var API: any;
@@ -142,6 +143,33 @@ export class Staff extends ModelObject implements Account {
             await API.onload();
         }
         return API.tripPlan.getTripPlanSave({accountId: this.id});
+    }
+
+    async modifyMobile(params){
+        if(!this.isLocal){
+            API.require('staff');
+            await API.onload();
+        }
+        params.id = this.id;
+        return API.staff.modifyMobile(params);
+    }
+    
+    async modifyEmail(params){
+        if(!this.isLocal){
+            API.require('staff');
+            await API.onload();
+        }
+        params.id = this.id;
+        return API.staff.modifyEmail(params);
+    }
+
+    async modifyPwd(params){
+        if(!this.isLocal){
+            API.require('staff');
+            await API.onload();
+        }
+        params.id = this.id;
+        return API.staff.modifyPwd(params);
     }
 
     /*async createInvitedLink(){
