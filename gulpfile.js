@@ -83,7 +83,9 @@ function ionic_files() {
             gulplib.public_dir + '/index.html',
             gulplib.public_dir + '/script/app.js',
             gulplib.public_dir + '/script/libs/*',
-            gulplib.public_dir + '/ionic/**/*'
+            gulplib.public_dir + '/ionic/**/*',
+            gulplib.public_dir + '/fonts/+(ionic|fontawesome)/*.woff',
+            gulplib.public_dir + '/fonts/font-awesome.css',
         ], {
             base: gulplib.public_dir
         })
@@ -100,14 +102,14 @@ function ionic_files() {
 var through2 = require('through2');
 function genManifest() {
     var calManifest = require('gulp-cordova-app-loader-manifest');
-    var watcher = gulplib.getWatch('manifest.nodep');
+    var watcher = gulplib.getWatch('manifest');
     return ionic_files()
         .pipe(through2.obj(function (file, enc, cb) {
             watcher.add(file.path);
             cb(null, file);
         }))
         .pipe(calManifest({load: []}))
-        .pipe(gulp.dest('www'));
+        .pipe(gulp.dest(gulplib.public_dir));
 }
 
 gulp.task('ionic.www.clean', function () {
@@ -122,7 +124,7 @@ gulp.task('ionic.www', ['manifest', 'ionic.www.clean'], function () {
 gulp.task('ionic.config', ['ionic.www'], function () {
     return gulp
         .src([
-            'www/manifest.json',
+            gulplib.public_dir + '/manifest.json',
             'ionic/config.json'
         ])
         .pipe(gulp.dest('ionic/www'));
