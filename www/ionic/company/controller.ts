@@ -15,7 +15,6 @@ const API = require("common/api");
 var L = require("common/language");
 var msgbox = require('msgbox');
 
-
 export async function ManagementController($scope, Models) {
     var staff = await Staff.getCurrent();
     var company = staff.company;
@@ -483,7 +482,9 @@ export async function DepartmentController($scope, Models, $ionicPopup, $ionicLi
     }
 }
 
+
 export async function StaffsController($scope, Models, $ionicPopup) {
+    require('./company.scss');
     var staff = await Staff.getCurrent();
     $scope.currentStaff = staff;
     $scope.staffs = [];

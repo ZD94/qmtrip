@@ -8,6 +8,13 @@
   }
 }
 
+
+ion-side-menu {
+  .menu-button.icon:before {
+    width: 28px;
+  }
+}
+
 .menu-button{
   .badge{
     float: right;
@@ -66,18 +73,14 @@
   transition: all ease-in-out 250ms;
 }
 
-.none-angular{
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  .progress{
-    width: 100%;
-    height: 20px;
-    border: solid 1px #0000ff;
-    .progress-bar{
-      height: 100%;
-      background: #00ccff;
+@media (max-width: 320px) {
+  ion-side-menu {
+    .side-menu-left {
+      .menulist {
+        .button.button-block {
+          margin: 0;
+        }
+      }
     }
   }
 }
-
