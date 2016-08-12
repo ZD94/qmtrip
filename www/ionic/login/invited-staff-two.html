@@ -9,7 +9,8 @@
                 </label>
                 <div class="item item-input">
                     <input type="text" placeholder="请输入验证码" ng-model="form.msgCode">
-                    <a class="button button-positive" ng-click="sendCode()">发送验证码</a>
+                    <a class="button button-positive" ng-click="sendCode()" ng-if="!showCount">发送验证码</a>
+                    <div class="button button-stable" style="width: 116px;text-align: center;" ng-if="showCount"><span id="countNum">{{beginNum}}</span>s</div>
                 </div>
                 <label class="item item-input">
                     <span class="input-label">登录密码</span>

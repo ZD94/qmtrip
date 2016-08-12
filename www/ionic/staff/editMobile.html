@@ -19,7 +19,8 @@
                     <label class="item-input">
                         <input type="text" placeholder="请输入验证码" ng-model="form.msgCode">
                     </label>
-                    <a class="button button-calm" ng-click="sendCode()">获取验证码</a>
+                    <a class="button button-calm" ng-click="sendCode()" ng-if="!showCount">获取验证码</a>
+                    <div class="button button-stable" style="width: 116px;text-align: center;" ng-if="showCount"><span id="countNum">{{beginNum}}</span>s</div>
                 </div>
             </div>
             <a class="button button-block button-calm" ng-click="save()">确认更换</a>
