@@ -12,6 +12,10 @@ const L = require("common/language");
 const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
+import _ = require("lodash");
+import {ticketPrefer} from './prefer';
+import {IFinalTicket, ITicket} from "./_interface";
+import {TRAFFIC} from "./_const";
 
 const defaultPrice = {
     "5": 500,
@@ -353,18 +357,101 @@ class ApiTravelBudget {
             leaveDate = moment(leaveDate).format("YYYY-MM-DD");
         }
 
-        let companyPolicy = staff.company.budgetPolicy;
-        let budget = await API.travelbudget.getTrafficBudget({
-                        originPlace: originPlace,
-                        destinationPlace: destinationPlace,
-                        leaveDate: leaveDate,
-                        leaveTime: leaveTime,
-                        cabinClass: cabinClass,
-                        trainCabinClass: trainCabinClass,
-                        policy: companyPolicy
-                    }) as TravelBudgeItem;
+        //let companyPolicy = staff.company.budgetPolicy;
+        // let budget = await API.travelbudget.getTrafficBudget({
+        //                 originPlace: originPlace,
+        //                 destinationPlace: destinationPlace,
+        //                 leaveDate: leaveDate,
+        //                 leaveTime: leaveTime,
+        //                 cabinClass: cabinClass,
+        //                 trainCabinClass: trainCabinClass,
+        //                 policy: companyPolicy
+        //             }) as TravelBudgeItem;
+        //
+        // return budget;
+        let m_originCity = await API.place.getCityInfo({cityCode: originPlace});
+        let m_destination = await API.place.getCityInfo({cityCode: destinationPlace});
 
-        return budget;
+        let flightTickets:ITicket[] = [];
+        if (m_originCity.skyCode && m_destination.skyCode) {
+            flightTickets = await API.flight.search_ticket({
+                originPlace: m_originCity.skyCode,
+                destination: m_destination.skyCode,
+                leaveDate: leaveDate,
+                cabin: cabinClass
+            });
+        }
+
+        let trainTickets = await API.train.search_ticket( {
+            originPlace: m_originCity.name,
+            destination: m_destination.name,
+            leaveDate: leaveDate,
+            cabin: trainCabinClass
+        });
+
+        let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
+        //将结果转换成线性结构
+        let _tickets: IFinalTicket[] = [];
+        for(var i=0, ii=tickets.length; i<ii; i++) {
+            let agents = tickets[i].agents;
+            for(var j=0, jj=agents.length; j < jj; j++) {
+                let cabins = agents[j].cabins;
+                for(var n = 0, nn=cabins.length; n< nn; n++) {
+                    let cabin = cabins[n];
+                    let _ticket = {
+                        No: tickets[i].No,
+                        departDateTime: tickets[i].departDateTime,
+                        arrivalDateTime: tickets[i].arrivalDateTime,
+                        originPlace: tickets[i].originPlace,
+                        destination: tickets[i].destination,
+                        originStation: tickets[i].originStation,
+                        destinationStation: tickets[i].destinationStation,
+                        agent: agents[j].name,
+                        cabin: cabin.name,
+                        price: cabin.price,
+                        remainNum: cabin.remainNum,
+                        bookUrl: agents[j].bookUrl,
+                        duration: tickets[i].duration,
+                        type: tickets[i].type,
+                    } as IFinalTicket
+                    _tickets.push(_ticket);
+                }
+            }
+        }
+
+        _tickets = ticketPrefer.arrivaltime(_tickets, `${leaveDate} 08:00 +0800`, null, 100);
+        _tickets = ticketPrefer.departtime(_tickets, null, `${leaveDate} 20:00 +0800`, 100);
+        let cheapsuppliers = ['春秋航空', '中国联合航空', '吉祥航空', '西部航空', '成都航空', '九元航空', '幸福航空']
+        _tickets = ticketPrefer.cheapsupplier(_tickets, cheapsuppliers, 100);
+        const CHOOSE_TRAIN_DURATION = 3.5 * 60;
+        const CHOOSE_FLIGHT_DURATION = 6 * 60;
+        _tickets = ticketPrefer.selecttraffic(_tickets, CHOOSE_TRAIN_DURATION, CHOOSE_FLIGHT_DURATION, 500);
+        _tickets = ticketPrefer.cabin(_tickets, ['Economy', '二等座', '硬卧'], 500);
+        if (!_tickets || !_tickets.length) return {price: -1};
+        _tickets = _tickets.sort( (v1, v2) => {
+            let diffScore =  v2.score - v1.score;
+            if (diffScore) return diffScore;
+            //火车按照价格倒叙
+            if (v1.type == TRAFFIC.TRAIN && v2.type == TRAFFIC.TRAIN) {
+                return v2.price - v1.price;
+            }
+            //飞机按照价格顺序
+            if (v1.type == TRAFFIC.FLIGHT && v2.type == TRAFFIC.FLIGHT) {
+                return v1.price - v2.price;
+            }
+            //飞机火车取价格较高的
+            return v2.price - v1.price;
+        });
+
+        return {
+            price: _tickets[0].price,
+            type: <EInvoiceType>(<number>_tickets[0].type),
+            No: _tickets[0].No,
+            agent: _tickets[0].agent,
+            cabin: _tickets[0].cabin,
+            destination: _tickets[0].destinationStation,
+            originPlace: _tickets[0].originPlace,
+        }
     }
 }
 

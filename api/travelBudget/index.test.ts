@@ -2,8 +2,8 @@
  * Created by wlh on 15/12/24.
  */
 
-var assert = require("assert");
-var moment = require("moment");
+import assert = require("assert");
+import moment = require("moment");
 var API = require("common/api");
 
 //var pg_promise = require('pg-promise');
@@ -21,7 +21,7 @@ describe("api/client/travelBudget.js", function() {
     var companyId = "";
     var staffId = "";
     var travelPolicyId = "";
-    var agency = {
+    var agency: any = {
         email: "travelBudget.test@tulingdao.com",
         userName: "喵喵",
         name: '喵喵的代理商',
@@ -29,7 +29,7 @@ describe("api/client/travelBudget.js", function() {
         description: '差旅预算API测试用'
     };
 
-    var company = {
+    var company: any = {
         name: '喵喵的企业',
         userName: '喵喵',
         domain: 'tulingdao.com',
@@ -38,7 +38,7 @@ describe("api/client/travelBudget.js", function() {
         mobile: '15269866805'
     }
 
-    var travelPolicy = {
+    var travelPolicy: any = {
         name: "四级标准",
         planeLevel: "经济舱" ,
         planeDiscount: "7.5",
@@ -57,12 +57,12 @@ describe("api/client/travelBudget.js", function() {
             .spread(function(ret1, ret2, ret3, ret4){
                 return API.agency.createAgency(agency);
             })
-            .then(function(ret){
+            .then(function(ret: any){
                 agencyId = ret.agency.id;
                 agencyUserId = ret.agencyUser.id;
                 return API.client.company.createCompany.call({accountId: agencyUserId}, company);
             })
-            .then(function(company){
+            .then(function(company: any){
                 companyId = company.id;
                 staffId = company.createUser;
                 travelPolicy.companyId = companyId;
