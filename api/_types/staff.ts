@@ -15,6 +15,11 @@ import {PaginateInterface} from "../../common/model/interface";
 declare var API: any;
 
 
+export enum EInvitedLinkStatus {
+    ACTIVE = 1,
+    FORBIDDEN = 0
+};
+
 export enum EStaffStatus {
     FORBIDDEN = 0,
     ON_JOB = 1,
@@ -265,9 +270,9 @@ export class InvitedLink extends ModelObject{
     get expiresTime(): Date { return null; }
     set expiresTime(val: Date) {}
 
-    @Field({type: Types.INTEGER, defaultValue: 1})
-    get status(): number {return 1}
-    set status(status: number){}
+    @Field({type: Types.INTEGER, defaultValue: EInvitedLinkStatus.ACTIVE})
+    get status(): EInvitedLinkStatus {return EInvitedLinkStatus.ACTIVE}
+    set status(status: EInvitedLinkStatus){}
 
     @Field({type: Types.STRING})
     get goInvitedLink(): string { return ''; }

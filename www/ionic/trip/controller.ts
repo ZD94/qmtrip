@@ -359,9 +359,6 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         try {
             let staff = await Staff.getCurrent();
             let tripApprove = await API.tripPlan.saveTripApprove({budgetId: id, title: trip.reason||trip.reasonName, approveUserId: trip.auditUser.id});
-            console.info(tripApprove);
-
-            // let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason||trip.reasonName, auditUser: trip.auditUser.id})
             window.location.href = '#/trip/committed?id='+tripApprove.id;
         } catch(err) {
             alert(err.msg || err);

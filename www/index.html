@@ -1,32 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="format-detection" content="telephone=no" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>鲸力智享</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
     <link rel="stylesheet" type="text/css" href="ionic/scss/ionic.app.css?v=201607211053">
     <script src="cordova.js"></script>
 </head>
 <body animation="slide-left-right-ios7">
-<div class="none-angular">
-    <div class="message" style="text-align: center;">
-        加载中
-    </div>
-    <div class="update-app">
-        <div class="progress">
-            <div class="progress-bar" style="width: 0%;">
+<ion-nav-bar class="bar-stable">
+</ion-nav-bar>
+<ion-nav-view>
+    <div class="initial-loading">
+        <div class="backdrop visible backdrop-loading active"></div>
+        <div class="loading-container visible active">
+            <div class="loading">
+                <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+                <div style="margin-top: 10px;">加载中...</div>
             </div>
         </div>
     </div>
-</div>
-<div>
-    <div>
-        <ion-nav-bar class="bar-stable">
-        </ion-nav-bar>
-        <ion-nav-view></ion-nav-view>
-    </div>
-</div>
+</ion-nav-view>
 </body>
 <script type="text/javascript" src="script/libs/bundle.preload.js"></script>
 <script type="text/javascript" src="script/libs/bundle.jquery.js"></script>

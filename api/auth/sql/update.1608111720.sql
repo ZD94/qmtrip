@@ -1,0 +1,1 @@
+update auth.accounts set is_validate_email = true where status = 1;

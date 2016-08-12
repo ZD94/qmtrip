@@ -82,9 +82,10 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
             window.location.href = backUrl;
         } catch (err) {
             var str = err.msg;
-            if(err.code == -28 && err.msg == "您的账号还未激活"){
+            /*if(err.code == -28 && err.msg == "您的账号还未激活"){
                 $scope.unactivated = true;
-            }else if(err.code == -37 && err.msg == "您的手机号还未验证"){
+            }else */
+            if(err.code == -37 && err.msg == "您的手机号还未验证"){
                 showMobilePopup();
             }else if(err.code == -38 && err.msg == "您的邮箱还未验证"){
                 showEmailPopup();
@@ -204,7 +205,8 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
 
     }
 
-    $scope.reSendActiveLink = async function(){
+    //暂不需要重新发送激活链接了
+    /*$scope.reSendActiveLink = async function(){
         try{
             await API.onload();
             var data = await API.auth.reSendActiveLink({account: $scope.form.account});
@@ -215,7 +217,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
         }catch(err){
             msgbox.log(err.msg || err);
         }
-    }
+    }*/
 }
 
 export async function TestController($scope) {

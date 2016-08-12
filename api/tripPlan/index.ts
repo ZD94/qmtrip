@@ -19,12 +19,11 @@ import {
     Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, ETripType, EAuditStatus,
     TripApprove, EApproveStatus
 } from "api/_types/tripPlan";
-import {Models, EAccountType} from "api/_types/index";
+import {Models} from "api/_types/index";
 import {FindResult} from "common/model/interface";
 import {Staff, EStaffRole, EStaffStatus} from "api/_types/staff";
 import {conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import {getSession} from "common/model/index";
-import {isMobile} from "common/validate";
 import {AgencyUser} from "../_types/agency";
 
 let msgConfig = config.message
@@ -40,7 +39,6 @@ class TripPlanModule {
      * @param params
      * @returns {TripPlan}
      */
-    @clientExport
     @requireParams(['budgetId', 'title'], ['description', 'remark', 'auditUser'])
     static async saveTripPlan(params): Promise<TripPlan> {
         let staff = await Staff.getCurrent();
@@ -93,7 +91,7 @@ class TripPlanModule {
             let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: price});
             detail.accountId = staff.id;
             detail.isCommit = false;
-            detail.status = EPlanStatus.WAIT_APPROVE;
+            detail.status = EPlanStatus.WAIT_UPLOAD;
             detail.tripPlan = tripPlan;
             switch(tripType) {
                 case ETripType.OUT_TRIP:
@@ -155,7 +153,7 @@ class TripPlanModule {
         });
 
         tripPlan.budget = totalBudget;
-        tripPlan.status = totalBudget<0 ? EPlanStatus.NO_BUDGET : EPlanStatus.WAIT_APPROVE;
+        tripPlan.status = totalBudget<0 ? EPlanStatus.NO_BUDGET : EPlanStatus.WAIT_UPLOAD;
         let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripPlan.id, userId: staff.id, remark: '创建出差计划'});
 
         await Promise.all([tripPlan.save(), tripPlanLog.save()]);
@@ -168,6 +166,7 @@ class TripPlanModule {
 
     /**
      * 获取出差计划中发送邮件的模板数据详情
+     * 该函数将在审批单分出后舍弃
      * @param tripPlan
      * @returns {{go: string, back: string, hotel: string}}
      */
@@ -258,7 +257,6 @@ class TripPlanModule {
             let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: price});
             detail.accountId = account.id;
             detail.isCommit = false;
-            detail.status = EPlanStatus.WAIT_APPROVE;
             detail.tripPlanId = approve.id;
             switch(tripType) {
                 case ETripType.OUT_TRIP:
@@ -1039,7 +1037,7 @@ class TripPlanModule {
     @modelNotNull('tripPlan')
     static async cancelTripPlan(params: {id: string}): Promise<boolean> {
         let tripPlan = await Models.tripPlan.get(params.id);
-        if(tripPlan.status != EPlanStatus.APPROVE_NOT_PASS && tripPlan.status != EPlanStatus.NO_BUDGET && tripPlan.status != EPlanStatus.WAIT_APPROVE) {
+        if( tripPlan.status != EPlanStatus.NO_BUDGET && tripPlan.status != EPlanStatus.WAIT_UPLOAD) {
             throw {code: -2, msg: "出差记录状态不正确！"};
         }
         
@@ -1070,7 +1068,7 @@ class TripPlanModule {
         let endTime = moment(startTime).add(1, 'months').format('YYYY-MM-DD');
 
         let where_sql = 'from trip_plan.trip_plans where company_id=\''
-            + companyId + '\' and status!=(' + EPlanStatus.APPROVE_NOT_PASS + ') and status!=' + EPlanStatus.WAIT_APPROVE + '  and status!=(' + EPlanStatus.CANCEL + ')  and status!=(' + EPlanStatus.NO_BUDGET + ') and start_at>=\''
+            + companyId + '\' and status!=(' + EPlanStatus.CANCEL + ')  and status!=(' + EPlanStatus.NO_BUDGET + ') and start_at>=\''
             + startTime + '\' and start_at<\'' + endTime + '\'';
 
         let complete_sql = 'from trip_plan.trip_plans where company_id=\''
@@ -1280,7 +1278,7 @@ class TripPlanModule {
             let detail = Models.tripDetail.create({type: tripType, invoiceType: budget.type, budget: price});
             detail.accountId = account.id;
             detail.isCommit = false;
-            detail.status = EPlanStatus.WAIT_APPROVE;
+            detail.status = EPlanStatus.WAIT_UPLOAD;
             detail.tripPlan = tripPlan;
             switch(tripType) {
                 case ETripType.OUT_TRIP:

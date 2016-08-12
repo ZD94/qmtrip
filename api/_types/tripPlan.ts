@@ -11,13 +11,13 @@ declare var API: any;
 export enum EPlanStatus {
     CANCEL = -4, //出差计划撤销状态
     AUDIT_NOT_PASS = -3, //票据未审核通过
-    APPROVE_NOT_PASS = -2, //审批未通过
+    // APPROVE_NOT_PASS = -2, //审批未通过
     NO_BUDGET = -1, //没有预算
-    WAIT_APPROVE = 0, //待审批状态
+    // WAIT_APPROVE = 0, //待审批状态
     WAIT_UPLOAD = 1, //待上传票据
     WAIT_COMMIT = 2, //待提交状态
     AUDITING = 3, //已提交待审核状态
-    COMPLETE = 4, //审核完，已完成状态
+    COMPLETE = 4 //审核完，已完成状态
 }
 
 export enum EApproveStatus {
