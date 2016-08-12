@@ -72,7 +72,7 @@
                     $("#mobile").focus();
                     return false;
                 }
-                API.auth.registerCheckEmailMobile({email: email, mobile: mobile})
+                API.auth.checkEmailAndMobile({email: email, mobile: mobile})
                         .then(function(){
                             $("#countNum").parent("span").show();
                             $self.hide();

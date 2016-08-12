@@ -7,6 +7,7 @@ import {EPlanStatus, ETripType, EAuditStatus} from 'api/_types/tripPlan';
 import {TravelPolicy, MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 import {Department} from "api/_types/department";
 import {AccordHotel} from "api/_types/accordHotel";
+import {ACCOUNT_STATUS} from "api/_types/auth"
 import validator = require('validator');
 import _ = require('lodash');
 const moment = require("moment");
@@ -14,7 +15,6 @@ const API = require("common/api");
 var L = require("common/language");
 var msgbox = require('msgbox');
 declare var ionic;
-
 
 export async function ManagementController($scope, Models) {
     var staff = await Staff.getCurrent();
@@ -483,7 +483,9 @@ export async function DepartmentController($scope, Models, $ionicPopup, $ionicLi
     }
 }
 
+
 export async function StaffsController($scope, Models, $ionicPopup) {
+    require('./company.scss');
     var staff = await Staff.getCurrent();
     $scope.currentStaff = staff;
     $scope.staffs = [];
@@ -584,7 +586,7 @@ export async function StaffsController($scope, Models, $ionicPopup) {
                     onTap: async function (e) {
                         try{
                             var forbidStaff = await Models.staff.get(id);
-                            forbidStaff.status = EStaffStatus.FORBIDDEN;
+                            forbidStaff.status = ACCOUNT_STATUS.FORBIDDEN;
                             forbidStaff.staffStatus = EStaffStatus.FORBIDDEN;//同时修改account和staff两张表会有问题 只会修改一张表
                             await forbidStaff.save();
                             $scope.staffs.splice(index, 1);

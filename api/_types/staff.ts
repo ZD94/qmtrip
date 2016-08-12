@@ -9,10 +9,16 @@ import { getSession } from 'common/model';
 import { TableExtends, Table, Create, Field, ResolveRef, Reference } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import {PaginateInterface} from "../../common/model/interface";
+import utils = require("common/utils");
 
 
 declare var API: any;
 
+
+export enum EInvitedLinkStatus {
+    ACTIVE = 1,
+    FORBIDDEN = 0
+};
 
 export enum EStaffStatus {
     FORBIDDEN = 0,
@@ -139,6 +145,33 @@ export class Staff extends ModelObject implements Account {
         return API.tripPlan.getTripPlanSave({accountId: this.id});
     }
 
+    async modifyMobile(params){
+        if(!this.isLocal){
+            API.require('staff');
+            await API.onload();
+        }
+        params.id = this.id;
+        return API.staff.modifyMobile(params);
+    }
+    
+    async modifyEmail(params){
+        if(!this.isLocal){
+            API.require('staff');
+            await API.onload();
+        }
+        params.id = this.id;
+        return API.staff.modifyEmail(params);
+    }
+
+    async modifyPwd(params){
+        if(!this.isLocal){
+            API.require('staff');
+            await API.onload();
+        }
+        params.id = this.id;
+        return API.staff.modifyPwd(params);
+    }
+
     /*async createInvitedLink(){
         var invitedLink = InvitedLink.create();
         invitedLink = await invitedLink.save();
@@ -261,9 +294,9 @@ export class InvitedLink extends ModelObject{
     get expiresTime(): Date { return null; }
     set expiresTime(val: Date) {}
 
-    @Field({type: Types.INTEGER, defaultValue: 1})
-    get status(): number {return 1}
-    set status(status: number){}
+    @Field({type: Types.INTEGER, defaultValue: EInvitedLinkStatus.ACTIVE})
+    get status(): EInvitedLinkStatus {return EInvitedLinkStatus.ACTIVE}
+    set status(status: EInvitedLinkStatus){}
 
     @Field({type: Types.STRING})
     get goInvitedLink(): string { return ''; }

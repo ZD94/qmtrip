@@ -82,9 +82,10 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
             window.location.href = backUrl;
         } catch (err) {
             var str = err.msg;
-            if(err.code == -28 && err.msg == "您的账号还未激活"){
+            /*if(err.code == -28 && err.msg == "您的账号还未激活"){
                 $scope.unactivated = true;
-            }else if(err.code == -37 && err.msg == "您的手机号还未验证"){
+            }else */
+            if(err.code == -37 && err.msg == "您的手机号还未验证"){
                 showMobilePopup();
             }else if(err.code == -38 && err.msg == "您的邮箱还未验证"){
                 showEmailPopup();
@@ -110,7 +111,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
                                 msgbox.log("用户名不能为空");
                             } else {
                                 try{
-                                    var data = await API.auth.reSendActiveLink({account: $scope.form.account});
+                                    var data = await API.auth.reSendActiveLink({email: $scope.form.account});
                                     if(data){
                                         showSendEmailSuccess();
                                     }
@@ -204,10 +205,11 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
 
     }
 
-    $scope.reSendActiveLink = async function(){
+    //暂不需要重新发送激活链接了
+    /*$scope.reSendActiveLink = async function(){
         try{
             await API.onload();
-            var data = await API.auth.reSendActiveLink({account: $scope.form.account});
+            var data = await API.auth.reSendActiveLink({email: $scope.form.account});
             if(data){
                 msgbox.log("发送成功");
             }
@@ -215,7 +217,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
         }catch(err){
             msgbox.log(err.msg || err);
         }
-    }
+    }*/
 }
 
 export async function TestController($scope) {
@@ -450,7 +452,7 @@ export async function ActiveController ($scope, $stateParams) {
 
     $scope.reSendActiveLink = async function(){
         try{
-            var data = await API.auth.reSendActiveLink({account: email});
+            var data = await API.auth.reSendActiveLink({email: email});
             if(data){
                 msgbox.log("发送成功");
             }
@@ -533,7 +535,7 @@ export async function InvitedStaffTwoController ($scope, $stateParams){
             msgbox.log("手机号不能为空");
             return;
         }
-        API.auth.registerCheckEmailMobile({mobile: $scope.form.mobile})
+        API.auth.checkEmailAndMobile({mobile: $scope.form.mobile})
             .then(async function(){
                 return API.checkcode.getMsgCheckCode({mobile: $scope.form.mobile})
                     .then(function(result){
