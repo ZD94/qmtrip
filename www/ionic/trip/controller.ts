@@ -361,8 +361,8 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
             let tripApprove = await API.tripPlan.saveTripApprove({budgetId: id, title: trip.reason||trip.reasonName, approveUserId: trip.auditUser.id});
             console.info(tripApprove);
 
-            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason||trip.reasonName, auditUser: trip.auditUser.id})
-            window.location.href = '#/trip/committed?id='+planTrip.id;
+            // let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason||trip.reasonName, auditUser: trip.auditUser.id})
+            window.location.href = '#/trip/committed?id='+tripApprove.id;
         } catch(err) {
             alert(err.msg || err);
         } finally {
@@ -373,13 +373,11 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
 
 export async function CommittedController($scope, $stateParams, Models){
     let id = $stateParams.id;
-
-    let tripPlan = await Models.tripPlan.get(id);
-    console.info("CommittedController==>", tripPlan);
-    $scope.tripPlan = tripPlan.target;
-
+    let tripApprove = await Models.tripApprove.get(id);
+    $scope.tripApprove = tripApprove;
+    console.info($scope.tripApprove);
     $scope.goToDetail = function() {
-        window.location.href = '#/trip/list-detail?tripid='+id;
+        window.location.href = `#/trip-approval/detail?approveId=${id}`;
     }
 }
 

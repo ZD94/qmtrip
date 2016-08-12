@@ -19,7 +19,7 @@ export async function ApprovedController($scope, Models, $stateParams){
     $scope.staffName = staff.name;
 }
 
-export async function DetailController($scope, Models, $stateParams, $ionicPopup, $ionicLoading){
+export async function DetailController($scope, Models, $stateParams, $ionicPopup, $loading){
     require('./trip-approval.scss');
     let approveId = $stateParams.approveId;
     let tripApprove = await Models.tripApprove.get(approveId);
@@ -33,36 +33,40 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.isHasPermissionApprove = isHasPermissionApprove;
     let totalBudget: number = 0;
 
-    // if (tripApprove.status == EApproveStatus.WAIT_APPROVE && tripApprove.query && isHasPermissionApprove) {
-    //     await $ionicLoading.show({template: '预算计算中...'});
-    //     //计算最终预算
-    //     API.require("travelBudget");
-    //     await API.onload();
-    //     let query = tripApprove.query;
-    //
-    //     if (typeof query == 'string')
-    //         query = JSON.parse(tripApprove.query);
-    //
-    //     query.staffId = tripApprove.account.id;
-    //     let budgetId = await API.travelBudget.getTravelPolicyBudget(query);
-    //     $scope.budgetId = budgetId;
-    //     let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.accountId});
-    //     let budgets = budgetInfo.budgets;
-    //
-    //     totalBudget = 0;
-    //     budgets.forEach((v) => {
-    //         if (v.price <= 0) {
-    //             totalBudget = -1;
-    //             return;
-    //         }
-    //         totalBudget += Number(v.price);
-    //     });
-    //
-    //     if (totalBudget > tripApprove.budget) {
-    //         tripApprove.budget = totalBudget;
-    //         tripApprove.budgetInfo = budgets;
-    //     }
-    // }
+    if (tripApprove.status == EApproveStatus.WAIT_APPROVE && tripApprove.query && isHasPermissionApprove) {
+        $loading.reset();
+        $loading.start({
+            template: '预算计算中...'
+        });
+        //计算最终预算
+        API.require("travelBudget");
+        await API.onload();
+        let query = tripApprove.query;
+
+        if (typeof query == 'string')
+            query = JSON.parse(tripApprove.query);
+
+        query.staffId = tripApprove.account.id;
+        let budgetId = await API.travelBudget.getTravelPolicyBudget(query);
+        $scope.budgetId = budgetId;
+        let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
+        let budgets = budgetInfo.budgets;
+
+        totalBudget = 0;
+        budgets.forEach((v) => {
+            if (v.price <= 0) {
+                totalBudget = -1;
+                return;
+            }
+            totalBudget += Number(v.price);
+        });
+
+        if (totalBudget > tripApprove.budget) {
+            tripApprove.budget = totalBudget;
+            tripApprove.budgetInfo = budgets;
+        }
+        $loading.end();
+    }
 
     let traffic = [], hotel = [], subsidy = [];
     let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;

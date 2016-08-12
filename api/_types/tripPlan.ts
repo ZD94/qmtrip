@@ -220,9 +220,9 @@ export class TripPlan extends ModelObject {
     get finalBudgetCreateAt() : Date { return null;}
     set finalBudgetCreateAt(d: Date) {};
 
-    @Field({type: Types.DATE})
-    get autoApproveTime() : Date { return null;}
-    set autoApproveTime(d: Date) {};
+    // @Field({type: Types.DATE})
+    // get autoApproveTime() : Date { return null;}
+    // set autoApproveTime(d: Date) {};
 
     @ResolveRef({type: Types.UUID}, Models.project)
     get project(): Project { return null; }
@@ -259,16 +259,6 @@ export class TripPlan extends ModelObject {
         }
         options.where.tripPlanId = this.id;
         return Models.tripDetail.find(options);
-    }
-
-    /**
-     * 审批人审批出差计划
-     * @param params
-     * @returns {Promise<boolean>}
-     */
-    approve(params: {auditResult: EAuditStatus, auditRemark?: string, budgetId?: string}): Promise<boolean> {
-        params['id'] = this.id;
-        return API.tripPlan.approveTripPlan(params);
     }
 
     /**
@@ -567,6 +557,9 @@ export class TripApprove extends ModelObject{
     get approveUser(): Staff { return null; }
     set approveUser(val: Staff) {}
 
+    @Field({type: Types.STRING})
+    get approveRemark(): string { return ''; }
+    set approveRemark(val: string) {}
 
     @Reference({type: Types.UUID})
     getCompany(id?:string): Promise<Company> {
@@ -574,4 +567,14 @@ export class TripApprove extends ModelObject{
     }
     setCompany(val: Company) {}
 
+
+    /**
+     * 审批人审批出差计划
+     * @param params
+     * @returns {Promise<boolean>}
+     */
+    approve(params: {auditResult: EAuditStatus, auditRemark?: string, budgetId?: string, id?: string}): Promise<boolean> {
+        params.id = this.id;
+        return API.tripPlan.approveTripPlan(params);
+    }
 }
