@@ -30,7 +30,10 @@ gulplib.bundle_lib('img', {ex: true, ts: false, require: ['arale-qrcode', 'hidpi
 gulplib.bundle_lib('base', {ex: true, ts: false, require:['md5', 'moment', 'tiny-cookie', 'shoe', 'lodash', 'validator', 'scssify', 'cssify']})
 gulplib.bundle_lib('sourcemap', {ex: true, ts: false, require: ['source-map-support']})
 
-gulplib.bundle_lib('preload', {ex: true, ts: false, require:['dyload', 'babel-polyfill', 'bluebird', 'common/ts_helper', 'common/zone', 'path']});
+gulplib.bundle_lib('preload', {ex: true, ts: false, require:[
+    'dyload', 'babel-polyfill', 'bluebird', 'common/ts_helper', 'common/zone', 'path',
+    'common/client/config:common/config'
+]});
 
 gulplib.bundle_lib('api', {require: ['common/client/api:common/api', 'common/api/helper', 'common/language']});
 gulplib.bundle_lib('calendar', {require: ['lunar-calendar', "calendar"]});
