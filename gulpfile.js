@@ -89,14 +89,12 @@ function ionic_files() {
     return gulp
         .src([
             gulplib.public_dir + '/index.html',
-            gulplib.public_dir + '/script/update.js',
+            gulplib.public_dir + '/script/try_cordova.js',
             gulplib.public_dir + '/script/libs/*',
             gulplib.public_dir + '/ionic/**/*',
             gulplib.public_dir + '/fonts/+(ionic|fontawesome)/*.woff',
             gulplib.public_dir + '/fonts/font-awesome.css',
-        ], {
-            base: gulplib.public_dir
-        })
+        ], { base: gulplib.public_dir })
         .pipe(filter([
             '**',
             '!**/controller.[jt]s',
@@ -124,20 +122,21 @@ gulp.task('ionic.www.clean', function () {
     var del = require('del');
     return del('ionic/www');
 });
-gulp.task('ionic.www.copy', ['manifest', 'ionic.www.clean'], function () {
+gulp.task('ionic.www.files', ['post.manifest', 'ionic.www.clean'], function () {
     var filter = require('gulp-filter');
     return ionic_files()
         .pipe(gulp.dest('ionic/www'));
 });
-gulp.task('ionic.www', ['ionic.www.copy'], function(){
+gulp.task('ionic.www.extra', ['ionic.www.files'], function(){
     return gulp
         .src([
             gulplib.public_dir + '/update.html',
+            gulplib.public_dir + '/script/update.js',
             gulplib.public_dir + '/manifest.json',
-        ])
+        ], { base: gulplib.public_dir })
         .pipe(gulp.dest('ionic/www'));
 })
-gulp.task('ionic.config', ['ionic.www.copy'], function (done) {
+gulp.task('ionic.www.config', ['ionic.www.files'], function (done) {
     var rename = require("gulp-rename");
     return gulp
         .src('ionic/config.'+argv.appconfig+'.json')
@@ -145,9 +144,9 @@ gulp.task('ionic.config', ['ionic.www.copy'], function (done) {
         .pipe(gulp.dest('ionic/www'));
 });
 
-gulp.task('ionic.dist', ['ionic.www', 'ionic.config']);
+gulp.task('ionic.www', ['ionic.www.files', 'ionic.www.extra', 'ionic.www.config']);
 
-gulp.task('ionic.ios', ['ionic.dist'], function (done) {
+gulp.task('ionic.ios', ['ionic.www'], function (done) {
     var exec = require('child_process').exec;
     process.chdir('ionic');
     var child_res = exec('ionic resources', function (err) {
@@ -167,7 +166,7 @@ gulp.task('ionic.ios', ['ionic.dist'], function (done) {
     child_res.stderr.pipe(process.stderr);
 });
 
-gulp.task('ionic.android', ['ionic.dist'], function (done) {
+gulp.task('ionic.android', ['ionic.www'], function (done) {
     var exec = require('child_process').exec;
     process.chdir('ionic');
     var child_res = exec('ionic resources', function (err) {
