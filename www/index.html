@@ -10,22 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
     <link rel="stylesheet" type="text/css" href="fonts/font-awesome.css">
     <link rel="stylesheet" type="text/css" href="ionic/scss/ionic.app.css">
-    <script type="text/javascript">
-        (function () {
-            var app = document.URL.indexOf('http://') === -1 && document.URL.indexOf('https://') === -1;
-            if (!app)
-                return;
-            var src = 'file:///android_asset/www/cordova.js';
-            if(/ios|iphone|ipod|ipad/i.test(navigator.userAgent)){
-                src = 'cdvfile://localhost/bundle/www/cordova.js';
-            }
-            var head = document.getElementsByTagName('head')[0]
-            var script = document.createElement('script')
-            script.type = 'text/javascript'
-            script.src = src
-            head.appendChild(script)
-        })()
-    </script>
+    <script type="text/javascript" src="script/try_cordova.js"></script>
 </head>
 <body>
 <ion-nav-bar class="bar-stable">
