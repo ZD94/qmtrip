@@ -8,6 +8,11 @@ var path = require('path');
 var gulp = require('gulp');
 var gulplib = require('./common/gulplib');
 
+var argv = require('yargs')
+    .alias('a', 'appconfig')
+    .default('appconfig', 'j')
+    .argv;
+
 gulplib.public_dir = 'www';
 
 gulplib.bundle_lib('browserify', {ex: true, ts: false, require:[
@@ -116,22 +121,28 @@ gulp.task('ionic.www.clean', function () {
     var del = require('del');
     return del('ionic/www');
 });
-gulp.task('ionic.www', ['manifest', 'ionic.www.clean'], function () {
+gulp.task('ionic.www.copy', ['manifest', 'ionic.www.clean'], function () {
     var filter = require('gulp-filter');
     return ionic_files()
         .pipe(gulp.dest('ionic/www'));
 });
-gulp.task('ionic.config', ['ionic.www'], function () {
+gulp.task('ionic.www', ['ionic.www.copy'], function(){
     return gulp
         .src([
             gulplib.public_dir + '/update.html',
             gulplib.public_dir + '/manifest.json',
-            'ionic/config.json'
         ])
+        .pipe(gulp.dest('ionic/www'));
+})
+gulp.task('ionic.config', ['ionic.www.copy'], function (done) {
+    var rename = require("gulp-rename");
+    return gulp
+        .src('ionic/config.'+argv.appconfig+'.json')
+        .pipe(rename('config.json'))
         .pipe(gulp.dest('ionic/www'));
 });
 
-gulp.task('ionic.dist', ['ionic.config']);
+gulp.task('ionic.dist', ['ionic.www', 'ionic.config']);
 
 gulp.task('ionic.ios', ['ionic.dist'], function (done) {
     var exec = require('child_process').exec;
