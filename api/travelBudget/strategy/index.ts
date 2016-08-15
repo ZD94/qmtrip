@@ -256,7 +256,6 @@ export class CommonHotelStrategy extends AbstractHotelStrategy {
             //然后按照价格排序
             return v2.price - v1.price;
         });
-        require('fs').writeFile('./data.json', JSON.stringify(hotels))
         let hotel = hotels[0];
         return {
             name: hotel.name,
