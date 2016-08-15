@@ -27,20 +27,20 @@ export abstract class AbstractStrategy implements IStrategy {
     abstract async buildProcess(params: any): Promise<any>;
     //开始计算前
     private async _begin(): Promise<any> {
-        console.log('原始数据:' + this.tickets)
+        console.log('原始数据:' + JSON.stringify(this.tickets))
         return null;
     }
     //计算完成
     private async _finish(): Promise<any> {
-        console.log('计算结果:' + this.result);
+        console.log('计算结果:' + JSON.stringify(this.result));
         return null;
     }
     //对外暴漏获取结果函数
     async getResult(params: any): Promise<any> {
         this._begin();
-        let result = await this.buildProcess(params);
+        this.result = await this.buildProcess(params);
         this._finish();
-        return result;
+        return this.result;
     }
 }
 
