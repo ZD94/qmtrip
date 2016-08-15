@@ -13,9 +13,7 @@ const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
-import {ticketPrefer} from './prefer';
-import {IFinalTicket, ITicket} from "./_interface";
-import {TRAFFIC} from "./_const";
+import {IFinalTicket, ITicket, TravelBudgeItem} from "../_types/travelBudget";
 import {CommonTicketStrategy} from "./strategy/index";
 
 const defaultPrice = {
@@ -23,12 +21,6 @@ const defaultPrice = {
     "4": 450,
     "3": 400,
     "2": 350
-}
-
-interface TravelBudgeItem {
-    price: number;
-    type?: EInvoiceType;
-    tripType?: ETripType;
 }
 
 interface BudgetOptions{

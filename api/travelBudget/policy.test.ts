@@ -11,8 +11,7 @@ import departtime = require('./prefer/ticket-departtime');
 import cheapsupplier = require('./prefer/ticket-cheapsupplier');
 import maxpricelimit = require('./prefer/ticket-maxpricelimit');
 import lowestprice = require('./prefer/ticket-lowestprice');
-import {IFinalTicket} from "./_interface";
-import {TRAFFIC} from "./_const";
+import {IFinalTicket, TRAFFIC} from "../_types/travelBudget";
 
 
 

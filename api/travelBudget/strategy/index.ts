@@ -3,9 +3,8 @@
  */
 
 'use strict';
-import {ITicket, IFinalTicket} from "../_interface";
+import {ITicket, IFinalTicket, TRAFFIC} from "../../_types/travelBudget";
 import {ticketPrefer} from '../prefer'
-import {TRAFFIC} from "../_const";
 import {EInvoiceType} from "../../_types/tripPlan";
 
 export interface IStrategy {

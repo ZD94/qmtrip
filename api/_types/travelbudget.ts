@@ -3,7 +3,19 @@
  */
 
 'use strict';
-import {TRAFFIC} from './_const';
+
+import {EInvoiceType, ETripType} from "../_types/tripPlan";
+
+export enum TRAFFIC {
+    TRAIN = 0,
+    FLIGHT = 1
+}
+
+export interface TravelBudgeItem {
+    price: number;
+    type?: EInvoiceType;
+    tripType?: ETripType;
+}
 
 export interface IFinalTicket {
     No: string;   //航班号或者车次
