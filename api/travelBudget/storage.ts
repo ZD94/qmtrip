@@ -51,7 +51,6 @@ export class RedisStorage implements IStorage {
         let client = this._getClient();
         return new Promise( (resolve, reject) => {
             key = `${this._prefix}${key}`;
-            console.info('SET redis:', key, this._cacheSeconds);
             client.set(key, JSON.stringify(content), 'ex', this._cacheSeconds, function(err) {
                 if (err) return reject(err);
                 return resolve(content);

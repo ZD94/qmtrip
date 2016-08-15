@@ -14,7 +14,7 @@ const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
 import {IFinalTicket, ITicket, TravelBudgeItem} from "../_types/travelBudget";
-import {CommonTicketStrategy} from "./strategy/index";
+import {CommonTicketStrategy, HighestPriceTicketStrategy} from "./strategy/index";
 
 const defaultPrice = {
     "5": 500,
@@ -313,9 +313,7 @@ class ApiTravelBudget {
         }
 
         //查询员工信息
-        // staff.travelPolicyId = "dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a";
         let staff = await Staff.getCurrent();
-
         if (!staff || !staff['travelPolicyId']) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
@@ -350,18 +348,7 @@ class ApiTravelBudget {
             leaveDate = moment(leaveDate).format("YYYY-MM-DD");
         }
 
-        //let companyPolicy = staff.company.budgetPolicy;
-        // let budget = await API.travelbudget.getTrafficBudget({
-        //                 originPlace: originPlace,
-        //                 destinationPlace: destinationPlace,
-        //                 leaveDate: leaveDate,
-        //                 leaveTime: leaveTime,
-        //                 cabinClass: cabinClass,
-        //                 trainCabinClass: trainCabinClass,
-        //                 policy: companyPolicy
-        //             }) as TravelBudgeItem;
-        //
-        // return budget;
+        let companyPolicy = staff.company.budgetPolicy;
         let m_originCity = await API.place.getCityInfo({cityCode: originPlace});
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace});
 
@@ -382,8 +369,14 @@ class ApiTravelBudget {
             cabin: trainCabinClass
         });
 
+        let strategySwitcher = {
+            default: CommonTicketStrategy,
+            bmw: HighestPriceTicketStrategy
+        }
+
         let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
-        let strategy = new CommonTicketStrategy(tickets);
+        console.info('选择的策略是:', companyPolicy);
+        let strategy = new strategySwitcher[companyPolicy](tickets);
         return strategy.getResult(params)
     }
 }

@@ -15,6 +15,7 @@ export interface TravelBudgeItem {
     price: number;
     type?: EInvoiceType;
     tripType?: ETripType;
+    id?: string;
 }
 
 export interface IFinalTicket {

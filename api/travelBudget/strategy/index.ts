@@ -33,12 +33,12 @@ export abstract class AbstractStrategy implements IStrategy {
     abstract async buildProcess(params: any): Promise<any>;
     //开始计算前
     private async _begin(): Promise<any> {
-        console.log('原始数据:' + JSON.stringify(this.tickets));
+        // console.log('原始数据:' + JSON.stringify(this.tickets));
         return this.storage.write(this._key+':data', JSON.stringify(this.tickets));
     }
     //计算完成
     private async _finish(): Promise<any> {
-        console.log('计算结果:' + JSON.stringify(this.result));
+        // console.log('计算结果:' + JSON.stringify(this.result));
         return this.storage.write(this._key, JSON.stringify(this.result));
     }
 
@@ -46,7 +46,7 @@ export abstract class AbstractStrategy implements IStrategy {
     async getResult(params: any): Promise<TravelBudgeItem> {
         this._begin();
         this.result = await this.buildProcess(params);
-        this.result['id'] = this._key;
+        this.result.id = this._key;
         this._finish();
         return this.result;
     }
