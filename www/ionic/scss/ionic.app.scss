@@ -104,6 +104,11 @@ ion-content{
   color: #fff;
 }
 
+.platform-android{
+  .scroll-view.scroll-y[overflow-scroll="false"][has-bouncing="true"]{
+    overflow-y: hidden;
+  }
+}
 
 .platform-wechat{
   .nav-bar-block{
