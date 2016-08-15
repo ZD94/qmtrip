@@ -13,3 +13,11 @@ export var ticketPrefer = {
     maxpricelimit: require('./ticket-maxpricelimit'),
     selecttraffic: require('./ticket-selecttraffic')
 };
+
+export var hotelPrefer = {
+    lowestprice: require('./hotel-lowestprice'),
+    blacklist: require('./hotel-blacklist'),
+    represent: require('./hotel-represent'),
+    starmatch: require('./hotel-starmatch'),
+    maxpricelimit: require('./hotel-maxpricelimit')
+}

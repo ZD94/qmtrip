@@ -64,3 +64,29 @@ export interface ITicket {
     destinationStation?: string;    //目的地机场或者车站
     type: TRAFFIC,
 }
+
+//酒店代理商
+export interface IHotelAgent extends IAgent{
+    price: number;
+}
+
+//酒店
+export interface IHotel {
+    name: string;
+    latitude: string;
+    longitude: string;
+    agents: Array<IHotelAgent>;
+    star: string| number;
+}
+
+export interface IFinalHotel {
+    name: string;
+    latitude: string;
+    longitude: string;
+    star: number;
+    agent: string;
+    price: number;
+    bookUrl?: string;
+    score?: number;
+    reasons?: string[]
+}

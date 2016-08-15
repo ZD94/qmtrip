@@ -3,14 +3,44 @@
  */
 
 'use strict';
-import {ITicket, IFinalTicket, TRAFFIC, TravelBudgeItem} from "../../_types/travelBudget";
-import {ticketPrefer} from '../prefer'
+import {ITicket, IFinalTicket, TRAFFIC, TravelBudgeItem, IHotel, IFinalHotel} from "../../_types/travelBudget";
+import {ticketPrefer, hotelPrefer} from '../prefer'
 import {EInvoiceType} from "../../_types/tripPlan";
 import {RedisStorage, IStorage} from '../storage';
 var C = require('config');
 
 export interface IStrategy {
      getResult(params: any): Promise<any>;
+}
+
+
+export abstract class AbstractHotelStrategy implements IStrategy {
+    protected hotels: IHotel[];
+    private _key: string;
+
+    constructor(hotels: IHotel[]) {
+        this.hotels = hotels;
+        this._key = 'ID' + Date.now() + Math.ceil(Math.random() * 1000);
+    }
+
+    async _begin(params: any): Promise<any> {
+        console.log(`${this._key}开始于:${Date.now()}`);
+        return null;
+    }
+
+    async _end(data: any): Promise<any> {
+        console.log(`${this._key}结束于:${Date.now()}`);
+        return null;
+    }
+
+    abstract buildProcess(params: any): Promise<any>;
+
+    async getResult(params: any): Promise<any> {
+        this._begin(params);
+        let result = await this.buildProcess(params);
+        this._end(result);
+        return result;
+    }
 }
 
 export abstract class AbstractStrategy implements IStrategy {
@@ -188,4 +218,73 @@ function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
         }
     }
     return _tickets;
+}
+
+export class CommonHotelStrategy extends AbstractHotelStrategy {
+
+    constructor(hotels: IHotel[]) {
+        super(hotels);
+    }
+
+    async buildProcess(params: {longitude: number, latitude: number, star: number}):Promise<TravelBudgeItem> {
+        const defaultPrice = {
+            "5": 500,
+            "4": 450,
+            "3": 400,
+            "2": 350
+        }
+
+        if (!this.hotels || !this.hotels.length) {
+            return {
+                price: defaultPrice[params.star]
+            } as TravelBudgeItem;
+        }
+
+        const BLACKLIST_SCORE = 500;
+        const STAR_MATCH = 1000;
+        const REPRESENT = 500;
+
+        let hotels = formatHotel(this.hotels);
+        hotels = hotelPrefer.blacklist(hotels, BLACKLIST_SCORE);
+        hotels = hotelPrefer.starmatch(hotels, params.star, STAR_MATCH);
+        hotels = hotelPrefer.represent(hotels, REPRESENT);
+
+        hotels.sort( (v1, v2) => {
+            //优先按照积分排序
+            let diff = v2.score - v1.score;
+            if (diff) return diff;
+            //然后按照价格排序
+            return v2.price - v1.price;
+        });
+        require('fs').writeFile('./data.json', JSON.stringify(hotels))
+        let hotel = hotels[0];
+        return {
+            name: hotel.name,
+            agent: hotel.agent,
+            price: hotel.price,
+            latitude: hotel.latitude,
+            longitude: hotel.longitude,
+        } as TravelBudgeItem;
+    }
+}
+
+
+function formatHotel(hotels: IHotel[]) : IFinalHotel[] {
+    let _hotels: IFinalHotel[] = [];
+    for(let i=0, ii=hotels.length; i<ii; i++) {
+        let hotel = hotels[i]
+        let agents = hotel.agents;
+        for(var j=0, jj=agents.length; j< jj; j++) {
+            _hotels.push({
+                name: hotel.name,
+                latitude: hotel.latitude,
+                longitude: hotel.longitude,
+                star: hotel.star,
+                price: agents[j].price,
+                bookUrl: agents[j].bookUrl,
+                agent: agents[j].name
+            } as IFinalHotel)
+        }
+    }
+    return _hotels;
 }

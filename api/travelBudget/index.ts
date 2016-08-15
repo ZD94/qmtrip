@@ -14,7 +14,7 @@ const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
 import {IFinalTicket, ITicket, TravelBudgeItem} from "../_types/travelBudget";
-import {CommonTicketStrategy, HighestPriceTicketStrategy} from "./strategy/index";
+import {CommonTicketStrategy, HighestPriceTicketStrategy, CommonHotelStrategy} from "./strategy/index";
 
 const defaultPrice = {
     "5": 500,
@@ -224,21 +224,17 @@ class ApiTravelBudget {
         if (!Boolean(cityId)) {
             throw L.ERR.CITY_NOT_EXIST();
         }
-
         if (!checkInDate || !validate.isDate(checkInDate)) {
             throw L.ERR.CHECK_IN_DATE_FORMAT_ERROR();
         }
-
         if (!checkOutDate || !validate.isDate(checkOutDate)) {
             throw L.ERR.CHECK_OUT_DATE_FORMAT_ERROR();
         }
-
         if (new Date(checkOutDate) < new Date(checkInDate)) {
             throw {code: -1, msg: "离开日期大于入住日期"};
         }
         let days = moment(checkOutDate).diff(checkInDate, 'days');
 
-        // let staff = await API.staff.getStaff({id: accountId});
         var staff = await Staff.getCurrent();
         if (!staff || !staff["travelPolicyId"]) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
@@ -262,25 +258,28 @@ class ApiTravelBudget {
         if(policy.hotelLevel){
             hotelStar = policy.hotelLevel;
         }
+        let gps = [];
+        if (/,/g.test(businessDistrict)) {
+            gps = businessDistrict.split(/,/);
+        } else {
+            let obj = API.plae.getCityInfo({cityCode: businessDistrict});
+            gps = [obj.latitude, obj.longitude];
+        }
 
-        let data = {
+        let qs = {
             maxMoney: policy.hotelPrice,
-            hotelStar: hotelStar,
+            star: hotelStar,
             cityId: cityId,
+            latitude: gps[0],
+            longitude: gps[1],
             businessDistrict: businessDistrict,
             checkInDate: checkInDate,
             checkOutDate: checkOutDate
         }
 
-        let budget = await API.travelbudget.getHotelBudget(data);
-        if (!budget.price || budget.price < 0) {
-            days = days<= 0 ? 1 :days;
-            if (policy.hotelPrice) {
-                budget = {price: policy.hotelPrice * days, type: EInvoiceType.HOTEL} as TravelBudgeItem;
-            } else {
-                budget = {price: defaultPrice[hotelStar] * days, type: EInvoiceType.HOTEL} as TravelBudgeItem;
-            }
-        }
+        let hotels = await API.hotel.search_hotels(qs);
+        let strategy = new CommonHotelStrategy(hotels);
+        let budget = await strategy.getResult(qs);
         budget.type = EInvoiceType.HOTEL;
         return budget;
     }
@@ -355,16 +354,16 @@ class ApiTravelBudget {
         let flightTickets:ITicket[] = [];
         if (m_originCity.skyCode && m_destination.skyCode) {
             flightTickets = await API.flight.search_ticket({
-                originPlace: m_originCity.skyCode,
-                destination: m_destination.skyCode,
+                originPlace: m_originCity,
+                destination: m_destination,
                 leaveDate: leaveDate,
                 cabin: cabinClass
             });
         }
 
         let trainTickets = await API.train.search_ticket( {
-            originPlace: m_originCity.name,
-            destination: m_destination.name,
+            originPlace: m_originCity,
+            destination: m_destination,
             leaveDate: leaveDate,
             cabin: trainCabinClass
         });
