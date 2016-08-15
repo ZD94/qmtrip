@@ -145,7 +145,9 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
             var nshow = $ionicPopup.show({
                 template: '<span>您的手机尚未激活，请获取验证码激活</span><br><span>手机号：'+$scope.form.account+'</span>' +
                 '<div class="item item-input"> <input type="text" placeholder="请输入验证码" ng-model="form.msgCode"> ' +
-                '<a class="button button-positive" ng-click="sendCode()">发送验证码</a> </div>',
+                '<a class="button button-positive" ng-click="sendCode()"  ng-if="!showCount">发送验证码</a> ' +
+                '<div class="button button-stable" style="width: 116px;text-align: center;" ng-if="showCount"><span id="countNum">{{beginNum}}</span>s</div>' +
+                '</div>',
                 scope: $scope,
                 buttons: [
                     {
@@ -190,13 +192,33 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
             })
         }
 
+        $scope.showCount = false;
+        $scope.beginCountDown = function(){
+            $scope.showCount = true;
+            $scope.beginNum = 90;
+            var timer = setInterval(function() {
+                if ($scope.beginNum <= 0) {
+                    $scope.showCount = false;
+                    clearInterval(timer);
+                    $scope.$apply();
+                    return;
+                }
+                $scope.beginNum = $scope.beginNum - 1;
+                $scope.$apply();
+            }, 1000);
+        }
+
         $scope.sendCode = async function(){
+            if (!$scope.form.account) {
+                msgbox.log("手机号不能为空");
+                return;
+            }
             API.require("checkcode");
             await API.onload();
             API.checkcode.getMsgCheckCode({mobile: $scope.form.account})
                 .then(function(result){
+                    $scope.beginCountDown();
                     $scope.ticket = result.ticket;
-                    console.info($scope.ticket);
                 })
                 .catch(function(err){
                     msgbox.log(err.msg||err)
@@ -356,19 +378,52 @@ export async function ForgetPwdController($scope,Models) {
         mobile:'',
         msgCode:''
     };
+
+    $scope.showCount = false;
+    $scope.beginCountDown = function(){
+        $scope.showCount = true;
+        $scope.beginNum = 90;
+        var timer = setInterval(function() {
+            if ($scope.beginNum <= 0) {
+                $scope.showCount = false;
+                clearInterval(timer);
+                $scope.$apply();
+                return;
+            }
+            $scope.beginNum = $scope.beginNum - 1;
+            $scope.$apply();
+        }, 1000);
+    }
+
     var ticket;
     $scope.sendCode = async function(){
+        if(!$scope.form.mobile){
+            msgbox.log("手机号不能为空");
+            return;
+        }
         await API.onload();
         API.checkcode.getMsgCheckCode({mobile: $scope.form.mobile})
             .then(function(result){
+                $scope.beginCountDown();
                 ticket = result.ticket;
-                console.info(ticket);
             })
             .catch(function(err){
                 msgbox.log(err.msg||err)
             })
     };
     $scope.nextStep = async function(){
+        if(!$scope.form.mobile){
+            msgbox.log("手机号不能为空");
+            return;
+        }
+        if(!$scope.form.msgCode){
+            msgbox.log("验证码不能为空");
+            return;
+        }
+        if(!ticket){
+            msgbox.log("验证码不正确");
+            return;
+        }
         await API.onload();
         API.auth.validateMsgCheckCode({msgCode: $scope.form.msgCode, msgTicket: ticket, mobile: $scope.form.mobile})
             .then(function(result){
@@ -530,6 +585,22 @@ export async function InvitedStaffTwoController ($scope, $stateParams){
             window.location.href = "index.html#/login/invalid-link";
         }).done();
 
+    $scope.showCount = false;
+    $scope.beginCountDown = function(){
+        $scope.showCount = true;
+        $scope.beginNum = 90;
+        var timer = setInterval(function() {
+            if ($scope.beginNum <= 0) {
+                $scope.showCount = false;
+                clearInterval(timer);
+                $scope.$apply();
+                return;
+            }
+            $scope.beginNum = $scope.beginNum - 1;
+            $scope.$apply();
+        }, 1000);
+    }
+
     $scope.sendCode = function(){
         if (!$scope.form.mobile) {
             msgbox.log("手机号不能为空");
@@ -539,8 +610,8 @@ export async function InvitedStaffTwoController ($scope, $stateParams){
             .then(async function(){
                 return API.checkcode.getMsgCheckCode({mobile: $scope.form.mobile})
                     .then(function(result){
+                        $scope.beginCountDown();
                         $scope.form.msgTicket =  result.ticket;
-                        console.info( result.ticket);
                     })
             })
             .catch(function(err){

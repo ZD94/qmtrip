@@ -40,17 +40,33 @@ export async function EditMobileController($scope,Models,$ionicHistory) {
         msgCode:''
     }
 
+    $scope.showCount = false;
+    $scope.beginCountDown = function(){
+        $scope.showCount = true;
+        $scope.beginNum = 90;
+        var timer = setInterval(function() {
+            if ($scope.beginNum <= 0) {
+                $scope.showCount = false;
+                clearInterval(timer);
+                $scope.$apply();
+                return;
+            }
+            $scope.beginNum = $scope.beginNum - 1;
+            $scope.$apply();
+        }, 1000);
+    }
     $scope.sendCode = function(){
         if (!$scope.form.mobile) {
             msgbox.log("手机号不能为空");
             return;
         }
+
         API.auth.checkEmailAndMobile({mobile: $scope.form.mobile})
             .then(async function(){
                 return API.checkcode.getMsgCheckCode({mobile: $scope.form.mobile})
                     .then(function(result){
+                        $scope.beginCountDown();
                         $scope.form.msgTicket =  result.ticket;
-                        console.info( result.ticket);
                     })
             })
             .catch(function(err){

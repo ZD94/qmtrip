@@ -97,7 +97,6 @@ app.run(function($ionicPlatform) {
             let Keyboard = cordova.plugins['Keyboard'];
             Keyboard.hideKeyboardAccessoryBar(true);
             Keyboard.disableScroll(true);
-
         }
         if (window.StatusBar) {
             // org.apache.cordova.statusbar required
@@ -106,6 +105,29 @@ app.run(function($ionicPlatform) {
     });
 });
 
+if(window.cordova) {
+    app.run(function($ionicPlatform, $ionicPopup) {
+        $ionicPlatform.ready(function(){
+            window['bundle_url'] = cordova.file.applicationDirectory + 'www/';
+            var el = $('<script manifest="' + window['bundle_url'] + 'manifest.json" timeout="10000"></script>');
+            $('head').append(el);
+            dyload('script/libs/bundle.update.js')
+                .then(function() {
+                    var updater = require('common/client/updater');
+                    updater.initUpdater(function(appLoader) {
+                        $ionicPopup.confirm({
+                            title: '有更新',
+                            template: '是否更新?'
+                        }).then(function(value) {
+                            if(!value)
+                                return;
+                            location.href = window['bundle_url'] + 'update.html';
+                        })
+                    })
+                });
+        })
+    });
+}
 
 var dyload = require('dyload');
 
