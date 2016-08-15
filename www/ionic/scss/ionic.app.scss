@@ -42,7 +42,8 @@ body {
   ion-nav-view {
     background-color: transparent !important;
     ion-view{
-      background-color: transparent !important;
+      background: url(../images/background.jpg) no-repeat;
+      background-size:cover;
     }
   }
 }

@@ -15,6 +15,7 @@ const API = require("common/api");
 var L = require("common/language");
 var msgbox = require('msgbox');
 declare var ionic;
+declare var wx:any;
 
 export async function ManagementController($scope, Models) {
     var staff = await Staff.getCurrent();
@@ -936,7 +937,7 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
     }
 }
 
-export async function StaffInvitedController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup){
+export async function StaffInvitedController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup,wxApi){
     require('./staff-invited.scss');
     var staff = await Staff.getCurrent();
     var now = moment().format('YYYY-MM-DD HH:mm:ss');
@@ -999,6 +1000,18 @@ export async function StaffInvitedController($scope, Models, $storage, $statePar
         transformSeconds(seconds);
         $scope.encodeLink = encodeURIComponent($scope.invitedLink.goInvitedLink);
         console.info($scope.invitedLink);
+        wx.onMenuShareAppMessage({
+            title:'邀请加入企业',
+            desc:'公司邀请你加入',
+            link:$scope.invitedLink,
+            imgUrl:'http://t.jingli365.com/ionic/images/logo.png',
+            success: function () {
+                // 用户确认分享后执行的回调函数
+            },
+            cancel: function () {
+                // 用户取消分享后执行的回调函数
+            }
+        })
     }
     $scope.createLink = async function (){
         var invitedLink = InvitedLink.create();
