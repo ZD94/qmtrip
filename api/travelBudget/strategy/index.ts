@@ -3,9 +3,11 @@
  */
 
 'use strict';
-import {ITicket, IFinalTicket, TRAFFIC} from "../../_types/travelBudget";
+import {ITicket, IFinalTicket, TRAFFIC, TravelBudgeItem} from "../../_types/travelBudget";
 import {ticketPrefer} from '../prefer'
 import {EInvoiceType} from "../../_types/tripPlan";
+import {RedisStorage, IStorage} from '../storage';
+var C = require('config');
 
 export interface IStrategy {
      getResult(params: any): Promise<any>;
@@ -13,11 +15,16 @@ export interface IStrategy {
 
 export abstract class AbstractStrategy implements IStrategy {
     tickets: ITicket[];
-    result: any;
+    result: TravelBudgeItem;
+    storage: IStorage;
+    private _key;
 
     constructor(tickets?: ITicket[]) {
+        this.storage = new RedisStorage(C.redis.conf);
         this.tickets = tickets;
+        this._key = 'ID' + Date.now() + Math.ceil(Math.random() * 1000);
     }
+
     //设置原始数据
     setTickets(tickets: ITicket[]) {
         this.tickets = tickets;
@@ -26,18 +33,20 @@ export abstract class AbstractStrategy implements IStrategy {
     abstract async buildProcess(params: any): Promise<any>;
     //开始计算前
     private async _begin(): Promise<any> {
-        console.log('原始数据:' + JSON.stringify(this.tickets))
-        return null;
+        console.log('原始数据:' + JSON.stringify(this.tickets));
+        return this.storage.write(this._key+':data', JSON.stringify(this.tickets));
     }
     //计算完成
     private async _finish(): Promise<any> {
         console.log('计算结果:' + JSON.stringify(this.result));
-        return null;
+        return this.storage.write(this._key, JSON.stringify(this.result));
     }
+
     //对外暴漏获取结果函数
-    async getResult(params: any): Promise<any> {
+    async getResult(params: any): Promise<TravelBudgeItem> {
         this._begin();
         this.result = await this.buildProcess(params);
+        this.result['id'] = this._key;
         this._finish();
         return this.result;
     }
@@ -131,7 +140,7 @@ export class HighestPriceTicketStrategy extends AbstractStrategy {
         this.tickets = tickets;
     }
 
-    async buildProcess(params:any):Promise<any> {
+    async buildProcess(params:any):Promise<TravelBudgeItem> {
         const POINTS = 500;
         let tickets = formatTicketData(this.tickets);
         tickets.sort( (v1, v2) => {
