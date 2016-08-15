@@ -14,6 +14,8 @@ const moment = require("moment");
 const API = require("common/api");
 var L = require("common/language");
 var msgbox = require('msgbox');
+declare var ionic;
+declare var wx:any;
 
 export async function ManagementController($scope, Models) {
     var staff = await Staff.getCurrent();
@@ -935,26 +937,114 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
     }
 }
 
-export async function StaffInvitedController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup){
-    require("./staff-invited.scss");
-
+export async function StaffInvitedController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup,wxApi){
+    require('./staff-invited.scss');
     var staff = await Staff.getCurrent();
     var now = moment().format('YYYY-MM-DD HH:mm:ss');
     var invitedLinks = await Models.invitedLink.find({where: {staffId: staff.id, status: 1, expiresTime: {$gt: now}}});
+    var seconds;
+    var time;
+    function transformSeconds(second){
+        var seconds = parseInt(second);//秒
+        var minutes = 0;//分
+        var hours = 0;//小时
+        var newsec,newmin,newhour;
+        clearInterval(time);
+        if(seconds>60){
+            minutes = Math.floor(seconds/60);
+            seconds = Math.floor(seconds%60);
+            if(minutes>60){
+                hours = Math.floor(minutes/60);
+                minutes = Math.floor(minutes%60);
+            }
+        }
+        time = setInterval(function(){
+            if(seconds>0){
+                seconds--;
+            }else{
+                seconds = 59;
+                if(minutes>0){
+                    minutes--;
+                }else{
+                    minutes = 59;
+                    if(hours>0){
+                        hours--;
+                    }else{
+                        $scope.invitedLink = null;
+                        clearInterval(time);
+                    }
+                }
+            }
+            if(seconds<10){
+                newsec = '0'+seconds;
+            }else{
+                newsec = seconds;
+            }
+            if(minutes<10){
+                newmin = '0'+minutes;
+            }else{
+                newmin = minutes;
+            }
+            if(hours<10){
+                newhour = '0'+hours;
+            }else{
+                newhour = hours;
+            }
+            $scope.countdown = newhour+':'+newmin+':'+newsec;
+            $scope.$apply();
+        },1000)
+    }
     if(invitedLinks && invitedLinks.length > 0){
         $scope.invitedLink = invitedLinks[0];
+        seconds = moment(invitedLinks[0]['expiresTime']).diff(moment(),'seconds');
+        transformSeconds(seconds);
+        $scope.encodeLink = encodeURIComponent($scope.invitedLink.goInvitedLink);
+        console.info($scope.invitedLink);
+        wx.onMenuShareAppMessage({
+            title:'邀请加入企业',
+            desc:'公司邀请你加入',
+            link:$scope.invitedLink,
+            imgUrl:'http://t.jingli365.com/ionic/images/logo.png',
+            success: function () {
+                // 用户确认分享后执行的回调函数
+            },
+            cancel: function () {
+                // 用户取消分享后执行的回调函数
+            }
+        })
     }
     $scope.createLink = async function (){
         var invitedLink = InvitedLink.create();
         invitedLink = await invitedLink.save();
+        seconds = moment(invitedLink['expiresTime']).diff(moment(),'seconds');
+        transformSeconds(seconds);
         $scope.invitedLink = invitedLink;
+        $scope.encodeLink = encodeURIComponent(invitedLink.goInvitedLink);
+        console.info($scope.invitedLink);
     }
     $scope.stopLink = function(invitedLink){
         invitedLink.status = 0;
         invitedLink.save();
+        clearInterval(time);
         $scope.invitedLink = null;
     }
-    console.info($scope.invitedLink);
+    $scope.copyLink = async function(){
+        var link:any = document.getElementById('link');
+        link.select();
+        document.execCommand('Copy');
+    }
+    function isAndroidBrowser() {
+        var userAgent = window.navigator['userAgent'];
+        //判断是否手机
+        return /(android)/ig.test(userAgent);
+    }
+    function isIphoneBrowser() {
+        var userAgent = window.navigator['userAgent'];
+        //判断是否手机
+        return /(iphone)|(ios)|(ipad)/ig.test(userAgent);
+    }
+    $scope.isAndroid = ionic.Platform.isAndroid();
+    $scope.isIos =  ionic.Platform.isIOS();
 }
 
 export async function StaffSavedRankController($scope) {

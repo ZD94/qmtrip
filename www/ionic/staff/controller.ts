@@ -7,11 +7,15 @@ var msgbox = require('msgbox');
 var API = require('common/api');
 
 API.require('auth');
-API.require("checkcode");
+API.require('checkcode');
 
 export async function IndexController($scope,Models) {
     require('./index.scss');
+    API.require('tripPlan');
     var staff = await Staff.getCurrent();
+    var tripBudget = await API.tripPlan.statisticTripBudget({isStaff: true});
+    console.info(tripBudget);
+    $scope.tripBudget = tripBudget;
     $scope.staff = staff;
     $scope.EStaffRole = EStaffRole;
 }
@@ -95,7 +99,7 @@ export async function EditMobileController($scope,Models,$ionicHistory) {
 
 }
 
-export async function EditEmailController($scope,Models,$ionicHistory) {
+export async function EditEmailController($scope,Models,$ionicHistory,$ionicPopup) {
     require('./editMobile.scss');
     await API.onload();
     var staff = await Staff.getCurrent();
@@ -119,7 +123,14 @@ export async function EditEmailController($scope,Models,$ionicHistory) {
             })
             .then(function(data){
                 if(data){
-                    window.location.href = "index.html#/staff/editEmailSuccess";
+                    var alert = $ionicPopup.alert({
+                        title:'激活邮件发送成功',
+                        template:'为保障您的权益和能够及时收到通知消息，请尽快到邮箱进行激活！',
+                        okText:'确定'
+                    }).then(function(res){
+                        window.location.href = "index.html#/staff/index";
+                    })
+                    // window.location.href = "index.html#/staff/editEmailSuccess";
                 }
             })
             .catch(function(err){
