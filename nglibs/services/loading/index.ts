@@ -30,7 +30,7 @@ class LoadingService {
                 .then(()=>{
                     if(this.firstLoding){
                         this.firstLoding = false;
-                        $('body ion-nav-view').html('');
+                        $('body ion-nav-view>.initial-loading').html('');
                     }
                 })
             //var wH = $(window).height();
