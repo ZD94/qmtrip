@@ -309,12 +309,7 @@ class TripPlanModule {
         });
     }
 
-    /**
-     * 发送通知
-     * @param tripPlan
-     * @param userId
-     * @returns {Promise<boolean>}
-     */
+
     static async sendTripApproveNotice(params: {approveId: string}) {
         let tripApprove = await Models.tripApprove.get(params.approveId);
         let staff = tripApprove.account;
