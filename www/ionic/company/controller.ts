@@ -14,6 +14,7 @@ const moment = require("moment");
 const API = require("common/api");
 var L = require("common/language");
 var msgbox = require('msgbox');
+var browserspec = require('browserspec');
 declare var ionic;
 declare var wx:any;
 
@@ -147,7 +148,7 @@ export async function BudgetStatisticsController($scope, $stateParams, Models) {
     }
 
     $scope.goToStaffRecords = function(name) {
-        window.location.href = `#/company/record?type=${type}&keyword=${name}`;
+        window.location.href = `#/company/record?type=${$scope.monthSelection.type}&keyword=${name}`;
     };
 
     $scope.searchStatistics = searchStatistics;
@@ -1014,18 +1015,18 @@ export async function StaffInvitedController($scope, Models, $storage, $statePar
         seconds = moment(invitedLinks[0]['expiresTime']).diff(moment(),'seconds');
         transformSeconds(seconds);
         $scope.encodeLink = encodeURIComponent($scope.invitedLink.goInvitedLink);
-        wx.onMenuShareAppMessage({
-            title:'邀请加入企业',
-            desc:'公司邀请你加入',
-            link:$scope.invitedLink,
-            imgUrl:'http://t.jingli365.com/ionic/images/logo.png',
-            success: function () {
-                // 用户确认分享后执行的回调函数
-            },
-            cancel: function () {
-                // 用户取消分享后执行的回调函数
-            }
-        })
+        // wx.onMenuShareAppMessage({
+        //     title:'邀请加入企业',
+        //     desc:'公司邀请你加入',
+        //     link:$scope.invitedLink,
+        //     imgUrl:'http://t.jingli365.com/ionic/images/logo.png',
+        //     success: function () {
+        //         // 用户确认分享后执行的回调函数
+        //     },
+        //     cancel: function () {
+        //         // 用户取消分享后执行的回调函数
+        //     }
+        // })
     }
     $scope.createLink = async function (){
         var invitedLink = InvitedLink.create();
@@ -1058,6 +1059,29 @@ export async function StaffInvitedController($scope, Models, $storage, $statePar
     }
     $scope.isAndroid = ionic.Platform.isAndroid();
     $scope.isIos =  ionic.Platform.isIOS();
+    
+    $scope.sendWx = function(){
+        if(browserspec.is_wechat){
+            alert("点击右上角发送给朋友");
+            wx.onMenuShareAppMessage({
+                title:'邀请加入企业',
+                desc:'公司邀请你加入',
+                link: $scope.invitedLink.goInvitedLink,
+                imgUrl:'http://t.jingli365.com/ionic/images/logo.png',
+                type: '', // 分享类型,music、video或link，不填默认为link
+                dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                success: function () {
+                    // 用户确认分享后执行的回调函数
+                },
+                cancel: function () {
+                    // 用户取消分享后执行的回调函数
+                }
+            });
+        }else{
+            alert("使用浏览器分享功能发送给朋友");
+        }
+
+    }
 }
 
 export async function StaffSavedRankController($scope) {
