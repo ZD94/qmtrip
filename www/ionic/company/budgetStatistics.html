@@ -22,8 +22,12 @@
         </form>
 
         <ion-list>
-            <ion-item class="item stat-label-content" ng-repeat="en in statisticData">
-                <div class="bar-header">{{en.keyInfo.name}}</div>
+            <ion-item class="item stat-label-content" ng-repeat="en in statisticData" ng-click="goToStaffRecords(en.keyInfo.name)">
+                <div class="bar-header">{{en.keyInfo.name}}
+                    <span style="float: right">查看详情
+                        <i class="icon ion-chevron-right"></i>
+                    </span>
+                </div>
                 <div class="left-div">
                     <div>
                         <div class="label-top-left">

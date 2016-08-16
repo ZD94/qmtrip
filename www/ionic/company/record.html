@@ -1,9 +1,9 @@
 <ion-view title="出差统计-出差记录" id="page25">
     <ion-content padding="true" class="has-header">
         <div class="item item-input">
-            <i class="icon ion-plane" ng-click="monthChange()"></i>
+            <i class="icon ion-chevron-left" ng-click="monthChange()"></i>
             <span class="input-label">{{monthSelection.showStr}}</span>
-            <i class="icon ion-plane" ng-click="monthChange(true)"></i>
+            <i class="icon ion-chevron-right" ng-click="monthChange(true)"></i>
         </div>
 
         <div class="spacer" style="width: 300px; height: 10px;"></div>
@@ -14,7 +14,7 @@
                 <input type="search" placeholder="员工姓名/项目名称/部门" ng-model="monthSelection.keyWord">
             </label>
         </form>
-        <trip-plan ng-repeat="trip in tripPlans track by trip.id"
+        <trip-plan ng-repeat="trip in tripPlans track by $index"
                    show-header="true" data="trip" show-detail-status="true" click="enterDetail" status="{{trip.status}}"></trip-plan>
         </div>
         <div id="page13-markdown3">
