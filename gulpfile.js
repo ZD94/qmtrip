@@ -31,7 +31,7 @@ gulplib.bundle_lib('base', {ex: true, ts: false, require:['md5', 'moment', 'tiny
 gulplib.bundle_lib('sourcemap', {ex: true, ts: false, require: ['source-map-support']})
 
 gulplib.bundle_lib('preload', {ex: true, ts: false, require:[
-    'dyload', 'babel-polyfill', 'bluebird', 'common/ts_helper', 'common/zone', 'path',
+    'dyload', 'babel-polyfill', 'bluebird', 'common/ts_helper', 'common/zone',
     'common/client/config:common/config'
 ]});
 
