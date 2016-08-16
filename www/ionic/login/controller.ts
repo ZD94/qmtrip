@@ -96,22 +96,25 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
 
         function showEmailPopup(){
             var nshow = $ionicPopup.show({
-                template: '<span>您的邮箱还未激活，请激活后再进行登录</span><br><span>邮箱：'+$scope.form.account+'</span>',
+                title:'邮箱未激活',
+                cssClass:'showAlert',
+                template: '<div class="popupDiv"><span>请激活后再进行登录</span><br><span>邮箱：{{form.account}}</span></div>',
                 scope: $scope,
                 buttons: [
                     {
-                        text: '返回用手机登录'
+                        text: '返回重新登录',
+                        type: 'button-small button-outline button-positive'
                     },
                     {
                         text: '获取激活邮件',
-                        type: 'button-positive',
+                        type: 'button-positive button-small',
                         onTap: async function (e) {
                             if (!$scope.form.account) {
                                 e.preventDefault();
                                 msgbox.log("用户名不能为空");
                             } else {
                                 try{
-                                    var data = await API.auth.reSendActiveLink({account: $scope.form.account});
+                                    var data = await API.auth.reSendActiveLink({email: $scope.form.account});
                                     if(data){
                                         showSendEmailSuccess();
                                     }
@@ -127,12 +130,13 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
 
         function showSendEmailSuccess(){
             var nshow = $ionicPopup.show({
-                template: '<span>邮箱：'+$scope.form.account+'</span><br><span>激活邮件发送成功！</span><br><span>请点击邮件中的链接完成激活，即可点击下方立即登陆按钮进入系统，链接有效期24个小时</span>',
+                template: '<div class="popupDiv"><p>邮箱：{{form.account}}</p><br><h2><i class="ion-checkmark-circled"></i>激活邮件发送成功！</h2><br><span>请点击邮件中的链接完成激活，即可点击下方立即登陆按钮进入系统，链接有效期24个小时</span></div>',
+                cssClass:'showAlert',
                 scope: $scope,
                 buttons: [
                     {
                         text: '立即登陆',
-                        type: 'button-positive',
+                        type: 'button-small button-positive',
                         onTap: async function (e) {
                             $scope.check_login();
                         }
@@ -143,17 +147,22 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
 
         function showMobilePopup(){
             var nshow = $ionicPopup.show({
-                template: '<span>您的手机尚未激活，请获取验证码激活</span><br><span>手机号：'+$scope.form.account+'</span>' +
+                title: '手机未激活',
+                template: '<div class="popupDiv"><span>请获取验证码激活</span><br><h2>手机号：{{form.account}}</h2>' +
                 '<div class="item item-input"> <input type="text" placeholder="请输入验证码" ng-model="form.msgCode"> ' +
-                '<a class="button button-positive" ng-click="sendCode()">发送验证码</a> </div>',
+                '<a class="button button-small button-positive" ng-click="sendCode()"  ng-if="!showCount">发送验证码</a> ' +
+                '<a class="button button-small button-stable" ng-if="showCount"><span id="countNum">{{beginNum}}</span>s</a>' +
+                '</div>',
+                cssClass:'showAlert',
                 scope: $scope,
                 buttons: [
                     {
-                        text: '返回用邮箱登录'
+                        text: '返回重新登录',
+                        type: 'button-small button-outline button-positive'
                     },
                     {
                         text: '立即激活',
-                        type: 'button-positive',
+                        type: 'button-small button-positive',
                         onTap: async function (e) {
                             if (!$scope.form.msgCode) {
                                 e.preventDefault();
@@ -176,7 +185,8 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
 
         function showCheckMobileSuccess(){
             var nshow = $ionicPopup.show({
-                template: '<span>手机号：'+$scope.form.account+'</span><br><span>激活成功！</span>',
+                title: '激活成功！',
+                template: '<span>手机号：{{form.account}}</span>',
                 scope: $scope,
                 buttons: [
                     {
@@ -190,13 +200,33 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
             })
         }
 
+        $scope.showCount = false;
+        $scope.beginCountDown = function(){
+            $scope.showCount = true;
+            $scope.beginNum = 90;
+            var timer = setInterval(function() {
+                if ($scope.beginNum <= 0) {
+                    $scope.showCount = false;
+                    clearInterval(timer);
+                    $scope.$apply();
+                    return;
+                }
+                $scope.beginNum = $scope.beginNum - 1;
+                $scope.$apply();
+            }, 1000);
+        }
+
         $scope.sendCode = async function(){
+            if (!$scope.form.account) {
+                msgbox.log("手机号不能为空");
+                return;
+            }
             API.require("checkcode");
             await API.onload();
             API.checkcode.getMsgCheckCode({mobile: $scope.form.account})
                 .then(function(result){
+                    $scope.beginCountDown();
                     $scope.ticket = result.ticket;
-                    console.info($scope.ticket);
                 })
                 .catch(function(err){
                     msgbox.log(err.msg||err)
@@ -209,7 +239,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
     /*$scope.reSendActiveLink = async function(){
         try{
             await API.onload();
-            var data = await API.auth.reSendActiveLink({account: $scope.form.account});
+            var data = await API.auth.reSendActiveLink({email: $scope.form.account});
             if(data){
                 msgbox.log("发送成功");
             }
@@ -356,19 +386,52 @@ export async function ForgetPwdController($scope,Models) {
         mobile:'',
         msgCode:''
     };
+
+    $scope.showCount = false;
+    $scope.beginCountDown = function(){
+        $scope.showCount = true;
+        $scope.beginNum = 90;
+        var timer = setInterval(function() {
+            if ($scope.beginNum <= 0) {
+                $scope.showCount = false;
+                clearInterval(timer);
+                $scope.$apply();
+                return;
+            }
+            $scope.beginNum = $scope.beginNum - 1;
+            $scope.$apply();
+        }, 1000);
+    }
+
     var ticket;
     $scope.sendCode = async function(){
+        if(!$scope.form.mobile){
+            msgbox.log("手机号不能为空");
+            return;
+        }
         await API.onload();
         API.checkcode.getMsgCheckCode({mobile: $scope.form.mobile})
             .then(function(result){
+                $scope.beginCountDown();
                 ticket = result.ticket;
-                console.info(ticket);
             })
             .catch(function(err){
                 msgbox.log(err.msg||err)
             })
     };
     $scope.nextStep = async function(){
+        if(!$scope.form.mobile){
+            msgbox.log("手机号不能为空");
+            return;
+        }
+        if(!$scope.form.msgCode){
+            msgbox.log("验证码不能为空");
+            return;
+        }
+        if(!ticket){
+            msgbox.log("验证码不正确");
+            return;
+        }
         await API.onload();
         API.auth.validateMsgCheckCode({msgCode: $scope.form.msgCode, msgTicket: ticket, mobile: $scope.form.mobile})
             .then(function(result){
@@ -452,7 +515,7 @@ export async function ActiveController ($scope, $stateParams) {
 
     $scope.reSendActiveLink = async function(){
         try{
-            var data = await API.auth.reSendActiveLink({account: email});
+            var data = await API.auth.reSendActiveLink({email: email});
             if(data){
                 msgbox.log("发送成功");
             }
@@ -530,6 +593,22 @@ export async function InvitedStaffTwoController ($scope, $stateParams){
             window.location.href = "index.html#/login/invalid-link";
         }).done();
 
+    $scope.showCount = false;
+    $scope.beginCountDown = function(){
+        $scope.showCount = true;
+        $scope.beginNum = 90;
+        var timer = setInterval(function() {
+            if ($scope.beginNum <= 0) {
+                $scope.showCount = false;
+                clearInterval(timer);
+                $scope.$apply();
+                return;
+            }
+            $scope.beginNum = $scope.beginNum - 1;
+            $scope.$apply();
+        }, 1000);
+    }
+
     $scope.sendCode = function(){
         if (!$scope.form.mobile) {
             msgbox.log("手机号不能为空");
@@ -539,8 +618,8 @@ export async function InvitedStaffTwoController ($scope, $stateParams){
             .then(async function(){
                 return API.checkcode.getMsgCheckCode({mobile: $scope.form.mobile})
                     .then(function(result){
+                        $scope.beginCountDown();
                         $scope.form.msgTicket =  result.ticket;
-                        console.info( result.ticket);
                     })
             })
             .catch(function(err){

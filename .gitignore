@@ -14,6 +14,7 @@ node_modules
 /public/*/less/*.css
 /www/*/less/*.css
 /www/manifest.json
+/www/fonts/font-awesome.css
 *.map
 controller.all.js
 /temp

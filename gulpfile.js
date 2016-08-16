@@ -8,13 +8,18 @@ var path = require('path');
 var gulp = require('gulp');
 var gulplib = require('./common/gulplib');
 
+var argv = require('yargs')
+    .alias('a', 'appconfig')
+    .default('appconfig', 'j')
+    .argv;
+
 gulplib.public_dir = 'www';
 
 gulplib.bundle_lib('browserify', {ex: true, ts: false, require:[
         'buffer', 'is-buffer', 'querystring', 'string_decoder',
         'http', 'https', 'url',
     'util', 'inherits', 'process', 'events', 'stream', 'zlib']});
-gulplib.bundle_lib('update', 'cordova-app-loader/bootstrap.js', {ex: true, ts: false, require: ['cordova-app-loader', 'cordova-promise-fs']});
+gulplib.bundle_lib('update', 'cordova-app-loader/bootstrap.js', {ex: true, ts: false, require: ['cordova-app-loader', 'cordova-promise-fs', 'common/client/updater']});
 gulplib.bundle_lib('ws', {ex: true, ts: false, require: ['ws', 'crypto'], exclude: ['bufferutil', 'utf-8-validate']});
 gulplib.bundle_lib('jquery', {ex: true, ts: false, require: ['jquery']});
 gulplib.bundle_lib('bootstrap', {ex: true, ts: false, require: ["bootstrap"]});
@@ -25,7 +30,10 @@ gulplib.bundle_lib('img', {ex: true, ts: false, require: ['arale-qrcode', 'hidpi
 gulplib.bundle_lib('base', {ex: true, ts: false, require:['md5', 'moment', 'tiny-cookie', 'shoe', 'lodash', 'validator', 'scssify', 'cssify']})
 gulplib.bundle_lib('sourcemap', {ex: true, ts: false, require: ['source-map-support']})
 
-gulplib.bundle_lib('preload', {ex: true, ts: false, require:['dyload', 'babel-polyfill', 'bluebird', 'common/ts_helper', 'common/zone', 'path']});
+gulplib.bundle_lib('preload', {ex: true, ts: false, require:[
+    'dyload', 'babel-polyfill', 'bluebird', 'common/ts_helper', 'common/zone', 'path',
+    'common/client/config:common/config'
+]});
 
 gulplib.bundle_lib('api', {require: ['common/client/api:common/api', 'common/api/helper', 'common/language']});
 gulplib.bundle_lib('calendar', {require: ['lunar-calendar', "calendar"]});
@@ -39,6 +47,8 @@ gulplib.bundle_lib('ngapp', {require: ['./common/client/ngapp/index.ts:ngapp', '
 gulplib.angular_app('agency');
 //gulplib.angular_app('mobile');
 gulplib.angular_app('ionic');
+
+gulplib.post_default('manifest', genManifest);
 
 gulplib.dist(function () {
     var filter = require('gulp-filter');
@@ -64,7 +74,6 @@ gulplib.dist(function () {
     });
     copy = [
         'config',
-        'www',
         'typings'
     ];
     copy.forEach(function (fname) {
@@ -80,12 +89,12 @@ function ionic_files() {
     return gulp
         .src([
             gulplib.public_dir + '/index.html',
-            gulplib.public_dir + '/script/app.js',
+            gulplib.public_dir + '/script/try_cordova.js',
             gulplib.public_dir + '/script/libs/*',
-            gulplib.public_dir + '/ionic/**/*'
-        ], {
-            base: gulplib.public_dir
-        })
+            gulplib.public_dir + '/ionic/**/*',
+            gulplib.public_dir + '/fonts/+(ionic|fontawesome)/*.woff',
+            gulplib.public_dir + '/fonts/font-awesome.css',
+        ], { base: gulplib.public_dir })
         .pipe(filter([
             '**',
             '!**/controller.[jt]s',
@@ -96,41 +105,48 @@ function ionic_files() {
             '!**/bundle.+(bootstrap|sourcemap|swiper|ws).js',
         ]));
 }
-
-gulp.task('manifest', [/*'default'*/], function () {
-    var json = fs.readFileSync('ionic/config.json');
-    var config = JSON.parse(json);
+var through2 = require('through2');
+function genManifest() {
     var calManifest = require('gulp-cordova-app-loader-manifest');
-    var options = {
-        load: [],
-        root: config.update
-    }
+    var watcher = gulplib.getWatch('manifest');
     return ionic_files()
-        .pipe(calManifest(options))
-        .pipe(gulp.dest('www'));
-});
+        .pipe(through2.obj(function (file, enc, cb) {
+            watcher.add(file.path);
+            cb(null, file);
+        }))
+        .pipe(calManifest({load: []}))
+        .pipe(gulp.dest(gulplib.public_dir));
+}
 
 gulp.task('ionic.www.clean', function () {
     var del = require('del');
     return del('ionic/www');
 });
-gulp.task('ionic.www', ['manifest', 'ionic.www.clean'], function () {
+gulp.task('ionic.www.files', ['post.manifest', 'ionic.www.clean'], function () {
     var filter = require('gulp-filter');
     return ionic_files()
         .pipe(gulp.dest('ionic/www'));
 });
-gulp.task('ionic.config', ['ionic.www'], function () {
+gulp.task('ionic.www.extra', ['ionic.www.files'], function(){
     return gulp
         .src([
-            'www/manifest.json',
-            'ionic/config.json'
-        ])
+            gulplib.public_dir + '/update.html',
+            gulplib.public_dir + '/script/update.js',
+            gulplib.public_dir + '/manifest.json',
+        ], { base: gulplib.public_dir })
+        .pipe(gulp.dest('ionic/www'));
+})
+gulp.task('ionic.www.config', ['ionic.www.files'], function (done) {
+    var rename = require("gulp-rename");
+    return gulp
+        .src('ionic/config.'+argv.appconfig+'.json')
+        .pipe(rename('config.json'))
         .pipe(gulp.dest('ionic/www'));
 });
 
-gulp.task('ionic.dist', ['ionic.config']);
+gulp.task('ionic.www', ['ionic.www.files', 'ionic.www.extra', 'ionic.www.config']);
 
-gulp.task('ionic.ios', ['ionic.dist'], function (done) {
+gulp.task('ionic.ios', ['ionic.www'], function (done) {
     var exec = require('child_process').exec;
     process.chdir('ionic');
     var child_res = exec('ionic resources', function (err) {
@@ -150,7 +166,7 @@ gulp.task('ionic.ios', ['ionic.dist'], function (done) {
     child_res.stderr.pipe(process.stderr);
 });
 
-gulp.task('ionic.android', ['ionic.dist'], function (done) {
+gulp.task('ionic.android', ['ionic.www'], function (done) {
     var exec = require('child_process').exec;
     process.chdir('ionic');
     var child_res = exec('ionic resources', function (err) {

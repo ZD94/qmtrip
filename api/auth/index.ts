@@ -189,21 +189,26 @@ class ApiAuth {
      * @returns {boolean}
      */
     @clientExport
-    static async reSendActiveLink (params:{account:string}):Promise<boolean> {
-        var mobileOrEmail = params.account;
-        var accounts = await Models.account.find({where : {$or : [{email: mobileOrEmail}, {mobile: mobileOrEmail}]}});
+    static async reSendActiveLink (params:{email:string, accountId?: string}):Promise<boolean> {
+        var mobileOrEmail = params.email;
+        var accountId = params.accountId;
         var account = Account.create();
-        if(accounts && accounts.length>0){
-            account = accounts[0];
-            //发送qm_first_set_pwd
-            // var staff = await Models.staff.get(account.id);
-            // await API.auth.sendResetPwdEmail({email: account.email, mobile: account.mobile, type: 1, isFirstSet: true, companyName: staff.company.name});
-            //发送qm_active
-            await _sendActiveEmail(account.id);
+        if(accountId){
+            account = await Models.account.get(accountId);
         }else{
-            throw L.ERR.ACCOUNT_NOT_EXIST();
+            var accounts = await Models.account.find({where : {$or : [{email: mobileOrEmail}, {mobile: mobileOrEmail}]}});
+            if(accounts && accounts.length>0){
+                account = accounts[0];
+            }else{
+                throw L.ERR.ACCOUNT_NOT_EXIST();
+            }
         }
 
+        //发送qm_first_set_pwd
+        // var staff = await Models.staff.get(account.id);
+        // await API.auth.sendResetPwdEmail({email: account.email, mobile: account.mobile, type: 1, isFirstSet: true, companyName: staff.company.name});
+        //发送qm_active
+        await _sendActiveEmail(account.id);
         return true;
     }
 
@@ -416,6 +421,54 @@ class ApiAuth {
 
         return true;
     }
+
+    /**
+     * @method resetPwdByOldPwd
+     *
+     * 根据旧密码重置密码
+     *
+     * @param {Object} params
+     * @param {String} params.oldPwd 旧密码
+     * @param {String} params.newPwd 新密码
+     * @return {Promise}
+     */
+    @clientExport
+    static resetPwdByOldPwd (params: {oldPwd: string, newPwd: string}) : Promise<boolean>{
+        let session = Zone.current.get("session");
+        let oldPwd = params.oldPwd;
+        let newPwd = params.newPwd;
+        let accountId = session["accountId"];
+
+        if (!accountId) {
+            throw L.ERR.NEED_LOGIN();
+        }
+
+        if (!oldPwd || !newPwd) {
+            throw L.ERR.PWD_EMPTY();
+        }
+
+        if (oldPwd == newPwd) {
+            throw {code: -1, msg: "新旧密码不能一致"};
+        }
+
+        return DBM.Account.findById(accountId)
+            .then(function(account) {
+                if (!account) {
+                    throw L.ERR.ACCOUNT_NOT_EXIST();
+                }
+
+                var pwd = utils.md5(oldPwd);
+                if (account.pwd != pwd) {
+                    throw L.ERR.PWD_ERROR();
+                }
+                newPwd = newPwd.replace(/\s/g, "");
+                pwd = utils.md5(newPwd);
+                return DBM.Account.update({pwd: pwd}, {where: {id: account.id}});
+            })
+            .then(function() {
+                return true;
+            });
+    };
 
 
     /**
@@ -1157,55 +1210,6 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             //     })
         }
         return Promise.resolve(true);
-    };
-
-
-    /**
-     * @method resetPwdByOldPwd
-     *
-     * 根据旧密码重置密码
-     *
-     * @param {Object} params
-     * @param {String} params.oldPwd 旧密码
-     * @param {String} params.newPwd 新密码
-     * @return {Promise}
-     */
-    @clientExport
-    static resetPwdByOldPwd (params: {oldPwd: string, newPwd: string}) : Promise<boolean>{
-        let session = Zone.current.get("session");
-        let oldPwd = params.oldPwd;
-        let newPwd = params.newPwd;
-        let accountId = session["accountId"];
-
-        if (!accountId) {
-            throw L.ERR.NEED_LOGIN();
-        }
-
-        if (!oldPwd || !newPwd) {
-            throw L.ERR.PWD_EMPTY();
-        }
-
-        if (oldPwd == newPwd) {
-            throw {code: -1, msg: "新旧密码不能一致"};
-        }
-
-        return DBM.Account.findById(accountId)
-            .then(function(account) {
-                if (!account) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST();
-                }
-
-                var pwd = utils.md5(oldPwd);
-                if (account.pwd != pwd) {
-                    throw L.ERR.PWD_ERROR();
-                }
-                newPwd = newPwd.replace(/\s/g, "");
-                pwd = utils.md5(newPwd);
-                return DBM.Account.update({pwd: pwd}, {where: {id: account.id}});
-            })
-            .then(function() {
-                return true;
-            });
     };
 
 

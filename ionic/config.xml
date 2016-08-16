@@ -7,12 +7,15 @@
   <author email="service@jingli365.com" href="http://www.jingli365.com/">
     小鲸商旅
   </author>
-  <content src="index.html"/>
+  <content src="update.html"/>
   <access origin="*"/>
+  <access origin="cdvfile://*"/>
+  <allow-intent href="cdvfile://*"/>
   <preference name="webviewbounce" value="false"/>
   <preference name="UIWebViewBounce" value="false"/>
   <preference name="DisallowOverscroll" value="true"/>
   <preference name="android-minSdkVersion" value="16"/>
+  <preference name="android-targetSdkVersion" value="19"/>
   <preference name="BackupWebStorage" value="none"/>
   <preference name="SplashScreen" value="screen"/>
   <preference name="SplashScreenDelay" value="3000"/>

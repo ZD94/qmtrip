@@ -5,24 +5,18 @@
                 <div class="item item-input">
                     <label class="item-input">
                         <span class="input-label">登录密码</span>
-                        <input type="text" placeholder="请输入登录密码确认身份">
+                        <input type="password" placeholder="请输入登录密码确认身份" ng-model="form.pwd">
                     </label>
                 </div>
                 <div class="spacer" style="height: 10px;"></div>
-                <div class="item item-input">
-                    <label class="item-input">
-                        <span class="input-label">原邮箱</span>
-                        <input type="text" placeholder="请输入11位手机号" >
-                    </label>
-                </div>
                 <div class="item item-input-inset">
                     <label class="item-input">
                         <span class="input-label">新邮箱</span>
-                        <input type="text" placeholder="请输入验证码">
+                        <input type="text" placeholder="请输入新邮箱" ng-model="form.email">
                     </label>
                 </div>
             </div>
-            <a class="button button-block button-calm">确认更换</a>
+            <a class="button button-block button-calm" ng-click="save()">确认更换</a>
         </div>
     </ion-content>
 </ion-view>

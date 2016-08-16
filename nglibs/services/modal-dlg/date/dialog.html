@@ -13,7 +13,7 @@
                     <div class="week-header" ng-repeat="weekday in weekDayNames">{{weekday}}</div>
                 </div>
             </div>
-            <ion-scroll style="overflow-y: hidden">
+            <ion-scroll overflow-scroll="false" has-bouncing="true">
                 <div ng-class="{month_2col:month_2col}">
                     <div ng-repeat="month in months">
                         <div class="month-title">{{month.year}}年{{month.month}}月</div>

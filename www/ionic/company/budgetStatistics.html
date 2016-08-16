@@ -1,9 +1,9 @@
 <ion-view title="出差统计-本月预算" id="page24">
     <ion-content padding="true" class="has-header">
-        <div class="item item-input">
-            <i class="icon ion-plane" ng-click="monthChange()"></i>
+        <div class="item item-input date_selected">
+            <i class="icon ion-chevron-left" ng-click="monthChange()"></i>
             <span class="input-label">{{monthSelection.showStr}}</span>
-            <i class="icon ion-plane" ng-click="monthChange(true)"></i>
+            <i class="icon ion-chevron-right" ng-click="monthChange(true)"></i>
         </div>
 
         <div class="button-bar">
@@ -13,7 +13,6 @@
             <button ng-class="{true: 'button-positive', false: 'button-stable'}[isDActive]" class="button button-block" ng-click="searchStatistics('D')">按部门</button>
         </div>
 
-        <!--<div class="spacer" style="width: 300px; height: 10px;"></div>-->
 
         <form class="list">
             <label class="item item-input">
@@ -23,29 +22,33 @@
         </form>
 
         <ion-list>
-            <ion-item class="item stat-label-content" ng-repeat="en in statisticData">
-                <div class="bar-header">{{en.keyInfo.name}}</div>
+            <ion-item class="item stat-label-content" ng-repeat="en in statisticData" ng-click="goToStaffRecords(en.keyInfo.name)">
+                <div class="bar-header">{{en.keyInfo.name}}
+                    <span style="float: right">查看详情
+                        <i class="icon ion-chevron-right"></i>
+                    </span>
+                </div>
                 <div class="left-div">
                     <div>
-                        <label class="label-top-left">
+                        <div class="label-top-left">
                             <p>已完成出差({{showManTimes}})</p>
                             <h2 class="ng-binding" style="text-align: center;">{{en.completeTripNum || 0}}</h2>
-                        </label>
-                        <label class="label-top-right">
+                        </div>
+                        <div class="label-top-right">
                             <p>已支出(元)</p>
                             <h2 class="ng-binding" style="text-align: center;">{{en.expenditure || 0}}</h2>
-                        </label>
+                        </div>
                     </div>
 
                     <div>
-                        <label class="label-bottom-left">
+                        <div class="label-bottom-left">
                             <p>还将进行出差({{showManTimes}})</p>
                             <h2 class="ng-binding" style="text-align: center;">{{en.planTripNum || 0}}</h2>
-                        </label>
-                        <label class="label-right">
+                        </div>
+                        <div class="label-right">
                             <p>计划支出(元)</p>
                             <h2 class="ng-binding" style="text-align: center;">{{en.planBudget || 0}}</h2>
-                        </label>
+                        </div>
                     </div>
                 </div>
                 <div class="right-div">

@@ -1,9 +1,9 @@
 <ion-view title="出差统计-本月预算" id="page24">
     <ion-content padding="true" class="has-header">
-        <div class="item item-input">
-            <i class="icon ion-plane" ng-click="monthChange()"></i>
+        <div class="item item-input date_selected">
+            <i class="icon ion-chevron-left" ng-click="monthChange()"></i>
             <span class="input-label">{{monthSelection.showStr}}</span>
-            <i class="icon ion-plane" ng-click="monthChange(true)"></i>
+            <i class="icon ion-chevron-right" ng-click="monthChange(true)"></i>
         </div>
 
         <!--<label class="item item-select">-->
@@ -20,25 +20,25 @@
             <!--<a href="#/company/distribution" id="page24-button75" class="button button-stable  button-block">员工分布</a>-->
         </div>
 
-        <ion-list show-delete="showDelete">
+        <ion-list show-delete="showDelete" class="tripStat">
             <ion-item class="item">
-                <div style="float:left; padding-left: 0.5em;">
+                <div>
                     <p>总计划支出(元)</p>
-                    <h2 class="ng-binding" style="text-align: center;">{{(statistic.expenditure || 0) + (statistic.planBudget || 0)}}</h2>
+                    <h2 style="color: #4a90e2">{{(statistic.expenditure || 0) + (statistic.planBudget || 0)}}</h2>
                 </div>
-                <div style="float: right; padding-right: 1em">
+                <div>
                     <p>实际已支出(元)</p>
-                    <h2 class="ng-binding" style="text-align: center;">{{statistic.expenditure || 0}}</h2>
+                    <h2 style="color: #F5A623">{{statistic.expenditure || 0}}</h2>
                 </div>
             </ion-item>
             <ion-item class="item">
-                <div style="float: left">
+                <div>
                     <p>计划出差人数(次)</p>
-                    <h2 class="ng-binding" style="text-align: center;">{{(statistic.completeTripNum || 0) + (statistic.planTripNum || 0)}}</h2>
+                    <h2 style="color: #9013fe">{{(statistic.completeTripNum || 0) + (statistic.planTripNum || 0)}}</h2>
                 </div>
-                <div style="float: right">
+                <div>
                     <p>已完成出差人数(次)</p>
-                    <h2 class="ng-binding" style="text-align: center;">{{statistic.completeTripNum || 0}}</h2>
+                    <h2 style="color: #50e3c2">{{statistic.completeTripNum || 0}}</h2>
                 </div>
             </ion-item>
         </ion-list>
@@ -46,20 +46,28 @@
         <div class="spacer" style="width: 300px; height: 10px;"></div>
         <div class="link-div">
             <!--<i class="icon ion-flag" style="font-size: 0.5em; color: red;"></i>-->
-            <a href="#/company/record"><div class="row item item-body" style="float:left;">员工出差记录</div></a>
-            <a href="#/company/distribution"><div class="row item item-body">员工地图分布</div></a>
+            <a href="#/company/record">
+                <div class="row item item-body item-icon-right">
+                    <i class="fa fa-list"></i>员工出差记录<i class="icon ion-chevron-right"></i>
+                </div>
+            </a>
+            <a href="#/company/distribution">
+                <div class="row item item-body item-icon-right">
+                    <i class="fa fa-map"></i>员工地图分布<i class="icon ion-chevron-right"></i>
+                </div>
+            </a>
         </div>
 
         <div class="spacer" style="width: 300px; height: 10px;"></div>
-        <ion-list show-delete="showDelete">
-            <ion-item class="item">
-                <div style="float: left; padding-left: 2em;">
+        <ion-list show-delete="showDelete" class="tripStat">
+            <ion-item class="item" style="border-top: 0;">
+                <div>
                     <p>动态预算(元)</p>
-                    <h2 class="ng-binding" style="text-align: center;">{{statistic.completeBudget}}</h2>
+                    <h2 style="color: #4a90e2">{{statistic.completeBudget}}</h2>
                 </div>
-                <div style="float:right; padding-right: 2em;">
+                <div>
                     <p>实际支出(元)</p>
-                    <h2 class="ng-binding" style="text-align: center;">{{statistic.expenditure || 0}}</h2>
+                    <h2 style="color: #F5A623">{{statistic.expenditure || 0}}</h2>
                 </div>
             </ion-item>
         </ion-list>
@@ -82,10 +90,12 @@
                 <h2>{{statistic.savedMoney}}</h2>
             </div>
         </div>
-
-        <div class="spacer" style="width: 300px; height: 10px;"></div>
         <div class="link-div">
-            <a href="#/company/staffSavedRank"><div class="row item item-body" style="float:left;">员工节省排行</div></a>
+            <a href="#/company/staffSavedRank">
+                <div class="row item item-body item-icon-left item-icon-right">
+                    <i class="ion-android-person"></i>员工节省排行<i class="icon ion-chevron-right"></i>
+                </div>
+            </a>
         </div>
         <div class="spacer" style="width: 300px; height: 30px;"></div>
     </ion-content>
