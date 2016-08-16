@@ -34,7 +34,7 @@ class WechatApi{
             var url = window.location.href.split('#')[0];
             var cfg = await API.wechat.getJSDKParams({
                 url: url,
-                jsApiList: ['chooseImage', 'uploadImage'],
+                jsApiList: ['chooseImage', 'uploadImage', 'onMenuShareTimeline', 'onMenuShareAppMessage'],
                 debug: false
             });
             await wxload;

@@ -8,6 +8,13 @@
   }
 }
 
+
+ion-side-menu {
+  .menu-button.icon:before {
+    width: 28px;
+  }
+}
+
 .menu-button{
   .badge{
     float: right;
@@ -64,4 +71,16 @@
 .slide-in-down > .ng-leave {
   -webkit-transition: all ease-in-out 250ms;
   transition: all ease-in-out 250ms;
+}
+
+@media (max-width: 320px) {
+  ion-side-menu {
+    .side-menu-left {
+      .menulist {
+        .button.button-block {
+          margin: 0;
+        }
+      }
+    }
+  }
 }

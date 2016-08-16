@@ -19,7 +19,7 @@ import {Agency, AgencyUser, EAgencyUserRole} from "api/_types/agency";
 import {Department} from "api/_types/department";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import {md5} from "common/utils";
-import {FindResult} from "common/model/interface";
+import { FindResult, PaginateInterface } from "common/model/interface";
 
 class CompanyModule {
     /**
@@ -160,7 +160,7 @@ class CompanyModule {
         return {ids: ids, count: companies['total']};
     }
     
-    static async getCompanyNoAgency() {
+    static async getCompanyNoAgency(): Promise<PaginateInterface<Company> > {
         let agencies = await Models.company.find({where: {agencyId: null}});
         return agencies;
     }

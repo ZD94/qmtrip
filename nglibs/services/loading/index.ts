@@ -7,6 +7,8 @@ class LoadingService {
     $timeout: ITimeoutService;
     level: number;
     $ionicLoading;
+    firstLoding = true;
+
     constructor($rootScope: IRootScopeService, $timeout: ITimeoutService, $ionicLoading){
         this.$timeout = $timeout;
         this.level = 0;
@@ -24,7 +26,13 @@ class LoadingService {
 
         if(this.level == 0){
             var template = options.template || require('./loading.html');
-            this.$ionicLoading.show({template: template});
+            this.$ionicLoading.show({template: template})
+                .then(()=>{
+                    if(this.firstLoding){
+                        this.firstLoding = false;
+                        $('body ion-nav-view>.initial-loading').html('');
+                    }
+                })
             //var wH = $(window).height();
             //$("#loading").show();
             //$("body").css({'height':wH,'overflow':'hidden'});

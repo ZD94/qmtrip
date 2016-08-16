@@ -6,6 +6,12 @@ import * as L from 'common/language';
 import { Table, Create, Field, TableIndex } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 
+export enum ACCOUNT_STATUS {
+    ACTIVE = 1,
+    NOT_ACTIVE = 0,
+    FORBIDDEN = -1
+};
+
 @regApiType('API.')
 class AuthCert {
     timestamp: string

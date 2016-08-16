@@ -109,6 +109,106 @@ class StaffModule{
     }
 
     /**
+     * 根据密码验证码修改并验证手机
+     * @param params
+     * @returns {Staff}
+     */
+    @clientExport
+    @requireParams(["id", "msgCode", "msgTicket", "mobile", "pwd"])
+    static async modifyMobile(params): Promise<Staff>{
+        let pwd = params.pwd;
+        let msgCode = params.msgCode;
+        let msgTicket = params.msgTicket;
+        let mobile = params.mobile;
+        let id = params.id;
+
+        await API.auth.checkEmailAndMobile({mobile: mobile});
+        var account = await DBM.Account.findById(id);
+
+        if (!account) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        pwd = utils.md5(pwd);
+        if (account.pwd != pwd) {
+            throw L.ERR.PWD_ERROR();
+        }
+
+        var result =  await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+
+        if(result){
+            var staff = await Models.staff.get(id);
+            staff.mobile = mobile;
+            staff.isValidateMobile = true;
+            staff = await staff.save();
+        }else{
+            throw L.ERR.CODE_ERROR();
+        }
+        return staff;
+    }
+
+    /**
+     * 修改员工邮箱
+     * @param params
+     * @returns {Staff}
+     */
+    @clientExport
+    @requireParams(["id", "email", "pwd"])
+    static async modifyEmail(params): Promise<Staff>{
+        let pwd = params.pwd;
+        let email = params.email;
+        let id = params.id;
+
+        await API.auth.checkEmailAndMobile({email: email});
+        var account = await DBM.Account.findById(id);
+
+        if (!account) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        pwd = utils.md5(pwd);
+        if (account.pwd != pwd) {
+            throw L.ERR.PWD_ERROR();
+        }
+
+        var staff = await Models.staff.get(id);
+        staff.isValidateEmail = false;
+        staff.email = email;
+        staff = await staff.save();
+        return staff;
+    }
+
+    /**
+     * 修改员工密码
+     * @param params
+     * @returns {Staff}
+     */
+    @clientExport
+    @requireParams(["id", "newPwd", "pwd"])
+    static async modifyPwd(params): Promise<Staff>{
+        let pwd = params.pwd;
+        let newPwd = params.newPwd;
+        let id = params.id;
+
+        var account = await DBM.Account.findById(id);
+
+        if (!account) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        pwd = utils.md5(pwd);
+        if (account.pwd != pwd) {
+            throw L.ERR.PWD_ERROR();
+        }
+
+        newPwd = utils.md5(newPwd);
+        var staff = await Models.staff.get(id);
+        staff.pwd = newPwd;
+        staff = await staff.save();
+        return staff;
+    }
+
+    /**
      * 更新员工
      * @param id
      * @param data
@@ -1321,7 +1421,7 @@ class StaffModule{
         var staff = await Staff.getCurrent();
         var invitedLink = InvitedLink.create();
         invitedLink.staff = staff;
-        invitedLink.expiresTime = moment().add(24, 'd');
+        invitedLink.expiresTime = moment().add(24, 'h');
         var linkToken = utils.getRndStr(6);
         invitedLink.linkToken = linkToken;
         var timeStr = utils.now();
@@ -1329,6 +1429,7 @@ class StaffModule{
         var timestamp = Date.now() + oneDay;  //失效时间2天
         var sign = makeLinkSign(linkToken, invitedLink.id, timestamp);
         var url = goInvitedLink + "?linkId="+invitedLink.id+"&timestamp="+timestamp+"&sign="+sign;
+        url = await API.wechat.shorturl({longurl: url});
         invitedLink.goInvitedLink = url;
         return  invitedLink.save();
     }

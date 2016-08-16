@@ -1,3 +1,43 @@
+.date_selected{
+  padding:0;
+  justify-content: center;
+  .input-label{
+    width: auto;
+    padding: 7px 20px;
+  }
+}
+.tripStat{
+  .item{
+    display: flex;
+    align-items: center;
+    padding: 0;
+    height:75px;
+    &:first-child{
+      border-bottom: 1px dashed #ddd;
+    }
+    &:last-child{
+      border-top: 1px dashed #ddd;
+    }
+    >div{
+      flex:1;
+      text-align: center;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      &:last-child{
+        border-left: 1px dotted #ddd;
+      }
+      p{
+        text-align: left;
+        font-size: 12px;
+        padding: 5px;
+      }
+      h2{
+        font-size: 30px;
+      }
+    }
+  }
+}
 .stat-label-content{
   position: relative;
   padding-top: 10px;
@@ -5,6 +45,7 @@
   .bar-header{
     height: 30px;
     line-height: 30px;
+    border-bottom: 1px dashed #ddd;
   }
   .left-div{
     float: left;
@@ -51,5 +92,73 @@
   }
   a:active {
     text-decoration: none;
+  }
+  .row{
+    padding: 8px;
+    .icon{
+      font-size: 14px;
+    }
+  }
+  .fa{
+    font-size: 12px;
+    line-height: 20px;
+    margin-right: 5px;
+    &.fa-list{
+      color:#F5A623;
+    }
+    &.fa-map{
+      color:#cb0a00;
+    }
+  }
+  .ion-android-person {
+    margin-right: 5px;
+    color: #4a90e2;
+  }
+
+}
+
+
+ion-nav-view ion-view ion-content {
+  .withChart {
+    background: #fff;
+    .doughnut-text {
+      position: relative;
+      .text-in-doughnut {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        span {
+          color: #666;
+        }
+        .savePercent {
+          margin: 10px 0;
+          text-align: center;
+          font-size: 30px;
+          @media (max-width: 320px) {
+            font-size: 26px;
+          }
+        }
+      }
+    }
+    .right-of-doughnut {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      p {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 2px;
+      }
+      h2 {
+        font-size: 16px;
+        margin: 2px;
+      }
+    }
   }
 }
