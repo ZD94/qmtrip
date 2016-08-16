@@ -14,6 +14,7 @@ const moment = require("moment");
 const API = require("common/api");
 var L = require("common/language");
 var msgbox = require('msgbox');
+var browserspec = require('browserspec');
 declare var ionic;
 declare var wx:any;
 
@@ -146,17 +147,23 @@ export async function BudgetStatisticsController($scope, $stateParams, Models) {
         $scope.statisticData = ret;
     }
 
+    $scope.goToStaffRecords = function(name) {
+        window.location.href = `#/company/record?type=${$scope.monthSelection.type}&keyword=${name}`;
+    };
+
     $scope.searchStatistics = searchStatistics;
 }
 
-export async function RecordController($scope) {
+export async function RecordController($scope, $stateParams) {
+    let keyword = $stateParams.keyword || '';
+    let type = $stateParams.type || null;
     let staff = await Staff.getCurrent();
     let company = staff.company;
     $scope.EPlanStatus = EPlanStatus;
 
     let formatStr = 'YYYY-MM-DD HH:mm:ss';
     let monthSelection = {
-        keyWord: '',
+        keyWord: keyword,
         month: moment().format('YYYY-MM'),
         startTime: moment().startOf('month').format(formatStr),
         endTime: moment().endOf('month').format(formatStr),
@@ -196,16 +203,26 @@ export async function RecordController($scope) {
         }};
         
         if(keyWord) {
-            options.where.$or = [{title: {$like: `%${keyWord}%`}}];
-            let staffOpt: any = {where: {$or: [{name: {$like: `%${keyWord}%`}}]}};
-            let depts = await company.getDepartments({where: {name: {$like: `%${keyWord}%`}}});
-            let deptIds = depts.map((d) => d.id);
-            if(deptIds && deptIds.length > 0)
-                staffOpt.where.$or.push({departmentId: deptIds});
+            options.where.$or = [];
+            if(!type || (type == 'P')) //不指定任何检索条件或者指定按项目检索关键字
+                options.where.$or.push({title: {$like: `%${keyWord}%`}});
 
-            let staffs = await company.getStaffs(staffOpt);
-            if(staffs && staffs.length > 0)
-                options.where.$or.push({accountId: staffs.map((s) => s.id)});
+            let staffOpt: any = {where: {$or: []}};
+
+            if(!type || type == 'D'){
+                let depts = await company.getDepartments({where: {name: {$like: `%${keyWord}%`}}});
+                let deptIds = depts.map((d) => d.id);
+                if(deptIds && deptIds.length > 0)
+                    staffOpt.where.$or.push({departmentId: deptIds});
+            }
+
+            if(!type || type =='S' || type == 'D'){
+                if(!type || type == 'S')
+                    staffOpt.where.$or.push({name: {$like: `%${keyWord}%`}});
+                let staffs = await company.getStaffs(staffOpt);
+                if(staffs && staffs.length > 0)
+                    options.where.$or.push({accountId: staffs.map((s) => s.id)});
+            }
         }
         var pager = await company.getTripPlans(options);
 
@@ -261,7 +278,6 @@ export async function RecordDetailController($scope, Models, $stateParams, $ioni
     let budgetId;
     totalBudget = tripPlan.budget as number;
     tripDetails.forEach(function(detail) {
-        console.info("tripDetail==>", detail)
         switch (detail.type) {
             case ETripType.OUT_TRIP:
                 traffic.push(detail);
@@ -999,19 +1015,18 @@ export async function StaffInvitedController($scope, Models, $storage, $statePar
         seconds = moment(invitedLinks[0]['expiresTime']).diff(moment(),'seconds');
         transformSeconds(seconds);
         $scope.encodeLink = encodeURIComponent($scope.invitedLink.goInvitedLink);
-        console.info($scope.invitedLink);
-        wx.onMenuShareAppMessage({
-            title:'邀请加入企业',
-            desc:'公司邀请你加入',
-            link:$scope.invitedLink,
-            imgUrl:'http://t.jingli365.com/ionic/images/logo.png',
-            success: function () {
-                // 用户确认分享后执行的回调函数
-            },
-            cancel: function () {
-                // 用户取消分享后执行的回调函数
-            }
-        })
+        // wx.onMenuShareAppMessage({
+        //     title:'邀请加入企业',
+        //     desc:'公司邀请你加入',
+        //     link:$scope.invitedLink,
+        //     imgUrl:'http://t.jingli365.com/ionic/images/logo.png',
+        //     success: function () {
+        //         // 用户确认分享后执行的回调函数
+        //     },
+        //     cancel: function () {
+        //         // 用户取消分享后执行的回调函数
+        //     }
+        // })
     }
     $scope.createLink = async function (){
         var invitedLink = InvitedLink.create();
@@ -1020,7 +1035,6 @@ export async function StaffInvitedController($scope, Models, $storage, $statePar
         transformSeconds(seconds);
         $scope.invitedLink = invitedLink;
         $scope.encodeLink = encodeURIComponent(invitedLink.goInvitedLink);
-        console.info($scope.invitedLink);
     }
     $scope.stopLink = function(invitedLink){
         invitedLink.status = 0;
@@ -1045,6 +1059,29 @@ export async function StaffInvitedController($scope, Models, $storage, $statePar
     }
     $scope.isAndroid = ionic.Platform.isAndroid();
     $scope.isIos =  ionic.Platform.isIOS();
+    
+    $scope.sendWx = function(){
+        if(browserspec.is_wechat){
+            alert("点击右上角发送给朋友");
+            wx.onMenuShareAppMessage({
+                title:'邀请加入企业',
+                desc:'公司邀请你加入',
+                link: $scope.invitedLink.goInvitedLink,
+                imgUrl:'http://t.jingli365.com/ionic/images/logo.png',
+                type: '', // 分享类型,music、video或link，不填默认为link
+                dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                success: function () {
+                    // 用户确认分享后执行的回调函数
+                },
+                cancel: function () {
+                    // 用户取消分享后执行的回调函数
+                }
+            });
+        }else{
+            alert("使用浏览器分享功能发送给朋友");
+        }
+
+    }
 }
 
 export async function StaffSavedRankController($scope) {

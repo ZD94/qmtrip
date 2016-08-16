@@ -3,6 +3,7 @@ var Cookie = require('tiny-cookie');
 var msgbox = require('msgbox');
 var API = require('common/api');
 import validator = require('validator');
+import { Staff } from "api/_types/staff";
 
 API.require('auth');
 
@@ -96,15 +97,18 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
 
         function showEmailPopup(){
             var nshow = $ionicPopup.show({
-                template: '<span>您的邮箱还未激活，请激活后再进行登录</span><br><span>邮箱：'+$scope.form.account+'</span>',
+                title:'邮箱未激活',
+                cssClass:'showAlert',
+                template: '<div class="popupDiv"><span>请激活后再进行登录</span><br><span>邮箱：{{form.account}}</span></div>',
                 scope: $scope,
                 buttons: [
                     {
-                        text: '返回用手机登录'
+                        text: '返回重新登录',
+                        type: 'button-small button-outline button-positive'
                     },
                     {
                         text: '获取激活邮件',
-                        type: 'button-positive',
+                        type: 'button-positive button-small',
                         onTap: async function (e) {
                             if (!$scope.form.account) {
                                 e.preventDefault();
@@ -127,12 +131,13 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
 
         function showSendEmailSuccess(){
             var nshow = $ionicPopup.show({
-                template: '<span>邮箱：'+$scope.form.account+'</span><br><span>激活邮件发送成功！</span><br><span>请点击邮件中的链接完成激活，即可点击下方立即登陆按钮进入系统，链接有效期24个小时</span>',
+                template: '<div class="popupDiv"><p>邮箱：{{form.account}}</p><br><h2><i class="ion-checkmark-circled"></i>激活邮件发送成功！</h2><br><span>请点击邮件中的链接完成激活，即可点击下方立即登陆按钮进入系统，链接有效期24个小时</span></div>',
+                cssClass:'showAlert',
                 scope: $scope,
                 buttons: [
                     {
                         text: '立即登陆',
-                        type: 'button-positive',
+                        type: 'button-small button-positive',
                         onTap: async function (e) {
                             $scope.check_login();
                         }
@@ -143,19 +148,22 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
 
         function showMobilePopup(){
             var nshow = $ionicPopup.show({
-                template: '<span>您的手机尚未激活，请获取验证码激活</span><br><span>手机号：'+$scope.form.account+'</span>' +
+                title: '手机未激活',
+                template: '<div class="popupDiv"><span>请获取验证码激活</span><br><h2>手机号：{{form.account}}</h2>' +
                 '<div class="item item-input"> <input type="text" placeholder="请输入验证码" ng-model="form.msgCode"> ' +
-                '<a class="button button-positive" ng-click="sendCode()"  ng-if="!showCount">发送验证码</a> ' +
-                '<div class="button button-stable" style="width: 116px;text-align: center;" ng-if="showCount"><span id="countNum">{{beginNum}}</span>s</div>' +
+                '<a class="button button-small button-positive" ng-click="sendCode()"  ng-if="!showCount">发送验证码</a> ' +
+                '<a class="button button-small button-stable" ng-if="showCount"><span id="countNum">{{beginNum}}</span>s</a>' +
                 '</div>',
+                cssClass:'showAlert',
                 scope: $scope,
                 buttons: [
                     {
-                        text: '返回用邮箱登录'
+                        text: '返回重新登录',
+                        type: 'button-small button-outline button-positive'
                     },
                     {
                         text: '立即激活',
-                        type: 'button-positive',
+                        type: 'button-small button-positive',
                         onTap: async function (e) {
                             if (!$scope.form.msgCode) {
                                 e.preventDefault();
@@ -178,7 +186,8 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
 
         function showCheckMobileSuccess(){
             var nshow = $ionicPopup.show({
-                template: '<span>手机号：'+$scope.form.account+'</span><br><span>激活成功！</span>',
+                title: '激活成功！',
+                template: '<span>手机号：{{form.account}}</span>',
                 scope: $scope,
                 buttons: [
                     {
@@ -521,19 +530,25 @@ export async function ActiveController ($scope, $stateParams) {
     }
 }
 
-export async function InvitedStaffOneController ($scope, $stateParams){
+export async function InvitedStaffOneController ($scope, $stateParams, $storage){
     require("./login.scss");
     let linkId = $stateParams.linkId;
     let sign = $stateParams.sign;
     let timestamp = $stateParams.timestamp;
     API.require("auth");
     await API.onload();
+    var auth_data = $storage.local.get('auth_data');
 
-    API.auth.checkInvitedLink({linkId: linkId, sign: sign, timestamp: timestamp})
+    await API.auth.checkInvitedLink({linkId: linkId, sign: sign, timestamp: timestamp})
         .then(async function (result) {
             if(result){
                 $scope.inviter = result.inviter;
                 $scope.comoany = result.company;
+                if(auth_data && auth_data.user_id && $scope.inviter && auth_data.user_id == $scope.inviter.id){
+                    //显示遮罩层
+                    alert("显示遮罩层");
+                    console.info("显示遮罩层");
+                }
             }else{
                 msgbox.log("激活链接已经失效");
                 window.location.href = "index.html#/login/invalid-link";
