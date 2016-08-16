@@ -53,6 +53,20 @@
     width: 65%;
     height: 100px;
     bottom: 10px;
+    >div{
+      &:first-child{
+        display: inline-block;
+        width: 100%;
+        border-bottom: 1px dashed #ddd;
+        h2{
+          color: #4a90e2;
+        }
+      }
+      h2{
+        color: #f7a05a;
+        text-align: center;
+      }
+    }
     .label-top-left{
       float: left;
       padding: 5px 1px;
@@ -77,6 +91,10 @@
     position: absolute;
     right: 10px;
     bottom: 40px;
+    h2{
+      text-align: center;
+      color: #62894e;
+    }
   }
 }
 

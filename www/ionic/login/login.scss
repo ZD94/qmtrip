@@ -68,3 +68,45 @@
     }
   }
 }
+.showAlert{
+  .popup{
+    border-radius: 5px;
+    .popupDiv{
+      text-align: center;
+      h2{
+        font-size: 20px;
+        margin-top: 0;
+      }
+      p{
+        font-size: 18px;
+      }
+      .item{
+        padding-top: 0;
+        padding-bottom: 0;
+        display: flex;
+        input{
+          flex: 2;
+        }
+        .button{
+          border-radius: 0;
+          flex: 1;
+          line-height: 30px;
+        }
+      }
+    }
+    .ion-checkmark-circled{
+      color: green;
+    }
+  }
+  .popup-buttons{
+    flex-direction: column-reverse;
+    .button{
+      max-width: 185px;
+      min-width: 160px;
+      margin: 0 auto;
+    }
+    .button-outline{
+      margin-top: 10px;
+    }
+  }
+}
