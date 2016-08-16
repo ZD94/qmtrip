@@ -3,6 +3,7 @@ var Cookie = require('tiny-cookie');
 var msgbox = require('msgbox');
 var API = require('common/api');
 import validator = require('validator');
+import { Staff } from "api/_types/staff";
 
 API.require('auth');
 
@@ -529,19 +530,25 @@ export async function ActiveController ($scope, $stateParams) {
     }
 }
 
-export async function InvitedStaffOneController ($scope, $stateParams){
+export async function InvitedStaffOneController ($scope, $stateParams, $storage){
     require("./login.scss");
     let linkId = $stateParams.linkId;
     let sign = $stateParams.sign;
     let timestamp = $stateParams.timestamp;
     API.require("auth");
     await API.onload();
+    var auth_data = $storage.local.get('auth_data');
 
-    API.auth.checkInvitedLink({linkId: linkId, sign: sign, timestamp: timestamp})
+    await API.auth.checkInvitedLink({linkId: linkId, sign: sign, timestamp: timestamp})
         .then(async function (result) {
             if(result){
                 $scope.inviter = result.inviter;
                 $scope.comoany = result.company;
+                if(auth_data && auth_data.user_id && $scope.inviter && auth_data.user_id == $scope.inviter.id){
+                    //显示遮罩层
+                    alert("显示遮罩层");
+                    console.info("显示遮罩层");
+                }
             }else{
                 msgbox.log("激活链接已经失效");
                 window.location.href = "index.html#/login/invalid-link";
