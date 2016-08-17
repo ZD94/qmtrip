@@ -229,14 +229,17 @@ class ApiAuth {
         var sign = data.sign;
         var accountId = data.accountId;
         var timestamp = data.timestamp;
-        var nowTime = Date.now();
+        var account = await Models.account.get(accountId);
 
+        if(account.isValidateEmail){
+            throw {code: -1, msg: "您的邮箱已激活"};
+        }
         //失效了
+        var nowTime = Date.now();
         if (timestamp<0 || nowTime - timestamp > 0) {
             throw L.ERR.ACTIVE_URL_INVALID();
         }
 
-        var account = await Models.account.get(accountId);
         if(!account){
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
@@ -272,7 +275,7 @@ class ApiAuth {
         }
 
         if (!msgCode || !msgTicket) {
-            throw {code: -1, msg: "短信验证码错误"};
+            throw L.ERR.CODE_ERROR();
         }
         var accounts = await Models.account.find({where : {mobile: mobile}});
         var account = Account.create();

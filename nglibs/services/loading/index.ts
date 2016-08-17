@@ -1,18 +1,13 @@
 "use strict";
 
 import angular = require('angular');
-import {IRootScopeService, ITimeoutService} from 'angular';
+import {IRootScopeService, IDocumentService} from 'angular';
 
 class LoadingService {
-    $timeout: ITimeoutService;
-    level: number;
-    $ionicLoading;
-    firstLoding = true;
+    level: number = 0;
 
-    constructor($rootScope: IRootScopeService, $timeout: ITimeoutService, $ionicLoading){
-        this.$timeout = $timeout;
-        this.level = 0;
-        this.$ionicLoading = $ionicLoading;
+    constructor(private $ionicLoading){
+        require('./loading.scss');
     }
 
     reset() {
@@ -27,12 +22,6 @@ class LoadingService {
         if(this.level == 0){
             var template = options.template || require('./loading.html');
             this.$ionicLoading.show({template: template})
-                .then(()=>{
-                    if(this.firstLoding){
-                        this.firstLoding = false;
-                        $('body ion-nav-view>.initial-loading').remove();
-                    }
-                })
             //var wH = $(window).height();
             //$("#loading").show();
             //$("body").css({'height':wH,'overflow':'hidden'});
@@ -84,4 +73,17 @@ angular
         $rootScope.$on("$scopeControllerDone", function(event) {
             $loading.end();
         });
+    })
+    .run(function($rootScope: IRootScopeService, $document: IDocumentService) {
+        var unreg = $rootScope.$on('backdrop.shown', function() {
+            unreg();
+            let body = $document.find('body');
+            let initialViewChildren = body.find('ion-nav-view>*');
+            body.addClass('initial-loading-switching');
+            initialViewChildren.data('$accessed', Date.now());
+            setTimeout(()=> {
+                initialViewChildren.remove();
+                $document.find('body').removeClass('initial-loading-switching');
+            });
+        })
     });

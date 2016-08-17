@@ -49,6 +49,7 @@ ion-side-menu {
     }
   }
 }
+
 // Slide up from the bottom, used for modals
 // -------------------------------
 
@@ -76,7 +77,7 @@ ion-side-menu {
 @media (max-width: 320px) {
   ion-side-menu {
     .side-menu-left {
-      .menulist {
+      .side-menu-list {
         .button.button-block {
           margin: 0;
         }
