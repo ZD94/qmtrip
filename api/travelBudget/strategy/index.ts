@@ -96,6 +96,7 @@ export class CommonTicketStrategy extends AbstractStrategy {
         const CHEAP_SUPPLIER_POINTS = 200;
         const CORRECT_TRAFFIC_POINTS = 500;
         const CABIN_POINTS = 500;
+        const PRICE_PREFER_POINTS = 100;
 
         let {leaveDate, leaveTime, latestArrivalTime} = params;
         let _tickets: IFinalTicket[] = [];
@@ -128,7 +129,8 @@ export class CommonTicketStrategy extends AbstractStrategy {
          * 根据仓位打分
          * * * * * * * * * * * * * */
         _tickets = ticketPrefer.cabin(_tickets, ['Economy', '二等座', '硬卧'], CABIN_POINTS);
-
+        
+        _tickets = ticketPrefer.priceprefer(_tickets, 0.5, PRICE_PREFER_POINTS);
         /* * * * * * * * * * * *
          * 如果没有车票信息,直接返回无预算
          * * * * * * * * * * * * * */
@@ -171,11 +173,17 @@ export class HighestPriceTicketStrategy extends AbstractStrategy {
     }
 
     async buildProcess(params:any):Promise<TravelBudgeItem> {
+        if (!this.tickets) {
+            return {
+                price: -1
+            }
+        }
         const POINTS = 500;
         let tickets = formatTicketData(this.tickets);
         tickets.sort( (v1, v2) => {
             return v2.price - v1.price;
         });
+        require("fs").writeFile("./data.json", JSON.stringify(tickets))
         return {
             price: tickets[0].price,
             type: <EInvoiceType>(<number>tickets[0].type),

@@ -24,7 +24,7 @@ gulplib.bundle_lib('ws', {ex: true, ts: false, require: ['ws', 'crypto'], exclud
 gulplib.bundle_lib('jquery', {ex: true, ts: false, require: ['jquery']});
 gulplib.bundle_lib('bootstrap', {ex: true, ts: false, require: ["bootstrap"]});
 gulplib.bundle_lib('angular', {ex: true, ts: false, require: ['angular', 'common/client/angular']});
-gulplib.bundle_lib('ionic', {ex: true, ts: false, require: ['./common/client/ionic/entry.js:ionic']});
+gulplib.bundle_lib('ionic', {ex: true, ts: false, require: ['common/client/ionic/entry.js:ionic']});
 gulplib.bundle_lib('swiper', {ex: true, ts: false, require: ['swiper']});
 gulplib.bundle_lib('img', {ex: true, ts: false, require: ['arale-qrcode', 'hidpi-canvas', 'exif-js', 'exif-orient']})
 gulplib.bundle_lib('base', {ex: true, ts: false, require:['md5', 'moment', 'tiny-cookie', 'shoe', 'lodash', 'validator', 'scssify', 'cssify']})
@@ -39,7 +39,7 @@ gulplib.bundle_lib('api', {require: ['common/client/api:common/api', 'common/api
 gulplib.bundle_lib('calendar', {require: ['lunar-calendar', "calendar"]});
 gulplib.bundle_lib('msgbox', {require: ['notie', 'msgbox']});
 gulplib.bundle_lib('nglibs', {require: ['nglibs', 'api/_types', 'api/_types/*', 'common/model/client:common/model']});
-gulplib.bundle_lib('ngapp', {require: ['./common/client/ngapp/index.ts:ngapp', 'browserspec']});
+gulplib.bundle_lib('ngapp', {require: ['common/client/ngapp/index.ts:ngapp', 'browserspec']});
 
 //gulplib.angular_app('staff');
 //gulplib.angular_app('corp');

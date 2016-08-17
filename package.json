@@ -92,6 +92,7 @@
     "browserify-incremental": "^3.1.1",
     "cordova-app-loader": "markmarijnissen/cordova-app-loader",
     "cordova-promise-fs": "^1.1.1",
+    "cssify": "^1.0.3",
     "cssnano": "^3.5.2",
     "del": "^2.2.0",
     "font-awesome": "^4.6.3",
