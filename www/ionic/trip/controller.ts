@@ -100,7 +100,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg){
     async function queryPlaces(keyword){
         if (!keyword) {
             let hotCities = $storage.local.get("hot_cities")
-            if (hotCities) {
+            if (hotCities && hotCities[0] && hotCities[0].id) {
                 return hotCities;
             }
         }
