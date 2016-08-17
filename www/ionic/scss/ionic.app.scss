@@ -20,7 +20,7 @@ $ionicons-font-path: "../../fonts/ionic" !default;
 $menu-side-shadow: none;
 
 // Include all of Ionic
-@import "../../../common/client/ionic/scss/ionic";
+@import "../../../common/vendor/ionic/scss/ionic";
 
 html {
   width: 100%;
