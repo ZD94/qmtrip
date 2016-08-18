@@ -880,7 +880,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
 
                 return makeAuthenticateSign(loginAccount.id)
                     .then(function(ret) {
-                        //判断是否首次登陆
+                        //判断是否首次登录
                         if (loginAccount.isFirstLogin) {
                             loginAccount.isFirstLogin = false;
                             return loginAccount.save()
@@ -1028,7 +1028,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     static async getAccount (params) {
         var id = params.id;
         var options: any = {};
-        options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt","loginFailTimes","lastLoginAt","lastLoginIp","activeToken","pwdToken","oldQrcodeToken","qrcodeToken","type","isFirstLogin"];
+        options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt","loginFailTimes","lastLoginAt","lastLoginIp","activeToken","pwdToken","oldQrcodeToken","qrcodeToken","type","isFirstLogin","isValidateEmail","isValidateMobile"];
         var acc = await Models.account.get(id, options);
         return acc;
     }
@@ -1527,7 +1527,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             let query = req.query;
             let redirect_url = query.redirect_url;
 
-            //如果是登陆页，直接跳转
+            //如果是登录页，直接跳转
             if(/^http\:\/\/\w*\.jingli365\.com\/(index\.html)?\#\/login\/(index)?/.test(redirect_url)){
                 redirect_url += redirect_url.indexOf('?') > 0 ? '&' : '?';
                 redirect_url += 'wxauthcode=' + query.code + '&wxauthstate=' + query.state;

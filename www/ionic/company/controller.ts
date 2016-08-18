@@ -653,7 +653,7 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
     $scope.role = role;
 
     $scope.savestaff = async function () {
-        //标识管理员修改自身权限 修改后要重新登陆
+        //标识管理员修改自身权限 修改后要重新登录
         // var logout = false;
         //标识企业拥有者修改管理员权限
         var ownerModifyAdmin = false;
@@ -718,7 +718,7 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
                         throw L.ERR.MOBILE_HAS_REGISTRY();
                     }
                 }
-                //管理员修改自身权限 修改后要重新登陆
+                //管理员修改自身权限 修改后要重新登录
                 /*if(preRole == EStaffRole.ADMIN && _staff.roleId == EStaffRole.COMMON && currentstaff.id == _staff.id){
                     logout = true;
                 }*/
@@ -754,7 +754,7 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
                 $ionicHistory.goBack(-1);
             }
 
-            //管理员修改自身权限 修改后要重新登陆
+            //管理员修改自身权限 修改后要重新登录
             /*if(logout){
                 //重新登录
                 var nshow = $ionicPopup.show({

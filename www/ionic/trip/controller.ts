@@ -325,7 +325,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     }
 
     $scope.totalPrice = totalPrice;
-    let duringDays = moment(trip.endDate).diff(moment(trip.beginDate), 'days');
+    let duringDays = moment(trip.endDate).diff(moment(trip.beginDate), 'days') + 1;
     $scope.duringDays = duringDays;
     $scope.budgets = budgets;
     $scope.EInvoiceType = EInvoiceType;

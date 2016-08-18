@@ -128,7 +128,7 @@ export async function EditEmailController($scope,Models,$ionicHistory,$ionicPopu
                         template:'为保障您的权益和能够及时收到通知消息，请尽快到邮箱进行激活！',
                         okText:'确定'
                     }).then(function(res){
-                        window.location.href = "index.html#/staff/index";
+                        window.location.href = "index.html#/staff/staffInfo";
                     })
                     // window.location.href = "index.html#/staff/editEmailSuccess";
                 }
