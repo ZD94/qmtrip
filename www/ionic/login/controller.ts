@@ -497,6 +497,7 @@ export async function ResetPwdController($scope, Models, $stateParams){
 }
 
 export async function ActiveController ($scope, $stateParams) {
+    require('./active.scss');
     let accountId = $stateParams.accountId;
     let sign = $stateParams.sign;
     let timestamp = $stateParams.timestamp;
