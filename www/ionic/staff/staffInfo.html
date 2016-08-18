@@ -11,7 +11,7 @@
                 <i class="icon ion-ios-arrow-right"></i>
             </a>
             <a class="item item-icon-right" href="#/staff/editEmail">
-                邮箱<i class="icon ion-ios-checkmark verify"></i>
+                邮箱<i class="icon ion-ios-checkmark verify" ng-class="staff.isValidateEmail ? '' : noverify"></i>
                 <span class="item-note">{{staff.email}}</span>
                 <i class="icon ion-ios-arrow-right"></i>
             </a>

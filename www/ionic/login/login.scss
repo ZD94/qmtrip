@@ -32,6 +32,15 @@
       }
     }
   }
+  .widthCodes{
+    padding: 0 0 0 16px;
+    .button{
+      border-radius: 0;
+      &.button-stable{
+        width: 116px;
+      }
+    }
+  }
   .mention{
     font-size: 12px;
     color: #fff;
@@ -46,13 +55,22 @@
     font-size: 20px;
     text-align: center;
   }
-  .padding_button{
+  .padding-button{
     padding: 10px;
+  }
+  .attention_wx{
+    height: 230px;
+    p{
+      text-align: center;
+      color: #fff;
+      padding-top: 20px;
+    }
   }
   .qrCode{
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     p{
       width: 300px;
       text-align: center;

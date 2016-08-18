@@ -12,6 +12,9 @@
           display: inline-block;
           font-size: 16px;
           color: #f5a623;
+          &.novalid{
+            color: #ddd;
+          }
         }
       }
     }

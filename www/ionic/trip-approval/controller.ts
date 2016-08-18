@@ -3,6 +3,7 @@
  */
 "use strict";
 import {EPlanStatus, ETripType, EAuditStatus, EInvoiceType, MTxPlaneLevel} from "api/_types/tripPlan";
+import {MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 import {Staff} from "api/_types/staff";
 import moment = require('moment');
 const API = require("common/api")
@@ -233,6 +234,31 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             alert(e);
         }
     }
+
+    $scope.showTravelPolicy = async function (staffId) {
+        var staff = await Models.staff.get(staffId);
+        if (!staff){
+            return;
+        }
+        var policy = await staff.getTravelPolicy();
+        if (policy) {   //判断是否设置差旅标准
+            var show = $ionicPopup.alert({
+                title: '差旅标准',
+                template: '飞机:' + MPlaneLevel[policy.planeLevel] +
+                '<br>' +
+                '火车:' + MTrainLevel[policy.trainLevel] +
+                '<br>' +
+                '住宿:' + MHotelLevel[policy.hotelLevel] +
+                '<br>' +
+                '补助:' + policy.subsidy + '/天'
+            })
+        } else {
+            var show = $ionicPopup.alert({   //定义show的原因是避免页面加载就执行
+                title: '提示',
+                template: '暂未设置差旅标准,请设置后查看'
+            })
+        }
+    };
 
     $scope.showReasonDialog = function () {
         $scope.reject = {reason: ''};

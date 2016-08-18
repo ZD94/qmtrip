@@ -32,7 +32,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
     var browserspec = require('browserspec');
     var backUrl = $stateParams.backurl || "#";
     require("./login.scss");
-    //微信中自动登陆
+    //微信中自动登录
     let href = window.location.href;
     if(browserspec.is_wechat && /.*jingli365\.com/.test(window.location.host) && !$stateParams.wxauthcode && !/.*backurl\=.*/.test(href)) {
         await API.onload();
@@ -99,7 +99,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
             var nshow = $ionicPopup.show({
                 title:'邮箱未激活',
                 cssClass:'showAlert',
-                template: '<div class="popupDiv"><span>请激活后再进行登录</span><br><span>邮箱：{{form.account}}</span></div>',
+                template: '<div class="popupDiv"><span>请激活后再进行登录</span><br><span>邮箱：'+$scope.form.account+'</span></div>',
                 scope: $scope,
                 buttons: [
                     {
@@ -131,12 +131,12 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
 
         function showSendEmailSuccess(){
             var nshow = $ionicPopup.show({
-                template: '<div class="popupDiv"><p>邮箱：{{form.account}}</p><br><h2><i class="ion-checkmark-circled"></i>激活邮件发送成功！</h2><br><span>请点击邮件中的链接完成激活，即可点击下方立即登陆按钮进入系统，链接有效期24个小时</span></div>',
+                template: '<div class="popupDiv"><p>邮箱：{{form.account}}</p><br><h2><i class="ion-checkmark-circled"></i>激活邮件发送成功！</h2><br><span>请点击邮件中的链接完成激活，即可点击下方立即登录按钮进入系统，链接有效期24个小时</span></div>',
                 cssClass:'showAlert',
                 scope: $scope,
                 buttons: [
                     {
-                        text: '立即登陆',
+                        text: '立即登录',
                         type: 'button-small button-positive',
                         onTap: async function (e) {
                             $scope.check_login();
@@ -149,7 +149,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
         function showMobilePopup(){
             var nshow = $ionicPopup.show({
                 title: '手机未激活',
-                template: '<div class="popupDiv"><span>请获取验证码激活</span><br><h2>手机号：{{form.account}}</h2>' +
+                template: '<div class="popupDiv"><span>请获取验证码激活</span><br><h2>手机号：'+$scope.form.account+'</h2>' +
                 '<div class="item item-input"> <input type="text" placeholder="请输入验证码" ng-model="form.msgCode"> ' +
                 '<a class="button button-small button-positive" ng-click="sendCode()"  ng-if="!showCount">发送验证码</a> ' +
                 '<a class="button button-small button-stable" ng-if="showCount"><span id="countNum">{{beginNum}}</span>s</a>' +
@@ -187,11 +187,11 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
         function showCheckMobileSuccess(){
             var nshow = $ionicPopup.show({
                 title: '激活成功！',
-                template: '<span>手机号：{{form.account}}</span>',
+                template: '<span>手机号：'+$scope.form.account+'</span>',
                 scope: $scope,
                 buttons: [
                     {
-                        text: '立即登陆',
+                        text: '立即登录',
                         type: 'button-positive',
                         onTap: async function (e) {
                             $scope.check_login();
@@ -479,6 +479,11 @@ export async function ResetPwdController($scope, Models, $stateParams){
             msgbox.log("两次密码不一致");
             return;
         }
+        var pwdPattern = /^[0-9a-zA-Z]*$/g;
+        if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >12){
+            msgbox.log("密码格式应为6-12位字母或数字");
+            return;
+        }
         API.auth.resetPwdByMobile({accountId: accountId, sign: sign, timestamp: timestamp, pwd: newPwd})
             .then(function () {
                 alert("密码设置成功,请重新登录");
@@ -530,7 +535,7 @@ export async function ActiveController ($scope, $stateParams) {
     }
 }
 
-export async function InvitedStaffOneController ($scope, $stateParams, $storage){
+export async function InvitedStaffOneController ($scope, $stateParams, $storage , $ionicPopup){
     require("./login.scss");
     let linkId = $stateParams.linkId;
     let sign = $stateParams.sign;
@@ -538,7 +543,6 @@ export async function InvitedStaffOneController ($scope, $stateParams, $storage)
     API.require("auth");
     await API.onload();
     var auth_data = $storage.local.get('auth_data');
-
     await API.auth.checkInvitedLink({linkId: linkId, sign: sign, timestamp: timestamp})
         .then(async function (result) {
             if(result){
@@ -546,8 +550,10 @@ export async function InvitedStaffOneController ($scope, $stateParams, $storage)
                 $scope.comoany = result.company;
                 if(auth_data && auth_data.user_id && $scope.inviter && auth_data.user_id == $scope.inviter.id){
                     //显示遮罩层
-                    alert("显示遮罩层");
-                    console.info("显示遮罩层");
+                    var show = $ionicPopup.show({
+                        template: '<p>请使用浏览器分享功能<br>将页面分享给好友</p>',
+                        cssClass: 'share_alert'
+                    })
                 }
             }else{
                 msgbox.log("激活链接已经失效");
@@ -654,6 +660,12 @@ export async function InvitedStaffTwoController ($scope, $stateParams){
         }
         if (!$scope.form.name) {
             msgbox.log("姓名不能为空");
+            return;
+        }
+        var pwdPattern = /^[0-9a-zA-Z]*$/g;
+        var newPwd = $scope.form.pwd;
+        if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >12){
+            msgbox.log("密码格式应为6-12位字母或数字");
             return;
         }
 
