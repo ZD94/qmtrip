@@ -17,9 +17,11 @@ export interface IStrategy {
 export abstract class AbstractHotelStrategy implements IStrategy {
     protected hotels: IHotel[];
     private _key: string;
+    protected storage: IStorage;
 
-    constructor(hotels: IHotel[]) {
+    constructor(hotels: IHotel[], storage: IStorage) {
         this.hotels = hotels;
+        this.storage = storage;
         this._key = 'ID' + Date.now() + Math.ceil(Math.random() * 1000);
     }
 
@@ -49,8 +51,8 @@ export abstract class AbstractStrategy implements IStrategy {
     storage: IStorage;
     private _key;
 
-    constructor(tickets?: ITicket[]) {
-        this.storage = new RedisStorage(C.redis.conf);
+    constructor(tickets?: ITicket[], storage?: IStorage) {
+        this.storage = storage;
         this.tickets = tickets;
         this._key = 'ID' + Date.now() + Math.ceil(Math.random() * 1000);
     }
@@ -64,12 +66,18 @@ export abstract class AbstractStrategy implements IStrategy {
     //开始计算前
     private async _begin(): Promise<any> {
         // console.log('原始数据:' + JSON.stringify(this.tickets));
-        return this.storage.write(this._key+':data', JSON.stringify(this.tickets));
+        if (this.storage) {
+            return this.storage.write(this._key+':data', JSON.stringify(this.tickets));
+        }
+        return null;
     }
     //计算完成
     private async _finish(): Promise<any> {
         // console.log('计算结果:' + JSON.stringify(this.result));
-        return this.storage.write(this._key, JSON.stringify(this.result));
+        if (this.storage) {
+            return this.storage.write(this._key, JSON.stringify(this.result));
+        }
+        return null;
     }
 
     //对外暴漏获取结果函数
@@ -84,8 +92,8 @@ export abstract class AbstractStrategy implements IStrategy {
 
 export class CommonTicketStrategy extends AbstractStrategy {
 
-    constructor(tickets?: ITicket[]) {
-        super(tickets);
+    constructor(tickets?: ITicket[], storage?: IStorage) {
+        super(tickets, storage);
     }
 
     async buildProcess(params: {originCity: any, destinationCity: any, leaveDate: string,
@@ -167,8 +175,8 @@ export class CommonTicketStrategy extends AbstractStrategy {
 }
 
 export class HighestPriceTicketStrategy extends AbstractStrategy {
-    constructor(tickets: ITicket[]) {
-        super(tickets);
+    constructor(tickets: ITicket[], storage?: IStorage) {
+        super(tickets, storage);
         this.tickets = tickets;
     }
 
@@ -183,7 +191,6 @@ export class HighestPriceTicketStrategy extends AbstractStrategy {
         tickets.sort( (v1, v2) => {
             return v2.price - v1.price;
         });
-        require("fs").writeFile("./data.json", JSON.stringify(tickets))
         return {
             price: tickets[0].price,
             type: <EInvoiceType>(<number>tickets[0].type),
@@ -230,8 +237,8 @@ function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
 
 export class CommonHotelStrategy extends AbstractHotelStrategy {
 
-    constructor(hotels: IHotel[]) {
-        super(hotels);
+    constructor(hotels: IHotel[], storage: IStorage) {
+        super(hotels, storage);
     }
 
     async buildProcess(params: {longitude: number, latitude: number, star: number}):Promise<TravelBudgeItem> {

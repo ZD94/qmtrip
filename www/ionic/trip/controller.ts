@@ -365,6 +365,18 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
             $ionicLoading.hide();
         }
     }
+
+    //我要报错
+    $scope.reportBudgetError = function() {
+        let id = $stateParams.id;
+        API.travelBudget.reportBudgetError({budgetId: id})
+            .then( (ret) => {
+                $scope.showErrorMsg(`感谢您的反馈,我们会在最短时间内处理`);
+            })
+            .catch((err) =>{
+                alert(err.msg ||err);
+            })
+    }
 }
 
 export async function CommittedController($scope, $stateParams, Models){

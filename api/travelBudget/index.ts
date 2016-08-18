@@ -278,7 +278,7 @@ class ApiTravelBudget {
         }
 
         let hotels = await API.hotel.search_hotels(qs);
-        let strategy = new CommonHotelStrategy(hotels);
+        let strategy = new CommonHotelStrategy(hotels, cache);
         let budget = await strategy.getResult(qs);
         budget.type = EInvoiceType.HOTEL;
         return budget;
@@ -375,8 +375,43 @@ class ApiTravelBudget {
 
         let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
         console.info('选择的策略是:', companyPolicy);
-        let strategy = new strategySwitcher[companyPolicy](tickets);
+        let strategy = new strategySwitcher[companyPolicy](tickets, cache);
         return strategy.getResult(params)
+    }
+
+    @clientExport
+    static async reportBudgetError(params: { budgetId: string}) {
+        let {accountId} = Zone.current.get('session');
+        let {budgetId} = params;
+        let content = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: accountId});
+        let budgets = content.budgets;
+        let fs = require("fs");
+        let d = new Date();
+        let prefix = `${d.getFullYear()}${d.getMonth()+1}${d.getDate()}${d.getHours()}${d.getMinutes()}`
+        let ps = budgets.map( async (budget): Promise<any> => {
+            if (!budget.id) {
+                return true;
+            }
+            let originData = await cache.read(`${budget.id}:data`);
+            return Promise.all([
+                new Promise( (resolve, reject) => {
+                    //原始数据
+                    fs.writeFile(`./tmp/${prefix}-${accountId}-${budgetId}-${budget.id}-data.json`, JSON.stringify(originData), function(err) {
+                        if (err) return reject(err);
+                        resolve(true);
+                    });
+                }),
+                new Promise( (resolve, reject) => {
+                    //预算结果
+                    fs.writeFile(`./tmp/${prefix}-${accountId}-${budgetId}-${budget.id}-result.json`, JSON.stringify(budget), function(err) {
+                        if (err) return reject(err);
+                        resolve(true);
+                    })
+                })
+            ])
+        });
+        await Promise.all(ps);
+        return true;
     }
 }
 
