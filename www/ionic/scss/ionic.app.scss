@@ -155,3 +155,25 @@ ion-content{
     }
   }
 }
+
+
+.share_alert{
+  background: rgba(0,0,0,.4);
+  .popup{
+    background: #28A7E1 url("../images/logo_write10.png") no-repeat;
+    background-position: 10px 40px;
+    background-size: 50px;
+    color: #fff;
+    border-radius: 5px;
+    height: 100px;
+    .popup-head{
+      display: none;
+    }
+    p{
+      text-align: right;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+  }
+}
