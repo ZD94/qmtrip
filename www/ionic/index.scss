@@ -23,6 +23,8 @@ ion-side-menu {
 }
 
 .item-thumbnail-left {
+  border-left: none;
+  border-right: none;
   .menu-portrait:first-child{
     position:absolute;
     top: 10px;
@@ -49,6 +51,7 @@ ion-side-menu {
     }
   }
 }
+
 // Slide up from the bottom, used for modals
 // -------------------------------
 
@@ -76,7 +79,7 @@ ion-side-menu {
 @media (max-width: 320px) {
   ion-side-menu {
     .side-menu-left {
-      .menulist {
+      .side-menu-list {
         .button.button-block {
           margin: 0;
         }

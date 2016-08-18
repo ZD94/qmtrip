@@ -128,7 +128,7 @@ export async function EditEmailController($scope,Models,$ionicHistory,$ionicPopu
                         template:'为保障您的权益和能够及时收到通知消息，请尽快到邮箱进行激活！',
                         okText:'确定'
                     }).then(function(res){
-                        window.location.href = "index.html#/staff/index";
+                        window.location.href = "index.html#/staff/staffInfo";
                     })
                     // window.location.href = "index.html#/staff/editEmailSuccess";
                 }
@@ -172,6 +172,12 @@ export async function EditPwdController($scope,Models,$ionicHistory,$storage,$io
         }
         if ($scope.form.confirmPwd != $scope.form.newPwd) {
             msgbox.log("新密码与确认密码不一致");
+            return;
+        }
+        var pwdPattern = /^[0-9a-zA-Z]*$/g;
+        var newPwd = $scope.form.newPwd;
+        if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >12){
+            msgbox.log("密码格式应为6-12位字母或数字");
             return;
         }
         await API.onload();

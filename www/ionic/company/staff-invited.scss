@@ -21,6 +21,9 @@
           font-size: 12px;
           white-space:normal;
           word-break: break-all;
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
         .countdown{
           line-height: 50px;
@@ -38,27 +41,31 @@
         }
       }
     }
-    &:last-child{
-      display: flex;
-      height: 110px;
-      text-align: center;
-      align-items: center;
-      padding: 0;
-      >a{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-        color:#4a4a4a;
-        &:nth-child(2){
-          border-left: 1px solid #ddd;
-          border-right: 1px solid #ddd;
-        }
-      }
-      .fa{
-        font-size: 30px;
-      }
+    //&:last-child{
+    //  text-align: right;
+    //  padding: 5px 0;
+    //  >a{
+    //    width: 45%;
+    //    &:nth-child(1){
+    //      float:left;
+    //    }
+    //  }
+      //.fa{
+      //  font-size: 30px;
+      //}
+    //}
+  }
+}
+.send_buttons{
+  text-align: right;
+  padding: 5px 0;
+  >a{
+    width: 45%;
+    &.button.button-calm,&.button.button-stable{
+      background: #fff;
+    }
+    &:nth-child(1){
+      float:left;
     }
   }
 }

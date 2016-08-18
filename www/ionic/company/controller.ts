@@ -155,6 +155,7 @@ export async function BudgetStatisticsController($scope, $stateParams, Models) {
 }
 
 export async function RecordController($scope, $stateParams) {
+    require('./company.scss')
     let keyword = $stateParams.keyword || '';
     let type = $stateParams.type || null;
     let staff = await Staff.getCurrent();
@@ -652,7 +653,7 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
     $scope.role = role;
 
     $scope.savestaff = async function () {
-        //标识管理员修改自身权限 修改后要重新登陆
+        //标识管理员修改自身权限 修改后要重新登录
         // var logout = false;
         //标识企业拥有者修改管理员权限
         var ownerModifyAdmin = false;
@@ -717,7 +718,7 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
                         throw L.ERR.MOBILE_HAS_REGISTRY();
                     }
                 }
-                //管理员修改自身权限 修改后要重新登陆
+                //管理员修改自身权限 修改后要重新登录
                 /*if(preRole == EStaffRole.ADMIN && _staff.roleId == EStaffRole.COMMON && currentstaff.id == _staff.id){
                     logout = true;
                 }*/
@@ -753,7 +754,7 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
                 $ionicHistory.goBack(-1);
             }
 
-            //管理员修改自身权限 修改后要重新登陆
+            //管理员修改自身权限 修改后要重新登录
             /*if(logout){
                 //重新登录
                 var nshow = $ionicPopup.show({
@@ -1059,10 +1060,13 @@ export async function StaffInvitedController($scope, Models, $storage, $statePar
     }
     $scope.isAndroid = ionic.Platform.isAndroid();
     $scope.isIos =  ionic.Platform.isIOS();
-    
+    $scope.is_wechat = browserspec.is_wechat;
     $scope.sendWx = function(){
         if(browserspec.is_wechat){
-            alert("点击右上角发送给朋友");
+            var show = $ionicPopup.show({
+                template: '<p>请点击微信右上角菜单<br>将链接分享给好友</p>',
+                cssClass: 'share_alert'
+            })
             wx.onMenuShareAppMessage({
                 title:'邀请加入企业',
                 desc:'公司邀请你加入',
@@ -1077,10 +1081,7 @@ export async function StaffInvitedController($scope, Models, $storage, $statePar
                     // 用户取消分享后执行的回调函数
                 }
             });
-        }else{
-            alert("使用浏览器分享功能发送给朋友");
         }
-
     }
 }
 

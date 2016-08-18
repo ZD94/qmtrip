@@ -229,14 +229,17 @@ class ApiAuth {
         var sign = data.sign;
         var accountId = data.accountId;
         var timestamp = data.timestamp;
-        var nowTime = Date.now();
+        var account = await Models.account.get(accountId);
 
+        if(account.isValidateEmail){
+            throw {code: -1, msg: "您的邮箱已激活"};
+        }
         //失效了
+        var nowTime = Date.now();
         if (timestamp<0 || nowTime - timestamp > 0) {
             throw L.ERR.ACTIVE_URL_INVALID();
         }
 
-        var account = await Models.account.get(accountId);
         if(!account){
             throw L.ERR.ACCOUNT_NOT_EXIST();
         }
@@ -272,7 +275,7 @@ class ApiAuth {
         }
 
         if (!msgCode || !msgTicket) {
-            throw {code: -1, msg: "短信验证码错误"};
+            throw L.ERR.CODE_ERROR();
         }
         var accounts = await Models.account.find({where : {mobile: mobile}});
         var account = Account.create();
@@ -512,16 +515,10 @@ class ApiAuth {
             throw {code: -1, msg: "密码为空"};
         }
 
-        return Promise.resolve(true)
-            .then(function(){
-                return API.auth.checkEmailAndMobile({email: email, mobile: mobile});
-            })
-            .then(function() {
-                return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
-            })
-            .then(function() {
-                return API.company.registerCompany({mobile:mobile, email: email,name: companyName,userName: name, pwd: pwd, status: 1});
-            })
+        await API.auth.checkEmailAndMobile({email: email, mobile: mobile});
+        await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+        var company = await API.company.registerCompany({mobile:mobile, email: email,name: companyName,userName: name, pwd: pwd, status: 1});
+        return company;
     }
 
 
@@ -877,7 +874,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
 
                 return makeAuthenticateSign(loginAccount.id)
                     .then(function(ret) {
-                        //判断是否首次登陆
+                        //判断是否首次登录
                         if (loginAccount.isFirstLogin) {
                             loginAccount.isFirstLogin = false;
                             return loginAccount.save()
@@ -1025,7 +1022,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
     static async getAccount (params) {
         var id = params.id;
         var options: any = {};
-        options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt","loginFailTimes","lastLoginAt","lastLoginIp","activeToken","pwdToken","oldQrcodeToken","qrcodeToken","type","isFirstLogin"];
+        options.attributes = ["id", "email", "mobile", "status", "forbiddenExpireAt","loginFailTimes","lastLoginAt","lastLoginIp","activeToken","pwdToken","oldQrcodeToken","qrcodeToken","type","isFirstLogin","isValidateEmail","isValidateMobile"];
         var acc = await Models.account.get(id, options);
         return acc;
     }
@@ -1302,47 +1299,39 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      */
     @clientExport
     static async getQRCodeUrl (params: {backUrl: string}) : Promise<string> {
-
         let session = Zone.current.get("session");
         var accountId = session["accountId"];
         var backUrl = params.backUrl;
 
-        return Promise.resolve()
-            .then(function(){
-                if (!Boolean(accountId)) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST();
-                }
+        if (!Boolean(accountId)) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
 
-                if (!Boolean(backUrl)) {
-                    throw {code: -1, msg: "跳转链接不存在"};
-                }
+        if (!Boolean(backUrl)) {
+            throw {code: -1, msg: "跳转链接不存在"};
+        }
 
-                return API.wechat.shorturl({longurl: backUrl})
-            })
-            .then(function(shortUrl) {
-                backUrl = encodeURIComponent(shortUrl);
-                return Models.account.get(accountId)
-            })
-            .then(function(account) {
-                if (!account) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST();
-                }
+        var shortUrl = await API.wechat.shorturl({longurl: backUrl});
+        backUrl = encodeURIComponent(shortUrl);
+        var account = await Models.account.get(accountId);
 
-                var qrcodeToken = utils.getRndStr(8);
-                account.oldQrcodeToken = account.qrcodeToken;
-                account.qrcodeToken = qrcodeToken;
+        if (!account) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
 
-                return account.save();
-            })
-            .then(function(account) {
-                var timestamp = Date.now() + 1000 * 60 * 5;
-                var data = {accountId: account.id, timestamp: timestamp, key: account.qrcodeToken};
-                var sign = cryptoData(data);
-                var urlParams = {accountId: account.id, timestamp: timestamp, sign: sign, backUrl: backUrl};
-                urlParams = combineData(urlParams);
-                console.info(C.host + QRCODE_LOGIN_URL +"?"+urlParams);
-                return C.host + QRCODE_LOGIN_URL +"?"+urlParams;
-            })
+        var qrcodeToken = utils.getRndStr(8);
+        account.oldQrcodeToken = account.qrcodeToken;
+        account.qrcodeToken = qrcodeToken;
+
+        account = await account.save();
+
+        var timestamp = Date.now() + 1000 * 60 * 5;
+        var data = {accountId: account.id, timestamp: timestamp, key: account.qrcodeToken};
+        var sign = cryptoData(data);
+        var urlParams = {accountId: account.id, timestamp: timestamp, sign: sign, backUrl: backUrl};
+        urlParams = combineData(urlParams);
+        console.info(C.host + QRCODE_LOGIN_URL +"?"+urlParams);
+        return C.host + QRCODE_LOGIN_URL +"?"+urlParams;
     }
 
     /**
@@ -1524,7 +1513,7 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             let query = req.query;
             let redirect_url = query.redirect_url;
 
-            //如果是登陆页，直接跳转
+            //如果是登录页，直接跳转
             if(/^http\:\/\/\w*\.jingli365\.com\/(index\.html)?\#\/login\/(index)?/.test(redirect_url)){
                 redirect_url += redirect_url.indexOf('?') > 0 ? '&' : '?';
                 redirect_url += 'wxauthcode=' + query.code + '&wxauthstate=' + query.state;

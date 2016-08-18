@@ -22,7 +22,7 @@
             </span>
             {{item.budget == -1 ? '暂无预算' : (item.budget| currency: '')+'元'}}<br/>
             <span ng-if="item.fullPrice">
-                折扣：{{item.fullPrice > item.budget ? ((item.budget/item.fullPrice)*100).toFixed(2)+'%' : '100%'}}<br/>
+                折扣：{{item.fullPrice > item.budget ? ((item.budget/item.fullPrice)*100).toFixed(1)+'%' : '100%'}}<br/>
             </span>
         </div>
 
@@ -44,8 +44,8 @@
             </span>
         </div>
 
-        <div ng-if="item.type != ETripType.SUBSIDY">
-            <div class="item-note" ng-if="item.status == EPlanStatus.WAIT_UPLOAD">
+        <div ng-if="item.type != ETripType.SUBSIDY" class="item-note detail_btn">
+            <div ng-if="item.status == EPlanStatus.WAIT_UPLOAD">
                 <div class="uploadbtns button-small botton-outline button-positive"
                      ng-uploader accept="image/*" title="item.title" done="item.done" url="uploadUrl"
                      ng-if="showUploader">
@@ -54,31 +54,33 @@
                 <div ng-if="!showUploader">等待上传票据</div>
             </div>
 
-            <div class="item-note" ng-if="item.status == EPlanStatus.WAIT_COMMIT">
+            <div ng-if="item.status == EPlanStatus.WAIT_COMMIT">
                 <div ng-if="showUploader">
                     <div class="uploadbtns button-small botton-outline button-positive" ng-uploader accept="image/*" title="item.title" done="item.done" url="uploadUrl">
                         重新上传
                     </div>
-                    <a class="button button-small button-outline" ng-click="viewInvoice(item.id)">查看票据</a>
+                    <a class="button button-small button-outline button-positive" ng-click="viewInvoice(item.id)">查看票据</a>
                 </div>
                 <div ng-if="!showUploader">等待提交</div>
             </div>
 
-            <div class="item-note" ng-if="item.status == EPlanStatus.AUDITING">
-                <a class="button button-small button-outline" ng-click="viewInvoice(item.id)" ng-if="showUploader">查看票据</a>
+            <div ng-if="item.status == EPlanStatus.AUDITING">
+                <a class="button button-small button-outline button-positive"
+                   ng-click="viewInvoice(item.id)" ng-if="showUploader">查看票据</a>
                 <span ng-if="!showUploader">票据审核中</span>
             </div>
 
-            <div class="item-note" ng-if="item.status == EPlanStatus.WAIT_APPROVE">
+            <div ng-if="item.status == EPlanStatus.WAIT_APPROVE">
                 待审批
             </div>
 
-            <div class="item-note" ng-if="item.status == EPlanStatus.COMPLETE">
-                <a class="button button-small button-outline" ng-click="viewInvoice(item.id)" ng-if="showUploader">查看票据</a>
+            <div ng-if="item.status == EPlanStatus.COMPLETE">
+                <a class="button button-small button-outline button-positive"
+                   ng-click="viewInvoice(item.id)" ng-if="showUploader">查看票据</a>
                 <span ng-if="!showUploader">已通过</span>
             </div>
 
-            <div class="item-note" ng-if="item.status == EPlanStatus.AUDIT_NOT_PASS">
+            <div ng-if="item.status == EPlanStatus.AUDIT_NOT_PASS">
                 <div class="uploadbtns button-small botton-outline button-positive"
                      ng-uploader accept="image/*"
                      title="item.title"
@@ -86,11 +88,13 @@
                      url="uploadUrl">
                      重新上传
                 </div>
-                <a class="button button-small button-outline" ng-click="viewInvoice(item.id)" ng-if="showUploader">查看票据</a>
+                <a class="button button-small button-outline button-positive"
+                   ng-click="viewInvoice(item.id)" ng-if="showUploader">查看票据</a>
             </div>
 
-            <div class="item-note" ng-if="item.status == EPlanStatus.NO_BUDGET">
-                <a class="button button-small button-outline" ng-click="viewInvoice(item.id)" ng-if="showUploader">查看票据</a>
+            <div ng-if="item.status == EPlanStatus.NO_BUDGET">
+                <a class="button button-small button-outline button-positive"
+                   ng-click="viewInvoice(item.id)" ng-if="showUploader">查看票据</a>
                 <span ng-if="!showUploader">暂无预算</span>
             </div>
         </div>

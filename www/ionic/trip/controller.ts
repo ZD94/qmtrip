@@ -100,7 +100,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg){
     async function queryPlaces(keyword){
         if (!keyword) {
             let hotCities = $storage.local.get("hot_cities")
-            if (hotCities) {
+            if (hotCities && hotCities[0] && hotCities[0].id) {
                 return hotCities;
             }
         }
@@ -325,7 +325,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     }
 
     $scope.totalPrice = totalPrice;
-    let duringDays = moment(trip.endDate).diff(moment(trip.beginDate), 'days');
+    let duringDays = moment(trip.endDate).diff(moment(trip.beginDate), 'days') + 1;
     $scope.duringDays = duringDays;
     $scope.budgets = budgets;
     $scope.EInvoiceType = EInvoiceType;

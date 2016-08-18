@@ -51,7 +51,7 @@ class CompanyModule {
      * @param params.name 企业名字
      * @param params.email 企业邮箱
      * @param params.userName 企业创建人姓名
-     * @param params.pwd 登陆密码
+     * @param params.pwd 登录密码
      * @param params.remark 备注
      * @param params.description 企业描述
      * @returns {Promise<Company>}

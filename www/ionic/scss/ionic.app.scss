@@ -17,31 +17,32 @@ $dark:                            #444 !default;
 
 // The path for our ionicons font files, relative to the built CSS in www/css
 $ionicons-font-path: "../../fonts/ionic" !default;
+$menu-side-shadow: none;
 
 // Include all of Ionic
-@import "../../../common/client/ionic/scss/ionic";
+@import "../../../common/vendor/ionic/scss/ionic";
 
 html {
   width: 100%;
   height: 100%;
 }
+@mixin app-background {
+  background: url(../images/background.jpg) no-repeat;
+  background-size:cover;
+  background-position: center;
+}
 body {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: url(../images/background.jpg) no-repeat;
-  background-size:cover;
-  background-position: center;
+  @include app-background;
   ion-side-menu-content{
-    background: url(../images/background.jpg) no-repeat;
-    background-size:cover;
-    background-position: center;
+    @include app-background;
   }
   ion-nav-view {
     background-color: transparent !important;
     ion-view{
-      background: url(../images/background.jpg) no-repeat;
-      background-size:cover;
+      @include app-background;
     }
   }
 }
@@ -68,18 +69,8 @@ a{
   }
 }
 
-body.loading-active{
-  .initial-loading{
-    display: none;
-  }
-}
-
-.loading-container{
-  z-index: 1003;
-  .loading {
-    background-color: white;
-    color: black;
-  }
+.menu-open ion-side-menu-content.menu-content {
+  filter: brightness(0.5);
 }
 
 ion-content{
@@ -112,9 +103,17 @@ ion-content{
 }
 
 .platform-wechat{
+  ion-side-menu-content{
+    .has-header{
+      top: 0;
+    }
+  }
   .nav-bar-block{
     right: auto;
     width: 40px;
+    .title {
+      display: none;
+    }
     .bar{
       padding: 0;
       background-color: rgba(255,255,255, 0);
@@ -149,18 +148,32 @@ ion-content{
         }
       }
     }
-    .title {
-      display: none;
-    }
   }
   .JingliLogin{
     .has-header{
       top: 0;
     }
   }
-  ion-side-menu-content{
-    .has-header{
-      top: 0;
+}
+
+
+.share_alert{
+  background: rgba(0,0,0,.4);
+  .popup{
+    background: #28A7E1 url("../images/logo_write10.png") no-repeat;
+    background-position: 10px 40px;
+    background-size: 50px;
+    color: #fff;
+    border-radius: 5px;
+    height: 100px;
+    .popup-head{
+      display: none;
+    }
+    p{
+      text-align: right;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 10px 0;
     }
   }
 }
