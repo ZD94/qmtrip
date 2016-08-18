@@ -38,7 +38,7 @@ var adminMenus = [
     {
         id: 1056,
         icon: 'stats-bars',
-        title: '预算统计',
+        title: '差旅统计',
         link: 'company/budget',
         badgeNum: 0
     },
