@@ -96,7 +96,7 @@ function ionic_files() {
             gulplib.public_dir + '/fonts/font-awesome.css',
         ], { base: gulplib.public_dir })
         .pipe(filter([
-            '**',
+            '**/*.+(js|css|html|json|woff|png|jpg)',
             '!**/controller.[jt]s',
             '!**/*.ts',
             '!**/*.less',
@@ -117,6 +117,34 @@ function genManifest() {
         .pipe(calManifest({load: []}))
         .pipe(gulp.dest(gulplib.public_dir));
 }
+
+gulp.task('bsync', ['watch'], function(done){
+    var watched_files = [];
+    var config = require('./config');
+    var bs = require('browser-sync').create();
+
+    return ionic_files()
+        .pipe(through2.obj(function (file, enc, cb) {
+            watched_files.push(file.path);
+            cb(null, file);
+        }))
+        .on('end', function(){
+            watched_files.forEach(function(f){
+                bs.watch([f]).on('change', bs.reload);
+            })
+            bs.init({
+                proxy: config.host,
+                ws: true,
+                reloadDebounce: 2000,
+                open: false,
+                //logLevel: "debug",
+                logConnections: true,
+                logFileChanges: true,
+            });
+        });
+})
+
+gulp.task('server.bsync', ['server', 'bsync']);
 
 gulp.task('ionic.www.clean', function () {
     var del = require('del');

@@ -155,6 +155,7 @@ export async function BudgetStatisticsController($scope, $stateParams, Models) {
 }
 
 export async function RecordController($scope, $stateParams) {
+    require('./company.scss')
     let keyword = $stateParams.keyword || '';
     let type = $stateParams.type || null;
     let staff = await Staff.getCurrent();
