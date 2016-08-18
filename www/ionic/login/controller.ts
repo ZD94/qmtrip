@@ -479,6 +479,11 @@ export async function ResetPwdController($scope, Models, $stateParams){
             msgbox.log("两次密码不一致");
             return;
         }
+        var pwdPattern = /^[0-9a-zA-Z]*$/g;
+        if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >12){
+            msgbox.log("密码格式应为6-12位字母或数字");
+            return;
+        }
         API.auth.resetPwdByMobile({accountId: accountId, sign: sign, timestamp: timestamp, pwd: newPwd})
             .then(function () {
                 alert("密码设置成功,请重新登录");
@@ -655,6 +660,12 @@ export async function InvitedStaffTwoController ($scope, $stateParams){
         }
         if (!$scope.form.name) {
             msgbox.log("姓名不能为空");
+            return;
+        }
+        var pwdPattern = /^[0-9a-zA-Z]*$/g;
+        var newPwd = $scope.form.pwd;
+        if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >12){
+            msgbox.log("密码格式应为6-12位字母或数字");
             return;
         }
 
