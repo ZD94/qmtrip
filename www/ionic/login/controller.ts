@@ -530,7 +530,7 @@ export async function ActiveController ($scope, $stateParams) {
     }
 }
 
-export async function InvitedStaffOneController ($scope, $stateParams, $storage){
+export async function InvitedStaffOneController ($scope, $stateParams, $storage , $ionicPopup){
     require("./login.scss");
     let linkId = $stateParams.linkId;
     let sign = $stateParams.sign;
@@ -538,7 +538,6 @@ export async function InvitedStaffOneController ($scope, $stateParams, $storage)
     API.require("auth");
     await API.onload();
     var auth_data = $storage.local.get('auth_data');
-
     await API.auth.checkInvitedLink({linkId: linkId, sign: sign, timestamp: timestamp})
         .then(async function (result) {
             if(result){
@@ -546,8 +545,10 @@ export async function InvitedStaffOneController ($scope, $stateParams, $storage)
                 $scope.comoany = result.company;
                 if(auth_data && auth_data.user_id && $scope.inviter && auth_data.user_id == $scope.inviter.id){
                     //显示遮罩层
-                    alert("显示遮罩层");
-                    console.info("显示遮罩层");
+                    var show = $ionicPopup.show({
+                        template: '<p>请使用浏览器分享功能<br>将页面分享给好友</p>',
+                        cssClass: 'share_alert'
+                    })
                 }
             }else{
                 msgbox.log("激活链接已经失效");
