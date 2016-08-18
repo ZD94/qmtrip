@@ -28,6 +28,14 @@ export enum EApproveStatus {
     PASS = 1 //审批通过
 }
 
+export enum EApproveResult {
+    NULL = -1,
+    WAIT_APPROVE = 0, //等待审批
+    AUTO_APPROVE = 1, //自动审批
+    PASS = 2, //审批通过
+    REJECT = 0 //驳回
+}
+
 export enum ETripType {
     OUT_TRIP = 0, //去程
     BACK_TRIP = 1,
@@ -462,6 +470,9 @@ export class TripPlanLog extends ModelObject{
     get remark(): string { return null; }
     set remark(val: string) {}
 
+    @Field({type: Types.INTEGER})
+    get approveStatus(): number { return EApproveResult.NULL; }
+    set approveStatus(val: number) {}
 }
 
 @Table(Models.tripApprove, 'tripPlan.')

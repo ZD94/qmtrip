@@ -2,11 +2,14 @@
  * Created by seven on 16/4/25.
  */
 "use strict";
-import {ETripType, EAuditStatus, EInvoiceType, MTxPlaneLevel, EApproveStatus} from "api/_types/tripPlan";
+import {
+    ETripType, EAuditStatus, EInvoiceType, MTxPlaneLevel, EApproveStatus,
+    EApproveResult
+} from "api/_types/tripPlan";
 import {MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 import {Staff} from "api/_types/staff";
 import moment = require('moment');
-const API = require("common/api")
+const API = require("common/api");
 let APPROVE_TEXT: any = {};
 APPROVE_TEXT[EApproveStatus.CANCEL] = '已撤销';
 APPROVE_TEXT[EApproveStatus.NO_BUDGET] = '没有预算';
@@ -27,6 +30,10 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.staff = tripApprove.account;
     APPROVE_TEXT[EApproveStatus.WAIT_APPROVE] = `等待 ${tripApprove.approveUser.name} 审批`;
     $scope.APPROVE_TEXT = APPROVE_TEXT;
+    $scope.EInvoiceType = EInvoiceType;
+    $scope.EApproveStatus = EApproveStatus;
+    $scope.MTxPlaneLevel = MTxPlaneLevel;
+    $scope.EApproveResult = EApproveResult;
 
     //判断有无审批权限
     let isHasPermissionApprove = false;
@@ -107,17 +114,15 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.hotelBudget = hotelBudget;
     $scope.subsidyBudget = subsidyBudget;
     $scope.subsidyDays = subsidyDays;
-    $scope.EInvoiceType = EInvoiceType;
-    $scope.EApproveStatus = EApproveStatus;
-    $scope.MTxPlaneLevel = MTxPlaneLevel;
+
 
     $loading.end();
 
 
-    async function approve(result: EAuditStatus, auditRemark?: string) {
+    async function approve(result: EApproveResult, approveRemark?: string) {
         try{
-            await tripApprove.approve({auditResult: result, auditRemark: auditRemark, budgetId: $scope.budgetId});
-            if(result == EAuditStatus.PASS) {
+            await tripApprove.approve({approveResult: result, isNextApprove: $scope.isNextApprove || false, approveRemark: approveRemark, budgetId: $scope.budgetId});
+            if(result == EApproveResult.PASS) {
                 window.location.href = "#/trip-approval/approved?staffId="+tripApprove.account.id;
             }
         }catch (e) {
@@ -180,7 +185,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
                     if (!$scope.reject.reason) {
                         e.preventDefault();
                     } else {
-                        approve(EAuditStatus.NOT_PASS, $scope.reject.reason);
+                        approve(EApproveResult.REJECT, $scope.reject.reason);
                     }
                 }
             }]
@@ -225,7 +230,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
                 text: '确认',
                 type: 'button-positive',
                 onTap: async function (e) {
-                    approve(EAuditStatus.PASS);
+                    approve(EApproveResult.PASS);
                 }
             }]
         })

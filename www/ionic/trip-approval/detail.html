@@ -2,7 +2,9 @@
     <ion-content padding="false" scroll="false" class="has-header">
         <div class="flex-c10">
             <ion-scroll>
-                <div class="list"><div class="item opactic">{{APPROVE_TEXT[tripApprove.status]}}</div></div>
+                <div class="list"><div class="item opactic">{{APPROVE_TEXT[tripApprove.status]}}
+                    <span ng-show="tripApprove.status==EApproveStatus.REJECT">{{tripApprove.approveRemark}}</span>
+                </div></div>
 
                 <ion-list ng-if="isHasPermissionApprove">
                     <ion-item class="item-thumbnail-left opactic">

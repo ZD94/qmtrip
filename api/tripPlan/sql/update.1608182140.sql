@@ -1,0 +1,1 @@
+alter table trip_plan.trip_plan_logs add approve_status integer default -1;

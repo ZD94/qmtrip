@@ -17,7 +17,7 @@ import _ = require('lodash');
 import {requireParams, clientExport} from 'common/api/helper';
 import {
     Project, TripPlan, TripDetail, EPlanStatus, EInvoiceType, TripPlanLog, ETripType, EAuditStatus,
-    TripApprove, EApproveStatus
+    TripApprove, EApproveStatus, EApproveResult
 } from "api/_types/tripPlan";
 import {Models} from "api/_types/index";
 import {FindResult} from "common/model/interface";
@@ -538,18 +538,21 @@ class TripPlanModule {
      * @returns {boolean}
      */
     @clientExport
-    @requireParams(['id', 'auditResult', 'isNextApprove'], ['auditRemark', "budgetId", 'nextApproveUserId'])
+    @requireParams(['id', 'approveResult', 'isNextApprove'], ['approveRemark', "budgetId", 'nextApproveUserId'])
     @modelNotNull('tripApprove')
     static async approveTripPlan(params): Promise<boolean> {
         let isNextApprove = params.isNextApprove;
         let staff = await Staff.getCurrent();
         let tripApprove = await Models.tripApprove.get(params.id);
-        let auditResult = params.auditResult;
+        let approveResult = params.approveResult;
         let budgetId = params.budgetId;
+
+        if(isNextApprove && !params.nextApproveUserId)
+            throw new Error("审批人不能为空");
 
         if (!budgetId){
             throw new Error(`预算信息已失效请重新生成`);
-        }else if(auditResult != EAuditStatus.PASS && auditResult != EAuditStatus.NOT_PASS) {
+        }else if(approveResult != EApproveResult.PASS && approveResult != EApproveResult.REJECT) {
             throw L.ERR.PERMISSION_DENY(); //只能审批待审批的出差记录
         }else if(tripApprove.status != EApproveStatus.WAIT_APPROVE) {
             throw L.ERR.TRIP_PLAN_STATUS_ERR(); //只能审批待审批的出差记录
@@ -572,30 +575,39 @@ class TripPlanModule {
         tripApprove.budgetInfo = budgetInfo.budgets;
 
         let tripPlan: TripPlan;
-        let approveResult = '';
+        let notifyRemark = '';
         let tplName = '';
         let log = TripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id});
 
-        if (auditResult == EAuditStatus.PASS) {
-            approveResult = '审批通过';
+        if (approveResult == EApproveResult.PASS && !isNextApprove) {
+            notifyRemark = `审批通过，审批人：${staff.name}`;
             tplName = 'qm_notify_approve_pass';
-            log.remark = `审批通过，审批人：${staff.name}`;
-            await log.save();
+            log.approveStatus = EApproveResult.PASS;
+            log.remark = `审批通过`;
+            log.save();
             tripApprove.status = EApproveStatus.PASS;
             tripApprove.approveRemark = '审批通过';
             tripPlan = await TripPlanModule.saveTripPlanByApprove({tripApproveId: params.id});
-        }else if(auditResult == EAuditStatus.NOT_PASS) {
-            if(!params.auditRemark) {
+        }else if(isNextApprove){ //指定下一级审批人
+            log.approveStatus = EApproveResult.WAIT_APPROVE;
+            log.save();
+            let nextApproveUser = await Models.staff.get(params.nextApproveUserId);
+            tripApprove.approveUser = nextApproveUser;
+        }else if(approveResult == EApproveResult.REJECT) {
+            let approveRemark = params.approveRemark;
+            if(!approveRemark) {
                 await tripApprove.reload();
                 throw {code: -2, msg: '拒绝原因不能为空'};
             }
-            approveResult = `审批未通过，原因：${params.auditRemark}`;
+            notifyRemark = `审批未通过，原因：${approveRemark}`;
             tplName = 'qm_notify_approve_not_pass';
-            log.remark = `审批未通过，原因：${params.auditRemark}，审批人：${staff.name}`;
-            tripApprove.approveRemark = params.auditRemark;
+            log.approveStatus = EApproveResult.REJECT;
+            log.remark = approveRemark;
+            log.save();
+            tripApprove.approveRemark = approveRemark;
             tripApprove.status = EApproveStatus.REJECT;
         }
-        await Promise.all([tripApprove.save(), log.save()]);
+        await tripApprove.save();
 
         // //发送审核结果邮件
         // let self_url = config.host + '/index.html#/trip/list-detail?tripid=' + tripApprove.id;
@@ -1517,7 +1529,7 @@ class TripPlanModule {
         tripApprove.budget = totalBudget;
         tripApprove.status = totalBudget < 0 ? EApproveStatus.NO_BUDGET : EApproveStatus.WAIT_APPROVE;
 
-        let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, remark: '提交出差审批'});
+        let tripPlanLog = Models.tripPlanLog.create({tripPlanId: tripApprove.id, userId: staff.id, approveStatus: EApproveResult.WAIT_APPROVE, remark: '提交审批单，等待审批'});
 
         //如果出差计划是待审批状态，增加自动审批时间
         if(tripApprove.status == EApproveStatus.WAIT_APPROVE) {
@@ -1589,7 +1601,7 @@ class TripPlanModule {
                 approve.status = EApproveStatus.PASS;
                 await approve.save();
                 if(approve.approveUser && approve.approveUser.id && /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(approve.approveUser.id)) {
-                    let log = Models.tripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser.id, remark: '系统自动审批出差计划'});
+                    let log = Models.tripPlanLog.create({tripPlanId: approve.id, userId: approve.approveUser.id, approveStatus: EApproveResult.AUTO_APPROVE, remark: '自动通过'});
                     await log.save();
                 }
                 await TripPlanModule.saveTripPlanByApprove({tripApproveId: approve.id});
