@@ -24,6 +24,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     let approveId = $stateParams.approveId;
     let tripApprove = await Models.tripApprove.get(approveId);
     $scope.staff = tripApprove.account;
+    APPROVE_TEXT[EApproveStatus.WAIT_APPROVE] = `等待 ${tripApprove.approveUser.name} 审批`;
     $scope.APPROVE_TEXT = APPROVE_TEXT;
 
     //判断有无审批权限
@@ -65,7 +66,6 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             tripApprove.budget = totalBudget;
             tripApprove.budgetInfo = budgets;
         }
-        $loading.end();
     }
 
     let traffic = [], hotel = [], subsidy = [];
@@ -109,6 +109,8 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.EInvoiceType = EInvoiceType;
     $scope.EApproveStatus = EApproveStatus;
     $scope.MTxPlaneLevel = MTxPlaneLevel;
+
+    $loading.end();
 
 
     async function approve(result: EAuditStatus, auditRemark?: string) {
@@ -160,9 +162,36 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     };
 
     $scope.showAlterDialog = function () {
-        $scope.reject = {reason: ''};
+        $scope.isNextApprove = false;
+
+        $scope.chooseOption = function(isNextApprove) {
+            $scope.isNextApprove = isNextApprove;
+        };
+
+        $scope.staffSelector = {
+            query: async function(keyword) {
+                let staff = await Staff.getCurrent();
+                let staffs = await staff.company.getStaffs({where: {id: {$ne: staff.id}}});
+                return staffs;
+            },
+            display: (staff)=>staff.name
+        };
+
         $ionicPopup.show({
             title: '确认同意',
+            template: `<ion-list show-delete="false">
+                             <ion-item ng-click="chooseOption(false)" ng-class="{true: '', false: 'item-option-selected'}[isNextApprove]">直接同意</ion-item>
+                             <ion-item ng-click="chooseOption(true)" ng-class="{true: 'item-option-selected', false: ''}[isNextApprove]" style="border-top: 1px #387ef5 solid">
+                                <span class="input-label">同意并转给</span>
+                                    <ng-selector-list style="float: right;"
+                                        ng-model="tripApprove.approveUser"
+                                        dlg-options="staffSelector"
+                                        dlg-title="选择审批人"
+                                        dlg-placeholder="请选择审批人"
+                                        class="fake-input">
+                                    </ng-selector-list>
+                            </ion-item>
+                       </ion-list>`,
             scope: $scope,
             buttons: [{
                 text: '取消'

@@ -538,9 +538,10 @@ class TripPlanModule {
      * @returns {boolean}
      */
     @clientExport
-    @requireParams(['id', 'auditResult'], ['auditRemark', "budgetId"])
+    @requireParams(['id', 'auditResult', 'isNextApprove'], ['auditRemark', "budgetId", 'nextApproveUserId'])
     @modelNotNull('tripApprove')
-    static async approveTripPlan(params: {id: string, auditResult: EAuditStatus, auditRemark?: string, budgetId?: string}): Promise<boolean> {
+    static async approveTripPlan(params): Promise<boolean> {
+        let isNextApprove = params.isNextApprove;
         let staff = await Staff.getCurrent();
         let tripApprove = await Models.tripApprove.get(params.id);
         let auditResult = params.auditResult;
