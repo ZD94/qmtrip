@@ -15,7 +15,7 @@
                 </div>
             </div>
         </div>
-        <div class="buttons" ng-if="!invitedLink">
+        <div class="send_buttons" ng-if="!invitedLink">
             <a class="button button-outline button-stable" >
                 <i class="fa fa-weixin"></i>
                 <span>通过微信发送</span>
@@ -25,7 +25,7 @@
                 <span>通过短信发送</span>
             </a>
         </div>
-        <div class="buttons" ng-if="invitedLink">
+        <div class="send_buttons" ng-if="invitedLink">
             <a class="button button-outline button-calm" href="" ng-click="sendWx()" ng-if="is_wechat">
                 <i class="fa fa-weixin"></i>
                 <span>通过微信发送</span>
