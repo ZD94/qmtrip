@@ -515,16 +515,10 @@ class ApiAuth {
             throw {code: -1, msg: "密码为空"};
         }
 
-        return Promise.resolve(true)
-            .then(function(){
-                return API.auth.checkEmailAndMobile({email: email, mobile: mobile});
-            })
-            .then(function() {
-                return API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
-            })
-            .then(function() {
-                return API.company.registerCompany({mobile:mobile, email: email,name: companyName,userName: name, pwd: pwd, status: 1});
-            })
+        await API.auth.checkEmailAndMobile({email: email, mobile: mobile});
+        await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+        var company = await API.company.registerCompany({mobile:mobile, email: email,name: companyName,userName: name, pwd: pwd, status: 1});
+        return company;
     }
 
 
@@ -1305,47 +1299,39 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
      */
     @clientExport
     static async getQRCodeUrl (params: {backUrl: string}) : Promise<string> {
-
         let session = Zone.current.get("session");
         var accountId = session["accountId"];
         var backUrl = params.backUrl;
 
-        return Promise.resolve()
-            .then(function(){
-                if (!Boolean(accountId)) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST();
-                }
+        if (!Boolean(accountId)) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
 
-                if (!Boolean(backUrl)) {
-                    throw {code: -1, msg: "跳转链接不存在"};
-                }
+        if (!Boolean(backUrl)) {
+            throw {code: -1, msg: "跳转链接不存在"};
+        }
 
-                return API.wechat.shorturl({longurl: backUrl})
-            })
-            .then(function(shortUrl) {
-                backUrl = encodeURIComponent(shortUrl);
-                return Models.account.get(accountId)
-            })
-            .then(function(account) {
-                if (!account) {
-                    throw L.ERR.ACCOUNT_NOT_EXIST();
-                }
+        var shortUrl = await API.wechat.shorturl({longurl: backUrl});
+        backUrl = encodeURIComponent(shortUrl);
+        var account = await Models.account.get(accountId);
 
-                var qrcodeToken = utils.getRndStr(8);
-                account.oldQrcodeToken = account.qrcodeToken;
-                account.qrcodeToken = qrcodeToken;
+        if (!account) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
 
-                return account.save();
-            })
-            .then(function(account) {
-                var timestamp = Date.now() + 1000 * 60 * 5;
-                var data = {accountId: account.id, timestamp: timestamp, key: account.qrcodeToken};
-                var sign = cryptoData(data);
-                var urlParams = {accountId: account.id, timestamp: timestamp, sign: sign, backUrl: backUrl};
-                urlParams = combineData(urlParams);
-                console.info(C.host + QRCODE_LOGIN_URL +"?"+urlParams);
-                return C.host + QRCODE_LOGIN_URL +"?"+urlParams;
-            })
+        var qrcodeToken = utils.getRndStr(8);
+        account.oldQrcodeToken = account.qrcodeToken;
+        account.qrcodeToken = qrcodeToken;
+
+        account = await account.save();
+
+        var timestamp = Date.now() + 1000 * 60 * 5;
+        var data = {accountId: account.id, timestamp: timestamp, key: account.qrcodeToken};
+        var sign = cryptoData(data);
+        var urlParams = {accountId: account.id, timestamp: timestamp, sign: sign, backUrl: backUrl};
+        urlParams = combineData(urlParams);
+        console.info(C.host + QRCODE_LOGIN_URL +"?"+urlParams);
+        return C.host + QRCODE_LOGIN_URL +"?"+urlParams;
     }
 
     /**
