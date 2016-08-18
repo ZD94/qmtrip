@@ -32,7 +32,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
     var browserspec = require('browserspec');
     var backUrl = $stateParams.backurl || "#";
     require("./login.scss");
-    //微信中自动登陆
+    //微信中自动登录
     let href = window.location.href;
     if(browserspec.is_wechat && /.*jingli365\.com/.test(window.location.host) && !$stateParams.wxauthcode && !/.*backurl\=.*/.test(href)) {
         await API.onload();
@@ -131,12 +131,12 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
 
         function showSendEmailSuccess(){
             var nshow = $ionicPopup.show({
-                template: '<div class="popupDiv"><p>邮箱：{{form.account}}</p><br><h2><i class="ion-checkmark-circled"></i>激活邮件发送成功！</h2><br><span>请点击邮件中的链接完成激活，即可点击下方立即登陆按钮进入系统，链接有效期24个小时</span></div>',
+                template: '<div class="popupDiv"><p>邮箱：{{form.account}}</p><br><h2><i class="ion-checkmark-circled"></i>激活邮件发送成功！</h2><br><span>请点击邮件中的链接完成激活，即可点击下方立即登录按钮进入系统，链接有效期24个小时</span></div>',
                 cssClass:'showAlert',
                 scope: $scope,
                 buttons: [
                     {
-                        text: '立即登陆',
+                        text: '立即登录',
                         type: 'button-small button-positive',
                         onTap: async function (e) {
                             $scope.check_login();
@@ -191,7 +191,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
                 scope: $scope,
                 buttons: [
                     {
-                        text: '立即登陆',
+                        text: '立即登录',
                         type: 'button-positive',
                         onTap: async function (e) {
                             $scope.check_login();
