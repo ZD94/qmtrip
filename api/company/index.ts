@@ -57,36 +57,36 @@ class CompanyModule {
      * @returns {Promise<Company>}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'email', 'userName'], ['pwd', 'status', 'remark', 'description'])
-    static async registerCompany(params: {mobile: string, name: string, email: string, domain: string,
-        userName: string, pwd?: string, status?: number, remark?: string, description?: string}): Promise<Company>{
+    @requireParams(['mobile', 'name', 'pwd', 'userName'], ['email', 'status', 'remark', 'description', 'isValidateMobile'])
+    static async registerCompany(params: {mobile: string, name: string, email?: string,
+        userName: string, pwd?: string, status?: number, remark?: string, description?: string, isValidateMobile?: boolean}): Promise<Company>{
         let session = Zone.current.get('session');
-        let pwd = params.pwd || '123456';
+        let pwd = params.pwd;
         let agencyId = Agency.__defaultAgencyId;
-        let domain = params.email.match(/.*\@(.*)/)[1]; //企业域名
+        let domain = ""; //企业域名
+
+        if(params.email){
+            domain = params.email.match(/.*\@(.*)/)[1];
+        }
 
         if(domain && domain != "" && params.email.indexOf(domain) == -1){
             throw {code: -6, msg: "邮箱格式不符合要求"};
         }
 
-        let companies = await Models.company.find({where: {$or: [{email: params.email}, {mobile: params.mobile}/*, {domain_name: domain}*/]}});
+        /*let companies = await Models.company.find({where: {$or: [{email: params.email}, {mobile: params.mobile}/!*, {domain_name: domain}*!/]}});
 
         if(companies && companies.length > 0) {
             throw {code: -7, msg: '邮箱或手机号已经注册'};
-        }
+        }*/
 
         if(session && session.accountId) {
             let agencyUser = await Models.agencyUser.get(session.accountId);
-
-            /*if(!agencyUser) {
-                throw L.ERR.AGENCY_NOT_EXIST();
-            }*/
             if(agencyUser) {
                 agencyId = agencyUser.agency.id;
             }
         }
 
-        let staff = Staff.create({email: params.email, name: params.userName, mobile: params.mobile, roleId: EStaffRole.OWNER, pwd: md5(pwd), status: params.status});
+        let staff = Staff.create({email: params.email, name: params.userName, mobile: params.mobile, roleId: EStaffRole.OWNER, pwd: md5(pwd), status: params.status, isValidateMobile: params.isValidateMobile});
         let company = Company.create(params);
         company.domainName = domain;
         company.isApproveOpen = true;
