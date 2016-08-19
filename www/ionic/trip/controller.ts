@@ -309,9 +309,9 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     let totalPrice: number = 0;
     budgets.map(function(budget){
         if(budget.fullPrice && budget.price > 0 && budget.price < budget.fullPrice){
-            budget.discount = ((budget.price/budget.fullPrice)*100).toFixed(2)+'%';
+            budget.discount = ((budget.price/budget.fullPrice)*10).toFixed(1)+'折';
         }else if(budget.price > budget.fullPrice){
-            budget.discount = '100%';
+            budget.discount = '全价';
         }
         return budget;
     })
