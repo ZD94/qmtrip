@@ -7,17 +7,23 @@
         -->
         <ion-content padding="false" scroll="false" class="side-menu-left">
             <div class="flex-c010">
-                <ion-item class="item-thumbnail-left">
-                    <a href="#/staff/index" class="menu-button" menu-close><div class="menu-portrait">{{currentStaff.name.substring(currentStaff.name.length-2,currentStaff.name.length)}}</div></a>
-                    <h2>{{currentStaff.name}}<i class="button button-small button-stable" ng-click="showTravelPolicy()">差旅标准</i></h2>
-                    <p>{{currentStaff.mobile || '暂未填写手机号'}}
-                        <br>节省：{{tripPlanSave || 0}}元
-                    </p>
-                </ion-item>
+                <a ng-href="#/staff/staffInfo" menu-close>
+                    <ion-item class="item-thumbnail-left menu-button">
+                        <div class="menu-portrait">
+                            {{currentStaff.name.substring(currentStaff.name.length-2,currentStaff.name.length)}}
+                        </div>
+                        <h2>{{currentStaff.name}}<i class="button button-small button-stable"
+                                                    ng-click="$event.stopPropagation();$event.preventDefault(); showTravelPolicy()">差旅标准</i></h2>
+                        <p>{{currentStaff.mobile || '暂未填写手机号'}}
+                            <br>节省：{{tripPlanSave || 0}}元
+                        </p>
+                    </ion-item>
+                </a>
+
                 <ion-scroll>
                     <ion-list class="side-menu-list">
                         <div class="side-menu-list-item" ng-repeat="menu in Menu.menus">
-                            <a ng-href="#{{menu.link}}" menu-close="" style="text-align:left;" class="button button-light menu-button button-block icon ion-{{menu.icon}}" ng-if="menu.title != ''">
+                            <a ng-href="#{{menu.link}}" menu-close style="text-align:left;" class="button button-light menu-button button-block icon ion-{{menu.icon}}" ng-if="menu.title != ''">
                                 {{menu.title}}
                                 <span class="badge badge-assertive" ng-if="menu.badgenum !='0'">{{menu.badgenum}}</span>
                             </a>
