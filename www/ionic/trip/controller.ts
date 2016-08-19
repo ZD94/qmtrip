@@ -566,7 +566,9 @@ export async function ListDetailController($location, $scope , Models, $statePar
             beginDate: moment(tripPlan.startAt).toDate(),
             endDate: moment(tripPlan.backAt).toDate(),
             place: {id: tripPlan.arrivalCityCode, name: tripPlan.arrivalCity},
-            reasonName: {id: undefined, name: tripPlan.title,}
+            reasonName: {id: undefined, name: tripPlan.title},
+            reason: tripPlan.title,
+            hotelPlaceObj: {}
         };
         if(tripDetails && tripDetails.length > 0) {
             await Promise.all(tripDetails.map(async (detail) => {
@@ -591,6 +593,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
                         if(landMarkInfo && landMarkInfo.name){
                             trip.hotelPlaceName = landMarkInfo.name;
                         }
+                        trip.hotelPlaceObj.title = trip.hotelPlaceName
                 }
             }));
         }
