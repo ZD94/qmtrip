@@ -201,8 +201,8 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg){
         }
 
         let params = {
-            originPlace: trip.fromPlace.id,
-            destinationPlace: trip.place.id,
+            originPlace: trip.fromPlace? trip.fromPlace.id : '',
+            destinationPlace: trip.place ? trip.place.id : '',
             leaveDate: moment(trip.beginDate).format('YYYY-MM-DD'),
             goBackDate: moment(trip.endDate).format('YYYY-MM-DD'),
             leaveTime: moment(trip.beginDate).format('HH:mm'),
@@ -309,9 +309,9 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     let totalPrice: number = 0;
     budgets.map(function(budget){
         if(budget.fullPrice && budget.price > 0 && budget.price < budget.fullPrice){
-            budget.discount = ((budget.price/budget.fullPrice)*100).toFixed(2)+'%';
+            budget.discount = ((budget.price/budget.fullPrice)*10).toFixed(1)+'折';
         }else if(budget.price > budget.fullPrice){
-            budget.discount = '100%';
+            budget.discount = '全价';
         }
         return budget;
     })
@@ -325,7 +325,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     }
 
     $scope.totalPrice = totalPrice;
-    let duringDays = moment(trip.endDate).diff(moment(trip.beginDate), 'days') + 1;
+    let duringDays = moment(trip.endDate).diff(moment(trip.beginDate), 'days');
     $scope.duringDays = duringDays;
     $scope.budgets = budgets;
     $scope.EInvoiceType = EInvoiceType;
@@ -397,7 +397,7 @@ export async function DetailController($scope, $stateParams, Models, $location){
     $scope.ETripType = ETripType;
 }
 
-export async function ListController($scope , Models){
+export async function ListController($scope , $stateParams, Models){
     var staff = await Staff.getCurrent();
     let statusTxt = {};
     statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
@@ -409,18 +409,28 @@ export async function ListController($scope , Models){
     $scope.statustext = statusTxt;
     $scope.isHasNextPage = true;
     $scope.tripPlans = [];
+    var status = [];
+    if($stateParams.status || $stateParams.status == 0){
+        status.push($stateParams.status);
+    }else{
+        status = [
+            EPlanStatus.WAIT_UPLOAD,
+            EPlanStatus.WAIT_COMMIT,
+            EPlanStatus.AUDIT_NOT_PASS,
+            EPlanStatus.COMPLETE,
+            EPlanStatus.NO_BUDGET,
+            EPlanStatus.AUDITING
+        ];
+    }
+    var where: any = {
+        status: {$in: status}
+    };
+    if($stateParams.auditStatus || $stateParams.auditStatus == 0){
+        where.auditStatus = $stateParams.auditStatus;
+    }
     let pager = await staff.getTripPlans({
         limit: 5,
-        where: {
-            status: {$in: [
-                EPlanStatus.WAIT_UPLOAD,
-                EPlanStatus.WAIT_COMMIT,
-                EPlanStatus.AUDIT_NOT_PASS,
-                EPlanStatus.COMPLETE,
-                EPlanStatus.NO_BUDGET,
-                EPlanStatus.AUDITING
-            ]}
-        }
+        where: where
     });
     loadTripPlan(pager);
     var vm = {
@@ -528,7 +538,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
     $scope.showAlterDialog = function () {
         $scope.reject = {reason: ''};
         $ionicPopup.show({
-            title: '确认提交该出差计划？',
+            title: '确认将所有出差票据提交审核么？',
             scope: $scope,
             buttons: [{
                 text: '取消'
@@ -565,19 +575,21 @@ export async function ListDetailController($location, $scope , Models, $statePar
             regenerate: true,
             beginDate: moment(tripPlan.startAt).toDate(),
             endDate: moment(tripPlan.backAt).toDate(),
-            place: {value: tripPlan.arrivalCityCode, name: tripPlan.arrivalCity},
-            reasonName: tripPlan.title
+            place: {id: tripPlan.arrivalCityCode, name: tripPlan.arrivalCity},
+            reasonName: {id: undefined, name: tripPlan.title},
+            reason: tripPlan.title,
+            hotelPlaceObj: {}
         };
         if(tripDetails && tripDetails.length > 0) {
             await Promise.all(tripDetails.map(async (detail) => {
                 switch (detail.type) {
                     case ETripType.OUT_TRIP:
                         trip.traffic = true;
-                        trip.fromPlace = {value: tripPlan.deptCityCode, name: tripPlan.deptCity};
+                        trip.fromPlace = {id: tripPlan.deptCityCode, name: tripPlan.deptCity};
                         break;
                     case ETripType.BACK_TRIP:
                         trip.traffic = true;
-                        trip.fromPlace = {value: tripPlan.deptCityCode, name: tripPlan.deptCity};
+                        trip.fromPlace = {id: tripPlan.deptCityCode, name: tripPlan.deptCity};
                         trip.round = true;
                         break;
                     case ETripType.HOTEL:
@@ -591,6 +603,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
                         if(landMarkInfo && landMarkInfo.name){
                             trip.hotelPlaceName = landMarkInfo.name;
                         }
+                        trip.hotelPlaceObj.title = trip.hotelPlaceName
                 }
             }));
         }

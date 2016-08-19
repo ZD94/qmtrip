@@ -1,9 +1,28 @@
 .date_selected{
   padding:0;
   justify-content: center;
-  .input-label{
-    width: auto;
-    padding: 7px 20px;
+  .data_show{
+    padding: 7px;
+  }
+  .icon{
+    text-align: center;
+  }
+}
+.budgetMenu{
+  margin-bottom: 10px;
+  .button{
+    min-height: 30px;
+    line-height: 30px;
+    &.button-outline{
+      background: #fff;
+    }
+  }
+}
+@media (max-width: 320px){
+  .button-bar{
+    .button{
+      font-size: 12px;
+    }
   }
 }
 .tripStat{
@@ -42,6 +61,7 @@
   position: relative;
   padding-top: 10px;
   height: 160px;
+  margin-bottom: 10px;
   .bar-header{
     height: 30px;
     line-height: 30px;

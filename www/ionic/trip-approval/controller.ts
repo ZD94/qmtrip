@@ -296,7 +296,7 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
     }
 }
 
-export async function PendingController($scope){
+export async function PendingController($scope, $stateParams){
     const PAGE_SIZE = 10;
     let staff = await Staff.getCurrent();
     let tripApproves = [];
@@ -304,6 +304,7 @@ export async function PendingController($scope){
     $scope.hasNextPage = (!Pager || !Pager.length) ? false : true;
     Pager.forEach((a) => {tripApproves.push(a);});
     $scope.tripApproves = tripApproves;
+
     $scope.Pager = Pager;
     $scope.EApproveStatus = EApproveStatus;
     console.info($scope.tripApproves);

@@ -683,9 +683,9 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
             if (!validator.isEmail(_staff.email)) {
                 throw L.ERR.EMAIL_FORMAT_INVALID();
             }
-            if(company.domainName && company.domainName != "" && _staff.email.indexOf(company.domainName) == -1){
+            /*if(company.domainName && company.domainName != "" && _staff.email.indexOf(company.domainName) == -1){
                 throw L.ERR.EMAIL_SUFFIX_INVALID();
-            }
+            }*/
 
             if (_staff.mobile && !validator.isMobilePhone(_staff.mobile, 'zh-CN')) {
                 throw L.ERR.MOBILE_NOT_CORRECT();
@@ -847,9 +847,6 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         await $scope.travelPolicy.save();
         $ionicHistory.goBack(-1);
     }
-    $scope.consoles = function (obj) {
-        console.info(obj);
-    }
 }
 
 
@@ -954,9 +951,10 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
     }
 }
 
-export async function StaffInvitedController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup,wxApi){
+export async function StaffInvitedController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup,ClosePopupService,wxApi){
     require('./staff-invited.scss');
     var staff = await Staff.getCurrent();
+    $scope.staff = staff;
     var now = moment().format('YYYY-MM-DD HH:mm:ss');
     var invitedLinks = await Models.invitedLink.find({where: {staffId: staff.id, status: 1, expiresTime: {$gt: now}}});
     var seconds;
@@ -1067,18 +1065,21 @@ export async function StaffInvitedController($scope, Models, $storage, $statePar
                 template: '<p>请点击微信右上角菜单<br>将链接分享给好友</p>',
                 cssClass: 'share_alert'
             })
+            ClosePopupService.register(show);
             wx.onMenuShareAppMessage({
-                title:'邀请加入企业',
-                desc:'公司邀请你加入',
+                title: staff.name +'邀请您注册鲸力商旅',
+                desc:'加入'+staff.company.name+',共同开启智能商旅!',
                 link: $scope.invitedLink.goInvitedLink,
                 imgUrl:'http://t.jingli365.com/ionic/images/logo.png',
                 type: '', // 分享类型,music、video或link，不填默认为link
                 dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
                 success: function () {
                     // 用户确认分享后执行的回调函数
+                    show.close();
                 },
                 cancel: function () {
                     // 用户取消分享后执行的回调函数
+                    show.close();
                 }
             });
         }
@@ -1086,6 +1087,7 @@ export async function StaffInvitedController($scope, Models, $storage, $statePar
 }
 
 export async function StaffSavedRankController($scope) {
+    require('./staffSavedRank.scss');
     API.require('tripPlan');
     await API.onload();
     $scope.isMonth = true;

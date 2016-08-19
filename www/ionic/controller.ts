@@ -5,6 +5,13 @@ var API = require('common/api');
 
 var staffMenus = [
     {
+        id: 1050,
+        icon: 'person',
+        title: '个人中心',
+        link: 'staff/index',
+        badgeNum: 0,
+    },
+    {
         id: 1051,
         icon: 'plane',
         title: '我要出差',
@@ -72,7 +79,7 @@ var adminMenus = [
     },
 ];
 
-export async function IndexController($scope, Menu, $ionicPopup, Models, $storage, $window, $location, $ionicHistory) {
+export async function IndexController($scope, Menu, $ionicPopup, Models, $storage, $window, $location, $ionicHistory, $ionicSideMenuDelegate) {
     require('./index.scss');
     $scope.ionicGoBack = function () {
         let viewHistory = $ionicHistory.viewHistory();
@@ -165,5 +172,9 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
     $scope.currentStaff = staff;
     if (staff) {
         $scope.tripPlanSave = await staff.getTripPlanSave();
+    }
+
+    $scope.goMyCenter = function() {
+        $location.path('/staff/staffInfo');
     }
 }

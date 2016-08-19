@@ -3,6 +3,7 @@
  */
 'use strict';
 import {Staff, EStaffRole} from 'api/_types/staff';
+import {EPlanStatus, EAuditStatus} from "api/_types/tripPlan";
 var msgbox = require('msgbox');
 var API = require('common/api');
 
@@ -18,6 +19,8 @@ export async function IndexController($scope,Models) {
     $scope.tripBudget = tripBudget;
     $scope.staff = staff;
     $scope.EStaffRole = EStaffRole;
+    $scope.EPlanStatus = EPlanStatus;
+    $scope.EAuditStatus = EAuditStatus;
 }
 
 export async function StaffInfoController($scope,Models) {
@@ -176,8 +179,8 @@ export async function EditPwdController($scope,Models,$ionicHistory,$storage,$io
         }
         var pwdPattern = /^[0-9a-zA-Z]*$/g;
         var newPwd = $scope.form.newPwd;
-        if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >12){
-            msgbox.log("密码格式应为6-12位字母或数字");
+        if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >20){
+            msgbox.log("密码格式应为6-20位字母或数字");
             return;
         }
         await API.onload();
