@@ -185,11 +185,11 @@ class ApiTravelBudget {
                     }
                 }
 
-                let days = moment(goBackDate).diff(moment(leaveDate), 'days') || 1;
+                let days = moment(goBackDate).diff(moment(leaveDate), 'days');
                 if (Boolean(travelPolicy['subsidy']) && travelPolicy['subsidy'] > 0) {
                     let budget: any = {};
                     budget.tripType = ETripType.SUBSIDY;
-                    budget.price = travelPolicy['subsidy'] * days;
+                    budget.price = travelPolicy['subsidy'] * (days+1);
                     budgets.push(budget);
                 }
                 resolve(true);
