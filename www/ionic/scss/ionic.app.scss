@@ -19,6 +19,10 @@ $dark:                            #444 !default;
 $ionicons-font-path: "../../fonts/ionic" !default;
 $menu-side-shadow: none;
 
+$popup-background-color: white;
+$popup-border-radius: 5px;
+$z-index-popup: 100;
+
 // Include all of Ionic
 @import "../../../common/vendor/ionic/scss/ionic";
 
