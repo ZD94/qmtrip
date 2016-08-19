@@ -74,19 +74,29 @@ angular
             $loading.end();
         });
     })
-    .run(function($rootScope: IRootScopeService, $document: IDocumentService) {
-        let body = $document.find('body');
-        let initialViewChildren = body.find('ion-nav-view>*');
-        initialViewChildren.data('$accessed', Date.now());
-        var unreg = $rootScope.$on('backdrop.shown', function() {
-            unreg();
+    .run(function($rootScope: IRootScopeService, $document: IDocumentService, $timeout) {
+        let initElements;
+        let deregisterSetupInitElements = $rootScope.$on("$locationChangeStart", function () {
+            deregisterSetupInitElements();
+            initElements = $document.find('body ion-nav-view>*');
+            initElements.data('$accessed', Date.now());
+        });
+        let deregisterRemoveInitElements = $rootScope.$on("$stateChangeSuccess", function() {
+            deregisterRemoveInitElements();
+            removeInitElements();
+        });
+        let deregisterRemoval:any = $rootScope.$on('backdrop.shown', removeInitElements);
+
+        function removeInitElements() {
+            if(!deregisterRemoval)
+                return;
+            deregisterRemoval();
+            deregisterRemoval = undefined;
             let body = $document.find('body');
-            let initialViewChildren = body.find('ion-nav-view>*');
-            initialViewChildren.data('$accessed', Date.now());
             body.addClass('initial-loading-switching');
-            setTimeout(()=> {
-                initialViewChildren.remove();
+            $timeout(()=>{
+                initElements.remove();
                 $document.find('body').removeClass('initial-loading-switching');
             });
-        })
+        }
     });
