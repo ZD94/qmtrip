@@ -307,25 +307,29 @@ function loadMonths($scope, $element) {
 
     $scope.month_2col = false;
     $scope.$on('modal.shown', function() {
-        if($element.width() > 680)
+        if($element.width() > 760)
             $scope.month_2col = true;
         fixMonths($scope);
     });
 
     $scope.months = [];
-    var date = moment().startOf('month');
-    let caldata = getMonth(date.year(), date.month() + 1);
-    $scope.months.push(caldata);
     function loadNextMonth() {
-        let last = $scope.months[$scope.months.length - 1];
-        let date = moment({year: last.year, month: last.month - 1, day: 1});
-        date = date.add(1, 'month');
+        let date;
+        if($scope.months.length == 0){
+            date = moment().startOf('month');
+        }else{
+            let last = $scope.months[$scope.months.length - 1];
+            date = moment({year: last.year, month: last.month - 1, day: 1});
+            date = date.add(1, 'month');
+        }
         let caldata = getMonth(date.year(), date.month() + 1);
         $scope.months.push(caldata);
     }
 
     loadNextMonth();
+    loadNextMonth();
     $scope.loadNextMonth = function() {
+        loadNextMonth();
         loadNextMonth();
         fixMonths($scope);
         //$scope.$broadcast('scroll.infiniteScrollComplete');
