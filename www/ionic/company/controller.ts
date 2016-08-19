@@ -1087,6 +1087,7 @@ export async function StaffInvitedController($scope, Models, $storage, $statePar
 }
 
 export async function StaffSavedRankController($scope) {
+    require('./staffSavedRank.scss');
     API.require('tripPlan');
     await API.onload();
     $scope.isMonth = true;
