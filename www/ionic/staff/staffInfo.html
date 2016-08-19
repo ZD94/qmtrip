@@ -12,7 +12,7 @@
             </a>
             <a class="item item-icon-right" href="#/staff/editEmail">
                 邮箱<i class="icon ion-ios-checkmark verify" ng-class="{novalid: !staff.isValidateEmail}"></i>
-                <span class="item-note">{{staff.email}}</span>
+                <span class="item-note">{{staff.email || '请绑定邮箱并验证'}}</span>
                 <i class="icon ion-chevron-right"></i>
             </a>
             <div class="spacer" style="height: 10px;"></div>

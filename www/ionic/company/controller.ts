@@ -957,6 +957,7 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
 export async function StaffInvitedController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup,wxApi){
     require('./staff-invited.scss');
     var staff = await Staff.getCurrent();
+    $scope.staff = staff;
     var now = moment().format('YYYY-MM-DD HH:mm:ss');
     var invitedLinks = await Models.invitedLink.find({where: {staffId: staff.id, status: 1, expiresTime: {$gt: now}}});
     var seconds;
@@ -1068,8 +1069,8 @@ export async function StaffInvitedController($scope, Models, $storage, $statePar
                 cssClass: 'share_alert'
             })
             wx.onMenuShareAppMessage({
-                title:'邀请加入企业',
-                desc:'公司邀请你加入',
+                title: staff.name +'邀请您注册鲸力商旅',
+                desc:'加入'+staff.company.name+',共同开启智能商旅!',
                 link: $scope.invitedLink.goInvitedLink,
                 imgUrl:'http://t.jingli365.com/ionic/images/logo.png',
                 type: '', // 分享类型,music、video或link，不填默认为link
