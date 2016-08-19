@@ -307,7 +307,7 @@ function loadMonths($scope, $element) {
 
     $scope.month_2col = false;
     $scope.$on('modal.shown', function() {
-        if($element.width() > 760)
+        if($element.width() > 640)
             $scope.month_2col = true;
         fixMonths($scope);
     });
