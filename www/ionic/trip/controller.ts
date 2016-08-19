@@ -201,8 +201,8 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg){
         }
 
         let params = {
-            originPlace: trip.fromPlace.id,
-            destinationPlace: trip.place.id,
+            originPlace: trip.fromPlace? trip.fromPlace.id : '',
+            destinationPlace: trip.place ? trip.place.id : '',
             leaveDate: moment(trip.beginDate).format('YYYY-MM-DD'),
             goBackDate: moment(trip.endDate).format('YYYY-MM-DD'),
             leaveTime: moment(trip.beginDate).format('HH:mm'),
@@ -397,7 +397,7 @@ export async function DetailController($scope, $stateParams, Models, $location){
     $scope.ETripType = ETripType;
 }
 
-export async function ListController($scope , Models){
+export async function ListController($scope , $stateParams, Models){
     var staff = await Staff.getCurrent();
     let statusTxt = {};
     statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
@@ -409,18 +409,28 @@ export async function ListController($scope , Models){
     $scope.statustext = statusTxt;
     $scope.isHasNextPage = true;
     $scope.tripPlans = [];
+    var status = [];
+    if($stateParams.status || $stateParams.status == 0){
+        status.push($stateParams.status);
+    }else{
+        status = [
+            EPlanStatus.WAIT_UPLOAD,
+            EPlanStatus.WAIT_COMMIT,
+            EPlanStatus.AUDIT_NOT_PASS,
+            EPlanStatus.COMPLETE,
+            EPlanStatus.NO_BUDGET,
+            EPlanStatus.AUDITING
+        ];
+    }
+    var where: any = {
+        status: {$in: status}
+    };
+    if($stateParams.auditStatus || $stateParams.auditStatus == 0){
+        where.auditStatus = $stateParams.auditStatus;
+    }
     let pager = await staff.getTripPlans({
         limit: 5,
-        where: {
-            status: {$in: [
-                EPlanStatus.WAIT_UPLOAD,
-                EPlanStatus.WAIT_COMMIT,
-                EPlanStatus.AUDIT_NOT_PASS,
-                EPlanStatus.COMPLETE,
-                EPlanStatus.NO_BUDGET,
-                EPlanStatus.AUDITING
-            ]}
-        }
+        where: where
     });
     loadTripPlan(pager);
     var vm = {
@@ -528,7 +538,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
     $scope.showAlterDialog = function () {
         $scope.reject = {reason: ''};
         $ionicPopup.show({
-            title: '确认提交该出差计划？',
+            title: '确认将所有出差票据提交审核么？',
             scope: $scope,
             buttons: [{
                 text: '取消'

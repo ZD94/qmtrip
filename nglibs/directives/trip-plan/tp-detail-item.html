@@ -22,7 +22,7 @@
             </span>
             {{item.budget == -1 ? '暂无预算' : (item.budget| currency: '')+'元'}}<br/>
             <span ng-if="item.fullPrice">
-                折扣：{{item.fullPrice > item.budget ? ((item.budget/item.fullPrice)*10).toFixed(1)+'折' : '100%'}}<br/>
+                折扣：{{item.fullPrice > item.budget ? ((item.budget/item.fullPrice)*10).toFixed(1)+'' : '100%'}}<br/>
             </span>
         </div>
 
@@ -37,10 +37,10 @@
         </div>
 
         <div ng-if="item.type == ETripType.SUBSIDY">
-            <span>{{item.startTime | date: 'MM/dd'}}至{{item.endTime | date: 'MM/dd'}},共{{days|| 1}}天</span>
+            <span>{{item.startTime | date: 'MM/dd'}}至{{item.endTime | date: 'MM/dd'}},共{{days+1}}天</span>
             <br/>
             <span ng-if="item.budget > 0">
-                {{item.budget / days | currency: ''}}元/天
+                {{item.budget / (days+1) | currency: ''}}元/天
             </span>
         </div>
 
