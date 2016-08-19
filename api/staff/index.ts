@@ -226,9 +226,9 @@ class StaffModule{
         let staff = await Staff.getCurrent();
 
         if(params.email){
-            if(staff && staff.company["domainName"] && params.email.indexOf(staff.company["domainName"]) == -1){
+            /*if(staff && staff.company["domainName"] && params.email.indexOf(staff.company["domainName"]) == -1){
                 throw L.ERR.EMAIL_SUFFIX_INVALID();
-            }
+            }*/
 
             if(updateStaff.status != 0){
                 throw L.ERR.NOTALLOWED_MODIFY_EMAIL();

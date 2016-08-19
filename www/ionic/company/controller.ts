@@ -683,9 +683,9 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
             if (!validator.isEmail(_staff.email)) {
                 throw L.ERR.EMAIL_FORMAT_INVALID();
             }
-            if(company.domainName && company.domainName != "" && _staff.email.indexOf(company.domainName) == -1){
+            /*if(company.domainName && company.domainName != "" && _staff.email.indexOf(company.domainName) == -1){
                 throw L.ERR.EMAIL_SUFFIX_INVALID();
-            }
+            }*/
 
             if (_staff.mobile && !validator.isMobilePhone(_staff.mobile, 'zh-CN')) {
                 throw L.ERR.MOBILE_NOT_CORRECT();
