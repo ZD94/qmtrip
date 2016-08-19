@@ -3,15 +3,15 @@
         <div class="flex-c01">
             <div class="item item-input date_selected">
                 <i class="icon ion-chevron-left" ng-click="monthChange()"></i>
-                <span class="input-label">{{monthSelection.showStr}}</span>
+                <span class="data_show">{{monthSelection.showStr}}</span>
                 <i class="icon ion-chevron-right" ng-click="monthChange(true)"></i>
             </div>
             <ion-scroll style="padding: 10px;">
                 <div class="button-bar">
-                    <a href="#/company/budget" id="page24-button73" class="button button-stable button-block">汇总</a>
-                    <button ng-class="{true: 'button-positive', false: 'button-stable'}[isSActive]" class="button button-block" ng-click="searchStatistics('S')">按员工</button>
-                    <button ng-class="{true: 'button-positive', false: 'button-stable'}[isPActive]" class="button button-block" ng-click="searchStatistics('P')">按项目</button>
-                    <button ng-class="{true: 'button-positive', false: 'button-stable'}[isDActive]" class="button button-block" ng-click="searchStatistics('D')">按部门</button>
+                    <a href="#/company/budget" id="page24-button73" class="button button-positive button-outline">汇总</a>
+                    <a ng-class="{true: '', false: 'button-outline'}[isSActive]" class="button button-positive" ng-click="searchStatistics('S')">按员工</a>
+                    <a ng-class="{true: '', false: 'button-outline'}[isPActive]" class="button button-positive" ng-click="searchStatistics('P')">按项目</a>
+                    <a ng-class="{true: '', false: 'button-outline'}[isDActive]" class="button button-positive" ng-click="searchStatistics('D')">按部门</a>
                 </div>
 
 
