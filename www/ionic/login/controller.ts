@@ -480,8 +480,8 @@ export async function ResetPwdController($scope, Models, $stateParams){
             return;
         }
         var pwdPattern = /^[0-9a-zA-Z]*$/g;
-        if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >12){
-            msgbox.log("密码格式应为6-12位字母或数字");
+        if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >20){
+            msgbox.log("密码格式应为6-20位字母或数字");
             return;
         }
         API.auth.resetPwdByMobile({accountId: accountId, sign: sign, timestamp: timestamp, pwd: newPwd})
@@ -665,8 +665,8 @@ export async function InvitedStaffTwoController ($scope, $stateParams){
         }
         var pwdPattern = /^[0-9a-zA-Z]*$/g;
         var newPwd = $scope.form.pwd;
-        if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >12){
-            msgbox.log("密码格式应为6-12位字母或数字");
+        if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >20){
+            msgbox.log("密码格式应为6-20位字母或数字");
             return;
         }
 
