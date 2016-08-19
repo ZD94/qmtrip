@@ -51,7 +51,7 @@ function apiAuth(remote, callback) {
         });
 }
 
-function initAPI($window, $location){
+function initAPI($window, $location, $ionicPopup){
     var API = require('common/api');
     API.require('auth');
     API.authenticate = apiAuth;
@@ -61,10 +61,16 @@ function initAPI($window, $location){
         return;
     var datastr = getAuthData();
     if(!datastr) {
-        gotoLogin();
+        gotoLogin(true);
     }
 
-    async function gotoLogin() {
+    async function gotoLogin(direct?: boolean) {
+        if(!direct){
+            await $ionicPopup.alert({
+                title: '登录已失效',
+                template: '<div style="text-align: center;">将返回重新登录</div>'
+            });
+        }
         var backUrl = $location.absUrl();
 
         if(/^\/login\//.test($location.path())) {
