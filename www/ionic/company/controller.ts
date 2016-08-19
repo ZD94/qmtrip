@@ -847,9 +847,6 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         await $scope.travelPolicy.save();
         $ionicHistory.goBack(-1);
     }
-    $scope.consoles = function (obj) {
-        console.info(obj);
-    }
 }
 
 
