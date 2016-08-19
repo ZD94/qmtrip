@@ -26,16 +26,6 @@
                     </ion-item>
                 </ion-list>
 
-                <!--<ion-list>
-                    <ion-item>
-                        出差事由<span class="item-note">{{trip.reason}}</span>
-                    </ion-item>
-                </ion-list>
-                <div class="spacer" style="width: 285px; height: 17px;"></div>
-                <ion-list>
-                    <ion-item>{{trip.beginDate| date: 'MM-dd'}} 至 {{trip.endDate | date: 'MM-dd'}}
-                        <br>总预算：{{totalPrice == -1 ? '暂无预算' : (totalPrice| currency: '')+'元'}}</ion-item>
-                </ion-list>-->
                 <div class="spacer" style="width: 285px; height: 17px;"></div>
                 <ion-list>
                     <div ng-repeat="budget in budgets">
@@ -73,7 +63,7 @@
                         </ion-item>
 
                         <ion-item ng-if="budget.tripType == ETripType.SUBSIDY">
-                            <span>{{trip.beginDate | date: 'MM-dd'}}至{{trip.endDate | date: 'MM-dd'}} 共{{duringDays}}天</span>
+                            <span>{{trip.beginDate | date: 'MM-dd'}}至{{trip.endDate | date: 'MM-dd'}} 共{{duringDays+1}}天</span>
                             <br/>
                             {{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')+'元'}}
                         </ion-item>
