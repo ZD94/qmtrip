@@ -954,7 +954,7 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
     }
 }
 
-export async function StaffInvitedController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup,ClosePopupService){
+export async function StaffInvitedController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup,ClosePopupService,wxApi){
     require('./staff-invited.scss');
     var staff = await Staff.getCurrent();
     $scope.staff = staff;
