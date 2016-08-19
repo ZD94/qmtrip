@@ -10,11 +10,11 @@
         </div>
 
         <ion-list>
-            <ion-item ng-repeat="v in staffSaves" style="font-size: 0.8em;">
-                <span style="display: block; position: absolute;width: 30px; height: 30px;">{{$index+1}}</span>
-                <div style="margin-left: 20px; display: block; position: absolute; width: 30px; height: 30px; text-align: center; line-height: 30px; border-radius: 50%; color: white; background:#2495da;">{{v.name| limitTo: -1}}</div>
-                <span style="padding-left: 70px;">{{v.name}}</span>
-                <span style="float: right;">{{v.save| currency: ''}}元</span>
+            <ion-item ng-repeat="v in staffSaves" class="rankList">
+                <span>{{$index+1}}</span>
+                <div class="rankAvatar">{{v.name| limitTo: -1}}</div>
+                <span>{{v.name}}</span>
+                <span>{{v.save| currency: ''}}元</span>
             </ion-item>
         </ion-list>
     </ion-content>
