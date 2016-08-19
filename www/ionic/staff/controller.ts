@@ -3,6 +3,7 @@
  */
 'use strict';
 import {Staff, EStaffRole} from 'api/_types/staff';
+import {EPlanStatus, EAuditStatus} from "api/_types/tripPlan";
 var msgbox = require('msgbox');
 var API = require('common/api');
 
@@ -18,6 +19,8 @@ export async function IndexController($scope,Models) {
     $scope.tripBudget = tripBudget;
     $scope.staff = staff;
     $scope.EStaffRole = EStaffRole;
+    $scope.EPlanStatus = EPlanStatus;
+    $scope.EAuditStatus = EAuditStatus;
 }
 
 export async function StaffInfoController($scope,Models) {
