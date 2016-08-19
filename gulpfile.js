@@ -15,24 +15,28 @@ var argv = require('yargs')
 
 gulplib.public_dir = 'www';
 
-gulplib.bundle_lib('browserify', {ex: true, ts: false, require:[
+gulplib.bundle_lib('browserify', {ex: true, require:[
         'buffer', 'is-buffer', 'querystring', 'string_decoder',
         'http', 'https', 'url',
     'util', 'inherits', 'process', 'events', 'stream', 'zlib']});
-gulplib.bundle_lib('update', 'cordova-app-loader/bootstrap.js', {ex: true, ts: false, require: ['cordova-app-loader', 'cordova-promise-fs', 'common/client/updater']});
-gulplib.bundle_lib('ws', {ex: true, ts: false, require: ['ws', 'crypto'], exclude: ['bufferutil', 'utf-8-validate']});
-gulplib.bundle_lib('jquery', {ex: true, ts: false, require: ['jquery']});
-gulplib.bundle_lib('bootstrap', {ex: true, ts: false, require: ["bootstrap"]});
-gulplib.bundle_lib('angular', {ex: true, ts: false, require: ['angular', 'common/client/angular']});
-gulplib.bundle_lib('ionic', {ex: true, ts: false, require: ['./common/client/ionic/entry.js:ionic']});
-gulplib.bundle_lib('swiper', {ex: true, ts: false, require: ['swiper']});
-gulplib.bundle_lib('img', {ex: true, ts: false, require: ['arale-qrcode', 'hidpi-canvas', 'exif-js', 'exif-orient']})
-gulplib.bundle_lib('base', {ex: true, ts: false, require:['md5', 'moment', 'tiny-cookie', 'shoe', 'lodash', 'validator', 'scssify', 'cssify']})
-gulplib.bundle_lib('sourcemap', {ex: true, ts: false, require: ['source-map-support']})
+gulplib.bundle_lib('update', 'cordova-app-loader/bootstrap.js', {ex: true, require: [
+    'cordova-app-loader', 'cordova-promise-fs', 'common/client/updater'
+]});
+gulplib.bundle_lib('ws', {ex: true, require: ['ws', 'crypto'], exclude: ['bufferutil', 'utf-8-validate']});
+gulplib.bundle_lib('jquery', {ex: true, require: ['jquery']});
+gulplib.bundle_lib('bootstrap', {ex: true, require: ["bootstrap"]});
+gulplib.bundle_lib('angular', {ex: true, require: ['angular', 'common/client/angular']});
+gulplib.bundle_lib('ionic', {ex: true, require: ['./common/client/ionic/entry.js:ionic']});
+gulplib.bundle_lib('swiper', {ex: true, require: ['swiper']});
+gulplib.bundle_lib('img', {ex: true, require: ['arale-qrcode', 'hidpi-canvas', 'exif-js', 'exif-orient']})
+gulplib.bundle_lib('base', {ex: true, require:[
+    'md5', 'moment', 'tiny-cookie', 'shoe', 'lodash', 'validator', 'scssify', 'cssify'
+]})
+gulplib.bundle_lib('sourcemap', {ex: true, require: ['source-map-support']})
 
-gulplib.bundle_lib('preload', {ex: true, ts: false, require:[
+gulplib.bundle_lib('preload', {ex: true, require:[
     'dyload', 'babel-polyfill', 'bluebird', 'common/ts_helper', 'common/zone',
-    'common/client/config:common/config'
+    'common/client/config:common/config', 'common/client/ngapp/appinit',
 ]});
 
 gulplib.bundle_lib('api', {require: ['common/client/api:common/api', 'common/api/helper', 'common/language']});

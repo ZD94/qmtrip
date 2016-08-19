@@ -29,19 +29,19 @@
                     <span class="icon ion-android-send"></span>进行中的出差<span class="item-note icon ion-chevron-right"></span>
                 </div></a>
                 <div class="item flex-111">
-                    <a href="#/trip-approval/pending">
+                    <a href="#/trip-approval/pending?status={{EPlanStatus.WAIT_APPROVE}}">
                         <span class="icon ion-ios-compose-outline"></span>
                         <p>待审批</p>
                     </a>
-                    <a href="#/trip-approval/pending">
+                    <a href="#/trip-approval/pending?status={{EPlanStatus.APPROVE_NOT_PASS}}">
                         <span class="icon ion-reply-all"></span>
                         <p>审批驳回</p>
                     </a>
-                    <a href="#/trip/list">
+                    <a href="#/trip/list?status={{EPlanStatus.WAIT_UPLOAD}}">
                         <span class="icon ion-ios-paper-outline"></span>
                         <p>待传票据</p>
                     </a>
-                    <a href="#/trip/list">
+                    <a href="#/trip/list?auditStatus={{EAuditStatus.INVOICE_NOT_PASS}}&status={{EPlanStatus.COMPLETE}}">
                         <span class="icon ion-alert-circled"></span>
                         <p>票据驳回</p>
                     </a>
