@@ -75,12 +75,15 @@ angular
         });
     })
     .run(function($rootScope: IRootScopeService, $document: IDocumentService) {
+        let body = $document.find('body');
+        let initialViewChildren = body.find('ion-nav-view>*');
+        initialViewChildren.data('$accessed', Date.now());
         var unreg = $rootScope.$on('backdrop.shown', function() {
             unreg();
             let body = $document.find('body');
             let initialViewChildren = body.find('ion-nav-view>*');
-            body.addClass('initial-loading-switching');
             initialViewChildren.data('$accessed', Date.now());
+            body.addClass('initial-loading-switching');
             setTimeout(()=> {
                 initialViewChildren.remove();
                 $document.find('body').removeClass('initial-loading-switching');
