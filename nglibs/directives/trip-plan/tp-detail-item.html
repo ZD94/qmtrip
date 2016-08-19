@@ -22,7 +22,7 @@
             </span>
             {{item.budget == -1 ? '暂无预算' : (item.budget| currency: '')+'元'}}<br/>
             <span ng-if="item.fullPrice">
-                折扣：{{item.fullPrice > item.budget ? ((item.budget/item.fullPrice)*100).toFixed(1)+'%' : '100%'}}<br/>
+                折扣：{{item.fullPrice > item.budget ? ((item.budget/item.fullPrice)*10).toFixed(1)+'折' : '100%'}}<br/>
             </span>
         </div>
 

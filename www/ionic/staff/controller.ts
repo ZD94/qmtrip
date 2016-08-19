@@ -176,8 +176,8 @@ export async function EditPwdController($scope,Models,$ionicHistory,$storage,$io
         }
         var pwdPattern = /^[0-9a-zA-Z]*$/g;
         var newPwd = $scope.form.newPwd;
-        if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >12){
-            msgbox.log("密码格式应为6-12位字母或数字");
+        if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >20){
+            msgbox.log("密码格式应为6-20位字母或数字");
             return;
         }
         await API.onload();
