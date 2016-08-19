@@ -1,5 +1,5 @@
 <ion-view title="审批单详情" id="page7">
-    <ion-content padding="false" scroll="false" class="has-header">
+    <ion-content ng-hide="isConfirm" padding="false" scroll="false" class="has-header">
         <div class="flex-c10">
             <ion-scroll>
                 <div class="list"><div class="item opactic">{{APPROVE_TEXT[tripApprove.status]}}
@@ -86,7 +86,7 @@
             <div>
                 <div class="button-bar" ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE && isHasPermissionApprove">
                     <a ng-click="showReasonDialog()" class="button button-assertive  button-block">拒绝</a>
-                    <a ng-click="showAlterDialog()" class="button button-positive  button-block">同意</a>
+                    <a ng-click="confirmButton()" class="button button-positive  button-block">同意</a>
                 </div>
             </div>
 
@@ -94,23 +94,27 @@
         </div>
     </ion-content>
 
-    <!--<ion-content style="display: block; position: fixed; width: 100%; height: 100%;background-color:Black; opacity:0.2; top: 0px;">-->
-        <!--<div class="flex-c10">-->
-            <!--<ion-list show-delete="false">-->
-                <!--<ion-item>直接同意</ion-item>-->
-                <!--<ion-item>-->
-                    <!--<div class="item item-input">-->
-                        <!--<span class="input-label">同意并转给</span>-->
-                        <!--<ng-selector-list-->
-                                <!--ng-model="tripApprove.approveUser"-->
-                                <!--dlg-options="staffSelector"-->
-                                <!--dlg-title="选择审批人"-->
-                                <!--dlg-placeholder="请选择审批人"-->
-                                <!--class="fake-input">-->
-                        <!--</ng-selector-list>-->
-                    <!--</div>-->
-                <!--</ion-item>-->
-            <!--</ion-list>-->
-        <!--</div>-->
-    <!--</ion-content>-->
+    <ion-content ng-show="isConfirm" padding="false" scroll="false" class="has-header">
+        <div class="flex-c10">
+            <ion-list show-delete="false">
+                <ion-item ng-click="chooseOption(false)" ng-class="{true: '', false: 'item-option-selected'}[isNextApprove]">直接同意</ion-item>
+                <ion-item ng-click="chooseOption(true)" ng-class="{true: 'item-option-selected', false: ''}[isNextApprove]" style="border-top: 1px #387ef5 solid">
+                    <span class="input-label">同意并转给</span>
+                    <ng-selector-list style="float: right;"
+                                      ng-model="tripApprove.approveUser"
+                                      dlg-options="staffSelector"
+                                      dlg-title="选择审批人"
+                                      dlg-placeholder="请选择审批人"
+                                      class="fake-input">
+                    </ng-selector-list>
+                </ion-item>
+            </ion-list>
+
+            <div class="button-bar">
+                <a ng-click="cancelConfirm()" class="button button-assertive  button-block">取消</a>
+                <a ng-click="confirmApprove()" class="button button-positive  button-block">确认</a>
+            </div>
+        </div>
+
+    </ion-content>
 </ion-view>

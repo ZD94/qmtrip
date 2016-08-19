@@ -536,6 +536,10 @@ export class TripApprove extends ModelObject{
     get arrivalCityCode(): string { return ''; }
     set arrivalCityCode(val: string) {}
 
+    @Field({type: Types.TEXT})
+    get approvedUsers(): string { return ''; }
+    set approvedUsers(val: string) {}
+
     @Field({type: Types.DATE})
     get startAt(): Date { return null; }
     set startAt(val: Date) {}

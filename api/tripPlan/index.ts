@@ -587,11 +587,13 @@ class TripPlanModule {
             log.save();
             tripApprove.status = EApproveStatus.PASS;
             tripApprove.approveRemark = '审批通过';
+            tripApprove.approvedUsers += `,${staff.id}`;
             tripPlan = await TripPlanModule.saveTripPlanByApprove({tripApproveId: params.id});
         }else if(isNextApprove){ //指定下一级审批人
-            log.approveStatus = EApproveResult.WAIT_APPROVE;
+            log.approveStatus = EApproveResult.PASS;
             log.save();
             let nextApproveUser = await Models.staff.get(params.nextApproveUserId);
+            tripApprove.approvedUsers += `,${staff.id}`;
             tripApprove.approveUser = nextApproveUser;
         }else if(approveResult == EApproveResult.REJECT) {
             let approveRemark = params.approveRemark;
@@ -1561,7 +1563,7 @@ class TripPlanModule {
         let staff = await Staff.getCurrent();
         let staffId = staff.id;
         let approve = await Models.tripApprove.get(params.id);
-        if(approve.account.id != staffId && approve.approveUser.id != staffId)
+        if(approve.account.id != staffId && approve.approveUser.id != staffId && approve.approvedUsers.indexOf(staffId) < 0)
             throw L.ERR.PERMISSION_DENY();
         return approve;
     }

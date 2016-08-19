@@ -28,6 +28,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     let approveId = $stateParams.approveId;
     let tripApprove = await Models.tripApprove.get(approveId);
     $scope.staff = tripApprove.account;
+    $scope.isConfirm = false;
     APPROVE_TEXT[EApproveStatus.WAIT_APPROVE] = `等待 ${tripApprove.approveUser.name} 审批`;
     $scope.APPROVE_TEXT = APPROVE_TEXT;
     $scope.EInvoiceType = EInvoiceType;
@@ -121,7 +122,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
 
     async function approve(result: EApproveResult, approveRemark?: string) {
         try{
-            await tripApprove.approve({approveResult: result, isNextApprove: $scope.isNextApprove || false, approveRemark: approveRemark, budgetId: $scope.budgetId});
+            await tripApprove.approve({approveResult: result, isNextApprove: $scope.isNextApprove || false, nextApproveUserId: tripApprove.approveUser.id, approveRemark: approveRemark, budgetId: $scope.budgetId});
             if(result == EApproveResult.PASS) {
                 window.location.href = "#/trip-approval/approved?staffId="+tripApprove.account.id;
             }
@@ -192,7 +193,8 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         })
     };
 
-    $scope.showAlterDialog = function () {
+    $scope.confirmButton = function() {
+        $scope.isConfirm = true;
         $scope.isNextApprove = false;
 
         $scope.chooseOption = function(isNextApprove) {
@@ -207,34 +209,18 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             },
             display: (staff)=>staff.name
         };
-
-        $ionicPopup.show({
-            title: '确认同意',
-            template: `<ion-list show-delete="false">
-                             <ion-item ng-click="chooseOption(false)" ng-class="{true: '', false: 'item-option-selected'}[isNextApprove]">直接同意</ion-item>
-                             <ion-item ng-click="chooseOption(true)" ng-class="{true: 'item-option-selected', false: ''}[isNextApprove]" style="border-top: 1px #387ef5 solid">
-                                <span class="input-label">同意并转给</span>
-                                    <ng-selector-list style="float: right;"
-                                        ng-model="tripApprove.approveUser"
-                                        dlg-options="staffSelector"
-                                        dlg-title="选择审批人"
-                                        dlg-placeholder="请选择审批人"
-                                        class="fake-input">
-                                    </ng-selector-list>
-                            </ion-item>
-                       </ion-list>`,
-            scope: $scope,
-            buttons: [{
-                text: '取消'
-            },{
-                text: '确认',
-                type: 'button-positive',
-                onTap: async function (e) {
-                    approve(EApproveResult.PASS);
-                }
-            }]
-        })
     };
+
+    $scope.cancelConfirm = function() {
+        $scope.isConfirm = false;
+        $scope.isNextApprove = false;
+    };
+    
+    $scope.confirmApprove = function() {
+        console.info("approveUserName=>", $scope.tripApprove.approveUser.name);
+        approve(EApproveResult.PASS);
+    };
+
 }
 
 export async function ListController($scope, Models, $stateParams, $ionicLoading){
