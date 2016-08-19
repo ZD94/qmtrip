@@ -565,19 +565,21 @@ export async function ListDetailController($location, $scope , Models, $statePar
             regenerate: true,
             beginDate: moment(tripPlan.startAt).toDate(),
             endDate: moment(tripPlan.backAt).toDate(),
-            place: {value: tripPlan.arrivalCityCode, name: tripPlan.arrivalCity},
-            reasonName: tripPlan.title
+            place: {id: tripPlan.arrivalCityCode, name: tripPlan.arrivalCity},
+            reasonName: {id: undefined, name: tripPlan.title},
+            reason: tripPlan.title,
+            hotelPlaceObj: {}
         };
         if(tripDetails && tripDetails.length > 0) {
             await Promise.all(tripDetails.map(async (detail) => {
                 switch (detail.type) {
                     case ETripType.OUT_TRIP:
                         trip.traffic = true;
-                        trip.fromPlace = {value: tripPlan.deptCityCode, name: tripPlan.deptCity};
+                        trip.fromPlace = {id: tripPlan.deptCityCode, name: tripPlan.deptCity};
                         break;
                     case ETripType.BACK_TRIP:
                         trip.traffic = true;
-                        trip.fromPlace = {value: tripPlan.deptCityCode, name: tripPlan.deptCity};
+                        trip.fromPlace = {id: tripPlan.deptCityCode, name: tripPlan.deptCity};
                         trip.round = true;
                         break;
                     case ETripType.HOTEL:
@@ -591,6 +593,7 @@ export async function ListDetailController($location, $scope , Models, $statePar
                         if(landMarkInfo && landMarkInfo.name){
                             trip.hotelPlaceName = landMarkInfo.name;
                         }
+                        trip.hotelPlaceObj.title = trip.hotelPlaceName
                 }
             }));
         }
