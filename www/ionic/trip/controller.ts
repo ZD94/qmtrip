@@ -201,8 +201,8 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg){
         }
 
         let params = {
-            originPlace: trip.fromPlace.id,
-            destinationPlace: trip.place.id,
+            originPlace: trip.fromPlace? trip.fromPlace.id : '',
+            destinationPlace: trip.place ? trip.place.id : '',
             leaveDate: moment(trip.beginDate).format('YYYY-MM-DD'),
             goBackDate: moment(trip.endDate).format('YYYY-MM-DD'),
             leaveTime: moment(trip.beginDate).format('HH:mm'),
