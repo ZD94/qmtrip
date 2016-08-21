@@ -31,7 +31,8 @@
                         <div class="month-title">{{month.year}}年{{month.month}}月</div>
                         <div class="week-7col">
                             <div ng-repeat="day in month.days">
-                                <ng-selector-date-day ng-modal="day" ng-if="month.month == day.month"
+                                <ng-selector-date-day ng-modal="day"
+                                                      ng-style="{'visibility': month.month == day.month ? 'visible' : 'hidden'}"
                                                       ng-click="confirm(day)"
                                                       ng-day-options="dayOptions"
                                 >
