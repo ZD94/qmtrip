@@ -16,6 +16,7 @@
         <div class="button-bar jl_approvelist">
             <a ng-click="changeTo('ALL')" class="button button-small" ng-class="filter == 'ALL' ? 'active': ''">全部</a>
             <a ng-click="changeTo('WAIT_APPROVE')" class="button button-small" ng-class="filter == 'WAIT_APPROVE' ? 'active': ''">待我审批</a>
+            <a ng-click="changeTo('APPROVING')" class="button button-small" ng-class="filter == 'APPROVING' ? 'active': ''">未完结审批</a>
             <a ng-click="changeTo('APPROVE_PASS')" class="button button-small" ng-class="filter == 'APPROVE_PASS' ? 'active': ''">审批通过</a>
             <a ng-click="changeTo('APPROVE_FAIL')" class="button button-small" ng-class="filter == 'APPROVE_FAIL' ? 'active': ''">审批驳回</a>
         </div>

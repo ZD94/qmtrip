@@ -2,9 +2,12 @@
     <ion-content ng-hide="isConfirm" padding="false" scroll="false" class="has-header">
         <div class="flex-c10">
             <ion-scroll>
-                <div class="list"><div class="item opactic">{{APPROVE_TEXT[tripApprove.status]}}
-                    <span ng-show="tripApprove.status==EApproveStatus.REJECT">{{tripApprove.approveRemark}}</span>
-                </div></div>
+                <div class="list">
+                    <div class="item opactic">{{APPROVE_TEXT[tripApprove.status]}}
+                        <span ng-show="tripApprove.status==EApproveStatus.REJECT">{{tripApprove.approveRemark}}</span>
+                        <button class="btn button-positive" style="float: right" ng-click="showApproveDetails()">审批详情</button>
+                    </div>
+                </div>
 
                 <ion-list ng-if="isHasPermissionApprove">
                     <ion-item class="item-thumbnail-left opactic">
@@ -85,8 +88,11 @@
 
             <div>
                 <div class="button-bar" ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE && isHasPermissionApprove">
-                    <a ng-click="showReasonDialog()" class="button button-assertive  button-block">拒绝</a>
+                    <a ng-click="showReasonDialog()" class="button button-assertive  button-block">驳回</a>
                     <a ng-click="confirmButton()" class="button button-positive  button-block">同意</a>
+                </div>
+                <div class="button-bar" ng-if="tripApprove.status == EApproveStatus.REJECT && !isHasPermissionApprove">
+                    <a ng-click="reCommitTripApprove()" class="button button-positive  button-block">重新提交</a>
                 </div>
             </div>
 

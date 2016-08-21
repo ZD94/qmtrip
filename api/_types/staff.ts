@@ -137,7 +137,12 @@ export class Staff extends ModelObject implements Account {
     getTripApprovesByApproverUser(options: {where?: any, limit?: number}): Promise<PaginateInterface<TripApprove>> {
         if (!options) options = {where: {}};
         if(!options.where) options.where = {};
-        options.where.approveUserId = this.id;
+        if(options.where.isApproving){
+            options.where.$or = [{approveUserId: this.id}, {approvedUsers: {$like: `%${this.id}%`}}];
+            delete options.where.isApproving;
+        }else{
+            options.where.approveUserId = this.id;
+        }
         return Models.tripApprove.find(options);
     }
 

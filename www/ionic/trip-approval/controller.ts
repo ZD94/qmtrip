@@ -9,6 +9,7 @@ import {
 import {MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 import {Staff} from "api/_types/staff";
 import moment = require('moment');
+import {stat} from "fs";
 const API = require("common/api");
 let APPROVE_TEXT: any = {};
 APPROVE_TEXT[EApproveStatus.CANCEL] = '已撤销';
@@ -23,7 +24,7 @@ export async function ApprovedController($scope, Models, $stateParams){
     $scope.staffName = staff.name;
 }
 
-export async function DetailController($scope, Models, $stateParams, $ionicPopup, $loading){
+export async function DetailController($scope, Models, $stateParams, $ionicPopup, $loading, $storage){
     require('./trip-approval.scss');
     let approveId = $stateParams.approveId;
     let tripApprove = await Models.tripApprove.get(approveId);
@@ -43,39 +44,39 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.isHasPermissionApprove = isHasPermissionApprove;
     let totalBudget: number = 0;
 
-    if (tripApprove.status == EApproveStatus.WAIT_APPROVE && tripApprove.query && isHasPermissionApprove) {
-        $loading.reset();
-        $loading.start({
-            template: '预算计算中...'
-        });
-        //计算最终预算
-        API.require("travelBudget");
-        await API.onload();
-        let query = tripApprove.query;
-
-        if (typeof query == 'string')
-            query = JSON.parse(tripApprove.query);
-
-        query.staffId = tripApprove.account.id;
-        let budgetId = await API.travelBudget.getTravelPolicyBudget(query);
-        $scope.budgetId = budgetId;
-        let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
-        let budgets = budgetInfo.budgets;
-
-        totalBudget = 0;
-        budgets.forEach((v) => {
-            if (v.price <= 0) {
-                totalBudget = -1;
-                return;
-            }
-            totalBudget += Number(v.price);
-        });
-
-        if (totalBudget > tripApprove.budget) {
-            tripApprove.budget = totalBudget;
-            tripApprove.budgetInfo = budgets;
-        }
-    }
+    // if (tripApprove.status == EApproveStatus.WAIT_APPROVE && tripApprove.query && isHasPermissionApprove) {
+    //     $loading.reset();
+    //     $loading.start({
+    //         template: '预算计算中...'
+    //     });
+    //     //计算最终预算
+    //     API.require("travelBudget");
+    //     await API.onload();
+    //     let query = tripApprove.query;
+    //
+    //     if (typeof query == 'string')
+    //         query = JSON.parse(tripApprove.query);
+    //
+    //     query.staffId = tripApprove.account.id;
+    //     let budgetId = await API.travelBudget.getTravelPolicyBudget(query);
+    //     $scope.budgetId = budgetId;
+    //     let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
+    //     let budgets = budgetInfo.budgets;
+    //
+    //     totalBudget = 0;
+    //     budgets.forEach((v) => {
+    //         if (v.price <= 0) {
+    //             totalBudget = -1;
+    //             return;
+    //         }
+    //         totalBudget += Number(v.price);
+    //     });
+    //
+    //     if (totalBudget > tripApprove.budget) {
+    //         tripApprove.budget = totalBudget;
+    //         tripApprove.budgetInfo = budgets;
+    //     }
+    // }
 
     let traffic = [], hotel = [], subsidy = [];
     let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
@@ -115,13 +116,11 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.hotelBudget = hotelBudget;
     $scope.subsidyBudget = subsidyBudget;
     $scope.subsidyDays = subsidyDays;
-
-
     $loading.end();
-
 
     async function approve(result: EApproveResult, approveRemark?: string) {
         try{
+            $scope.budgetId = '1471529270884Z4xl6y';
             await tripApprove.approve({approveResult: result, isNextApprove: $scope.isNextApprove || false, nextApproveUserId: tripApprove.approveUser.id, approveRemark: approveRemark, budgetId: $scope.budgetId});
             if(result == EApproveResult.PASS) {
                 window.location.href = "#/trip-approval/approved?staffId="+tripApprove.account.id;
@@ -193,6 +192,42 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         })
     };
 
+    $scope.showApproveDetails = async function() {
+        $loading.reset();
+        $loading.start({
+            template: '请稍后...'
+        });
+        let APPROVE_LOG_TEXT = {};
+        APPROVE_LOG_TEXT[EApproveResult.AUTO_APPROVE] = '自动通过';
+        APPROVE_LOG_TEXT[EApproveResult.PASS] = '审批通过';
+        APPROVE_LOG_TEXT[EApproveResult.REJECT] = '审批驳回';
+        APPROVE_LOG_TEXT[EApproveResult.WAIT_APPROVE] = '等待审批';
+        $scope.APPROVE_LOG_TEXT = APPROVE_LOG_TEXT;
+
+        let logs = await tripApprove.getApproveLogs();
+        logs = await Promise.all(logs.map(async (a) => {
+            a.staff = await Models.staff.get(a.userId);
+            return a;
+        }));
+        $scope.logs = logs;
+        $ionicPopup.show({
+            template: `<ion-list>
+                            <ion-item ng-repeat="item in logs track by $index" style="border: none;line-height: 20px;height: 90px;border-top: 1px #808080 solid">
+                                <div><span>{{APPROVE_LOG_TEXT[item.approveStatus]}}</span><span style="float: right">{{item.staff.name}}</span></div>
+                                <div ng-if="item.approveStatus==EApproveResult.REJECT">{{item.remark || "无"}}</div>
+                                <div style="position: absolute;bottom: 10px;color: grey;">{{item.createdAt|date: 'yyyy-MM-dd hh:mm:ss'}}</div>
+                            </ion-item>
+                       </ion-list>`,
+            title: '审批详情',
+            scope: $scope,
+            buttons: [{
+                text: '确定',
+                type: 'button-positive'
+            }]
+        });
+        $loading.end();
+    };
+
     $scope.confirmButton = function() {
         $scope.isConfirm = true;
         $scope.isNextApprove = false;
@@ -204,6 +239,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         $scope.staffSelector = {
             query: async function(keyword) {
                 let staff = await Staff.getCurrent();
+                let approveStaffId = $scope.tripApprove.account.id;
                 let staffs = await staff.company.getStaffs({where: {id: {$ne: staff.id}}});
                 return staffs;
             },
@@ -221,6 +257,37 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         approve(EApproveResult.PASS);
     };
 
+    $scope.reCommitTripApprove = async function() {
+        let tripApprove = $scope.tripApprove;
+        let tripDetails = $scope.budgets;
+        let trip: any = {
+            regenerate: true,
+            traffic: tripApprove.isNeedTraffic,
+            round: tripApprove.isRoundTrip,
+            hotel: tripApprove.isNeedHotel,
+            beginDate: moment(tripApprove.startAt).toDate(),
+            endDate: moment(tripApprove.backAt).toDate(),
+            place: {id: tripApprove.arrivalCityCode, name: tripApprove.arrivalCity},
+            reasonName: {id: undefined, name: tripApprove.title},
+            reason: tripApprove.title,
+            hotelPlaceObj: {}
+        };
+        // trip.hotelPlaceObj.title = trip.hotelPlaceName
+
+        if(tripApprove.isRoundTrip)
+            trip.fromPlace = {id: tripApprove.deptCityCode, name: tripApprove.deptCity};
+
+        if(tripApprove.isNeedHotel) {
+            trip.hotelPlace = tripApprove.arrivalCityCode || '';
+            trip.hotelPlaceName = tripApprove.arrivalCity || '';
+        }
+
+        console.info(tripApprove.query);
+        console.info(tripApprove.budgetInfo);
+        await $storage.local.set('trip', trip);
+        window.location.href="#/trip/create";
+    };
+
 }
 
 export async function ListController($scope, Models, $stateParams, $ionicLoading){
@@ -235,7 +302,7 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
     
     $scope.changeTo = async function(filter) {
         $scope.tripApproves = [];
-        if (['WAIT_APPROVE', 'ALL', 'APPROVE_PASS', 'APPROVE_FAIL'].indexOf(filter) >= 0) {
+        if (['WAIT_APPROVE', 'ALL', 'APPROVE_PASS', 'APPROVE_FAIL', 'APPROVING'].indexOf(filter) >= 0) {
             $scope.filter = filter;
         }
         let status: string|number|Object = 'ALL';
@@ -243,9 +310,12 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
             case 'WAIT_APPROVE': status = EApproveStatus.WAIT_APPROVE; break;
             case 'APPROVE_PASS': status = EApproveStatus.PASS; break;
             case 'APPROVE_FAIL': status = EApproveStatus.REJECT; break;
+            case 'APPROVING': status = EApproveStatus.WAIT_APPROVE; break;
         }
         let where: any = {};
         if (status != 'ALL') where.status = status;
+        if(filter == 'ALL' || filter == 'APPROVING')
+            where.isApproving = true;
         Pager = await staff.getTripApprovesByApproverUser({ where: where, limit: ONE_PAGE_LIMIT}); //获取待审批出差计划列表
         Pager.forEach(function(v) {
             $scope.tripApproves.push(v);
@@ -283,6 +353,7 @@ export async function ListController($scope, Models, $stateParams, $ionicLoading
 }
 
 export async function PendingController($scope, $stateParams){
+    require('./trip-approval.scss');
     const PAGE_SIZE = 10;
     let staff = await Staff.getCurrent();
     let tripApproves = [];
@@ -292,8 +363,29 @@ export async function PendingController($scope, $stateParams){
     $scope.tripApproves = tripApproves;
 
     $scope.Pager = Pager;
+    $scope.filter = 'ALL';
     $scope.EApproveStatus = EApproveStatus;
-    console.info($scope.tripApproves);
+    $scope.tripApproves = [];
+
+    $scope.changeTo = async function(filter) {
+        $scope.tripApproves = [];
+        if (['WAIT_APPROVE', 'ALL', 'APPROVE_FAIL'].indexOf(filter) >= 0) {
+            $scope.filter = filter;
+        }
+        let status: any = {$ne: EApproveStatus.CANCEL};
+        switch(filter) {
+            case 'ALL': status = {$ne: EApproveStatus.CANCEL};break;
+            case 'WAIT_APPROVE': status = EApproveStatus.WAIT_APPROVE; break;
+            case 'APPROVE_FAIL': status = EApproveStatus.REJECT; break;
+        }
+        let where: any = {status: status};
+        Pager = await staff.getTripApproves({ where: where, limit: PAGE_SIZE}); //获取待审批出差计划列表
+        Pager.forEach(function(v) {
+            $scope.tripApproves.push(v);
+        })
+    };
+
+    await $scope.changeTo($scope.filter);
 
     $scope.enterDetail = function(approveId){
         window.location.href = `#/trip-approval/detail?approveId=${approveId}`;

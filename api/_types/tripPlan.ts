@@ -33,7 +33,7 @@ export enum EApproveResult {
     WAIT_APPROVE = 0, //等待审批
     AUTO_APPROVE = 1, //自动审批
     PASS = 2, //审批通过
-    REJECT = 0 //驳回
+    REJECT = 3 //驳回
 }
 
 export enum ETripType {
@@ -471,8 +471,8 @@ export class TripPlanLog extends ModelObject{
     set remark(val: string) {}
 
     @Field({type: Types.INTEGER})
-    get approveStatus(): number { return EApproveResult.NULL; }
-    set approveStatus(val: number) {}
+    get approveStatus(): EApproveResult { return EApproveResult.NULL; }
+    set approveStatus(val: EApproveResult) {}
 }
 
 @Table(Models.tripApprove, 'tripPlan.')
@@ -591,5 +591,14 @@ export class TripApprove extends ModelObject{
     approve(params: {auditResult: EAuditStatus, auditRemark?: string, budgetId?: string, id?: string}): Promise<boolean> {
         params.id = this.id;
         return API.tripPlan.approveTripPlan(params);
+    }
+
+    getApproveLogs(options?: any): Promise<PaginateInterface<TripPlanLog>> {
+        if(!options) options = {where: {}};
+        if(!options.where) options.where = {};
+        options.where.tripPlanId = this.id;
+        options.where.approveStatus = {$ne: EApproveResult.NULL};
+        options.order = [['created_at', 'desc']];
+        return Models.tripPlanLog.find(options);
     }
 }
