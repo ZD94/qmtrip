@@ -12,18 +12,15 @@ const L = require("common/language");
 const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
+import _ = require("lodash");
+import {IFinalTicket, ITicket, TravelBudgeItem} from "../_types/travelBudget";
+import {CommonTicketStrategy, HighestPriceTicketStrategy, CommonHotelStrategy} from "./strategy/index";
 
 const defaultPrice = {
     "5": 500,
     "4": 450,
     "3": 400,
     "2": 350
-}
-
-interface TravelBudgeItem {
-    price: number;
-    type?: EInvoiceType;
-    tripType?: ETripType;
 }
 
 interface BudgetOptions{
@@ -227,21 +224,17 @@ class ApiTravelBudget {
         if (!Boolean(cityId)) {
             throw L.ERR.CITY_NOT_EXIST();
         }
-
         if (!checkInDate || !validate.isDate(checkInDate)) {
             throw L.ERR.CHECK_IN_DATE_FORMAT_ERROR();
         }
-
         if (!checkOutDate || !validate.isDate(checkOutDate)) {
             throw L.ERR.CHECK_OUT_DATE_FORMAT_ERROR();
         }
-
         if (new Date(checkOutDate) < new Date(checkInDate)) {
             throw {code: -1, msg: "离开日期大于入住日期"};
         }
         let days = moment(checkOutDate).diff(checkInDate, 'days');
 
-        // let staff = await API.staff.getStaff({id: accountId});
         var staff = await Staff.getCurrent();
         if (!staff || !staff["travelPolicyId"]) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
@@ -265,25 +258,28 @@ class ApiTravelBudget {
         if(policy.hotelLevel){
             hotelStar = policy.hotelLevel;
         }
+        let gps = [];
+        if (/,/g.test(businessDistrict)) {
+            gps = businessDistrict.split(/,/);
+        } else {
+            let obj = API.plae.getCityInfo({cityCode: businessDistrict});
+            gps = [obj.latitude, obj.longitude];
+        }
 
-        let data = {
+        let qs = {
             maxMoney: policy.hotelPrice,
-            hotelStar: hotelStar,
+            star: hotelStar,
             cityId: cityId,
+            latitude: gps[0],
+            longitude: gps[1],
             businessDistrict: businessDistrict,
             checkInDate: checkInDate,
             checkOutDate: checkOutDate
         }
 
-        let budget = await API.travelbudget.getHotelBudget(data);
-        if (!budget.price || budget.price < 0) {
-            days = days<= 0 ? 1 :days;
-            if (policy.hotelPrice) {
-                budget = {price: policy.hotelPrice * days, type: EInvoiceType.HOTEL} as TravelBudgeItem;
-            } else {
-                budget = {price: defaultPrice[hotelStar] * days, type: EInvoiceType.HOTEL} as TravelBudgeItem;
-            }
-        }
+        let hotels = await API.hotel.search_hotels(qs);
+        let strategy = new CommonHotelStrategy(hotels, cache);
+        let budget = await strategy.getResult(qs);
         budget.type = EInvoiceType.HOTEL;
         return budget;
     }
@@ -316,9 +312,7 @@ class ApiTravelBudget {
         }
 
         //查询员工信息
-        // staff.travelPolicyId = "dc6f4e50-a9f2-11e5-a9a3-9ff0188d1c1a";
         let staff = await Staff.getCurrent();
-
         if (!staff || !staff['travelPolicyId']) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
@@ -354,17 +348,70 @@ class ApiTravelBudget {
         }
 
         let companyPolicy = staff.company.budgetPolicy;
-        let budget = await API.travelbudget.getTrafficBudget({
-                        originPlace: originPlace,
-                        destinationPlace: destinationPlace,
-                        leaveDate: leaveDate,
-                        leaveTime: leaveTime,
-                        cabinClass: cabinClass,
-                        trainCabinClass: trainCabinClass,
-                        policy: companyPolicy
-                    }) as TravelBudgeItem;
+        let m_originCity = await API.place.getCityInfo({cityCode: originPlace});
+        let m_destination = await API.place.getCityInfo({cityCode: destinationPlace});
 
-        return budget;
+        let flightTickets:ITicket[] = [];
+        if (m_originCity.skyCode && m_destination.skyCode) {
+            flightTickets = await API.flight.search_ticket({
+                originPlace: m_originCity,
+                destination: m_destination,
+                leaveDate: leaveDate,
+                cabin: cabinClass
+            });
+        }
+
+        let trainTickets = await API.train.search_ticket( {
+            originPlace: m_originCity,
+            destination: m_destination,
+            leaveDate: leaveDate,
+            cabin: trainCabinClass
+        });
+
+        let strategySwitcher = {
+            default: CommonTicketStrategy,
+            bmw: HighestPriceTicketStrategy
+        }
+
+        let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
+        console.info('选择的策略是:', companyPolicy);
+        let strategy = new strategySwitcher[companyPolicy](tickets, cache);
+        return strategy.getResult(params)
+    }
+
+    @clientExport
+    static async reportBudgetError(params: { budgetId: string}) {
+        let {accountId} = Zone.current.get('session');
+        let {budgetId} = params;
+        let content = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: accountId});
+        let budgets = content.budgets;
+        let fs = require("fs");
+        let d = new Date();
+        let prefix = `${d.getFullYear()}${d.getMonth()+1}${d.getDate()}${d.getHours()}${d.getMinutes()}`
+        let ps = budgets.map( async (budget): Promise<any> => {
+            if (!budget.id) {
+                return true;
+            }
+            let originData = await cache.read(`${budget.id}:data`);
+            return Promise.all([
+                new Promise( (resolve, reject) => {
+                    //原始数据
+                    fs.writeFile(`./tmp/${prefix}-${accountId}-${budgetId}-${budget.id}-data.json`, JSON.stringify(originData), function(err) {
+                        if (err) return reject(err);
+                        resolve(true);
+                    });
+                }),
+                new Promise( (resolve, reject) => {
+                    //预算结果
+                    fs.writeFile(`./tmp/${prefix}-${accountId}-${budgetId}-${budget.id}-result.json`, JSON.stringify(budget), function(err) {
+                        if (err) return reject(err);
+                        resolve(true);
+                    })
+                })
+            ])
+        });
+        await Promise.all(ps);
+        return true;
     }
 }
 
