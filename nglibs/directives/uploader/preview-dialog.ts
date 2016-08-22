@@ -10,19 +10,23 @@ export function showPreviewDialog($scope, ngModalDlg, files, title): Promise<any
     });
 }
 
-function previewImageController($scope){
+async function previewImageController($scope, $element){
     var files = $scope.files;
 
-    for(var file of files){
-        previewImage(file)
-            .then(function(canvas){
-                insertPreviewElement(canvas);
-            })
+    $scope.canvases = await Promise.all(files.map(loadImageAsCanvas));
+
+    var $el = $element.find(".preview_img");
+    for(let canvas of $scope.canvases){
+        $el.append(canvas);
     }
 
-    function insertPreviewElement(element) {
-        var $el = $($scope.modal.modalEl);
-        $el.find(".preview_img").append(element);
+    $scope.confirm = function(){
+        var results = Promise.all($scope.canvases.map(function(canvas){
+            return new Promise(function(resolve){
+                canvas.toBlob(resolve);
+            });
+        }));
+        $scope.confirmModal(results);
     }
 }
 
@@ -34,13 +38,15 @@ async function loadImage(url){
             img.onload = function() {
                 resolve(img);
             };
+            img.onerror = reject;
             img.src = reader.result;
         };
+        reader.onerror = reject;
         reader.readAsDataURL(url);
     });
 }
 
-async function previewImage(url) {
+async function loadImageAsCanvas(url) {
     var [img] = await Promise.all([
         loadImage(url),
         dyload('/script/libs/bundle.img.js')
