@@ -821,6 +821,7 @@ export async function TravelpolicyController($scope, Models, $location) {
 }
 
 export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory) {
+    require('./editpolicy.scss');
     var staff = await Staff.getCurrent();
     var travelPolicy;
     if ($stateParams.policyId) {
