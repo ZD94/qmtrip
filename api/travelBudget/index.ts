@@ -13,7 +13,7 @@ const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
-import {IFinalTicket, ITicket, TravelBudgeItem} from "../_types/travelBudget";
+import {ITicket, TravelBudgeItem} from "../_types/travelBudget";
 import {CommonTicketStrategy, HighestPriceTicketStrategy, CommonHotelStrategy} from "./strategy/index";
 
 const defaultPrice = {
@@ -158,7 +158,8 @@ class ApiTravelBudget {
                             originPlace: destinationPlace,
                             destinationPlace: originPlace,
                             leaveDate: goBackDate,
-                            leaveTime: goBackTime
+                            leaveTime: '09:00',
+                            latestArrivalTime: goBackTime
                         });
                         budget.tripType = ETripType.BACK_TRIP;
                         budgets.push(budget);
@@ -296,7 +297,7 @@ class ApiTravelBudget {
      */
     @clientExport
     static async getTrafficBudget(params: {originPlace: string, destinationPlace: string,
-        leaveDate: Date | string, leaveTime: string}) : Promise<TravelBudgeItem> {
+        leaveDate: Date | string, leaveTime?: string, latestArrivalTime?: string}) : Promise<TravelBudgeItem> {
         let {originPlace, destinationPlace, leaveDate, leaveTime} = params;
 
         if (!destinationPlace) {
@@ -352,7 +353,7 @@ class ApiTravelBudget {
         let m_destination = await API.place.getCityInfo({cityCode: destinationPlace});
 
         let flightTickets:ITicket[] = [];
-        if (m_originCity.skyCode && m_destination.skyCode) {
+        if (m_originCity && m_destination) {
             flightTickets = await API.flight.search_ticket({
                 originPlace: m_originCity,
                 destination: m_destination,
