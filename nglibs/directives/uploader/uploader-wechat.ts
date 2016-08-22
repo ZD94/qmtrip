@@ -21,9 +21,13 @@ function wxUploadImage(option){
 }
 
 export function wechatUploaderController($scope, $element, $transclude, $ionicModal, $ionicPopup, $loading) {
-    $transclude($scope, function(clone) {
-        $element.append(clone);
+    var template = require('./preview-dialog.html');
+    $scope.modal = $ionicModal.fromTemplate(template, {
+        scope: $scope,
+        animation: 'slide-in-up',
+        focusFirstInput: true
     });
+    $transclude($scope, function(clone) {$element.append(clone);});
     $element.click(function(){
         wxChooseImage({
             // count: 1, // 默认9

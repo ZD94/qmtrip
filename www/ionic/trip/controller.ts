@@ -326,7 +326,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
 
     $scope.totalPrice = totalPrice;
     let duringDays = moment(trip.endDate).diff(moment(trip.beginDate), 'days');
-    $scope.duringDays = duringDays;
+    $scope.duringDays = duringDays + 1;
     $scope.budgets = budgets;
     $scope.EInvoiceType = EInvoiceType;
     $scope.ETripType = ETripType;
@@ -364,6 +364,18 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         } finally {
             $ionicLoading.hide();
         }
+    }
+
+    //我要报错
+    $scope.reportBudgetError = function() {
+        let id = $stateParams.id;
+        API.travelBudget.reportBudgetError({budgetId: id})
+            .then( (ret) => {
+                $scope.showErrorMsg(`感谢您的反馈,我们会在最短时间内处理`);
+            })
+            .catch((err) =>{
+                alert(err.msg ||err);
+            })
     }
 }
 
