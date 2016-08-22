@@ -84,7 +84,9 @@
                     </div>
                 </ion-list>
             </ion-scroll>
+
             <div class="button-bar">
+                <a class="button" ng-click="reportBudgetError()">我要报错</a>
                 <a ng-if="totalPrice>0" ng-click="saveTripPlan()" id="page16-button56" class="button button-positive">预算提交审批</a>
                 <a ng-if="totalPrice <= 0" id="page16-button57" class="button button-">暂无预算无法提交审批</a>
                 <!--<a href="#/trip/create" id="page16-button58" class="button button-light  button-block button-outline">取消</a>-->
