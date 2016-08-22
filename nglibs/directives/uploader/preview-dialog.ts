@@ -1,59 +1,24 @@
 
 var dyload = require('dyload');
 
-export function showPreviewDialog($scope, $ionicModal, file): Promise<any>{
-    var template = require('./preview-dialog.html');
-    $scope.modal = $ionicModal.fromTemplate(template, {
-        scope: $scope,
-        animation: 'slide-in-up',
-        focusFirstInput: true
+export function showPreviewDialog($scope, ngModalDlg, files, title): Promise<any>{
+    return ngModalDlg.createDialog({
+        parent: $scope,
+        scope: {files, title},
+        template: require('./preview-dialog.html'),
+        controller: previewImageController
     });
+}
 
-    $scope.$on('$destroy', function() {
-    });
-    $scope.$on('modal.shown', function() {
-    });
-    $scope.$on('modal.hidden', function() {
-        $scope.modal.remove();
-    });
-    $scope.$on('modal.removed', function() {
-    });
+function previewImageController($scope){
+    var files = $scope.files;
 
-    if (typeof file == 'string') {
-        var img = $('<img src="' + file + '"/>');
-        insertPreviewElement(img);
-    }else if(Array.isArray(file) && file.length > 0){
-        for(var f in file){
-            if(file[f]._file){
-                previewImage(file[f]._file)
-                    .then(function(canvas){
-                        insertPreviewElement(canvas);
-                    })
-            }else{
-                var img = $('<img src="' + file[f] + '"/>');
-                insertPreviewElement(img);
-            }
-        }
-    } else {
-        previewImage(file._file)
+    for(var file of files){
+        previewImage(file)
             .then(function(canvas){
                 insertPreviewElement(canvas);
             })
-            //.catch(function(err){
-            //});
     }
-
-    return new Promise(function(resolve, reject){
-        $scope.cancelModal = function(){
-            // resolve();
-            $scope.modal.hide();
-        }
-        $scope.confirmModal = function(){
-            resolve(file);
-            $scope.modal.hide();
-        }
-        $scope.modal.show();
-    });
 
     function insertPreviewElement(element) {
         var $el = $($scope.modal.modalEl);

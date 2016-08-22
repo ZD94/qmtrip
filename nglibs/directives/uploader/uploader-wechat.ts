@@ -20,13 +20,7 @@ function wxUploadImage(option){
     })
 }
 
-export function wechatUploaderController($scope, $element, $transclude, $ionicModal, $ionicPopup, $loading) {
-    var template = require('./preview-dialog.html');
-    $scope.modal = $ionicModal.fromTemplate(template, {
-        scope: $scope,
-        animation: 'slide-in-up',
-        focusFirstInput: true
-    });
+export function wechatUploaderController($scope, $element, $transclude, ngModalDlg, $ionicPopup, $loading) {
     $transclude($scope, function(clone) {$element.append(clone);});
     $element.click(function(){
         wxChooseImage({
@@ -36,31 +30,20 @@ export function wechatUploaderController($scope, $element, $transclude, $ionicMo
         })
             .then(function(res:any){
                 var fileLocalIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
-                return showPreviewDialog($scope, $ionicModal, fileLocalIds);
+                return showPreviewDialog($scope, ngModalDlg, fileLocalIds, $scope.title);
             })
             .then(async function(fileLocalIds){
                 $loading.start();
-                if(Array.isArray(fileLocalIds) && fileLocalIds.length > 0){
-                    var p = fileLocalIds.map(function(f){
-                        return wxUploadImage({
+                var p = fileLocalIds.map(function(f){
+                    return wxUploadImage({
                             localId: f, // 需要上传的图片的本地ID，由chooseImage接口获得
                             isShowProgressTips: 1, // 默认为1，显示进度提示
                         })
-                            .then(function (res: any) {
-                                return res.serverId; // 返回图片的服务器端ID
-                            })
-                    })
-                    return Promise.all(p)
-                        .then(function(serverIds){
-                            return serverIds;
+                        .then(function (res: any) {
+                            return res.serverId; // 返回图片的服务器端ID
                         })
-                }else{
-                    $loading.end();
-                    var msg = $ionicPopup.alert({
-                        title: '提示',
-                        template: '参数格式错误'
-                    });
-                }
+                })
+                return Promise.all(p);
             })
             .then(function (serverIds) {
                 // 返回图片的服务器端ID

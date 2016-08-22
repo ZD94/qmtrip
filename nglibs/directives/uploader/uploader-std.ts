@@ -1,47 +1,38 @@
 
 import { showPreviewDialog } from './preview-dialog';
 
-export function stdUploaderController($scope, $ionicModal, $element, $transclude, $loading, FileUploader) {
+export function stdUploaderController($scope, ngModalDlg, $element, $transclude, $loading, FileUploader) {
     $element.css('position', 'relative');
     $transclude($scope, function(clone) {
         $element.append(clone);
     });
     var fileIds = [];
-    var uploader = new FileUploader({
+    var uploader = $scope.uploader = new FileUploader({
         url: $scope.url || '/upload/ajax-upload-file?type=image',
         alias: $scope.name || 'tmpFile',
         autoUpload: false
     });
     uploader.onAfterAddingAll = async function(files) {
-        //此处应该清除uploader队列否则之前取消的图片会被传上去
-        var sparefiles = uploader.queue.length-files.length;
-        if(sparefiles > 0){
-            /*for(var i = 0;i<sparefiles;i++){
-                uploader.removeFromQueue(i);
-            }*/
-            uploader.queue = uploader.queue.slice(sparefiles);//截取数组
-        }
-
-        showPreviewDialog($scope, $ionicModal, files)
-            .then(function() {
+        var urls = files.map((file)=>file._file)
+        showPreviewDialog($scope, ngModalDlg, urls, $scope.title)
+            .then(function(files) {
+                if(!files){
+                    uploader.clearQueue();
+                    return;
+                }
                 $loading.start();
                 uploader.uploadAll();
             });
     };
-
     uploader.onCompleteItem  = function (file, response, status, headers) {
         fileIds.push(response.fileId);
         // $scope.done()(response);
         // $loading.end();
     };
-
     uploader.onCompleteAll  = function (file, response, status, headers) {
         console.info(fileIds);
         var obj = {ret: 0, errMsg: "", fileId: fileIds}
         $scope.done()(obj);
         $loading.end();
     };
-
-
-    $scope.uploader = uploader;
 }
