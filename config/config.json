@@ -70,5 +70,6 @@
     "is_send_message": true,
     "is_send_wechat": true,
     "is_send_email": true
-  }
+  },
+  "score_ratio": 1
 }

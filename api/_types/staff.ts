@@ -9,7 +9,16 @@ import { getSession } from 'common/model';
 import { TableExtends, Table, Create, Field, ResolveRef, Reference } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 import {PaginateInterface} from "../../common/model/interface";
+import utils = require("common/utils");
+
+
 declare var API: any;
+
+
+export enum EInvitedLinkStatus {
+    ACTIVE = 1,
+    FORBIDDEN = 0
+};
 
 export enum EStaffStatus {
     FORBIDDEN = 0,
@@ -136,6 +145,39 @@ export class Staff extends ModelObject implements Account {
         return API.tripPlan.getTripPlanSave({accountId: this.id});
     }
 
+    async modifyMobile(params){
+        if(!this.isLocal){
+            API.require('staff');
+            await API.onload();
+        }
+        params.id = this.id;
+        return API.staff.modifyMobile(params);
+    }
+    
+    async modifyEmail(params){
+        if(!this.isLocal){
+            API.require('staff');
+            await API.onload();
+        }
+        params.id = this.id;
+        return API.staff.modifyEmail(params);
+    }
+
+    async modifyPwd(params){
+        if(!this.isLocal){
+            API.require('staff');
+            await API.onload();
+        }
+        params.id = this.id;
+        return API.staff.modifyPwd(params);
+    }
+
+    /*async createInvitedLink(){
+        var invitedLink = InvitedLink.create();
+        invitedLink = await invitedLink.save();
+        return {GoInvitedLink:GoInvitedLink + "?staffId = "+invitedLink.staff.id, invitedLink: invitedLink};
+    }*/
+
     //Account properties:
     email: string;
     mobile: string;
@@ -149,8 +191,11 @@ export class Staff extends ModelObject implements Account {
     pwdToken: string;
     oldQrcodeToken: string;
     qrcodeToken: string;
+    checkcodeToken: string;
     type: EAccountType;
     isFirstLogin: boolean;
+    isValidateMobile: boolean;
+    isValidateEmail: boolean;
 }
 
 @Table(Models.credential, "staff.")
@@ -226,6 +271,40 @@ export class PointChange extends ModelObject{
     @Field({type: Types.TEXT})
     get remark(): string {return null}
     set remark(remark: string){}
+
+}
+
+@Table(Models.invitedLink, "staff.")
+export class InvitedLink extends ModelObject{
+    constructor(target: Object) {
+        super(target);
+    }
+    @Create()
+    static create(obj?: Object): InvitedLink { return null; }
+
+    @Field({type: Types.UUID})
+    get id(): string { return Values.UUIDV1(); }
+    set id(val: string) {}
+
+    @ResolveRef({type: Types.UUID}, Models.staff)
+    get staff(): Staff { return null; }
+    set staff(val: Staff) {}
+
+    @Field({type: Types.DATE})
+    get expiresTime(): Date { return null; }
+    set expiresTime(val: Date) {}
+
+    @Field({type: Types.INTEGER, defaultValue: EInvitedLinkStatus.ACTIVE})
+    get status(): EInvitedLinkStatus {return EInvitedLinkStatus.ACTIVE}
+    set status(status: EInvitedLinkStatus){}
+
+    @Field({type: Types.STRING})
+    get goInvitedLink(): string { return ''; }
+    set goInvitedLink(val: string) {}
+
+    @Field({type:Types.STRING})
+    get linkToken(): string { return null; }
+    set linkToken(linkToken: string){}
 
 }
 

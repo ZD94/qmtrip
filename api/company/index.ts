@@ -19,7 +19,7 @@ import {Agency, AgencyUser, EAgencyUserRole} from "api/_types/agency";
 import {Department} from "api/_types/department";
 import {requirePermit, conditionDecorator, condition, modelNotNull} from "api/_decorator";
 import {md5} from "common/utils";
-import {FindResult} from "common/model/interface";
+import { FindResult, PaginateInterface } from "common/model/interface";
 
 class CompanyModule {
     /**
@@ -51,7 +51,7 @@ class CompanyModule {
      * @param params.name 企业名字
      * @param params.email 企业邮箱
      * @param params.userName 企业创建人姓名
-     * @param params.pwd 登陆密码
+     * @param params.pwd 登录密码
      * @param params.remark 备注
      * @param params.description 企业描述
      * @returns {Promise<Company>}
@@ -89,6 +89,7 @@ class CompanyModule {
         let staff = Staff.create({email: params.email, name: params.userName, mobile: params.mobile, roleId: EStaffRole.OWNER, pwd: md5(pwd), status: params.status});
         let company = Company.create(params);
         company.domainName = domain;
+        company.isApproveOpen = true;
         let department = Department.create({name: "我的企业", isDefault: true});
 
         department.company = company;
@@ -159,7 +160,7 @@ class CompanyModule {
         return {ids: ids, count: companies['total']};
     }
     
-    static async getCompanyNoAgency() {
+    static async getCompanyNoAgency(): Promise<PaginateInterface<Company> > {
         let agencies = await Models.company.find({where: {agencyId: null}});
         return agencies;
     }

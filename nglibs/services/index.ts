@@ -2,9 +2,11 @@
 import './storage';
 import './loading';
 import './wx-api';
+import './modal-dlg';
 
 import './AirCompany';
 import './Airport';
+import './closePopup';
 
 var dyload = require('dyload');
 function dyloadSerivce(src: string){

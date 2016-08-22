@@ -8,11 +8,13 @@
                 <form class="list">
                     <div class="item item-input">
                         <span class="input-label">选择审批人</span>
-                        <div ng-model="trip.auditUserName"
-                             ng-selector="staffSelector"
-                             ng-selector-title="选择审批人"
-                             ng-selector-placeholder="请选择审批人" class="business_chooese"
-                        ></div>
+                        <ng-selector-list
+                                ng-model="trip.auditUser"
+                                dlg-options="staffSelector"
+                                dlg-title="选择审批人"
+                                dlg-placeholder="请选择审批人"
+                                class="fake-input"
+                        ></ng-selector-list>
                     </div>
                 </form>
 
@@ -24,16 +26,6 @@
                     </ion-item>
                 </ion-list>
 
-                <!--<ion-list>
-                    <ion-item>
-                        出差事由<span class="item-note">{{trip.reason}}</span>
-                    </ion-item>
-                </ion-list>
-                <div class="spacer" style="width: 285px; height: 17px;"></div>
-                <ion-list>
-                    <ion-item>{{trip.beginDate| date: 'MM-dd'}} 至 {{trip.endDate | date: 'MM-dd'}}
-                        <br>总预算：{{totalPrice == -1 ? '暂无预算' : (totalPrice| currency: '')+'元'}}</ion-item>
-                </ion-list>-->
                 <div class="spacer" style="width: 285px; height: 17px;"></div>
                 <ion-list>
                     <div ng-repeat="budget in budgets">
@@ -57,6 +49,7 @@
                             <br/> {{budget.type == EInvoiceType.TRAIN ? budget.cabinClass : (MTxPlaneLevel[budget.cabinClass ]? MTxPlaneLevel[budget.cabinClass] : "")}}
                             <!--{{MTxPlaneLevel[budget.cabinClass]?MTxPlaneLevel[budget.cabinClass]:""}}-->
                             <br/>{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')+'元'}}
+                            <br/><span ng-if="budget.discount">折扣：{{budget.discount}}</span>
                         </ion-item>
 
                         <ion-item ng-if="budget.tripType == ETripType.HOTEL">
@@ -70,7 +63,7 @@
                         </ion-item>
 
                         <ion-item ng-if="budget.tripType == ETripType.SUBSIDY">
-                            <span>{{trip.beginDate | date: 'MM-dd'}}至{{trip.endDate | date: 'MM-dd'}} 共{{duringDays}}天</span>
+                            <span>{{trip.beginDate | date: 'MM-dd'}}至{{trip.endDate | date: 'MM-dd'}} 共{{duringDays+1}}天</span>
                             <br/>
                             {{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')+'元'}}
                         </ion-item>
@@ -86,6 +79,7 @@
                             <br/> {{budget.type == EInvoiceType.TRAIN ? budget.cabinClass : (MTxPlaneLevel[budget.cabinClass ]? MTxPlaneLevel[budget.cabinClass] : "")}}
                             <!--{{MTxPlaneLevel[budget.cabinClass]?MTxPlaneLevel[budget.cabinClass]:""}}-->
                             <br/>{{budget.price == -1 ? '暂无预算' : (budget.price| currency: '')+'元'}}
+                            <br/><span ng-if="budget.discount">折扣：{{budget.discount}}</span>
                         </ion-item>
                     </div>
                 </ion-list>

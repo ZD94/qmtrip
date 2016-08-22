@@ -1,0 +1,130 @@
+.JingliLogin{
+  .logo_title{
+    margin: 50px auto 0;
+    .logo{
+      background: url(/ionic/images/logo.png) no-repeat;
+      background-size: 36px auto;
+      padding-left: 50px;
+      width: 195px;
+      color:#fff;
+      font-size: 36px;
+      height: 36px;
+      line-height: 36px;
+      margin: 0 auto;
+    }
+    .logo_text{
+      background: url(/ionic/images/logo_text.png) center no-repeat;
+      width: 240px;
+      height: 51px;
+      margin: 0 auto;
+      background-size: contain;
+    }
+  }
+  .invited_from{
+    >div{
+      color:#fff;
+      text-align: center;
+      font-size: 16px;
+      &:last-child{
+        background: rgba(255,255,255,.3);
+        height: 50px;
+        line-height: 50px;
+      }
+    }
+  }
+  .widthCodes{
+    padding: 0 0 0 16px;
+    .button{
+      border-radius: 0;
+      &.button-stable{
+        width: 116px;
+      }
+    }
+  }
+  .mention{
+    font-size: 12px;
+    color: #fff;
+    width: 70%;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .join_success{
+    height: 140px;
+    line-height: 140px;
+    color: #fff;
+    font-size: 20px;
+    text-align: center;
+  }
+  .padding-button{
+    padding: 10px;
+  }
+  .attention_wx{
+    height: 230px;
+    p{
+      text-align: center;
+      color: #fff;
+      padding-top: 20px;
+    }
+  }
+  .qrCode{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    p{
+      width: 300px;
+      text-align: center;
+      color: #fff;
+      margin-top: 20px;
+      font-size: 16px;
+    }
+  }
+  .spacer{
+    line-height: 40px;
+    a{
+      color: #fff;
+    }
+  }
+}
+.showAlert{
+  .popup{
+    border-radius: 5px;
+    .popupDiv{
+      text-align: center;
+      h2{
+        font-size: 20px;
+        margin-top: 0;
+      }
+      p{
+        font-size: 18px;
+      }
+      .item{
+        padding-top: 0;
+        padding-bottom: 0;
+        display: flex;
+        input{
+          flex: 2;
+        }
+        .button{
+          border-radius: 0;
+          flex: 1;
+          line-height: 30px;
+        }
+      }
+    }
+    .ion-checkmark-circled{
+      color: green;
+    }
+  }
+  .popup-buttons{
+    flex-direction: column-reverse;
+    .button{
+      max-width: 185px;
+      min-width: 160px;
+      margin: 0 auto;
+    }
+    .button-outline{
+      margin-top: 10px;
+    }
+  }
+}

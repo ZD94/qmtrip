@@ -13,13 +13,14 @@ node_modules
 /www/*/scss/*.css
 /public/*/less/*.css
 /www/*/less/*.css
+/www/manifest.json
+/www/fonts/font-awesome.css
 *.map
 controller.all.js
 /temp
 /public/temp
 /public/temp/*
 /public/font/font-awesome-*
-
 !public/font/css/icomoon.css
 npm-debug.log
 tools

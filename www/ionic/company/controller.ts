@@ -2,19 +2,21 @@
  * Created by seven on 16/5/9.
  */
 "use strict";
-import {EStaffRole, Staff, EStaffStatus} from "api/_types/staff";
+import {EStaffRole, Staff, EStaffStatus, InvitedLink} from "api/_types/staff";
 import {EPlanStatus, ETripType, EAuditStatus} from 'api/_types/tripPlan';
 import {TravelPolicy, MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 import {Department} from "api/_types/department";
 import {AccordHotel} from "api/_types/accordHotel";
+import {ACCOUNT_STATUS} from "api/_types/auth"
 import validator = require('validator');
 import _ = require('lodash');
-import async = Q.async;
 const moment = require("moment");
 const API = require("common/api");
 var L = require("common/language");
 var msgbox = require('msgbox');
-
+var browserspec = require('browserspec');
+declare var ionic;
+declare var wx:any;
 
 export async function ManagementController($scope, Models) {
     var staff = await Staff.getCurrent();
@@ -30,91 +32,205 @@ export async function ManagementController($scope, Models) {
 }
 
 export async function BudgetController($scope) {
-    let months = [];
-    let monthNow = moment().format('YYYY-MM');
-    months.push({value: monthNow, name: '本月'});
-    $scope.queryMonth = monthNow;
-
-    for(let i=1; i<6; i++) {
-        let month = moment(monthNow).subtract(i, 'months').format('YYYY-MM');
-        months.push({value: month, name: month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月')});
-    }
-
-    $scope.months = months;
-
-    $scope.staffSaves = [];
+    require('./statistics.scss');
     API.require("tripPlan");
     await API.onload();
+    let formatStr = 'YYYY-MM-DD HH:mm:ss';
+    
+    let monthSelection = {
+        month: moment().format('YYYY-MM'),
+        startTime: moment().startOf('month').format(formatStr),
+        endTime: moment().endOf('month').format(formatStr),
+        showStr: `${moment().startOf('month').format('YYYY.MM.DD')}-${moment().endOf('month').format('YYYY.MM.DD')}`
+    };
+    $scope.monthSelection = monthSelection;
 
-    $scope.staffSaves = await API.tripPlan.tripPlanSaveRank({limit: 3});
-    let staff = await Staff.getCurrent();
-    let company = staff.company;
+    $scope.monthChange = async function(isAdd?: boolean) {
+        let optionFun = isAdd ? 'add' : 'subtract';
+        let queryMonth = moment( $scope.monthSelection.month)[optionFun](1, 'month');
+        let monthSelection = {
+            month: queryMonth.format('YYYY-MM'),
+            startTime: queryMonth.startOf('month').format(formatStr),
+            endTime: queryMonth.endOf('month').format(formatStr),
+            showStr: `${queryMonth.startOf('month').format('YYYY.MM.DD')}-${queryMonth.endOf('month').format('YYYY.MM.DD')}`
+        };
+        $scope.monthSelection = monthSelection;
+        await searchData();
+    };
 
     $scope.saveMoneyChart = {};
     $scope.saveMoneyChart.labels = ["本月节省", "本月支出"];
-    $scope.saveMoneyChart.options = {
-        //legend: { display: true }, //图例
-        cutoutPercentage: 70
-    }
-    //$scope.saveMoneyChart.colors = ['#33cd5f', '#387ef5'];
-    $scope.saveMoneyChart.dataset = {
-        backgroundColor: ['#B9C9DB', '#4A90E2'],
-        borderWidth: [1, 1]
-    };
+    $scope.saveMoneyChart.options = {cutoutPercentage: 70};
+    $scope.saveMoneyChart.dataset = {backgroundColor: ['#4A90E2', '#B9C9DB'], borderWidth: [1, 1]};
 
-    await monthChange(monthNow);
+    await searchData();
 
-    async function monthChange(queryMonth) {
-        let statistic = await company.statisticTripPlanOfMonth({month: queryMonth});
-        statistic.month = statistic.month.replace(/(\w{4})\-(\w{1,2})/, '$1年$2月');
+    async function searchData() {
+        let month = $scope.monthSelection;
+        let statistic = await API.tripPlan.statisticTripBudget({startTime: month.startTime, endTime: month.endTime});
         $scope.statistic = statistic;
-
-        $scope.saveMoneyChart.data = [statistic.savedMoney || 0, statistic.dynamicBudget || 1];
-
-        $scope.option1 = {
-            all: statistic.dynamicBudget,
-            cover: statistic.dynamicBudget,
-            title: statistic.dynamicBudget + '元'
-        };
-        $scope.isShow1 = true;
-
-        $scope.option2 = {
-            all: statistic.dynamicBudget,
-            cover: statistic.savedMoney,
-            title: statistic.savedMoney + '元'
-        };
-        $scope.isShow2 = true;
+        $scope.saveMoneyChart.data = [statistic.savedMoney || 0, statistic.expenditure || 1];
     }
-    $scope.monthChange = monthChange;
-
 }
 
-export async function RecordController($scope) {
+export async function BudgetStatisticsController($scope, $stateParams, Models) {
+    require('./statistics.scss');
+    API.require('tripPlan');
+    await API.onload();
+    let type = $stateParams.type;
+    
+    let formatStr = 'YYYY-MM-DD HH:mm:ss';
+    let monthSelection = {
+        type: type,
+        month: moment().format('YYYY-MM'),
+        startTime: moment().startOf('month').format(formatStr),
+        endTime: moment().endOf('month').format(formatStr),
+        showStr: `${moment().startOf('month').format('YYYY.MM.DD')}-${moment().endOf('month').format('YYYY.MM.DD')}`
+    };
+    $scope.monthSelection = monthSelection;
+
+    $scope.monthChange = async function(isAdd?: boolean) {
+        let optionFun = isAdd ? 'add' : 'subtract';
+        let queryMonth = moment( $scope.monthSelection.month)[optionFun](1, 'month');
+        let monthSelection = {
+            type: $scope.monthSelection.type,
+            month: queryMonth.format('YYYY-MM'),
+            startTime: queryMonth.startOf('month').format(formatStr),
+            endTime: queryMonth.endOf('month').format(formatStr),
+            showStr: `${queryMonth.startOf('month').format('YYYY.MM.DD')}-${queryMonth.endOf('month').format('YYYY.MM.DD')}`
+        };
+        $scope.monthSelection = monthSelection;
+        await initData();
+    };
+
+    await searchStatistics(type);
+
+    async function searchStatistics(type) {
+        let modelName = '';
+        let placeholder;
+        let isSActive = false, isPActive = false, isDActive = false;
+
+        switch (type) {
+            case 'S':
+                placeholder='请输入员工姓名';modelName = 'staff';
+                isSActive = true; isPActive = isDActive = false;
+                $scope.showManTimes = '次';
+                break;
+            case 'P':
+                placeholder='请输入项目名称';modelName = 'project';
+                isPActive = true; isSActive = isDActive = false;
+                $scope.showManTimes = '人次';
+                break;
+            case 'D':
+                placeholder='请输入部门名称';modelName = 'department';
+                isDActive = true; isSActive = isPActive = false;
+                $scope.showManTimes = '人次';
+                break;
+            default: break;
+        }
+
+        $scope.isSActive = isSActive;
+        $scope.isPActive = isPActive;
+        $scope.isDActive = isDActive;
+        $scope.modelName = modelName;
+        $scope.placeholder = placeholder;
+        $scope.monthSelection.type = type;
+        await initData();
+    }
+
+    async function initData() {
+        let ret = await API.tripPlan.statisticBudgetsInfo($scope.monthSelection);
+        ret = await Promise.all(ret.map(async (s) => {
+            s.keyInfo = await Models[$scope.modelName].get(s.typeKey);
+            return s;
+        }));
+        $scope.statisticData = ret;
+    }
+
+    $scope.goToStaffRecords = function(name) {
+        window.location.href = `#/company/record?type=${$scope.monthSelection.type}&keyword=${name}`;
+    };
+
+    $scope.searchStatistics = searchStatistics;
+}
+
+export async function RecordController($scope, $stateParams) {
+    require('./company.scss')
+    let keyword = $stateParams.keyword || '';
+    let type = $stateParams.type || null;
     let staff = await Staff.getCurrent();
     let company = staff.company;
     $scope.EPlanStatus = EPlanStatus;
-    $scope.staffName = '';
+
+    let formatStr = 'YYYY-MM-DD HH:mm:ss';
+    let monthSelection = {
+        keyWord: keyword,
+        month: moment().format('YYYY-MM'),
+        startTime: moment().startOf('month').format(formatStr),
+        endTime: moment().endOf('month').format(formatStr),
+        showStr: `${moment().startOf('month').format('YYYY.MM.DD')}-${moment().endOf('month').format('YYYY.MM.DD')}`
+    };
+    $scope.monthSelection = monthSelection;
+
+    $scope.monthChange = async function(isAdd?: boolean) {
+        let optionFun = isAdd ? 'add' : 'subtract';
+        let queryMonth = moment( $scope.monthSelection.month)[optionFun](1, 'month');
+        let monthSelection = {
+            keyWord: $scope.monthSelection.keyWord,
+            month: queryMonth.format('YYYY-MM'),
+            startTime: queryMonth.startOf('month').format(formatStr),
+            endTime: queryMonth.endOf('month').format(formatStr),
+            showStr: `${queryMonth.startOf('month').format('YYYY.MM.DD')}-${queryMonth.endOf('month').format('YYYY.MM.DD')}`
+        };
+        $scope.monthSelection = monthSelection;
+        await searchTripPlans();
+    };
 
     $scope.enterDetail = function(trip){
         if (!trip) return;
-        window.location.href = "#/company/record-detail?tripid="+trip.id;
+        window.location.href = `#/company/record-detail?tripid=${trip.id}`;
     };
 
-    $scope.searchTripPlans = async function(staffName) {
+    async function searchTripPlans(newVal?: string, oldVal?: string) {
+        let monthSelection = $scope.monthSelection;
+        let keyWord = monthSelection.keyWord;
         let status = [EPlanStatus.AUDIT_NOT_PASS, EPlanStatus.AUDITING, EPlanStatus.COMPLETE, EPlanStatus.NO_BUDGET, EPlanStatus.WAIT_COMMIT, EPlanStatus.WAIT_UPLOAD];
         $scope.tripPlans = [];
 
-        var pager = await company.getTripPlans({where: {status: {$in: status}}});
-        if(staffName) {
-            let staffs = await company.getStaffs({where: {name: {$like: '%' + staffName + '%'}}});
-            let ids = staffs.map((s) => s.id);
-            pager = await company.getTripPlans({where: {accountId: ids, status: {$in: status}}});
+        let options: any = {where: {
+            startTime: monthSelection.startTime,
+            endTime: monthSelection.endTime,
+            status: {$in: status}
+        }};
+        
+        if(keyWord) {
+            options.where.$or = [];
+            if(!type || (type == 'P')) //不指定任何检索条件或者指定按项目检索关键字
+                options.where.$or.push({title: {$like: `%${keyWord}%`}});
+
+            let staffOpt: any = {where: {$or: []}};
+
+            if(!type || type == 'D'){
+                let depts = await company.getDepartments({where: {name: {$like: `%${keyWord}%`}}});
+                let deptIds = depts.map((d) => d.id);
+                if(deptIds && deptIds.length > 0)
+                    staffOpt.where.$or.push({departmentId: deptIds});
+            }
+
+            if(!type || type =='S' || type == 'D'){
+                if(!type || type == 'S')
+                    staffOpt.where.$or.push({name: {$like: `%${keyWord}%`}});
+                let staffs = await company.getStaffs(staffOpt);
+                if(staffs && staffs.length > 0)
+                    options.where.$or.push({accountId: staffs.map((s) => s.id)});
+            }
         }
+        var pager = await company.getTripPlans(options);
 
         $scope.pager = pager;
         loadTripPlans(pager);
 
-        var vm = {
+        $scope.vm = {
             isHasNextPage:true,
             nextPage : async function() {
                 try {
@@ -127,9 +243,7 @@ export async function RecordController($scope) {
                 loadTripPlans(pager);
                 $scope.$broadcast('scroll.infiniteScrollComplete');
             }
-        }
-
-        $scope.vm = vm;
+        };
 
         function loadTripPlans(pager) {
             pager.forEach(function(obj){
@@ -137,10 +251,9 @@ export async function RecordController($scope) {
             });
         }
 
+    }
 
-    };
-
-    await $scope.searchTripPlans();
+    $scope.$watch("monthSelection.keyWord", searchTripPlans);
 }
 
 export async function RecordDetailController($scope, Models, $stateParams, $ionicPopup, $ionicLoading){
@@ -166,7 +279,6 @@ export async function RecordDetailController($scope, Models, $stateParams, $ioni
     let budgetId;
     totalBudget = tripPlan.budget as number;
     tripDetails.forEach(function(detail) {
-        console.info("tripDetail==>", detail)
         switch (detail.type) {
             case ETripType.OUT_TRIP:
                 traffic.push(detail);
@@ -389,7 +501,9 @@ export async function DepartmentController($scope, Models, $ionicPopup, $ionicLi
     }
 }
 
+
 export async function StaffsController($scope, Models, $ionicPopup) {
+    require('./company.scss');
     var staff = await Staff.getCurrent();
     $scope.currentStaff = staff;
     $scope.staffs = [];
@@ -490,7 +604,7 @@ export async function StaffsController($scope, Models, $ionicPopup) {
                     onTap: async function (e) {
                         try{
                             var forbidStaff = await Models.staff.get(id);
-                            forbidStaff.status = EStaffStatus.FORBIDDEN;
+                            forbidStaff.status = ACCOUNT_STATUS.FORBIDDEN;
                             forbidStaff.staffStatus = EStaffStatus.FORBIDDEN;//同时修改account和staff两张表会有问题 只会修改一张表
                             await forbidStaff.save();
                             $scope.staffs.splice(index, 1);
@@ -539,7 +653,7 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
     $scope.role = role;
 
     $scope.savestaff = async function () {
-        //标识管理员修改自身权限 修改后要重新登陆
+        //标识管理员修改自身权限 修改后要重新登录
         // var logout = false;
         //标识企业拥有者修改管理员权限
         var ownerModifyAdmin = false;
@@ -569,9 +683,9 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
             if (!validator.isEmail(_staff.email)) {
                 throw L.ERR.EMAIL_FORMAT_INVALID();
             }
-            if(company.domainName && company.domainName != "" && _staff.email.indexOf(company.domainName) == -1){
+            /*if(company.domainName && company.domainName != "" && _staff.email.indexOf(company.domainName) == -1){
                 throw L.ERR.EMAIL_SUFFIX_INVALID();
-            }
+            }*/
 
             if (_staff.mobile && !validator.isMobilePhone(_staff.mobile, 'zh-CN')) {
                 throw L.ERR.MOBILE_NOT_CORRECT();
@@ -604,7 +718,7 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
                         throw L.ERR.MOBILE_HAS_REGISTRY();
                     }
                 }
-                //管理员修改自身权限 修改后要重新登陆
+                //管理员修改自身权限 修改后要重新登录
                 /*if(preRole == EStaffRole.ADMIN && _staff.roleId == EStaffRole.COMMON && currentstaff.id == _staff.id){
                     logout = true;
                 }*/
@@ -640,7 +754,7 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
                 $ionicHistory.goBack(-1);
             }
 
-            //管理员修改自身权限 修改后要重新登陆
+            //管理员修改自身权限 修改后要重新登录
             /*if(logout){
                 //重新登录
                 var nshow = $ionicPopup.show({
@@ -733,9 +847,6 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         await $scope.travelPolicy.save();
         $ionicHistory.goBack(-1);
     }
-    $scope.consoles = function (obj) {
-        console.info(obj);
-    }
 }
 
 
@@ -766,37 +877,35 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
     }
     $scope.accordHotel = accordHotel;
 
+    var accordHotels = await Models.accordHotel.find({where: {companyId: staff.company.id}});
+
+    $scope.city = accordHotel.cityName?{name: accordHotel.cityName}:undefined;
     $scope.placeSelector = {
-        query: queryPlaces,
+        query: async function(keyword){
+            var places = await API.place.queryPlace({keyword: keyword});
+            return places;
+        },
+        display: (item, forList)=>{
+            if(forList){
+                for(let city of accordHotels){
+                    if(city.cityName == item.name)
+                        return item.name + '<span class="item-note">已设置</span>';
+                }
+            }
+            return item.name;
+        },
+        disable: (item)=>{
+            for(let city of accordHotels){
+                if(city.cityName == item.name)
+                    return true;
+            }
+            return false;
+        },
         done: function(val) {
-            $scope.accordHotel.cityCode = val.value;
+            $scope.accordHotel.cityName = val.name;
+            $scope.accordHotel.cityCode = val.id;
         }
     };
-
-    async function queryPlaces(keyword){
-        /*if (!keyword) {
-            let hotCities = $storage.local.get("accord_hot_cities")
-            if (hotCities) {
-                return hotCities;
-            }
-        }*/
-        var places = await API.place.queryPlace({keyword: keyword});
-        /*places = places.map((place)=> {
-            return {name: place.name, value: place.id}
-        });*/
-        places = await Promise.all(places.map(async function(place){
-            var ahs = await Models.accordHotel.find({where: {companyId: staff.company.id, cityCode: place.id}});
-            if(ahs && ahs.length>0){
-                return {name: place.name, value: place.id, haveSet: true}
-            }else{
-                return {name: place.name, value: place.id, haveSet: false}
-            }
-        }))
-        /*if (!keyword) {
-            $storage.local.set('accord_hot_cities', places);
-        }*/
-        return places;
-    }
 
     $scope.saveAccordHotel = async function () {
         if(!$scope.accordHotel.cityName || !$scope.accordHotel.cityName){
@@ -840,4 +949,167 @@ export async function EditaccordhotelController($scope, Models, $storage, $state
             ]
         });
     }
+}
+
+export async function StaffInvitedController($scope, Models, $storage, $stateParams, $ionicHistory, $ionicPopup,ClosePopupService,wxApi){
+    require('./staff-invited.scss');
+    var staff = await Staff.getCurrent();
+    $scope.staff = staff;
+    var now = moment().format('YYYY-MM-DD HH:mm:ss');
+    var invitedLinks = await Models.invitedLink.find({where: {staffId: staff.id, status: 1, expiresTime: {$gt: now}}});
+    var seconds;
+    var time;
+    function transformSeconds(second){
+        var seconds = parseInt(second);//秒
+        var minutes = 0;//分
+        var hours = 0;//小时
+        var newsec,newmin,newhour;
+        clearInterval(time);
+        if(seconds>60){
+            minutes = Math.floor(seconds/60);
+            seconds = Math.floor(seconds%60);
+            if(minutes>60){
+                hours = Math.floor(minutes/60);
+                minutes = Math.floor(minutes%60);
+            }
+        }
+        time = setInterval(function(){
+            if(seconds>0){
+                seconds--;
+            }else{
+                seconds = 59;
+                if(minutes>0){
+                    minutes--;
+                }else{
+                    minutes = 59;
+                    if(hours>0){
+                        hours--;
+                    }else{
+                        $scope.invitedLink = null;
+                        clearInterval(time);
+                    }
+                }
+            }
+            if(seconds<10){
+                newsec = '0'+seconds;
+            }else{
+                newsec = seconds;
+            }
+            if(minutes<10){
+                newmin = '0'+minutes;
+            }else{
+                newmin = minutes;
+            }
+            if(hours<10){
+                newhour = '0'+hours;
+            }else{
+                newhour = hours;
+            }
+            $scope.countdown = newhour+':'+newmin+':'+newsec;
+            $scope.$apply();
+        },1000)
+    }
+    if(invitedLinks && invitedLinks.length > 0){
+        $scope.invitedLink = invitedLinks[0];
+        seconds = moment(invitedLinks[0]['expiresTime']).diff(moment(),'seconds');
+        transformSeconds(seconds);
+        $scope.encodeLink = encodeURIComponent($scope.invitedLink.goInvitedLink);
+        // wx.onMenuShareAppMessage({
+        //     title:'邀请加入企业',
+        //     desc:'公司邀请你加入',
+        //     link:$scope.invitedLink,
+        //     imgUrl:'http://t.jingli365.com/ionic/images/logo.png',
+        //     success: function () {
+        //         // 用户确认分享后执行的回调函数
+        //     },
+        //     cancel: function () {
+        //         // 用户取消分享后执行的回调函数
+        //     }
+        // })
+    }
+    $scope.createLink = async function (){
+        var invitedLink = InvitedLink.create();
+        invitedLink = await invitedLink.save();
+        seconds = moment(invitedLink['expiresTime']).diff(moment(),'seconds');
+        transformSeconds(seconds);
+        $scope.invitedLink = invitedLink;
+        $scope.encodeLink = encodeURIComponent(invitedLink.goInvitedLink);
+    }
+    $scope.stopLink = function(invitedLink){
+        invitedLink.status = 0;
+        invitedLink.save();
+        clearInterval(time);
+        $scope.invitedLink = null;
+    }
+    $scope.copyLink = async function(){
+        var link:any = document.getElementById('link');
+        link.select();
+        document.execCommand('Copy');
+    }
+    function isAndroidBrowser() {
+        var userAgent = window.navigator['userAgent'];
+        //判断是否手机
+        return /(android)/ig.test(userAgent);
+    }
+    function isIphoneBrowser() {
+        var userAgent = window.navigator['userAgent'];
+        //判断是否手机
+        return /(iphone)|(ios)|(ipad)/ig.test(userAgent);
+    }
+    $scope.isAndroid = ionic.Platform.isAndroid();
+    $scope.isIos =  ionic.Platform.isIOS();
+    $scope.is_wechat = browserspec.is_wechat;
+    $scope.sendWx = function(){
+        if(browserspec.is_wechat){
+            var show = $ionicPopup.show({
+                template: '<p>请点击微信右上角菜单<br>将链接分享给好友</p>',
+                cssClass: 'share_alert'
+            })
+            ClosePopupService.register(show);
+            wx.onMenuShareAppMessage({
+                title: staff.name +'邀请您注册鲸力商旅',
+                desc:'加入'+staff.company.name+',共同开启智能商旅!',
+                link: $scope.invitedLink.goInvitedLink,
+                imgUrl:'http://t.jingli365.com/ionic/images/logo.png',
+                type: '', // 分享类型,music、video或link，不填默认为link
+                dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                success: function () {
+                    // 用户确认分享后执行的回调函数
+                    show.close();
+                },
+                cancel: function () {
+                    // 用户取消分享后执行的回调函数
+                    show.close();
+                }
+            });
+        }
+    }
+}
+
+export async function StaffSavedRankController($scope) {
+    require('./staffSavedRank.scss');
+    API.require('tripPlan');
+    await API.onload();
+    $scope.isMonth = true;
+    $scope.isYear = false;
+    $scope.isAll = false;
+    $scope.staffSaves = [];
+    $scope.searchStaffSaves = searchStaffSaves;
+
+    async function searchStaffSaves(type: string) {
+        let formatStr = 'YYYY-MM-DD HH:mm:ss';
+        let options: any = {limit: 10};
+        $scope.isMonth = $scope.isYear = $scope.isAll = false;
+        $scope[type] = true;
+        
+        if(!$scope.isAll) {
+            let typeStr = $scope.isMonth ? 'month' : 'year';
+            options.startTime = moment().startOf(typeStr).format(formatStr);
+            options.endTime = moment().endOf(typeStr).format(formatStr);
+        }
+
+        $scope.staffSaves = await API.tripPlan.tripPlanSaveRank(options);
+    }
+
+    searchStaffSaves('isMonth');
 }

@@ -18,7 +18,7 @@ import L = require("common/language");
 import utils = require("common/utils");
 import {Paginate} from 'common/paginate';
 import {validateApi, requireParams, clientExport} from 'common/api/helper';
-import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_types/staff";
+import { Staff, Credential, PointChange, InvitedLink, EStaffRole, EStaffStatus } from "api/_types/staff";
 import { EAgencyUserRole, AgencyUser } from "api/_types/agency";
 import { Models, EAccountType } from 'api/_types';
 import promise = require("../../common/test/api/promise/index");
@@ -28,8 +28,11 @@ import {FindResult} from "common/model/interface";
 const staffCols = Staff['$fieldnames'];
 const papersCols = Credential['$fieldnames'];
 const pointChangeCols = PointChange['$fieldnames'];
+const invitedLinkCols = InvitedLink['$fieldnames'];
 
 const staffAllCols = Staff['$getAllFieldNames']();
+
+const goInvitedLink = config.host + "/index.html#/login/invited-staff-one";
 
 class StaffModule{
     /**
@@ -106,6 +109,106 @@ class StaffModule{
     }
 
     /**
+     * 根据密码验证码修改并验证手机
+     * @param params
+     * @returns {Staff}
+     */
+    @clientExport
+    @requireParams(["id", "msgCode", "msgTicket", "mobile", "pwd"])
+    static async modifyMobile(params): Promise<Staff>{
+        let pwd = params.pwd;
+        let msgCode = params.msgCode;
+        let msgTicket = params.msgTicket;
+        let mobile = params.mobile;
+        let id = params.id;
+
+        await API.auth.checkEmailAndMobile({mobile: mobile});
+        var account = await DBM.Account.findById(id);
+
+        if (!account) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        pwd = utils.md5(pwd);
+        if (account.pwd != pwd) {
+            throw L.ERR.PWD_ERROR();
+        }
+
+        var result =  await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
+
+        if(result){
+            var staff = await Models.staff.get(id);
+            staff.mobile = mobile;
+            staff.isValidateMobile = true;
+            staff = await staff.save();
+        }else{
+            throw L.ERR.CODE_ERROR();
+        }
+        return staff;
+    }
+
+    /**
+     * 修改员工邮箱
+     * @param params
+     * @returns {Staff}
+     */
+    @clientExport
+    @requireParams(["id", "email", "pwd"])
+    static async modifyEmail(params): Promise<Staff>{
+        let pwd = params.pwd;
+        let email = params.email;
+        let id = params.id;
+
+        await API.auth.checkEmailAndMobile({email: email});
+        var account = await DBM.Account.findById(id);
+
+        if (!account) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        pwd = utils.md5(pwd);
+        if (account.pwd != pwd) {
+            throw L.ERR.PWD_ERROR();
+        }
+
+        var staff = await Models.staff.get(id);
+        staff.isValidateEmail = false;
+        staff.email = email;
+        staff = await staff.save();
+        return staff;
+    }
+
+    /**
+     * 修改员工密码
+     * @param params
+     * @returns {Staff}
+     */
+    @clientExport
+    @requireParams(["id", "newPwd", "pwd"])
+    static async modifyPwd(params): Promise<Staff>{
+        let pwd = params.pwd;
+        let newPwd = params.newPwd;
+        let id = params.id;
+
+        var account = await DBM.Account.findById(id);
+
+        if (!account) {
+            throw L.ERR.ACCOUNT_NOT_EXIST();
+        }
+
+        pwd = utils.md5(pwd);
+        if (account.pwd != pwd) {
+            throw L.ERR.PWD_ERROR();
+        }
+
+        newPwd = utils.md5(newPwd);
+        var staff = await Models.staff.get(id);
+        staff.pwd = newPwd;
+        staff = await staff.save();
+        return staff;
+    }
+
+    /**
      * 更新员工
      * @param id
      * @param data
@@ -123,9 +226,9 @@ class StaffModule{
         let staff = await Staff.getCurrent();
 
         if(params.email){
-            if(staff && staff.company["domainName"] && params.email.indexOf(staff.company["domainName"]) == -1){
+            /*if(staff && staff.company["domainName"] && params.email.indexOf(staff.company["domainName"]) == -1){
                 throw L.ERR.EMAIL_SUFFIX_INVALID();
-            }
+            }*/
 
             if(updateStaff.status != 0){
                 throw L.ERR.NOTALLOWED_MODIFY_EMAIL();
@@ -208,7 +311,6 @@ class StaffModule{
         {if: condition.isStaffsAgency("0.id")}
     ])
     static async getStaff(params: {id: string}){
-
         let id = params.id;
         let getObj = await Models.staff.get(id);
         return getObj;
@@ -1312,8 +1414,72 @@ class StaffModule{
         options.attributes = params.attributes? ['*'] :params.attributes;
         return DBM.Credential.findAll(options);
     }
-
     /***********************证件信息end***********************/
+
+    @clientExport
+    static async createInvitedLink(params): Promise<InvitedLink>{
+        var staff = await Staff.getCurrent();
+        var invitedLink = InvitedLink.create();
+        invitedLink.staff = staff;
+        invitedLink.expiresTime = moment().add(24, 'h');
+        var linkToken = utils.getRndStr(6);
+        invitedLink.linkToken = linkToken;
+        var timeStr = utils.now();
+        var oneDay = 24 * 60 * 60 * 1000
+        var timestamp = Date.now() + oneDay;  //失效时间2天
+        var sign = makeLinkSign(linkToken, invitedLink.id, timestamp);
+        var url = goInvitedLink + "?linkId="+invitedLink.id+"&timestamp="+timestamp+"&sign="+sign;
+        url = await API.wechat.shorturl({longurl: url});
+        invitedLink.goInvitedLink = url;
+        return  invitedLink.save();
+    }
+
+    @clientExport
+    @requireParams(["id"], invitedLinkCols)
+    @conditionDecorator([
+        {if: condition.isSelfLink("0.id")}
+    ])
+    static async updateInvitedLink(params): Promise<InvitedLink>{
+        var updateInvitedLink = await Models.invitedLink.get(params.id);
+        for(var key in params){
+            updateInvitedLink[key] = params[key];
+        }
+        updateInvitedLink = await updateInvitedLink.save();
+        return updateInvitedLink;
+    }
+
+    @clientExport
+    @requireParams(["id"])
+    @conditionDecorator([
+        {if: condition.isSelfLink("0.id")}
+    ])
+    static async getInvitedLink(params): Promise<InvitedLink>{
+        var invitedLink = await Models.invitedLink.get(params.id)
+        return  invitedLink;
+    }
+
+    @clientExport
+    @requireParams(["where.staffId"], ["where.status"])
+    static async getInvitedLinks(params: {where: any, order?: any, attributes?: any}) :Promise<FindResult>{
+        let staff = await Staff.getCurrent();
+        if (!params.where) {
+            params.where = {};
+        }
+        params.where.status = params.where.status || 1;
+        params.order = params.order || [['createdAt', 'desc']];
+
+        if(staff){
+            params.where.staffId = staff.id;
+        }
+        let paginate = await Models.invitedLink.find(params);
+        return {ids: paginate.map((s)=> {return s.id;}), count: paginate['total']};
+    }
+
 }
 
+//生成邀请链接参数
+function makeLinkSign(linkToken, invitedLinkId, timestamp) {
+    var originStr = linkToken + invitedLinkId + timestamp;
+    return utils.md5(originStr);
+}
 export = StaffModule;

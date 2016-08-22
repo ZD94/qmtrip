@@ -2,6 +2,8 @@
 var Cookie = require('tiny-cookie');
 var msgbox = require('msgbox');
 var API = require('common/api');
+import validator = require('validator');
+import { Staff } from "api/_types/staff";
 
 API.require('auth');
 
@@ -16,46 +18,30 @@ export function StorageSetController($scope, $stateParams, $storage) {
         token_sign: token_sign,
         timestamp: timestamp };
     $storage.local.set('auth_data', data);
-//服务器端无法读取storage
+    //服务器端无法读取storage
     Cookie.set("user_id", data.user_id, {expires: 30});
     Cookie.set("token_sign", data.token_sign, {expires: 30});
     Cookie.set("timestamp", data.timestamp, {expires: 30});
     Cookie.set("token_id", data.token_id, {expires: 30});
     API.reload_all_modules();
-    console.info("go"+back_url);
     window.location.href = back_url;
 }
 
-export async function IndexController($scope, $stateParams, $storage) {
+export async function IndexController($scope, $stateParams, $storage, $sce, $loading, $ionicPopup) {
+    $loading.start();
     var browserspec = require('browserspec');
     var backUrl = $stateParams.backurl || "#";
-    let openid = $stateParams.openid;
+    require("./login.scss");
+    //微信中自动登录
+    let href = window.location.href;
+    if(browserspec.is_wechat && /.*jingli365\.com/.test(window.location.host) && !$stateParams.wxauthcode && !/.*backurl\=.*/.test(href)) {
+        await API.onload();
 
-    //微信中自动登陆
-    if(browserspec.is_wechat && /.*jingli365\.com/.test(window.location.host)) {
-        if (openid !== 'false' && openid !== false) {
-            await API.onload();
-            if(!openid) {
-                let url = await API.auth.getWeChatLoginUrl({redirectUrl: window.location.href});
-                window.location.href = url;
-                return;
-            }
-
-            if( backUrl != '#') {
-                let token = await API.auth.authWeChatLogin({openid: openid});
-
-                if(token) {
-                    $storage.local.set('auth_data', token);
-                    Cookie.set("user_id", token.user_id, {expires: 30});
-                    Cookie.set("token_sign", token.token_sign, {expires: 30});
-                    Cookie.set("timestamp", token.timestamp, {expires: 30});
-                    Cookie.set("token_id", token.token_id, {expires: 30});
-                    await API.reload_all_modules();
-                    window.location.href = backUrl;
-                    return;
-                }
-            }
-        }
+        let url = await API.auth.getWeChatLoginUrl({redirectUrl: href});
+        window.location.href = url;
+        return;
+    }else{
+        $loading.end();
     }
 
     $scope.form = {
@@ -87,20 +73,182 @@ export async function IndexController($scope, $stateParams, $storage) {
             Cookie.set("token_sign", data.token_sign, {expires: 30});
             Cookie.set("timestamp", data.timestamp, {expires: 30});
             Cookie.set("token_id", data.token_id, {expires: 30});
-            await API.reload_all_modules();
+            API.reload_all_modules();
 
-            if(browserspec.is_wechat && openid && openid !== 'false') {
+            if(browserspec.is_wechat && $stateParams.wxauthcode) {
                 //保存accountId和openId关联
-                API.require('auth');
                 await API.onload();
-                await API.auth.saveOrUpdateOpenId({openid: openid});
+                await API.auth.saveOrUpdateOpenId();
             }
             window.location.href = backUrl;
         } catch (err) {
             var str = err.msg;
-            msgbox.log(err);//显示错误消息
+            /*if(err.code == -28 && err.msg == "您的账号还未激活"){
+                $scope.unactivated = true;
+            }else */
+            if(err.code == -37 && err.msg == "您的手机号还未验证"){
+                showMobilePopup();
+            }else if(err.code == -38 && err.msg == "您的邮箱还未验证"){
+                showEmailPopup();
+            }else{
+                msgbox.log(err.msg || err);//显示错误消息
+            }
         }
+
+        function showEmailPopup(){
+            var nshow = $ionicPopup.show({
+                title:'邮箱未激活',
+                cssClass:'showAlert',
+                template: '<div class="popupDiv"><span>请激活后再进行登录</span><br><span>邮箱：'+$scope.form.account+'</span></div>',
+                scope: $scope,
+                buttons: [
+                    {
+                        text: '返回重新登录',
+                        type: 'button-small button-outline button-positive'
+                    },
+                    {
+                        text: '获取激活邮件',
+                        type: 'button-positive button-small',
+                        onTap: async function (e) {
+                            if (!$scope.form.account) {
+                                e.preventDefault();
+                                msgbox.log("用户名不能为空");
+                            } else {
+                                try{
+                                    var data = await API.auth.reSendActiveLink({email: $scope.form.account});
+                                    if(data){
+                                        showSendEmailSuccess();
+                                    }
+                                }catch(err){
+                                    msgbox.log(err.msg);
+                                }
+                            }
+                        }
+                    }
+                ]
+            })
+        }
+
+        function showSendEmailSuccess(){
+            var nshow = $ionicPopup.show({
+                template: '<div class="popupDiv"><p>邮箱：{{form.account}}</p><br><h2><i class="ion-checkmark-circled"></i>激活邮件发送成功！</h2><br><span>请点击邮件中的链接完成激活，即可点击下方立即登录按钮进入系统，链接有效期24个小时</span></div>',
+                cssClass:'showAlert',
+                scope: $scope,
+                buttons: [
+                    {
+                        text: '立即登录',
+                        type: 'button-small button-positive',
+                        onTap: async function (e) {
+                            $scope.check_login();
+                        }
+                    }
+                ]
+            })
+        }
+
+        function showMobilePopup(){
+            var nshow = $ionicPopup.show({
+                title: '手机未激活',
+                template: '<div class="popupDiv"><span>请获取验证码激活</span><br><h2>手机号：'+$scope.form.account+'</h2>' +
+                '<div class="item item-input"> <input type="text" placeholder="请输入验证码" ng-model="form.msgCode"> ' +
+                '<a class="button button-small button-positive" ng-click="sendCode()"  ng-if="!showCount">发送验证码</a> ' +
+                '<a class="button button-small button-stable" ng-if="showCount"><span id="countNum">{{beginNum}}</span>s</a>' +
+                '</div>',
+                cssClass:'showAlert',
+                scope: $scope,
+                buttons: [
+                    {
+                        text: '返回重新登录',
+                        type: 'button-small button-outline button-positive'
+                    },
+                    {
+                        text: '立即激活',
+                        type: 'button-small button-positive',
+                        onTap: async function (e) {
+                            if (!$scope.form.msgCode) {
+                                e.preventDefault();
+                                msgbox.log("验证码不能为空");
+                            } else {
+                                try{
+                                    var data = await API.auth.activeByMobile({mobile: $scope.form.account, msgCode: $scope.form.msgCode, msgTicket: $scope.ticket});
+                                    if(data.isValidateMobile){
+                                        showCheckMobileSuccess();
+                                    }
+                                }catch(err){
+                                    msgbox.log(err.msg);
+                                }
+                            }
+                        }
+                    }
+                ]
+            })
+        }
+
+        function showCheckMobileSuccess(){
+            var nshow = $ionicPopup.show({
+                title: '激活成功！',
+                template: '<span>手机号：'+$scope.form.account+'</span>',
+                scope: $scope,
+                buttons: [
+                    {
+                        text: '立即登录',
+                        type: 'button-positive',
+                        onTap: async function (e) {
+                            $scope.check_login();
+                        }
+                    }
+                ]
+            })
+        }
+
+        $scope.showCount = false;
+        $scope.beginCountDown = function(){
+            $scope.showCount = true;
+            $scope.beginNum = 90;
+            var timer = setInterval(function() {
+                if ($scope.beginNum <= 0) {
+                    $scope.showCount = false;
+                    clearInterval(timer);
+                    $scope.$apply();
+                    return;
+                }
+                $scope.beginNum = $scope.beginNum - 1;
+                $scope.$apply();
+            }, 1000);
+        }
+
+        $scope.sendCode = async function(){
+            if (!$scope.form.account) {
+                msgbox.log("手机号不能为空");
+                return;
+            }
+            API.require("checkcode");
+            await API.onload();
+            API.checkcode.getMsgCheckCode({mobile: $scope.form.account})
+                .then(function(result){
+                    $scope.beginCountDown();
+                    $scope.ticket = result.ticket;
+                })
+                .catch(function(err){
+                    msgbox.log(err.msg||err)
+                })
+        };
+
     }
+
+    //暂不需要重新发送激活链接了
+    /*$scope.reSendActiveLink = async function(){
+        try{
+            await API.onload();
+            var data = await API.auth.reSendActiveLink({email: $scope.form.account});
+            if(data){
+                msgbox.log("发送成功");
+            }
+
+        }catch(err){
+            msgbox.log(err.msg || err);
+        }
+    }*/
 }
 
 export async function TestController($scope) {
@@ -228,4 +376,321 @@ function trim(s) {
     if (!s) return s;
     s = s.replace(/\s+/g, "");
     return s;
+}
+
+
+export async function ForgetPwdController($scope,Models) {
+    require("./forget-pwd.scss");
+    API.require("auth");
+    API.require("checkcode");
+    $scope.form = {
+        mobile:'',
+        msgCode:''
+    };
+
+    $scope.showCount = false;
+    $scope.beginCountDown = function(){
+        $scope.showCount = true;
+        $scope.beginNum = 90;
+        var timer = setInterval(function() {
+            if ($scope.beginNum <= 0) {
+                $scope.showCount = false;
+                clearInterval(timer);
+                $scope.$apply();
+                return;
+            }
+            $scope.beginNum = $scope.beginNum - 1;
+            $scope.$apply();
+        }, 1000);
+    }
+
+    var ticket;
+    $scope.sendCode = async function(){
+        if(!$scope.form.mobile){
+            msgbox.log("手机号不能为空");
+            return;
+        }
+        await API.onload();
+        API.checkcode.getMsgCheckCode({mobile: $scope.form.mobile})
+            .then(function(result){
+                $scope.beginCountDown();
+                ticket = result.ticket;
+            })
+            .catch(function(err){
+                msgbox.log(err.msg||err)
+            })
+    };
+    $scope.nextStep = async function(){
+        if(!$scope.form.mobile){
+            msgbox.log("手机号不能为空");
+            return;
+        }
+        if(!$scope.form.msgCode){
+            msgbox.log("验证码不能为空");
+            return;
+        }
+        if(!ticket){
+            msgbox.log("验证码不正确");
+            return;
+        }
+        await API.onload();
+        API.auth.validateMsgCheckCode({msgCode: $scope.form.msgCode, msgTicket: ticket, mobile: $scope.form.mobile})
+            .then(function(result){
+                if(result){
+                    window.location.href= "index.html#/login/reset-pwd?accountId="+result.accountId+"&sign="+result.sign+"&timestamp="+result.expireAt;
+                }else{
+                    msgbox.log("验证码错误");
+                }
+            })
+            .catch(function(err){
+                msgbox.log(err.msg||err);
+            })
+
+    }
+}
+
+export async function ResetPwdController($scope, Models, $stateParams){
+    API.require("auth");
+    await API.onload();
+
+    let accountId = $stateParams.accountId;
+    let sign = $stateParams.sign;
+    let timestamp = $stateParams.timestamp;
+
+    $scope.form = {
+        newPwd: '',
+        confirmPwd: ''
+    }
+
+    $scope.setPwd = function() {
+        let newPwd = $scope.form.newPwd
+        let confirmPwd = $scope.form.confirmPwd
+        newPwd = trim(newPwd)
+        confirmPwd = trim(confirmPwd);
+        if(!newPwd){
+            msgbox.log("新密码不能为空");
+            return;
+        }
+        if(!confirmPwd){
+            msgbox.log("重复密码不能为空");
+            return;
+        }
+        if (newPwd != confirmPwd) {
+            msgbox.log("两次密码不一致");
+            return;
+        }
+        var pwdPattern = /^[0-9a-zA-Z]*$/g;
+        if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >20){
+            msgbox.log("密码格式应为6-20位字母或数字");
+            return;
+        }
+        API.auth.resetPwdByMobile({accountId: accountId, sign: sign, timestamp: timestamp, pwd: newPwd})
+            .then(function () {
+                alert("密码设置成功,请重新登录");
+                window.location.href = "index.html#/login/index";
+            })
+            .catch(function(err){
+                msgbox.log(err.msg||err);
+            }).done();
+    }
+
+}
+
+export async function ActiveController ($scope, $stateParams) {
+    require('./active.scss');
+    let accountId = $stateParams.accountId;
+    let sign = $stateParams.sign;
+    let timestamp = $stateParams.timestamp;
+    let email = $stateParams.email;//链接失效时重新发送激活邮件使用
+    await API.onload();
+    $scope.invalidLink = false;
+
+    await API.auth.activeByEmail({accountId: accountId, sign: sign, timestamp: timestamp})
+        .then(function (result) {
+            if(result){
+                $scope.account = result;
+            }
+        })
+        .catch(function(err){
+            if(err.code == -27 && err.msg == "激活链接已经失效"){
+                $scope.invalidLink = true;
+                $scope.email = email;
+            }else{
+                msgbox.log(err.msg||err);
+            }
+        }).done();
+
+    $scope.reSendActiveLink = async function(){
+        try{
+            var data = await API.auth.reSendActiveLink({email: email});
+            if(data){
+                msgbox.log("发送成功");
+            }
+        }catch(err){
+            msgbox.log(err.msg || err);
+        }
+    }
+
+    $scope.goLogin = function(){
+        window.location.href = "index.html#/login/index";
+    }
+}
+
+export async function InvitedStaffOneController ($scope, $stateParams, $storage , $ionicPopup){
+    require("./login.scss");
+    let linkId = $stateParams.linkId;
+    let sign = $stateParams.sign;
+    let timestamp = $stateParams.timestamp;
+    API.require("auth");
+    await API.onload();
+    var auth_data = $storage.local.get('auth_data');
+    await API.auth.checkInvitedLink({linkId: linkId, sign: sign, timestamp: timestamp})
+        .then(async function (result) {
+            if(result){
+                $scope.inviter = result.inviter;
+                $scope.comoany = result.company;
+                if(auth_data && auth_data.user_id && $scope.inviter && auth_data.user_id == $scope.inviter.id){
+                    //显示遮罩层
+                    var show = $ionicPopup.show({
+                        template: '<p>请使用浏览器分享功能<br>将页面分享给好友</p>',
+                        cssClass: 'share_alert'
+                    })
+                }
+            }else{
+                msgbox.log("激活链接已经失效");
+                window.location.href = "index.html#/login/invalid-link";
+            }
+        })
+        .catch(function(err){
+            msgbox.log(err.msg||err);
+            window.location.href = "index.html#/login/invalid-link";
+        }).done();
+
+    $scope.goRegister = function(){
+        window.location.href = "index.html#/login/invited-staff-two?companyId="+$scope.comoany.id+"&linkId="+linkId+"&sign="+sign+"&timestamp="+timestamp;
+    }
+}
+
+export async function InvitedStaffTwoController ($scope, $stateParams){
+    let companyId = $stateParams.companyId;
+    let linkId = $stateParams.linkId;
+    let sign = $stateParams.sign;
+    let timestamp = $stateParams.timestamp;
+    API.require("checkcode");
+    API.require("auth");
+    await API.onload();
+    require("./login.scss");
+    $scope.form = {
+        mobile:'',
+        msgCode:'',
+        pwd:'',
+        name:'',
+        companyId: companyId
+    };
+
+    API.auth.checkInvitedLink({linkId: linkId, sign: sign, timestamp: timestamp})
+        .then(async function (result) {
+            if(result){
+                if(result.company.id != companyId){
+                    msgbox.log("无效链接");
+                    window.location.href = "index.html#/login/invalid-link";
+                }
+                $scope.inviter = result.inviter;
+                $scope.comoany = result.company;
+            }else{
+                msgbox.log("激活链接已经失效");
+                window.location.href = "index.html#/login/invalid-link";
+            }
+        })
+        .catch(function(err){
+            msgbox.log(err.msg||err);
+            window.location.href = "index.html#/login/invalid-link";
+        }).done();
+
+    $scope.showCount = false;
+    $scope.beginCountDown = function(){
+        $scope.showCount = true;
+        $scope.beginNum = 90;
+        var timer = setInterval(function() {
+            if ($scope.beginNum <= 0) {
+                $scope.showCount = false;
+                clearInterval(timer);
+                $scope.$apply();
+                return;
+            }
+            $scope.beginNum = $scope.beginNum - 1;
+            $scope.$apply();
+        }, 1000);
+    }
+
+    $scope.sendCode = function(){
+        if (!$scope.form.mobile) {
+            msgbox.log("手机号不能为空");
+            return;
+        }
+        API.auth.checkEmailAndMobile({mobile: $scope.form.mobile})
+            .then(async function(){
+                return API.checkcode.getMsgCheckCode({mobile: $scope.form.mobile})
+                    .then(function(result){
+                        $scope.beginCountDown();
+                        $scope.form.msgTicket =  result.ticket;
+                    })
+            })
+            .catch(function(err){
+                msgbox.log(err.msg||err);
+            })
+
+    };
+
+    $scope.next = async function(){
+        if (!$scope.form.mobile) {
+            msgbox.log("手机号不能为空");
+            return;
+        }
+        if ($scope.form.mobile && !validator.isMobilePhone($scope.form.mobile, 'zh-CN')) {
+            msgbox.log("手机号格式不正确");
+            return;
+        }
+        if (!$scope.form.msgCode) {
+            msgbox.log("验证码不能为空");
+            return;
+        }
+        if (!$scope.form.pwd) {
+            msgbox.log("密码不能为空");
+            return;
+        }
+        if (!$scope.form.name) {
+            msgbox.log("姓名不能为空");
+            return;
+        }
+        var pwdPattern = /^[0-9a-zA-Z]*$/g;
+        var newPwd = $scope.form.pwd;
+        if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >20){
+            msgbox.log("密码格式应为6-20位字母或数字");
+            return;
+        }
+
+        API.auth.invitedStaffRegister($scope.form)
+            .then(function (result) {
+                console.info(result);
+                window.location.href = "index.html#/login/invited-staff-three?company="+result.name;
+            })
+            .catch(function(err){
+                msgbox.log(err.msg||err);
+            }).done();
+
+    }
+}
+
+export async function InvitedStaffThreeController ($scope, $stateParams){
+    require("./login.scss");
+    let company = $stateParams.company;
+    $scope.companyName = company;
+    $scope.goLogin = function(){
+        window.location.href = "index.html#/login/index";
+    }
+}
+
+export async function InvalidLinkController ($scope, $stateParams){
+    require("./login.scss");
 }

@@ -16,19 +16,108 @@ $dark:                            #444 !default;
 */
 
 // The path for our ionicons font files, relative to the built CSS in www/css
-$ionicons-font-path: "../fonts" !default;
+$ionicons-font-path: "../../fonts/ionic" !default;
+$menu-side-shadow: none;
+
+$popup-background-color: white;
+$popup-border-radius: 5px;
+$z-index-popup: 100;
 
 // Include all of Ionic
-@import "../../../common/client/ionic/scss/ionic";
+@import "../../../common/vendor/ionic/scss/ionic";
+
+html {
+  width: 100%;
+  height: 100%;
+}
+@mixin app-background {
+  background: url(../images/background.jpg) no-repeat;
+  background-size:cover;
+  background-position: center;
+}
+body {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  @include app-background;
+  ion-side-menu-content{
+    @include app-background;
+  }
+  ion-nav-view {
+    background-color: transparent !important;
+    ion-view{
+      @include app-background;
+    }
+  }
+}
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
 
+a{
+  text-decoration: none;
+}
+
+//item左右会超出
+.item{
+  margin-right: 0px;
+  margin-left: 0px;
+}
+
+//按钮图标大小过大
+.button-icon{
+  .icon:before,
+  &.icon:before {
+    font-size: inherit;
+  }
+}
+
+.menu-open ion-side-menu-content.menu-content {
+  filter: brightness(0.5);
+}
+
+ion-content{
+  >.flex-c10{
+    >ion-scroll{
+      padding: 10px;
+    }
+    >:last-child{
+      &.button-bar, >.button-bar{
+        >.button {
+          margin-top: 0;
+          margin-bottom: 0;
+          border-radius: 0;
+        }
+      }
+    }
+  }
+}
+
+.getMoreOrNoMore{
+  text-align: center;
+  margin-top: 20px;
+  color: #fff;
+}
+
+.platform-android{
+  .scroll-view.scroll-y[overflow-scroll="false"][has-bouncing="true"]{
+    overflow-y: hidden;
+  }
+}
+
 .platform-wechat{
+  ion-side-menu-content{
+    .has-header{
+      top: 0;
+    }
+  }
   .nav-bar-block{
     right: auto;
     width: 40px;
+    .title {
+      display: none;
+    }
     .bar{
       padding: 0;
       background-color: rgba(255,255,255, 0);
@@ -63,236 +152,32 @@ $ionicons-font-path: "../fonts" !default;
         }
       }
     }
-    .title {
-      display: none;
-    }
   }
   .JingliLogin{
     .has-header{
       top: 0;
     }
   }
-  ion-side-menu-content{
-    .has-header{
-      top: 0;
-    }
-  }
 }
 
-ion-nav-view ion-view ion-content{
-  background: url(../images/background.jpg) no-repeat center;
-  background-size:cover;
-  .spanRight{
-    float: right; //很多价位在右边
-  }
-  .getMoreOrNoMore{
-    text-align: center;
-    margin-top: 20px;
+
+.share_alert{
+  background: rgba(0,0,0,.4);
+  .popup{
+    background: #28A7E1 url("../images/logo_write10.png") no-repeat;
+    background-position: 10px 40px;
+    background-size: 50px;
     color: #fff;
-  }
-  .business_chooese{
-    height: 35px;
-    line-height: 35px;
-    width: 60%;
-    span{
-      display: block;
-      font-size: 14px;
-      &.placeholder-div{
-        color: #d5d5d5;
-      }
+    border-radius: 5px;
+    height: 100px;
+    .popup-head{
+      display: none;
+    }
+    p{
+      text-align: right;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 10px 0;
     }
   }
-  .row {
-    position: relative;
-    .col {
-      text-align: center;
-      .price {
-        font-size: 20px;
-      }
-    }
-    .jingli_divider {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      border-left: 1px solid rgba(255, 255, 255, .4);
-      height: 30px;
-      margin-top: -15px;
-    }
-    &.withChart{
-      background: #fff;
-      padding:5px 0;
-      .col{
-        padding: 0;
-        &:first-child{
-          position: relative;
-          .chart_info{
-            position: absolute;
-            width: 100%;
-            top: 0;
-            left:0;
-            right:0;
-            bottom: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            span{
-              color: #666;
-            }
-            .savePercent{
-              margin: 10px 0;
-              font-size: 30px;
-              text-align: center;
-            }
-          }
-          @media (max-width:320px) {
-            .chart_info{
-              .savePercent{
-                font-size: 26px;
-              }
-            }
-          }
-        }
-        .list{
-          position: relative;
-          .item{
-            border:0;
-          }
-          .item_divider{
-            border-top:1px solid #ddd;
-            position: absolute;
-            top:50%;
-            left: 20%;
-            width:60%;
-            z-index: 5;
-          }
-        }
-      }
-    }
-    &.project_info{
-      background: #fff;
-      border-top: 1px solid #ddd;
-      .col{
-        h2{
-          margin: 0;
-          font-size: 24px;
-          font-weight: normal;
-        }
-        p{
-          color: #666;
-        }
-        &:first-child{
-          border-right: 1px solid #ddd;
-        }
-      }
-    }
-  }
-  .item{
-    margin: -1px 0;
-  }
-}
-
-ion-side-menu{
-  .side-menu-left{
-    .menulist{
-      .list{
-        div{
-          .menu-button{
-            &.icon{
-              &:before{
-                width: 28px;
-              }
-            }
-          }
-          //&:last-child{
-          //  margin-bottom: 50px;
-          //}
-        }
-      }
-    }
-  }
-}
-.loading-container{
-  z-index: 1003;
-}
-
-//员工管理按钮
-.staffList{
-  a{
-    text-decoration: none;
-  }
-  .staff_btn{
-    position: absolute;
-    top: 16px;
-    right:20px;
-    background: #387ef5;
-    display: inline-block;
-    text-align: center;
-  }
-}
-//部门管理,左侧出现删除按钮
-.list-left-editing{
-  .item-left-editable{
-    .item-content{
-      webkit-transform: translate3d(42px, 0, 0);
-      transform: translate3d(42px, 0, 0);
-    }
-  }
-  .button-icon{
-    &.icon{
-      &.ion-minus-circled{
-        &:before{
-          font-size: 24px;
-        }
-      }
-    }
-  }
-}
-@media (max-width: 320px){
-  ion-side-menu{
-    .side-menu-left{
-      .menulist{
-        .button.button-block{
-          margin: 0;
-        }
-      }
-    }
-  }
-  //适配iPhone5的menu高度
-
-  .button-bar{
-    &.jl_approvelist{
-      .button{
-        padding: 2px 4px 1px;
-      }
-    }
-  }
-}
-
-ion-content{
-  >.flex-c10{
-    >ion-scroll{
-      padding: 10px;
-    }
-    >:last-child{
-      &.button-bar, >.button-bar{
-        >.button {
-          margin-top: 0;
-          margin-bottom: 0;
-          border-radius: 0;
-        }
-      }
-    }
-  }
-}
-
-.loading-container {
-  .loading {
-    background-color: white;
-    color: black;
-  }
-}
-
-.modal-backdrop, .modal-backdrop-bg{
-  position: absolute !important;
 }

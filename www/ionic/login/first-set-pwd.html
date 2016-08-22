@@ -1,16 +1,16 @@
-<ion-view title="激活账号" id="page17">
+<ion-view title="激活账号" class="sendCode">
     <ion-content padding="true">
         <form class="list">
             <div class="spacer" style="height: 40px;"></div>
             <ion-list>
-                <label class="item item-input">
+                <div class="item item-input">
                     <span class="input-label">新密码</span>
                     <input type="password" placeholder="" ng-model="form.newPwd" required ng-required>
-                </label>
-                <label class="item item-input">
+                </div>
+                <div class="item item-input">
                     <span class="input-label">重复密码</span>
                     <input type="password" placeholder="" ng-model="form.confirmPwd" required ng-required>
-                </label>
+                </div>
             </ion-list>
             <div class="spacer" style="height: 40px;"></div>
             <a id="btn_login" class="button button-stable  button-block" ng-click="setPwd()">设置密码</a>

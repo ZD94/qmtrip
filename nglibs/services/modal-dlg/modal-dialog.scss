@@ -1,0 +1,26 @@
+
+@import "../../../common/vendor/ionic/scss/variables";
+
+.ng-modal-select-list{
+  .new-item{
+    color: $calm;
+  }
+}
+
+.ng-modal-select-map{
+  .item{
+    padding: 10px 16px;
+    .color_key{
+      color: $positive;
+    }
+  }
+  .button{
+    &.button-block{
+      margin: 0;
+      border-radius: 0;
+    }
+  }
+}
+
+@import "./date/date";
+

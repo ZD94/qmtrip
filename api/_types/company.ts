@@ -137,9 +137,11 @@ export class Company extends ModelObject{
         return Models.staff.find(options);
     }
     
-    getDepartments(): Promise<Department[]> {
-        let query = { where: {companyId: this.id}}
-        return Models.department.find(query);
+    getDepartments(options?: any): Promise<Department[]> {
+        if(!options) { options = {}};
+        if(!options.where) { options.where = {}};
+        options.where.companyId = this.id;
+        return Models.department.find(options);
     }
 
     getTravelPolicies(): Promise<TravelPolicy[]> {
@@ -152,6 +154,16 @@ export class Company extends ModelObject{
         if(!options) {options = {where: {}}};
         if(!options.where) {options.where = {};}
         options.where.companyId = this.id;
+        if(options.where.startTime) {
+            if(!options.where.startAt){options.where.startAt = {}}
+            options.where.startAt.$gte = options.where.startTime;
+            delete options.where.startTime;
+        }
+        if(options.where.endTime) {
+            if(!options.where.startAt){options.where.startAt = {}}
+            options.where.startAt.$lte = options.where.endTime;
+            delete options.where.endTime;
+        }
         return Models.tripPlan.find(options);
     }
 

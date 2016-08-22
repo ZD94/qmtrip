@@ -1,0 +1,22 @@
+.staffinfo {
+  .item {
+    padding: 11px;
+    &.item-icon-right {
+      padding-right: 40px;
+      .icon {
+        font-size: 14px;
+        right: 5px;
+        &.verify {
+          right: auto;
+          position: static;
+          display: inline-block;
+          font-size: 16px;
+          color: #f5a623;
+          &.novalid{
+            color: #ddd;
+          }
+        }
+      }
+    }
+  }
+}

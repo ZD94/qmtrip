@@ -3,12 +3,14 @@
         <form class="list">
             <div class="item item-input">
                 <span class="input-label">出差地点</span>
-                <div ng-model="accordHotel.cityName"
-                     ng-selector="placeSelector"
-                     ng-selector-title="请选择城市"
-                     ng-selector-placeholder="请输入城市名或首字母缩写"
-                     class="business_chooese"
-                ></div>
+                <ng-selector-list
+                        ng-model="city"
+                        dlg-options="placeSelector"
+                        dlg-notice-msg="该城市已设置协议酒店不能重复设置"
+                        dlg-title="请选择城市"
+                        dlg-placeholder="请输入城市名或首字母缩写"
+                        class="fake-input"
+                ></ng-selector-list>
             </div>
             <div class="item item-input">
                 <span class="input-label">协议价格</span>

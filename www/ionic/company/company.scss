@@ -1,0 +1,32 @@
+
+//员工管理按钮
+.staffList{
+  a{
+    text-decoration: none;
+  }
+  .staff_btn{
+    position: absolute;
+    top: 16px;
+    right:20px;
+    background: #387ef5;
+    display: inline-block;
+    text-align: center;
+  }
+}
+
+.date_selected{
+  padding:0;
+  justify-content: center;
+  .data_show{
+    padding: 7px;
+  }
+  .icon{
+    text-align: center;
+  }
+}
+
+.flex-c01{
+  .card{
+    margin: 10px 0;
+  }
+}

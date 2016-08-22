@@ -1,16 +1,13 @@
 "use strict";
 
 import angular = require('angular');
-import {IRootScopeService, ITimeoutService} from 'angular';
+import {IRootScopeService, IDocumentService} from 'angular';
 
 class LoadingService {
-    $timeout: ITimeoutService;
-    level: number;
-    $ionicLoading;
-    constructor($rootScope: IRootScopeService, $timeout: ITimeoutService, $ionicLoading){
-        this.$timeout = $timeout;
-        this.level = 0;
-        this.$ionicLoading = $ionicLoading;
+    level: number = 0;
+
+    constructor(private $ionicLoading){
+        require('./loading.scss');
     }
 
     reset() {
@@ -24,7 +21,7 @@ class LoadingService {
 
         if(this.level == 0){
             var template = options.template || require('./loading.html');
-            this.$ionicLoading.show({template: template});
+            this.$ionicLoading.show({template: template})
             //var wH = $(window).height();
             //$("#loading").show();
             //$("body").css({'height':wH,'overflow':'hidden'});
@@ -76,4 +73,30 @@ angular
         $rootScope.$on("$scopeControllerDone", function(event) {
             $loading.end();
         });
+    })
+    .run(function($rootScope: IRootScopeService, $document: IDocumentService, $timeout) {
+        let initElements;
+        let deregisterSetupInitElements = $rootScope.$on("$locationChangeStart", function () {
+            deregisterSetupInitElements();
+            initElements = $document.find('body ion-nav-view>*');
+            initElements.data('$accessed', Date.now());
+        });
+        let deregisterRemoveInitElements = $rootScope.$on("$stateChangeSuccess", function() {
+            deregisterRemoveInitElements();
+            removeInitElements();
+        });
+        let deregisterRemoval:any = $rootScope.$on('backdrop.shown', removeInitElements);
+
+        function removeInitElements() {
+            if(!deregisterRemoval)
+                return;
+            deregisterRemoval();
+            deregisterRemoval = undefined;
+            let body = $document.find('body');
+            body.addClass('initial-loading-switching');
+            $timeout(()=>{
+                initElements.remove();
+                $document.find('body').removeClass('initial-loading-switching');
+            });
+        }
     });
