@@ -136,7 +136,7 @@ export class CommonTicketStrategy extends AbstractStrategy {
         /* * * * * * * * * * * *
          * 根据仓位打分
          * * * * * * * * * * * * * */
-        _tickets = ticketPrefer.cabin(_tickets, ['Economy', '二等座', '硬卧'], CABIN_POINTS);
+        _tickets = ticketPrefer.cabin(_tickets, params.cabin, CABIN_POINTS);
         
         _tickets = ticketPrefer.priceprefer(_tickets, 0.5, PRICE_PREFER_POINTS);
         /* * * * * * * * * * * *
@@ -186,11 +186,21 @@ export class HighestPriceTicketStrategy extends AbstractStrategy {
                 price: -1
             }
         }
-        const POINTS = 500;
+        const CHOOSE_TRAIN_DURATION = 6 * 60;
+        const CHOOSE_FLIGHT_DURATION = 3.5 * 60
+        const CHOOSE_TRAFFIC_SCORE = 500;
+        const PREFER_AGENT = 100;
+        const CORRECT_CABIN = 400;
         let tickets = formatTicketData(this.tickets);
+        tickets = ticketPrefer.selecttraffic(tickets, CHOOSE_FLIGHT_DURATION, CHOOSE_TRAIN_DURATION, CHOOSE_TRAFFIC_SCORE);
+        tickets = ticketPrefer.cabin(tickets, params.cabin, CORRECT_CABIN);
+        tickets = ticketPrefer.preferagent(tickets, ['ctrip', '携程旅行网', '同程旅游'], PREFER_AGENT);
+
         tickets.sort( (v1, v2) => {
+            if (v2.score - v1.score != 0) return v2.score - v1.score;
             return v2.price - v1.price;
         });
+
         return {
             price: tickets[0].price,
             type: <EInvoiceType>(<number>tickets[0].type),
