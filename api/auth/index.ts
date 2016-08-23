@@ -482,7 +482,7 @@ class ApiAuth {
     @clientExport
     @requireParams(['mobile', 'name', 'email', 'userName','msgCode','msgTicket'], ['pwd','agencyId', 'remark', 'description'])
     static async registerCompany(params:{name: string, userName: string, email: string, mobile: string, pwd: string,
-        msgCode: string, msgTicket: string, agencyId?: string}){
+        msgCode: string, msgTicket: string, agencyId?: string, isValidateMobile?: boolean, isValidateEmail?: boolean}){
         var companyName = params.name;
         var name = params.userName;
         var email = params.email;
@@ -517,7 +517,8 @@ class ApiAuth {
 
         await API.auth.checkEmailAndMobile({email: email, mobile: mobile});
         await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
-        var company = await API.company.registerCompany({mobile:mobile, email: email,name: companyName,userName: name, pwd: pwd, status: 1});
+        var company = await API.company.registerCompany({mobile:mobile, email: email,name: companyName,
+            userName: name, pwd: pwd, status: 1, isValidateMobile: true});
         return company;
     }
 
@@ -1535,6 +1536,38 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
                 res.redirect(url);
             }
         })
+    }
+
+    /**
+     * 注册验证手机号和邮箱
+     * @param data
+     * @returns {boolean}
+     */
+    @clientExport
+    static async registerCheckEmailMobile (data: {email?: string, mobile?: string}) {
+        if (data.email && !validator.isEmail(data.email)) {
+            throw L.ERR.INVALID_FORMAT('email');
+        }
+
+        if (data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+        //查询邮箱是否已经注册
+        if(data.email){
+            var account1 = await Models.account.find({where: {email: data.email}, paranoid: false});
+            if (account1 && account1.total>0) {
+                throw L.ERR.EMAIL_HAS_REGISTRY();
+            }
+        }
+
+        if(data.mobile){
+            var account2 = await Models.account.find({where: {mobile: data.mobile}, paranoid: false});
+            if (account2 && account2.total>0) {
+                throw L.ERR.MOBILE_HAS_REGISTRY();
+            }
+        }
+
+        return true;
     }
 
 }
