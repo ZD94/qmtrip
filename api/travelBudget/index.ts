@@ -298,7 +298,7 @@ class ApiTravelBudget {
     @clientExport
     static async getTrafficBudget(params: {originPlace: string, destinationPlace: string,
         leaveDate: Date | string, leaveTime?: string, latestArrivalTime?: string}) : Promise<TravelBudgeItem> {
-        let {originPlace, destinationPlace, leaveDate, leaveTime} = params;
+        let {originPlace, destinationPlace, leaveDate, leaveTime, latestArrivalTime} = params;
 
         if (!destinationPlace) {
             throw new Error(JSON.stringify({code: -1, msg: "目的地城市信息不存在"}));
@@ -362,11 +362,12 @@ class ApiTravelBudget {
             });
         }
 
+        let trainCabins = trainCabinClass.split(/,/g)
         let trainTickets = await API.train.search_ticket( {
             originPlace: m_originCity,
             destination: m_destination,
             leaveDate: leaveDate,
-            cabin: trainCabinClass
+            cabin: trainCabins
         });
 
         let strategySwitcher = {
@@ -377,7 +378,14 @@ class ApiTravelBudget {
         let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
         console.info('选择的策略是:', companyPolicy);
         let strategy = new strategySwitcher[companyPolicy](tickets, cache);
-        return strategy.getResult(params)
+        return strategy.getResult({
+            originPlace: m_originCity,
+            destination: m_destination,
+            leaveDate: leaveDate,
+            cabin: _.concat(cabinClass, trainCabins),
+            leaveTime: leaveTime,
+            latestArrivalTime: latestArrivalTime
+        })
     }
 
     @clientExport
