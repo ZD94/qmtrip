@@ -140,10 +140,16 @@ export async function IndexController($scope, Menu, $ionicPopup, Models, $storag
         }
     }
 
-    $scope.showTravelPolicy = async function () {
-        if (!staff)
+    $scope.showTravelPolicy = async function (staffId?: string) {
+        let pStaff = await Staff.getCurrent();
+
+        if(staffId)
+            pStaff = await Models.staff.get(staffId);
+
+        if (!pStaff)
             return;
-        var policy = await staff.getTravelPolicy();
+
+        var policy = await pStaff.getTravelPolicy();
         if (policy) {   //判断是否设置差旅标准
             var show = $ionicPopup.alert({
                 title: '差旅标准',

@@ -1,0 +1,1 @@
+alter table trip_plan.trip_approves add approved_users text default '';
