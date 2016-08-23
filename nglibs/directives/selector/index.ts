@@ -50,8 +50,8 @@ angular
                 options: '=dlgOptions'
             },
             controller: function($scope, ngModalDlg) {
-                $scope.options.city = $scope.city;
                 $scope.showSelectorDlg = async function() {
+                    $scope.options.city = $scope.city;
                     var value: any = await ngModalDlg.selectMapPoint($scope, $scope.options, $scope.value)
                     if(value == undefined)
                         return;
