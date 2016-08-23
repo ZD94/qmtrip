@@ -12,7 +12,9 @@ export var ticketPrefer = {
     lowestprice: require('./ticket-lowestprice'),
     maxpricelimit: require('./ticket-maxpricelimit'),
     selecttraffic: require('./ticket-selecttraffic'),
-    priceprefer: require('./ticket-priceprefer')
+    priceprefer: require('./ticket-priceprefer'),
+    preferagent: require('./ticket-preferagent'),
+    preferaircompany: require('./ticket-preferaircompany')
 };
 
 export var hotelPrefer = {
