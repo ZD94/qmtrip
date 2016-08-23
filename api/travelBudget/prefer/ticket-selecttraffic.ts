@@ -32,7 +32,10 @@ function selecttraffic(data: IFinalTicket[], selectTrainDuration: number, select
         return v1.duration - v2.duration;
     });
     let midIdx = Math.ceil(trains.length / 2) - 1;
-    let gainScoreTraffic;
+    let gainScoreTraffic: TRAFFIC = null;
+    if (typeof trains[midIdx] == 'string') {
+        trains[midIdx].duration = <number>trains[midIdx].duration;
+    }
     if (trains[midIdx].duration <= selectTrainDuration) {
         console.info(`时长小于只选火车:${trains[midIdx].duration} < ${selectTrainDuration}`)
         //火车加分
@@ -44,7 +47,7 @@ function selecttraffic(data: IFinalTicket[], selectTrainDuration: number, select
         gainScoreTraffic = TRAFFIC.FLIGHT;
     }
 
-    if (!gainScoreTraffic) {
+    if (gainScoreTraffic != TRAFFIC.TRAIN && gainScoreTraffic != TRAFFIC.FLIGHT) {
         console.info(`平均时长无法决定选择飞机火车:${selectTrainDuration} < ${trains[midIdx].duration} < ${selectFlightDuration}`)
     }
 
