@@ -97,7 +97,7 @@ export class CommonTicketStrategy extends AbstractStrategy {
     }
 
     async buildProcess(params: {originCity: any, destinationCity: any, leaveDate: string,
-        leaveTime?: string, latestArrivalTime?: string}):Promise<any> {
+        leaveTime?: string, latestArrivalTime?: string, cabin?: string[]}):Promise<any> {
 
         const ARRIVAL_TIME_POINTS = 100;
         const DEPART_TIME_POINTS = 100;
