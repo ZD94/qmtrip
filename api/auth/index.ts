@@ -482,7 +482,7 @@ class ApiAuth {
     @clientExport
     @requireParams(['mobile', 'name', 'email', 'userName','msgCode','msgTicket'], ['pwd','agencyId', 'remark', 'description'])
     static async registerCompany(params:{name: string, userName: string, email: string, mobile: string, pwd: string,
-        msgCode: string, msgTicket: string, agencyId?: string}){
+        msgCode: string, msgTicket: string, agencyId?: string, isValidateMobile?: boolean, isValidateEmail?: boolean}){
         var companyName = params.name;
         var name = params.userName;
         var email = params.email;
@@ -517,7 +517,8 @@ class ApiAuth {
 
         await API.auth.checkEmailAndMobile({email: email, mobile: mobile});
         await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
-        var company = await API.company.registerCompany({mobile:mobile, email: email,name: companyName,userName: name, pwd: pwd, status: 1});
+        var company = await API.company.registerCompany({mobile:mobile, email: email,name: companyName,
+            userName: name, pwd: pwd, status: 1, isValidateMobile: true});
         return company;
     }
 
@@ -1556,13 +1557,6 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
             var account1 = await Models.account.find({where: {email: data.email}, paranoid: false});
             if (account1 && account1.total>0) {
                 throw L.ERR.EMAIL_HAS_REGISTRY();
-            }
-            let domain = data.email.match(/.*\@(.*)/)[1]; //企业域名
-
-            let companies = await Models.company.find({where: {domain_name: domain}});
-
-            if(companies && (companies.length > 0 || companies.total > 0)) {
-                throw L.ERR.DOMAIN_HAS_EXIST();
             }
         }
 
