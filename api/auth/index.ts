@@ -1537,6 +1537,45 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
         })
     }
 
+    /**
+     * 注册验证手机号和邮箱
+     * @param data
+     * @returns {boolean}
+     */
+    @clientExport
+    static async registerCheckEmailMobile (data: {email?: string, mobile?: string}) {
+        if (data.email && !validator.isEmail(data.email)) {
+            throw L.ERR.INVALID_FORMAT('email');
+        }
+
+        if (data.mobile && !validator.isMobilePhone(data.mobile, 'zh-CN')) {
+            throw L.ERR.MOBILE_NOT_CORRECT();
+        }
+        //查询邮箱是否已经注册
+        if(data.email){
+            var account1 = await Models.account.find({where: {email: data.email}, paranoid: false});
+            if (account1 && account1.total>0) {
+                throw L.ERR.EMAIL_HAS_REGISTRY();
+            }
+            let domain = data.email.match(/.*\@(.*)/)[1]; //企业域名
+
+            let companies = await Models.company.find({where: {domain_name: domain}});
+
+            if(companies && (companies.length > 0 || companies.total > 0)) {
+                throw L.ERR.DOMAIN_HAS_EXIST();
+            }
+        }
+
+        if(data.mobile){
+            var account2 = await Models.account.find({where: {mobile: data.mobile}, paranoid: false});
+            if (account2 && account2.total>0) {
+                throw L.ERR.MOBILE_HAS_REGISTRY();
+            }
+        }
+
+        return true;
+    }
+
 }
 
 //拼接字符串
