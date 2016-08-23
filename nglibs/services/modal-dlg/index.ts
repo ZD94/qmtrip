@@ -4,13 +4,21 @@ import { selectFromListController } from './list';
 import { selectMapPointController } from './map';
 import { selectDateController, selectDateSpanController } from './date';
 
+interface DialogOptions{
+    scope: any;
+    parent: any;
+    template: string;
+    controller: Function
+    notHideOnConfiom?: boolean
+}
 @ngService('ngModalDlg')
 class ngModalDlg {
     constructor(private $ionicModal, private $ionicPopup, private $injector) {
         require('./modal-dialog.scss');
     }
 
-    createDialog({scope, parent, template, controller}) {
+    createDialog(options: DialogOptions) {
+        var {scope, parent, template, controller, notHideOnConfiom} = options;
         return new Promise((resolve, reject) => {
             let modal = this.$ionicModal.fromTemplate(template, {
                 scope: parent,
@@ -22,20 +30,31 @@ class ngModalDlg {
                 $scope[k] = scope[k];
             }
             $scope.modal = modal;
-            let result;
+            let confirmed = false;
             //$scope.$on('$destroy', function() {
             //});
-            parent.$on('modal.hidden', function() {
+            let deregHidden = parent.$on('modal.hidden', function(event, from) {
+                if(from != modal)
+                    return;
                 modal.remove();
-                resolve(result);
+                modal = undefined;
+                $scope.confirmModal();
             });
-            parent.$on('modal.removed', function() {
+            let deregRemove = parent.$on('modal.removed', function(event, from) {
+                if(from != modal)
+                    return;
                 $scope.$destroy();
+                deregHidden();
+                deregRemove();
             });
 
             $scope.confirmModal = function(value) {
-                result = value;
-                modal.hide();
+                if(confirmed)
+                    return;
+                confirmed = true;
+                if(modal && !notHideOnConfiom)
+                    modal.hide();
+                resolve(value);
             }
             modal.show();
             this.$injector.invoke(controller, this, {$scope, $element: modal.$el.find('ion-modal-view')});
