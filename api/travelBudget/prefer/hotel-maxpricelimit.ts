@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {IFinalHotel} from "../../_types/travelBudget";
+import {IFinalHotel} from "api/_types/travelbudget";
 
 function maxpricelimit(hotels: IFinalHotel[], maxprice: number, score: number) {
     hotels = hotels.map( (v) => {

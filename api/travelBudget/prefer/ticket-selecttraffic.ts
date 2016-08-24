@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {IFinalTicket, TRAFFIC} from "api/_types/travelBudget";
+import {IFinalTicket, TRAFFIC} from "api/_types/travelbudget";
 
 function selecttraffic(data: IFinalTicket[], selectTrainDuration: number, selectFlightDuration: number, score: number) :IFinalTicket[] {
     //分离火车,飞机预算

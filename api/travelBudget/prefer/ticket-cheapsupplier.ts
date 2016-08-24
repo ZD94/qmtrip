@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {IFinalTicket} from "api/_types/travelBudget";
+import {IFinalTicket} from "api/_types/travelbudget";
 //廉价供应商
 
 function cheapsupplier(data: IFinalTicket[], cheapsuppliers: Array<string>, score: number) :IFinalTicket[] {
