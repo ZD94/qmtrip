@@ -371,6 +371,18 @@ export async function FirstSetPwdController ($scope, $stateParams) {
     }
 }
 
+//企业注册页面  sc
+export async function CompanyRegisterController ($scope,$state,$stateParams){
+    var backUrl = $stateParams.path;
+    $scope.company_register = function(){
+        window.location.href = '#/login/company-welcome';
+    }
+}
+export async function CompanyWelcomeController ($scope,$state,$stateParams){}
+export async function CompanyFirstController ($scope){
+
+}
+
 
 function trim(s) {
     if (!s) return s;
