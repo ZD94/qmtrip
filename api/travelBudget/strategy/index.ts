@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {ITicket, IFinalTicket, TRAFFIC, TravelBudgeItem, IHotel, IFinalHotel} from "api/_types/travelBudget";
+import {ITicket, IFinalTicket, TRAFFIC, TravelBudgeItem, IHotel, IFinalHotel} from "api/_types/travelbudget";
 import {ticketPrefer, hotelPrefer} from '../prefer'
 import {EInvoiceType} from "api/_types/tripPlan";
 import {RedisStorage, IStorage} from '../storage';
