@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {IFinalTicket} from "api/_types/travelBudget";
+import {IFinalTicket} from "api/_types/travelbudget";
 /* * * * * * * * *
  * 仓位信息打分
  * * * * * * * * */

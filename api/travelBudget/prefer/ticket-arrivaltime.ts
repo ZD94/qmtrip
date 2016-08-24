@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {IFinalTicket} from "api/_types/travelBudget";
+import {IFinalTicket} from "api/_types/travelbudget";
 
 
 function arrivaltime(data: IFinalTicket[], d1, d2, score) :IFinalTicket[] {

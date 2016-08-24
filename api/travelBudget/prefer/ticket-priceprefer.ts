@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {IFinalTicket} from "../../_types/travelbudget";
+import {IFinalTicket} from "api/_types/travelbudget";
 
 
 function priceperfer(data: IFinalTicket[], percent: number, score: number) :IFinalTicket[]{

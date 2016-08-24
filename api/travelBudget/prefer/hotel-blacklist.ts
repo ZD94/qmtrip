@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {IFinalHotel} from "../../_types/travelBudget";
+import {IFinalHotel} from "api/_types/travelbudget";
 
 function blacklist(hotels: IFinalHotel[], score: number) : IFinalHotel[] {
     const FILTER_HOTEL_AGENTS = ['hotels.com', '好订'];

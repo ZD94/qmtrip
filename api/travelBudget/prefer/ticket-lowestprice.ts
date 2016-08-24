@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {IFinalTicket} from "api/_types/travelBudget";
+import {IFinalTicket} from "api/_types/travelbudget";
 
 function lowestprice(data: IFinalTicket[], score: number) :IFinalTicket[]{
     if (!data || !data.length) return data;

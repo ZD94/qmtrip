@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {IFinalHotel} from "../../_types/travelBudget";
+import {IFinalHotel} from "api/_types/travelbudget";
 
 function represent(hotels: IFinalHotel[], score: number) {
     const REFERENCE_HOTELS_PRICE = {

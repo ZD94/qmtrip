@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {IFinalTicket} from "api/_types/travelBudget";
+import {IFinalTicket} from "api/_types/travelbudget";
 import moment = require("moment");
 
 

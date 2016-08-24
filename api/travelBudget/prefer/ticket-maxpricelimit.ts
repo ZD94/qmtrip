@@ -3,7 +3,7 @@
  */
 
 'use strict';
-import {IFinalTicket} from "api/_types/travelBudget";
+import {IFinalTicket} from "api/_types/travelbudget";
 
 /**
  * 最高价格策略,超过最高价格的将减分
