@@ -392,6 +392,7 @@ class ApiTravelBudget {
     static async reportBudgetError(params: { budgetId: string}) {
         let {accountId} = Zone.current.get('session');
         let {budgetId} = params;
+        let staff = await Staff.getCurrent();
         let content = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: accountId});
         let budgets = content.budgets;
         let fs = require("fs");
@@ -405,14 +406,14 @@ class ApiTravelBudget {
             return Promise.all([
                 new Promise( (resolve, reject) => {
                     //原始数据
-                    fs.writeFile(`./tmp/${prefix}-${accountId}-${budgetId}-${budget.id}-data.json`, JSON.stringify(originData), function(err) {
+                    fs.writeFile(`./tmp/${prefix}-${staff.mobile}-data.json`, JSON.stringify(originData), function(err) {
                         if (err) return reject(err);
                         resolve(true);
                     });
                 }),
                 new Promise( (resolve, reject) => {
                     //预算结果
-                    fs.writeFile(`./tmp/${prefix}-${accountId}-${budgetId}-${budget.id}-result.json`, JSON.stringify(budget), function(err) {
+                    fs.writeFile(`./tmp/${prefix}-${staff.mobile}-result.json`, JSON.stringify(budget), function(err) {
                         if (err) return reject(err);
                         resolve(true);
                     })

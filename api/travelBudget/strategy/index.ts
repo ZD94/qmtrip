@@ -98,47 +98,46 @@ export class CommonTicketStrategy extends AbstractStrategy {
 
     async buildProcess(params: {originCity: any, destinationCity: any, leaveDate: string,
         leaveTime?: string, latestArrivalTime?: string, cabin?: string[]}):Promise<any> {
+        let {leaveDate, leaveTime, latestArrivalTime, cabin} = params;
 
-        const ARRIVAL_TIME_POINTS = 100;
-        const DEPART_TIME_POINTS = 100;
-        const CHEAP_SUPPLIER_POINTS = 200;
-        const CORRECT_TRAFFIC_POINTS = 500;
-        const CABIN_POINTS = 500;
-        const PRICE_PREFER_POINTS = 100;
+        let preferConfig = {
+            "ARRIVAL_TIME_POINTS": [null, `${leaveDate} ${latestArrivalTime} +0800`, 100],
+            "DEPART_TIME_POINTS": [`${leaveDate} ${leaveTime} +0800`, null, 100],
+            "CHEAP_SUPPLIER_POINTS": [['春秋航空', '中国联合航空', '吉祥航空', '西部航空', '成都航空', '九元航空', '幸福航空'], 200],
+            "CORRECT_TRAFFIC_POINTS": [3.5 * 60, 6 * 60, 500],
+            "CABIN_POINTS": [cabin, 500],
+            "PRICE_PREFER_POINTS": [0.5, 100]
+        }
 
-        let {leaveDate, leaveTime, latestArrivalTime} = params;
         let _tickets: IFinalTicket[] = [];
         _tickets = formatTicketData(this.tickets);
 
         /* * * * * * * * * * *
          * 根据到达时间打分
          * * * * * * * * * * * */
-        _tickets = ticketPrefer.arrivaltime(_tickets, `${leaveDate} ${leaveTime} +0800`, null, ARRIVAL_TIME_POINTS);
+        _tickets = ticketPrefer.arrivaltime.bind(null, _tickets).apply(null, preferConfig.ARRIVAL_TIME_POINTS);
 
         /* * * * * * * * * * *
          * 根据出发时间打分
          * * * * * * ** * * * */
-        _tickets = ticketPrefer.departtime(_tickets, null, `${leaveDate} ${latestArrivalTime} +0800`, DEPART_TIME_POINTS);
+        _tickets = ticketPrefer.departtime.bind(null, _tickets).apply(null, preferConfig.DEPART_TIME_POINTS);
 
         /* * * * * * * * * * * *
          * 根据是否廉价供应商打分
          * * * * * ** * * * * * */
-        let cheapSuppliers = ['春秋航空', '中国联合航空', '吉祥航空', '西部航空', '成都航空', '九元航空', '幸福航空']
-        _tickets = ticketPrefer.cheapsupplier(_tickets, cheapSuppliers, CHEAP_SUPPLIER_POINTS);
+        _tickets = ticketPrefer.cheapsupplier.bind(null, _tickets).apply(null, preferConfig.CHEAP_SUPPLIER_POINTS);
 
         /* * * * * * * * * * * *
          * 根据时长对不同交通方式打分
          * * * * * * * * * * * * * */
-        const CHOOSE_TRAIN_DURATION = 3.5 * 60;
-        const CHOOSE_FLIGHT_DURATION = 6 * 60;
-        _tickets = ticketPrefer.selecttraffic(_tickets, CHOOSE_TRAIN_DURATION, CHOOSE_FLIGHT_DURATION, CORRECT_TRAFFIC_POINTS);
+        _tickets = ticketPrefer.selecttraffic.bind(null, _tickets).apply(null, preferConfig.CORRECT_TRAFFIC_POINTS);
 
         /* * * * * * * * * * * *
          * 根据仓位打分
          * * * * * * * * * * * * * */
-        _tickets = ticketPrefer.cabin(_tickets, params.cabin, CABIN_POINTS);
+        _tickets = ticketPrefer.cabin.bind(null, _tickets).apply(null, preferConfig.CABIN_POINTS);
         
-        _tickets = ticketPrefer.priceprefer(_tickets, 0.5, PRICE_PREFER_POINTS);
+        _tickets = ticketPrefer.priceprefer.bind(null, _tickets).apply(null, preferConfig.PRICE_PREFER_POINTS);
         /* * * * * * * * * * * *
          * 如果没有车票信息,直接返回无预算
          * * * * * * * * * * * * * */
