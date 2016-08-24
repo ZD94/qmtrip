@@ -44,39 +44,39 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     $scope.isHasPermissionApprove = isHasPermissionApprove;
     let totalBudget: number = 0;
 
-    // if (tripApprove.status == EApproveStatus.WAIT_APPROVE && tripApprove.query && isHasPermissionApprove) {
-    //     $loading.reset();
-    //     $loading.start({
-    //         template: '预算计算中...'
-    //     });
-    //     //计算最终预算
-    //     API.require("travelBudget");
-    //     await API.onload();
-    //     let query = tripApprove.query;
-    //
-    //     if (typeof query == 'string')
-    //         query = JSON.parse(tripApprove.query);
-    //
-    //     query.staffId = tripApprove.account.id;
-    //     let budgetId = await API.travelBudget.getTravelPolicyBudget(query);
-    //     $scope.budgetId = budgetId;
-    //     let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
-    //     let budgets = budgetInfo.budgets;
-    //
-    //     totalBudget = 0;
-    //     budgets.forEach((v) => {
-    //         if (v.price <= 0) {
-    //             totalBudget = -1;
-    //             return;
-    //         }
-    //         totalBudget += Number(v.price);
-    //     });
-    //
-    //     if (totalBudget > tripApprove.budget) {
-    //         tripApprove.budget = totalBudget;
-    //         tripApprove.budgetInfo = budgets;
-    //     }
-    // }
+    if (tripApprove.status == EApproveStatus.WAIT_APPROVE && tripApprove.query && isHasPermissionApprove) {
+        $loading.reset();
+        $loading.start({
+            template: '预算计算中...'
+        });
+        //计算最终预算
+        API.require("travelBudget");
+        await API.onload();
+        let query = tripApprove.query;
+
+        if (typeof query == 'string')
+            query = JSON.parse(tripApprove.query);
+
+        query.staffId = tripApprove.account.id;
+        let budgetId = await API.travelBudget.getTravelPolicyBudget(query);
+        $scope.budgetId = budgetId;
+        let budgetInfo = await API.travelBudget.getBudgetInfo({id: budgetId, accountId: tripApprove.account.id});
+        let budgets = budgetInfo.budgets;
+
+        totalBudget = 0;
+        budgets.forEach((v) => {
+            if (v.price <= 0) {
+                totalBudget = -1;
+                return;
+            }
+            totalBudget += Number(v.price);
+        });
+
+        if (totalBudget > tripApprove.budget) {
+            tripApprove.budget = totalBudget;
+            tripApprove.budgetInfo = budgets;
+        }
+    }
 
     let traffic = [], hotel = [], subsidy = [];
     let trafficBudget = 0, hotelBudget = 0, subsidyBudget = 0;
@@ -120,7 +120,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
 
     async function approve(result: EApproveResult, approveRemark?: string) {
         try{
-            $scope.budgetId = '1471529270884Z4xl6y';
+            // $scope.budgetId = '1471529270884Z4xl6y';
             await tripApprove.approve({approveResult: result, isNextApprove: $scope.isNextApprove || false, nextApproveUserId: tripApprove.approveUser.id, approveRemark: approveRemark, budgetId: $scope.budgetId});
             if(result == EApproveResult.PASS) {
                 window.location.href = "#/trip-approval/approved?staffId="+tripApprove.account.id;
