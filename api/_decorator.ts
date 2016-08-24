@@ -18,7 +18,7 @@ export function requirePermit(permits: string| string[], type?: number) {
             let session = getSession();
             let account = Models.account.get(session.accountId);
             if(!account)
-                throw L.ERR.PERMISSION_DENIED();
+                throw L.ERR.PERMISSION_DENY();
 
             await API.permit.checkPermission({accountId: session.accountId, permissions: permits, type: account.type});
 
@@ -409,7 +409,7 @@ export var condition = {
             let session = Zone.current.get('session');
             
             if(!session || !session.accountId) {
-                throw L.ERR.PERMISSION_DENIED();
+                throw L.ERR.PERMISSION_DENY();
             }
             
             let account = await Models.account.get(session.accountId);
@@ -425,7 +425,7 @@ export var condition = {
                 let agency = await company.getAgency();
                 return agency.id == user.agency.id;
             }else {
-                throw L.ERR.PERMISSION_DENIED();
+                throw L.ERR.PERMISSION_DENY();
             }
         }
     }

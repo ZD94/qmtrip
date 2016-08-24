@@ -10,14 +10,13 @@ import moment = require("moment");
 require("./trip-plan.scss");
 
 let statusTxt = {};
-statusTxt[EPlanStatus.WAIT_APPROVE] = '等待审批';
 statusTxt[EPlanStatus.AUDIT_NOT_PASS] = "未通过";
 statusTxt[EPlanStatus.NO_BUDGET] = "没有预算";
 statusTxt[EPlanStatus.WAIT_UPLOAD] = "待上传票据";
 statusTxt[EPlanStatus.WAIT_COMMIT] = "待提交";
 statusTxt[EPlanStatus.AUDITING] = "已提交待审核";
 statusTxt[EPlanStatus.COMPLETE] = "已完成";
-statusTxt[EPlanStatus.APPROVE_NOT_PASS] = '审核未通过';
+// statusTxt[EPlanStatus.APPROVE_NOT_PASS] = '审核未通过';
 statusTxt[EPlanStatus.CANCEL] = "已撤销";
 
 angular
@@ -56,10 +55,10 @@ angular
             },
             controller: function($scope) {
                 //根据status转换成合适状态
-                if ($scope.status == EPlanStatus.APPROVE_NOT_PASS) {
-                    $scope.text = $scope.reason ? `审核未通过,备注:${$scope.reason}` : '审核未通过';
-                    return;
-                }
+                // if ($scope.status == EPlanStatus.APPROVE_NOT_PASS) {
+                //     $scope.text = $scope.reason ? `审核未通过,备注:${$scope.reason}` : '审核未通过';
+                //     return;
+                // }
                 $scope.$watch('status', function(newVal, oldVal) {
                     $scope.text = statusTxt[newVal];
                 });

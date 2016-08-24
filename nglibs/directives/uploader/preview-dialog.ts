@@ -1,63 +1,32 @@
 
 var dyload = require('dyload');
 
-export function showPreviewDialog($scope, $ionicModal, file): Promise<any>{
-    var template = require('./preview-dialog.html');
-    $scope.modal = $ionicModal.fromTemplate(template, {
-        scope: $scope,
-        animation: 'slide-in-up',
-        focusFirstInput: true
+export function showPreviewDialog($scope, ngModalDlg, files, title): Promise<any>{
+    return ngModalDlg.createDialog({
+        parent: $scope,
+        scope: {files, title},
+        template: require('./preview-dialog.html'),
+        controller: previewImageController
     });
+}
 
-    $scope.$on('$destroy', function() {
-    });
-    $scope.$on('modal.shown', function() {
-    });
-    $scope.$on('modal.hidden', function() {
-        $scope.modal.remove();
-    });
-    $scope.$on('modal.removed', function() {
-    });
+async function previewImageController($scope, $element){
+    var files = $scope.files;
 
-    if (typeof file == 'string') {
-        var img = $('<img src="' + file + '"/>');
-        insertPreviewElement(img);
-    }else if(Array.isArray(file) && file.length > 0){
-        for(var f in file){
-            if(file[f]._file){
-                previewImage(file[f]._file)
-                    .then(function(canvas){
-                        insertPreviewElement(canvas);
-                    })
-            }else{
-                var img = $('<img src="' + file[f] + '"/>');
-                insertPreviewElement(img);
-            }
-        }
-    } else {
-        previewImage(file._file)
-            .then(function(canvas){
-                insertPreviewElement(canvas);
-            })
-            //.catch(function(err){
-            //});
+    $scope.canvases = await Promise.all(files.map(loadImageAsCanvas));
+
+    var $el = $element.find(".preview_img");
+    for(let canvas of $scope.canvases){
+        $el.append(canvas);
     }
 
-    return new Promise(function(resolve, reject){
-        $scope.cancelModal = function(){
-            // resolve();
-            $scope.modal.hide();
-        }
-        $scope.confirmModal = function(){
-            resolve(file);
-            $scope.modal.hide();
-        }
-        $scope.modal.show();
-    });
-
-    function insertPreviewElement(element) {
-        var $el = $($scope.modal.modalEl);
-        $el.find(".preview_img").append(element);
+    $scope.confirm = function(){
+        var results = Promise.all($scope.canvases.map(function(canvas){
+            return new Promise(function(resolve){
+                canvas.toBlob(resolve);
+            });
+        }));
+        $scope.confirmModal(results);
     }
 }
 
@@ -69,13 +38,15 @@ async function loadImage(url){
             img.onload = function() {
                 resolve(img);
             };
+            img.onerror = reject;
             img.src = reader.result;
         };
+        reader.onerror = reject;
         reader.readAsDataURL(url);
     });
 }
 
-async function previewImage(url) {
+async function loadImageAsCanvas(url) {
     var [img] = await Promise.all([
         loadImage(url),
         dyload('/script/libs/bundle.img.js')

@@ -291,8 +291,10 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
     await API.onload();
     let result = await API.travelBudget.getBudgetInfo({id: id});
     let budgets = result.budgets;
+    console.info("budgets=>", budgets);
     let trip = $storage.local.get("trip");
     let query = result.query;
+    trip.reason = 'ceshiyuanyin';
     trip.beginDate = query.leaveDate;
     trip.endDate  = query.goBackDate;
     trip.createAt = new Date(result.createAt);
@@ -326,7 +328,7 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
 
     $scope.totalPrice = totalPrice;
     let duringDays = moment(trip.endDate).diff(moment(trip.beginDate), 'days');
-    $scope.duringDays = duringDays;
+    $scope.duringDays = duringDays + 1;
     $scope.budgets = budgets;
     $scope.EInvoiceType = EInvoiceType;
     $scope.ETripType = ETripType;
@@ -357,24 +359,36 @@ export async function BudgetController($scope, $storage, Models, $stateParams, $
         });
 
         try {
-            let planTrip = await API.tripPlan.saveTripPlan({budgetId: id, title: trip.reason||trip.reasonName, auditUser: trip.auditUser.id})
-            window.location.href = '#/trip/committed?id='+planTrip.id;
+            let staff = await Staff.getCurrent();
+            let tripApprove = await API.tripPlan.saveTripApprove({budgetId: id, title: trip.reason||trip.reasonName, approveUserId: trip.auditUser.id});
+            window.location.href = '#/trip/committed?id='+tripApprove.id;
         } catch(err) {
             alert(err.msg || err);
         } finally {
             $ionicLoading.hide();
         }
     }
+
+    //我要报错
+    $scope.reportBudgetError = function() {
+        let id = $stateParams.id;
+        API.travelBudget.reportBudgetError({budgetId: id})
+            .then( (ret) => {
+                $scope.showErrorMsg(`感谢您的反馈,我们会在最短时间内处理`);
+            })
+            .catch((err) =>{
+                alert(err.msg ||err);
+            })
+    }
 }
 
 export async function CommittedController($scope, $stateParams, Models){
     let id = $stateParams.id;
-
-    let tripPlan = await Models.tripPlan.get(id);
-    $scope.tripPlan = tripPlan.target;
-
+    let tripApprove = await Models.tripApprove.get(id);
+    $scope.tripApprove = tripApprove;
+    console.info($scope.tripApprove);
     $scope.goToDetail = function() {
-        window.location.href = '#/trip/list-detail?tripid='+id;
+        window.location.href = `#/trip-approval/detail?approveId=${id}`;
     }
 }
 
@@ -568,49 +582,6 @@ export async function ListDetailController($location, $scope , Models, $statePar
         }
     };
 
-    $scope.createTripPlan = async function() {
-        let tripPlan = $scope.tripDetail;
-        let tripDetails = $scope.budgets;
-        let trip: any = {
-            regenerate: true,
-            beginDate: moment(tripPlan.startAt).toDate(),
-            endDate: moment(tripPlan.backAt).toDate(),
-            place: {id: tripPlan.arrivalCityCode, name: tripPlan.arrivalCity},
-            reasonName: {id: undefined, name: tripPlan.title},
-            reason: tripPlan.title,
-            hotelPlaceObj: {}
-        };
-        if(tripDetails && tripDetails.length > 0) {
-            await Promise.all(tripDetails.map(async (detail) => {
-                switch (detail.type) {
-                    case ETripType.OUT_TRIP:
-                        trip.traffic = true;
-                        trip.fromPlace = {id: tripPlan.deptCityCode, name: tripPlan.deptCity};
-                        break;
-                    case ETripType.BACK_TRIP:
-                        trip.traffic = true;
-                        trip.fromPlace = {id: tripPlan.deptCityCode, name: tripPlan.deptCity};
-                        trip.round = true;
-                        break;
-                    case ETripType.HOTEL:
-                        trip.hotel = true;
-                        trip.hotelPlace = detail.hotelCode || '';
-                        trip.hotelPlaceName = detail.hotelName || '';
-                        let landMarkInfo = {name: ''};
-                        if(detail.hotelName) {
-                            landMarkInfo = await API.place.getCityInfo({cityCode: detail.hotelName});
-                        }
-                        if(landMarkInfo && landMarkInfo.name){
-                            trip.hotelPlaceName = landMarkInfo.name;
-                        }
-                        trip.hotelPlaceObj.title = trip.hotelPlaceName
-                }
-            }));
-        }
-        await $storage.local.set('trip', trip);
-        window.location.href="#/trip/create";
-    };
-    
     $scope.cancelTripPlan = function() {
         $ionicPopup.show({
             title: '确认撤销该出差计划？',

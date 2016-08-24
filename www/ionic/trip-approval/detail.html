@@ -1,9 +1,15 @@
-<ion-view title="待审批详情" id="page7">
-    <ion-content padding="false" scroll="false" class="has-header">
+<ion-view title="审批单详情" id="page7">
+    <ion-content ng-hide="isConfirm" padding="false" scroll="false" class="has-header">
         <div class="flex-c10">
             <ion-scroll>
-                <tp-status-bar status="tripPlan.status" reason="tripPlan.auditRemark"></tp-status-bar>
-                <ion-list>
+                <div class="list">
+                    <div class="item opactic">{{APPROVE_TEXT[tripApprove.status]}}
+                        <span ng-show="tripApprove.status==EApproveStatus.REJECT">{{tripApprove.approveRemark}}</span>
+                        <button class="btn button-positive" style="float: right" ng-click="showApproveDetails()">审批详情</button>
+                    </div>
+                </div>
+
+                <ion-list ng-if="isHasPermissionApprove">
                     <ion-item class="item-thumbnail-left opactic">
                         <div class="staff_portrait" ng-click="showTravelPolicy(staff.id)">
                             {{staff.name.substring(staff.name.length-2,staff.name.length)}}
@@ -16,19 +22,105 @@
                             <a class="button button-small" href="tel:{{staff.mobile}}">打电话</a>
                         </p>
                     </ion-item>
+                    <div class="spacer" style="width: 285px; height: 17px;"></div>
                 </ion-list>
-                <div class="spacer" style="width: 285px; height: 17px;"></div>
-                <tp-header trip="tripPlan"></tp-header>
-                <div class="spacer" style="width: 285px; height: 17px;"></div>
-                <ion-list>
-                    <tp-detail-item item="item" title="{{item.title}}" budget="{{item.showBudget| currency: ''}}元" ng-repeat="item in tripDetails"></tp-detail-item>
+
+                <ion-list class="jl_projectinfo">
+                    <ion-item class="project_tit">{{tripApprove.title}}</ion-item>
+                    <ion-item class="project_cont">
+                        <p ng-if="tripApprove && tripApprove.startAt">{{tripApprove.startAt | date: 'yyyy-MM-dd'}} 至 {{tripApprove.backAt | date: 'yyyy-MM-dd'}}</p>
+                        <p style="text-align: center">
+                            总预算:<span style="font-size: 20px;font-weight: bold;">{{tripApprove.budget <= 0 ? '暂无预算' : (tripApprove.budget| currency: '')}}</span>
+                            {{tripApprove.budget == -1 ? '' : '元'}}
+                        </p>
+                    </ion-item>
                 </ion-list>
+
+                <div class="spacer" style="width: 285px; height: 17px;"></div>
+
+                <div>
+                    <ion-item class="item-divider"><span>交通</span><span class="spanRight">{{trafficBudget}}元</span></ion-item>
+                    <ion-item ng-repeat="item in traffic">
+                        <span>{{item.startTime | date: 'yyyy-MM-dd'}}</span>
+                        <br>
+                        {{item.deptCity}}
+                        &nbsp;
+                        <i ng-if='item.type == EInvoiceType.PLANE' class="icon ion-plane"></i>
+                        <i ng-if='item.type == EInvoiceType.TRAIN' class="icon ion-android-train"></i>
+                        <i ng-if='item.type == EInvoiceType.HOTEL' class="icon ion-home"></i>
+                        <i ng-if='item.type == EInvoiceType.OTHER'>-</i>
+                        &nbsp;
+                        {{item.arrivalCity}}
+                        <br>
+                        <span ng-if="item.cabinClass">
+                            {{MTxPlaneLevel[item.cabinClass] ? MTxPlaneLevel[item.cabinClass] : item.cabinClass}}<br/>
+                        </span>
+                        {{item.price == -1 ? '暂无预算' : (item.price| currency: '')+'元'}}<br/>
+                        <span ng-if="item.fullPrice">
+                            折扣：{{item.fullPrice > item.price ? ((item.price/item.fullPrice)*100).toFixed(2)+'%' : '100%'}}<br/>
+                        </span>
+                        <!--<div class="item-note">{{APPROVE_TEXT[tripApprove.status]}}</div>-->
+                    </ion-item>
+
+                    <ion-item class="item-divider"><span>住宿</span><span class="spanRight">{{hotelBudget}}元</span></ion-item>
+                    <ion-item ng-repeat="item in hotel">
+                        <span>{{item.startTime | date: 'MM/dd'}}至{{item.endTime | date: 'MM/dd'}},共{{subsidyDays || 1}}天</span>
+                        <br/>
+                        <i class="icon ion-home"></i>{{item.city}}
+                        <br>
+                        <span ng-if="item.price > 0">
+                            {{item.price / subsidyDays | currency: ''}}元/晚
+                        </span>
+                    </ion-item>
+
+                    <ion-item class="item-divider"><span>补助</span><span class="spanRight">{{subsidyBudget}}元</span></ion-item>
+                    <ion-item ng-repeat="item in subsidy">
+                        <span>{{item.startTime | date: 'MM/dd'}}至{{item.endTime | date: 'MM/dd'}},共{{subsidyDays|| 1}}天</span>
+                        <br>
+                        <span ng-if="item.price > 0">
+                            {{item.price / subsidyDays | currency: ''}}元/天
+                        </span>
+                    </ion-item>
+
+                </div>
+
             </ion-scroll>
-            <div class="button-bar" ng-show="tripPlan.status == EPlanStatus.WAIT_APPROVE && isHasPermissionApprove">
-                <a ng-click="showReasonDialog()" id="page7-button41" class="button button-assertive  button-block">拒绝</a>
-                <a ng-click="showAlterDialog()" id="page7-button43"
-                   class="button button-positive  button-block">同意</a>
+
+            <div>
+                <div class="button-bar" ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE && isHasPermissionApprove">
+                    <a ng-click="showReasonDialog()" class="button button-assertive  button-block">驳回</a>
+                    <a ng-click="confirmButton()" class="button button-positive  button-block">同意</a>
+                </div>
+                <div class="button-bar" ng-if="tripApprove.status == EApproveStatus.REJECT && !isHasPermissionApprove">
+                    <a ng-click="reCommitTripApprove()" class="button button-positive  button-block">重新提交</a>
+                </div>
+            </div>
+
+
+        </div>
+    </ion-content>
+
+    <ion-content ng-show="isConfirm" padding="false" scroll="false" class="has-header">
+        <div class="flex-c10">
+            <ion-list show-delete="false">
+                <ion-item ng-click="chooseOption(false)" ng-class="{true: '', false: 'item-option-selected'}[isNextApprove]">直接同意</ion-item>
+                <ion-item ng-click="chooseOption(true)" ng-class="{true: 'item-option-selected', false: ''}[isNextApprove]" style="border-top: 1px #387ef5 solid">
+                    <span class="input-label">同意并转给</span>
+                    <ng-selector-list style="float: right;"
+                                      ng-model="tripApprove.approveUser"
+                                      dlg-options="staffSelector"
+                                      dlg-title="选择审批人"
+                                      dlg-placeholder="请选择审批人"
+                                      class="fake-input">
+                    </ng-selector-list>
+                </ion-item>
+            </ion-list>
+
+            <div class="button-bar">
+                <a ng-click="cancelConfirm()" class="button button-assertive  button-block">取消</a>
+                <a ng-click="confirmApprove()" class="button button-positive  button-block">确认</a>
             </div>
         </div>
+
     </ion-content>
 </ion-view>

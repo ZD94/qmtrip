@@ -11,13 +11,29 @@ declare var API: any;
 export enum EPlanStatus {
     CANCEL = -4, //出差计划撤销状态
     AUDIT_NOT_PASS = -3, //票据未审核通过
-    APPROVE_NOT_PASS = -2, //审批未通过
+    // APPROVE_NOT_PASS = -2, //审批未通过
     NO_BUDGET = -1, //没有预算
-    WAIT_APPROVE = 0, //待审批状态
+    // WAIT_APPROVE = 0, //待审批状态
     WAIT_UPLOAD = 1, //待上传票据
     WAIT_COMMIT = 2, //待提交状态
     AUDITING = 3, //已提交待审核状态
-    COMPLETE = 4, //审核完，已完成状态
+    COMPLETE = 4 //审核完，已完成状态
+}
+
+export enum EApproveStatus {
+    CANCEL = -3, //撤销状态
+    NO_BUDGET = -2, //没有预算
+    REJECT = -1, //审批驳回
+    WAIT_APPROVE = 0, //待审批
+    PASS = 1 //审批通过
+}
+
+export enum EApproveResult {
+    NULL = -1,
+    WAIT_APPROVE = 0, //等待审批
+    AUTO_APPROVE = 1, //自动审批
+    PASS = 2, //审批通过
+    REJECT = 3 //驳回
 }
 
 export enum ETripType {
@@ -81,6 +97,7 @@ export class Project extends ModelObject{
     get weight(): number { return 0; }
     set weight(val: number) {}
 }
+
 
 @Table(Models.tripPlan, 'tripPlan.')
 @TableIndex('accountId')
@@ -211,9 +228,9 @@ export class TripPlan extends ModelObject {
     get finalBudgetCreateAt() : Date { return null;}
     set finalBudgetCreateAt(d: Date) {};
 
-    @Field({type: Types.DATE})
-    get autoApproveTime() : Date { return null;}
-    set autoApproveTime(d: Date) {};
+    // @Field({type: Types.DATE})
+    // get autoApproveTime() : Date { return null;}
+    // set autoApproveTime(d: Date) {};
 
     @ResolveRef({type: Types.UUID}, Models.project)
     get project(): Project { return null; }
@@ -250,16 +267,6 @@ export class TripPlan extends ModelObject {
         }
         options.where.tripPlanId = this.id;
         return Models.tripDetail.find(options);
-    }
-
-    /**
-     * 审批人审批出差计划
-     * @param params
-     * @returns {Promise<boolean>}
-     */
-    approve(params: {auditResult: EAuditStatus, auditRemark?: string, budgetId?: string}): Promise<boolean> {
-        params['id'] = this.id;
-        return API.tripPlan.approveTripPlan(params);
     }
 
     /**
@@ -463,4 +470,135 @@ export class TripPlanLog extends ModelObject{
     get remark(): string { return null; }
     set remark(val: string) {}
 
+    @Field({type: Types.INTEGER})
+    get approveStatus(): EApproveResult { return EApproveResult.NULL; }
+    set approveStatus(val: EApproveResult) {}
+}
+
+@Table(Models.tripApprove, 'tripPlan.')
+@TableIndex('accountId')
+export class TripApprove extends ModelObject{
+    constructor(target: Object) {
+        super(target);
+    }
+    @Create()
+    static create(obj?: Object): TripApprove { return null; }
+
+    @Field({type: Types.UUID})
+    get id(): string { return Values.UUIDV1(); }
+    set id(val: string) {}
+
+    @Field({type: Types.UUID})
+    get accountId(): string { return null; }
+    set accountId(val: string) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isNeedTraffic(): boolean { return false; }
+    set isNeedTraffic(val: boolean) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isRoundTrip() :boolean { return true; }
+    set isRoundTrip(bool: boolean) {}
+
+    @Field({type: Types.BOOLEAN})
+    get isNeedHotel(): boolean { return false; }
+    set isNeedHotel(val: boolean) {}
+
+    @Field({ type: Types.JSONB})
+    get query() : any { return null};
+    set query(obj: any) {}
+
+    @Field({type: Types.STRING})
+    get title(): string { return ''; }
+    set title(val: string) {}
+
+    @Field({type: Types.STRING})
+    get description(): string { return ''; }
+    set description(val: string) {}
+
+    @Field({type: Types.INTEGER})
+    get status(): EApproveStatus { return EApproveStatus.WAIT_APPROVE; }
+    set status(val: EApproveStatus) {}
+
+    @Field({type: Types.STRING})
+    get deptCity(): string { return ''; }
+    set deptCity(val: string) {}
+
+    @Field({type: Types.STRING})
+    get arrivalCity(): string { return ''; }
+    set arrivalCity(val: string) {}
+
+    @Field({type: Types.STRING})
+    get deptCityCode(): string { return ''; }
+    set deptCityCode(val: string) {}
+
+    @Field({type: Types.STRING})
+    get arrivalCityCode(): string { return ''; }
+    set arrivalCityCode(val: string) {}
+
+    @Field({type: Types.TEXT})
+    get approvedUsers(): string { return ''; }
+    set approvedUsers(val: string) {}
+
+    @Field({type: Types.DATE})
+    get startAt(): Date { return null; }
+    set startAt(val: Date) {}
+
+    @Field({type: Types.DATE})
+    get backAt(): Date { return null; }
+    set backAt(val: Date) {}
+
+    @Field({type: Types.DOUBLE})
+    get budget(): number { return 0; }
+    set budget(val: number) {}
+
+    @Field({type: Types.JSONB})
+    get budgetInfo(): any { return []; }
+    set budgetInfo(val: any) {}
+
+    @Field({type: Types.DATE})
+    get autoApproveTime() : Date { return null;}
+    set autoApproveTime(d: Date) {};
+
+    @ResolveRef({type: Types.UUID}, Models.project)
+    get project(): Project { return null; }
+    set project(val: Project) {}
+
+    @ResolveRef({type: Types.UUID}, Models.staff)
+    get account(): Staff { return null; }
+    set account(val: Staff) {}
+
+    @ResolveRef({type: Types.UUID}, Models.staff)
+    get approveUser(): Staff { return null; }
+    set approveUser(val: Staff) {}
+
+    @Field({type: Types.STRING})
+    get approveRemark(): string { return ''; }
+    set approveRemark(val: string) {}
+
+    @Reference({type: Types.UUID})
+    getCompany(id?:string): Promise<Company> {
+        return Models.company.get(id);
+    }
+    setCompany(val: Company) {}
+
+
+    /**
+     * 审批人审批出差计划
+     * @param params
+     * @returns {Promise<boolean>}
+     */
+    approve(params: {auditResult: EAuditStatus, auditRemark?: string, budgetId?: string, id?: string}): Promise<boolean> {
+        params.id = this.id;
+        return API.tripPlan.approveTripPlan(params);
+    }
+
+    getApproveLogs(options?: any): Promise<PaginateInterface<TripPlanLog>> {
+        if(!options) options = {where: {}};
+        if(!options.where) options.where = {};
+        options.where.tripPlanId = this.id;
+        options.where.approveStatus = {$ne: EApproveResult.NULL};
+        options.order = [['created_at', 'desc']];
+        return Models.tripPlanLog.find(options);
+    }
 }

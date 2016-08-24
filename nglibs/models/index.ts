@@ -14,7 +14,7 @@ import { Department } from 'api/_types/department';
 import { TravelPolicy } from 'api/_types/travelPolicy';
 import { AccordHotel } from 'api/_types/accordHotel';
 import { Agency, AgencyUser } from 'api/_types/agency';
-import {TripPlan, TripDetail, Project, TripPlanLog} from 'api/_types/tripPlan';
+import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove} from 'api/_types/tripPlan';
 import { Place } from 'api/_types/place';
 import {Account, Token, AccountOpenid} from 'api/_types/auth';
 import { Seed } from 'api/_types/seed';
@@ -70,6 +70,9 @@ var Services = {
     },
     agencyUser: { type: AgencyUser, modname: 'agency',
         funcs: ['getAgencyUser', 'listAgencyUser', 'createAgencyUser', 'updateAgencyUser', 'deleteAgencyUser']
+    },
+    tripApprove: { type: TripApprove, modname: 'tripPlan',
+        funcs: ['getTripApprove', 'getTripApproves', 'saveTripApprove', 'updateTripApprove', 'deleteTripApprove']
     },
     tripPlan: { type: TripPlan, modname: 'tripPlan',
         funcs: ['getTripPlan', 'listTripPlans', 'saveTripPlan', 'updateTripPlan', 'deleteTripPlan']
@@ -128,6 +131,7 @@ class ClientModels implements ModelsInterface {
     tripPlanLog: ModelRemote<TripPlanLog>;
     moneyChange: ModelRemote<MoneyChange>;
     project: ModelRemote<Project>;
+    tripApprove: ModelRemote<TripApprove>;
     //place: ModelRemote<Place>;
     account: ModelRemote<Account>;
     seed: ModelRemote<Seed>;
@@ -150,7 +154,7 @@ class ClientModels implements ModelsInterface {
         this.tripPlanLog = createService<TripPlanLog>(Services.tripPlanLog, $cacheFactory);
         this.moneyChange = createService<MoneyChange>(Services.moneyChange, $cacheFactory);
         this.project = createService<Project>(Services.project, $cacheFactory);
-        //this.place = createService<Place>(Services.place, $cacheFactory);
+        this.tripApprove = createService<TripApprove>(Services.tripApprove, $cacheFactory);
         this.account = createService<Account>(Services.account, $cacheFactory);
         this.token = createService<Token>(Services.token, $cacheFactory);
         this.seed = createService<Seed>(Services.seed, $cacheFactory);
