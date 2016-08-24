@@ -3,9 +3,9 @@
  */
 
 'use strict';
-import {ITicket, IFinalTicket, TRAFFIC, TravelBudgeItem, IHotel, IFinalHotel} from "../../_types/travelBudget";
+import {ITicket, IFinalTicket, TRAFFIC, TravelBudgeItem, IHotel, IFinalHotel} from "api/_types/travelBudget";
 import {ticketPrefer, hotelPrefer} from '../prefer'
-import {EInvoiceType} from "../../_types/tripPlan";
+import {EInvoiceType} from "api/_types/tripPlan";
 import {RedisStorage, IStorage} from '../storage';
 var C = require('config');
 

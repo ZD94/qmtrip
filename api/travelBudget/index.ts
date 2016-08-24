@@ -13,7 +13,7 @@ const moment = require('moment');
 const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
-import {ITicket, TravelBudgeItem} from "../_types/travelBudget";
+import {ITicket, TravelBudgeItem} from "api/_types/travelBudget";
 import {CommonTicketStrategy, HighestPriceTicketStrategy, CommonHotelStrategy} from "./strategy/index";
 
 const defaultPrice = {
