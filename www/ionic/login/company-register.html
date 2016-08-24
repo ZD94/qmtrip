@@ -18,22 +18,22 @@
             <ion-list>
                 <div class="item item-input">
                     <span class="input-label">登录密码</span>
-                    <input type="text" placeholder="请输入6-20位字母或数字" ng-model="form.mobile" required ng-required>
+                    <input type="password" placeholder="请输入6-20位字母或数字" ng-model="form.pwd" required ng-required>
                 </div>
             </ion-list>
             <div class="spacer" style="height:10px"></div>
             <ion-list>
                 <div class="item item-input">
                     <span class="input-label">企业名称</span>
-                    <input type="text" placeholder="请输入企业名称" ng-model="form.mobile" required ng-required>
+                    <input type="text" placeholder="请输入企业名称" ng-model="form.name" required ng-required>
                 </div>
                 <div class="item item-input">
                     <span class="input-label">联系人</span>
-                    <input type="text" placeholder="请填写您的姓名" ng-model="form.mobile" required ng-required>
+                    <input type="text" placeholder="请填写您的姓名" ng-model="form.userName" required ng-required>
                 </div>
             </ion-list>
             <div class="spacer" style="height: 40px;"></div>
-            <input id="btn_submit" class="button button-calm button-block" type="submit" value="提交" ng-click="submit()">
+            <input id="btn_submit" class="button button-calm button-block" type="submit" value="提交" ng-click="submitRegister()">
         </form>
     </ion-content>
 </ion-view>
