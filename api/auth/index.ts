@@ -480,9 +480,9 @@ class ApiAuth {
      * @returns {Promise<TResult>|Promise<U>}
      */
     @clientExport
-    @requireParams(['mobile', 'name', 'email', 'userName','msgCode','msgTicket'], ['pwd','agencyId', 'remark', 'description'])
-    static async registerCompany(params:{name: string, userName: string, email: string, mobile: string, pwd: string,
-        msgCode: string, msgTicket: string, agencyId?: string, isValidateMobile?: boolean, isValidateEmail?: boolean}){
+    @requireParams(['mobile', 'name', 'userName', 'pwd', 'msgCode','msgTicket'], [ 'email', 'agencyId', 'remark', 'description'])
+    static async registerCompany(params:{name: string, userName: string, email?: string, mobile: string, pwd: string,
+        msgCode: string, msgTicket: string, agencyId?: string}){
         var companyName = params.name;
         var name = params.userName;
         var email = params.email;
@@ -495,9 +495,9 @@ class ApiAuth {
             throw L.ERR.MOBILE_NOT_CORRECT();
         }
 
-        if (!email || !validator.isEmail(email)) {
+        /*if (!email || !validator.isEmail(email)) {
             throw L.ERR.EMAIL_FORMAT_INVALID();
-        }
+        }*/
 
         if (!msgCode || !msgTicket) {
             throw {code: -1, msg: "短信验证码错误"};
@@ -517,8 +517,7 @@ class ApiAuth {
 
         await API.auth.checkEmailAndMobile({email: email, mobile: mobile});
         await API.checkcode.validateMsgCheckCode({code: msgCode, ticket: msgTicket, mobile: mobile});
-        var company = await API.company.registerCompany({mobile:mobile, email: email,name: companyName,
-            userName: name, pwd: pwd, status: 1, isValidateMobile: true});
+        var company = await API.company.registerCompany({mobile:mobile, email: email,name: companyName,userName: name, pwd: pwd, status: ACCOUNT_STATUS.ACTIVE, isValidateMobile: true});
         return company;
     }
 
