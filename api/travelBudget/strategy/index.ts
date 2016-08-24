@@ -106,7 +106,8 @@ export class CommonTicketStrategy extends AbstractStrategy {
             "CHEAP_SUPPLIER_POINTS": [['春秋航空', '中国联合航空', '吉祥航空', '西部航空', '成都航空', '九元航空', '幸福航空'], 200],
             "CORRECT_TRAFFIC_POINTS": [3.5 * 60, 6 * 60, 500],
             "CABIN_POINTS": [cabin, 500],
-            "PRICE_PREFER_POINTS": [0.5, 100]
+            "PRICE_PREFER_POINTS": [0.5, 100],
+            "PREFER_AGENT_POINTS": [['ctrip', '携程旅行网', '同程旅游'], 100],
         }
 
         let _tickets: IFinalTicket[] = [];
@@ -127,6 +128,11 @@ export class CommonTicketStrategy extends AbstractStrategy {
          * * * * * ** * * * * * */
         _tickets = ticketPrefer.cheapsupplier.bind(null, _tickets).apply(null, preferConfig.CHEAP_SUPPLIER_POINTS);
 
+        /**
+         *  价格比较靠谱的供应商
+         */
+        _tickets = ticketPrefer.preferagent.bind(null, _tickets).apply(null, preferConfig.PREFER_AGENT_POINTS);
+
         /* * * * * * * * * * * *
          * 根据时长对不同交通方式打分
          * * * * * * * * * * * * * */
@@ -136,8 +142,12 @@ export class CommonTicketStrategy extends AbstractStrategy {
          * 根据仓位打分
          * * * * * * * * * * * * * */
         _tickets = ticketPrefer.cabin.bind(null, _tickets).apply(null, preferConfig.CABIN_POINTS);
-        
+
+        /**
+         * 那个位置的价格比较靠谱
+         */
         _tickets = ticketPrefer.priceprefer.bind(null, _tickets).apply(null, preferConfig.PRICE_PREFER_POINTS);
+
         /* * * * * * * * * * * *
          * 如果没有车票信息,直接返回无预算
          * * * * * * * * * * * * * */
