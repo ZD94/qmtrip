@@ -39,6 +39,7 @@ class TripPlanModule {
      * @param params
      * @returns {TripPlan}
      */
+    @clientExport
     @requireParams(['budgetId', 'title'], ['description', 'remark', 'auditUser'])
     static async saveTripPlan(params): Promise<TripPlan> {
         let staff = await Staff.getCurrent();
