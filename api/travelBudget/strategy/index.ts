@@ -43,7 +43,7 @@ export abstract class AbstractHotelStrategy implements IStrategy {
     }
 }
 
-export abstract class AbstractStrategy implements IStrategy {
+export abstract class AbstractTicketStrategy implements IStrategy {
     tickets: ITicket[];
     storage: IStorage;
     private _key;
@@ -110,17 +110,17 @@ export abstract class AbstractStrategy implements IStrategy {
     }
 }
 
-export class CommonTicketStrategy extends AbstractStrategy {
+export class CommonTicketStrategy extends AbstractTicketStrategy {
 
     constructor(tickets: ITicket[], query: any, storage?: IStorage, pointConfig?: any) {
         let preferConfig = {
-            "arrivaltime": [null, `${query.leaveDate} ${query.latestArrivalTime} +0800`, 100],
-            "departtime": [`${query.leaveDate} ${query.leaveTime} +0800`, null, 100],
-            "cheapsupplier": [['春秋航空', '中国联合航空', '吉祥航空', '西部航空', '成都航空', '九元航空', '幸福航空'], 200],
-            "selecttraffic": [3.5 * 60, 6 * 60, 500],
-            "cabin": [query.cabin, 500],
-            "priceprefer": [0.5, 50],
-            "preferagent": [['ctrip', '携程旅行网', '同程旅游'], 100],
+            "arrivaltime": [null, `${query.leaveDate} ${query.latestArrivalTime} +0800`, 100],  //达到时间
+            "departtime": [`${query.leaveDate} ${query.leaveTime} +0800`, null, 100],           //出发时间
+            "cheapsupplier": [['春秋航空', '中国联合航空', '吉祥航空', '西部航空', '成都航空', '九元航空', '幸福航空'], 200], //廉价航空
+            "selecttraffic": [3.5 * 60, 6 * 60, 500],   //正确交通方式
+            "cabin": [query.cabin, 500],    //正确仓位信息
+            "priceprefer": [0.5, 50],       //那个百分比的价格合理
+            "preferagent": [['ctrip', '携程旅行网', '同程旅游'], 100],   //比较靠谱的供应商
         }
         super(tickets, preferConfig, storage);
     }
@@ -135,7 +135,7 @@ export class CommonTicketStrategy extends AbstractStrategy {
     }
 }
 
-export class HighestPriceTicketStrategy extends AbstractStrategy {
+export class HighestPriceTicketStrategy extends AbstractTicketStrategy {
 
     constructor(tickets: ITicket[], query: any, storage?: IStorage) {
         let preferConfig = {
@@ -161,7 +161,7 @@ export class HighestPriceTicketStrategy extends AbstractStrategy {
     }
 }
 
-export class DynamicTicketStrategy extends AbstractStrategy {
+export class DynamicTicketStrategy extends AbstractTicketStrategy {
     constructor(tickets: ITicket[], pointConfig: any, storage?: IStorage) {
         super(tickets, pointConfig, storage);
     }
