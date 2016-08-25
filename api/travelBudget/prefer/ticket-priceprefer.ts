@@ -7,7 +7,7 @@ import {IFinalTicket} from "api/_types/travelbudget";
 
 
 function priceperfer(data: IFinalTicket[], percent: number, score: number) :IFinalTicket[]{
-    console.info('价格排序:', data)
+    // console.info('价格排序:', data)
     if (!data || !data.length) return data;
     //只有一条记录直接返回
     let l = data.length;
