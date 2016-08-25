@@ -236,6 +236,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
 
     }
 
+
     //暂不需要重新发送激活链接了
     /*$scope.reSendActiveLink = async function(){
         try{
@@ -249,6 +250,105 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
             msgbox.log(err.msg || err);
         }
     }*/
+}
+
+export async function CompanyRegisterController ($scope, $stateParams){
+    API.require("checkcode");
+    API.require("auth");
+    await API.onload();
+    $scope.form = {
+        mobile:'',
+        msgCode:'',
+        pwd:'',
+        name:'',
+        userName:''
+    };
+
+    $scope.showCount = false;
+    $scope.beginCountDown = function(){
+        $scope.showCount = true;
+        $scope.beginNum = 90;
+        var timer = setInterval(function() {
+            if ($scope.beginNum <= 0) {
+                $scope.showCount = false;
+                clearInterval(timer);
+                $scope.$apply();
+                return;
+            }
+            $scope.beginNum = $scope.beginNum - 1;
+            $scope.$apply();
+        }, 1000);
+    }
+
+    $scope.sendCode = function(){
+        if (!$scope.form.mobile) {
+            msgbox.log("手机号不能为空");
+            return;
+        }
+        API.auth.checkEmailAndMobile({mobile: $scope.form.mobile})
+            .then(async function(){
+                return API.checkcode.getMsgCheckCode({mobile: $scope.form.mobile})
+                    .then(function(result){
+                        $scope.beginCountDown();
+                        $scope.form.msgTicket =  result.ticket;
+                    })
+            })
+            .catch(function(err){
+                msgbox.log(err.msg||err);
+            })
+
+    };
+
+    $scope.submitRegister = async function(){
+        if (!$scope.form.mobile) {
+            msgbox.log("手机号不能为空");
+            return;
+        }
+        if ($scope.form.mobile && !validator.isMobilePhone($scope.form.mobile, 'zh-CN')) {
+            msgbox.log("手机号格式不正确");
+            return;
+        }
+        if (!$scope.form.msgCode) {
+            msgbox.log("验证码不能为空");
+            return;
+        }
+        if (!$scope.form.pwd) {
+            msgbox.log("密码不能为空");
+            return;
+        }
+        if (!$scope.form.name) {
+            msgbox.log("企业名称不能为空");
+            return;
+        }
+        if (!$scope.form.userName) {
+            msgbox.log("联系人不能为空");
+            return;
+        }
+        var pwdPattern = /^[0-9a-zA-Z]*$/g;
+        var newPwd = $scope.form.pwd;
+        if(!pwdPattern.test(newPwd) || newPwd.length < 6 || newPwd.length >12){
+            msgbox.log("密码格式应为6-12位字母或数字");
+            return;
+        }
+
+        API.auth.registerCompany($scope.form)
+            .then(function (result) {
+                window.location.href = '#/login/company-welcome?company='+result.name;
+                // window.location.href = "index.html#/login/company-register-success?company="+result.name;
+            })
+            .catch(function(err){
+                msgbox.log(err.msg||err);
+            }).done();
+
+    }
+}
+
+export async function CompanyWelcomeController ($scope, $stateParams){
+    let company = $stateParams.company;
+    $scope.companyName = company;
+    $scope.goLogin = function(){
+        window.location.href = "index.html#/login/index";
+    }
 }
 
 export async function TestController($scope) {
@@ -372,27 +472,10 @@ export async function FirstSetPwdController ($scope, $stateParams) {
 }
 
 //企业注册页面  sc
-export async function CompanyRegisterController ($scope,$state,$stateParams){
-    var backUrl = $stateParams.path;
-    $scope.company_register = function(){
-        window.location.href = '#/login/company-welcome';
-    }
-}
-export async function CompanyWelcomeController ($scope,$state,$stateParams){
-    require("./company-register.scss")
-}
-export async function CompanyGuideController ($scope){
-    require("./company-guide.scss")
-}
 export async function CompanyFirstController ($scope){
-    require("./company-guide.scss")
+
 }
-export async function CompanySecondController ($scope){
-    require("./company-guide.scss")
-}
-export async function CompanyGuideSuccessController ($scope){
-    require("./company-guide.scss")
-}
+
 
 function trim(s) {
     if (!s) return s;
