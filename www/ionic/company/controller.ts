@@ -672,20 +672,21 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
             }
         }
         try{
-            if (!_staff.email) {
-                throw L.ERR.EMAIL_EMPTY();
-            }
 
-            if (!_staff.mobile) {
-                throw L.ERR.MOBILE_EMPTY();
-            }
+            /*if (!_staff.email) {
+             throw L.ERR.EMAIL_EMPTY();
+             }
 
             if (!validator.isEmail(_staff.email)) {
                 throw L.ERR.EMAIL_FORMAT_INVALID();
             }
-            /*if(company.domainName && company.domainName != "" && _staff.email.indexOf(company.domainName) == -1){
+            f(company.domainName && company.domainName != "" && _staff.email.indexOf(company.domainName) == -1){
                 throw L.ERR.EMAIL_SUFFIX_INVALID();
             }*/
+
+            if (!_staff.mobile) {
+                throw L.ERR.MOBILE_EMPTY();
+            }
 
             if (_staff.mobile && !validator.isMobilePhone(_staff.mobile, 'zh-CN')) {
                 throw L.ERR.MOBILE_NOT_CORRECT();
@@ -788,16 +789,11 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
     $scope.showrole = function () {
         $scope.staff.$fields = {};
         $scope.staff.$parents.account.$fields = {};
-        /*if ($scope.role.id == true) {
-            $scope.staff.roleId = EStaffRole.ADMIN;
-        } else {
-            $scope.staff.roleId = EStaffRole.COMMON;
-        }*/
         $ionicHistory.goBack(-1);
     }
 }
 
-export async function TravelpolicyController($scope, Models, $location) {
+export async function TravelpolicyController($scope, Models, $location, $ionicPopup, $ionicHistory) {
     var staff = await Staff.getCurrent();
     var company = await staff.company;
     var travelPolicies = await company.getTravelPolicies();
@@ -805,6 +801,10 @@ export async function TravelpolicyController($scope, Models, $location) {
         policy["hotelLevelName"] = MHotelLevel[policy.hotelLevel];
         policy["planeLevelName"] = MPlaneLevel[policy.planeLevel];
         policy["trainLevelName"] = MTrainLevel[policy.trainLevel];
+
+        if(policy.isDefault){
+            $scope.defaultTravelpolicy = policy;
+        }
 
         var obj = {policy: policy, usernum: ''};
         return obj;
@@ -818,9 +818,45 @@ export async function TravelpolicyController($scope, Models, $location) {
         // var travelpolicy = await Models.travelPolicy.get(id);
         $location.path('/company/editpolicy').search({'policyId': id}).replace();
     }
+
+    $scope.setDefault = async function(){
+        var nshow = $ionicPopup.show({
+            title:'设置默认标准',
+            template:'<div>请将一项差旅标准设为默认，被邀请加入的新员工将自动设置为次差旅标准</div>' +
+            '<div class="" ng-repeat="policy in travelPolicies" ng-click="selectTp(policy.policy)">' +
+            '<div class=""><div style="color:#000000;">{{policy.policy.name}}</div> </div> </div>',
+            scope: $scope,
+            buttons:[
+                {
+                    text: '确定',
+                    type: 'button-positive',
+                    onTap: async function () {
+                        try{
+                            if(!$scope.defaultTravelpolicy){
+                                $scope.newDefaultTp.isDefault = true;
+                                $scope.defaultTravelpolicy = await $scope.newDefaultTp.save();
+                            }else if($scope.defaultTravelpolicy && $scope.defaultTravelpolicy.id != $scope.newDefaultTp.id){
+                                $scope.defaultTravelpolicy.isDefault = false;
+                                await $scope.defaultTravelpolicy.save();
+                                $scope.newDefaultTp.isDefault = true;
+                                $scope.defaultTravelpolicy = await $scope.newDefaultTp.save();
+                            }
+                            msgbox.log("设置成功");
+                        }catch(err){
+                            msgbox.log(err.msg);
+                        }
+                    }
+                }
+            ]
+        });
+    }
+
+    $scope.selectTp = function(tp){
+        $scope.newDefaultTp = tp;
+    }
 }
 
-export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory) {
+export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory,$ionicPopup) {
     require('./editpolicy.scss');
     var staff = await Staff.getCurrent();
     var travelPolicy;
@@ -848,6 +884,55 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         await $scope.travelPolicy.save();
         $ionicHistory.goBack(-1);
     }
+
+    $scope.deletePolicy = async function () {
+        var nshow = $ionicPopup.show({
+            title:'提示',
+            template:'确定要删除该条差旅标准么?',
+            scope: $scope,
+            buttons:[
+                {
+                    text: '取消'
+                },
+                {
+                    text: '确认删除',
+                    type: 'button-positive',
+                    onTap: async function () {
+                        try{
+                            var result = await $scope.travelPolicy.getStaffs();
+                            if(result && result.length > 0){//why后端delete方法throw出来的异常捕获不了
+                                throw {code: -1, msg: '还有'+ result.length +'位员工在使用该标准'};
+                            }
+                            await $scope.travelPolicy.destroy();
+                            $ionicHistory.goBack(-1);
+                        }catch(err){
+                            if(err.code == -1){
+                                deleteFailed();
+                            }
+                        }
+                    }
+                }
+            ]
+        });
+
+        function deleteFailed(){
+            $ionicPopup.show({
+                title:'删除失败',
+                template:'还有员工在使用该标准，请先移除',
+                scope: $scope,
+                buttons:[
+                    {
+                        text: '确认',
+                        type: 'button-positive',
+                        onTap: async function () {
+                        }
+                    }
+                ]
+            });
+        }
+    }
+
+
 }
 
 

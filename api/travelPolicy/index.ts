@@ -53,14 +53,15 @@ class TravelPolicyModule{
         {if: condition.isTravelPolicyAgency("0.id")}
     ])
     static async deleteTravelPolicy(params) : Promise<any>{
-
-        let staffs = await Models.staff.find({where: {travelPolicyId: id, status: 0}});
-        if(staffs && staffs.length > 0){
-            throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准 暂不能删除，给这些员工匹配新的差旅标准后再进行操作'};
-        }
-
         var staff = await Staff.getCurrent();
         var id = params.id;
+
+        let staffs = await Models.staff.find({where: {travelPolicyId: id, staffStatus: EStaffStatus.ON_JOB}});
+        if(staffs && staffs.length > 0){
+            throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准请先移除'};
+        }
+
+
         var tp_delete = await Models.travelPolicy.get(id);
 
         if(staff && tp_delete["companyId"] != staff["companyId"]){
