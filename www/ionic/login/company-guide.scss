@@ -1,0 +1,82 @@
+//guide页面的两个样式
+.guide-circle{
+  height:90px;
+  width:90px;
+  background-color: white;
+  border-radius: 50%;
+  font-size: 50px;
+  line-height: 90px;
+  margin: 0 auto
+}
+
+.white-margin{
+  color:white;
+  margin-top: 10px;
+}
+//第一步的样式
+.company-first{
+  div.item{
+    span{
+      text-align: left;
+    }
+    span.plahoder{
+      text-align: left;
+      color:#c7c7cd;
+      font-size: 14px;
+    }
+  }
+}
+
+
+//第一步和第二部的公共的类
+.guild-title{
+  background-color: #503b83;
+  line-height: 34px;
+  color:white;
+  border-bottom: none;
+  background-size: 0px;
+}
+//第二步的样式
+
+.link-invite{
+  font-size: 18px;
+  line-height: 56px;
+}
+.stop-button{
+  width:30%;
+  background-color:#f29901 ;
+  color: #fff;
+  border-radius: 30px;
+
+}
+//第二步的下面的样式
+#companySecond{
+  .button-send{
+    width:100%;
+    background-color: #fff;
+    color:#28a7e1;
+    border:1px solid #28a7e1;
+    font-size: 14px;
+  }
+  p{
+    word-break: break-all;
+    word-wrap: break-word;
+    text-overflow: clip;
+    white-space: normal;
+  }
+}
+
+//引导成功页面样式
+.guide-success{
+  ion-content p,ion-content h4{
+    color: #fff;
+  }
+  h4{
+    line-height: 50px;
+  }
+  img{
+
+  }
+}
+
+
