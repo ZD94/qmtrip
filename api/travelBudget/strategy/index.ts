@@ -47,7 +47,6 @@ export abstract class AbstractHotelStrategy implements IStrategy {
 
 export abstract class AbstractStrategy implements IStrategy {
     tickets: ITicket[];
-    result: TravelBudgeItem;
     storage: IStorage;
     private _key;
     config: any;
@@ -59,6 +58,10 @@ export abstract class AbstractStrategy implements IStrategy {
         this.config = config;
     }
 
+    public async setPointConfig(pointConfig): Promise<any> {
+        this.config = pointConfig;
+    }
+    
     private async _markScore(): Promise<IFinalTicket[]> {
         let _tickets: IFinalTicket[] = [];
         _tickets = formatTicketData(this.tickets);
@@ -111,8 +114,7 @@ export abstract class AbstractStrategy implements IStrategy {
 
 export class CommonTicketStrategy extends AbstractStrategy {
 
-
-    constructor(tickets: ITicket[], query: any, storage?: IStorage) {
+    constructor(tickets: ITicket[], query: any, storage?: IStorage, pointConfig?: any) {
         let preferConfig = {
             "arrivaltime": [null, `${query.leaveDate} ${query.latestArrivalTime} +0800`, 100],
             "departtime": [`${query.leaveDate} ${query.leaveTime} +0800`, null, 100],
@@ -149,7 +151,6 @@ export class HighestPriceTicketStrategy extends AbstractStrategy {
         }
 
         super(tickets, preferConfig, storage);
-        this.tickets = tickets;
     }
 
     public async handleMarkedScoreData(tickets:IFinalTicket[]):Promise<IFinalTicket[]> {
@@ -157,6 +158,21 @@ export class HighestPriceTicketStrategy extends AbstractStrategy {
             let diff = v2.score - v1.score;
             if (diff) return diff;
             return v2.price - v1.price;
+        })
+        return tickets;
+    }
+}
+
+export class DynamicTicketStrategy extends AbstractStrategy {
+    constructor(tickets: ITicket[], pointConfig: any, storage?: IStorage) {
+        super(tickets, pointConfig, storage);
+    }
+
+    public async handleMarkedScoreData(tickets: IFinalTicket[]): Promise<IFinalTicket[]> {
+        tickets.sort( (v1, v2) => {
+            let diff = v2.score - v1.score;
+            if (diff) return diff;
+            return v1.price - v2.price;
         })
         return tickets;
     }
