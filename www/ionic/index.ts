@@ -145,6 +145,7 @@ ngapp.depend('chart.js');
 ngapp.root('ionic', '/trip/create');
 ngapp.useRoutePolicy(ngapp.RoutePolicy.None);
 ngapp.routeAddSingle('login');
+ngapp.routeAddSingle('guide');
 ngapp.routePushEmbed('');
 ngapp.routePopEmbed();
 var app = ngapp.create('qm.ionic');
