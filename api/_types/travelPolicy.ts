@@ -79,6 +79,10 @@ export class TravelPolicy extends ModelObject{
     @Field({type: Types.BOOLEAN})
     get isChangeLevel(): boolean {return null}
     set isChangeLevel(isChangeLevel: boolean){}
+    
+    @Field({type: Types.BOOLEAN})
+    get isDefault(): boolean {return false}
+    set isDefault(isDefault: boolean){}
 
     @ResolveRef({type: Types.UUID}, Models.company)
     get company(): Company { return null; }
