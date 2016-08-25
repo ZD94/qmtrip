@@ -50,175 +50,115 @@ export abstract class AbstractStrategy implements IStrategy {
     result: TravelBudgeItem;
     storage: IStorage;
     private _key;
+    config: any;
 
-    constructor(tickets?: ITicket[], storage?: IStorage) {
+    constructor(tickets: ITicket[], config: any, storage?: IStorage) {
         this.storage = storage;
         this.tickets = tickets;
         this._key = 'ID' + Date.now() + Math.ceil(Math.random() * 1000);
+        this.config = config;
     }
 
-    //设置原始数据
-    setTickets(tickets: ITicket[]) {
-        this.tickets = tickets;
+    private async _markScore(): Promise<IFinalTicket[]> {
+        let _tickets: IFinalTicket[] = [];
+        _tickets = formatTicketData(this.tickets);
+
+        let config = this.config;
+        let prefers = [
+            'arrivaltime',
+            'departtime',
+            'cheapsupplier',
+            'preferagent',
+            'selecttraffic',
+            'cabin',
+            'priceprefer',
+        ]
+
+        prefers.forEach( (fnName) => {
+            let fn = ticketPrefer[fnName];
+            if (fn && typeof fn == 'function') {
+                _tickets = fn.bind(null, _tickets).apply(null, config[fnName]);
+            }
+        })
+        return _tickets;
     }
-    //计算过程,子类需要实现
-    abstract async buildProcess(params: any): Promise<any>;
-    //开始计算前
-    private async _begin(): Promise<any> {
-        // console.log('原始数据:' + JSON.stringify(this.tickets));
-        if (this.storage) {
-            return this.storage.write(this._key+':data', JSON.stringify(this.tickets));
-        }
-        return null;
-    }
-    //计算完成
-    private async _finish(): Promise<any> {
-        // console.log('计算结果:' + JSON.stringify(this.result));
-        if (this.storage) {
-            return this.storage.write(this._key, JSON.stringify(this.result));
-        }
-        return null;
-    }
+
+    abstract async handleMarkedScoreData(tickets: IFinalTicket[]) :Promise<IFinalTicket[]>;
 
     //对外暴漏获取结果函数
-    async getResult(params: any): Promise<TravelBudgeItem> {
-        this._begin();
-        this.result = await this.buildProcess(params);
-        this.result.id = this._key;
-        this._finish();
-        return this.result;
+    async getResult(): Promise<TravelBudgeItem> {
+        if (this.storage) {
+            this.storage.write(this._key+':data', JSON.stringify(this.tickets));
+        }
+        let tickets = await this._markScore();
+        tickets = await this.handleMarkedScoreData(tickets);
+        if (this.storage) {
+            this.storage.write(this._key+':marked', JSON.stringify(tickets));
+        }
+        let ret = tickets[0];
+        return {
+            price: ret.price,
+            type: <EInvoiceType>(<number>ret.type),
+            No: ret.No,
+            agent: ret.agent,
+            cabin: ret.cabin,
+            destination: ret.destination,
+            originPlace: ret.originPlace,
+            id: this._key
+        }
     }
 }
 
 export class CommonTicketStrategy extends AbstractStrategy {
 
-    constructor(tickets?: ITicket[], storage?: IStorage) {
-        super(tickets, storage);
+
+    constructor(tickets: ITicket[], query: any, storage?: IStorage) {
+        let preferConfig = {
+            "arrivaltime": [null, `${query.leaveDate} ${query.latestArrivalTime} +0800`, 100],
+            "departtime": [`${query.leaveDate} ${query.leaveTime} +0800`, null, 100],
+            "cheapsupplier": [['春秋航空', '中国联合航空', '吉祥航空', '西部航空', '成都航空', '九元航空', '幸福航空'], 200],
+            "selecttraffic": [3.5 * 60, 6 * 60, 500],
+            "cabin": [query.cabin, 500],
+            "priceprefer": [0.5, 50],
+            "preferagent": [['ctrip', '携程旅行网', '同程旅游'], 100],
+        }
+        super(tickets, preferConfig, storage);
     }
 
-    async buildProcess(params: {originCity: any, destinationCity: any, leaveDate: string,
-        leaveTime?: string, latestArrivalTime?: string, cabin?: string[]}):Promise<any> {
-        let {leaveDate, leaveTime, latestArrivalTime, cabin} = params;
-
-        let preferConfig = {
-            "ARRIVAL_TIME_POINTS": [null, `${leaveDate} ${latestArrivalTime} +0800`, 100],
-            "DEPART_TIME_POINTS": [`${leaveDate} ${leaveTime} +0800`, null, 100],
-            "CHEAP_SUPPLIER_POINTS": [['春秋航空', '中国联合航空', '吉祥航空', '西部航空', '成都航空', '九元航空', '幸福航空'], 200],
-            "CORRECT_TRAFFIC_POINTS": [3.5 * 60, 6 * 60, 500],
-            "CABIN_POINTS": [cabin, 500],
-            "PRICE_PREFER_POINTS": [0.5, 100],
-            "PREFER_AGENT_POINTS": [['ctrip', '携程旅行网', '同程旅游'], 100],
-        }
-
-        let _tickets: IFinalTicket[] = [];
-        _tickets = formatTicketData(this.tickets);
-
-        /* * * * * * * * * * *
-         * 根据到达时间打分
-         * * * * * * * * * * * */
-        _tickets = ticketPrefer.arrivaltime.bind(null, _tickets).apply(null, preferConfig.ARRIVAL_TIME_POINTS);
-
-        /* * * * * * * * * * *
-         * 根据出发时间打分
-         * * * * * * ** * * * */
-        _tickets = ticketPrefer.departtime.bind(null, _tickets).apply(null, preferConfig.DEPART_TIME_POINTS);
-
-        /* * * * * * * * * * * *
-         * 根据是否廉价供应商打分
-         * * * * * ** * * * * * */
-        _tickets = ticketPrefer.cheapsupplier.bind(null, _tickets).apply(null, preferConfig.CHEAP_SUPPLIER_POINTS);
-
-        /**
-         *  价格比较靠谱的供应商
-         */
-        _tickets = ticketPrefer.preferagent.bind(null, _tickets).apply(null, preferConfig.PREFER_AGENT_POINTS);
-
-        /* * * * * * * * * * * *
-         * 根据时长对不同交通方式打分
-         * * * * * * * * * * * * * */
-        _tickets = ticketPrefer.selecttraffic.bind(null, _tickets).apply(null, preferConfig.CORRECT_TRAFFIC_POINTS);
-
-        /* * * * * * * * * * * *
-         * 根据仓位打分
-         * * * * * * * * * * * * * */
-        _tickets = ticketPrefer.cabin.bind(null, _tickets).apply(null, preferConfig.CABIN_POINTS);
-
-        /**
-         * 那个位置的价格比较靠谱
-         */
-        _tickets = ticketPrefer.priceprefer.bind(null, _tickets).apply(null, preferConfig.PRICE_PREFER_POINTS);
-
-        /* * * * * * * * * * * *
-         * 如果没有车票信息,直接返回无预算
-         * * * * * * * * * * * * * */
-        if (!_tickets || !_tickets.length) return {price: -1};
-
-        /* * * * * * * * * * * *
-         * 权衡得分,价格信息给出预算结果
-         * * * * * * * * * * * * * */
-        _tickets = _tickets.sort( (v1, v2) => {
-            let diffScore =  v2.score - v1.score;
-            if (diffScore) return diffScore;
-            //火车按照价格倒叙
-            if (v1.type == TRAFFIC.TRAIN && v2.type == TRAFFIC.TRAIN) {
-                return v2.price - v1.price;
-            }
-            //飞机按照价格顺序
-            if (v1.type == TRAFFIC.FLIGHT && v2.type == TRAFFIC.FLIGHT) {
-                return v1.price - v2.price;
-            }
-            //飞机火车取价格较高的
-            return v2.price - v1.price;
-        });
-
-        return {
-            price: _tickets[0].price,
-            type: <EInvoiceType>(<number>_tickets[0].type),
-            No: _tickets[0].No,
-            agent: _tickets[0].agent,
-            cabin: _tickets[0].cabin,
-            destination: _tickets[0].destination,
-            originPlace: _tickets[0].originPlace,
-        }
+    public async handleMarkedScoreData(tickets:IFinalTicket[]):Promise<IFinalTicket[]> {
+        tickets.sort ((v1, v2) => {
+            let diff = v2.score - v1.score;
+            if (diff) return diff;  //优先使用分数倒叙排序,如果份数相同使用价格升序排序
+            return v1.price - v2.price;
+        })
+        return tickets;
     }
 }
 
 export class HighestPriceTicketStrategy extends AbstractStrategy {
-    constructor(tickets: ITicket[], storage?: IStorage) {
-        super(tickets, storage);
+
+    constructor(tickets: ITicket[], query: any, storage?: IStorage) {
+        let preferConfig = {
+            "arrivaltime": [null, `${query.leaveDate} ${query.latestArrivalTime} +0800`, 0],
+            "departtime": [`${query.leaveDate} ${query.leaveTime} +0800`, null, 0],
+            "cheapsupplier": [['春秋航空', '中国联合航空', '吉祥航空', '西部航空', '成都航空', '九元航空', '幸福航空'], 200],
+            "selecttraffic": [3.5 * 60, 6 * 60, 500],
+            "cabin": [query.cabin, 500],
+            "priceprefer": [0.9, 500],
+            "preferagent": [['ctrip', '携程旅行网', '同程旅游'], 100],
+        }
+
+        super(tickets, preferConfig, storage);
         this.tickets = tickets;
     }
 
-    async buildProcess(params:any):Promise<TravelBudgeItem> {
-        if (!this.tickets) {
-            return {
-                price: -1
-            }
-        }
-        const CHOOSE_TRAIN_DURATION = 6 * 60;
-        const CHOOSE_FLIGHT_DURATION = 3.5 * 60
-        const CHOOSE_TRAFFIC_SCORE = 500;
-        const PREFER_AGENT = 100;
-        const CORRECT_CABIN = 400;
-        let tickets = formatTicketData(this.tickets);
-        tickets = ticketPrefer.selecttraffic(tickets, CHOOSE_FLIGHT_DURATION, CHOOSE_TRAIN_DURATION, CHOOSE_TRAFFIC_SCORE);
-        tickets = ticketPrefer.cabin(tickets, params.cabin, CORRECT_CABIN);
-        tickets = ticketPrefer.preferagent(tickets, ['ctrip', '携程旅行网', '同程旅游'], PREFER_AGENT);
-
+    public async handleMarkedScoreData(tickets:IFinalTicket[]):Promise<IFinalTicket[]> {
         tickets.sort( (v1, v2) => {
-            if (v2.score - v1.score != 0) return v2.score - v1.score;
+            let diff = v2.score - v1.score;
+            if (diff) return diff;
             return v2.price - v1.price;
-        });
-
-        return {
-            price: tickets[0].price,
-            type: <EInvoiceType>(<number>tickets[0].type),
-            No: tickets[0].No,
-            agent: tickets[0].agent,
-            cabin: tickets[0].cabin,
-            destination: tickets[0].destination,
-            originPlace: tickets[0].originPlace,
-        }
+        })
+        return tickets;
     }
 }
 
