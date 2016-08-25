@@ -378,11 +378,21 @@ export async function CompanyRegisterController ($scope,$state,$stateParams){
         window.location.href = '#/login/company-welcome';
     }
 }
-export async function CompanyWelcomeController ($scope,$state,$stateParams){}
-export async function CompanyFirstController ($scope){
-
+export async function CompanyWelcomeController ($scope,$state,$stateParams){
+    require("./company-register.scss")
 }
-
+export async function CompanyGuideController ($scope){
+    require("./company-guide.scss")
+}
+export async function CompanyFirstController ($scope){
+    require("./company-guide.scss")
+}
+export async function CompanySecondController ($scope){
+    require("./company-guide.scss")
+}
+export async function CompanyGuideSuccessController ($scope){
+    require("./company-guide.scss")
+}
 
 function trim(s) {
     if (!s) return s;

@@ -1,18 +1,47 @@
-<ion-view title="企业设置向导">
+<ion-view title="企业设置向导" class="company-first">
+    <ion-header-bar align-title="left" class="guild-title">
+        1/2 差旅标准设置
+    </ion-header-bar>
     <ion-content class="text-center" padding="true">
-        <div class="spacer" style="height:50px"></div>
-        <h3 style="color:white">感谢您使用鲸力商旅</h3>
-        <div class="spacer" style="height:40px"></div>
-        <p style="color:white">我们将通过简单的两部设置来开通服务</p>
-        <div class="row">
-            <div class="col col-50">
-                <div class="avatar icon ion-document-text " style="height:90px;width:90px;background-color: white"></div>
-                <p>差旅标准</p>
+        <div class="spacer" style="height:30px"></div>
+        <p style="color:white">该标准将作为被邀请员工新加入企业时的默认标准进入系统后，可以给差旅标准追加补助模板</p>
+        <div class="spacer" style="height:20px"></div>
+        <ion-list>
+            <div class="item item-input item-input-right">
+                <span class="input-label">标准名称</span>
+                <input type="text" placeholder="请输入名称" required ng-required>
             </div>
-            <div class="col col-50">
-                <div class="avatar icon ion-person"></div>
-                <p>邀请员工</p>
+            <!--这几个下拉菜单的内容是随意加的-->
+            <div class="item item-input item-select">
+                <span class="input-label">飞机仓位</span>
+                <span class="plahoder">请选择仓位</span>
+                <select style="width: 36%">
+                    <option value="">经济舱</option>
+                    <option value="">商务舱</option>
+                    <option value="">头等舱</option>
+                </select>
             </div>
-        </div>
+            <div class="item item-input item-select">
+                <span class="input-label">火车座次</span>
+                <span class="plahoder">请选择座次</span>
+                <select style="width: 36%">
+                    <option value="">高铁</option>
+                    <option value="">特快</option>
+                    <option value="">普快</option>
+                </select>
+            </div>
+            <div class="item item-input item-select">
+                <span class="input-label">住宿标准</span>
+                <span class="plahoder">请选择标准</span>
+                <select style="width: 36%">
+                    <option value="">五星</option>
+                    <option value="">四星</option>
+                    <option value="">三星</option>
+                </select>
+            </div>
+            <div class="spacer" style="height:30px"></div>
+            <a class="button button-calm button-block" href="#/login/company-second" >下一步</a>
+
+        </ion-list>
     </ion-content>
 </ion-view>
