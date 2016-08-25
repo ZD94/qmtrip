@@ -1521,7 +1521,9 @@ static async newAccount (data: {email: string, mobile?: string, pwd?: string, ty
                 res.redirect(redirect_url);
             }else {
                 redirect_url = encodeURIComponent(redirect_url);
-
+                if (!query.code) {
+                    return res.redirect('/#/login/index');
+                }
                 let tokenSign = await API.auth.authWeChatLogin({code: query.code});
                 let url = `${C.host}/index.html#/login/storageSet`;
                 if(!tokenSign) {
