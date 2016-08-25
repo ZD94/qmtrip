@@ -6,13 +6,11 @@
 import {ITicket, IFinalTicket, TRAFFIC, TravelBudgeItem, IHotel, IFinalHotel} from "api/_types/travelbudget";
 import {ticketPrefer, hotelPrefer} from '../prefer'
 import {EInvoiceType} from "api/_types/tripPlan";
-import {RedisStorage, IStorage} from '../storage';
-var C = require('config');
+import {IStorage} from '../storage';
 
 export interface IStrategy {
      getResult(params: any): Promise<any>;
 }
-
 
 export abstract class AbstractHotelStrategy implements IStrategy {
     protected hotels: IHotel[];
@@ -61,7 +59,7 @@ export abstract class AbstractStrategy implements IStrategy {
     public async setPointConfig(pointConfig): Promise<any> {
         this.config = pointConfig;
     }
-    
+
     private async _markScore(): Promise<IFinalTicket[]> {
         let _tickets: IFinalTicket[] = [];
         _tickets = formatTicketData(this.tickets);
