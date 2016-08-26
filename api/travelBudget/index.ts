@@ -14,7 +14,9 @@ const cache = require("common/cache");
 const utils = require("common/utils");
 import _ = require("lodash");
 import {ITicket, TravelBudgeItem} from "api/_types/travelbudget";
-import {CommonTicketStrategy, HighestPriceTicketStrategy, CommonHotelStrategy} from "./strategy/index";
+import {
+    CommonHotelStrategy, TrafficBudgetStrategyFactory
+} from "./strategy/index";
 
 const defaultPrice = {
     "5": 500,
@@ -38,6 +40,7 @@ interface BudgetOptions{
     businessDistrict?: string,
     staffId?: string
 }
+
 
 class ApiTravelBudget {
 
@@ -329,15 +332,11 @@ class ApiTravelBudget {
         if (policy.planeLevel == EPlaneLevel.ECONOMY ) {
             cabinClass.push('Economy');
         }
-        // if (policy.planeLevel.indexOf('高端经济舱') >= 0 ) {
-        //     cabinClass.push('PremiumEconomy');
-        // }
         if (policy.planeLevel == EPlaneLevel.BUSINESS_FIRST) {
             cabinClass.push('PremiumEconomy');
             cabinClass.push('Business');
             cabinClass.push('First');
         }
-
 
         let trainCabinClass = MTrainLevel[ETrainLevel.SECOND_CLASS].replace(/\//g, ",");
         if (policy.trainLevel) {
@@ -370,23 +369,45 @@ class ApiTravelBudget {
             cabin: trainCabins
         });
 
-        let strategySwitcher = {
-            default: CommonTicketStrategy,
-            bmw: HighestPriceTicketStrategy
+        let qs = {
+            policy: 'default',
+            prefers: [
+                {
+                    name: 'arrivalTime',
+                    options: {
+                        "begin": `${params.leaveDate} ${params.leaveTime}`,
+                        "end": `${params.leaveDate} ${params.latestArrivalTime}`,
+                        "outScore": -100
+                    }
+                },
+                {
+                    name: 'cabin',
+                    options: {
+                        "expectCabins": _.concat(cabinClass, trainCabins),
+                        "score": 500
+                    }
+                },
+                {
+                    name: 'selectTraffic',
+                    options: {
+                        "selectTrainDuration": 6 * 60,
+                        "selectFlightDuration": 3.5 * 60,
+                        "commonTrainScore": -1000,
+                        "score": 500
+                    }
+                },
+                {
+                    name: 'cheapSupplier',
+                    options: {
+                        "score": -100
+                    }
+                },
+            ]
         }
 
         let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
-        console.info('选择的策略是:', companyPolicy);
-        let query = {
-            originPlace: m_originCity,
-            destination: m_destination,
-            leaveDate: leaveDate,
-            cabin: _.concat(cabinClass, trainCabins),
-            leaveTime: leaveTime,
-            latestArrivalTime: latestArrivalTime
-        }
-        let strategy = new strategySwitcher[companyPolicy](tickets, query, cache);
-        return strategy.getResult()
+        let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs);
+        return strategy.getResult(tickets);
     }
 
     @clientExport
