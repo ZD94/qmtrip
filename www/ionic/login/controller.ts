@@ -344,6 +344,7 @@ export async function CompanyRegisterController ($scope, $stateParams){
 }
 
 export async function CompanyWelcomeController ($scope, $stateParams){
+    require("./company-register.scss");
     let company = $stateParams.company;
     $scope.companyName = company;
     $scope.goLogin = function(){
@@ -472,8 +473,20 @@ export async function FirstSetPwdController ($scope, $stateParams) {
 }
 
 //企业注册页面  sc
-export async function CompanyFirstController ($scope){
+export async function CompanyGuideController ($scope){
+    require("./company-guide.scss");
+}
 
+export async function CompanyFirstController ($scope){
+    require("./company-guide.scss");
+}
+
+export async function CompanySecondController ($scope){
+    require("./company-guide.scss");
+}
+
+export async function CompanyGuideSuccessController ($scope){
+    require("./company-guide.scss");
 }
 
 
