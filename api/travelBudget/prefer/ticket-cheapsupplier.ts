@@ -4,19 +4,44 @@
 
 'use strict';
 import {IFinalTicket} from "api/_types/travelbudget";
+import {AbstractPrefer} from "./index";
 //廉价供应商
 
-function cheapsupplier(data: IFinalTicket[], cheapsuppliers: Array<string>, score: number) :IFinalTicket[] {
-    data = data.map( (v) => {
-        if (!v['score']) v['score'] = 0;
-        if (!v['reasons']) v['reasons'] = [];
-        if (cheapsuppliers.indexOf(v.agent) >= 0) {
-            v['score'] -= score;
-            v['reasons'].push(`廉价供应商 -${score}`)
-        }
-        return v;
-    });
-    return data;
+const CHEAP_SUPPLIERS = ['春秋航空', '中国联合航空', '吉祥航空', '西部航空', '成都航空', '九元航空', '幸福航空'];
+class CheapSupplierPrefer extends AbstractPrefer {
+
+
+    private agents: string[];
+    private score: number;
+
+    constructor(name, options) {
+        super(name, options);
+    }
+
+    async markScoreProcess(tickets:IFinalTicket[]):Promise<IFinalTicket[]> {
+        let self = this;
+        tickets = tickets.map( (v) => {
+            if (!v['score']) v['score'] = 0;
+            if (!v['reasons']) v['reasons'] = [];
+            if (CHEAP_SUPPLIERS.indexOf(v.agent) >= 0) {
+                v['score'] += self.score;
+                v['reasons'].push(`廉价供应商 ${self.score}`)
+            }
+            return v;
+        });
+        return tickets;
+    }
 }
 
-export= cheapsupplier;
+export= CheapSupplierPrefer
+
+//
+//
+// function cheapsupplier(data: IFinalTicket[], cheapsuppliers: Array<string>, score: number) :IFinalTicket[] {
+//     data = data.map( (v) => {
+//
+//     });
+//     return data;
+// }
+//
+// export= cheapsupplier;
