@@ -6,13 +6,11 @@
 import {ITicket, IFinalTicket, TRAFFIC, TravelBudgeItem, IHotel, IFinalHotel} from "api/_types/travelbudget";
 import {ticketPrefer, hotelPrefer} from '../prefer'
 import {EInvoiceType} from "api/_types/tripPlan";
-import {RedisStorage, IStorage} from '../storage';
-var C = require('config');
+import {IStorage} from '../storage';
 
 export interface IStrategy {
      getResult(params: any): Promise<any>;
 }
-
 
 export abstract class AbstractHotelStrategy implements IStrategy {
     protected hotels: IHotel[];
@@ -45,9 +43,8 @@ export abstract class AbstractHotelStrategy implements IStrategy {
     }
 }
 
-export abstract class AbstractStrategy implements IStrategy {
+export abstract class AbstractTicketStrategy implements IStrategy {
     tickets: ITicket[];
-    result: TravelBudgeItem;
     storage: IStorage;
     private _key;
     config: any;
@@ -57,6 +54,10 @@ export abstract class AbstractStrategy implements IStrategy {
         this.tickets = tickets;
         this._key = 'ID' + Date.now() + Math.ceil(Math.random() * 1000);
         this.config = config;
+    }
+
+    public async setPointConfig(pointConfig): Promise<any> {
+        this.config = pointConfig;
     }
 
     private async _markScore(): Promise<IFinalTicket[]> {
@@ -109,18 +110,17 @@ export abstract class AbstractStrategy implements IStrategy {
     }
 }
 
-export class CommonTicketStrategy extends AbstractStrategy {
+export class CommonTicketStrategy extends AbstractTicketStrategy {
 
-
-    constructor(tickets: ITicket[], query: any, storage?: IStorage) {
+    constructor(tickets: ITicket[], query: any, storage?: IStorage, pointConfig?: any) {
         let preferConfig = {
-            "arrivaltime": [null, `${query.leaveDate} ${query.latestArrivalTime} +0800`, 100],
-            "departtime": [`${query.leaveDate} ${query.leaveTime} +0800`, null, 100],
-            "cheapsupplier": [['春秋航空', '中国联合航空', '吉祥航空', '西部航空', '成都航空', '九元航空', '幸福航空'], 200],
-            "selecttraffic": [3.5 * 60, 6 * 60, 500],
-            "cabin": [query.cabin, 500],
-            "priceprefer": [0.5, 50],
-            "preferagent": [['ctrip', '携程旅行网', '同程旅游'], 100],
+            "arrivaltime": [null, `${query.leaveDate} ${query.latestArrivalTime} +0800`, 100],  //达到时间
+            "departtime": [`${query.leaveDate} ${query.leaveTime} +0800`, null, 100],           //出发时间
+            "cheapsupplier": [['春秋航空', '中国联合航空', '吉祥航空', '西部航空', '成都航空', '九元航空', '幸福航空'], 200], //廉价航空
+            "selecttraffic": [3.5 * 60, 6 * 60, 500],   //正确交通方式
+            "cabin": [query.cabin, 500],    //正确仓位信息
+            "priceprefer": [0.5, 50],       //那个百分比的价格合理
+            "preferagent": [['ctrip', '携程旅行网', '同程旅游'], 100],   //比较靠谱的供应商
         }
         super(tickets, preferConfig, storage);
     }
@@ -135,7 +135,7 @@ export class CommonTicketStrategy extends AbstractStrategy {
     }
 }
 
-export class HighestPriceTicketStrategy extends AbstractStrategy {
+export class HighestPriceTicketStrategy extends AbstractTicketStrategy {
 
     constructor(tickets: ITicket[], query: any, storage?: IStorage) {
         let preferConfig = {
@@ -149,7 +149,6 @@ export class HighestPriceTicketStrategy extends AbstractStrategy {
         }
 
         super(tickets, preferConfig, storage);
-        this.tickets = tickets;
     }
 
     public async handleMarkedScoreData(tickets:IFinalTicket[]):Promise<IFinalTicket[]> {
@@ -157,6 +156,21 @@ export class HighestPriceTicketStrategy extends AbstractStrategy {
             let diff = v2.score - v1.score;
             if (diff) return diff;
             return v2.price - v1.price;
+        })
+        return tickets;
+    }
+}
+
+export class DynamicTicketStrategy extends AbstractTicketStrategy {
+    constructor(tickets: ITicket[], pointConfig: any, storage?: IStorage) {
+        super(tickets, pointConfig, storage);
+    }
+
+    public async handleMarkedScoreData(tickets: IFinalTicket[]): Promise<IFinalTicket[]> {
+        tickets.sort( (v1, v2) => {
+            let diff = v2.score - v1.score;
+            if (diff) return diff;
+            return v1.price - v2.price;
         })
         return tickets;
     }
