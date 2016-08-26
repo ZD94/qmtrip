@@ -1,0 +1,1 @@
+alter table travel_policy.travel_policies add column is_default boolean default false;

@@ -39,12 +39,17 @@
                 <input type="text" placeholder="元/晚" ng-model="travelPolicy.hotelPrice">
             </label>-->
             <div class="spacer" style="width: 300px; height: 18px;"></div>
-            <label class="item item-input">
+            <!--<label class="item item-input">
                 <span class="input-label">补助</span>
                 <input type="text" placeholder="元/天" ng-model="travelPolicy.subsidy">
+            </label>-->
+
+            <label class="item item-input item-icon-right" ng-click="subsidyTemplateList()">
+                <span class="input-label">补助模板</span>
+                <i class="icon ion-chevron-right"></i>
             </label>
         </form>
         <a id="page31-button90" class="button button-positive button-block" ng-click="savePolicy()" no-back>保存</a>
-        <a href="#/company/travelpolicy" id="page31-button91" class="button button-stable button-block" no-back>取消</a>
+        <a id="page31-button91" class="button button-assertive button-block " ng-click="deletePolicy()" ng-if="travelPolicy.id">删除标准</a>
     </ion-content>
 </ion-view>

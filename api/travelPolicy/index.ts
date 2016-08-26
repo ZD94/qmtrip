@@ -12,11 +12,12 @@ import {validateApi, requireParams, clientExport} from 'common/api/helper';
 import {requirePermit, conditionDecorator, condition} from "../_decorator";
 import {Staff, Credential, PointChange, EStaffRole, EStaffStatus} from "api/_types/staff";
 import types = require("api/_types/travelPolicy");
-import { TravelPolicy } from 'api/_types/travelPolicy';
+import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
 import { Models, EAccountType } from 'api/_types';
 import { FindResult, PaginateInterface } from "common/model/interface";
 
 const travalPolicyCols = TravelPolicy['$fieldnames'];
+const subsidyTemplateCols = SubsidyTemplate['$fieldnames'];
 
 class TravelPolicyModule{
     /**
@@ -53,14 +54,15 @@ class TravelPolicyModule{
         {if: condition.isTravelPolicyAgency("0.id")}
     ])
     static async deleteTravelPolicy(params) : Promise<any>{
-
-        let staffs = await Models.staff.find({where: {travelPolicyId: id, status: 0}});
-        if(staffs && staffs.length > 0){
-            throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准 暂不能删除，给这些员工匹配新的差旅标准后再进行操作'};
-        }
-
         var staff = await Staff.getCurrent();
         var id = params.id;
+
+        let staffs = await Models.staff.find({where: {travelPolicyId: id, staffStatus: EStaffStatus.ON_JOB}});
+        if(staffs && staffs.length > 0){
+            throw {code: -1, msg: '目前有'+staffs.length+'位员工在使用此标准请先移除'};
+        }
+
+
         var tp_delete = await Models.travelPolicy.get(id);
 
         if(staff && tp_delete["companyId"] != staff["companyId"]){
@@ -243,6 +245,113 @@ class TravelPolicyModule{
             });
 
     }
+
+    /*************************************补助模板begin***************************************/
+    /**
+     * 创建补助模板
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["subsidyMoney","name","travelPolicyId"])
+    @conditionDecorator([
+        {if: condition.isTravelPolicyAdminOrOwner("0.travelPolicyId")}
+    ])
+    static async createSubsidyTemplate (params) : Promise<SubsidyTemplate>{
+
+        /*let result = await Models.subsidyTemplate.find({where: {travelPolicyId: params.travelPolicyId}});
+        if(result && result.length>0){
+            throw {msg: "该城市补助模板已设置"};
+        }*/
+        var subsidyTemplate = SubsidyTemplate.create(params);
+        return subsidyTemplate.save();
+    }
+
+
+    /**
+     * 删除补助模板
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"])
+    static async deleteSubsidyTemplate(params) : Promise<any>{
+        var id = params.id;
+        var st_delete = await Models.subsidyTemplate.get(id);
+
+        await st_delete.destroy();
+        return true;
+    }
+
+
+    /**
+     * 更新补助模板
+     * @param id
+     * @param data
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"], subsidyTemplateCols)
+    @conditionDecorator([
+        {if: condition.isTravelPolicyAdminOrOwner("0.travelPolicyId")}
+    ])
+    static async updateSubsidyTemplate(params) : Promise<SubsidyTemplate>{
+        var id = params.id;
+        var staff = await Staff.getCurrent();
+
+        var ah = await Models.subsidyTemplate.get(id);
+        for(var key in params){
+            ah[key] = params[key];
+        }
+        return ah.save();
+    }
+
+    /**
+     * 根据id查询补助模板
+     * @param {String} params.id
+     * @param {Boolean} params.isReturnDefault 如果不存在返回默认 default true,
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["id"], ["travelPolicyId"])
+    static async getSubsidyTemplate(params: {id: string, travelPolicyId?: string}) : Promise<SubsidyTemplate>{
+        let id = params.id;
+        var ah = await Models.subsidyTemplate.get(id);
+
+        return ah;
+    };
+
+
+    /**
+     * 根据属性查找补助模板
+     * @param params
+     * @returns {*}
+     */
+    @clientExport
+    @requireParams(["where.travelPolicyId"],['attributes','where.name', 'where.subsudyMoney'])
+    @conditionDecorator([
+        {if: condition.isTravelPolicyAdminOrOwner("0.where.travelPolicyId")}
+    ])
+    static async getSubsidyTemplates(params): Promise<FindResult>{
+        var options: any = {
+            where: params.where
+        };
+        if(params.columns){
+            options.attributes = params.columns;
+        }
+        options.order = params.order || [['createdAt', 'desc']];
+        if(params.$or) {
+            options.where.$or = params.$or;
+        }
+
+        let paginate = await Models.subsidyTemplate.find(options);
+        let ids =  paginate.map(function(t){
+            return t.id;
+        })
+        return {ids: ids, count: paginate['total']};
+    }
+    /*************************************补助模板end***************************************/
+
 }
 
 export = TravelPolicyModule;

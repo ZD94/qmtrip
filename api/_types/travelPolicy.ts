@@ -5,6 +5,8 @@ import { Types, Values } from 'common/model';
 import { Table, Create, Field, ResolveRef } from 'common/model/common';
 import { ModelObject } from 'common/model/object';
 
+declare var API: any;
+
 export var  MTrainLevel  = {
     1: "商务座/高级软卧",
     2: "一等座/软卧",
@@ -79,13 +81,50 @@ export class TravelPolicy extends ModelObject{
     @Field({type: Types.BOOLEAN})
     get isChangeLevel(): boolean {return null}
     set isChangeLevel(isChangeLevel: boolean){}
+    
+    @Field({type: Types.BOOLEAN})
+    get isDefault(): boolean {return false}
+    set isDefault(isDefault: boolean){}
 
     @ResolveRef({type: Types.UUID}, Models.company)
     get company(): Company { return null; }
     set company(val: Company) {}
 
-    getStaffs(): Promise<Staff[]> {
-        let query = {where: {companyId: this.company.id, travelPolicyId: this.id}}
+    async getStaffs(): Promise<Staff[]> {
+        let query = {where: {companyId: this.company.id, travelPolicyId: this.id}};
         return Models.staff.find(query);
     }
+
+    async getSubsidyTemplates(): Promise<SubsidyTemplate[]> {
+        let query = { where: {travelPolicyId: this.id}};
+        return Models.subsidyTemplate.find(query);
+    }
+}
+
+@Table(Models.subsidyTemplate, "travelPolicy.")
+export class SubsidyTemplate extends ModelObject{
+    constructor(target: Object) {
+        super(target);
+    }
+    @Create()
+    static create(obj?: Object): SubsidyTemplate { return null; }
+
+    @Field({type: Types.UUID})
+    get id(): string { return Values.UUIDV1(); }
+    set id(val: string) {}
+
+    //补助金额
+    @Field({type: Types.NUMERIC(15, 2)})
+    get subsidyMoney(): number{return null}
+    set subsidyMoney(value: number){}
+
+    //模板名称
+    @Field({type: Types.STRING(50)})
+    get name(): string { return null; }
+    set name(val: string) {}
+
+    //所属差旅标准
+    @ResolveRef({type: Types.UUID}, Models.travelPolicy)
+    get travelPolicy(): Company { return null; }
+    set travelPolicy(val: Company) {}
 }

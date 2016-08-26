@@ -11,7 +11,7 @@ import { ngService } from '../index';
 import { Staff, Credential, PointChange, InvitedLink } from 'api/_types/staff';
 import { Company, MoneyChange } from 'api/_types/company';
 import { Department } from 'api/_types/department';
-import { TravelPolicy } from 'api/_types/travelPolicy';
+import { TravelPolicy, SubsidyTemplate } from 'api/_types/travelPolicy';
 import { AccordHotel } from 'api/_types/accordHotel';
 import { Agency, AgencyUser } from 'api/_types/agency';
 import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove} from 'api/_types/tripPlan';
@@ -61,6 +61,9 @@ var Services = {
     },
     travelPolicy: { type: TravelPolicy, modname: 'travelPolicy',
         funcs: ['getTravelPolicy', 'getTravelPolicies', 'createTravelPolicy', 'updateTravelPolicy', 'deleteTravelPolicy']
+    },
+    subsidyTemplate: { type: SubsidyTemplate, modname: 'travelPolicy',
+        funcs: ['getSubsidyTemplate', 'getSubsidyTemplates', 'createSubsidyTemplate', 'updateSubsidyTemplate', 'deleteSubsidyTemplate']
     },
     accordHotel: { type: AccordHotel, modname: 'accordHotel',
         funcs: ['getAccordHotel', 'getAccordHotels', 'createAccordHotel', 'updateAccordHotel', 'deleteAccordHotel']
@@ -123,6 +126,7 @@ class ClientModels implements ModelsInterface {
     company: ModelRemote<Company>;
     department: ModelRemote<Department>;
     travelPolicy: ModelRemote<TravelPolicy>;
+    subsidyTemplate: ModelRemote<SubsidyTemplate>;
     accordHotel: ModelRemote<AccordHotel>;
     agency: ModelRemote<Agency>;
     agencyUser: ModelRemote<AgencyUser>;
@@ -146,6 +150,7 @@ class ClientModels implements ModelsInterface {
         this.company = createService<Company>(Services.company, $cacheFactory);
         this.department = createService<Department>(Services.department, $cacheFactory);
         this.travelPolicy = createService<TravelPolicy>(Services.travelPolicy, $cacheFactory);
+        this.subsidyTemplate = createService<SubsidyTemplate>(Services.subsidyTemplate, $cacheFactory);
         this.accordHotel = createService<AccordHotel>(Services.accordHotel, $cacheFactory);
         this.agency = createService<Agency>(Services.agency, $cacheFactory);
         this.agencyUser = createService<AgencyUser>(Services.agencyUser, $cacheFactory);

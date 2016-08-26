@@ -377,15 +377,16 @@ class ApiTravelBudget {
 
         let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
         console.info('选择的策略是:', companyPolicy);
-        let strategy = new strategySwitcher[companyPolicy](tickets, cache);
-        return strategy.getResult({
+        let query = {
             originPlace: m_originCity,
             destination: m_destination,
             leaveDate: leaveDate,
             cabin: _.concat(cabinClass, trainCabins),
             leaveTime: leaveTime,
             latestArrivalTime: latestArrivalTime
-        })
+        }
+        let strategy = new strategySwitcher[companyPolicy](tickets, query, cache);
+        return strategy.getResult()
     }
 
     @clientExport
@@ -403,6 +404,7 @@ class ApiTravelBudget {
                 return true;
             }
             let originData = await cache.read(`${budget.id}:data`);
+            let markedData = await cache.read(`${budget.id}:marked`);
             return Promise.all([
                 new Promise( (resolve, reject) => {
                     //原始数据
@@ -410,6 +412,13 @@ class ApiTravelBudget {
                         if (err) return reject(err);
                         resolve(true);
                     });
+                }),
+                new Promise( (resolve, reject) => {
+                    //打分排序后数据
+                    fs.writeFile(`./tmp/${prefix}-${staff.mobile}-marked.json`, JSON.stringify(markedData), function(err) {
+                        if (err) return reject(err);
+                        resolve(true);
+                    })
                 }),
                 new Promise( (resolve, reject) => {
                     //预算结果
