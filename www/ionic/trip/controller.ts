@@ -662,19 +662,15 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
     var invoice = await Models.tripDetail.get($stateParams.detailId);
     $scope.invoice = invoice;
     $scope.EInvoiceType = EInvoiceType;
-    API.require('attachment');
-    await API.onload();
-    // var invoiceImg = await API.attachment.previewSelfImg({fileId: invoice.newInvoice});
     var latestInvoice = invoice.latestInvoice;
     var invoiceImgs = [];
     if(typeof latestInvoice =='string') {
         latestInvoice = JSON.parse(latestInvoice);
     }
 
-    await Promise.all(latestInvoice.map(async function(i){
-        var invoiceImg = await API.attachment.previewSelfImg({fileId: i});
-        invoiceImgs.push(invoiceImg);
-    }))
+    for(let i of latestInvoice){
+        invoiceImgs.push('/trip-detail/'+$stateParams.detailId+'/invoice/'+i);
+    }
     $scope.invoiceImgs = invoiceImgs;
 
     let statusTxt = {};

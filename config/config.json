@@ -30,11 +30,12 @@
     "url": "redis://localhost:6379"
   },
   "hosts": {
-    "main":{"addr":"api.local.jingli.tech", "port":4101}
+    "main":{"addr":"api.local.jingli.tech", "port":4101, "www":"http://${{hosts.main.addr}}:4001"}
   },
   "upload":{
-    "tmpDir": "${{ROOT_DIR}}/public/temp",
-    "pubDir": "${{ROOT_DIR}}/public/upload"
+    "tmpDir": "${{ROOT_DIR}}/tmp/upload",
+    "publicDir": "${{ROOT_DIR}}/www/upload",
+    "privateDir": "${{ROOT_DIR}}/tmp/files"
   },
   "template":{
     "file": "${{ROOT_DIR}}/public/templatefile"
