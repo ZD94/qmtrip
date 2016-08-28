@@ -45,6 +45,7 @@ function ngUploader($loading, wxApi): any {
                 alias: $scope.name || 'tmpFile',
                 autoUpload: false
             });
+            var fileIds = [];
             $scope.previewAndUpload = function(urls) {
                 console.info('upload:', urls)
                 showPreviewDialog($scope, ngModalDlg, urls, $scope.title)
@@ -57,6 +58,7 @@ function ngUploader($loading, wxApi): any {
                             uploader.queue[i]._file = blobs[i];
                         }
                         $loading.start();
+                        fileIds = [];
                         uploader.uploadAll();
                     });
             };
@@ -64,11 +66,8 @@ function ngUploader($loading, wxApi): any {
                 var urls = files.map((file)=>file._file)
                 $scope.previewAndUpload(urls);
             };
-            var fileIds = [];
             uploader.onCompleteItem  = function (file, response, status, headers) {
                 fileIds.push(response.fileId);
-                // $scope.done()(response);
-                // $loading.end();
             };
             uploader.onCompleteAll  = function (file, response, status, headers) {
                 console.info(fileIds);
