@@ -1,6 +1,5 @@
 "use strict";
 
-//企业注册页面  sc
 export async function CompanyGuideController ($scope){
     require("./company-guide.scss");
 }
