@@ -10,12 +10,13 @@ import {AbstractPrefer} from "./index";
 const CHEAP_SUPPLIERS = ['春秋航空', '中国联合航空', '吉祥航空', '西部航空', '成都航空', '九元航空', '幸福航空'];
 class CheapSupplierPrefer extends AbstractPrefer {
 
-
-    private agents: string[];
     private score: number;
 
     constructor(name, options) {
         super(name, options);
+        if (!this.score) {
+            this.score = 0;
+        }
     }
 
     async markScoreProcess(tickets:IFinalTicket[]):Promise<IFinalTicket[]> {
@@ -34,14 +35,3 @@ class CheapSupplierPrefer extends AbstractPrefer {
 }
 
 export= CheapSupplierPrefer
-
-//
-//
-// function cheapsupplier(data: IFinalTicket[], cheapsuppliers: Array<string>, score: number) :IFinalTicket[] {
-//     data = data.map( (v) => {
-//
-//     });
-//     return data;
-// }
-//
-// export= cheapsupplier;

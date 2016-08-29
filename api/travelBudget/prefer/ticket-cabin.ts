@@ -4,35 +4,36 @@
 
 'use strict';
 import {IFinalTicket} from "api/_types/travelbudget";
+import {AbstractPrefer} from "./index";
 /* * * * * * * * *
  * 仓位信息打分
  * * * * * * * * */
 
-/**
- * 根据仓位信息打分
- *
- * @param data
- * @param expected
- * @param notExpected
- * @param score
- */
-function cabin(data: IFinalTicket[], expected: Array<string>|string, score: number) :IFinalTicket[] {
-    let cabins: Array<string> = [];
-    if (typeof expected == 'string') {
-        cabins.push(expected);
-    } else {
-        cabins = expected;
-    }
-    data = data.map( (v) => {
-        if (!v['score']) v['score']=0;
-        if (!v.reasons) v.reasons = [];
-        if (cabins.indexOf(v.cabin) >= 0) {
-            v['score'] += score;
-            v.reasons.push(`座次符合规定:+${score}`)
+class CabinPrefer extends AbstractPrefer {
+
+    private expectCabins;
+    private score;
+
+    constructor(name, options) {
+        super(name, options);
+        if (!this.score) {
+            this.score = 0;
         }
-        return v;
-    });
-    return data;
+    }
+
+    async markScoreProcess(tickets:IFinalTicket[]):Promise<IFinalTicket[]> {
+        let self = this;
+        tickets = tickets.map( (v) => {
+            if (!v['score']) v['score']=0;
+            if (!v.reasons) v.reasons = [];
+            if (this.expectCabins.indexOf(v.cabin) >= 0) {
+                v['score'] += self.score;
+                v.reasons.push(`座次符合规定:+${self.score}`)
+            }
+            return v;
+        });
+        return tickets;
+    }
 }
 
-export= cabin;
+export= CabinPrefer
