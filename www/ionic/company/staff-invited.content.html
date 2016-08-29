@@ -1,0 +1,45 @@
+<div>
+    <span style="color: #ffffff;">将下方链接发送给同事即可邀请同事加入</span>
+    <div class="invied_link card">
+        <div class="item">
+            <div class="about_link flex-c111">
+                <div ng-if="!invitedLink" class="create_link">
+                    <a class="button button-calm" ng-click="createLink()">生成链接</a>
+                </div>
+                <div ng-if="invitedLink" class="link_style" >{{invitedLink.goInvitedLink}}</div>
+                <div ng-if="invitedLink" class="countdown">剩余有效期:{{countdown(expireTimeout)}}</div>
+                <div class="stop_link" ng-if="invitedLink">
+                    <a class="button button-energized" ng-click="stopLink(invitedLink)">停用</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="send_buttons" ng-if="!invitedLink">
+        <a class="button button-outline button-stable" >
+            <i class="fa fa-weixin"></i>
+            <span>通过微信发送</span>
+        </a>
+        <a class="button button-outline button-stable">
+            <i class="fa fa-envelope-o"></i>
+            <span>通过短信发送</span>
+        </a>
+    </div>
+    <div class="send_buttons" ng-if="invitedLink">
+        <a class="button button-outline button-calm" href="" ng-click="sendWx()" ng-if="is_wechat">
+            <i class="fa fa-weixin"></i>
+            <span>通过微信发送</span>
+        </a>
+        <a class="button button-outline button-calm" ng-href={{invitedLink.goInvitedLink}} ng-if="!is_wechat">
+            <i class="fa fa-weixin"></i>
+            <span>通过微信发送</span>
+        </a>
+        <a class="button button-outline button-calm" ng-href="sms:?&body={{staff.name}}邀请您注册鲸力商旅,详情 {{encodeLink}}" ng-if="isIos">
+            <i class="fa fa-envelope-o"></i>
+            <span>通过短信发送</span>
+        </a>
+        <a class="button button-outline button-calm" ng-href="sms:?&body={{staff.name}}邀请您注册鲸力商旅,详情 {{encodeLink}}" ng-if="isAndroid">
+            <i class="fa fa-envelope-o"></i>
+            <span>通过短信发送</span>
+        </a>
+    </div>
+</div>
