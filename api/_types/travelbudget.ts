@@ -126,6 +126,10 @@ export class TravelBudgetLog extends ModelObject {
     set originData(data: any) {}
 
     @Field({type: Types.JSONB})
+    get markedData(): any{ return null}
+    set markedData(data: any) {}
+
+    @Field({type: Types.JSONB})
     get result() :any { return null};
     set result(result: any) {}
 
