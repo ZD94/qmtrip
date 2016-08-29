@@ -153,6 +153,8 @@ export class Company extends ModelObject{
         var tps = await Models.travelPolicy.find({where: {companyId: this.id, isDefault: true}});
         if(tps && tps.length>0){
             return tps[0];
+        }else{
+            return null;
         }
     }
 
@@ -160,6 +162,8 @@ export class Company extends ModelObject{
         var depts = await Models.department.find({where: {companyId: this.id, isDefault: true}});
         if(depts && depts.length>0){
             return depts[0];
+        }else{
+            return null;
         }
     }
 

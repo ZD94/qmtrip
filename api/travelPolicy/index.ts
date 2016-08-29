@@ -339,7 +339,7 @@ class TravelPolicyModule{
         if(params.columns){
             options.attributes = params.columns;
         }
-        options.order = params.order || [['createdAt', 'desc']];
+        options.order = params.order || [['subsidyMoney', 'desc']];
         if(params.$or) {
             options.where.$or = params.$or;
         }
