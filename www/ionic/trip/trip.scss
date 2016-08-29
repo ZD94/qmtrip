@@ -114,3 +114,54 @@
     color: #fff;
   }
 }
+//右边有向右箭头
+.item-icon-right{
+  .icon{
+    font-size: 14px;
+  }
+}
+
+//补助选择popup
+.selectSubsidy{
+  .item-radio{
+    border: 0;
+    margin-bottom: 5px;
+    .radio-content{
+      .item-content{
+        border: 1px solid #ddd;
+        padding: 10px 10px 10px 40px;
+        font-size: 14px;
+      }
+      .icon{
+        font-size: 14px;
+        padding: 8px;
+        color: #28a7e1;
+      }
+    }
+  }
+  .item-toggle{
+    border: 0;
+    padding-left: 0;
+    font-size: 12px;
+    padding: 10px;
+    .toggle{
+      .track{
+        height: 25px;
+        width: 43px;
+        .handle{
+          height: 21px;
+          width: 21px;
+          border-radius: 21px;
+        }
+      }
+    }
+  }
+  .item-radio input:checked + .radio-content .item-content{
+    border: 1px solid #28a7e1;
+    background: none;
+  }
+  ion-scroll{
+    padding-top: 5px;
+    max-height: 155px;
+  }
+}
