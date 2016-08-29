@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width" />
     <title>预算调试</title>
     <!-- 新 Bootstrap 核心 CSS 文件 -->
     <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -9,6 +10,15 @@
     <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
     <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
     <script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <style>
+        .show {
+            display: block;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
@@ -27,13 +37,13 @@
         <tr>
             <th>原始数据:</th>
             <td>
-                <textarea placeholder="原始数据" rows="8" cols="80" id="originData"></textarea>
+                <textarea placeholder="原始数据" rows="8" cols="80" id="originData" class="hidden"></textarea><a href="#" class="showBtn">显示</a>
             </td>
         </tr>
         <tr>
             <th>打完分数据:</th>
             <td>
-                <textarea placeholder="打分后数据" rows="8" cols="80" id="markedData"></textarea>
+                <textarea placeholder="打分后数据" rows="8" cols="80" id="markedData" class="hidden"></textarea><a href="#" class="showBtn">显示</a>
             </td>
         </tr>
         <tr>

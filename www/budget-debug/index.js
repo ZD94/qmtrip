@@ -98,6 +98,7 @@ $(document).ready( function() {
       renderBudget();
       changeBudget();
       renderPrefers();
+      registryHideBtn();
     })
 })
 
@@ -137,4 +138,18 @@ function addPrefer() {
   _p = JSON.parse(_p);
   _val.push(_p);
   $("#prefers").val(JSON.stringify(_val));
+}
+
+function registryHideBtn() {
+  $(".showBtn").click( function() {
+    var self = $(this);
+    var val = self.html();
+    if (val == '显示') {
+      self.siblings("textarea").removeClass("hidden");
+      self.html("隐藏")
+    } else {
+      self.siblings("textarea").addClass("hidden");
+      self.html("显示")
+    }
+  })
 }
