@@ -27,10 +27,6 @@ export abstract class AbstractPrefer implements IPrefer {
 }
 
 export var ticketPrefer = {
-    // arrivaltime: require('./ticket-arrivaltime'),
-    // cabin: require('./ticket-cabin'),
-    cheapsupplier: require('./ticket-cheapsupplier'),
-    departtime: require('./ticket-departtime'),
     lowestprice: require('./ticket-lowestprice'),
     maxpricelimit: require('./ticket-maxpricelimit'),
     selecttraffic: require('./ticket-selecttraffic'),
@@ -52,5 +48,6 @@ export var ticketPrefers = {
     arrivalTime: require('./ticket-arrivaltime'),
     cheapSupplier: require('./ticket-cheapsupplier'),
     selectTraffic: require('./ticket-selecttraffic'),
-    cabin: require('./ticket-cabin')
+    cabin: require('./ticket-cabin'),
+    departTime: require('./ticket-departtime')
 }
