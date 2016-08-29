@@ -30,22 +30,24 @@ html {
   width: 100%;
   height: 100%;
 }
+
 @mixin app-background {
   background: url(../images/background.jpg) no-repeat;
-  background-size:cover;
+  background-size: cover;
   background-position: center;
 }
+
 body {
   position: absolute;
   width: 100%;
   height: 100%;
   @include app-background;
-  ion-side-menu-content{
+  ion-side-menu-content {
     @include app-background;
   }
   ion-nav-view {
     background-color: transparent !important;
-    ion-view{
+    ion-view {
       @include app-background;
     }
   }
@@ -55,18 +57,18 @@ body {
   display: none !important;
 }
 
-a{
+a {
   text-decoration: none;
 }
 
 //item左右会超出
-.item{
+.item {
   margin-right: 0px;
   margin-left: 0px;
 }
 
 //按钮图标大小过大
-.button-icon{
+.button-icon {
   .icon:before,
   &.icon:before {
     font-size: inherit;
@@ -77,14 +79,14 @@ a{
   filter: brightness(0.5);
 }
 
-ion-content{
-  >.flex-c10{
-    >ion-scroll{
+ion-content {
+  > .flex-c10 {
+    > ion-scroll {
       padding: 10px;
     }
-    >:last-child{
-      &.button-bar, >.button-bar{
-        >.button {
+    > :last-child {
+      &.button-bar, > .button-bar {
+        > .button {
           margin-top: 0;
           margin-bottom: 0;
           border-radius: 0;
@@ -94,90 +96,108 @@ ion-content{
   }
 }
 
-.getMoreOrNoMore{
+.getMoreOrNoMore {
   text-align: center;
   margin-top: 20px;
   color: #fff;
 }
 
-.platform-android{
-  .scroll-view.scroll-y[overflow-scroll="false"][has-bouncing="true"]{
+.platform-android {
+  .scroll-view.scroll-y[overflow-scroll="false"][has-bouncing="true"] {
     overflow-y: hidden;
   }
 }
 
-.platform-wechat{
-  ion-side-menu-content{
-    .has-header{
+.platform-wechat {
+  ion-side-menu-content {
+    .has-header {
       top: 0;
     }
   }
-  .nav-bar-block{
+  .nav-bar-block {
     right: auto;
     width: 40px;
     .title {
       display: none;
     }
-    .bar{
+    .bar {
       padding: 0;
-      background-color: rgba(255,255,255, 0);
+      background-color: rgba(255, 255, 255, 0);
       border: 0;
       height: 30px;
       -webkit-background-size: 0;
       background-size: 0;
-      button{
-        &.button-icon{
+      button {
+        &.button-icon {
           background-color: rgba($stable, 0.4);
           min-height: 32px;
           max-height: 32px;
           border-radius: 0 4px 4px 0;
-          &:before{
+          &:before {
             font-size: 24px;
             line-height: 32px;
           }
         }
-        &.back-button{
+        &.back-button {
           background-color: rgba($stable, 0.4);
           padding: 0 5px;
           border-radius: 0 4px 4px 0;
-          i{
-            &:before{
+          i {
+            &:before {
               font-size: 24px;
               line-height: 32px;
             }
           }
-          span{
+          span {
             display: none;
           }
         }
       }
     }
   }
-  .JingliLogin{
-    .has-header{
+  .JingliLogin {
+    .has-header {
       top: 0;
     }
   }
 }
 
-
-.share_alert{
-  background: rgba(0,0,0,.4);
-  .popup{
+.share_alert {
+  background: rgba(0, 0, 0, .4);
+  .popup {
     background: #28A7E1 url("../images/logo_write10.png") no-repeat;
     background-position: 10px 40px;
     background-size: 50px;
     color: #fff;
     border-radius: 5px;
     height: 100px;
-    .popup-head{
+    .popup-head {
       display: none;
     }
-    p{
+    p {
       text-align: right;
       font-size: 16px;
       font-weight: bold;
       margin: 10px 0;
     }
   }
+}
+
+//ion-radio
+.item-radio{
+  &.item-icon-left{
+    .radio-content {
+      .item-content{
+        padding: 16px 16px 16px 49px;
+      }
+      .icon{
+        left: 0;
+      }
+    }
+  }
+}
+
+//item-small
+.item-small{
+  font-size:$font-size-small;
 }

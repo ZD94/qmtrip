@@ -43,7 +43,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
     $scope.currentStaff = await Staff.getCurrent();
     $scope.currentTp = await $scope.currentStaff.getTravelPolicy();
     $scope.currentTpSts = await $scope.currentTp.getSubsidyTemplates();
-    $scope.subsidy = {hasFirstDaySubsidy: false, hasLastDaySubsidy: false, template: null};
+    $scope.subsidy = {hasFirstDaySubsidy: true, hasLastDaySubsidy: true, template: null};
 
     /*******************判断是否为第一次的登录  史聪************************/
     let staff = await Staff.getCurrent();
@@ -56,11 +56,8 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
     $scope.selectSubsidyTemplate = async function(){
         var nshow = $ionicPopup.show({
             title:'出差补助选择',
-            template:'<div>请选择补助模板</div>' +
-            '<div class="" ng-repeat="st in currentTpSts" ng-click="selectSt(st)">' +
-            '<div class=""><div style="color:#000000;">{{st.name}}&nbsp;&nbsp;&nbsp;&nbsp;{{st.subsidyMoney}}/天</div> </div> </div>' +
-            '<ion-toggle toggle-class="toggle-positive" ng-checked="subsidy.hasFirstDaySubsidy" ng-model="subsidy.hasFirstDaySubsidy">出发当天补助</ion-toggle>' +
-            ' <ion-toggle toggle-class="toggle-positive" ng-checked="subsidy.hasLastDaySubsidy" ng-model="subsidy.hasLastDaySubsidy">回程当天补助</ion-toggle>',
+            cssClass:'selectSubsidy',
+            template:require('./selectSubsidy.html'),
             scope: $scope,
             buttons:[
                 {
@@ -69,12 +66,15 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
                     onTap: async function (e) {
                         try{
                             if(!$scope.subsidy.template){
+                                console.info("选定的补助模板：", $scope.subsidy.template);
+                                console.info("出发当天补助：", $scope.subsidy.hasFirstDaySubsidy);
+                                console.info("回城当天补助：", $scope.subsidy.hasLastDaySubsidy);
                                 e.preventDefault();
                                 msgbox.log("请选择补助模板");
                                 return false;
                             }
                         }catch(err){
-                            msgbox.log(err.msg);
+                            msgbox.log(err.msg || err);
                         }
                     }
                 }
@@ -82,9 +82,6 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
         });
     }
 
-    $scope.selectSt = function(st){
-        $scope.subsidy.template = st;
-    }
     /*******************出差补助选择end************************/
 
     let minStDate = moment().format('YYYY-MM-DD');
@@ -331,6 +328,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
 
 export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading){
     require('./trip.scss');
+    require('./budget.scss');
     API.require("tripPlan");
     await API.onload();
 

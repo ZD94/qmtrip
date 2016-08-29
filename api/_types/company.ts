@@ -125,6 +125,10 @@ export class Company extends ModelObject{
     get budgetPolicy(): string { return 'default'; }
     set budgetPolicy(policy:string){}
 
+    @Field({type: Types.JSONB})
+    get budgetConfig(): any { return {}};
+    set budgetConfig(conf: any) {}
+
     @Reference({type: Types.UUID})
     getAgency(id?:string): Promise<Agency> {
         return Models.agency.get(id);
@@ -149,6 +153,23 @@ export class Company extends ModelObject{
         return Models.travelPolicy.find(query);
     }
 
+    async getDefaultTravelPolicy(companyId?:string): Promise<TravelPolicy> {
+        var tps = await Models.travelPolicy.find({where: {companyId: this.id, isDefault: true}});
+        if(tps && tps.length>0){
+            return tps[0];
+        }else{
+            return null;
+        }
+    }
+
+    async getDefaultDepartment(companyId?:string): Promise<Department> {
+        var depts = await Models.department.find({where: {companyId: this.id, isDefault: true}});
+        if(depts && depts.length>0){
+            return depts[0];
+        }else{
+            return null;
+        }
+    }
 
     getTripPlans(options?: any): Promise<TripPlan[]> {
         if(!options) {options = {where: {}}};

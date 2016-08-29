@@ -1,0 +1,21 @@
+.withCheck{
+  .item-radio{
+    border: 0;
+    margin-bottom: 5px;
+    .radio-content{
+      .item-content{
+        border: 1px solid #ddd;
+        padding: 10px 10px 10px 40px;
+      }
+      .icon{
+        font-size: 14px;
+        padding: 8px;
+        color: #28a7e1;
+      }
+    }
+  }
+  .item-radio input:checked + .radio-content .item-content{
+    border: 1px solid #28a7e1;
+    background: none;
+  }
+}

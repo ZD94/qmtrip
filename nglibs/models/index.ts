@@ -141,6 +141,7 @@ class ClientModels implements ModelsInterface {
     seed: ModelRemote<Seed>;
     token: ModelRemote<Token>;
     accountOpenid: ModelRemote<AccountOpenid>;
+    travelBudgetLog: ModelRemote<TravelBudgetLog>;
 
     constructor($cacheFactory: ng.ICacheFactoryService) {
         this.staff = createService<Staff>(Services.staff, $cacheFactory);
@@ -180,4 +181,5 @@ class ClientModels implements ModelsInterface {
 
 import './menu';
 import './place';
+import {TravelBudgetLog} from "../../api/_types/travelbudget";
 
