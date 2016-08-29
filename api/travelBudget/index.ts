@@ -381,7 +381,9 @@ class ApiTravelBudget {
         }
         //原始查询
         qs.query = params;
-        
+        qs.query.originPlace = m_originCity;
+        qs.query.destination = m_destination;
+
         let arrivalPrefer = {
             name: 'arrivalTime',
             options: {
@@ -395,7 +397,7 @@ class ApiTravelBudget {
                 "expectCabins": _.concat(cabinClass, trainCabins),
             }
         }
-        for(let p of qs.prefers) {
+        qs.prefers = qs.prefers.map( (p) => {
             if (p.name == arrivalPrefer.name) {
                 for(let k in arrivalPrefer.options) {
                     p.options[k] = arrivalPrefer.options[k];
@@ -406,9 +408,11 @@ class ApiTravelBudget {
                     p.options[k] = cabinPrefer.options[k];
                 }
             }
-        }
+            return p;
+        });
+        console.info("原始查询条件:",qs.prefers);
         let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
-        let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs);
+        let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
         return strategy.getResult(tickets);
     }
 
@@ -454,6 +458,54 @@ class ApiTravelBudget {
         });
         await Promise.all(ps);
         return true;
+    }
+
+    static __initHttpApp(app) {
+
+        function _auth_middleware(req, res, next) {
+            let key = req.query.key;
+            if (!key || key != 'jingli2016') {
+                return res.send(403)
+            }
+            next();
+        }
+
+        app.get("/api/budgets", _auth_middleware, function(req, res, next) {
+            let {p, pz} = req.query;
+            if (!p || !/^\d+$/.test(p) || p< 1) {
+                p = 1;
+            }
+            if (!pz || !/^\d+$/.test(pz) || pz < 1) {
+                pz = 20;
+            }
+
+            let offset = (p - 1) * pz;
+            Models.travelBudgetLog.find({where: {}, limit: pz, offset: offset, order: 'created_at desc'})
+                .then( (travelBudgetLogs) => {
+                    let datas = travelBudgetLogs.map( (v)=> {
+                        return v.target;
+                    });
+                    res.json(datas);
+                })
+                .catch(next);
+        })
+
+        app.post('/api/budgets', _auth_middleware, async function(req, res, next) {
+            let {query, prefers, policy, originData} = req.body;
+            let qs = {
+                policy: policy,
+                prefers: JSON.parse(prefers),
+                query: JSON.parse(query),
+            }
+
+            try {
+                let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs, {isRecord: false});
+                let result = await strategy.getResult(JSON.parse(originData));
+                res.json(result);
+            } catch(err) {
+                next(err);
+            }
+        })
     }
 }
 
