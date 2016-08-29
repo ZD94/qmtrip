@@ -5,33 +5,58 @@
 'use strict';
 import {IFinalTicket} from "api/_types/travelbudget";
 import moment = require("moment");
+import {AbstractPrefer} from "./index";
 
+class DepartTimePrefer extends AbstractPrefer {
 
-function departtime(data: IFinalTicket[], d1, d2, score) :IFinalTicket[] {
-    data = data.map( (v) => {
-        if (!v['score']) v['score'] = 0;
-        if (!v['reasons']) v['reasons'] = [];
-        let d = new Date(v.departDateTime).valueOf();
-        if (d1) {
-            let _d1 = new Date(d1).valueOf();
-            if (_d1 - d > 0) {
-                v['score'] -= score;
-                v['reasons'].push(`出发时间早于规定时间 -${score}`)
-                return v;
-            }
+    private begin: Date;
+    private end: Date;
+    private score: number;
+
+    constructor(name, options) {
+        super(name, options);
+        if (!this.score) {
+            this.score = 0;
         }
+    }
 
-        if (d2) {
-            let _d2 = new Date(d2).valueOf();
-            if (d - _d2> 0) {
-                v['score'] -= score;
-                v['reasons'].push(`出发时间晚于规定时间 -${score}`)
-                return v;
-            }
+    async markScoreProcess(tickets: IFinalTicket[]): Promise<IFinalTicket[]> {
+        let d1 = this.begin;
+        if (d1 && typeof d1 == 'string') {
+            d1 = new Date(d1 as string);
         }
-        return v;
-    })
-    return data;
+        let d2 = this.end;
+        if (d2 && typeof d2 == 'string') {
+            d2 = new Date(d2 as string);
+        }
+        let score = this.score;
+
+        tickets = tickets.map( (v) => {
+            if (!v['score']) v['score'] = 0;
+            if (!v['reasons']) v['reasons'] = [];
+            console.info(v.No, d1, v.departDateTime, d2)
+            let d = new Date(v.departDateTime).valueOf();
+            if (d1) {
+                let _d1 = d1.valueOf();
+                if (_d1 - d > 0) {
+                    v['score'] -= score;
+                    v['reasons'].push(`出发时间早于规定时间 -${score}`)
+                    return v;
+                }
+            }
+
+            if (d2) {
+                let _d2 = d2.valueOf();
+                if (d - _d2> 0) {
+                    v['score'] -= score;
+                    v['reasons'].push(`出发时间晚于规定时间 -${score}`)
+                    return v;
+                }
+            }
+            return v;
+        })
+        return tickets;
+    }
 }
 
-export= departtime;
+export= DepartTimePrefer;

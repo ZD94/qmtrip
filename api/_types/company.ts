@@ -125,6 +125,10 @@ export class Company extends ModelObject{
     get budgetPolicy(): string { return 'default'; }
     set budgetPolicy(policy:string){}
 
+    @Field({type: Types.JSONB})
+    get budgetConfig(): any { return {}};
+    set budgetConfig(conf: any) {}
+
     @Reference({type: Types.UUID})
     getAgency(id?:string): Promise<Agency> {
         return Models.agency.get(id);

@@ -5,6 +5,10 @@
 'use strict';
 
 import {EInvoiceType, ETripType} from "../_types/tripPlan";
+import {ModelObject} from "common/model/object";
+import {Table, Create, Field} from "common/model/common";
+import {Models} from "./index";
+import {Types, Values} from "common/model/index";
 
 export enum TRAFFIC {
     TRAIN = 0,
@@ -89,4 +93,47 @@ export interface IFinalHotel {
     bookUrl?: string;
     score?: number;
     reasons?: string[]
+}
+
+//记录预算分析数据及结果
+@Table(Models.travelBudgetLog, "travelbudget.travel_budget_log")
+export class TravelBudgetLog extends ModelObject {
+    constructor(target: Object) {
+        super(target);
+    }
+    @Create()
+    static create(obj?: Object): TravelBudgetLog { return null; }
+
+    @Field({type: Types.UUID})
+    get id():string { return Values.UUIDV1()};
+    set id(id: string) {}
+
+    //便于调试时选择
+    @Field({type: Types.STRING(255)})
+    get title(): string { return null}
+    set title(title: string) {}
+
+    @Field({type: Types.JSONB})
+    get query(): any { return null};
+    set query(query: any) {}
+
+    @Field({type: Types.JSONB})
+    get prefers(): any {return null};
+    set prefers(prefers: any) {}
+
+    @Field({type: Types.JSONB})
+    get originData(): any{ return null}
+    set originData(data: any) {}
+
+    @Field({type: Types.JSONB})
+    get markedData(): any{ return null}
+    set markedData(data: any) {}
+
+    @Field({type: Types.JSONB})
+    get result() :any { return null};
+    set result(result: any) {}
+
+    @Field({type: Types.INTEGER})
+    get type(): number { return 1};
+    set type(t: number) {}
 }
