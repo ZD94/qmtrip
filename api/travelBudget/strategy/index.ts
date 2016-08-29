@@ -204,7 +204,7 @@ abstract class AbstractTicketStrategy {
             id: this._id
         }
         if (this.isRecord) {
-            travelBudgetLog.title = `${this.qs.query.originPlace.name}-${this.qs.query.destination.name}(${this.qs.query.leaveDate})`
+            travelBudgetLog.title = `[交通]${this.qs.query.originPlace.name}-${this.qs.query.destination.name}(${this.qs.query.leaveDate})`
             travelBudgetLog.prefers = this.qs.prefers;
             travelBudgetLog.query = this.qs.query;
             travelBudgetLog.originData = tickets;
