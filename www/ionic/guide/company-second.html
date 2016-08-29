@@ -3,11 +3,12 @@
         2/2 邀请员工
     </ion-header-bar>
     <ion-content class="text-center" padding="true">
+        <!--
         <p style="color:white">将下方邀请链接发送给同事即可邀请同事加入</p>
         <div class="invied_link card" style="background-color: #fff">
             <div class="item">
                 <div ng-if="invitedLink" class="link_style">{{invitedLink.goInvitedLink}}</div>
-                <div ng-if="invitedLink" class="countdown" style="line-height: 50px">剩余有效期：{{countdown}}</div>
+                <div ng-if="invitedLink" class="countdown" style="line-height: 50px">剩余有效期：{{countdown(expireTimeout)}}</div>
                 <div>
                     <a ng-if="invitedLink" class="stop-button button button-energized" href="" ng-click="stopLink(invitedLink)">停用</a>
                 </div>
@@ -55,6 +56,8 @@
                 </a>
             </div>
         </div>
+        -->
+        <ng-include src="'ionic/company/staff-invited.content.html'"></ng-include>
         <a class="button button-calm button-block" ng-href="#/guide/company-guide-success" >完成设置</a>
     </ion-content>
 </ion-view>
