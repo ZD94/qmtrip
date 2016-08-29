@@ -320,6 +320,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
 
 export async function BudgetController($scope, $storage, Models, $stateParams, $ionicLoading){
     require('./trip.scss');
+    require('./budget.scss');
     API.require("tripPlan");
     await API.onload();
 
