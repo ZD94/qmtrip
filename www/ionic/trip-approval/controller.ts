@@ -30,8 +30,8 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     let tripApprove = await Models.tripApprove.get(approveId);
     $scope.staff = tripApprove.account;
     $scope.isConfirm = false;
-    APPROVE_TEXT[EApproveStatus.WAIT_APPROVE] = `等待 ${tripApprove.approveUser.name} 审批`;
-    $scope.APPROVE_TEXT = APPROVE_TEXT;
+    $scope.APPROVE_TEXT = _.clone(APPROVE_TEXT);
+    $scope.APPROVE_TEXT[EApproveStatus.WAIT_APPROVE] = `等待 ${tripApprove.approveUser.name} 审批`;
     $scope.EInvoiceType = EInvoiceType;
     $scope.EApproveStatus = EApproveStatus;
     $scope.MTxPlaneLevel = MTxPlaneLevel;
