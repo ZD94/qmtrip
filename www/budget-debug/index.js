@@ -13,7 +13,7 @@ if (groups) {
 var prefers = [
   {
     title: "到达时间",
-    value: '{"name": "arrivalTime", "options": {"begin": "开始时间,格式HH:mm", "end": "最晚时间", "inScore": "如果在这个时间段内得分"}}'
+    value: '{"name": "arrivalTime", "options": {"begin": "开始时间,格式YYYY-MM-DD HH:mm +0800", "end": "最晚时间", "outScore": "如果不在这个时间段内得分"}}'
   },
   {
     title: "舱位",
@@ -21,7 +21,7 @@ var prefers = [
   },
   {
     title: "廉价航空",
-    value: '{"name": "cheapsupplier", "options": {"score": "如果在廉价航空中得分"}}'
+    value: '{"name": "cheapSupplier", "options": {"score": "如果在廉价航空中得分"}}'
   },{
     title: "出发时间",
     value: '{"name": "departTime", "options": {"begin": "开始时间", "end": "最晚时间", "score": "符合时间得分"}}'
