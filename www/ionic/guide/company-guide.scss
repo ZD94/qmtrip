@@ -15,22 +15,10 @@
 }
 //第一步的样式
 .company-first{
-  div.item{
-    position: relative;
-  }
-}
-.company-first{
-  div.item{
-    span{
+  form.list {
+    span.input-label{
       text-align: left;
     }
-    //span.plahoder{
-    //  text-align: left;
-    //  color:#c7c7cd;
-    //  font-size: 14px;
-    //  position:absolute;
-    //  z-index: 2;
-    //}
   }
 }
 
@@ -44,12 +32,20 @@
   background-size: 0px;
 }
 //第二步的样式
+.invied_link{
+  > *{
+    &:nth-child(1){
+      height:264px
+    }
+  }
+  .link_style{
+    font-size: 18px;
+    line-height: 56px;
+  }
 
-
-.link-invite{
-  font-size: 18px;
-  line-height: 56px;
 }
+
+
 .stop-button{
   width:30%;
   background-color:#f29901 ;
@@ -58,7 +54,7 @@
 }
 //第二步的下面的样式
 #companySecond{
-  .cancel-padding{
+  .send_buttons{
     padding-left: 0px;
     padding-right: 0px;
   }
@@ -66,6 +62,12 @@
     width:100%;
     background-color: #fff;
     color:#28a7e1;
+    border:1px solid #28a7e1;
+    font-size: 14px;
+  }
+  .button-send-stable{
+    width:100%;
+    background-color: #fff;
     border:1px solid #28a7e1;
     font-size: 14px;
   }
