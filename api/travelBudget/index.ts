@@ -369,42 +369,44 @@ class ApiTravelBudget {
             cabin: trainCabins
         });
 
-        let qs = {
-            policy: 'default',
-            prefers: [
-                {
-                    name: 'arrivalTime',
-                    options: {
-                        "begin": `${params.leaveDate} ${params.leaveTime}`,
-                        "end": `${params.leaveDate} ${params.latestArrivalTime}`,
-                        "outScore": -100
-                    }
-                },
-                {
-                    name: 'cabin',
-                    options: {
-                        "expectCabins": _.concat(cabinClass, trainCabins),
-                        "score": 500
-                    }
-                },
-                {
-                    name: 'selectTraffic',
-                    options: {
-                        "selectTrainDuration": 6 * 60,
-                        "selectFlightDuration": 3.5 * 60,
-                        "commonTrainScore": -1000,
-                        "score": 500
-                    }
-                },
-                {
-                    name: 'cheapSupplier',
-                    options: {
-                        "score": -100
-                    }
-                },
-            ]
+        let qs: any = staff.company.budgetConfig;
+        if (!params.leaveTime) {
+            params.leaveTime = '09:00'
         }
-
+        if (!params.latestArrivalTime) {
+            params.latestArrivalTime = '21:00'
+        }
+        if (!qs.prefers) {
+            qs.prefers = [];
+        }
+        //原始查询
+        qs.query = params;
+        
+        let arrivalPrefer = {
+            name: 'arrivalTime',
+            options: {
+                "begin": `${params.leaveDate} ${params.leaveTime}`,
+                "end": `${params.leaveDate} ${params.latestArrivalTime}`,
+            }
+        };
+        let cabinPrefer = {
+            name: 'cabin',
+            options: {
+                "expectCabins": _.concat(cabinClass, trainCabins),
+            }
+        }
+        for(let p of qs.prefers) {
+            if (p.name == arrivalPrefer.name) {
+                for(let k in arrivalPrefer.options) {
+                    p.options[k] = arrivalPrefer.options[k];
+                }
+            }
+            if (p.name == cabinPrefer.name) {
+                for(let k in cabinPrefer.options) {
+                    p.options[k] = cabinPrefer.options[k];
+                }
+            }
+        }
         let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
         let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs);
         return strategy.getResult(tickets);

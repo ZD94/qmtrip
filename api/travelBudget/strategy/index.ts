@@ -8,6 +8,7 @@ import {hotelPrefer, ticketPrefers} from '../prefer'
 import {EInvoiceType} from "api/_types/tripPlan";
 import {IStorage} from '../storage';
 import {IPrefer} from '../prefer'
+import {Models} from "../../_types/index";
 export interface IStrategy {
      getResult(params: any): Promise<any>;
 }
@@ -145,11 +146,10 @@ function formatHotel(hotels: IHotel[]) : IFinalHotel[] {
 
 
 abstract class AbstractTicketStrategy {
-
     private prefers: IPrefer[];
     private _id: string;
 
-    constructor(public query: any) {
+    constructor(public qs: any) {
         let d = new Date();
         this._id = `ID${d.getFullYear()}${d.getMonth()+1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}${Math.ceil(Math.random() * 1000)}`;
         this.prefers = [];
@@ -170,7 +170,13 @@ abstract class AbstractTicketStrategy {
     abstract async customerMarkedScoreData(tickets: IFinalTicket[]): Promise<IFinalTicket[]>;
 
     async getResult(tickets: ITicket[]) :Promise<TravelBudgeItem> {
-        console.log(`* * * * * * * * 开始 ${this._id}* * * * * * * *`);
+        let travelBudgetLog = await Models.travelBudgetLog.create({});
+        // console.log(`* * * * * * * * 开始 ${this._id}* * * * * * * *`);
+        travelBudgetLog.title = `${this.qs.query.originPlace}-${this.qs.query.destinationPlace}(${this.qs.query.leaveDate})`
+        travelBudgetLog.prefers = this.prefers;
+        travelBudgetLog.query = this.qs.query;
+        travelBudgetLog.originData = tickets;
+        travelBudgetLog.type = 1;
         let _tickets = formatTicketData(tickets);
         if (!_tickets || !_tickets.length) {
             return {
@@ -194,7 +200,9 @@ abstract class AbstractTicketStrategy {
             originPlace: ret.originPlace,
             id: this._id
         }
-        console.log(`* * * * * * * * * * 结束 ${this._id} * * * * * * *`);
+        travelBudgetLog.result = result;
+        await travelBudgetLog.save();
+        // console.log(`* * * * * * * * * * 结束 ${this._id} * * * * * * *`);
         return result;
     }
 }
@@ -216,17 +224,17 @@ export class CommonTicketStrategy extends AbstractTicketStrategy {
 
 export class TrafficBudgetStrategyFactory {
 
-    static async getStrategy(query) {
-        let policy = query.policy;
-        let prefers = query.prefers;  //保存的是企业打分参数信息
+    static async getStrategy(qs) {
+        let policy = qs.policy;
+        let prefers = qs.prefers;  //保存的是企业打分参数信息
         let strategy;
         //选择策略
         switch(policy) {
             case 'bmw':
-                strategy = new CommonTicketStrategy(query);
+                strategy = new CommonTicketStrategy(qs);
                 break;
             default:
-                strategy = new CommonTicketStrategy(query);
+                strategy = new CommonTicketStrategy(qs);
         }
         //通过企业配置的喜好打分
         for(let k of prefers) {
@@ -237,7 +245,6 @@ export class TrafficBudgetStrategyFactory {
         return strategy;
     }
 }
-
 
 class PreferFactory {
     static getPrefer(name, options) {

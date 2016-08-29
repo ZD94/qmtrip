@@ -1,0 +1,1 @@
+alter table company.companies add budget_config jsonb default '{}';

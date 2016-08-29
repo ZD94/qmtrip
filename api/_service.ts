@@ -13,6 +13,7 @@ import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove} from './_types/
 import {Account, Token, AccountOpenid} from './_types/auth';
 import { Seed } from './_types/seed';
 import { createServerService } from 'common/model/sequelize';
+import {TravelBudgetLog} from "./_types/travelbudget";
 
 initModels({
     staff: createServerService<Staff>(Staff),
@@ -35,4 +36,5 @@ initModels({
     seed: createServerService<Seed>(Seed),
     token: createServerService<Token>(Token),
     accountOpenid: createServerService<AccountOpenid>(AccountOpenid),
+    travelBudgetLog: createServerService<TravelBudgetLog>(TravelBudgetLog),
 });

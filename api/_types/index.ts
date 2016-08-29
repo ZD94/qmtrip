@@ -10,6 +10,7 @@ import {Account, Token, AccountOpenid} from './auth';
 import {Seed} from "./seed";
 import { ModelInterface } from 'common/model/interface';
 import { ModelDelegate } from 'common/model/delegate';
+import {TravelBudgetLog} from "./travelbudget";
 
 
 export enum EGender {
@@ -44,7 +45,8 @@ export interface ModelsInterface {
     tripPlanLog: ModelInterface<TripPlanLog>;
     project: ModelInterface<Project>;
     tripApprove: ModelInterface<TripApprove>;
-    
+    travelBudgetLog: ModelInterface<TravelBudgetLog>;
+
     account: ModelInterface<Account>;
     token: ModelInterface<Token>;
     accountOpenid: ModelInterface<AccountOpenid>;
@@ -72,7 +74,7 @@ export var Models: ModelsInterface = {
     tripPlanLog: new ModelDelegate<TripPlanLog>(),
     project: new ModelDelegate<Project>(),
     tripApprove: new ModelDelegate<TripApprove>(),
-
+    travelBudgetLog: new ModelDelegate<TravelBudgetLog>(),
     account: new ModelDelegate<Account>(),
     token: new ModelDelegate<Token>(),
     accountOpenid: new ModelDelegate<AccountOpenid>(),
