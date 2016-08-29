@@ -3,16 +3,21 @@
  */
 'use strict';
 
-let key = window.location.href;
+var url = window.location.href;
+var key = '';
+var groups = /key=(\w+)/.exec(url);
+if (groups) {
+  key = groups[1];
+}
 
 var prefers = [
   {
     title: "到达时间",
-    value: '{"name": "arrivalTime", "options": {"begin": "开始时间", "end": "最晚时间", "inScore": "如果在这个时间段内得分"}}'
+    value: '{"name": "arrivalTime", "options": {"begin": "开始时间,格式HH:mm", "end": "最晚时间", "inScore": "如果在这个时间段内得分"}}'
   },
   {
     title: "舱位",
-    value: '{"name": "cabin", "options": {"expectCabins": ["期望的舱位"], "score": "符合舱位得分"}}'
+    value: '{"name": "cabin", "options": {"expectCabins": ["期望的舱位","仓位2","舱位3"], "score": "符合舱位得分"}}'
   },
   {
     title: "廉价航空",
@@ -34,7 +39,7 @@ var budgets = [];
 
 function getData() {
   return new Promise(function(resolve, reject) {
-    $.get('/api/budgets', {p: 1, pz: 20}, function(data) {
+    $.get('/api/budgets', {p: 1, pz: 20, key: key}, function(data) {
       resolve(data);
     }, "json").error(reject);
   })
@@ -80,6 +85,9 @@ function renderBudget(id) {
   if (budget.policy) {
     $("#policy").val(JSON.stringify(budget.policy));
   }
+  if (budget.markedData) {
+    $("#markedData").val(JSON.stringify(budget.markedData));
+  }
 }
 
 $(document).ready( function() {
@@ -105,7 +113,7 @@ function calBudget() {
   var query = $("#query").val();
   var policy = $("#policy").val();
   var prefers = $("#prefers").val();
-  $.post('/api/budgets', {originData: originData, query: query, policy: policy, prefers: prefers}, function(result) {
+  $.post('/api/budgets?key='+key, {originData: originData, query: query, policy: policy, prefers: prefers}, function(result) {
     $("#result").val(JSON.stringify(result));
     $("#calBudgetBtn").attr("disabled", false);
   }, "json")
@@ -116,15 +124,16 @@ function renderPrefers() {
   options = prefers.map( function(v) {
     return '<option value=\''+v.value+'\'>'+v.title + '</option>';
   });
+  options.unshift('<option value="">请选择打分项</option>')
   $("#availablePrefers").html(options);
 }
 
 function addPrefer() {
   var val = $("#availablePrefers").val();
+  if (!val) return;
   var _val = $("#prefers").val();
   _val = JSON.parse(_val);
   var _p = $("#availablePrefers").val();
-  console.info(_p)
   _p = JSON.parse(_p);
   _val.push(_p);
   $("#prefers").val(JSON.stringify(_val));
