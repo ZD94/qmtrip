@@ -6,7 +6,7 @@ import { initModels } from 'api/_types';
 import { Staff, Credential, PointChange, InvitedLink } from 'api/_types/staff';
 import { Company, MoneyChange } from './_types/company';
 import { Department } from './_types/department';
-import { TravelPolicy } from './_types/travelPolicy';
+import { TravelPolicy, SubsidyTemplate } from './_types/travelPolicy';
 import { AccordHotel } from './_types/accordHotel';
 import { Agency, AgencyUser } from './_types/agency';
 import {TripPlan, TripDetail, Project, TripPlanLog, TripApprove} from './_types/tripPlan';
@@ -23,6 +23,7 @@ initModels({
     company: createServerService<Company>(Company),
     department: createServerService<Department>(Department),
     travelPolicy: createServerService<TravelPolicy>(TravelPolicy),
+    subsidyTemplate: createServerService<SubsidyTemplate>(SubsidyTemplate),
     accordHotel: createServerService<AccordHotel>(AccordHotel),
     agency: createServerService<Agency>(Agency),
     agencyUser: createServerService<AgencyUser>(AgencyUser),

@@ -142,6 +142,7 @@ var ngapp = require('ngapp');
 ngapp.depend('ionic');
 ngapp.depend('nglibs');
 ngapp.depend('chart.js');
+ngapp.depend('hmTouchEvents');
 ngapp.root('ionic', '/trip/create');
 ngapp.useRoutePolicy(ngapp.RoutePolicy.None);
 ngapp.routeAddSingle('login');

@@ -4,7 +4,7 @@
 "use strict";
 import {EStaffRole, Staff, EStaffStatus, InvitedLink} from "api/_types/staff";
 import {EPlanStatus, ETripType, EAuditStatus} from 'api/_types/tripPlan';
-import {TravelPolicy, MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
+import {TravelPolicy, MHotelLevel, MPlaneLevel, MTrainLevel, SubsidyTemplate} from "api/_types/travelPolicy";
 import {Department} from "api/_types/department";
 import {AccordHotel} from "api/_types/accordHotel";
 import {ACCOUNT_STATUS} from "api/_types/auth"
@@ -794,14 +794,15 @@ export async function StaffdetailController($scope, $storage, $stateParams, Mode
 }
 
 export async function TravelpolicyController($scope, Models, $location, $ionicPopup, $ionicHistory) {
+    require('./travelpolicy.scss');
     var staff = await Staff.getCurrent();
     var company = await staff.company;
     var travelPolicies = await company.getTravelPolicies();
+    $scope.MHotelLevel = MHotelLevel;
+    $scope.MPlaneLevel = MPlaneLevel;
+    $scope.MTrainLevel = MTrainLevel;
     $scope.travelPolicies = travelPolicies.map(function (policy) {
-        policy["hotelLevelName"] = MHotelLevel[policy.hotelLevel];
-        policy["planeLevelName"] = MPlaneLevel[policy.planeLevel];
-        policy["trainLevelName"] = MTrainLevel[policy.trainLevel];
-
+        
         if(policy.isDefault){
             $scope.defaultTravelpolicy = policy;
         }
@@ -820,11 +821,15 @@ export async function TravelpolicyController($scope, Models, $location, $ionicPo
     }
 
     $scope.setDefault = async function(){
+        $scope.tripPolicy = {
+            newDefaultTp:''
+        }
+        if($scope.defaultTravelpolicy)
+            $scope.tripPolicy.newDefaultTp = $scope.defaultTravelpolicy;
         var nshow = $ionicPopup.show({
             title:'设置默认标准',
-            template:'<div>请将一项差旅标准设为默认，被邀请加入的新员工将自动设置为次差旅标准</div>' +
-            '<div class="" ng-repeat="policy in travelPolicies" ng-click="selectTp(policy.policy)">' +
-            '<div class=""><div style="color:#000000;">{{policy.policy.name}}</div> </div> </div>',
+            cssClass:'withCheck',
+            template: require('./defaultPolicyTemplate.html'),
             scope: $scope,
             buttons:[
                 {
@@ -833,17 +838,17 @@ export async function TravelpolicyController($scope, Models, $location, $ionicPo
                     onTap: async function () {
                         try{
                             if(!$scope.defaultTravelpolicy){
-                                $scope.newDefaultTp.isDefault = true;
-                                $scope.defaultTravelpolicy = await $scope.newDefaultTp.save();
-                            }else if($scope.defaultTravelpolicy && $scope.defaultTravelpolicy.id != $scope.newDefaultTp.id){
+                                $scope.tripPolicy.newDefaultTp.isDefault = true;
+                                $scope.defaultTravelpolicy = await $scope.tripPolicy.newDefaultTp.save();
+                            }else if($scope.defaultTravelpolicy && $scope.tripPolicy.newDefaultTp && $scope.defaultTravelpolicy.id != $scope.tripPolicy.newDefaultTp.id){
                                 $scope.defaultTravelpolicy.isDefault = false;
                                 await $scope.defaultTravelpolicy.save();
-                                $scope.newDefaultTp.isDefault = true;
-                                $scope.defaultTravelpolicy = await $scope.newDefaultTp.save();
+                                $scope.tripPolicy.newDefaultTp.isDefault = true;
+                                $scope.defaultTravelpolicy = await $scope.tripPolicy.newDefaultTp.save();
                             }
                             msgbox.log("设置成功");
                         }catch(err){
-                            msgbox.log(err.msg);
+                            msgbox.log(err.msg || err);
                         }
                     }
                 }
@@ -853,10 +858,11 @@ export async function TravelpolicyController($scope, Models, $location, $ionicPo
 
     $scope.selectTp = function(tp){
         $scope.newDefaultTp = tp;
+
     }
 }
 
-export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory,$ionicPopup) {
+export async function EditpolicyController($scope, Models, $stateParams, $ionicHistory, $ionicPopup, $location) {
     require('./editpolicy.scss');
     var staff = await Staff.getCurrent();
     var travelPolicy;
@@ -932,9 +938,91 @@ export async function EditpolicyController($scope, Models, $stateParams, $ionicH
         }
     }
 
+    $scope.subsidyTemplateList = async function(){
+        $location.path('/company/subsidy-templates').search({'travelPolicyId': $scope.travelPolicy.id}).replace();
+    }
 
 }
 
+
+export async function SubsidyTemplatesController($scope, Models, $location, $stateParams,$ionicPopup) {
+    require('./subsidy-templates.scss');
+    $scope.showDelete = false;
+    var tpId = $stateParams.travelPolicyId;
+    var travelPolicy = await Models.travelPolicy.get(tpId);
+    var subsidyTemplates = await travelPolicy.getSubsidyTemplates();
+    $scope.subsidyTemplates = subsidyTemplates;
+
+    $scope.addTemplate = async function () {
+        $scope.subsidyTemplate = SubsidyTemplate.create();
+        $scope.subsidyTemplate.travelPolicy = travelPolicy;
+        var ngshow = $ionicPopup.show({
+            title:'补助模板',
+            cssClass:'subsidyPopup',
+            template:'<div> <p>模板标题</p> ' +
+            '<input type="text" placeholder="请输入标题" ng-model="subsidyTemplate.name" maxlength="5"> </div>' +
+            '<div> <p>补助金额（元/天）</p>' +
+            '<input type="text" placeholder="请输入金额" ng-model="subsidyTemplate.subsidyMoney"> </div>',
+            scope: $scope,
+            buttons:[
+                {
+                    text: '取消',
+                    type: 'button-outline button-positive'
+                },
+                {
+                    text: '保存',
+                    type: 'button-positive',
+                    onTap: async function (e) {
+                        if(!$scope.subsidyTemplate.name){
+                            e.preventDefault();
+                            msgbox.log("模板标题不能为空");
+                            return false;
+                        }
+                        if(!$scope.subsidyTemplate.subsidyMoney){
+                            e.preventDefault();
+                            msgbox.log("补助金额不能为空");
+                            return false;
+                        }
+                        var re = /^[0-9]+.?[0-9]*$/;
+                        if(!re.test($scope.subsidyTemplate.subsidyMoney)){
+                            e.preventDefault();
+                            msgbox.log("补助金额必须为数字");
+                            return false;
+                        }
+                        var st = await $scope.subsidyTemplate.save();
+                        $scope.subsidyTemplates = await travelPolicy.getSubsidyTemplates();
+                    }
+                }
+            ]
+        });
+    }
+
+    $scope.deleteSt = async function(st, index){
+        var nshow = $ionicPopup.show({
+            title:'提示',
+            template:'确认删除该条出差补助么？',
+            scope: $scope,
+            buttons:[
+                {
+                    text: '取消',
+                    type: 'button-outline button-positive'
+                },
+                {
+                    text: '确定删除',
+                    type: 'button-positive',
+                    onTap: async function () {
+                        try{
+                            await st.destroy();
+                            $scope.subsidyTemplates.splice(index, 1);
+                        }catch(err){
+                            msgbox.log(err.msg);
+                        }
+                    }
+                }
+            ]
+        });
+    }
+}
 
 export async function AccordhotelController($scope, Models, $location) {
     require('./accordhotel.scss');

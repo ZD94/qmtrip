@@ -16,14 +16,21 @@
 //第一步的样式
 .company-first{
   div.item{
+    position: relative;
+  }
+}
+.company-first{
+  div.item{
     span{
       text-align: left;
     }
-    span.plahoder{
-      text-align: left;
-      color:#c7c7cd;
-      font-size: 14px;
-    }
+    //span.plahoder{
+    //  text-align: left;
+    //  color:#c7c7cd;
+    //  font-size: 14px;
+    //  position:absolute;
+    //  z-index: 2;
+    //}
   }
 }
 
@@ -38,6 +45,7 @@
 }
 //第二步的样式
 
+
 .link-invite{
   font-size: 18px;
   line-height: 56px;
@@ -47,10 +55,13 @@
   background-color:#f29901 ;
   color: #fff;
   border-radius: 30px;
-
 }
 //第二步的下面的样式
 #companySecond{
+  .cancel-padding{
+    padding-left: 0px;
+    padding-right: 0px;
+  }
   .button-send{
     width:100%;
     background-color: #fff;
@@ -74,9 +85,7 @@
   h4{
     line-height: 50px;
   }
-  img{
 
-  }
 }
 
 

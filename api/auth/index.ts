@@ -363,8 +363,12 @@ class ApiAuth {
 
         if(ckeckMsgCode){
             var company = await Models.company.get(companyId);
+            var defaultDeptment = await company.getDefaultDepartment();
+            var defaultTravelPolicy = await company.getDefaultTravelPolicy();
             var staff = Staff.create({mobile: mobile, name: name, pwd: utils.md5(pwd), status: ACCOUNT_STATUS.ACTIVE, isValidateMobile: true})
             staff.company = company;
+            staff.department = defaultDeptment;
+            staff["travelPolicyId"] = defaultTravelPolicy.id;
             staff = await staff.save();
         }else{
             throw {code: -1, msg: "短信验证码错误"};

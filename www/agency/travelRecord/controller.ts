@@ -147,7 +147,7 @@ export async function TravelDetailController($scope, $stateParams, $location, $a
                 var imageIds = tripDetail.latestInvoice;
                 var curTripDetailInoviceImgs = [];
                 await Promise.all(imageIds.map(function(invoiceId){
-                    invoiceId =  '/consume/invoice/detail/' + invoiceId;
+                    invoiceId =  '/trip-detail/'+tripDetailId+'/invoice/' + invoiceId;
                     curTripDetailInoviceImgs.push(invoiceId);
                     return invoiceId;
                 }))

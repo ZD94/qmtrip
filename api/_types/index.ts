@@ -1,7 +1,7 @@
 
 import { Company, MoneyChange } from "./company";
 import { Staff, Credential, PointChange, InvitedLink } from "./staff";
-import { TravelPolicy } from './travelPolicy';
+import { TravelPolicy, SubsidyTemplate } from './travelPolicy';
 import { Department } from './department';
 import { AccordHotel } from './accordHotel';
 import { Agency, AgencyUser } from './agency';
@@ -34,6 +34,7 @@ export interface ModelsInterface {
     
     department: ModelInterface<Department>;
     travelPolicy: ModelInterface<TravelPolicy>;
+    subsidyTemplate: ModelInterface<SubsidyTemplate>;
     accordHotel: ModelInterface<AccordHotel>;
 
     agency: ModelInterface<Agency>;
@@ -63,6 +64,7 @@ export var Models: ModelsInterface = {
     
     department: new ModelDelegate<Department>(),
     travelPolicy: new ModelDelegate<TravelPolicy>(),
+    subsidyTemplate: new ModelDelegate<SubsidyTemplate>(),
     accordHotel: new ModelDelegate<AccordHotel>(),
 
     agency: new ModelDelegate<Agency>(),

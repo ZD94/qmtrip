@@ -1,0 +1,21 @@
+<ion-view title="补助模板">
+    <ion-content padding="true" class="has-header">
+        <a ng-click="addTemplate()" id="page30-button89" class="button button-positive  button-block">新增补助模板</a>
+        <a id="page29-button88" class="button button-stable  button-block" ng-click="showDelete = !showDelete;showReorder = false">管理模板</a>
+        <ion-list show-delete="showDelete">
+            <ion-item ng-repeat="st in subsidyTemplates">
+                <ion-delete-button class="ion-minus-circled" ng-click="deleteSt(st, $index)"> </ion-delete-button>
+                <div id="page30-markdown21" style="color:#000000;">
+                    <p>模板标题：{{st.name}}</p>
+                </div>
+                <div id="page30-markdown22" style="color:#000000;">
+                    <p>补助金额：{{st.subsidyMoney}}元/天</p>
+                </div>
+            </ion-item>
+            <div class="subsidyAttend">请根据公司需要为设置不同级别的补助模板（如一级城市、耳机城市、三级城市等或其他分类形式），设置好的补助模板可以供员工在生成出差预算的时候进行选择，可以使预算更加准确。<br/>如没有补助此项可以忽略。</div>
+        </ion-list>
+        <div id="page13-markdown3">
+            <div ng-if="!subsidyTemplates.length" class="getMoreOrNoMore">暂无记录</div>
+        </div>
+    </ion-content>
+</ion-view>

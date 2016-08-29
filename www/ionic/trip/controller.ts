@@ -34,10 +34,47 @@ function TripDefineFromJson(obj: any): TripDefine{
     return obj as TripDefine;
 }
 
-export async function CreateController($scope, $storage, $loading, ngModalDlg){
+export async function CreateController($scope, $storage, $loading, ngModalDlg,$ionicPopup){
     require('./trip.scss');
     API.require('tripPlan');
     await API.onload();
+
+    /*******************出差补助选择begin************************/
+    $scope.currentStaff = await Staff.getCurrent();
+    $scope.currentTp = await $scope.currentStaff.getTravelPolicy();
+    $scope.currentTpSts = await $scope.currentTp.getSubsidyTemplates();
+    $scope.subsidy = {hasFirstDaySubsidy: true, hasLastDaySubsidy: true, template: null};
+
+    $scope.selectSubsidyTemplate = async function(){
+        var nshow = $ionicPopup.show({
+            title:'出差补助选择',
+            cssClass:'selectSubsidy',
+            template:require('./selectSubsidy.html'),
+            scope: $scope,
+            buttons:[
+                {
+                    text: '确定',
+                    type: 'button-positive',
+                    onTap: async function (e) {
+                        try{
+                            if(!$scope.subsidy.template){
+                                console.info("选定的补助模板：", $scope.subsidy.template);
+                                console.info("出发当天补助：", $scope.subsidy.hasFirstDaySubsidy);
+                                console.info("回城当天补助：", $scope.subsidy.hasLastDaySubsidy);
+                                e.preventDefault();
+                                msgbox.log("请选择补助模板");
+                                return false;
+                            }
+                        }catch(err){
+                            msgbox.log(err.msg || err);
+                        }
+                    }
+                }
+            ]
+        });
+    }
+
+    /*******************出差补助选择end************************/
 
     let minStDate = moment().format('YYYY-MM-DD');
     $scope.minStDate = minStDate;
@@ -622,19 +659,15 @@ export async function InvoiceDetailController($scope , Models, $stateParams){
     var invoice = await Models.tripDetail.get($stateParams.detailId);
     $scope.invoice = invoice;
     $scope.EInvoiceType = EInvoiceType;
-    API.require('attachment');
-    await API.onload();
-    // var invoiceImg = await API.attachment.previewSelfImg({fileId: invoice.newInvoice});
     var latestInvoice = invoice.latestInvoice;
     var invoiceImgs = [];
     if(typeof latestInvoice =='string') {
         latestInvoice = JSON.parse(latestInvoice);
     }
 
-    await Promise.all(latestInvoice.map(async function(i){
-        var invoiceImg = await API.attachment.previewSelfImg({fileId: i});
-        invoiceImgs.push(invoiceImg);
-    }))
+    for(let i of latestInvoice){
+        invoiceImgs.push('/trip-detail/'+$stateParams.detailId+'/invoice/'+i);
+    }
     $scope.invoiceImgs = invoiceImgs;
 
     let statusTxt = {};
