@@ -29,6 +29,7 @@ export function StorageSetController($scope, $stateParams, $storage) {
 
 export async function IndexController($scope, $stateParams, $storage, $sce, $loading, $ionicPopup) {
     $loading.start();
+
     var browserspec = require('browserspec');
     var backUrl = $stateParams.backurl || "#";
     require("./login.scss");
@@ -80,6 +81,7 @@ export async function IndexController($scope, $stateParams, $storage, $sce, $loa
                 await API.onload();
                 await API.auth.saveOrUpdateOpenId();
             }
+
             window.location.href = backUrl;
         } catch (err) {
             var str = err.msg;

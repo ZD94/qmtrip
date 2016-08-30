@@ -8,7 +8,7 @@ import {EInvoiceType, ETripType} from "../_types/tripPlan";
 import {ModelObject} from "common/model/object";
 import {Table, Create, Field} from "common/model/common";
 import {Models} from "./index";
-import {Types, Values} from "common/model/index";
+import {Types, Values} from "common/model";
 
 export enum TRAFFIC {
     TRAIN = 0,
