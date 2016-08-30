@@ -57,7 +57,7 @@
     "shoe": "0.0.15",
     "tiny-cookie": "^0.5.5",
     "traverse": "^0.6.6",
-    "ts-node": "^0.7.2",
+    "ts-node": "~1.2.3",
     "typescript": "^2.0.0",
     "uuid": "^2.0.2",
     "validator": "^5.2.0",
