@@ -6,20 +6,16 @@
 import {IFinalTicket} from "api/_types/travelbudget";
 import {AbstractPrefer} from "./index";
 
-class ArrivalTimePrefer extends AbstractPrefer {
+class ArrivalTimePrefer extends AbstractPrefer<IFinalTicket> {
 
     private begin: Date;
     private end: Date;
-    private inScore: number;
-    private outScore: number;
+    private score: number;
 
     constructor(public name: string, options: any) {
         super(name, options);
-        if (!this.inScore) {
-            this.inScore = 0;
-        }
-        if (!this.outScore) {
-            this.outScore = 0;
+        if (!this.score) {
+            this.score = 0;
         }
     }
     async markScoreProcess(tickets: IFinalTicket[]) : Promise<IFinalTicket[]> {
@@ -40,8 +36,8 @@ class ArrivalTimePrefer extends AbstractPrefer {
             if (d1) {
                 let _d1 = d1.valueOf();
                 if (_d1 - d > 0) {
-                    v['score'] += self.outScore;
-                    v.reasons.push(`到达时间早于规定时间 ${self.outScore}`)
+                    v['score'] += self.score;
+                    v.reasons.push(`到达时间早于规定时间 ${self.score}`)
                     return v;
                 }
             }
@@ -49,8 +45,8 @@ class ArrivalTimePrefer extends AbstractPrefer {
             if (d2) {
                 let _d2 = d2.valueOf();
                 if (d - _d2 > 0) {
-                    v['score'] += self.outScore;
-                    v.reasons.push(`到达时间晚于规定时间 ${self.outScore}`)
+                    v['score'] += self.score;
+                    v.reasons.push(`到达时间晚于规定时间 ${self.score}`)
                     return v;
                 }
             }

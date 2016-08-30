@@ -15,8 +15,9 @@ const utils = require("common/utils");
 import _ = require("lodash");
 import {ITicket, TravelBudgeItem} from "api/_types/travelbudget";
 import {
-    CommonHotelStrategy, TrafficBudgetStrategyFactory
+    CommonHotelStrategy, TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
+import {loadDefaultPrefer} from "./prefer/index";
 
 const defaultPrice = {
     "5": 500,
@@ -256,6 +257,7 @@ class ApiTravelBudget {
         //查询员工差旅标准
         let policy = await staff.getTravelPolicy();
         let hotelStar: number = 3;
+        let city = await API.place.getCityInfo({cityCode: cityId});
         if (!policy) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
@@ -269,21 +271,21 @@ class ApiTravelBudget {
             let obj = API.plae.getCityInfo({cityCode: businessDistrict});
             gps = [obj.latitude, obj.longitude];
         }
-
-        let qs = {
-            maxMoney: policy.hotelPrice,
+        let qs: any = {};
+        let query = {
             star: hotelStar,
-            cityId: cityId,
+            city: city,
             latitude: gps[0],
             longitude: gps[1],
             businessDistrict: businessDistrict,
             checkInDate: checkInDate,
             checkOutDate: checkOutDate
         }
-
-        let hotels = await API.hotel.search_hotels(qs);
-        let strategy = new CommonHotelStrategy(hotels, cache);
-        let budget = await strategy.getResult(qs);
+        qs.prefers = loadDefaultPrefer(query, 'hotel');
+        qs.query = query;
+        let hotels = await API.hotel.search_hotels(query);
+        let strategy = await HotelBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
+        let budget = await strategy.getResult(hotels);
         budget.type = EInvoiceType.HOTEL;
         return budget;
     }
@@ -376,41 +378,16 @@ class ApiTravelBudget {
         if (!params.latestArrivalTime) {
             params.latestArrivalTime = '21:00'
         }
-        if (!qs.prefers) {
-            qs.prefers = [];
-        }
-        //原始查询
+        qs.prefers = loadDefaultPrefer(params);
+        qs.prefers = qs.prefers.map( (p) => {
+            if (p.name == 'cabin') {
+                p.options['expectCabins'] = _.concat(cabinClass, trainCabins)
+            }
+            return p;
+        })
         qs.query = params;
         qs.query.originPlace = m_originCity;
         qs.query.destination = m_destination;
-
-        let arrivalPrefer = {
-            name: 'arrivalTime',
-            options: {
-                "begin": `${params.leaveDate} ${params.leaveTime}`,
-                "end": `${params.leaveDate} ${params.latestArrivalTime}`,
-            }
-        };
-        let cabinPrefer = {
-            name: 'cabin',
-            options: {
-                "expectCabins": _.concat(cabinClass, trainCabins),
-            }
-        }
-        qs.prefers = qs.prefers.map( (p) => {
-            if (p.name == arrivalPrefer.name) {
-                for(let k in arrivalPrefer.options) {
-                    p.options[k] = arrivalPrefer.options[k];
-                }
-            }
-            if (p.name == cabinPrefer.name) {
-                for(let k in cabinPrefer.options) {
-                    p.options[k] = cabinPrefer.options[k];
-                }
-            }
-            return p;
-        });
-        console.info("原始查询条件:",qs.prefers);
         let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
         let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
         return strategy.getResult(tickets);
@@ -491,7 +468,7 @@ class ApiTravelBudget {
         })
 
         app.post('/api/budgets', _auth_middleware, async function(req, res, next) {
-            let {query, prefers, policy, originData} = req.body;
+            let {query, prefers, policy, originData, type} = req.body;
             let qs = {
                 policy: policy,
                 prefers: JSON.parse(prefers),
@@ -499,7 +476,8 @@ class ApiTravelBudget {
             }
 
             try {
-                let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs, {isRecord: false});
+                let factory = (type == 1) ? TrafficBudgetStrategyFactory : HotelBudgetStrategyFactory;
+                let strategy = await factory.getStrategy(qs, {isRecord: false});
                 let result = await strategy.getResult(JSON.parse(originData));
                 res.json(result);
             } catch(err) {

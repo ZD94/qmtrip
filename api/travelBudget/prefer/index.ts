@@ -4,12 +4,15 @@
 
 'use strict';
 import {IFinalTicket} from "../../_types/travelbudget";
+import _ = require("lodash");
+var defaultTicketPrefer = require('./default-ticket-prefer.json');
+var defaultHotelPrefer = require('./default-hotel-prefer.json');
 
-export interface IPrefer {
-    markScore(tickets: IFinalTicket[]): Promise<IFinalTicket[]>;
+export interface IPrefer<T> {
+    markScore(tickets: T[]): Promise<T[]>;
 }
 
-export abstract class AbstractPrefer implements IPrefer {
+export abstract class AbstractPrefer<T> implements IPrefer<T> {
     constructor(public name: string, options: any) {
         if (options) {
             for(let k in options) {
@@ -17,23 +20,26 @@ export abstract class AbstractPrefer implements IPrefer {
             }
         }
     }
-    abstract async markScoreProcess(tickets: IFinalTicket[]) : Promise<IFinalTicket[]>;
-    async markScore(tickets: IFinalTicket[]): Promise<IFinalTicket[]> {
+    abstract async markScoreProcess(data: T[]) : Promise<T[]>;
+    async markScore(data: T[]): Promise<T[]> {
         console.log(`. BEGIN ${this.name}`);
-        let ret = await this.markScoreProcess(tickets);
+        let ret = await this.markScoreProcess(data);
         console.log(`. END ${this.name}`);
         return ret;
     }
 }
 
-export var ticketPrefer = {
-    lowestprice: require('./ticket-lowestprice'),
-    maxpricelimit: require('./ticket-maxpricelimit'),
-    selecttraffic: require('./ticket-selecttraffic'),
-    priceprefer: require('./ticket-priceprefer'),
-    preferagent: require('./ticket-preferagent'),
-    preferaircompany: require('./ticket-preferaircompany')
-};
+export function loadDefaultPrefer(qs: any, type?: string) {
+    let defaultPrefer;
+    if (type && type == 'hotel') {
+        defaultPrefer = defaultHotelPrefer;
+    } else {
+        defaultPrefer = defaultTicketPrefer;
+    }
+    let _prefers = JSON.stringify(defaultPrefer);
+    let _compiled = _.template(_prefers);
+    return JSON.parse(_compiled(qs));
+}
 
 export var hotelPrefer = {
     lowestprice: require('./hotel-lowestprice'),
@@ -43,6 +49,9 @@ export var hotelPrefer = {
     maxpricelimit: require('./hotel-maxpricelimit')
 }
 
+export var hotelPrefers = {
+    starMatch: require('./hotel-starmatch'),
+}
 
 export var ticketPrefers = {
     arrivalTime: require('./ticket-arrivaltime'),

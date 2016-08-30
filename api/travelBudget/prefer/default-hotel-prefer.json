@@ -1,0 +1,9 @@
+[
+  {
+    "name":"starMatch",
+    "options": {
+      "expectStar": "<%=star%>",
+      "score": 500
+    }
+  }
+]

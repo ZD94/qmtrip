@@ -7,7 +7,7 @@ import {IFinalTicket} from "api/_types/travelbudget";
 import moment = require("moment");
 import {AbstractPrefer} from "./index";
 
-class DepartTimePrefer extends AbstractPrefer {
+class DepartTimePrefer extends AbstractPrefer<IFinalTicket> {
 
     private begin: Date;
     private end: Date;
@@ -34,23 +34,20 @@ class DepartTimePrefer extends AbstractPrefer {
         tickets = tickets.map( (v) => {
             if (!v['score']) v['score'] = 0;
             if (!v['reasons']) v['reasons'] = [];
-            console.info(v.No, d1, v.departDateTime, d2)
             let d = new Date(v.departDateTime).valueOf();
             if (d1) {
                 let _d1 = d1.valueOf();
                 if (_d1 - d > 0) {
-                    v['score'] -= score;
-                    v['reasons'].push(`出发时间早于规定时间 -${score}`)
-                    return v;
+                    v['score'] += score;
+                    v['reasons'].push(`出发时间早于规定时间 ${score}`)
                 }
             }
 
             if (d2) {
                 let _d2 = d2.valueOf();
                 if (d - _d2> 0) {
-                    v['score'] -= score;
-                    v['reasons'].push(`出发时间晚于规定时间 -${score}`)
-                    return v;
+                    v['score'] += score;
+                    v['reasons'].push(`出发时间晚于规定时间 ${score}`)
                 }
             }
             return v;

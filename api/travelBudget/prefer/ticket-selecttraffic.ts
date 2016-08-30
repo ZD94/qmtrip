@@ -9,7 +9,7 @@ import {AbstractPrefer} from "./index";
 const ONLY_TRAIN_DURATION = 3.5 * 60;
 const ONLY_FLIGHT_DURATION = 6 * 60;
 
-class SelectTrafficPrefer extends AbstractPrefer {
+class SelectTrafficPrefer extends AbstractPrefer<IFinalTicket> {
     private selectTrainDuration: number;
     private selectFlightDuration: number;
     private score: number;
