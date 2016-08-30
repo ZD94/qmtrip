@@ -126,9 +126,8 @@ abstract class AbstractHotelStrategy {
         }
 
         if (this.isRecord) {
-            console.info(this.qs);
             let travelBudgetLog = await Models.travelBudgetLog.create({});
-            travelBudgetLog.title = `[住宿]${this.qs.query.cityId}-(${this.qs.query.checkInDate})`
+            travelBudgetLog.title = `[住宿]${this.qs.query.city.name}-(${this.qs.query.checkInDate})`
             travelBudgetLog.prefers = this.qs.prefers;
             travelBudgetLog.query = this.qs.query;
             travelBudgetLog.originData = hotels;

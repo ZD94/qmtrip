@@ -257,6 +257,7 @@ class ApiTravelBudget {
         //查询员工差旅标准
         let policy = await staff.getTravelPolicy();
         let hotelStar: number = 3;
+        let city = await API.place.getCityInfo({cityCode: cityId});
         if (!policy) {
             throw L.ERR.TRAVEL_POLICY_NOT_EXIST();
         }
@@ -272,9 +273,8 @@ class ApiTravelBudget {
         }
         let qs: any = {};
         let query = {
-            maxMoney: policy.hotelPrice,
             star: hotelStar,
-            cityId: cityId,
+            city: city,
             latitude: gps[0],
             longitude: gps[1],
             businessDistrict: businessDistrict,
