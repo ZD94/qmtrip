@@ -10,19 +10,22 @@
     <script src="script/libs/bundle.angular.js"></script>
 </head>
 <body ng-controller="TestController">
-<img src="../../ionic/images/qrCode.png" id="img">
-<div style="height: 300px;width: 300px;margin: 50px auto; background: lightgrey"
-     hm-pinch="onHammer($event)"
+<div id="touch-area" style="height: 300px;width: 300px;margin: 50px auto; background: lightgrey; border: solid 1px gray;"
      hm-pan="onHammer($event)"
-     hm-pinchstart="hammerStart($event)"
+     hm-pinch="onHammer($event)"
+     hm-rotate="onHammer($event)"
      hm-panstart="hammerStart($event)"
+     hm-pinchstart="hammerStart($event)"
+     hm-rotatestart="hammerStart($event)"
+     hm-pinchstart="hammerStart($event)"
+     hm-panend="hammerEnd($event)"
+     hm-pancancel="hammerEnd($event)"
      hm-pinchend="hammerEnd($event)"
      hm-pinchcancel="hammerEnd($event)"
-     hm-rotate="onHammer($event)"
-     hm-rotatestart="hammerStart($event)"
-     hm-recognizer-options="[{'type':'pinch','pointers':2,'threshold': 0.1},{'type':'rotate','threshold':10}]"
+     hm-rotateend="hammerEnd($event)"
+     hm-rotatecancel="hammerEnd($event)"
 >
-    <canvas width="1000" height="1000" style="width: 100%; height: 100%;"></canvas>
+    <canvas style="width: 100%; height: 100%;"></canvas>
 </div>
 </body>
 <script src="script/test.js"></script>
