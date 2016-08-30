@@ -178,8 +178,6 @@ abstract class AbstractTicketStrategy {
 
     async getResult(tickets: ITicket[]) :Promise<TravelBudgeItem> {
         let travelBudgetLog = await Models.travelBudgetLog.create({});
-        // console.log(`* * * * * * * * 开始 ${this._id}* * * * * * * *`);
-
         let _tickets = formatTicketData(tickets);
         if (!_tickets || !_tickets.length) {
             return {
@@ -201,7 +199,9 @@ abstract class AbstractTicketStrategy {
             cabin: ret.cabin,
             destination: ret.destination,
             originPlace: ret.originPlace,
-            id: this._id
+            id: this._id,
+            departDateTime: ret.departDateTime,
+            arrivalDateTime: ret.arrivalDateTime,
         }
         if (this.isRecord) {
             travelBudgetLog.title = `[交通]${this.qs.query.originPlace.name}-${this.qs.query.destination.name}(${this.qs.query.leaveDate})`
@@ -213,7 +213,6 @@ abstract class AbstractTicketStrategy {
             travelBudgetLog.markedData = _tickets;
             await travelBudgetLog.save();
         }
-        // console.log(`* * * * * * * * * * 结束 ${this._id} * * * * * * *`);
         return result;
     }
 }
