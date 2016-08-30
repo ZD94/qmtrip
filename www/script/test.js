@@ -1,3 +1,4 @@
+'use strict';
 
 var bluebird = require('bluebird');
 window.Promise = bluebird.Promise;
@@ -10,80 +11,106 @@ require('common/client/angular');
 angular.module('testApp', ["hmTouchEvents"])
     .controller('TestController', TestController);
 
-function TestController ($scope){
 
-    $scope.tap = function tap (event){
-        console.info(event)
+function TestController ($scope, $element){
+    var div = $element.find('#touch-area');
+    var canvas = div.find('canvas')[0];
+
+    var started = false;
+    var state = {
+        deltaX: 0, deltaY: 0,
+        centerX: 0, centerY: 0,
+        scale: 1.0,
+        rotation: 0,
     }
-    var img = document.getElementById('img');
-    var canvas = document.getElementsByTagName('canvas')[0];
-    var ctx = canvas.getContext('2d');
-    var canvasScale = canvas.width / $(canvas).width();
-    // setTimeout(function(){
-    //     ctx.drawImage(img,(canvas.width-img.width)/2,(canvas.height-img.height)/2,img.width,img.height)
-    // },1000)
-    img.onload = function(){
+    $scope.hammerStart = function saveOrigState(event){
+        //console.log(event.type, JSON.stringify([event.deltaX, event.deltaY, event.center, event.scale, event.rotation]));
+        var rect = canvas.getBoundingClientRect();
+        state.deltaX = event.deltaX;
+        state.deltaY = event.deltaY;
+        state.centerX = event.center.x - rect.left;
+        state.centerY = event.center.y - rect.top;
+        state.scale = 1.0;
+        state.rotation = event.rotation;
+        started = true;
+    }
+    $scope.hammerEnd = function onHammerEnd(event){
+        //console.log(event.type, JSON.stringify([event.deltaX, event.deltaY, event.center, event.scale, event.rotation]));
+        started = false;
+    }
+    $scope.onHammer = function onHammer(event) {
+        $scope.types = event.scale;
+        //console.log(event.type, JSON.stringify([event.deltaX, event.deltaY, event.center, event.scale, event.rotation]));
+        if(!started){
+            return;
+        }
+        if(event.type == 'pan'){
+            translate(event.deltaX - state.deltaX, event.deltaY - state.deltaY);
+            state.deltaX = event.deltaX;
+            state.deltaY = event.deltaY;
+        }
+        else if(event.type == 'pinch' || event.type == 'rotate'){
+            var rotation = event.rotation - state.rotation;
+            if(rotation < -80 || 80 < rotation)
+                return;
+            rotateAndScale(state.centerX, state.centerY, rotation, event.scale/state.scale);
+            state.rotation = event.rotation;
+            state.scale = event.scale;
+        }
         repaint();
     }
-    var state = {
-        offsetX: 0,
-        offsetY: 0,
-        centerX: 0,
-        centerY: 0,
-        scale: 1,
-        rotate: 0
-    };
-    var origState;
 
+    var ctx = canvas.getContext('2d');
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    var savedMatrix = svg.createSVGMatrix();
+    var canvasScale = 1;
+    function translate(x, y){
+        //console.log('translate '+JSON.stringify(Array.prototype.slice.call(arguments)));
+        savedMatrix = svg.createSVGMatrix()
+            .translate(x * canvasScale, y * canvasScale)
+            .multiply(savedMatrix);
+    }
+    function rotateAndScale(centerX, centerY, rotation, scale){
+        //console.log('transform '+JSON.stringify(Array.prototype.slice.call(arguments)));
+        centerX *= canvasScale;
+        centerY *= canvasScale;
+        savedMatrix = svg.createSVGMatrix()
+            .translate(centerX, centerY)
+            .scale(scale, scale)
+            .rotate(rotation)
+            .translate(-centerX, -centerY)
+            .multiply(savedMatrix);
+    }
+    var img = document.createElement('img');
     function repaint(){
-        //ctx.clear();
+        //ctx.save();
+        //ctx.fillStyle = "rgba(128, 128, 128, 0.1)";
+        //ctx.fillRect(0, 0, canvas.width, canvas.height);
+        //ctx.restore();
         ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.save();
-        ctx.translate(state.centerX,state.centerY);
-        ctx.scale(state.scale,state.scale);
-        ctx.rotate(state.rotate*Math.PI/180);
-        ctx.drawImage(img, state.offsetX, state.offsetY, img.width, img.height);
+        ctx.transform(savedMatrix.a, savedMatrix.b, savedMatrix.c, savedMatrix.d, savedMatrix.e, savedMatrix.f);
+        ctx.drawImage(img, 0, 0, img.width, img.height);
         ctx.restore();
     }
 
-    $scope.hammerStart = function saveOrigState(event){
-        console.info(event.type, event.deltaX, event.deltaY, event.scale, event.center, event.rotation);
-        origState = _.clone(state);
-        origState.rotate = origState.rotate - event.rotation;
-    }
-
-    $scope.hammerEnd = function onHammerEnd(event){
-        console.info(event.type, event.deltaX, event.deltaY, event.scale, event.center);
-        origState = undefined;
-    }
-
-    $scope.onHammer = function onHammer (event) {
-        $scope.types = event.scale;
-        console.info(event.type, event.deltaX, event.deltaY, event.scale, event.center, event.rotation);
-        if(!origState){
-            return;
+    img.onload = function(){
+        if(img.naturalWidth/img.naturalHeight > div.width()/div.height()){
+            canvas.width = img.naturalWidth;
+            canvasScale = img.naturalWidth / div.width();
+            canvas.height = div.height()*canvasScale;
+            translate(0, (canvas.height - img.naturalHeight)/2/canvasScale);
+        } else {
+            canvas.height = img.naturalHeight;
+            canvasScale = img.naturalHeight / div.height();
+            canvas.width = div.width()*canvasScale;
+            translate((canvas.width - img.naturalWidth)/2/canvasScale, 0);
         }
-        //ctx.scale(event.scale,event.scale);
-        if(event.type == 'pan'){
-            let deltaX = event.deltaX * canvasScale;
-            let deltaY = event.deltaY * canvasScale;
-            state.centerX = origState.centerX+deltaX;
-            state.centerY = origState.centerY+deltaY;
-        }
-        else if(event.type == 'pinch' || event.type == 'rotate'){
-            let centerX = event.center.x;
-            let centerY = event.center.y;
-            let rect = canvas.getBoundingClientRect();
-            centerX -= rect.left;
-            centerY -= rect.top;
-            state.offsetX = (origState.offsetX-(centerX-origState.centerX))*event.scale;
-            state.offsetY = (origState.offsetY-(centerY-origState.centerY))*event.scale;
-            state.centerX = centerX;
-            state.centerY = centerY;
 
-            state.scale = origState.scale*event.scale;
-            state.rotate = origState.rotate + event.rotation;
-        }
         repaint();
     }
+
+    //img.src = 'ionic/images/qrCode.png';
+    img.src = 'ionic/images/logo_text.png';
+    //img.src = 'ionic/images/backgroud.png';
 }
