@@ -12,23 +12,26 @@ if (groups) {
 
 var prefers = [
   {
-    title: "到达时间",
+    title: "[交通]到达时间",
     value: '{"name": "arrivalTime", "options": {"begin": "开始时间,格式YYYY-MM-DD HH:mm +0800", "end": "最晚时间", "outScore": "如果不在这个时间段内得分"}}'
   },
   {
-    title: "舱位",
+    title: "[交通]舱位",
     value: '{"name": "cabin", "options": {"expectCabins": ["期望的舱位","仓位2","舱位3"], "score": "符合舱位得分"}}'
   },
   {
-    title: "廉价航空",
+    title: "[交通]廉价航空",
     value: '{"name": "cheapSupplier", "options": {"score": "如果在廉价航空中得分"}}'
   },{
-    title: "出发时间",
+    title: "[交通]出发时间",
     value: '{"name": "departTime", "options": {"begin": "开始时间", "end": "最晚时间", "score": "符合时间得分"}}'
   },
   {
-    title: "交通方式",
+    title: "[交通]交通方式",
     value: '{"name": "selectTraffic", "options": {"selectTrainDuration": 360, "selectFlightDuration": 210, "score": 500}}'
+  },{
+    title: "[酒店]星级",
+    value: '{"name": "starMatch", "options": {"expectStar": 3, "score": 500}}'
   }
 ]
 
@@ -70,6 +73,9 @@ function renderBudget(id) {
       return;
     }
   });
+  if (budget.type) {
+    $("#budgetType").val(budget.type);
+  }
   if (budget.query) {
     $("#query").val(JSON.stringify(budget.query));
   }
@@ -114,7 +120,8 @@ function calBudget() {
   var query = $("#query").val();
   var policy = $("#policy").val();
   var prefers = $("#prefers").val();
-  $.post('/api/budgets?key='+key, {originData: originData, query: query, policy: policy, prefers: prefers}, function(result) {
+  var type = $("#budgetType").val();
+  $.post('/api/budgets?key='+key, {originData: originData, query: query, policy: policy, prefers: prefers, type: type}, function(result) {
     $("#result").val(JSON.stringify(result));
     $("#calBudgetBtn").attr("disabled", false);
   }, "json")

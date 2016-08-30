@@ -7,7 +7,7 @@
 import {IFinalTicket} from 'api/_types/travelbudget';
 import {AbstractPrefer} from "./index";
 
-class AgentPrefer extends AbstractPrefer {
+class AgentPrefer extends AbstractPrefer<IFinalTicket> {
 
     private expectedAgents: string[];
     private score: number;

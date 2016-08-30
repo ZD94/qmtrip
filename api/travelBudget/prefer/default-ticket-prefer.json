@@ -4,14 +4,14 @@
     "options": {
       "score": -100,
       "begin": "",
-      "end": "<%=leaveDate%> 21:00"
+      "end": "<%=leaveDate%> <%=latestArrivalTime%>"
     }
   },
   {
     "name": "departTime",
     "options": {
       "score": -100,
-      "begin": "<%=leaveDate%> 09:00",
+      "begin": "<%=leaveDate%> <%=leaveTime%>",
       "end": ""
     }
   },

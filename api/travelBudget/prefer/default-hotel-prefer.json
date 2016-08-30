@@ -1,0 +1,9 @@
+[
+  {
+    "name":"starMatch",
+    "options": {
+      "expectStar": 3,
+      "score": 500
+    }
+  }
+]

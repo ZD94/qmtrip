@@ -6,7 +6,7 @@
 import {IFinalTicket} from "api/_types/travelbudget";
 import {AbstractPrefer} from "./index";
 
-class ArrivalTimePrefer extends AbstractPrefer {
+class ArrivalTimePrefer extends AbstractPrefer<IFinalTicket> {
 
     private begin: Date;
     private end: Date;

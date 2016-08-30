@@ -9,7 +9,7 @@ import {AbstractPrefer} from "./index";
  * 仓位信息打分
  * * * * * * * * */
 
-class CabinPrefer extends AbstractPrefer {
+class CabinPrefer extends AbstractPrefer<IFinalTicket> {
 
     private expectCabins;
     private score;
