@@ -377,41 +377,16 @@ class ApiTravelBudget {
         if (!params.latestArrivalTime) {
             params.latestArrivalTime = '21:00'
         }
-        // if (!qs.prefers) {
         qs.prefers = loadDefaultPrefer(params);
-        // }
-        //原始查询
+        qs.prefers = qs.prefers.map( (p) => {
+            if (p.name == 'cabin') {
+                p.options['expectCabins'] = _.concat(cabinClass, trainCabins)
+            }
+            return p;
+        })
         qs.query = params;
         qs.query.originPlace = m_originCity;
         qs.query.destination = m_destination;
-
-        let arrivalPrefer = {
-            name: 'arrivalTime',
-            options: {
-                "begin": `${params.leaveDate} ${params.leaveTime}`,
-                "end": `${params.leaveDate} ${params.latestArrivalTime}`,
-            }
-        };
-        let cabinPrefer = {
-            name: 'cabin',
-            options: {
-                "expectCabins": _.concat(cabinClass, trainCabins),
-            }
-        }
-        qs.prefers = qs.prefers.map( (p) => {
-            if (p.name == arrivalPrefer.name) {
-                for(let k in arrivalPrefer.options) {
-                    p.options[k] = arrivalPrefer.options[k];
-                }
-            }
-            if (p.name == cabinPrefer.name) {
-                for(let k in cabinPrefer.options) {
-                    p.options[k] = cabinPrefer.options[k];
-                }
-            }
-            return p;
-        });
-        console.info("原始查询条件:",qs.prefers);
         let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
         let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
         return strategy.getResult(tickets);
