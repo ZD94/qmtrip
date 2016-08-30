@@ -270,8 +270,8 @@ class ApiTravelBudget {
             let obj = API.plae.getCityInfo({cityCode: businessDistrict});
             gps = [obj.latitude, obj.longitude];
         }
-
-        let qs = {
+        let qs: any = {};
+        let query = {
             maxMoney: policy.hotelPrice,
             star: hotelStar,
             cityId: cityId,
@@ -281,10 +281,11 @@ class ApiTravelBudget {
             checkInDate: checkInDate,
             checkOutDate: checkOutDate
         }
-
-        let hotels = await API.hotel.search_hotels(qs);
-        let strategy = new CommonHotelStrategy(hotels, cache);
-        let budget = await strategy.getResult(qs);
+        qs.prefers = loadDefaultPrefer(query, 'hotel');
+        qs.query = query;
+        let hotels = await API.hotel.search_hotels(query);
+        let strategy = new CommonHotelStrategy(qs, {isRecord: true});
+        let budget = await strategy.getResult(hotels);
         budget.type = EInvoiceType.HOTEL;
         return budget;
     }

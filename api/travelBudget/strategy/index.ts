@@ -13,37 +13,6 @@ export interface IStrategy {
      getResult(params: any): Promise<any>;
 }
 
-export abstract class AbstractHotelStrategy implements IStrategy {
-    protected hotels: IHotel[];
-    private _key: string;
-    protected storage: IStorage;
-
-    constructor(hotels: IHotel[], storage: IStorage) {
-        this.hotels = hotels;
-        this.storage = storage;
-        this._key = 'ID' + Date.now() + Math.ceil(Math.random() * 1000);
-    }
-
-    async _begin(params: any): Promise<any> {
-        console.log(`${this._key}开始于:${Date.now()}`);
-        return null;
-    }
-
-    async _end(data: any): Promise<any> {
-        console.log(`${this._key}结束于:${Date.now()}`);
-        return null;
-    }
-
-    abstract buildProcess(params: any): Promise<any>;
-
-    async getResult(params: any): Promise<any> {
-        this._begin(params);
-        let result = await this.buildProcess(params);
-        this._end(result);
-        return result;
-    }
-}
-
 function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
     let _tickets : IFinalTicket[] = [];
     //把数据平铺
@@ -76,59 +45,11 @@ function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
     return _tickets;
 }
 
-export class CommonHotelStrategy extends AbstractHotelStrategy {
-
-    constructor(hotels: IHotel[], storage: IStorage) {
-        super(hotels, storage);
-    }
-
-    async buildProcess(params: {longitude: number, latitude: number, star: number}):Promise<TravelBudgeItem> {
-        const defaultPrice = {
-            "5": 500,
-            "4": 450,
-            "3": 400,
-            "2": 350
-        }
-
-        if (!this.hotels || !this.hotels.length) {
-            return {
-                price: defaultPrice[params.star]
-            } as TravelBudgeItem;
-        }
-
-        const BLACKLIST_SCORE = 500;
-        const STAR_MATCH = 1000;
-        const REPRESENT = 500;
-
-        let hotels = formatHotel(this.hotels);
-        hotels = hotelPrefer.blacklist(hotels, BLACKLIST_SCORE);
-        hotels = hotelPrefer.starmatch(hotels, params.star, STAR_MATCH);
-        hotels = hotelPrefer.represent(hotels, REPRESENT);
-
-        hotels.sort( (v1, v2) => {
-            //优先按照积分排序
-            let diff = v2.score - v1.score;
-            if (diff) return diff;
-            //然后按照价格排序
-            return v2.price - v1.price;
-        });
-        let hotel = hotels[0];
-        return {
-            name: hotel.name,
-            agent: hotel.agent,
-            price: hotel.price,
-            latitude: hotel.latitude,
-            longitude: hotel.longitude,
-        } as TravelBudgeItem;
-    }
-}
-
-
 function formatHotel(hotels: IHotel[]) : IFinalHotel[] {
     let _hotels: IFinalHotel[] = [];
     for(let i=0, ii=hotels.length; i<ii; i++) {
         let hotel = hotels[i]
-        let agents = hotel.agents;
+        let agents = hotel.agents || hotel['agent'];
         for(var j=0, jj=agents.length; j< jj; j++) {
             _hotels.push({
                 name: hotel.name,
@@ -144,9 +65,116 @@ function formatHotel(hotels: IHotel[]) : IFinalHotel[] {
     return _hotels;
 }
 
+abstract class AbstractHotelStrategy {
+    private prefers: IPrefer<IFinalHotel>[];
+    private _id: string;
+    private isRecord: boolean;
+
+    constructor(public qs: any, options: any) {
+        if (options && options.isRecord) {
+            this.isRecord = true;
+        } else {
+            this.isRecord = false;
+        }
+        let d = new Date();
+        this._id = `ID${d.getFullYear()}${d.getMonth()+1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}${Math.ceil(Math.random() * 1000)}`;
+        this.prefers = [];
+    }
+
+    addPrefer(p: IPrefer<IFinalHotel>) {
+        this.prefers.push(p);
+    }
+
+    async getMarkedScoreHotels(hotels: IFinalHotel[]) :Promise<IFinalHotel[]> {
+        let self = this;
+        self.prefers.forEach( async (p) => {
+            hotels = await p.markScore(hotels);
+        })
+        return hotels;
+    }
+
+    abstract async customMarkedScoreData(hotels: IFinalHotel[]) :Promise<IFinalHotel[]>;
+
+    async getResult(hotels: IHotel[]): Promise<TravelBudgeItem> {
+        let _hotels = formatHotel(hotels);
+        if (!_hotels || !_hotels.length) {
+            const defaultPrice = {
+                "5": 500,
+                "4": 450,
+                "3": 400,
+                "2": 350
+            }
+            return {
+                price: defaultPrice[this.qs.star]
+            }
+        }
+
+        _hotels = await this.getMarkedScoreHotels(_hotels);
+        _hotels.sort( (v1, v2) => {
+            return v2.score - v1.score;
+        });
+        _hotels = await this.customMarkedScoreData(_hotels);
+        let ret = _hotels[0];
+        let result = {
+            price: ret.price,
+            agent: ret.agent,
+            name: ret.name,
+            star: ret.star,
+            latitude: ret.latitude,
+            longitude: ret.longitude,
+            id: this._id,
+        }
+
+        if (this.isRecord) {
+            console.info(this.qs);
+            let travelBudgetLog = await Models.travelBudgetLog.create({});
+            travelBudgetLog.title = `[住宿]${this.qs.query.cityId}-(${this.qs.query.checkInDate})`
+            travelBudgetLog.prefers = this.qs.prefers;
+            travelBudgetLog.query = this.qs.query;
+            travelBudgetLog.originData = hotels;
+            travelBudgetLog.type = 2;
+            travelBudgetLog.result = result;
+            travelBudgetLog.markedData = _hotels;
+            await travelBudgetLog.save();
+        }
+        return result;
+    }
+}
+
+export class CommonHotelStrategy extends AbstractHotelStrategy {
+
+    constructor(public qs: any, options: any) {
+        super(qs, options);
+    }
+
+    async customMarkedScoreData(hotels:IFinalHotel[]):Promise<IFinalHotel[]> {
+        hotels.sort ( (v1, v2) => {
+            let diff = v2.score - v1.score;
+            if (diff) return diff;
+            return v1.price - v2.price;
+        })
+        return hotels;
+    }
+}
+
+export class HighPriceHotelStrategy extends AbstractHotelStrategy {
+
+    constructor(public qs: any, options: any) {
+        super(qs, options);
+    }
+
+    async customMarkedScoreData(hotels: IFinalHotel[]): Promise<IFinalHotel[]> {
+        hotels.sort( (v1, v2) => {
+            let diff = v2.score - v1.score;
+            if (diff) return diff;
+            return v1.price - v2.price;
+        })
+        return hotels;
+    }
+}
 
 abstract class AbstractTicketStrategy {
-    private prefers: IPrefer[];
+    private prefers: IPrefer<IFinalTicket>[];
     private _id: string;
     private isRecord: boolean;
 
@@ -162,7 +190,7 @@ abstract class AbstractTicketStrategy {
         this.prefers = [];
     }
 
-    addPrefer(p: IPrefer) {
+    addPrefer(p: IPrefer<IFinalTicket>) {
         this.prefers.push(p);
     }
 
@@ -177,7 +205,6 @@ abstract class AbstractTicketStrategy {
     abstract async customerMarkedScoreData(tickets: IFinalTicket[]): Promise<IFinalTicket[]>;
 
     async getResult(tickets: ITicket[]) :Promise<TravelBudgeItem> {
-        let travelBudgetLog = await Models.travelBudgetLog.create({});
         let _tickets = formatTicketData(tickets);
         if (!_tickets || !_tickets.length) {
             return {
@@ -204,6 +231,7 @@ abstract class AbstractTicketStrategy {
             arrivalDateTime: ret.arrivalDateTime,
         }
         if (this.isRecord) {
+            let travelBudgetLog = await Models.travelBudgetLog.create({});
             travelBudgetLog.title = `[交通]${this.qs.query.originPlace.name}-${this.qs.query.destination.name}(${this.qs.query.leaveDate})`
             travelBudgetLog.prefers = this.qs.prefers;
             travelBudgetLog.query = this.qs.query;
