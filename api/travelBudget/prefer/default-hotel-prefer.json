@@ -2,7 +2,7 @@
   {
     "name":"starMatch",
     "options": {
-      "expectStar": 3,
+      "expectStar": "<%=star%>",
       "score": 500
     }
   }
