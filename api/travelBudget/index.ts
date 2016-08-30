@@ -15,7 +15,7 @@ const utils = require("common/utils");
 import _ = require("lodash");
 import {ITicket, TravelBudgeItem} from "api/_types/travelbudget";
 import {
-    CommonHotelStrategy, TrafficBudgetStrategyFactory
+    CommonHotelStrategy, TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
 import {loadDefaultPrefer} from "./prefer/index";
 
@@ -284,7 +284,7 @@ class ApiTravelBudget {
         qs.prefers = loadDefaultPrefer(query, 'hotel');
         qs.query = query;
         let hotels = await API.hotel.search_hotels(query);
-        let strategy = new CommonHotelStrategy(qs, {isRecord: true});
+        let strategy = await HotelBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
         let budget = await strategy.getResult(hotels);
         budget.type = EInvoiceType.HOTEL;
         return budget;
@@ -468,7 +468,7 @@ class ApiTravelBudget {
         })
 
         app.post('/api/budgets', _auth_middleware, async function(req, res, next) {
-            let {query, prefers, policy, originData} = req.body;
+            let {query, prefers, policy, originData, type} = req.body;
             let qs = {
                 policy: policy,
                 prefers: JSON.parse(prefers),
@@ -476,7 +476,8 @@ class ApiTravelBudget {
             }
 
             try {
-                let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs, {isRecord: false});
+                let factory = (type == 1) ? TrafficBudgetStrategyFactory : HotelBudgetStrategyFactory;
+                let strategy = await factory.getStrategy(qs, {isRecord: false});
                 let result = await strategy.getResult(JSON.parse(originData));
                 res.json(result);
             } catch(err) {

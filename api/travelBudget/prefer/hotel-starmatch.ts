@@ -4,21 +4,36 @@
 
 'use strict';
 import {IFinalHotel} from "api/_types/travelbudget";
+import {AbstractPrefer} from "./index";
 
 
-function starMatch(hotels: IFinalHotel[], expectStar: number, score: number) {
-    console.info(`期望星级:${expectStar}`)
-    hotels = hotels.map( (v) => {
-        if (!v.score) v.score = 0;
-        if (!v.reasons) v.reasons = [];
+class StarMatchPrefer extends AbstractPrefer<IFinalHotel> {
 
-        if (v.star == expectStar) {
-            v.score += score;
-            v.reasons.push(`符合星级标准+${score}`);
+    private score: number;
+    private expectStar:number;
+    
+    constructor(name, options) {
+        super(name, options);
+        if (!this.score) {
+            this.score = 0;
         }
-        return v;
-    })
-    return hotels;
+    }
+    
+    async markScoreProcess(hotels:IFinalHotel[]):Promise<IFinalHotel[]> {
+        let self = this;
+        hotels = hotels.map( (v) => {
+            if (!v.score) v.score = 0;
+            if (!v.reasons) v.reasons = [];
+
+            if (v.star == self.expectStar) {
+                v.score += self.score;
+                v.reasons.push(`符合星级标准+${self.score}`);
+            }
+            return v;
+        })
+        return hotels;
+    }
+    
 }
 
-export= starMatch;
+export= StarMatchPrefer;

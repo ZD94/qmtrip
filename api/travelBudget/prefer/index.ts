@@ -12,7 +12,7 @@ export interface IPrefer<T> {
     markScore(tickets: T[]): Promise<T[]>;
 }
 
-export abstract class AbstractPrefer implements IPrefer<IFinalTicket> {
+export abstract class AbstractPrefer<T> implements IPrefer<T> {
     constructor(public name: string, options: any) {
         if (options) {
             for(let k in options) {
@@ -20,10 +20,10 @@ export abstract class AbstractPrefer implements IPrefer<IFinalTicket> {
             }
         }
     }
-    abstract async markScoreProcess(tickets: IFinalTicket[]) : Promise<IFinalTicket[]>;
-    async markScore(tickets: IFinalTicket[]): Promise<IFinalTicket[]> {
+    abstract async markScoreProcess(data: T[]) : Promise<T[]>;
+    async markScore(data: T[]): Promise<T[]> {
         console.log(`. BEGIN ${this.name}`);
-        let ret = await this.markScoreProcess(tickets);
+        let ret = await this.markScoreProcess(data);
         console.log(`. END ${this.name}`);
         return ret;
     }
@@ -47,6 +47,10 @@ export var hotelPrefer = {
     represent: require('./hotel-represent'),
     starmatch: require('./hotel-starmatch'),
     maxpricelimit: require('./hotel-maxpricelimit')
+}
+
+export var hotelPrefers = {
+    starMatch: require('./hotel-starmatch'),
 }
 
 export var ticketPrefers = {

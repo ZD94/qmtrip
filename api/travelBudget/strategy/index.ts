@@ -4,7 +4,7 @@
 
 'use strict';
 import {ITicket, IFinalTicket, TRAFFIC, TravelBudgeItem, IHotel, IFinalHotel} from "api/_types/travelbudget";
-import {hotelPrefer, ticketPrefers} from '../prefer'
+import {hotelPrefer, ticketPrefers, hotelPrefers} from '../prefer'
 import {EInvoiceType} from "api/_types/tripPlan";
 import {IStorage} from '../storage';
 import {IPrefer} from '../prefer'
@@ -276,7 +276,6 @@ export class HighPriceTicketStrategy extends AbstractTicketStrategy {
 }
 
 export class TrafficBudgetStrategyFactory {
-
     static async getStrategy(qs, options) {
         let policy = qs.policy;
         let prefers = qs.prefers;  //保存的是企业打分参数信息
@@ -299,11 +298,25 @@ export class TrafficBudgetStrategyFactory {
     }
 }
 
+export class HotelBudgetStrategyFactory {
+    static async getStrategy(qs, options) {
+        let policy = qs.policy;
+        let prefers = qs.prefers;
+        let strategy = new CommonHotelStrategy(qs, options);
+        for(let p of prefers) {
+            let prefer = PreferFactory.getPrefer(p.name, p.options, 'hotel');
+            if (!prefer) continue;
+            strategy.addPrefer(prefer);
+        }
+        return strategy;
+    }
+}
+
 class PreferFactory {
-    static getPrefer(name, options) {
-        let cls = ticketPrefers[name]
+    static getPrefer(name, options, type?: string) {
+        let cls = type == 'hotel' ? hotelPrefers[name]: ticketPrefers[name];
         if (cls && typeof cls == 'function') {
-            return new (ticketPrefers[name])(name, options);
+            return new (cls)(name, options);
         }
         return null;
     }
