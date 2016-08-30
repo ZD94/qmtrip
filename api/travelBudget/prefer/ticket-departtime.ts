@@ -38,16 +38,16 @@ class DepartTimePrefer extends AbstractPrefer {
             if (d1) {
                 let _d1 = d1.valueOf();
                 if (_d1 - d > 0) {
-                    v['score'] -= score;
-                    v['reasons'].push(`出发时间早于规定时间 -${score}`)
+                    v['score'] += score;
+                    v['reasons'].push(`出发时间早于规定时间 ${score}`)
                 }
             }
 
             if (d2) {
                 let _d2 = d2.valueOf();
                 if (d - _d2> 0) {
-                    v['score'] -= score;
-                    v['reasons'].push(`出发时间晚于规定时间 -${score}`)
+                    v['score'] += score;
+                    v['reasons'].push(`出发时间晚于规定时间 ${score}`)
                 }
             }
             return v;
