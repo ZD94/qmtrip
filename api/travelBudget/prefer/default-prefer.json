@@ -1,0 +1,46 @@
+[
+  {
+    "name": "arrivalTime",
+    "options": {
+      "score": -100,
+      "begin": "",
+      "end": "<%=leaveDate%> 21:00"
+    }
+  },
+  {
+    "name": "departTime",
+    "options": {
+      "score": -100,
+      "begin": "<%=leaveDate%> 09:00",
+      "end": ""
+    }
+  },
+  {
+    "name": "cabin",
+    "options": {
+      "score": 500
+    }
+  },
+  {
+    "name": "selectTraffic",
+    "options": {
+      "selectTrainDuration": 360,
+      "selectFlightDuration": 210,
+      "score": 500,
+      "commonTrainScore": -1000
+    }
+  },
+  {
+    "name": "preferAgent",
+    "options": {
+      "expectedAgents": ["ctrip", "携程", "同城", "南航", "中航", "中国航空公司"],
+      "score": 100
+    }
+  },
+  {
+    "name": "cheapSupplier",
+    "options": {
+      "score": -100
+    }
+  }
+]

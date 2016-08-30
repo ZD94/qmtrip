@@ -4,6 +4,8 @@
 
 'use strict';
 import {IFinalTicket} from "../../_types/travelbudget";
+import _ = require("lodash");
+var defaultPrefer = require('./default-prefer.json');
 
 export interface IPrefer {
     markScore(tickets: IFinalTicket[]): Promise<IFinalTicket[]>;
@@ -26,14 +28,21 @@ export abstract class AbstractPrefer implements IPrefer {
     }
 }
 
-export var ticketPrefer = {
-    lowestprice: require('./ticket-lowestprice'),
-    maxpricelimit: require('./ticket-maxpricelimit'),
-    selecttraffic: require('./ticket-selecttraffic'),
-    priceprefer: require('./ticket-priceprefer'),
-    preferagent: require('./ticket-preferagent'),
-    preferaircompany: require('./ticket-preferaircompany')
-};
+export function loadDefaultPrefer(qs) {
+    console.info(qs)
+    let _prefers = JSON.stringify(defaultPrefer);
+    let _compiled = _.template(_prefers);
+    return JSON.parse(_compiled(qs));
+}
+
+// export var ticketPrefer = {
+//     lowestprice: require('./ticket-lowestprice'),
+//     maxpricelimit: require('./ticket-maxpricelimit'),
+//     selecttraffic: require('./ticket-selecttraffic'),
+//     priceprefer: require('./ticket-priceprefer'),
+//     preferagent: require('./ticket-preferagent'),
+//     preferaircompany: require('./ticket-preferaircompany')
+// };
 
 export var hotelPrefer = {
     lowestprice: require('./hotel-lowestprice'),

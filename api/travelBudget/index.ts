@@ -17,6 +17,7 @@ import {ITicket, TravelBudgeItem} from "api/_types/travelbudget";
 import {
     CommonHotelStrategy, TrafficBudgetStrategyFactory
 } from "./strategy/index";
+import {loadDefaultPrefer} from "./prefer/index";
 
 const defaultPrice = {
     "5": 500,
@@ -376,9 +377,9 @@ class ApiTravelBudget {
         if (!params.latestArrivalTime) {
             params.latestArrivalTime = '21:00'
         }
-        if (!qs.prefers) {
-            qs.prefers = [];
-        }
+        // if (!qs.prefers) {
+        qs.prefers = loadDefaultPrefer(params);
+        // }
         //原始查询
         qs.query = params;
         qs.query.originPlace = m_originCity;
