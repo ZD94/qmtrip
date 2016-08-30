@@ -16,9 +16,10 @@ var argv = require('yargs')
 gulplib.public_dir = 'www';
 
 gulplib.bundle_lib('browserify', {ex: true, require:[
-        'buffer', 'is-buffer', 'querystring', 'string_decoder',
-        'http', 'https', 'url',
-    'util', 'inherits', 'process', 'events', 'stream', 'zlib']});
+        'buffer', 'querystring', 'string_decoder', //'is-buffer',
+        'http', 'https', 'url', 'path',
+        'util', '_process:process', 'events', 'stream', 'zlib', 'inherits',
+]});
 gulplib.bundle_lib('update', 'cordova-app-loader/bootstrap.js', {ex: true, require: [
     'cordova-app-loader', 'cordova-promise-fs', 'common/client/updater'
 ]});
@@ -30,13 +31,13 @@ gulplib.bundle_lib('ionic', {ex: true, require: ['./common/client/ionic/entry.js
 gulplib.bundle_lib('swiper', {ex: true, require: ['swiper']});
 gulplib.bundle_lib('img', {ex: true, require: ['arale-qrcode', 'hidpi-canvas', 'exif-js', 'exif-orient']})
 gulplib.bundle_lib('base', {ex: true, require:[
-    'md5', 'moment', 'tiny-cookie', 'shoe', 'lodash', 'validator', 'scssify', 'cssify'
+    'md5', 'moment', 'printf', 'tiny-cookie', 'shoe', 'lodash', 'validator', 'scssify', 'cssify'
 ]})
 gulplib.bundle_lib('sourcemap', {ex: true, require: ['source-map-support']})
 
 gulplib.bundle_lib('preload', {ex: true, require:[
     'dyload', 'babel-polyfill', 'bluebird', 'common/ts_helper', 'common/zone',
-    'common/client/config:common/config', 
+    'common/client/config:common/config',
 ]});
 gulplib.bundle_lib('api', {require: ['common/client/api:common/api', 'common/api/helper', 'common/language']});
 gulplib.bundle_lib('calendar', {require: ['lunar-calendar', "calendar"]});
