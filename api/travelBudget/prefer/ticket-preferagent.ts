@@ -5,33 +5,44 @@
 'use strict';
 
 import {IFinalTicket} from 'api/_types/travelbudget';
+import {AbstractPrefer} from "./index";
 
-function preferagent(data: IFinalTicket[], expected: Array<string>|string, score: number) :IFinalTicket[] {
-    let expectedAgents: Array<string> = [];
-    if (typeof expected == 'string') {
-        expectedAgents.push(expected);
-    } else {
-        expectedAgents = expected;
+class AgentPrefer extends AbstractPrefer {
+
+    private expectedAgents: string[];
+    private score: number;
+
+    constructor(name, options) {
+        super(name, options);
+        if (!this.expectedAgents) {
+            this.expectedAgents = [];
+        }
+        if (!this.score) {
+            this.score = 0;
+        }
     }
 
-    data = data.map( (v) => {
-        if (!v['score']) v['score']=0;
-        if (!v.reasons) v.reasons = [];
+    async markScoreProcess(tickets: IFinalTicket[]) : Promise<IFinalTicket[]>{
+        let self = this;
+        tickets = tickets.map( (v) => {
+            if (!v['score']) v['score']=0;
+            if (!v.reasons) v.reasons = [];
 
-        let result = false;
-        expectedAgents.forEach( (agent) => {
-            if (v.agent && agent.indexOf(v.agent) >= 0) {
-                result = true;
-                return false;
+            let result = false;
+            self.expectedAgents.forEach( (agent) => {
+                if (v.agent && agent.indexOf(v.agent) >= 0) {
+                    result = true;
+                    return false;
+                }
+            });
+            if (result) {
+                v.score += self.score;
+                v.reasons.push(`期望代理商${self.score}`);
             }
+            return v;
         });
-        if (result) {
-            v.score += score;
-            v.reasons.push(`期望代理商+${score}`);
-        }
-        return v;
-    });
-    return data;
+        return tickets;
+    }
 }
 
-export= preferagent;
+export= AgentPrefer;
