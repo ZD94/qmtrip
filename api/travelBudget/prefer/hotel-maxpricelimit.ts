@@ -4,19 +4,34 @@
 
 'use strict';
 import {IFinalHotel} from "api/_types/travelbudget";
+import {AbstractPrefer} from "./index";
 
-function maxpricelimit(hotels: IFinalHotel[], maxprice: number, score: number) {
-    hotels = hotels.map( (v) => {
-        if (!v.score) v.score = 0;
-        if (!v.reasons) v.reasons=[];
+class MaxPriceLimitPrefer extends AbstractPrefer<IFinalHotel> {
 
-        if (v.price > maxprice) {
-            v.score -= score;
-            v.reasons.push(`超过限价${maxprice} -${score}`);
+    private score: number;
+    private maxPrice: number;
+
+    constructor(name, options) {
+        super(name, options);
+        if (!this.score) {
+            this.score = 0;
         }
-        return v;
-    })
-    return hotels;
+    }
+
+    async markScoreProcess(hotels: IFinalHotel[]) : Promise<IFinalHotel[]> {
+        let self = this;
+        hotels = hotels.map( (v) => {
+            if (!v.score) v.score = 0;
+            if (!v.reasons) v.reasons=[];
+
+            if (v.price > self.maxPrice) {
+                v.score += self.score;
+                v.reasons.push(`超过限价${self.maxPrice} -${self.score}`);
+            }
+            return v;
+        })
+        return hotels;
+    }
 }
 
-export= maxpricelimit;
+export= MaxPriceLimitPrefer;

@@ -42,7 +42,7 @@ export function loadDefaultPrefer(qs: any, type?: string) {
 }
 
 export var hotelPrefer = {
-    lowestprice: require('./hotel-lowestprice'),
+    lowestprice: require('./hotel-lowPrice'),
     blacklist: require('./hotel-blacklist'),
     represent: require('./hotel-represent'),
     starmatch: require('./hotel-starmatch'),
@@ -50,7 +50,10 @@ export var hotelPrefer = {
 }
 
 export var hotelPrefers = {
-    starMatch: require('./hotel-starmatch'),
+    starMatch: require('./hotel-starMatch'),
+    blackList: require('./hotel-blacklist'),
+    represent: require('./hotel-represent'),
+    maxPriceLimit: require('./hotel-maxPriceLimit')
 }
 
 export var ticketPrefers = {
