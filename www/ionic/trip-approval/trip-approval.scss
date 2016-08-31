@@ -26,6 +26,15 @@
     font-size: 16px;
     font-weight: bold;
   }
+  &.item-button-right{
+    .button{
+      font-size: 12px;
+      min-height: 20px;
+      line-height: 20px;
+      top: 12px;
+      padding: 2px 10px 1px;
+    }
+  }
 }
 .scroll-content {
   .scroll {
@@ -68,8 +77,4 @@
       }
     }
   }
-}
-
-.item-option-selected{
-  border: 1px #387ef5 solid;
 }
