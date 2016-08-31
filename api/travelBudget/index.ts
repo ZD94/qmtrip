@@ -390,7 +390,14 @@ class ApiTravelBudget {
         qs.query.destination = m_destination;
         let tickets: ITicket[] = _.concat(flightTickets, trainTickets) as ITicket[];
         let strategy = await TrafficBudgetStrategyFactory.getStrategy(qs, {isRecord: true});
-        return strategy.getResult(tickets);
+        let result =  await strategy.getResult(tickets);
+        result.cabinClass = result.cabin;
+        let fullPriceObj = await API.place.getFlightFullPrice({
+            originPlace: originPlace,
+            destination: destinationPlace,
+        });
+        result.fullPrice = fullPriceObj.EPrice;
+        return result;
     }
 
     @clientExport

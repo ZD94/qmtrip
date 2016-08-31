@@ -347,7 +347,7 @@ class TripPlanModule {
         if(company.isApproveOpen) {
             //给审核人发审核邮件
             let approveUser = tripApprove.approveUser;
-            let approve_url = `config.host + '/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
+            let approve_url = `${config.host}/index.html#/trip-approval/detail?approveId=${tripApprove.id}`;
             let approve_values = utils.clone(values);
             let shortUrl = await API.wechat.shorturl({longurl: approve_url});
             let openId = await API.auth.getOpenIdByAccount({accountId: approveUser.id});

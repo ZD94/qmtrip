@@ -5,5 +5,17 @@
       "expectStar": "<%=star%>",
       "score": 500
     }
+  },
+  {
+    "name": "represent",
+    "options": {
+      "score": 100
+    }
+  },
+  {
+    "name": "blackList",
+    "options": {
+      "score": -100
+    }
   }
 ]

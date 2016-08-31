@@ -9,7 +9,7 @@ import {
 import {MHotelLevel, MPlaneLevel, MTrainLevel} from "api/_types/travelPolicy";
 import {Staff} from "api/_types/staff";
 import moment = require('moment');
-import {stat} from "fs";
+import _ = require("lodash")
 const API = require("common/api");
 let APPROVE_TEXT: any = {};
 APPROVE_TEXT[EApproveStatus.CANCEL] = '已撤销';
