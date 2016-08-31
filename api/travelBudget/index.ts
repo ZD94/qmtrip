@@ -15,7 +15,7 @@ const utils = require("common/utils");
 import _ = require("lodash");
 import {ITicket, TravelBudgeItem} from "api/_types/travelbudget";
 import {
-    CommonHotelStrategy, TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
+    TrafficBudgetStrategyFactory, HotelBudgetStrategyFactory
 } from "./strategy/index";
 import {loadDefaultPrefer} from "./prefer/index";
 
@@ -39,7 +39,8 @@ interface BudgetOptions{
     checkInDate?: Date| string,
     checkOutDate?: Date|string,
     businessDistrict?: string,
-    staffId?: string
+    staffId?: string,
+    subsidy: any,
 }
 
 
@@ -86,7 +87,7 @@ class ApiTravelBudget {
             throw new Error(`差旅标准还未设置`);
         }
         let {leaveDate, goBackDate, isRoundTrip, originPlace, destinationPlace, checkInDate,
-            checkOutDate, businessDistrict, leaveTime, goBackTime, isNeedHotel, isNeedTraffic} = params;
+            checkOutDate, businessDistrict, leaveTime, goBackTime, isNeedHotel, isNeedTraffic, subsidy} = params;
 
         if (!Boolean(leaveDate)) {
             throw L.ERR.LEAVE_DATE_FORMAT_ERROR();
@@ -188,10 +189,22 @@ class ApiTravelBudget {
                 }
 
                 let days = moment(goBackDate).diff(moment(leaveDate), 'days');
-                if (Boolean(travelPolicy['subsidy']) && travelPolicy['subsidy'] > 0) {
+                days = days + 1;
+                if (!subsidy.hasFirstDaySubsidy) {
+                    days = days -1;
+                }
+                if (!subsidy.hasLastDaySubsidy) {
+                    days = days - 1;
+                }
+                if (days > 0) {
                     let budget: any = {};
+                    budget.fromDate = leaveDate;
+                    budget.endDate = goBackDate;
+                    budget.hasFirstDaySubsidy = subsidy.hasFirstDaySubsidy;
+                    budget.hasLastDaySubsidy = subsidy.hasLastDaySubsidy;
                     budget.tripType = ETripType.SUBSIDY;
-                    budget.price = travelPolicy['subsidy'] * (days+1);
+                    budget.price = subsidy.template.subsidyMoney * days;
+                    budget.template = {id: subsidy.template.id, name: subsidy.template.name}
                     budgets.push(budget);
                 }
                 resolve(true);
