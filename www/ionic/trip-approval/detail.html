@@ -3,9 +3,11 @@
         <div class="flex-c10">
             <ion-scroll>
                 <div class="list">
-                    <div class="item opactic">{{APPROVE_TEXT[tripApprove.status]}}
+                    <div class="item opactic item-button-right">
+                        <span ng-if="tripApprove.status != EApproveStatus.WAIT_APPROVE">{{APPROVE_TEXT[tripApprove.status]}}</span>
+                        <span ng-if="tripApprove.status == EApproveStatus.WAIT_APPROVE">等待{{tripApprove.approveUser.name}}审批</span>
                         <span ng-show="tripApprove.status==EApproveStatus.REJECT">{{tripApprove.approveRemark}}</span>
-                        <button class="btn button-positive" style="float: right" ng-click="showApproveDetails()">审批详情</button>
+                        <a class="button button-small button-calm" ng-href="#/trip-approval/approveProgress?approveId={{approveId}}">审批进度</a>
                     </div>
                 </div>
 

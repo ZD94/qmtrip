@@ -24,14 +24,14 @@ export async function ApprovedController($scope, Models, $stateParams){
     $scope.staffName = staff.name;
 }
 
-export async function DetailController($scope, Models, $stateParams, $ionicPopup, $loading, $storage){
+export async function DetailController($scope, Models, $stateParams, $ionicPopup, $loading, $storage,ngModalDlg){
     require('./trip-approval.scss');
     let approveId = $stateParams.approveId;
+    $scope.approveId =approveId;
     let tripApprove = await Models.tripApprove.get(approveId);
     $scope.staff = tripApprove.account;
     $scope.isConfirm = false;
-    $scope.APPROVE_TEXT = _.clone(APPROVE_TEXT);
-    $scope.APPROVE_TEXT[EApproveStatus.WAIT_APPROVE] = `等待 ${tripApprove.approveUser.name} 审批`;
+    $scope.APPROVE_TEXT = APPROVE_TEXT;
     $scope.EInvoiceType = EInvoiceType;
     $scope.EApproveStatus = EApproveStatus;
     $scope.MTxPlaneLevel = MTxPlaneLevel;
@@ -192,50 +192,8 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         })
     };
 
-    $scope.showApproveDetails = async function() {
-        $loading.reset();
-        $loading.start({
-            template: '请稍后...'
-        });
-        let APPROVE_LOG_TEXT = {};
-        APPROVE_LOG_TEXT[EApproveResult.AUTO_APPROVE] = '自动通过';
-        APPROVE_LOG_TEXT[EApproveResult.PASS] = '审批通过';
-        APPROVE_LOG_TEXT[EApproveResult.REJECT] = '审批驳回';
-        APPROVE_LOG_TEXT[EApproveResult.WAIT_APPROVE] = '等待审批';
-        $scope.APPROVE_LOG_TEXT = APPROVE_LOG_TEXT;
 
-        let logs = await tripApprove.getApproveLogs();
-        logs = await Promise.all(logs.map(async (a) => {
-            a.staff = await Models.staff.get(a.userId);
-            return a;
-        }));
-        $scope.logs = logs;
-        $ionicPopup.show({
-            template: `<ion-list>
-                            <ion-item ng-repeat="item in logs track by $index" style="border: none;line-height: 20px;height: 90px;border-top: 1px #808080 solid">
-                                <div><span>{{APPROVE_LOG_TEXT[item.approveStatus]}}</span><span style="float: right">{{item.staff.name}}</span></div>
-                                <div ng-if="item.approveStatus==EApproveResult.REJECT">{{item.remark || "无"}}</div>
-                                <div style="position: absolute;bottom: 10px;color: grey;">{{item.createdAt|date: 'yyyy-MM-dd hh:mm:ss'}}</div>
-                            </ion-item>
-                       </ion-list>`,
-            title: '审批详情',
-            scope: $scope,
-            buttons: [{
-                text: '确定',
-                type: 'button-positive'
-            }]
-        });
-        $loading.end();
-    };
-
-    $scope.confirmButton = function() {
-        $scope.isConfirm = true;
-        $scope.isNextApprove = false;
-
-        $scope.chooseOption = function(isNextApprove) {
-            $scope.isNextApprove = isNextApprove;
-        };
-
+    $scope.confirmButton = async function() {
         $scope.staffSelector = {
             query: async function(keyword) {
                 let staff = await Staff.getCurrent();
@@ -245,6 +203,23 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
             },
             display: (staff)=>staff.name
         };
+        var value = await ngModalDlg.selectMode($scope,$scope.staffSelector)
+        // $scope.isConfirm = true;
+        // $scope.isNextApprove = false;
+        //
+        // $scope.chooseOption = function(isNextApprove) {
+        //     $scope.isNextApprove = isNextApprove;
+        // };
+        //
+        // $scope.staffSelector = {
+        //     query: async function(keyword) {
+        //         let staff = await Staff.getCurrent();
+        //         let approveStaffId = $scope.tripApprove.account.id;
+        //         let staffs = await staff.company.getStaffs({where: {id: {$ne: staff.id}}});
+        //         return staffs;
+        //     },
+        //     display: (staff)=>staff.name
+        // };
     };
 
     $scope.cancelConfirm = function() {
@@ -410,8 +385,42 @@ export async function PendingController($scope, $stateParams){
     }
 }
 
+export async function ApproveProgressController ($scope, Models, $stateParams){
+    require('./approveProgress.scss');
+    let approveId = $stateParams.approveId;
+    let tripApprove = await Models.tripApprove.get(approveId);
+    $scope.tripApprove = tripApprove;
+    let APPROVE_LOG_TEXT = {};
+    $scope.EApproveStatus = EApproveStatus;
+    APPROVE_LOG_TEXT[EApproveResult.AUTO_APPROVE] = '自动通过';
+    APPROVE_LOG_TEXT[EApproveResult.PASS] = '审批通过';
+    APPROVE_LOG_TEXT[EApproveResult.REJECT] = '审批驳回';
+    APPROVE_LOG_TEXT[EApproveResult.WAIT_APPROVE] = '提交审批';
+    $scope.APPROVE_LOG_TEXT = APPROVE_LOG_TEXT;
+    let logs = await tripApprove.getApproveLogs();
+    logs = await Promise.all(logs.map(async (a) => {
+        a.staff = await Models.staff.get(a.userId);
+        console.log(a.remark);
+        console.info(a);
+        return a;
+    }));
+    $scope.logs = logs;
+}
+
 export function RejectReasonController($scope){
 
+    // function add($scope, a, b){
+    //     return a+b;
+    // }
+    // if(!(add($scope, 1, 2) === 3)){
+    //     throw new Error();
+    // }
+    // if(!(Function.prototype.call(add, 1, 2) === 3)){
+    //     throw new Error();
+    // }
+    // if(!($injector.invoke(add, null, {$scope: null, a:1, b:2}) === 3)){
+    //     throw new Error();
+    // }
 }
 
 export function RejectedController($scope){
