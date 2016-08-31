@@ -50,7 +50,9 @@ export var hotelPrefer = {
 }
 
 export var hotelPrefers = {
-    starMatch: require('./hotel-starmatch'),
+    starMatch: require('./hotel-starMatch'),
+    blackList: require('./hotel-blacklist'),
+    represent: require('./hotel-represent')
 }
 
 export var ticketPrefers = {

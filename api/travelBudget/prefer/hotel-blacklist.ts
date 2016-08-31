@@ -4,20 +4,35 @@
 
 'use strict';
 import {IFinalHotel} from "api/_types/travelbudget";
+import {AbstractPrefer} from "./index";
 
-function blacklist(hotels: IFinalHotel[], score: number) : IFinalHotel[] {
-    const FILTER_HOTEL_AGENTS = ['hotels.com', '好订'];
-    hotels = hotels.map( (hotel) => {
-        if (!hotel.score) hotel.score = 0;
-        if (!hotel.reasons) hotel.reasons=[];
+const BLACKLIST_HOTEL_AGENTS = ['hotels.com', '好订'];
 
-        if (FILTER_HOTEL_AGENTS.indexOf(hotel.agent) >= 0) {
-            hotel.score -= score;
-            hotel.reasons.push(`供应商黑名单-${score}`);
+class BlackListPrefer extends AbstractPrefer<IFinalHotel> {
+
+    private score:number;
+
+    constructor(name, options) {
+        super(name, options);
+        if (!this.score) {
+            this.score = 0;
         }
-        return hotel;
-    })
-    return hotels;
+    }
+
+    async markScoreProcess(hotels: IFinalHotel[]) : Promise<IFinalHotel[]> {
+        let self = this;
+        hotels = hotels.map( (hotel) => {
+            if (!hotel.score) hotel.score = 0;
+            if (!hotel.reasons) hotel.reasons=[];
+
+            if (BLACKLIST_HOTEL_AGENTS.indexOf(hotel.agent) >= 0) {
+                hotel.score += self.score;
+                hotel.reasons.push(`供应商黑名单+${self.score}`);
+            }
+            return hotel;
+        })
+        return hotels;
+    }
 }
 
-export= blacklist;
+export= BlackListPrefer;
