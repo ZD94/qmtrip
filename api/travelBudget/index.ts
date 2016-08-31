@@ -420,38 +420,13 @@ class ApiTravelBudget {
         let staff = await Staff.getCurrent();
         let content = await ApiTravelBudget.getBudgetInfo({id: budgetId, accountId: accountId});
         let budgets = content.budgets;
-        let fs = require("fs");
-        let d = new Date();
-        let prefix = `${d.getFullYear()}${d.getMonth()+1}${d.getDate()}${d.getHours()}${d.getMinutes()}`
         let ps = budgets.map( async (budget): Promise<any> => {
             if (!budget.id) {
                 return true;
             }
-            let originData = await cache.read(`${budget.id}:data`);
-            let markedData = await cache.read(`${budget.id}:marked`);
-            return Promise.all([
-                new Promise( (resolve, reject) => {
-                    //原始数据
-                    fs.writeFile(`./tmp/${prefix}-${staff.mobile}-data.json`, JSON.stringify(originData), function(err) {
-                        if (err) return reject(err);
-                        resolve(true);
-                    });
-                }),
-                new Promise( (resolve, reject) => {
-                    //打分排序后数据
-                    fs.writeFile(`./tmp/${prefix}-${staff.mobile}-marked.json`, JSON.stringify(markedData), function(err) {
-                        if (err) return reject(err);
-                        resolve(true);
-                    })
-                }),
-                new Promise( (resolve, reject) => {
-                    //预算结果
-                    fs.writeFile(`./tmp/${prefix}-${staff.mobile}-result.json`, JSON.stringify(budget), function(err) {
-                        if (err) return reject(err);
-                        resolve(true);
-                    })
-                })
-            ])
+            let log = await Models.travelBudgetLog.get(budget.id);
+            log.status = -1;
+            return log.save();
         });
         await Promise.all(ps);
         return true;

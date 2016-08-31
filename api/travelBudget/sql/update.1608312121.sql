@@ -1,0 +1,1 @@
+alter table travelbudget.travel_budget_logs add status integer default 0;
