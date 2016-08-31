@@ -48,8 +48,7 @@ export async function CreateController($scope, $storage, $loading, ngModalDlg,$i
     /*******************判断是否为第一次的登录  史聪************************/
     let staff = await Staff.getCurrent();
     let isFirstLogin = await staff.company.getTravelPolicies();
-    if(isFirstLogin.length < 1){
-        console.log('shicong');
+    if(isFirstLogin.length == 0){
         window.location.href = '#/guide/company-guide';
     }
 
