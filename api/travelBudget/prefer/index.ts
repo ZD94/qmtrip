@@ -52,7 +52,8 @@ export var hotelPrefer = {
 export var hotelPrefers = {
     starMatch: require('./hotel-starMatch'),
     blackList: require('./hotel-blacklist'),
-    represent: require('./hotel-represent')
+    represent: require('./hotel-represent'),
+    maxPriceLimit: require('./hotel-maxPriceLimit')
 }
 
 export var ticketPrefers = {
