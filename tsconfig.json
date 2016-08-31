@@ -23,7 +23,8 @@
     "public",
     "dist",
     "ionic",
-    "tmp"
+    "tmp",
+    "*.bak"
   ],
   "excludeNotUsing": [
   ]

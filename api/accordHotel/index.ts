@@ -4,7 +4,7 @@
 'use strict';
 var sequelize = require("common/model").DB;
 var DBM = sequelize.models;
-var _ = require('lodash');
+import _ = require('lodash');
 var API = require("common/api");
 let L = require("common/language");
 import {validateApi, requireParams, clientExport} from 'common/api/helper';

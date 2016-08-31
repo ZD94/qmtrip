@@ -26,3 +26,4 @@ npm-debug.log
 tools
 ionic/resources/android
 ionic/resources/ios
+*.bak
