@@ -362,7 +362,7 @@ class TripPlanModule {
             if (openId) {
                 approve_values.approveUser = approveUser.name;
                 approve_values.content = `员工${staff.name}${moment(tripApprove.startAt).format('YYYY-MM-DD')}到${tripApprove.arrivalCity}的出差计划已经发送给您，预算：￥${tripApprove.budget}，等待您审批！`;
-                // approve_values.autoApproveTime = moment(tripApprove.autoApproveTime).format(timeFormat);
+                approve_values.autoApproveTime = moment(tripApprove.autoApproveTime).format(timeFormat);
                 approve_values.staffName = staff.name;
                 approve_values.startDate = moment(tripApprove.startAt).format('YYYY.MM.DD');
                 approve_values.endDate = moment(tripApprove.backAt).format('YYYY.MM.DD');
