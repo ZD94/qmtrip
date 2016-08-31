@@ -3,7 +3,6 @@
  */
 
 'use strict';
-import {IFinalTicket} from "../../_types/travelbudget";
 import _ = require("lodash");
 var defaultTicketPrefer = require('./default-ticket-prefer.json');
 var defaultHotelPrefer = require('./default-hotel-prefer.json');
@@ -39,14 +38,6 @@ export function loadDefaultPrefer(qs: any, type?: string) {
     let _prefers = JSON.stringify(defaultPrefer);
     let _compiled = _.template(_prefers);
     return JSON.parse(_compiled(qs));
-}
-
-export var hotelPrefer = {
-    lowestprice: require('./hotel-lowPrice'),
-    blacklist: require('./hotel-blacklist'),
-    represent: require('./hotel-represent'),
-    starmatch: require('./hotel-starmatch'),
-    maxpricelimit: require('./hotel-maxpricelimit')
 }
 
 export var hotelPrefers = {

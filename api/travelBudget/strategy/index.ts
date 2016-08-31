@@ -4,14 +4,10 @@
 
 'use strict';
 import {ITicket, IFinalTicket, TRAFFIC, TravelBudgeItem, IHotel, IFinalHotel} from "api/_types/travelbudget";
-import {hotelPrefer, ticketPrefers, hotelPrefers} from '../prefer'
+import {ticketPrefers, hotelPrefers} from '../prefer'
 import {EInvoiceType} from "api/_types/tripPlan";
-import {IStorage} from '../storage';
 import {IPrefer} from '../prefer'
 import {Models} from "../../_types/index";
-export interface IStrategy {
-     getResult(params: any): Promise<any>;
-}
 
 function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
     let _tickets : IFinalTicket[] = [];
