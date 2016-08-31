@@ -2,6 +2,7 @@
 import {Staff, InvitedLink} from "api/_types/staff";
 import {TravelPolicy} from "api/_types/travelPolicy";
 import { StaffInvitedController } from '../company/controller';
+
 var printf = require('printf');
 
 const moment = require("moment");
@@ -39,6 +40,7 @@ export async function CompanyFirstController ($scope, Models, $stateParams){
         //add   shicong
         window.location.href = '#/guide/company-second';
     }
+
 }
 
 export async function CompanySecondController ($scope, $injector){
