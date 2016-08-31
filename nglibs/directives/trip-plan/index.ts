@@ -111,6 +111,13 @@ angular
                     $scope.showUploader = true;
                 }
                 $scope.days = moment($scope.item.endTime).diff(moment($scope.item.startTime), 'days');
+                $scope.subsidyDays = moment($scope.item.endTime).diff(moment($scope.item.startTime), 'days') + 1;
+                if ($scope.item.hasFirstDaySubsidy === false) {
+                    $scope.subsidyDays -= 1;
+                }
+                if ($scope.item.hasLastDaySubsidy === false) {
+                    $scope.subsidyDays -= 1;
+                }
                 $scope.viewInvoice = function(id) {
                     window.location.href="#/trip/invoice-detail?detailId="+id;
                 }

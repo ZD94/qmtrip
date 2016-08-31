@@ -101,10 +101,21 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
                 break;
             case ETripType.HOTEL:
                 budget.city = tripApprove.arrivalCity;
+                budget.duringDays = moment(tripApprove.backAt).diff(moment(tripApprove.startAt), 'days');
                 hotel.push(budget);
                 hotelBudget += Number(budget.price);
                 break;
-            case ETripType.SUBSIDY: subsidy.push(budget); subsidyBudget += Number(budget.price); break;
+            case ETripType.SUBSIDY:
+                budget.duringDays = moment(tripApprove.backAt).diff(moment(tripApprove.startAt), 'days') + 1;
+                if (budget.hasFirstDaySubsidy === false) {
+                    budget.duringDays -= 1;
+                }
+                if (budget.hasLastDaySubsidy === false) {
+                    budget.duringDays -= 1;
+                }
+                subsidy.push(budget);
+                subsidyBudget += Number(budget.price);
+                break;
         }
     });
 
@@ -243,7 +254,6 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
     };
     
     $scope.confirmApprove = function() {
-        console.info("approveUserName=>", $scope.tripApprove.approveUser.name);
         approve(EApproveResult.PASS);
     };
 

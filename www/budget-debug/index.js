@@ -62,13 +62,29 @@ function renderBudgetSelect() {
     var idx = 0;
     var options = budgets.map( function(v) {
       idx++;
+      var tag;
+      var icon = v.status == -1 ? '&times;': '&radic;'
+      var val = icon + '' + v.title;
       if (idx == 1) {
-        return '<option value="'+v.id+'" selected="selected" >' + v.title + '</option>';
+        tag = wrapTag('option', { value: v.id, selected: "selected"}, val);
+      } else {
+        tag = wrapTag('option', {value: v.id}, val);
       }
-      return '<option value="'+v.id+'" >' + v.title + '</option>';
+      return tag;
     });
     options.reverse()
     $("#budgetItemsSelect").html(options);
+}
+
+function wrapTag(name, options, value) {
+  var tag = '<'+name;
+  for(var k in options) {
+    tag += ' ' + k + '="' + options[k]+'" ';
+  }
+  tag += '>';
+  tag += value;
+  tag += '</' + name+'>';
+  return tag;
 }
 
 function renderBudget(id) {
