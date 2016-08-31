@@ -224,7 +224,8 @@ abstract class AbstractTicketStrategy {
             id: this._id,
             departDateTime: ret.departDateTime,
             arrivalDateTime: ret.arrivalDateTime,
-        }
+        } as TravelBudgeItem;
+
         if (this.isRecord) {
             let travelBudgetLog = await Models.travelBudgetLog.create({});
             travelBudgetLog.title = `[交通]${this.qs.query.originPlace.name}-${this.qs.query.destination.name}(${this.qs.query.leaveDate})`
