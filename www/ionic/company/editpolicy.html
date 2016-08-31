@@ -1,49 +1,7 @@
 <ion-view title="编辑差旅标准" id="page31">
     <ion-content padding="true" class="has-header">
         <form class="list">
-            <label class="item item-input item-input-right">
-                <span class="input-label">标准名称</span>
-                <input type="text" placeholder="请输入标准名称" ng-model="travelPolicy.name">
-            </label>
-            <label class="item item-input item-select">
-                <span class="input-label">飞机舱位</span>
-                <select ng-model="travelPolicy.planeLevel">
-                    <option value="1" ng-selected="travelPolicy.planeLevel == 1">公务舱/头等舱</option>
-                    <option value="2"  ng-selected="travelPolicy.planeLevel == 2">经济舱</option>
-                </select>
-            </label>
-            <!--<label class="item item-input item-select">
-                <span class="input-label">飞机折扣</span>
-                <select ng-model="travelPolicy.planeDiscount" ng-options="discount.value as discount.text for discount in discounts">
-                </select>
-            </label>-->
-            <label class="item item-input item-select">
-                <span class="input-label">火车</span>
-                <select ng-model="travelPolicy.trainLevel">
-                    <option value="1" ng-selected="travelPolicy.trainLevel == 1">商务座/高级软卧</option>
-                    <option value="2" ng-selected="travelPolicy.trainLevel == 2">一等座/软卧</option>
-                    <option value="3" ng-selected="travelPolicy.trainLevel == 3">二等座/硬卧</option>
-                </select>
-            </label>
-            <label class="item item-input item-select">
-                <span class="input-label">酒店星级</span>
-                <select ng-model="travelPolicy.hotelLevel">
-                    <option value="5" ng-selected="travelPolicy.hotelLevel == 5">国际五星</option>
-                    <option value="4" ng-selected="travelPolicy.hotelLevel == 4">高端商务</option>
-                    <option value="3" ng-selected="travelPolicy.hotelLevel == 3">精品连锁</option>
-                    <option value="2" ng-selected="travelPolicy.hotelLevel == 2">快捷连锁</option>
-                </select>
-            </label>
-            <!--<label class="item item-input">
-                <span class="input-label">每日标准</span>
-                <input type="text" placeholder="元/晚" ng-model="travelPolicy.hotelPrice">
-            </label>-->
-            <div class="spacer" style="width: 300px; height: 18px;"></div>
-            <!--<label class="item item-input">
-                <span class="input-label">补助</span>
-                <input type="text" placeholder="元/天" ng-model="travelPolicy.subsidy">
-            </label>-->
-
+            <ng-include src="'ionic/company/editpolicy.content.html'"></ng-include>
             <label class="item item-input item-icon-right" ng-click="subsidyTemplateList()">
                 <span class="input-label">补助模板</span>
                 <i class="icon ion-chevron-right"></i>

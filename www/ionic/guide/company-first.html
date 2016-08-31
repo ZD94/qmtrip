@@ -7,34 +7,7 @@
         <p style="color:white">该标准将作为被邀请员工新加入企业时的默认标准，进入系统后，可以给差旅标准追加补助模板</p>
         <div class="spacer" style="height:20px"></div>
         <form class="list">
-            <label class="item item-input item-input-right">
-                <span class="input-label">标准名称</span>
-                <input type="text" placeholder="请输入名称" ng-model="travelPolicy.name">
-            </label>
-            <label class="item item-input item-select">
-                <span class="input-label">飞机舱位</span>
-                <select ng-model="travelPolicy.planeLevel">
-                    <option value="1" ng-selected="travelPolicy.planeLevel == 1">公务舱/头等舱</option>
-                    <option value="2"  ng-selected="travelPolicy.planeLevel == 2">经济舱</option>
-                </select>
-            </label>
-            <label class="item item-input item-select">
-                <span class="input-label">火车</span>
-                <select ng-model="travelPolicy.trainLevel">
-                    <option value="1" ng-selected="travelPolicy.trainLevel == 1">商务座/高级软卧</option>
-                    <option value="2" ng-selected="travelPolicy.trainLevel == 2">一等座/软卧</option>
-                    <option value="3" ng-selected="travelPolicy.trainLevel == 3">二等座/硬卧</option>
-                </select>
-            </label>
-            <label class="item item-input item-select">
-                <span class="input-label">酒店星级</span>
-                <select ng-model="travelPolicy.hotelLevel">
-                    <option value="5" ng-selected="travelPolicy.hotelLevel == 5">国际五星</option>
-                    <option value="4" ng-selected="travelPolicy.hotelLevel == 4">高端商务</option>
-                    <option value="3" ng-selected="travelPolicy.hotelLevel == 3">精品连锁</option>
-                    <option value="2" ng-selected="travelPolicy.hotelLevel == 2">快捷连锁</option>
-                </select>
-            </label>
+            <ng-include src="'ionic/company/editpolicy.content.html'"></ng-include>
         </form>
         <div class="spacer" style="height:30px"></div>
         <a class="button button-calm button-block" ng-click="savePolicy()">下一步</a>
