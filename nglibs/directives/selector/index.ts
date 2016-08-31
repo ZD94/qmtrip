@@ -13,26 +13,26 @@ angular
                 noticeMsg: '@dlgNoticeMsg',
                 title: '@dlgTitle',
                 placeholder: '@dlgPlaceholder',
-                options: '=dlgOptions'
+                opts: '=dlgOptions'
             },
             controller: function($scope, $element, ngModalDlg) {
                 $scope.displayItem = function(item) {
-                    if(item && $scope.options && $scope.options.display) {
-                        return $scope.options.display(item, false);
+                    if(item && $scope.opts && $scope.opts.display) {
+                        return $scope.opts.display(item, false);
                     }
                     return item;
                 };
                 $scope.showSelectorDlg = async function() {
-                    $scope.options.title = $scope.title;
-                    $scope.options.placeholder = $scope.placeholder;
-                    $scope.options.noticeMsg = $scope.noticeMsg;
-                    var value: any = await ngModalDlg.selectFromList($scope, $scope.options, $scope.value)
+                    $scope.opts.title = $scope.title;
+                    $scope.opts.placeholder = $scope.placeholder;
+                    $scope.opts.noticeMsg = $scope.noticeMsg;
+                    var value: any = await ngModalDlg.selectFromList($scope, $scope.opts, $scope.value)
                     if(value == undefined)
                         return;
                     $scope.value = value;
 
-                    if($scope.options.done && typeof $scope.options.done == 'function') {
-                        return $scope.options.done(value);
+                    if($scope.opts.done && typeof $scope.opts.done == 'function') {
+                        return $scope.opts.done(value);
                     }
                 };
             }

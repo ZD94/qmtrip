@@ -1,12 +1,11 @@
-<ion-modal-view>
-    <ion-header-bar class="bar-stable">
+<ion-modal-view class="modal-popup">
+    <ion-header-bar class="bar-light">
         <h1 class="title">{{options.title}}</h1>
-        <div class="button button-clear" ng-click="modal.hide()">取消</div>
     </ion-header-bar>
-    <ion-content padding="false" scroll="false" class="has-header ng-modal-select-list">
+    <ion-content padding="true" scroll="false" class="has-header ng-modal-select-list">
         <ion-list show-delete="false">
             <ion-item ng-click="chooseOption(false)" ng-class="{true: '', false: 'item-option-selected'}[isNextApprove]">直接同意</ion-item>
-            <ion-item ng-click="chooseOption(true)" ng-class="{true: 'item-option-selected', false: ''}[isNextApprove]" style="border-top: 1px #387ef5 solid">
+            <ion-item ng-click="chooseOption(true)" ng-class="{true: 'item-option-selected', false: ''}[isNextApprove]">
                 <span class="input-label">同意并转给</span>
                 <ng-selector-list style="float: right;"
                                   ng-model="tripApprove.approveUser"
@@ -19,8 +18,8 @@
         </ion-list>
 
         <div class="button-bar">
-            <a ng-click="cancelConfirm()" class="button button-assertive  button-block">取消</a>
-            <a ng-click="confirmApprove()" class="button button-positive  button-block">确认</a>
+            <a ng-click="modal.hide()" class="button button-outline button-positive  button-block">取消</a>
+            <a ng-click="confirmApprove();" class="button button-positive  button-block">确认</a>
         </div>
     </ion-content>
 </ion-modal-view>
