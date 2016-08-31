@@ -32,6 +32,12 @@ var prefers = [
   },{
     title: "[酒店]星级",
     value: '{"name": "starMatch", "options": {"expectStar": 3, "score": 500}}'
+  },{
+    title: "[酒店]代表性酒店",
+    value: '{"name": "represent", "options": {"score": 100}}'
+  },{
+    title: "[酒店]黑名单",
+    value: '{"name": "blackList", "options": {"score": -100}}'
   }
 ]
 
