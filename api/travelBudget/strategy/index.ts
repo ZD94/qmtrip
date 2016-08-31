@@ -4,14 +4,10 @@
 
 'use strict';
 import {ITicket, IFinalTicket, TRAFFIC, TravelBudgeItem, IHotel, IFinalHotel} from "api/_types/travelbudget";
-import {hotelPrefer, ticketPrefers, hotelPrefers} from '../prefer'
+import {ticketPrefers, hotelPrefers} from '../prefer'
 import {EInvoiceType} from "api/_types/tripPlan";
-import {IStorage} from '../storage';
 import {IPrefer} from '../prefer'
 import {Models} from "../../_types/index";
-export interface IStrategy {
-     getResult(params: any): Promise<any>;
-}
 
 function formatTicketData(tickets: ITicket[]) : IFinalTicket[] {
     let _tickets : IFinalTicket[] = [];
@@ -150,7 +146,7 @@ export class CommonHotelStrategy extends AbstractHotelStrategy {
         hotels.sort ( (v1, v2) => {
             let diff = v2.score - v1.score;
             if (diff) return diff;
-            return v1.price - v2.price;
+            return v2.price - v1.price;
         })
         return hotels;
     }
@@ -228,7 +224,8 @@ abstract class AbstractTicketStrategy {
             id: this._id,
             departDateTime: ret.departDateTime,
             arrivalDateTime: ret.arrivalDateTime,
-        }
+        } as TravelBudgeItem;
+
         if (this.isRecord) {
             let travelBudgetLog = await Models.travelBudgetLog.create({});
             travelBudgetLog.title = `[交通]${this.qs.query.originPlace.name}-${this.qs.query.destination.name}(${this.qs.query.leaveDate})`

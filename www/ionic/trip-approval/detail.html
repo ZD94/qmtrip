@@ -57,7 +57,7 @@
                         </span>
                         {{item.price == -1 ? '暂无预算' : (item.price| currency: '')+'元'}}<br/>
                         <span ng-if="item.fullPrice">
-                            折扣：{{item.fullPrice > item.price ? ((item.price/item.fullPrice)*100).toFixed(2)+'%' : '100%'}}<br/>
+                            折扣：{{item.fullPrice > item.price ? ((item.price/item.fullPrice)* 10).toFixed(1)+'折' : '全价'}}<br/>
                         </span>
                         <!--<div class="item-note">{{APPROVE_TEXT[tripApprove.status]}}</div>-->
                     </ion-item>
