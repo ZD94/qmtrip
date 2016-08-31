@@ -13,7 +13,7 @@ const REFERENCE_HOTELS_PRICE = {
     "5": [ '万丽', '喜来登', '希尔顿', '皇冠假日', 'JW万豪', '威斯汀', '康莱德', '洲际酒店']
 }
 
-class RepresentPrefer extends AbstractPrefer {
+class RepresentPrefer extends AbstractPrefer<IFinalHotel> {
 
     private score: number;
 
@@ -24,7 +24,7 @@ class RepresentPrefer extends AbstractPrefer {
         }
     }
 
-    async makeScoreProcess(hotels: IFinalHotel[]) : Promise<IFinalHotel[]> {
+    async markScoreProcess(hotels: IFinalHotel[]) : Promise<IFinalHotel[]> {
         let self = this;
         hotels = hotels.map( (v) => {
             if (!v.score) v.score = 0;
