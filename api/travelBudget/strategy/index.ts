@@ -146,7 +146,7 @@ export class CommonHotelStrategy extends AbstractHotelStrategy {
         hotels.sort ( (v1, v2) => {
             let diff = v2.score - v1.score;
             if (diff) return diff;
-            return v1.price - v2.price;
+            return v2.price - v1.price;
         })
         return hotels;
     }
