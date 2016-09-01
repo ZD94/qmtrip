@@ -27,7 +27,6 @@ export async function CompanyFirstController ($scope, Models, $stateParams){
         travelPolicy.planeLevel = 2;
         travelPolicy.trainLevel = 3;
         travelPolicy.hotelLevel = 2;
-        console.log(travelPolicy)
     }
     $scope.travelPolicy = travelPolicy;
     $scope.savePolicy = async function () {
