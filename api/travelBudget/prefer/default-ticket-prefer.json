@@ -11,7 +11,7 @@
     "name": "departTime",
     "options": {
       "score": -100,
-      "begin": "<%=leaveDate%> <%=leaveTime%>",
+      "begin": "<%=leaveDate%> <%=earliestLeaveTime%>",
       "end": ""
     }
   },

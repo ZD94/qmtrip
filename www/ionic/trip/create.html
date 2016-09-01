@@ -3,10 +3,8 @@
         <form class="list">
             <div class="item item-input">
                 <span class="input-label">出差日期</span>
-                <!--<input type="date" placeholder="" min="{{minStDate}}" id="beginDate" ng-model="trip.beginDate" ng-change="checkDate(true)">-->
                 <fake-input value="{{trip.beginDate|date:'yyyy-MM-dd HH:mm'}}" placeholder="请选择出差日期" ng-click="selectDatespan()">
                 </fake-input>
-                <!--<div date-picker id="beginDate"></div>-->
             </div>
             <div class="item item-input">
                 <span class="input-label">结束日期</span>
@@ -16,9 +14,6 @@
                         dlg-title="请选择结束日期"
                         class="fake-input"
                 ></ng-selector-date>
-                <!--
-      <input type="date" min="{{minEndDate}}" placeholder="" id="endDate" ng-model="trip.endDate" ng-change="checkDate()">
- -->
             </div>
             <div class="item item-input">
                 <span class="input-label">出差地点</span>
