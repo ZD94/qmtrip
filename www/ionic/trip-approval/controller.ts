@@ -229,6 +229,7 @@ export async function DetailController($scope, Models, $stateParams, $ionicPopup
         var value = await ngModalDlg.selectMode($scope,$scope.staffSelector);
         if(value){
             $scope.isNextApprove = value.isNextApprove;
+            $scope.isHasPermissionApprove = isHasPermissionApprove;
             approve(value.result);
         }
         // $scope.isConfirm = true;
